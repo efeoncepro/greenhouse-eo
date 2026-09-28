@@ -3,7 +3,9 @@
  *
  * - En una `Proposal`, el `evidenceRef` es un `evidence_id` de su `proposal_evidence`. Una referencia que no existe
  *   aborta como en `assertEvidenceAllowedForAudience`: una evidencia inventada no «se omite», es un error.
- * - Un deck `client_facing` nunca usa evidencia `internal` (`internal-evidence`, error).
+ * - Ningún deck usa evidencia `internal`, ni siquiera uno interno (`internal-evidence`, error). Un deck de «La órbita»
+ *   es material para mostrar hacia afuera y el binder no puede saber qué significa un número: la evidencia interna es
+ *   donde vive el costo cargado y el margen, y así ninguno llega a una lámina (decisión del operador 2026-09-28).
  * - Una cifra propia necesita evidencia `measured`; un caso, un testimonio o un logo de tercero, `attested` con su
  *   documento de respaldo (`source_asset_id`). `illustrative` nunca liga un slot real.
  * - Fuera de una `Proposal`, una cifra puede venir del intent con un asset de respaldo verificado; la autorización de
@@ -58,13 +60,13 @@ export const checkEvidence = (sources: DeckBindingSources, evidenceRef: string, 
     }
   }
 
-  if (sources.audience === 'client_facing' && evidence.audience !== 'client_facing') {
+  if (evidence.audience !== 'client_facing') {
     return {
       ok: false,
       reason: 'internal-evidence',
       issue: {
         code: 'binding-internal-evidence',
-        detail: `La evidencia «${ref}» es interna: un deck para el cliente con una sola evidencia interna no compone.`
+        detail: `La evidencia «${ref}» es interna: un deck nunca usa evidencia interna, ni siquiera uno interno, y con una sola no compone.`
       }
     }
   }

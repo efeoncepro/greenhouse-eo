@@ -596,8 +596,10 @@ de las 78 recetas tenga binder o exclusión.
 
 Reglas que no se negocian:
 
-- **Audiencia:** un deck `client_facing` con una sola evidencia `internal` no compone (`binding-internal-evidence`);
-  además, toda evidencia ligada pasa por el gate canónico `assertEvidenceAllowedForAudience`.
+- **Audiencia:** ningún deck usa evidencia `internal`, ni siquiera uno interno: con una sola, no compone
+  (`binding-internal-evidence`). El binder no sabe qué significa un número y la evidencia interna es donde vive el costo
+  cargado y el margen (decisión del operador 2026-09-28). Además, toda evidencia ligada pasa por el gate canónico
+  `assertEvidenceAllowedForAudience` como artefacto `client_facing`.
 - **Evidencia inventada:** un `evidenceRef` que no es de la propuesta (o, fuera de una, un asset que no existe) es
   `binding-evidence-unknown` y el deck no compone.
 - **Fuera de una `Proposal`** (brochure, pitch o QBR de marca propia) sólo liga una cifra con un asset de respaldo vivo

@@ -366,7 +366,7 @@ mano: se ligan desde Greenhouse, y lo que hayas escrito en ellos se reemplaza po
 |---|---|---|
 | `no-evidence` | la cifra no tiene evidencia `measured` válida | registra la evidencia medida o quita la cifra |
 | `no-authorization` | el logo, la cita, la foto o la cifra de un caso no tiene evidencia `attested` con documento | registra la autorización con su documento |
-| `internal-evidence` | la evidencia es interna y el deck va al cliente: **no compone** | usa una evidencia `client_facing` o quita el dato |
+| `internal-evidence` | la evidencia es interna: **ningún deck la usa**, ni siquiera uno interno, y no compone | usa una evidencia `client_facing` o quita el dato |
 | `no-on-dark-logo` / `no-logo` | Account 360 no tiene el logo del cliente (o su versión para fondo oscuro) | súbelo en la organización del cliente |
 | `below-minimum` | el muro tiene menos logos autorizados de los que muestra la lámina (9) | autoriza más logos o usa otra lámina |
 | `not-in-quote` | la frase destacada no es un fragmento literal de la cita | copia la frase tal cual de la cita |

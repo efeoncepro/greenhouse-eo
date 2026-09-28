@@ -159,8 +159,18 @@ describe('audiencia fail-closed', () => {
     expect(result.ok).toBe(false)
   })
 
-  it('en un deck interno la evidencia interna sí liga', () => {
+  // Decisión del operador 2026-09-28: el binder no sabe qué significa un número y la evidencia interna es donde vive el
+  // costo cargado y el margen, así que ni un deck interno la usa.
+  it('tampoco un deck interno usa evidencia interna', () => {
     const result = bindDeckSlotsWith(plan(slide('content-focus')), sources([figure('f1', 'content-focus', 'proof', 'prev-internal')], { audience: 'internal' }))
+
+    expect(traceOf(result.bindings, 'proof')).toMatchObject({ status: 'unbound', reason: 'internal-evidence' })
+    expect(result.issues).toContainEqual(expect.objectContaining({ code: 'binding-internal-evidence', severity: 'error' }))
+    expect(result.ok).toBe(false)
+  })
+
+  it('en un deck interno la evidencia visible para el cliente sí liga', () => {
+    const result = bindDeckSlotsWith(plan(slide('content-focus')), sources([figure('f1', 'content-focus', 'proof', 'prev-m1')], { audience: 'internal' }))
 
     expect(traceOf(result.bindings, 'proof')?.status).toBe('bound')
   })

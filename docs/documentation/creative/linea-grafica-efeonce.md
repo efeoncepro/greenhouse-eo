@@ -508,7 +508,8 @@ clientes y partners, los montos y el equipo— ya no se copian a mano: se **liga
 cuando la portada es oscura. Cada cifra, caso o testimonio sale de la evidencia registrada en la propuesta, con su
 fuente y su fecha, y un logo o una cita de otro cliente sólo entran si su autorización quedó registrada con su
 documento. Si un dato no se puede verificar, el slot queda **sin ligar** con el motivo, y la lámina no sale: nunca se
-inventa una cifra, una cara ni un logo, y un deck para el cliente nunca usa evidencia interna.
+inventa una cifra, una cara ni un logo, y ningún deck —ni siquiera uno interno— usa evidencia interna, que es donde
+viven los costos y márgenes.
 
 Los montos siguen saliendo como `[MONTO]` hasta que la cotización congelada de la propuesta los entregue (TASK-1417), y
 la lámina de equipo espera el roster real (TASK-1418). Las láminas de muestra SEO/AEO conservan sus datos de ejemplo y

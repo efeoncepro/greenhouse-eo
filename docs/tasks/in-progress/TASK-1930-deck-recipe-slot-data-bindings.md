@@ -9,6 +9,10 @@
   de los chapter-authors, con `evidenceRef` = `evidence_id`) y la evidencia lo autoriza. Sin reader nuevo ni schema.
 - **Bug latente de TASK-1929 corregido:** `validateDeckPlan` rechazaba una lista en un slot `metric`, y
   `decision-case.stats` lleva cuatro cifras; ahora acepta una cifra o una lista y exige la fuente de cada una.
+- **Decisión del operador (2026-09-28):** ningún deck usa evidencia `internal`, ni siquiera uno interno. El binder no
+  sabe qué significa un número y la evidencia interna es donde vive el costo cargado y el margen; con esto la regla
+  «sin loaded cost ni margen en ningún slot» la garantiza el sistema y no quien arma el deck. El gate canónico
+  `assertEvidenceAllowedForAudience` corre como `client_facing` en todo deck.
 - Slices 5 y 6: `money` imprime `[MONTO]` y `team` queda `no-roster-facts` sin lógica paralela (deltas en TASK-1417 y
   TASK-1418). La task sigue `in-progress` hasta que esas dos cierren.
 
@@ -467,7 +471,7 @@ Sin flag propio: lectura pura sin consumer productivo. El cutover productivo lo 
 - [x] Logos de terceros y testimonios sólo se ligan desde evidencia `attested` con documento de respaldo (test). (`bind.test.ts` › prueba de terceros.)
 - [x] Ningún slot ni rastro contiene loaded cost, margen ni PII fuera de nombre, rol y dedicación (test anti-leak). (`bind.test.ts` › anti-leak: sólo campos permitidos de cada hecho.)
 - [ ] Los binders de montos y equipo importan los hechos de TASK-1417 y TASK-1418 sin recalcularlos (o el slice queda abierto con `Status real` que lo dice). **Abierto:** TASK-1417 y TASK-1418 siguen `to-do`; `money` imprime `[MONTO]` y `team` queda `no-roster-facts`, sin lógica paralela. `Status real` lo dice.
-- [x] Hay evidencia de una corrida `--bind` contra una `Proposal` de staging registrada en el cierre. (2026-09-28, instancia compartida dev/staging por proxy, sólo lectura, perfil `runtime`: `prop-5965260d-1345-4ed1-9956-d6d7f0628000` «SKY — Gestión del blog 2026», 4 evidencias. Con `client_facing`: la única `measured` es interna (costo cargado del equipo) → `internal-evidence` + `binding-internal-evidence`; las tres `attested` no tienen documento → `no-authorization`; el cliente no tiene logo en Account 360 → `no-logo`; `$3.500.000` → `[MONTO]`; `ok=false`. Con `internal`: la cifra liga desde `proposal-evidence` con su `asOf` 2026-07-12. No había una propuesta con evidencia `measured` client-facing ni `attested` con documento: el camino positivo completo está en `golden.test.ts`.)
+- [x] Hay evidencia de una corrida `--bind` contra una `Proposal` de staging registrada en el cierre. (2026-09-28, instancia compartida dev/staging por proxy, sólo lectura, perfil `runtime`: `prop-5965260d-1345-4ed1-9956-d6d7f0628000` «SKY — Gestión del blog 2026», 4 evidencias. Con `client_facing`: la única `measured` es interna (costo cargado del equipo) → `internal-evidence` + `binding-internal-evidence`; las tres `attested` no tienen documento → `no-authorization`; el cliente no tiene logo en Account 360 → `no-logo`; `$3.500.000` → `[MONTO]`; `ok=false`. Con `internal` primero ligó; tras la decisión del operador del mismo día (ningún deck usa evidencia interna) la re-corrida queda `internal-evidence` también en el deck interno. No había una propuesta con evidencia `measured` client-facing ni `attested` con documento: el camino positivo completo está en `golden.test.ts`.)
 - [x] README del catálogo, manual y doc funcional describen qué slot sale de qué fuente. (README 1.8 «Datos reales por slot», manual 1.7 paso 5b, funcional 1.16 delta (c).)
 
 ## Verification
@@ -499,6 +503,6 @@ Sin flag propio: lectura pura sin consumer productivo. El cutover productivo lo 
 - ~~¿La autorización de uso de un logo de cliente vale por deck o es permanente hasta revocarse?~~ **Resuelta
   2026-09-28:** por `Proposal` (evidencia `attested` con documento). Fuera de una propuesta no hay autorización de
   terceros (`no-authorization`); la permanente es la biblioteca del follow-up.
-- ¿Cuál es el mínimo de logos para que `content-clients` componga sin verse vacío? **Provisional 2026-09-28:** el de la
-  lámina aprobada, nueve (`LOGO_WALL_MIN` en `bindings/map.ts`), también para `content-partners`. Pendiente de que el
-  operador lo confirme o lo baje.
+- ~~¿Cuál es el mínimo de logos para que `content-clients` componga sin verse vacío?~~ **Resuelta 2026-09-28 (operador):**
+  nueve, las celdas de la lámina aprobada (`LOGO_WALL_MIN` en `bindings/map.ts`), también para `content-partners`. Con
+  menos logos autorizados se usa otra lámina de prueba (caso o testimonio), no un muro más chico.

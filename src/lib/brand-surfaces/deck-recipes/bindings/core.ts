@@ -119,8 +119,9 @@ export const bindDeckSlotsWith = (plan: DeckPlan, sources: DeckBindingSources): 
     }
   }
 
-  // Defensa en profundidad: toda evidencia ligada pasa por el gate canónico de audiencia de Proposal Studio.
-  if (sources.proposal && sources.audience === 'client_facing') {
+  // Defensa en profundidad: toda evidencia ligada pasa por el gate canónico de audiencia de Proposal Studio como
+  // artefacto `client_facing`, también en un deck interno (ningún deck usa evidencia interna).
+  if (sources.proposal) {
     const referenced = [...new Set(bindings.filter(entry => entry.source === 'proposal-evidence').flatMap(entry => entry.evidenceRefs ?? []))]
 
     assertEvidenceAllowedForAudience(

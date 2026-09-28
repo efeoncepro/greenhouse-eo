@@ -97,7 +97,7 @@ export type DeckBindingContext =
       kind: 'proposal'
       ownerOrgId: string
       proposalId: string
-      /** A quién va el deck: `client_facing` rechaza toda evidencia `internal`. */
+      /** A quién va el deck. Ninguno usa evidencia `internal`: ni siquiera un deck interno (2026-09-28). */
       audience: ProposalAudience
       facts?: DeckSlotFact[]
     }
