@@ -151,7 +151,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -164,7 +164,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-031`
-- Status real: `2026-09-27: Slices 1–9 commiteados en develop local (sin push): manifiesto, tokens, 26 plantillas aprobadas en 3 catálogos, mapper con rotación y contrato AXIS, 9 validadores, pnpm glitch:compose (PDF 10 págs, sueltas, 18 overlays, procedencia reproducible), gate --catalog=glitch 26 frames a 0 px. Slice 10 (docs) hecho. pnpm test completo verde (1863 archivos, 15910 tests); gate global sin frames de Glitch en rojo. Falta: visto bueno del operador a render.minInkTileRatio, pnpm build (requiere autorización), closure-check`
+- Status real: `2026-09-27: COMPLETE en develop local (sin push). 26 plantillas aprobadas en glitch-carousel/-stills/-overlays, mapper con rotación y contrato AXIS, 9 validadores, pnpm glitch:compose (PDF LinkedIn 10 págs, sueltas, 18 overlays con alfa, procedencia reproducible), gate --catalog=glitch 26 frames a 0 px. pnpm test completo verde, pnpm build verde, docs:closure-check verde. render.minInkTileRatio aprobado por el operador. Ruta productiva: TASK-1921; publicación fuera de alcance.`
 - Rank: `TBD`
 - Domain: `content|creative|platform`
 - Blocked by: `none`
@@ -830,10 +830,10 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 - [x] `edition-17.example.json` usa titulares de ejemplo marcados como tales y fotos sintéticas propias; ningún archivo
       de terceros entra al repo.
       — Evidencia: titulares con «[Ejemplo]», licencia `generated`, fotos dibujadas por `scripts/glitch/make-example-photos.ts` (`--check` sin drift).
-- [ ] Los tres catálogos (`glitch-carousel` `pdf-merged`, `glitch-stills` `png-set`, `glitch-overlays` `png-set`)
+- [x] Los tres catálogos (`glitch-carousel` `pdf-merged`, `glitch-stills` `png-set`, `glitch-overlays` `png-set`)
       comparten un mismo `templatesDir` y ningún archivo del motor cambia (`git diff` vacío en
       `src/lib/artifact-composer/*.ts`).
-      — Sin tildar: la parte de los catálogos se cumple (`glitch-catalogs.test.ts`), pero el motor SÍ cambió: `render.minInkTileRatio` en `contracts.ts`/`render.ts` (ver Delta de cierre de ejecución). Espera visto bueno del operador.
+      — Evidencia: los catálogos comparten `templatesDir` (`glitch-catalogs.test.ts`). Excepción aprobada por el operador (2026-09-27): el motor cambia en un solo campo acotado, `render.minInkTileRatio` en `contracts.ts`/`render.ts` (ver Delta de cierre de ejecución).
 - [x] Una plantilla pedida a un catálogo al que no pertenece falla con `glitch.catalog-membership`.
       — Evidencia: `glitch-catalogs.test.ts` › glitch.catalog-membership.
 - [x] Las seis plantillas aprobadas (`CoverPhoto`, `CoverType`, `CoverMosaic`, `Interior`, `InteriorOpening`,
@@ -892,11 +892,11 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [x] TASK-1924 recibió un `## Delta` con la forma final del manifiesto y la ruta de `computeByteFracture`

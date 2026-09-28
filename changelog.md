@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-27 — Una edición de Glitch se compone con `pnpm glitch:compose` (TASK-1923)
+
+- Tres catálogos de Glitch sobre una carpeta (`glitch-carousel`, `glitch-stills`, `glitch-overlays`, 26 plantillas
+  aprobadas): el carrusel de LinkedIn, los banners del blog (16:9, 1:1 y de noticia), la portada del reel, la miniatura
+  del vlog y los overlays del video en PNG con alfa.
+- El comando lee `GlitchEditionManifest`, elige la portada por rotación, valida cada lámina con `efeonce.glitch-line`,
+  desarma las fotos en bytes sin tocar rostros y verifica los límites de LinkedIn. El contrato de plantilla del motor
+  suma `render.minInkTileRatio` (aprobado). Detalle: [manual](docs/manual-de-uso/creative/componer-una-edicion-de-glitch.md).
+  Local en `develop`; la ruta productiva es TASK-1921.
+
 ## 2026-09-27 — El deck y el brochure de «La órbita» se componen con `pnpm brand:compose` (TASK-1927)
 
 - Greenhouse consume `efeonce.surface-composition` 0.1.2 (AXIS `v0.3.14`). El catálogo `graphic-line-deck` pasa de 6 a
@@ -605,12 +615,3 @@ escena y se lo pase al modelo como imagen 1, sin dejar que el modelo dibuje las 
 El recorte de fondo suma una opción opt-in para el caso de objeto claro sobre fondo oscuro: vacía los huecos pasantes
 (ventanas, cortes) que el matting dejaba opacos mostrando el fondo de estudio, con borde suave y sin halo. Reemplaza el
 script de corrida de la nave de Efeonce 3D y reproduce el mismo alfa en sus finales aprobados.
-
-## 2026-09-17 — LicitaLAB: CLI `pnpm licitalab` y flujo agéntico de licitaciones públicas
-
-Nuevo cliente canónico `src/lib/commercial/tenders/licitalab/client.ts` sobre el MCP de LicitaLAB y CLI con tres
-credenciales: API key en Secret Manager (`documents`, `ask-docs`, `support`), sesión OAuth de usuario de 7 días
-automatizada con Playwright (`opportunity`, `provider`; la key responde `unsupported`) y el radar web existente,
-ahora con `--headless/--no-login`, detrás de `search [--match] [--enrich]`. Verificado en vivo (20 recomendadas
-enriquecidas; 175 del listado completo). Receta 0 en la skill de licitaciones y manual
-`revisar-licitaciones-licitalab-con-cli.md`. El agente nunca ingresa la contraseña: renovar sesiones es del operador.

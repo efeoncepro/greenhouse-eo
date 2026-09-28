@@ -305,7 +305,7 @@ exploración y no se componen.
 > Detalle técnico: [norma §9.1 Qué ya se compone en el Artifact Composer](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#91-qué-ya-se-compone-en-el-artifact-composer-task-1923) ·
 > paso a paso en [Componer una edición de Glitch con `pnpm glitch:compose`](../../manual-de-uso/creative/componer-una-edicion-de-glitch.md) ·
 > [ADR, flujo de composición](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#decisión-propuesta--flujo-de-composición) ·
-> [TASK-1923](../../tasks/in-progress/TASK-1923-glitch-artifact-composer-catalogs.md) · código en
+> [TASK-1923](../../tasks/complete/TASK-1923-glitch-artifact-composer-catalogs.md) · código en
 > `src/lib/glitch-composition/` y `src/lib/artifact-composer/catalogs/glitch/`
 
 ## Dónde está cada cosa
