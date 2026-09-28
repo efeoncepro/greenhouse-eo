@@ -16,6 +16,16 @@ Las rutas conocidas pero todavía no autorizadas viven en el
 
 ## Flujos disponibles
 
+### Identidad y evolución de la herramienta
+
+La CLI tiene una versión SemVer independiente de Greenhouse. `pnpm dataforseo -- version` muestra la vigente y
+`--json` entrega el historial completo. Los recibos JSON incluyen `cliVersion`, de modo que una observación puede
+atribuirse al contrato que la produjo. El registro canónico vive en `data/dataforseo/cli-versions.json`.
+
+Una capacidad compatible incrementa `minor`; un fix o guardrail compatible incrementa `patch`; un cambio que
+rompe comandos, flags, outputs o checkpoints incrementa `major`. Las correcciones puramente editoriales no crean
+releases vacías. El digest gateado obliga a registrar cualquier cambio material en las fuentes de la CLI.
+
 ### Research SEO/SERP
 
 `research` combina descubrimiento de keywords, métricas, cobertura propia, competidores y SERP. Antes de comprar

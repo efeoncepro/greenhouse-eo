@@ -303,6 +303,11 @@ Grupo Berel):
   completo: `docs/manual-de-uso/growth/dataforseo-cli.md`. Contrato técnico:
   `docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md`.
 
+  **Versión de la herramienta:** antes de cambiar la CLI, lee `pnpm dataforseo -- version --json`. Toda mejora
+  material debe terminar con `dataforseo:version:bump` (`major` incompatible, `minor` capacidad compatible,
+  `patch` fix compatible) y `dataforseo:version:check`; los recibos JSON conservan `cliVersion`. No uses la
+  versión de `package.json` como identidad de esta herramienta ni crees releases por correcciones editoriales.
+
   **Separación de lentes:** GSC es medición de primera parte del sitio (clicks,
   impresiones, CTR y posición observados); DataForSEO es estimación de mercado y
   observación del proveedor. No las promedies, fusiones ni uses una para rellenar la

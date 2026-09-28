@@ -1,5 +1,12 @@
 # TASK-1935 — CLI diaria y catálogo completo de DataForSEO
 
+## Delta 2026-09-28 — contrato SemVer y registro de releases
+
+La CLI alcanza `1.0.0` con fuente única en `data/dataforseo/cli-versions.json`, historial backfilled de sus seis
+etapas de implementación, digest SHA-256 de fuentes gobernadas y comandos `version`, `version:check` y
+`version:bump`. Los recibos JSON declaran `cliVersion`; `local:check` falla si cambia la implementación sin bump,
+resumen, cambios y referencias. El ADR, documentación funcional, manual y skills definen `major|minor|patch`.
+
 ## Delta 2026-09-28 — evidencia consolidada de pruebas productivas
 
 La [auditoría transversal de la CLI](../../audits/seo/2026-09-28-dataforseo-cli-production-validation.md)

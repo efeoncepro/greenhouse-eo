@@ -58,6 +58,70 @@ keywords. Inventario oficial, autorización Greenhouse y disponibilidad runtime 
     `async_provider_result`, `cached_provider_result` o `not_returned`. Una task fallida conserva su código y raw,
     pero no produce filas que aparenten una ausencia orgánica.
 
+## Architecture Decision 2026-09-28 — versionamiento de la CLI
+
+- **Status:** Accepted
+- **Owner:** Growth SEO / Platform
+- **Scope:** `pnpm dataforseo`, sus comandos compuestos, presets, recibos y fuentes gobernadas.
+- **Reversibility:** two-way
+- **Confidence:** high
+- **Validated as of:** 2026-09-28
+
+### Context
+
+La CLI seguirá recibiendo mejoras incrementales de distintos agentes. El historial Git permite reconstruirlas,
+pero no entrega una identidad de producto visible en los artefactos ni bloquea que cambie un comando sin registrar
+el nuevo contrato.
+
+### Decision
+
+`data/dataforseo/cli-versions.json` es la fuente única de versión e historial. Usa SemVer sin prefijo: `major`
+para incompatibilidades, `minor` para capacidades compatibles y `patch` para fixes o guardrails compatibles. Cada
+release declara fecha, resumen, cambios y referencias. El registro es append-only: una corrección crea otra
+release; no reescribe una entrada publicada.
+
+Las fuentes declaradas en `governedPaths` producen un SHA-256 determinista. `pnpm dataforseo:version:check`
+compara el árbol actual con `sourceDigest` y falla si cambió sin bump. `pnpm local:check` ejecuta este gate. El
+workflow autorizado es:
+
+```bash
+pnpm dataforseo:version:bump -- patch \
+  --summary "Corrección breve" \
+  --change "Qué comportamiento cambió" \
+  --ref "TASK-###"
+```
+
+El comando calcula la siguiente versión, agrega la release y actualiza el digest; rechaza releases vacías cuando
+las fuentes no cambiaron. `pnpm dataforseo -- version --json` expone el registro y los recibos JSON de ejecución
+incluyen `cliVersion`. Correcciones editoriales puras, sin cambio en fuentes gobernadas ni contrato operativo, no
+crean una versión vacía.
+
+### Alternatives Considered
+
+- Usar la versión raíz de `package.json`: se descartó porque versiona todo Greenhouse, no esta herramienta.
+- Confiar sólo en commits/changelog: se descartó porque no genera identidad visible ni un gate de drift.
+- Mantener una constante sin historial: se descartó porque permite subirla sin explicar el cambio.
+
+### Consequences
+
+Todo cambio material en la CLI debe elegir explícitamente su compatibilidad y dejar un registro. El digest no
+pretende demostrar corrección funcional: los tests, lint y typecheck siguen siendo obligatorios. Los cambios en el
+transporte compartido que no modifiquen las fuentes gobernadas requieren criterio del owner para decidir si alteran
+el comportamiento observable de la CLI y, en ese caso, un bump acompañado de una modificación gobernada.
+
+### Runtime Contract
+
+- Registro canónico: `data/dataforseo/cli-versions.json`.
+- Loader/validador: `src/lib/ai/dataforseo-cli-version.ts`.
+- Gate y bump: `scripts/dataforseo/version-contract.mjs`.
+- Comandos: `dataforseo:version:check`, `dataforseo:version:bump` y `dataforseo -- version`.
+
+### Revisit When
+
+- La CLI se distribuye como paquete/binario independiente.
+- Se necesitan prereleases, múltiples líneas soportadas o migraciones automáticas de checkpoints entre majors.
+- El conjunto de fuentes gobernadas deja de representar el comportamiento observable.
+
 ## Technical architecture
 
 ```text
@@ -66,6 +130,7 @@ documentación oficial DataForSEO
         ▼
 data/dataforseo/endpoints.v3.json
         │
+        ├── cli-versions.json ─ SemVer + historial + digest
         ├── catalog search/list/describe
         ├── quick ── presets + market resolver
         ├── run ──── payload JSON genérico
@@ -89,10 +154,13 @@ data/dataforseo/endpoints.v3.json
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `scripts/dataforseo/generate-catalog.ts`                       | Lee REST WordPress y documentación renderizada oficiales, normaliza rutas v3 concretas y escribe/comprueba el snapshot. |
 | `scripts/dataforseo/generate-enablement-register.ts`           | Genera y comprueba el registro exhaustivo de rutas `catalog_only`, propósito eventual y postura de habilitación.        |
+| `scripts/dataforseo/version-contract.mjs`                       | Valida SemVer/digest y ejecuta bumps append-only sin releases vacías.                                                   |
 | `data/dataforseo/endpoints.v3.json`                            | Inventario versionado con digest, método, path, campos, modo y estado ejecutable. Es evidencia, no autorización.        |
+| `data/dataforseo/cli-versions.json`                             | Fuente única de versión, fuentes gobernadas e historial de releases de la CLI.                                          |
 | `GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md` | Backlog trazable de rutas no autorizadas; no es allowlist ni roadmap comprometido.                                      |
 | `src/lib/ai/dataforseo-catalog.ts`                             | Loader tipado, búsqueda y mapeo de la familia del proveedor al allowlist cerrado de Greenhouse.                         |
 | `src/lib/ai/dataforseo-cli-presets.ts`                         | Builders pequeños para operaciones frecuentes; la identidad de mercado sale de `src/lib/growth/markets`.                |
+| `src/lib/ai/dataforseo-cli-version.ts`                         | Loader tipado y validación estructural/semántica del registro SemVer.                                                    |
 | `src/lib/ai/dataforseo-keyword-research.ts`                    | Plan, estimación, payloads, extracción/deduplicación y CSV del flujo compuesto de keywords.                             |
 | `src/lib/ai/dataforseo-research-checkpoint.ts`                 | Fingerprints, runId, cache con TTL, resume tenant-safe y escritura atómica de pasos/tasks/costo.                        |
 | `src/lib/ai/dataforseo-ai-research.ts`                         | Contrato de panel AI, requests por lane y matriz normalizada API vs consumer surface.                                   |
@@ -106,6 +174,12 @@ La CLI consume estos contratos. No es dueña de credenciales, autorización de f
 persistencia productiva.
 
 ## Command and execution contracts
+
+### Version
+
+`version` y `--version` leen la identidad canónica sin llamar a DataForSEO. `--json` entrega el historial
+machine-readable. Todo recibo JSON de ejecución añade `cliVersion`; CSV conserva su schema específico y debe
+viajar junto al JSON cuando la versión sea necesaria para reproducibilidad.
 
 ### Catalog
 
@@ -259,6 +333,7 @@ también corrige las conclusiones de cobertura que no declararon el dominio can�
 ## Fitness functions
 
 - `pnpm dataforseo:catalog:check` detecta drift.
+- `pnpm dataforseo:version:check` impide cambios en fuentes gobernadas sin bump e historial.
 - `pnpm exec tsx scripts/dataforseo/generate-enablement-register.ts --check` fuerza paridad byte-for-byte entre
   el snapshot y el registro de rutas no autorizadas.
 - Tests comprueban rutas diarias, allowlist, Perú→2604, AI guards, research, estados task y GET sin body/retry.

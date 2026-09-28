@@ -12,7 +12,32 @@ Evidencia de campo: [validación transversal del 2026-09-28](../../audits/seo/20
 
 ```bash
 pnpm dataforseo -- help
+pnpm dataforseo -- version
 ```
+
+## Versionar una mejora de la CLI
+
+La versión vigente, el digest y el historial están en `data/dataforseo/cli-versions.json`. No edites la versión a
+mano. Después de cambiar una fuente gobernada, clasifica el cambio y ejecuta:
+
+```bash
+pnpm dataforseo:version:bump -- minor \
+  --summary "Agrega una capacidad compatible" \
+  --change "Nuevo comando o campo opcional" \
+  --ref "TASK-###"
+
+pnpm dataforseo:version:check
+pnpm dataforseo -- version --json
+```
+
+Usa `major` si un consumidor existente debe modificar comandos, flags, schema de salida o checkpoints; `minor`
+para capacidades compatibles; `patch` para fixes y guardrails compatibles. Repite `--change` y `--ref` cuando
+necesites más de uno. El bump falla si no detecta cambios en fuentes gobernadas y actualiza versión, release y
+SHA-256 en una sola escritura. Luego ejecuta tests, lint y typecheck normales; el digest no sustituye esos gates.
+
+No crees una release para typos o links que no cambian el contrato operativo. Si agregas un archivo que participa
+en el comportamiento de la CLI, incorpóralo a `governedPaths` antes del bump. `pnpm local:check` incluye el check
+de versión y bloquea un cambio material no registrado.
 
 ## Antes de empezar
 

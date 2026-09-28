@@ -12,6 +12,15 @@ Skill de dos capas, inseparables:
 
 Esta skill existe en `.claude/skills/` y `.codex/skills/` con el mismo cuerpo. **Las `references/` canónicas viven SOLO en `.claude/skills/dataforseo-operator/references/`** — ambos agentes las leen de ahí; no duplicarlas (anti-drift).
 
+### Versionamiento obligatorio de la CLI
+
+`pnpm dataforseo` tiene SemVer propio; no usa la versión raíz del repo. Antes de modificar sus comandos, flags,
+presets, outputs, checkpoints o módulos gobernados, consulta `pnpm dataforseo -- version --json`. Después del
+cambio ejecuta `pnpm dataforseo:version:bump -- major|minor|patch` con `--summary`, uno o más `--change` y
+`--ref`; nunca edites sólo `currentVersion` o el digest. `major` rompe compatibilidad, `minor` agrega capacidad
+compatible y `patch` corrige sin romper. `pnpm dataforseo:version:check` y `local:check` fallan si las fuentes
+cambian sin release. Canon: `data/dataforseo/cli-versions.json` y el ADR de la CLI.
+
 ---
 
 ## Regla cero — contrato Greenhouse (NO negociable)

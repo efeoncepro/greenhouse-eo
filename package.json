@@ -14,7 +14,7 @@
     ]
   },
   "scripts": {
-    "local:check": "pnpm nul-byte-gate && pnpm skills:mirrors && pnpm mcp:manifest:check && pnpm mcp:skills:check && pnpm vercel:reachability-gate && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
+    "local:check": "pnpm nul-byte-gate && pnpm skills:mirrors && pnpm mcp:manifest:check && pnpm mcp:skills:check && pnpm dataforseo:version:check && pnpm vercel:reachability-gate && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "local:check:full": "pnpm local:check && pnpm test && pnpm build",
     "local:check:ui": "pnpm local:check && pnpm design:lint && pnpm design-contract:lint && pnpm ui:code-lint --changed && pnpm build",
@@ -166,6 +166,8 @@
     "dataforseo": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/dataforseo/cli.ts",
     "dataforseo:catalog:sync": "tsx scripts/dataforseo/generate-catalog.ts",
     "dataforseo:catalog:check": "tsx scripts/dataforseo/generate-catalog.ts --check",
+    "dataforseo:version:check": "node scripts/dataforseo/version-contract.mjs check",
+    "dataforseo:version:bump": "node scripts/dataforseo/version-contract.mjs bump",
     "gtm:snapshot": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/gtm/snapshot.ts",
     "measurement:smoke": "node scripts/gtm/measurement-smoke.mjs",
     "growth:forms-tracking-audit": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/forms-tracking-audit.ts",

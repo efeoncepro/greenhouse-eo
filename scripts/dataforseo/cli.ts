@@ -21,6 +21,10 @@ import {
   isDataForSeoCliPreset
 } from '@/lib/ai/dataforseo-cli-presets'
 import {
+  DATAFORSEO_CLI_VERSION,
+  DATAFORSEO_CLI_VERSION_REGISTRY
+} from '@/lib/ai/dataforseo-cli-version'
+import {
   buildDataForSeoSerpCompareTasks,
   dataForSeoSerpCompareRowsToCsv,
   estimateDataForSeoSerpCompareCost,
@@ -136,7 +140,12 @@ const numberFlag = (flags: Flags, name: string): number | undefined => {
 
 const boolFlag = (flags: Flags, name: string) => flags[name] === true
 
-const printJson = (value: unknown) => process.stdout.write(`${JSON.stringify(value, null, 2)}\n`)
+const withCliVersion = <T>(value: T): T | (T & { cliVersion: string }) =>
+  value && typeof value === 'object' && !Array.isArray(value)
+    ? ({ cliVersion: DATAFORSEO_CLI_VERSION, ...value } as T & { cliVersion: string })
+    : value
+
+const printJson = (value: unknown) => process.stdout.write(`${JSON.stringify(withCliVersion(value), null, 2)}\n`)
 
 const printEndpoints = (endpoints: DataForSeoCatalogEndpoint[], json: boolean) => {
   if (json) return printJson(endpoints)
@@ -151,7 +160,13 @@ const printEndpoints = (endpoints: DataForSeoCatalogEndpoint[], json: boolean) =
 }
 
 const help = () => {
-  console.log(`DataForSEO CLI — catálogo oficial + ejecución gobernada
+  console.log(`DataForSEO CLI v${DATAFORSEO_CLI_VERSION} — catálogo oficial + ejecución gobernada
+
+Versión
+  pnpm dataforseo -- version [--json]
+  pnpm dataforseo -- --version
+  pnpm dataforseo:version:check
+  pnpm dataforseo:version:bump -- patch --summary "..." --change "..." --ref "TASK-..."
 
 Descubrimiento
   pnpm dataforseo -- catalog info [--json]
@@ -493,7 +508,7 @@ const execute = async (input: {
   const output = flag(flags, 'out')
   const csv = flag(flags, 'csv')
 
-  if (output) await writeFile(output, `${JSON.stringify(artifact, null, 2)}\n`, { flag: 'wx' })
+  if (output) await writeFile(output, `${JSON.stringify(withCliVersion(artifact), null, 2)}\n`, { flag: 'wx' })
 
   if (csv && input.buildCsv && normalizedResult !== undefined) {
     await writeFile(csv, input.buildCsv(normalizedResult), { flag: 'wx' })
@@ -881,7 +896,7 @@ const writeResearchArtifact = async (input: {
   const output = flag(input.flags, 'out')
   const csvOutput = flag(input.flags, 'csv')
 
-  if (output) await writeFile(output, `${JSON.stringify(input.artifact, null, 2)}\n`, { flag: 'wx' })
+  if (output) await writeFile(output, `${JSON.stringify(withCliVersion(input.artifact), null, 2)}\n`, { flag: 'wx' })
   if (csvOutput) await writeFile(csvOutput, keywordResearchRowsToCsv(input.rows), { flag: 'wx' })
 
   if (!output && !csvOutput) {
@@ -1338,7 +1353,7 @@ const runAiResearch = async (flags: Flags) => {
     const output = flag(flags, 'out')
     const csvOutput = flag(flags, 'csv')
 
-    if (output) await writeFile(output, `${JSON.stringify(artifact, null, 2)}\n`, { flag: 'wx' })
+    if (output) await writeFile(output, `${JSON.stringify(withCliVersion(artifact), null, 2)}\n`, { flag: 'wx' })
     if (csvOutput) await writeFile(csvOutput, dataForSeoAiResearchRowsToCsv(rows), { flag: 'wx' })
     printJson(artifact)
   } catch (error) {
@@ -1359,6 +1374,16 @@ const run = async () => {
   loadGreenhouseToolEnv()
   const { positional, flags } = parseArgs(process.argv.slice(2))
   const [command, subcommand, selector] = positional
+
+  if (command === 'version' || boolFlag(flags, 'version')) {
+    if (boolFlag(flags, 'json')) return printJson(DATAFORSEO_CLI_VERSION_REGISTRY)
+
+    const latest = DATAFORSEO_CLI_VERSION_REGISTRY.releases.at(-1)!
+
+    console.log(`DataForSEO CLI v${DATAFORSEO_CLI_VERSION} · ${latest.date} · ${latest.summary}`)
+
+    return
+  }
 
   if (!command || command === 'help' || boolFlag(flags, 'help')) return help()
 

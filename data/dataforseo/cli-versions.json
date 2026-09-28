@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "currentVersion": "1.0.0",
+  "sourceDigest": "edefe401fdbd274170384780463e061e5d6eb2c3aaecf41849f76c982a93f0c2",
+  "governedPaths": [
+    "scripts/dataforseo/cli.ts",
+    "scripts/dataforseo/version-contract.mjs",
+    "src/lib/ai/dataforseo-ai-research.ts",
+    "src/lib/ai/dataforseo-cli-presets.ts",
+    "src/lib/ai/dataforseo-cli-version.ts",
+    "src/lib/ai/dataforseo-keyword-research.ts",
+    "src/lib/ai/dataforseo-research-checkpoint.ts",
+    "src/lib/ai/dataforseo-serp-compare.ts"
+  ],
+  "releases": [
+    {
+      "version": "0.1.0",
+      "date": "2026-09-28",
+      "bump": "initial",
+      "summary": "Primera CLI gobernada para operar el catálogo oficial y ejecutar rutas DataForSEO.",
+      "changes": [
+        "Catálogo, presets, ejecución genérica, lifecycle asíncrono, dry-run y control de costo.",
+        "Transporte canónico, allowlist, entitlement y ledger compartidos con Greenhouse."
+      ],
+      "sourceRefs": ["fd9a84375", "TASK-1935"]
+    },
+    {
+      "version": "0.2.0",
+      "date": "2026-09-28",
+      "bump": "minor",
+      "summary": "Research SEO y AI compuesto, gobernado y reanudable.",
+      "changes": [
+        "Keyword mining, finalistas gobernadas, SERP Standard, checkpoints y presupuesto progresivo.",
+        "Panel ai-research con separación entre API y consumer surface."
+      ],
+      "sourceRefs": ["93a523f1b", "TASK-1935", "TASK-1651-A"]
+    },
+    {
+      "version": "0.3.0",
+      "date": "2026-09-28",
+      "bump": "minor",
+      "summary": "Comparación SERP transversal para múltiples entidades y dispositivos.",
+      "changes": [
+        "Nuevo comando serp-compare con aliases, dominios, JSON y CSV.",
+        "Separación de orgánico, mención AI, enlace, cita y Shopping."
+      ],
+      "sourceRefs": ["09d1b6179", "TASK-1935"]
+    },
+    {
+      "version": "0.3.1",
+      "date": "2026-09-28",
+      "bump": "patch",
+      "summary": "Regresión multidispositivo y frescura AI corregidas.",
+      "changes": [
+        "Organic Live Advanced se serializa a una task por request.",
+        "La frescura AI se deriva de la respuesta y las tasks fallidas no producen falsas ausencias."
+      ],
+      "sourceRefs": ["0be2cd2e3", "TASK-1935"]
+    },
+    {
+      "version": "0.4.0",
+      "date": "2026-09-28",
+      "bump": "minor",
+      "summary": "Flujo editorial endurecido y salidas aptas para operación productiva.",
+      "changes": [
+        "Las seeds manuales sobreviven al límite de candidatas y PAA reconoce su estructura anidada exacta.",
+        "Los archivos conservan el raw mientras stdout entrega un recibo compacto."
+      ],
+      "sourceRefs": ["59d3d4bf0", "TASK-1935"]
+    },
+    {
+      "version": "0.4.1",
+      "date": "2026-09-28",
+      "bump": "patch",
+      "summary": "Cierre canónico de recursos PostgreSQL.",
+      "changes": [
+        "La CLI termina el pool mediante closeGreenhousePostgres sin inventar un motivo de reset."
+      ],
+      "sourceRefs": ["12e92ac75", "TASK-1935"]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2026-09-28",
+      "bump": "major",
+      "summary": "Contrato estable de versionamiento y registro de cambios de la CLI.",
+      "changes": [
+        "SemVer, historial append-only y digest de las fuentes gobernadas.",
+        "Comandos version y --version, cliVersion en recibos JSON y gate integrado a local:check.",
+        "Workflow de bump que actualiza versión, digest y registro en una sola operación."
+      ],
+      "sourceRefs": ["TASK-1935", "GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1"]
+    }
+  ]
+}
