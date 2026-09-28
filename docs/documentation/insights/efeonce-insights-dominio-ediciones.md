@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.14
+> **Version:** 1.15
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-28 por Claude (TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -23,8 +23,10 @@ La primera unidad (TASK-1845) creó el **núcleo**: crear un encargo, recolectar
 dejar la edición lista para revisión. Después se sumaron el deck PDF (TASK-1846), el enlace compartido, el envío
 por correo y la recurrencia (TASK-1848, en producción pero apagados) y el informe A4 junto con el deck nuevo
 (TASK-1847, en producción desde el 2026-09-24), y el contrato editorial v2 que ordena qué dice cada informe
-(TASK-1888, encendido en producción desde el 2026-09-26). **Todavía no existe la vista web.** Como la emisión sigue apagada en
-producción, **ahí ninguna edición puede emitirse**: llega hasta `ready_for_review`.
+(TASK-1888, encendido en producción desde el 2026-09-26). La vista web ya existe: es la página del enlace en Think,
+en producción desde el 2026-09-28 (TASK-1875), con el enlace compartido encendido. Como la emisión sigue apagada en
+producción, **ahí ninguna edición puede emitirse**: llega hasta `ready_for_review`, y por eso todavía no hay informes
+reales de clientes para compartir.
 
 ## Cómo se comporta
 
@@ -337,7 +339,7 @@ proceso en segundo plano lo produce.
   "no existe" (no encontrado) y no se crea nada.
 - **Registro.** Cada pedido, reintento y cancelación queda a nombre de la persona que lo hizo, también si es un
   usuario cliente (antes todo quedaba como "sistema").
-- **Qué no hace todavía.** Existen el deck y el informe A4 (en producción desde el 2026-09-24). La vista web se rechaza al pedirla. Tener el deck
+- **Qué no hace todavía.** Existen el deck y el informe A4 (en producción desde el 2026-09-24). La vista web se rechaza al pedirla como render: no es un archivo, se lee por enlace en Think. Tener el deck
   no lo envía ni lo comparte: descargarlo, compartirlo y emitir siguen siendo pasos aparte.
 
 ## La página del enlace y la muestra para clientes
@@ -377,6 +379,60 @@ mismo diseño que el informe real, cualquier mejora del informe aparece también
 > «Shared Tokenized Report» en `docs/think/architecture-ui-patterns.md`; repo `efeonce-think`
 > (`src/components/insights/InsightReport.astro`, rutas `src/pages/insights/r/[token].astro` y
 > `src/pages/insights/muestra.astro`); dossier visual `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/`.
+
+## Cómo se ve y se lee un informe: PDF, página web y la marca Insights
+
+> Estado: 2026-09-28. Referencia visual con datos de ejemplo en el Lab de AXIS:
+> [axis.efeonce.org/references/insights](https://axis.efeonce.org/references/insights/).
+
+**Tres formas, las mismas cifras.** Una edición se puede leer como informe A4, como deck o como página web. Las tres
+salen del mismo plan congelado: ninguna recalcula ni agrega un número.
+
+| Forma | Para qué sirve | Cómo se lee |
+|---|---|---|
+| **Informe A4 (PDF)** | Leer con calma, archivar, reenviar | Portada, índice, «Lo esencial», una apertura por capítulo, una página por gráfico, tabla, plan, límites y contraportada (detalle en «Cómo se ve un informe y un deck con el diseño aprobado») |
+| **Deck (PDF 16:9)** | Presentar en una reunión | Lo mismo en láminas, más corto: sin portada blanca, sin índice y sin tabla |
+| **Página web del enlace** | Leer en pantalla o en el celular y mostrarla en vivo | Una sola página que se recorre bajando (detalle abajo) |
+
+**El orden de lectura es el mismo en las tres.** Primero la respuesta del período, después lo esencial con sus cifras,
+la decisión para la reunión, un capítulo por módulo, el plan de acción, los límites y cómo se midió, y al final la
+firma de Efeonce.
+
+**Lo que agrega la página web.**
+
+- Cada hallazgo se abre en su lugar y muestra su evidencia, su lectura y un enlace directo a ese hallazgo.
+- En cada capítulo el gráfico principal queda fijo mientras se baja y el relato avanza por pasos: la cifra, la
+  conclusión, lo que significa y el próximo paso. Cada gráfico se puede ver también como tabla.
+- Una barra arriba filtra por módulo, copia el enlace y descarga; la órbita de la portada reaparece pequeña en esa
+  barra y marca cuánto se ha leído.
+- **Presentar** muestra el informe como láminas; **Descargas** entrega los PDF que el enlace permite.
+- Si el período todavía no cerró, un aviso lo dice arriba: las cifras son las del corte y no se actualizan solas.
+- La página sabe dibujar todas las formas de gráfico del contrato; el PDF, sólo cuatro (comparación, columnas, metas y
+  tendencia). Hoy los informes sólo traen esas cuatro, así que en la práctica muestran lo mismo.
+
+**Movimiento y accesibilidad.** Al abrir, la esfera recorre su órbita (unos 2 segundos) y las cifras cuentan hasta su
+valor, terminando exactamente en la cifra del informe. Quien pide menos movimiento en su equipo ve todo sin
+animación; si el navegador no ejecuta el guion, la página se muestra completa igual. En pantallas angostas todo pasa a
+una columna, y al imprimir sale una versión clara.
+
+**La marca Insights.** Insights es la marca de producto del informe: la palabra «insights» en minúscula, con el punto
+de la primera «i» convertido en una pequeña órbita (un anillo y una esfera en el color de Growth).
+
+- **Va junto a Efeonce, nunca sola como firma.** Se muestra al lado del logo de Efeonce, separada por una línea fina.
+  Junto a Efeonce, Insights baja su brillo: la palabra va en gris y sólo la esfera conserva el color, para que mande
+  Efeonce. No lleva «by efeonce», porque Efeonce ya está al lado. La firma de cada informe sigue siendo el logo de
+  Efeonce en el pie.
+- **Dónde se ve hoy.** En la página web: la portada oscura, la versión impresa, el modo presentación y la imagen que
+  aparece al compartir el enlace. En las portadas del PDF y del deck se lee «efeonce | INSIGHTS» escrito con letras,
+  como en el diseño aprobado el 2026-09-25; todavía no usan el archivo oficial de la marca.
+- **Dónde falta (pendiente de decisión).** Las portadas del PDF y del deck con el archivo oficial, el correo de
+  entrega, el ícono de la pestaña del navegador, el portal y las herramientas por MCP todavía no llevan la marca
+  Insights. No hay una regla aprobada para esas superficies; hasta que exista, siguen como están.
+
+> Detalle técnico: [arquitectura §6.1–§6.4](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) (anatomía del
+> informe web, plantillas A4 y deck, mapa de la marca); manual de marca
+> [`EFEONCE_GRAPHIC_LINE_V1.md` §7.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md); archivos oficiales en
+> `@efeoncepro/axis-brand-assets` 0.4.0 (`insights-logo-*`, `insights-isotype-*`, `insights-lockup-*`).
 
 ## Compartir un informe por enlace
 

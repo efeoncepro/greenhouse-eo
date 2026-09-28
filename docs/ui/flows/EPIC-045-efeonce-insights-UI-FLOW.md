@@ -7,7 +7,7 @@
 
 ## Meta
 
-- Status: `draft` (2026-09-15; delta 2026-09-25 por el rediseño premium aprobado)
+- Status: `draft` (2026-09-15; delta 2026-09-25 por el rediseño premium aprobado; delta 2026-09-28: S6 en producción con TASK-1875 complete)
 - Epic: `EPIC-045` (+ integración `EPIC-046` P01/P02/P04/P09)
 - Skills de product design aplicadas: `info-architecture` (líder), `state-design`, `greenhouse-ux-writing`,
   `modern-ui`, `dataviz-design`.
@@ -23,7 +23,7 @@ salen tres renders con las mismas cifras: `deck_pdf` y `report_pdf` (Composer/Ar
 `web` (proyección `InsightWebModelV1`, TASK-1848 → render en Think, TASK-1875). El portal (TASK-1849) muestra el
 mismo plan desde los readers autenticados. Cambiar una cifra = nueva versión, nunca mutación.
 
-**Delta 2026-09-25 — portada sellada y rediseño (planificado, no construido).** El operador aprobó un diseño premium
+**Delta 2026-09-25 — portada sellada y rediseño (construido: TASK-1888 y TASK-1889 complete y en producción desde el 2026-09-26).** El operador aprobó un diseño premium
 para todo informe (dirección visual:
 `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`). Para la espina dorsal esto
 agrega una decisión más que se congela con la edición: la **portada** (navy o blanca). La resuelve el dominio
@@ -52,11 +52,11 @@ Desde el 2026-09-26 producción sirve sólo los catálogos v2 de TASK-1889 (rele
 | S3 | Detalle de edición: progreso por fase, evidencia (emitida para cliente; siempre para interno), plan, descargas | TASK-1849 | diseño |
 | S4 | Revisión y emisión (gate humano), retirada, recuperación por fase | TASK-1849 (UI) sobre commands de 1845 | diseño |
 | S5 | Compartir (grants), enviar (delivery intents), programar (schedules) | TASK-1849 (UI) sobre 1848 | diseño |
-| S6 | Vista web compartida por token en `https://think.efeoncepro.com/insights/r/<token>` (ruta SSR `src/pages/insights/r/[token].astro` de `efeonce-think`; lee `InsightWebModelV1` 1.1) | TASK-1875 sobre 1848 | construida, code complete local (2026-09-28); **sin desplegar** — el enlace no abre en producción hasta el rollout de TASK-1875 |
+| S6 | Vista web compartida por token en `https://think.efeoncepro.com/insights/r/<token>` (ruta SSR `src/pages/insights/r/[token].astro` de `efeonce-think`; acepta `InsightWebModelV1` 1.x) + muestra pública `https://think.efeoncepro.com/insights/muestra` (fixtures, `noindex`) | TASK-1875 sobre 1848 | **en producción desde el 2026-09-28** (`efeonce-think` `main` `7485e32`; `INSIGHTS_SHARING_ENABLED` ON en producción). Producción de Greenhouse sirve el modelo 1.0; el 1.1 (editorial v2 + logo del cliente) está en staging y sale con el próximo release. Referencia visual: [Lab AXIS › Insights](https://axis.efeonce.org/references/insights/) |
 | S7 | Correo de entrega (resumen útil + deep link autenticado o ShareGrant) | TASK-1849 (presentación) sobre 1848 | diseño |
 | S8 | Accesos contextuales desde Inicio/Mis servicios (EPIC-046 P04) | TASK-1854 | diseño |
 
-**Delta 2026-09-25 (planificado) — qué suman S2 y las descargas.**
+**Delta 2026-09-25 — qué suman S2 y las descargas** (contrato y PDF en producción desde el 2026-09-26; la UI de S2 sigue en diseño con TASK-1849).
 
 - **S2 (encargo):** muestra la preferencia de portada del cliente y permite cambiarla sólo para ese encargo
   (`brand.coverTheme`: `auto` | `dark` | `light`, opcional, dentro del mismo `InsightRequestV1`). Si TASK-1849 ofrece
@@ -64,8 +64,8 @@ Desde el 2026-09-26 producción sirve sólo los catálogos v2 de TASK-1889 (rele
   5); la superficie exacta se decide en su Discovery. En ambos casos es **consumer** del contrato de TASK-1888, sin
   lógica propia: no replica la regla `auto` ni ninguna otra resolución; la portada efectiva es la que el dominio sella
   en la edición.
-- **S3 y S6 (descargas):** los PDF traerán la portada navy o blanca sellada por edición y sus variantes por módulo
-  (TASK-1889). Ninguna superficie elige ni recalcula la portada al descargar.
+- **S3 y S6 (descargas):** los PDF traen la portada navy o blanca sellada por edición y sus variantes por módulo
+  (TASK-1889, en producción). Ninguna superficie elige ni recalcula la portada al descargar.
 
 ## 4. Las journeys cross-surface
 
@@ -97,7 +97,7 @@ por token, sin navegación privada, sin login, `noindex`. El token nunca cruza a
 | Crear/revisar encargo | `createInsightEdition` / `reviseInsightEdition` | app · ecosystem (internal) · MCP `create_insight_edition` |
 | Ver ediciones / detalle | `readInsightEditions` / `readInsightEdition` | app · ecosystem · MCP |
 | Emitir / retirar / recuperar | `issueInsightEdition` / `withdrawInsightEdition` / `recoverInsightEdition` | app (persona autenticada); nunca MCP para emitir |
-| Compartir / enviar / programar | TASK-1848 (`createShare`, `requestDelivery`, `createSchedule`, …) | app · ecosystem por definir |
+| Compartir / enviar / programar | TASK-1848 (`createShare`, `requestDelivery`, `createSchedule`, …) | app; MCP sólo lectura de enlaces, envíos y recurrencias (crear/revocar enlaces exige un scope de escritura que ningún cliente porta aún; enviar y programar, sólo desde el portal) |
 | Leer compartido / descargar | TASK-1848 (`resolveSharedEdition`, `downloadSharedOutput`) | público por token (S6) |
 | Cambiar la portada de un encargo *(en producción, TASK-1888)* | `createInsightEdition` con `brand.coverTheme` opcional (sin él, el hash del encargo no cambia) | mismas lanes que crear encargo |
 | Ver / fijar la preferencia de portada del cliente *(en producción, TASK-1888)* | `setInsightCoverPreference` + su reader | app · ecosystem · MCP (tool federada en `efeonce-mcp`) |
@@ -112,6 +112,12 @@ Correos con ShareGrant son token-sensitive; los deep links autenticados no lleva
 
 Portal: wrappers canónicos del shell (TASK-1849 motion). Think: motion self-contained de lectura (TASK-1875 motion).
 Continuidad de identidad: código `EO-INS-…` + versión visibles en S3, S6, S7 y en el PDF.
+
+**Marca de producto (delta 2026-09-28).** S6 lleva el lockup oficial «Efeonce | Insights» (`insights-lockup-*` de
+`@efeoncepro/axis-brand-assets` 0.4.0: negativo en pantalla, positivo en impresión, también en el modo presentación y
+en la imagen OG). Los PDF de S3/S6 componen «efeonce | INSIGHTS» tipográfico en portadas y aperturas, como aprobó el
+canvas de TASK-1889. S1–S5 y S7 no llevan marca de producto: **pendiente de decisión** (gaps en arquitectura §6.3).
+La firma sigue siendo Efeonce en todas las superficies.
 
 ## 9. Cobertura GVC
 
@@ -132,18 +138,18 @@ Estado al 2026-09-15 (se conserva como historia; el vigente está en el delta de
 | TASK-1875 | S6 | to-do (bloqueada por 1848) |
 | TASK-1854 | S8 | to-do (EPIC-046) |
 
-**Delta 2026-09-25 — estado vigente del mapa** (lifecycle leído de cada task):
+**Delta 2026-09-25, al día el 2026-09-28 — estado vigente del mapa** (lifecycle leído de cada task):
 
 | Task | Nodos | Estado |
 |---|---|---|
 | TASK-1845 | motor (sin UI) | complete (2026-09-16) |
 | TASK-1846 | render durable (Job `artifact-worker`) | complete (2026-09-16), en producción |
 | TASK-1847 | catálogos v1 `report_pdf` + `deck_pdf` (alimentan S3 y S6 descargas) | complete (2026-09-25), en producción desde 2026-09-24 |
-| TASK-1848 | S5 backend, S6 contrato, S7 backend | in-progress; en producción con flags OFF |
+| TASK-1848 | S5 backend, S6 contrato, S7 backend | in-progress; en producción: enlace compartido ON desde el 2026-09-28, correo y recurrencia OFF |
 | TASK-1888 | contrato de portada y editorial v2 (alimenta S2 y los PDF; sin UI) | complete (2026-09-26), en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON |
 | TASK-1889 | catálogos premium (los PDF de S3 y S6) | complete (2026-09-26), en producción; emitir y compartir siguen OFF |
 | TASK-1849 | S1–S5, S7 (+ portada en S2 como consumer de TASK-1888) | to-do |
-| TASK-1875 | S6 (+ mismos roles de color que los PDF) | in-progress (2026-09-28): code complete local en Greenhouse y Think, sin push ni deploy |
+| TASK-1875 | S6 (+ mismos roles de color que los PDF) | **complete (2026-09-28), en producción**: `efeonce-think` `main` `7485e32`; `INSIGHTS_SHARING_ENABLED` ON en producción; modelo 1.0 en producción, 1.1 en staging |
 | TASK-1854 | S8 | to-do (EPIC-046; bloqueada por TASK-1852 y TASK-1853) |
 
 ## Acceptance Checklist (del programa)

@@ -1,9 +1,9 @@
 # Efeonce Insights — Registro de implementación y despliegue (TASK-1845)
 
 > **Tipo de documento:** Registro de implementación y despliegue
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-15 por Claude
-> **Ultima actualizacion:** 2026-09-26 por Claude (§6.3, §8.aa y fila de §10: TASK-1888 en producción)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.4: §8.ab marca de producto Insights, su aplicación en Think y la página del Lab; filas de §10 y §11 con TASK-1875 en producción. Antes, 2026-09-26: §6.3, §8.aa y fila de §10: TASK-1888 en producción)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · ADR [EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md)
 > **Task:** [TASK-1845](../tasks/in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) (EPIC-045)
 
@@ -694,6 +694,45 @@ compartir; la de Berel conserva el defecto del empate porque las ediciones son i
 `--update-env-vars INSIGHTS_EDITORIAL_V2_ENABLED=false` y `:-false` en `deploy.sh` (si sólo se hace lo primero, el
 próximo deploy lo vuelve a prender).
 
+### 8.ab Marca de producto Insights, informe live en Think y referencia en el Lab (2026-09-28)
+
+Fuente: skill de la línea gráfica (`references/ledger.md`, fila 2026-09-28), generador y commits citados abajo;
+arquitectura §6.1–§6.4 y §14.10.
+
+**Marca (Greenhouse → AXIS).**
+
+| # | Hito | Commit | Qué entró |
+|---|---|---|---|
+| 1 | Logo e isotipo de Insights | `7deed5888` (greenhouse-eo, 2026-09-28 13:15) | Generador `scripts/brand/build-insights-logo.mjs`: contornos de Poppins Bold (fontkit), «insights» con el punto de la primera «i» convertido en órbita mínima (anillo en la tinta de la palabra, esfera en el acento de Growth `#0e8c82` papel / `#36c8bf` navy, con corte); canon en la línea gráfica |
+| 2 | Lockup oficial Efeonce \| Insights | `b64f07ffa` (greenhouse-eo, 13:32) | `insights-lockup-{positive,negative}`: Efeonce 30 px, aire 20, filete 1 × 26, aire 20, Insights 31,5; Insights en gris (`#6b6b6b` papel / `#6f89a2` navy) y sólo la esfera en acento |
+| 3 | Assets en AXIS | `25b5ecf` (axis-design-system) | Logo e isotipo positivo/negativo en `@efeoncepro/axis-brand-assets`; marca `insights` en `AXIS_BRAND_ASSET_BRANDS` |
+| 4 | Release del paquete | `4760e3e`, tag `v0.4.0` (axis-design-system) | `@efeoncepro/axis-brand-assets` **0.4.0** con el lockup (tipo `lockup`); ids sellados con SHA-256 en `packages/brand-assets/src/manifest.ts`; reglas en el README del paquete; copias del Lab sincronizadas por `apps/lab/scripts/sync-brand-assets.mjs` |
+
+Greenhouse sigue fijando `@efeoncepro/axis-brand-assets` 0.3.5 (`package.json`), así que el runtime de Greenhouse no
+consume todavía los assets de Insights.
+
+**Aplicación en Think (`efeonce-think`, TASK-1875).**
+
+| Commit | Qué entró |
+|---|---|
+| `3c2befe` (Slice 1, 2026-09-28 13:46) | Copias manuales de 5 SVG en `public/branding/insights/` (logo e isotipo negativos, logo positivo, lockup positivo y negativo); lockup en el hero (negativo en pantalla, positivo en impresión) |
+| `4cd3b01` (Slice 4) | `og-insights.png` (imagen OG de `[token].astro` y `muestra.astro`); modo presentación con el lockup negativo |
+| `7485e32` (`main`, producción) | Cierre de TASK-1875: una sola puerta de aceptación del modelo; major no soportado ⇒ 502 |
+
+Las copias de Think no se vigilan contra el paquete: si el paquete cambia, hay que copiarlas de nuevo (gap).
+
+**Referencia en el Lab de AXIS.** Página `https://axis.efeonce.org/references/insights/` (fuente
+`axis-design-system/apps/lab/src/pages/references/insights.astro`, JSON para agentes `references/insights.json.ts`,
+guía `docs/agent-composition/insights.md`): marca, aplicaciones aprobadas, secciones del informe y UI del informe live
+como referencia documentada, con datos de muestra. Se escribió el 2026-09-28 en paralelo a este registro; **su
+publicación no se verificó al escribir esta sección** (el Lab despliega al push de `main` de AXIS). Antes de ella, el Lab
+sólo mostraba Insights en el capítulo «Pruebas en producto» de `references/graphic-line.astro` (láminas 7.1 y 7.2,
+«prueba de diseño, cifras de muestra»).
+
+**Gaps abiertos (pendientes de decisión, sin task nueva):** lockup oficial en portadas PDF/deck, correo, favicon,
+portal y receta de deck (arquitectura §6.3); roles de datos y geometría de gráficos duplicados entre Greenhouse y
+Think como candidatos a AXIS (arquitectura §6.4).
+
 ## 9. Verificación realizada
 
 | Capa | Evidencia | Fuente |
@@ -738,6 +777,7 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Cloud Run `efeonce-mcp-gateway` (TASK-1848) | v1.7.0, 58 tools | Rev `00055-gk6` al 100 %; canary del provider contra producción verde | TASK-1848 Delta 2026-09-18 |
 | Vercel Production + Job `artifact-worker` (TASK-1889, 2026-09-26) | catálogos premium v2 (`insights-report`, `insights-deck`), regla de familia, portada con logo del cliente | **En producción** (releases `0e87c7a443a2` + `f9257b9c94af`); primeras ediciones internas renderizadas en producción con el diseño nuevo el 2026-09-26 — Berel `insed-7d470d9f-7119-4a84-b8af-c3fb584ceb92` (run `irun-dcd1fbed…`: A4 16 páginas + deck 15 láminas) y Sky `insed-9370d0cc-eb60-43c5-a547-70f10e011309` (run `irun-e5882459…`: A4 12 + deck 10), los cuatro PDF al primer intento (dispatcher 13:00Z, ejecución `artifact-worker-j47zl`) | §8.z; arquitectura §14.9 |
 | Vercel staging + Production + `ops-worker` (TASK-1888, 2026-09-26) | contrato editorial v2 (release `0e87c7a443a2`, luego `f9257b9c94af`) + `INSIGHTS_EDITORIAL_V2_ENABLED=true` en los dos runtimes lectores; gateway `efeonce-mcp` v1.9.0 | **En producción, flag ON**; canary de producción selló plan v2 (`insed-f5768172…`); emisión, enlaces y envío siguen OFF | §8.aa |
+| Think (`efeonce-think` `main`) + Vercel Production (TASK-1875, 2026-09-28) | informe live `/insights/r/<token>`, muestra `/insights/muestra`, lockup y OG de Insights; `INSIGHTS_SHARING_ENABLED=true` en Production (redeploy `greenhouse-cssemzyzb`); WAF con la excepción `x-efeonce-think-key` | **En producción** (`7485e32`); canary sobre `EO-INS-000014` verde (crear, leer, descargar, revocar ⇒ 410); producción sirve el modelo 1.0, el 1.1 en staging | §8.ab; arquitectura §14.10 |
 | Ledgers | `FEATURE_FLAG_STATE_LEDGER.md` (3 filas + snapshot), `PRODUCTION_RELEASE_TIMING_LEDGER.md` (fila del release) | Al día | líneas 249–251, 383–385; línea 78 |
 
 ---
@@ -750,7 +790,7 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Emisión | `INSIGHTS_ISSUANCE_ENABLED` OFF; el puerto (real desde 2026-09-16) responde `not_ready` mientras falte un output `completed` de la misma audiencia; `insights.edition.issued` nunca se ha publicado | rollout de TASK-1846 + policy EPIC-046 P01 |
 | IA de autoría | `INSIGHTS_AUTHORING_AI_ENABLED` OFF; todos los planes existentes son `deterministic` | medir costo/tokens en staging antes |
 | UI del portal (biblioteca, encargo, revisión) | no existe; sólo API/MCP | TASK-1849 |
-| Vista web compartida | resolver `InsightWebModelV1` + proxy **existen desde TASK-1848 (en producción con flag OFF, 2026-09-18)**; el render en Think no tiene código | TASK-1875 |
+| Vista web compartida | **Actualizado 2026-09-28:** en producción (TASK-1875 complete; Think `7485e32`, sharing ON). Sigue faltando: modelo 1.1 en producción (próximo release de Greenhouse) y ediciones emitidas de clientes (emisión OFF) | release de Greenhouse; policy EPIC-046 P01 |
 | Share/delivery/schedules | **Actualizado 2026-09-18:** construidos y en producción con flags OFF (release `bda1cf2cd938`, §8.y); faltan in-app/Teams, `portal_link`, recordatorios/preferencias/baja y ISSUE-174 → TASK-1876 | TASK-1849, TASK-1875, TASK-1876, TASK-690–693 |
 | Grant del scope `insights.write` a clientes MCP | `create_insight_edition` por el gateway ⇒ `insufficient_scope` | consentimiento/grant gobernado |
 | Ensayo de `migrate:down` | ejecutado 2026-09-16 00:24–00:25Z con el Down definitivo (down OK, readback, up OK, readback; canaries posteriores `EO-INS-000002` staging / `EO-INS-000003` producción) | cerrado (§4.8) |

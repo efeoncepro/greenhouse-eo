@@ -1,8 +1,8 @@
 # Estándar de marca y entrega de informes Efeonce
 
-**Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04 · **Última actualización:** 2026-09-26
-(estado de la dirección premium de Insights tras el cierre de TASK-1888; antes, dueño del contacto por tipo de
-documento tras TASK-1889).
+**Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04 · **Última actualización:** 2026-09-28
+(cómo firman hoy los informes de Insights y el gap del lockup en portadas PDF/deck; antes, 2026-09-26, estado de la
+dirección premium de Insights tras el cierre de TASK-1888 y dueño del contacto por tipo de documento tras TASK-1889).
 **Alcance:** todos los informes de Efeonce, internos o dirigidos a clientes, cualquiera que sea su disciplina.
 La metodología y las cifras siguen bajo el contrato del dominio; este estándar gobierna su presentación.
 
@@ -187,6 +187,24 @@ los documentos que reutilizan su contraportada.
 El deck aprobado lleva un pie con logo, edición (p. ej. «Insights · Informe de agosto 2026»), URL bubble y folio «NN / total»,
 sin dirección ni teléfonos. Es una excepción aprobada a la regla general de decks, limitada al deck de Insights; los
 demás decks conservan el pie con, como máximo, la URL bubble.
+
+### Marca de producto Insights: cómo firman hoy los informes (2026-09-28)
+
+Insights tiene marca de producto propia desde el 2026-09-28 (manual de la línea gráfica §7.1; archivos en
+`@efeoncepro/axis-brand-assets` 0.4.0). **La firma de un informe no cambia: siempre es el logo de Efeonce.** Insights
+acompaña y nunca firma. Estado por superficie, sin regla nueva:
+
+| Superficie | Cómo se ve hoy |
+|---|---|
+| Informe A4 y deck (PDF) | Pie y contraportada con el logo de Efeonce. Portadas y aperturas de capítulo con logo de Efeonce + filete + «INSIGHTS» en versalitas, tipografiado por la plantilla, como aprobó el canvas del 2026-09-25 |
+| Informe compartido en Think | Lockup oficial «Efeonce \| Insights» (`insights-lockup-*`) en la portada oscura, en impresión y en el modo presentación; el pie firma con el logo de Efeonce, el eslogan y la línea legal |
+| Correo de entrega | Plantilla de Efeonce, sin marca de producto |
+
+**Gap abierto, pendiente de decisión del operador:** el lockup oficial se aprobó el 2026-09-28 en el canvas
+«Insights en vivo», pero **no está implementado** en las portadas PDF/deck, que siguen con la composición tipográfica.
+Este estándar no fija todavía si el lockup la reemplaza, ni su tamaño mínimo en portada; hasta que el operador decida,
+las plantillas quedan como están y ningún agente lo cambia por su cuenta. Mapa técnico: arquitectura de Insights §6.3.
+Referencia visual con datos de ejemplo: [axis.efeonce.org/references/insights](https://axis.efeonce.org/references/insights/).
 
 ## Aplicación y propietarios
 

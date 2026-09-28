@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.13
+> **Version:** 1.14
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-28 por Claude (TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -310,6 +310,29 @@ Prender un flag del worker es multi-runtime: `deploy.sh` + revisión activa (led
 - **Problemas comunes:** página 404 con un enlace recién creado en staging (mirar la nota de arriba); sin botón de
   descarga (el enlace se creó sin `downloadOutputs`); 429 al probar muchas veces seguidas (espera un minuto y nunca
   pruebes con ráfagas: la base es compartida).
+
+### Cómo se ve el informe
+
+Referencia visual con datos de ejemplo (sin clientes reales): **[Lab AXIS › Insights](https://axis.efeonce.org/references/insights/)**
+—marca, aplicaciones, secciones del informe y UI de la página live—. Úsala para explicar el producto o revisar un
+cambio antes de mirar una edición real. Para una edición concreta, abre su enlace de Think o la muestra
+(`/insights/muestra`); para los PDF, «Revisar el diseño antes de compartir» (abajo).
+
+**Página live (Think), de arriba abajo:** portada oscura con la órbita, el lockup Efeonce | Insights, el estado del
+enlace y la respuesta del período → aviso de período abierto (si aplica) → barra fija (filtros por módulo, copiar
+enlace, presentar, descargar) → «Lo esencial» con hallazgos que se abren en su lugar → decisión → un capítulo por
+módulo con el gráfico principal por pasos (cifra, conclusión, significado, próximo paso) y opción de ver la tabla →
+plan de acción → metodología y límites → descargas → pie con la firma de Efeonce. «Presentar» abre las láminas en un
+diálogo (flechas, Esc). Estados: 404, 410, 429 y 502 (ver arriba).
+
+**PDF:** el A4 tiene portada (navy o blanca), índice, «Lo esencial», aperturas de capítulo, una página por gráfico
+(comparación, columnas, metas o tendencia), tabla, plan, límites y contraportada; el deck, lo mismo en 12 tipos de
+lámina, sin portada blanca, índice ni tabla. Las portadas muestran «efeonce | INSIGHTS» tipográfico; el lockup
+oficial en PDF está pendiente de decisión (no lo cambies por tu cuenta).
+
+**Qué revisar antes de compartir:** que el lockup y la firma de Efeonce se vean en la portada y el pie; que las cifras
+de la página live coincidan con las del PDF (salen del mismo plan); que la muestra nunca se confunda con un informe real
+(lleva el aviso «Muestra con datos de ejemplo»).
 
 ### Leer el reader público
 
