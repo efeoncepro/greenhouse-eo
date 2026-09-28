@@ -1,5 +1,6 @@
 import type { GutenbergBlockPatternCatalog, GutenbergBlockPatternCatalogEntry } from './contracts'
 import { renderHeadingBlock, renderYoastTableOfContents } from './gutenberg-blocks'
+import { renderGlitchDropBlock } from './gutenberg-glitch-drop'
 
 // Examples are generated from the canonical block builders so they are always
 // anchored + populated by construction (regression guard for the 250748 defect).
@@ -52,6 +53,29 @@ const tocExample = renderYoastTableOfContents([
   { level: 2, text: 'Que cambia para el equipo comercial' },
   { level: 3, text: 'Como aterrizarlo' }
 ])
+
+const glitchDropExample = renderGlitchDropBlock([
+  'El modelo del medio dejó de ser el plan B.',
+  'La pregunta ya no es cuál es el mejor modelo, sino para qué tarea necesitas de verdad el más caro.'
+])
+
+const stripedTableExample = [
+  '<!-- wp:table {"className":"is-style-stripes"} -->',
+  '<figure class="wp-block-table is-style-stripes"><table><thead><tr><th scope="col">Modelo</th><th scope="col">Precio</th></tr></thead><tbody><tr><td>Medio</td><td>Mitad</td></tr></tbody></table><figcaption class="wp-element-caption">Fuente: anuncio del proveedor.</figcaption></figure>',
+  '<!-- /wp:table -->'
+].join('\n')
+
+const buttonsExample = [
+  '<!-- wp:buttons -->',
+  '<div class="wp-block-buttons"><!-- wp:button -->',
+  '<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://efeoncepro.com/contacto/">Conversemos</a></div>',
+  '<!-- /wp:button -->',
+  '',
+  '<!-- wp:button {"className":"is-style-outline"} -->',
+  '<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="https://efeoncepro.com/glitch/">Leer Glitch</a></div>',
+  '<!-- /wp:button --></div>',
+  '<!-- /wp:buttons -->'
+].join('\n')
 
 const youtubeExample = [
   '<!-- wp:embed {"url":"https://www.youtube.com/watch?v=VIDEO_ID","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->',
@@ -169,6 +193,35 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
     example: pullquoteExample
   },
   {
+    blockName: 'core/table',
+    role: 'structure',
+    generationPolicy: 'allowed',
+    refreshPolicy: 'patch_carefully',
+    description: 'Native comparison/data table with optional caption and the core-registered stripes style (spec kind="table", style="stripes").',
+    constraints: [
+      'Every row keeps the header column count.',
+      'Only the core-registered is-style-stripes style; no inline colors.',
+      'Check Ohio at 390 px before using stripes on wide tables.'
+    ],
+    example: stripedTableExample
+  },
+  {
+    blockName: 'efeoncepro/glitch-drop',
+    role: 'editorial_aside',
+    generationPolicy: 'allowed',
+    refreshPolicy: 'patch_carefully',
+    description:
+      'Efeonce POV callout for Glitch posts. Dynamic block: text in the content attribute of a self-closing comment (spec kind="glitchDrop").',
+    requires: ['Glitch post (weekly edition or Glitch Flash)', 'plugin efeonce-editorial-blocks active'],
+    constraints: [
+      '1-4 plain-text lines joined by <br>; no links or other HTML.',
+      'The source link goes in the next paragraph.',
+      'Do not repeat the drop sentences in the paragraph before or after it.',
+      'Never hand-write the block comment; renderGlitchDropBlock serializes it like WordPress.'
+    ],
+    example: glitchDropExample
+  },
+  {
     blockName: 'core/separator',
     role: 'structure',
     generationPolicy: 'recommended',
@@ -209,7 +262,8 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
     constraints: [
       'Do not invent YouTube/video URLs.',
       'Use providerNameSlug when known.',
-      'Preserve existing embeds unless refresh scope explicitly changes them.'
+      'Preserve existing embeds unless refresh scope explicitly changes them.',
+      'Credit the source with embed.caption («Fuente: <medio>»), rendered as a real figcaption.'
     ],
     example: youtubeExample
   },
@@ -218,9 +272,14 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
     role: 'conversion',
     generationPolicy: 'allowed',
     refreshPolicy: 'patch_carefully',
-    description: 'Button group for governed CTA blocks when a conversion target is known.',
+    description: 'Button group for governed CTA blocks when a conversion target is known (spec kind="buttons").',
     requires: ['CTA target', 'reviewed visible label'],
-    constraints: ['Prefer paragraph CTA until the exact HubSpot/external target is known.', 'Never publish unreviewed CTA links.']
+    constraints: [
+      'Prefer paragraph CTA until the exact HubSpot/external target is known.',
+      'Never publish unreviewed CTA links.',
+      '1-3 buttons; variants fill (core default, no class) or outline (is-style-outline); no literal colors or unregistered classes.'
+    ],
+    example: buttonsExample
   },
   {
     blockName: 'core/button',
@@ -295,7 +354,7 @@ export const getEfeonceGutenbergBlockPatternCatalog = (
     recipePath: 'docs/documentation/public-site/gutenberg-post-authoring-recipes.md',
     validatorProfile: 'EFEONCE_BLOGPOST_COMPOSITION_PROFILE',
     observedRuntimeSample:
-      'WP-CLI read-only sample of six latest published efeoncepro.com posts on 2026-06-14 plus Creative Workflows FAQ block registry inspection on 2026-07-15'
+      'WP-CLI read-only sample of six latest published efeoncepro.com posts on 2026-06-14 plus Creative Workflows FAQ block registry inspection on 2026-07-15 and the runtime inventory of 2026-09-28'
   },
   entries: EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES
 })

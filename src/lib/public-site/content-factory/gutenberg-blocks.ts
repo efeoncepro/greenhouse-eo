@@ -35,6 +35,31 @@ export const escapeGutenbergHtml = (value: string): string =>
     .replace(/'/g, '&#39;')
 
 /**
+ * Serialize block attributes exactly like WordPress `serialize_block_attributes()`
+ * (wp-includes/blocks.php):
+ *
+ *   wp_json_encode($attrs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+ *   then `--` → `\u002d\u002d`, `<` → `\u003c`, `>` → `\u003e`, `&` → `\u0026`, `\"` → `\u0022`.
+ *
+ * `JSON.stringify` already matches `JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE`
+ * (slashes and non-ASCII stay literal; control characters use the same short and
+ * lowercase `\u00xx` escapes). The only extra step is U+2028/U+2029, which PHP
+ * escapes unless `JSON_UNESCAPED_LINE_TERMINATORS` is passed. WordPress does NOT
+ * escape apostrophes. A backslash immediately before a closing quote breaks the
+ * WordPress `\"` replacement (it is a known WP quirk), so callers that serialize
+ * free text must reject backslashes first (`renderGlitchDropBlock` does).
+ */
+export const serializeGutenbergBlockAttributes = (attrs: Record<string, unknown>): string =>
+  JSON.stringify(attrs)
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')
+    .replace(/--/g, '\\u002d\\u002d')
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\\"/g, '\\u0022')
+
+/**
  * Build the anchor id WordPress/Yoast use for a heading: `h-` + accent-stripped,
  * lowercased slug with punctuation/emoji removed and spaces collapsed to hyphens.
  * Verified against a live Efeonce post (248398): "¿Qué es Loop Marketing? ♾️"

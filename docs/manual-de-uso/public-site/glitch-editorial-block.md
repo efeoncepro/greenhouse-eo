@@ -1,9 +1,9 @@
 # Bloque editorial Glitch — operar, verificar y revertir
 
 > **Tipo de documento:** Manual de uso (operador)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-04 por Claude (TASK-1337)
-> **Ultima actualizacion:** 2026-09-28 por Claude (inserción desde un agente, caso Glitch Flash 251941)
+> **Ultima actualizacion:** 2026-09-28 por Claude (el spec de Content Factory emite el bloque: `kind: 'glitchDrop'`)
 > **Documentacion tecnica:** `docs/documentation/public-site/glitch-drop-gutenberg-block.md` · `docs/architecture/public-site/PRIMITIVES.md`
 
 ## Para que sirve
@@ -38,28 +38,54 @@ citas textuales externas (esas siguen siendo `core/quote`).
 
 ## Cómo insertarlo desde un agente (Content Factory)
 
-`GutenbergArticleSpec` todavía no tiene un tipo de bloque para Glitch, y el validador de Content Factory lo
-rechaza (`unsupported_gutenberg_block`). La receta vigente, usada en el Glitch Flash 251941 (2026-09-28), es:
+Desde el 2026-09-28 el agente escribe el drop **dentro del spec**, en el lugar exacto donde va, con el tipo
+`glitchDrop`:
 
-1. En el spec, donde va el drop, deja un párrafo marcador con texto único: `__GLITCH_DROP__` (o
-   `__GLITCH_DROP_1__`, `__GLITCH_DROP_2__`… si hay varios).
-2. Valida y crea el post **privado** como siempre:
+```json
+{
+  "heading": "El modelo del medio dejó de ser el plan B",
+  "level": 2,
+  "blocks": [
+    { "kind": "glitchDrop", "lines": [
+      "Durante mucho tiempo la regla fue sencilla: si la tarea importaba, ibas al modelo más grande.",
+      "La pregunta ya no es «¿cuál es el mejor modelo?», sino «¿para qué tarea necesito de verdad el más caro?»."
+    ] },
+    { "kind": "paragraph", "text": [
+      { "text": "Es la misma conversación que abrimos con " },
+      { "text": "GPT-5.6 y ChatGPT Work", "href": "https://efeoncepro.com/glitch/gpt-5-6-y-chatgpt-work-openai/" },
+      { "text": ": no se trata de elegir un modelo, sino de repartir el trabajo entre niveles de inteligencia." }
+    ] }
+  ]
+}
+```
+
+Paso a paso:
+
+1. Escribe de 1 a 4 líneas de texto plano. Nada de enlaces, direcciones web, HTML ni saltos de línea dentro de una
+   línea: el enlace va en el párrafo siguiente. Si algo de eso aparece, Content Factory se detiene con un código
+   `content_factory_article_glitch_drop_*` antes de armar el borrador.
+2. Corre el borrador en seco y revisa la validación:
+   `pnpm public-website:content-factory:run -- --spec <spec.json> --out <draft.json>`.
+3. Si aparece el aviso `glitch_drop_redundant_with_neighbor`, el párrafo anterior o el siguiente repite una línea o
+   una frase del drop (el aviso dice cuál). Reescribe uno de los dos y vuelve a correr; es exactamente el error que la
+   QA encontró a mano en el Glitch Flash 251941.
+4. Con `validation=pass`, crea el post **privado** como siempre:
    `pnpm public-website:content-factory:run -- --spec <spec.json> --send --author-id <id>`.
-3. Guarda un snapshot del `post_content` antes de tocarlo.
-4. Con un eval PHP revisado (`pnpm public-website:wpcli -- --eval-file ./tmp/<script>.php --wp-user 12`):
-   comprueba el ID del post, su manifest y que cada marcador aparezca **una sola vez**; luego `parse_blocks`,
-   reemplaza el párrafo marcador por el bloque `efeoncepro/glitch-drop` con el texto en el atributo `content`
-   (frases unidas por `<br>`, texto en nowdoc UTF-8), `serialize_blocks` y `wp_update_post(wp_slash(...))`.
-5. Lee de vuelta: el marcador ya no existe y hay tantos drops como esperabas.
-6. Si el post ya está publicado: purga la caché (`wp cache flush` + `kinsta cache purge --all`) y revisa en vivo que
+5. Si el post ya está publicado: purga la caché (`wp cache flush` + `kinsta cache purge --all`) y revisa en vivo que
    cada `aside.gh-glitch-drop` se vea (`offsetHeight > 0`) a 1280 y 390 px.
-7. Lee el drop junto a los párrafos vecinos: **ninguno puede repetir su frase**. En 251941 el párrafo siguiente
-   repetía el remate y hubo que corregirlo tras la QA en vivo.
+6. Haz igual la lectura humana del drop junto a sus vecinos: el aviso automático detecta repeticiones literales o casi
+   literales, no una idea repetida con otras palabras.
 
-Nunca escribas a mano el comentario `<!-- wp:efeoncepro/glitch-drop … /-->`: lo serializa WordPress. Detalle y
-propuesta para darle un tipo propio en el spec:
-`.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md` (§Glitch Drop sin `kind` y
-§Propuesta de extensión).
+Content Factory guarda el bloque tal como lo guarda WordPress (`<!-- wp:efeoncepro/glitch-drop {"content":"…"} /-->`,
+con las líneas unidas por `<br>`). Nunca escribas ese comentario a mano.
+
+### Receta anterior (histórica / fallback)
+
+Antes del 2026-09-28 el drop se insertaba después del write con un párrafo marcador `__GLITCH_DROP__` y un eval PHP
+gobernado (`parse_blocks` → reemplazo → `serialize_blocks` → `wp_update_post(wp_slash(...))`, con snapshot previo).
+Sólo se usa ya para meter un drop en un post que **no** se regenera desde su spec. Detalle:
+`.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md` (§Glitch Drop por marcador y
+§Extensión de GutenbergArticleSpec).
 
 ## Cómo verificar en runtime (WP-CLI gobernado)
 
@@ -124,6 +150,10 @@ pnpm public-website:wpcli -- --eval-file ./ruta/deactivate.php
   si un cambio de estilos lo pierde, el bloque desaparece. Tras editar CSS,
   **redeploy + purgar caché de Kinsta** (el CSS del bloque va inline en el HTML
   cacheado). Verifica con browser real que `offsetHeight > 0`.
+- **Content Factory se detiene con `content_factory_article_glitch_drop_*`:** una línea trae enlace, URL, HTML,
+  salto de línea o barra invertida, o hay más de 4 líneas / ninguna. El sufijo `:<n>` indica la línea (desde 0).
+- **Aviso `glitch_drop_redundant_with_neighbor`:** el párrafo de al lado repite una línea o frase del drop (≥ 60 % de
+  coincidencia o 8 palabras seguidas). Reescribe uno de los dos.
 - **El bloque sale anidado dentro de una cita / duplicado:** en el editor,
   saca el bloque Glitch fuera del bloque `core/quote` (déjalo a nivel raíz) y
   borra el quote redundante.
@@ -131,6 +161,8 @@ pnpm public-website:wpcli -- --eval-file ./ruta/deactivate.php
 ## Referencias técnicas
 
 - Contrato: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`
+- Builder y validación: `src/lib/public-site/content-factory/gutenberg-glitch-drop.ts`,
+  `article-authoring.ts` (`kind: 'glitchDrop'`), `gutenberg-validator.ts`
 - Registry: `docs/architecture/public-site/PRIMITIVES.md`
 - Recetas de authoring: `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
 - Task: `docs/tasks/**/TASK-1337-glitch-gutenberg-block.md`

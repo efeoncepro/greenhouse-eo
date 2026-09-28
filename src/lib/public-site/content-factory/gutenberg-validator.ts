@@ -6,6 +6,15 @@ import type {
   GutenbergHeadingOutlineItem
 } from './contracts'
 import { resolveContentFactoryValidationStatus } from './contracts'
+import {
+  GLITCH_DROP_ALLOWED_ATTRIBUTES,
+  GLITCH_DROP_BLOCK_NAME,
+  GLITCH_DROP_MAX_LINES,
+  findGlitchDropRedundancy,
+  glitchDropContentHasForeignMarkup,
+  glitchDropContentHasLink,
+  splitGlitchDropContent
+} from './gutenberg-glitch-drop'
 
 export type GutenbergDraftValidationOptions = {
   allowedBlocks?: string[]
@@ -42,6 +51,9 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   'core/separator',
   'core/spacer',
   'core/table',
+  // Dynamic Efeonce POV callout (plugin efeonce-editorial-blocks). Allowed only in its
+  // governed shape: self-closing, `content` without links or HTML other than <br>.
+  GLITCH_DROP_BLOCK_NAME,
   'yoast-seo/table-of-contents'
 ]
 
@@ -75,7 +87,8 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
     'core/separator',
     'core/table',
     'core/image',
-    'core/embed'
+    'core/embed',
+    GLITCH_DROP_BLOCK_NAME
   ]
 }
 
@@ -696,6 +709,227 @@ const validateDetailsBlocks = (
   }
 }
 
+type GutenbergBlockSpan = {
+  block: ParsedGutenbergBlockComment
+  start: number
+  end: number
+  parent: number | null
+}
+
+const commentEnd = (postContent: string, index: number) => {
+  const end = postContent.indexOf('-->', index)
+
+  return end < 0 ? postContent.length : end + 3
+}
+
+/**
+ * Flat list of opening blocks with their full span (opening comment → end of the
+ * closing comment) and the index of their parent span, so sibling relations can
+ * be read without a full parser.
+ */
+const buildBlockSpans = (postContent: string, blocks: ParsedGutenbergBlockComment[]): GutenbergBlockSpan[] => {
+  const spans: GutenbergBlockSpan[] = []
+  const stack: number[] = []
+
+  for (const block of blocks) {
+    if (block.closing) {
+      const openIndex = stack.pop()
+
+      if (openIndex !== undefined) spans[openIndex].end = commentEnd(postContent, block.index)
+      continue
+    }
+
+    const parent = stack.length ? stack[stack.length - 1] : null
+
+    spans.push({
+      block,
+      start: block.index,
+      end: block.selfClosing ? commentEnd(postContent, block.index) : postContent.length,
+      parent
+    })
+
+    if (!block.selfClosing) stack.push(spans.length - 1)
+  }
+
+  return spans
+}
+
+/** Blocks whose visible text can repeat a Glitch Drop sentence. */
+const REDUNDANCY_NEIGHBOUR_BLOCKS = new Set(['core/paragraph', 'core/list', 'core/quote', 'core/pullquote'])
+
+/** Blocks skipped when looking for the neighbouring paragraph (they carry no body copy). */
+const REDUNDANCY_TRANSPARENT_BLOCKS = new Set(['core/heading', 'core/separator', 'core/spacer', 'yoast-seo/table-of-contents'])
+
+const findRedundancyNeighbour = (
+  spans: GutenbergBlockSpan[],
+  spanIndex: number,
+  direction: -1 | 1
+): GutenbergBlockSpan | null => {
+  const parent = spans[spanIndex].parent
+
+  for (let index = spanIndex + direction; index >= 0 && index < spans.length; index += direction) {
+    const candidate = spans[index]
+
+    if (candidate.parent !== parent) continue
+    if (REDUNDANCY_NEIGHBOUR_BLOCKS.has(candidate.block.blockName)) return candidate
+    if (REDUNDANCY_TRANSPARENT_BLOCKS.has(candidate.block.blockName)) continue
+
+    return null
+  }
+
+  return null
+}
+
+/**
+ * `efeoncepro/glitch-drop` is allowed only in the governed shape the spec emits:
+ * self-closing dynamic block, `content` (and optionally `label`) attributes,
+ * text separated by `<br>`, no links or other HTML. A drop that repeats the
+ * neighbouring paragraph is a warning (the 251941 QA finding).
+ */
+const validateGlitchDropBlocks = (
+  postContent: string,
+  blocks: ParsedGutenbergBlockComment[],
+  findings: ContentFactoryValidationFinding[]
+) => {
+  const spans = buildBlockSpans(postContent, blocks)
+
+  for (const [spanIndex, span] of spans.entries()) {
+    const { block } = span
+
+    if (block.blockName !== GLITCH_DROP_BLOCK_NAME) continue
+
+    const path = `draft.postContent[${block.index}]`
+
+    if (!block.selfClosing) {
+      findings.push({
+        severity: 'block',
+        code: 'glitch_drop_not_self_closing',
+        message: `${GLITCH_DROP_BLOCK_NAME} is a dynamic block: its text lives in the content attribute of a self-closing comment.`,
+        path
+      })
+    }
+
+    const unsupportedAttrs = Object.keys(block.attrs).filter(
+      key => key !== '__invalidJson' && !(GLITCH_DROP_ALLOWED_ATTRIBUTES as readonly string[]).includes(key)
+    )
+
+    if (unsupportedAttrs.length > 0) {
+      findings.push({
+        severity: 'block',
+        code: 'glitch_drop_attrs_unsupported',
+        message: `${GLITCH_DROP_BLOCK_NAME} only accepts ${GLITCH_DROP_ALLOWED_ATTRIBUTES.join(', ')}; found ${unsupportedAttrs.join(', ')}.`,
+        path
+      })
+    }
+
+    const content = typeof block.attrs.content === 'string' ? block.attrs.content : ''
+    const lines = splitGlitchDropContent(content)
+
+    if (lines.length === 0) {
+      findings.push({
+        severity: 'block',
+        code: 'glitch_drop_content_missing',
+        message: `${GLITCH_DROP_BLOCK_NAME} needs non-empty content.`,
+        path
+      })
+
+      continue
+    }
+
+    if (glitchDropContentHasLink(content)) {
+      findings.push({
+        severity: 'block',
+        code: 'glitch_drop_link_not_allowed',
+        message: 'Glitch Drop must not contain links; put the source link in the following paragraph.',
+        path
+      })
+    } else if (glitchDropContentHasForeignMarkup(content)) {
+      findings.push({
+        severity: 'block',
+        code: 'glitch_drop_html_not_allowed',
+        message: 'Glitch Drop content accepts plain text separated by <br> only.',
+        path
+      })
+    }
+
+    if (lines.length > GLITCH_DROP_MAX_LINES) {
+      findings.push({
+        severity: 'warning',
+        code: 'glitch_drop_too_many_lines',
+        message: `Glitch Drop has ${lines.length} lines; keep it to ${GLITCH_DROP_MAX_LINES} or fewer.`,
+        path
+      })
+    }
+
+    for (const direction of [-1, 1] as const) {
+      const neighbour = findRedundancyNeighbour(spans, spanIndex, direction)
+
+      if (!neighbour) continue
+
+      const neighbourText = normalizeComparableText(postContent.slice(neighbour.start, neighbour.end))
+      const match = findGlitchDropRedundancy(lines, neighbourText)
+
+      if (match) {
+        findings.push({
+          severity: 'warning',
+          code: 'glitch_drop_redundant_with_neighbor',
+          message: `Glitch Drop repeats the ${direction === -1 ? 'previous' : 'next'} ${neighbour.block.blockName} (similarity ${match.similarity}, ${match.sharedRunWords} shared words in a row): «${match.unit}». Rewrite one of them.`,
+          path
+        })
+      }
+    }
+  }
+}
+
+const GOVERNED_BUTTON_STYLE_CLASSES = new Set(['is-style-fill', 'is-style-outline'])
+const LITERAL_STYLE_ATTRS = ['backgroundColor', 'textColor', 'gradient', 'style', 'fontSize', 'fontFamily', 'borderColor']
+
+/**
+ * Governed CTA buttons: core-registered styles only, no literal colors, and a
+ * reviewed http(s)/mailto destination. Warnings (not blocks) so refreshes of
+ * legacy posts (249768) stay possible; generated specs never trigger them.
+ */
+const validateButtonBlocks = (
+  postContent: string,
+  blocks: ParsedGutenbergBlockComment[],
+  findings: ContentFactoryValidationFinding[]
+) => {
+  const spans = buildBlockSpans(postContent, blocks)
+
+  for (const span of spans) {
+    const { block } = span
+
+    if (block.blockName !== 'core/button' && block.blockName !== 'core/buttons') continue
+
+    const path = `draft.postContent[${block.index}]`
+    const literalAttrs = LITERAL_STYLE_ATTRS.filter(attr => attr in block.attrs)
+    const classNames = typeof block.attrs.className === 'string' ? block.attrs.className.split(/\s+/).filter(Boolean) : []
+    const ungovernedClasses = classNames.filter(name => !GOVERNED_BUTTON_STYLE_CLASSES.has(name))
+
+    if (literalAttrs.length > 0 || ungovernedClasses.length > 0) {
+      findings.push({
+        severity: 'warning',
+        code: 'button_style_not_governed',
+        message: `${block.blockName} carries ${[...literalAttrs, ...ungovernedClasses].join(', ')}; use the governed fill/outline variants only.`,
+        path
+      })
+    }
+
+    if (block.blockName !== 'core/button') continue
+
+    const href = postContent.slice(span.start, span.end).match(/<a\b[^>]*\shref=["']([^"']*)["']/i)?.[1]
+
+    if (!href || !/^(?:https?:\/\/|mailto:)/i.test(decodeBasicHtmlEntities(href))) {
+      findings.push({
+        severity: 'warning',
+        code: 'button_link_not_governed',
+        message: 'core/button needs a reviewed https:, http: or mailto: destination.',
+        path
+      })
+    }
+  }
+}
+
 export const validateGeneratedGutenbergDraft = (
   draft: ContentFactoryGeneratedDraft,
   options: GutenbergDraftValidationOptions = {}
@@ -801,6 +1035,8 @@ export const validateGeneratedGutenbergDraft = (
   validateTableOfContentsIntegrity(postContent, blocks, findings)
   validateGovernedHtmlJsonLdBlocks(postContent, blocks, findings)
   validateDetailsBlocks(postContent, blocks, findings)
+  validateGlitchDropBlocks(postContent, blocks, findings)
+  validateButtonBlocks(postContent, blocks, findings)
 
   if (postContent.length < 600) {
     findings.push({

@@ -20,8 +20,10 @@ import {
   escapeGutenbergHtml,
   renderHeadingBlock,
   renderYoastTableOfContents,
+  serializeGutenbergBlockAttributes,
   type GutenbergOutlineHeading
 } from './gutenberg-blocks'
+import { renderGlitchDropBlock } from './gutenberg-glitch-drop'
 import { slugifyPublicSiteDraft } from './gutenberg-planner'
 
 export type GutenbergRichTextSegment = {
@@ -46,6 +48,19 @@ export type GutenbergFaqSchemaOptions = {
   inLanguage?: string
 }
 
+export type GutenbergButtonVariant = 'fill' | 'outline'
+
+export type GutenbergButtonItem = {
+  /** Visible label, plain text (escaped). */
+  text: string
+  /** Reviewed destination: `https:`, `http:` or `mailto:` only. */
+  href: string
+  /** Core-registered button styles only. `fill` is the core default and emits no class. */
+  variant?: GutenbergButtonVariant
+}
+
+export const GUTENBERG_BUTTONS_MAX_ITEMS = 3
+
 export type GutenbergArticleBlock =
   | { kind: 'paragraph'; text: GutenbergRichText }
   | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean }
@@ -56,6 +71,8 @@ export type GutenbergArticleBlock =
       headers: GutenbergRichText[]
       rows: GutenbergRichText[][]
       caption?: GutenbergRichText
+      /** Core-registered table style (`is-style-stripes`). Check Ohio at 390 px on wide tables. */
+      style?: 'stripes'
     }
   | { kind: 'quote'; text: string }
   | { kind: 'pullquote'; text: string }
@@ -74,7 +91,21 @@ export type GutenbergArticleBlock =
       /** Optional art-directed sources. The fallback attachment remains the Gutenberg image owner. */
       sources?: Array<{ url: string; media: string; type?: 'image/webp' | 'image/jpeg' | 'image/png' }>
     }
-  | { kind: 'embed'; provider: 'youtube'; url: string }
+  | {
+      kind: 'embed'
+      provider: 'youtube'
+      url: string
+      /** Source credit (Glitch convention «Fuente: <medio>»), rendered as a real figcaption. */
+      caption?: GutenbergRichText
+    }
+  /**
+   * Efeonce POV callout for Glitch posts (`efeoncepro/glitch-drop`, dynamic block).
+   * 1–4 plain-text lines joined by `<br>`; no links or markup (the link goes in the
+   * next paragraph). Serialized byte-identical to WordPress.
+   */
+  | { kind: 'glitchDrop'; lines: string[] }
+  /** Governed CTA buttons: 1–3 items, closed variants, no literal colors or custom classes. */
+  | { kind: 'buttons'; items: GutenbergButtonItem[] }
 
 export type GutenbergArticleSection = {
   heading: string
@@ -173,9 +204,17 @@ const tableBlock = (block: Extract<GutenbergArticleBlock, { kind: 'table' }>): s
     ? `<figcaption class="wp-element-caption">${renderRichText(block.caption)}</figcaption>`
     : ''
 
+  if (block.style !== undefined && block.style !== 'stripes') {
+    throw new Error(`content_factory_article_table_style_invalid:${String(block.style)}`)
+  }
+
+  const styleClass = block.style === 'stripes' ? 'is-style-stripes' : ''
+  const comment = styleClass ? `<!-- wp:table ${serializeGutenbergBlockAttributes({ className: styleClass })} -->` : '<!-- wp:table -->'
+  const figureClass = styleClass ? `wp-block-table ${styleClass}` : 'wp-block-table'
+
   return [
-    '<!-- wp:table -->',
-    `<figure class="wp-block-table"><table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>${caption}</figure>`,
+    comment,
+    `<figure class="${figureClass}"><table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>${caption}</figure>`,
     '<!-- /wp:table -->'
   ].join('\n')
 }
@@ -222,9 +261,12 @@ const blockToPlainText = (block: GutenbergArticleBlock): string => {
     case 'quote':
     case 'pullquote':
       return block.text
+    case 'glitchDrop':
+      return block.lines.join(' ')
     case 'separator':
     case 'image':
     case 'embed':
+    case 'buttons':
       return ''
     case 'faq':
       throw new Error('content_factory_article_faq_nested_unsupported')
@@ -372,12 +414,105 @@ const imageBlock = (block: Extract<GutenbergArticleBlock, { kind: 'image' }>): s
   ].join('\n')
 }
 
-const embedBlock = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>): string =>
-  [
-    `<!-- wp:embed {"url":"${block.url}","type":"video","providerNameSlug":"${block.provider}","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->`,
-    `<figure class="wp-block-embed is-type-video is-provider-${block.provider} wp-block-embed-${block.provider} wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">${block.url}</div></figure>`,
+const YOUTUBE_EMBED_HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be'])
+
+const assertEmbedUrl = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>): string => {
+  if (block.provider !== 'youtube') {
+    throw new Error(`content_factory_article_embed_provider_unsupported:${String(block.provider)}`)
+  }
+
+  let url: URL
+
+  try {
+    url = new URL(block.url)
+  } catch {
+    throw new Error('content_factory_article_embed_url_invalid')
+  }
+
+  if (url.protocol !== 'https:' || !YOUTUBE_EMBED_HOSTS.has(url.hostname)) {
+    throw new Error('content_factory_article_embed_url_invalid')
+  }
+
+  return block.url
+}
+
+const embedBlock = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>): string => {
+  const url = assertEmbedUrl(block)
+
+  const attrs = serializeGutenbergBlockAttributes({
+    url,
+    type: 'video',
+    providerNameSlug: block.provider,
+    responsive: true,
+    className: 'wp-embed-aspect-16-9 wp-has-aspect-ratio'
+  })
+
+  // Same shape WordPress stores for a captioned embed (Glitch #17, 251605): the
+  // figcaption follows the wrapper inside the figure.
+  const caption = block.caption
+    ? `<figcaption class="wp-element-caption">${renderRichText(block.caption)}</figcaption>`
+    : ''
+
+  return [
+    `<!-- wp:embed ${attrs} -->`,
+    `<figure class="wp-block-embed is-type-video is-provider-${block.provider} wp-block-embed-${block.provider} wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">${escapeGutenbergHtml(url)}</div>${caption}</figure>`,
     '<!-- /wp:embed -->'
   ].join('\n')
+}
+
+const assertButtonHref = (href: string, index: number): string => {
+  let url: URL
+
+  try {
+    url = new URL(href)
+  } catch {
+    throw new Error(`content_factory_article_button_href_invalid:${index}`)
+  }
+
+  if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) {
+    throw new Error(`content_factory_article_button_href_protocol_invalid:${index}:${url.protocol}`)
+  }
+
+  return href
+}
+
+const buttonsBlock = (block: Extract<GutenbergArticleBlock, { kind: 'buttons' }>): string => {
+  if (!Array.isArray(block.items) || block.items.length === 0 || block.items.length > GUTENBERG_BUTTONS_MAX_ITEMS) {
+    throw new Error('content_factory_article_buttons_count_invalid')
+  }
+
+  const buttons = block.items.map((item, index) => {
+    if (typeof item.text !== 'string' || !item.text.trim()) {
+      throw new Error(`content_factory_article_button_text_required:${index}`)
+    }
+
+    if (/<\/?[a-z!?]/i.test(item.text)) {
+      throw new Error(`content_factory_article_button_markup_not_allowed:${index}`)
+    }
+
+    const variant = item.variant ?? 'fill'
+
+    if (variant !== 'fill' && variant !== 'outline') {
+      throw new Error(`content_factory_article_button_variant_invalid:${index}:${String(variant)}`)
+    }
+
+    const href = assertButtonHref(item.href, index)
+
+    // `fill` is the core default style: no class, exactly what the editor stores.
+    const styleClass = variant === 'outline' ? 'is-style-outline' : ''
+    const comment = styleClass ? `<!-- wp:button ${serializeGutenbergBlockAttributes({ className: styleClass })} -->` : '<!-- wp:button -->'
+    const wrapperClass = styleClass ? `wp-block-button ${styleClass}` : 'wp-block-button'
+
+    return [
+      comment,
+      `<div class="${wrapperClass}"><a class="wp-block-button__link wp-element-button" href="${escapeGutenbergHtml(href)}">${escapeGutenbergHtml(item.text.trim())}</a></div>`,
+      '<!-- /wp:button -->'
+    ].join('\n')
+  })
+
+  // WordPress serializes inner blocks joined by a blank line, inside the wrapper div.
+  return ['<!-- wp:buttons -->', `<div class="wp-block-buttons">${buttons.join('\n\n')}</div>`, '<!-- /wp:buttons -->'].join('\n')
+}
 
 const renderArticleBlock = (
   block: GutenbergArticleBlock,
@@ -404,6 +539,10 @@ const renderArticleBlock = (
       return imageBlock(block)
     case 'embed':
       return embedBlock(block)
+    case 'glitchDrop':
+      return renderGlitchDropBlock(block.lines)
+    case 'buttons':
+      return buttonsBlock(block)
   }
 }
 

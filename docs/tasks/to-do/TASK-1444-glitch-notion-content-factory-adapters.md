@@ -1,5 +1,13 @@
 # TASK-1444 — Glitch Notion and Content Factory Adapters
 
+## Delta 2026-09-28 (tarde) — gap cerrado: el spec emite `glitchDrop`
+
+- `GutenbergArticleSpec` ya tiene `{ kind: 'glitchDrop', lines }` (1–4 líneas, serializado igual que WordPress,
+  validado en su forma gobernada, aviso `glitch_drop_redundant_with_neighbor`), además de `embed.caption`,
+  `table.style: 'stripes'` y `kind: 'buttons'`. El adapter Notion → spec debe mapear el POV a `glitchDrop`, no al
+  párrafo marcador. Detalle: `.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md`
+  §Extensión de GutenbergArticleSpec — cerrado por el trabajo de extensión del spec del 2026-09-28 (sin TASK propia).
+
 ## Delta 2026-09-28 — Content Factory no emite `efeoncepro/glitch-drop`
 
 - El primer Glitch Flash (post 251941, 2026-09-28) salió por Content Factory (`pnpm public-website:content-factory:run
