@@ -303,7 +303,7 @@ full `pnpm test` + `pnpm build`; push; deploy; staging flags; staging canary.
 ## TASK-1849 — portal library/builder/shared web (to-do)
 _Fill at closure._
 
-## TASK-1875 — Think shared web render (in-progress; production sharing live — 2026-09-28)
+## TASK-1875 — Think shared web render (complete 2026-09-28; production sharing live)
 
 **Delta 2026-09-28 (close-out).** Unsupported major now tested: Think `7485e32` adds `acceptSharedEdition`
 (`src/lib/insights-accept.ts`, no Astro imports) as the single acceptance gate for real responses and dev fixtures;
@@ -520,6 +520,19 @@ producción antes de compartir con clientes. Sin flag propio.
 
 ## Sessions (append as you go; newest first)
 
+- **2026-09-28 · Marca de producto + referencia en AXIS (sin task; barrido documental).** La marca de Insights quedó
+  canónica (operador: «Me encanta, canonízalo») y publicada en `@efeoncepro/axis-brand-assets` **0.4.0** (tag `v0.4.0`,
+  AXIS `25b5ecf` logo/isotipo + `4760e3e` lockup; Greenhouse `7deed5888` + `b64f07ffa`, generador
+  `scripts/brand/build-insights-logo.mjs`). Los archivos oficiales se aplican sólo en Think (lockup en hero y modo presentación, OG
+  propio, copias manuales en `public/branding/insights/`); las portadas del PDF y del deck componen una versión
+  tipográfica (logo Efeonce + filete + «INSIGHTS» en versalitas); el correo, el favicon, el portal y MCP
+  siguen sin marca y Greenhouse fija `axis-brand-assets` 0.3.5 — gaps sin decisión del operador. En paralelo se crea la página de
+  referencia del Lab `https://axis.efeonce.org/references/insights/` (fuente `apps/lab/src/pages/references/insights.astro`,
+  JSON `insights.json.ts`, guía `docs/agent-composition/insights.md`): referencia con datos de muestra, no componentes.
+  Frontera: AXIS publica valores y activos; la UI vive en Greenhouse y Think. Follow-up documentado (no implementado):
+  extraer a AXIS los roles de color de datos y la geometría de las 15 familias, que ya están copiados a mano en los dos
+  consumidores (y la copia divergió en «anterior sobre papel»). Todo esto vive ahora en
+  [`ui-and-brand.md`](ui-and-brand.md). Nada desplegado en Greenhouse por este barrido.
 - **2026-09-28 · TASK-1875 · activation in production.** WAF applied/read back without drift; exact Vercel Production
   flag + Ready redeploy `greenhouse-cssemzyzb`; sequential behavior canary green through Think and grant revoked.
   Production remains on supported web model 1.0; no Greenhouse release. Task stays in-progress for the automated

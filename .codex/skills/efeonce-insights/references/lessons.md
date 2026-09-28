@@ -1,5 +1,17 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-28 · marca + AXIS · La copia a mano de los roles de color ya divergió.** Síntoma: el dato «anterior» sobre
+  papel es `#1f9e94` (`--axis-deck-teal-650`, `editorial-roles.json`) en los PDF y `#0e8c82` (`orbita.accentLight`,
+  `efeonce-think/src/lib/insights-tokens.ts`) en la web; «actual» en papel y los dos roles en navy coinciden. Nadie lo
+  decidió: es el costo de dos copias sin fuente común. Regla: antes de tocar un color de dato en un consumidor, compara
+  los dos; no unifiques sin decisión del operador; la salida es extraer los roles a AXIS (follow-up en
+  [`ui-and-brand.md`](ui-and-brand.md) §1), no otra copia.
+- **2026-09-28 · marca + AXIS · Publicar la marca en AXIS no la pone en ninguna superficie.** `axis-brand-assets` 0.4.0
+  trae `insights-{logo,isotype,lockup}-*`, pero Greenhouse fija 0.3.5, las portadas A4/deck componen una versión
+  tipográfica («INSIGHTS» en versalitas junto al logo de Efeonce) en vez del archivo oficial, el correo usa
+  `brand='efeonce'` y sólo Think usa los archivos oficiales, con copias manuales. Regla: antes de afirmar que una
+  superficie «lleva la marca de Insights», revisa el mapa de aplicación de [`ui-and-brand.md`](ui-and-brand.md) §2 y el
+  archivo real; agregarla a una superficie nueva es decisión del operador.
 - **2026-09-28 · TASK-1875 · Pasar a medios de impresión con transiciones activas deja elementos a medio camino.** Las
   transiciones CSS ganan incluso a `!important` (su origen en la cascada está por encima): al imprimir, los elementos que
   estaban animando quedaron congelados en `opacity: 0`. Regla: la hoja de impresión fija `transition: none` y

@@ -77,6 +77,15 @@
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
+- **Marca de Insights fuera de Think (2026-09-28):** el archivo oficial sólo se aplica en el informe live de Think
+  (lockup en el hero y en el modo presentación, OG propio). Las portadas del PDF A4 y del deck (y el pie de la apertura
+  de capítulo del deck) componen una versión **tipográfica**: logo de Efeonce + filete + «INSIGHTS» en
+  versalitas; pie y contraportada del PDF, logo de Efeonce. **Sin decisión:** si esas portadas pasan al archivo oficial
+  `insights-lockup-*` (tocarlas pasa por el contrato de fidelidad de TASK-1889), si el
+  correo de Insights la lleva (hoy `brand='efeonce'`), el favicon de Think para `/insights/**` (hoy genérico), la ficha
+  de Insights en la receta `content-day-live-results` (hoy isotipo de Efeonce), el portal y MCP, y el **tamaño mínimo del
+  lockup** (el logo tiene 18 px sugeridos; el lockup, ninguno). Mapa completo: `efeonce-insights` →
+  `references/ui-and-brand.md` §2 y [applications.md](applications.md) §B3b.
 - **Íconos de Trazo `republicar` y `enviar` (2026-09-28):** dibujados con el método de AXIS; pasan `pnpm icons:check`
   (aire 0,535 y 0,611). Ya no hacen falta en la contraportada (se retiró la fila de acciones); quedan en borrador por si
   otra pieza los necesita. No entran a `STROKE_GLYPHS` sin aprobación.
@@ -260,6 +269,14 @@
 | 2026-09-28 | axis-tokens 0.3.24 · axis-ui-contracts 0.3.22 (Glitch Flash; AXIS `main@5b3056f`) | publicado (tag `v0.3.24`; CI y «Release UI packages» en verde) | `glitchLine.editions` (`weekly` \| `flash`; `editions.flash` `approved`, cabecera «NO ESPERA AL LUNES» + estela + «FLASH», chips, `progress: none`, `narratorCloser`), seis piezas `flash-*` con `derivesFrom`, `chip` y `coverTemplate: null`, `pendingDecisions` `edition-numbering-blog-vs-system` y `weekly-cover-chip`; contrato `efeonce.glitch-line` **0.2.0** (`edition` número o `{ kind, number? }`, campo `progress`, códigos `edition-kind-invalid`, `edition-kind-mismatch`, `flash-edition-number-not-allowed`, `flash-progress-not-allowed`, `progress-invalid`; 28 en total; un intent 0.1.0 resuelve igual). Lab `/references/glitch/#flash`. **Vigente: Greenhouse fija `axis-tokens` 0.3.24 y `axis-ui-contracts` 0.3.22 desde `53002b352`** (el bump exigió `pnpm brand:tokens` además de `pnpm glitch:tokens`: `609353e83`) |
 | 2026-09-28 | axis-graphic-line 0.8.0 (AXIS `main@3e1d971`) | publicado (tag `v0.8.0`) | Trazo `swipe` «Desliza» (D28): `ICON_CATALOG` pasa a 85 (37 Trazo + 48 Plastilina). Greenhouse sigue fijando axis-graphic-line 0.7.0 hasta que una tarea lo suba |
 | 2026-09-28 | axis-graphic-line 0.9.0 · axis-brand-assets 0.3.6 (AXIS `main@efe4d32`) | publicado (tag `v0.9.0`) | Plastilina `mano` (D29) con su volumen: `ICON_CATALOG` pasa a 86 (37 Trazo + 49 Plastilina) y `volume/` a 49 PNG. Greenhouse sigue fijando axis-graphic-line 0.7.0 y axis-brand-assets 0.3.5 hasta que una tarea los suba |
+| 2026-09-28 | axis-brand-assets 0.4.0 (AXIS `25b5ecf` + `4760e3e`, en `main`) | publicado (tag `v0.4.0`) | marca de producto de Efeonce Insights: `insights-logo-*`, `insights-isotype-*` y el tipo nuevo `lockup` (`insights-lockup-{positive,negative}`); 25 SVG sellados. **Greenhouse sigue fijando `axis-brand-assets` 0.3.5** (`package.json`), así que no trae estos archivos hasta que una tarea suba la versión; Think usa copias manuales |
+
+Lab AXIS, Insights (2026-09-28): página de **referencia** `https://axis.efeonce.org/references/insights/` (fuente
+`apps/lab/src/pages/references/insights.astro`, JSON para agentes `insights.json.ts`, guía
+`docs/agent-composition/insights.md`), creada en paralelo al barrido documental de ese día: muestra la marca, sus
+aplicaciones aprobadas, las secciones del informe y la UI del informe live con datos de muestra. No publica componentes
+ni contratos (la UI de Insights vive en Greenhouse y Think). Las láminas 7.1/7.2 de `/references/graphic-line/` siguen
+siendo pruebas. Confirmar que la URL responde antes de citarla como vigente.
 
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 

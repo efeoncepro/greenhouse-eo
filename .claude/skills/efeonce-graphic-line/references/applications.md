@@ -351,6 +351,28 @@ vale en toda aplicación:
   en el `artifact-worker`; informes que no son Insights, skill `report-studio`.
 - **Fuente:** L 5.1, L 7.1, L 7.2; M §1.3; `EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` (Delta 2026-09-25).
 
+### B3b. Marca de producto de Efeonce Insights — dónde se aplica (2026-09-28)
+
+La marca («insights» con la órbita mínima en el punto de la «i»; criterio en [criteria.md](criteria.md), «Insights,
+marca de producto que acompaña») acompaña a Efeonce y **nunca firma**: junto al logo de Efeonce se usa el archivo
+`insights-lockup-*` (Insights en gris, sólo la esfera en el acento), nunca los dos logos armados a mano.
+
+| Superficie | ¿Lleva la marca? | Qué hay hoy | Dónde |
+|---|---|---|---|
+| Informe live en Think (`/insights/r/<token>`, muestra `/insights/muestra`) | **sí** | lockup negativo en el hero (positivo al imprimir) y en la portada del modo presentación; OG `og-insights.png`; firma Efeonce en el pie | `efeonce-think/src/components/insights/InsightReport.astro`; archivos en `public/branding/insights/` (copias manuales) |
+| PDF A4 (`insights-report`) | **versión tipográfica** | portadas navy y clara: logo de Efeonce + filete + «INSIGHTS» en versalitas tipográficas (`.brand-product`), no el archivo oficial; pie de página y contraportada con el logo de Efeonce | `src/lib/artifact-composer/catalogs/insights-report/report-cover.html`, `report-cover-light.html`, `report-editorial.css` (usar el lockup oficial pasa por el contrato de fidelidad y el gate visual de TASK-1889) |
+| Deck (`insights-deck`) | **versión tipográfica** | portada y pie de la apertura de capítulo: logo de Efeonce + filete + «INSIGHTS» en versalitas (`.product`); los demás pies nombran «Insights · Informe de …» como texto | `catalogs/insights-deck/insights-cover.html`, `insights-chapter.html` |
+| Correo de entrega | pendiente | `brand='efeonce'`, diseño funcional | `src/emails/InsightsEditionDeliveryEmail.tsx` |
+| Favicon de Think en `/insights/**` | pendiente | favicon genérico del sitio | `efeonce-think/src/layouts/BaseLayout.astro` |
+| Ficha de Insights en la receta de deck `content-day-live-results` | pendiente | isotipo de Efeonce en ficha oscura | `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` |
+| Portal (TASK-1849) y MCP | pendiente | portal sólo diseñado; MCP sin superficie visual | — |
+
+«Versión tipográfica» = la marca se nombra con tipografía; falta usar el archivo oficial `insights-lockup-*`. Ambos
+estados, sin decisión del operador ([ledger.md](ledger.md), «Marca de Insights fuera de Think»). Greenhouse fija
+`@efeoncepro/axis-brand-assets` 0.3.5 y los archivos de Insights llegan en **0.4.0**: aplicarla en Greenhouse exige
+subir esa versión. Referencia visual: Lab AXIS `https://axis.efeonce.org/references/insights/`. Anatomía del informe y
+de la web: skill `efeonce-insights` → `references/ui-and-brand.md`.
+
 ### B4. Deck de Insights y correo de aviso
 
 - **Deck de Insights:** portada, figura y cierre en 16:9; la órbita chica de la esquina es la navegación (3 de 5); pie

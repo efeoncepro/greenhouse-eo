@@ -23,6 +23,7 @@
 | Identidad sonora (**recomendada, no canon**, 2026-09-26) | Greenhouse `docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`; AXIS (PR #4, squash `55486aa`, publicado 2026-09-26): página `https://axis.efeonce.org/references/sonic-brand/`, JSON `/references/sonic-brand.json` (esquema `axis.efeonce-sonic-brand.v1`), guía `docs/agent-composition/sonic-brand.md`, fuentes Lab `apps/lab/src/data/sonic-brand.ts` y `sonic-brand-assets.ts`. Sin tokens hasta canonizar | el operador (ledger); archivos, el kit |
 | Sub-línea de Glitch (sólo Glitch, 2026-09-27) | Greenhouse `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` (norma) + ADR `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md`; AXIS (publicado 2026-09-27): `/references/glitch/` (con `#sonido` y `#musica`), `/references/glitch.json` (campos `sound` y `music`), guía `docs/agent-composition/glitch.md`. Token `glitchLine` (`axis-tokens`; desde 0.3.24 con `editions` y las piezas `flash-*` del Glitch Flash), contrato `efeonce.glitch-line` 0.2.0 (`axis-ui-contracts` 0.3.22) y `AXIS_GLITCH_ASSETS` (`axis-brand-assets` 0.3.5); en Greenhouse, catálogos `src/lib/artifact-composer/catalogs/glitch/` (32 plantillas) y `pnpm glitch:compose`. Resumen en [glitch.md](glitch.md) | el operador; los valores, el token `glitchLine` |
 | Motion, sonido y música de Glitch (**aprobados**, sólo Glitch, 2026-09-27) | Producción: repo taller `efeoncepro/efeonce-brand-workshop` (`main` = `ed89a0b`), `tools/glitch-motion/` (HyperFrames; `src/sound.mjs` sobre `tools/brand-sound`; `src/music.mjs`), manifiesto por corrida en `corridas/<run>/manifiesto.json` (sha256, verificaciones, entrega; sin rutas de máquina). Música: másteres en `https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/` (`index.json`; sha256 fijado en `music.mjs`, falla cerrado si cambia). Sonido: `glitch/sound/v1/` del mismo bucket. Entregas al editor: OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/` (`v2/` la aprobada, `v2/sin-musica/`, `kit/`, `transiciones/`). Datos AXIS: `apps/lab/src/data/{glitch,glitch-sound,glitch-sound-assets,glitch-music,glitch-music-assets}.ts`. Comandos: norma de Glitch §13.13 y [glitch.md](glitch.md) §12 | el operador aprueba; los archivos del bucket (URL + sha256) mandan sobre cualquier script |
+| Marca de producto de Efeonce Insights (canónica 2026-09-28) | criterio [criteria.md](criteria.md) («Insights, marca de producto que acompaña»), decisión [ledger.md](ledger.md) (fila 2026-09-28); archivos `@efeoncepro/axis-brand-assets` ≥ 0.4.0 (`insights-{logo,isotype,lockup}-*`), generador Greenhouse `scripts/brand/build-insights-logo.mjs`; mapa de aplicación [applications.md](applications.md) §B3b; anatomía del informe y la web en la skill `efeonce-insights` → `references/ui-and-brand.md` | el operador; los archivos sellados mandan en la forma |
 
 Si un doc y el código no coinciden, manda el código verificado y se corrige el doc (con fecha).
 
@@ -33,6 +34,10 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
   - Lab: `https://axis.efeonce.org/references/graphic-line/` (fuente `apps/lab/src/pages/references/graphic-line.astro`,
     estilos `apps/lab/src/styles/graphic-line.css`, láminas del canvas en `apps/lab/src/data/graphic-line-elements.json`,
     helpers `apps/lab/src/lib/graphic-line.ts`, pruebas `apps/lab/src/test/{unit,e2e}`).
+  - Insights (2026-09-28): página de referencia `https://axis.efeonce.org/references/insights/` (fuente
+    `apps/lab/src/pages/references/insights.astro`, JSON `insights.json.ts`, guía `docs/agent-composition/insights.md`);
+    sólo datos de muestra, sin componentes. Archivos de la marca copiados al Lab en `apps/lab/public/branding/insights-*.svg`
+    por `apps/lab/scripts/sync-brand-assets.mjs`.
   - Manuales para agentes: `docs/agent-composition/graphic-line-orbit.md`, `email-signature.md`,
     `collaboration-selection.md`, `iconography.md`; decisiones AXIS `docs/architecture/GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md`
     e `ICONOGRAPHY_DECISION_V1.md`.
@@ -65,6 +70,7 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 | Qué | Dónde |
 |---|---|
 | Logos, isotipos, burbujas URL, 48 órbitas estáticas | `@efeoncepro/axis-brand-assets` (nunca copias a mano) |
+| Marca de Insights (logo, isotipo, lockup) | `@efeoncepro/axis-brand-assets` **0.4.0** (`insights-*`); Greenhouse fija 0.3.5 y no los trae; Think usa copias manuales en `efeonce-think/public/branding/insights/` (+ `og-insights.png`) |
 | Masters del motion del logo | `gs://efeonce-group-axis-public-media/motion/logo/v1.1/…` (público, CORS para el Lab) |
 | Kit de la identidad sonora (recomendada) | `gs://efeonce-group-axis-public-media/sonic/v1/` → `masters/` (logo, etiqueta con voz, motion WAV+MP4 16:9/9:16, piezas largas, cierre de energía, voz sola) y `web/` (MP3, MP4 720p, pósters WebP); 65 archivos. Producción: `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/`, `entrega/`, `guia/`; binarios fuera de git) |
 | Sonido de Glitch (sólo Glitch, versión B) | `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`masters/` + `web/`); lo produce el taller `efeonce-brand-workshop` → `tools/glitch-motion/src/sound.mjs`. Detalle: [glitch.md](glitch.md) §13 |
@@ -110,6 +116,10 @@ D26. Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 Flash, `53002b352`):** `axis-tokens` **0.3.24** · `axis-ui-contracts` **0.3.22** (tag `v0.3.24`) · `axis-brand-assets` 0.3.5 · `axis-graphic-line` 0.7.0
 (dependencia directa) · `axis-ui-registry` 0.3.1. Contrato `efeonce.surface-composition` 0.1.2 con los deltas (b)…(l)
 del ADR de AXIS. La serie completa está en [ledger.md](ledger.md).
+
+**Publicado el 2026-09-28 (tag `v0.4.0`, AXIS `25b5ecf` + `4760e3e` en `main`):** `axis-brand-assets` **0.4.0** con la
+marca de Insights y el tipo `lockup` (25 SVG sellados). Antes, el mismo día, `v0.9.0` publicó `axis-brand-assets` 0.3.6
+(volumen `mano`). Greenhouse sigue en 0.3.5.
 
 **Fuentes de la composición del deck (TASK-1927 y TASK-1928, verificado 2026-09-28):** tasks
 `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` y

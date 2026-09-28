@@ -547,6 +547,12 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
   ya pesa menos (Insights), así peso y brillo apuntan a la misma jerarquía; la palabra y el anillo van en gris de marca y
   sólo la esfera queda en el acento, como el eslogan. Se usa el archivo `insights-lockup-*`; **nunca** se arma el
   lockup a mano con los dos logos.
+- **Dónde va la marca de Insights hoy** (verificado 2026-09-28): el archivo oficial sólo en el informe live de Think
+  (hero, modo presentación, OG). Las portadas del PDF A4 y del deck componen una versión **tipográfica**
+  (logo de Efeonce + filete + «INSIGHTS» en versalitas), no el archivo `insights-lockup-*`; pie y contraportada del PDF,
+  logo de Efeonce. Correo, favicon, portal y MCP no la llevan. No hay decisión: no cambies ni agregues por criterio propio ([applications.md](applications.md) §B3b; [ledger.md](ledger.md), pendientes). Tamaño:
+  18 px de cuerpo sugeridos para el logo; el lockup no tiene mínimo escrito. Referencia visual: Lab AXIS
+  `https://axis.efeonce.org/references/insights/`.
 
 - **La firma de una pieza gráfica es el logo de Efeonce centrado, abajo al centro.** Cierra la composición al pie
   (manual §8.1; Tres voces, «la firma debe cerrar la composición al pie»).

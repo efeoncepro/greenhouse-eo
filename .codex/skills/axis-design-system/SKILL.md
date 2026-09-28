@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, and the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package)."
+description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/`."
 ---
 
 # AXIS Design System
@@ -264,8 +264,9 @@ Rules for agents:
   variants. Threshold 4.5 vs 3:1 pending the operator.
 - **The orbit never replaces the photographic composition** and never crosses subject, text reserves, bed or
   signature (`orbit-never-over-subject-or-reserves`).
-- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; Greenhouse pins `0.3.5`): 19 brand SVG (logo/isotype per brand, URL bubble
-  source and baked variants) plus the 48 static orbits, SHA-256 sealed; `findBrandAsset`, `brandAssetUrl`,
+- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; latest `0.4.0`; Greenhouse pins `0.3.5`): 25 brand SVG since
+  `0.4.0` (19 until `0.3.6`: logo/isotype per brand, URL bubble source and baked variants; `0.4.0` adds the Insights
+  logo/isotype and the `lockup` kind, see «Efeonce Insights in AXIS») plus the 48 static orbits, SHA-256 sealed; `findBrandAsset`, `brandAssetUrl`,
   `findOrbitAsset`. Consumers read the package, never a hand copy (Greenhouse guards its local copies with
   `src/config/efeonce-brand-assets.test.ts`). Not `efeonce.brand-logos` (third-party logo provenance).
 - **Motion:** the orbit animation (no logo) comes from this package (`ORBIT_MOTION_CSS`, `pnpm orbit:video`); the
@@ -565,6 +566,43 @@ public bucket `gs://efeonce-group-axis-public-media/sonic/v1/` (`masters/` + `we
   `/references/glitch/#sonido` and `#musica` (`glitch.json` → `sound`, `music`); never mix them with this kit. Never in client
   work or Greenhouse UI. Production and criterion live in Greenhouse: `docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`
   and `audio-studio` → `efeonce/EFEONCE_OVERLAY.md`.
+
+### Efeonce Insights in AXIS (brand assets + Lab reference; 2026-09-28)
+
+What AXIS holds for Efeonce Insights, and nothing more:
+
+- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.0`** (tag `v0.4.0`; AXIS `25b5ecf` logo/isotype +
+  `4760e3e` lockup, on `main`): brand `insights` in `AXIS_BRAND_ASSET_BRANDS` (`src/index.ts`); ids
+  `insights-logo-{positive,negative}`, `insights-isotype-{positive,negative}` and `insights-lockup-{positive,negative}`
+  (`src/manifest.ts`; new asset kind `lockup`, a fixed two-brand composition used as one file and never rebuilt). Rules
+  in the package README: the mark sits next to the Efeonce logo and never signs; in the lockup Insights goes in the
+  brand gray (`#6b6b6b` on paper, `#6f89a2` on navy) and only the sphere keeps the Growth accent. Files are generated in
+  Greenhouse by `scripts/brand/build-insights-logo.mjs` and re-sealed with `packages/brand-assets/scripts/seal.mjs`; never edited by hand. The
+  Lab copies them to `apps/lab/public/branding/` via `apps/lab/scripts/sync-brand-assets.mjs`.
+- **Greenhouse pins `0.3.5`**, so it does not carry these files yet; Think uses manual copies. The Greenhouse PDF/deck covers
+  show a type version (Efeonce logo + rule + «INSIGHTS» in small caps), not the official lockup file.
+  Switching them to the file, or adding the mark to email, favicon, portal or MCP, is an open operator decision (criterion and application map in
+  `efeonce-graphic-line` → `criteria.md` and `applications.md` §B3b).
+- **Lab reference page** `https://axis.efeonce.org/references/insights/` (source
+  `apps/lab/src/pages/references/insights.astro`, agent JSON `/references/insights.json` from `insights.json.ts`,
+  agent guide `docs/agent-composition/insights.md`; created on 2026-09-28 in parallel with the documentation sweep —
+  confirm it serves before citing it as live). It documents the mark and lockup, the approved applications, the report
+  sections and the live-report UI as a **reference**, the same way Glitch documents its approved pieces. The Lab is
+  public: sample data only (a fictitious organization, a «Logo del cliente» placeholder, illustrative figures), never
+  Berel, Sky or any client's data. The earlier boards 7.1/7.2 in `/references/graphic-line/` stay design tests.
+- **Boundary (binding):** AXIS publishes values, meaning and brand assets; it does **not** publish Insights product UI
+  (report templates, the Think components, chart renderers) as components or contracts. Product adapters stay in their
+  consumers until a second real consumer justifies extraction (`axis-design-system/docs/ARCHITECTURE.md`; ADR
+  `GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md` §Adapters; Lab §Boundary).
+- **Extraction candidates — follow-up, not implemented:** there are already two consumers with hand copies of (1) the
+  data-color roles (`greenhouse-eo/src/lib/artifact-composer/brand-packs/axis/editorial-roles.json` ↔
+  `efeonce-think/src/lib/insights-tokens.ts`, already diverging on «prior on paper»: `#1f9e94` vs `#0e8c82`) and (2) the
+  geometry of the 15 chart families (`greenhouse-eo/src/lib/artifact-composer/chart-geometry.ts` +
+  `catalogs/insights-shared/figure-svg.ts` ↔ `efeonce-think/src/lib/insights-chart-geometry.ts`). Extracting them needs
+  its own decision and task; never add them to AXIS inline, and never resolve the color divergence without the operator.
+- **Known drift:** the root README table and `docs/ARCHITECTURE.md` §Official brand files («0.3.0 … 19 SVGs») still
+  describe older `axis-brand-assets` versions.
+- Detail of the report and the live UI: `efeonce-insights` → `references/ui-and-brand.md`.
 
 ### AXIS Lab
 

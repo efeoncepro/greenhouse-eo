@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/`, when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -24,7 +24,12 @@ it without repeating what already cost a day*. It grows with every task: see the
 5. [`references/operations.md`](references/operations.md) — flags, module assignment, canaries,
    rollback, deploy traps.
 6. [`references/lessons.md`](references/lessons.md) — the traps that already bit someone.
-7. Canon docs only when you need the full contract:
+7. [`references/ui-and-brand.md`](references/ui-and-brand.md) — what Insights LOOKS like and where: product mark
+   (ids, rules, where it applies and where it is missing), the A4/deck report (15 + 12 templates, family → page,
+   variation rule, data roles, cover), the live Think report (12 sections, states, motion, responsive, routes, public
+   guard), email/portal/MCP, the AXIS boundary and the open gaps. Visual reference: AXIS Lab
+   `https://axis.efeonce.org/references/insights/` (+ `insights.json`, guide `docs/agent-composition/insights.md`).
+8. Canon docs only when you need the full contract:
    `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` (§5 windows, §7 API/MCP/authz, §10 gates,
    §14 state), `EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md` (ADR), and the exhaustive
    `EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md` (file-by-file record of the foundation).
@@ -145,6 +150,14 @@ it without repeating what already cost a day*. It grows with every task: see the
   none on a page that already has a sphere) needs its own task with the visual gate and operator approval: never
   swap or mix sets piecemeal, and never hand-draw a new icon into a catalog. The third layer, **Plastilina en volumen**
   (D24, 2026-09-27: matte-clay PNG from AXIS, hero moments only), never goes into Insights reports, dashboards or UI.
+- Product mark, report look, live-report UI, AXIS Lab page → [`references/ui-and-brand.md`](references/ui-and-brand.md)
+  + `efeonce-graphic-line` (`criteria.md` «Insights, marca de producto que acompaña», `applications.md` §B3–B4) +
+  `axis-design-system`. Boundary (binding): AXIS publishes the brand files (`insights-{logo,isotype,lockup}-*`,
+  `axis-brand-assets` 0.4.0) and a reference page, **never** Insights UI components or contracts; the UI lives in its
+  consumers (Greenhouse catalogs, Think). Data-color roles and chart geometry are duplicated in both consumers and are
+  a documented extraction follow-up, not something to fix inline. The PDF/deck covers show a TYPE version (Efeonce logo + rule + «INSIGHTS» in small caps, `.brand-product` / `.product`), not the official
+  `insights-lockup-*` file; email/favicon/portal/MCP carry no mark; Greenhouse pins `axis-brand-assets` 0.3.5. Swapping
+  or adding the mark anywhere is an operator decision, never yours.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).
@@ -174,6 +187,9 @@ this skill reflects what it built. At closure, in the same commit as the task's 
    `pnpm skills:mirrors`, and if `docs/mcp/skills/efeonce-insights/SKILL.md` (the MCP-served manual)
    needs the same knowledge for an external agent, update it too and regenerate with
    `pnpm mcp:skills:generate` + `pnpm mcp:skills:check` (no TASK ids, paths, UUIDs, org ids, secrets).
+
+Any change to the product mark, a catalog template, the Think report anatomy, the email look or the AXIS Lab page also
+updates `references/ui-and-brand.md` (and its gaps list) in the same commit.
 
 Sessions that do partial work (a slice, a canary, an incident) append to `references/lessons.md`
 and to the ledger's "sessions" list immediately, not at task closure. Codex, Claude and Cursor all
