@@ -270,11 +270,16 @@ const dispatchAttachment = async (
       sourceEntity: SOURCE_ENTITY
     })
 
-    if (result.status === 'skipped' && !result.dispatchOutcome) return settle(recipient, 'skipped', { skipReason: 'email_type_paused', emailDeliveryId: result.deliveryId || null })
-    if (result.dispatchOutcome === 'accepted') return settle(recipient, 'accepted', { emailDeliveryId: result.deliveryId })
-    if (result.dispatchOutcome === 'failed') return settle(recipient, 'failed', { emailDeliveryId: result.deliveryId, lastErrorCode: 'provider_rejected' })
+    // `sendEmail().deliveryId` es el id del BATCH; la fila de `email_deliveries` de este destinatario
+    // viene en `recipientResults[].deliveryId` (un solo destinatario por envío). Guardar el batch
+    // dejaba `email_delivery_id` apuntando a una fila inexistente (medido en staging 2026-09-28).
+    const emailDeliveryId = result.recipientResults?.[0]?.deliveryId || null
 
-    return settle(recipient, 'ambiguous', { emailDeliveryId: result.deliveryId || null, lastErrorCode: 'dispatch_unknown' })
+    if (result.status === 'skipped' && !result.dispatchOutcome) return settle(recipient, 'skipped', { skipReason: 'email_type_paused', emailDeliveryId })
+    if (result.dispatchOutcome === 'accepted') return settle(recipient, 'accepted', { emailDeliveryId })
+    if (result.dispatchOutcome === 'failed') return settle(recipient, 'failed', { emailDeliveryId, lastErrorCode: 'provider_rejected' })
+
+    return settle(recipient, 'ambiguous', { emailDeliveryId, lastErrorCode: 'dispatch_unknown' })
   } catch (error) {
     captureWithDomain(error, 'insights', { tags: { source: 'insights_delivery_attachment' }, extra: { deliveryRecipientId: recipient.deliveryRecipientId } })
 

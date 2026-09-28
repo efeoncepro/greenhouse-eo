@@ -277,6 +277,23 @@ describe('dispatchInsightDeliveryIntent', () => {
     expect(delivery.finishInsightDeliveryRecipient).toHaveBeenCalledWith(undefined, expect.objectContaining({ state: 'skipped', skipReason: 'edition_unavailable' }))
   })
 
+  it('attachment aceptado guarda la FILA de email_deliveries, no el id del batch de sendEmail', async () => {
+    const { dispatchInsightDeliveryIntent } = await import('./dispatch')
+
+    delivery.getInsightDeliveryIntent.mockResolvedValue(intentRecord({ modality: 'attachment', attachmentIrrevocableAck: true }))
+    email.sendEmail.mockResolvedValue({
+      deliveryId: 'batch-1',
+      status: 'sent',
+      dispatchOutcome: 'accepted',
+      resendId: 're_1',
+      recipientResults: [{ deliveryId: 'row-1', recipientEmail: 'cliente@berel.com', resendId: 're_1', status: 'sent', dispatchOutcome: 'accepted' }]
+    })
+
+    expect(await dispatchInsightDeliveryIntent('idlv-1', ENV_ON)).toMatchObject({ accepted: 1 })
+    expect(email.claimTokenSensitiveEmailIntent).not.toHaveBeenCalled()
+    expect(delivery.finishInsightDeliveryRecipient).toHaveBeenCalledWith(undefined, expect.objectContaining({ state: 'accepted', emailDeliveryId: 'row-1' }))
+  })
+
   it('otro dispatcher ya reclamó al destinatario ⇒ este no envía', async () => {
     const { dispatchInsightDeliveryIntent } = await import('./dispatch')
 
