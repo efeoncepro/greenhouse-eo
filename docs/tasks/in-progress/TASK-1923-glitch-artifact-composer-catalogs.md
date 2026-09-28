@@ -164,7 +164,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-031`
-- Status real: `2026-09-27: Slices 1–9 commiteados en develop local (sin push): manifiesto, tokens, 26 plantillas aprobadas en 3 catálogos, mapper con rotación y contrato AXIS, 9 validadores, pnpm glitch:compose (PDF 10 págs, sueltas, 18 overlays, procedencia reproducible), gate --catalog=glitch 26 frames a 0 px. Slice 10 (docs) hecho. pnpm test completo: 2 rojos ajenos (bump AXIS 0.3.16 sin commitear y WIP de TASK-1928). Falta: visto bueno del operador a render.minInkTileRatio, gate global tras el freeze de TASK-1928, pnpm build (requiere autorización), closure-check`
+- Status real: `2026-09-27: Slices 1–9 commiteados en develop local (sin push): manifiesto, tokens, 26 plantillas aprobadas en 3 catálogos, mapper con rotación y contrato AXIS, 9 validadores, pnpm glitch:compose (PDF 10 págs, sueltas, 18 overlays, procedencia reproducible), gate --catalog=glitch 26 frames a 0 px. Slice 10 (docs) hecho. pnpm test completo verde (1863 archivos, 15910 tests); gate global sin frames de Glitch en rojo. Falta: visto bueno del operador a render.minInkTileRatio, pnpm build (requiere autorización), closure-check`
 - Rank: `TBD`
 - Domain: `content|creative|platform`
 - Blocked by: `none`
@@ -870,9 +870,9 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
       — Evidencia: 35 PNG idénticos con `cmp` entre `.captures/glitch/edicion-17` y una segunda corrida; procedencia idéntica.
 - [x] `pnpm glitch:tokens --check` pasa contra la versión de AXIS fijada.
       — Evidencia: sin drift (13 archivos) contra `axis-tokens` 0.3.15.
-- [ ] `pnpm composer:visual-gate --catalog=glitch` da cero píxeles en las plantillas aprobadas y el gate global no
+- [x] `pnpm composer:visual-gate --catalog=glitch` da cero píxeles en las plantillas aprobadas y el gate global no
       suma frames en rojo; `BASELINE_DELTAS.md` registra el alta.
-      — Sin tildar: `--catalog=glitch` da 26 frames a 0 px y el selftest también. El gate global (2026-09-27) se detiene antes de diffear por 5 plantillas nuevas sin congelar de TASK-1928 (trabajo en curso de otra sesión en `graphic-line-deck`, no de Glitch); se repite cuando esa sesión congele.
+      — Evidencia: `--catalog=glitch` 26 frames a 0 px (selftest y gate). Gate global (2026-09-27, tras `2c7c67c5d`): 59 frames en rojo, todos `sky/` (28) y `templates/` de deck-axis (31), la deriva de entorno previa que el runbook documenta (ISSUE-122, sin rebaselinar); cero frames de `templates-glitch/` o de La órbita. `BASELINE_DELTAS.md` entrada (g).
 - [x] El peso del PDF de ejemplo queda bajo el límite vigente de LinkedIn para documentos, citado con su fuente y
       fecha en el manual.
       — Evidencia: ~0,7 MB, 10 páginas, un tamaño; límites y fuente (LinkedIn Help a518909, 2026-09-27) en `scripts/glitch/linkedin.ts` y en el manual `componer-una-edicion-de-glitch.md`.
