@@ -7,12 +7,11 @@
   mapear sólo una bajaría la plantilla y rompería las otras. Efecto hoy: la plantilla admite textos más largos que los
   medidos por receta (p. ej. respuesta 16 vs 10 en la SEO cine); el freno es `validateDeckPlan` (`slot-over-max-chars`),
   probado con un fixture adversarial de la SEO cine.
-- **Plate CR2b repetido** (el operador pidió registrarlo aquí el 2026-09-28; la elección entre (a) y (b) sigue pendiente): `proposal-cinematic-creative` y `cover-brochure-line-brand`
-  («Tu squad.») comparten `ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png`. En una
-  propuesta no chocan (la portada es sólo de brochure); en un brochure de Creative Services con las dos, `plate-repeated`
-  salta y es correcto. Opciones que propuso la sesión autora: (a) un plate propio para la portada, misma persona y
-  registro, reserva a la izquierda hasta x ≈ 760 (~USD 0,05, con `foto:isotipo`); (b) en ese brochure, la propuesta
-  sobria en vez de la cine. Mientras tanto `plate-repeated` sigue como error.
+- **Plate CR2b repetido — RESUELTO el 2026-09-28 (TASK-1934, pedido del operador):** la portada
+  `cover-brochure-line-brand` («Tu squad.») lleva su plate propio `CR4` «El squad te la entrega»
+  (`ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png`, aprobado a ojo por el operador);
+  `proposal-cinematic-creative` conserva CR2b. Un brochure de Creative Services con las dos ya no dispara `plate-repeated`
+  (test en `validate.test.ts`). Canon: registro cine §16.7.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
