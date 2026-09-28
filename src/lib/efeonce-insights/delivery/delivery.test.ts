@@ -277,20 +277,27 @@ describe('dispatchInsightDeliveryIntent', () => {
     expect(delivery.finishInsightDeliveryRecipient).toHaveBeenCalledWith(undefined, expect.objectContaining({ state: 'skipped', skipReason: 'edition_unavailable' }))
   })
 
-  it('attachment aceptado guarda la FILA de email_deliveries, no el id del batch de sendEmail', async () => {
+  it('attachment aceptado guarda la FILA de email_deliveries (por source_event_id), no el batch', async () => {
     const { dispatchInsightDeliveryIntent } = await import('./dispatch')
 
     delivery.getInsightDeliveryIntent.mockResolvedValue(intentRecord({ modality: 'attachment', attachmentIrrevocableAck: true }))
+
+    // Contrato real de sendEmail en el envío secuencial de primer intento: batch en ambos niveles.
     email.sendEmail.mockResolvedValue({
       deliveryId: 'batch-1',
       status: 'sent',
       dispatchOutcome: 'accepted',
       resendId: 're_1',
-      recipientResults: [{ deliveryId: 'row-1', recipientEmail: 'cliente@berel.com', resendId: 're_1', status: 'sent', dispatchOutcome: 'accepted' }]
+      recipientResults: [{ deliveryId: 'batch-1', recipientEmail: 'cliente@berel.com', resendId: 're_1', status: 'sent', dispatchOutcome: 'accepted' }]
     })
 
+    // 1ª lectura = dedupe previo (sin fila); 2ª = la fila que creó el envío.
+    delivery.readInsightDeliveryTransportForAttempt
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ deliveryId: 'row-1', status: 'sent', providerStatus: null, resendId: 're_1', errorClass: null })
+
     expect(await dispatchInsightDeliveryIntent('idlv-1', ENV_ON)).toMatchObject({ accepted: 1 })
-    expect(email.claimTokenSensitiveEmailIntent).not.toHaveBeenCalled()
+    expect(delivery.readInsightDeliveryTransportForAttempt).toHaveBeenLastCalledWith('idlr-00000000-0000-4000-8000-000000000001')
     expect(delivery.finishInsightDeliveryRecipient).toHaveBeenCalledWith(undefined, expect.objectContaining({ state: 'accepted', emailDeliveryId: 'row-1' }))
   })
 

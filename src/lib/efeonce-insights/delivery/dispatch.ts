@@ -270,10 +270,12 @@ const dispatchAttachment = async (
       sourceEntity: SOURCE_ENTITY
     })
 
-    // `sendEmail().deliveryId` es el id del BATCH; la fila de `email_deliveries` de este destinatario
-    // viene en `recipientResults[].deliveryId` (un solo destinatario por envío). Guardar el batch
-    // dejaba `email_delivery_id` apuntando a una fila inexistente (medido en staging 2026-09-28).
-    const emailDeliveryId = result.recipientResults?.[0]?.deliveryId || null
+    // En el envío secuencial de primer intento `sendEmail()` devuelve el id del BATCH, también en
+    // `recipientResults[].deliveryId` (descarta el id de `createDeliveryRow`). La fila se resuelve por
+    // la correlación canónica `source_entity` + `source_event_id`, igual que el estado de transporte.
+    // Guardar el batch dejaba `email_delivery_id` apuntando a una fila inexistente (staging 2026-09-28).
+    const ledgerRow = await readInsightDeliveryTransportForAttempt(sourceEventId).catch(() => null)
+    const emailDeliveryId = ledgerRow?.deliveryId ?? null
 
     if (result.status === 'skipped' && !result.dispatchOutcome) return settle(recipient, 'skipped', { skipReason: 'email_type_paused', emailDeliveryId })
     if (result.dispatchOutcome === 'accepted') return settle(recipient, 'accepted', { emailDeliveryId })
