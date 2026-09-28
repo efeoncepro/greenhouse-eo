@@ -14,6 +14,7 @@ import { resolveGrowthMarket } from '@/lib/growth/markets'
 import type { MarketSource } from './markets/contracts'
 import { localizePromptPack } from './prompt-packs/localized'
 import { localizedCategoryLabel } from './taxonomy/localized-label'
+import { classifyBusinessModel } from './taxonomy'
 import { assertRunCategoryResolved, resolveRunCategory } from './category-guard'
 import {
   type GrowthAiVisibilityExecutionMode,
@@ -76,15 +77,6 @@ export const buildExecuteInput = (input: RunGraderDiagnosticInput): ExecuteGrade
   const market = resolveGrowthMarket(input.market, input.locale)
   const competitorsDeclared = input.competitorsDeclared ?? []
 
-  // TASK-1290 — con el flag ON, el pack se resuelve por arquetipo (business_model) en vez del
-  // pack agencia v1 fijo. Default OFF / sin business_model → pack agencia (no-regresión bit-for-bit).
-  // Los tags del pack VIAJAN con el run (Slice 0) → el scorer mide con el framing del arquetipo.
-  const sourcePack = isArchetypePromptsEnabled()
-    ? resolveArchetypeBaselinePack(input.businessModel)
-    : resolvePromptPack(input.promptPackVersion)
-
-  const pack = localizePromptPack(sourcePack, market)
-
   // TASK-1288 — resolve the CANONICAL category (never the raw HubSpot enum) and guard the
   // run universally: every path (portal/operator/public/Nexa) converges here. The display
   // label replaces the raw enum in the prompts; an unresolved category blocks the run
@@ -97,6 +89,18 @@ export const buildExecuteInput = (input: RunGraderDiagnosticInput): ExecuteGrade
   })
 
   assertRunCategoryResolved(runCategory)
+
+  // All entry points share this resolution, including public/legacy inputs without a model.
+  // An explicit classification (including unknown) wins; an absent value uses the existing
+  // category classifier. Ambiguous categories keep the neutral pack, never an agency default.
+  const businessModel = input.businessModel?.trim()
+    || classifyBusinessModel({ categoryNodeId: runCategory.resolved ? runCategory.nodeId : null }).businessModel
+
+  const sourcePack = isArchetypePromptsEnabled()
+    ? resolveArchetypeBaselinePack(businessModel)
+    : resolvePromptPack(input.promptPackVersion)
+
+  const pack = localizePromptPack(sourcePack, market)
 
   const category =
     localizedCategoryLabel(runCategory.nodeId, market.language) ?? runCategory.displayLabel ?? input.category
