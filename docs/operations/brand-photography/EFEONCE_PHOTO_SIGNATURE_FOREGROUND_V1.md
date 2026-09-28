@@ -1,9 +1,9 @@
 # Firma fotográfica Efeonce V1 — primer plano planeado y logo
 
 > **Tipo de documento:** Especificación técnica y funcional de marca
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-26 por Claude — regla de la firma de piezas gráficas: logo centrado; burbuja URL sólo con el logo ya en la imagen ([§5.1](#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26))
+> **Última actualización:** 2026-09-28 por Claude — en portada de blog y banner la firma puede ir fuera del centro ([delta 2026-09-28](#delta-2026-09-28--banner-y-portada-de-blog-la-firma-no-tiene-que-ir-al-centro)). Antes: regla de la firma de piezas gráficas: logo centrado; burbuja URL sólo con el logo ya en la imagen ([§5.1](#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26))
 > **Estado:** Aprobado por el operador el 2026-09-19 (con pendientes en §8)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Marca en escena (regla previa)](../../../.claude/skills/social-media-studio/references/brand-in-scene.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · Scripts `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/{medir.mjs,componer.mjs}`
 
@@ -336,3 +336,13 @@ subirla mucho destruye el cierre, elevar ligeramente el inicio del lecho para al
 de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% ni la franja de v07 en preset.
 No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites sobre el export y el preview
 del placement; esta instrucción no afirma que los exports históricos ya hayan sido recompuestos.
+
+## Delta 2026-09-28 — banner y portada de blog: la firma no tiene que ir al centro
+
+**Decisión del operador:** «*en la firma de portada de blog o banner el logo no necesariamente tiene que estar al
+centro; puedes ponerlo en otra parte si se ve mejor*». En formatos horizontales con columna de texto (1200×630,
+banners) el logo puede ir **abajo a la izquierda, alineado con la columna del texto**, cuando así cierra la lectura y
+no compite con el sujeto. Caso: portada de blog de Marketing con Manzanitas (`MC5g`, 2026-09-28): margen 72 px,
+ancho 25 % del lado corto (157 px), sobre la madera oscura vacía de la mesa donde trabaja el sujeto, **19:1**. No
+cambia el resto de §5: dentro de la materia calma del lecho, con aire sobre su borde, nunca sobre el sujeto, contraste
+≥ 4,5:1 medido bajo la caja real. En piezas verticales y cuadradas la firma sigue centrada.

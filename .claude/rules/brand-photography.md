@@ -331,7 +331,14 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   corregido **sólo por el desplazamiento de la media** del entorno. Medido: **0 píxeles cambiados fuera de la
   marca**, forma intacta al 100 %, ≈ USD 0,05 por marca. Trampas medidas: mezclar el recorte entero o una elipse deja
   un **halo** (el modelo aclara todo el recorte); igualar también el desvío de color vuelve la marca **verde azulado
-  o lavada**. Mira la marca al 100 % antes y después, y compárala con la placa sin acabado.
+  o lavada**; pedir que la marca «se asiente» en la superficie dio en `MC5g` un **relieve con borde claro** a un solo
+  costado: el prompt pide la marca **a ras, como impresión fina, sin relieve, bisel ni borde de luz**. Mira la marca al
+  100 % antes y después, y compárala con la placa sin acabado.
+- **Firma del banner y de la portada de blog: no tiene que ir al centro** **[operador, 2026-09-28]**: «*en la firma de
+  portada de blog o banner el logo no necesariamente tiene que estar al centro; puedes ponerlo en otra parte si se ve
+  mejor*». Caso `MC5g` (1200×630): abajo a la izquierda, alineada con la columna del texto (margen 72, ancho 25 % del
+  lado corto), sobre la madera oscura vacía de la mesa, **19:1**; así cierra la columna de lectura y no compite con el
+  sujeto. Sigue valiendo todo lo demás: dentro de la materia del lecho, con aire, nunca sobre el sujeto.
 - 🔴 **La técnica de aplicación de marca la decide la TELA, no la costumbre del kit** **[operador, 2026-09-21]**:
   «*esa tela se borda no se estampa*». **Softshell y chaquetas técnicas → bordado** (la serigrafía sobre tela
   técnica se agrieta y se despega) · **piqué → bordado** (ya lo era) · **algodón afelpado del hoodie → abierto**,
