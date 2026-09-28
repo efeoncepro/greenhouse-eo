@@ -4,9 +4,9 @@ TASK-1863: staging; main retenido.
 
 **DataForSEO CLI (28/09):** [TASK-1935](docs/tasks/complete/TASK-1935-dataforseo-daily-operator-cli.md) complete con `research` SEO/AI gobernado y reanudable y `serp-compare` transversal para entidades/aliases/múltiples dominios; Organic Live se serializa a una task por request y el smoke final desktop/mobile cerró ambas tasks `20000` por USD 0,0055. [TASK-1651-A](docs/tasks/in-progress/TASK-1651-growth-seo-dataforseo-ai-optimization-llm-sov-foundation.md) operativa: CHECK aplicado/validado y canary AEO USD 0,0101 con resume sin recompra. El [registro catalog-only](docs/architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md) documenta 225 rutas bloqueadas (216 de producto + 9 de infraestructura/plantillas) y su posible habilitación sin ampliar el allowlist. `1651-B` no iniciada; sin push/deploy.
 
-**Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) code complete, rollout pendiente: en `develop` (37655fa93), no promover a main. Flag OFF; falta smoke en staging y federar en `efeonce-mcp`.
+**Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) en staging (flag ON, 6 catálogos + Insights verdes); federación en efeonce-mcp#22 sin merge; no promover a main.
 
-**Deck «La órbita» (28/09):** TASK-1927/1928 (69/69 recetas, AXIS `v0.3.21`) y TASK-1929 (`pnpm brand:deck-plan`) complete, en `develop`. Siguen TASK-1930…1933. [TASK-1934](docs/tasks/complete/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) complete local: 78 recetas con plantilla, AXIS `v0.3.23`, gate 73 frames a 0 px, portada «Tu squad.» con plate propio CR4; sin push.
+**Deck «La órbita» (28/09):** TASK-1927–1929 y TASK-1934 complete en `develop` (78 recetas, AXIS `v0.3.23`); siguen TASK-1930…1933.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 
