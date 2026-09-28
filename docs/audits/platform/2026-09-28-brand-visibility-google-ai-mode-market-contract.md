@@ -52,4 +52,6 @@ La [documentación oficial de Live Advanced](https://docs.dataforseo.com/v3/serp
 
 TASK-1863 sustituyó la propuesta inicial por la capacidad multidioma es/en/pt-BR/fr y 23 mercados.
 [Auditoría final y límites de rollout](2026-09-28-task-1863-verification.md): 22 canaries Google exitosos,
-Cuba omitida sin gasto, sin fallback; no se aplicó todavía al runtime compartido.
+Cuba omitida sin gasto, sin fallback. Implementación publicada después de este diagnóstico: Vercel staging
+y worker compartido `d86edb784`, verificados con 11 informes y Google 66/66. Main permanece en espera.
+La propuesta previa y los hallazgos del informe original son historia; el estado vigente vive en la auditoría final.

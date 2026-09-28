@@ -277,6 +277,9 @@ Y en la segunda pasada sobre el propio AEO encontró **15 más en EPIC-020** que
 
 ## TASK-1863 — 28-09-2026
 
-Implementación multi-mercado/multidioma en QA local: LATAM + Puerto Rico + España + EE. UU.; Google AI Mode
-verificado en 22 mercados, Cuba skip explícito; es/en/pt-BR/fr. [Evidencia y rollout pendiente](../audits/platform/2026-09-28-task-1863-verification.md).
-Sin deploy ni configuración comercial de Sky en esta ejecución.
+Implementación multi-mercado/multidioma desplegada en staging (Vercel y worker `d86edb784`); main en espera.
+23 mercados LATAM/PR/ES/US, es/en/pt-BR/fr; Google verificado en 22, Cuba skip explícito sin fallback.
+Canaries: Efeonce cuatro mercados, Sky seis y API Brasil; 11 informes, Google 66/66. Sky Perú conserva
+informe parcial por un rate limit de Perplexity. Canal operador, sin ampliar derechos comerciales.
+[Evidencia final](../audits/platform/2026-09-28-task-1863-verification.md). MCP `TASK-1861` y UI dedicada
+son dependencias futuras; recurrencia secundaria y seguimiento de producción esperan el release a main.

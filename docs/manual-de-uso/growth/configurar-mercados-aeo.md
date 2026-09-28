@@ -62,12 +62,17 @@ El portal conserva POST `/api/client-portal/growth/ai-visibility/run`: body opci
 5. Publicar Vercel + ops-worker coordinados, con `GROWTH_AI_VISIBILITY_MULTI_MARKET_ENABLED=false`.
    El código de catálogo/snapshot requiere la migración incluso con el flag OFF.
 6. Verificar una medición principal por command/API y su snapshot, prompts, observaciones, scoring,
-   cobertura e informe. Después habilitar multimer­cado y verificar el lote de Sky con derechos y
-   competidores confirmados. La habilitación en el worker afecta a ambos ambientes.
+   cobertura e informe. Habilitar lotes sólo en el entorno autorizado y validar su matriz; el canal
+   operador no concede mercados al portal cliente. El flag del worker controla la recurrencia
+   secundaria y afecta a ambos ambientes: conservar OFF mientras `main` siga retenido.
 7. Vigilar `market_primary_missing`, `market_unresolved`, `run_batch_partial` y la demora de cola.
 
-No se cierra la task con un canary del adapter: falta el recorrido por el runtime publicado y el lote
-cliente. Los canaries locales no publican reportes ni envían correos/CRM.
+Un canary del adapter sólo verifica el proveedor. El cierre de staging además exige el recorrido
+publicado, snapshot, scoring, delivery y matriz. Esa evidencia ya está registrada en la
+[auditoría de TASK-1863](../../audits/platform/2026-09-28-task-1863-verification.md): Efeonce en cuatro
+mercados, Sky en seis y una entrada directa BR sin modelo explícito. La prueba operativa de Sky no
+amplía su entitlement comercial. No repitas esas compras como paso rutinario de lectura documental.
+Los canaries locales del adapter no publican reportes ni envían correos/CRM.
 
 ## Reproducción local
 

@@ -710,7 +710,7 @@ tarda ≥30 minutos; el reader del lote expone el avance.
 |---|---|---|---|
 | Slice 1 | Revert PR (el catálogo reemplaza mapas con paridad) | < 15 min | sí |
 | Slice 2 | `-- Down Migration` elimina tablas/columnas nuevas (sin datos productivos antes de Slice 3) | < 30 min | sí |
-| Slice 3 | Script `--rollback` elimina mercados/sets creados por el backfill (marcados con `created_by = 'backfill:task-1863'`) y des-enlaza runs | < 30 min | sí (verificado en staging antes del apply) |
+| Slice 3 | Preservar mercados, sets y snapshots. El script soporta dry-run/`--apply`, no `--rollback`; cualquier reversión de datos exige plan y respaldo explícitos | por definir | no destructivo automático |
 | Slice 4 | Flag OFF + revert PR; configuraciones creadas quedan inertes | < 15 min | sí |
 | Slice 5 | Flag OFF (lotes >1 dejan de aceptarse); revert PR; worker redeploy con la revisión previa | < 30 min | sí |
 | Slice 6 | Revert PR (packs previos) | < 15 min | sí |
@@ -722,12 +722,12 @@ tarda ≥30 minutos; el reader del lote expone el avance.
 
 1. Slice 1 en staging: tests de paridad del catálogo + un run `light` de una marca CL existente sin cambios observables.
 2. Migración en la instancia compartida + verificación de tablas, índices, triggers y capability.
-3. Backfill dry-run → revisión de no resueltos → `--apply` → conteos: toda marca activa con primario; runs enlazados.
-4. Deploy de Vercel + `ops-worker` con flag OFF: run de marca existente idéntico (score y findings) al comportamiento previo.
+3. Backfill dry-run → revisión de no resueltos → `--apply` → conteos: cada perfil activo con primario; prompts legacy enlazados al principal, runs históricos sin geografía inferida.
+4. Deploy de Vercel + `ops-worker` con flag OFF: selección del principal y contrato legacy conservados; nuevos packs versionados, sin prometer el mismo score frente a otra muestra.
 5. Flag ON en staging: configurar Sky (6 mercados) por commands; lote `light` de 6 mercados; verificar prompts en
    `pt-BR` para BR, `location_code` correcto por mercado, `geoMode` por motor, matriz con 6 filas y sin overall combinado.
 6. Producción por el release control plane con flag OFF; luego flag ON y repetir 5 con un lote.
-7. Monitorear `market_unresolved`, `market_primary_missing`, `run_batch_partial`, `run_execution_lag` 7 días.
+7. Tras el futuro release a main, monitorear `market_unresolved`, `market_primary_missing`, `run_batch_partial`, `run_execution_lag` 7 días. No se declara esa ventana completada con los canaries de staging.
 
 ### Out-of-band coordination required
 
@@ -819,9 +819,9 @@ en `999492e8d`; 71 pruebas / 552 combinaciones. Protección adicional de identid
    incluye los seis?
 3. **Perfil libre `EO-GAVP-0021`** (Sky, sin organización, `blog.skyairline.com`, runs `00043`–`00048`): ¿se archiva
    o se conserva como histórico sin enlazar? No se mezcla con la serie del perfil canónico.
-4. **Alias de Sky.** Propuesto: nombre "SKY Airline"; alias "Sky Airline", "Sky Airlines" (`word_ci`) y "SKY" (`word_cs`).
+4. **Alias de Sky — resuelto.** Configurados "Sky Airline", "Sky Airlines" (`word_ci`) y "SKY" (`word_cs`) para nuevos snapshots. El primer lote conserva su nombre/aliases originales; no se reescribe el histórico.
 
-## Ejecución 2026-09-28
+## Inicio de ejecución 2026-09-28 (histórico, anterior al rollout)
 
 Goal confirmado por el operador: implementación completa y multidioma, checkout compartido develop, sin subagentes. Plan: [TASK-1863-plan.md](../plans/TASK-1863-plan.md). Hook `--develop` ejecutado; `pg:doctor` PASS. Sin push/deploy ni cambios de flags externos; rollout y canaries de cliente se registran aparte.
 
@@ -849,16 +849,17 @@ comerciales. Cuba no tiene ubicación DataForSEO: skip sin compra; no se fuerza 
 - Paths API planos bajo `/api/admin/growth/ai-visibility`, documentados en el manual, con idénticos
   commands/capabilities. No hay selector UI nuevo; backend-data mantiene la UI dedicada como follow-up.
 - La instancia y el ops-worker son compartidos: no existe migración/flag de worker “sólo staging”.
-- Configuración Sky, contrato de mercados incluidos, aplicación de migraciones, backfill y rollout
-  quedan sin tildar. No se presumen autorizaciones comerciales ni se archivan perfiles con el dry-run.
+- Migraciones, backfill, configuración del canary Sky y rollout staging quedaron verificados después
+  de esta fase inicial. Los derechos comerciales adicionales siguen sin presumirse; no se archivan
+  perfiles ni se asignan competidores a países por inferencia.
 
-### Readback previo a rollout
+### Readback previo a rollout (histórico; perfil único descartado en la corrección siguiente)
 
 27 perfiles activos; todos resolubles. Una organización tiene CUATRO perfiles activos; el script de
 reconciliación permite conservar el perfil que el reader ya usa y archivar explícitamente los otros
 sin mover ni recalcular sus runs. Guard de migración falla antes del DDL hasta resolverlo.
 
-### DDL pendiente y responsabilidad de activación
+### Plan DDL previo (histórico; sustituido por las migraciones aplicadas de la corrección siguiente)
 
 El operador del release reactiva las dos migraciones aditivas desde `pending-migrations/` únicamente
 tras verificar la reconciliación de perfiles. Se genera un timestamp nuevo con `pnpm migrate:create`,

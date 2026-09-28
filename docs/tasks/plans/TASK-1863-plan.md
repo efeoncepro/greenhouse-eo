@@ -3,7 +3,7 @@
 ## Autorización y objetivo
 
 28-09-2026: Julio confirmó el goal y pidió resolver la capacidad multidioma completa, incluido EE. UU.
-Se ejecuta en develop compartido, sin subagentes ni checkouts aislados. El operador autorizó después
+La implementación inicial se ejecutó en develop compartido, sin subagentes ni checkouts aislados. El operador autorizó después
 push y despliegue a staging, DDL/backfill y canary; `main` permanece en espera. Vercel y ops-worker
 publicados, backfill de 27 perfiles aplicado. Conservar históricos y cuatro perfiles Efeonce activos.
 
@@ -36,7 +36,9 @@ publicados, backfill de 27 perfiles aplicado. Conservar históricos y cuatro per
 
 ## Subagent strategy
 
-Sequential: el goal confirmado excluye subagentes; slices comparten store, run-engine y contratos.
+Implementación inicial secuencial: el goal confirmado excluía subagentes; slices compartían store, run-engine y contratos.
+El operador autorizó después tres subagentes para la revisión documental final: skills, docs y auditoría
+de completitud, todos en el checkout original y sin ownership solapado.
 La autorización cubre el plan de la task y su delta multidioma. Checkpoints adicionales sólo ante
 mutación externa no autorizada o conflicto real con trabajo ajeno.
 

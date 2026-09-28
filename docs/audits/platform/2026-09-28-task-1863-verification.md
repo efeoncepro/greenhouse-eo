@@ -1,7 +1,8 @@
 # TASK-1863 — evidencia de implementación y límites de rollout
 
 Fecha: 2026-09-28. Checkout develop compartido. Implementación publicada en staging; main en espera.
-Las secciones locales documentan la fase previa. El estado vigente está en «Rollout staging autorizado».
+Las secciones locales documentan la fase previa. El estado vigente es el veredicto y «Recuperación final de cuota y cierre de staging»; las incidencias
+intermedias conservan su evidencia histórica y no son bloqueos actuales.
 
 ## Google AI Mode: evidencia directa
 
@@ -68,13 +69,15 @@ antes de main. No se reescribió la geografía histórica ni se consumió la cuo
   restauró tsconfig.json; `git diff --check` PASS. Logs locales en `.captures/task-1863-qa/`.
 
 La suite `live` del repo escribe en Cloud SQL compartido; no se ejecuta como prueba local. El alcance DB
-se verifica con el harness efímero y se deja el canary de rollout sin tildar.
+se verificó con el harness efímero; los canaries posteriores de staging se registran más abajo.
 
 ## Veredicto
 
 **Staging verificado para Efeonce, Sky y entrada directa BR; main en espera.** La entrega satisface catálogo,
 localización, ubicación nativa, Google AI Mode, snapshots, lotes y matriz. La última protección de
-comparabilidad de identidad está en publicación; el cierre se registra al final.
+comparabilidad de identidad ya está desplegada en Vercel y worker (`d86edb784`), con salud 200,
+Ready y tráfico 100%; CI y workflow finales success. Main, recurrencia secundaria y contract destructivo
+permanecen diferidos; UI dedicada y nuevas tools MCP corresponden a sus propias tasks.
 
 ## Rollout staging autorizado (2026-09-28)
 
@@ -205,7 +208,7 @@ inválidas `as unknown as SurfaceIntent` en una prueba de Brand Surfaces. Esos a
 parte de los commits de TASK-1863. `d86edb784` ya está en develop remoto; main no se promovió.
 
 
-### Última publicación y bloqueo externo (28-09)
+### Bloqueo externo histórico (28-09; resuelto en la recuperación siguiente)
 
 `d86edb78419dad324943804e8d003dd18ffbea31` está READY en Vercel staging, deployment
 `dpl_3cjJrNALDj8QSK6awzGfG7sqTjkU`. Agent Context Governance, Task Contract y Playwright smoke
@@ -258,3 +261,26 @@ Evidencia: [cuota recuperada](evidence/task-1863/packages-quota-recovery.json),
 
 Workflow ops-worker `36413423962`, intento 2: **success**, incluidos verificación DataForSEO,
 salud, Ready y registro del commit. [Resultado final](evidence/task-1863/worker-quota-recovery-workflow.json).
+
+
+### Revisión documental con subagentes (28-09)
+
+Por autorización del operador se revisaron tres frentes independientes en el checkout original:
+skills, contratos/manuales y auditoría de completitud. Se retiraron instrucciones vigentes falsas de
+English-only, fallback US, pack genérico obligatorio, ausencia de commands de aliases/competidores,
+rollout pendiente y rollback inexistente del backfill. Se preservó la cronología etiquetada como tal.
+Epic, índice ADR, tasks dependientes y preguntas resueltas ahora coinciden con el estado de staging.
+Los espejos Claude/Codex conservan los mismos cambios; se excluyó WIP paralelo de otras sesiones.
+
+La revisión no encontró un faltante funcional adicional del alcance autorizado. El veredicto es PASS
+para implementación y staging; no declara terminados main, recurrencia secundaria, contract destructivo,
+UI dedicada ni tools MCP de TASK-1861. Tampoco concede mercados comerciales adicionales. Se registró
+el diagnóstico de cuota Packages en el runbook AXIS y la skill de higiene de secretos.
+Readback independiente de este cierre: [runtime](evidence/task-1863/docs-review-runtime.json).
+
+
+Validación del cierre documental: `skills:mirrors`, `task:lint --task TASK-1863`,
+`epic:lint --item EPIC-020 --strict-child-parity`, `git diff --check` y context governance strict.
+Closure scoped conserva una advertencia preexistente `architecture_doc_monolith` (44 secciones Delta
+históricas en la arquitectura general); no se añadieron nuevas secciones Delta a ese documento ni se
+mezcló su reestructuración global con el cierre. El ADR temático y manuales son los dueños vigentes.

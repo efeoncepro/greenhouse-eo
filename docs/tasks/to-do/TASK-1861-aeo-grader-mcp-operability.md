@@ -1023,6 +1023,7 @@ pueden colisionar con otra organización.
 
 ## Impacto cruzado TASK-1863 (2026-09-28)
 
-La implementación local del Grader multi-mercado incorpora catálogo es/en/pt-BR/fr, mercados y lotes,
-snapshots y readers por país/locale. Rollout pendiente: no asumir habilitación ni geografía inferida
-en históricos. Consumir los commands existentes; [contrato y manual](../../manual-de-uso/growth/configurar-mercados-aeo.md).
+El Grader multi-mercado está implementado y verificado en staging (Vercel y worker `d86edb784`):
+catálogo es/en/pt-BR/fr, mercados, lotes, snapshots y readers por país/locale. Main sigue en espera;
+no asumir habilitación comercial ni geografía inferida en históricos. Esta publicación no cierra
+la capacidad propia de esta task. Consumir los commands existentes; [contrato y manual](../../manual-de-uso/growth/configurar-mercados-aeo.md).

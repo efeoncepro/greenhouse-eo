@@ -59,7 +59,10 @@ EE. UU. impedían declarar qué se midió.
 
 Migraciones, reconciliación y backfill antes del código que consume tablas; drenar runs pendientes
 legacy antes de cambiar policy. Vercel y el **único ops-worker compartido** deben consumir la misma
-versión. Flag multimer­cado default OFF en ambos; OFF permite sólo el principal. Catálogo, snapshots
+versión. Flag multimer­cado default OFF: en el writer habilita la selección de mercados secundarios;
+en el scheduler del worker decide entre recurrencia por mercados y recurrencia legacy de perfiles.
+Staging puede autorizar lotes explícitos mientras el worker conserva OFF hasta promover el writer de
+`main`; el drain ejecuta los runs ya encolados. Catálogo, snapshots
 y request correctness aplican a runs nuevos aun con OFF. No tratar staging como base o worker aislado.
 
 El tope conservador `GROWTH_AI_VISIBILITY_BATCH_DAILY_BUDGET_USD` (25 por defecto) reserva techos por

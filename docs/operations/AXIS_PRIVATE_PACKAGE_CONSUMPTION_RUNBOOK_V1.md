@@ -357,6 +357,25 @@ source control.
   chat. Aplican las reglas duras del Delta 2026-08-29 (nada de sustituirla por una credencial de scope amplio en
   infraestructura).
 
+## Diagnóstico de descarga bloqueada por cuota (TASK-1863, 2026-09-28)
+
+Un `ERR_PNPM_FETCH_403` puede deberse a permisos del paquete o a facturación; el código HTTP solo
+no distingue las causas. En el rollout de TASK-1863, GitHub Packages respondió **Account has reached
+its billing limit** al descargar `axis-graphic-line@0.7.0` desde Cloud Build. La credencial seguía siendo
+válida; no se rotó ni se sustituyó por un token con mayor alcance.
+
+1. Clasificar el mensaje sanitizado de la descarga autenticada; nunca imprimir el token ni `.npmrc`.
+2. Si es cuota, el owner de facturación ajusta [Budgets and alerts de efeoncepro](https://github.com/organizations/efeoncepro/settings/billing/budgets).
+   Cambiar el límite permite gasto adicional y requiere autorización del operador; no es una reparación automática del agente.
+3. Verificar HTTP 200 en la descarga del paquete exacto con la credencial canónica; reintentar sólo
+   el workflow fallido con el mismo SHA. No publicar commits paralelos para disparar el retry.
+4. Verificar build, revisión, SHA, tráfico y salud del consumidor; la confirmación del cambio de cuota
+   por sí sola no prueba un despliegue correcto.
+
+El operador ajustó la cuota y la descarga dio 200. Ops-worker `36413423962`, intento 2, terminó success;
+`ops-worker-00733-5s6` sirve `d86edb784` al 100%, salud 200. Main quedó en espera.
+[Evidencia de recuperación](../audits/platform/2026-09-28-task-1863-verification.md#recuperación-final-de-cuota-y-cierre-de-staging-28-09-1131-utc).
+
 ## Delta 2026-09-26 — un paquete AXIS nuevo rompió el CI de develop durante horas
 
 - AXIS 0.2.7 publicó por primera vez `@efeoncepro/axis-brand-assets` (07:45Z; los 19 SVG oficiales de logos,

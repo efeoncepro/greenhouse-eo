@@ -1447,10 +1447,10 @@ Se agrega `google_ai_overview` como quinto provider gobernado del grader. El obj
 - **Contrato de provider:** `google_ai_overview` queda registrado en los enums TS, registry, policy resolver, cost estimator, normalizer/provider labels, smoke fake adapters y en los CHECK constraints DB de `greenhouse_growth.provider_observations.provider` + `greenhouse_growth.normalized_findings.provider`.
 - **Flag y rollout:** `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` nace default OFF. Sin master flag, provider flag o secret, el adapter devuelve `skipped` canonico y no llama DataForSEO.
 - **Degradacion honesta:** HTTP 200 sin bloque AI Overview / AI Mode se persiste como `skipped:no_ai_overview_block`, nunca como `succeeded` vacio. El cost estimator conserva `usage.dataforseo_cost_usd` tambien en ese caso porque DataForSEO cobra por request.
-- **Idioma/mercado:** DataForSEO documenta AI Mode como English-only hoy; el adapter manda `language_code='en'` y conserva `location_name` desde el market del run *(superseded 2026-08-27 por TASK-1652: el market ISO-2 ahora se traduce con el mapa market→`location_code`; ver Delta correspondiente)*. El keyword se normaliza y acota antes de enviar.
+- **Idioma/mercado:** el catálogo compartido `src/lib/growth/markets` resuelve país y locale antes del gasto. Google AI Mode recibe `location_code` y el idioma de la familia solicitada (`es`, `en`, `pt-BR` o `fr`), sin fallback geográfico. Cuba produce `skipped:market_unsupported`. Contrato vigente: [ADR multi-mercado](GREENHOUSE_AEO_MULTI_MARKET_MEASUREMENT_DECISION_V1.md). El keyword se normaliza y acota antes de enviar.
 - **Parser lock:** hay test focal para `ai_overview`, `ai_overview_element`, referencias heterogeneas (`references`/`links`/`sources`) y golden eval nuevo para una cita owned de `efeoncepro.com`.
 
-Estado operativo: code complete local/dev. Pendiente para cerrar runtime: aplicar migracion en ambientes, deploy con flag OFF, flip staging low-volume, smoke real con observation/citas en PG y decidir rotacion de la credencial DataForSEO antes de produccion porque fue compartida inicialmente en captura/chat.
+Estado histórico de este slice (sustituido por el rollout de TASK-1863 y su evidencia enlazada abajo): code complete local/dev. Entonces quedaba pendiente: aplicar migracion en ambientes, deploy con flag OFF, flip staging low-volume, smoke real con observation/citas en PG y decidir rotacion de la credencial DataForSEO antes de produccion porque fue compartida inicialmente en captura/chat.
 
 ## Delta 2026-06-28 — TASK-1265 activación staging + taxonomía de surfaces (Answer Engines / AI Search) · EPIC-020
 
@@ -2169,35 +2169,47 @@ probes y por `brand-intelligence/fetch-site-content`) pasa de tener garantías a
 
 El adapter `google_ai_overview` (`providers/google-ai-overview-adapter.ts`) tenía tres defectos de correctitud de request/parsing, corregidos y verificados con smoke live (commits `bc2dd0f99`…`b06f5cd20`):
 
-- **Location:** el market ISO-2 productivo (CL/MX/CO/PE/US) caía verbatim en `location_name` y DataForSEO fallaba per-task (error `40501`) bajo HTTP 200. Ahora hay mapa cerrado exportado `GOOGLE_AI_MODE_MARKET_LOCATION_CODES = { CL: 2152, MX: 2484, CO: 2170, PE: 2604, US: 2840 }` (códigos verificados en vivo contra `GET /v3/serp/google/locations/{cc}`, endpoint gratuito), con fallback observable a US (`captureWithDomain` nivel warning) para ISO-2 no mapeado; un nombre completo ("Chile") sigue pasando como `location_name`.
+- **Location (histórico, reemplazado por TASK-1863):** el market ISO-2 productivo (CL/MX/CO/PE/US) caía verbatim en `location_name` y DataForSEO fallaba per-task (error `40501`) bajo HTTP 200. Ahora hay mapa cerrado exportado `GOOGLE_AI_MODE_MARKET_LOCATION_CODES = { CL: 2152, MX: 2484, CO: 2170, PE: 2604, US: 2840 }` (códigos verificados en vivo contra `GET /v3/serp/google/locations/{cc}`, endpoint gratuito), con fallback observable a US (`captureWithDomain` nivel warning) para ISO-2 no mapeado; un nombre completo ("Chile") sigue pasando como `location_name`.
 - **Gate per-task:** HTTP 200 ≠ éxito. Solo un task con `status_code === 20000` avanza al parser; `!= 20000` → observación `failed:provider_error` con el código en `usage.dataforseo_status_code`; task/status ausente (shape roto) → `failed:invalid_response`. **Invariante nueva:** `skipped:no_ai_overview_block` queda RESERVADO para tasks `20000` realmente ejecutadas sin bloque AI.
 - **Citas anidadas:** el parser desciende un nivel (acotado, no recursivo) a los elementos `ai_overview_element` / `ai_overview_table_element` / `ai_overview_expanded_element` dentro del item `ai_overview`, recolectando sus `references[]`/`links[]` con dedupe por URL (`buildCitations`); el texto principal prefiere el `markdown` del bloque padre (los textos anidados duplicarían el hash). Verificado contra sandbox y payload live: el proveedor duplica las references en el nivel superior (top ⊇ anidadas), así que el descenso es defensa sin doble conteo.
 - **Hallazgo del smoke live — wrapper de citas:** Google envuelve TODAS las references de AI Mode en redirects propios — `domain` llega como `google.com`/`www.google.com` y `url` como `https://google.com/goto?url=<token opaco>` (o `/searchviewer`), no decodificable client-side; la identidad real de la fuente viene SOLO en el campo `source` (a veces domain-shaped como `agenciagrowth.cl`, a veces nombre de marca como `Bigbuda`). Sin manejo, toda cita se atribuía a google.com y el SoV de citabilidad quedaba envenenado. El adapter deriva el dominio real de `source` cuando es domain-shaped (`normalizeDomain`); las refs de marca no atribuible se DESCARTAN honesto (nunca atribuir a google.com) y se cuentan dedupeadas por URL en `usage.dataforseo_citations_unattributable`. Payload live real: 27 refs únicas → 2 atribuibles (`metrix.digital`, `agenciagrowth.cl`), 25 no atribuibles. Implicación para atribución URL-level futura (TASK-1311, ya tiene Delta): las `url` persistidas de este provider son punteros al wrapper, no la página citada.
 - **Dimensionamiento histórico** (query read-only sobre `greenhouse_growth.provider_observations`): 60 observaciones históricas `skipped:no_ai_overview_block` (2026-06-29 → 2026-07-17) eran falsos negativos con task fallido (54 con `40501`, 6 con `40201`). Regrade DESCARTADO: los tasks nunca se ejecutaron (nada que reinterpretar) y río abajo skipped/failed se excluyen por igual.
-- **Estado:** AIO en producción sigue OFF (gated por TASK-1341); el fix llega inerte a producción hasta ese rollout. AI Mode sigue English-only (`language_code='en'`). Smoke sanity: `scripts/growth/_sanity-task-1652-ai-mode-smoke.ts` (dry por defecto; `--spend` ejecuta una llamada real ~USD 0,004). Spec: `docs/tasks/complete/TASK-1652-aeo-grader-dataforseo-ai-mode-request-correctness.md`.
+- **Estado registrado en agosto (no vigente; ver TASK-1863 y ledger):** AIO en producción seguía OFF (gated por TASK-1341); el fix llega inerte a producción hasta ese rollout. La policy entonces forzaba inglés (`language_code='en'`); TASK-1863 la reemplazó. Smoke sanity: `scripts/growth/_sanity-task-1652-ai-mode-smoke.ts` (dry por defecto; `--spend` ejecuta una llamada real ~USD 0,004). Spec: `docs/tasks/complete/TASK-1652-aeo-grader-dataforseo-ai-mode-request-correctness.md`.
 
-## Delta 2026-09-28 — contrato de mercado de AI Mode, propuesta para TASK-1863
+## Contrato vigente de mercado e identidad de medición (TASK-1863)
 
 El run `EO-GRUN-00056` demostró que el camino de `market` legible (`"Perú"`) aún falla en
 DataForSEO (`location_name` → task `40501`), mientras `location_code=2604` con el mismo keyword,
 idioma y dispositivo dio task `20000`. La corrección de ISO-2 de TASK-1652 no cerró ese camino.
 `TASK-1863` es dueña del resolver compartido: una identidad de mercado produce la etiqueta
 localizada del prompt y el código de ubicación; el contrato se valida antes de la compra y
-nunca usa un fallback a otro país para un mercado no resuelto. La evidencia y propuesta de
-verificación están en [la auditoría del 28-09](../audits/platform/2026-09-28-brand-visibility-google-ai-mode-market-contract.md).
+nunca usa un fallback a otro país para un mercado no resuelto. La evidencia del incidente está en [la auditoría del 28-09](../audits/platform/2026-09-28-brand-visibility-google-ai-mode-market-contract.md).
 
 La afirmación histórica «AI Mode English-only» en §provider y en el delta de TASK-1652
 describe la policy del adapter al escribirla, pero **no** el catálogo publicado hoy: el
 [endpoint oficial de idiomas de AI Mode](https://docs.dataforseo.com/v3/serp/google/ai_mode/languages/)
 incluye `es`, `en`, `pt-BR` y `fr`, verificados en el catálogo vivo. TASK-1863 implementa
 `policy.v2.multilingual-geo` y packs localizados: cada run nuevo recibe el idioma solicitado y
-`location_code` del catálogo compartido. La implementación aún no está desplegada.
+`location_code` del catálogo compartido. Implementación verificada en staging; promoción a `main`
+en espera. Las revisiones y readbacks viven en la [auditoría de rollout](../audits/platform/2026-09-28-task-1863-verification.md).
 El informe distingue solicitados/intentados/respondidos y conserva `unknown` en artefactos legacy
 sin evidencia de respuesta. No se reescriben snapshots publicados.
 
 Contrato aceptado y límites de rollout: [ADR multi-mercado](GREENHOUSE_AEO_MULTI_MARKET_MEASUREMENT_DECISION_V1.md).
 23 mercados del producto; Cuba sin ubicación DataForSEO da skip explícito. La configuración de prompts
 legacy se enlaza al principal; los runs históricos no reciben una geografía inferida.
+
+`buildExecuteInput` resuelve categoría y modelo de negocio para cualquier marca, tanto inline como
+encolada. Conserva el modelo explícito; si falta, usa el clasificador de categoría. La protección de
+categoría conserva su flag y el arquetipo ambiguo permanece neutral. La reconciliación de Efeonce no
+introduce reglas particulares para esa marca.
+
+`getPreviousComparableScore` exige el mismo perfil, score, mercado, locale, policy y snapshot completo
+`brand` (nombre, aliases, dominio y categoría). El caller compara la versión del pack. Un set de
+competidores distinto elimina delta competitivo y overall, sin invalidar dimensiones independientes.
+Cambios de configuración afectan runs futuros; los perfiles legacy activos y sus resultados persistidos
+se conservan. La configuración multi-mercado se opera por los commands del ADR, sin deducir países
+históricos a partir del orden de perfiles.
 
 ## Delta 2026-09-11 — panel competitivo multi-marca y límites medidos
 
@@ -2228,19 +2240,15 @@ Uso comercial: [`docs/documentation/comercial/panel-competitivo-aeo.md`](../docu
   `grader_runs.prompt_set_id` no nulo y 12 entradas en `execution_prompts`. Máximo 12 prompts en modo `full`; tags del
   vocabulario cerrado (`family`, `fanOutType`, `intentStage`, `namesBrand`).
 
-**Identidad del perfil y forma del input (comportamiento vigente, medido).**
+**Identidad del perfil e input: caso histórico y contrato vigente.**
 
-- `findOrCreateGraderProfile` (`store.ts`) identifica el perfil por **marca + mercado + locale** en texto libre. Los
-  competidores quedan fijos desde el primer run y **no hay command para editarlos**; un nombre ya usado reusa el perfil
-  viejo (caso: "SKY Airline"/Chile/es-CL resolvía un perfil antiguo con `blog.skyairline.com` y Flybondi; por eso el
-  panel usó "SKY").
-- La ruta admin `POST /api/admin/growth/ai-visibility/runs` **no acepta `businessModel`**: sin set activo, el run sale
-  con el pack genérico de 7 prompts (`gn01`–`gn07`).
-- `market` debe ir como nombre ("Chile"): un ISO se interpola crudo en los prompts ("…en CL") y el provider de Google AI
-  acepta `location_name`; fuera de CL/MX/CO/PE/US un ISO cae a Estados Unidos. `category` debe resolver en
-  `taxonomy/catalog.ts` ("aerolinea de pasajeros" es alias exacto de `sector:passenger_airlines`).
-- El slot `{{competitor}}` usa sólo el primer competidor declarado y se descarta si la lista está vacía. La coincidencia
-  de nombres de marca es literal, palabra completa, sin mayúsculas y sin alias.
+El panel del 11-09 usó “SKY” para evitar la configuración previa de “SKY Airline”. Ese antecedente
+no prescribe renombrar marcas nuevas. TASK-1863 incorpora comandos de aliases y competidores
+versionados por mercado, conserva los perfiles legacy y sus runs, y resuelve nombres o ISO con el
+catálogo común. La ruta admin directa sigue sin aceptar `businessModel`; el command deriva el modelo
+ausente de la categoría con el clasificador canónico. El slot `{{competitor}}` mantiene su contrato:
+primer competidor o descarte si no existe. Para operar la configuración vigente, usa el
+[manual de mercados](../manual-de-uso/growth/configurar-mercados-aeo.md).
 
 **Tres defectos medidos (registrados: el 1 en `TASK-1867`; el 2 y el 3 en `TASK-1868`).**
 

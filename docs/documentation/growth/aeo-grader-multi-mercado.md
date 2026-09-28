@@ -1,8 +1,9 @@
 # Grader AEO por mercado
 
-Estado: implementación local de TASK-1863; migraciones y publicación pendientes.
+Estado registrado al 2026-09-28: TASK-1863 desplegada y verificada en staging; promoción a `main`
+en espera por decisión del operador. [Evidencia de rollout](../../audits/platform/2026-09-28-task-1863-verification.md).
 
-Una marca tiene un mercado principal y puede configurar otros países e idiomas. Cada medición usa
+Un perfil de marca tiene un mercado principal y puede configurar otros países e idiomas. Cada medición usa
 un solo país e idioma. Un lote permite solicitar varios; su costo y cuota se validan por el total.
 
 ## Cobertura
@@ -12,9 +13,16 @@ Haití, Honduras, México, Nicaragua, Panamá, Paraguay, Perú, República Domin
 Venezuela; además Puerto Rico, España y Estados Unidos.
 
 Español, inglés, portugués de Brasil y francés. Brasil predetermina pt-BR, Haití fr-HT, EE. UU. en-US
- y los demás español. Un cliente en EE. UU. puede medir también en español. Francés no significa
+y los demás español. Un cliente en EE. UU. puede medir también en español. Francés no significa
 soporte de criollo haitiano. Cuba no está soportada por la ubicación de Google AI Mode/DataForSEO;
 el resto de motores conserva su contrato de ubicación y los errores reales se muestran.
+
+## Todas las marcas y entradas
+
+La categoría y el modelo de negocio de cada marca determinan sus preguntas. Un modelo explícito se
+conserva; si falta, el command común lo deriva de la categoría. Una categoría ambigua no se convierte
+en agencia. Esta resolución se comparte entre ejecución directa y encolada: operador, portal,
+formulario, API y recurrencia usan los mismos comandos, con sus permisos y flags respectivos.
 
 ## Qué se conserva
 
@@ -45,3 +53,8 @@ score y findings ya persistidos incluso si se solicita `recompute`; no se recons
 un perfil modificado. Si nunca fue puntuado, conserva el carril legacy de primera puntuación.
 La comparación competitiva declara `competitor_set_changed` cuando cambia el set; no calcula un delta
 competitivo o global con universos diferentes.
+
+Los cambios de nombre, aliases, dominio o categoría de la marca también separan la serie de tendencias.
+Sólo se compara la misma identidad, país, idioma y metodología; un cambio de pack se declara
+incomparable. Los perfiles legacy activos se conservan con su histórico: tener varios perfiles no
+prueba duplicidad ni permite reasignarles países o competidores sin confirmación.

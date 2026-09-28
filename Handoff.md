@@ -1,6 +1,6 @@
 # Handoff activo
 
-**TASK-1863:** staging completo (Efeonce/Sky/BR); Vercel y worker d86edb784, CI verde; main en espera. [evidencia](docs/audits/platform/2026-09-28-task-1863-verification.md).
+TASK-1863: staging; main retenido.
 
 **DataForSEO CLI (28/09):** [TASK-1935](docs/tasks/complete/TASK-1935-dataforseo-daily-operator-cli.md) complete con `research` SEO/AI gobernado y reanudable; [TASK-1651-A](docs/tasks/in-progress/TASK-1651-growth-seo-dataforseo-ai-optimization-llm-sov-foundation.md) operativa: CHECK aplicado/validado y canary AEO USD 0,0101 con resume sin recompra. El [registro catalog-only](docs/architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md) documenta 225 rutas bloqueadas (216 de producto + 9 de infraestructura/plantillas) y su posible habilitación sin ampliar el allowlist. `1651-B` no iniciada; sin push/deploy.
 

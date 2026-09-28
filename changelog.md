@@ -38,8 +38,8 @@
   explícitos, sin fallback US. Canary real: 22 éxitos y Cuba skip por falta de ubicación.
 - Mercados/competidores versionados, snapshots, lotes atómicos y matriz sin promedio; ubicación nativa
   declarada por proveedor, presupuesto total y cobertura honesta de motores en informe/PDF.
-- Staging desplegado, migraciones y backfill aplicados a 27 perfiles; main en espera. Evidencia en
-  [la evidencia de TASK-1863](docs/audits/platform/2026-09-28-task-1863-verification.md).
+- Staging verificado en Vercel y worker `d86edb784`: 11 informes, Google 66/66; Sky PE parcial por
+  Perplexity. Migraciones/backfill aplicados, históricos preservados y main en espera. [Evidencia de TASK-1863](docs/audits/platform/2026-09-28-task-1863-verification.md).
 - Nueva cola `greenhouse_brand` (pedidos, jobs y eventos append-only). El command `requestBrandRender` valida el
   contrato AXIS y la receta aprobada antes de encolar, exige cada fuente como asset del uploader y es idempotente. Lo
   llaman el lane App, el lane ecosystem y tres tools MCP (`request_brand_render`, `get_brand_render_request`,
