@@ -4963,8 +4963,58 @@
           "maxChars": 34
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.method-surround-cycle",
+      "axis": {
+        "recipe": "method-surround-cycle",
+        "layout": null,
+        "role": "method",
+        "theme": "dark",
+        "uses": [
+          "proposal"
+        ],
+        "progress": false,
+        "page": {
+          "line": "growth",
+          "theme": "dark",
+          "role": "method",
+          "recipe": "method-surround-cycle",
+          "voice": {
+            "eyebrow": "Surround Discovery",
+            "question": "¿Cómo se sostiene?",
+            "answer": [
+              "En ciclo"
+            ]
+          },
+          "body": "La visibilidad ante la IA no se «logra»: se sostiene. Cada ciclo aprende del anterior y te sube un **nivel**.",
+          "startLabel": "Empieza aquí",
+          "stations": [
+            {
+              "icon": "docs/assets/public-site/aeo-service-icons/v2/measure.png",
+              "title": "Medir",
+              "description": "Tu visibilidad en ChatGPT, AI Overviews, Gemini, Perplexity, Copilot y Claude, por mercado y por prompt."
+            },
+            {
+              "icon": "docs/assets/public-site/aeo-service-icons/v2/create.png",
+              "title": "Crear",
+              "description": "Los activos que los motores entienden, citan y reproducen. No más contenido: el correcto."
+            },
+            {
+              "icon": "docs/assets/public-site/aeo-service-icons/v2/distribute.png",
+              "title": "Distribuir",
+              "description": "Tu presencia en cada superficie donde los motores descubren marcas, no sólo en tu sitio."
+            },
+            {
+              "icon": "docs/assets/public-site/aeo-service-icons/v2/optimize.png",
+              "title": "Optimizar",
+              "description": "Cada ciclo aprende del anterior: subes un nivel, medimos y corregimos."
+            }
+          ],
+          "core": {
+            "title": "Tu marca",
+            "caption": "sube un nivel en cada vuelta"
+          }
+        }
+      }
     },
     {
       "id": "method-eeat",
@@ -5027,8 +5077,76 @@
           "maxChars": 85
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.method-eeat",
+      "axis": {
+        "recipe": "method-eeat",
+        "layout": null,
+        "role": "method",
+        "theme": "dark",
+        "uses": [
+          "proposal"
+        ],
+        "progress": false,
+        "page": {
+          "role": "method",
+          "recipe": "method-eeat",
+          "line": "growth",
+          "theme": "dark",
+          "voice": {
+            "eyebrow": "E-E-A-T",
+            "question": "¿Por qué te citaría la IA?",
+            "answer": [
+              "Porque",
+              "confía"
+            ]
+          },
+          "body": "La IA no adivina: cita a quien puede **verificar**. Cada entregable construye una de estas señales.",
+          "meterTopic": "Peso de E-E-A-T",
+          "meter": [
+            {
+              "label": "En SEO clásico",
+              "value": "Importante",
+              "fill": 0.55
+            },
+            {
+              "label": "En AEO / IA",
+              "value": "Determinante",
+              "fill": 1
+            }
+          ],
+          "builtWithLabel": "Lo construimos con",
+          "letters": [
+            {
+              "letter": "E",
+              "name": "Experiencia",
+              "description": "Contenido de primera mano, escrito por quien lo vivió.",
+              "builtWith": "Autoría demostrable y casos reales",
+              "deliverable": "Contenido & landings"
+            },
+            {
+              "letter": "E",
+              "name": "Pericia",
+              "description": "Profundidad, precisión y fuentes que respaldan cada afirmación.",
+              "builtWith": "Autores con credenciales, contenido revisado",
+              "deliverable": "Contenido & landings"
+            },
+            {
+              "letter": "A",
+              "name": "Autoridad",
+              "description": "Que tu marca sea el referente de su sector.",
+              "builtWith": "PR, link building y entidad clara",
+              "deliverable": "PR & link building"
+            },
+            {
+              "letter": "T",
+              "name": "Confianza",
+              "description": "Un sitio seguro, transparente y verificable.",
+              "builtWith": "Schema, HTTPS y señales de confianza",
+              "deliverable": "Técnico & schema"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "content-focus",
@@ -6218,12 +6336,86 @@
         {
           "name": "illustrativeMark",
           "type": "text",
-          "required": true,
+          "required": false,
           "maxChars": 62
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.decision-ai-answer",
+      "axis": {
+        "recipe": "decision-ai-answer",
+        "layout": null,
+        "role": "decision",
+        "theme": "dark",
+        "uses": [
+          "proposal"
+        ],
+        "progress": false,
+        "page": {
+          "role": "decision",
+          "recipe": "decision-ai-answer",
+          "line": "growth",
+          "theme": "dark",
+          "voice": {
+            "eyebrow": "Visibilidad en IA",
+            "question": "¿A quién recomienda la IA?",
+            "answer": [
+              "A tu",
+              "competencia"
+            ]
+          },
+          "body": "Cuando tu comprador pregunta por tu categoría, la IA ya tiene favoritas. El AEO hace que la **próxima** respuesta te nombre.",
+          "prompt": "¿Cuáles son las mejores marcas de [tu categoría] en Chile?",
+          "today": {
+            "status": "Hoy",
+            "intro": "Estas son las opciones más recomendadas:",
+            "competitors": [
+              {
+                "name": "Competidor A",
+                "description": "Líder en recordación de la categoría.",
+                "citations": [
+                  "comparador.cl",
+                  "medio-sectorial.com"
+                ]
+              },
+              {
+                "name": "Competidor B",
+                "citations": [
+                  "competidor-b.com"
+                ]
+              },
+              {
+                "name": "Competidor C"
+              }
+            ],
+            "absent": "Tu marca no aparece"
+          },
+          "withAeo": {
+            "status": "Con AEO",
+            "intro": "Para [tu categoría] en Chile, la opción más recomendada es:",
+            "client": {
+              "name": "Tu marca",
+              "description": "Referente de la categoría: casos verificables, precios claros y reseñas consistentes.",
+              "citations": [
+                "tumarca.com",
+                "medio-sectorial.com",
+                "comparador.cl"
+              ]
+            },
+            "competitors": [
+              "Competidor A",
+              "Competidor B"
+            ]
+          },
+          "engine": "Motor de IA",
+          "dataOrigin": "illustrative",
+          "mark": "Ejemplo ilustrativo · tu diagnóstico muestra tu situación real",
+          "selection": {
+            "target": "object",
+            "label": "Cliente",
+            "participantKind": "role"
+          }
+        }
+      }
     },
     {
       "id": "decision-ai-market",
@@ -6280,8 +6472,56 @@
           "maxChars": 124
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.decision-ai-market",
+      "axis": {
+        "recipe": "decision-ai-market",
+        "layout": null,
+        "role": "decision",
+        "theme": "dark",
+        "uses": [
+          "proposal"
+        ],
+        "progress": false,
+        "page": {
+          "line": "growth",
+          "theme": "dark",
+          "role": "decision",
+          "recipe": "decision-ai-market",
+          "voice": {
+            "eyebrow": "El contexto",
+            "question": "¿Dónde busca tu cliente?",
+            "answer": [
+              "En la IA"
+            ]
+          },
+          "body": "SEO te hacía competir por el ranking. AEO te hace competir por la **recomendación**: antes de que exista un clic.",
+          "figures": [
+            {
+              "value": "−27%",
+              "label": "El tráfico que llegaba solo ya no está garantizado.",
+              "source": "HubSpot",
+              "detail": "El tráfico orgánico de clientes HubSpot cayó 27% interanual.",
+              "year": "2026",
+              "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+            },
+            {
+              "value": "50%",
+              "label": "Tu comprador ya le pregunta a la IA qué elegir.",
+              "source": "McKinsey & Company",
+              "detail": "Uno de cada dos consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir compras.",
+              "year": "2025"
+            },
+            {
+              "value": "<1 en 100",
+              "label": "Aparecer una vez no es una estrategia.",
+              "source": "SparkToro",
+              "detail": "Los motores de IA casi nunca repiten la misma lista de marcas.",
+              "year": "2026",
+              "sourceLogo": "docs/assets/public-site/aeo-market-logos/sparktoro-logo.svg"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "decision-difference",
@@ -6352,7 +6592,7 @@
           "name": "ownTeamTitle",
           "type": "text",
           "required": true,
-          "maxChars": 19
+          "maxChars": 25
         },
         {
           "name": "ownTeamPillars",
@@ -6361,8 +6601,81 @@
           "maxChars": 49
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.decision-difference",
+      "axis": {
+        "recipe": "decision-difference",
+        "layout": null,
+        "role": "decision",
+        "theme": "dark",
+        "uses": [
+          "proposal"
+        ],
+        "progress": false,
+        "page": {
+          "role": "decision",
+          "recipe": "decision-difference",
+          "line": "growth",
+          "theme": "dark",
+          "voice": {
+            "eyebrow": "La diferencia",
+            "question": "¿Qué nos hace distintos?",
+            "answer": [
+              "Lo puedes",
+              "ver"
+            ]
+          },
+          "body": "La mayoría vende promesas. Nosotros, un mecanismo que puedes ver y **medir**.",
+          "alternative": {
+            "kicker": "La alternativa",
+            "title": "Agencia commodity"
+          },
+          "efeonce": {
+            "kicker": "Efeonce",
+            "title": "Método medible"
+          },
+          "versus": "vs",
+          "rows": [
+            {
+              "alternative": "Promete «el #1 en Google» garantizado",
+              "efeonce": "Estima según tu punto de partida, sin promesas vacías"
+            },
+            {
+              "alternative": "Precio «desde $X» que no dice nada de tu caso",
+              "efeonce": "Alcance definido por prioridad e impacto real"
+            },
+            {
+              "alternative": "Reporte lleno de vanity metrics",
+              "efeonce": "Métricas que mueven el negocio + visibilidad en IA"
+            },
+            {
+              "alternative": "Caja negra: no sabes qué se hace",
+              "efeonce": "Ves qué se hace en cada ciclo, con entregables"
+            },
+            {
+              "alternative": "SEO aislado que ignora la era de la IA",
+              "efeonce": "Cimiento SEO + puente a AEO para que la IA te cite"
+            }
+          ],
+          "ownTeam": {
+            "kicker": "¿Y si lo hace mi equipo?",
+            "title": "Complemento, no reemplazo",
+            "pillars": [
+              {
+                "title": "Velocidad",
+                "description": "Sin meses de curva de aprendizaje"
+              },
+              {
+                "title": "Método",
+                "description": "Un sistema probado, multimercado y en español"
+              },
+              {
+                "title": "Foco",
+                "description": "Tu equipo sigue en lo suyo"
+              }
+            ]
+          }
+        }
+      }
     },
     {
       "id": "decision-traffic-to-revenue",
@@ -6425,8 +6738,59 @@
           "maxChars": 68
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.decision-traffic-to-revenue",
+      "axis": {
+        "recipe": "decision-traffic-to-revenue",
+        "layout": null,
+        "role": "decision",
+        "theme": "dark",
+        "uses": [
+          "proposal"
+        ],
+        "progress": false,
+        "page": {
+          "line": "growth",
+          "theme": "dark",
+          "role": "decision",
+          "recipe": "decision-traffic-to-revenue",
+          "voice": {
+            "eyebrow": "De tráfico a negocio",
+            "question": "¿Dónde termina el SEO?",
+            "answer": [
+              "En",
+              "ingresos"
+            ]
+          },
+          "body": "Conectamos el SEO con tus indicadores de negocio —leads, pipeline e **ingresos**—, como siempre debió medirse.",
+          "steps": [
+            {
+              "number": "01",
+              "name": "Tráfico calificado",
+              "description": "Visitas con intención comercial, segmentadas por cluster de tema.",
+              "channel": "Google · IA"
+            },
+            {
+              "number": "02",
+              "name": "Leads",
+              "description": "Quién llegó, desde qué búsqueda y qué pidió.",
+              "channel": "Formularios · CRM"
+            },
+            {
+              "number": "03",
+              "name": "Pipeline",
+              "description": "Oportunidades que nacen del orgánico, en tu CRM.",
+              "channel": "HubSpot · Salesforce"
+            },
+            {
+              "number": "04",
+              "name": "Ingresos",
+              "description": "Lo que el SEO trae al negocio, medido.",
+              "channel": "Greenhouse"
+            }
+          ],
+          "cutLabel": "La mayoría de las agencias se detiene aquí"
+        }
+      }
     },
     {
       "id": "proposal-service-aeo",
@@ -8315,7 +8679,7 @@
         {
           "name": "sampleMark",
           "type": "text",
-          "required": true,
+          "required": false,
           "maxChars": 16
         },
         {
@@ -8325,8 +8689,127 @@
           "maxChars": 92
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.decision-diagnosis-map",
+      "axis": {
+        "recipe": "decision-diagnosis-map",
+        "layout": null,
+        "role": "decision",
+        "theme": "dark",
+        "uses": [
+          "proposal"
+        ],
+        "progress": false,
+        "page": {
+          "role": "decision",
+          "recipe": "decision-diagnosis-map",
+          "line": "growth",
+          "theme": "dark",
+          "voice": {
+            "eyebrow": "Diagnóstico gratis",
+            "question": "¿Qué recibes primero?",
+            "answer": [
+              "El mapa"
+            ]
+          },
+          "body": "En 24–48 h sabes en qué nivel estás y por dónde empezamos a **subirte**. Gratis y sin compromiso.",
+          "report": {
+            "kicker": "Diagnóstico de visibilidad en IA",
+            "title": "Tu marca · Chile"
+          },
+          "modules": [
+            {
+              "kicker": "01 · Score real",
+              "title": "Tu score por motor de IA"
+            },
+            {
+              "kicker": "02 · Share of voice",
+              "title": "Frente a tus competidores"
+            },
+            {
+              "kicker": "03 · Prompts críticos",
+              "title": "Donde hoy no apareces"
+            },
+            {
+              "kicker": "04 · Plan priorizado",
+              "title": "Tus primeros movimientos"
+            }
+          ],
+          "engineScores": [
+            {
+              "engine": "ChatGPT",
+              "score": 38
+            },
+            {
+              "engine": "AI Overviews",
+              "score": 52
+            },
+            {
+              "engine": "Gemini",
+              "score": 31
+            },
+            {
+              "engine": "Perplexity",
+              "score": 24
+            },
+            {
+              "engine": "Copilot",
+              "score": 18
+            },
+            {
+              "engine": "Claude",
+              "score": 27
+            }
+          ],
+          "shareOfVoice": [
+            {
+              "label": "Tu marca",
+              "percent": 14
+            },
+            {
+              "label": "Competidor A",
+              "percent": 41
+            },
+            {
+              "label": "Competidor B",
+              "percent": 28
+            },
+            {
+              "label": "Otros",
+              "percent": 17
+            }
+          ],
+          "lostPrompts": [
+            "«mejor agencia de [categoría] en Chile»",
+            "«[categoría] precios y comparativa»",
+            "«alternativas a Competidor A»"
+          ],
+          "plan": [
+            {
+              "title": "Corregir cómo te describe la IA",
+              "kind": "Alto impacto"
+            },
+            {
+              "title": "Schema de organización y entidad",
+              "kind": "Base"
+            },
+            {
+              "title": "Cluster para los prompts perdidos",
+              "kind": "Contenido"
+            }
+          ],
+          "expertNote": {
+            "kicker": "Lectura experta",
+            "text": "El dato lo da la máquina; el criterio lo pone nuestro equipo."
+          },
+          "dataOrigin": "illustrative",
+          "sampleMark": "Datos de muestra",
+          "selection": {
+            "target": "object",
+            "label": "Cliente",
+            "participantKind": "role"
+          }
+        }
+      }
     },
     {
       "id": "breather",

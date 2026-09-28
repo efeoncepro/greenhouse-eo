@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-difference",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "La diferencia",
+    "question": "¿Qué nos hace distintos?",
+    "answer": [
+      "Lo puedes",
+      "ver"
+    ]
+  },
+  "body": "La mayoría vende promesas. Nosotros, un mecanismo que puedes ver y **medir**.",
+  "alternative": {
+    "kicker": "La alternativa",
+    "title": "Agencia commodity"
+  },
+  "efeonce": {
+    "kicker": "Efeonce",
+    "title": "Método medible"
+  },
+  "versus": "vs",
+  "rows": [
+    {
+      "alternative": "Promete «el #1 en Google» garantizado",
+      "efeonce": "Estima según tu punto de partida, sin promesas vacías"
+    },
+    {
+      "alternative": "Precio «desde $X» que no dice nada de tu caso",
+      "efeonce": "Alcance definido por prioridad e impacto real"
+    },
+    {
+      "alternative": "Reporte lleno de vanity metrics",
+      "efeonce": "Métricas que mueven el negocio + visibilidad en IA"
+    },
+    {
+      "alternative": "Caja negra: no sabes qué se hace",
+      "efeonce": "Ves qué se hace en cada ciclo, con entregables"
+    },
+    {
+      "alternative": "SEO aislado que ignora la era de la IA",
+      "efeonce": "Cimiento SEO + puente a AEO para que la IA te cite"
+    }
+  ],
+  "ownTeam": {
+    "kicker": "¿Y si lo hace mi equipo?",
+    "title": "Complemento, no reemplazo",
+    "pillars": [
+      {
+        "title": "Velocidad",
+        "description": "Sin meses de curva de aprendizaje"
+      },
+      {
+        "title": "Método",
+        "description": "Un sistema probado, multimercado y en español"
+      },
+      {
+        "title": "Foco",
+        "description": "Tu equipo sigue en lo suyo"
+      }
+    ]
+  }
+}

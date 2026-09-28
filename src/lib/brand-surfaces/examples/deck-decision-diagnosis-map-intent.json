@@ -1,0 +1,62 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-diagnosis-map",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Diagnóstico gratis",
+    "question": "¿Qué recibes primero?",
+    "answer": ["El mapa"]
+  },
+  "body": "En 24–48 h sabes en qué nivel estás y por dónde empezamos a **subirte**. Gratis y sin compromiso.",
+  "report": {
+    "kicker": "Diagnóstico de visibilidad en IA",
+    "title": "Tu marca · Chile"
+  },
+  "modules": [
+    { "kicker": "01 · Score real", "title": "Tu score por motor de IA" },
+    { "kicker": "02 · Share of voice", "title": "Frente a tus competidores" },
+    { "kicker": "03 · Prompts críticos", "title": "Donde hoy no apareces" },
+    { "kicker": "04 · Plan priorizado", "title": "Tus primeros movimientos" }
+  ],
+  "engineScores": [
+    { "engine": "ChatGPT", "score": 38 },
+    { "engine": "AI Overviews", "score": 52 },
+    { "engine": "Gemini", "score": 31 },
+    { "engine": "Perplexity", "score": 24 },
+    { "engine": "Copilot", "score": 18 },
+    { "engine": "Claude", "score": 27 }
+  ],
+  "shareOfVoice": [
+    { "label": "Tu marca", "percent": 14 },
+    { "label": "Competidor A", "percent": 41 },
+    { "label": "Competidor B", "percent": 28 },
+    { "label": "Otros", "percent": 17 }
+  ],
+  "lostPrompts": [
+    "«mejor agencia de [categoría] en Chile»",
+    "«[categoría] precios y comparativa»",
+    "«alternativas a Competidor A»"
+  ],
+  "plan": [
+    { "title": "Corregir cómo te describe la IA", "kind": "Alto impacto" },
+    { "title": "Schema de organización y entidad", "kind": "Base" },
+    { "title": "Cluster para los prompts perdidos", "kind": "Contenido" }
+  ],
+  "expertNote": {
+    "kicker": "Lectura experta",
+    "text": "El dato lo da la máquina; el criterio lo pone nuestro equipo."
+  },
+  "dataOrigin": "illustrative",
+  "sampleMark": "Datos de muestra",
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "role"
+  }
+}

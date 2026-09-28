@@ -2,31 +2,108 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <title>La órbita · la lámina de respiro</title>
+    <title>La órbita · el mapa del diagnóstico</title>
     <link rel="stylesheet" href="deck-fonts.css" />
     <link rel="stylesheet" href="graphic-line-tokens.css" />
     <link rel="stylesheet" href="graphic-line.css" />
   </head>
   <body>
-    <!-- PLACEHOLDER TASK-1934 (se reemplaza por la plantilla de decision-diagnosis-map).
-
-      Receta `breather` (surface deck, TASK-1928). La lámina de respiro: foto a sangre sin velo, la voz sobre el muro
-      calmo de la izquierda (la pregunta con el anillo chico) y el indicador de navegación arriba a la derecha. Sin
-      burbuja ni logo: la receta la exceptúa de la firma. Referencia: DeckRespiro (D3-respiro).
+    <!--
+      Receta `decision-diagnosis-map` (surface deck, tema oscuro, TASK-1934). «¿Qué recibes primero? El mapa.»: el
+      informe del diagnóstico abierto, en papel y girado sobre la plataforma de luz, con su cabecera (isotipo de Efeonce,
+      kicker, marca y mercado, y la marca de datos de muestra) y cuatro módulos en rejilla 2×2 — el score por motor, el
+      share of voice, los prompts donde no apareces y el plan priorizado, que toma la selección «Cliente» —; la ficha
+      «Lectura experta» en vidrio abajo a la derecha. Los motores van sólo como texto (interfaz genérica).
+      Referencia: DeckDiagnosticoMapa (MD4-diagnostico).
     -->
-    <main class="gl-slide gl-br gl-ring-small" data-gl-root data-slot="frame">
-      <figure class="gl-photo" data-slot="photo">
+    <main class="gl-slide gl-dm" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-dm-stage" data-slot="stage">
         <img data-slot-field="src" alt="" />
       </figure>
 
-      <figure class="gl-layer" data-slot="indicator">
+      <figure class="gl-layer gl-dm-platform" data-slot="platform">
         <img data-slot-field="src" alt="" />
       </figure>
 
-      <div data-slot="voice">
-        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Y el cliente?</span></p>
-        <p class="gl-answer"><span data-slot-field="answer">Aprobó</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      <section class="gl-dm-report">
+        <header class="gl-dm-head" data-slot="report">
+          <div class="gl-dm-brand">
+            <span class="gl-dm-tile"><img src="assets/efeonce-isotype-negative.svg" alt="" /></span>
+            <div>
+              <p class="gl-dm-kicker" data-slot-field="kicker">Diagnóstico de visibilidad en IA</p>
+              <p class="gl-dm-title" data-slot-field="title">Tu marca · Chile</p>
+            </div>
+          </div>
+          <span class="gl-dm-mark" data-slot-field="mark">Datos de muestra</span>
+        </header>
+
+        <div class="gl-dm-grid" data-slot="modules">
+          <section class="gl-dm-module">
+            <p class="gl-dm-module-kicker" data-slot-field="scoresKicker">01 · Score real</p>
+            <p class="gl-dm-module-title" data-slot-field="scoresTitle">Tu score por motor de IA</p>
+            <ol class="gl-dm-bars" data-slot="engineScores">
+              <li class="gl-dm-bar-row">
+                <span class="gl-dm-engine" data-slot-field="engine">ChatGPT</span>
+                <span class="gl-dm-track" aria-hidden="true"><span class="gl-dm-fill"></span></span>
+                <span class="gl-dm-score" data-slot-field="score">38</span>
+              </li>
+            </ol>
+          </section>
+
+          <section class="gl-dm-module">
+            <p class="gl-dm-module-kicker" data-slot-field="shareKicker">02 · Share of voice</p>
+            <p class="gl-dm-module-title" data-slot-field="shareTitle">Frente a tus competidores</p>
+            <div class="gl-dm-sov">
+              <figure class="gl-dm-donut" data-slot="donut">
+                <img data-slot-field="src" alt="" />
+              </figure>
+              <ol class="gl-dm-legend" data-slot="shareOfVoice">
+                <li class="gl-dm-legend-row"><span class="gl-dm-percent" data-slot-field="percent">14%</span> <span data-slot-field="label">Tu marca</span></li>
+              </ol>
+            </div>
+          </section>
+
+          <section class="gl-dm-module">
+            <p class="gl-dm-module-kicker" data-slot-field="promptsKicker">03 · Prompts críticos</p>
+            <p class="gl-dm-module-title" data-slot-field="promptsTitle">Donde hoy no apareces</p>
+            <ol class="gl-dm-prompts" data-slot="lostPrompts">
+              <li class="gl-dm-prompt">
+                <img class="gl-dm-miss" data-slot-field="icon" alt="" />
+                <span data-slot-field="text">«mejor agencia de [categoría] en Chile»</span>
+              </li>
+            </ol>
+          </section>
+
+          <section class="gl-dm-module">
+            <p class="gl-dm-module-kicker" data-slot-field="planKicker">04 · Plan priorizado</p>
+            <p class="gl-dm-module-title" data-slot-field="planTitle">Tus primeros movimientos</p>
+            <ol class="gl-dm-plan" data-slot="plan" data-gl-selection-target>
+              <li class="gl-dm-move">
+                <p class="gl-dm-move-number" data-slot-field="number">1</p>
+                <p class="gl-dm-move-title" data-slot-field="title">Corregir cómo te describe la IA</p>
+                <p class="gl-dm-move-kind" data-slot-field="kind">Alto impacto</p>
+              </li>
+            </ol>
+          </section>
+        </div>
+      </section>
+
+      <aside class="gl-dm-chip" data-slot="expertNote">
+        <p class="gl-dm-chip-kicker" data-slot-field="kicker">Lectura experta</p>
+        <p class="gl-dm-chip-text" data-slot-field="text">El dato lo da la máquina; el criterio lo pone nuestro equipo.</p>
+      </aside>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Diagnóstico gratis</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Qué recibes primero?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">El mapa</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
       </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">En 24–48 h sabes en qué nivel estás y por dónde empezamos a <strong>subirte</strong>. Gratis y sin compromiso.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
     </main>
   </body>
 </html>

@@ -2,31 +2,55 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <title>La órbita · la lámina de respiro</title>
+    <title>La órbita · el método en ciclo</title>
     <link rel="stylesheet" href="deck-fonts.css" />
     <link rel="stylesheet" href="graphic-line-tokens.css" />
     <link rel="stylesheet" href="graphic-line.css" />
   </head>
   <body>
-    <!-- PLACEHOLDER TASK-1934 (se reemplaza por la plantilla de method-surround-cycle).
-
-      Receta `breather` (surface deck, TASK-1928). La lámina de respiro: foto a sangre sin velo, la voz sobre el muro
-      calmo de la izquierda (la pregunta con el anillo chico) y el indicador de navegación arriba a la derecha. Sin
-      burbuja ni logo: la receta la exceptúa de la firma. Referencia: DeckRespiro (D3-respiro).
+    <!--
+      Receta `method-surround-cycle` (surface deck, tema oscuro, TASK-1934). «¿Cómo se sostiene? En ciclo.»: la órbita
+      tendida en perspectiva ES el loop Surround Discovery y es la única órbita de la lámina. El loop (relleno, anillo,
+      tramo encendido desde la estación 1, flechas de sentido y esfera) llega como una capa SVG que pinta el builder
+      desde el token `loop` de AXIS. Cuatro estaciones siempre, en orden: el ícono 3D sobre su nodo y la tarjeta de
+      vidrio fuera de la elipse; la estación 1 lleva el rótulo de inicio y el borde destacado. «Tu marca» al centro.
+      La voz «viva» a la izquierda y la burbuja URL en luminosidad al pie. Por ítem: título ≤ 14; descripción ≤ 155 en
+      las tarjetas anchas (1 y 3) y ≤ 126 en las laterales (2 y 4). Referencia: DeckCicloSurround (MX3-ciclo).
     -->
-    <main class="gl-slide gl-br gl-ring-small" data-gl-root data-slot="frame">
-      <figure class="gl-photo" data-slot="photo">
+    <main class="gl-slide gl-sur" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-sur-stage" data-slot="stage">
         <img data-slot-field="src" alt="" />
       </figure>
 
-      <figure class="gl-layer" data-slot="indicator">
+      <figure class="gl-layer gl-sur-loop" data-slot="loop">
         <img data-slot-field="src" alt="" />
       </figure>
 
-      <div data-slot="voice">
-        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Y el cliente?</span></p>
-        <p class="gl-answer"><span data-slot-field="answer">Aprobó</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      <div class="gl-sur-core" data-slot="core">
+        <p class="gl-sur-core-title" data-slot-field="title">Tu marca</p>
+        <p class="gl-sur-core-caption" data-slot-field="caption">sube un nivel en cada vuelta</p>
       </div>
+
+      <ol class="gl-sur-stations" data-slot="stations">
+        <li class="gl-sur-station">
+          <img class="gl-sur-icon" data-slot-field="src" alt="" />
+          <div class="gl-sur-card">
+            <p class="gl-sur-kicker"><span class="gl-sur-number" data-slot-field="number">01</span><span class="gl-sur-start" data-slot-field="start">Empieza aquí</span></p>
+            <p class="gl-sur-title" data-slot-field="title">Medir</p>
+            <p class="gl-sur-desc" data-slot-field="description">Tu visibilidad en ChatGPT, AI Overviews, Gemini, Perplexity, Copilot y Claude, por mercado y por prompt.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Surround Discovery</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo se sostiene?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">En ciclo</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">La visibilidad ante la IA no se «logra»: se sostiene. Cada ciclo aprende del anterior y te sube un <strong>nivel</strong>.</p>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
     </main>
   </body>
 </html>

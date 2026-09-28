@@ -25,7 +25,15 @@ export const ANSWER_RATIO_CONTENT_TYPES: ReadonlySet<string> = new Set([
   'deck.content-pricing.live',
   'deck.content-clients',
   'deck.decision-plan',
-  'deck.content-partners'
+  'deck.content-partners',
+  // TASK-1934: las siete láminas SEO/AEO (la respuesta a 3× la pregunta, 120 px como mínimo).
+  'deck.decision-ai-answer',
+  'deck.decision-ai-market',
+  'deck.method-surround-cycle',
+  'deck.decision-difference',
+  'deck.method-eeat',
+  'deck.decision-traffic-to-revenue',
+  'deck.decision-diagnosis-map'
 ])
 
 export interface RenderedAuditViolation {

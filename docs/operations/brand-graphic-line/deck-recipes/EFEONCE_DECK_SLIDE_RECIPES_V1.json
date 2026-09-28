@@ -6716,7 +6716,7 @@
               "description": "Cada ciclo aprende del anterior: subes un nivel, medimos y corregimos."
             }
           ],
-          "notes": "Estación 1 (arriba) lleva «Empieza aquí» y el borde teal. Medido: título 760 34px Bric en caja 260; descripción 400 15px, 4 líneas en 320 (arriba/abajo) o 260 (laterales). Exactamente 4 ítems. Por ítem: title (≤ 14) · description (≤ wide 155, narrow 126) · icon (image; Ícono 3D del servicio (docs/assets/public-site/aeo-service-icons/v2/{measure,create,distribute,optimize}.png))."
+          "notes": "Estación 1 (arriba) lleva «Empieza aquí» y el borde teal. Medido: título 760 34px Bric en caja 260; descripción 400 15px, 4 líneas en 320 (arriba/abajo) o 260 (laterales). Exactamente 4 ítems. Por ítem: title (≤ 14) · description (≤ wide 155, narrow 126) · icon (image; Ícono 3D del servicio (docs/assets/public-site/aeo-service-icons/v2/{measure,create,distribute,optimize}.png)). Las tarjetas angostas (2 y 4) admiten 126 caracteres de descripción y las anchas (1 y 3) 155: AXIS lo mide por tarjeta (stations.cards[].descMaxChars) y el builder lo exige."
         },
         {
           "name": "coreLabel",
@@ -6901,7 +6901,7 @@
               "deliverable": "Técnico & schema"
             }
           ],
-          "notes": "La cuarta (Confianza) se ilumina: es la base. Medido: caja interior 188 px (tarjeta 232 − 44 de padding). Exactamente 4 ítems. Por ítem: letter (≤ 1) · name (≤ 12) · description (≤ 85) · builtWith (≤ 42) · deliverable (≤ 26)."
+          "notes": "La cuarta (Confianza) se ilumina: es la base. Medido: caja interior 188 px (tarjeta 232 − 44 de padding). Exactamente 4 ítems. Por ítem: letter (≤ 1) · name (≤ 12) · description (≤ 85) · builtWith (≤ 44) · deliverable (≤ 26). builtWith corregido a 44 al construir la plantilla (TASK-1934): el copy aprobado «Autores con credenciales, contenido revisado» mide 44."
         }
       ],
       "fixed": [
@@ -8188,10 +8188,10 @@
         {
           "name": "illustrativeMark",
           "type": "text",
-          "required": true,
+          "required": false,
           "maxChars": 62,
           "example": "Ejemplo ilustrativo · tu diagnóstico muestra tu situación real",
-          "notes": "Marca OBLIGATORIA mientras el contenido sea de muestra; sólo se retira con provenance captured-output real. Valor fijo «Ejemplo ilustrativo · tu diagnóstico muestra tu situación real»: no se reescribe ni se quita."
+          "notes": "Marca «Ejemplo ilustrativo»: obligatoria mientras los datos sean de ejemplo (dataOrigin ilustrativo, el valor por defecto); la exige el builder y, sin ella, la lámina no compone. Sólo se omite con datos del cliente (dataOrigin 'client') que traen evidenceRef (TASK-1930). Por eso el slot no es obligatorio en el contrato: la regla es condicional y vive en el builder."
         }
       ],
       "fixed": [
@@ -8321,27 +8321,27 @@
           "example": [
             {
               "value": "−27%",
-              "takeaway": "El tráfico que llegaba solo ya no está garantizado.",
+              "label": "El tráfico que llegaba solo ya no está garantizado.",
               "detail": "El tráfico orgánico de clientes HubSpot cayó 27% interanual.",
               "source": "HubSpot",
               "year": "2026"
             },
             {
               "value": "50%",
-              "takeaway": "Tu comprador ya le pregunta a la IA qué elegir.",
+              "label": "Tu comprador ya le pregunta a la IA qué elegir.",
               "detail": "Uno de cada dos consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir compras.",
               "source": "McKinsey & Company",
               "year": "2025"
             },
             {
               "value": "<1 en 100",
-              "takeaway": "Aparecer una vez no es una estrategia.",
+              "label": "Aparecer una vez no es una estrategia.",
               "detail": "Los motores de IA casi nunca repiten la misma lista de marcas.",
               "source": "SparkToro",
               "year": "2026"
             }
           ],
-          "notes": "La cifra del centro (lead) es la que se adelanta y se ilumina. Cifras, copy y fuentes vigentes: docs/documentation/public-site/aeo-landing-elementor.md §market. Una cifra SIN fuente invalida la lámina (regla del validador). Exactamente 3 ítems. Por ítem: value (metric; ≤ lead 4, side 4, sideLong 6; Lead (centro) 150 px en caja 306 px; laterales 116 px en caja 248 px; si el valor supera 5 caracteres la plantilla baja a 76 px (caso «<1 en 100»).) · takeaway (≤ lead 59, side 55) · detail (≤ lead 124, side 84) · source (logo|wordmark; obligatorio; Logo en un tono claro (el texto claro de la superficie oscura) o wordmark de texto; OBLIGATORIO) · year (text; obligatorio; ≤ 4)."
+          "notes": "La cifra del centro (lead) es la que se adelanta y se ilumina. Cifras, copy y fuentes vigentes: docs/documentation/public-site/aeo-landing-elementor.md §market. Una cifra SIN fuente invalida la lámina (regla del validador). Exactamente 3 ítems. Por ítem: value (metric; ≤ lead 4, side 4, sideLong 6; Lead (centro) 150 px en caja 306 px; laterales 116 px en caja 248 px; si el valor supera 5 caracteres la plantilla baja a 76 px (caso «<1 en 100»).) · label (≤ lead 59, side 55) · detail (≤ lead 124, side 84) · source (logo|wordmark; obligatorio; Logo en un tono claro (el texto claro de la superficie oscura) o wordmark de texto; OBLIGATORIO) · year (text; obligatorio; ≤ 4). Cada ítem va por `figures` del contrato AXIS ({ value, label, source } + detail y year): una cifra sin source no compone (AXIS figure-source-required) ni valida (figure-source-missing). La cifra admite hasta 9 caracteres («<1 en 100»); sin logo, la fuente se imprime como wordmark (≤ 20)."
         }
       ],
       "fixed": [
@@ -8505,9 +8505,9 @@
           "name": "ownTeamTitle",
           "type": "text",
           "required": true,
-          "maxChars": 19,
+          "maxChars": 25,
           "example": "Complemento, no reemplazo",
-          "notes": "Medido: caja 260 px × 1 línea(s) a 760 26px Bric (≈12.85 px/carácter, 5 % de holgura)."
+          "notes": "Medido: caja 260 px × 1 línea(s) a 760 26px Bric (≈12.85 px/carácter, 5 % de holgura). Corregido a 25 al construir la plantilla (TASK-1934): el copy aprobado «Complemento, no reemplazo» mide 25 caracteres y ~346 px en la referencia; la medida anterior (19, caja de 260 px) no lo admitía."
         },
         {
           "name": "ownTeamPillars",
@@ -11003,10 +11003,10 @@
         {
           "name": "sampleMark",
           "type": "text",
-          "required": true,
+          "required": false,
           "maxChars": 16,
           "example": "Datos de muestra",
-          "notes": "OBLIGATORIA mientras los datos no sean del cliente. Valor fijo «Datos de muestra»: no se reescribe ni se quita."
+          "notes": "Marca «Datos de muestra»: obligatoria mientras los datos sean de ejemplo (dataOrigin ilustrativo, el valor por defecto); la exige el builder y, sin ella, la lámina no compone. Sólo se omite con datos del cliente (dataOrigin 'client') que traen evidenceRef (TASK-1930). Por eso el slot no es obligatorio en el contrato: la regla es condicional y vive en el builder."
         },
         {
           "name": "expertNote",

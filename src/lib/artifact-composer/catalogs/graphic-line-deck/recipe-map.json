@@ -337,6 +337,41 @@
       "example": "src/lib/brand-surfaces/examples/deck-proposal-cinematic-seo-intent.json",
       "slots": null
     },
+    "decision-ai-answer": {
+      "contentType": "deck.decision-ai-answer",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-ai-answer-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "prompt": "back.prompt", "answerIntroToday": "back.intro", "competitorsToday": "backRows", "answerIntroWithAeo": "front.intro", "clientName": "client.name", "clientDescription": "client.description", "clientCitations": "client.citations", "competitorsWithAeo": "frontRows", "illustrativeMark": "mark"}
+    },
+    "decision-ai-market": {
+      "contentType": "deck.decision-ai-market",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-ai-market-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "figures": "figures"}
+    },
+    "method-surround-cycle": {
+      "contentType": "deck.method-surround-cycle",
+      "example": "src/lib/brand-surfaces/examples/deck-method-surround-cycle-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "stations": "stations", "coreLabel": "core.title", "coreCaption": "core.caption"}
+    },
+    "decision-difference": {
+      "contentType": "deck.decision-difference",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-difference-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "alternativeTitle": "alternative.title", "rows": "alternativeRows[].text+efeonceRows[].text", "efeonceTitle": "efeonce.title", "ownTeamTitle": "ownTeam.title", "ownTeamPillars": "pillars"}
+    },
+    "method-eeat": {
+      "contentType": "deck.method-eeat",
+      "example": "src/lib/brand-surfaces/examples/deck-method-eeat-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "meter": "meter", "letters": "letters"}
+    },
+    "decision-traffic-to-revenue": {
+      "contentType": "deck.decision-traffic-to-revenue",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-traffic-to-revenue-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "steps": "steps[].description", "cutLabel": "cutLabel"}
+    },
+    "decision-diagnosis-map": {
+      "contentType": "deck.decision-diagnosis-map",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-diagnosis-map-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "reportTitle": "report.title", "engineScores": "engineScores", "shareOfVoice": "shareOfVoice", "lostPrompts": "lostPrompts", "plan": "plan", "sampleMark": "report.mark", "expertNote": "expertNote.text"}
+    },
     "proposal-cinematic-revops": {
       "contentType": "deck.proposal-cinematic",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=4",

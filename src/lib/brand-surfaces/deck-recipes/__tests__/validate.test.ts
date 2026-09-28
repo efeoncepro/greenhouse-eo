@@ -28,21 +28,10 @@ const withCoverSlots = (slots: Record<string, unknown>): DeckPlan => ({
 })
 
 describe('catálogo de runtime', () => {
-  // Las nueve láminas SEO/AEO (TASK-1934) entran al catálogo antes que su plantilla: esta lista se vacía slice a slice.
-  const WITHOUT_TEMPLATE_YET = [
-    'decision-ai-answer',
-    'decision-ai-market',
-    'decision-diagnosis-map',
-    'decision-difference',
-    'decision-traffic-to-revenue',
-    'method-eeat',
-    'method-surround-cycle'
-  ]
-
-  it('trae las 78 recetas aprobadas, todas con plantilla y con su página de AXIS salvo las que TASK-1934 aún compone', () => {
+  it('trae las 78 recetas aprobadas, todas con plantilla y con su página de AXIS', () => {
     expect(deckRecipeCatalog.recipes).toHaveLength(78)
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template).map(recipe => recipe.id).sort()).toEqual(WITHOUT_TEMPLATE_YET)
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id).sort()).toEqual(WITHOUT_TEMPLATE_YET)
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template)).toEqual([])
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id)).toEqual([])
   })
 
   it('acepta la portada y el cierre clásicos de AXIS sólo en pitch y QBR', () => {

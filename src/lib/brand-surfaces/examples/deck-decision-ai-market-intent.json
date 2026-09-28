@@ -1,0 +1,44 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-ai-market",
+  "voice": {
+    "eyebrow": "El contexto",
+    "question": "¿Dónde busca tu cliente?",
+    "answer": [
+      "En la IA"
+    ]
+  },
+  "body": "SEO te hacía competir por el ranking. AEO te hace competir por la **recomendación**: antes de que exista un clic.",
+  "figures": [
+    {
+      "value": "−27%",
+      "label": "El tráfico que llegaba solo ya no está garantizado.",
+      "source": "HubSpot",
+      "detail": "El tráfico orgánico de clientes HubSpot cayó 27% interanual.",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    },
+    {
+      "value": "50%",
+      "label": "Tu comprador ya le pregunta a la IA qué elegir.",
+      "source": "McKinsey & Company",
+      "detail": "Uno de cada dos consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir compras.",
+      "year": "2025"
+    },
+    {
+      "value": "<1 en 100",
+      "label": "Aparecer una vez no es una estrategia.",
+      "source": "SparkToro",
+      "detail": "Los motores de IA casi nunca repiten la misma lista de marcas.",
+      "year": "2026",
+      "sourceLogo": "docs/assets/public-site/aeo-market-logos/sparktoro-logo.svg"
+    }
+  ]
+}
