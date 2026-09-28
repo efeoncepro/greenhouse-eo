@@ -54,7 +54,8 @@ export interface RunGraderDiagnosticInput {
   /**
    * TASK-1290 — modelo de negocio del perfil (eje de buyer-intent). Detrás del flag
    * `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` selecciona el baseline del arquetipo
-   * (consumo/B2B/retail/…); sin flag o sin valor → pack agencia v1 (no-regresión).
+   * (consumo/B2B/retail/…). Sin valor usa el prior canónico de categoría; sin flag
+   * conserva el pack legacy (no-regresión).
    */
   businessModel?: string | null
   competitorsDeclared?: string[]

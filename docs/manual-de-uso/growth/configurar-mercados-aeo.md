@@ -40,6 +40,8 @@ El portal conserva POST `/api/client-portal/growth/ai-visibility/run`: body opci
    fila existente para corregir el país: crea la configuración correcta y pausa la anterior.
 3. Define competidores por mercado. `word_ci` ignora mayúsculas y acentos; `word_cs` diferencia
    `Gol` de `gol`. Los aliases permiten reconocer `LATAM` como `LATAM Airlines` sin renombrar evidencia.
+   Cambiar nombre, aliases, dominio o categoría inicia una serie comparable nueva; los informes anteriores
+   conservan su snapshot y no producen una falsa mejora por el cambio de configuración.
 4. Usa una clave única de solicitud para el lote. Repetir la misma clave/selección devuelve el lote;
    cambiar la selección con esa clave produce conflicto. Revisa costo total y derechos de servicio.
 5. Lee el progreso y la matriz. Un lote parcial conserva los resultados válidos y muestra los faltantes.

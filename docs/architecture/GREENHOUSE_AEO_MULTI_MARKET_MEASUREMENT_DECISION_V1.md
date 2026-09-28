@@ -40,7 +40,8 @@ EE. UU. impedían declarar qué se midió.
    una réplica de la experiencia de cada usuario final. Hash request v2 incluye país y locale.
 8. Reports distinguen solicitados, intentados y respondidos; éxito sin citas no significa cero
    visibilidad de marca ni citas inventadas. Matriz sin promedio (`blendedOverall: null`). Tendencias
-   sólo dentro del mismo mercado, categoría declarada y policy; pack distinto se declara incomparable. Cambio de set
+   sólo dentro del mismo mercado, identidad de marca (nombre, aliases, dominio y categoría) y policy;
+   pack distinto se declara incomparable. Cambio de set
    elimina delta competitivo y overall, preservando dimensiones independientes.
 9. Regrade por mercado con weekly/monthly/quarterly; compatibilidad del principal sincronizada con
    los campos legacy. SEO cruza por país+idioma del target; no toma el último run de otro país.

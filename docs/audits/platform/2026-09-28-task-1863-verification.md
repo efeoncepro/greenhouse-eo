@@ -167,3 +167,11 @@ no se crea checkout aislado ni se publica trabajo paralelo sin esa decisión.
 Control de contexto del SHA c5902e929: falló por Handoff de ~12.026 tokens frente al límite de 12.000.
 El resumen propio de TASK-1863 está reducido en el checkout compartido; se preservan las compactaciones
 concurrentes ajenas sin incluirlas en el commit de esta task. No se declara toda la CI nueva verde.
+
+### Comparabilidad de identidad de marca
+
+Se reprodujo en PostgreSQL real que un cambio de nombre, aliases o dominio podía elegirse como
+comparación histórica de una identidad distinta (tres regresiones fallaban antes del cambio). El reader
+ahora compara el objeto `brand` completo del snapshot, incluida la categoría, conservando el contrato
+legacy cuando ambos snapshots son null. Prueba de la corrección: **15/15 PASS** en PG efímero;
+ningún dato histórico se modifica. El cambio sólo afecta la selección de referencia de la tendencia.

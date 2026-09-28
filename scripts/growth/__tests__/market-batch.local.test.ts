@@ -172,6 +172,35 @@ describe.skipIf(!enabled)('TASK-1863 actual PostgreSQL batch atomicity and reser
     expect(previous?.score.runId).toBe('previous')
   })
 
+  it.each(['name', 'aliases', 'websiteUrl'])('excludes changed brand matching identity: %s', async field => {
+    const brand = { name: 'Example', aliases: [], websiteUrl: 'https://example.com', category: 'same category' }
+
+    const changedBrand = {
+      ...brand,
+      [field]: field === 'aliases' ? [{ name: 'EX', matchMode: 'word_cs' }] : 'different value'
+    }
+
+    for (const [id, date, snapshot] of [
+      ['previous', '2026-09-01', brand],
+      ['changed', '2026-09-02', changedBrand],
+      ['current', '2026-09-03', brand]
+    ] as const) {
+      await query(`INSERT INTO greenhouse_growth.grader_runs
+        (run_id,profile_id,market_id,market_code,locale,provider_policy_version,prompt_pack_version,created_at,matching_snapshot)
+        VALUES ($1,'profile-local','market-cl','CL','es-CL','policy-v2','pack-v2',$2,$3::jsonb)`,
+      [id, date, JSON.stringify({ brand: snapshot })])
+    }
+
+    await query(`INSERT INTO greenhouse_growth.grader_scores(run_id,score_version)
+      VALUES ('previous','score-v1'),('changed','score-v1')`)
+
+    const previous = await getPreviousComparableScore({
+      profileId: 'profile-local', scoreVersion: 'score-v1', currentRunId: 'current'
+    })
+
+    expect(previous?.score.runId).toBe('previous')
+  })
+
   it('rejects a secondary market with the flag OFF even for a single run', async () => {
     await expect(
       requestRunBatchInternal({
