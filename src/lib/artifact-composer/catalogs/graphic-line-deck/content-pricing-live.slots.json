@@ -593,13 +593,13 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 24,
+          "maxCharacters": 16,
           "example": "Inversión"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 22,
           "example": "¿Cuánto cuesta?"
         },
         "answerLead": {
@@ -611,7 +611,7 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 12,
+          "maxCharacters": 16,
           "resolver": "gl-answer",
           "example": "chica"
         }
@@ -622,11 +622,11 @@
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 140,
+        "maxCharacters": 110,
         "maxLines": 5,
         "overflow": "reject"
       },
-      "example": "Cada línea de la cotización a la vista, con su <strong>monto</strong> y lo que incluye. Los montos se definen en cada propuesta."
+      "example": "Cada línea de la cotización a la vista, con su <strong>monto</strong> y lo que incluye. Los montos se definen en la propuesta."
     },
     "quote": {
       "selector": "[data-slot='quote']",

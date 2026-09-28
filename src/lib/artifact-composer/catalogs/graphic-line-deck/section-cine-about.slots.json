@@ -221,13 +221,13 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 24,
           "example": "Quiénes somos"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 24,
           "example": "¿Quiénes somos?"
         },
         "answerLead": {
@@ -239,7 +239,7 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 16,
           "resolver": "gl-answer",
           "example": "equipo"
         }
@@ -250,7 +250,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 120,
+        "maxCharacters": 100,
         "maxLines": 3,
         "overflow": "reject"
       },
@@ -271,7 +271,7 @@
           "value": {
             "type": "string",
             "required": true,
-            "maxCharacters": 6
+            "maxCharacters": 4
           },
           "label": {
             "type": "string",

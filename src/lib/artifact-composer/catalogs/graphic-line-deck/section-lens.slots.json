@@ -143,13 +143,13 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 34,
           "example": "¿Quién decide el corte?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 14,
           "resolver": "gl-answer",
           "example": "El dato"
         }

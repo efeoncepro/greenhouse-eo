@@ -143,13 +143,13 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 24,
           "example": "Nuestro equipo"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 40,
           "example": "¿Quién hace crecer tu marca?"
         },
         "answerLead": {
@@ -161,7 +161,7 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 16,
           "resolver": "gl-answer",
           "example": "equipo"
         }

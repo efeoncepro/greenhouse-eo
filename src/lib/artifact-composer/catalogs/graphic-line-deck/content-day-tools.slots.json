@@ -560,7 +560,7 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 24
+            "maxCharacters": 22
           }
         }
       },
@@ -668,19 +668,19 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 26,
           "example": "Tu día a día con Efeonce"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 30,
           "example": "¿Cómo trabajamos contigo?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 5,
           "resolver": "gl-answer",
           "example": "Así"
         }
@@ -691,7 +691,7 @@
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 100,
         "maxLines": 5,
         "overflow": "reject"
       },

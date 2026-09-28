@@ -280,20 +280,20 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 24,
           "example": "¿Cuánto más rápido?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 10,
           "resolver": "gl-answer",
           "example": "Un cuarto"
         },
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 30,
           "example": "Resultados · Sky Airlines"
         }
       }
@@ -303,7 +303,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 100,
         "maxLines": 4,
         "overflow": "reject"
       },
@@ -324,7 +324,7 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 20
+            "maxCharacters": 14
           },
           "value": {
             "type": "string",
@@ -349,7 +349,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 8,
+        "maxCharacters": 7,
         "maxLines": 1,
         "overflow": "reject"
       },
@@ -360,7 +360,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 80,
+        "maxCharacters": 70,
         "maxLines": 1,
         "overflow": "reject"
       },
@@ -386,7 +386,7 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 24
+            "maxCharacters": 22
           }
         }
       },

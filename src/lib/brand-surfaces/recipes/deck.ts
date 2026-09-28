@@ -853,6 +853,9 @@ export const methodStaircase: RecipeBuilder = ({ intent, manifest, recipe }) => 
     columnWidth: px('column-width', stair.x0Px - 20)
   }
 
+  // La escalera tipográfica cierra con su nota (la receta la exige: sin ella, la trayectoria parece una garantía).
+  if (layout === 'flat' && !content.note) throw new SurfacePieceError('La escalera plana lleva su nota (`note`).', 'invalid-intent')
+
   if (layout === 'steps') frame.slabHeight = px('slab-height', measured(stair.slabHeightPx, 'el alto del peldaño'))
   else {
     frame.rowGap = px('row-gap', measured(stair.rowGapPx, 'el aire de la fila'))

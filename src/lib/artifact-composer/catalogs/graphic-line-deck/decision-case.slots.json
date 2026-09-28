@@ -203,20 +203,20 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 26,
           "example": "¿Qué cambió con Sky?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 11,
           "resolver": "gl-answer",
           "example": "Más rápido"
         },
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 20,
           "example": "Caso · 12 meses"
         }
       }

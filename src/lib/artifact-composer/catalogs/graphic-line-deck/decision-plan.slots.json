@@ -417,7 +417,7 @@
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 150,
+        "maxCharacters": 120,
         "maxLines": 5,
         "overflow": "reject"
       },

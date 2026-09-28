@@ -336,7 +336,7 @@
           "caption": {
             "type": "string",
             "required": true,
-            "maxCharacters": 32
+            "maxCharacters": 30
           }
         }
       },
@@ -366,13 +366,13 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 32,
           "example": "¿Cuál sale al cliente?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 6,
           "resolver": "gl-answer",
           "example": "Ésta"
         }

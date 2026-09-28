@@ -419,7 +419,7 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 20,
           "example": "Tu equipo"
         },
         "question": {
@@ -437,7 +437,7 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 18,
           "resolver": "gl-answer",
           "example": "reales"
         }
@@ -448,7 +448,7 @@
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 85,
         "maxLines": 4,
         "overflow": "reject"
       },

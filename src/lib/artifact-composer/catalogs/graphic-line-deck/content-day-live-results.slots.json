@@ -469,7 +469,7 @@
         "title": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 40,
           "example": "Revisión de resultados"
         },
         "meta": {
@@ -494,7 +494,7 @@
         "title": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 36,
           "example": "Tu reporte de la semana está listo"
         },
         "sample": {
@@ -525,7 +525,7 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 20
+            "maxCharacters": 18
           }
         }
       },
@@ -577,13 +577,13 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 26,
           "example": "Tu día a día con Efeonce"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 16,
           "example": "¿Cómo va?"
         },
         "answerLead": {
@@ -595,7 +595,7 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 10,
           "resolver": "gl-answer",
           "example": "vivo"
         }
@@ -606,7 +606,7 @@
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 120,
+        "maxCharacters": 100,
         "maxLines": 5,
         "overflow": "reject"
       },

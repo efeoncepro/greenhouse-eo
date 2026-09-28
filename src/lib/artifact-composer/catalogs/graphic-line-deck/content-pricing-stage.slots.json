@@ -659,13 +659,13 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 24,
+          "maxCharacters": 16,
           "example": "Inversión"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 24,
           "example": "¿Cómo se cotiza?"
         },
         "answerLead": {
@@ -677,7 +677,7 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 12,
+          "maxCharacters": 14,
           "resolver": "gl-answer",
           "example": "capacidad"
         }
@@ -688,7 +688,7 @@
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 120,
+        "maxCharacters": 90,
         "maxLines": 5,
         "overflow": "reject"
       },
@@ -751,7 +751,7 @@
                 "text": {
                   "type": "string",
                   "required": true,
-                  "maxCharacters": 40
+                  "maxCharacters": 32
                 }
               }
             }

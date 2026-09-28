@@ -438,13 +438,13 @@
         "title": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 24,
           "example": "Plan de la campaña"
         },
         "meta": {
           "type": "string",
           "required": true,
-          "maxCharacters": 20,
+          "maxCharacters": 14,
           "example": "Semana 3 de 6"
         }
       }
@@ -480,12 +480,12 @@
                 "title": {
                   "type": "string",
                   "required": true,
-                  "maxCharacters": 28
+                  "maxCharacters": 24
                 },
                 "tag": {
                   "type": "string",
                   "required": true,
-                  "maxCharacters": 28
+                  "maxCharacters": 24
                 }
               }
             }
@@ -555,7 +555,7 @@
         "title": {
           "type": "string",
           "required": true,
-          "maxCharacters": 24,
+          "maxCharacters": 20,
           "example": "Key visual"
         }
       }
@@ -656,7 +656,7 @@
           "text": {
             "type": "string",
             "required": true,
-            "maxCharacters": 40
+            "maxCharacters": 32
           }
         }
       },
@@ -714,13 +714,13 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 26,
           "example": "Tu día a día con Efeonce"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 28,
           "example": "¿Cómo avanza tu proyecto?"
         },
         "answerLead": {
@@ -732,7 +732,7 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 12,
           "resolver": "gl-answer",
           "example": "vista"
         }
@@ -743,7 +743,7 @@
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 100,
         "maxLines": 5,
         "overflow": "reject"
       },

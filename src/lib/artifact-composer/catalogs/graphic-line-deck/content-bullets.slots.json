@@ -184,19 +184,19 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 28,
           "example": "La experiencia Efeonce"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 44,
+          "maxCharacters": 40,
           "example": "¿Qué recibes al trabajar con nosotros?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 14,
           "resolver": "gl-answer",
           "example": "Un sistema"
         }
@@ -227,7 +227,7 @@
           "desc": {
             "type": "string",
             "required": true,
-            "maxCharacters": 110
+            "maxCharacters": 95
           }
         }
       },

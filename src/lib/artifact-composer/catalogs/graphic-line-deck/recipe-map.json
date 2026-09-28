@@ -5,192 +5,192 @@
     "content-pricing": {
       "contentType": "deck.content-pricing",
       "example": "src/lib/brand-surfaces/examples/deck-content-pricing-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "plans": "plans", "amounts": "plans[].amount", "recommendedPlan": "frame.recommended"}
     },
     "content-pricing-stage": {
       "contentType": "deck.content-pricing.stage",
       "example": "src/lib/brand-surfaces/examples/deck-content-pricing-stage-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "plans": "plans", "amounts": "plans[].amount", "recommendedPlan": "frame.recommended"}
     },
     "content-pricing-live": {
       "contentType": "deck.content-pricing.live",
       "example": "src/lib/brand-surfaces/examples/deck-content-pricing-live-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "quoteTitle": "quote.title", "lineItems": "lines", "total": "quote.total"}
     },
     "decision-next-steps": {
       "contentType": "deck.decision-next-steps",
       "example": "src/lib/brand-surfaces/examples/deck-decision-next-steps-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "cardDescriptor": "agenda.descriptor", "days": "days", "times": "times", "chosenSlot": "frame.chosenDay", "nextSteps": "nextSteps"}
     },
     "content-focus": {
       "contentType": "deck.content-focus",
       "example": "src/lib/brand-surfaces/examples/deck-content-focus-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "proof": "figure.value", "proofText": "figure.label", "source": "source#composite", "photo": "photo"}
     },
     "content-clients": {
       "contentType": "deck.content-clients",
       "example": "src/lib/brand-surfaces/examples/deck-content-clients-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "proofs": "stats", "logos": "clients", "markets": "markets.text", "selectedProof": "selection.item", "nav": "indicator"}
     },
     "content-partners": {
       "contentType": "deck.content-partners",
       "example": "src/lib/brand-surfaces/examples/deck-content-partners-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "partners": "row1", "selectedPartner": "selection.item", "selectionLabel": "selection.label", "nav": "indicator"}
     },
     "decision-risk": {
       "contentType": "deck.decision-risk",
       "example": "src/lib/brand-surfaces/examples/deck-decision-risk-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "rows": "risks", "selectedRow": "selection.item", "nav": "indicator"}
     },
     "decision-case": {
       "contentType": "deck.decision-case",
       "example": "src/lib/brand-surfaces/examples/deck-decision-case-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "clientLogo": "clientLogo", "stats": "figures", "source": "source#composite", "photo": "photo", "selectedStat": "selection.item"}
     },
     "decision-chart": {
       "contentType": "deck.decision-chart",
       "example": "src/lib/brand-surfaces/examples/deck-decision-chart-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "bars": "bars", "annotation": "annotation", "chartNote": "note", "kpis": "kpis", "source": "source#composite", "nav": "indicator"}
     },
     "decision-testimonial": {
       "contentType": "deck.decision-testimonial",
       "example": "src/lib/brand-surfaces/examples/deck-decision-testimonial-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "keyPhrase": "voice.answerLead+voice.answer", "fullQuote": "quote", "clientLogo": "clientLogo", "author": "author.name", "proof": "proof", "source": "source#composite", "nav": "indicator"}
     },
     "decision-why-us": {
       "contentType": "deck.decision-why-us",
       "example": "src/lib/brand-surfaces/examples/deck-decision-why-us-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "facts": "facts", "source": "source#composite", "selectedFact": "selection.item", "nav": "indicator"}
     },
     "section-lens": {
       "contentType": "deck.section-lens",
       "example": "src/lib/brand-surfaces/examples/deck-section-lens-intent.json",
-      "slots": null
+      "slots": {"question": "voice.question", "answer": "voice.answer", "section": "lens", "sectionName": "voice.eyebrow#composite", "photo": "lens"}
     },
     "section-bleed": {
       "contentType": "deck.section-bleed",
       "example": "src/lib/brand-surfaces/examples/deck-section-bleed-intent.json",
-      "slots": null
+      "slots": {"question": "voice.question", "answer": "voice.answer", "section": "indicator", "photo": "photo"}
     },
     "section-cine-services": {
       "contentType": "deck.section-cine.services",
       "example": "src/lib/brand-surfaces/examples/deck-section-cine-services-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "photo": "photo"}
     },
     "section-cine-team": {
       "contentType": "deck.section-cine",
       "example": "src/lib/brand-surfaces/examples/deck-section-cine-team-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "photo": "photo"}
     },
     "section-cine-about": {
       "contentType": "deck.section-cine.about",
       "example": "src/lib/brand-surfaces/examples/deck-section-cine-about-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "figures": "figures[].value", "photo": "photo"}
     },
     "section-cine-purpose": {
       "contentType": "deck.section-cine.purpose",
       "example": "src/lib/brand-surfaces/examples/deck-section-cine-purpose-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "pillars": "pillars", "photo": "photo"}
     },
     "content-team": {
       "contentType": "deck.content-team",
       "example": "src/lib/brand-surfaces/examples/deck-content-team-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lead": "team", "team": "team"}
     },
     "content-stack": {
       "contentType": "deck.content-stack",
       "example": "src/lib/brand-surfaces/examples/deck-content-stack-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "layers": "labels#composite", "highlightedLayer": "labels[].tone"}
     },
     "contact-sheet": {
       "contentType": "deck.contact-sheet",
       "example": "src/lib/brand-surfaces/examples/deck-contact-sheet-intent.json",
-      "slots": null
+      "slots": {"question": "voice.question", "answer": "voice.answer", "chosen": "chosen", "alternatives": "strip", "collaborator": "selection.label"}
     },
     "content-text": {
       "contentType": "deck.content-text",
       "example": "src/lib/brand-surfaces/examples/deck-content-text-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "pillars": "points", "nav": "indicator"}
     },
     "content-bullets": {
       "contentType": "deck.content-bullets",
       "example": "src/lib/brand-surfaces/examples/deck-content-bullets-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "items": "items", "selectedItem": "selection.item", "selectionLabel": "selection.label", "nav": "indicator"}
     },
     "content-day": {
       "contentType": "deck.content-day",
       "example": "src/lib/brand-surfaces/examples/deck-content-day-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "keyMoment": "lens", "moments": "moments"}
     },
     "content-day-tools": {
       "contentType": "deck.content-day.tools",
       "example": "src/lib/brand-surfaces/examples/deck-content-day-tools-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "panel": "panel", "tools": "tiles"}
     },
     "content-day-live-progress": {
       "contentType": "deck.content-day.live-progress",
       "example": "src/lib/brand-surfaces/examples/deck-content-day-live-progress-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "boardTitle": "plan.title", "boardProgress": "plan.meta", "boardCards": "columns", "reviewTitle": "review.title", "reviewImage": "piece", "clientComment": "comments[].text", "teamReply": "comments[].text"}
     },
     "content-day-live-results": {
       "contentType": "deck.content-day.live-results",
       "example": "src/lib/brand-surfaces/examples/deck-content-day-live-results-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "panel": "panel", "meeting": "meeting.title", "reportTitle": "report.title", "metrics": "kpis"}
     },
     "decision-agenda": {
       "contentType": "deck.decision-agenda",
       "example": "src/lib/brand-surfaces/examples/deck-decision-agenda-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "items": "topics", "highlightedItem": "selection.item", "nav": "indicator"}
     },
     "breather": {
       "contentType": "deck.breather",
       "example": "src/lib/brand-surfaces/examples/deck-breather-intent.json",
-      "slots": null
+      "slots": {"question": "voice.question", "answer": "voice.answer", "section": "indicator", "photo": "photo"}
     },
     "method-hybrid-workforce": {
       "contentType": "deck.method-hybrid-workforce",
       "example": "src/lib/brand-surfaces/examples/deck-method-hybrid-workforce-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "body": "body", "ladderTitle": "ladderTitle", "ladder": "ladder", "path": "path", "nav": "indicator"}
     },
     "method-hybrid-workforce-scene": {
       "contentType": "deck.method-hybrid-workforce.scene",
       "example": "src/lib/brand-surfaces/examples/deck-method-hybrid-workforce-scene-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "body": "body", "photo": "photo", "selectionTargets": "selection.targets"}
     },
     "method-score-ring": {
       "contentType": "deck.method-score-ring",
       "example": "src/lib/brand-surfaces/examples/deck-method-score-ring-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "dimensions": "labels", "total": "total", "cta": "cta.text", "ctaUrl": "cta.url"}
     },
     "decision-plan": {
       "contentType": "deck.decision-plan",
       "example": "src/lib/brand-surfaces/examples/deck-decision-plan-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "horizon": "horizon", "stops": "stops", "currentStop": "frame.currentStop"}
     },
     "method-staircase-flat": {
       "contentType": "deck.method-staircase.flat",
       "example": "src/lib/brand-surfaces/examples/deck-method-staircase-flat-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "body": "body", "levels": "levels[].name", "note": "note", "selectedLevel": "selection.level", "selectionLabel": "selection.label"}
     },
     "proposal-service-aeo": {
       "contentType": "deck.proposal-service",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-service-aeo-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite"}
     },
     "proposal-service-creative": {
       "contentType": "deck.proposal-service",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-service-creative-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "proof": "footnote#composite"}
     },
     "proposal-service-web": {
       "contentType": "deck.proposal-service",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-service-web-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps"}
     },
     "proposal-service-revops": {
       "contentType": "deck.proposal-service",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-service-revops-intent.json",
-      "slots": null
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite"}
     },
     "cover-brochure-cine-orbit": {
       "contentType": "deck.cover-brochure",

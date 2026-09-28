@@ -1,5 +1,14 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (m) — TASK-1928: los largos del catálogo mandan
+
+La paridad de slots receta ↔ plantilla (`recipe-map.json` → `slots`, test `recipe-slot-parity.test.ts`) alinea los
+largos máximos de los `slots.json` de las 38 recetas con los de su receta en el catálogo de láminas. El ejemplo de la
+bajada de la cotización en vivo medía 111 caracteres visibles contra los 110 de la receta: se acorta («Los montos se
+definen en la propuesta.»), y su frame se re-promueve. Ningún otro frame cambia (los largos no se pintan).
+
+- `templates-graphic-line-deck/ContentPricingLive.png` — ✏️ deck.content-pricing.live: la bajada del probe, una palabra menos
+
 ## 2026-09-27 (l) — TASK-1928: contenido y día a día
 
 Sexta y última familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.20, `axis-ui-contracts` 0.3.18, delta (k)
@@ -794,7 +803,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: b0aeba739b8651f31c3932983c6897f8f9111088d55886dd4d054c375b4aff72 -->
+<!-- manifest-digest: 77a6fa9ffdd6152b7e6d9dae00bbbd8ea7cc81d7701b0ccd1b4cd6980bc809f4 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

@@ -300,7 +300,7 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 28
+            "maxCharacters": 24
           }
         }
       },
@@ -367,19 +367,19 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 24,
           "example": "Un día con Efeonce"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 34,
           "example": "¿Cómo es un día con nosotros?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 5,
           "resolver": "gl-answer",
           "example": "Así"
         }
@@ -390,7 +390,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 130,
+        "maxCharacters": 120,
         "maxLines": 5,
         "overflow": "reject"
       },

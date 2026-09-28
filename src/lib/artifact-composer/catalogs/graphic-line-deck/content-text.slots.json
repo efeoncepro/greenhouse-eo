@@ -166,19 +166,19 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 28,
           "example": "Por qué existimos"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 32,
           "example": "¿Con quién crece tu marca?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 10,
+          "maxCharacters": 8,
           "resolver": "gl-answer",
           "example": "Contigo"
         }
@@ -189,7 +189,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 95,
         "maxLines": 2,
         "overflow": "reject"
       },
@@ -215,7 +215,7 @@
           "text": {
             "type": "string",
             "required": true,
-            "maxCharacters": 40
+            "maxCharacters": 46
           }
         }
       },

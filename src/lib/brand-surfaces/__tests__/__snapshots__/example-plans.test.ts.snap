@@ -2666,7 +2666,7 @@ exports[`planes de los intents de ejemplo > deck-content-pricing-live-intent.jso
         "contentType": "deck.content-pricing.live",
         "slideId": "deck-content-pricing",
         "slots": {
-          "body": "Cada línea de la cotización a la vista, con su <strong>monto</strong> y lo que incluye. Los montos se definen en cada propuesta.",
+          "body": "Cada línea de la cotización a la vista, con su <strong>monto</strong> y lo que incluye. Los montos se definen en la propuesta.",
           "chips": [
             {
               "kicker": "Cómo se mide",

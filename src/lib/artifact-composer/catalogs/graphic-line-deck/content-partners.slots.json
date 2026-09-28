@@ -214,20 +214,20 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 30,
           "example": "¿Con quién construimos?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 18,
           "resolver": "gl-answer",
           "example": "Con los grandes"
         },
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 20,
           "example": "Partners"
         }
       }
@@ -237,7 +237,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 80,
         "maxLines": 3,
         "overflow": "reject"
       },

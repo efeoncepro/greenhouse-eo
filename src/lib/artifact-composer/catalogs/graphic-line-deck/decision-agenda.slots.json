@@ -184,13 +184,13 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 32,
+          "maxCharacters": 16,
           "example": "Agenda"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 24,
           "example": "¿Qué veremos hoy?"
         },
         "answerLead": {
@@ -202,7 +202,7 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 14,
           "resolver": "gl-answer",
           "example": "temas"
         }
@@ -233,7 +233,7 @@
           "topic": {
             "type": "string",
             "required": true,
-            "maxCharacters": 24
+            "maxCharacters": 26
           }
         }
       },

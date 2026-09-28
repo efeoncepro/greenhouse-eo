@@ -160,7 +160,7 @@
           "name": {
             "type": "string",
             "required": true,
-            "maxCharacters": 16
+            "maxCharacters": 14
           },
           "descriptor": {
             "type": "string",
@@ -199,14 +199,14 @@
       "shape": {
         "eyebrow": {
           "type": "string",
-          "required": false,
-          "maxCharacters": 40,
+          "required": true,
+          "maxCharacters": 32,
           "example": "AEO · metodología BeX"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 30,
+          "maxCharacters": 28,
           "example": "¿Te recomienda la IA?"
         },
         "answerLead": {
@@ -238,9 +238,9 @@
     "note": {
       "selector": "[data-slot='note']",
       "type": "string",
-      "required": false,
+      "required": true,
       "constraints": {
-        "maxCharacters": 70,
+        "maxCharacters": 60,
         "maxLines": 1,
         "overflow": "reject"
       },
@@ -260,7 +260,7 @@
         "label": {
           "type": "string",
           "required": true,
-          "maxCharacters": 24,
+          "maxCharacters": 12,
           "consumer": "validation-only",
           "example": "SEO · AEO"
         },

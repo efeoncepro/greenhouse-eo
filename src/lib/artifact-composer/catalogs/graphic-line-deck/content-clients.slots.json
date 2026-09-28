@@ -232,14 +232,14 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 16,
           "resolver": "gl-answer",
           "example": "líderes"
         },
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 20,
           "example": "Clientes"
         },
         "answerLead": {
@@ -270,7 +270,7 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 60
+            "maxCharacters": 50
           }
         }
       },
@@ -363,7 +363,7 @@
         "text": {
           "type": "string",
           "required": true,
-          "maxCharacters": 44,
+          "maxCharacters": 45,
           "example": "Chile, EE. UU., Colombia, México y Perú"
         }
       }

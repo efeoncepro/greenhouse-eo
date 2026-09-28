@@ -265,13 +265,13 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 44,
           "example": "¿Llegan las entregas a tiempo?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 16,
           "resolver": "gl-answer",
           "example": "siempre"
         },
@@ -297,13 +297,13 @@
         "value": {
           "type": "string",
           "required": true,
-          "maxCharacters": 8,
+          "maxCharacters": 6,
           "example": "88 %"
         },
         "label": {
           "type": "string",
           "required": true,
-          "maxCharacters": 80,
+          "maxCharacters": 70,
           "example": "de las entregas de Sky llegaron a tiempo en 12 meses."
         }
       }

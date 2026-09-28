@@ -765,3 +765,12 @@ describe('deck · contenido y día a día (TASK-1928)', () => {
     expectCode(() => plan({ ...example('decision-agenda'), selected: 6 } as SurfaceIntent), 'invalid-intent')
   })
 })
+
+describe('deck · el largo del catálogo manda (TASK-1928)', () => {
+  it('un texto que supera su maxChars hace fallar la composición con el slot que lo recibe', () => {
+    const long = 'x'.repeat(101)
+    const { violations } = plan({ ...example('decision-risk'), body: long } as SurfaceIntent)
+
+    expect(violations.some(violation => (violation as { slot?: string }).slot === 'body')).toBe(true)
+  })
+})

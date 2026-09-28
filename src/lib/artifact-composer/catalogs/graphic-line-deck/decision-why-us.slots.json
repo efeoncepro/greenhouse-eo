@@ -184,20 +184,20 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 22,
           "example": "¿Por qué Efeonce?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 9,
           "resolver": "gl-answer",
           "example": "Por esto"
         },
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 22,
           "example": "Por qué elegirnos"
         }
       }
@@ -207,7 +207,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 100,
         "maxLines": 4,
         "overflow": "reject"
       },
@@ -238,7 +238,7 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 60
+            "maxCharacters": 54
           }
         }
       },

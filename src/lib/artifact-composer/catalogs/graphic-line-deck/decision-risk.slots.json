@@ -190,20 +190,20 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 22,
           "example": "¿Y si no funciona?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 22,
+          "maxCharacters": 18,
           "resolver": "gl-answer",
           "example": "chico"
         },
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28,
+          "maxCharacters": 24,
           "example": "Riesgo controlado"
         },
         "answerLead": {
@@ -219,7 +219,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 100,
         "maxLines": 4,
         "overflow": "reject"
       },
@@ -269,7 +269,7 @@
           "how": {
             "type": "string",
             "required": true,
-            "maxCharacters": 96
+            "maxCharacters": 100
           }
         }
       },

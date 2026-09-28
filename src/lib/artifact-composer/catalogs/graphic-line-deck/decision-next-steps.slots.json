@@ -617,13 +617,13 @@
         "eyebrow": {
           "type": "string",
           "required": true,
-          "maxCharacters": 24,
+          "maxCharacters": 20,
           "example": "Próximos pasos"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 26,
+          "maxCharacters": 22,
           "example": "¿Y ahora qué sigue?"
         },
         "answer": {
@@ -640,7 +640,7 @@
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 60,
         "maxLines": 3,
         "overflow": "reject"
       },
