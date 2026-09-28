@@ -1,5 +1,17 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-28 (n) — TASK-1928: la portada de brochure con la selección de Nexa
+
+El operador relajó «sin selección en `cover-brochure`» el 2026-09-28 y AXIS 0.3.21 (delta (l), `axis-ui-contracts`
+0.3.19) le da la composición `document-selection`: la receta aprobada `cover-brochure-cine-lines-selection` compone
+con la plantilla `CoverBrochure`, que ahora marca la respuesta como objetivo y declara el slot opcional `selection`. El
+probe del gate rellena todo slot no fijo, así que su frame suma el marco de ocho manijas y el cursor sobre la respuesta
+(runbook §4bis); el resto de la lámina no cambia. Compuesta con el plate NX6b y comparada a ojo contra la referencia
+`DeckPortadaPrincipal6Sel`: coincide (la burbuja URL de la referencia no está, igual que en la portada limpia de las
+cinco líneas de TASK-1927: la firma de `cover-brochure` es el logo). Con ella, las 69 recetas del deck tienen plantilla.
+
+- `templates-graphic-line-deck/CoverBrochure.png` — ✏️ deck.cover-brochure: el probe suma la selección sobre la respuesta
+
 ## 2026-09-27 (m) — TASK-1928: los largos del catálogo mandan
 
 La paridad de slots receta ↔ plantilla (`recipe-map.json` → `slots`, test `recipe-slot-parity.test.ts`) alinea los
@@ -803,7 +815,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 77a6fa9ffdd6152b7e6d9dae00bbbd8ea7cc81d7701b0ccd1b4cd6980bc809f4 -->
+<!-- manifest-digest: 24027cb7846f3b40e243afca3e8fd80ada5a59663ea9e5a244473df70bf2fc2c -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

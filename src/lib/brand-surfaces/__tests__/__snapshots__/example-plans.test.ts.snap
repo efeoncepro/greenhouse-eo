@@ -3792,6 +3792,87 @@ exports[`planes de los intents de ejemplo > deck-cover-brochure-cine-lines-inten
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-cover-brochure-cine-lines-selection-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "format": "16x9",
+        "height": 1080,
+        "unit": "px",
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+      "ref": "asset-ref:plate:NX6b-nexa-cinco-orbitas-isotipo",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-brochure.document-selection",
+  "plan": {
+    "artifactId": "deck-cover-brochure-cine-lines-selection",
+    "slides": [
+      {
+        "contentType": "deck.cover-brochure.document-selection",
+        "slideId": "deck-cover-brochure",
+        "slots": {
+          "backdrop": {
+            "alt": "Nexa con la chaqueta de Efeonce, rodeada por cinco esferas de luz en los colores de las líneas de servicio, la naranja en su palma",
+            "src": "asset-ref:plate:NX6b-nexa-cinco-orbitas-isotipo",
+          },
+          "evidence": "<strong>Cinco</strong> líneas de servicio:<br>Growth · Brand · Engine · Voice · Revenue",
+          "frame": {
+            "answerColor": "--gl-answer-color=#ffffff",
+            "answerInset": "--gl-answer-inset=-4px",
+            "answerLeading": "--gl-answer-leading=0.95",
+            "answerPx": 124,
+            "answerTop": 528,
+            "answerTracking": "--gl-answer-tracking=-0.035em",
+            "bodyColor": "--gl-body-color=#ffffff",
+            "bodyLeading": "--gl-body-leading=1.3",
+            "bodyPx": 28,
+            "bodyStrongWeight": "--gl-body-strong-wght=600",
+            "bodyTop": 776,
+            "bodyWeight": "--gl-body-wght=400",
+            "bodyWidth": 724,
+            "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+            "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+            "eyebrowPx": "--gl-eyebrow-px=22px",
+            "eyebrowTop": 390,
+            "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+            "eyebrowWeight": "--gl-eyebrow-wght=500",
+            "line": "growth",
+            "logoLeft": "--gl-logo-left=140px",
+            "logoTop": "--gl-logo-top=200px",
+            "logoWidth": "--gl-logo-width=500px",
+            "margin": 140,
+            "questionColor": "--gl-question-color=#ffffff",
+            "questionLeading": "--gl-question-leading=1.2",
+            "questionPx": "--gl-question-px=40px",
+            "questionTop": 438,
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Nexa",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "person",
+            "scale": 1.1,
+            "targetKind": "text",
+            "variant": "eight-handles",
+          },
+          "voice": {
+            "answer": "Crecer",
+            "eyebrow": "Brochure · Servicios 2026",
+            "question": "¿Qué hace Efeonce?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-cover-brochure-cine-orbit-intent.json compone el mismo plan 1`] = `
 {
   "assets": [

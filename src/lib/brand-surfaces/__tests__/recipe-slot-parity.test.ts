@@ -129,10 +129,13 @@ describe('paridad de slots receta ↔ plantilla', () => {
     for (const slot of recipe!.slots) {
       const [route, marker] = entry.slots![slot.name]!.split('#')
       const parts = route!.split('+')
-      const fields = parts.map(part => fieldAt(slots, part))
+      const found = parts.map(part => fieldAt(slots, part))
       const where = `${id}.${slot.name} → ${entry.slots![slot.name]}`
 
-      fields.forEach((field, i) => expect(field, `${where}: la plantilla no tiene «${parts[i]}»`).toBeDefined())
+      found.forEach((field, i) => expect(field, `${where}: la plantilla no tiene «${parts[i]}»`).toBeDefined())
+
+      const fields = found as Field[]
+
       expect(COMPATIBLE[slot.type]?.(fields.at(-1)!), `${where}: tipo ${slot.type} incompatible con ${fields.at(-1)!.type}`).toBe(true)
 
       if (slot.required) expect(fields.some(requiredOf), `${where}: la receta lo exige y la plantilla no`).toBe(true)

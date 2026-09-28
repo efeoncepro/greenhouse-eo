@@ -44,6 +44,7 @@ type ColumnTokens = {
   insetPx: number
   logoWidthPx: number
   offsetsPx: { logo: number; eyebrow: number; question: number; answer: number }
+  answerWithSelectionExtraPx: number
   bodyBelowAnswerPx: { plain: number; withSelection: number }
   top: { defaultPx: number; byReference: Record<string, number> }
   answerOpticalInsetPx: number
@@ -435,8 +436,12 @@ const contactSlots = (recipe: Record<string, unknown>, top: number) => {
 
 /* ── Portadas ─────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** La columna de voz de una portada: logo, eyebrow, pregunta, respuesta y evidencia, colgados de `top`. */
-const coverColumn = (intent: SurfaceIntent, manifest: SurfaceManifest, recipe: Record<string, unknown>) => {
+/**
+ * La columna de voz de una portada: logo, eyebrow, pregunta, respuesta y evidencia, colgados de `top`. Con selección
+ * sobre la respuesta, ésta baja `answerWithSelectionExtraPx` y la evidencia queda `bodyBelowAnswerPx.withSelection`
+ * bajo ella, para que quepa la etiqueta del colaborador (medidas de AXIS).
+ */
+const coverColumn = (intent: SurfaceIntent, manifest: SurfaceManifest, recipe: Record<string, unknown>, withSelection = false) => {
   const column = token<ColumnTokens>(recipe, 'column', 'la columna de voz')
   const content = contentOf(manifest)
   const voice = voiceSlots(manifest)
@@ -445,7 +450,7 @@ const coverColumn = (intent: SurfaceIntent, manifest: SurfaceManifest, recipe: R
   if (!content.body) throw new SurfacePieceError('La portada lleva la evidencia (`body`).', 'invalid-intent')
 
   const top = columnTop(intent, manifest, column)
-  const answerTop = top + column.offsetsPx.answer
+  const answerTop = top + column.offsetsPx.answer + (withSelection ? column.answerWithSelectionExtraPx : 0)
   const body = typeOf(manifest, 'body')
 
   return {
@@ -458,7 +463,7 @@ const coverColumn = (intent: SurfaceIntent, manifest: SurfaceManifest, recipe: R
       answerTop,
       answerPx: fixedPx(typeOf(manifest, 'answer'), 'la respuesta'),
       answerInset: cssVar('answer-inset', column.answerOpticalInsetPx),
-      bodyTop: answerTop + answerHeight(manifest, content.answer.length) + column.bodyBelowAnswerPx.plain,
+      bodyTop: answerTop + answerHeight(manifest, content.answer.length) + (withSelection ? column.bodyBelowAnswerPx.withSelection : column.bodyBelowAnswerPx.plain),
       bodyPx: fixedPx(body, 'la evidencia'),
       bodyWidth: Math.round(column.body.maxWidthOfWidth * manifest.canvas.width),
       bodyLeading: cssVar('body-leading', measured(body.lineHeight, 'el interlineado de la evidencia'), ''),
@@ -473,21 +478,57 @@ const coverColumn = (intent: SurfaceIntent, manifest: SurfaceManifest, recipe: R
 }
 
 /**
+ * La selección sobre la respuesta de la portada de brochure (`document-selection`): ocho manijas sobre el texto y UN
+ * cursor de colaborador. Todo sale del delegado de AXIS, incluido el velo (`none`), que la selección de texto de las
+ * demás láminas deja en su valor por defecto.
+ */
+const answerSelection = (manifest: SurfaceManifest): Record<string, unknown> => {
+  const delegate = selectionDelegate(manifest)
+  const cursors = delegate?.intent?.cursors ?? []
+  const cursor = cursors.find(c => c.kind === 'collaborator')
+
+  if (!delegate || !cursor?.label || cursors.length !== 1) {
+    throw new SurfacePieceError('La portada con selección lleva un solo cursor de colaborador sobre la respuesta; AXIS no lo delegó.', 'surface-issues')
+  }
+
+  if (delegate.targetKind !== 'text' || typeof delegate.collaboratorScale !== 'number') {
+    throw new SurfacePieceError('En la portada de brochure la selección toma la respuesta (texto), con la escala del cursor de AXIS.', 'surface-issues')
+  }
+
+  const overlay = delegate.overlay ?? (delegate.intent as { overlay?: unknown } | undefined)?.overlay
+
+  return {
+    label: String(cursor.label),
+    anchor: String(cursor.anchor ?? 'bottom-end'),
+    participantKind: String(cursor.participantKind ?? 'person'),
+    targetKind: 'text',
+    scale: delegate.collaboratorScale,
+    ...(delegate.variant ? { variant: String(delegate.variant) } : {}),
+    ...(delegate.padding ? { padding: String(delegate.padding) } : {}),
+    ...(overlay ? { overlay: String(overlay) } : {})
+  }
+}
+
+/**
  * `cover-brochure`: foto de cine a sangre con el sujeto a la derecha y la columna de voz a la izquierda. Composiciones
- * `document` (el brochure general) y `line` (una por línea de servicio, con el acento de SU línea). Sin cliente, sin
- * eslogan, sin selección y sin burbuja URL: firma el logo.
+ * `document` (el brochure general), `line` (una por línea de servicio, con el acento de SU línea) y
+ * `document-selection` (la de las cinco líneas con la selección de Nexa sobre la respuesta; AXIS 0.3.21). Sin cliente,
+ * sin eslogan y sin burbuja URL: firma el logo.
  */
 export const coverBrochure: RecipeBuilder = ({ intent, manifest, recipe }) => {
-  const column = coverColumn(intent, manifest, recipe)
+  const withSelection = manifest.layout === 'document-selection'
+  const column = coverColumn(intent, manifest, recipe, withSelection)
   const { logoWidth } = signatureOf(manifest, false)
   const photo = plateAsset(manifest, manifest.canvas)
 
   return {
+    ...(withSelection ? { contentType: 'deck.cover-brochure.document-selection' } : {}),
     slots: {
       frame: { line: intent.line, ...column.frame, logoWidth: cssVar('logo-width', logoWidth) },
       backdrop: { src: photo.ref, alt: photo.alt },
       voice: column.voice,
-      evidence: column.evidence
+      evidence: column.evidence,
+      ...(withSelection ? { selection: answerSelection(manifest) } : {})
     },
     assets: [photo.asset]
   }

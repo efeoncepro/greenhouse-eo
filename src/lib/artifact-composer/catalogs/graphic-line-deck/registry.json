@@ -5,6 +5,7 @@
   "canvas": { "width": 1920, "height": 1080 },
   "contentTypeTaxonomy": [
     "deck.cover-brochure",
+    "deck.cover-brochure.document-selection",
     "deck.cover-proposal",
     "deck.cover-proposal.dawn",
     "deck.close-brochure",
@@ -64,7 +65,7 @@
       "figmaNode": null,
       "owner": "claude",
       "status": "built",
-      "contentTypes": ["deck.cover-brochure"],
+      "contentTypes": ["deck.cover-brochure", "deck.cover-brochure.document-selection"],
       "prototype": "cover-brochure.html",
       "slotsRef": "cover-brochure.slots.json"
     },
@@ -611,6 +612,7 @@
   "selector": {
     "map": {
       "deck.cover-brochure": "CoverBrochure",
+      "deck.cover-brochure.document-selection": "CoverBrochure",
       "deck.cover-proposal": "CoverProposalOrbit",
       "deck.cover-proposal.dawn": "CoverProposalDawn",
       "deck.close-brochure": "CloseBrochure",

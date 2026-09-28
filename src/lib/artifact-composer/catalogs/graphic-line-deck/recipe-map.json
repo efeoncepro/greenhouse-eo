@@ -343,10 +343,9 @@
       "slots": null
     },
     "cover-brochure-cine-lines-selection": {
-      "contentType": null,
-      "example": null,
-      "slots": null,
-      "blocked": "El contrato de AXIS no admite selección en cover-brochure: compone como cover-brochure-cine-lines, sin la selección."
+      "contentType": "deck.cover-brochure.document-selection",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-cine-lines-selection-intent.json",
+      "slots": null
     }
   }
 }

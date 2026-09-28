@@ -38,7 +38,9 @@ const TEMPLATES_WITH_SELECTION = [
   // La fuerza híbrida: dos cursores sobre la respuesta, o dos selecciones medidas en la foto (TASK-1928).
   'MethodHybridWorkforce',
   'MethodHybridWorkforceScene',
-  // Portadas de propuesta: la selección toma el logo del cliente.
+  // Portadas de propuesta: la selección toma el logo del cliente. La de brochure con las cinco líneas
+  // (`document-selection`), la respuesta.
+  'CoverBrochure',
   'CoverProposalOrbit',
   'CoverProposalDawn',
   // El testimonio: la selección toma la frase del cliente (la respuesta).
