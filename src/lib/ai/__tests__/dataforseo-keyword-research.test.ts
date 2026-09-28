@@ -12,6 +12,7 @@ import {
   keywordResearchRowsToCsv,
   mergeKeywordResearchRows,
   parseResearchSeeds,
+  selectKeywordResearchCandidates,
   selectKeywordResearchFinalists,
   type DataForSeoKeywordResearchRow
 } from '../dataforseo-keyword-research'
@@ -81,6 +82,12 @@ describe('DataForSEO keyword research', () => {
     expect(parseResearchSeeds('SEO con IA, seo   con ia, Agencia SEO')).toEqual(['SEO con IA', 'Agencia SEO'])
   })
 
+  it('rejects a candidate cap that cannot retain every manual seed', () => {
+    expect(() => buildKeywordResearchPlan({ keyword: 'uno,dos', candidateLimit: 1 })).toThrow(
+      '--candidate-limit no puede ser menor que la cantidad de seeds manuales.'
+    )
+  })
+
   it('keeps endpoint-specific fields out of ideas and site requests', () => {
     const requests = buildKeywordResearchDiscoveryRequests(
       buildKeywordResearchPlan({ keyword: 'seed', target: 'example.com', includeIdeas: true })
@@ -146,6 +153,19 @@ describe('DataForSEO keyword research', () => {
     ])
   })
 
+  it('retains manual seeds inside the candidate cap even when they lack volume', () => {
+    const rows = mergeKeywordResearchRows([
+      row({ keyword: 'volumen alto', searchVolume: 1000, searchVolumeState: 'value', sources: ['suggestions'] }),
+      row({ keyword: 'volumen medio', searchVolume: 500, searchVolumeState: 'value', sources: ['suggestions'] }),
+      row({ keyword: 'semilla editorial', sources: ['manual_seed'] })
+    ])
+
+    expect(selectKeywordResearchCandidates(rows, 2).map(candidate => candidate.keyword)).toEqual([
+      'volumen alto',
+      'semilla editorial'
+    ])
+  })
+
   it('caps enrichment and produces a spreadsheet-safe CSV', () => {
     const plan = buildKeywordResearchPlan({ keyword: 'seed', candidateLimit: 1, serpLimit: 0 })
 
@@ -195,7 +215,18 @@ describe('DataForSEO keyword research', () => {
               items: [
                 { type: 'organic', url: 'https://efeonce.org/seo', domain: 'efeonce.org' },
                 { type: 'organic', url: 'https://competidor.cl/a', domain: 'competidor.cl' },
-                { type: 'people_also_ask', title: '¿Qué es AEO?' },
+                {
+                  type: 'people_also_ask',
+                  items: [
+                    {
+                      type: 'people_also_ask_element',
+                      title: '¿Qué es AEO?',
+                      expanded_element: [
+                        { type: 'people_also_ask_expanded_element', title: 'Una respuesta sobre AEO' }
+                      ]
+                    }
+                  ]
+                },
                 {
                   type: 'ai_overview',
                   references: [{ type: 'ai_overview_reference', url: 'https://fuente.cl/a' }]

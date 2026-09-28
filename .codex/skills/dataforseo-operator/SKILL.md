@@ -229,7 +229,8 @@ gobierna transporte, catálogo, lifecycle, seguridad y límites.
 6. Antes de SERP entrega `--finalists-file` con intención/categoría/prioridad/cobertura o aprueba explícitamente
    con `--approve-ranked-finalists`. `--yes` no reemplaza ese checkpoint editorial.
 7. Conserva evidencia con `--out` y `--csv`. Los archivos se crean de forma exclusiva: una ruta ya existente
-   falla en vez de sobrescribirse.
+   falla en vez de sobrescribirse. Con cualquiera de esas flags, stdout es un recibo compacto; el raw queda en
+   el JSON. Las seeds manuales deben sobrevivir a `candidateLimit` incluso sin volumen.
 
 ### Caso de validación multisuperficie — retail Chile
 
@@ -266,6 +267,20 @@ Smoke final multidispositivo: desktop `09281157-1987-0139-0000-77d35f5a773f` y m
 0,0055 reales frente a USD 0,016 estimados. Ambos bloques devolvieron `asynchronous_ai_overview=false` aunque se
 pidió carga asíncrona. Esto verifica serialización, agregación y semántica de frescura; no convierte el snapshot
 en ranking estable.
+
+### Caso de validación editorial — servicios creativos
+
+El 2026-09-28, el run `e2689fbf-9946-4954-b705-16a888495218` partió de cinco seeds homogéneas, Chile/es y
+`efeoncepro.com`; generó 100 candidatas, detuvo el gasto para aprobar cinco finalistas y completó SERP Standard
++ competidores por USD 0,22152. `agencia creativa` (140) y `diseño de marca` (110) lideraron el volumen estimado;
+`branding para empresas` y `servicios creativos` devolvieron 10; `producción de contenido` quedó `missing`, no
+cero. Ninguna URL propia apareció en el bloque orgánico capturado de las cinco consultas.
+
+Úsalo para proponer una arquitectura de contenido, no para redactar por volumen: landing de agencia/servicios,
+página de branding, guía de diseño de marca y página o guía de producción de contenido. Las PAA aportan preguntas
+sobre definición, proceso, tipos, selección y precio. Antes de crear piezas, contrasta cobertura real, oferta,
+GSC y riesgo de canibalización. El smoke corrigió tres invariantes: seeds manuales dentro del límite, PAA anidada
+sin títulos de respuestas y cierre explícito del pool PostgreSQL.
 
 Ejemplo mínimo de minería reproducible:
 

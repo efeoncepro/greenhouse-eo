@@ -42,6 +42,7 @@ import {
   applyKeywordResearchGovernance,
   keywordResearchRowsToCsv,
   mergeKeywordResearchRows,
+  selectKeywordResearchCandidates,
   selectKeywordResearchFinalists,
   type DataForSeoKeywordFinalistInput,
   type DataForSeoKeywordResearchRow
@@ -873,7 +874,7 @@ const labsRequestEstimate = (tasks: Record<string, unknown>[]) =>
   )
 
 const writeResearchArtifact = async (input: {
-  artifact: unknown
+  artifact: Record<string, unknown>
   rows: DataForSeoKeywordResearchRow[]
   flags: Flags
 }) => {
@@ -882,7 +883,32 @@ const writeResearchArtifact = async (input: {
 
   if (output) await writeFile(output, `${JSON.stringify(input.artifact, null, 2)}\n`, { flag: 'wx' })
   if (csvOutput) await writeFile(csvOutput, keywordResearchRowsToCsv(input.rows), { flag: 'wx' })
-  printJson(input.artifact)
+
+  if (!output && !csvOutput) {
+    printJson(input.artifact)
+
+    return
+  }
+
+  const result =
+    input.artifact.result && typeof input.artifact.result === 'object' && !Array.isArray(input.artifact.result)
+      ? (input.artifact.result as Record<string, unknown>)
+      : null
+
+  printJson({
+    ok: input.artifact.ok,
+    outcome: input.artifact.outcome ?? 'complete',
+    runId: input.artifact.runId,
+    checkpoint: input.artifact.checkpoint,
+    artifacts: { json: output ?? null, csv: csvOutput ?? null },
+    result: result
+      ? {
+          keywordCount: result.keywordCount,
+          finalistCount: result.finalistCount,
+          actualCostUsd: result.actualCostUsd
+        }
+      : null
+  })
 }
 
 const pollStandardSerp = async (input: {
@@ -1038,7 +1064,7 @@ const runKeywordResearch = async (flags: Flags) => {
       }
     }
 
-    let rows = mergeKeywordResearchRows(discoveredRows).slice(0, plan.candidateLimit)
+    let rows = selectKeywordResearchCandidates(mergeKeywordResearchRows(discoveredRows), plan.candidateLimit)
     const overviewTasks = buildKeywordOverviewTasks(rows, plan)
 
     if (overviewTasks.length > 0) {
@@ -1053,8 +1079,8 @@ const runKeywordResearch = async (flags: Flags) => {
       })
 
       steps.push(overview)
-      rows = mergeKeywordResearchRows([...rows, ...extractKeywordResearchRows(overview.tasks, 'overview')]).slice(
-        0,
+      rows = selectKeywordResearchCandidates(
+        mergeKeywordResearchRows([...rows, ...extractKeywordResearchRows(overview.tasks, 'overview')]),
         plan.candidateLimit
       )
     }
@@ -1458,8 +1484,18 @@ const run = async () => {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  run().catch(error => {
-    console.error(error instanceof Error ? error.message : String(error))
-    process.exitCode = CLI_EXIT.usage
-  })
+  run()
+    .catch(error => {
+      console.error(error instanceof Error ? error.message : String(error))
+      process.exitCode = CLI_EXIT.usage
+    })
+    .finally(async () => {
+      const { closeGreenhousePostgres } = await import('@/lib/postgres/client')
+
+      await closeGreenhousePostgres({ source: 'dataforseo-cli' })
+    })
+    .catch(error => {
+      console.error(`No se pudieron cerrar los recursos de la CLI: ${error instanceof Error ? error.message : String(error)}`)
+      process.exitCode = CLI_EXIT.transportError
+    })
 }

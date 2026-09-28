@@ -99,3 +99,14 @@ secuenciales con tasks `20000` y costo total real USD 0,0055. La estimación pre
 se usa para recalibrar precios automáticamente. Ambas capturas devolvieron `asynchronous_ai_overview=false`,
 aunque se pidió carga asíncrona. Esto valida la separación entre intención del request y frescura observada, no un
 ranking estable de ninguna marca.
+
+También se validó el flujo editorial transversal con cinco seeds de servicios creativos, Chile/es y
+`efeoncepro.com`. El run `e2689fbf-9946-4954-b705-16a888495218` produjo 100 candidatas, exigió aprobación de
+cinco finalistas y completó SERP Standard + competidores por USD 0,22152. La prueba detectó y corrigió tres clases
+de defecto: las seeds sin volumen ya no pueden caer fuera de `candidateLimit`; PAA reconoce la estructura anidada
+`people_also_ask_element` sin incorporar títulos de respuestas expandidas; y la CLI cierra PostgreSQL al terminar.
+Cuando existe `--out` o `--csv`, stdout entrega un recibo compacto y conserva el raw sólo en el artefacto.
+
+La evidencia resultante distingue volumen `missing` de cero, intención estimada del proveedor de intención
+declarada por el operador y ausencia en el bloque orgánico capturado de ausencia total en Google. El checkpoint
+reutilizó discovery y tasks Standard al rematerializar la matriz corregida, sin costo incremental.

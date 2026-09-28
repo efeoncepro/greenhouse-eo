@@ -268,6 +268,33 @@ multiplicador.
 dominante puede arrastrar una categoría válida pero ajena. Los límites son muestra y control de costo, nunca una
 afirmación de exhaustividad.
 
+#### Flujo productivo para decidir qué redactar
+
+Parte de un conjunto pequeño de seeds que pertenezcan al mismo problema comercial, no de una lista de servicios
+sin relación. La primera pasada compra discovery y métricas, pero se detiene antes de SERP. Revisa las candidatas,
+descarta marcas ajenas, geografías que no aplican y navegación accidental; luego aprueba una mezcla deliberada de
+intenciones comerciales e informativas. Las seeds manuales siempre se conservan dentro de `--candidate-limit`,
+aunque el proveedor no devuelva volumen para alguna de ellas.
+
+La validación del 2026-09-28 usó `servicios creativos`, `agencia creativa`, `branding para empresas`,
+`producción de contenido` y `diseño de marca`, con Chile/es, `efeoncepro.com`, 100 candidatas y cinco finalistas.
+El run terminó en USD 0,22152. La matriz observó volumen estimado 140 para `agencia creativa`, 110 para
+`diseño de marca`, 10 para `branding para empresas` y `servicios creativos`, y estado `missing` —no cero— para
+`producción de contenido`. Ninguna URL propia apareció en el bloque orgánico capturado de esas cinco SERP.
+
+Ese resultado orienta un backlog, no lo publica ni decide el copy:
+
+1. Landing principal de agencia/servicios creativos: propuesta, capacidades, proceso, evidencia y criterios de
+   selección; las PAA observadas preguntan qué es una agencia, cuáles destacan en Chile y cuánto cobra diseño.
+2. Página de branding para empresas: estrategia, naming, identidad, sistema y despliegue; el CPC estimado alto
+   señala valor comercial posible, no conversión probada.
+3. Guía de diseño de marca: proceso, elementos y tipos de branding, conectada a la página de servicio.
+4. Página o guía de producción de contenido: definición, tipos, proceso y ejemplos; conserva la demanda como
+   desconocida hasta contrastarla con GSC u otra medición.
+
+Con `--out` o `--csv`, stdout muestra sólo un recibo con estado, rutas, conteos y costo. El JSON completo queda en
+el archivo. Las rutas usan creación exclusiva; para rematerializar un checkpoint sin gastar, elige nombres nuevos.
+
 ### Research en superficies AI
 
 Primero consulta los modelos vivos; el nombre no se hardcodea porque el catálogo rota:

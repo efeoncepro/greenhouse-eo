@@ -158,6 +158,11 @@ export const buildKeywordResearchPlan = (input: {
 
   const loadAiOverview = input.loadAiOverview ?? false
   const target = input.target?.trim() || null
+
+  if (candidateLimit < seeds.length) {
+    throw new Error('--candidate-limit no puede ser menor que la cantidad de seeds manuales.')
+  }
+
   const discoveryRows = seeds.length * pageSize * maxPages
   const relatedRows = seeds.length * pageSize * maxPages
   const ideasRows = input.includeIdeas ? pageSize * maxPages : 0
@@ -390,6 +395,21 @@ export const mergeKeywordResearchRows = (rows: DataForSeoKeywordResearchRow[]) =
   })
 }
 
+export const selectKeywordResearchCandidates = (rows: DataForSeoKeywordResearchRow[], limit: number) => {
+  const required = rows.filter(row => row.sources.includes('manual_seed'))
+
+  if (required.length > limit) {
+    throw new Error('El límite de candidatas no alcanza para conservar todas las seeds manuales.')
+  }
+
+  const selected = new Set([
+    ...required.map(row => row.normalizedKeyword),
+    ...rows.filter(row => !row.sources.includes('manual_seed')).map(row => row.normalizedKeyword)
+  ].slice(0, limit))
+
+  return rows.filter(row => selected.has(row.normalizedKeyword))
+}
+
 export const buildKeywordOverviewTasks = (
   rows: DataForSeoKeywordResearchRow[],
   plan: DataForSeoKeywordResearchPlan
@@ -577,7 +597,7 @@ export const enrichKeywordResearchWithSerp = (input: {
         const title = stringOrNull(item.title)
 
         if (type) features.add(type)
-        if (type === 'people_also_ask' && title) paa.add(title)
+        if ((type === 'people_also_ask' || type === 'people_also_ask_element') && title) paa.add(title)
 
         if (url) {
           const domain =

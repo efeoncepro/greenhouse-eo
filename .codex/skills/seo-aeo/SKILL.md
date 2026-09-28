@@ -275,7 +275,9 @@ Grupo Berel):
     reserva SERP Standard para finalistas gobernadas. Revisa la matriz candidata y
     entrega `--finalists-file` con intención, categoría, prioridad y cobertura; `--yes`
     no reemplaza esa aprobación. Usa `--checkpoint`/`--resume`, TTL y paginación
-    acotada para no recomprar. Live y AI Overview son opt-in.
+    acotada para no recomprar. Las seeds manuales se conservan aunque no tengan volumen.
+    Para decidir qué redactar, combina finalistas comerciales e informativas, lee PAA y
+    URLs competidoras, y contrasta cobertura/GSC/canibalización. Live y AI Overview son opt-in.
   - `ai-research`: ejecuta un panel reproducible multi-plataforma y conserva lanes
     separadas de API y consumer surface. Normaliza citas, fan-out, entidades, modelo,
     mercado, costo y procedencia; no lo presentes como captura recurrente de producto.
