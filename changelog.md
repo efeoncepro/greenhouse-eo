@@ -657,13 +657,3 @@ ambiguo se reconcilia antes de reenviar) y programarse (semanal/mensual, zona y 
 un borrador en revisión, nunca emite ni envía). Migraciones aplicadas en la base compartida; los tres flags nuevos
 nacen apagados en producción y los EmailTypes apagados. Verificado en staging con canary sintético completo (incluye un
 correo real al buzón autorizado del operador); la prueba destapó `ISSUE-174` → `TASK-1876`. Producción y gateway pendientes.
-
-## 2026-09-18 — Corte ampliado de Dreamforce 2026 y UNBOUND 2026
-
-Se actualizaron los ledgers, docs de oferta, narrativa estratégica y skills espejo `.codex`/`.claude` con la
-investigación oficial ampliada al 18/09. Salesforce queda separado por AIforce, Koa, Missionforce, Agentforce,
-interoperabilidad y Marketing Cloud Next, con estados por capacidad y sin nuevos lanzamientos identificados el
-17–18/09 en el media hub. HubSpot incorpora Smart CRM self-updating, Growth Context, Context Home, Breeze, Marketing
-Studio, Microsoft Advertising, Prospecting Agent, ChatGPT Ads y las superficies mostradas en UNBOUND; Customer Agent
-Voice, HubSpot Work y Agent CLI quedan marcadas como first look/demo hasta verificar GA, pricing y runtime. No se
-activaron entitlements, betas, campañas ni conexiones.
