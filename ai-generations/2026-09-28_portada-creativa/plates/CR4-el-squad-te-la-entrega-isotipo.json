@@ -1,0 +1,22 @@
+{
+  "schema": "efeonce.foto.isotipo.v1",
+  "plate": "CR4-el-squad-te-la-entrega.png",
+  "salida": "CR4-el-squad-te-la-entrega-isotipo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.3.5",
+  "archivo": "assets/efeonce-isotype-negative.svg",
+  "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74",
+  "prenda": "oscura",
+  "caja": {
+    "centro": [
+      0.76,
+      0.5166
+    ],
+    "ancho": 0.0502,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": {
+    "umbral": 38
+  },
+  "creado": "2026-09-28T11:28:10.676Z"
+}

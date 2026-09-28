@@ -1,0 +1,23 @@
+{
+  "id": "CR3-tu-squad",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark creative studio at night): a Chilean creative director in her late twenties, curly dark hair loose, wearing the NAVY EFEONCE HOODIE, stands on the RIGHT half of the frame, framed from the waist up, arms relaxed, looking straight into the lens with a confident, warm half-smile, like the lead who brings her whole team with her. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. Behind her, deep in the haze and softly out of focus, her creative squad is at work around one long dark worktable: a designer drawing on a large tablet that glows deep azure blue (#0375DB), the one cool light at the table, a video editor in front of a wide editing timeline, a copywriter pinning cards to a board, a motion designer with headphones; they are small, turned toward their work, nobody looks at the camera and nobody looks at anyone else up close. ONE long strip of warm orange light (#FF6500) runs along the whole edge of that table like a glowing thread that ties the squad together, and it is the only strong light of the scene: it lights their hands and the work from below, throws orange glow into the haze and warms the edge of her hoodie and her cheek. A cool rim light from behind separates her from the dark. The screens of the squad show bold, abstract, art-directed color work, too small and too blurred to read any text. The LEFT 45% of the frame is calm, deep dark studio space with only faint haze, no people, no light strip, no screens, no objects. Rich contrast, punchy color, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a worktable close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

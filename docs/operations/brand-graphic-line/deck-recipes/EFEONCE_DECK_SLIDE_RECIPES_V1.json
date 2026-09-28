@@ -843,8 +843,8 @@
           "name": "photo",
           "type": "image",
           "required": true,
-          "example": "ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png",
-          "notes": "Plate aprobado de la línea: una directora creativa con hoodie dirigiendo una constelación de piezas. Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
+          "example": "ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png",
+          "notes": "Plate propio de la portada (CR4 «El squad te la entrega», aprobado el 2026-09-28): la directora creativa con hoodie mira a cámara y ofrece con las palmas una pieza terminada en azul; detrás, a su derecha, su squad trabaja y sus piezas viajan hacia ella por una cinta de luz naranja de la línea Brand. Mismo concepto de impacto que CR2 con otra toma (registro cine §16.7)."
         }
       ],
       "fixed": [
@@ -863,14 +863,14 @@
       "photo": {
         "uses": true,
         "register": "cine",
-        "plate": "ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png",
-        "ficha": "ai-generations/2026-09-26_deck-creativo/fichas/CR2-constelacion-digital.json",
-        "prompt": "ai-generations/2026-09-26_deck-creativo/prompts/CR2-constelacion-digital.txt",
+        "plate": "ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png",
+        "ficha": "ai-generations/2026-09-28_portada-creativa/fichas/CR4-el-squad-te-la-entrega-v2.json",
+        "prompt": "ai-generations/2026-09-28_portada-creativa/prompts/CR4-el-squad-te-la-entrega-v2.txt",
         "postprocess": [
-          "pnpm foto:emblema ai-generations/2026-09-26_deck-creativo/plates/CR2-constelacion-digital.png (100 %)",
-          "pnpm foto:isotipo sobre CR2-constelacion-digital.png (caja no registrada: no hay .json de procedencia de CR2b en plates/)"
+          "pnpm foto:emblema ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png (100 %: el bordado coincide con el isotipo oficial)",
+          "Sin foto:isotipo: su limpieza dejó un rectángulo plano sobre el brillo de la cinta junto al pecho; se publica el bordado generado, que ya es el oficial (precedente LN4; registro cine §16.6 #2 y §16.7)"
         ],
-        "replaceable": "No es foto de ejemplo: es la placa aprobada de la línea."
+        "replaceable": "No es foto de ejemplo: es la placa propia de la portada de la línea (CR4, aprobada por el operador el 2026-09-28)."
       },
       "prompts": {
         "composition": "Compón la portada del brochure de Creative Services con efeonceGraphicLine.surfaces.deck.recipes[\"cover-brochure\"], layout \"line\", 1920 × 1080 sobre efeonceGraphicLine.color.dark. Pon a sangre el plate de la línea (una directora creativa con hoodie dirigiendo una constelación de piezas). Toma el acento de efeonceGraphicLine.lines[\"brand\"].accentOnDark y úsalo SOLO en el anillo de la pregunta y la esfera de la respuesta. Columna en x = 140 con top = 220: logo negativo de Efeonce a 500 px; eyebrow «Brochure · Creative Services» en top + 190; pregunta «¿Quién crea mi contenido?» en top + 238 (Poppins Light 40 px, una línea); respuesta «Tu squad» en top + 300 (Bricolage 760, 124 px) cerrada con su esfera; evidencia Poppins 400 28/1,3 en 3 líneas con UNA palabra en negrita y las categorías del catálogo docs/services/ de la línea. Sin burbuja, eslogan, cliente ni selección. Si una línea toca al sujeto, un haz o una pieza de la foto, acorta la pregunta o parte la evidencia; no muevas la foto."
@@ -892,7 +892,7 @@
         "Un solo acento por lámina (five-accents-only-in-lines): no se mezclan colores de otras líneas en la voz.",
         "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %."
       ],
-      "notes": "Título previo: «✅ APROBADA · FOTO · Brochure Creative Services · «¿Quién crea mi contenido? Tu squad.»». El plate nació para proposal-cinematic (CR2b). Las piezas flotantes de la izquierda llegan a x ≈ 760 a la altura de la pregunta: «¿Quién crea mi contenido?» (25) es el máximo que cabe; no alargar. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927).",
+      "notes": "Título previo: «✅ APROBADA · FOTO · Brochure Creative Services · «¿Quién crea mi contenido? Tu squad.»». Desde el 2026-09-28 (TASK-1934, pedido del operador) lleva su plate propio CR4 «El squad te la entrega»: antes compartía CR2b con proposal-cinematic-creative y un brochure de Creative Services con las dos disparaba plate-repeated. «¿Quién crea mi contenido?» (25) sigue siendo el máximo aprobado; no alargar. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927).",
       "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPortadaLineaBrand.jpg"
     },
     {

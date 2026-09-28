@@ -4026,8 +4026,8 @@ exports[`planes de los intents de ejemplo > deck-cover-brochure-line-brand-inten
         "width": 1920,
       },
       "kind": "plate",
-      "path": "ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png",
-      "ref": "asset-ref:plate:CR2b-constelacion-isotipo",
+      "path": "ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png",
+      "ref": "asset-ref:plate:CR4-el-squad-te-la-entrega-v2",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -4040,8 +4040,8 @@ exports[`planes de los intents de ejemplo > deck-cover-brochure-line-brand-inten
         "slideId": "deck-cover-brochure",
         "slots": {
           "backdrop": {
-            "alt": "Una directora creativa de Efeonce con hoodie dirige con las manos una constelación de piezas creativas que flotan a su alrededor",
-            "src": "asset-ref:plate:CR2b-constelacion-isotipo",
+            "alt": "Una directora creativa de Efeonce con hoodie mira a cámara y ofrece con las palmas una pieza terminada que brilla en azul; detrás, a su derecha, su squad trabaja y sus piezas viajan hacia ella por una cinta de luz naranja",
+            "src": "asset-ref:plate:CR4-el-squad-te-la-entrega-v2",
           },
           "evidence": "<strong>Seis</strong> capacidades:<br>Squad creativo · Brand systems · Campañas<br>Contenido y social · Audiovisual · Run &amp; Gun",
           "frame": {

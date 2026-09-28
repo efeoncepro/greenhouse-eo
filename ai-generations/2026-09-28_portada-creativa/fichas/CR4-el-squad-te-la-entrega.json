@@ -1,0 +1,23 @@
+{
+  "id": "CR4-el-squad-te-la-entrega",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (staged, cinematic high-impact editorial photograph, a dark digital creative studio at night): a Chilean creative director in her late twenties, curly dark hair loose, wearing the NAVY EFEONCE HOODIE (deep navy, not royal blue), stands on the RIGHT half of the frame, framed from the waist up, REALISTIC ADULT PROPORTIONS, camera about two meters away at chest height, 85mm f/2. She holds BOTH hands forward at chest height, palms up and open, OFFERING something to the viewer, elbows relaxed, NOT raising her arm, NOT conducting; she looks straight into the lens with a calm, knowing, closed-mouth smile, head almost frontal. Just above her open palms hovers ONE finished piece of content: a thin frameless vertical 9:16 screen showing a bold, vivid, art-directed campaign image, glowing deep azure-blue (#0375DB), the one cool light of the scene; it throws blue light onto her palms and chin. Behind her, deep in the haze and softly out of focus, her creative squad works at three separate stations: a designer at a large tablet, a video editor at a wide timeline, a motion designer with headphones; they are small, turned toward their own work, nobody looks at the camera and nobody looks at anyone else up close. From each of those three stations a glowing piece of content lifts off and joins ONE single luminous ribbon of warm orange light (#FF6500) that rises from the squad at the back, sweeps up and over her far shoulder and flows forward down into her open hands, like a river carrying the work from the team to her: along that ribbon ride six or seven thin frameless screens of different real formats (square feed post, 4:5 post, wide 16:9 video frame, slim phone, web banner) at different depths, small and blurred near the squad, larger and sharper as they approach her hands. It is an OPEN flowing path from the back of the room toward the lens, NOT a closed ring and NOT an ellipse around her. The screens show saturated color-block graphics, a product close-up splashed with paint, a dancer mid-jump, a bold abstract gradient, and throw vivid orange, hot magenta, violet and teal light into the haze; any tiny text on them is too small and too blurred to read. Hard cool rim light from behind separates her hair and shoulders from the dark; the haze catches the orange ribbon and the colored beams. The ribbon, every screen and every person stay inside the RIGHT 55% of the frame. The LEFT 45% of the frame is calm, deep dark studio space, only a few far out-of-focus colored bokeh dots, no ribbon, no screens, no people, no objects. Rich contrast, punchy color, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a worktable close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

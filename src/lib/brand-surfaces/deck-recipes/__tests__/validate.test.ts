@@ -163,6 +163,12 @@ describe('láminas SEO/AEO (TASK-1934)', () => {
     expect(issues.filter(issue => issue.code === 'next-steps-after-diagnosis').map(issue => issue.recipeId)).toEqual(['decision-diagnosis-map'])
   })
 
+  it('la portada «Tu squad.» tiene plate propio (CR3): con la lámina cine creativa en el mismo brochure no repite plate', () => {
+    const issues = validateDeckPlan(plan('brochure', ['cover-brochure-line-brand', 'proposal-cinematic-creative', 'close-brochure-orbit'])).issues
+
+    expect(issues.map(issue => issue.code)).not.toContain('plate-repeated')
+  })
+
   it('una cifra de mercado sin fuente no valida', () => {
     const figures = [
       { value: '−27%', takeaway: 'El tráfico que llegaba solo ya no está garantizado.', source: 'HubSpot', year: '2026' },
