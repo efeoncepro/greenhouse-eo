@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   PRODUCTION_HOSTS,
+  PUBLIC_BURST_GUARD_LIMIT,
   PUBLIC_BURST_GUARD_RULES,
+  THINK_SERVER_KEY_HEADER,
   buildPublicBurstGuardRule,
   planPublicBurstGuardChanges,
   type ActiveFirewallRule,
@@ -201,5 +203,22 @@ describe('public burst guard WAF rules (TASK-1876)', () => {
       kind: 'update',
       id: vercelReadbackFixture.id
     })
+  })
+
+  it('exceptúa a Think sólo con su llave explícita, sin subir el límite (TASK-1875)', () => {
+    const withKey = buildPublicBurstGuardRule(PUBLIC_BURST_GUARD_RULES[0]!, { thinkKey: 'k-think' })
+    const conditions = withKey.conditionGroup[0]!.conditions
+
+    expect(conditions).toContainEqual({ type: 'header', key: THINK_SERVER_KEY_HEADER, op: 'eq', value: 'k-think', neg: true })
+    expect(withKey.action.mitigate.rateLimit.limit).toBe(PUBLIC_BURST_GUARD_LIMIT.requests)
+    expect(buildPublicBurstGuardRule(PUBLIC_BURST_GUARD_RULES[0]!).conditionGroup[0]!.conditions.some(c => c.type === 'header')).toBe(false)
+  })
+
+  it('detecta drift cuando la regla viva no tiene la excepción de Think', () => {
+    const live = { id: 'r1', ...buildPublicBurstGuardRule(PUBLIC_BURST_GUARD_RULES[0]!) }
+    const plan = planPublicBurstGuardChanges([live], [PUBLIC_BURST_GUARD_RULES[0]!], { thinkKey: 'k-think' })
+
+    expect(plan[0]!.kind).toBe('update')
+    expect(planPublicBurstGuardChanges([{ id: 'r1', ...buildPublicBurstGuardRule(PUBLIC_BURST_GUARD_RULES[0]!, { thinkKey: 'k-think' }) }], [PUBLIC_BURST_GUARD_RULES[0]!], { thinkKey: 'k-think' })[0]!.kind).toBe('unchanged')
   })
 })

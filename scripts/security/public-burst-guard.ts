@@ -10,6 +10,7 @@
  * o desactivar la regla en el dashboard (Firewall → Custom Rules).
  */
 import {
+  PUBLIC_BURST_GUARD_RULES,
   planPublicBurstGuardChanges,
   type ActiveFirewallRule,
   type FirewallRuleChange
@@ -56,8 +57,14 @@ const main = async () => {
 
   if (!token) throw new Error('Sin token de Vercel: exporta VERCEL_TOKEN o corre `vercel login`.')
 
+  // TASK-1875: la llave de servidor de Think exceptúa su tráfico. Nunca se imprime.
+  const thinkKey = process.env.PUBLIC_BURST_GUARD_THINK_KEY?.trim() || null
+  const options = { thinkKey }
+
   const active = await readActive(token)
-  const plan = planPublicBurstGuardChanges(active?.rules ?? [])
+  const plan = planPublicBurstGuardChanges(active?.rules ?? [], PUBLIC_BURST_GUARD_RULES, options)
+
+  console.log(thinkKey ? 'Excepción de Think: incluida (llave desde PUBLIC_BURST_GUARD_THINK_KEY).' : 'Excepción de Think: no incluida (falta PUBLIC_BURST_GUARD_THINK_KEY).')
 
   console.log(`Firewall ${active ? `activo (firewallEnabled=${active.firewallEnabled})` : 'sin configuración'}.`)
   console.log('Plan:')
@@ -93,7 +100,7 @@ const main = async () => {
   }
 
   const readback = await readActive(token)
-  const residual = planPublicBurstGuardChanges(readback?.rules ?? []).filter(change => change.kind !== 'unchanged')
+  const residual = planPublicBurstGuardChanges(readback?.rules ?? [], PUBLIC_BURST_GUARD_RULES, options).filter(change => change.kind !== 'unchanged')
 
   console.log(`\nReadback: firewallEnabled=${readback?.firewallEnabled}; reglas del guard sin drift: ${residual.length === 0}.`)
 

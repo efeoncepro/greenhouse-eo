@@ -14,8 +14,12 @@
  *   - producción: `observe` (sólo registra) hasta tener una ventana de logs que respalde el
  *     límite con tráfico legítimo real; pasar a `enforce` es cambiar `mode` aquí y aplicar.
  *
- * Tráfico server-side de Think (TASK-1875): cuando exista, se exceptúa con una condición
- * explícita en estas reglas; nunca subiendo el límite para todos.
+ * Tráfico server-side de Think (TASK-1875): Think lee el informe compartido desde pocas IPs de
+ * runtime, así que se exceptúa con una condición EXPLÍCITA —la regla sólo aplica a pedidos sin la
+ * llave de servidor de Think en `x-efeonce-think-key`—, nunca subiendo el límite para todos. La
+ * llave no vive en este archivo: el script la inyecta al aplicar desde
+ * `PUBLIC_BURST_GUARD_THINK_KEY` y nunca la imprime. Sin la variable, la regla se construye sin
+ * excepción (el comportamiento anterior).
  */
 
 export type PublicBurstGuardMode = 'observe' | 'enforce'
@@ -29,10 +33,20 @@ export const PRODUCTION_HOSTS = ['greenhouse.efeoncepro.com', 'greenhouse-eo.ver
 export const PUBLIC_BURST_GUARD_LIMIT = { windowSeconds: 10, requests: 20 } as const
 
 export interface VercelFirewallCondition {
-  type: 'path' | 'host'
+  type: 'path' | 'host' | 'header'
   op: 'pre' | 'eq' | 'inc'
   value: string | string[]
+  /** Sólo en `header`: el nombre de la cabecera. */
+  key?: string
   neg?: boolean
+}
+
+/** Cabecera con la que Think se identifica server-side ante `/api/public/**` (TASK-1875). */
+export const THINK_SERVER_KEY_HEADER = 'x-efeonce-think-key'
+
+export interface PublicBurstGuardBuildOptions {
+  /** Llave de servidor de Think; si viene, la regla exceptúa los pedidos que la presentan. */
+  thinkKey?: string | null
 }
 
 export interface VercelFirewallRuleValue {
@@ -68,11 +82,12 @@ export const PUBLIC_BURST_GUARD_RULES: readonly PublicBurstGuardRuleSpec[] = [
   { name: 'greenhouse-public-burst-guard-production', scope: 'production', mode: 'observe' }
 ]
 
-export const buildPublicBurstGuardRule = (spec: PublicBurstGuardRuleSpec): VercelFirewallRuleValue => ({
+export const buildPublicBurstGuardRule = (spec: PublicBurstGuardRuleSpec, options: PublicBurstGuardBuildOptions = {}): VercelFirewallRuleValue => ({
   name: spec.name,
   description:
     `TASK-1876/ISSUE-174: ${PUBLIC_BURST_GUARD_LIMIT.requests} req/${PUBLIC_BURST_GUARD_LIMIT.windowSeconds}s por IP ` +
-    `en ${PUBLIC_BURST_GUARD_PATH_PREFIX} (${spec.scope}, ${spec.mode}). Fuente: src/lib/security/public-burst-guard/firewall-rules.ts`,
+    `en ${PUBLIC_BURST_GUARD_PATH_PREFIX} (${spec.scope}, ${spec.mode})${options.thinkKey ? '; exceptúa Think server-side' : ''}. ` +
+    'Fuente: src/lib/security/public-burst-guard/firewall-rules.ts',
   active: true,
   conditionGroup: [
     {
@@ -83,7 +98,10 @@ export const buildPublicBurstGuardRule = (spec: PublicBurstGuardRuleSpec): Verce
           op: 'inc',
           value: [...PRODUCTION_HOSTS],
           ...(spec.scope === 'non_production' ? { neg: true } : {})
-        }
+        },
+        ...(options.thinkKey
+          ? [{ type: 'header' as const, key: THINK_SERVER_KEY_HEADER, op: 'eq' as const, value: options.thinkKey, neg: true }]
+          : [])
       ]
     }
   ],
@@ -154,6 +172,7 @@ const comparable = (rule: Omit<ActiveFirewallRule, 'id'>) => {
 
                 return {
                   type: condition.type,
+                  ...(typeof condition.key === 'string' ? { key: condition.key } : {}),
                   op: condition.op,
                   value: sortedStrings(condition.value),
                   neg: condition.neg === true
@@ -196,10 +215,11 @@ const comparable = (rule: Omit<ActiveFirewallRule, 'id'>) => {
  */
 export const planPublicBurstGuardChanges = (
   activeRules: readonly ActiveFirewallRule[],
-  specs: readonly PublicBurstGuardRuleSpec[] = PUBLIC_BURST_GUARD_RULES
+  specs: readonly PublicBurstGuardRuleSpec[] = PUBLIC_BURST_GUARD_RULES,
+  options: PublicBurstGuardBuildOptions = {}
 ): FirewallRuleChange[] =>
   specs.map(spec => {
-    const desired = buildPublicBurstGuardRule(spec)
+    const desired = buildPublicBurstGuardRule(spec, options)
     const existing = activeRules.find(rule => rule.name === spec.name)
 
     if (!existing) return { kind: 'insert', value: desired }
