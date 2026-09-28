@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `En ejecución 2026-09-28 — Discovery cerrado; decisión: WAF de Vercel + timeout de sesión sólo Vercel + alerta num_backends`
 - Rank: `TBD`
 - Domain: `platform|reliability|data|security`
 - Blocked by: `none`
