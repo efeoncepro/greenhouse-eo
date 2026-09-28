@@ -1,5 +1,18 @@
 # TASK-1930 — Datos reales en los slots del deck «La órbita»: logo, montos, equipo, métricas, casos y testimonios
 
+## Delta 2026-09-28 — TASK-1934 suma nueve recetas SEO/AEO
+
+- TASK-1934 lleva al catálogo las nueve láminas SEO/AEO aprobadas por el operador el 2026-09-28 (69 → **78 recetas**).
+  El criterio «todo slot `logo`, `money`, `metric`, `person` o de prueba … tiene binder o exclusión» cubre las 78.
+- Slots nuevos que necesitan binder o exclusión con razón (los nombres finales los fija TASK-1934 en su Slice 1):
+  - **cifras de mercado** de DeckMercadoIA (−27 % HubSpot 2026, 50 % McKinsey 2025, <1 en 100 SparkToro 2026): son
+    cifras públicas con fuente, no del cliente; entran por `figures` con fuente obligatoria. Recomendación: exclusión con
+    razón («dato de mercado citado, no del cliente»);
+  - **respuesta de ejemplo** de DeckIARespuesta (tu marca ausente «Hoy» y 1.ª «Con AEO»), marcada «Ejemplo ilustrativo»;
+  - **informe del diagnóstico** de DeckDiagnosticoMapa (score por motor, share of voice, prompts sin aparición, plan
+    priorizado), marcado «Datos de muestra». Cuando exista un diagnóstico real (AEO Grader), la marca sólo cambia por un
+    hecho con `evidenceRef`; nunca se inventa un score.
+
 ## Delta 2026-09-28 — TASK-1929 dejó el plan de deck contra el catálogo
 
 - Entrada pura e isomórfica `@/lib/brand-surfaces/deck-recipes`: `validateDeckPlan(plan: DeckPlan): { ok, issues: DeckPlanIssue[] }`
@@ -429,6 +442,7 @@ Sin flag propio: lectura pura sin consumer productivo. El cutover productivo lo 
 
 - [ ] `bindDeckSlots` existe y devuelve un `SlotBinding` por slot de datos, con `source` y `evidenceRef` o `reason`.
 - [ ] Todo slot `logo`, `money`, `metric`, `person` o de prueba de las 69 recetas tiene binder o exclusión con razón (test).
+- [ ] (Delta 2026-09-28, TASK-1934) Los slots de cifras de mercado, respuesta de ejemplo y datos de muestra de las nueve recetas SEO/AEO tienen binder o exclusión con razón, y la marca «Ejemplo ilustrativo» / «Datos de muestra» sólo se retira con un hecho con `evidenceRef` (test).
 - [ ] El logo del cliente sale de `readOrganizationLogoVariants` y una portada oscura sin variante oscura queda `unbound` (test).
 - [ ] Ningún slot `money` o `metric` se llena desde texto del LLM (test).
 - [ ] Sin cotización congelada, `money` se imprime `[MONTO]` (test).

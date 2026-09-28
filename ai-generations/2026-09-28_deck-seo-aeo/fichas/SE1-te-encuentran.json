@@ -1,0 +1,11 @@
+{
+  "id": "SE1-te-encuentran",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [{ "objeto": "polo-efeonce" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, a vast dark architectural space at night, slight low camera angle): an EFEONCE SEO strategist, a Latin American man in his mid thirties, short dark hair and a trimmed beard, wearing the NAVY EFEONCE POLO, stands on the RIGHT side of the frame, framed from the waist up, looking straight into the lens with a calm, confident half-smile, one hand resting in his pocket. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, focus on his eyes. Behind him rises an immense three-dimensional map made of light that fills the right half of the space: on the floor, a vast glowing grid of fine teal (#36C8BF) lines receding into the darkness, the technical foundation; above it, dozens of small floating constellations of white points joined by thin lines, clusters of knowledge; and at the center of it all, behind his shoulder, ONE large bright node of pure white light with an azure (#0375DB) core, from which hundreds of thin luminous threads reach out to every cluster, like a brand everything connects to. A single wide ring of azure-white light circles that central node in perspective, the one orbit of the frame, and the node's glow floods his face and shoulder from behind and the side. The node and its ring are the brightest elements; a cool rim separates him from the background; everything else stays in deep shadow. Fine haze catches the threads and the ring light. The LEFT 45% of the frame is calm, deep dark space with only faint haze: no grid lines, no points, no threads, no objects. Enormous contrast, punchy, awe-inspiring, no logos of any other brand, no readable text, no screens.",
+  "lecho": { "objeto": "the dark blurred edge of a desk close to the lens, outside every light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark space on the left 45% of the frame", "tinta": "blanca" } }
+}

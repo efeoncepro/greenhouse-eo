@@ -1,5 +1,17 @@
 # TASK-1931 — Banco de plates gobernado para las recetas del deck «La órbita»
 
+## Delta 2026-09-28 — TASK-1934 suma el plate SE1 y nueve recetas SEO/AEO
+
+- TASK-1934 lleva al catálogo las nueve láminas SEO/AEO aprobadas por el operador el 2026-09-28: el catálogo pasa de 69
+  a **78 recetas**. La siembra de esta task cubre las 78, no las 69.
+- Plate nuevo a sembrar: **SE1** (`ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png`, ficha
+  `fichas/SE1-te-encuentran.json`, prompt `prompts/SE1-te-encuentran.txt`, registro de `foto:isotipo`
+  `plates/SE1-te-encuentran-isotipo.json`). Lo usan dos recetas que son alternativas y nunca van juntas: la propuesta SEO
+  sobria (lente) y la cine (`proposal-cinematic` layout `service`). Registro cine dentro de su alcance
+  (`proposal-cinematic`).
+- Mientras el banco no exista, TASK-1934 deja SE1 declarado por ruta local en `photo.plate`, igual que las 69; no sube
+  ni registra nada fuera de este banco.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -405,6 +417,7 @@ encendido con sus flags. El cutover de la siembra es manual y revisado (`--dry-r
 - [ ] `resolvePlateForRecipe` nunca devuelve `pending` ni `retired` y excluye los plates ya usados en el deck (tests).
 - [ ] Las capabilities del banco están en `capabilities_registry` y `entitlements-catalog.ts`, con grant a al menos un rol real y coverage test en verde.
 - [ ] La siembra corrió en dry-run y apply: cada plate declarado por las 69 recetas está en el bucket privado y registrado, con el conteo en el cierre.
+- [ ] (Delta 2026-09-28, TASK-1934) La siembra cubre las 78 recetas e incluye SE1 con su ficha, su sha256 y el registro de `foto:isotipo`; queda `pending` hasta que una persona lo apruebe.
 - [ ] Los plates con procedencia completa quedaron aprobados por una persona; los de los pendientes de QA de isotipo quedaron `pending` con motivo.
 - [ ] Un asset sembrado se descarga por el reader del store y su sha coincide con el registrado.
 - [ ] Manual `banco-de-plates.md`, README de fotografía, doc funcional y delta de arquitectura publicados.

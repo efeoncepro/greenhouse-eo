@@ -73,7 +73,7 @@ const PHOTOS = {
   T1: '2026-09-26_deck-triptico-v2/plates/T1-escucha.png', T2: '2026-09-26_deck-triptico-v2/plates/T2-crea.png', T3: '2026-09-26_deck-triptico-v2/plates/T3-mide.png',
   H1b: '2026-09-26_web-hero/plates/H1b-estratega-uniforme.png', D1: '2026-09-26_ooh-caminero-lente/plates/D1-mupi-rodaje-en-vivo.png',
   D2: '2026-09-26_ooh-caminero-lente/plates/D2-led-medicion.png', D3: '2026-09-26_ooh-caminero-lente/plates/D3-led-medicion-mira-izquierda.png',
-  P2: '2026-09-26_deck-web-motion/plates/P2-web-hero-taller.png', M2: '2026-09-26_web-movil/plates/M2-voltea-chaqueta.png'
+  SE1: '2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png', P2: '2026-09-26_deck-web-motion/plates/P2-web-hero-taller.png', M2: '2026-09-26_web-movil/plates/M2-voltea-chaqueta.png'
 }
 const eyebrow = (s, t, top = 110) => `<p style="position:absolute;left:${M}px;top:${top}px;margin:0;font:500 16px Pop;letter-spacing:.14em;text-transform:uppercase;color:${s.soft}">${t}</p>`
 const question = (s, q, top = 200, dark = true) => `<p style="position:absolute;left:${M}px;top:${top}px;margin:0;font:300 40px/1.2 Pop;color:${dark ? SOFT : s.text}">${ring(s)}${q}</p>`
@@ -459,6 +459,9 @@ await proposal('P3-web', 'engine', 'Web', '¿Para quién es tu web?', 'Para todo
 await proposal('P4-revops', 'revenue-hubspot', 'RevOps', '¿Tu CRM vende contigo?', 'Con agentes', 'HubSpot operado como servicio: de la evaluación a la operación gestionada, con agentes que trabajan dentro de tu CRM.', 'H1b', 'center',
   [['Evaluación', 'Sin costo: dónde está tu CRM y qué le falta.', 'Empieza aquí · sin costo'], ['Blueprint', 'El diseño pagado de tu operación de revenue.', 'Proyecto'], ['Implementación', 'Implementación o migración, lista para operar.', 'Proyecto'], ['Operación gestionada', 'HubSpot y agentes operados por nosotros, mes a mes.', 'On-Going']], 'Marketing, ventas, servicio, datos y Agent Hub.')
 
+await proposal('P5-seo', 'engine', 'SEO', '¿Cómo te encuentran?', 'Con método', 'Que te encuentren en Google y que la IA no te ignore: base técnica, autoridad temática y entidad, trabajadas y medidas como un sistema.', 'SE1', 'east',
+  [['Diagnóstico', 'Tu punto de partida en búsqueda y en IA: sin ese mapa no hay plan honesto.', 'Empieza aquí · sin costo'], ['Base técnica', 'Rastreo, indexación, Core Web Vitals y datos estructurados.', 'Proyecto'], ['Contenido y autoridad', 'Clusters por intención, landings que convierten, PR y link building real.', 'On-Going'], ['Reporte vivo', 'Tráfico calificado, share of voice y visibilidad en IA, en Greenhouse.', 'Greenhouse']], 'No prometemos rankings. Reportamos lo que se mueve.')
+
 // P2b · PROPUESTA CREATIVA, VERSIÓN PLASTILINA: la voz blanda de la iconografía (canónica D22) como protagonista con su
 // órbita sesgada, la foto del oficio en un panel con la esquina de 300 px de la sección partida aprobada, y los tres
 // pasos con íconos Plastilina en reposo. Acento de Brand sobre el fondo Efeonce.
@@ -534,6 +537,26 @@ ${answer(s, ['Visible'], 318, 160, 'data-sel')}
 <p style="position:absolute;left:${M}px;top:520px;width:640px;margin:0;font:300 26px/1.45 Pop;color:${s.text}">Entre miles de marcas, que ChatGPT, Claude, Perplexity, Gemini y Google te encuentren, te entiendan y te recomienden.</p>
 ${stepHtml}
 <p style="position:absolute;left:${M + 320}px;top:${H - 80}px;margin:0;font:400 16px Pop;color:${SOFT}">Sin promesas de ranking: medimos y mostramos el avance.</p>
+${foot(s)}` })
+}
+
+// P5b · PROPUESTA SEO CON PUNCH (cine, 2026-09-28): el estratega SEO frente al mapa de luz de su oficio —la grilla
+// técnica en el piso, los clusters como constelaciones y la entidad como núcleo con su órbita— «¿Te encuentra Google?»
+// «Y la IA.» Isotipo del polo compuesto con foto:isotipo.
+{
+  const { resolveIcon } = await import('/Users/jreye/Documents/axis-design-system/packages/graphic-line/dist/icons.js')
+  const s = lineDark('engine')
+  const photo = await jpg(PH('2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png'), W, H)
+  const steps = [['busqueda', 'Diagnóstico', 'Sin costo'], ['contenido', 'Técnica y contenido', 'Proyecto'], ['medicion', 'Autoridad y entidad', 'On-Going'], ['informe', 'Reporte vivo', 'Greenhouse']]
+  const stepHtml = steps.map(([g, t, k], i) => `<div style="position:absolute;left:${M + i * 176}px;top:800px;width:170px;display:flex;flex-direction:column;gap:10px;z-index:2"><div style="width:44px;height:44px">${resolveIcon({ glyph: g, size: 44, line: 'engine', surface: 'dark', label: t, idPrefix: 'se' + i }).svg}</div><div><p style="margin:0;font:600 12px Pop;letter-spacing:.1em;text-transform:uppercase;color:${i === 0 ? '#fff' : SOFT}">${k}</p><p style="margin:4px 0 0;font:760 21px/1.05 Bric;letter-spacing:-.02em;color:#fff">${t}</p></div></div>`).join('')
+  slides.push({ id: 'P5b-seo-te-encuentran', surface: s, sel: { label: 'Cliente', anchor: 'bottom-end', kind: 'text', scale: 1.2 }, body: `
+<img src="${photo}" alt="Un estratega SEO con el polo de Efeonce mira a cámara; detrás, un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita al que todo se conecta" style="position:absolute;inset:0;width:${W}px;height:${H}px">
+${eyebrow(s, 'Nuestra propuesta · SEO', 120)}
+${question(s, '¿Te encuentra Google?', 186)}
+${answer(s, ['Y la IA'], 318, 160, 'data-sel')}
+<p style="position:absolute;left:${M}px;top:648px;width:640px;margin:0;font:300 25px/1.4 Pop;color:${s.text}">Posicionamiento SEO con método: base técnica, autoridad temática y entidad, para que Google te encuentre y la IA no te ignore.</p>
+${stepHtml}
+<p style="position:absolute;left:${M + 320}px;top:${H - 80}px;margin:0;font:400 16px Pop;color:${SOFT}">No prometemos rankings. Reportamos lo que se mueve.</p>
 ${foot(s)}` })
 }
 

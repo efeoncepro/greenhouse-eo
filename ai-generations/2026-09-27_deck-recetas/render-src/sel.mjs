@@ -27,7 +27,7 @@ export const paintSelection = async (pg, sel) => {
     measureLabel: (label, size) => label.length * size * 0.62,
     presentation: local ? { localCursorScale: sel.scale ?? 1 } : { collaboratorScale: sel.scale ?? 1.25 }
   })
-  if (!painted.evidence.withinCanvas) throw new Error('la selección sale del lienzo: ' + JSON.stringify(m.bounds) + ' ' + JSON.stringify(painted.evidence).slice(0, 600))
+  if (!painted.evidence.withinCanvas) throw new Error('la selección sale del lienzo: ' + JSON.stringify(m.bounds) + ' ' + JSON.stringify(painted.evidence))
   await pg.evaluate(({ underlay, overlay }) => {
     const root = document.body.firstElementChild
     const layer = (markup, z) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 1920 1080'); s.setAttribute('width', '1920'); s.setAttribute('height', '1080'); s.setAttribute('aria-hidden', 'true'); s.setAttribute('style', `position:absolute;inset:0;z-index:${z};pointer-events:none`); s.innerHTML = markup; return s }

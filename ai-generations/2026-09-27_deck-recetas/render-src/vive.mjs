@@ -335,6 +335,173 @@ ${L ? `<p style="margin:0 0 12px;font:600 14px Pop;letter-spacing:.14em;text-tra
       + bigVoice('Inversión', '¿Cuánto cuesta?', `Sin letra<br>${answerHtml('chica', GL.color.teal)}`, `Cada línea de la cotización a la vista, con su <b style="font-weight:600;color:#fff">monto</b> y lo que incluye. Los montos se definen en cada propuesta.`, 1, 118) + urlSign()
   } }
 
+  ,
+  // ── SEO · AEO (operador, 2026-09-28: «las altas con altísimo nivel de detalle»), desde las landings públicas
+  // /aeo-2/ y /servicios/posicionamiento-seo/. Cifras con su fuente tal como la publica el sitio.
+  // MX1 · LA RESPUESTA DE LA IA: el mismo prompt, dos respuestas. Atrás «Hoy» (tu marca no aparece); al frente «Con
+  // AEO» (tu marca primera, citada). Interfaz genérica de motor de IA —como la landing—, sin imitar ningún producto.
+  { id: 'MX1-ia-responde', sel: { targetKind: 'object', label: 'Cliente', participantKind: 'role', anchor: 'bottom-end', scale: 1.0, padding: 'compact' }, body: async () => {
+    const PROMPT = '¿Cuáles son las mejores marcas de [tu categoría] en Chile?'
+    const globe = c => `<svg viewBox="0 0 16 16" width="15" height="15" style="flex:none"><circle cx="8" cy="8" r="6.4" fill="none" stroke="${c}" stroke-width="1.3"/><path d="M1.8 8h12.4M8 1.6c2.1 2.2 2.1 10.6 0 12.8M8 1.6c-2.1 2.2-2.1 10.6 0 12.8" fill="none" stroke="${c}" stroke-width="1.1"/></svg>`
+    const cite = (t, on) => `<span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:${on ? 'rgba(54,200,191,.14)' : PAPER};box-shadow:0 0 0 1px ${on ? 'rgba(20,140,133,.35)' : LINE} inset;font:500 13px Pop;color:${on ? GL.color.tealDark : MUTED};white-space:nowrap">${globe(on ? GL.color.tealDark : MUTED)}${t}</span>`
+    const engine = (w, label, tone) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:0 0 16px;border-bottom:1px solid ${LINE}"><div style="display:flex;align-items:center;gap:10px"><span style="display:inline-flex;width:30px;height:30px;border-radius:50%;background:${INK};align-items:center;justify-content:center"><svg viewBox="0 0 20 20" width="16" height="16"><path d="M10 2l1.8 5.2L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.8z" fill="#fff"/></svg></span><span style="font:600 16px Pop;color:${INK}">Motor de IA</span></div><span style="padding:6px 13px;border-radius:999px;font:600 13px Pop;letter-spacing:.08em;text-transform:uppercase;${tone}">${label}</span></div>
+<div style="display:flex;justify-content:flex-end;margin-top:18px"><p style="margin:0;max-width:${w - 140}px;padding:12px 16px;border-radius:16px 16px 4px 16px;background:${PAPER};font:400 16px/1.4 Pop;color:${INK}">${PROMPT}</p></div>`
+    const row = (n, name, desc, cites, on) => `<div ${on ? 'data-sel ' : ''}style="display:flex;gap:14px;padding:${on ? '14px 16px' : '11px 4px'};margin-top:${on ? 10 : 2}px;border-radius:14px;${on ? `background:rgba(54,200,191,.10);box-shadow:0 0 0 2px ${GL.color.teal} inset;` : ''}"><span style="font:760 ${on ? 26 : 20}px Bric;color:${on ? GL.color.tealDark : MUTED};line-height:1.2;width:22px">${n}</span><div style="flex:1"><p style="margin:0;font:${on ? 700 : 600} ${on ? 21 : 17}px Pop;color:${INK}">${name}</p>${desc ? `<p style="margin:4px 0 0;font:400 ${on ? 15 : 14}px/1.45 Pop;color:${MUTED}">${desc}</p>` : ''}${cites ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:9px">${cites}</div>` : ''}</div></div>`
+    const back = `<div style="position:absolute;left:730px;top:168px;width:520px;box-sizing:border-box;padding:24px 26px 26px;border-radius:24px;background:${CARD};opacity:.82;transform:perspective(1600px) rotateY(16deg);transform-origin:right center;${deep};z-index:2">
+${engine(520, 'Hoy', `background:${PAPER};color:${MUTED};box-shadow:0 0 0 1px ${LINE} inset`)}
+<p style="margin:18px 0 6px;font:400 15px/1.45 Pop;color:${INK}">Estas son las opciones más recomendadas:</p>
+${row(1, 'Competidor A', 'Líder en recordación de la categoría.', cite('comparador.cl') + cite('medio-sectorial.com'))}
+${row(2, 'Competidor B', null, cite('competidor-b.com'))}
+${row(3, 'Competidor C', null, null)}
+<div style="display:flex;align-items:center;gap:10px;margin-top:16px;padding:12px 14px;border-radius:12px;background:${PAPER};box-shadow:0 0 0 1px ${LINE} inset"><span style="width:18px;height:18px;border-radius:50%;box-shadow:0 0 0 2px #9AA6B2 inset"></span><span style="font:600 15px Pop;color:${MUTED}">Tu marca no aparece</span></div></div>`
+    const front = `<div style="position:absolute;left:1040px;top:246px;width:600px;box-sizing:border-box;padding:26px 28px 28px;border-radius:26px;background:${CARD};box-shadow:0 0 0 2px rgba(114,222,216,.85),0 60px 120px rgba(0,6,16,.75),0 0 120px rgba(114,222,216,.35);z-index:4">
+${engine(600, 'Con AEO', `background:${GL.color.dark};color:${GL.color.halo}`)}
+<p style="margin:18px 0 0;font:400 15px/1.45 Pop;color:${INK}">Para [tu categoría] en Chile, la opción más recomendada es:</p>
+${row(1, 'Tu marca', 'Referente de la categoría: casos verificables, precios claros y reseñas consistentes.', cite('tumarca.com', true) + cite('medio-sectorial.com', true) + cite('comparador.cl', true), true)}
+${row(2, 'Competidor A', null, null)}
+${row(3, 'Competidor B', null, null)}</div>`
+    return stageBg(1330, 560) + platform(1230, 840, 560, 80) + beam(1240, 600, 1080, 470, 'mx1') + back + front
+      + `<p style="position:absolute;left:1040px;top:772px;width:600px;text-align:right;margin:0;font:400 15px Pop;color:${SOFT};z-index:5">Ejemplo ilustrativo · tu diagnóstico muestra tu situación real</p>`
+      + bigVoice('Visibilidad en IA', '¿A quién recomienda la IA?', `A tu<br>${answerHtml('competencia', GL.color.teal)}`, `Cuando tu comprador pregunta por tu categoría, la IA ya tiene favoritas. El AEO hace que la <b style="font-weight:600;color:#fff">próxima</b> respuesta te nombre.`, 2, 96) + urlSign()
+  } }
+  ,
+  // MX2 · CONTEXTO DE MERCADO: tres monolitos de vidrio sobre la órbita-plataforma, una cifra por fuente, tal como
+  // la publica /aeo-2/ (HubSpot 2026, McKinsey 2025, SparkToro 2026). La del centro, la del comprador, adelante.
+  { id: 'MX2-mercado', body: async () => {
+    const white = async (file, h) => { const b = await sharp(file, { density: 600 }).resize({ height: h * 2 }).ensureAlpha().extractChannel('alpha').toBuffer(); const m = await sharp(b).metadata(); return { src: 'data:image/png;base64,' + (await sharp({ create: { width: m.width, height: m.height, channels: 3, background: '#E6EDF3' } }).joinChannel(b).png().toBuffer()).toString('base64'), w: Math.round(m.width / 2), h } }
+    const hs = await white(R + 'public/images/logos/axis/hubspot-logotype.svg', 26)
+    const sp = await white(R + 'docs/assets/public-site/aeo-market-logos/sparktoro-logo.svg', 24)
+    const C3 = [
+      { n: '−27%', t: 'El tráfico que llegaba solo ya no está garantizado.', d: 'El tráfico orgánico de clientes HubSpot cayó 27% interanual.', src: `<img src="${hs.src}" alt="HubSpot" style="height:${hs.h}px;width:${hs.w}px">`, y: '2026', cx: 990, top: 250, w: 300, ry: 16, z: 2 },
+      { n: '50%', t: 'Tu comprador ya le pregunta a la IA qué elegir.', d: 'Uno de cada dos consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir compras.', src: `<span style="font:700 22px Pop;letter-spacing:-.01em;color:#E6EDF3">McKinsey &amp; Company</span>`, y: '2025', cx: 1320, top: 190, w: 370, ry: 0, z: 5, lead: true },
+      { n: '<1 en 100', t: 'Aparecer una vez no es una estrategia.', d: 'Los motores de IA casi nunca repiten la misma lista de marcas.', src: `<img src="${sp.src}" alt="SparkToro" style="height:${sp.h}px;width:${sp.w}px">`, y: '2026', cx: 1650, top: 250, w: 300, ry: -16, z: 2 }
+    ]
+    const cards = C3.map(c => `<div style="position:absolute;left:${c.cx - c.w / 2}px;top:${c.top}px;width:${c.w}px;height:${c.lead ? 600 : 540}px;box-sizing:border-box;padding:${c.lead ? '34px 32px' : '28px 26px'};border-radius:24px;display:flex;flex-direction:column;background:linear-gradient(165deg,${c.lead ? '#135064' : '#12344F'} 0%,#081C30 100%);transform:rotateY(${c.ry}deg);z-index:${c.z};box-shadow:0 0 0 ${c.lead ? 2 : 1}px ${c.lead ? 'rgba(114,222,216,.9)' : 'rgba(255,255,255,.16)'},0 50px 110px rgba(0,6,16,.7),0 0 ${c.lead ? 120 : 40}px rgba(114,222,216,${c.lead ? '.45' : '.14'});${REFLECT}">
+<p style="margin:0;font:760 ${c.n.length > 5 ? 76 : c.lead ? 150 : 116}px Bric;letter-spacing:-.05em;line-height:.95;color:${c.lead ? '#fff' : '#E6EDF3'};white-space:nowrap">${c.n}</p>
+<p style="margin:26px 0 0;font:760 ${c.lead ? 30 : 26}px/1.12 Bric;letter-spacing:-.02em;color:#fff">${c.t}</p>
+<p style="margin:14px 0 0;font:400 ${c.lead ? 18 : 16}px/1.5 Pop;color:#C9D6E2">${c.d}</p>
+<div style="margin-top:auto;padding-top:18px;border-top:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:space-between">${c.src}<span style="font:500 15px Pop;color:${SOFT}">${c.y}</span></div></div>`).join('')
+    return stageBg(1320, 520) + platform(1320, 890, 520, 90) + `
+<div style="position:absolute;inset:0;perspective:1800px;perspective-origin:1320px 450px;z-index:2">${cards}</div>`
+      + bigVoice('El contexto', '¿Dónde busca tu cliente?', answerHtml('En la IA', GL.color.teal), `SEO te hacía competir por el ranking. AEO te hace competir por la <b style="font-weight:600;color:#fff">recomendación</b>: antes de que exista un clic.`, 2, 132) + urlSign()
+  } }
+  ,
+  // MX3 · EL MÉTODO EN CICLO (Surround Discovery): la órbita tendida en perspectiva ES el loop; cuatro estaciones
+  // con los íconos 3D del servicio (los mismos de /aeo-2/), el tramo encendido recorre el ciclo y la esfera avanza.
+  { id: 'MX3-ciclo', body: async () => {
+    const IC = R + 'docs/assets/public-site/aeo-service-icons/v2/'
+    const icon = async (f, px) => 'data:image/png;base64,' + (await sharp(IC + f + '.png').resize(px * 2, px * 2, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer()).toString('base64')
+    const cx = 1290, cy = 600, rx = 380, ry = 140
+    const P = a => [cx + rx * Math.cos(a), cy + ry * Math.sin(a)]
+    const st = [
+      { f: 'measure', n: '01', t: 'Medir', d: 'Tu visibilidad en ChatGPT, AI Overviews, Gemini, Perplexity, Copilot y Claude, por mercado y por prompt.', a: -Math.PI / 2, box: [-180, -300, 360] },
+      { f: 'create', n: '02', t: 'Crear', d: 'Los activos que los motores entienden, citan y reproducen. No más contenido: el correcto.', a: 0, box: [-110, -262, 300] },
+      { f: 'distribute', n: '03', t: 'Distribuir', d: 'Tu presencia en cada superficie donde los motores descubren marcas, no sólo en tu sitio.', a: Math.PI / 2, box: [-180, 64, 360] },
+      { f: 'optimize', n: '04', t: 'Optimizar', d: 'Cada ciclo aprende del anterior: subes un nivel, medimos y corregimos.', a: Math.PI, box: [-290, 60, 300] }
+    ]
+    let icons = '', cards = ''
+    for (const [i, s] of st.entries()) {
+      const [x, y] = P(s.a), px = i === 0 ? 118 : 100, on = i === 0
+      icons += `<img src="${await icon(s.f, px)}" alt="" style="position:absolute;left:${x - px / 2}px;top:${y - px * .78}px;width:${px}px;height:${px}px;z-index:4;filter:drop-shadow(0 18px 24px rgba(0,6,16,.6))">`
+      const [dx, dy, w] = s.box
+      cards += `<div style="position:absolute;left:${x + dx}px;top:${y + dy}px;width:${w}px;box-sizing:border-box;padding:16px 20px 18px;border-radius:18px;background:${on ? 'linear-gradient(160deg,#0F4A5C 0%,#0A2A40 100%)' : 'linear-gradient(160deg,#0E2A44 0%,#081C30 100%)'};z-index:5;box-shadow:0 0 0 ${on ? 2 : 1}px ${on ? 'rgba(114,222,216,.9)' : 'rgba(255,255,255,.16)'},0 30px 70px rgba(0,6,16,.6),0 0 ${on ? 70 : 24}px rgba(114,222,216,${on ? '.4' : '.1'})">
+<p style="margin:0;font:600 14px Pop;letter-spacing:.12em;text-transform:uppercase;color:${on ? GL.color.halo : SOFT}">${s.n}${on ? ' · <span style="color:#fff">Empieza aquí</span>' : ''}</p>
+<p style="margin:6px 0 0;font:760 34px Bric;letter-spacing:-.03em;line-height:1;color:#fff">${s.t}</p>
+<p style="margin:8px 0 0;font:400 15px/1.45 Pop;color:#D6E2EC">${s.d}</p></div>`
+    }
+    // flechas del sentido del ciclo, a mitad de cada tramo
+    const arrows = [Math.PI * -0.25, Math.PI * 0.25, Math.PI * 0.75, Math.PI * 1.25].map(a => { const [x, y] = P(a), dxA = -rx * Math.sin(a), dyA = ry * Math.cos(a), ang = Math.atan2(dyA, dxA) * 180 / Math.PI; return `<g transform="translate(${x} ${y}) rotate(${ang})"><path d="M-9 -8 L5 0 L-9 8" fill="none" stroke="${GL.color.halo}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/></g>` }).join('')
+    const [sx, sy] = P(-Math.PI / 2 + 1.25)
+    const lit = `M ${P(-Math.PI / 2)[0]} ${P(-Math.PI / 2)[1]} A ${rx} ${ry} 0 0 1 ${sx} ${sy}`
+    const ring = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="position:absolute;inset:0;z-index:3"><defs><radialGradient id="lp" cx="${cx}" cy="${cy}" r="${rx}" gradientUnits="userSpaceOnUse" gradientTransform="translate(0 ${cy * (1 - ry / rx)}) scale(1 ${ry / rx})"><stop offset="0" stop-color="${GL.color.halo}" stop-opacity=".22"/><stop offset=".75" stop-color="${GL.color.teal}" stop-opacity=".05"/><stop offset="1" stop-color="${GL.color.teal}" stop-opacity="0"/></radialGradient><filter id="lg"><feGaussianBlur stdDeviation="9"/></filter></defs>
+<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#lp)"/>
+<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="${GL.color.halo}" stroke-opacity=".5" stroke-width="3"/>
+<path d="${lit}" fill="none" stroke="${GL.color.teal}" stroke-width="16" opacity=".45" filter="url(#lg)"/><path d="${lit}" fill="none" stroke="${GL.color.teal}" stroke-width="7" stroke-linecap="round"/>
+${arrows}
+<circle cx="${sx}" cy="${sy}" r="20" fill="${GL.color.teal}" filter="url(#lg)"/><circle cx="${sx}" cy="${sy}" r="13" fill="${GL.color.teal}"/></svg>`
+    const core = `<div style="position:absolute;left:${cx - 150}px;top:${cy - 42}px;width:300px;text-align:center;z-index:4"><p style="margin:0;font:760 38px Bric;letter-spacing:-.03em;line-height:1;color:#fff;text-shadow:0 0 30px rgba(114,222,216,.5)">Tu marca</p><p style="margin:6px 0 0;font:400 16px Pop;color:#D6E2EC">sube un nivel en cada vuelta</p></div>`
+    return stageBg(1290, 600) + ring + core + icons + cards
+      + bigVoice('Surround Discovery', '¿Cómo se sostiene?', answerHtml('En ciclo', GL.color.teal), `La visibilidad ante la IA no se «logra»: se sostiene. Cada ciclo aprende del anterior y te sube un <b style="font-weight:600;color:#fff">nivel</b>.`, 1, 150) + urlSign()
+  } }
+
+  ,
+  // ── SEO · AEO, prioridad media (operador, 2026-09-28: «ahora haz las medias»)
+  // MD1 · LA DIFERENCIA: agencia commodity frente al método medible (de /servicios/posicionamiento-seo/) y, abajo,
+  // la objeción del equipo propio (de /aeo-2/): complemento, no reemplazo.
+  { id: 'MD1-diferencia', body: async () => {
+    const rows = [['Promete «el #1 en Google» garantizado', 'Estima según tu punto de partida, sin promesas vacías'], ['Precio «desde $X» que no dice nada de tu caso', 'Alcance definido por prioridad e impacto real'], ['Reporte lleno de vanity metrics', 'Métricas que mueven el negocio + visibilidad en IA'], ['Caja negra: no sabes qué se hace', 'Ves qué se hace en cada ciclo, con entregables'], ['SEO aislado que ignora la era de la IA', 'Cimiento SEO + puente a AEO para que la IA te cite']]
+    const x = (c, on) => on ? `<svg viewBox="0 0 20 20" width="22" height="22" style="flex:none"><circle cx="10" cy="10" r="10" fill="${GL.color.teal}"/><path d="M5.5 10.4l3 3 6-6.4" fill="none" stroke="${GL.color.dark}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 20 20" width="20" height="20" style="flex:none"><circle cx="10" cy="10" r="9" fill="none" stroke="#7D8A98" stroke-width="1.6"/><path d="M6.5 6.5l7 7M13.5 6.5l-7 7" stroke="#7D8A98" stroke-width="1.6" stroke-linecap="round"/></svg>`
+    const card = (on) => `<div style="position:absolute;left:${on ? 1290 : 790}px;top:${on ? 170 : 210}px;width:${on ? 520 : 470}px;box-sizing:border-box;padding:${on ? '30px 30px 26px' : '26px 26px 22px'};border-radius:24px;background:${on ? CARD : 'linear-gradient(165deg,#12344F 0%,#081C30 100%)'};transform:perspective(1600px) rotateY(${on ? -6 : 14}deg);transform-origin:${on ? 'left' : 'right'} center;opacity:${on ? 1 : .88};z-index:${on ? 4 : 2};box-shadow:0 0 0 ${on ? 2 : 1}px ${on ? 'rgba(114,222,216,.9)' : 'rgba(255,255,255,.16)'},0 50px 110px rgba(0,6,16,.7),0 0 ${on ? 110 : 30}px rgba(114,222,216,${on ? '.4' : '.08'})">
+<p style="margin:0;font:600 14px Pop;letter-spacing:.12em;text-transform:uppercase;color:${on ? GL.color.tealDark : '#9FB3C8'}">${on ? 'Efeonce' : 'La alternativa'}</p>
+<p style="margin:6px 0 16px;font:760 ${on ? 38 : 32}px Bric;letter-spacing:-.03em;line-height:1;color:${on ? INK : '#E6EDF3'}">${on ? 'Método medible' : 'Agencia commodity'}</p>
+${rows.map(r => `<div style="display:flex;gap:12px;align-items:flex-start;padding:${on ? 13 : 12}px 0;border-top:1.5px solid ${on ? LINE : 'rgba(255,255,255,.1)'}">${x(0, on)}<span style="font:${on ? 500 : 400} ${on ? 18 : 16}px/1.35 Pop;color:${on ? INK : '#9FB3C8'};${on ? '' : 'text-decoration:line-through;text-decoration-color:rgba(159,179,200,.55)'}">${on ? r[1] : r[0]}</span></div>`).join('')}</div>`
+    const vs = `<div style="position:absolute;left:1238px;top:470px;width:64px;height:64px;border-radius:50%;background:${GL.color.dark};box-shadow:0 0 0 2px ${GL.color.halo},0 0 40px rgba(114,222,216,.5);display:flex;align-items:center;justify-content:center;font:760 22px Bric;color:#fff;z-index:5">vs</div>`
+    const own = `<div style="position:absolute;left:790px;top:858px;width:1020px;box-sizing:border-box;padding:18px 24px;border-radius:18px;background:linear-gradient(160deg,#0E2A44 0%,#081C30 100%);box-shadow:0 0 0 1px rgba(255,255,255,.16),0 30px 70px rgba(0,6,16,.55);display:flex;align-items:center;gap:26px;z-index:3">
+<div style="flex:none"><p style="margin:0;font:600 13px Pop;letter-spacing:.12em;text-transform:uppercase;color:${GL.color.halo}">¿Y si lo hace mi equipo?</p><p style="margin:4px 0 0;font:760 26px Bric;letter-spacing:-.02em;color:#fff">Complemento, no reemplazo</p></div>
+${[['Velocidad', 'Sin meses de curva de aprendizaje'], ['Método', 'Un sistema probado, multimercado y en español'], ['Foco', 'Tu equipo sigue en lo suyo']].map(([t, d]) => `<div style="flex:1;border-left:1px solid rgba(255,255,255,.14);padding-left:18px"><p style="margin:0;font:600 18px Pop;color:#fff">${t}</p><p style="margin:3px 0 0;font:400 14px/1.35 Pop;color:#C9D6E2">${d}</p></div>`).join('')}</div>`
+    return stageBg(1300, 520) + card(false) + card(true) + vs + own
+      + bigVoice('La diferencia', '¿Qué nos hace distintos?', `Lo puedes<br>${answerHtml('ver', GL.color.teal)}`, `La mayoría vende promesas. Nosotros, un mecanismo que puedes ver y <b style="font-weight:600;color:#fff">medir</b>.`, 2, 118) + urlSign()
+  } }
+  ,
+  // MD2 · E-E-A-T: cuatro letras de vidrio sobre la órbita-plataforma, cada una con lo que construimos; arriba el peso
+  // de E-E-A-T en SEO clásico frente a la IA (de /servicios/posicionamiento-seo/).
+  { id: 'MD2-eeat', body: async () => {
+    const L4 = [['E', 'Experiencia', 'Contenido de primera mano, escrito por quien lo vivió.', 'Autoría demostrable y casos reales', 'Contenido & landings'], ['E', 'Pericia', 'Profundidad, precisión y fuentes que respaldan cada afirmación.', 'Autores con credenciales, contenido revisado', 'Contenido & landings'], ['A', 'Autoridad', 'Que tu marca sea el referente de su sector.', 'PR, link building y entidad clara', 'PR & link building'], ['T', 'Confianza', 'Un sitio seguro, transparente y verificable.', 'Schema, HTTPS y señales de confianza', 'Técnico & schema']]
+    const x0 = 780, w = 232, g = 18
+    const tiles = L4.map(([l, t, d, b, k], i) => { const on = i === 3; return `<div style="position:absolute;left:${x0 + i * (w + g)}px;top:${on ? 250 : 280}px;width:${w}px;height:${on ? 560 : 530}px;box-sizing:border-box;padding:22px 22px 20px;border-radius:22px;display:flex;flex-direction:column;background:linear-gradient(165deg,${on ? '#135064' : '#12344F'} 0%,#081C30 100%);z-index:${on ? 4 : 2};box-shadow:0 0 0 ${on ? 2 : 1}px ${on ? 'rgba(114,222,216,.9)' : 'rgba(255,255,255,.16)'},0 50px 110px rgba(0,6,16,.7),0 0 ${on ? 100 : 30}px rgba(114,222,216,${on ? '.45' : '.12'});${REFLECT}">
+<p style="margin:0;font:760 150px Bric;letter-spacing:-.05em;line-height:.9;color:${on ? '#fff' : '#E6EDF3'}">${l}</p>
+<p style="margin:14px 0 0;font:760 30px Bric;letter-spacing:-.02em;color:#fff">${t}</p>
+<p style="margin:8px 0 0;font:400 16px/1.45 Pop;color:#C9D6E2">${d}</p>
+<div style="margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.14)"><p style="margin:0;font:600 12px Pop;letter-spacing:.1em;text-transform:uppercase;color:${on ? GL.color.halo : SOFT}">Lo construimos con</p><p style="margin:5px 0 0;font:600 16px/1.35 Pop;color:#fff">${b}</p><p style="margin:6px 0 0;font:400 13px Pop;color:${SOFT}">${k}</p></div></div>` }).join('')
+    const meter = `<div style="position:absolute;left:${x0}px;top:132px;width:${4 * w + 3 * g}px;display:flex;gap:18px;z-index:3">${[['En SEO clásico', 'Importante', .55, false], ['En AEO / IA', 'Determinante', 1, true]].map(([a, v, f, on]) => `<div style="flex:1"><div style="display:flex;justify-content:space-between;font:500 15px Pop;color:${SOFT}"><span>Peso de E-E-A-T · ${a}</span><span style="color:${on ? '#fff' : '#C9D6E2'};font-weight:600">${v}</span></div><div style="margin-top:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.1)"><div style="width:${f * 100}%;height:8px;border-radius:99px;background:${on ? GL.color.teal : '#5E7A94'};box-shadow:${on ? '0 0 16px rgba(54,200,191,.6)' : 'none'}"></div></div></div>`).join('')}</div>`
+    return stageBg(1270, 560) + platform(1270, 880, 540, 84) + meter + tiles
+      + bigVoice('E-E-A-T', '¿Por qué te citaría la IA?', answerHtml('Porque confía', GL.color.teal).replace('Porque confía', 'Porque<br>confía'), `La IA no adivina: cita a quien puede <b style="font-weight:600;color:#fff">verificar</b>. Cada entregable construye una de estas señales.`, 2, 118) + urlSign()
+  } }
+  ,
+  // MD3 · DEL TRÁFICO AL NEGOCIO: cuatro escalones de vidrio que suben (tráfico calificado → leads → pipeline →
+  // ingresos); la línea punteada marca dónde se detiene la mayoría y la luz sigue hasta el negocio.
+  { id: 'MD3-trafico-negocio', body: async () => {
+    const S4 = [['01', 'Tráfico calificado', 'Visitas con intención comercial, segmentadas por cluster de tema.', 'Google · IA'], ['02', 'Leads', 'Quién llegó, desde qué búsqueda y qué pidió.', 'Formularios · CRM'], ['03', 'Pipeline', 'Oportunidades que nacen del orgánico, en tu CRM.', 'HubSpot · Salesforce'], ['04', 'Ingresos', 'Lo que el SEO trae al negocio, medido.', 'Greenhouse']]
+    const x0 = 790, w = 250, g = 16, base = 870
+    const steps = S4.map(([n, t, d, k], i) => { const h = 250 + i * 110, on = i === 3; return `<div style="position:absolute;left:${x0 + i * (w + g)}px;top:${base - h}px;width:${w}px;height:${h}px;box-sizing:border-box;padding:20px 20px;border-radius:20px 20px 6px 6px;background:${on ? 'linear-gradient(170deg,#1A6E77 0%,#0B3A4A 100%)' : `linear-gradient(170deg,rgba(114,222,216,${0.10 + i * 0.05}) 0%,#081C30 100%)`};z-index:${2 + i};box-shadow:0 0 0 ${on ? 2 : 1}px ${on ? 'rgba(114,222,216,.9)' : 'rgba(255,255,255,.16)'},0 40px 90px rgba(0,6,16,.6),0 0 ${on ? 110 : 20}px rgba(114,222,216,${on ? '.5' : '.1'})">
+<p style="margin:0;font:300 40px Bric;line-height:1;color:${on ? '#fff' : GL.color.halo}">${n}</p>
+<p style="margin:8px 0 0;font:760 ${on ? 36 : 28}px Bric;letter-spacing:-.025em;line-height:1.02;color:#fff">${t}</p>
+<p style="margin:8px 0 0;font:400 15px/1.4 Pop;color:#D6E2EC">${d}</p>
+<p style="position:absolute;left:20px;bottom:16px;margin:0;font:600 12px Pop;letter-spacing:.1em;text-transform:uppercase;color:${on ? '#fff' : SOFT}">${k}</p></div>` }).join('')
+    const cut = x0 + w + g / 2
+    const line = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="position:absolute;inset:0;z-index:6"><line x1="${cut}" y1="300" x2="${cut}" y2="${base + 30}" stroke="#E6EDF3" stroke-opacity=".6" stroke-width="2" stroke-dasharray="7 8"/></svg>
+<p style="position:absolute;left:${cut - 200}px;top:262px;width:190px;text-align:right;margin:0;font:600 15px/1.3 Pop;color:#E6EDF3;z-index:6">La mayoría de las agencias se detiene aquí</p>`
+    const pts = [0, 1, 2, 3].map(i => [x0 + i * (w + g) + w / 2, base - (250 + i * 110) - 34])
+    const d = 'M ' + pts.map(([px, py], i) => i === 0 ? `${px - 110} ${py + 24} L ${px} ${py}` : `${px} ${py}`).join(' L ')
+    const [ex, ey] = pts[3]
+    const flow = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="position:absolute;inset:0;z-index:7"><defs><linearGradient id="fl" x1="${x0}" y1="0" x2="${x0 + 4 * w}" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${GL.color.halo}" stop-opacity=".2"/><stop offset="1" stop-color="${GL.color.teal}"/></linearGradient><filter id="flg"><feGaussianBlur stdDeviation="7"/></filter></defs>
+<path d="${d}" fill="none" stroke="url(#fl)" stroke-width="14" opacity=".5" filter="url(#flg)" stroke-linejoin="round"/>
+<path d="${d}" fill="none" stroke="url(#fl)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+${pts.slice(0, 3).map(([px, py]) => `<circle cx="${px}" cy="${py}" r="6" fill="${GL.color.halo}" opacity=".8"/>`).join('')}
+<circle cx="${ex}" cy="${ey}" r="18" fill="${GL.color.teal}" filter="url(#flg)"/><circle cx="${ex}" cy="${ey}" r="12" fill="${GL.color.teal}"/></svg>`
+    return stageBg(1300, 560) + `<div style="position:absolute;left:${x0 - 20}px;top:${base}px;width:${4 * w + 3 * g + 40}px;border-top:2px solid rgba(255,255,255,.18);z-index:1"></div>` + steps + line + flow
+      + bigVoice('De tráfico a negocio', '¿Dónde termina el SEO?', answerHtml('En ingresos', GL.color.teal).replace('En ingresos', 'En<br>ingresos'), `Conectamos el SEO con tus indicadores de negocio —leads, pipeline e <b style="font-weight:600;color:#fff">ingresos</b>—, como siempre debió medirse.`, 2, 132) + urlSign()
+  } }
+  ,
+  // MD4 · LO QUE RECIBES EN EL DIAGNÓSTICO («vívelo»): el informe abierto con sus cuatro entregables —score por motor,
+  // share of voice, prompts donde no apareces y plan priorizado— y la lectura experta. Datos de muestra.
+  { id: 'MD4-diagnostico', sel: { targetKind: 'object', label: 'Cliente', participantKind: 'role', anchor: 'bottom-end', scale: 1.0, padding: 'compact' }, body: async () => {
+    const eng = [['ChatGPT', 38], ['AI Overviews', 52], ['Gemini', 31], ['Perplexity', 24], ['Copilot', 18], ['Claude', 27]]
+    const mod = (n, t, inner, w) => `<div style="box-sizing:border-box;padding:16px 18px;border-radius:16px;background:${PAPER};box-shadow:0 0 0 1px ${LINE} inset;${w ? 'grid-column:span 2;' : ''}"><p style="margin:0;font:600 12px Pop;letter-spacing:.1em;text-transform:uppercase;color:${GL.color.tealDark}">${n}</p><p style="margin:3px 0 10px;font:760 20px Bric;letter-spacing:-.015em;color:${INK}">${t}</p>${inner}</div>`
+    const bars = eng.map(([e, v]) => `<div style="display:flex;align-items:center;gap:8px;margin-top:6px"><span style="width:92px;font:500 12px Pop;color:${MUTED}">${e}</span><span style="flex:1;height:8px;border-radius:9px;background:#E3E8EE"><span style="display:block;width:${v}%;height:8px;border-radius:9px;background:${GL.color.dark}"></span></span><span style="width:30px;text-align:right;font:600 12px Pop;color:${INK}">${v}</span></div>`).join('')
+    const sov = `<div style="display:flex;align-items:center;gap:16px"><svg viewBox="0 0 42 42" width="96" height="96"><circle cx="21" cy="21" r="15.9" fill="none" stroke="#E3E8EE" stroke-width="7"/><circle cx="21" cy="21" r="15.9" fill="none" stroke="${GL.color.dark}" stroke-width="7" stroke-dasharray="14 86" stroke-dashoffset="25"/><circle cx="21" cy="21" r="15.9" fill="none" stroke="#5E7A94" stroke-width="7" stroke-dasharray="41 59" stroke-dashoffset="11"/><circle cx="21" cy="21" r="15.9" fill="none" stroke="#9FB3C8" stroke-width="7" stroke-dasharray="28 72" stroke-dashoffset="-30"/></svg><div style="font:500 13px/1.7 Pop;color:${MUTED}"><div><b style="color:${INK}">14%</b> Tu marca</div><div>41% Competidor A</div><div>28% Competidor B</div><div>17% Otros</div></div></div>`
+    const prompts = ['«mejor agencia de [categoría] en Chile»', '«[categoría] precios y comparativa»', '«alternativas a Competidor A»'].map(p => `<div style="display:flex;align-items:center;gap:8px;margin-top:6px;font:400 13px Pop;color:${INK}"><svg viewBox="0 0 16 16" width="15" height="15"><circle cx="8" cy="8" r="7" fill="none" stroke="#B4261A" stroke-width="1.4"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#B4261A" stroke-width="1.4" stroke-linecap="round"/></svg>${p}</div>`).join('')
+    const plan = `<div data-sel style="display:flex;gap:10px">${[['1', 'Corregir cómo te describe la IA', 'Alto impacto'], ['2', 'Schema de organización y entidad', 'Base'], ['3', 'Cluster para los prompts perdidos', 'Contenido']].map(([n, t, k]) => `<div style="flex:1;padding:10px 12px;border-radius:12px;background:#fff;box-shadow:0 0 0 1px ${LINE} inset"><p style="margin:0;font:760 18px Bric;color:${GL.color.tealDark}">${n}</p><p style="margin:2px 0 0;font:600 13px/1.3 Pop;color:${INK}">${t}</p><p style="margin:4px 0 0;font:500 11px Pop;letter-spacing:.06em;text-transform:uppercase;color:${MUTED}">${k}</p></div>`).join('')}</div>`
+    const report = `<div style="position:absolute;left:800px;top:128px;width:880px;box-sizing:border-box;padding:28px 30px 26px;border-radius:26px;background:${CARD};transform:perspective(1800px) rotateY(-6deg);transform-origin:left center;${deep};z-index:3">
+<div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:14px">${tile(ISO, GL.color.dark, 28, 50)}<div><p style="margin:0;font:600 13px Pop;letter-spacing:.12em;text-transform:uppercase;color:${GL.color.tealDark}">Diagnóstico de visibilidad en IA</p><p style="margin:3px 0 0;font:760 28px Bric;letter-spacing:-.02em;line-height:1.05;color:${INK}">Tu marca · Chile</p></div></div><span style="padding:7px 13px;border-radius:999px;background:${PAPER};font:500 13px Pop;color:${MUTED}">Datos de muestra</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px">
+${mod('01 · Score real', 'Tu score por motor de IA', bars)}${mod('02 · Share of voice', 'Frente a tus competidores', sov)}
+${mod('03 · Prompts críticos', 'Donde hoy no apareces', prompts)}${mod('04 · Plan priorizado', 'Tus primeros movimientos', plan)}</div></div>`
+    const chip = `<div style="position:absolute;left:1500px;top:806px;width:330px;box-sizing:border-box;padding:16px 20px;border-radius:18px;background:linear-gradient(160deg,#0F4A5C 0%,#0A2A40 100%);transform:perspective(1400px) rotateY(-14deg);box-shadow:0 0 0 1px rgba(114,222,216,.6),0 30px 70px rgba(0,6,16,.65),0 0 50px rgba(114,222,216,.25);z-index:5"><p style="margin:0;font:600 13px Pop;letter-spacing:.12em;text-transform:uppercase;color:${GL.color.halo}">Lectura experta</p><p style="margin:6px 0 0;font:500 17px/1.35 Pop;color:#fff">El dato lo da la máquina; el criterio lo pone nuestro equipo.</p></div>`
+    return stageBg(1260, 520) + platform(1230, 960, 520, 70) + report + chip
+      + bigVoice('Diagnóstico gratis', '¿Qué recibes primero?', answerHtml('El mapa', GL.color.teal), `En 24–48 h sabes en qué nivel estás y por dónde empezamos a <b style="font-weight:600;color:#fff">subirte</b>. Gratis y sin compromiso.`, 2, 150) + urlSign()
+  } }
+
 ]
 
 const css = `<style>@font-face{font-family:Bric;src:url(${f64('BricolageGrotesque-Variable.ttf')});font-weight:200 800}@font-face{font-family:Pop;src:url(${f64('Poppins-Light.ttf')});font-weight:300}@font-face{font-family:Pop;src:url(${f64('Poppins-Regular.ttf')});font-weight:400}@font-face{font-family:Pop;src:url(${f64('Poppins-Medium.ttf')});font-weight:500}@font-face{font-family:Pop;src:url(${f64('Poppins-SemiBold.ttf')});font-weight:600}@font-face{font-family:Pop;src:url(${f64('Poppins-ExtraBold.ttf')});font-weight:800}@font-face{font-family:Pop;src:url(${f64('Poppins-ExtraBoldItalic.ttf')});font-weight:800;font-style:italic}@font-face{font-family:Pop;src:url(${f64('Poppins-BlackItalic.ttf')});font-weight:900;font-style:italic}@font-face{font-family:'Poppins';src:url(${f64('Poppins-Light.ttf')});font-weight:300}@font-face{font-family:'Poppins';src:url(${f64('Poppins-ExtraBold.ttf')});font-weight:800}@font-face{font-family:'Poppins';src:url(${f64('Poppins-ExtraBoldItalic.ttf')});font-weight:800;font-style:italic}@font-face{font-family:'Poppins';src:url(${f64('Poppins-BlackItalic.ttf')});font-weight:900;font-style:italic}@font-face{font-family:'Bricolage Grotesque';src:url(${f64('BricolageGrotesque-Variable.ttf')});font-weight:200 800}body{margin:0}</style>`
