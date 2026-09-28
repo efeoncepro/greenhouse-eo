@@ -42,9 +42,23 @@ describe('catálogo de runtime', () => {
 })
 
 describe('validateDeckPlan — planes golden', () => {
-  for (const name of ['golden-brochure.json', 'golden-proposal.json', 'golden-pitch.json', 'golden-qbr.json']) {
+  for (const name of ['golden-brochure.json', 'golden-proposal.json']) {
     it(`${name} no tiene errores ni advertencias`, () => {
       expect(validateDeckPlan(read<DeckPlan>(name))).toEqual({ ok: true, issues: [] })
+    })
+  }
+
+  // Pitch y QBR abren y cierran con la portada y el cierre clásicos de AXIS, que el composer no tiene: el plan es válido
+  // y avisa, en esas dos láminas, que el deck todavía no se compone de punta a punta.
+  for (const name of ['golden-pitch.json', 'golden-qbr.json']) {
+    it(`${name} es válido y avisa que sus marcos clásicos no tienen plantilla`, () => {
+      const result = validateDeckPlan(read<DeckPlan>(name))
+
+      expect(result.ok).toBe(true)
+      expect(result.issues.map(issue => [issue.code, issue.recipeId])).toEqual([
+        ['recipe-without-template', 'cover-classic'],
+        ['recipe-without-template', 'close-classic']
+      ])
     })
   }
 })

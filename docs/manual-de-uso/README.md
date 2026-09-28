@@ -47,7 +47,9 @@ La diferencia con otras capas de documentacion:
 - [Componer un deck con las recetas por lámina](creative/componer-deck-con-recetas.md) — armar un brochure, una
   propuesta, un pitch o un QBR de marca Efeonce con las 69 láminas aprobadas el 2026-09-27, **las 69 con plantilla**
   desde el 2026-09-28: elegir documento, portada y contraportada, esqueleto por familias, receta por tramo («cuándo
-  sí», «cuándo no», alternativa), pares y ritmo, cómo elegir la composición (`layout`) de cada receta, slots con su
+  sí», «cuándo no», alternativa), pares y ritmo, **validar el plan con `pnpm brand:deck-plan`** (cómo escribir
+  `plan.json`, tabla de códigos con su arreglo, pedirle el plan al agente con `--propose --context`, costo y
+  credenciales locales; TASK-1929), cómo elegir la composición (`layout`) de cada receta, slots con su
   largo máximo, cifras con fuente, `[MONTO]`, selección (`selected`, `recommended`, `selection.level`), `photo.focus`,
   intent propio, lámina o documento completo con `pnpm brand:compose`, estados y problemas comunes. La ruta dentro de la
   plataforma es TASK-1921, en curso.

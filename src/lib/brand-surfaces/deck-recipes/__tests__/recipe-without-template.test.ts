@@ -15,8 +15,8 @@ const { validateDeckPlan } = await import('../validate')
 describe('recipe-without-template', () => {
   it('avisa (warning) cuando una receta aprobada todavía no tiene plantilla', () => {
     const result = validateDeckPlan({
-      document: 'qbr',
-      slides: ['cover-classic', 'decision-case', 'close-classic'].map(recipeId => ({ recipeId }))
+      document: 'proposal',
+      slides: ['cover-proposal-orbit', 'decision-case', 'close-proposal-horizon'].map(recipeId => ({ recipeId }))
     })
 
     const issue = result.issues.find(entry => entry.code === 'recipe-without-template')
@@ -26,8 +26,8 @@ describe('recipe-without-template', () => {
 
   it('no avisa con recetas que sí tienen plantilla', () => {
     const result = validateDeckPlan({
-      document: 'qbr',
-      slides: ['cover-classic', 'decision-chart', 'close-classic'].map(recipeId => ({ recipeId }))
+      document: 'proposal',
+      slides: ['cover-proposal-orbit', 'decision-chart', 'close-proposal-horizon'].map(recipeId => ({ recipeId }))
     })
 
     expect(result.issues.map(entry => entry.code)).not.toContain('recipe-without-template')

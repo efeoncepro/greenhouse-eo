@@ -167,7 +167,16 @@
   - **Logos de terceros normalizados** al componer (un tono, el mismo peso óptico), con la excepción tonal de Aguas
     Andinas y la UC de Temuco; las barras del gráfico salen de su número (índice, antes = 100); el stack no pinta los
     «pilares de luz» del guion (en la referencia aprobada nunca se vieron).
-  **Pendiente:** nada de TASK-1928; siguen TASK-1929…1932 y la ruta productiva (TASK-1921).
+  **Pendiente:** nada de TASK-1928; siguen TASK-1930…1933 y la ruta productiva (TASK-1921).
+- Plan del deck contra el catálogo (TASK-1929, 2026-09-28): **code complete en `develop` local** (commits `651bb0972`,
+  `5a1fb974b`, `248d3e1de`), `in-progress` hasta docs y gates de cierre. Catálogo de runtime
+  `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` (esquema `efeonce.deck-recipes.runtime.v1`, lo genera
+  `pnpm brand:deck-recipes`), `validateDeckPlan` (piso AXIS + 14 errores y 3 avisos del catálogo) y
+  `proposeDeckPlan` (`claude-sonnet-5`, enum de ids, un reintento, fail-closed); CLI `pnpm brand:deck-plan`. Decisiones
+  de implementación: `sequence-order` retirada (`pairsWith sequence` no tiene dirección); `rhythm-paper-dark` de la spec
+  quedó como `rhythm-paper-run` (sólo papel: tres oscuras seguidas es la norma); `variant` = no adyacentes. Lo que no
+  hace: confirmación humana, API, Nexa y MCP (TASK-1932), datos reales en slots (TASK-1930), plates por `assetId`
+  (TASK-1931), QA abierta del catálogo (TASK-1933).
 - Composición por superficie en Greenhouse (TASK-1919): **hecho, en `origin/develop`** — las 20 recetas aprobadas son
   plantillas del Artifact Composer (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`), `pnpm
   brand:compose` y gate `--catalog=graphic-line` a 0 px. Falta la ruta productiva (TASK-1921, `in-progress` en otra sesión: API, `artifact-worker`,

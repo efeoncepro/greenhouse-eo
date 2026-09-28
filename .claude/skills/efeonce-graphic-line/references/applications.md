@@ -846,6 +846,15 @@ plates sigue siendo TASK-1926.
 plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 `src/lib/brand-surfaces/examples/deck-*-intent.json`.
 
+**Antes de componer un deck entero, valida su plan (TASK-1929, 2026-09-28).** El plan es la lista ordenada de ids de
+receta (`{ document, line?, diagnosisDone?, slides: [{ recipeId, slots?, plateRef?, progress?, purpose? }] }`):
+`pnpm brand:deck-plan -- --plan plan.json` corre `validateDeckPlan` (piso AXIS `resolveSurfaceDocument` en propuesta y
+brochure + reglas del catálogo que AXIS no conoce) y sale con 1 si hay error. El agente puede proponerlo con
+`pnpm brand:deck-plan -- --propose --context context.json [--out plan.json]` (sólo elige ids; un reintento;
+fail-closed). Tabla de códigos, forma del contexto y credenciales: skill `deck-studio` §«Plan del deck». El plan nombra
+recetas, nunca plantillas ni `contentType`; el `deck-plan.json` que escribe `brand:compose` es otra cosa (el `Plan` del
+composer).
+
 | Receta | `layout` | `contentType` |
 |---|---|---|
 | `proposal-cinematic` | `service` (o sin layout) · `hero` · `lines` | `deck.proposal-cinematic` · `.hero` · `.lines` |
@@ -974,8 +983,11 @@ receta, ni una receta sin aprobación.
    plantilla (slot opcional + entrada en `contentTypes`) en vez de duplicarla.
 6. **Mapa y ejemplo:** fila en `recipe-map.json` (`contentType`, `example`, `slots` receta → campo del `slots.json`)
    e intent de ejemplo `src/lib/brand-surfaces/examples/deck-<id>-intent.json` (entra al snapshot de
-   `__tests__/example-plans.test.ts`; actualízalo sólo por este alta). `pnpm brand:deck-recipes` reescribe el índice
-   del README del catálogo (`--check` sólo verifica; no está en un workflow de CI).
+   `__tests__/example-plans.test.ts`; actualízalo sólo por este alta). Si el alta o el cambio toca
+   `EFEONCE_DECK_SLIDE_RECIPES_V1.json`, **corre siempre `pnpm brand:deck-recipes`**: reescribe el índice del README
+   **y** el catálogo de runtime `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` (TASK-1929). `--check`
+   falla si cualquiera de los dos difiere, y el test `deck-recipes/__tests__/catalog-drift.test.ts` lo corre en la
+   suite (CI).
 7. **Paridad:** `recipe-slot-parity.test.ts` (campo, tipo, obligatoriedad y el mismo largo máximo; en una plantilla
    compartida manda el mayor), `recipe-map.test.ts` y `plan-surface-piece.test.ts`.
 8. **Gate y registro:** componer el ejemplo con `pnpm brand:compose` y compararlo **a ojo** con la referencia

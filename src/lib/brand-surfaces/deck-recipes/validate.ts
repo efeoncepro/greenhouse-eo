@@ -220,8 +220,10 @@ export const validateDeckPlan = (plan: DeckPlan): DeckPlanValidation => {
       add('recipe-not-for-document', `«${recipe.id}» no va en un ${plan.document} (documentos: ${recipe.documents.join(', ')}).`, { index, recipeId: recipe.id })
     }
 
-    if (!recipe.template && recipe.axis?.page) {
-      add('recipe-without-template', `«${recipe.id}» está aprobada pero todavía no tiene plantilla en el composer.`, { index, recipeId: recipe.id })
+    // También la portada y el cierre clásicos de AXIS: el plan los admite en pitch y QBR, pero el composer no tiene
+    // plantilla para ellos, así que ese deck todavía no se compone de punta a punta.
+    if (!recipe.template) {
+      add('recipe-without-template', `«${recipe.id}» no tiene plantilla en el composer todavía: la lámina no se compone con \`pnpm brand:compose\`.`, { index, recipeId: recipe.id })
     }
 
     if (recipe.id === 'decision-next-steps' && plan.document === 'proposal' && plan.diagnosisDone === true) {

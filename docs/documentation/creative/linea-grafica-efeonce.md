@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.14
+> **Version:** 1.15
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -475,8 +475,8 @@ La **portada de brochure con la selección de Nexa** sobre «Crecer.» también 
 la regla que no admitía selección en una portada de brochure. La selección va sobre la respuesta, nunca sobre la
 persona, con un solo cursor «Nexa».
 
-Lo que falta —la ruta dentro de la plataforma (TASK-1921, en curso), validar un plan de deck completo, datos reales en
-las casillas, el banco de fotos gobernado y el deck desde Proposal Studio— está en
+Lo que falta —la ruta dentro de la plataforma (TASK-1921, en curso), confirmar y guardar el plan del deck (validarlo ya
+se puede: delta de abajo), datos reales en las casillas, el banco de fotos gobernado y el deck desde Proposal Studio— está en
 [Composición de decks y brochures de marca propia](./composicion-de-decks-y-brochures.md#qué-no-hace-todavía).
 
 > Detalle técnico: [composición de decks y brochures](./composicion-de-decks-y-brochures.md) ·
@@ -484,6 +484,21 @@ las casillas, el banco de fotos gobernado y el deck desde Proposal Studio— est
 > [norma §7](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#7-estado-y-pendientes) · AXIS `v0.3.21`
 > (`axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19) ·
 > [TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
+
+## Delta 2026-09-28 (b) — el plan del deck se valida antes de componer
+
+Desde el 2026-09-28 la **lista de láminas** de un deck (su plan, nombrando cada lámina por su receta) se revisa en
+segundos con `pnpm brand:deck-plan`, antes de escribir los textos y componer. Revisa, con AXIS y con el catálogo de
+recetas, que cada lámina exista y sirva para ese documento, que la portada vaya primero y el cierre al final y sean
+pareja, que no haya dos cierres, variantes seguidas ni la misma foto dos veces, y que los textos ya escritos quepan.
+Un agente también puede **proponer** el plan: elige recetas del catálogo por su id, sin escribir textos ni cifras, y la
+persona decide si lo usa. Revisar o proponer no compone ni guarda nada; confirmar y guardar el plan, y pedirlo desde el
+portal, Nexa o MCP, es TASK-1932.
+
+> Detalle técnico: [composición de decks y brochures, «Validar y proponer el plan»](./composicion-de-decks-y-brochures.md#validar-y-proponer-el-plan-antes-de-componer) ·
+> [manual, paso 4b](../../manual-de-uso/creative/componer-deck-con-recetas.md#paso-4b--valida-el-plan-antes-de-componer) ·
+> [catálogo de recetas, códigos](../../operations/brand-graphic-line/deck-recipes/README.md#validar-el-plan-códigos-y-cómo-leerlos) ·
+> [TASK-1929](../../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md)
 
 ## Estado y pendientes
 

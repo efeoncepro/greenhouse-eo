@@ -146,6 +146,8 @@ Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 > `pnpm brand:compose -- --intent <intent.json>` (detalle en `deck-studio`). **Proposal Studio sigue emitiendo
 > `deck-axis`:** que arme el deck de La órbita desde recetas es TASK-1932 (to-do), y la ruta productiva de piezas de
 > marca (API, worker, MCP) es TASK-1921, en curso; ninguna de las dos está disponible todavía.
+> TASK-1932 consumirá `validateDeckPlan` / `proposeDeckPlan` (`src/lib/brand-surfaces/deck-recipes`, TASK-1929) para el
+> plan de recetas antes de la confirmación humana; hoy sólo existen por CLI (`pnpm brand:deck-plan`).
 
 ### Las que puntúan (no son opcionales)
 

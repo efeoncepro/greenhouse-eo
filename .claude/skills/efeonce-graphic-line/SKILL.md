@@ -38,6 +38,7 @@ dos esferas en una pieza (manzana + lente u órbita).
 | **Añadir o modificar una receta del deck de punta a punta** (token y release en AXIS → builder, plantilla, slots, registro, mapa y ejemplo en Greenhouse → paridad → gate y ledger) | [applications.md §L, «Añadir o modificar una receta del deck»](references/applications.md) + [lessons.md](references/lessons.md) (2026-09-27/28) + [qa-checklist.md §8d](references/qa-checklist.md) |
 | **Cambiar la foto, el copy o la sección de una lámina ya compuesta** (qué campo del intent, recorte, espejo en `panel-end`, sección partida sin control de foco) | [applications.md §L, «Cambiar la foto, el copy o la sección»](references/applications.md) + [manual de uso](../../../docs/manual-de-uso/creative/componer-por-superficie-con-axis.md) + [qa-checklist.md §8d](references/qa-checklist.md) |
 | **Elegir o armar una lámina de deck de marca propia** (brochure, propuesta, pitch, QBR): cuál de las 69 aprobadas usa cada documento, cuándo sí y cuándo no, pares, slots, foto y prompt | [catálogo de recetas por lámina](../../../docs/operations/brand-graphic-line/deck-recipes/README.md) + [norma §4.6, «Recetas por lámina»](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) + [manual](../../../docs/manual-de-uso/creative/componer-deck-con-recetas.md) + skill `deck-studio` |
+| **Planificar un deck entero y validarlo antes de componer** (plan de ids de receta, `pnpm brand:deck-plan -- --plan`, códigos de error y aviso, propuesta del agente con `--propose --context`) | skill `deck-studio` §«Plan del deck» + [applications.md §L, «Componer el deck hoy»](references/applications.md) + [qa-checklist.md §8d](references/qa-checklist.md) |
 | **Una pieza para una superficie concreta** — hero web, DOOH (caminero, paleta), pDOOH (LED, mupi, spot, variantes), gráfica animada con foto, video (cartela, zócalo, super, subtítulos) o lámina de deck (incluida la propuesta de cine `proposal-cinematic`): recetas aprobadas, opciones, pendientes, rechazos, firma por soporte y cómo se compone con AXIS | [norma de composición por superficie](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) + [applications.md §L](references/applications.md) + guías AXIS `docs/agent-composition/surfaces/` (en `main` de AXIS; [Lab](https://axis.efeonce.org/references/surfaces/)) + la página de la superficie en el [canvas](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina «Guía · cómo componer …»). **Receta aprobada → `pnpm brand:compose`** ([norma §2.1](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919), [manual de uso](../../../docs/manual-de-uso/creative/componer-por-superficie-con-axis.md)) |
 | **El criterio**: qué significa cada elemento (anillo, arco, esfera, halo, lente, foco, voces, eslogan, firma), cuándo usar la órbita y cuándo no, con qué se combina y qué delata que no se entendió la línea — **léelo primero** | [references/criteria.md](references/criteria.md) |
 | Saber qué existe: tokens, contratos, funciones del paquete, assets, comandos, versiones, el mapa del Lab | [references/package-and-tokens.md](references/package-and-tokens.md) |
@@ -109,7 +110,8 @@ dos esferas en una pieza (manzana + lente u órbita).
     plantilla bajo `pnpm composer:visual-gate --catalog=graphic-line`. **Deck (2026-09-27): las 69 láminas están
     aprobadas y cada una tiene su receta** en `docs/operations/brand-graphic-line/deck-recipes/`
     (`efeonce.deck-slide-recipes.v1`); una lámina de marca propia se **elige** del catálogo de recetas, no se inventa,
-    y se **compone** con el intent de AXIS. **Las 69 componen con `brand:compose`** sobre 50 plantillas (mapa
+    y se **compone** con el intent de AXIS; **antes de componer un deck, su plan (ids de receta) pasa por
+    `pnpm brand:deck-plan -- --plan plan.json`** sin errores (TASK-1929; detalle en `deck-studio` §«Plan del deck»). **Las 69 componen con `brand:compose`** sobre 50 plantillas (mapa
     receta → `contentType` → plantilla en la skill `deck-studio`, `composition.md` §«Mapa receta → plantilla»); la
     portada `cover-brochure-cine-lines-selection` compone desde el 2026-09-28 con el layout `document-selection` (AXIS
     0.3.21; el operador relajó «sin selección en cover-brochure» sólo para ella). Las plantillas hornean las decisiones
@@ -123,7 +125,8 @@ dos esferas en una pieza (manzana + lente u órbita).
     **Añadir o cambiar una receta** es otra cosa: AXIS primero, luego Greenhouse, paridad y gate
     ([applications.md §L](references/applications.md), «Añadir o modificar una receta del deck»). **Estado
     (2026-09-28):** TASK-1927 y TASK-1928 `complete`, aprobadas por el operador y en `origin/develop`; la ruta
-    productiva (TASK-1921) está `in-progress` en otra sesión y **no** está disponible.
+    productiva (TASK-1921) está `in-progress` en otra sesión y **no** está disponible; el validador del plan (TASK-1929)
+    está code complete en `develop` local.
 14. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado; la prueba sin
     logo va antes de cualquier pauta con la órbita. «Te hacemos visible» no sale a pauta sin revisión legal.
 

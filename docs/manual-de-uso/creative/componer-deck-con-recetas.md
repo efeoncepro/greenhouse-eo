@@ -1,9 +1,9 @@
 # Componer un deck con las recetas por lámina — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se arma con el catálogo de recetas, comandos locales y el Artifact Composer (la ruta productiva gobernada es TASK-1921, en curso en otra sesión: todavía no está disponible)
 > **Documentacion relacionada:** [Composición de decks y brochures (funcional)](../../documentation/creative/composicion-de-decks-y-brochures.md) · [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) · [Norma de composición por superficie §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Componer una pieza por superficie con AXIS](./componer-por-superficie-con-axis.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
@@ -38,13 +38,14 @@ cliente, para las ofertas a comité del catálogo `deck-axis` ni para la interfa
 - **Crea una carpeta de trabajo para tus intents**, fuera de `src/lib/brand-surfaces/examples/`. Esa carpeta es de
   los ejemplos y está vigilada por una prueba: no se editan ni se agregan ahí los intents de una pieza.
 
-## El flujo en cinco pasos
+## El flujo en seis pasos
 
-1. Elige la lámina en el catálogo de 69 recetas.
-2. Busca su intent de ejemplo: **las 69** recetas tienen plantilla y un ejemplo listo para copiar.
-3. Copia el ejemplo a tu carpeta y cambia el copy, las cifras y las fotos.
-4. Compón la lámina o el documento completo con `pnpm brand:compose`.
-5. Revisa a ojo contra la referencia aprobada.
+1. Elige las láminas en el catálogo de 69 recetas (o pídele a un agente que proponga el plan).
+2. Valida el plan del deck con `pnpm brand:deck-plan` y corrige hasta que no queden errores.
+3. Busca el intent de ejemplo de cada lámina: **las 69** recetas tienen plantilla y un ejemplo listo para copiar.
+4. Copia el ejemplo a tu carpeta y cambia el copy, las cifras y las fotos.
+5. Compón la lámina o el documento completo con `pnpm brand:compose`.
+6. Revisa a ojo contra la referencia aprobada.
 
 El paso a paso de abajo los detalla.
 
@@ -109,6 +110,179 @@ Criterios rápidos:
   servicio).
 - **Ritmo:** alterna papel y oscuro; no pongas dos secciones partidas con la misma esquina seguidas; no repitas el
   mismo plate en el mismo deck.
+
+El paso 4b revisa casi todo esto por ti.
+
+### Paso 4b · Valida el plan antes de componer
+
+Antes de escribir intents y componer, escribe el **plan** del deck y valídalo. Es un archivo corto con la lista de
+láminas por receta; el comando lo revisa contra el catálogo y contra AXIS en segundos, no escribe nada y no compone
+nada.
+
+#### 1. Escribe `plan.json`
+
+Guárdalo en tu carpeta de trabajo:
+
+```json
+{
+  "document": "brochure",
+  "line": "growth",
+  "slides": [
+    { "recipeId": "cover-brochure-cine-lines" },
+    { "recipeId": "proposal-cinematic-creative" },
+    { "recipeId": "section-cine-about" },
+    { "recipeId": "method-staircase" },
+    { "recipeId": "content-measure" },
+    { "recipeId": "decision-case" },
+    { "recipeId": "close-brochure-orbit" }
+  ]
+}
+```
+
+| Campo | Qué va | Obligatorio |
+|---|---|---|
+| `document` | `brochure`, `proposal`, `pitch` o `qbr` | sí |
+| `line` | la línea de servicio del documento (por ejemplo `growth`) | no |
+| `diagnosisDone` | `true` si es una propuesta enviada **después** del diagnóstico | no |
+| `slides` | las láminas en orden, al menos una | sí |
+| `slides[].recipeId` | el **id del catálogo** (`cover-proposal-orbit`, `content-pricing`…), nunca el nombre de la plantilla (`CoverBrochure`) ni el `contentType` (`deck.content-text`) | sí |
+| `slides[].slots` | los textos de la lámina, **por nombre de slot del catálogo** (`eyebrow`, `question`, `answer`, `evidence`…). Si no lo pones, la lámina es un esqueleto y sus textos no se revisan | no |
+| `slides[].plateRef` | otra foto para esa lámina, si no usas el plate de su receta | no |
+
+Los nombres de los slots son los del **catálogo**, no los campos del intent (`voice`, `body`). Para ver los de una
+receta, con su tipo, si es obligatorio y su largo máximo:
+
+```bash
+node -e 'const c=require("./src/lib/brand-surfaces/deck-recipes/catalog.generated.json");
+const r=c.recipes.find(r => r.id === "cover-brochure-cine-lines");
+console.table(r.slots)'
+```
+
+El orden recomendado: valida primero el esqueleto (sin `slots`) y, cuando ya tengas los textos, agrégalos y vuelve a
+validar para comprobar que caben.
+
+#### 2. Corre la validación
+
+```bash
+pnpm brand:deck-plan -- --plan <tu-carpeta>/plan.json
+```
+
+Un plan sin problemas responde `✓ Plan válido (0 aviso(s))`. Uno con problemas lista cada uno así (salida real):
+
+```text
+✗ Plan inválido: 2 error(es)
+  ✗ frame-photo-must-alternate [axis] · lámina 3 (close-brochure-horizon)
+    AXIS: frame-photo-must-alternate (pages[2])
+  ✗ pair-cover-close-mismatch [catalog] · lámina 3 (close-brochure-horizon)
+    «close-brochure-horizon» no es pareja aprobada de «cover-brochure-cine-lines» (parejas: close-brochure-orbit).
+```
+
+Cómo leer cada línea:
+
+- **`✗` es un error, `!` es un aviso.** Con un solo error el comando termina con código 1 y el plan no está listo. Los
+  avisos no impiden nada: mira si tienen sentido en tu deck.
+- **`[axis]` o `[catalog]`** dice quién lo detectó: AXIS (las reglas del documento; sólo en brochure y propuesta) o el
+  catálogo de recetas. Un mismo problema no sale dos veces con dos nombres.
+- **`lámina N (receta)`** cuenta desde 1. Si el problema es de todo el plan, dice `plan`. Si es de un texto, agrega el
+  slot.
+- En los códigos de AXIS, `pages[i]` cuenta desde 0: `pages[2]` es la lámina 3.
+
+#### 3. Corrige según el código
+
+| Código | Tipo | Qué significa | Cómo lo corriges |
+|---|---|---|---|
+| `plan-invalid` | error | al plan le falta algo básico: `document` no es uno de los cuatro, `slides` está vacío, una lámina no trae `recipeId` o `slots` no es un objeto | completa el campo que nombra el mensaje |
+| `template-named-instead-of-recipe` | error | nombraste una plantilla o un `contentType` (`CoverBrochure`, `deck.content-text`) en vez de una receta | usa el id del catálogo (columna «id» del [índice](../../operations/brand-graphic-line/deck-recipes/README.md#índice)) |
+| `recipe-unknown` | error | ese id no está en el catálogo (por ejemplo `proposal-service-seo`) | busca la receta en el índice; si ninguna sirve, pídesela al operador |
+| `recipe-not-for-document` | error | la receta no va en ese documento (por ejemplo la cotización en un brochure) | cámbiala por una que sí vaya; el mensaje lista sus documentos |
+| `frame-count` | error | hay más de una portada o más de un cierre (y con dos cierres, el eslogan saldría dos veces) | deja una portada y un cierre |
+| `frame-order` | error | la portada no va primera o el cierre no va último | mueve la portada al inicio y el cierre al final |
+| `pair-cover-close-mismatch` | error | el cierre no es pareja aprobada de la portada | usa una de las parejas que lista el mensaje |
+| `next-steps-after-diagnosis` | error | pusiste «Próximos pasos» en una propuesta con `diagnosisDone: true` | quita `decision-next-steps` |
+| `variant-adjacent` | error | dos versiones de la misma lámina van seguidas (por ejemplo la tabla y la escena de cotización) | elige una de las dos |
+| `plate-repeated` | error | la misma foto sale dos veces en el deck | cambia una lámina por otra, o dale otra foto con `plateRef` |
+| `slot-unknown` | error | escribiste un slot que esa receta no tiene (por ejemplo el eslogan en una portada: ninguna portada lo lleva) | quita el slot o revisa su nombre en el catálogo |
+| `slot-type-invalid` | error | el valor no es del tipo del slot (un número donde va texto, un texto donde va una lista) | escribe el valor con el tipo que dice el mensaje |
+| `slot-required-missing` | error | falta un slot obligatorio en una lámina que ya trae `slots` | escríbelo, o quita `slots` para dejar la lámina como esqueleto |
+| `slot-over-max-chars` | error | el texto pasa el largo máximo (en un texto enriquecido cuenta cada línea sin `**`; en una lista, cada ítem) | acorta el texto; nunca subas el `maxChars` |
+| `recipe-without-template` | aviso | la lámina no tiene plantilla en el composer. Las 69 recetas la tienen; hoy sólo sale en la portada y el cierre clásicos de un pitch o un QBR (`cover-classic`, `close-classic`) | ese deck se valida pero todavía no se compone de punta a punta: avísale al operador |
+| `section-split-corner-adjacent` | aviso | dos secciones partidas seguidas con la misma esquina (sin `layout` cuenta como esquina arriba) | alterna `section-split` con `section-split-corner-bottom` o `section-split-panel-end`, o separa las secciones |
+| `rhythm-paper-run` | aviso | tres láminas de papel (fondo claro) seguidas | intercala una oscura o con foto |
+| `brochure-cover-first` | error, AXIS | el brochure no abre con su portada | pon una portada de brochure primero |
+| `brochure-close-last` | error, AXIS | el brochure no termina con su contraportada | pon la contraportada al final |
+| `brochure-needs-service-page` | error, AXIS | el brochure no tiene ninguna página de servicio | agrega una (por ejemplo `proposal-cinematic-*` o `proposal-service-*`) |
+| `frame-photo-must-alternate` | error, AXIS | portada y cierre llevan foto los dos, o ninguno | cambia uno por su pareja con o sin foto |
+| `document-line-mismatch` | error, AXIS | la portada o el cierre llevan una línea distinta a la del documento | usa la misma línea en `line` y en las láminas del marco |
+| `use-not-for-recipe` | error, AXIS | la lámina no sirve para ese uso (por ejemplo una contraportada de brochure en una propuesta) | cámbiala por la del documento correcto |
+| `progress-required` | error, AXIS | la lámina necesita saber en qué sección del deck va y no se pudo deducir | revisa que el plan tenga secciones, o agrega `progress` a esa lámina (`{ "sections": N, "current": n }`) |
+
+Si AXIS devuelve otro código, el mensaje lo trae tal cual: búscalo en
+[los códigos de un documento](./componer-por-superficie-con-axis.md#códigos-de-un-documento).
+
+#### 4. O pídele el plan a un agente
+
+En vez de escribir el plan a mano, puedes pedirle uno al agente. Escribe un `context.json`:
+
+```json
+{
+  "document": "brochure",
+  "audience": "reading",
+  "line": "growth",
+  "sections": ["qué hace Efeonce", "cómo trabajamos", "pruebas", "cierre"],
+  "availableFacts": ["caso Sky publicado"],
+  "brief": "Brochure general de servicios 2026 para enviar a un prospecto."
+}
+```
+
+| Campo | Qué va | Obligatorio |
+|---|---|---|
+| `document` | `brochure`, `proposal`, `pitch` o `qbr` | sí |
+| `audience` | `room` (se presenta en sala) o `reading` (se lee sin presentador) | no |
+| `line` | la línea de servicio | no |
+| `diagnosisDone` | `true` o `false` | no |
+| `sections` | los temas del deck en orden, entre 1 y 20 | sí |
+| `availableFacts` | **nombres** de hechos que puedes usar (hasta 20), nunca sus valores | no |
+| `brief` | una línea de intención, hasta 200 caracteres | no |
+
+Sólo se aceptan esos campos. Cualquier otro (un id de organización, un monto, un nombre de persona) hace que el
+comando falle con `✗ Contexto inválido` **antes** de llamar al modelo. Cada texto admite hasta 200 caracteres.
+
+```bash
+pnpm brand:deck-plan -- --propose --context <tu-carpeta>/context.json --out <tu-carpeta>/plan.json
+```
+
+La respuesta trae el modelo y los intentos, los **tokens** usados y un **costo estimado** en dólares (calculado con una
+tarifa de referencia; no es la factura), la lista de láminas con para qué está cada una, el porqué del plan y los
+avisos. Con `--out`, el plan queda escrito en tu carpeta. Sin `--out`, sólo se imprime.
+
+Lo que tienes que saber:
+
+- **Cada corrida cuesta.** Una propuesta real de un brochure de 16 láminas costó cerca de USD 0,09 el 2026-09-28. No
+  la repitas para «ver otra opción» sin necesidad.
+- **El agente sólo elige recetas del catálogo** para ese documento y no escribe textos ni cifras.
+- **Si su primer plan tiene errores, lo corrige una vez.** Si el segundo también los tiene, responde
+  `✗ Sin plan válido`, muestra el plan rechazado sólo para diagnóstico y no escribe `--out`.
+- **`proposal-unavailable`** significa que el proveedor del modelo no respondió. Reintenta más tarde; no hay detalle
+  del error a propósito.
+- **Tú confirmas.** El plan propuesto es una sugerencia: revísalo, ajústalo si hace falta y vuelve a validarlo con
+  `--plan` después de cualquier cambio. Hoy la confirmación no queda registrada en ninguna parte (TASK-1932).
+
+**Credenciales para correrlo en tu equipo.** La propuesta usa el cliente de Anthropic de Greenhouse. Si tu
+`.env.local` no las trae, necesitas `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key` y
+`GCP_PROJECT=efeonce-group`, con tu sesión de `gcloud` (ADC) vigente:
+
+```bash
+ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key GCP_PROJECT=efeonce-group \
+  pnpm brand:deck-plan -- --propose --context <tu-carpeta>/context.json --out <tu-carpeta>/plan.json
+```
+
+Validar con `--plan` no necesita credenciales ni red.
+
+#### Qué no hace todavía
+
+- No convierte el plan en intents ni compone: eso sigue siendo `pnpm brand:compose` (pasos 7 a 9).
+- No llena los slots con datos reales (TASK-1930) ni elige fotos del banco (TASK-1931).
+- No está en el portal, en Nexa ni en MCP, y no guarda la confirmación (TASK-1932).
 
 ### Paso 5 · Llena los slots
 
@@ -227,6 +401,9 @@ La plantilla no se toca: si una lámina necesita otra disposición, se cambia de
 
 ### Paso 9 · Compón
 
+Antes de componer un documento completo, confirma que su plan pasó el paso 4b sin errores. El plan y el intent son
+archivos distintos: si cambiaste láminas al escribir los intents, actualiza el plan y vuelve a validarlo.
+
 Una lámina:
 
 ```bash
@@ -335,6 +512,14 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 | El documento no produce ninguna página | un solo problema deja el documento sin componer | lee el código: `brochure-cover-first` (la portada va primero), `brochure-close-last` (el cierre va al final), `brochure-needs-service-page` (falta una página de servicio), `document-line-mismatch` (portada y cierre llevan la línea del documento), `frame-photo-must-alternate` (portada y contraportada no pueden llevar foto las dos), `page[i]:<código>` (el problema está en esa página) |
 | La prueba de ejemplos falla después de tu cambio | editaste o agregaste un intent en `src/lib/brand-surfaces/examples/` | deja los ejemplos como estaban y guarda tu intent en tu carpeta |
 | La lámina se ve distinta de la referencia aprobada en una etiqueta chica, el tamaño de la respuesta, la fuente de una cifra, el logo de una sección con foto o el velo de «quiénes somos» | la plantilla aplica la norma sobre la referencia (D1, 3×, fuentes visibles, sin logo ni velo en láminas interiores con foto) | es lo esperado; la decisión de cada caso está en «Pendientes de QA» del catálogo |
+| `pnpm brand:deck-plan` responde `Uso: …` y sale con código 2 | no le pasaste `--plan` ni `--propose` | usa `-- --plan <plan.json>` o `-- --propose --context <context.json>` (el `--` después del nombre del comando es necesario) |
+| `✗ No se pudo leer plan.json` | la ruta no existe o el JSON está mal escrito | revisa la ruta y valida el JSON (comas, comillas) |
+| `✗ --propose necesita --context <context.json>` | pediste una propuesta sin contexto | agrega `--context` con tu `context.json` |
+| `✗ Contexto inválido: El contexto no admite …` | el `context.json` trae un campo fuera de la lista permitida (por ejemplo un id de cliente o un monto) | deja sólo `document`, `audience`, `line`, `diagnosisDone`, `sections`, `availableFacts` y `brief` |
+| La propuesta falla con `proposal-unavailable` y 0 tokens (en el log previo puede aparecer «[secrets] Secret ref normalization failed») | faltan las credenciales del cliente de Anthropic en tu equipo | define `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key` y `GCP_PROJECT=efeonce-group`, y renueva tu sesión de `gcloud` si venció |
+| `✗ Sin plan válido` después de dos intentos | el agente no logró un plan sin errores | lee los códigos del plan rechazado, ajusta el contexto (por ejemplo, agrega un tema de servicios a un brochure) o escribe el plan a mano |
+| `proposal-unavailable [agent]` | el proveedor del modelo no respondió | reintenta más tarde o escribe el plan a mano |
+| El plan valida, pero `pnpm brand:compose` rechaza una lámina | el plan revisa la secuencia y los largos de sus `slots`; el intent tiene campos que el plan no ve (cifras con fuente, `selected`, `column.topPx`) | corrige el intent según la fila de este cuadro que corresponda al código |
 | La lámina «quiénes somos» se ve con un velo oscuro | el velo viene horneado en el plate, no de la plantilla | pide el plate con la reserva izquierda, sin velo |
 
 ## Referencias técnicas
@@ -353,6 +538,13 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
   `efeonce.surface-composition` 0.1.2 (`axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19); un intent 0.1.0 o 0.1.1
   resuelve igual.
 - Paridad de slots receta ↔ plantilla: `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts`.
+- Plan del deck (TASK-1929): `validateDeckPlan` y `proposeDeckPlan` en `src/lib/brand-surfaces/deck-recipes/`
+  (`validate.ts`, `issues.ts` con los códigos, `propose.ts` `server-only` sobre el cliente canónico
+  `generateStructuredAnthropic`, modelo `claude-sonnet-5`, dos intentos como máximo); catálogo de runtime
+  `catalog.generated.json`, generado por `pnpm brand:deck-recipes`; comando `pnpm brand:deck-plan`
+  (`scripts/brand-surfaces/deck-plan.ts`); planes de ejemplo en `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/`
+  (`golden-*.json`, `adversarial.json`, `context-brochure.json`). Arquitectura:
+  [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
 - Tasks: TASK-1927 (31 recetas: el marco, secciones clásica y partida, medida, tríptico, escalera y propuestas de
   cine; `complete`); TASK-1928 (las 38 restantes y la portada con selección; `complete`, en `develop`); ruta
   productiva gobernada, TASK-1921 (en curso, todavía no disponible); fotos idempotentes, TASK-1926; plan de deck

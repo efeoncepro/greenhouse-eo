@@ -1,9 +1,11 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.4: revisión de consistencia — todo empujado a `develop`,
+> **Última actualización:** 2026-09-28 por Claude (1.5: sección «Validar el plan: códigos y cómo leerlos» —
+> `pnpm brand:deck-plan`, códigos del catálogo y de AXIS, avisos, propuesta del agente y catálogo de runtime generado
+> (TASK-1929). Antes, 1.4: revisión de consistencia — todo empujado a `develop`,
 > cuándo va el `layout` explícito, qué campo lleva la selección, `photo.focus` sólo en el reloj del día a día, TASK-1921
 > en curso, enlace a la documentación funcional. Antes, 1.3: la portada con selección compone — layout `document-selection`,
 > AXIS 0.3.21; **69 de 69** recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla, las familias
@@ -396,14 +398,66 @@ Los montos no son dato del intent: la cotización imprime siempre `[MONTO]`. El 
 
 Las fotos se piden por ficha (`pnpm foto:prompt`, `foto:generar`, `foto:validar`, `foto:emblema`, `foto:isotipo`); su
 producción idempotente es TASK-1926 y el banco de plates gobernado, TASK-1931. La ruta productiva gobernada (fuera
-del taller local) es TASK-1921, en curso; el plan de deck validado es TASK-1929, los datos reales en los slots
-TASK-1930 y el deck desde Proposal Studio TASK-1932.
+del taller local) es TASK-1921, en curso; el plan de deck ya se valida (sección de abajo, TASK-1929); los datos reales en los slots
+son TASK-1930 y el deck desde Proposal Studio, con la confirmación del plan, TASK-1932.
+
+## Validar el plan: códigos y cómo leerlos
+
+Desde el 2026-09-28 (TASK-1929) el **plan** de un deck —la lista de láminas, cada una por su `id` de este catálogo—
+se valida antes de componer:
+
+```bash
+pnpm brand:deck-plan -- --plan <plan.json>
+pnpm brand:deck-plan -- --propose --context <context.json> [--out <plan.json>]   # el agente propone; cuesta tokens
+```
+
+El plan (`document`, `line?`, `diagnosisDone?`, `slides[{ recipeId, slots?, plateRef? }]`) nombra **recetas por id**,
+nunca plantillas ni `contentType`; los `slots` usan los nombres de slot de este catálogo. Validar no escribe ni compone
+nada. Paso a paso, formato de `context.json` y problemas comunes:
+[manual de uso, paso 4b](../../../manual-de-uso/creative/componer-deck-con-recetas.md#paso-4b--valida-el-plan-antes-de-componer).
+
+Cada problema sale con su **fuente**: `[axis]` para las reglas de documento que AXIS ya valida (sólo brochure y
+propuesta, y sólo cuando todas las láminas existen) y `[catalog]` para las de este catálogo. Una regla vive en una sola
+de las dos: si AXIS ya la marcó en una lámina, el catálogo no la repite.
+
+| Código | Fuente | Tipo | Qué campo del catálogo lo decide |
+|---|---|---|---|
+| `plan-invalid` | catalog | error | forma del plan |
+| `template-named-instead-of-recipe` | catalog | error | el plan nombra una plantilla, un `contentType`, un id que empieza con `deck.` o con mayúscula |
+| `recipe-unknown` | catalog | error | `id` (acepta `cover-classic` y `close-classic` sólo en pitch y QBR; una familia de AXIS como `proposal-cinematic` no es receta) |
+| `recipe-not-for-document` | catalog | error | `documents` |
+| `frame-count` | catalog | error | más de una portada o de un cierre (cubre también el eslogan dos veces) |
+| `frame-order` | catalog | error | portada primera y cierre último |
+| `pair-cover-close-mismatch` | catalog | error | `pairsWith` con `cover↔close` |
+| `next-steps-after-diagnosis` | catalog | error | `decision-next-steps` en una propuesta con `diagnosisDone: true` |
+| `variant-adjacent` | catalog | error | `pairsWith` con `variant`: dos variantes seguidas |
+| `plate-repeated` | catalog | error | el plate de la receta (o `plateRef`) repetido en el plan; cierra el pendiente «plate repetido» dentro de un plan |
+| `slot-unknown` | catalog | error | `slots[].name` (el eslogan en una portada cae aquí: ninguna portada lo tiene) |
+| `slot-type-invalid` | catalog | error | `slots[].type` |
+| `slot-required-missing` | catalog | error | `slots[].required`, sólo si la lámina ya trae `slots` |
+| `slot-over-max-chars` | catalog | error | `slots[].maxChars` (texto: largo total; `richText`: por línea, sin `**`; lista: por ítem) |
+| `recipe-without-template` | catalog | aviso | lámina sin plantilla en el composer (hoy sólo `cover-classic`/`close-classic` en pitch y QBR) |
+| `section-split-corner-adjacent` | catalog | aviso | dos secciones partidas seguidas con la misma esquina |
+| `rhythm-paper-run` | catalog | aviso | tres láminas de papel seguidas (una vez por tramo) |
+| `brochure-cover-first`, `brochure-close-last`, `brochure-needs-service-page`, `frame-photo-must-alternate`, `document-line-mismatch`, `use-not-for-recipe`, `progress-required` | axis | error | el contrato de documento de AXIS; los de página (`page[i]:x`) salen como `x` en la lámina i |
+| `proposal-unavailable` | agent | error | sólo al proponer: el proveedor del modelo no respondió |
+
+Reglas del catálogo **sin código propio**, porque otra ya las cubre: la alternancia foto ↔ sin foto
+(`frame-photo-must-alternate` de AXIS), el eslogan en la portada (`slot-unknown`), el eslogan dos veces
+(`frame-count`) y el mensaje de cierre o las familias que un documento excluye (`recipe-not-for-document`). **No hay
+regla de orden de secuencia:** `pairsWith` con `sequence` dice qué láminas van juntas, no en qué orden
+(`proposal-cinematic-nexa-lines` lista una portada como secuencia), así que una regla de orden daría avisos falsos. El
+ritmo se vigila sólo en papel: las láminas oscuras son el fondo base del deck.
+
+El validador no lee este JSON en runtime: lee `src/lib/brand-surfaces/deck-recipes/catalog.generated.json`, que escribe
+`pnpm brand:deck-recipes` junto con el índice de abajo. Por eso, **después de editar el JSON, corre
+`pnpm brand:deck-recipes`**: `--check` falla si el índice **o** el catálogo de runtime quedaron atrás.
 
 ## Cómo regenerar el índice
 
 ```bash
-pnpm brand:deck-recipes            # valida el JSON y reescribe el índice de abajo
-pnpm brand:deck-recipes -- --check # valida y falla si el índice no está al día (no escribe)
+pnpm brand:deck-recipes            # valida el JSON y reescribe el índice de abajo y el catálogo de runtime
+pnpm brand:deck-recipes -- --check # valida y falla si el índice o el catálogo de runtime no están al día (no escribe)
 ```
 
 El script (`scripts/creative/deck-recipes/render-index.mjs`, Node sin dependencias) falla si el JSON no parsea, si

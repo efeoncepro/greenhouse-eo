@@ -354,8 +354,15 @@ No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y 
   de las 38 recetas restantes y la portada con selección; `complete` el 2026-09-28, aprobada por el operador). Siguientes:
   `docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md` (ruta productiva; `in-progress`
   en otra sesión, no está disponible), `docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md`
-  (plates) y, en `docs/tasks/to-do/`, TASK-1929 (plan de deck validado contra el catálogo), TASK-1930 (datos reales en
-  los slots), TASK-1931 (banco de plates gobernado) y TASK-1932 (Proposal Studio arma el deck desde recetas).
+  (plates), `docs/tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md` (plan de deck validado contra el
+  catálogo; code complete en `develop` local, commits `651bb0972`, `5a1fb974b`, `248d3e1de`) y, en `docs/tasks/to-do/`,
+  TASK-1930 (datos reales en los slots), TASK-1931 (banco de plates gobernado), TASK-1932 (Proposal Studio arma el deck
+  desde recetas; consume `validateDeckPlan`/`proposeDeckPlan`) y TASK-1933 (pendientes de QA del catálogo).
+- Plan de deck (TASK-1929): `src/lib/brand-surfaces/deck-recipes/` — `index.ts` (entrada pura), `catalog.ts`,
+  `catalog.generated.json` (lo escribe `scripts/creative/deck-recipes/render-index.mjs` vía `pnpm brand:deck-recipes`),
+  `types.ts`, `issues.ts` (códigos y `AXIS_EQUIVALENT`), `validate.ts`, `propose.ts` (`server-only`); CLI
+  `scripts/brand-surfaces/deck-plan.ts` (`pnpm brand:deck-plan`); tests y fixtures (`golden-*`, `adversarial.json`,
+  `context-brochure.json`) en `__tests__/`.
 - Código: `src/lib/brand-surfaces/recipes/deck.ts`, `frame.ts` y, desde TASK-1928, `proposal-service.ts`, `method.ts`,
   `close.ts`, `proof.ts`, `sections.ts`, `content.ts` (ayudas en `kit.ts`; todos registrados en
   `src/lib/brand-surfaces/index.ts`); `src/lib/brand-surfaces/document.ts`, `scripts/brand-surfaces/compose.ts`,

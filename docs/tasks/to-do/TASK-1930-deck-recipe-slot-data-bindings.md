@@ -1,5 +1,16 @@
 # TASK-1930 — Datos reales en los slots del deck «La órbita»: logo, montos, equipo, métricas, casos y testimonios
 
+## Delta 2026-09-28 — TASK-1929 dejó el plan de deck contra el catálogo
+
+- Entrada pura e isomórfica `@/lib/brand-surfaces/deck-recipes`: `validateDeckPlan(plan: DeckPlan): { ok, issues: DeckPlanIssue[] }`
+  (`DeckPlan = { document: 'proposal'|'brochure'|'pitch'|'qbr', line?, diagnosisDone?, slides: { recipeId, slots?, plateRef?, progress?, purpose? }[] }`;
+  `DeckPlanIssue = { code, severity: 'error'|'warning', source: 'axis'|'catalog'|'agent', slideIndex?, recipeId?, slot?, detail }`),
+  `getDeckRecipe`, `listDeckRecipes` y el catálogo de runtime `catalog.generated.json` (lo regenera `pnpm brand:deck-recipes`).
+- `server-only`: `proposeDeckPlan(context)` en `@/lib/brand-surfaces/deck-recipes/propose` → `{ ok: true, plan, issues, rationale, model, attempts, usage }`
+  o `{ ok: false, issues, rejectedPlan, model, attempts, usage }`; contexto por allowlist (`normalizeDeckPlanContext`, `DeckPlanContextError`).
+  No escribe: es el paso `propose`. CLI local `pnpm brand:deck-plan -- --plan | --propose --context`.
+- Para esta task: los binders llenan `slides[].slots` por NOMBRE de slot de la receta; `validateDeckPlan` rechaza `slot-unknown`, `slot-type-invalid`, `slot-required-missing` y `slot-over-max-chars` (richText por línea, list por ítem).
+
 ## Delta 2026-09-27 — TASK-1928 dejó las plantillas
 
 - TASK-1928 dejó **69 de 69** recetas del catálogo con plantilla en `graphic-line-deck` (commits `ab23fdd90`,

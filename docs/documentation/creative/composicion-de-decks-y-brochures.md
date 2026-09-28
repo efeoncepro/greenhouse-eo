@@ -1,9 +1,9 @@
 # Composición de decks y brochures de marca propia
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.0
+> **Version:** 2.1
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
+> **Ultima actualizacion:** 2026-09-28 por Claude (2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
 > **Documentacion tecnica:** [Arquitectura de la composición de piezas de marca](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) · [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
 > **Manual de uso:** [Componer un deck con las recetas por lámina](../../manual-de-uso/creative/componer-deck-con-recetas.md) · [Componer una pieza por superficie con AXIS](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
 
@@ -223,6 +223,88 @@ líneas, escalera y contraportada) y una propuesta de 7 páginas interiores.
 > [`deck-proposal-document.json`](../../../src/lib/brand-surfaces/examples/deck-proposal-document.json) ·
 > pruebas en [`document.test.ts`](../../../src/lib/brand-surfaces/__tests__/document.test.ts).
 
+## Validar y proponer el plan antes de componer
+
+Antes de escribir los textos y componer, conviene revisar el **plan** del deck: la lista de láminas en orden, cada una
+nombrada por su receta del catálogo. Desde el 2026-09-28 el sistema revisa ese plan en segundos y, si se le pide, un
+agente propone uno. Así un deck mal armado (dos cierres, una cotización en un brochure, la misma foto dos veces) se
+detecta cuando todavía es una lista, no cuando ya hay 16 láminas escritas.
+
+| Pregunta | Respuesta |
+| --- | --- |
+| ¿Qué es el plan? | Un archivo corto: qué documento es (brochure, propuesta, pitch o QBR), su línea de servicio y la lista de láminas por receta. Puede llevar ya los textos de cada lámina o no llevarlos todavía |
+| ¿Qué revisa? | Que cada lámina exista en el catálogo y sirva para ese documento, que la portada vaya primero y el cierre al final, que la portada y el cierre sean pareja, que no haya dos cierres, dos variantes de la misma lámina seguidas ni la misma foto dos veces, y que los textos que ya estén escritos quepan en su casilla |
+| ¿Qué no revisa? | La calidad del texto, si una cifra es verdadera ni cómo se ve la lámina: eso sigue siendo revisión a ojo del operador |
+| ¿Escribe o compone algo? | No. Revisar el plan no cambia nada ni produce piezas |
+
+### Dos revisores, una sola voz por regla
+
+El plan lo revisan dos capas, y cada regla vive en una sola:
+
+| Capa | Qué revisa | Cómo se reconoce en el resultado |
+| --- | --- | --- |
+| **AXIS** (el sistema de diseño) | las reglas del documento completo que AXIS ya conoce: portada primero y cierre al final en un brochure, al menos una página de servicio, foto ↔ sin foto entre portada y cierre, una línea por documento, que la lámina sirva para ese uso | marcada `[axis]`. Sólo aplica a **brochure y propuesta**, y sólo cuando todas las láminas existen en el catálogo |
+| **El catálogo de recetas** | lo que AXIS no conoce: recetas que no existen o no van en ese documento, parejas de portada y cierre, variantes seguidas, próximos pasos después de un diagnóstico, foto repetida, textos que no caben, ritmo | marcada `[catalog]`. Aplica a los cuatro documentos |
+
+Si AXIS ya dijo algo de una lámina, el catálogo no lo repite con otro nombre: cada problema aparece una vez.
+
+### Errores y avisos
+
+| Tipo | Qué significa | Ejemplos |
+| --- | --- | --- |
+| **Error** (✗) | el plan no está listo: hay que corregirlo antes de componer | una receta inventada, una plantilla nombrada en vez de una receta, dos cierres, una cotización en un brochure, la misma foto dos veces, un texto más largo que su casilla |
+| **Aviso** (!) | el plan es válido, pero conviene mirarlo | tres láminas de papel seguidas, dos secciones partidas seguidas con la misma esquina |
+
+Un plan con avisos y sin errores es válido. La lista completa de códigos, con cómo corregir cada uno, está en el
+[manual](../../manual-de-uso/creative/componer-deck-con-recetas.md#paso-4b--valida-el-plan-antes-de-componer).
+
+### El agente propone, la persona confirma
+
+Un agente puede proponer el plan a partir de un contexto corto: el documento, si se presenta en sala o se lee, la
+línea, si el diagnóstico ya se hizo, los temas en orden y los nombres de los hechos disponibles (por ejemplo «caso Sky
+publicado»).
+
+| Lo hace el agente | Lo hace la persona |
+| --- | --- |
+| Elige recetas **por id**, sólo entre las del catálogo para ese documento | Revisa el plan propuesto y decide si lo usa |
+| Explica en una línea para qué está cada lámina y por qué armó el plan así | Escribe los textos, las cifras con su fuente y las fotos |
+| Si su primer plan tiene errores, lo corrige una vez con la lista de problemas | Compone y aprueba la pieza |
+
+Reglas de la propuesta:
+
+- **El agente no escribe contenido ni cifras.** Sólo elige y ordena láminas.
+- **El contexto no admite datos del cliente:** ni identificadores de organización, ni montos, ni datos personales.
+  Cualquier campo fuera de la lista permitida se rechaza antes de llamar al modelo.
+- **Si después del segundo intento sigue habiendo errores, no hay plan:** se muestra el plan rechazado sólo para
+  entender qué falló.
+- **Si el proveedor del modelo no responde,** el resultado dice que la propuesta no está disponible, sin mostrar el
+  error interno.
+- **Cada propuesta cuesta dinero:** el comando imprime los tokens usados y un costo **estimado** (no es la factura).
+  Una propuesta real de un brochure de 16 láminas, el 2026-09-28, costó cerca de USD 0,09 en dos intentos: el
+  primero no traía página de servicio, AXIS lo marcó y el segundo lo corrigió.
+- **Proponer no guarda nada.** Hoy la confirmación es simplemente que la persona use el plan; la confirmación
+  registrada es trabajo pendiente (abajo).
+
+### Qué todavía no hace
+
+| Pendiente | Qué implica hoy | Dónde se resuelve |
+| --- | --- | --- |
+| Confirmar y guardar el plan; pedirlo por API, desde Nexa o por MCP | Sólo se valida y se propone desde un equipo, con un comando; el plan vive en un archivo | TASK-1932 |
+| Llenar las casillas con datos reales | Los textos del plan se escriben a mano | TASK-1930 |
+| Elegir fotos del banco gobernado | El validador sólo detecta una foto repetida dentro del plan | TASK-1931 |
+| Componer el plan de una vez | Se compone lámina a lámina o como documento con `pnpm brand:compose`; el plan no se convierte solo en pedido | TASK-1921 (ruta productiva, en curso) |
+
+> Detalle técnico: `validateDeckPlan` (pura, sin red ni escritura) en
+> [`src/lib/brand-surfaces/deck-recipes/validate.ts`](../../../src/lib/brand-surfaces/deck-recipes/validate.ts), que
+> valida el piso de AXIS con `resolveSurfaceDocument` de `@efeoncepro/axis-ui-contracts` · códigos del catálogo en
+> [`issues.ts`](../../../src/lib/brand-surfaces/deck-recipes/issues.ts) · catálogo de runtime
+> `catalog.generated.json` generado por `pnpm brand:deck-recipes` · `proposeDeckPlan` (`server-only`) en
+> [`propose.ts`](../../../src/lib/brand-surfaces/deck-recipes/propose.ts), vía el cliente canónico
+> `generateStructuredAnthropic` con un enum de ids de receta y un reintento · comando `pnpm brand:deck-plan`
+> ([`scripts/brand-surfaces/deck-plan.ts`](../../../scripts/brand-surfaces/deck-plan.ts)) ·
+> [arquitectura](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) ·
+> [TASK-1929](../../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md).
+
 ## Qué entrega
 
 Cada composición deja una carpeta con la pieza y con los archivos que permiten auditarla.
@@ -268,7 +350,7 @@ ojo, y la aprobación es del operador. Revisar esa prueba no es trabajo de quien
 | Pendiente | Qué implica hoy | Dónde se resuelve |
 | --- | --- | --- |
 | Ruta dentro de la plataforma | Sólo se compone desde un equipo, con un comando. No hay pantalla, cola ni acceso para agentes | TASK-1921, en curso |
-| Validar un plan de deck completo contra el catálogo | Nadie revisa todavía, en automático, que la secuencia de láminas respete pares y ritmo | TASK-1929 |
+| Confirmar y guardar el plan del deck; pedirlo por API, Nexa o MCP | El plan ya se valida y un agente lo propone (TASK-1929, ver arriba), pero sólo desde un equipo y sin registro de la confirmación | TASK-1932 |
 | Datos reales en las casillas | Logo del cliente, equipo, métricas, casos y testimonios se escriben a mano en el pedido | TASK-1930 |
 | Banco de fotos gobernado | Las fotos viven en el equipo de quien compone, fuera del repositorio | TASK-1931 |
 | Armar el deck desde Proposal Studio | Una propuesta no produce todavía su deck «La órbita» | TASK-1932 |

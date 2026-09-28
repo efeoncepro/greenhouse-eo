@@ -172,6 +172,32 @@
   intent y en la cotización `recommended`; el builder lo traduce al slot `selection.item` que marca el hook del
   catálogo. Regla: no lo busques en `selection` del contrato; copia el ejemplo de la lámina.
 
+## 2026-09-28 (el plan del deck contra el catálogo, TASK-1929)
+
+- **`pairsWith sequence` no tiene dirección.** La spec pedía una regla de orden (`sequence-order`), pero medido sobre
+  el catálogo, `proposal-cinematic-nexa-lines` lista la **portada** como su secuencia: una regla «A antes que B»
+  habría disparado avisos falsos. Regla: `sequence` dice qué láminas van juntas, no en qué orden; no hay código de
+  orden y no se inventa uno sin que el catálogo declare dirección.
+- **`variant` significa «no seguidas», no «una por deck».** El validador rechaza dos variantes de la misma lámina
+  adyacentes (`variant-adjacent`); separadas, pasan. Dos portadas o dos cierres ya los rechaza `frame-count`.
+- **El reintento con los issues funciona.** La corrida real de `--propose` (brochure, 2026-09-28) propuso primero un
+  plan sin página de servicio; AXIS lo rechazó con `brochure-needs-service-page` y el único reintento, con ese issue
+  como `fixTheseIssues`, lo corrigió: 16 láminas válidas, ≈ USD 0,09. Regla: el modelo recibe los códigos tal cual;
+  si tras un reintento siguen, se falla cerrado, no se reintenta en bucle.
+- **Una regla, una voz.** Lo que AXIS ya valida del documento (portada primera, cierre último, foto que alterna,
+  uso por receta) no se duplica en el catálogo: si AXIS habló de esa lámina, el código del catálogo calla
+  (`AXIS_EQUIVALENT` en `deck-recipes/issues.ts`). Regla: antes de sumar un código, mira si AXIS ya lo emite.
+- **El JSON de `docs/` no es runtime.** El código importa `catalog.generated.json` y un test prohíbe leer el JSON
+  aprobado con `fs`. Regla: tras editar `EFEONCE_DECK_SLIDE_RECIPES_V1.json`, `pnpm brand:deck-recipes` (README y
+  catálogo de runtime); si no, `--check` y `catalog-drift` fallan.
+- **Dos «plan» distintos.** El `plan.json` de recetas (`pnpm brand:deck-plan`) nombra ids del catálogo; el
+  `deck-plan.json` que escribe `brand:compose` es el `Plan` del composer, con plantillas ya resueltas. Regla: no
+  pases uno donde va el otro.
+- **Que el plan pase no vuelve componible un marco clásico.** El validador acepta `cover-classic`/`close-classic` en
+  pitch y QBR y avisa `recipe-without-template` en esas dos láminas (el composer no tiene plantilla para ellas): el
+  plan vale, pero ese deck no se compone de punta a punta y los marcos siguen sin aprobación del operador. Regla: en pitch o QBR, pregunta
+  qué marco usar.
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

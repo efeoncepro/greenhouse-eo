@@ -36,7 +36,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Discovery 2026-09-28: tomada tras cerrar TASK-1928 (69/69); plan en ejecución`
+- Status real: `Code complete 2026-09-28: catálogo de runtime, validateDeckPlan, proposeDeckPlan y CLI brand:deck-plan con tests verdes y una corrida real; docs y skills al día; pnpm test completo verde; pendiente pnpm build con autorización`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -249,22 +249,22 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. — SoT `EFEONCE_DECK_SLIDE_RECIPES_V1.json` → `src/lib/brand-surfaces/deck-recipes/catalog.generated.json`; contrato `validateDeckPlan`/`proposeDeckPlan` en `src/lib/brand-surfaces/deck-recipes/`; consumers: CLI `pnpm brand:deck-plan`, TASK-1921, TASK-1930, TASK-1932.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. — invariantes en el Backend/Data Contract, verificados por tests (`validate.test.ts`, `propose.test.ts`): plan inválido nunca sale como válido; recetas por id; una regla, una voz; contexto por allowlist sin ids de organización; propuesta sin escritura (sin idempotencia que gestionar).
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo. — N/A: no hay tablas nuevas.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. — sin migración ni backfill; rollback = `git revert` por slice.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. — corrida real de `pnpm brand:deck-plan -- --propose` (2026-09-28, brochure): plan válido en el 2.º intento, 17 918 + 2 368 tokens, ≈ USD 0,09; sin DB.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. — sin PII; el fallo del proveedor devuelve `proposal-unavailable` sin filtrar el error (test con `sk-ant` en el mensaje).
 
 ### Capability Definition of Done — Full API Parity gate
 
-- [ ] **Lógica en el primitive, no en la UI.** Las reglas viven en `src/lib/brand-surfaces/deck-recipes/`.
-- [ ] **Modelada como recurso/contrato, no como click-handler.**
-- [ ] **Read** como función pura reutilizable; la propuesta no escribe.
-- [ ] **Capability + grant en el MISMO PR:** `N/A — esta task no gatea ni expone endpoint; la capability la aplica TASK-1932`.
-- [ ] **Camino programático declarado:** CLI `pnpm brand:deck-plan` + follow-up explícito TASK-1932 (API, Nexa, MCP).
-- [ ] **Write apto para `propose → confirm → execute`:** la propuesta es el paso `propose`; confirm y execute son de TASK-1932/TASK-1921.
-- [ ] **Un primitive, muchos consumers:** CLI, TASK-1921 y TASK-1932 llaman a las mismas dos funciones.
+- [x] **Lógica en el primitive, no en la UI.** Las reglas viven en `src/lib/brand-surfaces/deck-recipes/`. — sí: `src/lib/brand-surfaces/deck-recipes/`.
+- [x] **Modelada como recurso/contrato, no como click-handler.** — sí: tipos `DeckPlan`/`DeckPlanIssue` y dos funciones.
+- [x] **Read** como función pura reutilizable; la propuesta no escribe. — `validateDeckPlan` pura e isomórfica; `proposeDeckPlan` no escribe.
+- [x] **Capability + grant en el MISMO PR:** `N/A — esta task no gatea ni expone endpoint; la capability la aplica TASK-1932`. — N/A confirmado: sin endpoint.
+- [x] **Camino programático declarado:** CLI `pnpm brand:deck-plan` + follow-up explícito TASK-1932 (API, Nexa, MCP). — CLI `pnpm brand:deck-plan` (commit `248d3e1de`); API/Nexa/MCP → TASK-1932.
+- [x] **Write apto para `propose → confirm → execute`:** la propuesta es el paso `propose`; confirm y execute son de TASK-1932/TASK-1921. — `proposeDeckPlan` es sólo el paso propose.
+- [x] **Un primitive, muchos consumers:** CLI, TASK-1921 y TASK-1932 llaman a las mismas dos funciones. — la CLI ya consume las dos funciones; TASK-1921/1932 reciben la firma por delta.
 - [ ] **Parity check = SÍ** una vez cerrada TASK-1932.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -407,15 +407,15 @@ Sin flag: aditivo y repo-only. Nada productivo lo invoca hasta que TASK-1932 lo 
 
 ## Acceptance Criteria
 
-- [ ] `catalog.generated.ts` existe, se genera desde el JSON y `pnpm brand:deck-recipes -- --check` falla si difieren.
-- [ ] Ningún módulo de `src/` lee `EFEONCE_DECK_SLIDE_RECIPES_V1.json` con `fs` en runtime.
-- [ ] `validateDeckPlan` implementa cada código de la tabla de Detailed Spec con un test que lo dispara y otro que no.
-- [ ] Un test verifica que ningún código propio duplica un issue de `resolveSurfaceDocument`.
-- [ ] Un plan que nombra una plantilla o un `contentType` en vez de una receta es inválido (test).
-- [ ] `proposeDeckPlan` llama al LLM sólo por el cliente canónico de `src/lib/ai/` y devuelve `ok: false` con issues cuando no logra un plan válido (test con mock).
-- [ ] El eval golden (brochure, propuesta, pitch, QBR) y el adversarial pasan en verde.
-- [ ] `pnpm brand:deck-plan` valida y propone desde la CLI, e imprime el costo del LLM en `--propose`.
-- [ ] El README del catálogo, el manual y la doc funcional explican el validador y sus códigos.
+- [x] `catalog.generated.ts` existe, se genera desde el JSON y `pnpm brand:deck-recipes -- --check` falla si difieren. — implementado como `catalog.generated.json` + `catalog.ts` tipado (importable sin `fs`, sin reescritura de lint); `--check` falla si difiere (test `catalog-drift.test.ts`).
+- [x] Ningún módulo de `src/` lee `EFEONCE_DECK_SLIDE_RECIPES_V1.json` con `fs` en runtime. — test «el catálogo de runtime no se lee del JSON de docs» en `validate.test.ts`.
+- [x] `validateDeckPlan` implementa cada código de la tabla de Detailed Spec con un test que lo dispara y otro que no. — `validate.test.ts` «un caso que dispara y otro que no, por código» + guarda «cada código tiene su caso»; `recipe-without-template` con catálogo simulado. Códigos de la spec cubiertos por otra regla o retirados (`sequence-order`: `pairsWith sequence` no tiene dirección) documentados en `issues.ts` y en la spec técnica.
+- [x] Un test verifica que ningún código propio duplica un issue de `resolveSurfaceDocument`. — «una regla, una voz» en `validate.test.ts`.
+- [x] Un plan que nombra una plantilla o un `contentType` en vez de una receta es inválido (test). — caso `template-named-instead-of-recipe` (golden y adversarial).
+- [x] `proposeDeckPlan` llama al LLM sólo por el cliente canónico de `src/lib/ai/` y devuelve `ok: false` con issues cuando no logra un plan válido (test con mock). — `propose.test.ts` con mock de `@/lib/ai/anthropic`: reintento, rechazo tras 2 intentos, proveedor caído.
+- [x] El eval golden (brochure, propuesta, pitch, QBR) y el adversarial pasan en verde. — fixtures `golden-*.json` sin issues y 13 adversariales con su código; 52 tests verdes.
+- [x] `pnpm brand:deck-plan` valida y propone desde la CLI, e imprime el costo del LLM en `--propose`. — `--plan` sobre golden (✓) y adversarial (✗, exit 1); `--propose` real con costo impreso.
+- [x] El README del catálogo, el manual y la doc funcional explican el validador y sus códigos. — README del catálogo v1.5 («Validar el plan: códigos y cómo leerlos»), manual v1.5 (paso 4b), doc funcional v2.1, spec técnica `GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md` §12, norma §4.6 y skills `deck-studio`/`efeonce-graphic-line` (espejadas).
 
 ## Verification
 
@@ -432,9 +432,9 @@ Sin flag: aditivo y repo-only. Nada productivo lo invoca hasta que TASK-1932 lo 
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `## Delta` en TASK-1930, TASK-1932 y TASK-1921 con la firma final de `validateDeckPlan` y `proposeDeckPlan`
+- [x] `## Delta` en TASK-1930, TASK-1932 y TASK-1921 con la firma final de `validateDeckPlan` y `proposeDeckPlan`
 
 ## Follow-ups
 

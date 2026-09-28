@@ -17,6 +17,14 @@
   `brand.render.stuck_job` y `sharp` como dependencia de runtime. Flag `BRAND_RENDER_ENABLED` OFF en los tres runtimes:
   code complete, rollout pendiente. En `develop`, sin promover a main.
 
+## 2026-09-28 — El plan de un deck se valida contra el catálogo de recetas (TASK-1929)
+
+- `pnpm brand:deck-plan -- --plan plan.json` valida el plan (recetas del catálogo por id): AXIS valida el documento
+  (portada, cierre, página de servicio, alternancia de foto) y el catálogo agrega pareja portada↔cierre, variantes
+  seguidas, plate repetido, slots y ritmo, sin duplicar códigos. `--propose` le pide al agente un plan validado que
+  falla cerrado; una persona confirma (TASK-1932 lo expone por API, Nexa y MCP). El catálogo de runtime se genera con
+  `pnpm brand:deck-recipes`.
+
 ## 2026-09-28 — Las 69 recetas de deck de «La órbita» componen (TASK-1928)
 
 - El catálogo `graphic-line-deck` suma 34 plantillas para las 38 recetas pendientes: propuestas sobrias, método,
@@ -616,10 +624,3 @@ documentación funcional, manual de uso, runbook, fleet ledger y skills espejo. 
 local para After Effects/Blender quedan como superficies preparadas; Higgsfield permanece
 `provider-supported / no Globe route` hasta contar con route card, adapter, secreto, coste, derechos, canary,
 Asset Governance y readback. No se instaló, generó, compró crédito ni publicó nada.
-
-## 2026-09-17 — Aplicar el logo 3D en escenas con IA generativa
-
-El kit 3D del logo ya no se compone a mano sobre la escena: se pega el render exacto y el modelo repinta sólo un halo
-alrededor con máscara, así aporta sombra de contacto, reflejo y rebote sin poder re-dibujar el logo. Con el logo grande
-en cuadro basta la pasada directa con el render como referencia. Medido en dos casos reales (avenida de Nueva York y
-escritorio): zona protegida 4,4/255 de diferencia y halo 39,6. La composición determinística queda como respaldo.

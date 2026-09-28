@@ -1,14 +1,14 @@
 # GREENHOUSE — Composición por superficie de «La órbita» en el Artifact Composer V1
 
 > **Tipo de documento:** Spec técnica (arquitectura del lado Greenhouse)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-28 por Claude
-> **Última actualización:** 2026-09-28 por Claude
+> **Última actualización:** 2026-09-28 por Claude (1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
 > **Estado:** vigente. Taller local (`pnpm brand:compose`) en `develop`; la ruta productiva gobernada es TASK-1921, en curso.
 > **Contrato y valores (AXIS):** ADR [`SURFACE_COMPOSITION_DECISION_V1.md`](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md) del repo `efeoncepro/axis-design-system` (contrato `efeonce.surface-composition` 0.1.2, deltas (b)…(l)); guía `docs/agent-composition/surfaces/deck.md` del mismo repo.
 > **Norma de marca:** [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (qué se aprobó por superficie, §2.1 ruta por el composer, §4.6 deck) · catálogo de recetas [`deck-recipes/`](../operations/brand-graphic-line/deck-recipes/README.md).
 > **Motor:** [`GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`](GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md) (el composer es domain-free; las superficies son catálogos) · invariantes [`COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`](agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md).
-> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69).
+> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69) · [TASK-1929](../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md) (plan de deck contra el catálogo, §12; code complete, en cierre).
 > **Manuales:** [componer por superficie con AXIS](../manual-de-uso/creative/componer-por-superficie-con-axis.md) · [componer un deck con las recetas](../manual-de-uso/creative/componer-deck-con-recetas.md) · runbook del gate [`composer-visual-gate.md`](../operations/runbooks/composer-visual-gate.md).
 
 ## 1. Qué es y dónde termina
@@ -436,7 +436,8 @@ sobre cada probe de los catálogos de La órbita: una violación falla el gate i
 | `plan-surface-piece.test.ts`, `document.test.ts`, `frame-recipes.test.ts`, `deck-recipes.test.ts`, `stills-recipes.test.ts`, `overlays-recipes.test.ts` | reglas del mapper, del documento y de cada familia |
 | `graphic-line-shared/__tests__/graphic-line-catalogs.test.ts`, `rendered-audit.test.ts` | guard de literales en plantillas y la auditoría renderizada |
 | `scripts/brand-surfaces/__tests__/graphic-line-tokens-sync.test.ts` y `pnpm brand:tokens --check` | el snapshot compilado coincide con la versión instalada de `axis-tokens` |
-| `pnpm brand:deck-recipes -- --check` | valida el catálogo de recetas y que el índice del README coincida; la columna «Plantilla» se deriva de `recipe-map.json` y exige que cada `contentType` exista en `registry.json` |
+| `pnpm brand:deck-recipes -- --check` | valida el catálogo de recetas y que el índice del README coincida; la columna «Plantilla» se deriva de `recipe-map.json` y exige que cada `contentType` exista en `registry.json`. Desde TASK-1929 también falla si el catálogo de runtime `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` no coincide con el JSON aprobado (§12.1) |
+| `src/lib/brand-surfaces/deck-recipes/__tests__/*.test.ts` | el plan de deck contra el catálogo (§12.8): validador, propuesta del agente con el cliente simulado y deriva del catálogo de runtime |
 
 El probe del gate no usa fotos reales: `plate:probe`, `icon:probe`, `layer:probe` y `file:probe` son SVG sintéticos
 (`GRAPHIC_LINE_PROBE_ASSETS`), así que ISSUE-122 no aplica. El probe **rellena todo slot opcional** (salvo
@@ -511,17 +512,215 @@ Secuencia para subir AXIS (detalle y credenciales en
 10. **Gate.** `pnpm composer:visual-gate --catalog=graphic-line --selftest`, declarar el alta en `BASELINE_DELTAS.md`,
     `--freeze` con el árbol del composer limpio salvo tu cambio, y commit atómico.
 
-## 12. Límites conocidos y pendientes
+## 12. Plan de deck contra el catálogo (TASK-1929)
+
+Antes de componer, un deck se puede **planear**: la lista ordenada de láminas, cada una nombrada por el **id de su
+receta** en el catálogo aprobado (`EFEONCE_DECK_SLIDE_RECIPES_V1.json`), nunca por plantilla ni `contentType`. TASK-1929
+agrega tres piezas: el catálogo legible en runtime, un validador determinista del plan y un agente que propone planes y
+falla cerrado. Nada de esto compone, persiste ni confirma: es el paso anterior a `pnpm brand:compose` (§2) y el paso
+`propose` del ciclo propose → confirm → execute.
+
+Código: `src/lib/brand-surfaces/deck-recipes/` (`index.ts`, `catalog.ts`, `catalog.generated.json`, `types.ts`,
+`issues.ts`, `validate.ts`, `propose.ts`). CLI: `scripts/brand-surfaces/deck-plan.ts`. Generador:
+`scripts/creative/deck-recipes/render-index.mjs`.
+
+### 12.1 El catálogo de runtime (artefacto generado)
+
+- `catalog.generated.json` lo **escribe** `pnpm brand:deck-recipes` (el mismo generador que el índice del README del
+  catálogo) desde el JSON aprobado de `docs/operations/brand-graphic-line/deck-recipes/` y los intents de ejemplo que
+  `recipe-map.json` asigna a cada receta. Lleva `$comment` de «GENERADO, no se edita a mano». Pesa ~200 KB.
+- Esquema `efeonce.deck-recipes.runtime.v1`: `source` (`schema`, `version`, `approvedAt` del JSON aprobado; hoy
+  `efeonce.deck-slide-recipes.v1` 1.0.0, aprobado el 2026-09-27), `axisRecipeFamilies` (las cinco familias de AXIS:
+  `cover-classic`, `close-classic`, `proposal-cinematic`, `section-cine`, `cover-brochure`) y `recipes`: las **69**,
+  todas con `template` y con página de AXIS.
+- Por receta sólo campos estructurados, nunca las notas en prosa: `id`, `name`, `family`, `documents`, `surface`,
+  `photo { uses, plate }` (el plate es la ruta del archivo; `null` si la lámina no lleva foto: 42 de 69 llevan),
+  `pairs { coverClose, variant, sequence }` (desde `pairsWith` por relación), `slots [{ name, type, required,
+  maxChars }]`, `template` (el `contentType` de `recipe-map.json`, o `null`) y `axis { recipe, layout, role, theme,
+  uses, progress, page }`. `page` es el intent de ejemplo **sin** lo que propaga el documento (`contract`, `version`,
+  `surface`, `format`, `use`, `progress`).
+- `pnpm brand:deck-recipes -- --check` no escribe y falla si el índice del README **o** el catálogo de runtime difieren
+  de lo que generaría («el catálogo de runtime … no coincide con el JSON aprobado: corre «pnpm brand:deck-recipes»»).
+  El generador acepta `--module <ruta>` para escribir o comparar otro destino.
+- **Ningún módulo de `src/` lee el JSON de `docs/` con `fs`**: `catalog.ts` importa el artefacto. Lo asegura un test
+  (§12.8).
+
+`catalog.ts` expone `deckRecipeCatalog`, `getDeckRecipe(id)`, `listDeckRecipes(document?)`, `isAxisFamily(id)` y
+`roleOf(recipe)` (el `axis.role`, o `cover`/`close` por familia). `getDeckRecipe` acepta además `cover-classic` y
+`close-classic` de AXIS como recetas sin plantilla de catálogo, **sólo para `pitch` y `qbr`** (fueron reemplazadas en
+brochure y propuesta el 2026-09-27); cualquier otra familia de AXIS, como `proposal-cinematic`, **no** es receta.
+
+### 12.2 Tipos
+
+`types.ts`:
+
+| Tipo | Forma |
+|---|---|
+| `DeckDocumentKind` | `'proposal' \| 'brochure' \| 'pitch' \| 'qbr'` (`DECK_DOCUMENT_KINDS`) |
+| `DeckPlan` | `{ document, line?, diagnosisDone?, slides }`. `line` es la línea del marco (AXIS: `growth`, `brand`, `engine`, `voice`, `revenue`); `diagnosisDone` marca una propuesta enviada después del diagnóstico |
+| `DeckPlanSlide` | `{ recipeId, slots?, plateRef?, progress?, purpose? }`. Sin `slots` la lámina es un **esqueleto** y sus slots no se validan; `plateRef` reemplaza el plate de la receta (TASK-1931 lo servirá por `assetId`); `progress { sections, current }` fija la navegación; `purpose` no se valida |
+| `DeckPlanIssue` | `{ code, severity: 'error' \| 'warning', source: 'axis' \| 'catalog' \| 'agent', slideIndex?, recipeId?, slot?, detail }` |
+| `DeckPlanValidation` | `{ ok, issues }`; `ok` es `false` si hay al menos un `error` |
+
+### 12.3 `validateDeckPlan(plan)`: dos capas
+
+Pura, determinista e isomórfica: no lee archivos, no llama a la red, no escribe. Orden de evaluación:
+
+0. **Forma.** `document` válido y al menos una lámina; si no, `plan-invalid` y termina.
+1. **Cada lámina a su receta.** Sin `recipeId` → `plan-invalid`; una plantilla nombrada → `template-named-instead-of-recipe`;
+   `slots` que no es objeto → `plan-invalid`; id que no está → `recipe-unknown` (con mensaje propio si es una familia
+   de AXIS).
+2. **Piso de AXIS.** Corre sólo si el documento es `proposal` o `brochure` (los que AXIS valida como documento), si
+   **todas** las láminas resolvieron a receta y si todas tienen página de AXIS. Arma el documento con la página de
+   ejemplo de cada receta en el orden del plan y lo valida `resolveSurfaceDocument` de `@efeoncepro/axis-ui-contracts`
+   (`surface: 'deck'`, `format: '16x9'`, `use` = el documento). La línea es la del plan, o la de la página de la
+   portada, o `growth`; la portada y el cierre pierden su `line` (el marco toma la del documento) y una página de
+   servicio conserva la suya. `progress` sale del plan o se deriva del orden de las secciones (`role: 'section'`) para
+   las recetas que lo llevan. Cada issue de AXIS entra con `severity: 'error'`, `source: 'axis'` y **su código tal
+   cual**; un código de página `page[i]:<código>` se reporta como `<código>` en la lámina `i`. Códigos que aparecen en
+   la práctica: `brochure-cover-first`, `brochure-close-last`, `brochure-needs-service-page`, `frame-photo-must-alternate`,
+   `document-line-mismatch`, `use-not-for-recipe`, `progress-required`.
+3. **Reglas del catálogo** (`source: 'catalog'`), las que AXIS no conoce (tabla de §12.4).
+
+Greenhouse no reimplementa ninguna regla de AXIS (§1): el piso es AXIS, y el catálogo sólo agrega lo que el contrato no
+sabe del catálogo de recetas (ids, documentos por receta, parejas, variantes, plates, slots y ritmo).
+
+### 12.4 Códigos del catálogo
+
+`DECK_PLAN_ISSUE_CODES` (`issues.ts`) fija la severidad de cada código; todos llevan `source: 'catalog'`.
+
+| Código | Severidad | Cuándo |
+|---|---|---|
+| `plan-invalid` | error | sin `document` válido, sin láminas, lámina sin `recipeId` o `slots` que no es objeto |
+| `template-named-instead-of-recipe` | error | la lámina trae `template` o `contentType`, o su id empieza con `deck.` o con mayúscula |
+| `recipe-unknown` | error | el id no está en el catálogo (una familia de AXIS tampoco, salvo los marcos clásicos en pitch y QBR) |
+| `recipe-not-for-document` | error | el documento no está en `documents` de la receta; se omite si AXIS ya dijo `use-not-for-recipe` en esa lámina |
+| `frame-count` | error | más de una portada o más de un cierre (cubre también «el eslogan dos veces») |
+| `frame-order` | error | la portada no es la primera o el cierre no es el último; se omite si AXIS ya dijo `brochure-cover-first` o `brochure-close-last` |
+| `pair-cover-close-mismatch` | error | el cierre no es pareja aprobada (`pairsWith` `cover↔close`, por id o por familia de AXIS) de la portada; sólo si alguna de las dos declara parejas |
+| `next-steps-after-diagnosis` | error | `decision-next-steps` en una propuesta con `diagnosisDone: true` |
+| `variant-adjacent` | error | dos variantes de la misma lámina (`pairsWith` `variant`) **seguidas**; dos portadas o dos cierres ya los rechaza `frame-count` |
+| `plate-repeated` | error | el mismo plate (el `plateRef` de la lámina o el de la receta) en dos láminas del plan |
+| `slot-unknown` | error | un slot que la receta no tiene (por ejemplo, un eslogan en una portada: ninguna portada tiene ese slot) |
+| `slot-type-invalid` | error | el valor no calza con el tipo del slot (texto para `text`/`richText`/`enum`/`date`, lista para `list`, escalar u objeto para `number`/`money`/`metric`) |
+| `slot-required-missing` | error | falta un slot obligatorio (vacío, `null`, texto en blanco o lista vacía) |
+| `slot-over-max-chars` | error | supera `maxChars`: `text`, largo total; `richText`, por línea (salto o `<br>`) y sin `**` ni etiquetas; `list`, por ítem |
+| `recipe-without-template` | warning | la lámina no tiene plantilla en el composer: una receta sin ella (hoy ninguna de las 69; se prueba con un catálogo simulado) o la portada/cierre clásicos de AXIS que el plan admite en pitch y QBR (`cover-classic`, `close-classic`): el plan es válido, pero ese deck no se compone de punta a punta |
+| `section-split-corner-adjacent` | warning | dos `section-split` seguidas con la misma esquina (sin `layout`, cuenta como `corner-top`) |
+| `rhythm-paper-run` | warning | tres láminas de papel (`theme: 'light'`) seguidas; un solo aviso por tramo, en la tercera |
+
+Los slots sólo se validan en las láminas que traen `slots`. Un aviso no hace `ok: false`.
+
+**Reglas de la norma que no tienen código propio, y por qué** (lo documenta también el encabezado de `issues.ts`):
+
+| Regla | Quién la cubre |
+|---|---|
+| Foto y sin foto se alternan entre portada y cierre | AXIS, `frame-photo-must-alternate` (piso, sólo proposal y brochure) |
+| El eslogan nunca en la portada | `slot-unknown`: ninguna portada del catálogo tiene slot de eslogan |
+| El eslogan una sola vez | `frame-count`: el eslogan va sólo en el cierre y hay un solo cierre |
+| El mensaje del cierre y las familias que un documento excluye | `recipe-not-for-document` (campo `documents` de cada receta) |
+| El orden de una secuencia | **ninguna, retirada a propósito:** `pairsWith` con `sequence` dice qué láminas van juntas, no en qué orden (medido el 2026-09-28: `proposal-cinematic-nexa-lines` lista la portada como secuencia); una regla `sequence-order` daría avisos falsos |
+| Ritmo papel/oscuro | quedó como `rhythm-paper-run`, sólo papel: lo oscuro es el fondo base del deck y tres oscuras seguidas es la norma |
+
+### 12.5 Una regla, una voz (`AXIS_EQUIVALENT`)
+
+Cuando AXIS y el catálogo podrían reportar lo mismo sobre la misma lámina, habla AXIS. `AXIS_EQUIVALENT` mapea cada
+código del catálogo a sus equivalentes de AXIS; si AXIS ya emitió uno de ellos (en esa lámina, o en cualquiera para
+`frame-order`), el del catálogo no se agrega:
+
+| Código del catálogo | Equivalente de AXIS |
+|---|---|
+| `recipe-not-for-document` | `use-not-for-recipe` |
+| `frame-order` | `brochure-cover-first`, `brochure-close-last` |
+
+En pitch y QBR no corre el piso de AXIS, así que esas reglas las reporta sólo el catálogo.
+
+### 12.6 `proposeDeckPlan(context)`: el agente propone y falla cerrado
+
+`propose.ts` es `import 'server-only'`: llama al cliente LLM canónico.
+
+- **Contexto por allowlist** (`normalizeDeckPlanContext`): sólo `document`, `audience` (`room` | `reading`), `line`,
+  `diagnosisDone`, `sections` (1 a 20 temas), `availableFacts` (hasta 20 **nombres** de hechos, sin valores) y `brief`.
+  Cada texto hasta 200 caracteres. Cualquier otra clave —un id de organización, un monto, un dato personal— lanza
+  `DeckPlanContextError` antes de llamar al modelo.
+- **Modelo:** `generateStructuredAnthropic` de `@/lib/ai/anthropic` con `DECK_PLAN_MODEL = 'claude-sonnet-5'`, tool
+  forzado `propose_deck_plan` y `maxTokens` 4096. El prompt lleva el contexto y el catálogo **del documento**
+  (`listDeckRecipes(document)`) en forma corta: id, nombre, familia, papel, foto, plate, `coverClose` y `variant`.
+- **Salida restringida:** el schema del tool acota `recipeId` a un `enum` con los ids de ese catálogo; el modelo
+  devuelve `slides [{ recipeId, purpose }]` + `rationale`. **No escribe contenido ni cifras.** El plan se arma con el
+  `document`, la `line` y el `diagnosisDone` del contexto y se corta a 40 láminas.
+- **Validación y un reintento:** el plan pasa por `validateDeckPlan`. Si trae errores, un solo reintento
+  (`DECK_PLAN_MAX_ATTEMPTS = 2`) con `previousPlan` y `fixTheseIssues` (código, lámina y detalle de cada error).
+- **Resultado (`DeckPlanProposal`):**
+  - éxito → `{ ok: true, plan, issues, rationale, model, attempts, usage }`; `issues` sólo puede traer avisos;
+  - errores tras el reintento → `{ ok: false, issues, rejectedPlan, model, attempts, usage }`; el plan rechazado sirve
+    sólo para diagnóstico;
+  - el proveedor falla → `{ ok: false, issues: [{ code: 'proposal-unavailable', severity: 'error', source: 'agent' }], … }`,
+    sin filtrar el error del proveedor.
+- **No escribe nada.** Un plan con errores nunca sale como bueno. La confirmación humana, la persistencia y el camino
+  por API, Nexa y MCP son de TASK-1932 (§12.9).
+
+### 12.7 CLI `pnpm brand:deck-plan`
+
+`tsx --require ./scripts/lib/server-only-shim.cjs scripts/brand-surfaces/deck-plan.ts`:
+
+| Uso | Qué hace | Salida |
+|---|---|---|
+| `pnpm brand:deck-plan -- --plan <plan.json>` | valida el plan | cada issue con `✗` (error) o `!` (aviso), código, `[source]`, lámina, slot y detalle; exit 1 si hay error, 2 si no puede leer el archivo |
+| `pnpm brand:deck-plan -- --propose --context <context.json> [--out <plan.json>]` | pide el plan al agente, lo valida y lo imprime; con `--out` escribe el plan propuesto | modelo, intentos, tokens de entrada y salida y un **costo estimado** con una tarifa de referencia de USD 3 / 15 por millón (no es la factura); exit 1 sin plan válido, 2 con contexto inválido |
+
+`--propose` necesita en local las credenciales del cliente canónico: `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key`
+y `GCP_PROJECT=efeonce-group` con ADC vigente, si `.env.local` no las trae. Según el inventario de la task, una corrida
+real el 2026-09-28 con `fixtures/context-brochure.json` entregó un plan válido de 16 láminas en el segundo intento (el
+primero no tenía página de servicio: AXIS `brochure-needs-service-page`), 17 918 + 2 368 tokens, ≈ USD 0,09, con un
+aviso `rhythm-paper-run`.
+
+### 12.8 Tests y fixtures
+
+`src/lib/brand-surfaces/deck-recipes/__tests__/`:
+
+| Archivo | Qué asegura |
+|---|---|
+| `validate.test.ts` | el catálogo tiene 69 de 69 recetas con plantilla y página de AXIS; los planes golden de brochure, propuesta, pitch y QBR pasan sin issues; los 13 casos adversariales; un caso que dispara y otro que no por cada código; «una regla, una voz» contra AXIS; ningún módulo de `src/` abre el JSON de `docs/` con `fs` |
+| `recipe-without-template.test.ts` | el aviso con un catálogo simulado; los golden de pitch y QBR lo verifican en sus marcos clásicos |
+| `catalog-drift.test.ts` | corre `pnpm brand:deck-recipes -- --check`: el artefacto coincide con el JSON aprobado y los ejemplos |
+| `propose.test.ts` | con el cliente canónico simulado: golden, el enum de ids del documento, reintento, rechazo tras el reintento, proveedor caído, receta inventada y la allowlist del contexto |
+
+Fixtures: `golden-brochure.json` (7 láminas), `golden-proposal.json` (9), `golden-pitch.json` (6), `golden-qbr.json`
+(5), `adversarial.json` (13 casos) y `context-brochure.json` (el contexto de la corrida real). La task registra 52 tests
+verdes.
+
+### 12.9 Fronteras
+
+- **Entrada pura vs `server-only`.** `@/lib/brand-surfaces/deck-recipes` (`index.ts`) exporta sólo lo isomórfico:
+  catálogo, tipos, códigos (`DECK_PLAN_ISSUE_CODES`, `AXIS_EQUIVALENT`) y `validateDeckPlan`; se puede usar en un
+  componente cliente. La propuesta se importa aparte desde `@/lib/brand-surfaces/deck-recipes/propose` y sólo corre en
+  el servidor.
+- **Qué no hace y quién es dueño:**
+
+| Qué | Dueña |
+|---|---|
+| Confirmación humana, persistencia del plan, endpoint, acción de Nexa y tool MCP (el contrato gobernado de Full API Parity se completa ahí) | TASK-1932 |
+| Llenar los slots con datos reales (logo del cliente, montos, equipo, métricas, casos) | TASK-1930 |
+| Registrar y elegir plates por `assetId` (el validador sólo detecta el plate repetido dentro de un plan) | TASK-1931 |
+| Componer el plan por la ruta productiva (command/API, `artifact-worker`, MCP); hoy se compone lámina a lámina o como documento con `pnpm brand:compose` | TASK-1921 |
+| Los pendientes de QA del catálogo (el logo en la órbita del cierre, filas 15 y 16 de §6 de la norma) | TASK-1933 |
+
+## 13. Límites conocidos y pendientes
 
 - **Ruta productiva:** TASK-1921 (in-progress, otra sesión): command/API, consumer del `artifact-worker`, MCP; debe
   aceptar también el intent de documento. Hasta que cierre, `pnpm brand:compose` es el taller local.
-- **TASK-1929:** validar el plan de un deck contra el catálogo (alternancia foto/sin foto, eslogan por documento, pares,
-  plates repetidos) apoyándose en `resolveSurfaceDocument`.
+- **TASK-1929 (code complete, en cierre):** el plan de un deck se valida contra el catálogo y un agente lo propone
+  (§12). Falta cerrar la task: documentación, gates de cierre y `pnpm build`. El plan todavía no se confirma, no se
+  persiste ni se compone de un paso: eso es TASK-1932 y TASK-1921.
 - **TASK-1930:** datos reales en los slots (logo del cliente, montos, equipo, métricas, casos).
 - **TASK-1931:** banco de plates gobernado.
-- **TASK-1932:** Proposal Studio arma el deck desde las recetas (Nexa/MCP).
+- **TASK-1932:** Proposal Studio arma el deck desde las recetas (Nexa/MCP), con la confirmación humana del plan.
 - **Abiertos de QA del catálogo:** el logo dentro de la órbita en el cierre (ninguna contraportada aprobada lo lleva
-  así); isotipos sin registro de procedencia; el plate P1 repetido (regla de uso).
+  así; TASK-1933); isotipos sin registro de procedencia; el plate P1 repetido (regla de uso). El plate P1
+  (`P1-deck-lente-edicion.png`) lo comparten en el catálogo `section-lens`, `section-bleed` y `content-measure`: desde
+  TASK-1929, usar dos de ellas en el mismo plan falla con `plate-repeated`, salvo que una traiga otro plate en
+  `plateRef`.
 - **Preguntas abiertas de TASK-1919 y TASK-1927** (lente del caminero, barrido del indicador de la sección partida, etc.):
   norma §7.
 - **Salida PPTX:** no existe para este catálogo (depende de la matriz de TASK-1395).

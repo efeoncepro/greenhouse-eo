@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.8
+> **Versión:** 1.9
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude (1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-09-28 por Claude (1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -545,6 +545,35 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
   recorridas** (la sección n de N muestra n − 1 de N). **Pregunta abierta del operador**, anotada en el token: si ese
   barrido se unifica con el de la lente y la sección clásica, que miden n de N. Hasta decidir, manda el token.
 
+**Qué reglas verifica la máquina en el plan de un deck (TASK-1929).** Esta norma sigue siendo la fuente de las reglas;
+desde el 2026-09-28, `validateDeckPlan` (`pnpm brand:deck-plan -- --plan <plan.json>`) revisa las que se pueden
+decidir sobre un plan de láminas nombradas por su receta, antes de componer. En propuesta y brochure, las reglas de
+documento las valida AXIS (`resolveSurfaceDocument`) y llegan con su código; el resto, el catálogo de recetas. Detalle
+técnico y tabla completa de códigos: [spec técnica §12](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
+
+| Regla de la norma | Código | Severidad |
+|---|---|---|
+| Foto y sin foto se alternan entre portada y contraportada (regla 1 de «Las reglas») | `frame-photo-must-alternate` (AXIS, sólo propuesta y brochure) | error |
+| Una portada y un cierre; el eslogan una sola vez | `frame-count` | error |
+| La portada primero y el cierre al final | `brochure-cover-first` / `brochure-close-last` (AXIS, brochure) o `frame-order` | error |
+| El brochure lleva una página de servicio; la línea del marco es la del documento | `brochure-needs-service-page`, `document-line-mismatch` (AXIS) | error |
+| El eslogan nunca en la portada (regla 4) | `slot-unknown`: ninguna portada tiene slot de eslogan | error |
+| El mensaje del cierre según el documento (regla 2) y las láminas que un documento no usa (p. ej. la cotización nunca en brochure) | `recipe-not-for-document` (o `use-not-for-recipe` de AXIS) | error |
+| La contraportada es pareja aprobada de la portada («Las parejas») | `pair-cover-close-mismatch` | error |
+| «Próximos pasos» no va en una propuesta enviada después del diagnóstico | `next-steps-after-diagnosis` | error |
+| Dos variantes de la misma lámina no van seguidas | `variant-adjacent` | error |
+| Un plate no se repite en un deck (el pendiente de QA del P1) | `plate-repeated` | error |
+| Los largos medidos de cada slot de la receta | `slot-over-max-chars` (con `slot-required-missing` y `slot-type-invalid`) | error |
+| Se elige la receta, nunca la plantilla | `template-named-instead-of-recipe` | error |
+| Nunca dos secciones partidas con la misma esquina seguidas | `section-split-corner-adjacent` | aviso |
+| Ritmo: tres láminas de papel seguidas | `rhythm-paper-run` | aviso |
+
+**No se verifican a máquina** (siguen en revisión humana sobre el PDF): el orden de una secuencia (el catálogo dice qué
+láminas van juntas, no en qué orden), la voz, la selección y los cursores, lo que la foto muestra y todo lo que depende
+del contenido real de la lámina. Un agente puede proponer el plan (`pnpm brand:deck-plan -- --propose`), pero sólo
+elige recetas: no escribe contenido ni cifras, y si su plan trae errores tras un reintento, no entrega plan. La
+confirmación humana del plan, su registro y el camino por Nexa y MCP llegan con TASK-1932.
+
 #### Cambiar la foto, el copy o la sección de una lámina
 
 **El contenido de una lámina es dato del intent, no de la plantilla.** La plantilla fija la composición; la foto, el
@@ -903,7 +932,9 @@ en texto de menos de 24 px (D1); cifras sin fuente visible; partners sin burbuja
 el logo chico de las secciones de cine; los montos, siempre `[MONTO]`, y la dirección de contacto desde
 `EFEONCE_CONTACT`; y, el 2026-09-28, la selección en `cover-brochure-cine-lines-selection` (layout
 `document-selection`). **Abiertos:** el logo dentro de la órbita en
-el cierre (§6, fila 17); isotipos sin registro de procedencia y un plate repetido (P1). Lista completa, con la receta
+el cierre (§6, fila 17); isotipos sin registro de procedencia y un plate repetido (P1). Desde TASK-1929, dentro de un
+plan el plate repetido lo detecta `validateDeckPlan` (`plate-repeated`); el banco de plates gobernado sigue en TASK-1931.
+Lista completa, con la receta
 y la decisión de cada uno: [catálogo, «Pendientes de QA»](./deck-recipes/README.md#pendientes-de-qa).
 
 ---
@@ -990,6 +1021,10 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   [TASK-1929](../../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md). **Quedó abierto:** la ruta productiva gobernada, que debe aceptar también el intent de documento (TASK-1921); el control de
   foco de la sección partida, sin task (§4.6); la pregunta del barrido del indicador; y las diferencias conocidas
   contra los prototipos (§4.6). Las recetas restantes del deck las tomó TASK-1928.
+- **TASK-1929: code complete (2026-09-28), en cierre.** El plan de un deck se valida contra el catálogo de recetas
+  antes de componer (`pnpm brand:deck-plan`; qué reglas verifica, en §4.6) y un agente puede proponerlo eligiendo
+  recetas por id. Falta el cierre de la task; la confirmación humana del plan es TASK-1932 y la composición por la ruta
+  productiva, TASK-1921.
 - **TASK-1928: `complete` (2026-09-28), en `origin/develop`.** Las recetas de deck aprobadas componen desde el
   catálogo `graphic-line-deck`: **69 de 69** (§2.1), con las decisiones de norma aplicadas (D1, 3×, cifras con fuente
   visible, sin logo ni velo en láminas interiores con foto, `[MONTO]`, contacto desde `EFEONCE_CONTACT`, burbuja URL en

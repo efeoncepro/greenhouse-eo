@@ -183,6 +183,7 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 
 | | Chequeo | Cómo se verifica |
 |---|---|---|
+| [ ] | **Antes de componer**, el plan del deck (ids de receta en orden) pasó `pnpm brand:deck-plan -- --plan plan.json` con **cero errores** y los avisos se leyeron (`rhythm-paper-run`, `section-split-corner-adjacent`) | Automático: exit 1 con cualquier error (`frame-order`, `variant-adjacent`, `plate-repeated`, `slot-over-max-chars`, los de AXIS…); los avisos, revisión |
 | [ ] | La receta tiene plantilla y el `layout` va explícito en el intent | Automático: el comando falla con `recipe-not-approved`, `recipe-without-template`, `layout-invalid` o `layout-not-in-recipe` |
 | [ ] | La pieza nace de un intent propio, fuera de `src/lib/brand-surfaces/examples/` | Revisión; automático: `src/lib/brand-surfaces/__tests__/example-plans.test.ts` falla si se editó un ejemplo |
 | [ ] | La foto viene declarada con `photo.plateRef` y `photo.alt`; el `alt` describe la escena, no el copy | Automático: `missing-photo`; revisión del texto del `alt` |
@@ -199,7 +200,7 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | [ ] | Portada con selección (`cover-brochure-cine-lines-selection`): va con `layout: 'document-selection'`; la selección cae sobre la respuesta («Crecer.»), nunca sobre la persona, con un solo cursor «Nexa»; sin burbuja URL | Automático: con `document` o `line` AXIS rechaza la selección (`selection-not-in-recipe`); el resto, revisión a ojo |
 | [ ] | La respuesta va sin punto (lo pone la esfera) y en 1–3 palabras (el testimonio, hasta 6) | Automático: `voice-answer-too-long` dentro de `surface-issues`; el punto, revisión |
 | [ ] | El ítem elegido (`selected`, o `recommended` en la cotización) existe en la lámina | Automático: `invalid-intent` si está fuera de rango |
-| [ ] | Un mismo plate no se repite dentro del deck (el P1 de la lente aparece en varios ejemplos: es de muestra) y los isotipos compuestos en la ropa tienen procedencia (`pnpm foto:emblema` antes de publicar) | Revisión del documento; pendientes abiertos del catálogo |
+| [ ] | Un mismo plate no se repite dentro del deck (el P1 de la lente aparece en varios ejemplos: es de muestra) y los isotipos compuestos en la ropa tienen procedencia (`pnpm foto:emblema` antes de publicar) | Automático para el plate si el plan declara `plateRef` (`plate-repeated`); lo demás, revisión (pendientes de TASK-1933) |
 | [ ] | La salida no se retocó a mano ni se editó la plantilla para una pieza puntual | Revisión |
 | [ ] | Se entregó con `<id>.provenance.json` y su manifest | Revisión de la carpeta de salida |
 
@@ -229,6 +230,9 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | Pruebas del compilador y del adapter | Greenhouse | `pnpm creative:layout:test` |
 | Campaña con capa `graphic_line` | Greenhouse | `pnpm creative:layout -- --contract c.yaml --mode check` |
 | Piezas con CTA y firma | Greenhouse | `pnpm foto:componer:cta plan.json` + `pnpm foto:cta:gate plan.json` |
+| Validar el plan de un deck (ids de receta) antes de componer | Greenhouse | `pnpm brand:deck-plan -- --plan <plan.json>` |
+| Que el agente proponga el plan (sólo ids; un reintento; fail-closed) | Greenhouse | `pnpm brand:deck-plan -- --propose --context <context.json> [--out <plan.json>]` |
+| Regenerar el índice del README y el catálogo de runtime tras editar las recetas (`--check` verifica) | Greenhouse | `pnpm brand:deck-recipes` |
 | Componer una receta aprobada o un documento (`pages`) | Greenhouse | `pnpm brand:compose -- --intent <intent.json> [--artifact-id <id>] [--out <dir>]` |
 | Gate visual de las plantillas de La órbita | Greenhouse | `pnpm composer:visual-gate --catalog=graphic-line` |
 | Firma de correo | AXIS | `pnpm signature:resolve -- --input intent.json` |

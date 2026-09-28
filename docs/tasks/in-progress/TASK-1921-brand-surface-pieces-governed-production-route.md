@@ -1,6 +1,5 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
-
 ## Delta 2026-09-28 — TASK-1929 dejó el plan de deck contra el catálogo
 
 - Entrada pura e isomórfica `@/lib/brand-surfaces/deck-recipes`: `validateDeckPlan(plan: DeckPlan): { ok, issues: DeckPlanIssue[] }`

@@ -84,6 +84,13 @@ componen; la última, `cover-brochure-cine-lines-selection`, entró el 2026-09-2
 cuadros de motion) y `graphic-line-overlays` (capas de video con alfa). Mapa completo de las 69: §«Mapa receta →
 plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose`».
 
+- **Antes de componer, el plan de recetas** (TASK-1929): un `DeckPlan` (`document`, `line?`, `diagnosisDone?`,
+  `slides[{ recipeId, slots?, plateRef?, progress?, purpose? }]`) se valida con
+  `pnpm brand:deck-plan -- --plan plan.json` (`validateDeckPlan`, pura: piso AXIS `resolveSurfaceDocument` en
+  propuesta y brochure + reglas del catálogo) o lo propone el agente con `--propose --context` (sólo elige ids de un
+  enum, un reintento, fail-closed). No confundirlo con el `Plan` del composer (`deck-plan.json` que escribe
+  `brand:compose`): el de recetas nombra recetas, el del composer ya trae plantillas. Códigos y arreglos:
+  [SKILL.md](SKILL.md) §«Plan del deck».
 - **Se componen desde un intent de superficie**, no desde un `Plan` escrito a mano:
   `pnpm brand:compose -- --intent <intent.json>`. El mapper `src/lib/brand-surfaces` exige receta aprobada, valida con
   el contrato AXIS `efeonce.surface-composition` y deriva el `contentType`; el autor nunca elige plantilla (sigue
@@ -134,8 +141,9 @@ plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.
   (`text`, `richText`, `number`, `metric`, `list`, `image`, `logo`, `person`, `money`, `date`, `enum`, `section`),
   `required` y `maxChars` **medido en la referencia aprobada** (lo que cabe sin cruzar la órbita ni al sujeto);
   `fixed[]` es lo que la plantilla quema y el autor no toca; `selection` declara el objetivo para
-  `efeonce.collaboration-selection`; `pairsWith` (`cover↔close`, `variant`, `sequence`) alimenta la validación del
-  documento. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
+  `efeonce.collaboration-selection`; `pairsWith` alimenta la validación del plan (TASK-1929): `cover↔close` →
+  `pair-cover-close-mismatch`, `variant` → `variant-adjacent` (no seguidas; separadas se permiten); `sequence` **no se
+  valida** porque no tiene dirección. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
   `method-staircase`…); los nuevos son kebab-case en inglés. **El catálogo de recetas sirve para elegir la lámina; se
   compone con el intent de AXIS.** Hoy componen **las 69** con **50 plantillas**: TASK-1927 dejó 30 recetas sobre 16
   plantillas; TASK-1928 sumó las 38 restantes sobre 34 plantillas y, el 2026-09-28, la portada con selección
@@ -397,5 +405,8 @@ Tres capacidades del motor que cambian lo que un deck puede afirmar:
   rechazarlo y el autor debe resolver el contenido o el schedule.
 - **NUNCA** declares un deck listo sin **MIRAR TODOS LOS FRAMES**. Los tests verdes no son el gate.
 - **SIEMPRE** el `Plan` es el artefacto auditable; el PDF es derivado y re-componible.
+- **SIEMPRE** que edites `EFEONCE_DECK_SLIDE_RECIPES_V1.json`, corre `pnpm brand:deck-recipes` (regenera el índice del
+  README y `src/lib/brand-surfaces/deck-recipes/catalog.generated.json`); el runtime nunca lee el JSON de `docs/`, y
+  `--check` + el test `catalog-drift` fallan si quedaron desalineados.
 - **SIEMPRE** preserva el lineage/ledger de un asset generativo insertado, sin imputar el render del deck como
   nueva operación generativa.

@@ -553,6 +553,15 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 > Spec técnica vigente del lado Greenhouse: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
 > Task: `docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md`.
 
+> **Delta 2026-09-28 (TASK-1929, code complete) — el plan de un deck se valida antes de componer, fuera del motor.**
+> `src/lib/brand-surfaces/deck-recipes/` (consumidor, no motor) agrega un catálogo de recetas legible en runtime
+> (`catalog.generated.json`, generado por `pnpm brand:deck-recipes`), `validateDeckPlan` (piso de documento de AXIS con
+> `resolveSurfaceDocument` + reglas del catálogo con código propio) y `proposeDeckPlan` (`server-only`: un agente elige
+> recetas por id y falla cerrado), con la CLI `pnpm brand:deck-plan`. El Artifact Composer no cambia: el plan sigue
+> entrando por `pnpm brand:compose`. Detalle en §12 de
+> [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
+> Task: `docs/tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md`.
+
 ---
 
 ## Hard rules (NUNCA / SIEMPRE)

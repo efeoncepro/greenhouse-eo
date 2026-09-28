@@ -14,7 +14,8 @@ description: >-
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
   "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "portada",
   "contraportada", "recetas del deck", "qué lámina uso". En marca propia Efeonce, elige láminas del
-  catálogo de 69 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/) y compón las
+  catálogo de 69 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/), valida el
+  plan con pnpm brand:deck-plan (o pídele al agente que lo proponga con --propose) y compón las
   69 (todas tienen plantilla), o el documento completo, con pnpm brand:compose.
 ---
 
@@ -295,7 +296,9 @@ AXIS (`efeonce.surface-composition`). El `id` del catálogo de recetas nombra la
 
 **El flujo completo de hoy (deck o brochure de marca propia):**
 
-1. **Elige la lámina** en el catálogo de 69 recetas (subsección «Recetas por lámina»).
+1. **Elige la lámina** en el catálogo de 69 recetas (subsección «Recetas por lámina»). Para un deck o documento
+   entero, escribe primero el **plan** (ids de receta en orden) y valídalo con
+   `pnpm brand:deck-plan -- --plan plan.json` hasta que no quede ningún error (subsección «Plan del deck»).
 2. **Mira su plantilla.** Las 69 tienen plantilla; la lista por id del catálogo, con su receta y `layout` de
    AXIS, está en el [README del catálogo](../../../docs/operations/brand-graphic-line/deck-recipes/README.md)
    §«Qué sale hoy con un comando» (columna «Plantilla», leída del `registry.json`). `recipe-map.json` ya no tiene
@@ -306,7 +309,8 @@ AXIS (`efeonce.surface-composition`). El `id` del catálogo de recetas nombra la
 4. **Compón** la pieza o el documento: `pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]`.
    Sin `--out`, sale en `.captures/brand-surfaces/<id>/` (el id es el nombre del archivo sin `-intent.json`):
    `<id>.pdf` (16:9), `01-<slug>.png` + `.pdf` (la lámina suelta, para revisar), `deck-plan.json`,
-   `<id>.manifest.json`, `<id>.surface-manifest.json` (el manifest de AXIS que la gobernó) y `<id>.provenance.json`. Si falla, lee la tabla «Qué falla y por qué» de abajo.
+   `<id>.manifest.json`, `<id>.surface-manifest.json` (el manifest de AXIS que la gobernó) y `<id>.provenance.json`. Si falla, lee la tabla «Qué falla y por qué» de abajo. Ojo: ese `deck-plan.json` es el `Plan` del
+   composer (plantillas ya resueltas), **no** el `plan.json` de recetas que valida `pnpm brand:deck-plan`.
 5. **Revisa a ojo** el PNG o el PDF contra la referencia aprobada de la lámina (canvas «Deck» o AXIS
    `references/surfaces/deck/<id>.jpg`). El gate visual cubre las plantillas con sus datos de prueba, no tu pieza.
    Componer no aprueba ni publica.
@@ -513,8 +517,10 @@ lo decidas por tu cuenta: la plantilla sigue el token.
 `origin/develop`: las 69 recetas componen, gate `--catalog=graphic-line` a 0 px en 66 frames. **Lo que todavía no
 está** (no lo afirmes como hecho): la ruta productiva gobernada (API, worker, MCP) es **TASK-1921, `in-progress` en
 otra sesión** — no la describas como disponible ni toques sus archivos (`src/lib/brand-surfaces/production/**`);
-`pnpm brand:compose` es el taller local. Siguen TASK-1929 (plan de deck validado contra el catálogo), TASK-1930 (datos
-reales en los slots), TASK-1931 (banco de plates gobernado) y TASK-1932 (Proposal Studio arma el deck desde recetas).
+`pnpm brand:compose` es el taller local. TASK-1929 (plan de deck validado contra el catálogo y propuesta del agente)
+está **code complete en `develop` local**, `in-progress` hasta docs y gates de cierre (subsección «Plan del deck»).
+Siguen TASK-1930 (datos reales en los slots), TASK-1931 (banco de plates gobernado), TASK-1932 (Proposal Studio arma
+el deck desde recetas: confirmación humana, API, Nexa y MCP del plan) y TASK-1933 (pendientes de QA del catálogo).
 El documento completo no tiene frame propio en el gate visual (usa fotos reales): lo cubren sus páginas.
 
 #### Recetas por lámina: el catálogo de las 69 (aprobado 2026-09-27)
@@ -530,20 +536,25 @@ por lámina». Manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md
    o `-dawn`) + contraportada con foto y «Empower your Growth» (`close-proposal-horizon` o `-dawn`). Brochure: portada
    con foto (`cover-brochure-cine-*` o `cover-brochure-line-*`) + `close-brochure-orbit`. Pitch y QBR: no hay portada
    propia en las 69; si el catálogo remite a `cover-classic` / `close-classic`, **no las uses** (el operador no las
-   aprobó y no tienen plantilla): pregunta al operador qué marco usar.
+   aprobó y no tienen plantilla): pregunta al operador qué marco usar. Ojo: el validador del plan **sí las acepta** en
+   pitch y QBR (y en ningún otro documento) y no avisa que no tienen plantilla; que el plan pase no las vuelve
+   componibles.
 2. **Esqueleto por familias** (`cover`, `section`, `about`, `content`, `method`, `proof`, `proposal-service`,
    `pricing`, `next-steps`, `breather`, `close`) y, en cada tramo, la receta por su `useWhen` / `avoidWhen`; si no
    calza, su `preferInstead` (`[{ recipe, when }]`) dice cuál usar y cuándo. Cada receta trae también `documents`
    (en qué documento va), `communicates` (qué afirma la lámina) y `reference` (la imagen aprobada).
-3. **Pares** (`pairsWith: [{ recipe, relation }]`): `cover↔close` (alternar foto y sin foto), `variant` (se elige una:
-   tabla, escena o cotización en vivo; escalera o BeX plana) y `sequence` (quiénes somos → por qué lo hacemos; sección
-   → página de servicio; cotización en vivo → riesgo).
+3. **Pares** (`pairsWith: [{ recipe, relation }]`): `cover↔close` (alternar foto y sin foto), `variant` (dos variantes
+   de la misma lámina **no van seguidas**; el validador no prohíbe repetirlas separadas: tabla, escena o cotización en
+   vivo; escalera o BeX plana) y `sequence` (van juntas —quiénes somos y por qué lo hacemos; sección y página de
+   servicio; cotización en vivo y riesgo—, **sin dirección**: no hay regla de orden, ver «Plan del deck»).
 4. **Slots** con su `maxChars` **medido** en la referencia: si no cabe, se acorta; la respuesta se escribe sin punto
    (lo pone la esfera); `money` siempre `[MONTO]`; `metric` con fuente; `logo` sólo de clientes que autorizan su uso.
-5. **Componer:** intent propio de AXIS + `pnpm brand:compose` (las 69 tienen plantilla; tablas de «Componer hoy con
+5. **Valida el plan** con `pnpm brand:deck-plan -- --plan plan.json`: corrige todo error, lee los avisos
+   (subsección siguiente).
+6. **Componer:** intent propio de AXIS + `pnpm brand:compose` (las 69 tienen plantilla; tablas de «Componer hoy con
    `pnpm brand:compose`» y lista por id en el README del catálogo). La portada con selección va con
    `layout: 'document-selection'`.
-6. **Revisar a ojo** cada lámina compuesta contra su referencia aprobada.
+7. **Revisar a ojo** cada lámina compuesta contra su referencia aprobada.
 
 **Decisiones que un agente necesita en el momento:** cotización en tres variantes, sólo en propuesta (tabla para
 lectura, escena para sala, en vivo cuando el alcance está acordado); `decision-next-steps` es la versión con la agenda
@@ -553,10 +564,104 @@ BeX: la escalera es la principal. **Registro cine** también en las láminas de 
 no se extiende a otras superficies). **Pendientes de QA de las referencias** (respuestas bajo 3×, acento bajo 24 px,
 cifras sin fuente, sin burbuja en partners, velo sobre el plate, logo chico en secciones de cine, dirección de
 contacto): TASK-1928 los resolvió en las plantillas aplicando la norma; si compones con `pnpm brand:compose` ya salen
-corregidos. Siguen abiertos el plate P1 repetido (no repetirlo en un mismo deck), los isotipos sin registro de
+corregidos. Siguen abiertos (TASK-1933) el plate P1 repetido (no repetirlo en un mismo deck: el validador del plan ya lo
+detecta con `plate-repeated`), los isotipos sin registro de
 procedencia (`pnpm foto:emblema` antes de publicar) y el logo dentro de la órbita en el cierre; lista en el README del
 catálogo.
 Si una `notes` del JSON contradice estas decisiones, mandan las decisiones.
+
+#### Plan del deck: validar contra el catálogo antes de componer (TASK-1929, 2026-09-28)
+
+**Flujo:** mensaje → **plan** (ids de receta en orden) → `pnpm brand:deck-plan -- --plan plan.json` (corrige **todo**
+error; lee los avisos) → intent por lámina o documento con `pages` → `pnpm brand:compose`. El validador es la puerta
+entre elegir y componer: un plan con error no se compone. Estado: code complete en `develop` local (TASK-1929
+`in-progress` hasta el cierre).
+
+**`plan.json`** (tipo `DeckPlan`; ejemplos en `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-*.json`):
+
+```json
+{ "document": "brochure", "line": "growth", "diagnosisDone": false,
+  "slides": [
+    { "recipeId": "cover-brochure-cine-orbit", "purpose": "abre con la pregunta de la línea" },
+    { "recipeId": "proposal-cinematic-aeo", "plateRef": "ai-generations/…/plate.png",
+      "progress": { "sections": 4, "current": 1 }, "slots": { "question": "¿Te encuentra la IA?" } }
+  ] }
+```
+
+- `document`: `proposal` | `brochure` | `pitch` | `qbr`. `line`: token de línea (`growth`, `brand`, `engine`, `voice`,
+  `revenue-hubspot`); la toman portada y cierre. `diagnosisDone`: sólo propuesta (activa `next-steps-after-diagnosis`).
+- `slides[].recipeId`: **id del catálogo, nunca plantilla, `contentType`, `deck.*` ni familia de AXIS**
+  (`proposal-cinematic` como familia no es receta; la excepción son `cover-classic`/`close-classic` en pitch y QBR,
+  ver «Cómo se usa»). `slots`, `plateRef` y `progress` son opcionales: **sin `slots` la lámina es esqueleto** y sus
+  slots no se validan; `plateRef` alimenta `plate-repeated`; sin `progress`, la navegación se deriva del orden de las
+  secciones.
+- Salida: `✓ Plan válido (N aviso(s))` o `✗ Plan inválido` con una línea por issue (`✗` error / `!` aviso,
+  `[source]`, lámina, slot, detalle). Exit 1 si hay error; 2 si el archivo o el contexto no se leen. `ok` = sin errores
+  (los avisos no bloquean).
+
+**Qué valida y cómo se arregla.** Dos fuentes, **una regla, una voz**: lo que AXIS valida del documento llega con
+`source: 'axis'` y el código de AXIS; el catálogo sólo agrega lo que AXIS no conoce, y calla si AXIS ya habló de esa
+lámina (`AXIS_EQUIVALENT` en `issues.ts`). El piso AXIS corre **sólo en propuesta y brochure y sólo si todas las
+láminas resolvieron** (arma el documento con la página de ejemplo de cada receta y lo pasa por
+`resolveSurfaceDocument`; los issues de página se reportan en su lámina, sin el prefijo `page[i]:`).
+
+| Código | Fuente | Tipo | Qué significa → cómo se arregla |
+|---|---|---|---|
+| `brochure-cover-first` · `brochure-close-last` | axis | error | la portada no abre / el cierre no cierra → muévelas |
+| `brochure-needs-service-page` | axis | error | brochure sin `proposal-cinematic` layout `service` → agrega una página de servicio |
+| `frame-photo-must-alternate` | axis | error | portada y cierre ambos con foto o ambos sin → cambia uno por su par (tabla «Qué portada con qué contraportada») |
+| `document-line-mismatch` · `use-not-for-recipe` · `progress-required` | axis | error | línea del marco ≠ la del documento / receta que no admite ese uso / falta navegación → ajusta `line`, cambia la receta o declara `progress` |
+| `plan-invalid` | catalog | error | el JSON no tiene la forma de `DeckPlan` → corrige la forma |
+| `template-named-instead-of-recipe` | catalog | error | nombraste plantilla, `contentType`, `deck.*` o un id con mayúscula → usa el id del catálogo |
+| `recipe-unknown` · `recipe-not-for-document` | catalog | error | id inexistente / receta que no va en ese documento (`documents`) → elige otra de `listDeckRecipes(document)` |
+| `frame-count` · `frame-order` | catalog | error | más de una portada o cierre (cubre «eslogan dos veces») / marco fuera de lugar → una portada primera, un cierre último |
+| `pair-cover-close-mismatch` | catalog | error | portada y cierre no son pareja `cover↔close` → usa la pareja declarada |
+| `next-steps-after-diagnosis` | catalog | error | `decision-next-steps` en propuesta con `diagnosisDone: true` → quítala; su `preferInstead` sugiere `content-pricing-live` si el siguiente gesto es aprobar la cotización |
+| `variant-adjacent` | catalog | error | dos variantes de la misma lámina **seguidas** → sepáralas o deja una |
+| `plate-repeated` | catalog | error | el mismo plate dos veces en el plan (el P1) → otro plate |
+| `slot-unknown` · `slot-type-invalid` · `slot-required-missing` · `slot-over-max-chars` | catalog | error | slot que la receta no tiene (p. ej. eslogan en portada) / tipo / obligatorio / largo (`text` total, `richText` por línea sin `**`, `list` por ítem) → **acorta la frase**, nunca la caja |
+| `recipe-without-template` | catalog | aviso | lámina sin plantilla en el composer: hoy sólo `cover-classic`/`close-classic` en pitch y QBR (las 69 recetas la tienen) → el plan vale pero ese deck no se compone de punta a punta |
+| `section-split-corner-adjacent` | catalog | aviso | dos secciones partidas seguidas con la misma esquina → cambia el `layout` de una |
+| `rhythm-paper-run` | catalog | aviso | tres láminas de papel seguidas (un aviso por tramo) → mete una oscura o un respiro; tres oscuras seguidas es la norma |
+| `proposal-unavailable` | agent | error | sólo en `--propose`: el proveedor falló → reintenta más tarde o arma el plan a mano |
+
+Sin código a propósito: la alternancia foto (AXIS), el eslogan en portada (`slot-unknown`), el orden de una
+`sequence` (**no hay**: `pairsWith sequence` no tiene dirección; `proposal-cinematic-nexa-lines` lista la portada como
+secuencia, así que una regla de orden daría avisos falsos).
+
+**Que el agente proponga el plan:** `pnpm brand:deck-plan -- --propose --context context.json [--out plan.json]`
+(`proposeDeckPlan` en `src/lib/brand-surfaces/deck-recipes/propose.ts`, `server-only`; ejemplo de contexto:
+`__tests__/fixtures/context-brochure.json`).
+
+- **Contexto por allowlist:** `document`, `audience` (`room` | `reading`), `line`, `diagnosisDone`, `sections`
+  (1–20 temas), `availableFacts?` (nombres de pruebas, hasta 20), `brief?`; cada texto ≤ 200 caracteres. Cualquier otra
+  clave (id de organización, monto, dato personal) → `DeckPlanContextError`, exit 2.
+- **El modelo sólo elige recetas:** `claude-sonnet-5` por el cliente canónico (`generateStructuredAnthropic`), tool
+  forzado con `recipeId` restringido a un **enum** con los ids del documento; devuelve `recipeId` + `purpose` + un
+  porqué, **nunca contenido ni cifras** (el plan sale sin `slots`: es esqueleto).
+- **Un reintento y fail-closed:** si el plan trae errores, **un** reintento con el plan previo y los issues; si
+  persisten, `✗ Sin plan válido`, el plan rechazado sólo para diagnóstico y exit 1. Con `--out` se escribe el plan
+  **sólo si es válido**. No confirma, no persiste ni compone (confirmación humana, API, Nexa y MCP: TASK-1932).
+- **Costo:** imprime tokens y un costo **estimado** con tarifa de referencia USD 3/15 por millón (no es factura).
+  Corrida real 2026-09-28 (brochure, 4 secciones): 16 láminas válidas en el 2.º intento (el 1.º sin página de servicio
+  → `brochure-needs-service-page`, corregido en el reintento), 17 918 + 2 368 tokens, ≈ USD 0,09, un aviso
+  `rhythm-paper-run`.
+- **Credenciales locales:** si `.env.local` no las trae,
+  `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key GCP_PROJECT=efeonce-group pnpm brand:deck-plan -- --propose …`
+  con ADC vigente (`pnpm gcloud:auth:playwright -- --force` si venció).
+
+**Invariantes:**
+
+- El plan **nombra recetas**, nunca plantillas ni `contentType`: la plantilla la deriva el mapper al componer
+  (`TemplateAuthorityError` sigue vigente).
+- **Nadie lee el JSON de `docs/` en runtime.** El código importa `catalog.generated.json` vía
+  `@/lib/brand-surfaces/deck-recipes` (`deckRecipeCatalog`, `getDeckRecipe`, `listDeckRecipes`, `validateDeckPlan`); un
+  test lo vigila. `proposeDeckPlan` se importa aparte desde `…/deck-recipes/propose`.
+- **Al editar `EFEONCE_DECK_SLIDE_RECIPES_V1.json` corre siempre `pnpm brand:deck-recipes`:** regenera el índice del
+  README **y** el catálogo de runtime. Sin eso, `pnpm brand:deck-recipes -- --check` falla («catálogo de runtime … no
+  coincide …») y el test `catalog-drift` rompe CI.
+- **Una regla, una voz con AXIS:** una regla que AXIS ya valida no se duplica en el catálogo; si AXIS cambia su código,
+  manda AXIS.
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
@@ -875,6 +980,8 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
   BBC lo rastreó hasta un sitio SEO que citaba 25 personas abandonando webs en 2008.)*
 - **NUNCA** dibujes una lámina freehand. Se **compone** desde el catálogo. Si no hay plantilla, hay un
   **gap de catálogo**, no una licencia.
+- **NUNCA** compongas un deck de marca propia sin antes validar su plan con `pnpm brand:deck-plan -- --plan`
+  (cero errores; avisos leídos). El plan nombra recetas por id, nunca plantillas ni `contentType`.
 - **NUNCA** cotices Studio Credits por lámina, deck, hora de autoría, render o export. Sólo una capability
   generativa gobernada y ejecutada puede devengar créditos.
 - **NUNCA** verifiques las anotaciones /Link de un PDF con grep sobre sus bytes: pdf-lib comprime en

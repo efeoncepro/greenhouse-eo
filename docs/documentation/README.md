@@ -41,8 +41,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   con la selección de Nexa, qué decide la persona (contenido, cifras con fuente, foto, ítem destacado) y qué decide el
   sistema (medidas, colores, tipografía, montos como `[MONTO]`, contacto), las reglas que hace cumplir (largos
   máximos, fuentes visibles, logos normalizados, sin logo ni velo en láminas interiores con foto, una selección por
-  lámina), las reglas de un documento de varias páginas, qué entrega y qué no hace todavía (ruta dentro de la
-  plataforma TASK-1921 en curso; TASK-1929 a TASK-1932). Actualizado el 2026-09-28.
+  lámina), las reglas de un documento de varias páginas, **validar y proponer el plan del deck antes de componer**
+  (`pnpm brand:deck-plan`: AXIS y el catálogo revisan la secuencia, errores y avisos, el agente propone recetas por id y
+  la persona confirma; TASK-1929), qué entrega y qué no hace todavía (ruta dentro de la plataforma TASK-1921 en curso;
+  TASK-1930 a TASK-1932). Actualizado el 2026-09-28.
 - [Render gobernado de piezas de marca — La órbita y Glitch](creative/render-gobernado-piezas-de-marca.md) — pedir
   una pieza, un documento o una edición de Glitch dentro de Greenhouse y recibir los archivos con su procedencia; qué
   se revisa antes de encolar, estados y quién puede usarlo. Construido y apagado (TASK-1921, rollout pendiente).
