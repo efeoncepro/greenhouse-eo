@@ -1,5 +1,15 @@
 # TASK-1903 — Efeonce Insights: agente redactor de informes de clientes
 
+## Delta 2026-09-28 — operable por MCP en dos modos (decisión del operador)
+
+- El operador pidió que el agente redactor sea **operable por MCP en ambos modos**: (1) **operar el redactor de
+  Greenhouse** —pedir la propuesta, leerla y aceptar o rechazar campo por campo— y (2) **autor externo**: un agente
+  conectado al MCP (Claude, ChatGPT u otro cliente) lee el contexto permitido y **envía él mismo** la propuesta, que
+  pasa por las mismas validaciones y la misma aceptación humana. Se agregan el Slice 4 (autor externo), los
+  contratos `InsightAgentContextV1` y `submitAgentProposal`, las tools MCP con sus banderas del manifiesto, y
+  decisiones nuevas del Slice 0 (confirmación humana por MCP y salida de datos a un modelo externo). La Cartera
+  pasa a ser el Slice 5 y la verificación, el Slice 6.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -39,6 +49,10 @@ recién ahí la edición avanza. Opera la cartera de clientes con las recurrenci
 revisión. El modelo se elige por una comparación medida entre proveedores; el operador propone OpenAI como candidato
 principal.
 
+Todo es operable por MCP en dos modos: se opera el redactor de Greenhouse (pedir, leer, aceptar o rechazar por
+campo), o un agente externo conectado al MCP redacta la propuesta él mismo sobre el mismo contexto permitido. En los
+dos casos la propuesta pasa por las mismas validaciones, queda con su procedencia y sólo una persona la acepta.
+
 ## Why This Task Exists
 
 El 2026-09-25 el operador aprobó los PDFs de Berel (`EO-INS-000019`) y Sky (`EO-INS-000022`) con el contrato
@@ -72,6 +86,11 @@ puede interpretar el agente, qué contexto puede leer y cómo se marca una hipó
 - La cartera de clientes con recurrencia activa llega a revisión con la propuesta del agente ya hecha, dentro de un
   techo de costo por organización y mes.
 - Paridad completa: todo lo que el agente propone y lo que la persona confirma existe por API y MCP.
+- Operable por MCP en modo **operación**: tools para pedir la propuesta al redactor de Greenhouse, leerla y aceptar o
+  rechazar por campo, con el mismo command que la API y la UI.
+- Operable por MCP en modo **autor externo**: un agente conectado al MCP lee el contexto permitido de una edición
+  (`InsightAgentContextV1`) y envía su propuesta (`submitAgentProposal`); Greenhouse la valida igual que la del
+  redactor interno, registra quién la escribió y la deja para aceptación humana. El agente externo nunca acepta.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -93,6 +112,12 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
 - `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` — §Invariantes de proveedores LLM (cliente
   canónico `src/lib/ai/`, secretos por `*_SECRET_REF`).
+- `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` — manifiesto como única fuente de tools
+  (§0: banderas ortogonales `writes` y `spendsProviderBudget`), la superficie agéntica como contrato (§1), guardas
+  sostenidas por mecanismo (§3), federar es parte de «listo» (§5) y manual servido por el protocolo (§8).
+- `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md` §22 + `EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
+  + `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md` D8–D11 — consentimiento, scopes y autoridad de persona.
+  Skill `efeonce-mcp-platform`.
 
 Reglas obligatorias:
 
@@ -106,6 +131,12 @@ Reglas obligatorias:
   decide el Slice 0).
 - **Sin SDK paralelo:** los proveedores se llaman por `src/lib/ai/` (`openai.ts`, `anthropic.ts`,
   `google-genai.ts`). Si falta un bucle de herramientas en el cliente canónico, se extiende ahí.
+- **Por MCP, ninguna tool acepta sin una persona.** Un agente (interno o externo) propone; aceptar exige un actor
+  persona con autoridad de revisión y el mecanismo de confirmación que fije el Slice 0. Una sesión con binding de
+  servicio o un agente actuando solo nunca acepta.
+- **El autor externo pasa por la misma puerta.** Una propuesta enviada por MCP se valida con el mismo código que la
+  del redactor interno (`validateEditorialPlan`, `PLAN_TEXT_LIMITS`, citas por frase); no existe una validación
+  «más liviana» para agentes externos.
 - **Replay determinista:** una edición sellada no vuelve a llamar al modelo; la propuesta aceptada queda congelada
   con su procedencia (modelo, versión de prompt, herramientas usadas, tokens, costo), nunca la cadena de
   razonamiento.
@@ -133,6 +164,11 @@ Reglas obligatorias:
   (follow-up `ui-ux`; esta task no dibuja UI).
 - TASK-1901 y TASK-1902 (más familias de gráfico): más evidencia le da más material al agente; no se bloquean.
 - Skill `efeonce-mcp-platform`: tools nuevas federadas en `efeonce-mcp` con scope propio de escritura.
+- Manifiesto de tools `src/mcp/greenhouse/tool-manifest.ts` (dominio `insights`) y su inventario generado
+  (`pnpm mcp:manifest:generate` / `pnpm mcp:manifest:check`).
+- Manual servido por MCP `docs/mcp/skills/efeonce-insights/SKILL.md` (recetas de los dos modos; sin TASK ids, rutas ni
+  ids internos: test de fuga; `pnpm mcp:skills:generate` + `pnpm mcp:skills:check`).
+- Gateway `efeonce-mcp` (repo hermano): federación de las tools nuevas, versión y canary.
 
 ### Files owned
 
@@ -144,6 +180,12 @@ Reglas obligatorias:
 - `scripts/insights/agent-bakeoff.ts` (nuevo)
 - `docs/architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md` (delta)
 - `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md` (primera ficha LLM)
+- `src/lib/efeonce-insights/editorial/agent/context.ts` (nuevo: `InsightAgentContextV1`, compartido por el redactor
+  interno y el autor externo) [verificar ubicación final en el Slice 2]
+- Rutas de lane de propuestas en `src/app/api/platform/{app,ecosystem}/insights/**` [verificar forma exacta]
+- `src/mcp/greenhouse/tool-manifest.ts` (entradas nuevas del dominio `insights`) y su inventario generado
+- `docs/mcp/skills/efeonce-insights/SKILL.md` (recetas de operación y de autor externo)
+- Federación en el gateway `efeonce-mcp` (repo hermano; coordinar con su dueño y su pipeline de deploy)
 
 ## Current Repo State
 
@@ -199,11 +241,18 @@ Reglas obligatorias:
 
 - Contrato existente a respetar: `EditorialPlanV1` v2 (TASK-1888), `validateEditorialPlan`, `PLAN_TEXT_LIMITS`,
   máquina de estados de la edición (`edition-state-machine.ts`).
-- Contrato nuevo o modificado: `InsightAgentProposalV1` (parche por campo, con `factIds` citados por cada texto,
-  procedencia y costo); commands `requestAgentProposal`, `acceptAgentProposalFields`, `rejectAgentProposal`.
+- Contrato nuevo o modificado:
+  - `InsightAgentProposalV1`: parche por campo, con `factIds` citados por cada texto, procedencia
+    (`author.kind: internal_agent | external_agent`; para el externo, el cliente MCP y la persona de la sesión; el
+    modelo que declare queda como `declared`, no verificado) y costo (sólo para el redactor interno).
+  - `InsightAgentContextV1`: el contexto permitido de una edición en revisión (hechos sellados, hallazgos
+    deterministas, plan vigente con su `planHash`, `PLAN_TEXT_LIMITS`, formato de citas y el contexto que autorice el
+    Slice 0). Es la MISMA entrada para el redactor interno y para el autor externo.
+  - Commands `requestAgentProposal` (redactor interno), `submitAgentProposal` (autor externo),
+    `acceptAgentProposalFields`, `rejectAgentProposal`; reader `getAgentProposal` / `listAgentProposals`.
 - Backward compatibility: `compatible`. Sin flag, todo sigue como hoy; un plan sin propuesta compone igual.
-- Full API parity: lane app/ecosystem + tools MCP para solicitar, leer, aceptar y rechazar, con el mismo command
-  canónico que usará la UI.
+- Full API parity: lane app/ecosystem + tools MCP para leer el contexto, solicitar, enviar (autor externo), leer,
+  aceptar y rechazar, con el mismo command canónico que usará la UI. Tabla de tools en `## Detailed Spec`.
 
 ### Data model and invariants
 
@@ -216,10 +265,18 @@ Reglas obligatorias:
   - Replay sin llamar al modelo.
   - Costo por edición y por organización al mes con techo duro; al superarlo, la edición sigue con el texto
     determinista y queda una señal.
+  - La propuesta de un autor externo se valida con el mismo código que la interna; un campo que no pasa se descarta
+    con motivo y el autor lo ve en la respuesta de la tool.
+  - Un autor (interno o externo) nunca acepta su propia propuesta; aceptar exige una persona con autoridad de revisión
+    y la confirmación que defina el Slice 0.
+  - Una propuesta se liga al `planHash` del contexto que leyó; si el plan cambió, enviar o aceptar falla con
+    `409 plan_changed` (nunca se aplica sobre un plan distinto al que vio el autor).
 - Write-target allowlist: tabla de propuestas del agente; el plan editorial sólo por el command de aceptación.
 - Tenant/space boundary: el agente sólo lee hechos y contexto de la organización de la edición.
-- Idempotency/concurrency: una propuesta vigente por edición y hash de plan; solicitar dos veces devuelve la misma.
-- Audit/outbox/history: eventos `insights.agent_proposal.created|accepted|rejected` en el catálogo de eventos.
+- Idempotency/concurrency: una propuesta vigente por edición, hash de plan y autor; solicitar o enviar dos veces con la
+  misma `idempotencyKey` devuelve la misma. Aceptar compara el `proposalHash` (compare-and-set).
+- Audit/outbox/history: eventos `insights.agent_proposal.created|accepted|rejected` en el catálogo de eventos, con
+  `authorKind` en el payload (sin texto del plan ni datos del cliente).
 
 ### Migration, backfill and rollout
 
@@ -232,7 +289,13 @@ Reglas obligatorias:
 ### Security and access
 
 - Auth/access gate: capability nueva `insights.agent_proposal.review` (aceptar/rechazar), con grant a un rol real
-  en el mismo PR; solicitar exige la misma autoridad que revisar la edición.
+  en el mismo PR; solicitar exige la misma autoridad que revisar la edición. Leer el contexto y enviar como autor
+  externo exigen autoridad sobre la edición de esa organización (capability exacta en el Slice 0).
+- MCP: las tools que escriben usan el scope de clase `efeonce.mcp.insights.write` (hoy ningún cliente lo porta; el
+  Slice 0 define qué clientes lo reciben). `request_insight_agent_proposal` declara `spendsProviderBudget: true`.
+  Aceptar por MCP sólo con actor persona (nunca binding de servicio) y con el mecanismo de confirmación del Slice 0.
+- Salida de datos: en el modo autor externo, los hechos de un cliente viajan al modelo del cliente MCP que usa la
+  persona. Quién puede hacerlo y con qué clientes lo decide el Slice 0 (gobierno de datos de IA).
 - Sensitive data posture: al modelo sólo viajan hechos sellados y contexto allowlisted; nada de PII operativa.
 - Error contract: `canonicalErrorResponse` en lanes; errores del proveedor saneados.
 - Abuse/rate-limit posture: techo de costo, pasos y tokens por propuesta; una solicitud por edición a la vez.
@@ -259,6 +322,9 @@ Reglas obligatorias:
   federadas en `efeonce-mcp` con scope propio de escritura.
 - La aceptación humana es el único camino que muta el plan (`propose → confirm → execute`).
 - Capability registrada en `capabilities_registry` + catálogo TS + grant a rol real en el mismo PR.
+- Tools MCP en `src/mcp/greenhouse/tool-manifest.ts` con `writes` y `spendsProviderBudget` correctos, federadas en
+  `efeonce-mcp` (versión nueva del gateway), con manual servido actualizado y canary contra el lane. Sin federar, la
+  paridad por MCP no está hecha.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -285,7 +351,17 @@ Reglas obligatorias:
   - cómo marca una hipótesis de causa, o si la prohíbe;
   - qué no hace nunca;
   - techo de costo;
-  - si reemplaza o convive con `authorPlanWithBoundedAi`.
+  - si reemplaza o convive con `authorPlanWithBoundedAi`;
+  - **confirmación humana por MCP**: cómo cuenta una aceptación hecha desde un cliente MCP. Opciones a decidir:
+    (a) aceptar por MCP con actor persona + `proposalHash` y confirmación explícita del usuario en el cliente
+    (elicitation de MCP si el gateway la soporta [verificar]); (b) por MCP sólo proponer y leer, y aceptar en el
+    portal o el lane app; (c) aceptar por MCP con un código de confirmación que la persona obtiene fuera del agente.
+    En ningún caso un agente acepta solo;
+  - **autor externo**: qué personas y qué clientes MCP pueden leer `InsightAgentContextV1` y enviar propuestas
+    (internos de Efeonce, clientes sobre su propia organización, o ambos), la capability que lo gobierna y si el autor
+    puede ser la misma persona que acepta;
+  - **salida de datos a un modelo externo**: qué contexto del cliente puede viajar al modelo del cliente MCP y con qué
+    términos (skill `greenhouse-ai-creative-rights-governance` + `legal-privacy-ip-operator`).
 - El operador lo acepta antes del Slice 2. Fila en `DECISIONS_INDEX.md`.
 
 ### Slice 1 — Comparación de modelos medida
@@ -317,23 +393,41 @@ Reglas obligatorias:
   descarta con motivo.
 - Migración aditiva y flag `INSIGHTS_AGENT_AUTHORING_ENABLED`.
 
-### Slice 3 — Revisión humana y paridad
+### Slice 3 — Revisión humana y paridad (MCP modo operación)
 
-- Commands `requestAgentProposal`, `acceptAgentProposalFields` (por campo) y `rejectAgentProposal`, con evento,
-  auditoría e idempotencia.
-- Lane app/ecosystem y tools MCP.
+- Commands `requestAgentProposal`, `acceptAgentProposalFields` (por campo, con `proposalHash`) y
+  `rejectAgentProposal`, con evento, auditoría e idempotencia; readers `getAgentProposal` y `listAgentProposals`.
+- Lane app/ecosystem con los mismos errores canónicos (`agent_authoring_disabled` 503, `plan_changed` 409, cupo 429,
+  404 anti-oráculo para otra organización).
+- Tools MCP del modo operación (ver tabla en `## Detailed Spec`) en el manifiesto, federadas en `efeonce-mcp` con el
+  mecanismo de confirmación del Slice 0.
+- Receta «operar el redactor» en el manual servido `docs/mcp/skills/efeonce-insights/SKILL.md`.
 - Aceptar produce un plan nuevo validado; la edición sigue en revisión hasta la emisión humana.
 
-### Slice 4 — Cartera
+### Slice 4 — Autor externo por MCP
+
+- `InsightAgentContextV1` y el command `submitAgentProposal`: el agente externo lee el contexto permitido y envía
+  `InsightAgentProposalV1`. Greenhouse la pasa por el mismo validador que la interna, descarta con motivo lo que no
+  pasa, la guarda append-only con `author.kind = external_agent` y la deja para aceptación humana.
+- Tools MCP `get_insight_agent_context` (lectura) y `submit_insight_agent_proposal` (escritura sin gasto de proveedor),
+  federadas en `efeonce-mcp`.
+- Receta «redactar como autor externo» en el manual servido: cómo leer el contexto, cómo citar (`factIds` por frase),
+  los límites de texto y qué hacer con un campo rechazado.
+- Tests: la misma propuesta inválida se rechaza igual por la vía interna y la externa; un autor externo no puede
+  aceptar su propia propuesta; otra organización responde 404; el `planHash` viejo responde 409.
+
+### Slice 5 — Cartera
 
 - Las recurrencias de TASK-1848 solicitan la propuesta al generar el borrador, con techo por organización y mes.
 - Aviso al responsable de la cuenta cuando la edición queda en revisión, o cuando la evidencia no alcanza.
 - Una señal de fiabilidad para propuestas fallidas.
 
-### Slice 5 — Verificación con ediciones reales
+### Slice 6 — Verificación con ediciones reales
 
 - Staging, flag ON: propuesta para Berel y Sky, revisión y aceptación del operador, PDF compuesto con los campos
   aceptados.
+- Por MCP, desde un cliente conectado con sesión de persona: los dos modos de punta a punta (pedir al redactor y
+  aceptar; enviar como autor externo y aceptar) sobre una edición interna, con la confirmación del Slice 0.
 - Aprobación del operador antes de habilitar producción.
 
 ## Out of Scope
@@ -343,6 +437,9 @@ Reglas obligatorias:
 - Calcular cifras nuevas o KPIs, y modificar adapters o evidencia.
 - Cambiar los catálogos o el diseño aprobado (TASK-1889).
 - Fuentes de contexto no allowlisted en el Slice 0 (correo, chats, documentos sueltos).
+- Que un agente externo acepte, emita, comparta o envíe: sólo propone.
+- Medir o pagar el costo del modelo que usa el autor externo: corre en la cuenta del cliente MCP, fuera de Greenhouse.
+- Cambiar el mecanismo de consentimiento o los scopes base del gateway más allá de lo que decida el Slice 0.
 
 ## Detailed Spec
 
@@ -360,12 +457,30 @@ Qué escribe el agente, sobre la base de lo que ya produce TASK-1888:
 La propuesta nunca reemplaza un hallazgo determinista por una afirmación sin hechos. Si el agente no puede
 respaldar un campo, lo deja vacío y lo dice en la propuesta.
 
+Tools MCP (nombres propuestos; se confirman al registrar el manifiesto, siguiendo el estilo vigente del dominio
+`insights`):
+
+| Tool | Modo | Command / reader | `writes` | `spendsProviderBudget` |
+|---|---|---|---|---|
+| `get_insight_agent_context` | autor externo | reader `InsightAgentContextV1` | no | no |
+| `submit_insight_agent_proposal` | autor externo | `submitAgentProposal` | sí | no |
+| `request_insight_agent_proposal` | operación | `requestAgentProposal` | sí | sí |
+| `get_insight_agent_proposal` | ambos | `getAgentProposal` | no | no |
+| `list_insight_agent_proposals` | ambos | `listAgentProposals` | no | no |
+| `accept_insight_agent_proposal_fields` | ambos | `acceptAgentProposalFields` (persona + `proposalHash` + confirmación del Slice 0) | sí | no |
+| `reject_insight_agent_proposal` | ambos | `rejectAgentProposal` | sí | no |
+
+Si el Slice 0 elige la opción (b), `accept_insight_agent_proposal_fields` no se federa y la aceptación queda en el
+portal o el lane app; el resto de la tabla se mantiene.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- Slice 0 aceptado por el operador → Slice 1 (modelo elegido) → Slice 2 → Slice 3 → Slice 4 → Slice 5. Sin
-  decisión aceptada no se construye; sin modelo elegido no se cablea proveedor.
+- Slice 0 aceptado por el operador → Slice 1 (modelo elegido) → Slice 2 → Slice 3 → Slice 4 → Slice 5 → Slice 6.
+  Sin decisión aceptada no se construye; sin modelo elegido no se cablea proveedor. El Slice 4 (autor externo)
+  puede construirse en paralelo al Slice 1 una vez listo `InsightAgentContextV1` (Slice 2), porque no depende del
+  modelo elegido. Ninguna tool MCP de escritura se federa antes de que el Slice 0 fije la confirmación humana.
 
 ### Risk matrix
 
@@ -376,6 +491,10 @@ respaldar un campo, lo deja vacío y lo dice en la propuesta.
 | Costo del proveedor fuera de control | finanzas / proveedor | low | techo por propuesta, por organización y por mes; flag | señal de techo alcanzado |
 | Dependencia de un proveedor | plataforma | medium | proveedor detrás del cliente canónico; comparación re-ejecutable | falla de proveedor → texto determinista |
 | Datos de un cliente en el contexto de otro | acceso | low | herramientas acotadas a la organización de la edición; test de aislamiento | test de aislamiento |
+| Un agente conectado por MCP acepta sin que una persona lo decida | Insights / MCP | medium | aceptar exige actor persona + `proposalHash` + confirmación del Slice 0; el autor nunca acepta lo suyo; bindings de servicio excluidos | eventos `accepted` con `authorKind` y actor; test negativo |
+| El autor externo envía texto inventado o cifras sin respaldo | Insights | medium | mismo validador que el interno + citas por frase + revisión humana | propuestas externas descartadas por validador |
+| Datos de un cliente salen a un modelo externo no autorizado | datos / legal | medium | regla del Slice 0 (quién, qué contexto, qué clientes MCP); contexto mínimo; sin PII | auditoría de lecturas de `get_insight_agent_context` |
+| La propuesta se aplica sobre un plan que cambió después | Insights | low | `planHash` y `proposalHash` (compare-and-set) → `409 plan_changed` | 409 en el lane |
 
 ### Feature flags / cutover
 
@@ -389,19 +508,23 @@ respaldar un campo, lo deja vacío y lo dice en la propuesta.
 | Slice 0 | revertir el delta del ADR | inmediato | si |
 | Slice 1 | ninguno (script local) | n/a | si |
 | Slice 2 | flag OFF | < 5 min | si |
-| Slice 3 | flag OFF; las propuestas quedan como historial | < 5 min | si |
-| Slice 4 | flag OFF en `ops-worker` (`deploy.sh` + revisión activa) | < 15 min | si |
-| Slice 5 | flag OFF en staging | < 5 min | si |
+| Slice 3 | flag OFF; las propuestas quedan como historial; retirar la tool del gateway con su versión anterior | < 15 min | si |
+| Slice 4 | flag OFF (el lane responde `agent_authoring_disabled`); retirar las dos tools del gateway | < 15 min | si |
+| Slice 5 | flag OFF en `ops-worker` (`deploy.sh` + revisión activa) | < 15 min | si |
+| Slice 6 | flag OFF en staging | < 5 min | si |
 
 ### Production verification sequence
 
-1. Staging con flag ON: propuesta real de Berel y Sky, aceptada por el operador, PDF compuesto.
+1. Staging con flag ON: propuesta real de Berel y Sky, aceptada por el operador, PDF compuesto; los dos modos por MCP
+   de punta a punta sobre una edición interna.
 2. Producción con flag ON sólo en organizaciones internas; una edición interna real revisada por el operador.
 3. Ampliar a clientes por organización, con techo de costo.
 
 ### Out-of-band coordination required
 
 - Operador: aceptar el Slice 0, revisar a ciegas la comparación de modelos, aprobar el costo por organización.
+- Dueño del gateway `efeonce-mcp`: federación de las tools nuevas, versión y deploy (repo hermano con su propio
+  pipeline; PR, no commit directo a `main`).
 - Proveedor elegido: acceso al modelo y secreto en Secret Manager.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -420,6 +543,16 @@ respaldar un campo, lo deja vacío y lo dice en la propuesta.
 - [ ] El agente no puede emitir, compartir ni enviar: no hay camino de código desde la propuesta a esos commands
   sin confirmación humana (test).
 - [ ] Aceptar y rechazar por campo existen por API y MCP con el mismo command.
+- [ ] Modo operación por MCP: pedir, leer, aceptar y rechazar funcionan desde un cliente MCP con sesión de persona,
+  con la confirmación definida en el Slice 0 (evidencia en staging).
+- [ ] Modo autor externo por MCP: `get_insight_agent_context` y `submit_insight_agent_proposal` funcionan desde un
+  cliente MCP; la propuesta queda con `author.kind = external_agent` y espera aceptación humana (evidencia en staging).
+- [ ] La misma propuesta inválida se rechaza igual por la vía interna y por la externa (test).
+- [ ] Ningún agente acepta sin persona: una sesión con binding de servicio y el propio autor no pueden aceptar (test).
+- [ ] Otra organización responde 404 anti-oráculo y un `planHash` desactualizado responde 409 (test).
+- [ ] Tools en el manifiesto con `writes` y `spendsProviderBudget` correctos, `pnpm mcp:manifest:check` verde y
+  federadas en `efeonce-mcp` con versión nueva y canary contra el lane.
+- [ ] Manual servido con las recetas de los dos modos, `pnpm mcp:skills:check` verde y sin fugas (test).
 - [ ] El techo de costo corta la propuesta y deja el texto determinista (test).
 - [ ] Berel y Sky en staging: propuesta aceptada por el operador y PDF compuesto con esos campos.
 - [ ] Flag con fila en el ledger y runtimes declarados (Vercel + `ops-worker` en `deploy.sh`).
@@ -430,6 +563,8 @@ respaldar un campo, lo deja vacío y lo dice en la propuesta.
 - Tests focales del agente, de los commands y del aislamiento por organización
 - `pnpm vitest run src/lib/efeonce-insights`
 - `pnpm task:lint --task TASK-1903`
+- `pnpm mcp:manifest:check` y `pnpm mcp:skills:check`
+- Canary del lane y de las tools federadas en el gateway, en staging
 - Comparación de modelos y vista previa con ediciones reales (evidencia en la task)
 
 ## Closing Protocol
@@ -442,6 +577,7 @@ respaldar un campo, lo deja vacío y lo dice en la propuesta.
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [ ] Skill `efeonce-insights` actualizada (espejo `.codex` incluido), arquitectura §6/§7 y manual de operación.
+- [ ] Manual servido por MCP y skill `efeonce-mcp-platform` al día con las tools nuevas y la confirmación humana.
 
 ## Follow-ups
 
@@ -453,3 +589,8 @@ respaldar un campo, lo deja vacío y lo dice en la propuesta.
 - Contexto permitido al agente más allá de los hechos sellados: lo define el Slice 0 con el operador.
 - Si el agente reemplaza `authorPlanWithBoundedAi` o convive con ella: lo define el Slice 0.
 - Techo de costo por organización y mes: lo fija el operador con los datos del Slice 1.
+- Cómo se confirma una aceptación hecha desde un cliente MCP (opciones a, b o c del Slice 0): lo decide el operador.
+- Quién puede actuar como autor externo (internos, clientes sobre su organización o ambos) y con qué clientes MCP; si
+  el autor puede ser la misma persona que acepta: lo decide el Slice 0.
+- Qué contexto del cliente puede viajar al modelo de un cliente MCP externo: lo decide el Slice 0 con gobierno de
+  datos de IA.
