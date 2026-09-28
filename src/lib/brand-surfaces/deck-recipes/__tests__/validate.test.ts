@@ -179,6 +179,19 @@ describe('láminas SEO/AEO (TASK-1934)', () => {
 
     expect(issues.filter(issue => issue.code === 'figure-source-missing').map(issue => issue.slot)).toEqual(['figures'])
   })
+
+  // TASK-1930: la lámina aprobada de un caso lleva cuatro cifras en `stats` (slot `metric`); una lista de cifras con
+  // fuente es válida y una cifra sin fuente dentro de la lista sigue fallando.
+  it('un slot metric acepta una lista de cifras y exige la fuente de cada una', () => {
+    const stat = (value: string, source?: string) => ({ value, label: 'piezas aprobadas', ...(source ? { source } : {}) })
+
+    const slotIssues = (stats: unknown) =>
+      validateDeckPlan({ document: 'pitch', slides: [{ recipeId: 'decision-case', slots: { stats } }] }).issues.filter(issue => issue.slot === 'stats').map(issue => issue.code)
+
+    expect(slotIssues([stat('+2.000', 'caso'), stat('39', 'caso'), stat('88 %', 'caso'), stat('−25 %', 'caso')])).toEqual([])
+    expect(slotIssues([stat('+2.000', 'caso'), stat('39')])).toEqual(['figure-source-missing'])
+    expect(slotIssues([['anidada']])).toEqual(['slot-type-invalid'])
+  })
 })
 
 describe('una regla, una voz: el catálogo no duplica a AXIS', () => {

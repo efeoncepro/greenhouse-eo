@@ -54,7 +54,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -67,7 +67,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Implementación — Slices 1–4 y 7`
 - Rank: `TBD`
 - Domain: `crm|content`
 - Blocked by: `none`

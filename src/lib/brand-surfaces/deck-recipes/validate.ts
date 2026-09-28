@@ -60,7 +60,12 @@ const SCALAR_TYPES = new Set(['number', 'money', 'metric'])
 const typeProblem = (slot: DeckRecipeSlot, value: unknown): string | null => {
   if (STRING_TYPES.has(slot.type) && typeof value !== 'string') return `se esperaba texto (${slot.type})`
   if (slot.type === 'list' && !Array.isArray(value)) return 'se esperaba una lista'
-  if (SCALAR_TYPES.has(slot.type) && typeof value !== 'string' && typeof value !== 'number' && !isObject(value)) return `se esperaba un valor (${slot.type})`
+  // Una cifra va sola o en lista: la lámina aprobada de un caso lleva cuatro (`decision-case.stats`), la de un
+  // testimonio tres (TASK-1930 liga cada una desde su hecho).
+  const isScalar = (item: unknown) => typeof item === 'string' || typeof item === 'number' || isObject(item)
+
+  if (slot.type === 'metric' && Array.isArray(value)) return value.every(isScalar) ? null : 'se esperaba una cifra o una lista de cifras'
+  if (SCALAR_TYPES.has(slot.type) && !isScalar(value)) return `se esperaba un valor (${slot.type})`
 
   return null
 }
@@ -68,7 +73,7 @@ const typeProblem = (slot: DeckRecipeSlot, value: unknown): string | null => {
 /** El tramo más largo del valor según el tipo del slot: por línea en texto rico, por ítem en listas. */
 const longestRun = (slot: DeckRecipeSlot, value: unknown): number => {
   if (slot.type === 'richText' && typeof value === 'string') return Math.max(0, ...linesOf(value).map(line => visibleText(line).trim().length))
-  if (slot.type === 'list' && Array.isArray(value)) return Math.max(0, ...value.filter(item => typeof item === 'string').map(item => (item as string).length))
+  if ((slot.type === 'list' || slot.type === 'metric') && Array.isArray(value)) return Math.max(0, ...value.filter(item => typeof item === 'string').map(item => (item as string).length))
   if (typeof value === 'string') return value.length
   if (typeof value === 'number') return String(value).length
 
