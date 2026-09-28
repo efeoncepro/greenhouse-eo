@@ -358,6 +358,20 @@ de la geometría real de la toma, de una de dos maneras (las dos aprobadas):**
 - **El sujeto USA el objeto** (`NX5b`): apoyada con las manos en el borde de la mesa; la mesa cercana al lente es el
   lecho y tapa la cintura porque ella está detrás, apoyada, no porque se ponga para la firma.
 
+**Opción C, la que se usa (2026-09-28, `MC1m`): la imagen dice lo que dice el texto y el lecho sale de ella.** La
+lámina «¿Qué revisa una IA antes de recomendarte? 5 cosas» se fotografió como eso: Nexa **sentada** a una mesa de nogal
+mate (*«matte oiled walnut, no reflections»*) revisa **cinco** tarjetas de vidrio sin texto; una línea fina de luz de la
+línea recorre la fila y se detiene en la que toca, y ella levanta la vista a cámara. El borde cercano de esa mesa, en
+sombra, es el lecho: ella la usa. Firma en 1237–1288 a **17,8:1**. Aprendido con la sesión que armó el registro cine:
+- **El modelo ignora los porcentajes de la cabeza** (pedido 40–44 %, salió 23–25 %). Lo que la baja es **la acción**
+  (sentarla a la mesa que usa) y el encuadre dicho en palabras de cámara (*«medium-wide shot, the whole table in frame,
+  a tall empty expanse above her head, camera tilted slightly upward»*); con la cabeza al 28 % la voz cabe si empieza
+  arriba (≈ 60 px). Si aun así choca, se acorta la voz, no se fuerza la foto.
+- **La órbita en cine sólo cuando aporta**: aquí sobra, porque la tarjeta encendida ya es el foco y la línea como luz
+  es el haz del escaneo; un anillo sería un segundo foco que compite con la esfera de la voz.
+- **Una fila de objetos puede caer donde vive la mano de «Desliza»**: el modelo ignoró dos veces *«the row spans only
+  the central two thirds»*. Decidir con el operador antes de otra toma.
+
 **Cómo se escribe y se verifica un lecho cine, en orden:**
 1. Preguntar **qué hay de verdad entre la cámara y el sujeto en esta escena** (el piso del espacio, la mesa de la
    reunión, el equipo del rodaje) y elegir eso, no un objeto traído para sostener la firma; del catálogo de lechos o
