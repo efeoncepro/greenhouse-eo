@@ -9,8 +9,12 @@
  *
  * Uso: node scripts/brand/build-insights-logo.mjs <directorio-de-salida>
  * Las variables INSIGHTS_* sólo existen para comparar exploraciones; el canon usa los valores por defecto.
- * Canon: @efeoncepro/axis-brand-assets (`insights-logo-*`, `insights-isotype-*`). Regenerar = correr esto y volver a
- * sellar el paquete; nunca editar los SVG a mano.
+ * También arma el lockup oficial (`insights-lockup-*`): el logo de Efeonce, un filete y el logo de Insights en gris
+ * (la marca que acompaña baja su brillo para que Efeonce mande; sólo la esfera conserva el acento). Proporciones del
+ * lockup aprobado en el canvas «Insights en vivo» (2026-09-28), en píxeles con el logo de Efeonce a 30 px de alto.
+ *
+ * Canon: @efeoncepro/axis-brand-assets (`insights-logo-*`, `insights-isotype-*`, `insights-lockup-*`). Regenerar = correr
+ * esto y volver a sellar el paquete; nunca editar los SVG a mano.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -26,6 +30,11 @@ if (!outDir) throw new Error('Uso: build-insights-logo.mjs <directorio-de-salida
 
 const INK = { positive: '#023c70', negative: '#ffffff' }
 const ACCENT = { positive: '#0e8c82', negative: '#36c8bf' } // accent-growth en papel / en oscuro
+
+// Insights junto a Efeonce: grises de marca medidos (≥ 4,5:1), no la tinta plena.
+// Oscuro: el gris de marca fusionado sobre navy (#6f89a2, 4,83:1). Papel: el gris de «Empower your» (#6b6b6b, 5,0:1).
+const ENDORSED_INK = { positive: '#6b6b6b', negative: '#6f89a2' }
+const EFEONCE_ASSETS = path.resolve(here, '../../node_modules/@efeoncepro/axis-brand-assets/assets')
 
 const font = fontkit.openSync(FONT)
 const TRACKING = Number(process.env.INSIGHTS_TRACKING ?? -18) // unidades por glifo: más cerrado que el texto corrido, sin que «gh» ni «ts» se toquen
@@ -75,8 +84,7 @@ const bottom = Math.min(...run.glyphs.map(g => g.bbox.minY)) // descendente de l
 const left = Math.min(stem.minX, ringCx - RING_OUTER)
 const pad = 0
 
-const build = (variant, kind) => {
-  const ink = INK[variant]
+const build = (variant, kind, ink = INK[variant]) => {
   const accent = ACCENT[variant]
   const glyphs = kind === 'logo' ? glyphPaths.slice(1) : []
   const stemPath = glyphPaths[0]
@@ -103,6 +111,49 @@ for (const kind of ['logo', 'isotype']) {
   for (const variant of ['positive', 'negative']) {
     fs.writeFileSync(path.join(outDir, `insights-${kind}-${variant}.svg`), build(variant, kind))
   }
+}
+
+// ─── Lockup: Efeonce | Insights ──────────────────────────────────────────────────────────────────────────────
+// Medidas del canvas aprobado, en px con Efeonce a 30 de alto: 20 de aire, filete de 1 × 26, 20 de aire e Insights a
+// 31,5 de alto; los tres centrados en vertical.
+const LOCKUP = { efeonceH: 30, gap: 20, ruleW: 1, ruleH: 26, insightsH: 31.5 }
+const RULE = { positive: { color: '#023c70', opacity: 0.25 }, negative: { color: '#cfe4fa', opacity: 0.3 } }
+
+const viewBoxOf = svg => svg.match(/viewBox="([^"]+)"/)[1].trim().split(/[\s,]+/).map(Number)
+
+// El logo de Efeonce trae su color en un <style>: se pasa a atributos para que ningún visor lo pierda.
+const inlineStyles = svg => {
+  const fills = Object.fromEntries([...svg.matchAll(/\.(cls-\d+)\s*\{\s*fill:\s*([^;]+);/g)].map(m => [m[1], m[2].trim()]))
+
+  return svg
+    .replace(/<\?xml[^>]*>/, '')
+    .replace(/<defs>[\s\S]*?<\/defs>/, '')
+    .replace(/class="(cls-\d+)"/g, (_, c) => `fill="${fills[c] ?? '#000'}"`)
+    .replace(/\s(id|data-name)="[^"]*"/g, '')
+}
+
+const nest = (svg, x, y, h) => {
+  const [, , vw, vh] = viewBoxOf(svg)
+  const w = f((vw * h) / vh)
+  const body = svg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '')
+
+  return { w, markup: `<svg x="${f(x)}" y="${f(y)}" width="${w}" height="${f(h)}" viewBox="0 0 ${vw} ${vh}">${body}</svg>` }
+}
+
+for (const variant of ['positive', 'negative']) {
+  const efeonce = inlineStyles(fs.readFileSync(path.join(EFEONCE_ASSETS, `efeonce-logo-${variant}.svg`), 'utf8'))
+  const insights = build(variant, 'logo', ENDORSED_INK[variant])
+  const H = Math.max(LOCKUP.efeonceH, LOCKUP.ruleH, LOCKUP.insightsH)
+  const e = nest(efeonce, 0, (H - LOCKUP.efeonceH) / 2, LOCKUP.efeonceH)
+  const ruleX = e.w + LOCKUP.gap
+  const i = nest(insights, ruleX + LOCKUP.ruleW + LOCKUP.gap, (H - LOCKUP.insightsH) / 2, LOCKUP.insightsH)
+  const W = f(ruleX + LOCKUP.ruleW + LOCKUP.gap + i.w)
+  const rule = `<rect x="${f(ruleX)}" y="${f((H - LOCKUP.ruleH) / 2)}" width="${LOCKUP.ruleW}" height="${LOCKUP.ruleH}" fill="${RULE[variant].color}" fill-opacity="${RULE[variant].opacity}"/>`
+
+  fs.writeFileSync(
+    path.join(outDir, `insights-lockup-${variant}.svg`),
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${f(H)}" role="img" aria-label="Efeonce Insights">\n  ${e.markup}\n  ${rule}\n  ${i.markup}\n</svg>\n`
+  )
 }
 
 console.log(JSON.stringify({ STEM_W, RING_STROKE, RING_OUTER, RING_CY, SPHERE_R, top, bottom, wordRight }, null, 0))

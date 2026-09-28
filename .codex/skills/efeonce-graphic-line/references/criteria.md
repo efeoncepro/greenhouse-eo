@@ -532,6 +532,10 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
   «by efeonce» porque Efeonce ya está al lado, y **nunca firma**: la firma sigue siendo el logo de Efeonce en el pie. Su
   esfera es parte del logo (como el planeta de Efeonce), no la esfera de la línea; si la pieza ya tiene una órbita con
   esfera en el mismo acento y compiten, se revisa a ojo. Archivos: `insights-logo-*` / `insights-isotype-*`.
+- **Junto a Efeonce, Insights baja su brillo** (operador, 2026-09-28): dos marcas a tinta plena compiten. Baja la que
+  ya pesa menos (Insights), así peso y brillo apuntan a la misma jerarquía; la palabra y el anillo van en gris de marca y
+  sólo la esfera queda en el acento, como el eslogan. Se usa el archivo `insights-lockup-*`; **nunca** se arma el
+  lockup a mano con los dos logos.
 
 - **La firma de una pieza gráfica es el logo de Efeonce centrado, abajo al centro.** Cierra la composición al pie
   (manual §8.1; Tres voces, «la firma debe cerrar la composición al pie»).

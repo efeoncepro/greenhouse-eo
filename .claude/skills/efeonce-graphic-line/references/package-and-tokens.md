@@ -587,7 +587,7 @@ Greenhouse: `ai-generations/2026-09-26_firma-partners/build4.mjs` (`HOST_BASE=�
 
 ## 6. `@efeoncepro/axis-brand-assets`
 
-19 SVG oficiales sellados con SHA-256 (`src/manifest.ts`, generado por `scripts/seal.mjs`) + 48 órbitas estáticas.
+25 SVG oficiales sellados con SHA-256 (19 hasta 0.3.6; 0.4.0 suma la marca de Insights y su lockup) (`src/manifest.ts`, generado por `scripts/seal.mjs`) + 48 órbitas estáticas.
 No incluye fuentes, fotos, el logo ni la marca de Greenhouse, ni el archivo del eslogan.
 
 | id | kind | surface | variant | aspectRatio (alto/ancho) |
@@ -597,7 +597,8 @@ No incluye fuentes, fotos, el logo ni la marca de Greenhouse, ni el archivo del 
 | `globe-logo-*` · `globe-isotype-*` | | | | 0,4925 · 1,1109 |
 | `wave-logo-*` · `wave-isotype-*` | | | | 0,4114 · 0,5558 |
 | `reach-logo-positive` · `reach-logo-negative` · `reach-isotype-*` | | | | 0,3128 · 0,3115 · 1,0143 |
-| `insights-logo-*` · `insights-isotype-*` (2026-09-28, rama `feat/insights-product-mark`, sin publicar) | | | | 0,2906 · 3,4231 |
+| `insights-logo-*` · `insights-isotype-*` (desde 0.4.0) | | | | 0,2906 · 3,4231 |
+| `insights-lockup-positive` / `-negative` (desde 0.4.0) | **lockup** | light / dark | positive / negative | Efeonce + filete + Insights en gris (`#6b6b6b` / `#6f89a2`); nunca se rearma |
 | `url-bubble-source` | url-bubble | any | source (gris `#848484`, fusionar con luminosidad) | 0,1968 |
 | `url-bubble-baked-light` | url-bubble | light | baked (`#848484`) | 0,1968 |
 | `url-bubble-baked-dark` | url-bubble | dark | baked (`#6f89a2`) | 0,1968 |
