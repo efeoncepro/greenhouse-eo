@@ -4,7 +4,7 @@
 
 **Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) code complete, rollout pendiente: en `develop` (37655fa93), no promover a main. Flag OFF; falta smoke en staging y federar en `efeonce-mcp`.
 
-**Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) complete en local, sin push. [TASK-1928](docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) **complete** (28/09): 69/69 recetas componen (AXIS `v0.3.21`, gates a 0 px, `pnpm test` y `pnpm build` verdes), aprobado por el operador y empujado a `develop`. [TASK-1929](docs/tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) complete (`pnpm brand:deck-plan`); TASK-1933 lleva los pendientes de QA.
+**Deck «La órbita» (28/09):** TASK-1927/1928 (69/69 recetas, AXIS `v0.3.21`) y TASK-1929 (`pnpm brand:deck-plan`) complete, en `develop`. Siguen TASK-1930…1933.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 
