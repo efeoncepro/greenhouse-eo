@@ -18,6 +18,7 @@ import { resolveSurfaceComposition } from '@efeoncepro/axis-ui-contracts'
 import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
 
 import { DECK_BUILDERS, type RecipeBuilder } from './recipes/deck'
+import { CLOSE_BUILDERS } from './recipes/close'
 import { METHOD_BUILDERS } from './recipes/method'
 import { OVERLAY_BUILDERS } from './recipes/overlays'
 import { STILL_BUILDERS } from './recipes/stills'
@@ -50,7 +51,7 @@ const OUTSIDE_COMPOSER: Record<string, string> = {
 
 /** Builders por superficie. Una receta aprobada sin builder falla con `recipe-without-template`. */
 const BUILDERS: Record<string, Record<string, RecipeBuilder>> = {
-  deck: { ...DECK_BUILDERS, ...METHOD_BUILDERS },
+  deck: { ...DECK_BUILDERS, ...METHOD_BUILDERS, ...CLOSE_BUILDERS },
   web: STILL_BUILDERS.web ?? {},
   dooh: STILL_BUILDERS.dooh ?? {},
   motion: STILL_BUILDERS.motion ?? {},

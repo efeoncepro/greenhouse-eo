@@ -150,6 +150,33 @@ export const graphicLineResolvers = (): ResolverRegistry => {
           : null
     },
 
+    // El día elegido en la agenda del diagnóstico (TASK-1928, `decision-next-steps`).
+    'gl-chosen-day': {
+      known: ['1', '2', '3', '4', '5'],
+      build: value =>
+        ['1', '2', '3', '4', '5'].includes(value.trim())
+          ? [{ selector: ':self', toneClass: `gl-day-${value.trim()}`, toneGroup: ['gl-day-1', 'gl-day-2', 'gl-day-3', 'gl-day-4', 'gl-day-5'] }]
+          : null
+    },
+
+    // La hora elegida en la agenda del diagnóstico (TASK-1928, `decision-next-steps`).
+    'gl-chosen-time': {
+      known: ['1', '2', '3', '4'],
+      build: value =>
+        ['1', '2', '3', '4'].includes(value.trim())
+          ? [{ selector: ':self', toneClass: `gl-time-${value.trim()}`, toneGroup: ['gl-time-1', 'gl-time-2', 'gl-time-3', 'gl-time-4'] }]
+          : null
+    },
+
+    // El plan recomendado de una cotización (TASK-1928, `content-pricing`): sale de la grilla o va al frente.
+    'gl-recommended': {
+      known: ['1', '2', '3'],
+      build: value =>
+        ['1', '2', '3'].includes(value.trim())
+          ? [{ selector: ':self', toneClass: `gl-rec-${value.trim()}`, toneGroup: ['gl-rec-1', 'gl-rec-2', 'gl-rec-3'] }]
+          : null
+    },
+
     // Texto alternativo de la foto: describe la escena, nunca transcribe el copy de la lámina.
     'gl-alt': {
       known: ['<descripción de la escena>'],

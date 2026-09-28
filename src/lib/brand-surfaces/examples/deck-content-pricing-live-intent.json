@@ -1,0 +1,58 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-pricing",
+  "line": "growth",
+  "theme": "dark",
+  "layout": "live",
+  "voice": {
+    "eyebrow": "Inversión",
+    "question": "¿Cuánto cuesta?",
+    "answer": [
+      "Sin letra",
+      "chica"
+    ]
+  },
+  "body": "Cada línea de la cotización a la vista, con su **monto** y lo que incluye. Los montos se definen en cada propuesta.",
+  "quote": {
+    "kicker": "Propuesta · Cotización",
+    "title": "Para tu marca",
+    "lines": [
+      {
+        "name": "Equipo",
+        "desc": "Capacidad gobernada del squad",
+        "period": "/ mes"
+      },
+      {
+        "name": "Greenhouse Pro",
+        "desc": "Dashboard, KPIs, acciones y reporting quincenal",
+        "period": "/ mes"
+      },
+      {
+        "name": "Sample Sprint",
+        "desc": "Piloto pagado y acotado para arrancar",
+        "period": "· único"
+      }
+    ],
+    "totalLabel": "Total mensual",
+    "tax": "neto + IVA",
+    "cta": "Aprobar propuesta"
+  },
+  "chips": [
+    {
+      "kicker": "Cómo se mide",
+      "text": "Capacidad gobernada,\nnunca horas ni piezas"
+    },
+    {
+      "kicker": "Sin sorpresas",
+      "text": "Valores netos,\nIVA no incluido"
+    }
+  ],
+  "selection": {
+    "target": "cta"
+  }
+}

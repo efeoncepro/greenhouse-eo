@@ -321,7 +321,7 @@ falta un campo del esquema, si hay ids repetidos o si un `preferInstead` o `pair
 <!-- Generado por scripts/creative/deck-recipes/render-index.mjs desde EFEONCE_DECK_SLIDE_RECIPES_V1.json. No editar a mano: corre «pnpm brand:deck-recipes». -->
 
 Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
-**39 de 69** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
+**44 de 69** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
 
 ### Recetas por familia y documento
 
@@ -449,21 +449,21 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
-| `content-pricing` | Cotización · tabla de tres planes con Pro recomendado | — | proposal | En una propuesta, para presentar los planes de Greenhouse junto al fee del equipo. | En un brochure: los montos se definen en cada propuesta. | `content-pricing-live`, `content-pricing-stage` | `eyebrow` ≤16, `question` ≤24, `answer` ≤14, `body` ≤120, `plans` ≤40, `amounts`, `recommendedPlan` |
-| `content-pricing-stage` | Cotización en escena · los tres planes en 3D con Pro al frente | — | proposal | En una propuesta presentada en sala, cuando la cotización necesita el mismo impacto que el resto del deck. | En un brochure. | `content-pricing`, `content-pricing-live` | `eyebrow` ≤16, `question` ≤24, `answer` ≤14, `body` ≤90, `plans` ≤32, `amounts`, `recommendedPlan` |
-| `content-pricing-live` | Cotización en vivo · cada línea a la vista y el cursor en «Aprobar propuesta» | — | proposal | En una propuesta con alcance acordado y una cotización única. | El alcance no está acordado o hay que comparar planes. | `content-pricing`, `content-pricing-stage` | `eyebrow` ≤16, `question` ≤22, `answer` ≤16, `body` ≤110, `quoteTitle` ≤20, `lineItems` ≤48, `total` |
+| `content-pricing` | Cotización · tabla de tres planes con Pro recomendado | `deck.content-pricing` | proposal | En una propuesta, para presentar los planes de Greenhouse junto al fee del equipo. | En un brochure: los montos se definen en cada propuesta. | `content-pricing-live`, `content-pricing-stage` | `eyebrow` ≤16, `question` ≤24, `answer` ≤14, `body` ≤120, `plans` ≤40, `amounts`, `recommendedPlan` |
+| `content-pricing-stage` | Cotización en escena · los tres planes en 3D con Pro al frente | `deck.content-pricing.stage` | proposal | En una propuesta presentada en sala, cuando la cotización necesita el mismo impacto que el resto del deck. | En un brochure. | `content-pricing`, `content-pricing-live` | `eyebrow` ≤16, `question` ≤24, `answer` ≤14, `body` ≤90, `plans` ≤32, `amounts`, `recommendedPlan` |
+| `content-pricing-live` | Cotización en vivo · cada línea a la vista y el cursor en «Aprobar propuesta» | `deck.content-pricing.live` | proposal | En una propuesta con alcance acordado y una cotización única. | El alcance no está acordado o hay que comparar planes. | `content-pricing`, `content-pricing-stage` | `eyebrow` ≤16, `question` ≤22, `answer` ≤16, `body` ≤110, `quoteTitle` ≤20, `lineItems` ≤48, `total` |
 
 ### Próximos pasos · `next-steps` (1)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
-| `decision-next-steps` | Próximos pasos · la agenda del diagnóstico abierta y el cursor en «Agenda un diagnóstico» | — | pitch, brochure, proposal | Al final de un pitch o de un brochure, para convertir el interés en una reunión. | En una propuesta enviada después del diagnóstico: ese paso ya ocurrió y el gesto es aprobar. | `content-pricing-live` | `eyebrow` ≤20, `question` ≤22, `answer` ≤10, `body` ≤60, `cardDescriptor` ≤100, `days`, `times`, `chosenSlot`, `nextSteps` ≤70 |
+| `decision-next-steps` | Próximos pasos · la agenda del diagnóstico abierta y el cursor en «Agenda un diagnóstico» | `deck.decision-next-steps` | pitch, brochure, proposal | Al final de un pitch o de un brochure, para convertir el interés en una reunión. | En una propuesta enviada después del diagnóstico: ese paso ya ocurrió y el gesto es aprobar. | `content-pricing-live` | `eyebrow` ≤20, `question` ≤22, `answer` ≤10, `body` ≤60, `cardDescriptor` ≤100, `days`, `times`, `chosenSlot`, `nextSteps` ≤70 |
 
 ### Respiro · `breather` (1)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
-| `breather` | Respiro · foto a sangre y sólo la voz | — | proposal, pitch, qbr | Después de dos o tres láminas densas, para bajar el ritmo sin perder el hilo. | Si la lámina tiene que probar algo: un respiro no lleva cifra ni fuente. | `content-focus`, `section-bleed` | `section`, `question` ≤24, `answer` ≤12, `photo` |
+| `breather` | Respiro · foto a sangre y sólo la voz | `deck.breather` | proposal, pitch, qbr | Después de dos o tres láminas densas, para bajar el ritmo sin perder el hilo. | Si la lámina tiene que probar algo: un respiro no lleva cifra ni fuente. | `content-focus`, `section-bleed` | `section`, `question` ≤24, `answer` ≤12, `photo` |
 
 ### Familias de AXIS citadas como alternativa (fuera del catálogo)
 

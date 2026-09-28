@@ -371,7 +371,8 @@ export const progressIndicatorLayer = (
   manifest: SurfaceManifest,
   line: string,
   pieceKey: string,
-  idPrefix: string
+  idPrefix: string,
+  overrides: { ringOpacity?: number } = {}
 ): { ref: string; asset: SurfaceAssetRequest } => {
   const progress = contentOf(manifest).progress
   const piece = GL.pieces.deck[pieceKey]
@@ -382,7 +383,7 @@ export const progressIndicatorLayer = (
   const { canvas, element } = orbitDelegate(manifest, 'progress')
   const resolved = resolveOrbit(canvas, element)
 
-  applyPiece(resolved.elements[0]!, piece)
+  applyPiece(resolved.elements[0]!, piece, overrides)
 
   return layerAsset(
     `${idPrefix}-progress-${progress.current}-of-${progress.sections}-${line}`,

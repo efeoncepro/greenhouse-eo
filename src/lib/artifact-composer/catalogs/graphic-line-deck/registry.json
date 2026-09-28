@@ -25,7 +25,12 @@
     "deck.decision-plan",
     "deck.method-score-ring",
     "deck.method-hybrid-workforce",
-    "deck.method-hybrid-workforce.scene"
+    "deck.method-hybrid-workforce.scene",
+    "deck.breather",
+    "deck.decision-next-steps",
+    "deck.content-pricing",
+    "deck.content-pricing.stage",
+    "deck.content-pricing.live"
   ],
   "templates": [
     {
@@ -269,6 +274,61 @@
       "contentTypes": ["deck.method-hybrid-workforce.scene"],
       "prototype": "method-hybrid-workforce-scene.html",
       "slotsRef": "method-hybrid-workforce-scene.slots.json"
+    },
+    {
+      "name": "Breather",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.breather"],
+      "prototype": "breather.html",
+      "slotsRef": "breather.slots.json"
+    },
+    {
+      "name": "DecisionNextSteps",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-next-steps"],
+      "prototype": "decision-next-steps.html",
+      "slotsRef": "decision-next-steps.slots.json"
+    },
+    {
+      "name": "ContentPricing",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-pricing"],
+      "prototype": "content-pricing.html",
+      "slotsRef": "content-pricing.slots.json"
+    },
+    {
+      "name": "ContentPricingStage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-pricing.stage"],
+      "prototype": "content-pricing-stage.html",
+      "slotsRef": "content-pricing-stage.slots.json"
+    },
+    {
+      "name": "ContentPricingLive",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-pricing.live"],
+      "prototype": "content-pricing-live.html",
+      "slotsRef": "content-pricing-live.slots.json"
     }
   ],
   "selector": {
@@ -294,7 +354,12 @@
       "deck.decision-plan": "DecisionPlan",
       "deck.method-score-ring": "MethodScoreRing",
       "deck.method-hybrid-workforce": "MethodHybridWorkforce",
-      "deck.method-hybrid-workforce.scene": "MethodHybridWorkforceScene"
+      "deck.method-hybrid-workforce.scene": "MethodHybridWorkforceScene",
+      "deck.breather": "Breather",
+      "deck.decision-next-steps": "DecisionNextSteps",
+      "deck.content-pricing": "ContentPricing",
+      "deck.content-pricing.stage": "ContentPricingStage",
+      "deck.content-pricing.live": "ContentPricingLive"
     }
   }
 }

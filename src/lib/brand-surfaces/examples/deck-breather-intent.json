@@ -1,0 +1,27 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "breather",
+  "use": "proposal",
+  "recipe": "breather",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "question": "¿Y el cliente?",
+    "answer": [
+      "Aprobó"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 4
+  },
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-web-motion/plates/P2-web-hero-taller.png",
+    "alt": "En el estudio de Efeonce, una estratega levanta una prueba impresa y se la muestra al equipo del cliente en el extremo de una mesa de nogal cubierta de pruebas"
+  }
+}

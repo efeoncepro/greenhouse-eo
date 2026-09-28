@@ -541,3 +541,51 @@ describe('deck · la familia método (TASK-1928)', () => {
     expectCode(() => plan({ ...intent, selectionTargets: [{ label: 'Estrategia', anchor: 'bottom-start', box: { x: 1800, y: 388, width: 260, height: 142 } }, (intent.selectionTargets as unknown[])[1]] }), 'invalid-intent')
   })
 })
+
+describe('deck · cotización, próximos pasos y respiro (TASK-1928)', () => {
+  it.each([
+    ['breather', 'Breather', 'deck.breather'],
+    ['decision-next-steps', 'DecisionNextSteps', 'deck.decision-next-steps'],
+    ['content-pricing', 'ContentPricing', 'deck.content-pricing'],
+    ['content-pricing-stage', 'ContentPricingStage', 'deck.content-pricing.stage'],
+    ['content-pricing-live', 'ContentPricingLive', 'deck.content-pricing.live']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template, contentType) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(contentType)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('los montos son siempre el marcador, aunque el intent traiga una cifra', () => {
+    const table = plan({ ...example('content-pricing'), amount: '$ 2.500.000' } as SurfaceIntent).slots
+    const live = plan(example('content-pricing-live')).slots
+
+    expect((table.plans as unknown as { amount: string }[]).map(p => p.amount)).toEqual(['[MONTO]', '[MONTO]', '[MONTO]'])
+    expect((live.lines as unknown as { amount: string }[]).map(line => line.amount)).toEqual(['[MONTO] / mes', '[MONTO] / mes', '[MONTO] · único'])
+    expect((live.quote as unknown as { total: string }).total).toBe('[MONTO]')
+  })
+
+  it('el rótulo del recomendado va sólo en su plan y la selección de Finanzas toma ese plan', () => {
+    const { slots } = plan(example('content-pricing'))
+    const plans = slots.plans as unknown as { label?: string }[]
+
+    expect(plans.map(p => p.label)).toEqual([undefined, 'Recomendado', undefined])
+    expect(slots.selection).toMatchObject({ label: 'Finanzas', item: 2 })
+    expectCode(() => plan({ ...example('content-pricing-stage'), recommended: 1 }), 'invalid-intent')
+  })
+
+  it('el contacto de los próximos pasos sale de los datos de Efeonce, nunca del intent', () => {
+    const { slots } = plan({ ...example('decision-next-steps'), contact: { email: 'otro@ejemplo.com' } } as SurfaceIntent)
+
+    expect(slots.contact).toEqual({ email: 'sales@efeoncepro.com', phone: '+56 9 3732 3064' })
+    expectCode(() => plan({ ...example('decision-next-steps'), agenda: { ...(example('decision-next-steps').agenda as object), chosen: { day: 6, time: 1 } } }), 'invalid-intent')
+  })
+
+  it('el respiro no firma: sin burbuja ni logo; el indicador lleva la opacidad medida', () => {
+    const { slots, piece } = plan(example('breather'))
+
+    expect(slots.urlBubble).toBeUndefined()
+    expect(piece.assets.some(asset => asset.ref.startsWith('asset-ref:layer:gl-br-progress-4-of-5'))).toBe(true)
+  })
+})

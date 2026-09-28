@@ -48,7 +48,7 @@ const TEMPLATES_WITH_SELECTION = [
  * mismo CTA canónico de las piezas con llamada a la acción, sin descriptor. El anillo del puntaje lo lleva sobre su
  * botón, con el descriptor bajo el cursor (su escala y su aire llegan en el slot `cta`, medidos por AXIS).
  */
-const TEMPLATES_WITH_READER_CURSOR = ['CloseBrochure', 'MethodScoreRing'] as const
+const TEMPLATES_WITH_READER_CURSOR = ['CloseBrochure', 'MethodScoreRing', 'DecisionNextSteps', 'ContentPricingLive'] as const
 
 /**
  * En la escalera del método (sus dos composiciones) la selección toma un NIVEL (`selection.level`, 1 = el de abajo),
@@ -58,22 +58,27 @@ const TEMPLATES_WITH_READER_CURSOR = ['CloseBrochure', 'MethodScoreRing'] as con
 const levelSelectionHook =
   (selectionHook: CatalogLayoutHook): CatalogLayoutHook =>
   async (page, slide, deckPlan) => {
-    const selection = slide.slots.selection as { level?: unknown } | null | undefined
+    const selection = slide.slots.selection as { level?: unknown; item?: unknown } | null | undefined
 
     if (selection) {
-      const level = Number(selection.level)
+      // Un nivel de la escalera (`level`) o un ítem de una lista (`item`: el plan recomendado de la cotización).
+      const byItem = selection.item !== undefined
+      const index = Number(byItem ? selection.item : selection.level) - 1
 
-      const marked = await page.evaluate(index => {
-        const row = document.querySelectorAll('[data-gl-level-row]')[index]
+      const marked = await page.evaluate(
+        ({ index, selector }) => {
+          const row = document.querySelectorAll(selector)[index]
 
-        if (!row) return false
+          if (!row) return false
 
-        row.setAttribute('data-gl-selection-target', '')
+          row.setAttribute('data-gl-selection-target', '')
 
-        return true
-      }, level - 1)
+          return true
+        },
+        { index, selector: byItem ? '[data-gl-select-item]' : '[data-gl-level-row]' }
+      )
 
-      if (!marked) throw new Error(`[${slide.slideId}] la selección pide el nivel ${level} y la escalera no lo tiene.`)
+      if (!marked) throw new Error(`[${slide.slideId}] la selección pide el ${byItem ? 'ítem' : 'nivel'} ${index + 1} y la lámina no lo tiene.`)
     }
 
     await selectionHook(page, slide, deckPlan)
@@ -91,6 +96,8 @@ export const createCatalog = (options: GraphicLineCatalogOptions = {}): Artifact
 
   layoutHooks.MethodStaircase = levelSelectionHook(selectionHook)
   layoutHooks.MethodStaircaseFlat = levelSelectionHook(selectionHook)
+  layoutHooks.ContentPricing = levelSelectionHook(selectionHook)
+  layoutHooks.ContentPricingStage = levelSelectionHook(selectionHook)
 
   return {
     name: 'graphic-line-deck',

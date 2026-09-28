@@ -1,5 +1,24 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (i) — TASK-1928: cotización, próximos pasos y respiro
+
+Tercera familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.17, `axis-ui-contracts` 0.3.15, delta (h) de AXIS):
+la cotización en sus tres composiciones (`table`, `stage` y `live`), los próximos pasos con la agenda del diagnóstico y
+la lámina de respiro. Compuestas con su plate real y comparadas a ojo contra las cinco referencias: coinciden salvo las
+correcciones de la norma — la respuesta de las cotizaciones a 120 px (3× la pregunta; las referencias, 118) y los
+kickers chicos sobre el papel en navy (D1: «Recomendado», «Propuesta · Cotización», «01 · Diagnóstico · Sin costo»
+iban en el acento a 14–15 px). Los montos se imprimen siempre como marcador y el contacto sale de `EFEONCE_CONTACT`.
+El CSS nuevo está acotado a `.gl-br`, `.gl-ns`, `.gl-pt`, `.gl-pcs`, `.gl-pv` y `.gl-flow-voice` (la escena de la
+cotización usa `gl-pcs`: `gl-ps` es la propuesta sobria, y compartir el prefijo movía su frame). Los hooks de selección
+y del CTA suman el ítem recomendado y la cotización en vivo sin cambiar a las plantillas previas. La auditoría
+renderizada (D1 y 3×, con las tres cotizaciones en la lista del 3×) pasa sobre los probes.
+
+- `templates-graphic-line-deck/Breather.png` — 🆕 deck.breather
+- `templates-graphic-line-deck/DecisionNextSteps.png` — 🆕 deck.decision-next-steps
+- `templates-graphic-line-deck/ContentPricing.png` — 🆕 deck.content-pricing
+- `templates-graphic-line-deck/ContentPricingStage.png` — 🆕 deck.content-pricing.stage
+- `templates-graphic-line-deck/ContentPricingLive.png` — 🆕 deck.content-pricing.live
+
 ## 2026-09-27 (h) — TASK-1928: la familia método
 
 Segunda familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.16, `axis-ui-contracts` 0.3.14, delta (g) de
@@ -710,7 +729,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: e1dba421e168c3429971a39160da3e37f638f550b66f2423e878196c5dcae76c -->
+<!-- manifest-digest: 4b458b167a10409ac557d5dffff849f008f76a62ef94025f2439904bb1a66fbf -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

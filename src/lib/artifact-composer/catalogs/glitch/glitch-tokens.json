@@ -2,7 +2,7 @@
   "$comment": "GENERADO por `pnpm glitch:tokens` desde @efeoncepro/axis-tokens (glitchLine). NO EDITAR A MANO: el test de sincronía detecta el drift.",
   "source": {
     "package": "@efeoncepro/axis-tokens",
-    "version": "0.3.16"
+    "version": "0.3.17"
   },
   "status": "candidate",
   "franchise": "glitch",

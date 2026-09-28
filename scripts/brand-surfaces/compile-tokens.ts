@@ -25,7 +25,7 @@ const TARGETS: { file: string; pick: 'json' | 'css' }[] = [
  * solo al worker). Se copian byte a byte desde @efeoncepro/axis-brand-assets: nunca se editan a mano.
  */
 const BRAND_ASSETS: Record<string, string[]> = {
-  'graphic-line-deck': ['url-bubble-baked-dark.svg', 'url-bubble-source.svg', 'efeonce-logo-negative.svg'],
+  'graphic-line-deck': ['url-bubble-baked-dark.svg', 'url-bubble-source.svg', 'efeonce-logo-negative.svg', 'efeonce-isotype-negative.svg'],
   'graphic-line-stills': ['url-bubble-baked-dark.svg', 'efeonce-logo-negative.svg', 'efeonce-isotype-negative.svg'],
   'graphic-line-overlays': ['url-bubble-baked-dark.svg']
 }
