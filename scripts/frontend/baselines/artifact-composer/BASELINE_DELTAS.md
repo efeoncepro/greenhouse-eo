@@ -1,5 +1,25 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-28 (o) — TASK-1934: las nueve láminas SEO/AEO del deck
+
+Las nueve láminas SEO/AEO aprobadas por el operador el 2026-09-28 componen en `graphic-line-deck` sobre AXIS 0.3.23
+(`axis-tokens` 0.3.23, `axis-ui-contracts` 0.3.21; deltas (m) y (n) de AXIS). Siete plantillas nuevas y dos recetas sobre
+plantillas existentes (`proposal-service-seo` sobre `ProposalService`, `proposal-cinematic-seo` sobre
+`ProposalCinematic`). Compuestas con sus plates, logos e íconos reales, comparadas lado a lado contra sus referencias y
+**aprobadas a ojo por el operador el 2026-09-28**. Diferencias con la referencia, todas decisión de norma: la respuesta a
+120 px (3×) en DeckIARespuesta, DeckDiferencia y DeckEEAT, con la ventana «Hoy» de DeckIARespuesta en 860/450; la tarjeta
+Efeonce blanca; el wordmark de McKinsey a 700; la esfera de la trayectoria con su brillo redondo. Los frames nuevos son
+el probe de cada plantilla (assets de prueba), como todos los del catálogo.
+
+- `templates-graphic-line-deck/DecisionAiAnswer.png` — 🆕 deck.decision-ai-answer: a quién recomienda la IA (motor genérico, datos de ejemplo marcados)
+- `templates-graphic-line-deck/DecisionAiMarket.png` — 🆕 deck.decision-ai-market: tres cifras de mercado con su fuente
+- `templates-graphic-line-deck/MethodSurroundCycle.png` — 🆕 deck.method-surround-cycle: el ciclo Surround Discovery sobre la órbita
+- `templates-graphic-line-deck/DecisionDifference.png` — 🆕 deck.decision-difference: agencia commodity frente a método medible
+- `templates-graphic-line-deck/MethodEeat.png` — 🆕 deck.method-eeat: las cuatro letras de E-E-A-T y el medidor
+- `templates-graphic-line-deck/DecisionTrafficToRevenue.png` — 🆕 deck.decision-traffic-to-revenue: del tráfico calificado a los ingresos
+- `templates-graphic-line-deck/DecisionDiagnosisMap.png` — 🆕 deck.decision-diagnosis-map: el mapa del diagnóstico (datos de muestra marcados)
+- `templates-graphic-line-deck/ProposalCinematic.png` — ✏️ deck.proposal-cinematic: el probe suma la nota del pie («Sin promesas de ranking…»), que la AEO y la SEO cine aprobadas llevaban
+
 ## 2026-09-28 (n) — TASK-1928: la portada de brochure con la selección de Nexa
 
 El operador relajó «sin selección en `cover-brochure`» el 2026-09-28 y AXIS 0.3.21 (delta (l), `axis-ui-contracts`
@@ -815,7 +835,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 24027cb7846f3b40e243afca3e8fd80ada5a59663ea9e5a244473df70bf2fc2c -->
+<!-- manifest-digest: 41737352f675efc66e5c707fe33240cc191914282bc984bff39796cae8c02697 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.
