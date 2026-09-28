@@ -231,3 +231,27 @@ Readback posterior a Vercel READY: matrices Efeonce (cuatro) y Sky (seis) HTTP 2
 Sky PE conserva gate partial, el resto ready, sin blendedOverall.
 [Evidencia final](evidence/task-1863/final-matrix-readback.json). El CI general `36413423815`
 seguía en ejecución al registrar este cierre; no se declara verde sin su resultado.
+
+
+### Recuperación final de cuota y cierre de staging (28-09, 11:31 UTC)
+
+El operador actualizó el límite de GitHub Packages. La descarga real de AXIS con la credencial
+canónica devolvió HTTP 200; no se rotaron credenciales. Se reintentó únicamente el job fallido de
+ops-worker, mismo SHA `d86edb78419dad324943804e8d003dd18ffbea31`, sin publicar commits paralelos.
+Cloud Build `4299bcee-6366-4fbc-a257-4c2ed7bad626` terminó SUCCESS. Revisión
+`ops-worker-00733-5s6`: Ready/ConfigurationsReady/RoutesReady True, GIT_SHA esperado y 100% del
+tráfico; spec.traffic y status.traffic concordantes. `/health` autenticado respondió HTTP 200, status ok.
+El bloqueo anterior queda resuelto; la protección de identidad ya está en Vercel y worker.
+
+CI general `36413423815` terminó **success**, incluidos tests y build. Los informes existentes siguen
+accesibles por matrices staging: cuatro Efeonce y seis Sky, con PE partial de Perplexity explícito.
+No se encolaron nuevas corridas ni se repitieron consultas pagadas a proveedores para este redeploy.
+Main y el deployment Production permanecen en `92002873ced9508433e9c6d56000417a9193886b`.
+El worker conserva multimer­cado OFF para recurrencia secundaria mientras main siga en espera;
+Vercel staging mantiene multimer­cado ON. La task conserva lifecycle in-progress por ese límite de release.
+
+Evidencia: [cuota recuperada](evidence/task-1863/packages-quota-recovery.json),
+[CI](evidence/task-1863/final-ci-success.json),
+[revisión](evidence/task-1863/worker-quota-recovery-readback.json),
+[tráfico](evidence/task-1863/worker-quota-recovery-traffic.json),
+[salud](evidence/task-1863/worker-quota-recovery-health.json).

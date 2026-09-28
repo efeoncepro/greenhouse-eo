@@ -58,7 +58,7 @@ clientes de EE. UU. La policy de runs nuevos se versiona; los históricos conser
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-020`
-- Status real: `Staging: Efeonce, Sky y BR verificados; identidad en Vercel, worker bloqueado por cuota Packages; main en espera`
+- Status real: `Staging completo: Efeonce, Sky y BR verificados; Vercel y worker en d86edb784; main en espera`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -747,10 +747,10 @@ tarda ≥30 minutos; el reader del lote expone el avance.
 Evidencia local y límites: [auditoría de verificación](../../audits/platform/2026-09-28-task-1863-verification.md).
 Staging: Efeonce 96/96; Sky 143/144 respuestas (un rate limit de Perplexity, informe parcial explícito);
 Brasil por API directa 24/24. Diez informes de lotes + smoke BR disponibles. Refuerzo universal desplegado
-en `999492e8d`; 71 pruebas / 552 combinaciones. Protección adicional de identidad `d86edb784` READY en Vercel; worker bloqueado por cuota GitHub Packages; main en espera.
+en `999492e8d`; 71 pruebas / 552 combinaciones. Protección adicional de identidad `d86edb784` READY en Vercel y worker `ops-worker-00733-5s6`, salud 200 y tráfico 100%; main en espera.
 
 - [x] Refuerzo universal desplegado en staging (`999492e8d`): `EO-GRUN-00071` entra por API sin businessModel, resuelve consumer_b2c y pt-BR, 24/24 respuestas e informe ready. Regresión local de todas las entradas: 71 pruebas / 552 combinaciones.
-- [ ] Protección de tendencias ante cambios de identidad (nombre/aliases/dominio/categoría): `d86edb784`, 15 pruebas PG reales PASS; Vercel staging READY. Worker pendiente: GitHub Packages rechaza la descarga de AXIS con 403 por límite de facturación; conserva `999492e8d` operativo.
+- [x] Protección de tendencias ante cambios de identidad (nombre/aliases/dominio/categoría): `d86edb784`, 15 pruebas PG reales PASS; Vercel staging READY y worker `ops-worker-00733-5s6` Ready, salud HTTP 200 y tráfico 100%. Cuota Packages corregida por el operador y descarga AXIS verificada HTTP 200; CI general success.
 - [x] Catálogo único para Grader/form/prospecto, 23 mercados y es/en/pt-BR/fr; pruebas de aliases, ISO y locales.
 - [x] País sin ubicación Google produce `skipped:market_unsupported`, sin fallback (Cuba: prueba y canary).
 - [x] Tablas, UNIQUE, FK, triggers e invariantes comprobados en PostgreSQL real efímero; Up/Down/Up PASS.

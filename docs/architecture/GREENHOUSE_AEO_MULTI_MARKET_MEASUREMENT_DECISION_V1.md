@@ -1,7 +1,7 @@
 # AEO Grader: identidad de mercado y metodología multidioma
 
 - Estado: **Accepted for implementation**, 2026-09-28, por instrucción del operador en TASK-1863.
-- Owner: Growth / EPIC-020. Runtime: pendiente de rollout; no implica habilitación externa.
+- Owner: Growth / EPIC-020. Estado de runtime: [evidencia de rollout](../audits/platform/2026-09-28-task-1863-verification.md); main en espera, sin habilitación externa nueva.
 - Canon anterior: [arquitectura del Grader](GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md).
 
 ## Contexto
@@ -18,7 +18,8 @@ EE. UU. impedían declarar qué se midió.
    23 entradas: los 20 países independientes de Latinoamérica, Puerto Rico, España y EE. UU.
    Cuba existe como mercado del producto; Google AI Mode vía DataForSEO no tiene ubicación para
    Cuba en el catálogo leído el 28-09: `skipped:market_unsupported`, sin compra ni fallback.
-2. Una marca activa por organización; N configuraciones inmutables de país+locale. Cambiar país o
+2. Un perfil de marca posee N configuraciones inmutables de país+locale; se conservan los perfiles
+   legacy activos según la compatibilidad descrita abajo. Cambiar país o
    idioma crea otra configuración. Pausa, reanudación, archivo y cambio de principal son commands.
    El perfil legacy conserva un espejo del mercado principal, competidores nominales y cadencia.
 3. Un run mide un mercado. Un lote reserva el costo total y encola todos sus runs en una misma

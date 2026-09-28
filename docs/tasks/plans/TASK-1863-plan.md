@@ -62,7 +62,7 @@ mutación externa no autorizada o conflicto real con trabajo ajeno.
 - [x] Canary Efeonce CL/CO/PE/MX: 96/96 respuestas, cuatro scores e informes ready; matriz staging HTTP 200.
 - [x] Refuerzo universal f7d2578a5 publicado en staging dentro de 999492e8d; API sin businessModel verificada, 71 pruebas/552 combinaciones.
 - [x] Sky seis mercados y BR por API directa verificados en staging; informes y matriz disponibles, un rate limit Perplexity declarado como parcial.
-- [ ] Completar protección adicional de tendencias por identidad d86edb784 en worker: Vercel staging READY; 15 pruebas PG PASS. Cloud Build bloqueado por límite de facturación de GitHub Packages (403); worker conserva 999492e8d.
+- [x] Protección adicional de tendencias por identidad d86edb784 publicada: Vercel staging READY; worker ops-worker-00733-5s6 Ready, salud HTTP 200 y tráfico 100%; 15 pruebas PG PASS y CI general success. El operador resolvió la cuota Packages; descarga real HTTP 200 y Cloud Build success.
 - Main explícitamente en espera; recurrencia secundaria y contract destructivo no se activan en esta fase.
 
 ## Evidencia de implementación
