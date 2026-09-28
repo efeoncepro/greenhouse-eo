@@ -8,9 +8,9 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
 | TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **complete** (in production since 2026-09-24, release `ebb9212a32ce`; first productive A4 + deck render 2026-09-25) | Job `artifact-worker` in staging and production: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22 staging, 2026-09-24 production) | 2026-09-25 |
-| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — in production with flags OFF** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON (sharing/delivery/schedules/issuance), production OFF until TASK-1875; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); 2026-09-28: zero double send verified on real rows + attachment `email_delivery_id` fix (`8882af0e3`, resolved by `source_event_id`); open (other owners): in-app/Teams (690–693), portal route (1849), Think (1875, gates prod flags), ISSUE-174 guard (1876 code complete), MCP negatives need a human session | 2026-09-28 |
+| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — sharing ON; delivery/schedules OFF in production** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON; Production sharing ON since TASK-1875 (`greenhouse-cssemzyzb`), delivery/schedules/issuance OFF; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); 2026-09-28: zero double send verified on real rows + attachment `email_delivery_id` fix (`8882af0e3`, resolved by `source_event_id`); open (other owners): in-app/Teams (690–693), portal route (1849), ISSUE-174 follow-up, MCP negatives need a human session | 2026-09-28 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
-| TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | **in-progress — Think in production, Greenhouse 1.1 in staging** (2026-09-28) | Think `main` `bbf8522` deployed to production (`/insights/r/<token>` + public sample `/insights/muestra`); Greenhouse `13fd47381` on `develop`/staging (model 1.1, logo route, WAF exception code); staging canary green (synthetic `EO-INS-000014`); `GREENHOUSE_THINK_KEY` in Think Vercel production (Secret Manager `efeonce-think-server-key`); pending operator: WAF `--apply`, Greenhouse production release, `INSIGHTS_SHARING_ENABLED` production (still OFF) | 2026-09-28 |
+| TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | **in-progress — production sharing live; automated unsupported-major case remains** (2026-09-28) | Think `main` `bbf8522`; Greenhouse Production model 1.0 + `INSIGHTS_SHARING_ENABLED=true` in Ready deployment `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`); WAF exception applied without drift at 20 req/10 s/IP; ecosystem canary green on `EO-INS-000014`, grant revoked; Greenhouse 1.1 remains in staging (`13fd47381`), no production release performed | 2026-09-28 |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
 | TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af` (Job `artifact-worker` deployed); first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
 
@@ -214,7 +214,10 @@ preventivas**. Queda acá como gap conocido, no como deuda silenciosa.
 tiene pipeline PDF); la dedupe de `plan.limits` ya la entregó TASK-1846; los umbrales de calidad declarados
 (4,2/3) eran inoperantes frente a los que el gate tiene fijos (4,5/4).
 
-## TASK-1848 — sharing, delivery, schedules (in-progress; in production with flags OFF since 2026-09-18)
+## TASK-1848 — sharing, delivery, schedules (in-progress; sharing ON, delivery/schedules OFF in production)
+
+**Delta 2026-09-28 (TASK-1875).** Production sharing is ON and behavior-verified through Think; delivery, schedules
+and issuance remain OFF. The 2026-09-18 delta below records the original release state and is historical.
 
 **Delta 2026-09-18 (production) — supersedes the staging delta's "production and gateway out of frontier" and the
 "Deployed where" table below.** Release `bda1cf2cd938` (PR #238, orchestrator `35349506106`, `released` 13:41Z, no retry;
@@ -300,14 +303,30 @@ full `pnpm test` + `pnpm build`; push; deploy; staging flags; staging canary.
 ## TASK-1849 — portal library/builder/shared web (to-do)
 _Fill at closure._
 
-## TASK-1875 — Think shared web render (in-progress; Think in production, Greenhouse 1.1 in staging — 2026-09-28)
+## TASK-1875 — Think shared web render (in-progress; production sharing live — 2026-09-28)
+
+**Delta 2026-09-28 (production activation).**
+- Applied the Think exception to both Vercel Firewall rules and re-read the plan without drift: negated
+  `x-efeonce-think-key` condition present, limit unchanged at 20 req/10 s per IP (`enforce` outside production,
+  `observe` in production).
+- Added exact `INSIGHTS_SHARING_ENABLED=true` to Vercel Production and redeployed the then-current production
+  deployment. `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`) reached Ready with alias
+  `greenhouse.efeoncepro.com`.
+- Sequential ecosystem-lane canary on synthetic issued edition `EO-INS-000014`: create 201; Think 200 with the three
+  privacy/indexing headers and token absent from HTML; `deck_pdf` 329 874 B with `%PDF` magic through the proxy;
+  revoke 200; page 410 without org name/report code; download 303. Grant
+  `ishr-df4a4ffa-20f6-475f-b0bb-2d2da51fc188` is revoked.
+- Production continues to serve `InsightWebModelV1` 1.0, which Think supports. Model 1.1 remains in staging; no
+  Greenhouse production release was performed. Remaining acceptance gap: automated visible 502/log behavior for an
+  unsupported model major.
 
 **Delta 2026-09-28 (rollout) — supersedes «code complete locally, NOT deployed» below.**
 - Greenhouse `develop` pushed through `13fd47381` (includes `d45fc780f` model 1.1 + `27b458aec` WAF exception); staging deployment Ready and serving `modelVersion: '1.1'`.
 - Staging canary (sequential, synthetic sandbox org): edition `insed-83c23534…` (`EO-INS-000014`, SEO+ICO, deck already rendered) issued with reason «TASK-1875: canary…»; grant A (no `downloadOutputs`) ⇒ Think local 200, headers `private, no-store` / `noindex, nofollow` / `no-referrer`, token absent from HTML, no GTM, `downloads: []` ⇒ no button and `?descargar=` 303; grant B (`expiresInDays: 1`, `downloadOutputs: ['deck_pdf']`) ⇒ PDF 329 874 B through Think's proxy; both revoked ⇒ Think 410 without org name or code and download 303; unknown token 404. The edition stays `issued` (synthetic) for the production canary.
 - Think `main` pushed (`bbf8522`) ⇒ production Ready: `think.efeoncepro.com/insights/r/<unknown>` 404 with the three headers; public sample `think.efeoncepro.com/insights/muestra` (operator request: an example to show clients) 200, prerendered, fictitious brand, notice in hero and footer, no downloads/logo/Greenhouse calls, `noindex`, out of the sitemap.
 - Think key generated: Secret Manager `efeonce-think-server-key` (project `efeonce-group`, 64 hex) + `GREENHOUSE_THINK_KEY` (sensitive) in Think's Vercel production env.
-- Pending, operator-run (the permission classifier blocks the agent): `PUBLIC_BURST_GUARD_THINK_KEY=$(gcloud secrets versions access latest --secret=efeonce-think-server-key --project=efeonce-group) pnpm security:public-burst-guard --apply`; Greenhouse production release (ships everything on `develop`); `INSIGHTS_SHARING_ENABLED=true` in Vercel Production (exact `printf %s true`) + redeploy + ecosystem-lane canary.
+- Production activation completed without releasing Greenhouse: WAF apply/readback, exact Production flag, redeploy and
+  ecosystem-lane canary are recorded above. A future Greenhouse production release remains a separate operator decision.
 
 
 **Built in Greenhouse (local `develop`, not pushed):**
@@ -340,13 +359,8 @@ create response (`sharing/commands.ts`). Staging links point to production Think
 production Greenhouse ⇒ a staging token 404s there; staging testing = local Think with `GREENHOUSE_API_BASE` at the
 staging `.vercel.app` + bypass.
 
-**Rollout pending (in order, operator-gated):** (1) generate the Think key, set `GREENHOUSE_THINK_KEY` in Think's Vercel
-production env and run `PUBLIC_BURST_GUARD_THINK_KEY=… pnpm security:public-burst-guard --apply` (operator runs it; the
-classifier blocks the agent) so the WAF rule carries the exception BEFORE Think goes live; (2) push Greenhouse `develop`
-→ staging and verify model 1.1 with a synthetic share grant on the sandbox edition (create → local Think render →
-revoke → 410 → download via proxy); (3) Greenhouse production release (`greenhouse-production-release`); (4) push Think
-`main` (auto-deploys production); (5) flip `INSIGHTS_SHARING_ENABLED` in production only with operator approval, after
-mapping where it is read.
+**Rollout state:** Think production, WAF exception, Production sharing flag/redeploy and both staging/production canaries
+are complete. Greenhouse 1.1 remains staged; its production release was deliberately not part of this operation.
 
 **Sesión 2026-09-24 — índice A4, familias de gráfico y auditoría de release.** El mapper compone un índice A4 con
 folios físicos; los tests locales cargan PDFs reales de 30 páginas y 25 láminas y ejercitan line/pie/donut/scatter en
@@ -499,6 +513,10 @@ producción antes de compartir con clientes. Sin flag propio.
 
 ## Sessions (append as you go; newest first)
 
+- **2026-09-28 · TASK-1875 · activation in production.** WAF applied/read back without drift; exact Vercel Production
+  flag + Ready redeploy `greenhouse-cssemzyzb`; sequential behavior canary green through Think and grant revoked.
+  Production remains on supported web model 1.0; no Greenhouse release. Task stays in-progress for the automated
+  unsupported-major acceptance case.
 - **2026-09-28 · TASK-1875 · implementación (code complete local, sin deploy).** Greenhouse: modelo web 1.1 aditivo
   (`d45fc780f`) + excepción de Think en el guard de `/api/public` (`27b458aec`); Think: ruta SSR `/insights/r/[token]`,
   modo presentación, impresión, en-US, logo del cliente, tests y AA (commits locales en `main`, sin push). Nada

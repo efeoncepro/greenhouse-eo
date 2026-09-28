@@ -37,6 +37,19 @@
   `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md` (valores como tokens, nunca HEX
   literal). — por trabajo en TASK-1888/TASK-1889
 
+## Delta 2026-09-28 — activación productiva
+
+- WAF de Vercel aplicado y releído sin drift: ambas reglas conservan la condición privada negada
+  `x-efeonce-think-key` y el límite 20 req/10 s por IP (`enforce` fuera de producción, `observe` en producción).
+- `INSIGHTS_SHARING_ENABLED` quedó en valor exacto `true` en Vercel Production. Redeploy Ready
+  `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`) sirve el alias `greenhouse.efeoncepro.com`.
+- Canary secuencial por el lane ecosystem sobre `EO-INS-000014`: create 201; Think 200 con `private, no-store`,
+  `noindex, nofollow`, `no-referrer` y token ausente del HTML; `deck_pdf` de 329 874 B con magic `%PDF` por el proxy;
+  revoke 200; página 410 sin nombre de organización ni código; descarga 303. El grant
+  `ishr-df4a4ffa-20f6-475f-b0bb-2d2da51fc188` quedó revocado.
+- Producción sigue sirviendo `InsightWebModelV1` 1.0, que Think soporta. El modelo 1.1 queda en staging; no se hizo
+  release de Greenhouse. La task permanece in-progress sólo por la prueba automatizada de major no soportada.
+
 ## Delta 2026-09-18
 
 - **Desbloqueada por TASK-1848** (en producción 2026-09-18, release `bda1cf2cd938`): el resolver público `GET /api/public/insights/shared/[token]` → `InsightWebModelV1` (`modelVersion '1.0'`, proyección client-facing) y el proxy de descarga `GET …/outputs/[output]` (re-chequea revocación) existen en producción, **con `INSIGHTS_SHARING_ENABLED` OFF** (con el flag OFF responde 404). Respuestas: 404 desconocido/expirado/flag OFF/org suspendida/módulo ausente; 410 revocado/retirado; 429 rate limit (IP 300/60 s, grant 60/20); cabeceras `private, no-store`, noindex, no-referrer, CSP. En staging el flag está ON y el canary sintético corrió completo en la org sandbox (`EO-INS-000015`). **El encendido en producción de sharing/delivery/schedules espera a esta task.** No probar límites con ráfagas concurrentes contra el resolver: una ráfaga de 64 requests dejó 86–88 conexiones ociosas en la base compartida (ISSUE-174 → TASK-1876). — por TASK-1848
@@ -66,7 +79,7 @@
 - Motion: `docs/ui/motion/TASK-1875-efeonce-insights-shared-web-render-think-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Think en producción (bbf8522): /insights/r/<token> y la muestra pública /insights/muestra; Greenhouse 1.1 en staging (13fd47381) con canary sintético verde; pendientes del operador: --apply del WAF, release de Greenhouse a producción e INSIGHTS_SHARING_ENABLED en producción (hoy OFF)`
+- Status real: `Think y sharing de Greenhouse operativos en producción: Think bbf8522; WAF sin drift a 20 req/10 s/IP; INSIGHTS_SHARING_ENABLED=true exacto en deployment Ready greenhouse-cssemzyzb; canary ecosystem 201→200/PDF→revoke→410/303, grant revocado. Producción sirve InsightWebModelV1 1.0 soportado; 1.1 sigue en staging y no se hizo release de Greenhouse. Falta la prueba automatizada de major no soportada.`
 - Rank: `TBD`
 - Domain: `ui|platform|public-site`
 - Blocked by: `none`
@@ -595,8 +608,8 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
 > embudo, desborde 1440/390, movimiento reducido, interacción, presentación, impresión); `audit-insights-a11y` todo AA
 > y foco visible en 1440/390 (completo, extremo y muestra); 15 pruebas unitarias; canary real en staging con la
 > edición sintética `EO-INS-000014` (200 con cabeceras, PDF de 329 874 B por el proxy, 410 tras revocar, 404
-> desconocido). Sin tildar: el 200 en `think.efeoncepro.com` con un grant real espera `INSIGHTS_SHARING_ENABLED` en
-> producción (hoy OFF; el canary se hizo con Think local contra staging), y la `modelVersion` con major no soportada
+> desconocido). El canary productivo por el lane ecosystem confirmó create 201, Think 200, PDF por proxy, revoke 200,
+> lectura 410 y descarga 303; el grant quedó revocado. Sin tildar sólo queda la `modelVersion` con major no soportada:
 > está en código (`isSupportedModelVersion` ⇒ `error` 502) pero sin prueba automatizada. `EditionMasthead` y
 > `FactCallout` no existen como tales: la portada es el `header.ins-hero` de `InsightReport` y el callout quedó como
 > `FactMark`; así está documentado en el README de primitivas.
@@ -604,7 +617,7 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
 - [x] Se declaro `Execution profile: ui-ux` y `UI impact: layout`; `UI ready` permanece `no` hasta que wireframe,
       flow, motion y `## UI/UX Contract` tengan mapping, GVC plan y decision log materializados con el contrato
       real de TASK-1848; si pasa a `yes`, `pnpm task:lint --task TASK-1875` no reporta findings.
-- [ ] `think.efeoncepro.com/insights/r/<token>` responde 200 para un grant válido con: código `EO-INS-…`, versión,
+- [x] `think.efeoncepro.com/insights/r/<token>` responde 200 para un grant válido con: código `EO-INS-…`, versión,
       período con zona, corte máximo, resumen, capítulos, figuras con tabla equivalente, límites, metodología y
       descargas; todas las cifras del DOM son iguales al fixture/snapshot (prueba automatizada), sin re-formatear.
 - [x] La página se resuelve en cada request (`prerender = false`), sirve `Cache-Control: private, no-store`,
@@ -643,7 +656,7 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
 - [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
 - [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1848 URL del correo, TASK-1849 botón copiar enlace, EPIC-045 nodo S6)
 - [x] dossier GVC + scorecard copiados a Greenhouse; docs de Think actualizados; commit del hub referenciado en el Delta de cierre

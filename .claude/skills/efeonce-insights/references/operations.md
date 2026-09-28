@@ -54,7 +54,7 @@ the v2 content (readings, essentials, cover, bands) only exists in plans generat
 | `INSIGHTS_GENERATION_ENABLED` | create / revise / evidence collection | Vercel only (`flags.ts`) | ON staging + Production; Preview OFF |
 | `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel | Production OFF (product decision); staging ON since 2026-09-18, operator-authorized for the TASK-1848 canary |
 | `INSIGHTS_AUTHORING_AI_ENABLED` | Gemini rewrite of the plan | Vercel only (ops-worker never reads it: scheduled editions stay deterministic) | ON in Production since 2026-09-26 (canary `EO-INS-000029`, `ai_bounded`, gemini-2.5-flash-lite); staging OFF |
-| `INSIGHTS_SHARING_ENABLED` (TASK-1848) | create share links + public reader (OFF ⇒ create 503 `sharing_disabled`, reader 404) | Vercel | 2026-09-18: staging ON · Production OFF until the Think reader (TASK-1875) |
+| `INSIGHTS_SHARING_ENABLED` (TASK-1848) | create share links + public reader (OFF ⇒ create 503 `sharing_disabled`, reader 404) | Vercel | staging ON since 2026-09-18 · Production ON since 2026-09-28 (`greenhouse-cssemzyzb`; TASK-1875 canary green) |
 | `INSIGHTS_DELIVERY_ENABLED` (TASK-1848) | create delivery intent (Vercel, OFF ⇒ 503 `delivery_disabled`) + dispatch (ops-worker) | Vercel + `ops-worker` (default `true` in `deploy.sh`, guarded by `deploy-contract.test.ts`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON (`ops-worker-00695-hrw`, then release `bda1cf2cd938`) |
 | `INSIGHTS_SCHEDULES_ENABLED` (TASK-1848) | schedule writes (Vercel) + tick (ops-worker) | Vercel + `ops-worker` (default `true`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON |
 | `INSIGHTS_GENERATION_ENABLED` in the worker (TASK-1848) | the schedules tick creates editions | now ALSO `ops-worker` (default `true` in `deploy.sh`) | ops-worker ON; `INSIGHTS_AUTHORING_AI_ENABLED` is NOT declared in the worker |
@@ -175,18 +175,19 @@ flag, 202 after.
 - Rollback: disable the flag in both runtimes; keep tables and assets; never `migrate:down` on the shared instance
   without explicit operator authorization (it serves production).
 
-## Sharing, delivery, schedules (TASK-1848) — in production with flags OFF (release `bda1cf2cd938`, 2026-09-18)
+## Sharing, delivery, schedules (TASK-1848) — sharing ON; delivery/schedules OFF in production
 
-Production flags stay OFF until the Think reader (TASK-1875) exists. ISSUE-174 (connection exhaustion by a concurrent
-burst on a public DB-backed route) is open → TASK-1876; weigh it before exposing the public reader to real traffic.
+`INSIGHTS_SHARING_ENABLED` is ON in Vercel Production since 2026-09-28 after the TASK-1875 behavior canary. Delivery
+and schedules remain OFF. ISSUE-174 (connection exhaustion by a concurrent burst on a public DB-backed route) remains
+governed by TASK-1876; all probes against the public reader stay sequential.
 
-**Edge guard (TASK-1876, code complete 2026-09-28, rollout pending):** `/api/public/**` — public reader and download
+**Edge guard (TASK-1876, applied and read back without drift 2026-09-28):** `/api/public/**` — public reader and download
 proxy included — sits behind a Vercel Firewall rate limit of 20 req / 10 s per IP: `enforce` (429 at the edge, function
 not invoked, no PG connection) in staging/preview, `observe` (log only) in production. Rules versioned in
 `src/lib/security/public-burst-guard/firewall-rules.ts`; `pnpm security:public-burst-guard` prints the plan,
 `--apply` writes and re-reads (apply is the operator's). Vercel PG sessions also request `idle_session_timeout=60s`.
 The domain per-grant limit (429 + `Retry-After: 60`) stays behind the edge. The Think server-side consumer (TASK-1875)
-is exempted by an explicit header condition (`x-efeonce-think-key`, code complete 2026-09-28 in `27b458aec`; see
+is exempted by an explicit header condition (`x-efeonce-think-key`, applied 2026-09-28; see
 § Shared web in Think) — never by raising the limit. Diagnosis: a 429
 without the domain JSON body / `Retry-After` and without a `rate_limited` access event came from the edge.
 
@@ -254,12 +255,14 @@ is off is `skipped/email_type_paused` (no grant issued).
   (both work with the flag OFF); deleting the Cloud Scheduler job stops the tick entirely.
 - **Schema:** never `migrate:down` on the shared instance without explicit operator authorization (it serves production).
 
-## Shared web in Think (TASK-1875) — Think in production, Greenhouse 1.1 in staging (2026-09-28)
+## Shared web in Think (TASK-1875) — Think and Greenhouse sharing in production; 1.1 remains in staging (2026-09-28)
 
-State: Think `main` `bbf8522` in production (`/insights/r/<token>` and the public sample `/insights/muestra`);
-Greenhouse `13fd47381` in staging (model 1.1). Steps 1 (key in Think), 2 (staging canary) and 4 (Think push) are done;
-the WAF `--apply`, step 3 (Greenhouse release) and step 5 (production flag) wait for the operator.
-`INSIGHTS_SHARING_ENABLED` is still staging ON / production OFF.
+State: Think `main` `bbf8522` is in production (`/insights/r/<token>` and public sample `/insights/muestra`). Greenhouse
+production serves `InsightWebModelV1` 1.0, supported by Think; Greenhouse `13fd47381` keeps model 1.1 in staging. The
+WAF exception is applied and read back without drift; `INSIGHTS_SHARING_ENABLED` is exact `true` in Vercel Production,
+deployment `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`) is Ready with alias
+`greenhouse.efeoncepro.com`. The production ecosystem-lane canary completed sequentially and its grant was revoked.
+No Greenhouse release was performed as part of this activation.
 
 **Public sample for clients** — `think.efeoncepro.com/insights/muestra`: the same `InsightReport` render with the
 fixture model, a fictitious brand («Marca de ejemplo»), a visible notice in the hero and footer, no downloads, no
@@ -295,16 +298,23 @@ or a commit.
 environment unless the base is overridden, and production Think reads production Greenhouse: a staging token 404s
 there. Test staging with local Think (`GREENHOUSE_API_BASE` = staging `.vercel.app` + `GREENHOUSE_API_BYPASS`).
 
-**Rollout order (operator-gated; do not reorder):**
+**Rollout order (executed through the production-sharing activation on 2026-09-28; do not reorder on replay):**
 1. Generate the Think key; set `GREENHOUSE_THINK_KEY` in Think's Vercel **production** env; run
    `PUBLIC_BURST_GUARD_THINK_KEY=… pnpm security:public-burst-guard --apply` (the operator runs it; the permission
    classifier blocks the agent) and re-read the plan: the rule must carry the exception BEFORE Think goes live.
 2. Push Greenhouse `develop` → staging. Verify model 1.1 with a synthetic share grant on the sandbox edition: create
    grant → local Think renders it → revoke → next GET 410 → download through the proxy. Sequential requests only.
-3. Release Greenhouse to production through the control plane (`greenhouse-production-release`).
+3. Release Greenhouse to production through the control plane (`greenhouse-production-release`) only when separately
+   authorized. The 2026-09-28 activation intentionally skipped this step because production model 1.0 is supported.
 4. Push Think `main` (auto-deploys production).
 5. Flip `INSIGHTS_SHARING_ENABLED` in production only with explicit operator approval, after mapping where it is read
    (`grep -rn INSIGHTS_SHARING_ENABLED src/ services/`), and register it in the flag ledger.
+
+**Production canary 2026-09-28:** ecosystem create 201 on synthetic edition `EO-INS-000014`; Think 200 with
+`Cache-Control: private, no-store`, `X-Robots-Tag: noindex, nofollow`, `Referrer-Policy: no-referrer` and no token in
+HTML; `deck_pdf` returned `%PDF` (329 874 B) through the proxy; revoke returned 200; the page then returned 410 without
+organization name or report code and download returned 303. Grant `ishr-df4a4ffa-20f6-475f-b0bb-2d2da51fc188` is
+revoked. Never record the one-time link token.
 
 **Think-side verification:** `pnpm test:insights`, `scripts/verify-insights-report.mjs`,
 `scripts/audit-insights-a11y.mjs`, `scripts/capture-insights-report.mjs` (repo `efeonce-think`).
