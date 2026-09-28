@@ -36,12 +36,20 @@ export const EFEONCE_MCP_READ_SCOPES = [
  * organización con `insights_v1` asignado, releída por llamada); el scope sólo responde si ESTE cliente puede pedir
  * esa clase. Las lecturas del catálogo y de ediciones viajan con el scope base.
  */
+/**
+ * `efeonce.mcp.brand.write` (TASK-1921): clase «encolar el render de una pieza de la marca propia de Efeonce» (La órbita
+ * y Glitch; `request_brand_render`). Clase propia porque su impacto no es el de Insights: produce piezas de la marca de
+ * Efeonce, no entregables de un cliente — conceder Insights nunca debe conceder esto. La autoridad real vive en
+ * Greenhouse (`brand_render.request.create`, sólo actores internos, organización de la marca); lecturas con el scope
+ * base. Nunca aprueba ni publica.
+ */
 export const EFEONCE_MCP_WRITE_SCOPES = [
   'efeonce.mcp.globe.credits.funding.ensure',
   'efeonce.mcp.seo.write',
   'efeonce.mcp.identity.write',
   'efeonce.mcp.client_services.write',
-  'efeonce.mcp.insights.write'
+  'efeonce.mcp.insights.write',
+  'efeonce.mcp.brand.write'
 ] as const
 
 export const EFEONCE_MCP_SCOPES = [...EFEONCE_MCP_READ_SCOPES, ...EFEONCE_MCP_WRITE_SCOPES] as const
