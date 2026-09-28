@@ -42,7 +42,7 @@ describe('catálogo de runtime', () => {
 })
 
 describe('validateDeckPlan — planes golden', () => {
-  for (const name of ['golden-brochure.json', 'golden-proposal.json']) {
+  for (const name of ['golden-brochure.json', 'golden-proposal.json', 'golden-proposal-seo-aeo.json', 'golden-brochure-seo-aeo.json']) {
     it(`${name} no tiene errores ni advertencias`, () => {
       expect(validateDeckPlan(read<DeckPlan>(name))).toEqual({ ok: true, issues: [] })
     })
