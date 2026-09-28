@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — El `--freeze` del composer sólo acepta la sección nueva sin sellar del ledger
+
+- Antes buscaba el nombre del frame en todo `BASELINE_DELTAS.md`, así que una declaración vieja de otra task lo
+  autorizaba para siempre (TASK-1928 re-promovió 10 frames sin declararlos). Ahora exige una sola sección `## ` sin el
+  marcador `sealed-by-freeze`, acepta sólo los frames que ella nombra, falla cerrado listando los demás y la sella al
+  promover. Regla en `scripts/artifact-composer/baseline-deltas-ledger.ts` (+ test);
+  [runbook §5](docs/operations/runbooks/composer-visual-gate.md). Las 44 secciones previas quedan `legacy-2026-09-28`.
+
 ## 2026-09-28 — Las nueve láminas SEO/AEO del deck «La órbita» componen (TASK-1934)
 
 - El catálogo de recetas pasa de 69 a 78, todas con plantilla en `graphic-line-deck` sobre AXIS `axis-tokens` 0.3.23 /
@@ -20,6 +28,9 @@
 
 ## 2026-09-28 — DataForSEO tiene CLI diaria y catálogo oficial reproducible (TASK-1935)
 
+- La CLI llega a `1.0.0` con SemVer propio, historial append-only, digest de fuentes gobernadas, `version` visible
+  y un bump automatizado. `local:check` bloquea mejoras sin versión y registro; los recibos JSON llevan
+  `cliVersion`. [Contrato técnico](docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md).
 - `serp-compare` compara cualquier marca o entidad mediante aliases y múltiples dominios sobre una sola captura
   por query/dispositivo. Exporta raw + JSON/CSV y separa orgánico, mención, enlace AI, cita AI y Shopping opcional;
   explicita depth y frescura sin fabricar posiciones. `quick organic` ya transmite target/depth/AI Overview.
@@ -652,13 +663,3 @@ con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED` y la emisión **apagados** has
 Staging queda encendido; el operador confirmó la llegada de los dos correos del canary. Gateway `efeonce-mcp` 1.7.0
 (revisión `00055-gk6`, 58 tools): 5 lecturas con el scope base y crear/revocar enlace con `efeonce.mcp.insights.write`
 (fail-closed); enviar y programar no existen por MCP. `ISSUE-174` → `TASK-1876` sigue abierto.
-
-## 2026-09-18 — Efeonce Insights: compartir por enlace, envío por correo y recurrencia (TASK-1848, code complete)
-
-Una edición emitida ya puede compartirse por enlace personal que vence (se guarda sólo el hash del token; revocable
-uno a uno; el lector público responde 404/410/429 y nunca cachea), enviarse por correo desde Efeonce a personas
-activas de la organización (enlace compartido o PDF adjunto opt-in, dedupe por persona y versión, un resultado
-ambiguo se reconcilia antes de reenviar) y programarse (semanal/mensual, zona y consolidación; cada ocurrencia deja
-un borrador en revisión, nunca emite ni envía). Migraciones aplicadas en la base compartida; los tres flags nuevos
-nacen apagados en producción y los EmailTypes apagados. Verificado en staging con canary sintético completo (incluye un
-correo real al buzón autorizado del operador); la prueba destapó `ISSUE-174` → `TASK-1876`. Producción y gateway pendientes.

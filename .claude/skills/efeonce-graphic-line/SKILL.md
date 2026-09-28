@@ -194,7 +194,7 @@ de Greenhouse; los catálogos `graphic-line-*` del Artifact Composer o `src/lib/
 - Greenhouse: `pnpm creative:layout:test`; motion: storyboard antes/después comparado byte a byte si se tocó el motor;
   composer por superficie: tests de `src/lib/brand-surfaces` y de los catálogos, `pnpm brand:tokens --check` y
   `pnpm composer:visual-gate --catalog=graphic-line` a 0 px (un bump de AXIS mueve píxeles: se declara en
-  `BASELINE_DELTAS.md`).
+  una sección nueva de `BASELINE_DELTAS.md`; `--freeze` sólo acepta los frames que esa sección nombra).
 - Skill: espejo `.claude/skills/efeonce-graphic-line/` → `.codex/skills/efeonce-graphic-line/`
   (`rsync -a --delete .claude/skills/efeonce-graphic-line/ .codex/skills/efeonce-graphic-line/`) y `pnpm skills:mirrors`.
   Se edita `.claude/` y se espeja; nunca al revés.

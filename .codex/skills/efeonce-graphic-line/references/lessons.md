@@ -256,6 +256,16 @@
   pieza compuesta con su plate real. Caso completo:
   [registro cine §16.7](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto).
 
+## 2026-09-28 (el freeze aceptaba declaraciones viejas)
+
+- **Una pieza compartida mueve frames que nadie declaró.** En TASK-1928 (`2c7c67c5d`) un cambio en
+  `graphic-line-shared/selection-hook.ts` movió 10 frames ya aprobados (`ProposalCinematic`, `HeroLens`, los tres
+  `HeroMobileNative*`, …). El `--freeze` de entonces los re-promovió sin error porque sus nombres aparecían en
+  entradas viejas del ledger. Ahora el freeze sólo acepta los frames de la sección nueva sin sellar y la sella; los
+  demás los lista como no declarados. Regla: cuando el freeze lista frames que no esperabas, se miran uno por uno
+  (se declaran con su porqué o se arregla el código), nunca se copian a la sección para que pase.
+  [Runbook §5](../../../../docs/operations/runbooks/composer-visual-gate.md).
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

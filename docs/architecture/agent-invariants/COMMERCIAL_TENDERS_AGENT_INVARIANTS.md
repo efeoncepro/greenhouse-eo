@@ -379,7 +379,8 @@ command canónico y cruza la MISMA puerta que las rutas.
 - **NUNCA** toques `src/lib/artifact-composer/**` ni `src/lib/commercial/tenders/**` sin correr
   `pnpm vitest run src/lib/artifact-composer src/lib/commercial/tenders` (las suites cubren las bug
   classes que ya nos costaron un deck roto) **y `pnpm composer:visual-gate`** (0 píxeles contra el
-  baseline; rebaseline sólo declarado en `BASELINE_DELTAS.md` + `--freeze`).
+  baseline; rebaseline sólo declarado en la sección nueva sin sellar de `BASELINE_DELTAS.md` + `--freeze`,
+  que sella esa sección — una declaración de otra entrada no autoriza nada; runbook §5).
 - **ANTES de cualquier `--freeze`, lee el runbook `docs/operations/runbooks/composer-visual-gate.md`**
   (fuente única del proceso — cualquier agente lo carga al tocar el composer). Bug class `ISSUE-122`, dos
   reglas duras: **(a)** el `--freeze` es **SINGLE-OWNER, serializado y atómico** (freeze + commit juntos);

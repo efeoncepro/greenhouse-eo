@@ -445,7 +445,7 @@ sobre cada probe de los catálogos de La órbita: una violación falla el gate i
 |---|---|
 | `pnpm composer:visual-gate --catalog=graphic-line` | **73 frames a 0 px** (57 del deck, 9 de stills, 7 de overlays) + auditoría renderizada D1 y 3×. Los siete frames de las plantillas de TASK-1934 y el re-congelado de `ProposalCinematic` (la nota del pie mueve su probe) se congelaron el 2026-09-28 tras la aprobación visual del operador (`c652f4f83`, ledger (o)) |
 | `pnpm composer:visual-gate --catalog=glitch` | 26 frames a 0 px del catálogo de Glitch (comparte motor, manifest y ledger) |
-| `--selftest` / `--freeze` | dos corridas deben dar 0 px antes de congelar; `--freeze` es **single-owner, serializado y atómico con su commit**, y cada frame cambiado se declara antes en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (TASK-1927: entradas (b)–(e); TASK-1928: (f), (h)–(n); (g) es Glitch) |
+| `--selftest` / `--freeze` | dos corridas deben dar 0 px antes de congelar; `--freeze` es **single-owner, serializado y atómico con su commit**, y cada frame cambiado se declara antes en la sección nueva sin sellar de `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`, que el freeze sella (runbook §5; TASK-1927: entradas (b)–(e); TASK-1928: (f), (h)–(n); (g) es Glitch) |
 | `src/lib/brand-surfaces/__tests__/recipe-map.test.ts` | el intent de ejemplo de cada receta planifica al `contentType` que promete `recipe-map.json` |
 | `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` | cada slot de la receta tiene campo, tipo compatible, obligatoriedad y el mismo largo máximo (en plantilla compartida manda el mayor) |
 | `src/lib/brand-surfaces/__tests__/example-plans.test.ts` | snapshot del plan de cada `*-intent.json` (catálogo, `contentType`, slots, assets): un bump de AXIS o un cambio del mapper no mueve el plan de un intent publicado sin declararlo |
@@ -537,7 +537,7 @@ Secuencia para subir AXIS (detalle y credenciales en
    nuevo es un alta; uno existente que cambia se declara).
 8. **Índice.** `pnpm brand:deck-recipes` y `pnpm brand:deck-recipes -- --check`.
 9. **Mirar.** `pnpm brand:compose -- --intent …` con el plate real y comparar contra la referencia aprobada.
-10. **Gate.** `pnpm composer:visual-gate --catalog=graphic-line --selftest`, declarar el alta en `BASELINE_DELTAS.md`,
+10. **Gate.** `pnpm composer:visual-gate --catalog=graphic-line --selftest`, declarar el alta en una sección nueva de `BASELINE_DELTAS.md`,
     `--freeze` con el árbol del composer limpio salvo tu cambio, y commit atómico.
 
 ## 12. Plan de deck contra el catálogo (TASK-1929)

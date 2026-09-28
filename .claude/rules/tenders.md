@@ -65,8 +65,9 @@ explica, no se propone). **El manifest se valida, NO se reescribe** (`.passthrou
   brand-pack-sync/gradient-inventory/…).
 - **`pnpm composer:visual-gate` a CERO píxeles** contra el baseline committeado
   (`scripts/frontend/baselines/artifact-composer/**`). Un cambio de píxel intencional se declara
-  lámina por lámina en `BASELINE_DELTAS.md` y se re-promueve con `--freeze` — **NUNCA** se muta el
-  baseline a mano (el digest sellado también falla el gate). **Antes de `--freeze`, leé el runbook
+  lámina por lámina en una **sección nueva** de `BASELINE_DELTAS.md` y se re-promueve con `--freeze`, que
+  sólo acepta los frames de la única sección sin sellar y la sella (una entrada vieja no autoriza nada;
+  runbook §5) — **NUNCA** se muta el baseline a mano (el digest sellado también falla el gate). **Antes de `--freeze`, leé el runbook
   `docs/operations/runbooks/composer-visual-gate.md`** (fuente única del proceso). Dos reglas duras de
   ese runbook (bug class `ISSUE-122`): **(1)** el `--freeze` es **SINGLE-OWNER, serializado y atómico**
   (freeze + commit juntos) — **NUNCA** congeles con el composer sucio por otro agente (`git status` en

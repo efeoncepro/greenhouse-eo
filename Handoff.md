@@ -6,6 +6,8 @@ TASK-1863: staging; main retenido.
 
 **Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) en staging (flag ON, 6 catálogos + Insights verdes); federación en efeonce-mcp#22 sin merge; no promover a main.
 
+**Composer `--freeze` (28/09):** sólo acepta frames de la sección nueva sin sellar de `BASELINE_DELTAS.md` y la sella (`77d3cb1f5`, [runbook §5](docs/operations/runbooks/composer-visual-gate.md)); las 44 secciones previas quedaron `legacy-2026-09-28`. Gate global sigue rojo en 59 frames sky/deck-axis (ISSUE-122).
+
 **Deck «La órbita» (28/09):** TASK-1927–1929 y TASK-1934 complete en `develop` (78 recetas, AXIS `v0.3.23`); siguen TASK-1930…1933.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
