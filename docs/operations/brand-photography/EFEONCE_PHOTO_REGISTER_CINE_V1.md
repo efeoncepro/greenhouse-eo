@@ -1,7 +1,7 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.2 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-27 por Claude (1.2: excepción aprobada para las láminas de **sección** y
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.3 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-09-28 por Claude (1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
 > 1.1: plates para portada y contraportada de brochure y propuesta, aprobados por el operador:
 > [§16](#16-plates-para-portada-y-contraportada-aprobado-2026-09-27))
@@ -50,7 +50,10 @@ uniforme por registro de escena, isotipo compuesto y revisado al 100 % (§7.3), 
 
 **Pendientes que deja [pendiente]:** ~~el contrato AXIS (`cine-requires-nexa-or-proposal`) todavía rechazaría estas
 láminas declaradas como cine~~ — **cerrado por TASK-1927 (2026-09-27)**: el contrato ya las admite (§2). Los plates de «about» se compusieron con un degradado
-lateral, contra «sin velos» (§9.3): se regeneran con la reserva izquierda; QS1b y QS2 no tienen registro de
+lateral, contra «sin velos» (§9.3). **Composición resuelta (TASK-1928, 2026-09-28):** las plantillas de «quiénes somos» y
+«por qué lo hacemos» (`section-cine` · `about` y `purpose`) no tienen capa de velo (regla `no-scrim` del token de AXIS) y
+las láminas interiores de cine no llevan logo; **sigue pendiente** regenerar esos plates con la reserva izquierda
+(TASK-1926); QS1b y QS2 no tienen registro de
 `foto:isotipo` junto al plate: pasan por `foto:emblema` antes de publicar. Receta de cada lámina:
 [catálogo de recetas del deck](../brand-graphic-line/deck-recipes/README.md); norma:
 [composición por superficie §3, regla 5, y §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
@@ -102,7 +105,7 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 
 **El contrato lo vigila [medido]:** AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue
 **`cine-requires-nexa-or-proposal`** (`@efeoncepro/axis-ui-contracts`, `surface-composition.js`): pasa si la receta
-está en la lista del token **o** si `photo.subject` es `nexa`. El token vive en `@efeoncepro/axis-tokens` (desde 0.3.8; Greenhouse fija 0.3.14 desde TASK-1927),
+está en la lista del token **o** si `photo.subject` es `nexa`. El token vive en `@efeoncepro/axis-tokens` (desde 0.3.8; Greenhouse fija 0.3.21 desde TASK-1928, con el mismo valor),
 `efeonceGraphicLine.surfaces.photo.cine`: `{ recipes: ['proposal-cinematic', 'cover-brochure', 'close-brochure',
 'close-proposal', 'section-cine', 'section-split'], subjects: ['nexa'], lensMm: 85, cameraDistanceM: 2 }`, y la regla transversal `cine-only-nexa-or-proposal`, junto a `no-close-gaze-pairs`.
 
@@ -616,6 +619,14 @@ pnpm brand:compose -- --intent <intent.json>               # la lámina proposal
 
 `foto:generar` deja el plate en `./plates` junto a la ficha si no se pasa `--out`; `foto:isotipo` escribe
 `<plate>-isotipo.png` y su `.json` de procedencia. Con varias prendas, se corre una vez por pecho.
+
+**El plate dentro del composer [medido en código, 2026-09-28]:** `pnpm brand:compose` recorta el plate a la caja de la
+lámina con un recorte **centrado** («cover»). Si el intent declara `photo.focus` (`xOfWidth` / `yOfHeight`, fracciones
+del archivo), el recorte se **dirige** hacia ese punto (asset `plate` con `focus`, TASK-1928); hoy lo aplica la lente del
+reloj del día (`content-day`). Declararlo es la forma de conservar al sujeto dentro de un recorte chico sin regenerar
+el plate; no reemplaza la reserva de la toma. Hoy **las 69 láminas del deck** componen desde el catálogo
+`graphic-line-deck`, incluidas las de sección y «about» de la excepción cine (sin logo y sin velo en la plantilla).
+Arquitectura: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
 
 ---
 

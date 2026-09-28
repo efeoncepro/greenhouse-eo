@@ -725,8 +725,9 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 > Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
 > Contrato AXIS `efeonce.surface-composition` 0.1.2 (manifest `axis.surface-composition.v1`; acepta intents 0.1.0 y
 > 0.1.1), tokens `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve`. **Greenhouse lo integró con
-> TASK-1927 (`complete` el 2026-09-27; en `develop` local, sin push):** fijó `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12 (tag AXIS
-> `v0.3.14`); **TASK-1928 los subió a 0.3.20 y 0.3.18** (tag `v0.3.20`) y, el 2026-09-28, a **0.3.21 y 0.3.19** (tag `v0.3.21`, layout `document-selection` de `cover-brochure`). Ver «Contrato 0.1.2» y «Componer el deck hoy» al final de esta sección,
+> TASK-1927 y completó el deck con TASK-1928** (las dos `complete` y en `origin/develop`): hoy fija `axis-tokens`
+> **0.3.21** y `axis-ui-contracts` **0.3.19** (tag AXIS `v0.3.21`; la serie de versiones está en
+> [ledger.md](ledger.md)). Ver «Contrato 0.1.2» y «Componer el deck hoy» al final de esta sección,
 > [Lab](https://axis.efeonce.org/references/surfaces/). Canvas por superficie:
 > [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), una página por
 > superficie con su lámina «Guía · cómo componer …» a la izquierda. Esta sección no copia valores: los números están
@@ -796,8 +797,8 @@ nivel de llegada en bloque sólido en el acento de la línea (BeX: cinco peldañ
 (deltas b y c del contrato), `v0.3.13` (delta e: tokens del marco) y `v0.3.14` (tipografía completa de las
 contraportadas)).** Aditivo: un intent 0.1.0 u 0.1.1 se resuelve como antes. Guía AXIS
 `docs/agent-composition/surfaces/deck.md`, ADR AXIS `docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md` (delta
-0.1.2), ejemplos en `docs/examples/surfaces/`. **En Greenhouse, `pnpm brand:compose` compone sobre la 0.1.2 desde
-TASK-1927** (fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12).
+0.1.2 y deltas (b)…(l)), ejemplos en `docs/examples/surfaces/`. **En Greenhouse, `pnpm brand:compose` compone sobre
+la 0.1.2 desde TASK-1927** (hoy con `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19).
 
 - **Usos:** `use: 'proposal' | 'brochure'` en el deck. Toda receta aprobada admite los dos (el brochure es un PDF
   horizontal 16:9 que se lee sin presentador); una opción, sólo `proposal` (`use-not-for-recipe`). En el brochure,
@@ -848,7 +849,8 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 | Receta | `layout` | `contentType` |
 |---|---|---|
 | `proposal-cinematic` | `service` (o sin layout) · `hero` · `lines` | `deck.proposal-cinematic` · `.hero` · `.lines` |
-| `section-classic` · `content-measure` · `method-staircase` · `triptych` | — | `deck.<receta>` |
+| `section-classic` · `content-measure` · `triptych` | — | `deck.<receta>` |
+| `method-staircase` | `steps` (o sin layout) · `flat` | `deck.method-staircase` · `.flat` |
 | `section-split` | `corner-top` (o sin layout) · `corner-bottom` · `panel-end` | `deck.section-split` · `.corner-bottom` · `.panel-end` |
 | `cover-brochure` (uso brochure, con foto) | `document` · `line` | `deck.cover-brochure` |
 | `cover-brochure` (uso brochure, con foto y selección) | `document-selection` | `deck.cover-brochure.document-selection` |
@@ -863,7 +865,7 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 | Familia | Receta y `layout` → `contentType` |
 |---|---|
 | Propuestas sobrias | `proposal-service` → `deck.proposal-service` (las cuatro láminas `proposal-service-aeo/creative/web/revops` comparten plantilla) |
-| Método | `method-staircase` + `flat` · `method-score-ring` · `method-hybrid-workforce` (+ `scene`) · `decision-plan` |
+| Método | `method-staircase` + `flat` · `method-score-ring` · `method-hybrid-workforce` (`ladder` por defecto · `scene`) · `decision-plan` |
 | Cotización y cierre | `content-pricing` (`table` por defecto · `stage` · `live`) · `decision-next-steps` · `breather` |
 | Prueba | `content-focus` · `content-clients` · `content-partners` · `decision-risk` · `decision-case` · `decision-chart` · `decision-testimonial` · `decision-why-us` |
 | Secciones y quiénes somos | `section-lens` · `section-bleed` · `section-cine` (`team` por defecto · `services` · `about` · `purpose`; team y services comparten plantilla) · `content-team` · `content-stack` |
@@ -911,14 +913,11 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 - **Sección partida:** el indicador sube por la izquierda (regla `split-indicator-rises-start`) y barre las secciones
   ya recorridas, (n−1) de N. **Pregunta abierta del operador**, anotada en el token: ¿unificar a n de N?
 - **Tríptico:** una palabra por toma, cada una con su esfera; una toma con más de una palabra falla.
-- **Estado (2026-09-27):** TASK-1927 `complete`, en `develop` local y sin push; aprobación visual del operador de las
-  láminas compuestas (`hero`, `lines` y el brochure de nueve páginas). Los gates se leen en la task
-  (`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`). TASK-1928 y TASK-1929 quedaron
-  desbloqueadas. TASK-1928 está `complete` (2026-09-28): las 69 recetas componen (gate `graphic-line` a 0 px en 66 frames),
-  aprobadas por el operador y empujadas a `develop`. **Pendiente:** ruta productiva gobernada, que debe aceptar también el documento (TASK-1921). La selección en `cover-brochure` se
-  resolvió el 2026-09-28 (layout `document-selection`, AXIS `v0.3.21`). Diferencias conocidas
-  contra los prototipos: tamaño de «Cuando quieras.», burbuja URL horneada en vez de la de luminosidad, caja de
-  selección del pintor canónico unos píxeles más ajustada.
+- **Estado (2026-09-28):** TASK-1927 y TASK-1928 `complete`, aprobadas a ojo por el operador y en `origin/develop`:
+  las 69 recetas componen, gate `graphic-line` a 0 px en 66 frames (tasks en `docs/tasks/complete/`). **Pendiente:**
+  la ruta productiva gobernada, que debe aceptar también el documento (TASK-1921, `in-progress` en otra sesión: no está
+  disponible), y TASK-1929…1932. Diferencias conocidas contra los prototipos: tamaño de «Cuando quieras.», burbuja URL
+  horneada en vez de la de luminosidad, caja de selección del pintor canónico unos píxeles más ajustada.
 
 **Cambiar la foto, el copy o la sección de una lámina (TASK-1927, 2026-09-27).** El contenido es **dato del intent**,
 no de la plantilla: nunca edites una plantilla ni retoques la salida para cambiarlo.
@@ -947,6 +946,45 @@ no de la plantilla: nunca edites una plantilla ni retoques la salida para cambia
   o con un logo sale al revés. El isotipo del uniforme se compone aparte: revísalo en esa composición.
 - **No cambia con la foto:** panel, esquina curva, indicador y columna de voz; los fija `layout`.
 - **En portadas con columna**, al cambiar la foto revisa `column.topPx` (se elige según dónde queda el sujeto).
+
+**Añadir o modificar una receta del deck (de punta a punta; así se hicieron las 38 de TASK-1928).** Requisito: la
+lámina está aprobada por el operador en el canvas y tiene su receta en `deck-recipes/`. Nunca una plantilla sin
+receta, ni una receta sin aprobación.
+
+1. **AXIS primero** (repo `axis-design-system`; flujo de release en la skill `axis-design-system`): la receta o la
+   composición nueva en `efeonceGraphicLine.surfaces.deck.recipes.<receta>` (`packages/tokens/src/tokens.ts`:
+   `status`, `uses`, `voice`, `type`, `reserves`, `selection`, `layouts[<layout>]` con `requires` / `forbids` /
+   `references`) y su prueba en `packages/contracts/src/surface-composition.test.ts`; si AXIS no mide todo lo que la
+   lámina pinta, se agrega el token antes de escribir la plantilla. Delta en el ADR
+   `docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md` y release (tokens + contracts republicado).
+2. **Validar antes de publicar:** copia temporal de `packages/tokens/dist` de AXIS sobre
+   `node_modules/@efeoncepro/axis-tokens/dist` en Greenhouse, componer y correr el gate; después reinstalar la versión
+   fijada ([lessons.md](lessons.md), 2026-09-27).
+3. **Greenhouse fija las dos versiones** exactas en `package.json` (`axis-tokens` y `axis-ui-contracts`), instala con
+   la credencial efímera y corre `pnpm brand:tokens` (regenera `graphic-line-tokens.json` y los `graphic-line-tokens.css`
+   de los catálogos; `--check` detecta deriva).
+4. **Builder** en `src/lib/brand-surfaces/recipes/<familia>.ts` (ayudas en `kit.ts`), registrado en
+   `src/lib/brand-surfaces/index.ts`. Mezcla el token base con el de la composición y **devuelve su `contentType`**
+   si la composición tiene plantilla propia. Los valores salen del manifest; nunca coordenadas en el builder.
+5. **Plantilla** `<slug>.html` + `<slug>.slots.json` en `src/lib/artifact-composer/catalogs/graphic-line-deck/`, con un
+   prefijo CSS propio, y su entrada en `registry.json` (`name`, `contentTypes`, `prototype`, `slotsRef`). Si lleva
+   selección o cursor, se agrega a `TEMPLATES_WITH_SELECTION` / `TEMPLATES_WITH_READER_CURSOR` o al hook de
+   selección por ítem o nivel en `index.ts`; si es de decisión con respuesta grande, a la lista 3× de
+   `graphic-line-shared/rendered-audit.ts`. Una variante que es la misma lámina con una capa más **reusa** la
+   plantilla (slot opcional + entrada en `contentTypes`) en vez de duplicarla.
+6. **Mapa y ejemplo:** fila en `recipe-map.json` (`contentType`, `example`, `slots` receta → campo del `slots.json`)
+   e intent de ejemplo `src/lib/brand-surfaces/examples/deck-<id>-intent.json` (entra al snapshot de
+   `__tests__/example-plans.test.ts`; actualízalo sólo por este alta). `pnpm brand:deck-recipes` reescribe el índice
+   del README del catálogo (`--check` sólo verifica; no está en un workflow de CI).
+7. **Paridad:** `recipe-slot-parity.test.ts` (campo, tipo, obligatoriedad y el mismo largo máximo; en una plantilla
+   compartida manda el mayor), `recipe-map.test.ts` y `plan-surface-piece.test.ts`.
+8. **Gate y registro:** componer el ejemplo con `pnpm brand:compose` y compararlo **a ojo** con la referencia
+   aprobada; declarar la alta o el cambio en `BASELINE_DELTAS.md`; `pnpm composer:visual-gate --catalog=graphic-line
+   --freeze` (single-owner, serializado y atómico con su commit; runbook `composer-visual-gate.md`) y luego el gate a
+   0 px. Anotar la decisión en [ledger.md](ledger.md) y lo aprendido en [lessons.md](lessons.md).
+
+Modificar una receta existente es el mismo recorrido desde el paso que corresponda: un cambio de valor empieza en AXIS
+(paso 1); un cambio de largo, en la receta aprobada y la paridad (paso 7), nunca sólo en el `slots.json`.
 
 **Recetas por lámina (aprobado por el operador, 2026-09-27).** Las 69 láminas del canvas «Deck» están aprobadas y
 tienen receta en [`deck-recipes/`](../../../../docs/operations/brand-graphic-line/deck-recipes/README.md) (JSON

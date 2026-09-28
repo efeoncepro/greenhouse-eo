@@ -140,6 +140,12 @@ Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 > ocurrió (el gesto es aprobar: `content-pricing-live`). **Esto no cambia este catálogo:** una licitación o una oferta
 > a comité sigue en `deck-axis` con su selector; las recetas de La órbita no se mezclan con él. Manual:
 > `docs/manual-de-uso/creative/componer-deck-con-recetas.md`.
+>
+> **Delta 2026-09-28 — las 69 recetas componen, pero no desde Proposal Studio.** Desde TASK-1928 cada receta de La
+> órbita tiene plantilla en `graphic-line-deck` y se compone lámina a lámina por CLI con
+> `pnpm brand:compose -- --intent <intent.json>` (detalle en `deck-studio`). **Proposal Studio sigue emitiendo
+> `deck-axis`:** que arme el deck de La órbita desde recetas es TASK-1932 (to-do), y la ruta productiva de piezas de
+> marca (API, worker, MCP) es TASK-1921, en curso; ninguna de las dos está disponible todavía.
 
 ### Las que puntúan (no son opcionales)
 

@@ -36,14 +36,18 @@ La diferencia con otras capas de documentacion:
 - [Componer una pieza por superficie con AXIS](creative/componer-por-superficie-con-axis.md) — web, DOOH, pDOOH,
   motion, video y deck: declarar superficie, formato, papel y receta; **Ruta A** para las recetas aprobadas con
   plantilla, `pnpm brand:compose` (Artifact Composer: PDF del deck, PNG de web/DOOH/motion y capas de video con alfa;
-  TASK-1919), incluidas las portadas y contraportadas, las composiciones `hero`/`lines` y el brochure o la propuesta
-  como documento de varias páginas en un solo PDF (TASK-1927); **Ruta B** para el resto, `pnpm surface:resolve` en AXIS (contrato `candidate`) y cada delegate a su
+  TASK-1919), incluidas **las 69 láminas del deck** (TASK-1927 y TASK-1928), la portada de brochure con la selección de
+  Nexa (`document-selection`) y el brochure o la propuesta como documento de varias páginas en un solo PDF; **Ruta B**
+  para el resto, `pnpm surface:resolve` en AXIS (contrato `candidate`) y cada delegate a su
   compositor de Greenhouse; la receta de deck `proposal-cinematic` y el registro cine, qué significan los estados, los
   `issues` y los errores `recipe-not-approved` / `recipe-outside-composer` / `surface-issues`, y problemas comunes.
 - [Componer un deck con las recetas por lámina](creative/componer-deck-con-recetas.md) — armar un brochure, una
-  propuesta, un pitch o un QBR de marca Efeonce con las 69 láminas aprobadas el 2026-09-27: elegir documento, portada y
-  contraportada, esqueleto por familias, receta por tramo («cuándo sí», «cuándo no», alternativa), pares y ritmo, slots,
-  fotos, qué sale con `pnpm brand:compose` y qué va como maqueta declarada, estados y problemas comunes.
+  propuesta, un pitch o un QBR de marca Efeonce con las 69 láminas aprobadas el 2026-09-27, **las 69 con plantilla**
+  desde el 2026-09-28: elegir documento, portada y contraportada, esqueleto por familias, receta por tramo («cuándo
+  sí», «cuándo no», alternativa), pares y ritmo, cómo elegir la composición (`layout`) de cada receta, slots con su
+  largo máximo, cifras con fuente, `[MONTO]`, selección (`selected`, `recommended`, `selection.level`), `photo.focus`,
+  intent propio, lámina o documento completo con `pnpm brand:compose`, estados y problemas comunes. La ruta dentro de la
+  plataforma es TASK-1921, en curso.
 - [Componer piezas de Glitch](creative/componer-piezas-glitch.md) — **sólo para Glitch** (no para piezas de
   Efeonce): elegir la portada con la regla de rotación, armar portada, láminas interiores, noticia 1 y contraportada,
   piezas del blog y del video en propuesta (mapa de zonas del reel), checklist, estados y problemas comunes. Las piezas

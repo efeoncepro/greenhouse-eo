@@ -81,8 +81,8 @@ a día; p. ej. `deck.proposal-service`, `deck.content-pricing` + `.stage`/`.live
 `.services`/`.about`/`.purpose`, `deck.content-day` + `.tools`/`.live-progress`/`.live-results`): **69 de 69** recetas
 componen; la última, `cover-brochure-cine-lines-selection`, entró el 2026-09-28 como `deck.cover-brochure.document-selection`
 (misma plantilla `CoverBrochure`, AXIS 0.3.21) y `recipe-map.json` ya no tiene `blocked`. Viven junto a `graphic-line-stills` (heros web, caminero,
-cuadros de motion) y `graphic-line-overlays` (capas de video con alfa). Tabla receta → `layout` → `contentType` y
-campos del intent: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose`».
+cuadros de motion) y `graphic-line-overlays` (capas de video con alfa). Mapa completo de las 69: §«Mapa receta →
+plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose`».
 
 - **Se componen desde un intent de superficie**, no desde un `Plan` escrito a mano:
   `pnpm brand:compose -- --intent <intent.json>`. El mapper `src/lib/brand-surfaces` exige receta aprobada, valida con
@@ -104,11 +104,16 @@ campos del intent: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose
 - **La pintura de la selección y del CTA se inyecta** (`createCatalog({ selectionPainter, ctaPainter })`): el catálogo
   no importa paquetes.
 - **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (66 frames a 0 px desde TASK-1928; altas y cambios
-  declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`, entradas 2026-09-27 b–e y (f)…(m), y 2026-09-28 (n) con el re-promovido de `CoverBrochure`; runbook
-  `docs/operations/runbooks/composer-visual-gate.md`). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
-- **Contrato 0.1.2, integrado (TASK-1927, 2026-09-27; local en `develop`).** Greenhouse fija
-  `@efeoncepro/axis-tokens` 0.3.14 y `@efeoncepro/axis-ui-contracts` 0.3.12 (desde TASK-1928, 0.3.20 y 0.3.18; desde el 2026-09-28, 0.3.21 y 0.3.19). El mapper lee `use` y `layout` (el que
-  resolvió AXIS, nunca inferido) y el marco vive en `src/lib/brand-surfaces/recipes/frame.ts`. Un intent 0.1.0 o 0.1.1
+  declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`: 2026-09-27 (b)–(e) de TASK-1927,
+  (f) y (h)…(m) de TASK-1928 —la (g) es Glitch— y 2026-09-28 (n), el re-promovido de `CoverBrochure`; ojo: esas letras
+  no son las de los deltas del ADR de AXIS; runbook `docs/operations/runbooks/composer-visual-gate.md`). El probe del
+  gate **rellena todo slot no fijo** y una auditoría renderizada aborta si hay acento en texto < 24 px o respuesta < 3×
+  la pregunta (`graphic-line-shared/rendered-audit.ts`). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
+- **Contrato 0.1.2, integrado (TASK-1927 y TASK-1928, `complete`, en `origin/develop`).** Greenhouse fija
+  `@efeoncepro/axis-tokens` **0.3.21** y `@efeoncepro/axis-ui-contracts` **0.3.19** (tag AXIS `v0.3.21`). El mapper
+  lee `use` y `layout` (el que resolvió AXIS, nunca inferido); los builders viven en `src/lib/brand-surfaces/recipes/`
+  (`deck.ts`, `frame.ts` para el marco, y `proposal-service.ts`, `method.ts`, `close.ts`, `proof.ts`, `sections.ts`,
+  `content.ts` con ayudas en `kit.ts`), registrados en `src/lib/brand-surfaces/index.ts`. Un intent 0.1.0 o 0.1.1
   resuelve igual.
 - **Documentos.** Un intent con `pages` compone **un PDF multipágina** con su manifest `axis.surface-document.v1` y su
   procedencia (`planSurfaceDocument` en `src/lib/brand-surfaces/document.ts`, que valida con
@@ -132,10 +137,75 @@ campos del intent: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose
   `efeonce.collaboration-selection`; `pairsWith` (`cover↔close`, `variant`, `sequence`) alimenta la validación del
   documento. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
   `method-staircase`…); los nuevos son kebab-case en inglés. **El catálogo de recetas sirve para elegir la lámina; se
-  compone con el intent de AXIS.** Hoy componen **las 69** (tablas de [SKILL.md](SKILL.md) §«Componer hoy»;
-  lista por id en el README del catálogo): 31 desde TASK-1927 y 34 plantillas para las 38 de TASK-1928. La portada con
-  selección (`cover-brochure-cine-lines-selection`) compone con el layout `document-selection` de `cover-brochure`.
-  **Nunca** se agrega una plantilla sin su receta ni una receta sin la aprobación del operador.
+  compone con el intent de AXIS.** Hoy componen **las 69** con **50 plantillas**: TASK-1927 dejó 30 recetas sobre 16
+  plantillas; TASK-1928 sumó las 38 restantes sobre 34 plantillas y, el 2026-09-28, la portada con selección
+  (`cover-brochure-cine-lines-selection`, layout `document-selection`) sin plantilla nueva. **Nunca** se agrega una
+  plantilla sin su receta ni una receta sin la aprobación del operador.
+
+### Mapa receta → plantilla (las 69, verificado contra `recipe-map.json` y `registry.json` el 2026-09-28)
+
+El autor escribe la columna 2; la 3 la deriva el mapper y la 4 la elige el selector del catálogo (nunca el autor).
+Ejemplo de cada fila: `src/lib/brand-surfaces/examples/deck-<id>-intent.json` (el campo `example` de
+`recipe-map.json`). Plantillas compartidas: `CoverBrochure` (portadas de brochure, con y sin selección),
+`SectionCine` (`team` y `services`), `ProposalService` (las cuatro sobrias) y `ProposalCinematic` (las cuatro de
+servicio). `recipe-map.json → slots` declara el campo del `slots.json` de cada slot en las 38 recetas de TASK-1928
+(las 30 anteriores lo declaran `null`: su contrato sale del manifest de AXIS).
+
+| Láminas (id del catálogo) | `recipe` + `layout` del intent | `contentType` | Plantilla |
+|---|---|---|---|
+| `breather` | `breather` | `deck.breather` | `Breather` |
+| `close-brochure-orbit` | `close-brochure` + `orbit` | `deck.close-brochure` | `CloseBrochure` |
+| `close-brochure-horizon` · `close-brochure-dawn` | `close-brochure` + `photo` | `deck.close-brochure.photo` | `CloseBrochurePhoto` |
+| `close-proposal-horizon` · `close-proposal-dawn` | `close-proposal` | `deck.close-proposal` | `CloseProposal` |
+| `contact-sheet` | `contact-sheet` | `deck.contact-sheet` | `ContactSheet` |
+| `content-bullets` | `content-bullets` | `deck.content-bullets` | `ContentBullets` |
+| `content-clients` | `content-clients` | `deck.content-clients` | `ContentClients` |
+| `content-day` | `content-day` + `clock` | `deck.content-day` | `ContentDay` |
+| `content-day-live-progress` | `content-day` + `live-progress` | `deck.content-day.live-progress` | `ContentDayProgress` |
+| `content-day-live-results` | `content-day` + `live-results` | `deck.content-day.live-results` | `ContentDayResults` |
+| `content-day-tools` | `content-day` + `tools` | `deck.content-day.tools` | `ContentDayTools` |
+| `content-focus` | `content-focus` | `deck.content-focus` | `ContentFocus` |
+| `content-measure` | `content-measure` | `deck.content-measure` | `ContentMeasure` |
+| `content-partners` | `content-partners` | `deck.content-partners` | `ContentPartners` |
+| `content-pricing` | `content-pricing` + `table` (por defecto) | `deck.content-pricing` | `ContentPricing` |
+| `content-pricing-live` | `content-pricing` + `live` | `deck.content-pricing.live` | `ContentPricingLive` |
+| `content-pricing-stage` | `content-pricing` + `stage` | `deck.content-pricing.stage` | `ContentPricingStage` |
+| `content-stack` | `content-stack` | `deck.content-stack` | `ContentStack` |
+| `content-team` | `content-team` | `deck.content-team` | `ContentTeam` |
+| `content-text` | `content-text` | `deck.content-text` | `ContentText` |
+| `cover-brochure-cine-orbit` · `-cine-lines` · `-cine-team` | `cover-brochure` + `document` | `deck.cover-brochure` | `CoverBrochure` |
+| `cover-brochure-line-growth` · `-line-brand` · `-line-engine` · `-line-voice` · `-line-revenue` | `cover-brochure` + `line` | `deck.cover-brochure` | `CoverBrochure` |
+| `cover-brochure-cine-lines-selection` | `cover-brochure` + `document-selection` | `deck.cover-brochure.document-selection` | `CoverBrochure` |
+| `cover-proposal-orbit` · `cover-proposal-orbit-sky` | `cover-proposal` + `orbit` | `deck.cover-proposal` | `CoverProposalOrbit` |
+| `cover-proposal-dawn` · `cover-proposal-dawn-sky` | `cover-proposal` + `dawn` | `deck.cover-proposal.dawn` | `CoverProposalDawn` |
+| `decision-agenda` | `decision-agenda` | `deck.decision-agenda` | `DecisionAgenda` |
+| `decision-case` | `decision-case` | `deck.decision-case` | `DecisionCase` |
+| `decision-chart` | `decision-chart` | `deck.decision-chart` | `DecisionChart` |
+| `decision-next-steps` | `decision-next-steps` | `deck.decision-next-steps` | `DecisionNextSteps` |
+| `decision-plan` | `decision-plan` | `deck.decision-plan` | `DecisionPlan` |
+| `decision-risk` | `decision-risk` | `deck.decision-risk` | `DecisionRisk` |
+| `decision-testimonial` | `decision-testimonial` | `deck.decision-testimonial` | `DecisionTestimonial` |
+| `decision-why-us` | `decision-why-us` | `deck.decision-why-us` | `DecisionWhyUs` |
+| `method-hybrid-workforce` | `method-hybrid-workforce` + `ladder` (por defecto) | `deck.method-hybrid-workforce` | `MethodHybridWorkforce` |
+| `method-hybrid-workforce-scene` | `method-hybrid-workforce` + `scene` | `deck.method-hybrid-workforce.scene` | `MethodHybridWorkforceScene` |
+| `method-score-ring` | `method-score-ring` | `deck.method-score-ring` | `MethodScoreRing` |
+| `method-staircase` | `method-staircase` + `steps` (por defecto) | `deck.method-staircase` | `MethodStaircase` |
+| `method-staircase-flat` | `method-staircase` + `flat` | `deck.method-staircase.flat` | `MethodStaircaseFlat` |
+| `proposal-cinematic-creative` · `-web` · `-aeo` · `-revops` (páginas de `deck-proposal-document.json`) | `proposal-cinematic` + `service` | `deck.proposal-cinematic` | `ProposalCinematic` |
+| `proposal-cinematic-nexa` | `proposal-cinematic` + `hero` | `deck.proposal-cinematic.hero` | `ProposalCinematicHero` |
+| `proposal-cinematic-nexa-lines` | `proposal-cinematic` + `lines` | `deck.proposal-cinematic.lines` | `ProposalCinematicLines` |
+| `proposal-service-aeo` · `-creative` · `-web` · `-revops` | `proposal-service` | `deck.proposal-service` | `ProposalService` |
+| `section-bleed` | `section-bleed` | `deck.section-bleed` | `SectionBleed` |
+| `section-cine-team` | `section-cine` + `team` | `deck.section-cine` | `SectionCine` |
+| `section-cine-about` | `section-cine` + `about` | `deck.section-cine.about` | `SectionCineAbout` |
+| `section-cine-purpose` | `section-cine` + `purpose` | `deck.section-cine.purpose` | `SectionCinePurpose` |
+| `section-cine-services` | `section-cine` + `services` | `deck.section-cine.services` | `SectionCine` |
+| `section-classic` | `section-classic` | `deck.section-classic` | `SectionClassic` |
+| `section-lens` | `section-lens` | `deck.section-lens` | `SectionLens` |
+| `section-split` | `section-split` + `corner-top` (o sin layout) | `deck.section-split` | `SectionSplit` |
+| `section-split-corner-bottom` | `section-split` + `corner-bottom` | `deck.section-split.corner-bottom` | `SectionSplitCornerBottom` |
+| `section-split-panel-end` | `section-split` + `panel-end` | `deck.section-split.panel-end` | `SectionSplitPanelEnd` |
+| `triptych` | `triptych` | `deck.triptych` | `Triptych` |
 
 ### Destinos editables posteriores — no confundir fuente, conversión ni renderer
 

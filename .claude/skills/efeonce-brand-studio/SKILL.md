@@ -227,12 +227,18 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
     equipo sigue en A, B o C.
   - **Excepción aprobada (operador, 2026-09-27):** las láminas de **sección y «about»** del deck (secciones partidas,
     «Quiénes somos», «Por qué lo hacemos») con personas en luz dramática; no amplía el cine fuera del deck y el
-    contrato AXIS ya la conoce (TASK-1927, `axis-tokens` 0.3.14): admite cine en `section-split`, `section-cine` y en
-    `cover-brochure`, `close-brochure` y `close-proposal`. Receta de cada lámina: `docs/operations/brand-graphic-line/deck-recipes/`.
+    contrato AXIS ya la conoce (desde `axis-tokens` 0.3.14, TASK-1927): admite cine en `section-split`, `section-cine`
+    (composiciones `team`, `services`, `about` y `purpose` desde TASK-1928) y en `cover-brochure`, `close-brochure` y
+    `close-proposal`. Receta de cada lámina: `docs/operations/brand-graphic-line/deck-recipes/`.
   - **Deck y brochure** (PDF horizontal 16:9) se componen con `pnpm brand:compose` (Artifact Composer, contrato AXIS
     `efeonce.surface-composition` 0.1.2, integrado en Greenhouse por TASK-1927: `use: proposal|brochure`, el marco
     `cover-brochure`, `cover-proposal`, `close-brochure` y `close-proposal`, las composiciones `service|hero|lines` de
-    `proposal-cinematic` y el documento multipágina con `pages`). Para armar el deck, carga la skill `deck-studio`. La lámina de líneas es la única con los cinco acentos;
+    `proposal-cinematic` y el documento multipágina con `pages`). **Las 69 recetas del catálogo componen** (TASK-1928,
+    2026-09-28: 50 plantillas en el catálogo `graphic-line-deck`; AXIS `axis-tokens` 0.3.21 / `axis-ui-contracts`
+    0.3.19; intent de ejemplo por receta en `src/lib/brand-surfaces/examples/deck-<receta>-intent.json`), incluida la
+    portada de brochure con la selección de Nexa (`cover-brochure` layout `document-selection`). Es composición local
+    por CLI: la ruta productiva (API, worker, MCP) es TASK-1921 y **no está disponible**. Para armar el deck, carga la
+    skill `deck-studio`; detalle de plantillas y gates en `efeonce-graphic-line`. La lámina de líneas es la única con los cinco acentos;
     en todo lo demás, un acento por pieza, tomado del `accentOnDark` de la línea que se vende. **Portadas y
     contraportadas** (operador, 2026-09-27): foto ↔ sin foto; «Empower your Growth» como mensaje de la contraportada de
     propuesta y «¿Conversamos? Cuando quieras.» en la de brochure; nunca el eslogan en la portada; `cover-classic` y

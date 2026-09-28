@@ -33,13 +33,16 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   burbuja URL sólo con el logo ya en la imagen; la órbita no reemplaza la composición de la foto), merch y oficina
   fotografiados, la línea en movimiento (la órbita y las animaciones del logo V1.1), los íconos (Trazo y Plastilina), dónde vive cada cosa y pendientes.
   Desde el 2026-09-27, las 69 láminas del deck aprobadas con su receta: [catálogo de recetas por lámina](../operations/brand-graphic-line/deck-recipes/README.md)
-  y [cómo armar un deck con ellas](../manual-de-uso/creative/componer-deck-con-recetas.md).
+  y [cómo armar un deck con ellas](../manual-de-uso/creative/componer-deck-con-recetas.md); desde el 2026-09-28 las 69
+  se componen solas.
 - [Composición de decks y brochures de marca propia](creative/composicion-de-decks-y-brochures.md) — qué es pedir
-  una lámina o un documento completo (brochure o propuesta) y recibirlo compuesto con «La órbita»: qué láminas se
-  componen hoy y cuáles no, qué decide la persona (contenido, foto, composición) y qué decide el sistema (medidas,
-  colores, tipografía), cómo se cambia la foto o el texto, las reglas de un documento (portada primero, cierre al
-  final, foto ↔ sin foto, una línea por documento), qué entrega y qué no hace todavía (ruta desde el portal, las 38
-  láminas restantes, control de foco en la sección partida). Desde el 2026-09-27 (TASK-1927).
+  una lámina o un documento completo (brochure o propuesta) y recibirlo compuesto con «La órbita»: **las 69 láminas
+  aprobadas se componen** (TASK-1927 y TASK-1928), sus familias y cómo elegir entre versiones, la portada de brochure
+  con la selección de Nexa, qué decide la persona (contenido, cifras con fuente, foto, ítem destacado) y qué decide el
+  sistema (medidas, colores, tipografía, montos como `[MONTO]`, contacto), las reglas que hace cumplir (largos
+  máximos, fuentes visibles, logos normalizados, sin logo ni velo en láminas interiores con foto, una selección por
+  lámina), las reglas de un documento de varias páginas, qué entrega y qué no hace todavía (ruta dentro de la
+  plataforma TASK-1921 en curso; TASK-1929 a TASK-1932). Actualizado el 2026-09-28.
 - [Identidad sonora de Efeonce — Tres puntos que se vuelven uno](creative/identidad-sonora-efeonce.md) — el sonido de
   la marca propia (recomendado por el operador el 2026-09-26, todavía no canon): la idea, el logo sonoro, los registros
   fondo y energía, el acento por línea de servicio, la voz del eslogan, el sonido de las animaciones del logo, qué se

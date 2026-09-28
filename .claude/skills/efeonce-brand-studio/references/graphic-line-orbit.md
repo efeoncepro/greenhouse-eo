@@ -130,7 +130,9 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 11c. **Recetas por lámina del deck** (operador, 2026-09-27): **las 69 láminas** del canvas «Deck» están aprobadas y
     cada una tiene su receta en `docs/operations/brand-graphic-line/deck-recipes/` (JSON `efeonce.deck-slide-recipes.v1`:
     cuándo sí, cuándo no, alternativa, pares, slots, fijos, foto y prompt; `pnpm brand:deck-recipes`). Una lámina de
-    marca propia se elige del catálogo. Checklist de las decisiones de ese día: tríptico con **una esfera por palabra**
+    marca propia se elige del catálogo. Desde TASK-1928 (2026-09-28) **las 69 componen** con
+    `pnpm brand:compose -- --intent src/lib/brand-surfaces/examples/deck-<receta>-intent.json` (plantillas en el
+    catálogo `graphic-line-deck`; detalle en las skills `deck-studio` y `efeonce-graphic-line`). Checklist de las decisiones de ese día: tríptico con **una esfera por palabra**
     («Escucha.» «Crea.» «Mide.»); sección partida con el indicador **por la izquierda** (tres variantes); cotización en
     tres variantes, sólo en propuesta y con `[MONTO]`; próximos pasos con la agenda abierta; clientes en un tono navy;
     foto del caso Sky de ejemplo; registro cine también en secciones y «about», nunca fuera del deck.
@@ -180,8 +182,9 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 - Greenhouse fija `axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` y `axis-brand-assets` 0.3.0 (en `develop`
   desde 2026-09-26; llega a `main` con el próximo release). **No** usa `axis-graphic-line`: su adapter conserva un
   pintor propio apto para rasterizar, ya en el contrato 0.3.0 (lente con arco y esfera, deck con un solo anillo).
-  **Vigente al 2026-09-27 (`package.json`):** `axis-tokens` 0.3.14, `axis-ui-contracts` 0.3.12, `axis-graphic-line`
-  0.7.0 (lo usa `src/lib/brand-surfaces`), `axis-brand-assets` 0.3.5 y `axis-ui-registry` 0.3.1.
+  **Vigente al 2026-09-28 (`package.json`):** `axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19 (TASK-1928, AXIS
+  `v0.3.21`), `axis-graphic-line` 0.7.0 (lo usa `src/lib/brand-surfaces`), `axis-brand-assets` 0.3.5 y
+  `axis-ui-registry` 0.3.1.
   Instalar AXIS en local exige una credencial `read:packages` en un `NPM_CONFIG_USERCONFIG` efímero; nunca se
   commitea ni se imprime.
 

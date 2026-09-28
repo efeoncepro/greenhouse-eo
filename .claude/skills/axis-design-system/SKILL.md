@@ -238,12 +238,12 @@ Rules for agents:
   change means changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
-- **Greenhouse consumption (verified 2026-09-27 in `package.json` and `node_modules`):** `develop` pins `axis-tokens`
-  `0.3.14`, `axis-ui-contracts` `0.3.12` (AXIS tag `v0.3.14`, TASK-1927), `axis-ui-registry` `0.3.1`,
-  `axis-brand-assets` `0.3.5` and `axis-graphic-line` `0.7.0` (the last two pinned by TASK-1922, tag `v0.3.12`).
-  Graphic-line visual gate: 32 frames at 0 px. The TASK-1927 bump lives on local `develop`; its push is pending.
-  History of the same day: tokens `0.3.11` + contracts `0.3.9` (TASK-1927), then `0.3.12` + `0.3.10` (TASK-1922,
-  Greenhouse commit `4dfb147f7`, 24 frames), then `0.3.14` + `0.3.12`.
+- **Greenhouse consumption (verified 2026-09-28 in `package.json` and `node_modules`):** `develop` pins `axis-tokens`
+  `0.3.21`, `axis-ui-contracts` `0.3.19` (AXIS tag `v0.3.21`; the contracts package depends on `axis-tokens` exactly
+  `0.3.21`), `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.5` and `axis-graphic-line` `0.7.0` (the last two
+  pinned by TASK-1922, tag `v0.3.12`). Graphic-line visual gate: 66 frames at 0 px (TASK-1928; 32 after TASK-1927).
+  Series: `0.3.11`…`0.3.14` (TASK-1927), `0.3.12` (TASK-1922, Glitch), `0.3.15`…`0.3.21` (TASK-1928); table in the
+  surface-composition section below.
   It does not use `efeonce.email-signature` yet. `axis-graphic-line` paints the orbit only in the Artifact Composer
   brand surfaces (`src/lib/brand-surfaces`, `src/lib/artifact-composer/catalogs/graphic-line-*`); the layout-compiler
   adapter `scripts/creative/layout-compiler/graphic-line.mjs` still resolves the contract from `axis-ui-contracts` and
@@ -280,34 +280,69 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
 `docs/examples/surfaces/`. Greenhouse norm:
 [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
 
-- **Current: contract `0.1.2` with its deltas (b), (c) and (e), published in AXIS tag `v0.3.14`
-  (`@efeoncepro/axis-tokens` `0.3.14` + `@efeoncepro/axis-ui-contracts` `0.3.12`).** `0.1.2` was first published on
-  2026-09-27 as tokens `0.3.9` + contracts `0.3.8` (tag `v0.3.9`, AXIS `main@ff0505a`). Additive (a `0.1.0`/`0.1.1`
-  intent resolves as before): deck `use: 'proposal' | 'brochure'` (without it AXIS resolves the recipe's use;
-  `use-not-for-recipe`); `layout`, always explicit and never inferred (`layout-field-required` /
-  `layout-field-not-allowed`): `service | hero | lines` on `proposal-cinematic` (`lines` takes the group selection),
-  `corner-top | corner-bottom | panel-end` on `section-split`, `document | line` on `cover-brochure`, `orbit | dawn` on
-  `cover-proposal`, `orbit | photo` on `close-brochure`; `selection.anchor`; and the **document** API
-  `resolveSurfaceDocument` / `validateSurfaceDocumentIntent` (schema `surface-document-intent.schema.json`, manifest
-  `axis.surface-document.v1`). `pnpm surface:resolve` detects `pages` and resolves a document. Document codes exercised
-  by Greenhouse: `brochure-cover-first`, `brochure-close-last`, `brochure-needs-service-page`, `document-line-mismatch`,
-  `frame-photo-must-alternate`, `document-pages-required`, `document-surface-invalid`, and page issues prefixed
-  `page[i]:<code>`.
-- **Releases made by TASK-1927 (2026-09-27, AXIS `main`)** — each one bumps `axis-tokens` and `axis-ui-contracts`
-  only:
+- **Current: contract `0.1.2` with its deltas (b)…(l) (ADR `docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md`),
+  published in AXIS tag `v0.3.21` (`@efeoncepro/axis-tokens` `0.3.21` + `@efeoncepro/axis-ui-contracts` `0.3.19`).**
+  `0.1.2` was first published on 2026-09-27 as tokens `0.3.9` + contracts `0.3.8` (tag `v0.3.9`, AXIS
+  `main@ff0505a`). Additive (a `0.1.0`/`0.1.1` intent resolves as before): deck `use: 'proposal' | 'brochure'`
+  (without it AXIS resolves the recipe's use; `use-not-for-recipe`); `layout`, always explicit and never inferred
+  (`layout-field-required` / `layout-field-not-allowed` / `layout-not-in-recipe`); `selection.anchor`; and the
+  **document** API `resolveSurfaceDocument` / `validateSurfaceDocumentIntent` (schema
+  `surface-document-intent.schema.json`, manifest `axis.surface-document.v1`). `pnpm surface:resolve` detects `pages`
+  and resolves a document. Document codes exercised by Greenhouse: `brochure-cover-first`, `brochure-close-last`,
+  `brochure-needs-service-page`, `document-line-mismatch`, `frame-photo-must-alternate`, `document-pages-required`,
+  `document-surface-invalid`, and page issues prefixed `page[i]:<code>`.
+- **Deck layouts in `0.3.21`** (`efeonceGraphicLine.surfaces.deck.recipes.<recipe>.layouts`, default in
+  `defaultLayout`): `proposal-cinematic` `service | hero | lines`; `section-split` `corner-top | corner-bottom |
+  panel-end`; `cover-brochure` `document | document-selection | line`; `cover-proposal` `orbit | dawn`;
+  `close-brochure` `orbit | photo`; `section-cine` `team | services | about | purpose`; `method-staircase`
+  `steps | flat`; `method-hybrid-workforce` `ladder | scene`; `content-day` `clock | tools | live-progress |
+  live-results`; `content-pricing` `table | stage | live`. The token carries 37 deck recipes, all `approved`;
+  `cover-classic` / `close-classic` keep `supersededBy` and are never used.
+- **`document-selection` (delta (l), `v0.3.21`, operator 2026-09-28):** the only `cover-brochure` layout that admits a
+  selection. Same column and photo as `document`; eight handles on the answer («Crecer.»), never on the person; one
+  collaborator cursor «Nexa» (`participantKind: person`) at `bottom-end`, scale 1.1, overlay none; the answer drops
+  `column.answerWithSelectionExtraPx` (28) and the evidence sits `bodyBelowAnswerPx.withSelection` (130) below it;
+  logo top 200. `document` and `line` still reject a selection (`selection-not-in-recipe`). A relaxed rule enters as
+  its **own composition**, never by loosening the recipe.
+- **Other contract changes of the `v0.3.15`…`v0.3.21` series:** a composition may declare `progress: false`;
+  `voice.maxWords` per recipe (`decision-testimonial` 6, the rest 3); steps without icons (`steps.icons: false`) and
+  `steps.min`; colors by palette name.
+- **Releases made for the deck (AXIS `main`)** — each one bumps `axis-tokens` and republishes `axis-ui-contracts`:
 
-  | Tag | `axis-tokens` | `axis-ui-contracts` | What it ships |
-  | --- | --- | --- | --- |
-  | `v0.3.11` | `0.3.11` | `0.3.9` | Deltas (b) and (c) of surface-composition `0.1.2` |
-  | `v0.3.13` | `0.3.13` | `0.3.11` | Delta (e): the frame tokens (covers and back covers), listed below |
-  | `v0.3.14` | `0.3.14` | `0.3.12` | Full typography of the back covers: line height and tracking of the voice in `close-brochure`; line height of the slogan in both back covers |
+  | Tag | `axis-tokens` | `axis-ui-contracts` | Task | What it ships |
+  | --- | --- | --- | --- | --- |
+  | `v0.3.11` | `0.3.11` | `0.3.9` | TASK-1927 | Deltas (b) and (c) of surface-composition `0.1.2` |
+  | `v0.3.13` | `0.3.13` | `0.3.11` | TASK-1927 | Delta (e): the frame tokens (covers and back covers), listed below |
+  | `v0.3.14` | `0.3.14` | `0.3.12` | TASK-1927 | Full typography of the back covers |
+  | `v0.3.15` | `0.3.15` | `0.3.13` | TASK-1928 | Delta (f): the sober proposal (`proposal-service`) |
+  | `v0.3.16` | `0.3.16` | `0.3.14` | TASK-1928 | Delta (g): the method family |
+  | `v0.3.17` | `0.3.17` | `0.3.15` | TASK-1928 | Delta (h): pricing, next steps and breather |
+  | `v0.3.18` | `0.3.18` | `0.3.16` | TASK-1928 | Delta (i): the proof family |
+  | `v0.3.19` | `0.3.19` | `0.3.17` | TASK-1928 | Delta (j): sections and «who we are» (`section-cine` `about`, `purpose`) |
+  | `v0.3.20` | `0.3.20` | `0.3.18` | TASK-1928 | Delta (k): content and the working day (`content-day` `tools`, `live-*`) |
+  | `v0.3.21` | `0.3.21` | `0.3.19` | TASK-1928 | Delta (l): `cover-brochure` `document-selection` |
 
-  `v0.3.12` sits between them and belongs to TASK-1922 (Glitch), not to this task.
-- **Why `axis-ui-contracts` is republished without a code change:** `0.3.11` and `0.3.12` carry no code change. The
+  `v0.3.12` sits between them and belongs to TASK-1922 (Glitch).
+- **Release flow used for each row (verified in the `v0.3.19`…`v0.3.21` commits and the workflows):** (1) token
+  change in `packages/tokens/src/tokens.ts` + contract test in `packages/contracts/src/surface-composition.test.ts`
+  (and contract source when the contract changes); (2) bump `packages/tokens/package.json` and
+  `packages/contracts/package.json`; (3) update the version table of `README.md`; (4) append the delta to
+  `docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md`; (5) update the Lab summaries in
+  `apps/lab/src/data/surfaces.ts`; (6) `pnpm build && pnpm test && pnpm lint && pnpm typecheck` at the root; (7) if the
+  change moves an example, re-resolve it (`pnpm surface:resolve -- --input docs/examples/surfaces/<x>-intent.json
+  --out docs/examples/surfaces/<x>-manifest.json`; none of the three verified commits touched `docs/examples/`);
+  (8) one commit `release(surfaces): axis-tokens X y axis-ui-contracts Y — <familia>`, push to `main` (operator
+  authorization), wait for `ci.yml` green; (9) push the tag `vX.Y.Z`: `release-packages.yml` («Release UI packages»,
+  on `v*.*.*` tags) re-runs install, build, typecheck and tests and publishes to GitHub Packages; (10) in Greenhouse,
+  pin both exact versions, install with the ephemeral credential, `pnpm brand:tokens`, compose the pieces and run
+  `pnpm composer:visual-gate --catalog=graphic-line`. Validate against the local AXIS build before step 8 (lesson
+  below) so a family does not cost two releases.
+- **Why `axis-ui-contracts` is republished without a code change:** most contracts releases of the series (e.g.
+  `0.3.11`, `0.3.12`, `0.3.19`) carry no code change. The
   package pins the **exact** `axis-tokens` version and the manifests resolve over those tokens, so new tokens reach a
-  consumer's resolver only through a contracts release that pins them. Verified in the installed packages:
-  `axis-ui-contracts` `0.3.12` depends on `axis-tokens` exactly `0.3.14`; `axis-graphic-line` `0.7.0` still depends on
-  `axis-tokens` `0.3.12` and `axis-ui-contracts` `0.3.10`.
+  consumer's resolver only through a contracts release that pins them. Verified in the installed packages
+  (2026-09-28): `axis-ui-contracts` `0.3.19` depends on `axis-tokens` exactly `0.3.21`; `axis-graphic-line` `0.7.0`
+  still depends on `axis-tokens` `0.3.12` and `axis-ui-contracts` `0.3.10` (it does not carry the deck surfaces).
 - **Delta (e) tokens and where they live:** every value is under
   `efeonceGraphicLine.surfaces.deck.recipes.<recipe>`; read it from the token, never from a document.
 
@@ -324,27 +359,30 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   `section-split.progress.sweep` carries an open operator question (`openQuestion`): whether to unify the sweep to
   current-of-sections. Do not resolve it in a consumer.
 - **Cine gate:** `photo.register: 'cine'` passes with `photo.subject: 'nexa'` or with one of the recipes listed in
-  `efeonceGraphicLine.surfaces.photo.cine.recipes` (in `0.3.14`: `proposal-cinematic`, `cover-brochure`,
+  `efeonceGraphicLine.surfaces.photo.cine.recipes` (same list in `0.3.21`: `proposal-cinematic`, `cover-brochure`,
   `close-brochure`, `close-proposal`, `section-cine`, `section-split`); otherwise issue
   `cine-requires-nexa-or-proposal`. The register itself (camera, the
   line as light, wardrobe, traps) is the Greenhouse doc
   [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
-- **Greenhouse consumption (TASK-1927, `complete`, local `develop`, push pending):** `pnpm brand:compose`
-  (`src/lib/brand-surfaces`) runs on contract `0.1.2` with tokens `0.3.14` + contracts `0.3.12`. The catalog
-  `graphic-line-deck` has 16 templates: `proposal-cinematic` (`service`, `hero`, `lines`), `section-classic`,
-  `section-split` (three layouts), `content-measure`, `method-staircase`, `triptych`, `cover-brochure`,
-  `cover-proposal` (`orbit`, `dawn`), `close-brochure` (`orbit`, `photo`) and `close-proposal`. A document intent
-  (`pages`) goes through `planSurfaceDocument` (`src/lib/brand-surfaces/document.ts`), which validates with
-  `resolveSurfaceDocument` and plans nothing when AXIS returns a single issue. Greenhouse-side fields:
-  `column.topPx` (must fall in the logo reserve, otherwise `invalid-intent`), `clientLogo: { path, alt }` (SVG or PNG;
-  without it the placeholder is painted) and the contact data of the back covers, which comes from `EFEONCE_CONTACT`
-  in `src/config/efeonce-brand.ts` (AXIS only defines the style). Task:
-  [TASK-1927](../../../docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md). Operating
+- **Greenhouse consumption (TASK-1927 and TASK-1928, both `complete`, pushed to `origin/develop`):**
+  `pnpm brand:compose -- --intent <intent.json> [--out <dir>]` (`src/lib/brand-surfaces`) runs on contract `0.1.2`
+  with tokens `0.3.21` + contracts `0.3.19`. The catalog `graphic-line-deck` has **50 templates covering all 69 deck
+  recipes** (16 from TASK-1927, 34 from TASK-1928; `cover-brochure` `document-selection` reuses `CoverBrochure`).
+  Recipe → `contentType` → template: `src/lib/artifact-composer/catalogs/graphic-line-deck/recipe-map.json` +
+  `registry.json` (full table in the `deck-studio` skill, `composition.md`). A document intent (`pages`) goes through
+  `planSurfaceDocument` (`src/lib/brand-surfaces/document.ts`), which validates with `resolveSurfaceDocument` and plans
+  nothing when AXIS returns a single issue. Greenhouse-side fields (not in the AXIS intent type): `column.topPx` (must
+  fall in the logo reserve, otherwise `invalid-intent`), `clientLogo: { path, alt }`, `selected` (1-based item for
+  proof/content recipes; `recommended` in pricing) and recipe-specific content arrays read by the builders; the
+  contact data of the back covers comes from `EFEONCE_CONTACT` in `src/config/efeonce-brand.ts` (AXIS only defines
+  the style). Tasks:
+  [TASK-1927](../../../docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) and
+  [TASK-1928](../../../docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md). Operating
   detail: [manual](../../../docs/manual-de-uso/creative/componer-por-superficie-con-axis.md) and
   [functional doc](../../../docs/documentation/creative/composicion-de-decks-y-brochures.md).
-- **Still pending (do not state as done):** the governed production route is TASK-1921 (it must also accept the
-  document intent); the remaining 38 deck recipes are TASK-1928; `section-split` has no focus control (its builder does
-  not read `photo.focus`).
+- **Still pending (do not state as done):** the governed production route is TASK-1921 (`in-progress` in another
+  session; it must also accept the document intent); TASK-1929…1932 (deck plan validation, real slot data, governed
+  plate bank, Proposal Studio); `section-split` has no focus control (its builder does not read `photo.focus`).
 - **Lesson — validate the consumer against the LOCAL AXIS build before publishing tokens:** copy
   `packages/tokens/dist` of the AXIS checkout over `node_modules/@efeoncepro/axis-tokens/dist` in the consumer, run the
   consumer's pieces and its visual gate, then reinstall to restore the published package. TASK-1927 avoided a fourth
@@ -357,18 +395,20 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   point to AXIS-only families use `axisRecipeFamilies`). Synced into the token by TASK-1927 (verified in `0.3.14`):
   `section-split` rises on the **left** (`progress.rises: 'start'`) and has the layouts `corner-bottom` and
   `panel-end`; `triptych` is one word per panel, each with its sphere (`voice.sphere: 'per-panel'`,
-  `voice.wordsPerPanel: 1`; a panel with more than one word fails). Not verified as synced: `decision-next-steps` (the
-  token still declares three columns; approved: the open diagnostic agenda) and the Lab pages. **The Greenhouse norm
+  `voice.wordsPerPanel: 1`; a panel with more than one word fails). The 38 remaining recipes were measured into the
+  token by deltas (f)…(k) (`v0.3.15`…`v0.3.20`), `decision-next-steps` included (its template reads `agenda` +
+  `nextSteps`); the Lab pages were only summarized (`apps/lab/src/data/surfaces.ts`). **The Greenhouse norm
   and the recipe catalog win**; never «fix» a slide back to the Lab state, and never publish a new Lab recipe without
   the approved Greenhouse recipe.
 - **Covers and back covers (operator, approved 2026-09-27):** they are contract recipes since delta (e):
-  `cover-brochure` (use brochure; photo plus voice column; no selection, no URL bubble), `cover-proposal` (use
+  `cover-brochure` (use brochure; photo plus voice column; no URL bubble; selection only in `document-selection`), `cover-proposal` (use
   proposal; **no photo**; client logo or its placeholder with the selection on its box, plus the URL bubble),
   `close-brochure` (use brochure) and `close-proposal` (use proposal; with photo; no voice, the message is the slogan).
   Rule: a cover with photo pairs with a back cover without photo, and the reverse (`frame-photo-must-alternate`).
   `cover-classic` and `close-classic` were not approved: the token keeps them with `supersededBy` and Greenhouse has
-  no template for them. The reference `cover-brochure-cine-lines-selection` has no template either: the contract
-  admits no selection on that cover. Do not invent recipe IDs. Norm: Greenhouse
+  no template for them. Since `v0.3.21` the reference `cover-brochure-cine-lines-selection` composes with the
+  `cover-brochure` layout `document-selection` (the only cover-brochure layout with a selection). Do not invent
+  recipe IDs. Norm: Greenhouse
   [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
   §4.6.
 - **Bump impact from `axis-tokens` `0.3.10` (already absorbed by Greenhouse):**
@@ -424,7 +464,7 @@ notes: `influencer` (Trazo) in response resembles `talent`, never together; `chi
 `galeria` and `biblioteca` look alike, use them apart; `prompt` is the weakest at 32 px. The set is now **36 Trazo + 43
 Plastilina = 79**, with **43 volume PNGs**. Published with tag `v0.6.0`: `axis-graphic-line` `0.6.0` and
 `axis-brand-assets` `0.3.4` (`axis-tokens` was at `0.3.8`, published by another session with the surfaces work, and
-did not change for D26; its latest is `0.3.14`, see Surface composition). Greenhouse pinned `axis-graphic-line` `0.6.0` and `axis-brand-assets` `0.3.4` at that release; it now pins `0.7.0` and `0.3.5` (D27 below). Guide §«Catálogo
+did not change for D26; its latest is `0.3.21`, see Surface composition). Greenhouse pinned `axis-graphic-line` `0.6.0` and `axis-brand-assets` `0.3.4` at that release; it now pins `0.7.0` and `0.3.5` (D27 below). Guide §«Catálogo
 aprobado», ADR delta «IA, social y staff: 19 glifos nuevos (D26)», Lab `/references/iconography/` (79 glyphs, 43 volumes).
 
 **Glitch action glyphs (D27, 2026-09-27; AXIS tag `v0.3.12`, commit `29a40b5`):** 5 new Plastilina glyphs in

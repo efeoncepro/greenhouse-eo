@@ -1,12 +1,12 @@
 # Componer un deck con las recetas por lámina — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
-> **Ruta en portal:** no aplica — se arma con el catálogo de recetas, comandos locales y el Artifact Composer (la ruta productiva gobernada es TASK-1921, pendiente)
-> **Documentacion relacionada:** [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) · [Norma de composición por superficie §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Componer una pieza por superficie con AXIS](./componer-por-superficie-con-axis.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
+> **Ruta en portal:** no aplica — se arma con el catálogo de recetas, comandos locales y el Artifact Composer (la ruta productiva gobernada es TASK-1921, en curso en otra sesión: todavía no está disponible)
+> **Documentacion relacionada:** [Composición de decks y brochures (funcional)](../../documentation/creative/composicion-de-decks-y-brochures.md) · [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) · [Norma de composición por superficie §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Componer una pieza por superficie con AXIS](./componer-por-superficie-con-axis.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
 
 ## Para qué sirve
 
@@ -126,6 +126,8 @@ vale. Reglas:
 - **Montos:** no se escriben. La cotización imprime siempre `[MONTO]`.
 - **Contacto:** no se escribe. Sale de los datos de Efeonce (`EFEONCE_CONTACT`).
 - **Logos** sólo de clientes que autorizan su uso. El compositor los deja en un tono y con el mismo peso.
+- **Selección:** una sola por lámina. Qué destaca depende de la receta (paso 8, «La selección»); si la receta no la
+  lleva, no la agregues.
 - **Fotos de ejemplo** (el caso Sky, las piezas dentro de las interfaces del «vívelo») se reemplazan antes de enviar.
 
 ### Paso 6 · Resuelve las fotos
@@ -160,9 +162,32 @@ protagonista, en las propuestas de cine y en las láminas de sección y «quién
    La tabla completa, receta por receta, está en el catálogo («Dos nombres para la misma lámina» y «Las recetas de
    TASK-1928»).
 
+#### Cómo elegir la composición (`layout`) de una receta que tiene varias
+
+Varias láminas del catálogo comparten una receta de AXIS y se distinguen por su `layout`. Estas son las que conviene
+tener claras:
+
+| Receta del intent | `layout` | Cuándo |
+|---|---|---|
+| `cover-brochure` | `document` | la portada general del brochure (Nexa frente a la órbita, las cinco líneas o el equipo: cambia la foto y el copy, no el `layout`) |
+| `cover-brochure` | `line` | la portada de **una** línea de servicio; la línea sale de `line` (`growth`, `brand`, `engine`, `voice`, `revenue-hubspot`) |
+| `cover-brochure` | `document-selection` | la portada de cinco líneas con la selección de Nexa sobre «Crecer.». La selección la trae el `layout`: el intent **no** lleva campo `selection` |
+| `section-cine` | `team` (o sin `layout`) | abre el capítulo del equipo |
+| `section-cine` | `services` | abre el capítulo de servicios |
+| `section-cine` | `about` · `purpose` | «quiénes somos» y «por qué lo hacemos», en ese orden |
+| `content-day` | `clock` | el día a día base: la órbita-reloj con los momentos del día |
+| `content-day` | `tools` | si preguntan con qué herramientas se trabaja (el panel de Greenhouse al centro) |
+| `content-day` | `live-progress` · `live-results` | los dos «vívelo»: cómo avanza y se aprueba el trabajo, y los resultados en vivo |
+| `content-pricing` | sin `layout` · `stage` · `live` | la tabla de planes para comparar · los planes en escena para empujar el recomendado en sala · la cotización en vivo cuando el alcance está acordado |
+| `method-staircase` | sin `layout` · `flat` | la escalera BeX (la principal) · la variante plana |
+| `method-hybrid-workforce` | sin `layout` · `scene` | la fuerza híbrida por tramos · la escena de persona y agente |
+| `section-split` | `corner-top` (o sin `layout`) · `corner-bottom` · `panel-end` | alterna la esquina para no repetir dos secciones partidas iguales seguidas |
+| `proposal-cinematic` | `service` · `hero` · `lines` | la página de un servicio en cine · Nexa protagonista · las líneas de servicio con Nexa |
+| `cover-proposal` | `orbit` · `dawn` | la órbita gigante · la órbita que sale como el sol |
+| `close-brochure` | `orbit` · `photo` | sin foto (la pareja de las portadas de brochure de hoy) · con foto |
+
 La portada con selección (`cover-brochure-cine-lines-selection`) se compone desde
-`deck-cover-brochure-cine-lines-selection-intent.json`, con `layout: "document-selection"` (contentType
-`deck.cover-brochure.document-selection`, plantilla `CoverBrochure`). Sólo ese layout admite la selección: con
+`deck-cover-brochure-cine-lines-selection-intent.json`. Sólo `document-selection` admite la selección: con
 `document` o `line`, AXIS la rechaza (`selection-not-in-recipe`).
 
 ### Paso 8 · Escribe el intent
@@ -181,7 +206,11 @@ La portada con selección (`cover-brochure-cine-lines-selection`) se compone des
    | La foto | `photo.plateRef` (ruta del archivo) y `photo.alt` (describe la escena, no el copy) |
    | El copy | `voice` (eyebrow, pregunta, respuesta), `body` y los campos propios de la receta (por ejemplo `quote` en la cotización, `moments` en el día a día) |
    | Las cifras | `figures`: `value`, `label` y `source` (la fuente es obligatoria) |
-   | El ítem marcado por la selección | `selected`: el número del ítem, desde 1 |
+   | El ítem marcado por la selección | `selected`: el número del ítem, desde 1. Según la receta es la viñeta, el tema de la agenda, la cifra (clientes, caso, «por qué elegirnos»), el partner, la barra del gráfico o el riesgo |
+   | El plan recomendado (cotización) | `recommended`: el número del plan; la selección lo sigue. En la escena, el recomendado es el que va al frente |
+   | El peldaño seleccionado (escalera) | `selection.level` |
+   | Quién aparece en el cursor | `selection.label` y `selection.participantKind` (`department`, `role` o `person`), como en el ejemplo |
+   | Hacia dónde recortar la foto | `photo.focus` (`xOfWidth`, `yOfHeight`, de 0 a 1). En el deck hoy sólo lo lee la lente del día a día (`content-day`, `clock`) |
    | La sección | `progress` (sección n de N) |
    | El uso | `use`: `proposal` o `brochure` |
    | El logo del cliente (portadas de propuesta) | `clientLogo`: `path` (SVG o PNG) y `alt` |
@@ -189,7 +218,10 @@ La portada con selección (`cover-brochure-cine-lines-selection`) se compone des
 
 3. Respeta los largos: cada texto dentro del `maxChars` de su slot en el catálogo.
 4. No agregues montos ni datos de contacto: la plantilla los pone.
-5. Deja el `layout` escrito, aunque sea el que va por defecto.
+5. Copia el `layout` tal como viene en el ejemplo. Si el ejemplo no lo trae, la receta tiene una sola composición o
+   usa la de por defecto (`section-split` → `corner-top`, `section-cine` → `team`); no inventes uno.
+6. No toques `selection.item`: es el campo interno que la plantilla recibe. Lo llena el sistema a partir de `selected`
+   o de `recommended`.
 
 La plantilla no se toca: si una lámina necesita otra disposición, se cambia de `layout` o de receta.
 
@@ -220,9 +252,10 @@ Si el documento tiene un solo problema, **no sale ninguna página**. El mensaje 
 ### Paso 10 · Revisa y entrega
 
 Mira cada lámina en el píxel final contra su referencia aprobada y contra los **pendientes de QA** del catálogo. La
-prueba visual automática cubre las plantillas con sus datos de prueba, no tu pieza: tu pieza se revisa a ojo. Si usaste
-`cover-brochure-cine-lines-selection`, revisa que la selección caiga sobre «Crecer.» y no sobre la persona. Componer no aprueba ni publica: la
-aprobación es del operador.
+prueba visual automática (`pnpm composer:visual-gate`) cubre las plantillas con sus datos de prueba, no tu pieza: tu
+pieza se revisa a ojo. Correr esa prueba **no es tu trabajo** como quien arma el deck; es de quien cambia una plantilla.
+Si usaste `cover-brochure-cine-lines-selection`, revisa que la selección caiga sobre «Crecer.» y no sobre la persona.
+Componer no aprueba ni publica: la aprobación es del operador.
 
 ## Cambiar la foto, el copy o la sección de una lámina
 
@@ -240,7 +273,7 @@ Qué cuidar al cambiar la foto:
 |---|---|
 | Escribe `photo.alt` | es obligatorio; sin él falla con `missing-photo` |
 | Confirma que el archivo existe | los plates viven fuera de git; sin el archivo, el comando falla antes de crear la salida |
-| Mira el recorte | la foto se ajusta al área de la lámina cubriéndola y **centrada**. En la sección partida la franja de foto mide 1.260 × 1.080 px sobre un lienzo de 1.920 × 1.080; en las láminas a sangre, el lienzo completo. Las recetas que lo admiten (por ejemplo, la lente del día a día) aceptan `photo.focus` para dirigir el recorte hacia un punto del archivo |
+| Mira el recorte | la foto se ajusta al área de la lámina cubriéndola y **centrada**. En la sección partida la franja de foto mide 1.260 × 1.080 px sobre un lienzo de 1.920 × 1.080; en las láminas a sangre, el lienzo completo. En el deck, hoy sólo la lente del día a día (`content-day` con `clock`) lee `photo.focus` para dirigir el recorte hacia un punto del archivo; en las demás el recorte es centrado |
 | En la sección partida, elige bien el encuadre | esa lámina no tiene control de foco: si el sujeto queda cortado, usa otra foto |
 | En el panel a la derecha (`panel-end`), revisa textos y logos | la foto va **espejada**: un texto legible o un logo saldrían al revés. Revisa también el isotipo del uniforme |
 | En portadas con columna, revisa `column.topPx` | se elige según dónde queda el sujeto |
@@ -294,6 +327,10 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 | Un texto o un logo de la foto sale al revés | la composición `panel-end` espeja la foto | usa una foto sin texto legible ni logo, o cambia a `corner-top` o `corner-bottom` |
 | El sujeto queda tapado por la columna de voz en una portada | `column.topPx` se eligió para otra foto | ajústalo mirando dónde queda el sujeto |
 | El tríptico falla | una toma trae más de una palabra | una palabra por toma; cada una lleva su esfera |
+| Falla con `invalid-intent` y dice cuántos elementos lleva la lámina («La cotización lleva 3 planes», «La lámina lleva 4 viñetas», «La agenda lleva 5 temas», «El reporte lleva tres cifras») | la lista del intent no tiene la cantidad que pide la receta | deja exactamente esa cantidad; si te sobra contenido, llévalo a otra lámina |
+| Falla con `invalid-intent`: «En el escenario, el plan recomendado va al frente» | en `content-pricing` + `stage`, `recommended` no es el plan del centro | usa como recomendado el plan que la escena pone al frente (el del ejemplo) o cambia a la tabla |
+| Falla con `invalid-intent`: la respuesta «va en una línea» | la receta (texto, viñetas, respiro, próximos pasos) no admite respuesta en dos líneas | escribe la respuesta en una sola línea |
+| Falla con `surface-issues` y `selection-not-in-recipe` | pediste selección en una receta o composición que no la lleva (por ejemplo, `cover-brochure` con `document` o `line`) | quita `selection`, o usa `document-selection` si es la portada de cinco líneas |
 | La portada de propuesta muestra «Logo del cliente» | el intent no trae `clientLogo` | agrega `clientLogo` con `path` y `alt` |
 | El documento no produce ninguna página | un solo problema deja el documento sin componer | lee el código: `brochure-cover-first` (la portada va primero), `brochure-close-last` (el cierre va al final), `brochure-needs-service-page` (falta una página de servicio), `document-line-mismatch` (portada y cierre llevan la línea del documento), `frame-photo-must-alternate` (portada y contraportada no pueden llevar foto las dos), `page[i]:<código>` (el problema está en esa página) |
 | La prueba de ejemplos falla después de tu cambio | editaste o agregaste un intent en `src/lib/brand-surfaces/examples/` | deja los ejemplos como estaban y guarda tu intent en tu carpeta |
@@ -317,7 +354,11 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
   resuelve igual.
 - Paridad de slots receta ↔ plantilla: `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts`.
 - Tasks: TASK-1927 (31 recetas: el marco, secciones clásica y partida, medida, tríptico, escalera y propuestas de
-  cine; `complete`); TASK-1928 (las 38 restantes; en `develop` local, push pendiente); ruta productiva gobernada,
-  TASK-1921; fotos idempotentes, TASK-1926.
-- Prueba visual de las plantillas: `pnpm composer:visual-gate --catalog=graphic-line` (66 frames).
+  cine; `complete`); TASK-1928 (las 38 restantes y la portada con selección; `complete`, en `develop`); ruta
+  productiva gobernada, TASK-1921 (en curso, todavía no disponible); fotos idempotentes, TASK-1926; plan de deck
+  validado, TASK-1929; datos reales en los slots, TASK-1930; banco de plates, TASK-1931; deck desde Proposal Studio,
+  TASK-1932.
+- Documentación funcional: [Composición de decks y brochures de marca propia](../../documentation/creative/composicion-de-decks-y-brochures.md);
+  arquitectura: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
+- Prueba visual de las plantillas: `pnpm composer:visual-gate --catalog=graphic-line` (66 frames, 50 del deck, a 0 px).
 - Skills: `deck-studio`, `efeonce-graphic-line`, `copywriting`, `design-studio`.

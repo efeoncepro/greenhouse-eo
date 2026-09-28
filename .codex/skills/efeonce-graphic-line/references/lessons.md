@@ -160,6 +160,17 @@
   plantilla marca la respuesta como objetivo (`data-gl-selection-target`), suma un slot `selection` opcional y entra a
   `TEMPLATES_WITH_SELECTION`. Regla: si la composición es la misma con una capa más, se extiende la plantilla y se
   re-promueve su frame declarándolo en `BASELINE_DELTAS.md` (entrada (n)); el conteo de plantillas no cambia (50).
+- **Un slot opcional nuevo mueve el frame del gate.** El probe del gate visual rellena **todo slot no fijo**,
+  obligatorio u opcional: al sumar `selection` a `CoverBrochure`, su frame ganó el marco de ocho manijas y el cursor
+  aunque las portadas sin selección no cambiaran. Regla: todo slot nuevo, aunque sea opcional, se declara en
+  `BASELINE_DELTAS.md` y re-promueve el frame (runbook `composer-visual-gate.md` §4bis); no lo confundas con una
+  regresión.
+- **Dos series de letras distintas.** Las entradas de `BASELINE_DELTAS.md` de Greenhouse ((f), (h)…(n) para TASK-1928;
+  la (g) es Glitch) y los deltas del ADR de AXIS `SURFACE_COMPOSITION_DECISION_V1.md` ((f)…(l)) no se corresponden.
+  Regla: cita siempre el archivo junto a la letra.
+- **El ítem seleccionado no es un campo de AXIS.** En prueba y contenido lo elige `selected` (1-based) en la raíz del
+  intent y en la cotización `recommended`; el builder lo traduce al slot `selection.item` que marca el hook del
+  catálogo. Regla: no lo busques en `selection` del contrato; copia el ejemplo de la lámina.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

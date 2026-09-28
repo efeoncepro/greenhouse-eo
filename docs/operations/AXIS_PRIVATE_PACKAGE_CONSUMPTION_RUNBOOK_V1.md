@@ -8,7 +8,12 @@ source control.
 
 ## Current state — 2026-09-14
 
-> **Actualizado 2026-09-27 (cierre del día) — estado vigente:** Greenhouse fija `axis-tokens` `0.3.14` y
+> **Actualizado 2026-09-28 — estado vigente:** Greenhouse fija `axis-tokens` `0.3.21` y `axis-ui-contracts` `0.3.19`
+> (tag `v0.3.21` de AXIS, TASK-1928), `axis-brand-assets` `0.3.5`, `axis-graphic-line` `0.7.0` y `axis-ui-registry`
+> `0.3.1`. Versiones leídas en `package.json` y en `node_modules`; el bump está en `origin/develop` (commit `88ce23831`).
+> Ver **Delta 2026-09-28 (f)**; las notas siguientes quedan como historia.
+
+> **Actualizado 2026-09-27 (cierre del día) — superado por la nota de arriba:** Greenhouse fijaba `axis-tokens` `0.3.14` y
 > `axis-ui-contracts` `0.3.12` (tag `v0.3.14` de AXIS, TASK-1927), `axis-brand-assets` `0.3.5` y `axis-graphic-line`
 > `0.7.0` (tag `v0.3.12`, TASK-1922) y `axis-ui-registry` `0.3.1`. Versiones leídas en `package.json` y en
 > `node_modules`. El bump a `0.3.14` / `0.3.12` está en `develop` **local**; el push está pendiente. Ver
@@ -85,6 +90,48 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-28 (f) — `v0.3.15` a `v0.3.21` publicados; Greenhouse fija `0.3.21` / `0.3.19` (TASK-1928)
+
+- **Publicado** entre el 2026-09-27 y el 2026-09-28 en siete tags de `main` de AXIS, todos hechos por TASK-1928 (las
+  plantillas de las recetas del deck que faltaban). Cada tag sube sólo `axis-tokens` y `axis-ui-contracts`;
+  `axis-ui-registry` sigue en `0.3.1`, `axis-brand-assets` en `0.3.5` y `axis-graphic-line` en `0.7.0`. Todos son
+  cambios aditivos de `efeonce.surface-composition` 0.1.2 (deltas (f)…(l) del ADR `SURFACE_COMPOSITION_DECISION_V1.md`
+  de AXIS):
+
+  | Tag | `axis-tokens` | `axis-ui-contracts` | Qué trae | Commit que lo fija en Greenhouse |
+  | --- | --- | --- | --- | --- |
+  | `v0.3.15` | `0.3.15` | `0.3.13` | Delta (f): la propuesta de servicio sobria (`proposal-service`) | `ab23fdd90` |
+  | `v0.3.16` | `0.3.16` | `0.3.14` | Delta (g): la familia método | `2c7c67c5d` |
+  | `v0.3.17` | `0.3.17` | `0.3.15` | Delta (h): cotización, próximos pasos y respiro | `39b9c7006` |
+  | `v0.3.18` | `0.3.18` | `0.3.16` | Delta (i): la familia prueba | `82964f2b4` |
+  | `v0.3.19` | `0.3.19` | `0.3.17` | Delta (j): secciones y quiénes somos (`section-cine` gana `about` y `purpose`) | `3def01768` |
+  | `v0.3.20` | `0.3.20` | `0.3.18` | Delta (k): contenido y día a día (`content-day` gana `tools`, `live-progress` y `live-results`) | `c3c290e16` |
+  | `v0.3.21` | `0.3.21` | `0.3.19` | Delta (l): `cover-brochure` gana la composición `document-selection` (la portada con la selección de Nexa) | `88ce23831` |
+
+  Cambios de contrato de la serie: una composición puede declarar `progress: false`; `voice.maxWords` por receta;
+  pasos sin íconos (`steps.icons: false`) y con mínimo (`steps.min`); colores por nombre de paleta. Los valores se
+  leen del token; este runbook no los copia.
+- **Serie completa consumida por TASK-1927 y TASK-1928:** `v0.3.11`, `v0.3.13` y `v0.3.14` (TASK-1927, Delta (e)),
+  `v0.3.12` (TASK-1922, Glitch, Delta (d)) y `v0.3.15` a `v0.3.21` (este delta).
+- **Transitivos** (leídos en `node_modules` el 2026-09-28): `axis-ui-contracts` `0.3.19` depende de `axis-tokens`
+  `0.3.21` exacto. `axis-graphic-line` `0.7.0` sigue dependiendo de `axis-tokens` `0.3.12` y `axis-ui-contracts`
+  `0.3.10`, y `axis-ui-registry` `0.3.1` de `axis-ui-contracts` `0.3.5`: el lockfile instala esas versiones sólo para
+  esos transitivos.
+- **Instalación local:** el patrón del Delta (e), sin cambios: `.npmrc` temporal con `${NODE_AUTH_TOKEN}` y
+  `NODE_AUTH_TOKEN="$(gh auth token)"` dentro de un subshell; el token no se imprime, no se guarda y nunca va a CI,
+  Cloud Build ni Secret Manager. El install de un bump va sin `--frozen-lockfile` (el lockfile cambia).
+- **Probar antes de publicar:** el overlay local del Delta (e) — copiar `packages/tokens/dist` del checkout de AXIS sobre
+  `node_modules/@efeoncepro/axis-tokens/dist`, componer y correr el gate, y reinstalar el paquete publicado al
+  terminar. La copia es temporal: nunca se commitea ni reemplaza la versión fijada.
+- **Después de cada bump:** `pnpm brand:tokens` y `pnpm brand:tokens --check` (catálogos de La órbita); `pnpm glitch:tokens`
+  cuando el bump toca el token `glitchLine` (catálogo de Glitch). Luego los tests del mapper y
+  `pnpm composer:visual-gate --catalog=graphic-line`.
+- **Evidencia:** `pnpm composer:visual-gate --catalog=graphic-line`: 66 frames a 0 px; `--catalog=glitch`: 26 a 0 px;
+  `pnpm test` completo y `pnpm build` verdes al cierre de TASK-1928; todo en `origin/develop`.
+- **Consumo:** las 69 recetas del deck componen con `pnpm brand:compose`. Spec técnica:
+  [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Pendiente:
+  la ruta productiva (TASK-1921, en curso).
 
 ## Delta 2026-09-27 (e) — `v0.3.11`, `v0.3.13` y `v0.3.14` publicados; Greenhouse fija `0.3.14` / `0.3.12` (TASK-1927)
 

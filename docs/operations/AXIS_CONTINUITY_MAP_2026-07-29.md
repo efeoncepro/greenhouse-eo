@@ -70,6 +70,22 @@ arreglo están en el runbook, Delta 2026-09-27 (c). Este mapa no autoriza el bum
 `axis-graphic-line` `0.7.0`, `axis-brand-assets` `0.3.5` y `axis-ui-registry` `0.3.1`. Los del párrafo anterior quedan
 como historia.
 
+## Actualización — 2026-09-28: serie `v0.3.11`…`v0.3.21` consumida por TASK-1927 y TASK-1928
+
+**Pines vigentes** (`package.json` y `node_modules`, 2026-09-28; en `origin/develop`): `axis-tokens` `0.3.21`,
+`axis-ui-contracts` `0.3.19`, `axis-graphic-line` `0.7.0`, `axis-brand-assets` `0.3.5` y `axis-ui-registry` `0.3.1`.
+Superan a los de la actualización anterior.
+
+La composición por superficie de «La órbita» consumió once tags seguidos de AXIS, cada uno con `axis-tokens` y
+`axis-ui-contracts`: `v0.3.11`, `v0.3.13` y `v0.3.14` (TASK-1927: contrato `efeonce.surface-composition` 0.1.2, tokens
+del marco y tipografía de las contraportadas), `v0.3.12` (TASK-1922, Glitch) y `v0.3.15` a `v0.3.21` (TASK-1928: una
+familia de recetas del deck por tag, más la portada con selección en `v0.3.21`). Con eso las 69 recetas del deck
+componen desde el Artifact Composer. Tabla por tag, transitivos, instalación con credencial efímera (`gh auth token`
+dentro de un subshell, nunca impreso) y prueba con el overlay local del build de AXIS: runbook, Delta 2026-09-28 (f) y
+Delta 2026-09-27 (e). Tras cada bump corren `pnpm brand:tokens` (y `pnpm glitch:tokens` si cambia `glitchLine`). Spec
+técnica del consumidor: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
+Este mapa no autoriza bumps nuevos.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro

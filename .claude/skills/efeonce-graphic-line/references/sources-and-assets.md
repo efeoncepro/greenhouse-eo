@@ -105,19 +105,36 @@ D26. Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 **Publicado el 2026-09-27 (tag `v0.3.8`):** `axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7, con el contrato
 `efeonce.surface-composition` 0.1.1 (`candidate`, acepta intents 0.1.0; modela el contenido de las láminas aprobadas).
 
-**Vigente en Greenhouse (2026-09-27, `package.json`, tras TASK-1927 y TASK-1922):** `axis-tokens` 0.3.14 ·
-`axis-ui-contracts` 0.3.12 · `axis-brand-assets` 0.3.5 · `axis-graphic-line` 0.7.0 (dependencia directa) ·
-`axis-ui-registry` 0.3.1. Contrato `efeonce.surface-composition` 0.1.2.
+**Vigente en Greenhouse (2026-09-28, `package.json`, tras TASK-1927, TASK-1922 y TASK-1928):** `axis-tokens`
+**0.3.21** · `axis-ui-contracts` **0.3.19** (tag `v0.3.21`) · `axis-brand-assets` 0.3.5 · `axis-graphic-line` 0.7.0
+(dependencia directa) · `axis-ui-registry` 0.3.1. Contrato `efeonce.surface-composition` 0.1.2 con los deltas (b)…(l)
+del ADR de AXIS. La serie completa está en [ledger.md](ledger.md).
 
-**Fuentes de la composición del deck (TASK-1927, 2026-09-27):** task
-`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`; código
-`src/lib/brand-surfaces/recipes/deck.ts`, `src/lib/brand-surfaces/recipes/frame.ts`,
-`src/lib/brand-surfaces/document.ts`, `scripts/brand-surfaces/compose.ts` y
-`src/lib/artifact-composer/catalogs/graphic-line-deck/registry.json`; ejemplos
-`src/lib/brand-surfaces/examples/deck-*-intent.json`, `deck-brochure-document.json` y `deck-proposal-document.json`;
-deltas del gate en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`; recetas por lámina en
-`docs/operations/brand-graphic-line/deck-recipes/`. Siguientes: TASK-1928 (38 recetas sin plantilla), TASK-1921 (ruta
-productiva) y TASK-1926 (plates). El
-`axis-graphic-line` lo usa sólo `src/lib/brand-surfaces` (`paintGraphicLine`, `resolveIcon`) para los catálogos del
+**Fuentes de la composición del deck (TASK-1927 y TASK-1928, verificado 2026-09-28):** tasks
+`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` y
+`docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md`; código
+`src/lib/brand-surfaces/recipes/` (`deck.ts`, `frame.ts`, `proposal-service.ts`, `method.ts`, `close.ts`, `proof.ts`,
+`sections.ts`, `content.ts`, `kit.ts`), `src/lib/brand-surfaces/{index,document,types}.ts`,
+`scripts/brand-surfaces/compose.ts` y `src/lib/artifact-composer/catalogs/graphic-line-deck/{index.ts,registry.json,recipe-map.json}`
+(+ `graphic-line-shared/{resolvers,rendered-audit}.ts`); ejemplos `src/lib/brand-surfaces/examples/deck-*-intent.json`,
+`deck-brochure-document.json` y `deck-proposal-document.json`; deltas del gate en
+`scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`; recetas por lámina en
+`docs/operations/brand-graphic-line/deck-recipes/`. Siguientes: TASK-1921 (ruta productiva, `in-progress` en otra
+sesión), TASK-1926 (plates idempotentes) y TASK-1929…1932 (plan validado, datos reales, banco de plates, Proposal
+Studio).
+
+**Archivos que usa el deck compuesto** (los ejemplos de `src/lib/brand-surfaces/examples/deck-*.json` los referencian;
+todos existían en disco el 2026-09-28):
+
+| Qué | Dónde | Nota |
+|---|---|---|
+| Plates de foto (cine y documental) | `ai-generations/<fecha>_<tema>/plates/*.png` — p. ej. `2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png`, `BR2b-…`, `BR3-contra-horizonte.png`, `BR4-contra-amanecer.png`; `2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png`, `NX5b-…`; `2026-09-26_deck-{creativo,web,revops,aeo,hibrido,triptico-v2,mosaico-documental,web-motion}/plates/`; `2026-09-27_{portadas-lineas,secciones-partidas,quienes-somos}/plates/`; `2026-09-26_web-hero/plates/H1b-estratega-uniforme.png` | sin versionar en git (carpeta de producción local); sin el archivo el CLI falla. `P1-deck-lente-edicion.png` aparece en cuatro ejemplos: es de muestra, no se repite en un deck real. Banco gobernado: TASK-1931 |
+| Logo e isotipo de Efeonce, burbujas URL | `graphic-line-deck/assets/` (`efeonce-logo-negative.svg`, `efeonce-isotype-negative.svg`, `url-bubble-baked-{dark,light}.svg`, `url-bubble-source.svg`) | copiados byte a byte desde `@efeoncepro/axis-brand-assets` por `pnpm brand:tokens`; nunca se editan |
+| Logos de clientes | `src/lib/artifact-composer/catalogs/deck-axis/assets/clients/*.svg` (`sky.svg`, `sky-on-dark.svg`, `aguas-andinas.svg`, `universidad-temuco.svg`, `carozzi.svg`, `berel.svg`, `anam.svg`…) | sólo de quienes autorizan su uso; el compositor los normaliza (asset `logo`) |
+| Logos de partners | `public/images/logos/partners/*` (HubSpot, Salesforce, Google Cloud, AWS, Microsoft, OpenAI, Claude, Adobe, BytePlus) | normalizados al componer |
+| Isotipos de herramientas y fotos del squad | `deck-axis/assets/tools/*-isotype.svg`, `deck-axis/assets/squad/squad-*.png`, `deck-axis/assets/product/greenhouse-seo-dashboard.png`, `public/images/greenhouse/SVG/negative-isotipo-green.svg` | leídos del catálogo `deck-axis` como archivo; la lámina de La órbita no los copia |
+| Isotipo compuesto sobre la ropa en los plates | lo compone la ficha fotográfica (`pnpm foto:*`) desde `@efeoncepro/axis-brand-assets` | abierto: procedencia sin registrar en algunos plates (`pnpm foto:emblema` antes de publicar) |
+
+El `axis-graphic-line` lo usa sólo `src/lib/brand-surfaces` (`paintGraphicLine`, `resolveIcon`) para los catálogos del
 Artifact Composer; las piezas de campaña siguen con el adapter propio raster-safe. Fuera de esa ruta, los SVG de
 íconos salen de `pnpm icons:export` en AXIS o del Lab.

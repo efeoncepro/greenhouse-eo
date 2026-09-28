@@ -70,10 +70,11 @@ distintos por página contra `docs/ui/visual-directions/TASK-1889-efeonce-insigh
 `Deck-Agrupadas` es la única excepción aprobada por el operador, con techo 2,5 %; una excepción nueva
 exige su aprobación). Dossier: `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`.
 
-### Scope de La órbita (`graphic-line`, TASK-1919 y TASK-1927)
+### Scope de La órbita (`graphic-line`, TASK-1919, TASK-1927 y TASK-1928)
 
 Los tres catálogos de la línea gráfica por superficie (`graphic-line-deck`, `graphic-line-stills` y
-`graphic-line-overlays`) tienen su propio scope, por la misma razón que Insights: no rebaselinar frames ajenos.
+`graphic-line-overlays`) tienen su propio scope, por la misma razón que Insights: no rebaselinar frames ajenos. Spec
+técnica de los catálogos: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
 
 ```bash
 pnpm composer:visual-gate --catalog=graphic-line --selftest
@@ -81,10 +82,34 @@ pnpm composer:visual-gate --catalog=graphic-line --freeze
 pnpm composer:visual-gate --catalog=graphic-line
 ```
 
-- **Qué cubre:** `templates-graphic-line-{deck,stills,overlays}/**`, **32 frames a 0 px** al cierre de TASK-1927
-  (2026-09-27): 16 del deck, 9 de stills y 7 de overlays (cuenta leída en `baseline-manifest.json`). El scope entró
-  con 22 frames (TASK-1919); las altas y cambios posteriores están declarados en `BASELINE_DELTAS.md`, entradas
-  2026-09-27 (b), (c), (d) y (e).
+- **Qué cubre:** `templates-graphic-line-{deck,stills,overlays}/**`, **66 frames a 0 px** al cierre de TASK-1928
+  (2026-09-28): **50 del deck** (una por plantilla de `registry.json`; cubren las 69 recetas del deck), 9 de stills y 7
+  de overlays. El scope entró con 22 frames (TASK-1919) y pasó a 32 con TASK-1927.
+- **Dónde está declarado cada cambio** (`BASELINE_DELTAS.md`):
+
+  | Entrada | Task | Qué declara |
+  | --- | --- | --- |
+  | 2026-09-27 (b) | TASK-1927 | composiciones `hero` y `lines` de `proposal-cinematic` (2 altas) |
+  | 2026-09-27 (c) | TASK-1927 | el tríptico, una palabra por toma (modificación) |
+  | 2026-09-27 (d) | TASK-1927 | la sección partida en tres composiciones (2 altas) |
+  | 2026-09-27 (e) | TASK-1927 | portadas y contraportadas aprobadas (6 altas) |
+  | 2026-09-27 (f) | TASK-1928 | la propuesta de servicio sobria (1 alta) |
+  | 2026-09-27 (g) | TASK-1923 | Glitch entra al gate (scope `glitch`, no es de La órbita) |
+  | 2026-09-27 (h) | TASK-1928 | la familia método (5 altas) |
+  | 2026-09-27 (i) | TASK-1928 | cotización, próximos pasos y respiro (5 altas) |
+  | 2026-09-27 (j) | TASK-1928 | la familia prueba (8 altas) |
+  | 2026-09-27 (k) | TASK-1928 | secciones y quiénes somos (7 altas) |
+  | 2026-09-27 (l) | TASK-1928 | contenido y día a día (8 altas) |
+  | 2026-09-27 (m) | TASK-1928 | los largos del catálogo mandan: `ContentPricingLive` re-promovido |
+  | 2026-09-28 (n) | TASK-1928 | la portada de brochure con la selección de Nexa: `CoverBrochure` re-promovido (§4bis) |
+
+- **Auditoría renderizada (TASK-1928).** Además del diff de píxeles, el gate mide sobre cada probe de La órbita dos
+  reglas que ni el contrato ni el `slots.json` ven (`graphic-line-shared/rendered-audit.ts`): **D1**
+  (`accent-text-min-size`: ningún texto de menos de 24 px con el color de acento de la línea, en todos los frames) y
+  **3×** (`answer-ratio`: la respuesta mide al menos 3 veces la pregunta en `deck.content-pricing`, `.stage`, `.live`,
+  `deck.content-clients`, `deck.decision-plan` y `deck.content-partners`; una de esas láminas sin pregunta y respuesta
+  también falla). Una violación falla el gate igual que un píxel y **no se arregla con `--freeze`**: se corrige la
+  plantilla o el builder. Una receta nueva que la norma obligue a 3× se agrega a `ANSWER_RATIO_CONTENT_TYPES`.
 - **Qué hace un freeze de este scope:** agrega o actualiza sólo los PNG y hashes cuyo frame empieza con
   `templates-graphic-line-`, y borra los de ese mismo prefijo que el render ya no produce (una plantilla retirada o
   renombrada). Los frames de `deck-axis`, SKY e Insights conservan su PNG y su hash; el digest se vuelve a sellar sobre
@@ -99,7 +124,7 @@ pnpm composer:visual-gate --catalog=graphic-line
   | `plate:probe` | la foto (el plate) |
   | `icon:probe` | un ícono |
   | `layer:probe` | una capa de la órbita |
-  | `file:probe` | un archivo entregado por quien compone; hoy, el logo del cliente de las portadas de propuesta. Es un rótulo sintético, nunca la marca de un cliente real (TASK-1927) |
+  | `file:probe` | un archivo entregado por quien compone: el logo del cliente de las portadas de propuesta (TASK-1927) y, desde TASK-1928, los logos de clientes y partners (en un render real, assets `logo` normalizados), las fotos del squad y los isotipos de herramientas (assets `file`). Es un rótulo sintético, nunca la marca de un cliente real |
 
   En el contrato se escriben con el prefijo `asset-ref:` (por ejemplo `"example": "asset-ref:file:probe"`).
 - **`"example": null` deja un slot opcional fuera del probe.** El probe usa el `example` del slot tal cual
@@ -116,6 +141,10 @@ pnpm composer:visual-gate --catalog=graphic-line
   | --- | --- |
   | `section-split.html` | `SectionSplit`, `SectionSplitCornerBottom`, `SectionSplitPanelEnd` |
   | `close-brochure.html` | `CloseBrochure`, `CloseBrochurePhoto` |
+
+  Al revés también pasa: varias recetas pueden compartir **una** plantilla y, por lo tanto, **un** frame
+  (`ProposalService` para las cuatro propuestas sobrias, `SectionCine` para equipo y servicios, `CoverBrochure` para las
+  ocho portadas de brochure). Por eso el scope tiene 50 frames de deck para 69 recetas.
 
   Un cambio en ese HTML mueve todos sus frames: se declaran uno por uno. No contradice la regla de `.claude/rules/tenders.md`
   sobre no registrar una plantilla para «la misma lámina con un elemento más» (eso lo resuelve un slot opcional): aquí
@@ -200,6 +229,12 @@ trabajo.
   ledger de deltas, no un archivo duplicado que después driftea.
 
 Caso fuente: `partnerBadge` en `BackCoverFull` (credencial HubSpot Solutions Partner, 2026-08-13).
+
+Segundo caso (La órbita, 2026-09-28, `BASELINE_DELTAS.md` (n)): la plantilla `CoverBrochure` ganó el slot opcional
+`selection` para la portada `document-selection`. El probe lo rellena, así que el frame único de `CoverBrochure` pasó a
+mostrar el marco de ocho manijas y el cursor sobre la respuesta, aunque las siete portadas limpias que comparten esa
+plantilla no llevan selección en un render real (el builder sólo llena el slot con `layout: 'document-selection'`). Se
+declaró como modificación y se re-promovió; no es una regresión de las portadas limpias.
 
 ### Valor de muestra declarado por el contrato (`example`, TASK-1889)
 

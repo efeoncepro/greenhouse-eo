@@ -318,7 +318,7 @@ lines.push(
 const templated = recipes.filter(recipe => templateOf(recipe.id)).length
 
 lines.push(
-  `**${templated} de ${recipes.length}** recetas tienen plantilla en el Artifact Composer y se componen con \`pnpm brand:compose\` (columna «Plantilla», leída de \`graphic-line-deck/registry.json\`). Las demás todavía no.`
+  `**${templated} de ${recipes.length}** recetas tienen plantilla en el Artifact Composer y se componen con \`pnpm brand:compose\` (columna «Plantilla», leída de \`graphic-line-deck/registry.json\`).${templated === recipes.length ? '' : ' Las demás todavía no.'}`
 )
 lines.push('')
 lines.push('### Recetas por familia y documento')

@@ -1,9 +1,11 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.3: la portada con selección compone — layout `document-selection`,
+> **Última actualización:** 2026-09-28 por Claude (1.4: revisión de consistencia — todo empujado a `develop`,
+> cuándo va el `layout` explícito, qué campo lleva la selección, `photo.focus` sólo en el reloj del día a día, TASK-1921
+> en curso, enlace a la documentación funcional. Antes, 1.3: la portada con selección compone — layout `document-selection`,
 > AXIS 0.3.21; **69 de 69** recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla, las familias
 > nuevas y sus intents de ejemplo, paridad de slots receta ↔ plantilla y los pendientes de QA que resolvió. Antes, 1.1:
 > estado tras el cierre de TASK-1927 — qué recetas tienen plantilla, equivalencia de nombres con el contrato de AXIS,
@@ -15,11 +17,12 @@
 > deck, portadas y contraportadas, decisiones del 2026-09-27) · [manual de la línea gráfica](../EFEONCE_GRAPHIC_LINE_V1.md)
 > (voz, órbita, firma, eslogan) · [registro cine](../../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (fotos de cine).
 > **Relacionados:** [manual de uso · componer un deck con las recetas](../../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
+> [documentación funcional · composición de decks y brochures](../../../documentation/creative/composicion-de-decks-y-brochures.md) ·
 > [documentación funcional de la línea](../../../documentation/creative/linea-grafica-efeonce.md) · skill
 > [`deck-studio`](../../../../.claude/skills/deck-studio/SKILL.md) · [TASK-1926](../../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)
 > (fotos) · [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (plantillas
 > de 31 recetas, `complete`) · [TASK-1928](../../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
-> (plantillas de las 38 recetas restantes).
+> (plantillas de las 38 recetas restantes y la portada con selección, `complete`).
 
 ## Qué es
 
@@ -238,14 +241,18 @@ la respuesta como objetivo de la selección y tiene un slot `selection` opcional
   en seis familias, sobre 34 plantillas nuevas: las cuatro `proposal-service-*` comparten
   `ProposalService`, y `section-cine-team` y `section-cine-services` comparten `SectionCine`.
 
-Todo está en `develop` local; el push sigue pendiente de la señal del operador.
+TASK-1927 y TASK-1928 están `complete` y empujadas a `develop`. La ruta productiva gobernada (API, `artifact-worker`,
+MCP) es [TASK-1921](../../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md), en curso:
+todavía no está disponible.
 
 ### Dos nombres para la misma lámina
 
 El **id del catálogo** nombra la lámina aprobada (`section-split-corner-bottom`, `cover-brochure-line-voice`). El
 **intent** que se compone usa la **receta del contrato de AXIS** (`efeonce.surface-composition`) y su `layout`
 (`section-split` + `corner-bottom`, `cover-brochure` + `line`). Varias láminas del catálogo comparten una receta de
-AXIS y se distinguen por el `layout`, la línea, la foto y el copy del intent. El `layout` va siempre explícito.
+AXIS y se distinguen por el `layout`, la línea, la foto y el copy del intent. El `layout` se copia tal como viene en
+el ejemplo: va explícito cuando la receta tiene varias composiciones; cuando el ejemplo no lo trae, la receta tiene una
+sola o resuelve la de por defecto (`section-split` → `corner-top`, `section-cine` → `team`).
 
 Los ejemplos viven en `src/lib/brand-surfaces/examples/`. Las recetas de TASK-1927:
 
@@ -373,14 +380,14 @@ esa carpeta está vigilada por un snapshot (`src/lib/brand-surfaces/__tests__/ex
 | La foto | `photo.plateRef`, `photo.alt` | `alt` obligatorio (describe la escena; sin él, `missing-photo`); el plate debe existir en disco (`ai-generations/**`, fuera de git) |
 | El copy | `voice`, `body` | el `maxChars` medido de la receta; la respuesta sin punto |
 | Las cifras | `figures` (valor, rótulo y fuente) | la fuente es obligatoria: sin ella AXIS rechaza la pieza |
-| El ítem seleccionado | `selected` (número de ítem, desde 1) | fuera del rango de ítems, la composición falla con `invalid-intent` |
+| El ítem seleccionado | `selected` (número de ítem, desde 1); en la cotización, `recommended` (la selección sigue al plan recomendado); en la escalera, `selection.level` | fuera del rango de ítems, la composición falla con `invalid-intent`. `selection.item` es el campo interno de la plantilla: lo llena el sistema, no el intent. La portada `document-selection` no lleva `selection` en el intent |
 | La sección | `progress` | sección n de N del deck real |
 | El alto de la columna (portadas) | `column.topPx` | se elige según dónde queda el sujeto; fuera de la reserva del logo falla con `invalid-intent` |
 
 El recorte de la foto es centrado y cubre el área que pide la receta: en la sección partida, una franja de
 1.260 × 1.080 px sobre el lienzo de 1.920 × 1.080; en las láminas a sangre, el lienzo completo. La sección partida
-**no tiene control de foco**: si el sujeto queda cortado, se usa una foto con otro encuadre. Las recetas que lo admiten
-(por ejemplo, la lente del día a día) aceptan `photo.focus` para dirigir el recorte hacia un punto del archivo. En
+**no tiene control de foco**: si el sujeto queda cortado, se usa una foto con otro encuadre. En el deck, hoy sólo la
+lente del día a día (`content-day` con `clock`) lee `photo.focus` para dirigir el recorte hacia un punto del archivo. En
 `section-split-panel-end` la foto va **espejada**: una foto con texto legible o con un logo saldría al revés. Al cambiar
 la foto no cambian el panel, la esquina curva, el indicador ni la columna de voz: eso lo fija el `layout`.
 
@@ -388,8 +395,9 @@ Los montos no son dato del intent: la cotización imprime siempre `[MONTO]`. El 
 `EFEONCE_CONTACT`.
 
 Las fotos se piden por ficha (`pnpm foto:prompt`, `foto:generar`, `foto:validar`, `foto:emblema`, `foto:isotipo`); su
-producción idempotente es TASK-1926. La ruta productiva gobernada (fuera del taller local) es TASK-1921 y está
-pendiente.
+producción idempotente es TASK-1926 y el banco de plates gobernado, TASK-1931. La ruta productiva gobernada (fuera
+del taller local) es TASK-1921, en curso; el plan de deck validado es TASK-1929, los datos reales en los slots
+TASK-1930 y el deck desde Proposal Studio TASK-1932.
 
 ## Cómo regenerar el índice
 
@@ -409,7 +417,7 @@ falta un campo del esquema, si hay ids repetidos o si un `preferInstead` o `pair
 <!-- Generado por scripts/creative/deck-recipes/render-index.mjs desde EFEONCE_DECK_SLIDE_RECIPES_V1.json. No editar a mano: corre «pnpm brand:deck-recipes». -->
 
 Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
-**69 de 69** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
+**69 de 69** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`).
 
 ### Recetas por familia y documento
 

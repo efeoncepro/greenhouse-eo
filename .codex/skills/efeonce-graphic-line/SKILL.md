@@ -35,6 +35,7 @@ dos esferas en una pieza (manzana + lente u órbita).
 | Necesitas… | Lee |
 |---|---|
 | **Componer un deck, un brochure o una propuesta HOY** (portada, contraportada, páginas de servicio, documento completo en un PDF): qué recetas tienen plantilla, con qué `layout`, y los campos del intent | [applications.md §L, «Componer el deck hoy»](references/applications.md) + skill `deck-studio` §«Componer hoy con `pnpm brand:compose`» |
+| **Añadir o modificar una receta del deck de punta a punta** (token y release en AXIS → builder, plantilla, slots, registro, mapa y ejemplo en Greenhouse → paridad → gate y ledger) | [applications.md §L, «Añadir o modificar una receta del deck»](references/applications.md) + [lessons.md](references/lessons.md) (2026-09-27/28) + [qa-checklist.md §8d](references/qa-checklist.md) |
 | **Cambiar la foto, el copy o la sección de una lámina ya compuesta** (qué campo del intent, recorte, espejo en `panel-end`, sección partida sin control de foco) | [applications.md §L, «Cambiar la foto, el copy o la sección»](references/applications.md) + [manual de uso](../../../docs/manual-de-uso/creative/componer-por-superficie-con-axis.md) + [qa-checklist.md §8d](references/qa-checklist.md) |
 | **Elegir o armar una lámina de deck de marca propia** (brochure, propuesta, pitch, QBR): cuál de las 69 aprobadas usa cada documento, cuándo sí y cuándo no, pares, slots, foto y prompt | [catálogo de recetas por lámina](../../../docs/operations/brand-graphic-line/deck-recipes/README.md) + [norma §4.6, «Recetas por lámina»](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) + [manual](../../../docs/manual-de-uso/creative/componer-deck-con-recetas.md) + skill `deck-studio` |
 | **Una pieza para una superficie concreta** — hero web, DOOH (caminero, paleta), pDOOH (LED, mupi, spot, variantes), gráfica animada con foto, video (cartela, zócalo, super, subtítulos) o lámina de deck (incluida la propuesta de cine `proposal-cinematic`): recetas aprobadas, opciones, pendientes, rechazos, firma por soporte y cómo se compone con AXIS | [norma de composición por superficie](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) + [applications.md §L](references/applications.md) + guías AXIS `docs/agent-composition/surfaces/` (en `main` de AXIS; [Lab](https://axis.efeonce.org/references/surfaces/)) + la página de la superficie en el [canvas](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina «Guía · cómo componer …»). **Receta aprobada → `pnpm brand:compose`** ([norma §2.1](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919), [manual de uso](../../../docs/manual-de-uso/creative/componer-por-superficie-con-axis.md)) |
@@ -108,25 +109,21 @@ dos esferas en una pieza (manzana + lente u órbita).
     plantilla bajo `pnpm composer:visual-gate --catalog=graphic-line`. **Deck (2026-09-27): las 69 láminas están
     aprobadas y cada una tiene su receta** en `docs/operations/brand-graphic-line/deck-recipes/`
     (`efeonce.deck-slide-recipes.v1`); una lámina de marca propia se **elige** del catálogo de recetas, no se inventa,
-    y se **compone** con el intent de AXIS. **Las 69 componen con `brand:compose`** (31 de TASK-1927 y 34
-    plantillas para las 38 de TASK-1928; tablas en [applications.md §L](references/applications.md)); la última,
-    `cover-brochure-cine-lines-selection`, compone desde el 2026-09-28 con el layout `document-selection` de
-    `cover-brochure` (AXIS 0.3.21; el operador relajó la regla «sin selección en cover-brochure»). Las plantillas hornean las decisiones de norma de TASK-1928 (acento
-    nunca bajo 24 px, respuesta ≥ 3× la pregunta, cifras con fuente visible, sin logo ni velo en láminas interiores con
-    foto, burbuja URL en partners, logos de terceros normalizados; detalle en
+    y se **compone** con el intent de AXIS. **Las 69 componen con `brand:compose`** sobre 50 plantillas (mapa
+    receta → `contentType` → plantilla en la skill `deck-studio`, `composition.md` §«Mapa receta → plantilla»); la
+    portada `cover-brochure-cine-lines-selection` compone desde el 2026-09-28 con el layout `document-selection` (AXIS
+    0.3.21; el operador relajó «sin selección en cover-brochure» sólo para ella). Las plantillas hornean las decisiones
+    de norma de TASK-1928 (acento nunca bajo 24 px, respuesta ≥ 3× la pregunta, cifras con fuente visible, sin logo ni
+    velo en láminas interiores con foto, burbuja URL en partners, logos de terceros normalizados; detalle en
     [ledger.md](references/ledger.md)) y **los largos del catálogo son el límite**: el compositor rechaza el texto que
-    se pasa. La sección partida sube por la **izquierda** (tres composiciones por `layout`) y el tríptico lleva
-    una palabra por toma, cada una con su esfera: las dos ya están en las plantillas. **`cover-classic` y
-    `close-classic` no se usan** (el operador no las aprobó; en AXIS quedan `supersededBy`). **El contenido de una
-    lámina es dato del intent:** para cambiar la foto (`photo.plateRef` + `photo.alt`, obligatorio), el copy (`voice`,
-    `body`) o la sección (`progress`), se edita un intent propio —nunca un ejemplo de
-    `src/lib/brand-surfaces/examples/`, ni la plantilla, ni la salida— y se vuelve a componer. El recorte es centrado;
-    la sección partida **no tiene control de foco** (si el sujeto queda cortado, se cambia la foto) y `panel-end`
-    **espeja** la foto (sin texto ni logos legibles). Pasos y trampas:
-    [applications.md §L](references/applications.md), «Cambiar la foto, el copy o la sección». TASK-1927 está
-    `complete` (2026-09-27, en `develop` local, sin push), con la aprobación visual del operador. TASK-1928 está
-    `complete` (2026-09-28, en `develop`): las 69 recetas componen (AXIS `axis-tokens` 0.3.21 / `axis-ui-contracts`
-    0.3.19, gate a 0 px), con la aprobación visual del operador.
+    se pasa. **`cover-classic` y `close-classic` no se usan** (el operador no las aprobó; en AXIS quedan
+    `supersededBy`). **El contenido de una lámina es dato del intent** (foto, copy, sección, cifras, selección): se
+    edita un intent propio —nunca un ejemplo de `src/lib/brand-surfaces/examples/`, ni la plantilla, ni la salida— y
+    se vuelve a componer ([applications.md §L](references/applications.md), «Cambiar la foto, el copy o la sección»).
+    **Añadir o cambiar una receta** es otra cosa: AXIS primero, luego Greenhouse, paridad y gate
+    ([applications.md §L](references/applications.md), «Añadir o modificar una receta del deck»). **Estado
+    (2026-09-28):** TASK-1927 y TASK-1928 `complete`, aprobadas por el operador y en `origin/develop`; la ruta
+    productiva (TASK-1921) está `in-progress` en otra sesión y **no** está disponible.
 14. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado; la prueba sin
     logo va antes de cualquier pauta con la órbita. «Te hacemos visible» no sale a pauta sin revisión legal.
 

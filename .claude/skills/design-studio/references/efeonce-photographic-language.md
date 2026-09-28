@@ -130,8 +130,8 @@ de partículas, esferas—, nunca pintado encima ni puesto como grade.
 | 3 · **Excepción:** láminas de **sección** y **«about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») | Personas en luz dramática, con o sin Nexa (en la sección con el panel a la derecha, la persona del cliente) | Equipo: uniforme por registro de escena; cliente: su ropa, sin marca Efeonce |
 
 AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue **`cine-requires-nexa-or-proposal`**; el
-caso 3 ya está en el contrato (TASK-1927, `axis-tokens` 0.3.14): admite cine en `section-split`, `section-cine` y en
-`cover-brochure`, `close-brochure` y `close-proposal`. Una pieza social, un hero web, publicidad o una lámina de **contenido** con personas del equipo sigue en A, B
+caso 3 ya está en el contrato (desde `axis-tokens` 0.3.14, TASK-1927): admite cine en `section-split`, `section-cine`
+(composiciones `team`, `services`, `about` y `purpose`) y en `cover-brochure`, `close-brochure` y `close-proposal`. Una pieza social, un hero web, publicidad o una lámina de **contenido** con personas del equipo sigue en A, B
 o C: la excepción del caso 3 no se extiende. Detalle: registro cine, delta (c); receta de cada lámina en
 `docs/operations/brand-graphic-line/deck-recipes/`.
 
@@ -182,8 +182,11 @@ pnpm brand:compose -- --intent <intent.json>               # lámina o brochure:
 `brand:compose` sigue el contrato AXIS `efeonce.surface-composition` 0.1.2 (`candidate`), **ya integrado en
 Greenhouse** (TASK-1927; un intent 0.1.0 o 0.1.1 resuelve igual): `use: proposal|brochure`, el marco `cover-brochure`,
 `cover-proposal`, `close-brochure` y `close-proposal`, las composiciones `service|hero|lines` de `proposal-cinematic`
-y el documento multipágina (intent con `pages`). `cover-classic` y `close-classic` no entran: el operador no las
-aprobó. La foto se cambia en el intent (`photo.plateRef` y `photo.alt`, obligatorio), no en la plantilla. La plantilla de ficha comentada (`RV1`, verbatim) está en §12 del registro.
+y el documento multipágina (intent con `pages`). Desde TASK-1928 (2026-09-28) **las 69 recetas del deck componen**
+(AXIS `axis-tokens` 0.3.21 / `axis-ui-contracts` 0.3.19; intent de ejemplo por receta en
+`src/lib/brand-surfaces/examples/deck-<receta>-intent.json`); lo que va encima de la foto lo deciden `deck-studio` y
+`efeonce-graphic-line`, no esta skill. La ruta productiva (API, worker, MCP) es TASK-1921 y no está disponible: hoy se
+compone por CLI. `cover-classic` y `close-classic` no entran: el operador no las aprobó. La foto se cambia en el intent (`photo.plateRef` y `photo.alt`, obligatorio), no en la plantilla. La plantilla de ficha comentada (`RV1`, verbatim) está en §12 del registro.
 
 **Plate de portada y contraportada de brochure o propuesta [operador, 2026-09-27].** La portada con foto lleva texto
 encima (logo de Efeonce a 500 px, eyebrow, pregunta, respuesta, evidencia) en una columna a la izquierda, así que el

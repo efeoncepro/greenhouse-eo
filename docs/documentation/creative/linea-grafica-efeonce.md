@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.13
+> **Version:** 1.14
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -321,7 +321,9 @@ maqueta: son plantillas del generador de piezas de Greenhouse (el Artifact Compo
 en un archivo y corre un solo comando (`pnpm brand:compose`); sale la pieza completa, con la foto, la órbita, la voz,
 la selección y los íconos en su lugar:
 
-- **Deck:** las seis láminas aprobadas, en PDF.
+- **Deck:** **las 69 láminas aprobadas**, sueltas o como documento completo (un brochure o una propuesta en un solo
+  PDF de varias páginas). Qué hace, qué reglas cumple y qué falta: [Composición de decks y brochures de marca
+  propia](./composicion-de-decks-y-brochures.md).
 - **Web y vía pública:** los cuatro heros (el teléfono en sus tres anchos) y el caminero, en imagen.
 - **Motion:** el último cuadro de la animación (la versión fija que la respalda) y el storyboard. La animación en sí
   sigue haciéndose con las herramientas de motion.
@@ -329,18 +331,17 @@ la selección y los íconos en su lugar:
   para montar sobre el plano, más la pantalla dividida y el plan de planos. El cierre con el logo es un video y sale de
   las animaciones del logo.
 
-Lo que no está aprobado (la paleta de ciudad, las pantallas digitales) **no tiene plantilla**; varias láminas del deck
-aprobadas el 2026-09-27 tampoco la tienen todavía (se arman como maqueta declarada hasta TASK-1927):
-el comando se niega a producirlo. Producir no es aprobar: la pieza sigue pasando la revisión del equipo. Por ahora el
-comando corre en el equipo de quien produce; la versión dentro de la plataforma (con permisos, cola y agentes) es una
-task aparte. Quedan preguntas del operador sobre detalles de algunas plantillas (la posición de la lente del caminero,
+Lo que no está aprobado (la paleta de ciudad, las pantallas digitales) **no tiene plantilla**: el comando se niega a
+producirlo. En el deck ya no queda ninguna lámina sin plantilla: desde el 2026-09-28 se componen las 69 (TASK-1927 y
+TASK-1928). Producir no es aprobar: la pieza sigue pasando la revisión del equipo. Por ahora el comando corre en el
+equipo de quien produce; la versión dentro de la plataforma (con permisos, cola y agentes) es TASK-1921, en curso. Quedan preguntas del operador sobre detalles de algunas plantillas (la posición de la lente del caminero,
 el arco del dato, la burbuja URL en algunas láminas, un gris sin valor oficial y la medida pendiente de la paleta de ciudad, 20 % o 35 %).
 
 > Detalle técnico: [norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) ·
 > [manual §10.0](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#100-composición-por-superficie) ·
 > [lenguaje fotográfico, delta 2026-09-27](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) ·
-> contrato `efeonce.surface-composition` 0.1.1 y tokens `efeonceGraphicLine.surfaces` en AXIS (publicados en `v0.3.8`;
-> [página del Lab](https://axis.efeonce.org/references/surfaces/)) · [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) ·
+> contrato `efeonce.surface-composition` 0.1.2 y tokens `efeonceGraphicLine.surfaces` en AXIS (Greenhouse fija
+> `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19; [página del Lab](https://axis.efeonce.org/references/surfaces/)) · [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) ·
 > [cómo componer por superficie](../../manual-de-uso/creative/componer-por-superficie-con-axis.md) ·
 > [ruta por el Artifact Composer, norma §2.1](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919) (TASK-1919)
 
@@ -351,7 +352,7 @@ el arco del dato, la burbuja URL en algunas láminas, un gris sin valor oficial 
 | Manual técnico-operativo (fuente de verdad) | [`EFEONCE_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) | quien produce o audita |
 | Norma de composición por superficie (web, vía pública, pantallas digitales, motion, video, deck) | [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) | quien produce una pieza para una superficie concreta |
 | Recetas por lámina del deck (las 69 aprobadas: cuándo usar cada una, slots, foto y prompt) | [catálogo `deck-recipes/`](../../operations/brand-graphic-line/deck-recipes/README.md) · [cómo armar un deck con las recetas](../../manual-de-uso/creative/componer-deck-con-recetas.md) | quien arma un brochure, una propuesta, un pitch o un QBR |
-| Plantillas de las piezas aprobadas por superficie (comando `pnpm brand:compose`) | catálogos `graphic-line-deck`, `graphic-line-stills` y `graphic-line-overlays` del Artifact Composer · [cómo usarlo](../../manual-de-uso/creative/componer-por-superficie-con-axis.md) | quien produce una pieza aprobada |
+| Plantillas de las piezas aprobadas por superficie (comando `pnpm brand:compose`) | catálogos `graphic-line-deck` (las 69 láminas del deck, en 50 plantillas), `graphic-line-stills` y `graphic-line-overlays` del Artifact Composer · [cómo usarlo](../../manual-de-uso/creative/componer-por-superficie-con-axis.md) · [qué hace con decks y brochures](./composicion-de-decks-y-brochures.md) | quien produce una pieza aprobada |
 | Canvas del equipo por superficie (una página por superficie) | [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) | el equipo y los agentes |
 | Decisión (ADR) | [`EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md`](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) | quien necesita saber qué se decidió y qué se descartó |
 | Manual en PDF (A4, 56 hojas, confidencial) | [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) | el equipo (uso interno) |
@@ -409,7 +410,7 @@ nuevas mandan:
   responde «Con foco.», con el nombre del cliente en la evidencia y su logo dentro de la órbita.
 
 También quedaron aprobadas una portada por cada línea de servicio, con su color y su par de pregunta y respuesta.
-Todavía no salen con `pnpm brand:compose`: su paso a plantilla es una task aparte (TASK-1927).
+En ese momento todavía no salían con `pnpm brand:compose`; desde el cierre de TASK-1927 (2026-09-27) se componen.
 
 > Detalle técnico: [norma de composición por superficie §4.6, «Portadas y contraportadas»](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) (reglas, catálogo, medidas y descartes) · [manual §4, pares aprobados, y §5, el eslogan](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#4-la-voz-pregunta-y-respuesta) · [canvas por superficie, página «Deck»](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7)
 
@@ -426,7 +427,7 @@ láminas va, qué textos e imágenes se cambian y cuáles quedan fijos.
 |---|---|---|---|
 | **Propuesta comercial** | sin foto, con el logo del cliente dentro de la órbita | con foto y «Empower your Growth» | «¿Conversamos?» (la propuesta llega después de conversar) |
 | **Brochure** | con foto: una general o la de una línea de servicio | sin foto: la órbita gigante con «¿Conversamos? Cuando quieras.» | precios (se definen en cada propuesta) |
-| **Pitch** y **QBR** | la portada clásica | el cierre clásico | precios |
+| **Pitch** y **QBR** | sin portada aprobada: se le pregunta al operador (la clásica no se usa) | sin cierre aprobado: se le pregunta al operador | precios |
 
 Después, en cada tramo del documento (secciones, contenido, método, prueba, cotización, próximos pasos), se elige la
 receta por su «cuándo sí» y su «cuándo no».
@@ -448,10 +449,41 @@ receta por su «cuándo sí» y su «cuándo no».
 
 Hay detalles de revisión pendientes que no frenan la aprobación (algunas respuestas un poco más chicas de lo que pide
 la regla, cifras que necesitan su fuente a la vista, etiquetas chicas en color de acento); se corrigen cuando cada
-lámina pasa a plantilla. Por ahora sólo algunas láminas salen con `pnpm brand:compose`; las demás se arman siguiendo
-su receta.
+lámina pasa a plantilla. **Actualización 2026-09-28:** ya pasaron todas (delta de abajo).
 
 > Detalle técnico: [catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) (índice, decisiones y pendientes de QA; JSON `efeonce.deck-slide-recipes.v1`) · [norma de composición por superficie, delta (c) y §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [registro cine, delta (c)](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck) · [manual de uso](../../manual-de-uso/creative/componer-deck-con-recetas.md)
+
+## Delta 2026-09-28 — las 69 láminas del deck se componen solas
+
+Desde el 2026-09-28 **las 69 láminas aprobadas del deck** salen con un solo comando (`pnpm brand:compose`), sueltas o
+como un brochure o una propuesta completos en un solo PDF. TASK-1927 dejó el marco (portadas y contraportadas), las
+secciones clásica y partida, la cifra medida, el tríptico, la escalera y las propuestas de cine; TASK-1928 sumó las
+otras 38: propuestas sobrias, método, cotización, próximos pasos y respiro, prueba, secciones y «quiénes somos», y
+contenido y día a día. El operador las aprobó a ojo.
+
+Al pasar a plantilla, cada lámina aplica la regla sobre la referencia aprobada cuando las dos chocaban:
+
+- **El acento no va en textos chicos:** etiquetas como «Recomendado» o «Revisamos contigo» van en azul marino o en
+  blanco.
+- **La respuesta mide al menos tres veces la pregunta:** subió en la cotización, clientes, plan, partners y testimonio.
+- **Toda cifra muestra su fuente:** la lámina imprime «Fuente: …»; una cifra sin fuente no sale.
+- **Las láminas interiores con foto no llevan logo ni velo** sobre la foto.
+- **Los montos salen como `[MONTO]`** y el contacto, de los datos de Efeonce.
+- **Los logos de clientes y partners** quedan en un tono y con el mismo peso.
+
+La **portada de brochure con la selección de Nexa** sobre «Crecer.» también se compone: el operador relajó para ella
+la regla que no admitía selección en una portada de brochure. La selección va sobre la respuesta, nunca sobre la
+persona, con un solo cursor «Nexa».
+
+Lo que falta —la ruta dentro de la plataforma (TASK-1921, en curso), validar un plan de deck completo, datos reales en
+las casillas, el banco de fotos gobernado y el deck desde Proposal Studio— está en
+[Composición de decks y brochures de marca propia](./composicion-de-decks-y-brochures.md#qué-no-hace-todavía).
+
+> Detalle técnico: [composición de decks y brochures](./composicion-de-decks-y-brochures.md) ·
+> [catálogo de recetas, «Qué sale hoy con un comando» y pendientes de QA](../../operations/brand-graphic-line/deck-recipes/README.md) ·
+> [norma §7](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#7-estado-y-pendientes) · AXIS `v0.3.21`
+> (`axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19) ·
+> [TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
 
 ## Estado y pendientes
 

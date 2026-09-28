@@ -3,7 +3,7 @@
 > **Tipo de documento:** ADR (decisión de marca y sistema de diseño)
 > **Estado:** Accepted (2026-09-25) — canonizada en AXIS; atribución sin logo sin medir
 > **Creado:** 2026-09-25 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (delta: IA, social y staff, 19 glifos nuevos, D26; antes, el mismo día: oficio, 30 glifos nuevos, D25; antes, el mismo día: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
+> **Última actualización:** 2026-09-28 por Claude (delta: el deck de la línea se compone entero desde el Artifact Composer, 69 de 69, con D1 medido por el gate). Antes, 2026-09-27 (delta: IA, social y staff, 19 glifos nuevos, D26; antes, el mismo día: oficio, 30 glifos nuevos, D25; antes, el mismo día: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
 > **Manual canónico:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Entregable:** [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf)
 > **Sistema de diseño:** AXIS, página `references/graphic-line` en `axis.efeonce.org` y tokens `efeonceGraphicLine`
@@ -254,6 +254,20 @@ en `@efeoncepro/axis-brand-assets` **0.3.4**, publicados con el tag `v0.6.0` (`a
 otra sesión con superficies, y no cambia por D26); guía `docs/agent-composition/iconography.md` §«Catálogo aprobado»;
 ADR de AXIS, delta «IA, social y staff: 19 glifos nuevos (D26)»; el Lab muestra los 79 y los 43 volúmenes. Greenhouse
 fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
+
+### Delta 2026-09-28 — El deck de la línea se compone entero desde el Artifact Composer
+
+- Las **69 láminas** aprobadas del deck (brochure y propuesta) tienen plantilla en el catálogo `graphic-line-deck` del
+  Artifact Composer y salen de un intent validado por el contrato `efeonce.surface-composition` 0.1.2 de AXIS
+  (`pnpm brand:compose`; un intent con `pages` compone el documento completo). TASK-1919, TASK-1927 y TASK-1928.
+- Dos decisiones de este ADR dejaron de depender de la revisión a ojo en el deck: **D1** (el acento nunca en texto de
+  menos de 24 px) la mide la auditoría renderizada del gate visual en todos los frames de La órbita, y la regla «respuesta
+  al menos 3× la pregunta» se mide en las láminas de decisión (cotización, clientes, plan y partners).
+- **D5** (logo dentro de la órbita en el cierre del deck) sigue abierto como pendiente de QA del catálogo: ninguna
+  contraportada aprobada lo lleva así; las aprobadas ponen el logo arriba de la columna.
+- Greenhouse fija `axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19, `axis-graphic-line` 0.7.0 y `axis-brand-assets` 0.3.5.
+  Spec técnica: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md); norma:
+  [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
 
 ## Alternativas descartadas
 

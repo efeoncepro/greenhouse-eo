@@ -26,15 +26,12 @@
 > — 2026-09-27 (`axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7, tag `v0.3.8`, contrato `efeonce.surface-composition`
 > 0.1.1; `src/lib/brand-surfaces`, `scripts/brand-surfaces/`, catálogos `graphic-line-*`).
 >
-> Contrato 0.1.2 en Greenhouse (TASK-1927): verificado contra el árbol local de `develop` — 2026-09-27
-> (`package.json`: `axis-tokens` 0.3.14, `axis-ui-contracts` 0.3.12, `axis-graphic-line` 0.7.0, `axis-brand-assets`
-> 0.3.5; `src/lib/brand-surfaces/recipes/{deck,frame}.ts`, `document.ts`, `registry.json` de `graphic-line-deck`).
-> Plantillas de las 38 recetas restantes (TASK-1928): verificado contra el árbol local de `develop` en `64be8aa16` —
-> 2026-09-27 (`package.json`: `axis-tokens` **0.3.20**, `axis-ui-contracts` **0.3.18**; builders
-> `src/lib/brand-surfaces/recipes/{proposal-service,method,close,proof,sections,content,kit}.ts`, `types.ts`,
-> `scripts/brand-surfaces/compose.ts`, `graphic-line-shared/resolvers.ts`, `graphic-line-deck/{index.ts,recipe-map.json}`).
-> Portada con selección (layout `document-selection` de `cover-brochure`): `package.json` fija `axis-tokens` **0.3.21**
-> y `axis-ui-contracts` **0.3.19** (tag `v0.3.21`, delta (l)) — 2026-09-28.
+> Deck completo de La órbita (TASK-1927 y TASK-1928, las dos `complete` y en `origin/develop`): verificado contra
+> `develop` el 2026-09-28 — `package.json` fija `axis-tokens` **0.3.21**, `axis-ui-contracts` **0.3.19** (tag
+> `v0.3.21`), `axis-graphic-line` 0.7.0 y `axis-brand-assets` 0.3.5; builders
+> `src/lib/brand-surfaces/recipes/{deck,frame,proposal-service,method,close,proof,sections,content,kit}.ts`,
+> `document.ts`, `types.ts`, `scripts/brand-surfaces/compose.ts`, `graphic-line-shared/{resolvers,rendered-audit}.ts`,
+> `graphic-line-deck/{index.ts,registry.json,recipe-map.json}` (50 plantillas, 69 recetas).
 > **Manda sobre las versiones que esta referencia cite más abajo para la composición por superficie.**
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
@@ -824,7 +821,7 @@ Ejemplos de intent en `docs/examples/graphic-line/` (`post-lens`, `deck-progress
 | `node scripts/creative/brand-motion/encode-orbit-motion.mjs --frames <dir> --sound <dir> --out <dir> [--only …]` | MP4 60/30 fps, GIF, ProRes 4444, WebM, HEVC, PNG por capas |
 | `pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]` (`scripts/brand-surfaces/compose.ts`, TASK-1919) | compone una receta **aprobada** por superficie en el Artifact Composer: exige receta aprobada → `resolveSurfaceComposition` (con `issues`, no compone) → builder de la receta → plan + assets (plate de `photo.plateRef` recortado, íconos `resolveIcon`, capas SVG de `paintGraphicLine`) → PDF (deck) o PNG (resto; capas de video con alfa). Salida por defecto `.captures/brand-surfaces/<id>/` más `<id>.surface-manifest.json`. Errores (`SurfacePieceError.code`): `recipe-not-approved`, `recipe-outside-composer` (`audiovisual.close-reveal`), `surface-issues` (lista los issues de AXIS), `recipe-without-template`, `missing-photo`, `invalid-intent`. Ejemplos por receta: `src/lib/brand-surfaces/examples/*-intent.json` |
 | `pnpm brand:tokens [--check]` (`scripts/brand-surfaces/compile-tokens.ts`) | compila `efeonceGraphicLine` a `graphic-line-tokens.{json,css}` de cada catálogo `graphic-line-*` y copia byte a byte los archivos de marca desde `axis-brand-assets`; `--check` falla si lo commiteado no coincide con la versión instalada |
-| `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 66 frames (desde TASK-1928; 32 tras TASK-1927) de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`; altas declaradas en `BASELINE_DELTAS.md`, secciones (f)…(l)) |
+| `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 66 frames (desde TASK-1928; 32 tras TASK-1927) de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`; altas declaradas en `BASELINE_DELTAS.md`: (b)–(e) de TASK-1927, (f) y (h)…(n) de TASK-1928; la (g) es Glitch; estas letras no son las del ADR de AXIS) |
 | `pnpm brand:deck-recipes [-- --check]` | reescribe (o verifica) el índice del README del catálogo de recetas del deck, con la columna «Plantilla» leída de `graphic-line-deck/registry.json` |
 
 **Documento (TASK-1927):** si el intent de `pnpm brand:compose` trae `pages`, compone un documento
@@ -846,8 +843,8 @@ catálogo exporta `createCatalog({ selectionPainter, ctaPainter })`: la pintura 
 consumidor (adaptador de Greenhouse sobre `efeonce.collaboration-selection`). Plantillas de capa declaran
 `render.background: 'transparent'`.
 
-**Deck completo (TASK-1928, 2026-09-27).** `graphic-line-deck` suma 34 plantillas: **las 69 recetas** del
-catálogo componen. La última, `cover-brochure-cine-lines-selection`, entró el 2026-09-28 sin plantilla nueva: contentType
+**Deck completo (TASK-1928, 2026-09-27/28).** `graphic-line-deck` suma 34 plantillas (50 en total): **las 69
+recetas** del catálogo componen. La última, `cover-brochure-cine-lines-selection`, entró el 2026-09-28 sin plantilla nueva: contentType
 `deck.cover-brochure.document-selection` sobre `CoverBrochure` (marca la respuesta con `data-gl-selection-target` y
 tiene un slot `selection` opcional; está en `TEMPLATES_WITH_SELECTION` de `graphic-line-deck/index.ts`), con el
 layout `document-selection` de AXIS `v0.3.21`. `recipe-map.json` ya no tiene recetas `blocked`. Tabla receta → `layout` → `contentType` en [applications.md §L](applications.md). Piezas nuevas:
@@ -859,7 +856,9 @@ layout `document-selection` de AXIS `v0.3.21`. `recipe-map.json` ya no tiene rec
   `yOfHeight` de 0 a 1, sólo cuando el intent declara `photo.focus`; sin él, recorte centrado).
 - **Resolvers** (`graphic-line-shared/resolvers.ts`): nuevos `gl-figure-size`, `gl-item-role`, `gl-align`; siguen
   `gl-current-stop`, `gl-label-side`, `gl-chosen-day`, `gl-chosen-time`, `gl-recommended`.
-- **Hooks del catálogo** (`graphic-line-deck/index.ts`): selección por ítem (`selection.item` / `selection.level`),
+- **Hooks del catálogo** (`graphic-line-deck/index.ts`): selección por ítem (slot `selection.item`, que el builder
+  llena desde `selected` del intent —en la cotización, desde `recommended`—, 1-based; marca `[data-gl-select-item]`) o por nivel (`selection.level` del intent;
+  marca `[data-gl-level-row]`),
   selección sobre la respuesta, cursor del lector (CTA) con hasta ocho manijas sobre un texto (sección de servicios) e
   indicador de progreso con su centro medido (sección a sangre, arriba a la izquierda).
 - **Paridad de slots receta ↔ plantilla:** `recipe-map.json` declara en `slots` el campo del `slots.json` donde vive

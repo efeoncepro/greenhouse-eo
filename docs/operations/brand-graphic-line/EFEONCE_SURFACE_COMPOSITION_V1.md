@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.7
+> **Versión:** 1.8
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude (1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-09-28 por Claude (1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -296,7 +296,9 @@ y `deck-proposal-document.json` (siete páginas interiores), en `src/lib/brand-s
   [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md), que debe aceptar también
   el intent de documento. Hoy `brand:compose` es el taller local.
 
-Componer no aprueba: la pieza sigue pasando la revisión de §4 y del manual de uso. Paso a paso y errores:
+Componer no aprueba: la pieza sigue pasando la revisión de §4 y del manual de uso. Arquitectura del lado Greenhouse
+(flujo, builders, assets, hooks, gates y cómo agregar una receta):
+[`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Paso a paso y errores:
 [manual de uso](../../manual-de-uso/creative/componer-por-superficie-con-axis.md). Gate visual:
 [runbook](../runbooks/composer-visual-gate.md) (`pnpm composer:visual-gate --catalog=graphic-line`: 66 frames a cero
 píxeles tras TASK-1928, un frame por receta nueva; altas y cambios declarados en
@@ -974,22 +976,21 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   `foto:prompt` (TASK-1918) y la ruta productiva de `brand:compose` (API, `artifact-worker`, MCP:
   [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md)). **Hechos el
   2026-09-27:** las 20 recetas aprobadas como catálogo del Artifact Composer (TASK-1919, §2.1) y el isotipo compuesto
-  sobre la prenda con `pnpm foto:isotipo` (TASK-1920). **Hechos con TASK-1927 (en `develop` local, sin publicar):** el
+  sobre la prenda con `pnpm foto:isotipo` (TASK-1920). **Hechos con TASK-1927 (en `origin/develop`):** el
   catálogo `graphic-line-deck` con 16 plantillas (§2.1), el documento completo con `pnpm brand:compose` y el gate visual
-  `graphic-line` con 32 frames a cero píxeles. **Hechos con TASK-1928 (en `develop` local, sin publicar):** las 38
+  `graphic-line` con 32 frames a cero píxeles. **Hechos con TASK-1928 (en `origin/develop`):** las 38
   recetas restantes del deck con plantilla (34 plantillas nuevas; el catálogo cubre 68 de 69 y, el 2026-09-28, 69 de 69), los assets `logo` y
   `painted` y el recorte `plate.focus` del compositor, la paridad de slots receta ↔ plantilla
   (`recipe-slot-parity.test.ts`) y el gate visual `graphic-line` con 66 frames a cero píxeles.
-- **TASK-1927: `complete`** (2026-09-27), con todo en `develop` local y **sin publicar** en el remoto. El operador dio
+- **TASK-1927: `complete`** (2026-09-27), con todo en `origin/develop` (empujado junto con TASK-1928). El operador dio
   la **aprobación visual** de las láminas compuestas ese día (las composiciones `hero` y `lines` y el brochure de nueve
   páginas). El estado de los gates se lee en la
   [task](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md). Con el cierre quedaron
   desbloqueadas [TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) y
-  [TASK-1929](../../tasks/to-do/TASK-1929-deck-plan-recipe-catalog-validator.md). **Quedó abierto:** la publicación en
-  `develop`; la ruta productiva gobernada, que debe aceptar también el intent de documento (TASK-1921); el control de
+  [TASK-1929](../../tasks/to-do/TASK-1929-deck-plan-recipe-catalog-validator.md). **Quedó abierto:** la ruta productiva gobernada, que debe aceptar también el intent de documento (TASK-1921); el control de
   foco de la sección partida, sin task (§4.6); la pregunta del barrido del indicador; y las diferencias conocidas
   contra los prototipos (§4.6). Las recetas restantes del deck las tomó TASK-1928.
-- **TASK-1928: `complete` (2026-09-28), en `develop`.** Las recetas de deck aprobadas componen desde el
+- **TASK-1928: `complete` (2026-09-28), en `origin/develop`.** Las recetas de deck aprobadas componen desde el
   catálogo `graphic-line-deck`: **69 de 69** (§2.1), con las decisiones de norma aplicadas (D1, 3×, cifras con fuente
   visible, sin logo ni velo en láminas interiores con foto, `[MONTO]`, contacto desde `EFEONCE_CONTACT`, burbuja URL en
   partners). El operador aprobó a ojo las seis familias y la portada con selección el 2026-09-28; `pnpm test` y
@@ -1013,6 +1014,8 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
 
 ## 8. Referencias
 
+- Spec técnica del lado Greenhouse (mapper, builders, catálogo, assets, hooks, gates y cómo agregar una receta):
+  [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
 - Manual de la línea: [`EFEONCE_GRAPHIC_LINE_V1.md`](./EFEONCE_GRAPHIC_LINE_V1.md) (§10.0 «Composición por
   superficie», §10.1, §13, §14).
 - Movimiento: [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) ·

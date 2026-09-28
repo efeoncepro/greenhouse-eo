@@ -344,7 +344,7 @@ provocador ES CONTRAPRODUCENTE** — refuerza el status quo, no lo rompes.
 
 ---
 
-## Fuentes internas: componer decks de marca propia en Greenhouse (2026-09-27)
+## Fuentes internas: componer decks de marca propia en Greenhouse (verificado 2026-09-28)
 
 No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y composition.md dicen sobre
 `pnpm brand:compose`. Si el código no coincide con la skill, manda el código y se corrige la skill.
@@ -352,14 +352,23 @@ No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y 
 - Task: `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` (contrato 0.1.2, marco
   de portadas y contraportadas, documento) y `docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md` (plantillas
   de las 38 recetas restantes y la portada con selección; `complete` el 2026-09-28, aprobada por el operador). Siguientes:
-  `docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md` (ruta productiva) y
-  `docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md` (plates).
+  `docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md` (ruta productiva; `in-progress`
+  en otra sesión, no está disponible), `docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md`
+  (plates) y, en `docs/tasks/to-do/`, TASK-1929 (plan de deck validado contra el catálogo), TASK-1930 (datos reales en
+  los slots), TASK-1931 (banco de plates gobernado) y TASK-1932 (Proposal Studio arma el deck desde recetas).
 - Código: `src/lib/brand-surfaces/recipes/deck.ts`, `frame.ts` y, desde TASK-1928, `proposal-service.ts`, `method.ts`,
   `close.ts`, `proof.ts`, `sections.ts`, `content.ts` (ayudas en `kit.ts`; todos registrados en
   `src/lib/brand-surfaces/index.ts`); `src/lib/brand-surfaces/document.ts`, `scripts/brand-surfaces/compose.ts`,
   `src/lib/artifact-composer/catalogs/graphic-line-deck/registry.json` y `recipe-map.json`, `src/config/efeonce-brand.ts`
   (`EFEONCE_CONTACT`). Paridad de slots: `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts`; rechazo por
-  largo: `src/lib/artifact-composer/validate.ts` (`overflow=reject`).
+  largo: `src/lib/artifact-composer/validate.ts` y `render.ts` (`overflow=reject`); códigos de error del mapper:
+  `SurfacePieceError` en `src/lib/brand-surfaces/types.ts`; hooks de selección, cursor del lector y selección por ítem
+  o nivel: `src/lib/artifact-composer/catalogs/graphic-line-deck/index.ts`; resolvers `gl-*`:
+  `graphic-line-shared/resolvers.ts`; auditoría renderizada D1 y 3×: `graphic-line-shared/rendered-audit.ts`.
+- Contrato AXIS (repo `axis-design-system`, sólo lectura desde aquí): tipo del intent y códigos de issue en
+  `packages/contracts/src/surface-composition.ts`; tokens `efeonceGraphicLine.surfaces.deck.recipes` en
+  `packages/tokens/src/tokens.ts`; ADR `docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md` (deltas (f)…(l) de
+  TASK-1928).
 - Ejemplos: `src/lib/brand-surfaces/examples/deck-*-intent.json`, `deck-brochure-document.json` y
   `deck-proposal-document.json`. La carpeta está vigilada por el snapshot de
   `src/lib/brand-surfaces/__tests__/example-plans.test.ts`: el intent de una pieza nueva va fuera de ella.
@@ -367,6 +376,7 @@ No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y 
   (`sectionSplit`) en `src/lib/brand-surfaces/recipes/deck.ts`.
 - Docs: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6,
   `docs/operations/brand-graphic-line/deck-recipes/README.md`,
-  `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (entradas 2026-09-27 b–e, (f)…(m) y 2026-09-28 (n)).
+  `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (entradas 2026-09-27 (b)–(e), (f) y (h)…(m) —la (g) es
+  Glitch— y 2026-09-28 (n)), runbook `docs/operations/runbooks/composer-visual-gate.md`.
 - Versiones: `package.json` (`@efeoncepro/axis-tokens` 0.3.21, `@efeoncepro/axis-ui-contracts` 0.3.19,
   `@efeoncepro/axis-graphic-line` 0.7.0, `@efeoncepro/axis-brand-assets` 0.3.5).

@@ -469,7 +469,7 @@ compilado hace que un catálogo nuevo declare **el suyo, una vez**.
 | Motor de composición | **Platform** | `src/lib/artifact-composer/**` (domain-free) |
 | Catálogo deck AXIS (16:9 → PDF) | Commercial | `catalogs/deck-axis/` |
 | Catálogo social (4:5 → PNG set) | Growth/Social | `catalogs/social-carousel/` |
-| Catálogos «La órbita» por superficie (deck PDF · fijos PNG · capas con alfa) | Brand (marca propia Efeonce) | `catalogs/graphic-line-{deck,stills,overlays}/` + `graphic-line-shared/`; mapper `src/lib/brand-surfaces` (TASK-1919) |
+| Catálogos «La órbita» por superficie (deck PDF · fijos PNG · capas con alfa) | Brand (marca propia Efeonce) | `catalogs/graphic-line-{deck,stills,overlays}/` + `graphic-line-shared/`; mapper `src/lib/brand-surfaces` (TASK-1919, TASK-1927, TASK-1928). Spec: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) |
 | Tokens de marca | **Brand-pack SoT declarado** | `deck-axis`: Figma PPT `33:2` → CSS custom props generado; `axis-tokens.ts` queda como mirror UI con crosswalk exacto |
 | Aggregate de la oferta | Commercial | `greenhouse_commercial.proposals` (`origin`) |
 | Precio | **quote-to-cash** | `src/lib/commercial/quote-to-cash/**` — el Proposal **no** calcula |
@@ -532,6 +532,26 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 > `pnpm brand:compose` acepta un intent de documento (`pages`) y entrega un PDF multipágina con manifest y
 > procedencia (`planSurfaceDocument`, `src/lib/brand-surfaces/document.ts`). Los conteos de arriba son los de
 > TASK-1919. Task: `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`.
+>
+> **Delta 2026-09-28 (TASK-1928) — las 69 recetas del deck componen, sin tocar el motor.** `graphic-line-deck` pasa de
+> 16 a **50 plantillas** (34 nuevas) y cubre las **69 de 69** recetas aprobadas del deck; comparten plantilla las cuatro
+> propuestas sobrias (`ProposalService`), las secciones de cine de equipo y servicios (`SectionCine`) y las portadas de
+> brochure, incluida la que lleva la selección de Nexa (`CoverBrochure` con `deck.cover-brochure.document-selection`,
+> AXIS `v0.3.21`). Otra vez, todo lo nuevo entró como **dato del catálogo** y del consumidor:
+>
+> - **Catálogo:** `recipe-map.json` (receta → `contentType`, ejemplo y mapa de slots) con su test de paridad receta ↔
+>   plantilla; resolvers nuevos `gl-align`, `gl-item-role` y `gl-figure-size`; hooks nuevos de selección por ítem o
+>   nivel (`selection.item` / `selection.level`), aire por línea (`textPad: 'per-line'`), cursores extra sobre el mismo
+>   objetivo y cursor del lector con ocho manijas sobre texto. CSS acotado por el prefijo de cada familia.
+> - **Consumidor:** assets externos `logo` (logo de tercero normalizado) y `painted` (capa del motor de la línea gráfica
+>   con la foto adentro), y recorte dirigido del plate (`photo.focus`), materializados por `scripts/brand-surfaces/compose.ts`.
+> - **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` queda en **66 frames a 0 px** (50 del deck, 9 de stills,
+>   7 de overlays) y suma una auditoría renderizada (D1: acento nunca en texto < 24 px; 3×: respuesta ≥ 3× la pregunta
+>   en cotización, clientes, plan y partners). El scope `--catalog=glitch` (TASK-1923) tiene 26 frames a 0 px.
+> - AXIS fijado en `axis-tokens` 0.3.21 / `axis-ui-contracts` 0.3.19. La ruta productiva sigue en TASK-1921 (en curso).
+>
+> Spec técnica vigente del lado Greenhouse: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
+> Task: `docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md`.
 
 ---
 

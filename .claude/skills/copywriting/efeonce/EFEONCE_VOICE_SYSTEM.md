@@ -86,6 +86,8 @@ escribe sin punto en el dato; el punto lo pone la esfera) y mide ≥ 3× la preg
 palabra en negrita. Estos pares están **aprobados por el operador** dentro de su pieza; fuera de ella vuelven a ser
 candidatos. Fuente exacta: `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json`
 (slots `question` / `answer`) y `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6.
+**Única excepción al largo** (TASK-1928, `voice.maxWords` por receta en AXIS): `decision-testimonial` cita al cliente
+textual y admite hasta seis palabras; el resto de las recetas sigue en tres.
 
 **Portadas y cierres (2026-09-27):** ¿Qué hace Efeonce? **Crecer.** (brochure general y sección de servicios) ·
 ¿Cómo crecemos en 2027? **Con foco.** (propuesta; evidencia «Preparada para **[Cliente]** · Confidencial») ·

@@ -55,7 +55,7 @@
 | 2026-09-27 | **Las 69 láminas del deck aprobadas, con receta por lámina** (canvas por superficie, página Deck): todo lo que era opción, prueba u «opción sin elegir» pasa a aprobado (lente, sangre, partida, foco, respiro, hoja de contactos, secciones de cine, las tres portadas generales del brochure y la de cinco líneas con selección y cursor de Nexa). **Tríptico:** una palabra por toma, cada una con su esfera («Escucha.» «Crea.» «Mide.»), reemplaza la frase única. **Sección partida:** el indicador sube por la **izquierda** con la esfera arriba a la izquierda, en tres variantes (esquina arriba, esquina abajo, panel a la derecha); la órbita a la derecha, descartada. **Registro cine:** excepción aprobada para las láminas de sección y «about» («Quiénes somos», «Por qué lo hacemos»), sin ampliar a otras superficies. **Cotización** en tres variantes (tabla, escena, en vivo; `[MONTO]`); **día a día** con cuatro momentos, herramientas y dos «vívelo»; **próximos pasos** con la agenda abierta (reemplaza tres columnas); **clientes** en un tono navy (Aguas Andinas y UC Temuco en tonos de navy); **caso Sky** con foto de ejemplo a reemplazar; **BeX:** la escalera es la principal. Catálogo: `docs/operations/brand-graphic-line/deck-recipes/` (JSON `efeonce.deck-slide-recipes.v1`, `pnpm brand:deck-recipes`); norma §4.6 «Recetas por lámina» y delta (c). AXIS (tokens, recetas, `cine-requires-nexa-or-proposal`) y las plantillas del composer se sincronizan en TASK-1927; pendientes de QA en el README del catálogo. |
 | 2026-09-27 | **Glitch: música aprobada, sólo Glitch** (tema B: intro, cortina y salida; cama post-punk bajo la noticia): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». Reemplaza la decisión «voz sola bajo las noticias» del sonido. Másteres en el bucket `glitch/music/v1/` (URL + sha256, nunca regenerados); integrada al taller (`tools/glitch-motion/src/music.mjs`, pre-roll animado de la intro elegido por el operador, `--music off`); en producción en AXIS (`/references/glitch/#musica`, `glitch.json → music`, commit `87c3298`). Único pendiente: probar la mezcla con la voz real del host. Detalle: [glitch.md](glitch.md) §13.7. |
 | 2026-09-27 | **Glitch: motion y sonido aprobados, sólo Glitch.** Motion (apertura y tarjeta final v2, kit de overlays con el lower third de la órbita, transición de bytes entre piezas y entre escenas, héroe): «Si, el tuyo también está aprobado». Diseño sonoro **versión B**: «La b me encanta más» / «Sus sonidos están aprobados» (la A queda descartada, sólo con `--sound a`). Pre-roll de la intro «los tres puntos al ritmo» (3,2 s, opaco, empalme PSNR ∞ con la apertura), elegido por el operador. Todo se produce en el taller `efeoncepro/efeonce-brand-workshop` (`tools/glitch-motion`, HyperFrames; sonido en `src/sound.mjs` sobre `tools/brand-sound`; música en `src/music.mjs`), empujado a `main` = `ed89a0b`. Verificado: v2 37/37, kit 95/95, 12/12 pruebas. Detalle: [glitch.md](glitch.md) §12–§13; comandos: norma de Glitch §13.13. |
-| 2026-09-27 | **Deck compuesto: aprobación visual del operador (TASK-1927).** El operador aprobó a ojo las láminas compuestas con `pnpm brand:compose`: las composiciones `hero` y `lines` de `proposal-cinematic` y el brochure de nueve páginas. Con esa aprobación TASK-1927 quedó `complete` (en `develop` local, sin push). Las portadas y contraportadas aprobadas ese día ya tienen receta del contrato y plantilla (`cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`); `cover-classic` y `close-classic` **no** están aprobadas. Detalle: `applications.md` §L, «Componer el deck hoy». |
+| 2026-09-27 | **Deck compuesto: aprobación visual del operador (TASK-1927).** El operador aprobó a ojo las láminas compuestas con `pnpm brand:compose`: las composiciones `hero` y `lines` de `proposal-cinematic` y el brochure de nueve páginas. Con esa aprobación TASK-1927 quedó `complete` (empujada después a `origin/develop`). Las portadas y contraportadas aprobadas ese día ya tienen receta del contrato y plantilla (`cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`); `cover-classic` y `close-classic` **no** están aprobadas. Detalle: `applications.md` §L, «Componer el deck hoy». |
 | 2026-09-28 | **Selección en la portada de brochure (relaja «sin selección en `cover-brochure`»).** El operador relajó la regla para la portada de cinco líneas con Nexa (`cover-brochure-cine-lines-selection`). AXIS `v0.3.21` (`axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19; delta (l) del ADR de composición por superficie) suma a `cover-brochure` el layout `document-selection`: la misma columna y foto que `document`, selección de ocho tiradores sobre la respuesta («Crecer.»), **nunca sobre la persona**, y un solo cursor colaborador «Nexa» abajo al final (escala 1.1, sin overlay); la respuesta baja 28 px (`column.answerWithSelectionExtraPx`), la evidencia queda 130 px debajo (`bodyBelowAnswerPx.withSelection`) y el logo arriba en 200. `document` y `line` siguen rechazando la selección (`selection-not-in-recipe`). Greenhouse la compone como `deck.cover-brochure.document-selection` sobre la misma plantilla `CoverBrochure`: **69 de 69** recetas del deck componen. Como la portada de cinco líneas de TASK-1927, firma con el logo y no lleva burbuja URL. |
 
 ## Pendientes del operador (no decidir por tu cuenta)
@@ -131,8 +131,9 @@
   release y no cambió por D26). Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 
 - Contrato 0.1.2 en Greenhouse (TASK-1927, 2026-09-27): **hecho; la task está `complete`**
-  (`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`), con todo en `develop` local y
-  **sin push**. Los gates se leen en la task. TASK-1928 y TASK-1929 quedaron desbloqueadas. Hecho: Greenhouse fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12; `pnpm brand:compose`
+  (`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`), en `origin/develop`. Los
+  gates se leen en la task. Hecho: Greenhouse fijó `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12 (hoy 0.3.21 y
+  0.3.19, fila siguiente); `pnpm brand:compose`
   compone `proposal-cinematic` en `service`, `hero` y `lines`, la sección partida por la izquierda en tres
   composiciones, el tríptico de una palabra por toma, y el marco aprobado (`cover-brochure`, `cover-proposal`,
   `close-brochure`, `close-proposal`); compone documentos (`pages`) en un PDF con manifest y procedencia
@@ -140,17 +141,17 @@
   `cover-classic` y `close-classic` no entran (no aprobadas; `supersededBy` en AXIS), ni
   `cover-brochure-cine-lines-selection` (en ese momento el contrato no admitía selección en esa portada; compone desde
   el 2026-09-28 con el layout `document-selection`). **Aprobado a ojo por el operador** (2026-09-27).
-  **Pendiente:** el push a `develop`; las 38 recetas restantes del deck (TASK-1928, ya con plantilla: fila siguiente); la ruta productiva, que debe aceptar también el intent de documento
-  (TASK-1921); plates idempotentes (TASK-1926); el control de foco de la sección partida (el builder `sectionSplit` no
+  **Pendiente:** la ruta productiva, que debe aceptar también el intent de documento (TASK-1921, `in-progress` en otra
+  sesión); plates idempotentes (TASK-1926); el control de foco de la sección partida (el builder `sectionSplit` no
   lee `photo.focus`; exige un cambio en AXIS y otro en Greenhouse, y **no tiene task**). Diferencias conocidas contra los prototipos: tamaño de «Cuando
   quieras.», burbuja URL horneada, caja de selección unos píxeles más ajustada.
 - Plantillas de las 38 recetas restantes (TASK-1928, 2026-09-27): **`complete` el 2026-09-28**, aprobada por el operador,
   con `pnpm test` y `pnpm build` verdes y empujada a `develop`. Hecho: 34
-  plantillas nuevas en `graphic-line-deck` (dos recetas comparten `SectionCine`, cuatro comparten `ProposalService`):
-  **68 de 69 recetas componían** con `axis-tokens` 0.3.20 y `axis-ui-contracts` 0.3.18; el 2026-09-28 entró la portada
-  con selección (**69 de 69**, sin plantilla nueva: 50 en total) y Greenhouse fija `axis-tokens` 0.3.21 y
-  `axis-ui-contracts` 0.3.19; gate `--catalog=graphic-line` con 66 frames a 0 px (deltas (f)…(m) en
-  `BASELINE_DELTAS.md`, y (n) con el frame `CoverBrochure` re-promovido). Decisiones de norma
+  plantillas nuevas en `graphic-line-deck` (dos recetas comparten `SectionCine`, cuatro comparten `ProposalService`)
+  para las 38 recetas restantes, y el 2026-09-28 la portada con selección sobre `CoverBrochure` (sin plantilla nueva):
+  **69 de 69 recetas componen con 50 plantillas**. Greenhouse fija `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19;
+  gate `--catalog=graphic-line` con 66 frames a 0 px (entradas (f) y (h)…(m) de `BASELINE_DELTAS.md` —la (g) es
+  Glitch— y (n) con el frame `CoverBrochure` re-promovido). Decisiones de norma
   aplicadas sobre las referencias aprobadas (no son decisiones nuevas del operador):
   - **D1**, el acento nunca en texto de menos de 24 px: «Recomendado», cabecera de la cotización en vivo, «01 ·
     Diagnóstico · Sin costo», rol del interlocutor, rótulos de los pilares de «por qué lo hacemos», «Revisamos contigo»
@@ -167,9 +168,9 @@
     Andinas y la UC de Temuco; las barras del gráfico salen de su número (índice, antes = 100); el stack no pinta los
     «pilares de luz» del guion (en la referencia aprobada nunca se vieron).
   **Pendiente:** nada de TASK-1928; siguen TASK-1929…1932 y la ruta productiva (TASK-1921).
-- Composición por superficie en Greenhouse (TASK-1919): **hecho, local en `develop`** — las 20 recetas aprobadas son
+- Composición por superficie en Greenhouse (TASK-1919): **hecho, en `origin/develop`** — las 20 recetas aprobadas son
   plantillas del Artifact Composer (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`), `pnpm
-  brand:compose` y gate `--catalog=graphic-line` a 0 px. Falta la ruta productiva (TASK-1921: API, `artifact-worker`,
+  brand:compose` y gate `--catalog=graphic-line` a 0 px. Falta la ruta productiva (TASK-1921, `in-progress` en otra sesión: API, `artifact-worker`,
   MCP) y cinco preguntas del operador: lente del caminero (token 0,70 vs ≈0,77 en la lámina), super de dato con arco
   completo o estela canónica, burbuja URL en sección/contenido/tríptico (se siguió la lámina, sin burbuja), gris del
   descriptor/bajada web sin token y paleta 20 % vs 35 %.
