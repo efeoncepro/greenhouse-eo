@@ -40,7 +40,7 @@ EE. UU. impedían declarar qué se midió.
    una réplica de la experiencia de cada usuario final. Hash request v2 incluye país y locale.
 8. Reports distinguen solicitados, intentados y respondidos; éxito sin citas no significa cero
    visibilidad de marca ni citas inventadas. Matriz sin promedio (`blendedOverall: null`). Tendencias
-   sólo dentro del mismo mercado y policy; pack distinto se declara incomparable. Cambio de set
+   sólo dentro del mismo mercado, categoría declarada y policy; pack distinto se declara incomparable. Cambio de set
    elimina delta competitivo y overall, preservando dimensiones independientes.
 9. Regrade por mercado con weekly/monthly/quarterly; compatibilidad del principal sincronizada con
    los campos legacy. SEO cruza por país+idioma del target; no toma el último run de otro país.
@@ -83,3 +83,13 @@ Múltiples perfiles activos por organización se conservan: no prueban duplicida
 La unicidad del nuevo modelo es por perfil/país/locale; el reader organizacional mantiene su selección
 legacy y sus mercados nuevos. La transición de perfiles entre países requiere correspondencia confirmada,
 sin reasignar runs ni competidores por inferencia. DDL de compatibilidad `20260928095058691`.
+
+## Entradas y marcas (2026-09-28)
+
+La resolución de categoría, arquetipo, país e idioma es común en `buildExecuteInput`, tanto para
+inline como para enqueue. Un modelo de negocio explícito prevalece; si la entrada legacy no lo
+trae, el clasificador canónico deriva el prior de la categoría resuelta. Una clasificación ambigua
+no se convierte en agencia. Se conserva el gate de categoría y los flags de transición existentes.
+La corrección de datos de Efeonce no es un default ni una excepción en código para esa marca.
+Operador/portal/recurrencia usan batches; formularios y API directa usan el mismo command. La futura
+exposición MCP de TASK-1861 debe consumir ese contrato, sin duplicar generación ni ejecución.

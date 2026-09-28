@@ -1,6 +1,7 @@
 # TASK-1863 — evidencia de implementación y límites de rollout
 
-Fecha: 2026-09-28. Checkout develop compartido. Sin commit, push, deploy ni flags externos modificados.
+Fecha: 2026-09-28. Checkout develop compartido. Implementación publicada en staging; main en espera.
+Las secciones locales documentan la fase previa. El estado vigente está en «Rollout staging autorizado».
 
 ## Google AI Mode: evidencia directa
 
@@ -41,20 +42,13 @@ Fuentes de contrato: [AI Mode Live Advanced](https://docs.dataforseo.com/v3/serp
   sin recorte. Artifact local `.captures/task-1863-report-proof/report.pdf` y `cover.png`.
   Es prueba del renderizador del PDF y copy compartido; no certifica navegación de un portal desplegado.
 
-## Esquema, datos y runtime pendientes
+## Esquema y datos
 
-Lectura directa compartida: 27 perfiles activos con país/locale resolubles; una organización tiene cuatro
-perfiles activos. El [manual](../../manual-de-uso/growth/configurar-mercados-aeo.md) contiene ids exactos,
-perfil retenido y script dry-run/apply con allowlist. Dry-run ejecutado; **apply no ejecutado**.
+El DDL aditivo y la compatibilidad legacy están aplicados; 27 perfiles tienen principal tras el backfill.
+Los cuatro perfiles Efeonce siguen activos. El contract destructivo sigue parqueado y no se aplica
+antes de main. No se reescribió la geografía histórica ni se consumió la cuota de Sky.
 
-Las dos migraciones están parqueadas fuera del runner, en `docs/tasks/pending-migrations/`,
-según el contrato de tooling; el manual define responsable y condición de reactivación.
-No se aplicaron las dos migraciones ni backfill en la instancia compartida. No se configuraron los seis
-mercados de Sky ni se consumió su cuota. No se activó multimer­cado fuera del proceso de prueba local.
-Las columnas legacy siguen vigentes como espejo: su retiro es un contract posterior con condición explícita.
-No se declara TASK-1863 complete hasta el readback de rollout y el lote cliente de aceptación.
-
-## QA final
+## QA local
 
 - Typecheck final PASS, lint del alcance PASS; formato del archivo generado DB preservado (66 líneas aditivas).
 - PostgreSQL efímero recreado después de interrupción: Up/Down/Up y 11 tests transaccionales PASS.
@@ -67,9 +61,9 @@ No se declara TASK-1863 complete hasta el readback de rollout y el lote cliente 
   se conserva el ADR temático y no se mezcla una reestructuración documental global.
 - Suite general `vitest --project unit --maxWorkers=4`: **1.852 archivos PASS, 2 omitidos; 15.886 tests PASS,
   33 omitidos, cero fallos** (350,45 s). Matriz y refuerzo legacy se verificaron además en la ronda enfocada.
-- Lint global ejecutado: 3 errores de formato en `scripts/dataforseo/generate-catalog.ts`, archivo nuevo
-  de trabajo concurrente fuera de TASK-1863, y 26 warnings de contraste existentes. No se declara lint
-  global verde; lint del alcance TASK-1863 sí PASS. Se preserva el WIP ajeno.
+- El lint global inicial detectó formato en WIP DataForSEO concurrente; el operador pidió corregirlo.
+  Autofix aplicado y comprobado: `pnpm exec eslint scripts/dataforseo src/lib/ai`, 0 errores.
+  Pre-push compartido final PASS: lint global 0 errores/26 warnings existentes y TypeScript PASS.
 - Build final de producción PASS (exit 0): compilación, TypeScript, páginas y rutas. El wrapper
   restauró tsconfig.json; `git diff --check` PASS. Logs locales en `.captures/task-1863-qa/`.
 
@@ -78,12 +72,9 @@ se verifica con el harness efímero y se deja el canary de rollout sin tildar.
 
 ## Veredicto
 
-**Code complete; rollout pendiente.** La entrega local satisface catálogo/localización, país nativo,
-Google AI Mode, configuración gobernada, snapshots/legacy, lotes y reservas atómicas, autoría/regrade,
-matriz/tendencias, copy de cobertura y documentación. La suite unit general, PostgreSQL efímero,
-canaries de proveedor y build son evidencia complementaria; ninguno sustituye el canary de cliente.
-El lint global del checkout queda señalado por trabajo concurrente ajeno; no se declara CI global verde.
-Sin commit, push, deploy, cambios de flags externos, migración compartida ni reescritura histórica.
+**Staging desplegado; aceptación runtime en curso; main en espera.** La entrega local satisface catálogo,
+localización, ubicación nativa, Google AI Mode, snapshots, lotes, matriz y documentación. La task sigue
+in-progress: el canary cliente y la aceptación Sky/BR se registran por separado.
 
 ## Rollout staging autorizado (2026-09-28)
 
@@ -96,3 +87,83 @@ las filas legacy registran CL y no se reasignan por inferencia. Evidencia en `ev
 Lint de `scripts/dataforseo` y `src/lib/ai`: 0 errores tras autofix solicitado por el operador.
 Compatibilidad de nombres de un carácter preservada (fixture legacy y marcas como X), con word boundaries
 y prueba dedicada. El backfill usa el mismo cliente transaccional para leer cada perfil.
+
+### Publicación y configuración verificadas
+
+- Commits de implementación `ddcf2ca4e`, compatibilidad `eabd3a29d` y contexto `6d25fac68` en develop remoto.
+- Vercel staging READY: `dpl_FxC9XctgFsRB1S4tzBiksQGzYhzY`, SHA `6d25fac68`.
+- Ops Worker Deploy [36406811838](https://github.com/efeoncepro/greenhouse-eo/actions/runs/36406811838): success.
+  Revisión `ops-worker-00730-jdk`, Ready/RoutesReady/ConfigurationsReady=True, tráfico 100%, SHA `eabd3a29d`.
+- Flag multimer­cado ON sólo en custom environment staging; producción sin habilitar. Worker compartido
+  conserva OFF para recurrencia secundaria mientras main usa el writer anterior; ejecuta los lotes explícitos.
+- Main leído directamente: `92002873ced9508433e9c6d56000417a9193886b`, igual al preflight.
+- Cuatro mercados Efeonce creados por API autenticada staging: CL/es-CL, CO/es-CO, PE/es-PE y MX/es-MX.
+  CL conserva cuatro competidores; los otros sets esperan confirmación de correspondencia, no se infieren.
+
+### Corrección de categoría solicitada por el operador
+
+Efeonce es agencia de marketing, creatividad, SEO y RevOps. El perfil `EO-GAVP-0020` tenía categoría
+legacy “Growth Operating System”. Se corrigió mediante reconciliación transaccional auditada a
+`sector:marketing_services` (resolución canónica taxonomy_alias), conservando el modelo B2B.
+La descripción explícita conserva marketing, creatividad, SEO y RevOps.
+
+El primer lote `EO-GRBT-00001` fue sustituido: runs 58/59/60 aún pending se cerraron como failed antes
+de gastar; run 57 ya running conserva sus snapshots/evidencia original. No representa la categoría corregida.
+El lote corregido `EO-GRBT-00002` contiene runs 61–64, cuatro mercados, techo agregado USD 2.
+Repetir el POST devuelve los mismos cuatro IDs con `idempotentHit:true`. Su resultado final se registra abajo.
+
+### Hallazgo del recorrido completo: reader de tendencias
+
+Los modelos terminaron y los scores se persistieron, pero el reader de informe devolvió 500.
+PostgreSQL confirmó `42601: subquery must return only one column` en la comparación de mercado/locale/policy.
+La corrección usa `ROW(...)` y excluye también categorías distintas para que el canary anterior no
+contamine tendencias. Regresión sobre PostgreSQL efímero: 12 pruebas PASS, incluida exclusión de otro
+país, policy y categoría. Lectura contra el run real corregida; publicación `c5902e929` en curso.
+Se recuperarán informes desde las observaciones ya persistidas, sin nuevas llamadas a proveedores.
+CI de implementación `36406811777`: success.
+
+### Resultado del lote corregido
+
+`EO-GRBT-00002`: CL/CO/MX/PE succeeded, 24 observaciones válidas por país (**96/96**, cero fallos),
+incluidas 6 de Google AI Mode por país (**24/24**, geo nativa correcta). Cuatro scores persistidos.
+Costo estimado total USD **1,0983**; techo agregado USD 2. El lote previo consumió USD 0,2515
+en su única corrida iniciada; las otras tres se detuvieron con costo cero.
+
+Recuperación mediante `finalizeRunDelivery` canónico: cuatro informes `ready`, sin repetir proveedores.
+Se respetó el gate de publicación (ready en los cuatro); los runs de operador no tienen lead para email.
+Ver [canary](evidence/task-1863/canary-runtime.json), [recuperación](evidence/task-1863/delivery-recovery.json)
+y [lote sustituido](evidence/task-1863/superseded-batch.json). Reader y matriz verificados por API autenticada en Vercel `c5902e929`: HTTP 200, cuatro informes ready,
+ubicación por proveedor y `blendedOverall:null`. [Readback](evidence/task-1863/staging-matrix-readback.json).
+
+### Universalidad: marcas y entradas
+
+El caso Efeonce sólo configura datos de ese tenant. Catálogo, snapshots, country/locale, adapters,
+scoring y reader de tendencias viven en componentes comunes, sin IDs ni nombres de Efeonce en runtime.
+Se reforzó `buildExecuteInput`: las entradas antiguas sin `businessModel` usan el clasificador existente
+sobre su categoría resuelta. Un modelo explícito, incluido unknown, tiene prioridad; nunca se infiere
+agencia por el nombre de la marca. Categoría no resuelta permanece bloqueada antes del gasto.
+
+Regresión: **71 pruebas PASS** en 8 archivos. Incluye seis tipos de marca (aerolínea/retail/SaaS/marketplace/
+institución/agencia) × 23 países × 4 idiomas (**552 combinaciones**), paridad inline/async, entradas
+públicas y proyección Forms, request de operador/portal, motor y matriz. No se crearon marcas cliente
+ni se consumieron cuotas para esta prueba.
+
+Rutas vigentes: operador y portal → request-run → run-batch → commands; formulario legado, API directa
+y proyecciones Forms → commands; recurrencia → run-batch; worker consume prompts/snapshot persistidos.
+La exposición MCP multimer­cado corresponde a TASK-1861 y debe consumir estos mismos commands; no se
+declara desplegada una tool nueva en TASK-1863. Refuerzo universal preparado para publicación en staging.
+
+### Readback final y límite de publicación
+
+Corrección de informes `c5902e929` publicada: Vercel staging READY (`dpl_mcxg5ELouDWDTXT3eExSPkR5nGmL`),
+API matriz/lote HTTP 200; worker `ops-worker-00731-75p` Ready=True, 100% del tráfico, mismo GIT_SHA.
+Main sigue en `92002873ced9508433e9c6d56000417a9193886b`.
+
+El refuerzo universal `f7d2578a5` está committeado localmente, 71 tests y TypeScript PASS. El push
+arrastraría `fd9a84375` (CLI DataForSEO) y `537087332` (docs de marca), de sesiones paralelas todavía
+no publicadas. Se pidió al operador decidir entre incluirlos en staging o esperar a sus sesiones;
+no se crea checkout aislado ni se publica trabajo paralelo sin esa decisión.
+
+Control de contexto del SHA c5902e929: falló por Handoff de ~12.026 tokens frente al límite de 12.000.
+El resumen propio de TASK-1863 está reducido en el checkout compartido; se preservan las compactaciones
+concurrentes ajenas sin incluirlas en el commit de esta task. No se declara toda la CI nueva verde.

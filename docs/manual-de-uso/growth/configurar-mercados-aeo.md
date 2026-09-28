@@ -2,9 +2,10 @@
 
 ## Estado y límites
 
-TASK-1863 está en rollout autorizado a staging; `main` permanece en espera. Las dos migraciones
-aditivas/compatibilidad ya se aplicaron a PostgreSQL compartido. Verifica la evidencia de rollout antes
-de ejecutar lotes. El worker y PostgreSQL son compartidos entre ambientes.
+TASK-1863 está desplegada en staging; `main` permanece en espera. Las dos migraciones y el backfill
+de 27 perfiles están aplicados. Vercel staging tiene multimer­cado ON; ops-worker compartido conserva
+OFF para no activar recurrencia secundaria antes de main. Ejecuta los lotes explícitos de staging.
+El worker y PostgreSQL son compartidos entre ambientes; consulta la auditoría para el canary vigente.
 Configurar un país no concede derechos de servicio. No se usa el formulario público para lotes.
 
 ## API y commands
@@ -43,7 +44,7 @@ El portal conserva POST `/api/client-portal/growth/ai-visibility/run`: body opci
    cambiar la selección con esa clave produce conflicto. Revisa costo total y derechos de servicio.
 5. Lee el progreso y la matriz. Un lote parcial conserva los resultados válidos y muestra los faltantes.
 
-## Rollout preparado
+## Secuencia de rollout y continuidad
 
 1. Revalidar `pnpm pg:doctor`, migraciones pendientes y ausencia de runs pending/running antes del
    cambio de policy. No mezclar observaciones legacy con una policy nueva en un run en curso.
@@ -85,3 +86,24 @@ Ambas fueron aplicadas a la instancia compartida el 2026-09-28. El retiro de col
 fuera del runner en `TASK-1863-primary-profile-contract.sql.pending`; no aplicar antes de main.
 Los perfiles antiguos mantienen su estado activo, competidores y vínculo de runs; no asignarles países
 nuevos por inferencia. Las configuraciones nuevas CL/CO/PE/MX se operan por el command de mercados.
+
+## Efeonce: identidad y mercados
+
+Efeonce es una agencia de marketing con servicios creativos, SEO y RevOps. El perfil operativo
+`EO-GAVP-0020` usa `sector:marketing_services`; `b2b_service_provider` clasifica el comprador.
+“Growth Operating System” no es la categoría competitiva de esta medición. La corrección del operador
+fue auditada; snapshots de corridas anteriores conservan su categoría original.
+
+Los cuatro perfiles legacy siguen activos. El perfil operativo tiene CL/es-CL, CO/es-CO, PE/es-PE y
+MX/es-MX. Los competidores de CL se conservaron; los demás sets quedan vacíos hasta confirmación,
+porque los perfiles anteriores no identificaban inequívocamente su país. No asignarlos por orden.
+
+## Otras marcas y puntos de entrada
+
+La capacidad aplica a cualquier marca con categoría resoluble y permisos vigentes. No copies la
+categoría ni los competidores de Efeonce a otros perfiles. Los arquetipos distinguen consumo, retail,
+SaaS, marketplace, institución y servicios B2B; un modelo explícito se conserva. Las entradas antiguas
+sin modelo usan el clasificador de su categoría en el command común; si la categoría no puede
+resolverse, el gate detiene la medición antes del gasto. País sin soporte Google produce skip explícito.
+Operador, portal, formulario, API y recurrencia convergen en los mismos comandos; el worker ejecuta
+el contexto persistido. La tool multimer­cado MCP sigue bajo TASK-1861, sin una implementación paralela.

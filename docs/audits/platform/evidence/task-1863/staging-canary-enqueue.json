@@ -1,0 +1,36 @@
+{
+  "batchId": "grbt-4dde910c-a6ec-4ad2-9cde-44bfef26f46e",
+  "publicId": "EO-GRBT-00002",
+  "idempotentHit": true,
+  "runs": [
+    {
+      "runId": "grun-e7236640-99fc-4b71-807b-d83f4a78a825",
+      "publicId": "EO-GRUN-00061",
+      "country": "CL",
+      "locale": "es-CL",
+      "status": "running"
+    },
+    {
+      "runId": "grun-5d9f5ef5-1c03-430b-98ff-1b8616ca7981",
+      "publicId": "EO-GRUN-00064",
+      "country": "PE",
+      "locale": "es-PE",
+      "status": "pending"
+    },
+    {
+      "runId": "grun-7704cf62-4b8e-4670-ac44-d37aef5832e0",
+      "publicId": "EO-GRUN-00063",
+      "country": "MX",
+      "locale": "es-MX",
+      "status": "pending"
+    },
+    {
+      "runId": "grun-7f1451b4-626c-46b8-99c0-2bf75aef1849",
+      "publicId": "EO-GRUN-00062",
+      "country": "CO",
+      "locale": "es-CO",
+      "status": "pending"
+    }
+  ],
+  "tier": "operator"
+}

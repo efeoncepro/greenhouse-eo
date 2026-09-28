@@ -3,9 +3,9 @@
 ## Autorización y objetivo
 
 28-09-2026: Julio confirmó el goal y pidió resolver la capacidad multidioma completa, incluido EE. UU.
-Se ejecuta en develop compartido sin subagentes, push, deploy, cambios de flags externos ni reescritura
-de runs históricos. El resultado local se declara `code complete, rollout pendiente` hasta aplicar y
-verificar migraciones/backfill, publicar runtimes y ejecutar canaries autorizados. No cerrar la task antes.
+Se ejecuta en develop compartido, sin subagentes ni checkouts aislados. El operador autorizó después
+push y despliegue a staging, DDL/backfill y canary; `main` permanece en espera. Vercel y ops-worker
+publicados, backfill de 27 perfiles aplicado. Conservar históricos y cuatro perfiles Efeonce activos.
 
 ## Audit
 
@@ -57,8 +57,11 @@ mutación externa no autorizada o conflicto real con trabajo ajeno.
 
 - [x] Hook, scope y lectura de task.
 - [x] Auditoría de raíz y documentación oficial AI Mode.
-- [x] Slices 1–8 implementados y verificados localmente; ver auditoría para lint global ajeno y rollout pendiente.
-- [ ] Rollout runtime (separado; sin autorización de deploy en este goal).
+- [x] Slices 1–8 implementados y verificados localmente; ver auditoría para evidencia local y runtime.
+- [x] DDL/backfill, publicación Vercel staging + worker y flags verificados.
+- [x] Canary Efeonce CL/CO/PE/MX: 96/96 respuestas, cuatro scores e informes ready; matriz staging HTTP 200.
+- [ ] Publicar refuerzo universal f7d2578a5 (71 pruebas/552 combinaciones); commits paralelos requieren decisión de alcance.
+- [ ] Aceptación Sky/BR restante; main explícitamente en espera.
 
 ## Evidencia de implementación
 

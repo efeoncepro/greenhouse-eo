@@ -1,0 +1,88 @@
+{
+  "profileId": "gprf-2f24e9ca-b7ec-4128-af6e-b9b1feefdbf5",
+  "brandAliases": [],
+  "markets": [
+    {
+      "marketId": "gpmk-6670b162-febe-49bc-bc22-27cccf404b96",
+      "profileId": "gprf-2f24e9ca-b7ec-4128-af6e-b9b1feefdbf5",
+      "marketCode": "CL",
+      "locale": "es-CL",
+      "status": "active",
+      "isPrimary": true,
+      "recurringRegradeEnabled": false,
+      "recurringRegradeCadence": "monthly",
+      "recurringRegradeNextAt": null,
+      "label": "Chile",
+      "competitors": [
+        {
+          "name": "cebra",
+          "aliases": [],
+          "position": 1,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "mind",
+          "aliases": [],
+          "position": 2,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "wolfbcp",
+          "aliases": [],
+          "position": 3,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "rompecabezas",
+          "aliases": [],
+          "position": 4,
+          "matchMode": "word_ci"
+        }
+      ],
+      "competitorSetVersion": 1
+    },
+    {
+      "marketId": "gpmk-e897ee80-fb30-449e-b5fb-526347986c26",
+      "profileId": "gprf-2f24e9ca-b7ec-4128-af6e-b9b1feefdbf5",
+      "marketCode": "CO",
+      "locale": "es-CO",
+      "status": "active",
+      "isPrimary": false,
+      "recurringRegradeEnabled": false,
+      "recurringRegradeCadence": "monthly",
+      "recurringRegradeNextAt": null,
+      "label": "Colombia",
+      "competitors": [],
+      "competitorSetVersion": 1
+    },
+    {
+      "marketId": "gpmk-bd79d94e-c4ab-49a2-ad84-7374824e001c",
+      "profileId": "gprf-2f24e9ca-b7ec-4128-af6e-b9b1feefdbf5",
+      "marketCode": "MX",
+      "locale": "es-MX",
+      "status": "active",
+      "isPrimary": false,
+      "recurringRegradeEnabled": false,
+      "recurringRegradeCadence": "monthly",
+      "recurringRegradeNextAt": null,
+      "label": "México",
+      "competitors": [],
+      "competitorSetVersion": 1
+    },
+    {
+      "marketId": "gpmk-bb0bd201-2d57-4108-a4a4-db6ee3a2d17d",
+      "profileId": "gprf-2f24e9ca-b7ec-4128-af6e-b9b1feefdbf5",
+      "marketCode": "PE",
+      "locale": "es-PE",
+      "status": "active",
+      "isPrimary": false,
+      "recurringRegradeEnabled": false,
+      "recurringRegradeCadence": "monthly",
+      "recurringRegradeNextAt": null,
+      "label": "Perú",
+      "competitors": [],
+      "competitorSetVersion": 1
+    }
+  ],
+  "signals": []
+}

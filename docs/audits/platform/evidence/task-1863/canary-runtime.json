@@ -1,0 +1,344 @@
+{
+  "checkedAt": "2026-09-28T10:22:50.739Z",
+  "profiles": [
+    {
+      "public_id": "EO-GAVP-0002",
+      "status": "active",
+      "market": "Chile",
+      "locale": "es-CL",
+      "legacy_runs": 10
+    },
+    {
+      "public_id": "EO-GAVP-0017",
+      "status": "active",
+      "market": "CL",
+      "locale": "es-CL",
+      "legacy_runs": 1
+    },
+    {
+      "public_id": "EO-GAVP-0018",
+      "status": "active",
+      "market": "CL",
+      "locale": "es-CL",
+      "legacy_runs": 1
+    },
+    {
+      "public_id": "EO-GAVP-0020",
+      "status": "active",
+      "market": "Chile",
+      "locale": "es-CL",
+      "legacy_runs": 2
+    }
+  ],
+  "backfill": {
+    "total": 27,
+    "active_profiles": 27
+  },
+  "runs": [
+    {
+      "public_id": "EO-GRBT-00002",
+      "cost_ceiling_total_usd": "2.0000",
+      "run_id": "grun-e7236640-99fc-4b71-807b-d83f4a78a825",
+      "run_public_id": "EO-GRUN-00061",
+      "market_code": "CL",
+      "locale": "es-CL",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.2741",
+      "market_snapshot": {
+        "code": "CL",
+        "label": "Chile",
+        "locale": "es-CL",
+        "language": "es",
+        "locationCode": 2152,
+        "googleAiModeLanguageCode": "es"
+      },
+      "brand_snapshot": {
+        "name": "Efeonce Group",
+        "aliases": [],
+        "category": "Marketing, creatividad, SEO y RevOps",
+        "websiteUrl": "https://efeoncepro.com"
+      },
+      "first_prompt": "¿Qué agencias de Servicios de marketing ayudan a empresas en Chile?",
+      "competitors_snapshot": [
+        {
+          "name": "cebra",
+          "aliases": [],
+          "position": 1,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "mind",
+          "aliases": [],
+          "position": 2,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "wolfbcp",
+          "aliases": [],
+          "position": 3,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "rompecabezas",
+          "aliases": [],
+          "position": 4,
+          "matchMode": "word_ci"
+        }
+      ],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    },
+    {
+      "public_id": "EO-GRBT-00002",
+      "cost_ceiling_total_usd": "2.0000",
+      "run_id": "grun-7f1451b4-626c-46b8-99c0-2bf75aef1849",
+      "run_public_id": "EO-GRUN-00062",
+      "market_code": "CO",
+      "locale": "es-CO",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.2656",
+      "market_snapshot": {
+        "code": "CO",
+        "label": "Colombia",
+        "locale": "es-CO",
+        "language": "es",
+        "locationCode": 2170,
+        "googleAiModeLanguageCode": "es"
+      },
+      "brand_snapshot": {
+        "name": "Efeonce Group",
+        "aliases": [],
+        "category": "Marketing, creatividad, SEO y RevOps",
+        "websiteUrl": "https://efeoncepro.com"
+      },
+      "first_prompt": "¿Qué agencias de Servicios de marketing ayudan a empresas en Colombia?",
+      "competitors_snapshot": [],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    },
+    {
+      "public_id": "EO-GRBT-00002",
+      "cost_ceiling_total_usd": "2.0000",
+      "run_id": "grun-7704cf62-4b8e-4670-ac44-d37aef5832e0",
+      "run_public_id": "EO-GRUN-00063",
+      "market_code": "MX",
+      "locale": "es-MX",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.2643",
+      "market_snapshot": {
+        "code": "MX",
+        "label": "México",
+        "locale": "es-MX",
+        "language": "es",
+        "locationCode": 2484,
+        "googleAiModeLanguageCode": "es"
+      },
+      "brand_snapshot": {
+        "name": "Efeonce Group",
+        "aliases": [],
+        "category": "Marketing, creatividad, SEO y RevOps",
+        "websiteUrl": "https://efeoncepro.com"
+      },
+      "first_prompt": "¿Qué agencias de Servicios de marketing ayudan a empresas en México?",
+      "competitors_snapshot": [],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    },
+    {
+      "public_id": "EO-GRBT-00002",
+      "cost_ceiling_total_usd": "2.0000",
+      "run_id": "grun-5d9f5ef5-1c03-430b-98ff-1b8616ca7981",
+      "run_public_id": "EO-GRUN-00064",
+      "market_code": "PE",
+      "locale": "es-PE",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.2943",
+      "market_snapshot": {
+        "code": "PE",
+        "label": "Perú",
+        "locale": "es-PE",
+        "language": "es",
+        "locationCode": 2604,
+        "googleAiModeLanguageCode": "es"
+      },
+      "brand_snapshot": {
+        "name": "Efeonce Group",
+        "aliases": [],
+        "category": "Marketing, creatividad, SEO y RevOps",
+        "websiteUrl": "https://efeoncepro.com"
+      },
+      "first_prompt": "¿Qué agencias de Servicios de marketing ayudan a empresas en Perú?",
+      "competitors_snapshot": [],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    }
+  ],
+  "observations": [
+    {
+      "public_id": "EO-GRUN-00061",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "CL",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00061",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CL",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00061",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CL",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00061",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CL",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00062",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "CO",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00062",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CO",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00062",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CO",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00062",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CO",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00063",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "MX",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00063",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "MX",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00063",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "MX",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00063",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "MX",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00064",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "PE",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00064",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "PE",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00064",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "PE",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00064",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "PE",
+      "observations": 6
+    }
+  ],
+  "scores": [
+    {
+      "public_id": "EO-GRUN-00061",
+      "persisted_scores": 1
+    },
+    {
+      "public_id": "EO-GRUN-00062",
+      "persisted_scores": 1
+    },
+    {
+      "public_id": "EO-GRUN-00063",
+      "persisted_scores": 1
+    },
+    {
+      "public_id": "EO-GRUN-00064",
+      "persisted_scores": 1
+    }
+  ]
+}

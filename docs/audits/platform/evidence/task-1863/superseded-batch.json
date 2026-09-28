@@ -1,0 +1,34 @@
+{
+  "checkedAt": "2026-09-28T10:22:53.117Z",
+  "supersededBy": "EO-GRBT-00002",
+  "runs": [
+    {
+      "public_id": "EO-GRUN-00057",
+      "status": "partial",
+      "estimated_cost_usd": "0.2515",
+      "public_delivery_state": "unavailable",
+      "observations": 24
+    },
+    {
+      "public_id": "EO-GRUN-00058",
+      "status": "failed",
+      "estimated_cost_usd": "0.0000",
+      "public_delivery_state": "unavailable",
+      "observations": 0
+    },
+    {
+      "public_id": "EO-GRUN-00059",
+      "status": "failed",
+      "estimated_cost_usd": "0.0000",
+      "public_delivery_state": "unavailable",
+      "observations": 0
+    },
+    {
+      "public_id": "EO-GRUN-00060",
+      "status": "failed",
+      "estimated_cost_usd": "0.0000",
+      "public_delivery_state": "unavailable",
+      "observations": 0
+    }
+  ]
+}

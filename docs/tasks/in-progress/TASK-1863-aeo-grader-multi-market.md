@@ -58,7 +58,7 @@ clientes de EE. UU. La policy de runs nuevos se versiona; los históricos conser
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-020`
-- Status real: `Code complete; rollout pendiente`
+- Status real: `Staging: canary Efeonce PASS; refuerzo universal local; main en espera`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -745,12 +745,14 @@ tarda ≥30 minutos; el reader del lote expone el avance.
 ## Acceptance Criteria
 
 Evidencia local y límites: [auditoría de verificación](../../audits/platform/2026-09-28-task-1863-verification.md).
-Los criterios de staging/producción quedan pendientes hasta el rollout autorizado.
+Canary Efeonce en staging PASS (96/96 respuestas, cuatro scores e informes ready). Refuerzo universal local
+f7d2578a5: 71 pruebas / 552 combinaciones. Aceptación Sky/BR pendiente; main en espera.
 
+- [ ] Refuerzo universal en staging: categorías/arquetipos para toda marca y entrada. Local PASS: 71 pruebas y 552 combinaciones; commit `f7d2578a5`. Push pendiente porque incluye dos commits paralelos todavía locales; decisión del operador solicitada.
 - [x] Catálogo único para Grader/form/prospecto, 23 mercados y es/en/pt-BR/fr; pruebas de aliases, ISO y locales.
 - [x] País sin ubicación Google produce `skipped:market_unsupported`, sin fallback (Cuba: prueba y canary).
 - [x] Tablas, UNIQUE, FK, triggers e invariantes comprobados en PostgreSQL real efímero; Up/Down/Up PASS.
-- [ ] Backfill compartido aplicado y cada marca activa con principal. Dry-run: 27 resolubles, una organización con cuatro perfiles activos; reconciliación previa pendiente. Históricos sin geografía inferida.
+- [x] Backfill compartido aplicado: 27 perfiles activos, 27 principales. Los cuatro perfiles Efeonce permanecen activos; 14 runs históricos intactos y sin geografía inferida. Evidencia de rollout en auditoría.
 - [x] Identidad país/locale inmutable y principal único, comprobados por SQL real.
 - [x] N mercados encolan N runs atómicamente; rollback, cuota concurrente, reserva diaria/mensual y derechos comerciales probados.
 - [x] Sin mercado explícito se usa el principal; paridad de selección legacy comprobada. Nuevos packs versionados: no se promete igualdad numérica entre muestras diferentes.
@@ -761,10 +763,10 @@ Los criterios de staging/producción quedan pendientes hasta el rollout autoriza
 - [x] Reader de matriz separado por mercado, metodología y `blendedOverall: null`; último run reportable con score.
 - [x] Tendencia restringida al mismo mercado; cambio de set anula deltas competitivo/global y declara `competitor_set_changed`.
 - [x] Regrade por mercado y principal con flag OFF pasa por el mismo batch, con reserva mensual atómica y espejo de cadencia.
-- [x] Capability market.manage, grants internos y denegación cliente probados; seed compartido pendiente con el DDL.
+- [x] Capability market.manage, grants internos y denegación cliente probados; seed compartido aplicado con el DDL.
 - [ ] Sky con seis mercados y lote de aceptación en staging: pendiente contrato comercial y rollout; no se consumió su cuota.
-- [x] Flag registrado en ledger y deploy.sh; auditoría flags sin Vercel PASS. Flags externos sin modificar.
-- [x] QA local y cierre documental ejecutados: unit 15.886 PASS, PG 11 PASS, build exit 0 y lint propio PASS. Lint global tiene 3 errores de formato en WIP concurrente ajeno; detalle en auditoría.
+- [x] Flag registrado en ledger y deploy.sh; auditoría flags sin Vercel PASS. Staging multimer­cado ON; worker compartido OFF para recurrencia secundaria; producción sin habilitar.
+- [x] QA local y cierre documental ejecutados: unit 15.886 PASS, PG 11 PASS, build exit 0 y lint propio PASS. Pre-push compartido final PASS: lint 0 errores/26 warnings existentes y TypeScript PASS.
 
 ## Verification
 
