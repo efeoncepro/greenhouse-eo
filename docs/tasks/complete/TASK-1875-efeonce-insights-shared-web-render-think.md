@@ -66,7 +66,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -79,7 +79,7 @@
 - Motion: `docs/ui/motion/TASK-1875-efeonce-insights-shared-web-render-think-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Operativo en producción: Think (7485e32) con /insights/r/<token> y la muestra /insights/muestra; INSIGHTS_SHARING_ENABLED=true en greenhouse-cssemzyzb; WAF sin drift; canary de producción verde. Todos los criterios con evidencia. Producción sirve el modelo 1.0 (soportado); el 1.1 espera el próximo release de Greenhouse. Para cerrar: pnpm test completo + pnpm build`
+- Status real: `Completa 2026-09-28: Think en producción (7485e32) con /insights/r/<token> y la muestra /insights/muestra; INSIGHTS_SHARING_ENABLED=true en producción (greenhouse-cssemzyzb); WAF sin drift; canary de producción verde; pnpm test completo (16 474) y pnpm build de producción en verde. Producción sirve el modelo 1.0; el 1.1 sale con el próximo release de Greenhouse`
 - Rank: `TBD`
 - Domain: `ui|platform|public-site`
 - Blocked by: `none`
@@ -656,7 +656,7 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
 
 - [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
 - [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1848 URL del correo, TASK-1849 botón copiar enlace, EPIC-045 nodo S6)
