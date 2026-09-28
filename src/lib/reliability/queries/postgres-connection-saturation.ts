@@ -4,6 +4,8 @@ import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
 import type { ReliabilitySignal } from '@/types/reliability'
 
+import { readPostgresBackendsPeak, type PostgresBackendsPeak } from './postgres-backends-peak'
+
 /**
  * TASK-846 Slice 6 — Reliability signal: PostgreSQL connection saturation.
  *
@@ -43,6 +45,39 @@ export const POSTGRES_CONNECTION_SATURATION_SIGNAL_ID =
 
 const WARNING_THRESHOLD_PCT = 60
 const ERROR_THRESHOLD_PCT = 80
+
+/**
+ * TASK-1876 — Un pico reciente ≥ 90 % del máximo utilizable (ventana 24 h, métrica nativa de
+ * Cloud SQL) eleva la señal a `warning` aunque el instante actual esté sano: la ráfaga de
+ * ISSUE-174 duró 5 min y nadie la habría visto leyendo sólo el presente. Los picos diarios
+ * normales (42–77 de 97 en sep-2026) quedan por debajo.
+ */
+const RECENT_PEAK_WARNING_RATIO = 0.9
+
+const readPeakSafely = async (): Promise<{ peak: PostgresBackendsPeak | null; unavailable: boolean }> => {
+  try {
+    return { peak: await readPostgresBackendsPeak(), unavailable: false }
+  } catch {
+    return { peak: null, unavailable: true }
+  }
+}
+
+const peakEvidence = (
+  peak: PostgresBackendsPeak | null,
+  unavailable: boolean
+): ReliabilitySignal['evidence'] =>
+  peak
+    ? [
+        { kind: 'metric', label: 'peak_backends_24h', value: String(peak.peak) },
+        { kind: 'metric', label: 'peak_at', value: peak.peakAt }
+      ]
+    : [
+        {
+          kind: 'metric',
+          label: 'peak_backends_24h',
+          value: unavailable ? 'no disponible (lectura de Cloud Monitoring falló)' : 'sin datos'
+        }
+      ]
 
 const SATURATION_QUERY = `
   WITH config AS (
@@ -160,9 +195,22 @@ export const getPostgresConnectionSaturationSignal =
   async (): Promise<ReliabilitySignal> => {
     const observedAt = new Date().toISOString()
 
+    const peakRead = readPeakSafely()
+
     try {
       const snapshot = await getPostgresConnectionSaturationSnapshot()
-      const severity = resolveSeverity(snapshot.usagePct)
+      const { peak, unavailable } = await peakRead
+      const currentSeverity = resolveSeverity(snapshot.usagePct)
+
+      const recentPeakHot =
+        peak !== null && peak.peak >= Math.ceil(snapshot.usableMax * RECENT_PEAK_WARNING_RATIO)
+
+      const severity = currentSeverity === 'ok' && recentPeakHot ? 'warning' : currentSeverity
+
+      const summary =
+        currentSeverity === 'ok' && recentPeakHot && peak
+          ? `Pico reciente de saturación: ${peak.peak}/${snapshot.usableMax} a las ${peak.peakAt} (ahora ${snapshot.usagePct}%). Revisar ráfagas en rutas públicas (ISSUE-174).`
+          : buildSummary(snapshot)
 
       return {
         signalId: POSTGRES_CONNECTION_SATURATION_SIGNAL_ID,
@@ -171,9 +219,10 @@ export const getPostgresConnectionSaturationSignal =
         source: 'getPostgresConnectionSaturationSignal',
         label: 'PostgreSQL connection saturation',
         severity,
-        summary: buildSummary(snapshot),
+        summary,
         observedAt,
         evidence: [
+          ...peakEvidence(peak, unavailable),
           {
             kind: 'metric',
             label: 'usage_pct',
@@ -238,6 +287,8 @@ export const getPostgresConnectionSaturationSignal =
         tags: { source: 'reliability_signal_postgres_connection_saturation' }
       })
 
+      const { peak, unavailable } = await peakRead
+
       return {
         signalId: POSTGRES_CONNECTION_SATURATION_SIGNAL_ID,
         moduleKey: 'cloud',
@@ -245,10 +296,11 @@ export const getPostgresConnectionSaturationSignal =
         source: 'getPostgresConnectionSaturationSignal',
         label: 'PostgreSQL connection saturation',
         severity: 'unknown',
-        summary:
-          'Detector falló — no se pudo evaluar saturación. Revisar Cloud Logging + Sentry domain=cloud.',
+        summary: peak
+          ? `Detector sin conexión a la base; pico de ${peak.peak} backends a las ${peak.peakAt} según Cloud SQL. Revisar saturación (ISSUE-174).`
+          : 'Detector falló — no se pudo evaluar saturación. Revisar Cloud Logging + Sentry domain=cloud.',
         observedAt,
-        evidence: []
+        evidence: peakEvidence(peak, unavailable)
       }
     }
   }
