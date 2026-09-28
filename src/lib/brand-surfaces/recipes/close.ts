@@ -332,7 +332,7 @@ export const decisionNextSteps: RecipeBuilder = ({ intent, manifest, recipe }) =
 /** El marcador de un monto: una cotización NUNCA imprime una cifra real en una plantilla (`prices-as-placeholder`). */
 const AMOUNT = '[MONTO]'
 
-type PlatformTokens = {
+export type PlatformTokens = {
   cxPx: number
   cyPx: number
   rxPx: number
@@ -405,7 +405,7 @@ type LiveTokens = {
 type PlanIntent = { name?: unknown; tagline?: unknown; features?: unknown[] }
 
 /** La plataforma elíptica del estilo «vivo»: el relleno de luz, su anillo y el arco del frente. */
-const platformSvg = (manifest: SurfaceManifest, platform: PlatformTokens, idPrefix: string): string => {
+export const platformSvg = (manifest: SurfaceManifest, platform: PlatformTokens, idPrefix: string): string => {
   const { cxPx: cx, cyPx: cy, rxPx: rx, ryPx: ry } = platform
   const stops = platform.fill.stops.map(stop => `<stop offset="${n(stop.at)}" stop-color="${paletteColor(stop.color, 'la plataforma')}" stop-opacity="${n(stop.opacity)}"/>`).join('')
   const from = { x: cx + rx * platform.arc.from[0], y: cy + ry * platform.arc.from[1] }

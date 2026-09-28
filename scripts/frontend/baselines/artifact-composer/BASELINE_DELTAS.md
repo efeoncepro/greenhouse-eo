@@ -1,5 +1,26 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (k) — TASK-1928: secciones y quiénes somos
+
+Quinta familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.19, `axis-ui-contracts` 0.3.17, delta (j) de AXIS):
+la sección con lente, la sección a sangre, la sección de cine en sus cuatro composiciones (equipo, servicios, quiénes
+somos y por qué lo hacemos), el equipo y el stack. Compuestas con sus plates, fotos del squad e isotipos reales y
+comparadas a ojo contra las ocho referencias: coinciden salvo las decisiones de la norma — sin el logo chico que
+conservaban las secciones de cine (lámina interior con foto: el eyebrow vuelve al margen), sin el velo lateral de
+quiénes somos y por qué lo hacemos, los rótulos de los pilares en blanco (D1), la fuente de las cifras de quiénes somos
+visible y sin los pilares de luz del stack (la referencia nunca los pintó). La lente la pinta entera el motor de la
+línea gráfica (asset `painted`: el plate lo inyecta quien compone). El CSS nuevo está acotado a `.gl-sec`, `.gl-tm`,
+`.gl-stk` y `.gl-live-voice`; el hook del CTA suma las ocho manijas sobre texto (servicios) sin cambiar a los CTAs
+previos, el indicador acepta su centro medido (la sangre) y el resolver nuevo `gl-item-role` marca la ficha al frente.
+
+- `templates-graphic-line-deck/SectionLens.png` — 🆕 deck.section-lens
+- `templates-graphic-line-deck/SectionBleed.png` — 🆕 deck.section-bleed
+- `templates-graphic-line-deck/SectionCine.png` — 🆕 deck.section-cine (+ services)
+- `templates-graphic-line-deck/SectionCineAbout.png` — 🆕 deck.section-cine.about
+- `templates-graphic-line-deck/SectionCinePurpose.png` — 🆕 deck.section-cine.purpose
+- `templates-graphic-line-deck/ContentTeam.png` — 🆕 deck.content-team
+- `templates-graphic-line-deck/ContentStack.png` — 🆕 deck.content-stack
+
 ## 2026-09-27 (j) — TASK-1928: la familia prueba
 
 Cuarta familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.18, `axis-ui-contracts` 0.3.16, delta (i) de AXIS):
@@ -752,7 +773,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: e7f639d24e2a2adc7c0ac737e0ec4ab167473d93c99c639e697fbf3ea9dfcd89 -->
+<!-- manifest-digest: 46a21f546c5e3ca351a2bff369413dd76c334e4f556b399d4b00c5758ac90d97 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

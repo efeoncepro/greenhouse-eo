@@ -177,6 +177,13 @@ export const graphicLineResolvers = (): ResolverRegistry => {
           : null
     },
 
+    // El papel de un ítem en su grupo (TASK-1928): la ficha del interlocutor al frente del equipo (`lead`) o las demás.
+    'gl-item-role': {
+      known: ['lead', 'rest'],
+      build: value =>
+        value === 'lead' || value === 'rest' ? [{ selector: ':self', toneClass: `gl-item-${value}`, toneGroup: ['gl-item-lead', 'gl-item-rest'] }] : null
+    },
+
     // El cuerpo de una cifra del muro (TASK-1928, por qué elegirnos): grande o, si es larga, el cuerpo menor de AXIS.
     // Lo decide el builder con el umbral de caracteres del token; la caja de la cifra no cambia.
     'gl-figure-size': {

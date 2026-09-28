@@ -14,6 +14,11 @@ export interface GraphicLineCtaRequest {
   canvas: { width: number; height: number }
   /** Escala del cursor local respecto del lienzo (1 en escritorio; el teléfono usa la suya). */
   cursorScale: number
+  /**
+   * El marco del cursor del lector: corchetes abiertos sobre un grupo (el CTA, por defecto) u ocho manijas sobre un
+   * texto (la sección de servicios, TASK-1928). Lo manda el slot `cta` como lo delegó AXIS.
+   */
+  frame?: { variant: 'open-brackets' | 'eight-handles'; targetKind: 'group' | 'text'; padding: 'compact' | 'standard' }
 }
 
 export interface GraphicLineCtaPaint {
@@ -68,11 +73,20 @@ export const makeCtaHook =
     if (!measured) throw new GraphicLineCtaError(slide.slideId, 'la plantilla no marca `[data-gl-cta-target]`.')
 
     const cursorScale = typeof cta.cursorScale === 'number' ? cta.cursorScale : options.cursorScale
+    const frame = cta.variant === 'eight-handles' ? { variant: 'eight-handles' as const, targetKind: 'text' as const, padding: 'standard' as const } : undefined
+
+    // Un texto se mide por su tinta, no por su caja de línea: arriba se recorta el 16 % del alto y abajo el 9,6 % (el
+    // mismo aire con que se aprobaron las selecciones sobre la respuesta).
+    if (frame) {
+      const height = measured.bounds.bottom - measured.bounds.top
+
+      measured.bounds = { ...measured.bounds, top: measured.bounds.top + height * 0.16, bottom: measured.bounds.bottom - height * 0.096 }
+    }
 
     const descriptorGap =
       typeof cta.descriptorGapPx === 'number' ? cta.descriptorGapPx : options.descriptorGapOfWidth * measured.canvas.width
 
-    const paint = painter({ bounds: measured.bounds, canvas: measured.canvas, cursorScale })
+    const paint = painter({ bounds: measured.bounds, canvas: measured.canvas, cursorScale, ...(frame ? { frame } : {}) })
 
     if (!paint.withinCanvas) throw new GraphicLineCtaError(slide.slideId, 'el CTA pintado queda fuera del lienzo.')
 

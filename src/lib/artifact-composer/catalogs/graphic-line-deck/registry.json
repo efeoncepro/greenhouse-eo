@@ -38,7 +38,15 @@
     "deck.decision-case",
     "deck.decision-chart",
     "deck.decision-testimonial",
-    "deck.decision-why-us"
+    "deck.decision-why-us",
+    "deck.section-lens",
+    "deck.section-bleed",
+    "deck.section-cine",
+    "deck.section-cine.about",
+    "deck.section-cine.purpose",
+    "deck.content-team",
+    "deck.content-stack",
+    "deck.section-cine.services"
   ],
   "templates": [
     {
@@ -425,6 +433,83 @@
       "contentTypes": ["deck.decision-why-us"],
       "prototype": "decision-why-us.html",
       "slotsRef": "decision-why-us.slots.json"
+    },
+    {
+      "name": "SectionLens",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.section-lens"],
+      "prototype": "section-lens.html",
+      "slotsRef": "section-lens.slots.json"
+    },
+    {
+      "name": "SectionBleed",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.section-bleed"],
+      "prototype": "section-bleed.html",
+      "slotsRef": "section-bleed.slots.json"
+    },
+    {
+      "name": "SectionCine",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.section-cine", "deck.section-cine.services"],
+      "prototype": "section-cine.html",
+      "slotsRef": "section-cine.slots.json"
+    },
+    {
+      "name": "SectionCineAbout",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.section-cine.about"],
+      "prototype": "section-cine-about.html",
+      "slotsRef": "section-cine-about.slots.json"
+    },
+    {
+      "name": "SectionCinePurpose",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.section-cine.purpose"],
+      "prototype": "section-cine-purpose.html",
+      "slotsRef": "section-cine-purpose.slots.json"
+    },
+    {
+      "name": "ContentTeam",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-team"],
+      "prototype": "content-team.html",
+      "slotsRef": "content-team.slots.json"
+    },
+    {
+      "name": "ContentStack",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-stack"],
+      "prototype": "content-stack.html",
+      "slotsRef": "content-stack.slots.json"
     }
   ],
   "selector": {
@@ -463,7 +548,15 @@
       "deck.decision-case": "DecisionCase",
       "deck.decision-chart": "DecisionChart",
       "deck.decision-testimonial": "DecisionTestimonial",
-      "deck.decision-why-us": "DecisionWhyUs"
+      "deck.decision-why-us": "DecisionWhyUs",
+      "deck.section-lens": "SectionLens",
+      "deck.section-bleed": "SectionBleed",
+      "deck.section-cine": "SectionCine",
+      "deck.section-cine.about": "SectionCineAbout",
+      "deck.section-cine.purpose": "SectionCinePurpose",
+      "deck.content-team": "ContentTeam",
+      "deck.content-stack": "ContentStack",
+      "deck.section-cine.services": "SectionCine"
     }
   }
 }

@@ -659,3 +659,59 @@ describe('deck · la familia prueba (TASK-1928)', () => {
     expect(facts.map(fact => fact.size)).toEqual(['large', 'large', 'large', 'large', 'small', 'small'])
   })
 })
+
+describe('deck · secciones y quiénes somos (TASK-1928)', () => {
+  it.each([
+    ['section-lens', 'SectionLens', 'deck.section-lens'],
+    ['section-bleed', 'SectionBleed', 'deck.section-bleed'],
+    ['section-cine-team', 'SectionCine', 'deck.section-cine'],
+    ['section-cine-services', 'SectionCine', 'deck.section-cine.services'],
+    ['section-cine-about', 'SectionCineAbout', 'deck.section-cine.about'],
+    ['section-cine-purpose', 'SectionCinePurpose', 'deck.section-cine.purpose'],
+    ['content-team', 'ContentTeam', 'deck.content-team'],
+    ['content-stack', 'ContentStack', 'deck.content-stack']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template, contentType) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(contentType)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('la lente la pinta el motor con la foto adentro: el arco es la navegación real y la foto la inyecta quien compone', () => {
+    const { piece } = plan(example('section-lens'))
+    const layer = piece.assets.find(asset => asset.kind === 'painted') as Extract<SurfaceAssetRequest, { kind: 'painted' }>
+
+    expect(layer.svg).toContain(layer.photo.marker)
+    expect(layer.svg).toContain('data-axis-part="arc"')
+    expect(layer.photo.path).toContain('P1-deck-lente-edicion.png')
+    expectCode(() => plan({ ...example('section-lens'), progress: undefined } as SurfaceIntent), 'surface-issues')
+  })
+
+  it('ninguna sección con foto lleva logo; quiénes somos y por qué lo hacemos firman con la burbuja', () => {
+    for (const recipe of ['section-bleed', 'section-cine-team', 'section-cine-services', 'section-cine-about', 'section-cine-purpose']) {
+      expect(plan(example(recipe)).piece.assets.some(asset => asset.ref.includes('logo'))).toBe(false)
+    }
+
+    expect(plan(example('section-cine-about')).slots.source).toBe('Fuente: Efeonce, 2026')
+    expect(plan(example('section-cine-services')).slots.cta).toEqual({ variant: 'eight-handles', cursorScale: 1.1 })
+  })
+
+  it('el equipo: fichas del squad real y la selección sobre el interlocutor, al frente', () => {
+    const { slots } = plan(example('content-team'))
+    const team = slots.team as unknown as { role: string; src: string }[]
+
+    expect(team.map(member => member.role)).toEqual(['rest', 'rest', 'lead', 'rest', 'rest'])
+    expect(team[2]!.src).toBe('asset-ref:file:squad-julio')
+    expect(slots.selection).toMatchObject({ label: 'Cliente', item: 3 })
+  })
+
+  it('el stack: el conteo de la bajada sale de las herramientas y la capa que se mide va en el acento', () => {
+    const { slots } = plan(example('content-stack'))
+
+    expect(slots.body).toContain('<strong>16</strong>')
+    expect((slots.tiles as unknown as unknown[]).length).toBe(16)
+    expect((slots.labels as unknown as { tone: string }[]).map(label => label.tone)).toEqual(['rest', 'lead', 'rest'])
+    expectCode(() => plan({ ...example('content-stack'), body: '16 herramientas a mano.' } as SurfaceIntent), 'invalid-intent')
+  })
+})

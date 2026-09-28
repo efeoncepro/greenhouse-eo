@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · quiénes somos</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `section-cine`, composición `about` (surface deck, tema oscuro, TASK-1928). El equipo en pleno trabajo; la voz
+      arriba a la izquierda con la respuesta gigante, la bajada y la fila de tres cifras con su fuente. Sin logo ni velo
+      (la referencia lo pintaba; la norma lo prohíbe): firma la burbuja URL del pie. Referencia: DeckQuienesSomos (QS1).
+    -->
+    <main class="gl-slide gl-sec gl-sec-about" data-gl-root data-slot="frame">
+      <figure class="gl-photo" data-slot="photo">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Quiénes somos</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quiénes somos?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Un solo</span><span data-slot-field="answer">equipo</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-sec-body" data-slot="body">Creatividad, datos, medios y tecnología en una misma mesa.</p>
+
+      <ol class="gl-sec-figures" data-slot="figures">
+        <li class="gl-sec-figure">
+          <p class="gl-sec-figure-value" data-slot-field="value">+10</p>
+          <p class="gl-sec-figure-label" data-slot-field="label">años como agencia</p>
+        </li>
+      </ol>
+
+      <p class="gl-sec-source" data-slot="source">Fuente: Efeonce.</p>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

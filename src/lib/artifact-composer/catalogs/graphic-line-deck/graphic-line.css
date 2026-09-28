@@ -3353,3 +3353,380 @@ body {
   top: var(--gl-dw-source-top);
   font-size: var(--gl-dw-source-px);
 }
+
+/* ══ Secciones y quiénes somos (TASK-1928) ════════════════════════════════════════════════════════════════
+ *
+ * La voz de las secciones (.gl-sec: lente, sangre y cine en sus cuatro composiciones), el equipo (.gl-tm) y el stack
+ * (.gl-stk). La voz «viva» del equipo y del día a día comparte .gl-live-voice. Sin respaldo: cada medida llega del
+ * builder (`src/lib/brand-surfaces/recipes/sections.ts`) desde los tokens de AXIS.
+ */
+
+.gl-sec .gl-sec-backdrop {
+  z-index: 0;
+}
+
+.gl-sec .gl-eyebrow {
+  z-index: 3;
+  font-size: var(--gl-sec-eyebrow-px);
+  font-weight: var(--gl-sec-eyebrow-wght);
+  letter-spacing: var(--gl-sec-eyebrow-tracking);
+  color: var(--gl-sec-eyebrow-color);
+}
+
+.gl-sec.gl-sec-plain .gl-eyebrow {
+  text-transform: none;
+}
+
+.gl-sec .gl-question {
+  z-index: 3;
+  font-size: var(--gl-sec-question-px);
+  line-height: var(--gl-sec-question-leading);
+  color: var(--gl-sec-question-color);
+}
+
+.gl-sec .gl-answer {
+  z-index: 3;
+  left: calc(var(--gl-margin) + var(--gl-sec-answer-inset));
+  line-height: var(--gl-sec-answer-leading);
+  letter-spacing: var(--gl-sec-answer-tracking);
+}
+
+/* La pregunta de la sección de cine puede bajar a dos líneas: la segunda arranca en el margen, como la referencia. */
+.gl-sec-cine .gl-question {
+  width: var(--gl-sc-question-width);
+  white-space: normal;
+}
+
+.gl-sec .gl-sec-body {
+  z-index: 3;
+  line-height: var(--gl-sc-body-leading);
+}
+
+.gl-sec-purpose .gl-sec-body {
+  color: var(--gl-sc-body-color);
+}
+
+.gl-sec .gl-sec-body strong {
+  font-weight: 600;
+}
+
+.gl-sec-about .gl-sec-figures {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-sc-figures-top);
+  z-index: 3;
+  display: flex;
+  gap: var(--gl-sc-figure-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* El filete entre cifras: una raya del alto de la fila, en blanco apagado. */
+.gl-sec-about .gl-sec-figure + .gl-sec-figure {
+  padding-left: var(--gl-sc-figure-gap);
+  border-left: var(--gl-sc-divider) solid color-mix(in srgb, var(--gl-ink-dark) var(--gl-sc-divider-opacity), transparent);
+}
+
+.gl-sec-about .gl-sec-figure-value {
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-sc-figure-px);
+  line-height: 1;
+  letter-spacing: var(--gl-sc-figure-tracking);
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-sec-about .gl-sec-figure-label {
+  margin: var(--gl-sc-label-gap) 0 0;
+  font: 400 var(--gl-sc-label-px) var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-sec-about .gl-sec-source {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-sc-source-top);
+  z-index: 3;
+  margin: 0;
+  font: 400 var(--gl-sc-source-px) var(--gl-text-family);
+  color: var(--gl-soft-dark);
+}
+
+.gl-sec-purpose .gl-sec-pillars {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-sc-pillars-top);
+  z-index: 3;
+  width: var(--gl-sc-pillars-width);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-sec-purpose .gl-sec-pillar {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gl-sc-pillar-gap);
+  padding: var(--gl-sc-pillar-pad-y) 0;
+  border-top: var(--gl-sc-pillar-rule) solid color-mix(in srgb, var(--gl-ink-dark) var(--gl-sc-pillar-rule-opacity), transparent);
+}
+
+.gl-sec-purpose .gl-sec-pillar-label {
+  flex: none;
+  width: var(--gl-sc-pillar-label-width);
+  margin: 0;
+  font: 600 var(--gl-sc-pillar-label-px) var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+.gl-sec-purpose .gl-sec-pillar-text {
+  margin: 0;
+  font: 400 var(--gl-sc-pillar-text-px) / 1.4 var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+/* ── La voz «viva» (equipo y día a día) ── */
+
+.gl-live-voice .gl-eyebrow,
+.gl-live-voice .gl-question,
+.gl-live-voice .gl-answer,
+.gl-live-body {
+  z-index: 9;
+}
+
+.gl-tm .gl-live-voice .gl-question {
+  width: var(--gl-tm-question-width);
+  white-space: normal;
+}
+
+.gl-tm .gl-live-voice .gl-answer {
+  left: calc(var(--gl-margin) + var(--gl-tm-answer-inset));
+  line-height: var(--gl-tm-answer-leading);
+  letter-spacing: var(--gl-tm-answer-tracking);
+  text-shadow: 0 var(--gl-tm-answer-shadow-y) var(--gl-tm-answer-shadow-blur) color-mix(in srgb, black var(--gl-tm-answer-shadow-opacity), transparent);
+}
+
+.gl-live-body strong {
+  font-weight: 600;
+  color: var(--gl-ink-dark);
+}
+
+/* ── content-team ── */
+
+.gl-tm .gl-tm-stage {
+  z-index: 0;
+}
+
+.gl-tm .gl-tm-platform {
+  z-index: 1;
+}
+
+.gl-tm .gl-tm-cards {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  perspective: var(--gl-tm-perspective);
+  perspective-origin: var(--gl-tm-origin-x) var(--gl-tm-origin-y);
+}
+
+.gl-tm .gl-tm-card {
+  position: absolute;
+  left: var(--gl-tm-left);
+  top: var(--gl-tm-top);
+  z-index: var(--gl-tm-z);
+  width: var(--gl-tm-width);
+  overflow: hidden;
+  border-radius: var(--gl-tm-rest-radius);
+  background: linear-gradient(180deg, var(--gl-tm-fill-from-color) 0%, var(--gl-tm-fill-to-color) 100%);
+  transform: rotateY(var(--gl-tm-rotate));
+  box-shadow:
+    0 0 0 var(--gl-tm-rest-border) color-mix(in srgb, var(--gl-tm-rest-border-color) var(--gl-tm-rest-border-opacity), transparent),
+    0 var(--gl-tm-shadow-y) var(--gl-tm-shadow-blur) color-mix(in srgb, var(--gl-tm-shadow-color) var(--gl-tm-shadow-opacity), transparent),
+    0 0 var(--gl-tm-rest-glow-blur) color-mix(in srgb, var(--gl-tm-halo-color) var(--gl-tm-rest-glow-opacity), transparent);
+  -webkit-box-reflect: below var(--gl-tm-reflect-gap) linear-gradient(transparent var(--gl-tm-reflect-from), color-mix(in srgb, white var(--gl-tm-reflect-opacity), transparent));
+}
+
+.gl-tm .gl-tm-card.gl-item-lead {
+  border-radius: var(--gl-tm-lead-radius);
+  box-shadow:
+    0 0 0 var(--gl-tm-lead-border) color-mix(in srgb, var(--gl-tm-lead-border-color) var(--gl-tm-lead-border-opacity), transparent),
+    0 var(--gl-tm-shadow-y) var(--gl-tm-shadow-blur) color-mix(in srgb, var(--gl-tm-shadow-color) var(--gl-tm-shadow-opacity), transparent),
+    0 0 var(--gl-tm-lead-glow-blur) color-mix(in srgb, var(--gl-tm-halo-color) var(--gl-tm-lead-glow-opacity), transparent);
+}
+
+.gl-tm .gl-tm-photo {
+  display: block;
+  width: 100%;
+  height: var(--gl-tm-photo-height);
+  object-fit: cover;
+  object-position: top;
+}
+
+.gl-tm .gl-tm-caption {
+  padding: var(--gl-tm-rest-pad-top) var(--gl-tm-rest-pad-x) var(--gl-tm-rest-pad-bottom);
+}
+
+.gl-tm .gl-item-lead .gl-tm-caption {
+  padding: var(--gl-tm-lead-pad-top) var(--gl-tm-lead-pad-x) var(--gl-tm-lead-pad-bottom);
+}
+
+.gl-tm .gl-tm-name {
+  margin: 0;
+  font: 600 var(--gl-tm-rest-name-px) var(--gl-text-family);
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-tm .gl-item-lead .gl-tm-name {
+  font-size: var(--gl-tm-lead-name-px);
+}
+
+.gl-tm .gl-tm-title {
+  margin: var(--gl-tm-role-gap) 0 0;
+  font: 400 var(--gl-tm-rest-role-px) / 1.3 var(--gl-text-family);
+  color: var(--gl-tm-role-color);
+}
+
+.gl-tm .gl-item-lead .gl-tm-title {
+  font-size: var(--gl-tm-lead-role-px);
+}
+
+.gl-tm .gl-tm-center {
+  position: absolute;
+  left: var(--gl-tm-center-left);
+  top: var(--gl-tm-center-top);
+  z-index: 6;
+  width: var(--gl-tm-center-width);
+  text-align: center;
+}
+
+.gl-tm .gl-tm-center-title {
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-tm-center-px);
+  line-height: 1;
+  letter-spacing: var(--gl-tm-center-tracking);
+  color: var(--gl-ink-dark);
+  text-shadow: 0 0 var(--gl-tm-center-glow-blur) color-mix(in srgb, var(--gl-tm-halo-color) var(--gl-tm-center-glow-opacity), transparent);
+}
+
+.gl-tm .gl-tm-center-note {
+  margin: var(--gl-tm-center-note-gap) 0 0;
+  font: 300 var(--gl-tm-center-note-px) var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+/* ── content-stack ── */
+
+.gl-stk .gl-stk-back {
+  z-index: 1;
+}
+
+.gl-stk .gl-stk-front {
+  z-index: 80;
+}
+
+.gl-stk .gl-stk-tiles,
+.gl-stk .gl-stk-labels {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-stk .gl-stk-tile {
+  position: absolute;
+  left: var(--gl-stk-left);
+  top: var(--gl-stk-top);
+  z-index: var(--gl-stk-z);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-stk-tile);
+  height: var(--gl-stk-tile);
+  border-radius: var(--gl-stk-tile-radius);
+  background: linear-gradient(160deg, var(--gl-stk-fill-from-color) 0%, var(--gl-stk-fill-mid-color) var(--gl-stk-fill-mid-at), var(--gl-stk-fill-to-color) 100%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, white var(--gl-stk-edge-opacity), transparent),
+    0 var(--gl-stk-tile-shadow-y) var(--gl-stk-tile-shadow-blur) color-mix(in srgb, var(--gl-stk-tile-shadow-color) var(--gl-stk-tile-shadow-opacity), transparent),
+    0 0 var(--gl-stk-tile-glow-blur) color-mix(in srgb, var(--gl-stk-halo-color) var(--gl-stk-tile-glow-opacity), transparent);
+}
+
+.gl-stk .gl-stk-tile img {
+  display: block;
+  width: var(--gl-stk-icon);
+  height: var(--gl-stk-icon);
+  object-fit: contain;
+}
+
+.gl-stk .gl-stk-label {
+  position: absolute;
+  left: var(--gl-stk-label-left);
+  top: var(--gl-stk-label-top);
+  z-index: 90;
+  width: var(--gl-stk-label-width);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.gl-stk .gl-stk-label-name {
+  margin: 0;
+  font: 600 var(--gl-stk-label-px) var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+/* La capa que se mide lleva su nombre en el acento (28 px: texto grande). */
+.gl-stk .gl-item-lead .gl-stk-label-name {
+  color: var(--gl-accent);
+}
+
+.gl-stk .gl-stk-label-note {
+  margin: 0;
+  font: 300 var(--gl-stk-label-note-px) var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-stk .gl-stk-base {
+  position: absolute;
+  left: var(--gl-stk-base-left);
+  top: var(--gl-stk-base-top);
+  z-index: 90;
+  width: var(--gl-stk-base-width);
+  text-align: right;
+}
+
+.gl-stk .gl-stk-base-lead {
+  margin: 0;
+  font: 300 var(--gl-stk-base-lead-px) var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-stk .gl-stk-base-logo {
+  display: block;
+  width: var(--gl-stk-base-logo);
+  height: auto;
+  margin: var(--gl-stk-base-logo-gap) 0 var(--gl-stk-base-logo-gap) auto;
+  filter: drop-shadow(0 0 var(--gl-stk-base-glow-blur) color-mix(in srgb, var(--gl-stk-halo-color) var(--gl-stk-base-glow-opacity), transparent));
+}
+
+.gl-stk .gl-stk-base-note {
+  margin: 0;
+  font: 300 var(--gl-stk-base-note-px) var(--gl-text-family);
+  color: var(--gl-soft-dark);
+}
+
+.gl-stk .gl-answer {
+  line-height: var(--gl-stk-answer-leading);
+  letter-spacing: var(--gl-stk-answer-tracking);
+}
+
+.gl-stk .gl-stk-body strong {
+  font-weight: 600;
+  color: var(--gl-ink-dark);
+}

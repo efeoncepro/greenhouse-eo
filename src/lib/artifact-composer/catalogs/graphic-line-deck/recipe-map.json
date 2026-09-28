@@ -62,6 +62,46 @@
       "example": "src/lib/brand-surfaces/examples/deck-decision-why-us-intent.json",
       "slots": null
     },
+    "section-lens": {
+      "contentType": "deck.section-lens",
+      "example": "src/lib/brand-surfaces/examples/deck-section-lens-intent.json",
+      "slots": null
+    },
+    "section-bleed": {
+      "contentType": "deck.section-bleed",
+      "example": "src/lib/brand-surfaces/examples/deck-section-bleed-intent.json",
+      "slots": null
+    },
+    "section-cine-services": {
+      "contentType": "deck.section-cine.services",
+      "example": "src/lib/brand-surfaces/examples/deck-section-cine-services-intent.json",
+      "slots": null
+    },
+    "section-cine-team": {
+      "contentType": "deck.section-cine",
+      "example": "src/lib/brand-surfaces/examples/deck-section-cine-team-intent.json",
+      "slots": null
+    },
+    "section-cine-about": {
+      "contentType": "deck.section-cine.about",
+      "example": "src/lib/brand-surfaces/examples/deck-section-cine-about-intent.json",
+      "slots": null
+    },
+    "section-cine-purpose": {
+      "contentType": "deck.section-cine.purpose",
+      "example": "src/lib/brand-surfaces/examples/deck-section-cine-purpose-intent.json",
+      "slots": null
+    },
+    "content-team": {
+      "contentType": "deck.content-team",
+      "example": "src/lib/brand-surfaces/examples/deck-content-team-intent.json",
+      "slots": null
+    },
+    "content-stack": {
+      "contentType": "deck.content-stack",
+      "example": "src/lib/brand-surfaces/examples/deck-content-stack-intent.json",
+      "slots": null
+    },
     "breather": {
       "contentType": "deck.breather",
       "example": "src/lib/brand-surfaces/examples/deck-breather-intent.json",

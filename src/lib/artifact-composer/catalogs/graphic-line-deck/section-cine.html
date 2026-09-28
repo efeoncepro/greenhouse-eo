@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · sección de cine</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `section-cine`, composiciones `team` y `services` (surface deck, tema oscuro, TASK-1928). Foto de cine a
+      sangre y la voz en la mitad baja de la columna izquierda. Lámina interior con foto: sin logo (el eyebrow vuelve al
+      margen) y sin velo. `services` suma el cursor propio del lector con ocho manijas sobre la respuesta (slot `cta`).
+      Referencias: DeckBrochurePortadaEquipo (team) y DeckBrochurePortadaOrbita (services).
+    -->
+    <main class="gl-slide gl-sec gl-sec-cine" data-gl-root data-slot="frame">
+      <figure class="gl-photo" data-slot="photo">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Nuestro equipo</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quién hace crecer tu marca?</span></p>
+        <p class="gl-answer" data-gl-cta-target><span class="gl-answer-lead" data-slot-field="answerLead">Este</span><span data-slot-field="answer">equipo</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <div class="gl-hidden" data-slot="cta"></div>
+    </main>
+  </body>
+</html>

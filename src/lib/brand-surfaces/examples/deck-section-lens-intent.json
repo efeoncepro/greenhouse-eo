@@ -1,0 +1,28 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-lens",
+  "voice": {
+    "eyebrow": "Sección 2 de 5 · Producción",
+    "question": "¿Quién decide el corte?",
+    "answer": [
+      "El dato"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 2
+  },
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+    "alt": "Un editor de Efeonce decide el corte frente a la línea de tiempo, con las métricas de la pieza en la segunda pantalla"
+  }
+}

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el equipo</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-team` (surface deck, tema oscuro, TASK-1928). El squad REAL en fichas de vidrio en profundidad
+      alrededor del interlocutor único (al frente, con la selección), sobre la plataforma de luz donde está «Tu marca».
+      La voz «viva» a la izquierda y la burbuja URL al pie. Referencia: DeckEquipo (EQ-equipo-impacto).
+    -->
+    <main class="gl-slide gl-tm" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-tm-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-layer gl-tm-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-tm-cards" data-slot="team">
+        <li class="gl-tm-card" data-gl-select-item>
+          <img class="gl-tm-photo" data-slot-field="src" alt="" />
+          <div class="gl-tm-caption">
+            <p class="gl-tm-name" data-slot-field="name">Julio</p>
+            <p class="gl-tm-title" data-slot-field="title">Responsable de Cuenta</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="gl-tm-center" data-slot="center">
+        <p class="gl-tm-center-title" data-slot-field="title">Tu marca</p>
+        <p class="gl-tm-center-note" data-slot-field="note">al centro de todo</p>
+      </div>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Tu equipo</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quién trabaja en tu cuenta?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Personas</span><span data-slot-field="answer">reales</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Un squad que orbita tu marca y un solo interlocutor.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

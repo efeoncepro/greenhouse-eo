@@ -18,6 +18,12 @@ export type GraphicLineCatalogName = 'graphic-line-deck' | 'graphic-line-stills'
 export type SurfaceAssetRequest =
   | { ref: string; kind: 'plate'; path: string; fit: { width: number; height: number } }
   | { ref: string; kind: 'svg'; svg: string }
+  /**
+   * Una capa que pinta el motor de la línea gráfica CON una foto adentro (la lente de una sección, TASK-1928): el SVG
+   * lleva el marcador `photo` donde va la foto, y quien compone lo reemplaza por los bytes del plate (recortado a `fit`).
+   * El builder no lee archivos; el motor pinta la pieza entera (penumbra, círculo, anillo, arco y esfera) tal cual.
+   */
+  | { ref: string; kind: 'painted'; svg: string; photo: { marker: string; path: string; fit: { width: number; height: number } } }
   /** Un archivo que quien compone lee tal cual (el logo de un cliente): SVG o PNG, sin recorte. */
   | { ref: string; kind: 'file'; path: string }
   /**

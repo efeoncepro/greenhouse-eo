@@ -372,7 +372,7 @@ export const progressIndicatorLayer = (
   line: string,
   pieceKey: string,
   idPrefix: string,
-  overrides: { ringOpacity?: number } = {}
+  overrides: { ringOpacity?: number; center?: { cx: number; cy: number } } = {}
 ): { ref: string; asset: SurfaceAssetRequest } => {
   const progress = contentOf(manifest).progress
   const piece = GL.pieces.deck[pieceKey]
@@ -383,14 +383,15 @@ export const progressIndicatorLayer = (
   const { canvas, element } = orbitDelegate(manifest, 'progress')
   const resolved = resolveOrbit(canvas, element)
 
-  applyPiece(resolved.elements[0]!, piece, overrides)
+  applyPiece(resolved.elements[0]!, piece, { ...(overrides.ringOpacity !== undefined ? { ringOpacity: overrides.ringOpacity } : {}) })
 
   return layerAsset(
     `${idPrefix}-progress-${progress.current}-of-${progress.sections}-${line}`,
     paintGraphicLine(resolved as never, {
       background: false,
       idPrefix,
-      circles: { [String(element.id)]: { cx: piece.ring.cx, cy: piece.ring.cy, r: piece.ring.r } }
+      // Una receta que mueve el indicador (la sección a sangre: arriba a la izquierda) manda su centro medido.
+      circles: { [String(element.id)]: { cx: overrides.center?.cx ?? piece.ring.cx, cy: overrides.center?.cy ?? piece.ring.cy, r: piece.ring.r } }
     }).svg
   )
 }

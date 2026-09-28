@@ -1,0 +1,25 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "services",
+  "voice": {
+    "eyebrow": "Servicios · 2026",
+    "question": "¿Qué hace Efeonce?",
+    "answer": [
+      "Crecer"
+    ]
+  },
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png",
+    "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara frente a una órbita de luz teal gigante con una sola esfera"
+  }
+}

@@ -100,11 +100,13 @@ export const greenhouseSelectionPainter: GraphicLineSelectionPainter = request =
 
 /** El CTA canónico: grupo con corchetes abiertos y el cursor local en `end-center`. */
 export const greenhouseCtaPainter: GraphicLineCtaPainter = request => {
+  const frame = request.frame ?? { variant: 'open-brackets', targetKind: 'group', padding: 'compact' }
+
   const manifest = resolveCollaborationSelectionIntent({
     targetId: 'cta',
-    targetKind: 'group',
-    variant: 'open-brackets',
-    padding: 'compact',
+    targetKind: frame.targetKind,
+    variant: frame.variant,
+    padding: frame.padding,
     overlay: 'none',
     cursors: [{ id: 'local', kind: 'local', targetId: 'cta', anchor: 'end-center', action: 'select' }]
   } as never)
@@ -152,6 +154,19 @@ export const materializeAssets = async (assets: SurfaceAssetRequest[], root: str
   for (const asset of assets) {
     if (asset.kind === 'svg') {
       out[key(asset.ref)] = `data:image/svg+xml;base64,${Buffer.from(asset.svg).toString('base64')}`
+      continue
+    }
+
+    if (asset.kind === 'painted') {
+      const photo = path.resolve(root, asset.photo.path)
+
+      if (!fs.existsSync(photo)) throw new Error(`No encuentro el plate ${asset.photo.path} de la capa pintada.`)
+      if (!asset.svg.includes(asset.photo.marker)) throw new Error(`La capa ${asset.ref} no lleva el marcador de su foto.`)
+
+      const jpeg = await sharp(photo).resize(asset.photo.fit.width, asset.photo.fit.height, { fit: 'cover', position: 'centre' }).jpeg({ quality: 90 }).toBuffer()
+      const svg = asset.svg.split(asset.photo.marker).join(`data:image/jpeg;base64,${jpeg.toString('base64')}`)
+
+      out[key(asset.ref)] = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
       continue
     }
 

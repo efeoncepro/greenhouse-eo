@@ -1,0 +1,108 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-stack",
+  "voice": {
+    "eyebrow": "Nuestro stack",
+    "question": "¿Con qué trabajamos?",
+    "answer": [
+      "Con lo",
+      "mejor"
+    ]
+  },
+  "body": "{count} herramientas en tres capas, conectadas en Efeonce: así cada pieza sale con calidad y se mide.",
+  "layers": [
+    {
+      "name": "Operar",
+      "note": "lo que se coordina",
+      "tools": [
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+          "name": "Notion"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/slack-isotype.svg",
+          "name": "Slack"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+          "name": "Teams"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/microsoft-365-isotype.svg",
+          "name": "Microsoft 365"
+        }
+      ]
+    },
+    {
+      "name": "Medir",
+      "note": "lo que se prueba",
+      "tools": [
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/semrush-isotype.svg",
+          "name": "Semrush"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/ahrefs-isotype.svg",
+          "name": "Ahrefs"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/screaming-frog-isotype.svg",
+          "name": "Screaming Frog"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/brand-visibility-grader-isotype.svg",
+          "name": "Visibility Grader"
+        }
+      ]
+    },
+    {
+      "name": "Crear",
+      "note": "lo que se produce",
+      "tools": [
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-photoshop-isotype.svg",
+          "name": "Photoshop"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-illustrator-isotype.svg",
+          "name": "Illustrator"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-premiere-isotype.svg",
+          "name": "Premiere"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-after-effects-isotype.svg",
+          "name": "After Effects"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-firefly-isotype.svg",
+          "name": "Firefly"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/higgsfield-isotype.svg",
+          "name": "Higgsfield"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/magnific-isotype.svg",
+          "name": "Magnific"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+          "name": "Frame.io"
+        }
+      ]
+    }
+  ],
+  "base": {
+    "lead": "Todo se conecta en",
+    "note": "donde cada pieza se mide"
+  }
+}
