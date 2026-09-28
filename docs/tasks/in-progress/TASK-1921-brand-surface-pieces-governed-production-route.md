@@ -105,7 +105,7 @@ Manda sobre el cuerpo cuando se contradigan.
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `En staging (2026-09-28): develop 5568a3f54 (sin promover a main por orden del operador). Flag ON en staging (Vercel staging + Job + ops-worker 00728-9vk); Production OFF. Smoke real verde: deck (PDF) y overlays (PNG) renderizados en el Job. Falta: catálogos con fotos (stills y Glitch) en staging, canary de Proposal/Insights, PR de efeonce-mcp (rama local 029272b), criterios Delta b (TASK-1930/1931)`
+- Status real: `En staging (2026-09-28): develop 5568a3f54 (sin promover a main por orden del operador). Flag ON en staging (Vercel staging + Job + ops-worker 00728-9vk); Production OFF. Smoke real verde en los SEIS catálogos (deck, overlays, stills con plate subido, y la edición de Glitch con 9 fotos: carrusel, stills y overlays) + canary de Insights verde. Falta: canary de Proposal, merge de efeonce-mcp#22 tras el release de Greenhouse, criterios Delta b (TASK-1930/1931)`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
 - Blocked by: `none`
@@ -485,27 +485,31 @@ Reglas obligatorias:
       (`render_disabled` ⇒ `policy_blocked`, `render_rejected`/`missing_source` ⇒ `invalid_request`, 404
       anti-oráculo). Mezclarlos rompería el mapeo del gateway. Evidencia: una sola tabla
       `brand-render-errors.ts` + su test, usada por los dos lanes.
-- [ ] El consumer del `artifact-worker` renderiza ambos catálogos en staging y adjunta un asset versionado con
+- [x] El consumer del `artifact-worker` renderiza ambos catálogos en staging y adjunta un asset versionado con
       procedencia completa.
-      — Parcial, con evidencia real (2026-09-28, staging `5568a3f54`): `brq-95c255e7…` → `graphic-line-deck`
+      — Evidencia real (2026-09-28, staging `5568a3f54`): `brq-95c255e7…` → `graphic-line-deck`
       `completed` al primer intento (PDF 37 717 B, 3,7 s) y `brq-0d435cf4…` → `graphic-line-overlays` `completed`
       (PNG con alfa, 2,5 s), cada uno con su asset `brand_render_output` en el bucket privado de staging, procedencia
       (versiones AXIS, `manifestHash`, `requestId`/`jobId`) y eventos `brand.render.requested` +
       `brand.render.job_completed` en el outbox; el mismo pedido repetido devolvió 200 `idempotent=true`. La lámina es
       la receta aprobada; frente a `pnpm brand:compose` en macOS difiere sólo el trazado del texto (1–2 px de avance,
-      Linux vs macOS), no la composición. Falta: `graphic-line-stills` y los tres de Glitch, que necesitan fuentes
-      subidas por el uploader.
+      Linux vs macOS), no la composición. Con fuentes subidas por el uploader (`brand_render_source_draft`, 201):
+      `brq-2b439ffb…` → `graphic-line-stills` DOOH caminero con lente `completed` (3000×1000, el plate dentro de la
+      lente) y `brq-32ce5f78…` → edición 17 de Glitch con 9 fotos: `glitch-carousel` (PDF 10 láminas),
+      `glitch-stills` (7 PNG) y `glitch-overlays` (18 PNG) `completed` al primer intento, con la falla en bytes
+      calculada en el worker. Descargas por el proxy autenticado: 200.
 - [ ] Con el flag OFF, el consumer no reclama jobs y el endpoint rechaza pedidos.
       — Parcial: con tests (`commands.test.ts` → `render_disabled`; `dispatch.test.ts` → no despacha). Falta
       verificarlo contra el runtime desplegado.
 - [ ] Proposal e Insights renderizan igual en staging con el consumer nuevo desplegado.
-      — Sin tildar: el consumer de marca va último en el registro y el despacho sólo lanza cuando las otras dos colas no
-      lanzaron; tests y CI verdes. Pero no hubo renders de Proposal ni Insights en 24 h, así que falta su canary.
+      — Parcial: Insights verificado — `irun-1f520d8d…` (deck de una edición sintética de Greenhouse Demo nunca
+      renderizada) `completed` al primer intento con el consumer de marca desplegado. Proposal sin canary: no hubo
+      renders de Proposal y su consumer va primero y no cambió (tests y CI verdes).
 - [ ] La tool MCP está federada (tool, scope, manifiesto, tests, release) y opera contra staging.
       — Parcial: tools y lane ecosystem en Greenhouse (`mcp:manifest:check` verde, 67 tools) + scope
       `efeonce.mcp.brand.write` en la paridad; federación hecha en `efeonce-mcp` rama `feat/task-1921-brand-render`
-      (`029272b`, provider `greenhouse-brand`, gateway 1.10.0, 75 tools, `pnpm check` 250/250). Falta: push + PR (el
-      clasificador lo bloqueó; en manos del operador/Codex), merge DESPUÉS del release de Greenhouse (el merge
+      (`029272b`, provider `greenhouse-brand`, gateway 1.10.0, 75 tools, `pnpm check` 250/250), PR
+      efeoncepro/efeonce-mcp#22 abierto con CI verde. Falta: merge DESPUÉS del release de Greenhouse (el merge
       despliega producción) y `pnpm brand:canary` contra staging.
 - [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` con sus dos runtimes y `pnpm docs:closure-check` pasa.
       — Evidencia: filas con los TRES runtimes (Vercel, ops-worker, Job); `docs:closure-check` exit 0 el 2026-09-28.
