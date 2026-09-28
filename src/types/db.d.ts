@@ -532,6 +532,65 @@ export interface GreenhouseAuthTotpEnrollments {
   subject: string;
 }
 
+export interface GreenhouseBrandBrandRenderEvents {
+  actor_kind: string;
+  created_at: Generated<Timestamp>;
+  detail: Generated<Json>;
+  from_state: string | null;
+  job_id: string | null;
+  organization_id: string;
+  render_event_id: Generated<Int8>;
+  request_id: string;
+  to_state: string;
+}
+
+export interface GreenhouseBrandBrandRenderJobs {
+  artifact_id: string;
+  asset_requests: Generated<Json>;
+  attempts: Generated<number>;
+  catalog_name: string;
+  constraints: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  deadline: Timestamp | null;
+  execution_name: string | null;
+  failure_code: string | null;
+  failure_detail: string | null;
+  fence_token: Generated<Int8>;
+  finished_at: Timestamp | null;
+  job_id: Generated<string>;
+  lease_expires_at: Timestamp | null;
+  manifest: Json;
+  manifest_hash: string;
+  max_attempts: Generated<number>;
+  organization_id: string;
+  output_asset_ids: Generated<string[]>;
+  output_report: Json | null;
+  output_target: string;
+  provenance: Json | null;
+  request_id: string;
+  started_at: Timestamp | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseBrandBrandRenderRequests {
+  axis_versions: Generated<Json>;
+  cancelled_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  family: string;
+  finished_at: Timestamp | null;
+  idempotency_key: string;
+  organization_id: string;
+  request_id: Generated<string>;
+  request_summary: Generated<Json>;
+  requested_by_kind: string;
+  requested_by_user_id: string | null;
+  source_asset_ids: Generated<string[]>;
+  started_at: Timestamp | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseClientPortalModuleAssignmentEvents {
   actor_user_id: string;
   assignment_id: string;
@@ -13625,6 +13684,9 @@ export interface DB {
   "greenhouse_auth.signing_keys": GreenhouseAuthSigningKeys;
   "greenhouse_auth.totp_backup_codes": GreenhouseAuthTotpBackupCodes;
   "greenhouse_auth.totp_enrollments": GreenhouseAuthTotpEnrollments;
+  "greenhouse_brand.brand_render_events": GreenhouseBrandBrandRenderEvents;
+  "greenhouse_brand.brand_render_jobs": GreenhouseBrandBrandRenderJobs;
+  "greenhouse_brand.brand_render_requests": GreenhouseBrandBrandRenderRequests;
   "greenhouse_client_portal.module_assignment_events": GreenhouseClientPortalModuleAssignmentEvents;
   "greenhouse_client_portal.module_assignments": GreenhouseClientPortalModuleAssignments;
   "greenhouse_client_portal.modules": GreenhouseClientPortalModules;

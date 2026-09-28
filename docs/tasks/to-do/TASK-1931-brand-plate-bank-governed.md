@@ -100,7 +100,7 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md` (generación idempotente, isotipo declarativo)
 - `docs/tasks/to-do/TASK-1925-brand-workshop-migration.md` (binarios por sha256 en el taller)
-- `docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md` (plates por `assetId`)
+- `docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md` (plates por `assetId`)
 - `scripts/foto/assets-lock.mjs` y `scripts/foto/aprobadores.json` (patrón vigente de sellado por sha256 y lista de
   aprobadores del compositor)
 

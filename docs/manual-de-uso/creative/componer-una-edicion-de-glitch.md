@@ -6,7 +6,7 @@
 > **Ultima actualizacion:** 2026-09-27 por Claude (v1.0: primera versión, con los catálogos de Glitch de TASK-1923)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita») · piezas estáticas
 > **Ruta en portal:** no aplica — es un taller local: se corre en una máquina con `greenhouse-eo` clonado. La ruta
-> productiva (API, `artifact-worker`, MCP) todavía no existe: es [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md)
+> productiva (API, `artifact-worker`, MCP) todavía no existe: es [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md)
 > **Documentacion relacionada:** [Componer piezas de Glitch](./componer-piezas-glitch.md) (el criterio de cada pieza) · [Documentación funcional](../../documentation/creative/linea-grafica-glitch.md) · [Norma de la sub-línea, §9.1](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#91-qué-ya-se-compone-en-el-artifact-composer-task-1923) · [TASK-1923](../../tasks/complete/TASK-1923-glitch-artifact-composer-catalogs.md) · [Producir el motion, el sonido y la música de Glitch](./producir-motion-glitch.md)
 
 > **⚠️ Este comando es SÓLO para Glitch.** No compone piezas de Efeonce ni de clientes. Para cualquier otra pieza de
@@ -252,5 +252,5 @@ carrusel no cumple los límites de LinkedIn, el PDF final no se escribe (los PNG
 - Comando: [`scripts/glitch/compose.ts`](../../../scripts/glitch/compose.ts) · límites de LinkedIn: [`scripts/glitch/linkedin.ts`](../../../scripts/glitch/linkedin.ts) · tokens: `pnpm glitch:tokens [--check]` (compila `glitch-tokens.css` desde `glitchLine` de AXIS)
 - Gate visual: `pnpm composer:visual-gate --catalog=glitch [--selftest|--freeze]`; frames en `scripts/frontend/baselines/artifact-composer/templates-glitch/`
 - Norma: [§9.1 Qué ya se compone en el Artifact Composer](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#91-qué-ya-se-compone-en-el-artifact-composer-task-1923) · ADR: [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
-- Tasks: [TASK-1923](../../tasks/complete/TASK-1923-glitch-artifact-composer-catalogs.md) (taller local) · [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md) (ruta productiva)
+- Tasks: [TASK-1923](../../tasks/complete/TASK-1923-glitch-artifact-composer-catalogs.md) (taller local) · [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) (ruta productiva)
 - Skill para agentes: `efeonce-graphic-line`, `references/glitch.md` §9
