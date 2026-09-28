@@ -8,7 +8,9 @@
  * - el eslogan en la portada: ninguna portada del catálogo tiene slot de eslogan (`slot-unknown` lo rechaza);
  * - el eslogan dos veces: el eslogan va sólo en el cierre y un deck tiene un cierre (`frame-count`);
  * - el mensaje de cierre y las familias que un documento excluye: los declara `documents` de cada receta
- *   (`recipe-not-for-document`).
+ *   (`recipe-not-for-document`);
+ * - el orden de una secuencia: `pairsWith` con `sequence` dice qué láminas van juntas, no en qué orden (medido
+ *   2026-09-28: `proposal-cinematic-nexa-lines` lista la portada como secuencia), así que no hay regla de orden.
  */
 
 import type { DeckPlanIssueSeverity } from './types'
@@ -29,7 +31,6 @@ export const DECK_PLAN_ISSUE_CODES = {
   'slot-required-missing': 'error',
   'slot-over-max-chars': 'error',
   'recipe-without-template': 'warning',
-  'sequence-order': 'warning',
   'section-split-corner-adjacent': 'warning',
   'rhythm-paper-run': 'warning'
 } as const satisfies Record<string, DeckPlanIssueSeverity>

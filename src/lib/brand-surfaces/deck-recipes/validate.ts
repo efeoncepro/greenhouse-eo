@@ -7,7 +7,7 @@
  *    cierre al final en un brochure, página de servicio, línea del marco, navegación y la foto que alterna entre portada
  *    y cierre. Sus issues llegan con `source: 'axis'` y el código de AXIS tal cual.
  * 2. **Reglas del catálogo** que AXIS no conoce: recetas por id, documentos, parejas portada ↔ cierre, variantes,
- *    secuencias, plates y slots. Si AXIS ya reportó lo mismo sobre la misma lámina, el código del catálogo no se agrega.
+ *    plates, slots y ritmo. Si AXIS ya reportó lo mismo sobre la misma lámina, el código del catálogo no se agrega.
  *
  * Es pura y determinista: no lee archivos, no llama a la red y no escribe. Isomórfica (sin `server-only`).
  */
@@ -279,17 +279,6 @@ export const validateDeckPlan = (plan: DeckPlan): DeckPlanValidation => {
       add('variant-adjacent', `«${entry.recipe.id}» es variante de «${previousSlide.recipe.id}»: no van seguidas.`, { index: entry.index, recipeId: entry.recipe.id })
     }
 
-    // Una secuencia declarada en un solo sentido (A → B) pide A antes que B.
-    const later = resolved.slice(position + 1)
-
-    const outOfOrder = later.find(
-      next => next.recipe.pairs.sequence.some(ref => refersTo(ref, entry.recipe)) && !entry.recipe.pairs.sequence.some(ref => refersTo(ref, next.recipe))
-    )
-
-    if (outOfOrder) {
-      add('sequence-order', `«${outOfOrder.recipe.id}» abre la secuencia que sigue «${entry.recipe.id}»: va antes.`, { index: entry.index, recipeId: entry.recipe.id })
-    }
-
     const previous = resolved[position - 1]
 
     if (
@@ -302,9 +291,14 @@ export const validateDeckPlan = (plan: DeckPlan): DeckPlanValidation => {
       add('section-split-corner-adjacent', 'Dos secciones partidas seguidas con la misma esquina.', { index: entry.index, recipeId: entry.recipe.id })
     }
 
-    const run = resolved.slice(Math.max(0, position - 2), position + 1)
+    // Un aviso por tramo: en la tercera lámina de papel seguida, no en cada una de las que siguen.
+    const run = resolved.slice(Math.max(0, position - 3), position + 1)
+    const paper = (item?: ResolvedSlide) => item?.recipe.axis?.theme === 'light'
+    const contiguous = (items: ResolvedSlide[]) => items.every((item, at) => at === 0 || item.index === items[at - 1]!.index + 1)
+    const lastThree = run.slice(-3)
+    const startsRun = run.length < 4 || !paper(run[0]) || !contiguous(run)
 
-    if (run.length === 3 && run.every(item => item.recipe.axis?.theme === 'light') && run[2]!.index - run[0]!.index === 2) {
+    if (lastThree.length === 3 && lastThree.every(item => paper(item)) && contiguous(lastThree) && startsRun) {
       add('rhythm-paper-run', 'Tres láminas de papel seguidas: intercala una oscura o con foto.', { index: entry.index, recipeId: entry.recipe.id })
     }
 

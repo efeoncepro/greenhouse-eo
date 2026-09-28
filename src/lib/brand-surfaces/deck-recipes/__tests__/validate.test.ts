@@ -85,7 +85,6 @@ describe('validateDeckPlan — una prueba que dispara y otra que no, por código
     'slot-over-max-chars': { fires: withCoverSlots({ ...COVER_SLOTS, answer: 'Crecer con foco y medida' }), quiet: withCoverSlots(COVER_SLOTS) },
     // Las 69 recetas tienen plantilla: el aviso se prueba en `recipe-without-template.test.ts` con un catálogo simulado.
     'recipe-without-template': { fires: read('golden-brochure.json'), quiet: read('golden-brochure.json') },
-    'sequence-order': { fires: plan('proposal', []), quiet: read('golden-proposal.json') },
     'section-split-corner-adjacent': {
       fires: plan('proposal', ['cover-proposal-orbit', 'section-split', 'section-split', 'proposal-service-aeo', 'close-proposal-horizon']),
       quiet: plan('proposal', ['cover-proposal-orbit', 'section-split', 'proposal-service-aeo', 'section-split-corner-bottom', 'close-proposal-horizon'])
@@ -93,27 +92,6 @@ describe('validateDeckPlan — una prueba que dispara y otra que no, por código
     'rhythm-paper-run': {
       fires: plan('proposal', ['cover-proposal-orbit', 'decision-risk', 'decision-chart', 'decision-why-us', 'proposal-service-aeo', 'close-proposal-horizon']),
       quiet: read('golden-proposal.json')
-    }
-  }
-
-  // `sequence-order` necesita una secuencia declarada en un solo sentido: la busca en el catálogo.
-  const asymmetric = listDeckRecipes('proposal').flatMap(first =>
-    first.pairs.sequence
-      .map(ref => getDeckRecipe(ref))
-      .filter(second => second && second.documents.includes('proposal') && !second.pairs.sequence.includes(first.id) && second.id !== first.id)
-      .map(second => [first.id, second!.id] as const)
-  )
-
-  it('el catálogo tiene al menos una secuencia en un solo sentido para probar `sequence-order`', () => {
-    expect(asymmetric.length).toBeGreaterThan(0)
-  })
-
-  if (asymmetric.length > 0) {
-    const [first, second] = asymmetric[0]!
-
-    cases['sequence-order'] = {
-      fires: plan('proposal', ['cover-proposal-orbit', second, 'proposal-service-aeo', first, 'close-proposal-horizon']),
-      quiet: plan('proposal', ['cover-proposal-orbit', first, 'proposal-service-aeo', second, 'close-proposal-horizon'])
     }
   }
 
@@ -125,6 +103,12 @@ describe('validateDeckPlan — una prueba que dispara y otra que no, por código
       expect(codes(quiet)).not.toContain(code)
     })
   }
+
+  it('un tramo de papel da un solo aviso, aunque siga', () => {
+    const issues = validateDeckPlan(plan('proposal', ['cover-proposal-orbit', 'decision-risk', 'decision-chart', 'decision-why-us', 'content-clients', 'proposal-service-aeo', 'close-proposal-horizon'])).issues
+
+    expect(issues.filter(issue => issue.code === 'rhythm-paper-run')).toHaveLength(1)
+  })
 
   it('cada código del catálogo tiene su caso', () => {
     expect(Object.keys(cases).sort()).toEqual(Object.keys(DECK_PLAN_ISSUE_CODES).sort())

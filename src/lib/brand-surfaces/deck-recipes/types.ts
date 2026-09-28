@@ -88,8 +88,8 @@ export interface DeckPlan {
 
 export type DeckPlanIssueSeverity = 'error' | 'warning'
 
-/** De dónde sale el issue: el piso de documento de AXIS o una regla del catálogo. */
-export type DeckPlanIssueSource = 'axis' | 'catalog'
+/** De dónde sale el issue: el piso de documento de AXIS, una regla del catálogo o la propuesta del agente. */
+export type DeckPlanIssueSource = 'axis' | 'catalog' | 'agent'
 
 export interface DeckPlanIssue {
   code: string
