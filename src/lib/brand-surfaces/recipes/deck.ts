@@ -164,19 +164,19 @@ const proposalCinematicService: RecipeBuilder = ({ intent, manifest, recipe }) =
 
   if (content.proof) slots.proof = { text: content.proof.text, source: content.proof.source }
 
-  // La nota del pie («Sin promesas de ranking…»), a la derecha de la burbuja URL, donde la reservó AXIS (TASK-1934).
+  // La nota del pie («Sin promesas de ranking…»), a la derecha de la burbuja URL, donde la reservó AXIS (TASK-1934). Las
+  // medidas van SIEMPRE en el frame (el renderer resuelve todos sus campos); el texto es opcional: sin nota, no se pinta.
+  const noteReserve = reserve(manifest, 'note')
+
+  Object.assign(slots.frame as Record<string, unknown>, {
+    noteLeft: `--gl-pc-note-left=${Math.round(measuredValue(noteReserve?.inset, 'el inicio de la nota') * width)}px`,
+    noteTop: `--gl-pc-note-top=${ofHeight(manifest, measuredValue(noteReserve?.fromTop, 'la altura de la nota'))}px`,
+    notePx: `--gl-pc-note-px=${measuredValue((type as Record<string, { px?: number }>).note?.px, 'el cuerpo de la nota')}px`
+  })
+
   const note = (content as { note?: string | null }).note
 
-  if (note) {
-    const noteReserve = reserve(manifest, 'note')
-
-    slots.note = note
-    Object.assign(slots.frame as Record<string, unknown>, {
-      noteLeft: `--gl-pc-note-left=${Math.round(measuredValue(noteReserve?.inset, 'el inicio de la nota') * width)}px`,
-      noteTop: `--gl-pc-note-top=${ofHeight(manifest, measuredValue(noteReserve?.fromTop, 'la altura de la nota'))}px`,
-      notePx: `--gl-pc-note-px=${measuredValue((type as Record<string, { px?: number }>).note?.px, 'el cuerpo de la nota')}px`
-    })
-  }
+  if (note) slots.note = note
 
   if (selection) slots.selection = selection
 

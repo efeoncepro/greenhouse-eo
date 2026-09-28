@@ -115,19 +115,19 @@
         },
         "noteLeft": {
           "type": "string",
-          "required": false,
+          "required": true,
           "resolver": "gl-css",
           "example": "--gl-pc-note-left=460px"
         },
         "noteTop": {
           "type": "string",
-          "required": false,
+          "required": true,
           "resolver": "gl-css",
           "example": "--gl-pc-note-top=1000px"
         },
         "notePx": {
           "type": "string",
-          "required": false,
+          "required": true,
           "resolver": "gl-css",
           "example": "--gl-pc-note-px=16px"
         }
