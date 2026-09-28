@@ -1,5 +1,11 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
+## Delta 2026-09-28 — TASK-1930 dejó el rastro de binding por slot
+
+- `bindDeckSlots(plan, context)` (`@/lib/brand-surfaces/deck-recipes/bindings`, `server-only`) entrega por slot de
+  datos un `SlotBinding` con `status`, `source`, `evidenceRef`/`evidenceRefs`, `asOf`, `reason` y `dataOrigin`. La procedencia del asset de un deck incluye ese
+  rastro tal cual; no se recalcula ni se resume.
+
 ## Delta 2026-09-28 — TASK-1929 dejó el plan de deck contra el catálogo
 
 - Entrada pura e isomórfica `@/lib/brand-surfaces/deck-recipes`: `validateDeckPlan(plan: DeckPlan): { ok, issues: DeckPlanIssue[] }`

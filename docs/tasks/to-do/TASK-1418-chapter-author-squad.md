@@ -1,5 +1,12 @@
 # TASK-1418 — Chapter-author de equipo/squad: la lámina `team-gallery` desde el roster real (fotos allowlist, nunca IA)
 
+## Delta 2026-09-28 — el binder de equipo de TASK-1930 espera estos hechos
+
+- `src/lib/brand-surfaces/deck-recipes/bindings/binders/team.ts` deja hoy `content-team.lead` y `content-team.team`
+  sin ligar (`no-roster-facts`): la lámina de equipo no compone. Al cerrar esta task, el Slice 6 de TASK-1930 cambia
+  ese binder para consumir los hechos del roster con `source: 'roster-facts'` y fotos sólo del allowlist
+  `squad-person` (nombre, rol y dedicación; nada más), sin recalcular el roster.
+
 ## Delta 2026-09-27 — segundo consumidor de los hechos del roster
 
 - TASK-1930 liga los slots de equipo de la receta `content-team` del deck «La órbita» a los hechos del roster de esta

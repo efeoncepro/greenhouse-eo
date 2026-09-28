@@ -8,7 +8,7 @@ TASK-1863: staging; main retenido.
 
 **Composer `--freeze` (28/09):** sólo acepta la sección nueva sin sellar de `BASELINE_DELTAS.md` ([runbook §5](docs/operations/runbooks/composer-visual-gate.md)). Gate global rojo en 59 frames (ISSUE-122).
 
-**Deck «La órbita» (28/09):** TASK-1927–1929 y TASK-1934 complete en `develop` (78 recetas, AXIS `v0.3.23`); siguen TASK-1930…1933.
+**Deck «La órbita» (28/09):** TASK-1927–1929 y TASK-1934 complete (78 recetas, AXIS `v0.3.23`). [TASK-1930](docs/tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md) in-progress: `bindDeckSlots` + `--bind` en `develop`; montos/equipo esperan TASK-1417/1418; mínimo de logos (9) por confirmar. Siguen 1931–1933.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 

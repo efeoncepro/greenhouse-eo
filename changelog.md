@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Los slots de datos del deck «La órbita» se ligan desde Greenhouse (TASK-1930, parcial)
+
+- `bindDeckSlots(plan, context)` (`src/lib/brand-surfaces/deck-recipes/bindings/`) llena logo del cliente (Account
+  360, variante oscura), cifras con evidencia `measured`, casos, testimonios y logos de terceros sólo con evidencia
+  `attested` y documento, y las láminas de muestra SEO/AEO; deja rastro por slot y falla cerrado. Montos siguen en
+  `[MONTO]` y equipo sin ligar hasta TASK-1417/TASK-1418. CLI: `pnpm brand:deck-plan -- --bind`.
+- `validateDeckPlan` acepta una lista de cifras en un slot `metric` (antes rechazaba las cuatro de `decision-case.stats`).
+
 ## 2026-09-28 — El `--freeze` del composer sólo acepta la sección nueva sin sellar del ledger
 
 - Antes buscaba el nombre del frame en todo `BASELINE_DELTAS.md`, así que una declaración vieja de otra task lo
@@ -654,12 +662,3 @@ revisión servida: auth-server `00076-t2t`, Vercel Production y gateway `00056-k
 manifiesto, ledger y skill `efeonce-mcp-platform` (espejo) quedaron actualizados. Además se documentó el diagnóstico —buen canary,
 retiro mal diseñado— y las reglas para la próxima corrida: clientes OAuth compartidos clasificados desde el día 0,
 señales y muestras por sujeto sin huecos, dry-run con el perfil del apply y gates inventariados al abrir.
-
-## 2026-09-18 — Efeonce Insights: enlaces, correo y recurrencia en producción con flags OFF (TASK-1848)
-
-Release `bda1cf2cd938` (PR #238) lleva a producción compartir por enlace, envío por correo y recurrencia de Insights
-con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED` y la emisión **apagados** hasta que exista el lector de Think
-(TASK-1875, ya desbloqueada). Canary de contrato: crear enlace ⇒ 503 `sharing_disabled`, token inexistente ⇒ 404.
-Staging queda encendido; el operador confirmó la llegada de los dos correos del canary. Gateway `efeonce-mcp` 1.7.0
-(revisión `00055-gk6`, 58 tools): 5 lecturas con el scope base y crear/revocar enlace con `efeonce.mcp.insights.write`
-(fail-closed); enviar y programar no existen por MCP. `ISSUE-174` → `TASK-1876` sigue abierto.

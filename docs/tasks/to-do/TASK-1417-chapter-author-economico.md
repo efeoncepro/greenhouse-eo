@@ -1,5 +1,13 @@
 # TASK-1417 — Chapter-author económico: la lámina `pricing` desde el motor de pricing (nunca desde el LLM)
 
+## Delta 2026-09-28 — el binder de montos de TASK-1930 espera estos hechos
+
+- `src/lib/brand-surfaces/deck-recipes/bindings/binders/money.ts` imprime hoy `[MONTO]` en todo slot `money`
+  (`no-frozen-quote`) y quita una línea de `content-pricing-live.lineItems` con un monto escrito. Al cerrar esta task,
+  el Slice 5 de TASK-1930 cambia ese binder para consumir los hechos económicos (ya redactados) con `source:
+  'economic-facts'` y su `evidenceRef`, sin recalcularlos. Mapa de slots: `content-pricing.amounts`,
+  `content-pricing-stage.amounts`, `content-pricing-live.total` y `content-pricing-live.lineItems`.
+
 ## Delta 2026-09-27 — segundo consumidor de los hechos económicos
 
 - TASK-1930 liga los slots `money` de las recetas de cotización del deck «La órbita» (`content-pricing`,

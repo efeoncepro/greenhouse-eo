@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.15
+> **Version:** 1.16
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -499,6 +499,26 @@ portal, Nexa o MCP, es TASK-1932.
 > [manual, paso 4b](../../manual-de-uso/creative/componer-deck-con-recetas.md#paso-4b--valida-el-plan-antes-de-componer) ·
 > [catálogo de recetas, códigos](../../operations/brand-graphic-line/deck-recipes/README.md#validar-el-plan-códigos-y-cómo-leerlos) ·
 > [TASK-1929](../../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md)
+
+## Delta 2026-09-28 (c) — los datos de un deck salen de Greenhouse, con su fuente
+
+Desde el 2026-09-28 los **datos** de un deck —el logo del cliente, las cifras, los casos, los testimonios, los logos de
+clientes y partners, los montos y el equipo— ya no se copian a mano: se **ligan** desde Greenhouse con
+`pnpm brand:deck-plan -- --bind`. El logo del cliente sale de su ficha (Account 360), en la versión para fondo oscuro
+cuando la portada es oscura. Cada cifra, caso o testimonio sale de la evidencia registrada en la propuesta, con su
+fuente y su fecha, y un logo o una cita de otro cliente sólo entran si su autorización quedó registrada con su
+documento. Si un dato no se puede verificar, el slot queda **sin ligar** con el motivo, y la lámina no sale: nunca se
+inventa una cifra, una cara ni un logo, y un deck para el cliente nunca usa evidencia interna.
+
+Los montos siguen saliendo como `[MONTO]` hasta que la cotización congelada de la propuesta los entregue (TASK-1417), y
+la lámina de equipo espera el roster real (TASK-1418). Las láminas de muestra SEO/AEO conservan sus datos de ejemplo y
+su marca hasta que haya un diagnóstico real con evidencia. Ligar no compone ni guarda nada: la salida productiva, con
+confirmación humana, es TASK-1932.
+
+> Detalle técnico: [catálogo de recetas, «Datos reales por slot»](../../operations/brand-graphic-line/deck-recipes/README.md#datos-reales-por-slot-task-1930) ·
+> [manual, paso 5b](../../manual-de-uso/creative/componer-deck-con-recetas.md#paso-5b--liga-los-datos-reales) ·
+> código: `src/lib/brand-surfaces/deck-recipes/bindings/` ·
+> [TASK-1930](../../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md)
 
 ## Estado y pendientes
 

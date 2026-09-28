@@ -1,9 +1,12 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.7
+> **Versión:** 1.8
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.7: `cover-brochure-line-brand` usa su plate propio `CR4` y deja
+> **Última actualización:** 2026-09-28 por Claude (1.8: sección «Datos reales por slot» — qué slot sale de qué fuente
+> con `bindDeckSlots` y `pnpm brand:deck-plan -- --bind`, motivos de «sin ligar» y reglas de audiencia y autorización
+> (TASK-1930).
+> Antes, 1.7: `cover-brochure-line-brand` usa su plate propio `CR4` y deja
 > de repetir `CR2b` con `proposal-cinematic-creative`; pendientes «Abiertos».
 > Antes, 1.6: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo (69 → 78 recetas,
 > todas con plantilla), cómo elegirlas y sus reglas (cifras con fuente,
@@ -553,6 +556,59 @@ ritmo se vigila sólo en papel: las láminas oscuras son el fondo base del deck.
 El validador no lee este JSON en runtime: lee `src/lib/brand-surfaces/deck-recipes/catalog.generated.json`, que escribe
 `pnpm brand:deck-recipes` junto con el índice de abajo. Por eso, **después de editar el JSON, corre
 `pnpm brand:deck-recipes`**: `--check` falla si el índice **o** el catálogo de runtime quedaron atrás.
+
+## Datos reales por slot (TASK-1930)
+
+Desde el 2026-09-28 los slots de **datos** de un plan —logo del cliente, cifras, casos, testimonios, logos de
+terceros, montos, equipo y datos de muestra— se llenan desde la verdad de Greenhouse con `bindDeckSlots(plan, context)`
+(`src/lib/brand-surfaces/deck-recipes/bindings/`). Los slots de voz no se ligan: los escribe quien propone y los
+confirma una persona.
+
+```bash
+pnpm brand:deck-plan -- --bind --plan <plan.json> --context <context.json> [--out <ligado.json>]
+pnpm brand:deck-plan -- --bind --plan <plan.json> --proposal <proposalId> --org <ownerOrgId> [--facts <hechos.json>]
+pnpm brand:deck-plan -- --bind --plan <plan.json> --sources <fuentes.json>   # sin base, sobre un fixture
+```
+
+**El valor nunca sale del texto del plan.** Sale de un **hecho** (el contrato `EvidencedFact` de los chapter-authors:
+`value`, `label`, `evidenceRef`) que se verifica contra la evidencia de la `Proposal`. `proposal_evidence` no guarda el
+valor de una cifra: guarda de dónde sale (`locator`), cuándo (`as_of`), su clasificación y su audiencia. Lo que el plan
+traiga en un slot de datos se reemplaza por el hecho o se quita, y el validador falla cerrado si el slot era
+obligatorio.
+
+| Slot (receta) | Binder | Fuente | Sin dato |
+|---|---|---|---|
+| `clientLogo` de las portadas de propuesta | `client-logo` | Account 360 (`readOrganizationLogoVariants`), variante para fondo oscuro | `no-on-dark-logo`, `no-logo`; sin propuesta, `no-proposal` |
+| `measure`, `figures`, `proof`, `bars`, `kpis`, `facts`, `metrics` (`content-measure`, `content-focus`, `decision-chart`, `decision-why-us`, `content-day-live-results`, `section-cine-about`, pruebas de servicio) | `metric` | hecho con evidencia `measured`; la fuente visible es el `locator` | `no-evidence` |
+| `source` y `annotation` de esas láminas | `metric-source`, `metric-delta` | las cifras ya ligadas (la diferencia se calcula de las barras) | el motivo de su slot hermano |
+| `clientLogo` del caso y del testimonio, muro `logos` y `partners` | `proof-logo` | hecho con evidencia `attested` **con documento de respaldo** | `no-authorization`; el muro omite el logo sin autorización y, con menos de 9, `below-minimum` |
+| `stats` del caso, `proof` del testimonio, `proofs` del muro | `proof-figures` | como `metric`, pero `attested` con documento | `no-authorization` |
+| `fullQuote`, `author`, `keyPhrase` del testimonio | `proof-quote` | cita textual, nombre y cargo del hecho; la frase destacada sólo si es un fragmento literal de la cita | `no-authorization`, `not-in-quote` |
+| `photo` del caso | `proof-photo` | la foto real que trae la evidencia; la de ejemplo nunca | `no-real-photo` |
+| `amounts`, `total`, `lineItems` de la cotización | `money` | hechos económicos de TASK-1417 (**pendiente**) | siempre `[MONTO]` (`no-frozen-quote`); una línea con un monto escrito se quita |
+| `lead`, `team` de `content-team` | `team` | roster real de TASK-1418 (**pendiente**) | `no-roster-facts`: sin roster no hay lámina de equipo, nunca una cara generada |
+| datos de `decision-ai-answer` y `decision-diagnosis-map` | `sample-data` | por defecto, muestra con su marca; con un hecho `sample-data` y evidencia `measured`, datos del cliente y la marca se retira | la marca se queda: nunca se quita sin evidencia |
+
+Sin binder, con su razón escrita en el mapa: las cifras de `decision-ai-market` (dato de mercado citado con fuente
+pública), el puntaje de `method-score-ring` (se calcula del scoring de Efeonce), el horizonte de `decision-plan` y los
+slots que eligen qué destaca la selección. Un test exige que todo slot `logo`, `money`, `metric`, `person` o de prueba
+de las 78 recetas tenga binder o exclusión.
+
+Reglas que no se negocian:
+
+- **Audiencia:** un deck `client_facing` con una sola evidencia `internal` no compone (`binding-internal-evidence`);
+  además, toda evidencia ligada pasa por el gate canónico `assertEvidenceAllowedForAudience`.
+- **Evidencia inventada:** un `evidenceRef` que no es de la propuesta (o, fuera de una, un asset que no existe) es
+  `binding-evidence-unknown` y el deck no compone.
+- **Fuera de una `Proposal`** (brochure, pitch o QBR de marca propia) sólo liga una cifra con un asset de respaldo vivo
+  y su `sourceLabel`; la autorización de un tercero no existe fuera de una propuesta (`no-authorization`).
+- **Nada extra viaja:** de cada hecho se copian sólo sus campos permitidos; ni costos, ni margen, ni datos personales
+  fuera de nombre y cargo llegan a la lámina ni al rastro.
+
+El rastro de cada slot (`status`, `source`, `evidenceRef`/`evidenceRefs`, `asOf`, `reason`, `dataOrigin`) viaja al
+manifest resuelto y a la procedencia del asset (TASK-1932, TASK-1921). La autorización de uso de un logo o testimonio
+se registra antes como evidencia `attested` de la propuesta (acción `record_proposal_evidence`), con su documento.
+Paso a paso: [manual de uso, paso 5b](../../../manual-de-uso/creative/componer-deck-con-recetas.md#paso-5b--liga-los-datos-reales).
 
 ## Cómo regenerar el índice
 

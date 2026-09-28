@@ -1,5 +1,17 @@
 # TASK-1930 — Datos reales en los slots del deck «La órbita»: logo, montos, equipo, métricas, casos y testimonios
 
+## Delta 2026-09-28 — Slices 1–4 y 7 entregados; 5 y 6 esperan sus hechos
+
+- `bindDeckSlots(plan, context)` (`server-only`) + núcleo puro `bindDeckSlotsWith(plan, sources)` en
+  `src/lib/brand-surfaces/deck-recipes/bindings/`; mapa de las 78 recetas; CLI `pnpm brand:deck-plan -- --bind`.
+- **Supuesto corregido en Discovery:** `proposal_evidence` no guarda el valor de una cifra ni el texto de una cita (sólo
+  `locator`, `method`, `as_of`, clasificación, audiencia y fuente). El valor viaja en un **hecho** (`EvidencedFact`
+  de los chapter-authors, con `evidenceRef` = `evidence_id`) y la evidencia lo autoriza. Sin reader nuevo ni schema.
+- **Bug latente de TASK-1929 corregido:** `validateDeckPlan` rechazaba una lista en un slot `metric`, y
+  `decision-case.stats` lleva cuatro cifras; ahora acepta una cifra o una lista y exige la fuente de cada una.
+- Slices 5 y 6: `money` imprime `[MONTO]` y `team` queda `no-roster-facts` sin lógica paralela (deltas en TASK-1417 y
+  TASK-1418). La task sigue `in-progress` hasta que esas dos cierren.
+
 ## Delta 2026-09-28 — TASK-1934 suma nueve recetas SEO/AEO (nombres finales)
 
 - El catálogo pasa de 69 a **78 recetas**, todas con plantilla. El criterio «todo slot `logo`, `money`, `metric`, `person`
@@ -67,7 +79,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Implementación — Slices 1–4 y 7`
+- Status real: `Slices 1–4 y 7 entregados en develop (a2b7d26bd, f456921c3); Slices 5 (montos) y 6 (equipo) abiertos: esperan TASK-1417 y TASK-1418`
 - Rank: `TBD`
 - Domain: `crm|content`
 - Blocked by: `none`
@@ -290,22 +302,22 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. (`bindings/index.ts`: `getProposalById`, `buildProposalRenderProjection`, `readOrganizationLogoVariants`, `getAssetById`.)
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. (Lectura acotada por `ownerOrgId`; test de determinismo en `bind.test.ts`.)
+- [x] N/A — sin tablas nuevas. Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. (Sin migración; rollback `git revert`.)
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. (Corrida `--bind` contra `prop-5965260d…`, abajo.)
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. (`DeckBindingReadError` + `captureWithDomain`, `load.test.ts`; anti-leak en `bind.test.ts`.)
 
 ### Capability Definition of Done — Full API Parity gate
 
-- [ ] **Lógica en el primitive, no en la UI.** Los binders viven en `src/lib/brand-surfaces/deck-recipes/bindings/`.
-- [ ] **Modelada como reader, no como click-handler.**
-- [ ] **Read** por readers canónicos existentes; sin escrituras.
-- [ ] **Capability + grant en el MISMO PR:** `N/A — sin endpoint propio; el consumer (TASK-1932) aplica `commercial.proposal.*``.
-- [ ] **Camino programático declarado:** CLI local + follow-up explícito TASK-1932 (API, Nexa, MCP).
-- [ ] **Write apto para `propose → confirm → execute`:** el binding ocurre antes del confirm y su rastro se muestra en el preview.
-- [ ] **Un primitive, muchos consumers:** CLI, TASK-1921 y TASK-1932 llaman a `bindDeckSlots`.
+- [x] **Lógica en el primitive, no en la UI.** Los binders viven en `src/lib/brand-surfaces/deck-recipes/bindings/`.
+- [x] **Modelada como reader, no como click-handler.**
+- [x] **Read** por readers canónicos existentes; sin escrituras.
+- [x] **Capability + grant en el MISMO PR:** `N/A — sin endpoint propio; el consumer (TASK-1932) aplica `commercial.proposal.*``.
+- [x] **Camino programático declarado:** CLI local + follow-up explícito TASK-1932 (API, Nexa, MCP).
+- [ ] (lo cierra TASK-1932) **Write apto para `propose → confirm → execute`:** el binding ocurre antes del confirm y su rastro se muestra en el preview.
+- [ ] (hoy sólo la CLI; TASK-1921 y TASK-1932 pendientes) **Un primitive, muchos consumers:** CLI, TASK-1921 y TASK-1932 llaman a `bindDeckSlots`.
 - [ ] **Parity check = SÍ** una vez cerrada TASK-1932.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -445,18 +457,18 @@ Sin flag propio: lectura pura sin consumer productivo. El cutover productivo lo 
 
 ## Acceptance Criteria
 
-- [ ] `bindDeckSlots` existe y devuelve un `SlotBinding` por slot de datos, con `source` y `evidenceRef` o `reason`.
-- [ ] Todo slot `logo`, `money`, `metric`, `person` o de prueba de las 69 recetas tiene binder o exclusión con razón (test).
-- [ ] (Delta 2026-09-28, TASK-1934) Los slots de cifras de mercado, respuesta de ejemplo y datos de muestra de las nueve recetas SEO/AEO tienen binder o exclusión con razón, y la marca «Ejemplo ilustrativo» / «Datos de muestra» sólo se retira con un hecho con `evidenceRef` (test).
-- [ ] El logo del cliente sale de `readOrganizationLogoVariants` y una portada oscura sin variante oscura queda `unbound` (test).
-- [ ] Ningún slot `money` o `metric` se llena desde texto del LLM (test).
-- [ ] Sin cotización congelada, `money` se imprime `[MONTO]` (test).
-- [ ] Un deck `client_facing` con evidencia `internal` no compone y reporta `internal-evidence` (test).
-- [ ] Logos de terceros y testimonios sólo se ligan desde evidencia `attested` con documento de respaldo (test).
-- [ ] Ningún slot ni rastro contiene loaded cost, margen ni PII fuera de nombre, rol y dedicación (test anti-leak).
-- [ ] Los binders de montos y equipo importan los hechos de TASK-1417 y TASK-1418 sin recalcularlos (o el slice queda abierto con `Status real` que lo dice).
-- [ ] Hay evidencia de una corrida `--bind` contra una `Proposal` de staging registrada en el cierre.
-- [ ] README del catálogo, manual y doc funcional describen qué slot sale de qué fuente.
+- [x] `bindDeckSlots` existe y devuelve un `SlotBinding` por slot de datos, con `source` y `evidenceRef` o `reason`. (`bindings/index.ts`, `core.ts`; `bind.test.ts`, `golden.test.ts`.)
+- [x] Todo slot `logo`, `money`, `metric`, `person` o de prueba de las 78 recetas tiene binder o exclusión con razón (test). (`map.test.ts`, contra el catálogo de runtime.)
+- [x] (Delta 2026-09-28, TASK-1934) Los slots de cifras de mercado, respuesta de ejemplo y datos de muestra de las nueve recetas SEO/AEO tienen binder o exclusión con razón, y la marca «Ejemplo ilustrativo» / «Datos de muestra» sólo se retira con un hecho con `evidenceRef` (test).
+- [x] El logo del cliente sale de `readOrganizationLogoVariants` y una portada oscura sin variante oscura queda `unbound` (test). (`bind.test.ts` › client-logo; `load.test.ts`.)
+- [x] Ningún slot `money` o `metric` se llena desde texto del LLM (test). (`bind.test.ts` › «nunca liga una cifra desde el texto del plan».)
+- [x] Sin cotización congelada, `money` se imprime `[MONTO]` (test). (`bind.test.ts` › money y team.)
+- [x] Un deck `client_facing` con evidencia `internal` no compone y reporta `internal-evidence` (test). (`bind.test.ts` › audiencia; también contra la base real, abajo.)
+- [x] Logos de terceros y testimonios sólo se ligan desde evidencia `attested` con documento de respaldo (test). (`bind.test.ts` › prueba de terceros.)
+- [x] Ningún slot ni rastro contiene loaded cost, margen ni PII fuera de nombre, rol y dedicación (test anti-leak). (`bind.test.ts` › anti-leak: sólo campos permitidos de cada hecho.)
+- [ ] Los binders de montos y equipo importan los hechos de TASK-1417 y TASK-1418 sin recalcularlos (o el slice queda abierto con `Status real` que lo dice). **Abierto:** TASK-1417 y TASK-1418 siguen `to-do`; `money` imprime `[MONTO]` y `team` queda `no-roster-facts`, sin lógica paralela. `Status real` lo dice.
+- [x] Hay evidencia de una corrida `--bind` contra una `Proposal` de staging registrada en el cierre. (2026-09-28, instancia compartida dev/staging por proxy, sólo lectura, perfil `runtime`: `prop-5965260d-1345-4ed1-9956-d6d7f0628000` «SKY — Gestión del blog 2026», 4 evidencias. Con `client_facing`: la única `measured` es interna (costo cargado del equipo) → `internal-evidence` + `binding-internal-evidence`; las tres `attested` no tienen documento → `no-authorization`; el cliente no tiene logo en Account 360 → `no-logo`; `$3.500.000` → `[MONTO]`; `ok=false`. Con `internal`: la cifra liga desde `proposal-evidence` con su `asOf` 2026-07-12. No había una propuesta con evidencia `measured` client-facing ni `attested` con documento: el camino positivo completo está en `golden.test.ts`.)
+- [x] README del catálogo, manual y doc funcional describen qué slot sale de qué fuente. (README 1.8 «Datos reales por slot», manual 1.7 paso 5b, funcional 1.16 delta (c).)
 
 ## Verification
 
@@ -474,7 +486,7 @@ Sin flag propio: lectura pura sin consumer productivo. El cutover productivo lo 
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `## Delta` en TASK-1932 y TASK-1921 con la firma final de `bindDeckSlots` y el formato del rastro
+- [x] `## Delta` en TASK-1932 y TASK-1921 con la firma final de `bindDeckSlots` y el formato del rastro (más TASK-1417 y TASK-1418)
 
 ## Follow-ups
 
@@ -484,6 +496,9 @@ Sin flag propio: lectura pura sin consumer productivo. El cutover productivo lo 
 
 ## Open Questions
 
-- ¿La autorización de uso de un logo de cliente vale por deck o es permanente hasta revocarse? Hoy se modela por
-  `Proposal` (evidencia `attested`); una autorización permanente pediría la biblioteca del follow-up.
-- ¿Cuál es el mínimo de logos para que `content-clients` componga sin verse vacío? Lo fija el operador.
+- ~~¿La autorización de uso de un logo de cliente vale por deck o es permanente hasta revocarse?~~ **Resuelta
+  2026-09-28:** por `Proposal` (evidencia `attested` con documento). Fuera de una propuesta no hay autorización de
+  terceros (`no-authorization`); la permanente es la biblioteca del follow-up.
+- ¿Cuál es el mínimo de logos para que `content-clients` componga sin verse vacío? **Provisional 2026-09-28:** el de la
+  lámina aprobada, nueve (`LOGO_WALL_MIN` en `bindings/map.ts`), también para `content-partners`. Pendiente de que el
+  operador lo confirme o lo baje.

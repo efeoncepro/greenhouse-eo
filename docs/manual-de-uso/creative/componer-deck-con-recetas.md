@@ -1,9 +1,9 @@
 # Componer un deck con las recetas por lámina — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.6: las nueve láminas SEO/AEO aprobadas el 2026-09-28 (78 recetas, todas con plantilla): cuándo usarlas, cifras siempre con fuente, datos de muestra marcados («Ejemplo ilustrativo», «Datos de muestra») y la interfaz de IA genérica; la regla de alternativas (una sola por deck, seguidas o no) y los códigos `variant-both-in-deck` y `figure-source-missing` (TASK-1934). Antes, 1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.7: paso 5b — ligar los datos reales de los slots con `pnpm brand:deck-plan -- --bind` (logo del cliente desde Account 360, cifras, casos, testimonios y logos con evidencia de la propuesta, montos en `[MONTO]` y equipo pendiente), cómo leer la tabla de slots y sus motivos (TASK-1930). Antes, 1.6: las nueve láminas SEO/AEO aprobadas el 2026-09-28 (78 recetas, todas con plantilla): cuándo usarlas, cifras siempre con fuente, datos de muestra marcados («Ejemplo ilustrativo», «Datos de muestra») y la interfaz de IA genérica; la regla de alternativas (una sola por deck, seguidas o no) y los códigos `variant-both-in-deck` y `figure-source-missing` (TASK-1934). Antes, 1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se arma con el catálogo de recetas, comandos locales y el Artifact Composer (la ruta productiva gobernada es TASK-1921, en curso en otra sesión: todavía no está disponible)
 > **Documentacion relacionada:** [Composición de decks y brochures (funcional)](../../documentation/creative/composicion-de-decks-y-brochures.md) · [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) · [Norma de composición por superficie §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Componer una pieza por superficie con AXIS](./componer-por-superficie-con-axis.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
@@ -295,7 +295,7 @@ Validar con `--plan` no necesita credenciales ni red.
 #### Qué no hace todavía
 
 - No convierte el plan en intents ni compone: eso sigue siendo `pnpm brand:compose` (pasos 7 a 9).
-- No llena los slots con datos reales (TASK-1930) ni elige fotos del banco (TASK-1931).
+- No llena los slots con datos reales: eso es el paso 5b (`--bind`, TASK-1930). Tampoco elige fotos del banco (TASK-1931).
 - No está en el portal, en Nexa ni en MCP, y no guarda la confirmación (TASK-1932).
 
 ### Paso 5 · Llena los slots
@@ -326,6 +326,59 @@ vale. Reglas:
 - **Selección:** una sola por lámina. Qué destaca depende de la receta (paso 8, «La selección»); si la receta no la
   lleva, no la agregues.
 - **Fotos de ejemplo** (el caso Sky, las piezas dentro de las interfaces del «vívelo») se reemplazan antes de enviar.
+
+### Paso 5b · Liga los datos reales
+
+Los slots de **datos** —logo del cliente, cifras, casos, testimonios, logos del muro, montos y equipo— no se escriben a
+mano: se ligan desde Greenhouse, y lo que hayas escrito en ellos se reemplaza por el dato verificado o se quita.
+
+1. **Registra primero la evidencia en la propuesta.** Cada cifra necesita una evidencia `measured` y cada caso,
+   testimonio, logo de tercero o foto de caso, una evidencia `attested` **con su documento de respaldo** (la
+   autorización de uso). Se registran con la acción `record_proposal_evidence` (Nexa) antes de ligar.
+2. **Escribe los hechos** (`hechos.json`): una lista con lo que va en cada slot y la evidencia que lo respalda.
+
+   ```json
+   [
+     { "kind": "figure", "factId": "otd", "target": { "recipeId": "content-focus", "slot": "proof" },
+       "value": "88 %", "label": "entregas a tiempo", "evidenceRef": "prev-…" },
+     { "kind": "quote", "factId": "cita", "target": { "recipeId": "decision-testimonial" },
+       "quote": "«…»", "authorName": "Nombre", "authorRole": "Cargo o equipo", "evidenceRef": "prev-…" },
+     { "kind": "logo", "factId": "sky", "target": { "recipeId": "content-clients", "slot": "logos" },
+       "name": "Sky Airline", "logoAssetId": "asset-…", "evidenceRef": "prev-…" }
+   ]
+   ```
+
+   Los tipos son `figure` (cifra; `numericValue` para barras y para el arco de `content-measure`, entre 0 y 1),
+   `logo`, `quote`, `photo` (foto real de un caso) y `sample-data` (datos del cliente en las láminas de muestra
+   SEO/AEO). Con `slideIndex` en `target` apuntas a una lámina puntual cuando la receta se repite.
+3. **Liga y lee la tabla** (necesita el proxy de Cloud SQL: `pnpm pg:connect`):
+
+   ```bash
+   pnpm brand:deck-plan -- --bind --plan <tu-carpeta>/plan.json --proposal <proposalId> --org <ownerOrgId> \
+     --facts <tu-carpeta>/hechos.json --out <tu-carpeta>/plan-ligado.json
+   ```
+
+   Cada slot de datos sale con `✓ ligado desde …` (y su evidencia y fecha) o `· sin ligar: <motivo>`. Sin propuesta
+   (brochure de marca propia) usa `--context` con `"kind": "brand"`: sólo ligan cifras con un asset de respaldo y su
+   `sourceLabel`. Para probar sin base, `--sources` con un fixture de fuentes ya leídas.
+
+| Motivo | Qué pasó | Qué hacer |
+|---|---|---|
+| `no-evidence` | la cifra no tiene evidencia `measured` válida | registra la evidencia medida o quita la cifra |
+| `no-authorization` | el logo, la cita, la foto o la cifra de un caso no tiene evidencia `attested` con documento | registra la autorización con su documento |
+| `internal-evidence` | la evidencia es interna y el deck va al cliente: **no compone** | usa una evidencia `client_facing` o quita el dato |
+| `no-on-dark-logo` / `no-logo` | Account 360 no tiene el logo del cliente (o su versión para fondo oscuro) | súbelo en la organización del cliente |
+| `below-minimum` | el muro tiene menos logos autorizados de los que muestra la lámina (9) | autoriza más logos o usa otra lámina |
+| `not-in-quote` | la frase destacada no es un fragmento literal de la cita | copia la frase tal cual de la cita |
+| `no-real-photo` | el caso no trae foto real | registra la foto del caso con su autorización |
+| `no-frozen-quote` | los montos todavía no salen de la cotización congelada (TASK-1417) | se imprime `[MONTO]`: es lo esperado |
+| `no-roster-facts` | el equipo todavía no sale del roster real (TASK-1418) | la lámina de equipo no compone por ahora |
+| `too-many-facts` | mandaste más hechos de los que la lámina admite | deja sólo los que van |
+| `illustrative-sample` | la lámina de muestra conserva sus datos de ejemplo y su marca | es lo esperado mientras no haya diagnóstico real |
+
+No hagas: escribir cifras, montos o nombres de personas en los slots de datos esperando que queden (el binding los
+quita); quitar la marca «Datos de muestra» o «Ejemplo ilustrativo» sin datos del cliente con evidencia; usar una foto de
+ejemplo o una cara generada para un caso o el equipo.
 
 ### Paso 6 · Resuelve las fotos
 

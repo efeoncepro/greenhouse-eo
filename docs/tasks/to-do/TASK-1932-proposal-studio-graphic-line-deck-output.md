@@ -1,5 +1,22 @@
 # TASK-1932 — Proposal Studio arma el deck «La órbita» desde recetas: render en `artifact-worker` y acción Nexa/MCP
 
+## Delta 2026-09-28 — TASK-1930 dejó `bindDeckSlots`
+
+- Firma final: `bindDeckSlots(plan: DeckPlan, context: unknown): Promise<DeckSlotBindingResult>` (`server-only`,
+  `@/lib/brand-surfaces/deck-recipes/bindings`) con `context = { kind: 'proposal', ownerOrgId, proposalId, audience,
+  facts? } | { kind: 'brand', audience, facts? }`; el núcleo puro es `bindDeckSlotsWith(plan, sources)`. Devuelve
+  `{ ok, plan, bindings: SlotBinding[], issues }`; cada `SlotBinding` es `{ slideIndex, recipeId, slot, binder,
+  status: 'bound'|'unbound', source?: 'account-360'|'proposal-evidence'|'economic-facts'|'roster-facts'|'intent',
+  evidenceRef?, evidenceRefs?, asOf?, reason?, dataOrigin? }`. Los issues del binding llegan con `source: 'binding'`
+  (`binding-internal-evidence`, `binding-evidence-unknown` = error; `binding-fact-unused` = aviso). Errores:
+  `DeckBindingContextError` (contexto o propuesta de otra organización) y `DeckBindingReadError` (lectura, ya
+  capturada con `captureWithDomain`).
+- Para esta task: llamar `bindDeckSlots` con el contexto ya autorizado por `assertProposalStudioAccessForSubject`,
+  mostrar la tabla de `bindings` en el preview (propose → confirm) y **no encolar el render si `ok` es `false`**. El
+  rastro va al manifest y a la procedencia del asset. Los valores de logo, foto y logos del muro llegan como
+  `{ assetId, alt }` (el cliente con `variant: 'on-dark'|'default'`): el mapper a intent resuelve el asset.
+- Montos: siempre `[MONTO]` hasta TASK-1417; equipo: `content-team` no compone hasta TASK-1418.
+
 ## Delta 2026-09-28 — TASK-1934 suma nueve recetas SEO/AEO y cambia dos reglas del plan
 
 - El catálogo tiene **78 recetas**, todas con plantilla en `graphic-line-deck` y página de AXIS (axis-tokens 0.3.23,
