@@ -188,8 +188,10 @@ export const getPreviousComparableScore = async (input: {
       WHERE r.profile_id = $1
         AND s.score_version = $2
         AND (r.market_id, r.market_code, r.locale, r.provider_policy_version)
-          IS NOT DISTINCT FROM (SELECT market_id,market_code,locale,provider_policy_version
+          IS NOT DISTINCT FROM (SELECT ROW(market_id,market_code,locale,provider_policy_version)
             FROM greenhouse_growth.grader_runs WHERE run_id=$3)
+        AND (r.matching_snapshot #>> '{brand,category}') IS NOT DISTINCT FROM
+          (SELECT matching_snapshot #>> '{brand,category}' FROM greenhouse_growth.grader_runs WHERE run_id=$3)
         AND r.created_at < (
           SELECT created_at FROM greenhouse_growth.grader_runs WHERE run_id = $3
         )

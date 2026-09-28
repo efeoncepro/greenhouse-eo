@@ -5,6 +5,7 @@ import type * as GraderCommands from '@/lib/growth/ai-visibility/commands'
 
 import { closeGreenhousePostgres, query } from '@/lib/db'
 import { requestRunBatchInternal, requestGraderRunBatch } from '@/lib/growth/ai-visibility/markets/run-batch'
+import { getPreviousComparableScore } from '@/lib/growth/ai-visibility/scoring/store'
 
 const state = { realEnqueue: false, failMarket: '', allowance: 20, included: ['MX'], budget: 100, authorized: true }
 
@@ -113,6 +114,9 @@ describe.skipIf(!enabled)('TASK-1863 actual PostgreSQL batch atomicity and reser
     await query(
       'CREATE TABLE IF NOT EXISTS greenhouse_growth.market_test_outbox(id bigint GENERATED ALWAYS AS IDENTITY)'
     )
+    await query(`CREATE TABLE IF NOT EXISTS greenhouse_growth.grader_scores (
+      run_id text PRIMARY KEY REFERENCES greenhouse_growth.grader_runs(run_id),
+      score_version text, created_at timestamptz DEFAULT now())`)
   })
   beforeEach(async () => {
     state.realEnqueue = false
@@ -145,6 +149,28 @@ describe.skipIf(!enabled)('TASK-1863 actual PostgreSQL batch atomicity and reser
     (SELECT count(*)::int FROM greenhouse_growth.grader_run_batches) batches,
     (SELECT count(*)::int FROM greenhouse_growth.market_test_outbox) events`)
     )[0]
+
+  it('reads the previous score with PostgreSQL row comparison and excludes other markets, policies and categories', async () => {
+    await query(`INSERT INTO greenhouse_growth.grader_runs
+      (run_id,profile_id,market_id,market_code,locale,provider_policy_version,prompt_pack_version,created_at)
+      VALUES
+      ('previous','profile-local','market-cl','CL','es-CL','policy-v2','pack-v2','2026-09-01'),
+      ('other-market','profile-local','market-mx','MX','es-MX','policy-v2','pack-v2','2026-09-02'),
+      ('other-policy','profile-local','market-cl','CL','es-CL','policy-v1','pack-v2','2026-09-03'),
+      ('current','profile-local','market-cl','CL','es-CL','policy-v2','pack-v2','2026-09-04')`)
+    await query(`INSERT INTO greenhouse_growth.grader_runs
+      (run_id,profile_id,market_id,market_code,locale,provider_policy_version,prompt_pack_version,created_at,matching_snapshot)
+      VALUES ('other-category','profile-local','market-cl','CL','es-CL','policy-v2','pack-v2','2026-09-03',
+      '{"brand":{"category":"different category"}}')`)
+    await query(`INSERT INTO greenhouse_growth.grader_scores(run_id,score_version)
+      VALUES ('previous','score-v1'),('other-market','score-v1'),('other-policy','score-v1'),('other-category','score-v1')`)
+
+    const previous = await getPreviousComparableScore({
+      profileId: 'profile-local', scoreVersion: 'score-v1', currentRunId: 'current'
+    })
+
+    expect(previous?.score.runId).toBe('previous')
+  })
 
   it('rejects a secondary market with the flag OFF even for a single run', async () => {
     await expect(
