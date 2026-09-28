@@ -29,8 +29,9 @@
 4. Reposo por defecto; responde uno solo y sólo si la pieza no tiene otra esfera. Antes de entregar,
    `auditIconGroup(items, { pieceHasSphere })`.
 5. Plastilina protagonista: `skewedOrbitHeroSvg` (el objeto en reposo, la órbita pone la esfera).
-6. Paquetes publicados: el catálogo completo de 79 glifos está en `@efeoncepro/axis-graphic-line` `0.6.0` (tag
-   `v0.6.0`); la 0.5.0 (tag `v0.5.0`) trae 60 (sin D26) y la 0.4.0 (tag `v0.3.6`) sólo los 30 de la base. Greenhouse
+6. Paquetes publicados: el catálogo completo de **85 glifos** (37 Trazo + 48 Plastilina) está en
+   `@efeoncepro/axis-graphic-line` `0.8.0` (tag `v0.8.0`, 2026-09-28, suma el Trazo `swipe` de D28); la 0.7.0 (tag `v0.3.12`)
+   trae 84 (con las 5 Plastilina de Glitch, D27); la 0.6.0 (tag `v0.6.0`) trae 79; la 0.5.0 (tag `v0.5.0`) trae 60 (sin D26) y la 0.4.0 (tag `v0.3.6`) sólo los 30 de la base. Greenhouse
    fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4 (2026-09-27); para una pieza, el paquete o
    `pnpm icons:export` en AXIS.
 7. Un objeto protagonista en volumen (D24): usa el PNG de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`);
@@ -413,7 +414,7 @@ megáfono deja el anillo de la esfera como hueco.
   **No se mezclan en una pieza.**
 - **No** se anima con el paquete: es un PNG, y el motion de los íconos sigue diferido (ver [ledger.md](ledger.md)).
 
-## 13. Catálogo aprobado (79 glifos; oficio desde D25 e IA, social y staff desde D26, 2026-09-27)
+## 13. Catálogo aprobado (85 glifos; oficio desde D25, IA, social y staff desde D26, redes de Glitch D27 y swipe D28)
 
 > **Estado:** canónico. Oficio (D25; operador, 2026-09-27: «Bien, subamos esos íconos al package de axis y a su web,
 > cuidando el diseño que ya tiene la web y documentando para agentes y el equipo»). IA, social y staff (D26; operador,
@@ -424,7 +425,9 @@ megáfono deja el anillo de la esfera como hueco.
 > 30 glifos nuevos (D25)» e «IA, social y staff: 19 glifos nuevos (D26)». Lab: `/references/iconography/` (los 79 del
 > catálogo y los 43 volúmenes). Si difiere de AXIS, manda AXIS.
 
-**36 Trazo + 43 Plastilina = 79 glifos.** Volumen: 43 PNG, uno por cada Plastilina.
+**37 Trazo + 48 Plastilina = 85 glifos** (desde `axis-graphic-line` 0.8.0). Volumen: 48 PNG, uno por cada Plastilina.
+La tabla lista la base, el oficio y D26; después de ella entraron **redes de Glitch (D27, 2026-09-27)**, cinco Plastilina
+(`guardar`, `compartir`, `recomendar`, `comentar`, `deslizar`\*), y **redes (D28, 2026-09-28)**, un Trazo: `swipe` («Desliza»).
 
 | Voz | Base (D22, 2026-09-26) | Oficio (D25, 2026-09-27) | IA, social y staff (D26, 2026-09-27) |
 |---|---|---|---|
@@ -470,3 +473,26 @@ Trazo del hoodie. Material de producción en [sources-and-assets.md](sources-and
 - **chispa** no va con **estrella** ni con **varita**.
 - **galería** y **biblioteca** se parecen: se usan separados.
 - **prompt** es el más débil a 32 px.
+
+### 13.3 Notas de D28 (swipe)
+
+> **Estado:** canónico (operador, 2026-09-28: «ese ícono queda aprobado y hay que canonizarlo»). AXIS `main@3e1d971`,
+> `@efeoncepro/axis-graphic-line` **0.8.0** (tag `v0.8.0`, CI y publicación verdes). Guía AXIS §«Catálogo aprobado» y
+> delta «Redes: 1 glifo Trazo (D28)» del ADR de iconografía.
+
+- **swipe** («Desliza») es el Trazo de la señal de deslizar de un carrusel (nació para Marketing con Manzanitas): la mano
+  inclinada 15° hacia donde se mueve, un arco sobre el dedo y la **esquina del set** como flecha (la de `revenue` y
+  `automatizacion`), nunca una punta simétrica girada. `replace`: la esfera toma el lugar de la flecha y el arco queda como
+  una órbita pequeña. Aire de la esfera 0,640.
+- Llegó en tres correcciones del operador que valen para cualquier glifo nuevo: **sin líneas de movimiento** (son rasgo de
+  Plastilina), **con la redondez del set** (dedos de radio 1,75, palma de radio 6, nada de bloques planos) y **en
+  movimiento** (inclinado, no recto; el arco con aire medido sobre el dedo: 0,19 se funde a tamaño chico, 1,5 no).
+- La clave es `swipe` porque `deslizar` ya es la Plastilina (D27): las claves son únicas entre voces (precedente `like`).
+- En las piezas va **sola, en reposo, a 64 px, a la derecha de la respuesta y alineada con ella**; nunca en la fila de la
+  firma, donde compite con los logos (operador, 2026-09-28).
+- **Pendiente del operador:** la Plastilina con la misma forma (mano inclinada, arco convertido en estela de tres trazos de
+  gesto, esfera en la punta; `icons:check`: área 484 u², aire del gesto 2,42) está como candidata en
+  `greenhouse-eo/ai-generations/2026-09-28_manzanitas-iconos/plastilina/mano-v3.json`. Falta decidir si **reemplaza** la
+  geometría de la Plastilina `deslizar` de Glitch (una sola mano para las dos marcas; Glitch cambia también) o si
+  **convive** con otra clave (`mano`). Hasta entonces el par de `swipe` en Plastilina es `deslizar`.
+
