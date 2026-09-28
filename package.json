@@ -400,7 +400,8 @@
     "foto:componer:cta:regresion": "node scripts/foto/componer-cta.regresion.mjs",
     "foto:accesibilidad": "node scripts/foto/accesibilidad-reporte.mjs",
     "foto:componer:cta:pruebas": "node scripts/foto/componer-cta.pruebas.mjs",
-    "foto:componer:cta:mutantes": "node scripts/foto/componer-cta.mutantes.mjs"
+    "foto:componer:cta:mutantes": "node scripts/foto/componer-cta.mutantes.mjs",
+    "security:public-burst-guard": "tsx scripts/security/public-burst-guard.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [
