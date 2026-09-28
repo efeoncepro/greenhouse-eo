@@ -28,7 +28,7 @@ import { requestBrandRender } from '../commands'
 const intent = JSON.parse(readFileSync(path.resolve(__dirname, '../../examples/deck-breather-intent.json'), 'utf8')) as Record<string, unknown>
 const plate = (intent.photo as { plateRef: string }).plateRef
 const subject = { userId: 'user-1', tenantType: 'efeonce_internal' } as never
-const ON = { BRAND_RENDER_ENABLED: 'true' } as NodeJS.ProcessEnv
+const ON = { BRAND_RENDER_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
 const body = { family: 'graphic_line_piece', intent, sources: { [plate]: 'ast-plate-1' } }
 
 const codeOf = async (fn: () => Promise<unknown>) => {
@@ -54,7 +54,7 @@ beforeEach(() => {
 
 describe('requestBrandRender', () => {
   it('con el flag apagado responde render_disabled y no toca nada', async () => {
-    expect(await codeOf(() => requestBrandRender({ subject, body, env: {} as NodeJS.ProcessEnv }))).toBe('render_disabled')
+    expect(await codeOf(() => requestBrandRender({ subject, body, env: {} as unknown as NodeJS.ProcessEnv }))).toBe('render_disabled')
     expect(store.insertBrandRenderRequest).not.toHaveBeenCalled()
   })
 

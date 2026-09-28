@@ -73,6 +73,7 @@ export type CaptureDomain =
   | 'insights' // TASK-1845 — Efeonce Insights (ediciones congeladas deck/A4/web, adapters SEO/AEO/ICO) (Markdown SSOT, read-only)
   | 'growth' // TASK-1226 — Growth domain (AI Visibility Grader provider adapters, runs, observations)
   | 'hiring' // TASK-353 — Hiring / ATS domain (talent demand, openings, candidate facets, applications)
+  | 'brand_render' // TASK-1921 — render gobernado de piezas de marca (La órbita y Glitch) en el artifact-worker
 
 export interface CaptureOptions {
   /** Free-form structured context. Ends up in Sentry's `Additional Data`. */
