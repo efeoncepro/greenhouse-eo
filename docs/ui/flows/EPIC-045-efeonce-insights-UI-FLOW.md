@@ -52,7 +52,7 @@ Desde el 2026-09-26 producción sirve sólo los catálogos v2 de TASK-1889 (rele
 | S3 | Detalle de edición: progreso por fase, evidencia (emitida para cliente; siempre para interno), plan, descargas | TASK-1849 | diseño |
 | S4 | Revisión y emisión (gate humano), retirada, recuperación por fase | TASK-1849 (UI) sobre commands de 1845 | diseño |
 | S5 | Compartir (grants), enviar (delivery intents), programar (schedules) | TASK-1849 (UI) sobre 1848 | diseño |
-| S6 | Vista web compartida por token en `https://think.efeoncepro.com/insights/r/<token>` (ruta SSR `src/pages/insights/r/[token].astro` de `efeonce-think`; acepta `InsightWebModelV1` 1.x) + muestra pública `https://think.efeoncepro.com/insights/muestra` (fixtures, `noindex`) | TASK-1875 sobre 1848 | **en producción desde el 2026-09-28** (`efeonce-think` `main` `7485e32`; `INSIGHTS_SHARING_ENABLED` ON en producción). Producción de Greenhouse sirve el modelo 1.0; el 1.1 (editorial v2 + logo del cliente) está en staging y sale con el próximo release. Referencia visual: [Lab AXIS › Insights](https://axis.efeonce.org/references/insights/) |
+| S6 | Vista web compartida por token en `https://think.efeoncepro.com/insights/r/<token>` (ruta SSR `src/pages/insights/r/[token].astro` de `efeonce-think`; acepta `InsightWebModelV1` 1.x) + muestra pública `https://think.efeoncepro.com/insights/muestra` (fixtures, `noindex`) | TASK-1875 sobre 1848 | **en producción desde el 2026-09-28** (`efeonce-think` `main` `544ecd4`; `INSIGHTS_SHARING_ENABLED` ON en producción). Producción de Greenhouse sirve el modelo 1.0 (un enlace real aún no trae decisión, aperturas ni lecturas de capítulo, «Qué mide este informe», «Cómo lo mediremos / Qué necesitamos», logo del cliente ni tasas del embudo); el 1.1 está en staging y sale con el próximo release. Referencia visual: la muestra `think.efeoncepro.com/insights/muestra`; la página del Lab de AXIS `/references/insights/` está pendiente de publicar (rama `docs/insights-lab`) |
 | S7 | Correo de entrega (resumen útil + deep link autenticado o ShareGrant) | TASK-1849 (presentación) sobre 1848 | diseño |
 | S8 | Accesos contextuales desde Inicio/Mis servicios (EPIC-046 P04) | TASK-1854 | diseño |
 
@@ -97,7 +97,7 @@ por token, sin navegación privada, sin login, `noindex`. El token nunca cruza a
 | Crear/revisar encargo | `createInsightEdition` / `reviseInsightEdition` | app · ecosystem (internal) · MCP `create_insight_edition` |
 | Ver ediciones / detalle | `readInsightEditions` / `readInsightEdition` | app · ecosystem · MCP |
 | Emitir / retirar / recuperar | `issueInsightEdition` / `withdrawInsightEdition` / `recoverInsightEdition` | app (persona autenticada); nunca MCP para emitir |
-| Compartir / enviar / programar | TASK-1848 (`createShare`, `requestDelivery`, `createSchedule`, …) | app; MCP sólo lectura de enlaces, envíos y recurrencias (crear/revocar enlaces exige un scope de escritura que ningún cliente porta aún; enviar y programar, sólo desde el portal) |
+| Compartir / enviar / programar | TASK-1848 (`createShare`, `requestDelivery`, `createSchedule`, …) | app; MCP sólo lectura de enlaces, envíos y recurrencias (crear/revocar enlaces exige un scope de escritura que ningún cliente porta aún; enviar y programar, sólo lane App con persona interna (UI del portal con TASK-1849)) |
 | Leer compartido / descargar | TASK-1848 (`resolveSharedEdition`, `downloadSharedOutput`) | público por token (S6) |
 | Cambiar la portada de un encargo *(en producción, TASK-1888)* | `createInsightEdition` con `brand.coverTheme` opcional (sin él, el hash del encargo no cambia) | mismas lanes que crear encargo |
 | Ver / fijar la preferencia de portada del cliente *(en producción, TASK-1888)* | `setInsightCoverPreference` + su reader | app · ecosystem · MCP (tool federada en `efeonce-mcp`) |
@@ -116,7 +116,8 @@ Continuidad de identidad: código `EO-INS-…` + versión visibles en S3, S6, S7
 **Marca de producto (delta 2026-09-28).** S6 lleva el lockup oficial «Efeonce | Insights» (`insights-lockup-*` de
 `@efeoncepro/axis-brand-assets` 0.4.0: negativo en pantalla, positivo en impresión, también en el modo presentación y
 en la imagen OG). Los PDF de S3/S6 componen «efeonce | INSIGHTS» tipográfico en portadas y aperturas, como aprobó el
-canvas de TASK-1889. S1–S5 y S7 no llevan marca de producto: **pendiente de decisión** (gaps en arquitectura §6.3).
+canvas de TASK-1889; en las portadas navy «INSIGHTS» va en el acento, **decisión abierta del operador** (arquitectura
+§6.3). S1–S5 y S7 no llevan marca de producto: **pendiente de decisión** (gaps en arquitectura §6.3).
 La firma sigue siendo Efeonce en todas las superficies.
 
 ## 9. Cobertura GVC
@@ -147,9 +148,9 @@ Estado al 2026-09-15 (se conserva como historia; el vigente está en el delta de
 | TASK-1847 | catálogos v1 `report_pdf` + `deck_pdf` (alimentan S3 y S6 descargas) | complete (2026-09-25), en producción desde 2026-09-24 |
 | TASK-1848 | S5 backend, S6 contrato, S7 backend | in-progress; en producción: enlace compartido ON desde el 2026-09-28, correo y recurrencia OFF |
 | TASK-1888 | contrato de portada y editorial v2 (alimenta S2 y los PDF; sin UI) | complete (2026-09-26), en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON |
-| TASK-1889 | catálogos premium (los PDF de S3 y S6) | complete (2026-09-26), en producción; emitir y compartir siguen OFF |
+| TASK-1889 | catálogos premium (los PDF de S3 y S6) | complete (2026-09-26), en producción; emitir sigue OFF, compartir ON desde el 2026-09-28 |
 | TASK-1849 | S1–S5, S7 (+ portada en S2 como consumer de TASK-1888) | to-do |
-| TASK-1875 | S6 (+ mismos roles de color que los PDF) | **complete (2026-09-28), en producción**: `efeonce-think` `main` `7485e32`; `INSIGHTS_SHARING_ENABLED` ON en producción; modelo 1.0 en producción, 1.1 en staging |
+| TASK-1875 | S6 (+ mismos roles de color que los PDF) | **complete (2026-09-28, cierre `df6f37ccd`), en producción**: `efeonce-think` `main` `544ecd4`; `INSIGHTS_SHARING_ENABLED` ON en producción; modelo 1.0 en producción, 1.1 en staging |
 | TASK-1854 | S8 | to-do (EPIC-046; bloqueada por TASK-1852 y TASK-1853) |
 
 ## Acceptance Checklist (del programa)

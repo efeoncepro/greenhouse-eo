@@ -359,19 +359,32 @@ marca de producto que acompaña») acompaña a Efeonce y **nunca firma**: junto 
 
 | Superficie | ¿Lleva la marca? | Qué hay hoy | Dónde |
 |---|---|---|---|
-| Informe live en Think (`/insights/r/<token>`, muestra `/insights/muestra`) | **sí** | lockup negativo en el hero (positivo al imprimir) y en la portada del modo presentación; OG `og-insights.png`; firma Efeonce en el pie | `efeonce-think/src/components/insights/InsightReport.astro`; archivos en `public/branding/insights/` (copias manuales) |
-| PDF A4 (`insights-report`) | **versión tipográfica** | portadas navy y clara: logo de Efeonce + filete + «INSIGHTS» en versalitas tipográficas (`.brand-product`), no el archivo oficial; pie de página y contraportada con el logo de Efeonce | `src/lib/artifact-composer/catalogs/insights-report/report-cover.html`, `report-cover-light.html`, `report-editorial.css` (usar el lockup oficial pasa por el contrato de fidelidad y el gate visual de TASK-1889) |
-| Deck (`insights-deck`) | **versión tipográfica** | portada y pie de la apertura de capítulo: logo de Efeonce + filete + «INSIGHTS» en versalitas (`.product`); los demás pies nombran «Insights · Informe de …» como texto | `catalogs/insights-deck/insights-cover.html`, `insights-chapter.html` |
+| Informe live en Think (`/insights/r/<token>`, muestra `/insights/muestra`) | **sí** | lockup **negativo** en el hero oscuro (31,5 px; 24 px en móvil, el menor en producción) y en la portada del modo presentación (40 px, dentro de `.ins-present.ins-dark`); **positivo sólo al imprimir** (intercambio `.ins-screen-only` / `.ins-print-only`); la barra fija superior no lleva marca, sólo la órbita de progreso; la lámina de cierre de la presentación y el pie firman con el logo de Efeonce + eslogan (Insights nunca firma); las pantallas de estado 404/410/429/502 muestran el logo de Efeonce, no la marca de Insights | `efeonce-think/src/components/insights/InsightReport.astro`, `src/styles/insights.css`, `src/components/primitives/StatusScreen.astro`; archivos en `public/branding/insights/` (copias manuales: 5 de los 6 SVG, falta `insights-isotype-positive`; en código sólo se usan los dos lockups) |
+| Imagen OG de Think | **sí** | `og-insights.png`, 1200 × 630: copia del lockup negativo a 520 px de ancho + una órbita de acento, sin datos de ningún informe. **Regenerarla cada vez que cambie el lockup** | `efeonce-think/scripts/build-insights-og.mjs` |
+| PDF A4 (`insights-report`) | **versión tipográfica** | portadas navy y clara (bloque navy): logo de Efeonce 32 px + aire 16 + filete 1 × 24 al 26 % + «INSIGHTS» en mayúsculas espaciadas (`uppercase` + `letter-spacing: 0.34em`, no versalitas de fuente; `.brand-product`, 12 px en `navyAccent` = teal-500 → **decisión abierta**, ver abajo), no el archivo oficial; apertura de capítulo: mini-lockup al pie (Efeonce 12 px + filete 1 × 10 + «INSIGHTS» 8 px en `navyMuted`, `report-chapter.html`); pie de página y contraportada con el logo de Efeonce | `src/lib/artifact-composer/catalogs/insights-report/report-cover.html`, `report-cover-light.html`, `report-editorial.css` (usar el lockup oficial pasa por el contrato de fidelidad y el gate visual de TASK-1889) |
+| Deck (`insights-deck`) | **versión tipográfica** | portada: logo de Efeonce 30 px + aire 16 + filete 1 × 22 + «INSIGHTS» en mayúsculas espaciadas 12 px en `navyAccent` (`.product`; **decisión abierta**); pie de la apertura de capítulo: Efeonce 13 px + filete 1 × 12 + «INSIGHTS» 9 px en `navyMuted`; los demás pies nombran «Insights · Informe de …» como texto | `catalogs/insights-deck/insights-cover.html`, `insights-chapter.html` |
 | Correo de entrega | pendiente | `brand='efeonce'`, diseño funcional | `src/emails/InsightsEditionDeliveryEmail.tsx` |
 | Favicon de Think en `/insights/**` | pendiente | favicon genérico del sitio | `efeonce-think/src/layouts/BaseLayout.astro` |
-| Ficha de Insights en la receta de deck `content-day-live-results` | pendiente | isotipo de Efeonce en ficha oscura | `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` |
+| Ficha de Insights en la receta de deck `content-day-live-results` | pendiente | isotipo de Efeonce en ficha oscura (`efeonce-isotype-negative.svg`, `catalogs/graphic-line-deck/content-day-live-results.html`) | `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` |
+| Ficha de Insights en la receta de deck `content-day-tools` | pendiente, **desalineada** | el Composer usa el ícono `probe` (`catalogs/graphic-line-deck/content-day-tools.slots.json`), mientras la nota de la receta pide el isotipo de Efeonce en ficha oscura | receta JSON (misma ruta) + `content-day-tools.slots.json` |
 | Portal (TASK-1849) y MCP | pendiente | portal sólo diseñado; MCP sin superficie visual | — |
 
 «Versión tipográfica» = la marca se nombra con tipografía; falta usar el archivo oficial `insights-lockup-*`. Ambos
 estados, sin decisión del operador ([ledger.md](ledger.md), «Marca de Insights fuera de Think»). Greenhouse fija
 `@efeoncepro/axis-brand-assets` 0.3.5 y los archivos de Insights llegan en **0.4.0**: aplicarla en Greenhouse exige
-subir esa versión. Referencia visual: Lab AXIS `https://axis.efeonce.org/references/insights/`. Anatomía del informe y
-de la web: skill `efeonce-insights` → `references/ui-and-brand.md`.
+subir esa versión. Referencia visual en el Lab de AXIS `/references/insights/`, **pendiente de publicar** (rama
+`docs/insights-lab`, commit `36a2707`; hoy da 404: no la enlaces como publicada); mientras tanto, la muestra
+`think.efeoncepro.com/insights/muestra`. Las copias `apps/lab/public/branding/insights-*.svg` sí están en `main` de AXIS.
+Anatomía del informe y de la web: skill `efeonce-insights` → `references/ui-and-brand.md`.
+
+**Decisión abierta (del operador; no la cambies por tu cuenta):** en las portadas PDF/deck, «INSIGHTS» va en el acento
+(`navyAccent` = teal-500, 12 px; `report-editorial.css`, `insights-cover.html`) y con proporciones propias. Choca con
+«junto a Efeonce, Insights baja su brillo; sólo la esfera conserva el acento» y con «el acento nunca en texto de menos
+de 24 px». Cambiarlo toca el contrato de fidelidad de TASK-1889. Los pies de capítulo ya van en `navyMuted`.
+
+**Mini-órbita y «una órbita por pieza»:** el anillo y la esfera de la «i» son parte del logo (como el planeta de
+Efeonce) y no cuentan como la órbita de la pieza; el hero de Think y la imagen OG la ponen junto a una órbita de acento,
+revisado a ojo el 2026-09-28. Es la interpretación de quien construyó la marca, pendiente de confirmación del operador.
 
 ### B4. Deck de Insights y correo de aviso
 

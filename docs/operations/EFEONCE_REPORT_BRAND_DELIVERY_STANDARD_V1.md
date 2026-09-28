@@ -1,7 +1,8 @@
 # Estándar de marca y entrega de informes Efeonce
 
 **Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04 · **Última actualización:** 2026-09-28
-(cómo firman hoy los informes de Insights y el gap del lockup en portadas PDF/deck; antes, 2026-09-26, estado de la
+(cómo firman hoy los informes de Insights, variantes del lockup en Think, el gap del lockup en portadas PDF/deck y el color
+de «INSIGHTS» en esas portadas como decisión abierta; antes, 2026-09-26, estado de la
 dirección premium de Insights tras el cierre de TASK-1888 y dueño del contacto por tipo de documento tras TASK-1889).
 **Alcance:** todos los informes de Efeonce, internos o dirigidos a clientes, cualquiera que sea su disciplina.
 La metodología y las cifras siguen bajo el contrato del dominio; este estándar gobierna su presentación.
@@ -196,15 +197,22 @@ acompaña y nunca firma. Estado por superficie, sin regla nueva:
 
 | Superficie | Cómo se ve hoy |
 |---|---|
-| Informe A4 y deck (PDF) | Pie y contraportada con el logo de Efeonce. Portadas y aperturas de capítulo con logo de Efeonce + filete + «INSIGHTS» en versalitas, tipografiado por la plantilla, como aprobó el canvas del 2026-09-25 |
-| Informe compartido en Think | Lockup oficial «Efeonce \| Insights» (`insights-lockup-*`) en la portada oscura, en impresión y en el modo presentación; el pie firma con el logo de Efeonce, el eslogan y la línea legal |
+| Informe A4 y deck (PDF) | Pie y contraportada con el logo de Efeonce. Portadas con logo de Efeonce + filete + «INSIGHTS» en mayúsculas espaciadas (`uppercase` + `letter-spacing: 0.34em`; no son versalitas de fuente), tipografiado por la plantilla, como aprobó el canvas del 2026-09-25; aperturas de capítulo con un mini-lockup tipográfico al pie en `navyMuted` |
+| Informe compartido en Think | Lockup oficial «Efeonce \| Insights»: `insights-lockup-negative` en el hero oscuro y en la portada del modo presentación (también oscura); `insights-lockup-positive` **sólo al imprimir**. La lámina de cierre de la presentación y el pie firman con el logo de Efeonce y el eslogan (el pie suma la línea legal). Imagen para compartir propia (`og-insights.png`, 1200 × 630, sin datos del informe) |
 | Correo de entrega | Plantilla de Efeonce, sin marca de producto |
 
 **Gap abierto, pendiente de decisión del operador:** el lockup oficial se aprobó el 2026-09-28 en el canvas
 «Insights en vivo», pero **no está implementado** en las portadas PDF/deck, que siguen con la composición tipográfica.
 Este estándar no fija todavía si el lockup la reemplaza, ni su tamaño mínimo en portada; hasta que el operador decida,
 las plantillas quedan como están y ningún agente lo cambia por su cuenta. Mapa técnico: arquitectura de Insights §6.3.
-Referencia visual con datos de ejemplo: [axis.efeonce.org/references/insights](https://axis.efeonce.org/references/insights/).
+
+**Segunda decisión abierta, del operador:** en las portadas PDF/deck, «INSIGHTS» se pinta en el acento (`navyAccent`,
+teal-500, a 12 px) y con proporciones propias. Choca con «junto a Efeonce, Insights baja su brillo; sólo la esfera
+conserva el acento» (2026-09-28) y con «el acento nunca en texto de menos de 24 px». Cambiarlo toca el contrato de
+fidelidad de TASK-1889; detalle en el manual de la línea gráfica §7.1.
+
+Referencia visual con datos de ejemplo en el Lab de AXIS `/references/insights/`, pendiente de publicar (rama
+`docs/insights-lab`); mientras tanto, la muestra `think.efeoncepro.com/insights/muestra`.
 
 ## Aplicación y propietarios
 

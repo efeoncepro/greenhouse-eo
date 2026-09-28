@@ -9,7 +9,7 @@ internal edition for Sky Airlines (`EO-INS-000022`, run `irun-166f4ed0…`: deck
 Production render canary with data: the sandbox org has NO ICO snapshots (`ico_engine.metric_snapshots_monthly`
 returns zero rows for its two spaces), so a new sandbox edition fails in `validating` with `evidence_rejected` — that
 is correct. Use an `internal` edition of a real client with data, only with explicit operator authorization
-(issuance and sharing are OFF in production, so the client sees nothing). Render is idempotent per live output: an
+(issuance is OFF in production and sharing needs an issued edition, so the client sees nothing). Render is idempotent per live output: an
 edition whose outputs already exist returns the old run (`200 idempotent:true`).
 
 The Composer's historical global visual set also drifts on clean, unrelated frames (ISSUE-122). Use
@@ -257,7 +257,7 @@ is off is `skipped/email_type_paused` (no grant issued).
 
 ## Shared web in Think (TASK-1875) — Think and Greenhouse sharing in production; 1.1 remains in staging (2026-09-28)
 
-State: Think `main` `bbf8522` is in production (`/insights/r/<token>` and public sample `/insights/muestra`). Greenhouse
+State: Think `main` `544ecd4` is in production (`/insights/r/<token>` and public sample `/insights/muestra`). Greenhouse
 production serves `InsightWebModelV1` 1.0, supported by Think; Greenhouse `13fd47381` keeps model 1.1 in staging. The
 WAF exception is applied and read back without drift; `INSIGHTS_SHARING_ENABLED` is exact `true` in Vercel Production,
 deployment `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`) is Ready with alias

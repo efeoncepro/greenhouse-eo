@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/`."
+description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/` (pending publication)."
 ---
 
 # AXIS Design System
@@ -600,17 +600,24 @@ What AXIS holds for Efeonce Insights, and nothing more:
   `insights-logo-{positive,negative}`, `insights-isotype-{positive,negative}` and `insights-lockup-{positive,negative}`
   (`src/manifest.ts`; new asset kind `lockup`, a fixed two-brand composition used as one file and never rebuilt). Rules
   in the package README: the mark sits next to the Efeonce logo and never signs; in the lockup Insights goes in the
-  brand gray (`#6b6b6b` on paper, `#6f89a2` on navy) and only the sphere keeps the Growth accent. Files are generated in
+  brand gray (`#6b6b6b` on paper `#f7f8f6`, 5.0:1; `#6f89a2` on the dark ground `#001a33`, 4.83:1 — on navy `#023c70` it drops to
+  3.07:1) and only the sphere keeps the Growth accent. Files are generated in
   Greenhouse by `scripts/brand/build-insights-logo.mjs` and re-sealed with `packages/brand-assets/scripts/seal.mjs`; never edited by hand. The
   Lab copies them to `apps/lab/public/branding/` via `apps/lab/scripts/sync-brand-assets.mjs`.
 - **Greenhouse pins `0.3.5`**, so it does not carry these files yet; Think uses manual copies. The Greenhouse PDF/deck covers
-  show a type version (Efeonce logo + rule + «INSIGHTS» in small caps), not the official lockup file.
+  show a type version (Efeonce logo + rule + «INSIGHTS» set in spaced capitals — `text-transform: uppercase` +
+  `letter-spacing: 0.34em`, not font small caps), not the official lockup file. **Open operator decision:** on those
+  navy covers «INSIGHTS» is painted in the accent (`navyAccent` = teal-500, 12 px) with its own proportions, which
+  conflicts with «next to Efeonce, Insights lowers its brightness; only the sphere keeps the accent» and with «the accent
+  never on text under 24 px»; changing it touches TASK-1889's fidelity contract, so no agent changes it. In Think the
+  negative lockup goes on the dark hero and on the presentation cover; the positive one only when printing.
   Switching them to the file, or adding the mark to email, favicon, portal or MCP, is an open operator decision (criterion and application map in
   `efeonce-graphic-line` → `criteria.md` and `applications.md` §B3b).
-- **Lab reference page** `https://axis.efeonce.org/references/insights/` (source
-  `apps/lab/src/pages/references/insights.astro`, agent JSON `/references/insights.json` from `insights.json.ts`,
-  agent guide `docs/agent-composition/insights.md`; created on 2026-09-28 in parallel with the documentation sweep —
-  confirm it serves before citing it as live). It documents the mark and lockup, the approved applications, the report
+- **Lab reference page** `/references/insights/` — **NOT published yet**: page, agent JSON and agent guide
+  (`apps/lab/src/pages/references/insights.astro`, `insights.json.ts`, `docs/agent-composition/insights.md`) exist only
+  on the AXIS branch `docs/insights-lab` (commit `36a2707`); `https://axis.efeonce.org/references/insights/` returns 404.
+  Only the SVG copies `apps/lab/public/branding/insights-*.svg` are on `main`. Until it ships, point to the sample
+  `think.efeoncepro.com/insights/muestra`; never cite the Lab URL as live. It documents the mark and lockup, the approved applications, the report
   sections and the live-report UI as a **reference**, the same way Glitch documents its approved pieces. The Lab is
   public: sample data only (a fictitious organization, a «Logo del cliente» placeholder, illustrative figures), never
   Berel, Sky or any client's data. The earlier boards 7.1/7.2 in `/references/graphic-line/` stay design tests.

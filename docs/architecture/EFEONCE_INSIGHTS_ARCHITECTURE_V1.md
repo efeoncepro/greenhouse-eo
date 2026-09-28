@@ -243,47 +243,95 @@ igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la
 
 ### 6.1 Anatomía del informe live (Think, vigente desde 2026-09-28)
 
-Render de `InsightWebModelV1` en `efeonce-think` (TASK-1875; estado en §14.10). Código: `src/components/insights/`
-(`InsightReport.astro`, `ModuleScene.astro`, `ChartFigure.astro`, `FactMark.astro`), `src/lib/insights-{view,copy,
-tokens,chart-geometry,fixtures,accept}.ts`, `src/scripts/insights-report.ts`, `src/styles/insights.css`. Rutas:
+Render de `InsightWebModelV1` en `efeonce-think` (TASK-1875; estado en §14.10; producción en `main` `544ecd4`). Código:
+`src/components/insights/` (`InsightReport.astro`, `ModuleScene.astro`, `ChartFigure.astro`, `FactMark.astro`),
+`src/lib/insights-{view,copy,tokens,chart-geometry,fixtures,accept}.ts`, `src/scripts/insights-report.ts`,
+`src/styles/insights.css`. `InsightReport.astro` es **el único render** de las dos rutas:
 `src/pages/insights/r/[token].astro` (SSR por request, `private, no-store`, `noindex, nofollow`, `no-referrer`; `?logo=1`
-y `?descargar=<output>` en la misma URL) y `src/pages/insights/muestra.astro` (fixtures, `noindex`, fuera del sitemap).
-Contratos de UI: `docs/ui/wireframes/TASK-1875-*.md`, `docs/ui/flows/TASK-1875-*-flow.md`, `docs/ui/motion/TASK-1875-*-motion.md`;
-dossier `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/`. Referencia visual pública con datos de
-ejemplo: [Lab AXIS › Insights](https://axis.efeonce.org/references/insights/).
+y `?descargar=` en la misma URL) y `src/pages/insights/muestra.astro` (fixtures, prerender, `noindex`, fuera del
+sitemap). Contratos de UI: `docs/ui/wireframes/TASK-1875-*.md`, `docs/ui/flows/TASK-1875-*-flow.md`,
+`docs/ui/motion/TASK-1875-*-motion.md`; dossier `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/`.
+Referencia visual pública con datos de ejemplo: la muestra `https://think.efeoncepro.com/insights/muestra`. La página
+del Lab de AXIS `/references/insights/` está **pendiente de publicar** (sólo en la rama `docs/insights-lab`, commit
+`36a2707`; hoy responde 404).
+
+> **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
+> capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a
+> paso de cada capítulo, sin «Qué mide este informe», sin «Cómo lo mediremos / Qué necesitamos», sin logo del cliente
+> y sin tasas del embudo. Eso llega con el modelo 1.1 (en staging) en el próximo release de Greenhouse; la muestra ya
+> lo enseña.
 
 **Secciones, en orden (`InsightReport.astro`):**
 
 | # | Sección | Qué hace |
 |---|---|---|
-| 1 | Hero oscuro | Órbita animada; lockup Efeonce \| Insights; chips de estado (enlace activo / vence, o «muestra»); kicker; titular en dos pesos; logo del cliente (1.1); meta; cue de scroll |
+| 1 | Hero oscuro | Órbita animada; lockup Efeonce \| Insights; chips de estado («Enlace vigente» + «vence el …», o «Muestra con datos de ejemplo»); kicker (título · período); titular = `executiveSummary[0]` (o `reportTitle`) partido por `splitLead`: cabeza peso 740, resto 340 en `ink-soft`; las demás afirmaciones como bajada; logo del cliente sobre placa blanca si `variant = default` (1.1, nunca en la muestra); meta (organización, edición, datos al); cue a `#hallazgos`. ≤ 720 px se ocultan el chip «vence» y el cue |
 | 2 | Aviso de período parcial | Sólo si `header.asOfMax` es anterior al cierre del período |
-| 3 | Topbar fija | Filtros por módulo, copiar enlace, presentar, descargar; la órbita reaparece chica y marca el avance |
-| 4 | `#hallazgos` | Tiles que se expanden en su lugar (evidencia, lectura, enlace directo `#h-…`); uno a la vez, Escape cierra |
-| 5 | Decisión | «Para decidir» + enlace al plan |
-| 6 | Un `ModuleScene` por capítulo | Gráfico principal fijo que avanza por pasos (cifra, conclusión, significado, próximo paso); interruptor gráfico/tabla; el resto de figuras compactas debajo |
-| 7 | `#plan` | Contador y acciones con chip de módulo |
-| 8 | `#metodologia` | Límites y referencias («De dónde sale cada cifra») |
-| 9 | `#conversemos` | CTA sólo en la muestra |
-| 10 | `#descargas` | Outputs que el grant permite; «No disponible en esta edición» si falta |
-| 11 | Footer | Firma Efeonce, eslogan, legal |
-| 12 | Dock, modo presentación y toast | Diálogo modal con láminas (flechas, Esc); toast «enlace copiado» |
+| 3 | Topbar fija | Filtros Todo / SEO / Respuestas de IA / Entrega creativa (View Transitions; si el lector está más abajo, vuelve a `#hallazgos`); «Plan» sólo con acciones; «Presentar»; copiar enlace; «Descargar» la primera salida disponible; la órbita reaparece chica y marca el avance por secciones `[data-section]`. ≤ 720 px las acciones se ocultan |
+| 4 | `#hallazgos` «Lo esencial del mes» | Tiles (el primero a todo el ancho, cifra en acento) que se expanden en su lugar: conclusión, gráfico oscuro compacto, «Lo que significa» / «Próximo paso», hechos, Fuente, Datos al; «Copiar enlace a este hallazgo» y «Cerrar»; enlace directo `#h-<claimId>`; uno a la vez, Escape cierra. Cifra ausente = «Sin dato», nunca cero; `FactMark` Medido = anillo sólido, Estimado = punteado. Con 1.0 los tiles son las afirmaciones del resumen que citan hechos; con 1.1, `essentials` |
+| 5 | Decisión (sólo 1.1) | Etiqueta «Para decidir en la reunión»; `splitLead` pone la petición grande (Bricolage 680) y la lectura debajo (Poppins 400); enlace «Plan de acción →» |
+| 6 | Un `ModuleScene` por capítulo (`#cap-01`, `#cap-02`…) | Apertura del capítulo (1.1); figura principal = la primera con lectura, fija, avanza por pasos (cifra, conclusión, significado, próximo paso) observados con `rootMargin` −40 % / −45 %; el resto como beats alternados con la etiqueta de su familia; afirmaciones, hechos sueltos y límites debajo |
+| 7 | `#plan` | Contador; «Cómo lo mediremos» y «Qué necesitamos de ustedes» (1.1); acciones con chip de módulo |
+| 8 | `#metodologia` | `<details>` cerrado «Cómo se midió», bajada «Fuentes, cortes y límites de cada cifra.»; dentro: «Qué mide este informe» (`scopeLines`, sólo 1.1), metodología, «Límites de la edición», «Referencias» |
+| 9 | `#conversemos` **o** `#descargas` | Alternativas: `#conversemos` sólo en la muestra; `#descargas` sólo en el enlace compartido (outputs del grant, sin `web`; «No disponible en esta edición» si falta) |
+| 10 | Footer | Firma Efeonce, eslogan, contacto, aviso del enlace o de la muestra, línea legal |
+| 11 | Dock, modo presentación y toast | Dock sólo ≤ 720 px («Copiar enlace» + «Descargar» si hay descarga); diálogo de presentación; toast «Enlace copiado» (2200 ms) |
 
-**Estados** (`StatusScreen`, códigos en `[token].astro`): `not_found` 404 (desconocido, vencido o mal copiado,
-indistinguibles), `gone` 410 (revocado o retirado), `rate_limited` 429, `error` 502 (Greenhouse no respondió o entregó
-un major no soportado; `src/lib/insights-accept.ts` acepta la familia 1.x). Ninguno revela el nombre del cliente.
+**`splitLead`** (`insights-view.ts`): parte en los dos puntos si caen entre los caracteres 12 y 80 y quedan más de 20
+después; si no, en la primera oración de 12 a 110 caracteres; si no, todo es cabeza. El texto queda íntegro (`joiner`).
+
+**Modo presentación.** Láminas: portada (lockup negativo, kicker, titular en dos pesos, «Preparado para»), una por
+hallazgo, decisión (sólo 1.1), plan (primeras 5 acciones), cierre (logo Efeonce + eslogan). Teclas: flechas, Espacio,
+Re Pág / Av Pág, Inicio / Fin, Esc; clic en el escenario avanza; foco atrapado y devuelto al salir. Pantalla completa
+sólo ≥ 900 px y sin movimiento reducido; salir de pantalla completa cierra. Contador «n de t», progreso, pista oculta
+≤ 720 px. No es alcanzable en móvil (el botón vive en las acciones de la topbar, ocultas ≤ 720 px).
+
+**Estados** (`StatusScreen`, códigos en `[token].astro`, siempre en es-CL): `not_found` 404 (desconocido, vencido, mal
+copiado o flag `INSIGHTS_SHARING_ENABLED` OFF, indistinguibles), `gone` 410 (revocado o retirado), `rate_limited` 429,
+`error` 502. **Causas de 502:** fallo del fetch; cualquier no-2xx distinto de 404/410/429 (p. ej. 403 del WAF, 500/503);
+JSON inválido; major distinto de 1.x; payload sin `model` o `header` (`acceptSharedEdition` en
+`src/lib/insights-accept.ts`, la misma puerta para fixtures). Ninguno revela el nombre del cliente. El flag de sharing
+gobierna sólo la ruta con token: la muestra nunca llama a Greenhouse.
+
+**Descargas y logo.** `?descargar=` acepta sólo `report_pdf` y `deck_pdf`; sin archivo, 303 de vuelta al informe.
+`?logo=1` responde 404 si no hay logo. `x-vercel-protection-bypass` se envía sólo contra staging.
 
 **Gráficos.** `ChartFigure.astro` + `insights-chart-geometry.ts` dibujan las 15 familias de `ChartSpecV1`; el PDF sólo
 cuatro (§6.2). Toda cifra impresa sale del `display` del modelo; la geometría sólo produce posiciones y tamaños.
+Interruptor «Gráfico» / «Tabla» sólo con JS; grupos de barras como botones con tooltip y `aria-label`; nota «Barras con
+origen en cero.»; familia desconocida → «Esta figura se lee en su tabla equivalente.»; embudo «pasa el X» sólo con
+`funnelStepRates` (1.1). Color: Think copia 4 roles (actual `#023c70`, anterior `#1f9e94`, actual sobre navy
+`#36c8bf`, anterior sobre navy `#8aa8d8`); la 3.ª serie en adelante es `color-mix(actual 45 %)` y la ausencia, trama.
 
-**Motion** (`src/scripts/insights-report.ts`; tiempos en `insights-tokens.ts`): órbita de portada 2,0 s (anillo 350 ms,
-recorrido 1100 ms con 200 ms de espera, halo 800 ms); conteo de cifras que termina exactamente en `display`; View
-Transitions al expandir un hallazgo si el navegador la tiene; IntersectionObserver para la órbita de la barra y las
-escenas. Mejora progresiva: sin JS la página queda completa (failsafe de 3 s que retira `ins-js`/`ins-motion` si el
-guion no montó); `prefers-reduced-motion` conserva la interacción sin animación.
+**Motion** (`src/scripts/insights-report.ts`; tiempos en `insights-tokens.ts`): órbita de portada ≈ 2,1 s (anillo
+350 ms, recorrido 1100 ms tras 200 ms, halo 800 ms, curva `easeStandard`, todo desde `motion.orbitMs` desde Think
+`544ecd4`); anillo «en vivo» 2400 ms en bucle desde los 1600 ms. Entrada del hero 900 ms (retardos 120/220/360/460 ms);
+revelados `data-reveal` 32 px / 900 ms y `data-stagger` 24 px / 700 ms con pasos de 70 ms hasta el 6.º hijo
+(IntersectionObserver `threshold` 0,12, margen inferior −10 %); conteo 1100 ms (easeOutQuart) que termina exactamente
+en `display`; hallazgo que se despliega 520 ms con View Transitions si existe; gráficos 800–1400 ms. Mejora
+progresiva: sin JS la página queda completa; si el módulo no monta en 3 s, el failsafe retira **`ins-motion` e
+`ins-js`**; `prefers-reduced-motion` conserva la interacción sin animación.
 
-**Responsive e impresión** (`insights.css`): breakpoints 1000 px y 720 px; bloque `@media print` con la versión clara
-(lockup positivo); es-CL y en-US.
+**Responsive, idioma, fuentes e impresión.** Breakpoints 1000 px y 720 px. Idioma sólo del chrome: es-CL por defecto,
+en-US cuando `model.locale` empieza por `en`; la muestra siempre es-CL; `og:locale` `es_CL`. Fuentes: Bricolage
+Grotesque Variable (opsz) + Poppins 400/500/600/800/800i/900i (7 archivos, 123 KB); `BaseLayout` carga además Geist.
+**La impresión es sólo un respaldo; el camino real para papel es el PDF descargable.** `@page` A4 14 mm; oculta
+topbar, dock, toast, cue, órbita, interruptor y presentación; repinta las secciones oscuras en blanco con texto navy;
+muestra las tablas; fuerza abierto «Cómo se midió»; usa los logos positivos (`.ins-print-only`); la evidencia de los
+hallazgos cerrados no se imprime.
+
+**OG y SEO.** `og-insights.png` 1200 × 630 sin datos (`scripts/build-insights-og.mjs`). Canonical `/insights` para la
+ruta con token y `/insights/muestra` para la muestra. La ruta con token no carga GTM y lleva `meta referrer
+no-referrer`; la muestra sí carga GTM a propósito (no hay token). El sitemap excluye `/insights/*`.
+
+**Muestra.** Organización «Marca de ejemplo», chip «Muestra con datos de ejemplo», aviso en el pie, CTA «Conversemos» →
+`mailto:sales@efeoncepro.com?subject=Efeonce Insights`, título «Muestra · Efeonce Insights»; conserva un código
+ficticio `EO-INS-000123 · versión 2`.
+
+**Verificación en Think.** `pnpm test:insights` (16 pruebas), `pnpm verify:insights` (incluye el fixture de versión 2 ⇒
+502 y la presencia/ausencia de «Qué mide este informe» con 1.1/1.0), `pnpm audit:insights-a11y` (AA y foco a 1440 y
+390); `scripts/capture-insights-report.mjs` regenera el dossier de 34 PNG (fuera de `package.json`). Claves de copy sin
+uso: `methodologyHeading`, `essentialsTitle`, `backToTop`.
 
 ### 6.2 Catálogo de plantillas A4 y deck (vigente desde 2026-09-26)
 
@@ -321,17 +369,23 @@ archivos oficiales en `@efeoncepro/axis-brand-assets` 0.4.0 (`insights-logo-*`, 
 |---|---|---|
 | Informe live (Think) | **Aplicada**: lockup negativo en pantalla, positivo en impresión, también en el modo presentación | `InsightReport.astro`; copias en `efeonce-think/public/branding/insights/` (5 SVG) |
 | Imagen al compartir (OG) de Think | **Aplicada** | `public/branding/insights/og-insights.png`, usada en `[token].astro` y `muestra.astro` |
-| Portadas y aperturas PDF A4 y deck | **Tipográfica, no el archivo oficial**: logo Efeonce + filete + «INSIGHTS» en versalitas (clase `.brand-product` en A4 `report-cover*.html`; `.product` en deck `insights-cover.html` e `insights-chapter.html`), como aprobó el canvas de TASK-1889 | `report-cover.html`, `report-cover-light.html`, `insights-cover.html`, `insights-chapter.html`; los catálogos sólo traen `assets/brand/logo-*.svg` de Efeonce |
+| Portadas y aperturas de capítulo PDF A4 y deck | **Tipográfica, no el archivo oficial**: logo Efeonce + filete + «INSIGHTS» en mayúsculas espaciadas (`text-transform: uppercase`, `letter-spacing: 0.34em`; no son versalitas reales) — clase `.brand-product` en A4 `report-cover*.html`, mini-lockup del pie de `report-chapter.html`; `.product` en deck `insights-cover.html` e `insights-chapter.html` (portada y pie) —, como aprobó el canvas de TASK-1889 | `report-cover.html`, `report-cover-light.html`, `report-chapter.html`, `insights-cover.html`, `insights-chapter.html`; los catálogos sólo traen `assets/brand/logo-*.svg` de Efeonce |
 | Correo de entrega | Falta: `EmailLayout` con `brand='efeonce'` | `src/emails/InsightsEditionDeliveryEmail.tsx` |
 | Favicon de Think | Falta: favicon genérico del hub | `efeonce-think/src/layouts/BaseLayout.astro` |
 | Receta de deck «resultados en vivo» | Usa el isotipo de Efeonce para la ficha de Insights | `deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` |
 | Portal (S1–S5) y MCP | Sin marca de producto | TASK-1849 (diseño); MCP sin superficie visual |
-| Dependencia en Greenhouse | Fija `@efeoncepro/axis-brand-assets` 0.3.5: no trae los assets de Insights | `package.json` |
+| Dependencia en Greenhouse | Fija `@efeoncepro/axis-brand-assets` 0.3.5: no trae los assets de Insights | `package.json:419` |
 
 **Pendiente de decisión (gaps, sin regla aprobada):** si el lockup oficial (aprobado el 2026-09-28 en el canvas
 «Insights en vivo») reemplaza la composición tipográfica de las portadas PDF/deck; marca en correo, favicon, portal y
 receta del deck; tamaño mínimo del lockup (el ledger de la línea sugiere 18 px sólo para el logo). Hasta decidir, cada
 superficie sigue como está.
+
+**Decisión abierta — acento de «INSIGHTS» en las portadas navy del PDF.** En la portada A4 (`report-editorial.css:51`)
+y en la del deck (`insights-deck/insights-cover.html:40`) la palabra va en el acento (`navyAccent` = teal-500, 12 px),
+con proporciones propias (logo Efeonce 32 px, aire 16, filete 1 × 24 al 26 %). Choca con la regla del 2026-09-28
+(junto a Efeonce, Insights baja su brillo; sólo la esfera conserva el acento) y con «el acento nunca en texto
+< 24 px». Pendiente de decisión del operador; cambiarlo toca el contrato de fidelidad de TASK-1889.
 
 ### 6.4 Candidatos a AXIS (follow-up, no implementado)
 
@@ -340,14 +394,18 @@ segundo consumidor real justifique extraerla. Insights ya tiene **dos consumidor
 
 - **Roles de color de datos:** `src/lib/artifact-composer/brand-packs/axis/editorial-roles.json` (PDF) copiados en
   `efeonce-think/src/lib/insights-tokens.ts` («valores copiados 1:1 de AXIS … mientras Think no consuma los paquetes
-  privados»).
+  privados»). Think copia sólo 4 roles (actual, anterior, y ambos sobre navy); oportunidad, ausencia y realce no
+  existen allí. La copia llegó a divergir: el dato «anterior» sobre papel era `#0e8c82` en Think; se resolvió el
+  2026-09-28 en Think `b3c5820`, que usa `#1f9e94` (`--axis-deck-role-dataPriorOnPaper` / teal-650), igual que los PDF
+  (3,29:1 como relleno sobre blanco: sirve para gráficos, nunca para texto chico).
 - **Geometría de las 15 familias:** `src/lib/artifact-composer/chart-geometry.ts` + `catalogs/insights-shared/figure-svg.ts`
   (PDF) frente a `efeonce-think/src/lib/insights-chart-geometry.ts` + `ChartFigure.astro` (web), que declara seguir
   «las mismas convenciones».
 
 Hoy la deriva se evita a mano. Extraerlos a AXIS (tokens de roles de datos y una geometría compartida) es **pendiente de
-decisión** del operador y de una task propia; mientras tanto, AXIS sólo publica una página de referencia en el Lab
-(`apps/lab/src/pages/references/insights.astro`), no componentes ni contratos nuevos.
+decisión** del operador y de una task propia; mientras tanto, AXIS sólo prepara una página de referencia en el Lab
+(`apps/lab/src/pages/references/insights.astro`, pendiente de publicar: rama `docs/insights-lab`), no componentes ni
+contratos nuevos.
 
 ## 7. API, MCP y autorización
 
@@ -1133,7 +1191,12 @@ sandbox «Greenhouse Demo» no sirve para este canary: sus espacios no tienen fi
 (correcto). El render es idempotente por salida viva: una edición ya renderizada devuelve su run anterior.
 El rediseño premium aprobado por el operador sigue en TASK-1888 (contrato) y TASK-1889 (catálogos).
 
-### 14.6 Estado de TASK-1848 — sharing, correo y recurrencia (en producción con flags OFF, 2026-09-18)
+### 14.6 Estado de TASK-1848 — sharing, correo y recurrencia (en producción; sharing ON desde 2026-09-28)
+
+> **Estado vigente (2026-09-28).** `INSIGHTS_SHARING_ENABLED` ON en Vercel Production desde 2026-09-28 (redeploy
+> `greenhouse-cssemzyzb`, canary de TASK-1875 verde, §14.10); correo (`INSIGHTS_DELIVERY_ENABLED`), recurrencia
+> (`INSIGHTS_SCHEDULES_ENABLED`) y emisión siguen OFF en producción. Las líneas «flags OFF en producción» de abajo son
+> el estado del 2026-09-18.
 
 > Los bloques «Construido» y «Pendiente» de abajo registran el estado al cerrar el código (commits locales, sin
 > deploy). **Superados** por el delta de producción al final de esta sección; se conservan como historia.
@@ -1332,8 +1395,10 @@ producción antes de compartir con un cliente.
 
 ### 14.10 Estado de TASK-1875 — vista web compartida en Think (complete 2026-09-28, en producción)
 
-> **Estado vigente (2026-09-28).** Think en producción con `efeonce-think` `main` `7485e32` (`/insights/r/<token>` y la
-> muestra `/insights/muestra`); `INSIGHTS_SHARING_ENABLED=true` en Vercel Production (redeploy `greenhouse-cssemzyzb`);
+> **Estado vigente (2026-09-28).** Task cerrada (`df6f37ccd`: `pnpm test` completo 16 474 en verde + `pnpm build` de
+> producción). Think en producción con `efeonce-think` `main` `544ecd4` (`/insights/r/<token>` y la muestra
+> `/insights/muestra`; después de `7485e32` entraron `b3c5820`, color del dato «anterior» igual al PDF, y `544ecd4`,
+> tiempos de la órbita desde tokens y «Qué mide este informe»); `INSIGHTS_SHARING_ENABLED=true` en Vercel Production (redeploy `greenhouse-cssemzyzb`);
 > WAF releído sin drift con la condición `x-efeonce-think-key`; canary de producción sobre `EO-INS-000014` verde (crear,
 > leer en Think, descargar por el proxy, revocar ⇒ 410, descarga ⇒ 303); major no soportado ⇒ 502 probado. Producción
 > de Greenhouse sirve `InsightWebModelV1` 1.0; el 1.1 queda en staging hasta el próximo release. Fuente:
@@ -1341,7 +1406,7 @@ producción antes de compartir con un cliente.
 > sigue abajo es el registro previo al despliegue y el orden de rollout que se ejecutó.
 
 
-**Estado al 2026-09-28:** código terminado en local, **nada desplegado**. Los commits de Greenhouse (`d45fc780f`,
+**Estado al 2026-09-28 (histórico, antes del rollout; superado por el bloque de arriba):** código terminado en local, **nada desplegado**. Los commits de Greenhouse (`d45fc780f`,
 `27b458aec`) están en `develop` local sin push; los de `efeonce-think` están en su `main` local sin push (ese `main`
 despliega producción automáticamente). `INSIGHTS_SHARING_ENABLED` sigue igual: ON en staging, OFF en producción.
 

@@ -34,10 +34,11 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
   - Lab: `https://axis.efeonce.org/references/graphic-line/` (fuente `apps/lab/src/pages/references/graphic-line.astro`,
     estilos `apps/lab/src/styles/graphic-line.css`, láminas del canvas en `apps/lab/src/data/graphic-line-elements.json`,
     helpers `apps/lab/src/lib/graphic-line.ts`, pruebas `apps/lab/src/test/{unit,e2e}`).
-  - Insights (2026-09-28): página de referencia `https://axis.efeonce.org/references/insights/` (fuente
-    `apps/lab/src/pages/references/insights.astro`, JSON `insights.json.ts`, guía `docs/agent-composition/insights.md`);
-    sólo datos de muestra, sin componentes. Archivos de la marca copiados al Lab en `apps/lab/public/branding/insights-*.svg`
-    por `apps/lab/scripts/sync-brand-assets.mjs`.
+  - Insights (2026-09-28): página de referencia `/references/insights/`, **pendiente de publicar**: la fuente
+    (`apps/lab/src/pages/references/insights.astro`, JSON `insights.json.ts`, guía `docs/agent-composition/insights.md`)
+    sólo existe en la rama `docs/insights-lab` (commit `36a2707`) y la URL da 404; mientras tanto, la muestra
+    `think.efeoncepro.com/insights/muestra`. Sólo datos de muestra, sin componentes. Los archivos de la marca copiados al
+    Lab (`apps/lab/public/branding/insights-*.svg`, por `apps/lab/scripts/sync-brand-assets.mjs`) sí están en `main`.
   - Manuales para agentes: `docs/agent-composition/graphic-line-orbit.md`, `email-signature.md`,
     `collaboration-selection.md`, `iconography.md`; decisiones AXIS `docs/architecture/GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md`
     e `ICONOGRAPHY_DECISION_V1.md`.
@@ -70,7 +71,7 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 | Qué | Dónde |
 |---|---|
 | Logos, isotipos, burbujas URL, 48 órbitas estáticas | `@efeoncepro/axis-brand-assets` (nunca copias a mano) |
-| Marca de Insights (logo, isotipo, lockup) | `@efeoncepro/axis-brand-assets` **0.4.0** (`insights-*`); Greenhouse fija 0.3.5 y no los trae; Think usa copias manuales en `efeonce-think/public/branding/insights/` (+ `og-insights.png`) |
+| Marca de Insights (logo, isotipo, lockup) | `@efeoncepro/axis-brand-assets` **0.4.0** (`insights-*`); Greenhouse fija 0.3.5 y no los trae; Think usa copias manuales en `efeonce-think/public/branding/insights/` (5 de los 6 SVG, sin `insights-isotype-positive`; en código sólo los dos lockups) + `og-insights.png`, generada por `efeonce-think/scripts/build-insights-og.mjs` (regenerarla si cambia el lockup) |
 | Masters del motion del logo | `gs://efeonce-group-axis-public-media/motion/logo/v1.1/…` (público, CORS para el Lab) |
 | Kit de la identidad sonora (recomendada) | `gs://efeonce-group-axis-public-media/sonic/v1/` → `masters/` (logo, etiqueta con voz, motion WAV+MP4 16:9/9:16, piezas largas, cierre de energía, voz sola) y `web/` (MP3, MP4 720p, pósters WebP); 65 archivos. Producción: `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/`, `entrega/`, `guia/`; binarios fuera de git) |
 | Sonido de Glitch (sólo Glitch, versión B) | `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`masters/` + `web/`); lo produce el taller `efeonce-brand-workshop` → `tools/glitch-motion/src/sound.mjs`. Detalle: [glitch.md](glitch.md) §13 |

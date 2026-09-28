@@ -10,7 +10,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **complete** (in production since 2026-09-24, release `ebb9212a32ce`; first productive A4 + deck render 2026-09-25) | Job `artifact-worker` in staging and production: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22 staging, 2026-09-24 production) | 2026-09-25 |
 | TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — sharing ON; delivery/schedules OFF in production** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON; Production sharing ON since TASK-1875 (`greenhouse-cssemzyzb`), delivery/schedules/issuance OFF; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); 2026-09-28: zero double send verified on real rows + attachment `email_delivery_id` fix (`8882af0e3`, resolved by `source_event_id`); open (other owners): in-app/Teams (690–693), portal route (1849), ISSUE-174 follow-up, MCP negatives need a human session | 2026-09-28 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
-| TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | **complete** (2026-09-28) | Think `main` `bbf8522`; Greenhouse Production model 1.0 + `INSIGHTS_SHARING_ENABLED=true` in Ready deployment `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`); WAF exception applied without drift at 20 req/10 s/IP; ecosystem canary green on `EO-INS-000014`, grant revoked; Greenhouse 1.1 remains in staging (`13fd47381`), no production release performed | 2026-09-28 |
+| TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | **complete** (2026-09-28, closure `df6f37ccd`) | Think `main` `544ecd4` (production); Greenhouse Production model 1.0 + `INSIGHTS_SHARING_ENABLED=true` in Ready deployment `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`); WAF exception applied without drift at 20 req/10 s/IP; ecosystem canary green on `EO-INS-000014`, grant revoked; Greenhouse 1.1 remains in staging (`13fd47381`), no production release performed | 2026-09-28 |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
 | TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af` (Job `artifact-worker` deployed); first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
 
@@ -305,12 +305,33 @@ _Fill at closure._
 
 ## TASK-1875 — Think shared web render (complete 2026-09-28; production sharing live)
 
+**Delta 2026-09-28 (closure, `df6f37ccd`).** Full `pnpm test` 16 474 passed + production `pnpm build` green; lifecycle
+`complete` (`docs/tasks/complete/TASK-1875-…`). Think `main` advanced after `7485e32` and is in production at
+**`544ecd4`**: `2d51ea9` (33 `data-reveal` blocks; reveal 32 px/900 ms, stagger 24 px/700 ms with 70 ms steps up to the
+6th child), `7485e32` (single acceptance gate, below), `b3c5820` (data «previous» on paper `#1f9e94` =
+`--axis-deck-role-dataPriorOnPaper` / teal-650, same as the PDFs; was `#0e8c82`), `544ecd4` (orbit ring/halo timings
+from tokens `motion.orbitMs` + `easeStandard`: ring 350 ms, travel 1100 ms after 200 ms, halo 800 ms ⇒ ≈2,1 s; «Cómo se
+midió» opens with «Qué mide este informe» when the 1.1 model brings `scopeLines`). Earlier: `73ddd9c` + `bbf8522`
+(`InsightReport.astro` is the single render for `/insights/r/[token]` and `/insights/muestra`; sample out of the
+sitemap), `f3f4638` (`splitLead`: the decision in two weights), `6385733`, `4cd3b01`.
+
+**Open items (not decided here):**
+- **Operator decision — accent of «INSIGHTS» on the navy PDF covers.** A4 (`report-editorial.css:51`) and deck
+  (`insights-deck/insights-cover.html:40`) paint the word in the accent (`navyAccent` teal-500, 12 px; uppercase with
+  0.34em tracking, not true small caps) with its own proportions (Efeonce 32 px, gap 16, rule 1 × 24 at 26 %). It
+  conflicts with the 2026-09-28 brightness rule (next to Efeonce, Insights lowers its brightness; only the sphere keeps
+  the accent) and with «accent never on text < 24 px». Changing it touches the TASK-1889 fidelity contract. Detail:
+  `ui-and-brand.md` §7.7.
+- Production serves web model 1.0: decision, chapter openings/readings, «Qué mide este informe», «Cómo lo mediremos /
+  Qué necesitamos», client logo and funnel rates reach clients only with the next Greenhouse release (1.1 in staging).
+- AXIS Lab page `/references/insights/` pending publication (branch `docs/insights-lab`, `36a2707`; 404 until `main`).
+
 **Delta 2026-09-28 (close-out).** Unsupported major now tested: Think `7485e32` adds `acceptSharedEdition`
 (`src/lib/insights-accept.ts`, no Astro imports) as the single acceptance gate for real responses and dev fixtures;
 `fixture-version-2` (modelVersion `2.0`) ⇒ 502 status screen with no edition data; 16 unit tests. Functional doc
 (`docs/documentation/insights/…dominio-ediciones.md` v1.14) and manual (`…operar-efeonce-insights-api-mcp.md` v1.13)
 describe the Think page, states, downloads (`downloadOutputs`), the public sample and local-against-staging testing.
-All TASK-1875 acceptance criteria are evidenced; closing only needs full `pnpm test` + `pnpm build`.
+All TASK-1875 acceptance criteria are evidenced; closing only needs full `pnpm test` + `pnpm build` (done, see the closure delta above).
 
 **Delta 2026-09-28 (production activation).**
 - Applied the Think exception to both Vercel Firewall rules and re-read the plan without drift: negated
@@ -336,7 +357,7 @@ All TASK-1875 acceptance criteria are evidenced; closing only needs full `pnpm t
   ecosystem-lane canary are recorded above. A future Greenhouse production release remains a separate operator decision.
 
 
-**Built in Greenhouse (local `develop`, not pushed):**
+**Built in Greenhouse (pushed to `develop` through `13fd47381`; 1.1 in staging):**
 - `d45fc780f` — `InsightWebModelV1` **1.1, additive** (`INSIGHT_WEB_MODEL_VERSION = '1.1'`,
   `src/lib/efeonce-insights/contracts/web-model.ts`): optional `chart.derived.funnelStepRates`, `chapter.opening`,
   `chapter.readings[]` (`InsightWebReadingV1`), `essentials`, `decision`, `measurement`, `ask`, `scopeLines` and
@@ -351,7 +372,7 @@ All TASK-1875 acceptance criteria are evidenced; closing only needs full `pnpm t
   exception. `scripts/security/public-burst-guard.ts` reads `PUBLIC_BURST_GUARD_THINK_KEY` and never prints it (14 tests).
 - Earlier: `bf99d89b6`/`df023e168` (lifecycle), `7deed5888`/`b64f07ffa` (Insights lockup, `scripts/brand/build-insights-logo.mjs`).
 
-**Built in `efeonce-think` (local `main`, not pushed):** `3c2befe`, `3ad3338`, `2d0e0e9`, `c50ed2f`, `4cd3b01`
+**Built in `efeonce-think` (all pushed; production head now `544ecd4`, see the closure delta):** `3c2befe`, `3ad3338`, `2d0e0e9`, `c50ed2f`, `4cd3b01`
 (model 1.1, presentation mode, print fallback, en-US, client logo), `6385733` (tests, AA, fonts), `90761ca` (print-only
 logo fix, capture script). SSR route `src/pages/insights/r/[token].astro`; client `src/lib/insights.ts` sends
 `x-efeonce-think-key` (`GREENHOUSE_THINK_KEY`) and `x-vercel-protection-bypass` (`GREENHOUSE_API_BYPASS`), accepts
@@ -520,23 +541,28 @@ producción antes de compartir con clientes. Sin flag propio.
 
 ## Sessions (append as you go; newest first)
 
+- **2026-09-28 · TASK-1875 · closure and doc sweep.** Closed with `df6f37ccd` (full `pnpm test` 16 474 passed +
+  production `pnpm build` green). Think production head `544ecd4` (`b3c5820` color fix, `544ecd4` orbit timings from
+  tokens + `scopeLines`). Docs aligned: 1.0 in production vs 1.1 in staging, Lab page pending publication, open
+  decision on the accent of «INSIGHTS» on the PDF navy covers (`ui-and-brand.md` §7.7).
 - **2026-09-28 · Marca de producto + referencia en AXIS (sin task; barrido documental).** La marca de Insights quedó
   canónica (operador: «Me encanta, canonízalo») y publicada en `@efeoncepro/axis-brand-assets` **0.4.0** (tag `v0.4.0`,
   AXIS `25b5ecf` logo/isotipo + `4760e3e` lockup; Greenhouse `7deed5888` + `b64f07ffa`, generador
   `scripts/brand/build-insights-logo.mjs`). Los archivos oficiales se aplican sólo en Think (lockup en hero y modo presentación, OG
   propio, copias manuales en `public/branding/insights/`); las portadas del PDF y del deck componen una versión
-  tipográfica (logo Efeonce + filete + «INSIGHTS» en versalitas); el correo, el favicon, el portal y MCP
+  tipográfica (logo Efeonce + filete + «INSIGHTS» en mayúsculas espaciadas); el correo, el favicon, el portal y MCP
   siguen sin marca y Greenhouse fija `axis-brand-assets` 0.3.5 — gaps sin decisión del operador. En paralelo se crea la página de
-  referencia del Lab `https://axis.efeonce.org/references/insights/` (fuente `apps/lab/src/pages/references/insights.astro`,
+  referencia del Lab `/references/insights/` (pendiente de publicar: rama AXIS `docs/insights-lab`, `36a2707`; 404 hasta `main`) (fuente `apps/lab/src/pages/references/insights.astro`,
   JSON `insights.json.ts`, guía `docs/agent-composition/insights.md`): referencia con datos de muestra, no componentes.
   Frontera: AXIS publica valores y activos; la UI vive en Greenhouse y Think. Follow-up documentado (no implementado):
   extraer a AXIS los roles de color de datos y la geometría de las 15 familias, que ya están copiados a mano en los dos
-  consumidores (y la copia divergió en «anterior sobre papel»). Todo esto vive ahora en
+  consumidores (y la copia divergió en «anterior sobre papel»; resuelto el mismo día, Think `b3c5820`). Todo esto vive ahora en
   [`ui-and-brand.md`](ui-and-brand.md). Nada desplegado en Greenhouse por este barrido.
 - **2026-09-28 · TASK-1875 · activation in production.** WAF applied/read back without drift; exact Vercel Production
   flag + Ready redeploy `greenhouse-cssemzyzb`; sequential behavior canary green through Think and grant revoked.
-  Production remains on supported web model 1.0; no Greenhouse release. Task stays in-progress for the automated
-  unsupported-major acceptance case.
+  Production remains on supported web model 1.0; no Greenhouse release. The automated unsupported-major case was
+  covered the same day by Think `7485e32`, and the task closed with `df6f37ccd` (full `pnpm test` + production
+  `pnpm build`).
 - **2026-09-28 · TASK-1875 · implementación (code complete local, sin deploy).** Greenhouse: modelo web 1.1 aditivo
   (`d45fc780f`) + excepción de Think en el guard de `/api/public` (`27b458aec`); Think: ruta SSR `/insights/r/[token]`,
   modo presentación, impresión, en-US, logo del cliente, tests y AA (commits locales en `main`, sin push). Nada

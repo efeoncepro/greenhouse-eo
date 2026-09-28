@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.14
+> **Version:** 1.15
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.15: la página del Lab sigue pendiente de publicar; qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -294,41 +294,57 @@ Prender un flag del worker es multi-runtime: `deploy.sh` + revisión activa (led
 - **URL:** `https://think.efeoncepro.com/insights/r/<token>`: es lo que devuelve la creación del enlace y lo que lleva el
   correo. Think resuelve el token en cada visita (sin caché): revocar corta el acceso en la visita siguiente.
 - **Estados:** 200 informe · 404 enlace inexistente, vencido o mal copiado (indistintos a propósito) · 410 revocado o
-  edición retirada · 429 demasiadas lecturas seguidas · 502 Greenhouse no respondió o entregó un modelo que Think no
-  entiende (sólo la familia 1.x).
-- **Descargas:** botón en la barra y en «Descargas»; pasan por `?descargar=<output>` en la misma URL y Think las
-  pide al proxy de Greenhouse. Si el archivo no existe o el enlace se revocó, vuelve al informe (303).
+  edición retirada · 429 demasiadas lecturas seguidas · 502 cuando el fetch falla, Greenhouse responde otro no-2xx
+  (p. ej. 403 del WAF, 500/503), el JSON es inválido, el major no es 1.x o falta `model`/`header` (misma puerta
+  `acceptSharedEdition` para fixtures). Con `INSIGHTS_SHARING_ENABLED` OFF, Greenhouse responde 404; el flag no afecta
+  a la muestra, que nunca llama a Greenhouse.
+- **Descargas:** botón en la barra (y en el dock del celular) y en «Descargas»; pasan por `?descargar=report_pdf` o
+  `?descargar=deck_pdf` en la misma URL y Think las pide al proxy de Greenhouse. Si el archivo no existe o el enlace se
+  revocó, vuelve al informe (303). El logo del cliente va por `?logo=1` (404 si no hay).
 - **Muestra para vender:** `https://think.efeoncepro.com/insights/muestra` (datos de ejemplo, marca ficticia, sin
   descargas, `noindex`). Se puede compartir libremente: no tiene token ni datos de clientes.
 - **Probar staging:** los enlaces de staging también apuntan a `think.efeoncepro.com`, que lee producción ⇒ 404. Para
   verlos, levanta Think local contra staging: `efeonce-think/.env.staging.local` (en `.gitignore`) con
   `GREENHOUSE_API_BASE` = staging `.vercel.app` y `GREENHOUSE_API_BYPASS`, y `pnpm --dir ../efeonce-think dev --port 4332
   --mode staging` (launch config `think-staging`). Astro admite un solo `astro dev` por proyecto.
-- **Verificación del hub** (repo `efeonce-think`, con `astro dev` arriba): `node scripts/verify-insights-report.mjs
-  [base]`, `node scripts/audit-insights-a11y.mjs [base] [token|/ruta]`, `pnpm test:insights`,
-  `node scripts/capture-insights-report.mjs <dir>`.
+- **Verificación del hub** (repo `efeonce-think`, con `astro dev` arriba): `pnpm verify:insights` (o `node
+  scripts/verify-insights-report.mjs [base]`; incluye el fixture de versión 2 ⇒ 502), `pnpm audit:insights-a11y` (o
+  `node scripts/audit-insights-a11y.mjs [base] [token|/ruta]`; AA y foco a 1440 y 390), `pnpm test:insights` (16
+  pruebas) y `node scripts/capture-insights-report.mjs <dir>` (dossier de 34 PNG; no está en `package.json`).
 - **Problemas comunes:** página 404 con un enlace recién creado en staging (mirar la nota de arriba); sin botón de
   descarga (el enlace se creó sin `downloadOutputs`); 429 al probar muchas veces seguidas (espera un minuto y nunca
   pruebes con ráfagas: la base es compartida).
 
 ### Cómo se ve el informe
 
-Referencia visual con datos de ejemplo (sin clientes reales): **[Lab AXIS › Insights](https://axis.efeonce.org/references/insights/)**
-—marca, aplicaciones, secciones del informe y UI de la página live—. Úsala para explicar el producto o revisar un
-cambio antes de mirar una edición real. Para una edición concreta, abre su enlace de Think o la muestra
-(`/insights/muestra`); para los PDF, «Revisar el diseño antes de compartir» (abajo).
+Referencia visual con datos de ejemplo (sin clientes reales): la muestra
+**[think.efeoncepro.com/insights/muestra](https://think.efeoncepro.com/insights/muestra)**. La página del Lab de AXIS
+`/references/insights/` (marca, aplicaciones, secciones del informe y UI de la página live) está **pendiente de
+publicar**: existe sólo en la rama `docs/insights-lab` de AXIS y hoy responde 404; no la cites como vigente hasta que
+responda. Para una edición concreta, abre su enlace de Think; para los PDF, «Revisar el diseño antes de compartir»
+(abajo).
 
 **Página live (Think), de arriba abajo:** portada oscura con la órbita, el lockup Efeonce | Insights, el estado del
 enlace y la respuesta del período → aviso de período abierto (si aplica) → barra fija (filtros por módulo, copiar
 enlace, presentar, descargar) → «Lo esencial» con hallazgos que se abren en su lugar → decisión → un capítulo por
 módulo con el gráfico principal por pasos (cifra, conclusión, significado, próximo paso) y opción de ver la tabla →
-plan de acción → metodología y límites → descargas → pie con la firma de Efeonce. «Presentar» abre las láminas en un
-diálogo (flechas, Esc). Estados: 404, 410, 429 y 502 (ver arriba).
+plan de acción → «Cómo se midió» (cerrado; dentro: «Qué mide este informe», metodología, límites y referencias) →
+descargas (o, en la muestra, «Conversemos») → pie con la firma de Efeonce. «Presentar» abre las láminas en un diálogo
+(flechas, Espacio, Re Pág/Av Pág, Inicio/Fin, Esc); no está en el celular porque las acciones de la barra se ocultan
+bajo 720 px. Estados: 404, 410, 429 y 502 (ver arriba). Imprimir la página es sólo un respaldo: para papel, descarga
+el PDF.
+
+> **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
+> capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a
+> paso de cada capítulo, sin «Qué mide este informe», sin «Cómo lo mediremos / Qué necesitamos», sin logo del cliente
+> y sin tasas del embudo. Eso llega con el modelo 1.1 (en staging) en el próximo release de Greenhouse; la muestra ya
+> lo enseña. Si revisas un enlace real y falta la decisión, no es un error.
 
 **PDF:** el A4 tiene portada (navy o blanca), índice, «Lo esencial», aperturas de capítulo, una página por gráfico
 (comparación, columnas, metas o tendencia), tabla, plan, límites y contraportada; el deck, lo mismo en 12 tipos de
-lámina, sin portada blanca, índice ni tabla. Las portadas muestran «efeonce | INSIGHTS» tipográfico; el lockup
-oficial en PDF está pendiente de decisión (no lo cambies por tu cuenta).
+lámina, sin portada blanca, índice ni tabla. Las portadas y las aperturas de capítulo muestran «efeonce | INSIGHTS»
+tipográfico (mayúsculas espaciadas); el lockup oficial en PDF y el color de acento de «INSIGHTS» en las portadas navy
+están pendientes de decisión del operador (no los cambies por tu cuenta).
 
 **Qué revisar antes de compartir:** que el lockup y la firma de Efeonce se vean en la portada y el pie; que las cifras
 de la página live coincidan con las del PDF (salen del mismo plan); que la muestra nunca se confunda con un informe real

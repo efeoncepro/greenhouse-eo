@@ -539,20 +539,30 @@ esfera: el acento va al cierre.
 producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la superficie del propio producto.*
 
 - **Insights, marca de producto que acompaña** (operador, 2026-09-28): en sus propias superficies (el informe compartido,
-  el portal) va **junto al logo de Efeonce**, separados por un filete fino y con las alturas de x alineadas; no lleva
+  el portal) va **junto al logo de Efeonce**, separados por un filete fino y los tres centrados en vertical (las alturas de x quedan ópticamente alineadas,
+  ±1 px); no lleva
   «by efeonce» porque Efeonce ya está al lado, y **nunca firma**: la firma sigue siendo el logo de Efeonce en el pie. Su
   esfera es parte del logo (como el planeta de Efeonce), no la esfera de la línea; si la pieza ya tiene una órbita con
-  esfera en el mismo acento y compiten, se revisa a ojo. Archivos: `insights-logo-*` / `insights-isotype-*`.
+  esfera en el mismo acento y compiten, se revisa a ojo. La mini-órbita de la «i» no cuenta como la órbita de la pieza
+  en «una órbita por pieza» (el hero de Think y la OG la ponen junto a una órbita de acento, revisado a ojo el
+  2026-09-28): interpretación de quien construyó la marca, **pendiente de confirmación del operador**. Archivos:
+  `insights-logo-*` / `insights-isotype-*`.
 - **Junto a Efeonce, Insights baja su brillo** (operador, 2026-09-28): dos marcas a tinta plena compiten. Baja la que
   ya pesa menos (Insights), así peso y brillo apuntan a la misma jerarquía; la palabra y el anillo van en gris de marca y
   sólo la esfera queda en el acento, como el eslogan. Se usa el archivo `insights-lockup-*`; **nunca** se arma el
   lockup a mano con los dos logos.
 - **Dónde va la marca de Insights hoy** (verificado 2026-09-28): el archivo oficial sólo en el informe live de Think
-  (hero, modo presentación, OG). Las portadas del PDF A4 y del deck componen una versión **tipográfica**
-  (logo de Efeonce + filete + «INSIGHTS» en versalitas), no el archivo `insights-lockup-*`; pie y contraportada del PDF,
-  logo de Efeonce. Correo, favicon, portal y MCP no la llevan. No hay decisión: no cambies ni agregues por criterio propio ([applications.md](applications.md) §B3b; [ledger.md](ledger.md), pendientes). Tamaño:
-  18 px de cuerpo sugeridos para el logo; el lockup no tiene mínimo escrito. Referencia visual: Lab AXIS
-  `https://axis.efeonce.org/references/insights/`.
+  (negativo en el hero y en la portada del modo presentación, ambos oscuros; positivo sólo al imprimir; OG). Las
+  portadas del PDF A4 y del deck componen una versión **tipográfica** (logo de Efeonce + filete + «INSIGHTS» en
+  mayúsculas espaciadas —`uppercase` + `letter-spacing: 0.34em`, no versalitas de fuente—), no el archivo
+  `insights-lockup-*`; pie y contraportada del PDF, logo de Efeonce. **Decisión abierta:** en esas portadas «INSIGHTS»
+  va en el acento (`navyAccent` = teal-500, 12 px) con proporciones propias, contra «Insights baja su brillo» y contra
+  «el acento nunca en texto de menos de 24 px»; cambiarlo toca el contrato de fidelidad de TASK-1889 y lo decide el
+  operador. Los pies de capítulo ya van en `navyMuted`. Correo, favicon, portal y MCP no la llevan. No hay decisión: no cambies ni agregues por criterio propio ([applications.md](applications.md) §B3b; [ledger.md](ledger.md), pendientes). Tamaño:
+  18 px de cuerpo sugeridos para el logo; el lockup no tiene mínimo escrito (el menor en producción: 24 px de alto en
+  móvil, Think). Referencia visual en el Lab de AXIS `/references/insights/`, **pendiente de publicar** (rama
+  `docs/insights-lab`; hoy da 404, no la cites como publicada); mientras tanto, la muestra
+  `think.efeoncepro.com/insights/muestra`.
 
 - **La firma de una pieza gráfica es el logo de Efeonce centrado, abajo al centro.** Cierra la composición al pie
   (manual §8.1; Tres voces, «la firma debe cerrar la composición al pie»).

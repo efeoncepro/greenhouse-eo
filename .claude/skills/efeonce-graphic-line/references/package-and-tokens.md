@@ -934,12 +934,14 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 | `#decisiones` | 6.1 y 6.2 | decisiones y prueba sin logo | láminas |
 | `#insights` | 7.1 y 7.2 | informe Efeonce Insights con la línea | láminas (prueba de diseño, cifras de muestra; no es el diseño de Insights) |
 
-**Página propia de Insights (2026-09-28):** `https://axis.efeonce.org/references/insights/` (fuente
+**Página propia de Insights (2026-09-28), pendiente de publicar:** `/references/insights/` sólo existe en la rama
+`docs/insights-lab` de AXIS (commit `36a2707`; la URL da 404); mientras tanto, la muestra
+`think.efeoncepro.com/insights/muestra`. Las copias `apps/lab/public/branding/insights-*.svg` sí están en `main` (fuente
 `apps/lab/src/pages/references/insights.astro`, JSON para agentes `/references/insights.json` desde `insights.json.ts`,
 guía `docs/agent-composition/insights.md`). Es **referencia** —marca y lockup, aplicaciones aprobadas, secciones del
 informe y la UI del informe live con datos de muestra—, no componentes ni contratos: la UI de Insights vive en
-Greenhouse (catálogos del Artifact Composer) y en Think. Creada en paralelo al barrido de ese día; confirmar que responde
-antes de citarla.
+Greenhouse (catálogos del Artifact Composer) y en Think. Página, JSON y guía viven sólo en esa rama; confirmar que la URL
+responde antes de citarla como publicada.
 
 ---
 
@@ -955,7 +957,8 @@ antes de citarla.
   (el Lab lo dibuja en la propia página).
 - **No hay archivo del eslogan** en `axis-brand-assets`, ni logo/isotipo de Greenhouse, ni fuentes, ni fotos.
 - **No hay UI de Efeonce Insights en AXIS**: ni componentes del informe, ni roles de color de datos, ni geometría de
-  gráficos. AXIS sólo trae la marca (`insights-*`, 0.4.0) y la página de referencia del Lab; roles y geometría siguen
+  gráficos. AXIS sólo trae la marca (`insights-*`, 0.4.0) y la página de referencia del Lab (pendiente de publicar, rama
+  `docs/insights-lab`); roles y geometría siguen
   copiados a mano en Greenhouse y Think (extraerlos es un follow-up documentado, no existe).
 - **No hay adapter de Figma, InDesign ni Office** para la órbita: para esos medios se usan los 48 archivos estáticos.
 - **El adapter de campañas de Greenhouse** (`scripts/creative/layout-compiler/graphic-line.mjs`) **no pinta** `spotlight` ni

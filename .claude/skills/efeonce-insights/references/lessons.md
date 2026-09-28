@@ -9,7 +9,7 @@
   a AXIS (follow-up en [`ui-and-brand.md`](ui-and-brand.md) §1), no otra copia.
 - **2026-09-28 · marca + AXIS · Publicar la marca en AXIS no la pone en ninguna superficie.** `axis-brand-assets` 0.4.0
   trae `insights-{logo,isotype,lockup}-*`, pero Greenhouse fija 0.3.5, las portadas A4/deck componen una versión
-  tipográfica («INSIGHTS» en versalitas junto al logo de Efeonce) en vez del archivo oficial, el correo usa
+  tipográfica («INSIGHTS» en mayúsculas espaciadas junto al logo de Efeonce) en vez del archivo oficial, el correo usa
   `brand='efeonce'` y sólo Think usa los archivos oficiales, con copias manuales. Regla: antes de afirmar que una
   superficie «lleva la marca de Insights», revisa el mapa de aplicación de [`ui-and-brand.md`](ui-and-brand.md) §2 y el
   archivo real; agregarla a una superficie nueva es decisión del operador.
