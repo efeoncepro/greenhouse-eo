@@ -88,9 +88,24 @@ describe('validateDeckPlan — una prueba que dispara y otra que no, por código
       fires: plan('proposal', ['cover-proposal-orbit', 'proposal-service-aeo', 'decision-next-steps', 'close-proposal-horizon'], { diagnosisDone: true }),
       quiet: plan('proposal', ['cover-proposal-orbit', 'proposal-service-aeo', 'decision-next-steps', 'close-proposal-horizon'], { diagnosisDone: false })
     },
-    'variant-adjacent': {
-      fires: plan('proposal', ['cover-proposal-orbit', 'proposal-service-aeo', 'content-pricing', 'content-pricing-stage', 'close-proposal-horizon']),
-      quiet: plan('proposal', ['cover-proposal-orbit', 'content-pricing', 'proposal-service-aeo', 'content-pricing-stage', 'close-proposal-horizon'])
+    // Alternativas: dos variantes nunca en el mismo deck, seguidas o separadas por otra lámina.
+    'variant-both-in-deck': {
+      fires: plan('proposal', ['cover-proposal-orbit', 'content-pricing', 'proposal-service-aeo', 'content-pricing-stage', 'close-proposal-horizon']),
+      quiet: plan('proposal', ['cover-proposal-orbit', 'content-pricing', 'proposal-service-aeo', 'close-proposal-horizon'])
+    },
+    'figure-source-missing': {
+      fires: {
+        document: 'proposal',
+        slides: [{ recipeId: 'cover-proposal-orbit' }, { recipeId: 'proposal-service-creative', slots: { proof: { value: '+2.000 piezas', label: 'Sky: +2.000 piezas' } } }, { recipeId: 'close-proposal-horizon' }]
+      },
+      quiet: {
+        document: 'proposal',
+        slides: [
+          { recipeId: 'cover-proposal-orbit' },
+          { recipeId: 'proposal-service-creative', slots: { proof: { value: '+2.000 piezas', label: 'Sky: +2.000 piezas', source: 'deck Sky, caso publicado' } } },
+          { recipeId: 'close-proposal-horizon' }
+        ]
+      }
     },
     'plate-repeated': { fires: plan('proposal', ['cover-proposal-orbit', 'proposal-service-creative', 'decision-case', 'close-proposal-horizon']), quiet: read('golden-proposal.json') },
     'slot-unknown': { fires: withCoverSlots({ ...COVER_SLOTS, sloganLineWord: 'Growth' }), quiet: withCoverSlots(COVER_SLOTS) },

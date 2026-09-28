@@ -75,6 +75,13 @@ const longestRun = (slot: DeckRecipeSlot, value: unknown): number => {
   return 0
 }
 
+/** Una cifra es un objeto con `value`; sin `source` no respalda nada. Cuenta las que faltan en el valor o en su lista. */
+const figuresWithoutSource = (value: unknown): number => {
+  const items = Array.isArray(value) ? value : [value]
+
+  return items.filter(item => isObject(item) && 'value' in item && isEmpty(item.source)).length
+}
+
 /** Un id del catálogo o una familia de AXIS (por ejemplo `proposal-cinematic`) contra una receta del plan. */
 const refersTo = (ref: string, recipe: DeckRecipe): boolean => ref === recipe.id || (isAxisFamily(ref) && recipe.axis?.recipe === ref)
 
@@ -226,8 +233,9 @@ export const validateDeckPlan = (plan: DeckPlan): DeckPlanValidation => {
       add('recipe-without-template', `«${recipe.id}» no tiene plantilla en el composer todavía: la lámina no se compone con \`pnpm brand:compose\`.`, { index, recipeId: recipe.id })
     }
 
-    if (recipe.id === 'decision-next-steps' && plan.document === 'proposal' && plan.diagnosisDone === true) {
-      add('next-steps-after-diagnosis', '«Próximos pasos» no va en una propuesta cuyo diagnóstico ya se hizo.', { index, recipeId: recipe.id })
+    // Toda la familia `next-steps` (los próximos pasos y el mapa del diagnóstico) supone un diagnóstico por hacer.
+    if (recipe.family === 'next-steps' && plan.document === 'proposal' && plan.diagnosisDone === true) {
+      add('next-steps-after-diagnosis', `«${recipe.name}» no va en una propuesta cuyo diagnóstico ya se hizo.`, { index, recipeId: recipe.id })
     }
   }
 
@@ -268,17 +276,18 @@ export const validateDeckPlan = (plan: DeckPlan): DeckPlanValidation => {
     const earlier = resolved.slice(0, position)
     const role = roleOf(entry.recipe)
 
-    // Dos variantes de la misma lámina no van seguidas (dos portadas o dos cierres ya los rechaza `frame-count`).
-    const previousSlide = earlier.at(-1)
+    // Dos variantes de la misma lámina son alternativas: se elige una y nunca van juntas en el deck, seguidas o no
+    // (decisión del operador 2026-09-28, TASK-1934). Dos portadas o dos cierres ya los rechaza `frame-count`.
+    const framePair = (other: ResolvedSlide) => role !== null && role === roleOf(other.recipe) && (role === 'cover' || role === 'close')
+    const isVariant = (other: ResolvedSlide) => other.recipe.pairs.variant.some(ref => refersTo(ref, entry.recipe)) || entry.recipe.pairs.variant.some(ref => refersTo(ref, other.recipe))
+    const alternative = earlier.find(other => !framePair(other) && isVariant(other))
 
-    const adjacentVariant =
-      previousSlide &&
-      previousSlide.index === entry.index - 1 &&
-      !(role && role === roleOf(previousSlide.recipe) && (role === 'cover' || role === 'close')) &&
-      (previousSlide.recipe.pairs.variant.some(ref => refersTo(ref, entry.recipe)) || entry.recipe.pairs.variant.some(ref => refersTo(ref, previousSlide.recipe)))
-
-    if (adjacentVariant) {
-      add('variant-adjacent', `«${entry.recipe.id}» es variante de «${previousSlide.recipe.id}»: no van seguidas.`, { index: entry.index, recipeId: entry.recipe.id })
+    if (alternative) {
+      add(
+        'variant-both-in-deck',
+        `«${entry.recipe.id}» es variante de «${alternative.recipe.id}» (lámina ${alternative.index + 1}): son alternativas, el deck lleva una sola.`,
+        { index: entry.index, recipeId: entry.recipe.id }
+      )
     }
 
     const previous = resolved[position - 1]
@@ -339,6 +348,11 @@ export const validateDeckPlan = (plan: DeckPlan): DeckPlanValidation => {
         add('slot-type-invalid', `«${slot.name}»: ${problem}.`, { index, recipeId: recipe.id, slot: slot.name })
 
         continue
+      }
+
+      // Una cifra (objeto con `value`) viaja con su fuente; en una lista, cada ítem.
+      if (figuresWithoutSource(value) > 0) {
+        add('figure-source-missing', `«${slot.name}» trae una cifra sin fuente: cada cifra lleva \`source\` con el documento que la respalda.`, { index, recipeId: recipe.id, slot: slot.name })
       }
 
       const length = longestRun(slot, value)

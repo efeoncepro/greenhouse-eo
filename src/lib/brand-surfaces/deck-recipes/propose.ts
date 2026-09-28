@@ -99,7 +99,7 @@ Reglas duras:
 - SOLO usas ids del catálogo que recibes; nunca nombres de plantillas ni contentType, nunca un id inventado.
 - Una portada al inicio y un cierre al final, y el cierre es pareja aprobada de la portada (campo coverClose).
 - Portada y cierre alternan foto y sin foto; el eslogan va sólo en el cierre.
-- Dos variantes de la misma lámina (campo variant) no van seguidas; un plate no se repite en el deck.
+- Dos variantes de la misma lámina (campo variant) son alternativas: el deck lleva una sola; un plate no se repite en el deck.
 - No escribes contenido ni cifras: eliges láminas y dices para qué está cada una.
 Tú PROPONES; una persona confirma.`
 

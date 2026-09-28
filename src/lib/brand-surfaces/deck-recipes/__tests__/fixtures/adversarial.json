@@ -74,7 +74,7 @@
   {
     "name": "variantes seguidas",
     "expect": [
-      "variant-adjacent"
+      "variant-both-in-deck"
     ],
     "plan": {
       "document": "proposal",
@@ -90,6 +90,58 @@
         },
         {
           "recipeId": "content-pricing-stage"
+        },
+        {
+          "recipeId": "close-proposal-horizon"
+        }
+      ]
+    }
+  },
+  {
+    "name": "variantes separadas en el mismo deck (sobria y cine del mismo servicio)",
+    "expect": [
+      "variant-both-in-deck"
+    ],
+    "plan": {
+      "document": "proposal",
+      "slides": [
+        {
+          "recipeId": "cover-proposal-orbit"
+        },
+        {
+          "recipeId": "proposal-service-aeo"
+        },
+        {
+          "recipeId": "method-score-ring"
+        },
+        {
+          "recipeId": "proposal-cinematic-aeo"
+        },
+        {
+          "recipeId": "close-proposal-horizon"
+        }
+      ]
+    }
+  },
+  {
+    "name": "cifra sin fuente",
+    "expect": [
+      "figure-source-missing"
+    ],
+    "plan": {
+      "document": "proposal",
+      "slides": [
+        {
+          "recipeId": "cover-proposal-orbit"
+        },
+        {
+          "recipeId": "proposal-service-creative",
+          "slots": {
+            "proof": {
+              "value": "+2.000 piezas",
+              "label": "Sky: +2.000 piezas aprobadas en 12 meses"
+            }
+          }
         },
         {
           "recipeId": "close-proposal-horizon"
