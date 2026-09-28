@@ -1,8 +1,9 @@
 # GREENHOUSE — Tender Proposal Studio (arquitectura V1)
 
 > **Tipo:** Architecture spec / ADR — **diseño del aggregate; parcialmente implementado** (ver §0)
-> **Versión:** 0.7 · **Status:** **Implemented (F0 operativo)** — aggregate `Proposal` + state machine persistida + API parity + intake agent + proyección de render, con **staging smoke verde** y el módulo `proposal_studio_v1` **activo para Efeonce** (2026-07-12). **§5-ter: Accepted** (topología del runtime del composer).
+> **Versión:** 0.8 · **Status:** **Implemented (F0 operativo)** — aggregate `Proposal` + state machine persistida + API parity + intake agent + proyección de render, con **staging smoke verde** y el módulo `proposal_studio_v1` **activo para Efeonce** (2026-07-12). **§5-ter: Accepted** (topología del runtime del composer).
 > **Creado:** 2026-07-11 por Claude (skill `arch-architect`) con Julio Reyes
+> **v0.8 (2026-09-28, por Claude, TASK-1930):** el deck de «La órbita» liga sus slots de datos desde la evidencia de la `Proposal` (`bindDeckSlots`): el valor viaja en un hecho y `proposal_evidence` lo autoriza; **ningún deck usa evidencia `internal`, ni siquiera uno interno** (decisión del operador). Ver «Delta 2026-09-28» al final de §5-ter.
 > **v0.7 (2026-08-02, clarificación de diseño; sin cambio runtime):** Proposal Studio deja de modelarse como un paquete físico fijo “técnica + económica”. La separación técnica/económica es lógica y de gobernanza; la entrega puede ser técnica sola, económica sola, separada o combinada. La económica client-facing deriva siempre de una versión congelada del cotizador headless. Se documentan como gaps el `quote_id` universal post-GO, el snapshot parcial y la proyección económica todavía incompleta.
 > 🏆 **Hito 2026-09-23 — primera licitación GANADA con el flujo agéntico de licitaciones.** La propuesta SKY Blog (Wherex) se construyó con el método de la skill `greenhouse-public-private-tenders` (bases → admisibilidad → diagnóstico → oferta) y se compuso con el **Artifact Composer**: deck desde catálogo, oferta técnica y económica y Excel generados desde fuente versionada, y evidencia viva (AI Visibility Grader y Radiografía AEO). La operó el operador junto a un agente. La adjudicación **no se atribuye sólo al flujo**: pesaron la relación existente con SKY, las reuniones de ronda 2, la negociación humana y el ajuste económico por alcance. Pero es la **primera validación en el mercado** de lo construido: una oferta producida con este flujo compitió contra ~15 propuestas y ganó, y lo hizo en una **cuenta de talla enterprise** (SKY Airline, aerolínea), no en un piloto menor.
 
@@ -424,6 +425,36 @@ servicio-agnóstico** en `src/lib/commercial/tenders/proposals/authoring/`:
   chapter-authors productivos restantes (creativo, social, web/CRM, HubSpot, contenido,
   económica, squad) se replican sobre estos rieles: uno por servicio, cambia sólo
   `deriveFacts`/`validate`/`toSlides`.
+
+### Delta 2026-09-28 — la evidencia de la `Proposal` liga los slots del deck «La órbita» (TASK-1930)
+
+El deck de marca propia «La órbita» (catálogo `graphic-line-deck`, plan validado por TASK-1929) ya no toma sus datos
+del texto del plan: `bindDeckSlots(plan, context)` (`src/lib/brand-surfaces/deck-recipes/bindings/`, `server-only`)
+liga el logo del cliente, las cifras, los casos, los testimonios, los logos de terceros y los datos de muestra desde
+la verdad de Greenhouse. Contrato completo:
+[`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md` §13](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Lo que toca a este
+aggregate:
+
+- **Consume sus readers, no los reemplaza:** `getProposalById` (acotado a la organización dueña),
+  `buildProposalRenderProjection` con audiencia `internal` (la autoría ve toda la evidencia; la regla la aplica el
+  binder) y `readOrganizationLogoVariants` (Account 360) para el logo del cliente. No escribe nada. El consumer
+  (TASK-1932, TASK-1921 o la CLI) ya autorizó al sujeto; el binder no autoriza personas.
+- **`proposal_evidence` no guarda el valor** de una cifra ni el texto de una cita (sólo `locator`, `method`, `as_of`,
+  `classification`, `audience` y `source_asset_id`). El valor viaja en un hecho —el mismo contrato `EvidencedFact` de
+  los chapter-authors, con su `evidenceRef`— y la evidencia lo autoriza: `measured` para una cifra propia; `attested`
+  **con** documento de respaldo para un caso, un testimonio o un logo de tercero.
+- **Ningún deck usa evidencia `internal`, ni siquiera uno interno** (decisión del operador, 2026-09-28): issue
+  `binding-internal-evidence` (error). El binder no sabe qué significa un número y la evidencia interna es donde viven
+  el costo cargado y el margen. Además, toda evidencia ligada vuelve a pasar por `assertEvidenceAllowedForAudience`
+  como artefacto `client_facing`. Verificado contra la propuesta real `prop-5965260d` (SKY blog 2026): su única
+  evidencia `measured` era interna (el costo cargado del equipo) y quedó bloqueada.
+- **Una evidencia que no es de la propuesta** rechaza el deck (`binding-evidence-unknown`), igual que en el gate de
+  audiencia.
+- **Montos y equipo no se calculan aquí:** todo monto sale `[MONTO]` hasta que existan los hechos económicos de la
+  cotización congelada (TASK-1417) y la lámina de equipo no compone hasta el roster real (TASK-1418).
+- El rastro por slot (fuente, `evidenceRef`, `asOf` o motivo) va al manifest y a la procedencia del asset (TASK-1932,
+  TASK-1921). Estado: [TASK-1930](../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md) en curso, Slices
+  1–4 y 7 entregados.
 
 ## 6. Económica: fuente única (Greenhouse), múltiples formatos de salida
 

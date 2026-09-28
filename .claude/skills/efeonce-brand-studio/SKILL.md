@@ -248,7 +248,11 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
     0.3.19; intent de ejemplo por receta en `src/lib/brand-surfaces/examples/deck-<receta>-intent.json`), incluida la
     portada de brochure con la selección de Nexa (`cover-brochure` layout `document-selection`). Es composición local
     por CLI: la ruta productiva (API, worker, MCP) es TASK-1921 y **no está disponible**. Para armar el deck, carga la
-    skill `deck-studio`; detalle de plantillas y gates en `efeonce-graphic-line`. La lámina de líneas es la única con los cinco acentos;
+    skill `deck-studio`; detalle de plantillas y gates en `efeonce-graphic-line`. **Los datos de las láminas** (logo del
+    cliente, cifras, casos, testimonios, logos de terceros, montos, equipo) **no se escriben a mano**: se ligan con
+    `pnpm brand:deck-plan -- --bind` (`bindDeckSlots`, TASK-1930) desde evidencia verificada; ningún deck, ni uno
+    interno, usa evidencia interna, y el uso de la marca de un tercero exige su autorización con documento (biblioteca
+    por tercero: TASK-1937). La lámina de líneas es la única con los cinco acentos;
     en todo lo demás, un acento por pieza, tomado del `accentOnDark` de la línea que se vende. **Portadas y
     contraportadas** (operador, 2026-09-27): foto ↔ sin foto; «Empower your Growth» como mensaje de la contraportada de
     propuesta y «¿Conversamos? Cuando quieras.» en la de brochure; nunca el eslogan en la portada; `cover-classic` y

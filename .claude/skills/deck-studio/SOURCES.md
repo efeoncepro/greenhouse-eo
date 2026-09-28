@@ -355,14 +355,24 @@ No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y 
   `docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md` (ruta productiva; `in-progress`
   en otra sesión, no está disponible), `docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md`
   (plates), `docs/tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md` (plan de deck validado contra el
-  catálogo; code complete en `develop` local, commits `651bb0972`, `5a1fb974b`, `248d3e1de`) y, en `docs/tasks/to-do/`,
-  TASK-1930 (datos reales en los slots), TASK-1931 (banco de plates gobernado), TASK-1932 (Proposal Studio arma el deck
+  catálogo; code complete en `develop` local, commits `651bb0972`, `5a1fb974b`, `248d3e1de`),
+  `docs/tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md` (datos reales en los slots; `in-progress`,
+  Slices 1–4 y 7 entregados, montos y equipo esperan TASK-1417/TASK-1418) y, en `docs/tasks/to-do/`, TASK-1931 (banco de plates gobernado), TASK-1932 (Proposal Studio arma el deck
   desde recetas; consume `validateDeckPlan`/`proposeDeckPlan`) y TASK-1933 (pendientes de QA del catálogo).
 - Plan de deck (TASK-1929): `src/lib/brand-surfaces/deck-recipes/` — `index.ts` (entrada pura), `catalog.ts`,
   `catalog.generated.json` (lo escribe `scripts/creative/deck-recipes/render-index.mjs` vía `pnpm brand:deck-recipes`),
   `types.ts`, `issues.ts` (códigos y `AXIS_EQUIVALENT`), `validate.ts`, `propose.ts` (`server-only`); CLI
   `scripts/brand-surfaces/deck-plan.ts` (`pnpm brand:deck-plan`); tests y fixtures (`golden-*`, `adversarial.json`,
   `context-brochure.json`) en `__tests__/`.
+- Datos reales en los slots (TASK-1930): `src/lib/brand-surfaces/deck-recipes/bindings/` — `index.ts`
+  (`bindDeckSlots`, `server-only`: lee `getProposalById`, `buildProposalRenderProjection`,
+  `readOrganizationLogoVariants` y, sin `Proposal`, `getAssetById`), `core.ts` (`bindDeckSlotsWith`, puro; códigos
+  `binding-*`), `map.ts` (slot → binder o exclusión; `LOGO_WALL_MIN`, `SAMPLE_MARKS`), `types.ts` (hechos, contexto,
+  motivos `SLOT_UNBOUND_REASONS`), `binders/` (uno por clase de slot) y `__tests__/`. CLI: `--bind` en
+  `scripts/brand-surfaces/deck-plan.ts`. Tabla humana: «Datos reales por slot» en
+  `docs/operations/brand-graphic-line/deck-recipes/README.md`; manual, paso 5b de
+  `docs/manual-de-uso/creative/componer-deck-con-recetas.md`. Biblioteca de autorizaciones por tercero: TASK-1937
+  (`to-do`).
 - Código: `src/lib/brand-surfaces/recipes/deck.ts`, `frame.ts` y, desde TASK-1928, `proposal-service.ts`, `method.ts`,
   `close.ts`, `proof.ts`, `sections.ts`, `content.ts` (ayudas en `kit.ts`; todos registrados en
   `src/lib/brand-surfaces/index.ts`); `src/lib/brand-surfaces/document.ts`, `scripts/brand-surfaces/compose.ts`,

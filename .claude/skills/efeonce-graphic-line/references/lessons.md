@@ -175,6 +175,17 @@
   intent y en la cotización `recommended`; el builder lo traduce al slot `selection.item` que marca el hook del
   catálogo. Regla: no lo busques en `selection` del contrato; copia el ejemplo de la lámina.
 
+## 2026-09-28 (datos reales en los slots, TASK-1930)
+
+- **La evidencia no guarda el valor.** `proposal_evidence` dice de dónde sale un dato, cuándo y quién puede verlo,
+  pero no el número ni la cita. Regla: el valor viaja en un hecho con `evidenceRef` y la evidencia sólo lo autoriza;
+  no busques el valor en la tabla.
+- **Un binder no sabe qué significa un número.** La única cifra `measured` de la propuesta real de prueba era el costo
+  cargado del equipo, marcada interna. Regla (decisión del operador): ningún deck usa evidencia interna, ni siquiera
+  uno interno; así «sin costo ni margen en una lámina» lo garantiza el sistema.
+- **El validador del plan rechazaba cuatro cifras.** Un slot `metric` sólo aceptaba un valor y `decision-case.stats`
+  lleva cuatro. Regla: una cifra o una lista de cifras, cada una con su fuente.
+
 ## 2026-09-28 (el plan del deck contra el catálogo, TASK-1929)
 
 - **`pairsWith sequence` no tiene dirección.** La spec pedía una regla de orden (`sequence-order`), pero medido sobre

@@ -148,6 +148,20 @@ Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 > marca (API, worker, MCP) es TASK-1921, en curso; ninguna de las dos está disponible todavía.
 > TASK-1932 consumirá `validateDeckPlan` / `proposeDeckPlan` (`src/lib/brand-surfaces/deck-recipes`, TASK-1929) para el
 > plan de recetas antes de la confirmación humana; hoy sólo existen por CLI (`pnpm brand:deck-plan`).
+>
+> **Delta 2026-09-28 (b) — los datos de una propuesta de La órbita se LIGAN, no se escriben (TASK-1930, en curso).**
+> `bindDeckSlots(plan, context)` (`server-only`, `src/lib/brand-surfaces/deck-recipes/bindings/index.ts`; núcleo puro
+> `bindDeckSlotsWith` en `bindings/core.ts`) llena los slots de datos del plan de recetas desde la `Proposal`
+> (`getProposalById`), su evidencia (proyección allowlisted `buildProposalRenderProjection`) y el logo del cliente
+> (`readOrganizationLogoVariants`). El valor viaja en un hecho con `evidenceRef` y la evidencia lo autoriza; un slot
+> de datos nunca sale del texto del plan. Cifras: evidencia `measured`, la fuente visible sale de la evidencia. Casos,
+> testimonios, logos de terceros y foto de caso: evidencia `attested` con documento de respaldo. Montos: `[MONTO]`
+> hasta TASK-1417; equipo: sin ligar hasta TASK-1418. **Ningún deck usa evidencia `internal`, ni siquiera uno
+> interno** (ahí vive el costo cargado y el margen; decisión del operador 2026-09-28), y el muro de logos pide nueve
+> autorizados como mínimo. TASK-1932 lo consumirá antes de la confirmación humana; hoy es CLI
+> (`pnpm brand:deck-plan -- --bind --plan <plan.json> --proposal <id> --org <ownerOrgId>`, con `pnpm pg:connect`).
+> **No toca `deck-axis`:** una oferta a comité sigue con su selector. Detalle: `deck-studio` §«Datos reales en los
+> slots».
 
 ### Las que puntúan (no son opcionales)
 

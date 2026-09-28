@@ -240,6 +240,12 @@
   quedó como `rhythm-paper-run` (sólo papel: tres oscuras seguidas es la norma); `variant` = no adyacentes. Lo que no
   hace: confirmación humana, API, Nexa y MCP (TASK-1932), datos reales en slots (TASK-1930), plates por `assetId`
   (TASK-1931), QA abierta del catálogo (TASK-1933).
+- Datos reales en los slots del deck (TASK-1930, 2026-09-28): **`in-progress`, Slices 1–4 y 7 en `develop`** (commits
+  `a2b7d26bd`, `f456921c3`, `ac1942620`, `07b417011`). `bindDeckSlots` + mapa de las 78 recetas
+  (`DECK_SLOT_BINDING_MAP`) + CLI `--bind`; verificado contra la propuesta real `prop-5965260d` (SKY blog 2026).
+  Decisiones del operador: ningún deck usa evidencia interna; muro de logos mínimo 9. Corrigió un bug latente de
+  TASK-1929 (un slot `metric` no aceptaba lista). Abierto: montos (TASK-1417) y equipo (TASK-1418); biblioteca de
+  autorizaciones por tercero en TASK-1937.
 - Composición por superficie en Greenhouse (TASK-1919): **hecho, en `origin/develop`** — las 20 recetas aprobadas son
   plantillas del Artifact Composer (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`), `pnpm
   brand:compose` y gate `--catalog=graphic-line` a 0 px. Falta la ruta productiva (TASK-1921, `in-progress` en otra sesión: API, `artifact-worker`,

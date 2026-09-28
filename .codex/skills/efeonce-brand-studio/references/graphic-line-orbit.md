@@ -141,6 +141,11 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
     («Escucha.» «Crea.» «Mide.»); sección partida con el indicador **por la izquierda** (tres variantes); cotización en
     tres variantes, sólo en propuesta y con `[MONTO]`; próximos pasos con la agenda abierta; clientes en un tono navy;
     foto del caso Sky de ejemplo; registro cine también en secciones y «about», nunca fuera del deck.
+    **Datos reales (TASK-1930, en curso):** los slots de datos (logo del cliente, cifras, casos, testimonios, logos de
+    terceros, montos, equipo, datos de muestra) nunca se escriben a mano: los liga `bindDeckSlots`
+    (`src/lib/brand-surfaces/deck-recipes/bindings/`; CLI `pnpm brand:deck-plan -- --bind`) desde evidencia
+    verificada, o quedan sin ligar y el deck no compone. Ningún deck usa evidencia interna; muro de logos con nueve
+    autorizados como mínimo; montos `[MONTO]`; equipo sin ligar hasta TASK-1418 y nunca con una cara generada.
 12. **Estado:** anillo = libre, esfera = ocupado, siempre con etiqueta escrita; nunca verde/rojo.
 13. **La esfera final es parte del texto** (operador, 2026-09-26): la respuesta y el titular display de marca propia
     cierran con ella, y la guía, las marcas de corte, la selección colaborativa y sus cursores miden la palabra

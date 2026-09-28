@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.11
+> **Versión:** 1.12
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude (1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-09-28 por Claude (1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -593,6 +593,29 @@ las láminas SEO/AEO no son del plan: los hacen cumplir el builder al componer y
 elige recetas: no escribe contenido ni cifras, y si su plan trae errores tras un reintento, no entrega plan. La
 confirmación humana del plan, su registro y el camino por Nexa y MCP llegan con TASK-1932.
 
+**De dónde salen los datos reales de un deck (TASK-1930, en curso).** El logo del cliente, las cifras, los casos, los
+testimonios, los logos de terceros, los montos, el equipo y los datos de las láminas de muestra **nunca salen del texto
+del plan**: `pnpm brand:deck-plan -- --bind` los liga desde la verdad de Greenhouse o los quita, y una lámina a la que le
+falta un dato obligatorio no compone. Qué exige cada uno:
+
+| Dato | De dónde sale | Sin él |
+|---|---|---|
+| Logo del cliente en la portada de propuesta | Account 360; la portada oscura exige la versión para fondo oscuro | la portada no compone |
+| Cifra propia | evidencia medida de la propuesta; la fuente visible es su procedencia. Fuera de una propuesta, un documento de respaldo y su fuente | la cifra se quita |
+| Caso, testimonio, logo de tercero, foto de un caso | evidencia atestiguada con su documento de respaldo. La frase destacada del testimonio es un fragmento literal de la cita; la foto de ejemplo nunca sale | se quita; fuera de una propuesta no se usa hasta tener la biblioteca de autorizaciones ([TASK-1937](../../tasks/to-do/TASK-1937-third-party-brand-usage-authorization-library.md)) |
+| Muro de clientes y de partners | como mínimo **nueve** logos autorizados (decisión del operador) | no compone |
+| Montos | siempre `[MONTO]` hasta que la propuesta tenga cotización congelada (TASK-1417); una línea con un monto escrito se quita | — |
+| Equipo | el roster real de la cuenta (TASK-1418); nunca una cara generada | la lámina de equipo no compone |
+| Datos de muestra (`decision-ai-answer`, `decision-diagnosis-map`) | por defecto, muestra con su marca; con datos medidos del cliente, la marca se retira | la marca se queda |
+
+**Ningún deck usa evidencia interna, ni siquiera uno interno** **[decisión del operador, 2026-09-28]**. Un número
+interno de una propuesta suele ser costo cargado o margen, y la máquina no distingue uno de otro: con una sola evidencia
+interna, el deck no compone. No se ligan a dato real las cifras de mercado de `decision-ai-market` (dato de mercado
+citado, regla de «Recetas por lámina»), el puntaje de `method-score-ring` (se calcula), el horizonte de `decision-plan`
+ni los slots de selección. Contrato y rastro por slot:
+[spec técnica §13](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) · task
+[TASK-1930](../../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md).
+
 #### Cambiar la foto, el copy o la sección de una lámina
 
 **El contenido de una lámina es dato del intent, no de la plantilla.** La plantilla fija la composición; la foto, el
@@ -1073,6 +1096,10 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   re-congelado de `ProposalCinematic`) se congelaron en `c652f4f83` (ledger (o)) y el gate `graphic-line` queda en 73
   frames a 0 px. La propuesta cine sin nota vuelve a componer (`af32d9353`, con test). **Falta:** el plate SE1 se
   siembra en el banco de TASK-1931 (§4.6, «Pendientes de QA»).
+- **TASK-1930: en curso (2026-09-28).** Los datos reales de un deck se ligan desde la verdad de Greenhouse
+  (`pnpm brand:deck-plan -- --bind`; qué exige cada dato, en §4.6): entregados el logo del cliente, las cifras, la
+  prueba de terceros y los datos de muestra. **Falta:** los montos (esperan la cotización congelada, TASK-1417) y el
+  equipo (el roster real, TASK-1418); fuera de una propuesta, la biblioteca de autorizaciones de terceros (TASK-1937).
 - **Preguntas abiertas del operador (TASK-1919):** la posición de la lente del caminero (el token dice 0,70 y la
   lámina aprobada la muestra cerca de 0,77); el super de dato, ¿arco completo como en la lámina o la estela canónica
   de la medida?; la burbuja URL en `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas

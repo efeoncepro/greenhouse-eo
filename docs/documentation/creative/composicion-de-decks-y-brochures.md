@@ -1,9 +1,9 @@
 # Composición de decks y brochures de marca propia
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.2
+> **Version:** 2.3
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
+> **Ultima actualizacion:** 2026-09-28 por Claude (2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
 > **Documentacion tecnica:** [Arquitectura de la composición de piezas de marca](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) · [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
 > **Manual de uso:** [Componer un deck con las recetas por lámina](../../manual-de-uso/creative/componer-deck-con-recetas.md) · [Componer una pieza por superficie con AXIS](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
 
@@ -286,7 +286,7 @@ publicado»).
 | Lo hace el agente | Lo hace la persona |
 | --- | --- |
 | Elige recetas **por id**, sólo entre las del catálogo para ese documento | Revisa el plan propuesto y decide si lo usa |
-| Explica en una línea para qué está cada lámina y por qué armó el plan así | Escribe los textos, las cifras con su fuente y las fotos |
+| Explica en una línea para qué está cada lámina y por qué armó el plan así | Escribe o confirma los textos y elige las fotos; las cifras, los casos y los logos se ligan desde la evidencia (abajo) |
 | Si su primer plan tiene errores, lo corrige una vez con la lista de problemas | Compone y aprueba la pieza |
 
 Reglas de la propuesta:
@@ -304,12 +304,60 @@ Reglas de la propuesta:
 - **Proponer no guarda nada.** Hoy la confirmación es simplemente que la persona use el plan; la confirmación
   registrada es trabajo pendiente (abajo).
 
+### Ligar los datos reales de cada lámina
+
+Un plan tiene dos clases de casillas. Las de **voz** (la pregunta, la respuesta, el cuerpo) las escribe quien propone
+y las confirma una persona. Las de **datos** (el logo del cliente, las cifras, los casos, los testimonios, los logos
+de otras marcas, los montos, el equipo y los datos de muestra) **nunca se escriben a mano**: se ligan desde la
+información verificada de Greenhouse. Si una casilla de datos traía algo escrito, se reemplaza por el dato verificado
+o se quita. Nunca se usa lo que venía escrito.
+
+| Casilla | De dónde sale | Cuándo queda vacía |
+| --- | --- | --- |
+| Logo del cliente | la ficha del cliente (Account 360); en una portada oscura, su versión para fondo oscuro | si no hay logo o falta la versión para fondo oscuro |
+| Cifras | una cifra **medida** de la evidencia de la propuesta; la fuente que se ve en la lámina sale de esa evidencia | si la cifra no tiene evidencia medida |
+| Casos, testimonios, logos de otras marcas y foto de un caso | evidencia **declarada con su documento de respaldo** (la autorización del cliente) | sin documento de respaldo. La frase destacada de un testimonio tiene que ser un trozo literal de la cita. Una foto de ejemplo nunca pasa por foto del caso |
+| Montos | siempre `[MONTO]` | hasta que exista la cotización congelada (TASK-1417) |
+| Equipo | todavía no se liga, y nunca se usa una cara generada | hasta TASK-1418 |
+| Láminas de muestra de SEO y AEO | conservan los datos y la marca de muestra | sólo con datos reales del cliente, con su evidencia, se retira la marca |
+
+Reglas que no cambian según el deck:
+
+- **Ningún deck usa evidencia interna, ni siquiera uno interno.** La evidencia interna es donde vive el costo y el
+  margen. Si una casilla apunta a evidencia interna, el plan falla.
+- **El muro de logos lleva al menos nueve logos autorizados** (decisión del operador del 2026-09-28). Con menos, se
+  usa otra lámina de prueba.
+- **Fuera de una propuesta** (un brochure, un pitch o un QBR) sólo se ligan cifras con un documento de respaldo. Los
+  casos, testimonios y logos de otras marcas quedan sin autorización hasta que exista la biblioteca de autorizaciones
+  por marca ([TASK-1937](../../tasks/to-do/TASK-1937-third-party-brand-usage-authorization-library.md)).
+- **Si falta un dato obligatorio, el plan no compone.** El sistema nunca llena una casilla para que pase.
+- **Cada casilla deja su rastro:** si quedó ligada o no, de dónde salió, qué evidencia la respalda, de qué fecha y,
+  si quedó vacía, por qué.
+
+Ligar **sólo lee**: no compone el deck ni guarda nada. El comando muestra cada casilla de datos con «ligado desde …»
+o «sin ligar: motivo». Cómo correrlo, paso a paso, está en el
+[manual](../../manual-de-uso/creative/componer-deck-con-recetas.md#paso-5b--liga-los-datos-reales); qué casilla de
+qué lámina sale de qué fuente, en el
+[catálogo](../../operations/brand-graphic-line/deck-recipes/README.md#datos-reales-por-slot-task-1930).
+
+> Detalle técnico: `bindDeckSlots(plan, context)` (`server-only`) en
+> [`src/lib/brand-surfaces/deck-recipes/bindings/index.ts`](../../../src/lib/brand-surfaces/deck-recipes/bindings/index.ts)
+> y su núcleo puro `bindDeckSlotsWith` en [`core.ts`](../../../src/lib/brand-surfaces/deck-recipes/bindings/core.ts);
+> devuelve `{ ok, plan, bindings, issues }` · lee sólo readers canónicos (`getProposalById`, la proyección allowlisted
+> de la evidencia, `readOrganizationLogoVariants`; fuera de una propuesta, `getAssetById`) · el valor viaja en un
+> hecho (`figure`, `logo`, `quote`, `photo`, `sample-data`, con su `evidenceRef`) porque `proposal_evidence` no guarda
+> el valor de una cifra ni el texto de una cita · comando
+> `pnpm brand:deck-plan -- --bind --plan <plan.json> (--context <c.json> | --proposal <id> --org <ownerOrgId> [--facts <f.json>] | --sources <fixture.json>) [--out <ligado.json>]`
+> (con `--proposal` necesita `pnpm pg:connect`) ·
+> [TASK-1930](../../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md), en curso.
+
 ### Qué todavía no hace
 
 | Pendiente | Qué implica hoy | Dónde se resuelve |
 | --- | --- | --- |
 | Confirmar y guardar el plan; pedirlo por API, desde Nexa o por MCP | Sólo se valida y se propone desde un equipo, con un comando; el plan vive en un archivo | TASK-1932 |
-| Llenar las casillas con datos reales | Los textos del plan se escriben a mano | TASK-1930 |
+| Montos y equipo con datos reales | Las cifras, los casos, los testimonios y el logo del cliente ya se ligan (arriba); los montos siguen como `[MONTO]` y el equipo queda sin ligar | TASK-1417 y TASK-1418 |
+| Guardar el plan ligado y componerlo con confirmación | Ligar sólo muestra el resultado; no compone ni guarda | TASK-1932 |
 | Elegir fotos del banco gobernado | El validador sólo detecta una foto repetida dentro del plan | TASK-1931 |
 | Componer el plan de una vez | Se compone lámina a lámina o como documento con `pnpm brand:compose`; el plan no se convierte solo en pedido | TASK-1921 (ruta productiva, en curso) |
 
@@ -370,7 +418,7 @@ ojo, y la aprobación es del operador. Revisar esa prueba no es trabajo de quien
 | --- | --- | --- |
 | Ruta dentro de la plataforma | Sólo se compone desde un equipo, con un comando. No hay pantalla, cola ni acceso para agentes | TASK-1921, en curso |
 | Confirmar y guardar el plan del deck; pedirlo por API, Nexa o MCP | El plan ya se valida y un agente lo propone (TASK-1929, ver arriba), pero sólo desde un equipo y sin registro de la confirmación | TASK-1932 |
-| Datos reales en las casillas | Logo del cliente, equipo, métricas, casos y testimonios se escriben a mano en el pedido | TASK-1930 |
+| Datos reales en las casillas | Logo del cliente, cifras, casos y testimonios ya se ligan desde un plan con `--bind` (ver arriba), pero sólo desde un equipo; montos y equipo siguen pendientes | TASK-1930 (en curso), TASK-1417, TASK-1418 |
 | Banco de fotos gobernado | Las fotos viven en el equipo de quien compone, fuera del repositorio | TASK-1931 |
 | Armar el deck desde Proposal Studio | Una propuesta no produce todavía su deck «La órbita» | TASK-1932 |
 | Control de foco en la sección partida | No se puede decir qué parte de la foto conservar. Si la persona queda cortada, se usa otra foto | sin task |
@@ -391,7 +439,7 @@ propuesta cinematográfica, y la prueba visual automática las congeló (TASK-19
 
 > Detalle técnico: [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) ·
 > [TASK-1929](../../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) ·
-> [TASK-1930](../../tasks/to-do/TASK-1930-deck-recipe-slot-data-bindings.md) ·
+> [TASK-1930](../../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md) ·
 > [TASK-1931](../../tasks/to-do/TASK-1931-brand-plate-bank-governed.md) ·
 > [TASK-1932](../../tasks/to-do/TASK-1932-proposal-studio-graphic-line-deck-output.md) · cierres en
 > [TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) y

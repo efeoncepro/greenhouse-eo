@@ -901,6 +901,19 @@ fail-closed). Tabla de códigos, forma del contexto y credenciales: skill `deck-
 recetas, nunca plantillas ni `contentType`; el `deck-plan.json` que escribe `brand:compose` es otra cosa (el `Plan` del
 composer).
 
+**Ligar los datos reales (TASK-1930, 2026-09-28).** Los slots de **datos** del plan —logo del cliente, cifras, casos,
+testimonios, logos de terceros, montos, equipo y datos de muestra— nunca se escriben a mano: los llena
+`bindDeckSlots(plan, context)` (`src/lib/brand-surfaces/deck-recipes/bindings/`, `server-only`; CLI
+`pnpm brand:deck-plan -- --bind --plan plan.json (--context c.json | --proposal <id> --org <org> | --sources f.json)`).
+Lo que el plan traiga en un slot de datos se reemplaza por el hecho verificado o se quita, y el plan falla cerrado.
+Reglas: el valor viaja en un **hecho** con `evidenceRef` (la `proposal_evidence` no guarda valores, sólo autoriza);
+cifras con evidencia `measured`; casos, testimonios, logos de terceros y foto de caso con evidencia `attested` **y**
+documento; **ningún deck usa evidencia interna**, ni siquiera uno interno (decisión del operador: ahí vive el costo
+cargado y el margen); montos siempre `[MONTO]` hasta TASK-1417; equipo sin ligar hasta TASK-1418 (nunca una cara
+generada); muro de logos con 9 autorizados o no compone; las láminas de muestra SEO/AEO quitan su marca sólo con datos
+del cliente con evidencia. Mapa por slot y motivos: catálogo `deck-recipes/README.md` §«Datos reales por slot».
+Biblioteca de autorizaciones por tercero fuera de una propuesta: TASK-1937 (to-do).
+
 | Receta | `layout` | `contentType` |
 |---|---|---|
 | `proposal-cinematic` | `service` (o sin layout) · `hero` · `lines` | `deck.proposal-cinematic` · `.hero` · `.lines` |

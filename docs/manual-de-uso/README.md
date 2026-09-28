@@ -49,7 +49,9 @@ La diferencia con otras capas de documentacion:
   desde el 2026-09-28: elegir documento, portada y contraportada, esqueleto por familias, receta por tramo («cuándo
   sí», «cuándo no», alternativa), pares y ritmo, **validar el plan con `pnpm brand:deck-plan`** (cómo escribir
   `plan.json`, tabla de códigos con su arreglo, pedirle el plan al agente con `--propose --context`, costo y
-  credenciales locales; TASK-1929), cómo elegir la composición (`layout`) de cada receta, slots con su
+  credenciales locales; TASK-1929), **ligar los datos reales con `--bind`** (paso 5b: logo del cliente, cifras,
+  casos, testimonios y logos desde la evidencia, montos en `[MONTO]`, equipo pendiente, la tabla de slots y sus
+  motivos; TASK-1930), cómo elegir la composición (`layout`) de cada receta, slots con su
   largo máximo, cifras con fuente, `[MONTO]`, selección (`selected`, `recommended`, `selection.level`), `photo.focus`,
   intent propio, lámina o documento completo con `pnpm brand:compose`, estados y problemas comunes. La ruta dentro de la
   plataforma es TASK-1921, en curso.

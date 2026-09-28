@@ -95,6 +95,13 @@ plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.
   enum, un reintento, fail-closed). No confundirlo con el `Plan` del composer (`deck-plan.json` que escribe
   `brand:compose`): el de recetas nombra recetas, el del composer ya trae plantillas. Códigos y arreglos:
   [SKILL.md](SKILL.md) §«Plan del deck».
+- **Después del plan, los datos reales** (TASK-1930, `in-progress`): `bindDeckSlots(plan, context)` (`server-only`,
+  `src/lib/brand-surfaces/deck-recipes/bindings/index.ts`; núcleo puro `bindDeckSlotsWith` en `bindings/core.ts`) liga
+  los slots de **datos** (logo del cliente, cifras, casos, testimonios, logos de terceros, montos, equipo, datos de
+  muestra) desde readers canónicos y deja el rastro por slot; CLI `pnpm brand:deck-plan -- --bind --plan plan.json …`.
+  Un slot de datos **nunca** sale del texto del plan: se reemplaza por el hecho verificado o se quita, y el plan falla
+  cerrado. Se compone el plan **ligado**. Reglas de evidencia y comando: [SKILL.md](SKILL.md) §«Datos reales en los
+  slots».
 - **Se componen desde un intent de superficie**, no desde un `Plan` escrito a mano:
   `pnpm brand:compose -- --intent <intent.json>`. El mapper `src/lib/brand-surfaces` exige receta aprobada, valida con
   el contrato AXIS `efeonce.surface-composition` y deriva el `contentType`; el autor nunca elige plantilla (sigue
@@ -427,6 +434,9 @@ Tres capacidades del motor que cambian lo que un deck puede afirmar:
   rechazarlo y el autor debe resolver el contenido o el schedule.
 - **NUNCA** declares un deck listo sin **MIRAR TODOS LOS FRAMES**. Los tests verdes no son el gate.
 - **SIEMPRE** el `Plan` es el artefacto auditable; el PDF es derivado y re-componible.
+- **NUNCA** escribas a mano un slot de datos de un deck de marca propia (logo del cliente, cifra, caso, testimonio,
+  logo de tercero, monto, equipo): lo liga `bindDeckSlots` desde evidencia verificada o queda sin ligar. Ningún deck,
+  ni uno interno, usa evidencia `internal` (TASK-1930).
 - **SIEMPRE** que edites `EFEONCE_DECK_SLIDE_RECIPES_V1.json`, corre `pnpm brand:deck-recipes` (regenera el índice del
   README y `src/lib/brand-surfaces/deck-recipes/catalog.generated.json`); el runtime nunca lee el JSON de `docs/`, y
   `--check` + el test `catalog-drift` fallan si quedaron desalineados.

@@ -1,14 +1,14 @@
 # GREENHOUSE — Composición por superficie de «La órbita» en el Artifact Composer V1
 
 > **Tipo de documento:** Spec técnica (arquitectura del lado Greenhouse)
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-28 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.2: TASK-1934 — las nueve láminas SEO/AEO: 78 recetas y 57 plantillas (§4), builders en `recipes/seo-aeo/` (§5), prefijos CSS (§7.3), 3× y reglas nuevas (§8), AXIS `v0.3.22`/`v0.3.23` (§10), catálogo de runtime y códigos `variant-both-in-deck` y `figure-source-missing` (§12), pendientes (§13). Antes, 1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
+> **Última actualización:** 2026-09-28 por Claude (1.3: TASK-1930 — §13 nueva, datos reales en los slots del deck: `bindDeckSlots`, mapa declarado, binders, regla de evidencia (ningún deck usa evidencia `internal`), rastro por slot y `pnpm brand:deck-plan -- --bind`; §9, §12.9 y §14 al día. Antes, 1.2: TASK-1934 — las nueve láminas SEO/AEO: 78 recetas y 57 plantillas (§4), builders en `recipes/seo-aeo/` (§5), prefijos CSS (§7.3), 3× y reglas nuevas (§8), AXIS `v0.3.22`/`v0.3.23` (§10), catálogo de runtime y códigos `variant-both-in-deck` y `figure-source-missing` (§12), pendientes (§13). Antes, 1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
 > **Estado:** vigente. Taller local (`pnpm brand:compose`) en `develop`; la ruta productiva gobernada es TASK-1921, en curso.
 > **Contrato y valores (AXIS):** ADR [`SURFACE_COMPOSITION_DECISION_V1.md`](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md) del repo `efeoncepro/axis-design-system` (contrato `efeonce.surface-composition` 0.1.2, deltas (b)…(n)); guía `docs/agent-composition/surfaces/deck.md` del mismo repo.
 > **Norma de marca:** [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (qué se aprobó por superficie, §2.1 ruta por el composer, §4.6 deck) · catálogo de recetas [`deck-recipes/`](../operations/brand-graphic-line/deck-recipes/README.md).
 > **Motor:** [`GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`](GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md) (el composer es domain-free; las superficies son catálogos) · invariantes [`COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`](agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md).
-> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69) · [TASK-1929](../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) (plan de deck contra el catálogo, §12; code complete, en cierre) · [TASK-1934](../tasks/in-progress/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) (las nueve láminas SEO/AEO: 78 de 78; en curso).
+> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69) · [TASK-1929](../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) (plan de deck contra el catálogo, §12; code complete, en cierre) · [TASK-1934](../tasks/complete/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) (las nueve láminas SEO/AEO: 78 de 78; complete) · [TASK-1930](../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md) (datos reales en los slots, §13; en curso).
 > **Manuales:** [componer por superficie con AXIS](../manual-de-uso/creative/componer-por-superficie-con-axis.md) · [componer un deck con las recetas](../manual-de-uso/creative/componer-deck-con-recetas.md) · runbook del gate [`composer-visual-gate.md`](../operations/runbooks/composer-visual-gate.md).
 
 ## 1. Qué es y dónde termina
@@ -454,6 +454,7 @@ sobre cada probe de los catálogos de La órbita: una violación falla el gate i
 | `scripts/brand-surfaces/__tests__/graphic-line-tokens-sync.test.ts` y `pnpm brand:tokens --check` | el snapshot compilado coincide con la versión instalada de `axis-tokens` |
 | `pnpm brand:deck-recipes -- --check` | valida el catálogo de recetas y que el índice del README coincida; la columna «Plantilla» se deriva de `recipe-map.json` y exige que cada `contentType` exista en `registry.json`. Desde TASK-1929 también falla si el catálogo de runtime `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` no coincide con el JSON aprobado (§12.1) |
 | `src/lib/brand-surfaces/deck-recipes/__tests__/*.test.ts` | el plan de deck contra el catálogo (§12.8): validador, propuesta del agente con el cliente simulado y deriva del catálogo de runtime |
+| `src/lib/brand-surfaces/deck-recipes/bindings/__tests__/*.test.ts` | el binding de datos reales (§13.8): el mapa declarado contra el catálogo de runtime, cada binder y la regla de evidencia, la lectura con readers canónicos simulados y el plan golden de propuesta ligado |
 
 El probe del gate no usa fotos reales: `plate:probe`, `icon:probe`, `layer:probe` y `file:probe` son SVG sintéticos
 (`GRAPHIC_LINE_PROBE_ASSETS`), así que ISSUE-122 no aplica. El probe **rellena todo slot opcional** (salvo
@@ -731,19 +732,174 @@ verdes.
 | Qué | Dueña |
 |---|---|
 | Confirmación humana, persistencia del plan, endpoint, acción de Nexa y tool MCP (el contrato gobernado de Full API Parity se completa ahí) | TASK-1932 |
-| Llenar los slots con datos reales (logo del cliente, montos, equipo, métricas, casos) | TASK-1930 |
+| Llenar los slots con datos reales (logo del cliente, montos, equipo, métricas, casos) | TASK-1930 (§13) |
 | Registrar y elegir plates por `assetId` (el validador sólo detecta el plate repetido dentro de un plan) | TASK-1931 |
 | Componer el plan por la ruta productiva (command/API, `artifact-worker`, MCP); hoy se compone lámina a lámina o como documento con `pnpm brand:compose` | TASK-1921 |
 | Los pendientes de QA del catálogo (el logo en la órbita del cierre, filas 15 y 16 de §6 de la norma) | TASK-1933 |
 
-## 13. Límites conocidos y pendientes
+## 13. Datos reales en los slots (TASK-1930)
+
+Un plan validado (§12) trae la voz de cada lámina, pero sus slots de **datos** —el logo del cliente, las cifras, los
+casos, los testimonios, los logos de terceros, los montos, el equipo y los datos de las láminas de muestra— no pueden
+salir del texto de quien propone. TASK-1930 los llena desde la verdad de Greenhouse y deja en cada slot su rastro. Sin
+dato verificable, el slot queda sin ligar con su motivo y el deck no compone.
+
+Código: `src/lib/brand-surfaces/deck-recipes/bindings/` (`index.ts`, `core.ts`, `map.ts`, `types.ts`, `binders/`).
+Tarea: [TASK-1930](../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md).
+
+### 13.1 El contrato
+
+- **`bindDeckSlots(plan, context)`** (`index.ts`, `import 'server-only'`) es el único contrato. Lee las fuentes y llama
+  al núcleo. Devuelve `{ ok, plan, bindings, issues }`: el plan con los slots de datos ligados, el rastro
+  (`SlotBinding[]`, §13.5) y los issues del validador más los del binding; `ok` es `false` con un solo error.
+- **`bindDeckSlotsWith(plan, sources)`** (`core.ts`) es el núcleo puro y determinista sobre fuentes ya leídas: el mismo
+  plan con las mismas fuentes da el mismo resultado.
+- **`context`** es `{ kind: 'proposal', ownerOrgId, proposalId, audience, facts? }` o `{ kind: 'brand', audience,
+  facts? }` (brochure, pitch o QBR de marca propia). `normalizeDeckBindingContext` valida la forma antes de tocar la
+  base; un contexto inválido o una propuesta que no existe en esa organización lanzan `DeckBindingContextError`.
+- **El consumer ya autorizó al sujeto** (TASK-1932 con `assertProposalStudioAccessForSubject`, TASK-1921 o la CLI
+  local). El binder no autoriza personas: autoriza datos.
+- **Lee sólo readers canónicos y no escribe nada:**
+
+| Fuente | Reader |
+|---|---|
+| La `Proposal`, acotada a su organización dueña | `getProposalById` |
+| Su evidencia | `buildProposalRenderProjection` con audiencia `internal`, para ver toda la evidencia; la regla de audiencia la aplica el binder (§13.4) |
+| El logo del cliente (Account 360) | `readOrganizationLogoVariants` |
+| Fuera de una `Proposal`, el asset de respaldo de cada hecho | `getAssetById` (un asset `deleted` o `quarantined` no cuenta) |
+
+Un error de lectura se reporta con `captureWithDomain(err, 'commercial', …)` y sale como `DeckBindingReadError`, sin
+detalle crudo en el mensaje.
+
+### 13.2 El valor viaja en un hecho; la evidencia lo autoriza
+
+**Supuesto corregido en Discovery:** `greenhouse_commercial.proposal_evidence` **no** guarda el valor de una cifra ni el
+texto de una cita. Guarda de dónde sale (`locator`, `method`), cuándo (`as_of`), su `classification`, su `audience` y
+el documento que la respalda (`source_asset_id`). Por eso el valor viaja en un **hecho** que trae el consumer —el mismo
+contrato `EvidencedFact` de los chapter-authors: valor, etiqueta, `numericValue` opcional y `evidenceRef`— y la
+evidencia lo autoriza.
+
+| Tipo de hecho | Lleva |
+|---|---|
+| `figure` | `value` (el texto exacto de la lámina), `label`, `numericValue?` (barras y arco de medida), `sourceLabel?` (fuente visible fuera de una `Proposal`) |
+| `logo` | `name`, `logoAssetId` |
+| `quote` | `quote`, `authorName`, `authorRole` (nombre y cargo o equipo, nada más) |
+| `photo` | `photoAssetId`, `alt` |
+| `sample-data` | `values` por nombre de slot del grupo de datos de la receta |
+
+Cada hecho apunta a `target: { recipeId, slot?, slideIndex? }` (sin `slideIndex`, a toda lámina de esa receta; `quote`
+y `sample-data` no llevan `slot`). En una `Proposal`, `evidenceRef` es un `evidence_id` de su `proposal_evidence`;
+fuera de una, el `asset_id` del documento de respaldo.
+
+**El valor de un slot de datos nunca sale del texto del plan:** se reemplaza por el hecho verificado o se quita. Un slot
+obligatorio que queda vacío lo reporta `validateDeckPlan` (`slot-required-missing`) y el deck falla cerrado; el binder
+nunca «completa» un slot para que pase.
+
+### 13.3 El mapa declarado y los binders
+
+`DECK_SLOT_BINDING_MAP` (`map.ts`) cubre las **78** recetas: todo slot `logo`, `money`, `metric` o `person` del
+catálogo, y cada slot de prueba o de datos de muestra, tiene un binder o una exclusión con su razón. `map.test.ts` lo
+exige contra el catálogo de runtime: una receta nueva con un slot de datos sin fila rompe el test. Los slots de voz no
+están en el mapa: los propone TASK-1929 y los confirma una persona.
+
+| Binder | Qué liga |
+|---|---|
+| `client-logo` | el logo del cliente de la `Proposal` desde Account 360. La portada oscura exige `logo_on_dark_asset_id`; si no está, `no-on-dark-logo` |
+| `metric` | cifras con evidencia `measured`; la fuente visible es el `locator` de la evidencia |
+| `metric-source`, `metric-delta` | derivados de las cifras ya ligadas en la misma lámina (corren después de ellas) |
+| `proof-logo`, `proof-figures`, `proof-quote`, `proof-photo` | la prueba de terceros, con evidencia `attested` **con** documento de respaldo. La frase destacada del testimonio sólo si es un fragmento literal de la cita; la foto de ejemplo nunca liga |
+| `money` | siempre `[MONTO]` (`no-frozen-quote`) hasta que existan los hechos económicos de TASK-1417; una línea de cotización con un monto escrito se quita |
+| `team` | `no-roster-facts` hasta que exista el roster de TASK-1418; nunca una cara generada |
+| `sample-data` | las láminas `decision-ai-answer` y `decision-diagnosis-map`: por defecto quedan como muestra con su marca (`illustrative-sample`); con un hecho `sample-data` y evidencia `measured`, `dataOrigin` pasa a `client` y la marca se retira. La marca nunca se quita sin evidencia |
+
+**Exclusiones con razón:** las cifras de `decision-ai-market` (dato de mercado citado), el puntaje de
+`method-score-ring` (se calcula desde la configuración del scoring), el horizonte de `decision-plan` y los slots de
+selección (una decisión de presentación, no un dato).
+
+**Muro de logos** (`content-clients`, `content-partners`): como mínimo **nueve** logos autorizados (`LOGO_WALL_MIN`,
+decisión del operador); con menos, `below-minimum`.
+
+### 13.4 La regla de evidencia
+
+`binders/evidence.ts` concentra la verificación que usan todos los binders:
+
+- **Ningún deck usa evidencia `internal`, ni siquiera uno interno** (decisión del operador del 2026-09-28): motivo
+  `internal-evidence` y issue `binding-internal-evidence` (error). El binder no sabe qué significa un número, y la
+  evidencia interna es donde viven el costo cargado y el margen. Verificado contra la propuesta real `prop-5965260d`
+  (SKY blog 2026): su única evidencia `measured` era interna (el costo cargado del equipo) y quedó bloqueada.
+- **Defensa en profundidad:** al final del binding, toda evidencia ligada pasa por el gate canónico
+  `assertEvidenceAllowedForAudience` de Proposal Studio como artefacto `client_facing`, también en un deck interno.
+- Una cifra propia necesita evidencia `measured`; un caso, un testimonio o un logo de tercero, `attested` con su
+  documento de respaldo. `illustrative` nunca liga un slot real.
+- **Una evidencia que no es de la propuesta** (o, fuera de una, un asset que no existe) es `binding-evidence-unknown`
+  (error): una evidencia inventada no se omite, rechaza el deck.
+- **Fuera de una `Proposal`** sólo ligan cifras con un asset de respaldo vivo y su `sourceLabel`; la prueba de
+  terceros queda `no-authorization`. La biblioteca canónica de autorizaciones por tercero es
+  [TASK-1937](../tasks/to-do/TASK-1937-third-party-brand-usage-authorization-library.md).
+
+### 13.5 El rastro por slot
+
+`SlotBinding`: `{ slideIndex, recipeId, slot, binder, status: 'bound' | 'unbound', source?, evidenceRef?,
+evidenceRefs?, asOf?, reason?, dataOrigin? }`.
+
+- `source`: `account-360` · `proposal-evidence` · `economic-facts` · `roster-facts` · `intent`.
+- `asOf`: la fecha de la evidencia más antigua del slot (el dato vale desde ahí).
+- `reason` (`SLOT_UNBOUND_REASONS`): `no-evidence`, `internal-evidence`, `no-authorization`, `no-frozen-quote`,
+  `no-real-photo`, `no-on-dark-logo`, `no-logo`, `no-proposal`, `no-roster-facts`, `below-minimum`, `too-many-facts`,
+  `not-in-quote`, `illustrative-sample`.
+- `dataOrigin`, en las láminas de muestra: `illustrative` o `client`.
+
+El rastro va al manifest y a la procedencia del asset compuesto (TASK-1932, TASK-1921). **Una lámina esqueleto** (sin
+`slots`) sólo recibe rastro: el binding corre después de escribir la voz y no convierte un esqueleto en una lámina a
+medias.
+
+### 13.6 Issues
+
+| Código | Severidad | Cuándo |
+|---|---|---|
+| `binding-internal-evidence` | error | un hecho cita evidencia `internal` (§13.4) |
+| `binding-evidence-unknown` | error | la evidencia no es de la propuesta, o el asset de respaldo no existe |
+| `binding-fact-unused` | aviso | un hecho apunta a una receta o un slot que el plan no tiene o no liga |
+
+Van con `source: 'binding'` (`DECK_SLOT_BINDING_ISSUE_CODES`), junto a los del validador sobre el plan ligado.
+
+**Cambio en el validador (TASK-1929):** un slot `metric` acepta una cifra o una **lista** de cifras
+(`decision-case.stats` lleva cuatro) y exige la fuente de cada una.
+
+### 13.7 CLI
+
+`pnpm brand:deck-plan -- --bind --plan <plan.json> (--context <c.json> | --proposal <id> --org <ownerOrgId> [--audience]
+[--facts <f.json>] | --sources <fixture.json>) [--out <ligado.json>]`
+
+- Imprime cuántos slots de datos quedaron ligados, la tabla de slots con su estado, fuente o motivo, evidencia y fecha,
+  y los issues. Con `--out` escribe el plan ligado y el rastro. Exit 1 si el plan ligado no compone; 2 con contexto
+  inválido.
+- Con `--proposal` (o `--context`) lee por los readers canónicos con el perfil `runtime` de PostgreSQL: necesita el
+  proxy de Cloud SQL (`pnpm pg:connect`). `--audience` toma `client_facing` por defecto.
+- Con `--sources` corre sin base sobre un fixture de fuentes ya resueltas (`bindDeckSlotsWith`).
+
+### 13.8 Tests
+
+`src/lib/brand-surfaces/deck-recipes/bindings/__tests__/`: `map.test.ts` (el mapa contra el catálogo de runtime),
+`bind.test.ts` (cada binder, la regla de evidencia y los issues), `load.test.ts` (la lectura con los readers canónicos
+simulados, `DeckBindingContextError` y `DeckBindingReadError`) y `golden.test.ts` (el plan golden de propuesta de §12.8
+con `fixtures/sources-proposal.json`, el mismo par que usa el manual con `--sources`).
+
+### 13.9 Estado
+
+TASK-1930 en curso: entregados los Slices 1–4 y 7 (commits `a2b7d26bd`, `f456921c3`, `ac1942620` y `07b417011`). Los
+montos (Slice 5) esperan a TASK-1417 y el equipo (Slice 6), a TASK-1418; hasta entonces sus binders no calculan nada.
+
+## 14. Límites conocidos y pendientes
 
 - **Ruta productiva:** TASK-1921 (in-progress, otra sesión): command/API, consumer del `artifact-worker`, MCP; debe
   aceptar también el intent de documento. Hasta que cierre, `pnpm brand:compose` es el taller local.
 - **TASK-1929 (complete, 2026-09-28):** el plan de un deck se valida contra el catálogo y un agente lo propone
   (§12). Falta cerrar la task: documentación, gates de cierre y `pnpm build`. El plan todavía no se confirma, no se
   persiste ni se compone de un paso: eso es TASK-1932 y TASK-1921.
-- **TASK-1930:** datos reales en los slots (logo del cliente, montos, equipo, métricas, casos).
+- **TASK-1930 (en curso):** datos reales en los slots (§13). Entregados los Slices 1–4 y 7; los montos (Slice 5) esperan
+  los hechos económicos de TASK-1417 y el equipo (Slice 6), el roster de TASK-1418. La biblioteca de autorizaciones de
+  uso de marcas, testimonios y fotos de terceros, fuera de una `Proposal`, es TASK-1937 (to-do).
 - **TASK-1931:** banco de plates gobernado.
 - **TASK-1932:** Proposal Studio arma el deck desde las recetas (Nexa/MCP), con la confirmación humana del plan.
 - **Abiertos de QA del catálogo:** el logo dentro de la órbita en el cierre (ninguna contraportada aprobada lo lleva

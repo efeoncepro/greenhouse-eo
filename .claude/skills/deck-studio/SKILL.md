@@ -16,7 +16,8 @@ description: >-
   "contraportada", "recetas del deck", "qué lámina uso". En marca propia Efeonce, elige láminas del
   catálogo de 78 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/; incluye las
   nueve SEO/AEO), valida el plan con pnpm brand:deck-plan (o pídele al agente que lo proponga con
-  --propose) y compón las 78 (todas tienen plantilla), o el documento completo, con pnpm brand:compose.
+  --propose), liga los datos reales de los slots con --bind (TASK-1930) y compón las 78 (todas tienen
+  plantilla), o el documento completo, con pnpm brand:compose.
 ---
 
 # deck-studio — el deck es un ARGUMENTO, no una pila de láminas
@@ -548,7 +549,8 @@ está** (no lo afirmes como hecho): la ruta productiva gobernada (API, worker, M
 otra sesión** — no la describas como disponible ni toques sus archivos (`src/lib/brand-surfaces/production/**`);
 `pnpm brand:compose` es el taller local. TASK-1929 (plan de deck validado contra el catálogo y propuesta del agente)
 está **code complete en `develop` local**, `in-progress` hasta docs y gates de cierre (subsección «Plan del deck»).
-Siguen TASK-1930 (datos reales en los slots), TASK-1931 (banco de plates gobernado), TASK-1932 (Proposal Studio arma
+TASK-1930 (datos reales en los slots: `bindDeckSlots` y `--bind`) está **`in-progress`** con los Slices 1–4 y 7
+entregados; montos y equipo esperan TASK-1417 y TASK-1418 (subsección «Datos reales en los slots»). Siguen TASK-1931 (banco de plates gobernado), TASK-1932 (Proposal Studio arma
 el deck desde recetas: confirmación humana, API, Nexa y MCP del plan) y TASK-1933 (pendientes de QA del catálogo).
 El documento completo no tiene frame propio en el gate visual (usa fotos reales): lo cubren sus páginas.
 
@@ -579,8 +581,12 @@ por lámina». Manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md
    servicio; cotización en vivo y riesgo—, **sin dirección**: no hay regla de orden, ver «Plan del deck»).
 4. **Slots** con su `maxChars` **medido** en la referencia: si no cabe, se acorta; la respuesta se escribe sin punto
    (lo pone la esfera); `money` siempre `[MONTO]`; `metric` con fuente; `logo` sólo de clientes que autorizan su uso.
+   Tú escribes sólo los slots de **voz**: los de **datos** (logo del cliente, cifras, casos, testimonios, logos de
+   terceros, montos, equipo, datos de muestra) no se escriben a mano, se ligan en el paso 5b.
 5. **Valida el plan** con `pnpm brand:deck-plan -- --plan plan.json`: corrige todo error, lee los avisos
    (subsección siguiente).
+5b. **Liga los datos reales** con `pnpm brand:deck-plan -- --bind --plan plan.json …` y compón el plan ligado, no el
+   que escribiste (subsección «Datos reales en los slots»).
 6. **Componer:** intent propio de AXIS + `pnpm brand:compose` (las 78 tienen plantilla; tablas de «Componer hoy con
    `pnpm brand:compose`» y lista por id en el README del catálogo). La portada con selección va con
    `layout: 'document-selection'`.
@@ -709,6 +715,54 @@ secuencia, así que una regla de orden daría avisos falsos).
   coincide …») y el test `catalog-drift` rompe CI.
 - **Una regla, una voz con AXIS:** una regla que AXIS ya valida no se duplica en el catálogo; si AXIS cambia su código,
   manda AXIS.
+
+#### Datos reales en los slots: `bindDeckSlots` (TASK-1930, 2026-09-28)
+
+**Qué hace:** llena los slots de **datos** del plan (logo del cliente, cifras, casos, testimonios, logos de terceros,
+montos, equipo, datos de muestra) desde la verdad de Greenhouse y deja el rastro de cada uno. Los slots de **voz** no
+se ligan: los escribe quien propone y los confirma una persona. Estado: `in-progress` (Slices 1–4 y 7); ligar **no
+compone ni guarda**: la salida productiva con confirmación humana es TASK-1932.
+
+- **Dónde vive:** `bindDeckSlots(plan, context)` (`server-only`) en
+  `src/lib/brand-surfaces/deck-recipes/bindings/index.ts`; núcleo puro `bindDeckSlotsWith(plan, sources)` en
+  `bindings/core.ts`; el mapa slot → binder (o exclusión con razón) en `bindings/map.ts`. Devuelve
+  `{ ok, plan, bindings, issues }`; al final corre `validateDeckPlan` sobre el plan ligado y el gate canónico de
+  audiencia `assertEvidenceAllowedForAudience`.
+- **Sólo readers canónicos, sin escritura:** la `Proposal` por `getProposalById`, su evidencia por la proyección
+  allowlisted `buildProposalRenderProjection`, el logo del cliente por `readOrganizationLogoVariants` (Account 360);
+  fuera de una `Proposal`, el asset de respaldo por `getAssetById`.
+- **El valor viaja en un HECHO, la evidencia lo autoriza.** `proposal_evidence` no guarda el valor de una cifra ni el
+  texto de una cita: el contexto trae `facts` (`kind`: `figure` | `logo` | `quote` | `photo` | `sample-data`, con
+  `factId`, `evidenceRef` y `target.recipeId`/`slot`).
+- **Un slot de datos NUNCA sale del texto del plan.** Lo que venía escrito se reemplaza por el hecho verificado o se
+  quita, y el plan falla cerrado (`slot-required-missing`). El binder nunca completa un slot para que pase.
+
+**Reglas de evidencia:**
+
+| Slot | Regla | Si no se cumple |
+| --- | --- | --- |
+| Logo del cliente | Account 360; en portada oscura, la versión para fondo oscuro | `no-logo` · `no-on-dark-logo` |
+| Cifras (`metric`) | evidencia `measured`; la fuente visible sale de la evidencia; un `metric` acepta una lista de cifras, cada una con su fuente | `no-evidence` |
+| Casos, testimonios, logos de terceros, foto de caso | evidencia `attested` **con** documento de respaldo; frase destacada sólo si es fragmento literal de la cita; foto de ejemplo nunca | `no-authorization` · `not-in-quote` · `no-real-photo` |
+| Montos (`money`) | siempre `[MONTO]` (`MONEY_PLACEHOLDER`) | hasta TASK-1417 (`no-frozen-quote`) |
+| Equipo | sin ligar; nunca una cara generada | hasta TASK-1418 (`no-roster-facts`) |
+| Láminas de muestra SEO/AEO | conservan muestra y marca; sólo con datos del cliente con evidencia se retira la marca | `illustrative-sample` |
+
+- **Ningún deck usa evidencia interna, ni siquiera uno interno** (decisión del operador 2026-09-28: ahí vive el costo
+  cargado y el margen) → `internal-evidence` / `binding-internal-evidence`.
+- **Muro de logos: mínimo 9 logos autorizados** (`LOGO_WALL_MIN`, decisión del operador); con menos
+  (`below-minimum`), usa otra lámina de prueba.
+- **Fuera de una `Proposal`** (brochure, pitch, QBR: `kind: 'brand'`) sólo se ligan cifras con asset de respaldo; la
+  prueba de terceros queda `no-authorization` hasta la biblioteca de autorizaciones por tercero (TASK-1937, `to-do`).
+- **Rastro por slot:** estado (`bound` / `unbound`), fuente, evidencia, fecha (`asOf`) y motivo; va al manifest y a
+  la procedencia del asset (TASK-1932, TASK-1921).
+
+**Comando:**
+`pnpm brand:deck-plan -- --bind --plan <plan.json> (--context <c.json> | --proposal <id> --org <ownerOrgId> [--facts <f.json>] | --sources <fixture.json>) [--out <ligado.json>]`
+— imprime cada slot de datos con «ligado desde …» o «sin ligar: <motivo>». Con `--proposal` necesita el proxy de
+Cloud SQL (`pnpm pg:connect`); `--sources` corre el núcleo puro sobre un fixture, sin base. Manual: paso 5b de
+`docs/manual-de-uso/creative/componer-deck-con-recetas.md`; qué slot sale de qué fuente: «Datos reales por slot» en el
+README del catálogo de recetas.
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
@@ -1029,6 +1083,9 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
   **gap de catálogo**, no una licencia.
 - **NUNCA** compongas un deck de marca propia sin antes validar su plan con `pnpm brand:deck-plan -- --plan`
   (cero errores; avisos leídos). El plan nombra recetas por id, nunca plantillas ni `contentType`.
+- **NUNCA** escribas a mano un slot de datos (logo del cliente, cifra, caso, testimonio, logo de tercero, monto,
+  equipo): se liga con `bindDeckSlots` / `--bind` desde evidencia verificada, o queda sin ligar y el deck no compone.
+  Ningún deck, ni uno interno, usa evidencia `internal`.
 - **NUNCA** cotices Studio Credits por lámina, deck, hora de autoría, render o export. Sólo una capability
   generativa gobernada y ejecutada puede devengar créditos.
 - **NUNCA** verifiques las anotaciones /Link de un PDF con grep sobre sus bytes: pdf-lib comprime en

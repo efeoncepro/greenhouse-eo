@@ -187,6 +187,7 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | | Chequeo | Cómo se verifica |
 |---|---|---|
 | [ ] | **Antes de componer**, el plan del deck (ids de receta en orden) pasó `pnpm brand:deck-plan -- --plan plan.json` con **cero errores** y los avisos se leyeron (`rhythm-paper-run`, `section-split-corner-adjacent`) | Automático: exit 1 con cualquier error (`frame-order`, `variant-both-in-deck`, `plate-repeated`, `slot-over-max-chars`, `figure-source-missing`, los de AXIS…); los avisos, revisión |
+| [ ] | Los slots de **datos** (logo del cliente, cifras, casos, testimonios, logos, montos, equipo) salieron de `pnpm brand:deck-plan -- --bind`, no escritos a mano; ninguno viene de evidencia interna y cada uno tiene su fuente en el rastro | Automático: `binding-internal-evidence`, `binding-evidence-unknown` y `slot-required-missing` fallan; la tabla de slots se lee |
 | [ ] | El deck lleva **una sola** lámina de cada par `variant` (tabla o escena o cotización en vivo; escalera o BeX plana; propuesta SEO sobria o de cine), aunque vayan separadas | Automático: `variant-both-in-deck` en el plan |
 | [ ] | La receta tiene plantilla y el `layout` va explícito en el intent | Automático: el comando falla con `recipe-not-approved`, `recipe-without-template`, `layout-invalid` o `layout-not-in-recipe` |
 | [ ] | La pieza nace de un intent propio, fuera de `src/lib/brand-surfaces/examples/` | Revisión; automático: `src/lib/brand-surfaces/__tests__/example-plans.test.ts` falla si se editó un ejemplo |
@@ -240,6 +241,7 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | Piezas con CTA y firma | Greenhouse | `pnpm foto:componer:cta plan.json` + `pnpm foto:cta:gate plan.json` |
 | Validar el plan de un deck (ids de receta) antes de componer | Greenhouse | `pnpm brand:deck-plan -- --plan <plan.json>` |
 | Que el agente proponga el plan (sólo ids; un reintento; fail-closed) | Greenhouse | `pnpm brand:deck-plan -- --propose --context <context.json> [--out <plan.json>]` |
+| Ligar los datos reales de los slots (TASK-1930) | Greenhouse | `pnpm brand:deck-plan -- --bind --plan <plan.json> --proposal <id> --org <org>` |
 | Regenerar el índice del README y el catálogo de runtime tras editar las recetas (`--check` verifica) | Greenhouse | `pnpm brand:deck-recipes` |
 | Componer una receta aprobada o un documento (`pages`) | Greenhouse | `pnpm brand:compose -- --intent <intent.json> [--artifact-id <id>] [--out <dir>]` |
 | Gate visual de las plantillas de La órbita | Greenhouse | `pnpm composer:visual-gate --catalog=graphic-line` |

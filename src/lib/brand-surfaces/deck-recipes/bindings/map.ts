@@ -36,8 +36,8 @@ export const isExclusion = (entry: DeckSlotMapEntry): entry is DeckSlotExclusion
 
 /**
  * Mínimo de logos del muro de clientes y del de partners: el de la lámina aprobada (nueve logos + la celda de
- * mercados). Pendiente de decisión del operador (Open Question de TASK-1930); hasta entonces, el muro no compone con
- * menos logos autorizados de los que la lámina aprobada muestra.
+ * mercados). Decisión del operador 2026-09-28: con menos logos autorizados el muro no compone y se usa otra lámina de
+ * prueba (un caso o un testimonio), nunca un muro más chico.
  */
 export const LOGO_WALL_MIN = 9
 
