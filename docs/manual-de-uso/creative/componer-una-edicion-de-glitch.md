@@ -1,9 +1,11 @@
 # Componer una edición de Glitch con `pnpm glitch:compose` — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (v1.3: la ruta productiva sólo conoce la edición semanal; problema
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.4: **numeración contra lo publicado** —`pnpm glitch:editions`,
+> `--check-published`, la próxima es la #18—; **muletilla del cierre del video** en `video.closingLine`; excepción de
+> licencia **`press`** sólo en el Flash, aprobada por pieza; errores nuevos. v1.3: la ruta productiva sólo conoce la edición semanal; problema
 > común tras subir AXIS —regenerar `pnpm glitch:tokens` y `pnpm brand:tokens`—; pendiente de la última frase fija de los
 > overlays. v1.2: **el Glitch Flash ya se compone** con este mismo comando
 > —manifiesto con `edition.kind: "flash"`, seis plantillas `Flash*`, ejemplo `flash-sonnet-5-5.example.json`— y las
@@ -51,9 +53,12 @@ Lo que **no** hace:
 ## Antes de empezar
 
 - **Confirma que la pieza es de Glitch.** Si no, este manual no aplica.
-- **Ten el contenido de la edición:** número (la próxima es la **#17**), fecha de publicación, semana que cubre, tesis,
-  las **ocho noticias** en orden (sección, titular, medio, fecha, foto, remate del narrador y porqué), el cierre de la
-  contraportada y, si hay video, sus datos.
+- **Confirma el número contra lo publicado.** La fuente de verdad de la numeración es el blog
+  (`efeoncepro.com/glitch/`): corre `pnpm glitch:editions` y usa el número que imprime como «Próxima semanal» (el
+  2026-09-28: última publicada **#17**, próxima **#18**). El Glitch Flash no lleva número y no cuenta.
+- **Ten el contenido de la edición:** número, fecha de publicación, semana que cubre, tesis, las **ocho noticias** en
+  orden (sección, titular, medio, fecha, foto, remate del narrador y porqué), el cierre de la contraportada y, si hay
+  video, sus datos (incluida la muletilla con la que el narrador cierra el video).
 - **Anota la plantilla de portada de la semana pasada** (A, B o C; `none` si es la primera edición compuesta). La
   rotación depende de ese dato.
 - **Fotos con licencia.** Cada foto declara su licencia y se valida. Sólo se admiten tres tipos:
@@ -64,7 +69,9 @@ Lo que **no** hace:
   | `owned` | foto propia de Efeonce |
   | `generated` | imagen generada |
 
-  **El kit de prensa no cuenta como licencia** (decisión del operador, 2026-09-27). Cada foto de noticia lleva además
+  **El kit de prensa no cuenta como licencia** (decisión del operador, 2026-09-27): en la edición semanal
+  `kind: "press"` se rechaza con `press-license-weekly-not-allowed`. La única excepción gobernada vive en el Glitch
+  Flash, aprobada pieza por pieza (ver [Componer un Glitch Flash](#componer-un-glitch-flash)). Cada foto de noticia lleva además
   su **crédito**, que se pinta en la lámina. La foto del host es propia: declara su licencia y **no** pinta crédito.
 - **Rostros declarados.** Para cada foto, anota dónde hay caras (`faceRegions`). La falla en bytes **nunca** cae sobre
   un rostro; si no hay caras, se escribe `[]` a propósito. Las regiones se miden sobre la **foto original**, en valores
@@ -107,7 +114,7 @@ largos máximos de cada texto no están aquí: son de cada plantilla, y un texto
 |---|---|---|
 | `schemaVersion` | `1` | siempre `1` |
 | `example` | `true` sólo en ejemplos | un manifiesto de ejemplo nunca se publica |
-| `edition.number` | número de la edición | entero; la serie es dato, el comando no la decide |
+| `edition.number` | número de la edición | entero; el que imprime `pnpm glitch:editions` como próxima. Con `--check-published`, uno ya publicado falla |
 | `edition.publishDate` | fecha de publicación | `AAAA-MM-DD`; también fija las fechas internas del PDF |
 | `edition.weekRange` | `from` y `to` de la semana | `AAAA-MM-DD`; `from` no puede ser posterior a `to` |
 | `thesis` | la tesis de la semana | texto |
@@ -146,6 +153,7 @@ largos máximos de cada texto no están aquí: son de cada plantilla, y un texto
 | `video.shortHeadlines` | titular corto de cada una de esas tres | obligatorio para cada noticia del video |
 | `video.drop.newsId` | la noticia que comenta el Drop | tiene que ser una de las tres del video |
 | `video.cta` | `reel` y `vlog`: el texto del llamado a la acción | — |
+| `video.closingLine` | la muletilla con la que el narrador cierra el video (overlay de cierre, en Guttery), p. ej. «el #18 sale el lunes.» | **obligatoria si pides overlays**; una línea; **escrita para esta edición** (varía, nunca fija). Si anuncia un número, es el de la próxima (`#<número + 1>`); nunca «el resto, el lunes» ni el marcador `#N` |
 | `video.transition` | `basic` o `bytes` | por defecto `basic` |
 | `video.hostPhoto` | `file`, `license` y `faceRegions` de la foto del host, o `null` | propia: licencia sí, crédito no |
 | `video.cover` | titular de la portada del reel y la miniatura (`entry` + `punch`) o `null` | — |
@@ -169,7 +177,8 @@ Piezas sueltas que admite `outputs.stills`:
 ### Paso 3 · Compón
 
 ```bash
-pnpm glitch:compose -- --manifest <ruta/a/edicion.json>
+pnpm glitch:editions                                               # última publicada y próxima
+pnpm glitch:compose -- --manifest <ruta/a/edicion.json> --check-published
 ```
 
 Argumentos:
@@ -179,6 +188,7 @@ Argumentos:
 | `--manifest <archivo>` | el manifiesto de la edición | obligatorio |
 | `--out <carpeta>` | dónde dejar las salidas | `.captures/glitch/edicion-<n>/` |
 | `--only carousel,stills,overlays` | compone sólo esas familias (separadas por coma) | las tres |
+| `--check-published` | verifica `edition.number` contra las ediciones publicadas del blog y **falla** si ya salió (`edition-number-already-published`) o si el blog no responde (`published-editions-unavailable`). Úsalo siempre en una edición real | sin el flag: verificación de mejor esfuerzo que sólo **avisa** (`⚠`); un manifiesto de ejemplo no consulta el blog |
 
 `--only` sólo decide **qué se pinta**: el manifiesto y el plan completo de la edición se validan siempre, así que un
 error en una noticia se reporta aunque pidas sólo los overlays.
@@ -230,9 +240,29 @@ El ejemplo (`example: true`, fotos sintéticas de `examples/fotos/`, nunca se pu
 | `news` | **exactamente una** noticia: `section`, `headline`, `outlet`, `date`, `photo` (igual que en la semanal, sin `strong`), `pov` y `why`. Sin `id` ni lente |
 | `cover` | `photo` (la imagen de la portada; `null` repite la de la noticia), `headline {entry, punch}` y dos `lines`, cada una con su `section` y su `text` (dos lecturas de la misma noticia) |
 | `back.closingLine` | **obligatoria** y escrita para este Flash: una línea o dos (`["léelo completo", "en nuestro blog."]`). Nunca el número de la próxima edición ni «el resto, el lunes» (rechazada por el operador) |
+| `news[0].photo.license` / `cover.photo.license` | como en la semanal, o la **excepción de prensa** (abajo) | — |
 | `outputs.stills` | `threads`, `blog:banner`, `blog:news` y, si las quieres sueltas, `cover`, `interior`, `back` |
 
-No lleva `previousEdition`, `thesis` ni `video`: si los pones, el comando te dice por qué sobran.
+No lleva `previousEdition`, `thesis` ni `video`: si los pones, el comando te dice por qué sobran. `--check-published`
+no aplica (el Flash no tiene número).
+
+**Fotos de terceros sin licencia (excepción `press`).** El kit de prensa no es licencia. En el primer Flash el operador
+decidió publicar las imágenes de Anthropic con crédito y sin licencia **para esa pieza**; esa decisión quedó modelada
+como una excepción gobernada, que **no** se usa por defecto:
+
+```json
+"license": {
+  "kind": "press",
+  "ref": "https://www.anthropic.com/news/…",
+  "approval": { "approvedBy": "julio-reyes", "approvedOn": "2026-09-28", "flash": "<slug de este Flash>", "reason": "por qué se acepta" }
+}
+```
+
+- `ref`: la URL pública **https** de la fuente. `credit` de la foto visible y no vacío («Imagen: Anthropic»).
+- `approvedBy`: alguien del registro [`src/lib/glitch-composition/approvers.json`](../../../src/lib/glitch-composition/approvers.json)
+  (hoy, el operador). Agregar a alguien es decisión del operador y va con commit.
+- `flash`: el `slug` de **este** Flash. Una aprobación no se copia a otro Flash.
+- Escríbela sólo con la aprobación del operador para esa pieza. La procedencia la registra en `licenseExceptions`.
 
 **Qué sale:**
 
@@ -241,7 +271,7 @@ No lleva `previousEdition`, `thesis` ni `video`: si los pones, el comando te dic
 | `glitch-flash-<slug>-carrusel.pdf` | el documento de LinkedIn: **3 páginas** (portada, la noticia, contraportada), un solo tamaño |
 | `carrusel/` | un PNG por lámina + manifiesto resuelto |
 | `sueltas/` | `threads` (la portada **sin «Desliza»**), `blog-banner` (16:9, 1920 × 1080) y `blog-news` (banner interno 1600 × 900) |
-| `glitch-flash-<slug>.provenance.json` | la procedencia, sin reloj, con `edition: null`, `editionKind: "flash"` y el `slug` |
+| `glitch-flash-<slug>.provenance.json` | la procedencia, sin reloj, con `edition: null`, `editionKind: "flash"`, el `slug` y, si alguna foto usa la excepción de prensa, `licenseExceptions` (fuente, crédito, quién aprobó, cuándo y por qué) |
 
 El comando pinta lo que la línea fija para el Flash: la cabecera «NO ESPERA AL LUNES» sobre la **estela de bytes** y
 «FLASH», el chip «LA NOTICIA» en la portada, Threads y el banner del blog, «ANUNCIO» en la noticia y en el banner
@@ -259,6 +289,12 @@ carrusel no cumple los límites de LinkedIn, el PDF final no se escribe (los PNG
 |---|---|---|
 | `manifest-invalid` | el manifiesto no cumple el esquema. Cada línea trae su ruta (por ejemplo `news[2].photo.credit`) y un sub-código: `field-unknown` (campo no admitido), `field-required` (falta un campo) o `field-invalid` (valor mal formado o regla rota: noticias fuera de orden, noticia desconocida, lente en `n1`, Drop fuera de las noticias del video, falta la foto o el titular del host para la portada del reel) | corrige el campo que indica la ruta. No agregues campos que el esquema no tenga |
 | `manifest-invalid` con `flash-edition-number-not-allowed` en `edition.number` | un Glitch Flash con número de edición | quita `edition.number`: el Flash no es la edición entera |
+| `manifest-invalid` con `field-required` en `video.closingLine` | pediste overlays y falta la muletilla del cierre del video (un manifiesto anterior al 2026-09-28 no la tiene) | escríbela para esta edición; no hay migración automática porque la frase fija de antes es justo lo que la regla prohíbe |
+| `manifest-invalid` con `field-invalid` en `video.closingLine` | la muletilla es una frase rechazada, trae `#N` sin resolver o anuncia un número que no es la próxima edición | corrige la frase |
+| `manifest-invalid` con `press-license-weekly-not-allowed` | una foto de la edición semanal declara `kind: "press"` | usa una foto `licensed`, `owned` o `generated`: la excepción existe sólo en el Flash |
+| `manifest-invalid` con `press-license-approval-required` · `press-license-approver-unknown` · `press-license-approval-mismatch` | la excepción de prensa del Flash sin aprobación, aprobada por alguien fuera del registro o aprobada para otro Flash | pide la aprobación del operador para esta pieza; no la inventes ni la copies de otro Flash |
+| `edition-number-already-published` | (`--check-published`) el número ya está publicado en el blog o es menor que el último | usa el que imprime `pnpm glitch:editions` como próxima |
+| `published-editions-unavailable` | (`--check-published` o `glitch:editions`) el blog no respondió o devolvió algo inesperado | reintenta; nunca fijes el número a ciegas |
 | `piece-not-approved` | una plantilla en PROPUESTA llegó al catálogo (hoy no hay ninguna: todas las piezas de Glitch están aprobadas) | no la compongas como canon: espera la aprobación del operador |
 | `cover-rotation-unsatisfiable` | ninguna plantilla sirve: el contenido sólo califica para la plantilla de la semana anterior (o para ninguna) | cambia el contenido de portada para que califique otra: una foto fuerte en la noticia de portada (A), un `standalonePov` (B) o un `mosaic` de cuatro (C). Nunca cambies `previousEdition` para forzarla |
 | `font-license-missing` | el brand pack no declara la licencia de Guttery, así que la muletilla del narrador no se puede componer | no lo resuelvas quitando la letra: avisa al operador. La licencia la declara `fonts.json` del brand pack `axis` |
@@ -275,7 +311,10 @@ carrusel no cumple los límites de LinkedIn, el PDF final no se escribe (los PNG
 - No agregues al manifiesto un campo para elegir la plantilla o la portada: se rechaza. La portada la deciden el
   contenido y la de la semana anterior (A > B > C, nunca la misma dos semanas seguidas).
 - No declares `faceRegions: []` en una foto que tiene caras para que pase la falla.
-- No uses fotos del kit de prensa ni fotos sin crédito.
+- No uses fotos del kit de prensa ni fotos sin crédito. La excepción `press` es sólo del Flash y sólo con la aprobación
+  del operador para esa pieza.
+- No fijes el número de una edición de memoria ni desde una maqueta: `pnpm glitch:editions`.
+- No copies la muletilla del cierre del video de la edición anterior.
 - No publiques el manifiesto de ejemplo ni sus piezas: sus noticias y fotos son de ejemplo.
 - No retoques a mano los PNG o el PDF que salen: si algo está mal, se corrige el manifiesto y se vuelve a componer.
 - No recortes la portada 4:5 para el cuadrado del blog: pide `blog:square`.
@@ -298,13 +337,15 @@ carrusel no cumple los límites de LinkedIn, el PDF final no se escribe (los PNG
 | La lente amplía otra zona | la región de la lente se mide sobre la foto original, no sobre la lámina | vuelve a medir `lens.region` sobre la foto original |
 | No aparece `sueltas/` u `overlays/` | no pediste piezas sueltas o overlays, o `--only` las dejó fuera | agrega valores en `outputs` o revisa `--only` |
 | Tras subir la versión de AXIS, falla un test de tokens o el CI (`graphic-line-tokens-sync.test.ts`, drift de `glitch-tokens.css`) | los archivos generados llevan el sello de la versión de `@efeoncepro/axis-tokens`; se regeneró sólo uno de los dos juegos | corre `pnpm glitch:tokens` **y** `pnpm brand:tokens`, y los dos con `--check`, antes del commit (así falló el CI de `53002b352` el 2026-09-28) |
-| El overlay `cta` dice «el #N sale el lunes.» aunque la contraportada tenga otra muletilla | la última frase de `overlay-cta-reel` / `overlay-cta-vlog` es fija (pendiente del operador) | no la edites en la plantilla ni en la salida; avisa al operador |
+| El overlay `cta` no dice lo que esperabas | la frase del cierre del video sale de `video.closingLine` (desde el 2026-09-28 ya no es fija en la plantilla) | corrige `video.closingLine` y vuelve a componer; nunca edites la plantilla ni el PNG |
+| `⚠ No se pudo verificar la numeración contra lo publicado` | sin `--check-published`, el blog no respondió a tiempo | vuelve a correr con `--check-published` antes de entregar una edición real |
 
 ## Referencias técnicas
 
 - Manifiesto (esquema estricto, `schemaVersion: 1`): [`src/lib/glitch-composition/manifest.ts`](../../../src/lib/glitch-composition/manifest.ts) (`GlitchEditionManifest` y, para el Flash, `GlitchFlashManifest`) · ejemplos [`examples/edition-17.example.json`](../../../src/lib/glitch-composition/examples/edition-17.example.json) y [`examples/flash-sonnet-5-5.example.json`](../../../src/lib/glitch-composition/examples/flash-sonnet-5-5.example.json)
 - Mapper puro (portada por rotación, contrato AXIS, falla en bytes): [`src/lib/glitch-composition/`](../../../src/lib/glitch-composition/) (`planGlitchEdition`, `planGlitchFlash`, `planGlitchManifest`, `resolveCoverTemplate`, `fitRegion`; falla en `byte-fracture.ts`; estela del Flash en `flash-trail.ts`)
 - Catálogos (`glitch-carousel`, `glitch-stills`, `glitch-overlays`; 32 plantillas aprobadas, seis de ellas del Flash): [`src/lib/artifact-composer/catalogs/glitch/`](../../../src/lib/artifact-composer/catalogs/glitch/)
+- Numeración publicada: [`src/lib/glitch-composition/published-editions.ts`](../../../src/lib/glitch-composition/published-editions.ts) · `pnpm glitch:editions` ([`scripts/glitch/editions.ts`](../../../scripts/glitch/editions.ts)) · aprobadores de la excepción de prensa: [`approvers.json`](../../../src/lib/glitch-composition/approvers.json)
 - Comando: [`scripts/glitch/compose.ts`](../../../scripts/glitch/compose.ts) · límites de LinkedIn: [`scripts/glitch/linkedin.ts`](../../../scripts/glitch/linkedin.ts) · tokens: `pnpm glitch:tokens [--check]` (compila `glitch-tokens.css` desde `glitchLine` de AXIS)
 - Gate visual: `pnpm composer:visual-gate --catalog=glitch [--selftest|--freeze]`; frames en `scripts/frontend/baselines/artifact-composer/templates-glitch/`
 - Norma: [§9.1 Qué ya se compone en el Artifact Composer](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#91-qué-ya-se-compone-en-el-artifact-composer-task-1923) · ADR: [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)

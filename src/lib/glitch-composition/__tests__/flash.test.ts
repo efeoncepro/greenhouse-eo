@@ -115,6 +115,83 @@ describe('manifiesto del Glitch Flash', () => {
   })
 })
 
+describe('excepción de licencia `press` del Glitch Flash', () => {
+  const PRESS = {
+    kind: 'press',
+    ref: 'https://www.anthropic.com/news/claude-sonnet-5-5',
+    approval: { approvedBy: 'julio-reyes', approvedOn: '2026-09-28', flash: 'ejemplo-claude-sonnet-5-5', reason: 'Imagen oficial del anuncio; el operador la aprueba para esta pieza.' }
+  }
+
+  const withPress = (patch: Record<string, unknown> = {}, where: 'news' | 'cover' = 'news') => {
+    const m = loadFlash() as unknown as { news: { photo: Record<string, unknown> }[]; cover: { photo: Record<string, unknown> | null } }
+    const target = where === 'news' ? m.news[0].photo : m.cover.photo!
+
+    target.license = { ...PRESS, ...patch }
+    target.credit = 'Imagen: Anthropic'
+
+    return m
+  }
+
+  it('la acepta con fuente https, crédito y la aprobación del registro para ESTA pieza, y el plan la entrega a la procedencia', () => {
+    const plan = planGlitchFlash(withPress())
+
+    expect(plan.licenseExceptions).toEqual([
+      {
+        photo: 'news',
+        file: 'fotos/n3.png',
+        kind: 'press',
+        ref: PRESS.ref,
+        credit: 'Imagen: Anthropic',
+        approvedBy: 'julio-reyes',
+        approverName: 'Julio Reyes',
+        approvedOn: '2026-09-28',
+        flash: 'ejemplo-claude-sonnet-5-5',
+        reason: PRESS.approval.reason
+      }
+    ])
+    expect(plan.carousel.plan.slides.find((s) => s.slideId === 'news')?.slots).toMatchObject({ credit: 'Imagen: Anthropic', photoLicense: `press:${PRESS.ref}` })
+  })
+
+  it('no la inventa: el ejemplo con fotos propias no declara excepciones', () => {
+    expect(planGlitchFlash(loadFlash()).licenseExceptions).toEqual([])
+  })
+
+  it('pasa el catálogo real (la validación de crédito admite press sólo en el Flash)', async () => {
+    const plan = planGlitchFlash(withPress({}, 'cover'))
+    const carousel = await resolvePlan(createGlitchCarouselCatalog(), plan.carousel.plan)
+
+    expect(plan.licenseExceptions.map((e) => e.photo)).toEqual(['cover'])
+    expect(carousel.validators.every((v) => v.result === 'pass')).toBe(true)
+  })
+
+  it('exige la aprobación, de alguien del registro y para este Flash', () => {
+    const sinAprobacion = withPress()
+
+    delete (sinAprobacion.news[0].photo.license as Record<string, unknown>).approval
+    expect(issuesOf(() => parseGlitchFlashManifest(sinAprobacion))?.issues).toContainEqual(
+      expect.objectContaining({ code: 'press-license-approval-required', path: 'news[0].photo.license.approval' })
+    )
+
+    expect(issuesOf(() => parseGlitchFlashManifest(withPress({ approval: { ...PRESS.approval, approvedBy: 'alguien-mas' } })))?.issues).toContainEqual(
+      expect.objectContaining({ code: 'press-license-approver-unknown', path: 'news[0].photo.license.approval.approvedBy' })
+    )
+
+    expect(issuesOf(() => parseGlitchFlashManifest(withPress({ approval: { ...PRESS.approval, flash: 'otro-flash' } })))?.issues).toContainEqual(
+      expect.objectContaining({ code: 'press-license-approval-mismatch', path: 'news[0].photo.license.approval.flash' })
+    )
+  })
+
+  it('exige una fuente pública https y el crédito visible', () => {
+    expect(issuesOf(() => parseGlitchFlashManifest(withPress({ ref: 'kit de prensa de Anthropic' })))?.issues.map((i) => i.path)).toContain('news[0].photo.license.ref')
+    expect(issuesOf(() => parseGlitchFlashManifest(withPress({ ref: 'http://www.anthropic.com/news' })))?.issues.map((i) => i.path)).toContain('news[0].photo.license.ref')
+
+    const sinCredito = withPress()
+
+    sinCredito.news[0].photo.credit = ' '
+    expect(issuesOf(() => parseGlitchFlashManifest(sinCredito))?.issues.map((i) => i.path)).toContain('news[0].photo.credit')
+  })
+})
+
 describe('planGlitchFlash', () => {
   it('da un carrusel de tres láminas, sin número ni avance, con los contentTypes del Flash', () => {
     const plan = planGlitchFlash(loadFlash())

@@ -20,6 +20,7 @@ import type { CompositionPlanInput, SlotValues } from '@/lib/artifact-composer/p
 
 import { GLITCH_BACK_NOTE, GLITCH_SECTION_LABEL, glitchShortDate, splitLastWord } from './copy'
 import {
+  GLITCH_LICENSE_APPROVERS,
   glitchFlashClosingLines,
   isGlitchFlashManifestInput,
   parseGlitchEditionManifest,
@@ -27,12 +28,29 @@ import {
   type GlitchEditionManifest,
   type GlitchNews
 } from './manifest'
-import { GlitchPieceError, type GlitchAssetRequest, type GlitchEditionPlan, type GlitchFlashPlan, type GlitchIssue } from './types'
+import {
+  GlitchPieceError,
+  type GlitchAssetRequest,
+  type GlitchEditionPlan,
+  type GlitchFlashPlan,
+  type GlitchIssue,
+  type GlitchLicenseException
+} from './types'
 
 export { parseGlitchEditionManifest, parseGlitchFlashManifest, parseGlitchManifest, isGlitchFlashManifestInput } from './manifest'
 export * from './types'
 export { computeByteFracture, paintByteFracture, fractureBand } from './byte-fracture'
 export { buildGlitchFlashTrailSvg, computeGlitchFlashTrail } from './flash-trail'
+export {
+  checkGlitchEditionNumber,
+  fetchPublishedGlitchEditions,
+  GLITCH_BLOG_CATEGORY_ID,
+  GLITCH_PUBLISHED_EDITIONS_URL,
+  parseGlitchEditionTitle,
+  summarizePublishedGlitchEditions,
+  type GlitchPublishedEdition,
+  type GlitchPublishedEditions
+} from './published-editions'
 
 type CoverTemplate = 'A' | 'B' | 'C'
 type Box = { x: number; y: number; w: number; h: number }
@@ -162,7 +180,9 @@ const newsById = (manifest: GlitchEditionManifest, id: string): GlitchNews => {
   return news
 }
 
-const licenseOf = (news: GlitchNews) => `${news.photo.license.kind}:${news.photo.license.ref}`
+/** `kind:ref` de una licencia (la semanal nunca llega aquí con `press`: el esquema la rechaza). */
+const licenseTag = (license: { kind: string; ref?: unknown }) => `${license.kind}:${String(license.ref ?? '')}`
+const licenseOf = (news: GlitchNews) => licenseTag(news.photo.license)
 
 /** Rostros de la foto en px del lienzo (la foto ocupa `box`). */
 const faceBoxes = (box: Box, regions: readonly Region[]): Box[] =>
@@ -439,7 +459,7 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
       contentType: thumbnail ? 'glitch.video.thumbnail' : 'glitch.reel.cover',
       slots: {
         host: { src: `asset-ref:photo:${slideId}`, alt: 'El host de Glitch, con un gesto fuerte.' },
-        photoLicense: `${host.license.kind}:${host.license.ref}`,
+        photoLicense: licenseTag(host.license),
         faces: JSON.stringify(faces),
         edition,
         headline: { entry: head.entry, ...punchParts(head.punch) }
@@ -511,7 +531,9 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
       },
       { headline: { entry: dropNews.pov.entry, close: dropNews.pov.punch } }
     )
-    push('cta', 'cta', { nextEdition: String(manifest.edition.number + 1), invite: video.cta[fmt] }, { narrator: { text: `el #${manifest.edition.number + 1} sale el lunes.` } })
+    // La muletilla del cierre VARÍA por edición (operador, 2026-09-28): la trae el manifiesto; el esquema ya exigió que
+    // exista cuando se piden overlays.
+    push('cta', 'cta', { closingLine: video.closingLine!, invite: video.cta[fmt] }, { narrator: { text: video.closingLine! } })
   }
 
   // ─── Contrato AXIS: cada lámina se valida antes de llegar al plan ───
@@ -598,6 +620,32 @@ export const planGlitchFlash = (input: unknown, options: PlanGlitchEditionOption
   }
 
   const license = (p: FlashPhoto) => `${p.license.kind}:${p.license.ref}`
+
+  // Excepción de prensa (aprobada por pieza en el manifiesto): el plan la entrega para que la procedencia la registre.
+  const licenseExceptions: GlitchLicenseException[] = []
+
+  for (const [photoRole, p] of [['cover', coverPhoto], ['news', news.photo]] as const) {
+    const lic = p.license
+
+    if (lic.kind !== 'press' || licenseExceptions.some((e) => e.file === p.file)) continue
+
+    const { approval } = lic
+    const approver = GLITCH_LICENSE_APPROVERS.find((a) => a.id === approval.approvedBy)
+
+    licenseExceptions.push({
+      photo: photoRole,
+      file: p.file,
+      kind: 'press',
+      ref: lic.ref,
+      credit: p.credit,
+      approvedBy: approval.approvedBy,
+      approverName: approver?.nombre ?? null,
+      approvedOn: approval.approvedOn,
+      flash: approval.flash,
+      reason: approval.reason
+    })
+  }
+
   const outlet = `${news.outlet} · ${glitchShortDate(news.date)}`
   const coverHeadline = { entry: manifest.cover.headline.entry, ...punchParts(manifest.cover.headline.punch) }
   const coverIntent = { entry: manifest.cover.headline.entry, close: manifest.cover.headline.punch }
@@ -728,7 +776,8 @@ export const planGlitchFlash = (input: unknown, options: PlanGlitchEditionOption
     carousel: { catalog: 'glitch-carousel', plan: toPlan(slides, 'carousel') },
     stills: { catalog: 'glitch-stills', plan: toPlan(stills, 'stills') },
     overlays: { catalog: 'glitch-overlays', plan: toPlan([], 'overlays') },
-    assets
+    assets,
+    licenseExceptions
   }
 }
 

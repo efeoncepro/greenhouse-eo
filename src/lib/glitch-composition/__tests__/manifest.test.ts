@@ -56,6 +56,59 @@ describe('GlitchEditionManifest', () => {
     expect(issuesOf(manifest).map((i) => i.path)).toContain('news[1].photo.license.kind')
   })
 
+  it('rejects the press exception in the weekly edition with its own code (it only exists in a Glitch Flash)', () => {
+    const manifest = load() as unknown as { news: { photo: { license: Record<string, unknown> } }[] }
+
+    manifest.news[3].photo.license = {
+      kind: 'press',
+      ref: 'https://www.anthropic.com/news',
+      approval: { approvedBy: 'julio-reyes', approvedOn: '2026-09-28', flash: 'x', reason: 'x' }
+    }
+    expect(issuesOf(manifest)).toContainEqual(expect.objectContaining({ code: 'press-license-weekly-not-allowed', path: 'news[3].photo.license.kind' }))
+
+    // Con la forma que sea: la semanal no la valida, la rechaza.
+    manifest.news[3].photo.license = { kind: 'press' }
+    expect(issuesOf(manifest)).toEqual([expect.objectContaining({ code: 'press-license-weekly-not-allowed', path: 'news[3].photo.license.kind' })])
+  })
+
+  describe('video.closingLine — la muletilla del cierre del video varía por edición', () => {
+    const withOverlays = (closingLine: unknown) => {
+      const manifest = load() as unknown as { video: Record<string, unknown>; outputs: { overlays: string[] } }
+
+      if (closingLine === undefined) delete manifest.video.closingLine
+      else manifest.video.closingLine = closingLine
+
+      manifest.outputs.overlays = ['reel', 'vlog']
+
+      return manifest
+    }
+
+    it('reads it from the manifest (the example keeps the text the overlay always had)', () => {
+      expect(parseGlitchEditionManifest(load()).video?.closingLine).toBe('el #18 sale el lunes.')
+      expect(parseGlitchEditionManifest(withOverlays('nos vemos en el blog.')).video?.closingLine).toBe('nos vemos en el blog.')
+    })
+
+    it('is required when overlays are requested: an old manifest fails with field-required, never a fixed phrase', () => {
+      expect(issuesOf(withOverlays(undefined))).toContainEqual(expect.objectContaining({ code: 'field-required', path: 'video.closingLine' }))
+      expect(issuesOf(withOverlays('   '))).toContainEqual(expect.objectContaining({ path: 'video.closingLine' }))
+    })
+
+    it('is optional without overlays', () => {
+      const manifest = withOverlays(undefined) as unknown as { outputs: { overlays: string[] } }
+
+      manifest.outputs.overlays = []
+      expect(parseGlitchEditionManifest(manifest).video?.closingLine).toBeUndefined()
+    })
+
+    it('rejects a phrase the operator rejected, an unresolved #N and a number that is not the next edition', () => {
+      expect(issuesOf(withOverlays('El resto, el lunes.'))).toContainEqual(expect.objectContaining({ code: 'field-invalid', path: 'video.closingLine' }))
+      expect(issuesOf(withOverlays('el #N sale el lunes.'))).toContainEqual(expect.objectContaining({ path: 'video.closingLine' }))
+      expect(issuesOf(withOverlays('el #19 sale el lunes.'))).toContainEqual(
+        expect.objectContaining({ path: 'video.closingLine', message: 'la muletilla anuncia el #19, pero la próxima edición es la #18' })
+      )
+    })
+  })
+
   it('requires faceRegions explicitly ([] means no faces)', () => {
     const manifest = load()
 

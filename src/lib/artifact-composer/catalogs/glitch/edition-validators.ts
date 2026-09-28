@@ -8,7 +8,8 @@
  *   - `glitch.single-sphere`     cada plantilla declara exactamente una esfera (manzana, lente o ninguna).
  *   - `glitch.headline-contrast` titular con entrada ligera y remate pesado: sin remate no hay contraste.
  *   - `glitch.photo-credit`      toda foto de noticia lleva crédito pintado y licencia admitida (licensed/owned/generated);
- *                                la del host (propia) sólo declara la licencia.
+ *                                la del host (propia) sólo declara la licencia. La excepción `press` (fuente pública,
+ *                                aprobada por pieza en el manifiesto) sólo pasa en las plantillas del Glitch Flash.
  *   - `glitch.face-safe-fracture` ninguna celda de la falla en bytes cae sobre un rostro.
  *   - `glitch.accent-on-light`   el verde nunca es texto sobre fondo claro: hoy toda plantilla es de superficie oscura.
  *   - `glitch.edition-structure` (sólo carrusel) portada + 8 noticias en orden + contraportada; el Glitch Flash, portada +
@@ -71,7 +72,10 @@ export const headlineContrastValidator = perSlide('glitch.headline-contrast', (s
   return filled(h.entry) && (filled(h.punch) || filled(h.punchLast)) ? null : 'El titular necesita entrada ligera y remate pesado: sin los dos no hay contraste de pesos.'
 })
 
-export const photoCreditValidator = perSlide('glitch.photo-credit', (slide) => {
+/** Plantillas del Glitch Flash: las únicas que admiten la excepción de licencia `press` (1.1.0, 2026-09-28). */
+const PRESS_LICENSE_TEMPLATES = new Set(['FlashCover', 'FlashInterior', 'FlashBlogBanner', 'FlashNewsBanner', 'FlashThreads'])
+
+export const photoCreditValidator: CatalogSemanticValidator = { ...perSlide('glitch.photo-credit', (slide) => {
   const slots = slotsOf(slide)
   const hostOnly = slots.host !== undefined && !PHOTO_SLOTS.some((key) => slots[key] !== undefined)
 
@@ -84,10 +88,16 @@ export const photoCreditValidator = perSlide('glitch.photo-credit', (slide) => {
 
   if (licenses.length === 0) return 'Una lámina con foto declara la licencia de cada foto (`kind:ref`).'
 
-  const bad = licenses.find((l) => !LICENSE_KINDS.has(l.split(':')[0]) || !l.includes(':') || l.endsWith(':'))
+  const pressAllowed = PRESS_LICENSE_TEMPLATES.has(slide.template)
+  const kindOk = (kind: string) => LICENSE_KINDS.has(kind) || (pressAllowed && kind === 'press')
+  const bad = licenses.find((l) => !kindOk(l.split(':')[0]) || !l.includes(':') || l.endsWith(':'))
 
-  return bad ? `Licencia de foto no admitida: «${bad}» (sólo licensed, owned o generated, con su referencia; el kit de prensa no cuenta).` : null
-})
+  if (!bad) return null
+
+  return bad.startsWith('press:')
+    ? `Licencia de foto no admitida: «${bad}» (la excepción de prensa existe sólo en el Glitch Flash, aprobada por pieza; aquí: licensed, owned o generated).`
+    : `Licencia de foto no admitida: «${bad}» (sólo licensed, owned o generated, con su referencia; el kit de prensa no cuenta).`
+}), version: '1.1.0' }
 
 const overlaps = (a: Box, b: Box) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h
 

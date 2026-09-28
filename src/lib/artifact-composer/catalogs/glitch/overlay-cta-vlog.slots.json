@@ -1,6 +1,6 @@
 {
   "template": "OverlayCtaVlog",
-  "version": "0.1",
+  "version": "0.2",
   "viewport": {
     "width": 1920,
     "height": 1080
@@ -9,15 +9,16 @@
     "background": "transparent"
   },
   "slots": {
-    "nextEdition": {
-      "selector": "[data-slot='nextEdition']",
+    "closingLine": {
+      "selector": "[data-slot='closingLine']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 4,
-        "overflow": "reject"
+        "maxCharacters": 32,
+        "overflow": "reject",
+        "maxLines": 1
       },
-      "example": "18"
+      "example": "el #18 sale el lunes."
     },
     "invite": {
       "selector": "[data-slot='invite']",

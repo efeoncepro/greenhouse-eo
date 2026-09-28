@@ -188,7 +188,23 @@ describe('planGlitchEdition', () => {
     const slot = (id: string) => plan.overlays.plan.slides.find((s) => s.slideId === id)!.slots as Record<string, unknown>
 
     expect(slot('reel-lower-third-host').person).toMatchObject({ kind: 'host', tag: 'AL AIRE · GLITCH #17' })
-    expect(slot('reel-cta')).toEqual({ nextEdition: '18', invite: 'Sigue a' })
+    expect(slot('reel-cta')).toEqual({ closingLine: 'el #18 sale el lunes.', invite: 'Sigue a' })
+  })
+
+  it('el cierre del video pinta la muletilla del manifiesto, no una frase fija', async () => {
+    const m = load()
+
+    m.outputs.overlays = ['reel', 'vlog']
+    m.video = { ...m.video!, closingLine: 'lo demás, en el blog.' }
+
+    const plan = planGlitchEdition(m)
+    const ctas = plan.overlays.plan.slides.filter((s) => s.slideId.endsWith('-cta'))
+
+    expect(ctas.map((s) => (s.slots as Record<string, unknown>).closingLine)).toEqual(['lo demás, en el blog.', 'lo demás, en el blog.'])
+
+    const resolved = await resolvePlan(createGlitchOverlaysCatalog(), plan.overlays.plan)
+
+    expect(resolved.slides.filter((s) => s.slideId.endsWith('-cta')).map((s) => s.template)).toEqual(['OverlayCtaReel', 'OverlayCtaVlog'])
   })
 
   it('attachFractures pega las celdas pintadas sólo en su lámina, sin mutar el plan', () => {

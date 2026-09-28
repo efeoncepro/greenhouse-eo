@@ -25,6 +25,8 @@ export type GlitchPieceErrorCode =
   | 'fracture-over-face'
   | 'contract-issues'
   | 'carousel-too-heavy'
+  | 'edition-number-already-published'
+  | 'published-editions-unavailable'
 
 export interface GlitchIssue {
   code: string
@@ -102,6 +104,23 @@ export interface GlitchEditionPlan {
  * Plan de un Glitch Flash (operador, 2026-09-28): una sola noticia, sin número de edición ni rotación de portada. El
  * carrusel son tres láminas (portada, la noticia, contraportada); las sueltas, Threads y el blog. No tiene overlays.
  */
+/**
+ * Una foto publicada con la excepción `press` (sólo Glitch Flash): crédito pintado, fuente pública y aprobación del
+ * operador para ESTA pieza. La procedencia la registra tal cual (`licenseExceptions`).
+ */
+export interface GlitchLicenseException {
+  photo: 'cover' | 'news'
+  file: string
+  kind: 'press'
+  ref: string
+  credit: string
+  approvedBy: string
+  approverName: string | null
+  approvedOn: string
+  flash: string
+  reason: string
+}
+
 export interface GlitchFlashPlan {
   kind: 'flash'
   slug: string
@@ -113,6 +132,8 @@ export interface GlitchFlashPlan {
   stills: GlitchCatalogPlan
   overlays: GlitchCatalogPlan
   assets: GlitchAssetRequest[]
+  /** Fotos publicadas con la excepción de prensa aprobada (vacío si todas tienen licencia). */
+  licenseExceptions: GlitchLicenseException[]
 }
 
 export const isGlitchFlashPlan = (plan: GlitchEditionPlan | GlitchFlashPlan): plan is GlitchFlashPlan => 'kind' in plan && plan.kind === 'flash'

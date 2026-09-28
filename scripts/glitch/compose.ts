@@ -1,5 +1,5 @@
 /**
- * pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays]
+ * pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays] [--check-published]
  *
  * Compone una edición de Glitch con el Artifact Composer (TASK-1923). Sólo Glitch. También compone un GLITCH FLASH
  * (manifiesto con `edition.kind: 'flash'`, operador 2026-09-28): carrusel de tres láminas (portada, la noticia,
@@ -16,7 +16,12 @@
  *     muletilla del narrador no se compone (`font-license-missing`).
  *   - Verifica el carrusel contra los límites de LinkedIn para documentos (peso, páginas, tamaño de página único) y
  *     falla con `carousel-too-heavy` antes de entregar un PDF que la plataforma rechazaría.
- *   - La procedencia (`glitch-<n>.provenance.json`) no lleva fechas: la misma edición produce el mismo archivo.
+ *   - La procedencia (`glitch-<n>.provenance.json`) no lleva fechas: la misma edición produce el mismo archivo. Si una
+ *     foto del Flash sale con la excepción de prensa aprobada, la procedencia la registra en `licenseExceptions`.
+ *   - Numeración contra lo PUBLICADO (fuente de verdad: el blog, `pnpm glitch:editions`): con `--check-published`, una
+ *     edición semanal cuyo número ya está publicado falla con `edition-number-already-published` (y sin respuesta del
+ *     blog, con `published-editions-unavailable`). Sin el flag, la verificación es de mejor esfuerzo: sólo avisa. Un
+ *     manifiesto de ejemplo (`example: true`, nunca se publica) no consulta el blog salvo que se pida el flag.
  *
  * Es el taller local. La ruta productiva (API + artifact-worker + MCP) es TASK-1921.
  */
@@ -32,7 +37,15 @@ import sharp from 'sharp'
 import { composeArtifact } from '@/lib/artifact-composer'
 import { resolvePlan } from '@/lib/artifact-composer/catalog'
 import { GLITCH_CATALOG_FACTORIES } from '@/lib/artifact-composer/catalogs/glitch'
-import { attachFractures, isGlitchFlashPlan, planGlitchManifest, type GlitchCatalogPlan } from '@/lib/glitch-composition'
+import {
+  attachFractures,
+  checkGlitchEditionNumber,
+  fetchPublishedGlitchEditions,
+  GlitchPieceError,
+  isGlitchFlashPlan,
+  planGlitchManifest,
+  type GlitchCatalogPlan
+} from '@/lib/glitch-composition'
 import { materializeGlitchAssets } from '@/lib/glitch-composition/materialize'
 
 import { glitchAxisVersions } from './glitch-tokens'
@@ -50,6 +63,48 @@ const arg = (name: string): string | undefined => {
 }
 
 const sha256 = (buf: Buffer | string) => crypto.createHash('sha256').update(buf).digest('hex')
+
+/**
+ * El número de la edición semanal contra lo publicado en el blog. `strict` (`--check-published`) falla cerrado; sin él,
+ * sólo avisa (y un ejemplo ni consulta). Nada de esto entra a la procedencia: el blog cambia, la edición no.
+ */
+const verifyPublishedNumbering = async (number: number, { strict, example }: { strict: boolean; example: boolean }) => {
+  if (!strict && example) {
+    console.log(`ℹ Manifiesto de ejemplo: el #${number} no se verifica contra lo publicado (usa --check-published para verificarlo).`)
+
+    return
+  }
+
+  let check: ReturnType<typeof checkGlitchEditionNumber>
+  let last: number | null
+
+  try {
+    const published = await fetchPublishedGlitchEditions({ timeoutMs: strict ? 10_000 : 5_000 })
+
+    check = checkGlitchEditionNumber(number, published)
+    last = published.lastNumber
+  } catch (error) {
+    if (strict) throw error
+
+    const reason = error instanceof GlitchPieceError ? error.message : String(error)
+
+    console.warn(`⚠ No se pudo verificar la numeración contra lo publicado: ${reason} Usa --check-published para exigirla.`)
+
+    return
+  }
+
+  for (const warning of check.warnings) console.warn(`⚠ ${warning}`)
+
+  if (check.issue) {
+    if (strict) throw new GlitchPieceError(`El #${number} no es la próxima edición: el blog ya la publicó.`, 'edition-number-already-published', [check.issue])
+
+    console.warn(`⚠ [${check.issue.code}] ${check.issue.message}. Usa --check-published para bloquear.`)
+
+    return
+  }
+
+  if (check.status === 'ok') console.log(`✓ Numeración: el #${number} sigue a la última publicada (#${last}).`)
+}
 
 /** La licencia de Guttery, tal como la declara el brand pack (sello por checksum). */
 const narratorFont = () => {
@@ -84,10 +139,11 @@ const main = async () => {
   const manifestPath = arg('manifest')
 
   if (!manifestPath) {
-    console.error('Uso: pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays]')
+    console.error('Uso: pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays] [--check-published]')
     process.exit(2)
   }
 
+  const checkPublished = process.argv.includes('--check-published')
   const only = new Set((arg('only') ?? ONLY.join(',')).split(',').map((s) => s.trim()) as Only[])
   const unknown = [...only].filter((o) => !ONLY.includes(o))
 
@@ -125,6 +181,13 @@ const main = async () => {
   const flash = isGlitchFlashPlan(plan) ? plan : null
   const fileBase = flash ? `glitch-flash-${flash.slug}` : `glitch-${plan.edition}`
   const title = flash ? flash.title : `Glitch #${plan.edition}`
+
+  // 2b. La numeración de la semanal la manda el blog (lo publicado), no el composer. El Flash no lleva número.
+  if (isGlitchFlashPlan(plan)) {
+    if (checkPublished) console.log('ℹ Un Glitch Flash no lleva número de edición: --check-published no aplica.')
+  } else {
+    await verifyPublishedNumbering(plan.edition, { strict: checkPublished, example: Boolean((input as { example?: boolean }).example) })
+  }
 
   // 3. Fotos al tamaño exacto de su hueco + la falla calculada sobre la foto ya procesada (materializador compartido
   //    con el artifact-worker: aquí la fuente es el disco).
@@ -179,6 +242,8 @@ const main = async () => {
     edition: plan.edition,
     // El Flash declara su formato y su slug; la semanal conserva exactamente su forma de siempre.
     ...(flash ? { editionKind: 'flash', slug: flash.slug } : {}),
+    // Fotos de terceros publicadas con la excepción de prensa aprobada por pieza (sólo Flash; ausente si no hay).
+    ...(flash && flash.licenseExceptions.length > 0 ? { licenseExceptions: flash.licenseExceptions } : {}),
     example: Boolean((input as { example?: boolean }).example),
     manifest: { file: path.basename(manifestPath), sha256: sha256(raw) },
     coverTemplate: plan.coverTemplate,

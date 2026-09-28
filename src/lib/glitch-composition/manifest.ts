@@ -9,7 +9,11 @@
  *   La portada la deciden el contenido y la plantilla de la semana anterior (`previousEdition.coverTemplate`).
  * - Los largos máximos NO viven aquí: son de cada plantilla (`*.slots.json`, `overflow: "reject"`). El mapper no recorta.
  * - Toda foto trae crédito (se pinta) y licencia (se valida). Licencias admitidas: `licensed`, `owned`, `generated`
- *   (decisión del operador, 2026-09-27: el kit de prensa NO cuenta).
+ *   (decisión del operador, 2026-09-27: el kit de prensa NO cuenta). La única excepción es `press` y vive SÓLO en el
+ *   Glitch Flash, aprobada pieza por pieza (ver `glitchPressLicenseSchema`); en la semanal se rechaza
+ *   (`press-license-weekly-not-allowed`).
+ * - Los overlays del video cierran con la muletilla del narrador (`video.closingLine`), que VARÍA por edición: nunca una
+ *   frase fija en la plantilla (operador, 2026-09-28).
  * - `faceRegions` es obligatorio y explícito: `[]` dice «sin rostros». La falla en bytes nunca cae sobre uno.
  * - La numeración es dato: el composer no decide la serie.
  */
@@ -17,6 +21,7 @@
 import { glitchLine } from '@efeoncepro/axis-tokens'
 import { z } from 'zod'
 
+import glitchApprovers from './approvers.json'
 import { GlitchPieceError, type GlitchIssue } from './types'
 
 const nonEmpty = z.string().trim().min(1)
@@ -34,6 +39,53 @@ export const glitchHeadlineSchema = z.object({ entry: nonEmpty, punch: nonEmpty 
 
 export const GLITCH_PHOTO_LICENSE_KINDS = ['licensed', 'owned', 'generated'] as const
 
+/**
+ * Código estable de un issue propio (lo lee `toIssues`): así un `superRefine` no sale como `field-invalid` genérico
+ * cuando la regla tiene nombre (`press-license-weekly-not-allowed`, `field-required`…).
+ */
+const coded = (glitchCode: string) => ({ glitchCode })
+
+/** Licencia de una foto con derechos: se valida, nunca se pinta. */
+const standardLicenseSchema = z.object({ kind: z.enum(GLITCH_PHOTO_LICENSE_KINDS), ref: nonEmpty }).strict()
+
+/** Quién puede aprobar la excepción `press` (registro versionado; agregar a alguien es decisión del operador, con commit). */
+export const GLITCH_LICENSE_APPROVERS: ReadonlyArray<{ id: string; nombre: string; rol: string }> = glitchApprovers.aprobadores
+
+/**
+ * Excepción gobernada `press` (operador, 2026-09-28): el primer Glitch Flash publicó imágenes de Anthropic con crédito y
+ * SIN licencia por decisión del operador para ESA pieza. No legaliza el kit de prensa: exige la fuente pública (`ref`,
+ * https), el crédito pintado y una aprobación explícita POR PIEZA (`approval.flash` = el slug del Flash) de alguien del
+ * registro `approvers.json`. Sólo existe en el Flash; la procedencia la registra como `licenseExceptions`.
+ */
+export const glitchPressLicenseSchema = z
+  .object({
+    kind: z.literal('press'),
+    /** URL pública de la fuente (la página del anuncio, el kit de prensa). */
+    ref: z
+      .string()
+      .trim()
+      .url('la fuente es una URL pública')
+      .refine((u) => u.startsWith('https://'), 'la fuente es una URL pública https'),
+    approval: z
+      .object({
+        /** Id del registro `src/lib/glitch-composition/approvers.json`. */
+        approvedBy: nonEmpty,
+        approvedOn: isoDate,
+        /** El slug del Flash para el que se aprobó: una aprobación no viaja a otra pieza. */
+        flash: nonEmpty,
+        /** Por qué se aceptó publicar sin licencia (queda en la procedencia). */
+        reason: nonEmpty
+      })
+      .strict()
+  })
+  .strict()
+
+/**
+ * La semanal no admite `press`: el esquema la RECONOCE (sin validar su forma) sólo para rechazarla con un código propio,
+ * `press-license-weekly-not-allowed`, en vez de un «valor no admitido» que invitaría a probar otra forma.
+ */
+const weeklyLicenseSchema = z.discriminatedUnion('kind', [standardLicenseSchema, z.object({ kind: z.literal('press') }).passthrough()])
+
 export const glitchPhotoSchema = z
   .object({
     /** Relativo al manifiesto (local); un asset ref en la ruta productiva. */
@@ -41,7 +93,7 @@ export const glitchPhotoSchema = z
     /** Se pinta en la lámina. */
     credit: nonEmpty,
     /** Se valida; nunca se pinta. */
-    license: z.object({ kind: z.enum(GLITCH_PHOTO_LICENSE_KINDS), ref: nonEmpty }).strict(),
+    license: weeklyLicenseSchema,
     /** Candidata a portada A cuando es la foto de la noticia de portada. */
     strong: z.boolean(),
     fractureEdge: z.enum(['bottom', 'left', 'right']),
@@ -83,11 +135,17 @@ export const glitchVideoSchema = z
     drop: z.object({ newsId: z.string() }).strict(),
     cta: z.object({ reel: nonEmpty, vlog: nonEmpty }).strict(),
     transition: z.enum(['basic', 'bytes']).default('basic'),
+    /**
+     * Muletilla del narrador (Guttery) que cierra el video, sobre el host (overlay de cierre del reel y del vlog).
+     * VARÍA por edición (operador, 2026-09-28): la plantilla ya no trae «el #N sale el lunes.» fijo. Obligatoria cuando
+     * se piden overlays; una línea. Si anuncia la próxima edición por número, es la que sigue (`#<número + 1>`).
+     */
+    closingLine: nonEmpty.optional(),
     /** Foto del host con un gesto fuerte (portada del reel y miniatura del vlog). Propia: licencia, nunca crédito pintado. */
     hostPhoto: z
       .object({
         file: nonEmpty,
-        license: z.object({ kind: z.enum(GLITCH_PHOTO_LICENSE_KINDS), ref: nonEmpty }).strict(),
+        license: weeklyLicenseSchema,
         faceRegions: z.array(glitchRegionSchema)
       })
       .strict()
@@ -190,6 +248,43 @@ export const glitchEditionManifestSchema = z
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['video'], message: 'los overlays salen del video de la edición: falta la sección video' })
     }
 
+    // La excepción de prensa es del Flash: en la semanal, ninguna foto la usa.
+    const photos: { path: (string | number)[]; kind: string }[] = [
+      ...m.news.map((n, i) => ({ path: ['news', i, 'photo', 'license', 'kind'], kind: n.photo.license.kind })),
+      ...(m.video?.hostPhoto ? [{ path: ['video', 'hostPhoto', 'license', 'kind'], kind: m.video.hostPhoto.license.kind }] : [])
+    ]
+
+    for (const photo of photos.filter((p) => p.kind === 'press')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: photo.path,
+        message: 'la edición semanal no admite la excepción de prensa: usa una foto licensed, owned o generated (el kit de prensa no es licencia; «press» existe sólo en un Glitch Flash, aprobado por pieza)',
+        params: coded('press-license-weekly-not-allowed')
+      })
+    }
+
+    // La muletilla del cierre del video: obligatoria con overlays, variable por edición (misma regla que la del Flash).
+    if (m.video && m.outputs.overlays.length > 0) {
+      const line = m.video.closingLine
+
+      if (line === undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['video', 'closingLine'],
+          message: `falta la muletilla del narrador que cierra el video (overlay de cierre): varía por edición, p. ej. «el #${m.edition.number + 1} sale el lunes.»`,
+          params: coded('field-required')
+        })
+      } else {
+        for (const message of glitchClosingLineProblems([line])) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['video', 'closingLine'], message })
+
+        for (const match of line.matchAll(/#\s*(\d+)/g)) {
+          if (Number(match[1]) !== m.edition.number + 1) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['video', 'closingLine'], message: `la muletilla anuncia el #${match[1]}, pero la próxima edición es la #${m.edition.number + 1}` })
+          }
+        }
+      }
+    }
+
     if (m.video) {
       m.video.newsIds.forEach((id, i) => ref(id, ['video', 'newsIds', i]))
       ref(m.video.drop.newsId, ['video', 'drop', 'newsId'])
@@ -223,6 +318,9 @@ const messageOf = (issue: z.ZodIssue): string => {
       return `valor no válido: se esperaba ${JSON.stringify(issue.expected)}`
     case 'invalid_enum_value':
       return `valor no admitido: usa ${issue.options.map((o) => JSON.stringify(o)).join(', ')}`
+    case 'invalid_union_discriminator':
+      // Hoy la única unión discriminada es la licencia de la foto.
+      return 'licencia no admitida: usa "licensed", "owned" o "generated" (el kit de prensa no es licencia; la excepción "press" existe sólo en un Glitch Flash, aprobada por pieza)'
     case 'too_small':
       return issue.type === 'array' ? `faltan elementos: se esperan ${issue.exact ? 'exactamente ' : 'al menos '}${issue.minimum}` : issue.type === 'string' ? 'no puede estar vacío' : `el valor mínimo es ${issue.minimum}`
     case 'too_big':
@@ -234,10 +332,16 @@ const messageOf = (issue: z.ZodIssue): string => {
   }
 }
 
+/** El código propio de un issue de `superRefine` (`params.glitchCode`), si lo trae. */
+const glitchCodeOf = (issue: z.ZodIssue): string | undefined =>
+  issue.code === 'custom' && typeof issue.params?.glitchCode === 'string' ? issue.params.glitchCode : undefined
+
 /** Traduce los issues de zod a issues legibles con la ruta del campo. */
 const toIssues = (error: z.ZodError): GlitchIssue[] =>
   error.issues.map((issue) => ({
-    code: issue.code === 'unrecognized_keys' ? 'field-unknown' : issue.code === 'invalid_type' && issue.received === 'undefined' ? 'field-required' : 'field-invalid',
+    code:
+      glitchCodeOf(issue) ??
+      (issue.code === 'unrecognized_keys' ? 'field-unknown' : issue.code === 'invalid_type' && issue.received === 'undefined' ? 'field-required' : 'field-invalid'),
     path: pathOf(issue.path) || undefined,
     message: issue.code === 'custom' || (issue.code === 'invalid_string' && issue.message !== 'Invalid') ? issue.message : messageOf(issue)
   }))
@@ -278,8 +382,13 @@ export const parseGlitchEditionManifest = (input: unknown): GlitchEditionManifes
 
 const FLASH = glitchLine.editions.flash
 
-/** Foto del Flash: la de la semanal sin `strong` (la portada del Flash no se elige por rotación). */
-export const glitchFlashPhotoSchema = glitchPhotoSchema.omit({ strong: true })
+/**
+ * Foto del Flash: la de la semanal sin `strong` (la portada del Flash no se elige por rotación) y con la excepción de
+ * prensa admitida y validada entera (fuente https, aprobación por pieza).
+ */
+export const glitchFlashPhotoSchema = glitchPhotoSchema.omit({ strong: true }).extend({
+  license: z.discriminatedUnion('kind', [standardLicenseSchema, glitchPressLicenseSchema])
+})
 
 export const glitchFlashNewsSchema = z
   .object({
@@ -332,15 +441,41 @@ export const glitchFlashManifestSchema = z
   .strict()
   .superRefine((m, ctx) => {
     const lines = glitchFlashClosingLines(m)
-    const normalize = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N} ]/gu, '').replace(/\s+/g, ' ').trim()
-    const rejected = new Set<string>(FLASH.narratorCloser.rejected.map(normalize))
 
-    if (rejected.has(normalize(lines.join(' ')))) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['back', 'closingLine'], message: 'el operador rechazó esta muletilla (no se escucha natural): el gesto del narrador varía en cada Flash' })
+    for (const message of glitchClosingLineProblems(lines)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['back', 'closingLine'], message })
+
+    if (lines.some((line) => /#\s*\d/.test(line))) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['back', 'closingLine'], message: 'un Flash no anuncia la próxima edición por número' })
     }
 
-    if (lines.some((line) => /#\s*(?:\d|N\b)/i.test(line))) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['back', 'closingLine'], message: 'un Flash no anuncia la próxima edición por número' })
+    // La excepción de prensa: aprobada por alguien del registro, y para ESTA pieza.
+    const pressPhotos = [
+      { path: ['news', 0, 'photo'], photo: m.news[0].photo },
+      ...(m.cover.photo ? [{ path: ['cover', 'photo'], photo: m.cover.photo }] : [])
+    ]
+
+    for (const { path, photo } of pressPhotos) {
+      if (photo.license.kind !== 'press') continue
+
+      const { approval } = photo.license
+
+      if (!GLITCH_LICENSE_APPROVERS.some((a) => a.id === approval.approvedBy)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [...path, 'license', 'approval', 'approvedBy'],
+          message: `«${approval.approvedBy}» no está en el registro de aprobadores (src/lib/glitch-composition/approvers.json): la excepción de prensa la aprueba el operador`,
+          params: coded('press-license-approver-unknown')
+        })
+      }
+
+      if (approval.flash !== m.edition.slug) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [...path, 'license', 'approval', 'flash'],
+          message: `la aprobación es para el Flash «${approval.flash}», no para «${m.edition.slug}»: la excepción de prensa se aprueba pieza por pieza`,
+          params: coded('press-license-approval-mismatch')
+        })
+      }
     }
 
     if (new Set(m.outputs.stills).size !== m.outputs.stills.length) {
@@ -350,6 +485,22 @@ export const glitchFlashManifestSchema = z
 
 export type GlitchFlashManifest = z.infer<typeof glitchFlashManifestSchema>
 export type GlitchFlashNews = z.infer<typeof glitchFlashNewsSchema>
+
+/**
+ * Reglas comunes de la muletilla del narrador (contraportada del Flash y cierre del video semanal): nunca una frase que
+ * el operador rechazó (`narratorCloser.rejected` del token) ni el marcador sin resolver `#N`. El número (prohibido en el
+ * Flash; el de la próxima edición en la semanal) lo valida cada formato.
+ */
+export function glitchClosingLineProblems(lines: readonly string[]): string[] {
+  const normalize = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N} ]/gu, '').replace(/\s+/g, ' ').trim()
+  const rejected = new Set<string>(FLASH.narratorCloser.rejected.map(normalize))
+  const problems: string[] = []
+
+  if (rejected.has(normalize(lines.join(' ')))) problems.push('el operador rechazó esta muletilla (no se escucha natural): el gesto del narrador varía en cada edición')
+  if (lines.some((line) => /#\s*N\b/i.test(line))) problems.push('la muletilla trae el marcador «#N» sin resolver: escribe la frase final')
+
+  return problems
+}
 
 /** La muletilla de la contraportada del Flash, siempre como lista de líneas. */
 export function glitchFlashClosingLines(manifest: Pick<GlitchFlashManifest, 'back'>): string[] {
@@ -388,6 +539,16 @@ export const parseGlitchFlashManifest = (input: unknown): GlitchFlashManifest =>
           closing === undefined
             ? { code: 'field-required', path: 'back.closingLine', message: 'falta la muletilla de la contraportada: el gesto del narrador varía en cada Flash' }
             : { code: 'field-invalid', path: 'back.closingLine', message: `la muletilla es una línea o una lista de hasta ${FLASH.narratorCloser.lines} líneas, sin vacías` }
+        ]
+      }
+
+      if (issue.code === 'invalid_type' && issue.received === 'undefined' && pathOf(issue.path).endsWith('license.approval')) {
+        return [
+          {
+            code: 'press-license-approval-required',
+            path: pathOf(issue.path),
+            message: 'la excepción de prensa exige la aprobación explícita del operador para esta pieza (approvedBy, approvedOn, flash, reason)'
+          }
         ]
       }
 

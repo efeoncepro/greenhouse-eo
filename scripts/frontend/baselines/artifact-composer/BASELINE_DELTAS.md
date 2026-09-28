@@ -1,5 +1,19 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-28 (q) — Glitch: la muletilla del cierre del video pasa a ser dato del manifiesto
+
+<!-- sealed-by-freeze: fbc50aba79536e19868dd075e0ba4d5c982e568d20e7fc5c97c1de0d81ca3ca4 -->
+
+Regla del operador (2026-09-28): la muletilla del narrador varía por edición, nunca es fija. Las plantillas de cierre
+del video (`overlay-cta-reel.html`, `overlay-cta-vlog.html`) traían «el #<span>N</span> sale el lunes.» con sólo el
+número como slot; ahora la frase entera es el slot `closingLine` (alimentado por `video.closingLine` del manifiesto,
+obligatoria cuando se piden overlays). El probe del gate usa el mismo texto de siempre («el #18 sale el lunes.»), así
+que no cambia nada de la composición: sólo que Guttery ya no parte el texto en tres tramos (`el #` · `18` ·
+` sale el lunes.`) y lo compone como una sola corrida, lo que mueve el antialias del «1» de «#18» (788 píxeles, ningún
+glifo cambia de lugar a la vista; comparado lado a lado). En el vlog el cambio no llega a los píxeles (0 px).
+
+- `templates-glitch/OverlayCtaReel.png` — ✏️ glitch.overlay.cta.reel: la muletilla es un solo slot (`closingLine`); mismo texto, antialias del «1» de «#18» por componerse como una corrida
+
 ## 2026-09-28 (p) — Glitch Flash: seis plantillas nuevas y «LA NOTICIA» en las portadas con foto
 
 <!-- sealed-by-freeze: eda719cb0ccf69b2d2e0c9a20e32a84feba06977a5f9272812b997db50f148c4 -->
@@ -935,7 +949,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: eda719cb0ccf69b2d2e0c9a20e32a84feba06977a5f9272812b997db50f148c4 -->
+<!-- manifest-digest: fbc50aba79536e19868dd075e0ba4d5c982e568d20e7fc5c97c1de0d81ca3ca4 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

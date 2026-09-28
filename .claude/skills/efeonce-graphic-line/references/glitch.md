@@ -1,6 +1,10 @@
 # Glitch — sub-línea gráfica (sólo para Glitch)
 
-> Verificado contra: greenhouse-eo@24e4c72ee (local, sin push; `origin/develop` = `53002b352`) — 2026-09-28 · **el
+> Verificado contra: greenhouse-eo@24b165816 + árbol local (sin commit) — 2026-09-28 (noche) · **numeración resuelta:
+> manda lo publicado en el blog, la próxima semanal es la #18** (`pnpm glitch:editions`, `--check-published`; §1) ·
+> **muletilla del cierre del video como dato** (`video.closingLine`; §6, §9.1) · **excepción de licencia `press`
+> gobernada, sólo en el Flash** (§9.1, §14.4) · antes: greenhouse-eo@24e4c72ee (local, sin push; `origin/develop` =
+> `53002b352`) — 2026-09-28 · **el
 > Glitch Flash compone** con `pnpm glitch:compose` (manifiesto `edition.kind: "flash"`, seis plantillas `Flash*`, estela
 > generada desde el token; AXIS tag `v0.3.24` = `axis-tokens` 0.3.24 + `axis-ui-contracts` 0.3.22 con el contrato
 > `efeonce.glitch-line` 0.2.0, fijados en Greenhouse por `53002b352`: §9, §9.1 y §14) y las portadas con foto del
@@ -71,13 +75,16 @@ pieza de la marca.
   propio del Flash está en §14.
 - Top 8 semanal, pero **manda el POV del narrador**: la noticia es el pretexto. «La noticia pregunta, el narrador
   responde». Le habla a marketers, creativos y apasionados por la IA y la tecnología. El «+ IA» es grande, no menor.
-- Se numera **«Edición #N»**. La próxima es la **#17** (decisión del operador, 2026-09-27): la serie sigue la del blog y
-  la del ADR del pipeline. Los «#11»–«#14» de las maquetas del canvas son ejemplos de diseño; nunca los copies como
-  número real. **DISCREPANCIA abierta (registrada el 2026-09-28, sin resolver):** el blog ya publicó «Glitch #16»
-  (2026-07-21, `/glitch/glitch-costo-real-ia-tarea/`) y «Glitch #17» (2026-07-28,
-  `/glitch/glitch-17-modelo-commodity-control-escaso/`, post 251605), así que «la próxima es la #17» no cuadra con la
-  serie del blog. **Pregunta abierta para el operador:** no la resuelvas por tu cuenta ni fijes el número de una
-  edición real hasta que responda.
+- Se numera **«Edición #N»**. **Numeración RESUELTA (2026-09-28, sesión autorizada por el operador):** la fuente de
+  verdad es el registro de ediciones **publicadas** del blog (`efeoncepro.com/glitch/`, categoría Glitch de WordPress,
+  term 183; títulos «Glitch #N: …»). El blog ya publicó «Glitch #16» (2026-07-21) y «Glitch #17» (2026-07-28, post
+  251605), así que **la próxima semanal es la #18** (la «#17» del 2026-09-27 quedó superada). Antes de fijar el número
+  de una edición real: `pnpm glitch:editions` (imprime la última publicada y la próxima) y compón con
+  `pnpm glitch:compose -- --manifest … --check-published`, que falla con `edition-number-already-published` si el
+  número ya salió. El Flash no lleva número y no cuenta. Los «#11»–«#14» de las maquetas del canvas son ejemplos de
+  diseño; nunca los copies como número real. AXIS la registra como resuelta en `axis-tokens` 0.3.25
+  (`glitchLine.resolvedDecisions` + `editions.weekly.numbering`, regla sin estado: nunca guarda el número); commit
+  local `84e9588` en la rama `docs/glitch-flash-composer`, **publicación pendiente** (push a `main` + tag `v0.3.25`).
 - Línea de servicio: **Growth** (decisión del operador, 2026-09-27) → eslogan de la contraportada «Empower your Growth».
 - Motivo: **«El micrófono se abre…»** (narrador de radio); cierra con **«El micrófono se cierra.»**.
 - Fuentes de marca: guía de tono v3 en OneDrive `Alineación/5. Contenidos/09. Glitch/Marca/Glitch-Guia-Tono-Voz-Personalidad-v3.docx`;
@@ -168,8 +175,9 @@ aprobada (el vlog embebido ya lo estaba con el motion).
   → **cierre** «El micrófono se cierra.» + «— El equipo editorial de Glitch» + íconos Plastilina versión papel.
 - **Callout v2 vs v1:** el v1 de TASK-1337 está **publicado** (bloque `efeoncepro/glitch-drop`: panel claro navy 5 %,
   barra navy, wordmark 18 px). El v2 (pedido del operador: «más punch») es bloque navy con puntos + wordmark + «DROP»,
-  remate Bricolage 800 con la manzana, porqué en Poppins y bytes en la esquina. **Aprobado desde la #17**: el bloque de
-  WordPress se actualiza al v2 **antes de publicar la #17**; los posts anteriores siguen con el v1. El v2 no es plantilla
+  remate Bricolage 800 con la manzana, porqué en Poppins y bytes en la esquina. **Aprobado desde la próxima edición** (se
+  dijo «#17»; con la numeración resuelta es la **#18**, §1): el bloque de WordPress se actualiza al v2 **antes de
+  publicarla**; los posts anteriores siguen con el v1. El v2 no es plantilla
   del Composer: vive sólo en el bloque. Hasta que el bloque se actualice, lo publicado es el v1.
 
 ## 6. Video — motion APROBADO (2026-09-27)
@@ -198,10 +206,12 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 
   Ocho piezas con fondo transparente: apertura, cabecera (noticia n/3 + wordmark), lower third (**aprobado**, §12;
   no inventes otro contenido), subtítulo, tarjeta de noticia, imagen de la fuente (plano dividido: la
-  noticia arriba se desarma hacia el host, host reencuadrado abajo), Glitch Drop y última frase («el #N+1 sale el
-  lunes.» + píldora «Sigue a Glitch»). **Pendiente (2026-09-28):** esa última frase es fija en el kit del taller y en
-  `overlay-cta-reel.html` / `overlay-cta-vlog.html` del Composer (`el #<nextEdition> sale el lunes.`), y choca con la
-  regla de la muletilla que varía por edición (§2); cambiarla es decisión del operador y trabajo de motion.
+  noticia arriba se desarma hacia el host, host reencuadrado abajo), Glitch Drop y última frase (la muletilla del
+  narrador + píldora «Sigue a Glitch»). **La última frase varía por edición** (regla de §2): en el Composer
+  (`overlay-cta-reel.html` / `overlay-cta-vlog.html`) es el slot `closingLine`, alimentado por `video.closingLine` del
+  manifiesto (obligatoria si se piden overlays; §9.1). En el **taller** de motion, `closingLine` del archivo de
+  edición reemplaza a `nextEdition` (y el taller ya compone un Flash) en la rama local `feat/glitch-flash-motion`
+  (`8061c93`, `ce63091`), **sin merge a `main`**; el motion del Flash es PROPUESTA pendiente de aprobación.
 - **Tarjeta final** (16:9 y reel): centrada, espejo de la apertura (los puntos se resuelven en la manzana → el reel
   empalma en loop; por eso el reel abre directo con la apertura, sin pre-roll), un mensaje, una acción, firma; sin texturas finas (la compresión las ensucia).
 - En el 16:9 (kit del vlog aprobado), la tarjeta de noticia va como overlay y el Drop a pantalla completa con «SOBRE LA
@@ -226,7 +236,11 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 - La órbita decorativa (la contraportada con órbita 8/8 se descartó: «no tiene nada que decir»).
 - La URL como texto o la burbuja URL: en Glitch firma el logo (firma y burbuja nunca a la vez; la burbuja sólo reemplaza
   al logo si el logo ya está en la imagen).
-- Descargar y resubir clips o imágenes de terceros: se embeben o se licencian.
+- Descargar y resubir clips o imágenes de terceros: se embeben o se licencian. La única salida sin licencia es la
+  excepción `press` del **Flash**, aprobada pieza por pieza por alguien del registro (§9.1, §14.4); nunca en la semanal.
+- Fijar el número de una edición semanal de memoria o desde una maqueta: sale de `pnpm glitch:editions` (§1).
+- Una frase fija en el cierre del video («el #N sale el lunes.» escrita en la plantilla): es `video.closingLine`, por
+  edición (§6).
 - Presentar como reales los titulares y noticias de las maquetas: son de ejemplo.
 - Íconos Plastilina en volumen (3D) en una pieza de Glitch: van planos (`glitchLine.icons.actions.rendering: 'flat'`).
 - Número de edición en un **Glitch Flash** («EDICIÓN», «#N», «el #N+1 sale el lunes.»): el Flash no es la edición entera
@@ -246,7 +260,7 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 | Lámina interior y contraportada | **APROBADO** |
 | Noticia 1 (franja «El micrófono se abre») | ajuste del operador, aplicado |
 | Variante con lente | **APROBADO** (2026-09-27) como variante ocasional (sólo POV sobre un detalle nítido de la foto; sin manzana en esa lámina) |
-| Blog: banners 16:9 A/B/C, 1:1 con plantilla propia, maqueta del post completa, callout «DROP» v2 | **APROBADO** (2026-09-27). Callout v2 **desde la #17**: el bloque de TASK-1337 se actualiza antes de publicarla; los posts anteriores siguen con el v1 |
+| Blog: banners 16:9 A/B/C, 1:1 con plantilla propia, maqueta del post completa, callout «DROP» v2 | **APROBADO** (2026-09-27). Callout v2 **desde la próxima edición (la #18, §1)**: el bloque de TASK-1337 se actualiza antes de publicarla; los posts anteriores siguen con el v1 |
 | Vlog 16:9, kit de overlays del reel, tarjetas finales (y los tableros de video del canvas) | **APROBADO** (2026-09-27, con el motion) |
 | La manzana como esfera y el verde como acento | **APROBADO** (2026-09-27); publicados en AXIS en `glitchLine.apple` y `glitchLine.color.accent` (v0.3.12) |
 | Línea de servicio Growth («Empower your Growth») | **APROBADO** (2026-09-27) |
@@ -263,7 +277,9 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 | **Glitch Flash** (portada, noticia, contraportada, banner 16:9 del blog, banner de noticia 1600×900, portada de Threads) | **LANZADO EN PRODUCCIÓN** el 2026-09-28 (Claude Sonnet 5.5) y **aprobado por el operador en uso real**. En AXIS: `glitchLine.editions.flash` + seis piezas `flash-*` (`axis-tokens` 0.3.24) y contrato `efeonce.glitch-line` 0.2.0 (`axis-ui-contracts` 0.3.22). En el Composer: seis plantillas `Flash*` aprobadas; se compone **en local** con `pnpm glitch:compose` (§9.1, §14.4); la ruta productiva todavía no lo conoce (§14.7) |
 | Chip «LA NOTICIA» en la portada con foto productiva | **DECIDIDO e IMPLEMENTADO** (2026-09-28): `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` lo pintan (§3) |
 | Muletilla de la contraportada variable por edición | **DECIDIDO** (2026-09-28, §2) |
-| Numeración de la edición semanal (#17 vs. el blog, que ya tiene #16 y #17) | **PREGUNTA ABIERTA** para el operador (2026-09-28, §1) |
+| Numeración de la edición semanal | **RESUELTA** (2026-09-28, §1): manda lo publicado en el blog; la próxima es la **#18**; `pnpm glitch:editions` y `glitch:compose --check-published` |
+| Muletilla del cierre del video (overlays del Composer) | **IMPLEMENTADA** (2026-09-28): slot `closingLine` desde `video.closingLine`; el kit del taller sigue con `nextEdition` (TASK-1924) |
+| Fotos de terceros sin licencia en el Flash | **EXCEPCIÓN GOBERNADA** (2026-09-28): `license.kind: "press"` con fuente https, crédito y aprobación por pieza; nunca en la semanal |
 
 Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador para aprobar. Desde el 2026-09-27 no queda
 ninguna pieza estática en PROPUESTA; el estado sigue valiendo para piezas nuevas.
@@ -354,9 +370,9 @@ pasarlos a `glitchLine` y `AXIS_GLITCH_ASSETS` es trabajo de TASK-1924 (cómo op
 assets y contrato de Glitch en AXIS → TASK-1922 (**publicado en AXIS `v0.3.12`**: incluye el alta de los cinco glifos Plastilina,
 D27, y la licencia de Guttery declarada en `glitchLine.type.narrator`); (b) catálogos
 de Glitch en el Composer → TASK-1923 (**taller local hecho**; ruta productiva → TASK-1921); (c) overlays HyperFrames + render con alfa → TASK-1924; (d) callout v2 en el
-bloque de WordPress (aprobado el 2026-09-27, desde la #17) → bloque de TASK-1337, antes de publicar la #17.
+bloque de WordPress (aprobado el 2026-09-27 «desde la #17»; con la numeración resuelta, la #18) → bloque de TASK-1337, antes de publicarla.
 
-**Resuelto por el operador el 2026-09-27:** manzana y verde aprobados; línea Growth; próxima edición #17; alta de los
+**Resuelto por el operador el 2026-09-27:** manzana y verde aprobados; línea Growth; próxima edición #17 (superado el 2026-09-28: manda lo publicado, la próxima es la #18, §1); alta de los
 cinco glifos aprobada; el diseño sonoro de Glitch (y con él el mnemónico): **versión B aprobada**, con sus cuatro
 decisiones (§13.6); el motion de Glitch (apertura y tarjeta final v2, kit con el lower third, transiciones) con el vlog
 16:9, el reel y las tarjetas finales: **aprobado**; el blog completo y la lámina con lente: **aprobados**.
@@ -369,8 +385,16 @@ Manual del operador: [`componer-una-edicion-de-glitch.md`](../../../../docs/manu
 Norma: §9.1 de `GLITCH_GRAPHIC_LINE_V1.md`.
 
 ```bash
-pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays]
+pnpm glitch:editions                      # última edición publicada en el blog y la próxima
+pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays] [--check-published]
 ```
+
+- **Numeración (§1):** `--check-published` consulta la API REST pública del blog (categoría 183, timeout 10 s) y falla
+  con `edition-number-already-published` si `edition.number` ≤ la última publicada, o con
+  `published-editions-unavailable` si el blog no responde (nunca inventa). Sin el flag, la verificación es de mejor
+  esfuerzo (5 s) y sólo avisa (`⚠`); un manifiesto `example: true` ni siquiera consulta. Saltarse números sólo avisa.
+  El Flash no lleva número (`--check-published` no aplica). Nada de esto entra a la procedencia (el blog cambia, la
+  edición no). Código: `src/lib/glitch-composition/published-editions.ts` (parser puro de títulos + fetch paginado).
 
 - **Parte del ejemplo:** `src/lib/glitch-composition/examples/edition-17.example.json` (fotos sintéticas en
   `examples/fotos/`, regenerables con `pnpm tsx scripts/glitch/make-example-photos.ts [--check]`). `example: true` =
@@ -379,11 +403,16 @@ pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,
   `thesis`, `previousEdition {number, coverTemplate A|B|C|none}`, `cover {newsId, standalonePov|null, mosaic[4]|null,
   muletilla|null, headline {entry, punch}, lines[2]}`, `news[8]` (`n1`…`n8` en orden: `section`, `headline`, `outlet`,
   `date`, `photo {file, credit, license {kind licensed|owned|generated, ref}, strong, fractureEdge bottom|left|right,
-  faceRegions[]}`, `pov`, `why`, `lens {region}|null` — nunca en `n1`), `back {closingLine}`, `video` (o `null`) y
-  `outputs {stills[], overlays[reel|vlog]}`. Stills: `cover`, `back`, `interior:nN`, `blog:banner`, `blog:square`,
+  faceRegions[]}`, `pov`, `why`, `lens {region}|null` — nunca en `n1`), `back {closingLine}`, `video` (o `null`; con
+  `closingLine`: la muletilla del cierre del video, **obligatoria si se piden overlays**, una línea, variable por
+  edición; si anuncia un número debe ser `#<número + 1>`; rechaza `narratorCloser.rejected` del token y el marcador
+  `#N`) y `outputs {stills[], overlays[reel|vlog]}`. Un manifiesto viejo con overlays y sin `video.closingLine` falla
+  con `field-required` (sin migración automática: rellenarla con la frase fija de antes sería justo lo que la regla
+  prohíbe). Stills: `cover`, `back`, `interior:nN`, `blog:banner`, `blog:square`,
   `blog:news:nN`, `reel:cover`, `video:thumbnail`; los dos últimos exigen `video.hostPhoto` y `video.cover`; los overlays
   exigen `video`. `faceRegions` es obligatorio (`[]` = sin rostros), normalizado a la foto ORIGINAL; el mapper lo lleva
-  al recorte **centrado** del hueco (`fitRegion`). El kit de prensa **no** es licencia.
+  al recorte **centrado** del hueco (`fitRegion`). El kit de prensa **no** es licencia: `license.kind: "press"` en la
+  semanal sale como `press-license-weekly-not-allowed` (la excepción existe sólo en el Flash, §14.4).
 - **Tú llenas datos; el comando decide** plantilla, coordenadas, tokens y falla. Nunca agregues un campo para elegir
   la plantilla (se rechaza) ni cambies `previousEdition` para forzar una portada.
 - **Salidas** (por defecto `.captures/glitch/edicion-<n>/`): `glitch-<n>-carrusel.pdf` (10 páginas, un tamaño,
@@ -401,6 +430,9 @@ pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,
   | `contract-issues` | el contrato `efeonce.glitch-line` (`validateGlitchLineIntent`; el Flash valida con 0.2.0 y `edition: { kind: 'flash' }`) rechaza una lámina; ruta `<lámina>.<campo>` con el código del contrato: corregir el dato |
   | `fracture-over-face` | otro `fractureEdge`, `faceRegions` bien medido u otra foto |
   | `carousel-too-heavy` | el PDF no cabe en los límites de LinkedIn |
+  | `edition-number-already-published` | (`--check-published`) el número ya salió en el blog: usar el que imprime `pnpm glitch:editions` |
+  | `published-editions-unavailable` | (`--check-published`) el blog no respondió: reintentar; nunca fijar el número a ciegas |
+  | `press-license-weekly-not-allowed` · `press-license-approval-required` · `press-license-approver-unknown` · `press-license-approval-mismatch` | la excepción de prensa: sólo en el Flash, con aprobación de alguien de `approvers.json` para ESTE slug (§14.4) |
   | `glitch.*` del catálogo (`glitch.cover-rotation`, `glitch.single-sphere`, `glitch.headline-contrast`, `glitch.photo-credit`, `glitch.face-safe-fracture`, `glitch.accent-on-light`, `glitch.edition-structure`, `glitch.catalog-membership`, `glitch.piece-approval`) | segunda línea: repiten las reglas sobre el plan resuelto; si salta una, el plan llegó sin pasar por el mapper |
 
 - **Dónde vive:** mapper puro `src/lib/glitch-composition/` (`planGlitchEdition`, `resolveCoverTemplate`,
@@ -445,7 +477,7 @@ pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,
 - [ ] Firma: logo de Efeonce centrado abajo; sin burbuja URL ni URL como texto.
 - [ ] Foto o clip de la fuente embebido o licenciado, con crédito.
 - [ ] Blog: la 1:1 sale de su plantilla propia (nunca la portada 4:5 recortada); cada banner interno lleva el crédito
-      de la foto; el callout «DROP» v2 sólo desde la #17 y con el bloque ya actualizado.
+      de la foto; el callout «DROP» v2 sólo desde la #18 (§1) y con el bloque ya actualizado.
 - [ ] Lámina con lente sólo si el POV trata de un detalle nítido de la foto; esa lámina no cierra con la manzana.
 - [ ] Íconos de acción («SI TE SIRVIÓ», «deslizar») planos, nunca en volumen.
 - [ ] Si la pieza sale de un intent, `validateGlitchLineIntent` (o `pnpm glitch:resolve`) no devuelve issues; un
@@ -671,8 +703,9 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
   editorial: EPIC-031). Plataforma: tokens, contrato y assets en AXIS ya publicados (TASK-1922, v0.3.12; el Flash en
   v0.3.24; falta que el taller los lea, TASK-1924), ruta productiva de las piezas estáticas (TASK-1921; los catálogos
   de TASK-1923 y los del Flash ya existen en local) y archivo de binarios en GCS (hoy sólo OneDrive + sha256 en los manifiestos).
-- **Última frase fija (pendiente, 2026-09-28):** la pieza `cta` del kit dice «el #N+1 sale el lunes.» siempre; con la
-  muletilla que varía por edición (§2) eso queda por decidir con el operador. No la cambies por tu cuenta.
+- **Última frase del taller (pendiente, TASK-1924):** la pieza `cta` del kit del taller todavía dice «el #N+1 sale el
+  lunes.» desde `nextEdition`. En el Composer ya es dato (`video.closingLine`, §6, §9.1); el taller debe leer la misma
+  muletilla del manifiesto. No reescribas el taller por tu cuenta.
 - **Si cambias tiempos del motion** (en `pieces.mjs`, `overlays.mjs` o `transitions.mjs` del taller), vuelve a correr
   el mismo comando del motion: el sonido lee los tiempos del código y sale de nuevo junto a cada `.mov` (§13.5). La
   música **no** se mueve con el motion: está amarrada a la grilla de 150 BPM y sus másteres son fijos (§13.7); cambiar
@@ -1004,8 +1037,14 @@ provisional). El ducking lo aplica el editor con los valores de arriba.
   `src/lib/glitch-composition/`. Una escena oscura se recorta y se le levanta la exposición **antes** de
   `processPhoto`, o se funde con el fondo navy ([lessons.md](lessons.md), 2026-09-28).
 - **Imágenes de terceros:** con crédito siempre. En el Flash de Sonnet 5.5 el operador decidió publicar las imágenes de
-  Anthropic **con crédito y sin licencia**; es una decisión de esa pieza, en tensión con §7 («se embeben o se
-  licencian»): no la generalices a otros Flash sin preguntar.
+  Anthropic **con crédito y sin licencia** para ESA pieza. Desde el 2026-09-28 esa excepción está **modelada y
+  gobernada, no legalizada por defecto**: `photo.license = { kind: "press", ref: "<URL https de la fuente>", approval:
+  { approvedBy, approvedOn, flash: "<slug de este Flash>", reason } }`, con `credit` visible no vacío. `approvedBy`
+  debe estar en `src/lib/glitch-composition/approvers.json` (hoy sólo `julio-reyes`; agregar a alguien es decisión del
+  operador, con commit) y `approval.flash` debe ser el slug del Flash (una aprobación no viaja a otra pieza). El plan
+  la entrega como `licenseExceptions` y la procedencia la registra. Sin aprobación del operador para la pieza, **no**
+  la escribas: pregunta. En la semanal no existe (`press-license-weekly-not-allowed`), y el catálogo sólo admite
+  `press:` en las plantillas `Flash*` (`glitch.photo-credit` 1.1.0).
 - **Copys:** el operador los revisa **antes** de programar («debo ver los copys antes de publicar»). El copy de la
   página de Efeonce usa la voz del narrador de Glitch; el LinkedIn personal de Julio busca thought leadership (opinión
   propia, primera persona, la noticia como pretexto, sin lista de specs).
@@ -1040,12 +1079,11 @@ provisional). El ducking lo aplica el editor con los valores de arriba.
 - La **ruta productiva** del Flash (TASK-1921: `src/lib/brand-surfaces/production/plan.ts`, `artifact-worker`, MCP):
   hoy sólo conoce la edición semanal (`planGlitchEdition`); el Flash es taller local (`planGlitchManifest` sólo lo
   usa `scripts/glitch/compose.ts`).
-- Si publicar imágenes de terceros con crédito y sin licencia (decidido para Sonnet 5.5) vale para otros Flash.
-- La **numeración** de la edición semanal (§1): pregunta abierta para el operador (en AXIS,
-  `pendingDecisions: edition-numbering-blog-vs-system`).
-- La **última frase del video** (overlays `overlay-cta-reel.html` / `overlay-cta-vlog.html` del Composer y la pieza
-  `cta` del taller) sigue fija en «el #N sale el lunes.»: choca con la muletilla variable (§2, §6); es trabajo de
-  motion y decisión del operador.
+- ~~Imágenes de terceros sin licencia~~ → excepción `press` gobernada (§14.4); cada uso sigue siendo una aprobación
+  del operador por pieza.
+- ~~Numeración~~ → resuelta (§1). Pendiente sólo en AXIS: retirar `pendingDecisions: edition-numbering-blog-vs-system`.
+- ~~Última frase del video en el Composer~~ → `video.closingLine` (§6). Pendiente: la pieza `cta` del **taller** de
+  motion (`nextEdition`, TASK-1924).
 - **Content Factory** no tiene `kind` para `efeoncepro/glitch-drop`: en el blog del Flash el Drop se inyectó con un
   párrafo marcador + `parse_blocks`/`serialize_blocks` en un eval gobernado. Propuesta escrita en la skill
   `efeonce-public-site-wordpress`, `references/content-factory-gutenberg.md`.

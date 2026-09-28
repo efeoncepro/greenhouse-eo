@@ -57,6 +57,24 @@ describe('glitch edition validators — un caso que pasa y uno que falla por reg
     expect(run(photoCreditValidator, [slide('CoverMosaic', { card1: {}, credit: 'Fotos: Glitch', photoLicense: 'owned:a generated:' })])).toEqual(['glitch.photo-credit'])
   })
 
+  it('photo-credit: la excepción de prensa pasa sólo en las plantillas del Glitch Flash', () => {
+    const press = { ...photoSlots, credit: 'Imagen: Anthropic', photoLicense: 'press:https://www.anthropic.com/news/claude-sonnet-5-5' }
+
+    expect(photoCreditValidator.version).toBe('1.1.0')
+
+    for (const template of ['FlashCover', 'FlashInterior', 'FlashBlogBanner', 'FlashNewsBanner', 'FlashThreads']) {
+      expect(run(photoCreditValidator, [slide(template, press)]), template).toEqual([])
+    }
+
+    for (const template of ['CoverPhoto', 'Interior', 'BlogBannerPhoto', 'BlogNewsBanner']) {
+      expect(run(photoCreditValidator, [slide(template, press)]), template).toEqual(['glitch.photo-credit'])
+    }
+
+    // Aun en el Flash, la excepción pinta el crédito y nombra su fuente.
+    expect(run(photoCreditValidator, [slide('FlashInterior', { ...press, credit: '' })])).toEqual(['glitch.photo-credit'])
+    expect(run(photoCreditValidator, [slide('FlashInterior', { ...press, photoLicense: 'press:' })])).toEqual(['glitch.photo-credit'])
+  })
+
   it('face-safe-fracture', () => {
     const bytes = JSON.stringify([{ x: 100, y: 600, size: 27, opacity: 1, fill: '#123456' }])
 

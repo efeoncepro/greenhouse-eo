@@ -1,9 +1,11 @@
 # Editar el video de Glitch con los gráficos animados — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (v1.8: la frase del `cta` («el #N sale el lunes.») queda como
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.9: la frase del `cta` ya no es fija en los overlays del
+> Artifact Composer: sale de `video.closingLine` del manifiesto, escrita para cada edición; el kit animado del taller
+> la lee como `closingLine` del archivo de edición en la rama local `feat/glitch-flash-motion`, sin merge a `main`. v1.8: la frase del `cta` («el #N sale el lunes.») queda como
 > pendiente: la muletilla del narrador ahora cambia por edición y el Glitch Flash no lleva número. v1.7: el **reel abre directo con la apertura, sin pre-roll**, y
 > `glitch-intro-reel.wav` dura 4,0 s; el pre-roll queda sólo en el vlog; el del reel pasó a `v2/descartado/`. v1.6: mapa de la edición completa en la línea de tiempo; el sonido
 > se toma de los WAV que vienen junto a cada `.mov` y `sonido-propuesta/` queda como histórico; el pre-roll entra en la
@@ -162,7 +164,7 @@ Cada archivo del kit es un **cuadro completo con fondo transparente** y el gráf
 | `noticia-1`, `noticia-2`, `noticia-3` | 5 s | tarjeta de la noticia: sección, titular y medio. Al presentar cada noticia |
 | `fuente-1`, `fuente-2`, `fuente-3` | 5 s | plano dividido con la foto de la noticia y su crédito. **Sólo si la noticia trae imagen** |
 | `drop` | 4 s (4,5 s con la versión en bytes) | «GLITCH DROP»: la opinión del host sobre la noticia. En el vlog es pantalla completa |
-| `cta` | 4 s | «el #18 sale el lunes.» y el botón, antes de la tarjeta final. **Pendiente (2026-09-28):** esta frase es fija en el kit y choca con la muletilla que ahora cambia por edición; en un Glitch Flash no aplica (no lleva número). No la edites en el `.mov`: lo decide el operador y se corrige en el taller |
+| `cta` | 4 s | la muletilla del narrador que cierra el video (p. ej. «el #18 sale el lunes.») y el botón, antes de la tarjeta final. **La frase cambia por edición** (regla del operador, 2026-09-28): la escribe el editor en el manifiesto de la edición, campo `video.closingLine` (obligatorio cuando se piden overlays; ver [Componer una edición de Glitch](./componer-una-edicion-de-glitch.md)). El cuadro fijo con alfa del Artifact Composer (`overlays/…-cta.png`) ya la lee de ahí; el `.mov` animado del taller todavía la arma con el número de la próxima edición, hasta que el taller lea el mismo campo (TASK-1924). En un Glitch Flash no hay video ni `cta`. **Nunca** la corrijas escribiendo encima en Premiere ni editando el `.mov`: se corrige el manifiesto y se vuelve a generar |
 
 **Plano dividido (`fuente-N`):** la foto de la noticia ocupa una parte del cuadro, así que **reencuadra la toma del
 host** para que su cara quede libre:
