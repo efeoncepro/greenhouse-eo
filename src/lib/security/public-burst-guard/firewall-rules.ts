@@ -117,14 +117,78 @@ export type FirewallRuleChange =
   | { kind: 'update'; id: string; value: VercelFirewallRuleValue }
   | { kind: 'unchanged'; id: string; name: string }
 
-/** Proyección comparable: sólo los campos que este archivo gobierna. */
-const comparable = (rule: Pick<ActiveFirewallRule, 'description' | 'active' | 'conditionGroup' | 'action'>) =>
-  JSON.stringify({
-    description: rule.description ?? null,
-    active: rule.active ?? null,
-    conditionGroup: rule.conditionGroup ?? null,
-    action: rule.action ?? null
-  })
+type UnknownRecord = Record<string, unknown>
+
+const asRecord = (value: unknown): UnknownRecord =>
+  typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as UnknownRecord) : {}
+
+const sortedStrings = (value: unknown) =>
+  Array.isArray(value) && value.every(item => typeof item === 'string') ? [...value].sort() : value
+
+/**
+ * Serialización canónica: el orden de las claves de un objeto no es semántico. Los arrays se
+ * conservan aquí porque `conditionGroup` y `conditions` sí tienen orden; los arrays-set se
+ * ordenan explícitamente al proyectarlos.
+ */
+const canonicalize = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(canonicalize)
+  if (typeof value !== 'object' || value === null) return value
+
+  return Object.fromEntries(
+    Object.entries(value as UnknownRecord)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, nested]) => [key, canonicalize(nested)])
+  )
+}
+
+/** Proyección comparable: sólo los campos que gobierna esta fuente versionada. */
+const comparable = (rule: ActiveFirewallRule) => {
+  const conditionGroup = Array.isArray(rule.conditionGroup)
+    ? rule.conditionGroup.map(rawGroup => {
+        const group = asRecord(rawGroup)
+
+        return {
+          conditions: Array.isArray(group.conditions)
+            ? group.conditions.map(rawCondition => {
+                const condition = asRecord(rawCondition)
+
+                return {
+                  type: condition.type,
+                  op: condition.op,
+                  value: sortedStrings(condition.value),
+                  neg: condition.neg === true
+                }
+              })
+            : []
+        }
+      })
+    : []
+
+  const action = asRecord(rule.action)
+  const mitigate = asRecord(action.mitigate)
+  const rateLimit = asRecord(mitigate.rateLimit)
+
+  return JSON.stringify(
+    canonicalize({
+      name: rule.name,
+      description: rule.description,
+      active: rule.active,
+      conditionGroup,
+      action: {
+        mitigate: {
+          action: mitigate.action,
+          rateLimit: {
+            algo: rateLimit.algo,
+            window: rateLimit.window,
+            limit: rateLimit.limit,
+            keys: sortedStrings(rateLimit.keys),
+            action: rateLimit.action
+          }
+        }
+      }
+    })
+  )
+}
 
 /**
  * Plan idempotente por nombre de regla: inserta las que faltan, actualiza las que difieren y
