@@ -1,23 +1,34 @@
 # TASK-1651 — Growth SEO: familia `ai_optimization` (DataForSEO) + fundación SoV de marca en LLMs per-org
 
-## Delta 2026-09-28 — `1651-A` code complete; rollout DB pendiente
+## Delta 2026-09-28 — consumer CLI gobernado; CHECK y canary verificados
+
+El delta de TASK-1935 agrega `ai-research` como consumer local de las rutas ya autorizadas. El panel es versionado,
+separa API de consumer surface, normaliza citas/`fan_out_queries`/`brand_entities` y aplica checkpoint, resume y
+gasto progresivo por organización. No agrega schema, worker, cron, readers ni MCP de `1651-B`.
+
+La migración `20260928095506879_task-1651-ai-optimization-family.sql` se aplicó el 2026-09-28 después de verificar
+que era la única pendiente. El readback confirmó el constraint validado con las seis familias. Un canary API de
+AI Keyword Data para una organización con entitlement y techo explícito de USD 0,012 costó USD 0,0101; el ledger
+registró una sola llamada con `family=ai_optimization`, `consumer=aeo` y `cost_basis=invoiced`. Repetir el mismo
+panel con `--resume` reutilizó el checkpoint con costo incremental cero y dejó el contador en uno.
+
+## Delta 2026-09-28 — `1651-A` operativa; `1651-B` no iniciada
 
 El pedido del operador de usar la CLI DataForSEO para research ejecutó sólo `1651-A`, reutilizando
 la CLI de TASK-1935. El registry, catálogo, transporte GET/POST, presets y guards locales ya cubren
 las 53 rutas oficiales actuales de `ai_optimization`; los cuatro endpoints `/models` se verificaron
-live con HTTP 200 y costo USD 0. No se hizo ninguna llamada pagada a la familia.
+live con HTTP 200 y costo USD 0. La primera llamada pagada se limitó al canary descrito arriba.
 
-La migración `20260928095506879_task-1651-ai-optimization-family.sql` amplía el CHECK del ledger,
-pero **no se aplicó** a staging ni producción. Por eso `1651-A` queda `code complete, rollout DB
-pendiente`; `1651-B` conserva su alcance P3 y no fue iniciado. No se agregaron cron, snapshots,
-readers, MCP tools ni flags de captura.
+La migración amplía el CHECK del ledger y quedó aplicada y verificada en el Postgres configurado. Por eso
+`1651-A` queda operativa para llamadas gobernadas desde la CLI; `1651-B` conserva su alcance P3 y no fue iniciado.
+No se agregaron cron, snapshots, readers, MCP tools ni flags de captura.
 
 ## Delta 2026-08-27
 
 - El ledger `seo_provider_spend_daily` ganó `consumer` (`seo`|`aeo`), `cost_basis`
   (`invoiced`|`estimated`) y `price_table_version`, y su clave única pasó a seis columnas
   `NULLS NOT DISTINCT` `(organization_id, family, spend_date, consumer, cost_basis,
-  price_table_version)` — cambiado por TASK-1696. La ampliación del CHECK de `family` que esta task
+price_table_version)` — cambiado por TASK-1696. La ampliación del CHECK de `family` que esta task
   debe hacer en el mismo PR sigue igual, pero el `ON CONFLICT` con el que convive ya no es de tres
   columnas.
 - El transporte `postDataForSeoTask` ahora **exige** `consumer` en todas sus variantes: toda llamada
@@ -41,10 +52,10 @@ task) y §8 (higiene documental pendiente).
 
 Dentro de este mismo archivo, el trabajo queda partido en dos bloques con prioridad distinta:
 
-| Bloque | Qué es | Prioridad | Por qué |
-|---|---|---|---|
+| Bloque       | Qué es                                                                                                                                      | Prioridad           | Por qué                                                                                                                                                     |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`1651-A`** | Ampliación gobernada del allowlist: familia `ai_optimization` en `DATAFORSEO_FAMILIES` + CHECK del spend ledger migrado + paridad TS↔CHECK | **P1** (sin cambio) | Infraestructura barata, aditiva y sin gasto. **Habilita toda la sección**, incluido LLM Scraper — que es el endpoint que sí sirve en el mercado del cliente |
-| **`1651-B`** | Captura de LLM Mentions como fundación de SoV (schema, captura batch, readers, MCP tools, señal) | **P3** (baja) | Su valor marginal hoy es una historia longitudinal de una superficie que **ya sabemos mirar**; va detrás del camino es-LATAM |
+| **`1651-B`** | Captura de LLM Mentions como fundación de SoV (schema, captura batch, readers, MCP tools, señal)                                            | **P3** (baja)       | Su valor marginal hoy es una historia longitudinal de una superficie que **ya sabemos mirar**; va detrás del camino es-LATAM                                |
 
 **Por qué `1651-B` baja.** LLM Mentions cubre **sólo ChatGPT US/English + Google AI Overview**. Para
 Berel (CL/MX) **sólo aplica el lado google** — y esa superficie **ya la observamos nosotros** vía AI
@@ -101,7 +112,7 @@ semanal fabrica una serie que parece viva y está muerta.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `1651-A code complete, rollout DB pendiente · 1651-B definida`
+- Status real: `1651-A operativa: CHECK aplicado + canary/ledger verificados · 1651-B definida, no iniciada`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -230,7 +241,7 @@ Reglas obligatorias:
 - `src/lib/ai/dataforseo-families.ts` (familia nueva) + `src/lib/ai/__tests__/dataforseo-families.test.ts`
 - `migrations/[timestamp]_task-1651-ai-optimization-family-llm-sov.sql` (CHECK + tablas nuevas)
 - `src/lib/growth/seo/llm-sov/**` (contracts, captura, readers, MCP tools) `[verificar nombre final
-  del sub-módulo en Discovery]`
+del sub-módulo en Discovery]`
 - `services/ops-worker/server.ts` + `services/ops-worker/deploy.sh` (endpoint + flag, patrón TASK-1303)
 - `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (delta §6 familia nueva)
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (fila del flag nuevo)
@@ -325,7 +336,7 @@ Reglas obligatorias:
 ### Migration, backfill and rollout
 
 - Migration posture: `additive` (CHECK ampliado + tablas nuevas con GRANTs; marker `-- Up Migration`
-  + bloque DO anti pre-up-marker).
+  - bloque DO anti pre-up-marker).
 - Default state: `flag OFF` (`GROWTH_SEO_LLM_SOV_CAPTURE_ENABLED`, default false, registrado en el
   ledger en el mismo PR; multi-runtime: se lee en ops-worker → declararlo en `deploy.sh`).
 - Backfill plan: N/A (la base del proveedor arranca 2025-08-01 pero la captura nuestra arranca en
@@ -371,7 +382,7 @@ Reglas obligatorias:
 - [ ] Lógica en primitives `src/lib/growth/seo/llm-sov/**`, no en consumer alguno.
 - [ ] Reads como readers canónicos + MCP tools en el MISMO PR (mandato TASK-1645).
 - [ ] Si se gatea con capability nueva: registry + grant a ≥1 rol real + coverage test en el mismo PR
-  (TASK-873/935); si reutiliza `growth.seo.*` existente, declararlo.
+      (TASK-873/935); si reutiliza `growth.seo.*` existente, declararlo.
 - [ ] Camino programático declarado: lane ecosystem (MCP) desde el día uno; UI es follow-up.
 - [ ] La captura es command batch idempotente apto para reintento; sin lógica duplicada por consumer.
 
@@ -402,8 +413,9 @@ Reglas obligatorias:
 - Tests de familia + paridad TS↔CHECK verdes; delta en arch doc §6 (costos as-of 2026-08-06).
 - Delta en la skill `dataforseo-operator` (candidata #1 → integrada) **en este bloque**, no al final:
   el allowlist queda abierto acá y la skill es el mapa que otros agentes leen.
-- **Cero gasto**: `1651-A` no ejecuta ninguna llamada pagada. La primera llamada real pertenece a
-  `1651-B` (o a la task de LLM Scraper, si esa llega antes).
+- **Cierre de implementación sin gasto**: el código de `1651-A` quedó completo antes de cualquier POST pagado.
+  El rollout posterior autorizado usó un solo canary API con techo USD 0,012 y costo real USD 0,0101; no habilitó
+  captura recurrente ni adelantó `1651-B`.
 
 ## `1651-B` — fundación SoV de marca en LLMs (P3, detrás del camino es-LATAM y de `TASK-1696`)
 
@@ -412,7 +424,7 @@ Reglas obligatorias:
 - Migración de tablas nuevas bajo `greenhouse_growth` (naming final según Open Question #1):
   snapshot diario por `organization_id × surface × capture_date` con métricas de menciones (brand
   mentions, total answers, share) + tabla hija o JSONB para top domains/pages/brands `[decidir en
-  plan]`; GRANTs runtime; tipos regenerados (`pnpm db:generate-types`).
+plan]`; GRANTs runtime; tipos regenerados (`pnpm db:generate-types`).
 - Contracts TS en `src/lib/growth/seo/llm-sov/contracts.ts` con semántica ◑ documentada.
 - **Persistir `fan_out_queries` y `brand_entities` desde el schema inicial.** Vienen gratis y son
   insumo directo del modelado de Query Fan-Out (hoy sólo etiquetado con un `fanOutType` plano) y del
@@ -474,7 +486,7 @@ El detalle operativo de la API (endpoints exactos, params, costos, gotchas, vari
 diseño que el plan debe respetar:
 
 - **Costo Mentions**: $0.1/request + $0.001/fila. Estimación de batch: `orgs × requests_por_org ×
-  ($0.1 + filas_esperadas × $0.001)`; pasar al gate como `estimatedCostUsd`.
+($0.1 + filas_esperadas × $0.001)`; pasar al gate como `estimatedCostUsd`.
 - **Cobertura**: solo `chatgpt` (US/English) + `google_ai_overview`. Para marcas es-CL/MX **la única
   señal aplicable es el lado google**, que el grader ya observa vía AI Mode a USD 0,0026 por
   observación: lo que Mentions agrega es la **serie desde 2025-08-01**, no una superficie nueva.
@@ -507,16 +519,16 @@ diseño que el plan debe respetar:
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
-|---|---|---|---|---|
-| Sobregiro de presupuesto por org (gate se consulta una vez, gasto se acumula después) | finance/spend ledger | medium | `estimatedCostUsd` del batch completo + batch acotado por corrida + re-consulta del gate cada K orgs | `seo.provider.cost_over_budget` |
-| Familia en TS sin CHECK migrado → gasto real + INSERT fallido silencioso | migration/outbox | low | parity test rompe build; migración en el mismo PR; bloque DO | test CI + `seo.llm_sov.capture_stale` |
-| Cadencia de captura desalineada con refresh de la base (frecuencia NO publicada) | cron | high | arrancar semanal en staging; medir delta entre corridas **antes** de declarar cadencia en UI/reader/reporte/propuesta; ajustar scheduler. Invariante duro, no recomendación | comparación de snapshots consecutivos (plan) |
-| Compra recurrente sin techo en USD por org (defecto §1.2 con cron) | finance/spend | **high si B2 se prende sin `TASK-1696`** | B2 bloqueado por el gate de presupuesto en dólares; toda llamada pasa `organizationId` y escribe fila en el ledger | familia `ai_optimization` con llamadas y sin filas en `seo_provider_spend_daily` |
-| Se vende "SoV en LLMs" y la cobertura real es media superficie para el cliente | comercial/confianza | **high** | cobertura por superficie en el contrato y en el reader; el material comercial dice "ChatGPT US/EN + Google AI Overview", nunca "los LLMs" | una propuesta que promete Claude/Perplexity/Gemini desde esta lente |
-| Breaker de `ai_optimization` abierto apaga captura completa | cron | low | diseño ya aislado por familia (no afecta serp/labs); reintento en corrida siguiente | `seo.llm_sov.capture_stale` |
-| Costo real > estimado (variantes full vs Lite, filas mayores a lo esperado) | finance | medium | primera corrida staging con 1 org allowlist; comparar `cost` real del batch vs estimación; ajustar fórmula | spend diario familia `ai_optimization` en ledger |
-| Confusión de lentes SoV (proveedor ◑ vs grader) en consumers futuros | UI/reporting | medium | semántica ◑ en el contrato + naming `llm_sov_*` explícito + Out of Scope declarado | review humana en la task UI |
+| Riesgo                                                                                | Sistema              | Probabilidad                             | Mitigation                                                                                                                                                                  | Signal de alerta                                                                 |
+| ------------------------------------------------------------------------------------- | -------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Sobregiro de presupuesto por org (gate se consulta una vez, gasto se acumula después) | finance/spend ledger | medium                                   | `estimatedCostUsd` del batch completo + batch acotado por corrida + re-consulta del gate cada K orgs                                                                        | `seo.provider.cost_over_budget`                                                  |
+| Familia en TS sin CHECK migrado → gasto real + INSERT fallido silencioso              | migration/outbox     | low                                      | parity test rompe build; migración en el mismo PR; bloque DO                                                                                                                | test CI + `seo.llm_sov.capture_stale`                                            |
+| Cadencia de captura desalineada con refresh de la base (frecuencia NO publicada)      | cron                 | high                                     | arrancar semanal en staging; medir delta entre corridas **antes** de declarar cadencia en UI/reader/reporte/propuesta; ajustar scheduler. Invariante duro, no recomendación | comparación de snapshots consecutivos (plan)                                     |
+| Compra recurrente sin techo en USD por org (defecto §1.2 con cron)                    | finance/spend        | **high si B2 se prende sin `TASK-1696`** | B2 bloqueado por el gate de presupuesto en dólares; toda llamada pasa `organizationId` y escribe fila en el ledger                                                          | familia `ai_optimization` con llamadas y sin filas en `seo_provider_spend_daily` |
+| Se vende "SoV en LLMs" y la cobertura real es media superficie para el cliente        | comercial/confianza  | **high**                                 | cobertura por superficie en el contrato y en el reader; el material comercial dice "ChatGPT US/EN + Google AI Overview", nunca "los LLMs"                                   | una propuesta que promete Claude/Perplexity/Gemini desde esta lente              |
+| Breaker de `ai_optimization` abierto apaga captura completa                           | cron                 | low                                      | diseño ya aislado por familia (no afecta serp/labs); reintento en corrida siguiente                                                                                         | `seo.llm_sov.capture_stale`                                                      |
+| Costo real > estimado (variantes full vs Lite, filas mayores a lo esperado)           | finance              | medium                                   | primera corrida staging con 1 org allowlist; comparar `cost` real del batch vs estimación; ajustar fórmula                                                                  | spend diario familia `ai_optimization` en ledger                                 |
+| Confusión de lentes SoV (proveedor ◑ vs grader) en consumers futuros                  | UI/reporting         | medium                                   | semántica ◑ en el contrato + naming `llm_sov_*` explícito + Out of Scope declarado                                                                                          | review humana en la task UI                                                      |
 
 ### Feature flags / cutover
 
@@ -529,13 +541,13 @@ diseño que el plan debe respetar:
 
 ### Rollback plan per slice
 
-| Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
-| Slice 1 (familia+CHECK) | revert PR; CHECK ampliado es aditivo (no rompe filas existentes) | <10 min | sí |
-| Slice 2 (schema) | tablas aditivas quedan vacías; revert PR del código; DROP solo vía down migration si se decide | <10 min | sí |
-| Slice 3 (captura) | flag OFF + pause del Cloud Scheduler job | <5 min | sí |
-| Slice 4 (readers/MCP) | revert PR (reads aditivos) | <10 min | sí |
-| Slice 5 (señal/docs) | revert PR | <10 min | sí |
+| Slice                   | Rollback                                                                                       | Tiempo  | Reversible? |
+| ----------------------- | ---------------------------------------------------------------------------------------------- | ------- | ----------- |
+| Slice 1 (familia+CHECK) | revert PR; CHECK ampliado es aditivo (no rompe filas existentes)                               | <10 min | sí          |
+| Slice 2 (schema)        | tablas aditivas quedan vacías; revert PR del código; DROP solo vía down migration si se decide | <10 min | sí          |
+| Slice 3 (captura)       | flag OFF + pause del Cloud Scheduler job                                                       | <5 min  | sí          |
+| Slice 4 (readers/MCP)   | revert PR (reads aditivos)                                                                     | <10 min | sí          |
+| Slice 5 (señal/docs)    | revert PR                                                                                      | <10 min | sí          |
 
 ### Production verification sequence
 
@@ -563,13 +575,19 @@ diseño que el plan debe respetar:
 
 **`1651-A`:**
 
-- [x] `DATAFORSEO_FAMILIES` incluye `ai_optimization` con `requiresOrganization: true` y el parity
-      test TS↔CHECK pasa contra la migración versionada. Aplicación runtime pendiente.
+- [x] `DATAFORSEO_FAMILIES` incluye `ai_optimization` con `requiresOrganization: true`; el parity
+      test TS↔CHECK pasa y el constraint runtime quedó aplicado y validado.
 - [x] Un intento de endpoint fuera del prefijo `/v3/ai_optimization/` con esa familia lanza
       (`normalizeEndpoint`), verificado por test.
-- [x] `1651-A` queda code complete **sin haber ejecutado una sola llamada pagada** a la familia nueva.
+- [x] `1651-A` quedó code complete antes de ejecutar una llamada pagada; el rollout posterior usó sólo el canary
+      autorizado, con techo USD 0,012 y costo real USD 0,0101.
 - [x] La skill `dataforseo-operator` refleja el allowlist ampliado y la cobertura real **por
       endpoint** (Mentions ≠ Scraper ≠ Responses).
+- [x] `ai-research` usa `consumer='aeo'`, organización explícita, checkpoint tenant-safe y entitlement/costo
+      progresivo antes de cada POST nuevo.
+- [x] La migración del CHECK está aplicada y el constraint real validado acepta `ai_optimization`.
+- [x] Un canary mínimo con techo USD 0,012 dejó readback atribuible en `seo_provider_spend_daily`: una llamada,
+      `consumer=aeo`, `cost_basis=invoiced`, USD 0,010100; `--resume` no agregó llamadas ni costo.
 
 **`1651-B`:**
 
@@ -583,7 +601,7 @@ diseño que el plan debe respetar:
 - [ ] `fan_out_queries` y `brand_entities` quedan persistidos desde la primera corrida.
 - [ ] 🔴 La cadencia declarada al cliente **está respaldada por deltas medidos** entre corridas
       consecutivas en staging; si no se midió, el cierre dice `code complete, cadencia no
-      verificada` y ninguna superficie promete periodicidad.
+  verificada` y ninguna superficie promete periodicidad.
 - [ ] La captura con flag OFF no ejecuta ninguna llamada al proveedor (verificado en staging logs).
 - [ ] Una corrida real en staging (1 org) materializa snapshot append-only, registra gasto en
       `seo_provider_spend_daily` con familia `ai_optimization`, y una segunda corrida el mismo día

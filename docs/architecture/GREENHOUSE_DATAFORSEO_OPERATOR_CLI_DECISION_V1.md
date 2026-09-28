@@ -4,6 +4,9 @@
 > Owner: Growth SEO / Platform
 > Task: `TASK-1935`
 
+Vista funcional: [`dataforseo-research-cli.md`](../documentation/growth/dataforseo-research-cli.md). Manual:
+[`dataforseo-cli.md`](../manual-de-uso/growth/dataforseo-cli.md).
+
 ## Context
 
 Greenhouse ya posee un transporte DataForSEO con auth, breaker, allowlist y spend ledger, pero no una entrada de
@@ -24,14 +27,23 @@ keywords. Inventario oficial, autorización Greenhouse y disponibilidad runtime 
    enlazadas por la portada oficial. No se inventa un OpenAPI.
 4. El snapshot distingue `official inventory` de `executable coverage`. Las seis familias del allowlist pueden
    ejecutarse; TASK-1651-A agrega `ai_optimization` con el mismo CHECK del ledger y paridad TS↔SQL.
-5. La CLI es server-only y local. Para gasto atribuible consume `enforceSeoRunEntitlement`; nunca fabrica una
-   organización. Sin `--yes` opera como preview. Todo POST pagado exige un ceiling y una estimación verificable o
-   declarada.
+5. La CLI es server-only y local. Research SEO consume `enforceSeoRunEntitlement`; research AI consume
+   `resolveAeoBudget`. Nunca fabrica una organización. Sin `--yes` opera como preview. Todo POST pagado exige un
+   ceiling y una estimación verificable o declarada.
 6. El lifecycle asíncrono separa submit, pending y result. Polling nunca resubmite el POST original.
 7. Los GET de catálogo, modelos y polling no crean gasto y pueden operar sin organización. Todo POST de
    `ai_optimization` exige organización, entitlement y `consumer='aeo'`; el preview sigue siendo libre de org.
-8. LLM Responses exige `max_output_tokens`; LLM Mentions exige `platform` explícita. `--max-usd` compara la
-   estimación preflight y no se presenta como hard cap del proveedor.
+8. LLM Responses exige `max_output_tokens`; LLM Mentions exige `platform` explícita. `--max-usd` valida el plan y,
+   antes de cada POST nuevo, compara costo real acumulado + estimación incremental. No se presenta como hard cap
+   transaccional dentro del proveedor.
+9. Los comandos compuestos persisten un checkpoint versionado por `runId`, organización y fingerprint. Cada
+   request aceptado se registra antes del siguiente; reanudar nunca vuelve a comprar un paso fresco idéntico.
+10. El gasto compuesto se gobierna progresivamente: antes de cada POST se compara costo real acumulado más la
+    estimación incremental contra el ceiling y se reconsulta entitlement.
+11. `research` usa SERP task-based Standard por defecto. Live y AI Overview son opt-in. `--yes` confirma gasto,
+    pero la selección SERP exige además un archivo de finalistas o aprobación explícita del ranking automático.
+12. `ai-research` consume un panel versionado y conserva separadas las lanes API y consumer surface. Normaliza
+    citas, fan-out, entidades y resultados por plataforma sin crear el data product recurrente de TASK-1651-B.
 
 ## Technical architecture
 
@@ -45,8 +57,11 @@ data/dataforseo/endpoints.v3.json
         ├── quick ── presets + market resolver
         ├── run ──── payload JSON genérico
         ├── task wait ── GET acotado, nunca resubmit
-        └── research ─── Labs discovery → overview → SERP/competitors
-                         │
+        ├── research ─── Labs paginado → checkpoint editorial → SERP Standard → matriz
+        └── ai-research ─ panel versionado → API lanes + consumer lanes → matriz
+                         │                         │
+                         └──── checkpoint + costo progresivo
+                                                   │
                          ▼
                requestDataForSeo
           allowlist · auth · breaker · cost
@@ -63,6 +78,8 @@ data/dataforseo/endpoints.v3.json
 | `src/lib/ai/dataforseo-catalog.ts`              | Loader tipado, búsqueda y mapeo de la familia del proveedor al allowlist cerrado de Greenhouse.                         |
 | `src/lib/ai/dataforseo-cli-presets.ts`          | Builders pequeños para operaciones frecuentes; la identidad de mercado sale de `src/lib/growth/markets`.                |
 | `src/lib/ai/dataforseo-keyword-research.ts`     | Plan, estimación, payloads, extracción/deduplicación y CSV del flujo compuesto de keywords.                             |
+| `src/lib/ai/dataforseo-research-checkpoint.ts`  | Fingerprints, runId, cache con TTL, resume tenant-safe y escritura atómica de pasos/tasks/costo.                        |
+| `src/lib/ai/dataforseo-ai-research.ts`          | Contrato de panel AI, requests por lane y matriz normalizada API vs consumer surface.                                   |
 | `scripts/dataforseo/cli.ts`                     | Orquestación local, preview, confirmación, validación, preflight de entitlement, outcomes y artefactos.                 |
 | `src/lib/ai/dataforseo.ts`                      | Transporte único: credenciales, prefijo, timeout, retry, breaker y notificación de costo.                               |
 | `src/lib/growth/seo/entitlement.ts`             | Decisión de quota y presupuesto por organización antes del gasto.                                                       |
@@ -98,13 +115,23 @@ de que el proveedor aceptó y cobró.
 
 ### Composed research
 
-`research` es un orquestador local, no un endpoint nuevo. Ejecuta Suggestions y Related, permite Ideas de forma
-explícita y, con target, agrega Keywords for Site y Competitors. Deduplica candidatas, enriquece con Keyword
-Overview y compra SERP orgánica live sólo para finalistas acotadas. La estimación usa máximos declarados de filas y
-tasks (`conservative_max_rows_v1`); ejecutar exige organización, entitlement, confirmación y ceiling.
+`research` es un orquestador local, no un endpoint nuevo. Ejecuta Suggestions y Related paginados, permite Ideas
+de forma explícita y, con target, agrega Keywords for Site y Competitors. Deduplica candidatas, enriquece con
+Keyword Overview y se detiene para aprobación editorial antes de comprar SERP.
 
-El JSON conserva tasks crudas por paso. El CSV es sólo la tabla normalizada de keywords. No se afirma una decisión
-automática de cobertura editorial, un score de oportunidad ni una métrica AI cross-platform.
+La selección visible prioriza aprobación, intención, categoría, prioridad de negocio y brecha de cobertura; el
+volumen queda al final. El operador entrega un archivo de finalistas o confirma expresamente el ranking automático.
+SERP usa Standard (`task_post` + `task_get/advanced`) por defecto, persiste IDs antes del polling y nunca resubmite.
+Live y AI Overview requieren flags explícitos.
+
+El JSON conserva raw tasks. El CSV es una matriz con métricas, gobernanza, URLs propias/competidoras, dominios,
+SERP features, PAA, AI Overview/citas y provenance. No se afirma un score de oportunidad ni se confunde ausencia,
+no solicitado, sin datos y error.
+
+`ai-research` ejecuta un panel versionado de Responses, Scraper, AI Keyword Data y Mentions. API y consumer
+surface son lanes separadas. La matriz normaliza query, plataforma, modelo, mercado, citas, `fan_out_queries`,
+`brand_entities`, menciones, task IDs, costo y evidencia; el JSON conserva raw. Es tooling local, no schema,
+writer, reader, MCP, worker ni schedule de TASK-1651-B.
 
 ## Authorization, cost and tenancy
 
@@ -112,10 +139,10 @@ automática de cobertura editorial, un score de oportunidad ni una métrica AI c
 - Todo POST fuera de SERP exige `organizationId`; SERP permite prospectos públicos sin org. Si existe org, el
   recorder de gasto es obligatorio para cualquier familia.
 - Toda llamada declara `consumer: seo|aeo`; AI Optimization usa `aeo`, y los presets SEO/research usan `seo`.
-- La ejecución pagada exige estimación conocida o declarada más `--max-usd`. Es comparación previa, no un límite
-  transaccional del proveedor.
-- El entitlement se consulta antes de ejecutar. Limitación conocida: una corrida compuesta larga no reconsulta
-  después de cada llamada, por lo que necesita estimación agregada conservadora.
+- La ejecución pagada exige estimación conocida o declarada más `--max-usd`. Los comandos simples comparan antes
+  de la llamada; los compuestos vuelven a comparar costo real acumulado + siguiente estimación antes de cada POST.
+- Los comandos compuestos reconsultan entitlement antes de cada POST nuevo. Un paso fresco idéntico recuperado del
+  checkpoint no vuelve a gastar ni consume otra decisión de entitlement.
 - El costo registrado es `cost` de la respuesta completa; no se inventa un costo por task.
 
 ## Output and failure contract
@@ -134,21 +161,23 @@ El snapshot del 2026-09-28 contiene 545 rutas oficiales; 320 caen en las seis fa
 Cobertura significa que la CLI genérica puede enrutar un payload válido por el transporte gobernado; no significa
 que cada endpoint tenga preset, estimador específico o smoke pagado.
 
-`ai_optimization` está code-complete en registry, catálogo, transporte y guards locales. La migración
-`migrations/20260928095506879_task-1651-ai-optimization-family.sql` está versionada pero no aplicada a staging ni
-producción al 2026-09-28. Los GET gratuitos/modelos y previews son utilizables. Los POST pagados no se declaran
-operativos hasta aplicar el CHECK y verificar en staging entitlement, `consumer=aeo` y readback del gasto.
-Captura recurrente, schema, readers, MCP y schedules quedan fuera de la CLI y pertenecen a `TASK-1651-B`.
+`ai_optimization` está operativa en registry, catálogo, transporte y guards. La migración
+`migrations/20260928095506879_task-1651-ai-optimization-family.sql` quedó aplicada el 2026-09-28 y el readback
+confirmó el constraint validado con las seis familias. Un canary API con techo USD 0,012 costó USD 0,0101 y dejó
+una sola fila lógica atribuida a `consumer=aeo` y `cost_basis=invoiced`; reanudar desde el mismo checkpoint tuvo
+costo incremental cero y no aumentó `call_count`. Esto certifica la lane API gobernada, no todas las combinaciones
+de proveedor/modelo ni la consumer surface. Captura recurrente, schema, readers, MCP y schedules quedan fuera de
+la CLI y pertenecen a `TASK-1651-B`.
 
 ## Known limitations
 
 - La fuente oficial es documentación HTML/WordPress, no OpenAPI; la validación extraída es parcial.
 - El pricing no es uniforme. Sin estimador verificable, el operador debe declarar `--estimated-usd`.
-- `research` es secuencial y no tiene checkpoint, caché, resume ni paginación automática; repetir puede recomprar.
-- Sus finalistas siguen un orden basado en volumen, no un modelo de prioridad de negocio o relevancia editorial.
-- El CSV no normaliza SERP features, PAA, AI Overview ni URLs competidoras; esa evidencia queda en JSON.
-- El flujo compuesto usa SERP live. Task-based standard es preferible para lotes no urgentes y se opera con
-  `run` + `task wait`.
+- El ceiling progresivo evita iniciar el siguiente request, pero DataForSEO no ofrece un hard cap transaccional
+  dentro de un request ya aceptado.
+- Cache/checkpoints son artefactos locales; su TTL no convierte DataForSEO en fuente de primera parte.
+- `--max-pages` mantiene la paginación acotada; no afirma exhaustividad.
+- La prioridad editorial sigue requiriendo decisión humana aunque la tupla sea determinista.
 - Ejecutabilidad no crea un data product: un consumer recurrente requiere schema, writer, idempotencia/frescura,
   readers, MCP parity, rollout y evidencia runtime.
 
@@ -171,6 +200,8 @@ Captura recurrente, schema, readers, MCP y schedules quedan fuera de la CLI y pe
 
 - `pnpm dataforseo:catalog:check` detecta drift.
 - Tests comprueban rutas diarias, allowlist, Perú→2604, AI guards, research, estados task y GET sin body/retry.
+- Tests focales comprueban fingerprints, aislamiento tenant, TTL, costo progresivo, cursor/offset, gobernanza,
+  matriz SERP y normalización AI API vs consumer.
 - `pnpm typecheck`, lint y task lint protegen integración.
 
 ## Revisit triggers
@@ -178,4 +209,4 @@ Captura recurrente, schema, readers, MCP y schedules quedan fuera de la CLI y pe
 - DataForSEO publica OpenAPI oficial estable.
 - Se propone una séptima familia.
 - El catálogo supera el costo aceptable de sync o la portada deja de enumerar rutas concretas.
-- Research necesita checkpoint/resume, paginación, normalización SERP o un workflow AI compuesto.
+- DataForSEO cambia el contrato de tokens de paginación, precios Standard o shapes AI normalizados.

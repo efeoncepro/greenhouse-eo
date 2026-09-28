@@ -2,7 +2,7 @@
 
 **TASK-1863:** staging desplegado; main en espera. Efeonce CL/CO/PE/MX; [evidencia](docs/audits/platform/2026-09-28-task-1863-verification.md).
 
-**DataForSEO CLI (28/09):** [TASK-1935](docs/tasks/complete/TASK-1935-dataforseo-daily-operator-cli.md) complete con `research` compuesto (Labs → overview → SERP finalista, JSON/CSV); [TASK-1651-A](docs/tasks/in-progress/TASK-1651-growth-seo-dataforseo-ai-optimization-llm-sov-foundation.md) code complete: 545/320 rutas (53 AI), modelos live USD 0; migración sin aplicar. Commit local; sin push/deploy.
+**DataForSEO CLI (28/09):** [TASK-1935](docs/tasks/complete/TASK-1935-dataforseo-daily-operator-cli.md) complete con `research` SEO/AI gobernado y reanudable; [TASK-1651-A](docs/tasks/in-progress/TASK-1651-growth-seo-dataforseo-ai-optimization-llm-sov-foundation.md) operativa: CHECK aplicado/validado y canary AEO USD 0,0101 con resume sin recompra. `1651-B` no iniciada; sin push/deploy.
 
 **Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) code complete, rollout pendiente: en `develop` (37655fa93), no promover a main. Flag OFF; falta smoke en staging y federar en `efeonce-mcp`.
 

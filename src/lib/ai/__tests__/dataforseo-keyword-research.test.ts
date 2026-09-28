@@ -4,11 +4,45 @@ import {
   buildKeywordOverviewTasks,
   buildKeywordResearchDiscoveryRequests,
   buildKeywordResearchPlan,
+  buildNextResearchPageTasks,
+  enrichKeywordResearchWithSerp,
   extractKeywordResearchRows,
+  extractResearchCursor,
+  applyKeywordResearchGovernance,
   keywordResearchRowsToCsv,
   mergeKeywordResearchRows,
-  parseResearchSeeds
+  parseResearchSeeds,
+  selectKeywordResearchFinalists,
+  type DataForSeoKeywordResearchRow
 } from '../dataforseo-keyword-research'
+
+const row = (input: Partial<DataForSeoKeywordResearchRow> & Pick<DataForSeoKeywordResearchRow, 'keyword'>) => ({
+  normalizedKeyword: input.keyword.toLocaleLowerCase('es'),
+  coreKeyword: null,
+  searchVolume: null,
+  searchVolumeState: 'missing' as const,
+  cpc: null,
+  competition: null,
+  competitionLevel: null,
+  keywordDifficulty: null,
+  intent: null,
+  declaredIntent: null,
+  category: null,
+  businessPriority: null,
+  existingCoverage: 'unknown' as const,
+  finalistApproved: false,
+  selectionReasons: [],
+  ownUrls: [],
+  competitorUrls: [],
+  competitorDomains: [],
+  serpFeatures: [],
+  paaQuestions: [],
+  aiOverviewPresent: null,
+  aiOverviewCitations: [],
+  evidence: [],
+  sources: [],
+  ...input
+})
 
 describe('DataForSEO keyword research', () => {
   it('builds a bounded multi-step plan with a conservative aggregate estimate', () => {
@@ -29,6 +63,7 @@ describe('DataForSEO keyword research', () => {
       discoveryLimit: 20,
       candidateLimit: 100,
       serpLimit: 5,
+      serpMode: 'standard',
       estimateBasis: 'conservative_max_rows_v1'
     })
     expect(plan.steps.map(step => step.name)).toEqual([
@@ -81,20 +116,12 @@ describe('DataForSEO keyword research', () => {
 
   it('merges provenance and lets overview enrichment replace a missing metric', () => {
     const rows = mergeKeywordResearchRows([
-      {
+      row({
         keyword: 'SEO con IA',
         normalizedKeyword: 'seo con ia',
-        coreKeyword: null,
-        searchVolume: null,
-        searchVolumeState: 'missing',
-        cpc: null,
-        competition: null,
-        competitionLevel: null,
-        keywordDifficulty: null,
-        intent: null,
         sources: ['suggestions']
-      },
-      {
+      }),
+      row({
         keyword: 'seo con ia',
         normalizedKeyword: 'seo con ia',
         coreKeyword: 'seo ia',
@@ -106,7 +133,7 @@ describe('DataForSEO keyword research', () => {
         keywordDifficulty: 12,
         intent: 'commercial',
         sources: ['overview']
-      }
+      })
     ])
 
     expect(rows).toEqual([
@@ -129,5 +156,74 @@ describe('DataForSEO keyword research', () => {
 
     expect(buildKeywordOverviewTasks(rows, plan)[0]?.keywords).toEqual(['uno, dos'])
     expect(keywordResearchRowsToCsv(rows)).toContain('"uno, dos"')
+  })
+
+  it('ranks governed relevance and coverage before volume', () => {
+    const governed = applyKeywordResearchGovernance(
+      [row({ keyword: 'mucho volumen', searchVolume: 10_000 }), row({ keyword: 'brecha clave', searchVolume: 50 })],
+      [
+        {
+          keyword: 'brecha clave',
+          intent: 'commercial',
+          category: 'servicio',
+          businessPriority: 5,
+          existingCoverage: 'gap'
+        }
+      ]
+    )
+
+    expect(selectKeywordResearchFinalists(governed, 1, 'approved')[0]).toMatchObject({
+      keyword: 'brecha clave',
+      finalistApproved: true,
+      businessPriority: 5,
+      existingCoverage: 'gap'
+    })
+  })
+
+  it('normalizes SERP features, PAA, owned URLs, competitor URLs and AI citations', () => {
+    const enriched = enrichKeywordResearchWithSerp({
+      rows: [row({ keyword: 'seo con ia' })],
+      target: 'efeonce.org',
+      endpoint: '/v3/serp/google/organic/live/advanced',
+      observedAt: '2026-09-28T12:00:00.000Z',
+      tasks: [
+        {
+          id: 'task-1',
+          result: [
+            {
+              keyword: 'seo con ia',
+              items: [
+                { type: 'organic', url: 'https://efeonce.org/seo', domain: 'efeonce.org' },
+                { type: 'organic', url: 'https://competidor.cl/a', domain: 'competidor.cl' },
+                { type: 'people_also_ask', title: '¿Qué es AEO?' },
+                {
+                  type: 'ai_overview',
+                  references: [{ type: 'ai_overview_reference', url: 'https://fuente.cl/a' }]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    })[0]
+
+    expect(enriched).toMatchObject({
+      ownUrls: ['https://efeonce.org/seo'],
+      paaQuestions: ['¿Qué es AEO?'],
+      aiOverviewPresent: true
+    })
+    expect(enriched.competitorUrls).toEqual(expect.arrayContaining(['https://competidor.cl/a', 'https://fuente.cl/a']))
+    expect(enriched.aiOverviewCitations).toEqual(['https://fuente.cl/a'])
+  })
+
+  it('uses provider cursors for subsequent pages and falls back to bounded offset', () => {
+    const cursor = extractResearchCursor([{ result: [{ offset_token: 'opaque' }] }])
+
+    expect(buildNextResearchPageTasks([{ keyword: 'seo', limit: 100 }], cursor, 100, 1)).toEqual([
+      { limit: 100, offset_token: 'opaque' }
+    ])
+    expect(buildNextResearchPageTasks([{ keyword: 'seo', limit: 100 }], null, 100, 2)).toEqual([
+      { keyword: 'seo', limit: 100, offset: 200 }
+    ])
   })
 })

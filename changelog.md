@@ -9,13 +9,18 @@
 
 ## 2026-09-28 — DataForSEO tiene CLI diaria y catálogo oficial reproducible (TASK-1935)
 
-- Delta: `pnpm dataforseo -- research` encadena minería Labs, enriquecimiento y SERP finalista con previsión
-  agregada, procedencia y export JSON/CSV; `keyword_ideas` queda opt-in para evitar deriva categorial.
+- Delta: `pnpm dataforseo -- research` encadena minería Labs, gobernanza explícita de finalistas, enriquecimiento
+  SERP Standard y una matriz JSON/CSV con intención, cobertura, competidores, features, PAA, citas y procedencia.
+  Pagina y reanuda por checkpoint sin recomprar pasos; `keyword_ideas` y AI Overview quedan opt-in.
+
+- `pnpm dataforseo -- ai-research` ejecuta paneles versionados para Responses, Scraper, AI Keyword Data y Mentions,
+  separa API de consumer surface y normaliza citas, fan-out, entidades, modelos, costo y evidencia.
 
 - TASK-1651-A amplía el allowlist gobernado a `ai_optimization`: 53 rutas de LLM Responses, LLM Scraper,
   AI Keyword Data y LLM Mentions quedan operables desde la CLI. GET de modelos/catálogos/polling es gratuito
   y no exige organización; todo POST real exige organización, entitlement, estimación, ceiling y ledger AEO.
-  La migración del CHECK está versionada y todavía no aplicada.
+  El CHECK quedó aplicado y validado. Un canary API con techo USD 0,012 costó USD 0,0101 y dejó una llamada
+  `consumer=aeo` en el ledger; repetirlo con `--resume` tuvo costo incremental cero y no elevó `call_count`.
 
 - `pnpm dataforseo` descubre 545 endpoints oficiales y separa los 320 ejecutables bajo el allowlist vigente de los
   que sólo se pueden consultar en catálogo. Incluye presets diarios, payload por archivo/JSON/stdin, lifecycle async,
@@ -31,8 +36,6 @@
   declarada por proveedor, presupuesto total y cobertura honesta de motores en informe/PDF.
 - Staging desplegado, migraciones y backfill aplicados a 27 perfiles; main en espera. Evidencia en
   [la evidencia de TASK-1863](docs/audits/platform/2026-09-28-task-1863-verification.md).
-
-
 - Nueva cola `greenhouse_brand` (pedidos, jobs y eventos append-only). El command `requestBrandRender` valida el
   contrato AXIS y la receta aprobada antes de encolar, exige cada fuente como asset del uploader y es idempotente. Lo
   llaman el lane App, el lane ecosystem y tres tools MCP (`request_brand_render`, `get_brand_render_request`,

@@ -6,6 +6,9 @@
 `pnpm dataforseo` es la entrada gobernada para research ad hoc. Usa el mismo transporte, allowlist, breaker,
 entitlement y ledger que los consumers productivos; no es un SDK alternativo. La fuente rápida de sintaxis es:
 
+Comportamiento funcional: [`dataforseo-research-cli.md`](../../documentation/growth/dataforseo-research-cli.md).
+Contrato técnico: [`GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md`](../../architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md).
+
 ```bash
 pnpm dataforseo -- help
 ```
@@ -111,7 +114,8 @@ no conviertas la ausencia de preset en permiso para usar `curl`.
 
 `research` encadena descubrimiento, enriquecimiento y validación sin bajar todo el universo a SERP. Por defecto
 usa Suggestions + Related; agrega Keywords for Site y Competitors cuando recibe `--target`. `keyword_overview`
-enriquece hasta 700 candidatas y la SERP orgánica valida sólo las finalistas.
+enriquece hasta 700 candidatas y SERP Standard valida sólo las finalistas aprobadas. Live y AI Overview son
+opt-in.
 
 ```bash
 pnpm dataforseo -- research \
@@ -121,10 +125,14 @@ pnpm dataforseo -- research \
   --limit 50 \
   --candidate-limit 500 \
   --serp-limit 10 \
+  --serp-mode standard \
+  --page-size 100 \
+  --max-pages 2 \
   --dry-run
 ```
 
-El preview muestra el plan y una estimación conservadora agregada. Para ejecutar y guardar ambos formatos:
+El preview muestra el plan, el modo SERP, el checkpoint editorial y una estimación conservadora. La ejecución
+exige un checkpoint persistente, porque un POST aceptado nunca se vuelve a enviar automáticamente:
 
 ```bash
 pnpm dataforseo -- research \
@@ -132,15 +140,57 @@ pnpm dataforseo -- research \
   --market CL \
   --target efeonce.org \
   --org <uuid> \
-  --max-usd <techo-mayor-o-igual-a-la-estimacion> \
+  --max-usd 0.25 \
+  --checkpoint /tmp/keyword-research.checkpoint.json \
+  --yes \
+  --out /tmp/keyword-candidates.json \
+  --csv /tmp/keyword-candidates.csv
+```
+
+La primera pasada se detiene antes de SERP con `outcome: awaiting_finalist_approval`. Revisa el CSV y crea un
+archivo JSON como éste:
+
+```json
+[
+  {
+    "keyword": "agencia seo con ia",
+    "intent": "commercial",
+    "category": "seo-aeo",
+    "businessPriority": 5,
+    "existingCoverage": "gap",
+    "approved": true
+  }
+]
+```
+
+Reanuda sin recomprar Suggestions, Related ni Overview:
+
+```bash
+pnpm dataforseo -- research \
+  --keyword "seo con ia,visibilidad en chatgpt" \
+  --market CL \
+  --target efeonce.org \
+  --org <uuid> \
+  --max-usd 0.25 \
+  --resume /tmp/keyword-research.checkpoint.json \
+  --finalists-file /tmp/finalistas.json \
   --yes \
   --out /tmp/keyword-research.json \
   --csv /tmp/keyword-research.csv
 ```
 
-La salida deduplica por keyword normalizada, conserva procedencia y distingue volumen ausente, `null` y cero.
-Ordena primero las filas con volumen observado, sin fabricar un score de oportunidad. El JSON conserva las
-respuestas por paso para revisar SERP, PAA y competidores; el CSV entrega la tabla de keywords enriquecida.
+`--approve-ranked-finalists` permite aprobar explícitamente el ranking automático, pero no es implícito en
+`--yes`. La tupla de selección prioriza aprobación, intención, categoría, prioridad de negocio y brecha de
+cobertura; el volumen sólo desempata después. `--cache-max-age-hours` controla la frescura de métricas reutilizadas.
+
+El CSV final es una matriz auditable: métricas, intención, gobernanza, URLs propias/competidoras, dominios,
+features, PAA, presencia/citas de AI Overview y evidencia con endpoint/task/fecha. El JSON conserva además las
+respuestas crudas. Missing, `null`, cero, no solicitado, sin datos y error no se colapsan.
+
+Para recuperar una task Standard pendiente, repite el mismo comando con `--resume`; el task ID se guarda justo
+después de `task_post`. No vuelvas a ejecutar con un checkpoint nuevo. Usa `--serp-mode live` sólo cuando la
+latencia lo justifique y `--load-ai-overview` sólo si el objetivo requiere ese bloque y el preview muestra el
+multiplicador.
 
 `--include-ideas` añade `keyword_ideas`, pero sólo debe usarse con seeds de una categoría homogénea: una entidad
 dominante puede arrastrar una categoría válida pero ajena. Los límites son muestra y control de costo, nunca una
@@ -179,6 +229,31 @@ Para una comparación multi-modelo, conserva una fila por plataforma/modelo/merc
 de preguntas propuestas. No mezcles una respuesta de API con la interfaz de consumidor: `llm_responses` y
 `llm_scraper` observan superficies distintas. Los `fan_out_queries` y `brand_entities` del proveedor son evidencia
 para análisis de entidades; no son un score propio de Greenhouse.
+
+`ai-research` automatiza ese panel sin mezclar las superficies. Copia
+[`dataforseo-ai-research-panel.example.json`](dataforseo-ai-research-panel.example.json), consulta los `/models`
+gratuitos y reemplaza cada modelo antes del preview. Cada lane declara su estimación por task porque el pricing
+depende del endpoint y modelo.
+
+```bash
+pnpm dataforseo -- ai-research \
+  --panel /tmp/panel-ai.json \
+  --dry-run
+
+pnpm dataforseo -- ai-research \
+  --panel /tmp/panel-ai.json \
+  --org <uuid> \
+  --max-usd 0.25 \
+  --checkpoint /tmp/panel-ai.checkpoint.json \
+  --yes \
+  --out /tmp/panel-ai.json.out \
+  --csv /tmp/panel-ai.csv
+```
+
+El resultado separa `result.api` de `result.consumer` y normaliza query, plataforma, modelo, mercado, respuesta,
+citas, `fanOutQueries`, `brandEntities`, menciones, task IDs, costo y procedencia. `--resume` reutiliza únicamente
+requests con el mismo digest de panel, organización y TTL. Este comando es research local, no el pipeline
+recurrente de TASK-1651-B.
 
 ## Endpoint genérico
 
@@ -257,20 +332,18 @@ de catálogo en ampliación de autorización.
 
 ## Limitaciones y estado operativo
 
-- `--max-usd` compara una estimación antes de la llamada. No es un hard cap transaccional de DataForSEO.
-- `research` es una corrida local secuencial: no tiene checkpoint, caché, reanudación ni paginación automática.
-  Un fallo tardío exige revisar los artefactos antes de repetir para no recomprar pasos.
-- El CSV de `research` es una tabla de keywords. SERP, PAA, AI Overview y competidores permanecen en las respuestas
-  crudas del JSON; el operador debe interpretarlos y conservar su fecha/procedencia.
-- La selección de finalistas SERP prioriza volumen observado; no sustituye relevancia, intención, cobertura propia
-  ni prioridad de negocio. `keyword_difficulty` tampoco equivale a una dificultad editorial total.
-- El research orgánico compuesto usa SERP live. Para lotes de baja urgencia, descubre y usa el lifecycle
-  task-based standard mediante `run` + `task wait` para reducir costo.
+- `--max-usd` frena cada siguiente request contra costo real acumulado + estimación incremental. Sigue sin ser un
+  hard cap transaccional dentro de DataForSEO: una respuesta individual puede costar más de lo estimado.
+- Checkpoints y cache son locales. Debes protegerlos como evidencia operativa y conservar el mismo archivo para
+  reanudar; cambiar plan, panel u organización falla cerrado.
+- La paginación está acotada por `--max-pages`; una muestra sigue sin demostrar exhaustividad.
+- El ranking de finalistas es una ayuda determinista, no una decisión editorial ni un score de oportunidad.
+- Standard reduce costo de lotes, pero puede quedar pending y requerir `--resume`.
 - La CLI cataloga endpoints fuera del allowlist, pero no puede ejecutar Keywords Data, Trends, Content Analysis,
   Business Data u otras familias sin una ampliación gobernada.
-- `ai_optimization` está integrado en código y catálogo. La migración
-  `20260928095506879_task-1651-ai-optimization-family.sql` sigue sin aplicarse en staging y producción al
-  2026-09-28. Los GET gratuitos y previews están disponibles; no declares operativo el POST pagado AI hasta aplicar
-  la migración y verificar CHECK, entitlement y fila de gasto en el ledger.
+- `ai_optimization` está integrado y el CHECK quedó aplicado y validado el 2026-09-28. Un canary API con techo
+  USD 0,012 costó USD 0,0101 y dejó una llamada `consumer=aeo`, `cost_basis=invoiced` en el ledger. Repetirlo con
+  `--resume` reutilizó el checkpoint sin costo incremental. Esta evidencia no certifica cada modelo ni la consumer
+  surface: usa preview, consulta `/models` y mantén un techo explícito para cada nueva combinación.
 - No existe captura recurrente AI, snapshot, reader, MCP ni cron por el solo hecho de que la CLI pueda ejecutar una
   ruta. Esos consumers pertenecen al rollout de `TASK-1651-B`.

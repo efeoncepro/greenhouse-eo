@@ -1,5 +1,14 @@
 # TASK-1935 — CLI diaria y catálogo completo de DataForSEO
 
+## Delta 2026-09-28 — research gobernado y reanudable
+
+Las cinco limitaciones registradas en el ADR quedan resueltas sin ampliar el allowlist: `research` produce matriz
+SEO/SERP con evidencia, exige gobernanza de finalistas, pagina con cursor/offset y reanuda desde checkpoint con
+TTL; revalida costo real acumulado y entitlement antes de cada POST; usa SERP Standard por defecto. El nuevo
+`ai-research` ejecuta paneles versionados y separa API de consumer surface mientras normaliza citas, fan-out,
+entidades y resultados por plataforma. TASK-1651 aplicó y verificó después el CHECK de `ai_optimization` y su
+primer canary acotado; TASK-1651-B no se inicia.
+
 ## Delta 2026-09-28 — discoverability para agentes y documentación operativa
 
 Las skills espejo `dataforseo-operator` y `seo-aeo` ahora enrutan explícitamente a `pnpm dataforseo`, distinguen
@@ -17,8 +26,8 @@ conserva procedencia y estados de volumen, calcula previsión agregada conservad
 
 La CLI conserva su cierre y ahora consume la sexta familia habilitada por TASK-1651-A:
 `ai_optimization`. El catálogo sigue en 545 endpoints, con 320 ejecutables en total y 53 rutas AI
-Optimization. La ampliación del allowlist, CHECK y rollout DB pertenece a TASK-1651; no reabre este
-scope ni convierte la migración pendiente en runtime verificado.
+Optimization. La ampliación del allowlist, CHECK y rollout DB pertenece a TASK-1651; su verificación runtime
+posterior no reabre este scope.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — INTAKE
@@ -41,7 +50,7 @@ scope ni convierte la migración pendiente en runtime verificado.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Complete local: catálogo 545/320, AI Optimization y keyword research compuesto; smokes pagados previos USD 0,006 y modelos AI USD 0; sin push, deploy ni flags`
+- Status real: `Complete local: catálogo 545/320, research SEO/AI gobernado y reanudable; canary AI USD 0,0101 con resume sin recompra; sin push, deploy ni flags`
 - Rank: `TBD`
 - Domain: `growth|seo|platform|ops`
 - Blocked by: `none`; coordina sin solapar con `TASK-1863` sobre `src/lib/growth/markets/`
@@ -193,7 +202,7 @@ Reglas obligatorias:
 ### Runtime evidence
 
 - Local checks: Vitest focal, TypeScript, lint, catálogo check y previews.
-- DB/runtime checks: entitlement focal; sin migración.
+- DB/runtime checks: entitlement AEO focal; CHECK `ai_optimization` aplicado/validado y ledger del canary leído.
 - Integration checks: un GET gratuito y smokes pagados mínimos sólo dentro de techo explícito.
 - Reliability signals/logs: breaker y spend ledger existentes.
 - Production verification sequence: no hay deploy; sync → tests → preview → GET gratuito → smoke mínimo autorizado.
@@ -326,6 +335,13 @@ N/A — cambio repo-only; no compra planes, no rota secretos y no despliega.
 - [x] Smokes reales mínimos quedan registrados con costo; no hay barrido pagado del catálogo.
 - [x] `research` encadena discovery, overview, SERP finalista y competencia bajo un presupuesto agregado.
 - [x] La salida deduplica, conserva procedencia y distingue volumen ausente, `null` y cero en JSON/CSV.
+- [x] El CSV normaliza intención, gobernanza, URLs propias/competidoras, features, PAA, AI Overview/citas y
+      provenance; el JSON conserva raw.
+- [x] SERP sólo corre con archivo de finalistas o aprobación automática explícita; `--yes` no sustituye ese gate.
+- [x] Checkpoint tenant-safe conserva runId, fingerprints, task IDs, TTL, cursores y costo para `--resume`.
+- [x] Cada POST compuesto revalida entitlement y costo observado + siguiente estimación contra `--max-usd`.
+- [x] SERP Standard es default; live y AI Overview son opt-in, y polling nunca resubmite.
+- [x] `ai-research` separa API/consumer y normaliza citas, fan-out, entidades, plataforma, modelo y costo.
 
 ## Verification
 
