@@ -310,6 +310,7 @@
     "foto:emblema": "node scripts/foto/emblema.mjs",
     "foto:isotipo": "node scripts/foto/isotipo.mjs",
     "brand:compose": "tsx scripts/brand-surfaces/compose.ts",
+    "brand:deck-plan": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/brand-surfaces/deck-plan.ts",
     "brand:deck-recipes": "node scripts/creative/deck-recipes/render-index.mjs",
     "brand:tokens": "tsx scripts/brand-surfaces/compile-tokens.ts",
     "glitch:compose": "tsx scripts/glitch/compose.ts",
