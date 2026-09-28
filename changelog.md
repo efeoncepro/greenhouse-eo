@@ -29,9 +29,8 @@
   explícitos, sin fallback US. Canary real: 22 éxitos y Cuba skip por falta de ubicación.
 - Mercados/competidores versionados, snapshots, lotes atómicos y matriz sin promedio; ubicación nativa
   declarada por proveedor, presupuesto total y cobertura honesta de motores en informe/PDF.
-- Migraciones/backfill y rollout siguen pendientes. Build y pruebas locales documentados en
+- Staging desplegado, migraciones y backfill aplicados a 27 perfiles; main en espera. Evidencia en
   [la evidencia de TASK-1863](docs/audits/platform/2026-09-28-task-1863-verification.md).
-
 
 
 - Nueva cola `greenhouse_brand` (pedidos, jobs y eventos append-only). El command `requestBrandRender` valida el
@@ -641,11 +640,3 @@ interoperabilidad y Marketing Cloud Next, con estados por capacidad y sin nuevos
 Studio, Microsoft Advertising, Prospecting Agent, ChatGPT Ads y las superficies mostradas en UNBOUND; Customer Agent
 Voice, HubSpot Work y Agent CLI quedan marcadas como first look/demo hasta verificar GA, pricing y runtime. No se
 activaron entitlements, betas, campañas ni conexiones.
-
-## 2026-09-17 — Higgsfield documentado como proveedor gobernado de Creative Studio
-
-La revisión de los nueve repositorios oficiales de Higgsfield quedó documentada en arquitectura, auditoría,
-documentación funcional, manual de uso, runbook, fleet ledger y skills espejo. API/SDK/CLI, skills agentic y MCP
-local para After Effects/Blender quedan como superficies preparadas; Higgsfield permanece
-`provider-supported / no Globe route` hasta contar con route card, adapter, secreto, coste, derechos, canary,
-Asset Governance y readback. No se instaló, generó, compró crédito ni publicó nada.

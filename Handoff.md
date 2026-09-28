@@ -1,6 +1,6 @@
 # Handoff activo
 
-**TASK-1863 (28/09):** rollout a staging autorizado, main en espera. DDL aditivo aplicado; cuatro perfiles Efeonce activos conservados (archivado inicial revertido), países confirmados CL/CO/PE/MX. Backfill y publicación en curso; [evidencia](docs/audits/platform/2026-09-28-task-1863-verification.md). Lint DataForSEO sin errores.
+**TASK-1863:** staging desplegado; main en espera. Efeonce CL/CO/PE/MX; [evidencia](docs/audits/platform/2026-09-28-task-1863-verification.md).
 
 **DataForSEO CLI (28/09):** [TASK-1935](docs/tasks/complete/TASK-1935-dataforseo-daily-operator-cli.md) complete con `research` compuesto (Labs → overview → SERP finalista, JSON/CSV); [TASK-1651-A](docs/tasks/in-progress/TASK-1651-growth-seo-dataforseo-ai-optimization-llm-sov-foundation.md) code complete: 545/320 rutas (53 AI), modelos live USD 0; migración sin aplicar. Commit local; sin push/deploy.
 
@@ -104,13 +104,7 @@ issues y el [contrato ATS](docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_
 `ISSUE-173`/`TASK-1872` (consumer Phase A), `TASK-1873`/`1874` (intake y Application 360), seis CV en cuarentena
 de `EO-OPN-0675`, readback del flag `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` y reader submissions↔postulaciones.
 
-**Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
-**no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
-`seo-aeo/references/competitor-methodologies-2026-09.md` (nuevo). `ai_optimization` sigue fuera del allowlist.
-Las 4 preguntas quedaron decididas el mismo día: `TASK-1870` (rotación SERP, costo cero) y `TASK-1871`
-(screening de toxicidad) en `to-do`; disavow descartado; gate de `rank_scale` ya en el repo. **Abierto:**
-`ISSUE-170` — el link gap del prospecto puede colapsar por intersección AND, con experimento definido y
-sin medir. Decisión y evidencia: `docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md`.
+**Revisión DataForSEO (11/09):** [investigación](docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md). TASK-1870/1871 en to-do; ISSUE-170 pendiente. El allowlist vigente está en la skill; [contexto histórico](docs/audits/platform/evidence/task-1863/context-history.md).
 
 **Portafolio de landings (2026-09-11, documental):** `EPIC-047` ordena las landings del sitio público en `Rank`;
 cuatro cerradas por el operador (1799, 1358, 1351, 1352). Decisiones pendientes en el epic.
