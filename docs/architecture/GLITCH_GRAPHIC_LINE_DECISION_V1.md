@@ -15,7 +15,9 @@
 > **lámina con lente** quedaron **Accepted** el 2026-09-27 ([Delta — blog y lente aprobados](#delta-2026-09-27--blog-y-lente-aprobados)):
 > ya no queda ninguna pieza estática en propuesta.
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude ([Delta de TASK-1922](#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922): **tokens `glitchLine`, contrato
+> **Última actualización:** 2026-09-27 por Claude ([Estado de implementación](#estado-de-implementación-task-1923-2026-09-27):
+> **las piezas estáticas ya se componen en el Artifact Composer** —TASK-1923, en local—, Guttery entra al repo privado y
+> dos desviaciones declaradas; antes, [Delta de TASK-1922](#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922): **tokens `glitchLine`, contrato
 > `efeonce.glitch-line` 0.1.0 y archivos de Glitch publicados en AXIS** —tag `v0.3.12`, autorizado por el operador— y
 > consumidos por Greenhouse (`4dfb147f7`); íconos de acción de la contraportada siempre Plastilina plana; antes,
 > [Delta del blog y la lente](#delta-2026-09-27--blog-y-lente-aprobados):
@@ -241,15 +243,16 @@ El único pendiente de la música es probar la mezcla con la voz real del host. 
 - Contenido del lower third: definido el 2026-09-27 (ver el Delta del piloto de motion).
 - Licencia de Guttery: confirmada por el operador (2026-09-27) y registrada en `glitchLine.type.narrator` (tag
   `v0.3.12`); falta sólo el número de contrato.
-- TASK-1923 (catálogos del Composer que leen `glitchLine`) y TASK-1924 (el taller lee `glitchLine` y retira su espejo de
-  paleta y manzana); promoción del contrato `efeonce.glitch-line` desde `candidate` tras la primera edición compuesta.
+- TASK-1924 (el taller lee `glitchLine` y retira su espejo de paleta y manzana); promoción del contrato
+  `efeonce.glitch-line` desde `candidate` tras la primera edición compuesta. TASK-1923 (catálogos del Composer que leen
+  `glitchLine`) ya existe en local: ver [Estado de implementación](#estado-de-implementación-task-1923-2026-09-27).
 
 ## Reversibilidad
 
 Alta. La sub-línea es documentación y piezas; nada del runtime de Greenhouse depende de ella. Desde el 2026-09-27 AXIS
 publica, además de la página de referencia, el token `glitchLine`, el contrato `efeonce.glitch-line` 0.1.0 y los
-archivos de Glitch (tag `v0.3.12`), todos en estado `candidate`, y Greenhouse fija esas versiones sin leerlas todavía
-en código (sólo un test focal). Revertir la decisión aceptada es retirar la norma y volver a componer Glitch con La
+archivos de Glitch (tag `v0.3.12`), todos en estado `candidate`. Desde TASK-1923 Greenhouse los lee: `pnpm glitch:tokens`
+compila `glitch-tokens.css` desde `glitchLine` y los catálogos de Glitch validan cada lámina con `efeonce.glitch-line`. Revertir la decisión aceptada es retirar la norma y volver a componer Glitch con La
 órbita; en AXIS, deprecar el token, el contrato y `AXIS_GLITCH_ASSETS` en una versión nueva (lo publicado no se
 borra). El costo de revertir crece cuando el catálogo entre al Composer (TASK-1923) y el taller lea el token
 (TASK-1924).
@@ -529,3 +532,60 @@ guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits
   promoción del contrato desde `candidate` tras la primera edición compuesta con él.
 - **Reversible:** deprecar el token, el contrato y `AXIS_GLITCH_ASSETS` en una versión nueva de AXIS y volver a fijar en
   Greenhouse las versiones anteriores (`v0.3.11`); nada del runtime de Greenhouse los lee todavía.
+
+## Estado de implementación (TASK-1923, 2026-09-27)
+
+> **Alcance:** sólo Glitch, nunca Efeonce. Registra lo construido por TASK-1923 (fila b del
+> [trabajo a crear](#trabajo-a-crear-tasks-creadas-el-2026-09-27-task-1922-task-1923-task-1924-d-vive-en-el-bloque-de-task-1337))
+> sin reescribir las decisiones anteriores. Detalle operativo en la
+> [norma §9.1, §10 y §12](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#91-qué-ya-se-compone-en-el-artifact-composer-task-1923)
+> y en el [manual para componer una edición](../manual-de-uso/creative/componer-una-edicion-de-glitch.md).
+
+**Qué existe** (commits en `develop` local, sin push, de `2f750b48c` a `19f66fa7f`):
+
+- **Tres catálogos sobre una misma carpeta**, como proponía el encaje verificado: `src/lib/artifact-composer/catalogs/glitch/`
+  con `glitch-carousel` (`pdf-merged`), `glitch-stills` (`png-set`) y `glitch-overlays` (`png-set` con alfa). **26
+  plantillas**, todas `approval: approved`: las 7 del carrusel (portada A/B/C, interior, interior de la noticia 1,
+  interior con lente, contraportada), 9 sueltas (banners 16:9 A/B/C, versión 1:1 A/B/C con plantilla propia, banner
+  interno de noticia 1600 × 900, portada del reel, miniatura del vlog) y 10 overlays PNG (cabecera, lower third, noticia,
+  Drop y CTA, en reel y en vlog), que son el cuadro fijo del kit de motion aprobado de TASK-1924. Sin color, medida ni
+  familia literal: todo sale de `glitch-tokens.css`, compilado desde `glitchLine` de AXIS 0.3.15.
+- **Manifiesto de edición** (`GlitchEditionManifest`, `src/lib/glitch-composition/manifest.ts`) y **mapper puro**
+  (`planGlitchEdition`): el selector de portada por rotación, el contrato `efeonce.glitch-line` 0.1.0 por lámina
+  (`validateGlitchLineIntent`) y la falla en bytes determinista calculada sobre la foto ya procesada, sin tocar la
+  cara. Validadores del catálogo (`validators.ts`, `edition-validators.ts`).
+- **CLI local** `pnpm glitch:compose`: carrusel en PDF verificado contra los límites de LinkedIn, sueltas, overlays y
+  procedencia sin reloj. Códigos de falla: `manifest-invalid`, `cover-rotation-unsatisfiable`, `contract-issues`,
+  `font-license-missing`, `fracture-over-face` y `carousel-too-heavy`. Dos corridas en procesos separados dan los mismos
+  35 PNG byte a byte.
+- **Gate visual:** `pnpm composer:visual-gate --catalog=glitch`, línea base de 26 cuadros en
+  `scripts/frontend/baselines/artifact-composer/templates-glitch/`.
+
+**Decisiones del operador que esta sección registra (2026-09-27):**
+
+| # | Tema | Decisión |
+|---|---|---|
+| 1 | Guttery en el repo | **entra al repo privado** de Greenhouse como extensión `glitch` del brand pack `axis` (`brand-packs/axis/fonts/guttery-400.ttf`, `embedRights: true`) y se embebe en los PDF y PNG de Glitch, sólo para las muletillas del narrador. Supersede, **sólo para Greenhouse**, el «se instala en la máquina que renderiza, nunca en git» de la norma §3.4; Guttery sigue fuera de los paquetes de AXIS y el taller la sigue leyendo de la máquina. Licencia web y video confirmada; número de contrato pendiente |
+| 2 | Portada del reel y miniatura del vlog | **aprobadas** como plantillas del Composer |
+| 3 | Overlays del reel en PNG | **agregados** a pedido del operador («si agrégalo»), junto con los del vlog |
+| 4 | Precedencia de portada | **A > B > C** por contenido, nunca la de la semana anterior |
+| 5 | Licencias de las fotos | `licensed`, `owned` o `generated`; **el kit de prensa no cuenta como licencia**. La foto del host es propia: declara licencia y no pinta crédito |
+
+**Desviaciones y pendientes (declarados, no escondidos):**
+
+1. **Un campo nuevo en el contrato de plantilla del motor.** El alcance dejaba el motor sin cambios; se agregó uno solo,
+   acotado: `render.minInkTileRatio` (con piso ≥ 0,3 %, `MIN_INK_TILE_RATIO_FLOOR` en `contracts.ts` y `render.ts`), para
+   capas pequeñas por diseño sobre 9:16 (lower third, cabecera). Sin él, el gate de lámina en blanco rechazaba un zócalo
+   legítimo.
+2. **`portada-c` en AXIS.** El token marca la portada C con esfera `apple`, pero la portada C aprobada no lleva manzana:
+   el test la trata como excepción explícita. Seguimiento: patch de AXIS.
+
+Además: la miniatura del vlog no tiene pieza propia en `glitchLine.pieces` (se valida con la de la portada del reel); la
+**ruta productiva** (API, `artifact-worker`, MCP, capability) **no existe**: es **TASK-1921**, y lo de hoy es el taller
+local; la publicación (Metricool, WordPress) queda fuera de alcance. El contrato `efeonce.glitch-line` sigue en
+`candidate` hasta la primera edición compuesta con él (hasta hoy sólo el ejemplo de la #17).
+
+**Reversibilidad:** el costo de revertir que anticipaba §«Reversibilidad» ya se materializó en parte: retirar la
+sub-línea ahora exige retirar los tres catálogos, la extensión `glitch` del brand pack y la línea base del gate. El
+campo `render.minInkTileRatio` es opcional: una plantilla que no lo declara conserva el umbral por defecto del gate de
+lámina en blanco (1,5 %).

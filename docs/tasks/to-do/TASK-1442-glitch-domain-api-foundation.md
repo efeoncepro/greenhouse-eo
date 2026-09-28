@@ -1,5 +1,12 @@
 # TASK-1442 — Glitch Domain, State and API Foundation
 
+## Delta 2026-09-27 — el contrato de datos de una edición existe (TASK-1923)
+
+- `GlitchEditionManifest` (`src/lib/glitch-composition/manifest.ts`, zod strict, `schemaVersion: 1`) es el contrato que
+  el dominio de ediciones debe producir: numeración, `previousEdition.coverTemplate` (de ella sale la rotación de
+  portada), 8 noticias con foto, crédito, licencia y regiones de rostro, POV, lente opcional, contraportada, sección
+  `video` y `outputs`. El dominio no redefine esos campos: los persiste y los entrega a `planGlitchEdition`.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

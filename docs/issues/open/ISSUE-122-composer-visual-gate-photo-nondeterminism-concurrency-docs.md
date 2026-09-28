@@ -4,6 +4,13 @@
 > **Ambiente:** local (composer `pnpm composer:visual-gate` + baseline `scripts/frontend/baselines/artifact-composer/**`)
 > **Detectado:** 2026-07-15, durante trabajo concurrente de dos agentes (Claude + Codex) sobre el deck de SKY
 
+## Delta 2026-09-27 — Glitch (TASK-1923): fotos reales deterministas entre procesos
+
+- `pnpm glitch:compose` pre-rasteriza cada foto al tamaño exacto de su hueco (DSF 1, recorte centrado, PNG sin perfil)
+  y la entrega como data URI: dos corridas en procesos separados dieron 35 PNG idénticos byte a byte, fotos incluidas.
+  El probe del gate de Glitch no usa fotos reales (SVG sintético `photo:probe`). Evidencia a favor de la mitigación de
+  la causa 1; no cierra el issue para `TeamGalleryFull`.
+
 ## Resumen
 
 En una sola sesión, **dos agentes con contexto del repo tropezaron con el visual gate**: colisión de

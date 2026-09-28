@@ -130,6 +130,32 @@ pnpm composer:visual-gate --catalog=graphic-line
   píxeles. Con el `render.ts` anterior a TASK-1919 sale la misma lista con las mismas cuentas: es deriva de entorno
   previa (ISSUE-122), no de estos catálogos, y **no se rebaselinó**. No uses un freeze global para «limpiarla».
 
+### Scope de Glitch (`glitch`, TASK-1923) — sólo Glitch
+
+Los tres catálogos de Glitch (`glitch-carousel`, `glitch-stills` y `glitch-overlays`) comparten la carpeta
+`src/lib/artifact-composer/catalogs/glitch/` y su `registry.json`, así que el gate tiene **una** entrada de probe para
+los tres y un scope propio.
+
+```bash
+pnpm composer:visual-gate --catalog=glitch --selftest
+pnpm composer:visual-gate --catalog=glitch --freeze
+pnpm composer:visual-gate --catalog=glitch
+```
+
+- **Qué cubre:** `templates-glitch/**`, **26 frames a 0 px** al congelar (2026-09-27, `BASELINE_DELTAS.md` entrada
+  (g)): las 7 láminas del carrusel, los banners del blog 16:9 y 1:1, el banner de noticia, la portada del reel, la
+  miniatura del vlog y los 10 overlays del reel y del vlog.
+- **El probe no usa fotos reales:** cada hueco recibe `asset-ref:photo:probe`, un SVG sintético
+  (`GLITCH_PROBE_ASSETS` en `scripts/artifact-composer/visual-gate.ts`); la falla en bytes del probe es el `example` del
+  slot `bytes` (vacía). La geometría de la falla la prueban los tests de `src/lib/glitch-composition/` y las fotos
+  reales las cubre `pnpm glitch:compose`: dos corridas en procesos separados dan los mismos PNG byte a byte (fotos
+  pre-rasterizadas al tamaño exacto del hueco, criterio de ISSUE-122).
+- **Los overlays se fotografían sin alfa** en el probe (el probe captura sobre el fondo del navegador); el PNG que
+  entrega `pnpm glitch:compose` sí lleva canal alfa.
+- **Un freeze de este scope** agrega o actualiza sólo los frames que empiezan con `templates-glitch` y vuelve a sellar el
+  digest sobre el manifest completo. Como el manifest y `BASELINE_DELTAS.md` son compartidos, aplica igual la regla
+  single-owner de §2: avisa a las sesiones que trabajan en el composer antes de congelar.
+
 ## 4. 🩸 El gotcha que TIENES que conocer: las fotos raster no son deterministas (ISSUE-122)
 
 Las láminas con **fotos** (`TeamGalleryFull` / la lámina del equipo) **driftean unos píxeles entre

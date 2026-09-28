@@ -1,5 +1,13 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
+## Delta 2026-09-27 (d) — Glitch tiene su taller local (TASK-1923)
+
+- Los catálogos de Glitch (`glitch-carousel`, `glitch-stills`, `glitch-overlays`) y el mapper puro
+  `planGlitchEdition(manifest, { narratorLicenseStatus, photoSizes })` (`src/lib/glitch-composition/`) existen; el
+  taller es `pnpm glitch:compose`. La ruta productiva de Glitch (command, API, `artifact-worker`, MCP, capability) sigue
+  siendo de esta task o de una nueva: el command debe reutilizar el mapper y los `GlitchAssetRequest` (foto con sus
+  `fractures`, detalle de la lente), igual que el CLI; nunca una copia del plan.
+
 ## Delta 2026-09-27 (c) — documento multipágina y contrato 0.1.2 (cerrado por TASK-1927)
 
 - El command de esta task debe aceptar también el **intent de documento** (un intent con `pages`: brochure o

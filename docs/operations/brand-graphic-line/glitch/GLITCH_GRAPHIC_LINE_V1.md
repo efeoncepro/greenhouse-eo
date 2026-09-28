@@ -6,9 +6,12 @@
 > reglas y agrega lo propio de Glitch.
 >
 > **Tipo de documento:** Norma de marca (sub-línea de franquicia editorial)
-> **Versión:** 1.11
+> **Versión:** 1.12
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (v1.11: **los valores ya viven en el token `glitchLine`**
+> **Última actualización:** 2026-09-27 por Claude (v1.12: **las piezas estáticas ya se componen en el Artifact
+> Composer** —TASK-1923: 26 plantillas en tres catálogos, `pnpm glitch:compose`, gate visual— y **Guttery entra al repo
+> privado** en el brand pack `axis` (extensión `glitch`, decisión del operador del 2026-09-27); la ruta productiva es
+> TASK-1921 —§3.4, §4.2, §6, §9, §9.1, §10, §10.1, §11, §12 y §13.1—. v1.11: **los valores ya viven en el token `glitchLine`**
 > —`@efeoncepro/axis-tokens` 0.3.12, tag `v0.3.12` de AXIS autorizado por el operador—, con el contrato
 > `efeonce.glitch-line` 0.1.0 `candidate`, los archivos `AXIS_GLITCH_ASSETS` y los cinco glifos Plastilina publicados;
 > los números de esta norma quedan como referencia humana espejada del token —si difieren, gana el token—; los íconos de
@@ -50,6 +53,7 @@
 > `v0.3.12` (ver §12 y el [Delta del ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922)).
 > **Documentación para personas:** [funcional](../../../documentation/creative/linea-grafica-glitch.md) ·
 > [manual de uso](../../../manual-de-uso/creative/componer-piezas-glitch.md) ·
+> [manual para componer una edición](../../../manual-de-uso/creative/componer-una-edicion-de-glitch.md) ·
 > [manual para editar el video](../../../manual-de-uso/creative/editar-video-glitch.md)
 
 ---
@@ -171,7 +175,14 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 | Titulares (contraste de pesos) | **Bricolage Grotesque**: entrada 300 (wdth 100, 0,72 em) + remate 800 condensado (`font-stretch: 78%`; `font-variation-settings: 'wdth' 78`); tracking +0,01 em |
 | Etiquetas | **Poppins** 600, versalitas espaciadas |
 | Cuerpo y subtítulos | **Poppins** |
-| Muletillas del narrador («spoiler:», «sin anestesia.», «nos vemos el lunes.», «el #N+1 sale el lunes.») | **Guttery**, en el acento, rotada −3° a −5°. **Licenciada** (confirmado por el operador, 2026-09-27): se instala en la máquina que renderiza y **nunca** entra a git |
+| Muletillas del narrador («spoiler:», «sin anestesia.», «nos vemos el lunes.», «el #N+1 sale el lunes.») | **Guttery**, en el acento, rotada −3° a −5°. **Licenciada** para web y video (confirmado por el operador, 2026-09-27; el número de contrato sigue pendiente). **Sólo para las muletillas del narrador** |
+
+**Guttery en el repo (decisión del operador, 2026-09-27).** Guttery **entra al repo privado** de Greenhouse como
+extensión `glitch` del brand pack `axis`: `src/lib/artifact-composer/brand-packs/axis/fonts/guttery-400.ttf`, sellada
+por sha256 en `fonts.json` con `embedRights: true` y la licencia declarada ahí. Se embebe en los PDF y PNG de Glitch que
+compone el Artifact Composer y en ninguna otra pieza: sólo Glitch y sólo las muletillas. Si el brand pack no declara la
+licencia, la muletilla no se compone (`font-license-missing`, §10). Guttery sigue **fuera de los paquetes de AXIS** (§12)
+y el repo taller la sigue leyendo de la máquina que renderiza (§13.1).
 
 ### 3.5 Cabecera (masthead)
 
@@ -223,6 +234,9 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 1. **Nunca dos semanas seguidas con la misma plantilla.**
 2. La elige el contenido: ¿foto fuerte? → **A** · ¿un POV que pega solo? → **B** · ¿varias noticias del mismo peso? → **C**.
 3. El **feed de nueve semanas** del canvas está **APROBADO** como muestra de la rotación.
+4. Cuando el contenido admite más de una, la precedencia es **A > B > C** (decisión del operador, 2026-09-27). En el
+   Composer la aplica el plan a partir de la portada de la edición anterior que trae el manifiesto; el autor nunca la
+   elige, y si ninguna posible es distinta de la anterior la composición falla con `cover-rotation-unsatisfiable` (§10).
 
 ### 4.3 Ajustes del operador ya aplicados
 
@@ -252,7 +266,7 @@ Con esto la **maqueta del post** completa queda aprobada (el vlog embebido ya lo
 | Pieza | Composición | Nota |
 |---|---|---|
 | **Banners 16:9 (1920 × 1080)** | las tres plantillas A/B/C en horizontal, sin «Desliza» | **APROBADOS** tal cual: son la imagen destacada del post |
-| **Versión 1:1 del banner** | **plantilla propia**, derivada de las portadas A/B/C | **APROBADA**. El archivo del blog recorta la imagen destacada en cuadrado; **nunca** se recorta la portada 4:5, porque pierde un quinto del alto y puede cortar el titular o la manzana. No es un diseño nuevo que aprobar: es una plantilla más de TASK-1923 |
+| **Versión 1:1 del banner** | **plantilla propia**, derivada de las portadas A/B/C | **APROBADA**. El archivo del blog recorta la imagen destacada en cuadrado; **nunca** se recorta la portada 4:5, porque pierde un quinto del alto y puede cortar el titular o la manzana. No es un diseño nuevo que aprobar: son tres plantillas más del Composer (`BlogSquarePhoto`, `BlogSquareType` y `BlogSquareMosaic`, 1080 × 1080; TASK-1923, §9.1) |
 | **Apertura** | bloque navy «El micrófono se abre» + tesis + «Vamos.» | **APROBADA**; reemplaza la cita con fecha |
 | **La escaleta** | índice de las ocho noticias, como en radio | **APROBADA** |
 | **Banner interno de noticia (1600 × 900)** | foto en duotono navy + bytes + chip número/sección + wordmark | **APROBADO**; reemplaza la imagen cruda de la fuente. **El crédito de la foto es obligatorio** |
@@ -386,7 +400,7 @@ La foto del host de las maquetas es del banco de marca, generada con IA
 | Interior con lente | **APROBADO** (2026-09-27) como variante ocasional: sólo cuando el POV trata de un detalle nítido de la foto; esa lámina no cierra con la manzana |
 | Blog (banners A/B/C 16:9, versión 1:1 con plantilla propia, maqueta del post completa, callout «DROP» v2) | **APROBADO** (2026-09-27, §6): «Vamos en todas con tu recomendación». El callout v2 rige **desde la #17** y exige actualizar el bloque `efeoncepro/glitch-drop` antes de publicarla |
 | Vlog 16:9 (kit del vlog y tablero 16:9 del canvas) | **APROBADO** (2026-09-27, con el motion) |
-| Reel (kit de overlays, mapa de zonas y tableros del canvas: host, noticia, Drop, tarjetas finales, hoja del kit) | **APROBADO** (2026-09-27): kit producido en HyperFrames (§13.2) |
+| Reel (kit de overlays, mapa de zonas y tableros del canvas: host, noticia, Drop, tarjetas finales, hoja del kit) | **APROBADO** (2026-09-27): kit producido en HyperFrames (§13.2). Su cuadro fijo (cabecera, lower third, noticia, Drop y CTA, del reel y del vlog) también sale como PNG con alfa del Composer (§9.1); la portada del reel y la miniatura del vlog, aprobadas por el operador, también (§9.1) |
 | Apertura y tarjeta final de video | **APROBADO** (2026-09-27): la v2 «más punch» (§13.2), con sus golpes en f24, f48 y f69 (apertura) y f6, f57 y f74 (tarjeta final). La v1 queda como alternativa más sencilla |
 | Pre-roll de la intro (3,2 s antes de la apertura) | **DEFINIDO** por el operador (2026-09-27): «los tres puntos al ritmo» (§13.2); producido en el taller (`2c8f36c`), empalme exacto con la apertura. **Sólo en el vlog**: el reel abre directo con la apertura, sin pre-roll (decisión del operador del 2026-09-27, taller `1f323ca`: en un reel el primer segundo manda y el bucle queda exacto) |
 | Lower third del reel y del vlog | **APROBADO** (2026-09-27): «AL AIRE · GLITCH #N», nombre y cargo, con la órbita real; variante de invitado |
@@ -401,18 +415,99 @@ La foto del host de las maquetas es del banco de marca, generada con IA
 | Línea de servicio Growth y eslogan «Empower your Growth» | **APROBADO** (2026-09-27) |
 | Diseño sonoro de Glitch (mnemónico, kit, lower third y transiciones) | **APROBADO, versión B** (2026-09-27, §13.11): «La b me encanta más. Sus sonidos están aprobados». La A queda como alternativa descartada. **Sólo de Glitch** |
 | Música de Glitch (tema B: intro, cortina y salida; cama post-punk bajo la noticia) | **APROBADA** (2026-09-27, §13.12): «Definitivamente la B es la decisión», «Me parecen bien todas» y «Post-punk definitivamente». Reemplaza la decisión 3 del sonido (voz sola bajo las noticias). **Sólo de Glitch**. Publicada en AXIS (PR #10, `87c3298`, más `d393c2e`) e integrada en el taller (`2c8f36c`, `ed89a0b`, con el pre-roll animado que eligió el operador); único pendiente: probar la mezcla con la voz real del host |
-| Flujo de composición (Composer + HyperFrames en el repo taller) | **ACEPTADO** 2026-09-27 ([ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)); TASK-1922 **hecha** (tokens, contrato y archivos publicados en AXIS el 2026-09-27); en construcción: TASK-1923 y TASK-1924 (el motion de TASK-1924 ya existe en el taller y está **APROBADO** desde el 2026-09-27) |
+| Flujo de composición (Composer + HyperFrames en el repo taller) | **ACEPTADO** 2026-09-27 ([ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)); TASK-1922 **hecha** (tokens, contrato y archivos publicados en AXIS el 2026-09-27); TASK-1923 **implementada en local** el 2026-09-27 (commits en `develop`, sin push): las 26 plantillas estáticas se componen con `pnpm glitch:compose` (§9.1 y §10); la ruta productiva (API, `artifact-worker`, MCP, capability) es **TASK-1921** y no existe todavía; en construcción: TASK-1924 (el motion ya existe en el taller y está **APROBADO** desde el 2026-09-27) |
+
+### 9.1 Qué ya se compone en el Artifact Composer (TASK-1923)
+
+Las **26 plantillas** existen en `src/lib/artifact-composer/catalogs/glitch/`, todas con `approval: approved`, repartidas
+en tres catálogos sobre la misma carpeta. Se componen en local con `pnpm glitch:compose` (§10); ninguna se arma a mano
+desde el canvas.
+
+| Catálogo (salida) | Pieza aprobada | Plantilla | Tamaño |
+|---|---|---|---|
+| `glitch-carousel` (PDF del carrusel) | Portada A · noticia con foto | `CoverPhoto` | 1080 × 1350 |
+| | Portada B · tipográfica | `CoverType` | 1080 × 1350 |
+| | Portada C · mosaico | `CoverMosaic` | 1080 × 1350 |
+| | Interior | `Interior` | 1080 × 1350 |
+| | Interior · noticia 1 («El micrófono se abre») | `InteriorOpening` | 1080 × 1350 |
+| | Interior con lente (variante ocasional, nunca en la noticia 1) | `InteriorLens` | 1080 × 1350 |
+| | Contraportada | `BackCover` | 1080 × 1350 |
+| `glitch-stills` (PNG sueltos) | Banners 16:9 del blog A/B/C | `BlogBannerPhoto`, `BlogBannerType`, `BlogBannerMosaic` | 1920 × 1080 |
+| | Versión 1:1 del banner A/B/C (plantillas propias, nunca recorte de la 4:5) | `BlogSquarePhoto`, `BlogSquareType`, `BlogSquareMosaic` | 1080 × 1080 |
+| | Banner interno de noticia (con el crédito pintado) | `BlogNewsBanner` | 1600 × 900 |
+| | Portada del reel | `ReelCover` | 1080 × 1920 |
+| | Miniatura del vlog | `VideoThumbnail` | 1280 × 720 |
+| `glitch-overlays` (PNG con alfa) | Cuadro fijo del kit de motion aprobado (§13.2): cabecera, lower third, tarjeta de noticia, Drop y CTA, en reel y en vlog | `OverlayHeader`, `OverlayLowerThird`, `OverlayNews`, `OverlayDrop`, `OverlayCta` + `Reel` o `Vlog` (10) | 1080 × 1920 · 1920 × 1080 |
+
+- Los overlays son **cuadros fijos**, no animación: cada PNG es un cuadro completo con alfa y se suelta en 0,0, igual que
+  los `.mov` del kit. El Drop del vlog es opaco a pantalla completa, como en el kit. La animación sigue en el repo taller
+  (§13).
+- La miniatura del vlog no tiene pieza propia en `glitchLine.pieces` de AXIS: se valida con la de la portada del reel.
+- Los bloques del post que no son imagen (apertura, escaleta, callout «DROP» v2, banner de suscripción, «El hilo de la
+  semana» y cierre) **no** son plantillas del Composer; el callout v2 es trabajo del bloque de WordPress de TASK-1337.
+- Siguen fuera del Composer, sin cambios: la historia 9:16 y el carrusel panorámico (EXPLORACIÓN), y todo el movimiento.
 
 ---
 
 ## 10. Flujo de composición — ACEPTADO (2026-09-27)
 
-El flujo propuesto (canon en Greenhouse, valores y contratos en AXIS, composición con el Artifact Composer y catálogo
-`glitch-edition`, overlays con HyperFrames renderizados a video con alfa, flujo semanal) está descrito en el
-[ADR, decisión propuesta](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#decisión-propuesta--flujo-de-composición).
-Los estáticos **todavía no existen** en el Composer: hoy cada pieza estática se parte del canvas y se ajusta a mano
-siguiendo esta norma. El movimiento ya existe en el repo taller y está **aprobado** (§13); por ahora lee su propio archivo
-de edición y no el manifiesto de TASK-1923.
+El flujo aceptado (canon en Greenhouse, valores y contratos en AXIS, composición con el Artifact Composer, overlays con
+HyperFrames renderizados a video con alfa, flujo semanal) está descrito en el
+[ADR, decisión del flujo](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#decisión--flujo-de-composición). El
+catálogo que el ADR llamaba `glitch-edition` quedó como **tres catálogos** sobre una misma carpeta (§9.1).
+
+**Los estáticos ya se componen en el Composer** (TASK-1923, 2026-09-27): ya no se parte del canvas ni se ajusta a mano.
+Es el **taller local**: la ruta productiva (API, `artifact-worker`, MCP y capability) es **TASK-1921** y no existe
+todavía, y la publicación (Metricool, WordPress) queda fuera. El movimiento vive en el repo taller y está **aprobado**
+(§13); por ahora lee su propio archivo de edición y no este manifiesto. Paso a paso para personas:
+[manual para componer una edición de Glitch](../../../manual-de-uso/creative/componer-una-edicion-de-glitch.md).
+
+**El flujo implementado:**
+
+1. **Manifiesto de la edición** (`GlitchEditionManifest`, `schemaVersion` 1, validación estricta:
+   `src/lib/glitch-composition/manifest.ts`). Trae la edición (número, fecha de publicación, semana), la tesis, la
+   **edición anterior con su portada** (A, B, C o ninguna), la portada, las **8 noticias** en orden (sección, titular,
+   medio, fecha, foto con crédito, licencia, si es fuerte, borde de la falla y regiones de rostros, POV, porqué y lente
+   opcional, nunca en la noticia 1), la contraportada, el video (host, invitado opcional, tres noticias, Drop, CTA de reel
+   y vlog, foto del host y su portada) y qué piezas sueltas y overlays se piden. Ejemplo completo con fotos sintéticas:
+   `src/lib/glitch-composition/examples/edition-17.example.json`.
+   - Licencias admitidas: `licensed`, `owned` o `generated`. **El kit de prensa no cuenta como licencia.** La foto del
+     host es propia: declara su licencia y no pinta crédito.
+   - La portada del reel y la miniatura del vlog exigen la foto del host y la portada del video; los overlays exigen el
+     bloque del video.
+2. **`pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays]`**
+   (`scripts/glitch/compose.ts`; por defecto escribe en `.captures/glitch/edicion-<n>/`).
+3. **Plan** (`planGlitchEdition`): elige la portada **A > B > C por contenido** —A si la noticia de portada trae foto
+   fuerte, B si hay un POV suelto y Guttery con licencia, C si hay un mosaico de 4— y **nunca** la de la semana anterior.
+   La rotación la decide el manifiesto (`previousEdition`), nunca el autor. Cada lámina pasa por el contrato
+   `efeonce.glitch-line` 0.1.0 (§10.1) y por los validadores del catálogo (una esfera por pieza, contraste del titular,
+   crédito de la foto, falla lejos de los rostros, acento nunca sobre claro, estructura del carrusel).
+4. **Fotos al hueco y falla en bytes.** Cada foto se rasteriza al tamaño exacto de su hueco; rostros y lente se trasladan
+   a ese recorte, que es **centrado**, no «inteligente». La falla en bytes se calcula sobre la foto ya procesada, con un
+   perfil por pieza (banda en el carrusel, lateral en el banner A y la miniatura, hacia adentro en la portada del reel y
+   por tarjeta en el banner C).
+5. **Salidas:**
+   - `glitch-<n>-carrusel.pdf`: el carrusel de LinkedIn en un solo tamaño de página, verificado contra los límites de
+     LinkedIn para documentos (100 MB, 300 páginas); más `carrusel/` con un PNG por lámina y el manifiesto resuelto.
+   - `sueltas/`: las piezas pedidas en `outputs.stills` (portada, contraportada, interior de una noticia, banner y 1:1 del
+     blog, banner interno de una noticia, portada del reel, miniatura).
+   - `overlays/`: los PNG con alfa del reel y del vlog pedidos en `outputs.overlays`.
+   - `glitch-<n>.provenance.json`: la procedencia, **sin reloj**: sha256 de cada fuente y de cada foto procesada, las
+     celdas de la falla por lámina, las versiones de AXIS, el estado de la licencia de Guttery y los límites de LinkedIn.
+     El PDF fija sus fechas internas a la fecha de publicación: dos corridas de la misma edición dan los mismos archivos.
+
+**Falla cerrado.** El plan y la falla se resuelven antes de pintar nada: si el manifiesto, la rotación, el contrato, la
+licencia o los rostros no cumplen, no se escribe ninguna pieza; `carousel-too-heavy` corta antes de escribir el PDF.
+Los códigos:
+
+| Código | Qué significa |
+|---|---|
+| `manifest-invalid` | el manifiesto no pasa la validación; el error trae la ruta del campo |
+| `cover-rotation-unsatisfiable` | ninguna portada posible por contenido es distinta de la de la semana anterior |
+| `contract-issues` | una lámina no pasa el contrato `efeonce.glitch-line` (trae sus códigos, §10.1) |
+| `font-license-missing` | el brand pack no declara la licencia de Guttery: la muletilla no se compone |
+| `fracture-over-face` | la falla en bytes caería sobre un rostro |
+| `carousel-too-heavy` | el PDF no se podría subir a LinkedIn |
 
 ### 10.1 Componer con el contrato
 
@@ -429,8 +524,10 @@ un **manifiesto** `axis.glitch-line-composition.v1` con los valores del token. N
    `accent-text-on-light`, `overlay-over-host-face`, `bytes-over-face`, `cover-template-repeated`,
    `narrator-font-unlicensed`, `url-bubble-not-applicable`, `icon-volume-not-applicable`).
 
-Hoy el contrato no tiene todavía un consumidor productivo: los catálogos del Composer (TASK-1923) y el taller (TASK-1924)
-son los primeros. Sale de `candidate` tras la primera edición compuesta con él.
+Desde TASK-1923 el primer consumidor es `pnpm glitch:compose` (§10): valida cada lámina con `validateGlitchLineIntent`
+y, si hay issues, falla con `contract-issues`. Sigue sin consumidor productivo (eso es TASK-1921) y el taller
+(TASK-1924) todavía no lo lee. Sale de `candidate` tras la primera edición compuesta con él; hasta hoy sólo se compuso el
+ejemplo de la #17, con fotos sintéticas y textos de ejemplo.
 
 ---
 
@@ -439,7 +536,8 @@ son los primeros. Sale de `candidate` tras la primera edición compuesta con él
 Resuelto el 2026-09-27 ([Delta del ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador)):
 la manzana y el verde (aprobados y publicados en el token `glitchLine` el 2026-09-27), la línea de servicio (**Growth**), la numeración
 (la próxima es la **#17**), el alta de los cinco glifos Plastilina (aprobada y publicada el 2026-09-27), la **licencia de
-Guttery** (confirmada para web y video y registrada en `glitchLine.type.narrator`; falta sólo el número de contrato), el **contenido del lower third**
+Guttery** (confirmada para web y video y registrada en `glitchLine.type.narrator`; el operador autorizó además que entre
+al repo privado de Greenhouse, §3.4; falta sólo el número de contrato), el **contenido del lower third**
 (definido: «AL AIRE · GLITCH #N», nombre y cargo, con la órbita real; variante de invitado), el **diseño sonoro**
 (aprobada la **versión B**, con sus cuatro decisiones: dos golpes graves, voz sola bajo las noticias —reemplazada el
 mismo día por la cama post-punk de la música, §13.12— y el clic del micrófono y el trazo del plumón sintetizados;
@@ -468,8 +566,10 @@ con crédito obligatorio, callout «DROP» v2 desde la #17, banner de suscripci�
 | Textos reales de la #17 | titulares, medios, fotos e invitado (el archivo de ejemplo trae textos entre corchetes) |
 | Autoservicio del texto | formulario en Marketing Studio (recomendado); `.mogrt` descartado. El dominio de ediciones (TASK-1442) que produciría el archivo de edición también está pendiente |
 | Operación de cada edición | hoy la corre alguien con el repo taller, `gh`, ffmpeg, HyperFrames y Guttery instalados **en su máquina** (el kit completo tarda ≈ 4 min); no hay autoservicio. El pipeline editorial agéntico está descrito en EPIC-031 |
-| Lectura del token | el token `glitchLine` ya está publicado (2026-09-27); falta que lo lean los catálogos del Composer (TASK-1923) y el taller, que hoy espeja la paleta y la manzana en `src/brand.mjs` (TASK-1924). El contrato sale de `candidate` tras la primera edición compuesta |
-| Catálogo | catálogo `glitch-edition` del Artifact Composer (TASK-1923); los archivos de Glitch ya están en `@efeoncepro/axis-brand-assets` 0.3.5 (`AXIS_GLITCH_ASSETS`) |
+| Lectura del token | los catálogos del Composer ya lo leen (TASK-1923: `glitch-tokens.css` se compila desde `glitchLine` con `pnpm glitch:tokens`); falta el taller, que hoy espeja la paleta y la manzana en `src/brand.mjs` (TASK-1924). El contrato sale de `candidate` tras la primera edición compuesta |
+| Ruta productiva de la composición | los catálogos y `pnpm glitch:compose` existen en local (TASK-1923, §9.1 y §10); falta la ruta gobernada (API, `artifact-worker`, MCP y capability): **TASK-1921**. La publicación (Metricool, WordPress) queda fuera |
+| `portada-c` en AXIS | el token marca la portada C con esfera `apple`, pero la portada C aprobada no lleva manzana; el test de Greenhouse la trata como excepción explícita hasta un patch de AXIS |
+| Número de contrato de Guttery | la licencia web y video está confirmada y Guttery ya se embebe en las piezas de Glitch (§3.4); falta registrar el número de contrato |
 | Archivo en GCS | guardar el motion aprobado en GCS: pendiente (hoy sólo OneDrive + sha256 en los manifiestos) |
 | Mezcla de la música con la voz real del host | probarla en una edición real (la demo usa una voz TTS provisional); el ducking lo aplica el editor con los valores de la §13.12 |
 
@@ -503,9 +603,16 @@ taller** (`main` empujado, con la música).
 | Música en el taller | repo taller, `tools/glitch-motion/src/music.mjs` (siete másteres por URL + sha256; `--music off` la apaga) | **integrada** 2026-09-27 (`2c8f36c`, `ed89a0b`) |
 | Token `glitchLine` (`@efeoncepro/axis-tokens` 0.3.12) | export de primer nivel (nunca rama de `efeonceGraphicLine`); lo sirve también `/references/glitch.json`, campo `tokens` | **publicado** 2026-09-27 (tag `v0.3.12`, `29a40b5`), estado `candidate`; Greenhouse lo fija en `4dfb147f7` |
 | Contrato `efeonce.glitch-line` 0.1.0 (`@efeoncepro/axis-ui-contracts` 0.3.10) | `validateGlitchLineIntent`, `resolveGlitchLineIntent`, manifiesto `axis.glitch-line-composition.v1`; en AXIS: `docs/agent-composition/glitch-line-intent.schema.json`, `docs/examples/glitch/` y `docs/agent-composition/glitch.md` | **publicado** 2026-09-27, `candidate` (§10.1) |
-| Archivos (`@efeoncepro/axis-brand-assets` 0.3.5) | `AXIS_GLITCH_ASSETS`: `glitch-logo-positive` (navy sobre claro), `glitch-logo-negative` (blanco sobre oscuro) y `glitch-apple`, sellados aparte de `AXIS_BRAND_ASSETS`, idénticos al píxel a `public/branding/glitch/`. Guttery **nunca** entra a un paquete | **publicados** 2026-09-27 |
+| Archivos (`@efeoncepro/axis-brand-assets` 0.3.5) | `AXIS_GLITCH_ASSETS`: `glitch-logo-positive` (navy sobre claro), `glitch-logo-negative` (blanco sobre oscuro) y `glitch-apple`, sellados aparte de `AXIS_BRAND_ASSETS`, idénticos al píxel a `public/branding/glitch/`. Guttery **nunca** entra a un paquete de AXIS: vive en el brand pack privado de Greenhouse (§3.4) | **publicados** 2026-09-27 |
 | Glifos Plastilina de Glitch (`@efeoncepro/axis-graphic-line` 0.7.0) | `PLASTILINA_GLYPHS` (84 glifos y 48 volúmenes en `iconography.json` del Lab) | **publicados** 2026-09-27; en Glitch, planos (§3.6) |
 | Wordmark en Greenhouse | [`public/branding/glitch/`](../../../../public/branding/glitch/) | vigente |
+| Catálogos de Glitch en el Composer | [`src/lib/artifact-composer/catalogs/glitch/`](../../../../src/lib/artifact-composer/catalogs/glitch/): una carpeta, tres catálogos (`glitch-carousel` PDF, `glitch-stills` PNG, `glitch-overlays` PNG con alfa), 26 plantillas, `registry.json`, validadores (`validators.ts`, `edition-validators.ts`) y `glitch-tokens.css` compilado desde `glitchLine` de AXIS 0.3.15 (`pnpm glitch:tokens [--check]`); ninguna plantilla lleva color, medida ni familia literal | implementados en local 2026-09-27 (TASK-1923) |
+| Guttery en Greenhouse | brand pack `axis`, extensión `glitch`: `src/lib/artifact-composer/brand-packs/axis/fonts/guttery-400.ttf`, sellada por sha256 en `fonts.json` con `embedRights: true` (§3.4) | en el repo privado desde 2026-09-27 |
+| Manifiesto de la edición y mapper | [`src/lib/glitch-composition/`](../../../../src/lib/glitch-composition/): `manifest.ts` (`GlitchEditionManifest`), `index.ts` (`planGlitchEdition`), `byte-fracture.ts` (la falla en bytes) y `copy.ts` (textos fijos) | implementados en local 2026-09-27 |
+| CLI | `pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays]` (`scripts/glitch/compose.ts`); salida por defecto `.captures/glitch/edicion-<n>/`; límites de LinkedIn en `scripts/glitch/linkedin.ts` | local (§10) |
+| Edición de ejemplo | `src/lib/glitch-composition/examples/edition-17.example.json`, con fotos sintéticas en `examples/fotos/` (`pnpm tsx scripts/glitch/make-example-photos.ts [--check]`); textos de ejemplo, no reales | vigente |
+| Gate visual | `pnpm composer:visual-gate --catalog=glitch [--selftest\|--freeze]`; línea base de 26 cuadros en `scripts/frontend/baselines/artifact-composer/templates-glitch/`, sección «2026-09-27 (g)» de `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | activo desde 2026-09-27 |
+| Manual para componer una edición | [`docs/manual-de-uso/creative/componer-una-edicion-de-glitch.md`](../../../manual-de-uso/creative/componer-una-edicion-de-glitch.md) | vigente |
 | Criterio para agentes | skill `efeonce-graphic-line`, `references/glitch.md` (cargarla para cualquier pieza de Glitch) | vigente |
 
 ---
@@ -536,7 +643,7 @@ taller** (`main` empujado, con la música).
 | Gobierno | esta norma, el [ADR de Glitch](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md), el [ADR del taller](../../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) y [TASK-1924](../../../tasks/to-do/TASK-1924-glitch-motion-overlays-hyperframes.md). Ninguna documentación gobernante vive en el taller |
 | Motor | HyperFrames 0.6.69 (HTML + GSAP → video) con GSAP 3.14.2 y CustomEase, copiados al build: el render no usa red |
 | Valores | el taller lee `@efeoncepro/axis-tokens` 0.3.8 (curvas, sobrepasos, onda, pulso, letras) y `@efeoncepro/axis-brand-assets` 0.3.4 (logo de Efeonce), y todavía **espeja** la paleta y la manzana de Glitch en `src/brand.mjs`. Desde el 2026-09-27 esos valores y el motion de Glitch están **publicados** en el token `glitchLine` (`axis-tokens` 0.3.12): el taller pasa a leerlo y retira el espejo en TASK-1924. Si difieren, gana el token |
-| Fuentes | Bricolage (font pack del Artifact Composer), Poppins 500/600/700 y Guttery (licenciada, instalada en la máquina, **nunca** en git) |
+| Fuentes | Bricolage (font pack del Artifact Composer), Poppins 500/600/700 y Guttery (licenciada; el taller la lee de la máquina que renderiza y **nunca** la versiona en su git; en Greenhouse vive en el brand pack privado, §3.4) |
 | Salida | ProRes 4444 con alfa (`.mov`, `yuva444p12le`), 30 fps, sin audio, y al lado de cada `.mov` su WAV del sonido aprobado (mismo nombre; `--sound b\|a\|off`, por defecto `b`), más la música aprobada (§13.12; `--music off` la apaga). Con música, `render` suma en el vlog el **pre-roll**
 opaco (`glitch-preroll-vlog.mov`, 3,2 s, §13.2; el reel no lleva pre-roll) y entrega `glitch-intro-*.wav` (vlog: pre-roll
 + apertura, 7,2 s; reel: sólo la apertura, 4,0 s) y `glitch-salida-*.wav` (con la tarjeta final), que **reemplazan** a

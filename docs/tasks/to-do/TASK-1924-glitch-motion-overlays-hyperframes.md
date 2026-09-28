@@ -1,5 +1,17 @@
 # TASK-1924 — Glitch en movimiento con HyperFrames
 
+## Delta 2026-09-27 (noche) — el manifiesto de edición de TASK-1923 ya existe
+
+- `GlitchEditionManifest` (`src/lib/glitch-composition/manifest.ts`, `schemaVersion: 1`) cubre los campos del archivo
+  de edición del taller en su sección `video`: `host`, `guest`, `newsIds` (3), `shortHeadlines`, `drop.newsId`,
+  `cta {reel, vlog}`, `transition`, más `hostPhoto` y `cover` para la portada del reel y la miniatura. Mapeo pendiente
+  para migrar el taller: `nextEdition` = `edition.number + 1`; `news[i]` del taller = la noticia `video.newsIds[i]`
+  (`headline`, `outlet` como `source`, `photo {file, credit}` como `image`); `drop.lite/bold` = `pov.entry/punch` de la
+  noticia del Drop. El bloqueo por «manifiesto de TASK-1923» queda cerrado.
+- El composer entrega además el **cuadro fijo** de cada overlay como PNG con alfa (cabecera, lower third host e
+  invitado, tarjeta de noticia, Drop y cierre, reel y vlog; plantillas `Overlay*` del catálogo `glitch-overlays`),
+  reproducido de este kit. Si el kit cambia su diseño, esas plantillas se actualizan con su frame en el gate.
+
 ## Delta 2026-09-27 — TASK-1922 publicada en AXIS `v0.3.12`: el taller debe leer el token
 
 - **Bloqueo por TASK-1922 levantado.** AXIS tag `v0.3.12` (commit `29a40b5`): `@efeoncepro/axis-tokens` `0.3.12` (token

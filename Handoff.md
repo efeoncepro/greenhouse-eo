@@ -4,9 +4,9 @@
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 
-**Glitch en el Composer (27/09):** [TASK-1923](docs/tasks/in-progress/TASK-1923-glitch-artifact-composer-catalogs.md) en ejecución (plan aprobado): catálogos glitch-* sobre un templatesDir compartido, Guttery al repo privado, portada del reel y miniatura aprobadas, sin kit de prensa. Local en develop, sin push.
+**Glitch en el Composer (27/09):** [TASK-1923](docs/tasks/in-progress/TASK-1923-glitch-artifact-composer-catalogs.md) code complete en local, sin push: 26 plantillas, `pnpm glitch:compose`, gate `--catalog=glitch` a 0 px. Pendiente: visto bueno a `render.minInkTileRatio`, gate global, `pnpm build`, tokens tras el bump AXIS 0.3.16.
 
-**Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/complete/TASK-1922-glitch-axis-franchise-token-contract.md) **complete**: AXIS `v0.3.12` (`29a40b5`) publica `glitchLine`, `efeonce.glitch-line` 0.1.0 candidate (`pnpm glitch:resolve`), `AXIS_GLITCH_ASSETS` y 5 glifos Plastilina D27 (84 glifos/48 volúmenes); Greenhouse los fija en `4dfb147f7`. Íconos de acción de Glitch siempre planos (operador). Siguen: TASK-1923 (Composer lee el token), TASK-1924 (el taller retira su espejo de paleta/manzana; reconciliar entrada 0,72 vs 0,66 em); número de contrato de Guttery pendiente.
+**Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/complete/TASK-1922-glitch-axis-franchise-token-contract.md) **complete**: AXIS `v0.3.12` publica `glitchLine`, `efeonce.glitch-line` 0.1.0 candidate y los archivos de Glitch. Siguen: TASK-1924 (el taller retira su espejo); número de contrato de Guttery.
 
 **La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). Pendiente: 5 preguntas del operador y TASK-1926.
 

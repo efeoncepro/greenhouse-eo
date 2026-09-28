@@ -10,12 +10,19 @@
 > Glitch](./producir-motion-glitch.md) y se corrigen las cifras de verificación. v1.3: el motion de Glitch y los
 > tableros de video quedaron aprobados)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita»)
-> **Ruta en portal:** no aplica — las piezas se arman desde el canvas de diseño; todavía no hay composición automática
+> **Ruta en portal:** no aplica — las piezas se arman desde el canvas de diseño; la edición completa se compone con `pnpm glitch:compose` ([Componer una edición de Glitch](./componer-una-edicion-de-glitch.md))
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-glitch.md) · [Norma de la sub-línea](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [ADR](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md) · [Usar la línea gráfica de Efeonce](./usar-linea-grafica-efeonce.md)
 
 > **⚠️ Este manual es SÓLO para piezas de Glitch.** Para cualquier otra pieza de Efeonce usa
 > [Usar la línea gráfica de Efeonce](./usar-linea-grafica-efeonce.md). La manzana, el verde Glitch, los bytes, Guttery y
 > la cabecera «EDICIÓN #N» **no** van en piezas de Efeonce.
+
+> **Este manual explica el criterio; el comando lo aplica.** Desde el 2026-09-27 (TASK-1923) las piezas estáticas de
+> una edición —carrusel, piezas sueltas del blog, portada del reel, miniatura del vlog y overlays en PNG— se componen
+> con `pnpm glitch:compose` a partir de un manifiesto de la edición: el paso a paso, los campos y los errores están en
+> [Componer una edición de Glitch con `pnpm glitch:compose`](./componer-una-edicion-de-glitch.md). Este manual sigue
+> siendo la referencia de **qué** lleva cada pieza y por qué (portada, láminas, blog, video, checklist); donde más abajo
+> dice que las piezas estáticas se arman a mano desde el canvas, rige el comando.
 
 ## Para qué sirve
 
@@ -23,8 +30,10 @@ Explica cómo armar las piezas de una edición de Glitch con su línea gráfica:
 láminas del carrusel de LinkedIn, la contraportada, las piezas del blog y los gráficos del video (vlog horizontal y reel
 vertical).
 
-**Hoy no hay composición automática de las piezas estáticas.** El motor de composición (Artifact Composer) todavía no
-tiene los catálogos de Glitch: se parte del **canvas de diseño** y se ajusta a mano siguiendo la norma. Los **gráficos
+**Las piezas estáticas se componen con `pnpm glitch:compose`** (TASK-1923, taller local): el Artifact Composer tiene los
+catálogos de Glitch y aplica solo la rotación, el contrato y los límites. Este manual explica el criterio; el paso a paso
+está en [Componer una edición de Glitch](./componer-una-edicion-de-glitch.md). El canvas de diseño queda para explorar
+piezas nuevas. Los **gráficos
 animados del video** se generan desde el repo taller y están **aprobados** (2026-09-27): ver
 [Video y motion](#video-y-motion) y el manual [Editar el video de Glitch](./editar-video-glitch.md).
 
@@ -101,8 +110,8 @@ Todo el blog está **aprobado** desde el 2026-09-27 («Vamos en todas con tu rec
 - **Imagen destacada:** banner 16:9 (1920 × 1080) con la plantilla A/B/C de la semana en horizontal, sin «Desliza».
 - **Versión 1:1:** el archivo del blog recorta la imagen destacada en cuadrado, así que agrega la versión 1:1 con su
   **plantilla propia** (derivada de las portadas). **Nunca** recortes la portada 4:5: pierde un quinto del alto y puede
-  cortar el titular o la manzana. La plantilla la construye TASK-1923; mientras no exista, recompón la portada de la
-  semana en el cuadrado (mismos elementos reubicados, titular y manzana completos) en lugar de recortarla.
+  cortar el titular o la manzana. Existe como tres plantillas propias (`BlogSquarePhoto`,
+  `BlogSquareType`, `BlogSquareMosaic`, una por portada): pídela con `blog:square` en `outputs.stills`.
 - **Apertura:** bloque navy «El micrófono se abre» + tesis + «Vamos.». Reemplaza la cita con fecha.
 - **Escaleta:** el índice de las ocho noticias, como en radio.
 - **Banner interno de cada noticia** (1600 × 900): foto en duotono navy + bytes + chip número/sección + wordmark, **con

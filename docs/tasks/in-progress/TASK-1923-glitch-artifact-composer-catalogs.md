@@ -1,5 +1,28 @@
 # TASK-1923 — Glitch en el Artifact Composer
 
+## Delta 2026-09-27 (cierre de ejecución) — overlays PNG dentro y una desviación en el motor
+
+- **Overlays del reel y del vlog en PNG: SÍ entran** (operador, 2026-09-27: «Vamos con todo y sí agrégalo»). Reemplaza
+  la línea del Delta (noche) que los dejaba fuera: el catálogo `glitch-overlays` tiene 10 plantillas (`Overlay{Header,
+  LowerThird,News,Drop,Cta}{Reel,Vlog}`), el cuadro fijo del kit de motion aprobado de TASK-1924, con canal alfa.
+- **Desviación declarada: un campo en el contrato de plantilla del motor.** El Out of Scope y un criterio de aceptación
+  pedían `git diff` vacío en `src/lib/artifact-composer/*.ts`. El gate de lámina en blanco del render (1,5 % de tiles con
+  tinta) rechazaba el lower third y la cabecera, que son pequeños por diseño sobre un lienzo 9:16. Se agregó
+  `render.minInkTileRatio` a `TemplateRenderOptions` (`contracts.ts`) y su uso en `render.ts`, con un piso duro
+  `MIN_INK_TILE_RATIO_FLOOR = 0,003`: sólo las cuatro plantillas de lower third y cabecera lo declaran (0,005). Es
+  domain-free y no cambia ninguna otra lámina (gate global y de La órbita sin frames nuevos en rojo). Requiere visto
+  bueno del operador; si no lo da, la alternativa es sacar esas cuatro plantillas del catálogo.
+- **Perfiles de la falla medidos por pieza:** `band` (carrusel), `side` (borde izquierdo del banner A del blog y de la
+  miniatura), `host` (hacia adentro por arriba, portada del reel) y `card` (tarjetas del banner C). El carrusel conserva
+  su geometría (test).
+- **Rostros y lente sobre la foto original:** `fitRegion` los traslada al recorte centrado del hueco; el materializador
+  dejó el recorte «attention» (no reproducible con el mapper).
+- **Nombres reales de salida:** el composer escribe `<artifactId>.manifest.json` por catálogo (no
+  `*.resolved-manifest.json`); el PDF entregado es `glitch-<n>-carrusel.pdf` con fechas internas fijadas a
+  `edition.publishDate`.
+- **Seguimiento en AXIS:** `glitchLine.pieces['portada-c'].sphere` dice `apple` y la portada C aprobada no lleva manzana
+  (excepción explícita en `glitch-catalogs.test.ts`, que se pone roja cuando AXIS lo corrija).
+
 ## Delta 2026-09-27 (noche) — recalibración antes de ejecutar
 
 Manda sobre el cuerpo de la spec cuando se contradigan. Decisiones del operador (Julio Reyes, 2026-09-27) y hallazgos
@@ -141,7 +164,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-031`
-- Status real: `En ejecución: plan aprobado por el operador (2026-09-27); Slices 0–10 locales en develop, sin push`
+- Status real: `2026-09-27: Slices 1–9 commiteados en develop local (sin push): manifiesto, tokens, 26 plantillas aprobadas en 3 catálogos, mapper con rotación y contrato AXIS, 9 validadores, pnpm glitch:compose (PDF 10 págs, sueltas, 18 overlays, procedencia reproducible), gate --catalog=glitch 26 frames a 0 px. Slice 10 (docs) hecho. pnpm test completo: 2 rojos ajenos (bump AXIS 0.3.16 sin commitear y WIP de TASK-1928). Falta: visto bueno del operador a render.minInkTileRatio, gate global tras el freeze de TASK-1928, pnpm build (requiere autorización), closure-check`
 - Rank: `TBD`
 - Domain: `content|creative|platform`
 - Blocked by: `none`
@@ -441,12 +464,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] *(No aplica: la task no crea tablas ni escribe en base de datos.)* Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] *(No aplica: no toca dominios sensibles; los errores son `GlitchPieceError` con códigos estables.)* Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. — `GlitchEditionManifest` (`src/lib/glitch-composition/manifest.ts`), `planGlitchEdition`, catálogos `catalogs/glitch/`, consumidor `scripts/glitch/compose.ts`; valores desde `glitchLine` (AXIS).
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. — sin tenant ni base (taller local, `ownerOrgId: efeonce`); mismo manifiesto → mismos PNG/PDF/procedencia (verificado en dos procesos); freeze del gate single-owner.
+- [x] *(No aplica: la task no crea tablas ni escribe en base de datos.)* Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. — sin migraciones; rollback por slice = revertir commits (tabla de rollback de la task).
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. — corrida de `pnpm glitch:compose` sobre #17 (Acceptance Criteria); no hay runtime productivo (TASK-1921).
+- [x] *(No aplica: no toca dominios sensibles; los errores son `GlitchPieceError` con códigos estables.)* Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -799,42 +822,62 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 
 ## Acceptance Criteria
 
-- [ ] El ADR de Glitch tiene el flujo de composición en `Accepted` antes del primer commit de código.
-- [ ] `GlitchEditionManifest` (`schemaVersion: 1`) valida `edition-17.example.json` y rechaza, con la ruta del campo,
+- [x] El ADR de Glitch tiene el flujo de composición en `Accepted` antes del primer commit de código.
+      — Evidencia: la norma §10 y el ADR declaran el flujo ACEPTADO el 2026-09-27, antes de `47eaa73ea` (Slice 1).
+- [x] `GlitchEditionManifest` (`schemaVersion: 1`) valida `edition-17.example.json` y rechaza, con la ruta del campo,
       un manifiesto sin crédito, sin licencia, sin `faceRegions`, con menos de ocho noticias o con un campo `template`.
-- [ ] `edition-17.example.json` usa titulares de ejemplo marcados como tales y fotos sintéticas propias; ningún archivo
+      — Evidencia: `src/lib/glitch-composition/__tests__/manifest.test.ts` (crédito, licencia, kit de prensa, `faceRegions`, ocho noticias, `template` rechazado).
+- [x] `edition-17.example.json` usa titulares de ejemplo marcados como tales y fotos sintéticas propias; ningún archivo
       de terceros entra al repo.
+      — Evidencia: titulares con «[Ejemplo]», licencia `generated`, fotos dibujadas por `scripts/glitch/make-example-photos.ts` (`--check` sin drift).
 - [ ] Los tres catálogos (`glitch-carousel` `pdf-merged`, `glitch-stills` `png-set`, `glitch-overlays` `png-set`)
       comparten un mismo `templatesDir` y ningún archivo del motor cambia (`git diff` vacío en
       `src/lib/artifact-composer/*.ts`).
-- [ ] Una plantilla pedida a un catálogo al que no pertenece falla con `glitch.catalog-membership`.
-- [ ] Las seis plantillas aprobadas (`CoverPhoto`, `CoverType`, `CoverMosaic`, `Interior`, `InteriorOpening`,
+      — Sin tildar: la parte de los catálogos se cumple (`glitch-catalogs.test.ts`), pero el motor SÍ cambió: `render.minInkTileRatio` en `contracts.ts`/`render.ts` (ver Delta de cierre de ejecución). Espera visto bueno del operador.
+- [x] Una plantilla pedida a un catálogo al que no pertenece falla con `glitch.catalog-membership`.
+      — Evidencia: `glitch-catalogs.test.ts` › glitch.catalog-membership.
+- [x] Las seis plantillas aprobadas (`CoverPhoto`, `CoverType`, `CoverMosaic`, `Interior`, `InteriorOpening`,
       `BackCover`) existen con `approval: "approved"`; todos sus textos declaran `maxCharacters` y `overflow: "reject"`.
-- [ ] Las plantillas aprobadas el 2026-09-27 (`InteriorLens`, `BlogBannerPhoto`, `BlogBannerType`,
+      — Evidencia: registry con `approval: approved`; `glitch-templates.test.ts` exige `maxCharacters` + `overflow: reject` en todo texto.
+- [x] Las plantillas aprobadas el 2026-09-27 (`InteriorLens`, `BlogBannerPhoto`, `BlogBannerType`,
       `BlogBannerMosaic`, `BlogBannerSquare` propia 1:1 y `BlogNewsBanner` con crédito requerido) existen con
       `approval: "approved"` y línea base de píxeles; `BlogBannerSquare` no es un recorte de la portada 4:5.
-- [ ] El mecanismo de PROPUESTA se conserva para piezas futuras: una plantilla con `approval: "proposed"` (las piezas
+      — Evidencia: existen con línea base (`templates-glitch/**`, BASELINE_DELTAS (g)); el 1:1 son tres plantillas propias (`BlogSquarePhoto/Type/Mosaic`, una por portada), nunca un recorte del 4:5.
+- [x] El mecanismo de PROPUESTA se conserva para piezas futuras: una plantilla con `approval: "proposed"` (las piezas
       del reel que sigan así o, si no queda ninguna, un fixture de test) pedida por el CLI sale con código distinto de
       cero y `piece-not-approved`, y un plan armado a mano con ella falla en `glitch.piece-approval`.
-- [ ] La tabla de rotación del Detailed Spec pasa completa en tests, incluido `cover-rotation-unsatisfiable`.
-- [ ] Un plan que declara `template` falla con `TemplateAuthorityError`.
-- [ ] Cada uno de los nueve validadores semánticos tiene un fixture que pasa y uno que falla.
-- [ ] `computeByteFracture` devuelve la misma lista para la misma foto, otra para otra foto, y ninguna celda intersecta
+      — Evidencia: `glitch-catalogs.test.ts` (plan a mano → glitch.piece-approval) y `scripts/glitch/__tests__/errors.test.ts` (el CLI lo traduce a `piece-not-approved`, salida 1).
+- [x] La tabla de rotación del Detailed Spec pasa completa en tests, incluido `cover-rotation-unsatisfiable`.
+      — Evidencia: `plan.test.ts` › resolveCoverTemplate (6 casos + `cover-rotation-unsatisfiable` + Guttery pendiente).
+- [x] Un plan que declara `template` falla con `TemplateAuthorityError`.
+      — Evidencia: `glitch-catalogs.test.ts` › TemplateAuthorityError.
+- [x] Cada uno de los nueve validadores semánticos tiene un fixture que pasa y uno que falla.
+      — Evidencia: los 7 de edición con caso que pasa y que falla en `edition-validators.test.ts`; membership y piece-approval fallan en `glitch-catalogs.test.ts` y pasan en cada `resolvePlan` de `plan.test.ts`.
+- [x] `computeByteFracture` devuelve la misma lista para la misma foto, otra para otra foto, y ninguna celda intersecta
       una región de rostro declarada.
-- [ ] Ninguna plantilla del catálogo contiene HEX, `rgb()`, familia tipográfica, px de diseño ni duraciones literales
+      — Evidencia: `byte-fracture.test.ts` (determinismo, otra semilla, rostros, perfiles nuevos).
+- [x] Ninguna plantilla del catálogo contiene HEX, `rgb()`, familia tipográfica, px de diseño ni duraciones literales
       (guarda de test), ni burbuja URL.
-- [ ] Guttery está en `fonts.json` con `extension: "glitch"` y `embedRights: true` sólo si la licencia quedó
+      — Evidencia: `glitch-templates.test.ts` › no HEX, rgb(), familia, animación ni burbuja URL (26 plantillas + molde).
+- [x] Guttery está en `fonts.json` con `extension: "glitch"` y `embedRights: true` sólo si la licencia quedó
       confirmada por escrito; si no, `CoverType` queda fuera de las candidatas con `font-license-missing` y así lo
       registra la procedencia.
-- [ ] `pnpm glitch:compose` sobre el ejemplo produce un PDF de 10 páginas a 1080 × 1350, un PNG por lámina, un
+      — Evidencia: `brand-packs/axis/fonts.json` (extensión glitch, `embedRights: true`); licencia confirmada por el operador en chat el 2026-09-27, número de contrato pendiente; la procedencia registra `narratorFont.status`.
+- [x] `pnpm glitch:compose` sobre el ejemplo produce un PDF de 10 páginas a 1080 × 1350, un PNG por lámina, un
       `*.resolved-manifest.json` por catálogo y `glitch-17.provenance.json` sin fechas.
-- [ ] Dos corridas en procesos separados con el mismo manifiesto y las mismas fotos dan PNG idénticos byte a byte.
-- [ ] `pnpm glitch:tokens --check` pasa contra la versión de AXIS fijada.
+      — Evidencia: `glitch-17-carrusel.pdf` de 10 páginas 810×1013 pt (1080×1350 px), un PNG por lámina, `<artifactId>.manifest.json` por catálogo (nombre real del composer) y `glitch-17.provenance.json` sin reloj.
+- [x] Dos corridas en procesos separados con el mismo manifiesto y las mismas fotos dan PNG idénticos byte a byte.
+      — Evidencia: 35 PNG idénticos con `cmp` entre `.captures/glitch/edicion-17` y una segunda corrida; procedencia idéntica.
+- [x] `pnpm glitch:tokens --check` pasa contra la versión de AXIS fijada.
+      — Evidencia: sin drift (13 archivos) contra `axis-tokens` 0.3.15.
 - [ ] `pnpm composer:visual-gate --catalog=glitch` da cero píxeles en las plantillas aprobadas y el gate global no
       suma frames en rojo; `BASELINE_DELTAS.md` registra el alta.
-- [ ] El peso del PDF de ejemplo queda bajo el límite vigente de LinkedIn para documentos, citado con su fuente y
+      — Sin tildar: `--catalog=glitch` da 26 frames a 0 px y el selftest también. El gate global (2026-09-27) se detiene antes de diffear por 5 plantillas nuevas sin congelar de TASK-1928 (trabajo en curso de otra sesión en `graphic-line-deck`, no de Glitch); se repite cuando esa sesión congele.
+- [x] El peso del PDF de ejemplo queda bajo el límite vigente de LinkedIn para documentos, citado con su fuente y
       fecha en el manual.
-- [ ] Norma, ADR, manual, documentación funcional y skill (`efeonce-graphic-line`, con espejo) actualizados.
+      — Evidencia: ~0,7 MB, 10 páginas, un tamaño; límites y fuente (LinkedIn Help a518909, 2026-09-27) en `scripts/glitch/linkedin.ts` y en el manual `componer-una-edicion-de-glitch.md`.
+- [x] Norma, ADR, manual, documentación funcional y skill (`efeonce-graphic-line`, con espejo) actualizados.
+      — Evidencia: norma v1.12 (§3.4, §4.2, §9.1, §10, §12), ADR «Estado de implementación», manual nuevo `componer-una-edicion-de-glitch.md`, `linea-grafica-glitch.md` v1.11, `references/glitch.md` §8–§9.1 con espejo (`pnpm skills:mirrors` idéntico), runbook del gate (scope Glitch) y regla `.claude/rules/glitch.md`.
 
 ## Verification
 
@@ -854,13 +897,13 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] TASK-1924 recibió un `## Delta` con la forma final del manifiesto y la ruta de `computeByteFracture`
-- [ ] TASK-1921 (o la task nueva de la ruta productiva de Glitch) recibió un `## Delta` con los nombres de los catálogos
+- [x] TASK-1924 recibió un `## Delta` con la forma final del manifiesto y la ruta de `computeByteFracture`
+- [x] TASK-1921 (o la task nueva de la ruta productiva de Glitch) recibió un `## Delta` con los nombres de los catálogos
       y del mapper
-- [ ] TASK-1442 recibió un `## Delta` con el contrato del manifiesto que su dominio deberá producir
-- [ ] ISSUE-122 recibió nota con el resultado de la prueba cross-proceso de las láminas con foto
+- [x] TASK-1442 recibió un `## Delta` con el contrato del manifiesto que su dominio deberá producir
+- [x] ISSUE-122 recibió nota con el resultado de la prueba cross-proceso de las láminas con foto
 
 ## Follow-ups
 

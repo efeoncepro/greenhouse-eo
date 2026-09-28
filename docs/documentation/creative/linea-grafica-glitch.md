@@ -1,9 +1,11 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.10: el blog completo y la lámina con lente quedaron aprobados;
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.11: las piezas estáticas ya se componen solas desde los datos
+> de la edición —carrusel, piezas del blog, portada del reel, miniatura del vlog y cuadros fijos de los gráficos—, con
+> la portada elegida por la regla de rotación; Guttery entra al repo privado; v1.10: el blog completo y la lámina con lente quedaron aprobados;
 > ya no hay piezas fijas en propuesta; v1.9: el reel abre directo con la apertura, sin los segundos de
 > banda previos; el pre-roll queda sólo en el video 16:9; v1.8: qué recibe el equipo en cada edición, el sonido se toma junto a
 > cada gráfico y qué falta para producir en el día a día; manual nuevo para quien corre el taller; v1.7: la música de Glitch ya está publicada en AXIS y el taller la
@@ -12,7 +14,7 @@
 > las noticias; v1.5: los gráficos animados del video quedaron aprobados; v1.4: el sonido de Glitch quedó aprobado,
 > versión B)
 > **Documentacion tecnica:** [Norma de la sub-línea de Glitch](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [ADR de la línea de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
-> **Manual de uso:** [Componer piezas de Glitch](../../manual-de-uso/creative/componer-piezas-glitch.md) · [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md) · [Producir el motion, el sonido y la música de Glitch](../../manual-de-uso/creative/producir-motion-glitch.md)
+> **Manual de uso:** [Componer piezas de Glitch](../../manual-de-uso/creative/componer-piezas-glitch.md) · [Componer una edición de Glitch con `pnpm glitch:compose`](../../manual-de-uso/creative/componer-una-edicion-de-glitch.md) · [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md) · [Producir el motion, el sonido y la música de Glitch](../../manual-de-uso/creative/producir-motion-glitch.md)
 
 > **⚠️ Importante: esta línea es SÓLO para Glitch.** No es la línea gráfica de Efeonce. La línea de Efeonce completa es
 > [La órbita](./linea-grafica-efeonce.md). Lo que aquí se describe como propio de Glitch (la manzana, el verde, los
@@ -260,14 +262,51 @@ cuando habla el host, con los valores del manual.
 > Detalle técnico: [norma §13.12 Música](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk) ·
 > montaje en [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md#6--montar-el-sonido)
 
-## Cómo se va a producir (flujo aceptado; piezas fijas en construcción)
+## Cómo se producen las piezas fijas (composición automática)
 
-Hoy cada pieza se arma a mano a partir del canvas de diseño, siguiendo la norma. El operador **aceptó** el flujo (2026-09-27) para que ninguna persona ni agente tenga que reinterpretar la línea: los valores quedarían en el sistema de
-diseño AXIS, las láminas y banners se compondrían solos a partir de los datos de la edición con el motor de composición
-de Greenhouse (que además elegiría la plantilla de portada según la regla de rotación), y los gráficos del video se
-animarían y exportarían con fondo transparente para que el editor los ponga sobre la grabación.
+Desde el 2026-09-27 las piezas fijas de una edición **ya no se arman a mano**: se llena un archivo con los datos de la
+edición (número, fechas, tesis, las ocho noticias con su foto, crédito, licencia y opinión del narrador, la
+contraportada y, si hay video, sus datos) y un comando compone todo con el motor de composición de Greenhouse. Nadie
+elige coordenadas, colores ni plantilla: la persona pone el contenido y el motor aplica la línea.
 
-> Detalle técnico: [ADR, decisión propuesta](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#decisión-propuesta--flujo-de-composición)
+Qué sale de cada edición:
+
+| Pieza | Formato |
+|---|---|
+| **Carrusel de LinkedIn**: portada, ocho láminas interiores y contraportada | un PDF de 10 páginas, listo para subir como documento (se revisa contra los límites de LinkedIn antes de entregarlo) |
+| **Piezas del blog**: imagen destacada horizontal, versión cuadrada propia (nunca la portada recortada) y banner de cada noticia con el crédito de la foto | imágenes sueltas |
+| **Portada del reel y miniatura del vlog** | imágenes sueltas |
+| **Cuadros fijos de los gráficos del video** (cabecera, rótulo del host, tarjeta de noticia, Glitch Drop y llamado a la acción, en reel y en vlog) | imágenes con fondo transparente; la animación, el sonido y la música siguen saliendo del taller de video |
+| **Registro de la edición** | un archivo con la huella de todo lo que entró y salió: la misma edición siempre produce los mismos archivos |
+
+**La portada rota sola.** El motor elige la plantilla por el contenido, en este orden: **A** si la noticia de portada
+tiene una foto fuerte, **B** si hay una opinión que pega sola, **C** si hay cuatro noticias del mismo peso. Y nunca la de
+la semana anterior. Si el contenido de la semana sólo da para repetir, el motor no compone la portada y pide cambiar el
+contenido: nunca la decide por gusto.
+
+**Reglas que el motor no deja romper** (si una pieza las rompe, no entrega nada y dice qué dato corregir):
+
+- Toda foto de noticia lleva **crédito** y una **licencia** válida: licenciada, propia o generada. El kit de prensa no
+  cuenta como licencia.
+- Los **rostros** de cada foto se declaran, y la falla en bytes **nunca** cae sobre ellos.
+- **Una sola esfera por pieza**: si la lámina lleva la lente, la opinión no cierra con la manzana; la lente nunca va en
+  la noticia 1.
+- El titular siempre lleva el **contraste de pesos** (entrada liviana y remate grueso).
+- El verde nunca va como texto sobre fondo claro; los íconos de acción van siempre planos; no hay burbuja de dirección
+  web.
+- La letra **Guttery** (las muletillas del narrador) sólo se usa con su licencia declarada; el operador autorizó el
+  2026-09-27 que entre al repo privado para componer las piezas de Glitch.
+
+**Qué sigue igual.** Publicar sigue siendo una tarea de una persona (LinkedIn vía Metricool, el blog en WordPress), con
+su confirmación: el comando no publica. Hoy se corre en la máquina de quien produce la edición; la versión que se podrá
+usar desde la plataforma, con su API, está pendiente (TASK-1921). La historia vertical y el carrusel panorámico siguen en
+exploración y no se componen.
+
+> Detalle técnico: [norma §9.1 Qué ya se compone en el Artifact Composer](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#91-qué-ya-se-compone-en-el-artifact-composer-task-1923) ·
+> paso a paso en [Componer una edición de Glitch con `pnpm glitch:compose`](../../manual-de-uso/creative/componer-una-edicion-de-glitch.md) ·
+> [ADR, flujo de composición](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#decisión-propuesta--flujo-de-composición) ·
+> [TASK-1923](../../tasks/in-progress/TASK-1923-glitch-artifact-composer-catalogs.md) · código en
+> `src/lib/glitch-composition/` y `src/lib/artifact-composer/catalogs/glitch/`
 
 ## Dónde está cada cosa
 
@@ -294,8 +333,8 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Callout nuevo del blog | aprobado (2026-09-27); falta actualizar el bloque de WordPress antes de publicar la #17 |
 | Gráficos animados del video | ya aprobados (2026-09-27); falta la cadencia de grabación (hoy 30 cuadros por segundo), la prueba con los editores en una edición real, el ritmo ajustable, dónde se usa la transición de bytes (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17, el formulario para cambiar textos sin programar, guardar una copia en la nube de Google y cualquier excepción a la regla de rostros |
 | Música de Glitch | ya aprobada (2026-09-27), publicada en AXIS y entregada por el taller junto a cada pieza, con el pre-roll de los tres puntos; sólo falta probar la mezcla con la voz real del host en una edición real |
-| Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27) |
-| Producción automática | los gráficos, el sonido y la música del video ya se generan con un comando a partir del archivo de la edición, pero alguien tiene que correrlo (ver abajo); falta construir la de piezas fijas (portadas, carrusel, banners: TASK-1923) |
+| Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27); entra al repo privado para componer las piezas de Glitch; falta registrar el número de contrato |
+| Producción automática | los gráficos, el sonido y la música del video ya se generan con un comando a partir del archivo de la edición, y las piezas fijas (portadas, carrusel, banners, portada del reel, miniatura y cuadros fijos de los gráficos) también, con `pnpm glitch:compose` (TASK-1923); en los dos casos alguien tiene que correrlo en su máquina (ver abajo). La versión desde la plataforma, con API, es TASK-1921 |
 
 ### Qué falta para producir el video en el día a día
 
@@ -311,8 +350,8 @@ Nada de esto está decidido todavía; queda anotado para que nadie lo dé por re
   programar (la opción recomendada, en Marketing Studio) y el registro de ediciones que produciría el archivo de la
   edición (TASK-1442) están pendientes. El flujo editorial con agentes está descrito en EPIC-031.
 - **Plataforma:** los valores de Glitch en el sistema de diseño AXIS (TASK-1922; hoy la paleta y la manzana son una
-  propuesta copiada en el taller), los archivos de marca de Glitch en AXIS, la composición automática de las piezas
-  fijas (TASK-1923) y guardar una copia de los videos en la nube de Google (hoy sólo están en OneDrive, con su huella en
+  propuesta copiada en el taller), los archivos de marca de Glitch en AXIS, la versión de la composición de piezas fijas que
+  se use desde la plataforma (TASK-1921; la composición local ya existe, TASK-1923) y guardar una copia de los videos en la nube de Google (hoy sólo están en OneDrive, con su huella en
   los registros del taller).
 
 Ya resuelto el 2026-09-27: Glitch es línea de servicio **Growth** y la próxima edición es la **#17**.

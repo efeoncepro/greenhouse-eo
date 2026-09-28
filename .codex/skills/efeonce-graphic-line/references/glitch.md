@@ -223,6 +223,7 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 | Motion: apertura/tarjeta final v2, kit, transición de bytes entre piezas y entre escenas, héroe | **APROBADO** (2026-09-27, §12): «Si, el tuyo también está aprobado». La v1 queda como alternativa sin aprobar. Falta decidir a qué piezas va la transición de bytes |
 | Subtítulos del video | pendiente (estilo de captions en Premiere, no hecho) |
 | Diseño sonoro de Glitch (ronda 6: apertura, tarjeta final, kit, lower third, transiciones) | **APROBADO, versión B** (2026-09-27, §13): «La b me encanta más. Sus sonidos están aprobados». La A queda como alternativa descartada |
+| Composición de las piezas estáticas en el Artifact Composer (carrusel, sueltas del blog, portada del reel, miniatura del vlog, overlays PNG) | **EXISTE** como taller local (TASK-1923, 2026-09-27): 26 plantillas, todas `approval: approved`, en tres catálogos; se compone con `pnpm glitch:compose` (§9.1). La ruta productiva (API, `artifact-worker`, MCP, capability) **no existe**: es TASK-1921 |
 | Música de Glitch: tema B (intro, cortina, salida) y cama post-punk bajo la noticia | **APROBADO** (2026-09-27, §13.7): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». **Integrada al taller** (`music.mjs`, pre-roll animado de la intro elegido por el operador) y **en producción en AXIS** (`#musica`, `glitch.json → music`). Único pendiente: probar la mezcla con la voz real del host |
 
 Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador para aprobar. Desde el 2026-09-27 no queda
@@ -260,41 +261,50 @@ Objetivo: que ningún agente reinterprete. **Los agentes llenan datos; nunca eli
    - **Assets** (`@efeoncepro/axis-brand-assets` 0.3.5): `AXIS_GLITCH_ASSETS`, `findGlitchAsset`, `glitchAssetUrl(id)`
      con `glitch-logo-positive`, `glitch-logo-negative` y `glitch-apple` (sellados en `GLITCH_ASSET_SEALS`), **fuera** de
      la familia `AXIS_BRAND_ASSETS`. Las fuentes (Guttery incluida) **nunca** viven en AXIS.
-3. **Composición con el Artifact Composer** (`src/lib/artifact-composer/**`, catálogos = dato, render en el Cloud Run
-   Job `artifact-worker`): catálogo `glitch-edition` con portada A/B/C, interior, interior-noticia-1, interior-lente,
-   contraportada, historia 9:16, banner blog A/B/C 16:9 (+1:1), banner interno 1600×900, portada de reel y miniatura.
-   Entrada: un **manifiesto de edición** (número, fechas, tesis, 8 noticias con sección, titular, medio, foto + crédito
-   + licencia, POV remate + porqué, foto fuerte sí/no, portada). El selector elige la portada por la regla de rotación
-   (el autor no elige: `TemplateAuthorityError`). Salidas: PNG por lámina, PDF del carrusel, imágenes del blog. Gate
-   visual a cero píxeles.
+3. **Composición con el Artifact Composer — EXISTE como taller local** (TASK-1923, 2026-09-27; catálogos = dato):
+   **una** carpeta `src/lib/artifact-composer/catalogs/glitch/` con **tres** catálogos — `glitch-carousel`
+   (`pdf-merged`: portada A/B/C, interior, interior de la noticia 1, interior con lente, contraportada), `glitch-stills`
+   (`png-set`: banners 16:9 A/B/C, 1:1 A/B/C con plantilla propia, banner interno 1600×900, portada del reel,
+   miniatura del vlog) y `glitch-overlays` (`png-set` con alfa: cuadro fijo de cabecera, lower third, noticia, Drop y
+   CTA, en reel y vlog). Entrada: el **manifiesto de edición** `GlitchEditionManifest` (`schemaVersion: 1`, zod
+   `strict`: no admite `template` ni `coverTemplate`). La portada la decide `resolveCoverTemplate` (A > B > C por
+   contenido, nunca la de `previousEdition.coverTemplate`). Salidas: PDF del carrusel, PNG por lámina, sueltas,
+   overlays y procedencia sin reloj. Gate visual a cero píxeles. **El render hoy es local** (`pnpm glitch:compose`);
+   el Cloud Run Job `artifact-worker` y la API son TASK-1921. Cómo operarlo: §9.1.
 4. **Motion con HyperFrames** (skills `hyperframes`, `hyperframes-cli`, `motion-design-studio`): los overlays del reel
-   y del 16:9 como composiciones del mismo catálogo, renderizadas por edición a video con alfa (ProRes 4444 `.mov` o
+   y del 16:9 como composiciones del repo taller (su cuadro fijo también sale como PNG con alfa del catálogo
+   `glitch-overlays`, §9.1), renderizadas por edición a video con alfa (ProRes 4444 `.mov` o
    WebM con alfa) para ponerlas sobre la toma; apertura y cierre (puntos → manzana) sincronizados con el mnemónico.
    Valores: `efeonceGraphicLine.motion` + spec de Glitch a registrar en AXIS. MOGRT de Premiere sólo si el editor
    necesita editar texto en su programa. **Dónde se produce:** en el taller, operado desde tu sesión de `greenhouse-eo`
    (el taller vive como hermano): `pnpm -C ../efeonce-brand-workshop --filter glitch-motion <doctor|render|kit|transiciones|heroe|test>` (§12).
    Nunca agregues HyperFrames ni scripts de video al `package.json` de Greenhouse, nunca copies esta skill al taller y
    nunca metas binarios (ProRes, WebM, PNG) ni rutas absolutas en git del taller: las corridas van a `corridas/` con
-   `manifiesto.json` por sha256 y los binarios a GCS u OneDrive. El manifiesto de edición llega al taller como archivo
-   JSON exportado por Greenhouse (TASK-1923); el taller no importa código de Greenhouse.
+   `manifiesto.json` por sha256 y los binarios a GCS u OneDrive. Hoy el taller lee **su propio** archivo de edición; la
+   sección `video` del manifiesto de TASK-1923 replica sus campos para que migre sin perder datos. El taller no importa
+   código de Greenhouse.
 5. **Semana:** contenido (pipeline editorial PDR-020 / content factory) → manifiesto → el Composer renderiza todas las
    superficies → QA humano → publicación (LinkedIn vía Metricool, blog vía WordPress; ambas con confirmación humana) →
    grabación del host → el editor monta los overlays del mismo manifiesto.
 
-**Encaje en el Artifact Composer (verificado 2026-09-27):** el carrusel NO necesita un «kind» nuevo en el motor. Un
-catálogo es datos y los destinos ya existen: `pdf-merged` (carrusel de LinkedIn) y `png-set` (Instagram, post suelto,
-banners; con `render.background: 'transparent'` para overlays con alfa). Como un catálogo tiene un solo `outputTarget`,
-la propuesta son catálogos delgados sobre un mismo `templatesDir` (`glitch-carousel` PDF, `glitch-stills` y
-`glitch-overlays` PNG) + extensión `glitch` del brand pack `axis` (Guttery) + selector de rotación + validadores. No va por
-`brand-surfaces`. Detalle en el ADR, §«Encaje verificado en el Artifact Composer».
+**Encaje en el Artifact Composer (implementado así en TASK-1923):** el carrusel NO necesitó un «kind» nuevo en el
+motor. Un catálogo es datos y los destinos ya existían: `pdf-merged` (carrusel de LinkedIn) y `png-set` (sueltas y
+overlays; con `render.background: 'transparent'` para el alfa). Como un catálogo tiene un solo `outputTarget`, son tres
+catálogos delgados sobre un mismo `templatesDir` + extensión `glitch` del brand pack `axis` (Guttery) + selector de
+rotación + validadores. No va por `brand-surfaces`. **Única desviación del motor:** un campo acotado del contrato de
+plantilla, `render.minInkTileRatio` (piso ≥ 0,3 %, `MIN_INK_TILE_RATIO_FLOOR`), para capas pequeñas por diseño sobre
+9:16 (lower third, cabecera), que el gate de lámina en blanco rechazaba. Detalle en el ADR, §«Encaje verificado en el
+Artifact Composer».
 
-**Estado:** **2 está publicado** (TASK-1922, AXIS `v0.3.12`). **3 todavía no existe** (sin catálogo `glitch-edition`):
-no lo cites como existente. **4 existe y está aprobado** (2026-09-27) en `tools/glitch-motion/` del taller; todavía
+**Estado:** **2 está publicado** (TASK-1922, AXIS `v0.3.12`; Greenhouse hoy fija `@efeoncepro/axis-tokens` 0.3.15 y
+`glitch-tokens.css` se compila de su `glitchLine`). **3 existe como taller local** (TASK-1923): tres catálogos
+(`glitch-carousel`, `glitch-stills`, `glitch-overlays`), no un catálogo `glitch-edition`; su ruta productiva no existe
+(TASK-1921), no la cites como existente. **4 existe y está aprobado** (2026-09-27) en `tools/glitch-motion/` del taller; todavía
 lleva la paleta y la manzana espejadas en `src/brand.mjs` y el wordmark desde `public/branding/glitch` de Greenhouse:
 pasarlos a `glitchLine` y `AXIS_GLITCH_ASSETS` es trabajo de TASK-1924 (cómo operarlo hoy en §12). Tasks: (a) tokens,
 assets y contrato de Glitch en AXIS → TASK-1922 (**publicado en AXIS `v0.3.12`**: incluye el alta de los cinco glifos Plastilina,
 D27, y la licencia de Guttery declarada en `glitchLine.type.narrator`); (b) catálogos
-de Glitch en el Composer → TASK-1923; (c) overlays HyperFrames + render con alfa → TASK-1924; (d) callout v2 en el
+de Glitch en el Composer → TASK-1923 (**taller local hecho**; ruta productiva → TASK-1921); (c) overlays HyperFrames + render con alfa → TASK-1924; (d) callout v2 en el
 bloque de WordPress (aprobado el 2026-09-27, desde la #17) → bloque de TASK-1337, antes de publicar la #17.
 
 **Resuelto por el operador el 2026-09-27:** manzana y verde aprobados; línea Growth; próxima edición #17; alta de los
@@ -303,6 +313,62 @@ decisiones (§13.6); el motion de Glitch (apertura y tarjeta final v2, kit con e
 16:9, el reel y las tarjetas finales: **aprobado**; el blog completo y la lámina con lente: **aprobados**.
 **Pendientes del operador (no decidas por tu cuenta):** la licencia de Guttery (confirmada; registrar la referencia); y los pendientes del motion de §12.7. El flujo de composición ya está `Accepted` y
 el hogar del movimiento ya está decidido (repo taller).
+
+### 9.1 Componer una edición (taller local, TASK-1923)
+
+Manual del operador: [`componer-una-edicion-de-glitch.md`](../../../../docs/manual-de-uso/creative/componer-una-edicion-de-glitch.md).
+Norma: §9.1 de `GLITCH_GRAPHIC_LINE_V1.md`.
+
+```bash
+pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays]
+```
+
+- **Parte del ejemplo:** `src/lib/glitch-composition/examples/edition-17.example.json` (fotos sintéticas en
+  `examples/fotos/`, regenerables con `pnpm tsx scripts/glitch/make-example-photos.ts [--check]`). `example: true` =
+  nunca se publica. Las rutas de `photo.file` son relativas al manifiesto.
+- **Manifiesto** (`src/lib/glitch-composition/manifest.ts`, estricto): `edition {number, publishDate, weekRange}`,
+  `thesis`, `previousEdition {number, coverTemplate A|B|C|none}`, `cover {newsId, standalonePov|null, mosaic[4]|null,
+  muletilla|null, headline {entry, punch}, lines[2]}`, `news[8]` (`n1`…`n8` en orden: `section`, `headline`, `outlet`,
+  `date`, `photo {file, credit, license {kind licensed|owned|generated, ref}, strong, fractureEdge bottom|left|right,
+  faceRegions[]}`, `pov`, `why`, `lens {region}|null` — nunca en `n1`), `back {closingLine}`, `video` (o `null`) y
+  `outputs {stills[], overlays[reel|vlog]}`. Stills: `cover`, `back`, `interior:nN`, `blog:banner`, `blog:square`,
+  `blog:news:nN`, `reel:cover`, `video:thumbnail`; los dos últimos exigen `video.hostPhoto` y `video.cover`; los overlays
+  exigen `video`. `faceRegions` es obligatorio (`[]` = sin rostros), normalizado a la foto ORIGINAL; el mapper lo lleva
+  al recorte **centrado** del hueco (`fitRegion`). El kit de prensa **no** es licencia.
+- **Tú llenas datos; el comando decide** plantilla, coordenadas, tokens y falla. Nunca agregues un campo para elegir
+  la plantilla (se rechaza) ni cambies `previousEdition` para forzar una portada.
+- **Salidas** (por defecto `.captures/glitch/edicion-<n>/`): `glitch-<n>-carrusel.pdf` (10 páginas, un tamaño,
+  verificado contra LinkedIn: 100 MB, 300 páginas, tamaño único), `carrusel/` (PNG + manifiesto resuelto), `sueltas/`,
+  `overlays/` (cuadros fijos con alfa, se sueltan en 0,0; el Drop del vlog es opaco) y `glitch-<n>.provenance.json`
+  (sin reloj: misma edición → mismos archivos; sha256 de fuente y foto procesada, celdas de la falla por lámina,
+  versiones AXIS, estado de Guttery, límites de LinkedIn). `--only` filtra lo que se pinta, no lo que se valida.
+- **Errores** (`✗ …` + `- [código] ruta: mensaje`, exit 1; nada se entrega a medias):
+
+  | Código | Qué hacer |
+  |---|---|
+  | `manifest-invalid` (`field-unknown` / `field-required` / `field-invalid`, con ruta del campo) | corregir el campo |
+  | `cover-rotation-unsatisfiable` | cambiar el contenido de portada para que califique otra plantilla (lo decide un humano, nunca el composer) |
+  | `font-license-missing` | Guttery sin licencia declarada en `fonts.json` del brand pack: avisar al operador, no quitar la letra |
+  | `contract-issues` | el contrato `efeonce.glitch-line` 0.1.0 (`validateGlitchLineIntent`) rechaza una lámina; ruta `<lámina>.<campo>` con el código del contrato: corregir el dato |
+  | `fracture-over-face` | otro `fractureEdge`, `faceRegions` bien medido u otra foto |
+  | `carousel-too-heavy` | el PDF no cabe en los límites de LinkedIn |
+  | `glitch.*` del catálogo (`glitch.cover-rotation`, `glitch.single-sphere`, `glitch.headline-contrast`, `glitch.photo-credit`, `glitch.face-safe-fracture`, `glitch.accent-on-light`, `glitch.edition-structure`, `glitch.catalog-membership`, `glitch.piece-approval`) | segunda línea: repiten las reglas sobre el plan resuelto; si salta una, el plan llegó sin pasar por el mapper |
+
+- **Dónde vive:** mapper puro `src/lib/glitch-composition/` (`planGlitchEdition`, `resolveCoverTemplate`,
+  `attachFractures`, `fitRegion`; falla en bytes `byte-fracture.ts`, perfiles `band`/`side`/`host`/`card`; copy fijo
+  `copy.ts`); catálogos y validadores `src/lib/artifact-composer/catalogs/glitch/` (`validators.ts`,
+  `edition-validators.ts`, `glitch-tokens.css` compilado desde `glitchLine`; nunca HEX ni familias literales en
+  plantillas); CLI `scripts/glitch/compose.ts` (+ `linkedin.ts`, `photos.ts`); tokens `pnpm glitch:tokens [--check]`;
+  Guttery en `src/lib/artifact-composer/brand-packs/axis/fonts/guttery-400.ttf` (extensión `glitch`,
+  `embedRights: true`; número de contrato pendiente).
+- **Gate:** `pnpm composer:visual-gate --catalog=glitch [--selftest|--freeze]`; 26 frames en
+  `scripts/frontend/baselines/artifact-composer/templates-glitch/`; rebaseline sólo declarado en `BASELINE_DELTAS.md`
+  (sección g).
+- **Fuera del comando:** publicar (LinkedIn vía Metricool, blog vía WordPress, con confirmación humana), el motion
+  animado (taller, §12) y la ruta productiva (TASK-1921).
+- **Pendientes conocidos:** el token `portada-c` de AXIS dice esfera `apple` pero la portada C aprobada no lleva
+  manzana (excepción explícita en el test; seguimiento: patch de AXIS); `VideoThumbnail` no tiene pieza propia en
+  `glitchLine.pieces` (se valida con la de la portada del reel).
 
 ## 10. QA de una pieza de Glitch (además de [qa-checklist.md](qa-checklist.md))
 
@@ -540,7 +606,7 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
   ffmpeg, HyperFrames y Guttery instalados **en su máquina** (el kit completo ≈ 4 min). No hay autoservicio: el
   formulario en Marketing Studio (recomendado) y el dominio de ediciones (TASK-1442) están pendientes (pipeline
   editorial: EPIC-031). Plataforma: tokens, contrato y assets en AXIS ya publicados (TASK-1922, v0.3.12; falta que el
-  taller los lea, TASK-1924), catálogo `glitch-edition` (TASK-1923) y archivo de binarios en GCS (hoy sólo OneDrive + sha256 en los manifiestos).
+  taller los lea, TASK-1924), ruta productiva de las piezas estáticas (TASK-1921; los catálogos de TASK-1923 ya existen en local) y archivo de binarios en GCS (hoy sólo OneDrive + sha256 en los manifiestos).
 - **Si cambias tiempos del motion** (en `pieces.mjs`, `overlays.mjs` o `transitions.mjs` del taller), vuelve a correr
   el mismo comando del motion: el sonido lee los tiempos del código y sale de nuevo junto a cada `.mov` (§13.5). La
   música **no** se mueve con el motion: está amarrada a la grilla de 150 BPM y sus másteres son fijos (§13.7); cambiar

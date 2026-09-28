@@ -46,9 +46,15 @@ La diferencia con otras capas de documentacion:
   fotos, qué sale con `pnpm brand:compose` y qué va como maqueta declarada, estados y problemas comunes.
 - [Componer piezas de Glitch](creative/componer-piezas-glitch.md) — **sólo para Glitch** (no para piezas de
   Efeonce): elegir la portada con la regla de rotación, armar portada, láminas interiores, noticia 1 y contraportada,
-  piezas del blog y del video en propuesta (mapa de zonas del reel), checklist, estados y problemas comunes. Hoy se
-  parte del canvas: la composición automática de las piezas estáticas todavía no existe; el motion tiene un piloto
-  (2026-09-27) y su flujo para agentes está en la sección «Video y motion».
+  piezas del blog y del video en propuesta (mapa de zonas del reel), checklist, estados y problemas comunes. Las piezas
+  estáticas se componen con `pnpm glitch:compose` (manual siguiente); el motion está aprobado (2026-09-27) y su flujo
+  para agentes está en la sección «Video y motion».
+- [Componer una edición de Glitch con `pnpm glitch:compose`](creative/componer-una-edicion-de-glitch.md) — **sólo
+  para Glitch**: el taller local de TASK-1923 (la ruta productiva es TASK-1921). Copiar el ejemplo de la #17, llenar el
+  manifiesto campo por campo (fotos con licencia `licensed`/`owned`/`generated`, rostros declarados), correr
+  `pnpm glitch:compose -- --manifest …` con `--out` y `--only`, qué sale (carrusel PDF para LinkedIn, piezas sueltas,
+  overlays PNG con alfa y la procedencia), qué significa cada error (`manifest-invalid`, `cover-rotation-unsatisfiable`,
+  `font-license-missing`, `contract-issues`, `fracture-over-face`, `carousel-too-heavy`) y problemas comunes. No publica.
 - [Editar el video de Glitch](creative/editar-video-glitch.md) — **sólo para Glitch** (la transición de la manzana en
   bytes es exclusiva de Glitch): para el editor en Premiere Pro y After Effects, dónde están los gráficos en OneDrive
   (ProRes 4444 con alfa, 30 fps), apertura y tarjeta final en bucle con su cuadro de sincronía, cada pieza del kit

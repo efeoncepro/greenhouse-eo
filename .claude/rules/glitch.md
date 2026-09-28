@@ -5,6 +5,10 @@ paths:
   - "docs/operations/brand-graphic-line/glitch/**"
   - "docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md"
   - "docs/manual-de-uso/creative/editar-video-glitch.md"
+  - "docs/manual-de-uso/creative/componer-una-edicion-de-glitch.md"
+  - "src/lib/glitch-composition/**"
+  - "src/lib/artifact-composer/catalogs/glitch/**"
+  - "scripts/glitch/**"
 ---
 
 # Glitch — sub-línea gráfica (auto-load por path)
@@ -14,7 +18,15 @@ Glitch (el magazine semanal de Efeonce: portadas, carrusel, blog, vlog/reel) tie
 `efeonce-advertising-creative` si lleva texto, `social-media-studio`, `motion-design-studio` para video). Canon:
 `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` (motion en §13) + ADR
 `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md`. AXIS `/references/glitch/` y `/references/glitch.json`:
-publicados (2026-09-27); los tokens y el contrato de Glitch llegan con TASK-1922.
+publicados (2026-09-27); el token `glitchLine` y el contrato `efeonce.glitch-line` están publicados en AXIS (TASK-1922).
+
+**Componer una edición (TASK-1923, taller local):** `pnpm glitch:compose -- --manifest <edicion.json>` (manifiesto
+`GlitchEditionManifest`, ejemplo en `src/lib/glitch-composition/examples/`; manual
+`docs/manual-de-uso/creative/componer-una-edicion-de-glitch.md`). **Nunca** elegir la plantilla de portada a mano (la
+decide la rotación desde `previousEdition.coverTemplate`) ni escribir un HEX, px de diseño o familia en una plantilla de
+`catalogs/glitch/` (salen de `glitch-tokens.css`, `pnpm glitch:tokens`). Rostros y lente se declaran sobre la foto
+original. Guttery está en el brand pack de Greenhouse (extensión `glitch`), nunca en un paquete de AXIS. Gate:
+`pnpm composer:visual-gate --catalog=glitch` (freeze single-owner). La ruta productiva es TASK-1921.
 
 Reglas duras:
 
