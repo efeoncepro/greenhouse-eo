@@ -53,8 +53,8 @@ Detalle completo con firmas y líneas: `../../../.claude/skills/dataforseo-opera
 | Estacionalidad / demanda relativa | — (evaluar) | DataForSEO Trends | live | $0.0012–0.006/task | 05 |
 | Stack tecnológico de dominios (lead-gen) | `domain` | `domains_by_technology`, `domain_technologies` | live | ~$1.21/1.000 dominios | 05 |
 | Whois enriquecido con métricas orgánicas | `domain` | `whois/overview` | live | $0.12/task + $0.0012/dominio | 05 |
-| **Share of voice de marca en LLMs** | — (candidata #1 allowlist) | AI Optimization: `llm_mentions` (+timeseries, top domains/pages/brands) | live only | ver reference 08 | 08 |
-| **Benchmark multi-modelo de citabilidad** | — (candidata #1) | AI Optimization: `llm_responses` (ChatGPT/Claude/Gemini/Perplexity) | live $0.0006+LLM; standard $0.0002+$0.01 | 08 |
+| **Share of voice de marca en LLMs** | `ai_optimization` | AI Optimization: `llm_mentions` (+timeseries, top domains/pages/brands) | live only | ver reference 08 | 08 |
+| **Benchmark multi-modelo de citabilidad** | `ai_optimization` | AI Optimization: `llm_responses` (ChatGPT/Claude/Gemini/Perplexity) | live $0.0006+LLM; standard $0.0002+$0.01 | 08 |
 | Menciones web + sentiment (brand monitoring) | — (candidata #2) | Content Analysis: search/trends/rating | live | ~$0.06/1.000 filas | 06 |
 | Reviews multi-fuente / listings Maps | — (candidata #3, acotada) | Business Data | mixto | ver reference | 06 |
 
@@ -122,7 +122,7 @@ Costos por familia verificados as-of 2026-08-06 en las references (las cifras de
 
 ## Ampliar el allowlist (proceso gobernado)
 
-Candidatas priorizadas (as-of 2026-08-06): **#1 `ai_optimization`** (completa — cierra el gap AEO/LLM del grader), **#2 `content_analysis`** (brand monitoring con sentiment), **#3 `business_data`** acotada a reviews+listings. `merchant`/`app_data` solo con cliente e-commerce/app en cartera. `keywords_data` sigue fuera (usar `labs`; excepción: volumen Ads real del ciclo actual). **Content Generation ya no existe en la doc v3** — retirada.
+Estado al 2026-09-28: `ai_optimization` ya es la sexta familia habilitada. Las próximas candidatas son **#1 `content_analysis`** (brand monitoring con sentiment) y **#2 `business_data`** acotada a reviews+listings. `merchant`/`app_data` sólo con cliente e-commerce/app en cartera. `keywords_data` sigue fuera (usar `labs`; excepción: volumen Ads real del ciclo actual). **Content Generation ya no existe en la doc v3** — retirada.
 
 Pasos para ampliar (todos en el MISMO PR):
 
@@ -174,24 +174,61 @@ Regla de composición: esta skill **nunca decide la estrategia SEO/AEO** (eso es
 
 ## CLI diaria de operador y agentes
 
-Usa `pnpm dataforseo -- help` como entrada de terminal. El manual canónico es
-`docs/manual-de-uso/growth/dataforseo-cli.md`. Antes de improvisar un script:
+`pnpm dataforseo` es la entrada local gobernada para personas y agentes. No es un segundo cliente ni un runtime
+productivo: consume `requestDataForSeo`, el allowlist, el breaker, el entitlement y el ledger existentes. Empieza
+por `pnpm dataforseo -- help`. El [manual de uso](../../../docs/manual-de-uso/growth/dataforseo-cli.md) gobierna la
+operación diaria; el [ADR técnico](../../../docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md)
+gobierna transporte, catálogo, lifecycle, seguridad y límites.
 
-1. `pnpm dataforseo -- catalog search "<capacidad>"`;
-2. `pnpm dataforseo -- catalog describe <id|path>`;
-3. `pnpm dataforseo -- quick <preset> ... --dry-run` o `run` con JSON;
-4. sólo después ejecuta con `--yes` y ceiling proporcional.
+### Qué puede operar
 
-Para minería reproducible usa `pnpm dataforseo -- research --keyword "seed uno,seed dos" --market CL
---target ejemplo.com --dry-run`. Encadena Suggestions + Related, Ideas sólo con `--include-ideas`, Overview y
-SERP de finalistas; con target agrega Keywords for Site y competidores. La ejecución exige `--org`, `--yes` y
-`--max-usd`; `--out` conserva JSON completo y `--csv` entrega la tabla deduplicada sin colapsar volumen ausente,
-`null` y cero. Los límites son muestra y control de costo, nunca prueba de exhaustividad.
+- Descubre el snapshot oficial completo y separa inventario de autorización: 545 rutas catalogadas y 320
+  ejecutables en las seis familias vigentes al 2026-09-28 (`serp`, `labs`, `backlinks`, `onpage`, `domain` y
+  `ai_optimization`). Una ruta `catalog_only` se describe, pero no se ejecuta.
+- Ofrece presets `quick` para SERP orgánico, AI Mode, Labs, Backlinks, OnPage y las cuatro capacidades principales
+  de AI Optimization; `run` cubre cualquier GET o POST ejecutable con JSON; `task wait` hace polling GET acotado
+  sin reenviar el POST.
+- Compone minería SEO con `research`: Suggestions + Related, Ideas sólo mediante `--include-ideas`, Keywords for
+  Site y competidores cuando hay `--target`, Overview para enriquecer y SERP live sólo para finalistas. El JSON
+  conserva las respuestas crudas por paso; el CSV contiene la tabla deduplicada de keywords.
+- Opera el carril AI permitido: catálogos/modelos, LLM Responses de ChatGPT/Claude/Gemini/Perplexity, LLM Scraper,
+  AI Keyword Data y LLM Mentions. Las 53 rutas `ai_optimization` ejecutables siguen disponibles mediante `run`;
+  los presets no son el límite de la API.
 
-El snapshot `data/dataforseo/endpoints.v3.json` se genera desde las páginas concretas y el REST oficial mediante
-`pnpm dataforseo:catalog:sync`; `pnpm dataforseo:catalog:check` detecta drift. Inventario oficial y autorización
-son planos distintos: `catalog_only` conserva el endpoint, la razón del bloqueo y la ruta de habilitación. Nunca
-uses esa visibilidad para llamar la ruta por fuera de `requestDataForSeo`.
+### Flujo obligatorio
+
+1. Descubre: `pnpm dataforseo -- catalog search "<capacidad>"`.
+2. Lee contrato y autorización: `pnpm dataforseo -- catalog describe <id|path>`.
+3. Previsualiza sin gasto: `pnpm dataforseo -- quick <preset> ... --dry-run`, `research ... --dry-run` o
+   `run <id|path> --file payload.json --dry-run`.
+4. Ejecuta sólo después del preview con `--yes`. Todo POST pagado sin estimador integrado exige
+   `--estimated-usd` y `--max-usd`; todo POST de familia distinta de SERP exige además `--org`. En
+   `ai_optimization`, declara `consumer='aeo'`; en investigación SEO, `consumer='seo'`.
+5. Conserva evidencia con `--out` y, para `research`, `--csv`. Los archivos se crean de forma exclusiva: una ruta
+   ya existente falla en vez de sobrescribirse.
+
+Ejemplo mínimo de minería reproducible:
+
+```bash
+pnpm dataforseo -- research \
+  --keyword "seed uno,seed dos" \
+  --market CL \
+  --target ejemplo.com \
+  --dry-run
+```
+
+Para research AI, consulta primero el endpoint `/models` gratuito de la plataforma, usa ese nombre vivo en el
+preset y conserva superficies separadas. Los GET de modelos/catálogos/polling no exigen organización; todo POST
+real de `ai_optimization` exige `--org`, entitlement, `--estimated-usd`, `--max-usd` y `--yes`. AI Keyword Data es
+un proxy ◑ estimado y LLM Mentions ChatGPT sólo cubre US/en; no los presentes como demanda LLM universal.
+Hasta aplicar y verificar la migración `20260928095506879_task-1651-ai-optimization-family.sql`, los GET y previews
+AI están disponibles, pero los POST pagados no se declaran operativos en staging ni producción.
+
+El snapshot `data/dataforseo/endpoints.v3.json` se regenera desde las páginas concretas y el REST oficial con
+`pnpm dataforseo:catalog:sync`; `pnpm dataforseo:catalog:check` detecta drift. Nunca uses la visibilidad del
+catálogo para llamar una ruta por `curl`, SDK o transporte paralelo. `--max-usd` compara la estimación preflight:
+no es un hard cap del proveedor, por lo que los límites, la paginación y la selección de finalistas siguen siendo
+guardas de costo obligatorias.
 
 ## Estado del runtime y drift conocido (as-of 2026-08-28)
 

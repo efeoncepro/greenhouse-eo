@@ -1,25 +1,16 @@
 ---
 name: seo-aeo
 description: >-
-  Skill experta y robusta de SEO + AEO/GEO 2026 para diagnosticar, diseñar,
-  auditar, priorizar y ejecutar búsqueda orgánica y visibilidad en motores de
-  respuesta IA. Cubre SEO técnico (crawl/index, Core Web Vitals, JSON-LD y
-  crawlers IA), contenido y topical authority, E-E-A-T y entidades, Query
-  Fan-Out, estructura editorial y citabilidad, AI Overviews/AI Mode, ChatGPT,
-  Claude, Perplexity, Gemini y Copilot, off-page/digital PR, local e internacional, YMYL,
-  GSC/GA4/BigQuery, Share of Voice, exactitud y playbooks de auditoría, migración
-  y recovery, Google Search Console API/Platform Properties, con overlay Efeonce
-  WordPress/Kinsta. Úsala también para blogposts,
-  pillars y guías: research dossier, intent/SERP, claim ledger, metadata,
-  canonical/robots, author Person, Article schema, publicación y QA live.
-  Cubre además ASO y descubrimiento de apps en la era de IA como superficie
-  adyacente: metadata de App Store y Google Play, creativos de ficha, Custom
-  Product Pages y Custom Store Listings, reseñas, Ask Play, Gemini,
-  Personalized Collections, App Intents/Spotlight y medición por fuente.
-  Triggers: SEO, AEO, GEO, LLMO, schema, JSON-LD, E-E-A-T, knowledge graph,
-  citabilidad, llms.txt, Core Web Vitals, topical authority, backlinks, hreflang,
-  auditoría SEO, rankear, posicionamiento, tráfico orgánico, Semrush, GSC, ASO,
-  App Store, Google Play y ficha de app.
+  Skill operativa de SEO + AEO/GEO para diagnosticar, priorizar y ejecutar
+  búsqueda orgánica y visibilidad en motores de respuesta IA. Cubre crawl e
+  indexación, Core Web Vitals, schema/JSON-LD, contenido, topical authority,
+  E-E-A-T, entidades, citabilidad, AI Overviews/AI Mode, ChatGPT, Claude,
+  Perplexity, Gemini y Copilot, off-page, local/internacional, YMYL,
+  GSC/GA4/BigQuery, auditorías, migraciones y recovery; también briefs,
+  metadata, canonical/robots, publicación y QA live en WordPress/Kinsta.
+  Incluye ASO y descubrimiento de apps. Triggers: SEO, AEO, GEO, LLMO,
+  knowledge graph, llms.txt, backlinks, hreflang, tráfico orgánico, DataForSEO,
+  keyword mining, SERP research, Semrush, GSC, ASO, App Store y Google Play.
 ---
 
 # SEO + AEO/GEO — Skill operativa 2026
@@ -63,6 +54,11 @@ description: >-
 7. **Si entregas una auditoría al cliente**, carga `modules/09_CLIENT_AUDIT_REPORTING.md`
    antes de redactar: continuidad histórica, responsabilidad de la agencia, validez
    de las fuentes y lectura de vuelta del entregable forman parte del cierre.
+8. **Si necesitas datos de mercado o superficies AI**, carga también la skill
+   `dataforseo-operator` y usa `pnpm dataforseo`; no llames la API del proveedor,
+   `curl` ni un SDK paralelo. El [manual de uso](../../../docs/manual-de-uso/growth/dataforseo-cli.md)
+   explica los comandos y la [decisión técnica](../../../docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md)
+   gobierna transporte, allowlist, costos y lifecycle.
 
 ### SEO/AEO como competencia de selección
 
@@ -259,6 +255,41 @@ Grupo Berel):
 ---
 
 ## 5. Herramientas (esta skill ejecuta, no solo asesora)
+
+- **DataForSEO CLI local gobernada (`pnpm dataforseo`)** — es el acceso disponible
+  en este repo a SERP, Labs, Backlinks, OnPage, Domain Analytics y AI Optimization.
+  Carga primero `dataforseo-operator`; la CLI reutiliza el transporte canónico,
+  allowlist, breaker, entitlement y ledger. Selecciona el modo según la pregunta:
+  - `catalog info|list|search|describe`: descubre rutas, estado ejecutable y shape
+    antes de preparar un payload. `catalog_only` significa conocida pero no autorizada;
+    nunca la eludas con una llamada directa.
+  - `research`: keyword mining compuesto. Usa Suggestions + Related, agrega
+    Keywords for Site y competidores con `--target`, enriquece candidatas con Labs y
+    reserva SERP para finalistas. `--include-ideas` sólo aplica a seeds de una categoría
+    homogénea. Los límites son una muestra, no exhaustividad.
+  - `quick`: usa un preset para preguntas rutinarias y revisables como organic SERP,
+    keyword overview, ranked keywords, competidores, backlinks, OnPage, AI Mode,
+    LLM Responses/Scraper, AI Keyword Data o LLM Mentions. Empieza con `--dry-run`.
+  - `run`: opera una ruta ejecutable por ID/path cuando no existe preset. Primero
+    usa `catalog describe`; para tasks asíncronas conserva el ID y continúa con
+    `task wait`, sin repetir `task_post`.
+  - AI Optimization: consulta modelos vivos con los GET de `llm_responses/models`;
+    no hardcodees modelos. Declara plataforma en LLM Mentions, y conserva resultados
+    de ChatGPT, Claude, Gemini, Perplexity, Google AI Mode y AI Overviews como
+    observaciones separadas por motor, superficie, mercado, idioma y fecha.
+
+  Toda operación pagada se previsualiza antes de usar `--yes`, organización y
+  `--max-usd`; ese techo valida la estimación, no limita al proveedor. Conserva la
+  salida JSON/CSV como evidencia, incluyendo procedencia y vacíos honestos. Manual
+  completo: `docs/manual-de-uso/growth/dataforseo-cli.md`. Contrato técnico:
+  `docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md`.
+
+  **Separación de lentes:** GSC es medición de primera parte del sitio (clicks,
+  impresiones, CTR y posición observados); DataForSEO es estimación de mercado y
+  observación del proveedor. No las promedies, fusiones ni uses una para rellenar la
+  otra. Del mismo modo, una mención/cita en un motor o superficie AI no prueba
+  presencia en otro: compara plataformas sólo con paneles equivalentes y reporta
+  cobertura y limitaciones de cada fuente.
 
 - **Semrush MCP** — keyword research, organic research, backlink research, site
   audit, trends, overview. Úsalo para *datos reales* en vez de estimar cuando

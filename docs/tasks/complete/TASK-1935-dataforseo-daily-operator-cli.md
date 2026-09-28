@@ -1,5 +1,12 @@
 # TASK-1935 — CLI diaria y catálogo completo de DataForSEO
 
+## Delta 2026-09-28 — discoverability para agentes y documentación operativa
+
+Las skills espejo `dataforseo-operator` y `seo-aeo` ahora enrutan explícitamente a `pnpm dataforseo`, distinguen
+catálogo, presets, ejecución genérica, lifecycle asíncrono, research SEO y superficies AI, y conservan los
+guardrails de costo, organización, consumer y allowlist. El manual operativo y el ADR técnico quedaron ampliados
+como las dos fuentes canónicas; no se creó un cliente, transporte ni documentación paralela.
+
 ## Delta 2026-09-28 — keyword research compuesto
 
 La CLI completa el caso de minería con `research`: Suggestions + Related, Ideas opt-in, Keywords for Site y

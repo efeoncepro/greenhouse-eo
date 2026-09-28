@@ -3,6 +3,26 @@
 > Alcance: herramienta local de operador/agentes. No despliega ni cambia flags.
 > Catálogo verificado el 2026-09-28: 545 endpoints oficiales; 320 pertenecen a las seis familias ejecutables.
 
+`pnpm dataforseo` es la entrada gobernada para research ad hoc. Usa el mismo transporte, allowlist, breaker,
+entitlement y ledger que los consumers productivos; no es un SDK alternativo. La fuente rápida de sintaxis es:
+
+```bash
+pnpm dataforseo -- help
+```
+
+## Antes de empezar
+
+- Configura `DATAFORSEO_API_LOGIN` y `DATAFORSEO_API_PASSWORD_SECRET_REF`; la contraseña se resuelve por la ruta
+  gobernada y nunca se pone en argumentos, payloads, archivos de salida ni capturas.
+- Define el objetivo, mercado y lente antes de comprar. GSC es medición de primera parte; DataForSEO es una
+  estimación de mercado. No se promedian ni se presentan como equivalentes.
+- Para una llamada pagada, empieza siempre con `--dry-run`. Revisa endpoint, mercado, cantidad de tasks,
+  estimación y `consumer` antes de confirmar.
+- Usa una organización real con `--org <uuid>` cuando corresponda. La CLI nunca la infiere ni la fabrica.
+
+El flujo recomendado es `catalog search` → `catalog describe` → `quick|run --dry-run` → revisión humana →
+`--yes --max-usd`. Si el endpoint es asíncrono, conserva el ID y termina con `task wait`.
+
 ## Descubrir antes de ejecutar
 
 ```bash
@@ -66,6 +86,26 @@ pnpm dataforseo -- quick onpage-audit --target example.com --org <uuid> --max-cr
 
 Los presets sin estimador oficial verificable exigen `--estimated-usd` y `--max-usd` al ejecutar. El preview no
 los exige y siempre muestra `estimateStatus: unavailable` cuando corresponde; nunca imprime un costo inventado.
+
+### Elegir el carril correcto
+
+| Necesidad                                                | Entrada recomendada                           | Familia / observación                                                |
+| -------------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------- |
+| Ver posición y features de una búsqueda                  | `quick organic`                               | SERP live; para lotes recurrentes prefiere task-based mediante `run` |
+| Observar Google AI Mode y sus referencias                | `quick ai-mode`                               | SERP con `consumer=aeo`                                              |
+| Volumen, intent y dificultad                             | `quick keyword-overview`                      | Labs; DataForSEO es lente estimada                                   |
+| Keywords de un dominio / competidores                    | `quick ranked-keywords` / `quick competitors` | Labs                                                                 |
+| Perfil agregado de enlaces                               | `quick backlinks`                             | Backlinks; usa `run` para referring domains, anchors o link gap      |
+| Diagnóstico inmediato de una URL                         | `quick onpage-instant`                        | OnPage live                                                          |
+| Crawl técnico completo                                   | `quick onpage-audit` + `task wait`            | OnPage asíncrono; JS/browser multiplican costo                       |
+| Tecnologías o WHOIS                                      | `run` después de `catalog search`             | Domain Analytics; no tiene preset dedicado                           |
+| Respuestas/citas de ChatGPT, Claude, Gemini o Perplexity | presets `*-response`                          | AI Optimization; modelo vivo obligatorio                             |
+| Superficie real de ChatGPT/Gemini                        | presets `*-scraper`                           | AI Optimization Scraper                                              |
+| Demanda proxy para preguntas AI                          | `quick ai-keyword-volume`                     | Estimación derivada; no es frecuencia observada en LLMs              |
+| Menciones longitudinales                                 | `quick llm-mentions`                          | Cobertura depende de plataforma y mercado                            |
+
+`quick` sólo cubre operaciones frecuentes. Para cualquier otra ruta autorizada usa `catalog describe` y `run`;
+no conviertas la ausencia de preset en permiso para usar `curl`.
 
 ### Keyword research compuesto
 
@@ -135,6 +175,11 @@ POST real agrega `--org`, `--estimated-usd`, `--max-usd` y `--yes`; el preview n
 plataformas produce escalas y coberturas incomparables. ChatGPT Mentions sólo admite US/en; Google usa el mercado
 declarado. AI Keyword Data es un proxy estadístico derivado de búsquedas, no demanda observada dentro de un LLM.
 
+Para una comparación multi-modelo, conserva una fila por plataforma/modelo/mercado/fecha y separa citas observadas
+de preguntas propuestas. No mezcles una respuesta de API con la interfaz de consumidor: `llm_responses` y
+`llm_scraper` observan superficies distintas. Los `fan_out_queries` y `brand_entities` del proveedor son evidencia
+para análisis de entidades; no son un score propio de Greenhouse.
+
 ## Endpoint genérico
 
 ```bash
@@ -149,6 +194,22 @@ printf '[{"keyword":"efeonce","location_code":2152,"language_code":"es"}]' | \
 El input puede ser objeto o arreglo. `--out` crea un archivo nuevo y falla si ya existe para no sobrescribir
 evidencia. La salida JSON conserva fecha, superficie, endpoint, organización si existe, task IDs/status, costo,
 latencia y respuesta.
+
+Flags comunes:
+
+| Flag                  | Efecto                                                                                 |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| `--dry-run`           | Genera preview sin llamar al proveedor                                                 |
+| `--yes`               | Confirma ejecución; sin este flag una operación pagada sigue en preview                |
+| `--org <uuid>`        | Atribuye gasto y habilita entitlement; obligatorio para POST no-SERP y para `research` |
+| `--consumer seo\|aeo` | Clasifica el gasto; los presets eligen el valor coherente, `run` permite declararlo    |
+| `--estimated-usd <n>` | Estimación explícita cuando no existe calculador verificable                           |
+| `--max-usd <n>`       | Ceiling de preflight; no limita el cargo dentro del proveedor                          |
+| `--timeout-ms <n>`    | Timeout de transporte                                                                  |
+| `--out <ruta>`        | Escribe el artefacto JSON con creación exclusiva                                       |
+
+Antes de un `run`, comprueba los campos obligatorios con `catalog describe`. La validación local comprueba forma
+básica, requireds y batch limit; el proveedor sigue siendo la autoridad sobre enums, condiciones y formas anidadas.
 
 ## Tasks asíncronas
 
@@ -193,3 +254,23 @@ es éxito; `>=40000` distinto de los pendientes es error de task. HTTP 200 por s
 
 La cifra cambia cuando cambia la documentación. Ejecuta `catalog:sync`, revisa el diff y no conviertas un cambio
 de catálogo en ampliación de autorización.
+
+## Limitaciones y estado operativo
+
+- `--max-usd` compara una estimación antes de la llamada. No es un hard cap transaccional de DataForSEO.
+- `research` es una corrida local secuencial: no tiene checkpoint, caché, reanudación ni paginación automática.
+  Un fallo tardío exige revisar los artefactos antes de repetir para no recomprar pasos.
+- El CSV de `research` es una tabla de keywords. SERP, PAA, AI Overview y competidores permanecen en las respuestas
+  crudas del JSON; el operador debe interpretarlos y conservar su fecha/procedencia.
+- La selección de finalistas SERP prioriza volumen observado; no sustituye relevancia, intención, cobertura propia
+  ni prioridad de negocio. `keyword_difficulty` tampoco equivale a una dificultad editorial total.
+- El research orgánico compuesto usa SERP live. Para lotes de baja urgencia, descubre y usa el lifecycle
+  task-based standard mediante `run` + `task wait` para reducir costo.
+- La CLI cataloga endpoints fuera del allowlist, pero no puede ejecutar Keywords Data, Trends, Content Analysis,
+  Business Data u otras familias sin una ampliación gobernada.
+- `ai_optimization` está integrado en código y catálogo. La migración
+  `20260928095506879_task-1651-ai-optimization-family.sql` sigue sin aplicarse en staging y producción al
+  2026-09-28. Los GET gratuitos y previews están disponibles; no declares operativo el POST pagado AI hasta aplicar
+  la migración y verificar CHECK, entitlement y fila de gasto en el ledger.
+- No existe captura recurrente AI, snapshot, reader, MCP ni cron por el solo hecho de que la CLI pueda ejecutar una
+  ruta. Esos consumers pertenecen al rollout de `TASK-1651-B`.
