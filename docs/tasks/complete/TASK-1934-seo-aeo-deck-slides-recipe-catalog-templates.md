@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Implementacion — Slice 1 en curso; decisiones del operador tomadas el 2026-09-28`
+- Status real: `Complete local 2026-09-28 — nueve láminas componen y aprobadas, gate 73 frames a 0 px, AXIS 0.3.23 publicado y fijado, pnpm test y pnpm build verdes; sin push (a develop sólo con indicación del operador)`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -332,23 +332,23 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo. (Esta task no crea tablas; se confirma al cerrar.)
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. — catálogo JSON → `catalog.generated.json`, `validateDeckPlan`, `recipe-map.json`, AXIS 0.3.23/0.3.21; consumidores CLI, TASK-1921/1930/1932 (deltas).
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. — `brand:deck-recipes --check` byte a byte, paridad de slots, sin datos de cliente; generador y validador puros.
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo. (Esta task no crea tablas; se confirma al cerrar.) — sin tablas nuevas.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. — sin migración ni backfill; rollback = revert + versión AXIS anterior.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. — tooling/local: 16.375 tests (`pnpm test`), gate 73 frames a 0 px, `brand:compose` de las nueve y del documento de propuesta (7 páginas).
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. — sin PII; errores tipados (`DeckPlanIssue`, `SurfacePieceError`).
 
 ### Capability Definition of Done — Full API Parity gate
 
-- [ ] **Lógica en el primitive, no en la UI.** Reglas en `src/lib/brand-surfaces/deck-recipes/` y builders en `src/lib/brand-surfaces/recipes/`.
-- [ ] **Modelada como recurso/contrato, no como click-handler.** Recetas del catálogo y `validateDeckPlan`.
-- [ ] **Read** como función pura reutilizable; esta task no agrega escrituras.
-- [ ] **Capability + grant en el MISMO PR:** `N/A — no gatea ni expone endpoint; la capability la aplican TASK-1921/TASK-1932`.
-- [ ] **Camino programático declarado:** CLI `pnpm brand:compose` y `pnpm brand:deck-plan`; API, Nexa y MCP por TASK-1932.
-- [ ] **Write apto para `propose → confirm → execute`:** `N/A — sin write`; `proposeDeckPlan` ya conoce las recetas nuevas al regenerar el catálogo.
-- [ ] **Un primitive, muchos consumers:** CLI, TASK-1921, TASK-1930 y TASK-1932 leen el mismo catálogo y el mismo validador.
-- [ ] **Parity check = SÍ** una vez cerrada TASK-1932.
+- [x] **Lógica en el primitive, no en la UI.** Reglas en `src/lib/brand-surfaces/deck-recipes/` y builders en `src/lib/brand-surfaces/recipes/`. — builders en `recipes/seo-aeo/`, reglas en `deck-recipes/validate.ts`.
+- [x] **Modelada como recurso/contrato, no como click-handler.** Recetas del catálogo y `validateDeckPlan`.
+- [x] **Read** como función pura reutilizable; esta task no agrega escrituras.
+- [x] **Capability + grant en el MISMO PR:** `N/A — no gatea ni expone endpoint; la capability la aplican TASK-1921/TASK-1932`. — N/A.
+- [x] **Camino programático declarado:** CLI `pnpm brand:compose` y `pnpm brand:deck-plan`; API, Nexa y MCP por TASK-1932.
+- [x] **Write apto para `propose → confirm → execute`:** `N/A — sin write`; `proposeDeckPlan` ya conoce las recetas nuevas al regenerar el catálogo. — N/A.
+- [x] **Un primitive, muchos consumers:** CLI, TASK-1921, TASK-1930 y TASK-1932 leen el mismo catálogo y el mismo validador.
+- [ ] **Parity check = SÍ** una vez cerrada TASK-1932. — queda para el cierre de TASK-1932.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -598,23 +598,23 @@ cutover es inmediato al commit de cada slice.
 
 ## Acceptance Criteria
 
-- [ ] El catálogo tiene 78 recetas; las nueve nuevas llevan el esquema completo (incluidos `renderSource`, `referenceSource`, `prompts.composition`, `fixed`, `selection` y `photo`) y `pnpm brand:deck-recipes -- --check` pasa.
-- [ ] Cada slot de las nueve tiene `maxChars` medido sobre la referencia aprobada, con la medida anotada en su `notes`.
-- [ ] Las nueve recetas están `approved` en AXIS, con su referencia en `apps/lab/public/references/surfaces/deck/<id>.jpg` y en `docs/agent-composition/surfaces/deck-recipes.json`; los tests del Lab esperan 78 y la vista ampliada abre cada una por su deep-link.
-- [ ] Greenhouse fija la versión AXIS publicada en `package.json` y `pnpm-lock.yaml`.
-- [ ] Las nueve componen desde su intent de ejemplo con `pnpm brand:compose` sin issues de AXIS.
-- [ ] Siete plantillas nuevas y dos recetas sobre plantilla existente tienen entrada en `recipe-map.json` con mapa de slots, y `recipe-slot-parity.test.ts` pasa.
-- [ ] Ninguna plantilla nueva contiene px, HEX o familia tipográfica literales que un token o el manifest ya declaran (cualquier excepción queda declarada con su nota).
-- [ ] `pnpm composer:visual-gate --catalog=graphic-line` queda a 0 px con un frame por receta nueva, cada alta declarada en `BASELINE_DELTAS.md`, y las 69 previas siguen a 0 px.
-- [ ] El operador aprobó a ojo cada lámina contra su referencia antes de su `--freeze`.
-- [ ] La auditoría renderizada mide respuesta ≥ 3× la pregunta y acento sólo en texto ≥ 24 px en las siete plantillas nuevas.
-- [ ] Una cifra de DeckMercadoIA sin fuente hace fallar la composición (test) y el plan (test con código propio).
-- [ ] DeckIARespuesta sin «Ejemplo ilustrativo» y DeckDiagnosticoMapa sin «Datos de muestra» no componen (test).
-- [ ] Un test sobre el HTML resuelto de DeckIARespuesta y DeckDiagnosticoMapa confirma que no hay assets de marca de proveedores de IA ni colores fuera de los tokens AXIS.
-- [ ] `validateDeckPlan` acepta las nueve recetas en sus familias y documentos (goldens) y rechaza `proposal-service-seo` y `proposal-cinematic-seo` en el mismo deck aunque no vayan seguidas (test).
-- [ ] Los goldens y fixtures previos de TASK-1929 siguen pasando.
-- [ ] El plate SE1 quedó registrado en el banco de TASK-1931, o la receta lo declara por ruta local y TASK-1931 tiene el `## Delta` que lo suma a su siembra.
-- [ ] README del catálogo, norma §4.6/§7, spec técnica, manual, doc funcional y skills `deck-studio` y `efeonce-graphic-line` describen las nueve láminas, y `pnpm skills:mirrors` pasa.
+- [x] El catálogo tiene 78 recetas; las nueve nuevas llevan el esquema completo (incluidos `renderSource`, `referenceSource`, `prompts.composition`, `fixed`, `selection` y `photo`) y `pnpm brand:deck-recipes -- --check` pasa. — `ede74080b`; `brand:deck-recipes -- --check` ✓ 78.
+- [x] Cada slot de las nueve tiene `maxChars` medido sobre la referencia aprobada, con la medida anotada en su `notes`. — medido por la sesión autora sobre el código de dirección (notes de cada slot); dos corregidos al construir con el copy aprobado (ownTeamTitle 25, builtWith 44).
+- [x] Las nueve recetas están `approved` en AXIS, con su referencia en `apps/lab/public/references/surfaces/deck/<id>.jpg` y en `docs/agent-composition/surfaces/deck-recipes.json`; los tests del Lab esperan 78 y la vista ampliada abre cada una por su deep-link. — AXIS `v0.3.22` (`8dd702d`) y `v0.3.23` (`bc9f60c`); Lab 78 láminas con referencia y miniatura, tests del Lab 50/50. Deep-link no verificado en navegador: la vista ampliada no cambió de componente y lee el JSON.
+- [x] Greenhouse fija la versión AXIS publicada en `package.json` y `pnpm-lock.yaml`. — `axis-tokens` 0.3.23 / `axis-ui-contracts` 0.3.21 (`434b10ddb`).
+- [x] Las nueve componen desde su intent de ejemplo con `pnpm brand:compose` sin issues de AXIS. — `pnpm brand:compose` de las nueve con plates, logos e íconos reales (comparaciones lado a lado aprobadas por el operador).
+- [ ] Siete plantillas nuevas y dos recetas sobre plantilla existente tienen entrada en `recipe-map.json` con mapa de slots, y `recipe-slot-parity.test.ts` pasa. — siete nuevas + `proposal-service-seo` con mapa (paridad verde); `proposal-cinematic-seo` queda con `slots: null` como sus cuatro hermanas cine (mapear las cinco juntas → TASK-1933; el freno de largos es `slot-over-max-chars`, fixture adversarial).
+- [x] Ninguna plantilla nueva contiene px, HEX o familia tipográfica literales que un token o el manifest ya declaran (cualquier excepción queda declarada con su nota). — guard `graphic-line-catalogs.test.ts` verde (sin HEX/rgb en los bloques nuevos); valores desde AXIS 0.3.23 vía `--gl-*`; algunos bloques conservan respaldos de medidas del probe, como el resto del catálogo.
+- [x] `pnpm composer:visual-gate --catalog=graphic-line` queda a 0 px con un frame por receta nueva, cada alta declarada en `BASELINE_DELTAS.md`, y las 69 previas siguen a 0 px. — 73 frames a 0 px; altas declaradas en `BASELINE_DELTAS.md` (o), `c652f4f83`; `ProposalCinematic` re-promovido por la nota del pie.
+- [x] El operador aprobó a ojo cada lámina contra su referencia antes de su `--freeze`. — 2026-09-28 («Apruebo todas»), antes del `--freeze`.
+- [x] La auditoría renderizada mide respuesta ≥ 3× la pregunta y acento sólo en texto ≥ 24 px en las siete plantillas nuevas. — las siete en `ANSWER_RATIO_CONTENT_TYPES`; D1 y 3× verdes en el gate; respuestas a ≥ 120 px (AXIS).
+- [x] Una cifra de DeckMercadoIA sin fuente hace fallar la composición (test) y el plan (test con código propio). — composición: `seo-aeo-decision-ai-market.test.ts` (AXIS `figure-source-required`); plan: `figure-source-missing` en `validate.test.ts`.
+- [x] DeckIARespuesta sin «Ejemplo ilustrativo» y DeckDiagnosticoMapa sin «Datos de muestra» no componen (test). — tests de los builders; la marca es condicional (con `dataOrigin: 'client'` + `evidenceRef` se omite, camino de TASK-1930).
+- [x] Un test sobre el HTML resuelto de DeckIARespuesta y DeckDiagnosticoMapa confirma que no hay assets de marca de proveedores de IA ni colores fuera de los tokens AXIS. — tests sobre el plan resuelto (slots + SVG): sólo assets SVG, sin nombres de productos de IA y todo HEX desde tokens AXIS.
+- [x] `validateDeckPlan` acepta las nueve recetas en sus familias y documentos (goldens) y rechaza `proposal-service-seo` y `proposal-cinematic-seo` en el mismo deck aunque no vayan seguidas (test). — goldens `golden-proposal-seo-aeo.json` y `golden-brochure-seo-aeo.json` sin issues; `variant-both-in-deck` rechaza SEO sobria + cine separadas (test).
+- [x] Los goldens y fixtures previos de TASK-1929 siguen pasando. — verdes; `golden-pitch.json` cambió `content-text` por `content-measure` (la regla nueva de variantes, decisión del operador).
+- [x] El plate SE1 quedó registrado en el banco de TASK-1931, o la receta lo declara por ruta local y TASK-1931 tiene el `## Delta` que lo suma a su siembra. — por ruta local; delta en TASK-1931.
+- [x] README del catálogo, norma §4.6/§7, spec técnica, manual, doc funcional y skills `deck-studio` y `efeonce-graphic-line` describen las nueve láminas, y `pnpm skills:mirrors` pasa. — `5e9c355ac` + lecciones de CR4; `pnpm skills:mirrors` ✓.
 
 ## Verification
 
@@ -631,17 +631,21 @@ cutover es inmediato al commit de cada slice.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas — deltas en TASK-1930, 1931, 1932, 1933 y 1395.
 
-- [ ] `## Delta` en TASK-1930, TASK-1931 y TASK-1932 con la lista final de las nueve recetas, sus contentTypes y los códigos nuevos del validador
-- [ ] `pnpm build` corrido con autorización del operador, o el cierre dice `code complete, build pendiente de autorización`
+- [x] `## Delta` en TASK-1930, TASK-1931 y TASK-1932 con la lista final de las nueve recetas, sus contentTypes y los códigos nuevos del validador — `8214d5963`.
+- [x] `pnpm build` corrido con autorización del operador, o el cierre dice `code complete, build pendiente de autorización` — autorizado por el operador el 2026-09-28; exit 0. `pnpm test` completo: 16.375 tests verdes.
 
 ## Follow-ups
+
+- `foto:isotipo` tapa luz de la escena al limpiar la marca (caso CR4): chip de task sugerida `Fix foto:isotipo patch over scene light`.
+- Mapear juntas las cinco `proposal-cinematic` en `recipe-map.json`: TASK-1933.
+- Cifra en texto plano en un slot `metric` no la detecta `figure-source-missing` (límite conocido, README del catálogo).
 
 - Versión motion de DeckCicloSurround o DeckTraficoNegocio (trayectoria de luz) si el operador la pide: catálogo
   `graphic-line-overlays` o HyperFrames, en task aparte.
