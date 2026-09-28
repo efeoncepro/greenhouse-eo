@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.0
 > **Creado:** 2026-09-28 por Claude (TASK-1876)
-> **Ultima actualizacion:** 2026-09-28 por Claude
+> **Ultima actualizacion:** 2026-09-28 por Claude (rollout staging)
 > **Documentacion tecnica:** [GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md](../../architecture/GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md) §V1.3
 
 ## Para qué sirve
@@ -58,43 +58,37 @@ Estado vigente de las reglas:
 2. Cambia `mode: 'observe'` → `mode: 'enforce'` en la regla de producción de `firewall-rules.ts`, commit.
 3. `pnpm security:public-burst-guard --apply`.
 
-### 4. Crear la alerta de conexiones (una vez)
+### 4. Alerta de conexiones (creada 2026-09-28)
+
+Definida como código en `infra/gcp/monitoring/cloudsql-connection-saturation.alert-policy.json`
+(`num_backends > 85` por 2 min → canal Slack de alertas). Vigente:
+`projects/efeonce-group/alertPolicies/11425632472409123636`. Para recrearla o crearla en otro proyecto:
 
 ```bash
-gcloud alpha monitoring policies create \
-  --project=efeonce-group \
-  --notification-channels=projects/efeonce-group/notificationChannels/8736345518502755361 \
-  --display-name='Cloud SQL greenhouse-pg-dev — conexiones > 85 (ISSUE-174)' \
-  --user-labels=severity=critical,component=postgres-connections \
-  --documentation='La instancia compartida (dev/staging/prod) supera 85 de 97 conexiones utilizables por 2 minutos. Revisar ráfagas en /api/public/** (Vercel Firewall → Traffic) y pg_stat_activity. Runbook: docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md' \
-  --condition-filter='metric.type="cloudsql.googleapis.com/database/postgresql/num_backends" AND resource.type="cloudsql_database" AND resource.labels.database_id="efeonce-group:greenhouse-pg-dev"' \
-  --condition-threshold-value=85 \
-  --condition-threshold-comparison=COMPARISON_GT \
-  --condition-threshold-duration=120s \
-  --condition-threshold-aggregations='alignment_period=60s,per_series_aligner=ALIGN_MAX,cross_series_reducer=REDUCE_SUM' \
-  --condition-display-name='num_backends > 85 for 2m'
+gcloud monitoring policies create --project=efeonce-group \
+  --policy-from-file=infra/gcp/monitoring/cloudsql-connection-saturation.alert-policy.json
 ```
 
-El umbral es alto a propósito: los picos diarios normales (septiembre 2026) van de 42 a 77.
+El `gcloud` instalado (560) no acepta los flags `--condition-threshold-*`: usa siempre el archivo.
+Antes de crearla, `gcloud monitoring policies list` para no duplicarla. El umbral es alto a propósito:
+los picos diarios normales (septiembre 2026) van de 42 a 77.
 
-### 5. Dar lectura de métricas a la señal (una vez)
+### 5. Lectura de métricas para la señal (otorgada 2026-09-28)
 
-La señal lee Cloud Monitoring con la identidad del portal, que hoy sólo puede escribir métricas:
-
-```bash
-gcloud projects add-iam-policy-binding efeonce-group \
-  --member=serviceAccount:greenhouse-portal@efeonce-group.iam.gserviceaccount.com \
-  --role=roles/monitoring.viewer --condition=None
-```
-
-Sin este permiso la señal sigue funcionando y marca el pico como «no disponible».
+`greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/monitoring.viewer`. Sin ese permiso
+la señal sigue funcionando y marca el pico como «no disponible».
 
 ### 6. Verificar con una ráfaga controlada (sólo staging)
 
-Sólo con las reglas aplicadas y el código desplegado en staging. Antes: mira `num_backends` en Cloud
-Monitoring; **si ya está sobre 50, no sigas**. Lanza como máximo 30 requests concurrentes a una ruta
-pública de staging y confirma: ~20 responden normal, el resto `429` desde el borde, y las conexiones
-vuelven a la línea base en ~1 minuto (antes eran 5).
+```bash
+pnpm security:public-burst-guard:verify          # 30 requests (máximo)
+```
+
+El comando trae los frenos: sólo el host de staging `.vercel.app`, máximo 30 requests, **aborta si
+`num_backends` supera 50 antes de disparar**, token inexistente (404 sin datos) y muestrea la métrica
+6 minutos. Resultado de referencia (2026-09-28, deploy `43931ea73`): 20 × 404 del dominio + 10 × 429 del
+borde; pico 26 conexiones con base 5, de vuelta a 6 al minuto siguiente (en ISSUE-174: 99 durante 5 min).
+Corre una sola vez por ventana; la métrica llega con 1–3 min de retraso.
 
 ## Qué significan los estados
 

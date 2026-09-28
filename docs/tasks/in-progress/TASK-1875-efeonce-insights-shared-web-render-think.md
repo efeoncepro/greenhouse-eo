@@ -11,7 +11,7 @@
 
 ## Delta 2026-09-28 (rate limit)
 
-- TASK-1876: `/api/public/**` queda detrás de un rate limit del Firewall de Vercel (20 req/10 s por IP; enforce en staging/preview, observe en producción). Si Think lee el reader público server-side desde pocas IPs de runtime, **exceptuarlo con una condición explícita** (cabecera/credencial de Think) en `src/lib/security/public-burst-guard/firewall-rules.ts` y aplicar con `pnpm security:public-burst-guard --apply`; nunca subir el límite para todos.
+- TASK-1876: `/api/public/**` queda detrás de un rate limit del Firewall de Vercel (20 req/10 s por IP; enforce en staging/preview, observe en producción). **Criterio transferido desde TASK-1876 (2026-09-28): esta task debe demostrar que el tráfico server-side de Think al lector público no es bloqueado por el guard** — excepción explícita en `src/lib/security/public-burst-guard/firewall-rules.ts` + `pnpm security:public-burst-guard --apply`; verificar en staging, donde la regla ya está en `enforce`. Si Think lee el reader público server-side desde pocas IPs de runtime, **exceptuarlo con una condición explícita** (cabecera/credencial de Think) en `src/lib/security/public-burst-guard/firewall-rules.ts` y aplicar con `pnpm security:public-burst-guard --apply`; nunca subir el límite para todos.
 
 ## Delta 2026-09-26
 

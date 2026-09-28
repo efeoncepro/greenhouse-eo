@@ -14,7 +14,7 @@ La señal (módulo `cloud`, `kind=runtime`, reader `src/lib/reliability/queries/
 - Pico ≥ 90 % del utilizable eleva `ok` → `warning` aunque el instante esté sano; nunca baja una severidad.
 - Si el detector PG falla, la señal queda `unknown` pero el resumen y la evidencia reportan el pico de Cloud SQL.
 - Si Monitoring no se puede leer, la evidencia declara `peak_backends_24h: no disponible`; nunca se interpreta como `ok`.
-- Rollout pendiente: la SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` necesita `roles/monitoring.viewer` (hoy sólo `monitoring.metricWriter`). Contrato: `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md` §V1.3.
+- La SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/monitoring.viewer` desde 2026-09-28 (lectura del pico verificada). Alerta complementaria `num_backends > 85` por 2 min: `projects/efeonce-group/alertPolicies/11425632472409123636`. Contrato: `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md` §V1.3.
 
 ## Delta 2026-09-04 — Release `9100bbd2765d`: `platform.release.worker_revision_drift` clasifica el change-gate por servicio
 

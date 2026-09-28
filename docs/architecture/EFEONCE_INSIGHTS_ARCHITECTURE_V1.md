@@ -325,7 +325,7 @@ y auth en servidor.
   (indistinguibles entre sí); `410` = revocado o edición retirada; `429` = rate limit; `503` sanitizado.
 - **Rate limit** (`insight_share_rate_buckets`, ventana por minuto sobre sujeto hasheado, UPSERT atómico): por IP
   300 vistas / 60 descargas por minuto; por grant 60 / 20. Si la base no responde, **falla cerrado**.
-- **Guard en el borde (TASK-1876, code complete 2026-09-28; apply del operador pendiente):** delante de todo
+- **Guard en el borde (TASK-1876, aplicado en staging 2026-09-28; producción en observe hasta el cutover):** delante de todo
   `/api/public/**` —lector y proxy de descarga incluidos— hay un rate limit del Firewall de Vercel de 20 req / 10 s
   por IP: `enforce` en staging/preview (429 desde el borde, sin invocar la función ni abrir conexión PostgreSQL) y
   `observe` (sólo registro) en producción. Reglas versionadas en `src/lib/security/public-burst-guard/firewall-rules.ts`,
@@ -1062,8 +1062,8 @@ contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate`
 - **Incidente durante el canary — ISSUE-174:** una ráfaga concurrente de 64 requests al lector público dejó 86–88
   conexiones ociosas en la instancia Cloud SQL compartida durante 5 min. Corrección: TASK-1876 (P1, to-do). Regla:
   nunca probar límites con ráfagas concurrentes contra la base compartida.
-  *Delta 2026-09-28:* TASK-1876 quedó code complete con el guard en el borde descrito en §8 (rollout pendiente:
-  apply de las reglas y cutover de producción de `observe` a `enforce`).
+  *Delta 2026-09-28:* TASK-1876 aplicó el guard en el borde descrito en §8 (staging en `enforce`, verificado con
+  ráfaga controlada; producción en `observe` hasta el cutover a `enforce`, ≥ 2026-10-05).
 - **Sigue abierto:** lector web en Think (TASK-1875, ya desbloqueada: `InsightWebModelV1` y el resolver existen);
   `portal_link` `not_ready` (TASK-1849); in-app/Teams (TASK-690–693 / TASK-1849); recordatorios, preferencias y baja
   no existen en V1; TASK-1876. El encendido en producción espera a TASK-1875.

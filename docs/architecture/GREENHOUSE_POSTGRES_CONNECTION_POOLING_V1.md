@@ -113,6 +113,12 @@ Decisiones:
    99 el 2026-09-18 11:05Z). Pico ≥ 90 % del utilizable eleva a `warning`; con el detector sin conexión reporta
    el pico. Alerta de Cloud Monitoring `num_backends > 85` por 2 min al canal Slack de alertas.
 
+**Estado vigente (2026-09-28):** reglas WAF aplicadas sin drift (staging/preview `enforce`, producción `observe`
+hasta el cutover, ≥ 2026-10-05); alerta `projects/efeonce-group/alertPolicies/11425632472409123636`
+(`infra/gcp/monitoring/cloudsql-connection-saturation.alert-policy.json`); `roles/monitoring.viewer` para
+`greenhouse-portal@`. Ráfaga controlada en staging (`pnpm security:public-burst-guard:verify`, deploy `43931ea73`):
+20×404 + 10×429 del borde; pico 26 conexiones con base 5, de vuelta a 6 al minuto siguiente (ISSUE-174: 99 por 5 min).
+
 Alternativas rechazadas: PgBouncer (TASK-847, ~USD 75–85/mes; sigue contingente a evidencia); límite en memoria en
 `proxy.ts` (no ve ráfagas distribuidas entre instancias); `ALTER ROLE` global (corta locks de sesión de workers).
 Límite honesto: una ráfaga distribuida entre muchas IPs no la frena un límite por IP; si la alerta muestra ese

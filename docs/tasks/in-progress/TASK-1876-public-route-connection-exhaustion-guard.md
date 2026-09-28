@@ -28,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Code complete 2026-09-28, rollout pendiente — slices 1–3 committeados (36ddfb382, f2cd62afe, 0a223a5f3) y docs; faltan apply WAF, alerta, roles/monitoring.viewer, deploy a staging y ráfaga controlada (bloqueados por permiso: operador)`
+- Status real: `Rollout de staging completo 2026-09-28 (WAF sin drift, alerta, IAM, deploy 43931ea73, ráfaga controlada verificada). Pendiente: cutover de producción de observe a enforce (≥ 2026-10-05 con 7 días de logs) → cierra ISSUE-174; excepción de Think transferida a TASK-1875`
 - Rank: `TBD`
 - Domain: `platform|reliability|data|security`
 - Blocked by: `none`
@@ -290,13 +290,13 @@ paralelas antes de ejecutarlos.
 
 ## Acceptance Criteria
 
-- [ ] Una ráfaga controlada de N requests concurrentes a `/api/public/**` en staging no eleva las conexiones `greenhouse_app` por sobre un techo documentado. — **Pendiente:** requiere reglas WAF aplicadas + deploy en staging; procedimiento en el manual §6 (techo: ≤30 requests, abortar si base > 50).
-- [ ] El guard responde `429` con `Retry-After` sin abrir conexión a PostgreSQL (verificado con test y con `pg_stat_activity`). — **Parcial:** tests prueban la partición de reglas por host/path (`firewall-rules.test.ts`); el `429` del borde por diseño no invoca la función. Falta evidencia viva: el apply del WAF fue denegado por el clasificador de permisos 2026-09-28.
-- [ ] El tráfico server-side de Think al reader público no es bloqueado por el guard. — **No verificable aún:** Think (TASK-1875) no existe; contrato: se exceptúa con condición explícita en `firewall-rules.ts`, nunca subiendo el límite (delta en TASK-1875).
-- [ ] `idle_session_timeout` del rol runtime queda en el valor decidido, con readback y Down probada, sin `57P05` inesperados en workers. — **Recalibrado:** no `ALTER ROLE` (el rol lo comparten los workers con locks de sesión); 60 s por conexión sólo en Vercel. Readback local contra PG real: Vercel `1min`, resto `5min`. Rollback = `GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS=0`. Falta verlo en staging tras deploy.
-- [ ] `runtime.postgres.connection_saturation` registra un pico que ocurre sin que nadie abra el overview. — **Code complete:** lee el pico de 24 h de `num_backends` (Cloud SQL registró 99 en ISSUE-174); falta `roles/monitoring.viewer` para `greenhouse-portal@` (hoy degrada a «no disponible») y crear la alerta.
+- [x] Una ráfaga controlada de N requests concurrentes a `/api/public/**` en staging no eleva las conexiones `greenhouse_app` por sobre un techo documentado. — **Verificado** con ráfaga controlada 2026-09-28 en staging (`pnpm security:public-burst-guard:verify`, deploy `43931ea73`): 30 requests ⇒ pico 26 conexiones (base 5), bajo el techo de 50 que el comando exige como piso de seguridad y muy por debajo de las 99 de ISSUE-174; de vuelta a 6 al minuto siguiente.
+- [x] El guard responde `429` sin abrir conexión a PostgreSQL (verificado con test y con la métrica). — **Verificado:** 10 de 30 respuestas fueron 429 del borde (sin cuerpo del dominio, la función no se invoca); el pico de conexiones corresponde sólo a los 20 requests que pasaron. Vercel no agrega `Retry-After` en el 429 del borde (el 429 del dominio sí, con `Retry-After: 60`); documentado en el manual de Insights.
+- [ ] El tráfico server-side de Think al reader público no es bloqueado por el guard. — **Transferido a TASK-1875** (in-progress, dueña del lector de Think): debe exceptuarse con una condición explícita en `firewall-rules.ts`, nunca subiendo el límite (delta 2026-09-28 en TASK-1875). No verificable hasta que Think exista.
+- [x] `idle_session_timeout` queda en el valor decidido, con readback, sin `57P05` inesperados en workers. — **Recalibrado y verificado:** no `ALTER ROLE`; 60 s por conexión sólo en Vercel (readback PG real: Vercel `1min`, resto `5min`). En staging las conexiones de la ráfaga se cerraron en ~1 min (antes 5). Los workers no cambian (rol intacto). Rollback: `GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS=0`.
+- [x] `runtime.postgres.connection_saturation` registra un pico que ocurre sin que nadie abra el overview. — **Verificado:** la señal lee el pico de 24 h de `num_backends` (métrica nativa, sin conexión a la base; `roles/monitoring.viewer` otorgado a `greenhouse-portal@` y lectura probada con esas credenciales) y la alerta `projects/efeonce-group/alertPolicies/11425632472409123636` (`num_backends > 85` por 2 min → Slack) quedó creada con readback.
 - [x] ~~`PUBLIC_BURST_GUARD_ENABLED` registrado en el ledger de flags~~ — **Superado por diseño:** no hay env flag; el modo por regla (`observe`/`enforce`) en `firewall-rules.ts` es la palanca, versionada y con readback.
-- [ ] `ISSUE-174` movido a `resolved/` con evidencia; decisión registrada en `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md`. — **Parcial:** decisión registrada (§V1.3); ISSUE-174 sigue open hasta la ráfaga de verificación.
+- [ ] `ISSUE-174` movido a `resolved/` con evidencia; decisión registrada en `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md`. — **Parcial:** decisión y estado registrados (§V1.3). ISSUE-174 queda **mitigado, no resuelto**: producción sigue en `observe`, así que una ráfaga contra los hosts productivos aún llega a la base (con cola de ~1 min en vez de 5). Se resuelve con el cutover a `enforce` (≥ 2026-10-05, 7 días de logs).
 
 ## Verification
 
@@ -308,9 +308,9 @@ paralelas antes de ejecutarlos.
 ## Closing Protocol
 
 - [ ] Lifecycle, carpeta, Status real y acceptance actualizados con evidencia.
-- [ ] `TASK_ID_REGISTRY.md` y `docs/tasks/README.md` sincronizados.
+- [x] `TASK_ID_REGISTRY.md` y `docs/tasks/README.md` sincronizados.
 - [ ] `ISSUE-174` resuelto con verificación; `docs/issues/README.md` actualizado.
-- [ ] Arquitectura de pooling, invariantes de infra y manual/runbook actualizados.
+- [x] Arquitectura de pooling, invariantes de infra y manual/runbook actualizados.
 - [ ] `pnpm test` completo + `pnpm build` en el último commit.
 
 ## Follow-ups

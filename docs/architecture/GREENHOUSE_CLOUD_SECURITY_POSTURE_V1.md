@@ -512,7 +512,7 @@ requireCronAuth(request)
 | Regla no productiva | `greenhouse-public-burst-guard-non-production` — `enforce` (429) en todo host que no sea producción |
 | Regla productiva | `greenhouse-public-burst-guard-production` — `observe` (sólo registra) en `greenhouse.efeoncepro.com` y `greenhouse-eo.vercel.app`; pasar a `enforce` es cambiar su `mode` y aplicar |
 | Operación | `pnpm security:public-burst-guard` (plan read-only, exit 2 con drift) · `--apply` (habilita el firewall, inserta/actualiza sólo las reglas del guard y relee; falla si no converge) |
-| Estado vivo (2026-09-28) | el proyecto aún no tiene configuración de firewall: `--apply` pendiente del operador |
+| Estado vivo (2026-09-28) | reglas aplicadas y sin drift (firewall habilitado); staging/preview en `enforce`, producción en `observe` hasta el cutover (≥ 2026-10-05). Verificado con ráfaga controlada: 20×404 + 10×429 del borde |
 
 No hay env flag: el `mode` por regla es la palanca de rollout. Las reglas ajenas al guard no se tocan. Runbook: `docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md`.
 

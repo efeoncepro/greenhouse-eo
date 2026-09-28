@@ -68,7 +68,7 @@ El Firewall de Vercel del proyecto se gobierna desde el repo, no desde el dashbo
 del guard volumétrico de `/api/public/**` (20 req / 10 s por IP; `enforce` fuera de producción,
 `observe` en producción) viven en `src/lib/security/public-burst-guard/firewall-rules.ts` y se
 sincronizan con `pnpm security:public-burst-guard` (plan) / `--apply` (escribe y relee). Estado
-vivo 2026-09-28: sin configuración de firewall, `--apply` pendiente. Postura y detalle:
+vivo 2026-09-28: reglas aplicadas sin drift; staging/preview en `enforce`, producción en `observe` hasta el cutover. Postura y detalle:
 `GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md` §3.3 (TASK-1876, ISSUE-174).
 
 ## Crons
