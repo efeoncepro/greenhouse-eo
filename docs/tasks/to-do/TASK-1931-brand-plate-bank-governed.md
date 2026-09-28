@@ -8,9 +8,13 @@
   `fichas/SE1-te-encuentran.json`, prompt `prompts/SE1-te-encuentran.txt`, registro de `foto:isotipo`
   `plates/SE1-te-encuentran-isotipo.json`). Lo usan dos recetas que son alternativas y nunca van juntas: la propuesta SEO
   sobria (lente) y la cine (`proposal-cinematic` layout `service`). Registro cine dentro de su alcance
-  (`proposal-cinematic`).
+  (`proposal-cinematic` y, desde AXIS 0.3.22, la lente de `proposal-service`).
 - Mientras el banco no exista, TASK-1934 deja SE1 declarado por ruta local en `photo.plate`, igual que las 69; no sube
   ni registra nada fuera de este banco.
+- Estado al cierre de TASK-1934: SE1 sigue por ruta local (el banco no existe). Lo usan `proposal-service-seo` (en la
+  lente, recortado hacia el estratega con `photo.focus`; AXIS 0.3.22 admite plate cine en la lente de `proposal-service`)
+  y `proposal-cinematic-seo` (a sangre). Son variantes (`variant-both-in-deck`): nunca van juntas, así que no chocan con
+  `plate-repeated`. Las siete láminas nuevas no usan plate (íconos y logos van como assets `file`/`logo` del repo).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

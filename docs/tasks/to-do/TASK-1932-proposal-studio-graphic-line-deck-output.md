@@ -1,5 +1,18 @@
 # TASK-1932 — Proposal Studio arma el deck «La órbita» desde recetas: render en `artifact-worker` y acción Nexa/MCP
 
+## Delta 2026-09-28 — TASK-1934 suma nueve recetas SEO/AEO y cambia dos reglas del plan
+
+- El catálogo tiene **78 recetas**, todas con plantilla en `graphic-line-deck` y página de AXIS (axis-tokens 0.3.23,
+  axis-ui-contracts 0.3.21). contentTypes nuevos: `deck.decision-ai-answer`, `deck.decision-ai-market`,
+  `deck.method-surround-cycle`, `deck.decision-difference`, `deck.method-eeat`, `deck.decision-traffic-to-revenue`,
+  `deck.decision-diagnosis-map`; `proposal-service-seo` y `proposal-cinematic-seo` usan `deck.proposal-service` y
+  `deck.proposal-cinematic` (`service`). El consumer del `artifact-worker` las renderiza sin cambio de código; los íconos 3D
+  del ciclo y los logos de fuente del mercado son assets del repo (`file`/`logo`) que el Job debe poder materializar.
+- `validateDeckPlan`: **`variant-both-in-deck`** reemplaza a `variant-adjacent` (dos recetas de un par `variant` nunca en
+  el mismo deck, seguidas o no); código nuevo **`figure-source-missing`** (una cifra en los `slots` del plan sin
+  `source`); `next-steps-after-diagnosis` rige por familia `next-steps` (incluye `decision-diagnosis-map`). La acción
+  Nexa/MCP y el endpoint muestran estos códigos tal cual.
+
 ## Delta 2026-09-28 — TASK-1929 dejó el plan de deck contra el catálogo
 
 - Entrada pura e isomórfica `@/lib/brand-surfaces/deck-recipes`: `validateDeckPlan(plan: DeckPlan): { ok, issues: DeckPlanIssue[] }`

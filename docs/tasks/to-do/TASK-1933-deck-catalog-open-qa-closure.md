@@ -1,5 +1,19 @@
 # TASK-1933 — Cerrar los pendientes abiertos del catálogo del deck «La órbita»: el logo en la órbita del cierre y el registro de QA
 
+## Delta 2026-09-28 — pendientes que deja TASK-1934
+
+- **Paridad de las cinco `proposal-cinematic`**: `recipe-map.json` las declara con `slots: null` (las cuatro de TASK-1928 y
+  `proposal-cinematic-seo`). Mapearlas juntas exige que la plantilla cine compartida tenga el MAYOR largo de las cinco;
+  mapear sólo una bajaría la plantilla y rompería las otras. Efecto hoy: la plantilla admite textos más largos que los
+  medidos por receta (p. ej. respuesta 16 vs 10 en la SEO cine); el freno es `validateDeckPlan` (`slot-over-max-chars`),
+  probado con un fixture adversarial de la SEO cine.
+- **Plate CR2b repetido** (el operador pidió registrarlo aquí el 2026-09-28; la elección entre (a) y (b) sigue pendiente): `proposal-cinematic-creative` y `cover-brochure-line-brand`
+  («Tu squad.») comparten `ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png`. En una
+  propuesta no chocan (la portada es sólo de brochure); en un brochure de Creative Services con las dos, `plate-repeated`
+  salta y es correcto. Opciones que propuso la sesión autora: (a) un plate propio para la portada, misma persona y
+  registro, reserva a la izquierda hasta x ≈ 760 (~USD 0,05, con `foto:isotipo`); (b) en ese brochure, la propuesta
+  sobria en vez de la cine. Mientras tanto `plate-repeated` sigue como error.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

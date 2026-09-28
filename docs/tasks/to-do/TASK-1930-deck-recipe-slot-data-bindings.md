@@ -1,17 +1,22 @@
 # TASK-1930 — Datos reales en los slots del deck «La órbita»: logo, montos, equipo, métricas, casos y testimonios
 
-## Delta 2026-09-28 — TASK-1934 suma nueve recetas SEO/AEO
+## Delta 2026-09-28 — TASK-1934 suma nueve recetas SEO/AEO (nombres finales)
 
-- TASK-1934 lleva al catálogo las nueve láminas SEO/AEO aprobadas por el operador el 2026-09-28 (69 → **78 recetas**).
-  El criterio «todo slot `logo`, `money`, `metric`, `person` o de prueba … tiene binder o exclusión» cubre las 78.
-- Slots nuevos que necesitan binder o exclusión con razón (los nombres finales los fija TASK-1934 en su Slice 1):
-  - **cifras de mercado** de DeckMercadoIA (−27 % HubSpot 2026, 50 % McKinsey 2025, <1 en 100 SparkToro 2026): son
-    cifras públicas con fuente, no del cliente; entran por `figures` con fuente obligatoria. Recomendación: exclusión con
-    razón («dato de mercado citado, no del cliente»);
-  - **respuesta de ejemplo** de DeckIARespuesta (tu marca ausente «Hoy» y 1.ª «Con AEO»), marcada «Ejemplo ilustrativo»;
-  - **informe del diagnóstico** de DeckDiagnosticoMapa (score por motor, share of voice, prompts sin aparición, plan
-    priorizado), marcado «Datos de muestra». Cuando exista un diagnóstico real (AEO Grader), la marca sólo cambia por un
-    hecho con `evidenceRef`; nunca se inventa un score.
+- El catálogo pasa de 69 a **78 recetas**, todas con plantilla. El criterio «todo slot `logo`, `money`, `metric`, `person`
+  o de prueba … tiene binder o exclusión» cubre las 78.
+- Slots nuevos que necesitan binder o exclusión con razón:
+  - `decision-ai-market.figures` (−27 % HubSpot 2026, 50 % McKinsey 2025, <1 en 100 SparkToro 2026): cifras públicas con
+    fuente, no del cliente; van por `figures` del contrato AXIS (`value`, `label`, `source` + `detail`, `year`,
+    `sourceLogo`). Recomendación: exclusión con razón («dato de mercado citado, no del cliente»).
+  - `decision-ai-answer`: `clientName`, `clientDescription`, `clientCitations`, `competitorsToday`, `competitorsWithAeo`
+    e `illustrativeMark` («Ejemplo ilustrativo»).
+  - `decision-diagnosis-map`: `reportTitle`, `engineScores` (6 × motor 0–100), `shareOfVoice` (suma 100), `lostPrompts`,
+    `plan` y `sampleMark` («Datos de muestra»).
+- **Contrato de la marca (decisión del operador 2026-09-28):** `illustrativeMark` y `sampleMark` NO son obligatorios en el
+  contrato; la regla vive en el builder: con `dataOrigin` ilustrativo (el valor por defecto) la marca es obligatoria y sin
+  ella la lámina no compone; con `dataOrigin: 'client'` el builder exige `evidenceRef` y permite omitir la marca. Esta task
+  es la dueña de ese camino: el binder que liga datos reales entrega `dataOrigin: 'client'` + `evidenceRef` (nunca un score
+  inventado ni una marca quitada sin evidencia).
 
 ## Delta 2026-09-28 — TASK-1929 dejó el plan de deck contra el catálogo
 

@@ -1,5 +1,13 @@
 # TASK-1395 — PPTX Native Editable Renderer for Artifact Composer
 
+## Delta 2026-09-28 — TASK-1934 suma siete plantillas a `graphic-line-deck`
+
+- TASK-1934 agrega `DecisionAiAnswer`, `DecisionAiMarket`, `MethodSurroundCycle`, `DecisionDifference`, `MethodEeat`,
+  `DecisionTrafficToRevenue` y `DecisionDiagnosisMap` (las láminas SEO/AEO; 78 recetas con plantilla). La matriz de
+  capacidad las declara (nativa o falla cerrada), igual que las de TASK-1928. Varias son escenas en perspectiva con capas
+  SVG y vidrio (monolitos, ventanas, escalones, informe girado): candidatas naturales a falla cerrada hasta que el
+  renderer nativo tenga equivalente.
+
 ## Delta 2026-09-27 (b) — decks «La órbita» desde Proposal Studio
 
 - TASK-1928 suma 38 plantillas a `graphic-line-deck` y TASK-1932 pide PPTX de decks «La órbita» desde Proposal Studio.
