@@ -1,0 +1,50 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "recipe": "method-staircase",
+  "layout": "flat",
+  "line": "engine",
+  "theme": "dark",
+  "body": "ChatGPT, Claude, Perplexity, Gemini y Google AI Overviews. Subimos tu marca nivel por nivel.",
+  "voice": {
+    "eyebrow": "AEO · metodología BeX",
+    "question": "¿Te recomienda la IA?",
+    "answer": [
+      "Capa",
+      "por capa"
+    ]
+  },
+  "levels": [
+    {
+      "name": "Be Found",
+      "descriptor": "que te encuentre"
+    },
+    {
+      "name": "Be Readable",
+      "descriptor": "que te entienda"
+    },
+    {
+      "name": "Be Correct",
+      "descriptor": "que te represente bien"
+    },
+    {
+      "name": "Be Actionable",
+      "descriptor": "que pueda actuar"
+    },
+    {
+      "name": "Be Intrinsic",
+      "descriptor": "que te prefiera"
+    }
+  ],
+  "note": "Be Intrinsic es una trayectoria, no una garantía.",
+  "selection": {
+    "target": "level",
+    "level": 3,
+    "label": "SEO · AEO",
+    "participantKind": "department"
+  },
+  "use": "proposal"
+}

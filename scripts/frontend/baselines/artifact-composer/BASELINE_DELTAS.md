@@ -1,5 +1,26 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (h) — TASK-1928: la familia método
+
+Segunda familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.16, `axis-ui-contracts` 0.3.14, delta (g) de
+AXIS): la escalera tipográfica (`method-staircase` · `flat`), el plan como trayectoria (`decision-plan`, reemplaza la
+órbita circular), el anillo del puntaje (`method-score-ring`) y la fuerza de trabajo híbrida con sus dos composiciones
+(`ladder` con dos cursores sobre la respuesta; `scene` con dos selecciones medidas en la foto). Compuestas con su
+plate real y comparadas a ojo contra las cinco referencias: coinciden salvo las correcciones de la norma — la
+respuesta del plan a 3× la pregunta (120 px; la referencia, 112), la fuente de los pesos del anillo visible en el pie
+y la ficha 3 del plan apoyada en la punta de su tallo (la referencia la dejaba 24 px arriba por un alto de ficha fijo).
+La escalera de vidrio sale ahora de los tokens de AXIS con los mismos valores: su frame NO cambia. El hook de
+selección mide el aire de la respuesta POR LÍNEA sólo cuando el slot lo pide (`textPad: 'per-line'`, la fuerza
+híbrida, como su lámina aprobada); el resto de las láminas con selección sobre texto no cambia. El CSS nuevo está
+acotado a `.gl-mf`, `.gl-dp`, `.gl-sr`, `.gl-hw` y `.gl-url-lum`. La auditoría renderizada (D1 y 3×, con
+`deck.decision-plan` en la lista del 3×) pasa sobre los probes.
+
+- `templates-graphic-line-deck/MethodStaircaseFlat.png` — 🆕 deck.method-staircase.flat
+- `templates-graphic-line-deck/DecisionPlan.png` — 🆕 deck.decision-plan
+- `templates-graphic-line-deck/MethodScoreRing.png` — 🆕 deck.method-score-ring
+- `templates-graphic-line-deck/MethodHybridWorkforce.png` — 🆕 deck.method-hybrid-workforce
+- `templates-graphic-line-deck/MethodHybridWorkforceScene.png` — 🆕 deck.method-hybrid-workforce.scene
+
 ## 2026-09-27 (g) — TASK-1923: Glitch entra al gate (26 plantillas, scope `--catalog=glitch`)
 
 Glitch (sólo Glitch) suma una entrada de probe: los catálogos `glitch-carousel`, `glitch-stills` y `glitch-overlays`
@@ -689,7 +710,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 23b4f64db4b46cb7cc51cd37fe4983082f4f7a6b3a27f280e7c66c11fe7fcd38 -->
+<!-- manifest-digest: e1dba421e168c3429971a39160da3e37f638f550b66f2423e878196c5dcae76c -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

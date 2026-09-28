@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el plan como trayectoria</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-plan` (surface deck, tema oscuro, TASK-1928). El plan como trayectoria: la órbita se vuelve una
+      curva de luz que sube de adelante-izquierda a atrás-derecha, con el primer tramo encendido en el acento; tres
+      paradas con nodo, tallo y ficha de vidrio cada vez más alta, la actual encendida; el total de días gigante y
+      tenue como horizonte. Sin indicador ni selección: firma la burbuja URL en luminosidad. Referencia: DeckPlan.
+    -->
+    <main class="gl-slide gl-dp" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-dp-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <p class="gl-dp-horizon" data-slot="horizon" aria-hidden="true">90</p>
+
+      <figure class="gl-layer gl-dp-trajectory" data-slot="trajectory">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-dp-stops" data-slot="stops">
+        <li class="gl-dp-stop">
+          <p class="gl-dp-range"><span data-slot-field="range">1 · Días 1–30</span><span class="gl-dp-here"> · Estás aquí</span></p>
+          <p class="gl-dp-title" data-slot-field="title">Arranque</p>
+          <p class="gl-dp-desc" data-slot-field="desc">Auditoría, línea base y primeras piezas.</p>
+        </li>
+      </ol>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Plan de trabajo</p>
+        <div class="gl-dp-voice">
+          <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Qué pasa al empezar?</span></p>
+          <p class="gl-answer"><span data-slot-field="answer">Movimiento</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+        </div>
+      </div>
+
+      <p class="gl-body gl-dp-body" data-slot="body"><strong>90</strong> días a la primera evidencia medible.</p>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

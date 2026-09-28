@@ -1168,3 +1168,465 @@ body {
   color: var(--gl-soft-dark);
   white-space: nowrap;
 }
+
+/* ══ method-staircase · composición `flat` (TASK-1928) ═════════════════════════════════════════════════
+ *
+ * La escalera tipográfica: cinco filas en diagonal, sin peldaños ni brillo. Sin respaldo: la posición de cada fila
+ * (x0 + i × dx, y0 − i × dy), los cuerpos y el aire llegan de AXIS (`method-staircase.layouts.flat.stair`).
+ */
+
+.gl-mf .gl-mf-levels {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: gl-level;
+}
+
+.gl-mf .gl-mf-level {
+  --i: 0;
+
+  counter-increment: gl-level;
+}
+
+.gl-mf .gl-mf-level:nth-child(2) {
+  --i: 1;
+}
+
+.gl-mf .gl-mf-level:nth-child(3) {
+  --i: 2;
+}
+
+.gl-mf .gl-mf-level:nth-child(4) {
+  --i: 3;
+}
+
+.gl-mf .gl-mf-level:nth-child(5) {
+  --i: 4;
+}
+
+.gl-mf .gl-mf-row {
+  position: absolute;
+  left: calc(var(--gl-stair-x0) + var(--i) * var(--gl-stair-dx));
+  top: calc(var(--gl-stair-y0) - var(--i) * var(--gl-stair-dy));
+  display: flex;
+  align-items: baseline;
+  gap: var(--gl-row-gap);
+  white-space: nowrap;
+}
+
+.gl-mf .gl-mf-number {
+  width: var(--gl-level-number-box);
+  font: 300 var(--gl-level-number-px) var(--gl-text-family);
+  color: var(--gl-soft-dark);
+}
+
+.gl-mf .gl-mf-number::before {
+  content: counter(gl-level);
+}
+
+.gl-mf .gl-mf-name {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-level-name-px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--gl-ink-dark);
+}
+
+.gl-mf .gl-mf-level:last-child .gl-mf-name {
+  font-size: var(--gl-level-top-name-px);
+  color: var(--gl-accent);
+}
+
+.gl-mf .gl-mf-descriptor {
+  font: 300 var(--gl-level-descriptor-px) var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-mf .gl-mf-note {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-note-top);
+  width: var(--gl-body-width);
+  margin: 0;
+  font: 400 var(--gl-note-px) / 1.4 var(--gl-text-family);
+  color: var(--gl-soft-dark);
+}
+
+/* ══ decision-plan: el plan como trayectoria (TASK-1928) ═══════════════════════════════════════════════
+ *
+ * Sin respaldo: el escenario y la trayectoria (curva, tramo encendido, tallos y nodos) llegan como capas SVG que el
+ * builder dibuja desde `decision-plan.plan` de AXIS; las fichas se apoyan en la punta de cada tallo
+ * (`--gl-dp-cardN-left/bottom`). Orden: escenario · horizonte · trayectoria · fichas · voz. La ficha actual la marca
+ * la clase `gl-current-N` de la raíz.
+ */
+
+.gl-dp .gl-dp-stage {
+  z-index: 0;
+}
+
+.gl-dp .gl-dp-trajectory {
+  z-index: 3;
+}
+
+.gl-dp .gl-dp-horizon {
+  position: absolute;
+  left: var(--gl-dp-horizon-left);
+  top: var(--gl-dp-horizon-top);
+  z-index: 1;
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-dp-horizon-px);
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: var(--gl-dp-halo-color);
+  opacity: var(--gl-dp-horizon-opacity);
+}
+
+.gl-dp .gl-dp-voice {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-question-top);
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.gl-dp .gl-dp-voice .gl-question {
+  position: static;
+  max-width: var(--gl-dp-question-width);
+  white-space: normal;
+}
+
+.gl-dp .gl-dp-voice .gl-answer {
+  position: static;
+  margin: var(--gl-dp-answer-gap) 0 0 -6px;
+  font-size: var(--gl-dp-answer-px);
+  line-height: var(--gl-dp-answer-leading);
+  letter-spacing: -0.05em;
+  text-shadow: 0 var(--gl-dp-answer-shadow-y) var(--gl-dp-answer-shadow-blur) color-mix(in srgb, black var(--gl-dp-answer-shadow-opacity), transparent);
+}
+
+.gl-dp .gl-eyebrow {
+  z-index: 9;
+}
+
+.gl-dp .gl-dp-body {
+  z-index: 9;
+}
+
+.gl-dp .gl-dp-body strong {
+  font-weight: 600;
+  color: var(--gl-ink-dark);
+}
+
+.gl-dp .gl-dp-stops {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-dp .gl-dp-stop {
+  position: absolute;
+  box-sizing: border-box;
+  width: var(--gl-dp-card-width);
+  padding: var(--gl-dp-card-pad-top) var(--gl-dp-card-pad-x) var(--gl-dp-card-pad-bottom);
+  border-radius: var(--gl-dp-card-radius);
+  background: linear-gradient(var(--gl-dp-fill-angle), var(--gl-dp-other-from-color), var(--gl-dp-other-to-color));
+  box-shadow:
+    inset 0 0 0 var(--gl-dp-other-border) color-mix(in srgb, var(--gl-ink-dark) var(--gl-dp-other-border-opacity), transparent),
+    0 var(--gl-dp-shadow-y) var(--gl-dp-shadow-blur) color-mix(in srgb, var(--gl-dp-shadow-color) var(--gl-dp-shadow-opacity), transparent),
+    0 0 var(--gl-dp-other-glow-blur) color-mix(in srgb, var(--gl-dp-halo-color) var(--gl-dp-other-glow-opacity), transparent);
+}
+
+.gl-dp .gl-dp-stop:nth-child(1) {
+  left: var(--gl-dp-card1-left);
+  bottom: var(--gl-dp-card1-bottom);
+  z-index: 4;
+}
+
+.gl-dp .gl-dp-stop:nth-child(2) {
+  left: var(--gl-dp-card2-left);
+  bottom: var(--gl-dp-card2-bottom);
+  z-index: 5;
+}
+
+.gl-dp .gl-dp-stop:nth-child(3) {
+  left: var(--gl-dp-card3-left);
+  bottom: var(--gl-dp-card3-bottom);
+  z-index: 6;
+}
+
+.gl-dp.gl-current-1 .gl-dp-stop:nth-child(1),
+.gl-dp.gl-current-2 .gl-dp-stop:nth-child(2),
+.gl-dp.gl-current-3 .gl-dp-stop:nth-child(3) {
+  background: linear-gradient(var(--gl-dp-fill-angle), var(--gl-dp-current-from-color), var(--gl-dp-current-to-color));
+  box-shadow:
+    inset 0 0 0 var(--gl-dp-current-border) color-mix(in srgb, var(--gl-dp-halo-color) var(--gl-dp-current-border-opacity), transparent),
+    0 var(--gl-dp-shadow-y) var(--gl-dp-shadow-blur) color-mix(in srgb, var(--gl-dp-shadow-color) var(--gl-dp-shadow-opacity), transparent),
+    0 0 var(--gl-dp-current-glow-blur) color-mix(in srgb, var(--gl-dp-halo-color) var(--gl-dp-current-glow-opacity), transparent);
+}
+
+/* El rango es texto chico: en el suave, y en el halo la parada actual; nunca en el acento (D1). */
+.gl-dp .gl-dp-range {
+  margin: 0;
+  font: 600 var(--gl-dp-range-px) var(--gl-text-family);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gl-soft-dark);
+}
+
+.gl-dp .gl-dp-here {
+  display: none;
+  color: var(--gl-ink-dark);
+}
+
+.gl-dp.gl-current-1 .gl-dp-stop:nth-child(1) .gl-dp-range,
+.gl-dp.gl-current-2 .gl-dp-stop:nth-child(2) .gl-dp-range,
+.gl-dp.gl-current-3 .gl-dp-stop:nth-child(3) .gl-dp-range {
+  color: var(--gl-dp-halo-color);
+}
+
+.gl-dp.gl-current-1 .gl-dp-stop:nth-child(1) .gl-dp-here,
+.gl-dp.gl-current-2 .gl-dp-stop:nth-child(2) .gl-dp-here,
+.gl-dp.gl-current-3 .gl-dp-stop:nth-child(3) .gl-dp-here {
+  display: inline;
+}
+
+.gl-dp .gl-dp-title {
+  margin: var(--gl-dp-range-gap) 0 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-dp-title-px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--gl-ink-dark);
+}
+
+.gl-dp .gl-dp-desc {
+  margin: var(--gl-dp-desc-gap) 0 0;
+  font: 400 var(--gl-dp-desc-px) / 1.45 var(--gl-text-family);
+  color: var(--gl-dp-desc-color);
+}
+
+/* La burbuja URL en luminosidad (la receta la pide): el gris oficial se funde con el fondo real. */
+.gl-url-lum {
+  position: absolute;
+  left: var(--gl-margin);
+  bottom: var(--gl-lum-bottom);
+  z-index: 4;
+  width: var(--gl-lum-width);
+  mix-blend-mode: luminosity;
+}
+
+/* ══ method-score-ring: el anillo del puntaje (TASK-1928) ══════════════════════════════════════════════
+ *
+ * Sin respaldo: los segmentos llegan en una capa SVG que el builder dibuja desde `method-score-ring.ring` de AXIS;
+ * cada rótulo trae su posición (`--gl-sr-label-left/top`) y su lado (`gl-side-start|end`). El CTA lo pinta el hook
+ * del CTA (corchetes abiertos y el cursor del lector) y ubica el descriptor bajo el cursor.
+ */
+
+.gl-sr .gl-sr-total {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.gl-sr .gl-sr-total-value,
+.gl-sr .gl-sr-total-label {
+  position: absolute;
+  left: var(--gl-sr-total-left);
+  width: var(--gl-sr-total-width);
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.gl-sr .gl-sr-total-value {
+  top: var(--gl-sr-total-top);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-variation-settings: 'wght' 300;
+  font-size: var(--gl-sr-total-px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--gl-ink-dark);
+}
+
+.gl-sr .gl-sr-total-label {
+  top: var(--gl-sr-total-label-top);
+  font: 300 var(--gl-sr-total-label-px) var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-sr .gl-sr-labels {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-sr .gl-sr-label {
+  position: absolute;
+  left: var(--gl-sr-label-left);
+  top: var(--gl-sr-label-top);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: var(--gl-sr-label-width);
+}
+
+.gl-sr .gl-sr-label.gl-side-start {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.gl-sr .gl-sr-label.gl-side-end {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.gl-sr .gl-sr-label-weight {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-variation-settings: 'wght' 300;
+  font-size: var(--gl-sr-label-weight-px);
+  line-height: 1;
+  color: var(--gl-ink-dark);
+}
+
+.gl-sr .gl-sr-label-name {
+  margin-top: var(--gl-sr-label-name-gap);
+  font: 400 var(--gl-sr-label-name-px) var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-sr .gl-sr-cta {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-sr-cta-top);
+  z-index: 4;
+  margin: 0;
+  padding: var(--gl-sr-cta-pad-y) var(--gl-sr-cta-pad-x);
+  border-radius: var(--gl-sr-cta-radius);
+  background: var(--gl-accent);
+  font: 600 var(--gl-sr-cta-px) var(--gl-text-family);
+  color: var(--gl-bg-dark);
+  white-space: nowrap;
+}
+
+.gl-sr .gl-sr-cta-url {
+  position: absolute;
+  left: var(--gl-margin);
+  z-index: 4;
+  margin: 0;
+  font: 300 var(--gl-sr-cta-url-px) / 1.4 var(--gl-text-family);
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
+}
+
+.gl-sr .gl-sr-source {
+  position: absolute;
+  left: var(--gl-sr-source-left);
+  top: var(--gl-sr-source-top);
+  margin: 0;
+  font: 400 var(--gl-sr-source-px) var(--gl-text-family);
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
+}
+
+/* ══ method-hybrid-workforce · composición `ladder` (TASK-1928) ═════════════════════════════════════════
+ *
+ * Sin respaldo: la barra `--i` (0 a la izquierda) mide `from + i × step` desde la base y su vidrio sube de opacidad;
+ * la última es sólida en el acento con el texto en el fondo. Todo llega de `method-hybrid-workforce.ladder` de AXIS.
+ */
+
+.gl-hw .gl-hw-title {
+  position: absolute;
+  left: var(--gl-hw-title-left);
+  top: var(--gl-hw-title-top);
+  margin: 0;
+  font: 600 var(--gl-hw-title-px) var(--gl-text-family);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
+}
+
+.gl-hw .gl-hw-ladder {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: gl-bar;
+}
+
+.gl-hw .gl-hw-bar {
+  --i: 0;
+
+  position: absolute;
+  left: calc(var(--gl-hw-x) + var(--i) * (var(--gl-hw-bar-width) + var(--gl-hw-bar-gap)));
+  top: calc(var(--gl-hw-base) - var(--gl-hw-bar-from) - var(--i) * var(--gl-hw-bar-step));
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: var(--gl-hw-bar-width);
+  height: calc(var(--gl-hw-bar-from) + var(--i) * var(--gl-hw-bar-step));
+  padding: var(--gl-hw-bar-pad-top) var(--gl-hw-bar-pad-x);
+  border-radius: var(--gl-hw-bar-radius) var(--gl-hw-bar-radius) 0 0;
+  background: color-mix(in srgb, var(--gl-hw-glass-color) calc(var(--gl-hw-glass-from) + var(--i) * var(--gl-hw-glass-step)), transparent);
+  color: var(--gl-ink-dark);
+  counter-increment: gl-bar;
+}
+
+.gl-hw .gl-hw-bar:nth-child(2) {
+  --i: 1;
+}
+
+.gl-hw .gl-hw-bar:nth-child(3) {
+  --i: 2;
+}
+
+.gl-hw .gl-hw-bar:nth-child(4) {
+  --i: 3;
+}
+
+.gl-hw .gl-hw-bar:last-child {
+  background: var(--gl-accent);
+  color: var(--gl-bg-dark);
+}
+
+.gl-hw .gl-hw-number {
+  font: 300 var(--gl-hw-number-px) / 1 var(--gl-answer-family);
+  font-variation-settings: 'wght' 300;
+}
+
+.gl-hw .gl-hw-number::before {
+  content: counter(gl-bar);
+}
+
+.gl-hw .gl-hw-label {
+  margin-top: var(--gl-hw-label-gap);
+  font: 600 var(--gl-hw-label-px) / 1.25 var(--gl-text-family);
+}
+
+.gl-hw .gl-hw-baseline {
+  position: absolute;
+  left: var(--gl-hw-x);
+  top: var(--gl-hw-base);
+  width: var(--gl-hw-baseline-width);
+  border-top: var(--gl-hw-baseline-stroke) solid var(--gl-rule-dark);
+}
+
+.gl-hw .gl-hw-path {
+  position: absolute;
+  left: var(--gl-hw-path-left);
+  top: var(--gl-hw-path-top);
+  width: var(--gl-hw-path-width);
+  margin: 0;
+  font: 300 var(--gl-hw-path-px) / 1.4 var(--gl-text-family);
+  color: var(--gl-text-dark);
+}

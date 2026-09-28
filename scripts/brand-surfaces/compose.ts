@@ -65,16 +65,34 @@ export const greenhouseSelectionPainter: GraphicLineSelectionPainter = request =
         action: 'select',
         label: request.label,
         participantKind: request.participantKind
-      }
+      },
+      // Otros colaboradores sobre el mismo objetivo (la fuerza híbrida): cada uno con su ancla y su acción.
+      ...(request.extraCursors ?? []).map((cursor, index) => ({
+        id: `collaborator-${index + 2}`,
+        kind: 'collaborator',
+        targetId: 'answer',
+        anchor: cursor.anchor,
+        action: cursor.action,
+        label: cursor.label,
+        participantKind: cursor.participantKind
+      }))
     ]
   } as never)
+
+  // El color de un participante sólo cuando la receta lo midió; el resto sigue el orden de la paleta del renderer.
+  const participantColors: Record<string, string> = {}
+
+  if (request.color) participantColors.collaborator = request.color
+  ;(request.extraCursors ?? []).forEach((cursor, index) => {
+    if (cursor.color) participantColors[`collaborator-${index + 2}`] = cursor.color
+  })
 
   const painted = renderCollaborationSelection({
     manifest,
     targetBounds: request.bounds,
     canvas: request.canvas,
     measureLabel: (label: string, size: number) => label.length * size * 0.62,
-    presentation: { collaboratorScale: request.scale }
+    presentation: { collaboratorScale: request.scale, participantColors }
   }) as { underlay: string; overlay: string; evidence: { withinCanvas: boolean } }
 
   return { underlay: painted.underlay, overlay: painted.overlay, withinCanvas: painted.evidence.withinCanvas }

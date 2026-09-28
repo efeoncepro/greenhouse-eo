@@ -469,3 +469,75 @@ describe('deck · proposal-service, la propuesta sobria (TASK-1928)', () => {
     expect(issuesOf({ ...intent, steps: intent.steps!.map(step => ({ ...step, glyph: 'rayo' })) })).toContain('step-glyph-not-in-recipe')
   })
 })
+
+describe('deck · la familia método (TASK-1928)', () => {
+  it.each([
+    ['method-staircase-flat', 'MethodStaircaseFlat', 'deck.method-staircase.flat'],
+    ['decision-plan', 'DecisionPlan', 'deck.decision-plan'],
+    ['method-score-ring', 'MethodScoreRing', 'deck.method-score-ring'],
+    ['method-hybrid-workforce', 'MethodHybridWorkforce', 'deck.method-hybrid-workforce'],
+    ['method-hybrid-workforce-scene', 'MethodHybridWorkforceScene', 'deck.method-hybrid-workforce.scene']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template, contentType) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(contentType)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('la escalera sale de AXIS: la de vidrio no cambia y la plana usa su propia geometría y su respuesta medida', () => {
+    const steps = plan(example('method-staircase')).slots.frame
+    const flat = plan(example('method-staircase-flat')).slots.frame
+
+    expect(steps).toMatchObject({ stairX0: '--gl-stair-x0=760px', slabHeight: '--gl-slab-height=124px', bodyWidth: 500 })
+    expect(flat).toMatchObject({ stairX0: '--gl-stair-x0=800px', rowGap: '--gl-row-gap=26px', answerPx: 140, bodyWidth: 520 })
+    expect(flat.slabHeight).toBeUndefined()
+  })
+
+  it('el plan: tres paradas, una actual, la respuesta a 3× y cada ficha apoyada en su tallo', () => {
+    const { slots, piece } = plan(example('decision-plan'))
+
+    expect(slots.frame).toMatchObject({ answerSize: '--gl-dp-answer-px=120px', currentStop: '1', card1Left: '--gl-dp-card1-left=787.74px' })
+    expect(slots.body).toContain('<strong>90</strong>')
+    expect((slots.stops as unknown as { range: string }[]).map(stop => stop.range)).toEqual(['1 · Días 1–30', '2 · Días 31–60', '3 · Días 61–90'])
+    expect(piece.assets.map(asset => asset.ref)).toEqual(['asset-ref:layer:decision-plan-stage', 'asset-ref:layer:decision-plan-trajectory-growth-1'])
+
+    const intent = example('decision-plan')
+
+    expectCode(() => plan({ ...intent, currentStop: 4 }), 'invalid-intent')
+    expectCode(() => plan({ ...intent, stops: (intent.stops as unknown[]).slice(0, 2) }), 'invalid-intent')
+    expectCode(() => plan({ ...intent, horizon: 'noventa' }), 'invalid-intent')
+  })
+
+  it('el anillo: los pesos suman una vuelta, la de más peso va gruesa y cada cifra lleva su fuente', () => {
+    const { slots, piece } = plan(example('method-score-ring'))
+    const ring = piece.assets.find(asset => asset.ref.startsWith('asset-ref:layer:method-score-ring')) as { svg: string }
+
+    expect(ring.svg.match(/<path/g)).toHaveLength(7)
+    expect(ring.svg.match(/stroke-width="34"/g)).toHaveLength(1)
+    expect(slots.source).toBe('Pesos del Brand Visibility Grader, versión V1')
+    expect(slots.cta).toMatchObject({ cursorScale: 1.3, descriptorGapPx: 20 })
+
+    const intent = example('method-score-ring')
+    const dimensions = intent.dimensions as { name: string; weight: number }[]
+
+    expectCode(() => plan({ ...intent, dimensions: dimensions.slice(1) }), 'invalid-intent')
+    expectCode(() => plan({ ...intent, total: { value: '100', label: 'puntos' } }), 'invalid-intent')
+  })
+
+  it('la fuerza híbrida: dos cursores sobre la respuesta, o dos selecciones medidas en la toma con el agente en Engine', () => {
+    const ladder = plan(example('method-hybrid-workforce')).slots
+    const scene = plan(example('method-hybrid-workforce-scene')).slots
+
+    expect(ladder.selection).toMatchObject({ label: 'Estrategia', anchor: 'top-end', also: [{ label: 'Agente IA', action: 'resize' }] })
+    expect((scene.selection as unknown as { targets: { label: string; color?: string }[] }).targets.map(t => [t.label, t.color])).toEqual([
+      ['Estrategia', undefined],
+      ['Agente IA', '#0375db']
+    ])
+
+    const intent = example('method-hybrid-workforce-scene')
+
+    expectCode(() => plan({ ...intent, selectionTargets: (intent.selectionTargets as unknown[]).slice(0, 1) }), 'invalid-intent')
+    expectCode(() => plan({ ...intent, selectionTargets: [{ label: 'Estrategia', anchor: 'bottom-start', box: { x: 1800, y: 388, width: 260, height: 142 } }, (intent.selectionTargets as unknown[])[1]] }), 'invalid-intent')
+  })
+})

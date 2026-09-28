@@ -35,6 +35,9 @@ const TEMPLATES_WITH_SELECTION = [
   'ProposalCinematicLines',
   // La propuesta sobria: la selección toma la primera tarjeta (por dónde se empieza).
   'ProposalService',
+  // La fuerza híbrida: dos cursores sobre la respuesta, o dos selecciones medidas en la foto (TASK-1928).
+  'MethodHybridWorkforce',
+  'MethodHybridWorkforceScene',
   // Portadas de propuesta: la selección toma el logo del cliente.
   'CoverProposalOrbit',
   'CoverProposalDawn'
@@ -42,14 +45,15 @@ const TEMPLATES_WITH_SELECTION = [
 
 /**
  * La contraportada de brochure sin foto lleva el cursor del LECTOR sobre la respuesta (corchetes abiertos): es el
- * mismo CTA canónico de las piezas con llamada a la acción, sin descriptor.
+ * mismo CTA canónico de las piezas con llamada a la acción, sin descriptor. El anillo del puntaje lo lleva sobre su
+ * botón, con el descriptor bajo el cursor (su escala y su aire llegan en el slot `cta`, medidos por AXIS).
  */
-const TEMPLATES_WITH_READER_CURSOR = ['CloseBrochure'] as const
+const TEMPLATES_WITH_READER_CURSOR = ['CloseBrochure', 'MethodScoreRing'] as const
 
 /**
- * En la escalera del método la selección toma un NIVEL (`selection.level`, 1 = el de abajo), no la respuesta. El
- * nivel es un item del array `levels`, así que la plantilla no puede marcarlo de antemano: este hook marca la fila
- * de ese nivel como objetivo y delega en el hook canónico de la selección, que la mide y la pinta.
+ * En la escalera del método (sus dos composiciones) la selección toma un NIVEL (`selection.level`, 1 = el de abajo),
+ * no la respuesta. El nivel es un item del array `levels`, así que la plantilla no puede marcarlo de antemano: este
+ * hook marca la fila `[data-gl-level-row]` de ese nivel como objetivo y delega en el hook canónico de la selección, que la mide y la pinta.
  */
 const levelSelectionHook =
   (selectionHook: CatalogLayoutHook): CatalogLayoutHook =>
@@ -60,7 +64,7 @@ const levelSelectionHook =
       const level = Number(selection.level)
 
       const marked = await page.evaluate(index => {
-        const row = document.querySelectorAll('.gl-ms-level .gl-ms-row')[index]
+        const row = document.querySelectorAll('[data-gl-level-row]')[index]
 
         if (!row) return false
 
@@ -86,6 +90,7 @@ export const createCatalog = (options: GraphicLineCatalogOptions = {}): Artifact
   }
 
   layoutHooks.MethodStaircase = levelSelectionHook(selectionHook)
+  layoutHooks.MethodStaircaseFlat = levelSelectionHook(selectionHook)
 
   return {
     name: 'graphic-line-deck',

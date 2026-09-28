@@ -1799,6 +1799,518 @@ exports[`planes de los intents de ejemplo > deck-cover-proposal-orbit-sky-intent
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-decision-plan-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:decision-plan-stage",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><radialGradient id="dp-halo" cx="1360" cy="560" r="900" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#72ded8" stop-opacity="0.28"/><stop offset="0.35" stop-color="#36c8bf" stop-opacity="0.1"/><stop offset="1" stop-color="#36c8bf" stop-opacity="0"/></radialGradient><linearGradient id="dp-floor" x1="0" y1="778" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000814" stop-opacity="0"/><stop offset="1" stop-color="#000814" stop-opacity="0.55"/></linearGradient></defs><rect width="1920" height="1080" fill="url(#dp-halo)"/><rect y="778" width="1920" height="302" fill="url(#dp-floor)"/></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:decision-plan-trajectory-growth-1",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><linearGradient id="dp-base" x1="760" y1="930" x2="1720" y2="360" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#72ded8" stop-opacity="0.25"/><stop offset="1" stop-color="#72ded8" stop-opacity="0.7"/></linearGradient><filter id="dp-lit-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="10"/></filter><filter id="dp-node-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M 760 930 Q 1420 940 1720 360" fill="none" stroke="url(#dp-base)" stroke-width="4"/><path d="M 825.1 929.52 L 833.64 929.24 L 842.16 928.9 L 850.64 928.51 L 859.08 928.07 L 867.5 927.57 L 875.88 927.02 L 884.24 926.42 L 892.56 925.77 L 900.84 925.06 L 909.1 924.3 L 917.32 923.49 L 925.52 922.63 L 933.68 921.71 L 941.8 920.75 L 949.9 919.73 L 957.96 918.65 L 966 917.53 L 974 916.35 L 981.96 915.12 L 989.9 913.84 L 997.8 912.5 L 1005.68 911.11 L 1013.52 909.67 L 1021.32 908.18 L 1029.1 906.64 L 1036.84 905.04 L 1044.56 903.39 L 1052.24 901.69 L 1059.88 899.93 L 1067.5 898.13" fill="none" stroke="#36c8bf" stroke-opacity="0.45" stroke-width="18" stroke-linecap="round" filter="url(#dp-lit-glow)"/><path d="M 825.1 929.52 L 833.64 929.24 L 842.16 928.9 L 850.64 928.51 L 859.08 928.07 L 867.5 927.57 L 875.88 927.02 L 884.24 926.42 L 892.56 925.77 L 900.84 925.06 L 909.1 924.3 L 917.32 923.49 L 925.52 922.63 L 933.68 921.71 L 941.8 920.75 L 949.9 919.73 L 957.96 918.65 L 966 917.53 L 974 916.35 L 981.96 915.12 L 989.9 913.84 L 997.8 912.5 L 1005.68 911.11 L 1013.52 909.67 L 1021.32 908.18 L 1029.1 906.64 L 1036.84 905.04 L 1044.56 903.39 L 1052.24 901.69 L 1059.88 899.93 L 1067.5 898.13" fill="none" stroke="#36c8bf" stroke-width="8" stroke-linecap="round"/><line x1="937.74" y1="921.24" x2="937.74" y2="857.24" stroke="#36c8bf" stroke-opacity="1" stroke-width="2"/><line x1="1349.06" y1="780.86" x2="1349.06" y2="716.86" stroke="#72ded8" stroke-opacity="0.5" stroke-width="2"/><line x1="1628.94" y1="510.84" x2="1628.94" y2="446.84" stroke="#72ded8" stroke-opacity="0.5" stroke-width="2"/><circle cx="937.74" cy="921.24" r="13" fill="#36c8bf" stroke="#72ded8" stroke-width="3" filter="url(#dp-node-glow)"/><circle cx="1349.06" cy="780.86" r="9" fill="#0b2a40" stroke="#72ded8" stroke-width="3"/><circle cx="1628.94" cy="510.84" r="9" fill="#0b2a40" stroke="#72ded8" stroke-width="3"/></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-plan",
+  "plan": {
+    "artifactId": "deck-decision-plan",
+    "slides": [
+      {
+        "contentType": "deck.decision-plan",
+        "slideId": "deck-decision-plan",
+        "slots": {
+          "body": "<strong>90</strong> días a la primera evidencia medible, en tres tramos de 30. Desde la primera semana ya hay piezas en marcha.",
+          "frame": {
+            "answerGap": "--gl-dp-answer-gap=36px",
+            "answerLeading": "--gl-dp-answer-leading=0.9",
+            "answerShadowBlur": "--gl-dp-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-dp-answer-shadow-opacity=35%",
+            "answerShadowY": "--gl-dp-answer-shadow-y=10px",
+            "answerSize": "--gl-dp-answer-px=120px",
+            "bodyPx": 26,
+            "bodyTop": 690,
+            "bodyWidth": 380,
+            "card1Bottom": "--gl-dp-card1-bottom=222.76px",
+            "card1Left": "--gl-dp-card1-left=787.74px",
+            "card2Bottom": "--gl-dp-card2-bottom=363.14px",
+            "card2Left": "--gl-dp-card2-left=1199.06px",
+            "card3Bottom": "--gl-dp-card3-bottom=633.16px",
+            "card3Left": "--gl-dp-card3-left=1478.94px",
+            "cardPadBottom": "--gl-dp-card-pad-bottom=22px",
+            "cardPadTop": "--gl-dp-card-pad-top=20px",
+            "cardPadX": "--gl-dp-card-pad-x=22px",
+            "cardRadius": "--gl-dp-card-radius=20px",
+            "cardWidth": "--gl-dp-card-width=300px",
+            "currentBorder": "--gl-dp-current-border=2px",
+            "currentBorderOpacity": "--gl-dp-current-border-opacity=90%",
+            "currentFillFrom": "--gl-dp-current-from-color=#0f4a5c",
+            "currentFillTo": "--gl-dp-current-to-color=#0a2a40",
+            "currentGlowBlur": "--gl-dp-current-glow-blur=80px",
+            "currentGlowOpacity": "--gl-dp-current-glow-opacity=45%",
+            "currentStop": "1",
+            "descColor": "--gl-dp-desc-color=#d6e2ec",
+            "descGap": "--gl-dp-desc-gap=10px",
+            "descPx": "--gl-dp-desc-px=17px",
+            "eyebrowTop": 110,
+            "fillAngle": "--gl-dp-fill-angle=160deg",
+            "haloColor": "--gl-dp-halo-color=#72ded8",
+            "horizonLeft": "--gl-dp-horizon-left=1050px",
+            "horizonOpacity": "--gl-dp-horizon-opacity=0.07",
+            "horizonPx": "--gl-dp-horizon-px=560px",
+            "horizonTop": "--gl-dp-horizon-top=40px",
+            "line": "growth",
+            "lumBottom": "--gl-lum-bottom=51px",
+            "lumWidth": "--gl-lum-width=216px",
+            "margin": 140,
+            "otherBorder": "--gl-dp-other-border=1px",
+            "otherBorderOpacity": "--gl-dp-other-border-opacity=16%",
+            "otherFillFrom": "--gl-dp-other-from-color=#0e2a44",
+            "otherFillTo": "--gl-dp-other-to-color=#081c30",
+            "otherGlowBlur": "--gl-dp-other-glow-blur=30px",
+            "otherGlowOpacity": "--gl-dp-other-glow-opacity=12%",
+            "questionTop": 196,
+            "questionWidth": "--gl-dp-question-width=470px",
+            "rangeGap": "--gl-dp-range-gap=8px",
+            "rangePx": "--gl-dp-range-px=15px",
+            "shadowBlur": "--gl-dp-shadow-blur=80px",
+            "shadowColor": "--gl-dp-shadow-color=#000610",
+            "shadowOpacity": "--gl-dp-shadow-opacity=65%",
+            "shadowY": "--gl-dp-shadow-y=34px",
+            "titlePx": "--gl-dp-title-px=40px",
+          },
+          "horizon": "90",
+          "stage": {
+            "src": "asset-ref:layer:decision-plan-stage",
+          },
+          "stops": [
+            {
+              "desc": "Auditoría, línea base y primeras piezas: movimiento desde la primera semana.",
+              "range": "1 · Días 1–30",
+              "title": "Arranque",
+            },
+            {
+              "desc": "El ciclo mensual completo: planificar, producir, entregar y medir.",
+              "range": "2 · Días 31–60",
+              "title": "Ritmo pleno",
+            },
+            {
+              "desc": "Primera evidencia medible y primer informe de resultados.",
+              "range": "3 · Días 61–90",
+              "title": "Evidencia",
+            },
+          ],
+          "trajectory": {
+            "src": "asset-ref:layer:decision-plan-trajectory-growth-1",
+          },
+          "voice": {
+            "answer": "Movimiento",
+            "eyebrow": "Plan de trabajo",
+            "question": "¿Qué pasa al empezar?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-method-hybrid-workforce-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:gl-hw-progress-2-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1783.51 162.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1783.51" cy="162.36" r="7.7" fill="#36c8bf"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.method-hybrid-workforce",
+  "plan": {
+    "artifactId": "deck-method-hybrid-workforce",
+    "slides": [
+      {
+        "contentType": "deck.method-hybrid-workforce",
+        "slideId": "deck-method-hybrid-workforce",
+        "slots": {
+          "body": "Diseñamos, activamos y operamos equipos donde personas y agentes comparten un trabajo medible. Las personas conservan la responsabilidad.",
+          "frame": {
+            "answerPx": 150,
+            "answerTop": 290,
+            "barFrom": "--gl-hw-bar-from=150px",
+            "barGap": "--gl-hw-bar-gap=14px",
+            "barPadTop": "--gl-hw-bar-pad-top=20px",
+            "barPadX": "--gl-hw-bar-pad-x=18px",
+            "barRadius": "--gl-hw-bar-radius=14px",
+            "barStep": "--gl-hw-bar-step=110px",
+            "barWidth": "--gl-hw-bar-width=170px",
+            "baselineStroke": "--gl-hw-baseline-stroke=2px",
+            "baselineWidth": "--gl-hw-baseline-width=722px",
+            "bodyPx": 27,
+            "bodyTop": 650,
+            "bodyWidth": 600,
+            "eyebrowTop": 110,
+            "glassColor": "--gl-hw-glass-color=#72ded8",
+            "glassFrom": "--gl-hw-glass-from=8%",
+            "glassStep": "--gl-hw-glass-step=7%",
+            "labelGap": "--gl-hw-label-gap=10px",
+            "labelPx": "--gl-hw-label-px=20px",
+            "ladderBase": "--gl-hw-base=900px",
+            "ladderTitleLeft": "--gl-hw-title-left=1070px",
+            "ladderTitlePx": "--gl-hw-title-px=18px",
+            "ladderTitleTop": "--gl-hw-title-top=260px",
+            "ladderX": "--gl-hw-x=1070px",
+            "line": "growth",
+            "margin": 140,
+            "numberPx": "--gl-hw-number-px=44px",
+            "pathLeft": "--gl-hw-path-left=1070px",
+            "pathPx": "--gl-hw-path-px=19px",
+            "pathTop": "--gl-hw-path-top=922px",
+            "pathWidth": "--gl-hw-path-width=760px",
+            "questionTop": 200,
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-hw-progress-2-of-5-growth",
+          },
+          "ladder": [
+            {
+              "label": "Leer y resumir",
+            },
+            {
+              "label": "Proponer",
+            },
+            {
+              "label": "Ejecutar con límites",
+            },
+            {
+              "label": "Actuar con aprobación",
+            },
+          ],
+          "ladderTitle": "La autoridad del agente crece por tramos",
+          "path": "Blueprint → primer equipo híbrido → operación híbrida → operación agéntica gestionada",
+          "selection": {
+            "also": [
+              {
+                "action": "resize",
+                "anchor": "bottom-end",
+                "label": "Agente IA",
+                "participantKind": "department",
+              },
+            ],
+            "anchor": "top-end",
+            "label": "Estrategia",
+            "participantKind": "department",
+            "scale": 1.25,
+            "textPad": "per-line",
+          },
+          "voice": {
+            "answer": "y agentes",
+            "answerLead": "Personas",
+            "eyebrow": "Fuerza de trabajo híbrida",
+            "question": "¿Quién hace el trabajo?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-method-hybrid-workforce-scene-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+      "ref": "asset-ref:plate:HW1-mismo-trabajo",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.method-hybrid-workforce.scene",
+  "plan": {
+    "artifactId": "deck-method-hybrid-workforce-scene",
+    "slides": [
+      {
+        "contentType": "deck.method-hybrid-workforce.scene",
+        "slideId": "deck-method-hybrid-workforce",
+        "slots": {
+          "body": "Sobre la misma pieza, al mismo tiempo. El agente suma capacidad medible; la persona decide y responde.",
+          "frame": {
+            "answerPx": 160,
+            "answerTop": 280,
+            "bodyPx": 28,
+            "bodyTop": 640,
+            "bodyWidth": 600,
+            "eyebrowTop": 110,
+            "line": "growth",
+            "margin": 140,
+            "questionTop": 200,
+          },
+          "photo": {
+            "alt": "Una estratega de Efeonce con polo y lanyard señala el gráfico en un monitor grande mientras un agente trabaja las imágenes de la misma pieza",
+            "src": "asset-ref:plate:HW1-mismo-trabajo",
+          },
+          "selection": {
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.25,
+            "targets": [
+              {
+                "anchor": "bottom-start",
+                "box": {
+                  "bottom": 530,
+                  "left": 1606,
+                  "right": 1866,
+                  "top": 388,
+                },
+                "label": "Estrategia",
+                "participantKind": "department",
+              },
+              {
+                "anchor": "top-start",
+                "box": {
+                  "bottom": 368,
+                  "left": 1614,
+                  "right": 1872,
+                  "top": 172,
+                },
+                "color": "#0375db",
+                "label": "Agente IA",
+                "participantKind": "department",
+              },
+            ],
+            "variant": "eight-handles",
+          },
+          "voice": {
+            "answer": "y agentes",
+            "answerLead": "Personas",
+            "eyebrow": "Fuerza de trabajo híbrida",
+            "question": "¿Quién hace el trabajo?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-method-score-ring-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:method-score-ring-engine-25-15-15-15-15-10-5",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><path d="M 1316.54 270.09 A 250 250 0 0 1 1559.91 513.46" fill="none" stroke="#0375db" stroke-opacity="1" stroke-width="34"/><path d="M 1559.91 526.54 A 250 250 0 0 1 1462.19 718.34" fill="none" stroke="#0375db" stroke-opacity="0.75" stroke-width="26"/><path d="M 1451.6 726.03 A 250 250 0 0 1 1239 759.7" fill="none" stroke="#0375db" stroke-opacity="0.67" stroke-width="26"/><path d="M 1226.55 755.66 A 250 250 0 0 1 1074.34 603.45" fill="none" stroke="#0375db" stroke-opacity="0.59" stroke-width="26"/><path d="M 1070.3 591 A 250 250 0 0 1 1103.97 378.4" fill="none" stroke="#0375db" stroke-opacity="0.51" stroke-width="26"/><path d="M 1111.66 367.81 A 250 250 0 0 1 1226.55 284.34" fill="none" stroke="#0375db" stroke-opacity="0.43" stroke-width="26"/><path d="M 1239 280.3 A 250 250 0 0 1 1303.46 270.09" fill="none" stroke="#0375db" stroke-opacity="0.35" stroke-width="26"/></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.method-score-ring",
+  "plan": {
+    "artifactId": "deck-method-score-ring",
+    "slides": [
+      {
+        "contentType": "deck.method-score-ring",
+        "slideId": "deck-method-score-ring",
+        "slots": {
+          "body": "Cómo los motores de respuesta entienden y recomiendan tu marca, frente a tu competencia. El informe es privado.",
+          "cta": {
+            "cursorScale": 1.3,
+            "descriptorGapPx": 20,
+            "text": "Mide tu marca gratis",
+            "url": "think.efeoncepro.com/brand-visibility",
+          },
+          "frame": {
+            "answerPx": 150,
+            "answerTop": 270,
+            "bodyPx": 25,
+            "bodyTop": 450,
+            "bodyWidth": 560,
+            "ctaPadX": "--gl-sr-cta-pad-x=38px",
+            "ctaPadY": "--gl-sr-cta-pad-y=22px",
+            "ctaPx": "--gl-sr-cta-px=24px",
+            "ctaRadius": "--gl-sr-cta-radius=14px",
+            "ctaTop": "--gl-sr-cta-top=700px",
+            "ctaUrlPx": "--gl-sr-cta-url-px=20px",
+            "eyebrowTop": 110,
+            "labelNameGap": "--gl-sr-label-name-gap=2px",
+            "labelNamePx": "--gl-sr-label-name-px=18px",
+            "labelWeightPx": "--gl-sr-label-weight-px=40px",
+            "labelWidth": "--gl-sr-label-width=300px",
+            "line": "engine",
+            "margin": 140,
+            "questionTop": 200,
+            "sourceLeft": "--gl-sr-source-left=660px",
+            "sourcePx": "--gl-sr-source-px=16px",
+            "sourceTop": "--gl-sr-source-top=1000px",
+            "totalLabelPx": "--gl-sr-total-label-px=22px",
+            "totalLabelTop": "--gl-sr-total-label-top=570px",
+            "totalLeft": "--gl-sr-total-left=1160px",
+            "totalPx": "--gl-sr-total-px=110px",
+            "totalTop": "--gl-sr-total-top=456px",
+            "totalWidth": "--gl-sr-total-width=300px",
+          },
+          "labels": [
+            {
+              "left": "--gl-sr-label-left=1536px",
+              "name": "AI Visibility",
+              "side": "start",
+              "top": "--gl-sr-label-top=268px",
+              "weight": "25",
+            },
+            {
+              "left": "--gl-sr-label-left=1595px",
+              "name": "Entity Clarity",
+              "side": "start",
+              "top": "--gl-sr-label-top=639px",
+              "weight": "15",
+            },
+            {
+              "left": "--gl-sr-label-left=1360px",
+              "name": "Category Ownership",
+              "side": "start",
+              "top": "--gl-sr-label-top=810px",
+              "weight": "15",
+            },
+            {
+              "left": "--gl-sr-label-left=784px",
+              "name": "Competitive Share of Voice",
+              "side": "end",
+              "top": "--gl-sr-label-top=720px",
+              "weight": "15",
+            },
+            {
+              "left": "--gl-sr-label-left=694px",
+              "name": "Citation Quality",
+              "side": "end",
+              "top": "--gl-sr-label-top=444px",
+              "weight": "15",
+            },
+            {
+              "left": "--gl-sr-label-left=822px",
+              "name": "Message Alignment",
+              "side": "end",
+              "top": "--gl-sr-label-top=235px",
+              "weight": "10",
+            },
+            {
+              "left": "--gl-sr-label-left=1260px",
+              "name": "Revenue Intent Coverage",
+              "side": "start",
+              "top": "--gl-sr-label-top=178px",
+              "weight": "5",
+            },
+          ],
+          "ring": {
+            "src": "asset-ref:layer:method-score-ring-engine-25-15-15-15-15-10-5",
+          },
+          "source": "Pesos del Brand Visibility Grader, versión V1",
+          "total": {
+            "label": "puntos en 7 dimensiones",
+            "value": "100",
+          },
+          "voice": {
+            "answer": "Mídelo",
+            "eyebrow": "Brand Visibility Grader",
+            "question": "¿Cómo te ve la IA?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-method-staircase-flat-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.method-staircase.flat",
+  "plan": {
+    "artifactId": "deck-method-staircase-flat",
+    "slides": [
+      {
+        "contentType": "deck.method-staircase.flat",
+        "slideId": "deck-method-staircase",
+        "slots": {
+          "body": "ChatGPT, Claude, Perplexity, Gemini y Google AI Overviews. Subimos tu marca nivel por nivel.",
+          "frame": {
+            "answerPx": 140,
+            "answerTop": 270,
+            "bodyPx": 25,
+            "bodyTop": 590,
+            "bodyWidth": 520,
+            "columnWidth": "--gl-column-width=780px",
+            "eyebrowTop": 110,
+            "levelDescriptorPx": "--gl-level-descriptor-px=24px",
+            "levelNamePx": "--gl-level-name-px=80px",
+            "levelNumberBox": "--gl-level-number-box=40px",
+            "levelNumberPx": "--gl-level-number-px=26px",
+            "levelTopNamePx": "--gl-level-top-name-px=92px",
+            "line": "engine",
+            "margin": 140,
+            "notePx": "--gl-note-px=17px",
+            "noteTop": "--gl-note-top=930px",
+            "questionTop": 200,
+            "rowGap": "--gl-row-gap=26px",
+            "stairDx": "--gl-stair-dx=60px",
+            "stairDy": "--gl-stair-dy=132px",
+            "stairX0": "--gl-stair-x0=800px",
+            "stairY0": "--gl-stair-y0=820px",
+          },
+          "levels": [
+            {
+              "descriptor": "que te encuentre",
+              "name": "Be Found",
+            },
+            {
+              "descriptor": "que te entienda",
+              "name": "Be Readable",
+            },
+            {
+              "descriptor": "que te represente bien",
+              "name": "Be Correct",
+            },
+            {
+              "descriptor": "que pueda actuar",
+              "name": "Be Actionable",
+            },
+            {
+              "descriptor": "que te prefiera",
+              "name": "Be Intrinsic",
+            },
+          ],
+          "note": "Be Intrinsic es una trayectoria, no una garantía.",
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "SEO · AEO",
+            "level": 3,
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "voice": {
+            "answer": "por capa",
+            "answerLead": "Capa",
+            "eyebrow": "AEO · metodología BeX",
+            "question": "¿Te recomienda la IA?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-method-staircase-intent.json compone el mismo plan 1`] = `
 {
   "assets": [],

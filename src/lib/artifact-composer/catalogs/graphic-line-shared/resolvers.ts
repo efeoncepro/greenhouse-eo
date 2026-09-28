@@ -131,6 +131,25 @@ export const graphicLineResolvers = (): ResolverRegistry => {
           : null
     },
 
+    // La parada actual de un plan (TASK-1928, `decision-plan`): la ficha encendida. La plantilla pinta hasta tres.
+    'gl-current-stop': {
+      known: ['1', '2', '3'],
+      build: value =>
+        ['1', '2', '3'].includes(value.trim())
+          ? [{ selector: ':self', toneClass: `gl-current-${value.trim()}`, toneGroup: ['gl-current-1', 'gl-current-2', 'gl-current-3'] }]
+          : null
+    },
+
+    // De qué lado del punto va un rótulo (TASK-1928, el anillo del puntaje): `start` crece a la derecha, `end` a la
+    // izquierda.
+    'gl-label-side': {
+      known: ['start', 'end'],
+      build: value =>
+        ['start', 'end'].includes(value.trim())
+          ? [{ selector: ':self', toneClass: `gl-side-${value.trim()}`, toneGroup: ['gl-side-start', 'gl-side-end'] }]
+          : null
+    },
+
     // Texto alternativo de la foto: describe la escena, nunca transcribe el copy de la lámina.
     'gl-alt': {
       known: ['<descripción de la escena>'],
@@ -157,9 +176,9 @@ export const graphicLineResolvers = (): ResolverRegistry => {
     // cerrada de `gl-px-*` (el centro y el radio de una lente, el ancho de una columna). Sólo acepta nombres
     // `--gl-` y valores numéricos con unidad: nunca un color ni una familia.
     'gl-css': {
-      known: ['--gl-<nombre>=<número>(px|em|%)?'],
+      known: ['--gl-<nombre>=<número>(px|em|%|deg)?'],
       build: value => {
-        const match = /^(--gl-[a-z0-9-]+)=(-?\d+(?:\.\d+)?(?:px|em|%)?)$/.exec(value.trim())
+        const match = /^(--gl-[a-z0-9-]+)=(-?\d+(?:\.\d+)?(?:px|em|%|deg)?)$/.exec(value.trim())
 
         return match ? [{ selector: ':self', styleProp: match[1]!, styleValue: match[2]! }] : null
       }

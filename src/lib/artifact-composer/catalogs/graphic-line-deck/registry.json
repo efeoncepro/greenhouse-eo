@@ -20,7 +20,12 @@
     "deck.section-split.panel-end",
     "deck.content-measure",
     "deck.triptych",
-    "deck.method-staircase"
+    "deck.method-staircase",
+    "deck.method-staircase.flat",
+    "deck.decision-plan",
+    "deck.method-score-ring",
+    "deck.method-hybrid-workforce",
+    "deck.method-hybrid-workforce.scene"
   ],
   "templates": [
     {
@@ -209,6 +214,61 @@
       "contentTypes": ["deck.method-staircase"],
       "prototype": "method-staircase.html",
       "slotsRef": "method-staircase.slots.json"
+    },
+    {
+      "name": "MethodStaircaseFlat",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-staircase.flat"],
+      "prototype": "method-staircase-flat.html",
+      "slotsRef": "method-staircase-flat.slots.json"
+    },
+    {
+      "name": "DecisionPlan",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-plan"],
+      "prototype": "decision-plan.html",
+      "slotsRef": "decision-plan.slots.json"
+    },
+    {
+      "name": "MethodScoreRing",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-score-ring"],
+      "prototype": "method-score-ring.html",
+      "slotsRef": "method-score-ring.slots.json"
+    },
+    {
+      "name": "MethodHybridWorkforce",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-hybrid-workforce"],
+      "prototype": "method-hybrid-workforce.html",
+      "slotsRef": "method-hybrid-workforce.slots.json"
+    },
+    {
+      "name": "MethodHybridWorkforceScene",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-hybrid-workforce.scene"],
+      "prototype": "method-hybrid-workforce-scene.html",
+      "slotsRef": "method-hybrid-workforce-scene.slots.json"
     }
   ],
   "selector": {
@@ -229,7 +289,12 @@
       "deck.section-split.panel-end": "SectionSplitPanelEnd",
       "deck.content-measure": "ContentMeasure",
       "deck.triptych": "Triptych",
-      "deck.method-staircase": "MethodStaircase"
+      "deck.method-staircase": "MethodStaircase",
+      "deck.method-staircase.flat": "MethodStaircaseFlat",
+      "deck.decision-plan": "DecisionPlan",
+      "deck.method-score-ring": "MethodScoreRing",
+      "deck.method-hybrid-workforce": "MethodHybridWorkforce",
+      "deck.method-hybrid-workforce.scene": "MethodHybridWorkforceScene"
     }
   }
 }

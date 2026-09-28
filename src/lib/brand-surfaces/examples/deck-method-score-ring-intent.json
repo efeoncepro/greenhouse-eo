@@ -1,0 +1,58 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-score-ring",
+  "line": "engine",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Brand Visibility Grader",
+    "question": "¿Cómo te ve la IA?",
+    "answer": [
+      "Mídelo"
+    ]
+  },
+  "body": "Cómo los motores de respuesta entienden y recomiendan tu marca, frente a tu competencia. El informe es privado.",
+  "dimensions": [
+    {
+      "name": "AI Visibility",
+      "weight": 25
+    },
+    {
+      "name": "Entity Clarity",
+      "weight": 15
+    },
+    {
+      "name": "Category Ownership",
+      "weight": 15
+    },
+    {
+      "name": "Competitive Share of Voice",
+      "weight": 15
+    },
+    {
+      "name": "Citation Quality",
+      "weight": 15
+    },
+    {
+      "name": "Message Alignment",
+      "weight": 10
+    },
+    {
+      "name": "Revenue Intent Coverage",
+      "weight": 5
+    }
+  ],
+  "total": {
+    "value": "100",
+    "label": "puntos en 7 dimensiones",
+    "source": "Pesos del Brand Visibility Grader, versión V1"
+  },
+  "ctaButton": {
+    "text": "Mide tu marca gratis",
+    "descriptor": "think.efeoncepro.com/brand-visibility"
+  }
+}

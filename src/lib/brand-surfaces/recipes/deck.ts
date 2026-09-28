@@ -363,6 +363,37 @@ const layerAsset = (id: string, svg: string): { ref: string; asset: SurfaceAsset
   return { ref, asset: { ref, kind: 'svg', svg } }
 }
 
+/**
+ * El indicador de navegación de una lámina (la pieza medida `pieces.deck.<pieza>`, «sección n de N»), pintado por
+ * AXIS sobre el progreso que delegó el manifest. Lo usan las recetas de otras familias que lo llevan (TASK-1928).
+ */
+export const progressIndicatorLayer = (
+  manifest: SurfaceManifest,
+  line: string,
+  pieceKey: string,
+  idPrefix: string
+): { ref: string; asset: SurfaceAssetRequest } => {
+  const progress = contentOf(manifest).progress
+  const piece = GL.pieces.deck[pieceKey]
+
+  if (!progress) throw new SurfacePieceError('La lámina lleva su indicador: falta `progress` (sección n de N).', 'invalid-intent')
+  if (!piece) throw new SurfacePieceError(`AXIS no midió la pieza «${pieceKey}» del deck.`, 'invalid-intent')
+
+  const { canvas, element } = orbitDelegate(manifest, 'progress')
+  const resolved = resolveOrbit(canvas, element)
+
+  applyPiece(resolved.elements[0]!, piece)
+
+  return layerAsset(
+    `${idPrefix}-progress-${progress.current}-of-${progress.sections}-${line}`,
+    paintGraphicLine(resolved as never, {
+      background: false,
+      idPrefix,
+      circles: { [String(element.id)]: { cx: piece.ring.cx, cy: piece.ring.cy, r: piece.ring.r } }
+    }).svg
+  )
+}
+
 const px = (name: string, value: number, unit = 'px'): string => `--gl-${name}=${Math.round(value * 100) / 100}${unit}`
 
 /** Una fracción del ancho del lienzo, en px enteros. */
@@ -734,91 +765,105 @@ export const triptych: RecipeBuilder = ({ intent, manifest, recipe }) => {
 }
 
 /**
- * `method-staircase`: un método por niveles como una escalera. Peldaños de vidrio que se iluminan al subir y sangran por
- * la derecha; el nivel de llegada es sólido en el acento de la línea, con brillo. La selección toma el nivel que se está
- * trabajando. AXIS aprobó la receta SIN medir su geometría (hueco `method-staircase` del deck): las medidas de abajo
- * son las de la lámina aprobada DeckBexEscalera (F2b), en un solo lugar, hasta que AXIS las mida.
+ * `method-staircase`: el método por niveles como escalera (TASK-1919; medidas en AXIS desde TASK-1928). Dos
+ * composiciones aprobadas: `steps` (por defecto), cinco peldaños de vidrio que se iluminan al subir y sangran por la
+ * derecha con el último sólido en el acento; y `flat`, la escalera tipográfica: cinco filas en diagonal sin peldaños,
+ * el último nombre más grande y en el acento (≥ 24 px, cumple D1). La selección toma el nivel que se trabaja.
  *
- * El contenido (voz, niveles, nota) y la selección salen del manifest: AXIS valida el número de niveles de la receta
+ * Todo sale de AXIS: la voz y la nota, de las reservas y tipos del manifest; la escalera, de `stair` de la receta o de
+ * su composición. El contenido (voz, niveles, nota) y la selección salen del manifest: AXIS valida el número de niveles
  * (`levels-count-invalid`), que cada uno tenga nombre y que la selección tome un nivel existente con su etiqueta
- * (`selection-level-invalid`, `selection-label-required`), y delega la selección del peldaño como objeto con su
- * variante, aire y velo.
+ * (`selection-level-invalid`, `selection-label-required`).
  */
-const STAIRCASE_BOARD = {
-  x0: 760,
-  dx: 70,
-  y0: 798,
-  dy: 132,
-  slabHeight: 124,
-  nameLevelPx: 76,
-  nameTopPx: 86,
-  numberPx: 30,
-  descriptorPx: 23,
-  eyebrowTop: 110,
-  questionTop: 200,
-  answerTop: 270,
-  bodyTop: 590,
-  bodyPx: 25,
-  bodyWidth: 500,
-  notePx: 17,
-  noteFromBottom: 150
-} as const
+type StairTokens = {
+  x0Px: number
+  dxPx: number
+  y0Px: number
+  dyPx: number
+  slabHeightPx?: number
+  rowGapPx?: number
+  name: { px: number }
+  lastName: { px: number }
+  number: { px: number; boxPx?: number }
+  descriptor: { px: number }
+}
 
 export const methodStaircase: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const content = contentOf(manifest)
   const levels = content.levels ?? []
-  const expected = (recipe.levels as { count: number }).count
+  const layout = manifest.layout ?? 'steps'
+  const layoutToken = (recipe.layouts as Record<string, { levels?: { count: number }; stair?: StairTokens }> | undefined)?.[layout]
+  const expected = (layoutToken?.levels ?? (recipe.levels as { count: number })).count
+
+  if (layout !== 'steps' && layout !== 'flat') {
+    throw new SurfacePieceError(`\`method-staircase\` no tiene plantilla para la composición «${layout}».`, 'recipe-without-template')
+  }
 
   // AXIS ya rechazó otro número de niveles; aquí sólo se cierra el caso de un manifest sin ellos (un intent 0.1.0).
   if (levels.length !== expected) {
     throw new SurfacePieceError(`\`method-staircase\` lleva ${expected} niveles en \`levels\`; llegaron ${levels.length}.`, 'invalid-intent')
   }
 
-  // AXIS deja el descriptor opcional; el peldaño aprobado lo lleva siempre bajo el nombre.
+  // AXIS deja el descriptor opcional; el nivel aprobado lo lleva siempre junto al nombre.
   if (levels.some(level => !level.descriptor)) {
     throw new SurfacePieceError('Cada nivel de la escalera lleva su descriptor (`levels[].descriptor`).', 'invalid-intent')
   }
 
   if (!content.body) throw new SurfacePieceError('`method-staircase` lleva bajada (`body`).', 'invalid-intent')
 
-  const margin = manifest.safeArea?.marginPx ?? 140
+  const margin = measured(manifest.safeArea?.marginPx, 'el margen del deck')
   const voice = voiceSlots(manifest)
-  const B = STAIRCASE_BOARD
+  const stair = measured(layoutToken?.stair ?? (recipe.stair as StairTokens | undefined), 'la geometría de la escalera')
+  const body = typeOf(manifest, 'body')
+  const note = typeOf(manifest, 'note')
 
-  // La respuesta: el mayor tamaño del rango del deck que cabe antes del primer peldaño (calibrado: «por capa» → 139,
+  // La respuesta: el mayor tamaño del rango del deck que cabe antes del primer nivel (calibrado: «por capa» → 139,
   // contra 140 aprobado).
+  // Si la composición midió la respuesta (la plana: 140 px), manda esa; si no, el mayor tamaño del rango que cabe.
   const longest = [voice.answerLead ?? '', voice.answer!].sort((a, b) => b.length - a.length)[0]!
-  const answerPx = answerPxWithinRange(longest, GL.surfaces.deck.base.answer.rangePx, B.x0 - margin - 40)
+  const measuredAnswer = (manifest.type as Record<string, { px?: unknown }> | undefined)?.answer?.px
 
-  // La selección del peldaño: nivel, etiqueta, ancla, escala y el objetivo (objeto, sin velo sobre el vidrio, como la
-  // lámina aprobada F2b), todo del delegado de AXIS.
+  const answerPx =
+    typeof measuredAnswer === 'number'
+      ? measuredAnswer
+      : answerPxWithinRange(longest, GL.surfaces.deck.base.answer.rangePx, stair.x0Px - margin - 40)
+
+  const frame: Record<string, unknown> = {
+    line: intent.line,
+    margin,
+    eyebrowTop: topOf(manifest, 'eyebrow'),
+    questionTop: topOf(manifest, 'question'),
+    answerTop: topOf(manifest, 'answer'),
+    answerPx,
+    bodyTop: topOf(manifest, 'body'),
+    bodyPx: fixedPx(body, 'la bajada'),
+    bodyWidth: measured(body.maxWidthPx as number | undefined, 'el ancho de la bajada'),
+    stairX0: px('stair-x0', stair.x0Px),
+    stairDx: px('stair-dx', stair.dxPx),
+    stairY0: px('stair-y0', stair.y0Px),
+    stairDy: px('stair-dy', stair.dyPx),
+    levelNamePx: px('level-name-px', stair.name.px),
+    levelTopNamePx: px('level-top-name-px', stair.lastName.px),
+    levelNumberPx: px('level-number-px', stair.number.px),
+    levelDescriptorPx: px('level-descriptor-px', stair.descriptor.px),
+    notePx: px('note-px', fixedPx(note, 'la nota')),
+    noteTop: px('note-top', topOf(manifest, 'note')),
+    columnWidth: px('column-width', stair.x0Px - 20)
+  }
+
+  if (layout === 'steps') frame.slabHeight = px('slab-height', measured(stair.slabHeightPx, 'el alto del peldaño'))
+  else {
+    frame.rowGap = px('row-gap', measured(stair.rowGapPx, 'el aire de la fila'))
+    frame.levelNumberBox = px('level-number-box', measured(stair.number.boxPx, 'la caja del número'))
+  }
+
+  // La selección del nivel: nivel, etiqueta, ancla, escala y el objetivo (objeto, sin velo), todo del delegado de AXIS.
   const selection = selectionSlot(manifest)
 
   return {
+    contentType: layout === 'flat' ? 'deck.method-staircase.flat' : undefined,
     slots: {
-      frame: {
-        line: intent.line,
-        margin,
-        eyebrowTop: B.eyebrowTop,
-        questionTop: B.questionTop,
-        answerTop: B.answerTop,
-        answerPx,
-        bodyTop: B.bodyTop,
-        bodyPx: B.bodyPx,
-        bodyWidth: B.bodyWidth,
-        stairX0: px('stair-x0', B.x0),
-        stairDx: px('stair-dx', B.dx),
-        stairY0: px('stair-y0', B.y0),
-        stairDy: px('stair-dy', B.dy),
-        slabHeight: px('slab-height', B.slabHeight),
-        levelNamePx: px('level-name-px', B.nameLevelPx),
-        levelTopNamePx: px('level-top-name-px', B.nameTopPx),
-        levelNumberPx: px('level-number-px', B.numberPx),
-        levelDescriptorPx: px('level-descriptor-px', B.descriptorPx),
-        notePx: px('note-px', B.notePx),
-        noteTop: px('note-top', manifest.canvas.height - B.noteFromBottom),
-        columnWidth: px('column-width', B.x0 - 20)
-      },
+      frame,
       voice,
       body: content.body,
       levels: levels.map(level => ({ name: level.name, descriptor: level.descriptor! })),

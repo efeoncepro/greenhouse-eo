@@ -1,0 +1,393 @@
+{
+  "template": "MethodScoreRing",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "engine"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 200
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 270
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 150
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 450
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 25
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 560
+        },
+        "ctaTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-cta-top=700px"
+        },
+        "ctaPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-cta-px=24px"
+        },
+        "ctaPadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-cta-pad-y=22px"
+        },
+        "ctaPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-cta-pad-x=38px"
+        },
+        "ctaRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-cta-radius=14px"
+        },
+        "ctaUrlPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-cta-url-px=20px"
+        },
+        "totalLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-total-left=1160px"
+        },
+        "totalWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-total-width=300px"
+        },
+        "totalTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-total-top=456px"
+        },
+        "totalPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-total-px=110px"
+        },
+        "totalLabelTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-total-label-top=570px"
+        },
+        "totalLabelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-total-label-px=22px"
+        },
+        "labelWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-label-width=300px"
+        },
+        "labelWeightPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-label-weight-px=40px"
+        },
+        "labelNamePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-label-name-px=18px"
+        },
+        "labelNameGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-label-name-gap=2px"
+        },
+        "sourceLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-source-left=660px"
+        },
+        "sourceTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-source-top=1000px"
+        },
+        "sourcePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-sr-source-px=16px"
+        }
+      }
+    },
+    "ring": {
+      "selector": "[data-slot='ring']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "example": "Brand Visibility Grader"
+        },
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 28,
+          "example": "¿Cómo te ve la IA?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 8,
+          "resolver": "gl-answer",
+          "example": "Mídelo"
+        }
+      }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 135,
+        "maxLines": 4,
+        "overflow": "reject"
+      },
+      "example": "Cómo los motores de respuesta entienden y recomiendan tu marca, frente a tu competencia. El informe es privado."
+    },
+    "total": {
+      "selector": "[data-slot='total']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "value": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 4,
+          "example": "100"
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "example": "puntos en 7 dimensiones"
+        }
+      }
+    },
+    "labels": {
+      "selector": "[data-slot='labels']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 3,
+        "maxItems": 8,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "left": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-css"
+          },
+          "top": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-css"
+          },
+          "side": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-label-side"
+          },
+          "weight": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 3
+          },
+          "name": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 28
+          }
+        }
+      },
+      "example": [
+        {
+          "left": "--gl-sr-label-left=1536px",
+          "top": "--gl-sr-label-top=268px",
+          "side": "start",
+          "weight": "25",
+          "name": "AI Visibility"
+        },
+        {
+          "left": "--gl-sr-label-left=1595px",
+          "top": "--gl-sr-label-top=639px",
+          "side": "start",
+          "weight": "15",
+          "name": "Entity Clarity"
+        },
+        {
+          "left": "--gl-sr-label-left=1360px",
+          "top": "--gl-sr-label-top=810px",
+          "side": "start",
+          "weight": "15",
+          "name": "Category Ownership"
+        },
+        {
+          "left": "--gl-sr-label-left=784px",
+          "top": "--gl-sr-label-top=720px",
+          "side": "end",
+          "weight": "15",
+          "name": "Competitive Share of Voice"
+        },
+        {
+          "left": "--gl-sr-label-left=694px",
+          "top": "--gl-sr-label-top=444px",
+          "side": "end",
+          "weight": "15",
+          "name": "Citation Quality"
+        },
+        {
+          "left": "--gl-sr-label-left=822px",
+          "top": "--gl-sr-label-top=235px",
+          "side": "end",
+          "weight": "10",
+          "name": "Message Alignment"
+        },
+        {
+          "left": "--gl-sr-label-left=1260px",
+          "top": "--gl-sr-label-top=178px",
+          "side": "start",
+          "weight": "5",
+          "name": "Revenue Intent Coverage"
+        }
+      ]
+    },
+    "cta": {
+      "selector": "[data-slot='cta']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 22,
+          "example": "Mide tu marca gratis"
+        },
+        "url": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 45,
+          "example": "think.efeoncepro.com/brand-visibility"
+        },
+        "cursorScale": {
+          "type": "number",
+          "required": true,
+          "consumer": "validation-only",
+          "example": 1.3
+        },
+        "descriptorGapPx": {
+          "type": "number",
+          "required": true,
+          "consumer": "validation-only",
+          "example": 20
+        }
+      }
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 70,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Pesos del Brand Visibility Grader, versión V1"
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-baked-dark.svg"
+    }
+  }
+}

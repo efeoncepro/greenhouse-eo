@@ -2,6 +2,31 @@
   "$comment": "Qué receta del catálogo de láminas (docs/operations/brand-graphic-line/deck-recipes/) compone con qué plantilla de este catálogo. Lo lee `pnpm brand:deck-recipes` para marcar en el índice qué lámina tiene plantilla, y el test de paridad de slots. `slots` mapea cada slot de la receta al campo del slots.json (obligatorio en las recetas nuevas de TASK-1928; las 30 anteriores lo declaran nulo porque su contrato sale del manifest de AXIS, no del catálogo). `example` apunta a un intent de pieza o a una página de un documento (`archivo.json#page=N`, desde 1). Una receta sin fila aquí no tiene plantilla.",
   "schema": "efeonce.deck-recipe-map.v1",
   "recipes": {
+    "method-hybrid-workforce": {
+      "contentType": "deck.method-hybrid-workforce",
+      "example": "src/lib/brand-surfaces/examples/deck-method-hybrid-workforce-intent.json",
+      "slots": null
+    },
+    "method-hybrid-workforce-scene": {
+      "contentType": "deck.method-hybrid-workforce.scene",
+      "example": "src/lib/brand-surfaces/examples/deck-method-hybrid-workforce-scene-intent.json",
+      "slots": null
+    },
+    "method-score-ring": {
+      "contentType": "deck.method-score-ring",
+      "example": "src/lib/brand-surfaces/examples/deck-method-score-ring-intent.json",
+      "slots": null
+    },
+    "decision-plan": {
+      "contentType": "deck.decision-plan",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-plan-intent.json",
+      "slots": null
+    },
+    "method-staircase-flat": {
+      "contentType": "deck.method-staircase.flat",
+      "example": "src/lib/brand-surfaces/examples/deck-method-staircase-flat-intent.json",
+      "slots": null
+    },
     "proposal-service-aeo": {
       "contentType": "deck.proposal-service",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-service-aeo-intent.json",

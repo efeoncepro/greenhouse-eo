@@ -34,6 +34,9 @@ export class GraphicLineCtaError extends Error {
 
 /**
  * @param descriptorGapOfWidth aire entre el cursor y el descriptor, como fracción del ancho del lienzo.
+ *
+ * Una receta que mide su propio CTA (TASK-1928: el anillo del puntaje) manda en el slot `cta` su escala del cursor
+ * (`cursorScale`) y el aire del descriptor en px (`descriptorGapPx`); sin ellos rigen las opciones del catálogo.
  */
 export const makeCtaHook =
   (painter: GraphicLineCtaPainter | undefined, options: { cursorScale: number; descriptorGapOfWidth: number }): CatalogLayoutHook =>
@@ -64,7 +67,12 @@ export const makeCtaHook =
 
     if (!measured) throw new GraphicLineCtaError(slide.slideId, 'la plantilla no marca `[data-gl-cta-target]`.')
 
-    const paint = painter({ bounds: measured.bounds, canvas: measured.canvas, cursorScale: options.cursorScale })
+    const cursorScale = typeof cta.cursorScale === 'number' ? cta.cursorScale : options.cursorScale
+
+    const descriptorGap =
+      typeof cta.descriptorGapPx === 'number' ? cta.descriptorGapPx : options.descriptorGapOfWidth * measured.canvas.width
+
+    const paint = painter({ bounds: measured.bounds, canvas: measured.canvas, cursorScale })
 
     if (!paint.withinCanvas) throw new GraphicLineCtaError(slide.slideId, 'el CTA pintado queda fuera del lienzo.')
 
@@ -88,7 +96,7 @@ export const makeCtaHook =
         overlay: paint.overlay,
         width: measured.canvas.width,
         height: measured.canvas.height,
-        descriptorTop: Math.round(paint.bottom + options.descriptorGapOfWidth * measured.canvas.width)
+        descriptorTop: Math.round(paint.bottom + descriptorGap)
       }
     )
   }
