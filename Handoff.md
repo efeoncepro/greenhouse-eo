@@ -6,7 +6,7 @@ TASK-1863: staging; main retenido.
 
 **Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) en staging (flag ON, 6 catálogos + Insights verdes); federación en efeonce-mcp#22 sin merge; no promover a main.
 
-**Composer `--freeze` (28/09):** sólo acepta frames de la sección nueva sin sellar de `BASELINE_DELTAS.md` y la sella (`77d3cb1f5`, [runbook §5](docs/operations/runbooks/composer-visual-gate.md)); las 44 secciones previas quedaron `legacy-2026-09-28`. Gate global sigue rojo en 59 frames sky/deck-axis (ISSUE-122).
+**Composer `--freeze` (28/09):** sólo acepta la sección nueva sin sellar de `BASELINE_DELTAS.md` ([runbook §5](docs/operations/runbooks/composer-visual-gate.md)). Gate global rojo en 59 frames (ISSUE-122).
 
 **Deck «La órbita» (28/09):** TASK-1927–1929 y TASK-1934 complete en `develop` (78 recetas, AXIS `v0.3.23`); siguen TASK-1930…1933.
 
@@ -367,90 +367,7 @@ tras drenar esa carrera. No existe todavía un nuevo canary humano directo compl
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-**MCP gateway — cartel del servidor, 2026-09-05 — DESPLEGADO:** `efeonce-mcp` `815df9b` en producción,
-revisión `efeonce-mcp-gateway-00036-5wc`. El gateway declara `title`/`websiteUrl`/`icons` y sirve UN ícono
-(isotipo blanco sobre placa navy opaca, sin `theme`, sin radio horneado). Front door verificado en vivo:
-`/icon-512.png` 200 `image/png` con bytes idénticos al asset del repo y sin challenge de auth;
-`/.well-known/oauth-protected-resource` 200; `POST /mcp` sin token 401 (fail-closed intacto);
-`/icon-512-dark.png` 404; `auth.efeonce.org/readyz` 200 (el piloto de TASK-1836 no se tocó). El deploy llevó
-sólo estos commits: la revisión anterior `00035-bhd` estaba construida desde `d7469d7`, su padre exacto. Sin
-impacto visible: ningún cliente Claude renderiza `icons` todavía. Razones:
-[ADR](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) §Delta 2026-09-05.
-
-**Berel, 2026-09-04:** Playbook y feedback de septiembre incorporados a la skill espejo, sin tocar
-artículos, assets ni Drupal. Fuentes, decisiones y drift: `berel-content-production/SOURCES.md`.
-
-**SEO/AEO y Berel, 2026-09-04:** método de informes documentado en
-[modelo operativo](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) y skills espejo.
-[Auditoría agosto](docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) guardada y verificada en
-[Notion](https://app.notion.com/3d139c2fefe781ba8928eef8dadfb219) y Markdown. El run EO-GRUN-00049
-no es línea base comercial válida: categoría amplia y probes MCP/API falsos positivos. Corregir instrumento
-y repetir medición sigue pendiente; este cambio solo documenta el método y el caso.
-[Informe PDF A4](docs/audits/seo/berel-agosto-2026/BEREL_INFORME_AGOSTO_2026_A4.pdf): 55 páginas revisadas,
-desempeño de Berel y pie institucional completo. [Estándar de informes](docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md)
-y skill `report-studio` creada para Claude/Codex: investigación primaria, siete módulos, plantillas y preflight probado. HTML queda como insumo; cobertura On-time explícita y exportación reproducible. Entrega local, sin envío al cliente.
-
-**Globe, 2026-09-03:** caller externo pausado; protección deploy sólo local, sin commit/push/deploy.
-Platform debe promoverla y medir ahorro. Reactivación/evidencia:
-[runbook TASK-1807](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
-
-**RELEASE 2026-09-04 `9100bbd2765d` — `released`** (greenhouse-eo-45; run `33893120972`; PR #221; manifest `9100bbd2765d-d5fae366-…`). EPIC-044 en producción: `auth-server` vivo (readyz 200, JWKS 2 kid, rev `auth-server-00005-pk8`, `oauth:false`); lane 1631 verificado (200/400/401); Vercel READY; watchdog `ok` 5/5 (ops-worker y auth-server change-gated, árbol idéntico). Post-release: `AUTH_SERVER_JWKS_URL` en Vercel Production+staging + redeploy; environment `efeonce-auth` registrado `draft` (`pnpm auth-server:register-issuer-environment`). Fix en develop: el watchdog ya clasifica el change-gate del `auth-server` (espejo + test de paridad). Pendientes: señales `identity.external_binding.*` en prod con sesión humana; retiro de llave v1 (eo-0f); `AUTH_SERVER_OAUTH_ENABLED` ON en staging con environment `active`. Detalle: ledger de tiempos.
-
-🔴 **TASK-1830 — el correo del magic link está MUERTO en producción** (hallado 2026-09-05 por el canary nuevo): `RESEND_API_KEY is not configured`. Declaré el `*_SECRET_REF` sin montar el secreto, y `sendEmail` usa el cliente SÍNCRONO. Corregido en `services/auth-server/deploy.sh` (commit `38fbfaeeb`), **pendiente de redeploy del auth-server**. La respuesta HTTP es 202 idéntica por anti-enumeración, así que nadie se habría enterado hasta que una persona real reclamara. Gate nuevo: `pnpm auth-server:person-auth:canary` (22 ok en vivo; exit 2 = incompleto, 1 = rojo). El resto del carril autenticado quedó verificado en vivo por primera vez.
-
-**TASK-1830 (EPIC-044 U03) — `code complete, rollout pendiente`** (2026-09-04, develop; commits, infra KMS, tablas y desviaciones en [la task](docs/tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md)). Personas externas sin contraseña (magic link, passkeys, TOTP) detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`; capability `identity.auth_person.revoke` + `POST /api/admin/auth-server/persons/revoke`; `sha256`+timing-safe en vez de bcrypt. **Próximo paso:** prender el flag en staging (exige `AUTH_SERVER_OAUTH_ENABLED=true` + environment `efeonce-auth` en `active`, si no `authorize` responde `environment_inactive`), verificar que el correo sale de verdad por Resend (anti-enumeración: un correo muerto NO se reporta solo) y ejercitar passkey en dos navegadores. Gate: `pnpm auth-server:person-auth:smoke`. TASK-1835 consume el contrato del flujo maestro §5.bis.
-
-**TASK-1829 (EPIC-044 U02) — `code complete, rollout pendiente`** (commits `263ee3a74` · `19d1658de` · `d31e6e913`). Superficie OAuth del emisor detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (en producción, apagada); endpoints, tablas, capabilities y señales en el contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Decisión del operador: `localhost` como loopback sólo para clientes públicos. Próximo paso: flag ON en staging (environment `efeonce-auth` a `active`, metadata validada, clientes CIMD/DCR de prueba); persona real exige TASK-1830. Sin `pnpm build` local ni canary de Globe OAuth (hibernado).
-
-**EPIC-044 (2026-09-03) — authorization server propio** (ADR `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`; WorkOS descartado). Estado por task en `docs/tasks/**/TASK-1828*`…`TASK-1834*`. **TASK-1631 (U04)** en producción desde el release 2026-09-04 (run 33893120972); próximo paso: el operador lee las 4 señales en `/admin/operations` prod; TASK-1829 emite tokens y activa el environment; TASK-1831 consume el reader. Paridad registry↔catálogo: 4 capabilities sembradas el 2026-09-25; el resto sigue como task aparte.
-
-Release SEO/D4 (2026-09-13): PR #235, run `34754161855`, manifiesto `released`; [auditoría](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
-
-Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
-skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
-
-Valentina (03/09): misma persona/usuario/member, correo nuevo y elegibilidad SSO verificados; login
-interactivo no probado. Último día anterior 30/05/2026, EO-CENG-0001 ending; EO-CENG-0002 activo desde
-20/08, bruto mensual 530.973 (450.000 líquidos). Agosto 12/31: EO-CPAY-0002 pending_readiness,
-neto 174.193,55, única falta boleta; sin obligación/orden nueva. Recuperación y evidencia abajo.
-
-TASK-1349 **EN PRODUCCIÓN + recovery aplicada** (2026-09-03; release `62356c9b7fd4`, run `33779259694`, flag
-`WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON prod+staging). Recovery por los commands canónicos, autorizada
-en chat: **Felipe** revisado `relationship_ended` con causal `termination` declarada por el operador → approved →
-scheduled → executed; member inactivo, compensación cerrada al 02/06, mayo `full_period`, junio `exclude_from_cutoff`,
-julio+ `exclude_entire_period`. **Luis Reyes y María Camila Hoyos**: lifecycle cerrado (relación employee terminada
-al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Snapshot inicial, sustituido por el cierre Maggie/María Fernanda de arriba: unresolved **1** (Maria Fernanda,
-draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprovisioned_without_case 0.
-
-🔴 **«Colaboradores fantasma» (2026-09-03 ~17:50Z, resuelto):** la pre-nómina de septiembre mostró seis
-`Colaborador <uuid>` sin contrato: sujetos sintéticos de mi live test con compensación abierta, que `derivePolicy`
-trataba como salida decidida (`identity_only` ejecutado → `full_period`). Compensaciones cerradas por command,
-`hasDecidedExitFact` ya excluye `identity_only`, el live test limpia al terminar; fix en PR #220 (`main`).
-
-**Valentina Hoyos (2026-09-03) — cerrado:** restauración gobernada aplicada (clave `valentina-lifecycle-reentry-restore-2026-09-03`, no repetir ni usar el SQL retirado); release `33795564223` released. Detalle: [auditoría](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) · [runbook](docs/operations/runbooks/workforce-reentry-recovery.md). Pendiente: Finance de Felipe (obligación junio + SII) sin command de anulación; UI TASK-1814.
-
-**Delta Claude 19:40Z — PR #220 CERRADO por Codex** (run `33795564223`, manifest released 19:30:49Z; ver arriba).
-Attempts 1 y 2 `aborted` por cancelaciones cruzadas: el webhook empareja por `target_sha` antes que por
-`workflow_run_id`, así que cancelar un run duplicado aborta el manifest ajeno (bug a tasquear). **Purga sintética
-APLICADA 18:37Z:** 12 members `TASK-1349 live …` (253 filas, `scripts/workforce/purge-task1349-live-subjects.sql`);
-265→253 members, 8 activos, reales. Barrido documental 20:10Z + [TASK-1815](docs/tasks/to-do/TASK-1815-release-webhook-reconciler-run-id-matching.md).
-
-Offboarding: la [auditoría inicial](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md)
-es antecedente, no estado vigente. [TASK-1349](docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md)
-conserva pendientes Finance; [TASK-1814](docs/tasks/to-do/TASK-1814-offboarding-case-review-recovery-ui.md) posee
-la UI aún sin implementar. No repetir las recoveries cerradas para probar ese recorrido.
-
-Cierre documental 03/09: tres subagentes sincronizaron Workforce/Talent, Contractors/Finance y Release/QA;
-root integró identidad, arquitectura, tareas e índices. [Cobertura y límites](docs/audits/payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
-Bug independiente de correlación de releases por SHA/run ID sigue pendiente; el runbook documenta mitigación
-con un coordinador y lectura de intentos/eventos, sin declararlo corregido.
-
-Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
-creada `to-do`, sin implementar. Codex 0.152.0 rechazó discovery; metadata pública revalidada a las 22:51Z.
-La [auditoría](docs/audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md) identifica scopes sin cualificar
-al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueba discovery. El plan B histórico
-de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
-no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
+Notas del 02–05/09 archivadas en [2026-09](docs/operations/agent-context-history/handoff/2026-09.md). Siguen abiertas: TASK-1829/1830 (rollout pendiente; magic link muerto en prod), TASK-1349 (Finance), TASK-1814 y TASK-1815.
 
 ## 2026-09-16 — TASK-1846 COMPLETE: render durable de Efeonce Insights en producción
 
