@@ -1,6 +1,15 @@
 # TASK-1875 — Efeonce Insights: vista web compartida renderizada en Think (efeonce-think)
 
-## Delta 2026-09-28
+## Delta 2026-09-28 (arranque)
+
+- Diseño aprobado por el operador en el canvas «Insights en vivo» (<https://claude.ai/artifact/EGh8K8eyKA8XNhETCQ1W4T>):
+  portada navy con la órbita que mide, resumen, capítulo con figura + tabla + límites, plan, metodología, descargas y
+  cierre con el eslogan en bloque oficial; tipografía Bricolage + Poppins del sistema «La órbita». Marca y lockup
+  canónicos: `axis-brand-assets` 0.4.0 (`insights-lockup-*`). El diseño usa campos editoriales v2 que
+  `InsightWebModelV1` todavía no proyecta: el render los toma como opcionales y su proyección en Greenhouse queda como
+  follow-up backend.
+
+## Delta 2026-09-28 (rate limit)
 
 - TASK-1876: `/api/public/**` queda detrás de un rate limit del Firewall de Vercel (20 req/10 s por IP; enforce en staging/preview, observe en producción). Si Think lee el reader público server-side desde pocas IPs de runtime, **exceptuarlo con una condición explícita** (cabecera/credencial de Think) en `src/lib/security/public-burst-guard/firewall-rules.ts` y aplicar con `pnpm security:public-burst-guard --apply`; nunca subir el límite para todos.
 
@@ -44,7 +53,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -57,7 +66,7 @@
 - Motion: `docs/ui/motion/TASK-1875-efeonce-insights-shared-web-render-think-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Diseno — contrato registrado 2026-09-15; runtime en el repo hermano efeonce-think, sin código`
+- Status real: `En implementación local (2026-09-28): diseño aprobado en el canvas «Insights en vivo»; render en efeonce-think con fixture sólo en dev, sin push`
 - Rank: `TBD`
 - Domain: `ui|platform|public-site`
 - Blocked by: `none`
