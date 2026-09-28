@@ -142,7 +142,7 @@ const canonicalize = (value: unknown): unknown => {
 }
 
 /** Proyección comparable: sólo los campos que gobierna esta fuente versionada. */
-const comparable = (rule: ActiveFirewallRule) => {
+const comparable = (rule: Omit<ActiveFirewallRule, 'id'>) => {
   const conditionGroup = Array.isArray(rule.conditionGroup)
     ? rule.conditionGroup.map(rawGroup => {
         const group = asRecord(rawGroup)

@@ -166,7 +166,9 @@ describe('public burst guard WAF rules (TASK-1876)', () => {
   it('ignores real Vercel readback fields and explicit neg false', () => {
     const fixtureWithExplicitFalse = structuredClone(vercelReadbackFixture)
 
-    fixtureWithExplicitFalse.conditionGroup![0].conditions[0].neg = false
+    const groups = fixtureWithExplicitFalse.conditionGroup as Array<{ conditions: Array<Record<string, unknown>> }>
+
+    groups[0].conditions[0].neg = false
 
     expect(planPublicBurstGuardChanges([fixtureWithExplicitFalse], [PUBLIC_BURST_GUARD_RULES[0]])).toEqual([
       {
