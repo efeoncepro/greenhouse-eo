@@ -16,9 +16,9 @@ describe('ops-worker deploy render dispatch contract', () => {
     expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"')
   })
 
-  it('declares BRAND_RENDER_ENABLED (default OFF, rollout pending): the shared dispatcher drains the brand queue (TASK-1921)', () => {
+  it('declares BRAND_RENDER_ENABLED with default ON for the shared brand dispatcher (TASK-1921)', () => {
     // Sin el flag declarado, dispatchNextBrandRender lo ve OFF y ningún pedido de marca lanza el Job.
-    expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},BRAND_RENDER_ENABLED=${BRAND_RENDER_ENABLED:-false}"')
+    expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},BRAND_RENDER_ENABLED=${BRAND_RENDER_ENABLED:-true}"')
   })
 
   it('declares INSIGHTS_DELIVERY_ENABLED ON: the reactive dispatcher sends Insights deliveries (TASK-1848)', () => {

@@ -47,7 +47,7 @@ asset store —nunca rutas locales— y las materializa con los mismos helpers q
 ## Flag (multi-runtime — ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
 
 Cada consumer tiene su flag: `ARTIFACT_RENDER_JOBS_ENABLED` (Proposal), `INSIGHTS_RENDER_ENABLED` (Insights) y
-`BRAND_RENDER_ENABLED` (piezas de marca, default **false** en los dos `deploy.sh`). Encender uno nunca enciende otro.
+`BRAND_RENDER_ENABLED` (piezas de marca, default **true** en los dos `deploy.sh`). Encender uno nunca enciende otro.
 
 `ARTIFACT_RENDER_JOBS_ENABLED` — default **false**. Se lee en 3 runtimes:
 
