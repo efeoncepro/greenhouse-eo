@@ -725,13 +725,19 @@ El registro cine («la marca en su película», 2026-09-27) sólo se usa con **N
   1152×2048 → **1024×1792**, 4:5 1152×1440 → **1024×1280**, 16:9 2048×1152 → **1792×1024** (medido en los logs del
   brochure y de `ai-generations/2026-09-27_ads-cine/`). Por eso las cajas (isotipo, reservas, firma) se miden **en
   fracciones**, nunca en píxeles.
-- 🔴 **El emblema nunca se usa tal como sale**, aunque parezca fiel (en el brochure salió fiel y aun así se compuso):
-  la prenda se pide con las referencias del kit en `objetos` → `pnpm foto:emblema <plate.png>` al 100 % →
-  `pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara]`, **una vez por pecho**. Escribe
-  `<plate>-isotipo.png` y un `.json` de procedencia (paquete `@efeoncepro/axis-brand-assets`, SHA-256 del SVG): la placa
-  aprobada lleva sufijo `b`. `foto:isotipo` compone el isotipo del pecho, no el logotipo de una espalda.
+- 🔴 **El bordado del uniforme lo trae la referencia; no se compone a mano** **[operador, 2026-09-28]**: *«para el
+  uniforme sí tiene varias referencias armadas, no sólo Nexa: cualquier personaje que use uniforme»*. La prenda se pide
+  con su kit en `objetos` (sin `vista`: llega la prenda PUESTA) → `pnpm foto:emblema <plate.png>` al 100 % → si muestra
+  nave, órbita y tres ventanas, **se publica tal como salió**, sin sufijo `b`. `pnpm foto:isotipo <plate.png> --centro x,y
+  --ancho w [--prenda oscura|clara]` sólo si el emblema difiere (una vez por pecho; deja `<plate>-isotipo.png` y un
+  `.json` de procedencia con el SHA-256 del SVG) y **siempre en el traje biónico de Nexa**, que no tiene referencia
+  (`--prenda clara`, pechera del lado izquierdo de quien lo lleva, como `NX5b`). Componer por defecto dejó el isotipo
+  impreso en vez de bordado y la limpieza tapó lo vecino: una cinta de luz en `CR4` y una mano en `MC2` (2026-09-28).
+  Si compones, mira la `b` al 100 % también después. `foto:isotipo` compone el isotipo del pecho, no el logotipo de una
+  espalda. Canon: `.claude/rules/brand-photography.md` y
+  [personas y vestuario](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
 - **Nunca describir el emblema en la escena**: pedir *«the white Efeonce rocket emblem»* dio un cohete genérico. Se
-  prohíbe por nombre (*«NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*) y se compone el oficial.
+  prohíbe por nombre (*«NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*) cuando la prenda no tiene kit (el traje de Nexa) y se compone el oficial; en el uniforme, la marca la trae la referencia.
 - **Ubicación de la herramienta:** hoy `scripts/foto/` en Greenhouse;
   [TASK-1925](../../../docs/tasks/to-do/TASK-1925-brand-workshop-migration.md) la migra al repo taller
   `efeoncepro/efeonce-brand-workshop` con delegadores, y los comandos `pnpm foto:*` no cambian para el operador.

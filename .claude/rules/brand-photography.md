@@ -298,15 +298,21 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   el canon ya fija para el retrato 4:5, aquí con la cámara baja. **Pero la reserva de lecho se mide como BANDA y
   la firma se mide bajo SU caja**: la misma pieza dio banda 1,75 ✗ y **logo 9,82 ✓**, porque la firma centrada
   cae en la zona en sombra. Si la banda falla, mide el logo antes de descartar la pieza.
-- 🔴 **El emblema bordado NO se genera.** Medido 2026-09-20: tres prendas dieron **tres emblemas distintos y
-  ninguno era el de Efeonce** (una espiral, dos barras, otras dos). Es el mismo hecho que gobierna la firma. En
-  orden: que **no se lea** (de espaldas, en sombra, pequeño) · **componerlo** después · **editar con máscara**.
-  **Componerlo es `pnpm foto:isotipo`** (2026-09-27): limpia la marca inventada midiendo el tono de la tela,
-  compone el SVG de `@efeoncepro/axis-brand-assets` (negativo en prenda oscura) con la luz de la escena y deja
-  procedencia con SHA-256. **No reemplaza las referencias del kit** en la ficha (`objetos`), que siguen siendo el
-  primer paso: el orden es referencias → `foto:emblema` al 100 % → `foto:isotipo` sólo si el emblema difiere.
-  **NUNCA** publicar el emblema tal como sale del generador, y **NUNCA** cerrar sin `pnpm foto:emblema`: el QA
-  sobre una hoja de contacto no sirve, a 520 px un bordado no se lee y pasa por bueno.
+- 🔴 **El bordado del uniforme lo trae la REFERENCIA del kit, no se compone a mano** **[operador, 2026-09-28]**:
+  «*no estás agarrando las referencias de ropa corporativa de Efeonce, si no te saldría el bordado*»; «*para el
+  uniforme sí tiene varias referencias armadas, no sólo Nexa: cualquier personaje que use uniforme*». Toda prenda
+  del uniforme (polo, hoodie, softshell, bomber, gorra), en cualquier persona, se pide por su kit en `objetos`
+  (sin `vista`, para que llegue la prenda PUESTA; `puesta` si es de espaldas). Después, **`pnpm foto:emblema` al
+  100 %**: si muestra nave, órbita y tres ventanas, **se publica el bordado generado**, sin `foto:isotipo` ni
+  sufijo `b` (lo que antes eran los precedentes `LN4` y `CR4`). Componer encima «por las dudas» es el error: el
+  isotipo compuesto se ve impreso, no bordado, y la limpieza de la herramienta tapa lo que tenga al lado (mano,
+  tarjeta, cinta de luz). **`foto:isotipo` sólo si el emblema difiere**; si difiere y no se puede componer limpio,
+  se rehace la toma. Medido antes (2026-09-20, sin referencias puestas): tres prendas dieron **tres emblemas
+  distintos y ninguno era el de Efeonce**; por eso la referencia puesta es obligatoria, no opcional.
+  **Excepción: el traje biónico de Nexa no tiene referencia** (es ficción): su isotipo **se compone** con
+  `pnpm foto:isotipo --prenda clara`, pequeño, en la pechera del lado izquierdo de quien lo lleva (como `NX5b`),
+  y la ficha pide la pechera lisa. **NUNCA** cerrar sin `pnpm foto:emblema`: el QA sobre una hoja de contacto no
+  sirve, a 520 px un bordado no se lee y pasa por bueno.
 - 🔴 **La técnica de aplicación de marca la decide la TELA, no la costumbre del kit** **[operador, 2026-09-21]**:
   «*esa tela se borda no se estampa*». **Softshell y chaquetas técnicas → bordado** (la serigrafía sobre tela
   técnica se agrieta y se despega) · **piqué → bordado** (ya lo era) · **algodón afelpado del hoodie → abierto**,

@@ -1,9 +1,9 @@
 # Personas en la fotografía Efeonce V1 — casting, identidad y vestuario
 
 > **Tipo de documento:** Especificación técnica y funcional de marca
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-21
+> **Última actualización:** 2026-09-28 por Claude (1.1: el bordado del uniforme lo trae la referencia puesta; `foto:isotipo` sólo si el emblema difiere, y siempre en el traje de Nexa)
 > **Estado:** Aprobado por el operador el 2026-09-19 (piezas de exploración; ninguna publicada)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Guía de kits de marca](../social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [Biblioteca de Nexa](../social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) · Evidencia `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/`
 
@@ -303,6 +303,15 @@ personas de Efeonce.
 
 ### El emblema bordado NO se genera **[medido 2026-09-20]**
 
+> **Delta 2026-09-28 [decisión del operador]:** «*no estás agarrando las referencias de ropa corporativa de
+> Efeonce, si no te saldría el bordado*»; «*para el uniforme sí tiene varias referencias armadas, no sólo Nexa:
+> cualquier personaje que use uniforme*». El uniforme, en cualquier persona, se pide por su kit en `objetos`
+> (llega la prenda **puesta**) y, si `pnpm foto:emblema` al 100 % muestra nave, órbita y tres ventanas, **se
+> publica el bordado generado**, sin componer encima. Componer por defecto fue el error del 2026-09-28
+> (`MC2`, Marketing con Manzanitas): el bordado generado ya era correcto y el isotipo compuesto lo dejó impreso,
+> además de tapar la mano vecina con la limpieza. `foto:isotipo` queda para cuando el emblema difiere, y para el
+> **traje biónico de Nexa**, que no tiene referencia (se compone siempre, como `NX5b`).
+
 **El modelo no reproduce el emblema: inventa uno distinto cada vez.** Medido sobre la tanda
 `2026-09-20_vestuario-registros/`: tres prendas dieron **tres emblemas diferentes entre sí y ninguno
 era el de Efeonce** — una espiral tipo arroba en un polo, dos barras verticales en otro, otras dos
@@ -335,7 +344,7 @@ propia, no.
    que el operador rechazó.
 3. **Editar con máscara** sobre la zona del emblema, partiendo del kit.
 
-**Nunca**: publicar el emblema tal como sale del generador.
+**Nunca**: publicar el emblema sin mirarlo al 100 % con `pnpm foto:emblema`. Si coincide con el del kit, se publica tal como salió; si no, se corrige o se rehace la toma.
 
 > **Por qué falló el control que ya existía.** La instrucción estaba en el kit —«never let the model
 > spell the emblem by itself — inspect it at 100% before publishing»— y se emitía en cada prompt. Pero
