@@ -1,6 +1,6 @@
 # Handoff activo
 
-**Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) en ejecución: dueño Greenhouse por ahora (extraction-ready), Glitch en la misma cola, plates por uploader privado. Local, sin push.
+**Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) code complete, rollout pendiente: en `develop` (37655fa93), no promover a main. Flag OFF; falta smoke en staging y federar en `efeonce-mcp`.
 
 **Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) complete en local, sin push. [TASK-1928](docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) **complete** (28/09): 69/69 recetas componen (AXIS `v0.3.21`, gates a 0 px, `pnpm test` y `pnpm build` verdes), aprobado por el operador y empujado a `develop`. [TASK-1929](docs/tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md) in-progress; TASK-1933 lleva los pendientes de QA.
 

@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Ruta gobernada para producir piezas de marca en la plataforma (TASK-1921)
+
+- Nueva cola `greenhouse_brand` (pedidos, jobs y eventos append-only). El command `requestBrandRender` valida el
+  contrato AXIS y la receta aprobada antes de encolar, exige cada fuente como asset del uploader y es idempotente. Lo
+  llaman el lane App, el lane ecosystem y tres tools MCP (`request_brand_render`, `get_brand_render_request`,
+  `list_brand_render_requests`).
+- Tercer consumer del `artifact-worker` (La órbita y Glitch, seis catálogos), con despacho en el ops-worker, la señal
+  `brand.render.stuck_job` y `sharp` como dependencia de runtime. Flag `BRAND_RENDER_ENABLED` OFF en los tres runtimes:
+  code complete, rollout pendiente. En `develop`, sin promover a main.
+
 ## 2026-09-28 — Las 69 recetas de deck de «La órbita» componen (TASK-1928)
 
 - El catálogo `graphic-line-deck` suma 34 plantillas para las 38 recetas pendientes: propuestas sobrias, método,
@@ -613,10 +623,3 @@ El kit 3D del logo ya no se compone a mano sobre la escena: se pega el render ex
 alrededor con máscara, así aporta sombra de contacto, reflejo y rebote sin poder re-dibujar el logo. Con el logo grande
 en cuadro basta la pasada directa con el render como referencia. Medido en dos casos reales (avenida de Nueva York y
 escritorio): zona protegida 4,4/255 de diferencia y halo 39,6. La composición determinística queda como respaldo.
-
-## 2026-09-17 — Logo de Efeonce en 3D como kit de referencia para agentes
-
-Quedó en `13- Branding/Logo Efeonce 3D` el logo completo en 3D renderizado en Blender desde el SVG oficial, en navy y
-blanco, en cuatro escalas (monumental, grande, mediana, pequeña) con 33 cámaras y luz izquierda/derecha, sin
-superficies. Cada escala trae un manifiesto de cámara y usos para que un agente elija el render que coincide con la
-escena y se lo pase al modelo como imagen 1, sin dejar que el modelo dibuje las letras.

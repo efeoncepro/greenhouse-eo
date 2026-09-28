@@ -94,7 +94,7 @@ Manda sobre el cuerpo cuando se contradigan.
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `En ejecución (2026-09-28): dueño decidido (Greenhouse por ahora, extraction-ready), Glitch en la misma cola, plates por uploader privado`
+- Status real: `Code complete, rollout pendiente (2026-09-28): Slices 1–6 en develop (37655fa93, push autorizado; sin promover a main). Migración aplicada. Flag BRAND_RENDER_ENABLED OFF en los tres runtimes. Falta: smoke de los seis catálogos en staging con el flag, federación de las tools en efeonce-mcp y los criterios Delta b (TASK-1929/1930/1931)`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
 - Blocked by: `none`
@@ -456,20 +456,41 @@ Reglas obligatorias:
 
 - [x] El dueño de dominio quedó decidido por el operador y registrado en la task.
       — Evidencia: Delta 2026-09-28 (Greenhouse por ahora; luego Marketing Studio o Globe).
-- [ ] Un intent inválido o con receta no aprobada se rechaza en el command con código canónico y no crea job.
-- [ ] Dos pedidos idénticos de la misma organización devuelven el mismo job.
-- [ ] La capability existe en `capabilities_registry` y en `entitlements-catalog.ts`, con grant a ≥1 rol real y
+- [x] Un intent inválido o con receta no aprobada se rechaza en el command con código canónico y no crea job.
+      — Evidencia: `__tests__/commands.test.ts` (`invalid_request`, `render_rejected` y `missing_source` sin escribir).
+- [x] Dos pedidos idénticos de la misma organización devuelven el mismo job.
+      — Evidencia: `commands.test.ts` (misma clave de idempotencia; el existente vuelve sin crear) + índice único
+      (`organization_id`, `idempotency_key`) aplicado en la base.
+- [x] La capability existe en `capabilities_registry` y en `entitlements-catalog.ts`, con grant a ≥1 rol real y
       coverage test verde.
+      — Evidencia: seed de la migración `20260928052624397` verificado en la base; grant DESIGNER ∪ EFEONCE_ADMIN en
+      `runtime.ts`; `pnpm test` completo verde (1871 archivos) el 2026-09-28.
 - [ ] El endpoint `api/platform/app/**` responde con `canonicalErrorResponse` en todos sus errores.
+      — Sin tildar: el lane `api/platform/*` usa su propio contrato (`ApiPlatformError` + tabla del dominio en
+      `brand-render-errors.ts`, probada), no `canonicalErrorResponse`. Es la convención del lane; el criterio quedó
+      mal redactado y requiere confirmación del operador.
 - [ ] El consumer del `artifact-worker` renderiza ambos catálogos en staging y adjunta un asset versionado con
       procedencia completa.
+      — Sin tildar: consumer probado con mocks (`consumers/brand-render.test.ts`); falta smoke real en staging con el
+      flag prendido (autorización aparte).
 - [ ] Con el flag OFF, el consumer no reclama jobs y el endpoint rechaza pedidos.
+      — Parcial: con tests (`commands.test.ts` → `render_disabled`; `dispatch.test.ts` → no despacha). Falta
+      verificarlo contra el runtime desplegado.
 - [ ] Proposal e Insights renderizan igual en staging con el consumer nuevo desplegado.
+      — Sin tildar: falta el canary en staging después del deploy de develop (37655fa93).
 - [ ] La tool MCP está federada (tool, scope, manifiesto, tests, release) y opera contra staging.
-- [ ] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` con sus dos runtimes y `pnpm docs:closure-check` pasa.
-- [ ] Documentación técnica, funcional y manual de uso publicadas.
+      — Parcial: tools y lane ecosystem en Greenhouse (`mcp:manifest:check` verde, 67 tools). Falta la federación
+      en `efeonce-mcp` (otro repo, requiere decisión del operador) y operarla contra staging.
+- [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` con sus dos runtimes y `pnpm docs:closure-check` pasa.
+      — Evidencia: filas con los TRES runtimes (Vercel, ops-worker, Job); `docs:closure-check` exit 0 el 2026-09-28.
+- [x] Documentación técnica, funcional y manual de uso publicadas.
+      — Evidencia: §10 de `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`, filas del catálogo de eventos,
+      `documentation/creative/render-gobernado-piezas-de-marca.md`, `manual-de-uso/creative/pedir-render-de-piezas-de-marca.md`.
 - [ ] (Delta 2026-09-27 b) El command de documento acepta un plan validado por `validateDeckPlan` (TASK-1929) con rastro de slots (TASK-1930) y plates por `assetId` del banco (TASK-1931), y rechaza plates referenciados por ruta local.
-- [ ] (Delta 2026-09-27 b) Esta task no expone una tool MCP para proponer planes de deck (es de TASK-1932); su tool pide y lee piezas y documentos.
+      — Parcial: las fuentes sólo entran por `assetId` (una ruta local nunca se lee). `validateDeckPlan` y el rastro de
+      slots dependen de TASK-1929/1930, en curso.
+- [x] (Delta 2026-09-27 b) Esta task no expone una tool MCP para proponer planes de deck (es de TASK-1932); su tool pide y lee piezas y documentos.
+      — Evidencia: tools `request_brand_render`, `get_brand_render_request`, `list_brand_render_requests`.
 
 ## Verification
 
