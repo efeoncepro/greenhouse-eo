@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Implementacion — Slice 1 en curso; decisiones del operador tomadas el 2026-09-28`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -649,6 +649,16 @@ cutover es inmediato al commit de cada slice.
   del catálogo (quedan como registro de dirección).
 
 ## Open Questions
+
+**Resueltas por el operador el 2026-09-28 (al tomar la task):**
+
+- Ids y familias: la tabla propuesta de `## Detailed Spec`, sin cambios. DeckDiferencia va en `proof` (no nace la familia `decision`).
+- Alternativas: la regla «nunca en el mismo deck» aplica a **todos** los pares `variant` del catálogo (portada y cierre siguen en `frame-count`). Consecuencia aceptada: los goldens que hoy llevan dos variantes separadas (`golden-pitch.json`: `content-text` y `decision-why-us`) se cambian en el Slice 4, y un deck ya no puede mezclar dos layouts de sección que sean variante entre sí.
+- `next-steps-after-diagnosis` se aplica por familia `next-steps` (incluye `decision-diagnosis-map`).
+- `proposal-service-seo` y `proposal-service-aeo` son servicios distintos: pueden ir en la misma propuesta y no son `variant`.
+- Release de AXIS (push a `main`, tag y release de `axis-tokens` y `axis-ui-contracts`, patch aditivo) autorizado en esta sesión, sólo con cambios aditivos para estas nueve recetas y CI verde.
+
+**Preguntas originales:**
 
 - ¿DeckDiferencia va en `proof` (como `decision-why-us` y `decision-risk`) o el operador quiere la familia `decision`?
   Recomendación: `proof`. Una familia nueva obliga a tocar `FAMILIES` en `render-index.mjs`, el tipo
