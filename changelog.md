@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Las nueve láminas SEO/AEO del deck «La órbita» componen (TASK-1934)
+
+- El catálogo de recetas pasa de 69 a 78, todas con plantilla en `graphic-line-deck` sobre AXIS `axis-tokens` 0.3.23 /
+  `axis-ui-contracts` 0.3.21 (releases aditivos `v0.3.22` y `v0.3.23`). Siete plantillas nuevas y dos propuestas SEO sobre
+  plantillas existentes; gate de La órbita en 73 frames a 0 px, aprobados a ojo por el operador.
+- `validateDeckPlan`: `variant-both-in-deck` reemplaza a `variant-adjacent` (dos variantes nunca en el mismo deck),
+  `figure-source-missing` nuevo y `next-steps-after-diagnosis` por familia. Cifras con fuente, datos de muestra marcados e
+  interfaz de IA genérica quedan cubiertos por tests.
+- La portada «Tu squad.» tiene plate propio (CR4) y un brochure de Creative Services ya no repite plate; la plantilla
+  cine recupera la nota «Sin promesas de ranking».
+
 ## 2026-09-28 — DataForSEO tiene CLI diaria y catálogo oficial reproducible (TASK-1935)
 
 - `serp-compare` compara cualquier marca o entidad mediante aliases y múltiples dominios sobre una sola captura
