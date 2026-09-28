@@ -20,7 +20,7 @@ import { DATAFORSEO_FAMILIES, DATAFORSEO_FAMILY_NAMES } from '../dataforseo-fami
 const MIGRATION = join(
   process.cwd(),
   'migrations',
-  '20260805194114467_task-1300-seo-provider-spend-daily.sql'
+  '20260928095506879_task-1651-ai-optimization-family.sql'
 )
 
 describe('paridad allowlist TS ↔ CHECK de seo_provider_spend_daily', () => {
@@ -51,10 +51,11 @@ describe('serp.requiresOrganization sigue en false (TASK-1696)', () => {
     expect(DATAFORSEO_FAMILIES.serp.requiresOrganization).toBe(false)
   })
 
-  it('las cuatro familias SEO sí la exigen: su gasto es siempre per-cliente', () => {
+  it('las familias SEO y AI Optimization sí la exigen para todo POST pagado', () => {
     expect(DATAFORSEO_FAMILIES.labs.requiresOrganization).toBe(true)
     expect(DATAFORSEO_FAMILIES.backlinks.requiresOrganization).toBe(true)
     expect(DATAFORSEO_FAMILIES.onpage.requiresOrganization).toBe(true)
     expect(DATAFORSEO_FAMILIES.domain.requiresOrganization).toBe(true)
+    expect(DATAFORSEO_FAMILIES.ai_optimization.requiresOrganization).toBe(true)
   })
 })

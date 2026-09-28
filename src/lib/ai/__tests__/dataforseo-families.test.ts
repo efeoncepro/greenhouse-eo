@@ -17,8 +17,15 @@ import {
 } from '../dataforseo-families'
 
 describe('DATAFORSEO_FAMILIES — allowlist cerrado', () => {
-  it('declara exactamente las 5 familias del contrato', () => {
-    expect(DATAFORSEO_FAMILY_NAMES.sort()).toEqual(['backlinks', 'domain', 'labs', 'onpage', 'serp'])
+  it('declara exactamente las 6 familias del contrato', () => {
+    expect(DATAFORSEO_FAMILY_NAMES.sort()).toEqual([
+      'ai_optimization',
+      'backlinks',
+      'domain',
+      'labs',
+      'onpage',
+      'serp'
+    ])
   })
 
   it('sólo `serp` puede correr sin organización', () => {
@@ -42,6 +49,7 @@ describe('DATAFORSEO_FAMILIES — allowlist cerrado', () => {
 
   it('reconoce familias válidas y rechaza cualquier otra cosa', () => {
     expect(isDataForSeoFamily('labs')).toBe(true)
+    expect(isDataForSeoFamily('ai_optimization')).toBe(true)
     expect(isDataForSeoFamily('keywords_data')).toBe(false)
     expect(isDataForSeoFamily('__proto__')).toBe(false)
   })
@@ -63,6 +71,9 @@ describe('normalizeEndpoint — el candado por familia', () => {
       /familia "labs"/
     )
     expect(() => normalizeEndpoint('/v3/dataforseo_labs/x', 'serp')).toThrow(/familia "serp"/)
+    expect(() => normalizeEndpoint('/v3/serp/google/organic/live/advanced', 'ai_optimization')).toThrow(
+      /familia "ai_optimization"/
+    )
   })
 
   it('rechaza rutas fuera del allowlist aunque sean de DataForSEO', () => {

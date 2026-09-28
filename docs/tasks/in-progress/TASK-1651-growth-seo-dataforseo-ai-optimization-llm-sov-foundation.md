@@ -1,5 +1,17 @@
 # TASK-1651 — Growth SEO: familia `ai_optimization` (DataForSEO) + fundación SoV de marca en LLMs per-org
 
+## Delta 2026-09-28 — `1651-A` code complete; rollout DB pendiente
+
+El pedido del operador de usar la CLI DataForSEO para research ejecutó sólo `1651-A`, reutilizando
+la CLI de TASK-1935. El registry, catálogo, transporte GET/POST, presets y guards locales ya cubren
+las 53 rutas oficiales actuales de `ai_optimization`; los cuatro endpoints `/models` se verificaron
+live con HTTP 200 y costo USD 0. No se hizo ninguna llamada pagada a la familia.
+
+La migración `20260928095506879_task-1651-ai-optimization-family.sql` amplía el CHECK del ledger,
+pero **no se aplicó** a staging ni producción. Por eso `1651-A` queda `code complete, rollout DB
+pendiente`; `1651-B` conserva su alcance P3 y no fue iniciado. No se agregaron cron, snapshots,
+readers, MCP tools ni flags de captura.
+
 ## Delta 2026-08-27
 
 - El ledger `seo_provider_spend_daily` ganó `consumer` (`seo`|`aeo`), `cost_basis`
@@ -76,7 +88,7 @@ semanal fabrica una serie que parece viva y está muerta.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1 (1651-A) · P3 (1651-B)`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -89,7 +101,7 @@ semanal fabrica una serie que parece viva y está muerta.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Definida`
+- Status real: `1651-A code complete, rollout DB pendiente · 1651-B definida`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -551,12 +563,12 @@ diseño que el plan debe respetar:
 
 **`1651-A`:**
 
-- [ ] `DATAFORSEO_FAMILIES` incluye `ai_optimization` con `requiresOrganization: true` y el parity
-      test TS↔CHECK pasa contra la migración aplicada.
-- [ ] Un intento de endpoint fuera del prefijo `/v3/ai_optimization/` con esa familia lanza
+- [x] `DATAFORSEO_FAMILIES` incluye `ai_optimization` con `requiresOrganization: true` y el parity
+      test TS↔CHECK pasa contra la migración versionada. Aplicación runtime pendiente.
+- [x] Un intento de endpoint fuera del prefijo `/v3/ai_optimization/` con esa familia lanza
       (`normalizeEndpoint`), verificado por test.
-- [ ] `1651-A` cierra **sin haber ejecutado una sola llamada pagada** a la familia nueva.
-- [ ] La skill `dataforseo-operator` refleja el allowlist ampliado y la cobertura real **por
+- [x] `1651-A` queda code complete **sin haber ejecutado una sola llamada pagada** a la familia nueva.
+- [x] La skill `dataforseo-operator` refleja el allowlist ampliado y la cobertura real **por
       endpoint** (Mentions ≠ Scraper ≠ Responses).
 
 **`1651-B`:**

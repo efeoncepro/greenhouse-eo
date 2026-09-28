@@ -2,6 +2,8 @@
 
 **TASK-1863 (28/09):** rollout a staging autorizado, main en espera. DDL aditivo aplicado; cuatro perfiles Efeonce activos conservados (archivado inicial revertido), países confirmados CL/CO/PE/MX. Backfill y publicación en curso; [evidencia](docs/audits/platform/2026-09-28-task-1863-verification.md). Lint DataForSEO sin errores.
 
+**DataForSEO CLI (28/09):** [TASK-1935](docs/tasks/complete/TASK-1935-dataforseo-daily-operator-cli.md) complete con `research` compuesto (Labs → overview → SERP finalista, JSON/CSV); [TASK-1651-A](docs/tasks/in-progress/TASK-1651-growth-seo-dataforseo-ai-optimization-llm-sov-foundation.md) code complete: 545/320 rutas (53 AI), modelos live USD 0; migración sin aplicar. Commit local; sin push/deploy.
+
 **Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) code complete, rollout pendiente: en `develop` (37655fa93), no promover a main. Flag OFF; falta smoke en staging y federar en `efeonce-mcp`.
 
 **Deck «La órbita» (28/09):** TASK-1927/1928 (69/69 recetas, AXIS `v0.3.21`) y TASK-1929 (`pnpm brand:deck-plan`) complete, en `develop`. Siguen TASK-1930…1933. [TASK-1934](docs/tasks/in-progress/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) in-progress: nueve láminas SEO/AEO al catálogo (69 → 78), AXIS y validador; release AXIS autorizado.

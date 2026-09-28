@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — DataForSEO tiene CLI diaria y catálogo oficial reproducible (TASK-1935)
+
+- Delta: `pnpm dataforseo -- research` encadena minería Labs, enriquecimiento y SERP finalista con previsión
+  agregada, procedencia y export JSON/CSV; `keyword_ideas` queda opt-in para evitar deriva categorial.
+
+- TASK-1651-A amplía el allowlist gobernado a `ai_optimization`: 53 rutas de LLM Responses, LLM Scraper,
+  AI Keyword Data y LLM Mentions quedan operables desde la CLI. GET de modelos/catálogos/polling es gratuito
+  y no exige organización; todo POST real exige organización, entitlement, estimación, ceiling y ledger AEO.
+  La migración del CHECK está versionada y todavía no aplicada.
+
+- `pnpm dataforseo` descubre 545 endpoints oficiales y separa los 320 ejecutables bajo el allowlist vigente de los
+  que sólo se pueden consultar en catálogo. Incluye presets diarios, payload por archivo/JSON/stdin, lifecycle async,
+  preview por defecto, techo de costo, salida machine-readable y el transporte canónico para GET/POST.
+- Smokes reales: catálogo AI Mode gratuito (USD 0), AI Mode Perú con `location_code=2604` (USD 0,004) y Organic Chile
+  (USD 0,002), todos con task `20000`. Commit local; sin push, deploy ni cambio de flags.
+
 ## 2026-09-28 — Ruta gobernada para producir piezas de marca en la plataforma (TASK-1921) y Grader por mercado (TASK-1863)
 
 - Catálogo compartido LATAM/PR/ES/US y packs es/en/pt-BR/fr; Google AI Mode usa location_code e idioma

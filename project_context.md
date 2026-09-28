@@ -113,9 +113,8 @@ y federado en `mcp.efeonce.org`, fail-closed por organización. `GROWTH_SEO_ENAB
 `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` e
 `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`.
 
-ETV DataForSEO: producción sirve `improved_layout_clickstream_v2` desde 2026-09-03 (legacy = rollback pre-corte):
-`docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` ·
-[auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
+DataForSEO: ETV prod `improved_layout_clickstream_v2`; CLI `pnpm dataforseo`; research AI y rollout DB: TASK-1651.
+[ADR ETV](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
 
 Efeonce Insights (EPIC-045): [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14 = estado real.
 
