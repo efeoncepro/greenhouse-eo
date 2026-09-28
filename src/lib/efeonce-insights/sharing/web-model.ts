@@ -4,14 +4,19 @@
  * `formatFactValue`, la MISMA función que validó el plan: el web model no inventa formato.
  */
 
+import { funnelGeometry } from '@/lib/artifact-composer/pure'
+
+import type { ChartSpecV1 } from '../contracts/chart-spec'
 import type { EvidenceFactV1 } from '../contracts/evidence'
-import type { EditorialPlanV1 } from '../contracts/plan'
+import type { EditorialPlanV1, PlanFigureReadingV1 } from '../contracts/plan'
 import {
   INSIGHT_WEB_MODEL_VERSION,
+  type InsightWebChartDerivedV1,
   type InsightWebChartV1,
   type InsightWebClaimV1,
   type InsightWebFactV1,
-  type InsightWebModelV1
+  type InsightWebModelV1,
+  type InsightWebReadingV1
 } from '../contracts/web-model'
 import { formatFactValue } from '../editorial/format'
 
@@ -41,6 +46,42 @@ const resolveCell = (cell: string | null, facts: Record<string, InsightWebFactV1
   return facts[cell]?.display ?? null
 }
 
+const projectReading = (reading: PlanFigureReadingV1): InsightWebReadingV1 => ({
+  chartId: reading.chartId,
+  ...(reading.keyFigure
+    ? { keyFigure: { factId: reading.keyFigure.factId, value: reading.keyFigure.value, caption: projectClaim(reading.keyFigure.caption) } }
+    : {}),
+  ...(reading.conclusion ? { conclusion: projectClaim(reading.conclusion) } : {}),
+  ...(reading.meaning ? { meaning: projectClaim(reading.meaning) } : {}),
+  nextStep: reading.nextStep ? projectClaim(reading.nextStep) : null
+})
+
+/**
+ * Cifras que el render no puede calcular (sería re-derivar): se obtienen con la MISMA geometría que dibuja el PDF y se
+ * formatean con `formatFactValue`. Si la geometría rechaza los datos (una etapa que crece), no se deriva nada: el
+ * render muestra las etapas sin tasas, nunca una tasa inventada.
+ */
+const deriveChart = (spec: ChartSpecV1, facts: Record<string, InsightWebFactV1>, locale: string): InsightWebChartDerivedV1 | undefined => {
+  if (spec.data?.kind !== 'funnel') return undefined
+
+  const stages = spec.data.stages.map(stage => ({ stageId: stage.stageId, label: stage.label, value: facts[stage.factId]?.value ?? null }))
+
+  if (stages.some(stage => stage.value === null)) return undefined
+
+  try {
+    const geometry = funnelGeometry(stages as Array<{ stageId: string; label: string; value: number }>)
+
+    return {
+      funnelStepRates: geometry.map(stage => ({
+        stageId: stage.stageId,
+        display: stage.stepRatePct === null ? null : formatFactValue(stage.stepRatePct, 'percent', locale)
+      }))
+    }
+  } catch {
+    return undefined
+  }
+}
+
 export interface BuildInsightWebModelInput {
   plan: EditorialPlanV1
   facts: EvidenceFactV1[]
@@ -57,17 +98,22 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
     module: chapter.module,
     title: chapter.title,
     claims: chapter.claims.map(projectClaim),
-    charts: chapter.charts.map(
-      (spec): InsightWebChartV1 => ({
+    charts: chapter.charts.map((spec): InsightWebChartV1 => {
+      const derived = deriveChart(spec, factMap, locale)
+
+      return {
         spec,
         table: {
           columns: [...spec.tabularEquivalent.columns],
           rows: spec.tabularEquivalent.rows.map(row => row.map(cell => resolveCell(cell, factMap)))
-        }
-      })
-    ),
+        },
+        ...(derived ? { derived } : {})
+      }
+    }),
     tables: chapter.tables.map(table => ({ tableId: table.tableId, title: table.title, columns: [...table.columns], rows: table.rows.map(row => [...row]) })),
-    limits: [...chapter.limits]
+    limits: [...chapter.limits],
+    ...(chapter.opening ? { opening: projectClaim(chapter.opening) } : {}),
+    ...(chapter.readings?.length ? { readings: chapter.readings.map(projectReading) } : {})
   }))
 
   return {
@@ -81,7 +127,13 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
     methodology: [...plan.methodology],
     // `evidenceRef` apunta al origen interno (runId, spaceId…): sólo viaja la etiqueta.
     references: plan.references.map(reference => ({ referenceId: reference.referenceId, label: reference.label })),
-    facts: factMap
+    facts: factMap,
+    // Campos editoriales v2 (TASK-1888): sólo si el plan sellado los trae; un plan v1 se proyecta igual que en 1.0.
+    ...(plan.essentials?.length ? { essentials: plan.essentials.map(projectClaim) } : {}),
+    ...(plan.decision ? { decision: projectClaim(plan.decision) } : {}),
+    ...(plan.measurement ? { measurement: projectClaim(plan.measurement) } : {}),
+    ...(plan.ask ? { ask: projectClaim(plan.ask) } : {}),
+    ...(plan.scopeLines?.length ? { scopeLines: [...plan.scopeLines] } : {})
   }
 }
 
