@@ -1,0 +1,51 @@
+{
+  "checkedAt": "2026-09-28T10:39:44.351Z",
+  "batchId": "grbt-6538a823-803b-4288-bf49-cd38e0ef6652",
+  "publicId": "EO-GRBT-00003",
+  "idempotentHit": false,
+  "tier": "operator",
+  "runs": [
+    {
+      "runId": "grun-c30c2278-233c-469d-8274-fe4e814155f0",
+      "publicId": "EO-GRUN-00065",
+      "country": "CL",
+      "locale": "es-CL",
+      "status": "pending"
+    },
+    {
+      "runId": "grun-3aa28d49-8810-4312-8d6f-d94b35fcd44d",
+      "publicId": "EO-GRUN-00066",
+      "country": "AR",
+      "locale": "es-AR",
+      "status": "pending"
+    },
+    {
+      "runId": "grun-a4e1e533-e440-4210-abd5-74bd06ccdcaf",
+      "publicId": "EO-GRUN-00067",
+      "country": "BR",
+      "locale": "pt-BR",
+      "status": "pending"
+    },
+    {
+      "runId": "grun-82be3d4d-c4ae-4012-99ba-23fca938d6d3",
+      "publicId": "EO-GRUN-00068",
+      "country": "CO",
+      "locale": "es-CO",
+      "status": "pending"
+    },
+    {
+      "runId": "grun-e74023ef-4dd8-46bb-bce1-d52a92d98ac4",
+      "publicId": "EO-GRUN-00069",
+      "country": "PE",
+      "locale": "es-PE",
+      "status": "pending"
+    },
+    {
+      "runId": "grun-098218ce-3afa-4b98-b127-445dc875fcb1",
+      "publicId": "EO-GRUN-00070",
+      "country": "UY",
+      "locale": "es-UY",
+      "status": "pending"
+    }
+  ]
+}

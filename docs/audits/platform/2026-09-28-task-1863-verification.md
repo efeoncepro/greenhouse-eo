@@ -72,9 +72,9 @@ se verifica con el harness efímero y se deja el canary de rollout sin tildar.
 
 ## Veredicto
 
-**Staging desplegado; aceptación runtime en curso; main en espera.** La entrega local satisface catálogo,
-localización, ubicación nativa, Google AI Mode, snapshots, lotes, matriz y documentación. La task sigue
-in-progress: el canary cliente y la aceptación Sky/BR se registran por separado.
+**Staging verificado para Efeonce, Sky y entrada directa BR; main en espera.** La entrega satisface catálogo,
+localización, ubicación nativa, Google AI Mode, snapshots, lotes y matriz. La última protección de
+comparabilidad de identidad está en publicación; el cierre se registra al final.
 
 ## Rollout staging autorizado (2026-09-28)
 
@@ -151,7 +151,7 @@ ni se consumieron cuotas para esta prueba.
 Rutas vigentes: operador y portal → request-run → run-batch → commands; formulario legado, API directa
 y proyecciones Forms → commands; recurrencia → run-batch; worker consume prompts/snapshot persistidos.
 La exposición MCP multimer­cado corresponde a TASK-1861 y debe consumir estos mismos commands; no se
-declara desplegada una tool nueva en TASK-1863. Refuerzo universal preparado para publicación en staging.
+declara desplegada una tool nueva en TASK-1863. Refuerzo universal publicado en staging dentro de `999492e8d`.
 
 ### Readback final y límite de publicación
 
@@ -159,14 +159,35 @@ Corrección de informes `c5902e929` publicada: Vercel staging READY (`dpl_mcxg5E
 API matriz/lote HTTP 200; worker `ops-worker-00731-75p` Ready=True, 100% del tráfico, mismo GIT_SHA.
 Main sigue en `92002873ced9508433e9c6d56000417a9193886b`.
 
-El refuerzo universal `f7d2578a5` está committeado localmente, 71 tests y TypeScript PASS. El push
-arrastraría `fd9a84375` (CLI DataForSEO) y `537087332` (docs de marca), de sesiones paralelas todavía
-no publicadas. Se pidió al operador decidir entre incluirlos en staging o esperar a sus sesiones;
-no se crea checkout aislado ni se publica trabajo paralelo sin esa decisión.
+El operador autorizó publicar el checkout compartido manteniendo main en espera. El refuerzo universal
+está desplegado en `999492e8d`: Vercel `dpl_5tqcpZ6yCfAi2Rc97rBmWCi4Rwqu` READY y worker
+`ops-worker-00732-86r` Ready=True con tráfico 100%. Producción Vercel conserva `92002873ced9`.
+El control documental de 999 falló por 12.127 tokens de Handoff y 61 entradas de changelog;
+la corrección `7f137d62d` pasa sobre el índice exacto (11.970 tokens, 60 entradas, 0 errores/0 warnings).
+Se preservó el historial y se dejaron fuera del commit las compactaciones paralelas de Handoff.
 
-Control de contexto del SHA c5902e929: falló por Handoff de ~12.026 tokens frente al límite de 12.000.
-El resumen propio de TASK-1863 está reducido en el checkout compartido; se preservan las compactaciones
-concurrentes ajenas sin incluirlas en el commit de esta task. No se declara toda la CI nueva verde.
+### Sky, Brasil y comportamiento degradado
+
+- `EO-GRBT-00003`: Sky CL/AR/BR/CO/PE/UY, modo light, techo USD 3, costo estimado **USD 1,8482**.
+  144 observaciones: **143 succeeded**, una `rate_limited` de Perplexity en PE; **Google 36/36** con
+  ubicación nativa por país. Cinco runs succeeded y PE partial. Seis informes disponibles; el informe
+  PE declara gate partial. Matriz por API staging HTTP 200, `blendedOverall:null`, sin señales de error.
+- Base de competidores confirmada en la task: LATAM, JetSMART, Avianca, Gol; no se inventaron aerolíneas
+  locales. Canal operator: no consume cuota de portal ni modifica mercados comerciales incluidos.
+  Los aliases Sky Airline/Sky Airlines/SKY se configuraron después del enqueue: el primer lote conserva
+  el nombre canónico legacy y su snapshot original; los siguientes usarán los aliases. No se re-scorea
+  el histórico para simular que ya existían. Este cambio motivó la protección de comparabilidad de abajo.
+- `EO-GRUN-00071`: API admin directa con `AIRLINES_AVIATION`, **sin businessModel**, BR/pt-BR.
+  Resolvió `archetype-consumer_b2c.v1.market-v1.pt-BR`; 24/24 observaciones válidas, Google 6/6,
+  informe ready, costo estimado **USD 0,3072**. Perfil smoke sin organización, sin consumo de cuota cliente.
+- Se usó el drain canónico desplegado para las corridas ya encoladas, con claim atómico y batchSize 1;
+  antes de cada invocación se comprobó que la cola pendiente sólo contenía IDs del canary.
+  Una invocación perdió la respuesta HTTP; el readback posterior verificó sus runs terminales e informes,
+  sin reintentar ni duplicar gasto.
+
+Evidencia: [Sky](evidence/task-1863/sky-runtime.json), [matriz Sky](evidence/task-1863/sky-staging-matrix-readback.json),
+[Brasil](evidence/task-1863/brazil-runtime.json), [worker](evidence/task-1863/worker-universal-readback.json),
+[producción sin promover](evidence/task-1863/production-deployment-readback.json).
 
 ### Comparabilidad de identidad de marca
 
@@ -175,3 +196,38 @@ comparación histórica de una identidad distinta (tres regresiones fallaban ant
 ahora compara el objeto `brand` completo del snapshot, incluida la categoría, conservando el contrato
 legacy cuando ambos snapshots son null. Prueba de la corrección: **15/15 PASS** en PG efímero;
 ningún dato histórico se modifica. El cambio sólo afecta la selección de referencia de la tendencia.
+
+### Coordinación del checkout compartido
+
+El cierre pasó por el pre-push completo (lint sin errores y TypeScript PASS). Se preservó WIP ajeno;
+el operador autorizó únicamente cinco saltos de línea de DataForSEO y la conversión de fixtures
+inválidas `as unknown as SurfaceIntent` en una prueba de Brand Surfaces. Esos archivos no forman
+parte de los commits de TASK-1863. `d86edb784` ya está en develop remoto; main no se promovió.
+
+
+### Última publicación y bloqueo externo (28-09)
+
+`d86edb78419dad324943804e8d003dd18ffbea31` está READY en Vercel staging, deployment
+`dpl_3cjJrNALDj8QSK6awzGfG7sqTjkU`. Agent Context Governance, Task Contract y Playwright smoke
+terminaron success. El despliegue de ops-worker `36413423962` falló en Cloud Build
+`88689e49-8cc0-4f90-a979-561f40f3e383`, antes de crear una revisión nueva: GitHub Packages devuelve
+HTTP 403 para `axis-graphic-line@0.7.0` con **Account has reached its billing limit**.
+La descarga directa autenticada confirmó el mismo diagnóstico; no se rotó ni sustituyó la credencial.
+El worker conserva `ops-worker-00732-86r`, GIT_SHA `999492e8d`, Ready=True y 100% de tráfico.
+La última protección de comparabilidad todavía requiere publicar el worker cuando se habilite cuota.
+No se presenta este bloqueo como cierre completo ni se reintenta el build sin resolver su causa.
+
+Main y Vercel Production permanecen en `92002873ced9508433e9c6d56000417a9193886b`.
+[Deployment final](evidence/task-1863/final-staging-deployment.json) ·
+[bloqueo del worker](evidence/task-1863/final-worker-blocker.json).
+
+El checkout adicional `aeo-staging-rollout` quedó archivado por la herramienta de la app, con snapshot
+recuperable. No tenía WIP ni procesos activos; su único commit documental `8d4815d7f` fue superado
+por la corrección de contexto `7f137d62d` del checkout original. Se retiró temporalmente la fijación
+de esta tarea para liberar la protección y se restauró al terminar. El checkout original
+`/Users/jreye/Documents/greenhouse-eo` se conserva y concentra el trabajo; otros checkouts no se tocaron.
+
+Readback posterior a Vercel READY: matrices Efeonce (cuatro) y Sky (seis) HTTP 200;
+Sky PE conserva gate partial, el resto ready, sin blendedOverall.
+[Evidencia final](evidence/task-1863/final-matrix-readback.json). El CI general `36413423815`
+seguía en ejecución al registrar este cierre; no se declara verde sin su resultado.

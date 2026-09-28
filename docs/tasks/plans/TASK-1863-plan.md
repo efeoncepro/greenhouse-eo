@@ -60,8 +60,10 @@ mutación externa no autorizada o conflicto real con trabajo ajeno.
 - [x] Slices 1–8 implementados y verificados localmente; ver auditoría para evidencia local y runtime.
 - [x] DDL/backfill, publicación Vercel staging + worker y flags verificados.
 - [x] Canary Efeonce CL/CO/PE/MX: 96/96 respuestas, cuatro scores e informes ready; matriz staging HTTP 200.
-- [ ] Publicar refuerzo universal f7d2578a5 (71 pruebas/552 combinaciones); commits paralelos requieren decisión de alcance.
-- [ ] Aceptación Sky/BR restante; main explícitamente en espera.
+- [x] Refuerzo universal f7d2578a5 publicado en staging dentro de 999492e8d; API sin businessModel verificada, 71 pruebas/552 combinaciones.
+- [x] Sky seis mercados y BR por API directa verificados en staging; informes y matriz disponibles, un rate limit Perplexity declarado como parcial.
+- [ ] Completar protección adicional de tendencias por identidad d86edb784 en worker: Vercel staging READY; 15 pruebas PG PASS. Cloud Build bloqueado por límite de facturación de GitHub Packages (403); worker conserva 999492e8d.
+- Main explícitamente en espera; recurrencia secundaria y contract destructivo no se activan en esta fase.
 
 ## Evidencia de implementación
 
@@ -69,3 +71,9 @@ mutación externa no autorizada o conflicto real con trabajo ajeno.
 PG efímero con atomicidad/concurrencia y Up→Down→Up, suites y build. Las rutas finales están en el
 manual. La asociación administrativa de runs legacy propuesta arriba NO se implementa: no hay
 backfill de geografía inferida. La configuración de prompts sí queda enlazada al principal original.
+
+## Checkout
+
+El checkout adicional `aeo-staging-rollout` quedó archivado con respaldo recuperable el 28-09.
+No tenía WIP ni procesos activos; su compactación documental aislada fue superada por `7f137d62d`.
+Todo el trabajo funcional y la evidencia están consolidados en el checkout original de develop.

@@ -58,7 +58,7 @@ clientes de EE. UU. La policy de runs nuevos se versiona; los históricos conser
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-020`
-- Status real: `Staging: canary Efeonce PASS; refuerzo universal local; main en espera`
+- Status real: `Staging: Efeonce, Sky y BR verificados; identidad en Vercel, worker bloqueado por cuota Packages; main en espera`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -385,7 +385,7 @@ Reglas obligatorias:
 - [x] La lógica de mercados, lotes, alias y competidores vive en `src/lib/growth/ai-visibility/**` y el catálogo en `src/lib/growth/markets/`.
 - [x] Modelada como aggregates (marca, mercado, set de competidores, lote), no como handlers de pantalla.
 - [x] Reads como readers canónicos; writes como commands con capability fina, idempotencia, audit/outbox y errores canónicos.
-- [x] Capability `growth.ai_visibility.market.manage` + grant a ≥1 rol real + coverage test en esta entrega local; seed de runtime pendiente con el rollout.
+- [x] Capability `growth.ai_visibility.market.manage` + grant a ≥1 rol real + coverage test en esta entrega local; seed aplicado en runtime con el DDL aditivo.
 - [x] Camino programático: rutas admin ahora; lanes y tools en TASK-1861 (Delta registrado).
 - [x] Writes aptos para `propose → confirm → execute`.
 - [x] Un primitive para portal, operador, intake y regrade; MCP/Nexa consumirán estos mismos commands en TASK-1861, sin duplicar lógica.
@@ -745,10 +745,12 @@ tarda ≥30 minutos; el reader del lote expone el avance.
 ## Acceptance Criteria
 
 Evidencia local y límites: [auditoría de verificación](../../audits/platform/2026-09-28-task-1863-verification.md).
-Canary Efeonce en staging PASS (96/96 respuestas, cuatro scores e informes ready). Refuerzo universal local
-f7d2578a5: 71 pruebas / 552 combinaciones. Aceptación Sky/BR pendiente; main en espera.
+Staging: Efeonce 96/96; Sky 143/144 respuestas (un rate limit de Perplexity, informe parcial explícito);
+Brasil por API directa 24/24. Diez informes de lotes + smoke BR disponibles. Refuerzo universal desplegado
+en `999492e8d`; 71 pruebas / 552 combinaciones. Protección adicional de identidad `d86edb784` READY en Vercel; worker bloqueado por cuota GitHub Packages; main en espera.
 
-- [ ] Refuerzo universal en staging: categorías/arquetipos para toda marca y entrada. Local PASS: 71 pruebas y 552 combinaciones; commit `f7d2578a5`. Push pendiente porque incluye dos commits paralelos todavía locales; decisión del operador solicitada.
+- [x] Refuerzo universal desplegado en staging (`999492e8d`): `EO-GRUN-00071` entra por API sin businessModel, resuelve consumer_b2c y pt-BR, 24/24 respuestas e informe ready. Regresión local de todas las entradas: 71 pruebas / 552 combinaciones.
+- [ ] Protección de tendencias ante cambios de identidad (nombre/aliases/dominio/categoría): `d86edb784`, 15 pruebas PG reales PASS; Vercel staging READY. Worker pendiente: GitHub Packages rechaza la descarga de AXIS con 403 por límite de facturación; conserva `999492e8d` operativo.
 - [x] Catálogo único para Grader/form/prospecto, 23 mercados y es/en/pt-BR/fr; pruebas de aliases, ISO y locales.
 - [x] País sin ubicación Google produce `skipped:market_unsupported`, sin fallback (Cuba: prueba y canary).
 - [x] Tablas, UNIQUE, FK, triggers e invariantes comprobados en PostgreSQL real efímero; Up/Down/Up PASS.
@@ -757,16 +759,16 @@ f7d2578a5: 71 pruebas / 552 combinaciones. Aceptación Sky/BR pendiente; main en
 - [x] N mercados encolan N runs atómicamente; rollback, cuota concurrente, reserva diaria/mensual y derechos comerciales probados.
 - [x] Sin mercado explícito se usa el principal; paridad de selección legacy comprobada. Nuevos packs versionados: no se promete igualdad numérica entre muestras diferentes.
 - [x] Snapshots de matching/competidores preservan la normalización histórica; aliases LATAM y caso sensible Gol probados.
-- [ ] Run Brasil completo en staging. Adapter local BR/pt-BR con código 2076 sí verificado contra Google; no equivale a staging.
+- [x] Brasil en staging: `EO-GRUN-00067` en lote Sky y `EO-GRUN-00071` por API sin businessModel; pt-BR, ubicación BR nativa en Google, 24/24 observaciones por run, informes ready.
 - [x] Packs localizados usan nombres legibles de país; pruebas sobre todos los arquetipos y locales.
 - [x] Observaciones intentadas persisten geo_mode/país y adapters nativos envían ubicación; tests HTTP y canaries Google. Observaciones legacy/sin intento conservan null.
 - [x] Reader de matriz separado por mercado, metodología y `blendedOverall: null`; último run reportable con score.
 - [x] Tendencia restringida al mismo mercado; cambio de set anula deltas competitivo/global y declara `competitor_set_changed`.
 - [x] Regrade por mercado y principal con flag OFF pasa por el mismo batch, con reserva mensual atómica y espejo de cadencia.
 - [x] Capability market.manage, grants internos y denegación cliente probados; seed compartido aplicado con el DDL.
-- [ ] Sky con seis mercados y lote de aceptación en staging: pendiente contrato comercial y rollout; no se consumió su cuota.
+- [x] Sky configurada en CL/PE/AR/BR/UY/CO, base confirmada LATAM/JetSMART/Avianca/Gol, lote interno `EO-GRBT-00003`: 144 observaciones (143 válidas y un rate limit de Perplexity PE), Google 36/36, seis informes y matriz HTTP 200 sin promedio. Canal operator, sin consumir cuota de portal ni ampliar mercados contratados. Alias configurados para snapshots siguientes; históricos preservados.
 - [x] Flag registrado en ledger y deploy.sh; auditoría flags sin Vercel PASS. Staging multimer­cado ON; worker compartido OFF para recurrencia secundaria; producción sin habilitar.
-- [x] QA local y cierre documental ejecutados: unit 15.886 PASS, PG 11 PASS, build exit 0 y lint propio PASS. Pre-push compartido final PASS: lint 0 errores/26 warnings existentes y TypeScript PASS.
+- [x] QA local y cierre documental ejecutados: unit 15.886 PASS, PG 15 PASS, build exit 0 y lint propio PASS. Pre-push compartido final PASS: lint 0 errores/26 warnings existentes y TypeScript PASS.
 
 ## Verification
 

@@ -1,0 +1,96 @@
+{
+  "checkedAt": "2026-09-28T10:51:50.711Z",
+  "profiles": [
+    {
+      "public_id": "EO-GAVP-0002",
+      "status": "active",
+      "market": "Chile",
+      "locale": "es-CL",
+      "legacy_runs": 10
+    },
+    {
+      "public_id": "EO-GAVP-0017",
+      "status": "active",
+      "market": "CL",
+      "locale": "es-CL",
+      "legacy_runs": 1
+    },
+    {
+      "public_id": "EO-GAVP-0018",
+      "status": "active",
+      "market": "CL",
+      "locale": "es-CL",
+      "legacy_runs": 1
+    },
+    {
+      "public_id": "EO-GAVP-0020",
+      "status": "active",
+      "market": "Chile",
+      "locale": "es-CL",
+      "legacy_runs": 2
+    }
+  ],
+  "backfill": {
+    "total": 28,
+    "active_profiles": 28
+  },
+  "runs": [
+    {
+      "run_id": "grun-35d51f60-909a-4b73-92c3-542116a54618",
+      "run_public_id": "EO-GRUN-00071",
+      "market_code": "BR",
+      "locale": "pt-BR",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.3072",
+      "first_prompt": "Quais são as melhores opções de Companhias aéreas e aviação em Brasil?",
+      "prompt_pack_version": "archetype-consumer_b2c.v1.market-v1.pt-BR",
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    }
+  ],
+  "observations": [
+    {
+      "public_id": "EO-GRUN-00071",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "BR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00071",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "BR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00071",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "BR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00071",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "BR",
+      "observations": 6
+    }
+  ],
+  "scores": [
+    {
+      "public_id": "EO-GRUN-00071",
+      "persisted_scores": 1
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "changed": true,
+  "aliases": [
+    {
+      "name": "Sky Airline",
+      "matchMode": "word_ci"
+    },
+    {
+      "name": "Sky Airlines",
+      "matchMode": "word_ci"
+    },
+    {
+      "name": "SKY",
+      "matchMode": "word_cs"
+    }
+  ]
+}

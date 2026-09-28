@@ -1,0 +1,595 @@
+{
+  "checkedAt": "2026-09-28T10:52:37.697Z",
+  "profiles": [
+    {
+      "public_id": "EO-GAVP-0015",
+      "status": "active",
+      "market": "CL",
+      "locale": "es-CL",
+      "legacy_runs": 3
+    }
+  ],
+  "backfill": {
+    "total": 28,
+    "active_profiles": 28
+  },
+  "runs": [
+    {
+      "public_id": "EO-GRBT-00003",
+      "cost_ceiling_total_usd": "3.0000",
+      "run_id": "grun-3aa28d49-8810-4312-8d6f-d94b35fcd44d",
+      "run_public_id": "EO-GRUN-00066",
+      "market_code": "AR",
+      "locale": "es-AR",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.3362",
+      "market_snapshot": {
+        "code": "AR",
+        "label": "Argentina",
+        "locale": "es-AR",
+        "language": "es",
+        "locationCode": 2032,
+        "googleAiModeLanguageCode": "es"
+      },
+      "brand_snapshot": {
+        "name": "Sky Airlines",
+        "aliases": [],
+        "category": "AIRLINES_AVIATION",
+        "websiteUrl": "https://skyairline.com"
+      },
+      "first_prompt": "¿Cuáles son las mejores Aerolineas de pasajeros en Argentina?",
+      "competitors_snapshot": [
+        {
+          "name": "LATAM",
+          "aliases": [],
+          "position": 1,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "JetSMART",
+          "aliases": [],
+          "position": 2,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Avianca",
+          "aliases": [],
+          "position": 3,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Gol",
+          "aliases": [],
+          "position": 4,
+          "matchMode": "word_cs"
+        }
+      ],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    },
+    {
+      "public_id": "EO-GRBT-00003",
+      "cost_ceiling_total_usd": "3.0000",
+      "run_id": "grun-a4e1e533-e440-4210-abd5-74bd06ccdcaf",
+      "run_public_id": "EO-GRUN-00067",
+      "market_code": "BR",
+      "locale": "pt-BR",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.3058",
+      "market_snapshot": {
+        "code": "BR",
+        "label": "Brasil",
+        "locale": "pt-BR",
+        "language": "pt-BR",
+        "locationCode": 2076,
+        "googleAiModeLanguageCode": "pt-BR"
+      },
+      "brand_snapshot": {
+        "name": "Sky Airlines",
+        "aliases": [],
+        "category": "AIRLINES_AVIATION",
+        "websiteUrl": "https://skyairline.com"
+      },
+      "first_prompt": "Quais são as melhores opções de Companhias aéreas de passageiros em Brasil?",
+      "competitors_snapshot": [
+        {
+          "name": "LATAM",
+          "aliases": [],
+          "position": 1,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "JetSMART",
+          "aliases": [],
+          "position": 2,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Avianca",
+          "aliases": [],
+          "position": 3,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Gol",
+          "aliases": [],
+          "position": 4,
+          "matchMode": "word_cs"
+        }
+      ],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    },
+    {
+      "public_id": "EO-GRBT-00003",
+      "cost_ceiling_total_usd": "3.0000",
+      "run_id": "grun-c30c2278-233c-469d-8274-fe4e814155f0",
+      "run_public_id": "EO-GRUN-00065",
+      "market_code": "CL",
+      "locale": "es-CL",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.3033",
+      "market_snapshot": {
+        "code": "CL",
+        "label": "Chile",
+        "locale": "es-CL",
+        "language": "es",
+        "locationCode": 2152,
+        "googleAiModeLanguageCode": "es"
+      },
+      "brand_snapshot": {
+        "name": "Sky Airlines",
+        "aliases": [],
+        "category": "AIRLINES_AVIATION",
+        "websiteUrl": "https://skyairline.com"
+      },
+      "first_prompt": "¿Cuáles son las mejores Aerolineas de pasajeros en Chile?",
+      "competitors_snapshot": [
+        {
+          "name": "LATAM",
+          "aliases": [],
+          "position": 1,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "JetSMART",
+          "aliases": [],
+          "position": 2,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Avianca",
+          "aliases": [],
+          "position": 3,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Gol",
+          "aliases": [],
+          "position": 4,
+          "matchMode": "word_cs"
+        }
+      ],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    },
+    {
+      "public_id": "EO-GRBT-00003",
+      "cost_ceiling_total_usd": "3.0000",
+      "run_id": "grun-82be3d4d-c4ae-4012-99ba-23fca938d6d3",
+      "run_public_id": "EO-GRUN-00068",
+      "market_code": "CO",
+      "locale": "es-CO",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.3042",
+      "market_snapshot": {
+        "code": "CO",
+        "label": "Colombia",
+        "locale": "es-CO",
+        "language": "es",
+        "locationCode": 2170,
+        "googleAiModeLanguageCode": "es"
+      },
+      "brand_snapshot": {
+        "name": "Sky Airlines",
+        "aliases": [],
+        "category": "AIRLINES_AVIATION",
+        "websiteUrl": "https://skyairline.com"
+      },
+      "first_prompt": "¿Cuáles son las mejores Aerolineas de pasajeros en Colombia?",
+      "competitors_snapshot": [
+        {
+          "name": "LATAM",
+          "aliases": [],
+          "position": 1,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "JetSMART",
+          "aliases": [],
+          "position": 2,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Avianca",
+          "aliases": [],
+          "position": 3,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Gol",
+          "aliases": [],
+          "position": 4,
+          "matchMode": "word_cs"
+        }
+      ],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    },
+    {
+      "public_id": "EO-GRBT-00003",
+      "cost_ceiling_total_usd": "3.0000",
+      "run_id": "grun-e74023ef-4dd8-46bb-bce1-d52a92d98ac4",
+      "run_public_id": "EO-GRUN-00069",
+      "market_code": "PE",
+      "locale": "es-PE",
+      "status": "partial",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.3004",
+      "market_snapshot": {
+        "code": "PE",
+        "label": "Perú",
+        "locale": "es-PE",
+        "language": "es",
+        "locationCode": 2604,
+        "googleAiModeLanguageCode": "es"
+      },
+      "brand_snapshot": {
+        "name": "Sky Airlines",
+        "aliases": [],
+        "category": "AIRLINES_AVIATION",
+        "websiteUrl": "https://skyairline.com"
+      },
+      "first_prompt": "¿Cuáles son las mejores Aerolineas de pasajeros en Perú?",
+      "competitors_snapshot": [
+        {
+          "name": "LATAM",
+          "aliases": [],
+          "position": 1,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "JetSMART",
+          "aliases": [],
+          "position": 2,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Avianca",
+          "aliases": [],
+          "position": 3,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Gol",
+          "aliases": [],
+          "position": 4,
+          "matchMode": "word_cs"
+        }
+      ],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    },
+    {
+      "public_id": "EO-GRBT-00003",
+      "cost_ceiling_total_usd": "3.0000",
+      "run_id": "grun-098218ce-3afa-4b98-b127-445dc875fcb1",
+      "run_public_id": "EO-GRUN-00070",
+      "market_code": "UY",
+      "locale": "es-UY",
+      "status": "succeeded",
+      "provider_policy_version": "policy.v2.multilingual-geo",
+      "estimated_cost_usd": "0.2983",
+      "market_snapshot": {
+        "code": "UY",
+        "label": "Uruguay",
+        "locale": "es-UY",
+        "language": "es",
+        "locationCode": 2858,
+        "googleAiModeLanguageCode": "es"
+      },
+      "brand_snapshot": {
+        "name": "Sky Airlines",
+        "aliases": [],
+        "category": "AIRLINES_AVIATION",
+        "websiteUrl": "https://skyairline.com"
+      },
+      "first_prompt": "¿Cuáles son las mejores Aerolineas de pasajeros en Uruguay?",
+      "competitors_snapshot": [
+        {
+          "name": "LATAM",
+          "aliases": [],
+          "position": 1,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "JetSMART",
+          "aliases": [],
+          "position": 2,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Avianca",
+          "aliases": [],
+          "position": 3,
+          "matchMode": "word_ci"
+        },
+        {
+          "name": "Gol",
+          "aliases": [],
+          "position": 4,
+          "matchMode": "word_cs"
+        }
+      ],
+      "prompt_count": 6,
+      "public_delivery_state": "ready"
+    }
+  ],
+  "observations": [
+    {
+      "public_id": "EO-GRUN-00065",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "CL",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00065",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CL",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00065",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CL",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00065",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CL",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00066",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "AR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00066",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "AR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00066",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "AR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00066",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "AR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00067",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "BR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00067",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "BR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00067",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "BR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00067",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "BR",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00068",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "CO",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00068",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CO",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00068",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CO",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00068",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "CO",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00069",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "PE",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00069",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "PE",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00069",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "PE",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00069",
+      "provider": "perplexity",
+      "status": "rate_limited",
+      "error_code": "rate_limited",
+      "geo_mode": "native",
+      "geo_country": "PE",
+      "observations": 1
+    },
+    {
+      "public_id": "EO-GRUN-00069",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "PE",
+      "observations": 5
+    },
+    {
+      "public_id": "EO-GRUN-00070",
+      "provider": "gemini",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "prompt_only",
+      "geo_country": "UY",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00070",
+      "provider": "google_ai_overview",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "UY",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00070",
+      "provider": "openai",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "UY",
+      "observations": 6
+    },
+    {
+      "public_id": "EO-GRUN-00070",
+      "provider": "perplexity",
+      "status": "succeeded",
+      "error_code": null,
+      "geo_mode": "native",
+      "geo_country": "UY",
+      "observations": 6
+    }
+  ],
+  "scores": [
+    {
+      "public_id": "EO-GRUN-00065",
+      "persisted_scores": 1
+    },
+    {
+      "public_id": "EO-GRUN-00066",
+      "persisted_scores": 1
+    },
+    {
+      "public_id": "EO-GRUN-00067",
+      "persisted_scores": 1
+    },
+    {
+      "public_id": "EO-GRUN-00068",
+      "persisted_scores": 1
+    },
+    {
+      "public_id": "EO-GRUN-00069",
+      "persisted_scores": 1
+    },
+    {
+      "public_id": "EO-GRUN-00070",
+      "persisted_scores": 1
+    }
+  ]
+}
