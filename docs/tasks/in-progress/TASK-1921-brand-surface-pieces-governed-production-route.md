@@ -1,5 +1,17 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
+
+## Delta 2026-09-28 — TASK-1929 dejó el plan de deck contra el catálogo
+
+- Entrada pura e isomórfica `@/lib/brand-surfaces/deck-recipes`: `validateDeckPlan(plan: DeckPlan): { ok, issues: DeckPlanIssue[] }`
+  (`DeckPlan = { document: 'proposal'|'brochure'|'pitch'|'qbr', line?, diagnosisDone?, slides: { recipeId, slots?, plateRef?, progress?, purpose? }[] }`;
+  `DeckPlanIssue = { code, severity: 'error'|'warning', source: 'axis'|'catalog'|'agent', slideIndex?, recipeId?, slot?, detail }`),
+  `getDeckRecipe`, `listDeckRecipes` y el catálogo de runtime `catalog.generated.json` (lo regenera `pnpm brand:deck-recipes`).
+- `server-only`: `proposeDeckPlan(context)` en `@/lib/brand-surfaces/deck-recipes/propose` → `{ ok: true, plan, issues, rationale, model, attempts, usage }`
+  o `{ ok: false, issues, rejectedPlan, model, attempts, usage }`; contexto por allowlist (`normalizeDeckPlanContext`, `DeckPlanContextError`).
+  No escribe: es el paso `propose`. CLI local `pnpm brand:deck-plan -- --plan | --propose --context`.
+- Para esta task: el command de documento puede exigir un plan con `validateDeckPlan(plan).ok === true` antes de encolar el render.
+
 ## Delta 2026-09-28 — recalibración antes de ejecutar (decisiones del operador y Discovery)
 
 Manda sobre el cuerpo cuando se contradigan.
@@ -465,10 +477,15 @@ Reglas obligatorias:
       coverage test verde.
       — Evidencia: seed de la migración `20260928052624397` verificado en la base; grant DESIGNER ∪ EFEONCE_ADMIN en
       `runtime.ts`; `pnpm test` completo verde (1871 archivos) el 2026-09-28.
-- [ ] El endpoint `api/platform/app/**` responde con `canonicalErrorResponse` en todos sus errores.
-      — Sin tildar: el lane `api/platform/*` usa su propio contrato (`ApiPlatformError` + tabla del dominio en
-      `brand-render-errors.ts`, probada), no `canonicalErrorResponse`. Es la convención del lane; el criterio quedó
-      mal redactado y requiere confirmación del operador.
+- [x] Los lanes `api/platform/app/**` y `api/platform/ecosystem/**` responden con el contrato de errores del API
+      Platform en todos sus errores (reformulado el 2026-09-28 con las skills de arquitectura y MCP; antes decía
+      `canonicalErrorResponse`).
+      — Decisión: `canonicalErrorResponse` es el contrato de las rutas de producto que consume la UI; los lanes
+      `api/platform/*` tienen su propio sobre (`GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` §11.3: `errors[].code` +
+      `details.code`, mensaje del dominio sin datos del pedido) y el gateway MCP mapea ESE sobre
+      (`render_disabled` ⇒ `policy_blocked`, `render_rejected`/`missing_source` ⇒ `invalid_request`, 404
+      anti-oráculo). Mezclarlos rompería el mapeo del gateway. Evidencia: una sola tabla
+      `brand-render-errors.ts` + su test, usada por los dos lanes.
 - [ ] El consumer del `artifact-worker` renderiza ambos catálogos en staging y adjunta un asset versionado con
       procedencia completa.
       — Sin tildar: consumer probado con mocks (`consumers/brand-render.test.ts`); falta smoke real en staging con el
