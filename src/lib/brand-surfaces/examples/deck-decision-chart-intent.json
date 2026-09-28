@@ -1,0 +1,63 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-chart",
+  "theme": "light",
+  "voice": {
+    "eyebrow": "Resultados · Sky Airlines",
+    "question": "¿Cuánto más rápido?",
+    "answer": [
+      "Un cuarto"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 3
+  },
+  "body": "El tiempo de producción bajó 25 % en 12 meses de operación con el equipo creativo.",
+  "bars": [
+    {
+      "label": "Antes",
+      "value": 100
+    },
+    {
+      "label": "Con Efeonce",
+      "value": 75
+    }
+  ],
+  "annotation": "−25 %",
+  "chartNote": "Tiempo de producción por campaña, en índice (antes = 100).",
+  "figures": [
+    {
+      "value": "+2.000",
+      "label": "piezas aprobadas",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    },
+    {
+      "value": "39",
+      "label": "campañas",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    },
+    {
+      "value": "0,12",
+      "label": "ajustes por pieza",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    },
+    {
+      "value": "5",
+      "label": "mercados",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    }
+  ],
+  "selected": 2,
+  "selection": {
+    "target": "object",
+    "label": "Performance",
+    "participantKind": "department"
+  }
+}

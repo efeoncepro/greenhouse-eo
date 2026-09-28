@@ -157,6 +157,13 @@ export const materializeAssets = async (assets: SurfaceAssetRequest[], root: str
 
     const file = path.resolve(root, asset.path)
 
+    if (asset.kind === 'logo') {
+      if (!fs.existsSync(file)) throw new Error(`No encuentro el logo ${asset.path}.`)
+
+      out[key(asset.ref)] = await normalizedLogo(file, asset)
+      continue
+    }
+
     if (asset.kind === 'file') {
       const mime = FILE_MIME[path.extname(file).toLowerCase()]
 
@@ -185,6 +192,61 @@ export const materializeAssets = async (assets: SurfaceAssetRequest[], root: str
 }
 
 const FILE_MIME: Record<string, string> = { '.svg': 'image/svg+xml', '.png': 'image/png' }
+
+const LUMA = (r: number, g: number, b: number) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
+
+/**
+ * Un logo de tercero en UN tono y con el mismo peso óptico que sus vecinos (TASK-1928): se mide el área de tinta del
+ * logo rasterizado y se escala para que todos tengan la misma, dentro de su caja máxima; después se pinta en el tono.
+ * Con `recolor` (la excepción tonal declarada) no se aplana: se reemplazan sus colores por tonos del mismo color, y el
+ * tono claro, que pesa menos, se compensa con `recolorBox`. Sale como SVG con su tamaño intrínseco (el PNG a 2×
+ * adentro), así la plantilla no fija medidas.
+ */
+const normalizedLogo = async (file: string, asset: Extract<SurfaceAssetRequest, { kind: 'logo' }>): Promise<string> => {
+  const base = await sharp(file, { density: 600 }).resize({ height: 400, fit: 'inside' }).ensureAlpha().png().toBuffer()
+  const { data: px, info } = await sharp(base).raw().toBuffer({ resolveWithObject: true })
+  const dropped = (o: number) => asset.knockout === true && LUMA(px[o]!, px[o + 1]!, px[o + 2]!) > 0.92
+  let ink = 0
+
+  for (let o = 0; o < px.length; o += 4) ink += dropped(o) ? 0 : px[o + 3]! / 255
+
+  if (ink <= 0) throw new Error(`El logo ${asset.path} no tiene tinta.`)
+
+  const k = Math.min(Math.sqrt(asset.inkArea / ink), asset.maxWidth / info.width, asset.maxHeight / info.height)
+  let w = Math.round(info.width * k)
+  let h = Math.round(info.height * k)
+  let png: Buffer
+
+  if (asset.recolor) {
+    let svg = fs.readFileSync(file, 'utf8')
+
+    for (const [from, to] of Object.entries(asset.recolor)) svg = svg.replaceAll(`fill="${from}"`, `fill="${to}"`)
+
+    const box = asset.recolorBox
+
+    if (box) {
+      const scale = Math.min(box.scaleMax, box.maxWidth / w, box.maxHeight / h)
+
+      w = Math.round(w * scale)
+      h = Math.round(h * scale)
+    }
+
+    png = await sharp(Buffer.from(svg), { density: 600 }).resize(w * 2, h * 2, { fit: 'fill' }).png().toBuffer()
+  } else {
+    const alpha = Buffer.alloc(info.width * info.height)
+
+    for (let i = 0; i < alpha.length; i++) alpha[i] = dropped(i * 4) ? 0 : px[i * 4 + 3]!
+
+    const mask = await sharp(alpha, { raw: { width: info.width, height: info.height, channels: 1 } }).resize(w * 2, h * 2).png().toBuffer()
+    const [r, g, b] = [0, 2, 4].map(i => Number.parseInt(asset.tone.replace('#', '').slice(i, i + 2), 16))
+
+    png = await sharp({ create: { width: w * 2, height: h * 2, channels: 3, background: { r: r!, g: g!, b: b! } } }).joinChannel(mask).png().toBuffer()
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><image href="data:image/png;base64,${png.toString('base64')}" width="${w}" height="${h}"/></svg>`
+
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
+}
 
 const sha256 = (data: Buffer | string): string => crypto.createHash('sha256').update(data).digest('hex')
 

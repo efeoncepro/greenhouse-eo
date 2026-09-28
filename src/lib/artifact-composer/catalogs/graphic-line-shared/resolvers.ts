@@ -177,6 +177,14 @@ export const graphicLineResolvers = (): ResolverRegistry => {
           : null
     },
 
+    // El cuerpo de una cifra del muro (TASK-1928, por qué elegirnos): grande o, si es larga, el cuerpo menor de AXIS.
+    // Lo decide el builder con el umbral de caracteres del token; la caja de la cifra no cambia.
+    'gl-figure-size': {
+      known: ['large', 'small'],
+      build: value =>
+        value === 'large' || value === 'small' ? [{ selector: ':self', toneClass: `gl-fig-${value}`, toneGroup: ['gl-fig-large', 'gl-fig-small'] }] : null
+    },
+
     // Texto alternativo de la foto: describe la escena, nunca transcribe el copy de la lámina.
     'gl-alt': {
       known: ['<descripción de la escena>'],

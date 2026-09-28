@@ -1,0 +1,32 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "content",
+  "recipe": "content-focus",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Resultados · Sky Airlines",
+    "question": "¿Llegan las entregas a tiempo?",
+    "answer": [
+      "Casi",
+      "siempre"
+    ]
+  },
+  "figures": [
+    {
+      "value": "88 %",
+      "label": "de las entregas de Sky llegaron a tiempo en 12 meses.",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    }
+  ],
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+    "alt": "Una estratega de Efeonce, con el uniforme del equipo, revisa el tablero de entregas del cliente"
+  }
+}

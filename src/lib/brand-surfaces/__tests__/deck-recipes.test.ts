@@ -15,6 +15,7 @@ import type { SlideSpec, TemplateContract } from '@/lib/artifact-composer/contra
 import { validateSlide } from '@/lib/artifact-composer/validate'
 
 import { planSurfacePiece, SurfacePieceError, type SurfaceIntent } from '../index'
+import type { SurfaceAssetRequest } from '../types'
 
 const EXAMPLES = path.join(__dirname, '..', 'examples')
 const CATALOG = path.join(__dirname, '..', '..', 'artifact-composer', 'catalogs', 'graphic-line-deck')
@@ -587,5 +588,74 @@ describe('deck · cotización, próximos pasos y respiro (TASK-1928)', () => {
 
     expect(slots.urlBubble).toBeUndefined()
     expect(piece.assets.some(asset => asset.ref.startsWith('asset-ref:layer:gl-br-progress-4-of-5'))).toBe(true)
+  })
+})
+
+describe('deck · la familia prueba (TASK-1928)', () => {
+  it.each([
+    ['content-focus', 'ContentFocus'],
+    ['content-clients', 'ContentClients'],
+    ['content-partners', 'ContentPartners'],
+    ['decision-risk', 'DecisionRisk'],
+    ['decision-case', 'DecisionCase'],
+    ['decision-chart', 'DecisionChart'],
+    ['decision-testimonial', 'DecisionTestimonial'],
+    ['decision-why-us', 'DecisionWhyUs']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(`deck.${recipe}`)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('cada cifra llega con su fuente y la lámina la imprime; una cifra sin fuente la rechaza AXIS', () => {
+    expect(plan(example('decision-chart')).slots.source).toBe('Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses')
+    expect(plan(example('content-clients')).slots.source).toBe('Fuente: caso publicado de Sky Airlines · caso publicado de Bresler')
+
+    const figures = (example('decision-why-us').figures as { value: string; label: string }[]).map(({ value, label }) => ({ value, label }))
+
+    expectCode(() => plan({ ...example('decision-why-us'), figures } as SurfaceIntent), 'surface-issues')
+  })
+
+  it('los logos de terceros se normalizan al componer: un tono y el mismo peso, con la excepción tonal de AXIS', () => {
+    const clients = plan(example('content-clients')).piece.assets.filter(asset => asset.kind === 'logo') as Extract<SurfaceAssetRequest, { kind: 'logo' }>[]
+    const partners = plan(example('content-partners')).piece.assets.filter(asset => asset.kind === 'logo') as Extract<SurfaceAssetRequest, { kind: 'logo' }>[]
+
+    expect(clients).toHaveLength(9)
+    expect(new Set(clients.map(logo => `${logo.tone}·${logo.inkArea}`)).size).toBe(1)
+    expect(clients.filter(logo => logo.recolor).map(logo => logo.path.split('/').pop())).toEqual(['aguas-andinas.svg', 'universidad-temuco.svg'])
+    expect(partners).toHaveLength(9)
+    expect(partners.every(logo => logo.tone === '#ffffff' && logo.knockout)).toBe(true)
+  })
+
+  it('una barra sale de su número: el largo es el valor sobre el máximo del eje; fuera de 1–100 falla cerrado', () => {
+    const { slots } = plan(example('decision-chart'))
+
+    expect(slots.frame.bar1Width).toBe('--gl-dch-bar1-width=900px')
+    expect(slots.frame.bar2Width).toBe('--gl-dch-bar2-width=675px')
+    expect(slots.frame.annotationLeft).toBe('--gl-dch-annotation-left=1485px')
+    expectCode(() => plan({ ...example('decision-chart'), bars: [{ label: 'Antes', value: 100 }, { label: 'Después', value: 140 }] } as SurfaceIntent), 'invalid-intent')
+  })
+
+  it('la selección toma el ítem elegido; fuera de rango falla cerrado', () => {
+    expect(plan(example('content-partners')).slots.selection).toMatchObject({ label: 'Agentes IA', item: 7 })
+    expect(plan(example('decision-why-us')).slots.selection).toMatchObject({ label: 'Cliente', item: 4 })
+    expectCode(() => plan({ ...example('decision-risk'), selected: 5 } as SurfaceIntent), 'invalid-intent')
+  })
+
+  it('el testimonio cita al cliente: la frase es la respuesta (hasta 6 palabras) y la selección la toma', () => {
+    const { slots } = plan(example('decision-testimonial'))
+
+    expect(slots.voice).toMatchObject({ answerLead: 'Agilizar mucho', answer: 'la carga de trabajo' })
+    expect(slots.selection).toMatchObject({ label: 'Cliente' })
+    expect(slots.selection).not.toHaveProperty('item')
+    expectCode(() => plan({ ...example('content-clients'), voice: { ...example('content-clients').voice, answer: ['Marcas líderes', 'de verdad'] } } as SurfaceIntent), 'surface-issues')
+  })
+
+  it('una cifra larga del muro baja de cuerpo sin mover su rótulo', () => {
+    const facts = plan(example('decision-why-us')).slots.facts as unknown as { size: string; value: string }[]
+
+    expect(facts.map(fact => fact.size)).toEqual(['large', 'large', 'large', 'large', 'small', 'small'])
   })
 })

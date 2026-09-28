@@ -853,6 +853,333 @@ exports[`planes de los intents de ejemplo > deck-close-proposal-horizon-intent.j
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-content-clients-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:gl-cc-progress-4-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="201.06" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1721.96 117.64" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1721.96" cy="117.64" r="7.7" fill="#0e8c82"/></g></svg>",
+    },
+    {
+      "inkArea": 4200,
+      "kind": "logo",
+      "maxHeight": 92,
+      "maxWidth": 220,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+      "ref": "asset-ref:file:sky",
+      "tone": "#023c70",
+    },
+    {
+      "inkArea": 4200,
+      "kind": "logo",
+      "maxHeight": 92,
+      "maxWidth": 220,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg",
+      "ref": "asset-ref:file:berel",
+      "tone": "#023c70",
+    },
+    {
+      "inkArea": 4200,
+      "kind": "logo",
+      "maxHeight": 92,
+      "maxWidth": 220,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/bresler.svg",
+      "ref": "asset-ref:file:bresler",
+      "tone": "#023c70",
+    },
+    {
+      "inkArea": 4200,
+      "kind": "logo",
+      "maxHeight": 92,
+      "maxWidth": 220,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/carozzi.svg",
+      "ref": "asset-ref:file:carozzi",
+      "tone": "#023c70",
+    },
+    {
+      "inkArea": 4200,
+      "kind": "logo",
+      "maxHeight": 92,
+      "maxWidth": 220,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/aguas-andinas.svg",
+      "recolor": {
+        "#014C94": "#023c70",
+        "#0A2540": "#023c70",
+        "#3A8245": "#6286a6",
+        "#F0A31F": "#b8c8d7",
+      },
+      "recolorBox": {
+        "maxHeight": 104,
+        "maxWidth": 230,
+        "scaleMax": 1.14,
+      },
+      "ref": "asset-ref:file:aguas-andinas",
+      "tone": "#023c70",
+    },
+    {
+      "inkArea": 4200,
+      "kind": "logo",
+      "maxHeight": 92,
+      "maxWidth": 220,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg",
+      "ref": "asset-ref:file:anam",
+      "tone": "#023c70",
+    },
+    {
+      "inkArea": 4200,
+      "kind": "logo",
+      "maxHeight": 92,
+      "maxWidth": 220,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/marca-chile.svg",
+      "ref": "asset-ref:file:marca-chile",
+      "tone": "#023c70",
+    },
+    {
+      "inkArea": 4200,
+      "kind": "logo",
+      "maxHeight": 92,
+      "maxWidth": 220,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/gobierno-santiago.svg",
+      "ref": "asset-ref:file:gobierno-santiago",
+      "tone": "#023c70",
+    },
+    {
+      "inkArea": 4200,
+      "kind": "logo",
+      "maxHeight": 92,
+      "maxWidth": 220,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/universidad-temuco.svg",
+      "recolor": {
+        "#0077BA": "#023c70",
+        "#0177BA": "#023c70",
+        "#0178BB": "#023c70",
+        "#878786": "#023c70",
+        "#888887": "#023c70",
+        "#FDC300": "#8da7bf",
+      },
+      "recolorBox": {
+        "maxHeight": 104,
+        "maxWidth": 230,
+        "scaleMax": 1.14,
+      },
+      "ref": "asset-ref:file:universidad-temuco",
+      "tone": "#023c70",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-clients",
+  "plan": {
+    "artifactId": "deck-content-clients",
+    "slides": [
+      {
+        "contentType": "deck.content-clients",
+        "slideId": "deck-content-clients",
+        "slots": {
+          "clients": [
+            {
+              "alt": "Sky Airline",
+              "src": "asset-ref:file:sky",
+            },
+            {
+              "alt": "Berel",
+              "src": "asset-ref:file:berel",
+            },
+            {
+              "alt": "Bresler",
+              "src": "asset-ref:file:bresler",
+            },
+            {
+              "alt": "Carozzi",
+              "src": "asset-ref:file:carozzi",
+            },
+            {
+              "alt": "Aguas Andinas",
+              "src": "asset-ref:file:aguas-andinas",
+            },
+            {
+              "alt": "ANAM",
+              "src": "asset-ref:file:anam",
+            },
+            {
+              "alt": "Marca Chile",
+              "src": "asset-ref:file:marca-chile",
+            },
+            {
+              "alt": "Gobierno de Santiago",
+              "src": "asset-ref:file:gobierno-santiago",
+            },
+            {
+              "alt": "Universidad Católica de Temuco",
+              "src": "asset-ref:file:universidad-temuco",
+            },
+          ],
+          "frame": {
+            "answerPx": 120,
+            "answerTop": 318,
+            "cellHeight": "--gl-cc-cell-height=160px",
+            "cellWidth": "--gl-cc-cell-width=328px",
+            "eyebrowTop": 110,
+            "gridLeft": "--gl-cc-grid-left=140px",
+            "gridTop": "--gl-cc-grid-top=616px",
+            "line": "growth",
+            "logoMaxHeight": "--gl-cc-logo-max-height=104px",
+            "logoMaxWidth": "--gl-cc-logo-max-width=230px",
+            "margin": 140,
+            "marketsGap": "--gl-cc-markets-gap=6px",
+            "marketsInset": "--gl-cc-markets-inset=36px",
+            "marketsPx": "--gl-cc-markets-px=22px",
+            "marketsTextPx": "--gl-cc-markets-text-px=20px",
+            "questionTop": 200,
+            "questionWidth": "--gl-cc-question-width=320px",
+            "ruleStroke": "--gl-cc-rule=1.5px",
+            "sourceLeft": "--gl-cc-source-left=500px",
+            "sourcePx": "--gl-cc-source-px=15px",
+            "sourceTop": "--gl-cc-source-top=1000px",
+            "stat1Left": "--gl-cc-stat1-left=760px",
+            "stat2Left": "--gl-cc-stat2-left=1290px",
+            "statLabelGap": "--gl-cc-stat-label-gap=14px",
+            "statLabelInset": "--gl-cc-stat-label-inset=8px",
+            "statLabelPx": "--gl-cc-stat-label-px=23px",
+            "statLabelWidth": "--gl-cc-stat-label-width=300px",
+            "statLeading": "--gl-cc-stat-leading=0.9",
+            "statPx": "--gl-cc-stat-px=184px",
+            "statTracking": "--gl-cc-stat-tracking=-0.05em",
+            "statWght": "--gl-cc-stat-wght=300",
+            "statsTop": "--gl-cc-stats-top=196px",
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-cc-progress-4-of-5-growth",
+          },
+          "markets": {
+            "text": "Chile, EE. UU., Colombia, México y Perú",
+            "title": "Operamos en",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "item": 1,
+            "label": "Growth",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.2,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "source": "Fuente: caso publicado de Sky Airlines · caso publicado de Bresler",
+          "stats": [
+            {
+              "label": "tráfico orgánico de Sky frente a LATAM Airlines",
+              "value": "+127%",
+            },
+            {
+              "label": "ventas digitales de Bresler",
+              "value": "+180%",
+            },
+          ],
+          "voice": {
+            "answer": "líderes",
+            "answerLead": "Marcas",
+            "eyebrow": "Clientes",
+            "question": "¿Quién confía en nosotros?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-content-focus-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+      "ref": "asset-ref:plate:H1b-estratega-uniforme",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:content-focus-orbit-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><g data-axis-part="spotlight-orbit"><circle data-axis-part="ring" cx="1150" cy="420" r="396" fill="none" stroke="#72ded8" stroke-opacity="0.22" stroke-width="2"/><path data-axis-part="arc" data-axis-length="345.58" pathLength="1" d="M 1115.49 25.51 A 396 396 0 0 1 1430.01 139.99" fill="none" stroke="#36c8bf" stroke-width="4" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1430.01" cy="139.99" r="8.8" fill="#36c8bf"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-focus",
+  "plan": {
+    "artifactId": "deck-content-focus",
+    "slides": [
+      {
+        "contentType": "deck.content-focus",
+        "slideId": "deck-content-focus",
+        "slots": {
+          "figure": {
+            "label": "de las entregas de Sky llegaron a tiempo en 12 meses.",
+            "value": "88 %",
+          },
+          "frame": {
+            "answerInset": "--gl-cf-answer-inset=-12px",
+            "answerLeading": "--gl-cf-answer-leading=0.92",
+            "answerPx": 170,
+            "answerTop": 370,
+            "answerTracking": "--gl-cf-answer-tracking=-0.05em",
+            "eyebrowColor": "--gl-cf-eyebrow-color=#9fb3c8",
+            "eyebrowPx": "--gl-cf-eyebrow-px=20px",
+            "eyebrowTop": 150,
+            "figurePx": "--gl-cf-figure-px=110px",
+            "figureTop": "--gl-cf-figure-top=720px",
+            "figureTracking": "--gl-cf-figure-tracking=-0.04em",
+            "inBright": "--gl-cf-in-bright=1.12",
+            "inContrast": "--gl-cf-in-contrast=1.05",
+            "labelInset": "--gl-cf-label-inset=2px",
+            "labelPx": "--gl-cf-label-px=28px",
+            "labelTop": "--gl-cf-label-top=840px",
+            "labelWidth": "--gl-cf-label-width=520px",
+            "lightR": "--gl-cf-light-r=360px",
+            "lightSoft": "--gl-cf-light-soft=78%",
+            "lightX": "--gl-cf-light-x=1150px",
+            "lightY": "--gl-cf-light-y=420px",
+            "line": "growth",
+            "margin": 140,
+            "outBright": "--gl-cf-out-bright=0.32",
+            "outGray": "--gl-cf-out-gray=0.85",
+            "questionLeading": "--gl-cf-question-leading=1.25",
+            "questionTop": 240,
+            "questionWidth": "--gl-cf-question-width=400px",
+            "sourceColor": "--gl-cf-source-color=#7f93a8",
+            "sourcePx": "--gl-cf-source-px=17px",
+            "sourceTop": "--gl-cf-source-top=960px",
+            "veilColor": "--gl-cf-veil-color=#021a33",
+            "veilOpacity": "--gl-cf-veil-opacity=60%",
+          },
+          "light": {
+            "src": "asset-ref:plate:H1b-estratega-uniforme",
+          },
+          "orbit": {
+            "src": "asset-ref:layer:content-focus-orbit-growth",
+          },
+          "photo": {
+            "alt": "Una estratega de Efeonce, con el uniforme del equipo, revisa el tablero de entregas del cliente",
+            "src": "asset-ref:plate:H1b-estratega-uniforme",
+          },
+          "source": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses",
+          "voice": {
+            "answer": "siempre",
+            "answerLead": "Casi",
+            "eyebrow": "Resultados · Sky Airlines",
+            "question": "¿Llegan las entregas a tiempo?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-content-measure-intent.json compone el mismo plan 1`] = `
 {
   "assets": [
@@ -928,6 +1255,214 @@ exports[`planes de los intents de ejemplo > deck-content-measure-intent.json com
             "answer": "62 %",
             "eyebrow": "Resultados · 3 de 5",
             "question": "¿Cuántos cortes pasan a la primera?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-content-partners-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:gl-cpt-progress-4-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="201.06" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1721.96 117.64" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1721.96" cy="117.64" r="7.7" fill="#36c8bf"/></g></svg>",
+    },
+    {
+      "inkArea": 4600,
+      "kind": "logo",
+      "knockout": true,
+      "maxHeight": 96,
+      "maxWidth": 260,
+      "path": "public/images/logos/partners/hubspot-logotype.svg",
+      "ref": "asset-ref:file:hubspot-logotype",
+      "tone": "#ffffff",
+    },
+    {
+      "inkArea": 4600,
+      "kind": "logo",
+      "knockout": true,
+      "maxHeight": 96,
+      "maxWidth": 260,
+      "path": "public/images/logos/partners/salesforce.com_logo.svg",
+      "ref": "asset-ref:file:salesforce.com_logo",
+      "tone": "#ffffff",
+    },
+    {
+      "inkArea": 4600,
+      "kind": "logo",
+      "knockout": true,
+      "maxHeight": 96,
+      "maxWidth": 260,
+      "path": "public/images/logos/partners/adobe-logotype.svg",
+      "ref": "asset-ref:file:adobe-logotype",
+      "tone": "#ffffff",
+    },
+    {
+      "inkArea": 4600,
+      "kind": "logo",
+      "knockout": true,
+      "maxHeight": 96,
+      "maxWidth": 260,
+      "path": "public/images/logos/partners/microsoft_logo_2012.svg",
+      "ref": "asset-ref:file:microsoft_logo_2012",
+      "tone": "#ffffff",
+    },
+    {
+      "inkArea": 4600,
+      "kind": "logo",
+      "knockout": true,
+      "maxHeight": 96,
+      "maxWidth": 260,
+      "path": "public/images/logos/partners/amazon_web_services_logo.svg",
+      "ref": "asset-ref:file:amazon_web_services_logo",
+      "tone": "#ffffff",
+    },
+    {
+      "inkArea": 4600,
+      "kind": "logo",
+      "knockout": true,
+      "maxHeight": 96,
+      "maxWidth": 260,
+      "path": "public/images/logos/partners/google_cloud_logo.svg",
+      "ref": "asset-ref:file:google_cloud_logo",
+      "tone": "#ffffff",
+    },
+    {
+      "inkArea": 4600,
+      "kind": "logo",
+      "knockout": true,
+      "maxHeight": 96,
+      "maxWidth": 260,
+      "path": "public/images/logos/partners/claude-logotype.svg",
+      "ref": "asset-ref:file:claude-logotype",
+      "tone": "#ffffff",
+    },
+    {
+      "inkArea": 4600,
+      "kind": "logo",
+      "knockout": true,
+      "maxHeight": 96,
+      "maxWidth": 260,
+      "path": "public/images/logos/partners/openai_logo.svg",
+      "ref": "asset-ref:file:openai_logo",
+      "tone": "#ffffff",
+    },
+    {
+      "inkArea": 4600,
+      "kind": "logo",
+      "knockout": true,
+      "maxHeight": 96,
+      "maxWidth": 260,
+      "path": "public/images/logos/partners/byteplus.png",
+      "ref": "asset-ref:file:byteplus",
+      "tone": "#ffffff",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-partners",
+  "plan": {
+    "artifactId": "deck-content-partners",
+    "slides": [
+      {
+        "contentType": "deck.content-partners",
+        "slideId": "deck-content-partners",
+        "slots": {
+          "body": "Programas oficiales de los fabricantes con los que operamos tu crecimiento.",
+          "frame": {
+            "answerInset": "--gl-cpt-answer-inset=-4px",
+            "answerLeading": "--gl-cpt-answer-leading=1",
+            "answerPx": 120,
+            "answerTop": 270,
+            "answerTracking": "--gl-cpt-answer-tracking=-0.04em",
+            "bodyPx": 26,
+            "bodyRight": "--gl-cpt-body-right=260px",
+            "bodyTop": 330,
+            "bodyWidth": 560,
+            "dividerHeight": "--gl-cpt-divider-height=40px",
+            "dividerWidth": "--gl-cpt-divider-width=2px",
+            "eyebrowTop": 110,
+            "line": "growth",
+            "logoMaxHeight": "--gl-cpt-logo-max-height=96px",
+            "logoMaxWidth": "--gl-cpt-logo-max-width=260px",
+            "margin": 140,
+            "questionTop": 200,
+            "questionWidth": "--gl-cpt-question-width=1300px",
+            "row1Top": "--gl-cpt-row1-top=616px",
+            "row1Width": "--gl-cpt-row1-width=1640px",
+            "row2Top": "--gl-cpt-row2-top=806px",
+            "row2Width": "--gl-cpt-row2-width=1300px",
+            "rowHeight": "--gl-cpt-row-height=110px",
+            "ruleStroke": "--gl-cpt-rule=2px",
+            "ruleTop": "--gl-cpt-rule-top=568px",
+            "ruleWidth": "--gl-cpt-rule-width=1640px",
+            "sealGap": "--gl-cpt-seal-gap=26px",
+            "sealLogo": "--gl-cpt-seal-logo=44px",
+            "sealPx": "--gl-cpt-seal-px=24px",
+            "sealTop": "--gl-cpt-seal-top=488px",
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-cpt-progress-4-of-5-growth",
+          },
+          "row1": [
+            {
+              "alt": "HubSpot",
+              "src": "asset-ref:file:hubspot-logotype",
+            },
+            {
+              "alt": "Salesforce",
+              "src": "asset-ref:file:salesforce.com_logo",
+            },
+            {
+              "alt": "Adobe",
+              "src": "asset-ref:file:adobe-logotype",
+            },
+            {
+              "alt": "Microsoft",
+              "src": "asset-ref:file:microsoft_logo_2012",
+            },
+            {
+              "alt": "Amazon Web Services",
+              "src": "asset-ref:file:amazon_web_services_logo",
+            },
+          ],
+          "row2": [
+            {
+              "alt": "Google Cloud",
+              "src": "asset-ref:file:google_cloud_logo",
+            },
+            {
+              "alt": "Claude",
+              "src": "asset-ref:file:claude-logotype",
+            },
+            {
+              "alt": "OpenAI",
+              "src": "asset-ref:file:openai_logo",
+            },
+            {
+              "alt": "BytePlus",
+              "src": "asset-ref:file:byteplus",
+            },
+          ],
+          "seal": "Partner oficial de",
+          "selection": {
+            "anchor": "bottom-end",
+            "item": 7,
+            "label": "Agentes IA",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.2,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "voice": {
+            "answer": "Con los grandes",
+            "eyebrow": "Partners",
+            "question": "¿Con quién construimos?",
           },
         },
       },
@@ -2414,6 +2949,235 @@ exports[`planes de los intents de ejemplo > deck-cover-proposal-orbit-sky-intent
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-decision-case-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1260,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+      "ref": "asset-ref:plate:T2-crea",
+    },
+    {
+      "inkArea": 5200,
+      "kind": "logo",
+      "maxHeight": 70,
+      "maxWidth": 200,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+      "ref": "asset-ref:file:sky",
+      "tone": "#023c70",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-case",
+  "plan": {
+    "artifactId": "deck-decision-case",
+    "slides": [
+      {
+        "contentType": "deck.decision-case",
+        "slideId": "deck-decision-case",
+        "slots": {
+          "clientLogo": {
+            "alt": "Sky Airline",
+            "src": "asset-ref:file:sky",
+          },
+          "figures": [
+            {
+              "label": "piezas aprobadas",
+              "value": "+2.000",
+            },
+            {
+              "label": "campañas",
+              "value": "39",
+            },
+            {
+              "label": "entregas a tiempo",
+              "value": "88 %",
+            },
+            {
+              "label": "tiempo de producción",
+              "value": "−25 %",
+            },
+          ],
+          "frame": {
+            "answerPx": 124,
+            "answerTop": 280,
+            "eyebrowTop": 104,
+            "figureLeading": "--gl-dc-figure-leading=0.95",
+            "figurePadTop": "--gl-dc-figure-pad-top=16px",
+            "figurePx": "--gl-dc-figure-px=104px",
+            "figureRule": "--gl-dc-figure-rule=2px",
+            "figureTracking": "--gl-dc-figure-tracking=-0.04em",
+            "figureWght": "--gl-dc-figure-wght=300",
+            "figuresColumnGap": "--gl-dc-figures-column-gap=50px",
+            "figuresRowGap": "--gl-dc-figures-row-gap=34px",
+            "figuresTop": "--gl-dc-figures-top=470px",
+            "figuresWidth": "--gl-dc-figures-width=760px",
+            "labelGap": "--gl-dc-label-gap=8px",
+            "labelPx": "--gl-dc-label-px=22px",
+            "line": "growth",
+            "logoGap": "--gl-dc-logo-gap=22px",
+            "logoMaxHeight": "--gl-dc-logo-max-height=70px",
+            "logoMaxWidth": "--gl-dc-logo-max-width=200px",
+            "margin": 140,
+            "panelRadius": "--gl-dc-panel-radius=300px",
+            "panelWidth": "--gl-dc-panel-width=1000px",
+            "photoLeft": "--gl-dc-photo-left=660px",
+            "questionTop": 210,
+            "sourcePx": "--gl-dc-source-px=16px",
+            "sourceTop": "--gl-dc-source-top=938px",
+            "sourceWidth": "--gl-dc-source-width=760px",
+          },
+          "photo": {
+            "alt": "El equipo creativo de Efeonce arma la pared de pruebas de la campaña",
+            "src": "asset-ref:plate:T2-crea",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "item": 4,
+            "label": "Performance",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.15,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "source": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses",
+          "voice": {
+            "answer": "Más rápido",
+            "eyebrow": "Caso · 12 meses",
+            "question": "¿Qué cambió con Sky?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-decision-chart-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:gl-dch-progress-3-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="216" data-axis-value="0.6"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="150.8" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1736.49 162.36" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1736.49" cy="162.36" r="7.7" fill="#0e8c82"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-chart",
+  "plan": {
+    "artifactId": "deck-decision-chart",
+    "slides": [
+      {
+        "contentType": "deck.decision-chart",
+        "slideId": "deck-decision-chart",
+        "slots": {
+          "annotation": "−25 %",
+          "bars": [
+            {
+              "label": "Antes",
+              "value": "100",
+            },
+            {
+              "label": "Con Efeonce",
+              "value": "75",
+            },
+          ],
+          "body": "El tiempo de producción bajó 25 % en 12 meses de operación con el equipo creativo.",
+          "frame": {
+            "afterColor": "--gl-dch-after-color=#023c70",
+            "annotationLeft": "--gl-dch-annotation-left=1485px",
+            "annotationPx": "--gl-dch-annotation-px=64px",
+            "answerPx": 120,
+            "answerTop": 270,
+            "bar1Width": "--gl-dch-bar1-width=900px",
+            "bar2Width": "--gl-dch-bar2-width=675px",
+            "barHeight": "--gl-dch-bar-height=120px",
+            "barLabelGap": "--gl-dch-bar-label-gap=44px",
+            "barLabelPx": "--gl-dch-bar-label-px=22px",
+            "barRadius": "--gl-dch-bar-radius=10px",
+            "barStep": "--gl-dch-bar-step=210px",
+            "barValuePx": "--gl-dch-bar-value-px=64px",
+            "barValueWght": "--gl-dch-bar-value-wght=300",
+            "beforeColor": "--gl-dch-before-color=#c9d2dc",
+            "bodyPx": 25,
+            "bodyTop": 420,
+            "bodyWidth": 520,
+            "chartLeft": "--gl-dch-chart-left=780px",
+            "chartTop": "--gl-dch-chart-top=330px",
+            "eyebrowTop": 110,
+            "kpiLabelGap": "--gl-dch-kpi-label-gap=6px",
+            "kpiLabelPx": "--gl-dch-kpi-label-px=20px",
+            "kpiPadTop": "--gl-dch-kpi-pad-top=18px",
+            "kpiPx": "--gl-dch-kpi-px=64px",
+            "kpiWght": "--gl-dch-kpi-wght=300",
+            "kpisRule": "--gl-dch-kpis-rule=2px",
+            "kpisTop": "--gl-dch-kpis-top=800px",
+            "kpisWidth": "--gl-dch-kpis-width=1640px",
+            "leaderGap": "--gl-dch-leader-gap=18px",
+            "leaderStroke": "--gl-dch-leader-stroke=2px",
+            "leaderWidth": "--gl-dch-leader-width=70px",
+            "line": "growth",
+            "margin": 140,
+            "notePx": "--gl-dch-note-px=16px",
+            "noteTop": "--gl-dch-note-top=690px",
+            "questionTop": 200,
+            "sourceLeft": "--gl-dch-source-left=500px",
+            "sourcePx": "--gl-dch-source-px=15px",
+            "sourceTop": "--gl-dch-source-top=1000px",
+            "valueInset": "--gl-dch-value-inset=28px",
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-dch-progress-3-of-5-growth",
+          },
+          "kpis": [
+            {
+              "label": "piezas aprobadas",
+              "value": "+2.000",
+            },
+            {
+              "label": "campañas",
+              "value": "39",
+            },
+            {
+              "label": "ajustes por pieza",
+              "value": "0,12",
+            },
+            {
+              "label": "mercados",
+              "value": "5",
+            },
+          ],
+          "note": "Tiempo de producción por campaña, en índice (antes = 100).",
+          "selection": {
+            "anchor": "bottom-end",
+            "item": 2,
+            "label": "Performance",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "source": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses",
+          "voice": {
+            "answer": "Un cuarto",
+            "eyebrow": "Resultados · Sky Airlines",
+            "question": "¿Cuánto más rápido?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-decision-next-steps-intent.json compone el mismo plan 1`] = `
 {
   "assets": [
@@ -2727,6 +3491,329 @@ exports[`planes de los intents de ejemplo > deck-decision-plan-intent.json compo
             "answer": "Movimiento",
             "eyebrow": "Plan de trabajo",
             "question": "¿Qué pasa al empezar?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-decision-risk-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:gl-dr-progress-5-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="360" data-axis-value="1"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><circle data-axis-part="arc" data-axis-length="251.33" pathLength="1" cx="1760" cy="130" r="40" fill="none" stroke="#0e8c82" stroke-width="3.96"/><circle data-axis-part="sphere" cx="1760" cy="90" r="7.7" fill="#0e8c82"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-risk",
+  "plan": {
+    "artifactId": "deck-decision-risk",
+    "slides": [
+      {
+        "contentType": "deck.decision-risk",
+        "slideId": "deck-decision-risk",
+        "slots": {
+          "body": "Cada riesgo tiene su cobertura escrita. Y el primer paso es un piloto, no un contrato largo.",
+          "frame": {
+            "answerPx": 132,
+            "answerTop": 270,
+            "bodyPx": 26,
+            "bodyTop": 560,
+            "bodyWidth": 520,
+            "columnGap": "--gl-dr-column-gap=40px",
+            "eyebrowTop": 110,
+            "headerPx": "--gl-dr-header-px=16px",
+            "headersTop": "--gl-dr-headers-top=200px",
+            "howGap": "--gl-dr-how-gap=10px",
+            "howPx": "--gl-dr-how-px=22px",
+            "line": "growth",
+            "margin": 140,
+            "namePx": "--gl-dr-name-px=44px",
+            "nameTracking": "--gl-dr-name-tracking=-0.02em",
+            "questionTop": 200,
+            "riskPx": "--gl-dr-risk-px=26px",
+            "riskWidth": "--gl-dr-risk-width=300px",
+            "rowGap": "--gl-dr-row-gap=20px",
+            "rowHeight": "--gl-dr-row-height=150px",
+            "rowPadTop": "--gl-dr-row-pad-top=22px",
+            "ruleStroke": "--gl-dr-rule=2px",
+            "secondColumn": "--gl-dr-second-column=1140px",
+            "tableLeft": "--gl-dr-table-left=800px",
+            "tableTop": "--gl-dr-table-top=250px",
+            "tableWidth": "--gl-dr-table-width=980px",
+          },
+          "headers": {
+            "how": "Cómo lo cubrimos",
+            "risk": "El riesgo",
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-dr-progress-5-of-5-growth",
+          },
+          "risks": [
+            {
+              "how": "Un piloto pagado, acotado y gobernado, con informe de cierre y una decisión clara.",
+              "name": "Sample Sprint",
+              "risk": "Que no encajemos",
+            },
+            {
+              "how": "OTD ≥ 90 % y FTR ≥ 80 %, medidos cada semana y visibles en tu portal.",
+              "name": "Métricas con umbral",
+              "risk": "Que se atrase",
+            },
+            {
+              "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria.",
+              "name": "Traspaso documentado",
+              "risk": "Depender de una persona",
+            },
+            {
+              "how": "La operación en vivo en Greenhouse: lo que pedimos, lo que entregamos y cuánto demora.",
+              "name": "Transparencia radical",
+              "risk": "No ver qué pasa",
+            },
+          ],
+          "selection": {
+            "anchor": "top-start",
+            "item": 1,
+            "label": "Cliente",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.15,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "voice": {
+            "answer": "chico",
+            "answerLead": "Empiezas",
+            "eyebrow": "Riesgo controlado",
+            "question": "¿Y si no funciona?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-decision-testimonial-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:decision-testimonial-glow",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><radialGradient id="dt-glow" cx="560" cy="520" r="760" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#72ded8" stop-opacity="0.1"/><stop offset="1" stop-color="#72ded8" stop-opacity="0"/></radialGradient></defs><rect width="1920" height="1080" fill="url(#dt-glow)"/></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:gl-dt-progress-3-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="216" data-axis-value="0.6"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="150.8" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1736.49 162.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1736.49" cy="162.36" r="7.7" fill="#36c8bf"/></g></svg>",
+    },
+    {
+      "inkArea": 5200,
+      "kind": "logo",
+      "maxHeight": 64,
+      "maxWidth": 200,
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+      "ref": "asset-ref:file:sky",
+      "tone": "#ffffff",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-testimonial",
+  "plan": {
+    "artifactId": "deck-decision-testimonial",
+    "slides": [
+      {
+        "contentType": "deck.decision-testimonial",
+        "slideId": "deck-decision-testimonial",
+        "slots": {
+          "author": {
+            "name": "Adriana Contreras",
+            "role": "Team SKY",
+          },
+          "clientLogo": {
+            "alt": "Sky Airline",
+            "src": "asset-ref:file:sky",
+          },
+          "frame": {
+            "answerLeading": "--gl-dt-answer-leading=0.98",
+            "answerPx": 120,
+            "answerTop": 392,
+            "answerTracking": "--gl-dt-answer-tracking=-0.04em",
+            "answerWidth": "--gl-dt-answer-width=1080px",
+            "dividerHeight": "--gl-dt-divider-height=48px",
+            "dividerWidth": "--gl-dt-divider-width=2px",
+            "eyebrowTop": 110,
+            "line": "growth",
+            "logoMaxHeight": "--gl-dt-logo-max-height=64px",
+            "logoMaxWidth": "--gl-dt-logo-max-width=200px",
+            "margin": 140,
+            "markInset": "--gl-dt-mark-inset=-14px",
+            "markPx": "--gl-dt-mark-px=190px",
+            "markTop": "--gl-dt-mark-top=236px",
+            "namePx": "--gl-dt-name-px=26px",
+            "proofLabelGap": "--gl-dt-proof-label-gap=8px",
+            "proofLabelPx": "--gl-dt-proof-label-px=22px",
+            "proofLeft": "--gl-dt-proof-left=1390px",
+            "proofPad": "--gl-dt-proof-pad=26px",
+            "proofPx": "--gl-dt-proof-px=88px",
+            "proofRule": "--gl-dt-proof-rule=2px",
+            "proofTop": "--gl-dt-proof-top=330px",
+            "proofTracking": "--gl-dt-proof-tracking=-0.04em",
+            "proofWidth": "--gl-dt-proof-width=390px",
+            "questionTop": 200,
+            "quotePx": "--gl-dt-quote-px=27px",
+            "quoteTop": "--gl-dt-quote-top=696px",
+            "quoteWidth": "--gl-dt-quote-width=980px",
+            "roleGap": "--gl-dt-role-gap=4px",
+            "rolePx": "--gl-dt-role-px=20px",
+            "signatureGap": "--gl-dt-signature-gap=28px",
+            "signatureTop": "--gl-dt-signature-top=854px",
+            "sourceGap": "--gl-dt-source-gap=18px",
+            "sourcePx": "--gl-dt-source-px=15px",
+          },
+          "glow": {
+            "src": "asset-ref:layer:decision-testimonial-glow",
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-dt-progress-3-of-5-growth",
+          },
+          "proof": [
+            {
+              "label": "piezas aprobadas",
+              "value": "+2.000",
+            },
+            {
+              "label": "entregadas a tiempo",
+              "value": "88 %",
+            },
+            {
+              "label": "tiempo de producción",
+              "value": "−25 %",
+            },
+          ],
+          "quote": "«Hemos mejorado muchísimo en cuanto a las herramientas tecnológicas. Siento que hemos podido, gracias a ellos, agilizar mucho la carga de trabajo.»",
+          "selection": {
+            "anchor": "top-end",
+            "label": "Cliente",
+            "participantKind": "department",
+            "scale": 1.15,
+          },
+          "source": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses",
+          "voice": {
+            "answer": "la carga de trabajo",
+            "answerLead": "Agilizar mucho",
+            "eyebrow": "En palabras de Sky",
+            "question": "¿Cómo es trabajar con nosotros?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-decision-why-us-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:gl-dw-progress-1-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="72" data-axis-value="0.2"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1798.04 117.64" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1798.04" cy="117.64" r="7.7" fill="#0e8c82"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-why-us",
+  "plan": {
+    "artifactId": "deck-decision-why-us",
+    "slides": [
+      {
+        "contentType": "deck.decision-why-us",
+        "slideId": "deck-decision-why-us",
+        "slots": {
+          "body": "No te entregamos crecimiento: lo construimos contigo y te dejamos más capaz de sostenerlo.",
+          "facts": [
+            {
+              "label": "años ejecutando en LATAM",
+              "size": "large",
+              "value": "+10",
+            },
+            {
+              "label": "mercados: Chile, EE. UU., Colombia, México y Perú",
+              "size": "large",
+              "value": "5",
+            },
+            {
+              "label": "empresas operan con Efeonce",
+              "size": "large",
+              "value": "+90",
+            },
+            {
+              "label": "solo interlocutor para todas las líneas",
+              "size": "large",
+              "value": "1",
+            },
+            {
+              "label": "tu operación visible en Greenhouse",
+              "size": "small",
+              "value": "En vivo",
+            },
+            {
+              "label": "Enabled: medimos negocio, no vanidad",
+              "size": "small",
+              "value": "Revenue",
+            },
+          ],
+          "frame": {
+            "answerPx": 140,
+            "answerTop": 270,
+            "bodyPx": 26,
+            "bodyTop": 450,
+            "bodyWidth": 520,
+            "cellPadTop": "--gl-dw-cell-pad-top=20px",
+            "cellWidth": "--gl-dw-cell-width=300px",
+            "columnGap": "--gl-dw-column-gap=30px",
+            "eyebrowTop": 110,
+            "figurePx": "--gl-dw-figure-px=150px",
+            "figureSecondaryPx": "--gl-dw-figure-secondary-px=92px",
+            "figureTracking": "--gl-dw-figure-tracking=-0.05em",
+            "figureWght": "--gl-dw-figure-wght=300",
+            "gridLeft": "--gl-dw-grid-left=800px",
+            "gridTop": "--gl-dw-grid-top=230px",
+            "labelGap": "--gl-dw-label-gap=14px",
+            "labelPx": "--gl-dw-label-px=22px",
+            "line": "growth",
+            "margin": 140,
+            "questionTop": 200,
+            "rowStep": "--gl-dw-row-step=360px",
+            "ruleStroke": "--gl-dw-rule=2px",
+            "sourceLeft": "--gl-dw-source-left=500px",
+            "sourcePx": "--gl-dw-source-px=15px",
+            "sourceTop": "--gl-dw-source-top=1000px",
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-dw-progress-1-of-5-growth",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "item": 4,
+            "label": "Cliente",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "source": "Fuente: Efeonce, 2026",
+          "voice": {
+            "answer": "Por esto",
+            "eyebrow": "Por qué elegirnos",
+            "question": "¿Por qué Efeonce?",
           },
         },
       },

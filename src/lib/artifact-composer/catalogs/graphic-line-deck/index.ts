@@ -40,7 +40,9 @@ const TEMPLATES_WITH_SELECTION = [
   'MethodHybridWorkforceScene',
   // Portadas de propuesta: la selección toma el logo del cliente.
   'CoverProposalOrbit',
-  'CoverProposalDawn'
+  'CoverProposalDawn',
+  // El testimonio: la selección toma la frase del cliente (la respuesta).
+  'DecisionTestimonial'
 ] as const
 
 /**
@@ -98,6 +100,12 @@ export const createCatalog = (options: GraphicLineCatalogOptions = {}): Artifact
   layoutHooks.MethodStaircaseFlat = levelSelectionHook(selectionHook)
   layoutHooks.ContentPricing = levelSelectionHook(selectionHook)
   layoutHooks.ContentPricingStage = levelSelectionHook(selectionHook)
+
+  // La familia Prueba (TASK-1928): la selección toma un ítem de la lámina (`selection.item`): la cifra, el logo, la fila
+  // del riesgo o la barra que se elige.
+  for (const template of ['ContentClients', 'ContentPartners', 'DecisionRisk', 'DecisionCase', 'DecisionChart', 'DecisionWhyUs']) {
+    layoutHooks[template] = levelSelectionHook(selectionHook)
+  }
 
   return {
     name: 'graphic-line-deck',

@@ -30,7 +30,15 @@
     "deck.decision-next-steps",
     "deck.content-pricing",
     "deck.content-pricing.stage",
-    "deck.content-pricing.live"
+    "deck.content-pricing.live",
+    "deck.content-focus",
+    "deck.content-clients",
+    "deck.content-partners",
+    "deck.decision-risk",
+    "deck.decision-case",
+    "deck.decision-chart",
+    "deck.decision-testimonial",
+    "deck.decision-why-us"
   ],
   "templates": [
     {
@@ -329,6 +337,94 @@
       "contentTypes": ["deck.content-pricing.live"],
       "prototype": "content-pricing-live.html",
       "slotsRef": "content-pricing-live.slots.json"
+    },
+    {
+      "name": "ContentFocus",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-focus"],
+      "prototype": "content-focus.html",
+      "slotsRef": "content-focus.slots.json"
+    },
+    {
+      "name": "ContentClients",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-clients"],
+      "prototype": "content-clients.html",
+      "slotsRef": "content-clients.slots.json"
+    },
+    {
+      "name": "ContentPartners",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-partners"],
+      "prototype": "content-partners.html",
+      "slotsRef": "content-partners.slots.json"
+    },
+    {
+      "name": "DecisionRisk",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-risk"],
+      "prototype": "decision-risk.html",
+      "slotsRef": "decision-risk.slots.json"
+    },
+    {
+      "name": "DecisionCase",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-case"],
+      "prototype": "decision-case.html",
+      "slotsRef": "decision-case.slots.json"
+    },
+    {
+      "name": "DecisionChart",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-chart"],
+      "prototype": "decision-chart.html",
+      "slotsRef": "decision-chart.slots.json"
+    },
+    {
+      "name": "DecisionTestimonial",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-testimonial"],
+      "prototype": "decision-testimonial.html",
+      "slotsRef": "decision-testimonial.slots.json"
+    },
+    {
+      "name": "DecisionWhyUs",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-why-us"],
+      "prototype": "decision-why-us.html",
+      "slotsRef": "decision-why-us.slots.json"
     }
   ],
   "selector": {
@@ -359,7 +455,15 @@
       "deck.decision-next-steps": "DecisionNextSteps",
       "deck.content-pricing": "ContentPricing",
       "deck.content-pricing.stage": "ContentPricingStage",
-      "deck.content-pricing.live": "ContentPricingLive"
+      "deck.content-pricing.live": "ContentPricingLive",
+      "deck.content-focus": "ContentFocus",
+      "deck.content-clients": "ContentClients",
+      "deck.content-partners": "ContentPartners",
+      "deck.decision-risk": "DecisionRisk",
+      "deck.decision-case": "DecisionCase",
+      "deck.decision-chart": "DecisionChart",
+      "deck.decision-testimonial": "DecisionTestimonial",
+      "deck.decision-why-us": "DecisionWhyUs"
     }
   }
 }

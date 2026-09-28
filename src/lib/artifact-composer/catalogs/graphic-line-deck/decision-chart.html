@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el gráfico</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-chart` (surface deck, papel, TASK-1928). El dato manda: dos barras en índice (antes = 100) cuyo largo
+      sale de su número, la anotación de la diferencia en el acento y una fila de cifras del caso con su fuente; la
+      selección toma la barra que se elige. Referencia: DeckGrafico (E4-grafico).
+    -->
+    <main class="gl-slide gl-paper gl-dch" data-gl-root data-slot="frame">
+      <figure class="gl-layer" data-slot="indicator">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Resultados · Sky Airlines</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cuánto más rápido?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">Un cuarto</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-dch-body" data-slot="body">El tiempo de producción bajó un cuarto.</p>
+
+      <ol class="gl-dch-bars" data-slot="bars">
+        <li class="gl-dch-bar-row">
+          <p class="gl-dch-bar-label" data-slot-field="label">Antes</p>
+          <div class="gl-dch-bar" data-gl-select-item><span class="gl-dch-bar-value" data-slot-field="value">100</span></div>
+        </li>
+      </ol>
+
+      <div class="gl-dch-annotation">
+        <span class="gl-dch-leader" aria-hidden="true"></span>
+        <span class="gl-dch-annotation-text" data-slot="annotation">−25 %</span>
+      </div>
+
+      <p class="gl-dch-note" data-slot="note">Tiempo de producción por campaña, en índice (antes = 100).</p>
+
+      <ol class="gl-dch-kpis" data-slot="kpis">
+        <li class="gl-dch-kpi">
+          <p class="gl-dch-kpi-value" data-slot-field="value">+2.000</p>
+          <p class="gl-dch-kpi-label" data-slot-field="label">piezas aprobadas</p>
+        </li>
+      </ol>
+
+      <p class="gl-dch-source" data-slot="source">Fuente: caso publicado de Sky Airlines.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-light.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

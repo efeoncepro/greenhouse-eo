@@ -1,0 +1,68 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "content",
+  "recipe": "content-partners",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Partners",
+    "question": "¿Con quién construimos?",
+    "answer": [
+      "Con los grandes"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 4
+  },
+  "body": "Programas oficiales de los fabricantes con los que operamos tu crecimiento.",
+  "seal": "Partner oficial de",
+  "selected": 7,
+  "partners": [
+    {
+      "path": "public/images/logos/partners/hubspot-logotype.svg",
+      "alt": "HubSpot"
+    },
+    {
+      "path": "public/images/logos/partners/salesforce.com_logo.svg",
+      "alt": "Salesforce"
+    },
+    {
+      "path": "public/images/logos/partners/adobe-logotype.svg",
+      "alt": "Adobe"
+    },
+    {
+      "path": "public/images/logos/partners/microsoft_logo_2012.svg",
+      "alt": "Microsoft"
+    },
+    {
+      "path": "public/images/logos/partners/amazon_web_services_logo.svg",
+      "alt": "Amazon Web Services"
+    },
+    {
+      "path": "public/images/logos/partners/google_cloud_logo.svg",
+      "alt": "Google Cloud"
+    },
+    {
+      "path": "public/images/logos/partners/claude-logotype.svg",
+      "alt": "Claude"
+    },
+    {
+      "path": "public/images/logos/partners/openai_logo.svg",
+      "alt": "OpenAI"
+    },
+    {
+      "path": "public/images/logos/partners/byteplus.png",
+      "alt": "BytePlus"
+    }
+  ],
+  "selection": {
+    "target": "object",
+    "label": "Agentes IA",
+    "participantKind": "department"
+  }
+}

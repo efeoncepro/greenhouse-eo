@@ -22,6 +22,46 @@
       "example": "src/lib/brand-surfaces/examples/deck-decision-next-steps-intent.json",
       "slots": null
     },
+    "content-focus": {
+      "contentType": "deck.content-focus",
+      "example": "src/lib/brand-surfaces/examples/deck-content-focus-intent.json",
+      "slots": null
+    },
+    "content-clients": {
+      "contentType": "deck.content-clients",
+      "example": "src/lib/brand-surfaces/examples/deck-content-clients-intent.json",
+      "slots": null
+    },
+    "content-partners": {
+      "contentType": "deck.content-partners",
+      "example": "src/lib/brand-surfaces/examples/deck-content-partners-intent.json",
+      "slots": null
+    },
+    "decision-risk": {
+      "contentType": "deck.decision-risk",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-risk-intent.json",
+      "slots": null
+    },
+    "decision-case": {
+      "contentType": "deck.decision-case",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-case-intent.json",
+      "slots": null
+    },
+    "decision-chart": {
+      "contentType": "deck.decision-chart",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-chart-intent.json",
+      "slots": null
+    },
+    "decision-testimonial": {
+      "contentType": "deck.decision-testimonial",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-testimonial-intent.json",
+      "slots": null
+    },
+    "decision-why-us": {
+      "contentType": "deck.decision-why-us",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-why-us-intent.json",
+      "slots": null
+    },
     "breather": {
       "contentType": "deck.breather",
       "example": "src/lib/brand-surfaces/examples/deck-breather-intent.json",

@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-case",
+  "theme": "light",
+  "voice": {
+    "eyebrow": "Caso · 12 meses",
+    "question": "¿Qué cambió con Sky?",
+    "answer": [
+      "Más rápido"
+    ]
+  },
+  "figures": [
+    {
+      "value": "+2.000",
+      "label": "piezas aprobadas",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    },
+    {
+      "value": "39",
+      "label": "campañas",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    },
+    {
+      "value": "88 %",
+      "label": "entregas a tiempo",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    },
+    {
+      "value": "−25 %",
+      "label": "tiempo de producción",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    }
+  ],
+  "clientLogo": {
+    "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+    "alt": "Sky Airline"
+  },
+  "selected": 4,
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+    "alt": "El equipo creativo de Efeonce arma la pared de pruebas de la campaña"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Performance",
+    "participantKind": "department"
+  }
+}

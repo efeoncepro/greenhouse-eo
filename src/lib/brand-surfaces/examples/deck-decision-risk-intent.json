@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-risk",
+  "theme": "light",
+  "voice": {
+    "eyebrow": "Riesgo controlado",
+    "question": "¿Y si no funciona?",
+    "answer": [
+      "Empiezas",
+      "chico"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 5
+  },
+  "body": "Cada riesgo tiene su cobertura escrita. Y el primer paso es un piloto, no un contrato largo.",
+  "headers": {
+    "risk": "El riesgo",
+    "how": "Cómo lo cubrimos"
+  },
+  "risks": [
+    {
+      "risk": "Que no encajemos",
+      "name": "Sample Sprint",
+      "how": "Un piloto pagado, acotado y gobernado, con informe de cierre y una decisión clara."
+    },
+    {
+      "risk": "Que se atrase",
+      "name": "Métricas con umbral",
+      "how": "OTD ≥ 90 % y FTR ≥ 80 %, medidos cada semana y visibles en tu portal."
+    },
+    {
+      "risk": "Depender de una persona",
+      "name": "Traspaso documentado",
+      "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+    },
+    {
+      "risk": "No ver qué pasa",
+      "name": "Transparencia radical",
+      "how": "La operación en vivo en Greenhouse: lo que pedimos, lo que entregamos y cuánto demora."
+    }
+  ],
+  "selected": 1,
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  }
+}

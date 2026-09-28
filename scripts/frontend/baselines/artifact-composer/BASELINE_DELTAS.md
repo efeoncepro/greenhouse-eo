@@ -1,5 +1,28 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (j) — TASK-1928: la familia prueba
+
+Cuarta familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.18, `axis-ui-contracts` 0.3.16, delta (i) de AXIS):
+el foco sobre la prueba, los clientes con su muro de logos, los partners, el riesgo, el caso, el gráfico, el testimonio
+y por qué elegirnos. Compuestas con sus plates y logos reales y comparadas a ojo contra las ocho referencias: coinciden
+salvo las correcciones de la norma — las respuestas de partners y testimonio a 120 px (3× la pregunta; las referencias,
+110 y 104), la fuente visible de las cifras de clientes, y la fuente real del foco (la referencia imprimía «Datos de
+muestra»). Las cifras llegan por `figures` del contrato con su fuente; una barra sale de su número; los logos de
+terceros se normalizan al componer (asset `logo`: un tono y el mismo peso óptico, con la excepción tonal de AXIS para
+Aguas Andinas y la UC de Temuco). En el probe cada logo es el rótulo sintético `file:probe`. El CSS nuevo está acotado a
+`.gl-cf`, `.gl-cc`, `.gl-cpt`, `.gl-dr`, `.gl-dc`, `.gl-dch`, `.gl-dt` y `.gl-dw`; el resolver nuevo `gl-figure-size`
+sólo lo usa por qué elegirnos. Los hooks suman `selection.item` a seis plantillas y la frase del testimonio a la selección
+sobre la respuesta, sin cambiar a las plantillas previas.
+
+- `templates-graphic-line-deck/ContentFocus.png` — 🆕 deck.content-focus
+- `templates-graphic-line-deck/ContentClients.png` — 🆕 deck.content-clients
+- `templates-graphic-line-deck/ContentPartners.png` — 🆕 deck.content-partners
+- `templates-graphic-line-deck/DecisionRisk.png` — 🆕 deck.decision-risk
+- `templates-graphic-line-deck/DecisionCase.png` — 🆕 deck.decision-case
+- `templates-graphic-line-deck/DecisionChart.png` — 🆕 deck.decision-chart
+- `templates-graphic-line-deck/DecisionTestimonial.png` — 🆕 deck.decision-testimonial
+- `templates-graphic-line-deck/DecisionWhyUs.png` — 🆕 deck.decision-why-us
+
 ## 2026-09-27 (i) — TASK-1928: cotización, próximos pasos y respiro
 
 Tercera familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.17, `axis-ui-contracts` 0.3.15, delta (h) de AXIS):
@@ -729,7 +752,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 4b458b167a10409ac557d5dffff849f008f76a62ef94025f2439904bb1a66fbf -->
+<!-- manifest-digest: e7f639d24e2a2adc7c0ac737e0ec4ab167473d93c99c639e697fbf3ea9dfcd89 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

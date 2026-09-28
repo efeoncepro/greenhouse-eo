@@ -1,0 +1,457 @@
+{
+  "template": "ContentClients",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 200
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 318
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 120
+        },
+        "sourceLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-source-left=500px"
+        },
+        "sourceTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-source-top=1000px"
+        },
+        "sourcePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-source-px=15px"
+        },
+        "questionWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-question-width=320px"
+        },
+        "statsTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stats-top=196px"
+        },
+        "statPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat-px=184px"
+        },
+        "statWght": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat-wght=300"
+        },
+        "statLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat-leading=0.9"
+        },
+        "statTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat-tracking=-0.05em"
+        },
+        "statLabelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat-label-px=23px"
+        },
+        "statLabelGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat-label-gap=14px"
+        },
+        "statLabelInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat-label-inset=8px"
+        },
+        "statLabelWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat-label-width=300px"
+        },
+        "gridLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-grid-left=140px"
+        },
+        "gridTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-grid-top=616px"
+        },
+        "cellWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-cell-width=328px"
+        },
+        "cellHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-cell-height=160px"
+        },
+        "ruleStroke": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-rule=1.5px"
+        },
+        "marketsPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-markets-px=22px"
+        },
+        "marketsTextPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-markets-text-px=20px"
+        },
+        "marketsGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-markets-gap=6px"
+        },
+        "marketsInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-markets-inset=36px"
+        },
+        "logoMaxWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-logo-max-width=230px"
+        },
+        "logoMaxHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-logo-max-height=104px"
+        },
+        "stat1Left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat1-left=760px"
+        },
+        "stat2Left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cc-stat2-left=1290px"
+        }
+      }
+    },
+    "indicator": {
+      "selector": "[data-slot='indicator']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 30,
+          "example": "¿Quién confía en nosotros?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 22,
+          "resolver": "gl-answer",
+          "example": "líderes"
+        },
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 28,
+          "example": "Clientes"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 18,
+          "example": "Marcas"
+        }
+      }
+    },
+    "stats": {
+      "selector": "[data-slot='stats']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 2,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 7
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 60
+          }
+        }
+      },
+      "example": [
+        {
+          "value": "+127%",
+          "label": "tráfico orgánico de Sky frente a LATAM Airlines"
+        },
+        {
+          "value": "+180%",
+          "label": "ventas digitales de Bresler"
+        }
+      ]
+    },
+    "clients": {
+      "selector": "[data-slot='clients']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 9,
+        "maxItems": 9,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "src": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-file-ref"
+          },
+          "alt": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 80,
+            "resolver": "gl-alt"
+          }
+        }
+      },
+      "example": [
+        {
+          "src": "asset-ref:file:probe",
+          "alt": "Sky Airline"
+        },
+        {
+          "src": "asset-ref:file:probe",
+          "alt": "Berel"
+        },
+        {
+          "src": "asset-ref:file:probe",
+          "alt": "Bresler"
+        },
+        {
+          "src": "asset-ref:file:probe",
+          "alt": "Carozzi"
+        },
+        {
+          "src": "asset-ref:file:probe",
+          "alt": "Aguas Andinas"
+        },
+        {
+          "src": "asset-ref:file:probe",
+          "alt": "ANAM"
+        },
+        {
+          "src": "asset-ref:file:probe",
+          "alt": "Marca Chile"
+        },
+        {
+          "src": "asset-ref:file:probe",
+          "alt": "Gobierno de Santiago"
+        },
+        {
+          "src": "asset-ref:file:probe",
+          "alt": "Universidad Católica de Temuco"
+        }
+      ]
+    },
+    "markets": {
+      "selector": "[data-slot='markets']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "title": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "example": "Operamos en"
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 44,
+          "example": "Chile, EE. UU., Colombia, México y Perú"
+        }
+      }
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Fuente: caso publicado de Sky Airlines · caso publicado de Bresler"
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Growth"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "bottom-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "department"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1.2
+        },
+        "targetKind": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "object"
+        },
+        "variant": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "eight-handles"
+        },
+        "padding": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "standard"
+        },
+        "overlay": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "none"
+        },
+        "item": {
+          "type": "number",
+          "required": true,
+          "consumer": "validation-only",
+          "example": 1
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-baked-light.svg"
+    }
+  }
+}

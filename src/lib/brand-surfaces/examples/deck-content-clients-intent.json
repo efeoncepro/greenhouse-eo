@@ -1,0 +1,83 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "content",
+  "recipe": "content-clients",
+  "theme": "light",
+  "voice": {
+    "eyebrow": "Clientes",
+    "question": "¿Quién confía en nosotros?",
+    "answer": [
+      "Marcas",
+      "líderes"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 4
+  },
+  "figures": [
+    {
+      "value": "+127%",
+      "label": "tráfico orgánico de Sky frente a LATAM Airlines",
+      "source": "caso publicado de Sky Airlines"
+    },
+    {
+      "value": "+180%",
+      "label": "ventas digitales de Bresler",
+      "source": "caso publicado de Bresler"
+    }
+  ],
+  "selected": 1,
+  "clients": [
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+      "alt": "Sky Airline"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg",
+      "alt": "Berel"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/bresler.svg",
+      "alt": "Bresler"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/carozzi.svg",
+      "alt": "Carozzi"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/aguas-andinas.svg",
+      "alt": "Aguas Andinas"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg",
+      "alt": "ANAM"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/marca-chile.svg",
+      "alt": "Marca Chile"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/gobierno-santiago.svg",
+      "alt": "Gobierno de Santiago"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/universidad-temuco.svg",
+      "alt": "Universidad Católica de Temuco"
+    }
+  ],
+  "markets": {
+    "title": "Operamos en",
+    "text": "Chile, EE. UU., Colombia, México y Perú"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Growth",
+    "participantKind": "department"
+  }
+}
