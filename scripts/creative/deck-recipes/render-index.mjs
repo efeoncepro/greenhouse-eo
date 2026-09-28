@@ -12,7 +12,11 @@
  *
  * Uso:
  *   pnpm brand:deck-recipes            # valida y reescribe el índice
- *   pnpm brand:deck-recipes -- --check # valida y falla si el índice escrito no coincide (no escribe)
+ *   pnpm brand:deck-recipes -- --check # valida y falla si el índice escrito o el catálogo de runtime no coinciden (no escribe)
+ *
+ * También escribe el catálogo de runtime `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` (TASK-1929): lo
+ * que el validador del plan de deck necesita de cada receta, más la página de AXIS de su intent de ejemplo. Ningún
+ * módulo de `src/` lee el JSON aprobado de `docs/` en runtime: importa este artefacto.
  *   node scripts/creative/deck-recipes/render-index.mjs --json <copia.json> --readme <copia.md>  # pruebas
  *
  * Sin dependencias: Node ESM puro. Salida determinística (sin fechas de corrida) para que el diff sólo cambie
@@ -240,6 +244,7 @@ for (const recipe of recipes) {
 
 // La plantilla de cada receta: `recipe-map.json` nombra el contentType y `registry.json` confirma que existe.
 let templateOf = () => null
+let exampleOf = () => null
 
 try {
   const map = JSON.parse(readFileSync(mapPath, 'utf8'))
@@ -260,6 +265,17 @@ try {
         errors.push(`recipe-map: el ejemplo de ${id} no existe (${entry.example})`)
       }
     }
+  }
+
+  exampleOf = id => {
+    const ref = map?.recipes?.[id]?.example
+
+    if (!ref) return null
+
+    const [file, fragment] = ref.split('#page=')
+    const intent = JSON.parse(readFileSync(resolve(repo, file), 'utf8'))
+
+    return fragment ? { ...intent.pages[Number(fragment) - 1], use: intent.use, theme: intent.theme } : intent
   }
 
   templateOf = id => {
@@ -380,7 +396,59 @@ lines.push(END)
 
 const block = lines.join('\n')
 
-// 4. Escribir o comprobar.
+// 4. El catálogo de runtime (TASK-1929): lo que el validador del plan de deck lee de cada receta. La página de AXIS es
+// el intent de ejemplo sin lo que el documento propaga (contrato, superficie, formato, uso, navegación): el validador
+// arma con ellas el documento que valida `resolveSurfaceDocument`.
+const modulePath = resolve(argValue('--module') ?? resolve(repo, 'src/lib/brand-surfaces/deck-recipes/catalog.generated.json'))
+const PROPAGATED = ['contract', 'version', 'surface', 'format', 'use', 'progress']
+
+const runtimeRecipe = recipe => {
+  const example = exampleOf(recipe.id)
+  const page = example ? Object.fromEntries(Object.entries(example).filter(([key]) => !PROPAGATED.includes(key))) : null
+  const related = relation => recipe.pairsWith.filter(pair => pair.relation === relation).map(pair => pair.recipe)
+
+  return {
+    id: recipe.id,
+    name: recipe.name,
+    family: recipe.family,
+    documents: recipe.documents,
+    surface: recipe.surface,
+    photo: { uses: recipe.photo?.uses === true, plate: recipe.photo?.uses === true ? (recipe.photo.plate ?? null) : null },
+    pairs: { coverClose: related('cover↔close'), variant: related('variant'), sequence: related('sequence') },
+    slots: recipe.slots.map(slot => ({ name: slot.name, type: slot.type, required: slot.required === true, maxChars: slot.maxChars ?? null })),
+    template: templateOf(recipe.id),
+    axis: example
+      ? {
+          recipe: example.recipe,
+          layout: example.layout ?? null,
+          role: example.role ?? null,
+          theme: example.theme ?? null,
+          uses: example.use ? [example.use] : [],
+          progress: Boolean(example.progress),
+          page
+        }
+      : null
+  }
+}
+
+const runtimeCatalog = {
+  $comment: `GENERADO por scripts/creative/deck-recipes/render-index.mjs desde ${rel(jsonPath)} y los intents de ejemplo de recipe-map.json. No se edita a mano: corre «pnpm brand:deck-recipes».`,
+  schema: 'efeonce.deck-recipes.runtime.v1',
+  source: { schema: catalog.schema, version: catalog.version, approvedAt: catalog.approvedAt },
+  axisRecipeFamilies: axisFamilies,
+  recipes: recipes.map(runtimeRecipe)
+}
+
+const moduleText = `${JSON.stringify(runtimeCatalog, null, 2)}\n`
+let currentModule = null
+
+try {
+  currentModule = readFileSync(modulePath, 'utf8')
+} catch {
+  currentModule = null
+}
+
+// 5. Escribir o comprobar el índice.
 let readme
 
 try {
@@ -400,15 +468,18 @@ const next = readme.slice(0, startAt) + block + readme.slice(endAt + END.length)
 const checkOnly = process.argv.includes('--check')
 
 if (checkOnly) {
-  if (next !== readme) {
-    fail([`el índice de ${rel(readmePath)} está desactualizado: corre «pnpm brand:deck-recipes»`])
-  }
+  const stale = []
 
-  console.log(`✓ ${recipes.length} recetas válidas; índice de ${rel(readmePath)} al día.`)
+  if (next !== readme) stale.push(`el índice de ${rel(readmePath)} está desactualizado: corre «pnpm brand:deck-recipes»`)
+  if (currentModule !== moduleText) stale.push(`el catálogo de runtime ${rel(modulePath)} no coincide con el JSON aprobado: corre «pnpm brand:deck-recipes»`)
+  if (stale.length > 0) fail(stale)
+
+  console.log(`✓ ${recipes.length} recetas válidas; índice de ${rel(readmePath)} y catálogo de runtime al día.`)
   process.exit(0)
 }
 
 if (next !== readme) writeFileSync(readmePath, next)
+if (currentModule !== moduleText) writeFileSync(modulePath, moduleText)
 
 console.log(
   `✓ ${recipes.length} recetas válidas (${FAMILIES.filter(([id]) => recipes.some(recipe => recipe.family === id)).length} familias); índice ${next === readme ? 'sin cambios' : 'reescrito'} en ${rel(readmePath)}.`

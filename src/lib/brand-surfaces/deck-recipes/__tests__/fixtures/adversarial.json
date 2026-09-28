@@ -1,0 +1,294 @@
+[
+  {
+    "name": "eslogan en la portada",
+    "expect": [
+      "slot-unknown"
+    ],
+    "plan": {
+      "document": "brochure",
+      "slides": [
+        {
+          "recipeId": "cover-brochure-cine-lines",
+          "slots": {
+            "eyebrow": "Brochure · Servicios 2026",
+            "question": "¿Qué hace Efeonce?",
+            "answer": "Crecer",
+            "evidence": "**Cinco** líneas de servicio:\nGrowth · Brand · Engine · Voice · Revenue",
+            "sloganLineWord": "Growth",
+            "photo": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png"
+          }
+        },
+        {
+          "recipeId": "proposal-cinematic-creative"
+        },
+        {
+          "recipeId": "close-brochure-orbit"
+        }
+      ]
+    }
+  },
+  {
+    "name": "portada y cierre con foto",
+    "expect": [
+      "frame-photo-must-alternate",
+      "pair-cover-close-mismatch"
+    ],
+    "plan": {
+      "document": "brochure",
+      "slides": [
+        {
+          "recipeId": "cover-brochure-cine-lines"
+        },
+        {
+          "recipeId": "proposal-cinematic-creative"
+        },
+        {
+          "recipeId": "close-brochure-horizon"
+        }
+      ]
+    }
+  },
+  {
+    "name": "cotización en un brochure",
+    "expect": [
+      "recipe-not-for-document"
+    ],
+    "plan": {
+      "document": "brochure",
+      "slides": [
+        {
+          "recipeId": "cover-brochure-cine-lines"
+        },
+        {
+          "recipeId": "proposal-cinematic-creative"
+        },
+        {
+          "recipeId": "content-pricing"
+        },
+        {
+          "recipeId": "close-brochure-orbit"
+        }
+      ]
+    }
+  },
+  {
+    "name": "variantes seguidas",
+    "expect": [
+      "variant-adjacent"
+    ],
+    "plan": {
+      "document": "proposal",
+      "slides": [
+        {
+          "recipeId": "cover-proposal-orbit"
+        },
+        {
+          "recipeId": "proposal-service-aeo"
+        },
+        {
+          "recipeId": "content-pricing"
+        },
+        {
+          "recipeId": "content-pricing-stage"
+        },
+        {
+          "recipeId": "close-proposal-horizon"
+        }
+      ]
+    }
+  },
+  {
+    "name": "plate repetido",
+    "expect": [
+      "plate-repeated"
+    ],
+    "plan": {
+      "document": "proposal",
+      "slides": [
+        {
+          "recipeId": "cover-proposal-orbit"
+        },
+        {
+          "recipeId": "proposal-service-creative"
+        },
+        {
+          "recipeId": "decision-case"
+        },
+        {
+          "recipeId": "close-proposal-horizon"
+        }
+      ]
+    }
+  },
+  {
+    "name": "texto sobre maxChars",
+    "expect": [
+      "slot-over-max-chars"
+    ],
+    "plan": {
+      "document": "brochure",
+      "slides": [
+        {
+          "recipeId": "cover-brochure-cine-lines",
+          "slots": {
+            "eyebrow": "Brochure · Servicios 2026",
+            "question": "¿Qué hace Efeonce?",
+            "answer": "Crecer con foco y medida",
+            "evidence": "**Cinco** líneas de servicio:\nGrowth · Brand · Engine · Voice · Revenue",
+            "photo": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png"
+          }
+        },
+        {
+          "recipeId": "proposal-cinematic-creative"
+        },
+        {
+          "recipeId": "close-brochure-orbit"
+        }
+      ]
+    }
+  },
+  {
+    "name": "plantilla en vez de receta",
+    "expect": [
+      "template-named-instead-of-recipe"
+    ],
+    "plan": {
+      "document": "brochure",
+      "slides": [
+        {
+          "recipeId": "CoverBrochure"
+        },
+        {
+          "recipeId": "deck.content-text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "receta inventada",
+    "expect": [
+      "recipe-unknown"
+    ],
+    "plan": {
+      "document": "proposal",
+      "slides": [
+        {
+          "recipeId": "cover-proposal-orbit"
+        },
+        {
+          "recipeId": "proposal-service-seo"
+        },
+        {
+          "recipeId": "close-proposal-horizon"
+        }
+      ]
+    }
+  },
+  {
+    "name": "dos cierres",
+    "expect": [
+      "frame-count"
+    ],
+    "plan": {
+      "document": "pitch",
+      "slides": [
+        {
+          "recipeId": "cover-classic"
+        },
+        {
+          "recipeId": "content-text"
+        },
+        {
+          "recipeId": "close-classic"
+        },
+        {
+          "recipeId": "close-classic"
+        }
+      ]
+    }
+  },
+  {
+    "name": "próximos pasos tras el diagnóstico",
+    "expect": [
+      "next-steps-after-diagnosis"
+    ],
+    "plan": {
+      "document": "proposal",
+      "diagnosisDone": true,
+      "slides": [
+        {
+          "recipeId": "cover-proposal-orbit"
+        },
+        {
+          "recipeId": "proposal-service-aeo"
+        },
+        {
+          "recipeId": "decision-next-steps"
+        },
+        {
+          "recipeId": "close-proposal-horizon"
+        }
+      ]
+    }
+  },
+  {
+    "name": "cierre que no es pareja",
+    "expect": [
+      "pair-cover-close-mismatch"
+    ],
+    "plan": {
+      "document": "proposal",
+      "slides": [
+        {
+          "recipeId": "cover-proposal-orbit"
+        },
+        {
+          "recipeId": "proposal-service-aeo"
+        },
+        {
+          "recipeId": "close-brochure-orbit"
+        }
+      ]
+    }
+  },
+  {
+    "name": "portada que no va primero",
+    "expect": [
+      "frame-order"
+    ],
+    "plan": {
+      "document": "proposal",
+      "slides": [
+        {
+          "recipeId": "proposal-service-aeo"
+        },
+        {
+          "recipeId": "cover-proposal-orbit"
+        },
+        {
+          "recipeId": "close-proposal-horizon"
+        }
+      ]
+    }
+  },
+  {
+    "name": "brochure que no abre con portada",
+    "expect": [
+      "brochure-cover-first"
+    ],
+    "plan": {
+      "document": "brochure",
+      "slides": [
+        {
+          "recipeId": "proposal-cinematic-creative"
+        },
+        {
+          "recipeId": "cover-brochure-cine-lines"
+        },
+        {
+          "recipeId": "close-brochure-orbit"
+        }
+      ]
+    }
+  }
+]

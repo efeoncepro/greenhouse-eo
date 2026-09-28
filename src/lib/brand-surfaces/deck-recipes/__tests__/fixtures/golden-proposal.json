@@ -1,0 +1,32 @@
+{
+  "document": "proposal",
+  "slides": [
+    {
+      "recipeId": "cover-proposal-orbit"
+    },
+    {
+      "recipeId": "decision-agenda"
+    },
+    {
+      "recipeId": "section-split"
+    },
+    {
+      "recipeId": "proposal-service-aeo"
+    },
+    {
+      "recipeId": "method-staircase"
+    },
+    {
+      "recipeId": "content-clients"
+    },
+    {
+      "recipeId": "content-pricing"
+    },
+    {
+      "recipeId": "decision-next-steps"
+    },
+    {
+      "recipeId": "close-proposal-horizon"
+    }
+  ]
+}
