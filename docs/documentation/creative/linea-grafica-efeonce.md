@@ -498,7 +498,7 @@ portal, Nexa o MCP, es TASK-1932.
 > Detalle técnico: [composición de decks y brochures, «Validar y proponer el plan»](./composicion-de-decks-y-brochures.md#validar-y-proponer-el-plan-antes-de-componer) ·
 > [manual, paso 4b](../../manual-de-uso/creative/componer-deck-con-recetas.md#paso-4b--valida-el-plan-antes-de-componer) ·
 > [catálogo de recetas, códigos](../../operations/brand-graphic-line/deck-recipes/README.md#validar-el-plan-códigos-y-cómo-leerlos) ·
-> [TASK-1929](../../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md)
+> [TASK-1929](../../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md)
 
 ## Estado y pendientes
 

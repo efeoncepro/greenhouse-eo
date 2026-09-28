@@ -51,7 +51,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `crm|content|platform`
-- Blocked by: `TASK-1921, TASK-1929, TASK-1930, TASK-1931`
+- Blocked by: `TASK-1921, TASK-1930, TASK-1931`
 - Branch: `Greenhouse develop; efeonce-mcp main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

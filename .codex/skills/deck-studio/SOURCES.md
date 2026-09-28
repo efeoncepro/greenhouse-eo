@@ -354,7 +354,7 @@ No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y 
   de las 38 recetas restantes y la portada con selección; `complete` el 2026-09-28, aprobada por el operador). Siguientes:
   `docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md` (ruta productiva; `in-progress`
   en otra sesión, no está disponible), `docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md`
-  (plates), `docs/tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md` (plan de deck validado contra el
+  (plates), `docs/tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md` (plan de deck validado contra el
   catálogo; code complete en `develop` local, commits `651bb0972`, `5a1fb974b`, `248d3e1de`) y, en `docs/tasks/to-do/`,
   TASK-1930 (datos reales en los slots), TASK-1931 (banco de plates gobernado), TASK-1932 (Proposal Studio arma el deck
   desde recetas; consume `validateDeckPlan`/`proposeDeckPlan`) y TASK-1933 (pendientes de QA del catálogo).

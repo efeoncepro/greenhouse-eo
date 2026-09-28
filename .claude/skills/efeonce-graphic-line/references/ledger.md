@@ -168,7 +168,7 @@
     Andinas y la UC de Temuco; las barras del gráfico salen de su número (índice, antes = 100); el stack no pinta los
     «pilares de luz» del guion (en la referencia aprobada nunca se vieron).
   **Pendiente:** nada de TASK-1928; siguen TASK-1930…1933 y la ruta productiva (TASK-1921).
-- Plan del deck contra el catálogo (TASK-1929, 2026-09-28): **code complete en `develop` local** (commits `651bb0972`,
+- Plan del deck contra el catálogo (TASK-1929, 2026-09-28): **complete (2026-09-28), en `develop`** (commits `651bb0972`,
   `5a1fb974b`, `248d3e1de`), `in-progress` hasta docs y gates de cierre. Catálogo de runtime
   `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` (esquema `efeonce.deck-recipes.runtime.v1`, lo genera
   `pnpm brand:deck-recipes`), `validateDeckPlan` (piso AXIS + 14 errores y 3 avisos del catálogo) y

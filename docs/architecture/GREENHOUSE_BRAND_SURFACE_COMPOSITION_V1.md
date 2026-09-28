@@ -8,7 +8,7 @@
 > **Contrato y valores (AXIS):** ADR [`SURFACE_COMPOSITION_DECISION_V1.md`](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md) del repo `efeoncepro/axis-design-system` (contrato `efeonce.surface-composition` 0.1.2, deltas (b)…(l)); guía `docs/agent-composition/surfaces/deck.md` del mismo repo.
 > **Norma de marca:** [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (qué se aprobó por superficie, §2.1 ruta por el composer, §4.6 deck) · catálogo de recetas [`deck-recipes/`](../operations/brand-graphic-line/deck-recipes/README.md).
 > **Motor:** [`GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`](GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md) (el composer es domain-free; las superficies son catálogos) · invariantes [`COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`](agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md).
-> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69) · [TASK-1929](../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md) (plan de deck contra el catálogo, §12; code complete, en cierre).
+> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69) · [TASK-1929](../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) (plan de deck contra el catálogo, §12; code complete, en cierre).
 > **Manuales:** [componer por superficie con AXIS](../manual-de-uso/creative/componer-por-superficie-con-axis.md) · [componer un deck con las recetas](../manual-de-uso/creative/componer-deck-con-recetas.md) · runbook del gate [`composer-visual-gate.md`](../operations/runbooks/composer-visual-gate.md).
 
 ## 1. Qué es y dónde termina
@@ -710,7 +710,7 @@ verdes.
 
 - **Ruta productiva:** TASK-1921 (in-progress, otra sesión): command/API, consumer del `artifact-worker`, MCP; debe
   aceptar también el intent de documento. Hasta que cierre, `pnpm brand:compose` es el taller local.
-- **TASK-1929 (code complete, en cierre):** el plan de un deck se valida contra el catálogo y un agente lo propone
+- **TASK-1929 (complete, 2026-09-28):** el plan de un deck se valida contra el catálogo y un agente lo propone
   (§12). Falta cerrar la task: documentación, gates de cierre y `pnpm build`. El plan todavía no se confirma, no se
   persiste ni se compone de un paso: eso es TASK-1932 y TASK-1921.
 - **TASK-1930:** datos reales en los slots (logo del cliente, montos, equipo, métricas, casos).

@@ -574,8 +574,7 @@ Si una `notes` del JSON contradice estas decisiones, mandan las decisiones.
 
 **Flujo:** mensaje → **plan** (ids de receta en orden) → `pnpm brand:deck-plan -- --plan plan.json` (corrige **todo**
 error; lee los avisos) → intent por lámina o documento con `pages` → `pnpm brand:compose`. El validador es la puerta
-entre elegir y componer: un plan con error no se compone. Estado: code complete en `develop` local (TASK-1929
-`in-progress` hasta el cierre).
+entre elegir y componer: un plan con error no se compone. Estado: `complete` en `develop` (TASK-1929, 2026-09-28).
 
 **`plan.json`** (tipo `DeckPlan`; ejemplos en `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-*.json`):
 

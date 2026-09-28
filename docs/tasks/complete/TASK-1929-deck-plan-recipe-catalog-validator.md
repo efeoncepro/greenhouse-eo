@@ -23,7 +23,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -36,7 +36,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Code complete 2026-09-28: catálogo de runtime, validateDeckPlan, proposeDeckPlan y CLI brand:deck-plan con tests verdes y una corrida real; docs y skills al día; pnpm test completo verde; pendiente pnpm build con autorización`
+- Status real: `Complete 2026-09-28: catálogo de runtime, validateDeckPlan, proposeDeckPlan y CLI pnpm brand:deck-plan; pnpm test completo (1875 archivos) y pnpm build verdes sobre 3d873e004; docs y skills al día`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -427,11 +427,11 @@ Sin flag: aditivo y repo-only. Nada productivo lo invoca hasta que TASK-1932 lo 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [x] `## Delta` en TASK-1930, TASK-1932 y TASK-1921 con la firma final de `validateDeckPlan` y `proposeDeckPlan`

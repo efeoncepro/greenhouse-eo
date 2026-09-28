@@ -126,7 +126,7 @@ dos esferas en una pieza (manzana + lente u órbita).
     ([applications.md §L](references/applications.md), «Añadir o modificar una receta del deck»). **Estado
     (2026-09-28):** TASK-1927 y TASK-1928 `complete`, aprobadas por el operador y en `origin/develop`; la ruta
     productiva (TASK-1921) está `in-progress` en otra sesión y **no** está disponible; el validador del plan (TASK-1929)
-    está code complete en `develop` local.
+    está `complete` en `develop`.
 14. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado; la prueba sin
     logo va antes de cualquier pauta con la órbita. «Te hacemos visible» no sale a pauta sin revisión legal.
 

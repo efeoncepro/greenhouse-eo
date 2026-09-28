@@ -303,7 +303,7 @@ Reglas de la propuesta:
 > `generateStructuredAnthropic` con un enum de ids de receta y un reintento · comando `pnpm brand:deck-plan`
 > ([`scripts/brand-surfaces/deck-plan.ts`](../../../scripts/brand-surfaces/deck-plan.ts)) ·
 > [arquitectura](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) ·
-> [TASK-1929](../../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md).
+> [TASK-1929](../../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md).
 
 ## Qué entrega
 
@@ -369,7 +369,7 @@ El operador aprobó a ojo las láminas compuestas el 2026-09-27 (TASK-1927) y el
 portada con selección (TASK-1928). Esa aprobación cubre las plantillas, no cada pieza futura.
 
 > Detalle técnico: [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) ·
-> [TASK-1929](../../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md) ·
+> [TASK-1929](../../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) ·
 > [TASK-1930](../../tasks/to-do/TASK-1930-deck-recipe-slot-data-bindings.md) ·
 > [TASK-1931](../../tasks/to-do/TASK-1931-brand-plate-bank-governed.md) ·
 > [TASK-1932](../../tasks/to-do/TASK-1932-proposal-studio-graphic-line-deck-output.md) · cierres en

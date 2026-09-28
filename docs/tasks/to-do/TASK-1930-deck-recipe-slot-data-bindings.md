@@ -52,7 +52,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `crm|content`
-- Blocked by: `TASK-1929`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -134,7 +134,7 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-1417-chapter-author-economico.md` (hechos económicos desde la proyección congelada)
 - `docs/tasks/to-do/TASK-1418-chapter-author-squad.md` (hechos del roster y allowlist `squad-person`)
-- `docs/tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md` (plan y contrato de slots)
+- `docs/tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md` (plan y contrato de slots)
 - `docs/manual-de-uso/creative/componer-deck-con-recetas.md`
 
 ## Dependencies & Impact
