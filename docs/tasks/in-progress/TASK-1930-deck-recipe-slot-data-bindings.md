@@ -494,8 +494,8 @@ Sin flag propio: lectura pura sin consumer productivo. El cutover productivo lo 
 
 ## Follow-ups
 
-- Biblioteca canónica de casos, testimonios y logos autorizados de Efeonce fuera de una `Proposal`, si el operador la
-  pide para brochures y pitches.
+- Biblioteca canónica de casos, testimonios y logos autorizados de Efeonce fuera de una `Proposal`: registrada como
+  [TASK-1937](../to-do/TASK-1937-third-party-brand-usage-authorization-library.md) (pedido del operador 2026-09-28).
 - Binder de fotos de caso reales desde el banco de plates (TASK-1931) cuando el caso tenga plate aprobado.
 
 ## Open Questions
