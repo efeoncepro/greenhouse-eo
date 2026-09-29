@@ -2,7 +2,7 @@
   "$comment": "GENERADO por `pnpm glitch:tokens` desde @efeoncepro/axis-tokens (glitchLine). NO EDITAR A MANO: el test de sincronía detecta el drift.",
   "source": {
     "package": "@efeoncepro/axis-tokens",
-    "version": "0.3.24"
+    "version": "0.3.28"
   },
   "status": "candidate",
   "franchise": "glitch",
@@ -310,8 +310,27 @@
     "weekly": {
       "numbered": true,
       "masthead": "edition-number",
+      "numbering": {
+        "source": "published-editions",
+        "registry": "https://efeoncepro.com/glitch/",
+        "rule": "greater-than-last-published",
+        "validatedBy": "consumer",
+        "stateInToken": "never"
+      },
       "progress": {
         "segments": 8
+      },
+      "chips": {
+        "cover": "LA NOTICIA"
+      },
+      "narratorCloser": {
+        "rule": "varies-per-edition",
+        "never": [
+          "fixed-phrase"
+        ],
+        "mayMention": [
+          "next-edition-number"
+        ]
       }
     },
     "flash": {
@@ -351,6 +370,32 @@
           },
           "density": "grows-towards-word",
           "side": "left-of-word",
+          "contexts": {
+            "large": {
+              "widthPx": 150,
+              "gapPx": 14,
+              "pieces": [
+                "flash-portada",
+                "flash-contraportada",
+                "flash-blog-banner",
+                "flash-threads"
+              ]
+            },
+            "compact": {
+              "widthPx": 66,
+              "gapPx": 8,
+              "pieces": [
+                "flash-interior"
+              ]
+            },
+            "news": {
+              "widthPx": 96,
+              "gapPx": 10,
+              "pieces": [
+                "flash-blog-banner-interno"
+              ]
+            }
+          },
           "gapPx": 14,
           "widthPx": {
             "compact": 66,
