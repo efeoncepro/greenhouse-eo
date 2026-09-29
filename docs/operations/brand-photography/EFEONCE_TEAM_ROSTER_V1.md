@@ -77,11 +77,17 @@ con Vision (distancia ojos → mentón); Daniela y Humberly un poco más lejos d
 | Dónde | Qué hay |
 | --- | --- |
 | GCP (público) | `gs://efeonce-group-axis-public-media/team/avatars/v1/1080/<nombre-apellido>.png` (maestros) y `…/v1/800/` (web). URL: `https://storage.googleapis.com/efeonce-group-axis-public-media/team/avatars/v1/1080/<nombre-apellido>.png` |
-| OneDrive del equipo | `Alineación/6. Marca/Kit media/Avatar/2026-09 La órbita/` (para la foto de perfil de Teams y Outlook) |
+| OneDrive del equipo | `Alineación/6. Marca/Kit media/Avatar/2026-09 La órbita/` (los seis) y la carpeta de cada persona (`Kit media/<Nombre>/`): `EO_Avatar-<Nombre-Apellido>-2026-09.png` y `firma-<nombre-apellido>.zip`; lo anterior, en `Viejo/` |
+| Página de descarga | `https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html` (una por persona: descarga en un clic, dónde cambiar la foto en Teams, Outlook, Notion, Frame.io y HubSpot, y enlace a su firma) e `…/team/kit/index.html` (el equipo). Generador: `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs` |
 | Repo (800 px) | `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-<persona>.png` (deck) y `public/images/greenhouse/team/` (portal; Julio en `EO_Avatar-Julio-Reyes.png`) |
 | Proceso | `ai-generations/2026-09-29_avatares-equipo/` (`componer-avatares.mjs`, `extender*.mjs`, `medir-rostro.swift`) |
 
 Slugs: `julio-reyes`, `andres-carlosama`, `daniela-ferreira`, `melkin-hernandez`, `humberly-henriquez`, `valentina-hoyos`.
+
+Aviso al equipo (2026-09-29, pedido del operador): tarjeta 1:1 del TeamBot a Andrés, Daniela, Melkin, Humberly y Valentina
+con su página (runs `teams-avatar-*`, correlación `manual-avatar-announcement-2026-09-29-avatar-orbita`, identidad
+verificada en Entra antes de cada envío) y mensaje en EO Team con las cinco menciones reconocidas por Teams y la página
+del equipo.
 
 ## Firmas de correo del equipo (2026-09-29)
 
