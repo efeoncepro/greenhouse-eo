@@ -1,5 +1,15 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
+## Delta 2026-09-29 — Marketing con Manzanitas existe en el Composer, pero no en esta ruta
+
+- `TASK-1939` (`1050036e8`) agregó los catálogos `manzanitas-carousel` y `manzanitas-stills`, el mapper puro
+  `planManzanitasIntent` (`src/lib/manzanitas-composition`) y `materializeManzanitasAssets` (sharp). Compone sólo en
+  local (`pnpm manzanitas:compose`). Para sumarlo a esta ruta: el command llama `planManzanitasIntent` y
+  `materializeManzanitasAssets` con otro `SourceLoader`, e inyecta el painter de gráficos (`scripts/manzanitas/painters.ts`,
+  que el worker debe poder importar) al crear los catálogos; sin painter, una lámina de gráfico falla cerrada.
+- Todo bump de `@efeoncepro/axis-tokens` corre ahora también `pnpm manzanitas:tokens --check` (además de
+  `brand:tokens` y `glitch:tokens`).
+
 ## Delta 2026-09-28 (noche) — el Glitch Flash existe en el Composer, pero no en esta ruta
 
 - El commit local `24e4c72ee` (sin push al escribir esto) agregó el **Glitch Flash**: `GlitchFlashManifest` (hermano del

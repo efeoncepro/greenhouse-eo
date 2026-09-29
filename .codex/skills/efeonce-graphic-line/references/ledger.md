@@ -1,8 +1,8 @@
 # Registro de decisiones y versiones
 
-> Verificado contra: greenhouse-eo@24e4c72ee (local, sin push) — 2026-09-28 (últimas filas: Glitch Flash publicado en
-> AXIS `v0.3.24` y compuesto en el Artifact Composer; antes, greenhouse-eo@9b531b396: Glitch Flash, muletilla variable,
-> chip «LA NOTICIA»).
+> Verificado contra: greenhouse-eo@1050036e8 (`develop`) — 2026-09-29 (última fila: las siete decisiones de Marketing
+> con Manzanitas publicadas en AXIS `v0.3.28` y su catálogo del Artifact Composer, TASK-1939; antes, greenhouse-eo@24e4c72ee:
+> Glitch Flash publicado en AXIS `v0.3.24` y compuesto en el Artifact Composer).
 
 > Documento vivo. Cada decisión del operador y cada versión publicada se registra acá con su fecha, en el mismo commit
 > que la aplica. Lo que no está aquí no se da por decidido.
@@ -78,6 +78,7 @@
 | 2026-09-28 | **Marketing con Manzanitas publicado en AXIS (push y tags autorizados por el operador: «Empuja todo junto»).** AXIS `main` `06cb62d`, tag `v0.3.26`: `axis-tokens` 0.3.26 (`manzanitasRegister`), `axis-ui-contracts` 0.3.24 (`efeonce.manzanitas-register` 0.1.0 `candidate`, `pnpm manzanitas:resolve`), `axis-brand-assets` 0.4.1 (`AXIS_MANZANITAS_ASSETS`) y `axis-graphic-line` 0.10.0 (`/charts`); el release de Glitch `v0.3.25` salió primero en el mismo push. Lab https://axis.efeonce.org/references/manzanitas/. Paridad geométrica con el canvas, no de píxeles; ninguna pendiente decidida. Greenhouse aún no fija estas versiones. Al cerrar la task salió el parche `v0.3.27` (`axis-ui-contracts` 0.3.27, contrato 0.1.1): el carrusel empieza con su portada y termina con su contraportada; antes una Lente podía abrirlo. Detalle: [manzanitas.md](manzanitas.md) §10.3 · TASK-1936 |
 | 2026-09-29 | **El eslogan es un elemento gráfico que acompaña la marca, no un texto: siempre debajo del logo y al 64 % de su ancho** («el eslogan no es un simple texto es un elemento gráfico que acompaña la marca»; pidió 85 % y confirmó el 64 % del canon: «Ponlo a 64% entonces esta bien»). Se dimensiona desde el logo (cuerpo = 0,64 × logo ÷ 11,586 em). Aplicado al correo de Insights y al informe del Grader en el canvas. |
 | 2026-09-29 | **«¿Conversamos? Cuando quieras.» sigue siempre la norma de la voz** («debe ser las normas de /efeonce-graphic-line»): pregunta chica con anillo, respuesta ≥ 3× en Bricolage 760 con la esfera en lugar del punto, también fuera del deck (contraportada A4 del informe del Grader). |
+| 2026-09-29 | **Marketing con Manzanitas: siete pendientes decididas y el registro compone en el Artifact Composer (TASK-1939).** Decisiones del operador: (1) la voz de «Desliza» en Voice es **Trazo** (`swipe.lineOverrides.voice`; en La órbita, Voice sigue sin voz de ícono); (2) los gráficos, la lámina de dato y el texto denso **no suman** a «nunca más de tres Pizarras seguidas» **ni cortan** la racha (`recreo.pizarraRun`); (3) la portada Pizarra con la mano en respuesta es una **excepción registrada** (`cover-pizarra-swipe-response`); (4) la zona segura de la story es **el 87 % de AXIS** (la firma de la Escena story sube a y 1619); (8) las recetas de gráficos siguen **sólo para MCM**; (9) el navy `#022a4e` del texto del logo es **tinta compartida de la familia Manzanitas** (Glitch lo declaró compartido: `glitchLine.scope.sharedWithEditorialFamily`, Greenhouse `c1e0ddfae`); (10) un tema de **Salesforce** lleva `revenue-salesforce` y uno de HubSpot o genérico, `revenue-hubspot`. **Siguen abiertas:** (5) el copy de cierre de la story, (6) el cine con personas del equipo en redes y (7) los Trazo `republicar` y `enviar`. Publicadas en AXIS con el tag `v0.3.28` (commit `2bfe206` en `main`): `axis-tokens` 0.3.28 (`manzanitasRegister.resolvedDecisions`), `axis-ui-contracts` 0.3.28 (contrato `efeonce.manzanitas-register` **0.2.0**, acepta intents 0.1.x) y `axis-graphic-line` 0.10.1; Greenhouse las fija con `axis-brand-assets` 0.4.1. **Composer (TASK-1939, `in-progress`, commit `1050036e8`):** `pnpm manzanitas:compose`, dos catálogos sobre una carpeta (`manzanitas-carousel` PDF y `manzanitas-stills` PNG), 18 plantillas para las 26 piezas aprobadas, painter de gráficos inyectado, assets precoloreados por línea, reglas de una línea que fallan cerradas y gate `pnpm composer:visual-gate --catalog=manzanitas` (sección `2026-09-29 (r)` de `BASELINE_DELTAS.md`). Los tres cierres aplican la regla del eslogan del 2026-09-29: con el logo de 400 px **sólo Voice** lleva la palabra en el acento (consecuencia que se le presenta al operador), y el cierre de YouTube pasa el eslogan de encima a debajo del logo. **Pendiente:** la aprobación visual del operador de los carruseles de ejemplo. Hallazgos para un patch de AXIS y detalle: [manzanitas.md](manzanitas.md) §10.1, §10.3 y §13 · ADR `MANZANITAS_REGISTER_DECISION_V1.md`, Delta 2026-09-29. |
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
@@ -107,12 +108,11 @@
 - **Manzanitas, prueba de contenidos creativos (2026-09-28):** carrusel de Creative Workflows en la línea Brand
   (acento naranja/frambuesa, «Empower your Brand», Plastilina, luz naranja en las fotos `MCB1c` y `MCB3`). Espera la
   revisión del operador; no es canon todavía.
-- **Manzanitas, registro (2026-09-28):** los pendientes del registro (voz de «Desliza» en Voice; si los gráficos cuentan
-  para «tres Pizarras seguidas»; la portada con la mano en respuesta; zona segura y copy de cierre de la story; cine con
-  personas del equipo; si los gráficos pasan a La órbita; el navy `#022a4e` del logo, que Glitch declara suyo; el acento
-  de un tema de Revenue en Salesforce; Trazo `republicar`/`enviar`) viven en [manzanitas.md](manzanitas.md) §13.
-- **Manzanitas, zona segura de la story:** la firma de la Escena story (1620–1671) cae en la franja de interfaz de la
-  lámina (desde y 1580) aunque respeta el 87 % de AXIS. Decidir cuál manda antes de rehacer la toma.
+- **Manzanitas, registro (actualizado el 2026-09-29):** siete de las diez pendientes se decidieron el 2026-09-29 (fila
+  de decisiones de ese día; la zona segura de la story, entre ellas). Siguen abiertas el copy de cierre de la story, el
+  cine con personas del equipo en redes y los Trazo `republicar`/`enviar` ([manzanitas.md](manzanitas.md) §13). Esperan
+  además al operador la aprobación visual de los carruseles de ejemplo del Composer (TASK-1939) y la consecuencia del
+  eslogan en los cierres (con el logo de 400 px, sólo Voice lleva la palabra en el acento).
 - **Deck compuesto (TASK-1927, 2026-09-27):** la aprobación visual ya está dada (fila del 2026-09-27 arriba). Sigue
   abierta la pregunta de la **sección partida**, anotada en el token: el indicador barre las secciones ya recorridas,
   (n−1) de N: ¿se unifica a n de N? Hasta decidir, la plantilla sigue el token.

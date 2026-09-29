@@ -1,5 +1,22 @@
 # TASK-1939 — Catálogo `manzanitas` del Artifact Composer: carruseles y piezas de Marketing con Manzanitas desde datos
 
+## Delta 2026-09-29 — implementación
+
+- **Hecho:** catálogos `manzanitas-carousel`/`-stills` (18 plantillas, 26 piezas), mapper `planManzanitasIntent`,
+  `materializeManzanitasAssets`, `pnpm manzanitas:tokens` y `pnpm manzanitas:compose`, scope `--catalog=manzanitas` del
+  gate visual, 6 ejemplos versionados con fotos sintéticas y 43 pruebas (4 renderizan y miden con `measureSlideFit`).
+- **Reglas que fallan cerradas** (descubiertas al componer los ejemplos de AXIS): la respuesta en una línea y sin pisar el
+  «Desliza»; la pregunta en una línea donde hay contenido fijo bajo la voz. Sin ellas, la esfera caía sola en la línea
+  siguiente o la respuesta pisaba la fuente del gráfico y la firma, con el render «verde».
+- **Eslogan:** la regla del operador del 2026-09-29 (debajo del logo, al 64 % de su ancho, palabra en la tinta bajo
+  24 px) se aplicó a los tres cierres; el cierre de YouTube del canvas v39 lo tenía encima. Con el logo de 400 px sólo
+  Voice conserva la palabra en el acento: se le presenta al operador.
+- **Desvío del plan:** el baseline se congeló antes de la aprobación visual del operador, como guarda de regresión (así
+  el gate `all` no queda rojo en CI). La aprobación sigue pendiente y es criterio de cierre.
+- **Hallazgos para AXIS** (patch con autorización): ejemplos con copy que no cabe, `slogan.closeLockup.sloganPx`
+  superado, rótulos de gráficos fuera del contrato, órbita del paso fuera del token, sin largos por pieza en el contrato,
+  y el Lab (`/references/manzanitas/`, contraportada A) que todavía pinta el eslogan a 24 px con la palabra en el acento.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -21,7 +38,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Diseño cerrado; implementación en curso (sesión del 2026-09-29, pedido del operador «termina todo lo pendiente»)`
+- Status real: `Code complete y verificado en local (1050036e8, 71f16b235); pendiente la aprobación visual del operador de los carruseles de ejemplo`
 - Rank: `TBD`
 - Domain: `content|creative|platform`
 - Blocked by: `none`
@@ -273,8 +290,9 @@ Reglas obligatorias:
 
 - **Catálogos:** una carpeta, dos catálogos: `manzanitas-carousel` (`pdf-merged`, el documento del carrusel) y
   `manzanitas-stills` (`png-set`: láminas sueltas, story, blog, YouTube y pódcast). Campo `catalogs` en el registry.
-- **Plantillas:** una por pieza aprobada (26); los nueve gráficos comparten dos plantillas por superficie
-  (`ChartPaper`, `ChartNavy`) y el hook pinta la receta.
+- **Plantillas:** 18 plantillas para las 26 piezas aprobadas: los siete gráficos con voz comparten `ChartVoice` y la
+  Medida y la Tendencia (sólo pregunta) `ChartQuestion`; la superficie la pone el tono del tema, no la plantilla, y el
+  hook pinta la receta. La portada Pizarra en reposo y en respuesta comparten `CoverPizarra`.
 - **Voz:** anatomía de `EfeonceOrbit.Voice` del canvas: pregunta Poppins 300 a respuesta × 38/128, anillo de 0,42 la
   pregunta en el acento, respuesta Bricolage 760 con `wdth 96`/`opsz 88` y la esfera como cierre del texto.
 - **Gráficos:** slot `chart` `validation-only` con el dato; `createManzanitasCatalogs({ chartPainter })`; el painter vive
@@ -323,16 +341,16 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] `pnpm manzanitas:tokens --check` sale en 0 y su test de drift pasa; ningún HEX, `rgb()` ni familia literal en las
-      plantillas ni en `manzanitas.css`.
-- [ ] Las 26 piezas aprobadas de `manzanitasRegister.pieces` tienen plantilla y el test compara el registry con el token.
-- [ ] `pnpm manzanitas:compose` compone los ejemplos válidos de AXIS (carrusel en PDF + PNG, story, blog, YouTube y
-      pódcast) y rechaza uno inválido con el código del contrato.
-- [ ] Cambiar la línea del tema cambia la manzana, los puntos, el arco, la cifra, el eslogan y «Desliza» en la salida.
-- [ ] Los gráficos compuestos pasan `runManzanitasChartChecks`.
-- [ ] `pnpm composer:visual-gate --catalog=manzanitas` sale en 0 con el baseline congelado y su sección sellada.
+- [x] `pnpm manzanitas:tokens --check` sale en 0 y su test de drift pasa; ningún HEX, `rgb()` ni familia literal en las
+      plantillas ni en `manzanitas.css`. — *49 salidas sin drift; `manzanitas-tokens-sync.test.ts` y `manzanitas-templates.test.ts` verdes.*
+- [x] Las 26 piezas aprobadas de `manzanitasRegister.pieces` tienen plantilla y el test compara el registry con el token. — *18 plantillas; `manzanitas-catalogs.test.ts` exige que cada pieza aprobada la pinte exactamente una.*
+- [x] `pnpm manzanitas:compose` compone los ejemplos válidos de AXIS (carrusel en PDF + PNG, story, blog, YouTube y
+      pódcast) y rechaza uno inválido con el código del contrato. — *Los 11 ejemplos válidos componen; tres traían copy que no cabe en la geometría del canvas («Todavía no», «Quién responde», la pregunta de «De cada 100») y el motor los rechaza con «no cabe en su lienzo»: se compusieron con copy corregido y quedan como hallazgo para AXIS. El inválido sale con `contract-issues` (`plan.test.ts`).*
+- [x] Cambiar la línea del tema cambia la manzana, los puntos, el arco, la cifra, el eslogan y «Desliza» en la salida. — *Compuesto en las seis líneas (engine, brand, growth, revenue-hubspot, revenue-salesforce, voice); un solo selector `.mcm-line-<línea>` y assets precoloreados por línea.*
+- [x] Los gráficos compuestos pasan `runManzanitasChartChecks`. — *El painter corre los chequeos y falla cerrado (`painters-and-errors.test.ts`).*
+- [x] `pnpm composer:visual-gate --catalog=manzanitas` sale en 0 con el baseline congelado y su sección sellada. — *18 frames, sección `2026-09-29 (r)`, selftest a 0 px. Se congeló antes de la aprobación del operador como guarda de regresión (desvío del orden del plan, ver Delta); si pide cambios, van en una sección nueva.*
 - [ ] El operador aprobó a ojo los carruseles de ejemplo.
-- [ ] `pnpm local:check` y las pruebas de los dominios nuevos en verde.
+- [x] `pnpm local:check` y las pruebas de los dominios nuevos en verde. — *`pnpm typecheck` rc=0, eslint limpio en los archivos nuevos, suite del Composer 37/564 verde, 43 pruebas nuevas; `local:check` completo corre en el pre-push.*
 
 ## Verification
 
@@ -351,7 +369,7 @@ Reglas obligatorias:
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] la skill y el manual dicen cómo componer con el comando
+- [x] la skill y el manual dicen cómo componer con el comando
 
 ## Follow-ups
 

@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-29 — Marketing con Manzanitas en el Artifact Composer (TASK-1939)
+
+- `1050036e8`: catálogos `manzanitas-carousel` (PDF) y `manzanitas-stills` (PNG), 18 plantillas para las 26 piezas
+  aprobadas; `pnpm manzanitas:tokens [--check]` (49 salidas desde `manzanitasRegister`) y `pnpm manzanitas:compose`
+  (intent del contrato `efeonce.manzanitas-register` 0.2.0 → PDF, PNG y procedencia sin reloj). Gráficos pintados con
+  `manzanitasChartSvg` y sus chequeos; Lente y órbita del paso con `axis-graphic-line`.
+- Fallan cerradas (el motor mide el recorte): respuesta en una línea y sin pisar «Desliza»; pregunta en una línea donde
+  hay contenido fijo bajo la voz. Eslogan de los cierres debajo del logo al 64 % de su ancho (regla del 2026-09-29).
+- Gate visual `--catalog=manzanitas`: 18 frames congelados. Aprobación visual del operador pendiente.
+
 ## 2026-09-28 — Marketing con Manzanitas publicado en AXIS (TASK-1936)
 
 - AXIS `v0.3.26` (`aca07c2`): `axis-tokens` 0.3.26 exporta `manzanitasRegister` (registro que complementa La órbita,
@@ -673,10 +683,3 @@ igual; lo que separaba los números era el formato. **[decisión del operador]**
 oscura está perfecta si la superficie existe de verdad y tiene nombre; lo prohibido es la reserva sin materia, en
 cualquier tono—. La capa de composición gráfica sobre la foto sigue **sin aprobar**.
 [Bitácora](docs/operations/social/2026-09-19-efeonce-photographic-language-production-method.md).
-
-## 2026-09-19 — Berel: QA visual de comentarios en Frame.io
-
-Los comentarios del share de octubre se clasificaron entre errores comprobables, ajustes visuales,
-preferencias con motivo, observaciones incompletas y aprobaciones. La skill Berel en ambos espejos y el
-Playbook/Aprendizajes de Notion incorporan gates de color, producto, legibilidad, función editorial y canal.
-Sin masters editables, no se modificaron artes, versiones, estados ni publicación.

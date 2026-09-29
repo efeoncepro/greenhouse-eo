@@ -116,6 +116,9 @@ source control.
 - **Regla (reemplaza a la de «Después de cada bump» del Delta (f)):** todo bump de `@efeoncepro/axis-tokens` corre
   `pnpm brand:tokens` **y** `pnpm glitch:tokens`, después `pnpm brand:tokens --check` y `pnpm glitch:tokens --check`, y
   recién entonces se commitea. No importa qué parte del token cambió: los dos juegos compilados llevan el sello de versión.
+  **Desde el 2026-09-29 (TASK-1939) son tres juegos:** se suma `pnpm manzanitas:tokens` y `pnpm manzanitas:tokens --check`
+  (catálogo Marketing con Manzanitas: `manzanitas-tokens.css`/`.json` y sus assets precoloreados, que también llevan el
+  sello de versión de `axis-tokens`; el test `scripts/manzanitas/__tests__/manzanitas-tokens-sync.test.ts` lo exige).
 - **Lección de permisos (sesiones de Claude Code):** los gates de AXIS se corren como comandos sueltos,
   `pnpm -C /Users/jreye/Documents/axis-design-system <script>` y `git -C /Users/jreye/Documents/axis-design-system <cmd>`.
   Un comando compuesto con `cd` y logs redirigidos a `/tmp` fue bloqueado por el clasificador de permisos en este

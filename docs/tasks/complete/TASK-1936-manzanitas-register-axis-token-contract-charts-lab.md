@@ -1,5 +1,15 @@
 # TASK-1936 — Registro Marketing con Manzanitas en AXIS: token, archivos, contrato, gráficos y Lab
 
+## Delta 2026-09-29
+
+- Follow-ups atendidos — cerrados por trabajo en `TASK-1939` y en la sesión del 2026-09-29: los pins de AXIS en
+  Greenhouse (`44f8db3f0`: `axis-tokens` 0.3.28, `axis-ui-contracts` 0.3.28, `axis-graphic-line` 0.10.1,
+  `axis-brand-assets` 0.4.1) y el catálogo `manzanitas` del Artifact Composer con `pnpm manzanitas:compose`
+  (`1050036e8`, `TASK-1939`, in-progress hasta la aprobación visual del operador). La skill ya documenta el comando.
+- El operador decidió 7 de las 10 pendientes del registro el 2026-09-29 (publicadas en AXIS `v0.3.28`, contrato 0.2.0);
+  siguen abiertas la 5 (copy de cierre de la story), la 6 (cine con personas del equipo) y la 7 (Trazo `republicar` y
+  `enviar`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

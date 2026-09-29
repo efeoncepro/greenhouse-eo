@@ -257,7 +257,9 @@ Rules for agents:
   `pnpm glitch:tokens`, then `pnpm brand:tokens --check` and `pnpm glitch:tokens --check`, all before the commit. Even
   when only the version stamp changes, a stale file fails `scripts/brand-surfaces/__tests__/graphic-line-tokens-sync.test.ts`
   in CI. Source case: the `0.3.24` pin (`53002b352`) ran only `glitch:tokens`, CI went red on 4 tests, and the fix was
-  `609353e83` (regenerated tokens, version stamp only).
+  `609353e83` (regenerated tokens, version stamp only). Since 2026-09-29 (TASK-1939) there is a THIRD set: also run
+  `pnpm manzanitas:tokens` and `pnpm manzanitas:tokens --check` (the Marketing con Manzanitas catalog tokens and its
+  per-line precoloured assets; `scripts/manzanitas/__tests__/manzanitas-tokens-sync.test.ts` fails on a stale stamp).
 - **Signature rule (operator, 2026-09-26):** the Efeonce logo, centered. The URL bubble signs instead ONLY when the
   logo already appears in the image (`signature.brandInScene: true`), centered, luminosity-blended on the real pixels
   at opacity 1, ≥ 4.5:1 measured (passes only on very dark beds); never beside the logo. Footer uses keep the baked

@@ -47,9 +47,11 @@ de la **línea del tema**; la cabecera; los formatos Pizarra, Escena, Lente y Re
 contraportada A), cómo usar los 9 gráficos que se calculan desde el dato y las 3 láminas de texto denso, y qué está
 pendiente. **Nunca** lo mezcles con Glitch (la manzana en contorno con tres puntos es de MCM; la manzana llena, de
 Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de marca editorial, no fotográfico. **Desde el
-2026-09-28 está en AXIS** (tag `v0.3.26`): token `manzanitasRegister`, contrato `efeonce.manzanitas-register` 0.1.1
+2026-09-28 está en AXIS** (hoy tag `v0.3.28`): token `manzanitasRegister`, contrato `efeonce.manzanitas-register` 0.2.0
 (`pnpm manzanitas:resolve`), gráficos en `@efeoncepro/axis-graphic-line/charts`, archivos `AXIS_MANZANITAS_ASSETS` y el Lab
-`/references/manzanitas/` (detalle en `references/manzanitas.md` §10.3); Greenhouse todavía no los fija.
+`/references/manzanitas/` (detalle en `references/manzanitas.md` §10.3). Greenhouse los fija (`axis-tokens` y
+`axis-ui-contracts` 0.3.28, `axis-graphic-line` 0.10.1) y **compone con `pnpm manzanitas:compose`** desde el
+2026-09-29 (TASK-1939, `references/manzanitas.md` §10.1).
 
 ## Por dónde empezar (carga selectiva)
 
@@ -80,7 +82,7 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
 | **Motion de Glitch** (APROBADO 2026-09-27; sólo Glitch): apertura y tarjeta final v2, pre-roll de la intro, kit de overlays, transición de bytes (entre piezas y entre escenas, exclusiva de Glitch) y héroe; se produce con HyperFrames en el taller (`pnpm -C ../efeonce-brand-workshop --filter glitch-motion doctor\|render\|kit\|transiciones\|heroe`), que entrega sonido B y música con cada pieza; nunca se anima a mano | [references/glitch.md §12](references/glitch.md) + norma §13.13 (comandos y argumentos) |
 | **Sonido de Glitch** (APROBADO, versión B, 2026-09-27; sólo Glitch, nunca Efeonce): WAV sidecar por `.mov` del motion, archivos en `glitch/sound/v1/` del bucket de AXIS, motor migrado al taller (`tools/glitch-motion/src/sound.mjs` sobre `tools/brand-sound`, commit `2d411b8`): regenerar = correr el mismo comando de `glitch-motion` | [references/glitch.md §13](references/glitch.md) |
 | **Música de Glitch** (APROBADA 2026-09-27; sólo Glitch): tema B (intro, cortina, salida) y cama post-punk bajo la noticia; másteres por URL + sha256 en `glitch/music/v1/` del bucket de AXIS, nunca regenerados; cama 15 dB bajo la voz con ducking, sin recortar medios y sólo bajo las noticias; integrada al taller (`tools/glitch-motion/src/music.mjs`, pre-roll de la intro, `--music off`) y en producción en AXIS (`#musica`, `glitch.json → music`); único pendiente: la mezcla con la voz real del host | [references/glitch.md §13.7](references/glitch.md) |
-| **Una pieza de Marketing con Manzanitas** (carrusel, story, blog y banner, miniatura, pódcast): el registro complementario de La órbita, aprobado 2026-09-28 — acentos de la línea del tema, cabecera, formatos Pizarra/Escena/Lente/Recreo, «Desliza», firma, contraportada A, 9 gráficos calculados desde el dato y 3 láminas de texto denso; complementa La órbita, no la reemplaza | [references/manzanitas.md](references/manzanitas.md) + norma [`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) + ADR [`MANZANITAS_REGISTER_DECISION_V1.md`](../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md) |
+| **Una pieza de Marketing con Manzanitas** (carrusel, story, blog y banner, miniatura, pódcast): el registro complementario de La órbita, aprobado 2026-09-28 — acentos de la línea del tema, cabecera, formatos Pizarra/Escena/Lente/Recreo, «Desliza», firma, contraportada A, 9 gráficos calculados desde el dato y 3 láminas de texto denso; complementa La órbita, no la reemplaza. **Se compone con `pnpm manzanitas:compose -- --intent <pieza.json>`** (Artifact Composer, TASK-1939; [manzanitas.md §10.1](references/manzanitas.md)) | [references/manzanitas.md](references/manzanitas.md) + norma [`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) + ADR [`MANZANITAS_REGISTER_DECISION_V1.md`](../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md) |
 
 ## Reglas duras (las más caras de romper)
 

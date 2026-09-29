@@ -1,7 +1,8 @@
 # Lecciones (trampas que ya costaron tiempo)
 
-> Verificado contra: greenhouse-eo@24e4c72ee (local, sin push) — 2026-09-28 (últimas entradas: el CI roto por el bump
-> de AXIS 0.3.24 y los gates de AXIS bloqueados por el clasificador; antes, el Glitch Flash de Claude Sonnet 5.5).
+> Verificado contra: greenhouse-eo@1050036e8 (`develop`) — 2026-09-29 (última entrada: los ejemplos del contrato de
+> Marketing con Manzanitas con copy que no cabe, TASK-1939; antes, greenhouse-eo@24e4c72ee: el CI roto por el bump de
+> AXIS 0.3.24 y los gates de AXIS bloqueados por el clasificador).
 
 > Cada entrada: fecha, síntoma, causa y la regla que la evita. Es la parte más valiosa de la skill: se agrega en el
 > momento, no al cierre.
@@ -332,6 +333,21 @@
   `recipes.ts`), respuesta en Bricolage 760 **al menos 3× la pregunta** con tracking −0,035 em, que cierra con la
   esfera (0,2 em, hueco óptico de `efeonceGraphicLine.sphere.opticalGapEm`) **en lugar del punto**; la evidencia
   debajo, en Poppins con una palabra en negrita. Nunca pregunta grande y respuesta chica.
+
+## 2026-09-29 (el catálogo Marketing con Manzanitas, TASK-1939)
+
+- **Los ejemplos del contrato pueden traer copy que no cabe en la geometría aprobada: el render es el juez, no el
+  contrato.** Síntoma: tres ejemplos de AXIS (`docs/examples/manzanitas/`) resuelven con el contrato
+  `efeonce.manzanitas-register` y, al componerlos en el Artifact Composer, el motor los rechaza: la portada «Todavía no»
+  (`carrusel-revops-salesforce`, `carrusel-voz-revenue-hubspot`) llega al «Desliza» que comparte su línea; el concepto
+  «Quién responde» (`carrusel-texto-denso-growth`) no cabe en su medida (partido, dejaría la esfera sola en la línea
+  siguiente), y la pregunta de «De cada 100», «¿Cuántos leads llegan ya informados?» (`carrusel-voz-revenue-hubspot`),
+  pasaría a dos líneas y empujaría la respuesta sobre la fuente (lo prueba `manzanitas-fit.test.ts`). Causa: el contrato
+  valida la pieza, las palabras de la respuesta y la estructura, pero no declara largos máximos por pieza; las reglas de
+  una línea viven en las plantillas de Greenhouse y sólo el render las mide (`measureSlideFit`). Regla: un copy válido
+  para el contrato no está aprobado hasta que el motor lo compone; si no cabe, se acorta el copy (Greenhouse usa «Aún
+  no», «Quién cita» y «¿Cuántos llegan ya informados?») y nunca se recorta, se parte ni se relaja la plantilla. Los
+  ejemplos de AXIS quedan como hallazgo para un patch de AXIS ([manzanitas.md](manzanitas.md) §10.3).
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
