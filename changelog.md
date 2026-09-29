@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-29 — Naming canónico de Efeonce AEO
+
+- [ADR](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md): **Efeonce AEO** (capacidad), **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (salida); aliases Grader preservados para trazabilidad y contratos. Se actualizaron docs y skills; el runtime visible requiere migración y verificación propias.
+
 ## 2026-09-29 — Marketing con Manzanitas en el Artifact Composer (TASK-1939)
 
 - `1050036e8`: catálogos `manzanitas-carousel` (PDF) y `manzanitas-stills` (PNG), 18 plantillas para las 26 piezas
@@ -663,23 +667,3 @@ registrar los portadores visibles del azul activo y del acento de historia, y me
 la firma vigente al **20 %** según la decisión del operador; el default histórico del compositor sigue en 15 % y se
 debe pasar `LOGO=0.20` explícitamente. La [prueba con Julio y Nexa](ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/README.md)
 documenta el fallo que motivó la guarda.
-
-## 2026-09-20 — Fotografía de marca: tres comandos, seis reservas y el umbral de calma en L\*
-
-El prompt de una toma ya no se concatena a mano: `pnpm foto:prompt` lo arma desde una ficha y resuelve formato, % del
-lecho y límite de sujetos desde **una sola tabla** — armarlo a mano fue la vía por la que «Vertical 4:5.» vivió dentro
-del bloque de realismo compartido sin que nadie lo viera. `pnpm foto:validar` evalúa las seis reservas sobre el plate
-limpio (zona de texto y objeto opt-in, en fracciones) y `pnpm foto:doctor` dice si la máquina puede generar, con seis
-chequeos que ejercitan la cadena hasta la clave, sin costo y sin imprimirla; 27 tests cubren las guardas, incluida la de
-materia de la superficie. Las reservas pasaron de cuatro a seis, con lecho por formato **[medido]** (4:5 18% · 9:16 22%
-· 16:9 16% · 1:1 18% sin validar) y campo profundo al margen.
-
-El piloto de 3 plates (USD 0,142) midió las dos nuevas: la banda del margen llega a **0,60** del alto cuando se pide, y
-el recuadro de selección tiene punto dulce de padding (0,02 → 3,29:1; 0,00 y 0,04 fallan), no monotonía. El umbral de
-calma se corrigió a **L\***: en luminancia lineal premiaba la oscuridad y la «losa» rechazada pasaba con 12× de margen;
-`CALMA_MAX` mide calma y **no** detecta la losa —una losa es calma—, que se ataca en la entrada con la guarda de materia.
-Se retiró §3.8.3 **[refutado]**: el prompt que supuestamente no la llevaba nunca se versionó y las dos franjas miden
-igual; lo que separaba los números era el formato. **[decisión del operador]** el tono nunca fue el problema —una reserva
-oscura está perfecta si la superficie existe de verdad y tiene nombre; lo prohibido es la reserva sin materia, en
-cualquier tono—. La capa de composición gráfica sobre la foto sigue **sin aprobar**.
-[Bitácora](docs/operations/social/2026-09-19-efeonce-photographic-language-production-method.md).

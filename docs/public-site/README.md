@@ -1,5 +1,7 @@
 # Public Site — Producto (efeoncepro.com + think.efeoncepro.com)
 
+> **Naming AEO vigente (2026-09-29):** **Efeonce AEO** es la capacidad de entrada; **Efeonce AEO Assessment** nombra el diagnóstico público y **Efeonce AI Visibility Report** su salida. `AI Visibility Grader`/`Brand Visibility` siguen siendo aliases técnicos e históricos y `/brand-visibility` conserva su ruta hasta un cambio de runtime independiente. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Qué es esto.** El hogar-producto del sitio público de Efeonce: dónde viven
 > las **decisiones de producto/posicionamiento** y el **roadmap de ejecución**
 > del sitio público como superficie comercial. Es el índice descubrible por

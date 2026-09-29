@@ -1,5 +1,7 @@
 # Epic Index
 
+> **Naming vigente para EPIC-020/021/022:** **Efeonce AEO** (capacidad), **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (entregable). Los títulos `AI Visibility Grader`/`AEO Grader` de epics y tasks preservan historia e identificadores del motor; Search Visibility 360 mantiene la oferta SEO+AEO. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 Panel operativo de epics del repo.
 
 ## Convencion vigente

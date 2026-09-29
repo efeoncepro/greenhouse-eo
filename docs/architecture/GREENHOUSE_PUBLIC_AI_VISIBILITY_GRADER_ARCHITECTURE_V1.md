@@ -9,6 +9,7 @@
 > Domain: `growth` (`GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`)
 > Runtime contract: `greenhouse-public-ai-visibility-grader.v1` (planned)
 > Complemento SEO (búsqueda clásica): `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` — motor hermano `growth.seo` (EPIC-022 "Search Visibility 360") que mide Google orgánico (rankeo/click/evolución). Los dos motores se **cruzan solo por `organization_id`** en el derived read `readSeoAeoGap` (quadrant 360 rankeo×citabilidad); **NUNCA** fusionan scoring ni comparten tablas.
+> Nomenclatura comercial vigente desde 2026-09-29: **Efeonce AEO** (capacidad), **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (entregable). Ver [ADR de naming](EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md). Los nombres y rutas técnicos de este documento conservan su significado histórico; el ADR no acredita un cambio de copy en runtime.
 
 ## 1. Purpose
 
@@ -48,6 +49,8 @@ The durable product is not only "your score is 47/100". The durable product is:
 - how those actions enter HubSpot/Greenhouse for follow-up.
 
 The public surface should be market-legible. The internal product architecture should preserve Efeonce IP:
+
+> **Delta 2026-09-29 — naming aceptado:** la tabla siguiente registra los rótulos recomendados en 2026-06-24 y no se borra como historia de diseño. Para trabajo nuevo rige [Efeonce AEO](EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md): capacidad **Efeonce AEO**, diagnóstico **Efeonce AEO Assessment**, informe **Efeonce AI Visibility Report**. **Search Visibility 360** sigue siendo la oferta SEO+AEO. `AI Visibility Grader`, `Brand Visibility Grader` y `AEO Grader` son aliases históricos/técnicos; `Surround Discovery Audit` no es el nombre de entrada al mercado.
 
 | Layer | Recommended label | Use |
 | --- | --- | --- |

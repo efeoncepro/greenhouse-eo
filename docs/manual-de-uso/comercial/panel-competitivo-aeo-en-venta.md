@@ -1,5 +1,7 @@
 # Usar el Panel Competitivo AEO en venta
 
+> **Naming vigente:** **Efeonce AEO** es la capacidad; **Efeonce AEO Assessment** y **Efeonce AI Visibility Report** nombran el diagnóstico público individual y su salida. El Panel Competitivo AEO conserva su nombre y alcance multi-marca. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo de documento:** Manual de uso (comercial)
 > **Version:** 1.0
 > **Creado:** 2026-09-11 por Claude

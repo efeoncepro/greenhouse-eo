@@ -1,5 +1,7 @@
 # EPIC-020 — Public AI Visibility Lead Magnet Program
 
+> **Nomenclatura canónica (2026-09-29):** el programa entrega el diagnóstico **Efeonce AEO Assessment** bajo la capacidad **Efeonce AEO**, con salida **Efeonce AI Visibility Report**. El título de este epic y `AI Visibility Grader` en su historia se conservan como términos técnicos/históricos. El ADR no acredita cambio de copy en la UI productiva. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -17,6 +17,7 @@
 > **Customer Model Integrity Pack:** [`SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md)
 > **Search + Social composition:** [`SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md`](SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md)
 > **Search & App extension (`Proposed`, 2026-09-10):** [`SEARCH_APP_VISIBILITY_EXTENSION_V1.md`](SEARCH_APP_VISIBILITY_EXTENSION_V1.md)
+> **Entrada AEO:** [`Efeonce AEO`](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) nombra la capacidad y su Assessment; Search Visibility 360 conserva el alcance SEO+AEO integral.
 
 ## Scope hypothesis
 

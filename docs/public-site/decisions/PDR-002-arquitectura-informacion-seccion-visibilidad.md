@@ -1,5 +1,7 @@
 # PDR-002 — Arquitectura de información de la sección de visibilidad
 
+> **Nota de vigencia (2026-09-29):** el nombre de la capacidad es **Efeonce AEO**; el nodo público se presenta como **Efeonce AEO Assessment** y su salida como **Efeonce AI Visibility Report**. `AI Visibility Grader` queda como alias técnico/histórico. Las cifras Semrush del 2026-07-05 son evidencia de aquella decisión de IA/URL, no prueba actual de demanda AEO pura: una consulta DataForSEO del 2026-09-29 encontró mezcla de significados para `aeo`. No se cambian slugs ni redirects mediante este ADR. [Decisión de naming](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo:** Product Decision Record (IA/URL del sitio público).
 > **Estado:** Accepted — slugs cerrados con datos (Semrush CL 2026-07-05); resta
 > confirmar contenido existente de `/servicios` por crawl vivo.

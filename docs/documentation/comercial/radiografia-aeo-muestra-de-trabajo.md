@@ -1,5 +1,7 @@
 # Radiografía AEO — Muestra de Trabajo, Educación y Habilitación de Ventas
 
+> **Naming vigente:** la Radiografía AEO conserva su nombre como muestra de trabajo; se relaciona con **Efeonce AEO** y puede seguir al **Efeonce AEO Assessment** / **Efeonce AI Visibility Report**. `AI Visibility Grader` queda como alias técnico/histórico del motor que genera evidencia. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
 > **Versión:** 1.1
 > **Creado:** 2026-07-14 por Claude (TASK-1410)

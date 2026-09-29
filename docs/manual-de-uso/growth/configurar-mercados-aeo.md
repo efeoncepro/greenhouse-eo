@@ -1,5 +1,7 @@
 # Configurar mercados AEO
 
+> **Naming vigente:** **Efeonce AEO** es la capacidad; **Efeonce AEO Assessment** y **Efeonce AI Visibility Report** son sus superficies públicas. Este manual mantiene los nombres técnicos de comandos, perfiles y rutas sin migrarlos. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 ## Estado y límites
 
 TASK-1863 está desplegada en staging; `main` permanece en espera. Las dos migraciones y el backfill

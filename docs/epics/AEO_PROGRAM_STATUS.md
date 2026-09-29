@@ -1,5 +1,7 @@
 # Programa AEO / AI Visibility — Estado y Qué Sigue
 
+> **Nomenclatura canónica desde 2026-09-29:** **Efeonce AEO** (capacidad) → **Efeonce AEO Assessment** (diagnóstico público) → **Efeonce AI Visibility Report** (entregable) → **Search Visibility 360** (oferta amplia). `AI Visibility Grader`, `Brand Visibility Grader` y `AEO Grader` permanecen como aliases técnicos o históricos en las tareas y el runtime. Este cambio documental no afirma que la UI pública ya exhiba los nombres nuevos. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo de documento:** Estado de programa + roadmap operativo (SSOT de "dónde estamos / qué sigue")
 > **Versión:** 1.5
 > **Creado:** 2026-07-16 por Claude (auditoría multi-agente del programa AEO)

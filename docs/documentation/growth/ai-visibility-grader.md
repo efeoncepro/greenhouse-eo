@@ -6,6 +6,8 @@
 
 # AI Visibility Grader — Motor de Providers (Growth)
 
+> **Nombre público canónico (2026-09-29):** **Efeonce AEO** es la capacidad; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su entregable. Este documento conserva **AI Visibility Grader**, **Brand Visibility Grader** y **AEO Grader** para identificar el motor, rutas, contratos e historia existentes; el cambio de nombre no altera el runtime. [ADR de naming](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 ## Que hace
 
 Mide como los "answer engines" de IA (ChatGPT/OpenAI, Claude/Anthropic, Perplexity, Gemini y Google AI Overview / AI Mode via DataForSEO) representan a una marca cuando alguien consulta su categoría, productos o servicios. Las preguntas siguen el modelo de negocio de cada marca. El objetivo es ver si la marca **aparece o no**, qué dicen de ella y a quién citan.

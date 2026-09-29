@@ -15,6 +15,8 @@ description: >-
 
 # SEO + AEO/GEO — Skill operativa 2026
 
+> **Naming Efeonce (2026-09-29):** **Efeonce AEO** = capacidad; **Efeonce AEO Assessment** = diagnóstico público; **Efeonce AI Visibility Report** = informe compartible. **Search Visibility 360** conserva la oferta amplia SEO + AEO. `AI Visibility Grader`, `Brand Visibility Grader` y `AEO Grader` son aliases técnicos/históricos para encontrar motor, rutas y contratos. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`; detalle técnico: `efeonce/AI_VISIBILITY_GRADER.md`.
+
 > **Qué es esto.** Una skill de dos manos: **(1) conocimiento experto** del
 > dominio búsqueda+IA al estado del arte 2026, y **(2) capacidad de ejecución**
 > (auditar con Semrush MCP si está disponible, verificar frescura con browsing

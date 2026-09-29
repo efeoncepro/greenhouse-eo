@@ -21,6 +21,8 @@ Efeonce (umbrella/masterbrand)
 The customer may recognize a product brand, but the commercial relationship, contract and accountability remain
 with Efeonce unless an approved contract explicitly states otherwise.
 
+> **Aplicación 2026-09-29:** [Efeonce AEO](EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) nombra una **capacidad** atribuida directamente a la masterbrand, no una product brand nueva. Su diagnóstico público es Efeonce AEO Assessment y puede abrir la conversación que conduce a la oferta SEO+AEO Search Visibility 360. Los identificadores técnicos del grader no son nombres comerciales.
+
 Partnerships and providers are a transversal enablement layer, not a peer business line or a collection of logos. They
 may enable licensing, advisory, implementation, managed operations or product services; the provider does not replace
 Efeonce's relationship, method or accountability. Canon: [`Efeonce Partner & Provider Layer Operating Model V1`](../business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).

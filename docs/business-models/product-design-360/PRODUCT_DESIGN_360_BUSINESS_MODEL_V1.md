@@ -645,7 +645,7 @@ aprobación identificado.
 de su producto, sus superficies comprometidas y su cadencia de release; obtiene **la brecha entre la capacidad de
 diseño que su roadmap exige y la que tiene**.
 
-**Por qué esta forma y no un folleto.** Replica el patrón del AI Visibility Grader, que Efeonce ya sabe operar:
+**Por qué esta forma y no un folleto.** Replica el patrón del AI Visibility Grader (nombre técnico/histórico del [Efeonce AEO Assessment](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md)), que Efeonce ya sabe operar:
 entrega valor por sí sola, califica a quien entra y —lo decisivo— **produce el número que el Head of Design
 necesita para pedir presupuesto**. No le damos una pieza de marketing: le damos munición para su reunión interna.
 

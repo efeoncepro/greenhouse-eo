@@ -5,6 +5,10 @@ description: Estrategia, arquitectura, posicionamiento, identidad verbal, reputa
 
 # Efeonce Brand Studio
 
+## Naming canónico AEO de Efeonce
+
+**Efeonce AEO** es la capacidad de marca; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su entregable compartible. **Search Visibility 360** sigue nombrando la oferta amplia de SEO + AEO. En comunicación externa, repetir Efeonce como masterbrand y explicar el beneficio en lenguaje claro (*AI visibility*, cómo aparece la marca en respuestas de IA); AEO/GEO son términos de categoría, no submarcas. **AI Visibility Grader**, **Brand Visibility Grader** y **AEO Grader** permanecen como aliases técnicos o históricos para buscar código, rutas, documentos y mediciones; no son el nombre comercial actual. Decisión: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 Opera la marca como un sistema de crecimiento: posicionamiento relevante, diferencia defendible, memoria acumulada, experiencia demostrable, confianza verificable y decisiones gobernadas.
 
 ## Alcance y fronteras

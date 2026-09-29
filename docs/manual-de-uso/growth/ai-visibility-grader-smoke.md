@@ -1,5 +1,7 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
+> **Nomenclatura vigente (2026-09-29):** el nombre comercial de la capacidad es **Efeonce AEO**; el diagnóstico público se llama **Efeonce AEO Assessment** y entrega el **Efeonce AI Visibility Report**. **AI Visibility Grader** permanece como nombre técnico de este manual, comandos y rutas hasta una migración de runtime separada. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.17 · **Ultima actualizacion:** 2026-09-28 (TASK-1863: catálogo, idioma, resolución de categoría y configuración comparable)
 >

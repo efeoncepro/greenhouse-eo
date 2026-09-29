@@ -1,5 +1,7 @@
 # Greenhouse EO — Documentacion Funcional del Portal
 
+> **Naming AEO vigente (2026-09-29):** **Efeonce AEO** es la capacidad; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su salida. Los títulos históricos `AI Visibility Grader`/`Brand Visibility Grader` siguen identificando el motor y su documentación técnica. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 Documentacion oficial de la plataforma Greenhouse. Cada documento describe como opera un modulo o dominio del portal en terminos claros, orientados a entender el funcionamiento y las reglas de negocio. Para detalle tecnico (schemas, APIs, decisiones de diseno), cada seccion enlaza a su spec de arquitectura correspondiente.
 
 ## Regla obligatoria

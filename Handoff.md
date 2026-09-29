@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Naming Efeonce AEO (29/09):** el [ADR aceptado](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) fija **Efeonce AEO** → **Efeonce AEO Assessment** → **Efeonce AI Visibility Report**. Documentación y skills se alinean conservando aliases técnicos/históricos; el copy de los runtimes públicos sigue pendiente de edición y readback. Search Visibility 360 permanece como oferta SEO+AEO.
+
 TASK-1863: staging; main retenido.
 
 **Manzanitas en el Composer (29/09):** [TASK-1939](docs/tasks/in-progress/TASK-1939-manzanitas-artifact-composer-catalog.md) code complete (`1050036e8`, `71f16b235`, local): `pnpm manzanitas:compose` compone carruseles (PDF + PNG), story, blog, YouTube y pódcast desde el intent del contrato; 18 plantillas / 26 piezas, gate `--catalog=manzanitas` congelado (sección `2026-09-29 (r)`). Pendiente: aprobación visual del operador. El eslogan de los cierres sigue la regla del 29/09 (debajo del logo, 64 %): con logo de 400 px sólo Voice conserva la palabra en el acento. Hallazgos para un patch de AXIS en la task. Todo bump de `axis-tokens` corre también `pnpm manzanitas:tokens --check`.

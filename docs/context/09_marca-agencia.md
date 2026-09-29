@@ -202,7 +202,8 @@ operativo, la elegibilidad social y sus planos de medición viven en PDR-018, no
 | Nested Loops™ | "Cada fase construye sobre la anterior." | Propuestas. |
 | ICO | "Ves en tiempo real qué pasa con tu marketing." | Diferenciador en pitches. Onboarding. |
 | **Ecosistema de producto** (Greenhouse + Kortex + Verk) | "Tienes login a tres plataformas donde ves tu operación, tu CRM y tu contenido en tiempo real. Cada ciclo el sistema se vuelve más valioso." | Demo en pitch. Ecosystem Tour. Switching cost. Referrals. |
-| Frameworks específicos (Surround Discovery™ —incluye SOLVE como etapa—, AEO, CSC, Revenue Enabled) | Se traducen a beneficios. | Solo en profundidad técnica. |
+| **Efeonce AEO** | "Descubre cómo aparece tu marca en respuestas de IA y qué conviene mejorar." El diagnóstico es **Efeonce AEO Assessment** y el entregable **Efeonce AI Visibility Report**. | Puerta de entrada de marca; [naming canónico](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md). |
+| Frameworks específicos (Surround Discovery™ —incluye SOLVE como etapa—, CSC, Revenue Enabled) | Se traducen a beneficios. | Solo en profundidad técnica. |
 
 ---
 

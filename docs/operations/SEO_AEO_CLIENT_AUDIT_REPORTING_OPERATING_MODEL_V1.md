@@ -1,5 +1,7 @@
 # Informes de auditoría SEO/AEO para clientes
 
+> **Nombre canónico del carril AEO:** **Efeonce AEO**; su diagnóstico público es **Efeonce AEO Assessment** y su informe compartible **Efeonce AI Visibility Report**. Este modelo de auditorías periódicas conserva su alcance y no implica que todo informe SEO/AEO sea un assessment público. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > Modelo operativo V1 · 2026-09-04 · Dueño: práctica SEO/AEO de Efeonce.
 > Aplica a auditorías periódicas y sus revisiones. La skill `seo-aeo` aporta el oficio;
 > la skill del cliente aporta alcance, voz y fuentes vivas.

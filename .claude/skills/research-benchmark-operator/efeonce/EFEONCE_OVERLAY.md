@@ -1,5 +1,7 @@
 # Overlay Efeonce — research & benchmark en el negocio real
 
+> **Naming comercial vigente:** **Efeonce AEO** (capacidad) → **Efeonce AEO Assessment** (diagnóstico público) → **Efeonce AI Visibility Report** (entregable). `AI Visibility Grader` es el alias del motor de benchmark que permanece en contratos y referencias históricas. **Search Visibility 360** designa la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 La skill es genérica y reutilizable, pero Efeonce tiene fuentes, un producto de benchmark real y una doble audiencia concretos. Este overlay los ancla. La doctrina de negocio/ICP/casos vive en `efeonce-agency` + `docs/context/`; acá se **usa**, no se inventa.
 
 ## Doble audiencia (recordatorio)
@@ -46,6 +48,7 @@ El primer benchmark/CI real producido con esta skill es el **baseline competitiv
 Aprendizajes canónicos de ese caso (aplican a futuros benchmarks de industria):
 - Rankings tipo Barómetro son **recall + rating** (percepción), no postulación → entrar es un juego de **notoriedad/prensa gremial/participación**, no de "subir tu agencia a una lista".
 - Los "rankings de mejores agencias" que circulan en la web suelen ser **auto-publicados** por las propias agencias (se auto-rankean #1) → válidos como **set competitivo**, no como jerarquía objetiva. Márcalos con esa salvedad.
+- Efeonce compite **full-stack** (Paid Media, CRO, Marketing de Contenidos, SEO/AEO, performance, CRM) como sistema integrado (Growth OS); su ventaja es la **integración**, no un servicio suelto.
 - Hallazgo CI reutilizable: los competidores ganan visibilidad **dominando su propio SERP de categoría** con contenido de autoridad; medir la ausencia/presencia ahí es un benchmark en sí (ties `07` AI SoV + `seo-aeo`).
 
 ## Reglas duras del overlay

@@ -1,5 +1,7 @@
 # Greenhouse EO — Manual de Uso
 
+> **Naming AEO vigente (2026-09-29):** la capacidad pública es **Efeonce AEO**, el diagnóstico **Efeonce AEO Assessment** y su entregable **Efeonce AI Visibility Report**. Los manuales conservan `AI Visibility Grader` para comandos y rutas existentes. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 Esta carpeta guarda guias practicas para usar capacidades concretas del portal Greenhouse.
 
 La diferencia con otras capas de documentacion:

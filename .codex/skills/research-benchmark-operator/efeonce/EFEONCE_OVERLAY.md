@@ -1,5 +1,7 @@
 # Overlay Efeonce — research & benchmark en el negocio real
 
+> **Naming comercial vigente:** **Efeonce AEO** (capacidad) → **Efeonce AEO Assessment** (diagnóstico público) → **Efeonce AI Visibility Report** (entregable). `AI Visibility Grader` es el alias del motor de benchmark que permanece en contratos y referencias históricas. **Search Visibility 360** designa la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 La skill es genérica y reutilizable, pero Efeonce tiene fuentes, un producto de benchmark real y una doble audiencia concretos. Este overlay los ancla. La doctrina de negocio/ICP/casos vive en `efeonce-agency` + `docs/context/`; acá se **usa**, no se inventa.
 
 ## Doble audiencia (recordatorio)

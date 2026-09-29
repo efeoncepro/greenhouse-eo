@@ -1,5 +1,7 @@
 # Greenhouse Public AI Visibility Grader Decision V1
 
+> **Delta de nomenclatura 2026-09-29:** la decisión aceptada [Efeonce AEO](EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) sustituye **solo** los nombres comerciales recomendados en este ADR de 2026-06-24. **Efeonce AEO** es la capacidad; **Efeonce AEO Assessment**, el diagnóstico público; **Efeonce AI Visibility Report**, el entregable. `AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader` y `Surround Discovery Audit` permanecen aquí como términos históricos/técnicos. El boundary y los contratos de runtime de este ADR no cambian.
+
 ## Status
 
 Accepted direction — no runtime changes yet.

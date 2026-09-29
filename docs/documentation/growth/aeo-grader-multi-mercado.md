@@ -1,5 +1,7 @@
 # Grader AEO por mercado
 
+> **Alias técnico:** este documento mantiene `Grader AEO` para el contrato de medición. La capacidad comercial es **Efeonce AEO**, su diagnóstico público **Efeonce AEO Assessment** y su entregable **Efeonce AI Visibility Report**. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 Estado registrado al 2026-09-28: TASK-1863 desplegada y verificada en staging; promoción a `main`
 en espera por decisión del operador. [Evidencia de rollout](../../audits/platform/2026-09-28-task-1863-verification.md).
 

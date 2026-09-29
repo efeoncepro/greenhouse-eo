@@ -1,5 +1,7 @@
 # Brand Visibility Landing
 
+> **Nombre público canónico (2026-09-29):** **Efeonce AEO Assessment**, dentro de **Efeonce AEO**; su salida es el **Efeonce AI Visibility Report**. `Brand Visibility` es el nombre histórico de la landing y el slug vigente, no una marca de producto separada. Este documento describe el contenido publicado antes del cambio de naming; la aplicación del copy al runtime Think requiere una edición y verificación propias. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 ## Estado verificado 2026-07-27
 
 La landing está publicada en producción en `https://think.efeoncepro.com/brand-visibility` y respondió `HTTP 200`.

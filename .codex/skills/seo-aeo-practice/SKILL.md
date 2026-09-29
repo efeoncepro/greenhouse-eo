@@ -19,6 +19,10 @@ description: >-
 
 # SEO/AEO Practice — el negocio, no el oficio
 
+## Nombre comercial vigente
+
+La capacidad se llama **Efeonce AEO**; el diagnóstico público, **Efeonce AEO Assessment**; el entregable, **Efeonce AI Visibility Report**. **Search Visibility 360** conserva el alcance más amplio de SEO + AEO. Usar **AI Visibility Grader**, **Brand Visibility Grader** o **AEO Grader** sólo como aliases técnicos o históricos al localizar el motor y sus documentos. El diagnóstico debe acumular reconocimiento para la masterbrand Efeonce; no depende de posicionar primero una metodología interna. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 Para decisiones transversales de packaging, pricing, billing, margen, descuentos y créditos cargar también
 `efeonce-pricing-operator`. Esta skill conserva las reglas específicas de Search Visibility 360 y sus hipótesis de
 mercado, oferta, venta y retención.

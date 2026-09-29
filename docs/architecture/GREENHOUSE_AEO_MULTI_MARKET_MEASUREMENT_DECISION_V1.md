@@ -1,5 +1,7 @@
 # AEO Grader: identidad de mercado y metodología multidioma
 
+> **Nomenclatura:** [Efeonce AEO](EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) es el nombre comercial de la capacidad desde 2026-09-29. `AEO Grader` sigue siendo el alias técnico/histórico de este motor y el contrato de medición multimer­cado de este ADR no cambia.
+
 - Estado: **Accepted for implementation**, 2026-09-28, por instrucción del operador en TASK-1863.
 - Owner: Growth / EPIC-020. Estado de runtime: [evidencia de rollout](../audits/platform/2026-09-28-task-1863-verification.md); main en espera, sin habilitación externa nueva.
 - Canon anterior: [arquitectura del Grader](GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md).

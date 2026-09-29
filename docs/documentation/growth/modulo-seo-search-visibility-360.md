@@ -6,6 +6,8 @@
 
 # Modulo SEO — Search Visibility 360 (Growth)
 
+> **Relación de nombres vigente:** **Efeonce AEO** es la capacidad de IA y su diagnóstico público **Efeonce AEO Assessment**; el **AI Visibility Grader** sigue siendo el motor técnico hermano del SEO. **Search Visibility 360** permanece como oferta amplia de búsqueda clásica + IA. [ADR de naming](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 ## Que es
 
 **Uso editorial:** discovery entrega candidatos, no artículos aprobados ni cobertura completa. La

@@ -1,5 +1,7 @@
 # 05 · La cuña — el AI Visibility Grader como motor de venta
 
+> **Nombre comercial vigente:** **Efeonce AEO Assessment**, diagnóstico de la capacidad **Efeonce AEO**. El informe compartible se llama **Efeonce AI Visibility Report**; **Search Visibility 360** es la oferta más amplia. `AI Visibility Grader` y `AEO Grader` siguen siendo aliases técnicos/históricos de este motor. Decisión: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 > 🎯 **No es un lead magnet. Es la venta entera.**
 > **En una categoría donde el 100% de los compradores tiene una cicatriz, regalarle la evidencia antes de
 > pedirle plata es lo único que te separa del que le falló.**

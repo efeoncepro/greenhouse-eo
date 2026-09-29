@@ -97,7 +97,7 @@ comercial: [`docs/services/salesforce/README.md`](../services/salesforce/README.
 | **BP3 CEO / Gerente General** | Necesita justificar ante comité; busca evidencia y bajo riesgo. | **Greenhouse (sistema completo)** |
 | **BP8 Dir. Comercial** | Pipeline débil; marketing no alimenta ventas. | Kortex (CRM intelligence) |
 
-**ICP puerta de entrada estrella:** AEO / Visibilidad en IA (ciclo 2–4 sem, ticket bajo, trigger urgente, "caballo de Troya"). Ruta de expansión: AEO → Search Visibility 360 → web/medición → CRM/GTM integral. Wave opera la visibilidad, web y measurement; Efeonce Digital/Kortex gobierna CRM.
+**ICP puerta de entrada estrella:** **Efeonce AEO** / visibilidad de marca en IA (ciclo 2–4 sem, ticket bajo, trigger urgente, "caballo de Troya"). La experiencia diagnóstica se nombra **Efeonce AEO Assessment** y el entregable **Efeonce AI Visibility Report**; la ruta de expansión es Efeonce AEO → Search Visibility 360 → web/medición → CRM/GTM integral. Este naming no valida el ticket ni el ciclo como promesa comercial: el [modelo AEO](../business-models/aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md) sigue `Draft`. Wave opera la visibilidad, web y measurement; Efeonce Digital/Kortex gobierna CRM. [ADR de naming](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 > Implicación de producto: el **CEO (BP3) elige por Greenhouse como sistema completo**. La demo de Greenhouse tiene que verse como un sistema serio y vivo, no como un MVP. Esto sube la vara de pulido y consistencia del portal.
 

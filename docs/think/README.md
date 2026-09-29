@@ -1,5 +1,7 @@
 # Think Docs
 
+> **Naming vigente:** la capacidad es **Efeonce AEO** y su diagnóstico público **Efeonce AEO Assessment**; el reporte se presenta como **Efeonce AI Visibility Report**. `AI Visibility Grader`/`Brand Visibility` siguen identificando el motor y las rutas existentes. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 `docs/think/` documenta los patrones de producto, UI y operacion del runtime publico
 `think.efeoncepro.com` cuando una experiencia vive fuera del portal
 Greenhouse pero depende de contratos, datos o renderers gobernados por
@@ -31,7 +33,7 @@ y la route-ownership matrix.
 
 | Herramienta | Qué es | Ruta |
 |---|---|---|
-| **AI Visibility Grader** | Diagnóstico público de visibilidad en motores de respuesta, por token. Greenhouse calcula, Think presenta. Mide el hueco: presencia, citación, competidores, readiness y próximos pasos. | `/brand-visibility` · `/brand-visibility/r/<token>` |
+| **Efeonce AEO Assessment** (`AI Visibility Grader` técnico) | Diagnóstico público de visibilidad en motores de respuesta, por token. Greenhouse calcula, Think presenta el **Efeonce AI Visibility Report**. Mide el hueco: presencia, citación, competidores, readiness y próximos pasos. | `/brand-visibility` · `/brand-visibility/r/<token>` |
 | **Efeonce Insights (informe compartido)** | Lectura ejecutiva de una edición de Insights para el cliente, por enlace con token. Greenhouse compone y gobierna el acceso; Think presenta: hallazgos que se expanden, escenas por módulo, modo presentación y descargas PDF. En producción desde 2026-09-28 (Think `bbf8522`); lee Greenhouse de producción, donde `INSIGHTS_SHARING_ENABLED` sigue OFF hasta el flip del operador. | `/insights/r/<token>` |
 | **Efeonce Insights (muestra para clientes)** | El mismo render con datos de ejemplo y una marca ficticia, para mostrar el producto en venta: aviso visible, sin descargas ni llamadas a Greenhouse, `noindex`, fuera del sitemap. | `/insights/muestra` |
 | **Radiografía AEO** | Herramienta de educación y sales enablement SEO/AEO. Recorre en 4 pantallas un artículo real, expone su capa técnica y demuestra cómo un hueco medido se convierte en contenido visible, citable y distribuible. El **cliente es un payload**, no código. | `/muestras/<slug>-<token>` |

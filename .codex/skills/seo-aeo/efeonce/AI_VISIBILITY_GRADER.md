@@ -1,5 +1,7 @@
 # AI Visibility Grader / Surround Discovery Audit — integración skill ↔ producto Greenhouse
 
+> **Naming comercial vigente (2026-09-29):** **Efeonce AEO** (capacidad) → **Efeonce AEO Assessment** (diagnóstico público) → **Efeonce AI Visibility Report** (entregable). **Search Visibility 360** es la oferta SEO + AEO más amplia. El título de este archivo, `AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader`, rutas y contratos son aliases técnicos o históricos; `Surround Discovery Audit` es lenguaje metodológico interno, no marca comercial. Ver `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 > **Qué es esto.** Greenhouse está construyendo un producto que *operacionaliza*
 > esta skill: un **grader público de visibilidad en IA**, gobernado desde
 > Greenhouse, en el nuevo dominio `growth`. Esta skill es el **conocimiento de
@@ -221,8 +223,8 @@ cierren, se declaran en cada entrega.
 ## Tesis del producto (por qué importa para la skill)
 HubSpot mide *percepción de marca* en answer engines. Efeonce convierte los
 **gaps de visibilidad en IA en un plan operativo** (contenido, CRM, PR, SEO/AEO,
-ventas) que entra a HubSpot/Greenhouse. Público = "AI Visibility Grader";
-frame propietario interno = **"Surround Discovery Audit"**. La durabilidad no es
+ventas) que entra a HubSpot/Greenhouse. Público = **"Efeonce AEO Assessment"**;
+`AI Visibility Grader` conserva la identidad técnica y **"Surround Discovery Audit"** el frame metodológico interno. La durabilidad no es
 "tu score es 47/100", es el diagnóstico accionable — que es exactamente lo que
 esta skill sabe producir.
 

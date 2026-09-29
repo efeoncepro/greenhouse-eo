@@ -1,5 +1,7 @@
 # Greenhouse SEO Module Architecture V1 — "Search Visibility 360"
 
+> **Nomenclatura desde 2026-09-29:** [Efeonce AEO](EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) es la capacidad de visibilidad en IA y su diagnóstico público se denomina **Efeonce AEO Assessment**. `AEO Grader` en esta arquitectura sigue identificando el motor técnico `growth.ai_visibility` y su historia. **Search Visibility 360** conserva el alcance SEO+AEO y las fronteras entre los dos motores.
+
 > **Status:** Accepted (design) · 2026-07-01
 > **ADR:** [GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md](GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md)
 > **Epic:** `EPIC-022` · **Dominio:** `growth.seo` (hermano de `growth.ai_visibility`)

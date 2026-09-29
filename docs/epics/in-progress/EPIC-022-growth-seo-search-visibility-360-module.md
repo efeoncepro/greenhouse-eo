@@ -1,5 +1,7 @@
 # EPIC-022 — Growth SEO Module (Search Visibility 360)
 
+> **Naming vigente (2026-09-29):** **Efeonce AEO** nombra la capacidad de IA, y **Efeonce AEO Assessment** su diagnóstico público. `AEO Grader` sigue como alias técnico del motor hermano `growth.ai_visibility`; **Search Visibility 360** conserva el alcance SEO+AEO de este epic. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 ## Status
 
 - Lifecycle: `in-progress`

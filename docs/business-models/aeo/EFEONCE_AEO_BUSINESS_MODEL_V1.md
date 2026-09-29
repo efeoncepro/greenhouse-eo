@@ -2,6 +2,11 @@
 
 > **Estado:** `Draft` — AEO es una wedge/capability, no la tesis completa de Efeonce.
 > **Owner:** Wave + SEO/AEO + Strategy + Finance
+> **Naming:** [`Efeonce AEO`](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) es el nombre canónico de la capacidad; `Draft` sigue siendo el estado de este modelo comercial.
+
+## Naming y ruta de entrada
+
+**Efeonce AEO** es la capacidad respaldada por la marca Efeonce. El diagnóstico público se llama **Efeonce AEO Assessment** y su entregable compartible, **Efeonce AI Visibility Report**. La experiencia introduce a la marca en el problema de cómo aparece en respuestas de IA y puede conducir a **Search Visibility 360**, la familia más amplia de SEO y AEO de Wave. `AI Visibility Grader`, `Brand Visibility Grader` y `AEO Grader` se conservan como nombres históricos o técnicos del motor, no como nuevos nombres de cara al mercado. La decisión de naming no aprueba packaging, pricing, claims ni cambios de runtime.
 
 ## Offer hypothesis
 

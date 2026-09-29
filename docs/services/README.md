@@ -95,6 +95,12 @@ que diseña, construye y opera la capa digital inteligente. El catálogo económ
 | **Digital Automation & Integrations** | API/Workflow Sprint · Data Pipeline · Automation Build · Integration Operations |
 | **Product Design 360** *(propuesta)* | **Capability de oficio** consumida por dos superficies. Lanes: Accesibilidad · Design system y tokens · Research y validación · Entrega de diseño (UI/UX) · Deuda de diseño · Design ops · Endurecer lo generado con IA. Entradas: Diagnóstico de Capacidad y Sample Sprint |
 
+La puerta de entrada de visibilidad en IA se presenta como **Efeonce AEO** (capacidad),
+**Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (entregable).
+La familia más amplia sigue siendo **Search Visibility 360**. Este naming no añade un servicio
+contratable ni aprueba el [modelo comercial AEO](../business-models/aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md),
+que permanece `Draft`. [ADR de naming](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 **Product Design 360** es una **sexta familia propuesta**, todavía no aceptada en el ADR de boundaries. Su motion
 primario es **extender la capacidad de un equipo de product design in-house**, no reemplazarlo: se venden lanes de
 capacidad gobernada, no diseñadores. Cubre superficies operables —web y producto digital— y separa *decidir cómo
