@@ -29,9 +29,11 @@
 
 ## Summary
 
-El informe PDF del Grader de visibilidad en IA pasa al lenguaje visual de Efeonce Insights y de «La órbita»: paleta,
-tipografía, portada con una órbita que mide el puntaje, páginas interiores de la misma familia y una contraportada con
-contacto y eslogan. No lleva el lockup de Insights y no cambia el motor de render (react-pdf) ni el contrato del adjunto.
+El informe PDF del Grader de visibilidad en IA pasa al lenguaje visual de Efeonce Insights y de «La órbita», en dos
+versiones: para no clientes (diagnóstico, cierra con «Agenda 30 minutos») y para clientes (parte del servicio: sin
+oferta, cierra con su equipo y el próximo informe). Portada con la órbita que mide, veredicto como hallazgo y escala;
+interiores en orden «respuesta primero» (qué hacer, por qué, dónde, mercado y fuentes). Sin lockup de Insights y sin
+cambiar el motor de render (react-pdf).
 
 ## Why This Task Exists
 
@@ -263,8 +265,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Dirección aprobada y sellada
 
-- Resolver con el operador las decisiones abiertas (tipografía, turquesa sobre papel, palabra del eslogan).
-- Exportar las cinco hojas aprobadas del canvas a `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita/`
+- Resolver con el operador las decisiones abiertas (tipografía, palabra del eslogan, enlace de agenda).
+- Exportar las ocho hojas aprobadas (dos portadas, cuatro interiores, dos contraportadas) del canvas a `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita/`
   y escribir la dirección `TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`; actualizar el wireframe.
 
 ### Slice 2 — Tokens y fuentes
@@ -274,9 +276,15 @@ Reglas obligatorias:
 - Si se aprueba Bricolage: generar instancias estáticas por peso, registrarlas en `register-fonts.ts` y documentar su
   procedencia junto a `BricolageGrotesque-SOURCE.md`.
 
-### Slice 3 — Portada con la órbita que mide
+### Slice 3 — Audiencia y portadas
 
+- Entrada de audiencia (`prospect | client`) en `renderAiVisibilityReportPdf`, resuelta antes del render desde el
+  vínculo del informe con una organización cliente (ver Open Questions); logo del cliente y responsable de la cuenta
+  cuando existen.
+- Dos portadas: rótulo, identidad («Preparado para» + logo en la de cliente) y tendencia según la audiencia.
 - Reemplazar `Gauge` por la órbita que mide (esfera en `score × 3,6°`, estela de 50°, halo) con el estado `null`.
+- Escala con los umbrales de `recommendations.ts` y veredicto como hallazgo (reglas sobre los datos, con
+  `headline.frame` de respaldo).
 - Firma con el logo de Efeonce desde `axis-brand-assets`.
 
 ### Slice 4 — Páginas interiores y contraportada
@@ -285,9 +293,13 @@ Reglas obligatorias:
   Overview; copias de ChatGPT y Claude con color literal.
 - Íconos del Trazo de AXIS en niveles, dimensiones, cifras de calidad, procedencia y encabezados.
 
-- Encabezado y pie corridos; páginas 02–04 con la nueva paleta y tipografía, mismo contenido y orden.
-- Contraportada nueva con invitación, burbuja URL, redes de `EFEONCE_SOCIAL_LINKS`, logo y eslogan; copy en
-  `src/lib/copy/growth.ts`.
+- Encabezado y pie corridos; cuatro interiores en orden «respuesta primero»: 02 qué hacer (brecha con evidencia +
+  plan con la dimensión que mueve y su peso), 03 por qué (dimensiones con peso, barras navy, gravedad en etiquetas; y
+  calidad), 04 dónde (niveles con su eje y su puntaje calculado desde sus dimensiones; motores), 05 mercado (participación
+  de voz en %, fuentes que sostienen la respuesta, procedencia).
+- Nombres de las dimensiones en español en `src/lib/copy/growth.ts`.
+- Dos contraportadas con la voz de la línea: prospecto con «Agenda 30 minutos», correo, burbuja URL y redes de
+  `EFEONCE_SOCIAL_LINKS`; cliente con responsable de la cuenta y próximo informe, sin oferta. Bloque de marca al 64 %.
 
 ### Slice 5 — Evidencia y documentación
 
@@ -381,10 +393,17 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [ ] El eslogan va en bloque debajo del logo de Efeonce, al 64 % de su ancho (cuerpo = 0,64 × logo ÷ 11,586 em), separado 1,35 veces su cuerpo; nunca como texto a cuerpo fijo.
 - [ ] Cada motor evaluado (ChatGPT, Claude, Gemini, Perplexity, Google AI Overview) aparece con su logo oficial en la portada y en «Canales de respuesta»; Google AI Overview usa la lupa de Google AI Mode de AXIS, nunca el logo de Gemini.
 - [ ] Los íconos son del Trazo de AXIS (`resolveIcon`), en reposo, y cada grupo pasa `auditIconGroup`; ninguno dibujado a mano.
-- [ ] El copy nuevo vive en `src/lib/copy/growth.ts`.
+- [ ] El copy nuevo vive en `src/lib/copy/growth.ts`, incluidos los nombres de las dimensiones en español.
+- [ ] Existen dos versiones del documento por audiencia; la de cliente no tiene CTA comercial, redes ni oferta del Grader, y la de no cliente cierra con «Agenda 30 minutos» y el correo comercial.
+- [ ] La gravedad de puntaje, niveles, dimensiones y motores sale de los umbrales de `recommendations.ts` (< 40 crítico, < 70 atención) y la portada muestra esa escala.
+- [ ] El puntaje de cada nivel es el promedio ponderado de sus dimensiones medidas; un nivel sin dimensiones medidas muestra «Sin dato» y el de operabilidad sin probes «En cobertura».
+- [ ] Sin histórico la portada dice «Primera medición» y nunca «▲ 0».
+- [ ] Las barras son navy y la gravedad va en etiquetas con punto de color.
+- [ ] El pie de cada página interior queda dentro de la hoja (medido en el PDF real).
+- [ ] La página 05 muestra la participación de voz en porcentaje y las fuentes citadas de `citationSourceBreakdown`.
 - [ ] `renderAiVisibilityReportPdf` conserva su firma y `build-report-attachment.ts` no cambia.
 - [ ] `report-artifact-pdf-no-leak.test.tsx` sigue verde.
-- [ ] El dossier tiene las cinco páginas en color y en gris, lado a lado con las hojas aprobadas, y el scorecard.
+- [ ] El dossier tiene las ocho hojas en color y en gris, lado a lado con las hojas aprobadas, y el scorecard.
 
 ## Verification
 
@@ -416,6 +435,10 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 
 - ¿Tipografía Bricolage + Poppins (sistema «La órbita», propuesta del canvas) o Poppins + Geist (catálogos A4 de
   Insights, TASK-1889)?
-- ¿El turquesa oscuro puede ir en ordinales y en «Tu marca» sobre papel, o queda sólo como acento sobre fondo oscuro
-  como en TASK-1889?
+- Resuelta en la propuesta 2026-09-29: el turquesa no va en texto sobre papel; «Tu marca» y las barras van en navy.
+- ¿De dónde sale la audiencia (cliente o no cliente)? Candidato: el vínculo del informe con una organización cliente
+  (`grader_profiles.organization_id`, TASK-1243). Si no hay un reader que lo entregue junto con el logo del cliente y
+  el responsable de la cuenta, esa parte se separa en una task `backend-data` antes de implementar.
+- ¿Qué enlace usa «Agenda 30 minutos» (calendario comercial o formulario)?
+- El fixture marca AI Visibility 72 como «atención», pero el umbral real lo hace óptimo: ¿se corrige el fixture?
 - ¿Qué palabra del eslogan corresponde al Grader («Growth» en la propuesta)?

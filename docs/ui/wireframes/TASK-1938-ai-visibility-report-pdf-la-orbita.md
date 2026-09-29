@@ -8,10 +8,12 @@ las páginas que TASK-1938 debe producir en el renderer PDF del Grader, con sus 
 
 - Visual direction mode: source-led (pendiente de aprobación).
 - **Fuente editable:** canvas «Correo de Efeonce Insights», página «Informe del Grader (PDF)»,
-  <https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd>. Archivos `project/GraderPortada.dc.html`,
-  `project/GraderNiveles.dc.html`, `project/GraderBrecha.dc.html`, `project/GraderMercado.dc.html` y
-  `project/GraderContraportada.dc.html` (se leen con la tool Artifact). Cifras ilustrativas tomadas de
-  `src/components/growth/ai-visibility/report-artifact/fixtures.ts`; copy de `src/lib/copy/growth.ts`.
+  <https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd>. Archivos `project/GraderPortadaProspecto.dc.html`,
+  `project/GraderPortadaCliente.dc.html`, `project/GraderQueHacer.dc.html`, `project/GraderPorQue.dc.html`,
+  `project/GraderDonde.dc.html`, `project/GraderMercado.dc.html`, `project/GraderContraProspecto.dc.html` y
+  `project/GraderContraCliente.dc.html` (se leen con la tool Artifact). Cifras del ejemplo tomadas de
+  `src/components/growth/ai-visibility/report-artifact/fixtures.ts` y recalculadas con las reglas del modelo (ver
+  «Datos»); copy de `src/lib/copy/growth.ts` salvo lo marcado como nuevo.
 - **Referencia de familia:** los catálogos premium de Efeonce Insights (TASK-1889) y su dirección
   `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`. El Grader se homologa al
   **lenguaje** de esa familia, no a su marca: no lleva el lockup de Efeonce Insights.
@@ -19,58 +21,86 @@ las páginas que TASK-1938 debe producir en el renderer PDF del Grader, con sus 
   superficie es el render `PDF (vectorial A4)` del nodo **S14 (report artifact)** y el adjunto del nodo **S3 (email del
   informe)**. No agrega nodos ni rutas.
 
+## Dos audiencias, un documento
+
+El informe se genera para **no clientes** (prospectos que piden el diagnóstico público) y para **clientes** (el
+Grader es parte de su servicio). Decisión del operador, 2026-09-29: dos portadas y dos contraportadas; **a un cliente
+nunca se le «ofrece» el Grader ni se le vende**. Las cuatro páginas interiores son las mismas.
+
+| | No cliente (prospecto) | Cliente |
+|---|---|---|
+| Rótulo de portada | «Diagnóstico de visibilidad en IA» | «Informe de visibilidad en IA» |
+| Identidad | nombre de la marca a 64 px | «Preparado para» + logo del cliente + nombre |
+| Bajo la órbita | «Primera medición: tu punto de partida» | «▲ N puntos desde el [fecha anterior]» (`trend.overall`) |
+| Contraportada | «¿Conversamos? / Cuando quieras» + «Agenda 30 minutos →» + `sales@efeoncepro.com` + burbuja URL y redes | «¿Lo revisamos juntos? / Cuando quieras» + responsable de la cuenta + próximo informe; sin CTA comercial ni redes |
+
+**Qué decide la variante [verificar en Discovery]:** que el informe esté ligado a una organización cliente
+(`grader_profiles.organization_id`, TASK-1243) o sea un lead del intake público. La variante es un dato del informe
+que el renderer recibe, nunca una deducción visual.
+
 ## Desktop Target
 
-El «desktop» es el documento a tamaño físico: A4 a 96 dpi, 794×1123 px por página. Cinco páginas: portada, 02, 03, 04
-y contraportada (hoy son cuatro: la contraportada es nueva).
+El «desktop» es el documento a tamaño físico: A4 a 96 dpi, 794×1123 px por página. Seis páginas por variante:
+portada, 02, 03, 04, 05 y contraportada. Orden «respuesta primero»: qué hacer → por qué → dónde → mercado.
 
-### Portada (fondo tinta `#001a33` de «La órbita»)
+### Portada (fondo tinta `#001a33`)
 
 | Región | Contenido | Regla |
 |---|---|---|
-| Cabecera | «Informe de visibilidad en IA» en versalitas + etiqueta con el período | copy `GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT.header.title`; período de `ReportHeader.periodLabel` |
-| Marca evaluada | nombre de la organización a 68 px en la voz de idea; debajo la fecha de los datos | `header.organizationName`; nunca un nombre inventado |
-| **Órbita que mide** | anillo fino, marca a las 12, arco con estela de 50° y esfera en `score × 3,6°`, con halo; dentro el puntaje grande, «de 100» y la etiqueta de gravedad | reemplaza al `Gauge` actual, que es un arco que se llena (un indicador de carga, prohibido por la línea). Única órbita de todo el documento. Sin puntaje (`null`): anillo sin arco ni esfera y «—» dentro |
-| Veredicto | «Veredicto ejecutivo» + `headline.frame` con dos pesos (fuerte + liviano) | ningún texto cruza el anillo |
-| Cobertura | fila de discos blancos con el logo de cada motor evaluado + «Evaluado en N motores de respuesta» y «N preguntas · N de M respondieron» | motores del roster público (`src/lib/growth/ai-visibility/report/engine-roster.ts`: ChatGPT, Claude, Gemini, Perplexity y Google AI Overview); cada motor con su logo oficial (ver Visual Fidelity Mapping) |
-| Firma | logo de Efeonce en blanco, centrado abajo | archivo oficial de `@efeoncepro/axis-brand-assets`; sin «Preparado por Efeonce · efeoncepro.com» como texto suelto |
+| Cabecera | rótulo en versalitas (según variante) + etiqueta con el período | período de `ReportHeader.periodLabel` |
+| Identidad | ver tabla de audiencias | nunca un nombre inventado; sin logo del cliente, «Preparado para» con el nombre solo |
+| **Órbita que mide** | anillo fino, marca a las 12, arco con estela de 50° y esfera en `score × 3,6°`, con halo; dentro el puntaje, «de 100» y la etiqueta de gravedad | reemplaza al `Gauge` actual (arco que se llena). Única órbita del documento. Puntaje `null`: anillo sin arco ni esfera y «—» |
+| Tendencia | ver tabla de audiencias | `trend.status` sin histórico → el texto de primera medición, nunca «▲ 0» |
+| **Escala** | «0–39 Crítico · 40–69 Atención · 70–100 Óptimo», con su punto de color | umbrales de `src/lib/growth/ai-visibility/report/recommendations.ts` (`SEVERITY_CRITICAL_BELOW = 40`, `SEVERITY_ATTENTION_BELOW = 70`); nunca escritos a mano en el renderer |
+| **Veredicto** | «Te encuentran, pero casi no te citan.» en dos pesos | un hallazgo de los datos (presencia óptima + citas críticas), no la frase comodín `headline.frame`; ver Copy Ledger |
+| Cobertura | discos blancos con el logo de cada motor + «Evaluado en N motores de respuesta» y «N preguntas · N de M respondieron» | roster de `engine-roster.ts` |
+| Firma | logo de Efeonce en blanco, centrado abajo | `@efeoncepro/axis-brand-assets`; sin eslogan (sólo cierra) |
 
-### Página 02 — Marco de evaluación y canales
+### Página 02 — Qué hacer
 
-- Encabezado corrido: «Informe de visibilidad en IA · [organización] · [período]» a la izquierda y el folio a la
-  derecha, sobre un filete. Pie: «Preparado por Efeonce» y `efeoncepro.com`.
-- «Niveles para existir en un internet de agentes»: leyenda de los dos ejes (percepción, operabilidad) y cinco filas
-  (ordinal, nombre ES · EN, pregunta, puntaje + etiqueta de gravedad, o «En cobertura» cuando el nivel no tiene puntaje).
-- «Canales de respuesta»: una barra por motor con el **logo del motor** en un disco, el porcentaje de presencia y «N
-  de M respuestas». Los cinco motores del roster, incluido Google AI Overview con la lupa de Google AI Mode.
-- Íconos del Trazo de AXIS en cada nivel (búsqueda, contenido, checklist, automatización, objetivo) y en los
-  encabezados de sección (medición, IA).
+- Encabezado corrido (rótulo · organización · período, folio) y pie «Preparado por Efeonce · efeoncepro.com» en todas
+  las interiores.
+- «Lo que más pesa hoy»: tarjeta navy con la brecha principal (dimensión y puntaje, gravedad), un titular que dice el
+  hallazgo («Te mencionan, pero no te citan.») y la **evidencia** en vez de repetir la acción: «Solo 32 de cada 100
+  respuestas con cita apuntan a tu sitio, y la fuente más citada sobre tu categoría es un tercero (g2.com, 18 de 45
+  citas)» (`citationInsight` + `citationSourceBreakdown`).
+- «Plan prioritario»: tres movimientos numerados con título, gravedad y acción, más una línea «Mueve [dimensión] · hoy
+  N/100 · peso P % del puntaje». Sin «impacto esperado» mientras el modelo no lo traiga: no se inventa.
 
-### Página 03 — Dónde enfocar
+### Página 03 — Por qué ocurre
 
-- «Brecha principal» en tarjeta navy: dimensión y puntaje, etiqueta de gravedad, título de la brecha a 36 px y
-  «Movimiento recomendado» con la primera recomendación.
-- «Por qué ocurre»: siete dimensiones con ícono del Trazo, barra, puntaje y gravedad; la dimensión sin dato muestra «—»
-  y «Sin dato», nunca cero.
-- «Calidad de la presencia»: tres cifras (share de citas, sentimiento con barra apilada positivo/neutral/negativo,
-  prominencia mejor/promedio).
+- «Siete dimensiones, con su peso»: una fila por dimensión con ícono, nombre en español, peso (`SCORE_DIMENSION_CONFIG`:
+  25, 15, 15, 15, 15, 10, 5 %), barra **navy**, puntaje y gravedad como punto + etiqueta. Sin dato: «—» y «Sin dato».
+- «Calidad de la presencia»: share de citas, sentimiento con barra apilada (positivo navy, neutral gris, negativo rojo) y
+  prominencia (mejor posición y promedio).
 
-### Página 04 — Mercado y plan
+### Página 04 — Dónde estás
 
-- «Benchmark competitivo»: barras de menciones; «Tu marca» destacada.
-- «Plan prioritario»: recomendaciones numeradas, cada una con título, gravedad y acción.
-- «Proveniencia y metodología»: fecha de los datos, número de preguntas, versión del puntaje y del paquete de preguntas;
+- «Niveles para existir en un internet de agentes» con la leyenda de los ejes que dice qué niveles pertenecen a cada uno
+  (Percepción: 01, 02, 03 y 05; Operabilidad: 04, según `REPORT_LEVEL_AXIS` de `model.ts`) y el eje en cada fila
+  («Nivel 02 · Percepción»).
+- El puntaje de cada nivel es el promedio ponderado de sus dimensiones (`REPORT_LEVEL_DIMENSIONS`); en el ejemplo:
+  01 → 72 (óptimo), 02 → 51, 03 → sin dato (su única dimensión no tiene dato), 04 → en cobertura, 05 → 59.
+- «Motor por motor»: logo del motor en disco, barra navy, porcentaje y «N de 24» con el punto de gravedad; el subtítulo
+  nombra dónde más se pierde presencia (los dos motores más bajos).
+
+### Página 05 — Mercado y fuentes
+
+- «Participación de voz»: barras con el **porcentaje** de las menciones (48 → 33 %, 41 → 28 %, 32 → 22 %, 23 → 16 %,
+  de 144) y las menciones debajo; «Tu marca» en navy, el resto en gris.
+- «Fuentes que sostienen la respuesta»: dominios de `citationSourceBreakdown.domains` con su clasificación (terceros,
+  comunidad, tu sitio, competidor) y las citas; el sitio propio destacado.
+- «Procedencia y metodología»: fecha de los datos, número de preguntas, versión del puntaje y del paquete de preguntas;
   debajo el aviso de alcance vigente (`model.disclaimer`).
 
-### Contraportada (fondo tinta)
+### Contraportada (fondo tinta, todo centrado en una sola columna)
 
-La voz pregunta–respuesta de la línea (`criteria.md` §4, `close-brochure`): «¿Conversamos?» a 24 px en Poppins Light
-con el anillo pequeño delante en el acento, y «Cuando quieras» a 78 px en Bricolage 760 (3,25×) que cierra con la esfera
-del acento en lugar del punto; debajo la evidencia en Poppins con «qué mover primero» en negrita. Después la burbuja URL oficial + las redes de
-`EFEONCE_SOCIAL_LINKS` (`src/config/efeonce-brand.ts`), y abajo el **bloque de marca**: logo de Efeonce de 440 px y,
-debajo, el eslogan al **64 % del ancho del logo** (24,3 px), separado 1,35 veces su cuerpo, con «Growth» en el acento
-(≥ 24 px). El eslogan es un elemento gráfico que acompaña la marca, no un texto: se dimensiona desde el logo (regla
-del operador 2026-09-29, `efeonce-graphic-line` → `criteria.md` §5). Sólo aparece aquí.
+- **Voz pregunta–respuesta** de la línea (`criteria.md` §4): pregunta a 24 px en Poppins Light con el anillo pequeño
+  delante en el acento; respuesta «Cuando quieras» a 78 px en Bricolage 760 (3,25×) que cierra con la esfera del
+  acento en lugar del punto; evidencia debajo en Poppins con una frase en negrita.
+- Acción según la variante (tabla de audiencias). El enlace de agenda es real ([enlace de agenda] por definir).
+- **Bloque de marca** a 112 px de la acción: logo de Efeonce de 240 px y, debajo, el eslogan al **64 % del ancho del
+  logo** (13,3 px; «Growth» en blanco porque mide menos de 24 px), separado 1,35 veces su cuerpo. La razón social al pie.
 
 ## Mobile Target
 
@@ -79,51 +109,71 @@ esta task (ver Out of Scope de la task).
 
 ## Action Hierarchy
 
-Ver el puntaje y el veredicto → entender dónde enfocar (brecha principal) → revisar por qué (dimensiones y calidad) →
-comparar con el mercado → leer el plan → contactar a Efeonce desde la contraportada. El documento no tiene acciones de
-negocio; los enlaces (URL, redes) son reales.
+Veredicto y puntaje → qué hacer (brecha y plan) → por qué (dimensiones y calidad) → dónde (niveles y motores) →
+mercado y fuentes → siguiente paso (agendar si es prospecto; revisar con su equipo si es cliente). El documento no
+tiene acciones de negocio; los enlaces (agenda, correo, URL, redes) son reales.
 
 ## Visual Fidelity Mapping
 
 - Paleta de «La órbita» en vez de la actual (`#023c70` + azul `#0375db`): tinta `#001a33` en portada y contraportada,
-  navy `#023c70` en estructura y tarjeta de brecha, texto claro `#cfe4fa` sobre oscuro, acento turquesa sólo como
-  gráfico sobre fondo oscuro o en cifras ≥ 24 px con contraste ≥ 3:1. Valores desde `efeonceGraphicLine`
-  (`@efeoncepro/axis-tokens`), nunca escritos a mano en el componente; `report-pdf-tokens.ts` es el único mapa.
-- Gravedad (crítico, atención, óptimo, sin dato) desde `axisSemanticHex`; la tinta oscura de «atención» (`warningInk`)
-  se conserva para texto sobre papel.
-- Tipografía: **decisión abierta** (ver Design Decision Log). La propuesta del canvas usa Bricolage para títulos y
-  cifras y Poppins para estructura (sistema «La órbita»); los catálogos A4 de Insights usan Poppins + Geist.
+  navy `#023c70` en estructura, barras y tarjeta de brecha, texto claro `#cfe4fa` sobre oscuro, acento turquesa sólo
+  como gráfico (anillo, esfera, anillo de la pregunta) o en texto ≥ 24 px. Valores desde `efeonceGraphicLine`
+  (`@efeoncepro/axis-tokens`); `report-pdf-tokens.ts` es el único mapa.
+- **Gravedad sólo en etiquetas y puntos**, no en barras: las barras son navy (el ámbar a sangre saturaba la página y
+  hacía que todo pareciera igual de urgente). Colores de `axisSemanticHex`; tinta oscura de «atención» (`warningInk`)
+  para texto sobre papel.
+- Tipografía: **decisión abierta** (ver Design Decision Log). La propuesta usa Bricolage para títulos y cifras y Poppins
+  para estructura (sistema «La órbita»); los catálogos A4 de Insights usan Poppins + Geist.
 - Logo de Efeonce y burbuja URL: archivos de `@efeoncepro/axis-brand-assets`; redes con el ícono de contorno de la
   firma de correo (`efeonceGraphicLine` email-signature `icons`).
 - **Logos de los motores (obligatorio):** ChatGPT `public/images/logos/axis/gpt-isotype.svg`, Claude
   `claude-isologo.svg`, Gemini `gemini-isotype.svg`, Perplexity `perplexity-icon.svg`; Google AI Overview con la
   **lupa con destello de Google AI Mode** de AXIS (`apps/lab/public/references/ai-mode-magnifier-sparkle-on-light.svg`,
-  guía `docs/agent-composition/search-boxes.md`), nunca el logo de Gemini. Van en un disco blanco (logo al 55–60 %).
-  Los SVG de ChatGPT y Claude pintan con `var(--fill-0, …)`: react-pdf y `<img>` no resuelven `var()`, así que se
-  copian con el color literal (negro y `#D97757`).
-- **Iconografía (obligatoria donde ayude a leer):** sólo el Trazo del catálogo de AXIS
-  (`resolveIcon` de `@efeoncepro/axis-graphic-line/icons`, superficie clara, en reposo porque la pieza ya tiene la
-  esfera de la portada), grupos revisados con `auditIconGroup`. Nunca un ícono dibujado a mano.
+  guía `docs/agent-composition/search-boxes.md`), nunca el logo de Gemini. Disco blanco, logo al 55–60 %. Los SVG de
+  ChatGPT y Claude pintan con `var(--fill-0, …)`: react-pdf y `<img>` no resuelven `var()`, así que se copian con el
+  color literal (negro y `#D97757`).
+- **Iconografía:** sólo el Trazo del catálogo de AXIS (`resolveIcon` de `@efeoncepro/axis-graphic-line/icons`, superficie
+  clara, en reposo porque la pieza ya tiene la esfera de la portada); los cuatro grupos pasan `auditIconGroup`.
+  Niveles: `busqueda`, `codigo` (legible por máquinas), `checklist`, `integracion` (lo pueden usar), `objetivo`.
+  Dimensiones: `ia`, `crm`, `objetivo`, `medios`, `prensa`, `social`, `revenue`. Calidad: `prensa`, `social`,
+  `medicion`. Procedencia: `calendario`, `composer`, `medicion`, `contrato`. Descartados por leerse mal: `contenido`
+  (lápiz: escribir, no entender), `automatizacion` (flecha circular: «recargar»), `buscador` (parece un interruptor).
 
 ## Copy Ledger
 
-Todo el copy existente sigue en `src/lib/copy/growth.ts` (`GH_GROWTH_AI_VISIBILITY` y
-`GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT`). Copy nuevo a agregar ahí: «¿Conversamos?», «Cuando quieras.», la línea de
-invitación de la contraportada, «Preparado por Efeonce» del pie y el título «Lo que más pesa hoy» si el operador lo
-aprueba (hoy la sección se titula «Brecha principal»). Validar con `greenhouse-ux-writing`.
+Copy existente en `src/lib/copy/growth.ts` (`GH_GROWTH_AI_VISIBILITY`, `GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT`).
+Nuevo, a agregar ahí y validar con `greenhouse-ux-writing`:
+
+- Rótulos «Diagnóstico de visibilidad en IA» (prospecto) y «Preparado para» (cliente); «Primera medición: tu punto de
+  partida»; «▲ N puntos desde el [fecha]»; la leyenda de la escala.
+- **Nombres de las dimensiones en español** (hoy `SCORE_DIMENSION_CONFIG` sólo trae los nombres en inglés): Visibilidad
+  en IA, Claridad de identidad, Dominio de la categoría, Participación de voz, Calidad de las citas, Alineación del
+  mensaje, Intención de compra.
+- Títulos de sección: «Qué hacer / Lo que más pesa hoy», «Por qué ocurre / Siete dimensiones, con su peso», «Dónde
+  estás», «Motor por motor», «Participación de voz», «Fuentes que sostienen la respuesta», «Procedencia y metodología»
+  (reemplaza «Proveniencia»).
+- **Veredicto y titular de la brecha como hallazgo:** se eligen por reglas sobre los datos (p. ej. nivel 01 óptimo y
+  citas críticas → «Te encuentran, pero casi no te citan»), con una frase por combinación aprobada; si ninguna regla
+  aplica, se usa `headline.frame`. Nunca los escribe un modelo de lenguaje sin validación.
+- Contraportadas: «¿Conversamos? / Cuando quieras», «Agenda 30 minutos», «o escríbenos a …» (prospecto); «¿Lo
+  revisamos juntos? / Cuando quieras», «Tu equipo», «Próximo informe», «Medimos lo mismo, mes a mes» (cliente).
 
 ## State Copy
 
 | State | Qué se ve | Regla |
 |---|---|---|
-| informe completo | cinco páginas | ninguna |
+| informe completo | seis páginas | ninguna |
 | puntaje `null` | anillo sin arco ni esfera, «—» y «Sin dato» | nunca un arco en 0 |
-| nivel sin puntaje | «En cobertura» | no se dibuja barra |
+| sin histórico (`trend` sin comparación) | «Primera medición: tu punto de partida» | nunca «▲ 0» |
+| nivel sin dimensiones medidas | «—» y «Sin dato» | nunca 0 |
+| nivel del eje de operabilidad sin probes | «En cobertura» | no se dibuja barra |
 | dimensión sin dato | «—» y «Sin dato» en gris | nunca 0/100 |
-| sin brecha principal (`primaryGap` ausente) | la tarjeta no se dibuja | no se inventa |
-| sin benchmark competitivo | la sección no se dibuja | idem |
+| sin brecha principal (`primaryGap` ausente) | la tarjeta no se dibuja; el plan sube | no se inventa |
+| sin benchmark o sin fuentes citadas | la sección no se dibuja | idem |
 | motores que no respondieron | «N de M motores respondieron» | cobertura honesta |
-| nombres largos (organización, competidores) | ajuste de línea | sin cortar con «…» |
+| cliente sin logo | «Preparado para» con el nombre | sin marcador vacío en producción |
+| cliente sin responsable de cuenta asignado | la tarjeta muestra el correo general de la cuenta | [verificar la fuente del responsable] |
+| nombres largos | ajuste de línea | sin cortar con «…» |
 
 ## Accessibility Contract
 
@@ -134,9 +184,11 @@ la etiqueta); lectura verificada en escala de grises; enlaces con destino real.
 
 - Superficie: `src/components/growth/ai-visibility/report-artifact/pdf/AiVisibilityReportPdf.tsx` (react-pdf) y sus
   tokens `report-pdf-tokens.ts`. `Nav placement: none`.
-- Consumidor: `src/lib/growth/ai-visibility/public-delivery/email/build-report-attachment.ts` (adjunto del correo). No
-  cambia su contrato: `renderAiVisibilityReportPdf(model, header)` sigue devolviendo el mismo buffer.
-- Modelo: `ReportArtifactModel` (`report-artifact/model.ts`) sin cambios de forma.
+- Consumidor: `src/lib/growth/ai-visibility/public-delivery/email/build-report-attachment.ts`.
+  `renderAiVisibilityReportPdf(model, header)` suma un campo de **audiencia** (`prospect | client`) resuelto antes del
+  render, más el logo del cliente y el responsable de la cuenta cuando existen [verificar fuentes en Discovery].
+- Modelo: `ReportArtifactModel` ya trae lo necesario para tendencia (`trend`), fuentes (`citationSourceBreakdown`),
+  niveles (`levels` con su eje) y pesos (vía `SCORE_DIMENSION_CONFIG`); el PDF hoy no dibuja tendencia ni fuentes.
 - Fuentes: `src/lib/finance/pdf/register-fonts.ts`. Si se adopta Bricolage, react-pdf necesita instancias estáticas
   por peso (el archivo del repo es variable).
 - Primitive: `extend` del renderer existente; sin librería nueva.
@@ -144,27 +196,29 @@ la etiqueta); lectura verificada en escala de grises; enlaces con destino real.
 ## GVC Scenario Plan
 
 - Quality profile: premium.
-- Scenario: **no aplica** GVC de portal (no hay ruta). Evidencia = PDF real renderizado con el fixture y con un
-  informe real de staging, abierto página por página, en color y en escala de grises.
+- Scenario: **no aplica** GVC de portal (no hay ruta). Evidencia = PDF real de cada variante, renderizado con el fixture
+  y con un informe real de staging, abierto página por página, en color y en escala de grises.
 - Fidelidad: cada página contra la hoja aprobada del canvas (exportada a `docs/ui/visual-directions/TASK-1938-*/`),
   lado a lado en el dossier `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/`.
-- Assertions: el test `report-artifact-pdf-no-leak.test.tsx` sigue verde; cifras iguales al modelo; fuentes embebidas.
+- Assertions: el test `report-artifact-pdf-no-leak.test.tsx` sigue verde; cifras y gravedades iguales al modelo; el
+  pie de cada página interior queda dentro de la hoja; fuentes embebidas.
 - Scroll-width: no aplica a PDF.
 
 ## Design Decision Log
 
-- **Lenguaje de Insights, marca de Efeonce.** El Grader es un diagnóstico público; Insights es un producto para
-  clientes. Comparten sistema visual, no lockup.
-- **La órbita mide el puntaje.** El `Gauge` actual se llena como un indicador de carga; la línea exige la esfera en la
-  posición del valor con estela corta.
-- **Una sola órbita** (la portada); el resto del documento usa barras y cifras.
-- **Contraportada nueva** con contacto y eslogan, igual que las piezas de marca y los informes de Insights.
-- **Motor sin cambiar en esta task (react-pdf).** Pasar al Artifact Composer es mejor a largo plazo, pero hoy el render
-  es de a una salida cada 2 minutos y el correo del Grader adjunta el PDF en el momento; esa migración es un follow-up
-  con su propio contrato.
-- **Logos de los motores y la lupa de Google AI Mode** (operador, 2026-09-29: «importantísimo»): cada motor se
-  reconoce por su marca, no por su nombre. El informe web hoy asigna a Google AI Overview el logo de Gemini
-  (`report-artifact/web/AiVisibilityReportArtifact.tsx`), contra la guía de AXIS: se corrige en el follow-up de paridad.
-- **Íconos del Trazo** en niveles, dimensiones, cifras de calidad y encabezados, para leer por bloques.
-- **Abiertas:** tipografía (Bricolage + Poppins o Poppins + Geist); si el turquesa oscuro va en ordinales y en «Tu
-  marca» sobre papel (TASK-1889 lo limita a acento sobre navy); qué palabra del eslogan corresponde al Grader.
+- **Lenguaje de Insights, marca de Efeonce.** Comparten sistema visual, no lockup.
+- **Dos portadas y dos contraportadas por audiencia** (operador, 2026-09-29): a un cliente no se le ofrece el Grader.
+- **Respuesta primero:** el ejecutivo sabe qué decidir en dos páginas; además resolvió que las páginas 02 y 03 de la
+  primera propuesta no cabían (el pie quedaba fuera de la hoja).
+- **La órbita mide el puntaje**, una sola en el documento.
+- **Gravedad desde las reglas del modelo, no del fixture:** el fixture marca AI Visibility 72 como «atención», pero con
+  el umbral real (≥ 70) es óptimo; y los niveles se calculan desde sus dimensiones. El diseño muestra lo que el modelo
+  produciría. Revisar el fixture en Discovery.
+- **Barras navy, gravedad en etiquetas.**
+- **Contraportada en una columna centrada**, con la voz de la línea y el bloque de marca al 64 %; logo de 240 px (la
+  norma del brochure lo pone en torno al 26 % del ancho) para que domine la respuesta.
+- **Motor sin cambiar en esta task (react-pdf)**; migrar al Artifact Composer es un follow-up.
+- **Logos de los motores y la lupa de Google AI Mode** (operador: «importantísimo»). El informe web hoy asigna a Google
+  AI Overview el logo de Gemini: se corrige en el follow-up de paridad.
+- **Abiertas:** tipografía (Bricolage + Poppins o Poppins + Geist); qué palabra del eslogan corresponde al Grader; el
+  enlace de agenda; la fuente del responsable de cuenta y del logo del cliente.
