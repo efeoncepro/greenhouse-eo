@@ -95,6 +95,9 @@ LinkedIn: pendiente (sólo Julio lo tiene hoy).
 - Paquetes por persona (HTML de papel y navy, respuesta, vistas e instrucción): OneDrive `Alineación/6. Marca/Kit
   media/Firmas/firma-<nombre-apellido>.zip`. Se generan con `ai-generations/2026-09-29_avatares-equipo/firmas/build-firmas.mjs`
   (`PERSON=<nombre-apellido>` y `HOST_BASE`, igual que la v3.1).
+- Página «Copiar mi firma» por persona y por buzón de área: `https://storage.googleapis.com/efeonce-group-axis-public-media/
+  email-signature/v3.1/instalar/<nombre-apellido | area-talent | area-finance | area-commercial>.html` (generador
+  `firmas/paginas-instalar.mjs`). El eslogan va horneado (`shared/<surface>/slogan-growth.png`) porque Outlook no carga Poppins.
 
 **Aprobado** [operador, 2026-09-29: «Está perfecto, aprobado»]: el operador revisó la hoja de contacto de la ronda
 piloto —cada persona junto a su foto, en la Escena interior de Marketing con Manzanitas— y la Escena de Daniela compuesta

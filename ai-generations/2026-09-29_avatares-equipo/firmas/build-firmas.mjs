@@ -48,7 +48,7 @@ const AREAS = {
   commercial: { nombre: 'Commercial', cargo: 'Comercial y alianzas · Efeonce', correo: 'sales@efeoncepro.com', icono: 'briefcase' }
 }
 const AREA = process.env.AREA && AREAS[process.env.AREA]
-const P = AREA ? { nombre: AREA.nombre, cargo: AREA.cargo, telefono: AGENCIA, correo: AREA.correo, linkedin: null, web: PERSONA.web } : PERSONA
+const P = AREA ? { nombre: AREA.nombre, cargo: AREA.cargo, telefono: null, correo: AREA.correo, linkedin: null, web: PERSONA.web } : PERSONA
 // La órbita del retrato (token portrait: caja 208, anillo r96, disco r78, arco 200°→250° trazo 4, esfera r7) con el ícono
 // del área al centro, en el color del nombre; la esfera lleva el acento.
 const areaOrbit = async (t) => {
@@ -95,7 +95,7 @@ ${P.linkedin ? `<td valign="middle" style="padding-left:10px">${link(P.linkedin,
   const divisor = `<tr><td colspan="3" style="padding:18px 0 0"><table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%" style="border-collapse:collapse"><tr><td valign="middle" style="height:9px"><div style="height:4px;border-bottom:1px solid ${t.line};font-size:0;line-height:0">&nbsp;</div></td><td valign="middle" width="9" style="width:9px;height:9px"><img src="${s.sphere}" width="9" height="9" alt="" style="display:block;border:0;width:9px;height:9px"></td></tr></table></td></tr>`
   const marca = `<tr><td colspan="3" style="padding:14px 0 0"><table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%" style="border-collapse:collapse"><tr>
 <td valign="middle"><img src="${s.logo}" width="108" alt="Efeonce" style="display:block;border:0;width:108px;height:auto"></td>
-<td valign="middle" align="right" style="font-family:${ESLOGAN};font-size:12px;line-height:16px;font-style:italic;font-weight:800;color:${t.slogan};white-space:nowrap">Empower <span style="font-style:normal">your</span> <span style="font-weight:900;color:${t.word}">Growth</span></td>
+<td valign="middle" align="right" style="font-size:0;line-height:0"><img src="${s.slogan}" width="${s.esloganW}" height="${s.esloganH}" alt="Empower your Growth" style="border:0;width:${s.esloganW}px;height:${s.esloganH}px"></td>
 </tr></table></td></tr>`
   const stripImg = `<img src="${s.strip}" width="${s.stripW}" alt="${ALT}" style="display:block;border:0;width:100%;max-width:${s.stripW}px;height:auto">`
   // Regla de sección: borde superior de una celda (Outlook no respeta la altura de un div de 1 px).
@@ -119,6 +119,35 @@ const respuesta = (t) => `<table cellpadding="0" cellspacing="0" border="0" role
 
 const fonts = '<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Poppins:ital,wght@0,400;0,500;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">'
 const browser = await chromium.launch()
+// El eslogan HORNEADO (2026-09-29): Outlook no carga Poppins y, sin la fuente, ExtraBold/Black caen a Arial negrita y
+// deja de ser el eslogan. Mismos pesos del SSOT de marca (Empower ExtraBold itálica, your ExtraBold, palabra Black
+// itálica), 3× y con alt. En la versión clara lleva el halo blanco del logo, para leerse en el modo oscuro de Outlook.
+const haloBlanco = async png => {
+  const { width, height } = await sharp(png).metadata()
+  const alfa = await sharp(png).ensureAlpha().extractChannel(3).toBuffer()
+  const blanco = await sharp({ create: { width, height, channels: 3, background: '#ffffff' } }).joinChannel(alfa).png().toBuffer()
+  const P = 5, capas = []
+
+  for (let dx = -4; dx <= 4; dx++) for (let dy = -4; dy <= 4; dy++) if (dx * dx + dy * dy <= 16) capas.push({ input: blanco, left: P + dx, top: P + dy })
+  const lienzo = await sharp({ create: { width: width + 2 * P, height: height + 2 * P, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite([...capas, { input: png, left: P, top: P }]).png().toBuffer()
+
+  return sharp(lienzo).extract({ left: P, top: P, width, height }).png().toBuffer()
+}
+const eslogan = async t => {
+  const pg = await browser.newPage({ viewport: { width: 400, height: 60 }, deviceScaleFactor: 3 })
+
+  await pg.setContent(`<!doctype html><html><head>${fonts}</head><body style="margin:0;background:transparent"><span id="e" style="display:inline-block;padding:3px 3px;font-family:${ESLOGAN};font-size:12px;line-height:16px;font-style:italic;font-weight:800;color:${t.slogan};white-space:nowrap">Empower <span style="font-style:normal">your</span> <span style="font-weight:900;color:${t.word}">Growth</span></span></body></html>`, { waitUntil: 'networkidle' })
+  await pg.evaluate(() => document.fonts.ready)
+  const el = await pg.$('#e')
+  const box = await el.boundingBox()
+  let png = await el.screenshot({ omitBackground: true })
+
+  await pg.close()
+  if (t.tone === 'white') png = await haloBlanco(png)
+
+  return { png, w: Math.round(box.width), h: Math.round(box.height) }
+}
 const shot = async (html, name, w, fontsOn = true) => {
   const pg = await browser.newPage({ viewport: { width: w, height: 300 }, deviceScaleFactor: 2 })
   await pg.setContent(`<!doctype html><html><head><meta charset="utf-8">${fontsOn ? fonts : ''}</head><body style="margin:0;padding:24px 20px;background:#fff">${fontsOn ? '' : '<style>*{font-family:Arial,Helvetica,sans-serif!important}</style>'}${html}</body></html>`, { waitUntil: 'networkidle' })
@@ -136,11 +165,13 @@ for (const id of ['b', 'a']) {
   const strip = await (await sp.$('div')).screenshot({ omitBackground: t.tone === 'white' })
   await sp.close()
   if (SEP === 'linea') writeFileSync(OUT + `partners-${t.tone}.png`, strip)
+  const e = await eslogan(t)
   const s = {
     phone: await icon('phone', t.accent, 14), mail: await icon('mail', t.accent, 14), linkedin: await icon('brand-linkedin', t.accent, 18),
     photo: AREA ? uri(await areaOrbit(t)) : file(FOTOS + (t.tone === 'navy' ? 'foto-orbita-oscura-' : 'foto-orbita-') + PERSON + '.png'), logo: file(FIRMA + t.logo + '.png'), bubble: file(AXIS + t.bubble, 'image/svg+xml'),
     strip: uri(strip), stripW,
-    sphere: uri(await esfera(t.accent))
+    sphere: uri(await esfera(t.accent)),
+    slogan: uri(e.png), esloganW: e.w, esloganH: e.h
   }
   const html = firma(t, s)
   writeFileSync(OUT + `firma-${id}.html`, html)
@@ -158,6 +189,7 @@ for (const id of ['b', 'a']) {
       bubble: put(`shared/${surface}/url-bubble.png`, await sharp(readFileSync(AXIS + t.bubble), { density: 600 }).resize(92 * 3, 18 * 3).png().toBuffer()),
       strip: put(`shared/${surface}/partners.png`, strip),
       sphere: put(`shared/${surface}/sphere.png`, await esfera(t.accent)),
+      slogan: put(`shared/${surface}/slogan-growth.png`, e.png), esloganW: e.w, esloganH: e.h,
       photo: AREA ? put(`areas/${process.env.AREA}-${surface}.png`, await areaOrbit(t)) : put(`people/${PERSON}-${surface}.png`, readFileSync(FOTOS + (t.tone === 'navy' ? 'foto-orbita-oscura-' : 'foto-orbita-') + PERSON + '.png')),
       stripW
     }

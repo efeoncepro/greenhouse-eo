@@ -18,10 +18,13 @@ const EQUIPO = {
   'humberly-henriquez': 'Humberly',
   'valentina-hoyos': 'Valentina'
 }
+// Firmas de buzón de área (sin foto; se instalan en la cuenta del buzón)
+const AREAS = { 'area-talent': 'Talent', 'area-finance': 'Finance', 'area-commercial': 'Commercial' }
 
 mkdirSync(DIR + 'instalar', { recursive: true })
 
-const pagina = (slug, nombre) => {
+const pagina = (slug, nombre, area = false) => {
+  const titulo = area ? `La firma del buzón ${nombre}` : `Tu firma de correo, ${nombre}`
   const a = readFileSync(DIR + `out/${slug}/outlook-a.html`, 'utf8')
   const b = readFileSync(DIR + `out/${slug}/outlook-b.html`, 'utf8')
   const r = readFileSync(DIR + `out/${slug}/outlook-respuesta.html`, 'utf8')
@@ -32,7 +35,7 @@ const pagina = (slug, nombre) => {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Tu firma Efeonce · ${nombre}</title>
+<title>Firma Efeonce · ${nombre}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -65,7 +68,7 @@ const pagina = (slug, nombre) => {
 </head>
 <body>
 <main>
-  <h1>Tu firma de correo, ${nombre}<span class="punto">.</span></h1>
+  <h1>${titulo}<span class="punto">.</span></h1>
   <p class="bajada">La firma con la nueva línea gráfica de Efeonce. Elige la versión, aprieta el botón y pégala en Outlook.</p>
 
   <div class="version" role="group" aria-label="Versión de la firma">
@@ -152,4 +155,5 @@ const pagina = (slug, nombre) => {
 }
 
 for (const [slug, nombre] of Object.entries(EQUIPO)) writeFileSync(DIR + `instalar/${slug}.html`, pagina(slug, nombre))
-console.log('ok', Object.keys(EQUIPO).length)
+for (const [slug, nombre] of Object.entries(AREAS)) writeFileSync(DIR + `instalar/${slug}.html`, pagina(slug, nombre, true))
+console.log('ok', Object.keys(EQUIPO).length + Object.keys(AREAS).length)

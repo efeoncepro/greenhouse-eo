@@ -289,6 +289,15 @@ dependen de ellas). Los paquetes para cada persona quedan en OneDrive: `Alineaci
 firma-<nombre-apellido>.zip`, con la instrucción de instalación adentro. Un cambio de foto se ve solo en las firmas ya
 instaladas: la URL de la foto no cambia.
 
+**Cómo lo instala cada persona:** su página con el botón «Copiar mi firma»
+(`https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1/instalar/<nombre-apellido>.html`; los
+buzones, `instalar/area-<talent|finance|commercial>.html`): la abre, aprieta el botón y la pega en Outlook. Nadie tiene que
+tocar HTML. Tres detalles de Outlook que el constructor ya resuelve (2026-09-29): la foto va en su propia celda de 96 px
+(con el margen dentro de la celda, Outlook la achataba), la esfera de la línea es una imagen (el círculo por estilos se
+perdía al pegar) y el **eslogan va horneado** con sus pesos canónicos (Outlook no carga Poppins y lo dejaba en Arial).
+Adaptarse sola al tema claro u oscuro del sistema no es posible: Outlook quita esas reglas al pegar; la versión de
+fondo blanco está preparada para el oscurecido automático de Outlook (logo y eslogan con halo blanco, partners transparente).
+
 **Firma de un buzón de área (equipo).** Talent, Finance y Commercial tienen firma propia, sin foto: la órbita rodea el
 ícono del área y sólo lleva su correo. Se genera con `AREA=talent` (o `finance`, `commercial`) delante del mismo
 comando, y se instala igual, en la cuenta del buzón. `people@efeoncepro.com` usa la firma de **Talent** (no es un área
