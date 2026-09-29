@@ -1,5 +1,17 @@
 # TASK-1933 — Cerrar los pendientes abiertos del catálogo del deck «La órbita»: el logo en la órbita del cierre y el registro de QA
 
+## Delta 2026-09-29 — eslogan de las contraportadas (a confirmar con el operador)
+
+- Las contraportadas con eslogan (`close-proposal-horizon` y afines) fijan el eslogan como mensaje principal a 72 px en
+  top 420, separado del logo (receta aprobada el 2026-09-27). La regla del 2026-09-29 para el cierre de Marketing con
+  Manzanitas y del motion lo pone **en bloque bajo el logo, al 64 % de su ancho**
+  (`efeonceGraphicLine.motion.layout.sloganOfLogo`, `MANZANITAS_REGISTER_V1.md` §7.2). La sesión de las láminas
+  Salesforce aplicó el bloque al 64 % en su contraportada (SF19,
+  `ai-generations/2026-09-29_deck-salesforce/DECISIONES.md`).
+- Falta la decisión del operador: ¿las contraportadas del deck adoptan el bloque al 64 %, o conservan los 72 px? Si
+  lo adoptan, se actualizan las recetas de contraportada, sus plantillas del Composer y el visual gate. Mientras tanto,
+  las recetas no cambian.
+
 ## Delta 2026-09-28 — pendientes que deja TASK-1934
 
 - **Paridad de las cinco `proposal-cinematic`**: `recipe-map.json` las declara con `slots: null` (las cuatro de TASK-1928 y
