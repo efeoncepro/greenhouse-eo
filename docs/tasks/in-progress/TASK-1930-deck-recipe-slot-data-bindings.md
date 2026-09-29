@@ -1,5 +1,12 @@
 # TASK-1930 — Datos reales en los slots del deck «La órbita»: logo, montos, equipo, métricas, casos y testimonios
 
+## Delta 2026-09-29 — TASK-1942 suma 16 recetas y slots de marcas de terceros
+
+- El catálogo pasa a 94 recetas, todas con plantilla. El mapa de binding declara **exclusiones con razón** para
+  `partnerMark` y `assistantMark` (`3833d54dd`): son marcas de terceros condicionadas (readback del programa o
+  autorización escrita), no datos de la propuesta, y nunca se ligan automáticamente. Las recetas nuevas con cifras de
+  muestra (SF11, SF13, SF15) las marcan como tales; `content-measure-formulas` no lleva cifras.
+
 ## Delta 2026-09-28 — Slices 1–4 y 7 entregados; 5 y 6 esperan sus hechos
 
 - `bindDeckSlots(plan, context)` (`server-only`) + núcleo puro `bindDeckSlotsWith(plan, sources)` en

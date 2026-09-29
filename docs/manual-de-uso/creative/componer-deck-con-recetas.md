@@ -1,9 +1,9 @@
 # Componer un deck con las recetas por lámina — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-29 por Claude (1.9: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas 09, 13, 14 y 17 (94 recetas, 16 sin plantilla), los dos cierres con su plan validado (brochure y propuesta), el logo de 700 px sólo en la contraportada Salesforce y el servicio «Enablement conversacional». Antes, 1.8: el deck de práctica Salesforce — cómo armarlo en cinco actos, qué láminas son recetas nuevas (sin plantilla todavía) y cuáles son datos de recetas existentes, marcas de terceros con condición, badge de partner con readback, la pregunta abierta de portada y cierre, y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 1.7: paso 5b — ligar los datos reales de los slots con `pnpm brand:deck-plan -- --bind` (logo del cliente desde Account 360, cifras, casos, testimonios y logos con evidencia de la propuesta, montos en `[MONTO]` y equipo pendiente), cómo leer la tabla de slots y sus motivos (TASK-1930). Antes, 1.6: las nueve láminas SEO/AEO aprobadas el 2026-09-28 (78 recetas, todas con plantilla): cuándo usarlas, cifras siempre con fuente, datos de muestra marcados («Ejemplo ilustrativo», «Datos de muestra») y la interfaz de IA genérica; la regla de alternativas (una sola por deck, seguidas o no) y los códigos `variant-both-in-deck` y `figure-source-missing` (TASK-1934). Antes, 1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
+> **Ultima actualizacion:** 2026-09-29 por Claude (1.10: las 94 recetas tienen plantilla — las cuatro de la segunda ronda Salesforce componen desde `f05c26e2f` —; los dos planes validan sin avisos; SF20 compuesta y pendiente del visto bueno; cómo regenerar el PDF de la propuesta sin insignia (TASK-1942). Antes, 1.9: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas 09, 13, 14 y 17 (94 recetas, 16 sin plantilla), los dos cierres con su plan validado (brochure y propuesta), el logo de 700 px sólo en la contraportada Salesforce y el servicio «Enablement conversacional». Antes, 1.8: el deck de práctica Salesforce — cómo armarlo en cinco actos, qué láminas son recetas nuevas (sin plantilla todavía) y cuáles son datos de recetas existentes, marcas de terceros con condición, badge de partner con readback, la pregunta abierta de portada y cierre, y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 1.7: paso 5b — ligar los datos reales de los slots con `pnpm brand:deck-plan -- --bind` (logo del cliente desde Account 360, cifras, casos, testimonios y logos con evidencia de la propuesta, montos en `[MONTO]` y equipo pendiente), cómo leer la tabla de slots y sus motivos (TASK-1930). Antes, 1.6: las nueve láminas SEO/AEO aprobadas el 2026-09-28 (78 recetas, todas con plantilla): cuándo usarlas, cifras siempre con fuente, datos de muestra marcados («Ejemplo ilustrativo», «Datos de muestra») y la interfaz de IA genérica; la regla de alternativas (una sola por deck, seguidas o no) y los códigos `variant-both-in-deck` y `figure-source-missing` (TASK-1934). Antes, 1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se arma con el catálogo de recetas, comandos locales y el Artifact Composer (la ruta productiva gobernada es TASK-1921, en curso en otra sesión: todavía no está disponible)
 > **Documentacion relacionada:** [Composición de decks y brochures (funcional)](../../documentation/creative/composicion-de-decks-y-brochures.md) · [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) · [Norma de composición por superficie §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Componer una pieza por superficie con AXIS](./componer-por-superficie-con-axis.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
@@ -42,8 +42,8 @@ cliente, para las ofertas a comité del catálogo `deck-axis` ni para la interfa
 
 1. Elige las láminas en el catálogo de 94 recetas (o pídele a un agente que proponga el plan).
 2. Valida el plan del deck con `pnpm brand:deck-plan` y corrige hasta que no queden errores.
-3. Busca el intent de ejemplo de cada lámina: **90 de las 94** recetas tienen plantilla y un ejemplo listo para copiar
-   (las 4 de la segunda ronda Salesforce todavía no; ver «El deck de práctica Salesforce»).
+3. Busca el intent de ejemplo de cada lámina: **las 94** recetas tienen plantilla y un ejemplo listo para copiar
+   (en `src/lib/brand-surfaces/examples/`).
 4. Copia el ejemplo a tu carpeta y cambia el copy, las cifras y las fotos.
 5. Compón la lámina o el documento completo con `pnpm brand:compose`.
 6. Revisa a ojo contra la referencia aprobada.
@@ -137,26 +137,34 @@ la [norma §4.6, «Deck de práctica Salesforce»](../../operations/brand-graphi
 
 Antes de armarlo:
 
-- **Cuatro láminas todavía no se componen** (09, 13, 14 y 17: recetas de la segunda ronda sin plantilla; las otras doce componen desde `84c83a044`): el plan las acepta con el aviso
-  `recipe-without-template`. Mientras tanto, las láminas aprobadas están en
+- **Las 16 láminas nuevas componen con `pnpm brand:compose`** (las doce de la primera ronda desde `84c83a044`, las
+  cuatro de la segunda desde `f05c26e2f`, sobre AXIS 0.3.33). Las láminas aprobadas de referencia están en
   `ai-generations/2026-09-29_deck-salesforce/out/` y se regeneran con `ONLY=<lámina> node
   ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs` (maquetas de dirección, no la ruta productiva).
+  Diferencias esperadas entre la plantilla y la aprobada: las negritas de SF16 y SF18 en 700 (la aprobada cayó a 800
+  por una fuente que el script no cargaba) y el número del bucle de SF18 en suave (el acento no colorea texto chico).
 - **Las láminas 09, 13, 14 y 17 tienen receta propia** desde el 2026-09-29 (`content-day-live-approval`,
   `decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`): no uses las recetas de las que antes se
   registraban como datos (`content-day-live-progress`, `decision-diagnosis-map`, `method-staircase`,
   `content-day-live-results`).
 - **Portada y cierre según el documento** (decisión del operador, 2026-09-29): parte de los dos planes validados,
   `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-brochure-salesforce.json` y
-  `golden-proposal-salesforce.json`, y valídalos con `pnpm brand:deck-plan -- --plan <plan>` (sin errores, 4 avisos
-  `recipe-without-template`). Conserva los `plateRef` de la portada, la 02 y la contraportada: sin ellos el plan falla
-  con `plate-repeated`. **La contraportada de brochure Salesforce todavía no existe como lámina:** la compone el
-  composer desde `close-brochure-orbit` y el operador tiene que darle el visto bueno antes de enviarla.
+  `golden-proposal-salesforce.json`, y valídalos con `pnpm brand:deck-plan -- --plan <plan>` (sin errores ni avisos,
+  verificado el 2026-09-29). Conserva los `plateRef` de la portada, la 02 y la contraportada: sin ellos el plan falla
+  con `plate-repeated`. **La contraportada de brochure Salesforce (SF20) ya está compuesta** desde
+  `close-brochure-orbit` (`ai-generations/2026-09-29_deck-salesforce/out/SF20-contraportada-brochure.png`), pero el
+  operador todavía no le da el visto bueno: no la envíes antes.
 - **Logo de la contraportada:** 700 px sólo en la Salesforce de propuesta (SF19); las demás contraportadas, 500 px.
 - **Marcas de terceros:** logo, íconos de producto, badge y Agent Astro necesitan la autorización escrita de Salesforce;
   Claude y Claudeforce, además la de Anthropic. **Están pendientes de archivar: sin ellas, el deck no sale a un
   cliente ni a pauta.** Agent Astro, Claude y Claudeforce son opcionales.
 - **Badge «Salesforce Partner»:** sólo con readback vigente en Partner Community. Sin él, usa el respaldo sin badge
   (`SIN_BADGE=1`): «Operamos sobre» + logo de Salesforce en la portada y nada en la contraportada.
+- **PDF de la propuesta (sin insignia):** `ai-generations/2026-09-29_deck-salesforce/out/Efeonce-Propuesta-Servicios-Salesforce.pdf`
+  (19 páginas). Para regenerarlo: `SIN_BADGE=1 DOC=propuesta ONLY=SF0-portada node
+  ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs` (portada rotulada «Propuesta») y después
+  `node ai-generations/2026-09-29_deck-salesforce/render-src/pdf-propuesta.mjs`. Es el PDF de las láminas de dirección,
+  no la salida del Composer, y valen las mismas condiciones de marcas de terceros antes de enviarlo.
 - **Cifras de muestra** marcadas y montos `[MONTO]`; la lámina de Dreamforce siempre con su fecha de corte.
 
 **Deck HubSpot:** todavía no existe la serie de contenido (sólo portada y propuesta `revenue-hubspot`). Está en
@@ -268,7 +276,7 @@ Cómo leer cada línea:
 | `slot-required-missing` | error | falta un slot obligatorio en una lámina que ya trae `slots` | escríbelo, o quita `slots` para dejar la lámina como esqueleto |
 | `slot-over-max-chars` | error | el texto pasa el largo máximo (en un texto enriquecido cuenta cada línea sin `**`; en una lista, cada ítem) | acorta el texto; nunca subas el `maxChars` |
 | `figure-source-missing` | error | una cifra del plan (un objeto con `value`) no trae `source` | agrega la fuente real del documento que la respalda, o quita la cifra. Ojo: una cifra escrita como texto plano («68 %») no la ve el validador; escríbela como objeto con `source` |
-| `recipe-without-template` | aviso | la lámina no tiene plantilla en el composer. Hoy sale en las 4 recetas de la segunda ronda del deck Salesforce y en la portada y el cierre clásicos de un pitch o un QBR (`cover-classic`, `close-classic`) | ese deck se valida pero todavía no se compone de punta a punta: avísale al operador |
+| `recipe-without-template` | aviso | la lámina no tiene plantilla en el composer. Hoy sale sólo en la portada y el cierre clásicos de un pitch o un QBR (`cover-classic`, `close-classic`); las 94 recetas del deck tienen plantilla | ese deck se valida pero todavía no se compone de punta a punta: avísale al operador |
 | `section-split-corner-adjacent` | aviso | dos secciones partidas seguidas con la misma esquina (sin `layout` cuenta como esquina arriba) | alterna `section-split` con `section-split-corner-bottom` o `section-split-panel-end`, o separa las secciones |
 | `rhythm-paper-run` | aviso | tres láminas de papel (fondo claro) seguidas | intercala una oscura o con foto |
 | `brochure-cover-first` | error, AXIS | el brochure no abre con su portada | pon una portada de brochure primero |

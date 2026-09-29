@@ -1,5 +1,14 @@
 # TASK-1937 — Biblioteca de autorizaciones de uso de marcas, testimonios y fotos de terceros
 
+## Delta 2026-09-29 — autorizaciones pendientes del deck de práctica Salesforce (TASK-1942)
+
+- Por archivar: la autorización escrita de **Salesforce** (logo, 8 íconos de producto, Agent Astro, insignia «Salesforce
+  Partner») y la de **Salesforce y Anthropic** (Claude y Claudeforce en la lámina «Enablement conversacional»). El
+  operador la declaró el 2026-09-29; sin la escrita, esas láminas no salen a clientes ni a pauta. Hoy el estado vive en
+  `AXIS_PARTNER_ASSETS` (`authorization.status: 'pending-written-authorization'`) y en
+  `ai-generations/2026-09-29_deck-salesforce/DECISIONES.md`; las plantillas exigen `authorizationRef` para mascota y
+  co-marcas. La insignia además exige readback del programa (registro de partnerships).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

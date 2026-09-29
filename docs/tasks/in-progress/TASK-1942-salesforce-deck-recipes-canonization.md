@@ -1,5 +1,21 @@
 # TASK-1942 — Canonizar el deck Salesforce de «La órbita»: 16 recetas nuevas, 4 usos de recetas existentes, Composer y AXIS
 
+## Delta 2026-09-29 (c) — Composer completo; code complete, rollout pendiente
+
+- **Slice 2 hecho:** las 16 recetas nuevas componen con `pnpm brand:compose` sobre AXIS 0.3.33 (`84c83a044` las doce,
+  `f05c26e2f` las cuatro de la segunda ronda y los valores del delta (q)); 94 de 94 recetas con plantilla; Greenhouse
+  fija `axis-tokens`/`axis-ui-contracts` 0.3.33 y `axis-brand-assets` 0.4.4 (`9289cab0c`, `2e002673e`). Baseline
+  `graphic-line` sellado en la sección (s) de `BASELINE_DELTAS.md`; gate re-verificado el 2026-09-29: **89 frames a 0 px**.
+- **SF20** (contraportada de brochure, `close-brochure-orbit` en `revenue-salesforce`) compuesta; espera el visto bueno.
+- **PDF de la propuesta sin insignia** (`963cd5534`): `ai-generations/2026-09-29_deck-salesforce/out/Efeonce-Propuesta-Servicios-Salesforce.pdf`,
+  generado con `render-src/pdf-propuesta.mjs`; portada rotulada «Propuesta» con `DOC=propuesta`.
+- **Peso 700** de las negritas de SF16/SF18 (decisión del operador; `c62a6ee94`).
+- **AXIS `v0.3.34`** (`4f370d1`, delta (r)): limpieza sin cambio de render taggeada en AXIS; el bump en Greenhouse lo
+  lleva otra sesión (sin commitear al cerrar este barrido).
+- Barrido documental y de skills: `efeonce-graphic-line` (package-and-tokens, applications §L, ledger, lessons,
+  criteria), `deck-studio`, las tres skills Salesforce, `hubspot-solutions-partner`, `axis-design-system`; norma §4.6,
+  manual, doc funcional y arquitectura `GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`.
+
 ## Delta 2026-09-29 (b) — decisiones del operador al canonizar
 
 - **SF5, SF10, SF11 y SF18 son recetas propias** (no cabían en los slots de sus recetas): `decision-diagnosis-verdict`,
@@ -35,7 +51,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Slice 1 hecho el 2026-09-29 (12 recetas) y ampliado el mismo día con las decisiones del operador (16 recetas, dos planes validados); Slice 3 (AXIS) publicado en v0.3.31 y v0.3.32 (tokens y contracts 0.3.32 en el registro, Lab en vivo con 94 láminas); Slice 2 (Composer) pendiente en otra sesión`
+- Status real: `code complete, rollout pendiente (2026-09-29): Slices 1, 2 y 3 hechos — 94/94 recetas con plantilla sobre AXIS 0.3.33, gate graphic-line 89 frames a 0 px, planes golden sin avisos; pendientes: pnpm test completo y pnpm build de producción (requieren autorización del operador), push, visto bueno de SF20, autorizaciones escritas de Salesforce y Anthropic, readback de la insignia`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -116,7 +132,7 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 
 ### Blocks / Impacts
 
-- `TASK-1932` (Proposal Studio): consume `catalog.generated.json` y `recipe-map.json`; ve 90 recetas, 12 sin plantilla.
+- `TASK-1932` (Proposal Studio): consume `catalog.generated.json` y `recipe-map.json`; ve 94 recetas, todas con plantilla (desde `f05c26e2f`).
 - `TASK-1933`: el delta del eslogan en bloque quedó resuelto para `close-proposal-horizon` (2026-09-29).
 - `TASK-1943` (deck HubSpot): reutiliza las recetas de práctica de esta task.
 
@@ -132,25 +148,26 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 
 ### Already exists
 
-- Catálogo con 94 recetas (78 con plantilla); las 16 nuevas con `template: null` y el aviso `recipe-without-template`.
+- Catálogo con 94 recetas, **todas con plantilla** (las 16 nuevas desde `84c83a044` y `f05c26e2f`), `recipe-map.json`,
+  builders `line-stage`, intents de ejemplo y tests por receta.
 - `approvedUses` en `cover-brochure-line-revenue`, `close-proposal-horizon`, `proposal-cinematic-revops` y
   `proposal-service-revops`, cada uno con su `fit` (qué cabe y qué no en los slots).
-- Los dos planes del deck (brochure y propuesta) como fixtures validados.
-- Norma §4.6 con el deck de práctica Salesforce en cinco actos; manual y doc funcional con su delta.
-- Láminas aprobadas `ai-generations/2026-09-29_deck-salesforce/out/SF*.jpg` y el script de dirección.
+- Los dos planes del deck (brochure y propuesta) como fixtures validados (0 errores, 0 avisos).
+- `partnerMark` opcional con falla cerrada (`readbackRef`) y `sloganBlock` en `close-proposal`; `partner-mark.test.ts`.
+- AXIS fijado en 0.3.33 (tokens y contracts) y `axis-brand-assets` 0.4.4 (`AXIS_PARTNER_ASSETS`).
+- Baseline `graphic-line` sellado (sección (s)); SF20 compuesta; PDF de la propuesta sin insignia.
+- Norma §4.6, manual, doc funcional, arquitectura y skills al día.
 
 ### Gap
 
-- Ninguna de las 16 recetas nuevas tiene builder, plantilla, fila en `recipe-map.json` ni intent de ejemplo.
-- La contraportada de brochure Salesforce (`close-brochure-orbit` en la línea `revenue-salesforce`) no existe como
-  lámina: el composer la compone desde la receta y necesita el visto bueno del operador.
-- Dos largos aprobados pasan el `maxChars` de su receta (pregunta de SF6, nombres de paso de SF7).
-- La plantilla `close-proposal` hornea el eslogan a 72 px; falta llevarla al bloque al 64 % (composición `sloganBlock`,
-  logo a 700 px sólo en la contraportada Salesforce).
-- `frame.ts` rechaza `column.topPx` 190 mientras Greenhouse fije AXIS `0.3.31`: la reserva propia de la línea
-  `revenue-salesforce` llega con `0.3.32`.
-- `deck-axis/assets/tools/loom-isotype.svg` no existe (el isotipo está en `AXIS_PARTNER_ASSETS`).
-- Las autorizaciones escritas de Salesforce y Anthropic y el readback del badge no están archivados.
+- Visto bueno del operador sobre SF20 (contraportada de brochure Salesforce).
+- `pnpm test` completo y `pnpm build` de producción en el último commit (requieren autorización del operador).
+- Push a `develop` (sin autorización todavía).
+- Autorizaciones escritas de Salesforce y Anthropic (TASK-1937) y readback de la insignia en Partner Community (owner
+  comercial).
+- Dos largos aprobados pasan el `maxChars` de su receta (verificado en el `fit` de `approvedUses`, 2026-09-29): la
+  pregunta de SF6 (30 > 28) y dos nombres de paso de SF7 (26 y 28 > 24). Decisión del operador: acortar o subir el
+  largo (las cinco cine se mapean en TASK-1933). Los planes golden no llevan slots y por eso validan sin avisos.
 
 ## Modular Placement Contract
 
@@ -289,10 +306,12 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - [x] `close-proposal-horizon` registra el eslogan en bloque al 64 % y el slot opcional `partnerMark`; el delta de TASK-1933 quedó cerrado con la fecha.
 - [x] `pnpm brand:deck-recipes --check` pasa y los tests de `src/lib/brand-surfaces` están en verde.
 - [x] La norma §4.6, el manual y la doc funcional describen el deck de práctica Salesforce y el pendiente HubSpot.
-- [ ] Las 16 recetas nuevas tienen plantilla y componen con `pnpm brand:compose`.
-- [ ] La contraportada de brochure Salesforce compone y tiene el visto bueno del operador.
-- [ ] `partnerMark` y el eslogan en bloque componen, con test sin el slot y el gate `graphic-line` a 0 px.
-- [x] AXIS publica las recetas, sus referencias y los assets de terceros con procedencia y estado de autorización (`v0.3.31` y `v0.3.32`; AXIS `main` `61e34a4`).
+- [x] Las 16 recetas nuevas tienen plantilla y componen con `pnpm brand:compose`. (`84c83a044` + `f05c26e2f`; `pnpm vitest run src/lib/brand-surfaces` 815/815 y `pnpm brand:deck-recipes --check` 94 recetas, 2026-09-29)
+- [ ] La contraportada de brochure Salesforce compone y tiene el visto bueno del operador. (Compone: SF20 en `out/`. **Sin tildar:** falta el visto bueno del operador.)
+- [x] `partnerMark` y el eslogan en bloque componen, con test sin el slot y el gate `graphic-line` a 0 px. (`partner-mark.test.ts`; freeze sección (s); `pnpm composer:visual-gate --catalog=graphic-line` 89 frames a 0 px, 2026-09-29)
+- [x] AXIS publica las recetas, sus referencias y los assets de terceros con procedencia y estado de autorización (`v0.3.31`, `v0.3.32` y `v0.3.33`; AXIS `main` `0bd2758`).
+- [ ] Gates de cierre: `pnpm test` completo y `pnpm build` de producción en el último commit. (**Sin tildar:** requieren autorización del operador — `pnpm build` consume ~30 GB en este equipo.)
+- [ ] Rollout comercial: autorizaciones escritas de Salesforce y Anthropic archivadas (TASK-1937) y readback vigente de la insignia «Salesforce Partner». (**Sin tildar:** owner Julio + RevOps & CRM; mientras tanto el deck sale sin insignia y sin marcas sujetas a autorización a clientes o pauta.)
 
 ## Verification
 
@@ -306,11 +325,11 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
 - [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (2026-09-29: deltas en TASK-1930, 1931, 1932, 1933, 1937 y 1943)
 
-- [ ] TASK-1932 y TASK-1931 recibieron delta: 94 recetas; 12 con plantilla desde 84c83a044 y 4 sin plantilla hasta completar el Slice 2; plates NXSF1–NXSF3 por ruta local
+- [x] TASK-1932 y TASK-1931 recibieron delta: 94 recetas, todas con plantilla (`84c83a044` y `f05c26e2f`); plates NXSF1–NXSF3 por ruta local y el plate SF1 rechazado
 
 ## Follow-ups
 

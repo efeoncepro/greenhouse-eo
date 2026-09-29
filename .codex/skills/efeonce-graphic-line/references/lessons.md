@@ -1,6 +1,7 @@
 # Lecciones (trampas que ya costaron tiempo)
 
-> Verificado contra: greenhouse-eo@2c95e60b2 (`develop`) — 2026-09-29, tarde (última entrada: la órbita del AI
+> Verificado contra: greenhouse-eo@f05c26e2f (`develop`) — 2026-09-29, noche (última entrada: el deck de práctica
+> Salesforce, TASK-1942; antes, greenhouse-eo@2c95e60b2: la órbita del AI
 > Visibility Report, canonizada en AXIS `v0.3.30`, `26097c5`, con la pregunta abierta del camino recorrido; antes, los
 > retratos viejos del equipo; antes, greenhouse-eo@1050036e8: los ejemplos del contrato de Marketing con Manzanitas con copy que no cabe,
 > TASK-1939; antes, greenhouse-eo@24e4c72ee: el CI roto por el bump de
@@ -388,6 +389,43 @@
   órbita y si se aplica a la portada del informe; **no hay respuesta**. Hasta que decida: no pintes el camino recorrido
   en ninguna otra pieza, no lo agregues a la portada del informe y no lo presentes como canon. Choca en apariencia con
   «nunca un arco que crece desde el origen» (§3.4): por eso lo decide el operador.
+
+## 2026-09-29 (el deck de práctica Salesforce, TASK-1942)
+
+- **El script de dirección cargaba sólo algunas caras de Poppins.** Síntoma: SF16 y SF18 aprobadas con las negritas en
+  800 y la plantilla, fiel al token, en 700. Causa: el render de las láminas cargaba 300/400/500/600/800 y no la 700; el
+  navegador cayó al peso más cercano. **Regla:** un script de render de láminas carga **todas** las caras que declaran
+  los tokens que usa; si una lámina aprobada depende de un fallback, manda el token (se decidió el 700) y se anota.
+- **El probe del gate llena TODOS los slots opcionales.** Síntoma: al sumar `partnerMark` (opcional) a la portada de
+  línea y a `close-proposal`, `CoverBrochure` y `CloseProposal` cambiaron en el gate aunque ninguna lámina aprobada use
+  el slot. Causa: el probe compone con los `example` de cada slot, incluidos los opcionales. **Regla:** un slot opcional
+  nuevo **sí** mueve el frame de su plantilla; se declara en `BASELINE_DELTAS.md` y se prueba aparte que las láminas
+  aprobadas SIN el slot quedan a 0 px (`partner-mark.test.ts`).
+- **`--freeze` exige UNA sola sección sin sellar en `BASELINE_DELTAS.md`.** Con dos sesiones escribiendo deltas el
+  mismo día, el freeze se niega hasta que quede una. **Regla:** una sección por freeze, con su letra (aquí la (s)), y el
+  freeze serializado con su commit; si otra sesión tiene una sección abierta, coordina antes de congelar. Correr el gate
+  mientras otra sesión congela da `missing_baseline` en masa: no es regresión, es una carrera; vuelve a correrlo cuando
+  el baseline esté commiteado.
+- **Una variante por línea no es una receta nueva: es `reservesByLine`.** La portada Salesforce cuelga la columna de
+  190 y las demás de 200. Resolverlo con una receta aparte o moviendo la reserva general cambiaba cinco portadas
+  aprobadas. **Regla:** cuando una línea necesita otra medida en una receta compartida, la reserva va por línea en el
+  token (AXIS `v0.3.32`) y sólo se aplica si el intent declara esa línea.
+- **La reserva de un logo o un claim de partner exige readback.** La insignia «Salesforce Partner» es el activo que la
+  guía del programa pide, y aun así es un claim: la aceptación de 2025 como *Provisional* Consulting Partner no prueba el
+  estado actual. **Regla:** todo slot que afirma una relación con un tercero nace opcional, con `requires:
+  'readback-current'` y un respaldo que no afirma nada («Operamos sobre» + logo); nunca fijo en una plantilla.
+- **La salida de un editor de canvas puede re-espaciar las filas.** Lo que el canvas guardó no era lo que la lámina
+  aprobada pintaba (filas y aires distintos). **Regla:** se mide sobre el render aprobado (`render-src/salesforce.mjs`),
+  no sobre el export del canvas (así se midió el delta (q) de AXIS: «manda la lámina aprobada»).
+- **Un wordmark de terceros sin vector publicado se ARMA, no se dibuja.** Claudeforce: «force», «a» y «e» del vector
+  oficial de Dreamforce; «d», «l», «u» y «C» construidas con las medidas oficiales y verificadas superponiendo contornos
+  sobre el cuadro del video (`logos/FUENTES.txt`). **Regla:** vector oficial + medidas + verificación contra la fuente,
+  procedencia escrita en el registro del asset, y reemplazo apenas el tercero publique el vector.
+- **Dos incidentes de proceso en la misma jornada.** (1) Un commit se hizo con `--no-verify`; se deshizo y se rehízo
+  con los hooks (`3221911b9`). (2) El `ledger.md` quedó vacío por un momento durante una edición concurrente y se
+  restauró desde git antes de commitear. **Regla:** nunca `--no-verify` sin autorización del operador; y antes de
+  editar el ledger, relee el archivo y confirma con `git diff --stat` que el cambio es sólo tuyo (otras sesiones lo
+  tocan el mismo día).
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

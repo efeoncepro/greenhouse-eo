@@ -1,9 +1,9 @@
 # Composición de decks y brochures de marca propia
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.5
+> **Version:** 2.6
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-29 por Claude (2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
+> **Ultima actualizacion:** 2026-09-29 por Claude (2.6: las 94 láminas se componen solas, incluidas las dieciséis del deck Salesforce; la contraportada de brochure Salesforce ya está compuesta y espera el visto bueno; la propuesta Salesforce existe como PDF sin insignia de partner (TASK-1942). Antes, 2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
 > **Documentacion tecnica:** [Arquitectura de la composición de piezas de marca](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) · [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
 > **Manual de uso:** [Componer un deck con las recetas por lámina](../../manual-de-uso/creative/componer-deck-con-recetas.md) · [Componer una pieza por superficie con AXIS](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
 
@@ -21,20 +21,20 @@ y dice qué falló.
 | --- | --- |
 | ¿Para qué marca sirve? | Sólo para la marca propia de Efeonce. No es para piezas con la marca de un cliente, para las ofertas a comité ni para la interfaz de Greenhouse |
 | ¿Qué documentos arma? | Láminas sueltas y documentos completos: un **brochure** (presenta a Efeonce) o una **propuesta comercial** (va dirigida a un cliente). Las láminas también sirven para un pitch o un QBR |
-| ¿Cuántas láminas puede componer? | **90 de las 94** que el operador aprobó: 69 el 2026-09-27, nueve de SEO y AEO el 2026-09-28 y dieciséis del deck Salesforce el 2026-09-29, de las que cuatro todavía esperan su plantilla |
+| ¿Cuántas láminas puede componer? | **Las 94** que el operador aprobó: 69 el 2026-09-27, nueve de SEO y AEO el 2026-09-28 y dieciséis del deck Salesforce el 2026-09-29 |
 | ¿Quién lo usa hoy? | Una persona o un agente, desde su equipo, con un comando |
 | ¿Está en el portal? | No. Hoy es un taller local. La ruta dentro de la plataforma (con permisos, cola y acceso para agentes) es TASK-1921, **en curso** |
 
 > Detalle técnico: comando `pnpm brand:compose` en
 > [`scripts/brand-surfaces/compose.ts`](../../../scripts/brand-surfaces/compose.ts) · traducción del pedido en
 > [`src/lib/brand-surfaces/`](../../../src/lib/brand-surfaces/) · contrato `efeonce.surface-composition` 0.1.2 de AXIS
-> (`@efeoncepro/axis-tokens` 0.3.23, `@efeoncepro/axis-ui-contracts` 0.3.21) ·
+> (`@efeoncepro/axis-tokens` 0.3.33, `@efeoncepro/axis-ui-contracts` 0.3.33) ·
 > [arquitectura](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
 
 ## Qué láminas se componen
 
-Las 94 láminas del deck están aprobadas; **90 se componen solas**; cuatro del deck Salesforce todavía no
-(ver abajo, «El deck de la práctica Salesforce»). Cada una tiene una **receta** en el catálogo del
+Las 94 láminas del deck están aprobadas y **las 94 se componen solas** (las del deck Salesforce desde el 2026-09-29;
+ver abajo, «El deck de la práctica Salesforce»). Cada una tiene una **receta** en el catálogo del
 deck: qué comunica, cuándo usarla, cuándo no y cuál conviene en su lugar, qué textos e imágenes se cambian y qué queda
 fijo. Las recetas se agrupan en familias:
 
@@ -105,12 +105,16 @@ usa recetas que ya existían (portada, propuesta y contraportada). Al canonizar,
 láminas que no cabían en la receta que usaban tengan la suya.
 
 - **Dos documentos, dos cierres:** si el deck se entrega como **brochure**, abre con la portada con foto y cierra con la
-  contraportada sin foto «¿Conversamos? Cuando quieras.» en el color de Salesforce (esa lámina todavía no existe: se
-  compone desde la receta y el operador la revisa antes de usarla). Si se entrega como **propuesta**, abre con la
+  contraportada sin foto «¿Conversamos? Cuando quieras.» en el color de Salesforce (ya compuesta desde su receta;
+  espera el visto bueno del operador antes de usarla). Si se entrega como **propuesta**, abre con la
   portada con el logo del cliente y cierra con la contraportada con foto «Empower your Revenue», la única con el logo
   de Efeonce a 700 px. Los dos planes están validados.
-- **Todavía no se componen solas:** las cuatro de la segunda ronda esperan su plantilla; las otras doce ya componen. Mientras tanto existen como láminas
-  aprobadas de referencia.
+- **Se componen solas:** las dieciséis láminas nuevas tienen plantilla y se comparan contra una imagen de referencia
+  congelada, así que un cambio accidental se detecta. Dos detalles quedaron como regla y no como copia exacta de la
+  lámina aprobada: las negritas van en el peso que define la marca, y un número pequeño de SF18 va en gris suave porque
+  el color de acento no se usa en textos chicos.
+- **La propuesta ya existe como PDF, sin insignia de partner:** 19 páginas armadas con las láminas aprobadas, con la
+  portada rotulada «Propuesta». Sale sin insignia porque la afiliación todavía no se confirmó en el portal de partners.
 - **Marcas de terceros con condición:** el logo, los íconos de producto, la insignia de partner y el personaje de
   Salesforce, y las marcas de Claude, necesitan una autorización escrita que todavía no está archivada. La insignia
   «Salesforce Partner» además se confirma en el portal de partners antes de enviar; hay una versión sin insignia.

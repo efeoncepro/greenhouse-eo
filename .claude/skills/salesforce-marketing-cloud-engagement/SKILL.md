@@ -41,3 +41,8 @@ Combina modos cuando el pedido lo requiera, pero separa diagnóstico, decisión 
 - Términos: [GLOSSARY.md](GLOSSARY.md)
 - Errores que bloquear: [ANTIPATTERNS.md](ANTIPATTERNS.md)
 - Plantillas: [templates/](templates/)
+- Deck de práctica aprobado (venta): el deck Salesforce de «La órbita» (TASK-1942) trae la lámina «Engagement o
+  Next» (`decision-platform-coexistence`, «No por defecto») y la de Data 360 y consentimiento
+  (`method-identity-consent`); se compone con `deck-studio` (norma §4.6 de
+  `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md`). Íconos de producto e insignia de partner
+  sujetos a autorización escrita y readback.

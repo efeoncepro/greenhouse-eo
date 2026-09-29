@@ -1,5 +1,20 @@
 # TASK-1932 — Proposal Studio arma el deck «La órbita» desde recetas: render en `artifact-worker` y acción Nexa/MCP
 
+## Delta 2026-09-29 — TASK-1942 suma 16 recetas del deck de práctica Salesforce, todas con plantilla
+
+- El catálogo pasa de 78 a **94 recetas, 94 con plantilla** (`catalog.generated.json` y `recipe-map.json` al día desde
+  `f05c26e2f`): `content-one-platform`, `method-agent-supervisor`, `decision-platform-coexistence`,
+  `decision-provider-fit`, `content-service-lanes`, `content-season-launches`, `method-identity-consent`,
+  `method-migration-reconcile`, `content-day-release-cycle`, `content-day-live-library`, `content-live-chat`,
+  `content-measure-formulas`, `decision-diagnosis-verdict`, `method-waves`, `content-day-live-console` y
+  `content-day-live-approval`. Las 78 anteriores no cambiaron `contentType` ni slots; `cover-brochure-line-revenue` y
+  `close-proposal-horizon` suman el slot OPCIONAL `partnerMark`.
+- Lo que Proposal Studio debe respetar al usarlas: `partnerMark` (insignia de partner) falla cerrado sin
+  `readbackRef`; mascota y co-marcas (Agent Astro, Claude, Claudeforce) sin `authorizationRef`; `content-season-launches`
+  exige fecha de corte y no entra en un brochure evergreen. Planes de ejemplo:
+  `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-{brochure,proposal}-salesforce.json` (0 errores, 0
+  avisos). AXIS fijado en 0.3.33.
+
 ## Delta 2026-09-28 — TASK-1930 dejó `bindDeckSlots`
 
 - Firma final: `bindDeckSlots(plan: DeckPlan, context: unknown): Promise<DeckSlotBindingResult>` (`server-only`,

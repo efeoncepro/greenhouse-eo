@@ -429,6 +429,30 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   recipe IDs. Norm: Greenhouse
   [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
   §4.6.
+- **Third-party (partner) marks — convention since `axis-brand-assets` `0.4.4` (tag `v0.3.31`, 2026-09-29,
+  TASK-1942).** A mark that belongs to someone else (a platform's product icons, a partner-program badge, a co-brand
+  wordmark, a tool isotype) never goes into `AXIS_BRAND_ASSETS`. It lives in `assets/partners/`, sealed apart in
+  `src/partner-manifest.ts` and exported as `AXIS_PARTNER_ASSETS` (`findPartnerAsset`, `partnerAssetUrl`). Each entry
+  must carry **`provenance`** (`source`, `retrievedOn`, `method`, `transformed`) and **`authorization`** (`status`:
+  `pending-written-authorization` or `in-stack`, `holders`, `declaredOn`, `note`); a partner-program badge also carries
+  **`claim`** (`requires: 'readback-current'`, `status`, `owner`, `fallback`). Files are byte copies of the source —
+  never recolored or redrawn; a mark assembled because no vector is published (the Claudeforce wordmark) says so in
+  `provenance`. A mark whose status is not `in-stack` does not go to a client or to paid media until the written
+  authorization is archived (Greenhouse TASK-1937); the badge also needs a current program readback. A mascot
+  interpretation that is not the official art (the edited Agent Astro) stays out of every published package
+  (`AXIS_PARTNER_ASSETS_EXCLUDED`) and is used only by explicit local path. Surfaces expose these marks only as
+  **optional** slots (`partnerMark`, rule `partner-claim-readback`; product icons only where the product is named),
+  never fixed in a template; the Lab lists them (section «Marcas de terceros», `/references/surfaces/partner-assets.json`,
+  metadata only). A new partner (e.g. HubSpot, TASK-1943) follows the same shape. Detail: Greenhouse skill
+  `efeonce-graphic-line` → `references/package-and-tokens.md` §6 and `references/criteria.md`.
+- **Deck Salesforce releases (2026-09-29):** `v0.3.31` (twelve recipes, delta (o), `AXIS_PARTNER_ASSETS`), `v0.3.32`
+  (four recipes, `LayoutToken.reservesByLine` — a line-specific column reserve applied by `withLayout` only when the
+  intent declares that line — and `sloganBlock.appliesTo`, delta (p)) and `v0.3.33` (what the approved slides paint and
+  the recipes did not measure, delta (q)). Greenhouse pins tokens/contracts `0.3.33` and brand-assets `0.4.4`
+  (`2e002673e`). `0.3.34` (AXIS `4f370d1`, delta (r)) is a no-render cleanup (steps resolver only
+  resolves declared `steps.layouts`; `method-waves` steps anatomy; alert-triangle geometry; explicit `ink` colors;
+  `loop.number.color` soft); the Greenhouse bump was in progress in another session when TASK-1942's sweep closed —
+  check `package.json` before citing the pin.
 - **Bump impact from `axis-tokens` `0.3.10` (already absorbed by Greenhouse):**
   `src/@core/theme/axis-package-drift.test.ts` requires `Object.keys(efeonceTokens.color)` to be exactly the
   compatibility roles plus neutrals, so a consumer pinning ≥ `0.3.10` fails it until `info: axisSemanticHex.info` is

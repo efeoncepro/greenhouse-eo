@@ -263,6 +263,23 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   nos asociamos» (lámina 0.2, «No hacer»). Las alianzas reales sólo se declaran en la zona de partners de la firma de
   correo, con el registro de partnerships (manual §10.2).
 
+#### Marcas de terceros y claims de partner (deck de práctica Salesforce, operador 2026-09-29)
+
+Una pieza de **práctica sobre una plataforma** (el deck Salesforce, TASK-1942) sí muestra marcas del tercero, con tres
+condiciones que no se negocian:
+
+- **Nombrar un producto no es aliarse.** El ícono oficial de un producto va sólo donde la pieza nombra ese producto
+  (una nube, un agente, un canal), nunca como adorno ni en los pasos del método; no se recolorea (la guía del tercero lo
+  prohíbe) y su costo de color se decide con el operador. Lo que no es producto sigue con el Trazo de la línea.
+- **La insignia del programa de partners es un claim** (Salesforce Partner; el badge de HubSpot tendrá el suyo): slot
+  **opcional** (`partnerMark`), sólo con **readback vigente** del programa (registro de partnerships, owner Julio +
+  RevOps & CRM) y con un respaldo que no afirma nada: «Operamos sobre» + logo de la plataforma. Nunca fija en una
+  plantilla, nunca el badge de otra categoría (Consulting Partner ≠ Cloud Reseller; los Navigator son credenciales).
+- **Toda marca de tercero viaja con su procedencia y su estado de autorización** (`AXIS_PARTNER_ASSETS`,
+  [package-and-tokens.md](package-and-tokens.md) §6): sin autorización escrita archivada no sale a cliente ni a pauta.
+  Mascotas del tercero (Agent Astro) y co-marcas (Claude, Claudeforce) son slots opcionales, nunca fijos; una
+  interpretación editada de una mascota no entra a un paquete publicado.
+
 ### 3.8 Lente — la foto como sujeto de atención
 
 - **Significa:** mirar de cerca, decidir. «La esfera muestra lo que importa: donde está la decisión» (lámina 1.3).
@@ -752,6 +769,7 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **Pregunta grande y respuesta larga y chica**, dos preguntas seguidas, pregunta retórica o chiste | la respuesta domina; la pregunta es real | láminas 2.1, 5.6 |
 | **«Te hacemos visible» sin «Y lo medimos.»** ni mecanismo | anti-humo: la visibilidad se mide | lámina 1.4 |
 | **Logos de terceros como satélites-alianza** | los satélites muestran dónde medimos, no con quién | lámina 0.2 |
+| **Insignia de partner fija o sin readback vigente**, o marca de tercero sin autorización archivada | la insignia es un claim: opcional, con readback y respaldo «Operamos sobre»; cada marca lleva procedencia y autorización | operador 2026-09-29; regla `partner-claim-readback` |
 | **Estado en colores de semáforo**, o sin etiqueta | el estado se dice con la forma y acompaña al texto | láminas 4.3 2/3, 7.2 |
 | **Discos rellenos, brillos, reflejos, esferas de vidrio**, halo como «glow» | línea fina y luz | lámina 0.2; manual §0 |
 | **Velo navy sobre foto de banco**, emblema legible en la ropa | la foto es oficio real; el logo lo pone la pieza | láminas 5.2, 5.6 |

@@ -60,6 +60,19 @@ Missionforce y las alianzas AWS/Google/NVIDIA/OpenAI son superficies con estados
 como una sola licencia ni como GA universal. Koa corresponde al 15/09; AIforce y Missionforce tienen publicaciones
 del 16/09, con una diferencia de fecha visible entre páginas regionales y la newsroom USA.
 
+## Deck de práctica aprobado (material de venta)
+
+Para vender la práctica con láminas, usa el **deck de práctica Salesforce de «La órbita»** (aprobado el 2026-09-29,
+TASK-1942): 19 láminas en cinco actos con receta por servicio (una operación, encaje Salesforce/HubSpot, Engagement vs
+Next, servicios, Dreamforce, agentes con supervisora, **«Enablement conversacional» con Claudeforce**, Data 360 y
+consentimiento, migración, diagnóstico, olas, día a día, operación y medición). Se arma como brochure o como propuesta
+con `deck-studio` y la norma §4.6 de
+[`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
+Condiciones que esta skill hace cumplir: la insignia «Salesforce Partner» es un claim y exige **readback vigente** del
+registro de partnerships (sin él, «Operamos sobre» + logo); logo, íconos de producto, Agent Astro, Claude y Claudeforce
+exigen la **autorización escrita** de Salesforce y Anthropic archivada; los estados de Dreamforce van con su corte
+(2026-09-18) y se verifican en cada org. El contenido de dominio de las láminas sigue saliendo de esta skill.
+
 ## Fuentes
 
 Antes de afirmar capacidades o condiciones comerciales perecibles, consulta [SOURCES.md](SOURCES.md). Usa [GLOSSARY.md](GLOSSARY.md) para nomenclatura y [ANTIPATTERNS.md](ANTIPATTERNS.md) durante revisión.

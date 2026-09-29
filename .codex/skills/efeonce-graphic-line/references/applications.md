@@ -1141,6 +1141,39 @@ lámina» y delta (c); manual: `docs/manual-de-uso/creative/componer-deck-con-re
 aprobó nueve láminas SEO/AEO más (78 en total; arriba, «Láminas SEO/AEO con plantilla desde TASK-1934») y decidió que
 dentro de un par `variant` la otra no entra al deck, seguida o no. El 2026-09-29 aprobó las 19 láminas del **deck de práctica Salesforce** (94 recetas; 16 nuevas sin plantilla todavía y cuatro láminas registradas como `approvedUses` de recetas existentes): orden en cinco actos, marcas de terceros con condición, badge como claim (`partnerMark`) y el deck HubSpot pendiente en la norma §4.6, «Deck de práctica Salesforce» (TASK-1942, TASK-1943). Al canonizar decidió además: las cuatro láminas que no cabían en sus recetas nacen como `decision-diagnosis-verdict` (SF5), `method-waves` (SF10), `content-day-live-console` (SF11) y `content-day-live-approval` (SF18); **dos cierres** según el documento (brochure: `close-brochure-orbit` en la línea `revenue-salesforce`, lámina todavía por componer y con visto bueno pendiente; propuesta: `cover-proposal-orbit` … SF19 `close-proposal-horizon` en la composición `sloganBlock`), con los dos planes validados como fixtures (`src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-{brochure,proposal}-salesforce.json`, con `plateRef` NXSF2/NXSF1/NXSF3 para no caer en `plate-repeated`); **logo de 700 px sólo en la contraportada Salesforce** (las del 2026-09-27 siguen a 500 px); la **columna de la portada en 190** con reserva propia de la línea `revenue-salesforce` en AXIS `v0.3.32` (`reservesByLine` de la composición `line`); y el servicio de SF16 se llama «Enablement conversacional».
 
+**El deck de práctica Salesforce, componible (TASK-1942, 2026-09-29; `f05c26e2f`).** Las 94 recetas del catálogo tienen
+plantilla: las 16 nuevas componen con `pnpm brand:compose` sobre AXIS 0.3.33 (familia `line-stage`: builders en
+`src/lib/brand-surfaces/recipes/line-stage/`, plantillas y `slots.json` en
+`src/lib/artifact-composer/catalogs/graphic-line-deck/`, intents de ejemplo en `src/lib/brand-surfaces/examples/`), y el
+baseline quedó sellado en la sección (s) de `BASELINE_DELTAS.md`. Cómo se arma según el documento:
+
+| Documento | Portada | Cuerpo (orden aprobado) | Cierre | Plan golden |
+|---|---|---|---|---|
+| **Brochure** | `cover-brochure-line-revenue` (línea `revenue-salesforce`, columna 190, «Brochure · Servicios Salesforce») | SF6 → SF1 → SF4 → SF3 → SF8 → SF9 → SF2 → SF18 → SF16 → SF12 → SF13 → SF5 → SF10 → SF14 → SF15 → SF11 → SF17 | `close-brochure-orbit` en `revenue-salesforce` («¿Conversamos? Cuando quieras.» + eslogan; SF20, **compuesta, pendiente del visto bueno del operador**) | `golden-brochure-salesforce.json` |
+| **Propuesta** | `cover-proposal-orbit` (sin foto, con el logo del cliente). El PDF de dirección usa en cambio la portada con foto de SF0 con el rótulo «Propuesta · Servicios Salesforce» (`DOC=propuesta`) | el mismo | `close-proposal-horizon` en la composición `sloganBlock` (SF19, logo 700 px) | `golden-proposal-salesforce.json` |
+
+Los planes viven en `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/` y se validan con
+`pnpm brand:deck-plan -- --plan <fixture>` (0 errores; `plateRef` NXSF2/NXSF1/NXSF3 evita `plate-repeated`). Condiciones
+que viajan con el deck y que un agente no resuelve solo:
+
+- **Insignia «Salesforce Partner» (`partnerMark`) = claim.** Ningún deck con SF0 o SF19 con insignia sale a un cliente
+  sin readback vigente en Partner Community (owner: Julio + RevOps & CRM). Mientras tanto se usan las variantes
+  **sin insignia** («Operamos sobre» + logo de Salesforce, que no afirma nada): `SIN_BADGE=1` en
+  `ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs`.
+- **Marcas de terceros** (íconos de producto, logo, Agent Astro, Claude y Claudeforce en SF16): `pending-written-authorization`
+  hasta archivar las autorizaciones escritas de Salesforce y Anthropic (TASK-1937). Agent Astro es una interpretación
+  editada y va sólo por ruta local. Detalle en [package-and-tokens.md](package-and-tokens.md) §6.
+- **Datos de muestra** marcados en SF11, SF13 y SF15; SF17 sin cifras; montos `[MONTO]`; SF9 con corte 2026-09-18 y
+  fuera de un brochure evergreen.
+- **Plates** `NXSF1`–`NXSF3` son rutas locales de `ai-generations/` hasta el banco de plates (TASK-1931): el Job
+  `artifact-worker` no los lee. El plate SF1 de la arquitecta está rechazado y no entra.
+
+**PDF de la propuesta (sin insignia):** `ai-generations/2026-09-29_deck-salesforce/out/Efeonce-Propuesta-Servicios-Salesforce.pdf`
+(19 páginas 1920×1080), generado por `node ai-generations/2026-09-29_deck-salesforce/render-src/pdf-propuesta.mjs` desde
+las láminas aprobadas en `out/` (la portada `SF0-portada-sin-badge-propuesta` se genera antes con
+`SIN_BADGE=1 DOC=propuesta ONLY=SF0-portada node …/salesforce.mjs`). Es el artefacto de dirección, no la salida del
+Composer; `out/` no está en git. Antes de enviarlo a un cliente valen las mismas condiciones de marcas de terceros.
+
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
 en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de
 opción a canon.

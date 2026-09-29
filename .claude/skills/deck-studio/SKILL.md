@@ -13,11 +13,11 @@ description: >-
   Triggers: "deck", "láminas", "slides", "presentación", "pitch", "propuesta visual",
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
   "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "portada",
-  "contraportada", "recetas del deck", "qué lámina uso". En marca propia Efeonce, elige láminas del
-  catálogo de 78 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/; incluye las
-  nueve SEO/AEO), valida el plan con pnpm brand:deck-plan (o pídele al agente que lo proponga con
-  --propose), liga los datos reales de los slots con --bind (TASK-1930) y compón las 78 (todas tienen
-  plantilla), o el documento completo, con pnpm brand:compose.
+  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce". En marca propia Efeonce, elige
+  láminas del catálogo de 94 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/; incluye las
+  nueve SEO/AEO y las 16 del deck de práctica Salesforce), valida el plan con pnpm brand:deck-plan (o pídele al
+  agente que lo proponga con --propose), liga los datos reales de los slots con --bind (TASK-1930) y compón las 94
+  (todas tienen plantilla), o el documento completo, con pnpm brand:compose.
 ---
 
 # deck-studio — el deck es un ARGUMENTO, no una pila de láminas
@@ -145,6 +145,20 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
 - **Portadas y contraportadas de brochure y propuesta** (operador, 2026-09-27): foto ↔ sin foto, mensaje de la
   contraportada por documento, voz en portada y logo a 500 px. Todo en la subsección «Portadas y contraportadas
   (aprobado 2026-09-27)» más abajo.
+- **Deck de práctica Salesforce (aprobado 2026-09-29, TASK-1942; 94 recetas, todas con plantilla desde `f05c26e2f`).**
+  Diecinueve láminas en cinco actos que venden la práctica RevOps & CRM sobre Salesforce; 16 recetas nuevas (familia
+  `line-stage`) y cuatro usos de recetas existentes. **Se arma de dos formas según el documento:** como **brochure**
+  (`cover-brochure-line-revenue` en la línea `revenue-salesforce` → cuerpo → `close-brochure-orbit`, SF20, pendiente
+  del visto bueno) o como **propuesta** (`cover-proposal-orbit` → el mismo cuerpo → `close-proposal-horizon` en
+  `sloganBlock`, SF19, logo de 700 px). Planes golden:
+  `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-{brochure,proposal}-salesforce.json` (validar con
+  `pnpm brand:deck-plan -- --plan <fixture>`). **PDF de la propuesta ya renderizado, sin insignia de partner:**
+  `ai-generations/2026-09-29_deck-salesforce/out/Efeonce-Propuesta-Servicios-Salesforce.pdf`
+  (`render-src/pdf-propuesta.mjs`; no está en git). Antes de enviarlo: la insignia «Salesforce Partner» es un claim y
+  exige readback vigente; los íconos de producto, Agent Astro, Claude y Claudeforce exigen autorización escrita archivada
+  (hoy pendiente). Detalle y condiciones: norma §4.6 «Deck de práctica Salesforce», manual
+  `docs/manual-de-uso/creative/componer-deck-con-recetas.md` y skill `efeonce-graphic-line`
+  (`references/applications.md` §L). La serie HubSpot equivalente es TASK-1943.
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
   **Integrado en Greenhouse** (TASK-1927 y TASK-1928, ambas `complete` y en `origin/develop`): `pnpm brand:compose`

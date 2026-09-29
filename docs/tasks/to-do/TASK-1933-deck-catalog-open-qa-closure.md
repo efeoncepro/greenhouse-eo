@@ -1,5 +1,16 @@
 # TASK-1933 — Cerrar los pendientes abiertos del catálogo del deck «La órbita»: el logo en la órbita del cierre y el registro de QA
 
+## Delta 2026-09-29 (b) — la plantilla `close-proposal` ya compone el bloque (TASK-1942)
+
+- El pendiente del composer del delta de abajo quedó hecho: la plantilla `close-proposal` compone la composición
+  `sloganBlock` (eslogan en bloque al 64 %, interlineado normal de los tramos, logo a 700 px **sólo** en la línea
+  `revenue-salesforce`), declarada en la sección (s) de `BASELINE_DELTAS.md` y congelada (`f05c26e2f`; gate
+  `graphic-line` 89 frames a 0 px). Las contraportadas del 2026-09-27 siguen en 72 px y logo 500: su cambio sigue abierto
+  aquí.
+- Nuevo para esta task: dos largos aprobados del deck Salesforce pasan el `maxChars` de recetas cine/sobria (pregunta
+  de SF6 en `proposal-cinematic-revops`, 30 > 28; dos nombres de paso de SF7 en `proposal-service-revops`, 26 y 28 >
+  24). Se decide con el operador junto al mapeo de las cinco cine.
+
 ## Delta 2026-09-29 — eslogan de las contraportadas (a confirmar con el operador)
 
 - Las contraportadas con eslogan (`close-proposal-horizon` y afines) fijan el eslogan como mensaje principal a 72 px en

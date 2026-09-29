@@ -55,6 +55,35 @@
 > re-selladas con el contrato 0.4.0; el dibujo no cambia) y `axis-ui-registry` **0.3.2**. `develop` sigue fijando
 > tokens y contracts 0.3.29, graphic-line 0.11.0, brand-assets 0.4.1 y registry 0.3.1: la adopción es parte de
 > TASK-1938, cuyo renderer del PDF todavía no existe. Inventario: §2.19, §2.20, §3, §7.10, §8.1 y §9 de este archivo.
+>
+> **Deck de práctica Salesforce (2026-09-29, TASK-1942; manda sobre las versiones de arriba):** tres releases seguidos
+> del contrato `efeonce.surface-composition`, los tres aditivos. `v0.3.31` (AXIS `88ac9b5`): `axis-tokens` y
+> `axis-ui-contracts` **0.3.31** con las doce recetas de la primera ronda (delta (o)) y `axis-brand-assets` **0.4.4**
+> con `AXIS_PARTNER_ASSETS` (§6). `v0.3.32` (`61e34a4`): las cuatro recetas de la segunda ronda, `LayoutToken.reservesByLine`
+> y `sloganBlock.appliesTo` (delta (p)). `v0.3.33` (`0bd2758`): lo que las láminas aprobadas pintan y las recetas no
+> medían (delta (q), p. ej. `sloganBlock.slogan.runLineHeight: 'normal'`). **Greenhouse fija `axis-tokens` y
+> `axis-ui-contracts` 0.3.33 y `axis-brand-assets` 0.4.4** (`2e002673e`; `axis-graphic-line` sigue en 0.11.0).
+> `v0.3.34` (AXIS `4f370d1`, delta (r)): limpieza que **no cambia ningún render** — el resolver de pasos sólo resuelve
+> por los `steps.layouts` declarados, la anatomía de pasos de `method-waves`, la geometría del triángulo de alerta de
+> `decision-diagnosis-verdict`, colores `ink` explícitos en `content-day-live-console` y `loop.number.color` en suave
+> en `content-day-live-approval`. Al cerrar el barrido de TASK-1942 estaba taggeada en AXIS y el bump de Greenhouse lo
+> llevaba otra sesión, sin commitear: verifica `package.json` y el registro antes de citar el pin.
+>
+> - **`reservesByLine`** (en la composición `line` de `cover-brochure`): la reserva de la columna PROPIA de una línea,
+>   que reemplaza a la de la receta **sólo** cuando el intent declara esa línea. Hoy una sola:
+>   `'revenue-salesforce'` → columna 190–300 (logo, eyebrow, pregunta, respuesta), porque la portada aprobada cuelga la
+>   columna de 190; las demás líneas siguen en 200–300 sin cambio. En Greenhouse lo aplica `withLayout` de
+>   `axis-ui-contracts` y lo lee `src/lib/brand-surfaces/recipes/frame.ts`. Es la forma de dar una variante a una línea
+>   sin tocar el render de las otras: no crees una receta nueva para eso.
+> - **`sloganBlock`** (composición de `close-proposal`, desde el 2026-09-29): eslogan en bloque bajo el logo al 64 % de
+>   su ancho y 1,35 cuerpos de separación (`sloganLockupLayout`, la misma constante de `motion.layout`), logo de
+>   **700 px en top 220**, contacto 110 px bajo el eslogan y `partnerMark` opcional 290 px bajo el contacto.
+>   `appliesTo.lines = ['revenue-salesforce']`: las contraportadas del 2026-09-27 siguen con el logo a 500 px. Los
+>   tramos del eslogan van con interlineado normal (`runLineHeight`, delta (q)); en Greenhouse los resuelve `gl-leading`
+>   y la plantilla lo declara como `sloganRunLeading`.
+> - **`partnerMark`** (opcional en la portada de línea y en `sloganBlock`): la insignia del programa de partners es un
+>   **claim** (`claim: 'partner-program'`, `requires: 'readback-current'`, regla `partner-claim-readback`); sin readback
+>   vigente va el `fallback` «Operamos sobre» + logo de la plataforma, o nada. Nunca es fijo.
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
 [3 Contrato de la órbita](#3-contrato-efeoncegraphic-line-orbit) · [4 Selección colaborativa](#4-contrato-efeoncecollaboration-selection) ·
@@ -695,6 +724,29 @@ re-sellan; nunca se editan a mano. Greenhouse fija 0.4.1 y los recibe con TASK-1
 
 **0.4.3 (tag `v0.3.30`, 2026-09-29):** las 48 órbitas estáticas se re-sellaron con el contrato de la órbita 0.4.0
 (cambia el sello `data-axis-graphic-line`, no el dibujo); ningún SVG de marca nuevo. Greenhouse fija 0.4.1.
+
+**Marcas de terceros: `AXIS_PARTNER_ASSETS` (0.4.4, tag `v0.3.31`, 2026-09-29; Greenhouse la fija desde `9289cab0c`).**
+`assets/partners/` guarda las marcas de terceros del deck Salesforce aprobado, **selladas aparte** en
+`src/partner-manifest.ts` y exportadas como `AXIS_PARTNER_ASSETS` (`findPartnerAsset(id)`, `partnerAssetUrl(id)`), nunca
+dentro de `AXIS_BRAND_ASSETS`. Once archivos: los 8 íconos oficiales de producto Salesforce (`salesforce-icon-{agentforce,
+sales,service,marketing,data-cloud,platform,slack,tableau}`), la insignia `salesforce-partner-badge-horizontal`, el
+wordmark `claudeforce-wordmark` y `loom-isotype`. Cada registro (`AxisPartnerAsset`) lleva:
+
+| Campo | Qué dice |
+|---|---|
+| `provenance` | `source` (URL o ruta de OneDrive), `retrievedOn`, `method` y `transformed` (p. ej. el `.ai` del badge convertido con `pdftocairo`, sólo el viewBox recortado) |
+| `authorization` | `status` — `pending-written-authorization` (el operador declaró la autorización el 2026-09-29; falta archivar la escrita) o `in-stack` (Loom: herramienta del stack real) —, `holders` (Salesforce; Salesforce y Anthropic en Claudeforce), `declaredOn` y `note` |
+| `claim` | sólo la insignia: `{ kind: 'partner-program', requires: 'readback-current', status: 'pending-readback', owner, fallback }` |
+
+Reglas del paquete: los archivos son copias byte a byte de la fuente (nunca se recolorean ni se redibujan; el wordmark
+Claudeforce es la excepción declarada: se armó desde el vector oficial de Dreamforce más medidas, sin vector publicado);
+una marca con `status` distinto de `in-stack` **no sale a cliente ni a pauta** hasta archivar la autorización escrita
+(TASK-1937); la insignia además exige readback. **Agent Astro queda fuera de todo paquete**
+(`AXIS_PARTNER_ASSETS_EXCLUDED`: es una interpretación editada, no el arte oficial) y sólo se usa por ruta local
+explícita. En Greenhouse, `pnpm brand:tokens` copia los archivos a `graphic-line-deck/assets/partners/` y el isotipo de
+Loom a `deck-axis/assets/tools/`; los probes del gate los reciben como `asset-ref:<kind>:probe`, nunca el archivo real.
+Lab: sección «Marcas de terceros» y `/references/surfaces/partner-assets.json` (sólo metadatos; el Lab no copia los
+archivos). Criterio: [criteria.md](criteria.md) («Marcas de terceros y claims de partner»).
 
 Tipo `AxisBrandAsset = { id, file (`<id>.svg`), brand, kind, surface, variant, sha256, aspectRatio, note? }`.
 

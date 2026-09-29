@@ -1,5 +1,12 @@
 # TASK-1943 — Deck HubSpot de «La órbita»: la serie de contenido equivalente a la de Salesforce
 
+## Delta 2026-09-29 — las recetas de práctica ya tienen plantilla (TASK-1942)
+
+- Las **16** recetas de práctica de TASK-1942 (no 12: cuatro nacieron al canonizar) tienen plantilla desde
+  `84c83a044` y `f05c26e2f`; la dependencia del Slice 2 de TASK-1942 está cumplida. Convención a reutilizar para las
+  marcas de HubSpot: `AXIS_PARTNER_ASSETS` en `@efeoncepro/axis-brand-assets` (procedencia, estado de autorización y,
+  para el badge, `claim` con readback), y `partnerMark` con falla cerrada sin `readbackRef`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -109,7 +116,7 @@ Reglas obligatorias:
 - Variante `revenue-hubspot` de la portada de línea (`cover-brochure-line-revenue`, plate RV1b) y de las propuestas
   `proposal-cinematic-revops` y `proposal-service-revops`.
 - Logotipo `public/images/logos/partners/hubspot-logotype.svg` y `src/lib/artifact-composer/catalogs/deck-axis/assets/tools/hubspot-logo-cream.svg`.
-- Recetas de práctica de TASK-1942 (12, sin plantilla todavía).
+- Recetas de práctica de TASK-1942 (16, todas con plantilla desde `f05c26e2f`).
 
 ### Gap
 

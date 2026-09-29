@@ -1,5 +1,14 @@
 # TASK-1931 — Banco de plates gobernado para las recetas del deck «La órbita»
 
+## Delta 2026-09-29 — TASK-1942 suma tres plates por ruta local y un plate rechazado
+
+- El deck de práctica Salesforce usa **`NXSF1`** (propuesta cine), **`NXSF2`** (portada) y **`NXSF3`** bordada
+  (contraportada), por ruta local en `ai-generations/2026-09-29_deck-salesforce/plates/` y declarados por `plateRef` en
+  los planes golden. Son candidatos a sembrar en el banco; hasta entonces, el Job `artifact-worker` no los lee y las
+  recetas con foto de ese deck heredan el bloqueo en productivo. Fichas: `ai-generations/2026-09-29_deck-salesforce/fichas/`.
+- **El plate SF1 de la arquitecta (`plates/SF1-una-operacion*.png`) está RECHAZADO** (rostro y piel deformados, sin
+  identidad): no entra al banco ni a ninguna receta.
+
 ## Delta 2026-09-28 — TASK-1934 suma el plate SE1 y nueve recetas SEO/AEO
 
 - TASK-1934 lleva al catálogo las nueve láminas SEO/AEO aprobadas por el operador el 2026-09-28: el catálogo pasa de 69

@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-29 — Deck de práctica Salesforce componible y documentado (TASK-1942)
+
+- Las 16 recetas del deck de práctica Salesforce tienen plantilla (familia `line-stage`): 94 de 94 recetas del
+  catálogo componen con `pnpm brand:compose` sobre AXIS 0.3.33 y `axis-brand-assets` 0.4.4; baseline `graphic-line`
+  sellado (sección (s), 89 frames a 0 px).
+- Marcas de terceros desde `AXIS_PARTNER_ASSETS` con procedencia y estado de autorización; la insignia de partner es un
+  claim (`partnerMark` falla cerrado sin `readbackRef`); mascota y co-marcas exigen `authorizationRef`.
+- `reservesByLine` (columna 190 sólo en la portada Salesforce) y `sloganBlock` (eslogan en bloque, logo 700 px sólo
+  en la contraportada Salesforce). PDF de la propuesta sin insignia (`render-src/pdf-propuesta.mjs`).
+- Barrido de skills (`efeonce-graphic-line`, `deck-studio`, Salesforce ×3, `hubspot-solutions-partner`,
+  `axis-design-system`) y de las tres capas de docs. Rollout pendiente: test/build de cierre, visto bueno de SF20,
+  autorizaciones escritas y readback de la insignia.
+
 ## 2026-09-29 — Efeonce AI Visibility Report canonizado en AXIS (TASK-1938)
 
 - AXIS `v0.3.30` (`26097c5`, registro verificado): `axis-tokens` 0.3.30 (`aiVisibilityReport` y
@@ -633,32 +646,3 @@ regla del vacío. Tres gates medidos el mismo día: destino (pillar y caso ANAM 
 Revenue Lifecycle/CFO sin capítulo y el capítulo 5 sin dolor en el mapa. Brief ejecutable de las siete fichas en
 [RUTA_HUBSPOT.md](docs/commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/RUTA_HUBSPOT.md). Los capítulos 1 y 2
 quedan con brief por primera vez. Sin producir, publicar, pautar ni declarar tier de partner.
-
-## 2026-09-22 — «Tu IA no conoce tu negocio»: del output a la pieza
-
-[CDR-003](docs/campaigns/decisions/CDR-003-tu-ia-no-conoce-del-output-a-la-pieza.md) acepta la extensión 5B del
-capítulo 5: entrada «A nosotros tampoco nos gusta el AI Slop», tesis durable «El output fue generado. La pieza fue
-diseñada» y Design Context de seis capas. El ajuste aprobado mantiene a **Efeonce como única marca a posicionar**:
-«Del output a la pieza» es territorio creativo, la metodología se comunica sin nombre comercial propio, Design
-Context es el artefacto que construye y Behind the Build es un formato demostrativo. También documenta su aplicación
-a cualquier disciplina de diseño, con contratos propios por oficio; gráfico, UI, UX, web, 3D y motion son ejemplos,
-no una lista cerrada. La tesis empresarial distingue
-acceso PYME de diferenciación/gobierno a escala en mid-market y enterprise: el fallo más costoso puede ser que todo
-se vea intercambiable. El
-[contrato interno](docs/operations/EFEONCE_AI_ASSISTED_DESIGN_METHOD_V1.md), la narrativa y el brief incorporan la
-distinción, el build completo, Behind the Build, límites de prueba y medición. Sin producir, publicar, pautar, fusionar
-ofertas ni crear SKU.
-
-## 2026-09-22 — Campañas CMP: brief y continuidad entre agentes
-
-[Contrato ampliado](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md): templates de brief, índice de exports y ficha
-por pieza, versionados Claude/Codex y sincronizados con OneDrive. Skills de estrategia, producción y medición
-rutean al mismo brief, con JTBD/evidencia, estados separados y receta reproducible. CMP-001 consolida SEO/AEO y
-Content, 25 exports por ruta; historial preservado. Corrección del lecho para nuevas adaptaciones documentada;
-sin regenerar finales, modificar runtime ni publicar/pautar.
-
-Reconciliación: CDR-002 registra el set de seis pilotos; BRIEF asigna roles vigentes. Template y guía separan recursos, contrato y motor; comprobar archivo adjunto/hash además del checker, que tolera ausentes en CI. Sin generación nueva.
-
-Entrega CMP-001 unificada para humanos/agentes: manifiesto único, catálogo visual y CSV generado; 28 exports por tipo/ratio, recetas históricas en Recursos con mapa de rutas.
-
-Manifiesto v2: copy externo, audiencias, UTM y presupuesto propuesto; handoff MCP íntegro generado con checksum, deduplicación y readback. Contrato transversal y template reusable sincronizados en skills Claude/Codex y OneDrive. Sin publicación.

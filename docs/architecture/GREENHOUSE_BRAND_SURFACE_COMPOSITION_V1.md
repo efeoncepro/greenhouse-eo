@@ -1,9 +1,9 @@
 # GREENHOUSE — Composición por superficie de «La órbita» en el Artifact Composer V1
 
 > **Tipo de documento:** Spec técnica (arquitectura del lado Greenhouse)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-28 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.3: TASK-1930 — §13 nueva, datos reales en los slots del deck: `bindDeckSlots`, mapa declarado, binders, regla de evidencia (ningún deck usa evidencia `internal`), rastro por slot y `pnpm brand:deck-plan -- --bind`; §9, §12.9 y §14 al día. Antes, 1.2: TASK-1934 — las nueve láminas SEO/AEO: 78 recetas y 57 plantillas (§4), builders en `recipes/seo-aeo/` (§5), prefijos CSS (§7.3), 3× y reglas nuevas (§8), AXIS `v0.3.22`/`v0.3.23` (§10), catálogo de runtime y códigos `variant-both-in-deck` y `figure-source-missing` (§12), pendientes (§13). Antes, 1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
+> **Última actualización:** 2026-09-29 por Claude (1.4: TASK-1942 — el deck de práctica Salesforce: 94 de 94 recetas con plantilla (familia `line-stage`, 16 recetas nuevas), marcas de terceros desde `AXIS_PARTNER_ASSETS` con falla cerrada (`readbackRef`, `authorizationRef`), `reservesByLine` y `sloganBlock`; pines AXIS 0.3.33 / brand-assets 0.4.4; §4.2, §6, §10 y §14. Antes, 1.3: TASK-1930 — §13 nueva, datos reales en los slots del deck: `bindDeckSlots`, mapa declarado, binders, regla de evidencia (ningún deck usa evidencia `internal`), rastro por slot y `pnpm brand:deck-plan -- --bind`; §9, §12.9 y §14 al día. Antes, 1.2: TASK-1934 — las nueve láminas SEO/AEO: 78 recetas y 57 plantillas (§4), builders en `recipes/seo-aeo/` (§5), prefijos CSS (§7.3), 3× y reglas nuevas (§8), AXIS `v0.3.22`/`v0.3.23` (§10), catálogo de runtime y códigos `variant-both-in-deck` y `figure-source-missing` (§12), pendientes (§13). Antes, 1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
 > **Estado:** vigente. Taller local (`pnpm brand:compose`) en `develop`; la ruta productiva gobernada es TASK-1921, en curso.
 > **Contrato y valores (AXIS):** ADR [`SURFACE_COMPOSITION_DECISION_V1.md`](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md) del repo `efeoncepro/axis-design-system` (contrato `efeonce.surface-composition` 0.1.2, deltas (b)…(n)); guía `docs/agent-composition/surfaces/deck.md` del mismo repo.
 > **Norma de marca:** [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (qué se aprobó por superficie, §2.1 ruta por el composer, §4.6 deck) · catálogo de recetas [`deck-recipes/`](../operations/brand-graphic-line/deck-recipes/README.md).
@@ -175,7 +175,12 @@ catálogo de ofertas a comité y del deck SKY): mezclarlos degradaría lo que es
 
 ### 4.2 Conteo
 
-- **78 de 78** recetas del catálogo de láminas (`EFEONCE_DECK_SLIDE_RECIPES_V1.json`) tienen plantilla.
+- **94 de 94** recetas del catálogo de láminas (`EFEONCE_DECK_SLIDE_RECIPES_V1.json`) tienen plantilla (78 hasta el
+  2026-09-28; las 16 del deck de práctica Salesforce llegaron con TASK-1942: doce en `84c83a044` y cuatro en
+  `f05c26e2f`). Las 16 son la familia **`line-stage`** (escenario de luz, plataforma y haces en el acento de la línea):
+  kit compartido `src/lib/brand-surfaces/recipes/line-stage/kit.ts`, un builder por receta en esa carpeta, una
+  plantilla con prefijo CSS propio por receta y un test `line-stage-<receta>.test.ts`. La tabla de §4.4 lista sólo las
+  78 anteriores; el índice completo es `recipe-map.json` y el README del catálogo.
 - **57 plantillas**: 16 de TASK-1927 (que incluyen las seis de TASK-1919), **34 de TASK-1928** y **7 de TASK-1934**
   (`DecisionAiAnswer`, `DecisionAiMarket`, `MethodSurroundCycle`, `DecisionDifference`, `MethodEeat`,
   `DecisionTrafficToRevenue`, `DecisionDiagnosisMap`). Comparten plantilla: las cinco `proposal-service-*` (incluida
@@ -325,6 +330,15 @@ render bloquea la red y no lee rutas externas. La clave de cada asset es su refe
 | `painted` | `asset-ref:layer:<id>` | un SVG pintado por el motor de la línea gráfica con un **marcador** donde va la foto, más `photo.path` y `photo.fit` | recorta el plate, lo convierte en data URI JPEG y reemplaza el marcador dentro del SVG; falla si el SVG no lleva el marcador. Lo usa la lente de `section-lens` |
 | `file` | `asset-ref:file:<id>` | un archivo que se entrega tal cual: el logo del cliente de la portada de propuesta, las fotos del squad de `content-team`, los isotipos de herramientas del stack y del día a día, el isotipo de Efeonce | SVG o PNG sin recorte; otra extensión falla |
 | `logo` | `asset-ref:file:<id>` | logo de tercero normalizado: `tone`, `inkArea`, `maxWidth`, `maxHeight`, y opcionales `knockout`, `recolor`, `recolorBox` | `normalizedLogo`: rasteriza, mide el área de tinta, escala para que todos los logos tengan la misma (dentro de su caja) y lo pinta en UN tono. `knockout` descarta el fondo casi blanco de un logo en caja; `recolor` (la excepción tonal: Aguas Andinas y UC de Temuco) reemplaza colores por tonos del mismo color en vez de aplanar, y `recolorBox` compensa su menor peso. Sale como SVG con su tamaño intrínseco (PNG a 2× adentro) |
+
+**Marcas de terceros (TASK-1942).** Los íconos de producto, la insignia de partner, el wordmark Claudeforce y el isotipo
+de Loom salen de `AXIS_PARTNER_ASSETS` (`@efeoncepro/axis-brand-assets` 0.4.4): `pnpm brand:tokens` los copia a
+`graphic-line-deck/assets/partners/` (y el isotipo de Loom a `deck-axis/assets/tools/`) y el builder los declara como
+`file` (`partnerFile`). Todo lo que afirma una relación o necesita autorización **falla cerrado**: la insignia exige
+`partnerMark.readbackRef` en el intent (sin él, `mode: "operates-on"`: «Operamos sobre» + el logo de la plataforma del
+registro `public/images/logos/partners/`, o nada); Claude, Claudeforce y la mascota exigen `authorizationRef`; Agent
+Astro no está en ningún paquete y sólo entra por ruta local explícita. En el gate, los probes los reciben como
+`asset-ref:<kind>:probe`, nunca el archivo real.
 
 Los plates viven fuera de git (`ai-generations/**/*.png`): si falta uno, el comando falla con el aviso y no deja salida.
 La procedencia registra el sha256 de los `plate` y los `file`.
@@ -485,9 +499,16 @@ Serie publicada para TASK-1927 y TASK-1928 (tag del repo AXIS → `axis-tokens` 
 | `v0.3.22` | 0.3.22 / 0.3.20 | las nueve láminas SEO/AEO (delta (m), TASK-1934) | `ed6995084` |
 | `v0.3.23` | 0.3.23 / 0.3.21 | medidas que pidieron las plantillas SEO/AEO (delta (n)) | `434b10ddb` |
 
-**Pines vigentes** (`package.json`): `@efeoncepro/axis-tokens` `0.3.23`, `@efeoncepro/axis-ui-contracts` `0.3.21`,
-`@efeoncepro/axis-graphic-line` `0.7.0`, `@efeoncepro/axis-brand-assets` `0.3.5`, `@efeoncepro/axis-ui-registry`
-`0.3.1`. Transitivos: `axis-ui-contracts` 0.3.21 fija `axis-tokens` 0.3.23 exacto; `axis-graphic-line` 0.7.0 sigue
+Serie del deck Salesforce (TASK-1942): `v0.3.31` (doce recetas, delta (o), `axis-brand-assets` 0.4.4 con
+`AXIS_PARTNER_ASSETS`; Greenhouse `9289cab0c`), `v0.3.32` (cuatro recetas; `LayoutToken.reservesByLine` — reserva de
+columna propia de una línea, aplicada por `withLayout` sólo si el intent declara esa línea; la lee `frame.ts` — y
+`sloganBlock.appliesTo`, delta (p); Greenhouse no la fijó) y `v0.3.33` (delta (q): lo que las láminas pintan y las
+recetas no medían, incluido `sloganBlock.slogan.runLineHeight`, que resuelve `gl-leading`; Greenhouse `2e002673e`).
+
+**Pines vigentes** (`package.json`, 2026-09-29): `@efeoncepro/axis-tokens` `0.3.33`, `@efeoncepro/axis-ui-contracts`
+`0.3.33`, `@efeoncepro/axis-graphic-line` `0.11.0`, `@efeoncepro/axis-brand-assets` `0.4.4`,
+`@efeoncepro/axis-ui-registry` `0.3.1`. (Hasta el 2026-09-28: tokens `0.3.23`, contracts `0.3.21`, graphic-line
+`0.7.0`, brand-assets `0.3.5`.) Transitivos (foto del 2026-09-28, no re-verificada para 0.3.33): `axis-ui-contracts` 0.3.21 fija `axis-tokens` 0.3.23 exacto; `axis-graphic-line` 0.7.0 sigue
 fijando `axis-tokens` 0.3.12 y `axis-ui-contracts` 0.3.10, que el lockfile instala sólo para él.
 
 Cambios de contrato de la serie TASK-1928 (aditivos, misma 0.1.2): una composición puede declarar `progress: false`;
@@ -921,3 +942,7 @@ montos (Slice 5) esperan a TASK-1417 y el equipo (Slice 6), a TASK-1418; hasta e
   líneas contando caracteres, no midiendo el texto. En TASK-1934 falló con preguntas de 21–22 caracteres que sí bajan a
   dos líneas a 470 px; AXIS `v0.3.23` lo fijó en 20 para `decision-traffic-to-revenue` y `decision-diagnosis-map`.
 - **Salida PPTX:** no existe para este catálogo (depende de la matriz de TASK-1395).
+- **Deck de práctica Salesforce (TASK-1942, code complete):** SF20 (`close-brochure-orbit` en `revenue-salesforce`)
+  espera el visto bueno del operador; las autorizaciones escritas de Salesforce y Anthropic (TASK-1937) y el readback
+  de la insignia siguen pendientes; los plates `NXSF1`–`NXSF3` son rutas locales hasta TASK-1931. La serie HubSpot
+  equivalente es TASK-1943.

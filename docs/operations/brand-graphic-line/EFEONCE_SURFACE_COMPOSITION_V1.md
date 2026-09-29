@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.14
+> **Versión:** 1.15
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-29 por Claude (1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-09-29 por Claude (1.15: las 94 recetas del deck tienen plantilla — las dieciséis del deck Salesforce componen sobre AXIS 0.3.33 y el baseline `graphic-line` quedó sellado (sección (s)); SF20 compuesta y pendiente del visto bueno; los dos planes validan sin avisos; PDF de la propuesta sin insignia; §4.6. Antes, 1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -50,6 +50,21 @@
 > [manual de uso](../../manual-de-uso/creative/componer-por-superficie-con-axis.md) ·
 > [documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) ·
 > [recetas por lámina del deck](./deck-recipes/README.md)
+
+## Delta 2026-09-29 (c) — el deck Salesforce se compone completo (TASK-1942, `f05c26e2f`)
+
+- **94 de 94 recetas con plantilla.** Las cuatro de la segunda ronda (`decision-diagnosis-verdict`, `method-waves`,
+  `content-day-live-console`, `content-day-live-approval`) componen desde `f05c26e2f`; las doce de la primera ronda
+  tomaron los valores del delta (q) de AXIS `v0.3.33`. Greenhouse fija `axis-tokens` y `axis-ui-contracts` 0.3.33 y
+  `axis-brand-assets` 0.4.4. Baseline `graphic-line` sellado en la sección (s) de `BASELINE_DELTAS.md` (16 frames nuevos;
+  `CoverBrochure` y `CloseProposal` cambian sólo porque el probe llena el `partnerMark` opcional).
+- **Dos diferencias con las láminas aprobadas, por regla:** las negritas de las láminas 10 y 09 en el peso 700 del token
+  (la aprobada caía a 800 por una cara que el script no cargaba) y el número del bucle de la 09 en suave
+  (`accent-text-min-size`).
+- **SF20** (contraportada de brochure, `close-brochure-orbit` en `revenue-salesforce`) está compuesta y **espera el
+  visto bueno del operador**. Los dos planes validan sin errores ni avisos.
+- **PDF de la propuesta sin insignia:** `ai-generations/2026-09-29_deck-salesforce/out/Efeonce-Propuesta-Servicios-Salesforce.pdf`
+  (`render-src/pdf-propuesta.mjs`), de las láminas de dirección; la insignia espera su readback.
 
 ## Delta 2026-09-29 (b) — decisiones del operador al canonizar el deck Salesforce **[decisión del operador, 2026-09-29]**
 
@@ -566,7 +581,7 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
 | **`method-staircase`** | el método como escalera, sin foto (abajo); la principal de BeX | **aprobado** (BeX, 2026-09-27) |
 | Sección con lente, sección a sangre, respiro, foco, hoja de contactos, secciones de cine (servicios, equipo, quiénes somos, por qué lo hacemos) y las láminas de contenido, método, prueba, propuesta por línea, cotización y próximos pasos | el resto de las láminas del canvas | **aprobado** (2026-09-27); receta de cada una en el catálogo |
 | Las nueve SEO/AEO (`decision-ai-answer`, `decision-ai-market`, `method-surround-cycle`, `proposal-service-seo`, `proposal-cinematic-seo`, `decision-difference`, `method-eeat`, `decision-traffic-to-revenue`, `decision-diagnosis-map`) | contexto de mercado, la respuesta de la IA, el ciclo Surround, E-E-A-T, la diferencia, del tráfico al negocio, el mapa del diagnóstico y la propuesta SEO sobria y de cine (abajo, «Recetas por lámina») | **aprobado** (2026-09-28) |
-| Las dieciséis del deck Salesforce (`content-one-platform`, `method-agent-supervisor`, `decision-platform-coexistence`, `decision-provider-fit`, `content-service-lanes`, `content-season-launches`, `method-identity-consent`, `method-migration-reconcile`, `content-day-release-cycle`, `content-day-live-library`, `content-live-chat`, `content-measure-formulas`, `decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`) | la práctica Salesforce en cinco actos (abajo, «Deck de práctica Salesforce»); sin plantilla todavía | **aprobado** (2026-09-29) |
+| Las dieciséis del deck Salesforce (`content-one-platform`, `method-agent-supervisor`, `decision-platform-coexistence`, `decision-provider-fit`, `content-service-lanes`, `content-season-launches`, `method-identity-consent`, `method-migration-reconcile`, `content-day-release-cycle`, `content-day-live-library`, `content-live-chat`, `content-measure-formulas`, `decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`) | la práctica Salesforce en cinco actos (abajo, «Deck de práctica Salesforce»); con plantilla desde `84c83a044` (doce) y `f05c26e2f` (cuatro) | **aprobado** (2026-09-29) |
 
 **Reglas del deck**
 
@@ -574,8 +589,8 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
 - Las viñetas nunca llevan la esfera. La órbita con satélites lleva el arco largo en degradé **sin esfera**.
 - Una receta nueva nace en el canvas, se aprueba y recién entonces entra al catálogo de recetas, al token y al
   contrato.
-- **Una receta aprobada se compone con su plantilla.** Hoy `pnpm brand:compose` produce **90 de las 94** recetas del
-  deck (tablas de §2.1; las doce de la primera ronda Salesforce desde `84c83a044`); las 4 de la segunda ronda esperan su plantilla (TASK-1942). La portada con selección (`cover-brochure-cine-lines-selection`) se pide como
+- **Una receta aprobada se compone con su plantilla.** Hoy `pnpm brand:compose` produce **las 94** recetas del
+  deck (tablas de §2.1; las dieciséis del deck Salesforce desde `84c83a044` y `f05c26e2f`, TASK-1942). La portada con selección (`cover-brochure-cine-lines-selection`) se pide como
   `cover-brochure` con `layout: 'document-selection'`; `document` y `line` siguen rechazando la selección
   (`selection-not-in-recipe`).
 - **El intent declara `use` y `layout`.** `use` (`proposal` o `brochure`) dice para qué documento es la lámina; si se
@@ -1021,7 +1036,7 @@ y la decisión de cada uno: [catálogo, «Pendientes de QA»](./deck-recipes/REA
 El operador aprobó las 19 láminas del deck de la práctica Salesforce («Esto está aprobado todo, canonicemos»; canvas
 [«Láminas Salesforce · La órbita»](https://claude.ai/artifact/Jp1zybpowqVVyvgnDu1NSw) y «La órbita», página «Deck»,
 fila y = 7900, boards `DeckSalesforce*`). Línea `revenue-salesforce`: su acento sale del token, nunca transcrito.
-Dieciséis son **recetas nuevas** (sin plantilla todavía: el plan avisa `recipe-without-template`): doce de la primera
+Dieciséis son **recetas nuevas** (con plantilla: las doce de la primera ronda desde `84c83a044`, las cuatro de la segunda desde `f05c26e2f`): doce de la primera
 ronda y cuatro que el operador decidió al canonizar (las láminas 13, 14, 17 y 09 no cabían en los slots de las recetas
 existentes). Las otras cuatro (01, 02, 19 y la alternativa de la 02) son **datos de recetas existentes**, registrados en
 el campo `approvedUses` de cada receta con su `fit` (qué cabe en los slots y qué no).
@@ -1050,7 +1065,7 @@ Fuente de hechos: `ai-generations/2026-09-29_deck-salesforce/CANON-INVENTARIO.md
 | | 16 | ¿Cómo aprende tu equipo? → A su ritmo. | `content-day-live-library` (nueva) |
 | | 17 | ¿Y después del go-live? → Lo operamos. | `content-day-live-console` (nueva, 2026-09-29 b) |
 | | 18 | ¿Cómo sabes que funciona? → Lo medimos. | `content-measure-formulas` (nueva) |
-| V · Cierre | 19 | Empower your Revenue (propuesta) · ¿Conversamos? Cuando quieras. (brochure) | propuesta: `close-proposal-horizon` (dato; plate NXSF3 bordada, `sloganBlock`, logo 700 px, badge opcional) · brochure: `close-brochure-orbit` en la línea `revenue-salesforce` (lámina por componer) |
+| V · Cierre | 19 | Empower your Revenue (propuesta) · ¿Conversamos? Cuando quieras. (brochure) | propuesta: `close-proposal-horizon` (dato; plate NXSF3 bordada, `sloganBlock`, logo 700 px, badge opcional) · brochure: `close-brochure-orbit` en la línea `revenue-salesforce` (SF20, compuesta, visto bueno pendiente) |
 
 Fuera del recorrido: la propuesta sobria (`proposal-service-revops`, mismo plate NXSF1: **excluyente** con la 02) y los
 respaldos sin badge de la 01 y la 19.
@@ -1078,18 +1093,18 @@ propuesta; las láminas 02 a 18 son las mismas y cambian el marco:
 
 | Documento | Portada | Contraportada | Plan de ejemplo |
 |---|---|---|---|
-| Brochure | `cover-brochure-line-revenue` (SF0, con foto; badge sólo con readback) | `close-brochure-orbit` en la línea `revenue-salesforce`, sin foto: «¿Conversamos? Cuando quieras.» + «Empower your Revenue» como firma, logo a 500 px. **La lámina no existe todavía:** el Artifact Composer la compone desde la receta existente (TASK-1942, Slice 2) y necesita el visto bueno del operador antes de enviarse | `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-brochure-salesforce.json` |
+| Brochure | `cover-brochure-line-revenue` (SF0, con foto; badge sólo con readback) | `close-brochure-orbit` en la línea `revenue-salesforce`, sin foto: «¿Conversamos? Cuando quieras.» + «Empower your Revenue» como firma, logo a 500 px. **Compuesta (SF20)** desde la receta existente; necesita el visto bueno del operador antes de enviarse | `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-brochure-salesforce.json` |
 | Propuesta | `cover-proposal-orbit` (sin foto, con el logo del cliente) | `close-proposal-horizon` (SF19, con foto; composición `sloganBlock`: logo a 700 px en top 220 y eslogan en bloque al 64 %) | `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-proposal-salesforce.json` |
 
-Los dos planes validan con `pnpm brand:deck-plan -- --plan <plan>`: sin errores y 4 avisos `recipe-without-template`
-(las láminas de la segunda ronda, sin plantilla todavía); los prueba `validate.test.ts`. Los plates van por `plateRef` (NXSF2 en la
+Los dos planes validan con `pnpm brand:deck-plan -- --plan <plan>`: sin errores ni avisos (verificado el 2026-09-29, tras
+`f05c26e2f`); los prueba `validate.test.ts`. Los plates van por `plateRef` (NXSF2 en la
 portada, NXSF1 en la 02, NXSF3 en la contraportada de propuesta), porque las recetas de línea comparten su plate de
 catálogo y sin él el plan falla con `plate-repeated`. En un brochure evergreen se quita la 07 (temporada).
 
 **Columna de la portada:** la portada aprobada cuelga la columna de voz de **190**, 10 px sobre la reserva general del
 logo (200–300). El operador pidió mantenerla como se aprobó: AXIS `v0.3.32` da a la línea `revenue-salesforce` de la
 composición `line` su propia reserva (190–300) y la referencia en 190, sin cambiar la reserva ni el render de ninguna
-otra portada. Greenhouse la compone al fijar esa versión (TASK-1942, Slice 2).
+otra portada. Greenhouse la compone desde que fija AXIS 0.3.33 (`2e002673e`, `f05c26e2f`).
 
 **Deck HubSpot: pendiente.** La práctica RevOps & CRM vende también HubSpot («HubSpot-first» es un veredicto de la
 lámina 04), y HubSpot sólo tiene portada de línea y propuesta (`revenue-hubspot`, plate RV1b). La serie de contenido
