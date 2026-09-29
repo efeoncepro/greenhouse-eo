@@ -65,6 +65,21 @@ const FORMATOS = {
     zonaTexto: ({ muro, tinta }) =>
       `TEXT SPACE (planned, essential): the LEFT 45% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right half.`
   },
+  // Fondo de videollamada (Microsoft Teams, 1920×1080 al entregar). SIN VALIDAR hasta medir una ronda con la
+  // silueta encima. La persona se sienta al CENTRO y lo tapa: lo importante vive en los tercios laterales y arriba
+  // (operador, 2026-09-29: fondos de oficina con elementos de Efeonce que no pasen desapercibidos). No reserva texto:
+  // el centro es de la persona, no de un titular. Sin lecho: el cuerpo ocupa el borde inferior y no hay firma.
+  'teams': {
+    size: '2048x1152',
+    declara: 'HORIZONTAL 16:9 VIDEO-CALL BACKGROUND (Microsoft Teams): the photograph is what a person on a call would have behind their chair.',
+    lecho: '16%',
+    limite:
+      'CALL ZONE (essential): the CENTRE of the frame — from 30% to 70% of the width, from 12% of the height down to the bottom — stays calm and uncluttered, an even mid-dark surface with no text, no logo, no light beams and no bright spots, because the person on the call sits there and covers it. Every key element (lettering, signs, the logo, the main prop) lives in the LEFT or RIGHT third or high in the top band, never behind that zone.',
+    sinValidar: true,
+    zonaTexto: () => {
+      throw new Error('El formato `teams` no reserva texto: el centro es de la persona en la llamada. Pon el texto en la escena, en un tercio lateral.')
+    }
+  },
   '1:1': {
     size: '1152x1152',
     declara: 'SQUARE 1:1 composition.',
@@ -555,6 +570,61 @@ export const OBJETOS = {
       'tres-cuartos-trasero': '08-tres-cuartos-trasero'
     },
     vistaDefecto: 'tres-cuartos-izq'
+  },
+  // Logo completo de Efeonce en 3D (kit aprobado 2026-09-17). Referencia de FORMA; el material, el montaje y la luz
+  // los describe la escena. Blanco sobre superficies oscuras, navy sobre claras. Nunca se pega el render (el operador lo
+  // rechazó dos veces: «se ve muy falso»). `letrero` = escala mediana (≈ 1,2 m, corpóreo de pared); `escritorio` =
+  // escala pequeña (24 cm, objeto sobre una mesa o repisa). Preferir `escritorio` como product placement: en la pared
+  // de una sala se siente forzado (operador, 2026-09-29).
+  'logo-efeonce-3d-letrero-blanco': {
+    etiqueta: 'the official 3D model of the full Efeonce logo (white)',
+    instruccion:
+      'Reproduce EXACTLY this logo — every letter of «efeonce», the ship emblem with its orbit ring, its cuts and its three small windows, same proportions and spacing. It is dimensional signage: the scene decides its material, mounting and light. Do not redraw, respell, simplify or add parts.',
+    base: 'ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/',
+    patron: 'efeonce-logo-3d-blanco-mediana-<V>-transparente.png',
+    vistas: {
+      frente: '01-frente-altura-ojos-luz-der', 'frente-luz-izq': '01-frente-altura-ojos-luz-izq',
+      'tres-cuartos-izq': '02-tres-cuartos-izquierda-luz-der', 'tres-cuartos-der': '03-tres-cuartos-derecha-luz-izq'
+    },
+    vistaDefecto: 'frente'
+  },
+  'logo-efeonce-3d-letrero-navy': {
+    etiqueta: 'the official 3D model of the full Efeonce logo (navy)',
+    instruccion:
+      'Reproduce EXACTLY this logo — every letter of «efeonce», the ship emblem with its orbit ring, its cuts and its three small windows, same proportions and spacing. It is dimensional signage: the scene decides its material, mounting and light. Do not redraw, respell, simplify or add parts.',
+    base: 'ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/',
+    patron: 'efeonce-logo-3d-navy-mediana-<V>-transparente.png',
+    vistas: {
+      frente: '01-frente-altura-ojos-luz-der', 'frente-luz-izq': '01-frente-altura-ojos-luz-izq',
+      'tres-cuartos-izq': '02-tres-cuartos-izquierda-luz-der', 'tres-cuartos-der': '03-tres-cuartos-derecha-luz-izq'
+    },
+    vistaDefecto: 'frente'
+  },
+  'logo-efeonce-3d-escritorio-blanco': {
+    etiqueta: 'the official 3D model of the full Efeonce logo (blanco), a small desk object about 24 cm wide',
+    instruccion:
+      'Reproduce EXACTLY this logo — every letter of «efeonce», the ship emblem with its orbit ring, its cuts and its three small windows, same proportions and spacing. It is a small solid desk object about 24 cm wide and 6 cm tall standing on its base: the scene decides its material and light. Do not redraw, respell, simplify or add parts.',
+    base: 'ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/',
+    patron: 'efeonce-logo-3d-blanco-pequena-<V>-transparente.png',
+    vistas: {
+      sentada: '02-picado-persona-sentada-luz-der', 'sentada-luz-izq': '02-picado-persona-sentada-luz-izq',
+      'a-ras': '01-frente-a-ras-luz-der', 'tres-cuartos-izq': '03-picado-tres-cuartos-izquierda-luz-der',
+      'tres-cuartos-der': '04-picado-tres-cuartos-derecha-luz-izq'
+    },
+    vistaDefecto: 'sentada'
+  },
+  'logo-efeonce-3d-escritorio-navy': {
+    etiqueta: 'the official 3D model of the full Efeonce logo (navy), a small desk object about 24 cm wide',
+    instruccion:
+      'Reproduce EXACTLY this logo — every letter of «efeonce», the ship emblem with its orbit ring, its cuts and its three small windows, same proportions and spacing. It is a small solid desk object about 24 cm wide and 6 cm tall standing on its base: the scene decides its material and light. Do not redraw, respell, simplify or add parts.',
+    base: 'ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/',
+    patron: 'efeonce-logo-3d-navy-pequena-<V>-transparente.png',
+    vistas: {
+      sentada: '02-picado-persona-sentada-luz-der', 'sentada-luz-izq': '02-picado-persona-sentada-luz-izq',
+      'a-ras': '01-frente-a-ras-luz-der', 'tres-cuartos-izq': '03-picado-tres-cuartos-izquierda-luz-der',
+      'tres-cuartos-der': '04-picado-tres-cuartos-derecha-luz-izq'
+    },
+    vistaDefecto: 'sentada'
   },
   'nave-efeonce': {
     etiqueta: 'the official white 3D model of the Efeonce ship emblem',
@@ -2200,6 +2270,8 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   )
 
   if (resueltas.some(r => r.sinValidar)) {
-    console.log('⚠ El formato 1:1 no tiene ronda validada: sus números son criterio, no medición.')
+    const sinRonda = [...new Set(resueltas.filter(r => r.sinValidar).map(r => r.ficha.formato))].join(', ')
+
+    console.log(`⚠ El formato ${sinRonda} no tiene ronda validada: sus números son criterio, no medición.`)
   }
 }

@@ -89,6 +89,16 @@ describe('foto:prompt · la tabla de formatos es la única fuente', () => {
     expect(construirPrompt({ ...fichaBase, formato: '1:1' }).sinValidar).toBe(true)
     expect(construirPrompt({ ...fichaBase, formato: '4:5' }).sinValidar).toBe(false)
   })
+
+  it('el fondo de Teams deja el centro a la persona y no reserva texto', () => {
+    const r = construirPrompt({ ...fichaBase, formato: 'teams', lecho: 'sin-lecho', sinLechoPorque: 'fondo de Teams: el cuerpo ocupa el borde inferior' })
+
+    expect(r.size).toBe('2048x1152')
+    expect(r.sinValidar).toBe(true)
+    expect(r.prompt).toContain('CALL ZONE')
+    expect(r.prompt).toContain('from 30% to 70% of the width')
+    expect(() => construirPrompt({ ...fichaBase, formato: 'teams', reservas: { texto: { muro: 'a wall' } } })).toThrow(/no reserva texto/)
+  })
 })
 
 describe('foto:prompt · las guardas', () => {
@@ -1197,6 +1207,17 @@ describe('la prenda se copia tal cual; el macro sólo refuerza el detalle', () =
 
   itConAssets('un objeto sin bordado sigue aportando una sola', () => {
     expect(construirPrompt({ ...base, objetos: ['nave-efeonce'] }).imagenes).toHaveLength(1)
+  })
+
+  itConAssets('el logo 3D entra como referencia de forma, por escala, color y vista', () => {
+    for (const color of ['blanco', 'navy']) {
+      const letrero = construirPrompt({ ...base, objetos: [{ objeto: `logo-efeonce-3d-letrero-${color}`, vista: 'frente' }] })
+      const escritorio = construirPrompt({ ...base, objetos: [`logo-efeonce-3d-escritorio-${color}`] })
+
+      expect(letrero.imagenes).toHaveLength(1)
+      expect(letrero.imagenes[0]).toContain(`efeonce-logo-3d-${color}-mediana-01-frente-altura-ojos-luz-der-transparente.png`)
+      expect(escritorio.imagenes[0]).toContain(`efeonce-logo-3d-${color}-pequena-02-picado-persona-sentada-luz-der-transparente.png`)
+    }
   })
 })
 

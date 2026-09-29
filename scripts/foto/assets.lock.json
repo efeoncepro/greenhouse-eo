@@ -274,6 +274,78 @@
       "rol": "kit:sprocket-hubspot/tres-cuartos-trasero",
       "sha256": "d0ea5ce54a6742f7bcf30efcf74a3a01fd903e75f3df374adc0ba3a6bcc01ad8"
     },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/efeonce-logo-3d-blanco-mediana-01-frente-altura-ojos-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-blanco/frente",
+      "sha256": "1ad8376e7b47174c8f98c040bcb3a121711e55aaee3414149a71c59e80b9e3b3"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/efeonce-logo-3d-blanco-mediana-01-frente-altura-ojos-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-blanco/frente-luz-izq",
+      "sha256": "bda3a58bb92402c766b722f2bd662989b3c85af2fc5337a76ffa50d495960df5"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/efeonce-logo-3d-blanco-mediana-02-tres-cuartos-izquierda-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-blanco/tres-cuartos-izq",
+      "sha256": "317ad05d4f3afd502abe25597ecbd121a1dd1c96a853ace7ecda8cf4e1386faa"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/efeonce-logo-3d-blanco-mediana-03-tres-cuartos-derecha-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-blanco/tres-cuartos-der",
+      "sha256": "8fbf6699614cfb35822154e9d20a5c006e86fb28482fbb507be1b5b1bcdb503b"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-navy/frente",
+      "sha256": "93013a0cbb40062af78d383596aa47a57caf083b055ab17a43ccfa73ed2d9386"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-navy/frente-luz-izq",
+      "sha256": "17dba09cf913129c8a6097fdcc7bae2554c94680e82e641b98cd2937ea5956f5"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-navy/tres-cuartos-izq",
+      "sha256": "afffc381865fd8b234f20da45785593f9bbe6683a3922c5e1760a67fa171d4b0"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-navy/tres-cuartos-der",
+      "sha256": "be2cba856fddfd7debce4db29ad9d2a1a53c9393dd223b66933372a9f9f83c25"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-02-picado-persona-sentada-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/sentada",
+      "sha256": "d009cf2376ea39378de5a5eb548e6bbdbc6783100b34f5d8c7635f77ae67ab8f"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-02-picado-persona-sentada-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/sentada-luz-izq",
+      "sha256": "aa4da9cba0e40c53e1adff7bdc9906c53390d6a24961ef937d7214753b0f7abb"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-01-frente-a-ras-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/a-ras",
+      "sha256": "56537895fd74081964f31137446e2a1e1441ec4ea674acd9fc6322aa21ee9df7"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-03-picado-tres-cuartos-izquierda-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/tres-cuartos-izq",
+      "sha256": "34edac15dbe39fee8c0886e3be06bbcc88250282917bdee2914fcf0826c060a3"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-04-picado-tres-cuartos-derecha-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/tres-cuartos-der",
+      "sha256": "7de6ac4bb25c4957e1f7dfbd3eb511ae2e18a79c0568afcf7543e183a124c328"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-02-picado-persona-sentada-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/sentada",
+      "sha256": "62afac8b16f3f1d6639a480adb572c94367789e965e7915593a93d0730426d2c"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-02-picado-persona-sentada-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/sentada-luz-izq",
+      "sha256": "6c17de1c0a5039f25541ddbefb494e6f8ff2c658db337d9ccbe8041e616a4bf1"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-01-frente-a-ras-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/a-ras",
+      "sha256": "f5745c4fa5442d20c3c80c41fe8bbb31d5be6607bcaa0adead833518dfd0a264"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-03-picado-tres-cuartos-izquierda-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/tres-cuartos-izq",
+      "sha256": "31984307ad640e95ecbbbdd4294bf7e37fc85fe99548e8de3928447f5e64a650"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-04-picado-tres-cuartos-derecha-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/tres-cuartos-der",
+      "sha256": "6abd8d7f437d1b044cb6b723077fec6a4d3f13e1dfbb8448707532177bb8e8fa"
+    },
     "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:nave-efeonce/frente",
       "sha256": "c12e6678db2dcb59fe11a38bc9e7806a957ba6f36ad9c58631d10fe6650384c2"
