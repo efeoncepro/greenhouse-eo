@@ -1,5 +1,9 @@
 # TASK-1915 — Marketing Studio: despachador de corridas de agente con adaptadores Claude/OpenAI
 
+## Actualización de proveedor — DevDay 2026-09-29
+
+El [inventario de lanzamientos](../../audits/platform/OPENAI_DEVDAY_2026_09_29_LAUNCH_INVENTORY.md) confirma Agents API gestionada con computer use y GPT-6.1 Sol. Son candidatos para evaluación por rol, no un quinto adaptador ni una ruta de modelo aprobada. Antes de modificar el contrato de cuatro adaptadores de esta task, comparar Agents API con Agents SDK/Responses para datos, residencia, ZDR, sesiones, identidad delegada, MCP, costo y recuperación, y registrar el delta del ADR. La Agents API actualmente declara residencia solo en EE. UU. y no ofrece ZDR aun con sandbox propio. Las evals públicas de Sol no sustituyen las de Studio.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

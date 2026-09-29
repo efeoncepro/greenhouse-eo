@@ -19,6 +19,17 @@
 > Claude.ai, Claude Desktop y ChatGPT leyeron base-only; Desktop y ChatGPT renovaron sin widening. Usa el readback
 > de Cloud Run y los probes públicos, nunca esta nota fechada, como prueba del runtime actual.
 
+## MCP Events — trabajo planificado en TASK-1904 U21
+
+Al 2026-09-29, el gateway productivo usa SDK MCP v2, pero la revisión verificada no implementa
+`server/discover` ni `events/list|subscribe|unsubscribe`. El protocolo declarado y un `tools/list`
+no acreditan Events. La [task compartida](../tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md)
+requiere ADR antes de código, suscripciones durables, callback verificado, entrega Standard Webhooks,
+revalidación de permisos y certificación separada en ChatGPT y Claude. La
+[guía de Claude Code](https://code.claude.com/docs/en/mcp) documenta negociación v2 y
+`list_changed`; no tratar esas notificaciones como eventos de negocio. Antes del rollout, comparar
+revisión y build SHA vivos, probar métodos autenticados y el ciclo completo en cada host.
+
 ## Operación interna multiorganización — TASK-1844
 
 Entrega completa y certificada el 2026-09-08 para una identidad interna. [Manual de uso](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) · [Funcional](../documentation/identity/acceso-mcp-interno-multiorganizacion.md) · [Rollout y rollback](TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md) · [Evidencia final](../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json). Este readback sirve gateway 1.3.0 en `00050-wlk`; las notas de versiones anteriores conservan su fecha.

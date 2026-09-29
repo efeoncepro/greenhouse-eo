@@ -440,6 +440,8 @@ plataforma con su propio ADR. Hasta entonces vive en Studio.
 Verificado en documentación oficial el 2026-09-26. Las superficies en beta pueden cambiar sin aviso; se reverifican
 al implementar cada adaptador.
 
+**Addendum de fuente 2026-09-29:** OpenAI confirma la Agents API como beta pública desde el 10-09 y anuncia hoy computer use mediante navegador alojado. La [guía actual](https://developers.openai.com/api/docs/guides/agents-api/overview) declara residencia solo en EE. UU. y ausencia de ZDR incluso con sandbox autoalojado; no extrapolarle el ZDR con Private Safety Processing de otros flujos API. GPT-6.1 Sol está en API (`gpt-6.1-sol`), Codex y Work, pero aún no en Chat. Su precio estándar es US$2/M input, US$0,10/M cached input y US$10/M output. [Sol](https://openai.com/index/introducing-gpt-6-1-sol/) y [DevDay](../../audits/platform/OPENAI_DEVDAY_2026_09_29_LAUNCH_INVENTORY.md). Esto abre una **evaluación** de Agents API y Sol para los roles; no modifica por sí mismo los cuatro adaptadores, el runtime preferido ni las gates de identidad y costo de esta decisión. La fila de Agents API del 26-09 siguiente conserva su evidencia histórica de esa fecha.
+
 | Proveedor | Hecho | Fuente |
 |---|---|---|
 | Anthropic | El **Claude Agent SDK** es una biblioteca en Python y TypeScript que corre el binario de Claude Code con sus herramientas, permisos, sesiones, hooks, subagentes, skills y MCP. Verificado 2026-09-26 | [Agent SDK overview](https://code.claude.com/docs/en/agent-sdk/overview) |

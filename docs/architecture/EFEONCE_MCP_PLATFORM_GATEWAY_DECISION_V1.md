@@ -785,3 +785,9 @@ Entra (consentimiento Admin, 2026-09-15) y **no** se agregó al cliente PKCE com
 legítima es un consentimiento/grant gobernado por cliente; cerrar el `insufficient_scope` de `create_insight_edition`
 ampliando el cliente compartido permitiría encargar ediciones de Insights a cualquier organización con módulo desde
 cualquier persona del tenant.
+
+### Delta propuesto 2026-09-29 — Events multicliente (TASK-1904, U21)
+
+Por pedido del operador, U21 debe construir Events para ChatGPT y Claude. Este delta **no aprueba aún** storage, event schema, callback, provider ni adaptador Claude: U21 debe presentar ADR con esas decisiones antes de código. Ownership previsto: el provider es dueño del hecho/outbox, autorización y command de efecto; el gateway neutral posee negociación `2026-07-28`, `server/discover`, catálogo y ciclo de suscripciones, filtros y entrega firmada. Una suscripción no amplía el grant; revalidar autoridad durante toda su vida. Preservar `initialize` y clientes previos.
+
+La [guía oficial de OpenAI](https://developers.openai.com/plugins/build/mcp-events) define entrega webhook con Standard Webhooks, verificación de callback y almacenamiento persistente. La [guía de Claude Code](https://code.claude.com/docs/en/mcp) confirma negociación MCP v2 y notificaciones `list_changed`, pero no acredita `events/subscribe` para eventos de negocio. La entrega Claude debe certificarse nativamente o mediante adaptador Efeonce aprobado, identificado como tal. La dependencia SDK 2.0.0 y un status `2026-07-28` son condiciones insuficientes de compatibilidad. Evidencia de código/runtime observada el 2026-09-29: gateway productivo sin ciclo Events implementado.

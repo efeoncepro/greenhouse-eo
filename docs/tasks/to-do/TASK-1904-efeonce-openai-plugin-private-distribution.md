@@ -1,4 +1,8 @@
-# TASK-1904 — Efeonce MCP: plugin oficial para Codex y ChatGPT, instalación privada, marca y skills
+# TASK-1904 — Efeonce MCP: plugin ChatGPT/Codex y Events para ChatGPT/Claude
+
+## Actualización de proveedor — DevDay 2026-09-29
+
+El [inventario oficial contrastado](../../audits/platform/OPENAI_DEVDAY_2026_09_29_LAUNCH_INVENTORY.md) agrega plugin extensions, Sites y MCP Events. **MCP Events pasa a ser trabajo obligatorio de esta task para ChatGPT y Claude**, con un contrato compartido de eventos en Efeonce y certificación separada por cliente (Slice 6). La documentación oficial de ChatGPT especifica suscripción y webhook; la de Claude Code documenta negociación MCP v2 y `list_changed`, pero no acredita `events/subscribe`. Slice 0 debe verificar el soporte real de Claude Code y del conector hospedado antes de elegir integración nativa o un adaptador autorizado, sin llamar «MCP Events nativos» a una alternativa. Ningún anuncio acredita instalación, autorización ni acceso cliente. `Sign in with ChatGPT`, consumo de allowance y Marketplace son contratos distintos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -34,7 +38,8 @@
 Entregar el plugin de Efeonce para Codex y ChatGPT: paquete versionado con identidad visual oficial,
 conexión OAuth al MCP existente, skills distribuibles, instalación privada reproducible y pruebas reales
 por cliente. Debe poder usarse sin revisión ni publicación en el directorio público de OpenAI.
-La task termina con una instalación funcional y evidencia; un manifest o una URL configurada no bastan.
+La misma task construye el canal compartido de eventos y lo conecta a ChatGPT y Claude con pruebas reales
+por cliente. Termina con instalaciones y eventos funcionales verificados; un manifest o una URL no bastan.
 
 ## Why This Task Exists
 
@@ -56,6 +61,7 @@ y se declararía su disponibilidad real por autoridad, sin prometer ni ampliar p
 - Distribuir skills de usuario verificadas que descubren capacidades y cargan los manuales canónicos.
 - Certificar OAuth, herramientas, aislamiento, errores, renovación, revocación, actualización y desinstalación.
 - Dejar distribución repetible para un segundo operador elegible, soporte y un expediente opcional de publicación.
+- Construir el ciclo de vida de eventos en el gateway y certificar la recepción y el efecto autorizado en ChatGPT y Claude, sin asumir paridad de protocolo entre hosts.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -113,10 +119,11 @@ Fuentes oficiales consultadas el 2026-09-26; revalidar esquema, plan y soporte p
 - TASK-1832/1833/1841: conservan certificación externa, assurance y piloto comercial. Sólo condicionan
   las cohortes externas que se pretendan habilitar, no la instalación privada interna ya autorizada.
 - Assets oficiales Efeonce/AXIS, cuenta OpenAI elegible y permisos efectivos del operador; inventariar sin presumirlos.
+- Fuente de eventos de un provider con contrato explícito, permiso y caso de uso aprobado; sin inferir que cualquier outbox puede publicarse.
 
 ### Blocks / Impacts
 
-- EPIC-044 U21; TASK-1864 U20 conserva semántica agéntica y Claude.
+- EPIC-044 U21; TASK-1864 U20 conserva kit/routing/eval agéntico de Claude y Codex. U21 posee Events compartidos y certificación de entrega a ChatGPT y Claude.
 - Providers existentes, incluido Studio: su presencia local no prueba habilitación para OAuth nativo.
 - Distribución pública futura: recibe este paquete y evidencias; no se vuelve prerequisito de esta task.
 
@@ -131,6 +138,8 @@ Rutas nuevas propuestas, confirmar en Slice 0 antes de crearlas:
 - `docs/manual-de-uso/plataforma/instalar-efeonce-en-codex-chatgpt.md`: manual del usuario.
 - `docs/operations/mcp/EFEONCE_OPENAI_PLUGIN_RELEASE_RUNBOOK.md`: release, soporte y rollback.
 - `docs/audits/mcp/TASK-1904/**`: evidencia, matrices, capturas sanitizadas y QA.
+- `../efeonce-mcp/src/**`: discovery MCP 2.0, suscripciones, verificación de callbacks y entrega firmada; rutas concretas se fijan en Slice 0 y ADR.
+- Provider/worker dueño del evento: contrato, outbox y publicación sólo bajo ownership acordado; no copiar hechos de dominio en el gateway.
 - Los dos contratos UI declarados en Status; task, índices y handoff correspondientes.
 
 Compartidos bajo coordinación: `../efeonce-mcp/src/branding.ts`, `src/surface.ts`, tests y `package.json`.
@@ -150,19 +159,21 @@ Auth-server, tool-manifest y providers conservan sus dueños: cambios funcionale
 
 ### Gap
 
-- No se ha demostrado paquete completo instalado con marca, skills y OAuth en ambos clientes.
+- No se ha demostrado paquete completo instalado con marca, skills y OAuth en ambos clientes OpenAI.
+- El SDK v2 instalado no equivale a `server/discover` ni a `events/list|subscribe|unsubscribe`; la revisión productiva verificada el 2026-09-29 no implementaba ese flujo.
+- No hay soporte nativo de MCP Events para Claude acreditado con fuente oficial ni prueba cliente; `list_changed` informa cambios de catálogo, no eventos de negocio.
 - Falta matriz instalada por cliente/versión/autoridad y una guía reproducible fuera de greenhouse-eo.
 - Falta ciclo de release, actualización, recuperación y retirada sin borrar otras conexiones.
 
 ## Modular Placement Contract
 
-- Topology impact: `tooling`
+- Topology impact: `cross-runtime`
 - Current home: `../efeonce-mcp/client-kit/openai/`; documentación central en Greenhouse.
 - Future candidate home: `remain-shared`
-- Boundary: paquete consume manifiestos y routing generado; gateway/provider conservan ejecución y policy.
+- Boundary: paquete consume manifiestos y routing; gateway posee suscripciones/entrega, provider posee el hecho y la policy, adaptadores ChatGPT/Claude sólo reciben eventos autorizados.
 - Server/browser split: paquete/skills sin secretos; tokens bajo almacenamiento seguro del host; servidor revalida cada llamada.
-- Build impact: ensamblado determinista independiente del build del portal; no introducir dependencias de UI en Greenhouse.
-- Extraction blocker: contrato de distribución por host pendiente de certificación; ningún runtime nuevo previsto.
+- Build impact: paquete y gateway se construyen separados del portal; storage/worker de suscripciones y SDK de firma se dimensionan en ADR.
+- Extraction blocker: autoridad por llamada, persistencia de suscripciones y compatibilidad del host Claude pendientes de certificar.
 
 ## UI/UX Contract
 
@@ -236,10 +247,18 @@ OAuth metadata/PKCE/refresh/revoke del emisor. Paquete portable `plugin.json`, `
 `assets/` y `extensions.com.openai`; compatibilidad `.codex-plugin/plugin.json` sólo cuando haga falta.
 `.app.json` usa un ID real obtenido del registro; nunca un ID inventado o una copia universal del ID personal.
 Versionar de forma separada paquete y gateway; cambios de superficie respetan digest/bump canónicos.
+Events exige `server/discover` negociado en `2026-07-28`, capability `events` y
+`events/list|subscribe|unsubscribe` en el endpoint autenticado. Anunciar sólo lo implementado
+y conservar compatibilidad con `initialize` y clientes anteriores. Claude se certifica por host y
+versión; un adaptador propio tiene contrato distinto de MCP Events nativos.
 
 ### Data model and invariants
 
-Sin tablas ni backfills nuevos. Write-target allowlist: `N/A — el paquete no persiste datos de dominio`.
+El paquete no persiste datos de dominio. Events requiere storage durable de suscripciones con
+owner, cliente, organización/objetivo, nombre, filtros, callback, secreto cifrado, TTL, estado y
+cursor cuando exista replay; definir migración, retención y borrado. El provider conserva el
+evento de origen y su outbox. El gateway filtra, firma los bytes exactos con Standard Webhooks,
+reintenta de forma acotada y mantiene IDs estables para deduplicación.
 Autoridad por persona/organización/scope/capability, con tenant boundary server-side y revocación vigente.
 Un selector de organización sólo restringe; nunca amplía. Grants internos, externos y canary son distintos.
 Una skill, annotations o allowlist local no reemplazan `tools/list` y `tools/call` autorizados.
@@ -248,9 +267,10 @@ Auditoría conserva actor humano y correlación, nunca tokens, cookies, PII inne
 
 ### Migration, backfill and rollout
 
-Migration posture: `none`. Instalación opt-in; se inventaría la conexión canary y se prueba una nueva o
+Migration posture: `additive` para suscripciones, `none` para el paquete. Instalación opt-in; se inventaría la conexión canary y se prueba una nueva o
 se actualiza la existente según su identidad real. Mantener recuperación hasta validar; no reactivar
 sujetos sintéticos retirados. Desinstalar el paquete y revocar el consentimiento son acciones distintas.
+Apagar Events detiene altas y entregas; el rollback dispone explícitamente las suscripciones y secretos.
 
 ### Security and access
 
@@ -260,12 +280,17 @@ necesidad y consentimiento. Errores distinguen sesión expirada, acceso denegado
 rate limit y provider caído, con recuperación sin filtraciones. Prompt injection en contenido de tools
 se trata como datos no confiables. Writes/gasto/publicación requieren controles del dominio y autorización
 correspondiente; el conector no recibe un consentimiento global para mutar todo.
+Events valida y verifica callback HTTPS, bloquea SSRF y redirecciones, revalida autoridad durante
+toda la vigencia y detiene entregas al revocar grant o conexión. Un evento no concede permiso de
+escritura ni delegación `act`; el efecto pasa por el command y gate del dominio.
 
 ### Runtime evidence
 
 Matriz autenticada por host y autoridad: catálogo observado, herramienta llamada, resultado esperado,
 versión, timestamp, evidencia sanitizada y FAIL/blocked explícitos. Anonymous 401/health 200 no certifican
 login. Verificar readback real y correlación del gateway; no cerrar con tests exclusivamente mock.
+Para Events registrar discovery, alta/refresh/baja, callback, firma, filtro negativo, revoke,
+expiración, duplicado, orden, replay/gap y efecto por host. Claude exige evidencia propia.
 
 ### Acceptance criteria additions
 
@@ -276,14 +301,17 @@ login. Verificar readback real y correlación del gateway; no cerrar con tests e
 
 ### Capability Definition of Done — Full API Parity gate
 
-`N/A — no capability nueva`: esta task empaqueta capacidades existentes. Todo gap funcional se enlaza al
-owner del dominio con tool/exclusión razonada; no crear endpoints de negocio específicos de OpenAI.
+El paquete reutiliza capabilities existentes; Events agrega una capability de integración.
+El evento de origen y su efecto pertenecen al dominio y se registran en su contrato canónico;
+`packages/contracts/src/operations.ts` declara tool o exclusión razonada donde aplique.
+No crear endpoints de negocio específicos de OpenAI.
 
 ## Hybrid Execution Justification
 
 - Why not split: UI acotada a metadata/assets y consumo de OAuth existente; es inseparable de probar instalación.
 - Primary execution profile: backend-data; la mayor superficie propia es packaging/integración.
 - Contract boundary: UI del host + auth existente; ni nueva pantalla de producto ni nueva foundation de identidad.
+- Events tiene backend/worker compartido y gates propios en Slice 6, en esta misma task para ambos conectores.
 - Risk controls: si discovery exige widgets, nuevas pantallas o nuevos grants, separar tasks antes de implementarlos.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -308,6 +336,9 @@ Registrar vía privada soportada, identidad del publicador, ownership, permisos 
 por superficie. ADR delta de distribución y decisión de layout portable/compatibilidad. Inventariar todos
 los providers/capabilities: tool, audiencia, scopes, manual, soporte nativo y prueba; no limitarlo a SEO.
 Si una capability no está autorizada por el emisor nativo, documentar gap y owner sin ampliarlo aquí.
+Para Events, comprobar soporte oficial y observado de ChatGPT, Claude Code y Claude hospedado por
+versión; elegir un evento real con owner, filtros, payload mínimo y efecto permitido. Proponer ADR
+de storage, seguridad, entrega y compatibilidad antes de implementar.
 
 ### Slice 1 — Paquete y marca oficial
 
@@ -348,10 +379,24 @@ válidos también en el uso privado. Preparar checklist de publicación (publish
 demo aislada, privacidad, términos, imágenes y casos); no crear/publicar submission ni modificar auth
 para una demo como condición del uso privado. Separar cada estado de release.
 
+### Slice 6 — MCP Events compartidos y conectores ChatGPT/Claude
+
+Tras el ADR de Slice 0, implementar `server/discover` 2.0, `events/list|subscribe|unsubscribe`,
+storage durable, verificación de callback y entrega HTTPS firmada. Revalidar permisos y filtros
+en cada entrega, manejar refresh, rotación, TTL, revocación, duplicados, orden variable y replay/gap.
+Conectar un evento real de un provider autorizado sin copiar su outbox al gateway.
+
+ChatGPT: certificar desde el plugin privado discovery → lista → alta → callback → evento →
+respuesta autorizada → baja. Claude Code y conector hospedado: verificar soporte real por versión;
+si admiten el protocolo, certificar el mismo ciclo. Si no, definir y construir un adaptador
+Efeonce de entrega a Claude con autorización y revocación equivalentes, documentando su canal
+y límites sin atribuirle soporte nativo MCP Events. Esta task no cierra sólo con ChatGPT ni con
+una prueba `list_changed`.
+
 ## Out of Scope
 
 Nuevos providers, scopes o autoridad externa; rollout comercial masivo; rehacer el gateway o Efeonce ID;
-implementación de `next`/instructions/harness de TASK-1864; conector Claude; widgets sin necesidad de
+implementación de `next`/instructions/harness y packaging Claude de TASK-1864; widgets sin necesidad de
 producto; publicación en directorio, campañas o mensajes a terceros. SEO no es el único dominio del paquete.
 
 ## Detailed Spec
@@ -364,6 +409,8 @@ producto; publicación en directorio, campañas o mensajes a terceros. SEO no es
 | Codex CLI/IDE disponibles | Resolución del paquete o adapter documentado, OAuth y skill fuera del repo | No asumir UI de catálogo idéntica ni config compartida con hosted |
 | ChatGPT hospedado | Conexión privada soportada, consentimiento, tools y operación en conversación nueva | Plan/workspace, visibilidad de metadata y soporte real de skills |
 | ChatGPT Work/desktop disponible | Instalación del paquete desde fuente privada y skills invocables | No extrapolar marketplace local al navegador remoto |
+| Claude Code | Kit de TASK-1864 y recepción de Events nativa o adaptador Efeonce certificado | No inferir Events desde negociación v2 o `list_changed` |
+| Claude.ai/Desktop | Conexión hospedada y recepción de Events nativa o adaptador Efeonce certificado | Certificar host y versión separados de Claude Code |
 | Segundo perfil limpio | Instalación desde artefacto y documentación, sin secretos del creador | Sin reutilizar tokens del primer operador |
 
 Codex desktop y ChatGPT hospedado son gates primarios. Una restricción de cuenta/host se registra como
@@ -393,8 +440,10 @@ La disponibilidad de una tool en el paquete no es prueba de acceso comercial par
 
 ### Slice ordering hard rule
 
-0 → 1 → 2; 3 consume el artefacto de TASK-1864 y puede prepararse después de 0; 2 + 3 → 4 → 5.
-La revisión pública nunca entra en este camino crítico. Cambios de gateway requieren su PR y gates;
+0 → 1 → 2; 3 consume el artefacto de TASK-1864 y puede prepararse después de 0; 2 + 3 → 4.
+Slice 6 empieza después de discovery/ADR (0): storage/autoridad → entrega firmada → ChatGPT → Claude.
+Slices 4 y 6 completos → 5 (entrega final y soporte).
+No anunciar `events` hasta que el ciclo funcione. La revisión pública nunca entra en este camino crítico. Cambios de gateway requieren su PR y gates;
 `main` despliega automáticamente: no usar un push para probar packaging.
 
 ### Risk matrix
@@ -406,7 +455,9 @@ La revisión pública nunca entra en este camino crítico. Cambios de gateway re
 | Duplicar tools o skills stale | Paquete/host | medium | Un wiring por superficie, upgrade en perfil limpio | Doble namespace o versiones divergentes |
 | Romper otras conexiones | Cuenta del operador | medium | Inventario, transición selectiva y rollback | Conector previamente útil deja de funcionar |
 | Confundir icono MCP con marca visible | Catálogo | high | Captura real por host y metadata nativa | Ficha genérica pese a icon HTTP 200 |
-| Prometer soporte no disponible | ChatGPT/Codex | medium | Matriz de plan/versión/fuente con bloqueos explícitos | Instalación local usada como prueba web |
+| Prometer soporte no disponible | ChatGPT/Codex/Claude | medium | Matriz de plan/versión/fuente con bloqueos explícitos | Instalación local usada como prueba web |
+| Callback malicioso o entrega tras revoke | Gateway/worker | high | Verificación HTTPS/anti-SSRF, recheck de autoridad, secreto cifrado y kill switch | Destino no autorizado o entrega tras revocación |
+| Duplicado o pérdida de evento | Provider/gateway/host | medium | ID estable, cursor cuando aplique, retries acotados e idempotencia de efecto | Dos efectos por un evento o gap sin señal |
 
 ### Feature flags / cutover
 
@@ -424,6 +475,7 @@ verificar identidad y reemplazo. Mantener fuente/versiones del paquete anteriore
 | 3 | Volver a router/skills compatibles y refrescar caché | Objetivo 15 min, medir | Sí |
 | 4 | Limpiar sólo fixtures de QA; conservar evidencia sanitizada | Según fixture, medir | Sí; no datos comerciales |
 | 5 | Retirar versión privada defectuosa y entregar versión conocida | Objetivo 30 min, medir | Sí |
+| 6 | Apagar anuncio/altas y entregas, detener worker, cancelar o conservar suscripciones según ADR, revocar secretos y volver a revisión previa | Medir en ensayo | Parcial: eventos no entregados requieren política de replay |
 
 ### Production verification sequence
 
@@ -431,9 +483,10 @@ verificar identidad y reemplazo. Mantener fuente/versiones del paquete anteriore
 2. Capturar versión/surfaceHash y metadata del gateway vivo sin cambios de acceso.
 3. Instalar en la cohorte interna elegible; consentir y verificar lectura real en ambos hosts.
 4. Certificar estados negativos, refresh/revoke y recuperación; probar actualización/rollback.
-5. Observar señales existentes de auth/gateway durante 24 h de uso acotado, con tasas 401/403/429/5xx
+5. Certificar Events en ChatGPT y Claude por canal/versión: subscribe, entrega, respuesta, unsubscribe, denegación y revoke; ejercer rollback de suscripciones.
+6. Observar señales existentes de auth/gateway durante 24 h de uso acotado, con tasas 401/403/429/5xx
    comparadas con baseline. Toda regresión cross-tenant o filtración bloquea distribución.
-6. Entregar artefacto reproducible/manual y estado por cliente; ampliar distribución privada sólo a
+7. Entregar artefacto reproducible/manual y estado por cliente; ampliar distribución privada sólo a
    usuarios ya elegibles. La publicación pública sigue separada.
 
 ### Out-of-band coordination required
@@ -466,6 +519,10 @@ la autorización efectiva para instalación, cambios de cuenta, deploy y cualqui
 - [ ] Skills integradas con TASK-1864; manuales no copiados, sin instrucciones internas ni secretos distribuidos.
 - [ ] Rollback ejercitado, observación completada y owners de release/soporte documentados.
 - [ ] Expediente de publicación opcional enumera pendientes sin bloquear el uso privado ni afirmar aprobación OpenAI.
+- [ ] ADR de Events aprobado, protocolo negociado sin romper clientes legacy, storage durable y evento de provider con owner/policy explícitos.
+- [ ] ChatGPT completa alta, refresh, callback verificado, entrega firmada, efecto autorizado y baja con evidencia real.
+- [ ] Claude Code y conector hospedado tienen soporte nativo certificado o adaptador Efeonce construido y certificado; se declara exactamente qué canal opera en cada host.
+- [ ] Revocación, expiración, filtros negativos, SSRF, reintentos, duplicados, replay/gap y rollback pasan con fixtures; ninguna entrega sobrevive al retiro de autoridad.
 
 ## Verification
 
@@ -490,4 +547,4 @@ Evitar tests que sólo repiten textos; probar instalación, autorización, selec
 
 - Directorio público: ejecutar task de submission sólo si se decide publicar, reutilizando esta entrega.
 - Gaps de autoridad/capability: derivar al owner identificado por el inventario; conservar pilotos externos existentes.
-- Claude y semántica agéntica general permanecen en TASK-1864 y su programa de certificación.
+- El kit/routing y semántica agéntica general de Claude permanecen en TASK-1864; la recepción de Events de Claude pertenece a esta task.

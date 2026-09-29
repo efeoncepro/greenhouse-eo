@@ -129,6 +129,8 @@ Reglas obligatorias:
 
 ## Dependencies & Impact
 
+**Frontera con U21 (2026-09-29):** TASK-1904 posee MCP Events y la entrega certificada a ChatGPT y Claude. Esta task conserva kit/routing/instructions/`next` y eval agéntico; `list_changed` o instrucciones del gateway no son eventos de negocio. Integrar los casos de Events al harness cuando U21 entregue su contrato, sin duplicar suscripciones ni dispatcher.
+
 ### Depends on
 
 - `TASK-1780` (manifiesto único de tools) y `TASK-1804` (catálogo de manuales) — complete.

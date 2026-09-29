@@ -44,6 +44,16 @@ For ChatGPT, Claude Code, Claude hosted connectors, Codex or any external client
 [`references/client-certification.md`](references/client-certification.md). Client version and local-versus-hosted
 surface are part of the evidence.
 
+OpenAI DevDay 2026-09-29 adds plugin extensions, Sites and draft MCP Events support. For a ChatGPT/Codex plugin
+decision, load the [dated launch inventory](../../../docs/audits/platform/OPENAI_DEVDAY_2026_09_29_LAUNCH_INVENTORY.md)
+and TASK-1904; recheck official docs and the installed client. TASK-1904 U21 now owns Events for both
+ChatGPT and Claude. SDK 2.0.0 and a reported `2026-07-28` version do not establish `server/discover`
+or `events/subscribe`. Claude Code documents v2 negotiation and `list_changed`, not native business
+Events; certify each host or build the expressly named Efeonce adapter after an ADR. Events require
+durable subscriptions, callback verification, signed delivery, authorization, deduplication, effect
+policy and QA. Neither a ChatGPT plugin nor Sign in
+with ChatGPT broadens Efeonce ID grants, provider tools or customer cohorts.
+
 If a source conflicts with remembered behavior, the verified runtime and its canonical architecture win.
 
 ## Native authority (TASK-1836 / TASK-1831 / TASK-1844)

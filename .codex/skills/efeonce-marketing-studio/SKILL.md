@@ -132,6 +132,12 @@ Nothing of it is in runtime yet; EPIC-049 tasks implement it by theme.
 
 Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md` (architecture §4.2).
 Nothing of it is in runtime yet; interactive mode (person + role skill + Efeonce MCP) already works for reads.
+Provider update (2026-09-29): load `docs/audits/platform/OPENAI_DEVDAY_2026_09_29_LAUNCH_INVENTORY.md`
+before selecting an OpenAI runtime/model. Agents API + computer use is an evaluation candidate, not an approved
+fifth adapter: its managed sessions currently lack ZDR and support US data residency only. GPT-6.1 Sol is
+available in API/Codex/Work but not Chat; its public benchmarks and prices require role-specific evals and
+cost-per-accepted-output measurement before routing. Dots, Space and Team Tasks are OpenAI products, not Studio
+runtime, memory or delegated authority.
 
 - **Work items** are the unit of hybrid work per campaign: assignee = person **or** agent role@version, requester,
   state machine, versioned inputs by reference, deliverable = draft with provenance (TASK-1909), review, handoff =
