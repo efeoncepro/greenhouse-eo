@@ -426,6 +426,17 @@
   restauró desde git antes de commitear. **Regla:** nunca `--no-verify` sin autorización del operador; y antes de
   editar el ledger, relee el archivo y confirma con `git diff --stat` que el cambio es sólo tuyo (otras sesiones lo
   tocan el mismo día).
+- **Una receta con pasos medidos sin `layouts` rompía el resolver.** Síntoma: un intent de `method-waves` con `steps`
+  lanzaba TypeError en `axis-ui-contracts` 0.3.33 (lo confundía con `method-staircase`), y el ejemplo tuvo que usar la
+  clave `waves`. **Regla:** toda receta con pasos medidos declara `icons: false` y `layouts` con su `count` (patrón de
+  `decision-traffic-to-revenue` y `method-waves`); el resolver ya devuelve `steps: null` sin `layouts` (AXIS
+  `v0.3.34`, delta (r)). Desde entonces el intent de SF10 es `steps: [{ kicker, name, desc }]`; `waves` ya no compone.
+- **Un builder no repinta en silencio un color que contradice una regla transversal.** SF18 traía `loop.number.color:
+  accent` a 15 px, contra `accent-text-min-size`; el builder pintaba suave sin avisar. **Regla:** se corrige el token
+  (AXIS `v0.3.34`) y el builder **falla** (`surface-issues`) si un token vuelve a pedir el acento bajo 24 px.
+- **Un test de sincronía que lista un directorio no puede leer subdirectorios como archivos.** Al sumar
+  `assets/partners/` (marcas de terceros), `graphic-line-tokens-sync.test.ts` reventó con EISDIR. **Regla:** recorrer
+  recursivo y comparar también lo anidado byte a byte (`94eb4e4b0`), no filtrar los directorios fuera.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
