@@ -21,7 +21,7 @@ y dice qué falló.
 | --- | --- |
 | ¿Para qué marca sirve? | Sólo para la marca propia de Efeonce. No es para piezas con la marca de un cliente, para las ofertas a comité ni para la interfaz de Greenhouse |
 | ¿Qué documentos arma? | Láminas sueltas y documentos completos: un **brochure** (presenta a Efeonce) o una **propuesta comercial** (va dirigida a un cliente). Las láminas también sirven para un pitch o un QBR |
-| ¿Cuántas láminas puede componer? | **78 de las 94** que el operador aprobó: 69 el 2026-09-27, nueve de SEO y AEO el 2026-09-28 y dieciséis del deck Salesforce el 2026-09-29, que todavía esperan su plantilla |
+| ¿Cuántas láminas puede componer? | **90 de las 94** que el operador aprobó: 69 el 2026-09-27, nueve de SEO y AEO el 2026-09-28 y dieciséis del deck Salesforce el 2026-09-29, de las que cuatro todavía esperan su plantilla |
 | ¿Quién lo usa hoy? | Una persona o un agente, desde su equipo, con un comando |
 | ¿Está en el portal? | No. Hoy es un taller local. La ruta dentro de la plataforma (con permisos, cola y acceso para agentes) es TASK-1921, **en curso** |
 
@@ -33,7 +33,7 @@ y dice qué falló.
 
 ## Qué láminas se componen
 
-Las 94 láminas del deck están aprobadas; **78 se componen solas** y las dieciséis nuevas del deck Salesforce todavía no
+Las 94 láminas del deck están aprobadas; **90 se componen solas**; cuatro del deck Salesforce todavía no
 (ver abajo, «El deck de la práctica Salesforce»). Cada una tiene una **receta** en el catálogo del
 deck: qué comunica, cuándo usarla, cuándo no y cuál conviene en su lugar, qué textos e imágenes se cambian y qué queda
 fijo. Las recetas se agrupan en familias:
@@ -109,7 +109,7 @@ láminas que no cabían en la receta que usaban tengan la suya.
   compone desde la receta y el operador la revisa antes de usarla). Si se entrega como **propuesta**, abre con la
   portada con el logo del cliente y cierra con la contraportada con foto «Empower your Revenue», la única con el logo
   de Efeonce a 700 px. Los dos planes están validados.
-- **Todavía no se componen solas:** las dieciséis nuevas esperan su plantilla. Mientras tanto existen como láminas
+- **Todavía no se componen solas:** las cuatro de la segunda ronda esperan su plantilla; las otras doce ya componen. Mientras tanto existen como láminas
   aprobadas de referencia.
 - **Marcas de terceros con condición:** el logo, los íconos de producto, la insignia de partner y el personaje de
   Salesforce, y las marcas de Claude, necesitan una autorización escrita que todavía no está archivada. La insignia

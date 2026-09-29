@@ -310,7 +310,7 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] TASK-1932 y TASK-1931 recibieron delta: 94 recetas, 16 sin plantilla hasta el Slice 2; plates NXSF1–NXSF3 por ruta local
+- [ ] TASK-1932 y TASK-1931 recibieron delta: 94 recetas; 12 con plantilla desde 84c83a044 y 4 sin plantilla hasta completar el Slice 2; plates NXSF1–NXSF3 por ruta local
 
 ## Follow-ups
 

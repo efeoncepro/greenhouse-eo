@@ -12775,7 +12775,7 @@
               "detail": "Llamada del ejecutivo"
             }
           ],
-          "notes": "Exactamente 3 fichas a la derecha (la primera encendida en blanco). Por ítem: icon (enum, ícono oficial: agentforce · sales · service · marketing · data-cloud · platform · slack · tableau) · title (≤ 31; 760 18px Bric, 2 líneas en 148 px) · detail (≤ 20; 400 13px Pop). Cada activación usa un canal con permiso del perfil."
+          "notes": "Exactamente 3 fichas a la derecha (la primera encendida en blanco). Por ítem: icon (enum, ícono oficial: agentforce · sales · service · marketing · data-cloud · platform · slack · tableau) · title (≤ 31; 760 18px Bric, 2 líneas en 148 px) · detail (≤ 21; 400 13px Pop: la aprobada dice «Llamada del ejecutivo», 21, en una línea de 148 px; corregido el 2026-09-29, antes ≤ 20). Cada activación usa un canal con permiso del perfil."
         }
       ],
       "fixed": [

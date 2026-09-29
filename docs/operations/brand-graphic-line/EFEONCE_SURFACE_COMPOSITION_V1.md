@@ -574,8 +574,8 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
 - Las viñetas nunca llevan la esfera. La órbita con satélites lleva el arco largo en degradé **sin esfera**.
 - Una receta nueva nace en el canvas, se aprueba y recién entonces entra al catálogo de recetas, al token y al
   contrato.
-- **Una receta aprobada se compone con su plantilla.** Hoy `pnpm brand:compose` produce **78 de las 94** recetas del
-  deck (tablas de §2.1); las 16 del deck Salesforce esperan su plantilla (TASK-1942). La portada con selección (`cover-brochure-cine-lines-selection`) se pide como
+- **Una receta aprobada se compone con su plantilla.** Hoy `pnpm brand:compose` produce **90 de las 94** recetas del
+  deck (tablas de §2.1; las doce de la primera ronda Salesforce desde `84c83a044`); las 4 de la segunda ronda esperan su plantilla (TASK-1942). La portada con selección (`cover-brochure-cine-lines-selection`) se pide como
   `cover-brochure` con `layout: 'document-selection'`; `document` y `line` siguen rechazando la selección
   (`selection-not-in-recipe`).
 - **El intent declara `use` y `layout`.** `use` (`proposal` o `brochure`) dice para qué documento es la lámina; si se
@@ -1081,8 +1081,8 @@ propuesta; las láminas 02 a 18 son las mismas y cambian el marco:
 | Brochure | `cover-brochure-line-revenue` (SF0, con foto; badge sólo con readback) | `close-brochure-orbit` en la línea `revenue-salesforce`, sin foto: «¿Conversamos? Cuando quieras.» + «Empower your Revenue» como firma, logo a 500 px. **La lámina no existe todavía:** el Artifact Composer la compone desde la receta existente (TASK-1942, Slice 2) y necesita el visto bueno del operador antes de enviarse | `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-brochure-salesforce.json` |
 | Propuesta | `cover-proposal-orbit` (sin foto, con el logo del cliente) | `close-proposal-horizon` (SF19, con foto; composición `sloganBlock`: logo a 700 px en top 220 y eslogan en bloque al 64 %) | `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-proposal-salesforce.json` |
 
-Los dos planes validan con `pnpm brand:deck-plan -- --plan <plan>`: sin errores y 16 avisos `recipe-without-template`
-(las láminas de práctica sin plantilla); los prueba `validate.test.ts`. Los plates van por `plateRef` (NXSF2 en la
+Los dos planes validan con `pnpm brand:deck-plan -- --plan <plan>`: sin errores y 4 avisos `recipe-without-template`
+(las láminas de la segunda ronda, sin plantilla todavía); los prueba `validate.test.ts`. Los plates van por `plateRef` (NXSF2 en la
 portada, NXSF1 en la 02, NXSF3 en la contraportada de propuesta), porque las recetas de línea comparten su plate de
 catálogo y sin él el plan falla con `plate-repeated`. En un brochure evergreen se quita la 07 (temporada).
 

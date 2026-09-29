@@ -42,8 +42,8 @@ cliente, para las ofertas a comité del catálogo `deck-axis` ni para la interfa
 
 1. Elige las láminas en el catálogo de 94 recetas (o pídele a un agente que proponga el plan).
 2. Valida el plan del deck con `pnpm brand:deck-plan` y corrige hasta que no queden errores.
-3. Busca el intent de ejemplo de cada lámina: **78 de las 94** recetas tienen plantilla y un ejemplo listo para copiar
-   (las 16 del deck Salesforce todavía no; ver «El deck de práctica Salesforce»).
+3. Busca el intent de ejemplo de cada lámina: **90 de las 94** recetas tienen plantilla y un ejemplo listo para copiar
+   (las 4 de la segunda ronda Salesforce todavía no; ver «El deck de práctica Salesforce»).
 4. Copia el ejemplo a tu carpeta y cambia el copy, las cifras y las fotos.
 5. Compón la lámina o el documento completo con `pnpm brand:compose`.
 6. Revisa a ojo contra la referencia aprobada.
@@ -137,7 +137,7 @@ la [norma §4.6, «Deck de práctica Salesforce»](../../operations/brand-graphi
 
 Antes de armarlo:
 
-- **Dieciséis láminas todavía no se componen** (recetas nuevas sin plantilla): el plan las acepta con el aviso
+- **Cuatro láminas todavía no se componen** (09, 13, 14 y 17: recetas de la segunda ronda sin plantilla; las otras doce componen desde `84c83a044`): el plan las acepta con el aviso
   `recipe-without-template`. Mientras tanto, las láminas aprobadas están en
   `ai-generations/2026-09-29_deck-salesforce/out/` y se regeneran con `ONLY=<lámina> node
   ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs` (maquetas de dirección, no la ruta productiva).
@@ -147,7 +147,7 @@ Antes de armarlo:
   `content-day-live-results`).
 - **Portada y cierre según el documento** (decisión del operador, 2026-09-29): parte de los dos planes validados,
   `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-brochure-salesforce.json` y
-  `golden-proposal-salesforce.json`, y valídalos con `pnpm brand:deck-plan -- --plan <plan>` (sin errores, 16 avisos
+  `golden-proposal-salesforce.json`, y valídalos con `pnpm brand:deck-plan -- --plan <plan>` (sin errores, 4 avisos
   `recipe-without-template`). Conserva los `plateRef` de la portada, la 02 y la contraportada: sin ellos el plan falla
   con `plate-repeated`. **La contraportada de brochure Salesforce todavía no existe como lámina:** la compone el
   composer desde `close-brochure-orbit` y el operador tiene que darle el visto bueno antes de enviarla.
@@ -268,7 +268,7 @@ Cómo leer cada línea:
 | `slot-required-missing` | error | falta un slot obligatorio en una lámina que ya trae `slots` | escríbelo, o quita `slots` para dejar la lámina como esqueleto |
 | `slot-over-max-chars` | error | el texto pasa el largo máximo (en un texto enriquecido cuenta cada línea sin `**`; en una lista, cada ítem) | acorta el texto; nunca subas el `maxChars` |
 | `figure-source-missing` | error | una cifra del plan (un objeto con `value`) no trae `source` | agrega la fuente real del documento que la respalda, o quita la cifra. Ojo: una cifra escrita como texto plano («68 %») no la ve el validador; escríbela como objeto con `source` |
-| `recipe-without-template` | aviso | la lámina no tiene plantilla en el composer. Hoy sale en las 16 recetas del deck Salesforce y en la portada y el cierre clásicos de un pitch o un QBR (`cover-classic`, `close-classic`) | ese deck se valida pero todavía no se compone de punta a punta: avísale al operador |
+| `recipe-without-template` | aviso | la lámina no tiene plantilla en el composer. Hoy sale en las 4 recetas de la segunda ronda del deck Salesforce y en la portada y el cierre clásicos de un pitch o un QBR (`cover-classic`, `close-classic`) | ese deck se valida pero todavía no se compone de punta a punta: avísale al operador |
 | `section-split-corner-adjacent` | aviso | dos secciones partidas seguidas con la misma esquina (sin `layout` cuenta como esquina arriba) | alterna `section-split` con `section-split-corner-bottom` o `section-split-panel-end`, o separa las secciones |
 | `rhythm-paper-run` | aviso | tres láminas de papel (fondo claro) seguidas | intercala una oscura o con foto |
 | `brochure-cover-first` | error, AXIS | el brochure no abre con su portada | pon una portada de brochure primero |
@@ -440,7 +440,7 @@ la lente de `proposal-service-seo`, que recorta el plate de cine SE1.
 ### Paso 7 · Busca la receta y su intent de ejemplo
 
 1. Abre el índice del [catálogo](../../operations/brand-graphic-line/deck-recipes/README.md#índice) y confirma en la
-   columna «Plantilla» que la receta la tiene (hoy, 78 de las 94).
+   columna «Plantilla» que la receta la tiene (hoy, 90 de las 94).
 2. Busca su intent de ejemplo. En casi todas se llama
    `src/lib/brand-surfaces/examples/deck-<id del catálogo>-intent.json` (por ejemplo,
    `deck-content-pricing-live-intent.json`). Las excepciones (páginas de servicio de cine, que están dentro de los
@@ -590,7 +590,7 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 | Estado | Qué significa |
 |---|---|
 | **aprobado** | la lámina está aprobada por el operador (hoy, las 94) y se puede usar |
-| **con plantilla** | además, `pnpm brand:compose` la produce entera (hoy, 78 de las 94) |
+| **con plantilla** | además, `pnpm brand:compose` la produce entera (hoy, 90 de las 94) |
 | **pendiente de QA** | la referencia aprobada tenía un detalle que la norma corrige (respuesta bajo 3×, acento en texto chico, cifra sin fuente). La plantilla ya lo corrige; el catálogo separa los resueltos de los que siguen abiertos |
 | `recipe-not-approved` | el contrato de AXIS no tiene esa receta como aprobada |
 | `recipe-without-template` | la receta está aprobada en AXIS, pero el composer no tiene plantilla para ella. En el deck no debería pasar: revisa que la receta y el `layout` sean los del ejemplo |
