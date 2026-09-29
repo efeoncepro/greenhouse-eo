@@ -183,13 +183,13 @@ Manual sends write audit rows in `greenhouse_sync.source_sync_runs` with `sync_r
 
 ```bash
 pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs -e '
+const { loadGreenhouseToolEnv } = require("./scripts/lib/load-greenhouse-tool-env");
+loadGreenhouseToolEnv();
+const pg = require("./src/lib/postgres/client");
 void (async () => {
-  const { loadGreenhouseToolEnv } = await import("./scripts/lib/load-greenhouse-tool-env");
-  loadGreenhouseToolEnv();
-  const pg = await import("./src/lib/postgres/client");
   try {
     const rows = await pg.runGreenhousePostgresQuery(
-      "select sync_run_id, status, sync_mode, triggered_by, notes, started_at, finished_at from greenhouse_sync.source_sync_runs where sync_run_id=\\$1",
+      "select sync_run_id, status, sync_mode, triggered_by, notes, started_at, finished_at from greenhouse_sync.source_sync_runs where sync_run_id=\$1",
       ["teams-manual-..."]
     );
     console.log(JSON.stringify(rows, null, 2));
@@ -199,6 +199,8 @@ void (async () => {
 })().catch(e => { console.error(e instanceof Error ? e.message : String(e)); process.exitCode = 1; });
 '
 ```
+
+Use `require`, not `await import()`: under `tsx -e` the eval runs as CommonJS and a dynamic import of a repo `.ts` module puts its exports under `.default` (`loadGreenhouseToolEnv is not a function`). Keep the placeholder as `\$1` inside the single-quoted shell string; `\\$1` reaches Postgres as `\$1` and fails with `syntax error at or near "\"` (both verified 2026-09-29). Always close the pool in `finally`, or the process hangs on the Cloud SQL Connector refresh timer.
 
 ## Generic 1:1 Messages (HR/People and other one-offs)
 

@@ -184,7 +184,20 @@ const main = async () => {
   }
 }
 
-void main().catch(error => {
-  console.error(error instanceof Error ? error.message : String(error))
-  process.exitCode = 1
-})
+void main()
+  .catch(error => {
+    console.error(error instanceof Error ? error.message : String(error))
+    process.exitCode = 1
+  })
+  .finally(async () => {
+    // The send-run audit opens the shared pool; the Cloud SQL Connector refresh timer and
+    // idle sockets keep Node alive until it is closed. A close failure must not flip the exit
+    // code: the outcome is already printed and a false failure invites a duplicate send.
+    const { closeGreenhousePostgres } = await import('@/lib/postgres/client')
+
+    await closeGreenhousePostgres().catch(error => {
+      console.error(
+        `Warning: Greenhouse Postgres did not close cleanly: ${error instanceof Error ? error.message : String(error)}`
+      )
+    })
+  })
