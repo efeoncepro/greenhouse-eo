@@ -1,7 +1,8 @@
 # Lecciones (trampas que ya costaron tiempo)
 
-> Verificado contra: greenhouse-eo@1050036e8 (`develop`) — 2026-09-29 (última entrada: los ejemplos del contrato de
-> Marketing con Manzanitas con copy que no cabe, TASK-1939; antes, greenhouse-eo@24e4c72ee: el CI roto por el bump de
+> Verificado contra: greenhouse-eo@2c95e60b2 (`develop`) — 2026-09-29, tarde (última entrada: los retratos viejos del
+> equipo; antes, greenhouse-eo@1050036e8: los ejemplos del contrato de Marketing con Manzanitas con copy que no cabe,
+> TASK-1939; antes, greenhouse-eo@24e4c72ee: el CI roto por el bump de
 > AXIS 0.3.24 y los gates de AXIS bloqueados por el clasificador).
 
 > Cada entrada: fecha, síntoma, causa y la regla que la evita. Es la parte más valiosa de la skill: se agrega en el
@@ -348,6 +349,18 @@
   para el contrato no está aprobado hasta que el motor lo compone; si no cabe, se acorta el copy (Greenhouse usa «Aún
   no», «Quién cita» y «¿Cuántos llegan ya informados?») y nunca se recorta, se parte ni se relaja la plantilla. Los
   ejemplos de AXIS quedan como hallazgo para un patch de AXIS ([manzanitas.md](manzanitas.md) §10.3).
+
+## 2026-09-29 (el equipo real en la fotografía de Marketing con Manzanitas)
+
+- **Los retratos del repo pueden ser viejos: antes de fijar una identidad, pregunta cuál es la foto actual.** Síntoma: al
+  armar el roster del equipo para las fotos cine de MCM se partió de los retratos que ya estaban en el repo
+  (`public/images/greenhouse/team/`). El operador corrigió: «Esos retratos son viejos, hoy todos a
+  excepción de Valentina y de mí salen con Hoodie Efeonce»; y Melkin cambió de peinado (el retrato antiguo lo muestra
+  con el pelo largo amarrado; su foto actual es la de `squad/`). Causa: que una foto esté en el repo no dice que sea la
+  de hoy, ni la ropa ni el pelo. Regla: antes de fijar la identidad o el vestuario de una persona real, pregunta al
+  operador cuál es su foto actual y cómo se viste hoy; ancla la identidad en esa foto (o márcala «falta foto actual»,
+  como Humberly y Luis en el [roster](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md)) y
+  declara el vestuario en la escena (si no, lo decide la referencia).
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

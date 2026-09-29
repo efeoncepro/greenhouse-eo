@@ -238,10 +238,10 @@ Rules for agents:
   change means changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
-- **Greenhouse consumption (verified 2026-09-28 in `package.json` and `node_modules`):** `develop` pins `axis-tokens`
-  `0.3.24`, `axis-ui-contracts` `0.3.22` (AXIS tag `v0.3.24`, 2026-09-28, Glitch Flash; the contracts package depends on
-  `axis-tokens` exactly `0.3.24`), `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.5` and `axis-graphic-line` `0.7.0` (the last two
-  pinned by TASK-1922, tag `v0.3.12`). Graphic-line visual gate: 66 frames at 0 px (TASK-1928; 32 after TASK-1927).
+- **Greenhouse consumption (verified 2026-09-29 in `package.json` and `node_modules`):** `develop` pins `axis-tokens`
+  `0.3.29`, `axis-ui-contracts` `0.3.29` (AXIS tag `v0.3.29`, 2026-09-29, Marketing con Manzanitas with no open
+  decisions; the contracts package depends on `axis-tokens` exactly `0.3.29`), `axis-ui-registry` `0.3.1`,
+  `axis-brand-assets` `0.4.1` and `axis-graphic-line` `0.11.0`. Graphic-line visual gate: 73 frames at 0 px (verified 2026-09-29 on the `v0.3.29` bump; 66 after TASK-1928).
   Series: `0.3.11`…`0.3.14` (TASK-1927), `0.3.12` (TASK-1922, Glitch), `0.3.15`…`0.3.21` (TASK-1928), `0.3.24` (Glitch Flash, contracts `0.3.22`); table in
   the surface-composition section below.
   It does not use `efeonce.email-signature` yet. `axis-graphic-line` paints the orbit only in the Artifact Composer
@@ -569,13 +569,21 @@ cover A; 9 charts computed from data; 3 dense-text slides. It is a sibling of th
   `0.4.1` seals `AXIS_MANZANITAS_ASSETS` apart (accent group `[data-axis-accent="topic-line"]`). AXIS ADR
   `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`, guide `docs/agent-composition/manzanitas.md`,
   examples `docs/examples/manzanitas/`, Lab https://axis.efeonce.org/references/manzanitas/ + JSON.
-- **Greenhouse does not pin these versions yet** and has no `manzanitas` Artifact Composer catalog (follow-ups of
-  TASK-1936). Never claim them as consumed; the governing docs stay the Greenhouse norm
+- **Current release: tag `v0.3.29`** (2026-09-29, AXIS `main` `f722a6f`, operator-authorized): `axis-tokens` `0.3.29`,
+  `axis-ui-contracts` `0.3.29` (contract `0.3.0`), `axis-graphic-line` `0.11.0`. No open decision is left
+  (`pendingDecisions: []`, ten in `resolvedDecisions`): the close copy varies with the context and its length is bounded
+  (`closeCopy.maxChars`, `close-copy-too-long`); the cine photos may show the real current team from the roster Greenhouse
+  keeps (`teamPeople`, the token names nobody); the Trazo `republicar` and `enviar` joined the icon set (88 glyphs). The
+  slogan is sized from the logo (`efeonceGraphicLine.slogan.widthEmByWord`; `closeLockup.sloganPx` removed), chart labels
+  are part of the contract and the step orbit lives in the token. The logo navy `#022a4e` is shared editorial ink
+  (`glitchLine.scope.sharedWithEditorialFamily`).
+- **Greenhouse pins that set and composes with it**: the Artifact Composer catalog `manzanitas` (TASK-1939,
+  `pnpm manzanitas:compose`, `pnpm manzanitas:tokens --check`, visual gate `--catalog=manzanitas`). Every `axis-tokens`
+  bump also runs `pnpm manzanitas:tokens --check`. The governing docs stay the Greenhouse norm
   `docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md`, the ADR
-  `docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md` and `efeonce-graphic-line` → `references/manzanitas.md`.
-- The ten open operator decisions live in `manzanitasRegister.pendingDecisions` (norm §13), including the logo navy
-  `#022a4e` that `glitchLine.scope.exclusive` claims for the Glitch wordmark (`masthead-ink-navy`). A value change goes
-  through the token and its test in AXIS, signed in the Greenhouse ADR — never by editing the norm or a canvas.
+  `docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md` and `efeonce-graphic-line` → `references/manzanitas.md`; the team
+  roster is `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`. A value change goes through the token and its
+  test in AXIS, signed in the Greenhouse ADR — never by editing the norm or a canvas.
 
 ### Efeonce sonic identity (Lab page + public bucket; recommended)
 

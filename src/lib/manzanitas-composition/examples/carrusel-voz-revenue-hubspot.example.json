@@ -1,7 +1,7 @@
 {
   "$comment": "Ejemplo de TASK-1939 (Marketing con Manzanitas). Fotos SINTÉTICAS: nunca se publica. Componer: pnpm manzanitas:compose -- --intent <este archivo>.",
   "contract": "efeonce.manzanitas-register",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "register": "marketing-con-manzanitas",
   "channel": "carousel",
   "topicLine": "revenue-hubspot",

@@ -1,9 +1,9 @@
 # Equipo en la fotografía de marca — roster V1
 
 > **Tipo de documento:** Norma operativa (fotografía de marca)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-29 por Claude (decisión del operador `cine-team-people-social`)
-> **Ultima actualizacion:** 2026-09-29 por Claude
+> **Ultima actualizacion:** 2026-09-29 por Claude (identidades aprobadas)
 > **Documentacion tecnica:** [`PERSONAS` de `scripts/foto/build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs) ·
 > [bloques de identidad del canon §3.6](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · token AXIS
 > `manzanitasRegister.teamPeople` (`rosterSource: 'greenhouse-team-roster'`)
@@ -31,18 +31,20 @@ hoy todos a excepción de Valentina y de mí salen con hoodie Efeonce.»
 | Clave | Persona | Referencia de identidad | Vestuario | Estado |
 | --- | --- | --- | --- | --- |
 | `julio` | Julio Reyes | set aprobado del 2026-09-20 (`ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`) | **polo** Efeonce | aprobado |
-| `andres` | Andrés | `squad/squad-andres.png` (actual, con hoodie) + retrato antiguo de `public/` | **hoodie** Efeonce | en prueba |
-| `daniela` | Daniela | `squad/squad-daniela.png` (actual, con hoodie) + retrato antiguo de `public/` | **hoodie** Efeonce | en prueba |
-| `melkin` | Melkin | sólo `squad/squad-melkin.png` (actual): el retrato antiguo lo muestra con el pelo largo amarrado | **hoodie** Efeonce | en prueba |
-| `humberly` | Humberly | retrato antiguo de `public/images/greenhouse/team/` (no hay foto actual en el repo) | **hoodie** Efeonce | en prueba · falta foto actual |
-| `luis` | Luis | retrato antiguo de `public/images/greenhouse/team/` (no hay foto actual en el repo) | **hoodie** Efeonce | en prueba · falta foto actual |
-| `valentina` | Valentina Hoyos | `public/images/greenhouse/team/EO_Avatar-Valentina.png` | **su propia ropa**, sin logo | en prueba |
+| `andres` | Andrés | `squad/squad-andres.png` (actual, con hoodie) + retrato antiguo de `public/` | **hoodie** Efeonce | aprobado |
+| `daniela` | Daniela | `squad/squad-daniela.png` (actual, con hoodie) + retrato antiguo de `public/` | **hoodie** Efeonce | aprobado |
+| `melkin` | Melkin | sólo `squad/squad-melkin.png` (actual): el retrato antiguo lo muestra con el pelo largo amarrado | **hoodie** Efeonce | aprobado |
+| `humberly` | Humberly | retrato antiguo de `public/images/greenhouse/team/` (no hay foto actual en el repo) | **hoodie** Efeonce | aprobado · falta foto actual |
+| `luis` | Luis | retrato antiguo de `public/images/greenhouse/team/` (no hay foto actual en el repo) | **hoodie** Efeonce | aprobado · falta foto actual |
+| `valentina` | Valentina Hoyos | `public/images/greenhouse/team/EO_Avatar-Valentina.png` | **su propia ropa**, sin logo | aprobado |
 
 `squad/` es `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`. Nexa sigue con su propia identidad (anclas de
 `ai-generations/_identidad-nexa/`).
 
-**En prueba** quiere decir que la identidad está declarada en `PERSONAS` y sellada en el lock de referencias, pero el
-operador todavía no aprobó la hoja de contacto de esa persona. Una pieza para publicar espera esa aprobación.
+**Aprobado** [operador, 2026-09-29: «Está perfecto, aprobado»]: el operador revisó la hoja de contacto de la ronda
+piloto —cada persona junto a su foto, en la Escena interior de Marketing con Manzanitas— y la Escena de Daniela compuesta
+en el carrusel. Evidencia: `ai-generations/2026-09-29_manzanitas-equipo/` (fichas, prompts y plates `EQ-*`). Una persona
+que entre después al equipo pasa por la misma ronda antes de publicarse.
 
 ## Cómo se usa
 
@@ -59,10 +61,10 @@ operador todavía no aprobó la hoja de contacto de esa persona. Una pieza para 
 - Usar a una persona que no esté en esta tabla, o la foto de alguien que ya no está en el equipo.
 - Vestir con hoodie a Valentina o a Julio, o sin hoodie al resto (salvo que la escena pida otro registro y el operador lo
   apruebe).
-- Publicar una pieza con una identidad «en prueba» sin la aprobación del operador.
+- Publicar a alguien nuevo en el equipo sin su ronda de identidad aprobada por el operador.
 - Describir la identidad de memoria: el bloque vive en `PERSONAS` y en el canon §3.6, y el gate exige que sean iguales.
 
 ## Pendiente
 
 - Fotos actuales (con hoodie) de **Humberly** y **Luis**; con ellas, su identidad pasa a salir de la foto actual.
-- Aprobación del operador de la hoja de contacto de cada persona en prueba.
+- Toda persona que entre al equipo: su ronda de identidad antes de publicarse.

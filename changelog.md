@@ -11,6 +11,15 @@
 
 - [ADR](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md): **Efeonce AEO** (capacidad), **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (salida); aliases Grader preservados para trazabilidad y contratos. Se actualizaron docs y skills; el runtime visible requiere migración y verificación propias.
 
+## 2026-09-29 — Manzanitas sin decisiones abiertas: AXIS v0.3.29 y el equipo real en las fotos
+
+- AXIS `v0.3.29` (`f722a6f`): `axis-tokens` 0.3.29 (`closeCopy`, `teamPeople`, `slogan.widthEmByWord`, órbita del paso;
+  sin `sloganPx`), `axis-ui-contracts` 0.3.29 (contrato 0.3.0: `close-copy-too-long`, `chart-labels-invalid`, eslogan desde
+  el logo en el manifiesto), `axis-graphic-line` 0.11.0 (Trazo `republicar` y `enviar`, 88 glifos; `/charts` lee los rótulos
+  del dato). Lab con la contraportada nueva y sin decisiones abiertas.
+- Greenhouse (`2c95e60b2`): pins, tokens recompilados sin drift, gate a 0 px; el catálogo lee eslogan y órbita del token.
+- Roster del equipo en la fotografía de marca y seis identidades nuevas en `foto:prompt`, aprobadas por el operador.
+
 ## 2026-09-29 — Marketing con Manzanitas en el Artifact Composer (TASK-1939)
 
 - `1050036e8`: catálogos `manzanitas-carousel` (PDF) y `manzanitas-stills` (PNG), 18 plantillas para las 26 piezas
@@ -659,11 +668,3 @@ Skills de publicidad, Design, Motion, Digital Marketing y Growth/CRO conectadas 
 con investigación primaria en tres frentes, doce palancas, recetas de estático/video/híbrido y definiciones
 por plataforma. Se distingue hipótesis de rendimiento, CTR de atención y palanca publicitaria de ficha foto;
 registro C sigue en construcción. Contenido sincronizado Codex/Claude; sin generación ni publicación.
-
-## 2026-09-20 — Fotografía Efeonce: comparación visual obligatoria antes del prompt
-
-El pipeline y las skills espejo de Design Studio y publicidad ahora exigen abrir los finales aprobados comparables,
-registrar los portadores visibles del azul activo y del acento de historia, y medirlos de nuevo en el plate. Se corrigió
-la firma vigente al **20 %** según la decisión del operador; el default histórico del compositor sigue en 15 % y se
-debe pasar `LOGO=0.20` explícitamente. La [prueba con Julio y Nexa](ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/README.md)
-documenta el fallo que motivó la guarda.

@@ -344,8 +344,8 @@ export const PERSONAS = {
   // sustitución de María Fernanda está Valentina Hoyos.» Una sola referencia por persona: su retrato del equipo en
   // `public/images/greenhouse/team/`. Por eso `cuerpo` apunta al mismo retrato: no hay foto de cuerpo entero todavía, y
   // la regla de 2026-09-17 («retrato solo deforma el cuerpo») se contrarresta en la ficha con encuadre de medio cuerpo,
-  // cámara a ~2 m a la altura del pecho y 85 mm. Identidad EN PRUEBA hasta que el operador apruebe la hoja de contacto
-  // de cada persona (roster y estado en `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`).
+  // cámara a ~2 m a la altura del pecho y 85 mm. Identidades APROBADAS por el operador el 2026-09-29 sobre la ronda
+  // piloto `ai-generations/2026-09-29_manzanitas-equipo/` (roster: `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`).
   andres: {
     etiqueta: 'Andrés',
     identity:

@@ -8,7 +8,8 @@
 > `@efeoncepro/axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`; `axis-tokens` sigue en 0.3.7). §13 (IA,
 > social y staff, D26): AXIS main@cf77452 (2026-09-27) (`@efeoncepro/axis-graphic-line` 0.6.0 y `@efeoncepro/axis-brand-assets`
 > 0.3.4, publicados con el tag `v0.6.0`; `axis-tokens` iba en 0.3.8 en ese release, publicado por otra sesión con superficies, y no
-> cambió por D26).
+> cambió por D26). §13 (Trazo `republicar` y `enviar`, decisión `stroke-republicar-enviar`): AXIS `main@f722a6f`
+> (`@efeoncepro/axis-graphic-line` 0.11.0, tag `v0.3.29`) — 2026-09-29.
 >
 > **Estado: canónica** (el operador la canonizó el 2026-09-26, D22). **La fuente de verdad es AXIS**, no este documento:
 > valores en `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens`), geometría y reglas ejecutables en
@@ -20,8 +21,8 @@
 
 1. La voz la decide la línea de servicio de la pieza: `iconVoiceForLine(line)` → Trazo (Growth, Engine, Revenue) o
    Plastilina (Brand); Voice, por decidir.
-2. El glifo sale de `ICON_CATALOG` (79: 36 de Trazo y 43 de Plastilina, con los 30 de oficio de D25 y los 19 de IA,
-   social y staff de D26; lista en §13).
+2. El glifo sale de `ICON_CATALOG` (88: 39 de Trazo y 49 de Plastilina, con los 30 de oficio de D25, los 19 de IA,
+   social y staff de D26, las redes de D27, D28 y D29, y los Trazo `republicar` y `enviar` del 2026-09-29; lista en §13).
    **Si no existe, no se dibuja dentro de la pieza**: se
    da de alta con `pnpm icons:check` (Trazo) o `pnpm icons:vectorize` + `pnpm icons:check` (Plastilina), en el repo AXIS,
    y con la aprobación del operador.
@@ -29,11 +30,12 @@
 4. Reposo por defecto; responde uno solo y sólo si la pieza no tiene otra esfera. Antes de entregar,
    `auditIconGroup(items, { pieceHasSphere })`.
 5. Plastilina protagonista: `skewedOrbitHeroSvg` (el objeto en reposo, la órbita pone la esfera).
-6. Paquetes publicados: el catálogo completo de **86 glifos** (37 Trazo + 49 Plastilina) está en
-   `@efeoncepro/axis-graphic-line` `0.9.0` y sus 49 volúmenes en `@efeoncepro/axis-brand-assets` `0.3.6` (tag `v0.9.0`,
-   2026-09-28, suma la Plastilina `mano` de D29); la 0.8.0 (tag `v0.8.0`) trae 85 con el Trazo `swipe` de D28; la 0.7.0 (tag `v0.3.12`)
+6. Paquetes publicados: el catálogo completo de **88 glifos** (39 Trazo + 49 Plastilina) está en
+   `@efeoncepro/axis-graphic-line` `0.11.0` (tag `v0.3.29`, 2026-09-29, suma los Trazo `republicar` y `enviar`); sus 49
+   volúmenes están en `@efeoncepro/axis-brand-assets` desde la `0.3.6`. La 0.9.0 (tag `v0.9.0`, 2026-09-28) trae 86 con la
+   Plastilina `mano` de D29; la 0.8.0 (tag `v0.8.0`) trae 85 con el Trazo `swipe` de D28; la 0.7.0 (tag `v0.3.12`)
    trae 84 (con las 5 Plastilina de Glitch, D27); la 0.6.0 (tag `v0.6.0`) trae 79; la 0.5.0 (tag `v0.5.0`) trae 60 (sin D26) y la 0.4.0 (tag `v0.3.6`) sólo los 30 de la base. Greenhouse
-   fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4 (2026-09-27); para una pieza, el paquete o
+   fija axis-graphic-line 0.11.0 y axis-brand-assets 0.4.1 (2026-09-29); para una pieza, el paquete o
    `pnpm icons:export` en AXIS.
 7. Un objeto protagonista en volumen (D24): usa el PNG de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`);
    nunca lo generes de nuevo ni lo uses en listas o UI (§12).
@@ -76,9 +78,9 @@ Dos maneras, y cada glifo usa una sola:
 
 - **Reemplaza:** una pieza del reposo se vuelve la esfera. La punta de la flecha de Revenue, el tope de la barra más alta
   de Medición, la onda exterior de Medios, el primer punto de la ventana de Web, la cabeza de la segunda persona de
-  Talent, la muesca superior de Finance.
+  Talent, la muesca superior de Finance, la punta de la flecha de arriba de Republicar.
 - **Completa:** la esfera aparece donde la acción se resuelve. El centro de la lupa de Búsqueda; el punto final que deja
-  el lápiz de Contenido.
+  el lápiz de Contenido; el lugar adonde llega el avión de papel de Enviar.
 
 Un glifo nuevo se dibuja **ya con el lugar de su esfera previsto**, con su aire de 0,5. Si no hay un lugar con sentido
 (una punta, un tope, un centro, un punto final), el glifo no tiene respuesta y queda siempre en reposo.
@@ -415,7 +417,7 @@ megáfono deja el anillo de la esfera como hueco.
   **No se mezclan en una pieza.**
 - **No** se anima con el paquete: es un PNG, y el motion de los íconos sigue diferido (ver [ledger.md](ledger.md)).
 
-## 13. Catálogo aprobado (86 glifos; oficio desde D25, IA, social y staff desde D26, redes de Glitch D27, swipe D28 y mano D29)
+## 13. Catálogo aprobado (88 glifos; oficio desde D25, IA, social y staff desde D26, redes de Glitch D27, swipe D28, mano D29 y republicar y enviar, 2026-09-29)
 
 > **Estado:** canónico. Oficio (D25; operador, 2026-09-27: «Bien, subamos esos íconos al package de axis y a su web,
 > cuidando el diseño que ya tiene la web y documentando para agentes y el equipo»). IA, social y staff (D26; operador,
@@ -426,9 +428,9 @@ megáfono deja el anillo de la esfera como hueco.
 > 30 glifos nuevos (D25)» e «IA, social y staff: 19 glifos nuevos (D26)». Lab: `/references/iconography/` (los 79 del
 > catálogo y los 43 volúmenes). Si difiere de AXIS, manda AXIS.
 
-**37 Trazo + 49 Plastilina = 86 glifos** (desde `axis-graphic-line` 0.9.0). Volumen: 49 PNG, uno por cada Plastilina.
+**39 Trazo + 49 Plastilina = 88 glifos** (desde `axis-graphic-line` 0.11.0). Volumen: 49 PNG, uno por cada Plastilina.
 La tabla lista la base, el oficio y D26; después de ella entraron **redes de Glitch (D27, 2026-09-27)**, cinco Plastilina
-(`guardar`, `compartir`, `recomendar`, `comentar`, `deslizar`\*), **redes (D28, 2026-09-28)**, un Trazo: `swipe` («Desliza»), y **su par en Plastilina (D29, 2026-09-28)**: `mano`.
+(`guardar`, `compartir`, `recomendar`, `comentar`, `deslizar`\*), **redes (D28, 2026-09-28)**, un Trazo: `swipe` («Desliza»), **su par en Plastilina (D29, 2026-09-28)**: `mano`, y **social de Marketing con Manzanitas (2026-09-29)**, dos Trazo: `republicar` y `enviar` (§13.4).
 
 | Voz | Base (D22, 2026-09-26) | Oficio (D25, 2026-09-27) | IA, social y staff (D26, 2026-09-27) |
 |---|---|---|---|
@@ -503,3 +505,23 @@ Trazo del hoodie. Material de producción en [sources-and-assets.md](sources-and
   línea (se usa sólo la referencia de estilo y se pide «solid filled, never outlines»), y una punta de flecha grande deja
   restos tras la esfera (el anillo de 4,5 no la cubre; en volumen sale «una bola con espina»): la punta va compacta.
 
+### 13.4 Notas del 2026-09-29 (republicar y enviar)
+
+> **Estado:** canónico (operador, 2026-09-29: «Los íconos de republicar y enviar tienes autorización de crearlos»;
+> decisión `stroke-republicar-enviar` de Marketing con Manzanitas). AXIS `main@f722a6f`, `@efeoncepro/axis-graphic-line`
+> **0.11.0** (tag `v0.3.29`, workflow «Release UI packages v0.3.29» y CI de `main` en verde). ADR de iconografía de AXIS,
+> delta 2026-09-29 «Social de Marketing con Manzanitas: 2 glifos Trazo».
+
+| Glifo | Uso | Modo | Cómo nace la esfera | Aire de la esfera |
+|---|---|---|---|---|
+| `republicar` («Republicar») | Social · republicar, compartir en el feed: el lazo del repost, dos flechas redondeadas (arriba, una hacia la derecha; abajo, otra hacia la izquierda) | `replace` | la **punta de la flecha de arriba** se vuelve la esfera, como las otras flechas del set que reemplazan | 0,500 (el mínimo) |
+| `enviar` («Enviar») | Social · enviar por mensaje directo: un avión de papel | `complete` | los trazos quedan enteros y la esfera aparece **delante de la punta, donde llega el envío** | 1,389 |
+
+- Los dos pasan `pnpm icons:check` (margen y aire a 160, 64, 32, 24 y 20 px sobre `#001a33` y papel) y ninguno lleva
+  líneas de movimiento (son rasgo de Plastilina, §13.3).
+- Sin par en Plastilina: `compartir` sigue siendo la Plastilina de Glitch para «enviar la pieza» (D27); las claves son
+  únicas entre voces.
+- Nacieron para la contraportada de Marketing con Manzanitas, pero entrar al catálogo **no** los pone ahí: esa lámina
+  sigue sin íconos sociales ni botones simulados ([manzanitas.md](manzanitas.md) §7).
+- Los borradores del 2026-09-28 (aire 0,535 y 0,611, [ledger.md](ledger.md)) no son estos: los glifos publicados son los
+  de AXIS 0.11.0; su geometría vive sólo en `STROKE_GLYPHS` y se pinta con `resolveIcon`.

@@ -1,7 +1,9 @@
 # Marketing con Manzanitas — registro complementario de La órbita (sólo piezas de MCM)
 
-> **Verificado contra: greenhouse-eo@1050036e8 (`develop`) — 2026-09-29** (TASK-1939: catálogo `manzanitas` del
-> Artifact Composer y `pnpm manzanitas:compose`; AXIS `v0.3.28`, leído en `node_modules`) · **canvas v39 — 2026-09-28**
+> **Verificado contra: greenhouse-eo@2c95e60b2 (`develop`) — 2026-09-29, tarde** (adopción de AXIS `v0.3.29`, leído en
+> `node_modules`: sin decisiones abiertas, `closeCopy`, `teamPeople`, el eslogan desde el token y el roster del equipo;
+> antes, greenhouse-eo@1050036e8: TASK-1939, catálogo `manzanitas` del Artifact Composer y `pnpm manzanitas:compose`,
+> con AXIS `v0.3.28`) · **canvas v39 — 2026-09-28**
 > («Marketing con Manzanitas · Línea v1», https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG; los tableros `Grafico-*` y
 > `Texto-*` se leyeron en su fuente, con la lógica `renderVals()` de cada lámina) · inventarios de hechos de las sesiones
 > del 2026-09-28 y del 2026-09-29 · [ledger.md](ledger.md) (filas del 2026-09-28 y del 2026-09-29) ·
@@ -17,11 +19,12 @@
 > órbita sigue siendo la línea gráfica de Efeonce y manda en todo lo que este registro no dice. El registro suma
 > reglas, estilos y piezas propias **sólo** para piezas de Marketing con Manzanitas.
 >
-> **Publicado en AXIS el 2026-09-28 (tag `v0.3.26`) y actualizado el 2026-09-29 (tag `v0.3.28`, con siete decisiones
-> del operador; §13).** Token `manzanitasRegister` (`@efeoncepro/axis-tokens` 0.3.28, con `resolvedDecisions`), contrato
-> `efeonce.manzanitas-register` **0.2.0** `candidate` (`@efeoncepro/axis-ui-contracts` 0.3.28; acepta intents 0.1.x;
-> `pnpm manzanitas:resolve`), gráficos `@efeoncepro/axis-graphic-line/charts` (0.10.1) y archivos `AXIS_MANZANITAS_ASSETS`
-> (`@efeoncepro/axis-brand-assets` 0.4.1). Página y JSON: https://axis.efeonce.org/references/manzanitas/
+> **Publicado en AXIS el 2026-09-28 (tag `v0.3.26`) y actualizado el 2026-09-29 dos veces: tag `v0.3.28` (siete
+> decisiones del operador) y tag `v0.3.29` (las tres últimas y los hallazgos de TASK-1939; no queda ninguna abierta,
+> §13).** Token `manzanitasRegister` (`@efeoncepro/axis-tokens` 0.3.29: `resolvedDecisions` con diez,
+> `pendingDecisions: []`), contrato `efeonce.manzanitas-register` **0.3.0** `candidate` (`@efeoncepro/axis-ui-contracts`
+> 0.3.29; acepta intents 0.1.x y 0.2.0; `pnpm manzanitas:resolve`), gráficos `@efeoncepro/axis-graphic-line/charts`
+> (0.11.0) y archivos `AXIS_MANZANITAS_ASSETS` (`@efeoncepro/axis-brand-assets` 0.4.1). Página y JSON: https://axis.efeonce.org/references/manzanitas/
 > (`axis.manzanitas-register.v1`). **Manda el token**: los números de esta referencia son la medida del canvas v39, espejo
 > humano; si difieren, gana el token (§10.3).
 >
@@ -147,9 +150,21 @@ Todos los gráficos y el texto denso son Pizarra.
   «consola», piso que corta las piernas.
 - El isotipo del traje de Nexa **se compone** y el modelo sólo lo termina sobre su silueta (método en
   `.claude/rules/brand-photography.md` y skill `design-studio`).
-- Cine con Nexa protagonista es el caso probado. **Personas del equipo en cine en redes: no aprobado** (pendiente 6);
-  la estratega de la Escena interior es una persona por rol, generada. Registro cine:
+- Cine con Nexa protagonista es el caso probado. **Personas del equipo (decidido el 2026-09-29, decisión 6
+  `cine-team-people-social`):** las fotos cine de MCM pueden mostrar a personas reales del **equipo actual**, sólo desde
+  el [roster del equipo](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md) que mantiene Greenhouse
+  (token `manzanitasRegister.teamPeople = { allowed: true, rosterSource: 'greenhouse-team-roster', onlyCurrentTeam: true }`;
+  **el token no nombra a nadie**, el Lab es público). Es el cuarto caso permitido del registro cine:
   [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
+  - **Quién y con qué ropa** (roster): Julio con **polo** (identidad aprobada); Andrés, Daniela, Melkin, Humberly y Luis
+    con **hoodie** Efeonce; Valentina Hoyos con **su propia ropa**, sin logo. María Fernanda ya no está en el equipo
+    actual: su foto de `squad/` no se usa.
+  - **La identidad se declara en la ficha** (`"identidad": ["<clave>"]`; claves en `PERSONAS` de
+    `scripts/foto/build-prompt.mjs`: `julio`, `andres`, `daniela`, `humberly`, `luis`, `melkin`, `valentina`) y se
+    regenera con sus referencias (`pnpm foto:generar`); nunca se injerta una cara ni se describe de memoria.
+  - **Las seis identidades nuevas están aprobadas por el operador el 2026-09-29 sobre la ronda piloto (`ai-generations/2026-09-29_manzanitas-equipo/`)**; una persona nueva en el equipo pasa por su propia ronda. De Humberly y Luis sólo hay retratos antiguos (falta su foto actual);
+    la foto actual de Melkin es la de `squad/` (el retrato antiguo lo muestra con otro peinado).
+  - La estratega de la Escena interior aprobada sigue siendo una persona por rol, generada.
 
 ### 4.3 Lente («Foto señalada»)
 
@@ -174,7 +189,8 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
 - **Story con foto:** la voz en la banda alta y la firma centrada sobre la mesa, dentro de la zona segura. **Manda la
   zona segura de AXIS, el 87 %** (13 % arriba y abajo; decidido el 2026-09-29, `canvases['story-9x16'].safeArea`): la
   firma de la Escena story sube de y 1620 a y 1619. La story no lleva «Desliza». La story de cierre lleva el eslogan
-  (§10.1); su copy de cierre sigue **pendiente** (5; hoy «Guárdala», provisional).
+  (§10.1) y **su voz, obligatoria** (`voice-missing`), con un texto de cierre que cambia con el contexto y cabe en su
+  extensión (decidido el 2026-09-29; §7).
 - **Blog y banner:** la foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630). La voz va en el lado oscuro; la firma
   puede ir abajo a la izquierda, cerrando la columna del texto. Sin eslogan.
 
@@ -231,14 +247,24 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
 - **Voz:** pregunta + respuesta accionable + bajada en una línea «En los comentarios: …».
   - Engine: «¿Te nombra la IA? **Pregúntale.**» + «En los comentarios: cuéntanos si te nombró.»
   - Brand (Creative Workflows): bajada «En los comentarios: el primer ingrediente de tu receta.»
+- **El texto del cierre cambia con el contexto, nunca queda fijo** (decisión 5, operador, 2026-09-29, verbatim: «El texto
+  de cierre tiene que variar dependiendo el contexto, no puede quedar fijo, lo que sí puedes normalizar es su extensión
+  para que no rompa el diseño»). Los ejemplos de arriba no son una fórmula. Lo que se normaliza es la **extensión**:
+  `manzanitasRegister.closeCopy = { varies: 'by-context', fixed: false, pieces: ['back-cover-a', 'story-close'],
+  maxChars: { question: 44, answer: 10, sub: 56 } }`. El contrato devuelve **`close-copy-too-long`** y exige la voz de la
+  story de cierre (`voice-missing`). El «Guárdala» provisional quedó retirado.
 - **La manzana de la portada vuelve 3,8 veces más grande**, recortada por arriba y por la derecha: su cuerpo con los
   tres puntos queda como una burbuja escribiendo, en el acento de la línea, **sin astilla del tallo en el borde**.
   100 px de aire bajo la manzana y 120 px sobre el logo. La cabecera va sin manzana.
 - **Nada simula un botón** (post orgánico). Guardar, compartir y enviar se piden en el copy del post cuando hacen
   falta, nunca los cuatro a la vez. Por qué no van los íconos sociales: una conversión por carrusel; los botones ya
   existen en la interfaz de LinkedIn; un comentario con sustancia pesa más.
+- **Los Trazo `republicar` y `enviar` entraron al catálogo** (decisión 7, 2026-09-29; [iconography.md](iconography.md) §13),
+  pero no cambian esta regla: la contraportada sigue sin íconos sociales ni botones simulados
+  (`backCover.simulatedButtons: false`).
 - Se mide en Metricool: comentarios con sustancia, guardados, envíos y clics al grader por UTM cuando aplique.
-- En el teléfono (390 px): respuesta 69 px, bajada 11 px, logo 144 px, eslogan 9 px.
+- En el teléfono (390 px): respuesta 69 px, bajada 11 px, logo 144 px (`backCover.phone390`). El eslogan ya no tiene un
+  cuerpo fijo: sale del logo (§6); el canvas lo medía en 9 px con el eslogan de 24 px anterior a la regla.
 - **Descartados:** B (órbita, más sutil) quedó como prueba. **C (acento a sangre) rechazada** («Logo azul Efeonce
   acá??? … muchísima saturación»): el acento nunca es superficie y el logo positivo trae el isotipo azul.
 
@@ -434,7 +460,9 @@ contrato y los gráficos (§10.3). El canvas de la línea queda como la referenc
 ### 10.1 Componer con el Artifact Composer (TASK-1939)
 
 **Estado:** TASK-1939 `in-progress` (commit `1050036e8` en `develop`): código completo y verificado en local (la suite
-del Composer, 564 pruebas en 37 archivos, y el gate visual, en verde). Falta la **aprobación visual del operador** de los
+del Composer, 564 pruebas en 37 archivos, y el gate visual, en verde). Desde el commit `2c95e60b2` fija AXIS `v0.3.29`
+(`axis-tokens` 0.3.29, `axis-ui-contracts` 0.3.29, `axis-graphic-line` 0.11.0): tokens regenerados sin drift y gate
+visual a 0 px (manzanitas 18, glitch 32, graphic-line 73). Falta la **aprobación visual del operador** de los
 carruseles de ejemplo. Es el **taller local**: no publica ni agenda, y la pieza sale para revisión humana; publicar lo
 decide el operador. La ruta productiva (API + `artifact-worker` + MCP) es TASK-1921, `in-progress` en otra sesión: la
 familia `manzanitas` se suma ahí después y **no la cites como disponible**. `pnpm brand:compose` y `pnpm glitch:compose`
@@ -460,16 +488,20 @@ pnpm manzanitas:compose -- --intent src/lib/manzanitas-composition/examples/carr
 
 #### El intent
 
-- Es el del contrato `efeonce.manzanitas-register` **0.2.0** (`@efeoncepro/axis-ui-contracts` 0.3.28; acepta también
-  0.1.x): `register: "marketing-con-manzanitas"`, `channel` (`carousel`, `story`, `blog`, `youtube` o `podcast`),
+- Es el del contrato `efeonce.manzanitas-register` **0.3.0** (`@efeoncepro/axis-ui-contracts` 0.3.29; acepta también
+  0.1.x y 0.2.0): `register: "marketing-con-manzanitas"`, `channel` (`carousel`, `story`, `blog`, `youtube` o `podcast`),
   `topicLine` (la clave AXIS de la línea del tema, §2) y `slides[]`. Cada lámina declara su `piece` (un id de
   `manzanitasRegister.pieces`), su `voice` (`question`, `answer`), `swipe` y, según la pieza, `chart` (el dato con claves
   en inglés, más `source` e `illustrative`; §10.3), `denseText` o `photo` (`register: "cine"`, `lightId`, `subject`,
   `alt`). Schema y ejemplos del contrato, en AXIS: `docs/agent-composition/manzanitas-register-intent.schema.json` y
   `docs/examples/manzanitas/`.
-- **Campos que agrega Greenhouse** (el contrato todavía no los declara): por lámina, `photo.path` (la foto real,
-  relativa al archivo del intent; con `photo.alt` obligatorio) y, dentro de `chart`, los rótulos del gráfico: `caption`,
-  `figureLabel`, `columnLabels`, `keyLabels` y `rateHeader`.
+- **Campo que agrega Greenhouse** (el contrato no lo declara): por lámina, `photo.path` (la foto real, relativa al
+  archivo del intent; con `photo.alt` obligatorio).
+- **Los rótulos del gráfico son del contrato desde la 0.3.0:** dentro de `chart`, `caption`, `figureLabel` y
+  `rateHeader` (una cadena) y `columnLabels` y `keyLabels` (dos); si no tienen esa forma, `chart-labels-invalid`.
+  `manzanitasChartSvg` los lee del dato y una opción explícita manda.
+- **El texto de cierre** (`back-cover-a`, `story-close`) cabe en `closeCopy.maxChars`: pregunta 44, respuesta 10 y bajada
+  56 caracteres (§7); si no, `close-copy-too-long`.
 - `artifactId` es opcional; si falta, `MCM-<canal>-<línea>`.
 - **Nunca eliges plantilla, coordenadas ni colores.** El contrato resuelve la pieza, la superficie, el «Desliza», la
   cabecera y la firma; el mapper `planManzanitasIntent` (`src/lib/manzanitas-composition/index.ts`) decide el
@@ -479,7 +511,8 @@ pnpm manzanitas:compose -- --intent src/lib/manzanitas-composition/examples/carr
   énfasis con `**así**`.
 
 Forma mínima (recortada del ejemplo `carrusel-recreo-engine`; el ejemplo completo lleva siete láminas, y un carrusel
-real pasa además por las reglas de Recreo del contrato):
+real pasa además por las reglas de Recreo del contrato). Los ejemplos de Greenhouse todavía declaran `"version": "0.2.0"`,
+que el contrato 0.3.0 acepta; los de AXIS declaran 0.3.0:
 
 ```json
 {
@@ -524,7 +557,7 @@ dato con su fuente real y tu copy.
 | Código | Cuándo | Qué haces |
 |---|---|---|
 | `intent-invalid` | El archivo no es JSON válido | Corrige el archivo |
-| `contract-issues` | El contrato no resuelve el intent (lista sus códigos: `slogan-not-allowed`, `chart-source-required`, `pizarra-run-exceeded`, `photo-slides-adjacent`…), falla una regla del catálogo (`manzanitas.catalog-membership`, `manzanitas.single-line`) o un gráfico no pasa sus chequeos | Corrige lo que dice cada código; nunca lo esquives cambiando de pieza |
+| `contract-issues` | El contrato no resuelve el intent (lista sus códigos: `slogan-not-allowed`, `chart-source-required`, `pizarra-run-exceeded`, `photo-slides-adjacent`, `close-copy-too-long`, `chart-labels-invalid`…), falla una regla del catálogo (`manzanitas.catalog-membership`, `manzanitas.single-line`) o un gráfico no pasa sus chequeos | Corrige lo que dice cada código; nunca lo esquives cambiando de pieza |
 | `photo-missing` | Una lámina con foto no trae `photo.path` o `photo.alt`, o el archivo no existe | Declara la foto real y su texto alternativo |
 | `dense-text-invalid` | El texto denso no tiene su forma (arriba) | Completa la forma |
 | `piece-not-approved` | La plantilla está en propuesta (validador `manzanitas.piece-approval`) | No se compone como canon hasta que el operador la apruebe |
@@ -543,8 +576,10 @@ de este catálogo, probadas en `src/lib/artifact-composer/catalogs/manzanitas/__
 3. **Donde hay contenido fijo bajo la voz** (gráficos con voz, Lente, paso, las tres láminas de texto denso, pódcast),
    **la pregunta va en UNA línea**: una segunda línea empujaría la respuesta sobre la fuente, la firma o el contenido.
 
-Que el contrato acepte un copy no prueba que quepa: los ejemplos de AXIS traen tres que Greenhouse rechaza
-([lessons.md](lessons.md), 2026-09-29).
+Del contrato, el único largo máximo es el del texto de cierre (`closeCopy.maxChars`): los slots de `BackCover` y
+`StoryClose` usan esos límites (44/10/56) y `manzanitas-templates.test.ts` lo exige. Fuera de los cierres, que el
+contrato acepte un copy no prueba que quepa: hasta `v0.3.29`, tres ejemplos de AXIS traían copy que Greenhouse rechaza
+([lessons.md](lessons.md), 2026-09-29); en `v0.3.29` se corrigieron.
 
 #### El eslogan de los cierres (regla del operador del 2026-09-29)
 
@@ -552,8 +587,10 @@ Que el contrato acepte un copy no prueba que quepa: los ejemplos de AXIS traen t
   `StoryClose` y `YoutubeClose`.
 - Va **siempre debajo** del logo de Efeonce, en bloque, al **64 %** del ancho del logo (`sloganOfLogo`), separado 1,35
   veces su cuerpo (`sloganGapOfFont`). Cuerpo = ancho del logo × 0,64 ÷ `--mcm-slogan-em` (el ancho del eslogan en em de
-  su línea, medido con fontkit sobre las fuentes del catálogo: «Empower » en Poppins 800 itálica, «your » en 800 y la
-  palabra en 900 itálica).
+  su línea). **Desde AXIS `v0.3.29` ese ancho sale del token**, `efeonceGraphicLine.slogan.widthEmByWord`, vía
+  `sloganEmOf` (`scripts/manzanitas/manzanitas-tokens.ts`); la medición con fontkit sobre las fuentes del catálogo
+  («Empower » en Poppins 800 itálica, «your » en 800 y la palabra en 900 itálica) queda como prueba de drift: miden lo
+  mismo que AXIS.
 - La palabra de la línea va en el acento **sólo si el cuerpo llega a 24 px** (`--mcm-accent-min-text-px`, de
   `manzanitasRegister.accent.contrast.largeTextMinPx`); si no, en la tinta de la superficie (blanco sobre navy). Lo
   decide un hook que mide después del layout (`slogan-hook.ts`), no la plantilla.
@@ -568,7 +605,11 @@ Que el contrato acepte un copy no prueba que quepa: los ejemplos de AXIS traen t
 
 - **Cierre de YouTube:** logo de 260 px, así que el eslogan queda entre 13,6 y 15,6 px y la palabra va en blanco. El
   canvas v39 tenía el eslogan **encima** del logo, a 64 px; ahora va debajo (la regla del 2026-09-29 es posterior).
-- `manzanitasRegister.slogan.closeLockup.sloganPx` (24) quedó superado por la regla: no lo uses (AXIS debe retirarlo).
+- `manzanitasRegister.slogan.closeLockup.sloganPx` (24) quedó superado por la regla y **AXIS lo retiró en 0.3.29**:
+  `closeLockup = { logoPx: 400, blockEndsY: 1253, byCanvas: { 'youtube-16x9': { logoPx: 260, align: 'center' } } }`.
+- El manifiesto del contrato 0.3.0 trae el eslogan resuelto: `slogan.px`, `gapPx`, `widthEm`, `wordInAccent`, `wordColor`
+  (el acento o la tinta) y `position: 'below-logo'`. Una prueba de render (`manzanitas-fit.test.ts`) compara el cuerpo
+  que pinta la plantilla con ese `slogan.px` (diferencia menor a 0,05 px).
 - Con el logo de 400 px, sólo Voice lleva la palabra en el acento: es la consecuencia visible de la regla y **se le
   presenta al operador**. No agrandes el logo ni fijes el cuerpo por tu cuenta.
 
@@ -582,8 +623,8 @@ Que el contrato acepte un copy no prueba que quepa: los ejemplos de AXIS traen t
   (§8.4).
 - **Lente:** `materializeManzanitasAssets` (`src/lib/manzanitas-composition/materialize.ts`) lleva la foto al tamaño
   exacto del lienzo y la incrusta en la Lente de La órbita (`lensRecipe('post')`).
-- **Órbita del paso:** `orbitSvg` sobre el círculo medido en el canvas v39 (cx 640, cy 500, r 324;
-  `MANZANITAS_STEP_ORBIT`); el token todavía no lo publica.
+- **Órbita del paso:** `orbitSvg` sobre el círculo medido en el canvas v39, que desde `v0.3.29` sale del token:
+  `manzanitasRegister.pieces['step-pizarra'].orbit = { cx: 640, cy: 500, r: 324 }` (`MANZANITAS_STEP_ORBIT`).
 
 #### Tokens, assets y fuentes compilados
 
@@ -602,8 +643,9 @@ Que el contrato acepte un copy no prueba que quepa: los ejemplos de AXIS traen t
 
 - `pnpm composer:visual-gate --catalog=manzanitas`: 18 frames (el probe de cada plantilla, con una foto sintética,
   nunca una real), congelados en la sección `2026-09-29 (r)` de
-  `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`. Tiene que quedar a 0 px.
-- Pruebas: 21 del catálogo (`manzanitas-catalogs`, `manzanitas-templates`, `manzanitas-fit`; cuatro renderizan), 12 del
+  `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`. Tiene que quedar a 0 px (con AXIS `v0.3.29` sigue
+  a 0 px, igual que glitch, 32, y graphic-line, 73).
+- Pruebas: 22 del catálogo (`manzanitas-catalogs`, `manzanitas-templates`, `manzanitas-fit`; cuatro renderizan; desde `2c95e60b2`, una exige los límites de `closeCopy` en los slots de cierre y la de render compara el eslogan con el `slogan.px` del contrato), 12 del
   mapper (`plan.test.ts`, incluye los ejemplos) y 10 de tokens, painter y errores (`scripts/manzanitas/__tests__/`).
   Además, en verde: `pnpm composer:color-ledger`, `pnpm composer:brand-pack --check` y `pnpm manzanitas:tokens --check`.
 
@@ -651,39 +693,45 @@ vuelve a componer.
    La superficie (papel o navy) la resuelve el contrato por pieza: no se cambia a mano.
 7. Aprobar la línea no autoriza publicar una pieza: la publicación la decide el operador.
 
-### 10.3 En AXIS (publicado el 2026-09-28; decisiones del 2026-09-29 en `v0.3.28`)
+### 10.3 En AXIS (publicado el 2026-09-28; decisiones del 2026-09-29 en `v0.3.28` y `v0.3.29`)
 
 Se ejecutó por [TASK-1936](../../../../docs/tasks/complete/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md)
-con autorización explícita del operador; `main` de AXIS en `06cb62d`, tag `v0.3.26`. Las siete decisiones del
-2026-09-29 salieron con el tag `v0.3.28` (commit `2bfe206` en `main`). ADR de AXIS:
+con autorización explícita del operador; `main` de AXIS en `06cb62d`, tag `v0.3.26`. Las siete primeras decisiones del
+2026-09-29 salieron con el tag `v0.3.28` (commit `2bfe206` en `main`); las tres últimas y los hallazgos de TASK-1939, con
+el tag `v0.3.29` (`main` en `f722a6f`, workflow «Release UI packages v0.3.29» y CI de `main` en verde; el operador lo
+autorizó: «Te autorizo a publicar el patch de axis que indicas»). ADR de AXIS:
 `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`; guía para agentes: `docs/agent-composition/manzanitas.md`.
 
 | Qué | Dónde | Cómo se usa |
 |---|---|---|
-| Valores | `manzanitasRegister` (`@efeoncepro/axis-tokens` 0.3.28; top-level, fuera de `axisTokens`) | lo heredado de La órbita es **referencia** a `efeonceGraphicLine` (prueba de identidad); nunca apunta a `glitchLine`. Grupos: `accent`, `surfaces`, `type`, `masthead`, `formats`, `recreo`, `swipe`, `signature`, `slogan`, `backCover`, `voice`, `charts`, `denseText`, `canvases`, `pieces`, `pendingDecisions` y, desde 0.3.28, `resolvedDecisions` |
-| Reglas | contrato `efeonce.manzanitas-register` **0.2.0** `candidate` (`@efeoncepro/axis-ui-contracts` 0.3.28; acepta intents 0.1.x) | `resolveManzanitasRegisterIntent(intent)` con el carrusel entero (`register`, `channel`, `topicLine`, `slides[]`; empieza con su portada y termina con su contraportada, nunca con una Lente); falla cerrado (45 códigos es-CL) y devuelve `pending-decision` si la regla depende de una pendiente. En AXIS: `pnpm manzanitas:resolve -- --input <intent.json> --out <manifest.json>` (manifest `axis.manzanitas-register-composition.v1`); schema `docs/agent-composition/manzanitas-register-intent.schema.json`; ejemplos en `docs/examples/manzanitas/` (11 válidos y 7 inválidos en `main`) |
-| Gráficos | `@efeoncepro/axis-graphic-line/charts` (0.10.1; **no** se exporta desde la raíz) | `manzanitasChartSvg(receta, dato, { line, caption? })` → `{ svg, manifest }` (`axis.manzanitas-chart.v1`); una función por receta (`rankingChartSvg`…); `runManzanitasChartChecks(resultado)` debe quedar sin fallas. Datos con claves en inglés: `rows` (`role: 'leader' \| 'you'`), `parts` (`tone`), `tasks`, `stages`, `value`, `series`, `labels`, más `source` e `illustrative` |
+| Valores | `manzanitasRegister` (`@efeoncepro/axis-tokens` 0.3.29; top-level, fuera de `axisTokens`) | lo heredado de La órbita es **referencia** a `efeonceGraphicLine` (prueba de identidad); nunca apunta a `glitchLine`. Grupos: `accent`, `surfaces`, `type`, `masthead`, `formats`, `recreo`, `swipe`, `signature`, `slogan`, `backCover`, `voice`, `charts`, `denseText`, `canvases`, `pieces`, `pendingDecisions` (vacío desde 0.3.29), `resolvedDecisions` (desde 0.3.28; diez desde 0.3.29) y, desde 0.3.29, `closeCopy` y `teamPeople`. El ancho del eslogan por línea vive en La órbita: `efeonceGraphicLine.slogan.widthEmByWord` |
+| Reglas | contrato `efeonce.manzanitas-register` **0.3.0** `candidate` (`@efeoncepro/axis-ui-contracts` 0.3.29; acepta intents 0.1.x y 0.2.0) | `resolveManzanitasRegisterIntent(intent)` con el carrusel entero (`register`, `channel`, `topicLine`, `slides[]`; empieza con su portada y termina con su contraportada, nunca con una Lente); falla cerrado (47 códigos es-CL en 0.3.0; 45 hasta la 0.2.0) y devuelve `pending-decision` si la regla depende de una pendiente. En AXIS: `pnpm manzanitas:resolve -- --input <intent.json> --out <manifest.json>` (manifest `axis.manzanitas-register-composition.v1`); schema `docs/agent-composition/manzanitas-register-intent.schema.json`; ejemplos en `docs/examples/manzanitas/` (11 válidos y 7 inválidos en `main`) |
+| Gráficos | `@efeoncepro/axis-graphic-line/charts` (0.11.0; **no** se exporta desde la raíz) | `manzanitasChartSvg(receta, dato, { line, caption? })` (desde 0.11.0 lee los rótulos del dato; una opción explícita manda) → `{ svg, manifest }` (`axis.manzanitas-chart.v1`); una función por receta (`rankingChartSvg`…); `runManzanitasChartChecks(resultado)` debe quedar sin fallas. Datos con claves en inglés: `rows` (`role: 'leader' \| 'you'`), `parts` (`tone`), `tasks`, `stages`, `value`, `series`, `labels`, más `source` e `illustrative` |
 | Archivos | `AXIS_MANZANITAS_ASSETS` (`@efeoncepro/axis-brand-assets` 0.4.1) | `manzanitas-logo-{positive,negative}`, `manzanitas-wordmark-{positive,negative}`, `manzanitas-apple`; la manzana y los puntos en `[data-axis-accent="topic-line"]` (`AXIS_MANZANITAS_ACCENT_SELECTOR`); trazos idénticos a los SVG oficiales |
 | Referencia | https://axis.efeonce.org/references/manzanitas/ + `.json` | selector de línea en vivo y editor del dato de los gráficos |
 
 Decisiones de la ejecución: la paridad con el canvas es **geométrica** (largos, posiciones, esfera, destacado), no de
 píxeles; en el Embudo, con empate, se destaca el primer paso; el Ranking dice «1 vez» cuando tu marca lidera. El
-2026-09-29 siete pendientes pasaron a `resolvedDecisions` (§13); siguen tres en `pendingDecisions`.
+2026-09-29 las diez pendientes pasaron a `resolvedDecisions` (§13): siete en 0.3.28 y tres en 0.3.29;
+`pendingDecisions` queda vacío.
 
-**Hallazgos para un patch de AXIS** (publicarlo requiere la autorización del operador; mientras, Greenhouse falla
-cerrado donde corresponde):
+**Hallazgos de TASK-1939: cerrados en `v0.3.29`** (el ADR de AXIS los registra en su delta (d) de
+`MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`; la iconografía, en el delta 2026-09-29 de `ICONOGRAPHY_DECISION_V1.md`):
 
-1. Ejemplos con copy que no cabe en la geometría aprobada: la portada «Todavía no» (`carrusel-revops-salesforce`,
-   `carrusel-voz-revenue-hubspot`), el concepto «Quién responde» (`carrusel-texto-denso-growth`) y la pregunta de «De
-   cada 100» «¿Cuántos leads llegan ya informados?» (`carrusel-voz-revenue-hubspot`). Los ejemplos de Greenhouse usan
-   «Aún no», «Quién cita» y «¿Cuántos llegan ya informados?».
-2. `slogan.closeLockup.sloganPx` (24) superado por la regla del eslogan del 2026-09-29.
-3. Los rótulos de los gráficos (`caption`, `figureLabel`, `columnLabels`, `keyLabels`, `rateHeader`) no están en el tipo
-   ni en el schema del contrato.
-4. La órbita del paso (cx 640, cy 500, r 324) no está en el token.
-5. El contrato no declara largos máximos por pieza: las reglas de una línea viven en las plantillas de Greenhouse.
-6. El Lab (`/references/manzanitas/`, contraportada A) todavía pinta el eslogan a 24 px con la palabra de la línea en el
-   acento; con la regla del 2026-09-29 va al 64 % del ancho del logo y la palabra en la tinta bajo 24 px.
+1. **Ejemplos corregidos:** «Todavía no» → «Aún no», «Quién responde» → «Quién cita» y la pregunta de «De cada 100» sin
+   «leads»; todos declaran 0.3.0.
+2. **Eslogan:** `efeonceGraphicLine.slogan.widthEmByWord` publica el ancho por línea; `slogan.closeLockup.sloganPx` se
+   retiró (`closeLockup = { logoPx: 400, blockEndsY: 1253, byCanvas: { 'youtube-16x9': { logoPx: 260, align: 'center' } } }`);
+   el manifiesto del contrato trae `slogan.px`, `gapPx`, `widthEm`, `wordInAccent`, `wordColor` y
+   `position: 'below-logo'`; `backCover.phone390` ya no tiene cuerpo fijo de eslogan.
+3. **Rótulos del gráfico en el contrato** (`caption`, `figureLabel`, `columnLabels`, `keyLabels`, `rateHeader`;
+   `chart-labels-invalid`).
+4. **La órbita del paso en el token:** `pieces['step-pizarra'].orbit = { cx: 640, cy: 500, r: 324 }`.
+5. **Largos máximos:** el contrato normaliza el texto de cierre (`closeCopy`); las reglas de una línea de las demás
+   piezas siguen en las plantillas de Greenhouse.
+6. **Lab:** la contraportada A recompuesta con el eslogan nuevo (desde el Composer de Greenhouse), la sección «Decisiones
+   del operador» sin abiertas, el JSON con `closeCopy`, `teamPeople` y la regla del eslogan, y la iconografía con 88
+   glifos.
 
 **Todavía no:** la ruta productiva (TASK-1921) y que esta skill consuma el paquete en vez de copiar valores. Nunca cites
 esos pasos como disponibles.
@@ -727,6 +775,10 @@ manda la regla.
 - Dos láminas con foto seguidas; más de tres Pizarras seguidas; el dato con fuente o el cierre fuera de Pizarra.
 - La Lente en la portada o combinada con otra órbita o con el foco.
 - Un lecho agregado (estudio vacío, cabezas del público, dorso de un portátil, «consola», piso que corta las piernas).
+- Una persona del equipo que no esté en el roster del equipo actual, la foto de alguien que ya no está (María
+  Fernanda), otra ropa que la de su fila, una cara injertada o una persona nueva en el equipo sin su ronda de identidad aprobada (§4.2).
+- Un texto de cierre fijo, repetido de pieza en pieza, o más largo que `closeCopy.maxChars` (§7).
+- Íconos sociales en la contraportada porque `republicar` y `enviar` ya existen en el catálogo (§7).
 - Elegir a mano la plantilla, las coordenadas o los colores de una lámina del Composer; editar un ejemplo versionado,
   una plantilla o una salida para cambiar el contenido de una pieza (se edita el intent propio y se vuelve a componer).
 - Recortar o partir un texto para que quepa, o pedir una excepción al motor: si no cabe, se acorta el copy (§10.1).
@@ -754,6 +806,10 @@ manda la regla.
       con la palabra en el acento sólo si el eslogan llega a 24 px (con el logo de 400 px, sólo Voice).
 - [ ] Contraportada: una sola conversión, bajada «En los comentarios: …», manzana 3,8× sin astilla del tallo, nada que
       simule un botón.
+- [ ] Texto de cierre (contraportada A y story de cierre): propio de la pieza, no fijo; pregunta ≤ 44, respuesta ≤ 10 y
+      bajada ≤ 56 caracteres; la story de cierre lleva su voz.
+- [ ] Personas del equipo, si las hay: están en el roster, con la ropa de su fila, la identidad declarada en la ficha y
+      la hoja de contacto aprobada por el operador.
 - [ ] Escena: lecho nativo, firma dentro de su materia con aire, rincón de «Desliza» libre; Lente sólo en interiores.
 - [ ] Compuesta con `pnpm manzanitas:compose` sin errores (§10.1) y revisada en sus PNG y su PDF, a tamaño real y a
       390 px. Si una lámina se explora en el canvas, en papel y en navy, con la lógica `renderVals()` corriendo.
@@ -762,15 +818,10 @@ manda la regla.
 
 ## 13. Pendientes del operador (no los decidas por tu cuenta)
 
-**Estado al 2026-09-29.** El operador decidió siete de las diez pendientes; AXIS las publicó en `v0.3.28`
-(`manzanitasRegister.resolvedDecisions`, contrato 0.2.0). La numeración se conserva porque otros documentos la citan.
-
-**Siguen abiertas** (`pendingDecisions`):
-
-- **5.** El copy de cierre de la story (hoy «Guárdala», provisional).
-- **6.** El registro cine con personas del equipo en redes aún no está aprobado (la estratega de la Escena interior es
-  una persona por rol, generada; ningún ejemplo usa personas reales).
-- **7.** Los Trazo candidatos `republicar` y `enviar` siguen en borrador y no entran al catálogo.
+**Estado al 2026-09-29, tarde: no queda ninguna abierta** (`manzanitasRegister.pendingDecisions: []`). El operador
+decidió las diez en dos rondas: siete publicadas en `v0.3.28` (contrato 0.2.0) y las tres últimas en `v0.3.29`
+(contrato 0.3.0). Todas viven en `resolvedDecisions`. La numeración se conserva porque otros documentos la citan. Si
+surge una pregunta nueva, llévasela al operador: no la decidas en una pieza.
 
 **Decididas el 2026-09-29** (ya no las preguntes; dónde viven en el token):
 
@@ -785,9 +836,17 @@ manda la regla.
   (`glitchLine.scope.sharedWithEditorialFamily`).
 - **10.** Un tema de **Salesforce** lleva `revenue-salesforce`; uno de HubSpot o genérico, `revenue-hubspot`
   (`topicLine.revenueByPlatform`).
+- **5.** El texto de cierre **cambia con el contexto y nunca queda fijo**; se normaliza su extensión
+  (`closeCopy.maxChars`: pregunta 44, respuesta 10, bajada 56; contraportada A y story de cierre; decisión
+  `story-close-copy`). El «Guárdala» provisional quedó retirado (§7).
+- **6.** Las fotos cine de MCM pueden mostrar a **personas reales del equipo actual**, sólo desde el roster que mantiene
+  Greenhouse (`teamPeople`; decisión `cine-team-people-social`; §4.2).
+- **7.** Los Trazo **`republicar`** y **`enviar`** entran al catálogo (`axis-graphic-line` 0.11.0; 39 Trazo + 49
+  Plastilina = 88; decisión `stroke-republicar-enviar`; [iconography.md](iconography.md) §13).
 
-**Por presentar o aprobar:** la aprobación visual de los carruseles de ejemplo del Composer (TASK-1939) y la
-consecuencia del eslogan en los cierres (con el logo de 400 px, sólo Voice lleva la palabra en el acento; §10.1).
+**Por presentar o aprobar (no son decisiones del token):** la aprobación visual de los carruseles de ejemplo del
+Composer (TASK-1939), la consecuencia del eslogan en los cierres (con el logo de 400 px, sólo Voice lleva la palabra en
+el acento; §10.1). Las identidades del equipo quedaron aprobadas el 2026-09-29 (§4.2).
 
 ## 14. Lecciones de esta sesión (no las repitas)
 
@@ -826,17 +885,21 @@ consecuencia del eslogan en los cierres (con el logo de 400 px, sólo Voice llev
   `Lens`, `Slogan`).
 - [ledger.md](ledger.md), filas del 2026-09-28 (Manzanitas: cine y lecho; firma, cabecera, canales y eslogan;
   contraportada social; contraportada A; acentos por línea, gráficos y texto denso) y del 2026-09-29 (el eslogan como
-  elemento gráfico; las siete decisiones de MCM y su catálogo del Artifact Composer), y sus pendientes.
+  elemento gráfico; las siete decisiones de MCM y su catálogo del Artifact Composer; las tres últimas decisiones y AXIS
+  `v0.3.29`), y sus pendientes.
 - [criteria.md](criteria.md) §3.4 (estela; la lámina de gráficos), §5 (eslogan en bloque; acento a sangre) y §8
   (Manzanitas toma el acento de la línea del tema).
-- [iconography.md](iconography.md) §13 (D28 `swipe`, D29 `mano`).
+- [iconography.md](iconography.md) §13 (D28 `swipe`, D29 `mano`; `republicar` y `enviar`, 2026-09-29).
 - [package-and-tokens.md](package-and-tokens.md) §2.2 (`efeonceGraphicLine.lines`) e `icons.voiceByLine`.
 - Biblioteca de recursos de MCM:
   [`MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md`](../../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md).
 - Canon social de la contraportada (una conversión, ningún botón falso):
   [`2026-07-28-carousel-storytelling-platform-research.md`](../../../../docs/audits/social/2026-07-28-carousel-storytelling-platform-research.md).
 - Registro cine: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md);
-  método del isotipo de Nexa: `.claude/rules/brand-photography.md`.
+  método del isotipo de Nexa: `.claude/rules/brand-photography.md`. Equipo en las fotos:
+  [`EFEONCE_TEAM_ROSTER_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md), `PERSONAS` de
+  `scripts/foto/build-prompt.mjs` y los bloques IDENTITY del canon §3.6
+  ([`EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md)).
 - Sub-línea hermana (no se mezcla): [glitch.md](glitch.md).
 - ADR del registro, [Delta 2026-09-29](../../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md#delta-2026-09-29--decisiones-del-operador-y-catálogo-del-artifact-composer)
   (decisiones del operador y catálogo del Artifact Composer).
@@ -846,3 +909,6 @@ consecuencia del eslogan en los cierres (con el logo de 400 px, sólo Voice llev
   `src/lib/manzanitas-composition/` (mapper, `materialize.ts`, ejemplos).
 - Manual de uso: [`componer-piezas-de-marketing-con-manzanitas.md`](../../../../docs/manual-de-uso/creative/componer-piezas-de-marketing-con-manzanitas.md).
 - AXIS `v0.3.28` (commit `2bfe206`): `manzanitasRegister.resolvedDecisions` y contrato `efeonce.manzanitas-register` 0.2.0.
+- AXIS `v0.3.29` (`main` `f722a6f`): `pendingDecisions: []`, `closeCopy`, `teamPeople`, `slogan.widthEmByWord`, la órbita
+  del paso, contrato 0.3.0 y los Trazo `republicar` y `enviar` (`axis-graphic-line` 0.11.0). ADR del registro,
+  [Delta 2026-09-29 (b)](../../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md#delta-2026-09-29-b--sin-decisiones-abiertas-axis-v0329-y-el-equipo-real-en-la-fotografía).

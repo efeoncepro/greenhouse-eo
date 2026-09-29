@@ -126,18 +126,19 @@ de partículas, esferas—, nunca pintado encima ni puesto como grade.
   `atmosfera: bruma`).
 - En 16:9, la **izquierda (≈ 45 %) es una reserva oscura y calma**, sin fenómeno de luz ni robots.
 
-**Sólo tres casos permitidos [operador, 2026-09-27]:**
+**Sólo cuatro casos permitidos [operador, 2026-09-27; el cuarto, 2026-09-29]:**
 
 | Caso | Protagonista | Vestuario |
 |---|---|---|
 | 1 · Nexa protagonista | Nexa (identidad A) | Traje de ficción (biónico) o uniforme Efeonce |
 | 2 · Receta de deck `proposal-cinematic` | Personas del equipo o Nexa | Personas: **uniforme por registro de escena**; el traje de ficción es sólo de Nexa |
 | 3 · **Excepción:** láminas de **sección** y **«about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») | Personas en luz dramática, con o sin Nexa (en la sección con el panel a la derecha, la persona del cliente) | Equipo: uniforme por registro de escena; cliente: su ropa, sin marca Efeonce |
+| 4 · **Fotos de Marketing con Manzanitas** (`cine-team-people-social`) | **Personas reales del equipo actual**, sólo las del [roster del equipo](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md), con `identidad` en la ficha; identidades aprobadas por el operador el 2026-09-29 | La de su fila del roster: hoodie Efeonce el equipo, polo Julio, su propia ropa Valentina Hoyos |
 
 AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue **`cine-requires-nexa-or-proposal`**; el
 caso 3 ya está en el contrato (desde `axis-tokens` 0.3.14, TASK-1927): admite cine en `section-split`, `section-cine`
 (composiciones `team`, `services`, `about` y `purpose`) y en `cover-brochure`, `close-brochure` y `close-proposal`. Una pieza social, un hero web, publicidad o una lámina de **contenido** con personas del equipo sigue en A, B
-o C: la excepción del caso 3 no se extiende. Detalle: registro cine, delta (c); receta de cada lámina en
+o C (salvo las fotos de MCM, caso 4): la excepción del caso 3 no se extiende. Detalle: registro cine, delta (c); receta de cada lámina en
 `docs/operations/brand-graphic-line/deck-recipes/`.
 
 **Publicidad 9:16 y 4:5: en prueba, no aprobada.** La tanda del 2026-09-27

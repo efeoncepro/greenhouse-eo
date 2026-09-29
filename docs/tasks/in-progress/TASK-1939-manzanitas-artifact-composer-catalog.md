@@ -1,5 +1,18 @@
 # TASK-1939 — Catálogo `manzanitas` del Artifact Composer: carruseles y piezas de Marketing con Manzanitas desde datos
 
+## Delta 2026-09-29 (b) — decisiones cerradas, AXIS v0.3.29 y el equipo real
+
+- El operador cerró las tres decisiones abiertas y autorizó el patch de AXIS: **tag `v0.3.29`** (`axis-tokens` 0.3.29,
+  `axis-ui-contracts` 0.3.29 con el contrato 0.3.0, `axis-graphic-line` 0.11.0; main `f722a6f`, release y CI verdes). Se
+  cerraron también los hallazgos de esta task: el ancho del eslogan en el token (`widthEmByWord`, sin `sloganPx`), los
+  rótulos de los gráficos en el contrato, la órbita del paso en el token, los ejemplos que no cabían y el Lab.
+- Greenhouse adopta el set (`2c95e60b2`): el catálogo lee el eslogan y la órbita del token, los slots de cierre usan
+  `closeCopy.maxChars` (el texto del cierre varía, su extensión no) y una prueba compara el cuerpo del eslogan con el del
+  contrato. Gate visual a 0 px en manzanitas, glitch y graphic-line.
+- El equipo real en las fotos: roster `EFEONCE_TEAM_ROSTER_V1.md`, seis personas nuevas en `PERSONAS` de `foto:prompt`,
+  **identidades aprobadas por el operador** («Está perfecto, aprobado») sobre la ronda piloto
+  `ai-generations/2026-09-29_manzanitas-equipo/`. Queda pendiente sólo la aprobación visual de los carruseles de ejemplo.
+
 ## Delta 2026-09-29 — implementación
 
 - **Hecho:** catálogos `manzanitas-carousel`/`-stills` (18 plantillas, 26 piezas), mapper `planManzanitasIntent`,
