@@ -1,0 +1,20 @@
+{
+  "$comment": "Ejemplo de TASK-1939 (Marketing con Manzanitas). Fotos SINTÉTICAS: nunca se publica. Componer: pnpm manzanitas:compose -- --intent <este archivo>.",
+  "contract": "efeonce.manzanitas-register",
+  "version": "0.2.0",
+  "register": "marketing-con-manzanitas",
+  "channel": "podcast",
+  "topicLine": "voice",
+  "slides": [
+    {
+      "piece": "podcast-cover",
+      "voice": {
+        "question": "¿Cómo suena una marca que conversa?",
+        "answer": "Así",
+        "sub": "Pódcast · Ep. 12\nCon **Nombre del invitado**"
+      }
+    }
+  ],
+  "artifactId": "MCM-ejemplo-podcast-portada",
+  "example": true
+}

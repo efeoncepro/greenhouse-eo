@@ -321,6 +321,8 @@
     "glitch:compose": "tsx scripts/glitch/compose.ts",
     "glitch:editions": "tsx scripts/glitch/editions.ts",
     "glitch:tokens": "tsx scripts/glitch/compile-tokens.ts",
+    "manzanitas:compose": "tsx scripts/manzanitas/compose.ts",
+    "manzanitas:tokens": "tsx scripts/manzanitas/compile-tokens.ts",
     "foto:generar": "node scripts/foto/generar.mjs",
     "foto:lanyard": "node scripts/foto/lanyard.mjs",
     "tender:new": "node scripts/commercial/new-tender.mjs",

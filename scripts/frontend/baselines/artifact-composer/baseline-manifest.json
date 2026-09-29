@@ -193,6 +193,24 @@
     "templates-glitch/OverlayNewsReel.png": "961eb12a155faf693b7fa46d82fd55916581b7eae1cb5338555ce8dee9902e6f",
     "templates-glitch/OverlayNewsVlog.png": "b1dc2b0ab4006f5009bb9c0399293eb56f37de10079698001fdbbcf61d14a132",
     "templates-glitch/ReelCover.png": "d89a9bf775326d9e3bacfc6a38cc9b4d29a9e264ea089639491d17a0ef1ac675",
-    "templates-glitch/VideoThumbnail.png": "b257e058c06927aa482e42b2ad4bcb9bc2092aa9933613a288e6769f683943d0"
+    "templates-glitch/VideoThumbnail.png": "b257e058c06927aa482e42b2ad4bcb9bc2092aa9933613a288e6769f683943d0",
+    "templates-manzanitas/BackCover.png": "e691075d056bbe9527005da83bd3e8eac0199f2484ffaa3566c0e03a17ab6335",
+    "templates-manzanitas/BlogBanner.png": "d4908e143025efe5ce526b55b99f5e06b872dc457d061dac77bbacbecb8503a5",
+    "templates-manzanitas/ChartQuestion.png": "31b87af89e568f3806e19839745b28b94f3865ba823c02f14b4b270c0fda7289",
+    "templates-manzanitas/ChartVoice.png": "fff4cd60d9a18e917e162358d5f53472f72ec343ef42e304cc4ff0a328e0cde6",
+    "templates-manzanitas/CoverEscena.png": "6db3ef9f8c30561449040560fb037e2fdd540faefda237326da047f0d06a8b64",
+    "templates-manzanitas/CoverPizarra.png": "1f6f2ad1dcf0c76e57ae5286f30067f2c5006c3b24cc7cc37675910d1c457667",
+    "templates-manzanitas/DataApples.png": "df92e9b3d5d83ce5e5da6e549b5cb6cde771a79e0de49b5d45924483c8944052",
+    "templates-manzanitas/DenseComparison.png": "23cbff4d38fbc1350652622735ff37feb470eb37aabb06d92afbde0eab8d4707",
+    "templates-manzanitas/DenseConcept.png": "97e5713a99aabd34d1c017a5d3306f5d7c16ad01d0b157ffc224d6cc75af1c6c",
+    "templates-manzanitas/DenseSteps.png": "5844e759488e4fc75f8ae33542e8513bff6dee8db0e07f990b1e8de3fc0a022d",
+    "templates-manzanitas/InteriorEscena.png": "f69be3768c26a16c00efd3b30e221830b2d351e7e01f2a13e7855c465c43140c",
+    "templates-manzanitas/InteriorLente.png": "ce035ff5794b3a4e546498866179334ea536c778ce27ee7d7b5afb01eb47238e",
+    "templates-manzanitas/PodcastCover.png": "0bdaa2bd12b1afaee7b981493ca77c58822f1964b2e25d03ce643bb6d5080682",
+    "templates-manzanitas/StepPizarra.png": "8e240c096c95daf1036f557f060406237c8751d9d5022be9be967bb8f1eb8c73",
+    "templates-manzanitas/StoryClose.png": "0ed016f2445196be7275c7111cdf6a6b6b6a1c495c85dc04307f058843029d0d",
+    "templates-manzanitas/StoryEscena.png": "6e39ff6e2c46726a84fe7f38612506ef01ee997d36a2cbbc79d20d426727323d",
+    "templates-manzanitas/YoutubeClose.png": "174b6341aa79462921b815d2c941d7cc661679db3390308ba77294814080171e",
+    "templates-manzanitas/YoutubeThumbnail.png": "d5551f8f44a250ada3d65d8496c0f42a7e521c89d965952cf096fed813756922"
   }
 }

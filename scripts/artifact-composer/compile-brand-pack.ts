@@ -30,6 +30,12 @@ import {
   GLITCH_TOKENS_PATH
 } from '@/lib/artifact-composer/catalogs/glitch/compile-tokens'
 import {
+  buildManzanitasTokensCss,
+  syncManzanitasFontBinaries,
+  MANZANITAS_FONTS_PATH,
+  MANZANITAS_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/manzanitas/compile-tokens'
+import {
   buildInsightsReportTokensCss,
   syncReportFontBinaries,
   REPORT_FONTS_PATH,
@@ -121,6 +127,13 @@ const CATALOGS: {
     tokensPath: GLITCH_TOKENS_PATH,
     fontsPath: GLITCH_FONTS_PATH,
     syncFonts: syncGlitchFontBinaries
+  },
+  {
+    name: 'manzanitas',
+    build: buildManzanitasTokensCss,
+    tokensPath: MANZANITAS_TOKENS_PATH,
+    fontsPath: MANZANITAS_FONTS_PATH,
+    syncFonts: syncManzanitasFontBinaries
   }
 ]
 

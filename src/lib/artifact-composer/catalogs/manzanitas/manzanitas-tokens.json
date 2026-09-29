@@ -1,0 +1,789 @@
+{
+  "source": {
+    "package": "@efeoncepro/axis-tokens",
+    "export": "manzanitasRegister",
+    "versions": {
+      "@efeoncepro/axis-tokens": "0.3.28",
+      "@efeoncepro/axis-brand-assets": "0.4.1",
+      "@efeoncepro/axis-graphic-line": "0.10.1",
+      "@efeoncepro/axis-ui-contracts": "0.3.28"
+    }
+  },
+  "register": "marketing-con-manzanitas",
+  "status": "candidate",
+  "pieces": {
+    "cover-pizarra": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "wordmark",
+        "x": 80,
+        "y": 76,
+        "w": 180,
+        "h": 48
+      },
+      "swipe": {
+        "y": 1033,
+        "state": "rest"
+      },
+      "bigApple": true,
+      "signature": "carousel"
+    },
+    "cover-pizarra-swipe-response": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "wordmark",
+        "x": 80,
+        "y": 76,
+        "w": 180,
+        "h": 48
+      },
+      "swipe": {
+        "y": 1033,
+        "state": "response"
+      },
+      "bigApple": true,
+      "signature": "carousel",
+      "exception": "one-sphere-per-piece"
+    },
+    "cover-escena": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "escena",
+      "role": "cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 64,
+        "w": 180,
+        "h": 81
+      },
+      "swipe": {
+        "y": 1033,
+        "state": "rest"
+      },
+      "photo": true,
+      "signature": "carousel"
+    },
+    "step-pizarra": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "interior",
+      "surfaces": [
+        "paper"
+      ],
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "data-apples-of-ten": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "data",
+      "surfaces": [
+        "paper"
+      ],
+      "masthead": {
+        "asset": "wordmark",
+        "x": 80,
+        "y": 72,
+        "w": 240,
+        "h": 64
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "data": {
+        "kind": "value",
+        "range": [
+          0,
+          10
+        ]
+      },
+      "source": true,
+      "signature": "carousel"
+    },
+    "interior-escena": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "escena",
+      "role": "interior",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 64,
+        "w": 160,
+        "h": 72
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "photo": true,
+      "signature": "carousel"
+    },
+    "interior-lente": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "lente",
+      "role": "interior",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 160,
+        "h": 72
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "photo": true,
+      "signature": "carousel"
+    },
+    "chart-measure": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "data",
+      "surfaces": [
+        "navy"
+      ],
+      "chart": "measure",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "chart-ranking": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "data",
+      "surfaces": [
+        "paper"
+      ],
+      "chart": "ranking",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "chart-before-after": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "data",
+      "surfaces": [
+        "paper"
+      ],
+      "chart": "before-after",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "chart-trend": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "data",
+      "surfaces": [
+        "navy"
+      ],
+      "chart": "trend",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "chart-parts": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "data",
+      "surfaces": [
+        "paper"
+      ],
+      "chart": "parts",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "chart-per-hundred": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "data",
+      "surfaces": [
+        "navy"
+      ],
+      "chart": "per-hundred",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "chart-venn-3": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "interior",
+      "surfaces": [
+        "paper"
+      ],
+      "chart": "venn-3",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "chart-matrix-2x2": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "interior",
+      "surfaces": [
+        "navy"
+      ],
+      "chart": "matrix-2x2",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "chart-funnel": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "data",
+      "surfaces": [
+        "paper"
+      ],
+      "chart": "funnel",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "dense-concept": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "interior",
+      "surfaces": [
+        "paper"
+      ],
+      "denseText": "concept-three-points",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "dense-comparison": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "interior",
+      "surfaces": [
+        "navy"
+      ],
+      "denseText": "comparison-two-columns",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "dense-steps": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "interior",
+      "surfaces": [
+        "paper"
+      ],
+      "denseText": "step-by-step",
+      "masthead": {
+        "asset": "logo",
+        "x": 80,
+        "y": 72,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": {
+        "y": 985,
+        "state": "rest"
+      },
+      "signature": "carousel"
+    },
+    "back-cover-a": {
+      "status": "approved",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "back-cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "wordmark",
+        "x": 80,
+        "y": 76,
+        "w": 180,
+        "h": 48
+      },
+      "swipe": null,
+      "bigApple": true,
+      "slogan": true,
+      "signature": "close-lockup"
+    },
+    "close-generic": {
+      "status": "superseded",
+      "supersededBy": "back-cover-a",
+      "channel": "carousel",
+      "canvas": "carousel-4x5",
+      "format": "pizarra",
+      "role": "back-cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "wordmark",
+        "x": 80,
+        "y": 76,
+        "w": 180,
+        "h": 48
+      },
+      "swipe": null,
+      "slogan": true,
+      "signature": "close-lockup"
+    },
+    "story-escena": {
+      "status": "approved",
+      "channel": "story",
+      "canvas": "story-9x16",
+      "format": "escena",
+      "role": "cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "logo",
+        "x": 108,
+        "y": 262,
+        "w": 180,
+        "h": 81
+      },
+      "swipe": null,
+      "photo": true,
+      "signature": {
+        "logoY": 1619,
+        "w": 216,
+        "h": 51,
+        "align": "center"
+      }
+    },
+    "story-close": {
+      "status": "approved",
+      "channel": "story",
+      "canvas": "story-9x16",
+      "format": "pizarra",
+      "role": "back-cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "logo",
+        "x": 108,
+        "y": 262,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": null,
+      "slogan": true,
+      "signature": "close-lockup",
+      "copyProvisional": "story-close-copy"
+    },
+    "blog-banner-escena": {
+      "status": "approved",
+      "channel": "blog",
+      "canvas": "blog-1200x630",
+      "format": "escena",
+      "role": "cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "logo",
+        "x": 72,
+        "y": 50,
+        "w": 180,
+        "h": 81
+      },
+      "swipe": null,
+      "photo": true,
+      "signature": {
+        "x": 72,
+        "y": 536,
+        "w": 157,
+        "h": 37,
+        "align": "start"
+      }
+    },
+    "youtube-thumbnail": {
+      "status": "approved",
+      "channel": "youtube",
+      "canvas": "youtube-16x9",
+      "format": "escena",
+      "role": "cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "logo",
+        "x": 72,
+        "y": 56,
+        "w": 200,
+        "h": 90
+      },
+      "swipe": null,
+      "photo": true,
+      "signature": {
+        "x": 72,
+        "y": 612,
+        "w": 180,
+        "h": 43,
+        "align": "start"
+      }
+    },
+    "youtube-close": {
+      "status": "approved",
+      "channel": "youtube",
+      "canvas": "youtube-16x9",
+      "format": "pizarra",
+      "role": "back-cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": null,
+      "swipe": null,
+      "slogan": true,
+      "signature": "close-lockup"
+    },
+    "podcast-cover": {
+      "status": "approved",
+      "channel": "podcast",
+      "canvas": "podcast-1x1",
+      "format": "pizarra",
+      "role": "cover",
+      "surfaces": [
+        "navy"
+      ],
+      "masthead": {
+        "asset": "wordmark",
+        "x": 80,
+        "y": 72,
+        "w": 420,
+        "h": 112
+      },
+      "swipe": null,
+      "signature": {
+        "logoY": 932,
+        "w": 216,
+        "h": 51,
+        "align": "center"
+      }
+    }
+  },
+  "canvases": {
+    "carousel-4x5": {
+      "w": 1080,
+      "h": 1350
+    },
+    "story-9x16": {
+      "w": 1080,
+      "h": 1920,
+      "safeArea": {
+        "inline": "10%",
+        "block": "13%",
+        "minimum": "1rem"
+      }
+    },
+    "blog-1200x630": {
+      "w": 1200,
+      "h": 630
+    },
+    "youtube-16x9": {
+      "w": 1280,
+      "h": 720
+    },
+    "podcast-1x1": {
+      "w": 1080,
+      "h": 1080
+    }
+  },
+  "topicLine": {
+    "selectors": 1,
+    "decidedBy": "topic",
+    "measured": [
+      "growth",
+      "brand",
+      "engine",
+      "voice",
+      "revenue-hubspot"
+    ],
+    "decided": [
+      "revenue-salesforce"
+    ],
+    "unreviewed": [],
+    "revenueByPlatform": {
+      "salesforce": "revenue-salesforce",
+      "hubspot": "revenue-hubspot",
+      "default": "revenue-hubspot"
+    },
+    "examples": {
+      "ai-visibility": "engine",
+      "creativity": "brand",
+      "salesforce-crm": "revenue-salesforce",
+      "hubspot-crm": "revenue-hubspot"
+    }
+  },
+  "lines": [
+    {
+      "key": "growth",
+      "sloganWord": "Growth",
+      "accentOnLight": "#0e8c82",
+      "accentOnDark": "#36c8bf"
+    },
+    {
+      "key": "brand",
+      "sloganWord": "Brand",
+      "accentOnLight": "#bb1954",
+      "accentOnDark": "#ff6500"
+    },
+    {
+      "key": "engine",
+      "sloganWord": "Engine",
+      "accentOnLight": "#0375db",
+      "accentOnDark": "#0375db"
+    },
+    {
+      "key": "voice",
+      "sloganWord": "Voice",
+      "accentOnLight": "#f83902",
+      "accentOnDark": "#f83902"
+    },
+    {
+      "key": "revenue-hubspot",
+      "sloganWord": "Revenue",
+      "accentOnLight": "#8e1b82",
+      "accentOnDark": "#e86bd0"
+    },
+    {
+      "key": "revenue-salesforce",
+      "sloganWord": "Revenue",
+      "accentOnLight": "#00739e",
+      "accentOnDark": "#2fb8ff"
+    }
+  ],
+  "swipe": {
+    "voiceByLine": {
+      "growth": "stroke",
+      "brand": "plastilina",
+      "engine": "stroke",
+      "voice": null,
+      "revenue-hubspot": "stroke",
+      "revenue-salesforce": "stroke"
+    },
+    "lineOverrides": {
+      "voice": "stroke"
+    },
+    "glyphs": {
+      "stroke": "swipe",
+      "plastilina": "mano"
+    }
+  },
+  "pendingDecisions": [
+    {
+      "id": "story-close-copy",
+      "blocks": null,
+      "provisional": "El copy de cierre de la story es provisional («Guárdala»)."
+    },
+    {
+      "id": "cine-team-people-social",
+      "blocks": null,
+      "provisional": "Ningún ejemplo usa personas reales del equipo en cine."
+    },
+    {
+      "id": "stroke-republicar-enviar",
+      "blocks": null,
+      "provisional": "Los Trazo «republicar» y «enviar» no entran al catálogo."
+    }
+  ],
+  "voiceGeometry": {
+    "questionOfAnswer": 0.296875,
+    "ringOfQuestion": 0.42,
+    "ringGapOfQuestion": 0.35,
+    "answerGapOfQuestion": 0.25,
+    "answerLineHeight": 0.95,
+    "answerWidth": 96,
+    "answerOpticalSize": 88,
+    "questionLineHeight": 1.25
+  },
+  "sphereGapEm": {
+    "byLetter": {
+      "r": -0.02,
+      "a": 0.03,
+      "s": 0.03,
+      "i": 0.03,
+      "z": 0.03,
+      "o": 0.035,
+      "n": 0.035,
+      "e": 0.035,
+      "d": 0.035,
+      "x": 0.02,
+      "t": 0
+    },
+    "default": 0.03
+  }
+}

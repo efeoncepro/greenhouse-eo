@@ -1,0 +1,81 @@
+{
+  "$comment": "Ejemplo de TASK-1939 (Marketing con Manzanitas). Fotos SINTÉTICAS: nunca se publica. Componer: pnpm manzanitas:compose -- --intent <este archivo>.",
+  "contract": "efeonce.manzanitas-register",
+  "version": "0.2.0",
+  "register": "marketing-con-manzanitas",
+  "channel": "carousel",
+  "topicLine": "revenue-hubspot",
+  "slides": [
+    {
+      "piece": "cover-pizarra",
+      "voice": {
+        "question": "¿Tu CRM sabe lo que la IA sabe de ti?",
+        "answer": "Aún no"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "chart-per-hundred",
+      "voice": {
+        "question": "¿Cuántos llegan ya informados?",
+        "answer": "58 de 100"
+      },
+      "chart": {
+        "value": 58,
+        "source": "[FUENTE, AÑO]",
+        "illustrative": true
+      },
+      "swipe": true
+    },
+    {
+      "piece": "chart-venn-3",
+      "voice": {
+        "question": "¿Dónde está tu oportunidad?",
+        "answer": "Al centro"
+      },
+      "chart": {
+        "labels": [
+          "Lo que tu cliente pregunta",
+          "Lo que publicas",
+          "Lo que la IA sabe de ti"
+        ]
+      },
+      "swipe": true
+    },
+    {
+      "piece": "interior-escena",
+      "voice": {
+        "question": "¿Quién atiende ese lead?",
+        "answer": "Ventas"
+      },
+      "photo": {
+        "register": "cine",
+        "lightId": "sesion-1",
+        "subject": "Una ejecutiva revisa una ficha de cliente en su laptop",
+        "alt": "Ejecutiva revisando la ficha de un cliente",
+        "path": "fotos/escena-4x5.svg"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "step-pizarra",
+      "voice": {
+        "question": "¿Qué le pregunta primero?",
+        "answer": "Qué leyó"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "back-cover-a",
+      "voice": {
+        "question": "¿Lo registras en el CRM?",
+        "answer": "Anótalo",
+        "sub": "En los comentarios: cuéntanos cómo lo registras."
+      },
+      "slogan": true,
+      "conversions": 1
+    }
+  ],
+  "artifactId": "MCM-ejemplo-carrusel-voz-revenue-hubspot",
+  "example": true
+}

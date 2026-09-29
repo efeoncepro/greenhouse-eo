@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Marketing con Manzanitas · Paso</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="manzanitas-tokens.css" />
+<link rel="stylesheet" href="manzanitas.css" />
+<style>
+.mcm-step .mcm-masthead { left: 80px; top: 72px; width: 200px; height: 90px; }
+.mcm-step .mcm-step__number { position: absolute; left: 440px; top: 372px; width: 400px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.mcm-step .mcm-step__numeral { font-family: var(--mcm-answer-family), sans-serif; font-weight: 300; font-size: 205px; line-height: 0.95; letter-spacing: -0.02em; color: var(--mcm-ink); }
+.mcm-step .mcm-step__label { font-size: 26px; }
+.mcm-step .mcm-voice { --mcm-answer-px: 140px; --mcm-voice-left: 80px; left: 80px; top: 880px; width: 920px; }
+.mcm-step .mcm-sub { margin-top: 22px; font-size: 24px; }
+</style>
+</head>
+<body>
+<main class="mcm-canvas mcm-canvas--4x5 mcm-tone-paper mcm-line-engine mcm-step mcm-grid" data-mcm-root data-slot="theme">
+  <div class="mcm-layer" data-slot="orbit"><img data-slot-field="src" src="assets/manzanitas-apple-paper-engine.svg" alt="" /></div>
+  <img class="mcm-masthead" data-mcm-masthead src="assets/manzanitas-logo-positive-engine.svg" alt="Marketing con Manzanitas" />
+  <div class="mcm-step__number" data-slot="step"><span class="mcm-step__numeral" data-slot-field="numeral">01</span><span class="mcm-label mcm-step__label" data-slot-field="label">Paso 1 de 3</span></div>
+  <div class="mcm-voice mcm-voice--beside-swipe" data-slot="voice">
+    <p class="mcm-q mcm-q--one-line"><span class="mcm-ring" aria-hidden="true"></span><span data-slot-field="question">¿La pregunta?</span></p>
+    <p class="mcm-a"><span data-slot-field="answer">Respuesta</span><span class="mcm-sphere" aria-hidden="true"></span></p>
+    <p class="mcm-sub" data-slot="sub">La bajada con <strong>lo importante</strong>.</p>
+  </div>
+  <img class="mcm-swipe mcm-swipe--interior" data-mcm-swipe src="assets/swipe-rest-paper-engine.svg" alt="Desliza" />
+  <img class="mcm-signature mcm-signature--carousel" data-mcm-signature src="assets/efeonce-logo-positive.svg" alt="Efeonce" />
+</main>
+</body>
+</html>

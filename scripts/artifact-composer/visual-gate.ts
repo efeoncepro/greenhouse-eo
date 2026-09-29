@@ -9,6 +9,8 @@
  *   pnpm composer:visual-gate --catalog=graphic-line --freeze
  *   pnpm composer:visual-gate --catalog=glitch              # gate aislado de los catálogos de Glitch (TASK-1923)
  *   pnpm composer:visual-gate --catalog=glitch --freeze
+ *   pnpm composer:visual-gate --catalog=manzanitas          # gate aislado de Marketing con Manzanitas (TASK-1939)
+ *   pnpm composer:visual-gate --catalog=manzanitas --freeze
  *   pnpm composer:visual-gate --freeze                      # congela/re-promueve el baseline completo
  *
  * Por qué existe: las tres operaciones centrales de TASK-1393 (tokenizar 80 bases de color, mover
@@ -39,6 +41,8 @@ import path from 'node:path'
 
 import type { Browser } from 'playwright'
 
+import { lensRecipe, orbitSvg } from '@efeoncepro/axis-graphic-line'
+
 import { evaluatePromotion, sealUnsealedSections } from './baseline-deltas-ledger'
 
 // Barrel del primitive — cero deep-imports (TASK-1393: el motor vive en artifact-composer/).
@@ -62,12 +66,15 @@ import {
 } from '@/lib/artifact-composer/catalogs/graphic-line-overlays'
 import { createCatalog as createGraphicLineStills, graphicLineStillsCatalogDir } from '@/lib/artifact-composer/catalogs/graphic-line-stills'
 import { createGlitchStillsCatalog, glitchCatalogDir } from '@/lib/artifact-composer/catalogs/glitch'
+import { createManzanitasStillsCatalog, manzanitasCatalogDir } from '@/lib/artifact-composer/catalogs/manzanitas'
+import { MANZANITAS_STEP_ORBIT } from '@/lib/manzanitas-composition'
 import {
   auditGraphicLineRendered,
   type RenderedAuditViolation
 } from '@/lib/artifact-composer/catalogs/graphic-line-shared/rendered-audit'
 
 import { greenhouseCtaPainter, greenhouseSelectionPainter } from '../brand-surfaces/compose'
+import { manzanitasChartPainter } from '../manzanitas/painters'
 
 import { compareImages, loadPng } from '../frontend/lib/visual-diff'
 
@@ -121,6 +128,27 @@ const GLITCH_PROBE_ASSETS: Readonly<Record<string, string>> = {
   )
 }
 
+/**
+ * Marketing con Manzanitas (TASK-1939): una sola entrada para sus dos catálogos, que comparten carpeta y registry (el
+ * probe fotografía las 18 plantillas con los mismos resolvers, el painter de gráficos y el hook del eslogan). La foto
+ * llega como `asset-ref:photo:probe` (un SVG sintético, nunca una foto real: ISSUE-122 no aplica); la Lente y la órbita
+ * del paso se pintan con `@efeoncepro/axis-graphic-line` sobre esa misma foto sintética, como lo hace el comando.
+ */
+const MANZANITAS_PROBE_PHOTO = svgDataUri(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350"><rect width="1080" height="1350" fill="#0b1a2b"/><circle cx="540" cy="560" r="170" fill="#8aa1b4"/><rect x="330" y="760" width="420" height="590" rx="150" fill="#5b7488"/><rect x="0" y="1080" width="1080" height="270" fill="#1d2a38"/></svg>'
+)
+
+const MANZANITAS_PROBE_ASSETS: Readonly<Record<string, string>> = {
+  'photo:probe': MANZANITAS_PROBE_PHOTO,
+  'lens:probe': svgDataUri(
+    lensRecipe('post', { photoId: 'photo', photoSrc: MANZANITAS_PROBE_PHOTO, alt: 'Foto sintética del probe', question: '', answer: '', line: 'engine', surface: 'dark' }).svg.replace(
+      /<image data-axis-part="signature"[^>]*\/>/,
+      ''
+    )
+  ),
+  'orbit:probe': svgDataUri(orbitSvg({ width: 1080, height: 1350, circle: MANZANITAS_STEP_ORBIT, line: 'engine', surface: 'light', channel: 'social', halo: false }).svg)
+}
+
 const painters = { selectionPainter: greenhouseSelectionPainter, ctaPainter: greenhouseCtaPainter }
 
 const PROBE_CATALOGS = [
@@ -134,18 +162,30 @@ const PROBE_CATALOGS = [
     dir: graphicLineOverlaysCatalogDir,
     frameDir: 'templates-graphic-line-overlays'
   },
-  { catalog: { ...createGlitchStillsCatalog(), externalAssets: GLITCH_PROBE_ASSETS }, dir: glitchCatalogDir, frameDir: 'templates-glitch' }
+  { catalog: { ...createGlitchStillsCatalog(), externalAssets: GLITCH_PROBE_ASSETS }, dir: glitchCatalogDir, frameDir: 'templates-glitch' },
+  {
+    catalog: { ...createManzanitasStillsCatalog({ chartPainter: manzanitasChartPainter }), externalAssets: MANZANITAS_PROBE_ASSETS },
+    dir: manzanitasCatalogDir,
+    frameDir: 'templates-manzanitas'
+  }
 ]
 
-type CatalogScope = 'all' | 'insights' | 'graphic-line' | 'glitch'
+type CatalogScope = 'all' | 'insights' | 'graphic-line' | 'glitch' | 'manzanitas'
 
 const SCOPE_FRAME_PREFIXES: Record<Exclude<CatalogScope, 'all'>, string> = {
   insights: 'templates-insights-',
   'graphic-line': 'templates-graphic-line-',
-  glitch: 'templates-glitch'
+  glitch: 'templates-glitch',
+  manzanitas: 'templates-manzanitas'
 }
 
-const SCOPE_LABEL: Record<CatalogScope, string> = { all: 'el set completo', insights: 'Insights', 'graphic-line': 'La órbita', glitch: 'Glitch' }
+const SCOPE_LABEL: Record<CatalogScope, string> = {
+  all: 'el set completo',
+  insights: 'Insights',
+  'graphic-line': 'La órbita',
+  glitch: 'Glitch',
+  manzanitas: 'Marketing con Manzanitas'
+}
 
 const frameInScope = (frame: string, scope: CatalogScope): boolean =>
   scope === 'all' || frame.startsWith(SCOPE_FRAME_PREFIXES[scope])
@@ -734,8 +774,8 @@ const main = async (): Promise<void> => {
   const args = process.argv.slice(2)
   const catalogArg = args.find(arg => arg.startsWith('--catalog='))?.slice('--catalog='.length) ?? 'all'
 
-  if (catalogArg !== 'all' && catalogArg !== 'insights' && catalogArg !== 'graphic-line' && catalogArg !== 'glitch') {
-    console.error(`✗ Catálogo desconocido: ${catalogArg}. Usa --catalog=all, --catalog=insights, --catalog=graphic-line o --catalog=glitch.\n`)
+  if (catalogArg !== 'all' && catalogArg !== 'insights' && catalogArg !== 'graphic-line' && catalogArg !== 'glitch' && catalogArg !== 'manzanitas') {
+    console.error(`✗ Catálogo desconocido: ${catalogArg}. Usa --catalog=all, --catalog=insights, --catalog=graphic-line, --catalog=glitch o --catalog=manzanitas.\n`)
     process.exit(1)
   }
 

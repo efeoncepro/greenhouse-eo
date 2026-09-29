@@ -1,0 +1,26 @@
+{
+  "$comment": "Ejemplo de TASK-1939 (Marketing con Manzanitas). Fotos SINTÉTICAS: nunca se publica. Componer: pnpm manzanitas:compose -- --intent <este archivo>.",
+  "contract": "efeonce.manzanitas-register",
+  "version": "0.2.0",
+  "register": "marketing-con-manzanitas",
+  "channel": "story",
+  "topicLine": "engine",
+  "slides": [
+    {
+      "piece": "story-escena",
+      "voice": {
+        "question": "¿Te nombra la IA?",
+        "answer": "Búscate"
+      },
+      "photo": {
+        "register": "cine",
+        "lightId": "sesion-1",
+        "subject": "Una persona pregunta algo a su teléfono junto a la ventana",
+        "alt": "Persona mirando su teléfono junto a la ventana",
+        "path": "fotos/escena-9x16.svg"
+      }
+    }
+  ],
+  "artifactId": "MCM-ejemplo-story-escena",
+  "example": true
+}

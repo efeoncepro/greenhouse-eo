@@ -239,6 +239,42 @@
       "embedRights": true,
       "source": "Guttery.otf instalado en el equipo del operador (contornos TrueType). El operador autorizó el 2026-09-27 que entre al repo privado y se embeba en PDF/PNG de Glitch; sólo para las muletillas del narrador (extensión glitch, TASK-1923: sólo Glitch)",
       "extension": "glitch"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "weight": "200 800",
+      "style": "normal",
+      "file": "fonts/bricolage-grotesque-variable.ttf",
+      "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682",
+      "bytes": 408496,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Mismo archivo variable de la extensión graphic-line, declarado con su rango de pesos para Marketing con Manzanitas: respuesta 760 con wdth 96 y opsz 88, y el numeral del paso en 300 (extensión manzanitas, TASK-1939: sólo MCM)",
+      "extension": "manzanitas"
+    },
+    {
+      "family": "Poppins",
+      "weight": 400,
+      "style": "normal",
+      "file": "fonts/poppins-400.ttf",
+      "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a",
+      "bytes": 158240,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Copia de la entrada graphic-line (extensión manzanitas, TASK-1939: sólo MCM)",
+      "extension": "manzanitas"
+    },
+    {
+      "family": "Poppins",
+      "weight": 500,
+      "style": "normal",
+      "file": "fonts/poppins-500.ttf",
+      "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016",
+      "bytes": 152860,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Copia de la entrada graphic-line (extensión manzanitas, TASK-1939: sólo MCM)",
+      "extension": "manzanitas"
     }
   ]
 }

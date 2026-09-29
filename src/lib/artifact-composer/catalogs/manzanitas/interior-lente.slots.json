@@ -1,0 +1,91 @@
+{
+  "template": "InteriorLente",
+  "version": "0.1",
+  "viewport": {
+    "width": 1080,
+    "height": 1350
+  },
+  "slots": {
+    "theme": {
+      "selector": "[data-slot='theme']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "mcm-line",
+          "consumer": "resolver-only",
+          "example": "engine"
+        },
+        "tone": {
+          "type": "string",
+          "required": true,
+          "resolver": "mcm-tone",
+          "consumer": "resolver-only",
+          "example": "navy"
+        },
+        "masthead": {
+          "type": "string",
+          "required": true,
+          "resolver": "mcm-masthead",
+          "consumer": "resolver-only",
+          "example": "manzanitas-logo-negative-engine"
+        },
+        "signature": {
+          "type": "string",
+          "required": true,
+          "resolver": "mcm-signature",
+          "consumer": "resolver-only",
+          "example": "efeonce-logo-negative"
+        },
+        "swipe": {
+          "type": "string",
+          "required": true,
+          "resolver": "mcm-swipe",
+          "consumer": "resolver-only",
+          "example": "swipe-rest-navy-engine"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 40,
+          "example": "¿Probaste más de un camino?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 14,
+          "example": "Explorar"
+        }
+      }
+    },
+    "lens": {
+      "selector": "[data-slot='lens']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "mcm-lens-ref",
+          "example": "asset-ref:lens:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 240,
+          "resolver": "mcm-alt",
+          "example": "Foto en registro cine con la lente sobre el detalle."
+        }
+      }
+    }
+  }
+}

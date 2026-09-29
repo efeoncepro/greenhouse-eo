@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Marketing con Manzanitas · Dato de diez</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="manzanitas-tokens.css" />
+<link rel="stylesheet" href="manzanitas.css" />
+<style>
+.mcm-apples-slide .mcm-masthead { left: 80px; top: 72px; width: 240px; height: 64px; }
+.mcm-apples-slide .mcm-apples { position: absolute; left: 80px; top: 216px; width: 920px; display: flex; flex-direction: column; gap: 34px; }
+.mcm-apples-slide .mcm-apples__row { display: flex; justify-content: space-between; }
+.mcm-apples-slide .mcm-apples__row img { display: block; width: 166.9px; height: 180px; }
+.mcm-apples-slide .mcm-voice { --mcm-answer-px: 160px; --mcm-voice-left: 80px; left: 80px; top: 800px; width: 920px; }
+.mcm-apples-slide .mcm-sub { margin-top: 22px; font-size: var(--mcm-chart-source-px); }
+</style>
+</head>
+<body>
+<main class="mcm-canvas mcm-canvas--4x5 mcm-tone-paper mcm-line-engine mcm-apples-slide" data-mcm-root data-slot="theme">
+  <img class="mcm-masthead" data-mcm-masthead src="assets/manzanitas-wordmark-positive.svg" alt="Marketing con Manzanitas" />
+  <div class="mcm-apples" role="img" data-slot="apples" aria-label="3 de 10 manzanas destacadas">
+    <div class="mcm-apples__row"><img data-mcm-apple-unit="1" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /><img data-mcm-apple-unit="2" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /><img data-mcm-apple-unit="3" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /><img data-mcm-apple-unit="4" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /><img data-mcm-apple-unit="5" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /></div>
+    <div class="mcm-apples__row"><img data-mcm-apple-unit="6" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /><img data-mcm-apple-unit="7" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /><img data-mcm-apple-unit="8" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /><img data-mcm-apple-unit="9" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /><img data-mcm-apple-unit="10" src="assets/manzanitas-apple-neutral-paper.svg" alt="" /></div>
+  </div>
+  <div class="mcm-voice mcm-voice--beside-swipe" data-slot="voice">
+    <p class="mcm-q"><span class="mcm-ring" aria-hidden="true"></span><span data-slot-field="question">¿La pregunta?</span></p>
+    <p class="mcm-a"><span data-slot-field="answer">Respuesta</span><span class="mcm-sphere" aria-hidden="true"></span></p>
+    <p class="mcm-sub" data-slot="sub">La bajada con <strong>lo importante</strong>.</p>
+  </div>
+  <img class="mcm-swipe mcm-swipe--interior" data-mcm-swipe src="assets/swipe-rest-paper-engine.svg" alt="Desliza" />
+  <img class="mcm-signature mcm-signature--carousel" data-mcm-signature src="assets/efeonce-logo-positive.svg" alt="Efeonce" />
+</main>
+</body>
+</html>

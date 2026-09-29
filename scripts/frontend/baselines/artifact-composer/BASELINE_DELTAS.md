@@ -1,5 +1,41 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-29 (r) — TASK-1939: catálogo Marketing con Manzanitas (18 plantillas nuevas)
+
+<!-- sealed-by-freeze: bc3b60603b00415eed249a37ef87596354dba007dca1025d64bd16dfc0467573 -->
+
+El registro Marketing con Manzanitas (aprobado completo por el operador el 2026-09-28, canvas v39; publicado en AXIS
+`axis-tokens` 0.3.28 y `axis-ui-contracts` 0.3.28, contrato `efeonce.manzanitas-register` 0.2.0) compone en dos catálogos
+delgados sobre una sola carpeta: `manzanitas-carousel` (PDF) y `manzanitas-stills` (PNG). Las 18 plantillas pintan las 26
+piezas aprobadas; los valores salen de `manzanitas-tokens.css` (compilado por `pnpm manzanitas:tokens`), los gráficos los
+pinta `manzanitasChartSvg` desde el dato y la Lente y la órbita del paso las pinta `@efeoncepro/axis-graphic-line`. Los
+frames nuevos son el probe de cada plantilla (foto sintética del gate, nunca una foto real: ISSUE-122 no aplica).
+
+Diferencias con el canvas v39, todas regla del operador o falla cerrada, no estética: el eslogan de los tres cierres va
+**debajo** del logo y al 64 % de su ancho (regla del 2026-09-29; el cierre de YouTube del canvas lo tenía encima), con la
+palabra de la línea en la tinta cuando el cuerpo queda bajo 24 px; la respuesta va en una línea y, donde comparte línea
+con el «Desliza», le deja su espacio; en las láminas con contenido fijo bajo la voz la pregunta va en una línea. Las tres
+reglas fallan cerradas (el motor mide el recorte) y las prueba `manzanitas-fit.test.ts`.
+
+- `templates-manzanitas/CoverPizarra.png` — 🆕 mcm.cover.pizarra: portada Pizarra con la manzana grande y el «Desliza» (cover-pizarra, cover-pizarra-swipe-response)
+- `templates-manzanitas/CoverEscena.png` — 🆕 mcm.cover.escena: portada con foto a sangre (cover-escena)
+- `templates-manzanitas/StepPizarra.png` — 🆕 mcm.step: el paso sobre la cuadrícula con la órbita que cuenta (step-pizarra)
+- `templates-manzanitas/DataApples.png` — 🆕 mcm.data.apples: el dato en manzanas de diez (data-apples-of-ten)
+- `templates-manzanitas/InteriorEscena.png` — 🆕 mcm.interior.escena: interior con foto y «Paso n de N» (interior-escena)
+- `templates-manzanitas/InteriorLente.png` — 🆕 mcm.interior.lente: la Lente de La órbita sobre la foto (interior-lente)
+- `templates-manzanitas/ChartVoice.png` — 🆕 mcm.chart.*: los siete gráficos con voz; el probe pinta «De cada 100» (chart-ranking … chart-funnel)
+- `templates-manzanitas/ChartQuestion.png` — 🆕 mcm.chart.measure / trend: sólo la pregunta, la esfera es el dato (chart-measure, chart-trend)
+- `templates-manzanitas/DenseConcept.png` — 🆕 mcm.dense.concept: concepto y tres puntos (dense-concept)
+- `templates-manzanitas/DenseComparison.png` — 🆕 mcm.dense.comparison: comparación en dos columnas (dense-comparison)
+- `templates-manzanitas/DenseSteps.png` — 🆕 mcm.dense.steps: paso a paso (dense-steps)
+- `templates-manzanitas/BackCover.png` — 🆕 mcm.back.a: contraportada A que conversa, con el eslogan debajo del logo (back-cover-a)
+- `templates-manzanitas/StoryEscena.png` — 🆕 mcm.story.escena: la story con foto (story-escena)
+- `templates-manzanitas/StoryClose.png` — 🆕 mcm.story.close: la story de cierre en Pizarra (story-close)
+- `templates-manzanitas/BlogBanner.png` — 🆕 mcm.blog.banner: el banner del blog con foto (blog-banner-escena)
+- `templates-manzanitas/YoutubeThumbnail.png` — 🆕 mcm.youtube.thumbnail: la miniatura con foto (youtube-thumbnail)
+- `templates-manzanitas/YoutubeClose.png` — 🆕 mcm.youtube.close: el cierre del video, logo con el eslogan debajo (youtube-close)
+- `templates-manzanitas/PodcastCover.png` — 🆕 mcm.podcast.cover: la portada del pódcast (podcast-cover)
+
 ## 2026-09-28 (q) — Glitch: la muletilla del cierre del video pasa a ser dato del manifiesto
 
 <!-- sealed-by-freeze: fbc50aba79536e19868dd075e0ba4d5c982e568d20e7fc5c97c1de0d81ca3ca4 -->
@@ -949,7 +985,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: fbc50aba79536e19868dd075e0ba4d5c982e568d20e7fc5c97c1de0d81ca3ca4 -->
+<!-- manifest-digest: bc3b60603b00415eed249a37ef87596354dba007dca1025d64bd16dfc0467573 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Marketing con Manzanitas · Concepto y tres puntos</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="manzanitas-tokens.css" />
+<link rel="stylesheet" href="manzanitas.css" />
+<style>
+.mcm-dense-concept .mcm-masthead { left: 80px; top: 72px; width: 200px; height: 90px; }
+.mcm-dense-concept .mcm-voice { --mcm-answer-px: var(--mcm-dense-answer-px); left: 80px; top: var(--mcm-dense-voice-top); width: 820px; }
+.mcm-dense-concept .mcm-paragraph { left: 80px; top: var(--mcm-concept-paragraph-top); width: 920px; font-size: var(--mcm-concept-paragraph-px); font-weight: 400; line-height: var(--mcm-concept-paragraph-lh); text-wrap: pretty; }
+.mcm-dense-concept .mcm-points { left: 80px; top: var(--mcm-concept-points-top); width: 840px; display: flex; flex-direction: column; gap: var(--mcm-concept-points-gap); }
+</style>
+</head>
+<body>
+<main class="mcm-canvas mcm-canvas--4x5 mcm-tone-paper mcm-line-engine mcm-dense-concept" data-mcm-root data-slot="theme">
+  <img class="mcm-masthead" data-mcm-masthead src="assets/manzanitas-logo-positive-engine.svg" alt="Marketing con Manzanitas" />
+  <div class="mcm-voice" data-slot="voice">
+    <p class="mcm-q mcm-q--one-line"><span class="mcm-ring" aria-hidden="true"></span><span data-slot-field="question">¿La pregunta?</span></p>
+    <p class="mcm-a"><span data-slot-field="answer">Respuesta</span><span class="mcm-sphere" aria-hidden="true"></span></p>
+  </div>
+  <p class="mcm-dense mcm-paragraph" data-slot="paragraph">El párrafo que define la idea, con <strong>lo importante</strong> en negrita.</p>
+  <div class="mcm-dense mcm-points" data-slot="points">
+      <div class="mcm-point"><span class="mcm-numeral" data-slot-field="n">1</span><div class="mcm-point__text"><span class="mcm-point__title" data-slot-field="title">Título</span><span class="mcm-point__body" data-slot-field="body">Cuerpo del punto.</span></div></div>
+  </div>
+  <img class="mcm-swipe mcm-swipe--interior" data-mcm-swipe src="assets/swipe-rest-paper-engine.svg" alt="Desliza" />
+  <img class="mcm-signature mcm-signature--carousel" data-mcm-signature src="assets/efeonce-logo-positive.svg" alt="Efeonce" />
+</main>
+</body>
+</html>

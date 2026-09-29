@@ -1,0 +1,116 @@
+{
+  "$comment": "Ejemplo de TASK-1939 (Marketing con Manzanitas). Fotos SINTÉTICAS: nunca se publica. Componer: pnpm manzanitas:compose -- --intent <este archivo>.",
+  "contract": "efeonce.manzanitas-register",
+  "version": "0.2.0",
+  "register": "marketing-con-manzanitas",
+  "channel": "carousel",
+  "topicLine": "engine",
+  "slides": [
+    {
+      "piece": "cover-pizarra",
+      "voice": {
+        "question": "¿Qué revisa una IA antes de recomendarte?",
+        "answer": "5 cosas"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "step-pizarra",
+      "voice": {
+        "question": "¿Qué no puede cambiar?",
+        "answer": "Preservar"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "interior-escena",
+      "voice": {
+        "question": "¿Qué prueba lo que dices?",
+        "answer": "Evidencia"
+      },
+      "photo": {
+        "register": "cine",
+        "lightId": "sesion-1",
+        "subject": "Una persona revisa fichas de producto en su escritorio",
+        "alt": "Persona revisando fichas de producto con luz de tarde",
+        "path": "fotos/escena-4x5.svg"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "chart-ranking",
+      "voice": {
+        "question": "¿Cuánto más nombran al líder?",
+        "answer": "4 veces"
+      },
+      "chart": {
+        "rows": [
+          {
+            "label": "Líder de la categoría",
+            "value": 46,
+            "role": "leader"
+          },
+          {
+            "label": "Competidor B",
+            "value": 31
+          },
+          {
+            "label": "Tu marca",
+            "value": 12,
+            "role": "you"
+          },
+          {
+            "label": "Competidor C",
+            "value": 7
+          },
+          {
+            "label": "Otros",
+            "value": 4
+          }
+        ],
+        "source": "[FUENTE, AÑO]",
+        "illustrative": true
+      },
+      "swipe": true
+    },
+    {
+      "piece": "interior-lente",
+      "voice": {
+        "question": "¿Probaste más de un camino?",
+        "answer": "Explorar"
+      },
+      "photo": {
+        "register": "cine",
+        "lightId": "sesion-1",
+        "subject": "Manos sobre un cuaderno con dos bocetos",
+        "alt": "Dos bocetos lado a lado bajo la lente",
+        "path": "fotos/detalle-4x5.svg"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "chart-measure",
+      "voice": {
+        "question": "¿En cuántas respuestas de IA aparece tu marca?"
+      },
+      "chart": {
+        "value": 38,
+        "source": "[FUENTE, AÑO]",
+        "illustrative": true
+      },
+      "swipe": true
+    },
+    {
+      "piece": "back-cover-a",
+      "voice": {
+        "question": "¿Te nombra la IA?",
+        "answer": "Pregúntale",
+        "sub": "En los comentarios: cuéntanos si te nombró."
+      },
+      "slogan": true,
+      "conversions": 1
+    }
+  ],
+  "artifactId": "MCM-ejemplo-carrusel-recreo-engine",
+  "example": true
+}
