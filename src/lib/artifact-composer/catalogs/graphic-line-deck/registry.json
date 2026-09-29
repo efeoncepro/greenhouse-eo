@@ -74,7 +74,11 @@
     "deck.content-day-release-cycle",
     "deck.content-day-live-library",
     "deck.content-live-chat",
-    "deck.content-measure-formulas"
+    "deck.content-measure-formulas",
+    "deck.decision-diagnosis-verdict",
+    "deck.method-waves",
+    "deck.content-day-live-console",
+    "deck.content-day-live-approval"
   ],
   "templates": [
     {
@@ -835,6 +839,50 @@
       "contentTypes": ["deck.content-measure-formulas"],
       "prototype": "content-measure-formulas.html",
       "slotsRef": "content-measure-formulas.slots.json"
+    },
+    {
+      "name": "DecisionDiagnosisVerdict",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-diagnosis-verdict"],
+      "prototype": "decision-diagnosis-verdict.html",
+      "slotsRef": "decision-diagnosis-verdict.slots.json"
+    },
+    {
+      "name": "MethodWaves",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-waves"],
+      "prototype": "method-waves.html",
+      "slotsRef": "method-waves.slots.json"
+    },
+    {
+      "name": "ContentDayLiveConsole",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-day-live-console"],
+      "prototype": "content-day-live-console.html",
+      "slotsRef": "content-day-live-console.slots.json"
+    },
+    {
+      "name": "ContentDayLiveApproval",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-day-live-approval"],
+      "prototype": "content-day-live-approval.html",
+      "slotsRef": "content-day-live-approval.slots.json"
     }
   ],
   "selector": {
@@ -909,7 +957,11 @@
       "deck.content-day-release-cycle": "ContentDayReleaseCycle",
       "deck.content-day-live-library": "ContentDayLiveLibrary",
       "deck.content-live-chat": "ContentLiveChat",
-      "deck.content-measure-formulas": "ContentMeasureFormulas"
+      "deck.content-measure-formulas": "ContentMeasureFormulas",
+      "deck.decision-diagnosis-verdict": "DecisionDiagnosisVerdict",
+      "deck.method-waves": "MethodWaves",
+      "deck.content-day-live-console": "ContentDayLiveConsole",
+      "deck.content-day-live-approval": "ContentDayLiveApproval"
     }
   }
 }

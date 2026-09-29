@@ -40,7 +40,7 @@ import {
   type Reflection
 } from './kit'
 
-type Text = { px: number; weight?: number; lineHeight?: number; tracking?: string; gapPx?: number; color?: string; text?: string; uppercase?: boolean }
+type Text = { px: number; weight?: number; lineHeight?: number; tracking?: string; gapPx?: number; color?: string; text?: string; uppercase?: boolean; leadColor?: string; restColor?: string }
 
 type SourceTokens = {
   count: number
@@ -67,6 +67,7 @@ type ProfileTokens = {
   icon: { px: number; gapPx: number }
   kicker: Text
   title: Text
+  headerGapBottomPx: number
   channels: {
     max: number
     paddingYPx: number
@@ -74,7 +75,7 @@ type ProfileTokens = {
     gapPx: number
     channel: Text
     purpose: Text
-    consent: { px: number; glyphPx: number; granted: { fill: string; color: string }; denied: { ring: { px: number; color: string }; color: string } }
+    consent: { px: number; glyphPx: number; glyphWeight: number; granted: { fill: string; color: string }; denied: { ring: { px: number; color: string }; color: string } }
   }
 }
 
@@ -225,6 +226,7 @@ export const methodIdentityConsent: RecipeBuilder = ({ intent, manifest, recipe 
     profileTitlePx: css('mic-profile-title-px', profileT.title.px),
     profileTitleTracking: css('mic-profile-title-tracking', trackingPx(profileT.title.tracking, profileT.title.px, 'el título del perfil')),
     profileTitleGap: css('mic-profile-title-gap', measured(profileT.title.gapPx, 'el aire del título del perfil')),
+    profileHeaderGap: css('mic-profile-header-gap', measured(profileT.headerGapBottomPx, 'el aire bajo la cabecera del perfil')),
     // Los canales
     channelPadY: css('mic-channel-pad-y', channelsT.paddingYPx),
     channelGap: css('mic-channel-gap', channelsT.gapPx),
@@ -236,6 +238,7 @@ export const methodIdentityConsent: RecipeBuilder = ({ intent, manifest, recipe 
     purposeColor: colorVar('mic-purpose', lineColor(measured(channelsT.purpose.color, 'el color del propósito'), line, 'el propósito', doc)),
     consentSize: css('mic-consent', consent.px),
     consentGlyph: css('mic-consent-glyph', consent.glyphPx),
+    consentGlyphWeight: css('mic-consent-glyph-wght', measured(consent.glyphWeight, 'el peso de la marca del permiso'), ''),
     grantedFill: colorVar('mic-granted-fill', lineColor(consent.granted.fill, line, 'el permiso', doc)),
     grantedInk: colorVar('mic-granted-ink', lineColor(consent.granted.color, line, 'la marca del permiso', doc)),
     deniedRing: css('mic-denied-ring', consent.denied.ring.px),
@@ -251,9 +254,13 @@ export const methodIdentityConsent: RecipeBuilder = ({ intent, manifest, recipe 
     actIcon: css('mic-act-icon', actsT.icon.px),
     actTitlePx: css('mic-act-title-px', actsT.title.px),
     actTitleLeading: css('mic-act-title-leading', measured(actsT.title.lineHeight, 'el interlineado de la activación'), ''),
+    actTitleLead: colorVar('mic-act-title-lead', lineColor(measured(actsT.title.leadColor, 'el color de la activación en papel'), line, 'la activación en papel', doc)),
+    actTitleRest: colorVar('mic-act-title-rest', lineColor(measured(actsT.title.restColor, 'el color de la activación en vidrio'), line, 'la activación en vidrio')),
     actDescPx: css('mic-act-desc-px', actsT.desc.px),
     actDescWeight: css('mic-act-desc-wght', measured(actsT.desc.weight, 'el peso del detalle'), ''),
-    actDescGap: css('mic-act-desc-gap', measured(actsT.desc.gapPx, 'el aire del detalle'))
+    actDescGap: css('mic-act-desc-gap', measured(actsT.desc.gapPx, 'el aire del detalle')),
+    actDescLead: colorVar('mic-act-desc-lead', lineColor(measured(actsT.desc.leadColor, 'el color del detalle en papel'), line, 'el detalle en papel', doc)),
+    actDescRest: colorVar('mic-act-desc-rest', lineColor(measured(actsT.desc.restColor, 'el color del detalle en vidrio'), line, 'el detalle en vidrio'))
   }
 
   const selection = selectionSlot(manifest)

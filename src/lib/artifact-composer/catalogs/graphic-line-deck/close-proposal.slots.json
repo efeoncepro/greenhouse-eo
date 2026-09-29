@@ -136,6 +136,12 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-contact-social-below=0px"
+        },
+        "sloganRunLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-leading",
+          "example": "--gl-slogan-run-leading=1.15"
         }
       }
     },

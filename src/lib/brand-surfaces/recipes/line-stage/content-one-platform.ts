@@ -46,6 +46,7 @@ type AccountTokens = {
   padding: [number, number, number]
   radiusPx: number
   avatar: { px: number; fill: string; initials: Text; gapPx: number }
+  headerGapBottomPx: number
   title: Text
   subtitle: Text
   facts: { max: number; paddingYPx: number; rule: string; key: Text; value: Text }
@@ -128,6 +129,7 @@ export const contentOnePlatform: RecipeBuilder = ({ intent, manifest, recipe }) 
     avatarSize: css('opl-avatar', account.avatar.px),
     avatarFill: colorVar('opl-avatar', lineColor(account.avatar.fill, line, 'el avatar', doc)),
     avatarGap: css('opl-avatar-gap', account.avatar.gapPx),
+    headGap: css('opl-head-gap', measured(account.headerGapBottomPx, 'el aire bajo la cabecera de la cuenta')),
     initialsPx: css('opl-initials-px', account.avatar.initials.px),
     initialsColor: colorVar('opl-initials', lineColor(measured(account.avatar.initials.color, 'el color de las iniciales'), line, 'las iniciales', doc)),
     titlePx: css('opl-title-px', account.title.px),

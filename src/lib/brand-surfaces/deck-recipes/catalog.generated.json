@@ -10811,8 +10811,96 @@
           "maxChars": 65
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.decision-diagnosis-verdict",
+      "axis": {
+        "recipe": "decision-diagnosis-verdict",
+        "layout": null,
+        "role": "decision",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "decision",
+          "recipe": "decision-diagnosis-verdict",
+          "line": "revenue-salesforce",
+          "theme": "dark",
+          "voice": {
+            "eyebrow": "Lo que recibes primero",
+            "question": "¿Qué recibes primero?",
+            "answer": [
+              "Una",
+              "decisión"
+            ]
+          },
+          "body": "Una decisión informada, con **evidencia**, no una recomendación por defecto.",
+          "reportTitle": "Diagnóstico de valor y arquitectura",
+          "reportSubtitle": "Salesforce · estado actual, encaje y roadmap",
+          "sampleMark": "Datos de muestra",
+          "modules": [
+            {
+              "kicker": "Estado actual",
+              "title": "Mapa de tu operación"
+            },
+            {
+              "kicker": "Veredicto",
+              "title": "Encaje de la plataforma"
+            },
+            {
+              "kicker": "Riesgos",
+              "title": "Lo que hoy frena"
+            },
+            {
+              "kicker": "Evidencia",
+              "title": "Registro verificable"
+            },
+            {
+              "kicker": "Roadmap",
+              "title": "Plan por olas"
+            }
+          ],
+          "operationNodes": [
+            "Ventas",
+            "Servicio",
+            "Marketing",
+            "ERP",
+            "Web",
+            "Datos"
+          ],
+          "operationFootnote": "14 integraciones · 3 sin dueño",
+          "verdictOptions": [
+            "Fit",
+            "Fit condicionado",
+            "No fit"
+          ],
+          "selectedVerdict": 2,
+          "verdictCondition": "Condición: resolver identidad y consentimiento antes de canales",
+          "risks": [
+            "Duplicados en cuentas",
+            "Flows sin ruta de error",
+            "Permisos amplios"
+          ],
+          "recordText": "Cada hallazgo con su fuente: la org, los datos y las entrevistas con tu equipo.",
+          "waves": [
+            {
+              "name": "Ola 1",
+              "title": "Datos y consentimiento",
+              "kicker": "Base"
+            },
+            {
+              "name": "Ola 2",
+              "title": "Servicio con SLA",
+              "kicker": "Primer valor"
+            },
+            {
+              "name": "Ola 3",
+              "title": "Agente de casos supervisado",
+              "kicker": "Agentes"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "method-waves",
@@ -10880,8 +10968,55 @@
           "maxChars": null
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.method-waves",
+      "axis": {
+        "recipe": "method-waves",
+        "layout": null,
+        "role": "method",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "method",
+          "recipe": "method-waves",
+          "line": "revenue-salesforce",
+          "theme": "dark",
+          "voice": {
+            "eyebrow": "Agentforce · equipos híbridos",
+            "question": "¿Cómo se suma un agente?",
+            "answer": [
+              "Por",
+              "olas"
+            ]
+          },
+          "body": "Primero el trabajo, después la tecnología: cada ola se **prueba** antes de pasar a la siguiente.",
+          "waves": [
+            {
+              "kicker": "Empieza aquí",
+              "title": "Blueprint",
+              "description": "Proceso actual y futuro, fichas de rol de cada agente y matriz de autonomía."
+            },
+            {
+              "kicker": "Primer valor",
+              "title": "Primer equipo híbrido",
+              "description": "Un workflow real con supervisora nombrada, pruebas y producción acotada."
+            },
+            {
+              "kicker": "Escala",
+              "title": "Entre equipos",
+              "description": "Se extiende a otros equipos con la misma ficha, rituales y evaluación."
+            },
+            {
+              "kicker": "On-Going",
+              "title": "Operación híbrida",
+              "description": "Catálogo de workflows, revisión humana y costo por resultado válido."
+            }
+          ],
+          "selectedStep": 1
+        }
+      }
     },
     {
       "id": "content-day-live-console",
@@ -10986,8 +11121,82 @@
           "maxChars": 14
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.content-day-live-console",
+      "axis": {
+        "recipe": "content-day-live-console",
+        "layout": null,
+        "role": "content",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "content",
+          "recipe": "content-day-live-console",
+          "line": "revenue-salesforce",
+          "theme": "dark",
+          "voice": {
+            "eyebrow": "Operación gestionada",
+            "question": "¿Y después del go-live?",
+            "answer": [
+              "Lo",
+              "operamos"
+            ]
+          },
+          "body": "Releases, soporte, datos, permisos y agentes, con SLA y una revisión **trimestral** de valor.",
+          "console": {
+            "icon": "platform",
+            "title": "Operación gestionada · este mes",
+            "subtitle": "Sales · Service · Marketing Cloud · Agentforce",
+            "sampleMark": "Datos de muestra",
+            "metrics": [
+              {
+                "value": "96 %",
+                "label": "Soporte en SLA",
+                "detail": "48 de 50 solicitudes"
+              },
+              {
+                "value": "3",
+                "label": "Releases",
+                "detail": "con pruebas y rollback"
+              },
+              {
+                "value": "0",
+                "label": "Flows con error",
+                "detail": "monitoreo continuo"
+              }
+            ],
+            "checks": [
+              {
+                "label": "Calidad de datos · duplicados en cuentas",
+                "status": "Bajo control",
+                "done": true
+              },
+              {
+                "label": "Revisión de permisos del trimestre",
+                "status": "Hecha",
+                "done": true
+              },
+              {
+                "label": "Consumo de Agentforce vs. presupuesto",
+                "status": "En rango",
+                "done": true
+              },
+              {
+                "label": "Nuevo journey de reactivación",
+                "status": "En pruebas",
+                "done": false
+              }
+            ],
+            "review": {
+              "kicker": "Próxima revisión trimestral",
+              "title": "Arquitectura, adopción, deuda y prioridades",
+              "cta": "Ver agenda"
+            }
+          }
+        }
+      }
     },
     {
       "id": "content-day-live-approval",
@@ -11121,8 +11330,76 @@
           "maxChars": null
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.content-day-live-approval",
+      "axis": {
+        "recipe": "content-day-live-approval",
+        "layout": null,
+        "role": "content",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "content",
+          "recipe": "content-day-live-approval",
+          "line": "revenue-salesforce",
+          "theme": "dark",
+          "voice": {
+            "eyebrow": "Agentforce · supervisión en vivo",
+            "question": "¿Dónde apruebas al agente?",
+            "answer": [
+              "Donde",
+              "trabajas"
+            ]
+          },
+          "body": "El agente propone con evidencia, tú **apruebas** en Slack y el cambio queda ejecutado y registrado.",
+          "note": "Ejemplo ilustrativo · la política y los límites se definen con tu equipo",
+          "channel": {
+            "tool": "slack",
+            "name": "# servicio-aprobaciones"
+          },
+          "agent": {
+            "icon": "agentforce",
+            "name": "Agente de casos",
+            "badge": "Agentforce"
+          },
+          "message": "Caso **#4821**: el cliente pide reembolso de **[MONTO]**. Según la política 3.2 corresponde aprobarlo.",
+          "evidenceChips": [
+            "Historial del cliente",
+            "Política 3.2"
+          ],
+          "actions": [
+            "Aprobar",
+            "Editar",
+            "Rechazar"
+          ],
+          "executed": {
+            "icon": "service",
+            "title": "Ejecutado en Service Cloud",
+            "text": "Reembolso aplicado, cliente notificado y registro de quién aprobó y cuándo."
+          },
+          "loop": [
+            {
+              "title": "Propone",
+              "detail": "El agente, con evidencia"
+            },
+            {
+              "title": "Apruebas",
+              "detail": "La supervisora, en Slack"
+            },
+            {
+              "title": "Ejecuta",
+              "detail": "En Service Cloud"
+            },
+            {
+              "title": "Queda registrado",
+              "detail": "Auditoría completa"
+            }
+          ],
+          "currentLoopStep": 2
+        }
+      }
     }
   ]
 }

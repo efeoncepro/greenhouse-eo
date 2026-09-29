@@ -104,6 +104,8 @@ describe('deck · method-agent-supervisor (TASK-1942)', () => {
     expect(agents[0]).toMatchObject({ left: '--gl-mas-left=1075px', top: '--gl-mas-top=470px', rotate: '--gl-mas-rotate=-6deg', depth: '--gl-mas-depth=2' })
     expect(agents[1]).toMatchObject({ depth: '--gl-mas-depth=0' })
     expect((slots.frame as Record<string, unknown>).supLeft).toBe('--gl-mas-sup-left=1005px')
+    // El aire bajo la cabecera de cada ficha lo mide AXIS (`agents.headerGapBottomPx`).
+    expect((slots.frame as Record<string, unknown>).headGap).toBe('--gl-mas-head-gap=10px')
   })
 
   it('cada fila de autonomía pinta su estado y su clave sale del vocabulario de AXIS', () => {

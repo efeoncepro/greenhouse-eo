@@ -247,6 +247,17 @@ export const graphicLineResolvers = (): ResolverRegistry => {
       }
     },
 
+    // Un interlineado de AXIS: un número o `normal` (TASK-1942, los tramos del eslogan en bloque de la contraportada
+    // Salesforce, `sloganBlock.slogan.runLineHeight`). `gl-css` no acepta palabras clave; éste sólo acepta `normal`.
+    'gl-leading': {
+      known: ['--gl-<nombre>=<número>|normal'],
+      build: value => {
+        const match = /^(--gl-[a-z0-9-]+)=(\d+(?:\.\d+)?|normal)$/.exec(value.trim())
+
+        return match ? [{ selector: ':self', styleProp: match[1]!, styleValue: match[2]! }] : null
+      }
+    },
+
     // Un color que resolvió AXIS para un texto de la receta (`manifest.type.<voz>.color`), como custom property
     // `--gl-<nombre>-color`. El valor lo entrega el builder desde el manifest: la plantilla nunca lo escribe. Sólo HEX
     // completos y sólo nombres que terminan en `-color`.

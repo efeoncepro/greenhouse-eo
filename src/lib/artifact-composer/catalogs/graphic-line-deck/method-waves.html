@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · por olas</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `method-waves` (surface deck, tema oscuro, TASK-1942). «¿Cómo se suma un agente? Por olas.»: cuatro escalones
+      de vidrio que suben sobre la línea de base; la trayectoria de luz une sus cimas y termina en la esfera (la única
+      órbita: sin plataforma). El escalón por donde se empieza va en papel y la selección «Cliente» lo toma por ítem
+      (`data-gl-select-item`). Sobre la esfera, opcional, el ícono oficial del producto.
+      Referencia: DeckSalesforceEquipoHibrido (SF10-equipo-hibrido).
+    -->
+    <main class="gl-slide gl-ls gl-mwv" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-mwv-trajectory" data-slot="trajectory">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-mwv-steps" data-slot="steps">
+        <li class="gl-mwv-step" data-gl-select-item>
+          <p class="gl-mwv-number" data-slot-field="number">01</p>
+          <p class="gl-mwv-kicker" data-slot-field="kicker">Empieza aquí</p>
+          <p class="gl-mwv-title" data-slot-field="title">Blueprint</p>
+          <p class="gl-mwv-desc" data-slot-field="description">Proceso actual y futuro, fichas de rol de cada agente y matriz de autonomía.</p>
+        </li>
+      </ol>
+
+      <figure class="gl-mwv-mark" data-slot="topMark">
+        <img data-slot-field="src" alt="Agentforce" />
+      </figure>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Agentforce · equipos híbridos</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo se suma un agente?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Por</span><span data-slot-field="answer">olas</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Primero el trabajo, después la tecnología: cada ola se <strong>prueba</strong> antes de pasar a la siguiente.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

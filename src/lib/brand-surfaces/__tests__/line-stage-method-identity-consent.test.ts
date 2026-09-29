@@ -150,4 +150,17 @@ describe('deck · method-identity-consent (TASK-1942)', () => {
     expect(layers).toContain(accent)
     expect(used.filter(hex => !allowed.has(hex))).toEqual([])
   })
+
+  it('el aire de la cabecera, el peso de la marca y los colores de las activaciones salen de AXIS (delta q)', () => {
+    const frame = plan(example()).slots.frame as Record<string, string>
+
+    expect(frame).toMatchObject({
+      profileHeaderGap: '--gl-mic-profile-header-gap=10px',
+      consentGlyphWeight: '--gl-mic-consent-glyph-wght=700',
+      actTitleLead: '--gl-mic-act-title-lead-color=#0b1f33',
+      actTitleRest: '--gl-mic-act-title-rest-color=#ffffff',
+      actDescLead: '--gl-mic-act-desc-lead-color=#5f6b7a',
+      actDescRest: `--gl-mic-act-desc-rest-color=${G.slogan.leadColor.onDark.toLowerCase()}`
+    })
+  })
 })

@@ -451,6 +451,26 @@
       "contentType": "deck.content-measure-formulas",
       "example": "src/lib/brand-surfaces/examples/deck-content-measure-formulas-intent.json",
       "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "metrics": "metrics"}
+    },
+    "decision-diagnosis-verdict": {
+      "contentType": "deck.decision-diagnosis-verdict",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-diagnosis-verdict-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "reportTitle": "report.title", "reportSubtitle": "report.subtitle", "sampleMark": "sampleMark", "modules": "moduleState.kicker", "operationNodes": "moduleState.nodes", "operationFootnote": "moduleState.footnote", "verdictOptions": "moduleVerdict.options", "selectedVerdict": "moduleVerdict.options", "verdictCondition": "moduleVerdict.condition", "risks": "moduleRisks.risks", "recordText": "moduleRecord.record", "waves": "moduleRoadmap.waves"}
+    },
+    "method-waves": {
+      "contentType": "deck.method-waves",
+      "example": "src/lib/brand-surfaces/examples/deck-method-waves-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "steps": "steps", "selectedStep": "selection.item", "topMark": "topMark.src"}
+    },
+    "content-day-live-console": {
+      "contentType": "deck.content-day-live-console",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-console-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "panelIcon": "consoleIcon", "panelTitle": "console.title", "panelSubtitle": "console.subtitle", "sampleMark": "sampleMark", "metrics": "metrics", "checks": "checks", "reviewKicker": "review.kicker", "reviewTitle": "review.title", "reviewCta": "review.cta"}
+    },
+    "content-day-live-approval": {
+      "contentType": "deck.content-day-live-approval",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-approval-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "channelIcon": "channel.icon", "channel": "channel.name", "agentIcon": "agentIcon", "agentName": "agent.name", "agentBadge": "agent.badge", "agentMessage": "message", "evidenceChips": "chips", "actions": "actions", "executedIcon": "executedIcon", "executedTitle": "executed.title", "executedText": "executed.text", "loop": "loop", "currentLoopStep": "loop[].state"}
     }
   }
 }

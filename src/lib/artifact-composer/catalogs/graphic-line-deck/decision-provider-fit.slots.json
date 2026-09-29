@@ -526,6 +526,48 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-dpf-footer-wght=600"
+        },
+        "footerColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-dpf-footer-color=#0b1f33"
+        },
+        "kickerLead": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-dpf-kicker-lead-color=#5f6b7a"
+        },
+        "kickerRest": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-dpf-kicker-rest-color=#e2e2e2"
+        },
+        "titleLead": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-dpf-title-lead-color=#0b1f33"
+        },
+        "titleRest": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-dpf-title-rest-color=#ffffff"
+        },
+        "descLead": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-dpf-desc-lead-color=#5f6b7a"
+        },
+        "descRest": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-dpf-desc-rest-color=#e6edf3"
         }
       }
     },

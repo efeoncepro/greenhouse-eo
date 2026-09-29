@@ -124,6 +124,20 @@ describe('deck · decision-provider-fit (TASK-1942)', () => {
     expectCode(() => plan(withVerdict(1, { glyph: 'public/images/logos/partners/hubspot.svg' })), 'invalid-intent')
   })
 
+  it('el color de cada texto sale del token: en papel el encendido, en vidrio los demás', () => {
+    const frame = plan(example()).slots.frame as Record<string, string>
+
+    expect(frame).toMatchObject({
+      kickerLead: '--gl-dpf-kicker-lead-color=#5f6b7a',
+      kickerRest: '--gl-dpf-kicker-rest-color=#e2e2e2',
+      titleLead: '--gl-dpf-title-lead-color=#0b1f33',
+      titleRest: '--gl-dpf-title-rest-color=#ffffff',
+      descLead: '--gl-dpf-desc-lead-color=#5f6b7a',
+      descRest: '--gl-dpf-desc-rest-color=#e6edf3',
+      footerColor: '--gl-dpf-footer-color=#0b1f33'
+    })
+  })
+
   it('el veredicto encendido va de 1 a 4', () => {
     expectCode(() => plan({ ...example(), selectedVerdict: 0 } as Intent), 'invalid-intent')
     expectCode(() => plan({ ...example(), selectedVerdict: 5 } as Intent), 'invalid-intent')

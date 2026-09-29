@@ -50,6 +50,7 @@ type PlatformTokens = {
   opacity: number
   glass: FrostedGlass
   icon: { px: number; gapPx: number }
+  headerGapBottomPx: number
   kicker: Text
   name: Text
   items: { max: number; paddingYPx: number; rule: { px: number; color: string; opacity: number }; dot: { px: number; color: string }; gapPx: number; text: Text }
@@ -159,6 +160,7 @@ export const decisionPlatformCoexistence: RecipeBuilder = ({ intent, manifest, r
     cardOpacity: css('dpc-card-opacity', platforms.opacity * 100, '%'),
     iconSize: css('dpc-icon', platforms.icon.px),
     iconGap: css('dpc-icon-gap', platforms.icon.gapPx),
+    cardHeadGap: css('dpc-card-head-gap', measured(platforms.headerGapBottomPx, 'el aire bajo la cabecera de la plataforma')),
     kickerPx: css('dpc-kicker-px', platforms.kicker.px),
     kickerWeight: css('dpc-kicker-wght', measured(platforms.kicker.weight, 'el peso del producto base'), ''),
     kickerTracking: cssFine('dpc-kicker-tracking', tracking(platforms.kicker.tracking, 'el producto base')),

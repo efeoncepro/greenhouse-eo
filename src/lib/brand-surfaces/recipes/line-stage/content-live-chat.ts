@@ -7,8 +7,8 @@
  * ilustrativo»).
  *
  * Todo lo que pinta sale de AXIS (`efeonceGraphicLine.surfaces.deck.recipes['content-live-chat']`); las claves de color
- * del documento (`ink`, `muted`) se resuelven con el documento de la familia (`familyDocument`), sobre el papel y el filete
- * medidos de la ventana. La ventana no recrea la interfaz real del asistente. Las marcas de terceros sujetas a
+ * del documento (`ink`, `muted`) se resuelven con el documento propio de la ventana (`window.document`: el papel crema
+ * y el filete del asistente). Los registros reparten sus columnas con `space-between` (`amount.distribution`). La ventana no recrea la interfaz real del asistente. Las marcas de terceros sujetas a
  * autorización son OPCIONALES y fallan cerradas sin su `authorizationRef`: `assistantMark` (el logotipo del asistente
  * del registro de logos del repo) y `platformMark` (el wordmark Claudeforce de `AXIS_PARTNER_ASSETS`, en su tarjeta
  * navy `coBrand`). El logo de la plataforma del chip de conexión es el del registro del repo.
@@ -20,7 +20,7 @@ import type { RecipeBuilder } from '../deck'
 import { evidenceHtml } from '../frame'
 import { colorVar, css, measured } from '../kit'
 
-import { familyDocument, twoLineAnswer } from './content-day-release-cycle'
+import { twoLineAnswer } from './content-day-release-cycle'
 import {
   documentVars,
   exactly,
@@ -50,9 +50,7 @@ type WindowTokens = {
   radiusPx: number
   fill: string
   rule: string
-  shadow: Shadow
-  halo: LineDocument['halo']
-  edge: LineDocument['edge']
+  document: LineDocument
   perspectivePx: number
   rotateYDeg: number
   origin: string
@@ -75,7 +73,7 @@ type WindowTokens = {
       gapPx: number
       name: Text
       stage: Text
-      amount: Text & { placeholder: string }
+      amount: Text & { placeholder: string; distribution: string }
       risk: { padding: [number, number]; radiusPx: number; ring: Border; px: number; weight: number; color: string; slotPx: number }
     }
   }
@@ -131,7 +129,7 @@ const authorizedMark = (value: unknown, what: string): boolean => {
 }
 
 /** Texto con `**negrita**` (varias): escapado y con `<strong>`. */
-const richHtml = (value: string): string =>
+export const richHtml = (value: string): string =>
   value
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -157,9 +155,10 @@ export const contentLiveChat: RecipeBuilder = ({ intent, manifest, recipe }) => 
 
   if (!/ejemplo ilustrativo/i.test(note)) throw new SurfacePieceError('La nota marca la conversación como «ejemplo ilustrativo».', 'invalid-intent')
 
-  // La ventana es el papel de la familia sobre el crema medido: toma la sombra, el halo y el filo del documento.
-  const family = familyDocument(win.shadow)
-  const doc: LineDocument = { ...family, fill: win.fill, rule: win.rule, shadow: win.shadow, halo: win.halo, edge: win.edge }
+  // La ventana es su propio documento: el papel crema y el filete del asistente, con la sombra y el halo de la familia.
+  const doc = measured(win.document, 'el documento de la ventana')
+
+  if (rows.amount.distribution !== 'space-between') throw new SurfacePieceError('AXIS reparte las columnas de los registros con `space-between`.', 'surface-issues')
   const color = (value: string, what: string) => lineColor(value, line, what, doc)
 
   const chat = (intent.chat ?? {}) as ChatIntent

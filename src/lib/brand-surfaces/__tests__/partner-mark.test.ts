@@ -104,6 +104,7 @@ describe('marca de partner y eslogan en bloque (TASK-1942)', () => {
     expect(dom.logoWidth).toBe(500)
     expect(dom.sloganPx).toBe('72px')
     expect((slots.frame as Record<string, unknown>).contactSocialBelow).toBe('--gl-contact-social-below=0px')
+    expect((slots.frame as Record<string, unknown>).sloganRunLeading).toBe('--gl-slogan-run-leading=1.15')
   }, 60_000)
 
   it('la portada Salesforce con «Operamos sobre» pinta el respaldo y no la insignia', async () => {
@@ -114,6 +115,14 @@ describe('marca de partner y eslogan en bloque (TASK-1942)', () => {
     expect(dom.logos).toEqual(['Salesforce'])
     expect(dom.badges).toBe(0)
   }, 60_000)
+
+  it('la portada Salesforce cuelga la columna de 190 (reservesByLine, AXIS 0.3.32); las demás líneas siguen en 200', () => {
+    const salesforce = planSurfacePiece(example('deck-cover-brochure-line-revenue-salesforce-intent.json'), { artifactId: 'x' })
+    const frame = salesforce.plan.slides[0]!.slots as { frame: Record<string, unknown> }
+
+    expect(frame.frame.logoTop).toBe('--gl-logo-top=190px')
+    expectCode(() => planSurfacePiece({ ...example('deck-cover-brochure-line-revenue-intent.json'), column: { topPx: 190 } } as Intent, { artifactId: 'x' }), 'invalid-intent')
+  })
 
   it('la insignia es un claim: sólo con readback vigente, sólo en la portada de línea y de la plataforma de la línea', async () => {
     const salesforce = example('deck-cover-brochure-line-revenue-salesforce-intent.json')
@@ -142,6 +151,8 @@ describe('marca de partner y eslogan en bloque (TASK-1942)', () => {
     expect(dom.sloganPx).toBe('36.5px')
     expect(frame.sloganTop).toBe('--gl-slogan-top=427px')
     expect(frame.contactSocialBelow).toBe('--gl-contact-social-below=14px')
+    // Delta (q) de AXIS: los tramos del eslogan con interlineado `normal`, como en la lámina aprobada (la caja conserva 1).
+    expect(frame.sloganRunLeading).toBe('--gl-slogan-run-leading=normal')
     expect(dom.marks).toBe(0)
   }, 60_000)
 

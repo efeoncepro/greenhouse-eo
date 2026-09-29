@@ -59,7 +59,10 @@ const TEMPLATES_WITH_SELECTION = [
   'MethodIdentityConsent',
   'MethodMigrationReconcile',
   'ContentDayReleaseCycle',
-  'ContentLiveChat'
+  'ContentLiveChat',
+  'DecisionDiagnosisVerdict',
+  'ContentDayLiveConsole',
+  'ContentDayLiveApproval'
 ] as const
 
 /**
@@ -120,8 +123,8 @@ export const createCatalog = (options: GraphicLineCatalogOptions = {}): Artifact
 
   // La familia Prueba (TASK-1928): la selección toma un ítem de la lámina (`selection.item`): la cifra, el logo, la fila
   // del riesgo o la barra que se elige.
-  // TASK-1942: la fila elegida de la decisión por capacidad y el veredicto encendido del diagnóstico de encaje.
-  for (const template of ['ContentClients', 'ContentPartners', 'DecisionRisk', 'DecisionCase', 'DecisionChart', 'DecisionWhyUs', 'ContentTeam', 'ContactSheet', 'ContentBullets', 'DecisionAgenda', 'DecisionPlatformCoexistence', 'DecisionProviderFit']) {
+  // TASK-1942: la fila elegida de la decisión por capacidad, el veredicto encendido y la ola por donde se empieza.
+  for (const template of ['ContentClients', 'ContentPartners', 'DecisionRisk', 'DecisionCase', 'DecisionChart', 'DecisionWhyUs', 'ContentTeam', 'ContactSheet', 'ContentBullets', 'DecisionAgenda', 'DecisionPlatformCoexistence', 'DecisionProviderFit', 'MethodWaves']) {
     layoutHooks[template] = levelSelectionHook(selectionHook)
   }
 

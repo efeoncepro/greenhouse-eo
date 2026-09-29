@@ -1,5 +1,5 @@
 /**
- * Builders de las doce láminas del deck Salesforce (TASK-1942): el estilo «vivo» con el escenario, la plataforma de luz
+ * Builders de las dieciséis láminas del deck Salesforce (TASK-1942): el estilo «vivo» con el escenario, la plataforma de luz
  * y los haces en el acento de la LÍNEA de la pieza. Un archivo por lámina en `line-stage/`; lo compartido (escenario,
  * vidrio, documento, voz, nota e íconos oficiales de producto) vive en `line-stage/kit.ts`.
  */
@@ -17,6 +17,10 @@ import { contentDayReleaseCycle } from './line-stage/content-day-release-cycle'
 import { contentDayLiveLibrary } from './line-stage/content-day-live-library'
 import { contentLiveChat } from './line-stage/content-live-chat'
 import { contentMeasureFormulas } from './line-stage/content-measure-formulas'
+import { decisionDiagnosisVerdict } from './line-stage/decision-diagnosis-verdict'
+import { methodWaves } from './line-stage/method-waves'
+import { contentDayLiveConsole } from './line-stage/content-day-live-console'
+import { contentDayLiveApproval } from './line-stage/content-day-live-approval'
 
 export const LINE_STAGE_BUILDERS: Record<string, RecipeBuilder> = {
   'content-one-platform': contentOnePlatform,
@@ -30,5 +34,9 @@ export const LINE_STAGE_BUILDERS: Record<string, RecipeBuilder> = {
   'content-day-release-cycle': contentDayReleaseCycle,
   'content-day-live-library': contentDayLiveLibrary,
   'content-live-chat': contentLiveChat,
-  'content-measure-formulas': contentMeasureFormulas
+  'content-measure-formulas': contentMeasureFormulas,
+  'decision-diagnosis-verdict': decisionDiagnosisVerdict,
+  'method-waves': methodWaves,
+  'content-day-live-console': contentDayLiveConsole,
+  'content-day-live-approval': contentDayLiveApproval
 }

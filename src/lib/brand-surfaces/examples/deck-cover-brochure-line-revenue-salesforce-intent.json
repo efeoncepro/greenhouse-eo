@@ -12,7 +12,9 @@
   "voice": {
     "eyebrow": "Brochure · Servicios Salesforce",
     "question": "¿Tu Salesforce ya actúa?",
-    "answer": ["Por ti"]
+    "answer": [
+      "Por ti"
+    ]
   },
   "body": "**Seis** servicios:\nVentas · Servicio · Marketing Cloud\nData 360 · Agentforce · Integración",
   "photo": {
@@ -22,7 +24,7 @@
     "alt": "Nexa, con la chaqueta navy de Efeonce, mira a cámara; detrás de ella se alza un gran anillo vertical de luz celeste del que salen cientos de hilos de luz que llegan a las yemas de sus dedos"
   },
   "column": {
-    "topPx": 200
+    "topPx": 190
   },
   "partnerMark": {
     "mode": "operates-on",

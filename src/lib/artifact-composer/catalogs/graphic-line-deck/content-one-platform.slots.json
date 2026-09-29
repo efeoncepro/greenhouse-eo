@@ -377,6 +377,12 @@
           "resolver": "gl-css",
           "example": "--gl-opl-avatar-gap=14px"
         },
+        "headGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-head-gap=12px"
+        },
         "initialsPx": {
           "type": "string",
           "required": true,
@@ -399,7 +405,7 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-opl-title-tracking=-0.01em"
+          "example": "--gl-opl-title-tracking=-0.015em"
         },
         "subtitlePx": {
           "type": "string",
@@ -525,7 +531,7 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-opl-area-tracking=-0.01em"
+          "example": "--gl-opl-area-tracking=-0.015em"
         },
         "areaColor": {
           "type": "string",

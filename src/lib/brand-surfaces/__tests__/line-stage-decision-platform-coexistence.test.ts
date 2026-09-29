@@ -101,6 +101,8 @@ describe('deck · decision-platform-coexistence (TASK-1942)', () => {
     // [790, 170, 16] en el token, corrido −80 px.
     expect(platforms[0]).toMatchObject({ left: '--gl-dpc-left=710px', top: '--gl-dpc-top=170px', rotate: '--gl-dpc-rotate=16deg' })
     expect((slots.frame as Record<string, unknown>).tableLeft).toBe('--gl-dpc-table-left=950px')
+    // El aire bajo la cabecera de cada plataforma lo mide AXIS (`platforms.headerGapBottomPx`).
+    expect((slots.frame as Record<string, unknown>).cardHeadGap).toBe('--gl-dpc-card-head-gap=14px')
   })
 
   it('cada veredicto pinta sus colores de AXIS y sale del vocabulario fijo; nunca todas las filas en «Migrar»', () => {

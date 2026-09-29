@@ -275,6 +275,12 @@
           "resolver": "gl-css",
           "example": "--gl-csn-icon-top=14px"
         },
+        "statusHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-csn-status-height=26px"
+        },
         "statusPadY": {
           "type": "string",
           "required": true,

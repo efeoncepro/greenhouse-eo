@@ -515,6 +515,12 @@
           "resolver": "gl-css",
           "example": "--gl-mic-profile-title-gap=2px"
         },
+        "profileHeaderGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-mic-profile-header-gap=10px"
+        },
         "channelPadY": {
           "type": "string",
           "required": true,
@@ -574,6 +580,12 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-mic-consent-glyph=14px"
+        },
+        "consentGlyphWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-mic-consent-glyph-wght=700"
         },
         "grantedFill": {
           "type": "string",
@@ -659,6 +671,18 @@
           "resolver": "gl-css",
           "example": "--gl-mic-act-title-leading=1.1"
         },
+        "actTitleLead": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-mic-act-title-lead-color=#0b1f33"
+        },
+        "actTitleRest": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-mic-act-title-rest-color=#ffffff"
+        },
         "actDescPx": {
           "type": "string",
           "required": true,
@@ -676,6 +700,18 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-mic-act-desc-gap=3px"
+        },
+        "actDescLead": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-mic-act-desc-lead-color=#5f6b7a"
+        },
+        "actDescRest": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-mic-act-desc-rest-color=#e2e2e2"
         }
       }
     },

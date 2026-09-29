@@ -33,6 +33,7 @@ type LaunchTokens = {
   glass: FrostedGlass
   icon: { px: number; endPx: number; topPx: number }
   status: {
+    heightPx: number
     padding: [number, number]
     radiusPx: number
     px: number
@@ -42,7 +43,7 @@ type LaunchTokens = {
     solid: { fill: string; color: string; values: string[] }
     outline: { ring: { px: number; color: string; opacity: number }; color: string }
   }
-  title: Text
+  title: Text & { topPx: number }
   desc: Text
 }
 
@@ -100,6 +101,12 @@ export const contentSeasonLaunches: RecipeBuilder = ({ intent, manifest, recipe 
   const { stage, platform } = stageLayers(manifest, recipe, line, 'csn')
   const status = launchesT.status
 
+  // El nombre empieza `title.topPx` bajo el borde de la ficha: relleno + píldora + aire (delta (q) de AXIS). Si las
+  // medidas no suman, la ficha no sería la aprobada.
+  if (launchesT.padding[0] + measured(status.heightPx, 'el alto de la píldora') + measured(launchesT.title.gapTopPx, 'el aire del lanzamiento') !== measured(launchesT.title.topPx, 'el inicio del nombre')) {
+    throw new SurfacePieceError('AXIS midió el inicio del nombre sin que cuadre con el relleno, la píldora y su aire.', 'invalid-intent')
+  }
+
   const frame: Record<string, unknown> = {
     line,
     ...lineVoiceFrame(manifest, recipe),
@@ -115,6 +122,7 @@ export const contentSeasonLaunches: RecipeBuilder = ({ intent, manifest, recipe 
     iconEnd: css('csn-icon-end', launchesT.icon.endPx),
     iconTop: css('csn-icon-top', launchesT.icon.topPx),
     // El estado anunciado
+    statusHeight: css('csn-status-height', status.heightPx),
     statusPadY: css('csn-status-pad-y', status.padding[0]),
     statusPadX: css('csn-status-pad-x', status.padding[1]),
     statusRadius: css('csn-status-radius', status.radiusPx),

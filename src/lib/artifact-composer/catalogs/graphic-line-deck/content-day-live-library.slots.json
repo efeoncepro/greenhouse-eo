@@ -491,6 +491,18 @@
           "resolver": "gl-css",
           "example": "--gl-cll-play-glyph-px=18px"
         },
+        "playFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cll-play-fill-color=#ffffff"
+        },
+        "playGlyph": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cll-play-glyph-color=#0b1f33"
+        },
         "durationPx": {
           "type": "string",
           "required": true,
@@ -539,6 +551,12 @@
           "resolver": "gl-css",
           "example": "--gl-cll-duration-fill-opacity=55%"
         },
+        "durationColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cll-duration-color=#ffffff"
+        },
         "rolePx": {
           "type": "string",
           "required": true,
@@ -562,6 +580,12 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-cll-role-gap=10px"
+        },
+        "roleInsetX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cll-role-inset-x=4px"
         },
         "roleColor": {
           "type": "string",
@@ -592,6 +616,18 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-cll-video-title-gap=3px"
+        },
+        "videoTitleInsetX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cll-video-title-inset-x=4px"
+        },
+        "videoTitleGapBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cll-video-title-gap-bottom=4px"
         },
         "statsGap": {
           "type": "string",

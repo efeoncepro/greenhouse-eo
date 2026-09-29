@@ -545,6 +545,12 @@
           "resolver": "gl-css",
           "example": "--gl-mas-icon-gap=12px"
         },
+        "headGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-mas-head-gap=10px"
+        },
         "kickerPx": {
           "type": "string",
           "required": true,
@@ -579,7 +585,7 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-mas-title-tracking=-0.01em"
+          "example": "--gl-mas-title-tracking=-0.015em"
         },
         "titleGap": {
           "type": "string",

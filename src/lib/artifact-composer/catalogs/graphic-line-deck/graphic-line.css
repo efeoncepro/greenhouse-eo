@@ -1019,6 +1019,11 @@ body {
   white-space: nowrap;
 }
 
+/* El interlineado de cada tramo (TASK-1942): el de la caja, salvo en el eslogan en bloque, donde AXIS pide `normal`. */
+.gl-frame-close .gl-slogan-run {
+  line-height: var(--gl-slogan-run-leading);
+}
+
 .gl-frame-close .gl-slogan-run + .gl-slogan-run::before {
   content: ' ';
   font-weight: normal;
@@ -6461,6 +6466,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--gl-opl-avatar-gap);
+  margin-bottom: var(--gl-opl-head-gap);
 }
 
 .gl-opl .gl-opl-avatar {
@@ -6599,6 +6605,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--gl-mas-icon-gap);
+  margin-bottom: var(--gl-mas-head-gap);
 }
 
 .gl-mas .gl-mas-icon {
@@ -6730,6 +6737,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--gl-dpc-icon-gap);
+  margin-bottom: var(--gl-dpc-card-head-gap);
 }
 
 .gl-dpc .gl-dpc-icon {
@@ -6931,7 +6939,7 @@ body {
   font: var(--gl-dpf-kicker-wght) var(--gl-dpf-kicker-px) var(--gl-text-family);
   letter-spacing: var(--gl-dpf-kicker-tracking);
   text-transform: uppercase;
-  color: var(--gl-soft-dark);
+  color: var(--gl-dpf-kicker-rest-color);
 }
 
 .gl-dpf .gl-dpf-title {
@@ -6941,23 +6949,26 @@ body {
   font-size: var(--gl-dpf-title-px);
   line-height: var(--gl-dpf-title-leading);
   letter-spacing: var(--gl-dpf-title-tracking);
-  color: var(--gl-ink-dark);
+  color: var(--gl-dpf-title-rest-color);
 }
 
 .gl-dpf .gl-dpf-desc {
   margin-top: var(--gl-dpf-desc-gap);
   font: var(--gl-dpf-desc-wght) var(--gl-dpf-desc-px) / var(--gl-dpf-desc-leading) var(--gl-text-family);
-  color: var(--gl-text-dark);
+  color: var(--gl-dpf-desc-rest-color);
 }
 
-.gl-dpf .gl-item-lead .gl-dpf-kicker,
+.gl-dpf .gl-item-lead .gl-dpf-kicker {
+  color: var(--gl-dpf-kicker-lead-color);
+}
+
 .gl-dpf .gl-item-lead .gl-dpf-desc {
-  color: var(--gl-ls-doc-muted-color);
+  color: var(--gl-dpf-desc-lead-color);
 }
 
 .gl-dpf .gl-item-lead .gl-dpf-title {
   font-size: var(--gl-dpf-title-lead-px);
-  color: var(--gl-ls-doc-ink-color);
+  color: var(--gl-dpf-title-lead-color);
 }
 
 .gl-dpf .gl-dpf-footer {
@@ -6968,7 +6979,7 @@ body {
   padding-top: var(--gl-dpf-footer-pad-top);
   border-top: 1px solid var(--gl-dpf-footer-rule-color);
   font: var(--gl-dpf-footer-wght) var(--gl-dpf-footer-px) var(--gl-text-family);
-  color: var(--gl-ls-doc-ink-color);
+  color: var(--gl-dpf-footer-color);
 }
 
 /* ── ancla TASK-1942 · decision-provider-fit (prefijo .gl-dpf) ── */
@@ -7102,8 +7113,14 @@ body {
   height: var(--gl-csn-icon);
 }
 
+/* La píldora mide su alto de AXIS (`status.heightPx`) como bloque: sin la línea que la contendría, el nombre empieza
+ * justo `title.topPx` bajo el borde de la ficha. */
 .gl-csn .gl-csn-status {
-  display: inline-block;
+  display: block;
+  box-sizing: border-box;
+  width: fit-content;
+  height: var(--gl-csn-status-height);
+  line-height: calc(var(--gl-csn-status-height) - 2 * var(--gl-csn-status-pad-y));
   padding: var(--gl-csn-status-pad-y) var(--gl-csn-status-pad-x);
   border-radius: var(--gl-csn-status-radius);
   font: var(--gl-csn-status-wght) var(--gl-csn-status-px) var(--gl-text-family);
@@ -7204,7 +7221,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--gl-mic-profile-icon-gap);
-  margin-bottom: var(--gl-mic-channel-gap);
+  margin-bottom: var(--gl-mic-profile-header-gap);
 }
 
 .gl-mic .gl-mic-profile-icon {
@@ -7259,8 +7276,7 @@ body {
   width: var(--gl-mic-consent);
   height: var(--gl-mic-consent);
   border-radius: 50%;
-  font-family: var(--gl-text-family);
-  font-size: var(--gl-mic-consent-glyph);
+  font: var(--gl-mic-consent-glyph-wght) var(--gl-mic-consent-glyph) var(--gl-text-family);
 }
 
 .gl-mic .gl-state-yes .gl-mic-consent {
@@ -7308,7 +7324,6 @@ body {
   box-shadow:
     inset 0 0 0 var(--gl-ls-glass-border) color-mix(in srgb, var(--gl-ls-glass-border-color) var(--gl-ls-glass-border-opacity), transparent),
     0 var(--gl-ls-glass-shadow-y) var(--gl-ls-glass-shadow-blur) color-mix(in srgb, var(--gl-ls-glass-shadow-color) var(--gl-ls-glass-shadow-opacity), transparent);
-  color: var(--gl-ink-dark);
 }
 
 .gl-mic .gl-mic-act-icon {
@@ -7332,12 +7347,21 @@ body {
   font: var(--gl-mic-act-desc-wght) var(--gl-mic-act-desc-px) var(--gl-text-family);
 }
 
+/* El texto en papel y en vidrio, con los colores que AXIS midió para cada uno (`title/desc.leadColor|restColor`). */
+.gl-mic .gl-item-lead .gl-mic-act-title {
+  color: var(--gl-mic-act-title-lead-color);
+}
+
+.gl-mic .gl-item-rest .gl-mic-act-title {
+  color: var(--gl-mic-act-title-rest-color);
+}
+
 .gl-mic .gl-item-lead .gl-mic-act-desc {
-  color: var(--gl-ls-doc-muted-color);
+  color: var(--gl-mic-act-desc-lead-color);
 }
 
 .gl-mic .gl-item-rest .gl-mic-act-desc {
-  color: var(--gl-soft-dark);
+  color: var(--gl-mic-act-desc-rest-color);
 }
 
 /* ── ancla TASK-1942 · method-identity-consent (prefijo .gl-mic) ── */
@@ -7455,6 +7479,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: var(--gl-crc-head-gap-bottom);
 }
 
 .gl-crc .gl-crc-kicker {
@@ -7503,7 +7528,7 @@ body {
   width: var(--gl-crc-dot-px);
   height: var(--gl-crc-dot-px);
   border-radius: 50%;
-  font: var(--gl-crc-dot-glyph-px) var(--gl-text-family);
+  font: var(--gl-crc-dot-glyph-wght) var(--gl-crc-dot-glyph-px) var(--gl-text-family);
 }
 
 .gl-crc .gl-state-done .gl-crc-dot {
@@ -7540,10 +7565,48 @@ body {
   background: linear-gradient(var(--gl-crc-video-angle), var(--gl-crc-video-from-color), var(--gl-crc-video-to-color));
 }
 
+/* La pantalla interior del video (genérica) y sus tres barras: los márgenes verticales de las barras colapsan como en
+   la lámina (primera arriba y abajo, las siguientes arriba y abajo). */
+.gl-crc .gl-crc-screen {
+  position: absolute;
+  left: var(--gl-crc-screen-inset-x);
+  right: var(--gl-crc-screen-inset-x);
+  top: var(--gl-crc-screen-top);
+  height: var(--gl-crc-screen-height);
+  border-radius: var(--gl-crc-screen-radius);
+  background: color-mix(in srgb, var(--gl-crc-screen-fill-color) var(--gl-crc-screen-fill-opacity), transparent);
+  box-shadow: inset 0 0 0 var(--gl-crc-screen-border) color-mix(in srgb, var(--gl-crc-screen-border-color) var(--gl-crc-screen-border-opacity), transparent);
+}
+
+.gl-crc .gl-crc-bar {
+  display: block;
+  height: var(--gl-crc-bar-height);
+  margin: var(--gl-crc-bar-gap) var(--gl-crc-bar-inset-x);
+  border-radius: var(--gl-crc-bar-radius);
+}
+
+.gl-crc .gl-crc-bar-1 {
+  width: var(--gl-crc-bar-1-width);
+  margin-top: var(--gl-crc-bar-first-top);
+  margin-bottom: var(--gl-crc-bar-first-top);
+  background: color-mix(in srgb, var(--gl-crc-bar-color) var(--gl-crc-bar-1-opacity), transparent);
+}
+
+.gl-crc .gl-crc-bar-2 {
+  width: var(--gl-crc-bar-2-width);
+  background: color-mix(in srgb, var(--gl-crc-bar-color) var(--gl-crc-bar-2-opacity), transparent);
+}
+
+.gl-crc .gl-crc-bar-3 {
+  width: var(--gl-crc-bar-3-width);
+  background: color-mix(in srgb, var(--gl-crc-bar-color) var(--gl-crc-bar-3-opacity), transparent);
+}
+
 .gl-crc .gl-crc-play {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: var(--gl-crc-play-top);
+  box-shadow: 0 var(--gl-crc-play-shadow-y) var(--gl-crc-play-shadow-blur) color-mix(in srgb, var(--gl-crc-play-shadow-color) var(--gl-crc-play-shadow-opacity), transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7582,13 +7645,13 @@ body {
 
 .gl-crc .gl-crc-duration {
   position: absolute;
-  left: 0;
-  bottom: 0;
+  left: var(--gl-crc-duration-start);
+  bottom: var(--gl-crc-duration-bottom);
   padding: var(--gl-crc-duration-pad-y) var(--gl-crc-duration-pad-x);
   border-radius: var(--gl-crc-duration-radius);
   background: color-mix(in srgb, var(--gl-crc-duration-fill-color) var(--gl-crc-duration-fill-opacity), transparent);
   font: var(--gl-crc-duration-wght) var(--gl-crc-duration-px) var(--gl-text-family);
-  color: var(--gl-crc-play-fill-color);
+  color: var(--gl-crc-duration-color);
 }
 
 /* La fila de aprobación: la herramienta del video y el botón que toma la selección. */
@@ -7596,6 +7659,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--gl-crc-footer-items-gap);
   margin-top: var(--gl-crc-footer-gap);
 }
 
@@ -7784,7 +7848,7 @@ body {
   height: var(--gl-cll-thumb-icon-px);
 }
 
-/* Reproducir: AXIS mide su cuerpo; el color es el de la tarjeta y la tinta del documento. */
+/* Reproducir: cuerpo y colores medidos por AXIS (`thumb.play`). */
 .gl-cll .gl-cll-play {
   position: absolute;
   left: 50%;
@@ -7795,7 +7859,7 @@ body {
   width: var(--gl-cll-play-px);
   height: var(--gl-cll-play-px);
   border-radius: 50%;
-  background: var(--gl-cll-card-fill-color);
+  background: var(--gl-cll-play-fill-color);
   transform: translate(-50%, -50%);
 }
 
@@ -7803,7 +7867,7 @@ body {
 .gl-cll .gl-cll-play-glyph {
   width: var(--gl-cll-play-glyph-px);
   height: var(--gl-cll-play-glyph-px);
-  background: var(--gl-ls-doc-ink-color);
+  background: var(--gl-cll-play-glyph-color);
   clip-path: polygon(30% 20%, 80% 50%, 30% 80%);
 }
 
@@ -7815,12 +7879,12 @@ body {
   border-radius: var(--gl-cll-duration-radius);
   background: color-mix(in srgb, var(--gl-cll-duration-fill-color) var(--gl-cll-duration-fill-opacity), transparent);
   font: var(--gl-cll-duration-wght) var(--gl-cll-duration-px) var(--gl-text-family);
-  color: var(--gl-cll-card-fill-color);
+  color: var(--gl-cll-duration-color);
 }
 
 .gl-cll .gl-cll-role {
   display: block;
-  margin-top: var(--gl-cll-role-gap);
+  margin: var(--gl-cll-role-gap) var(--gl-cll-role-inset-x) 0;
   font: var(--gl-cll-role-wght) var(--gl-cll-role-px) var(--gl-text-family);
   letter-spacing: var(--gl-cll-role-tracking);
   text-transform: uppercase;
@@ -7829,7 +7893,7 @@ body {
 
 .gl-cll .gl-cll-video-title {
   display: block;
-  margin-top: var(--gl-cll-video-title-gap);
+  margin: var(--gl-cll-video-title-gap) var(--gl-cll-video-title-inset-x) var(--gl-cll-video-title-gap-bottom);
   font: var(--gl-cll-video-title-wght) var(--gl-cll-video-title-px) / var(--gl-cll-video-title-leading) var(--gl-text-family);
 }
 
@@ -7972,11 +8036,14 @@ body {
   font: var(--gl-clc-amount-wght) var(--gl-clc-amount-px) var(--gl-text-family);
 }
 
-/* La columna de «En riesgo» ocupa su ancho medido en todas las filas, lleve o no la píldora. */
+/* Las columnas se reparten con `space-between` (`amount.distribution`): la fila en riesgo lleva la píldora con su ancho;
+   las demás, un hueco del ancho medido (`risk.slotPx`), como en la lámina. */
 .gl-clc .gl-clc-risk-slot {
   display: flex;
   flex: none;
-  justify-content: flex-end;
+}
+
+.gl-clc .gl-clc-risk-slot:empty {
   width: var(--gl-clc-risk-slot);
 }
 
@@ -8124,3 +8191,750 @@ body {
 }
 
 /* ── ancla TASK-1942 · content-measure-formulas (prefijo .gl-cmf) ── */
+
+/* ══ decision-diagnosis-verdict: el diagnóstico con su veredicto (TASK-1942, prefijo .gl-ddv) ══════════════════════
+ *
+ * El informe en papel, girado en perspectiva desde su borde izquierdo; cabecera con filete y la píldora de muestra;
+ * cinco módulos en grilla (el 05 ocupa las dos columnas por `--gl-ddv-span`). Cada módulo es su propio slot con su
+ * cuerpo obligatorio (`moduleState`, `moduleVerdict`, `moduleRisks`, `moduleRecord`, `moduleRoadmap`). La opción elegida del veredicto (`gl-item-lead`) va en tinta y más
+ * ancha; las olas del roadmap son el objeto de la selección.
+ */
+
+.gl-ddv .gl-ddv-report {
+  position: absolute;
+  left: var(--gl-ddv-left);
+  top: var(--gl-ddv-top);
+  z-index: 3;
+  width: var(--gl-ddv-width);
+  padding: var(--gl-ddv-pad-top) var(--gl-ddv-pad-x) var(--gl-ddv-pad-bottom);
+  border-radius: var(--gl-ddv-radius);
+  transform: perspective(var(--gl-ddv-perspective)) rotateY(var(--gl-ddv-rotate-y)) rotateX(var(--gl-ddv-rotate-x));
+  transform-origin: left center;
+}
+
+.gl-ddv .gl-ddv-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gl-ddv-head-gap-bottom);
+  padding-bottom: var(--gl-ddv-head-pad-bottom);
+  border-bottom: 1px solid var(--gl-ddv-head-rule-color);
+}
+
+.gl-ddv .gl-ddv-head-main {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-ddv-head-gap);
+}
+
+.gl-ddv .gl-ddv-icon-box {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-ddv-icon-box);
+  height: var(--gl-ddv-icon-box);
+  border-radius: var(--gl-ddv-icon-radius);
+  background: var(--gl-ddv-icon-fill-color);
+}
+
+.gl-ddv .gl-ddv-icon {
+  display: block;
+  width: var(--gl-ddv-icon);
+  height: var(--gl-ddv-icon);
+}
+
+.gl-ddv .gl-ddv-title {
+  display: block;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-ddv-title-px);
+  letter-spacing: var(--gl-ddv-title-tracking);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-ddv .gl-ddv-subtitle {
+  display: block;
+  margin-top: var(--gl-ddv-subtitle-gap);
+  font: var(--gl-ddv-subtitle-wght) var(--gl-ddv-subtitle-px) var(--gl-text-family);
+  color: var(--gl-ddv-subtitle-color);
+}
+
+.gl-ddv .gl-ddv-mark {
+  flex: none;
+  padding: var(--gl-ddv-mark-pad-y) var(--gl-ddv-mark-pad-x);
+  border-radius: var(--gl-ddv-mark-radius);
+  background: var(--gl-ddv-mark-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-ddv-mark-border) var(--gl-ddv-mark-border-color);
+  font: var(--gl-ddv-mark-wght) var(--gl-ddv-mark-px) var(--gl-text-family);
+  letter-spacing: var(--gl-ddv-mark-tracking);
+  text-transform: uppercase;
+  color: var(--gl-ddv-mark-color);
+}
+
+/* Sin la píldora (datos del cliente con evidencia), el renderer la vacía y no se pinta. */
+.gl-ddv .gl-ddv-mark:empty {
+  display: none;
+}
+
+.gl-ddv .gl-ddv-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--gl-ddv-grid-columns), 1fr);
+  gap: var(--gl-ddv-grid-gap);
+}
+
+.gl-ddv .gl-ddv-module {
+  grid-column: span var(--gl-ddv-span);
+  padding: var(--gl-ddv-module-pad-y) var(--gl-ddv-module-pad-x);
+  border-radius: var(--gl-ddv-module-radius);
+  background: var(--gl-ddv-module-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-ddv-module-border) var(--gl-ddv-module-border-color);
+}
+
+.gl-ddv .gl-ddv-kicker {
+  font: var(--gl-ddv-module-kicker-wght) var(--gl-ddv-module-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-ddv-module-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-ddv-module-kicker-color);
+}
+
+.gl-ddv .gl-ddv-module-title {
+  margin: var(--gl-ddv-module-title-gap-top) 0 var(--gl-ddv-module-title-gap-bottom);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-ddv-module-title-px);
+  letter-spacing: var(--gl-ddv-module-title-tracking);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-ddv .gl-ddv-nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gl-ddv-node-gap);
+}
+
+.gl-ddv .gl-ddv-node {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gl-ddv-node-dot-gap);
+  padding: var(--gl-ddv-node-pad-y) var(--gl-ddv-node-pad-x);
+  border-radius: var(--gl-ddv-node-radius);
+  background: var(--gl-ddv-node-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-ddv-node-border) var(--gl-ddv-node-border-color);
+  font: var(--gl-ddv-node-wght) var(--gl-ddv-node-px) var(--gl-text-family);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-ddv .gl-ddv-node::before {
+  content: '';
+  flex: none;
+  width: var(--gl-ddv-node-dot);
+  height: var(--gl-ddv-node-dot);
+  border-radius: 50%;
+  background: var(--gl-ddv-node-dot-color);
+}
+
+.gl-ddv .gl-ddv-footnote {
+  margin-top: var(--gl-ddv-footnote-gap);
+  font: var(--gl-ddv-footnote-wght) var(--gl-ddv-footnote-px) var(--gl-text-family);
+  color: var(--gl-ddv-footnote-color);
+}
+
+.gl-ddv .gl-ddv-options {
+  display: flex;
+  gap: var(--gl-ddv-option-gap);
+}
+
+.gl-ddv .gl-ddv-option {
+  flex: var(--gl-ddv-option-flex);
+  padding: var(--gl-ddv-option-pad-y) var(--gl-ddv-option-pad-x);
+  border-radius: var(--gl-ddv-option-radius);
+  background: var(--gl-ddv-option-other-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-ddv-option-border) var(--gl-ddv-option-border-color);
+  text-align: center;
+  font: var(--gl-ddv-option-wght) var(--gl-ddv-option-px) var(--gl-text-family);
+  color: var(--gl-ddv-option-other-color);
+}
+
+.gl-ddv .gl-ddv-option.gl-item-lead {
+  flex: var(--gl-ddv-option-flex-selected);
+  background: var(--gl-ddv-option-selected-fill-color);
+  box-shadow: none;
+  color: var(--gl-ddv-option-selected-color);
+}
+
+.gl-ddv .gl-ddv-condition {
+  margin-top: var(--gl-ddv-condition-gap);
+  font: var(--gl-ddv-condition-wght) var(--gl-ddv-condition-px) / var(--gl-ddv-condition-leading) var(--gl-text-family);
+  color: var(--gl-ddv-condition-color);
+}
+
+.gl-ddv .gl-ddv-risk {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-ddv-risk-gap);
+  margin-top: var(--gl-ddv-risk-gap-top);
+  font: var(--gl-ddv-risk-wght) var(--gl-ddv-risk-px) var(--gl-text-family);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-ddv .gl-ddv-risk-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-ddv-risk-icon);
+  height: var(--gl-ddv-risk-icon);
+}
+
+.gl-ddv .gl-ddv-record {
+  font: var(--gl-ddv-record-wght) var(--gl-ddv-record-px) / var(--gl-ddv-record-leading) var(--gl-text-family);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-ddv .gl-ddv-waves {
+  display: flex;
+  gap: var(--gl-ddv-wave-gap);
+}
+
+.gl-ddv .gl-ddv-wave {
+  flex: 1;
+  padding: var(--gl-ddv-wave-pad-y) var(--gl-ddv-wave-pad-x);
+  border-radius: var(--gl-ddv-wave-radius);
+  background: var(--gl-ddv-wave-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-ddv-wave-border) var(--gl-ddv-wave-border-color);
+}
+
+.gl-ddv .gl-ddv-wave-name {
+  display: block;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-ddv-wave-name-px);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-ddv .gl-ddv-wave-title {
+  display: block;
+  margin-top: var(--gl-ddv-wave-title-gap);
+  font: var(--gl-ddv-wave-title-wght) var(--gl-ddv-wave-title-px) / var(--gl-ddv-wave-title-leading) var(--gl-text-family);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-ddv .gl-ddv-wave-kicker {
+  display: block;
+  margin-top: var(--gl-ddv-wave-kicker-gap);
+  font: var(--gl-ddv-wave-kicker-wght) var(--gl-ddv-wave-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-ddv-wave-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-ddv-wave-kicker-color);
+}
+
+/* ── ancla TASK-1942 · decision-diagnosis-verdict (prefijo .gl-ddv) ── */
+
+/* ══ method-waves: por olas (TASK-1942, prefijo .gl-mwv) ═══════════════════════════════════════════════════════════
+ *
+ * Cuatro escalones con su posición y su alto (`--gl-mwv-left/top/height`) sobre la línea de base; la trayectoria con
+ * su esfera es una capa (z 2) bajo los escalones. Los de reposo (`gl-item-rest`) en vidrio con texto claro; el elegido
+ * (`gl-item-lead`) en papel con la sombra profunda. El ícono de la cima es opcional: sin él la figura queda vacía.
+ */
+
+.gl-mwv .gl-mwv-trajectory {
+  z-index: 2;
+}
+
+.gl-mwv .gl-mwv-step {
+  position: absolute;
+  left: var(--gl-mwv-left);
+  top: var(--gl-mwv-top);
+  z-index: 3;
+  box-sizing: border-box;
+  width: var(--gl-mwv-width);
+  height: var(--gl-mwv-height);
+  padding: var(--gl-mwv-pad-y) var(--gl-mwv-pad-x);
+  border-radius: var(--gl-mwv-radius);
+}
+
+/* Reposo: el vidrio esmerilado de la familia (mismas reglas que `.gl-ls-glass`). */
+.gl-mwv .gl-mwv-step.gl-item-rest {
+  background: linear-gradient(
+    var(--gl-ls-glass-angle),
+    color-mix(in srgb, var(--gl-ls-glass-from-color) var(--gl-ls-glass-from-opacity), transparent),
+    color-mix(in srgb, var(--gl-ls-glass-to-color) var(--gl-ls-glass-to-opacity), transparent)
+  );
+  backdrop-filter: blur(var(--gl-ls-glass-blur));
+  box-shadow:
+    inset 0 0 0 var(--gl-ls-glass-border) color-mix(in srgb, var(--gl-ls-glass-border-color) var(--gl-ls-glass-border-opacity), transparent),
+    0 var(--gl-ls-glass-shadow-y) var(--gl-ls-glass-shadow-blur) color-mix(in srgb, var(--gl-ls-glass-shadow-color) var(--gl-ls-glass-shadow-opacity), transparent);
+}
+
+/* Elegido: el documento claro con la sombra profunda (mismas reglas que `.gl-ls-doc`). */
+.gl-mwv .gl-mwv-step.gl-item-lead {
+  background: var(--gl-ls-doc-color);
+  box-shadow:
+    0 0 0 var(--gl-ls-doc-edge) color-mix(in srgb, var(--gl-ls-doc-edge-color) var(--gl-ls-doc-edge-opacity), transparent),
+    0 var(--gl-ls-doc-shadow-y) var(--gl-ls-doc-shadow-blur) color-mix(in srgb, var(--gl-ls-doc-shadow-color) var(--gl-ls-doc-shadow-opacity), transparent),
+    0 0 var(--gl-ls-doc-halo-blur) color-mix(in srgb, var(--gl-ls-doc-halo-color) var(--gl-ls-doc-halo-opacity), transparent);
+}
+
+.gl-mwv .gl-mwv-number {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mwv-number-px);
+  color: var(--gl-mwv-number-color);
+}
+
+.gl-mwv .gl-mwv-kicker {
+  margin-top: var(--gl-mwv-kicker-gap);
+  font: var(--gl-mwv-kicker-wght) var(--gl-mwv-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-mwv-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-mwv-kicker-color);
+}
+
+.gl-mwv .gl-mwv-title {
+  margin-top: var(--gl-mwv-title-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mwv-title-px);
+  line-height: var(--gl-mwv-title-leading);
+  letter-spacing: var(--gl-mwv-title-tracking);
+  color: var(--gl-mwv-title-color);
+}
+
+.gl-mwv .gl-mwv-desc {
+  margin-top: var(--gl-mwv-desc-gap);
+  font: var(--gl-mwv-desc-wght) var(--gl-mwv-desc-px) / var(--gl-mwv-desc-leading) var(--gl-text-family);
+  color: var(--gl-mwv-desc-color);
+}
+
+.gl-mwv .gl-item-lead .gl-mwv-number {
+  color: var(--gl-mwv-number-selected-color);
+}
+
+.gl-mwv .gl-item-lead .gl-mwv-kicker {
+  color: var(--gl-mwv-kicker-selected-color);
+}
+
+.gl-mwv .gl-item-lead .gl-mwv-title {
+  color: var(--gl-mwv-title-selected-color);
+}
+
+.gl-mwv .gl-item-lead .gl-mwv-desc {
+  color: var(--gl-mwv-desc-selected-color);
+}
+
+.gl-mwv .gl-mwv-mark {
+  position: absolute;
+  left: var(--gl-mwv-mark-left);
+  top: var(--gl-mwv-mark-top);
+  z-index: 4;
+  margin: 0;
+}
+
+.gl-mwv .gl-mwv-mark:empty {
+  display: none;
+}
+
+.gl-mwv .gl-mwv-mark img {
+  display: block;
+  width: var(--gl-mwv-mark);
+  height: var(--gl-mwv-mark);
+}
+
+/* ── ancla TASK-1942 · method-waves (prefijo .gl-mwv) ── */
+
+/* ══ content-day-live-console: la operación gestionada (TASK-1942, prefijo .gl-clv) ═══════════════════════════════
+ *
+ * La consola en el papel de la familia (`.gl-ls-doc`), girada en perspectiva desde su borde (`--gl-clv-rotate-*`,
+ * `--gl-clv-origin-x`): cabecera con ícono opcional y píldora de muestra, tres cifras en papel suave, cuatro controles
+ * (píldora llena si está resuelto, `gl-state-done`; en contorno si sigue en curso, `gl-state-todo`) y la franja en tinta
+ * de la revisión trimestral, objeto de la selección. Toda medida y todo color llegan del builder desde AXIS.
+ */
+
+.gl-clv .gl-clv-console {
+  position: absolute;
+  left: var(--gl-clv-left);
+  top: var(--gl-clv-top);
+  z-index: 3;
+  width: var(--gl-clv-width);
+  padding: var(--gl-clv-pad-top) var(--gl-clv-pad-x) var(--gl-clv-pad-bottom);
+  border-radius: var(--gl-clv-radius);
+  transform: perspective(var(--gl-clv-perspective)) rotateY(var(--gl-clv-rotate-y)) rotateX(var(--gl-clv-rotate-x));
+  transform-origin: var(--gl-clv-origin-x) 50%;
+}
+
+.gl-clv .gl-clv-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gl-clv-head-gap-bottom);
+  padding-bottom: var(--gl-clv-head-pad-bottom);
+  border-bottom: 1px solid var(--gl-clv-head-rule-color);
+}
+
+.gl-clv .gl-clv-head-main {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-clv-icon-gap);
+}
+
+.gl-clv .gl-clv-icon img {
+  display: block;
+  width: var(--gl-clv-icon);
+  height: var(--gl-clv-icon);
+}
+
+.gl-clv .gl-clv-title {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-clv-title-px);
+  letter-spacing: var(--gl-clv-title-tracking);
+}
+
+.gl-clv .gl-clv-subtitle {
+  margin-top: var(--gl-clv-subtitle-gap);
+  font: var(--gl-clv-subtitle-wght) var(--gl-clv-subtitle-px) var(--gl-text-family);
+  color: var(--gl-clv-subtitle-color);
+}
+
+.gl-clv .gl-clv-mark {
+  padding: var(--gl-clv-mark-pad-y) var(--gl-clv-mark-pad-x);
+  border-radius: var(--gl-clv-mark-radius);
+  background: var(--gl-clv-mark-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-clv-mark-border) var(--gl-clv-mark-border-color);
+  font: var(--gl-clv-mark-wght) var(--gl-clv-mark-px) var(--gl-text-family);
+  letter-spacing: var(--gl-clv-mark-tracking);
+  text-transform: uppercase;
+  color: var(--gl-clv-mark-color);
+}
+
+.gl-clv .gl-clv-metrics {
+  display: grid;
+  grid-template-columns: repeat(var(--gl-clv-metrics-columns), minmax(0, 1fr));
+  gap: var(--gl-clv-metrics-gap);
+}
+
+.gl-clv .gl-clv-metric {
+  padding: var(--gl-clv-metric-pad-y) var(--gl-clv-metric-pad-x);
+  border-radius: var(--gl-clv-metric-radius);
+  background: var(--gl-clv-metric-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-clv-metric-border) var(--gl-clv-metric-border-color);
+}
+
+.gl-clv .gl-clv-metric-label {
+  font: var(--gl-clv-metric-label-wght) var(--gl-clv-metric-label-px) var(--gl-text-family);
+  letter-spacing: var(--gl-clv-metric-label-tracking);
+  text-transform: uppercase;
+  color: var(--gl-clv-metric-label-color);
+}
+
+.gl-clv .gl-clv-metric-value {
+  margin-top: var(--gl-clv-metric-value-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-clv-metric-value-px);
+  letter-spacing: var(--gl-clv-metric-value-tracking);
+}
+
+.gl-clv .gl-clv-metric-detail {
+  margin-top: var(--gl-clv-metric-detail-gap);
+  font: var(--gl-clv-metric-detail-wght) var(--gl-clv-metric-detail-px) var(--gl-text-family);
+  color: var(--gl-clv-metric-detail-color);
+}
+
+.gl-clv .gl-clv-checks {
+  margin-top: var(--gl-clv-checks-gap);
+}
+
+.gl-clv .gl-clv-check {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gl-clv-check-gap);
+  padding: var(--gl-clv-check-pad-y) 0;
+  border-top: 1px solid var(--gl-clv-check-rule-color);
+}
+
+.gl-clv .gl-clv-check-label {
+  font: var(--gl-clv-check-label-wght) var(--gl-clv-check-label-px) var(--gl-text-family);
+}
+
+.gl-clv .gl-clv-status {
+  padding: var(--gl-clv-status-pad-y) var(--gl-clv-status-pad-x);
+  border-radius: var(--gl-clv-status-radius);
+  font: var(--gl-clv-status-wght) var(--gl-clv-status-px) var(--gl-text-family);
+}
+
+.gl-clv .gl-state-done .gl-clv-status {
+  background: var(--gl-clv-status-done-fill-color);
+  color: var(--gl-clv-status-done-ink-color);
+}
+
+.gl-clv .gl-state-todo .gl-clv-status {
+  box-shadow: inset 0 0 0 var(--gl-clv-status-open-ring) var(--gl-clv-status-open-ring-color);
+  color: var(--gl-clv-status-open-ink-color);
+}
+
+.gl-clv .gl-clv-review {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gl-clv-review-inner-gap);
+  margin-top: var(--gl-clv-review-gap);
+  padding: var(--gl-clv-review-pad-y) var(--gl-clv-review-pad-x);
+  border-radius: var(--gl-clv-review-radius);
+  background: var(--gl-clv-review-fill-color);
+}
+
+.gl-clv .gl-clv-review-kicker {
+  font: var(--gl-clv-review-kicker-wght) var(--gl-clv-review-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-clv-review-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-clv-review-kicker-color);
+}
+
+.gl-clv .gl-clv-review-title {
+  margin-top: var(--gl-clv-review-title-gap);
+  font: var(--gl-clv-review-title-wght) var(--gl-clv-review-title-px) var(--gl-text-family);
+  color: var(--gl-clv-review-title-color);
+}
+
+.gl-clv .gl-clv-cta {
+  padding: var(--gl-clv-cta-pad-y) var(--gl-clv-cta-pad-x);
+  border-radius: var(--gl-clv-cta-radius);
+  background: var(--gl-clv-cta-fill-color);
+  font: var(--gl-clv-cta-wght) var(--gl-clv-cta-px) var(--gl-text-family);
+  color: var(--gl-clv-cta-ink-color);
+}
+
+/* ── ancla TASK-1942 · content-day-live-console (prefijo .gl-clv) ── */
+
+/* ══ content-day-live-approval: la supervisión en vivo (TASK-1942, prefijo .gl-cla) ══════════════════════════════
+ *
+ * El mensaje del agente en el canal del equipo, en papel y en perspectiva desde su borde inicial (canal, agente con su
+ * etiqueta, la propuesta, las fichas de evidencia y los tres botones, separados para que la selección no pise el
+ * segundo); lo ejecutado en vidrio a la derecha; el ciclo de cuatro pasos debajo, con el de la persona en papel
+ * (`gl-state-now`). Toda medida y todo color llegan del builder desde AXIS (`--gl-cla-*`).
+ */
+
+.gl-cla .gl-cla-message {
+  position: absolute;
+  left: var(--gl-cla-message-left);
+  top: var(--gl-cla-message-top);
+  /* A la altura de la capa de la selección (z 3): la selección, que se inserta después, queda encima de «Aprobar». */
+  z-index: 3;
+  width: var(--gl-cla-message-width);
+  padding: var(--gl-cla-message-pad-y) var(--gl-cla-message-pad-x);
+  border-radius: var(--gl-cla-message-radius);
+  transform: perspective(var(--gl-cla-message-perspective)) rotateY(var(--gl-cla-message-rotate-y));
+  transform-origin: left center;
+}
+
+/* El canal: isotipo y nombre, con su filete. */
+.gl-cla .gl-cla-channel {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-cla-channel-gap);
+  padding-bottom: var(--gl-cla-channel-pad-bottom);
+  border-bottom: 1px solid var(--gl-cla-channel-rule-color);
+  font: var(--gl-cla-channel-wght) var(--gl-cla-channel-px) var(--gl-text-family);
+}
+
+.gl-cla .gl-cla-channel-icon {
+  display: block;
+  width: var(--gl-cla-channel-icon-px);
+  height: var(--gl-cla-channel-icon-px);
+}
+
+/* El agente: avatar opcional (ícono oficial del producto) y la columna del mensaje. */
+.gl-cla .gl-cla-agent {
+  display: flex;
+  gap: var(--gl-cla-agent-gap);
+  margin-top: var(--gl-cla-agent-gap-top);
+}
+
+.gl-cla .gl-cla-avatar:empty,
+.gl-cla .gl-cla-executed-icon:empty {
+  display: none;
+}
+
+.gl-cla .gl-cla-avatar-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-cla-agent-icon-px);
+  height: var(--gl-cla-agent-icon-px);
+}
+
+.gl-cla .gl-cla-post {
+  flex: 1;
+}
+
+.gl-cla .gl-cla-agent-line {
+  font: var(--gl-cla-agent-name-wght) var(--gl-cla-agent-name-px) var(--gl-text-family);
+}
+
+.gl-cla .gl-cla-badge {
+  margin-left: var(--gl-cla-badge-gap);
+  padding: var(--gl-cla-badge-pad-y) var(--gl-cla-badge-pad-x);
+  border-radius: var(--gl-cla-badge-radius);
+  background: var(--gl-cla-badge-fill-color);
+  font: var(--gl-cla-badge-wght) var(--gl-cla-badge-px) var(--gl-text-family);
+  text-transform: uppercase;
+  color: var(--gl-cla-badge-color);
+}
+
+.gl-cla .gl-cla-text {
+  margin-top: var(--gl-cla-text-gap-top);
+  font: var(--gl-cla-text-wght) var(--gl-cla-text-px) / var(--gl-cla-text-leading) var(--gl-text-family);
+}
+
+/* Las fichas de evidencia. */
+.gl-cla .gl-cla-chips {
+  display: flex;
+  gap: var(--gl-cla-chips-gap);
+  margin-top: var(--gl-cla-chips-gap-top);
+}
+
+.gl-cla .gl-cla-chip {
+  padding: var(--gl-cla-chip-pad-y) var(--gl-cla-chip-pad-x);
+  border-radius: var(--gl-cla-chip-radius);
+  background: var(--gl-cla-chip-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-cla-chip-border) var(--gl-cla-chip-border-color);
+  font: var(--gl-cla-chip-wght) var(--gl-cla-chip-px) var(--gl-text-family);
+  color: var(--gl-cla-chip-color);
+}
+
+/* Los tres botones, separados por `actions.gapPx`: el primero (lleno) toma la selección. */
+.gl-cla .gl-cla-actions {
+  display: flex;
+  gap: var(--gl-cla-actions-gap);
+  margin-top: var(--gl-cla-actions-gap-top);
+}
+
+.gl-cla .gl-cla-action {
+  padding: var(--gl-cla-action-pad-y) var(--gl-cla-action-pad-x);
+  border-radius: var(--gl-cla-action-radius);
+  font: var(--gl-cla-action-wght) var(--gl-cla-action-px) var(--gl-text-family);
+}
+
+.gl-cla .gl-cla-primary {
+  background: var(--gl-cla-primary-fill-color);
+  color: var(--gl-cla-primary-color);
+}
+
+.gl-cla .gl-cla-secondary {
+  box-shadow: inset 0 0 0 var(--gl-cla-secondary-ring) var(--gl-cla-secondary-ring-color);
+  color: var(--gl-cla-secondary-color);
+}
+
+.gl-cla .gl-cla-tertiary {
+  box-shadow: inset 0 0 0 var(--gl-cla-tertiary-ring) var(--gl-cla-tertiary-ring-color);
+  color: var(--gl-cla-tertiary-color);
+}
+
+/* Lo ejecutado y registrado, en vidrio a la derecha del mensaje (`executed.glass`). */
+.gl-cla .gl-cla-executed {
+  position: absolute;
+  left: var(--gl-cla-executed-left);
+  top: var(--gl-cla-executed-top);
+  z-index: 4;
+  box-sizing: border-box;
+  width: var(--gl-cla-executed-width);
+  padding: var(--gl-cla-executed-pad-y) var(--gl-cla-executed-pad-x);
+  border-radius: var(--gl-cla-executed-radius);
+  background: linear-gradient(
+    var(--gl-cla-ex-glass-angle),
+    color-mix(in srgb, var(--gl-cla-ex-glass-from-color) var(--gl-cla-ex-glass-from-opacity), transparent),
+    color-mix(in srgb, var(--gl-cla-ex-glass-to-color) var(--gl-cla-ex-glass-to-opacity), transparent)
+  );
+  backdrop-filter: blur(var(--gl-cla-ex-glass-blur));
+  box-shadow:
+    inset 0 0 0 var(--gl-cla-ex-glass-border) color-mix(in srgb, var(--gl-cla-ex-glass-border-color) var(--gl-cla-ex-glass-border-opacity), transparent),
+    0 var(--gl-cla-ex-glass-shadow-y) var(--gl-cla-ex-glass-shadow-blur) color-mix(in srgb, var(--gl-cla-ex-glass-shadow-color) var(--gl-cla-ex-glass-shadow-opacity), transparent);
+}
+
+.gl-cla .gl-cla-executed-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-cla-executed-icon-gap);
+}
+
+.gl-cla .gl-cla-executed-mark {
+  display: block;
+  flex: none;
+  width: var(--gl-cla-executed-icon-px);
+  height: var(--gl-cla-executed-icon-px);
+}
+
+.gl-cla .gl-cla-executed-title {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-cla-executed-title-px);
+  line-height: var(--gl-cla-executed-title-leading);
+  color: var(--gl-cla-executed-title-color);
+}
+
+.gl-cla .gl-cla-executed-text {
+  margin-top: var(--gl-cla-executed-text-gap);
+  font: var(--gl-cla-executed-text-wght) var(--gl-cla-executed-text-px) / var(--gl-cla-executed-text-leading) var(--gl-text-family);
+  color: var(--gl-cla-executed-text-color);
+}
+
+/* El ciclo: cuatro fichas en vidrio; la de la persona, en papel. */
+.gl-cla .gl-cla-loop {
+  position: absolute;
+  left: var(--gl-cla-loop-left);
+  top: var(--gl-cla-loop-top);
+  z-index: 3;
+  display: flex;
+  gap: var(--gl-cla-loop-gap);
+}
+
+.gl-cla .gl-cla-step {
+  width: var(--gl-cla-step-width);
+  padding: var(--gl-cla-step-pad-y) var(--gl-cla-step-pad-x);
+  border-radius: var(--gl-cla-step-radius);
+}
+
+.gl-cla .gl-cla-step.gl-state-now {
+  background: var(--gl-cla-current-fill-color);
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.gl-cla .gl-cla-number,
+.gl-cla .gl-cla-step-title {
+  display: block;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+}
+
+.gl-cla .gl-cla-number {
+  font-size: var(--gl-cla-number-px);
+  color: var(--gl-cla-number-color);
+}
+
+.gl-cla .gl-cla-step-title {
+  margin-top: var(--gl-cla-step-title-gap);
+  font-size: var(--gl-cla-step-title-px);
+  color: var(--gl-cla-step-title-color);
+}
+
+.gl-cla .gl-cla-step-detail {
+  display: block;
+  margin-top: var(--gl-cla-step-detail-gap);
+  font: var(--gl-cla-step-detail-wght) var(--gl-cla-step-detail-px) var(--gl-text-family);
+  color: var(--gl-cla-step-detail-color);
+}
+
+.gl-cla .gl-state-now .gl-cla-number {
+  color: var(--gl-cla-number-current-color);
+}
+
+.gl-cla .gl-state-now .gl-cla-step-title {
+  color: var(--gl-cla-step-title-current-color);
+}
+
+.gl-cla .gl-state-now .gl-cla-step-detail {
+  color: var(--gl-cla-step-detail-current-color);
+}
+
+/* ── ancla TASK-1942 · content-day-live-approval (prefijo .gl-cla) ── */

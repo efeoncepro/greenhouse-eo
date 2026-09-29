@@ -1,5 +1,46 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-29 (s) — TASK-1942: las 16 láminas de práctica del deck Salesforce y la marca del partner
+
+<!-- sealed-by-freeze: c1d25681ec982b91e06fc045bebac0ecafe24278c5b317edb9285356f72c6a74 -->
+
+El deck Salesforce «La órbita» (canvas aprobado por el operador el 2026-09-29; valores en AXIS `axis-tokens` y
+`axis-ui-contracts` 0.3.33, `axis-brand-assets` 0.4.4) compone completo en el catálogo `graphic-line-deck`: las doce
+recetas de la primera ronda y las cuatro de la segunda (SF5, SF10, SF11 y SF18) tienen plantilla, con la familia
+`.gl-ls` (escenario de luz, plataforma y voz) y un bloque de CSS por receta anclado en `graphic-line.css`. Los frames
+nuevos son el probe de cada plantilla (los `example` de su `slots.json`; los logos de terceros llegan como
+`asset-ref:<kind>:probe`, nunca un archivo real).
+
+Diferencias con las láminas aprobadas, todas falla cerrada o regla, no estética:
+- SF18 `content-day-live-approval`: AXIS 0.3.33 mide el número del bucle a 15 px «en el acento»; la regla transversal
+  `accent-text-min-size` (el acento no colorea texto de menos de 24 px) manda, así que el número va en suave. Queda
+  reportado a AXIS para que el token deje de pedir el acento.
+- SF16/SF18: las negritas van en el peso 700 del token; las aprobadas caían a 800 por un fallback de fuente.
+
+Frames que cambian (existían):
+- `templates-graphic-line-deck/CoverBrochure.png` — cambia: el probe llena el slot opcional nuevo `partnerMark` (la
+  insignia del partner en la portada de línea; sin él la portada no cambia, lo prueba `partner-mark.test.ts`)
+- `templates-graphic-line-deck/CloseProposal.png` — cambia: el probe llena el slot opcional nuevo `partnerMark`, y el
+  cierre declara `contactSocialBelow` y `sloganRunLeading` (el eslogan en bloque de la contraportada Salesforce)
+
+Frames nuevos:
+- `templates-graphic-line-deck/ContentOnePlatform.png` — 🆕 deck.content-one-platform: una operación: la cuenta en el centro y sus áreas de trabajo (content-one-platform)
+- `templates-graphic-line-deck/MethodAgentSupervisor.png` — 🆕 deck.method-agent-supervisor: la supervisora y sus agentes, con la aprobación pendiente (method-agent-supervisor)
+- `templates-graphic-line-deck/DecisionPlatformCoexistence.png` — 🆕 deck.decision-platform-coexistence: dos plataformas que conviven, capacidad por capacidad (decision-platform-coexistence)
+- `templates-graphic-line-deck/DecisionProviderFit.png` — 🆕 deck.decision-provider-fit: los monolitos del encaje de proveedor (decision-provider-fit)
+- `templates-graphic-line-deck/DecisionDiagnosisVerdict.png` — 🆕 deck.decision-diagnosis-verdict: el diagnóstico abierto con su veredicto y las olas del roadmap (cinco módulos, cada uno su slot) (decision-diagnosis-verdict)
+- `templates-graphic-line-deck/ContentServiceLanes.png` — 🆕 deck.content-service-lanes: los carriles del servicio (content-service-lanes)
+- `templates-graphic-line-deck/ContentSeasonLaunches.png` — 🆕 deck.content-season-launches: los lanzamientos de la temporada (content-season-launches)
+- `templates-graphic-line-deck/MethodIdentityConsent.png` — 🆕 deck.method-identity-consent: identidad y consentimiento: fuentes, perfil y activaciones (method-identity-consent)
+- `templates-graphic-line-deck/MethodMigrationReconcile.png` — 🆕 deck.method-migration-reconcile: la migración con sus contadores y el cuadre final (method-migration-reconcile)
+- `templates-graphic-line-deck/MethodWaves.png` — 🆕 deck.method-waves: cuatro escalones de vidrio unidos por la trayectoria de luz (sin ícono en la cima: es opcional) (method-waves)
+- `templates-graphic-line-deck/ContentDayLiveConsole.png` — 🆕 deck.content-day-live-console: la consola de operación gestionada (content-day-live-console)
+- `templates-graphic-line-deck/ContentDayReleaseCycle.png` — 🆕 deck.content-day-release-cycle: el ciclo de release con el video de la demo (content-day-release-cycle)
+- `templates-graphic-line-deck/ContentDayLiveLibrary.png` — 🆕 deck.content-day-live-library: la biblioteca de tutoriales por rol (content-day-live-library)
+- `templates-graphic-line-deck/ContentLiveChat.png` — 🆕 deck.content-live-chat: el CRM en una conversación (content-live-chat)
+- `templates-graphic-line-deck/ContentMeasureFormulas.png` — 🆕 deck.content-measure-formulas: cinco métricas con fórmula, fuente y dueño (content-measure-formulas)
+- `templates-graphic-line-deck/ContentDayLiveApproval.png` — 🆕 deck.content-day-live-approval: el agente propone en el canal, la supervisora aprueba y queda registrado (content-day-live-approval)
+
 ## 2026-09-29 (r) — TASK-1939: catálogo Marketing con Manzanitas (18 plantillas nuevas)
 
 <!-- sealed-by-freeze: bc3b60603b00415eed249a37ef87596354dba007dca1025d64bd16dfc0467573 -->
@@ -985,7 +1026,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: bc3b60603b00415eed249a37ef87596354dba007dca1025d64bd16dfc0467573 -->
+<!-- manifest-digest: c1d25681ec982b91e06fc045bebac0ecafe24278c5b317edb9285356f72c6a74 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

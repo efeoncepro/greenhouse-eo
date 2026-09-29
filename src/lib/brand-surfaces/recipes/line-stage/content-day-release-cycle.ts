@@ -13,8 +13,6 @@
  * el ícono oficial de un producto de Salesforce (`sf-icon:<producto>`, p. ej. `sf-icon:platform` para el sandbox).
  */
 
-import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
-
 import { SurfacePieceError, type SurfaceAssetRequest } from '../../types'
 import { contentOf, selectionSlot, voiceSlots } from '../../shared'
 import type { RecipeBuilder } from '../deck'
@@ -55,6 +53,7 @@ type ReleaseTokens = {
   kicker: Text
   title: Text
   icon: { px: number }
+  headerGapBottomPx: number
   steps: {
     labels: string[]
     gapPx: number
@@ -62,6 +61,7 @@ type ReleaseTokens = {
     dot: {
       px: number
       glyphPx: number
+      glyphWeight: number
       done: { fill: string; color: string; glyph: string }
       now: { fill: string; ring: Ring; glyph: string }
       todo: { fill: string; ring: Ring }
@@ -72,12 +72,22 @@ type ReleaseTokens = {
     heightPx: number
     radiusPx: number
     gradient: { angleDeg: number; from: string; to: string }
-    play: { px: number; glyphPx: number; fill: string; glyph: string }
+    screen: {
+      insetXPx: number
+      topPx: number
+      heightPx: number
+      radiusPx: number
+      fill: { color: string; opacity: number }
+      border: { px: number; color: string; opacity: number }
+      bars: { insetXPx: number; firstTopPx: number; gapPx: number; heightPx: number; radiusPx: number; color: string; widthsOfScreen: number[]; opacities: number[] }
+    }
+    play: { px: number; glyphPx: number; fill: string; glyph: string; centerTopOfHeight: number; shadow: Shadow }
     author: { px: number; fill: string; ring: Ring; initials: Text; endPx: number; bottomPx: number }
-    duration: { px: number; weight: number; padding: [number, number]; radiusPx: number; fill: { color: string; opacity: number } }
+    duration: { px: number; weight: number; padding: [number, number]; radiusPx: number; insetStartPx: number; bottomPx: number; color: string; fill: { color: string; opacity: number } }
   }
   footer: {
     gapTopPx: number
+    gapPx: number
     tool: { iconPx: number; gapPx: number; text: Text }
     cta: { padding: [number, number]; radiusPx: number; fill: string; color: string; px: number; weight: number; text: string }
   }
@@ -221,11 +231,13 @@ export const contentDayReleaseCycle: RecipeBuilder = ({ intent, manifest, recipe
     titleTracking: trackingPx('crc-title-tracking', release.title, 'el título del release'),
     titleGap: css('crc-title-gap', measured(release.title.gapPx, 'el aire del título del release')),
     iconPx: css('crc-icon-px', release.icon.px),
+    headGapBottom: css('crc-head-gap-bottom', release.headerGapBottomPx),
     // El ciclo
     stepsGap: css('crc-steps-gap', steps.gapPx),
     stepsGapBottom: css('crc-steps-gap-bottom', steps.gapBottomPx),
     dotPx: css('crc-dot-px', dot.px),
     dotGlyphPx: css('crc-dot-glyph-px', dot.glyphPx),
+    dotGlyphWeight: css('crc-dot-glyph-wght', dot.glyphWeight, ''),
     doneFill: colorVar('crc-done-fill', color(dot.done.fill, 'el paso hecho')),
     doneGlyph: colorVar('crc-done-glyph', color(dot.done.color, 'la marca del paso hecho')),
     nowFill: colorVar('crc-now-fill', color(dot.now.fill, 'el paso actual')),
@@ -244,7 +256,33 @@ export const contentDayReleaseCycle: RecipeBuilder = ({ intent, manifest, recipe
     videoAngle: css('crc-video-angle', video.gradient.angleDeg, 'deg'),
     videoFrom: colorVar('crc-video-from', color(video.gradient.from, 'el video')),
     videoTo: colorVar('crc-video-to', color(video.gradient.to, 'el video')),
+    screenInsetX: css('crc-screen-inset-x', video.screen.insetXPx),
+    screenTop: css('crc-screen-top', video.screen.topPx),
+    screenHeight: css('crc-screen-height', video.screen.heightPx),
+    screenRadius: css('crc-screen-radius', video.screen.radiusPx),
+    screenFill: colorVar('crc-screen-fill', color(video.screen.fill.color, 'la pantalla del video')),
+    screenFillOpacity: css('crc-screen-fill-opacity', video.screen.fill.opacity * 100, '%'),
+    screenBorder: css('crc-screen-border', video.screen.border.px),
+    screenBorderColor: colorVar('crc-screen-border', color(video.screen.border.color, 'el filo de la pantalla')),
+    screenBorderOpacity: css('crc-screen-border-opacity', video.screen.border.opacity * 100, '%'),
+    barInsetX: css('crc-bar-inset-x', video.screen.bars.insetXPx),
+    barFirstTop: css('crc-bar-first-top', video.screen.bars.firstTopPx),
+    barGap: css('crc-bar-gap', video.screen.bars.gapPx),
+    barHeight: css('crc-bar-height', video.screen.bars.heightPx),
+    barRadius: css('crc-bar-radius', video.screen.bars.radiusPx),
+    barColor: colorVar('crc-bar', color(video.screen.bars.color, 'las barras de la pantalla')),
+    ...Object.fromEntries(
+      [0, 1, 2].flatMap(i => [
+        [`bar${i + 1}Width`, css(`crc-bar-${i + 1}-width`, measured(video.screen.bars.widthsOfScreen[i], `el ancho de la barra ${i + 1}`) * 100, '%')],
+        [`bar${i + 1}Opacity`, css(`crc-bar-${i + 1}-opacity`, measured(video.screen.bars.opacities[i], `la opacidad de la barra ${i + 1}`) * 100, '%')]
+      ])
+    ),
     playPx: css('crc-play-px', video.play.px),
+    playTop: css('crc-play-top', video.play.centerTopOfHeight * 100, '%'),
+    playShadowY: css('crc-play-shadow-y', video.play.shadow.yPx),
+    playShadowBlur: css('crc-play-shadow-blur', video.play.shadow.blurPx),
+    playShadowColor: colorVar('crc-play-shadow', color(video.play.shadow.color, 'la sombra de reproducir')),
+    playShadowOpacity: css('crc-play-shadow-opacity', video.play.shadow.opacity * 100, '%'),
     playGlyphPx: css('crc-play-glyph-px', video.play.glyphPx),
     playFill: colorVar('crc-play-fill', color(video.play.fill, 'el botón de reproducir')),
     playGlyph: colorVar('crc-play-glyph', color(video.play.glyph, 'el triángulo de reproducir')),
@@ -261,10 +299,14 @@ export const contentDayReleaseCycle: RecipeBuilder = ({ intent, manifest, recipe
     durationPadY: css('crc-duration-pad-y', video.duration.padding[0]),
     durationPadX: css('crc-duration-pad-x', video.duration.padding[1]),
     durationRadius: css('crc-duration-radius', video.duration.radiusPx),
+    durationStart: css('crc-duration-start', video.duration.insetStartPx),
+    durationBottom: css('crc-duration-bottom', video.duration.bottomPx),
+    durationColor: colorVar('crc-duration', color(video.duration.color, 'el texto de la duración')),
     durationFill: colorVar('crc-duration-fill', color(video.duration.fill.color, 'la duración')),
     durationFillOpacity: css('crc-duration-fill-opacity', video.duration.fill.opacity * 100, '%'),
     // La fila de aprobación
     footerGap: css('crc-footer-gap', footer.gapTopPx),
+    footerItemsGap: css('crc-footer-items-gap', footer.gapPx),
     toolIconPx: css('crc-tool-icon-px', footer.tool.iconPx),
     toolGap: css('crc-tool-gap', footer.tool.gapPx),
     captionPx: css('crc-caption-px', footer.tool.text.px),
@@ -348,21 +390,4 @@ export const contentDayReleaseCycle: RecipeBuilder = ({ intent, manifest, recipe
     },
     assets: uniqueAssets([stage.asset, platform.asset, beams.asset, icon.asset, videoTool.asset, ...marks.map(mark => mark.asset)])
   }
-}
-
-/**
- * El documento claro de la familia (`deckLineDocument` de AXIS) leído del token de una receta que lo declara entero (la
- * referencia SF1, `content-one-platform.account.document`). Las recetas cuya pieza toma sólo la sombra, el halo y el filo
- * del documento (`content-day-live-library`, `content-live-chat`) resuelven con él las claves de color del documento
- * (`ink`, `muted`, `rule`, `chip`); el builder verifica que la sombra sea la misma (la misma familia).
- */
-export const familyDocument = (shadow: Shadow): LineDocument => {
-  const recipes = (efeonceGraphicLine as unknown as { surfaces: { deck: { recipes: Record<string, { account?: { document?: LineDocument } }> } } }).surfaces.deck.recipes
-  const doc = measured(recipes['content-one-platform']?.account?.document, 'el documento de la familia (deckLineDocument)')
-
-  if (JSON.stringify(doc.shadow) !== JSON.stringify(shadow)) {
-    throw new SurfacePieceError('La pieza no toma la sombra del documento de la familia (deckLineDocument).', 'surface-issues')
-  }
-
-  return doc
 }

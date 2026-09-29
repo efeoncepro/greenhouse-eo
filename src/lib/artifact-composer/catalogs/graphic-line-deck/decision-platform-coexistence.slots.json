@@ -395,6 +395,12 @@
           "resolver": "gl-css",
           "example": "--gl-dpc-icon-gap=14px"
         },
+        "cardHeadGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dpc-card-head-gap=14px"
+        },
         "kickerPx": {
           "type": "string",
           "required": true,
@@ -573,7 +579,7 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-dpc-head-tracking=-0.01em"
+          "example": "--gl-dpc-head-tracking=-0.015em"
         },
         "rowPadY": {
           "type": "string",

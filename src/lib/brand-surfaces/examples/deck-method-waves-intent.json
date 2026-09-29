@@ -1,0 +1,24 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "brochure",
+  "recipe": "method-waves",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Agentforce · equipos híbridos",
+    "question": "¿Cómo se suma un agente?",
+    "answer": ["Por", "olas"]
+  },
+  "body": "Primero el trabajo, después la tecnología: cada ola se **prueba** antes de pasar a la siguiente.",
+  "waves": [
+    { "kicker": "Empieza aquí", "title": "Blueprint", "description": "Proceso actual y futuro, fichas de rol de cada agente y matriz de autonomía." },
+    { "kicker": "Primer valor", "title": "Primer equipo híbrido", "description": "Un workflow real con supervisora nombrada, pruebas y producción acotada." },
+    { "kicker": "Escala", "title": "Entre equipos", "description": "Se extiende a otros equipos con la misma ficha, rituales y evaluación." },
+    { "kicker": "On-Going", "title": "Operación híbrida", "description": "Catálogo de workflows, revisión humana y costo por resultado válido." }
+  ],
+  "selectedStep": 1
+}

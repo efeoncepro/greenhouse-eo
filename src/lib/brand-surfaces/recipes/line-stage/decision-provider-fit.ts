@@ -35,7 +35,7 @@ import {
   type LineDocument,
   type Reflection, cssFine } from './kit'
 
-type Text = { px: number; weight?: number; tracking?: string; gapPx?: number; gapTopPx?: number; lineHeight?: number; text?: string }
+type Text = { px: number; weight?: number; tracking?: string; gapPx?: number; gapTopPx?: number; lineHeight?: number; text?: string; leadColor?: string; restColor?: string }
 
 type MonolithTokens = {
   count: number
@@ -56,9 +56,9 @@ type MonolithTokens = {
     rest: { fill: { color: string; opacity: number }; border: { px: number; color: string; opacity: number } }
   }
   kicker: Text
-  title: { leadPx: number; px: number; lineHeight: number; tracking: string; gapPx: number }
+  title: { leadPx: number; px: number; lineHeight: number; tracking: string; gapPx: number; leadColor?: string; restColor?: string }
   desc: Text
-  footer: { insetPx: number; paddingTopPx: number; rule: string; px: number; weight: number; text: string }
+  footer: { insetPx: number; paddingTopPx: number; rule: string; px: number; weight: number; text: string; color?: string }
 }
 
 type ShaftTokens = { topHalfWidthPx: number; baseHalfWidthPx: number; gradient: { from: { color: string; opacity: number }; to: { color: string; opacity: number } } }
@@ -135,6 +135,7 @@ export const decisionProviderFit: RecipeBuilder = ({ intent, manifest, recipe })
   const { stage, platform } = stageLayers(manifest, recipe, line, 'dpf', { haloCx: leadCx })
   const shaftLayer = layerAsset('decision-provider-fit-shaft', shaftSvg(manifest, shaft, leadCx, mono.baseYPx, line))
   const tile = mono.tile
+  const tone = (value: string | undefined, what: string) => lineColor(measured(value, `el color de ${what}`), line, what, doc)
 
   const frame: Record<string, unknown> = {
     line,
@@ -173,7 +174,15 @@ export const decisionProviderFit: RecipeBuilder = ({ intent, manifest, recipe })
     footerPadTop: css('dpf-footer-pad-top', mono.footer.paddingTopPx),
     footerRule: colorVar('dpf-footer-rule', lineColor(mono.footer.rule, line, 'el filete del pie', doc)),
     footerPx: css('dpf-footer-px', mono.footer.px),
-    footerWeight: css('dpf-footer-wght', mono.footer.weight, '')
+    footerWeight: css('dpf-footer-wght', mono.footer.weight, ''),
+    footerColor: colorVar('dpf-footer', tone(mono.footer.color, 'el pie')),
+    // El color de cada texto, en papel (el encendido) y en vidrio (los demás).
+    kickerLead: colorVar('dpf-kicker-lead', tone(mono.kicker.leadColor, 'el rótulo encendido')),
+    kickerRest: colorVar('dpf-kicker-rest', tone(mono.kicker.restColor, 'el rótulo')),
+    titleLead: colorVar('dpf-title-lead', tone(mono.title.leadColor, 'el veredicto encendido')),
+    titleRest: colorVar('dpf-title-rest', tone(mono.title.restColor, 'el veredicto')),
+    descLead: colorVar('dpf-desc-lead', tone(mono.desc.leadColor, 'la descripción encendida')),
+    descRest: colorVar('dpf-desc-rest', tone(mono.desc.restColor, 'la descripción'))
   }
 
   const delegate = selectionSlot(manifest)

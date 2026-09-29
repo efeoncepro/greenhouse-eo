@@ -62,6 +62,7 @@ type AgentTokens = {
   paintOrder: number[]
   document: LineDocument
   icon: { px: number; gapPx: number }
+  headerGapBottomPx: number
   kicker: Text
   title: Text
   job: Text
@@ -237,6 +238,7 @@ export const methodAgentSupervisor: RecipeBuilder = ({ intent, manifest, recipe 
     cardPerspective: css('mas-card-perspective', agents.perspectivePx),
     iconSize: css('mas-icon', agents.icon.px),
     iconGap: css('mas-icon-gap', agents.icon.gapPx),
+    headGap: css('mas-head-gap', measured(agents.headerGapBottomPx, 'el aire bajo la cabecera del agente')),
     kickerPx: css('mas-kicker-px', agents.kicker.px),
     kickerWeight: css('mas-kicker-wght', measured(agents.kicker.weight, 'el peso del rótulo del agente'), ''),
     kickerTracking: cssFine('mas-kicker-tracking', tracking(agents.kicker.tracking, 'el rótulo del agente')),

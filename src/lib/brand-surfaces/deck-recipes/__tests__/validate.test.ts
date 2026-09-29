@@ -28,20 +28,12 @@ const withCoverSlots = (slots: Record<string, unknown>): DeckPlan => ({
 })
 
 describe('catálogo de runtime', () => {
-  // Las cuatro recetas de la segunda ronda del deck Salesforce (SF5, SF10, SF11 y SF18, nacidas al canonizar el
-  // 2026-09-29) todavía no tienen plantilla ni página de AXIS: el plan las acepta y avisa `recipe-without-template` hasta
-  // que el Artifact Composer las implemente. Las doce de la primera ronda componen desde 84c83a044.
-  const SALESFORCE_WITHOUT_TEMPLATE = [
-    'decision-diagnosis-verdict',
-    'method-waves',
-    'content-day-live-console',
-    'content-day-live-approval'
-  ]
-
-  it('trae las 94 recetas aprobadas; todas con plantilla y página de AXIS salvo las 4 de la segunda ronda Salesforce', () => {
+  // Las 94 recetas componen: las doce de la primera ronda del deck Salesforce desde 84c83a044 y las cuatro de la
+  // segunda (SF5, SF10, SF11 y SF18) desde que el Artifact Composer las implementó (TASK-1942, tanda 2).
+  it('trae las 94 recetas aprobadas, todas con plantilla y página de AXIS', () => {
     expect(deckRecipeCatalog.recipes).toHaveLength(94)
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template).map(recipe => recipe.id)).toEqual(SALESFORCE_WITHOUT_TEMPLATE)
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id)).toEqual(SALESFORCE_WITHOUT_TEMPLATE)
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template).map(recipe => recipe.id)).toEqual([])
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id)).toEqual([])
   })
 
   it('acepta la portada y el cierre clásicos de AXIS sólo en pitch y QBR', () => {
@@ -59,15 +51,11 @@ describe('validateDeckPlan — planes golden', () => {
   }
 
   // El deck Salesforce en sus dos documentos (decisión del operador, 2026-09-29): como brochure cierra con la contraportada
-  // de brochure en la línea revenue-salesforce; como propuesta abre con la portada de propuesta y cierra con SF19. Los dos
-  // son válidos y sólo avisan las cuatro láminas de práctica que todavía no tienen plantilla.
+  // de brochure en la línea revenue-salesforce; como propuesta abre con la portada de propuesta y cierra con SF19. Con
+  // las cuatro láminas de práctica ya implementadas, los dos se componen de punta a punta sin avisos.
   for (const name of ['golden-brochure-salesforce.json', 'golden-proposal-salesforce.json']) {
-    it(`${name} es válido y sólo avisa las láminas de práctica sin plantilla`, () => {
-      const result = validateDeckPlan(read<DeckPlan>(name))
-
-      expect(result.ok).toBe(true)
-      expect(result.issues.every(issue => issue.code === 'recipe-without-template' && issue.severity === 'warning')).toBe(true)
-      expect(result.issues.map(issue => issue.recipeId).sort()).toEqual(['content-day-live-approval', 'content-day-live-console', 'decision-diagnosis-verdict', 'method-waves'])
+    it(`${name} no tiene errores ni advertencias`, () => {
+      expect(validateDeckPlan(read<DeckPlan>(name))).toEqual({ ok: true, issues: [] })
     })
   }
 

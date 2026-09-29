@@ -329,6 +329,12 @@
           "resolver": "gl-css",
           "example": "--gl-crc-icon-px=40px"
         },
+        "headGapBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-head-gap-bottom=14px"
+        },
         "stepsGap": {
           "type": "string",
           "required": true,
@@ -352,6 +358,12 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-crc-dot-glyph-px=14px"
+        },
+        "dotGlyphWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-dot-glyph-wght=700"
         },
         "doneFill": {
           "type": "string",
@@ -455,11 +467,167 @@
           "resolver": "gl-color",
           "example": "--gl-crc-video-to-color=#16395c"
         },
+        "screenInsetX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-screen-inset-x=18px"
+        },
+        "screenTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-screen-top=16px"
+        },
+        "screenHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-screen-height=120px"
+        },
+        "screenRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-screen-radius=10px"
+        },
+        "screenFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-crc-screen-fill-color=#ffffff"
+        },
+        "screenFillOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-screen-fill-opacity=8%"
+        },
+        "screenBorder": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-screen-border=1px"
+        },
+        "screenBorderColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-crc-screen-border-color=#ffffff"
+        },
+        "screenBorderOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-screen-border-opacity=12%"
+        },
+        "barInsetX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-inset-x=16px"
+        },
+        "barFirstTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-first-top=14px"
+        },
+        "barGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-gap=10px"
+        },
+        "barHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-height=10px"
+        },
+        "barRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-radius=6px"
+        },
+        "barColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-crc-bar-color=#ffffff"
+        },
+        "bar1Width": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-1-width=55%"
+        },
+        "bar1Opacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-1-opacity=35%"
+        },
+        "bar2Width": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-2-width=78%"
+        },
+        "bar2Opacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-2-opacity=20%"
+        },
+        "bar3Width": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-3-width=40%"
+        },
+        "bar3Opacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-bar-3-opacity=20%"
+        },
         "playPx": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-crc-play-px=58px"
+        },
+        "playTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-play-top=44%"
+        },
+        "playShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-play-shadow-y=10px"
+        },
+        "playShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-play-shadow-blur=30px"
+        },
+        "playShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-crc-play-shadow-color=#000000"
+        },
+        "playShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-play-shadow-opacity=40%"
         },
         "playGlyphPx": {
           "type": "string",
@@ -557,6 +725,24 @@
           "resolver": "gl-css",
           "example": "--gl-crc-duration-radius=8px"
         },
+        "durationStart": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-duration-start=18px"
+        },
+        "durationBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-duration-bottom=16px"
+        },
+        "durationColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-crc-duration-color=#ffffff"
+        },
         "durationFill": {
           "type": "string",
           "required": true,
@@ -574,6 +760,12 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-crc-footer-gap=14px"
+        },
+        "footerItemsGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-crc-footer-items-gap=12px"
         },
         "toolIconPx": {
           "type": "string",

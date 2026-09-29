@@ -34,7 +34,7 @@ export const ANSWER_RATIO_CONTENT_TYPES: ReadonlySet<string> = new Set([
   'deck.method-eeat',
   'deck.decision-traffic-to-revenue',
   'deck.decision-diagnosis-map',
-  // TASK-1942: las doce láminas del deck Salesforce (respuesta de 124 a 176 px sobre la pregunta de 40).
+  // TASK-1942: las dieciséis láminas del deck Salesforce (respuesta de 124 a 176 px sobre la pregunta de 40).
   'deck.content-one-platform',
   'deck.method-agent-supervisor',
   'deck.decision-platform-coexistence',
@@ -46,7 +46,11 @@ export const ANSWER_RATIO_CONTENT_TYPES: ReadonlySet<string> = new Set([
   'deck.content-day-release-cycle',
   'deck.content-day-live-library',
   'deck.content-live-chat',
-  'deck.content-measure-formulas'
+  'deck.content-measure-formulas',
+  'deck.decision-diagnosis-verdict',
+  'deck.method-waves',
+  'deck.content-day-live-console',
+  'deck.content-day-live-approval'
 ])
 
 export interface RenderedAuditViolation {

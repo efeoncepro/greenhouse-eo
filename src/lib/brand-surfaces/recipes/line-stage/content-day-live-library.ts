@@ -5,7 +5,7 @@
  * del producto, reproducir y duración; el rol y el título) y tres cifras. Sin selección.
  *
  * Todo lo que pinta sale de AXIS (`efeonceGraphicLine.surfaces.deck.recipes['content-day-live-library']`); las claves de
- * color del documento (`chip`, `muted`, `rule`) se resuelven con el documento de la familia (`familyDocument`). La
+ * color del documento (`chip`, `muted`, `rule`) se resuelven con el documento propio de la biblioteca (`library.document`). La
  * interfaz es genérica: sólo los isotipos son reales. El CONTENIDO llega en el intent: `library` (`tool` opcional
  * —la herramienta sólo si la cuenta la usa—, `kicker`, `title`), `videos` (cuatro: `icon`, `role`, `title`, `duration`),
  * `stats` (tres: `value`, `label`) y la marca de muestra (`sampleMark`), obligatoria con datos de muestra (`dataOrigin`
@@ -18,7 +18,7 @@ import type { RecipeBuilder } from '../deck'
 import { evidenceHtml } from '../frame'
 import { colorVar, css, measured } from '../kit'
 
-import { familyDocument, toolIsotype, trackingPx, twoLineAnswer } from './content-day-release-cycle'
+import { toolIsotype, trackingPx, twoLineAnswer } from './content-day-release-cycle'
 import {
   documentVars,
   exactly,
@@ -33,7 +33,7 @@ import {
   type Shadow
 } from './kit'
 
-type Text = { px: number; weight?: number; tracking?: string; gapPx?: number; gapTopPx?: number; color?: string; family?: string; lineHeight?: number; uppercase?: boolean }
+type Text = { px: number; weight?: number; tracking?: string; gapPx?: number; gapTopPx?: number; gapBottomPx?: number; insetXPx?: number; color?: string; family?: string; lineHeight?: number; uppercase?: boolean }
 
 type Border = { px: number; color: string }
 
@@ -44,9 +44,7 @@ type LibraryTokens = {
   padding: [number, number]
   radiusPx: number
   fill: string
-  shadow: Shadow
-  halo: LineDocument['halo']
-  edge: LineDocument['edge']
+  document: LineDocument
   perspectivePx: number
   rotateYDeg: number
   rotateXDeg: number
@@ -62,8 +60,8 @@ type LibraryTokens = {
       radiusPx: number
       gradient: { angleDeg: number; to: string; fromByRole: string[] }
       icon: { px: number; insetPx: number }
-      play: { px: number; glyphPx: number }
-      duration: { px: number; weight: number; padding: [number, number]; radiusPx: number; insetPx: number; fill: { color: string; opacity: number } }
+      play: { px: number; glyphPx: number; fill: string; glyph: string }
+      duration: { px: number; weight: number; padding: [number, number]; radiusPx: number; insetPx: number; color: string; fill: { color: string; opacity: number } }
     }
     role: Text
     title: Text
@@ -108,9 +106,9 @@ export const contentDayLiveLibrary: RecipeBuilder = ({ intent, manifest, recipe 
   if (!content.body) throw new SurfacePieceError('La lámina lleva su bajada (`body`).', 'invalid-intent')
   if (library.origin !== 'start') throw new SurfacePieceError('AXIS abre la biblioteca desde su borde inicial (`origin: start`).', 'surface-issues')
 
-  // La biblioteca es el papel de la familia sobre el chip: toma la sombra, el halo y el filo del documento.
-  const family = familyDocument(library.shadow)
-  const doc: LineDocument = { ...family, fill: lineColor(library.fill, line, 'la biblioteca', family), shadow: library.shadow, halo: library.halo, edge: library.edge }
+  // La biblioteca es su propio documento (papel suave sobre el chip): el fondo es una clave del mismo documento.
+  const own = measured(library.document, 'el documento de la biblioteca')
+  const doc: LineDocument = { ...own, fill: lineColor(own.fill, line, 'la biblioteca', own) }
   const color = (value: string, what: string) => lineColor(value, line, what, doc)
 
   const l = (intent.library ?? {}) as LibraryIntent
@@ -177,6 +175,8 @@ export const contentDayLiveLibrary: RecipeBuilder = ({ intent, manifest, recipe 
     thumbIconInset: css('cll-thumb-icon-inset', thumb.icon.insetPx),
     playPx: css('cll-play-px', thumb.play.px),
     playGlyphPx: css('cll-play-glyph-px', thumb.play.glyphPx),
+    playFill: colorVar('cll-play-fill', color(thumb.play.fill, 'el botón de reproducir')),
+    playGlyph: colorVar('cll-play-glyph', color(thumb.play.glyph, 'el triángulo de reproducir')),
     durationPx: css('cll-duration-px', thumb.duration.px),
     durationWeight: css('cll-duration-wght', thumb.duration.weight, ''),
     durationPadY: css('cll-duration-pad-y', thumb.duration.padding[0]),
@@ -185,15 +185,19 @@ export const contentDayLiveLibrary: RecipeBuilder = ({ intent, manifest, recipe 
     durationInset: css('cll-duration-inset', thumb.duration.insetPx),
     durationFill: colorVar('cll-duration-fill', color(thumb.duration.fill.color, 'la duración')),
     durationFillOpacity: css('cll-duration-fill-opacity', thumb.duration.fill.opacity * 100, '%'),
+    durationColor: colorVar('cll-duration', color(thumb.duration.color, 'el texto de la duración')),
     rolePx: css('cll-role-px', videos.role.px),
     roleWeight: css('cll-role-wght', measured(videos.role.weight, 'el peso del rol'), ''),
     roleTracking: trackingPx('cll-role-tracking', videos.role, 'el rol'),
     roleGap: css('cll-role-gap', measured(videos.role.gapTopPx, 'el aire del rol')),
+    roleInsetX: css('cll-role-inset-x', measured(videos.role.insetXPx, 'la sangría del rol')),
     roleColor: colorVar('cll-role', color(measured(videos.role.color, 'el color del rol'), 'el rol')),
     videoTitlePx: css('cll-video-title-px', videos.title.px),
     videoTitleWeight: css('cll-video-title-wght', measured(videos.title.weight, 'el peso del título del video'), ''),
     videoTitleLeading: css('cll-video-title-leading', measured(videos.title.lineHeight, 'el interlineado del título del video'), ''),
     videoTitleGap: css('cll-video-title-gap', measured(videos.title.gapPx, 'el aire del título del video')),
+    videoTitleInsetX: css('cll-video-title-inset-x', measured(videos.title.insetXPx, 'la sangría del título del video')),
+    videoTitleGapBottom: css('cll-video-title-gap-bottom', measured(videos.title.gapBottomPx, 'el aire bajo el título del video')),
     // Las cifras
     statsGap: css('cll-stats-gap', stats.gapPx),
     statsGapTop: css('cll-stats-gap-top', stats.gapTopPx),

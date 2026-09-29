@@ -851,7 +851,9 @@ export const closeProposal: RecipeBuilder = ({ intent, manifest, recipe }) => {
         ...sloganVars(manifest, ofHeight(manifest, measured(reserve(manifest, 'slogan')?.fromTop, 'la altura del eslogan'))),
         ...contact.frame,
         // Sin el bloque, las filas del contacto siguen a la fila de redes con el mismo espacio que entre sí.
-        contactSocialBelow: cssVar('contact-social-below', 0)
+        contactSocialBelow: cssVar('contact-social-below', 0),
+        // Y los tramos del eslogan conservan el interlineado de su caja.
+        sloganRunLeading: cssVar('slogan-run-leading', measured(typeOf(manifest, 'slogan').lineHeight, 'el interlineado del eslogan'), '')
       },
       backdrop: { src: photo.ref, alt: photo.alt },
       slogan: sloganSlots(manifest),
@@ -864,7 +866,8 @@ export const closeProposal: RecipeBuilder = ({ intent, manifest, recipe }) => {
 type SloganBlockTokens = {
   references: string[]
   logo: { widthPx: number; topPx: number }
-  slogan: { ofLogo: number; gapOfFont: number; boxLiftOfFont: number; lineHeight: number }
+  appliesTo: { lines: string[] }
+  slogan: { ofLogo: number; gapOfFont: number; boxLiftOfFont: number; lineHeight: number; runLineHeight: number | 'normal' }
   contact: {
     belowSloganPx: number
     socialRow: { urlBubbleHeightPx: number; iconPx: number; gapPx: number }
@@ -876,13 +879,13 @@ type SloganBlockTokens = {
 
 /**
  * La composición `sloganBlock` de la contraportada de propuesta (AXIS 0.3.31, operador 2026-09-29): sólo para las líneas
- * de sus referencias aprobadas (`close-proposal-horizon-<línea>`; hoy, Salesforce). Las contraportadas del 27/09 siguen
+ * de `appliesTo.lines` (AXIS 0.3.32; hoy, Salesforce). Las contraportadas del 27/09 siguen
  * con el logo de 500 px y el eslogan suelto.
  */
 const sloganBlockOf = (recipe: Record<string, unknown>, line: string): SloganBlockTokens | null => {
   const block = recipe.sloganBlock as SloganBlockTokens | undefined
 
-  return block?.references.some(reference => reference.endsWith(`-${line}`)) ? block : null
+  return block?.appliesTo.lines.includes(line) ? block : null
 }
 
 /**
@@ -940,6 +943,8 @@ const closeProposalSloganBlock = (
         sloganTop: cssVar('slogan-top', sloganTop),
         sloganPx: cssVar('slogan-px', sloganPx),
         sloganLeading: cssVar('slogan-leading', block.slogan.lineHeight, ''),
+        // Delta (q): cada tramo va con interlineado `normal` (la caja conserva 1), como en la lámina aprobada.
+        sloganRunLeading: `--gl-slogan-run-leading=${block.slogan.runLineHeight}`,
         ...base.frame,
         contactPx: cssVar('contact-px', lines.px),
         contactWeight: cssVar('contact-wght', lines.weight, ''),

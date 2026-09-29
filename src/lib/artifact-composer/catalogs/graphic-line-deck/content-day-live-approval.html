@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · la supervisión en vivo</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-day-live-approval` (surface deck, tema oscuro, TASK-1942). «¿Dónde apruebas al agente? Donde
+      trabajas.»: el mensaje del agente en el canal del equipo, en papel y en perspectiva (canal, agente con su etiqueta,
+      la propuesta, dos fichas de evidencia y tres botones separados para que la selección «Supervisora» tome «Aprobar»
+      sin pisar el segundo); a la derecha, en vidrio, lo ejecutado y registrado; debajo, el ciclo de cuatro pasos con el
+      de la persona en papel; arriba a la derecha, la nota. Interfaz genérica: sólo los isotipos son reales.
+      Referencia: DeckSalesforceSupervisionVivo (SF18-supervision-vivo).
+    -->
+    <main class="gl-slide gl-ls gl-cla" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <p class="gl-ls-note" data-slot="note">Ejemplo ilustrativo · la política y los límites se definen con tu equipo</p>
+
+      <section class="gl-ls-doc gl-cla-message">
+        <header class="gl-cla-channel" data-slot="channel">
+          <img class="gl-cla-channel-icon" data-slot-field="icon" alt="" />
+          <span data-slot-field="name"># servicio-aprobaciones</span>
+        </header>
+
+        <div class="gl-cla-agent">
+          <span class="gl-cla-avatar" data-slot="agentIcon"><img class="gl-cla-avatar-icon" data-slot-field="src" alt="" /></span>
+          <div class="gl-cla-post">
+            <p class="gl-cla-agent-line" data-slot="agent"><span data-slot-field="name">Agente de casos</span> <span class="gl-cla-badge" data-slot-field="badge">Agentforce</span></p>
+            <p class="gl-cla-text" data-slot="message">La propuesta del agente con su razón: el caso y el monto en <strong>negrita</strong>, y la política que la respalda.</p>
+            <ul class="gl-cla-chips" data-slot="chips">
+              <li class="gl-cla-chip"><span data-slot-field="label">Historial del cliente</span></li>
+            </ul>
+            <div class="gl-cla-actions" data-slot="actions">
+              <span class="gl-cla-action gl-cla-primary" data-slot-field="primary" data-gl-selection-target>Aprobar</span>
+              <span class="gl-cla-action gl-cla-secondary" data-slot-field="secondary">Editar</span>
+              <span class="gl-cla-action gl-cla-tertiary" data-slot-field="tertiary">Rechazar</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="gl-cla-executed" data-slot="executed">
+        <div class="gl-cla-executed-head">
+          <span class="gl-cla-executed-icon" data-slot="executedIcon"><img class="gl-cla-executed-mark" data-slot-field="src" alt="" /></span>
+          <span class="gl-cla-executed-title" data-slot-field="title">Ejecutado en Service Cloud</span>
+        </div>
+        <p class="gl-cla-executed-text" data-slot-field="text">Reembolso aplicado, cliente notificado y registro de quién aprobó y cuándo.</p>
+      </section>
+
+      <ol class="gl-cla-loop" data-slot="loop">
+        <li class="gl-ls-glass gl-cla-step">
+          <span class="gl-cla-number" data-slot-field="number">01</span>
+          <span class="gl-cla-step-title" data-slot-field="title">Propone</span>
+          <span class="gl-cla-step-detail" data-slot-field="detail">El agente, con evidencia</span>
+        </li>
+      </ol>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Agentforce · supervisión en vivo</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Dónde apruebas al agente?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Donde</span><span data-slot-field="answer">trabajas</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">El agente propone con evidencia, tú <strong>apruebas</strong> en Slack y el cambio queda ejecutado y registrado.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

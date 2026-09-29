@@ -159,4 +159,12 @@ describe('deck · content-season-launches (TASK-1942)', () => {
     expect(layers).toContain(accent)
     expect(used.filter(hex => !allowed.has(hex))).toEqual([])
   })
+
+  it('la píldora mide su alto de AXIS y el nombre empieza en su `title.topPx` (delta q)', () => {
+    const frame = plan(example()).slots.frame as Record<string, string>
+    const launches = G.surfaces.deck.recipes['content-season-launches']!.launches as { padding: number[]; status: { heightPx: number }; title: { gapTopPx: number; topPx: number } }
+
+    expect(frame.statusHeight).toBe('--gl-csn-status-height=26px')
+    expect(launches.padding[0]! + launches.status.heightPx + launches.title.gapTopPx).toBe(launches.title.topPx)
+  })
 })
