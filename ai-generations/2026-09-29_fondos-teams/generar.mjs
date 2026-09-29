@@ -6,7 +6,7 @@ import { construirPrompt } from '/Users/jreye/Documents/greenhouse-eo/scripts/fo
 
 const RAIZ = '/Users/jreye/Documents/greenhouse-eo'
 const D = new URL('./', import.meta.url).pathname
-const EXTRA = { cocina: ['arte/cocina.png', 'arte/nexa-mes.png'] }
+const EXTRA = { cocina: ['arte/cocina.png', 'arte/nexa-mes.png'], ...JSON.parse(readFileSync(new URL('./fichas/_imagenes-m.json', import.meta.url), 'utf8')) }
 const ids = process.argv[2].split(',')
 const v = process.argv[3] ?? 'v1'
 
