@@ -116,6 +116,28 @@ recuperación que crea entidades dispara sus correos, y el proveedor tiene cuota
   `src/lib/hiring/assessment/access-recovery/provider-block.ts` re-exporta. Email no depende de hiring; **NUNCA**
   redefinir el predicado en un dominio.
 
+## Delta 2026-09-29 — módulos de correo de Efeonce (AXIS `v0.3.38`, sin adoptar en Greenhouse)
+
+El operador canonizó en AXIS el **pie**, los **módulos de CTA** y el **bloque de marca** de los correos de Efeonce
+(token `efeonceEmail`, contrato `efeonce.email-modules` 0.1.0 `candidate`, PNG `AXIS_EMAIL_ASSETS` en
+`@efeoncepro/axis-brand-assets` 0.4.6); el correo de entrega de Insights es **una aplicación**, no la plantilla. El
+diseño y el template son de `greenhouse-email` (sección «Delta 2026-09-29») y la marca de `efeonce-graphic-line` →
+`references/applications.md` §C4. Lo que toca al proveedor:
+
+- **La atribución de la agenda va por UTM, no por click tracking.** La tarjeta «Agendar una reunión» (reemplaza a
+  «Suscribirme», retirado en todo correo) apunta a `https://efeoncepro.com/contacto/` con `utm_medium=email`,
+  `utm_source={producto}`, `utm_content=pie` (y `utm_campaign` si hay); el resolver no pisa un UTM que la URL ya
+  trae. El enlace personal de un informe no lleva UTM ni pasa por tracking de clics: sigue el invariante de links con
+  secreto de arriba. La agenda **nunca** es un `mailto:` (`agenda-never-email`).
+- **Imágenes: PNG @2x desde un origen público estable**, por su id de `axis-brand-assets` (logo, eslogan por línea,
+  cuatro redes, burbuja horneada), con `width`/`height` en el `<img>` y `alt`; nunca SVG en línea. Con imágenes
+  bloqueadas el pie se sigue leyendo porque legal, CTA, preferencias y motivo son texto vivo.
+- **Baja:** el pie lleva el enlace de baja (`footer-unsubscribe-required`); si el tipo de correo tiene baja, va además
+  la cabecera `List-Unsubscribe`. Esa exigencia choca con la policy propuesta de Greenhouse (TASK-1764,
+  `GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `Proposed`), que prohíbe la baja en transaccionales: tensión
+  registrada, sin resolver; no la decidas desde el proveedor.
+- **Estado:** Greenhouse fija el set anterior de AXIS y `src/emails/` no cambió; nada de esto está en runtime.
+
 ## Referencias
 
 Cárgalas según lo que estés tocando — no leas todo por defecto:

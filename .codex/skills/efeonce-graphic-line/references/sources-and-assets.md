@@ -6,6 +6,7 @@
 > 79 y 43 volúmenes): AXIS main@cf77452 (2026-09-27) (tag `v0.6.0`). Versiones fijadas y ruta por el Artifact Composer:
 > greenhouse-eo@016d0a183 — 2026-09-27 (tag AXIS `v0.3.8`). Versiones vigentes y fila de Glitch: greenhouse-eo@24e4c72ee
 > — 2026-09-28 (tag AXIS `v0.3.24`). Efeonce AI Visibility Report: AXIS `main` `26097c5`, tag `v0.3.30` — 2026-09-29.
+> Módulos de correo y camino recorrido: AXIS `main` `c92160b`, tag `v0.3.38` — 2026-09-29.
 
 ## Fuentes de verdad (por orden de autoridad)
 
@@ -15,7 +16,7 @@
 | Reglas de marca | `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` (manual) | el ADR |
 | Movimiento | `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md` (norma) y `EFEONCE_ORBIT_REVEAL_MOTION_V1.md` (producción) | el manual |
 | Valores | tokens `efeonceGraphicLine` en AXIS `packages/tokens/src/tokens.ts` | los docs describen; el token manda en números |
-| Composición por intención | contratos AXIS `efeonce.graphic-line-orbit`, `efeonce.collaboration-selection`, `efeonce.email-signature` | el token |
+| Composición por intención | contratos AXIS `efeonce.graphic-line-orbit`, `efeonce.collaboration-selection`, `efeonce.email-signature`, `efeonce.email-modules` | el token |
 | Composición por superficie | norma `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` + contrato AXIS `efeonce.surface-composition` (tokens `efeonceGraphicLine.surfaces`); en Greenhouse, las plantillas de las recetas aprobadas (catálogos `graphic-line-*`) | el operador aprueba la receta; el token manda en números; la plantilla sigue la lámina aprobada |
 | Pintura | paquete `@efeoncepro/axis-graphic-line` (recetas que reproducen las piezas medidas) | el contrato |
 | Fotografía | `docs/operations/brand-photography/` (lenguaje fotográfico, reservas, firma en primer plano) | el operador |
@@ -25,6 +26,7 @@
 | Motion, sonido y música de Glitch (**aprobados**, sólo Glitch, 2026-09-27) | Producción: repo taller `efeoncepro/efeonce-brand-workshop` (`main` = `ed89a0b`), `tools/glitch-motion/` (HyperFrames; `src/sound.mjs` sobre `tools/brand-sound`; `src/music.mjs`), manifiesto por corrida en `corridas/<run>/manifiesto.json` (sha256, verificaciones, entrega; sin rutas de máquina). Música: másteres en `https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/` (`index.json`; sha256 fijado en `music.mjs`, falla cerrado si cambia). Sonido: `glitch/sound/v1/` del mismo bucket. Entregas al editor: OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/` (`v2/` la aprobada, `v2/sin-musica/`, `kit/`, `transiciones/`). Datos AXIS: `apps/lab/src/data/{glitch,glitch-sound,glitch-sound-assets,glitch-music,glitch-music-assets}.ts`. Comandos: norma de Glitch §13.13 y [glitch.md](glitch.md) §12 | el operador aprueba; los archivos del bucket (URL + sha256) mandan sobre cualquier script |
 | Marca de producto de Efeonce Insights (canónica 2026-09-28) | criterio [criteria.md](criteria.md) («Insights, marca de producto que acompaña»), decisión [ledger.md](ledger.md) (fila 2026-09-28); archivos `@efeoncepro/axis-brand-assets` ≥ 0.4.0 (`insights-{logo,isotype,lockup}-*`), generador Greenhouse `scripts/brand/build-insights-logo.mjs`; mapa de aplicación [applications.md](applications.md) §B3b; anatomía del informe y la web en la skill `efeonce-insights` → `references/ui-and-brand.md` | el operador; los archivos sellados mandan en la forma |
 | Submarcas de producto SEO/AEO (aprobadas 2026-09-29): Efeonce \| SV360, AEO, AEO Assessment, AI Visibility Report | criterio [criteria.md](criteria.md) («Submarcas de producto SEO/AEO»), decisión [ledger.md](ledger.md) (fila 2026-09-29 tarde), norma manual §7.2, naming en el ADR `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md` §Delta 2026-09-29; archivos `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29; `sv360-*`, `aeo-*`, `aeo-assessment-*`, `ai-visibility-report-*`), generador Greenhouse `scripts/brand/build-seo-aeo-logos.mjs`; canvas de registro [«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac); aplicaciones [applications.md](applications.md) §B3c | el operador; los archivos sellados mandan en la forma |
+| Módulos de correo de Efeonce (pie, CTA principal, agenda, bloque de marca; aprobados 2026-09-29; el correo de entrega de Insights es una aplicación) | canvas [«Correo»](https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd) v21 (tableros: enlace en escritorio, en celular y PDF adjunto). AXIS: token `efeonceEmail` (`axis-tokens` 0.3.38), contrato `efeonce.email-modules` 0.1.0 `candidate` (`axis-ui-contracts` 0.3.38), PNG `AXIS_EMAIL_ASSETS` (`axis-brand-assets` 0.4.6), ADR `docs/architecture/EMAIL_MODULES_DECISION_V1.md`, guía `docs/agent-composition/email-modules.md` (+ schema y ejemplos en `docs/examples/email-modules/`), CLI `pnpm email:resolve`. Greenhouse: dirección sellada `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` + PNG en `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1/`; datos legales de `src/config/efeonce-brand.ts`; aplicación [applications.md](applications.md) §C4 | el operador aprueba; el token manda en números; los datos legales, el SSOT de Greenhouse |
 | Efeonce AI Visibility Report (el PDF del AEO Assessment; canónico en AXIS desde `v0.3.30`, 2026-09-29) | AXIS: tokens `efeonceGraphicLine.measureSeverity` y `aiVisibilityReport` (`axis-tokens` 0.3.30), contratos `efeonce.ai-visibility-report` 0.1.0 `candidate` y `efeonce.graphic-line-orbit` 0.4.0 (`axis-ui-contracts` 0.3.30), receta `@efeoncepro/axis-graphic-line/report` (0.12.0); ADR `docs/architecture/AI_VISIBILITY_REPORT_COMPOSITION_DECISION_V1.md`. Greenhouse: dirección sellada `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md` (commit `c76d75711`); criterio [criteria.md](criteria.md) §3.4 («Medida con gravedad»); inventario [package-and-tokens.md](package-and-tokens.md) §2.19, §2.20 y §7.10 | el operador aprueba; el token manda en números; los umbrales, el productor del puntaje |
 
 Si un doc y el código no coinciden, manda el código verificado y se corrige el doc (con fecha).
@@ -54,7 +56,15 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
     `docs/agent-composition/ai-visibility-report.md`, esquema `docs/agent-composition/ai-visibility-report-intent.schema.json`,
     ejemplos `docs/examples/ai-visibility-report/` (válidos e inválidos) y CLI `pnpm report:resolve`. La guía y el ADR
     de la órbita quedaron actualizados al contrato 0.4.0.
-  - Manuales para agentes: `docs/agent-composition/graphic-line-orbit.md`, `email-signature.md`,
+  - Módulos de correo (2026-09-29, `v0.3.38`): página
+    [axis.efeonce.org/references/email/](https://axis.efeonce.org/references/email/) y `/references/email.json`;
+    fuente `apps/lab/src/pages/references/email.astro` (+ `.json.ts`, `apps/lab/src/data/email.ts`,
+    `components/EmailFooter.astro`, `EmailAgenda.astro`, `styles/email.css`). Docs: ADR
+    `docs/architecture/EMAIL_MODULES_DECISION_V1.md`, guía `docs/agent-composition/email-modules.md`, esquema
+    `docs/agent-composition/email-modules-intent.schema.json`, ejemplos `docs/examples/email-modules/`, CLI
+    `pnpm email:resolve` y generador de PNG `pnpm email:assets`. La guía y el ADR de la órbita quedaron al contrato 0.5.0
+    (camino recorrido).
+  - Manuales para agentes: `docs/agent-composition/graphic-line-orbit.md`, `email-signature.md`, `email-modules.md`,
     `collaboration-selection.md`, `iconography.md`; decisiones AXIS `docs/architecture/GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md`
     e `ICONOGRAPHY_DECISION_V1.md`.
   - Iconografía: página `https://axis.efeonce.org/references/iconography/` (para el equipo, con «Copiar SVG») y
@@ -95,6 +105,7 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 | MP4, GIF y cuadros finales para el equipo | OneDrive `Alineación/5. Contenidos/13- Branding/Motion Órbita Efeonce/v1.1/` |
 | Versiones web del motion y pósters | Lab `apps/lab/public/media/graphic-line/motion/` |
 | Fotos de las láminas (lente, oficina, merch) | Lab `apps/lab/public/media/graphic-line/assets/` (`of-*.webp`, `ia-*.webp`, `L*-*.webp`) |
+| PNG para correo (logo 220, eslogan por línea separado del logo, 4 redes, burbuja horneada) | `@efeoncepro/axis-brand-assets` **0.4.6** (`assets/email/`, `AXIS_EMAIL_ASSETS`, `findEmailAsset`, `emailAssetUrl`); se regeneran con `pnpm email:assets` en AXIS; Greenhouse fija 0.4.5 y todavía no los usa |
 | Firma de correo (personal y de equipo) | contrato `efeonce.email-signature`; imágenes en `gs://efeonce-group-axis-public-media/email-signature/v3.1/` (`shared/<dark\|light>/`, `people/<persona>-<dark\|light>.png`, `areas/<área>-<dark\|light>.png`); generador vigente `ai-generations/2026-09-26_firma-partners/build4.mjs` (`HOST_BASE=<url>` escribe `hosted/` y los HTML de Outlook; `AREA=<área>` para la de equipo). La exploración de `exploracion-v5/firma/` es histórica (origen del token `portrait`) |
 | Kits 3D, prendas, lanyard, SVG oficiales | OneDrive `…/13- Branding/` (ver skill `efeonce-brand-studio`) |
 | Íconos de la línea (79 glifos aprobados: 36 Trazo + 43 Plastilina, desde D26) | `ICON_CATALOG` de `@efeoncepro/axis-graphic-line/icons` (79 desde 0.6.0, tag `v0.6.0`; 60 en 0.5.0; 30 en 0.4.0); en archivos, `pnpm icons:export` en AXIS (SVG por glifo y estado + `manifest.json`). Nunca copias a mano ni SVG dibujados en la pieza |
@@ -142,6 +153,12 @@ marca de Insights y el tipo `lockup` (25 SVG sellados). Antes, el mismo día, `v
 `axis-ui-contracts` 0.3.30, `axis-graphic-line` 0.12.0, `axis-brand-assets` 0.4.3 y `axis-ui-registry` 0.3.2 (el
 Efeonce AI Visibility Report y la medida con gravedad). `develop` de Greenhouse sigue en tokens y contracts 0.3.29,
 graphic-line 0.11.0, brand-assets 0.4.1 y registry 0.3.1; la adopción va con TASK-1938.
+
+**Publicado el 2026-09-29 (tag `v0.3.38`, AXIS `main` `c92160b`, verificado en el registro):** `axis-tokens` 0.3.38
+(`efeonceEmail`, `trajectory.measure.travelledPath`), `axis-ui-contracts` 0.3.38 (`efeonce.email-modules` 0.1.0 y la
+órbita 0.5.0), `axis-graphic-line` 0.13.0, `axis-brand-assets` 0.4.6 y `axis-ui-registry` 0.3.3. Greenhouse fija
+todavía `axis-tokens` y `axis-ui-contracts` 0.3.37, `axis-graphic-line` 0.11.0, `axis-brand-assets` 0.4.5 y
+`axis-ui-registry` 0.3.1 (`package.json`, 2026-09-29).
 
 **Fuentes de la composición del deck (TASK-1927 y TASK-1928, verificado 2026-09-28):** tasks
 `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` y

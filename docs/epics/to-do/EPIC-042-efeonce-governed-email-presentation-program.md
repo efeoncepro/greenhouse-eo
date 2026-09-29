@@ -78,6 +78,7 @@ esta clasificación es dirección de producto, no una declaración de cumplimien
 
 - `TASK-1774` — reparación del mecanismo de baja (`ISSUE-163`). Carril 0, precondición bloqueante.
 - `TASK-1764` — policy, dirección visual, inventario, decomposición de cohorts y gates anti-big-bang.
+- `TASK-1944` — adopción de los módulos canónicos de correo de Efeonce (pie, CTA principal, agenda y bloque de marca por línea; AXIS `v0.3.38`), empezando por el correo de entrega de Insights.
 - `TASK-1274` — retiro del lockup `Efeonce Greenhouse`. **Reanclada al epic el 2026-08-24**: su Open Question
   ("decidir la marca canónica de los emails del portal") no está abierta — `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`
   (Accepted) ya la responde, y su regla dura vigente (*"es Efeonce **o** Greenhouse"*) plantea como excluyentes dos

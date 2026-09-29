@@ -97,6 +97,15 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-09-29 — diseño del correo de entrega aprobado
+
+- El operador aprobó el correo de entrega de Insights (canvas v21: enlace escritorio, celular y PDF adjunto) y canonizó sus
+  módulos en AXIS `v0.3.38` (`efeonce.email-modules` 0.1.0): pie, CTA principal, agenda y bloque de marca por línea.
+  «Suscribirme» queda retirado. Dirección: `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`.
+- La presentación del correo (módulos y cuerpo de Insights) la construye
+  [TASK-1944](TASK-1944-efeonce-email-modules-adoption.md); esta task conserva el cableado de datos de la edición y el
+  portal. El criterio que pide el preview con `EmailLayout` queda sustituido por el diseño aprobado.
+
 ## Summary
 
 Construye biblioteca, encargo y gestión Insights para cliente autenticado y colaboradores internos autorizados,

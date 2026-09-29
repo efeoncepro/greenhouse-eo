@@ -9,6 +9,7 @@
 > `docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md`; norma
 > `EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`; `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md` («Tres
 > voces»); `docs/context/05_voz-tono-estilo.md` y `09_marca-agencia.md`; decisiones del operador del 2026-09-26.
+> §3.4 «El camino recorrido» (operador, 2026-09-29): AXIS `main@c92160b`, tag `v0.3.38` — 2026-09-29.
 > Lo que no está en una fuente va marcado **«inferido»**: tómalo como lectura razonada, no como regla.
 
 Este archivo no repite números: esos viven en los tokens `efeonceGraphicLine` y los explica
@@ -192,10 +193,28 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   completa (Lab 1.2.1; token `trajectory.measure`).
 - **Criterio del operador (2026-09-26):** la órbita que **recorre** es la que mejor funciona. Un dato no es un loader:
   es la posición de la esfera con una estela corta. **Al 100 % la esfera se queda**: perderla es un error, porque el
-  dato completo sigue siendo una decisión, no un anillo vacío.
+  dato completo sigue siendo una decisión, no un anillo vacío. (Desde el 2026-09-29 la acompaña el camino recorrido,
+  abajo: sigue siendo la esfera la que dice el dato.)
+- **El camino recorrido (operador, 2026-09-29; reemplaza el «nunca un arco que crece desde el origen»):** bajo la
+  estela, la medida dibuja el **camino recorrido** desde las 12 hasta la esfera, en el mismo color de la estela al
+  **60 % de opacidad** y con un trazo de **0,75 × el de la estela** (token
+  `efeonceGraphicLine.trajectory.measure.travelledPath`: `opacity 0.6`, `strokeOfTrail 0.75`, `full: 'ring-at-100'`,
+  `none: 'at-zero'`). Al 100 % es el anillo completo, con la esfera arriba; en 0 % no existe. Con gravedad toma el
+  color de la gravedad, como la estela.
+  - **Por qué:** con sólo la estela corta, un 62 % se leía como menos: el operador lo vio en el correo de Insights
+    («me hace pensar que está a menos»). El ojo no sabe hacia dónde viaja la esfera; el camino tenue le da la
+    dirección y la distancia sin volverse un loader, porque la estela y la esfera siguen mandando y el camino queda
+    debajo, más fino y más tenue.
+  - **Alcance:** **toda medida** («aplícalo en todas»), incluida la portada del AI Visibility Report. No aplica al
+    avance (`progress`), al acento ni a los satélites.
+  - Vive en AXIS desde `v0.3.38`: contrato `efeonce.graphic-line-orbit` **0.5.0** (toda `measure` resuelve su
+    `travelled`, sin campo nuevo en el intent; parte de anatomía `travelled-path`), `axis-graphic-line` 0.13.0 (el
+    pintor y `aiVisibilityReportOrbitSvg`) y las 48 órbitas estáticas re-selladas con la misma geometría. Greenhouse
+    todavía fija el set anterior y su adapter de la órbita sólo acepta el contrato 0.3.1
+    ([package-and-tokens.md](package-and-tokens.md) §2.21).
 - **Con qué:** la cifra entera impresa («60 %») y su fuente. Dos datos en una pieza: mismo radio, misma partida.
-- **Nunca:** un arco que crece desde el origen hasta volverse anillo; una estela más larga que lo recorrido; un dato sin
-  fuente (la esfera no se mueve sin dato real).
+- **Nunca:** un camino recorrido más grueso o más opaco que la estela (se vuelve un anillo que se llena); el camino sin
+  su estela y su esfera; una estela más larga que lo recorrido; un dato sin fuente (la esfera no se mueve sin dato real).
 - **Medida con gravedad (operador, 2026-09-29):** cuando el dato es un puntaje con una escala de gravedad publicada,
   la estela, la esfera y el halo pueden tomar el color de esa gravedad en vez del acento. El único caso aprobado hoy es
   la portada del Efeonce AI Visibility Report (umbrales < 40 crítico, < 70 atención y el resto óptimo).
@@ -219,7 +238,8 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   - Dirección: `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`.
 - **En una lámina de gráficos** (Marketing con Manzanitas, aprobada por el operador el 2026-09-28 con toda la
   línea; [manzanitas.md](manzanitas.md) §8): la dona de la línea es esta medida, con la geometría de AXIS (anillo, marca de partida, estela y esfera de
-  `measureSvg`); **no hay dona de partes**, porque tres segmentos en un anillo serían un arco que se llena: las partes,
+  `measureSvg`, que desde `axis-graphic-line` 0.13.0 hereda también el camino recorrido; Greenhouse fija 0.11.0 y sus
+  donas todavía no lo dibujan); **no hay dona de partes**, porque tres segmentos en un anillo serían un arco que se llena: las partes,
   hasta tres, van en una barra al 100 %. La tendencia termina en la esfera y su último tramo es la estela en el acento.
   Como la esfera es una por pieza, la lámina cuya esfera está en el gráfico no lleva la voz con su esfera. Ningún
   círculo suelto en un gráfico: el conteo va en cuadrados y el Venn en discos translúcidos sin anillo.
@@ -364,7 +384,7 @@ Decisión del operador (2026-09-26): todas las formas que el canvas exploró sig
 | **Plana**, sin halo | sobre fotos, en papel y en tamaños chicos |
 | **Con órbitas interiores** | sólo una órbita vacía: anatomía, portafolio |
 | **Con satélites** | arco largo en degradé, sin esfera; el portafolio o los canales |
-| **Un dato** | la esfera recorre hasta el valor con su estela corta |
+| **Un dato** | la esfera recorre hasta el valor con su estela corta, sobre el camino recorrido tenue desde las 12 (§3.4, desde 2026-09-29) |
 | **Órbita sesgada** (D20) | sólo alrededor del objeto protagonista de Plastilina: su firma; nunca mide (§3.14) |
 | **Lente**, **foco**, **marca de estado**, **cierre de marca**, **mapa de familia** | sus trabajos de 3.8 a 3.12 |
 
@@ -739,7 +759,8 @@ animaciones del logo nunca se generan con un modelo de video y son sólo de Efeo
 de Greenhouse. Detalle en [motion.md](motion.md).
 
 *Inferido:* un dato animado sigue la regla de la trayectoria: la esfera viaja desde las 12 hasta su valor con la estela
-detrás; nunca se anima como una barra que se llena.
+detrás; nunca se anima como una barra que se llena. El camino recorrido (§3.4) es estático: es el estado final de la
+medida, no una animación de llenado.
 
 ---
 
@@ -749,7 +770,8 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 
 | Error | Por qué está mal | Fuente |
 |---|---|---|
-| La órbita se **llena como un loader** | un dato es la posición de la esfera con estela corta; la órbita recorre | operador 2026-09-26; Lab 1.2.1 |
+| La órbita se **llena como un loader** | un dato es la posición de la esfera con estela corta; la órbita recorre. El camino recorrido tenue (60 %, 0,75 × la estela) no es un loader: si queda tan grueso u opaco como la estela, sí lo es | operador 2026-09-26 y 2026-09-29; Lab 1.2.1; `trajectory.measure.travelledPath` |
+| **Una medida sin camino recorrido** (sólo la estela corta) | el ojo no sabe la dirección y el dato se lee menor («62 %… me hace pensar que está a menos») | operador 2026-09-29; contrato de la órbita 0.5.0 |
 | **La esfera desaparece al 100 %** | el dato completo sigue siendo una decisión; la esfera se queda | operador 2026-09-26; token `trajectory` |
 | **Órbita ovalada** | la órbita es circular; el óvalo sólo existe en la animación del isotipo 3D y en la **órbita sesgada** de Plastilina (D20), que rodea un objeto y nunca mide | operador 2026-09-26 |
 | **Disco suelto** en la lente | la lente lleva la misma órbita: anillo, arco corto y esfera en la punta | manual §1.5; lámina 1.3 |

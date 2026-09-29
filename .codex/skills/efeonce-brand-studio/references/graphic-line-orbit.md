@@ -101,6 +101,22 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
   (`briefcase`, sales@efeoncepro.com). Sólo el correo del área, sin teléfono ni LinkedIn personal. Áreas en
   `efeonceGraphicLine.emailSignature.team` (AXIS 0.3.4); un área nueva nace ahí.
 
+## Correos de Efeonce: pie, CTA y bloque de marca (aprobados 2026-09-29)
+
+- **No es la firma de correo de una persona** (arriba): es el correo que envía Efeonce o un producto suyo. Se
+  canonizaron tres módulos que todo correo reutiliza con su propio cuerpo; el correo de entrega de Insights (canvas
+  «Correo» v21) es **una aplicación**, no la plantilla.
+- **Pie:** tarjeta de agenda («¿Lo revisamos juntos?», píldora blanca «Agendar una reunión» → `/contacto/` con UTM,
+  nunca a un correo) → bloque de marca (logo 220 px y, debajo, el eslogan al 64 % con la palabra de la **línea de
+  servicio**; en blanco a ese tamaño) → burbuja URL + LinkedIn, Instagram, YouTube, Threads → filete → legal desde
+  `src/config/efeonce-brand.ts` → filete → preferencias y baja → motivo y ©. **CTA principal:** píldora navy a todo el
+  ancho. **«Suscribirme» retirado.**
+- Logo y eslogan van en **dos** PNG (el eslogan nunca se funde con el logo). El pie lleva logo y burbuja a la vez: es
+  pie, no firma de pieza gráfica.
+- AXIS `v0.3.38`: token `efeonceEmail`, contrato `efeonce.email-modules` 0.1.0 (`candidate`), PNG `email-*` en
+  `axis-brand-assets` 0.4.6, Lab https://axis.efeonce.org/references/email/. Greenhouse **no** los adoptó; queda
+  abierta la tensión con la policy de footer de TASK-1764. Detalle: `efeonce-graphic-line` → `applications.md` §C4.
+
 ## Reglas duras (las más caras de romper)
 
 1. **Ningún texto cruza la órbita.** Texto en el tercio inferior izquierdo; órbita fuera de eje, arriba a la derecha.
@@ -170,7 +186,13 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
     productor. **No** vale para el estado (regla 12) ni para una medida sin escala. Contrato de la órbita 0.4.0
     (`measure.severity`) y el del informe `efeonce.ai-visibility-report` 0.1.0 (`candidate`), receta
     `aiVisibilityReportOrbitSvg`; página canónica https://axis.efeonce.org/references/ai-visibility-report/.
-    Greenhouse fija AXIS 0.3.29 hasta TASK-1938. Detalle: `efeonce-graphic-line` → `criteria.md` §3.4.
+    Greenhouse todavía no adopta la receta del informe (TASK-1938). Detalle: `efeonce-graphic-line` → `criteria.md` §3.4.
+19. **Toda medida dibuja el camino recorrido** (operador, 2026-09-29, «aplícalo en todas»; reemplaza «nunca un arco
+    que crece desde el origen»): bajo la estela, el arco de las 12 a la esfera en el mismo color (o el de la gravedad)
+    al 60 % y con 0,75 × el trazo de la estela; al 100 % es el anillo completo, en 0 % no existe. Por qué: un 62 % con
+    sólo la estela corta se leía como menos. Es estático (sólo la estela y la esfera se animan) y nunca más grueso ni
+    más opaco que la estela. AXIS `v0.3.38`: `trajectory.measure.travelledPath`, contrato de la órbita 0.5.0,
+    `axis-graphic-line` 0.13.0; Greenhouse sin adoptar. Detalle: `efeonce-graphic-line` → `criteria.md` §3.4.
 
 ## De dónde salen los valores y los archivos
 
@@ -363,6 +385,7 @@ el pre-push `scripts/ci/large-blob-gate.mjs` bloquea blobs grandes.
 | Órbita pintada | `@efeoncepro/axis-graphic-line` 0.3.1 | recetas, motion, React y Web Component (Greenhouse no lo usa) |
 | Íconos | `@efeoncepro/axis-graphic-line/icons` 0.4.0 · `efeonceGraphicLine.icons` (tokens 0.3.6) · https://axis.efeonce.org/references/iconography/ | Trazo y Plastilina: catálogo, `resolveIcon`, `auditIconGroup`, órbita sesgada |
 | Efeonce AI Visibility Report (2026-09-29) | https://axis.efeonce.org/references/ai-visibility-report/ (+ `.json`) · contrato `efeonce.ai-visibility-report` 0.1.0 · `@efeoncepro/axis-graphic-line/report` 0.12.0 · tokens `measureSeverity` y `aiVisibilityReport` (0.3.30) | el informe completo y la medida con gravedad de su portada; dirección de Greenhouse en `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md` |
+| Módulos de correo (2026-09-29) | https://axis.efeonce.org/references/email/ (+ `.json`) · contrato `efeonce.email-modules` 0.1.0 · token `efeonceEmail` · PNG `email-*` en `@efeoncepro/axis-brand-assets` 0.4.6 (0.3.38) | pie, CTA y bloque de marca de todo correo de Efeonce; dirección de Greenhouse en `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` |
 | Íconos en volumen (D24) | `@efeoncepro/axis-brand-assets` 0.3.2 `assets/volume/` · `efeonceGraphicLine.icons.volume` (tokens 0.3.7) · ambos publicados (tag `v0.3.7`) · Lab `#volumen` | Plastilina en volumen: 18 PNG con alfa, `volumeIconUrl(glyph)`, sólo objeto protagonista |
 | Motion | `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md` · `EFEONCE_ORBIT_REVEAL_MOTION_V1.md` | norma del lenguaje de movimiento · spec de reveal, apertura y sting V1.1 |
 | Adapter | `scripts/creative/layout-compiler/graphic-line.mjs` | resolver + pintor + medición de firma |

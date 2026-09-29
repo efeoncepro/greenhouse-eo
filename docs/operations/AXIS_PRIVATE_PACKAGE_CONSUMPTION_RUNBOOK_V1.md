@@ -8,10 +8,15 @@ source control.
 
 ## Current state — 2026-09-14
 
-> **Actualizado 2026-09-29 — estado vigente:** Greenhouse fija `axis-tokens` `0.3.29`, `axis-ui-contracts` `0.3.29`,
-> `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.1` y `axis-ui-registry` `0.3.1` (`package.json`, bump
-> `2c95e60b2`, tag `v0.3.29`). AXIS ya publicó `v0.3.30` (`main` `26097c5`), que Greenhouse **todavía no fija**. Ver
-> **Delta 2026-09-29 (h)**. La nota siguiente queda como historia.
+> **Actualizado 2026-09-29 (noche) — estado vigente:** Greenhouse fija `axis-tokens` `0.3.37`, `axis-ui-contracts`
+> `0.3.37`, `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.5` y `axis-ui-registry` `0.3.1` (`package.json`,
+> bump `bacd6a4ea`, tag `v0.3.37`). AXIS ya publicó `v0.3.38` (`main` `c92160b`), que Greenhouse **todavía no fija**, y
+> el adapter de la órbita está rojo con el juego actual. Ver **Delta 2026-09-29 (i)**. La nota siguiente queda como
+> historia.
+
+> **Actualizado 2026-09-29 — superado por la nota de arriba:** Greenhouse fijaba `axis-tokens` `0.3.29`,
+> `axis-ui-contracts` `0.3.29`, `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.1` y `axis-ui-registry` `0.3.1`
+> (`package.json`, bump `2c95e60b2`, tag `v0.3.29`), con `v0.3.30` publicado y sin fijar. Ver **Delta 2026-09-29 (h)**.
 
 > **Actualizado 2026-09-28 (noche) — superado por la nota de arriba:** Greenhouse fija `axis-tokens` `0.3.24` y `axis-ui-contracts`
 > `0.3.22` (tag `v0.3.24` de AXIS, commit `5b3056f`: `glitchLine.editions` y contrato `efeonce.glitch-line` 0.2.0, el
@@ -103,6 +108,35 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-29 (i) — `v0.3.38` publicado, no fijado: módulos de correo y recorrido de la medida
+
+- **Publicado** el 2026-09-29 en el tag `v0.3.38` de AXIS (commit `c92160b` en `main`, registro verificado):
+
+  | Paquete | Versión | Qué suma |
+  |---|---|---|
+  | `@efeoncepro/axis-tokens` | `0.3.38` | `efeonceEmail` (pie, `cta-primary`, `cta-agenda`, bloque de marca por línea, datos institucionales, suscripción retirada, reglas para clientes de correo) y `efeonceGraphicLine.trajectory.measure.travelledPath` |
+  | `@efeoncepro/axis-ui-contracts` | `0.3.38` | contrato nuevo `efeonce.email-modules` `0.1.0` (`candidate`) y `efeonce.graphic-line-orbit` `0.4.0` → `0.5.0` (toda medida resuelve su recorrido) |
+  | `@efeoncepro/axis-graphic-line` | `0.13.0` | el pintor y `aiVisibilityReportOrbitSvg` dibujan el recorrido |
+  | `@efeoncepro/axis-brand-assets` | `0.4.6` | doce PNG @2x para correo (`EMAIL_ASSET_SEALS`, logo y eslogan por línea separados, redes, burbuja) y órbitas estáticas re-selladas |
+  | `@efeoncepro/axis-ui-registry` | `0.3.3` | registro al día |
+
+- **Greenhouse sigue en `v0.3.37`**: `axis-tokens` y `axis-ui-contracts` `0.3.37`, `axis-graphic-line` `0.11.0`,
+  `axis-brand-assets` `0.4.5` y `axis-ui-registry` `0.3.1` (commit `bacd6a4ea`). Lo adoptan TASK-1944 (módulos de
+  correo) y TASK-1938 (PDF del AI Visibility Report), la que llegue primero, con la credencial efímera del Delta (e)
+  autorizada por el operador para esa instalación.
+- **El adapter de la órbita ya está rojo** (verificado el 2026-09-29): el juego `v0.3.31` (commit `9289cab0c`) subió el
+  contrato de la órbita a `0.4.0`, y `scripts/creative/layout-compiler/graphic-line.mjs` sigue declarando
+  `SUPPORTED_CONTRACT_VERSION = '0.3.1'`. `node --test scripts/creative/layout-compiler/graphic-line.test.mjs` da 0 de
+  7 («Unsupported AXIS graphic line contract 0.4.0»). `pnpm creative:layout:test` no corre en CI, por eso el bump pasó.
+  **Recomendación (pendiente de que el operador la adopte como regla):** todo bump de `axis-ui-contracts` que cambie
+  la versión de `efeonce.graphic-line-orbit` lleva el soporte del adapter en el mismo commit y corre
+  `pnpm creative:layout:test` antes de commitear.
+- Después del bump corren `pnpm brand:tokens`, `pnpm glitch:tokens` y `pnpm manzanitas:tokens`, con sus `--check`
+  (regla del Delta (g)).
+- **Assets de correo:** los PNG de `axis-brand-assets` `0.4.6` no se sirven desde el paquete a los clientes de correo;
+  TASK-1944 los publica en el bucket público de medios de Greenhouse (patrón de `EFEONCE_LOGO_URL`) y verifica cada
+  SHA-256 contra su sello.
 
 ## Delta 2026-09-29 (h) — `v0.3.30` publicado, no fijado: el Efeonce AI Visibility Report
 

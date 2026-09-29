@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), and the SEO/AEO product sub-brands SV360, AEO, AEO Assessment and AI Visibility Report (`axis-brand-assets` 0.4.2, Lab `/references/seo-aeo/`)."
+description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), the SEO/AEO product sub-brands SV360, AEO, AEO Assessment and AI Visibility Report (`axis-brand-assets` 0.4.2, Lab `/references/seo-aeo/`), and the Efeonce email modules — footer, primary CTA, agenda card and footer brand block (`efeonceEmail`, contract `efeonce.email-modules`, email-safe PNGs in `axis-brand-assets` 0.4.6, Lab `/references/email/`; 0.3.38 set)."
 ---
 
 # AXIS Design System
@@ -238,16 +238,19 @@ Rules for agents:
   change means changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
-- **Greenhouse consumption (verified 2026-09-29 in `package.json` and `node_modules`):** `develop` pins `axis-tokens`
-  `0.3.29`, `axis-ui-contracts` `0.3.29` (AXIS tag `v0.3.29`, 2026-09-29, Marketing con Manzanitas with no open
-  decisions; the contracts package depends on `axis-tokens` exactly `0.3.29`), `axis-ui-registry` `0.3.1`,
-  `axis-brand-assets` `0.4.1` and `axis-graphic-line` `0.11.0`. Graphic-line visual gate: 73 frames at 0 px (verified 2026-09-29 on the `v0.3.29` bump; 66 after TASK-1928).
-  **AXIS has since published tag `v0.3.30`** (2026-09-29, `main` `26097c5`: tokens/contracts `0.3.30`, graphic-line
-  `0.12.0`, brand-assets `0.4.3`, registry `0.3.2`; see «Efeonce AI Visibility Report (0.3.30 set)»); Greenhouse still
-  pins `0.3.29` and adopts `0.3.30` inside TASK-1938. A bump runs the three token regenerations below.
+- **Greenhouse consumption (verified 2026-09-29, night, with `grep '"@efeoncepro/axis' package.json`):** `develop`
+  pins `axis-tokens` `0.3.37`, `axis-ui-contracts` `0.3.37` (AXIS tag `v0.3.37`: Glitch and Marketing con Manzanitas
+  stable), `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.5` and `axis-ui-registry` `0.3.1`. **AXIS is at the
+  `0.3.38` set** (tag `v0.3.38`, 2026-09-29, `main` `c92160b`: tokens/contracts `0.3.38`, graphic-line `0.13.0`,
+  brand-assets `0.4.6`, registry `0.3.3`; see «Efeonce email modules (0.3.38 set)»), so Greenhouse is behind on
+  graphic-line (`0.12.0` and `0.13.0` not adopted: no `/report`, no travelled path), brand-assets (no email PNGs) and
+  registry; tokens/contracts `0.3.37` already carry the orbit contract `0.4.0` and the report token/contract. The layout-compiler orbit adapter accepts only
+  orbit contract `0.3.1`: moving to orbit `0.5.0` needs adapter support (the measure's `travelled`), not just a bump.
+  Graphic-line visual gate: 89 frames at 0 px on the `0.3.36` bump (73 on `v0.3.29`, 66 after TASK-1928). A bump runs
+  the three token regenerations below.
   Series: `0.3.11`…`0.3.14` (TASK-1927), `0.3.12` (TASK-1922, Glitch), `0.3.15`…`0.3.21` (TASK-1928), `0.3.24` (Glitch Flash, contracts `0.3.22`); table in
   the surface-composition section below.
-  It does not use `efeonce.email-signature` yet. `axis-graphic-line` paints the orbit only in the Artifact Composer
+  It does not use `efeonce.email-signature` yet, nor `efeonce.email-modules` (its emails in `src/emails/` are unchanged). `axis-graphic-line` paints the orbit only in the Artifact Composer
   brand surfaces (`src/lib/brand-surfaces`, `src/lib/artifact-composer/catalogs/graphic-line-*`); the layout-compiler
   adapter `scripts/creative/layout-compiler/graphic-line.mjs` still resolves the contract from `axis-ui-contracts` and
   keeps its own raster-safe painter (lens with arc + sphere, deck one ring), and `axis-advertising.mjs` requires
@@ -269,7 +272,7 @@ Rules for agents:
   variants. Threshold 4.5 vs 3:1 pending the operator.
 - **The orbit never replaces the photographic composition** and never crosses subject, text reserves, bed or
   signature (`orbit-never-over-subject-or-reserves`).
-- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; `0.4.2` published 2026-09-29, AXIS `main` `7f9c8bb`; `0.4.3`, tag `v0.3.30`, only re-stamps the 48 static orbits with orbit contract `0.4.0`; Greenhouse pins `0.4.1`): 58 brand SVG since
+- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; `0.4.2` published 2026-09-29, AXIS `main` `7f9c8bb`; `0.4.3`, tag `v0.3.30`, only re-stamps the 48 static orbits with orbit contract `0.4.0`; `0.4.4`/`0.4.5` add `AXIS_PARTNER_ASSETS`; `0.4.6`, tag `v0.3.38`, adds the email PNGs `AXIS_EMAIL_ASSETS` and re-stamps the orbits with contract `0.5.0`; Greenhouse pins `0.4.5`): 58 brand SVG since
   `0.4.2` (19 until `0.3.6`: logo/isotype per brand, URL bubble source and baked variants; `0.4.0` adds the Insights
   logo/isotype and the `lockup` kind, see «Efeonce Insights in AXIS»; `0.4.2` adds 33 SEO/AEO sub-brand files and the `white` variant, see «SEO/AEO product sub-brands in AXIS») plus the 48 static orbits, SHA-256 sealed; `findBrandAsset`, `brandAssetUrl`,
   `findOrbitAsset`. Consumers read the package, never a hand copy (Greenhouse guards its local copies with
@@ -714,8 +717,8 @@ Efeonce in a lockup and **never sign alone**. Naming: Greenhouse ADR `EFEONCE_AE
 - **Lab reference page** `/references/seo-aeo/` + `/references/seo-aeo.json`, agent guide
   `docs/agent-composition/seo-aeo.md` — published 2026-09-29 (answering 200 per `efeonce-graphic-line` →
   `sources-and-assets.md`).
-- **Greenhouse pins `0.4.1`**: it does not carry these files until TASK-1938 (Grader report PDF with the «Efeonce | AI
-  Visibility Report» lockup, Engine palette) bumps the version.
+- **Greenhouse pinned `0.4.1`** when these files shipped; it now pins `0.4.5`, which carries them. Their first
+  application is TASK-1938 (Grader report PDF with the «Efeonce | AI Visibility Report» lockup, Engine palette).
 - Criterion and application map: `efeonce-graphic-line` → `criteria.md` («Submarcas de producto SEO/AEO») and
   `applications.md` §B3c; Greenhouse norm `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §7.2.
 
@@ -752,11 +755,71 @@ tag **`v0.3.30`**, registry verified: `axis-tokens` `0.3.30`, `axis-ui-contracts
   them in a token). The severity exception is limited to a scored diagnostic: it is **not** a permission for the state
   mark, which stays without traffic lights, nor for coloring a measure without a published scale. Unlike Insights, AXIS
   holds a contract for this document; the PDF renderer is Greenhouse's.
-- **Greenhouse does not pin it yet:** `develop` pins tokens/contracts `0.3.29`, graphic-line `0.11.0`, brand-assets
-  `0.4.1`; adopting `0.3.30` is part of TASK-1938 (its renderer is not implemented). Sealed design:
-  `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. Criterion, inventory and the
-  open question about drawing the travelled path (undecided; not a rule): `efeonce-graphic-line` → `criteria.md` §3.4,
-  `package-and-tokens.md` §2.19/§2.20/§7.10, `ledger.md`.
+- **Travelled path (decided 2026-09-29, night; `0.3.38` set):** the operator decided «aplícalo en todas»: every
+  measure, this cover included, also draws the travelled path from 12 o'clock under the trail, in the trail's (or
+  severity's) color at 0.6 opacity and 0.75 × the trail stroke. `aiVisibilityReportOrbitSvg` draws it since
+  `axis-graphic-line` `0.13.0` (`aiVisibilityReport.cover.orbit.travelled`: 3 px under the 4 px trail). Details in
+  «Efeonce email modules (0.3.38 set)» below.
+- **Greenhouse does not pin it yet:** `develop` pins tokens/contracts `0.3.37`, graphic-line `0.11.0`, brand-assets
+  `0.4.5` (the report tokens and contract arrive with the `0.3.3x` pins, but not `/report` nor the travelled path);
+  adopting the report is part of TASK-1938 (its renderer is not implemented). Sealed design:
+  `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. Criterion and inventory:
+  `efeonce-graphic-line` → `criteria.md` §3.4, `package-and-tokens.md` §2.19/§2.20/§7.10, `ledger.md`.
+
+### Efeonce email modules (0.3.38 set)
+
+The operator approved the **Efeonce Insights delivery email** (canvas https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd
+v21, page «Correo», boards: share link desktop, mobile, PDF attached) and asked to canonize, with this scope: the
+Insights email is **one application**, not the email template. What is canonical is the **footer**, the **CTA modules**
+and the **footer brand block**; other emails build their own body on the same base. Published 2026-09-29, AXIS `main`
+`c92160b`, tag **`v0.3.38`**, registry verified: `axis-tokens` `0.3.38`, `axis-ui-contracts` `0.3.38`,
+`axis-graphic-line` `0.13.0`, `axis-brand-assets` `0.4.6`, `axis-ui-registry` `0.3.3`.
+
+- **Token `efeonceEmail`** (top-level export outside `efeonceGraphicLine`, `canonical`, `complements:
+  'efeonceGraphicLine'`, `scope: 'modules'`, `template: false`): `width` (desktop card 600 in a 680 frame; mobile 390
+  full-bleed), `palette`, `type`, `modules` (`ctaPrimary`: full-width navy `#001a33` pill, e.g. «Ver el informe
+  completo →»; `ctaAgenda`: card `#023c70`, radius 16, title «¿Lo revisamos juntos?» Bricolage 700 22 px, body 13 px
+  `#cfe4fa`, white pill «Agendar una reunión», URL `https://efeoncepro.com/contacto/` with UTM `utm_medium=email`,
+  `utm_source` = product, `utm_content=pie`, never overwriting a UTM the URL already carries), `brandBlock` (logo 220 px,
+  slogan **below** at 64 % of the logo width with the **service line** word — Growth, Brand, Engine, Voice or Revenue,
+  never the product; white under 24 px, so always white at 220 px), `institutional` (mirrors Greenhouse
+  `src/config/efeonce-brand.ts`), `retired: ['cta-subscribe']` («Suscribirme» is retired; the agenda replaces it in
+  every email), `applications` (`efeonce-insights-delivery`, line `growth`), `emailSafe` and `assets`.
+- **Footer order:** agenda card → brand block → URL bubble + 4 social circles (LinkedIn, Instagram, YouTube, Threads) →
+  hairline → legal block (11 px `#9fb3c8`: «Efeonce Group SpA» 600 `#cfe4fa` · RUT; address; phones · email) →
+  hairline → preferences and unsubscribe (11 px) → reason and © (10 px). Ground `#001a33` for every line.
+- **Contract `efeonce.email-modules` `0.1.0` (`candidate`)**, manifest `axis.email-modules-composition.v1`,
+  `validateEmailModulesIntent` / `resolveEmailModulesIntent`, 23 es-CL issue codes (including `cta-subscribe-retired`,
+  `agenda-never-email`, `cta-agenda-required`, `footer-unsubscribe-required`, `line-invalid`), 6 adapter checks
+  (`images-png-with-dimensions`, `no-inline-svg-in-email`, `legal-block-live-text`, `bulletproof-buttons`,
+  `footer-contrast`, `dark-mode-safe`). CLI `pnpm email:resolve -- --input <intent.json> [--out <manifest.json>]`; the
+  manifest has no HTML and no coordinates: the consumer's adapter builds table-based email HTML.
+- **Email-safe PNGs** in `axis-brand-assets` `0.4.6` (`AXIS_EMAIL_ASSETS`, `findEmailAsset`, `emailAssetUrl`; generated
+  by `pnpm email:assets`, sealed in `src/email-manifest.ts`, @2x RGBA): `email-logo-negative` (220 × 52),
+  `email-slogan-{growth,brand,engine,voice,revenue-hubspot,revenue-salesforce}-negative`,
+  `email-social-{linkedin,instagram,youtube,threads}-white` (40 × 40), `url-bubble-baked-dark-email` (163 × 32).
+  **Logo and slogan are separate assets**, stacked with the seal's `stack.gapBelowLogoImagePx`, because the brand SSOT
+  says the slogan is never merged into the logo; a logo of another width needs its own generated slogan, never a
+  scaled one.
+- **Travelled path of the measure** (same release): `efeonceGraphicLine.trajectory.measure.travelledPath` (`opacity
+  0.6`, `strokeOfTrail 0.75`, `full: 'ring-at-100'`, `none: 'at-zero'`); orbit contract `0.4.0` → **`0.5.0`** (every
+  `measure` resolves `travelled`, anatomy part `travelled-path`, no new intent field); the painter, `measureSvg` and
+  `aiVisibilityReportOrbitSvg` draw it (`data-axis-part="travelled"`); the 48 static orbits re-stamped, same geometry.
+  It supersedes «never an arc growing from the origin». Why: 62 % with only a short trail read as less.
+- **Lab and docs:** https://axis.efeonce.org/references/email/ + `/references/email.json` (the Insights email shown as
+  an application); ADR `docs/architecture/EMAIL_MODULES_DECISION_V1.md`, guide `docs/agent-composition/email-modules.md`,
+  intent schema, examples `docs/examples/email-modules/`. Greenhouse sealed design:
+  `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` + PNGs in
+  `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1/`.
+- **Not the email signature:** a person's signature stays `efeonce.email-signature` / `emailSignature`.
+- **Greenhouse has not adopted it:** it pins the older set (above), and `src/emails/InsightsEditionDeliveryEmail.tsx`
+  and `src/emails/components/EmailLayout.tsx` are unchanged. Skills: `greenhouse-email`, `resend-email-platform`,
+  `efeonce-graphic-line` → `applications.md` §C4.
+- **Open tension (recorded, not resolved):** the proposed Greenhouse email presentation policy (TASK-1764, ADR
+  `GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `Proposed`) forbids promotion in service emails and reserves
+  socials and unsubscribe for marketing profiles, while the approved footer carries the agenda and socials in every
+  email. No agent removes the agenda or socials to «comply»; the operator decides, and a change is a new contract
+  version.
 
 ### AXIS Lab
 

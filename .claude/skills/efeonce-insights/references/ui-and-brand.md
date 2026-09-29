@@ -102,8 +102,8 @@ edición. **Decisión abierta sobre el acento de esas portadas: §7.7.**
 versión tipográfica de arriba); correo (`src/emails/InsightsEditionDeliveryEmail.tsx:76`, `brand='efeonce'`); favicon de
 Think (genérico, `src/layouts/BaseLayout.astro:64`); receta de deck `content-day-live-results`, cuya ficha de Insights
 usa el isotipo de Efeonce (`docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json:4954`);
-portal y MCP. Y **Greenhouse fija `@efeoncepro/axis-brand-assets` 0.3.5** (`package.json:419`): no trae los archivos de
-Insights hasta que alguien suba la versión.
+portal y MCP. Greenhouse fijaba `@efeoncepro/axis-brand-assets` 0.3.5 al escribir esto; al 2026-09-29 fija 0.4.5, que
+ya trae los archivos de Insights (ninguna de estas superficies los usa todavía).
 
 ## 3. Informe PDF (Artifact Composer; en producción, emisión OFF)
 
@@ -278,8 +278,17 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
 ## 5. Otras superficies
 
 - **Correo** `src/emails/InsightsEditionDeliveryEmail.tsx` (TASK-1848): modalidades `portal_link`, `share_link`,
-  `attachment`; diseño «funcional y sobrio», marca Efeonce; la presentación final queda para TASK-1849.
-  `INSIGHTS_DELIVERY_ENABLED` OFF en producción.
+  `attachment`; hoy diseño «funcional y sobrio», marca Efeonce. `INSIGHTS_DELIVERY_ENABLED` OFF en producción.
+  **Diseño final aprobado el 2026-09-29, sin implementar:** canvas https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd
+  v21 (página «Correo»: enlace en escritorio, en celular y PDF adjunto), dirección sellada
+  `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` (PNG en `…/EFEONCE_EMAIL_MODULES_V1/`). Es **una
+  aplicación** de los módulos de correo de Efeonce canonizados en AXIS `v0.3.38` (pie, CTA principal navy, tarjeta de
+  agenda, bloque de marca con «Empower your Growth»; `efeonce.email-modules` 0.1.0, `efeonceEmail`, PNG `email-*` de
+  `axis-brand-assets` 0.4.6; Lab `https://axis.efeonce.org/references/email/`), no la plantilla. Lo propio de Insights:
+  cabecera, «Lo esencial del mes», la órbita de medida (con el camino recorrido desde las 12) y la tarjeta de decisión.
+  «Suscribirme» retirado; la agenda va a `/contacto/` con UTM `utm_source=efeonce-insights`. Pendiente: implementación
+  (hand-off de TASK-1848 a TASK-1849 o task propia), bump de AXIS y la tensión con la policy de footer de TASK-1764.
+  Si el correo lleva la marca de Insights sigue siendo gap (§7.1).
 - **Portal** (TASK-1849, S1–S5 y S7): sólo diseño (`docs/ui/{wireframes,flows,motion}/TASK-1849-*`), sin código.
 - **MCP**: ~17 tools (gateway `efeonce-mcp` v1.9.0); sin superficie visual.
 
@@ -299,7 +308,8 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
 1. PDF A4 y deck usan una versión tipográfica («INSIGHTS» en mayúsculas espaciadas junto al logo de Efeonce) en vez
    del archivo oficial `insights-lockup-*`, en portadas y aperturas de capítulo; correo, favicon de Think, portal y MCP
    no llevan la marca. Sin regla escrita para esas superficies ni tamaño mínimo del lockup.
-2. Greenhouse fija `axis-brand-assets` 0.3.5 (`package.json:419`); los archivos de Insights llegan desde 0.4.0.
+2. *(Cerrado: al 2026-09-29 Greenhouse fija `axis-brand-assets` 0.4.5, que ya trae los archivos de Insights; que
+   una superficie los use sigue siendo el gap 1.)*
 3. Roles de datos y geometría de gráficos duplicados en dos consumidores; ya produjeron una divergencia de color
    (resuelta en Think `b3c5820`, §1).
 4. Drift en AXIS: la tabla del README raíz y `docs/ARCHITECTURE.md` §Official brand files («0.3.0 … 19 SVGs») no

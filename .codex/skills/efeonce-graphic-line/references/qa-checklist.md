@@ -10,7 +10,7 @@
 > las láminas SEO/AEO, `variant-both-in-deck`, `figure-source-missing` y el camino «ausente» de un slot opcional —
 > `develop` tras `af32d9353` (TASK-1934, AXIS `v0.3.23`), 2026-09-28; §9, filas del bump de AXIS y de Glitch —
 > greenhouse-eo@24e4c72ee, 2026-09-28; fila de la medida con gravedad (§3) — AXIS `v0.3.30` (`main` `26097c5`),
-> 2026-09-29.
+> 2026-09-29; fila del camino recorrido (§1) y §7b (módulos de correo) — AXIS `v0.3.38` (`main` `c92160b`), 2026-09-29.
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -36,6 +36,7 @@
 | [ ] | La esfera está en la punta del arco, nunca suelta; la lente lleva anillo + arco + esfera | Revisión (`sphere-on-arc-end`); en el SVG existen `data-axis-part="arc"` y `"sphere"` dentro del grupo de la lente |
 | [ ] | Arco genérico de acento de 50°, centrado en su posición (arriba a la izquierda = 200°→250°) | Automático por el contrato; revisión si el adapter es propio |
 | [ ] | Una medida: la esfera en valor × 360° desde las 12 en sentido horario, estela ≤ 50° que no pasa antes de la partida, marca de partida visible; 0 % = esfera en la partida; 100 % = esfera de vuelta arriba | Automático: `measure-origin-is-top`, `trajectory.sweepDeg`; revisión: la marca `data-axis-part="origin"` (el adapter de Greenhouse no la pinta) |
+| [ ] | **Camino recorrido** (operador, 2026-09-29): toda medida dibuja el arco de las 12 a la esfera **bajo** la estela, en su mismo color (el de la gravedad si la hay) al 60 % y a 0,75 × su trazo; al 100 % es el anillo completo, en 0 % no existe; nunca más grueso ni más opaco que la estela | Automático desde AXIS `v0.3.38`: el contrato de la órbita 0.5.0 resuelve `travelled` en toda `measure` y el pintor lo marca `data-axis-part="travelled"` (`measureSvg`, `aiVisibilityReportOrbitSvg`). Greenhouse fija el set anterior y su adapter sólo acepta el contrato 0.3.1: en el repo, revisión |
 | [ ] | Dos datos en la misma pieza comparten radio y partida | Revisión |
 | [ ] | Progreso: portada con arco corto; cada sección suma su tramo; el cierre completa la vuelta **con** la esfera arriba | Automático: `closed`, `sphere` no nulo; prueba `4.2 · deck navigation` |
 | [ ] | Formatos fijos reproducen su pieza medida (lente, foco, deck, retrato) | Automático: prueba «every fixed-format recipe paints its canvas piece» del paquete; si no usas la receta, compara con `efeonceGraphicLine.pieces`/`portrait` |
@@ -129,6 +130,26 @@
 | [ ] | Masters pesados (ProRes, WebM/HEVC con alfa, 4K) en el bucket público de AXIS u OneDrive, nunca en git | Revisión |
 | [ ] | Merch y oficina: la foto IA es maqueta de dirección; la producción sale del vector con prueba física | Revisión |
 | [ ] | Greenhouse: `qa.json` con `status: 'pass'` y los `manual` revisados a ojo | `pnpm creative:orbit:render` (sale 1 si falla) |
+
+## 7b. Correo de Efeonce: pie, CTA y bloque de marca (módulos canónicos, 2026-09-29)
+
+Para un **correo** (no la firma de una persona, que es §7 y el contrato `efeonce.email-signature`). Detalle en
+[applications.md §C4](applications.md) y en AXIS `docs/agent-composition/email-modules.md`.
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | El intent resuelve sin issues: línea de servicio (nunca el producto: Insights firma `growth`), canal `desktop` o `mobile`, `product` como slug | Automático: `pnpm email:resolve -- --input intent.json` en AXIS (`line-invalid`, `channel-invalid`, `product-invalid`) |
+| [ ] | Cierra con **una** tarjeta de agenda arriba del pie («¿Lo revisamos juntos?», píldora blanca «Agendar una reunión») | Automático: `cta-agenda-required`, `cta-agenda-duplicate` |
+| [ ] | **Sin «Suscribirme»** en ningún correo | Automático: `cta-subscribe-retired` |
+| [ ] | La agenda va a la página de contacto con sus UTM (`utm_source` = producto, `utm_medium=email`, `utm_content=pie`, `utm_campaign` si la hay), sin pisar un UTM que la URL ya trae; nunca `mailto:` ni `http` | Automático: `agenda-never-email`, `agenda-url-invalid`; el resolver agrega los UTM |
+| [ ] | Como mucho un CTA principal: píldora navy `#001a33` a todo el ancho, etiqueta en texto vivo, URL https; el enlace personal de un informe sin UTM ni tracking de clics | Automático: `cta-primary-duplicate`, `cta-primary-label-required`, `cta-primary-url-invalid` |
+| [ ] | Pie en su orden fijo: agenda · bloque de marca · burbuja + 4 redes · filete · legal · filete · preferencias y baja · motivo y © | Automático en el manifest (`footer.order`); revisión del HTML |
+| [ ] | Bloque de marca: logo `email-logo-negative` 220 px y, **debajo**, el eslogan de la línea como **otra imagen** (`email-slogan-<línea>-negative`) separada por `stack.gapBelowLogoImagePx`; la palabra en blanco (a 220 px nunca llega a 24 px); nunca un solo PNG con los dos ni un eslogan escalado | Revisión del HTML contra el manifest y el sello de `axis-brand-assets` 0.4.6 |
+| [ ] | Legal en texto vivo desde el token (espejo de `src/config/efeonce-brand.ts`): razón social en 600 · RUT, dirección, teléfonos (`tel:`) y correo (`mailto:`) | Automático en el adapter: `legal-block-live-text`; nunca transcribir del canvas |
+| [ ] | Preferencias **y** baja en el pie, y el motivo; si el tipo de correo tiene baja, también la cabecera `List-Unsubscribe` | Automático: `footer-preferences-required`, `footer-unsubscribe-required`, `footer-reason-required`; la cabecera, revisión |
+| [ ] | Correo seguro: tablas, estilos en línea, PNG @2x con `width`/`height` y `alt`, sin SVG en línea, botones a prueba de Outlook (VML), filetes precompuestos, fondo oscuro declarado en la celda, texto del pie ≥ 4,5:1 | Automático en el adapter: `images-png-with-dimensions`, `no-inline-svg-in-email`, `bulletproof-buttons`, `footer-contrast`, `dark-mode-safe` |
+| [ ] | El cuerpo es propio de cada correo: nunca el de Insights como plantilla | Revisión |
+| [ ] | En Greenhouse, hasta que se adopten los módulos (plantillas en `src/emails/`), el pie de un correo nuevo no inventa su propia versión: se sigue la dirección `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` y se deja registrada la tensión con TASK-1764 | Revisión |
 
 ## 8. Accesibilidad
 
@@ -251,6 +272,8 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | Tras subir `axis-tokens`: generados de La órbita **y** de Glitch sin drift (los dos, siempre; lessons.md 2026-09-28) | Greenhouse | `pnpm brand:tokens --check` + `pnpm glitch:tokens --check` |
 | Componer una edición de Glitch o un Glitch Flash (QA propio en [glitch.md](glitch.md) §10 y §14.5) | Greenhouse | `pnpm glitch:compose -- --manifest <edicion-o-flash.json>` + `pnpm composer:visual-gate --catalog=glitch` |
 | Firma de correo | AXIS | `pnpm signature:resolve -- --input intent.json` |
+| Módulos de correo (pie, CTA, bloque de marca) | AXIS | `pnpm email:resolve -- --input intent.json [--out manifest.json]` |
+| Regenerar los PNG de correo tras cambiar tokens o logo | AXIS | `pnpm email:assets` |
 | Pruebas de tokens, contratos, paquete y archivos (trayectoria, piezas medidas, ids, órbitas byte a byte, contrastes) | AXIS | `pnpm build && pnpm test` |
 | e2e del Lab (página de la línea, ids duplicados, foco concéntrico) | AXIS | `pnpm --dir apps/lab test:e2e` |
 | Regenerar órbitas estáticas tras cambiar tokens | AXIS | `pnpm orbit:assets` |

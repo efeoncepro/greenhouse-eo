@@ -77,6 +77,41 @@ y el footer **sí** tiene red de regresión, porque vive en un solo archivo cubi
 los 17 snapshots de `EmailTemplateBaseline`. El hueco de cobertura es de cuerpo (11 plantillas sin caso), no de pie,
 y pertenece a las cohorts, no a la foundation.
 
+## Delta 2026-09-29 — módulos canónicos de correo Efeonce y tensión con esta política
+
+El operador aprobó el correo de entrega de Efeonce Insights (canvas v21) y pidió canonizar sus **módulos**, no su cuerpo:
+el pie oscuro, el CTA principal (`cta-primary`), la tarjeta de agenda (`cta-agenda`) y el bloque de marca (logo +
+«Empower your {Línea}», con la palabra de la línea de servicio). «Suscribirme» queda retirado y lo reemplaza «Agendar una
+reunión», a `https://efeoncepro.com/contacto/` con UTM y nunca a un correo. Dirección:
+`docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`. AXIS lo publicó el mismo día en `v0.3.38` (`main`
+`c92160b`): tokens `efeonceEmail`, contrato `efeonce.email-modules` `0.1.0` `candidate`, PNG para correo en
+`axis-brand-assets` `0.4.6`. La adopción en Greenhouse es
+[TASK-1944](TASK-1944-efeonce-email-modules-adoption.md).
+
+**La decisión de esta umbrella no cambia.** Legacy por defecto, cohortes de máximo cuatro tipos, prohibición de big
+bang, unsubscribe prohibido por defecto y RRSS sólo en suscripción o marketing siguen vigentes. Los módulos entran como
+**bloques** de los perfiles, no como un nuevo default de `EmailLayout`.
+
+**Tensión abierta, sin resolver aquí:**
+
+| Módulo aprobado | Lo que dice esta política | Lo que exige el contrato de AXIS `0.1.0` |
+|---|---|---|
+| `cta-agenda` («Agendar una reunión») | un transaccional no incorpora promoción; si la mezcla, se reclasifica | la agenda va en **todo** pie (`cta-agenda-required`) |
+| Redes (LinkedIn, Instagram, YouTube, Threads) en círculos de trazo sobre oscuro | `socialLinksPolicy='none'` salvo `optional_subscription` (opcional) y `commercial_marketing` (obligatorio); íconos monocromáticos sobre claro en el mockup | siempre en el pie |
+| Preferencias y baja | `unsubscribePolicy='forbidden'` salvo suscripción y marketing | siempre en el pie (`footer-preferences-required`, `footer-unsubscribe-required`) |
+| Bloque legal (razón social, RUT, dirección, teléfonos, correo; sin países) | `entity` en servicio; `full` (con países y privacidad) en suscripción y marketing | el bloque aprobado, sin países |
+
+- AXIS no decide el propósito de un correo. Su ADR (`EMAIL_MODULES_DECISION_V1.md` §7) deja la tensión a Greenhouse y
+  fija que un correo que no deba llevar agenda o redes pide **una versión nueva del contrato**, nunca un adapter que
+  quita módulos.
+- Hay que decidir el **propósito de los dos `EmailType` de Insights** (`insights_edition_delivery` e
+  `insights_edition_delivery_attachment`, hoy de prioridad `transactional`) antes de enviarlos con el pie nuevo. Un
+  informe recurrente es candidato a `optional_subscription`. La decisión es del operador y es una Open Question de
+  TASK-1944; cuando se tome, se registra aquí y en la ADR de presentación.
+- Cualquier pie con baja depende de `TASK-1774`: el enlace de baja tiene que funcionar antes del primer envío.
+- Los demás tipos adoptan los módulos sólo por cohorte de esta umbrella, con su perfil, y sólo si el contrato vigente de
+  AXIS lo permite.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"

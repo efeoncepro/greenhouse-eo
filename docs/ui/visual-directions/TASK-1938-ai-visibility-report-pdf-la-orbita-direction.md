@@ -50,8 +50,13 @@ los valores y de las reglas; las hojas de `paginas/` siguen siendo la referencia
 - **Docs en el repo `axis-design-system`:**
   - ADR `docs/architecture/AI_VISIBILITY_REPORT_COMPOSITION_DECISION_V1.md`.
   - Guía `docs/agent-composition/ai-visibility-report.md`.
-- **Estado en Greenhouse:** todavía fija `axis-tokens` y `axis-ui-contracts` `0.3.29`, `axis-graphic-line` `0.11.0` y
-  `axis-brand-assets` `0.4.1`. El renderer adopta el juego nuevo en TASK-1938.
+- **Recorrido de la órbita (AXIS `v0.3.38`, `main` `c92160b`, 2026-09-29):** `aiVisibilityReport.cover.orbit.travelled`
+  y `efeonceGraphicLine.trajectory.measure.travelledPath` (`axis-tokens` `0.3.38`), contrato `efeonce.graphic-line-orbit`
+  `0.5.0` (`axis-ui-contracts` `0.3.38`) y `aiVisibilityReportOrbitSvg` ya con el recorrido (`axis-graphic-line`
+  `0.13.0`); órbitas estáticas re-selladas en `axis-brand-assets` `0.4.6`.
+- **Estado en Greenhouse (2026-09-29):** fija `axis-tokens` y `axis-ui-contracts` `0.3.37`, `axis-graphic-line`
+  `0.11.0`, `axis-brand-assets` `0.4.5` y `axis-ui-registry` `0.3.1`. El renderer adopta el juego `v0.3.38` en
+  TASK-1938 (Slice 1), con el adapter de la órbita en el contrato `0.5.0`.
 
 ## Decisiones que fija
 
@@ -78,7 +83,14 @@ los valores y de las reglas; las hojas de `paginas/` siguen siendo la referencia
 La esfera siempre está en el puntaje real, en `score × 3,6°`, con una estela de 50° detrás y la marca de partida a las
 12; al 100 % la esfera vuelve a las 12.
 
-- **Qué cambia de color:** la estela, la esfera, el halo y el punto de la etiqueta de gravedad. Los umbrales son los
+- **Recorrido** (operador, 2026-09-29, «aplícalo en todas»): bajo la estela, un arco desde las 12 hasta la esfera, en el
+  mismo color que la estela, de **3 px** (0,75 × la estela de 4 px) al **60 %** de opacidad. Al 100 % es el anillo
+  completo; con 0 o sin dato no existe. Deja leer cuánto avanzó la medida sin volverla un medidor que se llena: la
+  estela y la esfera siguen dominando. Valores: `aiVisibilityReport.cover.orbit.travelled` (AXIS `v0.3.38`).
+  Las hojas de `paginas/` y la lámina de estados son anteriores a esta decisión y no dibujan el recorrido: para ese
+  trazo manda AXIS y su Lab.
+
+- **Qué cambia de color:** la estela, el recorrido, la esfera, el halo y el punto de la etiqueta de gravedad. Los umbrales son los
   del modelo (`recommendations.ts`): menos de 40 es crítico, menos de 70 es atención y el resto es óptimo.
 - **Qué no cambia:** el anillo, la marca de partida y la cifra.
 - **La etiqueta de texto** («Crítico», «Atención», «Óptimo») acompaña siempre al color, que nunca comunica solo.
@@ -92,7 +104,7 @@ La esfera siempre está en el puntaje real, en `score × 3,6°`, con una estela 
 
   - Se usa el paso 400 porque el 500 de error y de éxito queda en 3,54:1 y 3,28:1: pasan como gráfico, pero apenas.
   - Sobre papel, las etiquetas de las interiores siguen con `axisSemanticHex` y la tinta oscura de atención.
-- **Sin dato:** sólo el anillo y la marca de partida. No hay esfera ni estela; la cifra es «—», sin «de 100», con la
+- **Sin dato:** sólo el anillo y la marca de partida. No hay esfera, estela ni recorrido; la cifra es «—», sin «de 100», con la
   etiqueta «Sin dato».
 - **Leyenda:** la escala de la portada, «0–39 Crítico · 40–69 Atención · 70–100 Óptimo», usa los mismos tres colores.
 - **Excepción acotada a la línea:** en La órbita, el estado se dice con la forma y nunca con semáforo (§3.10 de la

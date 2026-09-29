@@ -57,7 +57,9 @@ y la diferencia se reporta.
 - **Receta** (`@efeoncepro/axis-graphic-line/report` `0.12.0`): `aiVisibilityReportOrbitSvg` y
   `aiVisibilityReportSeverityColor`. Lockups en `@efeoncepro/axis-brand-assets` `0.4.3`.
 - **Guía:** `docs/agent-composition/ai-visibility-report.md` en el repo `axis-design-system`.
-- **Estado en Greenhouse:** todavía fija el juego `0.3.29`; el renderer adopta `v0.3.30` en TASK-1938 (Slice 1).
+- **Estado en Greenhouse:** todavía fija el juego `0.3.37` (`axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.5`);
+  el renderer adopta el juego `v0.3.38` en TASK-1938 (Slice 1), que ya trae el recorrido de la órbita (Delta (e) de la
+  task).
 
 ## Dos audiencias, un documento
 
@@ -88,7 +90,7 @@ portada, 02, 03, 04, 05 y contraportada. Orden «respuesta primero»: qué hacer
 |---|---|---|
 | Cabecera | rótulo en versalitas (según variante) + etiqueta con el período | período de `ReportHeader.periodLabel` |
 | Identidad | ver tabla de audiencias | nunca un nombre inventado; sin logo del cliente, «Preparado para» con el nombre solo |
-| **Órbita que mide** | anillo fino, marca a las 12, arco con estela de 50° y esfera en `score × 3,6°`, con halo; dentro el puntaje, «de 100» y la etiqueta de gravedad | reemplaza al `Gauge` actual (arco que se llena). Única órbita del documento. **Estela, esfera, halo y punto de la etiqueta en el color de la gravedad** (operador, 2026-09-29): crítico `axisRamp.error[400]`, atención `axisRamp.warning[500]`, óptimo `axisRamp.success[400]`, todos ≥ 4,5:1 sobre `#091951`; anillo, partida y cifra sin cambio. Puntaje `null`: anillo sin arco ni esfera, «—» sin «de 100» y «Sin dato». Referencia: `visual-directions/TASK-1938-…/portada-estados-de-la-orbita.png` |
+| **Órbita que mide** | anillo fino, marca a las 12, **recorrido** desde las 12 hasta la esfera, arco con estela de 50° y esfera en `score × 3,6°`, con halo; dentro el puntaje, «de 100» y la etiqueta de gravedad | reemplaza al `Gauge` actual (arco que se llena). Única órbita del documento. **Recorrido** (operador, 2026-09-29, «aplícalo en todas»): bajo la estela, en su mismo color, **3 px al 60 %** de opacidad (0,75 × la estela de 4 px; `aiVisibilityReport.cover.orbit.travelled`, AXIS `v0.3.38`); anillo completo con 100, nada con 0 ni sin dato; la lámina de estados es anterior y no lo dibuja. **Estela, recorrido, esfera, halo y punto de la etiqueta en el color de la gravedad** (operador, 2026-09-29): crítico `axisRamp.error[400]`, atención `axisRamp.warning[500]`, óptimo `axisRamp.success[400]`, todos ≥ 4,5:1 sobre `#091951`; anillo, partida y cifra sin cambio. Puntaje `null`: anillo sin arco, recorrido ni esfera, «—» sin «de 100» y «Sin dato». Referencia: `visual-directions/TASK-1938-…/portada-estados-de-la-orbita.png` |
 | Tendencia | ver tabla de audiencias | `trend.status` sin histórico → el texto de primera medición, nunca «▲ 0» |
 | **Escala** | «0–39 Crítico · 40–69 Atención · 70–100 Óptimo», con su punto en los mismos colores de la órbita | umbrales de `src/lib/growth/ai-visibility/report/recommendations.ts` (`SEVERITY_CRITICAL_BELOW = 40`, `SEVERITY_ATTENTION_BELOW = 70`); nunca escritos a mano en el renderer |
 | **Veredicto** | «Te encuentran, pero casi no te citan.» en dos pesos | un hallazgo de los datos (presencia óptima + citas críticas), no la frase comodín `headline.frame`; ver Copy Ledger |

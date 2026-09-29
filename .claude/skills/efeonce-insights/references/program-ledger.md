@@ -307,6 +307,16 @@ full `pnpm test` + `pnpm build`; push; deploy; staging flags; staging canary.
   `src/emails/InsightsEditionDeliveryEmail.tsx`, the in-app notice, and the UI for share/delivery/schedules.
 
 ## TASK-1849 — portal library/builder/shared web (to-do)
+
+**Delta 2026-09-29 (design input, no code).** The «final presentation of `InsightsEditionDeliveryEmail.tsx`» that
+TASK-1848 handed to this task now has an **approved design**: canvas https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd
+v21 (page «Correo»: share link desktop, mobile, PDF attached), sealed direction
+`docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`. It is an **application** of the Efeonce email
+modules canonized in AXIS `v0.3.38` (footer, CTA modules, footer brand block; `efeonce.email-modules` 0.1.0), not a
+template for other emails. Implementation pending (whoever owns it: this task or a dedicated one), and it needs the
+AXIS bump (brand-assets 0.4.6 for the email PNGs, orbit contract 0.5.0 for the travelled path of its measure) plus a
+decision on the TASK-1764 footer-policy tension.
+
 _Fill at closure._
 
 ## TASK-1875 — Think shared web render (complete 2026-09-28; production sharing live)
@@ -548,6 +558,20 @@ producción antes de compartir con clientes. Sin flag propio.
 **Hand-off planificado:** TASK-1849 y TASK-1875 mantienen en la web los mismos roles de color y la misma lectura.
 
 ## Sessions (append as you go; newest first)
+
+- **2026-09-29 · Insights delivery email approved (design only; no task, no code).** The operator approved the delivery
+  email on the canvas https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd v21 (page «Correo», three boards: share link
+  desktop, mobile, PDF attached) and asked to canonize it, scoping it as **one application**: the canon is the footer,
+  the CTA modules and the footer brand block (slogan word by service line; Insights signs Growth); «Suscribirme» is
+  retired in every email and replaced by «Agendar una reunión» (`/contacto/` with UTM `utm_medium=email`,
+  `utm_source=efeonce-insights`, `utm_content=pie`, never an email address). Published in AXIS `v0.3.38` (`main`
+  `c92160b`: `efeonceEmail`, `efeonce.email-modules` 0.1.0 `candidate`, email PNGs in `axis-brand-assets` 0.4.6, Lab
+  `/references/email/`). Seeing the email's 62 % measure read «as less», the operator also decided that **every measure
+  draws the travelled path** from 12 o'clock (orbit contract 0.5.0, `axis-graphic-line` 0.13.0). Greenhouse sealed the
+  direction `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`; **nothing implemented**:
+  `src/emails/InsightsEditionDeliveryEmail.tsx` and `EmailLayout.tsx` unchanged, AXIS pins still `0.3.37` / graphic-line
+  `0.11.0` / brand-assets `0.4.5`; delivery stays OFF in production. Open: the TASK-1764 footer-policy tension (agenda
+  and socials in every email vs. no promotion in service email).
 
 - **2026-09-28 · TASK-1875 / EPIC-045 · Production issuance ON.** Vercel project
   `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`; exact `INSIGHTS_ISSUANCE_ENABLED=true`; Ready deployment

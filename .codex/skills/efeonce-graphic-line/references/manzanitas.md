@@ -337,7 +337,9 @@ Los ejemplos de cada ficha son los datos de muestra del canvas; sirven para comp
   r 8,33; marca de partida al 60 %) sale de `measureSvg` de AXIS (sonda en Engine sobre oscuro).
 - **Cálculo:** barrido = valor ÷ 100 × 360°, desde las 12 en sentido horario; la esfera en (540 + 300 · sen barrido,
   680 − 300 · cos barrido); la estela = min(50°, barrido) detrás de la esfera (50° = `trajectory.measure.trailDeg`).
-  0 %: la esfera en la partida, sin estela. 100 %: vuelve arriba y se queda. Verificado contra `measureSvg` en 0,05 /
+  0 %: la esfera en la partida, sin estela. 100 %: vuelve arriba y se queda. Desde AXIS 0.13.0 (contrato de la órbita
+  0.5.0) `measureSvg` dibuja además el camino recorrido desde las 12 (opacidad 0,6, trazo 0,75× la estela), y este gráfico lo
+  hereda sin cambios de código (operador, 2026-09-29, «aplícalo en todas»). Verificado contra `measureSvg` en 0,05 /
   0,38 / 0,62 / 0,9 / 1 (el generador del canvas se detiene si no coincide). Muestra: 38 → «38 %».
 
 **2 · Ranking** — tablero `Grafico-2`

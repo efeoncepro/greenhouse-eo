@@ -86,10 +86,23 @@
 >   referencia de su autorización o readback va el `fallback` «Operamos sobre» + logo de la plataforma, o nada. Nunca
 >   es fijo en la receta. La de Salesforce está autorizada por Salesforce (operador, 2026-09-29; referencia
 >   `salesforce-partner-authorization-2026-09-29`) y el deck Salesforce la lleva por defecto (en Greenhouse, `partnerMark.readbackRef`).
+>
+> **Módulos de correo y camino recorrido (2026-09-29, tag `v0.3.38`, AXIS `main` `c92160b`, publicado y verificado en
+> el registro; manda sobre las versiones de arriba):** `axis-tokens` **0.3.38** (export top-level nuevo `efeonceEmail`,
+> §2.21, y `efeonceGraphicLine.trajectory.measure.travelledPath`, §2.7), `axis-ui-contracts` **0.3.38** (contrato nuevo
+> `efeonce.email-modules` 0.1.0 `candidate`, manifest `axis.email-modules-composition.v1`, 23 códigos y 6 chequeos del
+> adapter; `efeonce.graphic-line-orbit` **0.4.0 → 0.5.0**: toda `measure` resuelve su `travelled`), `axis-graphic-line`
+> **0.13.0** (el pintor y `aiVisibilityReportOrbitSvg` dibujan el camino recorrido), `axis-brand-assets` **0.4.6** (PNG
+> @2x para correo `AXIS_EMAIL_ASSETS`, §6; las 48 órbitas estáticas re-selladas, misma geometría) y `axis-ui-registry`
+> **0.3.3**. **Greenhouse todavía fija el set anterior** (leído de `package.json` el 2026-09-29: `axis-tokens` y
+> `axis-ui-contracts` 0.3.37, `axis-graphic-line` 0.11.0, `axis-brand-assets` 0.4.5, `axis-ui-registry` 0.3.1) y no
+> adoptó los módulos de correo: `src/emails/InsightsEditionDeliveryEmail.tsx` y `src/emails/components/EmailLayout.tsx`
+> siguen como estaban. Su adapter de la órbita (`scripts/creative/layout-compiler/graphic-line.mjs`) sólo acepta el
+> contrato 0.3.1: subir a 0.5.0 exige que el adapter lo soporte (camino recorrido incluido), no sólo el bump.
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
 [3 Contrato de la órbita](#3-contrato-efeoncegraphic-line-orbit) · [4 Selección colaborativa](#4-contrato-efeoncecollaboration-selection) ·
-[5 Firma de correo](#5-contrato-efeonceemail-signature) · [6 Archivos de marca](#6-efeonceproaxis-brand-assets) ·
+[5 Firma de correo](#5-contrato-efeonceemail-signature) · [5b Módulos de correo](#5b-contrato-efeonceemail-modules) · [6 Archivos de marca](#6-efeonceproaxis-brand-assets) ·
 [7 Paquete de la órbita](#7-efeonceproaxis-graphic-line-cada-export) · [8 Comandos](#8-comandos) · [9 Lab](#9-mapa-del-lab) ·
 [10 Qué NO existe](#10-qué-no-existe-no-alucinar) · [11 Deriva conocida](#11-deriva-conocida-docs-vs-código)
 
@@ -160,13 +173,13 @@ Un repo consumidor nuevo necesita además que `axis-graphic-line` le dé «Manag
 | Import | Contiene |
 |---|---|
 | `@efeoncepro/axis-tokens` | `efeonceGraphicLine`, `axisMotion`, `axisAdvertising`, … (tipo `EfeonceGraphicLine`) |
-| `@efeoncepro/axis-ui-contracts` | todo el contrato (`export *` de `graphic-line.js` y `email-signature.js`) + selección colaborativa |
+| `@efeoncepro/axis-ui-contracts` | todo el contrato (`export *` de `graphic-line.js` y `email-signature.js`; desde 0.3.38 también `email-modules.js`, §5b) + selección colaborativa |
 | `@efeoncepro/axis-graphic-line` | pintor, recetas, checks, respuesta, movimiento, assets (no incluye React ni el Web Component) |
 | `@efeoncepro/axis-graphic-line/react` | `AxisOrbit`, `AxisOrbitProps` (peer `react >= 18`) |
 | `@efeoncepro/axis-graphic-line/element` | `defineAxisOrbitElement`, `renderAxisOrbit` |
 | `@efeoncepro/axis-graphic-line/motion` | `ORBIT_MOTION_CSS`, `ORBIT_MOTION_TIMELINE`, `ORBIT_MOTION_TOTAL_MS`, `orbitMotionFrameCss` |
 | `@efeoncepro/axis-graphic-line/report` (desde 0.12.0; no se exporta desde la raíz) | `aiVisibilityReportOrbitSvg`, `aiVisibilityReportSeverityColor` (§7.10) |
-| `@efeoncepro/axis-brand-assets` | ids, `findBrandAsset`, `brandAssetUrl`, `AXIS_ORBIT_ASSETS`, `findOrbitAsset`, `orbitAssetUrl` |
+| `@efeoncepro/axis-brand-assets` | ids, `findBrandAsset`, `brandAssetUrl`, `AXIS_ORBIT_ASSETS`, `findOrbitAsset`, `orbitAssetUrl`; desde 0.4.6 `AXIS_EMAIL_ASSETS`, `findEmailAsset`, `emailAssetUrl` (§6) |
 | `@efeoncepro/axis-brand-assets/assets/*` | los archivos (`efeonce-logo-negative.svg`, `orbit/orbit-growth-dark-social.png`, …) |
 
 ---
@@ -282,7 +295,7 @@ Valores resultantes típicos: 1080 social → anillo 2,38 · arco 3,81 · esfera
 | Clave | Valor |
 |---|---|
 | `origin` · `direction` | `'top'` (las 12) · `'clockwise'` |
-| `measure` | `encoding 'sphere-position'`, `degreesPerUnit 360`, `trailDeg 50`, `trailNeverBeforeOrigin true`, `originMark 'tick'`, `zero 'sphere-at-origin'`, `complete 'sphere-back-at-origin'`, `sourceRequired true`, `label 'percent-integer'` |
+| `measure` | `encoding 'sphere-position'`, `degreesPerUnit 360`, `trailDeg 50`, `trailNeverBeforeOrigin true`, `originMark 'tick'`, `zero 'sphere-at-origin'`, `complete 'sphere-back-at-origin'`, `sourceRequired true`, `label 'percent-integer'`; desde `axis-tokens` 0.3.38, `travelledPath { opacity 0.6, strokeOfTrail 0.75, full 'ring-at-100', none 'at-zero' }` (el camino recorrido de las 12 a la esfera, bajo la estela y en su color; operador, 2026-09-29) |
 | `progress` | `encoding 'accumulated-sections'`, `cover 'accent'`, `complete 'full-orbit-sphere-on-top'` |
 | `accent` | `start 'upper-start'`, `sweepDeg [40, 60]`, `pairsWithNumber false` |
 | `satellites` | `start 'start'`, `maxSweepDeg 140` |
@@ -469,6 +482,27 @@ medidas; el copy vive en el consumidor y en el Lab. Gobierna la dirección de Gr
 | `locales` | `es`, `en`, `pt-BR`, fallback `es`; sin traducir: eslogan, lockups y nombres de niveles del marco |
 | `never` | `insights-lockup`, `filling-arc`, `zero-for-missing`, `commercial-cta-for-client`, `email-as-cta`, `orbit-on-interior-pages`, `hand-written-hex` |
 
+Desde `axis-tokens` 0.3.38, `cover.orbit.travelled` = `{ strokePx 3, opacity }` (3 px bajo la estela de 4, con la
+opacidad de `travelledPath`).
+
+### 2.21 `efeonceEmail` (export top-level, fuera de `efeonceGraphicLine`; `axis-tokens` 0.3.38)
+
+Los **módulos de correo** de Efeonce, aprobados por el operador el 2026-09-29 (canvas «Correo», v21). `status:
+'canonical'`, `complements: 'efeonceGraphicLine'`, `scope: 'modules'`, **`template: false`**: AXIS canoniza el pie, el
+CTA principal y la agenda, no una plantilla de correo. **No es la firma de correo de una persona** (§2.15,
+`emailSignature`).
+
+| Clave | Qué guarda |
+|---|---|
+| `governance` · `width` · `palette` · `type` | gobierno del token; ancho desktop (tarjeta 600 en marco 680) y mobile (390 a sangre); paleta del correo; Bricolage, Poppins y la pila de respaldo |
+| `modules` | `ctaPrimary` (píldora navy `#001a33` a todo el ancho, p. ej. «Ver el informe completo →»), `ctaAgenda` (tarjeta `#023c70` radio 16, título Bricolage 700 22 px, bajada 13 px `#cfe4fa`, píldora blanca «Agendar una reunión»; `agenda.url` `https://efeoncepro.com/contacto/` con UTM `utm_medium=email`, `utm_source` = producto, `utm_content=pie`, sin pisar los que la URL ya trae) y el pie en su orden fijo |
+| `brandBlock` | logo de 220 px y, debajo, el eslogan de la línea al 64 % del ancho del logo (`widthEmByWord` por palabra); la palabra en blanco bajo 24 px, o sea siempre a 220 px |
+| `institutional` | razón social, RUT, dirección, teléfonos, correo, URL y mercados (espejo de `src/config/efeonce-brand.ts`) |
+| `retired` | `['cta-subscribe']`: «Suscribirme» retirado; la agenda lo reemplaza en todo correo |
+| `applications` | `efeonce-insights-delivery` (tableros `share-link-desktop`, `share-link-mobile`, `pdf-attached`; línea `growth`): una aplicación, no la plantilla |
+| `emailSafe` | PNG @2x con ancho, alto y `alt`; sin SVG en línea; sin fuentes web obligatorias; tablas y estilos en línea; botones `bulletproof`; texto vivo en legal, CTA, preferencias y motivo; 600 px; `darkMode 'ground-declared-on-cell'` |
+| `assets` | ids de `axis-brand-assets` (§6): `email-logo-negative`, los seis `email-slogan-<línea>-negative`, las cuatro `email-social-<red>-white` y `url-bubble-baked-dark-email` |
+
 ---
 
 ## 3. Contrato `efeonce.graphic-line-orbit`
@@ -480,7 +514,10 @@ chequeo `accent-text-min-size`. **0.4.0 publicado (contracts 0.3.30, tag `v0.3.3
 fija 0.3.29, que trae la 0.3.1):** `measure` gana `severity` (`critical`/`attention`/`optimal`), `severityLabel`,
 `scaleVisible` y `glow`, con cuatro códigos nuevos (§3.4) y el chequeo de accesibilidad
 `measure-severity-label-in-text`; el manifest de `measure` suma `severity { level, label, color, scaleVisible }` y
-`sphere.glow` (3 × el radio de la esfera, 0,5).
+`sphere.glow` (3 × el radio de la esfera, 0,5). **0.5.0 publicado (contracts 0.3.38, tag `v0.3.38`, 2026-09-29;
+Greenhouse fija 0.3.37 y su adapter sólo acepta 0.3.1):** toda `measure` resuelve `travelled` (el camino recorrido de
+las 12 a la esfera, al 60 % de opacidad y 0,75 × el trazo de la estela; en el color de la gravedad si la hay) sin campo
+nuevo en el intent; la anatomía suma `travelled-path`.
 
 API: `validateGraphicLineIntent(intent) → AxisGraphicLineIssue[]` (`{ code, elementId? }`) ·
 `resolveGraphicLineIntent(intent) → manifest` (lanza `AxisGraphicLineValidationError` con `.issues`; mensaje
@@ -581,7 +618,7 @@ socialMultiplierApplied }, palette: { accent, background, ring, halo }, elements
 | `kind` | Campos resueltos |
 |---|---|
 | `orbit` | `placement` (`{ target: { id, kind }, radius: { of: 'target-radius', airRatio: 0.12 } }` o `{ region, radius: { ratio, of } }`), `ring { strokePx, opacity, color, innerOrbits }`, `innerOrbits`, `arc { startDeg, sweepDeg, strokePx, color, linecap, gradient }` o `null`, `trajectory`, `sphere { radiusPx, color, at: 'arc-end', ring }` o `null` (con satélites o `none`), `halo { radiusRatio, stops, color }` o `null` (desde 0.3.1, en superficie clara las opacidades de `stops` salen × `haloOnLightScale`) |
-| `measure` | `placement` (target + aire 0,12), `value`, `source`, `label`, `ring`, `arc` (la **estela**: `startDeg = −90 + valor×360 − min(50, valor×360)`, `sweepDeg = min(50, valor×360)`), `sphere`, `originMark { deg: −90, color }`, `trajectory`, `halo: null` |
+| `measure` | `placement` (target + aire 0,12), `value`, `source`, `label`, `ring`, `arc` (la **estela**: `startDeg = −90 + valor×360 − min(50, valor×360)`, `sweepDeg = min(50, valor×360)`), `travelled` (desde 0.5.0: el camino de las 12 a la esfera bajo la estela, `opacity 0.6`, trazo 0,75 × el de la estela, en su color; `null` en 0 %, anillo completo al 100 %), `sphere`, `originMark { deg: −90, color }`, `trajectory`, `halo: null` |
 | `progress` | `placement` (región con radio de lienzo, o target con aire 0), `sections`, `current`, `ring`, `arc { startDeg −90, sweepDeg }` (portada 50°, si no `current/sections × 360`), `sphere`, `closed`, `originMark null`, `trajectory`, `halo null` |
 | `lens` | `photo { id, alt, subjectRegion }`, `placement` (región), `subject { circleRatio, airRatio }`, `inside { zoom }`, `outside`, `ring` (anatomía: trazo `max(1, 1,4×w/794)`, opacidad 0,28, `airRatio 0.12`) o `null`, `arc` (50° centrado en `accentSphere`, trazo 2,8×w/794) o `null`, `sphere` (5,6×w/794) o `null` |
 | `spotlight` | `photo`, `placement { region: subjectRegion }`, `outside`, `inside`, `edge { softStart }`, `ring` (opacidad 0,22, `airRatio 0.1`), `lamp { arc { startDeg 265, sweepDeg 50 }, sphere }` |
@@ -688,6 +725,41 @@ Greenhouse: `ai-generations/2026-09-26_firma-partners/build4.mjs` (`HOST_BASE=�
 
 ---
 
+## 5b. Contrato `efeonce.email-modules`
+
+Archivo: `packages/contracts/src/email-modules.ts`. `version '0.1.0'`, **`lifecycle 'candidate'`** (en
+`axis-ui-contracts` 0.3.38; registrado en `axis-ui-registry` 0.3.3). Manifest `axis.email-modules-composition.v1`.
+Guía para agentes: AXIS `docs/agent-composition/email-modules.md` (+ `email-modules-intent.schema.json`); ADR
+`docs/architecture/EMAIL_MODULES_DECISION_V1.md`. Es **otro contrato** que la firma de correo de una persona (§5).
+
+**Intent:** `{ contract?, version?, line (growth|brand|engine|voice|revenue-hubspot|revenue-salesforce), channel
+('desktop'|'mobile'), product (slug, = utm_source), campaign? (slug), modules[] (≤ 1 cta-primary { label, url, note? }
+y exactamente 1 cta-agenda { title, body, url, buttonLabel? }), footer { preferencesUrl, unsubscribeUrl, reason, year?,
+preferencesLabel?, unsubscribeLabel? } }`. La línea es la de servicio, **nunca el producto** (Insights firma
+`growth`).
+
+**API:** `validateEmailModulesIntent`, `resolveEmailModulesIntent` (`status 'resolved'` o `'invalid'` con issues),
+`resolveEmailSloganWord(line)`, `AXIS_EMAIL_MODULES_ISSUE_CODES` / `_ISSUE_MESSAGES` (es-CL), `AXIS_EMAIL_CHANNELS`,
+`AXIS_EMAIL_MODULE_KINDS`, `AXIS_EMAIL_LINES`, tipo `AxisResolvedEmailModules`.
+
+**23 códigos:** `intent-required`, `contract-invalid`, `version-unsupported`, `line-invalid`, `channel-invalid`,
+`product-invalid`, `campaign-invalid`, `modules-empty`, `module-kind-invalid`, `cta-subscribe-retired`,
+`cta-primary-label-required`, `cta-primary-url-invalid`, `cta-primary-duplicate`, `cta-agenda-title-required`,
+`cta-agenda-body-required`, `cta-agenda-required`, `cta-agenda-duplicate`, `agenda-never-email`,
+`agenda-url-invalid`, `footer-preferences-required`, `footer-unsubscribe-required`, `footer-reason-required`,
+`footer-year-invalid`.
+
+**Resuelto:** `width`, `palette`, `type`, `body.modules` (el `cta-primary`), `footer { ground #001a33 para toda línea,
+order [cta-agenda, brand-block, links, hairline, legal, hairline, preferences, reason], agenda (URL con UTM; layout
+row/stacked), brandBlock (logo 220 × 52 + slogan { word, text, bodyPx, gapPx }), links (burbuja + 4 redes), hairline,
+legal (tres líneas de texto vivo), preferences, reason (+ ©) }`, `institutional`, `emailSafe`, `retired`,
+`adapterChecks`. Sin HTML ni coordenadas.
+
+**`AXIS_EMAIL_MODULES_ADAPTER_CHECKS` (6):** `images-png-with-dimensions`, `no-inline-svg-in-email`,
+`legal-block-live-text`, `bulletproof-buttons`, `footer-contrast`, `dark-mode-safe`.
+
+---
+
 ## 6. `@efeoncepro/axis-brand-assets`
 
 58 SVG oficiales sellados con SHA-256 desde 0.4.2 (19 hasta 0.3.6; 25 desde 0.4.0, que suma la marca de Insights y su lockup; 0.4.2, **publicado el 2026-09-29, AXIS `main` `7f9c8bb`**, suma 33 de las submarcas SEO/AEO) (`src/manifest.ts`, generado por `scripts/seal.mjs`) + 48 órbitas estáticas.
@@ -723,6 +795,26 @@ incluidos, para fotos y fondos de color). 33 SVG: `{sv360,aeo,aeo-assessment,ai-
 re-sellan; nunca se editan a mano. Greenhouse fija 0.4.1 y los recibe con TASK-1938. Lab: `/references/seo-aeo/` y
 `/references/seo-aeo.json`, guía `docs/agent-composition/seo-aeo.md` (publicados el 2026-09-29; responden 200). Criterio:
 [criteria.md](criteria.md) («Submarcas de producto SEO/AEO»); aplicaciones: [applications.md](applications.md) §B3c.
+
+**PNG para correo: `AXIS_EMAIL_ASSETS` (0.4.6, tag `v0.3.38`, 2026-09-29; Greenhouse fija 0.4.5 y todavía no los
+usa).** `assets/email/`, @2x, RGBA con fondo transparente (se apoyan en el `#001a33` declarado en la celda), generados
+con `pnpm email:assets` (`scripts/generate-email-assets.mjs`, nunca a mano) y sellados en `src/email-manifest.ts`;
+`findEmailAsset(id)` y `emailAssetUrl(id)`.
+
+| id | Tamaño | Qué es |
+|---|---|---|
+| `email-logo-negative` | 220 × 52 | el logo negativo de Efeonce a 220 px, solo |
+| `email-slogan-{growth,brand,engine,voice,revenue-hubspot,revenue-salesforce}-negative` | 141–142 × 13–15 | sólo «Empower your {Palabra}», dimensionado para el logo de 220 px (los dos Revenue son el mismo archivo byte a byte) |
+| `email-social-{linkedin,instagram,youtube,threads}-white` | 40 × 40 | círculo con anillo horneado y el ícono blanco |
+| `url-bubble-baked-dark-email` | 163 × 32 | `url-bubble-baked-dark` rasterizada para correo |
+
+**Logo y eslogan van separados** (el SSOT de marca dice que el eslogan nunca se funde con el logo): el bloque son dos
+`<img>` centrados, el logo, un espaciador de `stack.gapBelowLogoImagePx` (del sello; 16,10 px en Growth, porque el PNG
+del logo termina con 0,31 px transparentes) y el eslogan a su propio ancho y alto del sello. Un logo de otro ancho
+necesita su propio eslogan generado, nunca uno escalado.
+
+**0.4.6 también re-sella las 48 órbitas estáticas** con el contrato 0.5.0 (cambia el sello, no el dibujo: son de
+acento, no medidas, así que no llevan camino recorrido).
 
 **0.4.3 (tag `v0.3.30`, 2026-09-29):** las 48 órbitas estáticas se re-sellaron con el contrato de la órbita 0.4.0
 (cambia el sello `data-axis-graphic-line`, no el dibujo); ningún SVG de marca nuevo. Greenhouse fija 0.4.1.
@@ -791,7 +883,7 @@ si pierde el alfa).
 ## 7. `@efeoncepro/axis-graphic-line`: cada export
 
 Todo SVG que devuelve el paquete es decorativo: `aria-hidden="true" focusable="false"`, sin `<title>` ni `tabindex`.
-Cada parte pintada lleva `data-axis-part` (`halo`, `ring`, `inner-orbit`, `arc`, `origin`, `sphere`, `sphere-ring`,
+Cada parte pintada lleva `data-axis-part` (`halo`, `ring`, `inner-orbit`, `arc`, `travelled` (desde 0.13.0), `origin`, `sphere`, `sphere-ring`,
 `lens`, `spotlight`, `spotlight-light`, `spotlight-orbit`, `satellite`, `signature`, `answer-period`, `state-free`,
 `state-busy`); cada grupo `data-axis-element`, `data-axis-kind` y, si aplica, `data-axis-trajectory`,
 `data-axis-sweep`, `data-axis-value`. La raíz lleva `data-axis-graphic-line="<versión del contrato>"`.
@@ -844,7 +936,8 @@ publicar.
 el anillo queda en `circle.r` porque la función divide por 1,12 antes de sumar el aire), `line?`, `surface?`,
 `channel?`, `background?` (false), `idPrefix?`. Desde 0.12.0 (contrato 0.4.0): `severity?`, `severityLabel?`,
 `scaleVisible?` y `glow?`, con las mismas reglas del contrato (§3.4); el pintor dibuja el brillo de la esfera
-(`data-axis-part="sphere-glow"`).
+(`data-axis-part="sphere-glow"`). Desde 0.13.0 (contrato 0.5.0) `measureSvg` pinta también el camino recorrido
+(`data-axis-part="travelled"`), sin opción nueva.
 
 ### 7.3 Chequeos (`checks.ts`)
 
@@ -949,7 +1042,7 @@ Se pinta en shadow DOM (ids aislados) y el host recibe `aria-hidden="true"`.
 
 | Export | Firma | Devuelve / regla |
 |---|---|---|
-| `aiVisibilityReportOrbitSvg({ score, severity, surface?, idPrefix? })` | `score` 0–100 o `null`; `severity` `critical`/`attention`/`optimal`/`no-data`; `surface` `dark` por defecto (`light` para una vista previa en papel) | SVG decorativo de 400 × 400 reproducido del token `aiVisibilityReport.cover.orbit` (nunca re-derivado de la escala): anillo, marca de partida, estela de 50°, esfera en `score × 3,6°` y su brillo, en el color de la gravedad. Sin dato, anillo y partida solos. **Lanza** si `score: null` no viene con `no-data` (o al revés) o si el puntaje sale de 0–100. La cifra y la etiqueta son texto del consumidor |
+| `aiVisibilityReportOrbitSvg({ score, severity, surface?, idPrefix? })` | `score` 0–100 o `null`; `severity` `critical`/`attention`/`optimal`/`no-data`; `surface` `dark` por defecto (`light` para una vista previa en papel) | SVG decorativo de 400 × 400 reproducido del token `aiVisibilityReport.cover.orbit` (nunca re-derivado de la escala): anillo, marca de partida, camino recorrido (desde 0.13.0: 3 px, bajo la estela), estela de 50°, esfera en `score × 3,6°` y su brillo, en el color de la gravedad. Sin dato, anillo y partida solos. **Lanza** si `score: null` no viene con `no-data` (o al revés) o si el puntaje sale de 0–100. La cifra y la etiqueta son texto del consumidor |
 | `aiVisibilityReportSeverityColor(severity, surface = 'dark')` | | el color de `measureSeverity.colors[surface]`, o `null` con `no-data` |
 
 La geometría (`aiVisibilityReportOrbitGeometry(score)`) y el resolver del documento viven en el contrato
@@ -976,6 +1069,8 @@ dato e inválidos) en `docs/examples/ai-visibility-report/`.
 | `pnpm orbit:assets` | regenera las 48 órbitas de `axis-brand-assets` y su manifest sellado |
 | `pnpm orbit:video -- --format 16x9\|1x1\|4x5\|9x16 --surface dark\|light [--line …] [--fps 30] --out <dir>` | video de la órbita **sin logo** (2,0 s + 0,5 s de reposo), MP4 + cuadro final PNG + JSON; necesita Playwright del Lab y `ffmpeg` |
 | `pnpm signature:resolve -- --input <intent.json> [--out …]` | resuelve la firma de correo |
+| `pnpm email:resolve -- --input <intent.json> [--out <manifest.json>]` (desde `v0.3.38`) | valida y resuelve los módulos de correo (`efeonce.email-modules` 0.1.0; compila antes `axis-ui-contracts`); sale 1 con un issue; no arma HTML, no envía |
+| `pnpm email:assets` (`scripts/generate-email-assets.mjs`) | regenera y sella los PNG de correo de `axis-brand-assets` (`AXIS_EMAIL_ASSETS`); nunca se exportan a mano |
 | `pnpm collaboration:resolve -- …` | resuelve la selección colaborativa |
 | `pnpm report:resolve` (`scripts/resolve-ai-visibility-report.mjs`; compila antes `axis-ui-contracts`) | valida y resuelve un intent del Efeonce AI Visibility Report (contrato `efeonce.ai-visibility-report` 0.1.0, desde `v0.3.30`) |
 | `pnpm icons:volume -- refs\|key\|check\|publish` (`scripts/icons-volume.mjs`) | Plastilina en volumen (D24): `refs` el plano en respuesta (con gesto) a 760 px sobre `#001a33`, centrado en 1024 · `key` alfa por color contra el fondo liso · `check` silueta ≥ 0,75 y misma cantidad de calados y piezas sueltas (avisa, sale 1; no rechaza) · `publish` comprime, copia al paquete y al Lab y sella. Detalle: `iconography.md` §12 |
@@ -983,8 +1078,9 @@ dato e inválidos) en `docs/examples/ai-visibility-report/`.
 | `pnpm build` · `pnpm test` · `pnpm typecheck` · `pnpm lint` | en todos los paquetes (`node --test dist/*.test.js`) |
 | `pnpm --dir apps/lab test:e2e` | e2e del Lab (incluye la página de la línea y ids duplicados) |
 
-Ejemplos de intent en `docs/examples/graphic-line/` (`post-lens`, `deck-progress`, `report-measure`) y
-`docs/examples/email-signature/`.
+Ejemplos de intent en `docs/examples/graphic-line/` (`post-lens`, `deck-progress`, `report-measure`),
+`docs/examples/email-signature/` y `docs/examples/email-modules/` (Insights desktop y mobile, Engine desktop e
+inválidos).
 
 ### 8.2 Greenhouse (`greenhouse-eo`)
 
@@ -1105,6 +1201,12 @@ guía `docs/agent-composition/insights.md`). Es **referencia** —marca y lockup
 informe y la UI del informe live con datos de muestra—, no componentes ni contratos: la UI de Insights vive en
 Greenhouse (catálogos del Artifact Composer) y en Think.
 
+**Página de los módulos de correo (2026-09-29, `v0.3.38`), publicada:**
+[axis.efeonce.org/references/email/](https://axis.efeonce.org/references/email/) y su JSON `/references/email.json`.
+Fuente `apps/lab/src/pages/references/email.astro` (+ `.json.ts`, datos en `apps/lab/src/data/email.ts`, componentes
+`EmailFooter.astro` y `EmailAgenda.astro`). Muestra el pie, los CTA y el bloque de marca como módulos, y el correo de
+Insights (enlace en escritorio y celular, PDF adjunto) como **una aplicación**, no como la plantilla.
+
 **Página del Efeonce AI Visibility Report (2026-09-29, `v0.3.30`), publicada:**
 [axis.efeonce.org/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/) y su
 JSON `/references/ai-visibility-report.json` (schema `axis.efeonce-ai-visibility-report.v1`). Fuente
@@ -1124,7 +1226,12 @@ para agentes. A diferencia de Insights, sí hay contrato (§7.10); el renderer d
 - **No hay componente de firma de correo HTML** en AXIS: el contrato resuelve valores; el HTML (tablas, estilos en
   línea, PNG) lo arma el generador del consumidor. Tampoco hay función que pinte el `area-mark` de la firma de equipo
   (el Lab lo dibuja en la propia página).
-- **No hay archivo del eslogan** en `axis-brand-assets`, ni logo/isotipo de Greenhouse, ni fuentes, ni fotos.
+- **No hay archivo SVG del eslogan** en `axis-brand-assets`, ni logo/isotipo de Greenhouse, ni fuentes, ni fotos. La
+  única excepción son los PNG de correo `email-slogan-<línea>-negative` (0.4.6), dimensionados para el logo de 220 px
+  y siempre **separados** del logo; no sirven para otra pieza ni para otro ancho de logo.
+- **No hay plantilla de correo en AXIS** ni HTML de correo: `efeonce.email-modules` resuelve valores y el adapter del
+  consumidor arma el HTML (tablas, estilos en línea, PNG). El cuerpo del correo de Insights (cabecera, «Lo esencial del
+  mes», órbita, tarjeta de decisión) no está en AXIS.
 - **No hay UI de Efeonce Insights en AXIS**: ni componentes del informe, ni roles de color de datos, ni geometría de
   gráficos. AXIS sólo trae la marca (`insights-*`, 0.4.0) y la página de referencia del Lab (publicada el 2026-09-28,
   AXIS main `3dfbf0e`); roles y geometría siguen
@@ -1138,8 +1245,8 @@ para agentes. A diferencia de Insights, sí hay contrato (§7.10); el renderer d
 - **No hay coordenadas libres en el contrato**: sólo regiones, posiciones, targets medidos o `bindings.circles`.
 - **No existe** el código `url-bubble-signature-is-efeonce-only` (se retiró: Efeonce firma en toda línea). No existe
   `lens.accentSphereDiameterRatio` como regla vigente (deprecado).
-- **No existe** un modo «loader» ni un arco que crece hasta llenarse para un dato; no existe «sin esfera» en progress o
-  measure. (La única órbita de dato sin esfera es la del AI Visibility Report **sin dato**: anillo y partida solos, cifra
+- **No existe** un modo «loader» ni un arco que crece hasta llenarse para un dato (el camino recorrido de 0.5.0 es
+  tenue, va bajo la estela y nunca la reemplaza); no existe «sin esfera» en progress o measure. (La única órbita de dato sin esfera es la del AI Visibility Report **sin dato**: anillo y partida solos, cifra
   «—»; la pinta `aiVisibilityReportOrbitSvg`, no `measure`, que exige un valor.)
 - **No existe** color de gravedad para la marca de estado ni para una medida sin escala publicada:
   `measureSeverity.allowedFor` es sólo `scored-diagnostic`. Los umbrales tampoco están en AXIS: los pone el productor.

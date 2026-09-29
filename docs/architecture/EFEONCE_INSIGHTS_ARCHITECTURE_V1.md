@@ -599,6 +599,16 @@ genera borrador para revisión; autoemisión/envío exige autorización previa e
   `insights_edition_delivery_attachment` (estándar, con PDF; exige `acknowledgeIrrevocableAttachment=true`).
   Dominio de correo `insights`, marca Efeonce. Ambos sembrados `enabled=false` en `email_type_config`, que falla
   abierto si falta la fila. Template funcional `src/emails/InsightsEditionDeliveryEmail.tsx` (presentación: 1849).
+- **Presentación aprobada (2026-09-29), sin implementar.** El operador aprobó el diseño del correo de entrega (canvas
+  v21: enlace en escritorio y celular, y PDF adjunto) y lo declaró **una aplicación** de los módulos canónicos de correo
+  Efeonce —pie oscuro, CTA principal, tarjeta de agenda «Agendar una reunión» y bloque de marca con «Empower your
+  Growth»—, no la plantilla de los demás correos. Dirección:
+  `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`; canon en AXIS `v0.3.38` (contrato
+  `efeonce.email-modules` 0.1.0). El template actual no cambia hasta
+  [TASK-1944](../tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md), que construye los módulos y la
+  presentación; TASK-1849 conserva el cableado de los datos de la edición (hallazgos, cifras, tarjeta de decisión).
+  Antes del primer envío con el pie nuevo, el operador decide el propósito de los dos `EmailType` frente a la política
+  de presentación (TASK-1764: el pie aprobado lleva agenda, redes y baja) y la baja tiene que funcionar (TASK-1774).
 - **Despacho:** projection `insights_delivery_dispatch` (lane `ops-reactive-notifications`) →
   `dispatchInsightDeliveryIntent`: claim atómico, revalida edición/persona/buzón; `share_link` usa
   `claimTokenSensitiveEmailIntent`, que crea la fila de `email_deliveries` y el grant (`source='delivery'`) en la

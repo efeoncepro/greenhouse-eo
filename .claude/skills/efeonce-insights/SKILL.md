@@ -164,8 +164,19 @@ it without repeating what already cost a day*. It grows with every task: see the
   version (Efeonce logo + rule + «INSIGHTS» as uppercase with 0.34em tracking —spaced capitals, not true small caps—,
   `.brand-product` / `.product`), not the official `insights-lockup-*` file; on the navy covers that word is painted in
   the accent, an open operator decision (`ui-and-brand.md` §7.7). Email/favicon/portal/MCP carry no mark; Greenhouse
-  pins `axis-brand-assets` 0.3.5. Swapping or adding the mark anywhere is an operator decision, never yours.
+  pins `axis-brand-assets` 0.4.5 (verified 2026-09-29), which already carries the Insights files. Swapping or adding the mark anywhere is an operator decision, never yours.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
+- **Delivery email design (approved 2026-09-29, implementation pending):** the operator approved the Insights delivery
+  email — canvas https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd v21, page «Correo», boards share link desktop,
+  mobile and PDF attached; sealed direction `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`. It is
+  **one application of the canonical Efeonce email modules** (AXIS `v0.3.38`: token `efeonceEmail`, contract
+  `efeonce.email-modules` 0.1.0 `candidate`, email PNGs in `axis-brand-assets` 0.4.6), **not the email template**: the
+  footer (agenda card, brand block with «Empower your Growth», URL bubble + 4 socials, legal, preferences/unsubscribe,
+  reason), the navy primary CTA and the agenda card are canon; the Insights header, «Lo esencial del mes», its measure
+  orbit (with the travelled path, decided the same day) and the decision card belong to this email only. «Suscribirme»
+  is retired. Greenhouse has **not** adopted it: `src/emails/InsightsEditionDeliveryEmail.tsx` and `EmailLayout.tsx`
+  are unchanged and pin the older AXIS set. Open tension with TASK-1764 (footer policy). Route: `greenhouse-email`
+  («Delta 2026-09-29»), `efeonce-graphic-line` → `applications.md` §C4, [`references/ui-and-brand.md`](references/ui-and-brand.md) §5.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).
 - Metrics semantics → `greenhouse-ico`, `seo-aeo`, growth SEO docs; never re-derive a formula here.

@@ -1,6 +1,7 @@
 # Lecciones (trampas que ya costaron tiempo)
 
-> Verificado contra: greenhouse-eo@f05c26e2f (`develop`) — 2026-09-29, noche (última entrada: el deck de práctica
+> Verificado contra: AXIS `c92160b` (tag `v0.3.38`) — 2026-09-29, noche (última entrada: el camino recorrido y los
+> módulos de correo); antes, greenhouse-eo@f05c26e2f (`develop`) — 2026-09-29, noche (el deck de práctica
 > Salesforce, TASK-1942; antes, greenhouse-eo@2c95e60b2: la órbita del AI
 > Visibility Report, canonizada en AXIS `v0.3.30`, `26097c5`, con la pregunta abierta del camino recorrido; antes, los
 > retratos viejos del equipo; antes, greenhouse-eo@1050036e8: los ejemplos del contrato de Marketing con Manzanitas con copy que no cabe,
@@ -383,7 +384,8 @@
   ya no se revisa a ojo: la exige el contrato; pero Greenhouse fija 0.3.29 hasta TASK-1938, así que en el repo sigue
   siendo revisión. Los umbrales (< 40 crítico, < 70 atención) son del productor, no de AXIS: no los copies al token ni
   al contrato.
-- **Pregunta abierta, no regla (2026-09-29):** en el canvas del correo de Insights, el operador notó que una medida de
+- ~~**Pregunta abierta, no regla (2026-09-29):**~~ **Decidida esa noche («aplícalo en todas»): ver la entrada «el
+  camino recorrido y los módulos de correo», abajo.** Lo que decía: en el canvas del correo de Insights, el operador notó que una medida de
   62 % con sólo la estela corta se lee como menos de 62 %, porque el ojo no sabe la dirección. En ese tablero, y sólo
   ahí, se agregó el camino recorrido desde las 12 al 60 % de opacidad y 3 px. Se le preguntó si pasa a ser regla de La
   órbita y si se aplica a la portada del informe; **no hay respuesta**. Hasta que decida: no pintes el camino recorrido
@@ -447,6 +449,39 @@
   `assets/partners/` (marcas de terceros), `graphic-line-tokens-sync.test.ts` reventó con EISDIR. **Regla:** recorrer
   recursivo y comparar también lo anidado byte a byte (`94eb4e4b0`), no filtrar los directorios fuera.
 
+## 2026-09-29 (el camino recorrido y los módulos de correo)
+
+- **Una medida con sólo la estela corta se lee como menos de lo que vale.** Síntoma: en el correo de Insights, un 62 %
+  con su estela corta «me hace pensar que está a menos» (operador). Causa: la estela dice dónde está la esfera, pero no
+  por dónde vino; el ojo no sabe la dirección ni la distancia recorrida. Regla (operador, «aplícalo en todas»): toda
+  medida dibuja el **camino recorrido** desde las 12, tenue y bajo la estela (60 %, 0,75 × su trazo;
+  `trajectory.measure.travelledPath`, órbita 0.5.0). La decisión reemplaza «nunca un arco que crece desde el origen»:
+  lo que no se permite es que el camino compita con la estela (mismo grosor u opacidad) y la medida vuelva a leerse
+  como un loader ([criteria.md](criteria.md) §3.4).
+- **Un ajuste hecho «sólo en este tablero» es una pregunta, no una regla, hasta que el operador responde.** Síntoma: el
+  camino recorrido existió unas horas sólo en el tablero del correo, con la instrucción de no pintarlo en otra pieza.
+  Regla: un cambio a un invariante de la línea que nace en una aplicación se registra como pendiente en el ledger y no
+  se propaga; cuando el operador decide, se canoniza **en AXIS primero** (token, contrato, pintor, órbitas estáticas) y
+  recién después en las aplicaciones.
+- **El correo aprobado es una aplicación, no la plantilla.** El operador acotó el alcance al canonizar: se canonizan el
+  pie, los CTA y el bloque de marca; el cuerpo de Insights (cabecera, «Lo esencial del mes», su órbita, la tarjeta de
+  decisión) no. Regla: al canonizar una pieza aprobada, pregunta qué parte es sistema y qué parte es de esa pieza; un
+  token con `template: false` y `applications` lo deja escrito para que nadie copie el correo entero.
+- **Logo y eslogan van en dos archivos, también en correo.** La tentación en correo es hornear el bloque de marca en
+  un solo PNG (una imagen, un `alt`, menos riesgo en Outlook). El SSOT de marca dice que el eslogan nunca se funde con
+  el logo, así que AXIS publica `email-logo-negative` y `email-slogan-<línea>-negative` por separado y los apila. Dos
+  trampas medidas: (1) el PNG del logo termina con 0,31 px transparentes, así que el espaciador bajo la **imagen** es
+  `stack.gapBelowLogoImagePx` del sello (16,10 px en Growth), no el `gapPx` calculado desde el dibujo (16,41); (2) los
+  `width`/`height` del `<img>` salen del sello (141), no del ancho calculado (140,8). Regla: un eslogan se genera para
+  **su** ancho de logo (`pnpm email:assets`), nunca se escala otro.
+- **«Suscribirme» y la agenda por correo se retiraron por contrato, no por costumbre.** Regla: la agenda va a
+  `/contacto/` con UTM y el contrato rechaza `cta-subscribe-retired` y `agenda-never-email`; un correo que «necesita»
+  suscripción es una decisión del operador y una versión nueva del contrato, no una excepción en la plantilla.
+- **Canon de AXIS publicado ≠ adoptado en Greenhouse.** Greenhouse fija el set anterior, `src/emails/` sigue igual y
+  el adapter de la órbita sólo acepta 0.3.1. Regla: al citar los módulos o el camino recorrido desde Greenhouse, di que
+  son canon en AXIS y están **sin adoptar**; el bump del adapter exige soportar el contrato 0.5.0, no sólo subir la
+  versión.
+
 ## 2026-09-29 (fondos de Teams en la oficina)
 
 - **Una foto de 16:9 no es un fondo de Teams.** La persona tapa el centro y Teams lo muestra a 300–600 px: el chiste va
@@ -477,7 +512,8 @@
 - `sphereDividerSvg` usa por defecto una esfera de 6 px; la firma de correo pide 9 px (`emailSignature`).
 - `urlBubble.assets` guarda nombres heredados (`url-lum-*.svg`) que no existen en brand-assets.
 - No existen: Lottie, un componente HTML de firma de correo, un pintor del `area-mark` de la firma de equipo, un archivo
-  del eslogan ni el logo de Greenhouse en brand-assets. No los inventes; proponlos.
+  SVG del eslogan ni el logo de Greenhouse en brand-assets (desde 0.4.6 sí hay PNG de correo del eslogan, sólo para el
+  logo de 220 px y siempre separados del logo). No los inventes; proponlos.
 
 Regla: al tocar cualquiera de estos puntos, corregir la fuente (código o doc), borrar la línea de aquí y anotarlo en el
 registro.

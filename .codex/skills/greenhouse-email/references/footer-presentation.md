@@ -6,6 +6,34 @@ preferencias o unsubscribe de un correo. La autoridad durable es
 `TASK-1764` su foundation y migración. Mientras la ADR siga `Proposed`, no presentes este contrato como runtime
 activo.
 
+## Módulos canónicos de Efeonce (AXIS, 2026-09-29) y la tensión con esta policy
+
+El 2026-09-29 el operador aprobó y canonizó en AXIS (`v0.3.38`) el **pie**, los **módulos de CTA** y el **bloque de
+marca** de los correos de Efeonce, a partir del correo de entrega de Insights (canvas
+https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd v21), que queda como **una aplicación**, no como la plantilla:
+
+| Módulo | Qué fija |
+| --- | --- |
+| Tarjeta de agenda | `#023c70`, radio 16; «¿Lo revisamos juntos?» Bricolage 700 22 px; bajada 13 px `#cfe4fa`; píldora blanca «Agendar una reunión» → `https://efeoncepro.com/contacto/` con `utm_medium=email`, `utm_source={producto}`, `utm_content=pie`; nunca `mailto:` |
+| Bloque de marca | logo de Efeonce 220 px y, debajo, el eslogan al 64 % del logo con la palabra de la línea de servicio (en blanco a ese tamaño); logo y eslogan en **dos** PNG |
+| Enlaces | burbuja URL horneada + LinkedIn, Instagram, YouTube, Threads en círculos |
+| Legal | 11 px `#9fb3c8`: razón social en 600 `#cfe4fa` · RUT; dirección; teléfonos · correo (valores de `src/config/efeonce-brand.ts`) |
+| Preferencias y baja | 11 px, entre filetes |
+| Motivo y © | 10 px |
+| CTA principal (cuerpo) | píldora navy `#001a33` a todo el ancho; uno como máximo |
+
+«Suscribirme» queda retirado. Contrato `efeonce.email-modules` 0.1.0 (`candidate`), token `efeonceEmail`, PNG en
+`@efeoncepro/axis-brand-assets` 0.4.6; dirección sellada `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`.
+**Greenhouse no los adoptó todavía.**
+
+**Tensión con esta referencia, registrada y sin resolver:** el pie aprobado difiere del orden visual de abajo
+(wordmark gris → contexto → controles → RRSS → identidad) y lleva agenda, redes y baja en todo correo, mientras la
+tabla de elegibilidad deja `unsubscribe: forbidden` y `RRSS: none` en los propósitos transaccionales y la policy prohíbe
+promoción en correos de servicio. Hasta que el operador decida al adoptar los módulos: no mezcles las dos anatomías en
+un template, no quites la agenda ni las redes de un correo que adopte los módulos para «cumplir» esta tabla, y no
+agregues agenda ni redes a un tipo transaccional migrado con esta policy. Los datos legales son los mismos en ambos
+casos (`src/config/efeonce-brand.ts`).
+
 ## Verdad visual aprobada
 
 La lámina `/admin/emails/footer-profiles/mockup` define la anatomía, jerarquía y densidad aprobadas. Es un mockup

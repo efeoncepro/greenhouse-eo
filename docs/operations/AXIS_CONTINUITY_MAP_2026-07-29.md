@@ -119,6 +119,30 @@ El tag `v0.3.30` de AXIS (`main` `26097c5`, registro verificado) publicó:
 (`scripts/creative/layout-compiler/graphic-line.mjs`) acepta sólo el contrato `0.3.1`, así que ese bump tiene que llevar
 el soporte de `0.4.0`. Detalle en el runbook, Delta 2026-09-29 (h). Este mapa no autoriza el bump.
 
+## Actualización — 2026-09-29 (b): `v0.3.38`, módulos de correo y recorrido de la medida
+
+**Pines vigentes** (`package.json`, 2026-09-29, bump `bacd6a4ea`, tag `v0.3.37` de AXIS): `axis-tokens` `0.3.37`,
+`axis-ui-contracts` `0.3.37`, `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.5` y `axis-ui-registry` `0.3.1`.
+Superan a los de la actualización anterior: los tags `v0.3.31` a `v0.3.37` (deck Salesforce, firma, sub-líneas Glitch y
+Manzanitas) se fijaron sin una actualización propia en este mapa.
+
+El tag `v0.3.38` de AXIS (`main` `c92160b`, registro verificado) publicó:
+
+- `axis-tokens` `0.3.38`: export nuevo `efeonceEmail` (módulos de correo) y `efeonceGraphicLine.trajectory.measure.travelledPath`
+  (el recorrido de toda medida, también en `aiVisibilityReport.cover.orbit.travelled`).
+- `axis-ui-contracts` `0.3.38`: contrato nuevo `efeonce.email-modules` `0.1.0` (`candidate`) y
+  `efeonce.graphic-line-orbit` `0.5.0`.
+- `axis-graphic-line` `0.13.0`: el pintor y la portada del AI Visibility Report dibujan el recorrido.
+- `axis-brand-assets` `0.4.6`: doce PNG @2x para correo con sello SHA-256 y órbitas estáticas re-selladas.
+- `axis-ui-registry` `0.3.3`. Lab `/references/email/`.
+
+**Greenhouse no lo fija todavía.** Lo adoptan TASK-1944 (módulos de correo) y TASK-1938 (PDF del AI Visibility Report),
+la que llegue primero. **Hallazgo 2026-09-29:** con los pines vigentes el contrato de la órbita ya es `0.4.0` (entró con
+`9289cab0c`, `v0.3.31`), y el adapter `scripts/creative/layout-compiler/graphic-line.mjs` sigue en `0.3.1`:
+`node --test scripts/creative/layout-compiler/graphic-line.test.mjs` da 0 de 7. La suite no corre en CI. El bump a
+`v0.3.38` tiene que llevar el soporte de `0.5.0` en el mismo commit. Detalle en el runbook, Delta 2026-09-29 (i). Este
+mapa no autoriza el bump.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro

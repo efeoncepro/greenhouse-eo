@@ -1,5 +1,17 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-29 · correo de entrega · La pieza aprobada no es la plantilla.** Síntoma: al canonizar el correo de entrega
+  aprobado (canvas v21), lo natural era publicarlo entero como «el correo de Efeonce». El operador acotó: se canonizan el
+  pie, los CTA y el bloque de marca; el correo de Insights es **una aplicación**. Regla: la cabecera, «Lo esencial del
+  mes», la órbita de medida y la tarjeta de decisión son de Insights y no se copian a otros correos; los módulos salen de
+  AXIS (`efeonce.email-modules`, `efeonceEmail`, PNG `email-*`), no del HTML de Insights. Diseño aprobado ≠ runtime:
+  `InsightsEditionDeliveryEmail.tsx` sigue sin cambios hasta que una task lo implemente.
+- **2026-09-29 · correo de entrega · Un 62 % con sólo la estela se lee como menos.** El operador lo vio en la órbita de
+  medida del correo; la decisión («aplícalo en todas») cambió La órbita para toda medida: camino recorrido tenue desde
+  las 12 (60 %, 0,75 × la estela; contrato de la órbita 0.5.0). Regla: una medida de Insights en cualquier superficie
+  (correo, PDF, Think) sigue esa regla cuando su consumidor adopte AXIS `0.3.38`; mientras tanto, no la pintes a mano
+  ni la mezcles con la versión sin camino dentro de una misma pieza.
+
 - **2026-09-28 · marca + AXIS · La copia a mano de los roles de color ya divergió.** Síntoma: el dato «anterior» sobre
   papel era `#1f9e94` (`--axis-deck-teal-650`, `editorial-roles.json`) en los PDF y `#0e8c82` (`orbita.accentLight`,
   `efeonce-think/src/lib/insights-tokens.ts`) en la web. Era un desvío de Think: se corrigió el mismo día

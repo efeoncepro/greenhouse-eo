@@ -7,7 +7,8 @@ Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (ícono
 TASK-1927 — 2026-09-27 · §L «Recetas con plantilla desde TASK-1928»: árbol local de `develop` en `64be8aa16`
 (AXIS `v0.3.20`) — 2026-09-27 · portada con selección (`document-selection`, AXIS `v0.3.21`) — 2026-09-28 · §L
 «Láminas SEO/AEO con plantilla desde TASK-1934» (AXIS `v0.3.23`, `develop` tras `af32d9353`) — 2026-09-28 · versiones
-vigentes de §L (AXIS `v0.3.24`, greenhouse-eo@53002b352) — 2026-09-28
+vigentes de §L (AXIS `v0.3.24`, greenhouse-eo@53002b352) — 2026-09-28 · §C4 (módulos de correo) y el camino recorrido
+de la medida: AXIS `main` `c92160b`, tag `v0.3.38` — 2026-09-29
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -363,7 +364,7 @@ marca de producto que acompaña») acompaña a Efeonce y **nunca firma**: junto 
 | Imagen OG de Think | **sí** | `og-insights.png`, 1200 × 630: copia del lockup negativo a 520 px de ancho + una órbita de acento, sin datos de ningún informe. **Regenerarla cada vez que cambie el lockup** | `efeonce-think/scripts/build-insights-og.mjs` |
 | PDF A4 (`insights-report`) | **versión tipográfica** | portadas navy y clara (bloque navy): logo de Efeonce 32 px + aire 16 + filete 1 × 24 al 26 % + «INSIGHTS» en mayúsculas espaciadas (`uppercase` + `letter-spacing: 0.34em`, no versalitas de fuente; `.brand-product`, 12 px en `navyAccent` = teal-500 → **decisión abierta**, ver abajo), no el archivo oficial; apertura de capítulo: mini-lockup al pie (Efeonce 12 px + filete 1 × 10 + «INSIGHTS» 8 px en `navyMuted`, `report-chapter.html`); pie de página y contraportada con el logo de Efeonce | `src/lib/artifact-composer/catalogs/insights-report/report-cover.html`, `report-cover-light.html`, `report-editorial.css` (usar el lockup oficial pasa por el contrato de fidelidad y el gate visual de TASK-1889) |
 | Deck (`insights-deck`) | **versión tipográfica** | portada: logo de Efeonce 30 px + aire 16 + filete 1 × 22 + «INSIGHTS» en mayúsculas espaciadas 12 px en `navyAccent` (`.product`; **decisión abierta**); pie de la apertura de capítulo: Efeonce 13 px + filete 1 × 12 + «INSIGHTS» 9 px en `navyMuted`; los demás pies nombran «Insights · Informe de …» como texto | `catalogs/insights-deck/insights-cover.html`, `insights-chapter.html` |
-| Correo de entrega | pendiente | `brand='efeonce'`, diseño funcional | `src/emails/InsightsEditionDeliveryEmail.tsx` |
+| Correo de entrega | diseño **aprobado** el 2026-09-29 (canvas «Correo» v21: enlace en escritorio y celular, PDF adjunto) como **aplicación** de los módulos de correo (§C4); implementación pendiente | hoy `brand='efeonce'`, diseño funcional, sin los módulos | `src/emails/InsightsEditionDeliveryEmail.tsx`; dirección `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` |
 | Favicon de Think en `/insights/**` | pendiente | favicon genérico del sitio | `efeonce-think/src/layouts/BaseLayout.astro` |
 | Ficha de Insights en la receta de deck `content-day-live-results` | pendiente | isotipo de Efeonce en ficha oscura (`efeonce-isotype-negative.svg`, `catalogs/graphic-line-deck/content-day-live-results.html`) | `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` |
 | Ficha de Insights en la receta de deck `content-day-tools` | pendiente, **desalineada** | el Composer usa el ícono `probe` (`catalogs/graphic-line-deck/content-day-tools.slots.json`), mientras la nota de la receta pide el isotipo de Efeonce en ficha oscura | receta JSON (misma ruta) + `content-day-tools.slots.json` |
@@ -413,7 +414,8 @@ el token `aiVisibilityReport` y en el contrato `efeonce.ai-visibility-report` 0.
 páginas (portada → qué hacer → por qué → dónde → mercado → contraportada), cabecera y pie interiores, dos audiencias
 (prospecto: agenda con UTM, nunca correo; cliente: responsable de la cuenta, sin oferta) y es/en/pt-BR con fallback es.
 La órbita sólo va en la portada y es la **medida con gravedad** ([criteria.md](criteria.md) §3.4): estela, esfera y
-su brillo en el color del nivel, con etiqueta y escala a la vista; umbrales del productor. Página canónica:
+su brillo en el color del nivel, con etiqueta y escala a la vista; umbrales del productor. Desde AXIS `v0.3.38`
+(`axis-graphic-line` 0.13.0) lleva además el **camino recorrido** desde las 12, en el color del nivel (§3.4). Página canónica:
 [axis.efeonce.org/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/) (JSON
 `/references/ai-visibility-report.json`); guía `docs/agent-composition/ai-visibility-report.md`; dirección de
 Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. Greenhouse fija
@@ -423,7 +425,9 @@ todavía AXIS 0.3.29: la adopción y el renderer son de TASK-1938.
 
 - **Deck de Insights:** portada, figura y cierre en 16:9; la órbita chica de la esquina es la navegación (3 de 5); pie
   con logo, edición, burbuja URL y folio (excepción aprobada). **Correo de aviso (640 × 900):** pregunta del mes y
-  respuesta «Tu informe está listo», misma voz.
+  respuesta «Tu informe está listo», misma voz. *Superado el 2026-09-29:* el correo de entrega de Insights aprobado es
+  una aplicación de los módulos de correo canónicos (§C4), con su propio cuerpo; esta lámina L 7.2 queda como
+  antecedente.
 - **Fuente:** L 7.2; `EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` §Deck de Insights.
 
 ### B5. Pantalla de recepción, webinar y pantallas de evento
@@ -508,6 +512,62 @@ todavía AXIS 0.3.29: la adopción y el renderer son de TASK-1938.
 
 - Una **línea de texto vivo** (nombre, cargo, teléfono), **sin imágenes** (T `emailSignature.reply`).
 - **Fuente:** M §10.2.
+
+### C4. Correos de Efeonce: pie, CTA y bloque de marca (módulos canónicos, aprobados 2026-09-29)
+
+**No es la firma de correo** (C1–C3: la firma de una persona, contrato `efeonce.email-signature`, token
+`emailSignature`, M §10.2). Esto es el **correo que envía Efeonce o un producto suyo** (Insights, el AI Visibility
+Report, avisos): contrato `efeonce.email-modules`, token `efeonceEmail`.
+
+- **Qué es canon y qué es aplicación** (operador, 2026-09-29, al aprobar el correo de entrega de Insights, canvas
+  [«Correo»](https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd) v21, tres tableros: enlace en escritorio, en celular
+  y PDF adjunto):
+
+  | Canon (todo correo) | Aplicación (sólo ese correo) |
+  |---|---|
+  | el **pie** completo, en su orden | el correo de Insights: cabecera, «Lo esencial del mes», su órbita de medida, la tarjeta de decisión |
+  | los **módulos de CTA**: el CTA principal y la tarjeta de agenda | el copy de cada CTA (el principal de Insights: «Ver el informe completo →») |
+  | el **bloque de marca** del pie (logo + eslogan de la línea) | — |
+
+  Otros correos arman su propio cuerpo sobre la misma base; **nunca** se copia el correo de Insights como plantilla.
+- **El pie, en orden:**
+  1. **Tarjeta de agenda:** `#023c70`, radio 16, título «¿Lo revisamos juntos?» en Bricolage 700 22 px, bajada 13 px
+     `#cfe4fa`, píldora blanca «Agendar una reunión». Va a `https://efeoncepro.com/contacto/` con UTM
+     (`utm_medium=email`, `utm_source={producto}`, `utm_content=pie`, `utm_campaign` si hay), **nunca a un correo**.
+  2. **Bloque de marca:** el logo de Efeonce a 220 px y, **debajo**, el eslogan al 64 % del ancho del logo, con la
+     palabra de la **línea de servicio** que firma (Growth, Brand, Engine, Voice o Revenue; nunca el producto: Insights
+     firma `growth`). Bajo 24 px la palabra va en blanco, y a 220 px siempre lo está.
+  3. **Burbuja URL + 4 redes** en círculos: LinkedIn, Instagram, YouTube, Threads.
+  4. Filete.
+  5. **Bloque legal** en 11 px `#9fb3c8`: «Efeonce Group SpA» en 600 `#cfe4fa` · RUT; dirección; teléfonos · correo.
+     Los valores salen de `src/config/efeonce-brand.ts` (espejados en el token), nunca del canvas.
+  6. Filete.
+  7. Enlaces de **preferencias y baja**, 11 px.
+  8. **Motivo** del envío y ©, 10 px.
+- **CTA principal:** píldora navy `#001a33` a todo el ancho, etiqueta en texto vivo; como mucho uno por correo.
+- **«Suscribirme» está retirado:** la agenda lo reemplaza en todo correo (`efeonceEmail.retired`, código
+  `cta-subscribe-retired`).
+- **El pie lleva logo y burbuja a la vez, y no rompe la regla de firma:** es un pie, como el de la hoja membretada o la
+  firma de correo; la burbuja es la URL del pie, no la firma de una pieza gráfica (criteria §6).
+- **Color y superficie:** banda del pie `#001a33` **para toda línea**; el acento de la línea no aparece en el pie.
+- **Nunca:** SVG en línea (Gmail y Outlook lo descartan: todo va en PNG @2x con ancho, alto y `alt`) · texto legal, CTA,
+  preferencias o motivo en imagen · logo y eslogan en **un solo** archivo · un eslogan escalado para otro ancho de logo
+  · fuentes web obligatorias · la agenda como `mailto:`.
+- **Cómo se produce:** intent → `pnpm email:resolve` en AXIS → manifest `axis.email-modules-composition.v1` → HTML de
+  correo del consumidor (tablas, estilos en línea, botones con VML) con los PNG `email-*` de
+  `@efeoncepro/axis-brand-assets` 0.4.6 → los 6 chequeos del adapter. Detalle en
+  [package-and-tokens.md](package-and-tokens.md) §2.21, §5b y §6; checklist en [qa-checklist.md](qa-checklist.md) §7b.
+- **Estado en Greenhouse (2026-09-29):** **no adoptado**. Greenhouse fija el set anterior de AXIS y
+  `src/emails/InsightsEditionDeliveryEmail.tsx` y `src/emails/components/EmailLayout.tsx` no cambiaron; la dirección
+  sellada es `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` (PNG de los tres tableros en
+  `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1/`). Skills `greenhouse-email` y `resend-email-platform`.
+- **Tensión abierta (registrada, no resuelta):** la política de presentación de correos propuesta (TASK-1764, ADR
+  `GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `Proposed`) prohíbe la promoción en correos de servicio y
+  reserva redes y baja a perfiles de marketing; el pie aprobado lleva agenda y redes en todo correo. Un agente no quita
+  la agenda ni las redes para «cumplir» esa política: lo decide el operador y, si cambia, es una versión nueva del
+  contrato.
+- **Fuente:** canvas «Correo» v21; AXIS `docs/architecture/EMAIL_MODULES_DECISION_V1.md` y
+  `docs/agent-composition/email-modules.md`; Lab [axis.efeonce.org/references/email/](https://axis.efeonce.org/references/email/); T `efeonceEmail`.
 
 ---
 
@@ -756,6 +816,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Firma de correo personal | retrato con órbita + línea que termina en la esfera | nombre con punto, contacto, burbuja, cierre de marca, partners | `build4.mjs`, `portraitOrbitSvg`, `sphereDividerSvg` |
 | Firma de equipo | órbita alrededor del ícono del área | área con punto, correo del área | `AREA=… build4.mjs` |
 | Firma de respuesta | ninguna | una línea de texto | texto vivo |
+| Correo de Efeonce (pie, CTA, bloque de marca) | ninguna en el pie (la órbita de medida del correo de Insights es de esa aplicación) | agenda, bloque de marca, burbuja + redes, legal, preferencias y baja, motivo; CTA principal navy | `pnpm email:resolve` (AXIS) + PNG `email-*`; Greenhouse sin adoptar |
 | Muro de recepción | órbita con el logo (única vez) | logo, eslogan | arte L 4.3; vinilo Ø 1,2 m a 1,5 m |
 | Mural / pasillo | lente, una por muro | foto + palabra con punto | `lensRecipe('wall')` |
 | Vidrio de sala | órbita en vinilo | nombre de sala, estado en texto | arte L 4.3 2/3 |
