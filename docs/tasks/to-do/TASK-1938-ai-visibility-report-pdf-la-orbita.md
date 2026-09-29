@@ -30,7 +30,7 @@
 ## Summary
 
 El informe PDF del Grader de visibilidad en IA pasa al lenguaje visual de Efeonce Insights y de «La órbita», en dos
-versiones: para no clientes (diagnóstico, cierra con «Agenda 30 minutos») y para clientes (parte del servicio: sin
+versiones: para no clientes (diagnóstico, cierra con «Agenda 30 minutos», que lleva a la agenda) y para clientes (parte del servicio: sin
 oferta, cierra con su equipo y el próximo informe). Portada con la órbita que mide, veredicto como hallazgo y escala;
 interiores en orden «respuesta primero» (qué hacer, por qué, dónde, mercado y fuentes). Sin lockup de Insights y sin
 cambiar el motor de render (react-pdf).
@@ -265,7 +265,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Dirección aprobada y sellada
 
-- Resolver con el operador las decisiones abiertas (tipografía, palabra del eslogan, enlace de agenda).
+- Resolver con el operador lo que queda abierto (palabra del eslogan, URL de la agenda).
+- Corregir `report-artifact/fixtures.ts` para que la gravedad coincida con los umbrales de `recommendations.ts`.
 - Exportar las ocho hojas aprobadas (dos portadas, cuatro interiores, dos contraportadas) del canvas a `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita/`
   y escribir la dirección `TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`; actualizar el wireframe.
 
@@ -394,7 +395,8 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [ ] Cada motor evaluado (ChatGPT, Claude, Gemini, Perplexity, Google AI Overview) aparece con su logo oficial en la portada y en «Canales de respuesta»; Google AI Overview usa la lupa de Google AI Mode de AXIS, nunca el logo de Gemini.
 - [ ] Los íconos son del Trazo de AXIS (`resolveIcon`), en reposo, y cada grupo pasa `auditIconGroup`; ninguno dibujado a mano.
 - [ ] El copy nuevo vive en `src/lib/copy/growth.ts`, incluidos los nombres de las dimensiones en español.
-- [ ] Existen dos versiones del documento por audiencia; la de cliente no tiene CTA comercial, redes ni oferta del Grader, y la de no cliente cierra con «Agenda 30 minutos» y el correo comercial.
+- [ ] Existen dos versiones del documento por audiencia, derivada del cliente que el Grader ya identifica; la de cliente no tiene CTA comercial, redes ni oferta del Grader, y la de no cliente cierra con «Agenda 30 minutos», que enlaza a la agenda (sin correo comercial).
+- [ ] La tipografía es la canónica de «La órbita» (Bricolage 760 + Poppins), registrada en `register-fonts.ts` con instancias estáticas por peso.
 - [ ] La gravedad de puntaje, niveles, dimensiones y motores sale de los umbrales de `recommendations.ts` (< 40 crítico, < 70 atención) y la portada muestra esa escala.
 - [ ] El puntaje de cada nivel es el promedio ponderado de sus dimensiones medidas; un nivel sin dimensiones medidas muestra «Sin dato» y el de operabilidad sin probes «En cobertura».
 - [ ] Sin histórico la portada dice «Primera medición» y nunca «▲ 0».
@@ -433,12 +435,16 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 
 ## Open Questions
 
-- ¿Tipografía Bricolage + Poppins (sistema «La órbita», propuesta del canvas) o Poppins + Geist (catálogos A4 de
-  Insights, TASK-1889)?
+- Resuelta (operador, 2026-09-29): tipografía **canónica de «La órbita»** (`efeonceGraphicLine.type`): Bricolage
+  Grotesque 760 para respuesta, titulares y cifras; Poppins 300 para la pregunta y 400/500 para el texto. No Geist.
 - Resuelta en la propuesta 2026-09-29: el turquesa no va en texto sobre papel; «Tu marca» y las barras van en navy.
-- ¿De dónde sale la audiencia (cliente o no cliente)? Candidato: el vínculo del informe con una organización cliente
-  (`grader_profiles.organization_id`, TASK-1243). Si no hay un reader que lo entregue junto con el logo del cliente y
-  el responsable de la cuenta, esa parte se separa en una task `backend-data` antes de implementar.
-- ¿Qué enlace usa «Agenda 30 minutos» (calendario comercial o formulario)?
-- El fixture marca AI Visibility 72 como «atención», pero el umbral real lo hace óptimo: ¿se corrige el fixture?
+- Resuelta (operador, 2026-09-29): **el Grader ya identifica al cliente cuando el informe viene de uno**, con su país y
+  su logo: el perfil guarda organización, país y mercado (`src/lib/growth/ai-visibility/provision-profile.ts`) y el
+  store resuelve el logo de la organización (`resolveOrganizationLogoUrl`, `src/lib/growth/ai-visibility/store.ts`).
+  La audiencia se deriva de ese vínculo; no hace falta una task de backend. Queda por verificar en Discovery de dónde
+  sale el responsable de la cuenta para la contraportada de cliente.
+- Resuelta (operador, 2026-09-29): «Agenda 30 minutos» **lleva a la agenda, no al correo**; la contraportada de no
+  cliente no muestra el correo comercial. Falta la URL de la agenda.
+- Decidida en la task: el ejemplo del informe (`report-artifact/fixtures.ts`) marca AI Visibility 72 como «atención»,
+  pero la regla real (≥ 70) lo hace óptimo; se corrige el ejemplo para que coincida con las reglas del modelo.
 - ¿Qué palabra del eslogan corresponde al Grader («Growth» en la propuesta)?

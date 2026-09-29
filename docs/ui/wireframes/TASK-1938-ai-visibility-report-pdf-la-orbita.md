@@ -32,11 +32,12 @@ nunca se le «ofrece» el Grader ni se le vende**. Las cuatro páginas interiore
 | Rótulo de portada | «Diagnóstico de visibilidad en IA» | «Informe de visibilidad en IA» |
 | Identidad | nombre de la marca a 64 px | «Preparado para» + logo del cliente + nombre |
 | Bajo la órbita | «Primera medición: tu punto de partida» | «▲ N puntos desde el [fecha anterior]» (`trend.overall`) |
-| Contraportada | «¿Conversamos? / Cuando quieras» + «Agenda 30 minutos →» + `sales@efeoncepro.com` + burbuja URL y redes | «¿Lo revisamos juntos? / Cuando quieras» + responsable de la cuenta + próximo informe; sin CTA comercial ni redes |
+| Contraportada | «¿Conversamos? / Cuando quieras» + «Agenda 30 minutos →» (enlace a la agenda, sin correo) + burbuja URL y redes | «¿Lo revisamos juntos? / Cuando quieras» + responsable de la cuenta + próximo informe; sin CTA comercial ni redes |
 
-**Qué decide la variante [verificar en Discovery]:** que el informe esté ligado a una organización cliente
-(`grader_profiles.organization_id`, TASK-1243) o sea un lead del intake público. La variante es un dato del informe
-que el renderer recibe, nunca una deducción visual.
+**Qué decide la variante:** el Grader ya identifica al cliente cuando el informe viene de uno, con su país y su logo
+(perfil con organización, país y mercado en `provision-profile.ts`; logo por `resolveOrganizationLogoUrl` en `store.ts`;
+operador, 2026-09-29). Con cliente identificado → versión cliente; lead del intake público → versión no cliente. La
+variante es un dato del informe que el renderer recibe, nunca una deducción visual.
 
 ## Desktop Target
 
@@ -98,7 +99,8 @@ portada, 02, 03, 04, 05 y contraportada. Orden «respuesta primero»: qué hacer
 - **Voz pregunta–respuesta** de la línea (`criteria.md` §4): pregunta a 24 px en Poppins Light con el anillo pequeño
   delante en el acento; respuesta «Cuando quieras» a 78 px en Bricolage 760 (3,25×) que cierra con la esfera del
   acento en lugar del punto; evidencia debajo en Poppins con una frase en negrita.
-- Acción según la variante (tabla de audiencias). El enlace de agenda es real ([enlace de agenda] por definir).
+- Acción según la variante (tabla de audiencias). En la de no cliente el botón enlaza a la agenda (URL por definir) y
+  debajo sólo «Elige el horario en la agenda de Efeonce»; nunca el correo comercial.
 - **Bloque de marca** a 112 px de la acción: logo de Efeonce de 240 px y, debajo, el eslogan al **64 % del ancho del
   logo** (13,3 px; «Growth» en blanco porque mide menos de 24 px), separado 1,35 veces su cuerpo. La razón social al pie.
 
@@ -122,8 +124,8 @@ tiene acciones de negocio; los enlaces (agenda, correo, URL, redes) son reales.
 - **Gravedad sólo en etiquetas y puntos**, no en barras: las barras son navy (el ámbar a sangre saturaba la página y
   hacía que todo pareciera igual de urgente). Colores de `axisSemanticHex`; tinta oscura de «atención» (`warningInk`)
   para texto sobre papel.
-- Tipografía: **decisión abierta** (ver Design Decision Log). La propuesta usa Bricolage para títulos y cifras y Poppins
-  para estructura (sistema «La órbita»); los catálogos A4 de Insights usan Poppins + Geist.
+- Tipografía **canónica de «La órbita»** (operador, 2026-09-29; `efeonceGraphicLine.type`): Bricolage Grotesque 760 para
+  respuesta, titulares y cifras; Poppins 300 para la pregunta y 400/500 para el texto. No Geist.
 - Logo de Efeonce y burbuja URL: archivos de `@efeoncepro/axis-brand-assets`; redes con el ícono de contorno de la
   firma de correo (`efeonceGraphicLine` email-signature `icons`).
 - **Logos de los motores (obligatorio):** ChatGPT `public/images/logos/axis/gpt-isotype.svg`, Claude
@@ -220,5 +222,6 @@ la etiqueta); lectura verificada en escala de grises; enlaces con destino real.
 - **Motor sin cambiar en esta task (react-pdf)**; migrar al Artifact Composer es un follow-up.
 - **Logos de los motores y la lupa de Google AI Mode** (operador: «importantísimo»). El informe web hoy asigna a Google
   AI Overview el logo de Gemini: se corrige en el follow-up de paridad.
-- **Abiertas:** tipografía (Bricolage + Poppins o Poppins + Geist); qué palabra del eslogan corresponde al Grader; el
-  enlace de agenda; la fuente del responsable de cuenta y del logo del cliente.
+- **Resueltas (2026-09-29):** tipografía canónica de «La órbita»; la audiencia sale del cliente que el Grader ya
+  identifica; «Agenda 30 minutos» lleva a la agenda, sin correo; el ejemplo del informe se corrige a los umbrales reales.
+- **Abiertas:** la palabra del eslogan para el Grader; la URL de la agenda; la fuente del responsable de la cuenta.
