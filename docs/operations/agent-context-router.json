@@ -626,7 +626,9 @@
         "Agent Hub",
         "Revenue Hub",
         "HubSpot sector",
-        "HubSpot landing"
+        "HubSpot landing",
+        "HubSpot Agent CLI",
+        "HubSpot MCP"
       ],
       "skills": [
         "hubspot-greenhouse-bridge",
@@ -636,7 +638,8 @@
       "sources": [
         "docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md",
         "docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md",
-        "docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md"
+        "docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md",
+        "docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md"
       ]
     },
     {

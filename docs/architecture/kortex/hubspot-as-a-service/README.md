@@ -28,7 +28,9 @@ This layer documents how Efeonce turns HubSpot configuration into a governed cli
 | Managed delivery and client operating loop | `hubspot-as-a-service` |
 | Kortex OAuth and HubSpot CMS/landing | `docs/architecture/kortex/hubspot-cms/` |
 | Greenhouse write bridge/webhooks | `hubspot-greenhouse-bridge` |
-| CRM connector operations | installed HubSpot connector and authenticated Agent CLI |
+| Direct CRM operations | installed HubSpot MCP connector or authenticated Agent CLI, selected per operation using [`HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md`](../../../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) |
+
+The two direct-operation transports have separate identities and permissions. Local Agent CLI OAuth was verified on Efeonce/Kortex portal `48713323` on 2026-09-29; it does not authorize ANAM portal `19893546`. A service key is required for some Agent CLI metadata endpoints even when OAuth exposes write scopes. The bridge, Kortex OAuth/CMS and `hs` developer profiles keep their own boundaries.
 
 ## Service contract
 

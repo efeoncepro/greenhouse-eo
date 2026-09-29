@@ -112,7 +112,7 @@ Fuentes verificadas 2026-08-27: [Gartner B2B Marketing Automation 2025](https://
 | **Sales Workspace** actualizado concentra companies, leads, deals, tareas, agenda y acciones sugeridas | [KB — Updated Sales Workspace](https://knowledge.hubspot.com/sales-workspace/manage-sales-activities-in-the-updated-sales-workspace) | Wedge de productividad/priorización comercial |
 | **Customer Success Workspace** configura customers, projects, revenue, workspaces por equipo y health scores | [KB — Customer Success Workspace](https://knowledge.hubspot.com/customer-success/set-up-and-manage-the-customer-success-workspace) | Wedge de churn, renewals y expansión |
 | **Agent Hub** sigue beta y centraliza agentes prebuilt/custom y agentic workflows | [KB — Agent Hub](https://knowledge.hubspot.com/ai/understand-agent-hub) | Vender readiness, caso de uso y gobierno; no roster ni continuidad garantizada de beta |
-| **Agent CLI** beta pública: bulk/scheduled/background; MCP/conectores para conversación human-in-loop | [Developer changelog — Agent CLI](https://developers.hubspot.com/changelog/hubspot-agent-cli-available-in-public-beta) | Elegir rail por workflow; `--dry-run` obligatorio para writes |
+| **Agent CLI** beta pública: bulk/scheduled/background; MCP/conectores para conversación human-in-loop | [Developer changelog — Agent CLI](https://developers.hubspot.com/changelog/hubspot-agent-cli-available-in-public-beta) | Elegir rail por workflow; comprobar `--dry-run` por comando y readback tras cada write |
 | Partners ganan en upmarket, agentic acceleration, marketing reimagined y especialización | [State of Ecosystems 2026](https://www.hubspot.com/state-of-ecosystems) | Prioridad de práctica y posicionamiento LATAM especializado |
 | HubSpot propone paquetes de servicios Loop/IA para partners | [Guide to Services for Loop Marketing](https://www.hubspot.com/hubfs/Agency/GTM%20-%20Product%20Resources%20%28Justin%29/Fall%20Spotlight/Guide%20to%20Services%20for%20Loop%20Marketing%20%281%29.pdf) | Validación de packaging; rangos orientativos, no price book Efeonce |
 | H2 2026 remunera activación de agentes, Credits y outcomes; premio mayor USD 100K y comisión promocional 40% para SKUs elegibles | [2026 Agentic Partner Incentives](https://www.hubspot.com/solutions-partners-2026-h2-incentives) | Señal interna. Confirmar cutoff/eligibilidad con PDM; la página tiene fechas inconsistentes |
@@ -283,7 +283,7 @@ lugar, y los pone a disposición **tanto de tu equipo como de agentes de IA** pa
 de fondo que corren **sin un humano en el loop**"*.
 **Comandos:** CRUD sobre cualquier objeto · **pipelines y stages** · **properties** · **associations**.
 **Auth:** OAuth (scoped) o **`admin mode` via service key** (requerido para schema y deletes).
-**Salida JSONL. Todos los writes soportan `--dry-run`.** ⚠️ No reemplaza al MCP (conversacional vs agéntico).
+**Salida JSONL.** El `--dry-run` depende del comando y la versión instalada; `properties create` no lo expone en la 0.15.0 local. ⚠️ No reemplaza al MCP: escoger por operación, portal y permiso verificados. [Runbook operativo](../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md).
 🔴 **Comoditiza el mecanismo de deployment programático de Kortex** — pero **valida la forma de trabajar de
 Efeonce**. → `modules/13_AGENTES.md`.
 ✅ [changelog — Agent CLI public beta](https://developers.hubspot.com/changelog/hubspot-agent-cli-available-in-public-beta)

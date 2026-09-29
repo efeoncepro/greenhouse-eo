@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-29 — HubSpot Agent CLI y MCP como carriles de operación directa
+
+- Agent CLI 0.15.0 instalada y OAuth de Efeonce/Kortex `48713323` verificado con una lectura CRM real. El conector MCP y la CLI se eligen por portal, capability y forma del trabajo; comparten change set, aprobación y readback, no credenciales. Límites OAuth y comandos sin `--dry-run` registrados en el [runbook](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); skills Codex/Claude sincronizadas.
+
 ## 2026-09-29 — `foto:isotipo --acabado`: el modelo termina el isotipo compuesto
 
 - `pnpm foto:isotipo … --acabado [--superficie "…"] [--lado px]` aplica la regla del operador del 2026-09-28: recorta
@@ -633,17 +637,3 @@ más rondas por instrucción del operador. La segunda corrida completa de 175 mu
 registradas, sin puntuación final. Persiste la intermitencia de P10; decisiones y cobertura faltante en §19.10.
 CMP001-04 se reemplazó en la carpeta local sincronizada de OneDrive con respaldo y hash de lectura posterior;
 sin readback del servidor, publicación ni pauta.
-
-## 2026-09-22 — ISSUE-177 resuelto: ninguna función de Vercel vuelve a cargar el motor de PDF
-
-Tres deploys de staging cayeron en tres semanas por funciones de Vercel de más de 250 MB (397, 434 y 441 MB),
-siempre con el gate local en verde. Desde ahora:
-
-- la entrada liviana `@/lib/artifact-composer/pure` y la regla ESLint `greenhouse/no-worker-only-module-in-vercel-code`
-  impiden importar como valor el motor de composición (Playwright, pdf-lib, catálogos) desde `src/`;
-- `pnpm vercel:reachability-gate` (pre-push y CI, ~2 s, sin build) recorre el grafo de imports de las 1.519 entradas
-  del App Router y falla ante la denylist o una ruta de runtime variable nueva;
-- `pnpm vercel:function-size-gate` mide el tamaño trazado de cada función tras el build de CI (falla sobre 200 MB);
-- las rutas de lectura de Insights ya no cargan comandos ni render.
-
-Reglas en `OPS_RELIABILITY_AGENT_INVARIANTS.md` §Tamaño de las funciones de Vercel.

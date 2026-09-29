@@ -145,8 +145,8 @@ Enterprise incluye 5.000/mes. Overage: **USD 10 / 1.000 créditos**.
 **properties** · **associations** (+ labels y límites).
 **Auth:** OAuth (scoped a los permisos del usuario) **o `admin mode` via service key** (requerido para schema
 y la mayoría de los deletes).
-**Salida:** JSONL. **Todos los writes soportan `--dry-run`.**
-⚠️ **No reemplaza al MCP de HubSpot** (el MCP es conversacional; la CLI es para agentes).
+**Salida:** JSONL por defecto. El soporte de `--dry-run` se verifica por comando y versión: la Agent CLI local 0.15.0 lo ofrece en `properties update`, pero no en `properties create`.
+⚠️ **No reemplaza al MCP de HubSpot**: ambos pueden operar el CRM cuando la conexión y la capability concreta están verificadas. MCP sirve bien a la consulta/cambio puntual en conversación; CLI a trabajo repetible, lotes y tareas de fondo. Estado local y fronteras de portal: [runbook Agent CLI/MCP](../../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md).
 
 ```bash
 # POSIX

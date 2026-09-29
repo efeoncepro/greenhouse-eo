@@ -95,6 +95,8 @@ artefacto versionado usa `orange` por su contraste con la portada clara.
 
 ## Contrato común de prestación
 
+La operación directa del portal puede usar el [conector MCP o la HubSpot Agent CLI](../../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) según la cobertura del comando, el portal autenticado y la forma del trabajo. Ambos conservan el mismo change set, aprobación y readback; la conexión local de la CLI a Efeonce/Kortex no se extiende a ANAM.
+
 - El cliente conserva la propiedad del portal, registros, paneles y decisiones de negocio.
 - Efeonce es responsable por método, diseño, change sets, ejecución aprobada, verificación, documentación y
   continuidad acordada.
@@ -113,4 +115,5 @@ artefacto versionado usa `orange` por su contraste con la portada clara.
 - [Canon técnico HubSpot as a Service](../../architecture/kortex/hubspot-as-a-service/README.md)
 - [Documentación funcional ANAM](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
 - [Manual operativo ANAM](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
+- [Operación directa HubSpot: Agent CLI o MCP](../../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md)
 - [Skill operativa](../../../.codex/skills/hubspot-as-a-service/SKILL.md)

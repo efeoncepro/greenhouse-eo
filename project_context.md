@@ -6,13 +6,13 @@ CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
 ## Actualización documental reciente
 
-Ledgers CRM Dreamforce/UNBOUND al 2026-09-19; el provider-fit admite
-`HubSpot-first | Salesforce-first | híbrida | no-fit`. La [transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
-está aprobado y probado comercialmente por confirmación del operador; pruebas publicables, pricing y elegibilidad
-de cada capacidad siguen sujetos a verificación.
+CRM (Dreamforce/UNBOUND, 19/09): provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
+[Transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): aprobada y probada comercialmente por el operador; pruebas publicables, pricing y elegibilidad de cada capacidad requieren verificación.
 
-Greenhouse: plataforma operativa Efeonce Group (Next.js 16/MUI 7/Vuexy/TS). Estado: `Handoff.md`. Historia:
+Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
+
+HubSpot directo: [Agent CLI/MCP](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); portal y permisos separados.
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 

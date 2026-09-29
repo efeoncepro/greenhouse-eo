@@ -36,6 +36,7 @@ explicit source of truth, lifecycle, consent, attribution, deduplication and syn
 
 1. Read `project_context.md`, `Handoff.md`, `docs/context/00_INDEX.md`, and client-specific context.
 2. Read [service-delivery.md](references/service-delivery.md) for the delivery loop and evidence contract.
+   For direct portal operations, read [`HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md`](../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) for the current CLI/MCP route and per-portal access evidence.
 3. Load only the workstream reference needed:
    - Customer Agent: [customer-agent.md](references/customer-agent.md)
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
@@ -56,7 +57,7 @@ For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_R
 | Need | Owner |
 |---|---|
 | Sell, scope, price, partner economics, HubSpot product narrative | `hubspot-solutions-partner` + `commercial-expert` |
-| Operate CRM records through the installed connector | `hubspot:hubspot` |
+| Operate CRM records directly | HubSpot MCP connector (`hubspot:hubspot`) or Agent CLI (`hubspot`), chosen per operation using the operator runbook |
 | Greenhouse-to-HubSpot Cloud Run bridge, webhooks, secrets | `hubspot-greenhouse-bridge` |
 | HubSpot CMS/landing/theme implementation | `docs/architecture/kortex/hubspot-cms/` and the CMS runbook |
 | Public Efeonce HubSpot landing positioning | `docs/public-site/` + `efeonce-public-site-wordpress` |
@@ -73,7 +74,7 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 3. **Design:** produce the target contract: source of truth, object/property schema, lifecycle, routing, agent autonomy, handoff and measurements.
 4. **Propose:** show exact writes and impacts. Reuse standard properties before custom ones.
 5. **Approve:** obtain human confirmation for schema writes, workflow activation, publication, permissions, destructive changes and external messages.
-6. **Execute:** prefer authenticated connector, Agent CLI or governed API. Use `--dry-run` where supported. Keep CMS changes draft-first.
+6. **Execute:** use the authenticated MCP connector or Agent CLI when that exact portal and command are verified; use a governed API when neither covers the operation. Use `--dry-run` where the installed command supports it. Keep CMS changes draft-first.
 7. **Verify:** read back configuration and test real workflows. A saved setting is not evidence of effective runtime behavior.
 8. **Document:** update Kortex/client operating docs, decision log, QA report and handoff.
 9. **Measure:** baseline and track business outcomes, exceptions, human handoffs, unresolved intents and data quality.
@@ -95,6 +96,7 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 - Keep Customer Agent knowledge sources in Markdown when this service owns the content.
 - Do not promise API parity. Verify whether a setting is available through CRM APIs, Customer Agent APIs, Agent CLI, CMS APIs or only the authenticated UI.
 - Do not publish, activate workflows, change licenses/permissions, or perform destructive writes without explicit approval.
+- Do not infer MCP portal access from Agent CLI OAuth or from `hs` profiles. The locally verified Agent CLI OAuth belongs to Efeonce/Kortex portal `48713323` as of 2026-09-29, not ANAM. Recheck `hubspot whoami` and connector identity for each operation. OAuth scopes do not override endpoint restrictions: `pipelines list` needs a service key, and HubSQL returned 403 in this portal. `properties create` in local Agent CLI 0.15.0 has no `--dry-run`; preview an exact payload in the change set and verify readback after an approved write.
 - Treat ChatGPT Ads in HubSpot as a public beta: require Super Admin opt-in, Ads publishing permission, an active OpenAI Ads account, country/account eligibility, consent for every contact shared in conversion matching, and readback of UTMs, pixel, event state and delivery. Keep HubSpot event caps (Starter 5 / Pro 50 / Enterprise 100) and OpenAI budget caps explicit; never infer pricing or Chile availability.
 - Treat the HubSpot connector for Claude/MCP, Agent Hub, Agent Builder, Breeze and Scheduled Prompts with the availability ladder. Reauthentication may be required for new Claude scopes; connector writes need approval and validation because bulk limits and HubSpot custom validation behavior apply. A UNBOUND session or vendor announcement is first-look evidence, not GA or runtime evidence.
 - Do not report a conversational test as passed from one prompt. Test multi-turn memory, natural phrasing, technical accuracy, escalation and failure modes.

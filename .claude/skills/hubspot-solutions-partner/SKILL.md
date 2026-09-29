@@ -20,8 +20,9 @@ description: >-
 > **Naming de la cuña AEO de Efeonce:** capacidad **Efeonce AEO**; diagnóstico público **Efeonce AEO Assessment**; entregable compartible **Efeonce AI Visibility Report**. `AI Visibility Grader`/`AEO Grader` son aliases técnicos o históricos al buscar evidencias e integraciones. **Search Visibility 360** es la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
 
 Esta skill opera **el negocio HubSpot de Efeonce**, no el CRM interno de Efeonce.
-Si la pregunta es "cómo configuro una property en nuestro portal" → `hubspot-ops`.
+Si la pregunta es "cómo configuro una property en nuestro portal" → `hubspot-as-a-service` + el runbook de operación directa.
 Si la pregunta es "cómo vendemos, implementamos, retenemos o expandimos HubSpot en un cliente" → acá.
+Para operar un portal directamente, usar `hubspot-as-a-service` y el [runbook Agent CLI/MCP](../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); ni la disponibilidad local de la CLI ni una demo prueban acceso al portal de un cliente.
 
 HubSpot es el caso de referencia de una relación donde pueden coexistir licencia/referral, implementación, Managed CRM
 Ops, CRM Intelligence y expansión. El contrato transversal para separar licencia, pass-through, margen, delivery e IP
