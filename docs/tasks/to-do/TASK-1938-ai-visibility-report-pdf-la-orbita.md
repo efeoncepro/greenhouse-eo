@@ -35,6 +35,19 @@ oferta, cierra con su equipo y el próximo informe). Portada con la órbita que 
 interiores en orden «respuesta primero» (qué hacer, por qué, dónde, mercado y fuentes). Sin lockup de Insights y sin
 cambiar el motor de render (react-pdf).
 
+## Delta 2026-09-29 — submarcas SEO/AEO y paleta Engine
+
+- El operador aprobó las submarcas de producto SEO/AEO de Efeonce (SV360, AEO, AEO Assessment y AI Visibility Report;
+  «la órbita vive en la O») y las canonizó en `@efeoncepro/axis-brand-assets` `0.4.2` (script
+  `scripts/brand/build-seo-aeo-logos.mjs`, Lab `/references/seo-aeo/`). El documento **es** el Efeonce AI Visibility
+  Report: sus portadas y encabezados llevan el lockup oficial `ai-visibility-report-lockup-*`, y bajo el veredicto va
+  el lockup `aeo-lockup-*` con «Resultado del AEO Assessment».
+- **Paleta de la línea Engine** (SEO y medición), aprobada con la aplicación «portada del AI Visibility Report»: fondo
+  oscuro `#091951` (`efeonceGraphicLine.lines.engine.darkBg`) y acento `#0375db` (`accentOnDark`) en la órbita que mide,
+  el anillo de la pregunta y la esfera de la respuesta; el eslogan de cierre es «Empower your Engine», al 64 % del logo.
+  Reemplaza al turquesa de Growth de la propuesta anterior.
+- Canvas actualizado: «Correo de Efeonce Insights», página «Informe del Grader (PDF)».
+
 ## Why This Task Exists
 
 El Grader es lo primero que ve un prospecto de Efeonce y Efeonce Insights es lo que recibe cuando ya es cliente, pero
@@ -265,7 +278,7 @@ Reglas obligatorias:
 
 ### Slice 1 — Dirección aprobada y sellada
 
-- Resolver con el operador lo que queda abierto (palabra del eslogan).
+- Pinear `@efeoncepro/axis-brand-assets` `0.4.2` en Greenhouse (instalación con credencial efímera autorizada) y leer los lockups desde el paquete.
 - Corregir `report-artifact/fixtures.ts` para que la gravedad coincida con los umbrales de `recommendations.ts`.
 - Exportar las ocho hojas aprobadas (dos portadas, cuatro interiores, dos contraportadas) del canvas a `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita/`
   y escribir la dirección `TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`; actualizar el wireframe.
@@ -388,7 +401,8 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [ ] La portada dibuja el puntaje con la esfera en `score × 3,6°` y estela de 50°; no queda ningún arco que se llene.
 - [ ] Con puntaje `null` la portada muestra el anillo sin arco ni esfera y «—».
 - [ ] Ningún nivel ni dimensión sin dato se muestra como 0.
-- [ ] `report-pdf-tokens.ts` no contiene el azul `#0375db` y sus colores salen de `efeonceGraphicLine` y `axisSemanticHex`.
+- [ ] `report-pdf-tokens.ts` toma fondo y acento de la línea Engine (`efeonceGraphicLine.lines.engine`) y la gravedad de `axisSemanticHex`; ningún HEX escrito a mano.
+- [ ] Portadas y encabezados usan el lockup oficial `ai-visibility-report-lockup-*` y la línea del AEO Assessment el `aeo-lockup-*`, leídos de `@efeoncepro/axis-brand-assets` `0.4.2`; el cierre dice «Empower your Engine».
 - [ ] El documento no usa el lockup de Efeonce Insights.
 - [ ] La contraportada toma las redes de `EFEONCE_SOCIAL_LINKS` y el logo y la burbuja de `axis-brand-assets`.
 - [ ] El eslogan va en bloque debajo del logo de Efeonce, al 64 % de su ancho (cuerpo = 0,64 × logo ÷ 11,586 em), separado 1,35 veces su cuerpo; nunca como texto a cuerpo fijo.
@@ -455,4 +469,4 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
   El texto es «Agenda una reunión» (el brief de contacto no fija duración; «30 minutos» se retiró).
 - Decidida en la task: el ejemplo del informe (`report-artifact/fixtures.ts`) marca AI Visibility 72 como «atención»,
   pero la regla real (≥ 70) lo hace óptimo; se corrige el ejemplo para que coincida con las reglas del modelo.
-- ¿Qué palabra del eslogan corresponde al Grader («Growth» en la propuesta)?
+- Resuelta (operador, 2026-09-29): la línea es Engine y el eslogan de cierre es «Empower your Engine».

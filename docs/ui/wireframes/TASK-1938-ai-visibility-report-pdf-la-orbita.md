@@ -21,6 +21,15 @@ las páginas que TASK-1938 debe producir en el renderer PDF del Grader, con sus 
   superficie es el render `PDF (vectorial A4)` del nodo **S14 (report artifact)** y el adjunto del nodo **S3 (email del
   informe)**. No agrega nodos ni rutas.
 
+## Delta 2026-09-29 — el documento es el Efeonce AI Visibility Report
+
+Portadas e interiores llevan el lockup oficial «Efeonce | AI Visibility Report» (`ai-visibility-report-lockup-*` de
+`@efeoncepro/axis-brand-assets` `0.4.2`) en vez del rótulo de texto; bajo el veredicto va el lockup «Efeonce | AEO» con
+«Resultado del AEO Assessment · 5 motores · 24 preguntas». Paleta de la línea Engine: fondo `#091951`, acento
+`#0375db` en la órbita, el anillo de la pregunta y la esfera de la respuesta; cierre «Empower your Engine» al 64 % del
+logo. El encabezado corrido de las interiores dice «AI Visibility Report · [organización] · [período]». Esto reemplaza
+lo que más abajo dice sobre el rótulo, el turquesa de Growth y «Empower your Growth».
+
 ## Dos audiencias, un documento
 
 El informe se genera para **no clientes** (prospectos que piden el diagnóstico público) y para **clientes** (el
