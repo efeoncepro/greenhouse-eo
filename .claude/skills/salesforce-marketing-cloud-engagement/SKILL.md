@@ -45,4 +45,4 @@ Combina modos cuando el pedido lo requiera, pero separa diagnóstico, decisión 
   Next» (`decision-platform-coexistence`, «No por defecto») y la de Data 360 y consentimiento
   (`method-identity-consent`); se compone con `deck-studio` (norma §4.6 de
   `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md`). Íconos de producto e insignia de partner
-  sujetos a autorización escrita y readback.
+  autorizados por Salesforce (declarado por el operador el 2026-09-29); la insignia no afirma tier.

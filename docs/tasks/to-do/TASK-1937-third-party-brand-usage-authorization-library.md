@@ -1,5 +1,14 @@
 # TASK-1937 — Biblioteca de autorizaciones de uso de marcas, testimonios y fotos de terceros
 
+## Delta 2026-09-29 (d) — Salesforce autorizó sus marcas (declarado por el operador)
+
+- El operador declaró la insignia «Salesforce Partner» autorizada por Salesforce («Todo está aprobado. Necesito que
+  tengan el Badge de Salesforce Partner ya está autorizado por Salesforce»); en el deck Salesforce valen también logo e
+  íconos de producto. Referencia estable: `salesforce-partner-authorization-2026-09-29` (registro de partnerships).
+  Archivar la copia escrita junto a `ai-generations/2026-09-29_deck-salesforce/DECISIONES.md` es recomendado, no
+  bloqueante. Sigue pendiente la autorización escrita de **Anthropic** (Claude y Claudeforce en SF16). Agent Astro,
+  edición interpretativa, no entra a ningún package. — TASK-1942.
+
 ## Delta 2026-09-29 — autorizaciones pendientes del deck de práctica Salesforce (TASK-1942)
 
 - Por archivar: la autorización escrita de **Salesforce** (logo, 8 íconos de producto, Agent Astro, insignia «Salesforce

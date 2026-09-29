@@ -60,8 +60,8 @@ como `[MONTO]`; colaborador «Cliente»/«Supervisora»/«Ejecutivo» (rol, no p
 
 | Asset | Archivo | Origen | Condición |
 |---|---|---|---|
-| 8 íconos oficiales de producto Salesforce (Agentforce, Sales, Service, Marketing, Data Cloud, Platform, Slack, Tableau) | `logos/icon-*.svg` | CDN salesforce.com (wp.sfdcdigital.com), con permiso | sujetos a autorización escrita de Salesforce; no se recolorean; sólo donde se nombra el producto |
-| Badge «Salesforce Partner» horizontal (vector) | `logos/salesforce-partner-badge-horizontal.svg` (+ `.ai` oficial) | kit de partner en OneDrive; `.ai` → SVG con pdftocairo, sólo recorte de viewBox | **claim bloqueante**: no sale a cliente sin readback en Partner Community (owner Julio + RevOps & CRM); respaldo «Operamos sobre» |
+| 8 íconos oficiales de producto Salesforce (Agentforce, Sales, Service, Marketing, Data Cloud, Platform, Slack, Tableau) | `logos/icon-*.svg` | CDN salesforce.com (wp.sfdcdigital.com), con permiso | autorizados por Salesforce (declarado por el operador, 2026-09-29); no se recolorean; sólo donde se nombra el producto; costo de color en SF1 y SF8 aprobado |
+| Badge «Salesforce Partner» horizontal (vector) | `logos/salesforce-partner-badge-horizontal.svg` (+ `.ai` oficial) | kit de partner en OneDrive; `.ai` → SVG con pdftocairo, sólo recorte de viewBox | **autorizado por Salesforce** (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`): va por defecto en SF0 y SF19; respaldo «Operamos sobre» |
 | Agent Astro (poses camina y saluda, alfa) | `astro/agent-astro-v1-alpha.png`, `astro/agent-astro-v2-saluda-alpha.png` | **interpretación**: edición del arte oficial `ASTRO_NoOutfit` (no es el arte oficial de Agent Astro) | autorización de Salesforce; sólo láminas gráficas, nunca dentro de una foto; reemplazar si aparece el oficial en Brand Central |
 | Wordmark Claudeforce (versión video: Claude blanco + force celeste con la f de Salesforce) | `logos/claudeforce-wordmark.svg`, script `render-src/claudeforce-wordmark.mjs` | force/a/e = vector oficial Dreamforce (`logos/claudeforce-layer1-oficial.svg`); d/l/u/C construidas con medidas oficiales, verificadas contra el cuadro del video | autorización de Salesforce y Anthropic; reemplazar si se publica el vector |
 | Loom (ícono de app) | `logos/loom-app-icon-180.png`, `logos/loom-pinned-tab.svg` | loom.com | Loom confirmado en el stack de Efeonce (2026-09-29); falta alta en `deck-axis/assets/tools/loom-isotype.svg` |
@@ -123,3 +123,15 @@ Reglas para canonizar (no perder):
 - Dos cierres: brochure con `close-brochure-orbit` en la línea `revenue-salesforce` (lámina por componer, visto bueno del
   operador) y propuesta con SF19. Planes: `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-{brochure,proposal}-salesforce.json`.
 - Logo de 700 px sólo en la contraportada Salesforce; columna de la portada en 190 (reserva propia en AXIS `v0.3.32`).
+
+## Aprobación final (2026-09-29, delta (d))
+
+- «Todo está aprobado» (operador): SF20 aprobada como cierre del deck como brochure; los largos de SF6 (30) y SF7 (26 y
+  28) aprobados tal cual (máximos subidos en el catálogo y en `proposal-service.slots.json`); costo de color de los
+  íconos de producto en SF1 y SF8 aprobado.
+- **Insignia «Salesforce Partner» autorizada por Salesforce** (declaración del operador): va por defecto en SF0 y SF19
+  (intents de ejemplo y planes golden con `partnerMark.readbackRef: salesforce-partner-authorization-2026-09-29`). La
+  regla general sigue para otros partners: sin autorización o readback, la insignia falla cerrado.
+- Condiciones que siguen: autorización escrita de **Anthropic** para Claude y Claudeforce (SF16); Agent Astro fuera de
+  los packages de AXIS (edición interpretativa); datos de muestra y corte de SF9. Archivar la copia escrita de la
+  autorización de Salesforce junto a `DECISIONES.md` es recomendado, no bloqueante.

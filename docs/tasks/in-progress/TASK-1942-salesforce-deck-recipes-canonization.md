@@ -1,5 +1,32 @@
 # TASK-1942 — Canonizar el deck Salesforce de «La órbita»: 16 recetas nuevas, 4 usos de recetas existentes, Composer y AXIS
 
+## Delta 2026-09-29 (d) — «Todo está aprobado» e insignia autorizada por Salesforce
+
+- **Decisión del operador (textual):** «Todo está aprobado. Necesito que tengan el Badge de Salesforce Partner ya está
+  autorizado por Salesforce».
+- **Insignia «Salesforce Partner» autorizada por Salesforce** (declarado por el operador; referencia estable
+  `salesforce-partner-authorization-2026-09-29` en `docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md`). Va **por
+  defecto** en la portada (`cover-brochure-line-revenue`) y en la contraportada de propuesta (`close-proposal-horizon`,
+  `sloganBlock`): intents de ejemplo y planes golden con `partnerMark: { mode: "badge", readbackRef: … }`; «Operamos
+  sobre» queda como respaldo (`deck-cover-brochure-line-revenue-salesforce-operates-on-intent.json`). El composer sigue
+  exigiendo `readbackRef` y `partner-mark.test.ts` prueba que la referencia de Salesforce no habilita la insignia de
+  HubSpot (falla cerrada para otros partners). Logo e íconos de producto de Salesforce, autorizados; Agent Astro sigue
+  fuera de los packages; Claude y Claudeforce esperan a Anthropic. Archivar la copia escrita: recomendado, no bloqueante.
+- **SF20 aprobada** como cierre del deck como brochure: `approvedUses` de `close-brochure-orbit` e intent
+  `src/lib/brand-surfaces/examples/deck-close-brochure-orbit-revenue-salesforce-intent.json` (0 px contra
+  `out/SF20-contraportada-brochure.png`).
+- **Largos aprobados tal cual:** `proposal-cinematic-revops.question` 28 → 30 (SF6) y nombre de paso de
+  `proposal-service-revops` 24 → 28 (SF7; catálogo y `proposal-service.slots.json`). Recetas consumidas por TASK-1932:
+  subir un máximo no rompe a nadie. Gate `graphic-line`: **89 frames a 0 px, sin freeze**.
+- **Costo de color** de los íconos de producto en SF1 y SF8: aprobado tal cual.
+- **Hallazgo:** `validateDeckPlan` mide los slots `text` con su marcado; el cuerpo de SF6 (124 visibles, 128 con `**`)
+  pasa el máximo de 125 si se liga literal. No se cambió: decidirlo antes de ligar SF6 desde una `Proposal`.
+- **AXIS:** el estado nuevo de `AXIS_PARTNER_ASSETS` (íconos e insignia `authorized-by-partner`, claim `authorized`,
+  Claudeforce con `authorizedBy: ['Salesforce']`, razón de Agent Astro) y el Lab «Marcas de terceros» quedaron
+  **preparados sin publicar** (AXIS `8368c22`, rama `feat/partner-badge-authorized`): las referencias del Lab de SF0 y
+  SF19 llevan «(sin insignia)» en su título de `axis-tokens` (`surfaceReference`), así que mostrarlas con insignia exige
+  `axis-tokens` 0.3.36, fuera de lo autorizado. Greenhouse sigue en `axis-brand-assets` 0.4.4.
+
 ## Delta 2026-09-29 (c) — Composer completo; code complete, rollout pendiente
 
 - **Slice 2 hecho:** las 16 recetas nuevas componen con `pnpm brand:compose` sobre AXIS 0.3.33 (`84c83a044` las doce,
@@ -51,7 +78,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `code complete, rollout pendiente (2026-09-29): Slices 1, 2 y 3 hechos — 94/94 recetas con plantilla sobre AXIS 0.3.33, gate graphic-line 89 frames a 0 px, planes golden sin avisos; pendientes: pnpm test completo y pnpm build de producción (requieren autorización del operador), push, visto bueno de SF20, autorizaciones escritas de Salesforce y Anthropic, readback de la insignia`
+- Status real: `code complete, rollout pendiente (2026-09-29, delta d): todo el deck aprobado por el operador (SF20, largos de SF6/SF7, costo de color de SF1/SF8) e insignia «Salesforce Partner» autorizada por Salesforce, por defecto en portada y contraportada de propuesta; 94/94 recetas con plantilla sobre AXIS 0.3.35, gate graphic-line 89 frames a 0 px sin freeze, planes golden con insignia sin avisos; pendientes: push a develop, pnpm test completo y pnpm build de producción (requieren autorización del operador) y la autorización escrita de Anthropic para Claude/Claudeforce; AXIS brand-assets 0.4.5 preparado sin publicar (las referencias del Lab exigen tokens 0.3.36)`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -155,19 +182,19 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - Los dos planes del deck (brochure y propuesta) como fixtures validados (0 errores, 0 avisos).
 - `partnerMark` opcional con falla cerrada (`readbackRef`) y `sloganBlock` en `close-proposal`; `partner-mark.test.ts`.
 - AXIS fijado en 0.3.33 (tokens y contracts) y `axis-brand-assets` 0.4.4 (`AXIS_PARTNER_ASSETS`).
-- Baseline `graphic-line` sellado (sección (s)); SF20 compuesta; PDF de la propuesta sin insignia.
+- Baseline `graphic-line` sellado (sección (s)); SF20 aprobada (intent de ejemplo, 0 px contra la aprobada); PDF de
+  la propuesta y del brochure con insignia (`render-src/pdf-propuesta.mjs`).
+- Insignia «Salesforce Partner» autorizada por Salesforce y por defecto en el deck (delta (d)).
 - Norma §4.6, manual, doc funcional, arquitectura y skills al día.
 
 ### Gap
 
-- Visto bueno del operador sobre SF20 (contraportada de brochure Salesforce).
 - `pnpm test` completo y `pnpm build` de producción en el último commit (requieren autorización del operador).
 - Push a `develop` (sin autorización todavía).
-- Autorizaciones escritas de Salesforce y Anthropic (TASK-1937) y readback de la insignia en Partner Community (owner
-  comercial).
-- Dos largos aprobados pasan el `maxChars` de su receta (verificado en el `fit` de `approvedUses`, 2026-09-29): la
-  pregunta de SF6 (30 > 28) y dos nombres de paso de SF7 (26 y 28 > 24). Decisión del operador: acortar o subir el
-  largo (las cinco cine se mapean en TASK-1933). Los planes golden no llevan slots y por eso validan sin avisos.
+- Autorización escrita de **Anthropic** para Claude y Claudeforce (SF16; TASK-1937).
+- Publicar `axis-brand-assets` 0.4.5 (preparado en AXIS `8368c22`): necesita decidir `axis-tokens` 0.3.36 para que las
+  referencias del Lab de SF0 y SF19 muestren la insignia (su título dice «sin insignia»).
+- Recomendado, no bloqueante: archivar la copia escrita de la autorización de Salesforce junto a `DECISIONES.md`.
 
 ## Modular Placement Contract
 
@@ -307,11 +334,13 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - [x] `pnpm brand:deck-recipes --check` pasa y los tests de `src/lib/brand-surfaces` están en verde.
 - [x] La norma §4.6, el manual y la doc funcional describen el deck de práctica Salesforce y el pendiente HubSpot.
 - [x] Las 16 recetas nuevas tienen plantilla y componen con `pnpm brand:compose`. (`84c83a044` + `f05c26e2f`; `pnpm vitest run src/lib/brand-surfaces` 815/815 y `pnpm brand:deck-recipes --check` 94 recetas, 2026-09-29)
-- [ ] La contraportada de brochure Salesforce compone y tiene el visto bueno del operador. (Compone: SF20 en `out/`. **Sin tildar:** falta el visto bueno del operador.)
+- [x] La contraportada de brochure Salesforce compone y tiene el visto bueno del operador. (SF20 aprobada por el operador el 2026-09-29, «Todo está aprobado»; intent de ejemplo con 0 px contra la aprobada.)
+- [x] Los largos aprobados de SF6 y SF7 caben en su receta. (`proposal-cinematic-revops.question` 30 y nombre de paso de `proposal-service-revops` 28, en el catálogo y en `proposal-service.slots.json`; gate `graphic-line` 89 frames a 0 px sin freeze, 2026-09-29.)
+- [x] La insignia «Salesforce Partner» va por defecto en el deck Salesforce y la falla cerrada sigue para otros partners. (Intents de ejemplo y planes golden con `readbackRef: salesforce-partner-authorization-2026-09-29`; `partner-mark.test.ts` 8/8; `pnpm brand:deck-plan` 0 errores en los dos planes.)
 - [x] `partnerMark` y el eslogan en bloque componen, con test sin el slot y el gate `graphic-line` a 0 px. (`partner-mark.test.ts`; freeze sección (s); `pnpm composer:visual-gate --catalog=graphic-line` 89 frames a 0 px, 2026-09-29)
 - [x] AXIS publica las recetas, sus referencias y los assets de terceros con procedencia y estado de autorización (`v0.3.31`, `v0.3.32` y `v0.3.33`; AXIS `main` `0bd2758`).
 - [ ] Gates de cierre: `pnpm test` completo y `pnpm build` de producción en el último commit. (**Sin tildar:** requieren autorización del operador — `pnpm build` consume ~30 GB en este equipo.)
-- [ ] Rollout comercial: autorizaciones escritas de Salesforce y Anthropic archivadas (TASK-1937) y readback vigente de la insignia «Salesforce Partner». (**Sin tildar:** owner Julio + RevOps & CRM; mientras tanto el deck sale sin insignia y sin marcas sujetas a autorización a clientes o pauta.)
+- [ ] Rollout comercial: autorizaciones escritas de Salesforce y Anthropic archivadas (TASK-1937) y readback vigente de la insignia «Salesforce Partner». (**Sin tildar:** la insignia y las marcas de Salesforce quedaron autorizadas por Salesforce el 2026-09-29 —declarado por el operador; archivar la copia escrita es recomendado, no bloqueante—; falta la autorización escrita de **Anthropic** para Claude y Claudeforce en SF16.)
 
 ## Verification
 
@@ -342,5 +371,7 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - Resueltas el 2026-09-29 por el operador: el deck se entrega como brochure (cierre `close-brochure-orbit`) o como
   propuesta (cierre SF19); el servicio de SF16 es «Enablement conversacional»; el logo de 700 px es sólo de la
   contraportada Salesforce; la columna de la portada queda en 190.
-- Costo de color de los íconos de producto en SF1 y SF8 (DECISIONES.md, a confirmar por el operador).
-- Visto bueno de la contraportada de brochure Salesforce, cuando el composer la componga.
+- Resueltas el 2026-09-29 (delta (d)): costo de color de los íconos de producto en SF1 y SF8 (aprobado tal cual),
+  visto bueno de SF20 (aprobada) y largos de SF6 y SF7 (aprobados tal cual).
+- ¿Se mide un slot `text` sin su marcado `**` en `validateDeckPlan`? (hallazgo del delta (d), antes de ligar SF6 desde
+  una `Proposal`).

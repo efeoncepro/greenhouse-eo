@@ -414,6 +414,15 @@
   guía del programa pide, y aun así es un claim: la aceptación de 2025 como *Provisional* Consulting Partner no prueba el
   estado actual. **Regla:** todo slot que afirma una relación con un tercero nace opcional, con `requires:
   'readback-current'` y un respaldo que no afirma nada («Operamos sobre» + logo); nunca fijo en una plantilla.
+- **Una autorización del titular reemplaza el readback, pero no apaga la guarda (2026-09-29, b).** Cuando el operador
+  declaró la insignia «Salesforce Partner» autorizada por Salesforce, lo correcto no fue quitar la exigencia de
+  `readbackRef` sino pasarle la **referencia estable de la autorización** (`salesforce-partner-authorization-2026-09-29`, registrada en el
+  registro de partnerships) desde los intents y planes del deck. **Regla:** el deck lleva la marca por defecto en sus
+  datos; el código sigue fallando cerrado para cualquier otro partner (hay un test que lo prueba con HubSpot).
+- **Un título de referencia vive donde vive el dato (2026-09-29, b).** Para mostrar la insignia en las referencias del
+  Lab de SF0 y SF19 no basta cambiar la imagen: el título «(sin insignia)» está en `axis-tokens` (`surfaceReference`).
+  **Regla:** antes de prometer «sólo brand-assets y Lab», buscar en los tokens todo texto que describa la imagen que se
+  va a cambiar; si está ahí, la release es de tokens.
 - **La salida de un editor de canvas puede re-espaciar las filas.** Lo que el canvas guardó no era lo que la lámina
   aprobada pintaba (filas y aires distintos). **Regla:** se mide sobre el render aprobado (`render-src/salesforce.mjs`),
   no sobre el export del canvas (así se midió el delta (q) de AXIS: «manda la lámina aprobada»).

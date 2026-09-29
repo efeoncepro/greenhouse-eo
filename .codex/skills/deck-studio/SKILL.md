@@ -148,15 +148,17 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
 - **Deck de práctica Salesforce (aprobado 2026-09-29, TASK-1942; 94 recetas, todas con plantilla desde `f05c26e2f`).**
   Diecinueve láminas en cinco actos que venden la práctica RevOps & CRM sobre Salesforce; 16 recetas nuevas (familia
   `line-stage`) y cuatro usos de recetas existentes. **Se arma de dos formas según el documento:** como **brochure**
-  (`cover-brochure-line-revenue` en la línea `revenue-salesforce` → cuerpo → `close-brochure-orbit`, SF20, pendiente
-  del visto bueno) o como **propuesta** (`cover-proposal-orbit` → el mismo cuerpo → `close-proposal-horizon` en
+  (`cover-brochure-line-revenue` en la línea `revenue-salesforce` → cuerpo → `close-brochure-orbit`, SF20, aprobada
+  el 2026-09-29) o como **propuesta** (`cover-proposal-orbit` → el mismo cuerpo → `close-proposal-horizon` en
   `sloganBlock`, SF19, logo de 700 px). Planes golden:
   `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-{brochure,proposal}-salesforce.json` (validar con
-  `pnpm brand:deck-plan -- --plan <fixture>`). **PDF de la propuesta ya renderizado, sin insignia de partner:**
-  `ai-generations/2026-09-29_deck-salesforce/out/Efeonce-Propuesta-Servicios-Salesforce.pdf`
-  (`render-src/pdf-propuesta.mjs`; no está en git). Antes de enviarlo: la insignia «Salesforce Partner» es un claim y
-  exige readback vigente; los íconos de producto, Agent Astro, Claude y Claudeforce exigen autorización escrita archivada
-  (hoy pendiente). Detalle y condiciones: norma §4.6 «Deck de práctica Salesforce», manual
+  `pnpm brand:deck-plan -- --plan <fixture>`). **PDF de la propuesta y del brochure ya renderizados, con la insignia
+  de partner:** `ai-generations/2026-09-29_deck-salesforce/out/Efeonce-{Propuesta,Brochure}-Servicios-Salesforce.pdf`
+  (`render-src/pdf-propuesta.mjs`; no están en git). La insignia «Salesforce Partner» está **autorizada por
+  Salesforce** (operador, 2026-09-29) y va por defecto en portada y contraportada de propuesta
+  (`partnerMark.readbackRef: "salesforce-partner-authorization-2026-09-29"`); logo e íconos de producto, también autorizados. Antes de
+  enviarlo: Claude y Claudeforce (SF16) exigen la autorización escrita de Anthropic, hoy pendiente; Agent Astro es una
+  edición interpretativa, sólo por ruta local. Detalle y condiciones: norma §4.6 «Deck de práctica Salesforce», manual
   `docs/manual-de-uso/creative/componer-deck-con-recetas.md` y skill `efeonce-graphic-line`
   (`references/applications.md` §L). La serie HubSpot equivalente es TASK-1943.
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,

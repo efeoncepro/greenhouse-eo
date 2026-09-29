@@ -434,11 +434,15 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   wordmark, a tool isotype) never goes into `AXIS_BRAND_ASSETS`. It lives in `assets/partners/`, sealed apart in
   `src/partner-manifest.ts` and exported as `AXIS_PARTNER_ASSETS` (`findPartnerAsset`, `partnerAssetUrl`). Each entry
   must carry **`provenance`** (`source`, `retrievedOn`, `method`, `transformed`) and **`authorization`** (`status`:
-  `pending-written-authorization` or `in-stack`, `holders`, `declaredOn`, `note`); a partner-program badge also carries
-  **`claim`** (`requires: 'readback-current'`, `status`, `owner`, `fallback`). Files are byte copies of the source —
+  `pending-written-authorization` or `in-stack` — and, in the version prepared after 2026-09-29 (b) and not yet
+  published, `authorized-by-partner` with `authorizedBy` and `reference` —, `holders`, `declaredOn`, `note`); a
+  partner-program badge also carries **`claim`** (`requires: 'readback-current'`, `status`, `owner`, `fallback`). Files are byte copies of the source —
   never recolored or redrawn; a mark assembled because no vector is published (the Claudeforce wordmark) says so in
-  `provenance`. A mark whose status is not `in-stack` does not go to a client or to paid media until the written
-  authorization is archived (Greenhouse TASK-1937); the badge also needs a current program readback. A mascot
+  `provenance`. A mark with `pending-written-authorization` does not go to a client or to paid media until the missing
+  holder's written authorization is archived (Greenhouse TASK-1937); a badge needs the reference of its authorization or
+  current program readback. The Salesforce marks and the «Salesforce Partner» badge are **authorized by Salesforce**
+  (declared by the operator 2026-09-29, reference `salesforce-partner-authorization-2026-09-29`): the Salesforce deck carries the badge by
+  default; Claudeforce still waits for Anthropic. A mascot
   interpretation that is not the official art (the edited Agent Astro) stays out of every published package
   (`AXIS_PARTNER_ASSETS_EXCLUDED`) and is used only by explicit local path. Surfaces expose these marks only as
   **optional** slots (`partnerMark`, rule `partner-claim-readback`; product icons only where the product is named),

@@ -1,9 +1,9 @@
 # GREENHOUSE — Composición por superficie de «La órbita» en el Artifact Composer V1
 
 > **Tipo de documento:** Spec técnica (arquitectura del lado Greenhouse)
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-28 por Claude
-> **Última actualización:** 2026-09-29 por Claude (1.4: TASK-1942 — el deck de práctica Salesforce: 94 de 94 recetas con plantilla (familia `line-stage`, 16 recetas nuevas), marcas de terceros desde `AXIS_PARTNER_ASSETS` con falla cerrada (`readbackRef`, `authorizationRef`), `reservesByLine` y `sloganBlock`; pines AXIS 0.3.33 / brand-assets 0.4.4; §4.2, §6, §10 y §14. Antes, 1.3: TASK-1930 — §13 nueva, datos reales en los slots del deck: `bindDeckSlots`, mapa declarado, binders, regla de evidencia (ningún deck usa evidencia `internal`), rastro por slot y `pnpm brand:deck-plan -- --bind`; §9, §12.9 y §14 al día. Antes, 1.2: TASK-1934 — las nueve láminas SEO/AEO: 78 recetas y 57 plantillas (§4), builders en `recipes/seo-aeo/` (§5), prefijos CSS (§7.3), 3× y reglas nuevas (§8), AXIS `v0.3.22`/`v0.3.23` (§10), catálogo de runtime y códigos `variant-both-in-deck` y `figure-source-missing` (§12), pendientes (§13). Antes, 1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
+> **Última actualización:** 2026-09-29 por Claude (1.5: la insignia «Salesforce Partner» autorizada por Salesforce va por defecto en los intents del deck Salesforce con `readbackRef: salesforce-partner-authorization-2026-09-29`; la falla cerrada sigue para otros partners; SF20 con intent de ejemplo; nombre de paso de `proposal-service` a 28. Antes, 1.4: TASK-1942 — el deck de práctica Salesforce: 94 de 94 recetas con plantilla (familia `line-stage`, 16 recetas nuevas), marcas de terceros desde `AXIS_PARTNER_ASSETS` con falla cerrada (`readbackRef`, `authorizationRef`), `reservesByLine` y `sloganBlock`; pines AXIS 0.3.33 / brand-assets 0.4.4; §4.2, §6, §10 y §14. Antes, 1.3: TASK-1930 — §13 nueva, datos reales en los slots del deck: `bindDeckSlots`, mapa declarado, binders, regla de evidencia (ningún deck usa evidencia `internal`), rastro por slot y `pnpm brand:deck-plan -- --bind`; §9, §12.9 y §14 al día. Antes, 1.2: TASK-1934 — las nueve láminas SEO/AEO: 78 recetas y 57 plantillas (§4), builders en `recipes/seo-aeo/` (§5), prefijos CSS (§7.3), 3× y reglas nuevas (§8), AXIS `v0.3.22`/`v0.3.23` (§10), catálogo de runtime y códigos `variant-both-in-deck` y `figure-source-missing` (§12), pendientes (§13). Antes, 1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
 > **Estado:** vigente. Taller local (`pnpm brand:compose`) en `develop`; la ruta productiva gobernada es TASK-1921, en curso.
 > **Contrato y valores (AXIS):** ADR [`SURFACE_COMPOSITION_DECISION_V1.md`](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md) del repo `efeoncepro/axis-design-system` (contrato `efeonce.surface-composition` 0.1.2, deltas (b)…(n)); guía `docs/agent-composition/surfaces/deck.md` del mismo repo.
 > **Norma de marca:** [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (qué se aprobó por superficie, §2.1 ruta por el composer, §4.6 deck) · catálogo de recetas [`deck-recipes/`](../operations/brand-graphic-line/deck-recipes/README.md).
@@ -335,8 +335,11 @@ render bloquea la red y no lee rutas externas. La clave de cada asset es su refe
 de Loom salen de `AXIS_PARTNER_ASSETS` (`@efeoncepro/axis-brand-assets` 0.4.4): `pnpm brand:tokens` los copia a
 `graphic-line-deck/assets/partners/` (y el isotipo de Loom a `deck-axis/assets/tools/`) y el builder los declara como
 `file` (`partnerFile`). Todo lo que afirma una relación o necesita autorización **falla cerrado**: la insignia exige
-`partnerMark.readbackRef` en el intent (sin él, `mode: "operates-on"`: «Operamos sobre» + el logo de la plataforma del
-registro `public/images/logos/partners/`, o nada); Claude, Claudeforce y la mascota exigen `authorizationRef`; Agent
+`partnerMark.readbackRef` en el intent —la referencia de su autorización o de su readback— (sin él, `mode:
+"operates-on"`: «Operamos sobre» + el logo de la plataforma del registro `public/images/logos/partners/`, o nada). La de
+Salesforce está autorizada por Salesforce (declarado por el operador el 2026-09-29): los intents de ejemplo del deck
+Salesforce la piden por defecto con `readbackRef: "salesforce-partner-authorization-2026-09-29"` (registro de
+partnerships) y `partner-mark.test.ts` prueba que la misma referencia no habilita la insignia de otro partner; Claude, Claudeforce y la mascota exigen `authorizationRef`; Agent
 Astro no está en ningún paquete y sólo entra por ruta local explícita. En el gate, los probes los reciben como
 `asset-ref:<kind>:probe`, nunca el archivo real.
 
@@ -942,7 +945,12 @@ montos (Slice 5) esperan a TASK-1417 y el equipo (Slice 6), a TASK-1418; hasta e
   líneas contando caracteres, no midiendo el texto. En TASK-1934 falló con preguntas de 21–22 caracteres que sí bajan a
   dos líneas a 470 px; AXIS `v0.3.23` lo fijó en 20 para `decision-traffic-to-revenue` y `decision-diagnosis-map`.
 - **Salida PPTX:** no existe para este catálogo (depende de la matriz de TASK-1395).
-- **Deck de práctica Salesforce (TASK-1942, code complete):** SF20 (`close-brochure-orbit` en `revenue-salesforce`)
-  espera el visto bueno del operador; las autorizaciones escritas de Salesforce y Anthropic (TASK-1937) y el readback
-  de la insignia siguen pendientes; los plates `NXSF1`–`NXSF3` son rutas locales hasta TASK-1931. La serie HubSpot
-  equivalente es TASK-1943.
+- **Deck de práctica Salesforce (TASK-1942, code complete):** aprobado completo por el operador el 2026-09-29, SF20
+  incluida (intent `deck-close-brochure-orbit-revenue-salesforce-intent.json`, 0 px contra la aprobada); la insignia y
+  las marcas de Salesforce están autorizadas por Salesforce (declarado por el operador); sigue pendiente la autorización
+  escrita de Anthropic para Claude y Claudeforce (TASK-1937); los plates `NXSF1`–`NXSF3` son rutas locales hasta
+  TASK-1931. La serie HubSpot equivalente es TASK-1943.
+- **Largo en slots de texto con negrita:** `validateDeckPlan` mide un slot `text` con su marcado (`**`): el cuerpo
+  aprobado de SF6 mide 124 visibles pero 128 con marcado contra un máximo de 125, así que un plan con el contenido
+  literal de SF6 da `slot-over-max-chars` en `body`. Los planes golden no llevan ese contenido; decidir si los slots
+  `text` se miden sin marcado (como `richText`) antes de ligar SF6 desde una `Proposal` (TASK-1930/1932).

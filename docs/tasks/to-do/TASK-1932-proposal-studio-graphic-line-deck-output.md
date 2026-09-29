@@ -1,5 +1,17 @@
 # TASK-1932 — Proposal Studio arma el deck «La órbita» desde recetas: render en `artifact-worker` y acción Nexa/MCP
 
+## Delta 2026-09-29 (d) — TASK-1942: máximos subidos e insignia por defecto en el deck Salesforce
+
+- El operador aprobó tal cual dos largos del deck Salesforce: `proposal-cinematic-revops.question` sube de 28 a 30 y el
+  nombre de paso de `proposal-service-revops` de 24 a 28 (catálogo, `catalog.generated.json` y
+  `proposal-service.slots.json`, plantilla compartida por las cinco `proposal-service-*`). Subir un máximo no rompe a
+  ningún consumidor; el render de las láminas existentes no cambió (gate `graphic-line` a 0 px).
+- La insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto en `cover-brochure-line-revenue` y
+  `close-proposal-horizon` del deck Salesforce (`partnerMark.readbackRef: salesforce-partner-authorization-2026-09-29`);
+  sigue excluida de las ligaduras de `Proposal` (es claim de Efeonce, no dato del cliente).
+- Ojo al ligar SF6: `validateDeckPlan` mide un slot `text` con su marcado `**`; el cuerpo aprobado de SF6 da 128 contra
+  125 (124 visibles).
+
 ## Delta 2026-09-29 — TASK-1942 suma 16 recetas del deck de práctica Salesforce, todas con plantilla
 
 - El catálogo pasa de 78 a **94 recetas, 94 con plantilla** (`catalog.generated.json` y `recipe-map.json` al día desde

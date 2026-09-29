@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.15
+> **Versión:** 1.16
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-29 por Claude (1.15: las 94 recetas del deck tienen plantilla — las dieciséis del deck Salesforce componen sobre AXIS 0.3.33 y el baseline `graphic-line` quedó sellado (sección (s)); SF20 compuesta y pendiente del visto bueno; los dos planes validan sin avisos; PDF de la propuesta sin insignia; §4.6. Antes, 1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-09-29 por Claude (1.16: la insignia «Salesforce Partner» está autorizada por Salesforce y el deck Salesforce la lleva por defecto; SF20 aprobada como cierre de brochure; largos de SF6 y SF7 aprobados (máximos subidos); costo de color de los íconos de producto aprobado; delta (d). Antes, 1.15: las 94 recetas del deck tienen plantilla — las dieciséis del deck Salesforce componen sobre AXIS 0.3.33 y el baseline `graphic-line` quedó sellado (sección (s)); SF20 compuesta y pendiente del visto bueno; los dos planes validan sin avisos; PDF de la propuesta sin insignia; §4.6. Antes, 1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -50,6 +50,37 @@
 > [manual de uso](../../manual-de-uso/creative/componer-por-superficie-con-axis.md) ·
 > [documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) ·
 > [recetas por lámina del deck](./deck-recipes/README.md)
+
+## Delta 2026-09-29 (d) — insignia autorizada y deck Salesforce aprobado completo **[decisión del operador, 2026-09-29]**
+
+El operador, textual: «Todo está aprobado. Necesito que tengan el Badge de Salesforce Partner ya está autorizado por
+Salesforce».
+
+- **Insignia «Salesforce Partner» autorizada por Salesforce** (declaración del operador, 2026-09-29; referencia estable
+  `salesforce-partner-authorization-2026-09-29`, registrada en el
+  [registro de partnerships](../EFEONCE_PARTNERSHIP_REGISTRY_V1.md)). Deja de ser un claim bloqueado por readback: el
+  deck Salesforce la lleva **por defecto** en la portada (`cover-brochure-line-revenue`, layout `line`) y en la
+  contraportada de propuesta (`close-proposal-horizon`, composición `sloganBlock`). «Operamos sobre» + logo de
+  Salesforce queda como **respaldo**. Se recomienda, sin bloquear, archivar la copia escrita de la autorización junto a
+  `ai-generations/2026-09-29_deck-salesforce/DECISIONES.md`.
+- **La regla general no cambia para otros partners:** el slot `partnerMark` en modo `badge` sigue exigiendo
+  `readbackRef` (la referencia de la autorización o del readback) y falla cerrado sin ella; la autorización de
+  Salesforce no se extiende a HubSpot ni a ningún otro programa.
+- **Logo e íconos de producto de Salesforce autorizados** por la misma declaración. Agent Astro sigue siendo una
+  edición interpretativa: ruta local, nunca en un package de AXIS publicado. **Claude y Claudeforce** siguen esperando
+  la autorización escrita de **Anthropic**.
+- **SF20 aprobada:** la contraportada de brochure (`close-brochure-orbit` layout `orbit`, línea `revenue-salesforce`)
+  es el cierre del deck como brochure; queda en `approvedUses` de la receta, con su intent de ejemplo
+  (`deck-close-brochure-orbit-revenue-salesforce-intent.json`, 0 px contra la lámina aprobada).
+- **Largos aprobados tal cual:** la pregunta de SF6 (30) y dos nombres de paso de SF7 (26 y 28). Suben
+  `proposal-cinematic-revops.question` de 28 a 30 y el nombre de paso de `proposal-service-revops` de 24 a 28 (catálogo
+  y `proposal-service.slots.json`); las láminas existentes no cambian de render (gate `graphic-line` a 0 px). Son
+  recetas que consume TASK-1932 (Proposal): subir un máximo no rompe a nadie.
+- **Costo de color de los íconos de producto en SF1 y SF8: aprobado tal cual.** Pendiente cerrado.
+- **Planes golden** con la insignia: la portada del brochure y la contraportada de la propuesta traen su `partnerMark`
+  con la referencia de la autorización (`pnpm brand:deck-plan`, 0 errores).
+- **PDF:** `out/Efeonce-Propuesta-Servicios-Salesforce.pdf` y `out/Efeonce-Brochure-Servicios-Salesforce.pdf`, con
+  insignia por defecto (`render-src/pdf-propuesta.mjs`; `SIN_BADGE=1` genera el respaldo y `DOC=brochure` el brochure).
 
 ## Delta 2026-09-29 (c) — el deck Salesforce se compone completo (TASK-1942, `f05c26e2f`)
 
@@ -1065,22 +1096,25 @@ Fuente de hechos: `ai-generations/2026-09-29_deck-salesforce/CANON-INVENTARIO.md
 | | 16 | ¿Cómo aprende tu equipo? → A su ritmo. | `content-day-live-library` (nueva) |
 | | 17 | ¿Y después del go-live? → Lo operamos. | `content-day-live-console` (nueva, 2026-09-29 b) |
 | | 18 | ¿Cómo sabes que funciona? → Lo medimos. | `content-measure-formulas` (nueva) |
-| V · Cierre | 19 | Empower your Revenue (propuesta) · ¿Conversamos? Cuando quieras. (brochure) | propuesta: `close-proposal-horizon` (dato; plate NXSF3 bordada, `sloganBlock`, logo 700 px, badge opcional) · brochure: `close-brochure-orbit` en la línea `revenue-salesforce` (SF20, compuesta, visto bueno pendiente) |
+| V · Cierre | 19 | Empower your Revenue (propuesta) · ¿Conversamos? Cuando quieras. (brochure) | propuesta: `close-proposal-horizon` (dato; plate NXSF3 bordada, `sloganBlock`, logo 700 px, insignia por defecto) · brochure: `close-brochure-orbit` en la línea `revenue-salesforce` (SF20, aprobada el 2026-09-29) |
 
 Fuera del recorrido: la propuesta sobria (`proposal-service-revops`, mismo plate NXSF1: **excluyente** con la 02) y los
-respaldos sin badge de la 01 y la 19.
+respaldos sin insignia de la 01 y la 19 (desde el delta (d), la insignia va por defecto).
 
 **Reglas del deck de práctica** (además de las del deck):
 
-- **Marcas de terceros con condición.** Logo, íconos de producto, badge y Agent Astro sujetos a la autorización escrita
-  de Salesforce; Claude y Claudeforce, a la de Salesforce y Anthropic. Están **pendientes de archivar**: sin ellas, las
-  láminas con esas marcas no salen a clientes ni a pauta. Los íconos de producto van sólo donde se nombra el producto y
-  sin recolorear.
-- **Badge de partner = claim bloqueante.** Slot opcional `partnerMark` en la portada de línea y en la contraportada de
-  propuesta, sólo con readback vigente en Partner Community (registro de partnerships); respaldo «Operamos sobre» + logo
-  corporativo en la portada y nada en la contraportada. Nunca el de Cloud Reseller ni los Navigator.
+- **Marcas de terceros con condición.** Logo, íconos de producto e insignia de Salesforce: **autorizados por
+  Salesforce** (declarado por el operador el 2026-09-29, delta (d)); se recomienda archivar la copia escrita, sin
+  bloquear. Claude y Claudeforce: pendientes de la autorización escrita de **Anthropic**; sin ella, esas marcas no salen
+  a clientes ni a pauta. Los íconos de producto van sólo donde se nombra el producto y sin recolorear (su costo de
+  color en las láminas 03 y 06 está aprobado).
+- **Insignia de partner = claim.** Slot `partnerMark` en la portada de línea y en la contraportada de propuesta, con la
+  referencia de su autorización o readback (`readbackRef`). La de Salesforce está autorizada
+  (`salesforce-partner-authorization-2026-09-29`) y va **por defecto** en el deck Salesforce; respaldo «Operamos sobre»
+  + logo corporativo en la portada y nada en la contraportada. Otro partner sin autorización falla cerrado. Nunca el de
+  Cloud Reseller ni los Navigator.
 - **Agent Astro, Claude y Claudeforce son slots opcionales**, nunca fijos. El Astro es una interpretación editada del
-  arte oficial: no va a un package de AXIS publicado sin autorización o arte oficial, ni dentro de una foto.
+  arte oficial: no va a un package de AXIS publicado ni dentro de una foto; se reemplaza si aparece el arte oficial.
 - **Temporada:** `content-season-launches` lleva fecha de corte obligatoria y no entra en un brochure evergreen.
 - **Muestra y montos:** cifras de muestra marcadas (12, 13, 16, 17); `content-measure-formulas` sin cifras; montos `[MONTO]`.
 - **Eslogan en bloque** en la contraportada: debajo del logo, al 64 % de su ancho (regla dura 8 de la línea); el
@@ -1093,8 +1127,8 @@ propuesta; las láminas 02 a 18 son las mismas y cambian el marco:
 
 | Documento | Portada | Contraportada | Plan de ejemplo |
 |---|---|---|---|
-| Brochure | `cover-brochure-line-revenue` (SF0, con foto; badge sólo con readback) | `close-brochure-orbit` en la línea `revenue-salesforce`, sin foto: «¿Conversamos? Cuando quieras.» + «Empower your Revenue» como firma, logo a 500 px. **Compuesta (SF20)** desde la receta existente; necesita el visto bueno del operador antes de enviarse | `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-brochure-salesforce.json` |
-| Propuesta | `cover-proposal-orbit` (sin foto, con el logo del cliente) | `close-proposal-horizon` (SF19, con foto; composición `sloganBlock`: logo a 700 px en top 220 y eslogan en bloque al 64 %) | `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-proposal-salesforce.json` |
+| Brochure | `cover-brochure-line-revenue` (SF0, con foto; insignia «Salesforce Partner» por defecto) | `close-brochure-orbit` en la línea `revenue-salesforce`, sin foto: «¿Conversamos? Cuando quieras.» + «Empower your Revenue» como firma, logo a 500 px. **SF20, aprobada** por el operador el 2026-09-29 | `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-brochure-salesforce.json` |
+| Propuesta | `cover-proposal-orbit` (sin foto, con el logo del cliente) | `close-proposal-horizon` (SF19, con foto; composición `sloganBlock`: logo a 700 px en top 220, eslogan en bloque al 64 % e insignia por defecto) | `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-proposal-salesforce.json` |
 
 Los dos planes validan con `pnpm brand:deck-plan -- --plan <plan>`: sin errores ni avisos (verificado el 2026-09-29, tras
 `f05c26e2f`); los prueba `validate.test.ts`. Los plates van por `plateRef` (NXSF2 en la

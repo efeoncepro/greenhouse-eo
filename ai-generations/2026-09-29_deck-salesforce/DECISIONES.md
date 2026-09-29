@@ -143,3 +143,24 @@ https://claude.ai/artifact/Jp1zybpowqVVyvgnDu1NSw · en «La órbita», página 
   Poppins 700 (sólo 300/400/500/600/800) y el navegador cayó al peso más cercano. Se compone en **700**, el peso
   declarado; la diferencia es mínima a tamaño real y no justifica otra release de AXIS. Lección: el script de render de
   láminas debe cargar todas las caras que usa (añadir Poppins-Bold) para que la lámina aprobada no dependa de un fallback.
+
+## Aprobación final e insignia autorizada (2026-09-29, delta (d))
+
+- **El operador, textual:** «Todo está aprobado. Necesito que tengan el Badge de Salesforce Partner ya está autorizado
+  por Salesforce».
+- **Insignia «Salesforce Partner» autorizada por Salesforce** (declaración del operador). Deja de ser un claim bloqueado
+  por readback: el deck lleva la insignia **por defecto** en la portada (SF0) y en la contraportada de propuesta (SF19).
+  «Operamos sobre» + logo de Salesforce queda como respaldo (`SIN_BADGE=1`). Referencia estable de la autorización:
+  `salesforce-partner-authorization-2026-09-29` (registro de partnerships; en el composer, `partnerMark.readbackRef`).
+  Tier y SPPA siguen pendientes de readback: la insignia no afirma un tier.
+- **Logo e íconos de producto de Salesforce:** autorizados por la misma declaración. **Agent Astro** sigue siendo una
+  edición interpretativa: ruta local, fuera de los packages de AXIS. **Claudeforce y Claude** (SF16) siguen esperando la
+  autorización escrita de **Anthropic**.
+- **Recomendado, no bloqueante:** archivar aquí la copia escrita de la autorización de Salesforce (correo o documento del
+  PAM/AE) como `autorizacion-salesforce-partner-2026-09-29.pdf`, junto a esta nota.
+- **SF20** (contraportada de brochure, `close-brochure-orbit` layout `orbit`, línea `revenue-salesforce`): aprobada; es el
+  cierre del deck como brochure. Se compone desde `src/lib/brand-surfaces/examples/deck-close-brochure-orbit-revenue-salesforce-intent.json`
+  (0 px contra `out/SF20-contraportada-brochure.png`).
+- **Largos aprobados tal cual:** la pregunta de SF6 (30 > 28) y los pasos de SF7 (26 y 28 > 24). Suben los máximos de
+  `proposal-cinematic-revops.question` (30) y del nombre de paso de `proposal-service-revops` (28); sin cambio de render.
+- **Costo de color de los íconos de producto en SF1 y SF8: aprobado tal cual.** Pendiente cerrado.

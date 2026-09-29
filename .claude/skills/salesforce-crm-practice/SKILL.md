@@ -68,9 +68,11 @@ Next, servicios, Dreamforce, agentes con supervisora, **«Enablement conversacio
 consentimiento, migración, diagnóstico, olas, día a día, operación y medición). Se arma como brochure o como propuesta
 con `deck-studio` y la norma §4.6 de
 [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
-Condiciones que esta skill hace cumplir: la insignia «Salesforce Partner» es un claim y exige **readback vigente** del
-registro de partnerships (sin él, «Operamos sobre» + logo); logo, íconos de producto, Agent Astro, Claude y Claudeforce
-exigen la **autorización escrita** de Salesforce y Anthropic archivada; los estados de Dreamforce van con su corte
+Condiciones que esta skill hace cumplir: la insignia «Salesforce Partner» es un claim **autorizado por Salesforce**
+(declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29` en el registro de partnerships): el deck
+la lleva por defecto, con «Operamos sobre» + logo como respaldo, y no afirma tier (tier, SPPA y certificaciones siguen
+exigiendo readback); logo e íconos de producto, autorizados por la misma declaración; Claude y Claudeforce exigen la
+**autorización escrita de Anthropic** archivada; Agent Astro es una edición interpretativa, sólo por ruta local; los estados de Dreamforce van con su corte
 (2026-09-18) y se verifican en cada org. El contenido de dominio de las láminas sigue saliendo de esta skill.
 
 ## Fuentes
