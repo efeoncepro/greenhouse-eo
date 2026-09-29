@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-29 — Creative Workbench: repo del equipo creativo gobernado desde Greenhouse
+
+- Nuevo repo privado `efeoncepro/creative-workbench` para el equipo creativo (Claude y Codex; clientes Efeonce, Berel
+  y SKY). Recibe por `pnpm creative:sync` 17 skills espejadas, los CLIs `foto:*`/`ai:*` (cierre de imports calculado
+  con esbuild, falla si alcanza dominios prohibidos), docs de marca por allowlist y brand packs; todo sellado por
+  sha256 con gate `managed-drift` y hook `PreToolUse` de Claude.
+- El sync exporta un **ref de git**, nunca el working tree (el bootstrap arrastró trabajo sin commitear de otra
+  sesión; corregido el mismo día).
+- Acceso declarativo en `scripts/creative-workbench/control.json` (`creative:access`); infraestructura idempotente en
+  un proyecto GCP propio con llaves de IA dedicadas (`creative:provision`, aún sin aplicar).
+- ADR [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
+
 ## 2026-09-29 — Efeonce AI Visibility Report canonizado en AXIS (TASK-1938)
 
 - AXIS `v0.3.30` (`26097c5`, registro verificado): `axis-tokens` 0.3.30 (`aiVisibilityReport` y
@@ -656,19 +668,3 @@ Reconciliación: CDR-002 registra el set de seis pilotos; BRIEF asigna roles vig
 Entrega CMP-001 unificada para humanos/agentes: manifiesto único, catálogo visual y CSV generado; 28 exports por tipo/ratio, recetas históricas en Recursos con mapa de rutas.
 
 Manifiesto v2: copy externo, audiencias, UTM y presupuesto propuesto; handoff MCP íntegro generado con checksum, deduplicación y readback. Contrato transversal y template reusable sincronizados en skills Claude/Codex y OneDrive. Sin publicación.
-
-## 2026-09-22 — Ads: Tres voces + acción
-
-[Regla aprobada](docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md): CTA Poppins en texto, contorno o
-relleno a demanda, complemento de las tres voces. Define jerarquía, gaps de tinta,
-protección de sujeto/firma, cursor semántico y editables. Publicidad, Design y Growth/CRO sincronizados en
-Codex/Claude; excepción acotada al relleno CTA sobre foto, sin scrims. Color a demanda según composición,
-tinta/borde/relleno medidos por separado. v04 completa16 pilotos:4conceptos×4:5/1:1/9:16/16:9,
-composición/contraste16/16 y firma≥5,52:1; arnés fotográfico genérico con límites explícitos.
-Prompts, editables, matriz y evidencia en OneDrive; cobertura de cuatro ratios documentada en skills espejo.
-v05 recompuso los cuatro verticales; el operador rechazó la firma alta. v06 la baja al pie según Claude,
-con texto/CTA protegidos y posible solapamiento de firma en Reels declarado; QA separado.
-16 finales autorizados en OneDrive, con conceptos/embudo, prompts, editables y reproducción; sin publicación.
-v07 reduce el lecho y ancla la firma dentro de su materia. Método completo y ocho skills actualizados;
-auditoría del compositor CTA: p98, cobertura del gate y campos no compatibles documentados, sin cambiar código.
-Sin cambios runtime.

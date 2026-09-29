@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Creative Workbench (29/09):** [ADR](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md). Repo `efeoncepro/creative-workbench` creado, sincronizado por PR (#1, CI `gates` verde) y equipo GitHub `creative-workbench` vacío. Control: `pnpm creative:{status,sync,access,provision,assets:publish}`. Pendiente: `creative:provision apply` (autorización del operador), llaves dedicadas con tope, miembros en `control.json`, re-sync desde commit limpio. `main` sin protección por plan GitHub Free.
+
 **AI Visibility Report en AXIS (29/09):** AXIS `v0.3.30` publicado (`26097c5`: tokens/contracts 0.3.30, contrato `efeonce.ai-visibility-report` 0.1.0 y `graphic-line-orbit` 0.4.0, graphic-line 0.12.0, brand-assets 0.4.3). Greenhouse sigue en 0.3.29 y el renderer del PDF de [TASK-1938](docs/tasks/to-do/TASK-1938-ai-visibility-report-pdf-la-orbita.md) está pendiente; su bump debe llevar `graphic-line.mjs` al contrato 0.4.0 (hoy sólo acepta 0.3.1). Abierta: si el recorrido desde las 12 al 60 % pasa a ser regla y va a la portada.
 
 **Naming Efeonce AEO (29/09):** el [ADR aceptado](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) fija **Efeonce AEO** → **Efeonce AEO Assessment** → **Efeonce AI Visibility Report**. Documentación y skills se alinean conservando aliases técnicos/históricos; el copy de los runtimes públicos sigue pendiente de edición y readback. Search Visibility 360 permanece como oferta SEO+AEO.

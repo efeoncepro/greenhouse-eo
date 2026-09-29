@@ -1,0 +1,32 @@
+{
+  "_comentario": "Estado DESEADO del acceso al creative-workbench. Se edita acá y se aplica con `pnpm creative:access plan|apply` y `pnpm creative:provision plan|apply`. Nada se da de alta a mano en GitHub o GCP: lo que no está acá, `apply` lo retira.",
+  "github": {
+    "org": "efeoncepro",
+    "repo": "creative-workbench",
+    "team": "creative-workbench",
+    "teamPermission": "push",
+    "owner": "cesargrowth11"
+  },
+  "gcp": {
+    "project": "efeonce-creative-workbench",
+    "parent": { "type": "organization", "id": "351053192958" },
+    "billingAccount": "013340-4C7071-668441",
+    "location": "us-east4",
+    "canonBucket": "efeonce-creative-canon",
+    "workBucket": "efeonce-creative-work",
+    "softDeleteDays": 30,
+    "services": [
+      "storage.googleapis.com",
+      "secretmanager.googleapis.com",
+      "aiplatform.googleapis.com",
+      "iam.googleapis.com"
+    ],
+    "aiSecrets": {
+      "OPENAI_API_KEY": "workbench-openai-api-key",
+      "FAL_API_KEY": "workbench-fal-api-key",
+      "HIGGSFIELD_API_KEY": "workbench-higgsfield-api-key"
+    }
+  },
+  "clientes": ["efeonce", "berel", "sky"],
+  "members": []
+}

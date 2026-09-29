@@ -1,0 +1,95 @@
+{
+  "_comentario": "Qué exporta greenhouse-eo al repo efeoncepro/creative-workbench. Es la ÚNICA puerta: lo que no está acá no sale. El sync calcula el cierre de código desde los entrypoints (no se lista archivo por archivo) y copia docs sólo desde la allowlist. Ver docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md.",
+  "schema": 1,
+  "target": {
+    "repo": "efeoncepro/creative-workbench",
+    "localPath": "../creative-workbench",
+    "defaultBranch": "main"
+  },
+  "skills": [
+    "copywriting",
+    "creative-direction",
+    "design-studio",
+    "efeonce-graphic-line",
+    "efeonce-brand-studio",
+    "efeonce-advertising-creative",
+    "social-media-studio",
+    "typography-design",
+    "ai-model-selection",
+    "axis-design-system",
+    "motion-design-studio",
+    "audio-studio",
+    "greenhouse-ai-image-generator",
+    "berel-content-production",
+    "content-marketing-studio",
+    "higgsfield-provider",
+    "dataviz-design"
+  ],
+  "scripts": {
+    "_comentario": "Scripts de package.json de greenhouse-eo que se exportan con el mismo nombre. Sus archivos de entrada definen el cierre de código.",
+    "include": ["foto:*", "ai:image", "ai:fal", "ai:omni", "ai:image:rmbg"],
+    "exclude": ["foto:componer:cta:mutantes", "foto:componer:cta:pruebas", "foto:componer:cta:regresion"]
+  },
+  "code": {
+    "_comentario": "Además del cierre de imports: datos que los CLIs leen del disco y no aparecen como import.",
+    "extra": [
+      "scripts/foto/bloques/**",
+      "scripts/foto/*.json",
+      "scripts/lib/server-only-shim.cjs",
+      "scripts/lib/server-only-empty.cjs"
+    ],
+    "forbiddenRoots": [
+      "src/lib/postgres",
+      "src/lib/db",
+      "src/lib/finance",
+      "src/lib/payroll",
+      "src/lib/hr",
+      "src/lib/auth",
+      "src/lib/entitlements",
+      "src/lib/commercial",
+      "src/lib/identity",
+      "src/lib/workforce"
+    ]
+  },
+  "docs": {
+    "_comentario": "Allowlist explícita. Una skill puede citar docs internos que NO salen (finanzas, contratación, modelo de negocio): el reporte de exportación los lista para que se decida uno por uno.",
+    "include": [
+      "docs/operations/social/**",
+      "docs/operations/brand-photography/**",
+      "docs/operations/brand-graphic-line/**",
+      "docs/operations/brand-sonic/**",
+      "docs/operations/creative-production/**",
+      "docs/manual-de-uso/creative/**",
+      "docs/documentation/creative/**",
+      "docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md",
+      "docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md",
+      "docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md",
+      "docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md",
+      "docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md",
+      "docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md",
+      "docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md",
+      "docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md",
+      "docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md",
+      "docs/operations/creative-studio/HIGGSFIELD_PROVIDER_RUNBOOK_V1.md",
+      "docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md",
+      "docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md",
+      "docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md",
+      "docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md",
+      "docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md",
+      "docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md",
+      "docs/architecture/GREENHOUSE_CAMPAIGN_LAYOUT_COMPILER_V1.md",
+      "docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md"
+    ],
+    "forbiddenRoots": [
+      "docs/operations/hiring",
+      "docs/business-models",
+      "docs/audits/commercial",
+      "docs/tasks",
+      "docs/issues",
+      "docs/finance"
+    ]
+  },
+  "limits": {
+    "maxFileBytes": 15000000
+  }
+}

@@ -1,5 +1,16 @@
 # GREENHOUSE_REPO_ECOSYSTEM_V1.md
 
+## Delta 2026-09-29 — `creative-workbench`, repo del equipo creativo
+
+- Repo: `efeoncepro/creative-workbench` (privado, `main`), clonado junto a `greenhouse-eo` en
+  `/Users/jreye/Documents/creative-workbench`.
+- **Cliente gobernado**, no hermano autónomo: todo lo que no es `projects/` llega por `pnpm creative:sync` desde un ref
+  de `greenhouse-eo` y queda sellado en `.workbench/sync.lock.json`. El acceso (GitHub + GCP) se declara en
+  `scripts/creative-workbench/control.json`.
+- CI: sólo el workflow `gates` (sin despliegue ni runtime). **Relevancia para cambios cross-repo:** no se le hacen
+  commits a mano; todo cambio entra por `creative:sync --pr`.
+- Decisión: [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](../architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
+
 ## Delta 2026-09-27 — `efeonce-brand-workshop`, repo taller de producción de marca
 
 - Repo: `efeoncepro/efeonce-brand-workshop` (privado, `main`), clonado junto a `greenhouse-eo` en

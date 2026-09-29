@@ -404,6 +404,11 @@
     "foto:accesibilidad": "node scripts/foto/accesibilidad-reporte.mjs",
     "foto:componer:cta:pruebas": "node scripts/foto/componer-cta.pruebas.mjs",
     "foto:componer:cta:mutantes": "node scripts/foto/componer-cta.mutantes.mjs",
+    "creative:sync": "node scripts/creative-workbench/sync.mjs",
+    "creative:status": "node scripts/creative-workbench/status.mjs",
+    "creative:access": "node scripts/creative-workbench/access.mjs",
+    "creative:provision": "node scripts/creative-workbench/provision.mjs",
+    "creative:assets:publish": "node scripts/creative-workbench/assets-publish.mjs",
     "security:public-burst-guard": "tsx scripts/security/public-burst-guard.ts",
     "security:public-burst-guard:verify": "tsx --require ./scripts/lib/server-only-shim.cjs --env-file=.env.local scripts/security/public-burst-guard-verify.ts"
   },

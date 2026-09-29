@@ -7,6 +7,19 @@
      ═══════════════════════════════════════════════════════════ -->
 
 
+## Delta 2026-09-29 — el creative-workbench consume `foto` desde su fuente canónica
+
+- Nació `efeoncepro/creative-workbench`, el repo del equipo creativo, gobernado desde Greenhouse
+  ([ADR](../../architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md)). `pnpm creative:sync` le exporta **copias
+  selladas** de los CLIs `foto:*` y `ai:*`: su cierre de imports se calcula desde `scripts/foto`, `scripts/ai` y
+  `src/lib/ai` de `greenhouse-eo`. No es un segundo pipeline, pero sí un consumidor.
+- **Impacto en esta task:** al migrar `foto` al taller, actualiza `scripts/creative-workbench/export-manifest.json`
+  para que el workbench tome `foto` desde el taller (o desde el paquete que salga de ahí) y no desde el delegador. Si
+  no, el workbench seguiría recibiendo la copia retirada.
+- **Bucket:** `efeonce-creative-canon` (proyecto `efeonce-creative-workbench`) está pensado para las referencias
+  aprobadas del catálogo de foto (`assets.lock.json`). Úsalo como bucket de referencias del taller en vez de crear
+  otro con el mismo contenido.
+
 ## Delta 2026-09-27 (tarde) — primeras herramientas ya viven en el taller
 
 - **Ya en el taller** (`main` = `ed89a0b`, empujado), fuera del alcance de esta task pero relevante para ella:
