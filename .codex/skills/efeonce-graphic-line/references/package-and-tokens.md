@@ -668,7 +668,7 @@ Estados que **no** permiten decir «partner» (`AXIS_EMAIL_SIGNATURE_UNCLAIMABLE
 `pending`, `provider-in-use`, `blocked`, `not-started`.
 
 **Resuelto (full/team):** `variant`, `surface`, `line`, `sloganWord`, `maxWidthPx`, `paddingPx`, `palette`
-(colores de la superficie + `accent`), `type`, `icons`, `portrait` (`{ sizePx: 96, …portrait }` o null), `areaMark`
+(colores de la superficie + `accent`), `type`, `icons`, `portrait` (`{ sizePx: 130, …portrait }` o null; 96 hasta `axis-tokens` 0.3.34), `areaMark`
 (team: disco, ícono, geometría portrait, área), `zones[{ zone, gapBeforePx }]`, `sphereDivider` (con `color` =
 línea de la superficie y `sphereColor` = acento), `sectionRule`, `endorsement` (`rows` balanceadas, `tone`, `alt`
 «Partner oficial de A, B y C», …), `builderChecks`. **Reply:** `form 'single-line'`, `images false`, `area`, `type`,

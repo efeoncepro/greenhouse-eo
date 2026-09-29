@@ -5,6 +5,13 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import sharp from '/Users/jreye/Documents/greenhouse-eo/node_modules/sharp/lib/index.js'
 import { chromium } from '/Users/jreye/Documents/greenhouse-eo/node_modules/playwright/index.mjs'
+import { createRequire } from 'node:module'
+
+// Tamaño del retrato en el correo: SIEMPRE del token de AXIS (operador, 2026-09-29: el retrato mide lo mismo que el
+// bloque de texto de al lado — 130 px la firma personal, 106 px la de buzón, que no lleva teléfono).
+const { efeonceGraphicLine: GL } = createRequire('/Users/jreye/Documents/greenhouse-eo/package.json')('@efeoncepro/axis-tokens')
+const RETRATO_PX = GL.emailSignature.portrait.sizePx
+const MARCA_AREA_PX = GL.emailSignature.team.areaMark.sizePx
 
 // Firmas del equipo (2026-09-29): el constructor v3.1 APROBADO sin cambios de diseño; sólo la persona y la foto salen
 // de la tabla EQUIPO. Los insumos (íconos, logos de partners) siguen en la carpeta de la v3.1.
@@ -59,7 +66,7 @@ const areaOrbit = async (t) => {
   const disc = dark ? '#0b2b4a' : '#eef3f7'
   const icon = readFileSync(DIR + `icons/${AREA.icono}.svg`, 'utf8').match(/<path[\s\S]*<\/svg>/)[0].replace('</svg>', '')
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${k}" height="${k}" viewBox="0 0 ${k} ${k}"><circle cx="${cx}" cy="${cx}" r="96" fill="none" stroke="${ring}" stroke-width="2"/><circle cx="${cx}" cy="${cx}" r="78" fill="${disc}"/><path d="M${x0} ${y0} A96 96 0 0 1 ${x1} ${y1}" fill="none" stroke="${t.accent}" stroke-width="4" stroke-linecap="round"/><circle cx="${x1}" cy="${y1}" r="7" fill="${t.accent}"/><g transform="translate(${cx - 36} ${cx - 36}) scale(3)" fill="none" stroke="${t.name}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${icon}</g></svg>`
-  return sharp(Buffer.from(svg), { density: 300 }).resize(k, k).png().toBuffer()
+  return sharp(Buffer.from(svg), { density: 600 }).resize(MARCA_AREA_PX * 3, MARCA_AREA_PX * 3).png().toBuffer()
 }
 // La esfera de la línea que termina en ella: PNG 3× en el acento, fondo transparente (Outlook pierde el border-radius).
 const esfera = accent => sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="27" height="27"><circle cx="13.5" cy="13.5" r="13.5" fill="${accent}"/></svg>`)).png().toBuffer()
@@ -82,11 +89,12 @@ const stripHtml = (t, w, bg = t.bg) => `<div style="width:${w}px;background:${bg
 </div>`
 
 const firma = (t, s) => {
+  const TAM = AREA ? MARCA_AREA_PX : RETRATO_PX
   const link = (href, txt, color) => `<a href="${href}" style="color:${color};text-decoration:none">${txt}</a>`
-  const fila = (src, contenido) => `<tr><td valign="middle" width="22" style="width:22px;padding:3px 0">${ico(src, 14)}</td><td valign="middle" style="padding:3px 0;font-family:${SANS};font-size:13px;line-height:18px;font-weight:400;color:${t.text}">${contenido}</td></tr>`
+  const fila = (src, contenido) => `<tr><td valign="middle" width="22" style="width:22px;min-width:22px;padding:3px 0">${ico(src, 14)}</td><td valign="middle" style="padding:3px 0;font-family:${SANS};font-size:13px;line-height:18px;font-weight:400;color:${t.text}">${contenido}</td></tr>`
   const contacto = `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;margin-top:10px">
 ${P.telefono ? fila(s.phone, link(`tel:${P.telefono.replace(/[^+\d]/g, '')}`, P.telefono, t.text)) : ''}
-${fila(s.mail, link(`mailto:${P.correo}`, P.correo, t.text))}
+${fila(s.mail, link(`mailto:${P.correo}`, P.correo.replace('@', '<wbr>@'), t.text))}
 <tr><td colspan="2" style="padding:8px 0 0"><table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse"><tr>
 <td valign="middle">${link(P.web, `<img src="${s.bubble}" width="92" height="18" alt="efeoncepro.com" style="display:block;border:0;width:92px;height:18px">`, t.text)}</td>
 ${P.linkedin ? `<td valign="middle" style="padding-left:10px">${link(P.linkedin, ico(s.linkedin, 18, 'LinkedIn'), t.text)}</td>` : ''}
@@ -105,7 +113,7 @@ ${P.linkedin ? `<td valign="middle" style="padding-left:10px">${link(P.linkedin,
     : SEP === 'banda' ? ''
     : `<tr><td colspan="3" style="padding:16px 0 0">${stripImg}</td></tr>`
   const cuerpo = `<table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%" style="border-collapse:collapse">
-<tr><td valign="middle" width="96" style="width:96px;min-width:96px;padding:0"><img src="${s.photo}" width="96" height="96" alt="${P.nombre}" style="display:block;border:0;width:96px;min-width:96px;max-width:96px;height:96px"></td><td width="16" style="width:16px;min-width:16px;font-size:0;line-height:0">&nbsp;</td>
+<tr><td valign="middle" width="${TAM}" style="width:${TAM}px;min-width:${TAM}px;padding:0"><img src="${s.photo}" width="${TAM}" height="${TAM}" alt="${P.nombre}" style="display:block;border:0;width:${TAM}px;min-width:${TAM}px;max-width:${TAM}px;height:${TAM}px"></td><td width="16" style="width:16px;min-width:16px;font-size:0;line-height:0">&nbsp;</td>
 <td valign="middle"><div style="font-family:${TITULAR};font-size:22px;line-height:26px;font-weight:800;letter-spacing:-0.3px;color:${t.name}">${P.nombre}<span style="color:${t.accent}">.</span></div>
 <div style="font-family:${SANS};font-size:13px;line-height:18px;font-weight:400;color:${t.sub};padding-top:2px">${P.cargo}</div>${contacto}</td></tr>
 ${divisor}${marca}${partners}</table>`

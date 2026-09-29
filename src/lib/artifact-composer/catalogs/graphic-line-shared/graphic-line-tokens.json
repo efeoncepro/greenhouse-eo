@@ -2,7 +2,7 @@
   "$comment": "GENERADO por `pnpm brand:tokens` desde @efeoncepro/axis-tokens (efeonceGraphicLine). NO EDITAR A MANO: se regenera y el test de sincronía detecta el drift.",
   "source": {
     "package": "@efeoncepro/axis-tokens",
-    "version": "0.3.34"
+    "version": "0.3.35"
   },
   "color": {
     "dark": "#001a33",

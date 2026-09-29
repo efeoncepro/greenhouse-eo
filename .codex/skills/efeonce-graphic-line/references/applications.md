@@ -454,7 +454,8 @@ todavía AXIS 0.3.29: la adopción y el renderer son de TASK-1938.
   navy** (B se reconoce de lejos en la bandeja y funciona en modo oscuro sin cambios).
 - **Lienzo:** 460 px de ancho máximo en escritorio; fluida en móvil (vista de 360 px en L 4.5).
 - **Zonas en orden fijo** (T `emailSignature.zones`; las opcionales se omiten, el orden no cambia):
-  foto con órbita (96 px, `portraitOrbitSvg`) → nombre y cargo (el nombre es la única voz de titular: Bricolage 800,
+  foto con órbita (130 px, a la altura del bloque de texto de al lado; la marca de área, 106 px; `portraitOrbitSvg`;
+  T `emailSignature.portrait.sizePx`, operador 2026-09-29) → nombre y cargo (el nombre es la única voz de titular: Bricolage 800,
   22 px, **con el punto en el acento**; cargo Poppins 400, 13 px) → teléfono y correo (texto vivo, íconos Tabler outline
   trazo 1,75 en el acento; **siguen con Tabler** hasta que el operador decida si los reemplaza la iconografía de la
   línea, §0.3) → burbuja URL + LinkedIn → **línea que termina en la esfera** (una sola vez, 18 px antes) →

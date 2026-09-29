@@ -287,13 +287,16 @@ la órbita; [roster](../../operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.m
 …/build-firmas.mjs` y sube sólo `hosted/people/*` (las imágenes compartidas ya están publicadas y otras firmas instaladas
 dependen de ellas). Los paquetes para cada persona quedan en OneDrive: `Alineación/6. Marca/Kit media/Firmas/
 firma-<nombre-apellido>.zip`, con la instrucción de instalación adentro. Un cambio de foto se ve solo en las firmas ya
-instaladas: la URL de la foto no cambia.
+instaladas: la URL de la foto no cambia. Las fotos con órbita salen de `firmas/fotos-orbita.mjs`, que lee el tamaño del
+token y las exporta a 3× (390 px). **Desde el 2026-09-29 el avatar mide 130 px**, a la altura del bloque de texto de al
+lado: quien pegó la firma antes sigue viendo la foto nueva, pero a 96 px; para verla más grande tiene que volver a copiarla
+desde su página. En pantallas angostas el correo largo se parte antes de la «@» en vez de desbordar la firma.
 
 **Cómo lo instala cada persona:** su página con el botón «Copiar mi firma»
 (`https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1/instalar/<nombre-apellido>.html`; los
 buzones, `instalar/area-<talent|finance|commercial>.html`): la abre, aprieta el botón y la pega en Outlook. Nadie tiene que
-tocar HTML. Tres detalles de Outlook que el constructor ya resuelve (2026-09-29): la foto va en su propia celda de 96 px
-(con el margen dentro de la celda, Outlook la achataba), la esfera de la línea es una imagen (el círculo por estilos se
+tocar HTML. Tres detalles de Outlook que el constructor ya resuelve (2026-09-29): la foto va en su propia celda, del
+tamaño del token (130 px; la marca de área, 106 px), porque con el margen dentro de la celda Outlook la achataba; la esfera de la línea es una imagen (el círculo por estilos se
 perdía al pegar) y el **eslogan va horneado** con sus pesos canónicos (Outlook no carga Poppins y lo dejaba en Arial).
 Adaptarse sola al tema claro u oscuro del sistema no es posible: Outlook quita esas reglas al pegar; la versión de
 fondo blanco está preparada para el oscurecido automático de Outlook (logo y eslogan con halo blanco, partners transparente).

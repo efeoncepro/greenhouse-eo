@@ -737,7 +737,7 @@ con tablas y estilos en línea, 460 px en escritorio y fluida en móvil. Contrat
 
 | Zona | Aire antes | Regla |
 |---|---|---|
-| Foto con órbita | — | `portraitOrbitSvg`, 96 px, PNG 2× (proporciones abajo) |
+| Foto con órbita | — | `portraitOrbitSvg`, **130 px**: mide lo mismo que el bloque de texto de al lado (del tope del nombre a la fila de la URL); PNG 3× (proporciones abajo). Antes 96 px; lo subió el operador el 2026-09-29 (`axis-tokens` 0.3.35) |
 | Nombre y cargo | — | El nombre es la única voz de titular: Bricolage 800, 22 px, con el punto en el acento de la línea. El cargo, Poppins 400 |
 | Teléfono y correo | — | Texto vivo en Poppins 13 con íconos Tabler outline (trazo 1,75) en el acento |
 | Burbuja URL y LinkedIn | — | La URL siempre en su burbuja horneada; LinkedIn como ícono con enlace |
@@ -775,7 +775,9 @@ persona, en su cuenta): **cada persona la instala en Outlook desde el HTML gener
 **Firma de equipo** (aprobada el 2026-09-26, `variant: 'team'`): para el buzón de un área. **No lleva foto:** la misma
 órbita del retrato rodea el **ícono del área** (Tabler outline) sobre un disco; el ícono va en el color del nombre y la
 esfera en el acento. El nombre es el área con su punto y la bajada su descripción. Lleva **sólo el correo del área**:
-sin teléfono ni LinkedIn personal. Todo lo demás es igual a la firma personal.
+sin teléfono ni LinkedIn personal. La marca del área mide **106 px**, la altura de su bloque de texto, que es más bajo
+porque no lleva teléfono (`emailSignature.team.areaMark.sizePx`, `axis-tokens` 0.3.35). Todo lo demás es igual a la
+firma personal.
 
 | Área | Bajada | Ícono | Buzón |
 |---|---|---|---|

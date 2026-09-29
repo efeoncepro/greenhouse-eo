@@ -98,6 +98,9 @@ LinkedIn: pendiente (sólo Julio lo tiene hoy).
 - Página «Copiar mi firma» por persona y por buzón de área: `https://storage.googleapis.com/efeonce-group-axis-public-media/
   email-signature/v3.1/instalar/<nombre-apellido | area-talent | area-finance | area-commercial>.html` (generador
   `firmas/paginas-instalar.mjs`). El eslogan va horneado (`shared/<surface>/slogan-growth.png`) porque Outlook no carga Poppins.
+- Tamaño (operador, 2026-09-29, opción C): el avatar con su órbita mide **130 px**, la altura del bloque de texto de al
+  lado, y la marca de área **106 px** (`axis-tokens` 0.3.35). Las fotos se exportan a 3× con `firmas/fotos-orbita.mjs`.
+  Quien instaló la firma antes debe volver a copiarla desde su página para ver el avatar grande (el operador avisa al equipo).
 
 **Aprobado** [operador, 2026-09-29: «Está perfecto, aprobado»]: el operador revisó la hoja de contacto de la ronda
 piloto —cada persona junto a su foto, en la Escena interior de Marketing con Manzanitas— y la Escena de Daniela compuesta
