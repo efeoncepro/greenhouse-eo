@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Diseno — propuesta en canvas pendiente de aprobación del operador`
+- Status real: `Diseno — propuesta en canvas en iteración con el operador; el renderer del PDF no se ha tocado. El commit a124ad9ab es el script de logos de las submarcas SEO/AEO (insumo de esta task), no su implementación`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `aprobación del operador de la propuesta del canvas (página «Informe del Grader (PDF)»)`
