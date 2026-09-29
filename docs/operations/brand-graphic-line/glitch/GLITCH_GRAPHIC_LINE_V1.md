@@ -626,7 +626,7 @@ con crédito obligatorio, callout «DROP» v2 desde la #18, banner de suscripci�
 | **Última frase del video en el taller** (2026-09-28) | resuelta en el Composer (`video.closingLine` → slot `closingLine` de `overlay-cta-reel.html` / `overlay-cta-vlog.html`); en el **taller**, `closingLine` del archivo de edición reemplaza a `nextEdition` en la rama local `feat/glitch-flash-motion` (`8061c93`), **sin merge a `main`** |
 | **Chip de la portada semanal en AXIS** (2026-09-28) | en Greenhouse las plantillas ya pintan «LA NOTICIA» (§4.3); AXIS 0.3.25 lo resuelve como token (`editions.weekly.chips.cover = 'LA NOTICIA'`, igual al del Flash): commit local `84e9588`, **publicación pendiente** |
 | **Glitch Drop en Content Factory** (2026-09-28) | el spec del Content Factory no tiene `kind` para el bloque `efeoncepro/glitch-drop`; en el blog del Flash se insertó con un párrafo marcador y `parse_blocks`/`serialize_blocks` en un eval gobernado. Propuesta escrita en la skill `efeonce-public-site-wordpress` (`references/content-factory-gutenberg.md`) |
-| **Glitch Flash: lo que falta** (2026-09-28) | el Flash ya está en AXIS (token y contrato 0.2.0) y en el Composer (§14.4). Falta: el ancho de la estela en la cabecera grande (150 px) y la separación compacta (8 px) y del banner interno (10 px) como valores del token (hoy son medidas del canvas aprobado en `glitch.css`); la ruta productiva del Flash (TASK-1921 sólo conoce la edición semanal); y decidir si publicar imágenes de terceros con crédito y sin licencia —decidido para el Flash de Sonnet 5.5— vale para otros Flash (§14.4) |
+| ~~Glitch Flash: lo que falta~~ (2026-09-28) | **RESUELTO** (2026-09-29): medidas de la estela por contexto en el token (`trail.contexts`, AXIS 0.3.25; Greenhouse `76376274a`); ruta productiva TASK-1921 con el Flash (`c43862008`; falta el redespliegue del Job en staging y un smoke); licencia `press` gobernada (§14.4). Abierto: si el Flash admite un reel opcional (el taller ya lo compone como propuesta) |
 | Mezcla de la música con la voz real del host | probarla en una edición real (la demo usa una voz TTS provisional); el ducking lo aplica el editor con los valores de la §13.12 |
 
 Cerrados el 2026-09-27 (§13.12): la **música en el taller** (`2c8f36c`, `ed89a0b`: cada render entrega la música junto a
@@ -1414,9 +1414,9 @@ Ninguna ruta de máquina se versiona: la entrega queda anotada en el manifiesto 
 - La estela es **token** (`glitchLine.editions.flash.masthead.trail`: rejilla, opacidades, separación grande, anchos
   compacto y del banner interno, semilla 1755). El generador vive en Greenhouse
   (`src/lib/glitch-composition/flash-trail.ts`, determinista) y reproduce **celda por celda** el SVG del primer Flash
-  publicado; `pnpm glitch:tokens` lo escribe como `assets/flash-trail.svg` en el acento. El ancho en la cabecera grande
-  (150 px) y las separaciones compacta (8 px) y del banner (10 px) son medidas del canvas aprobado que el token todavía
-  no publica (§11).
+  publicado; `pnpm glitch:tokens` lo escribe como `assets/flash-trail.svg` en el acento. Ancho y separación salen del
+  token por contexto (`trail.contexts`: grande 150/14 px, compacta 66/8 px, banner de noticia 96/10 px; axis-tokens
+  ≥ 0.3.25): ninguna medida de la estela vive literal en `glitch.css`.
 
 ### 14.4 Cómo se compone
 

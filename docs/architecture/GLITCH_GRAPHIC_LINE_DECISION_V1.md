@@ -690,6 +690,13 @@ reproduce las 34 celdas publicadas; `pnpm glitch:tokens` escribe `assets/flash-t
 8. **Push:** `609353e83` y `24e4c72ee` están en `develop` local; `origin/develop` sigue en `53002b352`, con el CI rojo
    hasta que se empujen. Lo decide el operador.
 
+**Estado 2026-09-29:** los ocho quedaron resueltos. (1) TASK-1921 acepta el Flash (`c43862008`). (2) `trail.contexts`
+en AXIS 0.3.25; `glitch.css` lo lee (`76376274a`). (3) Manda lo publicado en el blog; la próxima semanal es la #18
+(`pnpm glitch:editions`). (4) `video.closingLine` en el Composer; en el taller, rama local `feat/glitch-flash-motion`.
+(5) Licencia `press` gobernada sólo en el Flash, aprobada por pieza. (6) `kind: 'glitchDrop'` en Content Factory.
+(7) Chip «LA NOTICIA» como token (`editions.weekly.chips.cover`). (8) Todo empujado a `develop`. Queda abierto si el
+Flash admite un reel opcional.
+
 **Reversibilidad:** ahora el Flash sí tiene código y token: revertirlo exige retirar las seis plantillas `Flash*`, su
 sección de la línea base del gate, `GlitchFlashManifest`/`planGlitchFlash`/`flash-trail.ts` y, en AXIS, las piezas
 `flash-*` y `editions.flash` (el contrato 0.2.0 es aditivo: un intent 0.1.0 sigue resolviendo). El manifiesto semanal

@@ -1016,8 +1016,9 @@ provisional). El ducking lo aplica el editor con los valores de arriba.
   (`src/lib/glitch-composition/flash-trail.ts`, `computeGlitchFlashTrail` / `buildGlitchFlashTrailSvg`: MT19937 con la
   siembra de `random` de Python) y reproduce **celda por celda** las 34 celdas del SVG publicado (test en
   `__tests__/flash.test.ts`). `pnpm glitch:tokens` lo escribe como `catalogs/glitch/assets/flash-trail.svg` en el
-  acento. El ancho en la cabecera grande (150 px) y las separaciones compacta (8 px) y del banner (10 px) son medidas del
-  canvas aprobado en `glitch.css`: el token todavía no las publica (§14.7). Nunca dibujes la estela a mano.
+  acento. Ancho y separación salen del token **por contexto** (`trail.contexts`, axis-tokens ≥ 0.3.25): cabecera
+  grande 150/14 px, cabecera compacta 66/8 px y pie del banner de noticia 96/10 px, como `--gx-flash-trail-*` en
+  `glitch-tokens.css`; `glitch.css` no tiene medidas literales de la estela. Nunca dibujes la estela a mano.
 
 ### 14.4 Cómo se compone
 
@@ -1074,18 +1075,15 @@ provisional). El ducking lo aplica el editor con los valores de arriba.
 
 ### 14.7 Pendiente (no lo decidas por tu cuenta)
 
-- Publicar en el token el ancho de la estela en la cabecera grande (150 px) y las separaciones compacta (8 px) y del
-  banner (10 px): hoy son medidas del canvas aprobado en `glitch.css`.
-- La **ruta productiva** del Flash (TASK-1921: `src/lib/brand-surfaces/production/plan.ts`, `artifact-worker`, MCP):
-  hoy sólo conoce la edición semanal (`planGlitchEdition`); el Flash es taller local (`planGlitchManifest` sólo lo
-  usa `scripts/glitch/compose.ts`).
+- ~~Medidas de la estela en el token~~ → `trail.contexts` (AXIS 0.3.25; Greenhouse fija 0.3.28, `76376274a`).
+- ~~Ruta productiva del Flash~~ → TASK-1921 acepta el Flash (`c43862008`); falta redesplegar el Job `artifact-worker`
+  en staging con las plantillas `Flash*` y hacer un smoke real.
 - ~~Imágenes de terceros sin licencia~~ → excepción `press` gobernada (§14.4); cada uso sigue siendo una aprobación
   del operador por pieza.
-- ~~Numeración~~ → resuelta (§1). Pendiente sólo en AXIS: retirar `pendingDecisions: edition-numbering-blog-vs-system`.
-- ~~Última frase del video en el Composer~~ → `video.closingLine` (§6). Pendiente: la pieza `cta` del **taller** de
-  motion (`nextEdition`, TASK-1924).
-- **Content Factory** no tiene `kind` para `efeoncepro/glitch-drop`: en el blog del Flash el Drop se inyectó con un
-  párrafo marcador + `parse_blocks`/`serialize_blocks` en un eval gobernado. Propuesta escrita en la skill
-  `efeonce-public-site-wordpress`, `references/content-factory-gutenberg.md`.
-- **Push:** los commits `609353e83` (tokens de La órbita) y `24e4c72ee` (Flash en el Composer) están en `develop`
-  local, sin empujar; `origin/develop` = `53002b352` con el CI rojo hasta que se empujen. Lo decide el operador.
+- ~~Numeración~~ → resuelta (§1) y registrada en AXIS 0.3.25 (`resolvedDecisions`).
+- ~~Última frase del video~~ → `video.closingLine` en el Composer (§6); en el taller, `closingLine` en la rama local
+  `feat/glitch-flash-motion` (sin merge).
+- ~~Content Factory sin `kind` para el Drop~~ → `kind: 'glitchDrop'` (`c6f076e9f`).
+- **Video del Flash:** el manifiesto Flash rechaza `video`, pero el taller ya compone un Flash en motion (PROPUESTA sin
+  aprobar). Decide el operador si el Flash admite un reel opcional.
+- **Chip de la tarjeta del kit** en el Flash: hoy «· LA NOTICIA»; propuesta «ANUNCIO» (como la lámina interior).
