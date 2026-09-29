@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`)."
+description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), and the SEO/AEO product sub-brands SV360, AEO, AEO Assessment and AI Visibility Report (`axis-brand-assets` 0.4.2, Lab `/references/seo-aeo/`)."
 ---
 
 # AXIS Design System
@@ -266,9 +266,9 @@ Rules for agents:
   variants. Threshold 4.5 vs 3:1 pending the operator.
 - **The orbit never replaces the photographic composition** and never crosses subject, text reserves, bed or
   signature (`orbit-never-over-subject-or-reserves`).
-- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; latest `0.4.0`; Greenhouse pins `0.3.5`): 25 brand SVG since
-  `0.4.0` (19 until `0.3.6`: logo/isotype per brand, URL bubble source and baked variants; `0.4.0` adds the Insights
-  logo/isotype and the `lockup` kind, see «Efeonce Insights in AXIS») plus the 48 static orbits, SHA-256 sealed; `findBrandAsset`, `brandAssetUrl`,
+- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; `0.4.2` being released on 2026-09-29; Greenhouse pins `0.4.1`): 58 brand SVG since
+  `0.4.2` (19 until `0.3.6`: logo/isotype per brand, URL bubble source and baked variants; `0.4.0` adds the Insights
+  logo/isotype and the `lockup` kind, see «Efeonce Insights in AXIS»; `0.4.2` adds 33 SEO/AEO sub-brand files and the `white` variant, see «SEO/AEO product sub-brands in AXIS») plus the 48 static orbits, SHA-256 sealed; `findBrandAsset`, `brandAssetUrl`,
   `findOrbitAsset`. Consumers read the package, never a hand copy (Greenhouse guards its local copies with
   `src/config/efeonce-brand-assets.test.ts`). Not `efeonce.brand-logos` (third-party logo provenance).
 - **Motion:** the orbit animation (no logo) comes from this package (`ORBIT_MOTION_CSS`, `pnpm orbit:video`); the
@@ -619,7 +619,7 @@ What AXIS holds for Efeonce Insights, and nothing more:
   3.07:1) and only the sphere keeps the Growth accent. Files are generated in
   Greenhouse by `scripts/brand/build-insights-logo.mjs` and re-sealed with `packages/brand-assets/scripts/seal.mjs`; never edited by hand. The
   Lab copies them to `apps/lab/public/branding/` via `apps/lab/scripts/sync-brand-assets.mjs`.
-- **Greenhouse pins `0.3.5`**, so it does not carry these files yet; Think uses manual copies. The Greenhouse PDF/deck covers
+- **Greenhouse pinned `0.3.5`** on 2026-09-28 (today it pins `0.4.1`, which carries these files; the PDF/deck covers still do not use them); Think uses manual copies. The Greenhouse PDF/deck covers
   show a type version (Efeonce logo + rule + «INSIGHTS» set in spaced capitals — `text-transform: uppercase` +
   `letter-spacing: 0.34em`, not font small caps), not the official lockup file. **Open operator decision:** on those
   navy covers «INSIGHTS» is painted in the accent (`navyAccent` = teal-500, 12 px) with its own proportions, which
@@ -650,6 +650,42 @@ What AXIS holds for Efeonce Insights, and nothing more:
 - **Known drift:** the root README table and `docs/ARCHITECTURE.md` §Official brand files («0.3.0 … 19 SVGs») still
   describe older `axis-brand-assets` versions.
 - Detail of the report and the live UI: `efeonce-insights` → `references/ui-and-brand.md`.
+
+### SEO/AEO product sub-brands in AXIS (brand assets + Lab; 2026-09-29)
+
+The operator approved four **Efeonce product sub-brands** for the SEO/AEO practice, with logos («todas estas son
+submarcas de producto de Efeonce»; «están aprobados todos»; canvas of record «Marcas SEO y AEO de Efeonce»,
+https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac): **Efeonce | SV360** (Search Visibility 360, the full SEO + AEO
+product capability), **Efeonce | AEO** (brand visibility in AI answers), **Efeonce | AEO Assessment** (the process that
+evaluates the brand) and **Efeonce | AI Visibility Report** (the deliverable). Same pattern as Insights: they accompany
+Efeonce in a lockup and **never sign alone**. Naming: Greenhouse ADR `EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md` §Delta
+2026-09-29 (it updates the earlier «not a product brand» clause; legacy aliases unchanged).
+
+- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.2`** (tag `v0.4.2`, **being released on 2026-09-29** —
+  confirm the tag before citing it as published): export `AXIS_SEO_AEO_BRANDS` (`sv360`, `aeo`, `aeo-assessment`,
+  `ai-visibility-report`) and the new variant `white`; 33 new SVG (58 total):
+  `{sv360,aeo,aeo-assessment,ai-visibility-report}-logo-{positive,negative,white}`, `{sv360,aeo}-isotype-{…}` (Assessment
+  and Report have no isotype), `{…}-lockup-{positive,negative,white}` and `sv360-name-lockup-{…}` (lockup with the full
+  «Search Visibility 360»). Surfaces: positive = light, negative = dark, white = any.
+- **Construction («the orbit lives in the O»):** the o of the Efeonce logo is already the ship in orbit; each sub-brand
+  inherits it in its own O — AEO's O (sphere at 1:30), SV360's 0 (a full turn: the sphere back at 12, the line at 100 %)
+  and the o of «Report» (the smallest orbit of the family, weakest at small sizes). Poppins Bold; the descriptors
+  «Assessment» and «Search Visibility 360» in Poppins Medium, smaller. Thin ring in the word's ink, sphere in the
+  **Engine** line accent (`#0375db`, `efeonceGraphicLine.lines` key `engine`), a cut in the ring around the sphere; the
+  full ring was rejected (it reads as a C with a dot). Lockups use the Insights measures (Efeonce 30 px high, 20 air,
+  rule 1 × 26, 20 air), sub-brand in measured gray (`#6b6b6b` on paper; `#6f89a2`: 4.83:1 on `#001a33`, 4.55:1 on
+  `#091951`), only the sphere in the accent. `white` is all white (sphere and Efeonce logo included) for photos and
+  colored grounds; on the line's dark ground use the negative.
+- **Line:** SEO/AEO pieces belong to **Engine** (web, infrastructure, SEO and measurement): accent `#0375db`, dark ground
+  `#091951`, slogan word «Engine» («Empower your Engine») in the closes.
+- **Generation:** Greenhouse `scripts/brand/build-seo-aeo-logos.mjs` (fontkit Poppins outlines; colors read from
+  `@efeoncepro/axis-tokens`), then copy to `packages/brand-assets/assets/` and re-seal; never edit the SVG by hand.
+- **Lab reference page** `/references/seo-aeo/` + `/references/seo-aeo.json`, agent guide
+  `docs/agent-composition/seo-aeo.md` — **being built on 2026-09-29**; verify it answers before linking it as published.
+- **Greenhouse pins `0.4.1`**: it does not carry these files until TASK-1938 (Grader report PDF with the «Efeonce | AI
+  Visibility Report» lockup, Engine palette) bumps the version.
+- Criterion and application map: `efeonce-graphic-line` → `criteria.md` («Submarcas de producto SEO/AEO») and
+  `applications.md` §B3c; Greenhouse norm `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §7.2.
 
 ### AXIS Lab
 

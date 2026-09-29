@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.16
+> **Versión:** 1.17
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-28 por Claude (1.16: §7.1 precisada contra el código — página del Lab de Insights aún sin publicar, variante negativa también en la portada de presentación, mini-lockups de capítulo, tamaños en uso en Think, imagen OG, pantallas de estado, recetas del deck y la decisión abierta del color de «INSIGHTS» en las portadas PDF. Antes, 1.15: §7.1 nueva — Insights, marca de producto que acompaña: construcción, reglas, lockup, dónde se aplica y gaps; §8.6 con `axis-brand-assets` 0.4.0. Antes, 1.14: §10.0 al día con el cierre de TASK-1928 — las 69 recetas del deck con plantilla en el Artifact Composer, AXIS fijado en `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19, enlace a la spec técnica `GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`. Antes, 2026-09-27, 1.13: §10.0 al día con el cierre de TASK-1927 — contrato `efeonce.surface-composition` 0.1.2 publicado en AXIS `v0.3.14` y fijado en Greenhouse; el deck con sus 16 plantillas, incluidas las portadas y contraportadas, y el documento completo con `pnpm brand:compose`; el contenido de una lámina es dato del intent. Antes, 1.12: portadas y contraportadas aprobadas por el operador — pares aprobados para portadas y contraportada de brochure, §4; el eslogan como mensaje principal de la contraportada de propuesta y nunca en la portada, §5; puntero de §10.1 a la composición por superficie §4.6. Antes, el mismo día: IA, social y staff, D26: §14 y §14.1, 19 íconos nuevos, set en 36 Trazo + 43 Plastilina = 79 y 43 volúmenes; `axis-graphic-line` 0.6.0 y `axis-brand-assets` 0.3.4, publicados con el tag `v0.6.0`; Greenhouse fija esas versiones. Antes, el mismo día: oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-09-29 por Claude (1.17: §7.2 nueva — submarcas de producto SEO/AEO (SV360, AEO, AEO Assessment, AI Visibility Report), «la órbita vive en la O», línea Engine, lockups y variante `white`; §8.6 con `axis-brand-assets` 0.4.2 publicado el 2026-09-29. Antes, 2026-09-28, 1.16: §7.1 precisada contra el código — página del Lab de Insights aún sin publicar, variante negativa también en la portada de presentación, mini-lockups de capítulo, tamaños en uso en Think, imagen OG, pantallas de estado, recetas del deck y la decisión abierta del color de «INSIGHTS» en las portadas PDF. Antes, 1.15: §7.1 nueva — Insights, marca de producto que acompaña: construcción, reglas, lockup, dónde se aplica y gaps; §8.6 con `axis-brand-assets` 0.4.0. Antes, 1.14: §10.0 al día con el cierre de TASK-1928 — las 69 recetas del deck con plantilla en el Artifact Composer, AXIS fijado en `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19, enlace a la spec técnica `GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`. Antes, 2026-09-27, 1.13: §10.0 al día con el cierre de TASK-1927 — contrato `efeonce.surface-composition` 0.1.2 publicado en AXIS `v0.3.14` y fijado en Greenhouse; el deck con sus 16 plantillas, incluidas las portadas y contraportadas, y el documento completo con `pnpm brand:compose`; el contenido de una lámina es dato del intent. Antes, 1.12: portadas y contraportadas aprobadas por el operador — pares aprobados para portadas y contraportada de brochure, §4; el eslogan como mensaje principal de la contraportada de propuesta y nunca en la portada, §5; puntero de §10.1 a la composición por superficie §4.6. Antes, el mismo día: IA, social y staff, D26: §14 y §14.1, 19 íconos nuevos, set en 36 Trazo + 43 Plastilina = 79 y 43 volúmenes; `axis-graphic-line` 0.6.0 y `axis-brand-assets` 0.3.4, publicados con el tag `v0.6.0`; Greenhouse fija esas versiones. Antes, el mismo día: oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -381,6 +381,57 @@ la ficha de Insights y «herramientas del día» tiene el ícono y la nota desal
 portadas PDF (decisión abierta, arriba); Greenhouse fija `axis-brand-assets` 0.3.5 y no trae los archivos; las copias de Think son
 manuales. Mapa técnico: [arquitectura de Insights §6.3](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md).
 
+### 7.2 Submarcas de producto SEO/AEO: «la órbita vive en la O» (aprobadas el 2026-09-29)
+
+La práctica SEO/AEO tiene cuatro **submarcas de producto de Efeonce**, con logo (operador, 2026-09-29: «todas estas son
+submarcas de producto de Efeonce»; «están aprobados todos»; canvas de registro
+[«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac)). Naming y alcance:
+[ADR de naming §Delta 2026-09-29](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md#delta-2026-09-29--submarcas-de-producto-seoaeo-con-logo).
+
+| Submarca | Qué nombra | Archivos |
+|---|---|---|
+| **Efeonce \| SV360** | Search Visibility 360, la capacidad completa de producto SEO + AEO | `sv360-logo-*`, `sv360-isotype-*`, `sv360-lockup-*`, `sv360-name-lockup-*` (lockup con «Search Visibility 360») |
+| **Efeonce \| AEO** | la visibilidad de marca en respuestas de IA | `aeo-logo-*`, `aeo-isotype-*`, `aeo-lockup-*` |
+| **Efeonce \| AEO Assessment** | el proceso en el que se evalúa la marca | `aeo-assessment-logo-*`, `aeo-assessment-lockup-*` (sin isotipo) |
+| **Efeonce \| AI Visibility Report** | el entregable | `ai-visibility-report-logo-*`, `ai-visibility-report-lockup-*` (sin isotipo) |
+
+**Construcción: la órbita vive en la O.** La o del logo de Efeonce ya es la nave en órbita; cada submarca la hereda en
+su propia O. En AEO, la O con la esfera a las 1:30; en SV360, el 0 es la vuelta completa: la esfera vuelve a las 12 (la
+regla de la línea al 100 %); en el Report, la o de «Report». Palabra en Poppins Bold; los descriptores «Assessment» y
+«Search Visibility 360» en Poppins Medium, más chicos (en el Report, «AI Visibility» en Bold y «Report» en Medium). La
+letra se reemplaza por un anillo fino en la tinta de la palabra, con la esfera en el acento de la línea **Engine**
+(`#0375db`, de `efeonceGraphicLine.lines`, clave `engine`) y un corte en el anillo alrededor de la esfera, como el
+planeta del logo de Efeonce. **Descartado:** el anillo pleno, porque se lee como una C con punto. El Report es la órbita
+más chica de la familia y la más débil en tamaños chicos.
+
+**Línea.** SEO y AEO pertenecen a la línea **Engine** (web, infraestructura, SEO y medición): acento `#0375db`, fondo
+oscuro `#091951` y «Engine» como palabra del eslogan («Empower your Engine») en los cierres de estas piezas. La paleta
+Engine quedó aprobada con la portada del informe aprobada en el canvas.
+
+**Reglas.**
+
+- **Acompañan, nunca firman** (mismo patrón que Insights, §7.1): van junto al logo de Efeonce, separadas por un filete
+  fino, y la firma sigue siendo el logo de Efeonce en el pie. No llevan «by efeonce».
+- **Junto a Efeonce bajan su brillo:** en el lockup la submarca va en el gris medido —`#6b6b6b` sobre papel; `#6f89a2`
+  en negativo (4,83:1 sobre `#001a33`, 4,55:1 sobre `#091951`)— y sólo la esfera conserva el acento.
+- **El lockup es un archivo, nunca se rearma:** medidas del lockup de Insights (Efeonce 30 px de alto, aire 20, filete
+  1 × 26, aire 20).
+- **Variantes:** `positive` (papel), `negative` (fondo oscuro; sobre el oscuro de la línea se usa ésta) y `white`
+  (todo blanco, esfera y logo de Efeonce incluidos) para fotos y fondos de color donde el acento no alcanza contraste.
+- **Isotipos:** sólo SV360 y AEO.
+- **Nunca se editan a mano:** se regeneran con `scripts/brand/build-seo-aeo-logos.mjs` (contornos de Poppins con
+  fontkit; colores leídos de `@efeoncepro/axis-tokens`) y se vuelven a sellar en AXIS.
+
+**Archivos.** `@efeoncepro/axis-brand-assets` **0.4.2** (tag `v0.4.2`, **publicado el 2026-09-29, AXIS `main` `7f9c8bb`**): 33 SVG nuevos
+(58 en total), export `AXIS_SEO_AEO_BRANDS` y la variante nueva `white`. Referencia visual en el Lab de AXIS:
+`/references/seo-aeo/` y `/references/seo-aeo.json`, con la guía `docs/agent-composition/seo-aeo.md` (publicados el
+2026-09-29; responden 200). Greenhouse fija `axis-brand-assets` 0.4.1: los archivos llegan cuando se implemente TASK-1938.
+
+**Aplicaciones aprobadas en el canvas.** Landing del AEO Assessment («¿Te recomiendan las IA? / Averígualo»), portada
+del AI Visibility Report y post 1:1 de SV360. **Primera aplicación en producto:** el PDF del informe del Grader
+(TASK-1938) lleva el lockup «Efeonce | AI Visibility Report» en sus dos versiones (cliente / no cliente) y pasa a la
+paleta Engine.
+
 ---
 
 ## 8. Logo e isotipo
@@ -493,7 +544,9 @@ fusionar y las horneadas `url-bubble-baked-light` y `url-bubble-baked-dark`), ca
 proporción de su viewBox. No incluye fuentes ni fotos, y no es `efeonce.brand-logos` (la procedencia de logos de
 terceros en interfaces). Las copias locales de Greenhouse se vigilan contra el paquete (§13). Desde 0.3.0 el paquete
 suma además 48 órbitas estáticas (SVG + PNG), generadas desde `@efeoncepro/axis-graphic-line` (§13.1). Desde 0.4.0
-(2026-09-28) son 25 SVG: suma la marca de Insights (logo e isotipo, positivo y negativo) y su lockup con Efeonce (§7.1).
+(2026-09-28) son 25 SVG: suma la marca de Insights (logo e isotipo, positivo y negativo) y su lockup con Efeonce (§7.1). Desde 0.4.2
+(2026-09-29, tag `v0.4.2`) son 58 SVG: suma las submarcas SEO/AEO en `positive`, `negative` y la variante nueva
+`white` (§7.2).
 
 ---
 

@@ -385,6 +385,28 @@ de 24 px». Cambiarlo toca el contrato de fidelidad de TASK-1889. Los pies de ca
 Efeonce) y no cuentan como la órbita de la pieza; el hero de Think y la imagen OG la ponen junto a una órbita de acento,
 revisado a ojo el 2026-09-28. Es la interpretación de quien construyó la marca, pendiente de confirmación del operador.
 
+### B3c. Submarcas de producto SEO/AEO — dónde se aplican (2026-09-29)
+
+Las cuatro submarcas (**Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment**, **Efeonce | AI Visibility
+Report**; criterio en [criteria.md](criteria.md), «Submarcas de producto SEO/AEO») acompañan a Efeonce y **nunca
+firman**: junto al logo de Efeonce se usa el archivo `*-lockup-*` (o `sv360-name-lockup-*` cuando se quiere el nombre
+completo «Search Visibility 360»), nunca los dos logos armados a mano. Piezas de la línea **Engine**: acento `#0375db`,
+fondo oscuro `#091951`, «Empower your Engine» en el cierre. Variante `white` para foto y fondos de color; sobre el
+oscuro de la línea, la negativa.
+
+| Superficie | ¿Lleva la marca? | Estado | Dónde |
+|---|---|---|---|
+| Landing del AEO Assessment («¿Te recomiendan las IA? / Averígualo») | sí | aprobada en el canvas; no implementada | canvas «Marcas SEO y AEO de Efeonce» |
+| Portada del AI Visibility Report | sí | aprobada en el canvas (aprobó también la paleta Engine) | canvas |
+| Post 1:1 de SV360 | sí | aprobado en el canvas | canvas |
+| PDF del informe del Grader (versión cliente y no cliente) | sí, lockup «Efeonce \| AI Visibility Report» | por implementar; pasa a la paleta Engine | TASK-1938 (dueña del cambio) |
+
+Canvas de registro: [«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac) (sistema, hojas
+por marca, versión en blanco y aplicaciones). Archivos en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el
+2026-09-29, AXIS `main` `7f9c8bb`); Greenhouse fija 0.4.1 y los recibe con TASK-1938. Referencia visual en el Lab de AXIS
+`/references/seo-aeo/` (JSON `/references/seo-aeo.json`, guía `docs/agent-composition/seo-aeo.md`; publicados el
+2026-09-29). Norma: manual §7.2.
+
 ### B4. Deck de Insights y correo de aviso
 
 - **Deck de Insights:** portada, figura y cierre en 16:9; la órbita chica de la esquina es la navegación (3 de 5); pie

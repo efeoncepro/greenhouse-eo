@@ -128,6 +128,8 @@ Una sola marca lidera toda la relación externa: **Efeonce es la marca paraguas*
 
 > Implicación de producto: Greenhouse puede organizar internamente por líneas de negocio, product brands, ownership y delivery. La experiencia de cara al cliente debe liderar con "Efeonce" como marca paraguas y mostrar la product brand solo cuando aporte claridad. No expongas líneas o marcas como proveedores contractuales separados.
 
+> **Submarcas de producto que acompañan (2026-09-29):** distintas de las product brands de la tabla, **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** (línea Engine / Digital Services & Engineering) son submarcas de producto de Efeonce con logo: van siempre en lockup con Efeonce (mismo patrón que Efeonce Insights) y nunca firman solas. [ADR de naming §Delta 2026-09-29](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md#delta-2026-09-29--submarcas-de-producto-seoaeo-con-logo).
+
 ---
 
 ## Sistema verbal: "Empower your ___"

@@ -8,6 +8,8 @@
 - **Confidence:** high para la decisión de arquitectura de marca; medium para copy y adopción de cada superficie, que requieren verificación al publicarse.
 - **Validated as of:** 2026-09-29. Decisión explícita del operador; contrastada con la arquitectura del grader, el módulo SEO y el glosario de AEO. No es una verificación de despliegue ni de disponibilidad legal de nombres.
 
+> **Delta 2026-09-29 (addendum de decisión):** el operador aprobó, el mismo día, que **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** son **submarcas de producto de Efeonce** con logo propio. Esto actualiza las cláusulas 1 y 2 («no es una product brand independiente», «no crea una segunda marca»): ver [§Delta 2026-09-29](#delta-2026-09-29--submarcas-de-producto-seoaeo-con-logo). Efeonce sigue siendo la masterbrand y la única que firma.
+
 ## Context
 
 El motor AEO de Greenhouse aparece en documentos y código como **AI Visibility Grader**, **Brand Visibility Grader** o **AEO Grader**. Son nombres comprensibles para encontrar el trabajo previo y los contratos técnicos, pero no había un nombre comercial formal que acumulara reconocimiento para Efeonce. **Search Visibility 360** ya nombra la oferta más amplia que reúne SEO y AEO. La metodología **Surround Discovery** existe en documentación previa, pero el operador no quiere depender de que el mercado la conozca antes de entrar por AEO.
@@ -52,3 +54,25 @@ Esta es una decisión de **nomenclatura y arquitectura de marca**, no un cambio 
 - Una búsqueda de disponibilidad marcaria o un conflicto real obligue a modificar el nombre.
 - La capacidad evolucione materialmente más allá de visibilidad/optimización en respuestas y búsqueda con IA, o la arquitectura de la oferta SEO+AEO cambie.
 - La medición de atribución de marca demuestre que otra arquitectura de naming transfiere mejor reconocimiento a Efeonce.
+
+## Delta 2026-09-29 — submarcas de producto SEO/AEO con logo
+
+**Decisión del operador (addendum).** «todas estas son submarcas de producto de Efeonce» y «están aprobados todos», sobre el canvas de registro [«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac) (sistema, hojas por marca, versión en blanco y aplicaciones). Cuatro submarcas de producto de la práctica SEO/AEO, cada una con logo:
+
+| Submarca | Qué nombra |
+|---|---|
+| **Efeonce \| SV360** (Search Visibility 360) | la capacidad completa de producto SEO + AEO |
+| **Efeonce \| AEO** | la capacidad de visibilidad de marca en respuestas de IA |
+| **Efeonce \| AEO Assessment** | el proceso en el que se evalúa la marca (el diagnóstico) |
+| **Efeonce \| AI Visibility Report** | el entregable |
+
+El operador corrigió el nombre del proceso a **Efeonce AEO Assessment** (no «AI Assessment»).
+
+**Qué cambia.** Las cláusulas 1 y 2 de §Decision decían que Efeonce AEO «no es una product brand independiente» y que `Assessment` «no crea una segunda marca». Desde este addendum son **submarcas de producto que acompañan a Efeonce**, con el mismo patrón que [Efeonce Insights](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) (§7.1): Efeonce sigue siendo la masterbrand, la relación comercial y **la única que firma**; las submarcas van junto al logo de Efeonce (lockup) y **nunca firman solas**. No son product brands independientes como Globe, Wave o Reach. La cláusula 3 (Report) y la 4 (Search Visibility 360 como oferta amplia) se mantienen; SV360 pasa a tener, además, su logo.
+
+**Qué no cambia.** La regla de aliases (cláusula 6) sigue igual: `AI Visibility Grader`, `Brand Visibility Grader` y `AEO Grader` son aliases técnicos/históricos; los identificadores (`growth.ai_visibility`, `growth.seo`, rutas `/ai-visibility/`, `grader_*`) no se renombran. Tampoco cambian el runtime, el scoring ni el contrato de reporte, y este addendum no demuestra que las superficies publicadas ya muestren los logos.
+
+**Identidad visual («la órbita vive en la O»).** La o del logo de Efeonce ya es la nave en órbita; cada submarca la hereda en su propia O: la O de AEO (esfera a las 1:30), el 0 de SV360 (vuelta completa: la esfera vuelve a las 12, la regla de la línea al 100 %) y la o de «Report». Pertenecen a la línea **Engine** (web, infraestructura, SEO y medición): esfera en `#0375db`, fondo oscuro `#091951`, eslogan «Empower your Engine» en los cierres. Criterio, lockups y variantes: [línea gráfica §7.2](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). Archivos oficiales: `@efeoncepro/axis-brand-assets` `0.4.2` (publicado el 2026-09-29; `sv360-*`, `aeo-*`, `aeo-assessment-*`, `ai-visibility-report-*`), generados con `scripts/brand/build-seo-aeo-logos.mjs` y nunca editados a mano. Referencia visual en el Lab de AXIS: `/references/seo-aeo/` (publicados el 2026-09-29; responden 200).
+
+**Primera aplicación.** El PDF del informe del Grader (TASK-1938) lleva el lockup «Efeonce | AI Visibility Report» en sus dos versiones (cliente / no cliente) y pasa a la paleta Engine; la task es la dueña de ese cambio.
+

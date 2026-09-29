@@ -23,6 +23,8 @@ description: >-
 
 La capacidad se llama **Efeonce AEO**; el diagnóstico público, **Efeonce AEO Assessment**; el entregable, **Efeonce AI Visibility Report**. **Search Visibility 360** conserva el alcance más amplio de SEO + AEO. Usar **AI Visibility Grader**, **Brand Visibility Grader** o **AEO Grader** sólo como aliases técnicos o históricos al localizar el motor y sus documentos. El diagnóstico debe acumular reconocimiento para la masterbrand Efeonce; no depende de posicionar primero una metodología interna. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
 
+Las cuatro son **submarcas de producto de Efeonce** con logos oficiales (aprobadas el 2026-09-29): **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report**, en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29). Acompañan a Efeonce en un lockup y nunca firman solas; referencia visual en el Lab de AXIS `https://axis.efeonce.org/references/seo-aeo/` (publicados el 2026-09-29; responden 200). Canon: ADR de naming §Delta 2026-09-29.
+
 Para decisiones transversales de packaging, pricing, billing, margen, descuentos y créditos cargar también
 `efeonce-pricing-operator`. Esta skill conserva las reglas específicas de Search Visibility 360 y sus hipótesis de
 mercado, oferta, venta y retención.

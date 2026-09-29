@@ -572,6 +572,21 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
   18 px de cuerpo sugeridos para el logo; el lockup no tiene mínimo escrito (el menor en producción: 24 px de alto en
   móvil, Think). Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`); ejemplo vivo del producto: la muestra
   `think.efeoncepro.com/insights/muestra`.
+- **Submarcas de producto SEO/AEO: «la órbita vive en la O»** (operador, 2026-09-29: «todas estas son submarcas de
+  producto de Efeonce»; «están aprobados todos»; canvas «Marcas SEO y AEO de Efeonce»). **Efeonce | SV360** (la
+  capacidad completa SEO + AEO), **Efeonce | AEO** (visibilidad de marca en respuestas de IA), **Efeonce | AEO
+  Assessment** (el proceso que evalúa la marca) y **Efeonce | AI Visibility Report** (el entregable). Mismo patrón que
+  Insights: acompañan a Efeonce en un lockup (Efeonce 30 px, aire 20, filete 1 × 26, aire 20; la submarca en gris
+  medido `#6b6b6b` / `#6f89a2`, sólo la esfera en el acento) y **nunca firman**. La o del logo de Efeonce ya es la nave
+  en órbita y cada submarca la hereda en su propia O: la O de AEO (esfera a las 1:30), el 0 de SV360 (vuelta completa:
+  la esfera vuelve a las 12, la línea al 100 %) y la o de «Report» (la órbita más chica, la más débil en tamaños
+  chicos). Anillo fino en la tinta de la palabra, esfera en el acento de **Engine** (`#0375db`), corte alrededor de la
+  esfera; el anillo pleno se descartó (se lee como una C con punto). Línea Engine: fondo oscuro `#091951`, «Empower
+  your Engine» en los cierres. Variantes `positive`, `negative` y `white` (todo blanco, para fotos y fondos de color;
+  sobre el oscuro de la línea, la negativa); isotipos sólo SV360 y AEO. Archivos `@efeoncepro/axis-brand-assets` 0.4.2
+  (publicado el 2026-09-29, AXIS `main` `7f9c8bb`), nunca editados a mano (`scripts/brand/build-seo-aeo-logos.mjs`). Norma: manual §7.2;
+  aplicaciones: [applications.md](applications.md) §B3c; naming: ADR `EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md` §Delta
+  2026-09-29.
 
 - **La firma de una pieza gráfica es el logo de Efeonce centrado, abajo al centro.** Cierra la composición al pie
   (manual §8.1; Tres voces, «la firma debe cerrar la composición al pie»).

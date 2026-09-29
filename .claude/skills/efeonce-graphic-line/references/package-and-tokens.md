@@ -603,7 +603,7 @@ Greenhouse: `ai-generations/2026-09-26_firma-partners/build4.mjs` (`HOST_BASE=�
 
 ## 6. `@efeoncepro/axis-brand-assets`
 
-25 SVG oficiales sellados con SHA-256 (19 hasta 0.3.6; 0.4.0 suma la marca de Insights y su lockup) (`src/manifest.ts`, generado por `scripts/seal.mjs`) + 48 órbitas estáticas.
+58 SVG oficiales sellados con SHA-256 desde 0.4.2 (19 hasta 0.3.6; 25 desde 0.4.0, que suma la marca de Insights y su lockup; 0.4.2, **publicado el 2026-09-29, AXIS `main` `7f9c8bb`**, suma 33 de las submarcas SEO/AEO) (`src/manifest.ts`, generado por `scripts/seal.mjs`) + 48 órbitas estáticas.
 No incluye fuentes, fotos, el logo ni la marca de Greenhouse, ni el archivo del eslogan.
 
 | id | kind | surface | variant | aspectRatio (alto/ancho) |
@@ -615,14 +615,27 @@ No incluye fuentes, fotos, el logo ni la marca de Greenhouse, ni el archivo del 
 | `reach-logo-positive` · `reach-logo-negative` · `reach-isotype-*` | | | | 0,3128 · 0,3115 · 1,0143 |
 | `insights-logo-*` · `insights-isotype-*` (desde 0.4.0) | | | | 0,2906 · 3,4231 |
 | `insights-lockup-positive` / `-negative` (desde 0.4.0) | **lockup** | light / dark | positive / negative | Efeonce + filete + Insights en gris (`#6b6b6b` / `#6f89a2`); nunca se rearma |
+| `sv360-logo-*` · `sv360-isotype-*` · `sv360-lockup-*` · `sv360-name-lockup-*` (desde 0.4.2) | logo / isotype / lockup | light / dark / any | positive / negative / **white** | Efeonce \| SV360; `name-lockup` suma «Search Visibility 360» |
+| `aeo-logo-*` · `aeo-isotype-*` · `aeo-lockup-*` (desde 0.4.2) | logo / isotype / lockup | | positive / negative / white | Efeonce \| AEO |
+| `aeo-assessment-logo-*` · `aeo-assessment-lockup-*` (desde 0.4.2) | logo / lockup | | positive / negative / white | Efeonce \| AEO Assessment (sin isotipo) |
+| `ai-visibility-report-logo-*` · `ai-visibility-report-lockup-*` (desde 0.4.2) | logo / lockup | | positive / negative / white | Efeonce \| AI Visibility Report (sin isotipo) |
 | `url-bubble-source` | url-bubble | any | source (gris `#848484`, fusionar con luminosidad) | 0,1968 |
 | `url-bubble-baked-light` | url-bubble | light | baked (`#848484`) | 0,1968 |
 | `url-bubble-baked-dark` | url-bubble | dark | baked (`#6f89a2`) | 0,1968 |
 
 **Insights (0.4.0, tag `v0.4.0`):** marca `insights` en `AXIS_BRAND_ASSET_BRANDS`; `kind: 'lockup'` es nuevo y sólo lo usa
 `insights-lockup-*`. Se generan en Greenhouse con `scripts/brand/build-insights-logo.mjs` y se re-sellan con
-`scripts/seal.mjs`; nunca se editan a mano. **Greenhouse fija 0.3.5** (`package.json`): no los trae todavía. Dónde se
+`scripts/seal.mjs`; nunca se editan a mano. **Greenhouse fijaba 0.3.5** al 2026-09-28; hoy fija 0.4.1, que ya los trae. Dónde se
 aplican y dónde no: [applications.md](applications.md) §B3b.
+
+**Submarcas SEO/AEO (0.4.2, tag `v0.4.2`, publicado el 2026-09-29, AXIS `main` `7f9c8bb`):** export nuevo `AXIS_SEO_AEO_BRANDS` y variante nueva `white` (todo blanco, esfera y logo de Efeonce
+incluidos, para fotos y fondos de color). 33 SVG: `{sv360,aeo,aeo-assessment,ai-visibility-report}-logo-{positive,negative,white}`,
+`{sv360,aeo}-isotype-{positive,negative,white}`, los cuatro `*-lockup-{positive,negative,white}` y
+`sv360-name-lockup-{positive,negative,white}`. Se generan en Greenhouse con `scripts/brand/build-seo-aeo-logos.mjs`
+(contornos de Poppins con fontkit; colores de `@efeoncepro/axis-tokens`, esfera en el acento de Engine `#0375db`) y se
+re-sellan; nunca se editan a mano. Greenhouse fija 0.4.1 y los recibe con TASK-1938. Lab: `/references/seo-aeo/` y
+`/references/seo-aeo.json`, guía `docs/agent-composition/seo-aeo.md` (publicados el 2026-09-29; responden 200). Criterio:
+[criteria.md](criteria.md) («Submarcas de producto SEO/AEO»); aplicaciones: [applications.md](applications.md) §B3c.
 
 Tipo `AxisBrandAsset = { id, file (`<id>.svg`), brand, kind, surface, variant, sha256, aspectRatio, note? }`.
 
