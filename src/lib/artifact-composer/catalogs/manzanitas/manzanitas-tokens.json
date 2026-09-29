@@ -3,10 +3,10 @@
     "package": "@efeoncepro/axis-tokens",
     "export": "manzanitasRegister",
     "versions": {
-      "@efeoncepro/axis-tokens": "0.3.31",
+      "@efeoncepro/axis-tokens": "0.3.33",
       "@efeoncepro/axis-brand-assets": "0.4.4",
       "@efeoncepro/axis-graphic-line": "0.11.0",
-      "@efeoncepro/axis-ui-contracts": "0.3.31"
+      "@efeoncepro/axis-ui-contracts": "0.3.33"
     }
   },
   "register": "marketing-con-manzanitas",

@@ -36,11 +36,11 @@ importers:
         specifier: 0.11.0
         version: 0.11.0(react@19.2.3)
       '@efeoncepro/axis-tokens':
-        specifier: 0.3.31
-        version: 0.3.31
+        specifier: 0.3.33
+        version: 0.3.33
       '@efeoncepro/axis-ui-contracts':
-        specifier: 0.3.31
-        version: 0.3.31
+        specifier: 0.3.33
+        version: 0.3.33
       '@efeoncepro/axis-ui-registry':
         specifier: 0.3.1
         version: 0.3.1
@@ -884,8 +884,8 @@ packages:
   '@efeoncepro/axis-tokens@0.3.29':
     resolution: {integrity: sha512-U4EFJpYgk1NtDFfjoVmNRZNaXkzF/tak54nviZmDjIqs7lig7U3JQlrY7fY1TPjuNJ2ZqdSLzbTBQ/6mFOHk9A==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.3.29/7d612331ca174ec892191e9d2df400654f5e5711}
 
-  '@efeoncepro/axis-tokens@0.3.31':
-    resolution: {integrity: sha512-rn9J571HS0KSicr9v3NXId4uqcK0/8BNQGIgb7wdV7dhkRtANNFhN6SxACJ6mU/tPUSgzp7zIwuh0q3HPaMl7A==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.3.31/73f9db5e55ebe7f91da249577f9b1a68dfecefea}
+  '@efeoncepro/axis-tokens@0.3.33':
+    resolution: {integrity: sha512-RaN7dLpqkj3r02zlfNTircl4mx+fvjz9W72yLDDPtIQBK0TFBTMG82OLiimPkYbnmd91RTKLV0Kwv8/pz9fKJA==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.3.33/19de62abcec19f438d170d4c397dc15b67cc131a}
 
   '@efeoncepro/axis-tokens@0.3.5':
     resolution: {integrity: sha512-RXKOUot+Lg+pUcJV5cTB4ybseW26XlsOatJFbBdDWCZAPO7e0JsnPWLpaww0jvqr3Cl12x05ueMAjKSYnvnHKA==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.3.5/ee4863718faafc626c6f527425ac82706705fd89}
@@ -893,8 +893,8 @@ packages:
   '@efeoncepro/axis-ui-contracts@0.3.29':
     resolution: {integrity: sha512-3i8Ujtw2hj2tCfvylzPlyelGYOCVbYP7/ViuHEYOJ9BRDmC7TRkgGnL0n8kWfg+ooSZSn0+aT5tS0lxLpYmCqQ==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.3.29/1b24ad9e77148e26315e81b47a0595eb8173e138}
 
-  '@efeoncepro/axis-ui-contracts@0.3.31':
-    resolution: {integrity: sha512-HOLmhkTJOhexfxmz91DziEw+BWkJH9Eyxu3Q5hD+bMovUCWlq5m2ZPrLq563HNXleOVZaX9NKKMKEAXKgau0sg==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.3.31/ff69cba044ee470a46b6cd585b33bcc6e3ccba4b}
+  '@efeoncepro/axis-ui-contracts@0.3.33':
+    resolution: {integrity: sha512-9edFXLstqDpt6wulyApyzQsjeTyAhzu1GnPNm76rSDK9r1NgV9M7NNrtG8z8+FdYCIuAvGYwD/TZHjM4I7AUGg==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.3.33/b9c460ce7c7f8be136aab6892e294d147a205ce5}
 
   '@efeoncepro/axis-ui-contracts@0.3.5':
     resolution: {integrity: sha512-msGs1T3Gbz8q5AQvastzRL652OwCsIAhFIazGncT2GN+qrSOF4+B1iQrOk8IrBtPNvPqTJ/hfuI0SPm5hryA8Q==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.3.5/38afe8bd6d0f1ccbc1ead3d2cf3981b5e8bbecc4}
@@ -11107,7 +11107,7 @@ snapshots:
 
   '@efeoncepro/axis-tokens@0.3.29': {}
 
-  '@efeoncepro/axis-tokens@0.3.31': {}
+  '@efeoncepro/axis-tokens@0.3.33': {}
 
   '@efeoncepro/axis-tokens@0.3.5': {}
 
@@ -11115,9 +11115,9 @@ snapshots:
     dependencies:
       '@efeoncepro/axis-tokens': 0.3.29
 
-  '@efeoncepro/axis-ui-contracts@0.3.31':
+  '@efeoncepro/axis-ui-contracts@0.3.33':
     dependencies:
-      '@efeoncepro/axis-tokens': 0.3.31
+      '@efeoncepro/axis-tokens': 0.3.33
 
   '@efeoncepro/axis-ui-contracts@0.3.5':
     dependencies:
