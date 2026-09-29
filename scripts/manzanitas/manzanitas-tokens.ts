@@ -179,12 +179,25 @@ export const measureSloganEm = (word: string, fontsDir = path.join(manzanitasCat
 }
 
 /**
+ * El ancho del eslogan de una palabra de línea, desde AXIS (`efeonceGraphicLine.slogan.widthEmByWord`, publicado en
+ * `axis-tokens` 0.3.29). `measureSloganEm` queda como verificación: la prueba de drift mide las fuentes del catálogo y
+ * exige que coincidan con el token.
+ */
+export const sloganEmOf = (word: string): number => {
+  const em = (GL.slogan.widthEmByWord as Record<string, number>)[word]
+
+  if (!Number.isFinite(em)) throw new Error(`AXIS no publica el ancho del eslogan para «${word}» (efeonceGraphicLine.slogan.widthEmByWord).`)
+
+  return em
+}
+
+/**
  * Cada línea declara su acento sobre papel y sobre navy (el tono de la lámina elige cuál usa `--mcm-accent`) y el
  * ancho de su eslogan en em (el cierre lo dimensiona desde el logo).
  */
 export const buildManzanitasLineClasses = (): string =>
   GL.lines
-    .map((l) => `.mcm-line-${l.key} {\n  --mcm-accent-paper: ${l.accentOnLight};\n  --mcm-accent-navy: ${l.accentOnDark};\n  --mcm-slogan-em: ${measureSloganEm(l.sloganWord)};\n}\n`)
+    .map((l) => `.mcm-line-${l.key} {\n  --mcm-accent-paper: ${l.accentOnLight};\n  --mcm-accent-navy: ${l.accentOnDark};\n  --mcm-slogan-em: ${sloganEmOf(l.sloganWord)};\n}\n`)
     .join('\n')
 
 export interface ManzanitasTokenArtifacts {
@@ -220,6 +233,8 @@ export const buildManzanitasTokenArtifacts = (): ManzanitasTokenArtifacts => {
     lines: GL.lines.map((l) => ({ key: l.key, sloganWord: l.sloganWord, accentOnLight: l.accentOnLight, accentOnDark: l.accentOnDark })),
     swipe: { voiceByLine: M.swipe.voiceByLine, lineOverrides: M.swipe.lineOverrides, glyphs: M.swipe.glyphs },
     pendingDecisions: M.pendingDecisions,
+    closeCopy: M.closeCopy,
+    teamPeople: M.teamPeople,
     voiceGeometry: MANZANITAS_VOICE_GEOMETRY,
     sphereGapEm: { byLetter: GL.sphere.opticalGapEm, default: GL.sphere.defaultGapEm }
   }

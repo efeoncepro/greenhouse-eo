@@ -11,6 +11,7 @@ const registry = JSON.parse(fs.readFileSync(path.join(manzanitasCatalogDir, 'reg
 
 const tokens = JSON.parse(fs.readFileSync(path.join(manzanitasCatalogDir, 'manzanitas-tokens.json'), 'utf8')) as {
   pieces: Record<string, { swipe?: { y: number } }>
+  closeCopy: { pieces: string[]; maxChars: { question: number; answer: number; sub: number } }
 }
 
 const read = (file: string) => fs.readFileSync(path.join(manzanitasCatalogDir, file), 'utf8')
@@ -94,6 +95,20 @@ describe('manzanitas templates — values come from manzanitasRegister, never li
     for (const name of ['CoverPizarra', 'StepPizarra', 'DataApples', 'ChartVoice', 'InteriorLente']) {
       expect(html[name], name).toContain('mcm-voice--beside-swipe')
       expect(html[name], name).toMatch(/--mcm-voice-left: [0-9.]+px/)
+    }
+  })
+
+  it('the close copy varies with the context, its length does not: the close slots carry the token limits', () => {
+    // Operador, 2026-09-29: el texto del cierre nunca queda fijo; lo que se normaliza es su extensión (closeCopy.maxChars).
+    const byPiece = Object.fromEntries(registry.templates.flatMap((t) => t.pieces.map((p) => [p, t])))
+    const max = tokens.closeCopy.maxChars
+
+    for (const piece of tokens.closeCopy.pieces) {
+      const contract = JSON.parse(read(byPiece[piece].slotsRef)) as SlotContract
+
+      expect(contract.slots.voice.shape?.question.maxCharacters, piece).toBe(max.question)
+      expect(contract.slots.voice.shape?.answer.maxCharacters, piece).toBe(max.answer)
+      expect(contract.slots.sub.constraints?.maxCharacters, piece).toBe(max.sub)
     }
   })
 

@@ -56,13 +56,13 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 40,
+          "maxCharacters": 44,
           "example": "¿Qué revisa una IA antes de recomendarte?"
         },
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 14,
+          "maxCharacters": 10,
           "example": "5 cosas"
         }
       }
@@ -72,7 +72,7 @@
       "type": "rich-string",
       "required": false,
       "constraints": {
-        "maxCharacters": 70,
+        "maxCharacters": 56,
         "overflow": "reject",
         "maxLines": 2
       },

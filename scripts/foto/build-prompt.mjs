@@ -338,6 +338,57 @@ export const PERSONAS = {
     // `vistasDeCuerpo`: si la referencia ya es de cuerpo, añadir además el cuerpo frontal mete dos cuerpos
     // sin rostro cercano y hace derivar la cara.
     vestuarioDeCuerpo: ['casual-3', 'casual-4', 'casual-5', 'casual-6', 'home-2', 'home-4', 'prof-1', 'prof-2', 'prof-3', 'speaker-1', 'speaker-2', 'speaker-3', 'lifestyle-1', 'lifestyle-2', 'lifestyle-3', 'lifestyle-4']
+  },
+  // ── El equipo actual en el registro cine (decisión del operador, 2026-09-29, `cine-team-people-social`) ──
+  // «Las personas del equipo todas están en el repo, tienes que ponerlas sin la foto de María Fernanda; en
+  // sustitución de María Fernanda está Valentina Hoyos.» Una sola referencia por persona: su retrato del equipo en
+  // `public/images/greenhouse/team/`. Por eso `cuerpo` apunta al mismo retrato: no hay foto de cuerpo entero todavía, y
+  // la regla de 2026-09-17 («retrato solo deforma el cuerpo») se contrarresta en la ficha con encuadre de medio cuerpo,
+  // cámara a ~2 m a la altura del pecho y 85 mm. Identidad EN PRUEBA hasta que el operador apruebe la hoja de contacto
+  // de cada persona (roster y estado en `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`).
+  andres: {
+    etiqueta: 'Andrés',
+    identity:
+      'IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is a SHORT, SOFT OVAL, slightly wider at the cheekbones and narrowing to a small chin — never long, never square. HAIR black, thick and slightly wavy, TOUSLED on top with a loose, messy fringe falling toward the forehead, shorter at the sides. GLASSES rectangular frames in RED-BURGUNDY acetate of medium thickness — never metal, never rimless, never black. FACIAL HAIR a light moustache and a small, sparse goatee on the chin; the cheeks are clean-shaven. EXPRESSION a wide, warm smile showing the upper teeth, eyes crinkling behind the glasses. Light-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or smooth him.',
+    // La foto ACTUAL (con el hoodie, carpeta squad) va primera; el retrato antiguo suma detalle del rostro.
+    refs: ['src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png', 'public/images/greenhouse/team/EO_Avatar-Fondo_Team_Andrés.png'],
+    cuerpo: 'src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png'
+  },
+  daniela: {
+    etiqueta: 'Daniela',
+    identity:
+      'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a LONG OVAL with high, rounded cheekbones, narrowing to a soft pointed chin — never round, never square. HAIR black, very long and straight, parted slightly off-centre, falling well past the shoulders with a long side-swept section over one side of the forehead. EYES dark brown and almond-shaped; BROWS dark, softly arched. EXPRESSION a WIDE, BRIGHT SMILE showing the upper teeth, her natural expression. Warm medium-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or lighten her.',
+    refs: ['src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png', 'public/images/greenhouse/team/EO_Avatar-Daniela.png'],
+    cuerpo: 'src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png'
+  },
+  humberly: {
+    etiqueta: 'Humberly',
+    identity:
+      'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a ROUNDED OVAL with full cheeks and a soft, rounded chin — never long, never angular. HAIR black, reaching the upper chest, parted to one side, with face-framing layers and soft loose waves at the ends. EYES dark brown; BROWS dark and softly arched; a tiny nose stud on one nostril. EXPRESSION a soft, calm, closed-mouth smile. Fair skin with a warm undertone, natural blush and visible pores, a young adult as in the reference: do not age, beautify or slim her face.',
+    refs: ['public/images/greenhouse/team/Humberly.jpg'],
+    cuerpo: 'public/images/greenhouse/team/Humberly.jpg'
+  },
+  luis: {
+    etiqueta: 'Luis',
+    identity:
+      'IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is BROAD AND ROUNDED-SQUARE, with full cheeks and a wide jaw — never long or narrow. HAIR black, very short, faded close at the sides with a short, neat top. GLASSES thin rectangular METAL frames in silver, the top bar slightly heavier than the rest — never plastic, never round, never rimless. FACIAL HAIR a dense, short, trimmed full beard along the jaw and chin, joined to a full moustache. EXPRESSION serious and composed, mouth closed. Medium warm-brown skin with visible pores, an adult as in the reference: do not age, beautify, slim or smooth him.',
+    refs: ['public/images/greenhouse/team/Luis.jpg'],
+    cuerpo: 'public/images/greenhouse/team/Luis.jpg'
+  },
+  melkin: {
+    etiqueta: 'Melkin',
+    // Sólo la foto ACTUAL (squad): el retrato antiguo lo muestra con el pelo largo amarrado, que ya no lleva.
+    identity:
+      'IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is LONG AND NARROW, a lean vertical oval with defined cheekbones and a narrow jaw — never round, never wide. HAIR black, medium-short, swept to one side from a side part, with loose strands falling across the forehead — never long, never tied back, never slicked flat. BROWS thick, dark and straight. FACIAL HAIR only a thin moustache and a narrow pointed goatee on the chin; the cheeks and jaw are clean-shaven. EXPRESSION calm, a slight closed-mouth smile. Light-brown skin with visible pores, an adult as in the reference: do not age, beautify or widen his face.',
+    refs: ['src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png'],
+    cuerpo: 'src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png'
+  },
+  valentina: {
+    etiqueta: 'Valentina',
+    identity:
+      'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a SOFT, ROUNDED OVAL with full cheeks and a small rounded chin — never long, never angular. HAIR black, very long and straight, falling well past the shoulders, with a thick straight FRINGE cut just above the eyebrows. EYES dark brown and almond-shaped; BROWS fine and straight under the fringe. NOSE small with a soft rounded tip. EXPRESSION calm and serene, closed mouth, a very slight smile. Light warm-beige skin with a natural blush on the cheeks and visible pores, a young adult as in the reference: do not age, beautify or slim her face.',
+    refs: ['public/images/greenhouse/team/EO_Avatar-Valentina.png'],
+    cuerpo: 'public/images/greenhouse/team/EO_Avatar-Valentina.png'
   }
 }
 

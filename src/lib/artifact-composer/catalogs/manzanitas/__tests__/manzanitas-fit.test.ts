@@ -12,6 +12,8 @@ import path from 'node:path'
 import { chromium, type Browser } from 'playwright'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
+import { resolveManzanitasRegisterIntent } from '@efeoncepro/axis-ui-contracts'
+
 import type { SlideSpec, TemplateContract } from '../../../contracts'
 import { fillSlide, measureSlideFit } from '../../../render'
 import { synthesizeProbeSlots } from '../../../synthesize'
@@ -44,7 +46,13 @@ const render = async (file: string, template: string, contentType: string, overr
     const clipped = await measureSlideFit(page, contract)
     const sloganInk = await page.evaluate(() => document.querySelector('.mcm-slogan')?.classList.contains('mcm-slogan--ink') ?? null)
 
-    return { clipped: clipped.map((c) => c.slot), sloganInk }
+    const sloganPx = await page.evaluate(() => {
+      const el = document.querySelector('.mcm-slogan')
+
+      return el ? parseFloat(getComputedStyle(el).fontSize) : null
+    })
+
+    return { clipped: clipped.map((c) => c.slot), sloganInk, sloganPx }
   } finally {
     await page.close()
   }
@@ -96,5 +104,22 @@ describe('manzanitas — the rendered layout judges the copy', () => {
     expect(engine.clipped).toEqual([])
     expect(engine.sloganInk).toBe(true)
     expect(voice.sloganInk).toBe(false)
+
+    // Paridad con el contrato: el cuerpo que pinta la plantilla es el que resuelve AXIS (manifiesto `slogan.px`).
+    const intent = (line: string, word: string) => ({
+      register: 'marketing-con-manzanitas' as const,
+      channel: 'carousel' as const,
+      topicLine: line,
+      slides: [{ piece: 'back-cover-a', voice: { question: '¿Te nombra la IA?', answer: 'Pregúntale', sub: `Palabra ${word}` }, slogan: true, conversions: 1 }]
+    })
+
+    for (const [line, word, rendered] of [['engine', 'Engine', engine], ['voice', 'Voice', voice]] as const) {
+      const resolved = resolveManzanitasRegisterIntent(intent(line, word))
+
+      expect(resolved.status).toBe('resolved')
+      if (resolved.status !== 'resolved') continue
+      expect(Math.abs((rendered.sloganPx ?? 0) - resolved.slides[0].slogan!.px), line).toBeLessThan(0.05)
+      expect(resolved.slides[0].slogan!.wordInAccent, line).toBe(!rendered.sloganInk)
+    }
   }, 60_000)
 })

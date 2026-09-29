@@ -1,6 +1,6 @@
 {
   "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
-  "sellado": "2026-09-26",
+  "sellado": "2026-09-29",
   "assets": {
     "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
       "rol": "persona:julio",
@@ -213,6 +213,38 @@
     "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-4.png": {
       "rol": "persona:nexa/lifestyle-4",
       "sha256": "336317422a32b20e680ed478daf9ed451f08be5c163ce67ea4084d5844a40203"
+    },
+    "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png": {
+      "rol": "persona:andres/cuerpo",
+      "sha256": "f0d6b3ac3ef9b64b7e09c474fe51367a00fcfdb8acf37fb6e620c61d5313e829"
+    },
+    "public/images/greenhouse/team/EO_Avatar-Fondo_Team_Andrés.png": {
+      "rol": "persona:andres",
+      "sha256": "d3d0eaac4d0062c5d586f0663a1bd88f3bb38b582357da086e18613c0427ca02"
+    },
+    "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png": {
+      "rol": "persona:daniela/cuerpo",
+      "sha256": "aec2989c53440e329ba36986c83d7d4143bbcffbd0b19001840b00d3c7244e29"
+    },
+    "public/images/greenhouse/team/EO_Avatar-Daniela.png": {
+      "rol": "persona:daniela",
+      "sha256": "50dd595f8e45419d22dd79341dc10ca2280acb80c87eac51876e9453795c41dd"
+    },
+    "public/images/greenhouse/team/Humberly.jpg": {
+      "rol": "persona:humberly/cuerpo",
+      "sha256": "7582bd9e234d44550107eff390b9bcaa45c052fdfc89338a2b29f33ef173fd5d"
+    },
+    "public/images/greenhouse/team/Luis.jpg": {
+      "rol": "persona:luis/cuerpo",
+      "sha256": "690e168ea7a3ea2e08d75c3af56727ad48849de27f77f622df75f62d5dd56687"
+    },
+    "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png": {
+      "rol": "persona:melkin/cuerpo",
+      "sha256": "e307af20687a760f5d10ddf15c21f9838eeffa4e629a902397adf1ddafefcf6d"
+    },
+    "public/images/greenhouse/team/EO_Avatar-Valentina.png": {
+      "rol": "persona:valentina/cuerpo",
+      "sha256": "fc3766c570af188bdc67da6a45ca3cd4037dcbdb136301510e0854499ba17077"
     },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",

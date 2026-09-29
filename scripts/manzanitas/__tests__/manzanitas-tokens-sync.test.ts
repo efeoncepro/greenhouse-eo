@@ -8,7 +8,7 @@ import { efeonceGraphicLine as GL } from '@efeoncepro/axis-tokens'
 
 import { manzanitasCatalogDir } from '../../../src/lib/artifact-composer/catalogs/manzanitas/brand'
 import { buildManzanitasOutputs, recolorAccentGroup, swipeVoiceOf } from '../compile-tokens'
-import { measureSloganEm } from '../manzanitas-tokens'
+import { measureSloganEm, sloganEmOf } from '../manzanitas-tokens'
 
 const require = createRequire(path.join(process.cwd(), 'package.json'))
 const brandAssets = path.join(path.dirname(require.resolve('@efeoncepro/axis-brand-assets/package.json')), 'assets')
@@ -40,8 +40,11 @@ describe('manzanitas tokens (pnpm manzanitas:tokens)', () => {
     expect(() => recolorAccentGroup('<svg></svg>', '#0375db')).toThrow(/data-axis-accent/)
   })
 
-  it('the slogan width of «Empower your Growth» is the 11.586 em of the operator rule (2026-09-29)', () => {
-    expect(measureSloganEm('Growth')).toBe(11.586)
+  it('the slogan width comes from AXIS, and the catalog fonts measure exactly what AXIS publishes (drift)', () => {
+    // AXIS publica el ancho (efeonceGraphicLine.slogan.widthEmByWord, axis-tokens 0.3.29); la medición con fontkit sobre
+    // las fuentes que pinta el render tiene que dar lo mismo: si no, el eslogan saldría a otro ancho que el del contrato.
+    for (const line of GL.lines) expect(measureSloganEm(line.sloganWord), line.sloganWord).toBe(sloganEmOf(line.sloganWord))
+    expect(sloganEmOf('Growth')).toBe(11.586)
   })
 
   it('every line has its slogan width; the one of the line word decides the body size of the close', () => {

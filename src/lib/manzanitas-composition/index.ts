@@ -60,10 +60,12 @@ export interface ManzanitasCompositionPlan {
   assets: ManzanitasAssetRequest[]
 }
 
-/** Campos que el intent admite además de los del contrato: la foto real y los rótulos del gráfico. */
+/**
+ * Campos que el intent admite además de los del contrato: la foto real (`photo.path`). Los rótulos del gráfico son parte
+ * del contrato desde la 0.3.0 (`caption`, `figureLabel`, `columnLabels`, `keyLabels`, `rateHeader`).
+ */
 export interface ManzanitasSlideExtras {
   photo?: { path?: string; alt?: string }
-  chart?: { caption?: string; figureLabel?: string; columnLabels?: [string, string]; keyLabels?: [string, string]; rateHeader?: string }
 }
 
 const CONTENT_TYPE: Record<string, string> = {
@@ -107,8 +109,8 @@ const THEME_FIELDS: Record<string, readonly string[]> = {
   'mcm.podcast.cover': ['line', 'tone', 'masthead', 'signature', 'apple', 'sphereGap']
 }
 
-/** La órbita del paso: medida en el canvas v39 (tablero de paso); el token todavía no la publica. */
-export const MANZANITAS_STEP_ORBIT = { cx: 640, cy: 500, r: 324 } as const
+/** La órbita del paso (medida en el canvas v39), desde el token: `manzanitasRegister.pieces['step-pizarra'].orbit`. */
+export const MANZANITAS_STEP_ORBIT = (M.pieces['step-pizarra'] as unknown as { orbit: { cx: number; cy: number; r: number } }).orbit
 
 const LENS_PHOTO_PLACEHOLDER = '__MCM_LENS_PHOTO__'
 

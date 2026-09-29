@@ -81,7 +81,7 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 | ¿Mira al lente? | Nadie | El sujeto sí | Depende del elenco | **El sujeto sí, siempre** |
 | Luz | Luz con carácter, fuente real | Luz con carácter + atmósfera | `luz-motivada` por el objeto digital | **La fuente es el objeto de ficción con el color de la línea** + rim desde atrás + bruma |
 | Vestuario | Código por registro de escena | Igual | Igual (Nexa con uniforme) | Equipo: código por registro. **Nexa: traje de ficción permitido** |
-| Quién puede protagonizar | Personas del equipo | Personas, mascotas de partner | Objeto, Nexa, criaturas | **Sólo Nexa** o **personas del equipo dentro de `proposal-cinematic`** |
+| Quién puede protagonizar | Personas del equipo | Personas, mascotas de partner | Objeto, Nexa, criaturas | **Nexa**, **personas del equipo dentro de `proposal-cinematic`** o, desde el 2026-09-29, **el equipo real en las fotos de Marketing con Manzanitas** |
 
 **Qué NO es [criterio]:**
 
@@ -97,13 +97,14 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 
 ## 2. Cuándo se usa — y cuándo no
 
-**Permitido en tres casos, y sólo en esos [decisión del operador, 2026-09-27]:**
+**Permitido en cuatro casos, y sólo en esos [decisión del operador, 2026-09-27; el cuarto, 2026-09-29]:**
 
 | Caso | Quién protagoniza | Vestuario | Dónde vive la regla |
 |---|---|---|---|
 | **1 · Nexa protagonista** | Nexa (identidad A) | Traje de ficción permitido (traje biónico) **o** uniforme Efeonce | Delta 2026-09-26 (noche) del maestro |
 | **2 · Receta de deck `proposal-cinematic`** | Personas del equipo **o** Nexa | Personas: **uniforme correcto por registro de escena**; el traje de ficción queda sólo para Nexa | Delta 2026-09-27 del maestro + [superficie §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) |
 | **3 · Láminas de sección y «about» del deck** (excepción, 2026-09-27) | Personas del equipo (o del cliente, en la sección con el panel a la derecha), con o sin Nexa | Equipo: uniforme por registro de escena; cliente: su propia ropa, sin marca Efeonce | [Delta (c) de arriba](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck) + [superficie §3, regla 5](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) |
+| **4 · Fotos de Marketing con Manzanitas** (decisión del operador, 2026-09-29, `cine-team-people-social`) | **Personas reales del equipo actual**, con su identidad (`identidad` en la ficha), desde el [roster del equipo](./EFEONCE_TEAM_ROSTER_V1.md) | El de su fila del roster: **hoodie** Efeonce para el equipo, **polo** para Julio y **su propia ropa** para Valentina | [Roster](./EFEONCE_TEAM_ROSTER_V1.md) · token AXIS `manzanitasRegister.teamPeople` |
 
 **El contrato lo vigila [medido]:** AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue
 **`cine-requires-nexa-or-proposal`** (`@efeoncepro/axis-ui-contracts`, `surface-composition.js`): pasa si la receta
@@ -295,7 +296,13 @@ el kit del hoodie declara la tela en **azul royal** (`ai-generations/2026-09-17_
 | Lentes | *«sleek futuristic wraparound glasses with CLEAR TRANSPARENT lenses lightly tinted azure blue, a thin frameless edge and a fine glowing azure line along the top of the lenses; her eyes are clearly visible through the transparent lenses, no mirror reflection covers her eyes»*. Conservaron ojos e identidad | `NX4`/`NX5` **[medido]** |
 | Accesorios | Ver la trampa de §10 (el bloque de accesorios pide smartwatch y anillo; las fichas cine los quitan) | **[pendiente]** |
 
-### 7.2 Personas del equipo (sólo en `proposal-cinematic`)
+### 7.2 Personas del equipo (en `proposal-cinematic` y, con identidad real, en Marketing con Manzanitas)
+
+**Delta 2026-09-29 [decisión del operador]:** las fotos de Marketing con Manzanitas pueden mostrar a las personas reales
+del equipo actual —«tienes que ponerlas sin la foto de María Fernanda; en sustitución de María Fernanda está Valentina
+Hoyos»—. Van con su identidad declarada en `PERSONAS` (`pnpm foto:prompt`) y el vestuario de su fila del
+[roster](./EFEONCE_TEAM_ROSTER_V1.md): «hoy todos a excepción de Valentina y de mí salen con hoodie Efeonce». Lo que sigue
+sobre el casting por rol vale para `proposal-cinematic` y para las piezas donde no se pide una persona real.
 
 **Casting por rol, no identidad [medido].** Las fichas `CR2`, `WB1`, `RV1`, `AE1`, `AE2` **no declaran `identidad`**:
 describen el rol, la edad, el pelo y el origen (*«a Latin American RevOps lead in her mid thirties, dark wavy

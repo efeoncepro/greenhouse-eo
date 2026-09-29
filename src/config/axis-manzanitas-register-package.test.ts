@@ -7,17 +7,20 @@ import { AXIS_MANZANITAS_REGISTER_CONTRACT, resolveManzanitasRegisterIntent } fr
 
 // TASK-1936: Greenhouse fija la versión de AXIS que publica el registro Marketing con Manzanitas (sólo MCM; complementa
 // La órbita). Esta prueba confirma que las exportaciones existen en los paquetes instalados; el primer consumidor real es
-// el catálogo `manzanitas` del Artifact Composer. Contrato 0.2.0 (AXIS v0.3.28, 2026-09-29): las decisiones del operador.
+// el catálogo `manzanitas` del Artifact Composer. Contrato 0.3.0 (AXIS v0.3.29, 2026-09-29): ninguna decisión abierta.
 describe('AXIS Marketing con Manzanitas packages', () => {
   it('exports the register token, complementing La órbita by reference and isolated from Glitch', () => {
     expect(manzanitasRegister.complements).toBe('efeonceGraphicLine')
     expect(manzanitasRegister.lines).toBe(efeonceGraphicLine.lines)
     expect(JSON.stringify(manzanitasRegister)).not.toContain(glitchLine.color.accent)
-    expect(manzanitasRegister.pendingDecisions.map(d => d.id)).toEqual(['story-close-copy', 'cine-team-people-social', 'stroke-republicar-enviar'])
+    expect(manzanitasRegister.pendingDecisions).toEqual([])
+    expect(manzanitasRegister.resolvedDecisions).toHaveLength(10)
+    expect(manzanitasRegister.closeCopy.fixed).toBe(false)
+    expect(manzanitasRegister.teamPeople.rosterSource).toBe('greenhouse-team-roster')
   })
 
   it('exports the candidate contract and resolves a carousel that opens with its cover and closes with its back cover', () => {
-    expect(AXIS_MANZANITAS_REGISTER_CONTRACT).toMatchObject({ id: 'efeonce.manzanitas-register', version: '0.2.0', lifecycle: 'candidate' })
+    expect(AXIS_MANZANITAS_REGISTER_CONTRACT).toMatchObject({ id: 'efeonce.manzanitas-register', version: '0.3.0', lifecycle: 'candidate' })
 
     const intent = {
       register: 'marketing-con-manzanitas' as const,

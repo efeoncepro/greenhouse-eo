@@ -194,6 +194,32 @@ IDENTITY (critical): the man is the SAME real person shown in the reference imag
 IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
 ```
 
+El equipo actual (decisión del operador, 2026-09-29): Andrés, Daniela, Humberly, Luis, Melkin y Valentina, en ese orden; identidad en prueba hasta aprobar la hoja de contacto de cada persona ([roster](./EFEONCE_TEAM_ROSTER_V1.md)).
+
+```text
+IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is a SHORT, SOFT OVAL, slightly wider at the cheekbones and narrowing to a small chin — never long, never square. HAIR black, thick and slightly wavy, TOUSLED on top with a loose, messy fringe falling toward the forehead, shorter at the sides. GLASSES rectangular frames in RED-BURGUNDY acetate of medium thickness — never metal, never rimless, never black. FACIAL HAIR a light moustache and a small, sparse goatee on the chin; the cheeks are clean-shaven. EXPRESSION a wide, warm smile showing the upper teeth, eyes crinkling behind the glasses. Light-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or smooth him.
+```
+
+```text
+IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a LONG OVAL with high, rounded cheekbones, narrowing to a soft pointed chin — never round, never square. HAIR black, very long and straight, parted slightly off-centre, falling well past the shoulders with a long side-swept section over one side of the forehead. EYES dark brown and almond-shaped; BROWS dark, softly arched. EXPRESSION a WIDE, BRIGHT SMILE showing the upper teeth, her natural expression. Warm medium-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or lighten her.
+```
+
+```text
+IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a ROUNDED OVAL with full cheeks and a soft, rounded chin — never long, never angular. HAIR black, reaching the upper chest, parted to one side, with face-framing layers and soft loose waves at the ends. EYES dark brown; BROWS dark and softly arched; a tiny nose stud on one nostril. EXPRESSION a soft, calm, closed-mouth smile. Fair skin with a warm undertone, natural blush and visible pores, a young adult as in the reference: do not age, beautify or slim her face.
+```
+
+```text
+IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is BROAD AND ROUNDED-SQUARE, with full cheeks and a wide jaw — never long or narrow. HAIR black, very short, faded close at the sides with a short, neat top. GLASSES thin rectangular METAL frames in silver, the top bar slightly heavier than the rest — never plastic, never round, never rimless. FACIAL HAIR a dense, short, trimmed full beard along the jaw and chin, joined to a full moustache. EXPRESSION serious and composed, mouth closed. Medium warm-brown skin with visible pores, an adult as in the reference: do not age, beautify, slim or smooth him.
+```
+
+```text
+IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is LONG AND NARROW, a lean vertical oval with defined cheekbones and a narrow jaw — never round, never wide. HAIR black, medium-short, swept to one side from a side part, with loose strands falling across the forehead — never long, never tied back, never slicked flat. BROWS thick, dark and straight. FACIAL HAIR only a thin moustache and a narrow pointed goatee on the chin; the cheeks and jaw are clean-shaven. EXPRESSION calm, a slight closed-mouth smile. Light-brown skin with visible pores, an adult as in the reference: do not age, beautify or widen his face.
+```
+
+```text
+IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a SOFT, ROUNDED OVAL with full cheeks and a small rounded chin — never long, never angular. HAIR black, very long and straight, falling well past the shoulders, with a thick straight FRINGE cut just above the eyebrows. EYES dark brown and almond-shaped; BROWS fine and straight under the fringe. NOSE small with a soft rounded tip. EXPRESSION calm and serene, closed mouth, a very slight smile. Light warm-beige skin with a natural blush on the cheeks and visible pores, a young adult as in the reference: do not age, beautify or slim her face.
+```
+
 ```text
 SIGNATURE ACCESSORIES (Nexa always wears these; render them whenever the relevant body part is in frame AND large enough to resolve): a geometric matte-silver statement ring on the INDEX finger of her right hand — not a plain band, not gold, not on another finger; a modern SMARTWATCH on her LEFT wrist — a rounded-square aluminium or titanium case with a bright rectangular screen and a plain sport or woven band in navy or graphite, NEVER a round analogue dial with hands; small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate. Nails are neatly kept, short to medium, in a single colour across both hands: dark navy or rosy nude.
 ```

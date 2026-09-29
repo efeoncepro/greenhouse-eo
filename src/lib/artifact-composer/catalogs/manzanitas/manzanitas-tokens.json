@@ -3,10 +3,10 @@
     "package": "@efeoncepro/axis-tokens",
     "export": "manzanitasRegister",
     "versions": {
-      "@efeoncepro/axis-tokens": "0.3.28",
+      "@efeoncepro/axis-tokens": "0.3.29",
       "@efeoncepro/axis-brand-assets": "0.4.1",
-      "@efeoncepro/axis-graphic-line": "0.10.1",
-      "@efeoncepro/axis-ui-contracts": "0.3.28"
+      "@efeoncepro/axis-graphic-line": "0.11.0",
+      "@efeoncepro/axis-ui-contracts": "0.3.29"
     }
   },
   "register": "marketing-con-manzanitas",
@@ -102,7 +102,12 @@
         "y": 985,
         "state": "rest"
       },
-      "signature": "carousel"
+      "signature": "carousel",
+      "orbit": {
+        "cx": 640,
+        "cy": 500,
+        "r": 324
+      }
     },
     "data-apples-of-ten": {
       "status": "approved",
@@ -542,7 +547,7 @@
       "swipe": null,
       "slogan": true,
       "signature": "close-lockup",
-      "copyProvisional": "story-close-copy"
+      "closeCopy": true
     },
     "blog-banner-escena": {
       "status": "approved",
@@ -743,23 +748,25 @@
       "plastilina": "mano"
     }
   },
-  "pendingDecisions": [
-    {
-      "id": "story-close-copy",
-      "blocks": null,
-      "provisional": "El copy de cierre de la story es provisional («Guárdala»)."
-    },
-    {
-      "id": "cine-team-people-social",
-      "blocks": null,
-      "provisional": "Ningún ejemplo usa personas reales del equipo en cine."
-    },
-    {
-      "id": "stroke-republicar-enviar",
-      "blocks": null,
-      "provisional": "Los Trazo «republicar» y «enviar» no entran al catálogo."
+  "pendingDecisions": [],
+  "closeCopy": {
+    "varies": "by-context",
+    "fixed": false,
+    "pieces": [
+      "back-cover-a",
+      "story-close"
+    ],
+    "maxChars": {
+      "question": 44,
+      "answer": 10,
+      "sub": 56
     }
-  ],
+  },
+  "teamPeople": {
+    "allowed": true,
+    "rosterSource": "greenhouse-team-roster",
+    "onlyCurrentTeam": true
+  },
   "voiceGeometry": {
     "questionOfAnswer": 0.296875,
     "ringOfQuestion": 0.42,
