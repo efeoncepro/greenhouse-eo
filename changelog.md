@@ -7,18 +7,6 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-29 — Creative Workbench: repo del equipo creativo gobernado desde Greenhouse
-
-- Nuevo repo privado `efeoncepro/creative-workbench` para el equipo creativo (Claude y Codex; clientes Efeonce, Berel
-  y SKY). Recibe por `pnpm creative:sync` 17 skills espejadas, los CLIs `foto:*`/`ai:*` (cierre de imports calculado
-  con esbuild, falla si alcanza dominios prohibidos), docs de marca por allowlist y brand packs; todo sellado por
-  sha256 con gate `managed-drift` y hook `PreToolUse` de Claude.
-- El sync exporta un **ref de git**, nunca el working tree (el bootstrap arrastró trabajo sin commitear de otra
-  sesión; corregido el mismo día).
-- Acceso declarativo en `scripts/creative-workbench/control.json` (`creative:access`); infraestructura idempotente en
-  un proyecto GCP propio con llaves de IA dedicadas (`creative:provision`, aún sin aplicar).
-- ADR [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
-
 ## 2026-09-29 — Efeonce AI Visibility Report canonizado en AXIS (TASK-1938)
 
 - AXIS `v0.3.30` (`26097c5`, registro verificado): `axis-tokens` 0.3.30 (`aiVisibilityReport` y
@@ -32,6 +20,12 @@
 ## 2026-09-29 — Naming canónico de Efeonce AEO
 
 - [ADR](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md): **Efeonce AEO** (capacidad), **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (salida); aliases Grader preservados para trazabilidad y contratos. Se actualizaron docs y skills; el runtime visible requiere migración y verificación propias.
+
+## 2026-09-29 — Avatares oficiales y firmas del equipo
+
+- Seis avatares nuevos (bomber sobre polo piqué, fondo oscuro con el halo de la órbita) en GCP `team/avatars/v1/`, en el Kit media de OneDrive y en el repo (800 px: `squad/` y `public/images/greenhouse/team/`).
+- Firmas v3.1 para el equipo con esos avatares (`build-firmas.mjs`), fotos publicadas en `email-signature/v3.1/people/` y paquetes en `Kit media/Firmas/`.
+- Luis sale del roster de fotos y del dashboard de Efeonce; nombres, cargos y avatar de Julio corregidos ahí. Referencias de identidad en `ai-generations/_identidad-equipo/`.
 
 ## 2026-09-29 — Manzanitas sin decisiones abiertas: AXIS v0.3.29 y el equipo real en las fotos
 

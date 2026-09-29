@@ -1503,7 +1503,7 @@ describe('foto:prompt · vestuario del equipo por línea de servicio', () => {
     expect(() => validarVestuarioDeLinea(conEquipo(undefined, ['hoodie-efeonce']))).not.toThrow()
     expect(() => validarVestuarioDeLinea({ identidad: ['nexa'], linea: 'growth', objetos: [{ objeto: 'hoodie-efeonce' }] })).not.toThrow()
     expect(() => validarVestuarioDeLinea({ identidad: [{ persona: 'julio', vista: 'frente' }], linea: 'growth', objetos: ['hoodie-efeonce'] })).toThrow(/julio/)
-    expect(EQUIPO_REAL).toEqual(['julio', 'andres', 'daniela', 'humberly', 'luis', 'melkin', 'valentina'])
+    expect(EQUIPO_REAL).toEqual(['julio', 'andres', 'daniela', 'humberly', 'melkin', 'valentina'])
   })
 })
 

@@ -156,7 +156,7 @@ Todos los gráficos y el texto denso son Pizarra.
   (token `manzanitasRegister.teamPeople = { allowed: true, rosterSource: 'greenhouse-team-roster', onlyCurrentTeam: true }`;
   **el token no nombra a nadie**, el Lab es público). Es el cuarto caso permitido del registro cine:
   [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
-  - **Quién**: Julio, Andrés, Daniela, Melkin, Humberly, Luis y Valentina Hoyos (roster). María Fernanda ya no está en
+  - **Quién**: Julio, Andrés, Daniela, Melkin, Humberly y Valentina Hoyos (roster; Luis salió el 2026-09-29). María Fernanda ya no está en
     el equipo actual: su foto de `squad/` no se usa.
   - **Con qué ropa: la decide la línea de la pieza, no la persona** (operador, 2026-09-29, «por la personalidad de las
     líneas de negocio»): **hoodie** Efeonce en Servicios creativos (`brand`); **bomber o softshell** del uniforme

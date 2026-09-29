@@ -1,0 +1,5 @@
+This is a portrait photo that was extended downward. The TOP 1024 pixels are the real photo. The BOTTOM band (from 1024 px down) is only mirrored PADDING, not real content.
+
+Replace the padding with the natural continuation of the same person's upper body, down to the bottom edge: the same open navy bomber jacket with its zip, the same top underneath, the same arms and shoulders, the same studio background continuing as it is at the bottom of the real photo, the same light.
+
+The jacket keeps a SINGLE embroidered mark, the one that already exists in the top part: do NOT add a second mark or any logo, text or badge in the new band. Keep the top 1024 pixels exactly as they are.

@@ -100,9 +100,11 @@ Commit `2c95e60b2` en `develop`:
 3. **El equipo en la fotografía** (decisión 6):
    - Roster nuevo, [`EFEONCE_TEAM_ROSTER_V1.md`](../operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md) (fila 12 del
      índice del canon). Equipo actual: Julio (identidad aprobada); Andrés, Daniela y Melkin (su foto actual, con hoodie,
-     está en `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`); Humberly y Luis (sólo hay retratos antiguos
+     está en `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`); Humberly (sólo hay retratos antiguos
      en `public/images/greenhouse/team/`, falta su foto actual), y Valentina Hoyos. María Fernanda no está en el equipo
-     actual: su foto de `squad/` no se usa.
+     actual: su foto de `squad/` no se usa. Luis salió del equipo el mismo día (fuera de `PERSONAS`). Las fotos reales de
+     referencia viven desde entonces en `ai-generations/_identidad-equipo/`: los avatares del repo pasaron a ser derivados
+     editados (bomber y fondo con el halo de la órbita; roster §«Avatares oficiales del equipo»).
    - **El vestuario lo decide la línea de la pieza** (decisión del operador, 2026-09-29, noche: «para todas las líneas de
      negocio sea la bomber y/o softshell de los uniformes corporativos, y para los servicios creativos sea el hoodie,
      esto por la "personalidad" de las líneas de negocio»): hoodie en `brand`; bomber o softshell, con el polo debajo si

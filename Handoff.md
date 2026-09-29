@@ -1,12 +1,12 @@
 # Handoff activo
 
-**Creative Workbench (29/09):** [ADR](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md). Repo `efeoncepro/creative-workbench` creado, sincronizado por PR (#1, CI `gates` verde) y equipo GitHub `creative-workbench` vacío. Control: `pnpm creative:{status,sync,access,provision,assets:publish}`. Pendiente: `creative:provision apply` (autorización del operador), llaves dedicadas con tope, miembros en `control.json`, re-sync desde commit limpio. `main` sin protección por plan GitHub Free.
-
 **AI Visibility Report en AXIS (29/09):** AXIS `v0.3.30` publicado (`26097c5`: tokens/contracts 0.3.30, contrato `efeonce.ai-visibility-report` 0.1.0 y `graphic-line-orbit` 0.4.0, graphic-line 0.12.0, brand-assets 0.4.3). Greenhouse sigue en 0.3.29 y el renderer del PDF de [TASK-1938](docs/tasks/to-do/TASK-1938-ai-visibility-report-pdf-la-orbita.md) está pendiente; su bump debe llevar `graphic-line.mjs` al contrato 0.4.0 (hoy sólo acepta 0.3.1). Abierta: si el recorrido desde las 12 al 60 % pasa a ser regla y va a la portada.
 
 **Naming Efeonce AEO (29/09):** el [ADR aceptado](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) fija **Efeonce AEO** → **Efeonce AEO Assessment** → **Efeonce AI Visibility Report**. Documentación y skills se alinean conservando aliases técnicos/históricos; el copy de los runtimes públicos sigue pendiente de edición y readback. Search Visibility 360 permanece como oferta SEO+AEO.
 
 TASK-1863: staging; main retenido.
+
+**Avatares y firmas del equipo (29/09, noche):** los seis con bomber sobre polo piqué y fondo oscuro con el halo de la órbita (sin anillo); caras medidas con Vision. GCP `gs://efeonce-group-axis-public-media/team/avatars/v1/{1080,800}/`; firmas v3.1 en `…/email-signature/v3.1/people/` y paquetes en OneDrive `Alineación/6. Marca/Kit media/Firmas/`. Repo: `squad/` y `public/images/greenhouse/team/` a 800 px; referencias de identidad en `ai-generations/_identidad-equipo/`. Luis fuera del roster y del dashboard de Efeonce. **Pendiente:** congelar el gate visual deck-axis (declarado en BASELINE_DELTAS 2026-09-29 (s); lo congela esta sesión cuando la de Salesforce termine sus láminas; la deriva de Chromium desde `0323fb933` también va ahí) y el LinkedIn de cada firma.
 
 **Manzanitas sin decisiones abiertas (29/09, tarde):** AXIS `v0.3.29` publicado con autorización (tokens/contracts 0.3.29, contrato 0.3.0, graphic-line 0.11.0: `closeCopy`, `teamPeople`, Trazo `republicar`/`enviar`, `slogan.widthEmByWord`). Greenhouse lo fija (`2c95e60b2`). El equipo real entra a las fotos de MCM: [roster](docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md), seis identidades nuevas en `PERSONAS` aprobadas por el operador. **La ropa la decide la línea de la pieza** (noche): hoodie en Servicios creativos, bomber o softshell en las líneas de negocio, para todo el equipo; `foto:prompt` lo exige con `linea` en la ficha. Falta foto actual de Humberly y Luis.
 

@@ -278,6 +278,17 @@ que las hace cumplir es `efeonce.email-signature` de AXIS.
    `outlook-respuesta.html` y elígela para respuestas y reenvíos. Envíate un correo de prueba y revísalo en escritorio
    y en el teléfono.
 
+**Firmas personales del equipo (2026-09-29).** Las seis firmas del equipo actual (Julio, Daniela, Andrés, Melkin,
+Humberly y Valentina) se generan con `ai-generations/2026-09-29_avatares-equipo/firmas/build-firmas.mjs`: el mismo
+constructor v3.1 con la tabla del equipo (nombres y correos de Entra, cargos del operador, el WhatsApp de la agencia
++56 9 3732 3064 como teléfono salvo Julio) y la foto con órbita sacada del avatar oficial (bomber y fondo con el halo de
+la órbita; [roster](../../operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md)). Corre
+`HOST_BASE=https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1 PERSON=<nombre-apellido> node
+…/build-firmas.mjs` y sube sólo `hosted/people/*` (las imágenes compartidas ya están publicadas y otras firmas instaladas
+dependen de ellas). Los paquetes para cada persona quedan en OneDrive: `Alineación/6. Marca/Kit media/Firmas/
+firma-<nombre-apellido>.zip`, con la instrucción de instalación adentro. Un cambio de foto se ve solo en las firmas ya
+instaladas: la URL de la foto no cambia.
+
 **Firma de un buzón de área (equipo).** Talent, Finance y Commercial tienen firma propia, sin foto: la órbita rodea el
 ícono del área y sólo lleva su correo. Se genera con `AREA=talent` (o `finance`, `commercial`) delante del mismo
 comando, y se instala igual, en la cuenta del buzón. `people@efeoncepro.com` usa la firma de **Talent** (no es un área

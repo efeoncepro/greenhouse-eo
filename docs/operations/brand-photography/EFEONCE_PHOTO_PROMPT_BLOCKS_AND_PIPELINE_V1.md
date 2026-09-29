@@ -194,7 +194,7 @@ IDENTITY (critical): the man is the SAME real person shown in the reference imag
 IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
 ```
 
-El equipo actual (decisión del operador, 2026-09-29): Andrés, Daniela, Humberly, Luis, Melkin y Valentina, en ese orden; identidades aprobadas por el operador el 2026-09-29 ([roster](./EFEONCE_TEAM_ROSTER_V1.md)).
+El equipo actual (decisión del operador, 2026-09-29): Andrés, Daniela, Humberly, Melkin y Valentina, en ese orden (Luis salió del equipo el mismo día); identidades aprobadas por el operador el 2026-09-29 ([roster](./EFEONCE_TEAM_ROSTER_V1.md)).
 
 **El vestuario del equipo lo decide la línea de la pieza** (decisión del operador, 2026-09-29): la ficha declara `"linea"` (una clave de `efeonceGraphicLine.lines`) y `pnpm foto:prompt` exige en `objetos` el hoodie en `brand` y la bomber o la softshell (con el polo debajo, si se quiere) en las líneas de negocio. Tabla y razón en el [roster §«El vestuario lo decide la línea de servicio»](./EFEONCE_TEAM_ROSTER_V1.md#el-vestuario-lo-decide-la-línea-de-servicio).
 
@@ -208,10 +208,6 @@ IDENTITY (critical): the woman is the SAME real person shown in the reference im
 
 ```text
 IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a ROUNDED OVAL with full cheeks and a soft, rounded chin — never long, never angular. HAIR black, reaching the upper chest, parted to one side, with face-framing layers and soft loose waves at the ends. EYES dark brown; BROWS dark and softly arched; a tiny nose stud on one nostril. EXPRESSION a soft, calm, closed-mouth smile. Fair skin with a warm undertone, natural blush and visible pores, a young adult as in the reference: do not age, beautify or slim her face.
-```
-
-```text
-IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is BROAD AND ROUNDED-SQUARE, with full cheeks and a wide jaw — never long or narrow. HAIR black, very short, faded close at the sides with a short, neat top. GLASSES thin rectangular METAL frames in silver, the top bar slightly heavier than the rest — never plastic, never round, never rimless. FACIAL HAIR a dense, short, trimmed full beard along the jaw and chin, joined to a full moustache. EXPRESSION serious and composed, mouth closed. Medium warm-brown skin with visible pores, an adult as in the reference: do not age, beautify, slim or smooth him.
 ```
 
 ```text

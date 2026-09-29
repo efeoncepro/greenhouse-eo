@@ -1,9 +1,9 @@
 # Equipo en la fotografía de marca — roster V1
 
 > **Tipo de documento:** Norma operativa (fotografía de marca)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-29 por Claude (decisión del operador `cine-team-people-social`)
-> **Ultima actualizacion:** 2026-09-29 por Claude (el vestuario lo decide la línea de servicio)
+> **Ultima actualizacion:** 2026-09-29 por Claude (avatares oficiales con bomber y halo; firmas del equipo; Luis sale del equipo)
 > **Documentacion tecnica:** [`PERSONAS` de `scripts/foto/build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs) ·
 > [bloques de identidad del canon §3.6](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · token AXIS
 > `manzanitasRegister.teamPeople` (`rosterSource: 'greenhouse-team-roster'`)
@@ -52,17 +52,49 @@ corporativos, y para los servicios creativos sea el hoodie, esto por la "persona
 | Clave | Persona | Referencia de identidad | Estado |
 | --- | --- | --- | --- |
 | `julio` | Julio Reyes | set aprobado del 2026-09-20 (`ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`) | aprobado |
-| `andres` | Andrés | `squad/squad-andres.png` (actual, con hoodie) + retrato antiguo de `public/` | aprobado |
-| `daniela` | Daniela | `squad/squad-daniela.png` (actual, con hoodie) + retrato antiguo de `public/` | aprobado |
-| `melkin` | Melkin | sólo `squad/squad-melkin.png` (actual): el retrato antiguo lo muestra con el pelo largo amarrado | aprobado |
-| `humberly` | Humberly | retrato antiguo de `public/images/greenhouse/team/` (no hay foto actual en el repo) | aprobado · falta foto actual |
-| `luis` | Luis | retrato antiguo de `public/images/greenhouse/team/` (no hay foto actual en el repo) | aprobado · falta foto actual |
-| `valentina` | Valentina Hoyos | `public/images/greenhouse/team/EO_Avatar-Valentina.png` | aprobado |
+| `andres` | Andrés Carlosama | `_identidad-equipo/andres/actual.png` (con hoodie) + `antiguo.png` | aprobado |
+| `daniela` | Daniela Ferreira | `_identidad-equipo/daniela/actual.png` (con hoodie) + `antiguo.png` | aprobado |
+| `melkin` | Melkin Hernandez | sólo `_identidad-equipo/melkin/actual.png`: el retrato antiguo lo muestra con el pelo largo amarrado | aprobado |
+| `humberly` | Humberly Henriquez | `_identidad-equipo/humberly/antiguo.jpg` (no hay foto actual) | aprobado · falta foto actual |
+| `valentina` | Valentina Hoyos | `_identidad-equipo/valentina/actual.png` | aprobado |
+
+`_identidad-equipo/` es `ai-generations/_identidad-equipo/` (con su `LEEME.md`): el hogar de las **fotos reales**. Desde el
+2026-09-29 los avatares del repo son derivados editados (bomber, fondo nuevo) y no sirven de referencia de identidad.
+**Luis salió del equipo** (operador, 2026-09-29): ya no está en `PERSONAS` ni en el canon §3.6.
 
 La ropa de la foto de referencia no decide nada: la escena declara la prenda de la línea y el modelo viste con el kit.
 
-`squad/` es `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`. Nexa sigue con su propia identidad (anclas de
-`ai-generations/_identidad-nexa/`).
+Nexa sigue con su propia identidad (anclas de `ai-generations/_identidad-nexa/`).
+
+## Avatares oficiales del equipo (2026-09-29)
+
+**[decisiones del operador, 2026-09-29]** Todo el equipo con la **bomber** Efeonce sobre el **polo piqué** navy (Julio y
+Valentina incluidos). Fondo: el **oscuro de la línea con el halo de la órbita** —el que pinta `orbitSvg` de
+`@efeoncepro/axis-graphic-line` sobre superficie oscura (`#001a33` y el halo del acento con las paradas del token), sin
+anillo ni arco—: el navy solo «pequeño se siente plano». Todas las caras con el mismo tamaño y a la misma altura, medidas
+con Vision (distancia ojos → mentón); Daniela y Humberly un poco más lejos del lente para que se vea la chaqueta.
+
+| Dónde | Qué hay |
+| --- | --- |
+| GCP (público) | `gs://efeonce-group-axis-public-media/team/avatars/v1/1080/<nombre-apellido>.png` (maestros) y `…/v1/800/` (web). URL: `https://storage.googleapis.com/efeonce-group-axis-public-media/team/avatars/v1/1080/<nombre-apellido>.png` |
+| OneDrive del equipo | `Alineación/6. Marca/Kit media/Avatar/2026-09 La órbita/` (para la foto de perfil de Teams y Outlook) |
+| Repo (800 px) | `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-<persona>.png` (deck) y `public/images/greenhouse/team/` (portal; Julio en `EO_Avatar-Julio-Reyes.png`) |
+| Proceso | `ai-generations/2026-09-29_avatares-equipo/` (`componer-avatares.mjs`, `extender*.mjs`, `medir-rostro.swift`) |
+
+Slugs: `julio-reyes`, `andres-carlosama`, `daniela-ferreira`, `melkin-hernandez`, `humberly-henriquez`, `valentina-hoyos`.
+
+## Firmas de correo del equipo (2026-09-29)
+
+La firma v3.1 aprobada, sin cambios de diseño, para las seis personas: la foto con órbita sale del avatar nuevo
+(geometría del token `portrait`). Nombres y correos de Entra; cargos del operador (Daniela: Creative Operations Lead;
+Andrés y Melkin: Senior Visual Designer; Julio: Managing & GTM Director; Humberly: Head of Finance; Valentina: Content
+Lead). Teléfono: el WhatsApp de la agencia (+56 9 3732 3064) para todos y el propio para Julio (+56 9 3480 2860).
+LinkedIn: pendiente (sólo Julio lo tiene hoy).
+
+- Fotos de firma: `gs://efeonce-group-axis-public-media/email-signature/v3.1/people/<nombre-apellido>-{light,dark}.png`.
+- Paquetes por persona (HTML de papel y navy, respuesta, vistas e instrucción): OneDrive `Alineación/6. Marca/Kit
+  media/Firmas/firma-<nombre-apellido>.zip`. Se generan con `ai-generations/2026-09-29_avatares-equipo/firmas/build-firmas.mjs`
+  (`PERSON=<nombre-apellido>` y `HOST_BASE`, igual que la v3.1).
 
 **Aprobado** [operador, 2026-09-29: «Está perfecto, aprobado»]: el operador revisó la hoja de contacto de la ronda
 piloto —cada persona junto a su foto, en la Escena interior de Marketing con Manzanitas— y la Escena de Daniela compuesta
@@ -93,5 +125,6 @@ referencia de vestuario para una pieza de línea de negocio.
 
 ## Pendiente
 
-- Fotos actuales (con hoodie) de **Humberly** y **Luis**; con ellas, su identidad pasa a salir de la foto actual.
+- Foto actual de **Humberly**; con ella, su identidad pasa a salir de la foto actual.
+- El LinkedIn de cada persona en su firma.
 - Toda persona que entre al equipo: su ronda de identidad antes de publicarse.
