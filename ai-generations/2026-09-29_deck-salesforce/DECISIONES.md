@@ -136,3 +136,10 @@ https://claude.ai/artifact/Jp1zybpowqVVyvgnDu1NSw · en «La órbita», página 
 - **Logo de la contraportada a 700 px sólo en Salesforce** (composición `sloganBlock` de close-proposal); las
   contraportadas del 27/09 siguen a 500 px.
 - **Nombre del servicio de SF16: «Enablement conversacional»** (eyebrow «Claudeforce · Enablement conversacional").
+
+## Peso de las negritas en SF16 y SF18 (2026-09-29, composer)
+
+- El token declara Poppins 700. Las láminas aprobadas se ven en 800 porque el script de render no cargaba la cara
+  Poppins 700 (sólo 300/400/500/600/800) y el navegador cayó al peso más cercano. Se compone en **700**, el peso
+  declarado; la diferencia es mínima a tamaño real y no justifica otra release de AXIS. Lección: el script de render de
+  láminas debe cargar todas las caras que usa (añadir Poppins-Bold) para que la lámina aprobada no dependa de un fallback.
