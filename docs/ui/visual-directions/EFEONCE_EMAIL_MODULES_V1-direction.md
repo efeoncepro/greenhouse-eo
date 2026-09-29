@@ -382,10 +382,11 @@ y este documento difieren, manda AXIS y se corrige aquí.
     valiendo). El borde de las redes va horneado en su PNG.
   - El tamaño de cada `<img>` sale del sello del asset, no del ancho calculado del eslogan (140,8 vs 141 px).
   - El texto de la baja en AXIS es «Dejar de recibir estos correos»; el canvas decía «…estos informes». El contrato
-    acepta `unsubscribeLabel`; la elección para Insights es una Open Question de TASK-1944.
-- **Lo que el contrato exige:** la agenda va en **todo** pie (`cta-agenda-required`) y el pie siempre lleva preferencias,
-  baja y motivo. Un correo que no deba llevarlos no se arregla con un adapter que quita módulos: es una versión nueva del
-  contrato (ADR de AXIS §7).
+    acepta `unsubscribeLabel`; Insights usa «Dejar de recibir estos informes» (operador, 2026-09-29).
+- **Lo que el contrato `0.1.0` exige:** la agenda va en **todo** pie (`cta-agenda-required`) y el pie siempre lleva
+  preferencias, baja y motivo. **Superado por la `0.2.0`** (publicado en `v0.3.39`, commit `1c18a2e`): el pie depende del `purpose` y de
+  una `application` con excepción registrada (ver «Greenhouse hoy»). Un adapter nunca quita módulos por su cuenta (ADR
+  de AXIS §7).
 - **Adopción en Greenhouse:** [TASK-1944](../../tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md). Greenhouse
   todavía **no** fija este juego: `develop` fija `axis-tokens` y `axis-ui-contracts` `0.3.37`, `axis-graphic-line`
   `0.11.0`, `axis-brand-assets` `0.4.5` y `axis-ui-registry` `0.3.1` (`package.json`, 2026-09-29).
@@ -434,7 +435,8 @@ Se relevó el runtime el 2026-09-29 sin cambiarlo. **Ningún correo usa todavía
   - la fijación del juego de AXIS `v0.3.38` (publicado el 2026-09-29).
 - Todo eso lo lleva [TASK-1944](../../tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md).
 
-**Tensión abierta con TASK-1764.** El pie aprobado mete en un correo de servicio al cliente tres elementos:
+**Tensión con TASK-1764 (resuelta para Insights el 2026-09-29, ver abajo).** El pie aprobado mete en un correo de
+servicio al cliente tres elementos:
 
 - un CTA comercial, «Agendar una reunión»;
 - redes sociales;
@@ -444,15 +446,18 @@ Su política clasifica hoy esos tres elementos como exclusivos de `optional_subs
 prohíbe la promoción en transaccionales y pide `legalIdentityMode='full'` (con países y privacidad) para suscripción y
 marketing. Además, sus redes son isotipos sólidos grises sobre claro, no círculos de trazo sobre oscuro.
 
-Antes de implementar hay que decidir tres cosas:
+**Decisión del operador (2026-09-29).** El correo de Insights va a clientes: es un correo de servicio al cliente,
+propósito `relationship_transactional`. Como **excepción explícita** (`efeonce-insights-delivery`) conserva el pie
+aprobado completo: agenda «Agendar una reunión», redes, y preferencias y baja con el texto del canvas, «Dejar de recibir
+estos informes». El operador la eligió frente a dejar sólo el botón.
 
-1. El propósito de los correos de Insights. Un informe recurrente es candidato a `optional_subscription`.
-2. Si la agenda cabe en ese propósito o convierte el correo en mixto.
-3. Si el bloque legal aprobado (sin países) cumple el perfil.
-
-Esta dirección registra la tensión; no la resuelve. La decisión es una Open Question de
-[TASK-1944](../../tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md) y queda registrada en el Delta 2026-09-29 de
-TASK-1764.
+- **Los demás correos siguen la política:** sin agenda, redes ni baja en transaccionales y de servicio; baja
+  obligatoria en suscripción y marketing; redes opcionales en suscripción y obligatorias en marketing.
+- Las excepciones son explícitas y por tipo, con aprobador, fecha y motivo (Delta 2026-09-29 de la ADR de
+  presentación y de TASK-1764).
+- AXIS lo expresa en `efeonce.email-modules` `0.2.0`, publicado en `v0.3.39` (commit `1c18a2e`): el intent pide `purpose` y
+  `application`, se retira `cta-agenda-required` y un pie con agenda, redes o baja fuera de su propósito es inválido
+  salvo por una excepción registrada. Implementación: [TASK-1944](../../tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md).
 
 ## Decisiones que fija
 
@@ -480,7 +485,7 @@ TASK-1764.
 - **Logo y eslogan en un único PNG:** no se recomienda. El SSOT de marca los trata como elementos independientes; se
   sirven como dos PNG apilados, salvo que AXIS publique otra cosa.
 - **Pie claro de TASK-1764 para el correo de Insights:** no es lo aprobado para esta superficie. La convivencia se
-  decide en la reconciliación descrita arriba.
+  decidió el 2026-09-29: Insights conserva este pie por excepción; los demás correos siguen la política.
 - **Órbita sin recorrido,** con sólo la estela y la esfera: reemplazada. El recorrido tenue deja leer cuánto avanzó la
   medida sin volverla un medidor que se llena.
 - **Órbita como medidor que se llena hasta el valor:** sigue prohibida en La órbita. El dato es la posición de la

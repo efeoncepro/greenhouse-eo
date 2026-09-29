@@ -481,6 +481,12 @@
   el adapter de la órbita sólo acepta 0.3.1. Regla: al citar los módulos o el camino recorrido desde Greenhouse, di que
   son canon en AXIS y están **sin adoptar**; el bump del adapter exige soportar el contrato 0.5.0, no sólo subir la
   versión.
+- **Un elemento comercial en un correo de servicio pide una excepción explícita, no una ambigüedad.** Síntoma: el pie
+  aprobado (agenda, redes, baja) chocaba con la política que prohíbe promoción en correos de servicio, y el contrato
+  0.1.0 exigía la agenda en todo pie. Regla (operador, 2026-09-29): se decide el propósito del tipo y, si conserva
+  algo comercial, se registra una excepción por tipo con aprobador, fecha y motivo (Insights:
+  `efeonce-insights-delivery`); el contrato valida por `purpose` + `application`. Nunca reclasificar el correo para que
+  calce ni quitar módulos en el adapter.
 
 ## 2026-09-29 (fondos de Teams en la oficina)
 

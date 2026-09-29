@@ -561,11 +561,15 @@ Report, avisos): contrato `efeonce.email-modules`, token `efeonceEmail`.
   `src/emails/InsightsEditionDeliveryEmail.tsx` y `src/emails/components/EmailLayout.tsx` no cambiaron; la dirección
   sellada es `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` (PNG de los tres tableros en
   `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1/`). Skills `greenhouse-email` y `resend-email-platform`.
-- **Tensión abierta (registrada, no resuelta):** la política de presentación de correos propuesta (TASK-1764, ADR
-  `GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `Proposed`) prohíbe la promoción en correos de servicio y
-  reserva redes y baja a perfiles de marketing; el pie aprobado lleva agenda y redes en todo correo. Un agente no quita
-  la agenda ni las redes para «cumplir» esa política: lo decide el operador y, si cambia, es una versión nueva del
-  contrato.
+- **Pie por propósito (operador, 2026-09-29; resuelve la tensión con TASK-1764):** el correo de Insights va a clientes
+  y es `relationship_transactional` con la **excepción explícita** `efeonce-insights-delivery`, que le conserva el pie
+  completo (agenda, redes, preferencias y baja «Dejar de recibir estos informes»). Los demás correos siguen la política
+  de presentación: sin agenda, redes ni baja en transaccionales y de servicio; baja obligatoria en suscripción y
+  marketing; redes opcionales en suscripción y obligatorias en marketing. Contrato `efeonce.email-modules` `0.2.0`, en
+  publicado en `v0.3.39`: el intent lleva `purpose` y, si hay excepción, `application`; se retira `cta-agenda-required`
+  (códigos nuevos `cta-agenda-not-allowed`, `footer-socials-not-allowed`, `footer-unsubscribe-not-allowed`,
+  `application-unknown`, `application-purpose-mismatch`). Una excepción es por tipo, con aprobador, fecha y motivo;
+  un agente nunca la infiere ni quita módulos en el adapter.
 - **Fuente:** canvas «Correo» v21; AXIS `docs/architecture/EMAIL_MODULES_DECISION_V1.md` y
   `docs/agent-composition/email-modules.md`; Lab [axis.efeonce.org/references/email/](https://axis.efeonce.org/references/email/); T `efeonceEmail`.
 

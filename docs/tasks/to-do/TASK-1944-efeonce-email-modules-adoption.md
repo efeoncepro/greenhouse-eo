@@ -21,19 +21,21 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-042`
-- Status real: `Diseño aprobado por el operador el 2026-09-29 y canonizado en AXIS v0.3.38 el mismo día (main c92160b: tokens efeonceEmail, contrato efeonce.email-modules 0.1.0 candidate, graphic-line-orbit 0.5.0, PNG para correo en axis-brand-assets 0.4.6). Greenhouse no lo fija ni lo usa: ningún correo tiene estos módulos. Falta la decisión del operador sobre el propósito del correo de Insights`
+- Status real: `Diseño aprobado por el operador el 2026-09-29 y canonizado en AXIS v0.3.38 el mismo día (main c92160b: tokens efeonceEmail, contrato efeonce.email-modules 0.1.0 candidate, graphic-line-orbit 0.5.0, PNG para correo en axis-brand-assets 0.4.6). Greenhouse no lo fija ni lo usa: ningún correo tiene estos módulos. Propósito del correo de Insights decidido el 2026-09-29 (relationship_transactional con la excepción efeonce-insights-delivery, ver Delta); AXIS publica en paralelo el contrato efeonce.email-modules 0.2.0 (publicado en `v0.3.39`, commit `1c18a2e`)`
 - Rank: `TBD`
 - Domain: `content|ui|delivery`
-- Blocked by: `TASK-1774 (sólo Slices 4 y 5: el pie canónico lleva un enlace de baja que tiene que funcionar; los Slices 1 a 3 se pueden tomar)`
+- Blocked by: `TASK-1774 (sólo el envío del Slice 4 y la evidencia del Slice 5: el pie de Insights lleva un enlace de baja que tiene que funcionar). La decisión de propósito y la publicación de AXIS v0.3.39 (2026-09-29) ya no bloquean`
 - Branch: `Greenhouse develop; sin worktrees`
 
 ## Summary
 
 Lleva a Greenhouse los módulos canónicos de correo de Efeonce que el operador aprobó el 2026-09-29: el pie oscuro, el
-CTA principal, la tarjeta de agenda y el bloque de marca con «Empower your {Línea}». Fija el juego de AXIS `v0.3.38`,
-pone al día el adapter de la órbita, construye los cuatro módulos desde el manifiesto de `efeonce.email-modules` y los
-aplica primero al correo de entrega de Efeonce Insights. Los demás correos los adoptan después, tipo por tipo, según la
-política de presentación. «Suscribirme» queda retirado.
+CTA principal, la tarjeta de agenda y el bloque de marca con «Empower your {Línea}». Fija el juego de AXIS `v0.3.39`
+(en publicación; contrato `efeonce.email-modules` `0.2.0`), pone al día el adapter de la órbita, construye los cuatro
+módulos desde el manifiesto de `efeonce.email-modules` y los aplica primero al correo de entrega de Efeonce Insights,
+que es un correo de servicio al cliente (`relationship_transactional`) con una excepción explícita que le deja el pie
+aprobado completo. Los demás correos los adoptan después, tipo por tipo, según la política de presentación.
+«Suscribirme» queda retirado.
 
 ## Why This Task Exists
 
@@ -52,16 +54,38 @@ CI (`pnpm creative:layout:test`), por eso nadie lo vio. El contrato `0.3.31` ent
 Y hay una tensión abierta con la política de presentación (TASK-1764, ADR `Proposed`). La política prohíbe la promoción
 en correos de servicio y reserva redes y baja a suscripción o marketing. El contrato de AXIS, en cambio, exige la agenda,
 las preferencias y la baja en **todo** pie. Aplicarlo a un correo sin decidir su propósito sería tomar esa decisión por
-la vía del código.
+la vía del código. **Resuelta para Insights el 2026-09-29** por decisión del operador (ver Delta 2026-09-29).
 
 ## Goal
 
-- Greenhouse fija AXIS `v0.3.38` y el adapter de la órbita vuelve a verde con el contrato `0.5.0`.
+- Greenhouse fija AXIS `v0.3.39` y el adapter de la órbita vuelve a verde con el contrato `0.5.0`.
 - Existen cuatro módulos de correo reutilizables que leen todos sus valores del manifiesto de AXIS y los PNG sellados.
 - El correo de entrega de Insights se ve como los tres tableros aprobados, en sus tres modalidades, en los clientes de
   correo reales.
-- El propósito del correo de Insights queda decidido por el operador antes de enviarlo con el pie nuevo, y cada tipo que
-  lo adopte después pasa por la política de presentación.
+- El correo de Insights sale como `relationship_transactional` con la excepción `efeonce-insights-delivery` declarada en
+  el registro de política de Greenhouse, y cada tipo que adopte los módulos después pasa por la política de
+  presentación sin excepción implícita.
+
+## Delta 2026-09-29 — propósito del correo de Insights decidido
+
+- **Decisión del operador (2026-09-29).** El correo de entrega de Efeonce Insights va a **clientes**: es un correo de
+  servicio al cliente, propósito `relationship_transactional` de la política de presentación
+  (`GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `Proposed`).
+- **Excepción explícita y documentada.** Conserva el **pie aprobado completo** del canvas v21: la tarjeta de agenda
+  «Agendar una reunión», las redes y los enlaces de preferencias y baja («Dejar de recibir estos informes»). El operador
+  la eligió frente a «sólo el botón» cuando se le preguntó. Aprobador: el operador; fecha: 2026-09-29; motivo: conservar el
+  pie del diseño aprobado (canvas v21).
+- **Los demás correos siguen la política:** sin agenda, redes ni baja en transaccionales y de servicio; baja obligatoria
+  en suscripción y marketing; redes opcionales en suscripción y obligatorias en marketing.
+- **AXIS, en paralelo:** `efeonce.email-modules` `0.2.0`. El intent pide `purpose` (obligatorio) y `application`, que
+  referencia un registro de excepciones; la excepción `efeonce-insights-delivery` permite `cta-agenda`, `socials` y
+  `unsubscribe`. Se retira `cta-agenda-required`; entran `cta-agenda-not-allowed`, `footer-socials-not-allowed`,
+  `footer-unsubscribe-not-allowed`, `application-unknown` y `application-purpose-mismatch`. Publicación objetivo:
+  tokens y contratos `0.3.39`, registro `0.3.4`, publicado el 2026-09-29 (tag `v0.3.39`, commit `1c18a2e`).
+- **Efecto en esta task:** Slice 1 fija `v0.3.39`; el adapter pasa `purpose` y `application` al contrato; sólo Insights
+  lleva agenda, redes y baja; el registro de política de Greenhouse declara la excepción. La decisión de propósito deja
+  de bloquear. Sigue bloqueando el envío: TASK-1774 (la baja del pie de Insights tiene que funcionar).
+- Registrado también en TASK-1764 (Delta 2026-09-29, resolución) y en la ADR de presentación (Delta 2026-09-29).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -94,8 +118,10 @@ Reglas obligatorias:
   correos.
 - Ningún correo pinta «Suscribirme». La agenda lleva a `https://efeoncepro.com/contacto/` con UTM y nunca a un
   `mailto:`.
-- Si un tipo no debe llevar agenda, redes o baja, eso se resuelve con una versión nueva del contrato en AXIS, nunca con
-  un adapter que quita módulos (ADR de AXIS `EMAIL_MODULES_DECISION_V1.md` §7).
+- El adapter pasa siempre `purpose` (y `application` cuando el tipo tiene excepción) al contrato
+  `efeonce.email-modules` `0.2.0`, que decide si caben agenda, redes y baja. El adapter nunca quita ni agrega módulos
+  por su cuenta (ADR de AXIS `EMAIL_MODULES_DECISION_V1.md` §7). Una excepción nueva es decisión del operador, con
+  aprobador, fecha y motivo, en el registro de Greenhouse y en el de AXIS.
 - Copy visible en `src/lib/copy/insights.ts` y `src/lib/copy/dictionaries/es-CL/emails.ts`, validado con
   `greenhouse-ux-writing`.
 - `Sentry` sólo por `captureWithDomain`.
@@ -117,16 +143,22 @@ Reglas obligatorias:
 - AXIS `v0.3.38` publicado (hecho el 2026-09-29): `@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts` `0.3.38`,
   `@efeoncepro/axis-graphic-line` `0.13.0`, `@efeoncepro/axis-brand-assets` `0.4.6`, `@efeoncepro/axis-ui-registry`
   `0.3.3`.
+- AXIS `v0.3.39` **publicado** (commit `1c18a2e`): `axis-tokens` y `axis-ui-contracts` `0.3.39` (contrato `efeonce.email-modules`
+  `0.2.0`, con `purpose` y `application`) y `axis-ui-registry` `0.3.4`. Es el objetivo del Slice 1; se confirma al
+  publicar.
 - Credencial efímera de lectura de paquetes, autorizada por el operador para esa instalación (runbook de AXIS).
-- `TASK-1774` (mecanismo de baja): el pie canónico siempre lleva un enlace de baja; mientras la baja no funcione, el pie
-  no se envía a nadie.
-- Decisión del operador sobre el propósito del correo de Insights (Open Questions).
+- `TASK-1774` (mecanismo de baja): el pie de Insights lleva un enlace de baja; mientras la baja no funcione, no se envía
+  a nadie.
+- Decisión del operador sobre el propósito del correo de Insights: **tomada el 2026-09-29** (Delta 2026-09-29).
+- Registro de política de presentación de Greenhouse (foundation de TASK-1764), donde se declara la excepción de
+  Insights.
 - Escritura en el bucket público de medios (`GREENHOUSE_PUBLIC_MEDIA_BUCKET`) para subir los PNG, autorizada por el
   operador.
 
 ### Blocks / Impacts
 
-- `TASK-1764` (umbrella de perfiles de pie): recibe los módulos como bloques del perfil y la tensión descrita arriba.
+- `TASK-1764` (umbrella de perfiles de pie): recibe los módulos como bloques del perfil. La tensión quedó resuelta para
+  Insights por excepción; su registro de política debe admitir excepciones por tipo con aprobador, fecha y motivo.
 - `TASK-1849` (biblioteca y presentación del correo de Insights): esta task construye la presentación del correo; 1849
   conserva el cableado de datos de la edición (hallazgos, cifras de «Lo esencial», tarjeta de decisión) y la ruta del
   portal.
@@ -145,6 +177,8 @@ Reglas obligatorias:
 - `src/emails/InsightsEditionDeliveryEmail.tsx`
 - `src/emails/constants.ts` (sólo URLs de los PNG de correo)
 - `src/lib/email/templates.ts` (sólo el registro y la vista previa del correo de Insights)
+- El registro de política de presentación en `src/lib/email/**` (sólo la declaración de los dos `EmailType` de
+  Insights y su excepción; la ruta la fija TASK-1764)
 - `src/emails/__snapshots__/EmailTemplateBaseline.test.tsx.snap` y `src/emails/EmailTemplateBaseline.test.tsx`
 - `src/config/efeonce-brand.ts` (sólo si la prueba de deriva pide un dato que falte, como el `tel` de cada teléfono)
 - `src/lib/copy/insights.ts` y `src/lib/copy/dictionaries/es-CL/emails.ts`
@@ -179,7 +213,10 @@ Reglas obligatorias:
 - Los PNG para correo de `axis-brand-assets` `0.4.6` no están en el bucket público.
 - El adapter de la órbita está rojo con el juego fijado hoy (0 de 7).
 - No hay prueba de deriva entre `efeonceEmail.institutional` de AXIS y `src/config/efeonce-brand.ts`.
-- El propósito de los correos de Insights no está clasificado en la política de presentación (la ADR sigue `Proposed`).
+- El propósito de los correos de Insights está decidido (`relationship_transactional` con la excepción
+  `efeonce-insights-delivery`), pero no está declarado en ningún registro de Greenhouse: el registro de política de
+  TASK-1764 todavía no existe y la ADR sigue `Proposed`.
+- Greenhouse no pasa `purpose` ni `application` a ningún contrato de AXIS.
 
 ## Modular Placement Contract
 
@@ -292,8 +329,10 @@ Reglas obligatorias:
   (descartado: no es lo aprobado para esta superficie).
 - Why this pattern: un canon y muchos correos; cada tipo adopta cuando su perfil lo permite.
 - Reuse / extend / new primitive: `new` (módulos) y `extend` (correo de Insights).
-- Open risks: propósito sin decidir; baja rota (TASK-1774); Outlook para Windows y la píldora; imagen de la órbita por
-  edición.
+- Propósito (operador, 2026-09-29): Insights es `relationship_transactional` con la excepción
+  `efeonce-insights-delivery`, que conserva agenda, redes y baja; los demás correos siguen la política sin excepción.
+- Open risks: baja rota (TASK-1774); registro de política aún inexistente; Outlook para Windows y la píldora; imagen de
+  la órbita por edición.
 
 ### Visual verification
 
@@ -324,11 +363,13 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Fijar AXIS `v0.3.38` y el adapter de la órbita en el mismo commit
+### Slice 1 — Fijar AXIS `v0.3.39` y el adapter de la órbita en el mismo commit
 
-- Fijar `@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts` `0.3.38`, `@efeoncepro/axis-graphic-line`
-  `0.13.0`, `@efeoncepro/axis-brand-assets` `0.4.6` y `@efeoncepro/axis-ui-registry` `0.3.3`. Instalar con una
-  credencial efímera autorizada por el operador (userconfig temporal fuera del repo, borrado al terminar), según
+- Fijar `@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts` `0.3.39` (contrato `efeonce.email-modules`
+  `0.2.0`) y `@efeoncepro/axis-ui-registry` `0.3.4`, con `@efeoncepro/axis-graphic-line` `0.13.0` y
+  `@efeoncepro/axis-brand-assets` `0.4.6` salvo que `v0.3.39` publique otras [verificar al publicar]. `v0.3.39` está en
+  publicación: el slice se toma cuando esté en el registro. Instalar con una credencial efímera autorizada por el
+  operador (userconfig temporal fuera del repo, borrado al terminar), según
   `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`.
 - En el mismo commit, llevar `scripts/creative/layout-compiler/graphic-line.mjs` al contrato
   `efeonce.graphic-line-orbit` `0.5.0`: `SUPPORTED_CONTRACT_VERSION` y lo que el contrato `0.4.0` (medida con
@@ -342,6 +383,12 @@ Reglas obligatorias:
 
 - Adapter que arma el intent y llama a `resolveEmailModulesIntent`; un `status: 'invalid'` no renderiza nada y se
   registra con `captureWithDomain`.
+- El adapter pasa `purpose` en todo intent y `application` sólo cuando el tipo tiene una excepción declarada. El
+  propósito y la excepción salen del registro de política de Greenhouse, nunca de una constante en la plantilla.
+- Pruebas del contrato `0.2.0`: `relationship_transactional` sin `application` con agenda, redes o baja da
+  `cta-agenda-not-allowed`, `footer-socials-not-allowed` o `footer-unsubscribe-not-allowed`; con
+  `application: 'efeonce-insights-delivery'` resuelve el pie completo; una `application` desconocida o de otro
+  propósito da `application-unknown` o `application-purpose-mismatch`.
 - Componentes `EfeonceEmailFooter`, `EmailCtaPrimary`, `EmailCtaAgenda` y `EfeonceEmailBrandBlock` con tablas, estilos
   en línea, botones a prueba de clientes (VML en Outlook) y colores translúcidos precompuestos.
 - Tamaño de cada imagen desde `EMAIL_ASSET_SEALS`; el eslogan según la línea (`email-slogan-{line}-negative`).
@@ -364,16 +411,24 @@ Reglas obligatorias:
 - Las tres modalidades y los dos locales; copy nuevo en `src/lib/copy/insights.ts`.
 - La modalidad `portal_link` se diseña pero no se habilita (`INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE` sigue en `false`).
 - Los bloques opcionales reciben sus datos por props; el cableado desde la edición es de TASK-1849.
-- Cabecera `List-Unsubscribe` si el tipo lleva baja, según la decisión de propósito.
+- Intent con `purpose: 'relationship_transactional'` y `application: 'efeonce-insights-delivery'`: pie completo con
+  agenda, redes, preferencias y baja, con `unsubscribeLabel` «Dejar de recibir estos informes».
+- Declarar en el registro de política de presentación de Greenhouse (foundation de TASK-1764) el propósito de
+  `insights_edition_delivery` e `insights_edition_delivery_attachment` y la excepción `efeonce-insights-delivery`, con
+  aprobador (operador), fecha (2026-09-29) y motivo. Si el registro no existe al tomar el slice, el plan acuerda con
+  TASK-1764 dónde nace la declaración; nunca una excepción implícita en la plantilla.
+- Como Insights lleva baja, va además la cabecera `List-Unsubscribe` una vez que TASK-1774 la deje funcionando.
 - Snapshot del correo en `EmailTemplateBaseline.test.tsx` y vista previa al día en `templates.ts`.
-- Requiere la decisión del operador sobre el propósito y la baja funcionando (TASK-1774).
+- El envío requiere la baja funcionando (TASK-1774). La decisión de propósito ya está tomada.
 
 ### Slice 5 — Evidencia en clientes de correo y adopción por tipo
 
 - Envío real a buzones de prueba: Gmail web y app, Outlook para Windows, Outlook web y Apple Mail, en claro y oscuro,
   con imágenes bloqueadas; dossier y scorecard.
-- Registrar en TASK-1764 la clasificación del correo de Insights y dejar escrita la regla de adopción de los demás tipos:
-  cada uno entra por una cohorte de TASK-1764, con su perfil, y sólo si el contrato vigente de AXIS lo permite.
+- Confirmar en TASK-1764 que la clasificación del correo de Insights y su excepción quedaron declaradas en el registro,
+  y dejar escrita la regla de adopción de los demás tipos: cada uno entra por una cohorte de TASK-1764, con su perfil y
+  su `purpose`, sin agenda, redes ni baja donde la política no los admite, y sin excepción que el operador no haya
+  aprobado.
 - Actualizar la documentación funcional y el manual de correo de Insights.
 
 ## Out of Scope
@@ -384,7 +439,9 @@ Reglas obligatorias:
 - Reparar el mecanismo de baja (TASK-1774).
 - Crear la página de preferencias de correo si no existe [verificar]; si falta, es una task aparte.
 - Cambiar el despacho, los destinatarios, la recurrencia o el visor compartido de Insights.
-- Publicar una versión nueva del contrato en AXIS; si hace falta un pie sin agenda o sin redes, se pide a AXIS.
+- Publicar el contrato en AXIS: `efeonce.email-modules` `0.2.0` lo publica AXIS en paralelo (`v0.3.39`); cualquier
+  cambio posterior se pide a AXIS.
+- Construir el registro de política de presentación completo (es de TASK-1764); aquí sólo se declara Insights.
 - El formulario de captura de Growth que dice «Suscribirme» (`src/growth-forms-renderer/copy.ts`): es otra superficie.
 
 ## Detailed Spec
@@ -392,10 +449,13 @@ Reglas obligatorias:
 El detalle región por región, los estados, el copy y las reglas de cliente de correo viven en el wireframe
 `docs/ui/wireframes/TASK-1944-efeonce-email-modules-adoption.md`.
 
-Intent de ejemplo para el correo de Insights (forma del contrato `efeonce.email-modules` `0.1.0`):
+Intent de ejemplo para el correo de Insights (forma del contrato `efeonce.email-modules` `0.2.0`; los nombres exactos
+se confirman contra el paquete publicado):
 
 ```ts
 resolveEmailModulesIntent({
+  purpose: 'relationship_transactional',
+  application: 'efeonce-insights-delivery', // excepción: permite cta-agenda, socials y unsubscribe
   line: 'growth',
   channel: 'desktop', // y un segundo render 'mobile' si el plan elige dos pasadas; ver Open Questions
   product: 'efeonce-insights',
@@ -404,9 +464,18 @@ resolveEmailModulesIntent({
     { kind: 'cta-primary', label: 'Ver el informe completo  →', url: shareUrl, note: '3 capítulos · …' },
     { kind: 'cta-agenda', title: '¿Lo revisamos juntos?', body: 'Elige un horario y te mostramos…', url: 'https://efeoncepro.com/contacto/' }
   ],
-  footer: { preferencesUrl, unsubscribeUrl, reason: 'Recibes este correo porque tu organización trabaja con Efeonce.' }
+  footer: {
+    preferencesUrl,
+    unsubscribeUrl,
+    unsubscribeLabel: 'Dejar de recibir estos informes',
+    reason: 'Recibes este correo porque tu organización trabaja con Efeonce.'
+  }
 })
 ```
+
+Sin `application`, el mismo intent con `purpose: 'relationship_transactional'` es inválido
+(`cta-agenda-not-allowed`, `footer-socials-not-allowed`, `footer-unsubscribe-not-allowed`): así queda el pie de
+cualquier otro correo de servicio.
 
 El resolver agrega `utm_medium=email`, `utm_source=efeonce-insights`, `utm_content=pie` y `utm_campaign` a la agenda
 sin pisar los que ya traiga la URL. En la modalidad `attachment` no hay `cta-primary`: el intent lleva sólo la agenda.
@@ -418,15 +487,16 @@ sin pisar los que ya traiga la URL. En la modalidad `attachment` no hay `cta-pri
 - Slice 1 → Slice 2 → Slice 3 → Slice 4 → Slice 5.
 - El bump de AXIS y el adapter de la órbita van en **un solo commit**: separados, el adapter queda rojo o el bump no
   compila la suite creativa.
-- Slice 4 no se envía a clientes antes de dos condiciones: la decisión del operador sobre el propósito y TASK-1774 con
-  la baja funcionando.
-- Si TASK-1938 hace el bump antes, el Slice 1 se reduce a verificarlo.
+- Slice 1 espera `v0.3.39` en el registro de paquetes.
+- Slice 4 no se envía a clientes antes de dos condiciones: la excepción de Insights declarada en el registro de
+  política y TASK-1774 con la baja funcionando. La decisión de propósito ya está tomada (2026-09-29).
+- Si TASK-1938 hace el bump antes, el Slice 1 se reduce a verificarlo (y a subirlo a `v0.3.39` si fijó `v0.3.38`).
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Un correo de servicio sale con agenda y redes contra la política | email / compliance | medium | decisión de propósito antes del envío; tipos nuevos sólo por cohorte de TASK-1764 | revisión de la cohorte; no hay señal automática |
+| Un correo de servicio sale con agenda y redes contra la política | email / compliance | low | el contrato `0.2.0` rechaza agenda, redes y baja fuera de su propósito salvo una excepción registrada; el adapter pasa `purpose` y `application` desde el registro; tipos nuevos sólo por cohorte de TASK-1764 | intent `invalid` registrado con `captureWithDomain`; prueba del contrato |
 | El enlace de baja del pie no funciona | email | high hoy | bloqueo del Slice 4 por TASK-1774 | reclamos o rebotes en `email_deliveries` |
 | El bump rompe la suite creativa o los tokens compilados | tooling / Composer | medium | adapter en el mismo commit; `brand:tokens`, `glitch:tokens` y `manzanitas:tokens` con `--check`; `creative:layout:test` | CI de `develop` |
 | Outlook para Windows pinta mal la píldora o los filetes | email | medium | VML, colores precompuestos, filetes como celdas | revisión en buzón de prueba |
@@ -461,9 +531,10 @@ sin pisar los que ya traiga la URL. En la modalidad `attachment` no hay `cta-pri
 
 ### Out-of-band coordination required
 
-- Decisión del operador sobre el propósito del correo de Insights y sobre las Open Questions.
+- Decisión del operador sobre el propósito del correo de Insights: tomada el 2026-09-29. Quedan las Open Questions
+  abiertas.
 - Credencial efímera de paquetes y escritura en el bucket público, ambas autorizadas por el operador.
-- Si el propósito exige una versión nueva del contrato, publicación en AXIS antes del Slice 4.
+- Publicación de AXIS `v0.3.39` (contrato `0.2.0` con la excepción `efeonce-insights-delivery`) antes del Slice 1.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -477,8 +548,9 @@ sin pisar los que ya traiga la URL. En la modalidad `attachment` no hay `cta-pri
 - [x] El operador aprobó el correo y sus tableros quedaron en `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1/` (2026-09-29).
 - [ ] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation mapping, GVC
   scenario plan y design decision log cerrados; si pasa a `yes`, `pnpm task:lint --task TASK-1944` queda sin hallazgos.
-- [ ] Greenhouse fija `axis-tokens` y `axis-ui-contracts` `0.3.38`, `axis-graphic-line` `0.13.0`, `axis-brand-assets`
-  `0.4.6` y `axis-ui-registry` `0.3.3`, instalados con credencial efímera autorizada.
+- [ ] Greenhouse fija `axis-tokens` y `axis-ui-contracts` `0.3.39` (contrato `efeonce.email-modules` `0.2.0`) y
+  `axis-ui-registry` `0.3.4`, con `axis-graphic-line` y `axis-brand-assets` en las versiones que publique `v0.3.39`,
+  instalados con credencial efímera autorizada.
 - [ ] En el mismo commit, `graphic-line.mjs` acepta el contrato `efeonce.graphic-line-orbit` `0.5.0` y dibuja el
   recorrido; `pnpm creative:layout:test` queda verde.
 - [ ] `pnpm brand:tokens --check`, `pnpm glitch:tokens --check` y `pnpm manzanitas:tokens --check` quedan verdes tras el
@@ -488,6 +560,15 @@ sin pisar los que ya traiga la URL. En la modalidad `attachment` no hay `cta-pri
 - [ ] `EmailLayout` conserva su default y `EmailButton` sigue sirviendo a los demás correos; el snapshot de los otros
   tipos no cambia.
 - [ ] Un intent con `status: 'invalid'` no produce correo y queda registrado con `captureWithDomain`.
+- [ ] El adapter pasa `purpose` en todo intent y `application` sólo para un tipo con excepción declarada, ambos leídos
+  del registro de política; ninguna plantilla los fija a mano.
+- [ ] Sólo el correo de Insights (`application: 'efeonce-insights-delivery'`) lleva agenda, redes y baja; un test
+  prueba que el mismo intent sin `application` da `cta-agenda-not-allowed`, `footer-socials-not-allowed` y
+  `footer-unsubscribe-not-allowed`, y que una `application` desconocida o de otro propósito es inválida.
+- [ ] El registro de política de presentación de Greenhouse declara los dos `EmailType` de Insights como
+  `relationship_transactional` con la excepción `efeonce-insights-delivery` (aprobador, fecha 2026-09-29 y motivo).
+- [ ] La baja del pie de Insights dice «Dejar de recibir estos informes» (`unsubscribeLabel`) y el correo lleva la
+  cabecera `List-Unsubscribe`.
 - [ ] Una prueba compara `efeonceEmail.institutional` con `src/config/efeonce-brand.ts` y falla ante cualquier diferencia.
 - [ ] Ningún correo de `src/emails/**` pinta «Suscribirme»; la agenda enlaza a `https://efeoncepro.com/contacto/` con
   `utm_medium=email`, `utm_source=efeonce-insights`, `utm_content=pie` y `utm_campaign=insights-report`, nunca a un
@@ -505,8 +586,9 @@ sin pisar los que ya traiga la URL. En la modalidad `attachment` no hay `cta-pri
 - [ ] El HTML pasa los seis checks del adapter de AXIS, verificado por test.
 - [ ] Evidencia en Gmail web y app, Outlook para Windows, Outlook web y Apple Mail, en claro y oscuro, y con imágenes
   bloqueadas, en el dossier.
-- [ ] El operador decidió el propósito del correo de Insights y la decisión quedó registrada en TASK-1764 y en la ADR de
-  presentación antes del primer envío con el pie nuevo.
+- [x] El operador decidió el propósito del correo de Insights (2026-09-29: `relationship_transactional` con la excepción
+  `efeonce-insights-delivery`) y la decisión quedó registrada en TASK-1764 y en la ADR de presentación (Delta
+  2026-09-29) antes del primer envío con el pie nuevo.
 - [ ] El enlace de baja del pie funciona de punta a punta (TASK-1774 cerrada) antes del primer envío.
 
 ## Verification
@@ -528,29 +610,28 @@ sin pisar los que ya traiga la URL. En la modalidad `attachment` no hay `cta-pri
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] La dirección `EFEONCE_EMAIL_MODULES_V1-direction.md` y el runbook de AXIS registran que Greenhouse fija `v0.3.38`.
+- [ ] La dirección `EFEONCE_EMAIL_MODULES_V1-direction.md` y el runbook de AXIS registran que Greenhouse fija `v0.3.39`.
 - [ ] `efeonceEmail.applications` de AXIS y el ADR de AXIS reciben la aplicación implementada, para promover el
   contrato a `trial`.
 
 ## Follow-ups
 
 - Adopción por cohorte de los demás tipos, dentro de TASK-1764, cuando su perfil lo permita.
-- Si el propósito de algún tipo pide un pie sin agenda o sin redes, versión nueva de `efeonce.email-modules` en AXIS.
+- Otra excepción por tipo sólo con decisión del operador (aprobador, fecha y motivo), declarada en el registro de
+  Greenhouse y en el de excepciones de AXIS.
 - Página de preferencias de correo, si no existe.
 - Promoción del contrato de `candidate` a `trial` en AXIS con la evidencia de esta task.
 
 ## Open Questions
 
-- **Propósito del correo de Insights (decide el operador).** Un informe recurrente cabe en `optional_subscription`
-  (baja obligatoria, redes opcionales, identidad legal `full` con países y privacidad) o en `relationship_transactional`
-  (sin baja, sin redes, sin promoción). El pie aprobado lleva agenda, redes y baja: con `optional_subscription` la baja y
-  las redes calzan, pero falta decidir si la agenda vuelve el correo mixto y si el bloque legal sin países cumple el
-  perfil `full`. Con `relationship_transactional`, el pie aprobado no calza y haría falta una versión nueva del contrato.
-- **Qué pie llevan los demás correos.** El contrato `0.1.0` exige agenda, preferencias y baja en todo pie
-  (`cta-agenda-required`, `footer-preferences-required`, `footer-unsubscribe-required`). ¿Se pide a AXIS una variante
-  por perfil antes de la primera cohorte fuera de Insights?
-- **Texto de la baja.** AXIS dice «Dejar de recibir estos correos»; el canvas decía «Dejar de recibir estos informes».
-  El contrato acepta `unsubscribeLabel`: ¿se usa la versión del canvas para Insights?
+- ~~**Propósito del correo de Insights.**~~ **Resuelta el 2026-09-29 por el operador:** `relationship_transactional`
+  (va a clientes) con la excepción explícita `efeonce-insights-delivery`, que conserva el pie aprobado completo (agenda,
+  redes, preferencias y baja). Elegida frente a «sólo el botón». Ver Delta 2026-09-29.
+- ~~**Qué pie llevan los demás correos.**~~ **Resuelta el 2026-09-29:** siguen la política. Sin agenda, redes ni baja en
+  transaccionales y de servicio; baja obligatoria en suscripción y marketing; redes opcionales en suscripción y
+  obligatorias en marketing. El contrato `0.2.0` retira `cta-agenda-required` y valida por `purpose`.
+- ~~**Texto de la baja.**~~ **Resuelta el 2026-09-29:** Insights usa «Dejar de recibir estos informes»
+  (`unsubscribeLabel`).
 - **Imagen de la órbita por edición.** Hornear un PNG por edición exige generarlo y servirlo: adjunto en línea (CID) en
   el envío o archivo público por edición. Si pide almacenamiento o un endpoint nuevo, es una task `backend-data` aparte.
 - **Dos anchos en un HTML.** El resolver entrega valores por `channel`; el correo es uno solo. El plan decide si se

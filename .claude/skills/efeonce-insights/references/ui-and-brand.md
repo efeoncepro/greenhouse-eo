@@ -286,8 +286,12 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
   agenda, bloque de marca con «Empower your Growth»; `efeonce.email-modules` 0.1.0, `efeonceEmail`, PNG `email-*` de
   `axis-brand-assets` 0.4.6; Lab `https://axis.efeonce.org/references/email/`), no la plantilla. Lo propio de Insights:
   cabecera, «Lo esencial del mes», la órbita de medida (con el camino recorrido desde las 12) y la tarjeta de decisión.
-  «Suscribirme» retirado; la agenda va a `/contacto/` con UTM `utm_source=efeonce-insights`. Pendiente: implementación
-  (hand-off de TASK-1848 a TASK-1849 o task propia), bump de AXIS y la tensión con la policy de footer de TASK-1764.
+  «Suscribirme» retirado; la agenda va a `/contacto/` con UTM `utm_source=efeonce-insights`. **Propósito (operador,
+  2026-09-29):** correo de servicio al cliente, `relationship_transactional`, con la **excepción explícita**
+  `efeonce-insights-delivery` que conserva el pie completo (agenda, redes, preferencias y baja «Dejar de recibir estos
+  informes»); los demás correos siguen la policy de footer (TASK-1764). El adapter pasa `purpose` y `application` al
+  contrato `efeonce.email-modules` `0.2.0` (publicado en `v0.3.39`, commit `1c18a2e`). Pendiente: implementación (TASK-1944; TASK-1849
+  cablea los datos de la edición), bump de AXIS a v0.3.39 y la baja funcionando (TASK-1774).
   Si el correo lleva la marca de Insights sigue siendo gap (§7.1).
 - **Portal** (TASK-1849, S1–S5 y S7): sólo diseño (`docs/ui/{wireframes,flows,motion}/TASK-1849-*`), sin código.
 - **MCP**: ~17 tools (gateway `efeonce-mcp` v1.9.0); sin superficie visual.

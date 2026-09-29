@@ -26,13 +26,22 @@ https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd v21), que queda como **una apl
 `@efeoncepro/axis-brand-assets` 0.4.6; dirección sellada `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`.
 **Greenhouse no los adoptó todavía.**
 
-**Tensión con esta referencia, registrada y sin resolver:** el pie aprobado difiere del orden visual de abajo
-(wordmark gris → contexto → controles → RRSS → identidad) y lleva agenda, redes y baja en todo correo, mientras la
-tabla de elegibilidad deja `unsubscribe: forbidden` y `RRSS: none` en los propósitos transaccionales y la policy prohíbe
-promoción en correos de servicio. Hasta que el operador decida al adoptar los módulos: no mezcles las dos anatomías en
-un template, no quites la agenda ni las redes de un correo que adopte los módulos para «cumplir» esta tabla, y no
-agregues agenda ni redes a un tipo transaccional migrado con esta policy. Los datos legales son los mismos en ambos
-casos (`src/config/efeonce-brand.ts`).
+**Resuelto el 2026-09-29 (operador) con una excepción explícita:**
+
+| Caso | Agenda | Redes | Baja |
+| --- | --- | --- | --- |
+| Insights (`insights_edition_delivery` e `insights_edition_delivery_attachment`): `relationship_transactional` + excepción `efeonce-insights-delivery` | sí | sí | sí, «Dejar de recibir estos informes» |
+| Transaccionales y de servicio sin excepción | no | no | no |
+| `optional_subscription` | según el contrato | opcionales | obligatoria |
+| `commercial_marketing` | según el contrato | obligatorias | obligatoria |
+
+- La excepción es **por tipo**, con aprobador (operador), fecha (2026-09-29) y motivo, y se declara en el registro
+  `EMAIL_PRESENTATION_POLICY` (TASK-1764 debe admitir excepciones). Sin excepción registrada rige el perfil base.
+- El contrato `efeonce.email-modules` `0.2.0` (publicado en `v0.3.39`, commit `1c18a2e`) recibe `purpose` y `application`; sin excepción
+  rechaza agenda, redes o baja fuera de su propósito (`cta-agenda-not-allowed`, `footer-socials-not-allowed`,
+  `footer-unsubscribe-not-allowed`) y una `application` ajena (`application-unknown`, `application-purpose-mismatch`).
+- No mezcles las dos anatomías en un template ni quites módulos en el adapter. Los datos legales son los mismos en
+  ambos casos (`src/config/efeonce-brand.ts`). La baja de Insights depende de `TASK-1774`.
 
 ## Verdad visual aprobada
 

@@ -315,7 +315,11 @@ v21 (page «Correo»: share link desktop, mobile, PDF attached), sealed directio
 modules canonized in AXIS `v0.3.38` (footer, CTA modules, footer brand block; `efeonce.email-modules` 0.1.0), not a
 template for other emails. Implementation pending (whoever owns it: this task or a dedicated one), and it needs the
 AXIS bump (brand-assets 0.4.6 for the email PNGs, orbit contract 0.5.0 for the travelled path of its measure) plus a
-decision on the TASK-1764 footer-policy tension.
+decision on the TASK-1764 footer-policy tension. **Implementation owner: TASK-1944** (1849 keeps the edition data
+wiring). **Tension decided 2026-09-29 (operator):** both Insights `EmailType`s go to clients and are
+`relationship_transactional`, with the explicit exception `efeonce-insights-delivery` that keeps the full approved
+footer (agenda, socials, preferences and unsubscribe «Dejar de recibir estos informes»); every other email follows the
+policy. Contract `efeonce.email-modules` 0.2.0 (`purpose` + `application`), publishing in AXIS v0.3.39.
 
 _Fill at closure._
 
@@ -559,6 +563,14 @@ producción antes de compartir con clientes. Sin flag propio.
 
 ## Sessions (append as you go; newest first)
 
+- **2026-09-29 · Insights delivery email purpose decided (docs only; no code).** Operator: the email goes to clients,
+  so it is a client service email, `relationship_transactional` in the presentation policy. As an explicit, documented
+  exception (`efeonce-insights-delivery`; approver: operator; 2026-09-29) it keeps the whole approved footer of canvas
+  v21: agenda «Agendar una reunión», socials and preferences/unsubscribe («Dejar de recibir estos informes»), chosen
+  over «only the button». Every other email follows the policy. AXIS publishes `efeonce.email-modules` 0.2.0
+  (`purpose` required, `application` referencing an exceptions registry, `cta-agenda-required` removed), target
+  v0.3.39 (publishing). Recorded in TASK-1944, TASK-1764, the presentation ADR and `DECISIONS_INDEX`. Sending still
+  needs TASK-1774 (working unsubscribe).
 - **2026-09-29 · Insights delivery email approved (design only; no task, no code).** The operator approved the delivery
   email on the canvas https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd v21 (page «Correo», three boards: share link
   desktop, mobile, PDF attached) and asked to canonize it, scoping it as **one application**: the canon is the footer,

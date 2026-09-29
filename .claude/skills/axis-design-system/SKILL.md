@@ -815,11 +815,16 @@ and the **footer brand block**; other emails build their own body on the same ba
 - **Greenhouse has not adopted it:** it pins the older set (above), and `src/emails/InsightsEditionDeliveryEmail.tsx`
   and `src/emails/components/EmailLayout.tsx` are unchanged. Skills: `greenhouse-email`, `resend-email-platform`,
   `efeonce-graphic-line` → `applications.md` §C4.
-- **Open tension (recorded, not resolved):** the proposed Greenhouse email presentation policy (TASK-1764, ADR
-  `GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `Proposed`) forbids promotion in service emails and reserves
-  socials and unsubscribe for marketing profiles, while the approved footer carries the agenda and socials in every
-  email. No agent removes the agenda or socials to «comply»; the operator decides, and a change is a new contract
-  version.
+- **Footer by purpose (operator decision 2026-09-29; resolves the TASK-1764 tension for Insights):** the Insights
+  delivery email goes to clients, so it is `relationship_transactional`, with the explicit exception
+  `efeonce-insights-delivery` that keeps the full footer (agenda, socials, preferences and unsubscribe «Dejar de
+  recibir estos informes»). Every other email follows the Greenhouse policy: no agenda, socials or unsubscribe in
+  transactional/service emails; unsubscribe required in subscription and marketing; socials optional in subscription,
+  required in marketing. **Contract `efeonce.email-modules` `0.2.0`** (publishing in v0.3.39: tokens and contracts
+  0.3.39, registry 0.3.4): required `purpose` and an `application` that references an exceptions registry;
+  `cta-agenda-required` removed; new codes `cta-agenda-not-allowed`, `footer-socials-not-allowed`,
+  `footer-unsubscribe-not-allowed`, `application-unknown`, `application-purpose-mismatch`. Exceptions are per type,
+  with approver, date and reason; no adapter removes modules on its own.
 
 ### AXIS Lab
 

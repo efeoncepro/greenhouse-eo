@@ -92,7 +92,7 @@ reunión», a `https://efeoncepro.com/contacto/` con UTM y nunca a un correo. Di
 bang, unsubscribe prohibido por defecto y RRSS sólo en suscripción o marketing siguen vigentes. Los módulos entran como
 **bloques** de los perfiles, no como un nuevo default de `EmailLayout`.
 
-**Tensión abierta, sin resolver aquí:**
+**Tensión (resuelta para Insights en el Delta 2026-09-29 de resolución, abajo):**
 
 | Módulo aprobado | Lo que dice esta política | Lo que exige el contrato de AXIS `0.1.0` |
 |---|---|---|
@@ -111,6 +111,20 @@ bang, unsubscribe prohibido por defecto y RRSS sólo en suscripción o marketing
 - Cualquier pie con baja depende de `TASK-1774`: el enlace de baja tiene que funcionar antes del primer envío.
 - Los demás tipos adoptan los módulos sólo por cohorte de esta umbrella, con su perfil, y sólo si el contrato vigente de
   AXIS lo permite.
+
+## Delta 2026-09-29 (resolución) — tensión resuelta para Insights por excepción explícita
+
+- **Decisión del operador:** los dos `EmailType` de Insights van a clientes y son `relationship_transactional`. Como
+  **excepción explícita y documentada** (`efeonce-insights-delivery`), conservan el pie aprobado completo: agenda,
+  redes, preferencias y baja («Dejar de recibir estos informes»). El operador la prefirió a dejar sólo el botón.
+- **La decisión de esta umbrella no cambia para los demás tipos:** sin agenda, redes ni baja en transaccionales y de
+  servicio; baja obligatoria en suscripción y marketing; redes opcionales en suscripción y obligatorias en marketing.
+- **Nuevo requisito del registro** `EMAIL_PRESENTATION_POLICY`: admitir **excepciones por tipo**, cada una con
+  aprobador, fecha y motivo, y declarar la de Insights (aprobador: operador; 2026-09-29). Ausencia de excepción
+  registrada = el perfil base, nunca una excepción inferida.
+- AXIS lo expresa en `efeonce.email-modules` `0.2.0` (`purpose` obligatorio + `application` contra un registro de
+  excepciones; se retira `cta-agenda-required`), publicado en `v0.3.39` (commit `1c18a2e`). La baja de Insights sigue dependiendo de
+  `TASK-1774`. Implementación: [TASK-1944](TASK-1944-efeonce-email-modules-adoption.md).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS

@@ -607,8 +607,12 @@ genera borrador para revisión; autoemisión/envío exige autorización previa e
   `efeonce.email-modules` 0.1.0). El template actual no cambia hasta
   [TASK-1944](../tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md), que construye los módulos y la
   presentación; TASK-1849 conserva el cableado de los datos de la edición (hallazgos, cifras, tarjeta de decisión).
-  Antes del primer envío con el pie nuevo, el operador decide el propósito de los dos `EmailType` frente a la política
-  de presentación (TASK-1764: el pie aprobado lleva agenda, redes y baja) y la baja tiene que funcionar (TASK-1774).
+  **Propósito decidido (operador, 2026-09-29):** los dos `EmailType` van a clientes y son `relationship_transactional`,
+  con la **excepción explícita** `efeonce-insights-delivery` que conserva el pie aprobado completo (agenda, redes,
+  preferencias y baja «Dejar de recibir estos informes»); los demás correos siguen la política de presentación. La
+  excepción se declara con aprobador, fecha y motivo en el registro de política (TASK-1764) y viaja al contrato
+  `efeonce.email-modules` `0.2.0` como `purpose` + `application` (publicado en `v0.3.39`, commit `1c18a2e`). Antes del primer envío la
+  baja tiene que funcionar (TASK-1774).
 - **Despacho:** projection `insights_delivery_dispatch` (lane `ops-reactive-notifications`) →
   `dispatchInsightDeliveryIntent`: claim atómico, revalida edición/persona/buzón; `share_link` usa
   `claimTokenSensitiveEmailIntent`, que crea la fila de `email_deliveries` y el grant (`source='delivery'`) en la

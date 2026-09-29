@@ -7,8 +7,14 @@ aplicación, el correo de entrega de Efeonce Insights, en sus tres modalidades.
 > **Estado 2026-09-29:** dirección **aprobada** («Quedó aprobadísimo este mail, canonízalo») y canon **publicado** en
 > AXIS `v0.3.38` (`main` `c92160b`). La dirección y sus tres tableros son el contrato de fidelidad:
 > [`EFEONCE_EMAIL_MODULES_V1-direction.md`](../visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md).
-> `UI ready` sigue en `no`: faltan la decisión del propósito del correo de Insights (Open Questions de la task), el
-> mapeo contra el HTML real de React Email y el plan GVC ejecutado en clientes de correo.
+> `UI ready` sigue en `no`: faltan el mapeo contra el HTML real de React Email y el plan GVC ejecutado en clientes de
+> correo.
+>
+> **Delta 2026-09-29 — propósito decidido.** El operador clasificó el correo de Insights como
+> `relationship_transactional` (va a clientes) con la excepción explícita `efeonce-insights-delivery`, que le conserva
+> el pie aprobado completo: agenda, redes, preferencias y baja «Dejar de recibir estos informes». Los demás correos
+> siguen la política (ver «Pie por propósito»). AXIS lo expresa en `efeonce.email-modules` `0.2.0`, en publicación
+> (v0.3.39).
 
 - Visual direction mode: source-led (aprobada el 2026-09-29).
 - Product Design asset: `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1/insights-enlace-escritorio.png`
@@ -17,7 +23,8 @@ aplicación, el correo de entrega de Efeonce Insights, en sus tres modalidades.
 - **Fuente editable:** canvas «Correo de Efeonce Insights», página «Correo», versión 21:
   <https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd> (`Main.dc.html`, `Movil.dc.html`, `Adjunto.dc.html`).
 - **Canon de valores:** AXIS. Tokens `efeonceEmail` (`@efeoncepro/axis-tokens` `0.3.38`); contrato
-  `efeonce.email-modules` `0.1.0` `candidate` (`@efeoncepro/axis-ui-contracts` `0.3.38`, resolver
+  `efeonce.email-modules` `0.1.0` `candidate` (`@efeoncepro/axis-ui-contracts` `0.3.38`; la `0.2.0`, con `purpose` y
+  `application`, publicado en `v0.3.39`; resolver
   `resolveEmailModulesIntent`, schema del manifiesto `axis.email-modules-composition.v1`); PNG para correo en
   `@efeoncepro/axis-brand-assets` `0.4.6` (`EMAIL_ASSET_SEALS`); Lab <https://axis.efeonce.org/references/email/>; ADR
   `docs/architecture/EMAIL_MODULES_DECISION_V1.md` y guía `docs/agent-composition/email-modules.md` en el repo
@@ -66,6 +73,27 @@ Banda de ancho completo sobre `efeonceEmail.palette.ground` (`#001a33`), en este
 8. **Motivo y ©:** «Recibes este correo porque tu organización trabaja con Efeonce.» y «© [año] Efeonce Group SpA.
    Todos los derechos reservados.».
 
+Ésta es la anatomía **completa**, la que lleva el correo de Insights por su excepción. Otro correo pinta sólo las
+piezas que su propósito admite, en el mismo orden.
+
+### Pie por propósito (contrato `efeonce.email-modules` `0.2.0`)
+
+El adapter pasa `purpose` en todo intent y `application` sólo si el tipo tiene excepción; el contrato decide qué piezas
+caben. El adapter nunca quita ni agrega piezas por su cuenta.
+
+| Propósito del tipo | Agenda | Redes | Baja (con preferencias) |
+|---|---|---|---|
+| Transaccional o de servicio (`relationship_transactional`, `transactional_service` y los demás no comerciales) | no (`cta-agenda-not-allowed`) | no (`footer-socials-not-allowed`) | no (`footer-unsubscribe-not-allowed`) |
+| `optional_subscription` | la fija el contrato `0.2.0` | opcionales | obligatoria |
+| `commercial_marketing` | la fija el contrato `0.2.0` | obligatorias | obligatoria |
+| **Excepción `efeonce-insights-delivery`** (`relationship_transactional`) | sí | sí | sí, «Dejar de recibir estos informes» |
+
+- La excepción es explícita, por tipo, con aprobador (operador), fecha (2026-09-29) y motivo, y vive en el registro de
+  política de Greenhouse y en el registro de excepciones de AXIS. Una `application` desconocida o de otro propósito es
+  inválida (`application-unknown`, `application-purpose-mismatch`).
+- Bloque de marca, bloque legal y motivo con © van según el perfil de la política; los datos legales siempre salen de
+  `src/config/efeonce-brand.ts`.
+
 ### Órbita de medida (R4, aplicación)
 
 - Geometría del canvas: `viewBox` 260 a 240 px, centro (130, 130), radio 110.
@@ -108,7 +136,7 @@ Tablero de referencia: `insights-enlace-movil.png` (390×2900).
 1. **Primaria del cuerpo:** `cta-primary`, «Ver el informe completo  →», al informe (enlace compartido o portal según la
    modalidad). Una sola por correo (`cta-primary-duplicate`). No existe en la modalidad `attachment`.
 2. **Secundaria, única comercial:** `cta-agenda`, «Agendar una reunión», a la agenda con UTM. Una sola vez, arriba del
-   pie (`cta-agenda-duplicate`).
+   pie (`cta-agenda-duplicate`), y sólo donde el propósito o una excepción la admite (Insights, por su excepción).
 3. **Terciarias:** burbuja URL, redes, `tel:`, `mailto:`, preferencias y baja.
 4. **Retirada:** «Suscribirme». AXIS la rechaza (`cta-subscribe-retired`); ningún correo la vuelve a pintar.
 
@@ -134,8 +162,8 @@ aquí (eso es de TASK-1057).
 ## Copy Ledger
 
 Canon de AXIS (se toma del manifiesto, no se reescribe): «Agendar una reunión», «Preferencias de correo», el enlace de
-baja (AXIS: «Dejar de recibir estos correos»; el canvas decía «…estos informes», ver Open Questions de la task), el
-motivo y el ©.
+baja, el motivo y el ©. La baja por defecto de AXIS es «Dejar de recibir estos correos»; **Insights usa «Dejar de
+recibir estos informes»** vía `unsubscribeLabel` (decisión del operador, 2026-09-29).
 
 De la aplicación, en `src/lib/copy/insights.ts` (Insights) y `src/lib/copy/dictionaries/es-CL/emails.ts` (lo que sea
 compartido entre correos), validado con `greenhouse-ux-writing`, es-CL con tuteo, y su versión `en`:
@@ -191,13 +219,14 @@ compartido entre correos), validado con `greenhouse-ux-writing`, es-CL con tuteo
   (`darkMode: 'ground-declared-on-cell'`).
 - Los PNG se sirven desde un origen público estable, con el mismo patrón que `EFEONCE_LOGO_URL`
   (`GREENHOUSE_PUBLIC_MEDIA_BUCKET`, carpeta `emails/`), y su SHA-256 coincide con `EMAIL_ASSET_SEALS`.
-- El enlace personal con token no pasa por tracking de clics (TASK-1848). La agenda sí lleva UTM. Si el tipo lleva baja,
-  va además la cabecera `List-Unsubscribe`.
+- El enlace personal con token no pasa por tracking de clics (TASK-1848). La agenda sí lleva UTM. Si el tipo lleva baja
+  (Insights la lleva por su excepción), va además la cabecera `List-Unsubscribe`.
 
 ## Implementation Mapping
 
 - **Adapter del manifiesto** [propuesta de ruta; se confirma en el plan]: `src/emails/efeonce-modules/resolve.ts`
-  arma el intent (`line`, `channel`, `product`, `campaign`, `modules`, `footer`) desde el contexto del correo y llama a
+  arma el intent (`purpose`, `application` si hay excepción, `line`, `channel`, `product`, `campaign`, `modules`,
+  `footer`) desde el contexto del correo y el registro de política de Greenhouse, y llama a
   `resolveEmailModulesIntent`; convierte cada id de asset en URL pública y precompone los `rgba`.
 - **Componentes** [propuesta]: `src/emails/efeonce-modules/EfeonceEmailFooter.tsx`, `EmailCtaPrimary.tsx`,
   `EmailCtaAgenda.tsx` y `EfeonceEmailBrandBlock.tsx`. Piezas componibles: **no** cambian el default de
@@ -238,7 +267,9 @@ compartido entre correos), validado con `greenhouse-ux-writing`, es-CL con tuteo
 - **«Agendar una reunión» reemplaza a «Suscribirme» en todo correo**, a la agenda con UTM, nunca a un correo.
 - **Logo y eslogan en dos PNG**, nunca uno: el SSOT de marca los trata como elementos independientes.
 - **Piezas componibles junto a `EmailLayout`, no un nuevo default**: evita el big bang que TASK-1764 prohíbe.
-- **Un correo que no deba llevar agenda o redes no se arregla quitando módulos en el adapter**: eso es una versión
-  nueva del contrato en AXIS (ADR de AXIS §7).
+- **Un correo que no deba llevar agenda o redes no se arregla quitando módulos en el adapter** (ADR de AXIS §7): el
+  adapter declara `purpose` y el contrato `0.2.0` decide.
+- **Insights es `relationship_transactional` con la excepción `efeonce-insights-delivery`** (operador, 2026-09-29): va
+  a clientes y conserva el pie completo; se prefirió a dejar sólo el botón. Los demás correos siguen la política.
 - Descartado: pie claro de TASK-1764 para Insights (no es lo aprobado para esta superficie); eslogan en el acento
   (a ~12 px no llega a 24 px); agenda como `mailto:`; SVG en línea.

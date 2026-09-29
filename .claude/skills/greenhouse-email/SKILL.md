@@ -211,11 +211,14 @@ Dirección sellada en Greenhouse: `docs/ui/visual-directions/EFEONCE_EMAIL_MODUL
 (`efeonce-insights`). No declares el pie nuevo como runtime ni lo copies a mano desde el canvas: se consume desde el
 manifiesto y los PNG de AXIS cuando haya task de adopción.
 
-**Tensión abierta (registrar, no resolver):** la policy propuesta (TASK-1764, ADR
-`GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `Proposed`) prohíbe promoción en correos de servicio, deja
-`unsubscribe` en `forbidden` y RRSS en `none` para los propósitos transaccionales; el pie aprobado lleva agenda, redes
-y baja en **todo** correo de Efeonce. No quites la agenda ni las redes de un correo para «cumplir» la policy, ni
-reescribas la policy para calzar con el pie: lo decide el operador al adoptar los módulos. Detalle en
+**Pie por propósito (decisión del operador, 2026-09-29).** Los correos de Insights (`insights_edition_delivery*`)
+van a clientes: `relationship_transactional` con la **excepción explícita** `efeonce-insights-delivery`, que conserva
+el pie aprobado completo (agenda, redes, preferencias y baja «Dejar de recibir estos informes»). **Todo otro correo
+sigue la policy:** sin agenda, redes ni baja en transaccionales y de servicio; baja obligatoria en suscripción y
+marketing; redes opcionales en suscripción y obligatorias en marketing. Las excepciones son por tipo, con aprobador,
+fecha y motivo, en el registro `EMAIL_PRESENTATION_POLICY`; nunca se infieren. El adapter pasa `purpose` y, si hay
+excepción, `application` al contrato `efeonce.email-modules` `0.2.0` (publicado en `v0.3.39`, commit `1c18a2e`), que ya no exige la
+agenda; nunca quita módulos por su cuenta. Adopción: TASK-1944. Detalle en
 [references/footer-presentation.md](references/footer-presentation.md) §«Módulos canónicos».
 
 ## Verificación mínima
