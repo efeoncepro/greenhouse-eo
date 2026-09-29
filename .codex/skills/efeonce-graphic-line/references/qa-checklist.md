@@ -9,7 +9,8 @@
 > plate repetido, prefijo CSS, auditoría renderizada y slot opcional — `develop` en `c58a94ccb`, 2026-09-28; filas de
 > las láminas SEO/AEO, `variant-both-in-deck`, `figure-source-missing` y el camino «ausente» de un slot opcional —
 > `develop` tras `af32d9353` (TASK-1934, AXIS `v0.3.23`), 2026-09-28; §9, filas del bump de AXIS y de Glitch —
-> greenhouse-eo@24e4c72ee, 2026-09-28.
+> greenhouse-eo@24e4c72ee, 2026-09-28; fila de la medida con gravedad (§3) — AXIS `v0.3.30` (`main` `26097c5`),
+> 2026-09-29.
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -74,7 +75,7 @@
 | [ ] | Halo sobre papel a media intensidad (D7) | `orbit.haloOnLightScale` 0,5 | Automático con el contrato 0.3.1; con 0.3.0 el halo claro sale igual al oscuro: revisar y reducir |
 | [ ] | Cierre del deck: la palabra del eslogan en el acento, no en blanco (D3) | 8,5:1 sobre `#001a33` (Growth) | `deckSlideHtml('close')` desde axis-graphic-line 0.3.2; revisión si se arma a mano |
 | [ ] | Estado por forma (anillo/esfera) en el acento de la línea, nunca rojo/amarillo/verde | — | Automático: `state` resuelve `trafficLightColorsAllowed false`; revisión |
-| [ ] | Medida con gravedad (sólo un puntaje con escala publicada, hoy la portada del AI Visibility Report): estela, esfera y halo en el color de la gravedad; anillo, partida y cifra sin cambio; etiqueta en texto y escala visibles | sobre `#091951`: `error[400]` 4,62 · `warning[500]` 9,47 · `success[400]` 5,61 | Revisión; el contrato `measure` aún no admite `severity` (pendiente en AXIS) |
+| [ ] | Medida con gravedad (sólo un puntaje con escala publicada, hoy la portada del AI Visibility Report): estela, esfera, su brillo y el punto de la etiqueta en el color de la gravedad; anillo, partida y cifra sin cambio; etiqueta en texto y escala visibles; sin dato, anillo y partida solos, «—» sin «de 100»; umbrales del productor | sobre `#091951`: `error[400]` 4,62 · `warning[500]` 9,47 · `success[400]` 5,61; sobre claro `error[600]`, `warning[900]`, `success[500]` ≥ 3:1 (token `measureSeverity`) | Automático desde AXIS `v0.3.30`: contrato de la órbita 0.4.0 (`measure-severity-invalid`, `measure-severity-label-required`, `measure-severity-scale-required`, `measure-severity-label-without-severity`) y, en el informe, el contrato `efeonce.ai-visibility-report` 0.1.0 (`score-severity-label-required`, `score-no-data-mismatch`) con sus chequeos de adapter `severity-label-in-text`, `scale-legend-visible`, `figure-matches-score` y `orbit-only-on-cover`. Greenhouse fija 0.3.29 hasta TASK-1938: en el repo, todavía revisión |
 | [ ] | No usar el gris viejo del eslogan `#848484` sobre claro | 3,51:1 sobre papel (falla) | Revisión (ojo: `src/config/efeonce-brand.ts` y el render de motion aún lo usan) |
 | [ ] | Sobre producción física, color con prueba del proveedor (valores son sRGB) | — | Revisión |
 

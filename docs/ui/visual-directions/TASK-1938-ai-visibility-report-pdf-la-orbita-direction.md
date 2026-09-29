@@ -27,6 +27,32 @@
 - Cifras: son ilustrativas y coherentes con el fixture corregido. El puntaje general es 63 y los niveles salen del
   promedio ponderado de sus dimensiones.
 
+## Canon en AXIS (2026-09-29)
+
+Esta dirección está canonizada en AXIS desde el tag `v0.3.30` (`main` `26097c5`, registro verificado). AXIS es dueño de
+los valores y de las reglas; las hojas de `paginas/` siguen siendo la referencia de fidelidad visual.
+
+- **Lab:** <https://axis.efeonce.org/references/ai-visibility-report/> y su `.json`.
+- **Tokens** (`@efeoncepro/axis-tokens` `0.3.30`):
+  - `aiVisibilityReport` guarda la anatomía del documento: paleta, página, orden, capítulos, audiencias, geometría de
+    la órbita de la portada, encabezado y pie, contraportada, locales y `never`.
+  - `efeonceGraphicLine.measureSeverity` guarda el color de gravedad de una medida con escala publicada:
+    - Sobre oscuro, `error[400]`, `warning[500]` y `success[400]` (≥ 4,5:1 sobre `#091951`).
+    - Sobre claro, `error[600]`, `warning[900]` y `success[500]` (≥ 3:1).
+- **Contratos** (`@efeoncepro/axis-ui-contracts` `0.3.30`):
+  - `efeonce.ai-visibility-report` `0.1.0` (`candidate`): intent → manifiesto de seis páginas, 22 códigos de issue y
+    9 checks del adapter; resolver `resolveAiVisibilityReportIntent` y, en AXIS, `pnpm report:resolve`.
+  - `efeonce.graphic-line-orbit` `0.4.0`: la medida suma `severity`, `severityLabel`, `scaleVisible` y `glow`.
+- **Receta de la portada** (`@efeoncepro/axis-graphic-line/report` `0.12.0`): `aiVisibilityReportOrbitSvg` y
+  `aiVisibilityReportSeverityColor`.
+- **Lockups y órbitas estáticas:** `@efeoncepro/axis-brand-assets` `0.4.3`; las órbitas se re-sellaron sin cambiar el
+  dibujo.
+- **Docs en el repo `axis-design-system`:**
+  - ADR `docs/architecture/AI_VISIBILITY_REPORT_COMPOSITION_DECISION_V1.md`.
+  - Guía `docs/agent-composition/ai-visibility-report.md`.
+- **Estado en Greenhouse:** todavía fija `axis-tokens` y `axis-ui-contracts` `0.3.29`, `axis-graphic-line` `0.11.0` y
+  `axis-brand-assets` `0.4.1`. El renderer adopta el juego nuevo en TASK-1938.
+
 ## Decisiones que fija
 
 1. **Dos audiencias.**

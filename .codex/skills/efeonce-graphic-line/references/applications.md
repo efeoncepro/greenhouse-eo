@@ -397,15 +397,27 @@ oscuro de la línea, la negativa.
 | Superficie | ¿Lleva la marca? | Estado | Dónde |
 |---|---|---|---|
 | Landing del AEO Assessment («¿Te recomiendan las IA? / Averígualo») | sí | aprobada en el canvas; no implementada | canvas «Marcas SEO y AEO de Efeonce» |
-| Portada del AI Visibility Report | sí | aprobada en el canvas (aprobó también la paleta Engine) | canvas |
+| Portada del AI Visibility Report | sí | aprobada en el canvas (aprobó también la paleta Engine); canónica en AXIS desde `v0.3.30`: la órbita de la portada dice la gravedad | canvas; Lab `/references/ai-visibility-report/`; receta `aiVisibilityReportOrbitSvg` |
 | Post 1:1 de SV360 | sí | aprobado en el canvas | canvas |
-| PDF del informe del Grader (versión cliente y no cliente) | sí, lockup «Efeonce \| AI Visibility Report» | por implementar; pasa a la paleta Engine | TASK-1938 (dueña del cambio) |
+| PDF del informe del Grader (versión cliente y no cliente) | sí, lockup «Efeonce \| AI Visibility Report» | diseño aprobado (24 páginas en es/en/pt-BR) y canónico en AXIS (contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`); el renderer está por implementar y pasa a la paleta Engine | TASK-1938 (dueña del cambio y de la adopción de AXIS 0.3.30) |
 
 Canvas de registro: [«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac) (sistema, hojas
 por marca, versión en blanco y aplicaciones). Archivos en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el
 2026-09-29, AXIS `main` `7f9c8bb`); Greenhouse fija 0.4.1 y los recibe con TASK-1938. Referencia visual en el Lab de AXIS
 `/references/seo-aeo/` (JSON `/references/seo-aeo.json`, guía `docs/agent-composition/seo-aeo.md`; publicados el
 2026-09-29). Norma: manual §7.2.
+
+**El informe completo (canon AXIS, 2026-09-29, tag `v0.3.30`):** la anatomía del Efeonce AI Visibility Report vive en
+el token `aiVisibilityReport` y en el contrato `efeonce.ai-visibility-report` 0.1.0 (`candidate`; manifest
+`axis.ai-visibility-report-composition.v1`, 22 códigos, 9 chequeos de adapter, `pnpm report:resolve` en AXIS): A4, seis
+páginas (portada → qué hacer → por qué → dónde → mercado → contraportada), cabecera y pie interiores, dos audiencias
+(prospecto: agenda con UTM, nunca correo; cliente: responsable de la cuenta, sin oferta) y es/en/pt-BR con fallback es.
+La órbita sólo va en la portada y es la **medida con gravedad** ([criteria.md](criteria.md) §3.4): estela, esfera y
+su brillo en el color del nivel, con etiqueta y escala a la vista; umbrales del productor. Página canónica:
+[axis.efeonce.org/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/) (JSON
+`/references/ai-visibility-report.json`); guía `docs/agent-composition/ai-visibility-report.md`; dirección de
+Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. Greenhouse fija
+todavía AXIS 0.3.29: la adopción y el renderer son de TASK-1938.
 
 ### B4. Deck de Insights y correo de aviso
 

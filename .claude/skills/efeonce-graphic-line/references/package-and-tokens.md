@@ -46,6 +46,15 @@
 > 0.3.27 con el contrato 0.1.1),
 > `axis-graphic-line` 0.10.0 agrega `/charts` (no se exporta desde la raíz) y `axis-brand-assets` 0.4.1 sella
 > `AXIS_MANZANITAS_ASSETS`. Su inventario vive en [manzanitas.md](manzanitas.md) §10.3, no aquí.
+>
+> **Efeonce AI Visibility Report (2026-09-29, tag `v0.3.30`, AXIS `main` `26097c5`, verificado en el registro;
+> Greenhouse aún NO lo fija):** `axis-tokens` **0.3.30** (`efeonceGraphicLine.measureSeverity` y el export top-level
+> `aiVisibilityReport`), `axis-ui-contracts` **0.3.30** (contrato nuevo `efeonce.ai-visibility-report` 0.1.0
+> `candidate` y `efeonce.graphic-line-orbit` **0.3.1 → 0.4.0**, con la gravedad en `measure`), `axis-graphic-line`
+> **0.12.0** (entrada `/report` y `measureSvg` con gravedad), `axis-brand-assets` **0.4.3** (las 48 órbitas estáticas
+> re-selladas con el contrato 0.4.0; el dibujo no cambia) y `axis-ui-registry` **0.3.2**. `develop` sigue fijando
+> tokens y contracts 0.3.29, graphic-line 0.11.0, brand-assets 0.4.1 y registry 0.3.1: la adopción es parte de
+> TASK-1938, cuyo renderer del PDF todavía no existe. Inventario: §2.19, §2.20, §3, §7.10, §8.1 y §9 de este archivo.
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
 [3 Contrato de la órbita](#3-contrato-efeoncegraphic-line-orbit) · [4 Selección colaborativa](#4-contrato-efeoncecollaboration-selection) ·
@@ -125,6 +134,7 @@ Un repo consumidor nuevo necesita además que `axis-graphic-line` le dé «Manag
 | `@efeoncepro/axis-graphic-line/react` | `AxisOrbit`, `AxisOrbitProps` (peer `react >= 18`) |
 | `@efeoncepro/axis-graphic-line/element` | `defineAxisOrbitElement`, `renderAxisOrbit` |
 | `@efeoncepro/axis-graphic-line/motion` | `ORBIT_MOTION_CSS`, `ORBIT_MOTION_TIMELINE`, `ORBIT_MOTION_TOTAL_MS`, `orbitMotionFrameCss` |
+| `@efeoncepro/axis-graphic-line/report` (desde 0.12.0; no se exporta desde la raíz) | `aiVisibilityReportOrbitSvg`, `aiVisibilityReportSeverityColor` (§7.10) |
 | `@efeoncepro/axis-brand-assets` | ids, `findBrandAsset`, `brandAssetUrl`, `AXIS_ORBIT_ASSETS`, `findOrbitAsset`, `orbitAssetUrl` |
 | `@efeoncepro/axis-brand-assets/assets/*` | los archivos (`efeonce-logo-negative.svg`, `orbit/orbit-growth-dark-social.png`, …) |
 
@@ -390,6 +400,44 @@ palabra final 900 itálica.
 `axisMotion.reducedMotion = 'prefers-reduced-motion: reduce'`; duraciones `instant 75ms`, `short 150ms`,
 `standard 200ms`, `medium 300ms`, `long 400ms`, `extended 600ms`.
 
+### 2.19 `measureSeverity` (medida con gravedad; `axis-tokens` 0.3.30)
+
+`status: 'canonical'`, aprobada el 2026-09-29, `allowedFor: ['scored-diagnostic']`: **sólo** un puntaje con escala de
+gravedad publicada (hoy la portada del Efeonce AI Visibility Report). No autoriza semáforo en la marca de estado.
+
+| Clave | Valor |
+|---|---|
+| `levels` | `critical`, `attention`, `optimal` |
+| `parts` (toman el color) | `trail`, `sphere`, `sphere-glow`, `label-dot` |
+| `unchanged` | `ring`, `origin-mark`, `figure` |
+| `labelRequired` · `scaleVisibleRequired` | `true` · `true` (la etiqueta en texto y la escala a la vista; el color nunca se lee solo) |
+| `thresholdsOwner` | `'producer'`: los umbrales son del productor del puntaje; el contrato recibe el nivel ya resuelto |
+| `colors.dark` | `axisRamp.error[400]` `#e25a61` · `warning[500]` `#ffb703` · `success[400]` `#46a877` (cada uno ≥ 4,5:1 sobre `#091951`) |
+| `colors.light` | `error[600]` · `warning[900]` · `success[500]` (cada uno ≥ 3:1 sobre papel y blanco) |
+| `minContrast` | `dark 4.5`, `light 3` |
+| `sphereGlow` | `ofSphere 3`, `opacity 0.5` (brillo de la esfera: 3 veces su radio, al 50 % en el centro) |
+| `noData` | `render 'ring-and-origin-only'`, `figure '—'`, `showOutOf false`: sin dato no es cero, sin estela ni esfera y sin «de 100» |
+
+### 2.20 `aiVisibilityReport` (export top-level, fuera de `efeonceGraphicLine`; `axis-tokens` 0.3.30)
+
+Anatomía del documento, `status: 'candidate'`, `kind: 'document'`, `complements: 'efeonceGraphicLine'`. Estructura y
+medidas; el copy vive en el consumidor y en el Lab. Gobierna la dirección de Greenhouse
+`docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md` (y su wireframe).
+
+| Clave | Qué guarda |
+|---|---|
+| `brand` | línea `engine`; lockups `ai-visibility-report-lockup-{negative,positive}`; bajo el veredicto, `aeo-lockup-*` («Resultado del AEO Assessment»); firma `efeonce-logo-*`; burbuja horneada; `never: ['insights-lockup', 'product-signs']` |
+| `palette` | fondo y acento de Engine, papel `#ffffff`, tinta, navy, `muted`, `rule`, `surface`, `softOnDark`, `doneOnLight`, barras navy y `severity` = `measureSeverity.colors` |
+| `type` | display y cifra en Bricolage Grotesque 760 (cifra 128 px), estructura en Poppins 300–600, folio Bricolage 700 15 px |
+| `page` · `order` | A4 794 × 1123 a 96 dpi, 6 páginas: `cover` → `what-to-do` → `why` → `where` → `market` → `back-cover`; `chapters` con su glifo Trazo |
+| `audiences` | `prospect`: portada con título de marca, cierre con agenda (CTA comercial con UTM, **nunca** correo), redes y oferta del Grader · `client`: «preparado para», cierre con el responsable de la cuenta y el próximo informe, sin oferta |
+| `cover.orbit` | caja 400, radio 172, estela de 4 px y 50°, esfera 10, brillo 30 (la reproduce `aiVisibilityReportOrbitSvg`, §7.10) |
+| `cover` | leyenda de escala visible, veredicto, motores (`chatgpt`, `claude`, `gemini`, `perplexity`, `google-ai-overview`), tendencia (`first-measurement`, nunca flecha de cambio cero), firma con el logo centrado |
+| `interior` | papel; cabecera con lockup, glifo del capítulo y 4 segmentos de avance; pie con organización · período, burbuja URL horneada y folio `NN / 06`; `orbit: 'never'` en páginas interiores |
+| `backCover` | voz (pregunta Poppins 300, respuesta Bricolage 760 ≥ 3×), agenda `/contacto/` con UTM (`never: 'email'`), bloque de marca con el eslogan de Engine, línea legal |
+| `locales` | `es`, `en`, `pt-BR`, fallback `es`; sin traducir: eslogan, lockups y nombres de niveles del marco |
+| `never` | `insights-lockup`, `filling-arc`, `zero-for-missing`, `commercial-cta-for-client`, `email-as-cta`, `orbit-on-interior-pages`, `hand-written-hex` |
+
 ---
 
 ## 3. Contrato `efeonce.graphic-line-orbit`
@@ -397,7 +445,11 @@ palabra final 900 itálica.
 Archivo: `packages/contracts/src/graphic-line.ts`. `version '0.3.0'`, `lifecycle 'stable'`, owner
 `efeonce-brand-studio`. Manifest: `axis.graphic-line-orbit-composition.v1`. **0.3.1 publicado (contracts 0.3.5)** (en
 `axis-ui-contracts` 0.3.5): `orbit.live`, el código `sphere-ring-only-live`, el halo a `haloOnLightScale` en claro y el
-chequeo `accent-text-min-size`.
+chequeo `accent-text-min-size`. **0.4.0 publicado (contracts 0.3.30, tag `v0.3.30`, 2026-09-29; Greenhouse todavía
+fija 0.3.29, que trae la 0.3.1):** `measure` gana `severity` (`critical`/`attention`/`optimal`), `severityLabel`,
+`scaleVisible` y `glow`, con cuatro códigos nuevos (§3.4) y el chequeo de accesibilidad
+`measure-severity-label-in-text`; el manifest de `measure` suma `severity { level, label, color, scaleVisible }` y
+`sphere.glow` (3 × el radio de la esfera, 0,5).
 
 API: `validateGraphicLineIntent(intent) → AxisGraphicLineIssue[]` (`{ code, elementId? }`) ·
 `resolveGraphicLineIntent(intent) → manifest` (lanza `AxisGraphicLineValidationError` con `.issues`; mensaje
@@ -432,7 +484,7 @@ Elementos **con anillo** (cuentan para «un anillo por pieza»): `orbit`, `measu
 | `kind` | Campos (✱ obligatorio) | Defaults del resolver |
 |---|---|---|
 | `orbit` | `targetId?` + `targetKind?` **o** `region?`; `arc?: { start?, span? }`; `innerOrbits?`; `halo?`; `sphereRing?`; `live?` (boolean, desde 0.3.1) | sin target → `region 'center'`; `targetKind 'object'`; `start 'upper-start'`; `span 'accent'`; `innerOrbits false`; halo sí salvo `halo: false`; `sphereRing` no; `sphereRing: true` exige `live: true` (0.3.1) |
-| `measure` | ✱`targetId`, ✱`value` (0–1), ✱`source`, `label?`, `start?` (sólo `'top'`) | origen las 12 |
+| `measure` | ✱`targetId`, ✱`value` (0–1), ✱`source`, `label?`, `start?` (sólo `'top'`); desde 0.4.0 `severity?`, `severityLabel?`, `scaleVisible?`, `glow?` | origen las 12; con `severity`, la estela y la esfera toman `measureSeverity.colors[surface]`; `glow` sólo si `glow: true` |
 | `progress` | ✱`sections` (entero ≥ 1), ✱`current` (0…sections), `region?` o `targetId?` | `region 'upper-end'`; con `targetId`, aire 0 |
 | `lens` | ✱`photoId`, ✱`alt`, `region?`, `subjectRegion?`, `ring?`, `accentSphere?` (posición o `'none'`) | `region 'center'`, `subjectRegion 'center'`, anillo sí salvo `ring: false`, `accentSphere 'upper-start'` |
 | `spotlight` | ✱`photoId`, ✱`alt`, `subjectRegion?` | `subjectRegion 'center'` (también ubica la luz) |
@@ -480,6 +532,10 @@ Elementos **con anillo** (cuentan para «un anillo por pieza»): `orbit`, `measu
 | `single-signature-per-piece` | más de un `signature` |
 | `signature-already-decides-url-bubble` | `signature` y `url-bubble` en la misma pieza |
 | `sphere-ring-only-live` | `orbit` con `sphereRing: true` sin `live: true` (contrato 0.3.1; D8) |
+| `measure-severity-invalid` | `severity` fuera de `critical`/`attention`/`optimal` (contrato 0.4.0) |
+| `measure-severity-label-required` | `severity` sin `severityLabel` (el color nunca se lee solo; 0.4.0) |
+| `measure-severity-scale-required` | `severity` sin `scaleVisible: true` (la escala va a la vista en la misma pieza; 0.4.0) |
+| `measure-severity-label-without-severity` | `severityLabel` sin `severity` (0.4.0) |
 
 ### 3.5 El manifest
 
@@ -637,6 +693,9 @@ re-sellan; nunca se editan a mano. Greenhouse fija 0.4.1 y los recibe con TASK-1
 `/references/seo-aeo.json`, guía `docs/agent-composition/seo-aeo.md` (publicados el 2026-09-29; responden 200). Criterio:
 [criteria.md](criteria.md) («Submarcas de producto SEO/AEO»); aplicaciones: [applications.md](applications.md) §B3c.
 
+**0.4.3 (tag `v0.3.30`, 2026-09-29):** las 48 órbitas estáticas se re-sellaron con el contrato de la órbita 0.4.0
+(cambia el sello `data-axis-graphic-line`, no el dibujo); ningún SVG de marca nuevo. Greenhouse fija 0.4.1.
+
 Tipo `AxisBrandAsset = { id, file (`<id>.svg`), brand, kind, surface, variant, sha256, aspectRatio, note? }`.
 
 | Función | Firma | Devuelve |
@@ -721,7 +780,9 @@ publicar.
 
 `MeasureOptions`: `width`, `height`, `value` (0–1), `source` (obligatoria), `label?`, `circle` (el objeto rodeado;
 el anillo queda en `circle.r` porque la función divide por 1,12 antes de sumar el aire), `line?`, `surface?`,
-`channel?`, `background?` (false), `idPrefix?`.
+`channel?`, `background?` (false), `idPrefix?`. Desde 0.12.0 (contrato 0.4.0): `severity?`, `severityLabel?`,
+`scaleVisible?` y `glow?`, con las mismas reglas del contrato (§3.4); el pintor dibuja el brillo de la esfera
+(`data-axis-part="sphere-glow"`).
 
 ### 7.3 Chequeos (`checks.ts`)
 
@@ -822,6 +883,25 @@ ids); `animate` agrega `ORBIT_MOTION_CSS` y la clase. Seguro en servidor (sin ef
 
 Se pinta en shadow DOM (ids aislados) y el host recibe `aria-hidden="true"`.
 
+### 7.10 Órbita del AI Visibility Report (`/report`, desde 0.12.0)
+
+| Export | Firma | Devuelve / regla |
+|---|---|---|
+| `aiVisibilityReportOrbitSvg({ score, severity, surface?, idPrefix? })` | `score` 0–100 o `null`; `severity` `critical`/`attention`/`optimal`/`no-data`; `surface` `dark` por defecto (`light` para una vista previa en papel) | SVG decorativo de 400 × 400 reproducido del token `aiVisibilityReport.cover.orbit` (nunca re-derivado de la escala): anillo, marca de partida, estela de 50°, esfera en `score × 3,6°` y su brillo, en el color de la gravedad. Sin dato, anillo y partida solos. **Lanza** si `score: null` no viene con `no-data` (o al revés) o si el puntaje sale de 0–100. La cifra y la etiqueta son texto del consumidor |
+| `aiVisibilityReportSeverityColor(severity, surface = 'dark')` | | el color de `measureSeverity.colors[surface]`, o `null` con `no-data` |
+
+La geometría (`aiVisibilityReportOrbitGeometry(score)`) y el resolver del documento viven en el contrato
+`efeonce.ai-visibility-report` 0.1.0 (`@efeoncepro/axis-ui-contracts` 0.3.30, `candidate`, manifest
+`axis.ai-visibility-report-composition.v1`): `validateAiVisibilityReportIntent`, `resolveAiVisibilityReportIntent`,
+`resolveAiVisibilityReportLocale`, 22 códigos (`AXIS_AI_VISIBILITY_REPORT_ISSUE_CODES`: p. ej.
+`score-severity-label-required`, `score-no-data-mismatch`, `agenda-never-email`, `client-no-commercial-cta`,
+`client-account-lead-required`) y 9 chequeos del adapter (`AXIS_AI_VISIBILITY_REPORT_ADAPTER_CHECKS`:
+`footer-inside-page`, `figure-matches-score`, `severity-label-in-text`, `scale-legend-visible`,
+`orbit-only-on-cover`, `lockups-from-brand-assets`, `percent-and-dates-by-locale`, `client-without-commercial-cta`,
+`slogan-block-under-logo`). Guía para agentes: `docs/agent-composition/ai-visibility-report.md`; esquema del intent
+`docs/agent-composition/ai-visibility-report-intent.schema.json`; ejemplos (prospecto es/en, cliente es/pt-BR, sin
+dato e inválidos) en `docs/examples/ai-visibility-report/`.
+
 ---
 
 ## 8. Comandos
@@ -835,6 +915,7 @@ Se pinta en shadow DOM (ids aislados) y el host recibe `aria-hidden="true"`.
 | `pnpm orbit:video -- --format 16x9\|1x1\|4x5\|9x16 --surface dark\|light [--line …] [--fps 30] --out <dir>` | video de la órbita **sin logo** (2,0 s + 0,5 s de reposo), MP4 + cuadro final PNG + JSON; necesita Playwright del Lab y `ffmpeg` |
 | `pnpm signature:resolve -- --input <intent.json> [--out …]` | resuelve la firma de correo |
 | `pnpm collaboration:resolve -- …` | resuelve la selección colaborativa |
+| `pnpm report:resolve` (`scripts/resolve-ai-visibility-report.mjs`; compila antes `axis-ui-contracts`) | valida y resuelve un intent del Efeonce AI Visibility Report (contrato `efeonce.ai-visibility-report` 0.1.0, desde `v0.3.30`) |
 | `pnpm icons:volume -- refs\|key\|check\|publish` (`scripts/icons-volume.mjs`) | Plastilina en volumen (D24): `refs` el plano en respuesta (con gesto) a 760 px sobre `#001a33`, centrado en 1024 · `key` alfa por color contra el fondo liso · `check` silueta ≥ 0,75 y misma cantidad de calados y piezas sueltas (avisa, sale 1; no rechaza) · `publish` comprime, copia al paquete y al Lab y sella. Detalle: `iconography.md` §12 |
 | `pnpm design:generate` · `pnpm design:check` | genera / verifica el DESIGN.md desde tokens |
 | `pnpm build` · `pnpm test` · `pnpm typecheck` · `pnpm lint` | en todos los paquetes (`node --test dist/*.test.js`) |
@@ -962,6 +1043,13 @@ guía `docs/agent-composition/insights.md`). Es **referencia** —marca y lockup
 informe y la UI del informe live con datos de muestra—, no componentes ni contratos: la UI de Insights vive en
 Greenhouse (catálogos del Artifact Composer) y en Think.
 
+**Página del Efeonce AI Visibility Report (2026-09-29, `v0.3.30`), publicada:**
+[axis.efeonce.org/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/) y su
+JSON `/references/ai-visibility-report.json` (schema `axis.efeonce-ai-visibility-report.v1`). Fuente
+`apps/lab/src/pages/references/ai-visibility-report.astro` (+ `.json.ts`, datos en `apps/lab/src/data/`). Muestra los
+estados de gravedad en vivo con un deslizador, la anatomía, las 24 páginas aprobadas en tres idiomas y una sección
+para agentes. A diferencia de Insights, sí hay contrato (§7.10); el renderer del PDF es de Greenhouse (TASK-1938).
+
 ---
 
 ## 10. Qué NO existe (no alucinar)
@@ -989,7 +1077,11 @@ Greenhouse (catálogos del Artifact Composer) y en Think.
 - **No existe** el código `url-bubble-signature-is-efeonce-only` (se retiró: Efeonce firma en toda línea). No existe
   `lens.accentSphereDiameterRatio` como regla vigente (deprecado).
 - **No existe** un modo «loader» ni un arco que crece hasta llenarse para un dato; no existe «sin esfera» en progress o
-  measure.
+  measure. (La única órbita de dato sin esfera es la del AI Visibility Report **sin dato**: anillo y partida solos, cifra
+  «—»; la pinta `aiVisibilityReportOrbitSvg`, no `measure`, que exige un valor.)
+- **No existe** color de gravedad para la marca de estado ni para una medida sin escala publicada:
+  `measureSeverity.allowedFor` es sólo `scored-diagnostic`. Los umbrales tampoco están en AXIS: los pone el productor.
+- **No existe** un renderer del PDF del AI Visibility Report en AXIS ni, al 2026-09-29, en Greenhouse (TASK-1938).
 - No existen roles de eslogan distintos de `close`, ni formas distintas de `lockup` y `standalone`.
 
 ---

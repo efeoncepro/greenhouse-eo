@@ -76,3 +76,5 @@ El operador corrigió el nombre del proceso a **Efeonce AEO Assessment** (no «A
 
 **Primera aplicación.** El PDF del informe del Grader (TASK-1938) lleva el lockup «Efeonce | AI Visibility Report» en sus dos versiones (cliente / no cliente) y pasa a la paleta Engine; la task es la dueña de ese cambio.
 
+**Canon visual del AI Visibility Report (2026-09-29).** Vive en AXIS desde el tag `v0.3.30`: página del Lab `https://axis.efeonce.org/references/ai-visibility-report/` y contrato `efeonce.ai-visibility-report` 0.1.0 (`candidate`, `@efeoncepro/axis-ui-contracts` 0.3.30), con el token `aiVisibilityReport` en `@efeoncepro/axis-tokens` 0.3.30. Greenhouse lo adopta en TASK-1938; hasta entonces fija el juego 0.3.29.
+

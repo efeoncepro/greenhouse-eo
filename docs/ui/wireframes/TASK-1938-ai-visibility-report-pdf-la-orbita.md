@@ -41,6 +41,24 @@ no repite ese rótulo encima de su título. Pie: a la izquierda «[organización
 `url-bubble-baked-light` (la regla de la línea: `efeoncepro.com` nunca como texto) y a la derecha el folio «02 / 06»;
 filete encima. Reemplaza al encabezado de texto gris y al pie «Preparado por Efeonce · efeoncepro.com».
 
+## Delta 2026-09-29 (b) — canon en AXIS
+
+Esta anatomía vive en AXIS desde el tag `v0.3.30` (`main` `26097c5`). Donde este wireframe y AXIS difieran, manda AXIS
+y la diferencia se reporta.
+
+- **Lab:** <https://axis.efeonce.org/references/ai-visibility-report/> (y `.json`).
+- **Tokens** (`@efeoncepro/axis-tokens` `0.3.30`):
+  - `aiVisibilityReport`: página, orden, capítulos, audiencias, órbita de portada, encabezado y pie, contraportada y
+    locales.
+  - `efeonceGraphicLine.measureSeverity`: gravedad de la órbita de la portada.
+- **Contrato** `efeonce.ai-visibility-report` `0.1.0` (`candidate`, `@efeoncepro/axis-ui-contracts` `0.3.30`): valida
+  el intent (audiencia, locale, organización, puntaje con gravedad y etiqueta, tendencia, veredicto, motores y cierre)
+  y devuelve el manifiesto de seis páginas con los checks del adapter. `efeonce.graphic-line-orbit` pasa a `0.4.0`.
+- **Receta** (`@efeoncepro/axis-graphic-line/report` `0.12.0`): `aiVisibilityReportOrbitSvg` y
+  `aiVisibilityReportSeverityColor`. Lockups en `@efeoncepro/axis-brand-assets` `0.4.3`.
+- **Guía:** `docs/agent-composition/ai-visibility-report.md` en el repo `axis-design-system`.
+- **Estado en Greenhouse:** todavía fija el juego `0.3.29`; el renderer adopta `v0.3.30` en TASK-1938 (Slice 1).
+
 ## Dos audiencias, un documento
 
 El informe se genera para **no clientes** (prospectos que piden el diagnóstico público) y para **clientes** (el
@@ -142,6 +160,9 @@ tiene acciones de negocio; los enlaces (agenda, correo, URL, redes) son reales.
   navy `#023c70` en estructura, barras y tarjeta de brecha, texto claro `#cfe4fa` sobre oscuro, acento turquesa sólo
   como gráfico (anillo, esfera, anillo de la pregunta) o en texto ≥ 24 px. Valores desde `efeonceGraphicLine`
   (`@efeoncepro/axis-tokens`); `report-pdf-tokens.ts` es el único mapa.
+- **Desde AXIS `v0.3.30`:** la anatomía del documento sale de `aiVisibilityReport` y el color de gravedad de la órbita
+  de `efeonceGraphicLine.measureSeverity` (`axis-tokens` `0.3.30`). La portada se toma de `aiVisibilityReportOrbitSvg`
+  o se reproduce desde `aiVisibilityReport.cover.orbit`, porque react-pdf no recibe un string SVG.
 - **Gravedad sólo en etiquetas y puntos**, no en barras: las barras son navy (el ámbar a sangre saturaba la página y
   hacía que todo pareciera igual de urgente). Colores de `axisSemanticHex`; tinta oscura de «atención» (`warningInk`)
   para texto sobre papel.

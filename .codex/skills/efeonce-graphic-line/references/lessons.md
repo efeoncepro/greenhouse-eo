@@ -1,7 +1,8 @@
 # Lecciones (trampas que ya costaron tiempo)
 
-> Verificado contra: greenhouse-eo@2c95e60b2 (`develop`) — 2026-09-29, tarde (última entrada: los retratos viejos del
-> equipo; antes, greenhouse-eo@1050036e8: los ejemplos del contrato de Marketing con Manzanitas con copy que no cabe,
+> Verificado contra: greenhouse-eo@2c95e60b2 (`develop`) — 2026-09-29, tarde (última entrada: la órbita del AI
+> Visibility Report, canonizada en AXIS `v0.3.30`, `26097c5`, con la pregunta abierta del camino recorrido; antes, los
+> retratos viejos del equipo; antes, greenhouse-eo@1050036e8: los ejemplos del contrato de Marketing con Manzanitas con copy que no cabe,
 > TASK-1939; antes, greenhouse-eo@24e4c72ee: el CI roto por el bump de
 > AXIS 0.3.24 y los gates de AXIS bloqueados por el clasificador).
 
@@ -372,6 +373,21 @@
   usa el 400 (4,62 y 5,61); atención queda en 500 (9,47). **Regla:** mide el color de gravedad sobre el fondo real antes
   de elegir el paso; no copies el HEX semántico de papel a un fondo oscuro.
 - Sin dato no es «0»: la portada deja el anillo solo, «—» sin «de 100» y la etiqueta «Sin dato».
+- **Se canonizó el mismo día en AXIS** (el operador aprobó el informe y pidió canonizarlo; tag `v0.3.30`, `main`
+  `26097c5`): token `efeonceGraphicLine.measureSeverity` (también el punto de la etiqueta y el brillo de la esfera, 3
+  veces su radio al 50 %; sobre claro `error[600]`, `warning[900]`, `success[500]`, ≥ 3:1), contrato de la órbita
+  **0.4.0** con cuatro códigos `measure-severity-*`, contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`, receta
+  `aiVisibilityReportOrbitSvg` en `@efeoncepro/axis-graphic-line/report` (0.12.0) y la página
+  [/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/). **Regla:** la gravedad
+  ya no se revisa a ojo: la exige el contrato; pero Greenhouse fija 0.3.29 hasta TASK-1938, así que en el repo sigue
+  siendo revisión. Los umbrales (< 40 crítico, < 70 atención) son del productor, no de AXIS: no los copies al token ni
+  al contrato.
+- **Pregunta abierta, no regla (2026-09-29):** en el canvas del correo de Insights, el operador notó que una medida de
+  62 % con sólo la estela corta se lee como menos de 62 %, porque el ojo no sabe la dirección. En ese tablero, y sólo
+  ahí, se agregó el camino recorrido desde las 12 al 60 % de opacidad y 3 px. Se le preguntó si pasa a ser regla de La
+  órbita y si se aplica a la portada del informe; **no hay respuesta**. Hasta que decida: no pintes el camino recorrido
+  en ninguna otra pieza, no lo agregues a la portada del informe y no lo presentes como canon. Choca en apariencia con
+  «nunca un arco que crece desde el origen» (§3.4): por eso lo decide el operador.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

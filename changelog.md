@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-29 — Efeonce AI Visibility Report canonizado en AXIS (TASK-1938)
+
+- AXIS `v0.3.30` (`26097c5`, registro verificado): `axis-tokens` 0.3.30 (`aiVisibilityReport` y
+  `efeonceGraphicLine.measureSeverity`, color de gravedad sólo para un puntaje con escala publicada),
+  `axis-ui-contracts` 0.3.30 (contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`; `efeonce.graphic-line-orbit`
+  0.4.0), `axis-graphic-line` 0.12.0 (`/report`), `axis-brand-assets` 0.4.3 y `axis-ui-registry` 0.3.2. Lab
+  `/references/ai-visibility-report/`.
+- Greenhouse sigue en 0.3.29 y el renderer del PDF no cambió; TASK-1938, la dirección, el wireframe, el manual de La
+  órbita (1.19) y el runbook de AXIS apuntan al canon nuevo.
+
 ## 2026-09-29 — Naming canónico de Efeonce AEO
 
 - [ADR](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md): **Efeonce AEO** (capacidad), **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (salida); aliases Grader preservados para trazabilidad y contratos. Se actualizaron docs y skills; el runtime visible requiere migración y verificación propias.
@@ -662,11 +672,3 @@ con texto/CTA protegidos y posible solapamiento de firma en Reels declarado; QA 
 v07 reduce el lecho y ancla la firma dentro de su materia. Método completo y ocho skills actualizados;
 auditoría del compositor CTA: p98, cobertura del gate y campos no compatibles documentados, sin cambiar código.
 Sin cambios runtime.
-
-## 2026-09-21 — Paid visual: palancas, cinematic ads y medición por formato
-
-Skills de publicidad, Design, Motion, Digital Marketing y Growth/CRO conectadas al
-[playbook de atención visual](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md),
-con investigación primaria en tres frentes, doce palancas, recetas de estático/video/híbrido y definiciones
-por plataforma. Se distingue hipótesis de rendimiento, CTR de atención y palanca publicitaria de ficha foto;
-registro C sigue en construcción. Contenido sincronizado Codex/Claude; sin generación ni publicación.

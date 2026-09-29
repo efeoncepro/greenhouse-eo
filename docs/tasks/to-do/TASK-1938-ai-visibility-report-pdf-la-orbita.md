@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Diseño aprobado por el operador el 2026-09-29 y sellado en docs/ui/visual-directions (24 hojas en es, en y pt-BR, más los estados de la órbita); el renderer del PDF no se ha tocado. El commit a124ad9ab es el script de logos de las submarcas SEO/AEO, un insumo de esta task, no su implementación`
+- Status real: `Diseño aprobado por el operador el 2026-09-29 y sellado en docs/ui/visual-directions (24 hojas en es, en y pt-BR, más los estados de la órbita). Canonizado en AXIS v0.3.30 el mismo día (tokens aiVisibilityReport y measureSeverity, contrato efeonce.ai-visibility-report 0.1.0, graphic-line 0.12.0); Greenhouse aún fija 0.3.29 y el renderer del PDF no se ha tocado. El commit a124ad9ab es el script de logos de las submarcas SEO/AEO, un insumo de esta task, no su implementación`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -75,6 +75,35 @@ del informe: `es` (es-CL, tuteo), `en` (en-US) y `pt-BR` (você). El intake púb
 - El canvas (versión 17) muestra las tres filas de idioma en la página «Informe del Grader (PDF)»; ya no hay páginas
   separadas por idioma.
 
+## Delta 2026-09-29 (d) — canonizado en AXIS
+
+El operador pidió llevar el informe a AXIS. AXIS lo publicó el mismo día: `main` `26097c5`, tag `v0.3.30`, registro
+verificado. Desde aquí los valores y las reglas del documento salen de AXIS, no del canvas ni de esta task.
+
+| Paquete | Versión publicada | Qué trae para este informe |
+|---|---|---|
+| `@efeoncepro/axis-tokens` | `0.3.30` | export nuevo `aiVisibilityReport` (anatomía: paleta, página, orden, capítulos, audiencias, geometría de la órbita de portada, encabezado y pie, contraportada, locales y `never`) y `efeonceGraphicLine.measureSeverity` |
+| `@efeoncepro/axis-ui-contracts` | `0.3.30` | contrato nuevo `efeonce.ai-visibility-report` `0.1.0` (`candidate`): intent → manifiesto de seis páginas, 22 códigos de issue y 9 checks del adapter; `efeonce.graphic-line-orbit` pasa de `0.3.1` a `0.4.0` (medida con `severity`, `severityLabel`, `scaleVisible` y `glow`) |
+| `@efeoncepro/axis-graphic-line` | `0.12.0` | `/report`: `aiVisibilityReportOrbitSvg` y `aiVisibilityReportSeverityColor` |
+| `@efeoncepro/axis-brand-assets` | `0.4.3` | órbitas estáticas re-selladas; el dibujo no cambia |
+| `@efeoncepro/axis-ui-registry` | `0.3.2` | registro al día |
+
+- **`measureSeverity`:** sólo un puntaje con escala publicada puede colorear estela, esfera y halo. Sobre oscuro:
+  `error[400]`, `warning[500]` y `success[400]`, cada uno ≥ 4,5:1 sobre `#091951`; sobre claro: `error[600]`,
+  `warning[900]` y `success[500]`, cada uno ≥ 3:1. Anillo, partida y cifra conservan su color; la etiqueta es
+  obligatoria y la escala, visible. Los umbrales son del productor (aquí, `recommendations.ts`): AXIS recibe la
+  gravedad ya resuelta. Sin dato, sólo el anillo y «—». La marca de estado sigue sin semáforo.
+- **Referencias:** Lab <https://axis.efeonce.org/references/ai-visibility-report/> (y `.json`); ADR de AXIS
+  `docs/architecture/AI_VISIBILITY_REPORT_COMPOSITION_DECISION_V1.md` y guía `docs/agent-composition/ai-visibility-report.md`
+  en el repo `axis-design-system`; en AXIS, `pnpm report:resolve` compone el manifiesto desde un intent.
+- **Greenhouse todavía no fija este juego.** `develop` fija `axis-tokens` y `axis-ui-contracts` `0.3.29`,
+  `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.1` y `axis-ui-registry` `0.3.1` (`package.json`, 2026-09-29).
+  El renderer (`src/components/growth/ai-visibility/report-artifact/pdf/**`) no cambió. La adopción es el Slice 1.
+- **Efecto del bump fuera del PDF:** el adapter de la órbita de Greenhouse
+  (`scripts/creative/layout-compiler/graphic-line.mjs`) acepta sólo el contrato `efeonce.graphic-line-orbit` `0.3.1`
+  (`SUPPORTED_CONTRACT_VERSION`) y lanza un error con cualquier otra versión. Con `axis-ui-contracts` `0.3.30` el
+  contrato es `0.4.0`, así que el bump tiene que llevar el soporte de `0.4.0` en el mismo commit.
+
 ## Why This Task Exists
 
 El Grader es lo primero que ve un prospecto de Efeonce y Efeonce Insights es lo que recibe cuando ya es cliente, pero
@@ -120,6 +149,9 @@ Reglas obligatorias:
 
 - `docs/ui/wireframes/TASK-1938-ai-visibility-report-pdf-la-orbita.md`
 - Canvas de la propuesta: <https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd>, página «Informe del Grader (PDF)».
+- Canon en AXIS (`v0.3.30`): Lab <https://axis.efeonce.org/references/ai-visibility-report/>; contrato
+  `efeonce.ai-visibility-report` `0.1.0` y guía `docs/agent-composition/ai-visibility-report.md` en el repo
+  `axis-design-system`. Donde el canvas y AXIS difieran, se reporta; no se copia el valor del canvas.
 - `.claude/skills/efeonce-graphic-line/SKILL.md` y `references/criteria.md`
 - Memoria operativa de react-pdf: un `<Svg>` sobre `Page.backgroundColor` corrompe el render; el alpha del trazo se
   pierde sobre navy (ver el comentario de `gaugeTrackOnNavy` en `report-pdf-tokens.ts`).
@@ -129,8 +161,9 @@ Reglas obligatorias:
 ### Depends on
 
 - Aprobación del operador de la propuesta del canvas (bloqueante de la implementación, no de la planificación).
-- `@efeoncepro/axis-tokens` y `@efeoncepro/axis-brand-assets` ya instalados en Greenhouse [verificar versión de
-  `axis-brand-assets`: el Lab de AXIS indica que Greenhouse fija 0.3.5].
+- `@efeoncepro/axis-tokens` y `@efeoncepro/axis-brand-assets` ya instalados en Greenhouse, pero en el juego anterior:
+  `develop` fija `axis-tokens` `0.3.29` y `axis-brand-assets` `0.4.1` (`package.json`, 2026-09-29). El juego de AXIS
+  `v0.3.30`, que trae el informe, se fija en el Slice 1.
 
 ### Blocks / Impacts
 
@@ -162,7 +195,7 @@ Reglas obligatorias:
 - Fixture del modelo: `report-artifact/fixtures.ts`.
 - Fuentes registradas: Geist y Poppins en `src/lib/finance/pdf/register-fonts.ts`; Bricolage sólo como TTF variable
   (`src/assets/fonts/BricolageGrotesque-Variable.ttf`).
-- Propuesta visual en el canvas (5 páginas, cifras ilustrativas del fixture).
+- Propuesta visual aprobada en el canvas (seis páginas por variante, cifras ilustrativas del fixture) y canonizada en AXIS `v0.3.30`.
 
 ### Gap
 
@@ -208,7 +241,7 @@ Reglas obligatorias:
 
 ### State inventory
 
-- Default: informe completo en cinco páginas.
+- Default: informe completo en seis páginas (portada, cuatro interiores y contraportada).
 - Loading: no aplica (el PDF se genera en el servidor antes del envío).
 - Empty: puntaje `null` → anillo sin arco ni esfera y «—»; secciones sin datos no se dibujan.
 - Error: si el render falla, el correo sigue el camino de error actual de `build-report-attachment.ts` (sin cambio).
@@ -279,7 +312,7 @@ Reglas obligatorias:
 
 - GVC scenario: no aplica; evidencia por PDF real.
 - Viewports: A4.
-- Required captures: cinco páginas en color y en gris.
+- Required captures: seis páginas por variante, en color y en gris.
 - Required `data-capture` markers: no aplica.
 - Scroll-width check: no aplica.
 - Accessibility/focus checks: contraste AA en papel y en tinta; gravedad nunca sólo por color.
@@ -305,7 +338,16 @@ Reglas obligatorias:
 
 ### Slice 1 — Dirección aprobada y sellada
 
-- Pinear `@efeoncepro/axis-brand-assets` `0.4.2` en Greenhouse (instalación con credencial efímera autorizada) y leer los lockups desde el paquete.
+- Fijar en Greenhouse el juego de AXIS `v0.3.30`: `@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts`
+  `0.3.30`, `@efeoncepro/axis-graphic-line` `0.12.0` y `@efeoncepro/axis-brand-assets` `0.4.3` (reemplaza al
+  `0.4.2` que pedía la versión anterior de este slice). Se instala con una credencial efímera autorizada por el
+  operador, según `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. Los lockups se leen desde el
+  paquete.
+- En el mismo commit del bump:
+  - Llevar el adapter `scripts/creative/layout-compiler/graphic-line.mjs` al contrato `efeonce.graphic-line-orbit`
+    `0.4.0`, porque hoy rechaza toda versión distinta de `0.3.1`.
+  - Correr `pnpm brand:tokens`, `pnpm glitch:tokens` y `pnpm manzanitas:tokens`, con sus `--check`, como exige la regla
+    de todo bump de `axis-tokens` (runbook, Delta 2026-09-28 (g)).
 - Corregir `report-artifact/fixtures.ts` para que la gravedad coincida con los umbrales de `recommendations.ts`.
 - ~~Exportar las hojas aprobadas del canvas y escribir la dirección~~: hecho el 2026-09-29 (24 hojas en tres idiomas y
   `TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`); el wireframe está al día.
@@ -314,6 +356,18 @@ Reglas obligatorias:
 
 - Reescribir `report-pdf-tokens.ts` con la paleta de «La órbita» desde `efeonceGraphicLine` y la gravedad desde
   `axisSemanticHex`.
+- Leer de `@efeoncepro/axis-tokens` `0.3.30` la anatomía del documento (`aiVisibilityReport`: paleta, página, orden,
+  capítulos, audiencias, encabezado y pie, contraportada y locales) y el color de gravedad de la órbita
+  (`efeonceGraphicLine.measureSeverity`). `report-pdf-tokens.ts` sigue siendo el único mapa hacia el renderer.
+- La órbita de la portada tiene dos caminos, y el slice elige uno:
+  - Tomar el SVG de `aiVisibilityReportOrbitSvg` (`@efeoncepro/axis-graphic-line/report` `0.12.0`) y rasterizarlo o
+    convertirlo antes del render, porque react-pdf no recibe un string SVG.
+  - Reproducirla con primitivas `Svg` de react-pdf desde `aiVisibilityReport.cover.orbit`, con el color de
+    `aiVisibilityReportSeverityColor` o `measureSeverity`.
+- En los dos casos la geometría y el color salen del paquete; ningún valor se copia a mano.
+- La composición del documento se puede validar contra `resolveAiVisibilityReportIntent`
+  (`@efeoncepro/axis-ui-contracts` `0.3.30`), con un intent armado desde el modelo. Un `status: 'invalid'` significa que
+  el documento no cumple el contrato. Cómo lo trata el renderer (test, guarda en runtime o ambos) se decide en el plan.
 - Si se aprueba Bricolage: generar instancias estáticas por peso, registrarlas en `register-fonts.ts` y documentar su
   procedencia junto a `BricolageGrotesque-SOURCE.md`.
 
@@ -390,7 +444,7 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 |---|---|---|---|---|
 | react-pdf dibuja mal la órbita o el halo sobre fondo oscuro | UI (PDF) | medium | fondo con `View`, colores opacos premezclados, halo con gradiente radial probado o círculos concéntricos | revisión visual del PDF real |
 | Bricolage variable se ve en un solo peso | UI (PDF) | high si se adopta | instancias estáticas por peso | revisión visual; test que verifica la fuente embebida |
-| El PDF crece de 4 a 5 páginas y pesa más en el adjunto | email | low | medir el tamaño antes y después; fuentes con subconjunto | tamaño del buffer en el test |
+| El PDF crece de 4 a 6 páginas y pesa más en el adjunto | email | low | medir el tamaño antes y después; fuentes con subconjunto | tamaño del buffer en el test |
 | Web y print quedan con otro diseño que el PDF | UI | high (esperado) | follow-up de paridad declarado; nota en el master flow | revisión del master flow |
 | Falla el render y el correo no sale | email | low | el camino de error de `build-report-attachment.ts` no cambia; test del renderer con el fixture y con estados `null` | errores del consumer reactivo del correo |
 
@@ -412,7 +466,7 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 
 ### Production verification sequence
 
-1. Render local con el fixture y los estados `null`; revisar las cinco páginas.
+1. Render local con el fixture y los estados `null`; revisar las seis páginas.
 2. En staging, pedir un informe real del Grader y abrir el PDF adjunto página por página.
 3. Promover con el release normal; en producción, abrir el adjunto del primer informe enviado.
 
@@ -437,7 +491,7 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [ ] Estela, esfera, halo y punto de la etiqueta de la portada toman el color de la gravedad del puntaje, con los umbrales de `recommendations.ts` y los colores `axisRamp.error[400]`, `axisRamp.warning[500]` y `axisRamp.success[400]`. El anillo, la marca de partida y la cifra no cambian, y la etiqueta en texto siempre acompaña al color. Cada estado coincide con `portada-estados-de-la-orbita.png`.
 - [ ] Ningún nivel ni dimensión sin dato se muestra como 0.
 - [ ] `report-pdf-tokens.ts` toma fondo y acento de la línea Engine (`efeonceGraphicLine.lines.engine`) y la gravedad de `axisSemanticHex`; ningún HEX escrito a mano.
-- [ ] Portadas y encabezados usan el lockup oficial `ai-visibility-report-lockup-*` y la línea del AEO Assessment el `aeo-lockup-*`, leídos de `@efeoncepro/axis-brand-assets` `0.4.2`; el cierre dice «Empower your Engine».
+- [ ] Portadas y encabezados usan el lockup oficial `ai-visibility-report-lockup-*` y la línea del AEO Assessment el `aeo-lockup-*`, leídos de `@efeoncepro/axis-brand-assets` `0.4.3`; el cierre dice «Empower your Engine».
 - [ ] El documento no usa el lockup de Efeonce Insights.
 - [ ] La contraportada toma las redes de `EFEONCE_SOCIAL_LINKS` y el logo y la burbuja de `axis-brand-assets`.
 - [ ] El eslogan va en bloque debajo del logo de Efeonce, al 64 % de su ancho (cuerpo = 0,64 × logo ÷ 11,586 em), separado 1,35 veces su cuerpo; nunca como texto a cuerpo fijo.
@@ -456,6 +510,16 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [ ] La página 05 muestra la participación de voz en porcentaje y las fuentes citadas de `citationSourceBreakdown`.
 - [ ] `renderAiVisibilityReportPdf` conserva su firma y `build-report-attachment.ts` no cambia.
 - [ ] `report-artifact-pdf-no-leak.test.tsx` sigue verde.
+- [ ] Greenhouse fija `axis-tokens` y `axis-ui-contracts` `0.3.30`, `axis-graphic-line` `0.12.0` y `axis-brand-assets`
+  `0.4.3`, instalados con credencial efímera autorizada. El adapter `graphic-line.mjs` acepta el contrato
+  `efeonce.graphic-line-orbit` `0.4.0`, y `pnpm brand:tokens --check`, `pnpm glitch:tokens --check` y
+  `pnpm manzanitas:tokens --check` quedan verdes.
+- [ ] El renderer lee la anatomía del documento de `aiVisibilityReport` y el color de gravedad de
+  `efeonceGraphicLine.measureSeverity` (`axis-tokens` `0.3.30`), sin HEX ni medidas copiadas del canvas.
+- [ ] La órbita de la portada sale de `aiVisibilityReportOrbitSvg` o se reproduce desde `aiVisibilityReport.cover.orbit`,
+  y coincide con el Lab de AXIS (`/references/ai-visibility-report/`) en sus cuatro estados.
+- [ ] Un intent armado desde el modelo resuelve `status: 'resolved'` con `resolveAiVisibilityReportIntent` para las dos
+  audiencias y los tres idiomas del fixture, verificado por un test.
 - [ ] El dossier tiene las ocho hojas de cada idioma en color y en gris, lado a lado con las hojas aprobadas, y el scorecard.
 
 ## Verification
@@ -506,3 +570,7 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - Decidida en la task: el ejemplo del informe (`report-artifact/fixtures.ts`) marca AI Visibility 72 como «atención»,
   pero la regla real (≥ 70) lo hace óptimo; se corrige el ejemplo para que coincida con las reglas del modelo.
 - Resuelta (operador, 2026-09-29): la línea es Engine y el eslogan de cierre es «Empower your Engine».
+- **Abierta (2026-09-29, sin respuesta del operador):** un 62 % con sólo la estela corta se lee como menos de lo que es.
+  En un tablero del correo de Insights se probó dibujar además el recorrido desde las 12 al 60 % de opacidad. Falta
+  decidir si eso pasa a ser regla y si se aplica a la portada de este informe. Hasta que el operador decida, la portada
+  sigue el canon publicado en AXIS (estela de 50°, sin recorrido).

@@ -5,7 +5,7 @@
 > catálogo de 60 y 33 volúmenes): AXIS main@aa66225, 2026-09-27 (tag `v0.5.0`). IA, social y staff (D26, catálogo de
 > 79 y 43 volúmenes): AXIS main@cf77452 (2026-09-27) (tag `v0.6.0`). Versiones fijadas y ruta por el Artifact Composer:
 > greenhouse-eo@016d0a183 — 2026-09-27 (tag AXIS `v0.3.8`). Versiones vigentes y fila de Glitch: greenhouse-eo@24e4c72ee
-> — 2026-09-28 (tag AXIS `v0.3.24`).
+> — 2026-09-28 (tag AXIS `v0.3.24`). Efeonce AI Visibility Report: AXIS `main` `26097c5`, tag `v0.3.30` — 2026-09-29.
 
 ## Fuentes de verdad (por orden de autoridad)
 
@@ -25,6 +25,7 @@
 | Motion, sonido y música de Glitch (**aprobados**, sólo Glitch, 2026-09-27) | Producción: repo taller `efeoncepro/efeonce-brand-workshop` (`main` = `ed89a0b`), `tools/glitch-motion/` (HyperFrames; `src/sound.mjs` sobre `tools/brand-sound`; `src/music.mjs`), manifiesto por corrida en `corridas/<run>/manifiesto.json` (sha256, verificaciones, entrega; sin rutas de máquina). Música: másteres en `https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/` (`index.json`; sha256 fijado en `music.mjs`, falla cerrado si cambia). Sonido: `glitch/sound/v1/` del mismo bucket. Entregas al editor: OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/` (`v2/` la aprobada, `v2/sin-musica/`, `kit/`, `transiciones/`). Datos AXIS: `apps/lab/src/data/{glitch,glitch-sound,glitch-sound-assets,glitch-music,glitch-music-assets}.ts`. Comandos: norma de Glitch §13.13 y [glitch.md](glitch.md) §12 | el operador aprueba; los archivos del bucket (URL + sha256) mandan sobre cualquier script |
 | Marca de producto de Efeonce Insights (canónica 2026-09-28) | criterio [criteria.md](criteria.md) («Insights, marca de producto que acompaña»), decisión [ledger.md](ledger.md) (fila 2026-09-28); archivos `@efeoncepro/axis-brand-assets` ≥ 0.4.0 (`insights-{logo,isotype,lockup}-*`), generador Greenhouse `scripts/brand/build-insights-logo.mjs`; mapa de aplicación [applications.md](applications.md) §B3b; anatomía del informe y la web en la skill `efeonce-insights` → `references/ui-and-brand.md` | el operador; los archivos sellados mandan en la forma |
 | Submarcas de producto SEO/AEO (aprobadas 2026-09-29): Efeonce \| SV360, AEO, AEO Assessment, AI Visibility Report | criterio [criteria.md](criteria.md) («Submarcas de producto SEO/AEO»), decisión [ledger.md](ledger.md) (fila 2026-09-29 tarde), norma manual §7.2, naming en el ADR `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md` §Delta 2026-09-29; archivos `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29; `sv360-*`, `aeo-*`, `aeo-assessment-*`, `ai-visibility-report-*`), generador Greenhouse `scripts/brand/build-seo-aeo-logos.mjs`; canvas de registro [«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac); aplicaciones [applications.md](applications.md) §B3c | el operador; los archivos sellados mandan en la forma |
+| Efeonce AI Visibility Report (el PDF del AEO Assessment; canónico en AXIS desde `v0.3.30`, 2026-09-29) | AXIS: tokens `efeonceGraphicLine.measureSeverity` y `aiVisibilityReport` (`axis-tokens` 0.3.30), contratos `efeonce.ai-visibility-report` 0.1.0 `candidate` y `efeonce.graphic-line-orbit` 0.4.0 (`axis-ui-contracts` 0.3.30), receta `@efeoncepro/axis-graphic-line/report` (0.12.0); ADR `docs/architecture/AI_VISIBILITY_REPORT_COMPOSITION_DECISION_V1.md`. Greenhouse: dirección sellada `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md` (commit `c76d75711`); criterio [criteria.md](criteria.md) §3.4 («Medida con gravedad»); inventario [package-and-tokens.md](package-and-tokens.md) §2.19, §2.20 y §7.10 | el operador aprueba; el token manda en números; los umbrales, el productor del puntaje |
 
 Si un doc y el código no coinciden, manda el código verificado y se corrige el doc (con fecha).
 
@@ -44,6 +45,15 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
     ejemplo vivo del producto es la muestra `think.efeoncepro.com/insights/muestra`.
   - Submarcas SEO/AEO (2026-09-29): página de referencia `/references/seo-aeo/`, JSON para agentes
     `/references/seo-aeo.json` y guía `docs/agent-composition/seo-aeo.md`, **publicados el 2026-09-29** (verificados: responden 200).
+  - Efeonce AI Visibility Report (2026-09-29, `v0.3.30`): página
+    [axis.efeonce.org/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/)
+    (gravedad en vivo con deslizador, anatomía, las 24 páginas aprobadas en es/en/pt-BR y sección para agentes) y
+    `/references/ai-visibility-report.json` (schema `axis.efeonce-ai-visibility-report.v1`); fuente
+    `apps/lab/src/pages/references/ai-visibility-report.astro` (+ `.json.ts`, `apps/lab/src/data/ai-visibility-report.ts`).
+    Docs: ADR `docs/architecture/AI_VISIBILITY_REPORT_COMPOSITION_DECISION_V1.md`, guía para agentes
+    `docs/agent-composition/ai-visibility-report.md`, esquema `docs/agent-composition/ai-visibility-report-intent.schema.json`,
+    ejemplos `docs/examples/ai-visibility-report/` (válidos e inválidos) y CLI `pnpm report:resolve`. La guía y el ADR
+    de la órbita quedaron actualizados al contrato 0.4.0.
   - Manuales para agentes: `docs/agent-composition/graphic-line-orbit.md`, `email-signature.md`,
     `collaboration-selection.md`, `iconography.md`; decisiones AXIS `docs/architecture/GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md`
     e `ICONOGRAPHY_DECISION_V1.md`.
@@ -77,7 +87,7 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 |---|---|
 | Logos, isotipos, burbujas URL, 48 órbitas estáticas | `@efeoncepro/axis-brand-assets` (nunca copias a mano) |
 | Marca de Insights (logo, isotipo, lockup) | `@efeoncepro/axis-brand-assets` **0.4.0** (`insights-*`); Greenhouse fija 0.3.5 y no los trae; Think usa copias manuales en `efeonce-think/public/branding/insights/` (5 de los 6 SVG, sin `insights-isotype-positive`; en código sólo los dos lockups) + `og-insights.png`, generada por `efeonce-think/scripts/build-insights-og.mjs` (regenerarla si cambia el lockup) |
-| Submarcas SEO/AEO (logo, isotipo de SV360 y AEO, lockup, `sv360-name-lockup`; variantes positive/negative/white) | `@efeoncepro/axis-brand-assets` **0.4.2** (publicado el 2026-09-29; `AXIS_SEO_AEO_BRANDS`); Greenhouse fija 0.4.1 y los recibe con TASK-1938. Nunca copias a mano: se regeneran con `scripts/brand/build-seo-aeo-logos.mjs` |
+| Submarcas SEO/AEO (logo, isotipo de SV360 y AEO, lockup, `sv360-name-lockup`; variantes positive/negative/white) | `@efeoncepro/axis-brand-assets` **0.4.2** (publicado el 2026-09-29; `AXIS_SEO_AEO_BRANDS`; 0.4.3, del mismo día, sólo re-sella las órbitas estáticas con el contrato 0.4.0); Greenhouse fija 0.4.1 y los recibe con TASK-1938. Nunca copias a mano: se regeneran con `scripts/brand/build-seo-aeo-logos.mjs` |
 | Masters del motion del logo | `gs://efeonce-group-axis-public-media/motion/logo/v1.1/…` (público, CORS para el Lab) |
 | Kit de la identidad sonora (recomendada) | `gs://efeonce-group-axis-public-media/sonic/v1/` → `masters/` (logo, etiqueta con voz, motion WAV+MP4 16:9/9:16, piezas largas, cierre de energía, voz sola) y `web/` (MP3, MP4 720p, pósters WebP); 65 archivos. Producción: `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/`, `entrega/`, `guia/`; binarios fuera de git) |
 | Sonido de Glitch (sólo Glitch, versión B) | `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`masters/` + `web/`); lo produce el taller `efeonce-brand-workshop` → `tools/glitch-motion/src/sound.mjs`. Detalle: [glitch.md](glitch.md) §13 |
@@ -127,6 +137,11 @@ del ADR de AXIS. La serie completa está en [ledger.md](ledger.md).
 **Publicado el 2026-09-28 (tag `v0.4.0`, AXIS `25b5ecf` + `4760e3e` en `main`):** `axis-brand-assets` **0.4.0** con la
 marca de Insights y el tipo `lockup` (25 SVG sellados). Antes, el mismo día, `v0.9.0` publicó `axis-brand-assets` 0.3.6
 (volumen `mano`). Greenhouse sigue en 0.3.5.
+
+**Publicado el 2026-09-29 (tag `v0.3.30`, AXIS `main` `26097c5`, verificado en el registro):** `axis-tokens` 0.3.30,
+`axis-ui-contracts` 0.3.30, `axis-graphic-line` 0.12.0, `axis-brand-assets` 0.4.3 y `axis-ui-registry` 0.3.2 (el
+Efeonce AI Visibility Report y la medida con gravedad). `develop` de Greenhouse sigue en tokens y contracts 0.3.29,
+graphic-line 0.11.0, brand-assets 0.4.1 y registry 0.3.1; la adopción va con TASK-1938.
 
 **Fuentes de la composición del deck (TASK-1927 y TASK-1928, verificado 2026-09-28):** tasks
 `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` y

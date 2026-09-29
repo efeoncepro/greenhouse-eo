@@ -13,7 +13,8 @@
 Una esfera que recorre su órbita. La forma nace del isotipo (la nave ya tiene anillo y esfera): la línea no inventa
 un símbolo, extiende el que existe. Anatomía: **anillo** fino (el recorrido) + **arco** (lo avanzado) + **esfera** en
 la punta (dónde vamos) + **halo** (luz, nunca disco relleno). Gramática: **anillo = pregunta / libre / abierto ·
-esfera = respuesta / ocupado / decidido**; nunca colores de semáforo (manual §0, §1.3).
+esfera = respuesta / ocupado / decidido**; nunca colores de semáforo (manual §0, §1.3). La única excepción, acotada,
+es la medida con gravedad de un puntaje con escala publicada (regla 18).
 
 Tres usos, un sistema:
 
@@ -162,6 +163,14 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
     200°–250°); arco y esfera en el extremo bajo de su rango (3,81 / 8,33 px en un lienzo social de 1080); anillo al
     16 %, al 22 % sólo con órbitas interiores o satélites. Las piezas de formato fijo (lente, foco, deck, retrato)
     se midieron una por una en `pieces` y `portrait`: la receta las **reproduce**, no las deriva de una escala.
+18. **Medida con gravedad** (operador, 2026-09-29; canónica en AXIS `v0.3.30`): sólo un puntaje con escala de gravedad
+    publicada —hoy la portada del **Efeonce AI Visibility Report**— pinta la estela, la esfera, su brillo y el punto de
+    la etiqueta en el color del nivel (token `efeonceGraphicLine.measureSeverity`); anillo, partida y cifra no cambian;
+    etiqueta en texto y escala a la vista siempre; sin dato, anillo y partida solos y «—». Los umbrales son del
+    productor. **No** vale para el estado (regla 12) ni para una medida sin escala. Contrato de la órbita 0.4.0
+    (`measure.severity`) y el del informe `efeonce.ai-visibility-report` 0.1.0 (`candidate`), receta
+    `aiVisibilityReportOrbitSvg`; página canónica https://axis.efeonce.org/references/ai-visibility-report/.
+    Greenhouse fija AXIS 0.3.29 hasta TASK-1938. Detalle: `efeonce-graphic-line` → `criteria.md` §3.4.
 
 ## De dónde salen los valores y los archivos
 
@@ -353,6 +362,7 @@ el pre-push `scripts/ci/large-blob-gate.mjs` bloquea blobs grandes.
 | Archivos oficiales | `@efeoncepro/axis-brand-assets` 0.3.0 | logos, isotipos, burbujas y 48 órbitas; el Lab los sincroniza en cada build (`pnpm brand:sync`) |
 | Órbita pintada | `@efeoncepro/axis-graphic-line` 0.3.1 | recetas, motion, React y Web Component (Greenhouse no lo usa) |
 | Íconos | `@efeoncepro/axis-graphic-line/icons` 0.4.0 · `efeonceGraphicLine.icons` (tokens 0.3.6) · https://axis.efeonce.org/references/iconography/ | Trazo y Plastilina: catálogo, `resolveIcon`, `auditIconGroup`, órbita sesgada |
+| Efeonce AI Visibility Report (2026-09-29) | https://axis.efeonce.org/references/ai-visibility-report/ (+ `.json`) · contrato `efeonce.ai-visibility-report` 0.1.0 · `@efeoncepro/axis-graphic-line/report` 0.12.0 · tokens `measureSeverity` y `aiVisibilityReport` (0.3.30) | el informe completo y la medida con gravedad de su portada; dirección de Greenhouse en `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md` |
 | Íconos en volumen (D24) | `@efeoncepro/axis-brand-assets` 0.3.2 `assets/volume/` · `efeonceGraphicLine.icons.volume` (tokens 0.3.7) · ambos publicados (tag `v0.3.7`) · Lab `#volumen` | Plastilina en volumen: 18 PNG con alfa, `volumeIconUrl(glyph)`, sólo objeto protagonista |
 | Motion | `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md` · `EFEONCE_ORBIT_REVEAL_MOTION_V1.md` | norma del lenguaje de movimiento · spec de reveal, apertura y sting V1.1 |
 | Adapter | `scripts/creative/layout-compiler/graphic-line.mjs` | resolver + pintor + medición de firma |

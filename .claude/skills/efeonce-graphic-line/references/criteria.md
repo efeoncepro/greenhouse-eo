@@ -203,9 +203,19 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   - La etiqueta en texto va siempre, y la escala es visible en la misma pieza.
   - Sobre oscuro se usa el paso de la rampa AXIS que da ≥ 4,5:1: `error[400]`, `warning[500]` y `success[400]` sobre
     `#091951`.
-  - Sin dato, sólo el anillo, «—» y «Sin dato».
+  - Sobre claro, el paso que da ≥ 3:1 sobre papel y blanco: `error[600]`, `warning[900]` y `success[500]`.
+  - El punto de la etiqueta también toma la gravedad; el brillo de la esfera es 3 veces su radio, al 50 %.
+  - Sin dato, sólo el anillo y la marca de partida, «—» sin «de 100» y «Sin dato»: sin dato no es cero.
+  - Los umbrales son del productor del puntaje, no de la línea gráfica.
   - No es un permiso para la marca de estado (§3.10), que sigue sin semáforo, ni para colorear una medida sin escala
     publicada.
+  - **Vive en AXIS desde `v0.3.30` (2026-09-29):** token `efeonceGraphicLine.measureSeverity`
+    (`@efeoncepro/axis-tokens` 0.3.30), `measure` con `severity`, `severityLabel`, `scaleVisible` y `glow` en el
+    contrato `efeonce.graphic-line-orbit` **0.4.0**, y la receta `aiVisibilityReportOrbitSvg` en
+    `@efeoncepro/axis-graphic-line/report` (0.12.0). El informe completo es el contrato
+    `efeonce.ai-visibility-report` 0.1.0 (candidate). Lab:
+    [axis.efeonce.org/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/).
+    Greenhouse fija todavía 0.3.29 y lo adopta con TASK-1938 ([package-and-tokens.md](package-and-tokens.md) §2.19 y §7.10).
   - Dirección: `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`.
 - **En una lámina de gráficos** (Marketing con Manzanitas, aprobada por el operador el 2026-09-28 con toda la
   línea; [manzanitas.md](manzanitas.md) §8): la dona de la línea es esta medida, con la geometría de AXIS (anillo, marca de partida, estela y esfera de

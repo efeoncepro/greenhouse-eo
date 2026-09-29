@@ -25,6 +25,8 @@ La capacidad se llama **Efeonce AEO**; el diagnóstico público, **Efeonce AEO A
 
 Las cuatro son **submarcas de producto de Efeonce** con logos oficiales (aprobadas el 2026-09-29): **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report**, en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29). Acompañan a Efeonce en un lockup y nunca firman solas; referencia visual en el Lab de AXIS `https://axis.efeonce.org/references/seo-aeo/` (publicados el 2026-09-29; responden 200). Canon: ADR de naming §Delta 2026-09-29.
 
+El canon visual del **AI Visibility Report** vive en AXIS desde `v0.3.30` (2026-09-29): página `https://axis.efeonce.org/references/ai-visibility-report/` y contrato `efeonce.ai-visibility-report` 0.1.0 (`candidate`). La portada muestra la gravedad en su órbita (color del nivel con etiqueta y escala visibles; sin dato, «—»); la versión para prospecto cierra con la agenda, nunca con correo, y la de cliente no lleva oferta. El renderer del PDF es de TASK-1938.
+
 Para decisiones transversales de packaging, pricing, billing, margen, descuentos y créditos cargar también
 `efeonce-pricing-operator`. Esta skill conserva las reglas específicas de Search Visibility 360 y sus hipótesis de
 mercado, oferta, venta y retención.

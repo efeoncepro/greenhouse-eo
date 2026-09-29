@@ -99,6 +99,26 @@ anterior. El tag `v0.3.24` de AXIS (commit `5b3056f`) agrega `glitchLine.edition
 `glitch:tokens` y el CI falló en `graphic-line-tokens-sync.test.ts`; arreglo en `609353e83`. Detalle: runbook, Delta
 2026-09-28 (g). Este mapa no autoriza bumps nuevos.
 
+## Actualización — 2026-09-29: `v0.3.30`, el AI Visibility Report
+
+**Pines vigentes** (`package.json`, 2026-09-29, bump `2c95e60b2`, tag `v0.3.29` de AXIS): `axis-tokens` `0.3.29`,
+`axis-ui-contracts` `0.3.29`, `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.1` y `axis-ui-registry` `0.3.1`.
+Superan a los de la actualización anterior. Los tags `v0.3.25` a `v0.3.29` no tienen una actualización propia en este
+mapa.
+
+El tag `v0.3.30` de AXIS (`main` `26097c5`, registro verificado) publicó:
+
+- `axis-tokens` `0.3.30`: `aiVisibilityReport` y `efeonceGraphicLine.measureSeverity`.
+- `axis-ui-contracts` `0.3.30`: contrato nuevo `efeonce.ai-visibility-report` `0.1.0` (`candidate`) y
+  `efeonce.graphic-line-orbit` `0.4.0`.
+- `axis-graphic-line` `0.12.0`: `/report`, con `aiVisibilityReportOrbitSvg` y `aiVisibilityReportSeverityColor`.
+- `axis-brand-assets` `0.4.3`: órbitas estáticas re-selladas, sin cambio de dibujo.
+- `axis-ui-registry` `0.3.2`.
+
+**Greenhouse no lo fija todavía.** Lo adopta TASK-1938 (el PDF del AI Visibility Report). El adapter de la órbita
+(`scripts/creative/layout-compiler/graphic-line.mjs`) acepta sólo el contrato `0.3.1`, así que ese bump tiene que llevar
+el soporte de `0.4.0`. Detalle en el runbook, Delta 2026-09-29 (h). Este mapa no autoriza el bump.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro

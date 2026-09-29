@@ -242,6 +242,9 @@ Rules for agents:
   `0.3.29`, `axis-ui-contracts` `0.3.29` (AXIS tag `v0.3.29`, 2026-09-29, Marketing con Manzanitas with no open
   decisions; the contracts package depends on `axis-tokens` exactly `0.3.29`), `axis-ui-registry` `0.3.1`,
   `axis-brand-assets` `0.4.1` and `axis-graphic-line` `0.11.0`. Graphic-line visual gate: 73 frames at 0 px (verified 2026-09-29 on the `v0.3.29` bump; 66 after TASK-1928).
+  **AXIS has since published tag `v0.3.30`** (2026-09-29, `main` `26097c5`: tokens/contracts `0.3.30`, graphic-line
+  `0.12.0`, brand-assets `0.4.3`, registry `0.3.2`; see «Efeonce AI Visibility Report (0.3.30 set)»); Greenhouse still
+  pins `0.3.29` and adopts `0.3.30` inside TASK-1938. A bump runs the three token regenerations below.
   Series: `0.3.11`…`0.3.14` (TASK-1927), `0.3.12` (TASK-1922, Glitch), `0.3.15`…`0.3.21` (TASK-1928), `0.3.24` (Glitch Flash, contracts `0.3.22`); table in
   the surface-composition section below.
   It does not use `efeonce.email-signature` yet. `axis-graphic-line` paints the orbit only in the Artifact Composer
@@ -266,7 +269,7 @@ Rules for agents:
   variants. Threshold 4.5 vs 3:1 pending the operator.
 - **The orbit never replaces the photographic composition** and never crosses subject, text reserves, bed or
   signature (`orbit-never-over-subject-or-reserves`).
-- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; `0.4.2` being released on 2026-09-29; Greenhouse pins `0.4.1`): 58 brand SVG since
+- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; `0.4.2` published 2026-09-29, AXIS `main` `7f9c8bb`; `0.4.3`, tag `v0.3.30`, only re-stamps the 48 static orbits with orbit contract `0.4.0`; Greenhouse pins `0.4.1`): 58 brand SVG since
   `0.4.2` (19 until `0.3.6`: logo/isotype per brand, URL bubble source and baked variants; `0.4.0` adds the Insights
   logo/isotype and the `lockup` kind, see «Efeonce Insights in AXIS»; `0.4.2` adds 33 SEO/AEO sub-brand files and the `white` variant, see «SEO/AEO product sub-brands in AXIS») plus the 48 static orbits, SHA-256 sealed; `findBrandAsset`, `brandAssetUrl`,
   `findOrbitAsset`. Consumers read the package, never a hand copy (Greenhouse guards its local copies with
@@ -661,8 +664,8 @@ evaluates the brand) and **Efeonce | AI Visibility Report** (the deliverable). S
 Efeonce in a lockup and **never sign alone**. Naming: Greenhouse ADR `EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md` §Delta
 2026-09-29 (it updates the earlier «not a product brand» clause; legacy aliases unchanged).
 
-- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.2`** (tag `v0.4.2`, **being released on 2026-09-29** —
-  confirm the tag before citing it as published): export `AXIS_SEO_AEO_BRANDS` (`sv360`, `aeo`, `aeo-assessment`,
+- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.2`** (tag `v0.4.2`, published 2026-09-29, AXIS `main`
+  `7f9c8bb`): export `AXIS_SEO_AEO_BRANDS` (`sv360`, `aeo`, `aeo-assessment`,
   `ai-visibility-report`) and the new variant `white`; 33 new SVG (58 total):
   `{sv360,aeo,aeo-assessment,ai-visibility-report}-logo-{positive,negative,white}`, `{sv360,aeo}-isotype-{…}` (Assessment
   and Report have no isotype), `{…}-lockup-{positive,negative,white}` and `sv360-name-lockup-{…}` (lockup with the full
@@ -681,11 +684,51 @@ Efeonce in a lockup and **never sign alone**. Naming: Greenhouse ADR `EFEONCE_AE
 - **Generation:** Greenhouse `scripts/brand/build-seo-aeo-logos.mjs` (fontkit Poppins outlines; colors read from
   `@efeoncepro/axis-tokens`), then copy to `packages/brand-assets/assets/` and re-seal; never edit the SVG by hand.
 - **Lab reference page** `/references/seo-aeo/` + `/references/seo-aeo.json`, agent guide
-  `docs/agent-composition/seo-aeo.md` — **being built on 2026-09-29**; verify it answers before linking it as published.
+  `docs/agent-composition/seo-aeo.md` — published 2026-09-29 (answering 200 per `efeonce-graphic-line` →
+  `sources-and-assets.md`).
 - **Greenhouse pins `0.4.1`**: it does not carry these files until TASK-1938 (Grader report PDF with the «Efeonce | AI
   Visibility Report» lockup, Engine palette) bumps the version.
 - Criterion and application map: `efeonce-graphic-line` → `criteria.md` («Submarcas de producto SEO/AEO») and
   `applications.md` §B3c; Greenhouse norm `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §7.2.
+
+### Efeonce AI Visibility Report (0.3.30 set)
+
+The operator approved the **Efeonce AI Visibility Report** (the PDF deliverable of the Efeonce AEO Assessment; product
+sub-brand, «La órbita», Engine line) and asked to canonize it in AXIS. Published 2026-09-29, AXIS `main` `26097c5`,
+tag **`v0.3.30`**, registry verified: `axis-tokens` `0.3.30`, `axis-ui-contracts` `0.3.30`, `axis-graphic-line`
+`0.12.0`, `axis-brand-assets` `0.4.3`, `axis-ui-registry` `0.3.2`.
+
+- **Tokens:** `efeonceGraphicLine.measureSeverity` (`canonical`, `allowedFor: ['scored-diagnostic']`) — only a score
+  with a published severity scale may color trail, sphere, sphere glow and label dot; ring, origin mark and figure do
+  not change; text label required and scale visible. Dark: `axisRamp.error[400]` `#e25a61`, `warning[500]` `#ffb703`,
+  `success[400]` `#46a877` (each ≥ 4.5:1 on `#091951`); light: `error[600]`, `warning[900]`, `success[500]` (each
+  ≥ 3:1 on paper and white); `sphereGlow` ofSphere 3, opacity 0.5; no data = ring + origin only, «—», no «de 100».
+  New top-level export `aiVisibilityReport` (`candidate`): palette, type, A4 page, order cover → what-to-do → why →
+  where → market → back-cover, chapters with Trazo glyphs, the two audiences (prospect: agenda CTA with UTM, never
+  email; client: account lead, no offer), cover orbit geometry (box 400, r 172, 4 px trail of 50°, sphere 10, glow 30),
+  interior header/footer, back cover, locales `es`/`en`/`pt-BR` (fallback `es`) and the `never` list.
+- **Contracts:** new `efeonce.ai-visibility-report` `0.1.0` (`candidate`), manifest
+  `axis.ai-visibility-report-composition.v1`, 22 issue codes, 9 adapter checks, CLI `pnpm report:resolve` in AXIS.
+  `efeonce.graphic-line-orbit` `0.3.1` → **`0.4.0`**: `measure` gains `severity`, `severityLabel`, `scaleVisible`,
+  `glow`; codes `measure-severity-label-required`, `measure-severity-scale-required`, `measure-severity-invalid`,
+  `measure-severity-label-without-severity`.
+- **Recipe:** `@efeoncepro/axis-graphic-line/report` — `aiVisibilityReportOrbitSvg({ score, severity, surface?,
+  idPrefix? })` and `aiVisibilityReportSeverityColor`; `measureSvg` accepts the severity options and the painter draws
+  the sphere glow. `axis-brand-assets` `0.4.3` re-stamps the 48 static orbits with contract `0.4.0` (same drawing).
+- **Lab:** https://axis.efeonce.org/references/ai-visibility-report/ + `.json` (schema
+  `axis.efeonce-ai-visibility-report.v1`): live severity states with a slider, anatomy, the 24 approved pages in three
+  languages, an agents section. **Docs:** ADR `docs/architecture/AI_VISIBILITY_REPORT_COMPOSITION_DECISION_V1.md`,
+  guide `docs/agent-composition/ai-visibility-report.md`, the intent schema, `docs/examples/ai-visibility-report/`;
+  the orbit guide and ADR updated for `0.4.0`.
+- **Boundaries (binding):** the thresholds belong to the producer (the contract receives the resolved level; never put
+  them in a token). The severity exception is limited to a scored diagnostic: it is **not** a permission for the state
+  mark, which stays without traffic lights, nor for coloring a measure without a published scale. Unlike Insights, AXIS
+  holds a contract for this document; the PDF renderer is Greenhouse's.
+- **Greenhouse does not pin it yet:** `develop` pins tokens/contracts `0.3.29`, graphic-line `0.11.0`, brand-assets
+  `0.4.1`; adopting `0.3.30` is part of TASK-1938 (its renderer is not implemented). Sealed design:
+  `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. Criterion, inventory and the
+  open question about drawing the travelled path (undecided; not a rule): `efeonce-graphic-line` → `criteria.md` §3.4,
+  `package-and-tokens.md` §2.19/§2.20/§7.10, `ledger.md`.
 
 ### AXIS Lab
 

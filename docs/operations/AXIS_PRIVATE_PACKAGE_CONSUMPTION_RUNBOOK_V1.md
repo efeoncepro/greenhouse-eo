@@ -8,7 +8,12 @@ source control.
 
 ## Current state — 2026-09-14
 
-> **Actualizado 2026-09-28 (noche) — estado vigente:** Greenhouse fija `axis-tokens` `0.3.24` y `axis-ui-contracts`
+> **Actualizado 2026-09-29 — estado vigente:** Greenhouse fija `axis-tokens` `0.3.29`, `axis-ui-contracts` `0.3.29`,
+> `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.1` y `axis-ui-registry` `0.3.1` (`package.json`, bump
+> `2c95e60b2`, tag `v0.3.29`). AXIS ya publicó `v0.3.30` (`main` `26097c5`), que Greenhouse **todavía no fija**. Ver
+> **Delta 2026-09-29 (h)**. La nota siguiente queda como historia.
+
+> **Actualizado 2026-09-28 (noche) — superado por la nota de arriba:** Greenhouse fija `axis-tokens` `0.3.24` y `axis-ui-contracts`
 > `0.3.22` (tag `v0.3.24` de AXIS, commit `5b3056f`: `glitchLine.editions` y contrato `efeonce.glitch-line` 0.2.0, el
 > Glitch Flash), `axis-brand-assets` `0.3.5`, `axis-graphic-line` `0.7.0` y `axis-ui-registry` `0.3.1`. Instalado con
 > credencial efímera (`gh auth token` en un userconfig temporal fuera del repo, borrado al terminar), autorizada por el
@@ -98,6 +103,27 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-29 (h) — `v0.3.30` publicado, no fijado: el Efeonce AI Visibility Report
+
+- **Publicado** el 2026-09-29 en el tag `v0.3.30` de AXIS (commit `26097c5` en `main`, registro verificado):
+
+  | Paquete | Versión | Qué suma |
+  |---|---|---|
+  | `@efeoncepro/axis-tokens` | `0.3.30` | `aiVisibilityReport` (anatomía del informe) y `efeonceGraphicLine.measureSeverity` |
+  | `@efeoncepro/axis-ui-contracts` | `0.3.30` | contrato `efeonce.ai-visibility-report` `0.1.0` (`candidate`) y `efeonce.graphic-line-orbit` `0.3.1` → `0.4.0` |
+  | `@efeoncepro/axis-graphic-line` | `0.12.0` | `/report`: `aiVisibilityReportOrbitSvg` y `aiVisibilityReportSeverityColor` |
+  | `@efeoncepro/axis-brand-assets` | `0.4.3` | órbitas estáticas re-selladas; el dibujo no cambia |
+  | `@efeoncepro/axis-ui-registry` | `0.3.2` | registro al día |
+
+- **Greenhouse sigue en `v0.3.29`**: `axis-tokens` y `axis-ui-contracts` `0.3.29`, `axis-graphic-line` `0.11.0`,
+  `axis-brand-assets` `0.4.1` y `axis-ui-registry` `0.3.1`. Lo adopta TASK-1938, con la credencial efímera del Delta (e)
+  autorizada por el operador para esa instalación.
+- **Antes de fijarlo:** el adapter `scripts/creative/layout-compiler/graphic-line.mjs` declara
+  `SUPPORTED_CONTRACT_VERSION = '0.3.1'` y lanza un error con cualquier otra versión del contrato de la órbita. El bump a
+  `axis-ui-contracts` `0.3.30` tiene que llevar el soporte de `0.4.0` en el mismo commit.
+- Después del bump corren `pnpm brand:tokens`, `pnpm glitch:tokens` y `pnpm manzanitas:tokens`, con sus `--check`
+  (regla del Delta (g)).
 
 ## Delta 2026-09-28 (g) — `v0.3.24` publicado y fijado: Glitch Flash; todo bump recompila los dos juegos de tokens
 
