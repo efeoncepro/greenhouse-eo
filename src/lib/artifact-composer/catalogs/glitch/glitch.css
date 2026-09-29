@@ -250,9 +250,8 @@ body {
 /* ─── Glitch Flash: «NO ESPERA AL LUNES» sobre la estela de bytes + «FLASH», nunca un número ───
    La etiqueta y la palabra usan la tipografía de «EDICIÓN» y del número (por referencia en glitchLine.editions.flash).
    La estela es `assets/flash-trail.svg` (generada desde el token): va a la izquierda de la palabra, nunca en cursiva ni
-   con skew. La separación grande y los anchos compacto y del banner interno salen del token; el ancho en la cabecera
-   grande (150 px) y las separaciones compacta (8 px) y del banner (10 px) son las medidas del canvas aprobado el
-   2026-09-28, que el token todavía no publica. */
+   con skew. Ancho y separación salen del token por contexto (`trail.contexts`: cabecera grande, cabecera compacta y
+   pie del banner de noticia); ninguna medida de la estela vive literal en este archivo. */
 .gx-flash-mark {
   display: inline-flex;
   align-items: center;
@@ -262,7 +261,7 @@ body {
 .gx-flash-trail {
   display: block;
   flex-shrink: 0;
-  width: 150px;
+  width: var(--gx-flash-trail-width-large);
   height: auto;
 }
 
@@ -271,7 +270,7 @@ body {
 }
 
 .gx-masthead__inline .gx-flash-mark {
-  gap: 8px;
+  gap: var(--gx-flash-trail-gap-compact);
 }
 
 .gx-masthead__inline .gx-flash-trail {
@@ -279,7 +278,7 @@ body {
 }
 
 .gx-foot .gx-flash-mark {
-  gap: 10px;
+  gap: var(--gx-flash-trail-gap-news);
 }
 
 .gx-foot .gx-flash-trail {

@@ -82,10 +82,14 @@ export const buildGlitchTokenProperties = (): [string, string][] => {
     ['--gx-edition-number-weight', String(m.editionNumber.number.weight)],
     ['--gx-edition-number-width', String(m.editionNumber.number.width)],
     // Glitch Flash: la etiqueta y la palabra usan la tipografía de «EDICIÓN» y del número (por referencia en AXIS); la
-    // estela es un asset (`assets/flash-trail.svg`) y aquí sólo van su separación y sus anchos publicados.
-    ['--gx-flash-trail-gap', px(trail.gapPx)],
-    ['--gx-flash-trail-width-compact', px(trail.widthPx.compact)],
-    ['--gx-flash-trail-width-news', px(trail.widthPx.newsBanner)],
+    // estela es un asset (`assets/flash-trail.svg`) y aquí van su ancho y su separación POR CONTEXTO
+    // (`trail.contexts`, axis-tokens ≥ 0.3.25): cabecera grande, cabecera compacta y pie del banner de noticia.
+    ['--gx-flash-trail-gap', px(trail.contexts.large.gapPx)],
+    ['--gx-flash-trail-width-large', px(trail.contexts.large.widthPx)],
+    ['--gx-flash-trail-gap-compact', px(trail.contexts.compact.gapPx)],
+    ['--gx-flash-trail-width-compact', px(trail.contexts.compact.widthPx)],
+    ['--gx-flash-trail-gap-news', px(trail.contexts.news.gapPx)],
+    ['--gx-flash-trail-width-news', px(trail.contexts.news.widthPx)],
     ['--gx-photo-band-top', px(band[0])],
     ['--gx-photo-band-height', px(band[1] - band[0])],
     ['--gx-reel-ui-top', px(reel.appUiTop[1])],

@@ -32,7 +32,10 @@
   --gx-edition-number-weight: 800;
   --gx-edition-number-width: 78;
   --gx-flash-trail-gap: 14px;
+  --gx-flash-trail-width-large: 150px;
+  --gx-flash-trail-gap-compact: 8px;
   --gx-flash-trail-width-compact: 66px;
+  --gx-flash-trail-gap-news: 10px;
   --gx-flash-trail-width-news: 96px;
   --gx-photo-band-top: 176px;
   --gx-photo-band-height: 450px;
