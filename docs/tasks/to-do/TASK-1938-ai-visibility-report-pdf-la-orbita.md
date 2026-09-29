@@ -48,6 +48,16 @@ cambiar el motor de render (react-pdf).
   Reemplaza al turquesa de Growth de la propuesta anterior.
 - Canvas actualizado: «Correo de Efeonce Insights», página «Informe del Grader (PDF)».
 
+## Delta 2026-09-29 (b) — tres idiomas
+
+El operador pidió «exactamente el mismo informe» en inglés y en portugués. El canvas tiene las tres versiones (páginas
+«Informe del Grader (PDF)», «(inglés)» y «(portugués)»), cada una en sus dos audiencias. El PDF se renderiza en el idioma
+del informe: `es` (es-CL, tuteo), `en` (en-US) y `pt-BR` (você). El intake público ya guarda `locale`
+(`src/lib/growth/ai-visibility/public-intake/contracts.ts`) y el mercado del informe trae `market.locale`
+(`report/contracts.ts`); hoy el renderer sólo sabe español. Reglas de la traducción aprobada: porcentajes sin espacio en
+`en` y `pt-BR` («32%»); fechas en el formato de cada idioma; en `en` los niveles usan sólo el nombre del marco («Be Found»,
+«Be Readable»…), en `es` y `pt-BR` el nombre local seguido del inglés; «Empower your Engine» y el lockup no se traducen.
+
 ## Why This Task Exists
 
 El Grader es lo primero que ve un prospecto de Efeonce y Efeonce Insights es lo que recibe cuando ya es cliente, pero
@@ -315,6 +325,13 @@ Reglas obligatorias:
 - Dos contraportadas con la voz de la línea: prospecto con «Agenda una reunión» (a `/contacto/`), burbuja URL y redes de
   `EFEONCE_SOCIAL_LINKS`; cliente con responsable de la cuenta y próximo informe, sin oferta. Bloque de marca al 64 %.
 
+### Slice 4b — Tres idiomas
+
+- Diccionarios de copy del informe en `es`, `en` y `pt-BR` (en `src/lib/copy/growth.ts` o su equivalente por locale),
+  con el texto aprobado en el canvas; el renderer elige el idioma desde el locale del informe [verificar la fuente:
+  `market.locale` del informe o `locale` del intake] y cae a `es` si no hay uno soportado.
+- Fechas y porcentajes con el formato de cada idioma (`Intl`), nunca armados a mano.
+
 ### Slice 5 — Evidencia y documentación
 
 - PDF con el fixture y con un informe real de staging, en color y en gris, lado a lado con las hojas aprobadas;
@@ -409,6 +426,7 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [ ] Cada motor evaluado (ChatGPT, Claude, Gemini, Perplexity, Google AI Overview) aparece con su logo oficial en la portada y en «Canales de respuesta»; Google AI Overview usa la lupa de Google AI Mode de AXIS, nunca el logo de Gemini.
 - [ ] Los íconos son del Trazo de AXIS (`resolveIcon`), en reposo, y cada grupo pasa `auditIconGroup`; ninguno dibujado a mano.
 - [ ] El copy nuevo vive en `src/lib/copy/growth.ts`, incluidos los nombres de las dimensiones en español.
+- [ ] El PDF sale en `es`, `en` y `pt-BR` según el locale del informe, con el texto aprobado en el canvas, fechas y porcentajes formateados con `Intl`, y cae a `es` cuando el locale no está soportado.
 - [ ] Existen dos versiones del documento por audiencia, derivada del cliente que el Grader ya identifica; la de cliente no tiene CTA comercial, redes ni oferta del Grader, y la de no cliente cierra con «Agenda una reunión», que enlaza a `efeoncepro.com/contacto/` con UTM (sin correo comercial).
 - [ ] La contraportada de cliente muestra al responsable de la cuenta desde un único valor configurable (hoy Julio Reyes, Managing Director & GTM).
 - [ ] La tipografía es la canónica de «La órbita» (Bricolage 760 + Poppins), registrada en `register-fonts.ts` con instancias estáticas por peso.
@@ -420,7 +438,7 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [ ] La página 05 muestra la participación de voz en porcentaje y las fuentes citadas de `citationSourceBreakdown`.
 - [ ] `renderAiVisibilityReportPdf` conserva su firma y `build-report-attachment.ts` no cambia.
 - [ ] `report-artifact-pdf-no-leak.test.tsx` sigue verde.
-- [ ] El dossier tiene las ocho hojas en color y en gris, lado a lado con las hojas aprobadas, y el scorecard.
+- [ ] El dossier tiene las ocho hojas de cada idioma en color y en gris, lado a lado con las hojas aprobadas, y el scorecard.
 
 ## Verification
 
