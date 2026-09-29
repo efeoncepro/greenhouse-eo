@@ -74,6 +74,7 @@
 | [ ] | Halo sobre papel a media intensidad (D7) | `orbit.haloOnLightScale` 0,5 | Automático con el contrato 0.3.1; con 0.3.0 el halo claro sale igual al oscuro: revisar y reducir |
 | [ ] | Cierre del deck: la palabra del eslogan en el acento, no en blanco (D3) | 8,5:1 sobre `#001a33` (Growth) | `deckSlideHtml('close')` desde axis-graphic-line 0.3.2; revisión si se arma a mano |
 | [ ] | Estado por forma (anillo/esfera) en el acento de la línea, nunca rojo/amarillo/verde | — | Automático: `state` resuelve `trafficLightColorsAllowed false`; revisión |
+| [ ] | Medida con gravedad (sólo un puntaje con escala publicada, hoy la portada del AI Visibility Report): estela, esfera y halo en el color de la gravedad; anillo, partida y cifra sin cambio; etiqueta en texto y escala visibles | sobre `#091951`: `error[400]` 4,62 · `warning[500]` 9,47 · `success[400]` 5,61 | Revisión; el contrato `measure` aún no admite `severity` (pendiente en AXIS) |
 | [ ] | No usar el gris viejo del eslogan `#848484` sobre claro | 3,51:1 sobre papel (falla) | Revisión (ojo: `src/config/efeonce-brand.ts` y el render de motion aún lo usan) |
 | [ ] | Sobre producción física, color con prueba del proveedor (valores son sRGB) | — | Revisión |
 

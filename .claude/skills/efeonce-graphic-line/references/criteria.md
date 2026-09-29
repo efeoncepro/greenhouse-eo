@@ -196,6 +196,17 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
 - **Con qué:** la cifra entera impresa («60 %») y su fuente. Dos datos en una pieza: mismo radio, misma partida.
 - **Nunca:** un arco que crece desde el origen hasta volverse anillo; una estela más larga que lo recorrido; un dato sin
   fuente (la esfera no se mueve sin dato real).
+- **Medida con gravedad (operador, 2026-09-29):** cuando el dato es un puntaje con una escala de gravedad publicada,
+  la estela, la esfera y el halo pueden tomar el color de esa gravedad en vez del acento. El único caso aprobado hoy es
+  la portada del Efeonce AI Visibility Report (umbrales < 40 crítico, < 70 atención y el resto óptimo).
+  - El anillo, la marca de partida y la cifra no cambian.
+  - La etiqueta en texto va siempre, y la escala es visible en la misma pieza.
+  - Sobre oscuro se usa el paso de la rampa AXIS que da ≥ 4,5:1: `error[400]`, `warning[500]` y `success[400]` sobre
+    `#091951`.
+  - Sin dato, sólo el anillo, «—» y «Sin dato».
+  - No es un permiso para la marca de estado (§3.10), que sigue sin semáforo, ni para colorear una medida sin escala
+    publicada.
+  - Dirección: `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`.
 - **En una lámina de gráficos** (Marketing con Manzanitas, aprobada por el operador el 2026-09-28 con toda la
   línea; [manzanitas.md](manzanitas.md) §8): la dona de la línea es esta medida, con la geometría de AXIS (anillo, marca de partida, estela y esfera de
   `measureSvg`); **no hay dona de partes**, porque tres segmentos en un anillo serían un arco que se llena: las partes,
@@ -284,7 +295,8 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   staff; lámina 4.6 3/3); cabina de llamadas «anillo libre, esfera en el aire»; sobre «cerrado = respondido».
 - **En vivo:** el estado activo, «en el aire», es el único estado que puede sumar el anillo propio de la esfera
   (`sphereRing` con `live: true`; ver 3.3). Ocupado no es lo mismo que en vivo: una sala reservada lleva la esfera sola.
-- **Nunca:** como semáforo de colores (verde/rojo); sin etiqueta.
+- **Nunca:** como semáforo de colores (verde/rojo); sin etiqueta. (El color de gravedad de §3.4 es sólo para un
+  puntaje con escala publicada, no para un estado.)
 
 ### 3.11 Cierre de marca
 

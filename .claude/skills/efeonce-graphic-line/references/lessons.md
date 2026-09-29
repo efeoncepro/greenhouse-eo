@@ -362,6 +362,17 @@
   como Humberly y Luis en el [roster](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md)) y
   declara el vestuario en la escena (si no, lo decide la referencia).
 
+## 2026-09-29 (la órbita del AI Visibility Report dice la gravedad)
+
+- El operador pidió que la órbita de la portada cambie de color según el puntaje sea crítico u óptimo. Choca en
+  apariencia con «el estado se dice con la forma, nunca semáforo» (§3.10), pero esa regla es para la **marca de
+  estado** (libre/ocupado), no para una medida. Se canonizó como excepción acotada en §3.4: sólo un puntaje con escala de
+  gravedad publicada, siempre con su etiqueta y con la escala a la vista.
+- El paso 500 de la rampa sobre `#091951` pasa como gráfico, pero apenas (error 3,54 y éxito 3,28). En la portada se
+  usa el 400 (4,62 y 5,61); atención queda en 500 (9,47). **Regla:** mide el color de gravedad sobre el fondo real antes
+  de elegir el paso; no copies el HEX semántico de papel a un fondo oscuro.
+- Sin dato no es «0»: la portada deja el anillo solo, «—» sin «de 100» y la etiqueta «Sin dato».
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

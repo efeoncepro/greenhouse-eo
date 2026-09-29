@@ -3,10 +3,13 @@
 Creado 2026-09-29 a partir de la propuesta que el operador pidió diseñar en el canvas. Describe, región por región,
 las páginas que TASK-1938 debe producir en el renderer PDF del Grader, con sus datos, estados y reglas.
 
-> **Estado 2026-09-29:** propuesta en canvas, **sin aprobar**. Mientras el operador no la apruebe, este wireframe es
-> la intención de diseño y no un contrato de fidelidad: `UI ready` sigue en `no`.
+> **Estado 2026-09-29:** **aprobado por el operador** («con eso cerraríamos … canoniza este informe»). La dirección
+> y sus hojas nativas son el contrato de fidelidad:
+> [`TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`](../visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md).
+> Tiene 24 hojas en `es`, `en` y `pt-BR` y la lámina de estados de la órbita. `UI ready` sigue en `no` hasta cerrar el
+> implementation mapping y el plan GVC contra el renderer real.
 
-- Visual direction mode: source-led (pendiente de aprobación).
+- Visual direction mode: source-led (aprobada el 2026-09-29).
 - **Fuente editable:** canvas «Correo de Efeonce Insights», página «Informe del Grader (PDF)»,
   <https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd>. Archivos `project/GraderPortadaProspecto.dc.html`,
   `project/GraderPortadaCliente.dc.html`, `project/GraderQueHacer.dc.html`, `project/GraderPorQue.dc.html`,
@@ -67,9 +70,9 @@ portada, 02, 03, 04, 05 y contraportada. Orden «respuesta primero»: qué hacer
 |---|---|---|
 | Cabecera | rótulo en versalitas (según variante) + etiqueta con el período | período de `ReportHeader.periodLabel` |
 | Identidad | ver tabla de audiencias | nunca un nombre inventado; sin logo del cliente, «Preparado para» con el nombre solo |
-| **Órbita que mide** | anillo fino, marca a las 12, arco con estela de 50° y esfera en `score × 3,6°`, con halo; dentro el puntaje, «de 100» y la etiqueta de gravedad | reemplaza al `Gauge` actual (arco que se llena). Única órbita del documento. Puntaje `null`: anillo sin arco ni esfera y «—» |
+| **Órbita que mide** | anillo fino, marca a las 12, arco con estela de 50° y esfera en `score × 3,6°`, con halo; dentro el puntaje, «de 100» y la etiqueta de gravedad | reemplaza al `Gauge` actual (arco que se llena). Única órbita del documento. **Estela, esfera, halo y punto de la etiqueta en el color de la gravedad** (operador, 2026-09-29): crítico `axisRamp.error[400]`, atención `axisRamp.warning[500]`, óptimo `axisRamp.success[400]`, todos ≥ 4,5:1 sobre `#091951`; anillo, partida y cifra sin cambio. Puntaje `null`: anillo sin arco ni esfera, «—» sin «de 100» y «Sin dato». Referencia: `visual-directions/TASK-1938-…/portada-estados-de-la-orbita.png` |
 | Tendencia | ver tabla de audiencias | `trend.status` sin histórico → el texto de primera medición, nunca «▲ 0» |
-| **Escala** | «0–39 Crítico · 40–69 Atención · 70–100 Óptimo», con su punto de color | umbrales de `src/lib/growth/ai-visibility/report/recommendations.ts` (`SEVERITY_CRITICAL_BELOW = 40`, `SEVERITY_ATTENTION_BELOW = 70`); nunca escritos a mano en el renderer |
+| **Escala** | «0–39 Crítico · 40–69 Atención · 70–100 Óptimo», con su punto en los mismos colores de la órbita | umbrales de `src/lib/growth/ai-visibility/report/recommendations.ts` (`SEVERITY_CRITICAL_BELOW = 40`, `SEVERITY_ATTENTION_BELOW = 70`); nunca escritos a mano en el renderer |
 | **Veredicto** | «Te encuentran, pero casi no te citan.» en dos pesos | un hallazgo de los datos (presencia óptima + citas críticas), no la frase comodín `headline.frame`; ver Copy Ledger |
 | Cobertura | discos blancos con el logo de cada motor + «Evaluado en N motores de respuesta» y «N preguntas · N de M respondieron» | roster de `engine-roster.ts` |
 | Firma | logo de Efeonce en blanco, centrado abajo | `@efeoncepro/axis-brand-assets`; sin eslogan (sólo cierra) |

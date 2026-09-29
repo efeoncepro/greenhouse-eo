@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Diseno — propuesta en canvas en iteración con el operador; el renderer del PDF no se ha tocado. El commit a124ad9ab es el script de logos de las submarcas SEO/AEO (insumo de esta task), no su implementación`
+- Status real: `Diseño aprobado por el operador el 2026-09-29 y sellado en docs/ui/visual-directions (24 hojas en es, en y pt-BR, más los estados de la órbita); el renderer del PDF no se ha tocado. El commit a124ad9ab es el script de logos de las submarcas SEO/AEO, un insumo de esta task, no su implementación`
 - Rank: `TBD`
 - Domain: `content`
-- Blocked by: `aprobación del operador de la propuesta del canvas (página «Informe del Grader (PDF)»)`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 
 ## Summary
@@ -57,6 +57,23 @@ del informe: `es` (es-CL, tuteo), `en` (en-US) y `pt-BR` (você). El intake púb
 (`report/contracts.ts`); hoy el renderer sólo sabe español. Reglas de la traducción aprobada: porcentajes sin espacio en
 `en` y `pt-BR` («32%»); fechas en el formato de cada idioma; en `en` los niveles usan sólo el nombre del marco («Be Found»,
 «Be Readable»…), en `es` y `pt-BR` el nombre local seguido del inglés; «Empower your Engine» y el lockup no se traducen.
+
+## Delta 2026-09-29 (c) — diseño aprobado y órbita con color de gravedad
+
+- El operador cerró el diseño y pidió canonizarlo. Las 24 hojas aprobadas (8 por idioma) están en
+  `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita/paginas/`, con la dirección en
+  `TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md` y las fuentes del canvas empaquetadas. Con esto quedan
+  hechas la exportación y la dirección del Slice 1.
+- **La órbita de la portada toma el color de la gravedad del puntaje.** Estela, esfera, halo y el punto de la etiqueta
+  van en rojo, ámbar o verde según los umbrales de `recommendations.ts`. El anillo, la marca de partida y la cifra no
+  cambian, y la etiqueta en texto acompaña siempre al color.
+  - Sobre `#091951` los colores son `axisRamp.error[400]`, `axisRamp.warning[500]` y `axisRamp.success[400]`, todos
+    ≥ 4,5:1.
+  - Sin dato: anillo solo, «—» y la etiqueta «Sin dato».
+  - Es una excepción acotada a la regla de estado sin semáforo de La órbita (skill `efeonce-graphic-line`, §3.4 y
+    §3.10). Lámina: `portada-estados-de-la-orbita.png`.
+- El canvas (versión 17) muestra las tres filas de idioma en la página «Informe del Grader (PDF)»; ya no hay páginas
+  separadas por idioma.
 
 ## Why This Task Exists
 
@@ -290,8 +307,8 @@ Reglas obligatorias:
 
 - Pinear `@efeoncepro/axis-brand-assets` `0.4.2` en Greenhouse (instalación con credencial efímera autorizada) y leer los lockups desde el paquete.
 - Corregir `report-artifact/fixtures.ts` para que la gravedad coincida con los umbrales de `recommendations.ts`.
-- Exportar las ocho hojas aprobadas (dos portadas, cuatro interiores, dos contraportadas) del canvas a `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita/`
-  y escribir la dirección `TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`; actualizar el wireframe.
+- ~~Exportar las hojas aprobadas del canvas y escribir la dirección~~: hecho el 2026-09-29 (24 hojas en tres idiomas y
+  `TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`); el wireframe está al día.
 
 ### Slice 2 — Tokens y fuentes
 
@@ -412,11 +429,12 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 
 ## Acceptance Criteria
 
-- [ ] El operador aprobó la propuesta del canvas y las hojas quedaron en `docs/ui/visual-directions/`.
+- [x] El operador aprobó la propuesta del canvas y las hojas quedaron en `docs/ui/visual-directions/` (2026-09-29: 24 hojas nativas en `es`, `en` y `pt-BR`, más la lámina de estados de la órbita).
 - [ ] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation mapping, GVC
   scenario plan y design decision log cerrados; si pasa a `yes`, `pnpm task:lint --task TASK-1938` queda sin hallazgos.
 - [ ] La portada dibuja el puntaje con la esfera en `score × 3,6°` y estela de 50°; no queda ningún arco que se llene.
-- [ ] Con puntaje `null` la portada muestra el anillo sin arco ni esfera y «—».
+- [ ] Con puntaje `null` la portada muestra el anillo sin arco ni esfera, «—» sin «de 100» y la etiqueta «Sin dato».
+- [ ] Estela, esfera, halo y punto de la etiqueta de la portada toman el color de la gravedad del puntaje, con los umbrales de `recommendations.ts` y los colores `axisRamp.error[400]`, `axisRamp.warning[500]` y `axisRamp.success[400]`. El anillo, la marca de partida y la cifra no cambian, y la etiqueta en texto siempre acompaña al color. Cada estado coincide con `portada-estados-de-la-orbita.png`.
 - [ ] Ningún nivel ni dimensión sin dato se muestra como 0.
 - [ ] `report-pdf-tokens.ts` toma fondo y acento de la línea Engine (`efeonceGraphicLine.lines.engine`) y la gravedad de `axisSemanticHex`; ningún HEX escrito a mano.
 - [ ] Portadas y encabezados usan el lockup oficial `ai-visibility-report-lockup-*` y la línea del AEO Assessment el `aeo-lockup-*`, leídos de `@efeoncepro/axis-brand-assets` `0.4.2`; el cierre dice «Empower your Engine».
