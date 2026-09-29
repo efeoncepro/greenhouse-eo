@@ -64,7 +64,9 @@ y contraportada (hoy son cuatro: la contraportada es nueva).
 
 ### Contraportada (fondo tinta)
 
-«¿Conversamos? / Cuando quieras.», una línea de invitación, la burbuja URL oficial + las redes de
+La voz pregunta–respuesta de la línea (`criteria.md` §4, `close-brochure`): «¿Conversamos?» a 24 px en Poppins Light
+con el anillo pequeño delante en el acento, y «Cuando quieras» a 78 px en Bricolage 760 (3,25×) que cierra con la esfera
+del acento en lugar del punto; debajo la evidencia en Poppins con «qué mover primero» en negrita. Después la burbuja URL oficial + las redes de
 `EFEONCE_SOCIAL_LINKS` (`src/config/efeonce-brand.ts`), y abajo el **bloque de marca**: logo de Efeonce de 440 px y,
 debajo, el eslogan al **64 % del ancho del logo** (24,3 px), separado 1,35 veces su cuerpo, con «Growth» en el acento
 (≥ 24 px). El eslogan es un elemento gráfico que acompaña la marca, no un texto: se dimensiona desde el logo (regla

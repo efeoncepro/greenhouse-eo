@@ -324,6 +324,15 @@
   unidad centrada; el acento en «Growth» exige un logo de 435 px o más, y bajo eso la palabra va en blanco o navy
   (criteria.md §5).
 
+- **«¿Conversamos? Cuando quieras.» escrito como un titular de dos pesos.** Síntoma: en la contraportada del informe
+  del Grader la pregunta iba a 72 px en Bricolage y la respuesta en peso liviano, sin anillo ni esfera. Causa: se tomó
+  la frase del cierre de brochure como un titular y no como la voz. Regla (operador, 2026-09-29: «el conversamos cuando
+  quieras debe ser las normas»): es un par pregunta–respuesta y sigue §4 de `criteria.md` en cualquier superficie —
+  pregunta chica en Poppins Light 300 con el anillo pequeño delante (0,42 em, trazo `max(1px, 0,06 em)`, en el acento;
+  `recipes.ts`), respuesta en Bricolage 760 **al menos 3× la pregunta** con tracking −0,035 em, que cierra con la
+  esfera (0,2 em, hueco óptico de `efeonceGraphicLine.sphere.opticalGapEm`) **en lugar del punto**; la evidencia
+  debajo, en Poppins con una palabra en negrita. Nunca pregunta grande y respuesta chica.
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos
