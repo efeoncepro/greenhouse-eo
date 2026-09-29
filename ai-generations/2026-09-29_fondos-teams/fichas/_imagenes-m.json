@@ -23,5 +23,13 @@
   ],
   "hecho-a-mano-m": [
     "arte/hecho-a-mano.png"
+  ],
+  "formatos-m": [
+    "arte/voz-formatos.png",
+    "arte/muro-pantallas.png"
+  ],
+  "noche-m": [
+    "arte/vinilo-horas.png",
+    "arte/app-variantes.png"
   ]
 }
