@@ -50,7 +50,16 @@ const TEMPLATES_WITH_SELECTION = [
   'ContentDay',
   // TASK-1934: la selección «Cliente» toma la fila de tu marca y el plan priorizado del diagnóstico.
   'DecisionAiAnswer',
-  'DecisionDiagnosisMap'
+  'DecisionDiagnosisMap',
+  // TASK-1942 (deck Salesforce): la selección del rol («Cliente», «Supervisora», «Ejecutivo») toma el objeto
+  // que la persona confirma o elige: la cuenta, la propuesta del agente, el perfil, la reconciliación, el botón del release
+  // y la acción gobernada. La fila de la decisión y el veredicto elegido van por ítem (abajo).
+  'ContentOnePlatform',
+  'MethodAgentSupervisor',
+  'MethodIdentityConsent',
+  'MethodMigrationReconcile',
+  'ContentDayReleaseCycle',
+  'ContentLiveChat'
 ] as const
 
 /**
@@ -111,7 +120,8 @@ export const createCatalog = (options: GraphicLineCatalogOptions = {}): Artifact
 
   // La familia Prueba (TASK-1928): la selección toma un ítem de la lámina (`selection.item`): la cifra, el logo, la fila
   // del riesgo o la barra que se elige.
-  for (const template of ['ContentClients', 'ContentPartners', 'DecisionRisk', 'DecisionCase', 'DecisionChart', 'DecisionWhyUs', 'ContentTeam', 'ContactSheet', 'ContentBullets', 'DecisionAgenda']) {
+  // TASK-1942: la fila elegida de la decisión por capacidad y el veredicto encendido del diagnóstico de encaje.
+  for (const template of ['ContentClients', 'ContentPartners', 'DecisionRisk', 'DecisionCase', 'DecisionChart', 'DecisionWhyUs', 'ContentTeam', 'ContactSheet', 'ContentBullets', 'DecisionAgenda', 'DecisionPlatformCoexistence', 'DecisionProviderFit']) {
     layoutHooks[template] = levelSelectionHook(selectionHook)
   }
 

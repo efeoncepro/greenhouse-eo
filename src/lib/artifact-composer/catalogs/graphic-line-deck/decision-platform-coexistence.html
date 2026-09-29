@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · decisión por capacidad</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-platform-coexistence` (surface deck, tema oscuro, TASK-1942). «¿Hay que migrar a Next? No por
+      defecto.»: dos plataformas que conviven, atrás en vidrio y atenuadas, con el ícono oficial de su producto; al
+      frente, en papel y con reflejo, la decisión capacidad por capacidad. La fila elegida se enciende en el acento y la
+      selección «Cliente» la toma por ítem (`data-gl-select-item`).
+      Referencia: DeckSalesforceEngagementNext (SF3-engagement-next).
+    -->
+    <main class="gl-slide gl-ls gl-dpc" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-dpc-platforms" data-slot="platforms">
+        <li class="gl-ls-glass gl-dpc-card">
+          <div class="gl-dpc-card-head">
+            <img class="gl-dpc-icon" data-slot-field="icon" alt="" />
+            <span>
+              <span class="gl-dpc-base" data-slot-field="base">Marketing Cloud</span>
+              <span class="gl-dpc-name" data-slot-field="name">Engagement</span>
+            </span>
+          </div>
+          <ul class="gl-dpc-items" data-slot-field="items">
+            <li class="gl-dpc-item"><span data-slot-field="text">Journeys y automatizaciones</span></li>
+          </ul>
+        </li>
+      </ol>
+
+      <figure class="gl-layer gl-ls-beams" data-slot="beams">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <section class="gl-ls-doc gl-ls-reflect gl-dpc-table">
+        <header class="gl-dpc-head">
+          <figure class="gl-dpc-head-icon" data-slot="tableIcon"><img data-slot-field="src" alt="" /></figure>
+          <span class="gl-dpc-title" data-slot="tableTitle">Decisión por capacidad</span>
+        </header>
+        <ol class="gl-dpc-rows" data-slot="capabilities">
+          <li class="gl-dpc-row" data-gl-select-item>
+            <span class="gl-dpc-capability" data-slot-field="capability">Journeys de bienvenida</span>
+            <span class="gl-dpc-verdict" data-slot-field="verdict">Mantener</span>
+          </li>
+        </ol>
+      </section>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Marketing Cloud · Engagement y Next</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Hay que migrar a Next?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">No por</span><span data-slot-field="answer">defecto</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Engagement sigue vigente y Next no lo reemplaza solo. Decidimos <strong>capacidad</strong> por capacidad.</p>
+
+      <p class="gl-ls-note" data-slot="note">Ejemplo ilustrativo · el diagnóstico decide con tu inventario real</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "brochure",
+  "recipe": "method-migration-reconcile",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Integración y migración",
+    "question": "¿Cómo sabes que migró todo?",
+    "answer": ["Porque", "cuadra"]
+  },
+  "body": "Claves, duplicados, carga de prueba y **reconciliación** registro por registro, con vuelta atrás lista.",
+  "note": "Datos de muestra · cada migración define claves y reglas con tu equipo",
+  "stages": [
+    { "label": "Origen", "value": "48.210", "description": "registros de cuentas y contactos" },
+    { "label": "Claves y duplicados", "value": "1.842", "description": "duplicados unificados" },
+    { "label": "Carga de prueba", "value": "500", "description": "registros · 0 errores" },
+    { "label": "Carga completa", "value": "46.368", "description": "con resultado por registro" }
+  ],
+  "reconciliation": "46.368 = 46.368 · cuadra",
+  "rollbackBadge": "Rollback listo"
+}

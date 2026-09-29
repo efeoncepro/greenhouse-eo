@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · migración que cuadra</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `method-migration-reconcile` (surface deck, tema oscuro, TASK-1942). «¿Cómo sabes que migró todo? Porque
+      cuadra.»: cuatro etapas de la carga en vidrio, numeradas y en escalera descendente, unidas por haces del acento; al
+      frente, en papel, la reconciliación con el ícono oficial de la plataforma, el conteo que cuadra y «Rollback listo».
+      La selección «Cliente» toma la reconciliación (ancla bottom-start).
+      Referencia: DeckSalesforceMigracion (SF13-migracion).
+    -->
+    <main class="gl-slide gl-ls gl-mmr" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-mmr-stages" data-slot="stages">
+        <li class="gl-ls-glass gl-mmr-block">
+          <p class="gl-mmr-kicker" data-slot-field="label">01 · Origen</p>
+          <p class="gl-mmr-value" data-slot-field="value">48.210</p>
+          <p class="gl-mmr-desc" data-slot-field="description">registros de cuentas y contactos</p>
+        </li>
+      </ol>
+
+      <figure class="gl-layer gl-ls-beams" data-slot="beams">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <section class="gl-ls-doc gl-mmr-rec" data-slot="reconcile" data-gl-selection-target>
+        <img class="gl-mmr-rec-icon" data-slot-field="icon" alt="Salesforce Platform" />
+        <div class="gl-mmr-rec-text">
+          <p class="gl-mmr-rec-kicker"><span data-slot-field="step">05</span> · Reconciliación</p>
+          <p class="gl-mmr-rec-result" data-slot-field="result">46.368 = 46.368 · cuadra</p>
+        </div>
+        <span class="gl-mmr-tag" data-slot-field="badge">Rollback listo</span>
+      </section>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Integración y migración</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo sabes que migró todo?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Porque</span><span data-slot-field="answer">cuadra</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Claves, duplicados, carga de prueba y <strong>reconciliación</strong> registro por registro, con vuelta atrás lista.</p>
+
+      <p class="gl-ls-note" data-slot="note">Datos de muestra · cada migración define claves y reglas con tu equipo</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

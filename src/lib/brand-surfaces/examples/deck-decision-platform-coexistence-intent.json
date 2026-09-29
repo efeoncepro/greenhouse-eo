@@ -1,0 +1,41 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "brochure",
+  "recipe": "decision-platform-coexistence",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Marketing Cloud · Engagement y Next",
+    "question": "¿Hay que migrar a Next?",
+    "answer": ["No por", "defecto"]
+  },
+  "body": "Engagement sigue vigente y Next no lo reemplaza solo. Decidimos **capacidad** por capacidad.",
+  "note": "Ejemplo ilustrativo · el diagnóstico decide con tu inventario real",
+  "platforms": [
+    {
+      "icon": "marketing",
+      "base": "Marketing Cloud",
+      "name": "Engagement",
+      "items": ["Journeys y automatizaciones", "Data Extensions", "Dominios, IPs y supresiones", "Content Builder"]
+    },
+    {
+      "icon": "marketing",
+      "base": "Marketing Cloud",
+      "name": "Next",
+      "items": ["Salesforce Platform", "Data 360 y consentimiento", "Flow y segmentos", "Agentforce"]
+    }
+  ],
+  "tableTitle": "Decisión por capacidad",
+  "capabilities": [
+    { "capability": "Journeys de bienvenida", "verdict": "Mantener" },
+    { "capability": "Preferencias y consentimiento", "verdict": "Integrar" },
+    { "capability": "Segmentación de audiencias", "verdict": "Modernizar" },
+    { "capability": "Campaña B2B nueva", "verdict": "Migrar" },
+    { "capability": "Automatización sin dueño", "verdict": "Retirar" }
+  ],
+  "selectedCapability": 4
+}

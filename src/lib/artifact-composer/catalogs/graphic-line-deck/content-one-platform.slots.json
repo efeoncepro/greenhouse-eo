@@ -1,0 +1,870 @@
+{
+  "template": "ContentOnePlatform",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "revenue-salesforce"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 196
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 330
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 176
+        },
+        "answerLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-leading=0.9"
+        },
+        "answerTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-tracking=-0.05em"
+        },
+        "answerInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-inset=-8px"
+        },
+        "questionWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-question-width=500px"
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 690
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 26
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 420
+        },
+        "answerShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-shadow-y=10px"
+        },
+        "answerShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-shadow-blur=60px"
+        },
+        "answerShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-shadow-opacity=35%"
+        },
+        "answerShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-answer-shadow-color=#000000"
+        },
+        "lumWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lum-width=216px"
+        },
+        "lumBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lum-bottom=51px"
+        },
+        "lsGlassFrom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-glass-from-color=#ffffff"
+        },
+        "lsGlassFromOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-from-opacity=14%"
+        },
+        "lsGlassTo": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-glass-to-color=#ffffff"
+        },
+        "lsGlassToOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-to-opacity=4%"
+        },
+        "lsGlassAngle": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-angle=160deg"
+        },
+        "lsGlassBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-blur=6px"
+        },
+        "lsGlassBorder": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-border=1px"
+        },
+        "lsGlassBorderColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-glass-border-color=#ffffff"
+        },
+        "lsGlassBorderOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-border-opacity=18%"
+        },
+        "lsGlassShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-shadow-y=30px"
+        },
+        "lsGlassShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-shadow-blur=70px"
+        },
+        "lsGlassShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-glass-shadow-color=#000610"
+        },
+        "lsGlassShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-shadow-opacity=60%"
+        },
+        "docFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-color=#ffffff"
+        },
+        "docInk": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-ink-color=#0b1f33"
+        },
+        "docMuted": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-muted-color=#5f6b7a"
+        },
+        "docRule": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-rule-color=#e3e8ee"
+        },
+        "docChip": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-chip-color=#f5f7fa"
+        },
+        "docShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-shadow-y=50px"
+        },
+        "docShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-shadow-blur=110px"
+        },
+        "docShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-shadow-color=#000610"
+        },
+        "docShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-shadow-opacity=75%"
+        },
+        "docHaloBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-halo-blur=90px"
+        },
+        "docHaloColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-halo-color=#2fb8ff"
+        },
+        "docHaloOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-halo-opacity=22%"
+        },
+        "docEdge": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-edge=1px"
+        },
+        "docEdgeColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-edge-color=#ffffff"
+        },
+        "docEdgeOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-edge-opacity=16%"
+        },
+        "reflectGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-reflect-gap=14px"
+        },
+        "reflectFrom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-reflect-from=72%"
+        },
+        "reflectColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-reflect-color=#ffffff"
+        },
+        "reflectOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-reflect-opacity=16%"
+        },
+        "accountLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-account-left=1010px"
+        },
+        "accountTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-account-top=430px"
+        },
+        "accountWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-account-width=400px"
+        },
+        "accountPadTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-account-pad-top=22px"
+        },
+        "accountPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-account-pad-x=24px"
+        },
+        "accountPadBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-account-pad-bottom=16px"
+        },
+        "accountRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-account-radius=24px"
+        },
+        "avatarSize": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-avatar=52px"
+        },
+        "avatarFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-opl-avatar-color=#0b1f33"
+        },
+        "avatarGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-avatar-gap=14px"
+        },
+        "initialsPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-initials-px=20px"
+        },
+        "initialsColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-opl-initials-color=#ffffff"
+        },
+        "titlePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-title-px=24px"
+        },
+        "titleTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-title-tracking=-0.01em"
+        },
+        "subtitlePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-subtitle-px=14px"
+        },
+        "subtitleWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-subtitle-wght=400"
+        },
+        "subtitleGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-subtitle-gap=2px"
+        },
+        "subtitleColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-opl-subtitle-color=#5f6b7a"
+        },
+        "factPadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-fact-pad-y=9px"
+        },
+        "factRule": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-opl-fact-rule-color=#e3e8ee"
+        },
+        "factKeyPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-fact-key-px=15px"
+        },
+        "factKeyWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-fact-key-wght=400"
+        },
+        "factKeyColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-opl-fact-key-color=#5f6b7a"
+        },
+        "factValuePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-fact-value-px=15px"
+        },
+        "factValueWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-fact-value-wght=600"
+        },
+        "factValueColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-opl-fact-value-color=#0b1f33"
+        },
+        "tileWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-tile-width=280px"
+        },
+        "tilePadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-tile-pad-y=18px"
+        },
+        "tilePadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-tile-pad-x=20px"
+        },
+        "tileRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-tile-radius=20px"
+        },
+        "tilePerspective": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-tile-perspective=1400px"
+        },
+        "tileIcon": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-tile-icon=56px"
+        },
+        "tileGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-tile-gap=14px"
+        },
+        "areaPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-area-px=26px"
+        },
+        "areaTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-area-tracking=-0.01em"
+        },
+        "areaColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-opl-area-color=#ffffff"
+        },
+        "productPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-product-px=15px"
+        },
+        "productWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-product-wght=400"
+        },
+        "productGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-opl-product-gap=2px"
+        },
+        "productColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-opl-product-color=#e2e2e2"
+        }
+      }
+    },
+    "stage": {
+      "selector": "[data-slot='stage']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "platform": {
+      "selector": "[data-slot='platform']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "beams": {
+      "selector": "[data-slot='beams']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 44,
+          "example": "¿Cuántos Salesforce tienes?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 7,
+          "resolver": "gl-answer",
+          "example": "Uno"
+        },
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 51,
+          "example": "Salesforce · RevOps y CRM"
+        }
+      }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 179,
+        "maxLines": 6,
+        "overflow": "reject"
+      },
+      "example": "Conectamos CRM, servicio, marketing, datos y agentes para que Salesforce funcione como <strong>una</strong> sola operación alrededor del cliente."
+    },
+    "workAreas": {
+      "selector": "[data-slot='workAreas']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 5,
+        "maxItems": 5,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "icon": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-file-ref",
+            "example": "asset-ref:file:probe"
+          },
+          "area": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "example": "Ventas"
+          },
+          "product": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 20,
+            "example": "Sales Cloud"
+          },
+          "left": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-css",
+            "example": "--gl-opl-left=760px"
+          },
+          "top": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-css",
+            "example": "--gl-opl-top=250px"
+          },
+          "rotate": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-css",
+            "example": "--gl-opl-rotate=-10deg"
+          }
+        }
+      },
+      "example": [
+        {
+          "icon": "asset-ref:file:probe",
+          "area": "Ventas",
+          "product": "Sales Cloud",
+          "left": "--gl-opl-left=760px",
+          "top": "--gl-opl-top=250px",
+          "rotate": "--gl-opl-rotate=-10deg"
+        },
+        {
+          "icon": "asset-ref:file:probe",
+          "area": "Servicio",
+          "product": "Service Cloud",
+          "left": "--gl-opl-left=1430px",
+          "top": "--gl-opl-top=220px",
+          "rotate": "--gl-opl-rotate=10deg"
+        },
+        {
+          "icon": "asset-ref:file:probe",
+          "area": "Marketing",
+          "product": "Engagement y Next",
+          "left": "--gl-opl-left=670px",
+          "top": "--gl-opl-top=640px",
+          "rotate": "--gl-opl-rotate=-14deg"
+        },
+        {
+          "icon": "asset-ref:file:probe",
+          "area": "Datos",
+          "product": "Data 360",
+          "left": "--gl-opl-left=1500px",
+          "top": "--gl-opl-top=640px",
+          "rotate": "--gl-opl-rotate=14deg"
+        },
+        {
+          "icon": "asset-ref:file:probe",
+          "area": "Agentes",
+          "product": "Agentforce",
+          "left": "--gl-opl-left=1105px",
+          "top": "--gl-opl-top=110px",
+          "rotate": "--gl-opl-rotate=0deg"
+        }
+      ]
+    },
+    "account": {
+      "selector": "[data-slot='account']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "initials": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 2,
+          "example": "TC"
+        },
+        "name": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 22,
+          "example": "Tu cliente"
+        },
+        "subtitle": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 37,
+          "example": "Una sola cuenta, todos los equipos"
+        }
+      }
+    },
+    "accountFacts": {
+      "selector": "[data-slot='accountFacts']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 4,
+        "maxItems": 4,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 18,
+            "example": "Oportunidad"
+          },
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 22,
+            "example": "En negociación"
+          }
+        }
+      },
+      "example": [
+        {
+          "label": "Oportunidad",
+          "value": "En negociación"
+        },
+        {
+          "label": "Caso abierto",
+          "value": "Dentro del SLA"
+        },
+        {
+          "label": "Journey",
+          "value": "Bienvenida · paso 3"
+        },
+        {
+          "label": "Consentimiento",
+          "value": "Email ✓ · SMS —"
+        }
+      ]
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Cliente"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "bottom-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "role"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1
+        },
+        "targetKind": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "object"
+        },
+        "variant": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "eight-handles"
+        },
+        "padding": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "compact"
+        },
+        "overlay": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "none"
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-source.svg"
+    }
+  }
+}

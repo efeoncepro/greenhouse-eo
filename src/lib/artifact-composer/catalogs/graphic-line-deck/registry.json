@@ -62,7 +62,19 @@
     "deck.content-day.tools",
     "deck.content-day.live-progress",
     "deck.content-day.live-results",
-    "deck.decision-agenda"
+    "deck.decision-agenda",
+    "deck.content-one-platform",
+    "deck.method-agent-supervisor",
+    "deck.decision-platform-coexistence",
+    "deck.decision-provider-fit",
+    "deck.content-service-lanes",
+    "deck.content-season-launches",
+    "deck.method-identity-consent",
+    "deck.method-migration-reconcile",
+    "deck.content-day-release-cycle",
+    "deck.content-day-live-library",
+    "deck.content-live-chat",
+    "deck.content-measure-formulas"
   ],
   "templates": [
     {
@@ -691,6 +703,138 @@
       "contentTypes": ["deck.decision-agenda"],
       "prototype": "decision-agenda.html",
       "slotsRef": "decision-agenda.slots.json"
+    },
+    {
+      "name": "ContentOnePlatform",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-one-platform"],
+      "prototype": "content-one-platform.html",
+      "slotsRef": "content-one-platform.slots.json"
+    },
+    {
+      "name": "MethodAgentSupervisor",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-agent-supervisor"],
+      "prototype": "method-agent-supervisor.html",
+      "slotsRef": "method-agent-supervisor.slots.json"
+    },
+    {
+      "name": "DecisionPlatformCoexistence",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-platform-coexistence"],
+      "prototype": "decision-platform-coexistence.html",
+      "slotsRef": "decision-platform-coexistence.slots.json"
+    },
+    {
+      "name": "DecisionProviderFit",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-provider-fit"],
+      "prototype": "decision-provider-fit.html",
+      "slotsRef": "decision-provider-fit.slots.json"
+    },
+    {
+      "name": "ContentServiceLanes",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-service-lanes"],
+      "prototype": "content-service-lanes.html",
+      "slotsRef": "content-service-lanes.slots.json"
+    },
+    {
+      "name": "ContentSeasonLaunches",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-season-launches"],
+      "prototype": "content-season-launches.html",
+      "slotsRef": "content-season-launches.slots.json"
+    },
+    {
+      "name": "MethodIdentityConsent",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-identity-consent"],
+      "prototype": "method-identity-consent.html",
+      "slotsRef": "method-identity-consent.slots.json"
+    },
+    {
+      "name": "MethodMigrationReconcile",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-migration-reconcile"],
+      "prototype": "method-migration-reconcile.html",
+      "slotsRef": "method-migration-reconcile.slots.json"
+    },
+    {
+      "name": "ContentDayReleaseCycle",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-day-release-cycle"],
+      "prototype": "content-day-release-cycle.html",
+      "slotsRef": "content-day-release-cycle.slots.json"
+    },
+    {
+      "name": "ContentDayLiveLibrary",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-day-live-library"],
+      "prototype": "content-day-live-library.html",
+      "slotsRef": "content-day-live-library.slots.json"
+    },
+    {
+      "name": "ContentLiveChat",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-live-chat"],
+      "prototype": "content-live-chat.html",
+      "slotsRef": "content-live-chat.slots.json"
+    },
+    {
+      "name": "ContentMeasureFormulas",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-measure-formulas"],
+      "prototype": "content-measure-formulas.html",
+      "slotsRef": "content-measure-formulas.slots.json"
     }
   ],
   "selector": {
@@ -753,7 +897,19 @@
       "deck.decision-difference": "DecisionDifference",
       "deck.method-eeat": "MethodEeat",
       "deck.decision-traffic-to-revenue": "DecisionTrafficToRevenue",
-      "deck.decision-diagnosis-map": "DecisionDiagnosisMap"
+      "deck.decision-diagnosis-map": "DecisionDiagnosisMap",
+      "deck.content-one-platform": "ContentOnePlatform",
+      "deck.method-agent-supervisor": "MethodAgentSupervisor",
+      "deck.decision-platform-coexistence": "DecisionPlatformCoexistence",
+      "deck.decision-provider-fit": "DecisionProviderFit",
+      "deck.content-service-lanes": "ContentServiceLanes",
+      "deck.content-season-launches": "ContentSeasonLaunches",
+      "deck.method-identity-consent": "MethodIdentityConsent",
+      "deck.method-migration-reconcile": "MethodMigrationReconcile",
+      "deck.content-day-release-cycle": "ContentDayReleaseCycle",
+      "deck.content-day-live-library": "ContentDayLiveLibrary",
+      "deck.content-live-chat": "ContentLiveChat",
+      "deck.content-measure-formulas": "ContentMeasureFormulas"
     }
   }
 }

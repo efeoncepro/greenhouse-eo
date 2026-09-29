@@ -1,0 +1,34 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-day-release-cycle",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Tu día a día con Efeonce",
+    "question": "¿Cómo trabajamos contigo?",
+    "answer": ["Sin", "sorpresas"]
+  },
+  "body": "Nada llega a producción sin tu **aprobación**: lo pruebas en sandbox y lo ves explicado en un video corto.",
+  "release": {
+    "kicker": "Release 14 · Service Cloud",
+    "title": "Enrutamiento de casos por prioridad",
+    "icon": "service",
+    "currentStep": 3,
+    "videoTool": "loom",
+    "videoDuration": "3:12",
+    "presenterInitials": "EF",
+    "videoCaption": "Qué cambia en tu consola, en 3 minutos",
+    "approveCta": "Aprobar release"
+  },
+  "tools": [
+    { "tool": "teams", "kicker": "Microsoft Teams", "label": "Nos hablamos" },
+    { "tool": "notion", "kicker": "Notion", "label": "Backlog y documentos" },
+    { "tool": "loom", "kicker": "Loom", "label": "Te lo mostramos" },
+    { "tool": "sf-icon:platform", "kicker": "Salesforce", "label": "Pruebas en sandbox" }
+  ]
+}

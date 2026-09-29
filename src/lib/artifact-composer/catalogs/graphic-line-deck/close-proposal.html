@@ -12,6 +12,9 @@
       Receta `close-proposal` (surface deck, papel close, uso proposal; aprobada 2026-09-27). Foto de cine a sangre. El
       eslogan ES el mensaje (la propuesta llega después de conversar: no lleva voz), con el logo arriba y el contacto
       debajo. Los tramos del eslogan llegan de `content.slogan.runs`; el contacto, de `EFEONCE_CONTACT`.
+      Composición `sloganBlock` (TASK-1942, AXIS 0.3.31, sólo las líneas de sus referencias: hoy Salesforce): logo de
+      700 px con el eslogan en bloque debajo, al 64 % de su ancho, y la insignia de partner OPCIONAL (claim con readback)
+      bajo el contacto.
     -->
     <main class="gl-slide gl-frame gl-frame-column gl-frame-close" data-gl-root data-slot="frame">
       <figure class="gl-backdrop" data-slot="backdrop">
@@ -39,6 +42,10 @@
         <p class="gl-contact-line"><svg class="gl-contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m15.556 14.548l-.455.48s-1.083 1.139-4.038-1.972s-1.872-4.25-1.872-4.25l.287-.303c.706-.744.773-1.938.156-2.81L8.374 3.91C7.61 2.83 6.135 2.688 5.26 3.609L3.691 5.26c-.433.457-.723 1.048-.688 1.705c.09 1.68.808 5.293 4.812 9.51c4.247 4.47 8.232 4.648 9.861 4.487c.516-.05.964-.329 1.325-.709l1.42-1.496c.96-1.01.69-2.74-.538-3.446l-1.91-1.1c-.806-.463-1.787-.327-2.417.336M13.26 1.88a.75.75 0 0 1 .861-.62c.025.005.107.02.15.03q.129.027.352.09c.297.087.712.23 1.21.458c.996.457 2.321 1.256 3.697 2.631c1.376 1.376 2.175 2.702 2.632 3.698c.228.498.37.912.457 1.21a6 6 0 0 1 .113.454l.005.031a.765.765 0 0 1-.617.878a.75.75 0 0 1-.86-.617a3 3 0 0 0-.081-.327a7.4 7.4 0 0 0-.38-1.004c-.39-.85-1.092-2.024-2.33-3.262s-2.411-1.939-3.262-2.329a7.4 7.4 0 0 0-1.003-.38a6 6 0 0 0-.318-.08a.76.76 0 0 1-.626-.861"/><path fill-rule="evenodd" d="M13.486 5.33a.75.75 0 0 1 .927-.516l-.206.721l.206-.72h.003l.003.001l.008.002l.02.006l.056.02q.067.023.177.07c.146.062.345.158.59.303c.489.29 1.157.77 1.942 1.556c.785.785 1.266 1.453 1.556 1.942c.145.245.241.444.303.59a3 3 0 0 1 .09.233l.005.02l.003.008v.003l.001.001s0 .002-.72.208l.72-.206a.75.75 0 0 1-1.439.422l-.003-.01l-.035-.088a4 4 0 0 0-.216-.417c-.223-.376-.626-.946-1.326-1.646s-1.269-1.102-1.646-1.325a4 4 0 0 0-.504-.25l-.01-.004a.75.75 0 0 1-.505-.925" clip-rule="evenodd"/></svg><span data-slot-field="phoneSecond">teléfono</span></p>
         <p class="gl-contact-line"><svg class="gl-contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2c-4.418 0-8 4.003-8 8.5c0 4.462 2.553 9.312 6.537 11.174a3.45 3.45 0 0 0 2.926 0C17.447 19.812 20 14.962 20 10.5C20 6.003 16.418 2 12 2m0 10a2 2 0 1 0 0-4a2 2 0 0 0 0 4" clip-rule="evenodd"/></svg><span data-slot-field="address">dirección</span></p>
       </address>
+
+      <div class="gl-partner-mark" data-slot="partnerMark">
+        <img class="gl-pm-badge" data-slot-field="badge" alt="Insignia de partner de la plataforma" />
+      </div>
     </main>
   </body>
 </html>

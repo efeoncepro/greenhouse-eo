@@ -1,0 +1,35 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-day-live-library",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Activación y adopción",
+    "question": "¿Cómo aprende tu equipo?",
+    "answer": ["A su", "ritmo"]
+  },
+  "body": "Tutoriales cortos en video, grabados sobre **tu** Salesforce: responden «¿cómo hago…?» sin agendar una reunión.",
+  "library": {
+    "tool": "loom",
+    "kicker": "En Loom · sobre tu org",
+    "title": "Tutoriales de tu equipo"
+  },
+  "dataOrigin": "illustrative",
+  "sampleMark": "Datos de muestra",
+  "videos": [
+    { "icon": "sales", "role": "Ventas", "title": "Cómo registrar una oportunidad", "duration": "2:40" },
+    { "icon": "service", "role": "Servicio", "title": "Cerrar un caso con knowledge", "duration": "3:05" },
+    { "icon": "marketing", "role": "Marketing", "title": "Probar un journey antes de activarlo", "duration": "4:12" },
+    { "icon": "agentforce", "role": "Supervisión", "title": "Revisar y aprobar lo que propone el agente", "duration": "3:30" }
+  ],
+  "stats": [
+    { "value": "24", "label": "tutoriales grabados" },
+    { "value": "3 min", "label": "duración promedio" },
+    { "value": "Por rol", "label": "ventas, servicio, marketing y supervisión" }
+  ]
+}

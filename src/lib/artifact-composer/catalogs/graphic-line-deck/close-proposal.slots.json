@@ -130,6 +130,12 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-contact-icon-opacity=0.78"
+        },
+        "contactSocialBelow": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-contact-social-below=0px"
         }
       }
     },
@@ -226,6 +232,37 @@
           "required": true,
           "maxCharacters": 80,
           "example": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+        }
+      }
+    },
+    "partnerMark": {
+      "selector": "[data-slot='partnerMark']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-left=140px"
+        },
+        "badge": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "badgeTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-badge-top=864px"
+        },
+        "badgeHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-badge-height=72px"
         }
       }
     }

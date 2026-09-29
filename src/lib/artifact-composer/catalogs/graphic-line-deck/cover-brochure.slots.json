@@ -311,6 +311,117 @@
           "example": "none"
         }
       }
+    },
+    "partnerMark": {
+      "selector": "[data-slot='partnerMark']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-left=140px"
+        },
+        "badge": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "badgeTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-badge-top=920px"
+        },
+        "badgeHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-badge-height=84px"
+        }
+      }
+    },
+    "partnerMarkFallback": {
+      "selector": "[data-slot='partnerMarkFallback']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-left=140px"
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "example": "OPERAMOS SOBRE"
+        },
+        "labelTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-top=912px"
+        },
+        "labelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-px=16px"
+        },
+        "labelWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-wght=500"
+        },
+        "labelLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-leading=1"
+        },
+        "labelTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-tracking=0.2em"
+        },
+        "labelColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pm-label-color=#e2e2e2"
+        },
+        "logo": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "logoAlt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 60,
+          "resolver": "gl-alt",
+          "example": "Salesforce"
+        },
+        "logoTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-logo-top=942px"
+        },
+        "logoHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-logo-height=64px"
+        }
+      }
     }
   }
 }

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · qué medimos</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-measure-formulas` (surface deck, tema oscuro, TASK-1942). «¿Cómo sabes que funciona? Lo medimos.»:
+      cinco métricas en fichas de vidrio (tres arriba y dos abajo, centradas), cada una con su ícono Trazo de AXIS, su
+      nombre, su fórmula en un recuadro, su fuente y su dueño. Sin cifras: la nota explica que la línea base se mide en el
+      diagnóstico. Sin selección.
+      Referencia: DeckSalesforceQueMedimos (SF17-que-medimos).
+    -->
+    <main class="gl-slide gl-ls gl-cmf" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-cmf-metrics" data-slot="metrics">
+        <li class="gl-ls-glass gl-cmf-card">
+          <img class="gl-cmf-icon" data-slot-field="icon" alt="" />
+          <p class="gl-cmf-name" data-slot-field="name">Adopción</p>
+          <p class="gl-cmf-formula" data-slot-field="formula">Usuarios activos ÷ licencias</p>
+          <p class="gl-cmf-meta"><span data-slot-field="sourceLabel">Fuente</span> · <span data-slot-field="source">Salesforce</span></p>
+          <p class="gl-cmf-meta"><span data-slot-field="ownerLabel">Dueño</span> · <span data-slot-field="owner">Líder del área</span></p>
+        </li>
+      </ol>
+
+      <p class="gl-ls-note" data-slot="note">Sin cifras de promesa: la línea base se mide en el diagnóstico</p>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Qué medimos</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo sabes que funciona?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Lo</span><span data-slot-field="answer">medimos</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Cada métrica con su fórmula, su fuente y un <strong>dueño</strong>, desde el diagnóstico.</p>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

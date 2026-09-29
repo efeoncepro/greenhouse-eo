@@ -1084,6 +1084,52 @@ body {
   opacity: var(--gl-contact-icon-opacity);
 }
 
+/*
+ * La marca de partner OPCIONAL (TASK-1942, AXIS 0.3.31): la insignia (claim con readback vigente) al pie de la columna
+ * de la portada de línea o bajo el contacto de la contraportada en bloque, o el respaldo «Operamos sobre» con el logo de
+ * la plataforma. Posición y medidas llegan en el slot (`--gl-pm-*`); sin el slot, el nodo no existe.
+ */
+.gl-frame .gl-partner-mark {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.gl-frame .gl-pm-badge,
+.gl-frame .gl-pm-logo {
+  position: absolute;
+  left: var(--gl-pm-left);
+  display: block;
+  width: auto;
+}
+
+.gl-frame .gl-pm-badge {
+  top: var(--gl-pm-badge-top);
+  height: var(--gl-pm-badge-height);
+}
+
+.gl-frame .gl-pm-logo {
+  top: var(--gl-pm-logo-top);
+  height: var(--gl-pm-logo-height);
+}
+
+.gl-frame .gl-pm-label {
+  position: absolute;
+  left: var(--gl-pm-left);
+  top: var(--gl-pm-label-top);
+  margin: 0;
+  font: var(--gl-pm-label-wght) var(--gl-pm-label-px) / var(--gl-pm-label-leading) var(--gl-text-family);
+  letter-spacing: var(--gl-pm-label-tracking);
+  color: var(--gl-pm-label-color);
+  white-space: nowrap;
+}
+
+/* El eslogan en bloque (`sloganBlock`): las filas del contacto empiezan más abajo de la fila de redes que entre sí. */
+.gl-frame-close .gl-contact-social {
+  margin-bottom: var(--gl-contact-social-below, 0px);
+}
+
 /* Con el logo del cliente, el marcador no existe: su nodo queda vacío y no se pinta (ni su borde). */
 .gl-frame .gl-client-placeholder:empty,
 .gl-frame .gl-client-logo:empty {
@@ -6272,3 +6318,1809 @@ body {
 }
 
 /* ── ancla TASK-1934 · decision-diagnosis-map (prefijo .gl-dm) ── */
+
+/* ══ La familia con escenario en el acento de la línea (deck Salesforce, TASK-1942, prefijo .gl-ls) ════════════════
+ *
+ * Doce láminas aprobadas el 2026-09-29 comparten el estilo «vivo» con el halo, la plataforma de luz y los haces en el
+ * acento de la LÍNEA de la pieza (capas SVG del builder, `src/lib/brand-surfaces/recipes/line-stage/kit.ts`), el vidrio
+ * esmerilado (`.gl-ls-glass`), el documento claro con su halo en el acento (`.gl-ls-doc`) y su reflejo
+ * (`.gl-ls-reflect`), la voz a la izquierda y la nota arriba a la derecha. Sin respaldo: toda medida y todo color llegan
+ * del builder desde los tokens de AXIS (`--gl-ls-*`); cada lámina suma su bloque con su prefijo propio.
+ */
+
+.gl-ls .gl-ls-stage {
+  z-index: 0;
+}
+
+.gl-ls .gl-ls-platform {
+  z-index: 1;
+}
+
+.gl-ls .gl-ls-beams {
+  z-index: 3;
+}
+
+.gl-ls .gl-live-voice .gl-question {
+  width: var(--gl-ls-question-width);
+  white-space: normal;
+}
+
+.gl-ls .gl-live-voice .gl-answer {
+  left: calc(var(--gl-margin) + var(--gl-ls-answer-inset));
+  line-height: var(--gl-ls-answer-leading);
+  letter-spacing: var(--gl-ls-answer-tracking);
+  text-shadow: 0 var(--gl-ls-answer-shadow-y) var(--gl-ls-answer-shadow-blur) color-mix(in srgb, var(--gl-ls-answer-shadow-color) var(--gl-ls-answer-shadow-opacity), transparent);
+}
+
+.gl-ls p,
+.gl-ls ol,
+.gl-ls ul {
+  margin: 0;
+}
+
+.gl-ls ol,
+.gl-ls ul {
+  padding: 0;
+  list-style: none;
+}
+
+.gl-ls .gl-ls-note {
+  position: absolute;
+  top: var(--gl-ls-note-top);
+  right: var(--gl-ls-note-right);
+  z-index: 9;
+  margin: 0;
+  font: var(--gl-ls-note-wght) var(--gl-ls-note-px) var(--gl-text-family);
+  color: var(--gl-ls-note-color);
+}
+
+/* El vidrio esmerilado de las fichas oscuras (`deckFrostedGlass`). */
+.gl-ls .gl-ls-glass {
+  box-sizing: border-box;
+  background: linear-gradient(
+    var(--gl-ls-glass-angle),
+    color-mix(in srgb, var(--gl-ls-glass-from-color) var(--gl-ls-glass-from-opacity), transparent),
+    color-mix(in srgb, var(--gl-ls-glass-to-color) var(--gl-ls-glass-to-opacity), transparent)
+  );
+  backdrop-filter: blur(var(--gl-ls-glass-blur));
+  box-shadow:
+    inset 0 0 0 var(--gl-ls-glass-border) color-mix(in srgb, var(--gl-ls-glass-border-color) var(--gl-ls-glass-border-opacity), transparent),
+    0 var(--gl-ls-glass-shadow-y) var(--gl-ls-glass-shadow-blur) color-mix(in srgb, var(--gl-ls-glass-shadow-color) var(--gl-ls-glass-shadow-opacity), transparent);
+}
+
+/* El documento claro con la sombra profunda y el halo en el acento de la línea (`deckLineDocument`). */
+.gl-ls .gl-ls-doc {
+  box-sizing: border-box;
+  background: var(--gl-ls-doc-color);
+  color: var(--gl-ls-doc-ink-color);
+  box-shadow:
+    0 0 0 var(--gl-ls-doc-edge) color-mix(in srgb, var(--gl-ls-doc-edge-color) var(--gl-ls-doc-edge-opacity), transparent),
+    0 var(--gl-ls-doc-shadow-y) var(--gl-ls-doc-shadow-blur) color-mix(in srgb, var(--gl-ls-doc-shadow-color) var(--gl-ls-doc-shadow-opacity), transparent),
+    0 0 var(--gl-ls-doc-halo-blur) color-mix(in srgb, var(--gl-ls-doc-halo-color) var(--gl-ls-doc-halo-opacity), transparent);
+}
+
+/* El reflejo bajo el documento (`deckReflection`). */
+.gl-ls .gl-ls-reflect {
+  -webkit-box-reflect: below var(--gl-ls-reflect-gap) linear-gradient(transparent var(--gl-ls-reflect-from), color-mix(in srgb, var(--gl-ls-reflect-color) var(--gl-ls-reflect-opacity), transparent));
+}
+
+/* ══ content-one-platform: una sola operación (TASK-1942, prefijo .gl-opl) ══════════════════════════════════════
+ *
+ * La cuenta del cliente al centro en papel, con reflejo, y cinco áreas de trabajo en vidrio a distinta profundidad con
+ * el ícono oficial de su producto. Cada ficha trae su posición y su giro (`--gl-opl-left/top/rotate`).
+ */
+
+.gl-opl .gl-opl-tile {
+  position: absolute;
+  left: var(--gl-opl-left);
+  top: var(--gl-opl-top);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--gl-opl-tile-gap);
+  width: var(--gl-opl-tile-width);
+  padding: var(--gl-opl-tile-pad-y) var(--gl-opl-tile-pad-x);
+  border-radius: var(--gl-opl-tile-radius);
+  transform: perspective(var(--gl-opl-tile-perspective)) rotateY(var(--gl-opl-rotate));
+}
+
+.gl-opl .gl-opl-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-opl-tile-icon);
+  height: var(--gl-opl-tile-icon);
+}
+
+.gl-opl .gl-opl-area {
+  display: block;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-opl-area-px);
+  letter-spacing: var(--gl-opl-area-tracking);
+  color: var(--gl-opl-area-color);
+}
+
+.gl-opl .gl-opl-product {
+  display: block;
+  margin-top: var(--gl-opl-product-gap);
+  font: var(--gl-opl-product-wght) var(--gl-opl-product-px) var(--gl-text-family);
+  color: var(--gl-opl-product-color);
+}
+
+.gl-opl .gl-opl-account {
+  position: absolute;
+  left: var(--gl-opl-account-left);
+  top: var(--gl-opl-account-top);
+  z-index: 6;
+  width: var(--gl-opl-account-width);
+  padding: var(--gl-opl-account-pad-top) var(--gl-opl-account-pad-x) var(--gl-opl-account-pad-bottom);
+  border-radius: var(--gl-opl-account-radius);
+}
+
+.gl-opl .gl-opl-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-opl-avatar-gap);
+}
+
+.gl-opl .gl-opl-avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-opl-avatar);
+  height: var(--gl-opl-avatar);
+  border-radius: 50%;
+  background: var(--gl-opl-avatar-color);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-opl-initials-px);
+  color: var(--gl-opl-initials-color);
+}
+
+.gl-opl .gl-opl-name {
+  display: block;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-opl-title-px);
+  letter-spacing: var(--gl-opl-title-tracking);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-opl .gl-opl-subtitle {
+  display: block;
+  margin-top: var(--gl-opl-subtitle-gap);
+  font: var(--gl-opl-subtitle-wght) var(--gl-opl-subtitle-px) var(--gl-text-family);
+  color: var(--gl-opl-subtitle-color);
+}
+
+.gl-opl .gl-opl-fact {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--gl-opl-fact-pad-y) 0;
+  border-top: 1px solid var(--gl-opl-fact-rule-color);
+}
+
+.gl-opl .gl-opl-fact-key {
+  font: var(--gl-opl-fact-key-wght) var(--gl-opl-fact-key-px) var(--gl-text-family);
+  color: var(--gl-opl-fact-key-color);
+}
+
+.gl-opl .gl-opl-fact-value {
+  font: var(--gl-opl-fact-value-wght) var(--gl-opl-fact-value-px) var(--gl-text-family);
+  color: var(--gl-opl-fact-value-color);
+}
+
+/* ── ancla TASK-1942 · content-one-platform (prefijo .gl-opl) ── */
+
+/* ══ method-agent-supervisor: agentes con supervisora (TASK-1942, prefijo .gl-mas) ═══════════════════════════════
+ *
+ * La persona responsable arriba en vidrio, con el avatar anillado en el acento; tres agentes en papel a distinta
+ * profundidad, cada uno con su posición, su giro y su orden de pintura (`--gl-mas-left/top/rotate/depth`). La ficha de
+ * autonomía pinta el punto por estado (`gl-state-yes|half|no`); la fila de aprobación sólo vive en el primer agente.
+ */
+
+.gl-mas .gl-mas-sup {
+  position: absolute;
+  left: var(--gl-mas-sup-left);
+  top: var(--gl-mas-sup-top);
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: var(--gl-mas-sup-gap);
+  width: var(--gl-mas-sup-width);
+  padding: var(--gl-mas-sup-pad-y) var(--gl-mas-sup-pad-x);
+  border-radius: var(--gl-mas-sup-radius);
+}
+
+.gl-mas .gl-mas-avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-mas-avatar);
+  height: var(--gl-mas-avatar);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--gl-mas-avatar-color) var(--gl-mas-avatar-opacity), transparent);
+  box-shadow:
+    inset 0 0 0 var(--gl-mas-avatar-ring) var(--gl-mas-avatar-ring-color),
+    0 0 var(--gl-mas-avatar-glow) color-mix(in srgb, var(--gl-mas-avatar-glow-color) var(--gl-mas-avatar-glow-opacity), transparent);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mas-initials-px);
+  color: var(--gl-mas-initials-color);
+}
+
+.gl-mas .gl-mas-sup-kicker {
+  display: block;
+  font: var(--gl-mas-sup-kicker-wght) var(--gl-mas-sup-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-mas-sup-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-mas-sup-kicker-color);
+}
+
+.gl-mas .gl-mas-sup-role {
+  display: block;
+  margin-top: var(--gl-mas-sup-role-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mas-sup-role-px);
+  letter-spacing: var(--gl-mas-sup-role-tracking);
+  color: var(--gl-mas-sup-role-color);
+}
+
+.gl-mas .gl-mas-sup-duty {
+  display: block;
+  margin-top: var(--gl-mas-sup-duty-gap);
+  font: var(--gl-mas-sup-duty-wght) var(--gl-mas-sup-duty-px) var(--gl-text-family);
+  color: var(--gl-mas-sup-duty-color);
+}
+
+.gl-mas .gl-mas-agents {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+/* Las fichas se ordenan DENTRO de su capa (orden de pintura de AXIS): la capa queda sobre los haces y bajo la selección,
+ * que el hook pinta después en la misma altura, así el recuadro se ve sobre la fila del primer agente. */
+.gl-mas .gl-mas-card {
+  position: absolute;
+  left: var(--gl-mas-left);
+  top: var(--gl-mas-top);
+  z-index: calc(1 + var(--gl-mas-depth));
+  width: var(--gl-mas-card-width);
+  padding: var(--gl-mas-card-pad-top) var(--gl-mas-card-pad-x) var(--gl-mas-card-pad-bottom);
+  border-radius: var(--gl-mas-card-radius);
+  transform: perspective(var(--gl-mas-card-perspective)) rotateY(var(--gl-mas-rotate));
+}
+
+.gl-mas .gl-mas-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-mas-icon-gap);
+}
+
+.gl-mas .gl-mas-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-mas-icon);
+  height: var(--gl-mas-icon);
+}
+
+.gl-mas .gl-mas-kicker {
+  display: block;
+  font: var(--gl-mas-kicker-wght) var(--gl-mas-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-mas-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-mas-kicker-color);
+}
+
+.gl-mas .gl-mas-title {
+  display: block;
+  margin-top: var(--gl-mas-title-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mas-title-px);
+  letter-spacing: var(--gl-mas-title-tracking);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-mas .gl-mas-job {
+  margin-bottom: var(--gl-mas-job-gap);
+  font: var(--gl-mas-job-wght) var(--gl-mas-job-px) / var(--gl-mas-job-leading) var(--gl-text-family);
+  color: var(--gl-mas-job-color);
+}
+
+.gl-mas .gl-mas-level {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-mas-row-gap);
+  padding: var(--gl-mas-row-pad-y) 0;
+  border-top: 1px solid var(--gl-mas-row-rule-color);
+}
+
+.gl-mas .gl-mas-dot {
+  flex: none;
+  width: var(--gl-mas-dot);
+  height: var(--gl-mas-dot);
+  border-radius: 50%;
+}
+
+.gl-mas .gl-state-yes .gl-mas-dot {
+  background: var(--gl-mas-dot-full-color);
+}
+
+.gl-mas .gl-state-half .gl-mas-dot {
+  background: linear-gradient(90deg, var(--gl-mas-dot-half-color) 50%, transparent 50%);
+  box-shadow: inset 0 0 0 var(--gl-mas-dot-half-ring) var(--gl-mas-dot-half-color);
+}
+
+.gl-mas .gl-state-no .gl-mas-dot {
+  box-shadow: inset 0 0 0 var(--gl-mas-dot-empty-ring) var(--gl-mas-dot-empty-color);
+}
+
+.gl-mas .gl-mas-key {
+  flex: none;
+  width: var(--gl-mas-key-width);
+  font: var(--gl-mas-key-wght) var(--gl-mas-key-px) var(--gl-text-family);
+  letter-spacing: var(--gl-mas-key-tracking);
+  text-transform: uppercase;
+  color: var(--gl-mas-key-color);
+}
+
+.gl-mas .gl-mas-value {
+  flex: 1;
+  font: var(--gl-mas-value-wght) var(--gl-mas-value-px) / var(--gl-mas-value-leading) var(--gl-text-family);
+  color: var(--gl-mas-value-color);
+}
+
+.gl-mas .gl-mas-approval {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--gl-mas-approval-gap);
+  padding: var(--gl-mas-approval-pad-y) var(--gl-mas-approval-pad-x);
+  border-radius: var(--gl-mas-approval-radius);
+  background: var(--gl-mas-approval-color);
+  box-shadow: inset 0 0 0 var(--gl-mas-approval-border) var(--gl-mas-approval-border-color);
+}
+
+/* Sólo el primer agente trae la propuesta: en los demás el renderer quita el campo y la fila no se pinta. */
+.gl-mas .gl-mas-approval:not(:has(.gl-mas-pending)) {
+  display: none;
+}
+
+.gl-mas .gl-mas-pending {
+  font: var(--gl-mas-approval-wght) var(--gl-mas-approval-px) / var(--gl-mas-approval-leading) var(--gl-text-family);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-mas .gl-mas-button {
+  flex: none;
+  padding: var(--gl-mas-button-pad-y) var(--gl-mas-button-pad-x);
+  border-radius: var(--gl-mas-button-radius);
+  background: var(--gl-mas-button-color);
+  font: var(--gl-mas-button-wght) var(--gl-mas-button-px) var(--gl-text-family);
+  color: var(--gl-mas-button-ink-color);
+}
+
+/* ── ancla TASK-1942 · method-agent-supervisor (prefijo .gl-mas) ── */
+
+/* ══ decision-platform-coexistence: decisión por capacidad (TASK-1942, prefijo .gl-dpc) ════════════════════════════
+ *
+ * Dos plataformas en vidrio, atenuadas y giradas (`--gl-dpc-left/top/rotate`), bajo los haces; al frente la tabla en
+ * papel con reflejo. Cada fila trae el color de su veredicto (`--gl-dpc-pill-color`, `--gl-dpc-pill-ink-color`); la
+ * fila elegida (`gl-item-lead`) se enciende en el acento y es el objeto de la selección.
+ */
+
+.gl-dpc .gl-dpc-card {
+  position: absolute;
+  left: var(--gl-dpc-left);
+  top: var(--gl-dpc-top);
+  z-index: 3;
+  width: var(--gl-dpc-card-width);
+  padding: var(--gl-dpc-card-pad-y) var(--gl-dpc-card-pad-x);
+  border-radius: var(--gl-dpc-card-radius);
+  opacity: var(--gl-dpc-card-opacity);
+  transform: perspective(var(--gl-dpc-card-perspective)) rotateY(var(--gl-dpc-rotate));
+}
+
+.gl-dpc .gl-dpc-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-dpc-icon-gap);
+}
+
+.gl-dpc .gl-dpc-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-dpc-icon);
+  height: var(--gl-dpc-icon);
+}
+
+.gl-dpc .gl-dpc-base {
+  display: block;
+  font: var(--gl-dpc-kicker-wght) var(--gl-dpc-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-dpc-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-dpc-kicker-color);
+}
+
+.gl-dpc .gl-dpc-name {
+  display: block;
+  margin-top: var(--gl-dpc-name-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-dpc-name-px);
+  letter-spacing: var(--gl-dpc-name-tracking);
+  color: var(--gl-dpc-name-color);
+}
+
+.gl-dpc .gl-dpc-item {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-dpc-item-gap);
+  padding: var(--gl-dpc-item-pad-y) 0;
+  border-top: var(--gl-dpc-item-rule) solid color-mix(in srgb, var(--gl-dpc-item-rule-color) var(--gl-dpc-item-rule-opacity), transparent);
+  font: var(--gl-dpc-item-wght) var(--gl-dpc-item-px) var(--gl-text-family);
+  color: var(--gl-dpc-item-color);
+}
+
+.gl-dpc .gl-dpc-item::before {
+  content: '';
+  flex: none;
+  width: var(--gl-dpc-dot);
+  height: var(--gl-dpc-dot);
+  border-radius: 50%;
+  background: var(--gl-dpc-dot-color);
+}
+
+.gl-dpc .gl-dpc-table {
+  position: absolute;
+  left: var(--gl-dpc-table-left);
+  top: var(--gl-dpc-table-top);
+  z-index: 3;
+  width: var(--gl-dpc-table-width);
+  padding: var(--gl-dpc-table-pad-top) var(--gl-dpc-table-pad-x) var(--gl-dpc-table-pad-bottom);
+  border-radius: var(--gl-dpc-table-radius);
+}
+
+.gl-dpc .gl-dpc-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-dpc-head-gap);
+  padding-bottom: var(--gl-dpc-head-pad-bottom);
+}
+
+.gl-dpc .gl-dpc-head-icon {
+  flex: none;
+  margin: 0;
+}
+
+/* Sin producto compartido la tabla va sin ícono: el renderer vacía la figura y el encabezado no deja su hueco. */
+.gl-dpc .gl-dpc-head-icon:empty {
+  display: none;
+}
+
+.gl-dpc .gl-dpc-head-icon img {
+  display: block;
+  width: var(--gl-dpc-head-icon);
+  height: var(--gl-dpc-head-icon);
+}
+
+.gl-dpc .gl-dpc-title {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-dpc-head-px);
+  letter-spacing: var(--gl-dpc-head-tracking);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-dpc .gl-dpc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gl-dpc-row-gap);
+  padding: var(--gl-dpc-row-pad-y) var(--gl-dpc-row-pad-x);
+  border-top: 1px solid var(--gl-dpc-row-rule-color);
+}
+
+.gl-dpc .gl-dpc-row.gl-item-lead {
+  margin-top: var(--gl-dpc-sel-gap);
+  padding: var(--gl-dpc-sel-pad-y) var(--gl-dpc-sel-pad-x);
+  border-top: none;
+  border-radius: var(--gl-dpc-sel-radius);
+  background: color-mix(in srgb, var(--gl-dpc-sel-color) var(--gl-dpc-sel-opacity), transparent);
+}
+
+.gl-dpc .gl-dpc-capability {
+  font: var(--gl-dpc-cap-wght) var(--gl-dpc-cap-px) var(--gl-text-family);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-dpc .gl-item-lead .gl-dpc-capability {
+  font-weight: var(--gl-dpc-sel-wght);
+}
+
+.gl-dpc .gl-dpc-verdict {
+  flex: none;
+  padding: var(--gl-dpc-pill-pad-y) var(--gl-dpc-pill-pad-x);
+  border-radius: var(--gl-dpc-pill-radius);
+  background: var(--gl-dpc-pill-color);
+  box-shadow: inset 0 0 0 var(--gl-dpc-pill-ring) var(--gl-dpc-pill-ring-color);
+  font: var(--gl-dpc-pill-wght) var(--gl-dpc-pill-px) var(--gl-text-family);
+  letter-spacing: var(--gl-dpc-pill-tracking);
+  text-transform: uppercase;
+  color: var(--gl-dpc-pill-ink-color);
+}
+
+/* ── ancla TASK-1942 · decision-platform-coexistence (prefijo .gl-dpc) ── */
+
+/* ══ decision-provider-fit: el que encaje (TASK-1942, prefijo .gl-dpf) ══════════════════════════════════════════════
+ *
+ * Cuatro monolitos sobre la plataforma, cada uno con su posición y su alto (`--gl-dpf-left/top/height`). Los de
+ * reposo (`gl-item-rest`) en vidrio con texto claro; el encendido (`gl-item-lead`) en papel con reflejo, el título mayor
+ * y el pie «Tu caso · con evidencia». El haz vertical es una capa (z 2) entre el halo y los monolitos.
+ */
+
+.gl-dpf .gl-dpf-shaft {
+  z-index: 2;
+}
+
+.gl-dpf .gl-dpf-mono {
+  position: absolute;
+  left: var(--gl-dpf-left);
+  top: var(--gl-dpf-top);
+  z-index: 4;
+  box-sizing: border-box;
+  width: var(--gl-dpf-width);
+  height: var(--gl-dpf-height);
+  padding: var(--gl-dpf-pad-y) var(--gl-dpf-pad-x);
+  border-radius: var(--gl-dpf-radius);
+}
+
+/* Reposo: el vidrio esmerilado de la familia (mismas reglas que `.gl-ls-glass`). */
+.gl-dpf .gl-dpf-mono.gl-item-rest {
+  background: linear-gradient(
+    var(--gl-ls-glass-angle),
+    color-mix(in srgb, var(--gl-ls-glass-from-color) var(--gl-ls-glass-from-opacity), transparent),
+    color-mix(in srgb, var(--gl-ls-glass-to-color) var(--gl-ls-glass-to-opacity), transparent)
+  );
+  backdrop-filter: blur(var(--gl-ls-glass-blur));
+  box-shadow:
+    inset 0 0 0 var(--gl-ls-glass-border) color-mix(in srgb, var(--gl-ls-glass-border-color) var(--gl-ls-glass-border-opacity), transparent),
+    0 var(--gl-ls-glass-shadow-y) var(--gl-ls-glass-shadow-blur) color-mix(in srgb, var(--gl-ls-glass-shadow-color) var(--gl-ls-glass-shadow-opacity), transparent);
+}
+
+/* Encendido: el documento claro con su reflejo (mismas reglas que `.gl-ls-doc` y `.gl-ls-reflect`). */
+.gl-dpf .gl-dpf-mono.gl-item-lead {
+  z-index: 6;
+  background: var(--gl-ls-doc-color);
+  box-shadow:
+    0 0 0 var(--gl-ls-doc-edge) color-mix(in srgb, var(--gl-ls-doc-edge-color) var(--gl-ls-doc-edge-opacity), transparent),
+    0 var(--gl-ls-doc-shadow-y) var(--gl-ls-doc-shadow-blur) color-mix(in srgb, var(--gl-ls-doc-shadow-color) var(--gl-ls-doc-shadow-opacity), transparent),
+    0 0 var(--gl-ls-doc-halo-blur) color-mix(in srgb, var(--gl-ls-doc-halo-color) var(--gl-ls-doc-halo-opacity), transparent);
+  -webkit-box-reflect: below var(--gl-ls-reflect-gap) linear-gradient(transparent var(--gl-ls-reflect-from), color-mix(in srgb, var(--gl-ls-reflect-color) var(--gl-ls-reflect-opacity), transparent));
+}
+
+.gl-dpf .gl-dpf-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-dpf-tile);
+  height: var(--gl-dpf-tile);
+  border-radius: var(--gl-dpf-tile-radius);
+}
+
+.gl-dpf .gl-item-rest .gl-dpf-tile {
+  background: color-mix(in srgb, var(--gl-dpf-tile-rest-color) var(--gl-dpf-tile-rest-opacity), transparent);
+  box-shadow: inset 0 0 0 var(--gl-dpf-tile-border) color-mix(in srgb, var(--gl-dpf-tile-border-color) var(--gl-dpf-tile-border-opacity), transparent);
+}
+
+.gl-dpf .gl-item-lead .gl-dpf-tile {
+  background: var(--gl-dpf-tile-lead-color);
+}
+
+.gl-dpf .gl-dpf-glyph {
+  display: block;
+}
+
+.gl-dpf .gl-dpf-kicker {
+  margin-top: var(--gl-dpf-kicker-gap);
+  font: var(--gl-dpf-kicker-wght) var(--gl-dpf-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-dpf-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-soft-dark);
+}
+
+.gl-dpf .gl-dpf-title {
+  margin-top: var(--gl-dpf-title-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-dpf-title-px);
+  line-height: var(--gl-dpf-title-leading);
+  letter-spacing: var(--gl-dpf-title-tracking);
+  color: var(--gl-ink-dark);
+}
+
+.gl-dpf .gl-dpf-desc {
+  margin-top: var(--gl-dpf-desc-gap);
+  font: var(--gl-dpf-desc-wght) var(--gl-dpf-desc-px) / var(--gl-dpf-desc-leading) var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-dpf .gl-item-lead .gl-dpf-kicker,
+.gl-dpf .gl-item-lead .gl-dpf-desc {
+  color: var(--gl-ls-doc-muted-color);
+}
+
+.gl-dpf .gl-item-lead .gl-dpf-title {
+  font-size: var(--gl-dpf-title-lead-px);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-dpf .gl-dpf-footer {
+  position: absolute;
+  left: var(--gl-dpf-footer-inset);
+  right: var(--gl-dpf-footer-inset);
+  bottom: var(--gl-dpf-footer-inset);
+  padding-top: var(--gl-dpf-footer-pad-top);
+  border-top: 1px solid var(--gl-dpf-footer-rule-color);
+  font: var(--gl-dpf-footer-wght) var(--gl-dpf-footer-px) var(--gl-text-family);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+/* ── ancla TASK-1942 · decision-provider-fit (prefijo .gl-dpf) ── */
+
+/* ══ content-service-lanes: nuestros servicios Salesforce (TASK-1942, prefijo .gl-csl) ══════════════════════════
+ *
+ * Seis carriles de vidrio (3 × 2) con el ícono oficial de su producto, las cuatro fases numeradas unidas por un tramo
+ * en el acento y la mascota opcional sobre la plataforma chica. La voz de esta lámina va en una línea, sin bajada.
+ * Cada carril trae su posición (`--gl-csl-left/top`); toda medida y todo color llegan del builder desde AXIS.
+ */
+
+.gl-csl .gl-live-voice .gl-question {
+  white-space: nowrap;
+}
+
+.gl-csl .gl-csl-lane {
+  position: absolute;
+  left: var(--gl-csl-left);
+  top: var(--gl-csl-top);
+  z-index: 3;
+  width: var(--gl-csl-lane-width);
+  height: var(--gl-csl-lane-height);
+  padding: var(--gl-csl-lane-pad-y) var(--gl-csl-lane-pad-x);
+  border-radius: var(--gl-csl-lane-radius);
+}
+
+.gl-csl .gl-csl-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-csl-lane-icon-gap);
+}
+
+.gl-csl .gl-csl-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-csl-lane-icon);
+  height: var(--gl-csl-lane-icon);
+}
+
+.gl-csl .gl-csl-title {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-csl-title-px);
+  line-height: var(--gl-csl-title-leading);
+  letter-spacing: var(--gl-csl-title-tracking);
+  color: var(--gl-csl-title-color);
+}
+
+.gl-csl .gl-csl-product {
+  margin-top: var(--gl-csl-product-gap);
+  font: var(--gl-csl-product-wght) var(--gl-csl-product-px) var(--gl-text-family);
+  color: var(--gl-csl-product-color);
+}
+
+.gl-csl .gl-csl-desc {
+  margin-top: var(--gl-csl-desc-gap);
+  font: var(--gl-csl-desc-wght) var(--gl-csl-desc-px) / var(--gl-csl-desc-leading) var(--gl-text-family);
+  color: var(--gl-csl-desc-color);
+}
+
+.gl-csl .gl-csl-phases {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-csl-phases-top);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--gl-csl-phases-gap);
+}
+
+.gl-csl .gl-csl-phase {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-csl-phases-gap);
+  font: var(--gl-csl-phase-wght) var(--gl-csl-phase-px) var(--gl-text-family);
+  color: var(--gl-csl-phase-color);
+  white-space: nowrap;
+}
+
+/* El tramo en el acento une cada fase con la anterior. */
+.gl-csl .gl-csl-phase + .gl-csl-phase::before {
+  content: '';
+  flex: none;
+  width: var(--gl-csl-connector-width);
+  height: var(--gl-csl-connector-height);
+  background: color-mix(in srgb, var(--gl-csl-connector-color) var(--gl-csl-connector-opacity), transparent);
+}
+
+.gl-csl .gl-csl-mascot {
+  position: absolute;
+  left: var(--gl-csl-mascot-left);
+  top: var(--gl-csl-mascot-top);
+  z-index: 4;
+  width: var(--gl-csl-mascot-width);
+  margin: 0;
+}
+
+.gl-csl .gl-csl-mascot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 var(--gl-csl-mascot-shadow-y) var(--gl-csl-mascot-shadow-blur) color-mix(in srgb, var(--gl-csl-mascot-shadow-color) var(--gl-csl-mascot-shadow-opacity), transparent));
+}
+
+/* ── ancla TASK-1942 · content-service-lanes (prefijo .gl-csl) ── */
+
+/* ══ content-season-launches: lo nuevo de la temporada (TASK-1942, prefijo .gl-csn) ═══════════════════════════════
+ *
+ * Ocho fichas de vidrio en dos columnas a los lados de la plataforma, cada una con el ícono oficial de su producto
+ * arriba a la derecha y su estado anunciado: píldora sólida (`gl-state-solid`) si ya está disponible, en contorno
+ * (`gl-state-outline`) si no. La mascota opcional queda detrás de las fichas. Toda medida y todo color llegan del
+ * builder desde AXIS; cada ficha trae su posición (`--gl-csn-left/top`).
+ */
+
+.gl-csn .gl-csn-card {
+  position: absolute;
+  left: var(--gl-csn-left);
+  top: var(--gl-csn-top);
+  z-index: 5;
+  width: var(--gl-csn-card-width);
+  padding: var(--gl-csn-card-pad-y) var(--gl-csn-card-pad-x);
+  border-radius: var(--gl-csn-card-radius);
+}
+
+.gl-csn .gl-csn-icon {
+  position: absolute;
+  right: var(--gl-csn-icon-end);
+  top: var(--gl-csn-icon-top);
+  display: block;
+  width: var(--gl-csn-icon);
+  height: var(--gl-csn-icon);
+}
+
+.gl-csn .gl-csn-status {
+  display: inline-block;
+  padding: var(--gl-csn-status-pad-y) var(--gl-csn-status-pad-x);
+  border-radius: var(--gl-csn-status-radius);
+  font: var(--gl-csn-status-wght) var(--gl-csn-status-px) var(--gl-text-family);
+  letter-spacing: var(--gl-csn-status-tracking);
+  text-transform: uppercase;
+}
+
+.gl-csn .gl-state-solid .gl-csn-status {
+  background: var(--gl-csn-status-solid-fill-color);
+  color: var(--gl-csn-status-solid-ink-color);
+}
+
+.gl-csn .gl-state-outline .gl-csn-status {
+  box-shadow: inset 0 0 0 var(--gl-csn-status-ring) color-mix(in srgb, var(--gl-csn-status-ring-color) var(--gl-csn-status-ring-opacity), transparent);
+  color: var(--gl-csn-status-outline-ink-color);
+}
+
+.gl-csn .gl-csn-name {
+  margin-top: var(--gl-csn-title-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-csn-title-px);
+  line-height: var(--gl-csn-title-leading);
+  letter-spacing: var(--gl-csn-title-tracking);
+  color: var(--gl-csn-title-color);
+}
+
+.gl-csn .gl-csn-desc {
+  margin-top: var(--gl-csn-desc-gap);
+  font: var(--gl-csn-desc-wght) var(--gl-csn-desc-px) / var(--gl-csn-desc-leading) var(--gl-text-family);
+  color: var(--gl-csn-desc-color);
+}
+
+.gl-csn .gl-csn-mascot {
+  position: absolute;
+  left: var(--gl-csn-mascot-left);
+  top: var(--gl-csn-mascot-top);
+  z-index: 4;
+  width: var(--gl-csn-mascot-width);
+  margin: 0;
+}
+
+.gl-csn .gl-csn-mascot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 var(--gl-csn-mascot-shadow-y) var(--gl-csn-mascot-shadow-blur) color-mix(in srgb, var(--gl-csn-mascot-shadow-color) var(--gl-csn-mascot-shadow-opacity), transparent));
+}
+
+/* ── ancla TASK-1942 · content-season-launches (prefijo .gl-csn) ── */
+
+/* ══ method-identity-consent: identidad y consentimiento (TASK-1942, prefijo .gl-mic) ═════════════════════════════
+ *
+ * Cinco fuentes en vidrio en columna, el perfil unificado en papel con su reflejo y una fila por canal (el permiso en un
+ * círculo: lleno si hay permiso, `gl-state-yes`; en contorno si no, `gl-state-no`) y tres activaciones: la primera en
+ * papel (`gl-item-lead`), las demás en vidrio (`gl-item-rest`). Toda medida y todo color llegan del builder desde AXIS;
+ * el papel y el vidrio de las activaciones son los de la familia (`--gl-ls-doc-*`, `--gl-ls-glass-*`).
+ */
+
+.gl-mic .gl-mic-source {
+  position: absolute;
+  left: var(--gl-mic-source-left);
+  top: var(--gl-mic-source-top);
+  z-index: 3;
+  width: var(--gl-mic-source-width);
+  padding: var(--gl-mic-source-pad-y) var(--gl-mic-source-pad-x);
+  border-radius: var(--gl-mic-source-radius);
+}
+
+.gl-mic .gl-mic-source-kicker {
+  display: block;
+  font: var(--gl-mic-source-kicker-wght) var(--gl-mic-source-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-mic-source-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-mic-source-kicker-color);
+}
+
+.gl-mic .gl-mic-source-name {
+  display: block;
+  margin-top: var(--gl-mic-source-name-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mic-source-name-px);
+  color: var(--gl-mic-source-name-color);
+}
+
+.gl-mic .gl-mic-profile {
+  position: absolute;
+  left: var(--gl-mic-profile-left);
+  top: var(--gl-mic-profile-top);
+  z-index: 4;
+  width: var(--gl-mic-profile-width);
+  padding: var(--gl-mic-profile-pad-top) var(--gl-mic-profile-pad-x) var(--gl-mic-profile-pad-bottom);
+  border-radius: var(--gl-mic-profile-radius);
+}
+
+.gl-mic .gl-mic-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-mic-profile-icon-gap);
+  margin-bottom: var(--gl-mic-channel-gap);
+}
+
+.gl-mic .gl-mic-profile-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-mic-profile-icon);
+  height: var(--gl-mic-profile-icon);
+}
+
+.gl-mic .gl-mic-profile-kicker {
+  display: block;
+  font: var(--gl-mic-profile-kicker-wght) var(--gl-mic-profile-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-mic-profile-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-mic-profile-kicker-color);
+}
+
+.gl-mic .gl-mic-profile-title {
+  display: block;
+  margin-top: var(--gl-mic-profile-title-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mic-profile-title-px);
+  letter-spacing: var(--gl-mic-profile-title-tracking);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-mic .gl-mic-channel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gl-mic-channel-gap);
+  padding: var(--gl-mic-channel-pad-y) 0;
+  border-top: 1px solid var(--gl-mic-channel-rule-color);
+}
+
+.gl-mic .gl-mic-channel-name {
+  font: var(--gl-mic-channel-wght) var(--gl-mic-channel-px) var(--gl-text-family);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-mic .gl-mic-purpose {
+  font: var(--gl-mic-purpose-wght) var(--gl-mic-purpose-px) var(--gl-text-family);
+  color: var(--gl-mic-purpose-color);
+}
+
+.gl-mic .gl-mic-consent {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-mic-consent);
+  height: var(--gl-mic-consent);
+  border-radius: 50%;
+  font-family: var(--gl-text-family);
+  font-size: var(--gl-mic-consent-glyph);
+}
+
+.gl-mic .gl-state-yes .gl-mic-consent {
+  background: var(--gl-mic-granted-fill-color);
+  color: var(--gl-mic-granted-ink-color);
+}
+
+.gl-mic .gl-state-no .gl-mic-consent {
+  box-shadow: inset 0 0 0 var(--gl-mic-denied-ring) var(--gl-mic-denied-ring-color);
+  color: var(--gl-mic-denied-ink-color);
+}
+
+.gl-mic .gl-mic-act {
+  position: absolute;
+  left: var(--gl-mic-act-left);
+  top: var(--gl-mic-act-top);
+  z-index: 4;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--gl-mic-act-gap);
+  width: var(--gl-mic-act-width);
+  padding: var(--gl-mic-act-pad-y) var(--gl-mic-act-pad-x);
+  border-radius: var(--gl-mic-act-radius);
+}
+
+/* La primera activación, en el papel de la familia (`deckLineDocument`). */
+.gl-mic .gl-mic-act.gl-item-lead {
+  background: var(--gl-ls-doc-color);
+  color: var(--gl-ls-doc-ink-color);
+  box-shadow:
+    0 0 0 var(--gl-ls-doc-edge) color-mix(in srgb, var(--gl-ls-doc-edge-color) var(--gl-ls-doc-edge-opacity), transparent),
+    0 var(--gl-ls-doc-shadow-y) var(--gl-ls-doc-shadow-blur) color-mix(in srgb, var(--gl-ls-doc-shadow-color) var(--gl-ls-doc-shadow-opacity), transparent),
+    0 0 var(--gl-ls-doc-halo-blur) color-mix(in srgb, var(--gl-ls-doc-halo-color) var(--gl-ls-doc-halo-opacity), transparent);
+}
+
+/* Las demás, en el vidrio de la familia (`deckFrostedGlass`). */
+.gl-mic .gl-mic-act.gl-item-rest {
+  background: linear-gradient(
+    var(--gl-ls-glass-angle),
+    color-mix(in srgb, var(--gl-ls-glass-from-color) var(--gl-ls-glass-from-opacity), transparent),
+    color-mix(in srgb, var(--gl-ls-glass-to-color) var(--gl-ls-glass-to-opacity), transparent)
+  );
+  backdrop-filter: blur(var(--gl-ls-glass-blur));
+  box-shadow:
+    inset 0 0 0 var(--gl-ls-glass-border) color-mix(in srgb, var(--gl-ls-glass-border-color) var(--gl-ls-glass-border-opacity), transparent),
+    0 var(--gl-ls-glass-shadow-y) var(--gl-ls-glass-shadow-blur) color-mix(in srgb, var(--gl-ls-glass-shadow-color) var(--gl-ls-glass-shadow-opacity), transparent);
+  color: var(--gl-ink-dark);
+}
+
+.gl-mic .gl-mic-act-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-mic-act-icon);
+  height: var(--gl-mic-act-icon);
+}
+
+.gl-mic .gl-mic-act-title {
+  display: block;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mic-act-title-px);
+  line-height: var(--gl-mic-act-title-leading);
+}
+
+.gl-mic .gl-mic-act-desc {
+  display: block;
+  margin-top: var(--gl-mic-act-desc-gap);
+  font: var(--gl-mic-act-desc-wght) var(--gl-mic-act-desc-px) var(--gl-text-family);
+}
+
+.gl-mic .gl-item-lead .gl-mic-act-desc {
+  color: var(--gl-ls-doc-muted-color);
+}
+
+.gl-mic .gl-item-rest .gl-mic-act-desc {
+  color: var(--gl-soft-dark);
+}
+
+/* ── ancla TASK-1942 · method-identity-consent (prefijo .gl-mic) ── */
+
+/* ══ method-migration-reconcile: migración que cuadra (TASK-1942, prefijo .gl-mmr) ═══════════════════════════════════
+ *
+ * Cuatro bloques de vidrio en escalera descendente (`--gl-mmr-left/top`), bajo los haces que los unen; al frente la
+ * reconciliación en papel, con el ícono de la plataforma, el conteo que cuadra y la píldora en contorno.
+ */
+
+.gl-mmr .gl-mmr-block {
+  position: absolute;
+  left: var(--gl-mmr-left);
+  top: var(--gl-mmr-top);
+  z-index: 3;
+  width: var(--gl-mmr-block-width);
+  height: var(--gl-mmr-block-height);
+  padding: var(--gl-mmr-block-pad);
+  border-radius: var(--gl-mmr-block-radius);
+}
+
+.gl-mmr .gl-mmr-kicker {
+  font: var(--gl-mmr-kicker-wght) var(--gl-mmr-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-mmr-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-mmr-kicker-color);
+}
+
+.gl-mmr .gl-mmr-value {
+  margin-top: var(--gl-mmr-value-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mmr-value-px);
+  letter-spacing: var(--gl-mmr-value-tracking);
+  color: var(--gl-mmr-value-color);
+}
+
+.gl-mmr .gl-mmr-desc {
+  margin-top: var(--gl-mmr-desc-gap);
+  font: var(--gl-mmr-desc-wght) var(--gl-mmr-desc-px) / var(--gl-mmr-desc-leading) var(--gl-text-family);
+  color: var(--gl-mmr-desc-color);
+}
+
+.gl-mmr .gl-mmr-rec {
+  position: absolute;
+  left: var(--gl-mmr-rec-left);
+  top: var(--gl-mmr-rec-top);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: var(--gl-mmr-rec-gap);
+  width: var(--gl-mmr-rec-width);
+  padding: var(--gl-mmr-rec-pad-y) var(--gl-mmr-rec-pad-x);
+  border-radius: var(--gl-mmr-rec-radius);
+}
+
+.gl-mmr .gl-mmr-rec-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-mmr-rec-icon);
+  height: var(--gl-mmr-rec-icon);
+}
+
+.gl-mmr .gl-mmr-rec-text {
+  flex: 1;
+}
+
+.gl-mmr .gl-mmr-rec-kicker {
+  font: var(--gl-mmr-rec-kicker-wght) var(--gl-mmr-rec-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-mmr-rec-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-mmr-rec-kicker-color);
+}
+
+.gl-mmr .gl-mmr-rec-result {
+  margin-top: var(--gl-mmr-rec-title-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-mmr-rec-title-px);
+  letter-spacing: var(--gl-mmr-rec-title-tracking);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+.gl-mmr .gl-mmr-tag {
+  flex: none;
+  padding: var(--gl-mmr-tag-pad-y) var(--gl-mmr-tag-pad-x);
+  border-radius: var(--gl-mmr-tag-radius);
+  box-shadow: inset 0 0 0 var(--gl-mmr-tag-ring) var(--gl-mmr-tag-ring-color);
+  font: var(--gl-mmr-tag-wght) var(--gl-mmr-tag-px) var(--gl-text-family);
+  color: var(--gl-ls-doc-ink-color);
+}
+
+/* ── ancla TASK-1942 · method-migration-reconcile (prefijo .gl-mmr) ── */
+
+/* ══ content-day-release-cycle: el ciclo del release (TASK-1942, prefijo .gl-crc) ═════════════════════════════════
+ *
+ * El release al centro en papel, con reflejo: cabecera con el ícono oficial del producto, el ciclo fijo de cuatro pasos
+ * (hecho, ahora, pendiente: `gl-state-*`), el video del cambio y la fila de aprobación con el botón que toma la
+ * selección. Alrededor, cuatro herramientas con su isotipo oficial en una ficha blanca (`--gl-crc-left/top`). Toda
+ * medida y todo color llegan del builder desde AXIS (`--gl-crc-*`).
+ */
+
+.gl-crc .gl-crc-release {
+  position: absolute;
+  left: var(--gl-crc-release-left);
+  top: var(--gl-crc-release-top);
+  /* A la altura de la capa de la selección (z 3): la selección, que se inserta después, queda encima del botón. */
+  z-index: 3;
+  width: var(--gl-crc-release-width);
+  padding: var(--gl-crc-release-pad-top) var(--gl-crc-release-pad-x) var(--gl-crc-release-pad-bottom);
+  border-radius: var(--gl-crc-release-radius);
+}
+
+.gl-crc .gl-crc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gl-crc .gl-crc-kicker {
+  display: block;
+  font: var(--gl-crc-kicker-wght) var(--gl-crc-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-crc-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-crc-kicker-color);
+}
+
+.gl-crc .gl-crc-title {
+  display: block;
+  margin-top: var(--gl-crc-title-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-crc-title-px);
+  letter-spacing: var(--gl-crc-title-tracking);
+}
+
+.gl-crc .gl-crc-product {
+  display: block;
+  flex: none;
+  width: var(--gl-crc-icon-px);
+  height: var(--gl-crc-icon-px);
+}
+
+/* El ciclo: cuatro pasos iguales; el estado lo pinta la clase `gl-state-*` del builder. */
+.gl-crc .gl-crc-steps {
+  display: flex;
+  gap: var(--gl-crc-steps-gap);
+  margin-bottom: var(--gl-crc-steps-gap-bottom);
+}
+
+.gl-crc .gl-crc-step {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gl-crc .gl-crc-dot {
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-crc-dot-px);
+  height: var(--gl-crc-dot-px);
+  border-radius: 50%;
+  font: var(--gl-crc-dot-glyph-px) var(--gl-text-family);
+}
+
+.gl-crc .gl-state-done .gl-crc-dot {
+  background: var(--gl-crc-done-fill-color);
+  color: var(--gl-crc-done-glyph-color);
+}
+
+.gl-crc .gl-state-now .gl-crc-dot {
+  background: var(--gl-crc-now-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-crc-now-ring) var(--gl-crc-now-ring-color);
+}
+
+.gl-crc .gl-state-todo .gl-crc-dot {
+  background: var(--gl-crc-todo-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-crc-todo-ring) var(--gl-crc-todo-ring-color);
+}
+
+.gl-crc .gl-crc-step-label {
+  display: block;
+  margin-top: var(--gl-crc-step-label-gap);
+  font: var(--gl-crc-step-label-wght) var(--gl-crc-step-label-px) var(--gl-text-family);
+}
+
+.gl-crc .gl-state-todo .gl-crc-step-label {
+  color: var(--gl-crc-step-todo-color);
+}
+
+/* El video del cambio (genérico): reproducir al centro, el presentador y la duración. */
+.gl-crc .gl-crc-video {
+  position: relative;
+  height: var(--gl-crc-video-height);
+  overflow: hidden;
+  border-radius: var(--gl-crc-video-radius);
+  background: linear-gradient(var(--gl-crc-video-angle), var(--gl-crc-video-from-color), var(--gl-crc-video-to-color));
+}
+
+.gl-crc .gl-crc-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-crc-play-px);
+  height: var(--gl-crc-play-px);
+  border-radius: 50%;
+  background: var(--gl-crc-play-fill-color);
+  transform: translate(-50%, -50%);
+}
+
+/* El triángulo de reproducir, la misma geometría de la lámina (M6 4 l10 6 −10 6 en una caja de 20). */
+.gl-crc .gl-crc-play-glyph {
+  width: var(--gl-crc-play-glyph-px);
+  height: var(--gl-crc-play-glyph-px);
+  background: var(--gl-crc-play-glyph-color);
+  clip-path: polygon(30% 20%, 80% 50%, 30% 80%);
+}
+
+.gl-crc .gl-crc-author {
+  position: absolute;
+  right: var(--gl-crc-author-end);
+  bottom: var(--gl-crc-author-bottom);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-crc-author-px);
+  height: var(--gl-crc-author-px);
+  border-radius: 50%;
+  background: var(--gl-crc-author-fill-color);
+  box-shadow: 0 0 0 var(--gl-crc-author-ring) var(--gl-crc-author-ring-color);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-crc-initials-px);
+  color: var(--gl-crc-initials-color);
+}
+
+.gl-crc .gl-crc-duration {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: var(--gl-crc-duration-pad-y) var(--gl-crc-duration-pad-x);
+  border-radius: var(--gl-crc-duration-radius);
+  background: color-mix(in srgb, var(--gl-crc-duration-fill-color) var(--gl-crc-duration-fill-opacity), transparent);
+  font: var(--gl-crc-duration-wght) var(--gl-crc-duration-px) var(--gl-text-family);
+  color: var(--gl-crc-play-fill-color);
+}
+
+/* La fila de aprobación: la herramienta del video y el botón que toma la selección. */
+.gl-crc .gl-crc-approval {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--gl-crc-footer-gap);
+}
+
+.gl-crc .gl-crc-tool {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-crc-tool-gap);
+}
+
+.gl-crc .gl-crc-tool-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-crc-tool-icon-px);
+  height: var(--gl-crc-tool-icon-px);
+}
+
+.gl-crc .gl-crc-caption {
+  font: var(--gl-crc-caption-wght) var(--gl-crc-caption-px) var(--gl-text-family);
+}
+
+.gl-crc .gl-crc-cta {
+  padding: var(--gl-crc-cta-pad-y) var(--gl-crc-cta-pad-x);
+  border-radius: var(--gl-crc-cta-radius);
+  background: var(--gl-crc-cta-fill-color);
+  font: var(--gl-crc-cta-wght) var(--gl-crc-cta-px) var(--gl-text-family);
+  color: var(--gl-crc-cta-color);
+  white-space: nowrap;
+}
+
+/* Las herramientas: isotipo oficial en una ficha blanca, rótulo y lo que hacemos ahí. */
+.gl-crc .gl-crc-tool-item {
+  position: absolute;
+  left: var(--gl-crc-left);
+  top: var(--gl-crc-top);
+  z-index: 5;
+  width: var(--gl-crc-tool-width);
+  text-align: center;
+}
+
+.gl-crc .gl-crc-tile {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-crc-tile-px);
+  height: var(--gl-crc-tile-px);
+  margin: 0 auto;
+  border-radius: var(--gl-crc-tile-radius);
+  background: var(--gl-crc-tile-fill-color);
+  box-shadow:
+    0 var(--gl-crc-tile-shadow-y) var(--gl-crc-tile-shadow-blur) color-mix(in srgb, var(--gl-crc-tile-shadow-color) var(--gl-crc-tile-shadow-opacity), transparent),
+    inset 0 0 0 var(--gl-crc-tile-edge) color-mix(in srgb, var(--gl-crc-tile-edge-color) var(--gl-crc-tile-edge-opacity), transparent);
+}
+
+.gl-crc .gl-crc-mark {
+  display: block;
+  width: var(--gl-crc-mark-px);
+  height: var(--gl-crc-mark-px);
+}
+
+.gl-crc .gl-crc-tool-kicker {
+  display: block;
+  margin-top: var(--gl-crc-tool-kicker-gap);
+  font: var(--gl-crc-tool-kicker-wght) var(--gl-crc-tool-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-crc-tool-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-crc-tool-kicker-color);
+}
+
+.gl-crc .gl-crc-tool-label {
+  display: block;
+  margin-top: var(--gl-crc-tool-label-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-crc-tool-label-px);
+  line-height: var(--gl-crc-tool-label-leading);
+  letter-spacing: var(--gl-crc-tool-label-tracking);
+  color: var(--gl-crc-tool-label-color);
+}
+
+/* ── ancla TASK-1942 · content-day-release-cycle (prefijo .gl-crc) ── */
+
+/* ══ content-day-live-library: la biblioteca a su ritmo (TASK-1942, prefijo .gl-cll) ═════════════════════════════
+ *
+ * La biblioteca en papel sobre el chip, abierta en perspectiva desde su borde inicial: cabecera con el isotipo de la
+ * herramienta y la marca de datos de muestra, cuatro videos (miniatura con el ícono oficial del producto, reproducir y
+ * duración; el rol y el título) y tres cifras. Toda medida y todo color llegan del builder desde AXIS (`--gl-cll-*`).
+ */
+
+.gl-cll .gl-cll-library {
+  position: absolute;
+  left: var(--gl-cll-library-left);
+  top: var(--gl-cll-library-top);
+  z-index: 3;
+  width: var(--gl-cll-library-width);
+  padding: var(--gl-cll-library-pad-y) var(--gl-cll-library-pad-x);
+  border-radius: var(--gl-cll-library-radius);
+  transform: perspective(var(--gl-cll-library-perspective)) rotateY(var(--gl-cll-library-rotate-y)) rotateX(var(--gl-cll-library-rotate-x));
+  transform-origin: left center;
+}
+
+.gl-cll .gl-cll-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gl-cll-header-gap-bottom);
+}
+
+.gl-cll .gl-cll-head-start {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-cll-header-gap);
+}
+
+/* Un slot opcional ausente vacía su nodo: la herramienta y la marca de muestra no dejan ni el hueco ni la píldora. */
+.gl-cll .gl-cll-tool:empty,
+.gl-cll .gl-cll-mark:empty {
+  display: none;
+}
+
+.gl-cll .gl-cll-tool-icon {
+  display: block;
+  width: var(--gl-cll-tool-px);
+  height: var(--gl-cll-tool-px);
+}
+
+.gl-cll .gl-cll-kicker {
+  display: block;
+  font: var(--gl-cll-kicker-wght) var(--gl-cll-kicker-px) var(--gl-text-family);
+  letter-spacing: var(--gl-cll-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--gl-cll-kicker-color);
+}
+
+.gl-cll .gl-cll-title {
+  display: block;
+  margin-top: var(--gl-cll-title-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-cll-title-px);
+  letter-spacing: var(--gl-cll-title-tracking);
+}
+
+/* La marca de datos de muestra: píldora con su filete. */
+.gl-cll .gl-cll-mark {
+  padding: var(--gl-cll-mark-pad-y) var(--gl-cll-mark-pad-x);
+  border-radius: var(--gl-cll-mark-radius);
+  background: var(--gl-cll-mark-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-cll-mark-border) var(--gl-cll-mark-border-color);
+  font: var(--gl-cll-mark-wght) var(--gl-cll-mark-px) var(--gl-text-family);
+  letter-spacing: var(--gl-cll-mark-tracking);
+  text-transform: uppercase;
+  color: var(--gl-cll-mark-color);
+}
+
+/* Los videos: una fila de tarjetas iguales. */
+.gl-cll .gl-cll-videos {
+  display: grid;
+  grid-template-columns: repeat(var(--gl-cll-videos), minmax(0, 1fr));
+  gap: var(--gl-cll-videos-gap);
+}
+
+.gl-cll .gl-cll-card {
+  box-sizing: border-box;
+  padding: var(--gl-cll-card-pad);
+  border-radius: var(--gl-cll-card-radius);
+  background: var(--gl-cll-card-fill-color);
+  box-shadow: 0 var(--gl-cll-card-shadow-y) var(--gl-cll-card-shadow-blur) color-mix(in srgb, var(--gl-cll-card-shadow-color) var(--gl-cll-card-shadow-opacity), transparent);
+}
+
+.gl-cll .gl-cll-thumb {
+  position: relative;
+  display: block;
+  height: var(--gl-cll-thumb-height);
+  overflow: hidden;
+  border-radius: var(--gl-cll-thumb-radius);
+  background: linear-gradient(var(--gl-cll-thumb-angle), var(--gl-cll-thumb-from-color), var(--gl-cll-thumb-to-color));
+}
+
+.gl-cll .gl-cll-thumb-icon {
+  position: absolute;
+  left: var(--gl-cll-thumb-icon-inset);
+  top: var(--gl-cll-thumb-icon-inset);
+  display: block;
+  width: var(--gl-cll-thumb-icon-px);
+  height: var(--gl-cll-thumb-icon-px);
+}
+
+/* Reproducir: AXIS mide su cuerpo; el color es el de la tarjeta y la tinta del documento. */
+.gl-cll .gl-cll-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-cll-play-px);
+  height: var(--gl-cll-play-px);
+  border-radius: 50%;
+  background: var(--gl-cll-card-fill-color);
+  transform: translate(-50%, -50%);
+}
+
+/* El triángulo de reproducir, la misma geometría de la lámina (M6 4 l10 6 −10 6 en una caja de 20). */
+.gl-cll .gl-cll-play-glyph {
+  width: var(--gl-cll-play-glyph-px);
+  height: var(--gl-cll-play-glyph-px);
+  background: var(--gl-ls-doc-ink-color);
+  clip-path: polygon(30% 20%, 80% 50%, 30% 80%);
+}
+
+.gl-cll .gl-cll-duration {
+  position: absolute;
+  right: var(--gl-cll-duration-inset);
+  bottom: var(--gl-cll-duration-inset);
+  padding: var(--gl-cll-duration-pad-y) var(--gl-cll-duration-pad-x);
+  border-radius: var(--gl-cll-duration-radius);
+  background: color-mix(in srgb, var(--gl-cll-duration-fill-color) var(--gl-cll-duration-fill-opacity), transparent);
+  font: var(--gl-cll-duration-wght) var(--gl-cll-duration-px) var(--gl-text-family);
+  color: var(--gl-cll-card-fill-color);
+}
+
+.gl-cll .gl-cll-role {
+  display: block;
+  margin-top: var(--gl-cll-role-gap);
+  font: var(--gl-cll-role-wght) var(--gl-cll-role-px) var(--gl-text-family);
+  letter-spacing: var(--gl-cll-role-tracking);
+  text-transform: uppercase;
+  color: var(--gl-cll-role-color);
+}
+
+.gl-cll .gl-cll-video-title {
+  display: block;
+  margin-top: var(--gl-cll-video-title-gap);
+  font: var(--gl-cll-video-title-wght) var(--gl-cll-video-title-px) / var(--gl-cll-video-title-leading) var(--gl-text-family);
+}
+
+/* Las cifras: tres fichas iguales bajo los videos. */
+.gl-cll .gl-cll-stats {
+  display: flex;
+  gap: var(--gl-cll-stats-gap);
+  margin-top: var(--gl-cll-stats-gap-top);
+}
+
+.gl-cll .gl-cll-stat {
+  flex: 1;
+  padding: var(--gl-cll-stat-pad-y) var(--gl-cll-stat-pad-x);
+  border-radius: var(--gl-cll-stat-radius);
+  background: var(--gl-cll-stat-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-cll-stat-border) var(--gl-cll-stat-border-color);
+}
+
+.gl-cll .gl-cll-stat-value {
+  display: block;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-cll-stat-value-px);
+}
+
+.gl-cll .gl-cll-stat-label {
+  display: block;
+  margin-top: var(--gl-cll-stat-label-gap);
+  font: var(--gl-cll-stat-label-wght) var(--gl-cll-stat-label-px) var(--gl-text-family);
+  color: var(--gl-cll-stat-label-color);
+}
+
+/* ── ancla TASK-1942 · content-day-live-library (prefijo .gl-cll) ── */
+
+/* ══ content-live-chat: el CRM en una conversación (TASK-1942, prefijo .gl-clc) ══════════════════════════════════
+ *
+ * La ventana genérica del asistente en papel crema, abierta en perspectiva desde su borde inicial: cabecera (logotipo
+ * del asistente opcional y chip de conexión), la consulta del usuario, la respuesta con los registros y la acción
+ * gobernada con «Confirmar», que toma la selección. Tres garantías en vidrio (`--gl-clc-left`) y la tarjeta navy de la
+ * co-marca, opcional. Toda medida y todo color llegan del builder desde AXIS (`--gl-clc-*`).
+ */
+
+.gl-clc .gl-clc-window {
+  position: absolute;
+  left: var(--gl-clc-window-left);
+  top: var(--gl-clc-window-top);
+  /* A la altura de la capa de la selección (z 3): la selección, que se inserta después, queda encima de la acción. */
+  z-index: 3;
+  width: var(--gl-clc-window-width);
+  padding: var(--gl-clc-window-pad-top) var(--gl-clc-window-pad-x) var(--gl-clc-window-pad-bottom);
+  border-radius: var(--gl-clc-window-radius);
+  transform: perspective(var(--gl-clc-window-perspective)) rotateY(var(--gl-clc-window-rotate-y));
+  transform-origin: left center;
+}
+
+.gl-clc .gl-clc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--gl-clc-header-pad-bottom);
+  border-bottom: 1px solid var(--gl-ls-doc-rule-color);
+}
+
+/* Un slot opcional ausente vacía su nodo: sin marca del asistente, el chip sigue al final de la cabecera. */
+.gl-clc .gl-clc-assistant:empty,
+.gl-clc .gl-clc-cobrand:empty {
+  display: none;
+}
+
+.gl-clc .gl-clc-assistant-logo {
+  display: block;
+  height: var(--gl-clc-assistant-height);
+}
+
+.gl-clc .gl-clc-connection {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gl-clc-connection-gap);
+  margin-left: auto;
+  padding: var(--gl-clc-connection-pad-y) var(--gl-clc-connection-pad-x);
+  border-radius: var(--gl-clc-connection-radius);
+  background: var(--gl-clc-connection-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-clc-connection-border) var(--gl-clc-connection-border-color);
+  font: var(--gl-clc-connection-wght) var(--gl-clc-connection-px) var(--gl-text-family);
+}
+
+.gl-clc .gl-clc-platform-logo {
+  display: block;
+  height: var(--gl-clc-platform-logo-height);
+}
+
+/* La consulta del usuario, alineada al final. */
+.gl-clc .gl-clc-user {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--gl-clc-user-gap);
+}
+
+.gl-clc .gl-clc-prompt {
+  max-width: var(--gl-clc-user-width);
+  padding: var(--gl-clc-user-pad-y) var(--gl-clc-user-pad-x);
+  border-radius: var(--gl-clc-user-radius-1) var(--gl-clc-user-radius-2) var(--gl-clc-user-radius-3) var(--gl-clc-user-radius-4);
+  background: var(--gl-clc-user-fill-color);
+  font: var(--gl-clc-user-px) / var(--gl-clc-user-leading) var(--gl-text-family);
+}
+
+/* La respuesta con los registros vivos. */
+.gl-clc .gl-clc-answer {
+  margin-top: var(--gl-clc-answer-gap);
+  padding: var(--gl-clc-answer-pad-y) var(--gl-clc-answer-pad-x);
+  border-radius: var(--gl-clc-answer-radius);
+  background: var(--gl-clc-answer-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-clc-answer-border) var(--gl-clc-answer-border-color);
+}
+
+.gl-clc .gl-clc-intro {
+  margin-bottom: var(--gl-clc-intro-gap);
+  font: var(--gl-clc-intro-px) / var(--gl-clc-intro-leading) var(--gl-text-family);
+}
+
+.gl-clc .gl-clc-record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gl-clc-row-gap);
+  padding: var(--gl-clc-row-pad-y) 0;
+  border-top: 1px solid var(--gl-ls-doc-rule-color);
+}
+
+.gl-clc .gl-clc-name {
+  font: var(--gl-clc-name-wght) var(--gl-clc-name-px) var(--gl-text-family);
+}
+
+.gl-clc .gl-clc-stage {
+  font: var(--gl-clc-stage-wght) var(--gl-clc-stage-px) var(--gl-text-family);
+  color: var(--gl-clc-stage-color);
+}
+
+.gl-clc .gl-clc-amount {
+  font: var(--gl-clc-amount-wght) var(--gl-clc-amount-px) var(--gl-text-family);
+}
+
+/* La columna de «En riesgo» ocupa su ancho medido en todas las filas, lleve o no la píldora. */
+.gl-clc .gl-clc-risk-slot {
+  display: flex;
+  flex: none;
+  justify-content: flex-end;
+  width: var(--gl-clc-risk-slot);
+}
+
+.gl-clc .gl-clc-risk {
+  padding: var(--gl-clc-risk-pad-y) var(--gl-clc-risk-pad-x);
+  border-radius: var(--gl-clc-risk-radius);
+  box-shadow: inset 0 0 0 var(--gl-clc-risk-ring) var(--gl-clc-risk-ring-color);
+  font: var(--gl-clc-risk-wght) var(--gl-clc-risk-px) var(--gl-text-family);
+  color: var(--gl-clc-risk-color);
+  white-space: nowrap;
+}
+
+/* La acción gobernada: lo que el asistente propone, con «Confirmar». */
+.gl-clc .gl-clc-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gl-clc-row-gap);
+  margin-top: var(--gl-clc-action-gap);
+  padding: var(--gl-clc-action-pad-y) var(--gl-clc-action-pad-x);
+  border-radius: var(--gl-clc-action-radius);
+  background: var(--gl-clc-action-fill-color);
+  box-shadow: inset 0 0 0 var(--gl-clc-action-border) var(--gl-clc-action-border-color);
+}
+
+.gl-clc .gl-clc-action-text {
+  font: var(--gl-clc-action-wght) var(--gl-clc-action-px) / var(--gl-clc-action-leading) var(--gl-text-family);
+}
+
+.gl-clc .gl-clc-button {
+  padding: var(--gl-clc-button-pad-y) var(--gl-clc-button-pad-x);
+  border-radius: var(--gl-clc-button-radius);
+  background: var(--gl-clc-button-fill-color);
+  font: var(--gl-clc-button-wght) var(--gl-clc-button-px) var(--gl-text-family);
+  color: var(--gl-clc-button-color);
+  white-space: nowrap;
+}
+
+/* La tarjeta navy de la co-marca (opcional, con autorización). */
+.gl-clc .gl-clc-cobrand {
+  position: absolute;
+  left: var(--gl-clc-cobrand-left);
+  top: var(--gl-clc-cobrand-top);
+  z-index: 4;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-clc-cobrand-size);
+  height: var(--gl-clc-cobrand-size);
+  border-radius: var(--gl-clc-cobrand-radius);
+  background: var(--gl-clc-cobrand-fill-color);
+  box-shadow:
+    inset 0 0 0 var(--gl-clc-cobrand-border) color-mix(in srgb, var(--gl-clc-cobrand-border-color) var(--gl-clc-cobrand-border-opacity), transparent),
+    0 var(--gl-clc-cobrand-shadow-y) var(--gl-clc-cobrand-shadow-blur) color-mix(in srgb, var(--gl-clc-cobrand-shadow-color) var(--gl-clc-cobrand-shadow-opacity), transparent);
+}
+
+.gl-clc .gl-clc-cobrand-mark {
+  display: block;
+  width: var(--gl-clc-cobrand-mark-width);
+  height: auto;
+}
+
+/* Las garantías en vidrio, en fila bajo la ventana. */
+.gl-clc .gl-clc-guarantee {
+  position: absolute;
+  left: var(--gl-clc-left);
+  top: var(--gl-clc-guarantee-top);
+  z-index: 4;
+  width: var(--gl-clc-guarantee-width);
+  padding: var(--gl-clc-guarantee-pad-y) var(--gl-clc-guarantee-pad-x);
+  border-radius: var(--gl-clc-guarantee-radius);
+}
+
+.gl-clc .gl-clc-guarantee-title {
+  display: block;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-clc-guarantee-title-px);
+  line-height: var(--gl-clc-guarantee-title-leading);
+  color: var(--gl-clc-guarantee-title-color);
+}
+
+.gl-clc .gl-clc-guarantee-desc {
+  display: block;
+  margin-top: var(--gl-clc-guarantee-desc-gap);
+  font: var(--gl-clc-guarantee-desc-wght) var(--gl-clc-guarantee-desc-px) / var(--gl-clc-guarantee-desc-leading) var(--gl-text-family);
+  color: var(--gl-clc-guarantee-desc-color);
+}
+
+/* ── ancla TASK-1942 · content-live-chat (prefijo .gl-clc) ── */
+
+/* ══ content-measure-formulas: qué medimos (TASK-1942, prefijo .gl-cmf) ═══════════════════════════════════════════
+ *
+ * Cinco fichas de vidrio de alto fijo (tres arriba y dos abajo, medio paso a la derecha), cada una con el ícono Trazo de
+ * AXIS en reposo, el nombre, la fórmula en su recuadro y la fuente y el dueño en mayúsculas. Toda medida y todo color
+ * llegan del builder desde AXIS; cada ficha trae su posición (`--gl-cmf-left/top`).
+ */
+
+.gl-cmf .gl-cmf-card {
+  position: absolute;
+  left: var(--gl-cmf-left);
+  top: var(--gl-cmf-top);
+  z-index: 3;
+  width: var(--gl-cmf-card-width);
+  height: var(--gl-cmf-card-height);
+  padding: var(--gl-cmf-card-pad-y) var(--gl-cmf-card-pad-x);
+  border-radius: var(--gl-cmf-card-radius);
+}
+
+.gl-cmf .gl-cmf-icon {
+  display: block;
+  width: var(--gl-cmf-icon);
+  height: var(--gl-cmf-icon);
+}
+
+.gl-cmf .gl-cmf-name {
+  margin-top: var(--gl-cmf-title-gap);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-cmf-title-px);
+  letter-spacing: var(--gl-cmf-title-tracking);
+  color: var(--gl-cmf-title-color);
+}
+
+.gl-cmf .gl-cmf-formula {
+  margin-top: var(--gl-cmf-formula-gap);
+  padding: var(--gl-cmf-formula-pad-y) var(--gl-cmf-formula-pad-x);
+  border-radius: var(--gl-cmf-formula-radius);
+  background: color-mix(in srgb, var(--gl-cmf-formula-fill-color) var(--gl-cmf-formula-fill-opacity), transparent);
+  font: var(--gl-cmf-formula-wght) var(--gl-cmf-formula-px) / var(--gl-cmf-formula-leading) var(--gl-text-family);
+  color: var(--gl-cmf-formula-color);
+}
+
+.gl-cmf .gl-cmf-meta {
+  margin-top: var(--gl-cmf-meta-gap-next);
+  font: var(--gl-cmf-meta-wght) var(--gl-cmf-meta-px) var(--gl-text-family);
+  letter-spacing: var(--gl-cmf-meta-tracking);
+  text-transform: uppercase;
+  color: var(--gl-cmf-meta-color);
+}
+
+.gl-cmf .gl-cmf-formula + .gl-cmf-meta {
+  margin-top: var(--gl-cmf-meta-gap-first);
+}
+
+/* ── ancla TASK-1942 · content-measure-formulas (prefijo .gl-cmf) ── */

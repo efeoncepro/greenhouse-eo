@@ -1,0 +1,34 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-live-chat",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Claudeforce · Enablement conversacional",
+    "question": "¿Y si le preguntas a tu CRM?",
+    "answer": ["Te", "responde"]
+  },
+  "body": "Configuramos Salesforce en Claude con permisos, skills y **adopción**: tu equipo consulta y actualiza el CRM conversando.",
+  "note": "Salesforce en Claude · beta abierta desde sep. 2026 · ejemplo ilustrativo",
+  "chat": {
+    "connectionLabel": "Conectado a Salesforce",
+    "userPrompt": "¿Qué oportunidades cierran este mes y cuál está en riesgo?",
+    "answerIntro": "Tienes **3 oportunidades** con cierre este mes. **Andes Retail** lleva 21 días sin actividad:",
+    "records": [
+      { "name": "Andes Retail", "stage": "Propuesta", "amount": "[MONTO]", "atRisk": true },
+      { "name": "Grupo Norte", "stage": "Negociación", "amount": "[MONTO]", "atRisk": false },
+      { "name": "Clínica Sur", "stage": "Cierre", "amount": "[MONTO]", "atRisk": false }
+    ],
+    "proposedAction": "Propongo agendar reunión y crear tarea para el ejecutivo en Salesforce"
+  },
+  "guarantees": [
+    { "title": "Ve lo que tú ves", "detail": "Respeta los permisos de tu org." },
+    { "title": "Tú confirmas", "detail": "Ninguna acción sin tu visto bueno." },
+    { "title": "37 skills de ventas", "detail": "Pipeline, cuentas y seguimiento." }
+  ]
+}

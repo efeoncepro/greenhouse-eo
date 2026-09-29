@@ -1,0 +1,35 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-one-platform",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Salesforce · RevOps y CRM",
+    "question": "¿Cuántos Salesforce tienes?",
+    "answer": ["Uno"]
+  },
+  "body": "Conectamos CRM, servicio, marketing, datos y agentes para que Salesforce funcione como **una** sola operación alrededor del cliente.",
+  "workAreas": [
+    { "icon": "sales", "area": "Ventas", "product": "Sales Cloud" },
+    { "icon": "service", "area": "Servicio", "product": "Service Cloud" },
+    { "icon": "marketing", "area": "Marketing", "product": "Engagement y Next" },
+    { "icon": "data-cloud", "area": "Datos", "product": "Data 360" },
+    { "icon": "agentforce", "area": "Agentes", "product": "Agentforce" }
+  ],
+  "account": {
+    "name": "Tu cliente",
+    "initials": "TC",
+    "subtitle": "Una sola cuenta, todos los equipos",
+    "facts": [
+      { "label": "Oportunidad", "value": "En negociación" },
+      { "label": "Caso abierto", "value": "Dentro del SLA" },
+      { "label": "Journey", "value": "Bienvenida · paso 3" },
+      { "label": "Consentimiento", "value": "Email ✓ · SMS —" }
+    ]
+  }
+}

@@ -33,7 +33,20 @@ export const ANSWER_RATIO_CONTENT_TYPES: ReadonlySet<string> = new Set([
   'deck.decision-difference',
   'deck.method-eeat',
   'deck.decision-traffic-to-revenue',
-  'deck.decision-diagnosis-map'
+  'deck.decision-diagnosis-map',
+  // TASK-1942: las doce láminas del deck Salesforce (respuesta de 124 a 176 px sobre la pregunta de 40).
+  'deck.content-one-platform',
+  'deck.method-agent-supervisor',
+  'deck.decision-platform-coexistence',
+  'deck.decision-provider-fit',
+  'deck.content-service-lanes',
+  'deck.content-season-launches',
+  'deck.method-identity-consent',
+  'deck.method-migration-reconcile',
+  'deck.content-day-release-cycle',
+  'deck.content-day-live-library',
+  'deck.content-live-chat',
+  'deck.content-measure-formulas'
 ])
 
 export interface RenderedAuditViolation {

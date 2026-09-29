@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el que encaje</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-provider-fit` (surface deck, tema oscuro, TASK-1942). «¿Salesforce o HubSpot? El que encaje.»:
+      cuatro veredictos como monolitos de vidrio sobre la plataforma, con alturas escalonadas; el del cliente se enciende
+      en papel, más alto, bajo el haz vertical en el acento y con el pie «Tu caso · con evidencia». Íconos Trazo de AXIS,
+      nunca logos de proveedores. La selección «Cliente» toma el veredicto encendido por ítem (`data-gl-select-item`).
+      Referencia: DeckSalesforceElQueEncaje (SF4-el-que-encaje).
+    -->
+    <main class="gl-slide gl-ls gl-dpf" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-dpf-shaft" data-slot="shaft">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-dpf-monoliths" data-slot="verdicts">
+        <li class="gl-dpf-mono" data-gl-select-item>
+          <span class="gl-dpf-tile"><img class="gl-dpf-glyph" data-slot-field="glyph" alt="" /></span>
+          <p class="gl-dpf-kicker" data-slot-field="kicker">Veredicto</p>
+          <p class="gl-dpf-title" data-slot-field="title">Híbrida</p>
+          <p class="gl-dpf-desc" data-slot-field="description">Cada plataforma donde rinde mejor, conectadas.</p>
+          <p class="gl-dpf-footer" data-slot-field="footer">Tu caso · con evidencia</p>
+        </li>
+      </ol>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Diagnóstico de encaje</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Salesforce o HubSpot?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">El que</span><span data-slot-field="answer">encaje</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">No vendemos una plataforma: vendemos la <strong>decisión</strong>, con evidencia de tu operación.</p>
+
+      <p class="gl-ls-note" data-slot="note">Ejemplo ilustrativo · el veredicto sale del diagnóstico</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

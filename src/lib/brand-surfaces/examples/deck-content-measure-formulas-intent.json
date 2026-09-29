@@ -1,0 +1,25 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-measure-formulas",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Qué medimos",
+    "question": "¿Cómo sabes que funciona?",
+    "answer": ["Lo", "medimos"]
+  },
+  "body": "Cada métrica con su fórmula, su fuente y un **dueño**, desde el diagnóstico.",
+  "note": "Sin cifras de promesa: la línea base se mide en el diagnóstico",
+  "metrics": [
+    { "glyph": "medicion", "name": "Adopción", "formula": "Usuarios activos ÷ licencias", "source": "Salesforce", "owner": "Líder del área" },
+    { "glyph": "reloj", "name": "Primer valor", "formula": "Días del kickoff al primer valor acordado", "source": "Plan del proyecto", "owner": "Efeonce" },
+    { "glyph": "checklist", "name": "Soporte en SLA", "formula": "Solicitudes dentro del SLA ÷ total", "source": "Tu canal de soporte", "owner": "Efeonce" },
+    { "glyph": "base-de-datos", "name": "Calidad de datos", "formula": "Registros completos y sin duplicar ÷ total", "source": "Data 360 · informes", "owner": "Admin de tu org" },
+    { "glyph": "ia", "name": "Agentes", "formula": "Propuestas aprobadas sin corrección ÷ total", "source": "Agentforce", "owner": "Supervisora" }
+  ]
+}

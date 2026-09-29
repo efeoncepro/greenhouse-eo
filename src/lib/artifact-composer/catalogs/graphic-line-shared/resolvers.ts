@@ -31,6 +31,9 @@ export const GRAPHIC_LINE_KEYS = snapshot.lines.map(line => line.key)
 
 const LINE_CLASSES = GRAPHIC_LINE_KEYS.map(key => `gl-line-${key}`)
 
+/** Los estados que un ítem puede pintar (`gl-state`, TASK-1942). Lista cerrada: un estado nuevo se declara acá. */
+export const ITEM_STATES = ['done', 'now', 'todo', 'yes', 'half', 'no', 'solid', 'outline'] as const
+
 /** El aire entre la última letra y la esfera: mismo cálculo que `answerSphere` de AXIS. */
 export const sphereGapEm = (text: string): number => {
   const last = text.trim().slice(-1).toLowerCase()
@@ -189,6 +192,17 @@ export const graphicLineResolvers = (): ResolverRegistry => {
       known: ['lead', 'rest'],
       build: value =>
         value === 'lead' || value === 'rest' ? [{ selector: ':self', toneClass: `gl-item-${value}`, toneGroup: ['gl-item-lead', 'gl-item-rest'] }] : null
+    },
+
+    // El estado de un ítem (TASK-1942, láminas con escenario en el acento de la línea): el paso de un ciclo (hecho, ahora,
+    // pendiente), una fila de autonomía o de consentimiento (sí, a medias, no) y una píldora de estado (sólida o en
+    // contorno). Lo decide el builder desde el intent; la plantilla sólo pinta la clase `gl-state-<estado>`.
+    'gl-state': {
+      known: [...ITEM_STATES],
+      build: value =>
+        (ITEM_STATES as readonly string[]).includes(value.trim())
+          ? [{ selector: ':self', toneClass: `gl-state-${value.trim()}`, toneGroup: ITEM_STATES.map(state => `gl-state-${state}`) }]
+          : null
     },
 
     // El cuerpo de una cifra del muro (TASK-1928, por qué elegirnos): grande o, si es larga, el cuerpo menor de AXIS.

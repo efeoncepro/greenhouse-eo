@@ -391,6 +391,66 @@
       "contentType": "deck.cover-brochure.document-selection",
       "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-cine-lines-selection-intent.json",
       "slots": null
+    },
+    "content-one-platform": {
+      "contentType": "deck.content-one-platform",
+      "example": "src/lib/brand-surfaces/examples/deck-content-one-platform-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "workAreas": "workAreas", "accountName": "account.name", "accountInitials": "account.initials", "accountSubtitle": "account.subtitle", "accountFacts": "accountFacts"}
+    },
+    "method-agent-supervisor": {
+      "contentType": "deck.method-agent-supervisor",
+      "example": "src/lib/brand-surfaces/examples/deck-method-agent-supervisor-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "supervisorKicker": "supervisor.kicker", "supervisorRole": "supervisor.role", "supervisorInitials": "supervisor.initials", "supervisorDuty": "supervisor.duty", "agents": "agents", "pendingApproval": "approval.text"}
+    },
+    "decision-platform-coexistence": {
+      "contentType": "deck.decision-platform-coexistence",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-platform-coexistence-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "platforms": "platforms", "tableTitle": "tableTitle", "capabilities": "capabilities", "selectedCapability": "selection.item"}
+    },
+    "decision-provider-fit": {
+      "contentType": "deck.decision-provider-fit",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-provider-fit-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "verdicts": "verdicts", "selectedVerdict": "selection.item"}
+    },
+    "content-service-lanes": {
+      "contentType": "deck.content-service-lanes",
+      "example": "src/lib/brand-surfaces/examples/deck-content-service-lanes-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "lanes": "lanes", "phases": "phases", "mascot": "mascot"}
+    },
+    "content-season-launches": {
+      "contentType": "deck.content-season-launches",
+      "example": "src/lib/brand-surfaces/examples/deck-content-season-launches-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "asOf": "asOf", "note": "note", "launches": "launches", "mascot": "mascot"}
+    },
+    "method-identity-consent": {
+      "contentType": "deck.method-identity-consent",
+      "example": "src/lib/brand-surfaces/examples/deck-method-identity-consent-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "sources": "sources", "profileTitle": "profile.title", "channels": "channels", "activations": "activations"}
+    },
+    "method-migration-reconcile": {
+      "contentType": "deck.method-migration-reconcile",
+      "example": "src/lib/brand-surfaces/examples/deck-method-migration-reconcile-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "stages": "stages", "reconciliation": "reconcile.result", "rollbackBadge": "reconcile.badge"}
+    },
+    "content-day-release-cycle": {
+      "contentType": "deck.content-day-release-cycle",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-release-cycle-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "releaseKicker": "release.kicker", "releaseTitle": "release.title", "releaseIcon": "release.icon", "currentStep": "steps[].state", "videoDuration": "video.duration", "presenterInitials": "video.initials", "videoCaption": "approval.caption", "approveCta": "approval.cta", "tools": "tools"}
+    },
+    "content-day-live-library": {
+      "contentType": "deck.content-day-live-library",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-library-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "libraryKicker": "library.kicker", "libraryTitle": "library.title", "sampleMark": "sampleMark", "videos": "videos", "stats": "stats"}
+    },
+    "content-live-chat": {
+      "contentType": "deck.content-live-chat",
+      "example": "src/lib/brand-surfaces/examples/deck-content-live-chat-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "assistantMark": "assistantMark", "connectionLabel": "connection.label", "userPrompt": "prompt", "answerIntro": "intro", "records": "records", "proposedAction": "action.text", "platformMark": "platformMark", "guarantees": "guarantees"}
+    },
+    "content-measure-formulas": {
+      "contentType": "deck.content-measure-formulas",
+      "example": "src/lib/brand-surfaces/examples/deck-content-measure-formulas-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "metrics": "metrics"}
     }
   }
 }

@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "brochure",
+  "recipe": "method-agent-supervisor",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Agentforce · equipos híbridos",
+    "question": "¿Quién responde por el agente?",
+    "answer": ["Una", "persona"]
+  },
+  "body": "Cada agente nace con su ficha: qué lee, qué propone, qué ejecuta y **quién** lo aprueba.",
+  "note": "Ejemplo ilustrativo · cada ficha se define con tu equipo",
+  "supervisor": {
+    "kicker": "Persona responsable",
+    "role": "Supervisora de servicio",
+    "initials": "SV",
+    "duty": "Aprueba, corrige y detiene"
+  },
+  "agents": [
+    {
+      "title": "Casos",
+      "job": "Clasifica, enruta y propone la respuesta.",
+      "levels": [
+        { "kind": "Lee", "value": "Historial y knowledge", "state": "y" },
+        { "kind": "Propone", "value": "Respuesta al cliente", "state": "y" },
+        { "kind": "Ejecuta", "value": "Enrutar dentro del SLA", "state": "y" },
+        { "kind": "Aprueba", "value": "La supervisora", "state": "n" }
+      ]
+    },
+    {
+      "title": "Pipeline",
+      "job": "Sugiere la siguiente acción comercial.",
+      "levels": [
+        { "kind": "Lee", "value": "Oportunidades y actividad", "state": "y" },
+        { "kind": "Propone", "value": "Siguiente paso", "state": "y" },
+        { "kind": "Ejecuta", "value": "Sólo tareas y recordatorios", "state": "h" },
+        { "kind": "Nunca", "value": "Cambiar montos", "state": "n" }
+      ]
+    },
+    {
+      "title": "Campañas",
+      "job": "Prepara variantes para audiencias con consentimiento.",
+      "levels": [
+        { "kind": "Lee", "value": "Segmentos consentidos", "state": "y" },
+        { "kind": "Propone", "value": "Variantes y audiencia", "state": "y" },
+        { "kind": "Ejecuta", "value": "Nada sin aprobación", "state": "n" }
+      ]
+    }
+  ],
+  "pendingApproval": "Respuesta propuesta al caso #4821"
+}

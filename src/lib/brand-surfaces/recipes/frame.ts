@@ -14,6 +14,7 @@
  *     marcador «Logo del cliente» (la plantilla).
  */
 
+import { AXIS_BRAND_ASSETS, AXIS_PARTNER_ASSETS } from '@efeoncepro/axis-brand-assets'
 import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
 
 import { EFEONCE_CONTACT } from '@/config/efeonce-brand'
@@ -23,6 +24,7 @@ import { SurfacePieceError } from '../types'
 import { contentOf, ofHeight, plateAsset, reserve, selectionDelegate, voiceSlots, type SurfaceIntent, type SurfaceManifest } from '../shared'
 
 import type { RecipeBuilder } from './deck'
+import { partnerFile } from './line-stage/kit'
 
 /* ── Tokens de la receta ──────────────────────────────────────────────────────────────────────────────────── */
 
@@ -434,6 +436,116 @@ const contactSlots = (recipe: Record<string, unknown>, top: number) => {
   }
 }
 
+/* ── La marca de partner (TASK-1942, deck Salesforce) ─────────────────────────────────────────────────────── */
+
+type PartnerMarkTokens = {
+  xPx?: number
+  topPx?: number
+  heightPx: number
+  belowContactPx?: number
+  fallback?: {
+    label: { text: string; px: number; weight: number; lineHeight: number; tracking: string; uppercase: boolean; color: string; topPx: number }
+    platformLogo: { heightPx: number; topPx: number }
+  }
+}
+
+type PartnerMarkIntent = { mode?: unknown; readbackRef?: unknown; logo?: { path?: unknown; alt?: unknown } }
+
+/** El registro de logos de plataforma del repo: el único origen del logo de «Operamos sobre». */
+const PLATFORM_LOGO_DIR = 'public/images/logos/partners/'
+
+const SOFT_ON_DARK = (efeonceGraphicLine as unknown as { slogan: { leadColor: { onDark: string } } }).slogan.leadColor.onDark
+
+/**
+ * La insignia de partner de la plataforma de la línea (`AXIS_PARTNER_ASSETS`, kind `partner-badge`). Es un CLAIM (regla
+ * `partner-claim-readback`): sólo con el readback vigente del programa, que el intent declara en `readbackRef`; sin él,
+ * no compone. La línea tiene que operarse sobre una plataforma de partner (`lines[].platform`).
+ */
+const partnerBadge = (line: string, readbackRef: unknown): { ref: string; asset: SurfaceAssetRequest } => {
+  const platform = (efeonceGraphicLine.lines as unknown as { key: string; platform: string | null }[]).find(entry => entry.key === line)?.platform
+
+  if (!platform) throw new SurfacePieceError(`La línea «${line}» no se opera sobre una plataforma de partner: no lleva insignia.`, 'invalid-intent')
+
+  if (typeof readbackRef !== 'string' || !readbackRef.trim()) {
+    throw new SurfacePieceError(
+      'La insignia de partner es un claim: exige el readback vigente del programa (`partnerMark.readbackRef`). Sin él, usa `mode: "operates-on"` en la portada o deja la contraportada sin insignia.',
+      'invalid-intent'
+    )
+  }
+
+  const badge = (AXIS_PARTNER_ASSETS as readonly { id: string; kind: string; partner: string }[]).find(asset => asset.kind === 'partner-badge' && asset.partner === platform)
+
+  if (!badge) throw new SurfacePieceError(`AXIS no publica la insignia de partner de «${platform}».`, 'invalid-intent')
+
+  return partnerFile(badge.id)
+}
+
+/**
+ * `partnerMark` de la portada de línea (`cover-brochure` layout `line`, AXIS 0.3.31): OPCIONAL y nunca fijo. `badge`: la
+ * insignia de partner (claim con readback) al pie de la columna, en el slot `partnerMark`; `operates-on`: el respaldo
+ * que no afirma nada —«Operamos sobre» y el logo de la plataforma del registro del repo—, en `partnerMarkFallback`.
+ * Sin `partnerMark` la portada va sin nada al pie (los dos slots son opcionales y se borran).
+ */
+const coverPartnerMark = (intent: SurfaceIntent, recipe: Record<string, unknown>, layout: string | null | undefined) => {
+  const asked = intent.partnerMark as PartnerMarkIntent | undefined
+
+  if (asked === undefined) return null
+  if (layout !== 'line') throw new SurfacePieceError('La marca de partner va sólo en la portada de línea (`layout: "line"`).', 'invalid-intent')
+
+  const mark = measured(
+    (recipe.layouts as Record<string, { partnerMark?: PartnerMarkTokens }> | undefined)?.line?.partnerMark,
+    'la marca de partner de la portada de línea'
+  )
+
+  const left = cssVar('pm-left', measured(mark.xPx, 'la x de la marca de partner'))
+
+  if (asked.mode === 'badge') {
+    const badge = partnerBadge(String(intent.line), asked.readbackRef)
+
+    return {
+      slots: { partnerMark: { left, badgeTop: cssVar('pm-badge-top', measured(mark.topPx, 'la altura de la insignia')), badgeHeight: cssVar('pm-badge-height', mark.heightPx), badge: badge.ref } },
+      assets: [badge.asset]
+    }
+  }
+
+  if (asked.mode === 'operates-on') {
+    const fallback = measured(mark.fallback, 'el respaldo «Operamos sobre»')
+    const path = typeof asked.logo?.path === 'string' ? asked.logo.path.trim() : ''
+    const alt = typeof asked.logo?.alt === 'string' ? asked.logo.alt.trim() : ''
+
+    if (!path.startsWith(PLATFORM_LOGO_DIR) || !alt) {
+      throw new SurfacePieceError(`«Operamos sobre» lleva el logo de la plataforma del registro del repo (\`partnerMark.logo.path\` en ${PLATFORM_LOGO_DIR}) y su \`alt\`.`, 'invalid-intent')
+    }
+
+    const ref = `asset-ref:file:platform-${path.split('/').pop()!.replace(/\.[a-z0-9]+$/i, '')}`
+    const label = fallback.label
+
+    if (label.color !== 'soft') throw new SurfacePieceError(`AXIS pide el color «${label.color}» para «Operamos sobre» y la plantilla pinta el suave.`, 'recipe-without-template')
+
+    return {
+      slots: {
+        partnerMarkFallback: {
+        left,
+        label: label.uppercase ? label.text.toUpperCase() : label.text,
+        labelTop: cssVar('pm-label-top', label.topPx),
+        labelPx: cssVar('pm-label-px', label.px),
+        labelWeight: cssVar('pm-label-wght', label.weight, ''),
+        labelLeading: cssVar('pm-label-leading', label.lineHeight, ''),
+        labelTracking: cssVar('pm-label-tracking', label.tracking),
+        labelColor: colorVar('pm-label', SOFT_ON_DARK.toLowerCase()),
+        logo: ref,
+        logoAlt: alt,
+        logoTop: cssVar('pm-logo-top', fallback.platformLogo.topPx),
+        logoHeight: cssVar('pm-logo-height', fallback.platformLogo.heightPx)
+        }
+      },
+      assets: [{ ref, kind: 'file', path } as SurfaceAssetRequest]
+    }
+  }
+
+  throw new SurfacePieceError('`partnerMark.mode` es `badge` (con `readbackRef`) u `operates-on` (con el logo de la plataforma).', 'invalid-intent')
+}
+
 /* ── Portadas ─────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
@@ -520,6 +632,7 @@ export const coverBrochure: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const column = coverColumn(intent, manifest, recipe, withSelection)
   const { logoWidth } = signatureOf(manifest, false)
   const photo = plateAsset(manifest, manifest.canvas)
+  const partnerMark = coverPartnerMark(intent, recipe, manifest.layout)
 
   return {
     ...(withSelection ? { contentType: 'deck.cover-brochure.document-selection' } : {}),
@@ -528,9 +641,10 @@ export const coverBrochure: RecipeBuilder = ({ intent, manifest, recipe }) => {
       backdrop: { src: photo.ref, alt: photo.alt },
       voice: column.voice,
       evidence: column.evidence,
-      ...(withSelection ? { selection: answerSelection(manifest) } : {})
+      ...(withSelection ? { selection: answerSelection(manifest) } : {}),
+      ...(partnerMark?.slots ?? {})
     },
-    assets: [photo.asset]
+    assets: [photo.asset, ...(partnerMark?.assets ?? [])]
   }
 }
 
@@ -712,13 +826,22 @@ export const closeBrochure: RecipeBuilder = ({ intent, manifest, recipe }) => {
  * conversar: no lleva voz), con el logo arriba y el contacto debajo.
  */
 export const closeProposal: RecipeBuilder = ({ intent, manifest, recipe }) => {
-  const logo = closeLogo(manifest)
   const photo = plateAsset(manifest, manifest.canvas)
-  const contact = contactSlots(recipe, ofHeight(manifest, measured(reserve(manifest, 'contact')?.fromTop, 'la altura del contacto')))
 
   if (contentOf(manifest).answer.length > 0) {
     throw new SurfacePieceError('La contraportada de propuesta no lleva voz: su mensaje es el eslogan.', 'invalid-intent')
   }
+
+  const block = sloganBlockOf(recipe, String(intent.line))
+
+  if (block) return closeProposalSloganBlock({ intent, manifest, recipe }, block, photo)
+
+  if (intent.partnerMark !== undefined) {
+    throw new SurfacePieceError('La insignia de partner de la contraportada va sólo con el eslogan en bloque (`sloganBlock`, las líneas de sus referencias).', 'invalid-intent')
+  }
+
+  const logo = closeLogo(manifest)
+  const contact = contactSlots(recipe, ofHeight(manifest, measured(reserve(manifest, 'contact')?.fromTop, 'la altura del contacto')))
 
   return {
     slots: {
@@ -726,13 +849,119 @@ export const closeProposal: RecipeBuilder = ({ intent, manifest, recipe }) => {
         line: intent.line,
         ...logo.frame,
         ...sloganVars(manifest, ofHeight(manifest, measured(reserve(manifest, 'slogan')?.fromTop, 'la altura del eslogan'))),
-        ...contact.frame
+        ...contact.frame,
+        // Sin el bloque, las filas del contacto siguen a la fila de redes con el mismo espacio que entre sí.
+        contactSocialBelow: cssVar('contact-social-below', 0)
       },
       backdrop: { src: photo.ref, alt: photo.alt },
       slogan: sloganSlots(manifest),
       contact: contact.contact
     },
     assets: [photo.asset]
+  }
+}
+
+type SloganBlockTokens = {
+  references: string[]
+  logo: { widthPx: number; topPx: number }
+  slogan: { ofLogo: number; gapOfFont: number; boxLiftOfFont: number; lineHeight: number }
+  contact: {
+    belowSloganPx: number
+    socialRow: { urlBubbleHeightPx: number; iconPx: number; gapPx: number }
+    lines: { belowSocialRowPx: number; px: number; weight: number; lineHeight: number; rowGapPx: number; iconPx: number; iconGapPx: number; color: string }
+    icon: { color: string; opacity: number }
+  }
+  partnerMark: PartnerMarkTokens
+}
+
+/**
+ * La composición `sloganBlock` de la contraportada de propuesta (AXIS 0.3.31, operador 2026-09-29): sólo para las líneas
+ * de sus referencias aprobadas (`close-proposal-horizon-<línea>`; hoy, Salesforce). Las contraportadas del 27/09 siguen
+ * con el logo de 500 px y el eslogan suelto.
+ */
+const sloganBlockOf = (recipe: Record<string, unknown>, line: string): SloganBlockTokens | null => {
+  const block = recipe.sloganBlock as SloganBlockTokens | undefined
+
+  return block?.references.some(reference => reference.endsWith(`-${line}`)) ? block : null
+}
+
+/**
+ * El eslogan EN BLOQUE con el logo: debajo del logo, al `ofLogo` (64 %) de su ancho, separado `gapOfFont` veces su
+ * cuerpo (la caja sube `boxLiftOfFont` para que la tinta, no la caja, quede a esa distancia); cuerpo = ancho del logo ×
+ * 0,64 ÷ `slogan.widthEmByWord[palabra]`. El contacto cuelga `belowSloganPx` bajo el eslogan y la insignia OPCIONAL de
+ * partner, `belowContactPx` bajo el inicio del contacto.
+ */
+const closeProposalSloganBlock = (
+  { intent, manifest, recipe }: Parameters<RecipeBuilder>[0],
+  block: SloganBlockTokens,
+  photo: ReturnType<typeof plateAsset>
+) => {
+  const line = String(intent.line)
+  const word = measured((efeonceGraphicLine.lines as unknown as { key: string; sloganWord: string }[]).find(entry => entry.key === line)?.sloganWord, `la palabra del eslogan de «${line}»`)
+  const widthEm = measured((efeonceGraphicLine as unknown as { slogan: { widthEmByWord: Record<string, number> } }).slogan.widthEmByWord[word], `el ancho del eslogan con «${word}»`)
+  const aspect = measured((AXIS_BRAND_ASSETS as readonly { id: string; aspectRatio: number }[]).find(asset => asset.id === FRAME_LOGO)?.aspectRatio, 'la proporción del logo')
+  const reserveLogo = reserve(manifest, 'logo') as { inset?: number } | undefined
+  const inset = Math.round(measured(reserveLogo?.inset, 'la sangría del logo') * manifest.canvas.width)
+  const logoHeight = Math.round(block.logo.widthPx * aspect)
+  const sloganPx = Number(((block.slogan.ofLogo * block.logo.widthPx) / widthEm).toFixed(1))
+  const sloganTop = block.logo.topPx + logoHeight + Math.round(sloganPx * block.slogan.gapOfFont) - Math.round(sloganPx * block.slogan.boxLiftOfFont)
+  const contactTop = sloganTop + sloganPx + block.contact.belowSloganPx
+  const { socialRow, lines, icon } = block.contact
+  const base = contactSlots(recipe, contactTop)
+  const asked = intent.partnerMark as PartnerMarkIntent | undefined
+  let partnerMark: { slot: Record<string, unknown>; assets: SurfaceAssetRequest[] } | null = null
+
+  if (lines.color !== 'soft') throw new SurfacePieceError(`AXIS pide el color «${lines.color}» para el contacto y la plantilla pinta el suave.`, 'recipe-without-template')
+
+  if (asked !== undefined) {
+    if (asked.mode !== 'badge') throw new SurfacePieceError('La contraportada sólo lleva la insignia de partner (`partnerMark.mode: "badge"`); sin readback, va sin insignia.', 'invalid-intent')
+
+    const badge = partnerBadge(line, asked.readbackRef)
+
+    partnerMark = {
+      slot: {
+        left: cssVar('pm-left', inset),
+        badgeTop: cssVar('pm-badge-top', contactTop + measured(block.partnerMark.belowContactPx, 'la insignia bajo el contacto')),
+        badgeHeight: cssVar('pm-badge-height', block.partnerMark.heightPx),
+        badge: badge.ref
+      },
+      assets: [badge.asset]
+    }
+  }
+
+  return {
+    slots: {
+      frame: {
+        line: intent.line,
+        margin: inset,
+        logoLeft: cssVar('logo-left', inset),
+        logoTop: cssVar('logo-top', block.logo.topPx),
+        logoWidth: cssVar('logo-width', block.logo.widthPx),
+        sloganTop: cssVar('slogan-top', sloganTop),
+        sloganPx: cssVar('slogan-px', sloganPx),
+        sloganLeading: cssVar('slogan-leading', block.slogan.lineHeight, ''),
+        ...base.frame,
+        contactPx: cssVar('contact-px', lines.px),
+        contactWeight: cssVar('contact-wght', lines.weight, ''),
+        contactLeading: cssVar('contact-leading', lines.lineHeight, ''),
+        contactRowGap: cssVar('contact-row-gap', lines.rowGapPx),
+        contactBubbleHeight: cssVar('contact-bubble-height', socialRow.urlBubbleHeightPx),
+        contactSocialGap: cssVar('contact-social-gap', socialRow.gapPx),
+        contactSocialIcon: cssVar('contact-social-icon', socialRow.iconPx),
+        contactSocialIconGap: cssVar('contact-social-icon-gap', socialRow.gapPx),
+        contactItemIcon: cssVar('contact-item-icon', lines.iconPx),
+        contactItemGap: cssVar('contact-item-gap', lines.iconGapPx),
+        contactIconOpacity: cssVar('contact-icon-opacity', icon.opacity, ''),
+        // Las filas empiezan `belowSocialRowPx` bajo el inicio de la fila de redes: lo que falta tras el alto de la fila y
+        // el espacio entre filas.
+        contactSocialBelow: cssVar('contact-social-below', lines.belowSocialRowPx - Math.max(socialRow.urlBubbleHeightPx, socialRow.iconPx) - lines.rowGapPx)
+      },
+      backdrop: { src: photo.ref, alt: photo.alt },
+      slogan: sloganSlots(manifest),
+      contact: base.contact,
+      ...(partnerMark ? { partnerMark: partnerMark.slot } : {})
+    },
+    assets: [photo.asset, ...(partnerMark?.assets ?? [])]
   }
 }
 

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · lo nuevo de la temporada</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-season-launches` (surface deck, tema oscuro, TASK-1942). «¿Qué trajo Dreamforce? Agentes.»: ocho
+      fichas de vidrio, cuatro a cada lado de la plataforma de luz, con su estado anunciado (píldora sólida si ya está
+      disponible, en contorno si no) y el ícono oficial de su producto. Al centro, la plataforma: vacía o con la mascota del
+      partner (slot opcional, sujeto a la autorización escrita de Salesforce). Lámina de temporada: la fecha de corte va en
+      el eyebrow y en la nota. Sin selección.
+      Referencia: DeckSalesforceDreamforce (SF9-dreamforce-2026).
+    -->
+    <main class="gl-slide gl-ls gl-csn" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-csn-mascot" data-slot="mascot">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-csn-launches" data-slot="launches">
+        <li class="gl-ls-glass gl-csn-card">
+          <img class="gl-csn-icon" data-slot-field="icon" alt="" />
+          <span class="gl-csn-status" data-slot-field="status">GA</span>
+          <p class="gl-csn-name" data-slot-field="name">Agentes con oficio</p>
+          <p class="gl-csn-desc" data-slot-field="description">Casey, Paige, Carter, Marshall, Piper y Fin</p>
+        </li>
+      </ol>
+
+      <p class="gl-ls-note" data-slot="note">Estado anunciado por Salesforce al 18-09-2026 · se verifica en cada org</p>
+      <time class="gl-hidden" data-slot="asOf">2026-09-18</time>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Dreamforce 2026 · al 18-09-2026</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Qué trajo Dreamforce?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">Agentes</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Lo aterrizamos en tu org: verificamos <strong>disponibilidad</strong>, permisos y consumo antes de comprometerlo.</p>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

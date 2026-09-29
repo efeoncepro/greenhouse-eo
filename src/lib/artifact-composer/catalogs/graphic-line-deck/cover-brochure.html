@@ -14,6 +14,8 @@
       respuesta con su esfera y la evidencia con una palabra en negrita. Composiciones `document` (el brochure general)
       y `line` (una por línea, con el acento de SU línea), y `document-selection`: la de las cinco líneas con la selección
       de ocho manijas y el cursor de Nexa sobre la respuesta (AXIS 0.3.21). Sin cliente, sin eslogan y sin burbuja URL.
+      En la composición `line`, la marca de partner OPCIONAL al pie de la columna (TASK-1942, AXIS 0.3.31): la insignia
+      (claim con readback vigente) o el respaldo «Operamos sobre» con el logo de la plataforma; sin ella, nada al pie.
       Toda medida, peso y color llega del manifest y de los tokens de AXIS; la plantilla no declara respaldo.
     -->
     <main class="gl-slide gl-frame gl-frame-column" data-gl-root data-slot="frame">
@@ -32,6 +34,15 @@
       <p class="gl-evidence" data-slot="evidence">Evidencia</p>
 
       <div class="gl-hidden" data-slot="selection"></div>
+
+      <div class="gl-partner-mark" data-slot="partnerMark">
+        <img class="gl-pm-badge" data-slot-field="badge" alt="Insignia de partner de la plataforma" />
+      </div>
+
+      <div class="gl-partner-mark" data-slot="partnerMarkFallback">
+        <p class="gl-pm-label" data-slot-field="label">Operamos sobre</p>
+        <img class="gl-pm-logo" data-slot-field="logo" alt="" />
+      </div>
     </main>
   </body>
 </html>
