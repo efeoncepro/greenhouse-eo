@@ -221,7 +221,7 @@ ${urlSign()}`
     const top = 190
     return `<img src="${photo}" alt="Nexa, con la chaqueta navy de Efeonce, mira a cámara; detrás de ella se alza un gran anillo vertical de luz celeste del que salen cientos de hilos de luz que llegan a las yemas de sus dedos" style="position:absolute;inset:0;width:${W}px;height:${H}px">
 <img src="${LOGO}" alt="Efeonce" style="position:absolute;left:${M}px;top:${top}px;width:500px;height:auto;z-index:3">
-<p style="position:absolute;left:${M}px;top:${top + 190}px;margin:0;font:500 22px/1.2 Pop;letter-spacing:.24em;text-transform:uppercase;color:${SOFT};z-index:3">Brochure · Servicios Salesforce</p>
+<p style="position:absolute;left:${M}px;top:${top + 190}px;margin:0;font:500 22px/1.2 Pop;letter-spacing:.24em;text-transform:uppercase;color:${SOFT};z-index:3">${process.env.DOC === 'propuesta' ? 'Propuesta' : 'Brochure'} · Servicios Salesforce</p>
 <p style="position:absolute;left:${M}px;top:${top + 238}px;margin:0;font:300 40px/1.2 Pop;color:#F4F6F8;white-space:nowrap;z-index:3">${ring}¿Tu Salesforce ya actúa?</p>
 <p style="position:absolute;left:${M - 4}px;top:${top + 300}px;margin:0;font:760 124px Bric;line-height:.95;letter-spacing:-.035em;color:#fff;white-space:nowrap;z-index:3">${answerHtml('Por ti', A)}</p>
 <p style="position:absolute;left:${M}px;top:${top + 452}px;margin:0;font:400 28px/1.3 Pop;color:#F4F6F8;z-index:3">${b('Seis')} servicios:<br>Ventas · Servicio · Marketing Cloud<br>Data 360 · Agentforce · Integración</p>
@@ -508,7 +508,7 @@ for (const sl of slides.filter(s => !process.env.ONLY || process.env.ONLY.split(
   await pg.setContent(`<html><head>${css}</head><body><div style="position:relative;width:${W}px;height:${H}px;overflow:hidden;background:${C.dark}">${body}</div></body></html>`, { waitUntil: 'load' })
   await pg.evaluate(() => document.fonts.ready)
   if (sl.sel) console.log(sl.id, JSON.stringify(await paintSelection(pg, sl.sel)).slice(0, 160))
-  const name = sl.id + (SIN_BADGE ? '-sin-badge' : '')
+  const name = sl.id + (SIN_BADGE ? '-sin-badge' : '') + (process.env.DOC === 'propuesta' ? '-propuesta' : '')
   await pg.screenshot({ path: `${OUT}${name}.png` })
   await sharp(`${OUT}${name}.png`).jpeg({ quality: 88 }).toFile(`${OUT}${name}.jpg`)
   console.log('ok', sl.id)
