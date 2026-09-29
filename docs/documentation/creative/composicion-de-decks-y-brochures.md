@@ -129,7 +129,7 @@ láminas que no cabían en la receta que usaban tengan la suya.
 
 > Detalle técnico: [norma §4.6, «Deck de práctica Salesforce»](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) ·
 > [catálogo de recetas](../../operations/brand-graphic-line/deck-recipes/README.md) ·
-> [TASK-1942](../../tasks/in-progress/TASK-1942-salesforce-deck-recipes-canonization.md).
+> [TASK-1942](../../tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md).
 
 ## La portada con la selección de Nexa
 

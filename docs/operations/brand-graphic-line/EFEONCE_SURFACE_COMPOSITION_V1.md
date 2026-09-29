@@ -1072,7 +1072,7 @@ ronda y cuatro que el operador decidió al canonizar (las láminas 13, 14, 17 y 
 existentes). Las otras cuatro (01, 02, 19 y la alternativa de la 02) son **datos de recetas existentes**, registrados en
 el campo `approvedUses` de cada receta con su `fit` (qué cabe en los slots y qué no).
 Fuente de hechos: `ai-generations/2026-09-29_deck-salesforce/CANON-INVENTARIO.md` y `DECISIONES.md`; task
-[TASK-1942](../../tasks/in-progress/TASK-1942-salesforce-deck-recipes-canonization.md).
+[TASK-1942](../../tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md).
 
 **Orden narrativo en cinco actos** (el del canvas de revisión, de izquierda a derecha):
 

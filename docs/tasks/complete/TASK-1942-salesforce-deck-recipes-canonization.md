@@ -1,5 +1,18 @@
 # TASK-1942 — Canonizar el deck Salesforce de «La órbita»: 16 recetas nuevas, 4 usos de recetas existentes, Composer y AXIS
 
+## Delta 2026-09-29 (e) — cierre: gates completos, push y CI en verde
+
+- **Push a develop** coordinado con las sesiones vecinas: `9fe1a0cef` (hasta `b6946dcd9`, empujado por la sesión «Línea
+  gráfica evergreen») y `814255694` (fija AXIS 0.3.36 y `axis-brand-assets` 0.4.5). CI de `814255694`: **9/9 workflows en
+  verde** (CI, Playwright E2E smoke, Task Contract, Agent Context Governance y los cinco worker deploys).
+- **Gates de cierre** con autorización del operador («haz todo»), sobre `66833da08` (develop con todo el programa):
+  `pnpm test` completo **1936 archivos / 16 917 tests en verde** (65 archivos y 276 tests `skipped`, ninguno fallido) y
+  `pnpm build` de producción **exit 0** («Compiled successfully»).
+- **AXIS `v0.3.36`** empujado a `main` (`302f7f7`) con autorización del operador; «Release UI packages» y CI en verde;
+  registro con `axis-tokens` / `axis-ui-contracts` 0.3.36 y `axis-brand-assets` 0.4.5; Lab 200.
+- **Autorización escrita de Anthropic** para Claude y Claudeforce (SF16): condición externa trasladada a TASK-1937. El
+  sistema ya la hace cumplir: `assistantMark` y `platformMark` son opcionales y fallan cerrados sin `authorizationRef`.
+
 ## Delta 2026-09-29 (d) — «Todo está aprobado» e insignia autorizada por Salesforce
 
 - **Decisión del operador (textual):** «Todo está aprobado. Necesito que tengan el Badge de Salesforce Partner ya está
@@ -68,7 +81,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -80,7 +93,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `code complete, rollout pendiente (2026-09-29, delta d): todo el deck aprobado por el operador (SF20, largos de SF6/SF7, costo de color de SF1/SF8) e insignia «Salesforce Partner» autorizada por Salesforce, por defecto en portada y contraportada de propuesta; 94/94 recetas con plantilla sobre AXIS 0.3.36 (brand-assets 0.4.5, tag v0.3.36 publicado con las referencias del Lab con insignia), gate graphic-line 89 frames a 0 px sin freeze, planes golden con insignia sin avisos; pendientes: push a develop, pnpm test completo y pnpm build de producción (requieren autorización del operador) y la autorización escrita de Anthropic para Claude/Claudeforce`
+- Status real: `complete (2026-09-29, delta e): deck Salesforce aprobado y canonizado — 94/94 recetas con plantilla sobre AXIS 0.3.36 (brand-assets 0.4.5), insignia «Salesforce Partner» autorizada y por defecto, gate graphic-line 89 frames a 0 px; en develop (814255694) con CI 9/9 en verde; pnpm test completo y pnpm build de producción en verde; la autorización escrita de Anthropic para Claude/Claudeforce sigue en TASK-1937 (slots opcionales que fallan cerrados)`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -340,8 +353,8 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - [x] La insignia «Salesforce Partner» va por defecto en el deck Salesforce y la falla cerrada sigue para otros partners. (Intents de ejemplo y planes golden con `readbackRef: salesforce-partner-authorization-2026-09-29`; `partner-mark.test.ts` 8/8; `pnpm brand:deck-plan` 0 errores en los dos planes.)
 - [x] `partnerMark` y el eslogan en bloque componen, con test sin el slot y el gate `graphic-line` a 0 px. (`partner-mark.test.ts`; freeze sección (s); `pnpm composer:visual-gate --catalog=graphic-line` 89 frames a 0 px, 2026-09-29)
 - [x] AXIS publica las recetas, sus referencias y los assets de terceros con procedencia y estado de autorización (`v0.3.31`, `v0.3.32` y `v0.3.33`; AXIS `main` `0bd2758`; la insignia autorizada y las referencias con insignia en `v0.3.36`, `302f7f7`, que Greenhouse fija).
-- [ ] Gates de cierre: `pnpm test` completo y `pnpm build` de producción en el último commit. (**Sin tildar:** requieren autorización del operador — `pnpm build` consume ~30 GB en este equipo.)
-- [ ] Rollout comercial: autorizaciones escritas de Salesforce y Anthropic archivadas (TASK-1937) y readback vigente de la insignia «Salesforce Partner». (**Sin tildar:** la insignia y las marcas de Salesforce quedaron autorizadas por Salesforce el 2026-09-29 —declarado por el operador; archivar la copia escrita es recomendado, no bloqueante—; falta la autorización escrita de **Anthropic** para Claude y Claudeforce en SF16.)
+- [x] Gates de cierre: `pnpm test` completo y `pnpm build` de producción en el último commit. (Autorizados por el operador el 2026-09-29: `pnpm test` 1936 archivos / 16 917 tests en verde; `pnpm build` exit 0; CI de `814255694` 9/9 en verde.)
+- [x] Rollout comercial: marcas de Salesforce e insignia «Salesforce Partner» autorizadas por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; archivar la copia escrita es recomendado). La autorización escrita de **Anthropic** para Claude y Claudeforce (SF16) queda en TASK-1937: el composer la hace cumplir (slots opcionales que fallan cerrados sin `authorizationRef`).
 
 ## Verification
 
@@ -352,9 +365,9 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (2026-09-29: deltas en TASK-1930, 1931, 1932, 1933, 1937 y 1943)

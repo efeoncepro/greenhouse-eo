@@ -37,6 +37,7 @@
   render (gate `graphic-line` a 0 px); costo de color de los íconos de producto aprobado.
 - Registro de partnerships, oferta Salesforce (§Claims), norma §4.6, manual, doc funcional, arquitectura y skills al día.
   AXIS `axis-brand-assets` con el estado nuevo, preparado sin publicar (las referencias del Lab exigen tokens 0.3.36).
+- Cierre de TASK-1942: AXIS `v0.3.36` (`302f7f7`) publicado y fijado en Greenhouse; develop `814255694` con CI 9/9 en verde; `pnpm test` completo y `pnpm build` de producción en verde; PDF de propuesta y de brochure con insignia.
 
 ## 2026-09-29 — Deck de práctica Salesforce componible y documentado (TASK-1942)
 

@@ -148,7 +148,7 @@ SEO y AEO son **servicios distintos**: `proposal-service-seo` y `proposal-servic
 Diecinueve láminas de la práctica Salesforce (línea `revenue-salesforce`), aprobadas por el operador el 2026-09-29.
 Orden en cinco actos, reglas y los dos planes (brochure y propuesta): [norma §4.6, «Deck de práctica
 Salesforce»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck). Task:
-[TASK-1942](../../../tasks/in-progress/TASK-1942-salesforce-deck-recipes-canonization.md).
+[TASK-1942](../../../tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md).
 
 | Lámina | id | Familia | Cuándo usarla | Qué no se negocia |
 |---|---|---|---|---|
