@@ -244,6 +244,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 | `formato` | tamaño, % del lecho y límite de sujetos, de UNA tabla |
 | `identidad` | bloques `IDENTITY` + `REFERENCES` verbatim, con **vista por ángulo** (`{ persona, vista }`) |
 | `objetos` | kits de marca como **referencia de forma** (logo, mascota, prenda, merch), numerados tras la identidad |
+| `linea` | línea de servicio de la pieza: con alguien del equipo en `identidad`, **exige la prenda de la línea** (hoodie en `brand`; bomber o softshell en las líneas de negocio) — [roster](../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md) |
 | `palanca` | **una sola** de las **24 de encuadre** → [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) |
 | `atmosfera` | `polvo` · `bruma` · `vapor` · `humo` — aire con materia que hace visible la luz. **Exige haz** |
 | `suspendido` | qué está congelado en el aire |

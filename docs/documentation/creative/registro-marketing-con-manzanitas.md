@@ -1,9 +1,9 @@
 # Registro Marketing con Manzanitas — registro complementario de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-28 por Claude
-> **Ultima actualizacion:** 2026-09-29 por Claude (TASK-1939) (1.3: las diez decisiones resueltas: el texto de cierre que cambia con cada pieza, el equipo real en las fotos y los íconos de republicar y enviar; AXIS `v0.3.29`. 1.2: cómo se componen hoy las piezas, decisiones del operador del 2026-09-29 y el eslogan debajo del logo)
+> **Ultima actualizacion:** 2026-09-29 por Claude (TASK-1939) (1.4: la ropa del equipo la decide la línea; 1.3: las diez decisiones resueltas: el texto de cierre que cambia con cada pieza, el equipo real en las fotos y los íconos de republicar y enviar; AXIS `v0.3.29`. 1.2: cómo se componen hoy las piezas, decisiones del operador del 2026-09-29 y el eslogan debajo del logo)
 > **Documentacion tecnica:** [ADR del registro Marketing con Manzanitas](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) · [Norma del registro](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
 > **Manual de uso:** [Componer piezas de Marketing con Manzanitas](../../manual-de-uso/creative/componer-piezas-de-marketing-con-manzanitas.md)
 
@@ -147,8 +147,10 @@ oficial y el modelo sólo lo termina sobre su silueta.
 
 **Las personas del equipo en las fotos.** Desde el 2026-09-29, las fotos de MCM pueden mostrar a personas reales del
 equipo actual de Efeonce (lo decidió el operador ese día). Sólo salen las que están en el **roster del equipo**, la lista
-que mantiene Greenhouse, y cada una con su ropa: el equipo con el hoodie de Efeonce, Julio con el polo y Valentina Hoyos
-con su propia ropa, sin logo. María Fernanda ya no está en el equipo actual, así que su foto no se usa. La cara de cada
+que mantiene Greenhouse. La ropa no depende de la persona sino de la línea de la pieza, por la personalidad de cada
+línea (lo decidió el operador el mismo día): en Servicios creativos, el hoodie de Efeonce; en las líneas de negocio
+(Growth, Engine, Voice y Revenue), la bomber o la softshell del uniforme corporativo, con el polo debajo si se quiere.
+Vale para todo el equipo, y la herramienta que arma la foto no deja pasar otra prenda. María Fernanda ya no está en el equipo actual, así que su foto no se usa. La cara de cada
 persona se genera a partir de sus fotos de referencia, nunca se pega. El operador aprobó cómo quedó cada una el
 2026-09-29; quien entre después al equipo pasa por la misma revisión. La estratega de la Escena interior
 aprobada sigue siendo una persona inventada para el rol.
@@ -344,7 +346,7 @@ texto debajo.
 - **Sin fuente, la cifra no sale**; los datos de muestra se marcan como ejemplo.
 - **El eslogan sólo cierra**, siempre debajo del logo.
 - **La contraportada pide una sola conversión** y nada simula un botón; su texto de cierre es propio de cada pieza.
-- **En las fotos, sólo personas del equipo actual que estén en el roster**, con su ropa y su identidad aprobada.
+- **En las fotos, sólo personas del equipo actual que estén en el roster**, con la prenda de la línea de la pieza y su identidad aprobada.
 - **El lecho de una Escena sale de la foto**, nunca se agrega.
 
 > Detalle técnico: [norma §11 Nunca](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md#11-nunca) · [§12 QA antes de entregar](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md#12-qa-antes-de-entregar)

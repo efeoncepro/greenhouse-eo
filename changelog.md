@@ -19,6 +19,8 @@
   del dato). Lab con la contraportada nueva y sin decisiones abiertas.
 - Greenhouse (`2c95e60b2`): pins, tokens recompilados sin drift, gate a 0 px; el catálogo lee eslogan y órbita del token.
 - Roster del equipo en la fotografía de marca y seis identidades nuevas en `foto:prompt`, aprobadas por el operador.
+- El vestuario del equipo lo decide la línea de la pieza (hoodie en Servicios creativos; bomber o softshell en las líneas
+  de negocio): `foto:prompt` lo exige con `linea` en la ficha, y el polo debajo de la chaqueta ya no cuenta como mezcla de registros.
 
 ## 2026-09-29 — Marketing con Manzanitas en el Artifact Composer (TASK-1939)
 

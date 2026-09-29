@@ -196,6 +196,8 @@ IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa refere
 
 El equipo actual (decisión del operador, 2026-09-29): Andrés, Daniela, Humberly, Luis, Melkin y Valentina, en ese orden; identidades aprobadas por el operador el 2026-09-29 ([roster](./EFEONCE_TEAM_ROSTER_V1.md)).
 
+**El vestuario del equipo lo decide la línea de la pieza** (decisión del operador, 2026-09-29): la ficha declara `"linea"` (una clave de `efeonceGraphicLine.lines`) y `pnpm foto:prompt` exige en `objetos` el hoodie en `brand` y la bomber o la softshell (con el polo debajo, si se quiere) en las líneas de negocio. Tabla y razón en el [roster §«El vestuario lo decide la línea de servicio»](./EFEONCE_TEAM_ROSTER_V1.md#el-vestuario-lo-decide-la-línea-de-servicio).
+
 ```text
 IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is a SHORT, SOFT OVAL, slightly wider at the cheekbones and narrowing to a small chin — never long, never square. HAIR black, thick and slightly wavy, TOUSLED on top with a loose, messy fringe falling toward the forehead, shorter at the sides. GLASSES rectangular frames in RED-BURGUNDY acetate of medium thickness — never metal, never rimless, never black. FACIAL HAIR a light moustache and a small, sparse goatee on the chin; the cheeks are clean-shaven. EXPRESSION a wide, warm smile showing the upper teeth, eyes crinkling behind the glasses. Light-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or smooth him.
 ```

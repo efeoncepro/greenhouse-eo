@@ -256,8 +256,11 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
   [roster del equipo](../../brand-photography/EFEONCE_TEAM_ROSTER_V1.md) (token `manzanitasRegister.teamPeople`:
   `allowed`, `rosterSource: 'greenhouse-team-roster'`, `onlyCurrentTeam`; el token no nombra a nadie, porque el Lab es
   público). Es el cuarto caso permitido del [registro cine](../../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
-  - **Quién y con qué ropa** (roster): el equipo con **hoodie** Efeonce, Julio con **polo** y Valentina Hoyos con **su
-    propia ropa**, sin logo. María Fernanda ya no está en el equipo actual: su foto no se usa.
+  - **Quién** (roster): el equipo actual, con Valentina Hoyos. María Fernanda ya no está en el equipo: su foto no se usa.
+  - **Con qué ropa: la de la línea de la pieza** (decisión del operador, 2026-09-29, «por la "personalidad" de las líneas
+    de negocio»): **hoodie** Efeonce en Servicios creativos; **bomber o softshell** del uniforme corporativo en las
+    líneas de negocio (Growth, Engine, Voice, Revenue), con el polo debajo si se quiere y nunca el polo solo. Vale para
+    todo el equipo, Julio y Valentina incluidos. La ficha declara su `linea` y `pnpm foto:prompt` exige la prenda.
   - **La identidad se regenera con sus referencias** (`identidad` en la ficha, `pnpm foto:prompt`), nunca se injerta una
     cara. Las seis identidades nuevas quedaron **aprobadas por el operador el 2026-09-29 sobre la ronda piloto (`ai-generations/2026-09-29_manzanitas-equipo/`)**; una persona nueva en el equipo pasa por su propia ronda.
   - La estratega de la Escena interior aprobada sigue siendo una persona por rol, generada.
@@ -883,9 +886,9 @@ Revisa cada pieza sobre los **píxeles finales**, no sobre la paleta teórica.
 - [ ] Todas las fotos comparten registro (cine) y luz; la lámina después de cada foto retoma la voz.
 - [ ] El lecho de cada Escena es nativo de la foto; el sujeto no ocupa el rincón de «Desliza».
 - [ ] La foto de la Lente deja la cara o el objeto dentro del círculo y nadie mira al lente.
-- [ ] Si una foto muestra a personas del equipo: están en el roster del equipo actual, con el vestuario de su fila
-      (hoodie Efeonce; Julio con polo; Valentina con su propia ropa) y su identidad aprobada por el operador antes de
-      publicar.
+- [ ] Si una foto muestra a personas del equipo: están en el roster del equipo actual, con la prenda de la línea de la
+      pieza (hoodie en Servicios creativos; bomber o softshell en las líneas de negocio) y su identidad aprobada por el
+      operador antes de publicar.
 
 **Canales**
 

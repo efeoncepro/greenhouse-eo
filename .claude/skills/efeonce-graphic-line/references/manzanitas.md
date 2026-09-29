@@ -156,9 +156,14 @@ Todos los gráficos y el texto denso son Pizarra.
   (token `manzanitasRegister.teamPeople = { allowed: true, rosterSource: 'greenhouse-team-roster', onlyCurrentTeam: true }`;
   **el token no nombra a nadie**, el Lab es público). Es el cuarto caso permitido del registro cine:
   [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
-  - **Quién y con qué ropa** (roster): Julio con **polo** (identidad aprobada); Andrés, Daniela, Melkin, Humberly y Luis
-    con **hoodie** Efeonce; Valentina Hoyos con **su propia ropa**, sin logo. María Fernanda ya no está en el equipo
-    actual: su foto de `squad/` no se usa.
+  - **Quién**: Julio, Andrés, Daniela, Melkin, Humberly, Luis y Valentina Hoyos (roster). María Fernanda ya no está en
+    el equipo actual: su foto de `squad/` no se usa.
+  - **Con qué ropa: la decide la línea de la pieza, no la persona** (operador, 2026-09-29, «por la personalidad de las
+    líneas de negocio»): **hoodie** Efeonce en Servicios creativos (`brand`); **bomber o softshell** del uniforme
+    corporativo en `growth`, `engine`, `voice`, `revenue-hubspot` y `revenue-salesforce`, con el polo debajo si se
+    quiere (nunca el polo solo). Todo el equipo, Julio y Valentina incluidos. La ficha declara `"linea"` y la prenda en
+    `objetos`; `pnpm foto:prompt` se detiene si no calzan (`validarVestuarioDeLinea`). Los plates piloto del
+    2026-09-29 (hoodie) aprueban identidad, no vestuario.
   - **La identidad se declara en la ficha** (`"identidad": ["<clave>"]`; claves en `PERSONAS` de
     `scripts/foto/build-prompt.mjs`: `julio`, `andres`, `daniela`, `humberly`, `luis`, `melkin`, `valentina`) y se
     regenera con sus referencias (`pnpm foto:generar`); nunca se injerta una cara ni se describe de memoria.
@@ -808,8 +813,9 @@ manda la regla.
       simule un botón.
 - [ ] Texto de cierre (contraportada A y story de cierre): propio de la pieza, no fijo; pregunta ≤ 44, respuesta ≤ 10 y
       bajada ≤ 56 caracteres; la story de cierre lleva su voz.
-- [ ] Personas del equipo, si las hay: están en el roster, con la ropa de su fila, la identidad declarada en la ficha y
-      la hoja de contacto aprobada por el operador.
+- [ ] Personas del equipo, si las hay: están en el roster, con la prenda de la línea (hoodie en `brand`; bomber o
+      softshell en las líneas de negocio), `linea` e identidad declaradas en la ficha y la hoja de contacto aprobada por
+      el operador.
 - [ ] Escena: lecho nativo, firma dentro de su materia con aire, rincón de «Desliza» libre; Lente sólo en interiores.
 - [ ] Compuesta con `pnpm manzanitas:compose` sin errores (§10.1) y revisada en sus PNG y su PDF, a tamaño real y a
       390 px. Si una lámina se explora en el canvas, en papel y en navy, con la lógica `renderVals()` corriendo.

@@ -99,10 +99,16 @@ Commit `2c95e60b2` en `develop`:
    contrato (diferencia menor a 0,05 px). Los rótulos del gráfico dejan de ser campos extra del intent.
 3. **El equipo en la fotografía** (decisión 6):
    - Roster nuevo, [`EFEONCE_TEAM_ROSTER_V1.md`](../operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md) (fila 12 del
-     índice del canon). Equipo actual: Julio (polo, identidad aprobada); Andrés, Daniela y Melkin (hoodie; la foto actual
-     de Melkin con hoodie está en `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`); Humberly y Luis
-     (hoodie; sólo hay retratos antiguos en `public/images/greenhouse/team/`, falta su foto actual), y Valentina Hoyos
-     (su propia ropa, sin logo). María Fernanda no está en el equipo actual: su foto de `squad/` no se usa.
+     índice del canon). Equipo actual: Julio (identidad aprobada); Andrés, Daniela y Melkin (su foto actual, con hoodie,
+     está en `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`); Humberly y Luis (sólo hay retratos antiguos
+     en `public/images/greenhouse/team/`, falta su foto actual), y Valentina Hoyos. María Fernanda no está en el equipo
+     actual: su foto de `squad/` no se usa.
+   - **El vestuario lo decide la línea de la pieza** (decisión del operador, 2026-09-29, noche: «para todas las líneas de
+     negocio sea la bomber y/o softshell de los uniformes corporativos, y para los servicios creativos sea el hoodie,
+     esto por la "personalidad" de las líneas de negocio»): hoodie en `brand`; bomber o softshell, con el polo debajo si
+     se quiere, en `growth`, `engine`, `voice`, `revenue-hubspot` y `revenue-salesforce`. Todo el equipo, Julio y
+     Valentina incluidos; reemplaza la ropa por persona (Julio con polo, Valentina con su ropa). `pnpm foto:prompt` lo
+     exige cuando la ficha declara `linea` (`validarVestuarioDeLinea`).
    - Seis personas nuevas en `PERSONAS` de `scripts/foto/build-prompt.mjs` (`andres`, `daniela`, `humberly`, `luis`,
      `melkin`, `valentina`), con su bloque IDENTITY verbatim también en el canon §3.6
      (`EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md`) y sus referencias selladas en `scripts/foto/assets.lock.json`

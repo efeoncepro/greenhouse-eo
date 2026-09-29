@@ -18,6 +18,8 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
+
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 // Los bloques viven AL LADO del comando, no en una carpeta de corrida fechada. La copia de
 // `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/` queda como evidencia histórica de
@@ -1592,8 +1594,14 @@ export const auditarEmblema = objetos => {
   ]
 }
 
+// Con chaqueta, el polo es la capa de abajo: las dos chaquetas se diseñaron «para ir sobre el polo»
+// (`2026-09-17_chaqueta-efeonce/LEEME.md`) y sus vistas puestas lo llevan debajo. Ahí no marca registro.
+const CHAQUETAS = ['chaqueta-softshell-efeonce', 'chaqueta-bomber-efeonce']
+
 export const auditarRegistroVestuario = objetos => {
-  const prendas = (objetos ?? []).filter(o => REGISTRO_PRENDA[o])
+  const lista = objetos ?? []
+  const conChaqueta = lista.some(o => CHAQUETAS.includes(o))
+  const prendas = lista.filter(o => REGISTRO_PRENDA[o] && !(conChaqueta && o === 'polo-efeonce'))
 
   if (prendas.length < 2) return []
 
@@ -1876,6 +1884,44 @@ export const auditarVestuario = (escena, identidad) =>
     ? 'no declara el VESTUARIO y hay identidad: el modelo copia la ropa de las referencias aunque el prompt diga "ignore their clothing"'
     : null
 
+// ── Vestuario del equipo por línea de servicio (decisión del operador, 2026-09-29) ──────────────────
+// «Para todas las líneas de negocio sea la bomber y/o softshell de los uniformes corporativos, y para los servicios
+// creativos sea el hoodie, por la personalidad de las líneas de negocio.» La línea la declara la ficha (`linea`, una
+// clave de `efeonceGraphicLine.lines`); la de servicios creativos es la que el token llama Creative Services (`brand`).
+// Aplica a las personas REALES del equipo (el roster); Nexa conserva su vestuario propio.
+export const EQUIPO_REAL = ['julio', 'andres', 'daniela', 'humberly', 'luis', 'melkin', 'valentina']
+export const LINEA_CREATIVA = efeonceGraphicLine.lines.find(l => l.scope === 'Creative Services')?.key ?? 'brand'
+export const VESTUARIO_POR_LINEA = {
+  negocio: { prendas: ['chaqueta-bomber-efeonce', 'chaqueta-softshell-efeonce'], etiqueta: 'la bomber o la softshell del uniforme corporativo' },
+  creativa: { prendas: ['hoodie-efeonce'], etiqueta: 'el hoodie Efeonce' }
+}
+
+export const validarVestuarioDeLinea = ficha => {
+  const personas = (Array.isArray(ficha.identidad) ? ficha.identidad : []).map(p => (typeof p === 'string' ? p : p?.persona))
+  const delEquipo = personas.filter(p => EQUIPO_REAL.includes(p))
+
+  if (delEquipo.length === 0 || ficha.linea === undefined) return
+
+  const lineas = efeonceGraphicLine.lines.map(l => l.key)
+
+  if (!lineas.includes(ficha.linea)) {
+    throw new Error(`La línea "${ficha.linea}" no existe. Usa una de efeonceGraphicLine.lines: ${lineas.join(', ')}.`)
+  }
+
+  const familia = ficha.linea === LINEA_CREATIVA ? 'creativa' : 'negocio'
+  const regla = VESTUARIO_POR_LINEA[familia]
+  const otra = VESTUARIO_POR_LINEA[familia === 'creativa' ? 'negocio' : 'creativa']
+  const prendas = (ficha.objetos ?? []).map(o => (typeof o === 'string' ? o : o?.objeto))
+
+  if (!prendas.some(p => regla.prendas.includes(p)) || prendas.some(p => otra.prendas.includes(p))) {
+    throw new Error(
+      `En la línea ${ficha.linea} el equipo (${delEquipo.join(', ')}) va con ${regla.etiqueta} ` +
+        `(${regla.prendas.join(' o ')} en \`objetos\`), nunca con ${otra.etiqueta}. ` +
+        'Es la personalidad de la línea (decisión del operador, 2026-09-29); el polo nunca va solo: sólo debajo de la chaqueta.'
+    )
+  }
+}
+
 export const construirPrompt = ficha => {
   const fmt = FORMATOS[ficha.formato]
 
@@ -1908,6 +1954,8 @@ export const construirPrompt = ficha => {
         'y declara `sinLechoPorque`.'
     )
   }
+
+  validarVestuarioDeLinea(ficha)
 
   if (ficha.toma) {
     for (const [reserva, regla] of Object.entries(INCOMPATIBLES)) {

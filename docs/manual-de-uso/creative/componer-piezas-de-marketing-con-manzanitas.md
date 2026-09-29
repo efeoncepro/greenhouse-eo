@@ -1,9 +1,9 @@
 # Componer piezas de Marketing con Manzanitas — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-28 por Claude
-> **Ultima actualizacion:** 2026-09-29 por Claude (TASK-1939) (1.3: las diez decisiones resueltas; el texto de cierre que cambia con el contexto y su extensión normalizada; las personas del equipo en las fotos, con su roster y su vestuario; los íconos `republicar` y `enviar`; AXIS `v0.3.29`. 1.2: componer con el comando `pnpm manzanitas:compose`, decisiones del operador del 2026-09-29 y regla del eslogan de los cierres)
+> **Ultima actualizacion:** 2026-09-29 por Claude (TASK-1939) (1.4: el vestuario del equipo lo decide la línea de la pieza; 1.3: las diez decisiones resueltas; el texto de cierre que cambia con el contexto y su extensión normalizada; las personas del equipo en las fotos, con su roster y su vestuario; los íconos `republicar` y `enviar`; AXIS `v0.3.29`. 1.2: componer con el comando `pnpm manzanitas:compose`, decisiones del operador del 2026-09-29 y regla del eslogan de los cierres)
 > **Modulo:** Creative · Marketing con Manzanitas (registro complementario de «La órbita»)
 > **Ruta en portal:** no aplica — las piezas se componen en el taller local con `pnpm manzanitas:compose` (catálogo `manzanitas` del Artifact Composer, TASK-1939) o en el canvas de la línea con los componentes del DS «Efeonce — La órbita»; la validación y los gráficos desde datos están en AXIS (`pnpm manzanitas:resolve`, `axis-graphic-line/charts`); la ruta productiva (API, worker y MCP) llega con TASK-1921
 > **Documentacion tecnica:** [ADR del registro](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) · [Norma del registro](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
@@ -208,8 +208,11 @@ Greenhouse (AXIS no nombra a nadie).
 
 1. **Elige a la persona en el roster.** Si no está ahí, no sale. María Fernanda ya no está en el equipo actual: su foto
    no se usa.
-2. **Vístela como dice su fila:** el equipo con **hoodie** Efeonce, Julio con **polo** y Valentina Hoyos con **su propia
-   ropa**, sin logo. Declara el vestuario en la escena.
+2. **Vístela según la línea de la pieza**, no según la persona: **hoodie** Efeonce en Servicios creativos (`brand`);
+   **bomber o softshell** del uniforme corporativo en las líneas de negocio (Growth, Engine, Voice, Revenue), con el polo
+   debajo si quieres, nunca el polo solo. Vale para todo el equipo, Julio y Valentina incluidos. En la ficha, declara
+   `"linea"` y la prenda en `objetos` (`hoodie-efeonce`, `chaqueta-bomber-efeonce` o `chaqueta-softshell-efeonce`), y
+   descríbela en la escena: si no calzan con la línea, `pnpm foto:prompt` se detiene y te dice cuál corresponde.
 3. **Declara su identidad en la ficha** (`"identidad": ["<clave>"]`) y genera con los comandos de la foto: la identidad
    se regenera con sus referencias, nunca se pega una cara.
 4. **Revisa la identidad** en una hoja de contacto, al lado de su foto de referencia.
@@ -282,8 +285,8 @@ aplique.
 - [ ] **Contraportada:** una sola conversión y nada que simule un botón.
 - [ ] **Texto del cierre:** propio de esta pieza, no copiado de otra; pregunta de hasta 44 caracteres, respuesta de
   hasta 10 y bajada de hasta 56.
-- [ ] **Personas del equipo:** si aparecen, están en el roster, con la ropa de su fila, y su identidad está aprobada por
-  el operador.
+- [ ] **Personas del equipo:** si aparecen, están en el roster, con la prenda de la línea de la pieza, y su identidad
+  está aprobada por el operador.
 - [ ] **Nada de Glitch:** ni la manzana llena, ni el verde, ni los bytes, ni Guttery, ni la cabecera «EDICIÓN #N».
 - [ ] **En el teléfono:** mira cada lámina a 390 px de ancho. Como referencia, en la contraportada del canvas v39 la
   respuesta queda en 69 px, la bajada en 11 px, el logo en 144 px y el eslogan en 9 px.
@@ -343,8 +346,9 @@ Componer no es publicar: publicar requiere la autorización del operador, y este
 - No simules botones ni pongas íconos sociales en la contraportada, ni pidas más de una conversión.
 - No agregues un lecho a una Escena: sale de la foto.
 - No recortes la manzana dejando sólo la hoja y el tallo.
-- No uses a una persona que no esté en el roster del equipo actual ni le pongas otra ropa que la de su fila; a alguien
-  nuevo en el equipo, primero su ronda de identidad aprobada.
+- No uses a una persona que no esté en el roster del equipo actual ni la vistas con otra prenda que la de la línea
+  (hoodie en una línea de negocio, chaqueta corporativa en Servicios creativos, o el polo solo); a alguien nuevo en el
+  equipo, primero su ronda de identidad aprobada.
 - No repitas un texto de cierre fijo de pieza en pieza ni lo alargues más allá de su extensión.
 - No decidas por tu cuenta una pregunta nueva de la línea: llévasela al operador.
 
@@ -367,7 +371,8 @@ Componer no es publicar: publicar requiere la autorización del operador, y este
 | Hay dos fotos seguidas o cuatro Pizarras seguidas | no se revisó el Recreo | reordena: intercala una Pizarra entre fotos y una foto cada tres Pizarras como máximo |
 | La firma de la Escena story cae en la franja de la interfaz | la story no respetó la zona segura | usa la zona segura de AXIS (el 87 %, decidida el 2026-09-29): la firma sube de y 1620 a y 1619 y termina dentro |
 | El cierre sale rechazado con `close-copy-too-long` | la pregunta pasa de 44 caracteres, la respuesta de 10 o la bajada de 56 | acorta esa parte; la extensión es fija aunque el texto cambie en cada pieza |
-| La persona del equipo no se parece a sí misma, o sale con otra ropa | la ficha no declaró su identidad o su vestuario, o se usó un retrato viejo | declara `identidad` y la prenda de su fila del roster; los retratos antiguos del repo pueden no ser la foto actual |
+| La persona del equipo no se parece a sí misma, o sale con otra ropa | la ficha no declaró su identidad, su `linea` o su vestuario, o se usó un retrato viejo | declara `identidad`, `linea` y la prenda de esa línea; los retratos antiguos del repo pueden no ser la foto actual |
+| `foto:prompt` se detiene con «En la línea … el equipo va con …» | la prenda de `objetos` no es la de la línea de la pieza | cambia la prenda (hoodie en `brand`; bomber o softshell en las demás) o corrige la `linea` si estaba mal |
 
 ## Decisiones del operador
 
@@ -458,8 +463,8 @@ superficie, el «Desliza», la cabecera y la firma; el catálogo elige la planti
   fotos son **sintéticas** (SVG en `examples/fotos/`), llevan `example: true` y nunca se publican.
 - **La foto real** se produce con el lenguaje fotográfico de Efeonce, en el registro cine
   ([Producir una foto de marca Efeonce](../marketing/fotografia-de-marca-efeonce.md)). Si muestra a personas del equipo,
-  sólo las del [roster](../../operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md), con la ropa de su fila y su
-  identidad aprobada por el operador antes de publicar (paso 7).
+  sólo las del [roster](../../operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md), con la prenda de la línea de la
+  pieza y su identidad aprobada por el operador antes de publicar (paso 7).
 - **Escribe el copy corto.** La respuesta va en una línea y, en varias láminas, la pregunta también (ver
   [Reglas que fallan cerradas](#reglas-que-fallan-cerradas)). En la contraportada y la story de cierre, el texto del
   cierre tiene su extensión fija: pregunta 44, respuesta 10 y bajada 56 caracteres (paso 8).
