@@ -1,5 +1,16 @@
 # TASK-1939 — Catálogo `manzanitas` del Artifact Composer: carruseles y piezas de Marketing con Manzanitas desde datos
 
+## Delta 2026-09-29 (c) — cierre
+
+- **Aprobación visual del operador:** «Los carruseles de ejemplo están aprobados sí» (2026-09-29). Era el último
+  criterio abierto.
+- **Gates de cierre:** `pnpm test` completo (1936 archivos / 16 917 pruebas en verde) y `pnpm build` de producción
+  (exit 0) corridos por la sesión de TASK-1942 sobre `814255694`, que contiene los tres commits de esta task
+  (`8ab1d458b`, `1050036e8`, `0adee8ab5`); entre ese SHA y `origin/develop` sólo cambió documentación. CI de
+  `814255694` 9/9 en verde. El operador dio por buenos esos gates («la sesión de Salesforce hizo el build»).
+- **Queda abierta, fuera del cierre:** la consecuencia del eslogan en los cierres (con el logo de 400 px sólo Voice
+  lleva la palabra en el acento; con ~460 px la llevarían todas). Es decisión del operador y va en Follow-ups.
+
 ## Delta 2026-09-29 (b) — decisiones cerradas, AXIS v0.3.29 y el equipo real
 
 - El operador cerró las tres decisiones abiertas y autorizó el patch de AXIS: **tag `v0.3.29`** (`axis-tokens` 0.3.29,
@@ -38,7 +49,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -51,7 +62,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Code complete y verificado en local (1050036e8, 71f16b235); pendiente la aprobación visual del operador de los carruseles de ejemplo`
+- Status real: `complete (2026-09-29): 18 plantillas para las 26 piezas aprobadas, pnpm manzanitas:compose y gate visual a 0 px; carruseles de ejemplo aprobados por el operador; pnpm test completo y pnpm build en verde sobre 814255694 (CI 9/9); la ruta productiva sigue en TASK-1921`
 - Rank: `TBD`
 - Domain: `content|creative|platform`
 - Blocked by: `none`
@@ -362,7 +373,7 @@ Reglas obligatorias:
 - [x] Cambiar la línea del tema cambia la manzana, los puntos, el arco, la cifra, el eslogan y «Desliza» en la salida. — *Compuesto en las seis líneas (engine, brand, growth, revenue-hubspot, revenue-salesforce, voice); un solo selector `.mcm-line-<línea>` y assets precoloreados por línea.*
 - [x] Los gráficos compuestos pasan `runManzanitasChartChecks`. — *El painter corre los chequeos y falla cerrado (`painters-and-errors.test.ts`).*
 - [x] `pnpm composer:visual-gate --catalog=manzanitas` sale en 0 con el baseline congelado y su sección sellada. — *18 frames, sección `2026-09-29 (r)`, selftest a 0 px. Se congeló antes de la aprobación del operador como guarda de regresión (desvío del orden del plan, ver Delta); si pide cambios, van en una sección nueva.*
-- [ ] El operador aprobó a ojo los carruseles de ejemplo.
+- [x] El operador aprobó a ojo los carruseles de ejemplo. — *«Los carruseles de ejemplo están aprobados sí» (2026-09-29).*
 - [x] `pnpm local:check` y las pruebas de los dominios nuevos en verde. — *`pnpm typecheck` rc=0, eslint limpio en los archivos nuevos, suite del Composer 37/564 verde, 43 pruebas nuevas; `local:check` completo corre en el pre-push.*
 
 ## Verification
@@ -375,16 +386,17 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [x] la skill y el manual dicen cómo componer con el comando
 
 ## Follow-ups
 
 - Familia `manzanitas` en la ruta productiva (`TASK-1921`).
-- Las tres pendientes abiertas del registro, cuando el operador las decida.
+- Decisión del operador: el tamaño del logo en los cierres (con 400 px sólo Voice lleva la palabra del eslogan en el
+  acento; con ~460 px la llevarían todas). Las tres pendientes del registro ya se decidieron (Delta b).

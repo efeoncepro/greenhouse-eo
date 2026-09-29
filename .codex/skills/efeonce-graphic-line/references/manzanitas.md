@@ -29,8 +29,8 @@
 > humano; si difieren, gana el token (§10.3).
 >
 > **Desde el 2026-09-29 Greenhouse fija esas versiones y compone MCM con el Artifact Composer:**
-> `pnpm manzanitas:compose -- --intent <pieza.json>` (§10.1; TASK-1939, `in-progress`: falta la aprobación visual del
-> operador de los carruseles de ejemplo). Es el taller local: no publica ni agenda. La ruta productiva (TASK-1921)
+> `pnpm manzanitas:compose -- --intent <pieza.json>` (§10.1; TASK-1939, `complete` el 2026-09-29: el operador
+> aprobó los carruseles de ejemplo). Es el taller local: no publica ni agenda. La ruta productiva (TASK-1921)
 > todavía no compone MCM.
 
 **Nombre canónico:** «registro Marketing con Manzanitas» (abreviado «registro MCM» o «registro Manzanitas»). MCM es la
@@ -464,11 +464,11 @@ contrato y los gráficos (§10.3). El canvas de la línea queda como la referenc
 
 ### 10.1 Componer con el Artifact Composer (TASK-1939)
 
-**Estado:** TASK-1939 `in-progress` (commit `1050036e8` en `develop`): código completo y verificado en local (la suite
+**Estado:** TASK-1939 `complete` (2026-09-29; código en `1050036e8`, en `develop`): código completo y verificado (la suite
 del Composer, 564 pruebas en 37 archivos, y el gate visual, en verde). Desde el commit `2c95e60b2` fija AXIS `v0.3.29`
 (`axis-tokens` 0.3.29, `axis-ui-contracts` 0.3.29, `axis-graphic-line` 0.11.0): tokens regenerados sin drift y gate
-visual a 0 px (manzanitas 18, glitch 32, graphic-line 73). Falta la **aprobación visual del operador** de los
-carruseles de ejemplo. Es el **taller local**: no publica ni agenda, y la pieza sale para revisión humana; publicar lo
+visual a 0 px (manzanitas 18, glitch 32, graphic-line 73). El operador **aprobó los carruseles de ejemplo** («Los
+carruseles de ejemplo están aprobados sí») y `pnpm test` completo y `pnpm build` pasaron sobre `814255694`. Es el **taller local**: no publica ni agenda, y la pieza sale para revisión humana; publicar lo
 decide el operador. La ruta productiva (API + `artifact-worker` + MCP) es TASK-1921, `in-progress` en otra sesión: la
 familia `manzanitas` se suma ahí después y **no la cites como disponible**. `pnpm brand:compose` y `pnpm glitch:compose`
 no componen MCM.
@@ -850,9 +850,9 @@ surge una pregunta nueva, llévasela al operador: no la decidas en una pieza.
 - **7.** Los Trazo **`republicar`** y **`enviar`** entran al catálogo (`axis-graphic-line` 0.11.0; 39 Trazo + 49
   Plastilina = 88; decisión `stroke-republicar-enviar`; [iconography.md](iconography.md) §13).
 
-**Por presentar o aprobar (no son decisiones del token):** la aprobación visual de los carruseles de ejemplo del
-Composer (TASK-1939), la consecuencia del eslogan en los cierres (con el logo de 400 px, sólo Voice lleva la palabra en
-el acento; §10.1). Las identidades del equipo quedaron aprobadas el 2026-09-29 (§4.2).
+**Por presentar o aprobar (no son decisiones del token):** la consecuencia del eslogan en los cierres (con el logo de 400 px, sólo Voice lleva la palabra en
+el acento; §10.1). Los carruseles de ejemplo del Composer y las identidades del equipo quedaron aprobados el
+2026-09-29 (TASK-1939 cerrada; §4.2).
 
 ## 14. Lecciones de esta sesión (no las repitas)
 

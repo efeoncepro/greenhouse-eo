@@ -92,7 +92,8 @@
   `manzanitasChartSvg` y sus chequeos; Lente y órbita del paso con `axis-graphic-line`.
 - Fallan cerradas (el motor mide el recorte): respuesta en una línea y sin pisar «Desliza»; pregunta en una línea donde
   hay contenido fijo bajo la voz. Eslogan de los cierres debajo del logo al 64 % de su ancho (regla del 2026-09-29).
-- Gate visual `--catalog=manzanitas`: 18 frames congelados. Aprobación visual del operador pendiente.
+- Gate visual `--catalog=manzanitas`: 18 frames congelados. Carruseles aprobados por el operador; TASK-1939 cerrada el
+  2026-09-29 con `pnpm test` completo y `pnpm build` en verde sobre `814255694`.
 
 ## 2026-09-28 — Marketing con Manzanitas publicado en AXIS (TASK-1936)
 

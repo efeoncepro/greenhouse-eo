@@ -135,9 +135,9 @@
   (acento naranja/frambuesa, «Empower your Brand», Plastilina, luz naranja en las fotos `MCB1c` y `MCB3`). Espera la
   revisión del operador; no es canon todavía.
 - **Manzanitas, registro (actualizado el 2026-09-29, tarde):** las diez pendientes quedaron decididas ese día (filas de
-  decisiones del 2026-09-29; `pendingDecisions: []`). Esperan al operador aprobaciones, no decisiones: la aprobación
-  visual de los carruseles de ejemplo del Composer (TASK-1939), la consecuencia del eslogan en los cierres (con el logo
-  de 400 px, sólo Voice lleva la palabra en el acento). Las identidades del equipo quedaron aprobadas el 2026-09-29
+  decisiones del 2026-09-29; `pendingDecisions: []`). Espera al operador una aprobación, no una decisión del token: la
+  consecuencia del eslogan en los cierres (con el logo de 400 px, sólo Voice lleva la palabra en el acento; con ~460 px
+  la llevarían todas). Los carruseles de ejemplo del Composer quedaron aprobados el 2026-09-29 y TASK-1939 cerrada. Las identidades del equipo quedaron aprobadas el 2026-09-29
   (ronda piloto en `ai-generations/2026-09-29_manzanitas-equipo/`; [manzanitas.md](manzanitas.md) §13).
 - **Deck compuesto (TASK-1927, 2026-09-27):** la aprobación visual ya está dada (fila del 2026-09-27 arriba). Sigue
   abierta la pregunta de la **sección partida**, anotada en el token: el indicador barre las secciones ya recorridas,
