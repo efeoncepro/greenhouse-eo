@@ -13,7 +13,6 @@ import path from 'node:path'
 import { createRequire } from 'node:module'
 
 import { efeonceGraphicLine as GL, manzanitasRegister as M } from '@efeoncepro/axis-tokens'
-import * as fontkit from 'fontkit'
 
 import { manzanitasCatalogDir } from '../../src/lib/artifact-composer/catalogs/manzanitas/brand'
 
@@ -152,6 +151,14 @@ export const buildManzanitasTokenProperties = (): [string, string][] => {
   ]
 }
 
+/** Lo único que se usa de fontkit (el paquete no publica tipos). */
+interface MeasuredFont {
+  unitsPerEm: number
+  layout: (text: string) => { glyphs: { advanceWidth: number }[] }
+}
+
+const fontkit = createRequire(path.join(process.cwd(), 'package.json'))('fontkit') as { openSync: (file: string) => MeasuredFont }
+
 /**
  * Ancho del eslogan «Empower your <Palabra>» en em, en sus pesos oficiales: «Empower » Poppins 800 itálica, «your »
  * Poppins 800 y la palabra de la línea Poppins 900 itálica (el espacio va con la palabra que lo precede, como en la
@@ -162,10 +169,11 @@ export const buildManzanitasTokenProperties = (): [string, string][] => {
  * (`manzanitasRegister.slogan.layout.sloganOfLogo`), debajo del logo y separado 1,35 veces su cuerpo.
  */
 export const measureSloganEm = (word: string, fontsDir = path.join(manzanitasCatalogDir, 'fonts')): number => {
-  const open = (file: string) => fontkit.openSync(path.join(fontsDir, file)) as fontkit.Font
-  const width = (font: fontkit.Font, text: string) => font.layout(text).glyphs.reduce((sum, g) => sum + g.advanceWidth, 0) / font.unitsPerEm
+  const open = (file: string) => fontkit.openSync(path.join(fontsDir, file))
+  const width = (font: MeasuredFont, text: string) => font.layout(text).glyphs.reduce((sum, g) => sum + g.advanceWidth, 0) / font.unitsPerEm
+  const [lead, ...your] = M.slogan.inherits.lead.split(' ')
 
-  const em = width(open('poppins-800-italic.ttf'), `${M.slogan.inherits.lead.split(' ')[0]} `) + width(open('poppins-800.ttf'), `${M.slogan.inherits.lead.split(' ').slice(1).join(' ')} `) + width(open('poppins-900-italic.ttf'), word)
+  const em = width(open('poppins-800-italic.ttf'), `${lead} `) + width(open('poppins-800.ttf'), `${your.join(' ')} `) + width(open('poppins-900-italic.ttf'), word)
 
   return Math.round(em * 1000) / 1000
 }
