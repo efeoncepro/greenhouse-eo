@@ -30,7 +30,7 @@
 ## Summary
 
 El informe PDF del Grader de visibilidad en IA pasa al lenguaje visual de Efeonce Insights y de «La órbita», en dos
-versiones: para no clientes (diagnóstico, cierra con «Agenda 30 minutos», que lleva a la agenda) y para clientes (parte del servicio: sin
+versiones: para no clientes (diagnóstico, cierra con «Agenda una reunión», que lleva a la agenda) y para clientes (parte del servicio: sin
 oferta, cierra con su equipo y el próximo informe). Portada con la órbita que mide, veredicto como hallazgo y escala;
 interiores en orden «respuesta primero» (qué hacer, por qué, dónde, mercado y fuentes). Sin lockup de Insights y sin
 cambiar el motor de render (react-pdf).
@@ -265,7 +265,7 @@ Reglas obligatorias:
 
 ### Slice 1 — Dirección aprobada y sellada
 
-- Resolver con el operador lo que queda abierto (palabra del eslogan, URL de la agenda).
+- Resolver con el operador lo que queda abierto (palabra del eslogan).
 - Corregir `report-artifact/fixtures.ts` para que la gravedad coincida con los umbrales de `recommendations.ts`.
 - Exportar las ocho hojas aprobadas (dos portadas, cuatro interiores, dos contraportadas) del canvas a `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita/`
   y escribir la dirección `TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`; actualizar el wireframe.
@@ -299,7 +299,7 @@ Reglas obligatorias:
   calidad), 04 dónde (niveles con su eje y su puntaje calculado desde sus dimensiones; motores), 05 mercado (participación
   de voz en %, fuentes que sostienen la respuesta, procedencia).
 - Nombres de las dimensiones en español en `src/lib/copy/growth.ts`.
-- Dos contraportadas con la voz de la línea: prospecto con «Agenda 30 minutos», correo, burbuja URL y redes de
+- Dos contraportadas con la voz de la línea: prospecto con «Agenda una reunión» (a `/contacto/`), burbuja URL y redes de
   `EFEONCE_SOCIAL_LINKS`; cliente con responsable de la cuenta y próximo informe, sin oferta. Bloque de marca al 64 %.
 
 ### Slice 5 — Evidencia y documentación
@@ -395,7 +395,8 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [ ] Cada motor evaluado (ChatGPT, Claude, Gemini, Perplexity, Google AI Overview) aparece con su logo oficial en la portada y en «Canales de respuesta»; Google AI Overview usa la lupa de Google AI Mode de AXIS, nunca el logo de Gemini.
 - [ ] Los íconos son del Trazo de AXIS (`resolveIcon`), en reposo, y cada grupo pasa `auditIconGroup`; ninguno dibujado a mano.
 - [ ] El copy nuevo vive en `src/lib/copy/growth.ts`, incluidos los nombres de las dimensiones en español.
-- [ ] Existen dos versiones del documento por audiencia, derivada del cliente que el Grader ya identifica; la de cliente no tiene CTA comercial, redes ni oferta del Grader, y la de no cliente cierra con «Agenda 30 minutos», que enlaza a la agenda (sin correo comercial).
+- [ ] Existen dos versiones del documento por audiencia, derivada del cliente que el Grader ya identifica; la de cliente no tiene CTA comercial, redes ni oferta del Grader, y la de no cliente cierra con «Agenda una reunión», que enlaza a `efeoncepro.com/contacto/` con UTM (sin correo comercial).
+- [ ] La contraportada de cliente muestra al responsable de la cuenta desde un único valor configurable (hoy Julio Reyes, Managing Director & GTM).
 - [ ] La tipografía es la canónica de «La órbita» (Bricolage 760 + Poppins), registrada en `register-fonts.ts` con instancias estáticas por peso.
 - [ ] La gravedad de puntaje, niveles, dimensiones y motores sale de los umbrales de `recommendations.ts` (< 40 crítico, < 70 atención) y la portada muestra esa escala.
 - [ ] El puntaje de cada nivel es el promedio ponderado de sus dimensiones medidas; un nivel sin dimensiones medidas muestra «Sin dato» y el de operabilidad sin probes «En cobertura».
@@ -430,6 +431,9 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 
 - Paridad de `report-artifact/web` y `report-artifact/print` con el nuevo diseño (continuidad cross-surface de EPIC-020),
   incluida la corrección del logo de Google AI Overview en el web (hoy usa el de Gemini).
+- Cuando la página de agenda renovada esté publicada, cambiar el destino del botón de `/contacto/` a esa página
+  (idealmente con un enlace que abra el agendamiento directo).
+- Responsable de cuenta por cliente: reemplazar el valor único por la asignación real cuando exista.
 - Motor: evaluar pasar el informe del Grader a un catálogo del Artifact Composer cuando el render admita más de una
   salida por ciclo o el correo pueda enviar el enlace primero y el PDF después (task `backend-data` aparte).
 
@@ -441,10 +445,14 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - Resuelta (operador, 2026-09-29): **el Grader ya identifica al cliente cuando el informe viene de uno**, con su país y
   su logo: el perfil guarda organización, país y mercado (`src/lib/growth/ai-visibility/provision-profile.ts`) y el
   store resuelve el logo de la organización (`resolveOrganizationLogoUrl`, `src/lib/growth/ai-visibility/store.ts`).
-  La audiencia se deriva de ese vínculo; no hace falta una task de backend. Queda por verificar en Discovery de dónde
-  sale el responsable de la cuenta para la contraportada de cliente.
-- Resuelta (operador, 2026-09-29): «Agenda 30 minutos» **lleva a la agenda, no al correo**; la contraportada de no
-  cliente no muestra el correo comercial. Falta la URL de la agenda.
+  La audiencia se deriva de ese vínculo; no hace falta una task de backend.
+- Resuelta (operador, 2026-09-29): **responsable de la cuenta, de momento Julio Reyes, Managing Director & GTM
+  (`jreyes@efeoncepro.com`)** para todos los clientes, hasta que el operador asigne responsables por cuenta. El valor
+  se declara en un solo lugar (configuración o copy), nunca repetido en el renderer, para reemplazarlo sin tocar diseño.
+- Resuelta (operador, 2026-09-29): el botón **lleva a la agenda, no al correo**. Mientras la página de agenda se
+  renueva, el destino es `https://efeoncepro.com/contacto/`, que abre el pop up de agendamiento (HubSpot Meetings con
+  el estilo propio de Efeonce), con UTM `utm_source=ai-visibility-grader&utm_medium=pdf&utm_campaign=grader-report&utm_content=contraportada`.
+  El texto es «Agenda una reunión» (el brief de contacto no fija duración; «30 minutos» se retiró).
 - Decidida en la task: el ejemplo del informe (`report-artifact/fixtures.ts`) marca AI Visibility 72 como «atención»,
   pero la regla real (≥ 70) lo hace óptimo; se corrige el ejemplo para que coincida con las reglas del modelo.
 - ¿Qué palabra del eslogan corresponde al Grader («Growth» en la propuesta)?

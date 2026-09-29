@@ -32,7 +32,7 @@ nunca se le «ofrece» el Grader ni se le vende**. Las cuatro páginas interiore
 | Rótulo de portada | «Diagnóstico de visibilidad en IA» | «Informe de visibilidad en IA» |
 | Identidad | nombre de la marca a 64 px | «Preparado para» + logo del cliente + nombre |
 | Bajo la órbita | «Primera medición: tu punto de partida» | «▲ N puntos desde el [fecha anterior]» (`trend.overall`) |
-| Contraportada | «¿Conversamos? / Cuando quieras» + «Agenda 30 minutos →» (enlace a la agenda, sin correo) + burbuja URL y redes | «¿Lo revisamos juntos? / Cuando quieras» + responsable de la cuenta + próximo informe; sin CTA comercial ni redes |
+| Contraportada | «¿Conversamos? / Cuando quieras» + «Agenda una reunión →» (enlace a `efeoncepro.com/contacto/`, que abre el agendamiento; sin correo) + burbuja URL y redes | «¿Lo revisamos juntos? / Cuando quieras» + responsable de la cuenta (hoy Julio Reyes, Managing Director & GTM, `jreyes@efeoncepro.com`) + próximo informe; sin CTA comercial ni redes |
 
 **Qué decide la variante:** el Grader ya identifica al cliente cuando el informe viene de uno, con su país y su logo
 (perfil con organización, país y mercado en `provision-profile.ts`; logo por `resolveOrganizationLogoUrl` en `store.ts`;
@@ -99,8 +99,9 @@ portada, 02, 03, 04, 05 y contraportada. Orden «respuesta primero»: qué hacer
 - **Voz pregunta–respuesta** de la línea (`criteria.md` §4): pregunta a 24 px en Poppins Light con el anillo pequeño
   delante en el acento; respuesta «Cuando quieras» a 78 px en Bricolage 760 (3,25×) que cierra con la esfera del
   acento en lugar del punto; evidencia debajo en Poppins con una frase en negrita.
-- Acción según la variante (tabla de audiencias). En la de no cliente el botón enlaza a la agenda (URL por definir) y
-  debajo sólo «Elige el horario en la agenda de Efeonce»; nunca el correo comercial.
+- Acción según la variante (tabla de audiencias). En la de no cliente el botón «Agenda una reunión» enlaza a
+  `https://efeoncepro.com/contacto/` con UTM (el pop up de agendamiento; la página de agenda se está renovando) y debajo
+  «Elige el horario en efeoncepro.com/contacto»; nunca el correo comercial.
 - **Bloque de marca** a 112 px de la acción: logo de Efeonce de 240 px y, debajo, el eslogan al **64 % del ancho del
   logo** (13,3 px; «Growth» en blanco porque mide menos de 24 px), separado 1,35 veces su cuerpo. La razón social al pie.
 
@@ -157,7 +158,7 @@ Nuevo, a agregar ahí y validar con `greenhouse-ux-writing`:
 - **Veredicto y titular de la brecha como hallazgo:** se eligen por reglas sobre los datos (p. ej. nivel 01 óptimo y
   citas críticas → «Te encuentran, pero casi no te citan»), con una frase por combinación aprobada; si ninguna regla
   aplica, se usa `headline.frame`. Nunca los escribe un modelo de lenguaje sin validación.
-- Contraportadas: «¿Conversamos? / Cuando quieras», «Agenda 30 minutos», «o escríbenos a …» (prospecto); «¿Lo
+- Contraportadas: «¿Conversamos? / Cuando quieras», «Agenda una reunión», «Elige el horario en efeoncepro.com/contacto» (prospecto); «¿Lo
   revisamos juntos? / Cuando quieras», «Tu equipo», «Próximo informe», «Medimos lo mismo, mes a mes» (cliente).
 
 ## State Copy
@@ -223,5 +224,7 @@ la etiqueta); lectura verificada en escala de grises; enlaces con destino real.
 - **Logos de los motores y la lupa de Google AI Mode** (operador: «importantísimo»). El informe web hoy asigna a Google
   AI Overview el logo de Gemini: se corrige en el follow-up de paridad.
 - **Resueltas (2026-09-29):** tipografía canónica de «La órbita»; la audiencia sale del cliente que el Grader ya
-  identifica; «Agenda 30 minutos» lleva a la agenda, sin correo; el ejemplo del informe se corrige a los umbrales reales.
-- **Abiertas:** la palabra del eslogan para el Grader; la URL de la agenda; la fuente del responsable de la cuenta.
+  identifica; «Agenda una reunión» lleva a la agenda, sin correo; el ejemplo del informe se corrige a los umbrales reales.
+- **Resueltas también:** responsable de la cuenta Julio Reyes (Managing Director & GTM) hasta asignar por cliente; el
+  botón lleva a `/contacto/` mientras se renueva la agenda.
+- **Abierta:** la palabra del eslogan para el Grader.
