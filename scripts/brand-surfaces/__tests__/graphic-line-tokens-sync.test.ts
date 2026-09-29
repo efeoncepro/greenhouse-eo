@@ -31,10 +31,19 @@ describe('tokens de La órbita', () => {
       'assets'
     )
 
+    // Recorre subdirectorios (p. ej. `partners/`, los assets de terceros de AXIS_PARTNER_ASSETS): también se comparan
+    // byte a byte en vez de saltarse, y un directorio nunca se lee como archivo.
+    const files = (root: string, rel = ''): string[] =>
+      fs.readdirSync(path.join(root, rel), { withFileTypes: true }).flatMap(entry => {
+        const child = path.join(rel, entry.name)
+
+        return entry.isDirectory() ? files(root, child) : [child]
+      })
+
     for (const catalog of ['graphic-line-deck', 'graphic-line-stills', 'graphic-line-overlays']) {
       const dir = path.join(CATALOGS, catalog, 'assets')
 
-      for (const file of fs.readdirSync(dir).filter(name => fs.existsSync(path.join(brandAssets, name)))) {
+      for (const file of files(dir).filter(name => fs.existsSync(path.join(brandAssets, name)))) {
         expect(fs.readFileSync(path.join(dir, file)).equals(fs.readFileSync(path.join(brandAssets, file))), `${catalog}/${file}`).toBe(true)
       }
     }
