@@ -283,7 +283,7 @@
           "name": {
             "type": "string",
             "required": true,
-            "maxCharacters": 24
+            "maxCharacters": 28
           },
           "desc": {
             "type": "string",

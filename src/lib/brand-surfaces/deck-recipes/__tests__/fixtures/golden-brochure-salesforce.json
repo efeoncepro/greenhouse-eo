@@ -5,7 +5,22 @@
     {
       "recipeId": "cover-brochure-line-revenue",
       "plateRef": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF2-nexa-portal.png",
-      "purpose": "01 · ¿Tu Salesforce ya actúa? Por ti. (SF0; badge sólo con readback)"
+      "purpose": "01 · ¿Tu Salesforce ya actúa? Por ti. (SF0; insignia «Salesforce Partner» por defecto, autorizada por Salesforce)",
+      "slots": {
+        "eyebrow": "Brochure · Servicios Salesforce",
+        "question": "¿Tu Salesforce ya actúa?",
+        "answer": "Por ti",
+        "evidence": "**Seis** servicios:\nVentas · Servicio · Marketing Cloud\nData 360 · Agentforce · Integración",
+        "line": "revenue-salesforce",
+        "photo": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF2-nexa-portal.png",
+        "partnerMark": {
+          "kind": "partner-badge",
+          "mode": "badge",
+          "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
+          "alt": "Salesforce Partner",
+          "readbackRef": "salesforce-partner-authorization-2026-09-29"
+        }
+      }
     },
     {
       "recipeId": "proposal-cinematic-revops",
@@ -78,7 +93,7 @@
     },
     {
       "recipeId": "close-brochure-orbit",
-      "purpose": "19 · ¿Conversamos? Cuando quieras. + «Empower your Revenue» (contraportada de brochure en la línea revenue-salesforce; lámina por componer, con visto bueno del operador)"
+      "purpose": "19 · ¿Conversamos? Cuando quieras. + «Empower your Revenue» (SF20: contraportada de brochure en la línea revenue-salesforce, aprobada por el operador el 2026-09-29)"
     }
   ]
 }

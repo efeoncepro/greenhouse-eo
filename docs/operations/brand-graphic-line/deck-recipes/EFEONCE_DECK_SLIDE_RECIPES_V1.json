@@ -1320,9 +1320,10 @@
           "example": {
             "kind": "partner-badge",
             "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
-            "alt": "Salesforce Partner"
+            "alt": "Salesforce Partner",
+            "readbackRef": "salesforce-partner-authorization-2026-09-29"
           },
-          "notes": "OPCIONAL y condicionado (delta 2026-09-29, deck Salesforce): la insignia de partner de la plataforma de la línea al pie de la columna de voz (84 px de alto en top 1080 − 160, x = 140). En la aprobada, el badge «Salesforce Partner» horizontal en vector (ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg: el .ai oficial del kit de partner convertido con pdftocairo, sólo con el viewBox recortado; fuentes en logos/FUENTES.txt). Es un CLAIM bloqueante: sólo con readback primario vigente en Partner Community (owner Julio + RevOps & CRM; registro docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md y §Claims de EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md); la aceptación de 2025 como Provisional Consulting Partner no prueba el estado actual. Nunca el badge de Cloud Reseller (Consulting Partner ≠ Reseller) ni los Navigator. Nunca elemento fijo. Slot NUEVO en una receta con plantilla: la plantilla necesita un test que componga las recetas existentes SIN el slot (lessons 2026-09-28). Sin readback, el pie lleva el RESPALDO en vez del badge: kind «operates-on» = «Operamos sobre» (500 16px Pop, mayúsculas, tracking .2em, color suave, top 1080 − 168) + el logo corporativo de la plataforma a 64 px de alto (public/images/logos/partners/salesforce.com_logo.svg, sujeto a la autorización escrita de Salesforce), que no afirma nada. Sin slot, la portada queda como las demás portadas de línea (sin marca de terceros)."
+          "notes": "OPCIONAL y condicionado (delta 2026-09-29, deck Salesforce): la insignia de partner de la plataforma de la línea al pie de la columna de voz (84 px de alto en top 1080 − 160, x = 140). En la aprobada, el badge «Salesforce Partner» horizontal en vector (ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg: el .ai oficial del kit de partner convertido con pdftocairo, sólo con el viewBox recortado; fuentes en logos/FUENTES.txt). Es un CLAIM: va sólo con la referencia de su autorización o de su readback vigente (readbackRef; registro docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md y §Claims de EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md). Delta 2026-09-29 (b): la insignia «Salesforce Partner» está autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear) y el deck Salesforce la lleva POR DEFECTO en esta portada. La autorización no se extiende a otro partner: su insignia sigue fallando cerrado sin su propia autorización o readback. Nunca el badge de Cloud Reseller (Consulting Partner ≠ Reseller) ni los Navigator. Nunca elemento fijo. Slot NUEVO en una receta con plantilla: la plantilla necesita un test que componga las recetas existentes SIN el slot (lessons 2026-09-28). Respaldo, cuando el deck no deba llevar la insignia: kind «operates-on» = «Operamos sobre» (500 16px Pop, mayúsculas, tracking .2em, color suave, top 1080 − 168) + el logo corporativo de la plataforma a 64 px de alto (public/images/logos/partners/salesforce.com_logo.svg, sujeto a la autorización escrita de Salesforce), que no afirma nada. Sin slot, la portada queda como las demás portadas de línea (sin marca de terceros)."
         }
       ],
       "fixed": [
@@ -1370,7 +1371,7 @@
         "Un solo acento por lámina (five-accents-only-in-lines): no se mezclan colores de otras líneas en la voz.",
         "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %."
       ],
-      "notes": "Título previo: «✅ APROBADA · FOTO · Brochure RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.»». Variante HubSpot (acento magenta). La variante Salesforce (revenue-salesforce) está aprobada desde el 2026-09-29: portada del deck Salesforce «¿Tu Salesforce ya actúa? Por ti.» con el plate NXSF2 (ver approvedUses). Las partículas del moño entran al 45 % izquierdo por debajo de la evidencia (x < 700, y > 820): la columna aprobada las libra, pero la evidencia de cuatro líneas es el máximo. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927). Delta 2026-09-29 (deck Salesforce): (1) la línea revenue-salesforce pasa a aprobada; (2) slot OPCIONAL nuevo partnerMark (badge de partner condicionado a readback, respaldo «Operamos sobre» + logo corporativo). No cambian contentType, layout ni los slots existentes; el composer debe implementar partnerMark con un test que componga las portadas de línea SIN él.",
+      "notes": "Título previo: «✅ APROBADA · FOTO · Brochure RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.»». Variante HubSpot (acento magenta). La variante Salesforce (revenue-salesforce) está aprobada desde el 2026-09-29: portada del deck Salesforce «¿Tu Salesforce ya actúa? Por ti.» con el plate NXSF2 (ver approvedUses). Las partículas del moño entran al 45 % izquierdo por debajo de la evidencia (x < 700, y > 820): la columna aprobada las libra, pero la evidencia de cuatro líneas es el máximo. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927). Delta 2026-09-29 (deck Salesforce): (1) la línea revenue-salesforce pasa a aprobada; (2) slot OPCIONAL nuevo partnerMark (badge de partner condicionado a readback, respaldo «Operamos sobre» + logo corporativo). No cambian contentType, layout ni los slots existentes; el composer debe implementar partnerMark con un test que componga las portadas de línea SIN él. Delta 2026-09-29 (b): la insignia «Salesforce Partner» está autorizada por Salesforce (declarado por el operador, referencia `salesforce-partner-authorization-2026-09-29`): el deck Salesforce la lleva por defecto (partnerMark mode badge) y «Operamos sobre» queda como respaldo.",
       "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPortadaLineaRevenue.jpg",
       "approvedUses": [
         {
@@ -1395,7 +1396,8 @@
             "partnerMark": {
               "kind": "partner-badge",
               "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
-              "alt": "Salesforce Partner"
+              "alt": "Salesforce Partner",
+              "readbackRef": "salesforce-partner-authorization-2026-09-29"
             },
             "column.topPx": 190
           },
@@ -1407,7 +1409,7 @@
             "alt": "Nexa, con la chaqueta navy de Efeonce, mira a cámara; detrás de ella se alza un gran anillo vertical de luz celeste del que salen cientos de hilos de luz que llegan a las yemas de sus dedos",
             "notes": "Nexa (identidad A) con la softshell del kit, registro cine (85 mm, reserva del 45 % izquierdo); el portal de luz es la órbita. Revisada al 100 % contra el ancla y emblema correcto (nave, órbita y tres ventanas). Pipeline: pnpm foto:prompt <ficha> → pnpm foto:generar <ficha> --quality high (gpt-image-2.5-sunburst, edición con 4 referencias: tres anclas de Nexa de ai-generations/_identidad-nexa/1-anclas/ y la vista puesta de la softshell del kit) → pnpm foto:validar → pnpm foto:emblema al 100 %. El plate es ruta local (ai-generations/**, fuera de git): el Job artifact-worker no lo lee hasta el banco de plates (TASK-1931)."
           },
-          "fit": "Cabe en los slots de la receta: la portada compone con layout «line» y column.topPx 190. El badge es el slot opcional nuevo partnerMark. La columna en 190 queda 10 px sobre la reserva general del logo (200–300); desde AXIS v0.3.32 la línea revenue-salesforce tiene reserva propia (190–300) y su valor por referencia es 190, sin cambiar la reserva ni el render de ninguna otra portada. Greenhouse la compone al fijar esa versión (TASK-1942, Slice 2).",
+          "fit": "Cabe en los slots de la receta: la portada compone con layout «line» y column.topPx 190. El badge es el slot opcional nuevo partnerMark. La columna en 190 queda 10 px sobre la reserva general del logo (200–300); desde AXIS v0.3.32 la línea revenue-salesforce tiene reserva propia (190–300) y su valor por referencia es 190, sin cambiar la reserva ni el render de ninguna otra portada. Greenhouse la compone al fijar esa versión (TASK-1942, Slice 2). Desde el 2026-09-29 (b) la insignia va por defecto: el intent de ejemplo src/lib/brand-surfaces/examples/deck-cover-brochure-line-revenue-salesforce-intent.json la pide con readbackRef `salesforce-partner-authorization-2026-09-29`; el respaldo está en deck-cover-brochure-line-revenue-salesforce-operates-on-intent.json.",
           "backup": {
             "slide": "SF0-portada-sin-badge",
             "board": "DeckSalesforcePortadaSinBadge",
@@ -1418,11 +1420,11 @@
               "asset": "public/images/logos/partners/salesforce.com_logo.svg",
               "label": "Operamos sobre"
             },
-            "when": "mientras no haya readback vigente del badge en Partner Community"
+            "when": "respaldo: cuando el deck no deba llevar la insignia (por ejemplo, si la autorización se revoca o no aplica al documento)"
           },
           "conditions": [
-            "Badge bloqueante para enviar: ningún deck con el badge sale a un cliente sin readback.",
-            "Logo, íconos y badge de Salesforce sujetos a la autorización escrita de Salesforce, pendiente de archivar."
+            "Insignia «Salesforce Partner» autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear).",
+            "Logo, íconos e insignia de Salesforce autorizados por Salesforce (misma declaración del operador)."
           ]
         }
       ]
@@ -2368,7 +2370,7 @@
           "type": "enum",
           "required": true,
           "example": "Growth",
-          "notes": "Palabra final del eslogan en el acento: Growth (marca madre) por defecto. Brand · Engine · Voice · Revenue existen en el manual §7, pero la lámina aprobada sólo trae Growth y la luz del plate es teal: no cambiarla sin el operador. Delta 2026-09-29 (decisión del operador al canonizar el deck Salesforce): el brochure Salesforce cierra con esta receta en la línea revenue-salesforce, «¿Conversamos? Cuando quieras.» y el eslogan «Empower your Revenue» como firma, con el acento de la línea (efeonceGraphicLine.lines[\"revenue-salesforce\"]). Esa contraportada todavía NO existe como lámina: el composer la compondrá desde esta receta y necesita el visto bueno del operador antes de usarse. Brand, Engine y Voice siguen sin contraportada aprobada."
+          "notes": "Palabra final del eslogan en el acento: Growth (marca madre) por defecto. Brand · Engine · Voice · Revenue existen en el manual §7, pero la lámina aprobada sólo trae Growth y la luz del plate es teal: no cambiarla sin el operador. Delta 2026-09-29 (decisión del operador al canonizar el deck Salesforce): el brochure Salesforce cierra con esta receta en la línea revenue-salesforce, «¿Conversamos? Cuando quieras.» y el eslogan «Empower your Revenue» como firma, con el acento de la línea (efeonceGraphicLine.lines[\"revenue-salesforce\"]). Esa contraportada es SF20: la compuso el composer desde esta receta y el operador la aprobó el 2026-09-29 (approvedUses). Brand, Engine y Voice siguen sin contraportada aprobada."
         }
       ],
       "fixed": [
@@ -2412,8 +2414,39 @@
         "La órbita gigante sin foto es recurso de la portada de propuesta; en el brochure va SOLO como contraportada (giant-orbit-cover-is-proposal).",
         "Una sola órbita por lámina: la que trae la foto (luz de la escena) o la gigante sin foto; no se suma otra órbita ni indicador de deck."
       ],
-      "notes": "Título previo: «✅ APROBADA · SIN FOTO · la órbita gigante (pareja de las portadas con foto)». Es hoy la ÚNICA pareja válida de cualquier portada de brochure. Respuesta compuesta a 118 px en la lámina (2,95× la pregunta); el token pide 124. El render dibuja la órbita con giantOrbitBg(1640, 540, 820, 212 °) en brochure.mjs; el token la redondea a 1638 · 540 · 818. §6 fila 17 (pendiente): el manual dice que el cierre lleva el logo dentro de la órbita; esta receta no lo hace. Delta 2026-09-29: el operador decidió que el deck Salesforce, como brochure, cierra con esta receta en la línea revenue-salesforce («¿Conversamos? Cuando quieras.» + eslogan «Empower your Revenue» como firma, logo a 500 px como las contraportadas del 2026-09-27). La lámina no existe todavía: la compone el Artifact Composer desde la receta (TASK-1942, Slice 2) y queda pendiente del visto bueno del operador. La regla del eslogan en bloque (regla dura 8) para las contraportadas de brochure sigue abierta en TASK-1933.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckBrochureContraOrbitaGigante.jpg"
+      "notes": "Título previo: «✅ APROBADA · SIN FOTO · la órbita gigante (pareja de las portadas con foto)». Es hoy la ÚNICA pareja válida de cualquier portada de brochure. Respuesta compuesta a 118 px en la lámina (2,95× la pregunta); el token pide 124. El render dibuja la órbita con giantOrbitBg(1640, 540, 820, 212 °) en brochure.mjs; el token la redondea a 1638 · 540 · 818. §6 fila 17 (pendiente): el manual dice que el cierre lleva el logo dentro de la órbita; esta receta no lo hace. Delta 2026-09-29: el operador decidió que el deck Salesforce, como brochure, cierra con esta receta en la línea revenue-salesforce («¿Conversamos? Cuando quieras.» + eslogan «Empower your Revenue» como firma, logo a 500 px como las contraportadas del 2026-09-27). La lámina es SF20, compuesta por el Artifact Composer desde la receta (TASK-1942, Slice 2) y aprobada por el operador el 2026-09-29 (approvedUses): es el cierre del deck Salesforce como brochure. La regla del eslogan en bloque (regla dura 8) para las contraportadas de brochure sigue abierta en TASK-1933.",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckBrochureContraOrbitaGigante.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-29",
+          "approvedBy": "operador, 2026-09-29 («Todo está aprobado. Necesito que tengan el Badge de Salesforce Partner ya está autorizado por Salesforce»)",
+          "deck": "Salesforce (línea revenue-salesforce)",
+          "line": "revenue-salesforce",
+          "slide": "SF20-contraportada-brochure",
+          "board": "DeckSalesforceContraportadaBrochure",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF20-contraportada-brochure.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent src/lib/brand-surfaces/examples/deck-close-brochure-orbit-revenue-salesforce-intent.json",
+            "intent": "src/lib/brand-surfaces/examples/deck-close-brochure-orbit-revenue-salesforce-intent.json"
+          },
+          "content": {
+            "question": "¿Conversamos?",
+            "answer": "Cuando quieras",
+            "sloganLineWord": "Revenue",
+            "line": "revenue-salesforce"
+          },
+          "photo": {
+            "register": "none",
+            "plate": null,
+            "notes": "Sin foto: la órbita gigante en el acento de la línea revenue-salesforce (alterna con la portada con foto SF0)."
+          },
+          "fit": "Cabe en los slots de la receta sin cambios: layout «orbit», línea revenue-salesforce, logo a 500 px y eslogan «Empower your Revenue» como firma. Compuesta desde el intent de ejemplo; el PNG del composer es idéntico a la lámina aprobada (0 px de diferencia, verificado el 2026-09-29). Es el cierre del deck Salesforce como BROCHURE (plan golden-brochure-salesforce.json); como propuesta cierra SF19 (close-proposal-horizon).",
+          "conditions": [
+            "Sin marcas de terceros: no lleva insignia de partner (el slot partnerMark es sólo de la portada de línea y de la contraportada de propuesta)."
+          ]
+        }
+      ]
     },
     {
       "id": "close-proposal-horizon",
@@ -2501,9 +2534,10 @@
           "example": {
             "kind": "partner-badge",
             "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
-            "alt": "Salesforce Partner"
+            "alt": "Salesforce Partner",
+            "readbackRef": "salesforce-partner-authorization-2026-09-29"
           },
-          "notes": "OPCIONAL y condicionado (delta 2026-09-29, deck Salesforce): la insignia de partner de la plataforma de la línea bajo el bloque de contacto (72 px de alto, 290 px bajo el inicio del contacto, x = 140). En la aprobada, el badge «Salesforce Partner» horizontal en vector (ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg: el .ai oficial del kit de partner convertido con pdftocairo, sólo con el viewBox recortado; fuentes en logos/FUENTES.txt). Es un CLAIM bloqueante: sólo con readback primario vigente en Partner Community (owner Julio + RevOps & CRM; registro docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md y §Claims de EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md); la aceptación de 2025 como Provisional Consulting Partner no prueba el estado actual. Nunca el badge de Cloud Reseller (Consulting Partner ≠ Reseller) ni los Navigator. Nunca elemento fijo. Slot NUEVO en una receta con plantilla: la plantilla necesita un test que componga las recetas existentes SIN el slot (lessons 2026-09-28). Sin readback, el slot se omite y la contraportada queda sin marca de terceros (respaldo SF19-contraportada-sin-badge)."
+          "notes": "OPCIONAL y condicionado (delta 2026-09-29, deck Salesforce): la insignia de partner de la plataforma de la línea bajo el bloque de contacto (72 px de alto, 290 px bajo el inicio del contacto, x = 140). En la aprobada, el badge «Salesforce Partner» horizontal en vector (ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg: el .ai oficial del kit de partner convertido con pdftocairo, sólo con el viewBox recortado; fuentes en logos/FUENTES.txt). Es un CLAIM: va sólo con la referencia de su autorización o de su readback vigente (readbackRef; registro docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md y §Claims de EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md). Delta 2026-09-29 (b): la insignia «Salesforce Partner» está autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear) y el deck Salesforce la lleva POR DEFECTO en esta contraportada (composición sloganBlock). La autorización no se extiende a otro partner. Nunca el badge de Cloud Reseller (Consulting Partner ≠ Reseller) ni los Navigator. Nunca elemento fijo. Slot NUEVO en una receta con plantilla: la plantilla necesita un test que componga las recetas existentes SIN el slot (lessons 2026-09-28). Sin la insignia (respaldo), el slot se omite y la contraportada queda sin marca de terceros (respaldo SF19-contraportada-sin-badge)."
         }
       ],
       "fixed": [
@@ -2546,7 +2580,7 @@
         "Sujeto de espaldas hacia la órbita: el último fotograma, nunca mirando al lente.",
         "El eslogan va en bloque con el logo: debajo, al 64 % del ancho del logo y separado 1,35 veces su cuerpo; nunca a un cuerpo fijo, más ancho que el logo, encima, al lado ni suelto (regla dura 8, operador 2026-09-29)."
       ],
-      "notes": "Título previo: «✅ APROBADA · FOTO · contraportada de propuesta: Empower your Growth (hacia la órbita)». Comparte plate con close-brochure-horizon; lo que cambia es el mensaje por documento. El render vive en brochure.mjs (bloque PRO-contraportada-*), no en propuesta.mjs. §6 fila 17 (pendiente): el manual pide el logo dentro de la órbita en el cierre; esta receta lo lleva arriba en la columna. Delta 2026-09-29: el eslogan pasa a ir en bloque bajo el logo al 64 % de su ancho (decisión del operador; cierra el delta de TASK-1933 para esta receta) y se suma el slot OPCIONAL partnerMark. No cambian contentType ni los slots existentes. Pendiente del composer: la plantilla close-proposal hornea el eslogan a 72 px; hay que llevarla al bloque (valores de motion.layout) y registrar el cambio en BASELINE_DELTAS.md antes de congelar, y un test sin partnerMark.",
+      "notes": "Título previo: «✅ APROBADA · FOTO · contraportada de propuesta: Empower your Growth (hacia la órbita)». Comparte plate con close-brochure-horizon; lo que cambia es el mensaje por documento. El render vive en brochure.mjs (bloque PRO-contraportada-*), no en propuesta.mjs. §6 fila 17 (pendiente): el manual pide el logo dentro de la órbita en el cierre; esta receta lo lleva arriba en la columna. Delta 2026-09-29: el eslogan pasa a ir en bloque bajo el logo al 64 % de su ancho (decisión del operador; cierra el delta de TASK-1933 para esta receta) y se suma el slot OPCIONAL partnerMark. No cambian contentType ni los slots existentes. Pendiente del composer: la plantilla close-proposal hornea el eslogan a 72 px; hay que llevarla al bloque (valores de motion.layout) y registrar el cambio en BASELINE_DELTAS.md antes de congelar, y un test sin partnerMark. Delta 2026-09-29 (b): la insignia «Salesforce Partner» está autorizada por Salesforce (declarado por el operador, referencia `salesforce-partner-authorization-2026-09-29`) y va por defecto en la contraportada Salesforce.",
       "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaContraHorizonte.jpg",
       "approvedUses": [
         {
@@ -2567,7 +2601,8 @@
             "partnerMark": {
               "kind": "partner-badge",
               "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
-              "alt": "Salesforce Partner"
+              "alt": "Salesforce Partner",
+              "readbackRef": "salesforce-partner-authorization-2026-09-29"
             }
           },
           "photo": {
@@ -2584,17 +2619,17 @@
             "notes": "Pipeline: pnpm foto:prompt <ficha> → pnpm foto:generar <ficha> --quality high (gpt-image-2.5-sunburst, edición con 4 referencias: tres anclas de Nexa de ai-generations/_identidad-nexa/1-anclas/ y la vista puesta de la softshell del kit) → pnpm foto:validar → pnpm foto:emblema al 100 %. El plate es ruta local (ai-generations/**, fuera de git): el Job artifact-worker no lo lee hasta el banco de plates (TASK-1931)."
           },
           "layout": "Logo de Efeonce a 700 px en top 220 (la receta aprobada del 2026-09-27 lo pone a 500 px en top 230) y eslogan en bloque al 64 % («Revenue» en el acento): cuerpo ≈ 36,5 px. Contacto desde EFEONCE_CONTACT y redes; badge 290 px bajo el inicio del contacto. Decisión del operador (2026-09-29, al canonizar): el logo a 700 px en top 220 es SÓLO de la contraportada Salesforce (composición sloganBlock del token de AXIS); las contraportadas aprobadas el 2026-09-27 siguen con el logo a 500 px.",
-          "fit": "Cabe en los slots de la receta (sloganLineWord, photo) más el slot opcional nuevo partnerMark, con la composición sloganBlock. Decisión del operador (2026-09-29): es el cierre del deck Salesforce cuando se usa como PROPUESTA (portada cover-proposal-orbit o cover-proposal-dawn, sin foto); como brochure el deck cierra con close-brochure-orbit en la línea revenue-salesforce. Ver la norma §4.6, «Deck de práctica Salesforce», y los dos planes de ejemplo.",
+          "fit": "Cabe en los slots de la receta (sloganLineWord, photo) más el slot opcional nuevo partnerMark, con la composición sloganBlock. Decisión del operador (2026-09-29): es el cierre del deck Salesforce cuando se usa como PROPUESTA (portada cover-proposal-orbit o cover-proposal-dawn, sin foto); como brochure el deck cierra con close-brochure-orbit en la línea revenue-salesforce. Ver la norma §4.6, «Deck de práctica Salesforce», y los dos planes de ejemplo. Desde el 2026-09-29 (b) la insignia va por defecto: el intent de ejemplo src/lib/brand-surfaces/examples/deck-close-proposal-horizon-revenue-salesforce-intent.json la pide con readbackRef `salesforce-partner-authorization-2026-09-29`.",
           "backup": {
             "slide": "SF19-contraportada-sin-badge",
             "board": "DeckSalesforceContraportadaSinBadge",
             "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF19-contraportada-sin-badge.jpg",
             "render": "SIN_BADGE=1 ONLY=SF19-contraportada node ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
             "partnerMark": null,
-            "when": "mientras no haya readback vigente del badge"
+            "when": "respaldo: cuando el deck no deba llevar la insignia"
           },
           "conditions": [
-            "Badge bloqueante para enviar; autorización escrita de Salesforce pendiente de archivar."
+            "Insignia «Salesforce Partner» autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear)."
           ]
         }
       ]
@@ -9431,7 +9466,7 @@
               "desc": "HubSpot y agentes operados por nosotros, mes a mes."
             }
           ],
-          "notes": "Cuatro tarjetas: kicker ≤ 28, nombre ≤ 24 (dos líneas), descripción ≤ 90."
+          "notes": "Cuatro tarjetas: kicker ≤ 28, nombre ≤ 28 (dos líneas; subido de 24 el 2026-09-29 por decisión del operador, que aprobó tal cual los pasos de SF7 de 26 y 28), descripción ≤ 90."
         },
         {
           "name": "note",
@@ -9539,7 +9574,7 @@
             "scale": 1.1,
             "padding": "standard"
           },
-          "fit": "Cabe salvo dos nombres de paso: steps.name tiene maxChars 24 y la aprobada lleva «Diagnóstico y arquitectura» (26) e «Implementación e integración» (28), en dos líneas; validateDeckPlan daría slot-over-max-chars. El catálogo no se cambió: decidir con el operador si se acortan o se sube el largo (la plantilla proposal-service los muestra en dos líneas).",
+          "fit": "Cabe en los slots de la receta desde el 2026-09-29 (b): el operador aprobó tal cual «Diagnóstico y arquitectura» (26) e «Implementación e integración» (28), y el nombre de paso subió de 24 a 28 en la receta y en proposal-service.slots.json (steps[].name; la plantilla los muestra en dos líneas, sin cambio de render en las láminas existentes). Receta consumida por TASK-1932 (Proposal).",
           "conditions": [
             "Fuera del recorrido del brochure: alternativa de SF6, nunca juntas."
           ]
@@ -10082,8 +10117,9 @@
           "name": "question",
           "type": "text",
           "required": true,
-          "maxChars": 28,
-          "example": "¿Tu CRM vende contigo?"
+          "maxChars": 30,
+          "example": "¿Tu CRM vende contigo?",
+          "notes": "Delta 2026-09-29 (b): máximo subido de 28 a 30 por decisión del operador, que aprobó tal cual la pregunta de SF6 («¿Qué le falta a tu Salesforce?», 30). La plantilla cine admite hasta 40; las láminas existentes no cambian de render. Receta consumida por TASK-1932 (Proposal): subir un máximo no rompe a nadie."
         },
         {
           "name": "answer",
@@ -10234,7 +10270,7 @@
             "anchor": "bottom-end",
             "scale": 1.1
           },
-          "fit": "Cabe salvo un largo: question tiene maxChars 28 y la aprobada mide 30 («¿Qué le falta a tu Salesforce?»); validateDeckPlan daría slot-over-max-chars. La plantilla cine admite el texto (slots: null en recipe-map); el catálogo no se cambió: decidir si se acorta la pregunta o se sube el largo con el operador (TASK-1933 mapea las cinco cine).",
+          "fit": "Cabe en los slots de la receta desde el 2026-09-29 (b): el operador aprobó tal cual la pregunta de 30 caracteres y question.maxChars subió de 28 a 30 (la plantilla cine admite 40; sin cambio de render).",
           "conditions": [
             "Nexa, sin marcas de terceros en la foto; autorización de Salesforce sólo por el nombre en el texto (no aplica logo)."
           ]
@@ -11462,7 +11498,7 @@
       ],
       "avoidWhen": [
         "El cliente usa un solo producto y no hay integración que mostrar.",
-        "Sin la autorización escrita de Salesforce archivada: los íconos oficiales de producto no salen a clientes.",
+        "Con íconos o marcas de otro partner sin su autorización de uso (los de Salesforce están autorizados por Salesforce desde el 2026-09-29, declarado por el operador).",
         "Si lo que se necesita es la lista de servicios: usar content-service-lanes."
       ],
       "preferInstead": [
@@ -11637,7 +11673,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Cinco áreas, cada una con su producto oficial: no se inventan nubes ni se agrupan productos que la cuenta no usa."
       ],
       "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 03 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Selección con el contrato efeonce.collaboration-selection 0.3.0 (paintSelection). Reutilizable en HubSpot con los productos de HubSpot sólo con sus íconos oficiales (ver TASK del deck HubSpot)."
@@ -11666,7 +11702,7 @@
       "avoidWhen": [
         "El deck no ofrece agentes.",
         "Se necesita la ruta de adopción por olas: usar method-staircase (equipo híbrido por olas).",
-        "Sin la autorización escrita de Salesforce archivada (ícono oficial de Agentforce)."
+        "Con íconos o marcas de otro partner sin su autorización de uso (los de Salesforce están autorizados por Salesforce desde el 2026-09-29, declarado por el operador)."
       ],
       "preferInstead": [
         {
@@ -11888,7 +11924,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Toda ficha de agente dice quién aprueba o qué nunca hace: un agente sin supervisión no se dibuja.",
         "Montos como [MONTO] si aparecen; el agente nunca cambia montos en el ejemplo aprobado."
       ],
@@ -11918,7 +11954,7 @@
       "avoidWhen": [
         "La migración ya se decidió y lo que falta es mostrar que se hará bien: usar method-migration-reconcile.",
         "Sin inventario del cliente: los veredictos son ejemplo y la nota lo dice.",
-        "Sin la autorización escrita de Salesforce archivada (ícono oficial de Marketing Cloud)."
+        "Con íconos o marcas de otro partner sin su autorización de uso (los de Salesforce están autorizados por Salesforce desde el 2026-09-29, declarado por el operador)."
       ],
       "preferInstead": [
         {
@@ -12091,7 +12127,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Los cinco veredictos son el vocabulario fijo; la lámina no recomienda un reemplazo completo por defecto."
       ],
       "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 05 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). En la aprobada compara Marketing Cloud Engagement y Next; la receta sirve para cualquier par de generaciones de una plataforma. En HubSpot no hay par equivalente: no se reutiliza sin un caso real."
@@ -12284,7 +12320,7 @@
       "avoidWhen": [
         "Se propone un solo servicio: usar la propuesta de la línea (proposal-cinematic-revops o proposal-service-revops).",
         "La lista pasa de seis carriles: se agrupa, no se achica la letra.",
-        "Sin la autorización escrita de Salesforce archivada (íconos oficiales de producto)."
+        "Con íconos o marcas de otro partner sin su autorización de uso (los de Salesforce están autorizados por Salesforce desde el 2026-09-29, declarado por el operador)."
       ],
       "preferInstead": [
         {
@@ -12394,7 +12430,7 @@
           "type": "image",
           "required": false,
           "example": "ai-generations/2026-09-29_deck-salesforce/astro/agent-astro-v2-saluda-alpha.png",
-          "notes": "OPCIONAL y sujeto a autorización: Agent Astro (pose saluda, con alfa) de pie sobre la plataforma de luz a la derecha. Es una INTERPRETACIÓN editada del arte oficial ASTRO_NoOutfit, no el arte oficial de Agent Astro: se reemplaza si aparece el oficial en Brand Central. Sin la autorización escrita de Salesforce el slot se omite; la composición sin mascota no tiene lámina aprobada y se revisa a ojo. Nunca va dentro de una foto ni en un package de AXIS publicado mientras no llegue la autorización o el arte oficial."
+          "notes": "OPCIONAL: Agent Astro (pose saluda, con alfa) de pie sobre la plataforma de luz a la derecha. Es una INTERPRETACIÓN editada del arte oficial ASTRO_NoOutfit, no el arte oficial de Agent Astro: se reemplaza si aparece el oficial en Brand Central. Salesforce autorizó el uso de sus marcas (declarado por el operador, 2026-09-29), pero esta pieza es una interpretación: si el slot se omite, la composición sin mascota no tiene lámina aprobada y se revisa a ojo. Nunca va dentro de una foto ni en un package de AXIS publicado: es una edición interpretativa, no el arte oficial."
         }
       ],
       "fixed": [
@@ -12424,8 +12460,8 @@
         "Ningún texto cruza la órbita, la mascota ni las piezas del escenario.",
         "Respuesta ≥ 3× la pregunta (124/40 = 3,1: la respuesta no baja de 124 px).",
         "Acento sólo en texto de 24 px o más.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
-        "La mascota de Salesforce es un slot opcional sujeto a autorización, nunca un elemento fijo.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
+        "La mascota de Salesforce es un slot opcional, nunca un elemento fijo: la pieza de Agent Astro es una edición interpretativa (no el arte oficial) y va sólo por ruta local.",
         "Español neutro, sin voseo."
       ],
       "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 06 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Sirve en HubSpot con los carriles y los íconos oficiales de HubSpot; sin mascota (no hay mascota de HubSpot aprobada y no se inventa)."
@@ -12453,7 +12489,7 @@
       "avoidWhen": [
         "En un brochure evergreen: es una lámina de temporada y envejece con la fecha de corte.",
         "Sin fecha de corte (as-of) o sin volver a verificar el ledger de lanzamientos antes de enviar.",
-        "Sin la autorización escrita de Salesforce archivada (íconos oficiales y mascota)."
+        "Con íconos o marcas de otro partner sin su autorización de uso (los de Salesforce están autorizados por Salesforce desde el 2026-09-29, declarado por el operador)."
       ],
       "preferInstead": [
         {
@@ -12577,7 +12613,7 @@
           "type": "image",
           "required": false,
           "example": "ai-generations/2026-09-29_deck-salesforce/astro/agent-astro-v1-alpha.png",
-          "notes": "OPCIONAL y sujeto a autorización: Agent Astro (pose camina, con alfa) al centro sobre la plataforma. Interpretación editada del arte oficial, no el arte oficial de Agent Astro; se reemplaza si aparece el oficial. Sin la autorización escrita de Salesforce el slot se omite; la composición sin mascota no tiene lámina aprobada y se revisa a ojo. Nunca dentro de una foto ni en un package de AXIS publicado sin autorización."
+          "notes": "OPCIONAL: Agent Astro (pose camina, con alfa) al centro sobre la plataforma. Interpretación editada del arte oficial, no el arte oficial de Agent Astro; se reemplaza si aparece el oficial. Salesforce autorizó el uso de sus marcas (declarado por el operador, 2026-09-29), pero esta pieza es una interpretación: si el slot se omite, la composición sin mascota no tiene lámina aprobada y se revisa a ojo. Nunca dentro de una foto ni en un package de AXIS publicado: es una edición interpretativa, no el arte oficial."
         }
       ],
       "fixed": [
@@ -12612,10 +12648,10 @@
         "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Lámina de temporada: la fecha de corte (asOf) es obligatoria y se imprime; no entra en un brochure evergreen.",
         "Cada estado se verifica contra el ledger vigente antes de enviar; «se verifica en cada org» siempre visible.",
-        "La mascota de Salesforce es un slot opcional sujeto a autorización, nunca un elemento fijo."
+        "La mascota de Salesforce es un slot opcional, nunca un elemento fijo: la pieza de Agent Astro es una edición interpretativa (no el arte oficial) y va sólo por ruta local."
       ],
       "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 07 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). No evergreen: al pasar la temporada se reemplaza o se retira del deck. En HubSpot el equivalente sería INBOUND, con su propio ledger; sin mascota."
     },
@@ -12643,7 +12679,7 @@
       "avoidWhen": [
         "El deck no toca datos personales.",
         "Se usa como asesoría legal: la lámina muestra el diseño, no reemplaza la revisión legal.",
-        "Sin la autorización escrita de Salesforce archivada (íconos oficiales)."
+        "Con íconos o marcas de otro partner sin su autorización de uso (los de Salesforce están autorizados por Salesforce desde el 2026-09-29, declarado por el operador)."
       ],
       "preferInstead": [
         {
@@ -12813,7 +12849,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Toda activación usa un canal con permiso del perfil; ninguna activación sale de un canal marcado —.",
         "No es asesoría legal: la privacidad del cliente la revisa legal-privacy-ip-operator."
       ],
@@ -12978,7 +13014,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Los números cuadran: origen − duplicados = carga completa = los dos lados de la reconciliación (48.210 − 1.842 = 46.368 en la aprobada).",
         "Cifras de muestra siempre marcadas; con datos del cliente, sólo con evidencia (TASK-1930)."
       ],
@@ -13191,7 +13227,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Interfaces genéricas; sólo los isotipos son reales. No se recrea el diseño propietario de ninguna herramienta.",
         "El ciclo es fijo y siempre pasa por la aprobación del cliente antes de producción."
       ],
@@ -13382,7 +13418,7 @@
         "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Interfaces genéricas; sólo los isotipos son reales.",
         "Loom sólo porque está en el stack real de Efeonce (confirmado el 2026-09-29); si la cuenta no lo usa, la biblioteca va sin marca de herramienta.",
         "Datos de muestra siempre marcados."
@@ -13410,7 +13446,7 @@
         "Cuando el cliente pregunta cómo usar la IA con su CRM sin perder control."
       ],
       "avoidWhen": [
-        "Sin la autorización de uso de marca de Salesforce y de Anthropic archivada: la ventana va sin marcas y la composición sin marcas no tiene lámina aprobada.",
+        "Sin la autorización de uso de marca de Anthropic archivada (la de Salesforce está declarada por el operador desde el 2026-09-29): el logotipo del asistente y el wordmark Claudeforce se omiten, y la composición sin esas marcas no tiene lámina aprobada.",
         "Con la interfaz real del asistente recreada: la ventana es genérica.",
         "Con montos reales: siempre [MONTO]."
       ],
@@ -13484,7 +13520,7 @@
           "required": true,
           "maxChars": 30,
           "example": "Conectado a Salesforce",
-          "notes": "Chip de la cabecera con el logo de la plataforma (public/images/logos/partners/salesforce.com_logo.svg, sujeto a la autorización de Salesforce)."
+          "notes": "Chip de la cabecera con el logo de la plataforma (public/images/logos/partners/salesforce.com_logo.svg, autorizado por Salesforce, declarado por el operador el 2026-09-29)."
         },
         {
           "name": "userPrompt",
@@ -13542,7 +13578,7 @@
           "type": "image",
           "required": false,
           "example": "ai-generations/2026-09-29_deck-salesforce/logos/claudeforce-wordmark.svg",
-          "notes": "OPCIONAL y sujeto a autorización de Salesforce y Anthropic: el wordmark «Claudeforce» (versión de video, armado en render-src/claudeforce-wordmark.mjs a partir del vector oficial de Dreamforce; se reemplaza si Salesforce publica el vector) en una tarjeta navy de 200 px arriba a la derecha. Sin autorización, el slot se omite."
+          "notes": "OPCIONAL y sujeto a la autorización escrita de Anthropic, pendiente de archivar (la de Salesforce, declarada por el operador el 2026-09-29): el wordmark «Claudeforce» (versión de video, armado en render-src/claudeforce-wordmark.mjs a partir del vector oficial de Dreamforce; se reemplaza si Salesforce publica el vector) en una tarjeta navy de 200 px arriba a la derecha. Sin autorización, el slot se omite."
         },
         {
           "name": "guarantees",
@@ -13601,7 +13637,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Marcas de terceros (logotipo del asistente, wordmark Claudeforce, logo de Salesforce) sujetas a la autorización de Salesforce y de Anthropic, pendiente de archivar; son slots opcionales, nunca fijos.",
+        "Marcas de terceros: el logo de Salesforce está autorizado por Salesforce (declarado por el operador, 2026-09-29); el logotipo del asistente y el wordmark Claudeforce siguen sujetos a la autorización escrita de Anthropic, pendiente de archivar (la parte de Salesforce de Claudeforce ya está autorizada). Son slots opcionales, nunca fijos.",
         "La ventana es genérica: no se recrea la interfaz real del asistente.",
         "La acción es gobernada: se propone y el ejecutivo la confirma; la lámina nunca muestra una acción ejecutada sin confirmación.",
         "Montos siempre [MONTO]; producto en beta marcado con su fecha."
@@ -14161,7 +14197,7 @@
           "type": "enum",
           "required": false,
           "example": "agentforce",
-          "notes": "OPCIONAL y sujeto a la autorización escrita de Salesforce: el ícono oficial del producto (60 px) sobre la esfera en la cima de la trayectoria (agentforce · sales · service · marketing · data-cloud · platform · slack · tableau). Sin él, la trayectoria termina en su esfera sola. Nunca un ícono Trazo en su lugar."
+          "notes": "OPCIONAL (ícono autorizado por Salesforce, declarado por el operador el 2026-09-29): el ícono oficial del producto (60 px) sobre la esfera en la cima de la trayectoria (agentforce · sales · service · marketing · data-cloud · platform · slack · tableau). Sin él, la trayectoria termina en su esfera sola. Nunca un ícono Trazo en su lugar."
         }
       ],
       "fixed": [
@@ -14199,7 +14235,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt; en AXIS, AXIS_PARTNER_ASSETS) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt; en AXIS, AXIS_PARTNER_ASSETS) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Cada ola se prueba antes de la siguiente: los escalones son una progresión real, nunca una lista de servicios."
       ],
       "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 14 del deck Salesforce (acto IV). Al canonizar, el operador decidió que no cabe en method-staircase y nace como receta propia (antes registrada como approvedUses de method-staircase, que no cambia). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template); de respuesta grande: entra a la auditoría 3× de rendered-audit.ts. La una sola órbita es la trayectoria de luz (la lámina aprobada no lleva plataforma). Oferta transversal de transformación humano-agente: sirve en HubSpot con su ícono oficial o sin ícono."
@@ -14289,7 +14325,7 @@
           "type": "enum",
           "required": false,
           "example": "platform",
-          "notes": "OPCIONAL y sujeto a la autorización escrita de Salesforce: el ícono oficial del producto (40 px) en la cabecera de la consola (agentforce · sales · service · marketing · data-cloud · platform · slack · tableau). Sin él, la cabecera va sin ícono; nunca un ícono Trazo en su lugar."
+          "notes": "OPCIONAL (ícono autorizado por Salesforce, declarado por el operador el 2026-09-29): el ícono oficial del producto (40 px) en la cabecera de la consola (agentforce · sales · service · marketing · data-cloud · platform · slack · tableau). Sin él, la cabecera va sin ícono; nunca un ícono Trazo en su lugar."
         },
         {
           "name": "panelTitle",
@@ -14429,7 +14465,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt; en AXIS, AXIS_PARTNER_ASSETS) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt; en AXIS, AXIS_PARTNER_ASSETS) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Interfaces genéricas; sólo los isotipos son reales.",
         "Cifras de muestra siempre marcadas; con datos del cliente, sólo con evidencia (TASK-1930).",
         "Cada cifra dice de dónde sale (su detalle): sin detalle, no va."
@@ -14528,7 +14564,7 @@
           "type": "enum",
           "required": true,
           "example": "slack",
-          "notes": "Isotipo del canal donde trabaja el equipo (30 px): slack (ícono oficial de Salesforce, sujeto a su autorización) o teams (deck-axis/assets/tools/teams-isotype.svg) si el cliente trabaja en Teams; el canal cambia con él. Nunca un canal que la cuenta no usa."
+          "notes": "Isotipo del canal donde trabaja el equipo (30 px): slack (ícono oficial de Salesforce, autorizado por Salesforce desde el 2026-09-29) o teams (deck-axis/assets/tools/teams-isotype.svg) si el cliente trabaja en Teams; el canal cambia con él. Nunca un canal que la cuenta no usa."
         },
         {
           "name": "channel",
@@ -14543,7 +14579,7 @@
           "type": "enum",
           "required": false,
           "example": "agentforce",
-          "notes": "OPCIONAL y sujeto a la autorización escrita de Salesforce: el ícono oficial del producto del agente (44 px) como avatar (agentforce · sales · service · marketing · data-cloud · platform · slack · tableau). Sin él, el avatar va con las iniciales del agente en navy."
+          "notes": "OPCIONAL (ícono autorizado por Salesforce, declarado por el operador el 2026-09-29): el ícono oficial del producto del agente (44 px) como avatar (agentforce · sales · service · marketing · data-cloud · platform · slack · tableau). Sin él, el avatar va con las iniciales del agente en navy."
         },
         {
           "name": "agentName",
@@ -14597,7 +14633,7 @@
           "type": "enum",
           "required": false,
           "example": "service",
-          "notes": "OPCIONAL y sujeto a la autorización escrita de Salesforce: el ícono oficial del producto donde se ejecuta el cambio (36 px) en la tarjeta de vidrio (agentforce · sales · service · marketing · data-cloud · platform · slack · tableau). Sin él, la tarjeta va sin ícono."
+          "notes": "OPCIONAL (ícono autorizado por Salesforce, declarado por el operador el 2026-09-29): el ícono oficial del producto donde se ejecuta el cambio (36 px) en la tarjeta de vidrio (agentforce · sales · service · marketing · data-cloud · platform · slack · tableau). Sin él, la tarjeta va sin ícono."
         },
         {
           "name": "executedTitle",
@@ -14684,7 +14720,7 @@
         "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
         "Sin olivo.",
         "Español neutro, sin voseo.",
-        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt; en AXIS, AXIS_PARTNER_ASSETS) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt; en AXIS, AXIS_PARTNER_ASSETS) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Interfaces genéricas; sólo los isotipos son reales.",
         "El agente propone y una persona aprueba: el ciclo nunca se salta la aprobación y todo queda registrado.",
         "Montos como [MONTO]; el canal es el que usa la cuenta (Slack o Teams)."

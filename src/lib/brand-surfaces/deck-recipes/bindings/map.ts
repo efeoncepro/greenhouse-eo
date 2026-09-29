@@ -58,7 +58,7 @@ const COMPUTED_SCORE =
 const PRESENTATION_CHOICE = 'Elige qué destaca la lámina: es una decisión de presentación, no un dato.'
 
 const PARTNER_CLAIM =
-  'Claim de partner de Efeonce, no dato del cliente ni de la propuesta: la insignia sólo va con readback primario vigente en Partner Community (docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md); sin él, el respaldo «Operamos sobre» + logo corporativo o nada.'
+  'Claim de partner de Efeonce, no dato del cliente ni de la propuesta: la insignia va con la referencia de su autorización o readback vigente (docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md; la de Salesforce, autorizada por Salesforce: `salesforce-partner-authorization-2026-09-29`, declarado por el operador); sin ella, el respaldo «Operamos sobre» + logo corporativo o nada.'
 
 /** `recipeId → slot → regla o exclusión`. */
 export const DECK_SLOT_BINDING_MAP: Record<string, Record<string, DeckSlotMapEntry>> = {

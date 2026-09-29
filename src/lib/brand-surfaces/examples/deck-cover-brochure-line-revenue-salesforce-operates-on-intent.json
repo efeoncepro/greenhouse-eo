@@ -27,7 +27,10 @@
     "topPx": 190
   },
   "partnerMark": {
-    "mode": "badge",
-    "readbackRef": "salesforce-partner-authorization-2026-09-29"
+    "mode": "operates-on",
+    "logo": {
+      "path": "public/images/logos/partners/salesforce.com_logo.svg",
+      "alt": "Salesforce"
+    }
   }
 }

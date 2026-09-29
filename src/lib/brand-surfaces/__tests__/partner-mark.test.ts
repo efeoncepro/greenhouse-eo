@@ -1,7 +1,10 @@
 /**
  * Los slots OPCIONALES nuevos de las plantillas compartidas del marco (TASK-1942, AXIS 0.3.31): la marca de partner de
- * la portada de línea (`partnerMark` = la insignia, claim con readback; `partnerMarkFallback` = «Operamos sobre» y el
- * logo de la plataforma) y la composición `sloganBlock` de la contraportada de propuesta con su insignia opcional.
+ * la portada de línea (`partnerMark` = la insignia, claim con autorización o readback; `partnerMarkFallback` = «Operamos
+ * sobre» y el logo de la plataforma) y la composición `sloganBlock` de la contraportada de propuesta con su insignia
+ * opcional. Desde el 2026-09-29 la insignia «Salesforce Partner» está autorizada por Salesforce (declarado por el
+ * operador) y el deck Salesforce la lleva por defecto: sus intents de ejemplo la piden con la referencia
+ * `salesforce-partner-authorization-2026-09-29`; «Operamos sobre» queda como respaldo.
  *
  * Regla de lessons.md (2026-09-28, TASK-1934): el probe del gate llena SIEMPRE todo slot opcional y los planes no
  * renderizan, así que el camino «ausente» sólo lo prueba un test que COMPONE las recetas existentes SIN el slot. Aquí se
@@ -27,6 +30,9 @@ const EXAMPLES = path.join(__dirname, '..', 'examples')
 type Intent = SurfaceIntent & Record<string, unknown>
 
 const example = (file: string): Intent => JSON.parse(fs.readFileSync(path.join(EXAMPLES, file), 'utf8')) as Intent
+
+/** La referencia estable de la autorización de Salesforce a la insignia (registro de partnerships, 2026-09-29). */
+const SALESFORCE_AUTHORIZATION = 'salesforce-partner-authorization-2026-09-29'
 
 const PROBE = `data:image/svg+xml;base64,${Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20" fill="#123456"/></svg>').toString('base64')}`
 
@@ -107,8 +113,19 @@ describe('marca de partner y eslogan en bloque (TASK-1942)', () => {
     expect((slots.frame as Record<string, unknown>).sloganRunLeading).toBe('--gl-slogan-run-leading=1.15')
   }, 60_000)
 
-  it('la portada Salesforce con «Operamos sobre» pinta el respaldo y no la insignia', async () => {
-    const { violations, dom } = await compose(example('deck-cover-brochure-line-revenue-salesforce-intent.json'))
+  it('la portada Salesforce lleva la insignia por defecto (autorizada por Salesforce, 2026-09-29)', async () => {
+    const intent = example('deck-cover-brochure-line-revenue-salesforce-intent.json')
+    const { violations, dom } = await compose(intent)
+
+    expect(intent.partnerMark).toEqual({ mode: 'badge', readbackRef: SALESFORCE_AUTHORIZATION })
+    expect(violations).toEqual([])
+    expect(dom.badges).toBe(1)
+    expect(dom.labels).toEqual([])
+    expect(dom.logos).toEqual([])
+  }, 60_000)
+
+  it('el respaldo «Operamos sobre» pinta el logo de la plataforma y no la insignia', async () => {
+    const { violations, dom } = await compose(example('deck-cover-brochure-line-revenue-salesforce-operates-on-intent.json'))
 
     expect(violations).toEqual([])
     expect(dom.labels).toEqual(['OPERAMOS SOBRE'])
@@ -124,10 +141,9 @@ describe('marca de partner y eslogan en bloque (TASK-1942)', () => {
     expectCode(() => planSurfacePiece({ ...example('deck-cover-brochure-line-revenue-intent.json'), column: { topPx: 190 } } as Intent, { artifactId: 'x' }), 'invalid-intent')
   })
 
-  it('la insignia es un claim: sólo con readback vigente, sólo en la portada de línea y de la plataforma de la línea', async () => {
+  it('la insignia es un claim: sólo con autorización o readback, sólo en la portada de línea y de la plataforma de la línea', async () => {
     const salesforce = example('deck-cover-brochure-line-revenue-salesforce-intent.json')
-    const withBadge = { ...salesforce, partnerMark: { mode: 'badge', readbackRef: 'readback Partner Community 2026-09-29' } }
-    const { violations, dom, piece } = await compose(withBadge as Intent)
+    const { violations, dom, piece } = await compose(salesforce)
 
     expect(violations).toEqual([])
     expect(dom.badges).toBe(1)
@@ -137,12 +153,21 @@ describe('marca de partner y eslogan en bloque (TASK-1942)', () => {
     expectCode(() => planSurfacePiece({ ...salesforce, partnerMark: { mode: 'badge' } } as Intent, { artifactId: 'x' }), 'invalid-intent')
     expectCode(() => planSurfacePiece({ ...salesforce, partnerMark: { mode: 'badge', readbackRef: ' ' } } as Intent, { artifactId: 'x' }), 'invalid-intent')
     expectCode(() => planSurfacePiece({ ...salesforce, line: 'growth', partnerMark: { mode: 'badge', readbackRef: 'r' } } as Intent, { artifactId: 'x' }), 'invalid-intent')
+    // La autorización de Salesforce no se extiende a otro partner: HubSpot (línea revenue-hubspot) sigue fallando cerrado,
+    // con o sin referencia, mientras AXIS no publique su insignia con su propia autorización.
+    expectCode(() => planSurfacePiece({ ...salesforce, line: 'revenue-hubspot', partnerMark: { mode: 'badge' } } as Intent, { artifactId: 'x' }), 'invalid-intent')
+    expectCode(() => planSurfacePiece({ ...salesforce, line: 'revenue-hubspot', partnerMark: { mode: 'badge', readbackRef: SALESFORCE_AUTHORIZATION } } as Intent, { artifactId: 'x' }), 'invalid-intent')
     expectCode(() => planSurfacePiece({ ...salesforce, partnerMark: { mode: 'operates-on', logo: { path: 'ai-generations/x.svg', alt: 'x' } } } as Intent, { artifactId: 'x' }), 'invalid-intent')
     expectCode(() => planSurfacePiece({ ...salesforce, partnerMark: { mode: 'sello' } } as Intent, { artifactId: 'x' }), 'invalid-intent')
   }, 60_000)
 
   it('la contraportada Salesforce compone el eslogan en bloque: logo de 700 px y eslogan al 64 % de su ancho', async () => {
-    const { violations, dom, slots } = await compose(example('deck-close-proposal-horizon-revenue-salesforce-intent.json'))
+    // Sin la insignia, para medir sólo el bloque (la insignia por defecto se prueba abajo).
+    const withoutBadge = example('deck-close-proposal-horizon-revenue-salesforce-intent.json')
+
+    delete withoutBadge.partnerMark
+
+    const { violations, dom, slots } = await compose(withoutBadge)
     const frame = slots.frame as Record<string, string>
 
     expect(violations).toEqual([])
@@ -156,10 +181,11 @@ describe('marca de partner y eslogan en bloque (TASK-1942)', () => {
     expect(dom.marks).toBe(0)
   }, 60_000)
 
-  it('la insignia de la contraportada va sólo con el eslogan en bloque y con readback', async () => {
+  it('la insignia de la contraportada va por defecto en la Salesforce, sólo con el eslogan en bloque y con autorización o readback', async () => {
     const salesforce = example('deck-close-proposal-horizon-revenue-salesforce-intent.json')
-    const { dom, violations } = await compose({ ...salesforce, partnerMark: { mode: 'badge', readbackRef: 'readback Partner Community 2026-09-29' } } as Intent)
+    const { dom, violations } = await compose(salesforce)
 
+    expect(salesforce.partnerMark).toEqual({ mode: 'badge', readbackRef: SALESFORCE_AUTHORIZATION })
     expect(violations).toEqual([])
     expect(dom.badges).toBe(1)
 

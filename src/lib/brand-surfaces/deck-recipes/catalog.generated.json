@@ -7706,7 +7706,7 @@
           "name": "question",
           "type": "text",
           "required": true,
-          "maxChars": 28
+          "maxChars": 30
         },
         {
           "name": "answer",

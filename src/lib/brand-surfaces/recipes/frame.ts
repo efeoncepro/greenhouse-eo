@@ -458,8 +458,11 @@ const SOFT_ON_DARK = (efeonceGraphicLine as unknown as { slogan: { leadColor: { 
 
 /**
  * La insignia de partner de la plataforma de la línea (`AXIS_PARTNER_ASSETS`, kind `partner-badge`). Es un CLAIM (regla
- * `partner-claim-readback`): sólo con el readback vigente del programa, que el intent declara en `readbackRef`; sin él,
- * no compone. La línea tiene que operarse sobre una plataforma de partner (`lines[].platform`).
+ * `partner-claim-readback`): sólo con la referencia de su autorización o de su readback vigente, que el intent declara
+ * en `readbackRef`; sin ella, no compone (falla cerrada para cualquier partner). La de Salesforce está autorizada por
+ * Salesforce (declarado por el operador el 2026-09-29) y se cita como `salesforce-partner-authorization-2026-09-29`
+ * (registro de partnerships de Greenhouse). La línea tiene que operarse sobre una plataforma de partner
+ * (`lines[].platform`).
  */
 const partnerBadge = (line: string, readbackRef: unknown): { ref: string; asset: SurfaceAssetRequest } => {
   const platform = (efeonceGraphicLine.lines as unknown as { key: string; platform: string | null }[]).find(entry => entry.key === line)?.platform
@@ -468,7 +471,7 @@ const partnerBadge = (line: string, readbackRef: unknown): { ref: string; asset:
 
   if (typeof readbackRef !== 'string' || !readbackRef.trim()) {
     throw new SurfacePieceError(
-      'La insignia de partner es un claim: exige el readback vigente del programa (`partnerMark.readbackRef`). Sin él, usa `mode: "operates-on"` en la portada o deja la contraportada sin insignia.',
+      'La insignia de partner es un claim: exige la referencia de su autorización o readback vigente (`partnerMark.readbackRef`, p. ej. `salesforce-partner-authorization-2026-09-29`). Sin ella, usa `mode: "operates-on"` en la portada o deja la contraportada sin insignia.',
       'invalid-intent'
     )
   }
@@ -481,8 +484,9 @@ const partnerBadge = (line: string, readbackRef: unknown): { ref: string; asset:
 }
 
 /**
- * `partnerMark` de la portada de línea (`cover-brochure` layout `line`, AXIS 0.3.31): OPCIONAL y nunca fijo. `badge`: la
- * insignia de partner (claim con readback) al pie de la columna, en el slot `partnerMark`; `operates-on`: el respaldo
+ * `partnerMark` de la portada de línea (`cover-brochure` layout `line`, AXIS 0.3.31): OPCIONAL y nunca fijo en la
+ * receta (el deck Salesforce lo lleva por defecto desde el 2026-09-29, en su intent). `badge`: la insignia de partner
+ * (claim con autorización o readback) al pie de la columna, en el slot `partnerMark`; `operates-on`: el respaldo
  * que no afirma nada —«Operamos sobre» y el logo de la plataforma del registro del repo—, en `partnerMarkFallback`.
  * Sin `partnerMark` la portada va sin nada al pie (los dos slots son opcionales y se borran).
  */
@@ -917,7 +921,7 @@ const closeProposalSloganBlock = (
   if (lines.color !== 'soft') throw new SurfacePieceError(`AXIS pide el color «${lines.color}» para el contacto y la plantilla pinta el suave.`, 'recipe-without-template')
 
   if (asked !== undefined) {
-    if (asked.mode !== 'badge') throw new SurfacePieceError('La contraportada sólo lleva la insignia de partner (`partnerMark.mode: "badge"`); sin readback, va sin insignia.', 'invalid-intent')
+    if (asked.mode !== 'badge') throw new SurfacePieceError('La contraportada sólo lleva la insignia de partner (`partnerMark.mode: "badge"`); sin autorización o readback, va sin insignia.', 'invalid-intent')
 
     const badge = partnerBadge(line, asked.readbackRef)
 

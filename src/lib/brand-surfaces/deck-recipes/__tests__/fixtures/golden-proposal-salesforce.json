@@ -78,7 +78,18 @@
     {
       "recipeId": "close-proposal-horizon",
       "plateRef": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF3-nexa-contraportada-bordada.png",
-      "purpose": "19 · Empower your Revenue (SF19, composición sloganBlock, logo a 700 px; badge sólo con readback)"
+      "purpose": "19 · Empower your Revenue (SF19, composición sloganBlock, logo a 700 px; insignia «Salesforce Partner» por defecto, autorizada por Salesforce)",
+      "slots": {
+        "sloganLineWord": "Revenue",
+        "photo": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF3-nexa-contraportada-bordada.png",
+        "partnerMark": {
+          "kind": "partner-badge",
+          "mode": "badge",
+          "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
+          "alt": "Salesforce Partner",
+          "readbackRef": "salesforce-partner-authorization-2026-09-29"
+        }
+      }
     }
   ]
 }

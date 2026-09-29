@@ -699,6 +699,95 @@ exports[`planes de los intents de ejemplo > deck-close-brochure-orbit-intent.jso
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-close-brochure-orbit-revenue-salesforce-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:close-brochure-orbit-revenue-salesforce",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><filter id="gl-go-ring" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="gl-go-sphere" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><radialGradient id="gl-go-halo" cx="1638" cy="540" r="899.8" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2fb8ff" stop-opacity="0.1"/><stop offset="0.75" stop-color="#2fb8ff" stop-opacity="0.03"/><stop offset="1" stop-color="#2fb8ff" stop-opacity="0"/></radialGradient></defs><circle cx="1638" cy="540" r="899.8" fill="url(#gl-go-halo)"/><circle cx="1638" cy="540" r="818" fill="none" stroke="#2fb8ff" stroke-width="6" filter="url(#gl-go-ring)"/><circle cx="944.3" cy="106.53" r="30" fill="#2fb8ff" filter="url(#gl-go-sphere)"/><circle cx="944.3" cy="106.53" r="22" fill="#e9fffd"/></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.close-brochure",
+  "plan": {
+    "artifactId": "deck-close-brochure-orbit-revenue-salesforce",
+    "slides": [
+      {
+        "contentType": "deck.close-brochure",
+        "slideId": "deck-close-brochure",
+        "slots": {
+          "backdrop": {
+            "alt": "",
+            "src": "asset-ref:layer:close-brochure-orbit-revenue-salesforce",
+          },
+          "contact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "email": "sales@efeoncepro.com",
+            "phoneFirst": "+56 9 3732 3064",
+            "phoneSecond": "+1 (239) 235-2073",
+          },
+          "cta": {
+            "target": "answer",
+          },
+          "frame": {
+            "answerColor": "--gl-answer-color=#ffffff",
+            "answerInset": "--gl-answer-inset=-4px",
+            "answerLeading": "--gl-answer-leading=0.95",
+            "answerPx": 124,
+            "answerTop": 440,
+            "answerTracking": "--gl-answer-tracking=-0.035em",
+            "contactBubbleHeight": "--gl-contact-bubble-height=32px",
+            "contactIconOpacity": "--gl-contact-icon-opacity=0.78",
+            "contactItemGap": "--gl-contact-item-gap=8px",
+            "contactItemIcon": "--gl-contact-item-icon=23px",
+            "contactLeading": "--gl-contact-leading=1.3",
+            "contactPx": "--gl-contact-px=20px",
+            "contactRowGap": "--gl-contact-row-gap=18px",
+            "contactSocialGap": "--gl-contact-social-gap=28px",
+            "contactSocialIcon": "--gl-contact-social-icon=32px",
+            "contactSocialIconGap": "--gl-contact-social-icon-gap=14px",
+            "contactTop": "--gl-contact-top=780px",
+            "contactWeight": "--gl-contact-wght=500",
+            "line": "revenue-salesforce",
+            "logoLeft": "--gl-logo-left=140px",
+            "logoTop": "--gl-logo-top=140px",
+            "logoWidth": "--gl-logo-width=500px",
+            "margin": 140,
+            "questionColor": "--gl-question-color=#ffffff",
+            "questionLeading": "--gl-question-leading=1.2",
+            "questionPx": "--gl-question-px=40px",
+            "questionTop": 378,
+            "sloganLeading": "--gl-slogan-leading=1.15",
+            "sloganPx": "--gl-slogan-px=28px",
+            "sloganTop": "--gl-slogan-top=710px",
+          },
+          "slogan": [
+            {
+              "style": "800 italic #e2e2e2",
+              "text": "Empower",
+            },
+            {
+              "style": "800 normal #e2e2e2",
+              "text": "your",
+            },
+            {
+              "style": "900 italic #2fb8ff",
+              "text": "Revenue",
+            },
+          ],
+          "voice": {
+            "answer": "quieras",
+            "answerLead": "Cuando",
+            "question": "¿Conversamos?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-close-proposal-dawn-intent.json compone el mismo plan 1`] = `
 {
   "assets": [
@@ -871,6 +960,11 @@ exports[`planes de los intents de ejemplo > deck-close-proposal-horizon-revenue-
       "path": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF3-nexa-contraportada-bordada.png",
       "ref": "asset-ref:plate:NXSF3-nexa-contraportada-bordada",
     },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/salesforce-partner-badge-horizontal.svg",
+      "ref": "asset-ref:file:salesforce-partner-badge-horizontal",
+    },
   ],
   "catalog": "graphic-line-deck",
   "contentType": "deck.close-proposal",
@@ -914,6 +1008,12 @@ exports[`planes de los intents de ejemplo > deck-close-proposal-horizon-revenue-
             "sloganPx": "--gl-slogan-px=36.5px",
             "sloganRunLeading": "--gl-slogan-run-leading=normal",
             "sloganTop": "--gl-slogan-top=427px",
+          },
+          "partnerMark": {
+            "badge": "asset-ref:file:salesforce-partner-badge-horizontal",
+            "badgeHeight": "--gl-pm-badge-height=72px",
+            "badgeTop": "--gl-pm-badge-top=863.5px",
+            "left": "--gl-pm-left=140px",
           },
           "slogan": [
             {
@@ -6567,6 +6667,88 @@ exports[`planes de los intents de ejemplo > deck-cover-brochure-line-revenue-sal
     },
     {
       "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/salesforce-partner-badge-horizontal.svg",
+      "ref": "asset-ref:file:salesforce-partner-badge-horizontal",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-brochure",
+  "plan": {
+    "artifactId": "deck-cover-brochure-line-revenue-salesforce",
+    "slides": [
+      {
+        "contentType": "deck.cover-brochure",
+        "slideId": "deck-cover-brochure",
+        "slots": {
+          "backdrop": {
+            "alt": "Nexa, con la chaqueta navy de Efeonce, mira a cámara; detrás de ella se alza un gran anillo vertical de luz celeste del que salen cientos de hilos de luz que llegan a las yemas de sus dedos",
+            "src": "asset-ref:plate:NXSF2-nexa-portal",
+          },
+          "evidence": "<strong>Seis</strong> servicios:<br>Ventas · Servicio · Marketing Cloud<br>Data 360 · Agentforce · Integración",
+          "frame": {
+            "answerColor": "--gl-answer-color=#ffffff",
+            "answerInset": "--gl-answer-inset=-4px",
+            "answerLeading": "--gl-answer-leading=0.95",
+            "answerPx": 124,
+            "answerTop": 490,
+            "answerTracking": "--gl-answer-tracking=-0.035em",
+            "bodyColor": "--gl-body-color=#ffffff",
+            "bodyLeading": "--gl-body-leading=1.3",
+            "bodyPx": 28,
+            "bodyStrongWeight": "--gl-body-strong-wght=600",
+            "bodyTop": 642,
+            "bodyWeight": "--gl-body-wght=400",
+            "bodyWidth": 724,
+            "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+            "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+            "eyebrowPx": "--gl-eyebrow-px=22px",
+            "eyebrowTop": 380,
+            "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+            "eyebrowWeight": "--gl-eyebrow-wght=500",
+            "line": "revenue-salesforce",
+            "logoLeft": "--gl-logo-left=140px",
+            "logoTop": "--gl-logo-top=190px",
+            "logoWidth": "--gl-logo-width=500px",
+            "margin": 140,
+            "questionColor": "--gl-question-color=#ffffff",
+            "questionLeading": "--gl-question-leading=1.2",
+            "questionPx": "--gl-question-px=40px",
+            "questionTop": 428,
+          },
+          "partnerMark": {
+            "badge": "asset-ref:file:salesforce-partner-badge-horizontal",
+            "badgeHeight": "--gl-pm-badge-height=84px",
+            "badgeTop": "--gl-pm-badge-top=920px",
+            "left": "--gl-pm-left=140px",
+          },
+          "voice": {
+            "answer": "Por ti",
+            "eyebrow": "Brochure · Servicios Salesforce",
+            "question": "¿Tu Salesforce ya actúa?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-cover-brochure-line-revenue-salesforce-operates-on-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "format": "16x9",
+        "height": 1080,
+        "unit": "px",
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF2-nexa-portal.png",
+      "ref": "asset-ref:plate:NXSF2-nexa-portal",
+    },
+    {
+      "kind": "file",
       "path": "public/images/logos/partners/salesforce.com_logo.svg",
       "ref": "asset-ref:file:platform-salesforce.com_logo",
     },
@@ -6574,7 +6756,7 @@ exports[`planes de los intents de ejemplo > deck-cover-brochure-line-revenue-sal
   "catalog": "graphic-line-deck",
   "contentType": "deck.cover-brochure",
   "plan": {
-    "artifactId": "deck-cover-brochure-line-revenue-salesforce",
+    "artifactId": "deck-cover-brochure-line-revenue-salesforce-operates-on",
     "slides": [
       {
         "contentType": "deck.cover-brochure",
