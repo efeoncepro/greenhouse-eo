@@ -437,6 +437,18 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
      Corrige la fuente y vuelve a correr.
 5. Abre el PDF y revisa al menos la portada, una hoja con la burbuja de URL y una hoja del anexo.
 
+## Paso a paso — fondos de Teams y kit de cada persona
+
+Cada persona del equipo tiene su página con el kit completo: su avatar, los nueve fondos de Teams y su firma
+(`https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html`). Los fondos
+también están en OneDrive, `Kit media/Fondos de Teams/2026-09 La órbita/`.
+
+1. **Poner un fondo:** en Teams, antes o durante la reunión, Efectos de fondo → Agregar nuevo → elige el archivo.
+2. **Hacer un fondo nuevo:** se parte de una ficha con `"formato": "teams"` en `pnpm foto:prompt` (el centro queda
+   libre para la persona) y del arte exacto de cada texto; el logo de Efeonce va como objeto (`logo-efeonce-3d-escritorio-*`).
+3. **Revisar antes de repartir:** el texto y el logo al 100 %, y la prueba con una silueta sentada encima reducida a
+   480 y 1280 px: nada importante puede quedar detrás de la persona.
+
 ## Qué significan los estados
 
 | Estado | Qué significa |

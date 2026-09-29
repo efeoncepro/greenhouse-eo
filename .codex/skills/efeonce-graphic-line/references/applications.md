@@ -443,6 +443,16 @@ todavía AXIS 0.3.29: la adopción y el renderer son de TASK-1938.
 - **Espacio:** **la zona izquierda queda libre para la cámara**; nada de texto donde va la persona.
 - **Nunca:** órbita interior (la lámina tiene una: se reproduce con un solo anillo, D6) · eslogan · voz larga.
 - **Fuente:** L 4.3 3/3; M §10.3.
+- **Fondos de Teams fotográficos (aprobados por el operador, 2026-09-29):** nueve rincones del mismo piso moderno
+  de Efeonce (sala «Responder.», open space «Crecimiento orgánico.», sala «Cerrar.», cocina, muro «final_final_v27»,
+  «Hecho a mano. (casi)», «¿Cuántos formatos? Todos.», «¿Cuántas tomas? Una.», «¿Y la marca? Intacta.»). Reglas
+  aprendidas: **el centro es de la persona** (30–70 % del ancho): el chiste y la marca van en los tercios; **el logo
+  va siempre, como product placement** (logo 3D de escritorio del kit sobre una mesa o repisa), **nunca forzado en la
+  pared de una sala**; una órbita por fondo y sutil, en un objeto real (panel de sala «En sesión», alfombra, tazas,
+  stickers, órbita de plastilina); Nexa siempre con el uniforme; ironía sobre nosotros, nunca sobre el cliente, sin
+  logros inventados. Se producen con `foto:prompt` (formato `teams`), arte exacto de cada texto y prueba de silueta a
+  480/1280 px. Archivos: OneDrive `Kit media/Fondos de Teams/2026-09 La órbita/`, GCS `team/teams-backgrounds/v1/`,
+  fuentes `ai-generations/2026-09-29_fondos-teams/`.
 
 ---
 

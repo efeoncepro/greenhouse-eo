@@ -78,7 +78,7 @@ con Vision (distancia ojos → mentón); Daniela y Humberly un poco más lejos d
 | --- | --- |
 | GCP (público) | `gs://efeonce-group-axis-public-media/team/avatars/v1/1080/<nombre-apellido>.png` (maestros) y `…/v1/800/` (web). URL: `https://storage.googleapis.com/efeonce-group-axis-public-media/team/avatars/v1/1080/<nombre-apellido>.png` |
 | OneDrive del equipo | `Alineación/6. Marca/Kit media/Avatar/2026-09 La órbita/` (los seis) y la carpeta de cada persona (`Kit media/<Nombre>/`): `EO_Avatar-<Nombre-Apellido>-2026-09.png` y `firma-<nombre-apellido>.zip`; lo anterior, en `Viejo/` |
-| Página de descarga | `https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html` (una por persona: descarga en un clic, dónde cambiar la foto en Teams, Outlook, Notion, Frame.io y HubSpot, y enlace a su firma) e `…/team/kit/index.html` (el equipo). Generador: `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs` |
+| Página de descarga | `https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html` (una por persona, el kit completo: el avatar con descarga en un clic y dónde cambiarlo en Teams, Outlook, Notion, Frame.io y HubSpot; los nueve fondos de Teams aprobados, publicados en `…/team/teams-backgrounds/v1/`; y el enlace a su firma) e `…/team/kit/index.html` (el equipo). Generador: `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs` |
 | Repo (800 px) | `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-<persona>.png` (deck) y `public/images/greenhouse/team/` (portal; Julio en `EO_Avatar-Julio-Reyes.png`) |
 | Proceso | `ai-generations/2026-09-29_avatares-equipo/` (`componer-avatares.mjs`, `extender*.mjs`, `medir-rostro.swift`) |
 

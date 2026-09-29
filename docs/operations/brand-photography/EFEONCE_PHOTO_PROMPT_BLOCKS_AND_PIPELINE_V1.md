@@ -296,7 +296,7 @@ Kits en el catálogo, por tipo:
 |---|---|
 | Prenda (viste a la persona) | `polo-efeonce` · `hoodie-efeonce` · `chaqueta-softshell-efeonce` · `chaqueta-bomber-efeonce` · `gorra-efeonce` |
 | Merch | `lanyard-efeonce` (cinta, yoyo y portacarnet de marco rígido) |
-| Marca propia | `nave-efeonce` |
+| Marca propia | `nave-efeonce` · logo 3D completo: `logo-efeonce-3d-letrero-{blanco,navy}` (escala mediana ≈ 1,2 m, corpóreo de pared) y `logo-efeonce-3d-escritorio-{blanco,navy}` (escala pequeña, 24 cm, objeto de mesa; vistas `sentada`, `sentada-luz-izq`, `a-ras`, `tres-cuartos-izq/der`) |
 | Mascota de partner | `clawd` · `codex` · `gigi` (16 vistas) · `gigi-aeo` (8 vistas propias de búsqueda y AEO) |
 | Marca de tercero | `sprocket-hubspot` |
 
@@ -718,7 +718,7 @@ La ficha declara **intención**; el comando resuelve los valores:
 
 | Campo de la ficha | Qué es |
 |---|---|
-| `formato` | `4:5` · `9:16` · `16:9` · `1:1`. Determina `--size`, la frase que declara el formato, el **porcentaje del lecho** y el **límite de sujetos**. Es la única fuente de esos cuatro valores |
+| `formato` | `4:5` · `9:16` · `16:9` · `1:1` · `teams` (fondo de videollamada 2048×1152, sin validar: el centro, 30–70 % del ancho desde el 12 % del alto, es de la persona; no reserva texto; va con `lecho: "sin-lecho"`). Determina `--size`, la frase que declara el formato, el **porcentaje del lecho** y el **límite de sujetos**. Es la única fuente de esos cuatro valores |
 | `escena` | El párrafo `SCENE (...)` de la toma. Obligatorio: el modelo no inventa la escena |
 | `lecho.objeto` / `lecho.tono` | Qué se pone cerca del lente y con qué tono declarado. Obligatorio: la firma siempre necesita su lecho |
 | `reservas.texto` | `{ muro, tinta }` — zona de titular, con la geometría del formato |

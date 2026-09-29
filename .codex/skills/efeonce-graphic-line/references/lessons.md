@@ -447,6 +447,22 @@
   `assets/partners/` (marcas de terceros), `graphic-line-tokens-sync.test.ts` reventó con EISDIR. **Regla:** recorrer
   recursivo y comparar también lo anidado byte a byte (`94eb4e4b0`), no filtrar los directorios fuera.
 
+## 2026-09-29 (fondos de Teams en la oficina)
+
+- **Una foto de 16:9 no es un fondo de Teams.** La persona tapa el centro y Teams lo muestra a 300–600 px: el chiste va
+  en un tercio lateral y grande (≥ 8–10 % del alto), y se prueba con una silueta encima reducida a 480 y 1280 px. El
+  piloto tenía el texto al 40–76 % del ancho: la cabeza lo tapaba.
+- **Un logo corpóreo en la pared de una sala se ve puesto.** El operador lo pidió como product placement: el logo 3D de
+  escritorio del kit (24 cm) sobre una mesa o repisa, y siempre fuera de la zona de la persona (a la altura de la mesa,
+  los hombros cubren del 29 al 71 %).
+- **El modelo tiñe el navy de azul rey** en objetos chicos: el prompt dice «DEEP NAVY (#023C70), never royal blue» y
+  se mide el color. **Y escribe mal lo chico** («cámarrs»): todo texto sale de un arte exacto y se revisa al 100 %;
+  el error se corrige editando con el arte como referencia.
+- **Editar conserva**: mover un objeto, cambiar una pantalla o corregir un color se hace editando el candidato
+  aprobado, nunca regenerando; un cambio de arquitectura (oficina moderna) sí exige regenerar.
+- **Los íconos de Plastilina en volumen no se regeneran** dentro de una pieza: en la mesa de producción va plastilina
+  genérica; para una pantalla, el render oficial (la nave 3D) entra como arte exacto de la pantalla.
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos
