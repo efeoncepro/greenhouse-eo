@@ -35,10 +35,12 @@ sin número: «NO ESPERA AL LUNES» + «FLASH»), lanzado en producción el 2026
 la manzana, el verde Glitch, la falla en bytes, Guttery ni la cabecera «EDICIÓN #N» en una pieza de Efeonce, y nunca
 dos esferas en una pieza (manzana + lente u órbita).
 
-### Marketing con Manzanitas: registro complementario, sólo para Manzanitas
+### Marketing con Manzanitas: sub-línea de La órbita, sólo para Manzanitas
 
-Marketing con Manzanitas (MCM, la marca editorial evergreen del blog) tiene un **registro complementario** de La órbita,
-aprobado completo por el operador el 2026-09-28 («Me encantan, queda aprobada toda la línea gráfica», canvas v39). **La
+Marketing con Manzanitas (MCM, la marca editorial evergreen del blog) es una **sub-línea dentro del sistema de La órbita,
+igual que Glitch** (operador, 2026-09-29: «no sustituye a la orbita es una sublinea dentro del design system de la orbita
+igual que glitch»; los documentos anteriores la llaman «registro complementario»: es lo mismo). Aprobada completa por el
+operador el 2026-09-28 («Me encantan, queda aprobada toda la línea gráfica», canvas v39). **La
 complementa, no la reemplaza** (operador: «esta línea gráfica no reemplaza The Orbit … sino que la complementa con un
 nuevo registro para marketing con Manzanitas»): en todo lo que el registro no dice, manda La órbita. Si la pieza es de
 MCM (carrusel, story, blog y banner, miniatura de YouTube, pódcast), carga [references/manzanitas.md](references/manzanitas.md)

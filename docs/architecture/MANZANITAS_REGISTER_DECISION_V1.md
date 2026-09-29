@@ -31,7 +31,8 @@
 > `v0.3.29` (`main` `f722a6f`, workflow «Release UI packages v0.3.29» y CI de `main` en verde) y compuestos por el
 > catálogo de Greenhouse (commits `1050036e8` y `2c95e60b2`, gate visual a 0 px).
 > **Creado:** 2026-09-28 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-29 por Claude (delta (b): las tres últimas decisiones, AXIS `v0.3.29` y su adopción
+> **Última actualización:** 2026-09-29 por Claude (delta (c): aprobada para usar como sub-línea de La órbita, igual que
+> Glitch; antes, delta (b): las tres últimas decisiones, AXIS `v0.3.29` y su adopción
 > en Greenhouse; antes, el delta de las siete decisiones y el catálogo del Artifact Composer, TASK-1939)
 > **Norma operativa:** [`MANZANITAS_REGISTER_V1.md`](../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
 > **Referencia para agentes:** `.claude/skills/efeonce-graphic-line/references/manzanitas.md` (skill `efeonce-graphic-line`)
@@ -45,6 +46,19 @@
 > **Canvas de referencia (privado):** [«Marketing con Manzanitas · Línea v1»](https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG), versión 39
 > **Sistema de diseño de referencia (privado):** [«Efeonce — La órbita»](https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc)
 
+
+## Delta 2026-09-29 (c) — aprobado para usar: sub-línea de La órbita, como Glitch
+
+- **Aprobación de uso (operador, 2026-09-29, verbatim):** «Ok manzanitas esta aprobado, pero ojo no sustituye a la
+  orbita es una sublinea dentro del design system de la orbita igual que glitch».
+- **Posición en el sistema:** Marketing con Manzanitas es una **sub-línea dentro del sistema de diseño de La órbita**, al
+  mismo nivel que la [sub-línea de Glitch](./GLITCH_GRAPHIC_LINE_DECISION_V1.md). No es una línea paralela ni un
+  reemplazo: La órbita sigue siendo la línea de Efeonce y manda en todo lo que la sub-línea no dice. «Registro
+  complementario» y «sub-línea» nombran lo mismo en este ADR y en la skill; el nombre canónico desde hoy es **sub-línea**.
+- **Estado de uso:** lista para piezas de MCM con `pnpm manzanitas:compose` (TASK-1939 `complete`). Siguen fuera: la ruta
+  productiva (API, `artifact-worker`, MCP; TASK-1921) y la promoción del contrato `efeonce.manzanitas-register` de
+  `candidate` a estable, que es un release de AXIS y requiere autorización explícita del operador.
+- Sin cambio de valores, contratos ni piezas.
 
 ## Delta 2026-09-29 (b) — sin decisiones abiertas: AXIS `v0.3.29` y el equipo real en la fotografía
 

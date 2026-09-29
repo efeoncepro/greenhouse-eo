@@ -14,6 +14,12 @@
 > los acentos por línea; los 9 gráficos y las 3 láminas de texto denso. Si otra referencia de esta skill todavía llama
 > «propuesta» a los gráficos o al texto denso, es anterior a esta aprobación.
 >
+> **Aprobada para usar como sub-línea (operador, 2026-09-29, verbatim):** «Ok manzanitas esta aprobado, pero ojo no
+> sustituye a la orbita es una sublinea dentro del design system de la orbita igual que glitch». MCM es una **sub-línea
+> dentro del sistema de La órbita, al mismo nivel que Glitch**; «registro complementario» (abajo y en el resto de esta
+> referencia) nombra lo mismo. Lista para piezas de MCM con `pnpm manzanitas:compose`; la ruta productiva (TASK-1921) y
+> el contrato estable (hoy `candidate`) siguen pendientes.
+>
 > **Canonización (operador, verbatim):** «esta línea gráfica no reemplaza The Orbit que es la /efeonce-graphic-line
 > sino que la complementa con un nuevo registro para marketing con Manzanitas». **Complementa, no reemplaza:** La
 > órbita sigue siendo la línea gráfica de Efeonce y manda en todo lo que este registro no dice. El registro suma
