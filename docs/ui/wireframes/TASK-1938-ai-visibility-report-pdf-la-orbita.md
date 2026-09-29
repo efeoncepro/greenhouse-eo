@@ -32,7 +32,7 @@ y contraportada (hoy son cuatro: la contraportada es nueva).
 | Marca evaluada | nombre de la organización a 68 px en la voz de idea; debajo la fecha de los datos | `header.organizationName`; nunca un nombre inventado |
 | **Órbita que mide** | anillo fino, marca a las 12, arco con estela de 50° y esfera en `score × 3,6°`, con halo; dentro el puntaje grande, «de 100» y la etiqueta de gravedad | reemplaza al `Gauge` actual, que es un arco que se llena (un indicador de carga, prohibido por la línea). Única órbita de todo el documento. Sin puntaje (`null`): anillo sin arco ni esfera y «—» dentro |
 | Veredicto | «Veredicto ejecutivo» + `headline.frame` con dos pesos (fuerte + liviano) | ningún texto cruza el anillo |
-| Cobertura | motores evaluados, número de preguntas y motores que respondieron | de `provenance`; los nombres visibles de los motores (Gemini, ChatGPT, Claude, Perplexity) salen de `engine-roster.ts` [verificar] |
+| Cobertura | fila de discos blancos con el logo de cada motor evaluado + «Evaluado en N motores de respuesta» y «N preguntas · N de M respondieron» | motores del roster público (`src/lib/growth/ai-visibility/report/engine-roster.ts`: ChatGPT, Claude, Gemini, Perplexity y Google AI Overview); cada motor con su logo oficial (ver Visual Fidelity Mapping) |
 | Firma | logo de Efeonce en blanco, centrado abajo | archivo oficial de `@efeoncepro/axis-brand-assets`; sin «Preparado por Efeonce · efeoncepro.com» como texto suelto |
 
 ### Página 02 — Marco de evaluación y canales
@@ -41,14 +41,17 @@ y contraportada (hoy son cuatro: la contraportada es nueva).
   derecha, sobre un filete. Pie: «Preparado por Efeonce» y `efeoncepro.com`.
 - «Niveles para existir en un internet de agentes»: leyenda de los dos ejes (percepción, operabilidad) y cinco filas
   (ordinal, nombre ES · EN, pregunta, puntaje + etiqueta de gravedad, o «En cobertura» cuando el nivel no tiene puntaje).
-- «Canales de respuesta»: una barra por motor con el porcentaje de presencia y «N de M respuestas».
+- «Canales de respuesta»: una barra por motor con el **logo del motor** en un disco, el porcentaje de presencia y «N
+  de M respuestas». Los cinco motores del roster, incluido Google AI Overview con la lupa de Google AI Mode.
+- Íconos del Trazo de AXIS en cada nivel (búsqueda, contenido, checklist, automatización, objetivo) y en los
+  encabezados de sección (medición, IA).
 
 ### Página 03 — Dónde enfocar
 
 - «Brecha principal» en tarjeta navy: dimensión y puntaje, etiqueta de gravedad, título de la brecha a 36 px y
   «Movimiento recomendado» con la primera recomendación.
-- «Por qué ocurre»: siete dimensiones con barra, puntaje y gravedad; la dimensión sin dato muestra «—» y «Sin dato»,
-  nunca cero.
+- «Por qué ocurre»: siete dimensiones con ícono del Trazo, barra, puntaje y gravedad; la dimensión sin dato muestra «—»
+  y «Sin dato», nunca cero.
 - «Calidad de la presencia»: tres cifras (share de citas, sentimiento con barra apilada positivo/neutral/negativo,
   prominencia mejor/promedio).
 
@@ -62,8 +65,10 @@ y contraportada (hoy son cuatro: la contraportada es nueva).
 ### Contraportada (fondo tinta)
 
 «¿Conversamos? / Cuando quieras.», una línea de invitación, la burbuja URL oficial + las redes de
-`EFEONCE_SOCIAL_LINKS` (`src/config/efeonce-brand.ts`), y abajo el logo de Efeonce centrado con el eslogan de la
-línea de servicio y la razón social. El eslogan sólo aparece aquí.
+`EFEONCE_SOCIAL_LINKS` (`src/config/efeonce-brand.ts`), y abajo el **bloque de marca**: logo de Efeonce de 440 px y,
+debajo, el eslogan al **64 % del ancho del logo** (24,3 px), separado 1,35 veces su cuerpo, con «Growth» en el acento
+(≥ 24 px). El eslogan es un elemento gráfico que acompaña la marca, no un texto: se dimensiona desde el logo (regla
+del operador 2026-09-29, `efeonce-graphic-line` → `criteria.md` §5). Sólo aparece aquí.
 
 ## Mobile Target
 
@@ -88,6 +93,15 @@ negocio; los enlaces (URL, redes) son reales.
   cifras y Poppins para estructura (sistema «La órbita»); los catálogos A4 de Insights usan Poppins + Geist.
 - Logo de Efeonce y burbuja URL: archivos de `@efeoncepro/axis-brand-assets`; redes con el ícono de contorno de la
   firma de correo (`efeonceGraphicLine` email-signature `icons`).
+- **Logos de los motores (obligatorio):** ChatGPT `public/images/logos/axis/gpt-isotype.svg`, Claude
+  `claude-isologo.svg`, Gemini `gemini-isotype.svg`, Perplexity `perplexity-icon.svg`; Google AI Overview con la
+  **lupa con destello de Google AI Mode** de AXIS (`apps/lab/public/references/ai-mode-magnifier-sparkle-on-light.svg`,
+  guía `docs/agent-composition/search-boxes.md`), nunca el logo de Gemini. Van en un disco blanco (logo al 55–60 %).
+  Los SVG de ChatGPT y Claude pintan con `var(--fill-0, …)`: react-pdf y `<img>` no resuelven `var()`, así que se
+  copian con el color literal (negro y `#D97757`).
+- **Iconografía (obligatoria donde ayude a leer):** sólo el Trazo del catálogo de AXIS
+  (`resolveIcon` de `@efeoncepro/axis-graphic-line/icons`, superficie clara, en reposo porque la pieza ya tiene la
+  esfera de la portada), grupos revisados con `auditIconGroup`. Nunca un ícono dibujado a mano.
 
 ## Copy Ledger
 
@@ -146,5 +160,9 @@ la etiqueta); lectura verificada en escala de grises; enlaces con destino real.
 - **Motor sin cambiar en esta task (react-pdf).** Pasar al Artifact Composer es mejor a largo plazo, pero hoy el render
   es de a una salida cada 2 minutos y el correo del Grader adjunta el PDF en el momento; esa migración es un follow-up
   con su propio contrato.
+- **Logos de los motores y la lupa de Google AI Mode** (operador, 2026-09-29: «importantísimo»): cada motor se
+  reconoce por su marca, no por su nombre. El informe web hoy asigna a Google AI Overview el logo de Gemini
+  (`report-artifact/web/AiVisibilityReportArtifact.tsx`), contra la guía de AXIS: se corrige en el follow-up de paridad.
+- **Íconos del Trazo** en niveles, dimensiones, cifras de calidad y encabezados, para leer por bloques.
 - **Abiertas:** tipografía (Bricolage + Poppins o Poppins + Geist); si el turquesa oscuro va en ordinales y en «Tu
   marca» sobre papel (TASK-1889 lo limita a acento sobre navy); qué palabra del eslogan corresponde al Grader.

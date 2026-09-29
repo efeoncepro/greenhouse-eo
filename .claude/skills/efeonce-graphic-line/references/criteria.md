@@ -498,6 +498,16 @@ esfera: el acento va al cierre.
   la publicidad, no del eslogan de Efeonce. Como el componente `Slogan` pinta la palabra siempre en el acento, el bloque
   se dimensiona para que el eslogan mida **24 px o más** (en 1080 de ancho, logo de 400 px); más chico, la palabra iría
   en blanco y el componente no lo hace solo.
+- **El bloque se dimensiona como gráfico, no como texto** (operador, 2026-09-29, al revisar el correo y la
+  contraportada del informe del Grader: «El eslogan va […] siempre debajo del logo, el eslogan no es un simple texto es
+  un elemento gráfico que acompaña la marca»). Pidió el 85 % y confirmó el mismo día que queda en el **64 %** del
+  canon. El error que lo motivó: el eslogan se escribió a 26 px como una línea más y quedó **más ancho que el logo**.
+  Cómo se compone: primero el ancho del logo, después el eslogan a `0,64 × ancho del logo`. El ancho de «Empower your
+  Growth» en sus pesos oficiales (Poppins 800 itálica, 800 y 900 itálica) es **11,586 em**, medido con fontkit sobre
+  `src/assets/fonts/Poppins-*.ttf`: cuerpo = `0,64 × ancho del logo ÷ 11,586`, en una sola línea (`nowrap`). Con logo
+  de 220 px el eslogan mide 12,2 px y la palabra final va en blanco (menos de 24 px); para que «Growth» vaya en el
+  acento el logo debe medir **435 px o más** (440 px → 24,3 px). Esta medida es de «Empower your Growth»: con otra
+  palabra de línea se vuelve a medir. El bloque se centra como una unidad.
 - **El acento no va a sangre como fondo de una lámina** (operador, 2026-09-28, contraportada de Manzanitas en naranja:
   «Logo azul Efeonce acá??? Y hay muchísima saturación en toda la composición, este no lo aprobaría aunque quisiera»).
   El acento es luz, gráfico y palabra, nunca superficie: un campo entero de acento satura la pieza. Además, el logo

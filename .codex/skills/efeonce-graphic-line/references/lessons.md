@@ -315,6 +315,15 @@
   `pnpm -C <repo>` / `git -C <repo>`, sin `cd` encadenado ni redirecciones a `/tmp`; y pedir la autorización de la
   mutación externa (push, release) al empezar, no al final.
 
+## 2026-09-29 (el eslogan como texto suelto)
+
+- **El eslogan quedó más ancho que el logo.** Síntoma: en el pie del correo de Insights y en la contraportada del
+  informe del Grader, «Empower your Growth» a 26 px medía cerca de 300 px bajo un logo de 170 px. Causa: se compuso
+  como una línea de texto con un cuerpo elegido a ojo, no como el bloque de marca. Regla: el eslogan se dimensiona
+  desde el logo, al 64 % de su ancho (cuerpo = 0,64 × ancho del logo ÷ 11,586 em), siempre debajo y como una sola
+  unidad centrada; el acento en «Growth» exige un logo de 435 px o más, y bajo eso la palabra va en blanco o navy
+  (criteria.md §5).
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

@@ -58,6 +58,7 @@
 | [ ] | Una medida imprime su valor (`trajectory.valueLabel`, p. ej. «60 %») **y su fuente** como texto | Revisión (`measure-shows-value-and-source`) |
 | [ ] | El arco de acento no queda junto a un número | Revisión (`accent-arc-never-reads-as-data`) |
 | [ ] | Eslogan sólo en cierres, desde el archivo oficial, sin esfera, sin mayúsculas, sin traducir; palabra final = la de la línea | Automático: `slogan-closes-only`; revisión de pesos (*Empower* 800 itálica, *your* 800, palabra 900 itálica) |
+| [ ] | Eslogan en bloque con el logo de Efeonce: **debajo**, al **64 % del ancho del logo**, separado 1,35 × su cuerpo, en una línea; nunca más ancho que el logo ni suelto como texto (operador, 2026-09-29) | Medir anchos: eslogan ÷ logo = 0,64 (cuerpo = 0,64 × logo ÷ 11,586 em) |
 | [ ] | El foco va con su prueba («Y lo medimos.» o el mecanismo) y sin competidores reales en la penumbra | Automático en `spotlightRecipe` (sin `proof` lanza); revisión |
 | [ ] | Español neutro con tuteo, sin voseo; la respuesta no promete lo que no se prueba | Revisión |
 

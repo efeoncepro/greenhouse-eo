@@ -102,6 +102,11 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
    contraportada de una propuesta comercial es el mensaje principal («Empower your Growth»); en la de un brochure firma
    debajo de «¿Conversamos? Cuando quieras.» (norma `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6). **El acento mide ≥ 3:1 contra su fondo** en gráfico y en
    texto ≥ 24 px, y **nunca va en texto de menos de 24 px** (ahí navy sobre claro, blanco sobre oscuro).
+   **El eslogan es un elemento gráfico que acompaña la marca, no un texto** (operador, 2026-09-29): va siempre en
+   bloque con el logo de Efeonce, **debajo** del logo, al **64 % del ancho del logo**
+   (`efeonceGraphicLine.motion.layout.sloganOfLogo`) y separado 1,35 veces su cuerpo (`sloganGapOfFont`). Se
+   dimensiona por ancho, no por cuerpo de texto: cuerpo = 0,64 × ancho del logo ÷ 11,586 em. Nunca a un cuerpo fijo,
+   más ancho que el logo, encima, al lado ni suelto en una columna de texto ([criteria.md §5](references/criteria.md)).
 9. **La órbita no sustituye la composición fotográfica**: se declara a propósito y nunca cubre sujeto, reservas, lecho
    ni firma (chequeo `orbit-never-over-subject-or-reserves`).
 10. **Valores sólo desde tokens** (`efeonceGraphicLine`, `axisMotion`): nunca HEX, px, grados o tiempos transcritos

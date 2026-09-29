@@ -201,7 +201,8 @@ Reglas obligatorias:
 
 - Route / surface: PDF de `renderAiVisibilityReportPdf`.
 - Primitive / variant / kind: renderer react-pdf existente (`extend`).
-- Component candidates: `Gauge` → órbita que mide; nueva página de contraportada; encabezado y pie corridos.
+- Component candidates: `Gauge` → órbita que mide; nueva página de contraportada; encabezado y pie corridos; disco de
+  logo de motor; ícono del Trazo (SVG de `resolveIcon` convertido a primitivas `Svg` de react-pdf).
 - Copy source: `src/lib/copy/growth.ts`.
 - Data reader / command: `ReportArtifactModel` sin cambios de forma.
 - API parity: sin acción de negocio nueva; el adjunto sigue saliendo del mismo contrato.
@@ -279,6 +280,10 @@ Reglas obligatorias:
 - Firma con el logo de Efeonce desde `axis-brand-assets`.
 
 ### Slice 4 — Páginas interiores y contraportada
+
+- Logos de los motores en disco (portada y «Canales de respuesta»), con la lupa de Google AI Mode para Google AI
+  Overview; copias de ChatGPT y Claude con color literal.
+- Íconos del Trazo de AXIS en niveles, dimensiones, cifras de calidad, procedencia y encabezados.
 
 - Encabezado y pie corridos; páginas 02–04 con la nueva paleta y tipografía, mismo contenido y orden.
 - Contraportada nueva con invitación, burbuja URL, redes de `EFEONCE_SOCIAL_LINKS`, logo y eslogan; copy en
@@ -373,6 +378,9 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [ ] `report-pdf-tokens.ts` no contiene el azul `#0375db` y sus colores salen de `efeonceGraphicLine` y `axisSemanticHex`.
 - [ ] El documento no usa el lockup de Efeonce Insights.
 - [ ] La contraportada toma las redes de `EFEONCE_SOCIAL_LINKS` y el logo y la burbuja de `axis-brand-assets`.
+- [ ] El eslogan va en bloque debajo del logo de Efeonce, al 64 % de su ancho (cuerpo = 0,64 × logo ÷ 11,586 em), separado 1,35 veces su cuerpo; nunca como texto a cuerpo fijo.
+- [ ] Cada motor evaluado (ChatGPT, Claude, Gemini, Perplexity, Google AI Overview) aparece con su logo oficial en la portada y en «Canales de respuesta»; Google AI Overview usa la lupa de Google AI Mode de AXIS, nunca el logo de Gemini.
+- [ ] Los íconos son del Trazo de AXIS (`resolveIcon`), en reposo, y cada grupo pasa `auditIconGroup`; ninguno dibujado a mano.
 - [ ] El copy nuevo vive en `src/lib/copy/growth.ts`.
 - [ ] `renderAiVisibilityReportPdf` conserva su firma y `build-report-attachment.ts` no cambia.
 - [ ] `report-artifact-pdf-no-leak.test.tsx` sigue verde.
@@ -399,7 +407,8 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 
 ## Follow-ups
 
-- Paridad de `report-artifact/web` y `report-artifact/print` con el nuevo diseño (continuidad cross-surface de EPIC-020).
+- Paridad de `report-artifact/web` y `report-artifact/print` con el nuevo diseño (continuidad cross-surface de EPIC-020),
+  incluida la corrección del logo de Google AI Overview en el web (hoy usa el de Gemini).
 - Motor: evaluar pasar el informe del Grader a un catálogo del Artifact Composer cuando el render admita más de una
   salida por ciclo o el correo pueda enviar el enlace primero y el PDF después (task `backend-data` aparte).
 
