@@ -40,8 +40,8 @@ const PROOF_SLOTS = new Set([
 ])
 
 describe('mapa de binding contra el catálogo de runtime', () => {
-  it('cubre las 90 recetas del catálogo', () => {
-    expect(deckRecipeCatalog.recipes).toHaveLength(90)
+  it('cubre las 94 recetas del catálogo', () => {
+    expect(deckRecipeCatalog.recipes).toHaveLength(94)
   })
 
   it('todo slot logo, money, metric, person o de prueba tiene binder o exclusión con razón', () => {

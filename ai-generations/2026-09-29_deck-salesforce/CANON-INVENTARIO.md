@@ -26,15 +26,15 @@ se pregunta. No inventar.
 | 06 | SF8-servicios | ¿Qué hacemos en Salesforce? → Todo el ciclo. | nueva | 6 carriles con íconos oficiales + 4 fases, **Agent Astro pose saluda** |
 | 07 | SF9-dreamforce-2026 | ¿Qué trajo Dreamforce? → Agentes. | nueva | Agent Astro pose camina, 8 chips de lanzamiento con estado (corte 2026-09-18) |
 | 08 | SF2-agentes-supervisor | Agentforce: ¿Quién responde por el agente? → Una persona. | nueva | supervisora + 3 fichas de agente con autonomía, ícono Agentforce |
-| 09 | SF18-supervision-vivo | ¿Dónde apruebas al agente? → Donde trabajas. | `content-day-live-progress` (datos: aprobación en la herramienta; allí Notion/Frame.io, aquí Slack + Service Cloud) | aprobación del agente en Slack, selección «Supervisora», gap de botones 26 |
-| 10 | SF16-crm-en-claude | ¿Y si le preguntas a tu CRM? → Te responde. | nueva | ventana de chat Claude (logotipo Claude del repo), «Conectado a Salesforce», acción que el ejecutivo confirma, **wordmark Claudeforce** en tarjeta navy, 3 garantías en fila, selección «Ejecutivo» |
+| 09 | SF18-supervision-vivo | ¿Dónde apruebas al agente? → Donde trabajas. | `content-day-live-approval` (receta propia, decisión del operador al canonizar) | aprobación del agente en Slack, selección «Supervisora», gap de botones 26 |
+| 10 | SF16-crm-en-claude | ¿Y si le preguntas a tu CRM? → Te responde. | nueva (`content-live-chat`; servicio «Enablement conversacional») | ventana de chat Claude (logotipo Claude del repo), «Conectado a Salesforce», acción que el ejecutivo confirma, **wordmark Claudeforce** en tarjeta navy, 3 garantías en fila, selección «Ejecutivo» |
 | 11 | SF12-data-consentimiento | ¿Puedes contactar a ese cliente? → Con permiso. | nueva | 5 fuentes → resolución de identidad → perfil con preferencias, ícono Data Cloud |
 | 12 | SF13-migracion | ¿Cómo sabes que migró todo? → Porque cuadra. | nueva | 5 etapas con contadores (datos de muestra) + reconciliación |
-| 13 | SF5-diagnostico-decision | ¿Qué recibes primero? → Una decisión. | `decision-diagnosis-map` (datos) | mapa del estado, veredicto, «recomendación por defecto» |
-| 14 | SF10-equipo-hibrido | ¿Cómo se suma un agente? → Por olas. | `method-staircase` (datos) | 4 olas |
+| 13 | SF5-diagnostico-decision | ¿Qué recibes primero? → Una decisión. | `decision-diagnosis-verdict` (receta propia, decisión del operador al canonizar) | mapa del estado, veredicto, «recomendación por defecto» |
+| 14 | SF10-equipo-hibrido | ¿Cómo se suma un agente? → Por olas. | `method-waves` (receta propia, decisión del operador al canonizar) | 4 olas |
 | 15 | SF14-dia-a-dia | ¿Cómo trabajamos contigo? → Sin sorpresas. | **receta nueva «ciclo del release»** (no `content-day-tools`: quitó el panel Greenhouse fijo de esa receta) | Teams, Notion, Loom, sandbox Salesforce; avatar «EF» |
 | 16 | SF15-adopcion-loom | ¿Cómo aprende tu equipo? → A su ritmo. | nueva | biblioteca de tutoriales Loom por rol (datos de muestra) |
-| 17 | SF11-operacion | ¿Y después del go-live? → Lo operamos. | variante de datos de `content-day-live-results` | consola de operación (releases, SLA, calidad) |
+| 17 | SF11-operacion | ¿Y después del go-live? → Lo operamos. | `content-day-live-console` (receta propia, decisión del operador al canonizar) | consola de operación (releases, SLA, calidad) |
 | 18 | SF17-que-medimos | ¿Cómo sabes que funciona? → Lo medimos. | nueva | 5 métricas: fórmula · fuente · dueño (rol), sin cifras |
 | 19 | SF19-contraportada | Empower your Revenue | `close-proposal-horizon` línea revenue-salesforce | foto NXSF3 bordada (Nexa de espaldas), logo 700 px + eslogan en bloque al 64 %, contacto, redes, **badge** bajo el contacto |
 
@@ -76,8 +76,8 @@ como `[MONTO]`; colaborador «Cliente»/«Supervisora»/«Ejecutivo» (rol, no p
 3. Cifras de SF11, SF13 y SF15 = datos de muestra; SF17 sin cifras (baseline en el diagnóstico); montos `[MONTO]`.
 4. Dreamforce (SF9): estado de lanzamientos con corte 2026-09-18; se verifica en cada org; ledger
    `.claude/skills/salesforce-crm-practice/references/dreamforce-2026.md`.
-5. Nombre del servicio de SF16: «CRM conversacional» (sugerido) vs «Enablement conversacional» (propuesta del operador):
-   decisión abierta.
+5. Nombre del servicio de SF16: **«Enablement conversacional»** (decidido por el operador el 2026-09-29; antes se
+   sugería «CRM conversacional»).
 6. Receta `close-proposal-horizon`: su ficha fija el eslogan a 72 px suelto; la regla del operador del 2026-09-29 lo pone
    en bloque bajo el logo al 64 %. El delta lo registra la sesión «Efeonce línea gráfica: huecos pendientes».
 7. **Falta el deck HubSpot equivalente** (misma práctica RevOps & CRM: HubSpot-first es un veredicto de SF4). Documentar
@@ -115,3 +115,11 @@ Reglas para canonizar (no perder):
   contenido equivalente** → follow-up.
 - Consumidor: la sesión «Artifact composer con 78 slides nuevas» (TASK-1932, Proposal) lee `catalog.generated.json` y
   `recipe-map.json`; **no cambiar contentType ni slots de las 78 existentes** y avisarle al integrar.
+
+## Decisiones del operador al canonizar (2026-09-29, segunda ronda)
+
+- SF5, SF10, SF11 y SF18 son recetas propias: `decision-diagnosis-verdict`, `method-waves`, `content-day-live-console` y
+  `content-day-live-approval` (94 recetas en el catálogo). Las recetas existentes no cambian.
+- Dos cierres: brochure con `close-brochure-orbit` en la línea `revenue-salesforce` (lámina por componer, visto bueno del
+  operador) y propuesta con SF19. Planes: `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-{brochure,proposal}-salesforce.json`.
+- Logo de 700 px sólo en la contraportada Salesforce; columna de la portada en 190 (reserva propia en AXIS `v0.3.32`).

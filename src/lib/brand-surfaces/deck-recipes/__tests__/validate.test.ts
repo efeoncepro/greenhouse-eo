@@ -28,8 +28,9 @@ const withCoverSlots = (slots: Record<string, unknown>): DeckPlan => ({
 })
 
 describe('catálogo de runtime', () => {
-  // Las 12 recetas nuevas del deck Salesforce (aprobadas el 2026-09-29) todavía no tienen plantilla ni página de AXIS:
-  // el plan las acepta y avisa `recipe-without-template` hasta que el Artifact Composer las implemente.
+  // Las 16 recetas nuevas del deck Salesforce (aprobadas el 2026-09-29; las cuatro últimas, SF5, SF10, SF11 y SF18, nacieron
+  // al canonizar porque no cabían en recetas existentes) todavía no tienen plantilla ni página de AXIS: el plan las acepta
+  // y avisa `recipe-without-template` hasta que el Artifact Composer las implemente.
   const SALESFORCE_WITHOUT_TEMPLATE = [
     'content-one-platform',
     'method-agent-supervisor',
@@ -42,11 +43,15 @@ describe('catálogo de runtime', () => {
     'content-day-release-cycle',
     'content-day-live-library',
     'content-live-chat',
-    'content-measure-formulas'
+    'content-measure-formulas',
+    'decision-diagnosis-verdict',
+    'method-waves',
+    'content-day-live-console',
+    'content-day-live-approval'
   ]
 
-  it('trae las 90 recetas aprobadas; todas con plantilla y página de AXIS salvo las 12 del deck Salesforce', () => {
-    expect(deckRecipeCatalog.recipes).toHaveLength(90)
+  it('trae las 94 recetas aprobadas; todas con plantilla y página de AXIS salvo las 16 del deck Salesforce', () => {
+    expect(deckRecipeCatalog.recipes).toHaveLength(94)
     expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template).map(recipe => recipe.id)).toEqual(SALESFORCE_WITHOUT_TEMPLATE)
     expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id)).toEqual(SALESFORCE_WITHOUT_TEMPLATE)
   })
@@ -62,6 +67,19 @@ describe('validateDeckPlan — planes golden', () => {
   for (const name of ['golden-brochure.json', 'golden-proposal.json', 'golden-proposal-seo-aeo.json', 'golden-brochure-seo-aeo.json']) {
     it(`${name} no tiene errores ni advertencias`, () => {
       expect(validateDeckPlan(read<DeckPlan>(name))).toEqual({ ok: true, issues: [] })
+    })
+  }
+
+  // El deck Salesforce en sus dos documentos (decisión del operador, 2026-09-29): como brochure cierra con la contraportada
+  // de brochure en la línea revenue-salesforce; como propuesta abre con la portada de propuesta y cierra con SF19. Los dos
+  // son válidos y sólo avisan que sus 16 láminas de práctica todavía no tienen plantilla.
+  for (const name of ['golden-brochure-salesforce.json', 'golden-proposal-salesforce.json']) {
+    it(`${name} es válido y sólo avisa las láminas de práctica sin plantilla`, () => {
+      const result = validateDeckPlan(read<DeckPlan>(name))
+
+      expect(result.ok).toBe(true)
+      expect(result.issues.every(issue => issue.code === 'recipe-without-template' && issue.severity === 'warning')).toBe(true)
+      expect(result.issues).toHaveLength(16)
     })
   }
 

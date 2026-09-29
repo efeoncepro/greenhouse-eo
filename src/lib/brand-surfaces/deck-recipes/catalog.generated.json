@@ -9000,8 +9000,8 @@
         "coverClose": [],
         "variant": [],
         "sequence": [
-          "content-day-live-progress",
-          "method-staircase"
+          "content-day-live-approval",
+          "method-waves"
         ]
       },
       "slots": [
@@ -9536,7 +9536,7 @@
         "variant": [],
         "sequence": [
           "content-day-live-library",
-          "content-day-live-results"
+          "content-day-live-console"
         ]
       },
       "slots": [
@@ -9641,7 +9641,7 @@
         "variant": [],
         "sequence": [
           "content-day-release-cycle",
-          "content-day-live-results"
+          "content-day-live-console"
         ]
       },
       "slots": [
@@ -9722,7 +9722,7 @@
         "variant": [],
         "sequence": [
           "method-identity-consent",
-          "content-day-live-progress"
+          "content-day-live-approval"
         ]
       },
       "slots": [
@@ -9826,7 +9826,7 @@
         "coverClose": [],
         "variant": [],
         "sequence": [
-          "content-day-live-results"
+          "content-day-live-console"
         ]
       },
       "slots": [
@@ -9865,6 +9865,439 @@
           "type": "list",
           "required": true,
           "maxChars": 58
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "decision-diagnosis-verdict",
+      "name": "Lo que recibes primero · el diagnóstico abierto: estado actual, veredicto de encaje, riesgos, evidencia y roadmap por olas",
+      "family": "next-steps",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "decision-provider-fit",
+          "method-waves"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "reportTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 52
+        },
+        {
+          "name": "reportSubtitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 83
+        },
+        {
+          "name": "sampleMark",
+          "type": "text",
+          "required": false,
+          "maxChars": 16
+        },
+        {
+          "name": "modules",
+          "type": "list",
+          "required": true,
+          "maxChars": 43
+        },
+        {
+          "name": "operationNodes",
+          "type": "list",
+          "required": true,
+          "maxChars": 11
+        },
+        {
+          "name": "operationFootnote",
+          "type": "text",
+          "required": true,
+          "maxChars": 56
+        },
+        {
+          "name": "verdictOptions",
+          "type": "list",
+          "required": true,
+          "maxChars": 20
+        },
+        {
+          "name": "selectedVerdict",
+          "type": "number",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "verdictCondition",
+          "type": "text",
+          "required": true,
+          "maxChars": 113
+        },
+        {
+          "name": "risks",
+          "type": "list",
+          "required": true,
+          "maxChars": 49
+        },
+        {
+          "name": "recordText",
+          "type": "text",
+          "required": true,
+          "maxChars": 157
+        },
+        {
+          "name": "waves",
+          "type": "list",
+          "required": true,
+          "maxChars": 65
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "method-waves",
+      "name": "Por olas · cuatro escalones de vidrio que suben del blueprint a la operación híbrida, unidos por la trayectoria de luz",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "method-agent-supervisor",
+          "decision-diagnosis-verdict"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "steps",
+          "type": "list",
+          "required": true,
+          "maxChars": 97
+        },
+        {
+          "name": "selectedStep",
+          "type": "number",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "topMark",
+          "type": "enum",
+          "required": false,
+          "maxChars": null
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-day-live-console",
+      "name": "Lo operamos · la consola de operación gestionada abierta: tres cifras del mes, cuatro controles y la revisión trimestral",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch",
+        "qbr"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-day-release-cycle",
+          "content-measure-formulas"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "panelIcon",
+          "type": "enum",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "panelTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 48
+        },
+        {
+          "name": "panelSubtitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 77
+        },
+        {
+          "name": "sampleMark",
+          "type": "text",
+          "required": false,
+          "maxChars": 16
+        },
+        {
+          "name": "metrics",
+          "type": "list",
+          "required": true,
+          "maxChars": 30
+        },
+        {
+          "name": "checks",
+          "type": "list",
+          "required": true,
+          "maxChars": 77
+        },
+        {
+          "name": "reviewKicker",
+          "type": "text",
+          "required": true,
+          "maxChars": 71
+        },
+        {
+          "name": "reviewTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 69
+        },
+        {
+          "name": "reviewCta",
+          "type": "text",
+          "required": true,
+          "maxChars": 14
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-day-live-approval",
+      "name": "Donde trabajas · el agente propone en el canal del equipo, la supervisora aprueba y el cambio queda ejecutado y registrado",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "method-agent-supervisor",
+          "content-live-chat"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115
+        },
+        {
+          "name": "channelIcon",
+          "type": "enum",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "required": true,
+          "maxChars": 69
+        },
+        {
+          "name": "agentIcon",
+          "type": "enum",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "agentName",
+          "type": "text",
+          "required": true,
+          "maxChars": 56
+        },
+        {
+          "name": "agentBadge",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "agentMessage",
+          "type": "richText",
+          "required": true,
+          "maxChars": 146
+        },
+        {
+          "name": "evidenceChips",
+          "type": "list",
+          "required": true,
+          "maxChars": 41
+        },
+        {
+          "name": "actions",
+          "type": "list",
+          "required": true,
+          "maxChars": 14
+        },
+        {
+          "name": "executedIcon",
+          "type": "enum",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "executedTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 39
+        },
+        {
+          "name": "executedText",
+          "type": "text",
+          "required": true,
+          "maxChars": 123
+        },
+        {
+          "name": "loop",
+          "type": "list",
+          "required": true,
+          "maxChars": 30
+        },
+        {
+          "name": "currentLoopStep",
+          "type": "number",
+          "required": true,
+          "maxChars": null
         }
       ],
       "template": null,
