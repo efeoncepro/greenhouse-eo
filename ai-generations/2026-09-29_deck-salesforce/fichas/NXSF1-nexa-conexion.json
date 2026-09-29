@@ -1,0 +1,27 @@
+{
+  "id": "NXSF1-nexa-conexion",
+  "formato": "16:9",
+  "linea": "revenue-salesforce",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "lecho": {
+    "objeto": "the near edge of a matte black standing meeting table, the lens only a few centimetres behind it, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark studio at night): she stands on the RIGHT half of the frame, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. Her head is almost frontal: both eyes, both eyebrows and both cheeks visible, only her eyes turn. She holds her open right palm up at chest height and looks straight into the lens with a confident, knowing half-smile. Five separate streams of fine glowing particles arrive from five different directions of the dark space behind her, all of the same vivid sky-blue light (#2FB8FF), and above her open palm they braid together into ONE single ring of brilliant sky-blue and white light seen in perspective, the one orbit of the frame, with ONE small blazing white sphere riding on that ring. The ring is the brightest element and lights her face, her palm and her jacket from below and the side. Cool rim light from behind separates her from the background. Thin haze catches every light. The LEFT 45% of the frame is calm, deep dark studio space with only faint haze: no light, no particles, no objects. The whole frame is cool and contemporary: nothing warm, amber, orange or golden. No robots, no mascots, no cartoon characters, no cloud symbols, no logos of any other brand, no readable text, no screens."
+}

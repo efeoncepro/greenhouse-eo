@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.12
+> **Versión:** 1.13
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude (1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-09-29 por Claude (1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -50,6 +50,14 @@
 > [manual de uso](../../manual-de-uso/creative/componer-por-superficie-con-axis.md) ·
 > [documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) ·
 > [recetas por lámina del deck](./deck-recipes/README.md)
+
+## Delta 2026-09-29 — el deck de práctica Salesforce, aprobado y con receta **[decisión del operador, 2026-09-29]**
+
+El operador aprobó las 19 láminas del deck Salesforce. Doce son recetas nuevas del catálogo (90 recetas; 78 con
+plantilla) y ocho son datos de recetas existentes, registrados en `approvedUses`. Cambian dos recetas existentes sin
+tocar `contentType` ni sus slots previos: `cover-brochure-line-revenue` (la línea `revenue-salesforce` pasa a aprobada y
+suma el slot opcional `partnerMark`) y `close-proposal-horizon` (eslogan en bloque al 64 % y `partnerMark` opcional).
+Detalle, cinco actos, reglas y el pendiente HubSpot: §4.6, «Deck de práctica Salesforce».
 
 ## Delta 2026-09-27 (c) — las 69 láminas del deck, aprobadas y con receta **[decisión del operador, 2026-09-27]**
 
@@ -525,8 +533,8 @@ sólo el acento de la línea**. Logos de terceros en un tono y con el mismo peso
 logo: firman la portada y el cierre. El cierre lleva el logo dentro de la órbita y la palabra final del eslogan en el
 acento ([manual §10.1](./EFEONCE_GRAPHIC_LINE_V1.md#101-pantalla-y-campaña)).
 
-**Las 69 láminas de la página «Deck» están aprobadas (2026-09-27), más nueve SEO/AEO aprobadas el 2026-09-28: 78 en
-total**, y cada una tiene su receta en el
+**Las 69 láminas de la página «Deck» están aprobadas (2026-09-27), más nueve SEO/AEO aprobadas el 2026-09-28 y doce
+recetas nuevas del deck Salesforce aprobadas el 2026-09-29: 90 en total**, y cada una tiene su receta en el
 [catálogo de recetas por lámina](./deck-recipes/README.md) (JSON `EFEONCE_DECK_SLIDE_RECIPES_V1.json`, esquema
 `efeonce.deck-slide-recipes.v1`). **Para elegir una lámina, empieza por el catálogo:** trae el índice por familia y por
 documento (propuesta, brochure, pitch, QBR), cuándo sí, cuándo no y qué conviene en su lugar, pares y data slots. Esta
@@ -543,6 +551,7 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
 | **`method-staircase`** | el método como escalera, sin foto (abajo); la principal de BeX | **aprobado** (BeX, 2026-09-27) |
 | Sección con lente, sección a sangre, respiro, foco, hoja de contactos, secciones de cine (servicios, equipo, quiénes somos, por qué lo hacemos) y las láminas de contenido, método, prueba, propuesta por línea, cotización y próximos pasos | el resto de las láminas del canvas | **aprobado** (2026-09-27); receta de cada una en el catálogo |
 | Las nueve SEO/AEO (`decision-ai-answer`, `decision-ai-market`, `method-surround-cycle`, `proposal-service-seo`, `proposal-cinematic-seo`, `decision-difference`, `method-eeat`, `decision-traffic-to-revenue`, `decision-diagnosis-map`) | contexto de mercado, la respuesta de la IA, el ciclo Surround, E-E-A-T, la diferencia, del tráfico al negocio, el mapa del diagnóstico y la propuesta SEO sobria y de cine (abajo, «Recetas por lámina») | **aprobado** (2026-09-28) |
+| Las doce del deck Salesforce (`content-one-platform`, `method-agent-supervisor`, `decision-platform-coexistence`, `decision-provider-fit`, `content-service-lanes`, `content-season-launches`, `method-identity-consent`, `method-migration-reconcile`, `content-day-release-cycle`, `content-day-live-library`, `content-live-chat`, `content-measure-formulas`) | la práctica Salesforce en cinco actos (abajo, «Deck de práctica Salesforce»); sin plantilla todavía | **aprobado** (2026-09-29) |
 
 **Reglas del deck**
 
@@ -550,8 +559,8 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
 - Las viñetas nunca llevan la esfera. La órbita con satélites lleva el arco largo en degradé **sin esfera**.
 - Una receta nueva nace en el canvas, se aprueba y recién entonces entra al catálogo de recetas, al token y al
   contrato.
-- **Una receta aprobada se compone con su plantilla.** Hoy `pnpm brand:compose` produce **las 78** recetas del
-  deck (tablas de §2.1). La portada con selección (`cover-brochure-cine-lines-selection`) se pide como
+- **Una receta aprobada se compone con su plantilla.** Hoy `pnpm brand:compose` produce **78 de las 90** recetas del
+  deck (tablas de §2.1); las 12 del deck Salesforce esperan su plantilla (TASK-1942). La portada con selección (`cover-brochure-cine-lines-selection`) se pide como
   `cover-brochure` con `layout: 'document-selection'`; `document` y `line` siguen rechazando la selección
   (`selection-not-in-recipe`).
 - **El intent declara `use` y `layout`.** `use` (`proposal` o `brochure`) dice para qué documento es la lámina; si se
@@ -946,7 +955,7 @@ JSON.
 
 | Tema | Receta(s) | Decisión |
 |---|---|---|
-| **Aprobación** | las 69 (2026-09-27) y las nueve SEO/AEO (2026-09-28): 78 | todo lo que el canon o AXIS marcaban como opción, prueba u «opción sin elegir» pasa a aprobado. No quedan opciones en la página «Deck» |
+| **Aprobación** | las 69 (2026-09-27), las nueve SEO/AEO (2026-09-28) y las doce del deck Salesforce (2026-09-29): 90 | todo lo que el canon o AXIS marcaban como opción, prueba u «opción sin elegir» pasa a aprobado. No quedan opciones en la página «Deck» |
 | **Alternativas** | todo par `variant` del catálogo | se elige una y la otra no entra al deck, seguidas o no (decisión del 2026-09-28; `variant-both-in-deck`). La portada y el cierre siguen en `frame-count` |
 | **Tríptico** | `triptych` | una palabra por toma, **cada una con su esfera**: «Escucha.» «Crea.» «Mide.», en Bricolage blanca sobre el lecho oscuro de cada toma y a la misma altura; la pregunta («¿Cómo trabajamos?») arriba a la izquierda. Es la única lámina con tres esferas de voz: las tres palabras son una respuesta repartida en tres tomas, no tres respuestas. Tres tomas verticales nativas, nunca recortes |
 | **Sección partida** | `section-split` (esquina arriba), `section-split-corner-bottom` (esquina abajo), `section-split-panel-end` (panel a la derecha) | el indicador nace abajo a la izquierda y **sube por la izquierda** en sentido horario; la esfera queda **arriba a la izquierda** del panel (también con el panel a la derecha). El texto vive entero en el papel. Se alternan: nunca dos con la misma esquina seguidas. Pares aprobados: «¿Quién decide el corte? **El dato.**», «¿Cuánto tarda tu campaña? **En días.**», «¿Qué responde la IA? **Tu marca.**» |
@@ -990,6 +999,72 @@ slot `metric` no la detecta `figure-source-missing`; y el plate SE1 se declara p
 banco de TASK-1931.
 Lista completa, con la receta
 y la decisión de cada uno: [catálogo, «Pendientes de QA»](./deck-recipes/README.md#pendientes-de-qa).
+
+#### Deck de práctica Salesforce (aprobado el 2026-09-29) **[decisión del operador, 2026-09-29]**
+
+El operador aprobó las 19 láminas del deck de la práctica Salesforce («Esto está aprobado todo, canonicemos»; canvas
+[«Láminas Salesforce · La órbita»](https://claude.ai/artifact/Jp1zybpowqVVyvgnDu1NSw) y «La órbita», página «Deck»,
+fila y = 7900, boards `DeckSalesforce*`). Línea `revenue-salesforce`: su acento sale del token, nunca transcrito. Doce
+son **recetas nuevas** (sin plantilla todavía: el plan avisa `recipe-without-template`) y ocho son **datos de recetas
+existentes**, registrados en el campo `approvedUses` de cada receta con su `fit` (qué cabe en los slots y qué no).
+Fuente de hechos: `ai-generations/2026-09-29_deck-salesforce/CANON-INVENTARIO.md` y `DECISIONES.md`; task
+[TASK-1942](../../tasks/in-progress/TASK-1942-salesforce-deck-recipes-canonization.md).
+
+**Orden narrativo en cinco actos** (el del canvas de revisión, de izquierda a derecha):
+
+| Acto | Lámina | Pregunta → respuesta | Receta |
+|---|---|---|---|
+| I · Apertura: la promesa | 01 | ¿Tu Salesforce ya actúa? → Por ti. | `cover-brochure-line-revenue` (dato; línea `revenue-salesforce`, plate NXSF2, badge opcional) |
+| | 02 | ¿Qué le falta a tu Salesforce? → Conexión. | `proposal-cinematic-revops` (dato; plate NXSF1) |
+| II · Cómo pensamos: criterio antes que licencia | 03 | ¿Cuántos Salesforce tienes? → Uno. | `content-one-platform` (nueva) |
+| | 04 | ¿Salesforce o HubSpot? → El que encaje. | `decision-provider-fit` (nueva) |
+| | 05 | ¿Hay que migrar a Next? → No por defecto. | `decision-platform-coexistence` (nueva) |
+| III · Qué hacemos: servicios, agentes y datos | 06 | ¿Qué hacemos en Salesforce? → Todo el ciclo. | `content-service-lanes` (nueva; Agent Astro opcional) |
+| | 07 | ¿Qué trajo Dreamforce? → Agentes. | `content-season-launches` (nueva; corte obligatorio; Astro opcional) |
+| | 08 | ¿Quién responde por el agente? → Una persona. | `method-agent-supervisor` (nueva) |
+| | 09 | ¿Dónde apruebas al agente? → Donde trabajas. | `content-day-live-progress` (dato; no cabe en sus slots) |
+| | 10 | ¿Y si le preguntas a tu CRM? → Te responde. | `content-live-chat` (nueva; Claude y Claudeforce opcionales) |
+| | 11 | ¿Puedes contactar a ese cliente? → Con permiso. | `method-identity-consent` (nueva) |
+| | 12 | ¿Cómo sabes que migró todo? → Porque cuadra. | `method-migration-reconcile` (nueva) |
+| IV · Cómo trabajamos: del diagnóstico a la operación | 13 | ¿Qué recibes primero? → Una decisión. | `decision-diagnosis-map` (dato; no cabe en sus slots) |
+| | 14 | ¿Cómo se suma un agente? → Por olas. | `method-staircase` (dato; no cabe en sus slots) |
+| | 15 | ¿Cómo trabajamos contigo? → Sin sorpresas. | `content-day-release-cycle` (nueva) |
+| | 16 | ¿Cómo aprende tu equipo? → A su ritmo. | `content-day-live-library` (nueva) |
+| | 17 | ¿Y después del go-live? → Lo operamos. | `content-day-live-results` (dato; no cabe en sus slots) |
+| | 18 | ¿Cómo sabes que funciona? → Lo medimos. | `content-measure-formulas` (nueva) |
+| V · Cierre | 19 | Empower your Revenue | `close-proposal-horizon` (dato; plate NXSF3 bordada, badge opcional) |
+
+Fuera del recorrido: la propuesta sobria (`proposal-service-revops`, mismo plate NXSF1: **excluyente** con la 02) y los
+respaldos sin badge de la 01 y la 19.
+
+**Reglas del deck de práctica** (además de las del deck):
+
+- **Marcas de terceros con condición.** Logo, íconos de producto, badge y Agent Astro sujetos a la autorización escrita
+  de Salesforce; Claude y Claudeforce, a la de Salesforce y Anthropic. Están **pendientes de archivar**: sin ellas, las
+  láminas con esas marcas no salen a clientes ni a pauta. Los íconos de producto van sólo donde se nombra el producto y
+  sin recolorear.
+- **Badge de partner = claim bloqueante.** Slot opcional `partnerMark` en la portada de línea y en la contraportada de
+  propuesta, sólo con readback vigente en Partner Community (registro de partnerships); respaldo «Operamos sobre» + logo
+  corporativo en la portada y nada en la contraportada. Nunca el de Cloud Reseller ni los Navigator.
+- **Agent Astro, Claude y Claudeforce son slots opcionales**, nunca fijos. El Astro es una interpretación editada del
+  arte oficial: no va a un package de AXIS publicado sin autorización o arte oficial, ni dentro de una foto.
+- **Temporada:** `content-season-launches` lleva fecha de corte obligatoria y no entra en un brochure evergreen.
+- **Muestra y montos:** cifras de muestra marcadas (13, 15, 16, 17); `content-measure-formulas` sin cifras; montos `[MONTO]`.
+- **Eslogan en bloque** en la contraportada: debajo del logo, al 64 % de su ancho (regla dura 8 de la línea); el
+  catálogo lo registra en `close-proposal-horizon` y cierra el delta de TASK-1933 para esa receta.
+- **Plates:** NXSF1 (propuesta), NXSF2 (portada) y NXSF3 bordada (contraportada), Nexa identidad A con la softshell del
+  kit, registro cine; rutas locales hasta el banco de TASK-1931. El plate SF1 de la arquitecta está rechazado.
+
+**Pregunta abierta del operador (bloquea componer el recorrido tal cual):** la narrativa abre con la portada de
+**brochure** y cierra con la contraportada de **propuesta**. `validateDeckPlan` lo rechaza como brochure
+(`recipe-not-for-document`, `pair-cover-close-mismatch`). Como brochure, la contraportada es `close-brochure-orbit`
+(sin foto) y el plan es válido; como propuesta, la portada es `cover-proposal-*` (sin foto, con el logo del cliente) y
+el plan es válido. Las dos variantes pasan hoy con 12 avisos `recipe-without-template`.
+
+**Deck HubSpot: pendiente.** La práctica RevOps & CRM vende también HubSpot («HubSpot-first» es un veredicto de la
+lámina 04), y HubSpot sólo tiene portada de línea y propuesta (`revenue-hubspot`, plate RV1b). La serie de contenido
+equivalente reutiliza las recetas de práctica con logos e íconos oficiales de HubSpot, su badge con su propio readback
+y **sin mascota inventada**: [TASK-1943](../../tasks/to-do/TASK-1943-hubspot-deck-content-series.md).
 
 ---
 

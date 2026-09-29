@@ -28,10 +28,27 @@ const withCoverSlots = (slots: Record<string, unknown>): DeckPlan => ({
 })
 
 describe('catálogo de runtime', () => {
-  it('trae las 78 recetas aprobadas, todas con plantilla y con su página de AXIS', () => {
-    expect(deckRecipeCatalog.recipes).toHaveLength(78)
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template)).toEqual([])
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id)).toEqual([])
+  // Las 12 recetas nuevas del deck Salesforce (aprobadas el 2026-09-29) todavía no tienen plantilla ni página de AXIS:
+  // el plan las acepta y avisa `recipe-without-template` hasta que el Artifact Composer las implemente.
+  const SALESFORCE_WITHOUT_TEMPLATE = [
+    'content-one-platform',
+    'method-agent-supervisor',
+    'decision-platform-coexistence',
+    'decision-provider-fit',
+    'content-service-lanes',
+    'content-season-launches',
+    'method-identity-consent',
+    'method-migration-reconcile',
+    'content-day-release-cycle',
+    'content-day-live-library',
+    'content-live-chat',
+    'content-measure-formulas'
+  ]
+
+  it('trae las 90 recetas aprobadas; todas con plantilla y página de AXIS salvo las 12 del deck Salesforce', () => {
+    expect(deckRecipeCatalog.recipes).toHaveLength(90)
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template).map(recipe => recipe.id)).toEqual(SALESFORCE_WITHOUT_TEMPLATE)
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id)).toEqual(SALESFORCE_WITHOUT_TEMPLATE)
   })
 
   it('acepta la portada y el cierre clásicos de AXIS sólo en pitch y QBR', () => {

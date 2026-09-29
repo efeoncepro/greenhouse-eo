@@ -1,0 +1,26 @@
+icon-agentforce.svg  https://wp.sfdcdigital.com/en-us/wp-content/uploads/sites/4/2024/09/icon-agentforce.svg  (descargado 2026-09-29, autorización del operador)
+icon-sales.svg  https://wp.sfdcdigital.com/en-us/wp-content/uploads/sites/4/2024/06/icon-sales.svg  (descargado 2026-09-29, autorización del operador)
+icon-service.svg  https://wp.sfdcdigital.com/en-us/wp-content/uploads/sites/4/2024/06/icon-service.svg  (descargado 2026-09-29, autorización del operador)
+icon-marketing.svg  https://wp.sfdcdigital.com/en-us/wp-content/uploads/sites/4/2024/06/icon-marketing.svg  (descargado 2026-09-29, autorización del operador)
+icon-data-cloud.svg  https://wp.sfdcdigital.com/en-us/wp-content/uploads/sites/4/2024/06/icon-data-cloud.svg  (descargado 2026-09-29, autorización del operador)
+icon-platform.svg  https://wp.sfdcdigital.com/en-us/wp-content/uploads/sites/4/2024/06/icon-platform.svg  (descargado 2026-09-29, autorización del operador)
+icon-slack.svg  https://wp.sfdcdigital.com/en-us/wp-content/uploads/sites/4/2024/06/icon-slack.svg  (descargado 2026-09-29, autorización del operador)
+icon-tableau.svg  https://wp.sfdcdigital.com/en-us/wp-content/uploads/sites/4/2024/06/icon-tableau.svg  (descargado 2026-09-29, autorización del operador)
+loom-media-kit.svg  https://cdn.sanity.io/images/pvn35iyy/production/ed4626352add7a8aa7f018a082d42f223df93392-403x278.svg (imagen de https://www.loom.com/media-kit)
+loom-pinned-tab.svg  https://cdn.loom.com/assets/favicons-loom/safari-pinned-tab.svg
+loom-app-icon-180.png  https://cdn.loom.com/assets/favicons-loom/apple-touch-icon-180x180.png  (descargados 2026-09-29, pedido del operador)
+claudeforce-anuncio-oficial.png  https://www.salesforce.com/news/wp-content/uploads/sites/3/2026/08/Anthropic-Partnership3.png (imagen del comunicado oficial Salesforce+Anthropic, 2026-08-26)
+claudeforce-tile-oficial.png  recorte sin alterar de la tarjeta «Claudeforce» de esa imagen (no existe logo aislado publicado)
+salesforce-partner-badge-horizontal.png / -square.png  OneDrive Alineación/7. Branding & Diseño/04. Logos & Partnership/02. Salesforce/Salesforce/Salesforce_Partner_Badge/Transparent_Background (kit oficial de partner; pedido del operador 2026-09-29)
+
+salesforce-partner-badge-horizontal-oficial.ai — vector oficial del kit de partner (OneDrive: Workspace/Efeonce Group/Partnership/2025 Salesforce_Partner Program Badges/Salesforce_Partner_Badge/Transparent_Background/Horizontal/Salesforce_Partner_Badge_Trnsp_Hrzntl_RGB.ai). Copia sin modificar (2026-09-29).
+salesforce-partner-badge-horizontal.svg — conversión del .ai con `pdftocairo -svg`; sólo se recortó el viewBox a la caja del badge (183.36 360 245.28 72, medida en render a 300 ppp). Sin redibujar ni alterar trazos ni colores. Reemplaza al PNG en las láminas.
+
+claudeforce-layer1-oficial.svg — wordmark oficial de Dreamforce en vector, publicado en https://www.salesforce.com/claudeforce/ (wp.sfdcdigital.com/.../2026/08/Layer_1.svg). Descargado con permiso del operador (2026-09-29).
+claudeforce-marquee-desktop-oficial.jpg — fondo del marquee de la misma página (4000×2440). Descargado con permiso del operador; sin uso en las láminas.
+claudeforce-frame-video-operador.png — cuadro de 640×480 del video de lanzamiento de Claudeforce, enviado por el operador en la sesión (2026-09-29). Es la versión de video del wordmark: «Claude» blanco + «force» celeste con la f del logo de Salesforce.
+claudeforce-wordmark.svg — wordmark armado por render-src/claudeforce-wordmark.mjs (no existe vector publicado):
+  «force», «a» y «e» = paths oficiales de Layer_1.svg sin alterar · «d» = «a» oficial + asta prolongada a la altura de la D ·
+  «l» = asta de 6,8 u (ancho oficial) de la altura de la D a la base · «u» y «C» = construidas geométricas con las medidas
+  oficiales (asta 6,8; x-height 16,45; base 47,25) y los radios/anchos medidos en el cuadro. Verificado superponiendo los
+  contornos sobre el cuadro del video. Celeste #00B6FF = color del vector oficial.

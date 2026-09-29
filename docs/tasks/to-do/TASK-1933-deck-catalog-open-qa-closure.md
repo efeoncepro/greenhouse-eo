@@ -11,6 +11,12 @@
 - Falta la decisión del operador: ¿las contraportadas del deck adoptan el bloque al 64 %, o conservan los 72 px? Si
   lo adoptan, se actualizan las recetas de contraportada, sus plantillas del Composer y el visual gate. Mientras tanto,
   las recetas no cambian.
+- **Cerrado el 2026-09-29 para `close-proposal-horizon`** (TASK-1942): la regla es del operador (regla dura 8 de la
+  skill `efeonce-graphic-line`: el eslogan va siempre en bloque bajo el logo, al 64 % de su ancho) y el operador aprobó
+  la contraportada SF19 con el bloque. La receta ya lo registra (fijo, prompt, regla y nota con el delta). Pendiente
+  del composer (TASK-1942, Slice 2): llevar la plantilla `close-proposal` al bloque, declararlo en `BASELINE_DELTAS.md`
+  y congelar. Las demás contraportadas con eslogan (`close-proposal-dawn`, `close-brochure-*`) no se tocaron en el
+  catálogo: la regla dura 8 las alcanza por su redacción («siempre»), pero su cambio de receta queda aquí abierto.
 
 ## Delta 2026-09-28 — pendientes que deja TASK-1934
 

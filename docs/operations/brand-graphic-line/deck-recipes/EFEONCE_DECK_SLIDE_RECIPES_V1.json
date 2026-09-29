@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "approvedAt": "2026-09-27",
   "approvedBy": "operador (canvas «La órbita», página Deck)",
-  "count": 78,
+  "count": 90,
   "axisRecipeFamilies": {
     "cover-classic": "portada clásica AXIS (deckSlideHtml cover)",
     "close-classic": "cierre clásico AXIS (deckSlideHtml close)",
@@ -1304,7 +1304,7 @@
           "type": "enum",
           "required": true,
           "example": "revenue-hubspot",
-          "notes": "Clave de efeonceGraphicLine.lines que da el acento del anillo y la esfera: growth · brand · engine · voice · revenue-hubspot (revenue-salesforce pendiente, no aprobada). Debe coincidir con la luz de acento del plate."
+          "notes": "Clave de efeonceGraphicLine.lines que da el acento del anillo y la esfera: growth · brand · engine · voice · revenue-hubspot · revenue-salesforce (aprobada el 2026-09-29 con la portada del deck Salesforce, SF0). Debe coincidir con la luz de acento del plate."
         },
         {
           "name": "photo",
@@ -1312,6 +1312,17 @@
           "required": true,
           "example": "ai-generations/2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png",
           "notes": "Plate aprobado de la línea: una líder de RevOps con chaqueta que dirige el nudo de un moño de luz magenta y azul con agentes robot. Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
+        },
+        {
+          "name": "partnerMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "kind": "partner-badge",
+            "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
+            "alt": "Salesforce Partner"
+          },
+          "notes": "OPCIONAL y condicionado (delta 2026-09-29, deck Salesforce): la insignia de partner de la plataforma de la línea al pie de la columna de voz (84 px de alto en top 1080 − 160, x = 140). En la aprobada, el badge «Salesforce Partner» horizontal en vector (ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg: el .ai oficial del kit de partner convertido con pdftocairo, sólo con el viewBox recortado; fuentes en logos/FUENTES.txt). Es un CLAIM bloqueante: sólo con readback primario vigente en Partner Community (owner Julio + RevOps & CRM; registro docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md y §Claims de EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md); la aceptación de 2025 como Provisional Consulting Partner no prueba el estado actual. Nunca el badge de Cloud Reseller (Consulting Partner ≠ Reseller) ni los Navigator. Nunca elemento fijo. Slot NUEVO en una receta con plantilla: la plantilla necesita un test que componga las recetas existentes SIN el slot (lessons 2026-09-28). Sin readback, el pie lleva el RESPALDO en vez del badge: kind «operates-on» = «Operamos sobre» (500 16px Pop, mayúsculas, tracking .2em, color suave, top 1080 − 168) + el logo corporativo de la plataforma a 64 px de alto (public/images/logos/partners/salesforce.com_logo.svg, sujeto a la autorización escrita de Salesforce), que no afirma nada. Sin slot, la portada queda como las demás portadas de línea (sin marca de terceros)."
         }
       ],
       "fixed": [
@@ -1359,8 +1370,62 @@
         "Un solo acento por lámina (five-accents-only-in-lines): no se mezclan colores de otras líneas en la voz.",
         "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %."
       ],
-      "notes": "Título previo: «✅ APROBADA · FOTO · Brochure RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.»». Variante HubSpot (acento magenta). La variante Salesforce (revenue-salesforce, acento cielo) es un pendiente opcional y no existe todavía. Las partículas del moño entran al 45 % izquierdo por debajo de la evidencia (x < 700, y > 820): la columna aprobada las libra, pero la evidencia de cuatro líneas es el máximo. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPortadaLineaRevenue.jpg"
+      "notes": "Título previo: «✅ APROBADA · FOTO · Brochure RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.»». Variante HubSpot (acento magenta). La variante Salesforce (revenue-salesforce) está aprobada desde el 2026-09-29: portada del deck Salesforce «¿Tu Salesforce ya actúa? Por ti.» con el plate NXSF2 (ver approvedUses). Las partículas del moño entran al 45 % izquierdo por debajo de la evidencia (x < 700, y > 820): la columna aprobada las libra, pero la evidencia de cuatro líneas es el máximo. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927). Delta 2026-09-29 (deck Salesforce): (1) la línea revenue-salesforce pasa a aprobada; (2) slot OPCIONAL nuevo partnerMark (badge de partner condicionado a readback, respaldo «Operamos sobre» + logo corporativo). No cambian contentType, layout ni los slots existentes; el composer debe implementar partnerMark con un test que componga las portadas de línea SIN él.",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPortadaLineaRevenue.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-29",
+          "approvedBy": "operador, 2026-09-29 («Esto está aprobado todo, canonicemos»; canvas «Láminas Salesforce · La órbita» y «La órbita», página Deck, fila y = 7900)",
+          "deck": "Salesforce (línea revenue-salesforce)",
+          "line": "revenue-salesforce",
+          "slide": "SF0-portada",
+          "board": "DeckSalesforcePortada",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF0-portada.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "slideId": "SF0-portada"
+          },
+          "content": {
+            "eyebrow": "Brochure · Servicios Salesforce",
+            "question": "¿Tu Salesforce ya actúa?",
+            "answer": "Por ti",
+            "evidence": "**Seis** servicios:\nVentas · Servicio · Marketing Cloud\nData 360 · Agentforce · Integración",
+            "line": "revenue-salesforce",
+            "partnerMark": {
+              "kind": "partner-badge",
+              "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
+              "alt": "Salesforce Partner"
+            },
+            "column.topPx": 190
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF2-nexa-portal.png",
+            "ficha": "ai-generations/2026-09-29_deck-salesforce/fichas/NXSF2-nexa-portal.json",
+            "prompt": "ai-generations/2026-09-29_deck-salesforce/prompts/NXSF2-nexa-portal.txt",
+            "alt": "Nexa, con la chaqueta navy de Efeonce, mira a cámara; detrás de ella se alza un gran anillo vertical de luz celeste del que salen cientos de hilos de luz que llegan a las yemas de sus dedos",
+            "notes": "Nexa (identidad A) con la softshell del kit, registro cine (85 mm, reserva del 45 % izquierdo); el portal de luz es la órbita. Revisada al 100 % contra el ancla y emblema correcto (nave, órbita y tres ventanas). Pipeline: pnpm foto:prompt <ficha> → pnpm foto:generar <ficha> --quality high (gpt-image-2.5-sunburst, edición con 4 referencias: tres anclas de Nexa de ai-generations/_identidad-nexa/1-anclas/ y la vista puesta de la softshell del kit) → pnpm foto:validar → pnpm foto:emblema al 100 %. El plate es ruta local (ai-generations/**, fuera de git): el Job artifact-worker no lo lee hasta el banco de plates (TASK-1931)."
+          },
+          "fit": "Cabe en los slots de la receta: la portada compone con layout «line» y column.topPx 190. El badge es el slot opcional nuevo partnerMark.",
+          "backup": {
+            "slide": "SF0-portada-sin-badge",
+            "board": "DeckSalesforcePortadaSinBadge",
+            "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF0-portada-sin-badge.jpg",
+            "render": "SIN_BADGE=1 ONLY=SF0-portada node ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "partnerMark": {
+              "kind": "operates-on",
+              "asset": "public/images/logos/partners/salesforce.com_logo.svg",
+              "label": "Operamos sobre"
+            },
+            "when": "mientras no haya readback vigente del badge en Partner Community"
+          },
+          "conditions": [
+            "Badge bloqueante para enviar: ningún deck con el badge sale a un cliente sin readback.",
+            "Logo, íconos y badge de Salesforce sujetos a la autorización escrita de Salesforce, pendiente de archivar."
+          ]
+        }
+      ]
     },
     {
       "id": "cover-proposal-orbit",
@@ -2420,19 +2485,30 @@
           "type": "enum",
           "required": true,
           "example": "Growth",
-          "notes": "Palabra final del eslogan en el acento. La lámina aprobada lleva Growth (marca madre) con luz teal en la foto. Las palabras por línea (Brand, Engine, Voice, Revenue) existen en el manual §7, pero no hay contraportada aprobada con ellas ni plate con esa luz: no cambiarla sin el operador."
+          "notes": "Palabra final del eslogan en el acento. La lámina aprobada lleva Growth (marca madre) con luz teal en la foto. Las palabras por línea (Brand, Engine, Voice, Revenue) existen en el manual §7, pero no hay contraportada aprobada con ellas ni plate con esa luz: no cambiarla sin el operador. Delta 2026-09-29: «Revenue» con la línea revenue-salesforce y el plate NXSF3 está aprobada (contraportada del deck Salesforce, SF19). Brand, Engine y Voice siguen sin contraportada aprobada."
         },
         {
           "name": "photo",
           "type": "image",
           "required": true,
           "example": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
-          "notes": "Plate fijo (Nexa de espaldas camina hacia un anillo teal vertical); es el mismo de close-brochure-horizon."
+          "notes": "Plate fijo (Nexa de espaldas camina hacia un anillo teal vertical); es el mismo de close-brochure-horizon. Plate alternativo aprobado el 2026-09-29 para la línea revenue-salesforce: ai-generations/2026-09-29_deck-salesforce/plates/NXSF3-nexa-contraportada-bordada.png (Nexa de espaldas hacia un anillo celeste; la espalda corregida a bordado)."
+        },
+        {
+          "name": "partnerMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "kind": "partner-badge",
+            "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
+            "alt": "Salesforce Partner"
+          },
+          "notes": "OPCIONAL y condicionado (delta 2026-09-29, deck Salesforce): la insignia de partner de la plataforma de la línea bajo el bloque de contacto (72 px de alto, 290 px bajo el inicio del contacto, x = 140). En la aprobada, el badge «Salesforce Partner» horizontal en vector (ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg: el .ai oficial del kit de partner convertido con pdftocairo, sólo con el viewBox recortado; fuentes en logos/FUENTES.txt). Es un CLAIM bloqueante: sólo con readback primario vigente en Partner Community (owner Julio + RevOps & CRM; registro docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md y §Claims de EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md); la aceptación de 2025 como Provisional Consulting Partner no prueba el estado actual. Nunca el badge de Cloud Reseller (Consulting Partner ≠ Reseller) ni los Navigator. Nunca elemento fijo. Slot NUEVO en una receta con plantilla: la plantilla necesita un test que componga las recetas existentes SIN el slot (lessons 2026-09-28). Sin readback, el slot se omite y la contraportada queda sin marca de terceros (respaldo SF19-contraportada-sin-badge)."
         }
       ],
       "fixed": [
         "Logo de Efeonce negativo a 500 px en x = 140, top = 230.",
-        "Eslogan «Empower your Growth» como mensaje principal a 72 px en top 420, en sus pesos oficiales (sloganRuns): «Empower» 800 itálica y «your» 800 en el suave de la voz, «Growth» 900 itálica en el acento teal.",
+        "Eslogan «Empower your <Palabra>» como mensaje principal EN BLOQUE con el logo: debajo del logo, al 64 % de su ancho (efeonceGraphicLine.motion.layout.sloganOfLogo) y separado 1,35 veces su cuerpo (sloganGapOfFont); el cuerpo se calcula del ancho, nunca fijo: 0,64 × ancho del logo ÷ efeonceGraphicLine.slogan.widthEmByWord[palabra] (Growth 11,586 em; Revenue 12,278 em). Pesos oficiales (sloganRuns): «Empower» 800 itálica y «your» 800 en el suave de la voz, la palabra 900 itálica en el acento de la línea. Reemplaza el eslogan suelto a 72 px en top 420 de la aprobada del 2026-09-27 (regla del operador del 2026-09-29, regla dura 8 de la skill efeonce-graphic-line; aplicada y aprobada en la contraportada Salesforce SF19).",
         "Bloque de contacto (frameContact): la burbuja URL horneada (url-bubble-baked-dark.svg) en la fila de redes, seguida de los íconos Spotify · Instagram · LinkedIn · Threads · YouTube · TikTok (src/lib/artifact-composer/catalogs/deck-axis/assets/social/), y debajo correo, dos teléfonos y dirección con sus íconos (assets/contact/). Los datos salen de EFEONCE_CONTACT en src/config/efeonce-brand.ts, no se escriben por lámina. Empieza en top 600.",
         "Sin voz pregunta–respuesta: sin «¿Conversamos?», sin eyebrow ni evidencia."
       ],
@@ -2453,7 +2529,7 @@
         "replaceable": "No es foto de ejemplo; no lleva datos del cliente."
       },
       "prompts": {
-        "composition": "Compón la contraportada de propuesta con efeonceGraphicLine.surfaces.deck.recipes[\"close-proposal\"] sobre efeonceGraphicLine.color.dark. Pon a sangre el plate BR3-contra-horizonte (Nexa de espaldas camina hacia un anillo teal vertical). Columna en x = 140: logo negativo de Efeonce a 500 px en top 230; el eslogan «Empower your Growth» a 72 px en top 420 con sloganRuns (Empower 800 itálica, your 800, Growth 900 itálica en el acento teal); desde top 600 el bloque de contacto: burbuja URL horneada oscura con los seis íconos de redes en una fila y debajo correo, dos teléfonos y dirección de EFEONCE_CONTACT con sus íconos. No escribas «¿Conversamos?», eyebrow ni evidencia (voice mode none). Verifica que «Growth» termine antes de la órbita y de la silueta."
+        "composition": "Compón la contraportada de propuesta con efeonceGraphicLine.surfaces.deck.recipes[\"close-proposal\"] sobre efeonceGraphicLine.color.dark. Pon a sangre el plate BR3-contra-horizonte (Nexa de espaldas camina hacia un anillo teal vertical). Columna en x = 140: logo negativo de Efeonce a 500 px en top 230; el eslogan «Empower your Growth» en bloque debajo del logo, al 64 % de su ancho (motion.layout.sloganOfLogo) y separado 1,35 veces su cuerpo (sloganGapOfFont), con sloganRuns (Empower 800 itálica, your 800, Growth 900 itálica en el acento de la línea); desde top 600 el bloque de contacto: burbuja URL horneada oscura con los seis íconos de redes en una fila y debajo correo, dos teléfonos y dirección de EFEONCE_CONTACT con sus íconos. No escribas «¿Conversamos?», eyebrow ni evidencia (voice mode none). Verifica que «Growth» termine antes de la órbita y de la silueta."
       },
       "renderSource": {
         "script": "ai-generations/2026-09-27_deck-recetas/render-src/brochure.mjs",
@@ -2467,10 +2543,61 @@
         "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
         "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
         "El eslogan va sólo en el cierre.",
-        "Sujeto de espaldas hacia la órbita: el último fotograma, nunca mirando al lente."
+        "Sujeto de espaldas hacia la órbita: el último fotograma, nunca mirando al lente.",
+        "El eslogan va en bloque con el logo: debajo, al 64 % del ancho del logo y separado 1,35 veces su cuerpo; nunca a un cuerpo fijo, más ancho que el logo, encima, al lado ni suelto (regla dura 8, operador 2026-09-29)."
       ],
-      "notes": "Título previo: «✅ APROBADA · FOTO · contraportada de propuesta: Empower your Growth (hacia la órbita)». Comparte plate con close-brochure-horizon; lo que cambia es el mensaje por documento. El render vive en brochure.mjs (bloque PRO-contraportada-*), no en propuesta.mjs. §6 fila 17 (pendiente): el manual pide el logo dentro de la órbita en el cierre; esta receta lo lleva arriba en la columna.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaContraHorizonte.jpg"
+      "notes": "Título previo: «✅ APROBADA · FOTO · contraportada de propuesta: Empower your Growth (hacia la órbita)». Comparte plate con close-brochure-horizon; lo que cambia es el mensaje por documento. El render vive en brochure.mjs (bloque PRO-contraportada-*), no en propuesta.mjs. §6 fila 17 (pendiente): el manual pide el logo dentro de la órbita en el cierre; esta receta lo lleva arriba en la columna. Delta 2026-09-29: el eslogan pasa a ir en bloque bajo el logo al 64 % de su ancho (decisión del operador; cierra el delta de TASK-1933 para esta receta) y se suma el slot OPCIONAL partnerMark. No cambian contentType ni los slots existentes. Pendiente del composer: la plantilla close-proposal hornea el eslogan a 72 px; hay que llevarla al bloque (valores de motion.layout) y registrar el cambio en BASELINE_DELTAS.md antes de congelar, y un test sin partnerMark.",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaContraHorizonte.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-29",
+          "approvedBy": "operador, 2026-09-29 («Esto está aprobado todo, canonicemos»; canvas «Láminas Salesforce · La órbita» y «La órbita», página Deck, fila y = 7900)",
+          "deck": "Salesforce (línea revenue-salesforce)",
+          "line": "revenue-salesforce",
+          "slide": "SF19-contraportada",
+          "board": "DeckSalesforceContraportada",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF19-contraportada.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "slideId": "SF19-contraportada"
+          },
+          "content": {
+            "sloganLineWord": "Revenue",
+            "partnerMark": {
+              "kind": "partner-badge",
+              "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
+              "alt": "Salesforce Partner"
+            }
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF3-nexa-contraportada-bordada.png",
+            "ficha": "ai-generations/2026-09-29_deck-salesforce/fichas/NXSF3-nexa-contraportada.json",
+            "prompt": "ai-generations/2026-09-29_deck-salesforce/prompts/NXSF3-nexa-contraportada.txt",
+            "alt": "Nexa, con la chaqueta de Efeonce, camina de espaldas por un piso brillante hacia un gran anillo vertical de luz celeste con una esfera blanca en lo alto",
+            "postprocess": [
+              "La vista «puesta: espalda» del kit de la softshell sigue estampada (pendiente conocido del kit): la marca de la espalda se llevó a bordado con el método de acabado — recorte de la espalda a 1024 (plates/espalda-crop-1024.png) → edición con el prompt plates/prompt-bordado.txt («satin-stitch», sin cambiar forma, letras ni posición) → mezcla sólo sobre la silueta de la marca; 0 píxeles cambiados fuera de la marca. Salida: plates/NXSF3-nexa-contraportada-bordada.png.",
+              "pnpm foto:emblema al 100 % (plates/espalda-bordada-zoom.png). A esa escala (~130 px) el bordado apenas se distingue. La chaqueta dice «Empower your Growth» porque es la estampa del uniforme.",
+              "Pendiente del kit: rehacer en bordado las vistas puestas de espalda de softshell y bomber."
+            ],
+            "notes": "Pipeline: pnpm foto:prompt <ficha> → pnpm foto:generar <ficha> --quality high (gpt-image-2.5-sunburst, edición con 4 referencias: tres anclas de Nexa de ai-generations/_identidad-nexa/1-anclas/ y la vista puesta de la softshell del kit) → pnpm foto:validar → pnpm foto:emblema al 100 %. El plate es ruta local (ai-generations/**, fuera de git): el Job artifact-worker no lo lee hasta el banco de plates (TASK-1931)."
+          },
+          "layout": "Logo de Efeonce a 700 px en top 220 (la receta aprobada del 2026-09-27 lo pone a 500 px en top 230) y eslogan en bloque al 64 % («Revenue» en el acento): cuerpo ≈ 36,5 px. Contacto desde EFEONCE_CONTACT y redes; badge 290 px bajo el inicio del contacto. Qué ancho de logo queda como canon de la receta (500 o 700) no lo decidió el operador: el composer lo confirma antes de hornear.",
+          "fit": "Cabe en los slots de la receta (sloganLineWord, photo) más el slot opcional nuevo partnerMark. Choca con la norma del documento si se arma como BROCHURE: close-proposal-horizon es contraportada de PROPUESTA (con foto) y la portada SF0 es de brochure (con foto): frame-photo-must-alternate y recipe-not-for-document. Ver la norma §4.6, «Deck de práctica Salesforce».",
+          "backup": {
+            "slide": "SF19-contraportada-sin-badge",
+            "board": "DeckSalesforceContraportadaSinBadge",
+            "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF19-contraportada-sin-badge.jpg",
+            "render": "SIN_BADGE=1 ONLY=SF19-contraportada node ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "partnerMark": null,
+            "when": "mientras no haya readback vigente del badge"
+          },
+          "conditions": [
+            "Badge bloqueante para enviar; autorización escrita de Salesforce pendiente de archivar."
+          ]
+        }
+      ]
     },
     {
       "id": "close-proposal-dawn",
@@ -5146,7 +5273,73 @@
         "El isotipo del uniforme en la pieza de ejemplo es el compuesto, nunca el del modelo."
       ],
       "notes": "Receta nueva (no existe en AXIS). Primer «vívelo» del día a día (matiz del operador: «que quien lo ve VIVA la experiencia de trabajar con nosotros»). Antecedente sin 3D: V1-avanza-a-la-vista en el mismo script. Hallazgo: dentro del tablero, la etiqueta «Esperando tu visto bueno» va en color.tealDark a 13 px (D1 reserva el acento para 24 px o más).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVivoAvanza.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVivoAvanza.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-29",
+          "approvedBy": "operador, 2026-09-29 («Esto está aprobado todo, canonicemos»; canvas «Láminas Salesforce · La órbita» y «La órbita», página Deck, fila y = 7900)",
+          "deck": "Salesforce (línea revenue-salesforce)",
+          "line": "revenue-salesforce",
+          "slide": "SF18-supervision-vivo",
+          "board": "DeckSalesforceSupervisionVivo",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF18-supervision-vivo.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "slideId": "SF18-supervision-vivo"
+          },
+          "content": {
+            "eyebrow": "Agentforce · supervisión en vivo",
+            "question": "¿Dónde apruebas al agente?",
+            "answer": "Donde trabajas",
+            "body": "El agente propone con evidencia, tú **apruebas** en Slack y el cambio queda ejecutado y registrado.",
+            "note": "Ejemplo ilustrativo · la política y los límites se definen con tu equipo",
+            "channel": "# servicio-aprobaciones",
+            "agentMessage": "Caso #4821: el cliente pide reembolso de [MONTO]. Según la política 3.2 corresponde aprobarlo.",
+            "evidenceChips": [
+              "Historial del cliente",
+              "Política 3.2"
+            ],
+            "actions": [
+              "Aprobar",
+              "Editar",
+              "Rechazar"
+            ],
+            "executed": {
+              "title": "Ejecutado en Service Cloud",
+              "text": "Reembolso aplicado, cliente notificado y registro de quién aprobó y cuándo."
+            },
+            "loop": [
+              [
+                "Propone",
+                "El agente, con evidencia"
+              ],
+              [
+                "Apruebas",
+                "La supervisora, en Slack"
+              ],
+              [
+                "Ejecuta",
+                "En Service Cloud"
+              ],
+              [
+                "Queda registrado",
+                "Auditoría completa"
+              ]
+            ]
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Supervisora",
+            "target": "el botón «Aprobar» (26 px de separación entre botones para que la selección no pise «Editar»)",
+            "anchor": "bottom-end"
+          },
+          "fit": "Misma idea («vívelo»: la aprobación en la herramienta donde se trabaja), otro contenido: la receta es el tablero de Notion y la revisión de Frame.io (boardTitle, boardCards, reviewTitle, reviewImage, clientComment, teamReply) con cursor local sin etiqueta; la lámina Salesforce es un mensaje del agente en Slack con Aprobar/Editar/Rechazar, la tarjeta «Ejecutado en Service Cloud» y el ciclo de cuatro pasos, con colaborador «Supervisora». Además eyebrow tiene maxChars 26 (la aprobada mide 32) y answer 12 (la aprobada, 14). No cabe en los slots: para componerla hace falta una composición nueva o una receta propia; decisión del composer con el operador. Si el cliente trabaja en Teams, el canal cambia.",
+          "conditions": [
+            "Ícono oficial de Slack, Agentforce y Service sujetos a la autorización escrita de Salesforce; montos [MONTO]."
+          ]
+        }
+      ]
     },
     {
       "id": "content-day-live-results",
@@ -5281,7 +5474,82 @@
         "Cursor local del cliente, sin etiqueta."
       ],
       "notes": "Receta nueva (no existe en AXIS). Segundo «vívelo» del día a día. Antecedente sin 3D: V2-resultados-en-vivo en el mismo script. Las cifras de la referencia (+22 %, +14, 61 %) son de la vista de muestra y así lo dice la tarjeta.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVivoResultados.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVivoResultados.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-29",
+          "approvedBy": "operador, 2026-09-29 («Esto está aprobado todo, canonicemos»; canvas «Láminas Salesforce · La órbita» y «La órbita», página Deck, fila y = 7900)",
+          "deck": "Salesforce (línea revenue-salesforce)",
+          "line": "revenue-salesforce",
+          "slide": "SF11-operacion",
+          "board": "DeckSalesforceOperacion",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF11-operacion.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "slideId": "SF11-operacion"
+          },
+          "content": {
+            "eyebrow": "Operación gestionada",
+            "question": "¿Y después del go-live?",
+            "answer": "Lo operamos",
+            "body": "Releases, soporte, datos, permisos y agentes, con SLA y una revisión **trimestral** de valor.",
+            "panelTitle": "Operación gestionada · este mes",
+            "panelSubtitle": "Sales · Service · Marketing Cloud · Agentforce",
+            "sampleMark": "Datos de muestra",
+            "metrics": [
+              [
+                "96 %",
+                "Soporte en SLA",
+                "48 de 50 solicitudes"
+              ],
+              [
+                "3",
+                "Releases",
+                "con pruebas y rollback"
+              ],
+              [
+                "0",
+                "Flows con error",
+                "monitoreo continuo"
+              ]
+            ],
+            "checks": [
+              [
+                "Calidad de datos · duplicados en cuentas",
+                "Bajo control"
+              ],
+              [
+                "Revisión de permisos del trimestre",
+                "Hecha"
+              ],
+              [
+                "Consumo de Agentforce vs. presupuesto",
+                "En rango"
+              ],
+              [
+                "Nuevo journey de reactivación",
+                "En pruebas"
+              ]
+            ],
+            "review": {
+              "kicker": "Próxima revisión trimestral",
+              "title": "Arquitectura, adopción, deuda y prioridades",
+              "cta": "Ver agenda"
+            }
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "la franja de la revisión trimestral",
+            "anchor": "bottom-start"
+          },
+          "fit": "Variante de datos que NO cabe en los slots: la receta muestra la captura del panel de Greenhouse (panel: image), la invitación de Teams (meeting) y el reporte (reportTitle), con cursor local sin etiqueta (local-cta); la lámina Salesforce es una consola HTML con tres cifras, cuatro controles y la revisión trimestral, con colaborador «Cliente». Además question tiene maxChars 16 (la aprobada mide 23) y answer 10 (la aprobada, 11). El inventario la clasifica como «≈ content-day-live-results»: para componerla hace falta una composición nueva o una receta propia; decisión del composer con el operador.",
+          "conditions": [
+            "Cifras de muestra siempre marcadas; ícono oficial de Salesforce Platform sujeto a autorización."
+          ]
+        }
+      ]
     },
     {
       "id": "decision-agenda",
@@ -6479,7 +6747,65 @@
         "Si el último nivel es aspiración, la nota lo dice"
       ],
       "notes": "Receta formal de AXIS `method-staircase` (aprobada con BeX «escalera» el 2026-09-27); es la única del grupo con plantilla en `pnpm brand:compose` que compone tal cual. Lámina interior, junto a la BeX original (variante plana). Referencia del Lab: `apps/lab/public/references/surfaces/deck/method-staircase.jpg`.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckBexEscalera.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckBexEscalera.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-29",
+          "approvedBy": "operador, 2026-09-29 («Esto está aprobado todo, canonicemos»; canvas «Láminas Salesforce · La órbita» y «La órbita», página Deck, fila y = 7900)",
+          "deck": "Salesforce (línea revenue-salesforce)",
+          "line": "revenue-salesforce",
+          "slide": "SF10-equipo-hibrido",
+          "board": "DeckSalesforceEquipoHibrido",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF10-equipo-hibrido.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "slideId": "SF10-equipo-hibrido"
+          },
+          "content": {
+            "eyebrow": "Agentforce · equipos híbridos",
+            "question": "¿Cómo se suma un agente?",
+            "answer": [
+              "Por",
+              "olas"
+            ],
+            "body": "Primero el trabajo, después la tecnología: cada ola se **prueba** antes de pasar a la siguiente.",
+            "steps": [
+              [
+                "01",
+                "Blueprint",
+                "Proceso actual y futuro, fichas de rol de cada agente y matriz de autonomía.",
+                "Empieza aquí"
+              ],
+              [
+                "02",
+                "Primer equipo híbrido",
+                "Un workflow real con supervisora nombrada, pruebas y producción acotada.",
+                "Primer valor"
+              ],
+              [
+                "03",
+                "Entre equipos",
+                "Se extiende a otros equipos con la misma ficha, rituales y evaluación.",
+                "Escala"
+              ],
+              [
+                "04",
+                "Operación híbrida",
+                "Catálogo de workflows, revisión humana y costo por resultado válido.",
+                "On-Going"
+              ]
+            ],
+            "selectedLevel": 1,
+            "selectionLabel": "Cliente",
+            "topMark": "ícono oficial de Agentforce sobre la esfera del último escalón"
+          },
+          "fit": "NO cabe en los slots de la receta tal como están: method-staircase exige exactamente 5 niveles (levels.count del token) con name ≤ 14 y descriptor ≤ 24, y una nota obligatoria; la lámina Salesforce tiene 4 olas con número, kicker, título (hasta 21) y descripción (hasta ~80), sin nota, y un ícono de producto en la cima. La idea (escalones de vidrio que suben con la trayectoria de luz, selección en el primero) es la de la escalera. Por tema también toca method-hybrid-workforce (su slot path es la misma ruta Blueprint → primer equipo híbrido → operación híbrida), pero su visual es la escalera de autoridad por tramos, no esta. Para componerla hace falta una composición nueva de method-staircase (4 escalones con descripción) o una receta propia: decisión del composer con el operador.",
+          "conditions": [
+            "Ícono oficial de Agentforce sujeto a la autorización escrita de Salesforce."
+          ]
+        }
+      ]
     },
     {
       "id": "proposal-cinematic-nexa",
@@ -9340,7 +9666,72 @@
         "Precios nunca en la lámina"
       ],
       "notes": "Versión sobria de RevOps; la cine (`proposal-cinematic-revops`) es la de impacto con la misma voz. Id nuevo, sin plantilla en `pnpm brand:compose`. Mismo hallazgo D1 en el kicker de la primera tarjeta. La foto de la lente es de puesta en escena (mira al lente), a diferencia de AEO y web, que son documentales.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaRevOps.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaRevOps.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-29",
+          "approvedBy": "operador, 2026-09-29 («Esto está aprobado todo, canonicemos»; canvas «Láminas Salesforce · La órbita» y «La órbita», página Deck, fila y = 7900)",
+          "deck": "Salesforce (línea revenue-salesforce)",
+          "line": "revenue-salesforce",
+          "slide": "SF7-propuesta",
+          "board": "DeckPropuestaSalesforce",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF7-propuesta.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "slideId": "SF7-propuesta"
+          },
+          "content": {
+            "eyebrow": "Nuestra propuesta · Salesforce",
+            "question": "¿Qué le falta a tu Salesforce?",
+            "answer": "Conexión",
+            "body": "Unimos CRM, servicio, marketing, datos y agentes en una sola operación: de la decisión informada a la operación gestionada.",
+            "steps": [
+              {
+                "kicker": "Empieza aquí",
+                "name": "Diagnóstico y arquitectura",
+                "desc": "Tu base instalada, datos y procesos: una decisión con evidencia."
+              },
+              {
+                "kicker": "Proyecto",
+                "name": "Implementación e integración",
+                "desc": "Sales, Service, Marketing Cloud y Data 360, conectados y probados."
+              },
+              {
+                "kicker": "Primer valor",
+                "name": "Activación y adopción",
+                "desc": "El primer valor nombrado antes de construir, y tu equipo usándolo."
+              },
+              {
+                "kicker": "On-Going",
+                "name": "Operación y evolución",
+                "desc": "Releases, datos, agentes y roadmap operados contigo."
+              }
+            ],
+            "note": "Licencias, consumo y servicios Efeonce se cotizan por separado."
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF1-nexa-conexion.png",
+            "ficha": "ai-generations/2026-09-29_deck-salesforce/fichas/NXSF1-nexa-conexion.json",
+            "prompt": "ai-generations/2026-09-29_deck-salesforce/prompts/NXSF1-nexa-conexion.txt",
+            "lens": "recorte 600 × 600 desde (1020, 20) del plate, cubierto a 1100 y centrado al este, en la lente de 220 px de radio",
+            "notes": "Mismo plate que la cine (SF6): alternativa sobria, nunca las dos en el mismo deck."
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "la primera tarjeta («Empieza aquí»)",
+            "anchor": "top-end",
+            "scale": 1.1,
+            "padding": "standard"
+          },
+          "fit": "Cabe salvo dos nombres de paso: steps.name tiene maxChars 24 y la aprobada lleva «Diagnóstico y arquitectura» (26) e «Implementación e integración» (28), en dos líneas; validateDeckPlan daría slot-over-max-chars. El catálogo no se cambió: decidir con el operador si se acortan o se sube el largo (la plantilla proposal-service los muestra en dos líneas).",
+          "conditions": [
+            "Fuera del recorrido del brochure: alternativa de SF6, nunca juntas."
+          ]
+        }
+      ]
     },
     {
       "id": "proposal-cinematic-creative",
@@ -9972,7 +10363,70 @@
         "Acento magenta = Revenue HubSpot; Salesforce usaría el cielo y no tiene lámina"
       ],
       "notes": "Receta AXIS `proposal-cinematic`, referencia `proposal-cinematic-revops` (placa RV1b, aprobada el 2026-09-27 a la 01:46). Es la única de las propuestas cine con el colaborador abajo a la derecha (`selection.anchor: 'bottom-end'`). Sin prueba en la referencia: el builder 0.1.1 de `pnpm brand:compose` la rechaza hasta TASK-1927. En la referencia la etiqueta «Cliente» queda muy cerca de la mano que dirige el nudo: revisar al 100 % al componer.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaRevOpsCine.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaRevOpsCine.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-29",
+          "approvedBy": "operador, 2026-09-29 («Esto está aprobado todo, canonicemos»; canvas «Láminas Salesforce · La órbita» y «La órbita», página Deck, fila y = 7900)",
+          "deck": "Salesforce (línea revenue-salesforce)",
+          "line": "revenue-salesforce",
+          "slide": "SF6-propuesta-cine",
+          "board": "DeckPropuestaSalesforceCine",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF6-propuesta-cine.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "slideId": "SF6-propuesta-cine"
+          },
+          "content": {
+            "eyebrow": "Nuestra propuesta · Salesforce",
+            "question": "¿Qué le falta a tu Salesforce?",
+            "answer": "Conexión",
+            "body": "Unimos CRM, servicio, marketing, datos y agentes para que Salesforce funcione como **una** sola operación alrededor del cliente.",
+            "steps": [
+              {
+                "glyph": "checklist",
+                "kicker": "Empieza aquí",
+                "name": "Diagnóstico"
+              },
+              {
+                "glyph": "integracion",
+                "kicker": "Proyecto",
+                "name": "Implementación"
+              },
+              {
+                "glyph": "crm",
+                "kicker": "Primer valor",
+                "name": "Activación"
+              },
+              {
+                "glyph": "automatizacion",
+                "kicker": "On-Going",
+                "name": "Operación"
+              }
+            ]
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF1-nexa-conexion.png",
+            "ficha": "ai-generations/2026-09-29_deck-salesforce/fichas/NXSF1-nexa-conexion.json",
+            "prompt": "ai-generations/2026-09-29_deck-salesforce/prompts/NXSF1-nexa-conexion.txt",
+            "alt": "Nexa, con la chaqueta navy de Efeonce, mira a cámara y sostiene sobre la palma abierta un anillo de luz celeste en el que se trenzan cinco haces de partículas, con una esfera blanca sobre el anillo",
+            "notes": "Plate reservado para la propuesta: la sobria (proposal-service-revops, SF7) usa el mismo, así que son variantes excluyentes (variant-both-in-deck, plate-repeated). Pipeline: pnpm foto:prompt <ficha> → pnpm foto:generar <ficha> --quality high (gpt-image-2.5-sunburst, edición con 4 referencias: tres anclas de Nexa de ai-generations/_identidad-nexa/1-anclas/ y la vista puesta de la softshell del kit) → pnpm foto:validar → pnpm foto:emblema al 100 %. El plate es ruta local (ai-generations/**, fuera de git): el Job artifact-worker no lo lee hasta el banco de plates (TASK-1931)."
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "la respuesta «Conexión» (targetKind text)",
+            "anchor": "bottom-end",
+            "scale": 1.1
+          },
+          "fit": "Cabe salvo un largo: question tiene maxChars 28 y la aprobada mide 30 («¿Qué le falta a tu Salesforce?»); validateDeckPlan daría slot-over-max-chars. La plantilla cine admite el texto (slots: null en recipe-map); el catálogo no se cambió: decidir si se acorta la pregunta o se sube el largo con el operador (TASK-1933 mapea las cinco cine).",
+          "conditions": [
+            "Nexa, sin marcas de terceros en la foto; autorización de Salesforce sólo por el nombre en el texto (no aplica logo)."
+          ]
+        }
+      ]
     },
     {
       "id": "proposal-service-seo",
@@ -11052,7 +11506,97 @@
         "Datos de muestra siempre marcados",
         "El share of voice suma 100"
       ],
-      "notes": "Aprobada el 2026-09-28. Entregables de /aeo-2/ (Empieza con tu diagnóstico gratis)."
+      "notes": "Aprobada el 2026-09-28. Entregables de /aeo-2/ (Empieza con tu diagnóstico gratis).",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-29",
+          "approvedBy": "operador, 2026-09-29 («Esto está aprobado todo, canonicemos»; canvas «Láminas Salesforce · La órbita» y «La órbita», página Deck, fila y = 7900)",
+          "deck": "Salesforce (línea revenue-salesforce)",
+          "line": "revenue-salesforce",
+          "slide": "SF5-diagnostico-decision",
+          "board": "DeckSalesforceDiagnostico",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF5-diagnostico-decision.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+            "slideId": "SF5-diagnostico-decision"
+          },
+          "content": {
+            "eyebrow": "Lo que recibes primero",
+            "question": "¿Qué recibes primero?",
+            "answer": "Una decisión",
+            "evidence": "Una decisión informada, con **evidencia**, no una recomendación por defecto.",
+            "reportTitle": "Diagnóstico de valor y arquitectura",
+            "sampleMark": "Datos de muestra",
+            "modules": {
+              "01 · Estado actual": {
+                "title": "Mapa de tu operación",
+                "nodes": [
+                  "Ventas",
+                  "Servicio",
+                  "Marketing",
+                  "ERP",
+                  "Web",
+                  "Datos"
+                ],
+                "footnote": "14 integraciones · 3 sin dueño"
+              },
+              "02 · Veredicto": {
+                "title": "Encaje de la plataforma",
+                "options": [
+                  "Fit",
+                  "Fit condicionado",
+                  "No fit"
+                ],
+                "selected": "Fit condicionado",
+                "condition": "Condición: resolver identidad y consentimiento antes de canales"
+              },
+              "03 · Riesgos": {
+                "title": "Lo que hoy frena",
+                "items": [
+                  "Duplicados en cuentas",
+                  "Flows sin ruta de error",
+                  "Permisos amplios"
+                ]
+              },
+              "04 · Evidencia": {
+                "title": "Registro verificable",
+                "text": "Cada hallazgo con su fuente: la org, los datos y las entrevistas con tu equipo."
+              },
+              "05 · Roadmap": {
+                "title": "Plan por olas",
+                "waves": [
+                  [
+                    "Ola 1",
+                    "Datos y consentimiento",
+                    "Base"
+                  ],
+                  [
+                    "Ola 2",
+                    "Servicio con SLA",
+                    "Primer valor"
+                  ],
+                  [
+                    "Ola 3",
+                    "Agente de casos supervisado",
+                    "Agentes"
+                  ]
+                ]
+              }
+            }
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "el módulo 05 · Roadmap (las olas)",
+            "anchor": "bottom-end"
+          },
+          "fit": "NO cabe en los slots de la receta: la receta es el diagnóstico AEO (engineScores 6, shareOfVoice, lostPrompts, plan de 3, expertNote) y la lámina Salesforce muestra otros cinco módulos (estado actual, veredicto, riesgos, evidencia, roadmap por olas), sin ficha «Lectura experta»; además answer tiene maxChars 8 y la aprobada es «Una decisión» (12, en dos líneas a 150 px). Mismo contentType, otro contenido: para componerla hace falta una composición nueva de la plantilla (layout) o una receta propia; el catálogo no cambió los slots existentes. Decisión del composer con el operador.",
+          "conditions": [
+            "Datos de muestra siempre marcados."
+          ]
+        }
+      ]
     },
     {
       "id": "breather",
@@ -11167,6 +11711,2339 @@
       ],
       "notes": "Estado: aprobada el 2026-09-27; la norma v1.3 y los tokens de AXIS quedaron sincronizados (lo que sigue sobre «option» es histórico). Aprobada el 2026-09-27; en la norma y en AXIS figura como `option`. El plate P2 aparece también en la hoja de contactos y en el hero web: no repetirlo dentro del mismo deck.",
       "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckRespiro.jpg"
+    },
+    {
+      "id": "content-one-platform",
+      "board": "DeckSalesforceUnaOperacion",
+      "name": "Una sola operación · la cuenta del cliente al centro y cinco áreas de trabajo conectadas",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/content-one-platform.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF1-una-operacion.jpg",
+      "communicates": "La plataforma no se vende por nubes: ventas, servicio, marketing, datos y agentes trabajan sobre una sola cuenta del cliente.",
+      "useWhen": [
+        "Abrir la conversación de plataforma después de la propuesta: el problema del cliente es tener varias herramientas que no se hablan.",
+        "Deck de RevOps y CRM donde hay que mostrar la integración antes del catálogo de servicios.",
+        "Cuando el comité ve cada producto como un proyecto separado."
+      ],
+      "avoidWhen": [
+        "El cliente usa un solo producto y no hay integración que mostrar.",
+        "Sin la autorización escrita de Salesforce archivada: los íconos oficiales de producto no salen a clientes.",
+        "Si lo que se necesita es la lista de servicios: usar content-service-lanes."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-service-lanes",
+          "when": "la pregunta es qué hacemos, no cómo se conecta"
+        },
+        {
+          "recipe": "proposal-cinematic-revops",
+          "when": "se necesita la lámina que propone el servicio completo"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "decision-provider-fit",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-platform-coexistence",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Salesforce · RevOps y CRM",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Cuántos Salesforce tienes?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 7,
+          "example": "Uno",
+          "notes": "Medido: caja 590 px × 1 línea a 760 176px Bric (≈79.35 px/carácter sin tracking, 5 % de holgura). Una palabra, sin punto: cierra con la esfera en el acento. 176/40 = 4,4× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Conectamos CRM, servicio, marketing, datos y agentes para que Salesforce funcione como **una** sola operación alrededor del cliente.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "workAreas",
+          "type": "list",
+          "required": true,
+          "maxChars": 20,
+          "example": [
+            {
+              "icon": "sales",
+              "area": "Ventas",
+              "product": "Sales Cloud"
+            },
+            {
+              "icon": "service",
+              "area": "Servicio",
+              "product": "Service Cloud"
+            },
+            {
+              "icon": "marketing",
+              "area": "Marketing",
+              "product": "Engagement y Next"
+            },
+            {
+              "icon": "data-cloud",
+              "area": "Datos",
+              "product": "Data 360"
+            },
+            {
+              "icon": "agentforce",
+              "area": "Agentes",
+              "product": "Agentforce"
+            }
+          ],
+          "notes": "Exactamente 5 tarjetas de vidrio a distinta profundidad (280 px, rotateY ±10–14°), la de agentes arriba al centro; cada una manda un haz de luz a la cuenta. Por ítem: icon (enum, ícono oficial de producto: agentforce · sales · service · marketing · data-cloud · platform · slack · tableau) · area (≤ 12; 760 26px Bric en 170 px) · product (≤ 20; 400 15px Pop en 170 px). El producto se nombra como lo nombra Salesforce."
+        },
+        {
+          "name": "accountName",
+          "type": "text",
+          "required": true,
+          "maxChars": 22,
+          "example": "Tu cliente",
+          "notes": "Tarjeta blanca de la cuenta al centro, sobre la plataforma, con reflejo. Medido: 286 px a 760 24px Bric. Con un cliente real, su nombre sólo con autorización (TASK-1930/1937)."
+        },
+        {
+          "name": "accountInitials",
+          "type": "text",
+          "required": true,
+          "maxChars": 2,
+          "example": "TC",
+          "notes": "Iniciales en el círculo navy de 52 px (760 20px Bric). Nunca una foto ni una cara generada."
+        },
+        {
+          "name": "accountSubtitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 37,
+          "example": "Una sola cuenta, todos los equipos",
+          "notes": "Medido: 286 px a 400 14px Pop."
+        },
+        {
+          "name": "accountFacts",
+          "type": "list",
+          "required": true,
+          "maxChars": 22,
+          "example": [
+            [
+              "Oportunidad",
+              "En negociación"
+            ],
+            [
+              "Caso abierto",
+              "Dentro del SLA"
+            ],
+            [
+              "Journey",
+              "Bienvenida · paso 3"
+            ],
+            [
+              "Consentimiento",
+              "Email ✓ · SMS —"
+            ]
+          ],
+          "notes": "Exactamente 4 filas, una por área que toca la cuenta. Por ítem: label (≤ 18; 400 15px Pop en 150 px) · value (≤ 22; 600 15px Pop en 186 px). Datos de ejemplo: con datos del cliente, sólo desde su org y con evidencia (TASK-1930)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "La cuenta del cliente al centro sobre la plataforma de luz; las cinco tarjetas flotan alrededor y su luz baja a la cuenta.",
+        "Sin nota arriba a la derecha."
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "la tarjeta de la cuenta (targetKind object)",
+        "anchor": "bottom-end",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Una sola operación» sobre fondo Efeonce oscuro con el acento de la línea del documento (revenue-salesforce en la aprobada). Voz a la izquierda: eyebrow, pregunta en dos líneas con anillo, respuesta de una palabra a 176 px («Uno.») y evidencia con UNA palabra en negrita. A la derecha, la tarjeta blanca de la cuenta del cliente (iniciales, nombre, bajada y cuatro filas de estado por área) al centro sobre la plataforma de luz, con reflejo; alrededor, cinco tarjetas de vidrio a distinta profundidad con el ícono oficial del producto, el área y el nombre del producto, cada una con un haz de luz hacia la cuenta. Selección de colaborador «Cliente» sobre la cuenta, anclada abajo al final. Burbuja URL en el pie."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF1-una-operacion"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Cinco áreas, cada una con su producto oficial: no se inventan nubes ni se agrupan productos que la cuenta no usa."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 03 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Selección con el contrato efeonce.collaboration-selection 0.3.0 (paintSelection). Reutilizable en HubSpot con los productos de HubSpot sólo con sus íconos oficiales (ver TASK del deck HubSpot)."
+    },
+    {
+      "id": "method-agent-supervisor",
+      "board": "DeckSalesforceAgentesSupervisor",
+      "name": "Agentes con supervisora · cada agente con su ficha de autonomía y una persona que responde",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/method-agent-supervisor.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF2-agentes-supervisor.jpg",
+      "communicates": "Ningún agente trabaja solo: cada uno nace con su ficha (qué lee, qué propone, qué ejecuta) y una persona nombrada lo aprueba, lo corrige y lo detiene.",
+      "useWhen": [
+        "Propuesta o brochure con agentes (Agentforce) cuando la objeción es el control o el riesgo.",
+        "Antes de la lámina que lo muestra en vivo (content-day-live-progress con datos de supervisión).",
+        "Comité que pregunta quién responde por lo que hace un agente."
+      ],
+      "avoidWhen": [
+        "El deck no ofrece agentes.",
+        "Se necesita la ruta de adopción por olas: usar method-staircase (equipo híbrido por olas).",
+        "Sin la autorización escrita de Salesforce archivada (ícono oficial de Agentforce)."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "method-hybrid-workforce",
+          "when": "la pregunta es quién hace el trabajo y cómo crece la autoridad del agente por tramos, sin producto"
+        },
+        {
+          "recipe": "content-day-live-progress",
+          "when": "basta con mostrar la aprobación en vivo en la herramienta del cliente"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-day-live-progress",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "method-staircase",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Agentforce · equipos híbridos",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Quién responde por el agente?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "Una persona",
+          "notes": "Medido: caja 590 px por línea a 760 150px Bric (≈67.63 px/carácter sin tracking, 5 % de holgura): 16 caracteres entre las dos líneas y hasta 9 por línea («sorpresas», 9, es la línea más larga aprobada). 1–3 palabras partidas en dos líneas con salto manual; sin punto final: cierra con la esfera en el acento (answerHtml). 150/40 = 3,75× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Cada agente nace con su ficha: qué lee, qué propone, qué ejecuta y **quién** lo aprueba.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115,
+          "example": "Ejemplo ilustrativo · cada ficha se define con tu equipo",
+          "notes": "Nota arriba a la derecha (400 16px Pop, color suave, alineada al margen derecho, top 112). Medido sobre 1000 px × 1 línea (≈8.26 px/carácter, 5 % de holgura). Obligatoria: las fichas son un ejemplo que se define con el equipo del cliente."
+        },
+        {
+          "name": "supervisorKicker",
+          "type": "text",
+          "required": true,
+          "maxChars": 33,
+          "example": "Persona responsable",
+          "notes": "Medido: 324 px a 600 13px Pop en mayúsculas con tracking .12em."
+        },
+        {
+          "name": "supervisorRole",
+          "type": "text",
+          "required": true,
+          "maxChars": 41,
+          "example": "Supervisora de servicio",
+          "notes": "Rol, nunca un nombre propio. Medido: 324 px × 2 líneas a 760 30px Bric."
+        },
+        {
+          "name": "supervisorInitials",
+          "type": "text",
+          "required": true,
+          "maxChars": 2,
+          "example": "SV",
+          "notes": "Iniciales del rol en el círculo de 76 px con anillo del acento. Nunca una cara."
+        },
+        {
+          "name": "supervisorDuty",
+          "type": "text",
+          "required": true,
+          "maxChars": 37,
+          "example": "Aprueba, corrige y detiene",
+          "notes": "Medido: 324 px a 400 16px Pop."
+        },
+        {
+          "name": "agents",
+          "type": "list",
+          "required": true,
+          "maxChars": 72,
+          "example": [
+            {
+              "title": "Casos",
+              "job": "Clasifica, enruta y propone la respuesta.",
+              "levels": [
+                [
+                  "Lee",
+                  "Historial y knowledge",
+                  "y"
+                ],
+                [
+                  "Propone",
+                  "Respuesta al cliente",
+                  "y"
+                ],
+                [
+                  "Ejecuta",
+                  "Enrutar dentro del SLA",
+                  "y"
+                ],
+                [
+                  "Aprueba",
+                  "La supervisora",
+                  "n"
+                ]
+              ]
+            },
+            {
+              "title": "Pipeline",
+              "job": "Sugiere la siguiente acción comercial.",
+              "levels": [
+                [
+                  "Lee",
+                  "Oportunidades y actividad",
+                  "y"
+                ],
+                [
+                  "Propone",
+                  "Siguiente paso",
+                  "y"
+                ],
+                [
+                  "Ejecuta",
+                  "Sólo tareas y recordatorios",
+                  "h"
+                ],
+                [
+                  "Nunca",
+                  "Cambiar montos",
+                  "n"
+                ]
+              ]
+            },
+            {
+              "title": "Campañas",
+              "job": "Prepara variantes para audiencias con consentimiento.",
+              "levels": [
+                [
+                  "Lee",
+                  "Segmentos consentidos",
+                  "y"
+                ],
+                [
+                  "Propone",
+                  "Variantes y audiencia",
+                  "y"
+                ],
+                [
+                  "Ejecuta",
+                  "Nada sin aprobación",
+                  "n"
+                ]
+              ]
+            }
+          ],
+          "notes": "Exactamente 3 fichas blancas; la primera va al centro y al frente con la propuesta que espera aprobación. Por ítem: title (≤ 18; 760 22px Bric) · job (≤ 72; 400 14px Pop, 2 líneas en 276 px) · levels (3 o 4 filas: kind Lee | Propone | Ejecuta | Aprueba | Nunca, en 600 13px Pop mayúsculas · value ≤ 42, 2 líneas en 160 px · estado y = sí, h = parcial, n = no). Cada ficha lleva el ícono oficial de Agentforce."
+        },
+        {
+          "name": "pendingApproval",
+          "type": "text",
+          "required": true,
+          "maxChars": 47,
+          "example": "Respuesta propuesta al caso #4821",
+          "notes": "Fila en la ficha central con el botón «Aprobar»: es el objetivo de la selección. Medido: 170 px × 2 líneas a 500 13px Pop."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "La supervisora arriba en vidrio, con el anillo del acento en sus iniciales; tres haces bajan de ella a las fichas.",
+        "Las tres fichas a distinta profundidad (rotateY −6°, 12° y −16°) sobre la plataforma; la central al frente.",
+        "Botón «Aprobar» en navy dentro de la fila de la propuesta."
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Supervisora",
+        "target": "la fila de la propuesta con el botón «Aprobar» de la ficha central (targetKind object)",
+        "anchor": "bottom-end",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Agentes con supervisora» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda (pregunta de dos líneas, respuesta de dos líneas a 150 px «Una / persona.», evidencia con una palabra en negrita) y la nota «Ejemplo ilustrativo» arriba a la derecha. A la derecha: arriba, la ficha de vidrio de la persona responsable (iniciales del rol con anillo del acento, rótulo, rol y «Aprueba, corrige y detiene»); abajo, tres fichas blancas de agente con el ícono oficial de Agentforce, su tarea y sus niveles de autonomía (Lee, Propone, Ejecuta, Aprueba o Nunca, con punto lleno, medio o vacío); la central, al frente, con la propuesta pendiente y el botón «Aprobar». Haces de luz de la supervisora a las fichas, plataforma de luz debajo. Selección de colaborador «Supervisora» sobre la fila de aprobación."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF2-agentes-supervisor"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Toda ficha de agente dice quién aprueba o qué nunca hace: un agente sin supervisión no se dibuja.",
+        "Montos como [MONTO] si aparecen; el agente nunca cambia montos en el ejemplo aprobado."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 08 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Su «vívelo» es SF18 (content-day-live-progress con la aprobación en Slack). Reutilizable en HubSpot con el vocabulario de agentes de HubSpot (Breeze) y su ícono oficial, sólo si existe y se autoriza."
+    },
+    {
+      "id": "decision-platform-coexistence",
+      "board": "DeckSalesforceEngagementNext",
+      "name": "Dos plataformas que conviven · la decisión se toma capacidad por capacidad, no por reemplazo",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/decision-platform-coexistence.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF3-engagement-next.jpg",
+      "communicates": "Migrar no es la respuesta por defecto: cada capacidad se mantiene, integra, moderniza, migra o retira según el inventario real.",
+      "useWhen": [
+        "El cliente pregunta si debe migrar de una generación de producto a otra (en la aprobada, Marketing Cloud Engagement a Next).",
+        "Cuando el proveedor empuja un reemplazo completo y hay que mostrar criterio.",
+        "Antes de una propuesta de migración, para acotar qué se mueve."
+      ],
+      "avoidWhen": [
+        "La migración ya se decidió y lo que falta es mostrar que se hará bien: usar method-migration-reconcile.",
+        "Sin inventario del cliente: los veredictos son ejemplo y la nota lo dice.",
+        "Sin la autorización escrita de Salesforce archivada (ícono oficial de Marketing Cloud)."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "method-migration-reconcile",
+          "when": "la pregunta es cómo sabes que la migración salió completa"
+        },
+        {
+          "recipe": "decision-diagnosis-map",
+          "when": "se quiere cerrar con el diagnóstico que entrega esta decisión"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "decision-provider-fit",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "content-one-platform",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Marketing Cloud · Engagement y Next",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Hay que migrar a Next?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "No por defecto",
+          "notes": "Medido: caja 590 px por línea a 760 150px Bric (≈67.63 px/carácter sin tracking, 5 % de holgura): 16 caracteres entre las dos líneas y hasta 9 por línea («sorpresas», 9, es la línea más larga aprobada). 1–3 palabras partidas en dos líneas con salto manual; sin punto final: cierra con la esfera en el acento (answerHtml). 150/40 = 3,75× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Engagement sigue vigente y Next no lo reemplaza solo. Decidimos **capacidad** por capacidad.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115,
+          "example": "Ejemplo ilustrativo · el diagnóstico decide con tu inventario real",
+          "notes": "Nota arriba a la derecha (400 16px Pop, color suave, alineada al margen derecho, top 112). Medido sobre 1000 px × 1 línea (≈8.26 px/carácter, 5 % de holgura). Obligatoria mientras los veredictos no salgan del inventario del cliente."
+        },
+        {
+          "name": "platforms",
+          "type": "list",
+          "required": true,
+          "maxChars": 33,
+          "example": [
+            {
+              "icon": "marketing",
+              "base": "Marketing Cloud",
+              "name": "Engagement",
+              "items": [
+                "Journeys y automatizaciones",
+                "Data Extensions",
+                "Dominios, IPs y supresiones",
+                "Content Builder"
+              ]
+            },
+            {
+              "icon": "marketing",
+              "base": "Marketing Cloud",
+              "name": "Next",
+              "items": [
+                "Salesforce Platform",
+                "Data 360 y consentimiento",
+                "Flow y segmentos",
+                "Agentforce"
+              ]
+            }
+          ],
+          "notes": "Exactamente 2 tarjetas de vidrio atrás, a distinta profundidad (rotateY ±16°). Por ítem: icon (enum, ícono oficial: agentforce · sales · service · marketing · data-cloud · platform · slack · tableau) · base (≤ 26; 600 13px Pop mayúsculas en 254 px) · name (≤ 14; 760 34px Bric) · items (exactamente 4, ≤ 33; 400 16px Pop en 294 px). Los nombres de producto, como los nombra Salesforce."
+        },
+        {
+          "name": "tableTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 39,
+          "example": "Decisión por capacidad",
+          "notes": "Medido: 494 px a 760 24px Bric."
+        },
+        {
+          "name": "capabilities",
+          "type": "list",
+          "required": true,
+          "maxChars": 42,
+          "example": [
+            [
+              "Journeys de bienvenida",
+              "Mantener"
+            ],
+            [
+              "Preferencias y consentimiento",
+              "Integrar"
+            ],
+            [
+              "Segmentación de audiencias",
+              "Modernizar"
+            ],
+            [
+              "Campaña B2B nueva",
+              "Migrar"
+            ],
+            [
+              "Automatización sin dueño",
+              "Retirar"
+            ]
+          ],
+          "notes": "Exactamente 5 filas en la tabla blanca al frente, con reflejo. Por ítem: capability (≤ 42; 400 17px Pop, la seleccionada en 600) · verdict (enum Mantener | Integrar | Modernizar | Migrar | Retirar; «Mantener» sólido en navy, «Retirar» apagado). En la aprobada cada veredicto aparece una vez."
+        },
+        {
+          "name": "selectedCapability",
+          "type": "number",
+          "required": true,
+          "example": 4,
+          "notes": "Índice (1–5) de la fila que se enciende en el acento suave: el objetivo de la selección."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "Las dos plataformas atrás en vidrio, apenas atenuadas; la tabla de decisión al frente en blanco con reflejo; dos haces bajan de las plataformas a la tabla."
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "la fila seleccionada de la tabla (targetKind object)",
+        "anchor": "bottom-end",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Dos plataformas que conviven» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda (pregunta en dos líneas, respuesta «No por / defecto.» a 150 px, evidencia con una palabra en negrita) y la nota «Ejemplo ilustrativo» arriba a la derecha. A la derecha, atrás y a distinta profundidad, dos tarjetas de vidrio con el ícono oficial del producto, la base y el nombre de cada plataforma y cuatro capacidades; al frente, la tabla blanca «Decisión por capacidad» con cinco filas y su veredicto en píldora (Mantener, Integrar, Modernizar, Migrar, Retirar), una fila encendida. Dos haces de luz bajan a la tabla; plataforma de luz debajo. Selección de colaborador «Cliente» sobre la fila encendida."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF3-engagement-next"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Los cinco veredictos son el vocabulario fijo; la lámina no recomienda un reemplazo completo por defecto."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 05 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). En la aprobada compara Marketing Cloud Engagement y Next; la receta sirve para cualquier par de generaciones de una plataforma. En HubSpot no hay par equivalente: no se reutiliza sin un caso real."
+    },
+    {
+      "id": "decision-provider-fit",
+      "board": "DeckSalesforceElQueEncaje",
+      "name": "El que encaje · cuatro veredictos posibles y el del cliente encendido",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/decision-provider-fit.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF4-el-que-encaje.jpg",
+      "communicates": "Efeonce no vende una plataforma: vende la decisión, y el veredicto puede ser Salesforce, HubSpot, una arquitectura híbrida o no avanzar todavía.",
+      "useWhen": [
+        "El cliente compara plataformas CRM (Salesforce, HubSpot) o viene a pedir una licencia.",
+        "Para mostrar independencia de proveedor en un deck de RevOps y CRM.",
+        "Antes del diagnóstico: el veredicto sale de él."
+      ],
+      "avoidWhen": [
+        "La plataforma ya está decidida y en operación.",
+        "Si el cliente ya tiene su veredicto documentado: usar decision-diagnosis-map con el real."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "decision-diagnosis-map",
+          "when": "se quiere mostrar lo que entrega el diagnóstico que produce el veredicto"
+        },
+        {
+          "recipe": "decision-difference",
+          "when": "la comparación es contra otras agencias o el equipo propio, no entre plataformas"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-one-platform",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-platform-coexistence",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Diagnóstico de encaje",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Salesforce o HubSpot?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "El que encaje",
+          "notes": "Medido: caja 590 px por línea a 760 150px Bric (≈67.63 px/carácter sin tracking, 5 % de holgura): 16 caracteres entre las dos líneas y hasta 9 por línea («sorpresas», 9, es la línea más larga aprobada). 1–3 palabras partidas en dos líneas con salto manual; sin punto final: cierra con la esfera en el acento (answerHtml). 150/40 = 3,75× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "No vendemos una plataforma: vendemos la **decisión**, con evidencia de tu operación.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115,
+          "example": "Ejemplo ilustrativo · el veredicto sale del diagnóstico",
+          "notes": "Nota arriba a la derecha (400 16px Pop, color suave, alineada al margen derecho, top 112). Medido sobre 1000 px × 1 línea (≈8.26 px/carácter, 5 % de holgura). Obligatoria mientras el veredicto encendido no sea el del diagnóstico real del cliente."
+        },
+        {
+          "name": "verdicts",
+          "type": "list",
+          "required": true,
+          "maxChars": 94,
+          "example": [
+            {
+              "glyph": "crm",
+              "title": "Salesforce",
+              "description": "Org compleja, gobierno enterprise, servicio a escala, varios países."
+            },
+            {
+              "glyph": "embudo",
+              "title": "HubSpot",
+              "description": "Crecimiento B2B, equipo mid-market, valor en semanas."
+            },
+            {
+              "glyph": "integracion",
+              "title": "Híbrida",
+              "description": "Cada plataforma donde rinde mejor, conectadas."
+            },
+            {
+              "glyph": "checklist",
+              "title": "No avanzar",
+              "description": "Mantener lo que funciona y ordenar primero los datos."
+            }
+          ],
+          "notes": "Exactamente 4 monolitos de vidrio de 250 px sobre la plataforma (alturas escalonadas). Por ítem: glyph (ícono Trazo del catálogo AXIS con resolveIcon, nunca un logo de proveedor) · title (≤ 11; 760 36px Bric en el encendido, 32 en los demás) · description (≤ 94; 400 16px Pop, 4 líneas en 206 px). En la aprobada, los cuatro veredictos son Salesforce, HubSpot, Híbrida y No avanzar."
+        },
+        {
+          "name": "selectedVerdict",
+          "type": "number",
+          "required": true,
+          "example": 3,
+          "notes": "Índice (1–4) del veredicto del cliente: se enciende en blanco, más alto (470 px), con el foco de luz desde arriba y el pie «Tu caso · con evidencia»."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "Foco de luz del acento que baja sobre el veredicto encendido.",
+        "Pie del encendido «Tu caso · con evidencia».",
+        "Sin logos de Salesforce ni de HubSpot: los proveedores se nombran en texto."
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "el veredicto encendido (targetKind object)",
+        "anchor": "bottom-end",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «El que encaje» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda (pregunta «¿Salesforce o HubSpot?» en dos líneas, respuesta «El que / encaje.» a 150 px, evidencia con «decisión» en negrita) y la nota «Ejemplo ilustrativo» arriba a la derecha. A la derecha, cuatro monolitos de vidrio en fila sobre la plataforma de luz, cada uno con su ícono Trazo, el rótulo «Veredicto», el nombre y una descripción; el del cliente encendido en blanco, más alto, con un foco de luz desde arriba y el pie «Tu caso · con evidencia». Selección de colaborador «Cliente» sobre el veredicto encendido."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF4-el-que-encaje"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Íconos Trazo de AXIS (resolveIcon), nunca logos de los proveedores.",
+        "El veredicto sale del diagnóstico: sin diagnóstico, la nota de ejemplo es obligatoria."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 04 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta compartida de la práctica RevOps & CRM: sirve igual en el deck HubSpot (HubSpot-first es uno de sus veredictos)."
+    },
+    {
+      "id": "content-service-lanes",
+      "board": "DeckSalesforceServicios",
+      "name": "Servicios de la práctica · seis carriles con sus productos y las cuatro fases del ciclo",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/content-service-lanes.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF8-servicios.jpg",
+      "communicates": "Efeonce cubre todo el ciclo de la plataforma: seis carriles de servicio, del diagnóstico a la operación gestionada.",
+      "useWhen": [
+        "Brochure de una práctica: la lámina que lista qué hacemos.",
+        "Propuesta que necesita mostrar el alcance completo antes de acotar.",
+        "Pitch donde el cliente pregunta qué más hacemos en la plataforma."
+      ],
+      "avoidWhen": [
+        "Se propone un solo servicio: usar la propuesta de la línea (proposal-cinematic-revops o proposal-service-revops).",
+        "La lista pasa de seis carriles: se agrupa, no se achica la letra.",
+        "Sin la autorización escrita de Salesforce archivada (íconos oficiales de producto)."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "proposal-cinematic-revops",
+          "when": "se propone el servicio completo en una sola lámina con impacto"
+        },
+        {
+          "recipe": "content-bullets",
+          "when": "no hay productos que nombrar y basta con viñetas"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-season-launches",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "method-agent-supervisor",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Nuestros servicios Salesforce",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 57,
+          "example": "¿Qué hacemos en Salesforce?",
+          "notes": "Una sola línea en top 170 (300 40px Pop, ≈20.49 px/carácter): medido sobre 1240 px, hasta la mascota."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 21,
+          "example": "Todo el ciclo",
+          "notes": "Una línea a 124 px (760 Bric, ≈55.9 px/carácter sin tracking) en top 228, sin partir: 124/40 = 3,1× la pregunta, el mínimo. Sin punto: cierra con la esfera."
+        },
+        {
+          "name": "lanes",
+          "type": "list",
+          "required": true,
+          "maxChars": 108,
+          "example": [
+            {
+              "icon": "sales",
+              "title": "Ventas y revenue",
+              "products": "Sales Cloud",
+              "description": "Pipeline, forecast, territorios y la siguiente acción de cada oportunidad."
+            },
+            {
+              "icon": "service",
+              "title": "Servicio al cliente",
+              "products": "Agentforce Service",
+              "description": "Casos, knowledge, routing y SLA con contexto completo del cliente."
+            },
+            {
+              "icon": "marketing",
+              "title": "Marketing y lifecycle",
+              "products": "Marketing Cloud Engagement · Next",
+              "description": "Journeys, deliverability y campañas desde identidad y consentimiento."
+            },
+            {
+              "icon": "data-cloud",
+              "title": "Datos y consentimiento",
+              "products": "Data 360",
+              "description": "Identidad unificada, preferencias por canal y activación gobernada."
+            },
+            {
+              "icon": "agentforce",
+              "title": "Agentes y automatización",
+              "products": "Agentforce · Flow",
+              "description": "Agentes con ficha, supervisión humana y consumo medido."
+            },
+            {
+              "icon": "platform",
+              "title": "Integración y experiencia",
+              "products": "APIs · Experience Cloud",
+              "description": "Migraciones con reconciliación, portales e integraciones con dueño."
+            }
+          ],
+          "notes": "Exactamente 6 tarjetas de vidrio en rejilla de 3 × 2 (400 × 214 px). Por ítem: icon (enum, ícono oficial: agentforce · sales · service · marketing · data-cloud · platform · slack · tableau) · title (≤ 43; 760 25px Bric, 2 líneas en 286 px) · products (≤ 37; 500 14px Pop) · description (≤ 108; 300 18px Pop, 3 líneas en 352 px). Las categorías salen del catálogo docs/services/ de la práctica, no se inventan."
+        },
+        {
+          "name": "phases",
+          "type": "list",
+          "required": true,
+          "maxChars": 28,
+          "example": [
+            "Diagnóstico y arquitectura",
+            "Implementación e integración",
+            "Activación y adopción",
+            "Operación gestionada"
+          ],
+          "notes": "Exactamente 4 fases en una tira de una línea bajo la rejilla (600 17px Pop, numeradas «01 · …» y unidas por trazos del acento). La tira entera termina antes de la mascota (x ≈ 1380): la aprobada suma 95 caracteres entre las cuatro y no admite más en total."
+        },
+        {
+          "name": "mascot",
+          "type": "image",
+          "required": false,
+          "example": "ai-generations/2026-09-29_deck-salesforce/astro/agent-astro-v2-saluda-alpha.png",
+          "notes": "OPCIONAL y sujeto a autorización: Agent Astro (pose saluda, con alfa) de pie sobre la plataforma de luz a la derecha. Es una INTERPRETACIÓN editada del arte oficial ASTRO_NoOutfit, no el arte oficial de Agent Astro: se reemplaza si aparece el oficial en Brand Central. Sin la autorización escrita de Salesforce el slot se omite; la composición sin mascota no tiene lámina aprobada y se revisa a ojo. Nunca va dentro de una foto ni en un package de AXIS publicado mientras no llegue la autorización o el arte oficial."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro con el halo del acento a la derecha (stageBg).",
+        "Voz arriba a la izquierda sin evidencia: eyebrow, pregunta de una línea con anillo y respuesta de una línea a 124 px.",
+        "Plataforma de luz pequeña a la derecha (la órbita), bajo la mascota o vacía.",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign).",
+        "Sin nota arriba a la derecha y sin selección."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Servicios de la práctica» sobre fondo Efeonce oscuro con el acento de la línea del documento. Arriba a la izquierda: eyebrow, la pregunta en una línea con anillo y la respuesta en una línea a 124 px («Todo el ciclo.»). Debajo, seis tarjetas de vidrio en rejilla de tres por dos, cada una con el ícono oficial del producto, el carril, los productos y una descripción; bajo la rejilla, la tira de las cuatro fases numeradas unidas por trazos del acento. A la derecha, la plataforma de luz y, sólo si hay autorización, Agent Astro saludando de pie sobre ella. Sin selección; burbuja URL en el pie."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF8-servicios"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita, la mascota ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta (124/40 = 3,1: la respuesta no baja de 124 px).",
+        "Acento sólo en texto de 24 px o más.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "La mascota de Salesforce es un slot opcional sujeto a autorización, nunca un elemento fijo.",
+        "Español neutro, sin voseo."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 06 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Sirve en HubSpot con los carriles y los íconos oficiales de HubSpot; sin mascota (no hay mascota de HubSpot aprobada y no se inventa)."
+    },
+    {
+      "id": "content-season-launches",
+      "board": "DeckSalesforceDreamforce",
+      "name": "Lo nuevo de la temporada · los lanzamientos del evento con su estado anunciado y la fecha de corte",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/content-season-launches.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF9-dreamforce-2026.jpg",
+      "communicates": "Sabemos qué anunció la plataforma y en qué estado está cada cosa, y lo aterrizamos en tu org antes de comprometerlo.",
+      "useWhen": [
+        "En las semanas que siguen a un evento de la plataforma (en la aprobada, Dreamforce 2026), mientras el ledger de lanzamientos esté vigente.",
+        "Pitch o propuesta donde el cliente pregunta por lo último que anunció el proveedor."
+      ],
+      "avoidWhen": [
+        "En un brochure evergreen: es una lámina de temporada y envejece con la fecha de corte.",
+        "Sin fecha de corte (as-of) o sin volver a verificar el ledger de lanzamientos antes de enviar.",
+        "Sin la autorización escrita de Salesforce archivada (íconos oficiales y mascota)."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-service-lanes",
+          "when": "la lámina tiene que durar: los servicios no dependen del evento"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-service-lanes",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Dreamforce 2026 · al 18-09-2026",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Qué trajo Dreamforce?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 8,
+          "example": "Agentes",
+          "notes": "Una línea a 150 px (760 Bric, ≈67.63 px/carácter sin tracking) en caja de 590 px. Sin punto: cierra con la esfera."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Lo aterrizamos en tu org: verificamos **disponibilidad**, permisos y consumo antes de comprometerlo.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "asOf",
+          "type": "date",
+          "required": true,
+          "example": "2026-09-18",
+          "notes": "OBLIGATORIO: fecha de corte del estado de los lanzamientos. Se imprime en el eyebrow («… · al 18-09-2026») y en la nota. Sale del ledger .claude/skills/salesforce-crm-practice/references/dreamforce-2026.md (corte 2026-09-18); nunca de memoria."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115,
+          "example": "Estado anunciado por Salesforce al 18-09-2026 · se verifica en cada org",
+          "notes": "Nota arriba a la derecha (400 16px Pop, color suave, alineada al margen derecho, top 112). Medido sobre 1000 px × 1 línea (≈8.26 px/carácter, 5 % de holgura). Obligatoria: repite la fecha de corte y aclara que el estado se verifica en cada org."
+        },
+        {
+          "name": "launches",
+          "type": "list",
+          "required": true,
+          "maxChars": 69,
+          "example": [
+            {
+              "status": "GA",
+              "name": "Agentes con oficio",
+              "description": "Casey, Paige, Carter, Marshall, Piper y Fin",
+              "icon": "agentforce"
+            },
+            {
+              "status": "GA",
+              "name": "Multi-Agent Orchestration",
+              "description": "Varios agentes coordinados en un flujo",
+              "icon": "agentforce"
+            },
+            {
+              "status": "Disponible",
+              "name": "Agentforce Coworker",
+              "description": "El agente junto a Lightning",
+              "icon": "agentforce"
+            },
+            {
+              "status": "Piloto · GA nov.",
+              "name": "Hunter",
+              "description": "Agente de ventas outbound",
+              "icon": "agentforce"
+            },
+            {
+              "status": "Anunciado",
+              "name": "AIforce",
+              "description": "Salesforce dentro de Claude, Slack y otras interfaces",
+              "icon": "platform"
+            },
+            {
+              "status": "GA · oct.",
+              "name": "Campaign Agent",
+              "description": "Campañas, audiencias y journeys con guardrails",
+              "icon": "marketing"
+            },
+            {
+              "status": "GA · oct.",
+              "name": "Headless Marketing + MCP",
+              "description": "Journeys y flows en lenguaje natural",
+              "icon": "marketing"
+            },
+            {
+              "status": "Piloto",
+              "name": "Koa",
+              "description": "Modelo de razonamiento CRM",
+              "icon": "agentforce"
+            }
+          ],
+          "notes": "Exactamente 8 fichas de vidrio de 300 px, cuatro a cada lado de la mascota. Por ítem: status (≤ 24; 600 12px Pop mayúsculas; píldora sólida blanca si es GA o Disponible, contorno en los demás) · name (≤ 40; 760 21px Bric, 2 líneas) · description (≤ 69; 400 14px Pop, 2 líneas en 264 px) · icon (enum, ícono oficial arriba a la derecha: agentforce · sales · service · marketing · data-cloud · platform · slack · tableau). Estado y nombre salen del ledger con su fuente oficial, nunca de memoria."
+        },
+        {
+          "name": "mascot",
+          "type": "image",
+          "required": false,
+          "example": "ai-generations/2026-09-29_deck-salesforce/astro/agent-astro-v1-alpha.png",
+          "notes": "OPCIONAL y sujeto a autorización: Agent Astro (pose camina, con alfa) al centro sobre la plataforma. Interpretación editada del arte oficial, no el arte oficial de Agent Astro; se reemplaza si aparece el oficial. Sin la autorización escrita de Salesforce el slot se omite; la composición sin mascota no tiene lámina aprobada y se revisa a ojo. Nunca dentro de una foto ni en un package de AXIS publicado sin autorización."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "Plataforma de luz al centro, bajo la mascota o vacía, con las fichas en dos columnas a los lados.",
+        "Sin selección."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Lo nuevo de la temporada» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda: eyebrow con el evento y la fecha de corte, pregunta en dos líneas, respuesta de una palabra a 150 px («Agentes.»), evidencia con una palabra en negrita; la nota con la fecha de corte arriba a la derecha. Al centro, la plataforma de luz y, sólo con autorización, Agent Astro caminando sobre ella; a cada lado, cuatro fichas de vidrio con el estado anunciado en píldora (sólida si es GA o Disponible), el nombre, una descripción y el ícono oficial del producto. Estado y nombres del ledger de lanzamientos con fecha de corte. Sin selección."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF9-dreamforce-2026"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Lámina de temporada: la fecha de corte (asOf) es obligatoria y se imprime; no entra en un brochure evergreen.",
+        "Cada estado se verifica contra el ledger vigente antes de enviar; «se verifica en cada org» siempre visible.",
+        "La mascota de Salesforce es un slot opcional sujeto a autorización, nunca un elemento fijo."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 07 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). No evergreen: al pasar la temporada se reemplaza o se retira del deck. En HubSpot el equivalente sería INBOUND, con su propio ledger; sin mascota."
+    },
+    {
+      "id": "method-identity-consent",
+      "board": "DeckSalesforceDataConsentimiento",
+      "name": "Identidad y consentimiento · cinco fuentes, un perfil con preferencias y activación sólo donde hay permiso",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/method-identity-consent.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF12-data-consentimiento.jpg",
+      "communicates": "Unificar datos no da permiso para contactar: el perfil guarda canal y propósito, y cada activación usa sólo lo consentido.",
+      "useWhen": [
+        "Propuesta de datos (Data 360 en la aprobada) o de marketing con datos personales.",
+        "Cuando el cliente quiere activar audiencias y hay que mostrar gobierno del consentimiento.",
+        "Ante preguntas de privacidad en el comité."
+      ],
+      "avoidWhen": [
+        "El deck no toca datos personales.",
+        "Se usa como asesoría legal: la lámina muestra el diseño, no reemplaza la revisión legal.",
+        "Sin la autorización escrita de Salesforce archivada (íconos oficiales)."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "method-migration-reconcile",
+          "when": "la pregunta es mover los datos, no activarlos"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-live-chat",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "method-migration-reconcile",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Data 360 · identidad y consentimiento",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Puedes contactar a ese cliente?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "Con permiso",
+          "notes": "Medido: caja 590 px por línea a 760 150px Bric (≈67.63 px/carácter sin tracking, 5 % de holgura): 16 caracteres entre las dos líneas y hasta 9 por línea («sorpresas», 9, es la línea más larga aprobada). 1–3 palabras partidas en dos líneas con salto manual; sin punto final: cierra con la esfera en el acento (answerHtml). 150/40 = 3,75× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Unificar datos no da permiso para contactar: gobernamos **canal** y propósito antes de activar.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115,
+          "example": "Ejemplo ilustrativo · el diseño sale de tu inventario de datos",
+          "notes": "Nota arriba a la derecha (400 16px Pop, color suave, alineada al margen derecho, top 112). Medido sobre 1000 px × 1 línea (≈8.26 px/carácter, 5 % de holgura). Obligatoria mientras las fuentes, los canales y las activaciones sean de ejemplo."
+        },
+        {
+          "name": "sources",
+          "type": "list",
+          "required": true,
+          "maxChars": 12,
+          "example": [
+            "CRM",
+            "Web",
+            "E-commerce",
+            "ERP",
+            "App"
+          ],
+          "notes": "Exactamente 5 fichas de vidrio en columna, con el rótulo «Fuente» y el nombre (≤ 12; 760 21px Bric en 138 px); cada una manda un haz al perfil."
+        },
+        {
+          "name": "profileTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 22,
+          "example": "Una persona, 5 fuentes",
+          "notes": "Tarjeta blanca del perfil unificado, con el ícono oficial del producto de datos y el rótulo «Perfil unificado». Medido: 274 px a 760 23px Bric. El número coincide con el de fuentes."
+        },
+        {
+          "name": "channels",
+          "type": "list",
+          "required": true,
+          "maxChars": 18,
+          "example": [
+            [
+              "Email",
+              "Marketing",
+              true
+            ],
+            [
+              "WhatsApp",
+              "Servicio",
+              true
+            ],
+            [
+              "SMS",
+              "Marketing",
+              false
+            ],
+            [
+              "Llamada",
+              "Ventas",
+              true
+            ]
+          ],
+          "notes": "Exactamente 4 filas: channel (≤ 14; 500 15px Pop) · purpose (≤ 18; 400 13px Pop) · permitted (booleano: ✓ en navy o — en contorno). Al menos un canal sin permiso, como en la aprobada, para que se lea la diferencia."
+        },
+        {
+          "name": "activations",
+          "type": "list",
+          "required": true,
+          "maxChars": 31,
+          "example": [
+            {
+              "icon": "marketing",
+              "title": "Journey",
+              "detail": "Sólo con email ✓"
+            },
+            {
+              "icon": "agentforce",
+              "title": "Agente de servicio",
+              "detail": "Por WhatsApp ✓"
+            },
+            {
+              "icon": "sales",
+              "title": "Siguiente acción",
+              "detail": "Llamada del ejecutivo"
+            }
+          ],
+          "notes": "Exactamente 3 fichas a la derecha (la primera encendida en blanco). Por ítem: icon (enum, ícono oficial: agentforce · sales · service · marketing · data-cloud · platform · slack · tableau) · title (≤ 31; 760 18px Bric, 2 líneas en 148 px) · detail (≤ 20; 400 13px Pop). Cada activación usa un canal con permiso del perfil."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "Cinco haces de las fuentes al perfil y tres del perfil a las activaciones.",
+        "El perfil blanco con reflejo es el centro de la lámina."
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "la tarjeta del perfil unificado (targetKind object)",
+        "anchor": "bottom-end",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Identidad y consentimiento» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda (pregunta en dos líneas, respuesta «Con / permiso.» a 150 px, evidencia con «canal» en negrita) y la nota «Ejemplo ilustrativo» arriba a la derecha. Al centro-derecha: cinco fichas de vidrio de fuentes en columna que mandan haces a la tarjeta blanca del perfil unificado (ícono oficial del producto de datos, título y cuatro canales con su propósito y ✓ o —); a la derecha, tres activaciones con su ícono oficial, cada una por un canal permitido. Plataforma de luz debajo. Selección de colaborador «Cliente» sobre el perfil."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF12-data-consentimiento"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Toda activación usa un canal con permiso del perfil; ninguna activación sale de un canal marcado —.",
+        "No es asesoría legal: la privacidad del cliente la revisa legal-privacy-ip-operator."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 11 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta de la práctica: sirve en HubSpot con sus objetos de consentimiento y sus íconos oficiales, si existen y se autorizan."
+    },
+    {
+      "id": "method-migration-reconcile",
+      "board": "DeckSalesforceMigracion",
+      "name": "Migración con reconciliación · cuatro etapas con sus contadores y el cuadre final con vuelta atrás",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/method-migration-reconcile.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF13-migracion.jpg",
+      "communicates": "Una migración se prueba con números: origen, duplicados, carga de prueba, carga completa y un cuadre registro por registro, con el rollback listo.",
+      "useWhen": [
+        "Propuesta de implementación o cambio de plataforma con datos existentes.",
+        "Cuando el riesgo percibido es perder o duplicar registros.",
+        "Para explicar el método de migración antes de cotizarlo."
+      ],
+      "avoidWhen": [
+        "No hay datos que migrar.",
+        "Todavía se discute si migrar: usar decision-platform-coexistence.",
+        "Con cifras que no cuadran: la resta tiene que dar."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "decision-platform-coexistence",
+          "when": "la pregunta es si hay que migrar"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "method-identity-consent",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Integración y migración",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Cómo sabes que migró todo?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "Porque cuadra",
+          "notes": "Medido: caja 590 px por línea a 760 150px Bric (≈67.63 px/carácter sin tracking, 5 % de holgura): 16 caracteres entre las dos líneas y hasta 9 por línea («sorpresas», 9, es la línea más larga aprobada). 1–3 palabras partidas en dos líneas con salto manual; sin punto final: cierra con la esfera en el acento (answerHtml). 150/40 = 3,75× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Claves, duplicados, carga de prueba y **reconciliación** registro por registro, con vuelta atrás lista.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115,
+          "example": "Datos de muestra · cada migración define claves y reglas con tu equipo",
+          "notes": "Nota arriba a la derecha (400 16px Pop, color suave, alineada al margen derecho, top 112). Medido sobre 1000 px × 1 línea (≈8.26 px/carácter, 5 % de holgura). Obligatoria mientras las cifras sean de muestra."
+        },
+        {
+          "name": "stages",
+          "type": "list",
+          "required": true,
+          "maxChars": 47,
+          "example": [
+            {
+              "label": "Origen",
+              "value": "48.210",
+              "description": "registros de cuentas y contactos"
+            },
+            {
+              "label": "Claves y duplicados",
+              "value": "1.842",
+              "description": "duplicados unificados"
+            },
+            {
+              "label": "Carga de prueba",
+              "value": "500",
+              "description": "registros · 0 errores"
+            },
+            {
+              "label": "Carga completa",
+              "value": "46.368",
+              "description": "con resultado por registro"
+            }
+          ],
+          "notes": "Exactamente 4 bloques de vidrio de 232 px que bajan en escalera, numerados 01–04. Por ítem: label (≤ 43 con el número; 600 12px Pop mayúsculas, 2 líneas en 192 px) · value (≤ 8; 760 44px Bric, número con separador de miles es-CL) · description (≤ 47; 400 15px Pop, 2 líneas). Haces del acento de un bloque al siguiente."
+        },
+        {
+          "name": "reconciliation",
+          "type": "text",
+          "required": true,
+          "maxChars": 30,
+          "example": "46.368 = 46.368 · cuadra",
+          "notes": "Tarjeta blanca «05 · Reconciliación» con el ícono oficial de la plataforma; medido: 412 px a 760 26px Bric. Es el objetivo de la selección."
+        },
+        {
+          "name": "rollbackBadge",
+          "type": "text",
+          "required": true,
+          "maxChars": 18,
+          "example": "Rollback listo",
+          "notes": "Píldora en contorno navy (600 13px Pop)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "Los cuatro bloques en escalera descendente y la reconciliación al frente, en blanco."
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "la tarjeta de reconciliación (targetKind object)",
+        "anchor": "bottom-start",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Migración con reconciliación» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda (pregunta en dos líneas, respuesta «Porque / cuadra.» a 150 px, evidencia con «reconciliación» en negrita) y la nota «Datos de muestra» arriba a la derecha. A la derecha, cuatro bloques de vidrio en escalera descendente (Origen, Claves y duplicados, Carga de prueba, Carga completa) con su contador grande y una bajada, unidos por haces del acento; al frente, la tarjeta blanca «05 · Reconciliación» con el ícono oficial de la plataforma, el cuadre «X = X · cuadra» y la píldora «Rollback listo». Plataforma de luz debajo. Selección de colaborador «Cliente» sobre la reconciliación, anclada abajo al inicio."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF13-migracion"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Los números cuadran: origen − duplicados = carga completa = los dos lados de la reconciliación (48.210 − 1.842 = 46.368 en la aprobada).",
+        "Cifras de muestra siempre marcadas; con datos del cliente, sólo con evidencia (TASK-1930)."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 12 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta de la práctica: sirve igual en HubSpot (el método de migración no depende del producto) cambiando el ícono por el oficial de HubSpot o sin ícono."
+    },
+    {
+      "id": "content-day-release-cycle",
+      "board": "DeckSalesforceDiaADia",
+      "name": "El ciclo del release · sandbox, pruebas, tu aprobación y producción, con el video que lo explica",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/content-day-release-cycle.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF14-dia-a-dia.jpg",
+      "communicates": "Nada llega a producción sin la aprobación del cliente: lo prueba en sandbox y lo ve explicado en un video corto, en sus herramientas de siempre.",
+      "useWhen": [
+        "Día a día de una práctica de plataforma (implementación y operación) donde el cliente aprueba releases.",
+        "Cuando la objeción es el riesgo de cambios en producción.",
+        "En lugar del panel de Greenhouse fijo de content-day-tools, cuando el argumento es el release."
+      ],
+      "avoidWhen": [
+        "La cuenta no tiene un ciclo de releases (servicios sin plataforma): usar content-day-tools.",
+        "Junto a content-day-tools en el mismo deck: las dos responden «¿Cómo trabajamos contigo?» (no está declarado variant; confirmar con el operador).",
+        "Con herramientas que la cuenta no usa."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-day-tools",
+          "when": "el argumento es el panel de Greenhouse y las herramientas, sin release"
+        },
+        {
+          "recipe": "content-day-live-progress",
+          "when": "se quiere vivir la aprobación de piezas visuales"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-day-live-library",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "content-day-live-results",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Tu día a día con Efeonce",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Cómo trabajamos contigo?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "Sin sorpresas",
+          "notes": "Medido: caja 590 px por línea a 760 150px Bric (≈67.63 px/carácter sin tracking, 5 % de holgura): 16 caracteres entre las dos líneas y hasta 9 por línea («sorpresas», 9, es la línea más larga aprobada). 1–3 palabras partidas en dos líneas con salto manual; sin punto final: cierra con la esfera en el acento (answerHtml). 150/40 = 3,75× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Nada llega a producción sin tu **aprobación**: lo pruebas en sandbox y lo ves explicado en un video corto.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "releaseKicker",
+          "type": "text",
+          "required": true,
+          "maxChars": 53,
+          "example": "Release 14 · Service Cloud",
+          "notes": "Medido: 460 px a 600 12px Pop mayúsculas. Número de release y producto."
+        },
+        {
+          "name": "releaseTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 39,
+          "example": "Enrutamiento de casos por prioridad",
+          "notes": "Medido: 460 px a 760 22px Bric, una línea."
+        },
+        {
+          "name": "releaseIcon",
+          "type": "enum",
+          "required": true,
+          "example": "service",
+          "notes": "Ícono oficial del producto del release, arriba a la derecha de la tarjeta: agentforce · sales · service · marketing · data-cloud · platform · slack · tableau."
+        },
+        {
+          "name": "currentStep",
+          "type": "number",
+          "required": true,
+          "example": 3,
+          "notes": "Paso actual (1–4) del ciclo fijo Sandbox → Pruebas → Tu aprobación → Producción: los anteriores con ✓ en navy, el actual con contorno y punto, los siguientes apagados. En la aprobada, 3 (tu aprobación)."
+        },
+        {
+          "name": "videoDuration",
+          "type": "text",
+          "required": true,
+          "maxChars": 5,
+          "example": "3:12",
+          "notes": "Duración m:ss del video del release."
+        },
+        {
+          "name": "presenterInitials",
+          "type": "text",
+          "required": true,
+          "maxChars": 2,
+          "example": "EF",
+          "notes": "Iniciales en el círculo navy del presentador del video. Nunca una cara generada (el equipo real llega con TASK-1418)."
+        },
+        {
+          "name": "videoCaption",
+          "type": "text",
+          "required": true,
+          "maxChars": 40,
+          "example": "Qué cambia en tu consola, en 3 minutos",
+          "notes": "Junto al ícono de Loom; medido: 310 px a 500 14px Pop."
+        },
+        {
+          "name": "approveCta",
+          "type": "text",
+          "required": true,
+          "maxChars": 22,
+          "example": "Aprobar release",
+          "notes": "Botón navy (600 14px Pop, sin partir): es el objetivo de la selección."
+        },
+        {
+          "name": "tools",
+          "type": "list",
+          "required": true,
+          "maxChars": 36,
+          "example": [
+            {
+              "tool": "teams",
+              "kicker": "Microsoft Teams",
+              "label": "Nos hablamos"
+            },
+            {
+              "tool": "notion",
+              "kicker": "Notion",
+              "label": "Backlog y documentos"
+            },
+            {
+              "tool": "loom",
+              "kicker": "Loom",
+              "label": "Te lo mostramos"
+            },
+            {
+              "tool": "sf-icon:platform",
+              "kicker": "Salesforce",
+              "label": "Pruebas en sandbox"
+            }
+          ],
+          "notes": "Exactamente 4 fichas de herramienta alrededor de la tarjeta (isotipo en ficha blanca de 112 px). Por ítem: tool (isotipo del catálogo deck-axis/assets/tools/<tool>-isotype.svg: teams y notion existen; loom todavía no —loom-isotype.svg pendiente, fuente oficial en logos/loom-pinned-tab.svg—; el sandbox usa el ícono oficial de producto platform de Salesforce) · kicker (≤ 23; 600 13px Pop mayúsculas) · label (≤ 36; 760 24px Bric, 2 líneas en 230 px). Sólo herramientas que la cuenta usa de verdad (Loom confirmado en el stack de Efeonce el 2026-09-29)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "La tarjeta blanca del release al centro con reflejo: cabecera, los cuatro pasos del ciclo, el video (reproducción, duración, presentador) y la fila de Loom con el botón «Aprobar release».",
+        "Cuatro haces de las herramientas a la tarjeta.",
+        "Sin nota arriba a la derecha."
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "el botón «Aprobar release» (targetKind object)",
+        "anchor": "bottom-start",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «El ciclo del release» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda (pregunta en dos líneas, respuesta «Sin / sorpresas.» a 150 px, evidencia con «aprobación» en negrita). A la derecha, la tarjeta blanca del release con reflejo: kicker y título del release con el ícono oficial del producto, los cuatro pasos (Sandbox, Pruebas, Tu aprobación, Producción) con el actual marcado, un video genérico con reproducción, duración y las iniciales del presentador, y abajo el ícono de Loom, la bajada y el botón «Aprobar release». Alrededor, cuatro fichas de herramienta con su isotipo (Teams, Notion, Loom y el sandbox de Salesforce), con haces hacia la tarjeta. Plataforma de luz debajo. Selección de colaborador «Cliente» sobre «Aprobar release», anclada abajo al inicio."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF14-dia-a-dia"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Interfaces genéricas; sólo los isotipos son reales. No se recrea el diseño propietario de ninguna herramienta.",
+        "El ciclo es fijo y siempre pasa por la aprobación del cliente antes de producción."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 15 del deck Salesforce (acto IV). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Decisión de la sesión del deck (DECISIONES.md, tanda 4): receta nueva y no datos de content-day-tools, porque reemplaza el panel de Greenhouse fijo de esa receta por la tarjeta del release (el panel ya aparece en SF11). Sale Frame.io; entran Teams, Notion, Loom y el sandbox. Sirve en HubSpot con el sandbox de HubSpot y su ícono oficial."
+    },
+    {
+      "id": "content-day-live-library",
+      "board": "DeckSalesforceAdopcionLoom",
+      "name": "Adopción a su ritmo · la biblioteca de tutoriales en video por rol, grabados sobre la org del cliente",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/content-day-live-library.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF15-adopcion-loom.jpg",
+      "communicates": "El equipo del cliente aprende sin agendar reuniones: tutoriales cortos por rol, grabados sobre su propia org.",
+      "useWhen": [
+        "Fase de activación y adopción de una implementación.",
+        "Cuando la objeción es que el equipo no va a usar la herramienta.",
+        "Después del ciclo del release, para mostrar cómo se sostiene el uso."
+      ],
+      "avoidWhen": [
+        "La cuenta no graba tutoriales ni usa Loom: sin la herramienta, los tutoriales van sin marca.",
+        "Con cifras de la biblioteca que no son del cliente y sin la marca «Datos de muestra»."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-day-live-results",
+          "when": "el argumento son los resultados, no la adopción"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-day-release-cycle",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "content-day-live-results",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Activación y adopción",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Cómo aprende tu equipo?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "A su ritmo",
+          "notes": "Medido: caja 590 px por línea a 760 150px Bric (≈67.63 px/carácter sin tracking, 5 % de holgura): 16 caracteres entre las dos líneas y hasta 9 por línea («sorpresas», 9, es la línea más larga aprobada). 1–3 palabras partidas en dos líneas con salto manual; sin punto final: cierra con la esfera en el acento (answerHtml). 150/40 = 3,75× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Tutoriales cortos en video, grabados sobre **tu** Salesforce: responden «¿cómo hago…?» sin agendar una reunión.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "libraryKicker",
+          "type": "text",
+          "required": true,
+          "maxChars": 58,
+          "example": "En Loom · sobre tu org",
+          "notes": "Medido: 500 px a 600 12px Pop mayúsculas, junto al isotipo de Loom."
+        },
+        {
+          "name": "libraryTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 43,
+          "example": "Tutoriales de tu equipo",
+          "notes": "Medido: 500 px a 760 22px Bric."
+        },
+        {
+          "name": "sampleMark",
+          "type": "text",
+          "required": false,
+          "maxChars": 16,
+          "example": "Datos de muestra",
+          "notes": "Píldora arriba a la derecha de la biblioteca: obligatoria mientras los títulos y las cifras sean de muestra; sólo se omite con datos del cliente con evidencia (TASK-1930). Como en decision-diagnosis-map, la regla es condicional y el slot no es obligatorio en el contrato."
+        },
+        {
+          "name": "videos",
+          "type": "list",
+          "required": true,
+          "maxChars": 55,
+          "example": [
+            {
+              "icon": "sales",
+              "role": "Ventas",
+              "title": "Cómo registrar una oportunidad",
+              "duration": "2:40"
+            },
+            {
+              "icon": "service",
+              "role": "Servicio",
+              "title": "Cerrar un caso con knowledge",
+              "duration": "3:05"
+            },
+            {
+              "icon": "marketing",
+              "role": "Marketing",
+              "title": "Probar un journey antes de activarlo",
+              "duration": "4:12"
+            },
+            {
+              "icon": "agentforce",
+              "role": "Supervisión",
+              "title": "Revisar y aprobar lo que propone el agente",
+              "duration": "3:30"
+            }
+          ],
+          "notes": "Exactamente 4 tarjetas de video en fila. Por ítem: icon (enum, ícono oficial: agentforce · sales · service · marketing · data-cloud · platform · slack · tableau) · role (≤ 19; 600 12px Pop mayúsculas) · title (≤ 55; 600 16px Pop, 3 líneas en 164 px) · duration (m:ss)."
+        },
+        {
+          "name": "stats",
+          "type": "list",
+          "required": true,
+          "maxChars": 66,
+          "example": [
+            [
+              "24",
+              "tutoriales grabados"
+            ],
+            [
+              "3 min",
+              "duración promedio"
+            ],
+            [
+              "Por rol",
+              "ventas, servicio, marketing y supervisión"
+            ]
+          ],
+          "notes": "Exactamente 3 fichas bajo los videos: value (≤ 17; 760 26px Bric) · label (≤ 66; 400 13px Pop, 2 líneas en 236 px). Cifras de muestra."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "La biblioteca en papel con perspectiva (rotateY −8°) sobre la plataforma de luz; interfaz genérica con el isotipo real de Loom.",
+        "Sin nota arriba a la derecha y sin selección en la lámina aprobada."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada (la lámina aprobada va sin selección)"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Adopción a su ritmo» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda (pregunta en dos líneas, respuesta «A su / ritmo.» a 150 px, evidencia con «tu» en negrita). A la derecha, en perspectiva sobre la plataforma de luz, la biblioteca de tutoriales en papel: cabecera con el isotipo de Loom, el kicker y el título, y la píldora «Datos de muestra»; cuatro tarjetas de video por rol con el ícono oficial del producto, reproducción y duración; debajo, tres fichas de cifras. Interfaz genérica; sin selección."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF15-adopcion-loom"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Están sujetos a la autorización escrita de Salesforce, pendiente de archivar: sin ella la lámina no sale a clientes ni a pauta (DECISIONES.md, punto 1).",
+        "Interfaces genéricas; sólo los isotipos son reales.",
+        "Loom sólo porque está en el stack real de Efeonce (confirmado el 2026-09-29); si la cuenta no lo usa, la biblioteca va sin marca de herramienta.",
+        "Datos de muestra siempre marcados."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 16 del deck Salesforce (acto IV). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Sirve en HubSpot con los íconos oficiales de HubSpot. Falta dar de alta el isotipo de Loom en deck-axis/assets/tools/loom-isotype.svg al pasar al Composer."
+    },
+    {
+      "id": "content-live-chat",
+      "board": "DeckSalesforceCrmEnClaude",
+      "name": "El CRM en una conversación · la consulta con datos vivos y la acción que el ejecutivo confirma",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/content-live-chat.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF16-crm-en-claude.jpg",
+      "communicates": "El equipo consulta y actualiza el CRM conversando con un asistente conectado, con sus permisos, y ninguna acción se ejecuta sin su confirmación.",
+      "useWhen": [
+        "Propuesta del servicio de CRM conversacional (en la aprobada, Salesforce en Claude, «Claudeforce»).",
+        "Cuando el cliente pregunta cómo usar la IA con su CRM sin perder control."
+      ],
+      "avoidWhen": [
+        "Sin la autorización de uso de marca de Salesforce y de Anthropic archivada: la ventana va sin marcas y la composición sin marcas no tiene lámina aprobada.",
+        "Con la interfaz real del asistente recreada: la ventana es genérica.",
+        "Con montos reales: siempre [MONTO]."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "method-agent-supervisor",
+          "when": "el argumento son los agentes autónomos con supervisión, no la consulta conversacional"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "method-identity-consent",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "content-day-live-progress",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Claudeforce · CRM conversacional",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Y si le preguntas a tu CRM?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "Te responde",
+          "notes": "Medido: caja 590 px por línea a 760 150px Bric (≈67.63 px/carácter sin tracking, 5 % de holgura): 16 caracteres entre las dos líneas y hasta 9 por línea («sorpresas», 9, es la línea más larga aprobada). 1–3 palabras partidas en dos líneas con salto manual; sin punto final: cierra con la esfera en el acento (answerHtml). 150/40 = 3,75× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Configuramos Salesforce en Claude con permisos, skills y **adopción**: tu equipo consulta y actualiza el CRM conversando.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115,
+          "example": "Salesforce en Claude · beta abierta desde sep. 2026 · ejemplo ilustrativo",
+          "notes": "Nota arriba a la derecha (400 16px Pop, color suave, alineada al margen derecho, top 112). Medido sobre 1000 px × 1 línea (≈8.26 px/carácter, 5 % de holgura). Obligatoria: estado del producto (beta) con su fecha y «ejemplo ilustrativo»."
+        },
+        {
+          "name": "assistantMark",
+          "type": "logo",
+          "required": false,
+          "example": "public/images/logos/partners/claude-logotype.svg",
+          "notes": "OPCIONAL y sujeto a autorización de Anthropic: logotipo del asistente en la cabecera de la ventana, del registro de logos del repo. Sin autorización, la ventana va sin marca del asistente."
+        },
+        {
+          "name": "connectionLabel",
+          "type": "text",
+          "required": true,
+          "maxChars": 30,
+          "example": "Conectado a Salesforce",
+          "notes": "Chip de la cabecera con el logo de la plataforma (public/images/logos/partners/salesforce.com_logo.svg, sujeto a la autorización de Salesforce)."
+        },
+        {
+          "name": "userPrompt",
+          "type": "text",
+          "required": true,
+          "maxChars": 127,
+          "example": "¿Qué oportunidades cierran este mes y cuál está en riesgo?",
+          "notes": "Burbuja del usuario a la derecha; medido: 520 px × 2 líneas a 400 15px Pop."
+        },
+        {
+          "name": "answerIntro",
+          "type": "richText",
+          "required": true,
+          "maxChars": 177,
+          "example": "Tienes **3 oportunidades** con cierre este mes. **Andes Retail** lleva 21 días sin actividad:",
+          "notes": "Medido: 676 px × 2 líneas a 400 14px Pop."
+        },
+        {
+          "name": "records",
+          "type": "list",
+          "required": true,
+          "maxChars": 25,
+          "example": [
+            [
+              "Andes Retail",
+              "Propuesta",
+              "[MONTO]",
+              true
+            ],
+            [
+              "Grupo Norte",
+              "Negociación",
+              "[MONTO]",
+              false
+            ],
+            [
+              "Clínica Sur",
+              "Cierre",
+              "[MONTO]",
+              false
+            ]
+          ],
+          "notes": "Exactamente 3 filas: name (≤ 25; 600 14px Pop; cuentas de ejemplo, nunca clientes reales sin autorización) · stage (≤ 21; 400 13px Pop) · amount (siempre «[MONTO]») · atRisk (booleano; como máximo una fila con la píldora «En riesgo»)."
+        },
+        {
+          "name": "proposedAction",
+          "type": "text",
+          "required": true,
+          "maxChars": 139,
+          "example": "Propongo agendar reunión y crear tarea para el ejecutivo en Salesforce",
+          "notes": "Fila con contorno navy y el botón «Confirmar»: la acción gobernada que espera al ejecutivo; es el objetivo de la selección. Medido: 534 px × 2 líneas a 500 14px Pop."
+        },
+        {
+          "name": "platformMark",
+          "type": "image",
+          "required": false,
+          "example": "ai-generations/2026-09-29_deck-salesforce/logos/claudeforce-wordmark.svg",
+          "notes": "OPCIONAL y sujeto a autorización de Salesforce y Anthropic: el wordmark «Claudeforce» (versión de video, armado en render-src/claudeforce-wordmark.mjs a partir del vector oficial de Dreamforce; se reemplaza si Salesforce publica el vector) en una tarjeta navy de 200 px arriba a la derecha. Sin autorización, el slot se omite."
+        },
+        {
+          "name": "guarantees",
+          "type": "list",
+          "required": true,
+          "maxChars": 57,
+          "example": [
+            [
+              "Ve lo que tú ves",
+              "Respeta los permisos de tu org."
+            ],
+            [
+              "Tú confirmas",
+              "Ninguna acción sin tu visto bueno."
+            ],
+            [
+              "37 skills de ventas",
+              "Pipeline, cuentas y seguimiento."
+            ]
+          ],
+          "notes": "Exactamente 3 fichas de vidrio en fila bajo la ventana: title (≤ 43; 760 18px Bric, 2 líneas en 204 px) · detail (≤ 57; 400 13px Pop, 2 líneas). Una cifra del producto (p. ej. «37 skills») sólo con su fuente oficial vigente."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "Ventana de chat genérica en crema, en perspectiva (rotateY −7°): cabecera, burbuja del usuario, respuesta con la tabla de registros y la fila de la acción con «Confirmar».",
+        "Sin imitar la interfaz real del asistente: sólo el logotipo del registro del repo, si está autorizado."
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Ejecutivo",
+        "target": "la fila de la acción propuesta con «Confirmar» (targetKind object)",
+        "anchor": "bottom-end",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «El CRM en una conversación» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda (pregunta en dos líneas, respuesta «Te / responde.» a 150 px, evidencia con «adopción» en negrita) y la nota del estado del producto arriba a la derecha. A la derecha, una ventana de chat genérica en perspectiva: cabecera con el logotipo del asistente (si está autorizado) y el chip «Conectado a …» con el logo de la plataforma; la pregunta del usuario; la respuesta con tres registros (nombre, etapa, [MONTO], uno «En riesgo»); y la acción propuesta con el botón «Confirmar». Arriba a la derecha, sólo con autorización, la tarjeta navy con el wordmark del producto. Debajo, tres garantías en fichas de vidrio. Plataforma de luz. Selección de colaborador «Ejecutivo» sobre la acción."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF16-crm-en-claude"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "El colaborador es un rol («Cliente», «Supervisora», «Ejecutivo»), nunca una persona.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Marcas de terceros (logotipo del asistente, wordmark Claudeforce, logo de Salesforce) sujetas a la autorización de Salesforce y de Anthropic, pendiente de archivar; son slots opcionales, nunca fijos.",
+        "La ventana es genérica: no se recrea la interfaz real del asistente.",
+        "La acción es gobernada: se propone y el ejecutivo la confirma; la lámina nunca muestra una acción ejecutada sin confirmación.",
+        "Montos siempre [MONTO]; producto en beta marcado con su fecha."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 10 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Decisión abierta del operador: el nombre del servicio, «CRM conversacional» (sugerido, el de la lámina) o «Enablement conversacional» (propuesta del operador). Sirve en HubSpot con el conector de HubSpot para el asistente, si existe y se autoriza su marca."
+    },
+    {
+      "id": "content-measure-formulas",
+      "board": "DeckSalesforceQueMedimos",
+      "name": "Qué medimos · cinco métricas con su fórmula, su fuente y su dueño, sin cifras de promesa",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-29",
+      "reference": "references/surfaces/deck/content-measure-formulas.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF17-que-medimos.jpg",
+      "communicates": "Cada resultado se puede medir: la métrica tiene fórmula, fuente y un dueño, y la línea base sale del diagnóstico, no de una promesa.",
+      "useWhen": [
+        "Propuesta o brochure donde el cliente pregunta cómo se sabrá si funciona.",
+        "Antes de fijar metas: la lámina no promete cifras.",
+        "Para alinear dueños de cada métrica con el equipo del cliente."
+      ],
+      "avoidWhen": [
+        "Ya hay resultados medidos con fuente: usar content-measure o decision-chart.",
+        "Con cifras de meta inventadas: esta lámina va sin cifras."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-measure",
+          "when": "hay UN porcentaje real con fuente que mostrar"
+        },
+        {
+          "recipe": "decision-chart",
+          "when": "hay un antes y después medido de un caso"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-day-live-results",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Qué medimos",
+          "notes": "Medido: caja 620 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.38 px/carácter, 5 % de holgura). Color suave de la voz, en top 110."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44,
+          "example": "¿Cómo sabes que funciona?",
+          "notes": "Medido: caja 500 px × 2 líneas a 300 40px Pop (≈20.49 px/carácter, 5 % de holgura), descontado el anillo en el acento. Siempre en dos líneas: la respuesta baja a top 330 (bigVoice con qLines = 2)."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "Lo medimos",
+          "notes": "Medido: caja 590 px por línea a 760 150px Bric (≈67.63 px/carácter sin tracking, 5 % de holgura): 16 caracteres entre las dos líneas y hasta 9 por línea («sorpresas», 9, es la línea más larga aprobada). 1–3 palabras partidas en dos líneas con salto manual; sin punto final: cierra con la esfera en el acento (answerHtml). 150/40 = 3,75× la pregunta."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179,
+          "example": "Cada métrica con su fórmula, su fuente y un **dueño**, desde el diagnóstico.",
+          "notes": "Medido: caja 420 px × 6 líneas a 300 26px Pop (≈13.32 px/carácter, 5 % de holgura), en top 690. Una sola palabra en negrita blanca (**palabra**)."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115,
+          "example": "Sin cifras de promesa: la línea base se mide en el diagnóstico",
+          "notes": "Nota arriba a la derecha (400 16px Pop, color suave, alineada al margen derecho, top 112). Medido sobre 1000 px × 1 línea (≈8.26 px/carácter, 5 % de holgura). Obligatoria: explica por qué no hay cifras."
+        },
+        {
+          "name": "metrics",
+          "type": "list",
+          "required": true,
+          "maxChars": 58,
+          "example": [
+            {
+              "glyph": "medicion",
+              "name": "Adopción",
+              "formula": "Usuarios activos ÷ licencias",
+              "source": "Salesforce",
+              "owner": "Líder del área"
+            },
+            {
+              "glyph": "reloj",
+              "name": "Primer valor",
+              "formula": "Días del kickoff al primer valor acordado",
+              "source": "Plan del proyecto",
+              "owner": "Efeonce"
+            },
+            {
+              "glyph": "checklist",
+              "name": "Soporte en SLA",
+              "formula": "Solicitudes dentro del SLA ÷ total",
+              "source": "Tu canal de soporte",
+              "owner": "Efeonce"
+            },
+            {
+              "glyph": "base-de-datos",
+              "name": "Calidad de datos",
+              "formula": "Registros completos y sin duplicar ÷ total",
+              "source": "Data 360 · informes",
+              "owner": "Admin de tu org"
+            },
+            {
+              "glyph": "ia",
+              "name": "Agentes",
+              "formula": "Propuestas aprobadas sin corrección ÷ total",
+              "source": "Agentforce",
+              "owner": "Supervisora"
+            }
+          ],
+          "notes": "Exactamente 5 fichas de vidrio (tres arriba y dos abajo, centradas). Por ítem: glyph (ícono Trazo del catálogo AXIS con resolveIcon) · name (≤ 19; 760 28px Bric) · formula (≤ 58; 500 16px Pop en su recuadro, 2 líneas en 258 px) · source y owner (≤ 30 cada uno con su prefijo «Fuente · » y «Dueño · »; 500 13px Pop mayúsculas). El dueño es un rol, nunca un nombre propio."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark) con el halo del acento detrás del escenario (stageBg).",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia.",
+        "Acento de la línea del documento leído del token, nunca transcrito: en la lámina aprobada, efeonceGraphicLine.lines[\"revenue-salesforce\"].accentOnDark (anillo, esfera, plataforma y haces).",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo de Efeonce.",
+        "Una sola órbita: la plataforma de luz bajo el escenario, con su arco de acento.",
+        "Cinco fichas de vidrio con ícono Trazo, nombre, fórmula en recuadro, fuente y dueño; sin selección."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Qué medimos» sobre fondo Efeonce oscuro con el acento de la línea del documento. Voz a la izquierda (pregunta en dos líneas, respuesta «Lo / medimos.» a 150 px, evidencia con «dueño» en negrita) y la nota «Sin cifras de promesa» arriba a la derecha. A la derecha, cinco fichas de vidrio (tres arriba, dos abajo centradas) con un ícono Trazo, el nombre de la métrica, su fórmula en un recuadro y dos líneas en mayúsculas con la fuente y el dueño (un rol). Plataforma de luz debajo. Sin cifras y sin selección."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs",
+        "slideId": "SF17-que-medimos"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las piezas del escenario.",
+        "Respuesta ≥ 3× la pregunta.",
+        "Acento sólo en texto de 24 px o más; debajo, navy sobre claro y blanco sobre oscuro.",
+        "Márgenes de 140 px, incluidas las etiquetas del colaborador.",
+        "Sin olivo.",
+        "Español neutro, sin voseo.",
+        "Sin cifras: ni metas ni resultados; la línea base se mide en el diagnóstico.",
+        "Cada métrica con fórmula, fuente y dueño (un rol).",
+        "Íconos Trazo de AXIS (resolveIcon), no íconos de producto."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 18 del deck Salesforce (acto IV). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta de la práctica: sirve en HubSpot cambiando las fuentes por las de HubSpot."
     }
   ]
 }

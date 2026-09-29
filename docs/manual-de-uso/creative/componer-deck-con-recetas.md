@@ -1,9 +1,9 @@
 # Componer un deck con las recetas por lámina — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.7: paso 5b — ligar los datos reales de los slots con `pnpm brand:deck-plan -- --bind` (logo del cliente desde Account 360, cifras, casos, testimonios y logos con evidencia de la propuesta, montos en `[MONTO]` y equipo pendiente), cómo leer la tabla de slots y sus motivos (TASK-1930). Antes, 1.6: las nueve láminas SEO/AEO aprobadas el 2026-09-28 (78 recetas, todas con plantilla): cuándo usarlas, cifras siempre con fuente, datos de muestra marcados («Ejemplo ilustrativo», «Datos de muestra») y la interfaz de IA genérica; la regla de alternativas (una sola por deck, seguidas o no) y los códigos `variant-both-in-deck` y `figure-source-missing` (TASK-1934). Antes, 1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
+> **Ultima actualizacion:** 2026-09-29 por Claude (1.8: el deck de práctica Salesforce — cómo armarlo en cinco actos, qué láminas son recetas nuevas (sin plantilla todavía) y cuáles son datos de recetas existentes, marcas de terceros con condición, badge de partner con readback, la pregunta abierta de portada y cierre, y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 1.7: paso 5b — ligar los datos reales de los slots con `pnpm brand:deck-plan -- --bind` (logo del cliente desde Account 360, cifras, casos, testimonios y logos con evidencia de la propuesta, montos en `[MONTO]` y equipo pendiente), cómo leer la tabla de slots y sus motivos (TASK-1930). Antes, 1.6: las nueve láminas SEO/AEO aprobadas el 2026-09-28 (78 recetas, todas con plantilla): cuándo usarlas, cifras siempre con fuente, datos de muestra marcados («Ejemplo ilustrativo», «Datos de muestra») y la interfaz de IA genérica; la regla de alternativas (una sola por deck, seguidas o no) y los códigos `variant-both-in-deck` y `figure-source-missing` (TASK-1934). Antes, 1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se arma con el catálogo de recetas, comandos locales y el Artifact Composer (la ruta productiva gobernada es TASK-1921, en curso en otra sesión: todavía no está disponible)
 > **Documentacion relacionada:** [Composición de decks y brochures (funcional)](../../documentation/creative/composicion-de-decks-y-brochures.md) · [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) · [Norma de composición por superficie §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Componer una pieza por superficie con AXIS](./componer-por-superficie-con-axis.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
@@ -11,7 +11,7 @@
 ## Para qué sirve
 
 Para armar un deck real de la marca Efeonce —un **brochure**, una **propuesta comercial**, un **pitch** o un **QBR**—
-con las **78 láminas aprobadas** (69 el 2026-09-27 y nueve de SEO/AEO el 2026-09-28), en vez de diseñar cada lámina
+con las **90 láminas aprobadas** (69 el 2026-09-27, nueve de SEO/AEO el 2026-09-28 y doce del deck Salesforce el 2026-09-29), en vez de diseñar cada lámina
 desde cero. Cada lámina tiene una **receta** en el catálogo: qué comunica, cuándo usarla, cuándo no y cuál conviene en su lugar, con qué otras va, qué
 textos e imágenes se cambian (los *slots*) y qué queda fijo.
 
@@ -40,9 +40,10 @@ cliente, para las ofertas a comité del catálogo `deck-axis` ni para la interfa
 
 ## El flujo en seis pasos
 
-1. Elige las láminas en el catálogo de 78 recetas (o pídele a un agente que proponga el plan).
+1. Elige las láminas en el catálogo de 90 recetas (o pídele a un agente que proponga el plan).
 2. Valida el plan del deck con `pnpm brand:deck-plan` y corrige hasta que no queden errores.
-3. Busca el intent de ejemplo de cada lámina: **las 78** recetas tienen plantilla y un ejemplo listo para copiar.
+3. Busca el intent de ejemplo de cada lámina: **78 de las 90** recetas tienen plantilla y un ejemplo listo para copiar
+   (las 12 del deck Salesforce todavía no; ver «El deck de práctica Salesforce»).
 4. Copia el ejemplo a tu carpeta y cambia el copy, las cifras y las fotos.
 5. Compón la lámina o el documento completo con `pnpm brand:compose`.
 6. Revisa a ojo contra la referencia aprobada.
@@ -113,6 +114,45 @@ Criterios rápidos:
     tráfico al negocio; sin CRM ni medición de leads, no la uses);
   - el cierre: `decision-diagnosis-map` (lo que el cliente recibe primero). Es de la familia de próximos pasos: no va
     en una propuesta enviada después del diagnóstico.
+- **Deck de práctica Salesforce** (19 láminas aprobadas el 2026-09-29): ver la sección de abajo.
+
+#### El deck de práctica Salesforce
+
+Para un brochure o una propuesta de los servicios Salesforce, sigue el orden aprobado en cinco actos (tabla completa en
+la [norma §4.6, «Deck de práctica Salesforce»](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck)):
+
+1. **Apertura:** portada de línea `cover-brochure-line-revenue` con `line: revenue-salesforce` y el plate NXSF2 →
+   propuesta cine `proposal-cinematic-revops` con el plate NXSF1 (o la sobria `proposal-service-revops`, nunca las dos).
+2. **Cómo pensamos:** `content-one-platform` → `decision-provider-fit` → `decision-platform-coexistence`.
+3. **Qué hacemos:** `content-service-lanes` → `content-season-launches` (sólo en temporada, con fecha de corte) →
+   `method-agent-supervisor` → la aprobación en vivo (lámina 09) → `content-live-chat` → `method-identity-consent` →
+   `method-migration-reconcile`.
+4. **Cómo trabajamos:** el diagnóstico (lámina 13) → el equipo híbrido por olas (lámina 14) →
+   `content-day-release-cycle` → `content-day-live-library` → la operación gestionada (lámina 17) →
+   `content-measure-formulas`.
+5. **Cierre:** la contraportada con «Empower your Revenue» (`close-proposal-horizon`, plate NXSF3 bordada).
+
+Antes de armarlo:
+
+- **Doce láminas todavía no se componen** (recetas nuevas sin plantilla): el plan las acepta con el aviso
+  `recipe-without-template`. Mientras tanto, las láminas aprobadas están en
+  `ai-generations/2026-09-29_deck-salesforce/out/` y se regeneran con `ONLY=<lámina> node
+  ai-generations/2026-09-29_deck-salesforce/render-src/salesforce.mjs` (maquetas de dirección, no la ruta productiva).
+- **Cuatro láminas (09, 13, 14 y 17) son datos de recetas existentes que no caben en sus slots:** no las compongas con
+  esas plantillas; el `fit` de cada `approvedUses` explica por qué y el composer lo resuelve (TASK-1942).
+- **Portada y cierre:** la narrativa aprobada abre con la portada de brochure y cierra con la contraportada de
+  propuesta, y el plan lo rechaza como brochure. Pregúntale al operador: como **brochure** cierra con
+  `close-brochure-orbit`; como **propuesta** abre con `cover-proposal-*` y el logo del cliente.
+- **Marcas de terceros:** logo, íconos de producto, badge y Agent Astro necesitan la autorización escrita de Salesforce;
+  Claude y Claudeforce, además la de Anthropic. **Están pendientes de archivar: sin ellas, el deck no sale a un
+  cliente ni a pauta.** Agent Astro, Claude y Claudeforce son opcionales.
+- **Badge «Salesforce Partner»:** sólo con readback vigente en Partner Community. Sin él, usa el respaldo sin badge
+  (`SIN_BADGE=1`): «Operamos sobre» + logo de Salesforce en la portada y nada en la contraportada.
+- **Cifras de muestra** marcadas y montos `[MONTO]`; la lámina de Dreamforce siempre con su fecha de corte.
+
+**Deck HubSpot:** todavía no existe la serie de contenido (sólo portada y propuesta `revenue-hubspot`). Está en
+[TASK-1943](../../tasks/to-do/TASK-1943-hubspot-deck-content-series.md): no armes un deck HubSpot con las láminas de
+Salesforce.
 
 ### Paso 4 · Revisa pares y ritmo
 
@@ -219,7 +259,7 @@ Cómo leer cada línea:
 | `slot-required-missing` | error | falta un slot obligatorio en una lámina que ya trae `slots` | escríbelo, o quita `slots` para dejar la lámina como esqueleto |
 | `slot-over-max-chars` | error | el texto pasa el largo máximo (en un texto enriquecido cuenta cada línea sin `**`; en una lista, cada ítem) | acorta el texto; nunca subas el `maxChars` |
 | `figure-source-missing` | error | una cifra del plan (un objeto con `value`) no trae `source` | agrega la fuente real del documento que la respalda, o quita la cifra. Ojo: una cifra escrita como texto plano («68 %») no la ve el validador; escríbela como objeto con `source` |
-| `recipe-without-template` | aviso | la lámina no tiene plantilla en el composer. Las 78 recetas la tienen; hoy sólo sale en la portada y el cierre clásicos de un pitch o un QBR (`cover-classic`, `close-classic`) | ese deck se valida pero todavía no se compone de punta a punta: avísale al operador |
+| `recipe-without-template` | aviso | la lámina no tiene plantilla en el composer. Hoy sale en las 12 recetas del deck Salesforce y en la portada y el cierre clásicos de un pitch o un QBR (`cover-classic`, `close-classic`) | ese deck se valida pero todavía no se compone de punta a punta: avísale al operador |
 | `section-split-corner-adjacent` | aviso | dos secciones partidas seguidas con la misma esquina (sin `layout` cuenta como esquina arriba) | alterna `section-split` con `section-split-corner-bottom` o `section-split-panel-end`, o separa las secciones |
 | `rhythm-paper-run` | aviso | tres láminas de papel (fondo claro) seguidas | intercala una oscura o con foto |
 | `brochure-cover-first` | error, AXIS | el brochure no abre con su portada | pon una portada de brochure primero |
@@ -391,7 +431,7 @@ la lente de `proposal-service-seo`, que recorta el plate de cine SE1.
 ### Paso 7 · Busca la receta y su intent de ejemplo
 
 1. Abre el índice del [catálogo](../../operations/brand-graphic-line/deck-recipes/README.md#índice) y confirma en la
-   columna «Plantilla» que la receta la tiene (hoy, las 78).
+   columna «Plantilla» que la receta la tiene (hoy, 78 de las 90).
 2. Busca su intent de ejemplo. En casi todas se llama
    `src/lib/brand-surfaces/examples/deck-<id del catálogo>-intent.json` (por ejemplo,
    `deck-content-pricing-live-intent.json`). Las excepciones (páginas de servicio de cine, que están dentro de los
@@ -540,8 +580,8 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 
 | Estado | Qué significa |
 |---|---|
-| **aprobado** | la lámina está aprobada por el operador (hoy, las 78) y se puede usar |
-| **con plantilla** | además, `pnpm brand:compose` la produce entera (hoy, las 78) |
+| **aprobado** | la lámina está aprobada por el operador (hoy, las 90) y se puede usar |
+| **con plantilla** | además, `pnpm brand:compose` la produce entera (hoy, 78 de las 90) |
 | **pendiente de QA** | la referencia aprobada tenía un detalle que la norma corrige (respuesta bajo 3×, acento en texto chico, cifra sin fuente). La plantilla ya lo corrige; el catálogo separa los resueltos de los que siguen abiertos |
 | `recipe-not-approved` | el contrato de AXIS no tiene esa receta como aprobada |
 | `recipe-without-template` | la receta está aprobada en AXIS, pero el composer no tiene plantilla para ella. En el deck no debería pasar: revisa que la receta y el `layout` sean los del ejemplo |

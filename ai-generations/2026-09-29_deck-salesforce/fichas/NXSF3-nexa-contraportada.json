@@ -1,0 +1,13 @@
+{
+  "id": "NXSF3-nexa-contraportada",
+  "formato": "16:9",
+  "linea": "revenue-salesforce",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "objetos": [{ "objeto": "chaqueta-softshell-efeonce", "puesta": "espalda" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, a vast dark studio at night with a polished dark concrete floor): she is seen FROM BEHIND, walking away from the camera on the RIGHT half of the frame, full body, wearing the NAVY EFEONCE SOFTSHELL JACKET with its back print visible, dark trousers and light sneakers, her long dark wavy hair falling on her shoulders. REALISTIC ADULT PROPORTIONS: camera about four meters behind her at hip height, 85mm. Far ahead of her, standing vertically on the floor, rises ONE colossal perfect ring of sky-blue light (#2FB8FF), seen straight on, with ONE small blazing white sphere at its top; she walks toward the center of the ring. The ring is the only light source: it rims her silhouette, hair and shoulders from the front and draws a long glossy reflection on the wet-looking floor between her and the ring. Fine haze fills the air and catches the ring light. The LEFT 45% of the frame is calm, deep dark studio space with only faint haze: no light, no objects. The whole frame is cool and contemporary: nothing warm, amber, orange or golden. No robots, no mascots, no logos of any other brand, no readable text, no screens.",
+  "lecho": { "objeto": "the dark polished concrete floor close to the lens, outside every light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark studio space on the left 45% of the frame", "tinta": "blanca" } }
+}

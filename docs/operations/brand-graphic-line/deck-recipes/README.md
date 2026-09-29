@@ -1,9 +1,12 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.8
+> **Versión:** 1.9
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.8: sección «Datos reales por slot» — qué slot sale de qué fuente
+> **Última actualización:** 2026-09-29 por Claude (1.9: el deck de práctica Salesforce — 12 recetas nuevas sin
+> plantilla todavía (90 en el catálogo), 8 láminas registradas en el campo nuevo `approvedUses` de recetas existentes,
+> `partnerMark` opcional y eslogan en bloque en `close-proposal-horizon`, deck HubSpot pendiente (TASK-1942, TASK-1943).
+> Antes, 1.8: sección «Datos reales por slot» — qué slot sale de qué fuente
 > con `bindDeckSlots` y `pnpm brand:deck-plan -- --bind`, motivos de «sin ligar» y reglas de audiencia y autorización
 > (TASK-1930).
 > Antes, 1.7: `cover-brochure-line-brand` usa su plate propio `CR4` y deja
@@ -22,7 +25,7 @@
 > estado tras el cierre de TASK-1927 — qué recetas tienen plantilla, equivalencia de nombres con el contrato de AXIS,
 > pendientes de QA resueltos y abiertos, cómo cambiar la foto, el copy o la sección)
 > **Fuente de verdad:** [`EFEONCE_DECK_SLIDE_RECIPES_V1.json`](./EFEONCE_DECK_SLIDE_RECIPES_V1.json) (esquema
-> `efeonce.deck-slide-recipes.v1`, 78 recetas). Este README explica cómo usarlo; el índice del final se **genera**
+> `efeonce.deck-slide-recipes.v1`, 90 recetas). Este README explica cómo usarlo; el índice del final se **genera**
 > desde el JSON con `pnpm brand:deck-recipes` y no se edita a mano.
 > **Canon que manda:** [composición por superficie §4.6](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) (reglas del
 > deck, portadas y contraportadas, decisiones del 2026-09-27) · [manual de la línea gráfica](../EFEONCE_GRAPHIC_LINE_V1.md)
@@ -46,7 +49,9 @@ conviene en su lugar, con qué otras láminas va, qué partes son **data slots**
 selección lleva, de qué foto sale (ficha, prompt y post-proceso), con qué prompt se compone y qué reglas hace cumplir.
 
 El **2026-09-28** el operador aprobó **nueve láminas más, sobre SEO y AEO** (tabla en «Las láminas SEO/AEO»), y el
-catálogo quedó en **78 recetas**.
+catálogo quedó en **78 recetas**. El **2026-09-29** aprobó las 19 láminas del **deck de práctica Salesforce**: doce son
+recetas nuevas (sin plantilla todavía) y ocho son datos de recetas existentes (sección «El deck de práctica
+Salesforce»). El catálogo tiene **90 recetas**.
 
 Sirve para que una persona o un agente arme un deck de **marca propia de Efeonce** (brochure, propuesta comercial,
 pitch o QBR) eligiendo láminas aprobadas en vez de inventarlas. No aplica a decks con la marca de un cliente, al
@@ -65,7 +70,8 @@ catálogo `deck-axis` de las ofertas a comité ni a la interfaz de Greenhouse.
 4. **Llena los slots** con datos reales: textos dentro de su `maxChars` medido, montos siempre `[MONTO]`, cifras con
    fuente (cada cifra con su `source`), logos sólo de clientes que autorizan su uso, fotos de ejemplo reemplazadas y
    datos de muestra marcados como tales («Ejemplo ilustrativo», «Datos de muestra»).
-5. **Compón con la plantilla.** **Las 78** recetas tienen plantilla (columna «Plantilla» del índice y tabla de «Qué
+5. **Compón con la plantilla.** **78 de las 90** recetas tienen plantilla (las 12 del deck Salesforce todavía no: el
+   plan avisa `recipe-without-template`) (columna «Plantilla» del índice y tabla de «Qué
    sale hoy con un comando»). **Escribe el intent** en un archivo propio, partiendo del intent de ejemplo de la receta
    (`src/lib/brand-surfaces/examples/deck-<receta>-intent.json`), con la receta y el `layout` de AXIS que le
    corresponden, y compón la lámina o el documento completo con `pnpm brand:compose`. La portada con selección
@@ -131,6 +137,38 @@ SEO y AEO son **servicios distintos**: `proposal-service-seo` y `proposal-servic
 `decision-ai-market` → `decision-ai-answer` → `method-surround-cycle` → `proposal-service-aeo` →
 `decision-diagnosis-map`. Los pares exactos de cada lámina están en su `pairsWith`.
 
+## El deck de práctica Salesforce (aprobado el 2026-09-29)
+
+Diecinueve láminas de la práctica Salesforce (línea `revenue-salesforce`), aprobadas por el operador el 2026-09-29.
+Orden en cinco actos, reglas y la pregunta abierta de portada y cierre: [norma §4.6, «Deck de práctica
+Salesforce»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck). Task:
+[TASK-1942](../../../tasks/in-progress/TASK-1942-salesforce-deck-recipes-canonization.md).
+
+| Lámina | id | Familia | Cuándo usarla | Qué no se negocia |
+|---|---|---|---|---|
+| 03 · Uno | `content-one-platform` | `content` | el problema es tener varias herramientas que no se hablan | cinco áreas con su producto oficial; íconos de producto con autorización |
+| 04 · El que encaje | `decision-provider-fit` | `proof` | el cliente compara Salesforce y HubSpot o viene a pedir una licencia | íconos Trazo, nunca logos de proveedor; nota de ejemplo sin diagnóstico real |
+| 05 · No por defecto | `decision-platform-coexistence` | `method` | migrar entre generaciones de una plataforma (Engagement y Next) | cinco veredictos fijos; nunca reemplazo por defecto |
+| 06 · Todo el ciclo | `content-service-lanes` | `content` | la lámina que lista qué hace la práctica | seis carriles del catálogo `docs/services/`; Agent Astro sólo con autorización |
+| 07 · Agentes | `content-season-launches` | `content` | semanas después del evento, con el ledger vigente | fecha de corte obligatoria; nunca en un brochure evergreen |
+| 08 · Una persona | `method-agent-supervisor` | `method` | la objeción es el control del agente | toda ficha dice quién aprueba o qué nunca hace |
+| 10 · Te responde | `content-live-chat` | `content` | el servicio de CRM conversacional | ventana genérica; marcas de Claude y Claudeforce opcionales con autorización; `[MONTO]` |
+| 11 · Con permiso | `method-identity-consent` | `method` | activar audiencias con datos personales | toda activación por un canal con permiso |
+| 12 · Porque cuadra | `method-migration-reconcile` | `method` | migrar con datos existentes | los números cuadran; datos de muestra marcados |
+| 15 · Sin sorpresas | `content-day-release-cycle` | `content` | el cliente aprueba releases de una plataforma | ciclo fijo sandbox → pruebas → tu aprobación → producción |
+| 16 · A su ritmo | `content-day-live-library` | `content` | activación y adopción | Loom sólo porque está en el stack real; «Datos de muestra» |
+| 18 · Lo medimos | `content-measure-formulas` | `content` | cómo se sabrá si funciona | sin cifras; fórmula, fuente y dueño (un rol) |
+
+**Datos de recetas existentes** (campo `approvedUses`, con su `fit`): 01 → `cover-brochure-line-revenue` · 02 →
+`proposal-cinematic-revops` · 13 → `decision-diagnosis-map` · 09 → `content-day-live-progress` · 14 →
+`method-staircase` · 17 → `content-day-live-results` · 19 → `close-proposal-horizon` · alternativa de la 02 →
+`proposal-service-revops`. **Cuatro no caben en los slots de su receta** (13, 14, 17 y 09: otro contenido con la misma
+idea visual) y dos pasan un largo (la pregunta de la 02 y dos pasos de la sobria): el `fit` de cada una lo detalla y la
+decisión es del composer con el operador. Condiciones de terceros: la autorización escrita de Salesforce (y de
+Anthropic en la 10) está pendiente de archivar; el badge de partner es un claim bloqueante hasta su readback.
+
+**Deck HubSpot pendiente:** [TASK-1943](../../../tasks/to-do/TASK-1943-hubspot-deck-content-series.md).
+
 ## Anatomía de una receta (campos del JSON)
 
 | Campo | Para qué |
@@ -146,6 +184,7 @@ SEO y AEO son **servicios distintos**: `proposal-service-seo` y `proposal-servic
 | `prompts.composition` | el prompt para componer la lámina desde datos, con tokens AXIS y medidas del canon, sin HEX ni px crudos |
 | `renderSource` · `reference` · `referenceSource` | el prototipo de dirección que la compuso y la referencia aprobada (en AXIS: `references/surfaces/deck/<id>.jpg`) |
 | `rules` · `notes` | reglas que la lámina hace cumplir y matices del operador |
+| `approvedUses` (opcional, desde 2026-09-29) | láminas aprobadas que son datos de la receta (deck Salesforce): contenido por slot, foto con ficha y prompt, selección, respaldo sin badge, condiciones y `fit` (qué cabe en los slots y qué no). No lo lee el runtime |
 
 ## Reglas transversales
 
@@ -216,6 +255,14 @@ decisión** (ver «Notas del JSON que quedaron atrás»).
 5. **La propuesta SEO de cine es fiel a la referencia:** la nota del pie y la bajada bajo la selección.
 6. **3× en las respuestas:** las de DeckIARespuesta, DeckDiferencia y DeckEEAT suben a 120 px; en DeckIARespuesta la
    ventana trasera se corre a 860 y se angosta a 450 para que la respuesta no la toque.
+
+### Decisiones del operador (2026-09-29, deck Salesforce, TASK-1942)
+
+1. **Las 19 láminas del deck Salesforce están aprobadas**: doce recetas nuevas y ocho datos de recetas existentes.
+2. **La línea `revenue-salesforce` pasa a aprobada** en la portada de línea (`cover-brochure-line-revenue`).
+3. **Eslogan en bloque** bajo el logo al 64 % de su ancho en `close-proposal-horizon` (regla dura 8 de la línea);
+   cierra el delta de TASK-1933 para esa receta.
+4. **Badge, Agent Astro, Claude y Claudeforce** son slots opcionales condicionados, nunca fijos.
 
 ### Notas del JSON que quedaron atrás
 
@@ -629,8 +676,8 @@ falta un campo del esquema, si hay ids repetidos o si un `preferInstead` o `pair
 
 <!-- Generado por scripts/creative/deck-recipes/render-index.mjs desde EFEONCE_DECK_SLIDE_RECIPES_V1.json. No editar a mano: corre «pnpm brand:deck-recipes». -->
 
-Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
-**78 de 78** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`).
+Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 90 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
+**78 de 90** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
 
 ### Recetas por familia y documento
 
@@ -640,9 +687,9 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | Contraportadas (`close`) | 2 | 3 | — | — | 5 |
 | Secciones (`section`) | 8 | 6 | 6 | 6 | 8 |
 | Quiénes somos, equipo y stack (`about`) | 5 | 5 | 4 | 1 | 5 |
-| Contenido (`content`) | 9 | 7 | 9 | 4 | 9 |
-| Método (`method`) | 10 | 9 | 8 | 3 | 10 |
-| Prueba (`proof`) | 12 | 10 | 12 | 4 | 12 |
+| Contenido (`content`) | 16 | 14 | 16 | 4 | 16 |
+| Método (`method`) | 14 | 13 | 12 | 3 | 14 |
+| Prueba (`proof`) | 13 | 11 | 13 | 4 | 13 |
 | Propuesta por línea de servicio (`proposal-service`) | 10 | 10 | — | — | 10 |
 | Cotización (`pricing`) | 3 | — | — | — | 3 |
 | Próximos pasos (`next-steps`) | 2 | 2 | 2 | — | 2 |
@@ -662,7 +709,7 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | `cover-brochure-line-brand` | Portada de brochure por línea · Creative Services · «¿Quién crea mi contenido? Tu squad.» | `deck.cover-brochure` | brochure | Portada del brochure de la línea Creative Services (documento de una sola línea de servicio). | En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»). | `cover-brochure-cine-orbit`, `cover-proposal-orbit`, `proposal-cinematic` (AXIS) | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `line`, `photo` |
 | `cover-brochure-line-engine` | Portada de brochure por línea · Digital Services & Engineering · «¿Te encuentra la IA? Visible.» | `deck.cover-brochure` | brochure | Portada del brochure de la línea Digital Services & Engineering (documento de una sola línea de servicio). | En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»). | `cover-brochure-cine-orbit`, `cover-proposal-orbit`, `proposal-cinematic` (AXIS) | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `line`, `photo` |
 | `cover-brochure-line-voice` | Portada de brochure por línea · Media & Distribution · «¿Dónde invierto? Donde rinde.» | `deck.cover-brochure` | brochure | Portada del brochure de la línea Media & Distribution (documento de una sola línea de servicio). | En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»). | `cover-brochure-cine-orbit`, `cover-proposal-orbit`, `proposal-cinematic` (AXIS) | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `line`, `photo` |
-| `cover-brochure-line-revenue` | Portada de brochure por línea · RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.» | `deck.cover-brochure` | brochure | Portada del brochure de la línea RevOps & CRM (documento de una sola línea de servicio). | En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»). | `cover-brochure-cine-orbit`, `cover-proposal-orbit`, `proposal-cinematic` (AXIS) | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `line`, `photo` |
+| `cover-brochure-line-revenue` | Portada de brochure por línea · RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.» | `deck.cover-brochure` | brochure | Portada del brochure de la línea RevOps & CRM (documento de una sola línea de servicio). | En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»). | `cover-brochure-cine-orbit`, `cover-proposal-orbit`, `proposal-cinematic` (AXIS) | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `line`, `photo`, (+1 opcional) |
 | `cover-proposal-orbit` | Portada de propuesta sin foto · la órbita gigante sostiene el logo del cliente (plantilla) | `deck.cover-proposal` | proposal | Portada de una propuesta comercial enviada a un cliente con nombre (después de conversar). | En un brochure: la portada de brochure lleva foto y no lleva cliente. | `cover-brochure-cine-orbit`, `cover-proposal-dawn` | `eyebrow` ≤34, `question` ≤24, `answer` ≤10, `clientName` ≤18, `evidence` ≤44, `clientLogo`, `selectionLabel` ≤12 |
 | `cover-proposal-orbit-sky` | Portada de propuesta sin foto · la órbita gigante con el logo de SKY (ejemplo) | `deck.cover-proposal` | proposal | Portada de una propuesta comercial enviada a un cliente con nombre (después de conversar). | En un brochure: la portada de brochure lleva foto y no lleva cliente. | `cover-brochure-cine-orbit`, `cover-proposal-dawn`, `cover-proposal-orbit` | `eyebrow` ≤34, `question` ≤24, `answer` ≤10, `clientName` ≤18, `evidence` ≤44, `clientLogo`, `selectionLabel` ≤12 |
 | `cover-proposal-dawn-sky` | Portada de propuesta sin foto · la órbita sale como el sol con SKY dentro (ejemplo) | `deck.cover-proposal.dawn` | proposal | Portada de una propuesta comercial enviada a un cliente con nombre (después de conversar). | En un brochure: la portada de brochure lleva foto y no lleva cliente. | `cover-brochure-cine-orbit`, `cover-proposal-orbit`, `cover-proposal-dawn` | `eyebrow` ≤34, `question` ≤24, `answer` ≤10, `clientName` ≤18, `evidence` ≤44, `clientLogo`, `selectionLabel` ≤12 |
@@ -675,7 +722,7 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | `close-brochure-horizon` | Contraportada de brochure · Nexa camina hacia la órbita · «¿Conversamos? Cuando quieras.» | `deck.close-brochure.photo` | brochure | Contraportada de un brochure cuya portada va SIN foto (regla de alternancia). | Con cualquiera de las portadas de brochure aprobadas hoy: todas llevan foto, así que esta contraportada no tiene pareja válida. | `close-brochure-orbit`, `close-proposal-horizon` | `sloganLineWord`, `photo` |
 | `close-brochure-dawn` | Contraportada de brochure · Nexa y un agente hacia la órbita al amanecer · «¿Conversamos? Cuando quieras.» | `deck.close-brochure.photo` | brochure | Contraportada de un brochure con portada SIN foto, cuando se quiere subrayar que personas y agentes trabajan juntos. | Con cualquiera de las portadas de brochure aprobadas hoy (todas con foto): no tiene pareja válida. | `close-brochure-orbit`, `close-proposal-dawn` | `sloganLineWord`, `photo` |
 | `close-brochure-orbit` | Contraportada de brochure sin foto · la órbita gigante · «¿Conversamos? Cuando quieras.» | `deck.close-brochure` | brochure | Contraportada por defecto de TODO brochure: es la pareja sin foto de las portadas con foto (las tres generales y las cinco por línea). | En una propuesta comercial: la propuesta cierra con foto y con «Empower your Growth». | `close-proposal-horizon`, `close-brochure-horizon`, `close-classic` (AXIS) | `sloganLineWord` |
-| `close-proposal-horizon` | Contraportada de propuesta · «Empower your Growth» hacia la órbita | `deck.close-proposal` | proposal | Contraportada de toda propuesta comercial: es la pareja CON foto de las portadas de propuesta sin foto. | En un brochure: su contraportada abre la conversación con «¿Conversamos? Cuando quieras.». | `close-brochure-orbit`, `decision-next-steps`, `close-proposal-dawn` | `sloganLineWord`, `photo` |
+| `close-proposal-horizon` | Contraportada de propuesta · «Empower your Growth» hacia la órbita | `deck.close-proposal` | proposal | Contraportada de toda propuesta comercial: es la pareja CON foto de las portadas de propuesta sin foto. | En un brochure: su contraportada abre la conversación con «¿Conversamos? Cuando quieras.». | `close-brochure-orbit`, `decision-next-steps`, `close-proposal-dawn` | `sloganLineWord`, `photo`, (+1 opcional) |
 | `close-proposal-dawn` | Contraportada de propuesta · «Empower your Growth» al amanecer | `deck.close-proposal` | proposal | Contraportada de toda propuesta comercial: es la pareja CON foto de las portadas de propuesta sin foto. | En un brochure: su contraportada abre la conversación con «¿Conversamos? Cuando quieras.». | `close-brochure-orbit`, `decision-next-steps`, `close-proposal-horizon` | `sloganLineWord`, `photo` |
 
 ### Secciones · `section` (8)
@@ -701,7 +748,7 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | `content-stack` | Nuestro stack · tres capas de herramientas sobre Efeonce | `deck.content-stack` | proposal, brochure, pitch | Para justificar un delivery premium por el stack que lo sostiene. | La conversación es de programas de partner. | `content-partners`, `content-day-tools` | `eyebrow` ≤20, `question` ≤26, `answer` ≤12, `body` ≤100, `layers` ≤22, `highlightedLayer` |
 | `proposal-cinematic-nexa-lines` | Líneas de servicio con Nexa · cinco esferas de luz, una por línea, orbitan a su alrededor | `deck.proposal-cinematic.lines` | proposal, brochure | Presentar el portafolio completo de líneas de servicio | La propuesta es de una sola línea: se pasa directo a su lámina de servicio | `proposal-cinematic-creative`, `cover-brochure` (AXIS) | `eyebrow` ≤34, `body` ≤36, `photo`, (+1 opcional) |
 
-### Contenido · `content` (9)
+### Contenido · `content` (16)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
@@ -714,8 +761,15 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | `content-day-live-progress` | Vívelo 1 · el plan en Notion y la aprobación en Frame.io | `deck.content-day.live-progress` | proposal, brochure, pitch | Después del día a día con herramientas, para que quien lo ve viva la aprobación. | La cuenta no aprueba piezas visuales (servicios sin producción creativa). | `content-day-live-results`, `content-day-tools` | `eyebrow` ≤26, `question` ≤28, `answer` ≤12, `body` ≤100, `boardTitle` ≤24, `boardCards` ≤24, `reviewTitle` ≤20, `reviewImage`, `clientComment` ≤32, `teamReply` ≤32, (+1 opcional) |
 | `content-day-live-results` | Vívelo 2 · los resultados en vivo en Insights, Greenhouse y Teams | `deck.content-day.live-results` | proposal, brochure, pitch, qbr | Después de «Vívelo 1», o sola cuando la objeción es la reportería. | La cuenta no tiene Efeonce Insights ni panel de Greenhouse. | `decision-chart`, `content-day-tools` | `eyebrow` ≤26, `question` ≤16, `answer` ≤10, `body` ≤100, `panel`, `meeting` ≤40, `reportTitle` ≤36, `metrics` ≤18 |
 | `decision-agenda` | Agenda · cinco temas y el que importa marcado | `deck.decision-agenda` | proposal, pitch, qbr | Después de la portada de una presentación en sala (propuesta, pitch, QBR). | En un brochure que se lee solo: no hay «hoy». | `section-classic` | `eyebrow` ≤16, `question` ≤24, `answer` ≤14, `items` ≤26, `highlightedItem`, `nav` |
+| `content-one-platform` | Una sola operación · la cuenta del cliente al centro y cinco áreas de trabajo conectadas | — | proposal, brochure, pitch | Abrir la conversación de plataforma después de la propuesta: el problema del cliente es tener varias herramientas que no se hablan. | El cliente usa un solo producto y no hay integración que mostrar. | `content-service-lanes`, `proposal-cinematic-revops` | `eyebrow` ≤51, `question` ≤44, `answer` ≤7, `evidence` ≤179, `workAreas` ≤20, `accountName` ≤22, `accountInitials` ≤2, `accountSubtitle` ≤37, `accountFacts` ≤22 |
+| `content-service-lanes` | Servicios de la práctica · seis carriles con sus productos y las cuatro fases del ciclo | — | proposal, brochure, pitch | Brochure de una práctica: la lámina que lista qué hacemos. | Se propone un solo servicio: usar la propuesta de la línea (proposal-cinematic-revops o proposal-service-revops). | `proposal-cinematic-revops`, `content-bullets` | `eyebrow` ≤51, `question` ≤57, `answer` ≤21, `lanes` ≤108, `phases` ≤28, (+1 opcional) |
+| `content-season-launches` | Lo nuevo de la temporada · los lanzamientos del evento con su estado anunciado y la fecha de corte | — | proposal, brochure, pitch | En las semanas que siguen a un evento de la plataforma (en la aprobada, Dreamforce 2026), mientras el ledger de lanzamientos esté vigente. | En un brochure evergreen: es una lámina de temporada y envejece con la fecha de corte. | `content-service-lanes` | `eyebrow` ≤51, `question` ≤44, `answer` ≤8, `evidence` ≤179, `asOf`, `note` ≤115, `launches` ≤69, (+1 opcional) |
+| `content-day-release-cycle` | El ciclo del release · sandbox, pruebas, tu aprobación y producción, con el video que lo explica | — | proposal, brochure, pitch | Día a día de una práctica de plataforma (implementación y operación) donde el cliente aprueba releases. | La cuenta no tiene un ciclo de releases (servicios sin plataforma): usar content-day-tools. | `content-day-tools`, `content-day-live-progress` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `releaseKicker` ≤53, `releaseTitle` ≤39, `releaseIcon`, `currentStep`, `videoDuration` ≤5, `presenterInitials` ≤2, `videoCaption` ≤40, `approveCta` ≤22, `tools` ≤36 |
+| `content-day-live-library` | Adopción a su ritmo · la biblioteca de tutoriales en video por rol, grabados sobre la org del cliente | — | proposal, brochure, pitch | Fase de activación y adopción de una implementación. | La cuenta no graba tutoriales ni usa Loom: sin la herramienta, los tutoriales van sin marca. | `content-day-live-results` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `libraryKicker` ≤58, `libraryTitle` ≤43, `videos` ≤55, `stats` ≤66, (+1 opcional) |
+| `content-live-chat` | El CRM en una conversación · la consulta con datos vivos y la acción que el ejecutivo confirma | — | proposal, brochure, pitch | Propuesta del servicio de CRM conversacional (en la aprobada, Salesforce en Claude, «Claudeforce»). | Sin la autorización de uso de marca de Salesforce y de Anthropic archivada: la ventana va sin marcas y la composición sin marcas no tiene lámina aprobada. | `method-agent-supervisor` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `connectionLabel` ≤30, `userPrompt` ≤127, `answerIntro` ≤177, `records` ≤25, `proposedAction` ≤139, `guarantees` ≤57, (+2 opcionales) |
+| `content-measure-formulas` | Qué medimos · cinco métricas con su fórmula, su fuente y su dueño, sin cifras de promesa | — | proposal, brochure, pitch | Propuesta o brochure donde el cliente pregunta cómo se sabrá si funciona. | Ya hay resultados medidos con fuente: usar content-measure o decision-chart. | `content-measure`, `decision-chart` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `metrics` ≤58 |
 
-### Método · `method` (10)
+### Método · `method` (14)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
@@ -729,8 +783,12 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | `proposal-cinematic-nexa` | Fuerza híbrida en cine · Nexa biónica con lentes en la partida, con sus agentes | `deck.proposal-cinematic.hero` | proposal, brochure | Abrir o cerrar el bloque de fuerza híbrida con impacto | Hay que explicar el gobierno del agente o vender pasos: esta composición no lleva prueba ni pasos | `method-hybrid-workforce`, `method-hybrid-workforce-scene` | `eyebrow` ≤32, `question` ≤26, `answer` ≤8, `body` ≤110, `photo` |
 | `method-surround-cycle` | El método en ciclo · Surround Discovery: Medir, Crear, Distribuir, Optimizar | `deck.method-surround-cycle` | proposal, brochure, pitch | Explicar cómo trabajamos AEO/SEO después de mostrar el problema | El servicio es un proyecto de una vez | `method-staircase`, `decision-plan` | `eyebrow` ≤51, `question` ≤21, `answer` ≤8, `evidence` ≤161, `stations` ≤155, `coreLabel` ≤15, (+1 opcional) |
 | `method-eeat` | E-E-A-T · cuatro letras de vidrio y lo que construimos en cada una | `deck.method-eeat` | proposal, brochure, pitch | Explicar por qué el contenido y la autoridad importan para la IA | La audiencia ya domina E-E-A-T: pasar a la oferta | `method-surround-cycle` | `eyebrow` ≤51, `question` ≤43, `answer` ≤21, `evidence` ≤161, `meter` ≤24, `letters` ≤85 |
+| `method-agent-supervisor` | Agentes con supervisora · cada agente con su ficha de autonomía y una persona que responde | — | proposal, brochure, pitch | Propuesta o brochure con agentes (Agentforce) cuando la objeción es el control o el riesgo. | El deck no ofrece agentes. | `method-hybrid-workforce`, `content-day-live-progress` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `supervisorKicker` ≤33, `supervisorRole` ≤41, `supervisorInitials` ≤2, `supervisorDuty` ≤37, `agents` ≤72, `pendingApproval` ≤47 |
+| `decision-platform-coexistence` | Dos plataformas que conviven · la decisión se toma capacidad por capacidad, no por reemplazo | — | proposal, brochure, pitch | El cliente pregunta si debe migrar de una generación de producto a otra (en la aprobada, Marketing Cloud Engagement a Next). | La migración ya se decidió y lo que falta es mostrar que se hará bien: usar method-migration-reconcile. | `method-migration-reconcile`, `decision-diagnosis-map` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `platforms` ≤33, `tableTitle` ≤39, `capabilities` ≤42, `selectedCapability` |
+| `method-identity-consent` | Identidad y consentimiento · cinco fuentes, un perfil con preferencias y activación sólo donde hay permiso | — | proposal, brochure, pitch | Propuesta de datos (Data 360 en la aprobada) o de marketing con datos personales. | El deck no toca datos personales. | `method-migration-reconcile` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `sources` ≤12, `profileTitle` ≤22, `channels` ≤18, `activations` ≤31 |
+| `method-migration-reconcile` | Migración con reconciliación · cuatro etapas con sus contadores y el cuadre final con vuelta atrás | — | proposal, brochure, pitch | Propuesta de implementación o cambio de plataforma con datos existentes. | No hay datos que migrar. | `decision-platform-coexistence` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `stages` ≤47, `reconciliation` ≤30, `rollbackBadge` ≤18 |
 
-### Prueba · `proof` (12)
+### Prueba · `proof` (13)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
@@ -746,6 +804,7 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | `decision-ai-market` | Contexto de mercado · tres cifras con su fuente sobre la órbita de luz | `deck.decision-ai-market` | proposal, brochure, pitch, qbr | Abrir la conversación de SEO/AEO con el porqué ahora | No hay fuente verificable para alguna cifra: no se muestra sin fuente | `content-measure`, `decision-ai-answer` | `eyebrow` ≤51, `question` ≤43, `answer` ≤9, `evidence` ≤161, `figures` ≤124 |
 | `decision-difference` | La diferencia · agencia commodity vs. método medible, y la objeción del equipo propio | `deck.decision-difference` | proposal, brochure, pitch | El cliente compara con otras agencias o con hacerlo en casa | No hay comparación en juego: la lámina se lee defensiva | `decision-why-us`, `decision-risk` | `eyebrow` ≤51, `question` ≤43, `answer` ≤21, `evidence` ≤161, `alternativeTitle` ≤25, `rows` ≤88, `efeonceTitle` ≤23, `ownTeamTitle` ≤25, `ownTeamPillars` ≤49 |
 | `decision-traffic-to-revenue` | Del tráfico al negocio · cuatro escalones hasta los ingresos | `deck.decision-traffic-to-revenue` | proposal, brochure, pitch, qbr | El cliente mide al proveedor por tráfico y hay que subir la conversación a negocio | No hay CRM ni medición de leads: no prometer el escalón que no se puede medir | `decision-chart` | `eyebrow` ≤51, `question` ≤43, `answer` ≤18, `evidence` ≤161, `steps` ≤102, `cutLabel` ≤68 |
+| `decision-provider-fit` | El que encaje · cuatro veredictos posibles y el del cliente encendido | — | proposal, brochure, pitch | El cliente compara plataformas CRM (Salesforce, HubSpot) o viene a pedir una licencia. | La plataforma ya está decidida y en operación. | `decision-diagnosis-map`, `decision-difference` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `verdicts` ≤94, `selectedVerdict` |
 
 ### Propuesta por línea de servicio · `proposal-service` (10)
 

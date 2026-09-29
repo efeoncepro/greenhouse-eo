@@ -832,6 +832,12 @@
           "type": "image",
           "required": true,
           "maxChars": null
+        },
+        {
+          "name": "partnerMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.cover-brochure",
@@ -1516,6 +1522,12 @@
           "name": "photo",
           "type": "image",
           "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "partnerMark",
+          "type": "logo",
+          "required": false,
           "maxChars": null
         }
       ],
@@ -8888,6 +8900,975 @@
           }
         }
       }
+    },
+    {
+      "id": "content-one-platform",
+      "name": "Una sola operación · la cuenta del cliente al centro y cinco áreas de trabajo conectadas",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "decision-provider-fit",
+          "decision-platform-coexistence"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 7
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "workAreas",
+          "type": "list",
+          "required": true,
+          "maxChars": 20
+        },
+        {
+          "name": "accountName",
+          "type": "text",
+          "required": true,
+          "maxChars": 22
+        },
+        {
+          "name": "accountInitials",
+          "type": "text",
+          "required": true,
+          "maxChars": 2
+        },
+        {
+          "name": "accountSubtitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 37
+        },
+        {
+          "name": "accountFacts",
+          "type": "list",
+          "required": true,
+          "maxChars": 22
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "method-agent-supervisor",
+      "name": "Agentes con supervisora · cada agente con su ficha de autonomía y una persona que responde",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-day-live-progress",
+          "method-staircase"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115
+        },
+        {
+          "name": "supervisorKicker",
+          "type": "text",
+          "required": true,
+          "maxChars": 33
+        },
+        {
+          "name": "supervisorRole",
+          "type": "text",
+          "required": true,
+          "maxChars": 41
+        },
+        {
+          "name": "supervisorInitials",
+          "type": "text",
+          "required": true,
+          "maxChars": 2
+        },
+        {
+          "name": "supervisorDuty",
+          "type": "text",
+          "required": true,
+          "maxChars": 37
+        },
+        {
+          "name": "agents",
+          "type": "list",
+          "required": true,
+          "maxChars": 72
+        },
+        {
+          "name": "pendingApproval",
+          "type": "text",
+          "required": true,
+          "maxChars": 47
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "decision-platform-coexistence",
+      "name": "Dos plataformas que conviven · la decisión se toma capacidad por capacidad, no por reemplazo",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "decision-provider-fit",
+          "content-one-platform"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115
+        },
+        {
+          "name": "platforms",
+          "type": "list",
+          "required": true,
+          "maxChars": 33
+        },
+        {
+          "name": "tableTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 39
+        },
+        {
+          "name": "capabilities",
+          "type": "list",
+          "required": true,
+          "maxChars": 42
+        },
+        {
+          "name": "selectedCapability",
+          "type": "number",
+          "required": true,
+          "maxChars": null
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "decision-provider-fit",
+      "name": "El que encaje · cuatro veredictos posibles y el del cliente encendido",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-one-platform",
+          "decision-platform-coexistence"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115
+        },
+        {
+          "name": "verdicts",
+          "type": "list",
+          "required": true,
+          "maxChars": 94
+        },
+        {
+          "name": "selectedVerdict",
+          "type": "number",
+          "required": true,
+          "maxChars": null
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-service-lanes",
+      "name": "Servicios de la práctica · seis carriles con sus productos y las cuatro fases del ciclo",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-season-launches",
+          "method-agent-supervisor"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 57
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 21
+        },
+        {
+          "name": "lanes",
+          "type": "list",
+          "required": true,
+          "maxChars": 108
+        },
+        {
+          "name": "phases",
+          "type": "list",
+          "required": true,
+          "maxChars": 28
+        },
+        {
+          "name": "mascot",
+          "type": "image",
+          "required": false,
+          "maxChars": null
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-season-launches",
+      "name": "Lo nuevo de la temporada · los lanzamientos del evento con su estado anunciado y la fecha de corte",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-service-lanes"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 8
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "asOf",
+          "type": "date",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115
+        },
+        {
+          "name": "launches",
+          "type": "list",
+          "required": true,
+          "maxChars": 69
+        },
+        {
+          "name": "mascot",
+          "type": "image",
+          "required": false,
+          "maxChars": null
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "method-identity-consent",
+      "name": "Identidad y consentimiento · cinco fuentes, un perfil con preferencias y activación sólo donde hay permiso",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-live-chat",
+          "method-migration-reconcile"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115
+        },
+        {
+          "name": "sources",
+          "type": "list",
+          "required": true,
+          "maxChars": 12
+        },
+        {
+          "name": "profileTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 22
+        },
+        {
+          "name": "channels",
+          "type": "list",
+          "required": true,
+          "maxChars": 18
+        },
+        {
+          "name": "activations",
+          "type": "list",
+          "required": true,
+          "maxChars": 31
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "method-migration-reconcile",
+      "name": "Migración con reconciliación · cuatro etapas con sus contadores y el cuadre final con vuelta atrás",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "method-identity-consent"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115
+        },
+        {
+          "name": "stages",
+          "type": "list",
+          "required": true,
+          "maxChars": 47
+        },
+        {
+          "name": "reconciliation",
+          "type": "text",
+          "required": true,
+          "maxChars": 30
+        },
+        {
+          "name": "rollbackBadge",
+          "type": "text",
+          "required": true,
+          "maxChars": 18
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-day-release-cycle",
+      "name": "El ciclo del release · sandbox, pruebas, tu aprobación y producción, con el video que lo explica",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-day-live-library",
+          "content-day-live-results"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "releaseKicker",
+          "type": "text",
+          "required": true,
+          "maxChars": 53
+        },
+        {
+          "name": "releaseTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 39
+        },
+        {
+          "name": "releaseIcon",
+          "type": "enum",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "currentStep",
+          "type": "number",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "videoDuration",
+          "type": "text",
+          "required": true,
+          "maxChars": 5
+        },
+        {
+          "name": "presenterInitials",
+          "type": "text",
+          "required": true,
+          "maxChars": 2
+        },
+        {
+          "name": "videoCaption",
+          "type": "text",
+          "required": true,
+          "maxChars": 40
+        },
+        {
+          "name": "approveCta",
+          "type": "text",
+          "required": true,
+          "maxChars": 22
+        },
+        {
+          "name": "tools",
+          "type": "list",
+          "required": true,
+          "maxChars": 36
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-day-live-library",
+      "name": "Adopción a su ritmo · la biblioteca de tutoriales en video por rol, grabados sobre la org del cliente",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-day-release-cycle",
+          "content-day-live-results"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "libraryKicker",
+          "type": "text",
+          "required": true,
+          "maxChars": 58
+        },
+        {
+          "name": "libraryTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 43
+        },
+        {
+          "name": "sampleMark",
+          "type": "text",
+          "required": false,
+          "maxChars": 16
+        },
+        {
+          "name": "videos",
+          "type": "list",
+          "required": true,
+          "maxChars": 55
+        },
+        {
+          "name": "stats",
+          "type": "list",
+          "required": true,
+          "maxChars": 66
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-live-chat",
+      "name": "El CRM en una conversación · la consulta con datos vivos y la acción que el ejecutivo confirma",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "method-identity-consent",
+          "content-day-live-progress"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115
+        },
+        {
+          "name": "assistantMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "connectionLabel",
+          "type": "text",
+          "required": true,
+          "maxChars": 30
+        },
+        {
+          "name": "userPrompt",
+          "type": "text",
+          "required": true,
+          "maxChars": 127
+        },
+        {
+          "name": "answerIntro",
+          "type": "richText",
+          "required": true,
+          "maxChars": 177
+        },
+        {
+          "name": "records",
+          "type": "list",
+          "required": true,
+          "maxChars": 25
+        },
+        {
+          "name": "proposedAction",
+          "type": "text",
+          "required": true,
+          "maxChars": 139
+        },
+        {
+          "name": "platformMark",
+          "type": "image",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "guarantees",
+          "type": "list",
+          "required": true,
+          "maxChars": 57
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-measure-formulas",
+      "name": "Qué medimos · cinco métricas con su fórmula, su fuente y su dueño, sin cifras de promesa",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-day-live-results"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 44
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 179
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 115
+        },
+        {
+          "name": "metrics",
+          "type": "list",
+          "required": true,
+          "maxChars": 58
+        }
+      ],
+      "template": null,
+      "axis": null
     }
   ]
 }

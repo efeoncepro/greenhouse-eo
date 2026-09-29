@@ -57,6 +57,9 @@ const COMPUTED_SCORE =
 
 const PRESENTATION_CHOICE = 'Elige qué destaca la lámina: es una decisión de presentación, no un dato.'
 
+const PARTNER_CLAIM =
+  'Claim de partner de Efeonce, no dato del cliente ni de la propuesta: la insignia sólo va con readback primario vigente en Partner Community (docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md); sin él, el respaldo «Operamos sobre» + logo corporativo o nada.'
+
 /** `recipeId → slot → regla o exclusión`. */
 export const DECK_SLOT_BINDING_MAP: Record<string, Record<string, DeckSlotMapEntry>> = {
   // Portadas de propuesta: el logo del cliente de la `Proposal` (Account 360), en su versión para fondo oscuro.
@@ -161,7 +164,17 @@ export const DECK_SLOT_BINDING_MAP: Record<string, Record<string, DeckSlotMapEnt
   },
   'decision-plan': { horizon: { excluded: true, reason: 'Horizonte del plan: lo decide quien propone y lo confirma una persona.' } },
   'method-staircase': { selectedLevel: { excluded: true, reason: PRESENTATION_CHOICE } },
-  'method-staircase-flat': { selectedLevel: { excluded: true, reason: PRESENTATION_CHOICE } }
+  'method-staircase-flat': { selectedLevel: { excluded: true, reason: PRESENTATION_CHOICE } },
+
+  // Deck Salesforce (2026-09-29): marcas de terceros que no son datos del cliente ni de la propuesta.
+  'cover-brochure-line-revenue': { partnerMark: { excluded: true, reason: PARTNER_CLAIM } },
+  'close-proposal-horizon': { partnerMark: { excluded: true, reason: PARTNER_CLAIM } },
+  'content-live-chat': {
+    assistantMark: {
+      excluded: true,
+      reason: 'Marca de un proveedor de la práctica (Claude, de Anthropic) sujeta a su autorización de uso de marca, pendiente de archivar (biblioteca de autorizaciones: TASK-1937): no es dato del cliente ni de la propuesta.'
+    }
+  }
 }
 
 /** Las filas con binder de una receta, en el orden del mapa. */

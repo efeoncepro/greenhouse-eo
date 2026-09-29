@@ -1139,7 +1139,7 @@ tonal de Aguas Andinas y UC Temuco); **caso Sky** con foto de ejemplo; **BeX** c
 **excepción del registro cine** para secciones y «about». Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Recetas por
 lámina» y delta (c); manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md`. El 2026-09-28 el operador
 aprobó nueve láminas SEO/AEO más (78 en total; arriba, «Láminas SEO/AEO con plantilla desde TASK-1934») y decidió que
-dentro de un par `variant` la otra no entra al deck, seguida o no.
+dentro de un par `variant` la otra no entra al deck, seguida o no. El 2026-09-29 aprobó las 19 láminas del **deck de práctica Salesforce** (90 recetas; las 12 nuevas sin plantilla todavía y ocho láminas registradas como `approvedUses` de recetas existentes, cuatro de ellas sin caber en sus slots): orden en cinco actos, marcas de terceros con condición, badge como claim (`partnerMark`) y el deck HubSpot pendiente en la norma §4.6, «Deck de práctica Salesforce» (TASK-1942, TASK-1943).
 
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
 en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de
