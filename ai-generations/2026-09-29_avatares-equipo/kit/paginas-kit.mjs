@@ -13,6 +13,13 @@ const C = efeonceGraphicLine.color
 const BASE = 'https://storage.googleapis.com/efeonce-group-axis-public-media'
 const AVATAR = `${BASE}/team/avatars/v1`
 const FIRMA = `${BASE}/email-signature/v3.1/instalar`
+const FONDOS = `${BASE}/team/teams-backgrounds/v1`
+// Fondos de Teams aprobados por el operador (2026-09-29): la oficina de Efeonce, con el logo como product placement.
+const TEAMS = [
+  ['01-responder', 'Responder'], ['02-crecimiento-organico', 'Crecimiento orgánico'], ['03-cerrar', 'Cerrar'],
+  ['04-cocina', 'La cocina'], ['05-muro-v27', 'final_final_v27'], ['06-hecho-a-mano', 'Hecho a mano'],
+  ['07-todos-los-formatos', 'Todos los formatos'], ['09-una-toma', 'Una toma'], ['10-intacta', 'Intacta']
+]
 
 const EQUIPO = [
   { slug: 'andres-carlosama', nombre: 'Andrés', completo: 'Andrés Carlosama', archivo: 'Andres-Carlosama' },
@@ -53,6 +60,11 @@ const estilos = `
   .equipo { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
   .persona { display: flex; flex-direction: column; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px 16px; text-decoration: none; color: var(--navy); font-weight: 600; }
   .persona img { width: 120px; height: 120px; border-radius: 50%; }
+  .fondos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .fondo { background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .fondo img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+  .fondo div { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; font-size: 14px; font-weight: 600; }
+  .fondo a { font-size: 13px; color: var(--teal); text-decoration: none; white-space: nowrap; }
 `
 
 const cabeza = titulo => `<!doctype html>
@@ -69,9 +81,9 @@ const cabeza = titulo => `<!doctype html>
 <body>
 <main>`
 
-const pagina = p => `${cabeza(`Tu avatar Efeonce · ${p.nombre}`)}
-  <h1>Tu avatar nuevo, ${p.nombre}<span class="punto">.</span></h1>
-  <p class="bajada">El avatar oficial con la nueva línea gráfica de Efeonce. Descárgalo y úsalo como foto de perfil en todas tus herramientas de trabajo.</p>
+const pagina = p => `${cabeza(`Tu kit Efeonce · ${p.nombre}`)}
+  <h1>Tu kit Efeonce, ${p.nombre}<span class="punto">.</span></h1>
+  <p class="bajada">Tu kit Efeonce con la nueva línea gráfica: tu avatar, tus fondos de Teams y tu firma de correo, todo en un lugar.</p>
 
   <section class="tarjeta" aria-label="Tu avatar">
     <img class="retrato" src="${AVATAR}/800/${p.slug}.png" width="200" height="200" alt="Avatar de ${p.completo}">
@@ -86,6 +98,12 @@ const pagina = p => `${cabeza(`Tu avatar Efeonce · ${p.nombre}`)}
   <dl>
 ${DONDE.map(([d, t]) => `    <dt>${d}</dt>\n    <dd>${t}</dd>`).join('\n')}
   </dl>
+
+  <h2>Tus fondos de Teams<span class="punto">.</span></h2>
+  <p class="bajada">La oficina de Efeonce detrás de ti. En Teams: antes o durante la reunión, Efectos de fondo → Agregar nuevo → elige el archivo. Cada uno está pensado para que tú quedes al centro y lo importante a los lados.</p>
+  <div class="fondos">
+${TEAMS.map(([id, n]) => `    <div class="fondo"><img src="${FONDOS}/min/efeonce-teams-${id}.jpg" width="640" height="360" alt="Fondo de Teams: ${n}" loading="lazy"><div>${n}<a href="${FONDOS}/efeonce-teams-${id}.jpg" download="efeonce-teams-${id}.jpg">Descargar</a></div></div>`).join('\n')}
+  </div>
 
   <h2>Tu firma de correo<span class="punto">.</span></h2>
   <p class="bajada">Ya lleva este avatar. Si ya la habías pegado en Outlook, cópiala de nuevo para verla con la foto más grande.</p>
