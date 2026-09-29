@@ -60,7 +60,7 @@ pieza de la marca.
 |---|---|
 | «El anillo pregunta, la esfera responde»; los verbos rodea / mide / enfoca | La **manzana** como esfera |
 | **Una sola esfera por pieza**; ningún texto cruza la órbita; el halo | El **verde Glitch** `#6ec207` como acento |
-| La anatomía de la lente | El **navy Glitch** `#022a4e` (del wordmark) |
+| La anatomía de la lente | El **navy** `#022a4e` del wordmark: **tinta compartida** con el logo de Marketing con Manzanitas, la otra marca editorial (operador, 2026-09-29; `glitchLine.scope.sharedWithEditorialFamily`), así que no es exclusivo de Glitch; sigue sin usarse en piezas de Efeonce |
 | Fondo oscuro `#001a33` | La **falla en bytes** |
 | Bricolage Grotesque + Poppins | **Guttery** como voz del narrador |
 | La firma de piezas (logo Efeonce centrado abajo) | La cabecera **«EDICIÓN #N»** (en el Glitch Flash: «NO ESPERA AL LUNES» + estela de bytes + «FLASH», §14) |

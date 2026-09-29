@@ -103,11 +103,14 @@ cierra con **la manzana**, la esfera propia de Glitch.
 
 ### 1.2 Lo exclusivo de Glitch (nunca en piezas de Efeonce)
 
+> **Delta 2026-09-29:** el navy `#022a4e` del wordmark salió de esta lista. Es **tinta compartida** de la familia
+> editorial con el logo de Marketing con Manzanitas (decisión del operador; AXIS `axis-tokens` 0.3.28,
+> `glitchLine.scope.sharedWithEditorialFamily`). Sigue sin usarse en piezas de Efeonce.
+
 | Exclusivo de Glitch | Qué es |
 |---|---|
 | **La manzana** | la esfera de Glitch (§3.1) |
 | **Verde Glitch `#6ec207`** | el acento de Glitch |
-| **Navy Glitch `#022a4e`** | el navy del wordmark |
 | **La falla en bytes** | la foto o la manzana que se desarma en celdas (§3.2) |
 | **Guttery** | la voz del narrador (muletillas) |
 | **Cabecera «EDICIÓN #N»** | el masthead de cada edición (§3.5) |

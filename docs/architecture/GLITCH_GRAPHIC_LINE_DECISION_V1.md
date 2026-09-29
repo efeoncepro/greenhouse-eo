@@ -63,9 +63,11 @@ sistema de portada y las láminas del carrusel el 2026-09-27.
    rodea/mide/enfoca, una sola esfera por pieza, ningún texto cruza la órbita, el halo, la anatomía de la lente, el fondo
    `#001a33`, Bricolage Grotesque + Poppins, la firma de piezas (logo de Efeonce centrado abajo), la regla de contraste
    del acento, la iconografía AXIS (Trazo y Plastilina) y el territorio sonoro «Puntos suspensivos».
-3. **Es exclusivo de Glitch (nunca en piezas de Efeonce):** la manzana como esfera, el verde `#6ec207` como acento, el
-   navy `#022a4e` del wordmark, la falla en bytes, Guttery como voz del narrador, la cabecera «EDICIÓN #N», «El micrófono
-   se abre / se cierra» y el Glitch Drop.
+3. **Es exclusivo de Glitch (nunca en piezas de Efeonce):** la manzana como esfera, el verde `#6ec207` como acento, la
+   falla en bytes, Guttery como voz del narrador, la cabecera «EDICIÓN #N», «El micrófono
+   se abre / se cierra» y el Glitch Drop. El navy `#022a4e` del wordmark **ya no es exclusivo**: es tinta compartida de la
+   familia editorial con el logo de Marketing con Manzanitas (operador, 2026-09-29; AXIS `axis-tokens` 0.3.28,
+   `glitchLine.scope.sharedWithEditorialFamily`); sigue sin usarse en piezas de Efeonce.
 4. **Efeonce firma Glitch.** La firma de cada pieza es el logo de Efeonce; Glitch es contexto, como un producto (manual
    de La órbita §7). La burbuja URL no aplica a Glitch.
 5. **Piezas aprobadas por el operador el 2026-09-27:**
