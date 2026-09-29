@@ -21,11 +21,13 @@
 - **Costo de color** de los íconos de producto en SF1 y SF8: aprobado tal cual.
 - **Hallazgo:** `validateDeckPlan` mide los slots `text` con su marcado; el cuerpo de SF6 (124 visibles, 128 con `**`)
   pasa el máximo de 125 si se liga literal. No se cambió: decidirlo antes de ligar SF6 desde una `Proposal`.
-- **AXIS:** el estado nuevo de `AXIS_PARTNER_ASSETS` (íconos e insignia `authorized-by-partner`, claim `authorized`,
-  Claudeforce con `authorizedBy: ['Salesforce']`, razón de Agent Astro) y el Lab «Marcas de terceros» quedaron
-  **preparados sin publicar** (AXIS `8368c22`, rama `feat/partner-badge-authorized`): las referencias del Lab de SF0 y
-  SF19 llevan «(sin insignia)» en su título de `axis-tokens` (`surfaceReference`), así que mostrarlas con insignia exige
-  `axis-tokens` 0.3.36, fuera de lo autorizado. Greenhouse sigue en `axis-brand-assets` 0.4.4.
+- **AXIS `v0.3.36` publicado** (`main` `302f7f7`; «Release UI packages» y CI en verde; registro verificado; Lab 200):
+  `axis-tokens` y `axis-ui-contracts` 0.3.36 (delta (s), sin cambio de render: referencias del Lab de SF0 y SF19 con la
+  insignia y sus títulos; reglas `partner-claim-readback` y `third-party-mark-authorization` con la referencia de la
+  autorización) y `axis-brand-assets` 0.4.5 (`AXIS_PARTNER_ASSETS`: íconos e insignia `authorized-by-partner`, claim
+  `authorized`, Claudeforce con `authorizedBy: ['Salesforce']`, razón de Agent Astro). **Greenhouse fija 0.3.36 y
+  0.4.5**; `brand:tokens`, `glitch:tokens` y `manzanitas:tokens --check` sin drift, gate `graphic-line` 89 frames a 0 px
+  sin freeze, vitest focal 1488/1488 y typecheck verdes.
 
 ## Delta 2026-09-29 (c) — Composer completo; code complete, rollout pendiente
 
@@ -78,7 +80,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `code complete, rollout pendiente (2026-09-29, delta d): todo el deck aprobado por el operador (SF20, largos de SF6/SF7, costo de color de SF1/SF8) e insignia «Salesforce Partner» autorizada por Salesforce, por defecto en portada y contraportada de propuesta; 94/94 recetas con plantilla sobre AXIS 0.3.35, gate graphic-line 89 frames a 0 px sin freeze, planes golden con insignia sin avisos; pendientes: push a develop, pnpm test completo y pnpm build de producción (requieren autorización del operador) y la autorización escrita de Anthropic para Claude/Claudeforce; AXIS brand-assets 0.4.5 preparado sin publicar (las referencias del Lab exigen tokens 0.3.36)`
+- Status real: `code complete, rollout pendiente (2026-09-29, delta d): todo el deck aprobado por el operador (SF20, largos de SF6/SF7, costo de color de SF1/SF8) e insignia «Salesforce Partner» autorizada por Salesforce, por defecto en portada y contraportada de propuesta; 94/94 recetas con plantilla sobre AXIS 0.3.36 (brand-assets 0.4.5, tag v0.3.36 publicado con las referencias del Lab con insignia), gate graphic-line 89 frames a 0 px sin freeze, planes golden con insignia sin avisos; pendientes: push a develop, pnpm test completo y pnpm build de producción (requieren autorización del operador) y la autorización escrita de Anthropic para Claude/Claudeforce`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -181,7 +183,8 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
   `proposal-service-revops`, cada uno con su `fit` (qué cabe y qué no en los slots).
 - Los dos planes del deck (brochure y propuesta) como fixtures validados (0 errores, 0 avisos).
 - `partnerMark` opcional con falla cerrada (`readbackRef`) y `sloganBlock` en `close-proposal`; `partner-mark.test.ts`.
-- AXIS fijado en 0.3.33 (tokens y contracts) y `axis-brand-assets` 0.4.4 (`AXIS_PARTNER_ASSETS`).
+- AXIS fijado en 0.3.36 (tokens y contracts) y `axis-brand-assets` 0.4.5 (`AXIS_PARTNER_ASSETS` con las marcas de
+  Salesforce autorizadas; tag `v0.3.36`).
 - Baseline `graphic-line` sellado (sección (s)); SF20 aprobada (intent de ejemplo, 0 px contra la aprobada); PDF de
   la propuesta y del brochure con insignia (`render-src/pdf-propuesta.mjs`).
 - Insignia «Salesforce Partner» autorizada por Salesforce y por defecto en el deck (delta (d)).
@@ -192,8 +195,6 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - `pnpm test` completo y `pnpm build` de producción en el último commit (requieren autorización del operador).
 - Push a `develop` (sin autorización todavía).
 - Autorización escrita de **Anthropic** para Claude y Claudeforce (SF16; TASK-1937).
-- Publicar `axis-brand-assets` 0.4.5 (preparado en AXIS `8368c22`): necesita decidir `axis-tokens` 0.3.36 para que las
-  referencias del Lab de SF0 y SF19 muestren la insignia (su título dice «sin insignia»).
 - Recomendado, no bloqueante: archivar la copia escrita de la autorización de Salesforce junto a `DECISIONES.md`.
 
 ## Modular Placement Contract
@@ -338,7 +339,7 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - [x] Los largos aprobados de SF6 y SF7 caben en su receta. (`proposal-cinematic-revops.question` 30 y nombre de paso de `proposal-service-revops` 28, en el catálogo y en `proposal-service.slots.json`; gate `graphic-line` 89 frames a 0 px sin freeze, 2026-09-29.)
 - [x] La insignia «Salesforce Partner» va por defecto en el deck Salesforce y la falla cerrada sigue para otros partners. (Intents de ejemplo y planes golden con `readbackRef: salesforce-partner-authorization-2026-09-29`; `partner-mark.test.ts` 8/8; `pnpm brand:deck-plan` 0 errores en los dos planes.)
 - [x] `partnerMark` y el eslogan en bloque componen, con test sin el slot y el gate `graphic-line` a 0 px. (`partner-mark.test.ts`; freeze sección (s); `pnpm composer:visual-gate --catalog=graphic-line` 89 frames a 0 px, 2026-09-29)
-- [x] AXIS publica las recetas, sus referencias y los assets de terceros con procedencia y estado de autorización (`v0.3.31`, `v0.3.32` y `v0.3.33`; AXIS `main` `0bd2758`).
+- [x] AXIS publica las recetas, sus referencias y los assets de terceros con procedencia y estado de autorización (`v0.3.31`, `v0.3.32` y `v0.3.33`; AXIS `main` `0bd2758`; la insignia autorizada y las referencias con insignia en `v0.3.36`, `302f7f7`, que Greenhouse fija).
 - [ ] Gates de cierre: `pnpm test` completo y `pnpm build` de producción en el último commit. (**Sin tildar:** requieren autorización del operador — `pnpm build` consume ~30 GB en este equipo.)
 - [ ] Rollout comercial: autorizaciones escritas de Salesforce y Anthropic archivadas (TASK-1937) y readback vigente de la insignia «Salesforce Partner». (**Sin tildar:** la insignia y las marcas de Salesforce quedaron autorizadas por Salesforce el 2026-09-29 —declarado por el operador; archivar la copia escrita es recomendado, no bloqueante—; falta la autorización escrita de **Anthropic** para Claude y Claudeforce en SF16.)
 

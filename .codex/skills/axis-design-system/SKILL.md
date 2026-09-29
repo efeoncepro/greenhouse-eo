@@ -434,8 +434,8 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   wordmark, a tool isotype) never goes into `AXIS_BRAND_ASSETS`. It lives in `assets/partners/`, sealed apart in
   `src/partner-manifest.ts` and exported as `AXIS_PARTNER_ASSETS` (`findPartnerAsset`, `partnerAssetUrl`). Each entry
   must carry **`provenance`** (`source`, `retrievedOn`, `method`, `transformed`) and **`authorization`** (`status`:
-  `pending-written-authorization` or `in-stack` — and, in the version prepared after 2026-09-29 (b) and not yet
-  published, `authorized-by-partner` with `authorizedBy` and `reference` —, `holders`, `declaredOn`, `note`); a
+  `pending-written-authorization` or `in-stack` — and, since `axis-brand-assets` 0.4.5 (tag `v0.3.36`),
+  `authorized-by-partner` with `authorizedBy` and `reference` —, `holders`, `declaredOn`, `note`); a
   partner-program badge also carries **`claim`** (`requires: 'readback-current'`, `status`, `owner`, `fallback`). Files are byte copies of the source —
   never recolored or redrawn; a mark assembled because no vector is published (the Claudeforce wordmark) says so in
   `provenance`. A mark with `pending-written-authorization` does not go to a client or to paid media until the missing

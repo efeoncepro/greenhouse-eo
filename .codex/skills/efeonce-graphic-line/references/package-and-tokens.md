@@ -737,8 +737,8 @@ wordmark `claudeforce-wordmark` y `loom-isotype`. Cada registro (`AxisPartnerAss
 | Campo | Qué dice |
 |---|---|
 | `provenance` | `source` (URL o ruta de OneDrive), `retrievedOn`, `method` y `transformed` (p. ej. el `.ai` del badge convertido con `pdftocairo`, sólo el viewBox recortado) |
-| `authorization` | `status` — `pending-written-authorization` (falta la autorización escrita de un titular) o `in-stack` (Loom: herramienta del stack real); desde la versión preparada tras el 2026-09-29 (b), también `authorized-by-partner` con `authorizedBy` y `reference` —, `holders` (Salesforce; Salesforce y Anthropic en Claudeforce), `declaredOn` y `note` |
-| `claim` | sólo la insignia: `{ kind: 'partner-program', requires: 'readback-current', status, owner, fallback }` — `status: 'pending-readback'` en 0.4.4; `'authorized'` + `reference` en la versión preparada |
+| `authorization` | `status` — `pending-written-authorization` (falta la autorización escrita de un titular) o `in-stack` (Loom: herramienta del stack real); desde 0.4.5, también `authorized-by-partner` con `authorizedBy` y `reference` —, `holders` (Salesforce; Salesforce y Anthropic en Claudeforce), `declaredOn` y `note` |
+| `claim` | sólo la insignia: `{ kind: 'partner-program', requires: 'readback-current', status, owner, fallback }` — `status: 'pending-readback'` en 0.4.4; `'authorized'` + `reference` desde 0.4.5 |
 
 Reglas del paquete: los archivos son copias byte a byte de la fuente (nunca se recolorean ni se redibujan; el wordmark
 Claudeforce es la excepción declarada: se armó desde el vector oficial de Dreamforce más medidas, sin vector publicado);
@@ -746,13 +746,14 @@ una marca con `status` distinto de `in-stack` **no sale a cliente ni a pauta** h
 (TASK-1937); la insignia además exige readback. **Agent Astro queda fuera de todo paquete**
 (`AXIS_PARTNER_ASSETS_EXCLUDED`: es una interpretación editada, no el arte oficial) y sólo se usa por ruta local
 explícita. **Delta 2026-09-29 (b):** el operador declaró la insignia y las marcas de Salesforce **autorizadas por
-Salesforce**. En AXIS quedó preparado (commit local `8368c22` en la rama `feat/partner-badge-authorized`, **sin
-publicar**) el cambio de `AXIS_PARTNER_ASSETS`: íconos e insignia en `authorized-by-partner` con `reference:
+Salesforce**. **`axis-brand-assets` 0.4.5** (tag `v0.3.36`, AXIS `main` `302f7f7`, publicado y verificado en el
+registro; Greenhouse lo fija) cambia `AXIS_PARTNER_ASSETS`: íconos e insignia en `authorized-by-partner` con `reference:
 'salesforce-partner-authorization-2026-09-29'`, el claim de la insignia en `authorized`, Claudeforce con `authorizedBy: ['Salesforce']`
-(falta Anthropic) y la razón de Agent Astro al día. No se versionó porque las referencias del Lab de SF0 y SF19 llevan
-«(sin insignia)» en su título, que vive en `axis-tokens` (`surfaceReference`): pasarlas a la versión con insignia exige
-`axis-tokens` 0.3.36. Mientras tanto Greenhouse fija 0.4.4 (que todavía dice `pending-written-authorization`) y la
-fuente de la autorización es el registro de partnerships de Greenhouse. En Greenhouse, `pnpm brand:tokens` copia los archivos a `graphic-line-deck/assets/partners/` y el isotipo de
+(falta Anthropic) y la razón de Agent Astro al día. En el mismo tag, `axis-tokens` 0.3.36 y `axis-ui-contracts` 0.3.36
+(delta (s), sin cambio de render): los títulos de las referencias del Lab de SF0 y SF19 dicen que llevan la insignia
+autorizada (las imágenes pasaron a las láminas con insignia) y las reglas `partner-claim-readback` y
+`third-party-mark-authorization` aceptan la referencia de la autorización. La fuente de la autorización sigue siendo el
+registro de partnerships de Greenhouse. En Greenhouse, `pnpm brand:tokens` copia los archivos a `graphic-line-deck/assets/partners/` y el isotipo de
 Loom a `deck-axis/assets/tools/`; los probes del gate los reciben como `asset-ref:<kind>:probe`, nunca el archivo real.
 Lab: sección «Marcas de terceros» y `/references/surfaces/partner-assets.json` (sólo metadatos; el Lab no copia los
 archivos). Criterio: [criteria.md](criteria.md) («Marcas de terceros y claims de partner»).
