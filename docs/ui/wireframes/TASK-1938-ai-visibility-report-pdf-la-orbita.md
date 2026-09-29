@@ -30,6 +30,14 @@ Portadas e interiores llevan el lockup oficial «Efeonce | AI Visibility Report�
 logo. El encabezado corrido de las interiores dice «AI Visibility Report · [organización] · [período]». Esto reemplaza
 lo que más abajo dice sobre el rótulo, el turquesa de Growth y «Empower your Growth».
 
+**Encabezado y pie de las láminas internas (2026-09-29).** Encabezado: a la izquierda el lockup
+`ai-visibility-report-lockup-positive` a 22 px de alto; a la derecha el capítulo con su ícono del Trazo («Qué hacer»,
+«Por qué ocurre», «Dónde estás», «Mercado y fuentes») y cuatro segmentos de avance (el actual en el acento Engine, los
+leídos en gris azulado, los que faltan en gris claro); filete debajo. Como el encabezado ya nombra el capítulo, la página
+no repite ese rótulo encima de su título. Pie: a la izquierda «[organización] · [período]», al centro la burbuja oficial
+`url-bubble-baked-light` (la regla de la línea: `efeoncepro.com` nunca como texto) y a la derecha el folio «02 / 06»;
+filete encima. Reemplaza al encabezado de texto gris y al pie «Preparado por Efeonce · efeoncepro.com».
+
 ## Dos audiencias, un documento
 
 El informe se genera para **no clientes** (prospectos que piden el diagnóstico público) y para **clientes** (el
