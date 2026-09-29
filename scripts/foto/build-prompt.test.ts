@@ -31,7 +31,8 @@ import {
   LINEA_CREATIVA,
   PERSONAS,
   referenciasDeclaradas,
-  ROLES_DE_REFERENCIA
+  ROLES_DE_REFERENCIA,
+  validarVestuarioDeLinea
 } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
@@ -1476,30 +1477,41 @@ describe('el asset de USO es la prenda puesta, y es el defecto', () => {
 
 // Decisión del operador, 2026-09-29: el equipo real se viste según la PERSONALIDAD de la línea de la pieza. Las líneas
 // de negocio llevan el uniforme corporativo (bomber o softshell); la de servicios creativos, el hoodie.
+// La regla se prueba sobre la guarda pura (corre en CI, sin assets); el cableado en `construirPrompt`, con assets.
 describe('foto:prompt · vestuario del equipo por línea de servicio', () => {
-  const conEquipo = (linea: string | undefined, objetos: string[]) => ({ ...fichaBase, identidad: ['daniela'], linea, objetos: objetos.map(objeto => ({ objeto })) })
+  const conEquipo = (linea: string | undefined, objetos: string[]) => ({ identidad: ['daniela'], linea, objetos: objetos.map(objeto => ({ objeto })) })
 
   it('las líneas de negocio van con bomber o softshell', () => {
     for (const linea of ['growth', 'engine', 'voice', 'revenue-hubspot', 'revenue-salesforce']) {
-      expect(() => construirPrompt(conEquipo(linea, ['chaqueta-bomber-efeonce'])), linea).not.toThrow()
-      expect(() => construirPrompt(conEquipo(linea, ['chaqueta-bomber-efeonce', 'polo-efeonce'])), linea).not.toThrow()
-      expect(() => construirPrompt(conEquipo(linea, ['chaqueta-softshell-efeonce', 'polo-efeonce'])), linea).not.toThrow()
-      expect(() => construirPrompt(conEquipo(linea, ['hoodie-efeonce'])), linea).toThrow(/bomber o la softshell/)
-      expect(() => construirPrompt(conEquipo(linea, ['polo-efeonce'])), linea).toThrow(/bomber o la softshell/)
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['chaqueta-bomber-efeonce'])), linea).not.toThrow()
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['chaqueta-bomber-efeonce', 'polo-efeonce'])), linea).not.toThrow()
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['chaqueta-softshell-efeonce', 'polo-efeonce'])), linea).not.toThrow()
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['hoodie-efeonce'])), linea).toThrow(/bomber o la softshell/)
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['polo-efeonce'])), linea).toThrow(/bomber o la softshell/)
     }
   })
 
   it('servicios creativos (brand) van con el hoodie, nunca con la chaqueta corporativa', () => {
     expect(LINEA_CREATIVA).toBe('brand')
-    expect(() => construirPrompt(conEquipo('brand', ['hoodie-efeonce']))).not.toThrow()
-    expect(() => construirPrompt(conEquipo('brand', ['chaqueta-bomber-efeonce']))).toThrow(/hoodie Efeonce/)
-    expect(() => construirPrompt(conEquipo('brand', ['hoodie-efeonce', 'chaqueta-softshell-efeonce']))).toThrow(/nunca con/)
+    expect(() => validarVestuarioDeLinea(conEquipo('brand', ['hoodie-efeonce']))).not.toThrow()
+    expect(() => validarVestuarioDeLinea(conEquipo('brand', ['chaqueta-bomber-efeonce']))).toThrow(/hoodie Efeonce/)
+    expect(() => validarVestuarioDeLinea(conEquipo('brand', ['hoodie-efeonce', 'chaqueta-softshell-efeonce']))).toThrow(/nunca con/)
   })
 
   it('una línea que no existe se rechaza; sin línea o sin equipo real, la guarda no aplica', () => {
-    expect(() => construirPrompt(conEquipo('creative', ['hoodie-efeonce']))).toThrow(/no existe/)
-    expect(() => construirPrompt(conEquipo(undefined, ['hoodie-efeonce']))).not.toThrow()
-    expect(() => construirPrompt({ ...fichaBase, identidad: ['nexa'], linea: 'growth', objetos: [{ objeto: 'hoodie-efeonce' }] })).not.toThrow()
+    expect(() => validarVestuarioDeLinea(conEquipo('creative', ['hoodie-efeonce']))).toThrow(/no existe/)
+    expect(() => validarVestuarioDeLinea(conEquipo(undefined, ['hoodie-efeonce']))).not.toThrow()
+    expect(() => validarVestuarioDeLinea({ identidad: ['nexa'], linea: 'growth', objetos: [{ objeto: 'hoodie-efeonce' }] })).not.toThrow()
+    expect(() => validarVestuarioDeLinea({ identidad: [{ persona: 'julio', vista: 'frente' }], linea: 'growth', objetos: ['hoodie-efeonce'] })).toThrow(/julio/)
     expect(EQUIPO_REAL).toEqual(['julio', 'andres', 'daniela', 'humberly', 'luis', 'melkin', 'valentina'])
+  })
+})
+
+conAssets('foto:prompt · la guarda de vestuario está cableada', () => {
+  it('construirPrompt se detiene con la prenda de la otra línea y arma el prompt con la correcta', () => {
+    const ficha = (objetos: string[]) => ({ ...fichaBase, identidad: ['daniela'], linea: 'growth', objetos: objetos.map(objeto => ({ objeto })) })
+
+    expect(() => construirPrompt(ficha(['hoodie-efeonce']))).toThrow(/bomber o la softshell/)
+    expect(() => construirPrompt(ficha(['chaqueta-bomber-efeonce']))).not.toThrow()
   })
 })
