@@ -502,7 +502,8 @@ export const contarCambios = ({ antes, despues, zona, caja }) => {
  * código 0: el código de salida NO prueba que haya edición, así que se exige el archivo.
  */
 export const editarConAiImage = async ({ recorte, edicion, prompt }) => {
-  const argv = ['-s', 'ai:image', '--model', MODELO_ACABADO, '--quality', CALIDAD_ACABADO, '--size', `${LADO_MODELO}x${LADO_MODELO}`, '--image', recorte, '--out', edicion, '--prompt', prompt]
+  // `ai:image` corre en la raíz del repo: las rutas van absolutas para no depender del cwd de quien llama.
+  const argv = ['-s', 'ai:image', '--model', MODELO_ACABADO, '--quality', CALIDAD_ACABADO, '--size', `${LADO_MODELO}x${LADO_MODELO}`, '--image', path.resolve(recorte), '--out', path.resolve(edicion), '--prompt', prompt]
 
   const { codigo, salida } = await new Promise((resolve, reject) => {
     const hijo = spawn('pnpm', argv, { cwd: REPO, stdio: ['ignore', 'pipe', 'pipe'] })
