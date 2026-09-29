@@ -31,5 +31,13 @@
   "noche-m": [
     "arte/vinilo-horas.png",
     "arte/app-variantes.png"
+  ],
+  "captura-m": [
+    "arte/voz-tomas.png",
+    "arte/hoja-contactos.png"
+  ],
+  "memoria-m": [
+    "arte/voz-marca.png",
+    "arte/archivo-marca.png"
   ]
 }
