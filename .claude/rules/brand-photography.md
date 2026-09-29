@@ -185,7 +185,7 @@ pnpm foto:componer <piezas.json>    # la CAPA GRÁFICA encima: voces, selección
 pnpm foto:componer:cta <plan.json>  # pieza CON CTA: compone y emite su QA con huellas (out/qa-<plan>.json)
 pnpm foto:cta:gate <plan.json>      # la certifica: 0 certificado · 1 falla · 2 uso · 3 NO certificable (no es pase)
 pnpm foto:emblema <plate.png>       # amplía el bordado para mirarlo al 100% (no decide: quita la excusa)
-pnpm foto:isotipo <plate.png> --centro x,y --ancho w   # compone el isotipo OFICIAL si foto:emblema muestra otro
+pnpm foto:isotipo <plate.png> --centro x,y --ancho w --acabado   # compone el isotipo OFICIAL si foto:emblema muestra otro, y el modelo lo termina
 pnpm foto:lanyard --nombre … --cargo … --foto …   # arma el lanyard determinístico; el modelo sólo lo termina
 ```
 
@@ -318,23 +318,34 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   se rehace la toma. Medido antes (2026-09-20, sin referencias puestas): tres prendas dieron **tres emblemas
   distintos y ninguno era el de Efeonce**; por eso la referencia puesta es obligatoria, no opcional.
   **Excepción: el traje biónico de Nexa no tiene referencia** (es ficción): su isotipo **se compone** con
-  `pnpm foto:isotipo --prenda clara`, pequeño, en la pechera del lado izquierdo de quien lo lleva (como `NX5b`),
+  `pnpm foto:isotipo --prenda clara --acabado`, pequeño, en la pechera del lado izquierdo de quien lo lleva (como `NX5b`),
   y la ficha pide la pechera lisa. **NUNCA** cerrar sin `pnpm foto:emblema`: el QA sobre una hoja de contacto no
   sirve, a 520 px un bordado no se lee y pasa por bueno.
 - 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: «*cuando compones el isotipo no
   siempre queda bien; pásalo al modelo pidiéndole que haga el acabado sin alterar lo que está bien*». Compuesto
-  solo, se ve pegado encima. Método probado en `MC1h` y `MC4g` (`ai-generations/2026-09-28_manzanitas-cine/plates/
-  acabado/`, scripts `isotipo-acabado.cjs` + `isotipo-mezcla.cjs`): (1) recorte de 512 px alrededor del isotipo
-  compuesto, ampliado a 1024; (2) `pnpm ai:image --model gpt-image-2.5-sunburst --image <recorte>` con un prompt
-  que declara la marca **terminada** —forma, partes, proporción, color, tamaño y posición intactos— y pide sólo
-  **materia y luz** (curvatura de la superficie, gradiente de luz, rim, grano); (3) la edición vuelve a la placa
-  **sólo sobre la silueta del isotipo** (diferencia compuesto − original, dilatada 3 px, alfa suave) y con el color
-  corregido **sólo por el desplazamiento de la media** del entorno. Medido: **0 píxeles cambiados fuera de la
-  marca**, forma intacta al 100 %, ≈ USD 0,05 por marca. Trampas medidas: mezclar el recorte entero o una elipse deja
-  un **halo** (el modelo aclara todo el recorte); igualar también el desvío de color vuelve la marca **verde azulado
-  o lavada**; pedir que la marca «se asiente» en la superficie dio en `MC5g` un **relieve con borde claro** a un solo
-  costado: el prompt pide la marca **a ras, como impresión fina, sin relieve, bisel ni borde de luz**. Mira la marca al
-  100 % antes y después, y compárala con la placa sin acabado.
+  solo, se ve pegado encima. **Comando (desde el 2026-09-29): `pnpm foto:isotipo <plate.png> --centro x,y --ancho w
+  --acabado [--superficie "<qué lleva la marca, en inglés>"]`**. NUNCA lo rehagas a mano ni copies los scripts de
+  `MC1h`/`MC4g` (`ai-generations/2026-09-28_manzanitas-cine/plates/acabado/`), que quedan como histórico. Hace el
+  método probado en esas dos piezas: (1) recorte de 512 px alrededor del isotipo compuesto, ampliado a 1024 (`--lado`
+  si la marca no cabe con aire); (2) `pnpm ai:image --model gpt-image-2.5-sunburst --quality high --size 1024x1024
+  --image <recorte>` con un prompt que declara la marca **terminada** —forma, partes, proporción, color, tamaño y
+  posición intactos— y pide sólo **materia y luz** (curvatura de la superficie, gradiente de luz, rim, grano);
+  `--superficie` nombra el soporte (*«a white armored chest plate of a futuristic suit»* en el traje de Nexa); (3) la
+  edición vuelve a la placa **sólo sobre la silueta del isotipo** (diferencia compuesto − placa **ya limpia** > 10 de
+  luminancia, dilatada 3 px, alfa con blur 1,6) y con el color corregido **sólo por el desplazamiento de la media**
+  por canal en un anillo de 14 px. Escribe `<plate>-isotipo-acabado.png`, el recorte (`-acabado-recorte.png`), su
+  edición (`-acabado-edicion.png`), la hoja antes/después al 300 % (`-acabado-comparar.png`: izquierda el compuesto,
+  derecha el acabado) y la procedencia —modelo, prompt, SHA-256 de recorte, edición, acabado y prompt, conteos— en
+  el `.json` de `foto:isotipo`. **Falla si cambió un solo píxel fuera de la marca** (silueta + 8 px, medido sobre la
+  imagen entera en disco) y deja el archivo como `-acabado.rechazado.png`. `pnpm ai:image` imprime `FAILED` y sale
+  con **0** cuando la edición falla: el comando exige el archivo, no el código. Medido el 2026-09-29 reinyectando la
+  edición original: reproduce **byte a byte** las salidas de `MC1h` y `MC4g`, con 0 píxeles fuera. ≈ USD 0,05 por
+  marca. Trampas medidas, ya resueltas en el comando (no las reintroduzcas): mezclar el recorte entero o una elipse
+  deja un **halo** (el modelo aclara todo el recorte: −16 niveles en `MC1h`); igualar también el desvío de color vuelve
+  la marca **verde azulado o lavada**; pedir que la marca «se asiente» en la superficie dio en `MC5g` un **relieve con
+  borde claro** a un solo costado: el prompt pide la marca **a ras, como impresión fina, sin relieve, bisel ni borde de
+  luz**; y con la limpieza encendida, medir la silueta contra el plate original llevaría la luz del modelo a la zona
+  limpiada. Mira la hoja y la marca al 100 % (`pnpm foto:emblema <acabado>`) antes de publicar.
 - **Firma del banner y de la portada de blog: no tiene que ir al centro** **[operador, 2026-09-28]**: «*en la firma de
   portada de blog o banner el logo no necesariamente tiene que estar al centro; puedes ponerlo en otra parte si se ve
   mejor*». Caso `MC5g` (1200×630): abajo a la izquierda, alineada con la columna del texto (margen 72, ancho 25 % del

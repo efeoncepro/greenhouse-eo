@@ -635,12 +635,13 @@ pnpm foto:doctor                                            # ¿puede esta máqu
 pnpm foto:prompt <ficha.json>                               # compila el prompt; LEE el resultado (trampas 6–8)
 pnpm foto:generar <ficha.json> --quality high --out <dir>   # genera con las referencias que la ficha declara
 pnpm foto:emblema <plate.png>                               # el bordado al 100 %: siempre, aunque parezca bien
-pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara]   # compone el isotipo oficial
+pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara] --acabado   # compone el isotipo oficial y el modelo lo termina
 pnpm brand:compose -- --intent <intent.json>               # la lámina proposal-cinematic entera (PDF 16:9)
 ```
 
 `foto:generar` deja el plate en `./plates` junto a la ficha si no se pasa `--out`; `foto:isotipo` escribe
-`<plate>-isotipo.png` y su `.json` de procedencia. Con varias prendas, se corre una vez por pecho.
+`<plate>-isotipo.png` y su `.json` de procedencia, y con `--acabado` también `<plate>-isotipo-acabado.png` y la hoja
+antes/después (regla del 2026-09-28: lo compuesto lo termina el modelo). Con varias prendas, se corre una vez por pecho.
 
 **El plate dentro del composer [medido en código, 2026-09-28]:** `pnpm brand:compose` recorta el plate a la caja de la
 lámina con un recorte **centrado** («cover»). Si el intent declara `photo.focus` (`xOfWidth` / `yOfHeight`, fracciones

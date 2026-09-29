@@ -184,7 +184,7 @@ pnpm foto:doctor
 pnpm foto:prompt <ficha.json>                               # LEE el resultado (trampas 6–8 del registro)
 pnpm foto:generar <ficha.json> --quality high --out <dir>
 pnpm foto:emblema <plate.png>                               # siempre, aunque el emblema parezca bien
-pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara]   # una vez por pecho
+pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara] --acabado   # una vez por pecho; el modelo lo termina
 pnpm brand:compose -- --intent <intent.json>               # lámina o brochure: Artifact Composer
 ```
 

@@ -313,8 +313,8 @@ personas de Efeonce.
 > **traje biónico de Nexa**, que no tiene referencia (se compone siempre, como `NX5b`).
 >
 > **Y lo compuesto se termina con el modelo [operador, 2026-09-28]:** el isotipo compuesto se ve pegado encima; se
-> recorta la zona, el modelo le da materia y luz sin tocar la marca, y la edición vuelve sólo sobre su silueta
-> (método medido en `.claude/rules/brand-photography.md`).
+> recorta la zona, el modelo le da materia y luz sin tocar la marca, y la edición vuelve sólo sobre su silueta. Desde
+> el 2026-09-29 lo hace `pnpm foto:isotipo … --acabado` (método medido en `.claude/rules/brand-photography.md`).
 
 **El modelo no reproduce el emblema: inventa uno distinto cada vez.** Medido sobre la tanda
 `2026-09-20_vestuario-registros/`: tres prendas dieron **tres emblemas diferentes entre sí y ninguno

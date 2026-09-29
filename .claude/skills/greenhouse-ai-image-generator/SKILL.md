@@ -729,18 +729,21 @@ El registro cine («la marca en su película», 2026-09-27) sólo se usa con **N
   uniforme sí tiene varias referencias armadas, no sólo Nexa: cualquier personaje que use uniforme»*. La prenda se pide
   con su kit en `objetos` (sin `vista`: llega la prenda PUESTA) → `pnpm foto:emblema <plate.png>` al 100 % → si muestra
   nave, órbita y tres ventanas, **se publica tal como salió**, sin sufijo `b`. `pnpm foto:isotipo <plate.png> --centro x,y
-  --ancho w [--prenda oscura|clara]` sólo si el emblema difiere (una vez por pecho; deja `<plate>-isotipo.png` y un
+  --ancho w [--prenda oscura|clara] --acabado` sólo si el emblema difiere (una vez por pecho; deja `<plate>-isotipo.png` y un
   `.json` de procedencia con el SHA-256 del SVG) y **siempre en el traje biónico de Nexa**, que no tiene referencia
   (`--prenda clara`, pechera del lado izquierdo de quien lo lleva, como `NX5b`). Componer por defecto dejó el isotipo
   impreso en vez de bordado y la limpieza tapó lo vecino: una cinta de luz en `CR4` ([registro cine §16.7](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)) y una mano en `MC2` (2026-09-28).
   Si compones, mira la `b` al 100 % también después. `foto:isotipo` compone el isotipo del pecho, no el logotipo de una
   espalda. Canon: `.claude/rules/brand-photography.md` y
   [personas y vestuario](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
-- 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: compuesto solo se ve pegado. Recorte
-  de 512 px alrededor de la marca → `pnpm ai:image --model gpt-image-2.5-sunburst --image <recorte>` con prompt de
-  acabado (marca terminada e intacta; sólo materia y luz) → devolver la edición **sólo sobre la silueta** del isotipo
-  con el color corregido por el desplazamiento de la media del entorno. Mezclar el recorte entero deja halo; escalar
-  el desvío de color cambia el tono de la marca. Medido: 0 px fuera de la marca. Método completo en
+- 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: compuesto solo se ve pegado. Se hace
+  con **`pnpm foto:isotipo <plate.png> --centro x,y --ancho w --acabado [--superficie "<soporte, en inglés>"]`**, nunca a
+  mano: recorta 512 px alrededor de la marca, pide a `gpt-image-2.5-sunburst` (high, 1024×1024) sólo materia y luz con
+  la marca declarada terminada e intacta, y devuelve la edición **sólo sobre la silueta** del isotipo con el color
+  corregido por el desplazamiento de la media del entorno. Deja `<plate>-isotipo-acabado.png`, el recorte, la edición,
+  la hoja antes/después al 300 % y la procedencia (modelo, prompt, hashes) en el `.json`; **falla si cambia un píxel
+  fuera de la marca**. ≈ USD 0,05. Rehacerlo a mano reintroduce las trampas medidas: mezclar el recorte entero deja
+  halo y escalar el desvío de color cambia el tono de la marca. Método y mediciones en
   `.claude/rules/brand-photography.md`.
 - **Nunca describir el emblema en la escena**: pedir *«the white Efeonce rocket emblem»* dio un cohete genérico. Se
   prohíbe por nombre (*«NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*) cuando la prenda no tiene kit (el traje de Nexa) y se compone el oficial; en el uniforme, la marca la trae la referencia.

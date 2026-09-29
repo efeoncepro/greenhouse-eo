@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-29 — `foto:isotipo --acabado`: el modelo termina el isotipo compuesto
+
+- `pnpm foto:isotipo … --acabado [--superficie "…"] [--lado px]` aplica la regla del operador del 2026-09-28: recorta
+  512 px alrededor de la marca, pide a `gpt-image-2.5-sunburst` (high, 1024×1024) sólo materia y luz y devuelve la
+  edición sólo sobre la silueta del isotipo, con el color corregido por el desplazamiento de la media. Escribe
+  `<plate>-isotipo-acabado.png`, el recorte, la edición, la hoja antes/después al 300 % y la procedencia (modelo,
+  prompt, hashes, conteos) en el `.json` de `foto:isotipo`.
+- Falla si cambia un píxel fuera de la marca (silueta + 8 px) y deja el resultado como `.rechazado.png`; exige el
+  archivo de la edición porque `ai:image` sale con 0 aunque falle. La silueta se mide contra la placa ya limpia: con la
+  limpieza encendida, la zona limpiada no recibe la luz del modelo. `--out` sin `.png` ahora se rechaza (el `.json`
+  pisaba la imagen).
+- Reinyectando la edición original, reproduce byte a byte las salidas de `MC1h` y `MC4g`. 10 pruebas nuevas con
+  `ai:image` simulado; las mutaciones halo, sin corrección de color y silueta contra el original las rompen. La regla
+  de fotografía y las skills `greenhouse-ai-image-generator` y `design-studio` apuntan al comando.
+
 ## 2026-09-29 — Deck Salesforce aprobado completo; insignia «Salesforce Partner» autorizada y por defecto (TASK-1942)
 
 - El operador aprobó todo el deck y declaró la insignia «Salesforce Partner» autorizada por Salesforce: va por defecto
@@ -632,30 +647,3 @@ siempre con el gate local en verde. Desde ahora:
 - las rutas de lectura de Insights ya no cargan comandos ni render.
 
 Reglas en `OPS_RELIABILITY_AGENT_INVARIANTS.md` §Tamaño de las funciones de Vercel.
-
-## 2026-09-22 — Efeonce Insights: informe A4 y deck nuevo en staging, probados con datos reales
-
-TASK-1847 en staging (`develop` hasta `21c991999`), sin producción. El canary con Berel (SEO+AEO) y Sky (ICO), en
-ediciones internas y sin emitir y con `insights_v1` asignado a ambas orgs, encontró y cerró:
-
-- el validador de cifras rechazaba toda edición SEO real (fecha partida, cifras de la etiqueta del hecho);
-- OTD nunca llegaba a un informe (`otd` frente a `otd_pct`);
-- límites y metodología mostraban identificadores internos;
-- las figuras del A4 tenían formato propio, recortes y la barra destacada invisible;
-- el deck sobre `deck-axis` recortaba y callaba métricas, así que `deck_pdf` pasa a `insights-deck`.
-
-Vista previa con datos reales en `scripts/insights/preview-edition.ts`. Se abre ISSUE-177: no hay gate que mida el
-tamaño de las funciones de Vercel.
-
-## 2026-09-22 — «Tu IA no conoce tu negocio»: el carril HubSpot
-
-[CDR-004](docs/campaigns/decisions/CDR-004-tu-ia-no-conoce-carril-hubspot.md) (`Proposed`) resuelve cómo se vende
-HubSpot dentro de una narrativa que declara no ser una campaña de HubSpot: el carril es provider-specific, no una
-campaña paralela, y rige la regla de sujeto —el problema del comprador es el qué, HubSpot es el cómo—. La unidad de
-producción pasa a ser el dolor del mapa del pillar, no el Hub ni la familia; tres registros de mención con gate
-propio; mitigación del riesgo «HubSpot no sirve» moviendo la pregunta en vez de atacar la herramienta; herencia de la
-regla del vacío. Tres gates medidos el mismo día: destino (pillar y caso ANAM `200`, otras cuatro `404`), partner
-(tier declarado, no revalidado) y prueba (un solo caso publicado). El cruce deja dos huecos declarados, no rellenados:
-Revenue Lifecycle/CFO sin capítulo y el capítulo 5 sin dolor en el mapa. Brief ejecutable de las siete fichas en
-[RUTA_HUBSPOT.md](docs/commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/RUTA_HUBSPOT.md). Los capítulos 1 y 2
-quedan con brief por primera vez. Sin producir, publicar, pautar ni declarar tier de partner.
