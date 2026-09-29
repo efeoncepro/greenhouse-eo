@@ -1,5 +1,90 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-29 (t) — Avatares nuevos del equipo y deriva de Chromium en deck-axis
+
+<!-- sealed-by-freeze: 6c5b56126801a849edaf1c4c3c4863ecc181eda2072977487d8b920ffbfb8278 -->
+
+Decisión del operador (2026-09-29): todo el equipo con la bomber Efeonce sobre el polo piqué y el fondo oscuro de la
+línea con el halo de la órbita (el que pinta `orbitSvg` sobre oscuro, sin anillo ni arco). Se reemplazaron los avatares
+de `assets/squad/` (Julio, Andrés, Daniela, Melkin, Humberly y Valentina; mismas claves del resolver `squad-person`,
+800 px; commit `0d585f614`). Maestros de 1080 px y proceso: `ai-generations/2026-09-29_avatares-equipo/`; copia en GCP:
+`gs://efeonce-group-axis-public-media/team/avatars/v1/`.
+
+**Frames de los avatares (2):**
+
+- `sky/21-equipo.png` — 433208 píxeles: las fotos nuevas del equipo
+- `templates/TeamGalleryFull.png` — 715836 píxeles: las fotos nuevas del equipo
+
+**Deriva de rasterización del texto (57), sin cambio visible:** el baseline de estas láminas es del 2026-07-15 y el
+commit `0323fb933` (2026-07-19) cambió la versión de Playwright y con ella el Chromium que rasteriza. Los píxeles distintos
+están sólo en los bordes del texto (diff de `sky/13-dia-a-dia` revisado lado a lado: mismas letras, mismo color); los
+catálogos congelados después de esa fecha (graphic-line, glitch, manzanitas) dan 0 px. No es regresión: el render de
+estas plantillas no cambió.
+
+**Mismo píxel, otros bytes (2):** el gate las da en 0 píxeles, pero el freeze compara huellas de archivo y el PNG
+recodificado cambia sus bytes. Se re-promueven sin cambio visible:
+
+- `templates/CoverFull.png` — 0 píxeles
+- `templates/HighlightWave.png` — 0 píxeles
+
+- `sky/01-portada.png` — 1
+- `sky/02-agenda.png` — 887
+- `sky/03-entendimiento.png` — 293
+- `sky/04-near-miss.png` — 775
+- `sky/05-capa-tecnica.png` — 149
+- `sky/06-diagnostico.png` — 101
+- `sky/07-escalera.png` — 1868
+- `sky/08-informe.png` — 632
+- `sky/09-terreno.png` — 125
+- `sky/10-operacion.png` — 348
+- `sky/11-stack-operativo.png` — 1860
+- `sky/12-ciclo.png` — 1232
+- `sky/13-dia-a-dia.png` — 2366
+- `sky/14-arranque.png` — 910
+- `sky/15-lineas.png` — 6
+- `sky/16-seo-aeo.png` — 696
+- `sky/17-content-hub-anatomy.png` — 3148
+- `sky/18-muestra.png` — 758
+- `sky/19-portal.png` — 340
+- `sky/20-portal-vista.png` — 802
+- `sky/22-berel.png` — 3
+- `sky/23-clientes.png` — 447
+- `sky/24-testimonios.png` — 444
+- `sky/25-seguro.png` — 77
+- `sky/26-cumplimiento.png` — 525
+- `sky/27-economica.png` — 595
+- `sky/28-contraportada.png` — 198
+- `templates/AgendaFull.png` — 345
+- `templates/ArtifactShowcaseFull.png` — 27
+- `templates/BackCoverFull.png` — 198
+- `templates/BulletListSplit.png` — 4
+- `templates/CardGridFull.png` — 61
+- `templates/CaseStudySplit.png` — 148
+- `templates/ChartSplit.png` — 185
+- `templates/ClientLogosFull.png` — 46
+- `templates/ComparisonSplit.png` — 15
+- `templates/ContentHubAnatomyFull.png` — 613
+- `templates/CredentialsFull.png` — 7896
+- `templates/DailyOpsHubFull.png` — 700
+- `templates/DualListSplit.png` — 13
+- `templates/DualTextSplit.png` — 21
+- `templates/EvidenceStoryGrid.png` — 58
+- `templates/FourPillarsFull.png` — 25
+- `templates/HumanImpactFull.png` — 4
+- `templates/MaturityLadderFull.png` — 197
+- `templates/MetricsSplit.png` — 70
+- `templates/NarrativeSplit.png` — 1
+- `templates/PricingFull.png` — 121
+- `templates/ProcessStepsFull.png` — 443
+- `templates/QuoteSplit.png` — 5
+- `templates/RequirementsTableFull.png` — 129
+- `templates/SectionDividerSplit.png` — 35
+- `templates/StatSplit.png` — 7
+- `templates/TeamSplit.png` — 51
+- `templates/TestimonialsFull.png` — 34
+- `templates/TimelineFull.png` — 332
+- `templates/ToolStackFull.png` — 138
+
 ## 2026-09-29 (s) — TASK-1942: las 16 láminas de práctica del deck Salesforce y la marca del partner
 
 <!-- sealed-by-freeze: c1d25681ec982b91e06fc045bebac0ecafe24278c5b317edb9285356f72c6a74 -->
@@ -1026,7 +1111,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: c1d25681ec982b91e06fc045bebac0ecafe24278c5b317edb9285356f72c6a74 -->
+<!-- manifest-digest: 6c5b56126801a849edaf1c4c3c4863ecc181eda2072977487d8b920ffbfb8278 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.
