@@ -1,11 +1,11 @@
 # Componer piezas de Marketing con Manzanitas — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-28 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.1: el registro está publicado en AXIS)
 > **Modulo:** Creative · Marketing con Manzanitas (registro complementario de «La órbita»)
-> **Ruta en portal:** no aplica — hoy las piezas se componen en el canvas de la línea con los componentes del DS «Efeonce — La órbita»; la composición desde datos (AXIS y Artifact Composer) llega por una task aparte
+> **Ruta en portal:** no aplica — hoy las piezas se componen en el canvas de la línea con los componentes del DS «Efeonce — La órbita»; la validación y los gráficos desde datos ya están en AXIS (`pnpm manzanitas:resolve`, `axis-graphic-line/charts`); la composición con el Artifact Composer llega por una task aparte
 > **Documentacion tecnica:** [ADR del registro](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) · [Norma del registro](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/registro-marketing-con-manzanitas.md) · [Usar la línea gráfica de Efeonce](./usar-linea-grafica-efeonce.md) · [Producir una foto de marca Efeonce](../marketing/fotografia-de-marca-efeonce.md)
 
@@ -13,10 +13,12 @@
 > reemplaza: todo lo que aquí no se dice, lo dice [Usar la línea gráfica de Efeonce](./usar-linea-grafica-efeonce.md).
 > Para Glitch usa [Componer piezas de Glitch](./componer-piezas-glitch.md): los dos no se mezclan.
 
-> **Hoy se compone en el canvas, no con un comando.** Nada del registro está todavía en AXIS: no hay token, contrato,
-> comando ni plantilla del Artifact Composer. Las piezas se arman en el canvas «Marketing con Manzanitas · Línea v1» con
-> los componentes del DS «Efeonce — La órbita». Cuando el registro llegue a AXIS y a Greenhouse (por TASK-1936 y sus follow-ups),
-> este manual se actualiza.
+> **El registro está en AXIS desde el 2026-09-28; en Greenhouse todavía no hay plantilla.** Los valores, las reglas y
+> los gráficos ya viven en AXIS (token `manzanitasRegister`, contrato `efeonce.manzanitas-register`, gráficos en
+> `@efeoncepro/axis-graphic-line/charts`; ver [El registro en AXIS](#el-registro-en-axis-cómo-usarlo-hoy)). Greenhouse aún no
+> tiene un catálogo del Artifact Composer para MCM, así que las piezas se siguen armando en el canvas «Marketing con
+> Manzanitas · Línea v1» con los componentes del DS «Efeonce — La órbita», validando el carrusel con el contrato antes de
+> entregar.
 
 ## Para qué sirve
 
@@ -262,7 +264,7 @@ Componer no es publicar: publicar requiere la autorización del operador, y este
 | **En estudio** | todavía no es canon: la portada Pizarra con la mano en respuesta (dos esferas) |
 | **Borrador** | no se usa en una pieza final: los íconos de Trazo `republicar` y `enviar` |
 | **Pendiente** | lo decide el operador (ver «Pendientes») |
-| **Próximamente en AXIS** | el token, el contrato, las recetas de gráficos y la página del Lab del registro: todavía no existen |
+| **Pendiente en Greenhouse** | el catálogo `manzanitas` del Artifact Composer y las versiones de AXIS que usa Greenhouse: todavía no existen (en AXIS el registro ya está publicado) |
 
 **Señales dentro de la pieza:**
 
@@ -328,20 +330,37 @@ Componer no es publicar: publicar requiere la autorización del operador, y este
 9. El navy del texto del logo de Manzanitas, que Glitch declara suyo en su wordmark (hoy va el del archivo oficial).
 10. El acento de un tema de Revenue en Salesforce (hoy se usa Revenue en HubSpot).
 
-## Próximamente: el registro en AXIS
+## El registro en AXIS: cómo usarlo hoy
 
-Está propuesto, todavía sin ejecutar, y llega por [TASK-1936](../../tasks/to-do/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md). Cuando exista:
+Está publicado desde el 2026-09-28 en el repositorio `efeoncepro/axis-design-system` (tag `v0.3.26`). Sirve para
+**revisar** un carrusel antes de entregarlo y para **dibujar** sus gráficos desde el dato.
 
-- un token `manzanitasRegister` en AXIS con la cabecera, los formatos, «Desliza», la firma, la contraportada, el Recreo,
-  los gráficos y el texto denso;
-- los archivos de MCM en el paquete de marca de AXIS, con la manzana y sus puntos listos para tomar el acento;
-- las nueve recetas de gráficos, que convierten un dato en la lámina y revisan sus reglas;
-- un contrato `efeonce.manzanitas-register` que revisa la pieza y se niega a resolverla si algo falla, con el comando
-  `pnpm manzanitas:resolve`;
-- una página del Lab en `/references/manzanitas/`;
-- y en Greenhouse, un catálogo `manzanitas` en el Artifact Composer para componer carruseles desde los datos.
+1. **Consulta la página de referencia:** [axis.efeonce.org/references/manzanitas/](https://axis.efeonce.org/references/manzanitas/).
+   Elige la línea del tema en el selector y verás la manzana, el eslogan, «Desliza» y los gráficos en el acento de esa
+   línea. Los agentes leen lo mismo en `/references/manzanitas.json`.
+2. **Describe el carrusel como datos** en un archivo JSON (intent): canal, línea del tema y, por lámina, la pieza, la voz
+   y, si es un gráfico, su dato con la fuente. Parte de un ejemplo de `docs/examples/manzanitas/` (en AXIS), por ejemplo
+   `carrusel-recreo-engine-intent.json`.
+3. **Revísalo** desde la raíz del repositorio de AXIS:
 
-Hasta entonces, nada de eso existe: no lo cites como disponible ni intentes correr esos comandos.
+   ```bash
+   pnpm manzanitas:resolve -- --input carrusel.json --out manifest.json
+   ```
+
+   Si sale `status: "resolved"`, el carrusel cumple el registro y `manifest.json` trae cada lámina resuelta (acento,
+   cabecera, «Desliza», firma, voz y la respuesta del gráfico calculada del dato). Si sale `invalid`, el comando termina
+   con error y dice qué regla falla, con su código y un mensaje en español: corrige el intent, no la regla.
+4. **Dibuja los gráficos** con `manzanitasChartSvg` de `@efeoncepro/axis-graphic-line/charts` y revisa el resultado con
+   `runManzanitasChartChecks`: no debe quedar ningún chequeo en falso. También puedes probar un dato en el editor de la
+   página de referencia («Editar el dato»).
+5. **Compón y entrega** en el canvas como siempre; los números vienen del manifiesto o del token, nunca copiados a ojo.
+
+**Qué significa `pending-decision`:** la pieza o la regla depende de una de las pendientes del operador (por ejemplo,
+la story con foto o un tema de Revenue en Salesforce). No es un error tuyo: la pieza espera esa decisión.
+
+**Lo que todavía no existe en Greenhouse:** el catálogo `manzanitas` del Artifact Composer para componer el carrusel desde
+los datos con `pnpm brand:compose`, y la actualización de las versiones de AXIS que usa Greenhouse. No los cites como
+disponibles.
 
 ## Referencias técnicas
 

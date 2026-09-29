@@ -6,10 +6,9 @@
 > dice. El registro suma reglas, estilos y piezas propias sólo para piezas de MCM.
 >
 > **Tipo de documento:** Norma operativa de marca (registro complementario de la línea gráfica)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-28 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude (1.0: versión inicial, escrita desde el inventario de decisiones y
-> medidas del canvas v39)
+> **Última actualización:** 2026-09-28 por Claude (1.1: el registro se publicó en AXIS, `v0.3.26`; §14 al día)
 > **Estado:** **aprobada por el operador el 2026-09-28**: «Me encantan, queda aprobada toda la línea gráfica», sobre el
 > canvas v39. Cubre los formatos Pizarra, Escena, Lente y Recreo; la cabecera y la firma; la contraportada A; los
 > acentos por línea; los 9 gráficos y las 3 láminas de texto denso. Lo marcado **[pendiente]** no es canon hasta que el
@@ -22,7 +21,10 @@
 > **versión 39**
 > **Sistema de diseño de referencia (privado):** [«Efeonce — La órbita»](https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc)
 > (componentes `EfeonceOrbit.Voice`, `Measure`, `Lens` y `Slogan`)
-> **Valores en AXIS:** **ninguno todavía**. Nada del registro está en AXIS; el plan está en §14.
+> **Valores en AXIS (desde el 2026-09-28, tag `v0.3.26`):** token `manzanitasRegister` (`axis-tokens` 0.3.26), contrato
+> `efeonce.manzanitas-register` 0.1.1 (`axis-ui-contracts` 0.3.27, tag `v0.3.27`), gráficos `@efeoncepro/axis-graphic-line/charts` (0.10.0)
+> y archivos `AXIS_MANZANITAS_ASSETS` (`axis-brand-assets` 0.4.1). Página: [axis.efeonce.org/references/manzanitas/](https://axis.efeonce.org/references/manzanitas/).
+> **Los números de esta norma son referencia humana: si difieren del token, gana el token** (§14).
 > **Hermana, no se mezcla:** [sub-línea de Glitch](../glitch/GLITCH_GRAPHIC_LINE_V1.md)
 
 **Convenciones.** Salvo que se indique otra cosa, cada regla de esta norma es **decisión del operador** (aprobada el
@@ -826,7 +828,9 @@ No se deciden por cuenta propia. Mientras estén abiertos, rige lo que dice esta
 
 ### 14.1 Estado honesto
 
-**Nada del registro está aún en AXIS.** Hoy vive en:
+**Desde el 2026-09-28 el registro está publicado en AXIS** (`v0.3.26`, §14.3): token, contrato, gráficos, archivos y
+página del Lab. Greenhouse todavía no fija esas versiones ni compone MCM con el Artifact Composer (follow-ups de
+TASK-1936). Antes de AXIS, el registro vivía en:
 
 - **El canvas v39** «Marketing con Manzanitas · Línea v1», con sus tableros: `Grafico-1…9`, `Texto-1…3`,
   `Graficos-resumen` («cómo funcionan»), `Graficos-lineas` («acentos por línea»), `Formatos`, `Cierre-acciones`,
@@ -836,8 +840,9 @@ No se deciden por cuenta propia. Mientras estén abiertos, rige lo que dice esta
 - **La skill `efeonce-graphic-line`**: `references/criteria.md` §3.4 y §8, y el ledger del 2026-09-28.
 - **Esta norma** y su [ADR](../../../architecture/MANZANITAS_REGISTER_DECISION_V1.md).
 
-Mientras no esté en AXIS, **el canvas v39 es la referencia de valores** y esta norma la referencia de reglas. Los
-valores de esta norma son la medida del canvas; cuando exista el token, **gana el token**.
+Hasta el 2026-09-28 el canvas v39 fue la referencia de valores. **Desde `v0.3.26` el token `manzanitasRegister` es la
+fuente de los valores y el contrato `efeonce.manzanitas-register` verifica las reglas**; esta norma guarda el criterio y
+sus números son la medida del canvas, espejo del token: si difieren, **gana el token**.
 
 ### 14.2 Precedente: Glitch
 
@@ -849,9 +854,19 @@ El camino a seguir es el de Glitch: ADR y norma en Greenhouse
 `docs/examples/glitch/*.json`, archivos en `assets/glitch/` sellados fuera de `AXIS_BRAND_ASSETS`, y la página del Lab
 `/references/glitch/` con su gemelo `glitch.json` → tasks de Greenhouse TASK-1922, TASK-1923 y TASK-1924.
 
-### 14.3 Plan propuesto (pendiente de ejecutar)
+### 14.3 Plan (ejecutado y publicado el 2026-09-28)
 
-**Se ejecuta por [TASK-1936](../../../tasks/to-do/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md)**, que fija el orden de ejecución (el contrato va antes que los gráficos, porque `axis-graphic-line` depende de `axis-ui-contracts`); esta norma no lo ejecuta ni lo reemplaza. El plan visual y la maqueta de la página del Lab están en el canvas https://claude.ai/artifact/WdEJAsC6HGkKdvyNvkDbvk.
+> **Publicado en AXIS** con autorización explícita del operador: `main` en `06cb62d`, tag `v0.3.26` (`axis-tokens` 0.3.26,
+> `axis-ui-contracts` 0.3.24, `axis-brand-assets` 0.4.1, `axis-graphic-line` 0.10.0; después, el parche `v0.3.27`:
+> `axis-ui-contracts` 0.3.27 con el contrato 0.1.1, que exige que el carrusel empiece con su portada y termine con su
+> contraportada), CI y publicación en verde. En AXIS:
+> guía `docs/agent-composition/manzanitas.md`, schema, 16 ejemplos en `docs/examples/manzanitas/` (9 válidos, 7
+> inválidos), `pnpm manzanitas:resolve` y el ADR `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`.
+> Decisiones de la ejecución: claves de datos en inglés; paridad **geométrica** con el canvas (no de píxeles); en el
+> Embudo, con empate, el primer paso; «1 vez» cuando tu marca lidera. Ninguna pendiente de §13 se decidió. Lo que sigue
+> es el plan tal como se aprobó.
+
+**Se ejecutó por [TASK-1936](../../../tasks/complete/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md)**, que fijó el orden de ejecución (el contrato va antes que los gráficos, porque `axis-graphic-line` depende de `axis-ui-contracts`); esta norma no lo ejecuta ni lo reemplaza. El plan visual y la maqueta de la página del Lab están en el canvas https://claude.ai/artifact/WdEJAsC6HGkKdvyNvkDbvk.
 
 1. **ADR de AXIS** `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`.
 2. **Token top-level `manzanitasRegister`** en `@efeoncepro/axis-tokens` (no una rama de `efeonceGraphicLine`). Hereda
@@ -878,9 +893,9 @@ El camino a seguir es el de Glitch: ADR y norma en Greenhouse
 
 ### 14.4 Coordinación
 
-- El checkout de AXIS es **compartido**: hoy lo usa la sesión de Insights (rama `docs/insights-lab`) y hay una rama
-  local `docs/glitch-flash-composer` con 2 commits de otra sesión. El trabajo de MCM va en **rama propia desde `main`**
-  cuando el checkout se libere, y los releases se secuencian para no chocar versiones.
+- El checkout de AXIS es **compartido**. El trabajo de MCM se hizo en la rama `feat/manzanitas-register`, coordinado con
+  las sesiones de Glitch e Insights; el release de Glitch (`v0.3.25`) salió primero y el de MCM (`v0.3.26`) encima, para
+  no chocar versiones.
 - **Empujar a AXIS `main` y crear tags es una mutación externa:** requiere **autorización explícita del operador**.
 
 ---

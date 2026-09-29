@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Publicado en AXIS 2026-09-28 (main 6a1a912; tags v0.3.26 y v0.3.27, CI y release verdes); Lab en vivo; Greenhouse aún no fija versiones (follow-up)`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
 - Blocked by: `none`
@@ -43,6 +43,12 @@
 > **Prioridad P2 inferida (ajustable):** la línea quedó aprobada el 2026-09-28 y las piezas se pueden producir hoy desde
 > el canvas v39; nada está roto, pero cada pieza copia valores a mano y ninguna regla del registro se verifica antes de
 > un render.
+
+## Delta 2026-09-28 — cerrada
+
+- Ejecutada completa en AXIS (rama `feat/manzanitas-register` → `main`) con autorización explícita del operador («Ejecuta todo tu plan entonces», «Coordinate con las peer session y avanza con todo», «Empuja todo junto» y, para el parche, «Publícalo»). Publicado: `v0.3.26` (`axis-tokens` 0.3.26 `manzanitasRegister`, `axis-ui-contracts` 0.3.24 `efeonce.manzanitas-register` 0.1.0, `axis-brand-assets` 0.4.1 `AXIS_MANZANITAS_ASSETS`, `axis-graphic-line` 0.10.0 `/charts`) y el parche `v0.3.27` (`axis-ui-contracts` 0.3.27, contrato 0.1.1: el carrusel empieza con su portada y termina con su contraportada; lo descubrió el criterio «Lente en la portada»). En el mismo push salió el release de Glitch `v0.3.25`, coordinado con su sesión. Lab: https://axis.efeonce.org/references/manzanitas/.
+- Decisión de ejecución que cambia un criterio: la paridad con el canvas es **geométrica** (ADR de AXIS), no de píxeles; el criterio del script de paridad en píxeles queda sin tildar por eso.
+- Nombres finales: `channels` → `canvases`, `close` → `slogan` + `backCover`.
 
 ## Summary
 
@@ -376,12 +382,12 @@ Greenhouse (`/Users/jreye/Documents/greenhouse-eo`), sólo al cierre y sólo com
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] *(No aplica: la task no crea tablas ni escribe en base de datos.)* Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] *(No aplica: no toca datos sensibles; los errores del validador son issues con código estable.)* Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] *(No aplica: la task no crea tablas ni escribe en base de datos.)* Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] *(No aplica: no toca datos sensibles; los errores del validador son issues con código estable.)* Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -760,54 +766,54 @@ skill).
 
 ## Acceptance Criteria
 
-- [ ] Existe `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md` en AXIS, cita el ADR y la norma de
-      Greenhouse y fija los nombres finales, la ubicación de la geometría de gráficos y el umbral de paridad.
-- [ ] `@efeoncepro/axis-tokens` exporta `manzanitasRegister` (valor y tipo) con `status: 'candidate'`, `accent`,
+- [x] Existe `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md` en AXIS, cita el ADR y la norma de
+      Greenhouse y fija los nombres finales, la ubicación de la geometría de gráficos y el umbral de paridad. — *Evidencia: ADR en AXIS `main`; el umbral de paridad quedó como paridad geométrica.*
+- [x] `@efeoncepro/axis-tokens` exporta `manzanitasRegister` (valor y tipo) con `status: 'candidate'`, `accent`,
       `surfaces`, `type`, `masthead`, `formats`, `channels`, `swipe`, `signature`, `close`, `backCover`, `charts`,
-      `denseText`, `pieces` y `pendingDecisions` (nombres finales del ADR).
-- [ ] Cada valor heredado de La órbita es una referencia a `efeonceGraphicLine` (prueba de identidad de valor) y no hay
-      literales duplicados de La órbita en el bloque.
-- [ ] Ningún valor de `efeonceGraphicLine` ni de `glitchLine` referencia al registro, el registro no referencia a
-      `glitchLine`, y el diff de ambos bloques en esta task es vacío.
-- [ ] Cada `accentOnLight` sobre papel y cada `accentOnDark` sobre navy miden ≥ 3:1 en la prueba del token.
-- [ ] `pendingDecisions` contiene las pendientes de la norma §13 y ninguna pieza afectada por una pendiente
-      bloqueante figura como `approved`.
-- [ ] `assets/manzanitas/` está sellado en `MANZANITAS_ASSET_SEALS` y declarado en `AXIS_MANZANITAS_ASSETS`; ningún
+      `denseText`, `pieces` y `pendingDecisions` (nombres finales del ADR). — *Evidencia: `axis-tokens` 0.3.26; los nombres finales son `canvases` (por `channels`) y `slogan` + `backCover` (por `close`), registrados en el ADR de AXIS.*
+- [x] Cada valor heredado de La órbita es una referencia a `efeonceGraphicLine` (prueba de identidad de valor) y no hay
+      literales duplicados de La órbita en el bloque. — *Evidencia: prueba de identidad en `tokens.test.ts`.*
+- [x] Ningún valor de `efeonceGraphicLine` ni de `glitchLine` referencia al registro, el registro no referencia a
+      `glitchLine`, y el diff de ambos bloques en esta task es vacío. — *Evidencia: prueba de aislamiento; el diff del token en `d18b201` es sólo inserción (334 líneas, 0 borradas).*
+- [x] Cada `accentOnLight` sobre papel y cada `accentOnDark` sobre navy miden ≥ 3:1 en la prueba del token. — *Evidencia: prueba de contraste en `tokens.test.ts`.*
+- [x] `pendingDecisions` contiene las pendientes de la norma §13 y ninguna pieza afectada por una pendiente
+      bloqueante figura como `approved`. — *Evidencia: 10 pendientes; `story-escena` y `cover-pizarra-swipe-response` quedan en `study`.*
+- [x] `assets/manzanitas/` está sellado en `MANZANITAS_ASSET_SEALS` y declarado en `AXIS_MANZANITAS_ASSETS`; ningún
       archivo aparece en `AXIS_BRAND_ASSETS` ni en `AXIS_GLITCH_ASSETS`; no hay `<style>` en esos SVG; los `d` son
-      idénticos a los originales; el logo completo tiene exactamente 4 trazos en el grupo de acento.
-- [ ] `@efeoncepro/axis-ui-contracts` exporta `efeonce.manzanitas-register` 0.1.0 `candidate` con validador y resolver,
-      y hay una prueba por cada código de issue.
-- [ ] Un intent con la manzana en color fijo, dos láminas con foto seguidas, un dato sin fuente, un dato de muestra sin
+      idénticos a los originales; el logo completo tiene exactamente 4 trazos en el grupo de acento. — *Evidencia: pruebas de `brand-assets` (13/13); `seal` sin diff; los `d` de los cinco SVG son idénticos y en el mismo orden que los originales de OneDrive (verificado el 2026-09-28).*
+- [x] `@efeoncepro/axis-ui-contracts` exporta `efeonce.manzanitas-register` 0.1.0 `candidate` con validador y resolver,
+      y hay una prueba por cada código de issue. — *Evidencia: 0.1.0 en 0.3.24 y 0.1.1 en 0.3.27; una prueba por cada uno de los 45 códigos.*
+- [x] Un intent con la manzana en color fijo, dos láminas con foto seguidas, un dato sin fuente, un dato de muestra sin
       marca, el eslogan en la portada, «Desliza» en la última lámina, Lente en la portada, cuatro partes, texto en
-      acento de menos de 24 px, voz en la Medida o un elemento de Glitch falla con su issue.
-- [ ] Una pieza que no está `approved` falla con `piece-not-approved` (o `pending-decision` si depende de una pendiente).
-- [ ] La regla de las tres Pizarras sigue la decisión del operador sobre la pendiente 2, o falla cerrado con
-      `pending-decision` en las secuencias ambiguas, sin aplicar la recomendación por su cuenta.
-- [ ] Dos resoluciones del mismo intent producen manifiestos idénticos byte a byte.
-- [ ] `pnpm manzanitas:resolve` resuelve cada ejemplo válido de `docs/examples/manzanitas/` con salida 0 y rechaza cada
-      inválido con salida distinta de cero y el issue de `invalid-expected-issues.json`.
-- [ ] `@efeoncepro/axis-graphic-line/charts` expone las 9 recetas; el export raíz no las re-exporta.
-- [ ] Cada receta devuelve `{ svg, manifest }` con largos, posiciones, esfera y destacado calculados del dato, y las
-      respuestas «N veces», «1 de N» y «N de 100» salen del dato.
-- [ ] La Medida usa `measureSvg` y coincide con el canvas en 0,05 / 0,38 / 0,62 / 0,9 / 1.
-- [ ] Los chequeos del módulo (barras desde su número y desde cero, un acento, una esfera, fuente, marca de ejemplo,
+      acento de menos de 24 px, voz en la Medida o un elemento de Glitch falla con su issue. — *Evidencia: cada caso tiene su código en la prueba del contrato. «Lente en la portada» no fallaba en 0.1.0 y se corrigió en 0.1.1 (`cover-not-first`, ejemplo `invalid-lente-en-portada`).*
+- [x] Una pieza que no está `approved` falla con `piece-not-approved` (o `pending-decision` si depende de una pendiente). — *Evidencia: `close-generic` da `piece-not-approved` y `story-escena` da `pending-decision`.*
+- [x] La regla de las tres Pizarras sigue la decisión del operador sobre la pendiente 2, o falla cerrado con
+      `pending-decision` en las secuencias ambiguas, sin aplicar la recomendación por su cuenta. — *Evidencia: la pendiente 2 sigue abierta, así que la secuencia ambigua devuelve `pending-decision` (con prueba).*
+- [x] Dos resoluciones del mismo intent producen manifiestos idénticos byte a byte. — *Evidencia: prueba de determinismo.*
+- [x] `pnpm manzanitas:resolve` resuelve cada ejemplo válido de `docs/examples/manzanitas/` con salida 0 y rechaza cada
+      inválido con salida distinta de cero y el issue de `invalid-expected-issues.json`. — *Evidencia: 9 válidos salen con 0 y 8 inválidos con 1, con los issues de `invalid-expected-issues.json`.*
+- [x] `@efeoncepro/axis-graphic-line/charts` expone las 9 recetas; el export raíz no las re-exporta. — *Evidencia: `axis-graphic-line` 0.10.0; hay una prueba de que la raíz no las exporta.*
+- [x] Cada receta devuelve `{ svg, manifest }` con largos, posiciones, esfera y destacado calculados del dato, y las
+      respuestas «N veces», «1 de N» y «N de 100» salen del dato. — *Evidencia: `charts.test.ts` y la prueba del contrato (4 veces, 1 de 8, 58 de 100, 1 vez).*
+- [x] La Medida usa `measureSvg` y coincide con el canvas en 0,05 / 0,38 / 0,62 / 0,9 / 1. — *Evidencia: la esfera coincide con `measureSvg` en 5, 38, 62, 90 y 100 %; el canvas pinta su medida con `measureSvg` (norma §9.4).*
+- [x] Los chequeos del módulo (barras desde su número y desde cero, un acento, una esfera, fuente, marca de ejemplo,
       ≤ 3 partes, sin dona de partes, sin círculo suelto, texto en acento ≥ 24 px, acento ≥ 3:1) tienen prueba y pasan
-      en las 9 recetas.
+      en las 9 recetas. — *Evidencia: `runManzanitasChartChecks` pasa en las 9 recetas; hay casos negativos para acento bajo 24 px, círculo suelto y segunda esfera.*
 - [ ] El script de paridad pasa en las 9 recetas contra las referencias del canvas v39 al umbral del ADR, en píxeles y
-      en geometría numérica.
-- [ ] `/references/manzanitas/` publica las secciones del Slice 5 y `apps/lab/src/data/manzanitas.ts` no contiene
-      ningún HEX ni medida del registro.
-- [ ] En el Lab, cambiar «Línea del tema» cambia a la vez la manzana y sus puntos, el gráfico, la palabra del eslogan y
-      la voz del ícono «Desliza» (prueba e2e), con Voice rotulada como pendiente.
-- [ ] `/references/manzanitas.json` (schema `axis.manzanitas-register.v1`) trae `register`, `tokens`, `contract` con
-      `id === 'efeonce.manzanitas-register'`, `assets`, `charts` y `pendingDecisions`.
-- [ ] La navegación del Lab tiene la entrada «Manzanitas» con `aria-current` en su página y no hay scroll horizontal a
-      390 px.
-- [ ] La publicación ocurrió sólo después de la autorización explícita del operador del push y del tag, registrada con
-      fecha en el ADR de AXIS.
-- [ ] CI de AXIS verde en `main` y run de `release-packages.yml` verde con las versiones nuevas publicadas.
-- [ ] El ADR, la norma y la referencia de la skill en Greenhouse (con espejo `.codex/`) citan las versiones y los nombres
-      publicados.
+      en geometría numérica. — *Sin tildar: el ADR de AXIS reemplazó la paridad en píxeles por paridad geométrica (anchos del ranking `[760, 512, 198, 116, 66]`, embudo, tendencia, partes y matriz en `charts.test.ts`), porque el canvas maqueta el texto en HTML y el paquete pinta SVG.*
+- [x] `/references/manzanitas/` publica las secciones del Slice 5 y `apps/lab/src/data/manzanitas.ts` no contiene
+      ningún HEX ni medida del registro. — *Evidencia: página en vivo; la prueba unitaria no encuentra HEX en `data/manzanitas.ts` ni en `manzanitas.css`.*
+- [x] En el Lab, cambiar «Línea del tema» cambia a la vez la manzana y sus puntos, el gráfico, la palabra del eslogan y
+      la voz del ícono «Desliza» (prueba e2e), con Voice rotulada como pendiente. — *Evidencia: e2e en escritorio y móvil (manzana, acento del gráfico, eslogan, voz de «Desliza»); Voice queda rotulada como «provisional» y Salesforce como pendiente.*
+- [x] `/references/manzanitas.json` (schema `axis.manzanitas-register.v1`) trae `register`, `tokens`, `contract` con
+      `id === 'efeonce.manzanitas-register'`, `assets`, `charts` y `pendingDecisions`. — *Evidencia: el JSON en vivo trae `pendingDecisions` (10).*
+- [x] La navegación del Lab tiene la entrada «Manzanitas» con `aria-current` en su página y no hay scroll horizontal a
+      390 px. — *Evidencia: e2e (`aria-current`, sin scroll horizontal en iPhone 13 de 390 px).*
+- [x] La publicación ocurrió sólo después de la autorización explícita del operador del push y del tag, registrada con
+      fecha en el ADR de AXIS. — *Evidencia: deltas del ADR de AXIS del 2026-09-28.*
+- [x] CI de AXIS verde en `main` y run de `release-packages.yml` verde con las versiones nuevas publicadas. — *Evidencia: CI de `main` en verde; `release-packages.yml` verde en `v0.3.25`, `v0.3.26` y `v0.3.27`.*
+- [x] El ADR, la norma y la referencia de la skill en Greenhouse (con espejo `.codex/`) citan las versiones y los nombres
+      publicados. — *Evidencia: deltas del 2026-09-28 en el ADR, la norma §14, `references/manzanitas.md` §10.3 y la skill `axis-design-system`, con espejo en `.codex/`.*
 
 ## Verification
 
@@ -820,18 +826,18 @@ skill).
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas — *ninguna task activa depende del registro; las que nombran Manzanitas (TASK-1802, TASK-1370, TASK-899) tratan naming y voz.*
 
 - [ ] los follow-ups (pins de AXIS en Greenhouse, catálogo `manzanitas` del Artifact Composer, consumo desde la skill)
-      quedaron registrados como tasks con ID propio y con los nombres finales del token, del contrato y de los assets
-- [ ] el ADR de AXIS registra con fecha la autorización del operador que habilitó la publicación
-- [ ] cada pendiente del inventario §3 que el operador haya decidido durante la task quedó registrada en el ADR de
-      Greenhouse y retirada de `pendingDecisions` en el mismo release
+      quedaron registrados como tasks con ID propio y con los nombres finales del token, del contrato y de los assets — *Sin tildar: no se reservaron IDs; quedan listados en «Follow-ups», con los nombres finales ya publicados. La sesión de Glitch se ofreció a fijar las versiones en Greenhouse.*
+- [x] el ADR de AXIS registra con fecha la autorización del operador que habilitó la publicación
+- [x] cada pendiente del inventario §3 que el operador haya decidido durante la task quedó registrada en el ADR de
+      Greenhouse y retirada de `pendingDecisions` en el mismo release — *ninguna pendiente se decidió durante la task; las diez siguen en `pendingDecisions`.*
 
 ## Follow-ups
 

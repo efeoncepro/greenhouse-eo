@@ -1,9 +1,9 @@
 # Registro Marketing con Manzanitas — registro complementario de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-28 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.1: publicado en AXIS)
 > **Documentacion tecnica:** [ADR del registro Marketing con Manzanitas](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) · [Norma del registro](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
 > **Manual de uso:** [Componer piezas de Marketing con Manzanitas](../../manual-de-uso/creative/componer-piezas-de-marketing-con-manzanitas.md)
 
@@ -349,25 +349,31 @@ Pendientes (los decide el operador; nadie los decide por su cuenta):
 | 9 | El navy del texto del logo de Manzanitas, que Glitch declara suyo en su wordmark | hoy va el del archivo oficial |
 | 10 | El acento de un tema de Revenue en Salesforce | sin decidir |
 
-### Lo que viene: el registro en AXIS (propuesto, por TASK-1936)
+### El registro en AXIS (publicado el 2026-09-28)
 
-El plan, todavía sin ejecutar, sigue el mismo camino que ya recorrió Glitch:
+Desde el 2026-09-28 el registro vive en AXIS, el sistema de diseño de Efeonce, siguiendo el camino que ya recorrió
+Glitch:
 
-- **En AXIS:** una decisión (ADR) propia; un token `manzanitasRegister` que toma de La órbita por referencia las líneas,
-  las superficies, la voz, la trayectoria y el eslogan, y que se prueba aislado de Glitch y de La órbita; los archivos de
-  la marca (el logo con la manzana y los puntos preparados para tomar el acento, el texto solo y la manzana en contorno);
-  las nueve recetas de gráficos como un módulo que convierte un dato en una imagen con sus chequeos; un contrato
-  `efeonce.manzanitas-register` en prueba (`candidate`) que revisa la pieza y se niega a resolverla si algo falla; y una
-  página del Lab en `/references/manzanitas/`.
-- **Después, en Greenhouse** (tareas aparte): actualizar las versiones de AXIS que usa Greenhouse, un catálogo
-  `manzanitas` en el Artifact Composer para componer carruseles desde datos y que la skill use el paquete.
+- **Los valores** (acentos por línea, cabecera, «Desliza», firma, contraportada, formatos, Recreo, gráficos, texto denso y
+  las pendientes) están en un token, `manzanitasRegister`. Lo que hereda de La órbita lo toma por referencia, así que un
+  cambio en La órbita llega solo.
+- **Las reglas** las revisa un contrato, `efeonce.manzanitas-register`, en prueba (`candidate`): se le describe el
+  carrusel con datos y devuelve cada lámina resuelta, o se niega a resolverla y dice por qué (por ejemplo, dos fotos
+  seguidas o una cifra sin fuente). Si la regla depende de una decisión que el operador aún no tomó, tampoco la adivina.
+- **Los nueve gráficos** se dibujan desde el dato con un módulo propio, que además revisa que el gráfico cumpla la
+  gramática (un acento, una esfera, barras desde su número, fuente visible).
+- **Los archivos** del logo y la manzana están sellados, con la manzana y los puntos preparados para tomar el acento.
+- **La página de referencia** está en [axis.efeonce.org/references/manzanitas/](https://axis.efeonce.org/references/manzanitas/):
+  tiene un selector de línea que cambia todo a la vez y los gráficos en vivo, con un editor del dato.
 
-Publicar en AXIS y crear versiones es un cambio externo: requiere la autorización explícita del operador. Hasta que
-exista, las piezas se componen en el canvas, como explica el
-[manual de uso](../../manual-de-uso/creative/componer-piezas-de-marketing-con-manzanitas.md).
+Greenhouse todavía no usa estas versiones: faltan, en tareas aparte, actualizar las versiones de AXIS que usa Greenhouse,
+un catálogo `manzanitas` en el Artifact Composer para componer carruseles desde datos y que la skill use el paquete.
+Mientras tanto, las piezas se siguen componiendo en el canvas, como explica el
+[manual de uso](../../manual-de-uso/creative/componer-piezas-de-marketing-con-manzanitas.md), leyendo los valores del
+token o de la página de referencia.
 
-> Detalle técnico: [norma §13 Pendientes](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md#13-pendientes-del-operador) y [§14 Del canvas a AXIS](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md#14-del-canvas-a-axis-estado-y-plan) · plan completo en el [ADR del registro](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) ·
-> precedente: [ADR de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md) (token `glitchLine`, contrato
-> `efeonce.glitch-line`, `pnpm glitch:resolve`, Lab `/references/glitch/`) · AXIS ADR previsto
-> `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`, contrato `efeonce.manzanitas-register` 0.1.0 y
-> comando `pnpm manzanitas:resolve` (todavía no existen)
+> Detalle técnico: [norma §13 Pendientes](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md#13-pendientes-del-operador) y [§14 Del canvas a AXIS](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md#14-del-canvas-a-axis-estado-y-plan) · [ADR del registro](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) (delta 2026-09-28) ·
+> en AXIS (`efeoncepro/axis-design-system`, tag `v0.3.26`): ADR `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`,
+> guía `docs/agent-composition/manzanitas.md`, token `manzanitasRegister` (`axis-tokens` 0.3.26), contrato
+> `efeonce.manzanitas-register` 0.1.1 (`axis-ui-contracts` 0.3.27, tag `v0.3.27`), `@efeoncepro/axis-graphic-line/charts` (0.10.0),
+> `AXIS_MANZANITAS_ASSETS` (`axis-brand-assets` 0.4.1) y el comando `pnpm manzanitas:resolve`

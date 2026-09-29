@@ -15,10 +15,12 @@
 > órbita sigue siendo la línea gráfica de Efeonce y manda en todo lo que este registro no dice. El registro suma
 > reglas, estilos y piezas propias **sólo** para piezas de Marketing con Manzanitas.
 >
-> **Nada del registro existe todavía en AXIS.** No hay token `manzanitasRegister`, ni contrato
-> `efeonce.manzanitas-register`, ni carpeta `assets/manzanitas/`, ni módulo `charts`: son el plan (§10.3). Hoy la
-> fuente de lo propio es el canvas; lo heredado se lee de `efeonceGraphicLine` y nunca se transcribe. Los números de
-> esta referencia son **referencia humana medida en el canvas**: cuando exista el token, manda el token.
+> **Publicado en AXIS el 2026-09-28 (tag `v0.3.26`).** Token `manzanitasRegister` (`@efeoncepro/axis-tokens` 0.3.26),
+> contrato `efeonce.manzanitas-register` 0.1.1 `candidate` (`@efeoncepro/axis-ui-contracts` 0.3.27, tag `v0.3.27`; `pnpm manzanitas:resolve`),
+> gráficos `@efeoncepro/axis-graphic-line/charts` (0.10.0) y archivos `AXIS_MANZANITAS_ASSETS` (`@efeoncepro/axis-brand-assets`
+> 0.4.1). Página y JSON: https://axis.efeonce.org/references/manzanitas/ (`axis.manzanitas-register.v1`). **Manda el token**:
+> los números de esta referencia son la medida del canvas v39, espejo humano; si difieren, gana el token (§10.3).
+> Greenhouse todavía no fija esas versiones ni tiene catálogo `manzanitas` en el Artifact Composer.
 
 **Nombre canónico:** «registro Marketing con Manzanitas» (abreviado «registro MCM» o «registro Manzanitas»). MCM es la
 marca editorial evergreen del blog de Efeonce: marketing explicado simple.
@@ -401,7 +403,7 @@ el cuerpo queda en 10 a 11,5 px (28 a 32 px en la lámina) y los rótulos en 9 p
 
 ### 10.1 En el canvas de la línea
 
-Mientras AXIS no tenga el registro, **las piezas se componen en el canvas** «Marketing con Manzanitas · Línea v1»
+Mientras Greenhouse no tenga un catálogo `manzanitas` en el Artifact Composer, **las piezas se componen en el canvas** «Marketing con Manzanitas · Línea v1»
 (https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG, v39), montando los componentes del DS «Efeonce — La órbita»
 (https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc): `EfeonceOrbit.Voice`, `EfeonceOrbit.Measure`,
 `EfeonceOrbit.Lens` y `EfeonceOrbit.Slogan`.
@@ -431,38 +433,27 @@ Mientras AXIS no tenga el registro, **las piezas se componen en el canvas** «Ma
 5. **Revisa en el canvas**, donde corre la lógica de cada lámina, y pasa el QA (§12).
 6. Aprobar la línea no autoriza publicar una pieza: la publicación la decide el operador.
 
-### 10.3 Plan de AXIS (propuesto, pendiente de ejecutar)
+### 10.3 En AXIS (publicado el 2026-09-28)
 
-> Se ejecuta por [TASK-1936](../../../../docs/tasks/to-do/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md), que fija el orden: ADR, token, assets, **contrato antes que gráficos** (`axis-graphic-line` depende de `axis-ui-contracts`), Lab y release. Plan visual y maqueta del Lab: https://claude.ai/artifact/WdEJAsC6HGkKdvyNvkDbvk.
+Se ejecutó por [TASK-1936](../../../../docs/tasks/complete/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md)
+con autorización explícita del operador; `main` de AXIS en `06cb62d`, tag `v0.3.26`. ADR de AXIS:
+`docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`; guía para agentes: `docs/agent-composition/manzanitas.md`.
 
-Precedente: Glitch (ADR [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../../../docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
-+ norma [`GLITCH_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) →
-ADR de AXIS `GLITCH_LINE_TOKEN_CONTRACT_DECISION_V1.md`, token `glitchLine`, contrato `efeonce.glitch-line` con
-validador y resolver que falla cerrado, `pnpm glitch:resolve`, assets en `assets/glitch/`, Lab `/references/glitch/`).
+| Qué | Dónde | Cómo se usa |
+|---|---|---|
+| Valores | `manzanitasRegister` (`@efeoncepro/axis-tokens` 0.3.26; top-level, fuera de `axisTokens`) | lo heredado de La órbita es **referencia** a `efeonceGraphicLine` (prueba de identidad); nunca apunta a `glitchLine`. Grupos: `accent`, `surfaces`, `type`, `masthead`, `formats`, `recreo`, `swipe`, `signature`, `slogan`, `backCover`, `voice`, `charts`, `denseText`, `canvases`, `pieces`, `pendingDecisions` |
+| Reglas | contrato `efeonce.manzanitas-register` 0.1.1 `candidate` (`@efeoncepro/axis-ui-contracts` 0.3.27; acepta intents 0.1.0) | `resolveManzanitasRegisterIntent(intent)` con el carrusel entero (`register`, `channel`, `topicLine`, `slides[]`; empieza con su portada y termina con su contraportada, nunca con una Lente); falla cerrado (45 códigos es-CL) y devuelve `pending-decision` si la regla depende de una pendiente. En AXIS: `pnpm manzanitas:resolve -- --input <intent.json> --out <manifest.json>` (manifest `axis.manzanitas-register-composition.v1`); schema `docs/agent-composition/manzanitas-register-intent.schema.json`; 16 ejemplos en `docs/examples/manzanitas/` |
+| Gráficos | `@efeoncepro/axis-graphic-line/charts` (0.10.0; **no** se exporta desde la raíz) | `manzanitasChartSvg(receta, dato, { line, caption? })` → `{ svg, manifest }` (`axis.manzanitas-chart.v1`); una función por receta (`rankingChartSvg`…); `runManzanitasChartChecks(resultado)` debe quedar sin fallas. Datos con claves en inglés: `rows` (`role: 'leader' \| 'you'`), `parts` (`tone`), `tasks`, `stages`, `value`, `series`, `labels`, más `source` e `illustrative` |
+| Archivos | `AXIS_MANZANITAS_ASSETS` (`@efeoncepro/axis-brand-assets` 0.4.1) | `manzanitas-logo-{positive,negative}`, `manzanitas-wordmark-{positive,negative}`, `manzanitas-apple`; la manzana y los puntos en `[data-axis-accent="topic-line"]` (`AXIS_MANZANITAS_ACCENT_SELECTOR`); trazos idénticos a los SVG oficiales |
+| Referencia | https://axis.efeonce.org/references/manzanitas/ + `.json` | selector de línea en vivo y editor del dato de los gráficos |
 
-1. ADR de AXIS `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`.
-2. Token top-level **`manzanitasRegister`** en `@efeoncepro/axis-tokens` (no rama de `efeonceGraphicLine`): hereda por
-   **referencia** (test de identidad) líneas, superficies, voz, trayectoria y eslogan; test de aislamiento contra
-   `glitchLine` y contra `efeonceGraphicLine` (nada de La órbita referencia al registro).
-3. Assets en `@efeoncepro/axis-brand-assets`, `assets/manzanitas/` (logo con el grupo manzana + puntos como atributo de
-   color, texto solo, manzana en contorno), sellados como `MANZANITAS_ASSET_SEALS` y declarados en
-   `AXIS_MANZANITAS_ASSETS`, fuera de `AXIS_BRAND_ASSETS`; colores como atributos, nunca `<style>`.
-4. Módulo **`charts`** en `@efeoncepro/axis-graphic-line` con las 9 recetas (dato → SVG + manifiesto; la medida
-   reutiliza `measureSvg`) y sus chequeos (barras desde el valor, un acento, una esfera, fuente, marca de ejemplo,
-   ≤ 3 partes, sin dona de partes, texto en acento ≥ 24 px). Genérico por línea; aprobado sólo para MCM.
-5. Contrato **`efeonce.manzanitas-register` 0.1.0 (`candidate`)** en `@efeoncepro/axis-ui-contracts`: intent (pieza,
-   formato, línea del tema, superficie, datos), validador con issues en es-CL y resolver que falla cerrado;
-   `pnpm manzanitas:resolve`; ejemplos válidos e inválidos en `docs/examples/manzanitas/`.
-6. Lab **`/references/manzanitas/`** + `/references/manzanitas.json`, con tests unitarios y e2e y entrada en la
-   navegación.
-7. Release con tag de tokens, contracts, graphic-line y brand-assets; `pnpm design:check`.
-8. Después, en Greenhouse (tareas aparte): subir los pins de AXIS, catálogo `manzanitas` del Artifact Composer para
-   componer carruseles desde datos, y que esta skill consuma el paquete.
+Decisiones de la ejecución: la paridad con el canvas es **geométrica** (largos, posiciones, esfera, destacado), no de
+píxeles; en el Embudo, con empate, se destaca el primer paso; el Ranking dice «1 vez» cuando tu marca lidera. Ninguna
+pendiente de §13 se decidió: siguen las diez de `pendingDecisions`.
 
-**Coordinación:** el checkout de AXIS es compartido (hoy lo usa la sesión de Insights, rama `docs/insights-lab`, y hay
-una rama local `docs/glitch-flash-composer` con 2 commits de otra sesión). El trabajo de MCM va en rama propia desde
-`main` cuando el checkout se libere, y los releases se secuencian para no chocar versiones. **Empujar a `main` de AXIS
-y crear tags es una mutación externa: requiere autorización explícita del operador.**
+**Todavía no (follow-ups de TASK-1936):** fijar estas versiones en Greenhouse, el catálogo `manzanitas` del Artifact
+Composer (`pnpm brand:compose` no compone MCM) y que esta skill consuma el paquete en vez de copiar valores. Nunca cites
+esos pasos como disponibles.
 
 ## 11. NUNCA
 

@@ -40,6 +40,12 @@
 > 0.3.21), `axis-graphic-line` 0.7.0, `axis-brand-assets` 0.3.5, `axis-ui-registry` 0.3.1; fijadas en `53002b352`. El
 > contrato `efeonce.surface-composition` no cambió (0.1.2); el de Glitch pasó a `efeonce.glitch-line` 0.2.0 (su
 > inventario vive en [glitch.md](glitch.md) §9, no aquí). **Manda sobre las otras versiones de este encabezado.**
+>
+> **Marketing con Manzanitas (2026-09-28, tag `v0.3.26`, publicado en AXIS; Greenhouse aún NO lo fija):** `axis-tokens`
+> 0.3.26 exporta `manzanitasRegister`, `axis-ui-contracts` 0.3.24 exporta `efeonce.manzanitas-register` 0.1.0 `candidate` (parche `v0.3.27`: `axis-ui-contracts`
+> 0.3.27 con el contrato 0.1.1),
+> `axis-graphic-line` 0.10.0 agrega `/charts` (no se exporta desde la raíz) y `axis-brand-assets` 0.4.1 sella
+> `AXIS_MANZANITAS_ASSETS`. Su inventario vive en [manzanitas.md](manzanitas.md) §10.3, no aquí.
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
 [3 Contrato de la órbita](#3-contrato-efeoncegraphic-line-orbit) · [4 Selección colaborativa](#4-contrato-efeoncecollaboration-selection) ·

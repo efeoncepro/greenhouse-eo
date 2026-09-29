@@ -6,21 +6,21 @@
 >
 > **Tipo de documento:** ADR (decisión de marca y de composición)
 > **Estado:** **Accepted** (2026-09-28) — aprobado por el operador (Julio Reyes): toda la línea del canvas v39 y su
-> canonización como registro complementario de La órbita (citas en [Contexto](#contexto)). El [plan de AXIS](#plan-en-axis-propuesto-pendiente-de-ejecutar)
-> es **propuesta pendiente de ejecutar**: nada del registro existe hoy en AXIS.
+> canonización como registro complementario de La órbita (citas en [Contexto](#contexto)). El [plan de AXIS](#plan-en-axis-ejecutado-el-2026-09-28)
+> **se ejecutó y se publicó el 2026-09-28** (tag `v0.3.26`; ver [Delta 2026-09-28](#delta-2026-09-28--publicado-en-axis)).
 > **Fecha:** 2026-09-28
-> **Owner:** Marca Efeonce (operador: Julio Reyes). Greenhouse guarda el canon humano; AXIS será el dueño de los
-> valores y del contrato cuando se publiquen.
+> **Owner:** Marca Efeonce (operador: Julio Reyes). Greenhouse guarda el canon humano; AXIS es el dueño de los
+> valores y del contrato desde el 2026-09-28.
 > **Alcance técnico:** este ADR, la norma operativa y la referencia para agentes de la skill `efeonce-graphic-line`. En
-> AXIS, **propuestos**: token `manzanitasRegister`, contrato `efeonce.manzanitas-register`, `assets/manzanitas/`, módulo
-> `charts` de `axis-graphic-line` y Lab `/references/manzanitas/`. Ningún runtime de Greenhouse depende hoy del registro.
+> AXIS, **publicados**: token `manzanitasRegister`, contrato `efeonce.manzanitas-register`, `assets/manzanitas/`, módulo
+> `charts` de `axis-graphic-line` y Lab `/references/manzanitas/`. Ningún runtime de Greenhouse depende todavía del registro
+> (Greenhouse aún no fija esas versiones).
 > **Reversibilidad:** `two-way` (documentación y piezas; ver [Reversibilidad](#reversibilidad)).
-> **Confianza:** `high` en la decisión (aprobación y canonización explícitas del operador); el plan de AXIS es propuesta.
-> **Validado al:** 2026-09-28 — valores medidos en el canvas v39 (inventario de hechos de la sesión del 2026-09-28). En el
-> checkout local de AXIS (rama `docs/insights-lab`) no hay token, contrato ni assets del registro: sólo menciones al
-> pasar, como el Trazo `swipe` (D28) dibujado para el «Desliza» de MCM.
+> **Confianza:** `high` en la decisión (aprobación y canonización explícitas del operador) y en su publicación en AXIS.
+> **Validado al:** 2026-09-28 — valores medidos en el canvas v39 y publicados en AXIS `v0.3.26` (verificado contra los
+> paquetes publicados, el Lab en vivo y el CI de `main`).
 > **Creado:** 2026-09-28 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude (creación)
+> **Última actualización:** 2026-09-28 por Claude (delta: publicado en AXIS por TASK-1936)
 > **Norma operativa:** [`MANZANITAS_REGISTER_V1.md`](../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
 > **Referencia para agentes:** `.claude/skills/efeonce-graphic-line/references/manzanitas.md` (skill `efeonce-graphic-line`)
 > **Línea madre:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) ·
@@ -31,6 +31,34 @@
 > **Canvas de referencia (privado):** [«Marketing con Manzanitas · Línea v1»](https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG), versión 39
 > **Sistema de diseño de referencia (privado):** [«Efeonce — La órbita»](https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc)
 
+
+## Delta 2026-09-28 — publicado en AXIS
+
+TASK-1936 llevó el registro a AXIS con autorización explícita del operador («Ejecuta todo tu plan entonces», «Coordinate
+con las peer session y avanza con todo» y, al ver qué salía, «Empuja todo junto»). `main` de AXIS quedó en `06cb62d`, con
+CI verde; el tag `v0.3.26` (commit `aca07c2`) publicó, con `release-packages.yml` verde:
+
+| Paquete | Versión | Qué trae |
+|---|---|---|
+| `@efeoncepro/axis-tokens` | `0.3.26` | `manzanitasRegister` (top-level, `status: 'candidate'`, fuera de `axisTokens`) |
+| `@efeoncepro/axis-ui-contracts` | `0.3.24` → **`0.3.27`** (tag `v0.3.27`) | `efeonce.manzanitas-register` 0.1.0 → **0.1.1** (`candidate`; 0.1.1 exige que el carrusel empiece con su portada y termine con su contraportada, y acepta intents 0.1.0): `validateManzanitasRegisterIntent`, `resolveManzanitasRegisterIntent`, `resolveManzanitasChart`; 45 códigos es-CL; falla cerrado y devuelve `pending-decision` cuando la regla depende de una pendiente |
+| `@efeoncepro/axis-brand-assets` | `0.4.1` | `AXIS_MANZANITAS_ASSETS`: `manzanitas-logo-{positive,negative}`, `manzanitas-wordmark-{positive,negative}`, `manzanitas-apple`; la manzana y los puntos en `[data-axis-accent="topic-line"]` |
+| `@efeoncepro/axis-graphic-line` | `0.10.0` | `/charts` (no se exporta desde la raíz): `manzanitasChartSvg`, una función por receta, `runManzanitasChartChecks` |
+
+En el mismo push salió el release de Glitch que otra sesión había dejado en local (`v0.3.25`: `axis-tokens` 0.3.25 y
+`axis-ui-contracts` 0.3.23). Página y JSON: [axis.efeonce.org/references/manzanitas/](https://axis.efeonce.org/references/manzanitas/)
+(`axis.manzanitas-register.v1`). Guía para agentes, schema y 16 ejemplos (9 válidos, 7 inválidos) en AXIS:
+`docs/agent-composition/manzanitas.md`, `docs/agent-composition/manzanitas-register-intent.schema.json`,
+`docs/examples/manzanitas/`. ADR de AXIS: `docs/architecture/MANZANITAS_REGISTER_TOKEN_CONTRACT_DECISION_V1.md`.
+
+Decisiones de la ejecución (en el ADR de AXIS): claves de datos en inglés (`rows`, `parts`, `tasks`, `stages`); la
+paridad con el canvas es **geométrica** (largos, posiciones, esfera y destacado), no de píxeles, porque el canvas maqueta
+el texto en HTML y el paquete pinta SVG; en el Embudo, con empate, se destaca el primer paso; el Ranking dice «1 vez»
+cuando tu marca lidera; los nombres del plan `channels` y `close` salieron como `canvases` y `slogan`/`backCover`.
+
+**Sigue abierto:** ninguna de las pendientes se decidió; las diez están en `manzanitasRegister.pendingDecisions`
+(incluida `masthead-ink-navy`, el navy `#022a4e` del logo). Greenhouse todavía **no** fija estas versiones ni tiene un
+catálogo `manzanitas` en el Artifact Composer: son follow-ups de TASK-1936.
 ## Contexto
 
 Marketing con Manzanitas (MCM, «marketing explicado simple») es la marca editorial evergreen del blog de Efeonce. Sale
@@ -298,9 +326,9 @@ destacado en el acento.
   guarda el detalle y las medidas para personas. **La referencia para agentes**
   `.claude/skills/efeonce-graphic-line/references/manzanitas.md` es la que carga un agente al componer una pieza de
   MCM, junto con la skill `efeonce-graphic-line`.
-- **Hasta que AXIS publique**, las medidas viven como referencia en el canvas v39 y en la norma, y no hay validador ni
-  resolver: nada impide mecánicamente una pieza fuera del registro.
-- **Cuando AXIS publique**, rige la regla de La órbita: los valores son tokens, no copias. Como en Glitch, los números de
+- **Hasta que AXIS publicó** (2026-09-28), las medidas vivían como referencia en el canvas v39 y en la norma, sin
+  validador ni resolver.
+- **Desde que AXIS publicó** (`v0.3.26`), rige la regla de La órbita: los valores son tokens, no copias. Como en Glitch, los números de
   la norma pasan a ser una referencia humana espejada del token y, si difieren, gana el token.
 - Las recetas de gráficos no se usan todavía en piezas de Efeonce fuera de MCM (pendiente 8).
 - La Escena con personas del equipo en redes espera la aprobación del registro cine con personas (pendiente 6); la
@@ -310,19 +338,21 @@ destacado en el acento.
 
 ### Fuente de verdad vigente
 
-| Qué | Hoy | Cuando se ejecute el plan de AXIS |
+| Qué | Desde el 2026-09-28 (publicado en AXIS) | Antes |
 |---|---|---|
 | Decisión y alcance | este ADR | este ADR |
-| Detalle y medidas | canvas v39 + [norma](../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) | token `manzanitasRegister` (la norma lo espeja) |
-| Reglas verificables | criterio humano; skill `efeonce-graphic-line` (criteria §3.4 y §8, ledger 2026-09-28) | contrato `efeonce.manzanitas-register` |
-| Componentes heredados | DS «Efeonce — La órbita» (`EfeonceOrbit.Voice`, `Measure`, `Lens`, `Slogan`) | los mismos, por referencia desde el token |
-| Logo y manzana | SVG oficiales en OneDrive (`13- Branding/SVG`) | `assets/manzanitas/` en `@efeoncepro/axis-brand-assets` |
+| Detalle y medidas | token `manzanitasRegister` (`axis-tokens` 0.3.26); la [norma](../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) lo espeja y, si difieren, gana el token | canvas v39 + norma |
+| Reglas verificables | contrato `efeonce.manzanitas-register` 0.1.1 (`axis-ui-contracts` 0.3.27), `pnpm manzanitas:resolve` en AXIS | criterio humano; skill `efeonce-graphic-line` |
+| Gráficos | `@efeoncepro/axis-graphic-line/charts` (0.10.0): `manzanitasChartSvg` + `runManzanitasChartChecks` | dibujados en el canvas |
+| Componentes heredados | DS «Efeonce — La órbita» (`EfeonceOrbit.Voice`, `Measure`, `Lens`, `Slogan`), por referencia desde el token | los mismos |
+| Logo y manzana | `AXIS_MANZANITAS_ASSETS` en `@efeoncepro/axis-brand-assets` 0.4.1 (trazos idénticos a los SVG oficiales) | SVG oficiales en OneDrive (`13- Branding/SVG`) |
 
-## Plan en AXIS (propuesto, pendiente de ejecutar)
+## Plan en AXIS (ejecutado el 2026-09-28)
 
-> Se ejecuta por [TASK-1936](../tasks/to-do/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md), que fija el orden: ADR, token, assets, **contrato antes que gráficos** (`axis-graphic-line` depende de `axis-ui-contracts`), Lab y release. Plan visual y maqueta del Lab: https://claude.ai/artifact/WdEJAsC6HGkKdvyNvkDbvk.
+> **Ejecutado y publicado** (ver [Delta 2026-09-28](#delta-2026-09-28--publicado-en-axis)); lo que sigue es el plan tal como se
+> aprobó, útil como registro. Se ejecutó por [TASK-1936](../tasks/complete/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md), que fija el orden: ADR, token, assets, **contrato antes que gráficos** (`axis-graphic-line` depende de `axis-ui-contracts`), Lab y release. Plan visual y maqueta del Lab: https://claude.ai/artifact/WdEJAsC6HGkKdvyNvkDbvk.
 
-> **Nada de esto existe hoy en AXIS.** Es la propuesta para llevar el registro a código, siguiendo el precedente de
+> Era la propuesta para llevar el registro a código, siguiendo el precedente de
 > Glitch: ADR de Greenhouse [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](./GLITCH_GRAPHIC_LINE_DECISION_V1.md) + norma
 > `glitch/GLITCH_GRAPHIC_LINE_V1.md` → ADR de AXIS `docs/architecture/GLITCH_LINE_TOKEN_CONTRACT_DECISION_V1.md`, token
 > top-level `glitchLine`, contrato `efeonce.glitch-line` con validador y resolver que falla cerrado,

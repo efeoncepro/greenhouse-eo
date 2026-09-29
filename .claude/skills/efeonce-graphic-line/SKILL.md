@@ -46,9 +46,10 @@ además de esta skill: qué hereda y qué es propio (la manzana, sus tres puntos
 de la **línea del tema**; la cabecera; los formatos Pizarra, Escena, Lente y Recreo; «Desliza» y firma en sitio fijo; la
 contraportada A), cómo usar los 9 gráficos que se calculan desde el dato y las 3 láminas de texto denso, y qué está
 pendiente. **Nunca** lo mezcles con Glitch (la manzana en contorno con tres puntos es de MCM; la manzana llena, de
-Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de marca editorial, no fotográfico. **Nada del
-registro está aún en AXIS**: el plan (token `manzanitasRegister`, contrato `efeonce.manzanitas-register`, módulo `charts`,
-Lab `/references/manzanitas/`) vive en la norma §14 y en su task.
+Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de marca editorial, no fotográfico. **Desde el
+2026-09-28 está en AXIS** (tag `v0.3.26`): token `manzanitasRegister`, contrato `efeonce.manzanitas-register` 0.1.1
+(`pnpm manzanitas:resolve`), gráficos en `@efeoncepro/axis-graphic-line/charts`, archivos `AXIS_MANZANITAS_ASSETS` y el Lab
+`/references/manzanitas/` (detalle en `references/manzanitas.md` §10.3); Greenhouse todavía no los fija.
 
 ## Por dónde empezar (carga selectiva)
 

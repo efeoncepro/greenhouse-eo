@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Marketing con Manzanitas publicado en AXIS (TASK-1936)
+
+- AXIS `v0.3.26` (`aca07c2`): `axis-tokens` 0.3.26 exporta `manzanitasRegister` (registro que complementa La órbita,
+  hereda por referencia, aislado de Glitch); `axis-ui-contracts` 0.3.24 exporta `efeonce.manzanitas-register` 0.1.0
+  (`pnpm manzanitas:resolve`, 45 códigos, `pending-decision`); `axis-graphic-line` 0.10.0 agrega `/charts` (9 gráficos
+  calculados desde el dato); `axis-brand-assets` 0.4.1 sella `AXIS_MANZANITAS_ASSETS`. Lab `/references/manzanitas/`.
+- AXIS `v0.3.27` (`6a1a912`): contrato 0.1.1, el carrusel empieza con su portada y termina con su contraportada.
+- Greenhouse: ADR, norma §14, doc funcional, manual y skills (`efeonce-graphic-line`, `axis-design-system`, espejo
+  `.codex/`) al día. Greenhouse no fija estas versiones todavía.
+
 ## 2026-09-28 — Glitch: pendientes del Flash cerrados (ruta productiva, muletilla, licencia, numeración, Content Factory)
 
 - TASK-1921 (`c43862008`): `planBrandRender` despacha con `planGlitchManifest`; el Flash sale por la ruta productiva
@@ -670,12 +680,3 @@ Los comentarios del share de octubre se clasificaron entre errores comprobables,
 preferencias con motivo, observaciones incompletas y aprobaciones. La skill Berel en ambos espejos y el
 Playbook/Aprendizajes de Notion incorporan gates de color, producto, legibilidad, función editorial y canal.
 Sin masters editables, no se modificaron artes, versiones, estados ni publicación.
-
-## 2026-09-19 — ISSUE-175: recuperado keyword discovery de DataForSEO
-
-Restaurado el login ausente del worker compartido sin cambiar imagen ni otras env vars. Canary real
-por scheduler: 10 candidatos, USD 0.0132, gasto reconciliado. TASK-1341 añade localmente guard de
-configuración antes de build y readback de revisiones con tráfico, incluso si CI salta el deploy;
-discovery distingue configuración ausente y no cuenta requests que no salieron. Cierre: guard y check
-post-deploy corrieron en `ops-worker-deploy` (revisión `ops-worker-00699-6rf`) y el smoke AIO drenado por el
-worker dio 6/6 `succeeded` (EO-GRUN-00055, USD 0,024). TASK-1341 complete.
