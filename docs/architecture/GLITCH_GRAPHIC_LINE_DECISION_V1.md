@@ -84,6 +84,17 @@ sistema de portada y las láminas del carrusel el 2026-09-27.
    panorámico son exploración (norma §9). La manzana y el verde dejaron de ser exploración: los aprobó el operador el
    2026-09-27 (Delta abajo).
 
+## Delta 2026-09-29 — estable en AXIS `v0.3.37`, sub-línea de La órbita
+
+- El operador fijó la posición de las dos líneas editoriales: «no sustituye a la orbita es una sublinea dentro del
+  design system de la orbita igual que glitch» (sobre Marketing con Manzanitas) y autorizó promoverlas a estable («Si,
+  hazlo»). **Glitch es una sub-línea dentro del sistema de La órbita**, al mismo nivel que Marketing con Manzanitas.
+- AXIS `v0.3.37`: `glitchLine.status` `candidate` → `canonical` y `efeonce.glitch-line` 0.2.0 `candidate` → `stable`
+  (evidencia `approval:operator-2026-09-29-stable`, `position:sub-line-of-efeonce.graphic-line-orbit`). Metadato
+  aditivo: sin cambio de valores, reglas ni render. Esto reemplaza la condición anterior («promover tras la primera
+  edición compuesta»). Greenhouse fija 0.3.37; el catálogo `glitch` del Artifact Composer sigue `candidate` porque mide
+  la ruta de Greenhouse (TASK-1921), no el contrato.
+
 ## Delta 2026-09-27 — decisiones del operador
 
 Respuesta del operador (Julio Reyes) a las preguntas abiertas de esta decisión y de TASK-1922/1923/1924: «Si, aprueba

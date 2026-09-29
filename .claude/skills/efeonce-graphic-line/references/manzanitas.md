@@ -17,8 +17,8 @@
 > **Aprobada para usar como sub-línea (operador, 2026-09-29, verbatim):** «Ok manzanitas esta aprobado, pero ojo no
 > sustituye a la orbita es una sublinea dentro del design system de la orbita igual que glitch». MCM es una **sub-línea
 > dentro del sistema de La órbita, al mismo nivel que Glitch**; «registro complementario» (abajo y en el resto de esta
-> referencia) nombra lo mismo. Lista para piezas de MCM con `pnpm manzanitas:compose`; la ruta productiva (TASK-1921) y
-> el contrato estable (hoy `candidate`) siguen pendientes.
+> referencia) nombra lo mismo. Lista para piezas de MCM con `pnpm manzanitas:compose`; el token y el contrato son **estables desde AXIS
+> `v0.3.37`** (`canonical` / `stable`, 2026-09-29); sólo falta la ruta productiva (TASK-1921).
 >
 > **Canonización (operador, verbatim):** «esta línea gráfica no reemplaza The Orbit que es la /efeonce-graphic-line
 > sino que la complementa con un nuevo registro para marketing con Manzanitas». **Complementa, no reemplaza:** La
@@ -28,7 +28,7 @@
 > **Publicado en AXIS el 2026-09-28 (tag `v0.3.26`) y actualizado el 2026-09-29 dos veces: tag `v0.3.28` (siete
 > decisiones del operador) y tag `v0.3.29` (las tres últimas y los hallazgos de TASK-1939; no queda ninguna abierta,
 > §13).** Token `manzanitasRegister` (`@efeoncepro/axis-tokens` 0.3.29: `resolvedDecisions` con diez,
-> `pendingDecisions: []`), contrato `efeonce.manzanitas-register` **0.3.0** `candidate` (`@efeoncepro/axis-ui-contracts`
+> `pendingDecisions: []`), contrato `efeonce.manzanitas-register` **0.3.0** (`stable` desde `v0.3.37`) (`@efeoncepro/axis-ui-contracts`
 > 0.3.29; acepta intents 0.1.x y 0.2.0; `pnpm manzanitas:resolve`), gráficos `@efeoncepro/axis-graphic-line/charts`
 > (0.11.0) y archivos `AXIS_MANZANITAS_ASSETS` (`@efeoncepro/axis-brand-assets` 0.4.1). Página y JSON: https://axis.efeonce.org/references/manzanitas/
 > (`axis.manzanitas-register.v1`). **Manda el token**: los números de esta referencia son la medida del canvas v39, espejo
@@ -716,7 +716,7 @@ autorizó: «Te autorizo a publicar el patch de axis que indicas»). ADR de AXIS
 | Qué | Dónde | Cómo se usa |
 |---|---|---|
 | Valores | `manzanitasRegister` (`@efeoncepro/axis-tokens` 0.3.29; top-level, fuera de `axisTokens`) | lo heredado de La órbita es **referencia** a `efeonceGraphicLine` (prueba de identidad); nunca apunta a `glitchLine`. Grupos: `accent`, `surfaces`, `type`, `masthead`, `formats`, `recreo`, `swipe`, `signature`, `slogan`, `backCover`, `voice`, `charts`, `denseText`, `canvases`, `pieces`, `pendingDecisions` (vacío desde 0.3.29), `resolvedDecisions` (desde 0.3.28; diez desde 0.3.29) y, desde 0.3.29, `closeCopy` y `teamPeople`. El ancho del eslogan por línea vive en La órbita: `efeonceGraphicLine.slogan.widthEmByWord` |
-| Reglas | contrato `efeonce.manzanitas-register` **0.3.0** `candidate` (`@efeoncepro/axis-ui-contracts` 0.3.29; acepta intents 0.1.x y 0.2.0) | `resolveManzanitasRegisterIntent(intent)` con el carrusel entero (`register`, `channel`, `topicLine`, `slides[]`; empieza con su portada y termina con su contraportada, nunca con una Lente); falla cerrado (47 códigos es-CL en 0.3.0; 45 hasta la 0.2.0) y devuelve `pending-decision` si la regla depende de una pendiente. En AXIS: `pnpm manzanitas:resolve -- --input <intent.json> --out <manifest.json>` (manifest `axis.manzanitas-register-composition.v1`); schema `docs/agent-composition/manzanitas-register-intent.schema.json`; ejemplos en `docs/examples/manzanitas/` (11 válidos y 7 inválidos en `main`) |
+| Reglas | contrato `efeonce.manzanitas-register` **0.3.0** `stable` desde `v0.3.37` (`@efeoncepro/axis-ui-contracts` 0.3.37; acepta intents 0.1.x y 0.2.0) | `resolveManzanitasRegisterIntent(intent)` con el carrusel entero (`register`, `channel`, `topicLine`, `slides[]`; empieza con su portada y termina con su contraportada, nunca con una Lente); falla cerrado (47 códigos es-CL en 0.3.0; 45 hasta la 0.2.0) y devuelve `pending-decision` si la regla depende de una pendiente. En AXIS: `pnpm manzanitas:resolve -- --input <intent.json> --out <manifest.json>` (manifest `axis.manzanitas-register-composition.v1`); schema `docs/agent-composition/manzanitas-register-intent.schema.json`; ejemplos en `docs/examples/manzanitas/` (11 válidos y 7 inválidos en `main`) |
 | Gráficos | `@efeoncepro/axis-graphic-line/charts` (0.11.0; **no** se exporta desde la raíz) | `manzanitasChartSvg(receta, dato, { line, caption? })` (desde 0.11.0 lee los rótulos del dato; una opción explícita manda) → `{ svg, manifest }` (`axis.manzanitas-chart.v1`); una función por receta (`rankingChartSvg`…); `runManzanitasChartChecks(resultado)` debe quedar sin fallas. Datos con claves en inglés: `rows` (`role: 'leader' \| 'you'`), `parts` (`tone`), `tasks`, `stages`, `value`, `series`, `labels`, más `source` e `illustrative` |
 | Archivos | `AXIS_MANZANITAS_ASSETS` (`@efeoncepro/axis-brand-assets` 0.4.1) | `manzanitas-logo-{positive,negative}`, `manzanitas-wordmark-{positive,negative}`, `manzanitas-apple`; la manzana y los puntos en `[data-axis-accent="topic-line"]` (`AXIS_MANZANITAS_ACCENT_SELECTOR`); trazos idénticos a los SVG oficiales |
 | Referencia | https://axis.efeonce.org/references/manzanitas/ + `.json` | selector de línea en vivo y editor del dato de los gráficos |

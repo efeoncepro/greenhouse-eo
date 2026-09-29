@@ -39,7 +39,8 @@ dos esferas en una pieza (manzana + lente u órbita).
 
 Marketing con Manzanitas (MCM, la marca editorial evergreen del blog) es una **sub-línea dentro del sistema de La órbita,
 igual que Glitch** (operador, 2026-09-29: «no sustituye a la orbita es una sublinea dentro del design system de la orbita
-igual que glitch»; los documentos anteriores la llaman «registro complementario»: es lo mismo). Aprobada completa por el
+igual que glitch»; los documentos anteriores la llaman «registro complementario»: es lo mismo). Estable en AXIS desde `v0.3.37` (token
+`canonical`, contrato `stable`). Aprobada completa por el
 operador el 2026-09-28 («Me encantan, queda aprobada toda la línea gráfica», canvas v39). **La
 complementa, no la reemplaza** (operador: «esta línea gráfica no reemplaza The Orbit … sino que la complementa con un
 nuevo registro para marketing con Manzanitas»): en todo lo que el registro no dice, manda La órbita. Si la pieza es de

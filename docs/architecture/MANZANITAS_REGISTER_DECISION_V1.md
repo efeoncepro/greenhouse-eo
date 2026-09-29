@@ -55,9 +55,12 @@
   mismo nivel que la [sub-línea de Glitch](./GLITCH_GRAPHIC_LINE_DECISION_V1.md). No es una línea paralela ni un
   reemplazo: La órbita sigue siendo la línea de Efeonce y manda en todo lo que la sub-línea no dice. «Registro
   complementario» y «sub-línea» nombran lo mismo en este ADR y en la skill; el nombre canónico desde hoy es **sub-línea**.
-- **Estado de uso:** lista para piezas de MCM con `pnpm manzanitas:compose` (TASK-1939 `complete`). Siguen fuera: la ruta
-  productiva (API, `artifact-worker`, MCP; TASK-1921) y la promoción del contrato `efeonce.manzanitas-register` de
-  `candidate` a estable, que es un release de AXIS y requiere autorización explícita del operador.
+- **Estado de uso:** lista para piezas de MCM con `pnpm manzanitas:compose` (TASK-1939 `complete`). Sigue fuera la ruta
+  productiva (API, `artifact-worker`, MCP; TASK-1921).
+- **Estable en AXIS `v0.3.37`** (autorizado: «Si, hazlo»): `manzanitasRegister.status` `canonical` y
+  `efeonce.manzanitas-register` 0.3.0 `stable` (evidencia `approval:operator-2026-09-29-stable`,
+  `position:sub-line-of-efeonce.graphic-line-orbit`); Glitch se promovió en el mismo release. Metadato aditivo: el
+  token conserva `kind: 'editorial-register'` y `complements: 'efeonceGraphicLine'`. Greenhouse fija 0.3.37.
 - Sin cambio de valores, contratos ni piezas.
 
 ## Delta 2026-09-29 (b) — sin decisiones abiertas: AXIS `v0.3.29` y el equipo real en la fotografía

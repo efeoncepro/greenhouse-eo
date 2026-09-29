@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-29 — Glitch y Marketing con Manzanitas estables como sub-líneas de La órbita (AXIS `v0.3.37`)
+
+- El operador aprobó Manzanitas para usar y fijó su lugar: «no sustituye a la orbita es una sublinea dentro del design
+  system de la orbita igual que glitch». Con su autorización, AXIS `v0.3.37` pasa `glitchLine` y `manzanitasRegister` a
+  `canonical` y los contratos `efeonce.glitch-line` 0.2.0 y `efeonce.manzanitas-register` 0.3.0 a `stable`, sin cambio de
+  valores ni render. Greenhouse fija `axis-tokens` y `axis-ui-contracts` 0.3.37 y regenera los tokens compilados; los
+  catálogos del Artifact Composer siguen `candidate` hasta la ruta productiva (TASK-1921).
+
 ## 2026-09-29 — HubSpot Agent CLI y MCP como carriles de operación directa
 
 - Agent CLI 0.15.0 instalada y OAuth de Efeonce/Kortex `48713323` verificado con una lectura CRM real. El conector MCP y la CLI se eligen por portal, capability y forma del trabajo; comparten change set, aprobación y readback, no credenciales. Límites OAuth y comandos sin `--dry-run` registrados en el [runbook](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); skills Codex/Claude sincronizadas.

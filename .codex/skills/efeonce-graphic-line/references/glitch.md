@@ -34,9 +34,9 @@
 > `#flash`), gemelo para agentes `https://axis.efeonce.org/references/glitch.json` (con `tokens` —incluido
 > `editions`—, `contract` y `assets`; schema `axis.glitch-line.v1`) y guía `docs/agent-composition/glitch.md` del repo
 > `efeoncepro/axis-design-system`. **La fuente de verdad de los valores es el token `glitchLine`**
-> (`@efeoncepro/axis-tokens`, export de primer nivel, tipo `GlitchLine`, `status: candidate`; desde 0.3.24 con
+> (`@efeoncepro/axis-tokens`, export de primer nivel, tipo `GlitchLine`, `status: canonical` desde 0.3.37 —sub-línea de La órbita, estable el 2026-09-29—; desde 0.3.24 con
 > `editions` y las piezas `flash-*`), el **contrato `efeonce.glitch-line`** (`@efeoncepro/axis-ui-contracts`; 0.2.0
-> desde 0.3.22, acepta intents 0.1.0) y los **assets `AXIS_GLITCH_ASSETS`** (`@efeoncepro/axis-brand-assets` 0.3.5).
+> desde 0.3.22, `stable` desde 0.3.37, acepta intents 0.1.0) y los **assets `AXIS_GLITCH_ASSETS`** (`@efeoncepro/axis-brand-assets` 0.3.5).
 > Greenhouse `develop` fija `axis-tokens` **0.3.24**, `axis-ui-contracts` **0.3.22** y `axis-brand-assets` 0.3.5 desde
 > `53002b352` (antes, 0.3.12 / 0.3.10 desde `4dfb147f7`).
 > Los números de esta referencia son **referencia humana**: si difieren del token, manda el token. **Nunca copies
