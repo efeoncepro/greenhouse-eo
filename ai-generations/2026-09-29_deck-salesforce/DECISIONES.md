@@ -126,3 +126,13 @@ https://claude.ai/artifact/Jp1zybpowqVVyvgnDu1NSw · en «La órbita», página 
   oficiales y verificadas contra el cuadro. Si Salesforce publica el vector, se reemplaza.
 - SF16 ahora muestra el wordmark en una tarjeta navy (mismo lugar y tamaño que la tarjeta anterior). Sigue sujeta a
   autorización de Salesforce y Anthropic.
+
+## Decisiones del operador al canonizar (2026-09-29)
+
+- **Documento:** ambos cierres. Como brochure, el deck cierra con una contraportada de brochure («¿Conversamos? Cuando
+  quieras.» + eslogan) en la línea revenue-salesforce; la SF19 aprobada es el cierre cuando el deck se usa como propuesta.
+- **SF5, SF10, SF11 y SF18** no caben en las recetas existentes: se canonizan como **4 recetas nuevas**, tal como se
+  aprobaron (las 78 existentes no se tocan).
+- **Logo de la contraportada a 700 px sólo en Salesforce** (composición `sloganBlock` de close-proposal); las
+  contraportadas del 27/09 siguen a 500 px.
+- **Nombre del servicio de SF16: «Enablement conversacional»** (eyebrow «Claudeforce · Enablement conversacional").

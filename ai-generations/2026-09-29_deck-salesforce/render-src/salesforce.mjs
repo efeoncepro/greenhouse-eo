@@ -431,7 +431,7 @@ ${opp('Andes Retail', 'Propuesta', '[MONTO]', true)}${opp('Grupo Norte', 'Negoci
     return stageBg(1180, 520) + platform(1180, 950, 480, 72) + chat + tile
       + side('Ve lo que tú ves', 'Respeta los permisos de tu org.', 780) + side('Tú confirmas', 'Ninguna acción sin tu visto bueno.', 1036) + side('37 skills de ventas', 'Pipeline, cuentas y seguimiento.', 1292)
       + note('Salesforce en Claude · beta abierta desde sep. 2026 · ejemplo ilustrativo')
-      + bigVoice('Claudeforce · CRM conversacional', '¿Y si le preguntas a tu CRM?', answerHtml('Te responde', A).replace('Te responde', 'Te<br>responde'), `Configuramos Salesforce en Claude con permisos, skills y ${b('adopción')}: tu equipo consulta y actualiza el CRM conversando.`, 2, 150) + urlSign()
+      + bigVoice('Claudeforce · Enablement conversacional', '¿Y si le preguntas a tu CRM?', answerHtml('Te responde', A).replace('Te responde', 'Te<br>responde'), `Configuramos Salesforce en Claude con permisos, skills y ${b('adopción')}: tu equipo consulta y actualiza el CRM conversando.`, 2, 150) + urlSign()
   } },
 
   // SF17 · QUÉ MEDIMOS: cinco métricas de la práctica con su fórmula y su fuente, sin cifras (se fijan con baseline en
