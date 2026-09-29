@@ -32,7 +32,7 @@ const cssOf = (id: string): string => {
 }
 
 type Intent = SurfaceIntent & Record<string, unknown>
-type Step = { kicker: string; title: string; description: string }
+type Step = { kicker: string; name: string; desc: string }
 
 const example = (): Intent => JSON.parse(fs.readFileSync(EXAMPLE, 'utf8')) as Intent
 const contract = JSON.parse(fs.readFileSync(path.join(CATALOG, `${ID}.slots.json`), 'utf8')) as TemplateContract
@@ -62,7 +62,7 @@ const expectCode = (fn: () => unknown, code: SurfacePieceError['code']) => {
 const withStep = (i: number, patch: Partial<Step>): Intent => {
   const intent = example()
 
-  return { ...intent, waves: (intent.waves as Step[]).map((s, j) => (j === i ? { ...s, ...patch } : s)) } as Intent
+  return { ...intent, steps: (intent.steps as Step[]).map((s, j) => (j === i ? { ...s, ...patch } : s)) } as Intent
 }
 
 const G = efeonceGraphicLine as unknown as {
@@ -137,17 +137,21 @@ describe('deck · method-waves (TASK-1942)', () => {
   it('un campo obligatorio ausente o una cuenta que no calza no compone', () => {
     expectCode(() => plan({ ...example(), body: undefined } as unknown as Intent), 'invalid-intent')
     expectCode(() => plan({ ...example(), voice: { ...(example().voice as object), answer: ['Por olas'] } } as Intent), 'invalid-intent')
-    expectCode(() => plan({ ...example(), waves: (example().waves as unknown[]).slice(0, 3) } as Intent), 'invalid-intent')
+    expectCode(() => plan({ ...example(), steps: (example().steps as unknown[]).slice(0, 3) } as Intent), 'invalid-intent')
+    // Los escalones van en `steps` (AXIS 0.3.34, delta (r)); la clave provisional `waves` ya no compone.
+    const { steps: legacy, ...rest } = example()
+
+    expectCode(() => plan({ ...rest, waves: legacy } as unknown as Intent), 'invalid-intent')
     expectCode(() => plan(withStep(1, { kicker: ' ' })), 'invalid-intent')
-    expectCode(() => plan(withStep(2, { description: '' })), 'invalid-intent')
+    expectCode(() => plan(withStep(2, { desc: '' })), 'invalid-intent')
   })
 
   it('un texto sobre su largo del catálogo falla en su slot', () => {
     const violated = (intent: Intent, slot: string) => plan(intent).violations.some(v => (v as { slot?: string }).slot === slot)
 
     expect(violated(withStep(0, { kicker: 'x'.repeat(23) }), 'steps')).toBe(true)
-    expect(violated(withStep(1, { title: 'x'.repeat(32) }), 'steps')).toBe(true)
-    expect(violated(withStep(3, { description: 'x'.repeat(98) }), 'steps')).toBe(true)
+    expect(violated(withStep(1, { name: 'x'.repeat(32) }), 'steps')).toBe(true)
+    expect(violated(withStep(3, { desc: 'x'.repeat(98) }), 'steps')).toBe(true)
   })
 
   it('todo color del plan sale de AXIS y la trayectoria toma el acento de la línea', () => {

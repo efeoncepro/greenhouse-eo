@@ -90,6 +90,12 @@ export const contentDayLiveConsole: RecipeBuilder = ({ intent, manifest, recipe 
   const doc = t.document
   const { header, mark, metrics: metricsT, checks: checksT, review: reviewT } = t
 
+  // Los filetes de la píldora y de las cifras van por dentro (AXIS 0.3.34, delta (r)): la plantilla los pinta como
+  // `box-shadow: inset`, así que un filete por fuera en el token sería otra lámina.
+  if (mark.border.inset !== true || metricsT.border.inset !== true) {
+    throw new SurfacePieceError('AXIS declara por dentro (`inset: true`) los filetes de la píldora y de las cifras: la plantilla los pinta así.', 'surface-issues')
+  }
+
   twoLineAnswer(voice, 'la operación gestionada')
   if (!content.body) throw new SurfacePieceError('La lámina lleva su bajada (`body`).', 'invalid-intent')
 
@@ -152,6 +158,7 @@ export const contentDayLiveConsole: RecipeBuilder = ({ intent, manifest, recipe 
     iconGap: css('clv-icon-gap', header.icon.gapPx),
     titlePx: css('clv-title-px', header.title.px),
     titleTracking: cssFine('clv-title-tracking', tracking(header.title.tracking, 'el título de la consola')),
+    titleColor: colorVar('clv-title', lineColor(measured(header.title.color, 'el color del título de la consola'), line, 'el título de la consola', doc)),
     subtitlePx: css('clv-subtitle-px', header.subtitle.px),
     subtitleWeight: css('clv-subtitle-wght', measured(header.subtitle.weight, 'el peso de la bajada de la consola'), ''),
     subtitleGap: css('clv-subtitle-gap', measured(header.subtitle.gapPx, 'el aire de la bajada de la consola')),
@@ -183,6 +190,7 @@ export const contentDayLiveConsole: RecipeBuilder = ({ intent, manifest, recipe 
     metricValuePx: css('clv-metric-value-px', metricsT.value.px),
     metricValueTracking: cssFine('clv-metric-value-tracking', tracking(metricsT.value.tracking, 'la cifra')),
     metricValueGap: css('clv-metric-value-gap', measured(metricsT.value.gapTopPx, 'el aire de la cifra')),
+    metricValueColor: colorVar('clv-metric-value', lineColor(measured(metricsT.value.color, 'el color de la cifra'), line, 'la cifra', doc)),
     metricDetailPx: css('clv-metric-detail-px', metricsT.detail.px),
     metricDetailWeight: css('clv-metric-detail-wght', measured(metricsT.detail.weight, 'el peso del detalle'), ''),
     metricDetailGap: css('clv-metric-detail-gap', measured(metricsT.detail.gapTopPx, 'el aire del detalle')),
@@ -194,6 +202,7 @@ export const contentDayLiveConsole: RecipeBuilder = ({ intent, manifest, recipe 
     checkRule: colorVar('clv-check-rule', lineColor(checksT.rule, line, 'el filete de los controles', doc)),
     checkLabelPx: css('clv-check-label-px', checksT.label.px),
     checkLabelWeight: css('clv-check-label-wght', measured(checksT.label.weight, 'el peso del control'), ''),
+    checkLabelColor: colorVar('clv-check-label', lineColor(measured(checksT.label.color, 'el color del control'), line, 'el control', doc)),
     statusPadY: css('clv-status-pad-y', status.padding[0]),
     statusPadX: css('clv-status-pad-x', status.padding[1]),
     statusRadius: css('clv-status-radius', status.radiusPx),

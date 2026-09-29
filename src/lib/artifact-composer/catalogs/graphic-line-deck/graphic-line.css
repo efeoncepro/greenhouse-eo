@@ -8587,6 +8587,7 @@ body {
   font-weight: var(--gl-answer-weight);
   font-size: var(--gl-clv-title-px);
   letter-spacing: var(--gl-clv-title-tracking);
+  color: var(--gl-clv-title-color);
 }
 
 .gl-clv .gl-clv-subtitle {
@@ -8632,6 +8633,7 @@ body {
   font-weight: var(--gl-answer-weight);
   font-size: var(--gl-clv-metric-value-px);
   letter-spacing: var(--gl-clv-metric-value-tracking);
+  color: var(--gl-clv-metric-value-color);
 }
 
 .gl-clv .gl-clv-metric-detail {
@@ -8655,6 +8657,7 @@ body {
 
 .gl-clv .gl-clv-check-label {
   font: var(--gl-clv-check-label-wght) var(--gl-clv-check-label-px) var(--gl-text-family);
+  color: var(--gl-clv-check-label-color);
 }
 
 .gl-clv .gl-clv-status {

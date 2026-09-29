@@ -71,10 +71,13 @@ type ReportTokens = {
     other: { fill: string; color: string; border: Border }
     condition: Text
   }
-  risks: { count: number; gapTopPx: number; gapPx: number; px: number; weight: number; icon: { px: number; shape: string; strokePx: number; color: string } }
+  risks: { count: number; gapTopPx: number; gapPx: number; px: number; weight: number; icon: { px: number; shape: string; strokePx: number; color: string; geometry?: TriangleGeometry } }
   record: Text
   waves: { count: number; gapPx: number; padding: [number, number]; radiusPx: number; fill: string; border: Border; name: Text; title: Text; kicker: Text }
 }
+
+/** La forma del triángulo de alerta en su viewBox (AXIS 0.3.34, delta (r)). */
+type TriangleGeometry = { viewBox: number; outline: { d: string; join: string }; mark: { d: string; cap: string } }
 
 type ModuleIntent = { kicker?: unknown; title?: unknown }
 type WaveIntent = { name?: unknown; title?: unknown; kicker?: unknown }
@@ -90,19 +93,21 @@ const tracking = (value: string | undefined, what: string): number => Number.par
 const step = (index: number): string => String(index).padStart(2, '0')
 
 /**
- * El triángulo de alerta de los riesgos (`risks.icon.shape: 'warning-triangle'`). AXIS mide su tamaño, su trazo y su
- * color, pero no su geometría: se transcribe de la lámina aprobada (viewBox de 16, triángulo y signo de exclamación).
+ * El triángulo de alerta de los riesgos (`risks.icon.shape: 'warning-triangle'`). Todo sale de AXIS: tamaño, trazo y
+ * color, y desde 0.3.34 (delta (r)) también su forma (`risks.icon.geometry`: el viewBox, el contorno y el signo de
+ * exclamación de la lámina aprobada).
  */
 const warningTriangle = (icon: ReportTokens['risks']['icon'], line: string): { ref: string; asset: SurfaceAssetRequest } => {
   if (icon.shape !== 'warning-triangle') throw new SurfacePieceError(`AXIS pide el ícono «${icon.shape}» y el builder sólo sabe pintar «warning-triangle».`, 'invalid-intent')
 
+  const shape = measured(icon.geometry, 'la forma del triángulo de alerta')
   const color = lineColor(icon.color, line, 'el triángulo de alerta')
   const ref = `asset-ref:icon:warning-triangle-${icon.px}`
 
   const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="${n(icon.px)}" height="${n(icon.px)}" aria-hidden="true">` +
-    `<path d="M8 1.8l6.6 11.6H1.4z" fill="none" stroke="${color}" stroke-width="${n(icon.strokePx)}" stroke-linejoin="round"/>` +
-    `<path d="M8 6.2v3.4M8 11.4v.2" stroke="${color}" stroke-width="${n(icon.strokePx)}" stroke-linecap="round"/>` +
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n(shape.viewBox)} ${n(shape.viewBox)}" width="${n(icon.px)}" height="${n(icon.px)}" aria-hidden="true">` +
+    `<path d="${shape.outline.d}" fill="none" stroke="${color}" stroke-width="${n(icon.strokePx)}" stroke-linejoin="${shape.outline.join}"/>` +
+    `<path d="${shape.mark.d}" stroke="${color}" stroke-width="${n(icon.strokePx)}" stroke-linecap="${shape.mark.cap}"/>` +
     '</svg>'
 
   return { ref, asset: { ref, kind: 'svg', svg } }

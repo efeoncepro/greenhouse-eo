@@ -103,15 +103,18 @@ const CURRENCY = /[$€£]|\b(?:USD|CLP|MXN|COP|PEN|EUR|UF)\b/
 
 
 /**
- * El color del número del bucle. AXIS 0.3.33 lo mide a 15 px «en el acento», pero su propia regla transversal
- * `accent-text-min-size` dice que el acento nunca colorea texto de menos de 24 px y que ahí el texto va «en blanco o
- * suave sobre oscuro». La regla manda sobre el token (el gate de La órbita la exige sobre la lámina renderizada): bajo
- * 24 px el acento cae a `soft`. Defecto reportado a AXIS: `loop.number.color` debe dejar de ser `accent`.
+ * El color del número del bucle. Desde AXIS 0.3.34 (delta (r)) el token lo mide `soft`, alineado con la regla
+ * transversal `accent-text-min-size` (el acento nunca colorea texto de menos de 24 px: ahí va en blanco o suave sobre
+ * oscuro). Si un token volviera a pedir el acento bajo 24 px, la lámina no compone en vez de repintar en silencio.
  */
 const numberColor = (number: { px: number; color?: string }): string => {
   const value = measured(number.color, 'el color del número')
 
-  return number.px < 24 && value === 'accent' ? 'soft' : value
+  if (number.px < 24 && value === 'accent') {
+    throw new SurfacePieceError(`AXIS pide el número del bucle en el acento a ${number.px} px, y \`accent-text-min-size\` lo prohíbe bajo 24 px.`, 'surface-issues')
+  }
+
+  return value
 }
 
 export const contentDayLiveApproval: RecipeBuilder = ({ intent, manifest, recipe }) => {

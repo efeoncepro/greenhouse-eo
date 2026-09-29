@@ -128,6 +128,13 @@ describe('deck · decision-diagnosis-verdict (TASK-1942)', () => {
     expect(piece.assets.map(asset => asset.ref)).toContain('asset-ref:icon:informe-revenue-salesforce-dark-24')
     expect(alert.svg).toContain('stroke="#b4261a"')
     expect(alert.svg).toContain('stroke-width="1.4"')
+    // La forma sale de AXIS 0.3.34 (`risks.icon.geometry`) y reproduce la de la lámina aprobada byte a byte.
+    expect(alert.svg).toBe(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">' +
+        '<path d="M8 1.8l6.6 11.6H1.4z" fill="none" stroke="#b4261a" stroke-width="1.4" stroke-linejoin="round"/>' +
+        '<path d="M8 6.2v3.4M8 11.4v.2" stroke="#b4261a" stroke-width="1.4" stroke-linecap="round"/>' +
+        '</svg>'
+    )
   })
 
   it('un campo obligatorio ausente o una cuenta que no calza no compone', () => {

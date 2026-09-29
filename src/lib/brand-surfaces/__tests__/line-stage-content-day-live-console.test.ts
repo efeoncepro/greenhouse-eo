@@ -175,6 +175,19 @@ describe('deck · content-day-live-console (TASK-1942)', () => {
     expect(used.filter(hex => !allowed.has(hex))).toEqual([])
   })
 
+  it('el título, la cifra y el control dicen su tinta; la píldora y las cifras llevan el filete por dentro (AXIS 0.3.34)', () => {
+    const frame = plan(example()).slots.frame as Record<string, string>
+    const ink = (frame.docInk ?? '').split('=')[1]
+
+    expect(ink).toMatch(/^#[0-9a-f]{6}$/)
+    expect([frame.titleColor, frame.metricValueColor, frame.checkLabelColor]).toEqual([
+      `--gl-clv-title-color=${ink}`,
+      `--gl-clv-metric-value-color=${ink}`,
+      `--gl-clv-check-label-color=${ink}`
+    ])
+    expect(styles).toMatch(/\.gl-clv-mark \{[^}]*box-shadow: inset/)
+  })
+
   it('la plantilla y su CSS no escriben valores de diseño: todo llega del builder', () => {
     for (const source of [template, styles]) {
       expect(source).not.toMatch(/#[0-9a-f]{3,8}\b/i)

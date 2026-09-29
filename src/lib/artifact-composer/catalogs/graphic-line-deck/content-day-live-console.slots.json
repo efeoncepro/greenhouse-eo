@@ -323,6 +323,12 @@
           "resolver": "gl-css",
           "example": "--gl-clv-title-tracking=-0.015em"
         },
+        "titleColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-clv-title-color=#0b1f33"
+        },
         "subtitlePx": {
           "type": "string",
           "required": true,
@@ -497,6 +503,12 @@
           "resolver": "gl-css",
           "example": "--gl-clv-metric-value-gap=6px"
         },
+        "metricValueColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-clv-metric-value-color=#0b1f33"
+        },
         "metricDetailPx": {
           "type": "string",
           "required": true,
@@ -556,6 +568,12 @@
           "required": true,
           "resolver": "gl-css",
           "example": "--gl-clv-check-label-wght=500"
+        },
+        "checkLabelColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-clv-check-label-color=#0b1f33"
         },
         "statusPadY": {
           "type": "string",

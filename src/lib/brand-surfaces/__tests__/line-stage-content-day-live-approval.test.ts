@@ -185,6 +185,12 @@ describe('deck · content-day-live-approval (TASK-1942)', () => {
     expect(used.filter(hex => !allowed.has(hex))).toEqual([])
   })
 
+  it('el número del bucle (15 px) va suave sobre oscuro, como lo mide AXIS 0.3.34: nunca en el acento', () => {
+    const frame = plan(example()).slots.frame as Record<string, string>
+
+    expect(frame.numberColor).toBe(`--gl-cla-number-color=${G.slogan.leadColor.onDark.toLowerCase()}`)
+  })
+
   it('la plantilla y su CSS no escriben valores de diseño: todo llega del builder', () => {
     for (const source of [template, styles]) {
       expect(source).not.toMatch(/#[0-9a-f]{3,8}\b/i)

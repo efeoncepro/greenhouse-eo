@@ -7,8 +7,8 @@
  *
  * Todo lo que pinta sale de AXIS (`efeonceGraphicLine.surfaces.deck.recipes['method-waves']`): la voz, el halo, la línea
  * de base, los escalones (posición, alturas, vidrio y papel, tipografía y colores en reposo y elegido), la trayectoria
- * con su esfera y el ícono de la cima. El CONTENIDO llega en el intent: `waves` (cuatro escalones: `kicker`, `title`,
- * `description`; el número 01–04 lo pone el builder), `selectedStep` y, opcional, `topMark`.
+ * con su esfera y el ícono de la cima. El CONTENIDO llega en el intent: `steps` (cuatro escalones con la forma de paso de
+ * AXIS: `kicker`, `name`, `desc`; el número 01–04 lo pone el builder), `selectedStep` y, opcional, `topMark`.
  */
 
 import { SurfacePieceError } from '../../types'
@@ -63,7 +63,7 @@ type TrajectoryTokens = {
   sphere: { rPx: number; glowRPx: number }
 }
 
-type StepIntent = { kicker?: unknown; title?: unknown; description?: unknown }
+type StepIntent = { kicker?: unknown; name?: unknown; desc?: unknown }
 
 const tracking = (value: string | undefined, what: string): number => Number.parseFloat(measured(value, `el tracking de ${what}`))
 
@@ -110,9 +110,9 @@ export const methodWaves: RecipeBuilder = ({ intent, manifest, recipe }) => {
   if (!voice.answerLead) throw new SurfacePieceError('La respuesta va en dos líneas (`voice.answer` con dos tramos).', 'invalid-intent')
   if (!content.body) throw new SurfacePieceError('La lámina lleva su bajada (`body`).', 'invalid-intent')
 
-  // El intent los llama `waves`: con `steps`, el resolver de AXIS los toma por los pasos con ícono de method-staircase y
-  // busca `steps.layouts`, que esta receta no tiene.
-  const list = exactly<StepIntent>(intent.waves, steps.count, 'Los escalones (`waves`)')
+  // Los escalones son los `steps` del intent: desde AXIS 0.3.34 (delta (r)) la receta declara su anatomía de pasos
+  // (tarjetas sin ícono, un layout de cuatro) y el resolver los valida como los demás pasos medidos.
+  const list = exactly<StepIntent>(intent.steps, steps.count, 'Los escalones (`steps`)')
   const selected = indexIn(intent.selectedStep, steps.count, 'El escalón por donde se empieza (`selectedStep`)')
   // El ícono de la cima es opcional: sólo el oficial del producto (nunca un Trazo), sujeto a la autorización de Salesforce.
   const mark = intent.topMark === undefined || intent.topMark === null ? null : productIcon(intent.topMark, 'El ícono de la cima (`topMark`)')
@@ -172,7 +172,7 @@ export const methodWaves: RecipeBuilder = ({ intent, manifest, recipe }) => {
       voice,
       body: evidenceHtml(content.body, 'none'),
       steps: list.map((item, i) => {
-        const where = `el escalón ${i + 1} (\`waves[${i}]\`)`
+        const where = `el escalón ${i + 1} (\`steps[${i}]\`)`
 
         return {
           role: i + 1 === selected ? 'lead' : 'rest',
@@ -181,8 +181,8 @@ export const methodWaves: RecipeBuilder = ({ intent, manifest, recipe }) => {
           height: css('mwv-height', heightOf(i)),
           number: number.numbered ? step(i + 1) : String(i + 1),
           kicker: req(item.kicker, `El rótulo de ${where} (\`kicker\`)`),
-          title: req(item.title, `El título de ${where} (\`title\`)`),
-          description: req(item.description, `La descripción de ${where} (\`description\`)`)
+          title: req(item.name, `El título de ${where} (\`name\`)`),
+          description: req(item.desc, `La descripción de ${where} (\`desc\`)`)
         }
       }),
       ...(mark
