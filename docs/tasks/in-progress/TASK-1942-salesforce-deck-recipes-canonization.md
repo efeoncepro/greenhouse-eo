@@ -35,7 +35,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Slice 1 hecho el 2026-09-29 (12 recetas) y ampliado el mismo día con las decisiones del operador (16 recetas, dos planes validados); Slice 3 (AXIS) publicado en v0.3.31, la ampliación va en v0.3.32; Slice 2 (Composer) pendiente en otra sesión`
+- Status real: `Slice 1 hecho el 2026-09-29 (12 recetas) y ampliado el mismo día con las decisiones del operador (16 recetas, dos planes validados); Slice 3 (AXIS) publicado en v0.3.31 y v0.3.32 (tokens y contracts 0.3.32 en el registro, Lab en vivo con 94 láminas); Slice 2 (Composer) pendiente en otra sesión`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -292,7 +292,7 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-salesforce/CANON
 - [ ] Las 16 recetas nuevas tienen plantilla y componen con `pnpm brand:compose`.
 - [ ] La contraportada de brochure Salesforce compone y tiene el visto bueno del operador.
 - [ ] `partnerMark` y el eslogan en bloque componen, con test sin el slot y el gate `graphic-line` a 0 px.
-- [ ] AXIS publica las recetas, sus referencias y los assets de terceros con procedencia y estado de autorización.
+- [x] AXIS publica las recetas, sus referencias y los assets de terceros con procedencia y estado de autorización (`v0.3.31` y `v0.3.32`; AXIS `main` `61e34a4`).
 
 ## Verification
 
