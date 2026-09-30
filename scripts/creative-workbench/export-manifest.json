@@ -107,7 +107,10 @@
       "pnpm-lock.yaml",
       "tools/doctor.mjs",
       "tools/instalar.mjs",
-      "clients/sky/README.md"
+      "clients/sky/README.md",
+      "clients/brands.json",
+      "tools/brand-context.mjs",
+      "tools/marca-preflight.mjs"
     ],
     "reserved": ["gates/**", ".github/workflows/gates.yml", ".github/CODEOWNERS", ".workbench/**"]
   },

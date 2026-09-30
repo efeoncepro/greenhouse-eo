@@ -458,29 +458,50 @@ describe('creative-workbench — gate native-policy', () => {
     expect(gate()).toMatchObject({ ok: true })
   })
 
-  it('admite el broker y los tests en test/, y rechaza hosts, SDKs e imports del broker fuera de él', () => {
+  it('admite el broker y los tests en test/, y rechaza hosts, SDKs, llaves e imports que llegan al proveedor', () => {
     write('services/production-broker/openai.mjs', "import OpenAI from 'openai'\nfetch('https://api.openai.com/v1')")
     write('services/production-broker/request.mjs', 'export const validate = x => x')
     write('tools/client.mjs', "import { validate } from '../services/production-broker/request.mjs'")
     write('test/broker.test.mjs', "assert(url !== 'https://api.openai.com')")
     expect(gate().ok).toBe(true)
 
+    write('src/lib/ai/openai-image.ts', "export const gen = () => fetch('https://api.openai.com/v1/images')")
     write('tools/provider-doctor.ts', "fetch('https://api.openai.com/v1/models')")
     write('tools/gen.mjs', "import { GoogleGenAI } from '@google/genai'")
+    write('tools/bare.mjs', "import 'openai'")
     write('tools/via-broker.mjs', "import { run } from '../services/production-broker/openai.mjs'")
+    write('tools/via-engine.mjs', "const m = await import('../src/lib/ai/openai-image')")
+    write('tools/env-key.mjs', 'const key = process.env.OPENAI_API_KEY')
+    write('tools/secret.sh', 'gcloud secrets versions access latest --secret=workbench-openai-api-key')
+    write('tools/rest.mjs', "fetch('https://secretmanager.googleapis.com/v1/projects/x/secrets/y')")
     write('tools/tests/sneaky.test.mjs', "fetch('https://api.anthropic.com/v1')")
-    write('package.json', JSON.stringify({ dependencies: { openai: '5.0.0' } }))
+    write(
+      'package.json',
+      JSON.stringify({ dependencies: { openai: '5.0.0', '@google-cloud/secret-manager': '6.0.0' } })
+    )
     const result = gate()
 
     expect(result.ok).toBe(false)
-    expect(result.out).toContain('tools/provider-doctor.ts: contiene api.openai.com')
-    expect(result.out).toContain('tools/gen.mjs: importa el SDK @google/genai')
-    expect(result.out).toContain(
-      'tools/via-broker.mjs: importa services/production-broker/openai.mjs, que llama al proveedor'
-    )
-    expect(result.out).toContain('tools/tests/sneaky.test.mjs: contiene api.anthropic.com')
-    expect(result.out).toContain('package.json: declara openai')
+
+    for (const expected of [
+      'tools/provider-doctor.ts: api.openai.com',
+      'tools/gen.mjs: @google/genai',
+      'tools/bare.mjs: openai',
+      'tools/via-broker.mjs: importa services/production-broker/openai.mjs',
+      'tools/via-engine.mjs: importa src/lib/ai/openai-image.ts',
+      'tools/env-key.mjs: OPENAI_API_KEY',
+      'tools/secret.sh: gcloud secrets',
+      'tools/rest.mjs: secretmanager.googleapis.com',
+      'tools/tests/sneaky.test.mjs: api.anthropic.com',
+      'package.json: declara openai'
+    ])
+      expect(result.out).toContain(expected)
+
+    // Los engines gestionados necesitan el SDK de Secret Manager: declararlo no es una falta.
+    expect(result.out).not.toContain('declara @google-cloud/secret-manager')
+    expect(result.out).not.toContain('tools/client.mjs')
     remove('tools')
+    remove('src')
     remove('package.json')
   })
 
@@ -517,7 +538,7 @@ describe('creative-workbench — gate native-policy', () => {
     )
     const result = gate()
 
-    expect(result.out).toContain('tools/leak.mjs: contiene api.openai.com')
+    expect(result.out).toContain('tools/leak.mjs: api.openai.com')
     expect(existsSync(path.join(dir, 'tools/leak.mjs'))).toBe(true)
     remove('tools')
     restoreHarness()

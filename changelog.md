@@ -19,7 +19,9 @@
 - Gate nuevo `native-policy` (reglas selladas para lo nativo): prueba el guardarraíl con sondas, exige denegaciones y
   hook en `settings.json` y rechaza código fuera del broker que llame a un proveedor de IA. Sobre el estado del PR #3
   sólo marca `tools/provider-doctor.ts` (llama a OpenAI directo con la llave de Secret Manager).
-- Tras una revisión adversarial con subagentes se endureció todo: el guard corre al final y en una copia con sondas
+- Tras una revisión adversarial con subagentes (y una segunda revisión con acceso a GCP) se endureció todo: `native-policy`
+  detecta además imports que llegan a los engines históricos, `import 'openai'`, `*_API_KEY`, `gcloud secrets` y Secret
+  Manager; el guard corre al final y en una copia con sondas
   aleatorias, se detectan SDKs e imports del adaptador del broker, `disableAllHooks`, sellos sin commit, PRs que
   cambian el sello sin ser sync (CI compara contra la base) y rutas nativas no canónicas.
 - Nota «En el Workbench»: el sync la inserta al inicio del `SKILL.md` de las 12 skills que mencionan `foto:*`, `ai:*`

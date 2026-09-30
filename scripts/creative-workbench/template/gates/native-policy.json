@@ -30,7 +30,7 @@
     "hookCommand": "^node \"?\\$CLAUDE_PROJECT_DIR/\\.claude/hooks/guard\\.mjs\"?$"
   },
   "providers": {
-    "_comentario": "Ningún código ni configuración del workbench llama a un proveedor de IA salvo el broker. Se omiten los engines gestionados y gates/ (son de greenhouse-eo), docs/ y los tests que viven en una carpeta test/.",
+    "_comentario": "Ningún código ni configuración del workbench llega a un proveedor de IA ni a sus llaves salvo el broker: ni directo (host, SDK, lectura de llaves) ni importando un módulo que lo haga (el adaptador del broker, los engines históricos src/lib/ai/*). Se omiten los engines gestionados y gates/ (son de greenhouse-eo), el guard y settings.json (citan hosts y comandos para bloquearlos; los prueba la sección guard), docs/ y los tests *.test.* dentro de una carpeta test/. Es un lint: un texto ofuscado lo evade; la barrera real es que el equipo no tiene llaves. secretPackages se detecta al importarse, no como dependencia: los engines gestionados lo necesitan en package.json.",
     "hosts": [
       "api.openai.com",
       "fal.run",
@@ -40,7 +40,8 @@
       "aiplatform.googleapis.com",
       "api.anthropic.com",
       "openrouter.ai",
-      "api.replicate.com"
+      "api.replicate.com",
+      "secretmanager.googleapis.com"
     ],
     "sdkPackages": [
       "openai",
@@ -54,7 +55,26 @@
       "replicate"
     ],
     "allowedIn": ["services/production-broker/**"],
-    "skipIn": ["docs/**", "gates/**"],
-    "extensions": [".mjs", ".js", ".cjs", ".ts", ".tsx", ".mts", ".cts", ".sh", ".py", ".json", ".yml", ".yaml"]
+    "skipIn": ["docs/**", "gates/**", ".claude/settings.json", ".claude/hooks/guard.mjs"],
+    "extensions": [
+      ".mjs",
+      ".js",
+      ".cjs",
+      ".jsx",
+      ".ts",
+      ".tsx",
+      ".mts",
+      ".cts",
+      ".sh",
+      ".py",
+      ".json",
+      ".yml",
+      ".yaml"
+    ],
+    "secretAccess": [
+      "gcloud\\s+secrets\\b",
+      "\\b(?:OPENAI|FAL|HIGGSFIELD|ANTHROPIC|GEMINI|GOOGLE_GENAI|REPLICATE)_API_KEY\\b"
+    ],
+    "secretPackages": ["@google-cloud/secret-manager"]
   }
 }

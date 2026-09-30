@@ -212,7 +212,9 @@ Mecánica (`scripts/creative-workbench/`):
   que tocan archivos gestionados o `.workbench/`, y lista las dependencias que los engines entregados
   necesitan y que el `package.json` nativo no declara.
 
-Rutas nativas iniciales, las 11 que el PR #3 necesita poseer: `AGENTS.md`, `CLAUDE.md`, `README.md`,
+Rutas nativas iniciales, las 11 que el PR #3 necesita poseer (más `clients/brands.json`, `tools/brand-context.mjs` y
+`tools/marca-preflight.mjs`, agregadas el mismo día para que copias viejas que aparezcan en la plantilla nunca se
+exporten encima del harness): `AGENTS.md`, `CLAUDE.md`, `README.md`,
 `.gitignore`, `.claude/hooks/guard.mjs`, `.claude/settings.json`, `package.json`, `pnpm-lock.yaml`,
 `tools/doctor.mjs`, `tools/instalar.mjs`, `clients/sky/README.md`. De los 13 archivos que el PR editó,
 `gates/managed-drift.mjs` y `gates/hygiene.mjs` **no** pasan a nativos: los gates son la forma de controlar
@@ -251,10 +253,14 @@ omitidos requieren canon licenciado).
 `native-policy` lo verifica **por comportamiento**, sin leer el código del workbench. Es un **lint**, no una
 frontera de seguridad: la barrera real es IAM (el equipo no tiene llaves) y la revisión de PRs.
 
-- **Proveedores (primero):** ningún archivo de código o configuración (`.mjs/.ts/.sh/.py/.json/.yml`…) fuera de
-  `services/production-broker/**` contiene un host de proveedor de IA, importa un SDK de IA ni lo declara como
-  dependencia, ni importa un módulo del broker que llegue al proveedor (importar sus validadores compartidos está
-  bien). Se omiten los archivos gestionados, `gates/`, `docs/` y los tests `*.test.*` dentro de una carpeta `test/`.
+- **Proveedores (primero):** ningún archivo de código o configuración (`.mjs/.ts/.jsx/.sh/.py/.json/.yml`…) fuera de
+  `services/production-broker/**` llega a un proveedor de IA o a sus llaves: ni directo (host, SDK de IA importado o
+  declarado, `import 'openai'`, `*_API_KEY`, `gcloud secrets`, `secretmanager.googleapis.com`, el SDK de Secret
+  Manager importado) ni importando —relativo o con alias `@/`, transitivamente— un módulo que lo haga: el adaptador
+  del broker o los engines históricos `src/lib/ai/*`. Importar validadores que no llegan al proveedor está bien.
+  Se omiten los archivos gestionados, `gates/`, el guard y `settings.json` (los prueba la sección siguiente),
+  `docs/` y los tests `*.test.*` dentro de una carpeta `test/`. Un texto ofuscado (`"api.openai" + ".com"`) lo
+  evade: es un lint.
 - **Settings de Claude:** `permissions.deny` conserva las denegaciones mínimas, `disableAllHooks` no está activo y
   el hook `PreToolUse` corre exactamente `node "$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs"` para `Bash|Edit|Write`.
 - **Guardarraíl (al final, en una copia):** ejecuta `.claude/hooks/guard.mjs` sobre una copia temporal de lo

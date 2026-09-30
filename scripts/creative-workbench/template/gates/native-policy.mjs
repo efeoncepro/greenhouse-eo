@@ -9,7 +9,7 @@
 //     aleatorios, y la ruta gestionada se elige al azar del sello.
 import { spawnSync } from 'node:child_process'
 import { randomBytes, randomUUID } from 'node:crypto'
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -62,45 +62,66 @@ function checkSettings(policy, problems) {
     )
 }
 
+// Resuelve un import relativo (o el alias `@/` → `src/`) a un archivo del repo, probando las extensiones
+// que un import puede omitir. Devuelve la ruta relativa al repo o null si no existe.
+const RESOLVE_SUFFIXES = ['', '.ts', '.tsx', '.mts', '.mjs', '.js', '.cjs', '/index.ts', '/index.mjs', '/index.js']
+
+function resolveImport(fromRel, spec) {
+  const base = spec.startsWith('@/')
+    ? path.join(ROOT, 'src', spec.slice(2))
+    : path.resolve(path.dirname(path.join(ROOT, fromRel)), spec)
+
+  for (const suffix of RESOLVE_SUFFIXES) {
+    const abs = base + suffix
+
+    if (existsSync(abs) && statSync(abs).isFile()) return path.relative(ROOT, abs).split(path.sep).join('/')
+  }
+
+  return null
+}
+
 function checkProviders(policy, lock, problems) {
   const managed = lock?.files ?? {}
+  const where = policy.allowedIn.join(', ')
+  const importPrefix = String.raw`(?:from\s*|import\s*|require\(\s*|import\(\s*)`
 
   const sdkImport = new RegExp(
-    `(?:from\\s*|require\\(\\s*|import\\(\\s*)['"](${policy.sdkPackages.map(escape).join('|')})(?:/[^'"]*)?['"]`
+    `${importPrefix}['"](${[...policy.sdkPackages, ...(policy.secretPackages ?? [])].map(escape).join('|')})(?:/[^'"]*)?['"]`
   )
 
-  const importSpec = /(?:from\s*|require\(\s*|import\(\s*)['"](\.{1,2}\/[^'"]+)['"]/g
+  const localImport = new RegExp(`${importPrefix}['"]((?:\\.{1,2}/|@/)[^'"]+)['"]`, 'g')
+  const secretAccess = policy.secretAccess.map(p => new RegExp(p))
 
-  // Un módulo del broker "habla con el proveedor" si contiene un host o un SDK, o importa uno que lo
-  // haga. Importar sus validadores compartidos está bien; importar el adaptador del proveedor, no.
-  const tainted = new Map()
+  // Qué hace un archivo de código por sí mismo: llamar a un proveedor, usar un SDK de IA o leer llaves.
+  const directHit = text =>
+    policy.hosts.find(h => text.includes(h)) ??
+    text.match(sdkImport)?.[1] ??
+    secretAccess.map(re => text.match(re)?.[0]).find(Boolean) ??
+    null
 
-  const talksToProvider = abs => {
-    if (tainted.has(abs)) return tainted.get(abs)
-    tainted.set(abs, false)
-    if (!existsSync(abs)) return false
+  // Un módulo "llega al proveedor" si lo hace directamente o importa (transitivamente) uno que lo haga.
+  // Así se detecta importar el adaptador del broker o los engines históricos (src/lib/ai/*); importar
+  // validadores o utilidades que no llegan al proveedor está bien.
+  const reach = new Map()
 
-    const text = readFileSync(abs, 'utf8')
+  const reachesProvider = rel => {
+    if (reach.has(rel)) return reach.get(rel)
+    reach.set(rel, null)
 
-    const hit =
-      policy.hosts.some(h => text.includes(h)) ||
-      sdkImport.test(text) ||
-      [...text.matchAll(importSpec)].some(m => talksToProvider(path.resolve(path.dirname(abs), m[1])))
+    const text = readFileSync(path.join(ROOT, rel), 'utf8')
+    let hit = directHit(text) ? rel : null
 
-    tainted.set(abs, hit)
+    for (const m of text.matchAll(localImport)) {
+      if (hit) break
+      const target = resolveImport(rel, m[1])
+
+      if (target && reachesProvider(target)) hit = target
+    }
+
+    reach.set(rel, hit)
 
     return hit
   }
-
-  const reachesProvider = (rel, text) =>
-    [...text.matchAll(importSpec)]
-      .map(m =>
-        path
-          .relative(ROOT, path.resolve(path.dirname(path.join(ROOT, rel)), m[1]))
-          .split(path.sep)
-          .join('/')
-      )
-      .find(target => isNative(target, policy.allowedIn) && talksToProvider(path.join(ROOT, target)))
 
   for (const rel of trackedFiles()) {
     if (rel in managed || isTest(rel) || isNative(rel, policy.allowedIn) || isNative(rel, policy.skipIn)) continue
@@ -111,18 +132,17 @@ function checkProviders(policy, lock, problems) {
     if (!existsSync(abs)) continue
 
     const text = readFileSync(abs, 'utf8')
-    const host = policy.hosts.find(h => text.includes(h))
-    const where = policy.allowedIn.join(', ')
+    const direct = directHit(text)
 
-    if (host) problems.push(`${rel}: contiene ${host}. La IA pasa por el broker (${where})`)
+    if (direct)
+      problems.push(`${rel}: ${direct} (proveedor, SDK de IA o lectura de llaves). La IA pasa por el broker (${where})`)
+    else {
+      const via = [...text.matchAll(localImport)]
+        .map(m => resolveImport(rel, m[1]))
+        .find(target => target && reachesProvider(target))
 
-    const sdk = text.match(sdkImport)
-
-    if (sdk) problems.push(`${rel}: importa el SDK ${sdk[1]}. Los SDK de IA sólo viven en ${where}`)
-
-    const reach = reachesProvider(rel, text)
-
-    if (reach) problems.push(`${rel}: importa ${reach}, que llama al proveedor; el broker se usa por HTTP`)
+      if (via) problems.push(`${rel}: importa ${via}, que llega al proveedor o a las llaves; el broker se usa por HTTP`)
+    }
 
     if (path.basename(rel) === 'package.json') {
       let pkg = {}
