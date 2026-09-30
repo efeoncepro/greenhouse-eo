@@ -103,6 +103,7 @@ plantilla, el sync aborta con una colisión: decide qué versión queda antes de
 | `Sello íntegro: ✗ N anomalías` | El sello publicado no es el que greenhouse-eo habría escrito para su commit (una exención o una huella editada a mano) | Revisa el historial de `.workbench/sync.lock.json` y re-sincroniza |
 | `PR #N … ⚠ toca N gestionados` | Un PR que no viene del sync edita archivos sellados o el sello | Si el cambio es legítimo, pórtalo aquí o declara la ruta nativa; si no, pide revertirlo |
 | `Dependencias … faltan N` | El `package.json` nativo no declara lo que necesitan los engines que se siguen entregando | Puede ser a propósito (engine desactivado); si no, pide agregarlas |
+| `native-policy` rojo en el workbench | El harness nativo dejó de cumplir una regla sellada: el guard ya no bloquea algo, `settings.json` perdió una denegación o hay código fuera del broker que llama a un proveedor | Corregirlo en el workbench; si la regla debe cambiar, se cambia en `template/gates/native-policy.json` aquí |
 | `✗ N rutas del plan ya existen en el workbench y no las gestiona el sello` (sync) | La plantilla trae un archivo que el workbench ya tiene como propio | Decláralo nativo o quítalo de la plantilla; el sync no lo pisa |
 
 ## Qué no hacer

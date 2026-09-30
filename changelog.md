@@ -16,8 +16,11 @@
 - El gate `managed-drift` de la plantilla lee `native` **sólo del sello**: `.workbench/native-ownership.json` (PR #3 del
   workbench, de Codex) deja de eximir. `creative:status` usa sólo REST, verifica la integridad del sello recalculando el
   plan de su commit, marca PRs que tocan lo gestionado y lista dependencias que faltan en el `package.json` nativo.
-- 23 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar, gates
-  verdes y tests del harness de Codex iguales antes y después. Decisión: §8 de
+- Gate nuevo `native-policy` (reglas selladas para lo nativo): prueba el guardarraíl con sondas, exige denegaciones y
+  hook en `settings.json` y rechaza código fuera del broker que llame a un proveedor de IA. Sobre el estado del PR #3
+  sólo marca `tools/provider-doctor.ts` (llama a OpenAI directo con la llave de Secret Manager).
+- 26 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests
+  del harness de Codex iguales antes y después. Decisión: §8 de
   [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
 
 ## 2026-09-29 — HubSpot Agent CLI y MCP como carriles de operación directa

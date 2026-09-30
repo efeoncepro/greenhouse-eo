@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -310,5 +310,69 @@ describe('creative-workbench — guardarraíl de Claude', () => {
 
     for (const command of ['pnpm ai:image --prompt x', 'git push -u origin pieza/fix-main-banner'])
       expect(call({ tool_name: 'Bash', tool_input: { command } })).toBe(0)
+  })
+})
+
+describe('creative-workbench — gate native-policy', () => {
+  let dir: string
+  const template = path.join(ROOT, TEMPLATE_REL)
+
+  const write = (rel: string, text: string) => {
+    mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true })
+    writeFileSync(path.join(dir, rel), text)
+  }
+
+  const gate = () => {
+    spawnSync('git', ['add', '-A'], { cwd: dir })
+
+    const r = spawnSync(
+      process.execPath,
+      ['-e', "import('./gates/native-policy.mjs').then(m => process.exit(m.nativePolicy() ? 0 : 1))"],
+      { cwd: dir, encoding: 'utf8' }
+    )
+
+    return { ok: r.status === 0, out: r.stdout }
+  }
+
+  beforeAll(() => {
+    dir = mkdtempSync(path.join(os.tmpdir(), 'wb-policy-'))
+    cpSync(path.join(template, 'gates'), path.join(dir, 'gates'), { recursive: true })
+    cpSync(path.join(template, '.claude'), path.join(dir, '.claude'), { recursive: true })
+    write(
+      '.workbench/sync.lock.json',
+      JSON.stringify({ native: ['.claude/hooks/guard.mjs'], files: { 'gates/lib.mjs': 'x' } })
+    )
+    spawnSync('git', ['init', '-q'], { cwd: dir })
+  })
+
+  afterAll(() => rmSync(dir, { recursive: true, force: true }))
+
+  it('el guardarraíl y los settings de la plantilla cumplen la política', () => {
+    expect(gate()).toMatchObject({ ok: true })
+  })
+
+  it('rechaza código fuera del broker que llama a un proveedor, y admite el broker y los tests', () => {
+    write('services/production-broker/openai.mjs', "fetch('https://api.openai.com/v1/images')")
+    write('test/broker.test.mjs', "assert(url !== 'https://api.openai.com')")
+    expect(gate().ok).toBe(true)
+
+    write('tools/provider-doctor.ts', "fetch('https://api.openai.com/v1/models')")
+    const result = gate()
+
+    expect(result.ok).toBe(false)
+    expect(result.out).toContain('tools/provider-doctor.ts: llama a api.openai.com')
+    rmSync(path.join(dir, 'tools'), { recursive: true, force: true })
+  })
+
+  it('rechaza un guardarraíl que deja pasar todo y settings sin denegaciones', () => {
+    write('.claude/hooks/guard.mjs', 'process.exit(0)\n')
+    write('.claude/settings.json', JSON.stringify({ permissions: { deny: [] }, hooks: {} }))
+    const result = gate()
+
+    expect(result.ok).toBe(false)
+    expect(result.out).toContain('guard: debe bloquear `gcloud secrets')
+    expect(result.out).toContain('guard: debe impedir editar .workbench/sync.lock.json')
+    expect(result.out).toContain('falta "Read(./.env.local)"')
+    expect(result.out).toContain('el hook PreToolUse debe correr')
   })
 })

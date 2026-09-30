@@ -237,9 +237,7 @@ omitidos requieren canon licenciado).
 2. Sync de transición `pnpm creative:sync --pr`: entrega las 11 rutas, instala los gates que leen `native` y
    pone al día los engines (`isotipo`, línea gráfica). Después, el workbench puede retirar
    `native-ownership.json` y su test.
-3. **Política de lo nativo:** reglas selladas que un gate verifica sobre el harness (el guard sigue
-   bloqueando secretos y push a `main`, ningún script llama directo a un proveedor, marcas coherentes con
-   `control.json`).
+3. ~~**Política de lo nativo**~~ ✅ 2026-09-30 (§8.5).
 4. **Broker e IAM a `control.json`:** hoy la cuenta de servicio, los bindings del broker, el proyecto de
    Vercel y `production-policy.json` («todas las marcas para todo el equipo», distinto del acceso por
    cliente de §2.4) se crearon fuera de `creative:access`/`creative:provision`. `deployment-plan.json` del
@@ -247,3 +245,21 @@ omitidos requieren canon licenciado).
 5. **Skills vs. harness:** las 17 skills siguen indicando `pnpm foto:*`/`ai:*`, desactivados en el
    workbench; Efeonce y Berel quedaron cerrados («gated»). Hay que decidir si se entrega una capa por repo o
    si `AGENTS.md` nativo lo resuelve.
+
+### 8.5 Política de lo nativo (gate `native-policy`)
+
+`gates/native-policy.json` (reservado, sellado) declara lo que el harness nativo debe cumplir, y el gate
+`native-policy` lo verifica **por comportamiento**, sin leer el código del workbench:
+
+- **Guardarraíl:** ejecuta `.claude/hooks/guard.mjs` con sondas. Debe bloquear leer secretos, borrar en buckets,
+  push forzado o a `main`, leer `.env.local`, llamar a un proveedor y `--no-verify`; debe impedir editar el
+  sello y un archivo gestionado; debe dejar pasar `git status`, un push a una rama y escribir en `projects/`.
+- **Settings de Claude:** `permissions.deny` conserva las denegaciones mínimas y el hook `PreToolUse` sigue
+  corriendo el guard para Bash, Edit y Write.
+- **Proveedores:** ningún código del workbench fuera de `services/production-broker/**` contiene un host de
+  proveedor de IA. Se omiten los engines gestionados (son de greenhouse-eo) y los tests.
+
+Verificado 2026-09-30 sobre copias: `main` en verde; el estado del PR #3 cumple guard y settings y falla sólo
+por `tools/provider-doctor.ts`, un archivo sin script que lo invoque que lee la llave de OpenAI de Secret Manager
+y llama a `api.openai.com` directo. Hay que retirarlo antes del sync de transición o el gate queda en rojo.
+
