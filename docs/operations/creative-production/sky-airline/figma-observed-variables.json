@@ -1,0 +1,60 @@
+{
+  "brandId": "sky-airline",
+  "status": "observed-not-approved",
+  "observedOn": "2026-09-29",
+  "source": {
+    "fileKey": "ZhnJUPqzvYqy7nTcLLKLr1",
+    "pageId": "0:1"
+  },
+  "coverage": "Variables used by four selected nodes; not full library inventory",
+  "nodes": [
+    {
+      "nodeId": "2001:1078",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"purple/700\":\"#671e75\",\"28/SemiBold\":\"Font(family: \\\"Metric\\\", style: SemiBold, size: 28, weight: 600, lineHeight: 28, letterSpacing: 0)\",\"Radius-XXS\":\"8\",\"SPACING/XL\":\"24\",\"SPACING/L\":\"16\",\"Radius-Round\":\"999\",\"purple/50\":\"#f8dcfd\",\"green/50\":\"#e2fddc\",\"purple/800\":\"#50015c\",\"green/100\":\"#c5fcba\",\"neutral/white\":\"#ffffff\",\"24/SemiBold\":\"Font(family: \\\"Metric\\\", style: SemiBold, size: 24, weight: 600, lineHeight: 24, letterSpacing: 0)\",\"20/SemiBold\":\"Font(family: \\\"Metric\\\", style: SemiBold, size: 20, weight: 600, lineHeight: 20, letterSpacing: 0)\",\"blue/300\":\"#9747ff\"}"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "nodeId": "2026:2630",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"neutral/white\":\"#ffffff\",\"green/400\":\"#26de00\",\"72/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 72, weight: 700, lineHeight: 72, letterSpacing: 0)\",\"28/SemiBold\":\"Font(family: \\\"Metric\\\", style: SemiBold, size: 28, weight: 600, lineHeight: 28, letterSpacing: 0)\",\"purple/100\":\"#f1bafc\",\"purple/500\":\"#78028a\",\"purple/700\":\"#671e75\",\"56/Black\":\"Font(family: \\\"Metric\\\", style: Black, size: 56, weight: 900, lineHeight: 56, letterSpacing: 0)\",\"24/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 24, weight: 700, lineHeight: 24, letterSpacing: 0)\",\"Radius-Round\":\"999\",\"SPACING/S\":\"8\",\"Radius-XXS\":\"8\",\"Radius-XS\":\"12\",\"green/100\":\"#c5fcba\",\"28/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 28, weight: 700, lineHeight: 28, letterSpacing: 0)\",\"SPACING/M\":\"12\",\"96/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 96, weight: 700, lineHeight: 96, letterSpacing: 0)\",\"SPACING/XS\":\"4\",\"SPACING/XL\":\"24\",\"SPACING/L\":\"16\",\"purple/50\":\"#f8dcfd\",\"green/50\":\"#e2fddc\",\"purple/800\":\"#50015c\",\"56/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 56, weight: 700, lineHeight: 56, letterSpacing: 0)\",\"120/Black\":\"Font(family: \\\"Metric\\\", style: Black, size: 120, weight: 900, lineHeight: 120, letterSpacing: 0)\",\"28/Regular\":\"Font(family: \\\"Metric\\\", style: Regular, size: 28, weight: 400, lineHeight: 28, letterSpacing: 0)\",\"green/300\":\"#46dc28\",\"neutral/600\":\"#747474\",\"SPACING/L 2\":\"20\",\"SPACING/XXL 2\":\"40\"}"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "nodeId": "2026:2649",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"neutral/white\":\"#ffffff\",\"green/400\":\"#26de00\",\"72/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 72, weight: 700, lineHeight: 72, letterSpacing: 0)\",\"28/SemiBold\":\"Font(family: \\\"Metric\\\", style: SemiBold, size: 28, weight: 600, lineHeight: 28, letterSpacing: 0)\",\"purple/100\":\"#f1bafc\",\"purple/500\":\"#78028a\",\"purple/700\":\"#671e75\",\"56/Black\":\"Font(family: \\\"Metric\\\", style: Black, size: 56, weight: 900, lineHeight: 56, letterSpacing: 0)\",\"24/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 24, weight: 700, lineHeight: 24, letterSpacing: 0)\",\"Radius-Round\":\"999\",\"SPACING/S\":\"8\",\"neutral/600\":\"#747474\",\"28/Regular\":\"Font(family: \\\"Metric\\\", style: Regular, size: 28, weight: 400, lineHeight: 28, letterSpacing: 0)\",\"SPACING/L 2\":\"20\",\"Radius-XXS\":\"8\",\"Radius-XS\":\"12\",\"green/100\":\"#c5fcba\",\"28/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 28, weight: 700, lineHeight: 28, letterSpacing: 0)\",\"SPACING/M\":\"12\",\"96/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 96, weight: 700, lineHeight: 96, letterSpacing: 0)\",\"SPACING/XS\":\"4\",\"SPACING/XL\":\"24\",\"SPACING/L\":\"16\",\"purple/50\":\"#f8dcfd\",\"green/50\":\"#e2fddc\",\"purple/800\":\"#50015c\",\"56/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 56, weight: 700, lineHeight: 56, letterSpacing: 0)\",\"120/Black\":\"Font(family: \\\"Metric\\\", style: Black, size: 120, weight: 900, lineHeight: 120, letterSpacing: 0)\",\"green/300\":\"#46dc28\",\"SPACING/XXL 2\":\"40\"}"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "nodeId": "2026:2611",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"neutral/white\":\"#ffffff\",\"green/400\":\"#26de00\",\"96/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 96, weight: 700, lineHeight: 96, letterSpacing: 0)\",\"28/SemiBold\":\"Font(family: \\\"Metric\\\", style: SemiBold, size: 28, weight: 600, lineHeight: 28, letterSpacing: 0)\",\"purple/100\":\"#f1bafc\",\"purple/500\":\"#78028a\",\"purple/700\":\"#671e75\",\"56/Black\":\"Font(family: \\\"Metric\\\", style: Black, size: 56, weight: 900, lineHeight: 56, letterSpacing: 0)\",\"24/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 24, weight: 700, lineHeight: 24, letterSpacing: 0)\",\"Radius-Round\":\"999\",\"SPACING/S\":\"8\",\"Radius-XXS\":\"8\",\"Radius-XS\":\"12\",\"green/100\":\"#c5fcba\",\"28/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 28, weight: 700, lineHeight: 28, letterSpacing: 0)\",\"SPACING/M\":\"12\",\"SPACING/XS\":\"4\",\"SPACING/XL\":\"24\",\"SPACING/L\":\"16\",\"purple/50\":\"#f8dcfd\",\"green/50\":\"#e2fddc\",\"purple/800\":\"#50015c\",\"56/Bold\":\"Font(family: \\\"Metric\\\", style: Bold, size: 56, weight: 700, lineHeight: 56, letterSpacing: 0)\",\"120/Black\":\"Font(family: \\\"Metric\\\", style: Black, size: 120, weight: 900, lineHeight: 120, letterSpacing: 0)\",\"28/Regular\":\"Font(family: \\\"Metric\\\", style: Regular, size: 28, weight: 400, lineHeight: 28, letterSpacing: 0)\",\"green/300\":\"#46dc28\",\"neutral/600\":\"#747474\",\"SPACING/L 2\":\"20\",\"SPACING/XXL 2\":\"40\"}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  ]
+}
