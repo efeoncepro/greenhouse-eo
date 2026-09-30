@@ -1,5 +1,17 @@
 # TASK-1937 — Biblioteca de autorizaciones de uso de marcas, testimonios y fotos de terceros
 
+## Delta 2026-09-30 — primeros casos de clientes: Banco BICE, BICECORP y Berel (deck SEO/AEO, TASK-1949)
+
+- El deck SEO/AEO aprobado por el operador el 2026-09-30 lleva tres casos (`decision-case`) con el logo del cliente:
+  **BICECORP** (`logos/bicecorp.svg`, trazado con potrace desde la imagen de bicecorp.com), **Banco BICE**
+  (`logos/banco-bice.svg` y `banco-bice-blanco.svg`, SVG oficial de banco.bice.cl, sólo recoloreado; además compuesto
+  dentro del plate CS1b) y **Berel** (`src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg`).
+  Procedencia en `ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/PROCEDENCIA.txt`.
+- Son los **primeros casos pendientes** de esta biblioteca para logos de clientes: su uso está condicionado a la
+  autorización de cada cliente, y las cifras de los tres casos son de ejemplo hasta que el operador pase las reales con
+  fuente, período, servicio y permiso. Ningún deck con esas láminas sale a un cliente sin las dos cosas. Grupo Security
+  se fusionó con BICECORP (sep-2025, marca BICE): si los casos vienen de esa época, el pie debe decirlo.
+
 ## Delta 2026-09-29 (d) — Salesforce autorizó sus marcas (declarado por el operador)
 
 - El operador declaró la insignia «Salesforce Partner» autorizada por Salesforce («Todo está aprobado. Necesito que

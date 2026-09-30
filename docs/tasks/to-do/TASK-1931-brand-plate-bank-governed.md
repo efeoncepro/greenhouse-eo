@@ -1,5 +1,30 @@
 # TASK-1931 — Banco de plates gobernado para las recetas del deck «La órbita»
 
+## Delta 2026-09-30 — TASK-1949 suma seis plates aprobados y seis rechazados (deck SEO/AEO)
+
+- **Aprobados para el banco** (ruta local en `ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/`, declarados
+  por `plateRef` en los planes golden `golden-{completo,brochure,proposal}-seo.json`; fichas en `fichas/`, prompts en
+  `prompts/`, post-proceso según `CANON-INVENTARIO.md`):
+  - **SX4** `SX4-busqueda-y-respuesta.png` (1:1) — `section-split`, registro cine (`pnpm foto:generar
+    fichas/SX4-busqueda-y-respuesta.json --quality high`; sin marcas ni texto).
+  - **DV1** `DV1-lo-hacemos.png` (16:9, 1792×1024) — `proposal-cinematic-web`, registro cine (softshell del kit, línea
+    engine; `DV1-emblema-al-100.png`: nave, órbita, esfera y tres ventanas).
+  - **CS1b** `CS1b-bice-tarjeta.png` (1:1) — `decision-case` Banco BICE, puesta en escena (`pnpm ai:image
+    --prompt-file fichas/CS1b-bice-tarjeta.prompt.txt` → tarjeta en blanco `-plate.png` + logo oficial Banco BICE
+    blanco compuesto con sharp: rotado 4,22°, opacidad 0,93, en 520,372, ancho 236).
+  - **CS2** `CS2-banco-bice.png` (1:1) — `decision-case` BICECORP, puesta en escena (`pnpm foto:generar
+    fichas/CS2-banco-bice.json`; sin marcas).
+  - **CS3b** `CS3b-berel-squad.png` (1:1) — `decision-case` Berel, puesta en escena (`pnpm ai:image --image <softshell
+    del kit> --prompt-file fichas/CS3b-berel-squad.prompt.txt`; `CS3b-emblema-al-100.png` OK).
+  - **MK2** `MK2-mercados.png` (1536×1024) — `content-markets`, sin personas, no es registro cine (`pnpm ai:image
+    --prompt-file fichas/MK2-mercados.prompt.txt`; cinco nodos medidos: Miami 1112,215 · CDMX 958,283 · Bogotá
+    1132,405 · Lima 1098,567 · Santiago 1181,773).
+- **Rechazados — nunca se registran:** `SX1-seo-o-aeo` y `SX1c-seo-o-aeo-cine` (reemplazados por SX4), `SX3-a-otra-marca`
+  (rechazado: «ataca al cliente»), `CS1-bicecorp` (reemplazado), `CS3-berel` (reemplazado) y `MK1-mercados` (sexto
+  nodo en Brasil).
+- Las fotos de los casos son imágenes de ambiente asociadas al cliente (decisión 14 del deck); el logo del cliente se
+  compone desde el archivo oficial y su uso depende de la autorización del cliente (TASK-1937).
+
 ## Delta 2026-09-29 — TASK-1942 suma tres plates por ruta local y un plate rechazado
 
 - El deck de práctica Salesforce usa **`NXSF1`** (propuesta cine), **`NXSF2`** (portada) y **`NXSF3`** bordada
