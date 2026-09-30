@@ -17,7 +17,6 @@ import { isNative, readJson, readLock, report, ROOT, trackedFiles } from './lib.
 
 // Sólo se omiten tests que viven en una carpeta test/ y se llaman *.test.* (citan hosts para probar rechazos).
 const isTest = rel => /(^|\/)test\/(.+\/)?[^/]+\.test\.[cm]?[jt]sx?$/.test(rel)
-const stem = p => (p.endsWith('/**') ? p.slice(0, -2) : p)
 const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 function checkSettings(policy, problems) {
@@ -65,15 +64,43 @@ function checkSettings(policy, problems) {
 
 function checkProviders(policy, lock, problems) {
   const managed = lock?.files ?? {}
-  const allowedStems = policy.allowedIn.map(stem)
 
   const sdkImport = new RegExp(
     `(?:from\\s*|require\\(\\s*|import\\(\\s*)['"](${policy.sdkPackages.map(escape).join('|')})(?:/[^'"]*)?['"]`
   )
 
-  const brokerImport = new RegExp(
-    `(?:from\\s*|require\\(\\s*|import\\(\\s*)['"][^'"]*(${allowedStems.map(escape).join('|')})`
-  )
+  const importSpec = /(?:from\s*|require\(\s*|import\(\s*)['"](\.{1,2}\/[^'"]+)['"]/g
+
+  // Un módulo del broker "habla con el proveedor" si contiene un host o un SDK, o importa uno que lo
+  // haga. Importar sus validadores compartidos está bien; importar el adaptador del proveedor, no.
+  const tainted = new Map()
+
+  const talksToProvider = abs => {
+    if (tainted.has(abs)) return tainted.get(abs)
+    tainted.set(abs, false)
+    if (!existsSync(abs)) return false
+
+    const text = readFileSync(abs, 'utf8')
+
+    const hit =
+      policy.hosts.some(h => text.includes(h)) ||
+      sdkImport.test(text) ||
+      [...text.matchAll(importSpec)].some(m => talksToProvider(path.resolve(path.dirname(abs), m[1])))
+
+    tainted.set(abs, hit)
+
+    return hit
+  }
+
+  const reachesProvider = (rel, text) =>
+    [...text.matchAll(importSpec)]
+      .map(m =>
+        path
+          .relative(ROOT, path.resolve(path.dirname(path.join(ROOT, rel)), m[1]))
+          .split(path.sep)
+          .join('/')
+      )
+      .find(target => isNative(target, policy.allowedIn) && talksToProvider(path.join(ROOT, target)))
 
   for (const rel of trackedFiles()) {
     if (rel in managed || isTest(rel) || isNative(rel, policy.allowedIn) || isNative(rel, policy.skipIn)) continue
@@ -93,9 +120,9 @@ function checkProviders(policy, lock, problems) {
 
     if (sdk) problems.push(`${rel}: importa el SDK ${sdk[1]}. Los SDK de IA sólo viven en ${where}`)
 
-    const reach = text.match(brokerImport)
+    const reach = reachesProvider(rel, text)
 
-    if (reach) problems.push(`${rel}: importa código de ${reach[1]}; el broker se usa por HTTP, no importándolo`)
+    if (reach) problems.push(`${rel}: importa ${reach}, que llama al proveedor; el broker se usa por HTTP`)
 
     if (path.basename(rel) === 'package.json') {
       let pkg = {}

@@ -401,6 +401,8 @@ describe('creative-workbench — gate native-policy', () => {
 
   it('admite el broker y los tests en test/, y rechaza hosts, SDKs e imports del broker fuera de él', () => {
     write('services/production-broker/openai.mjs', "import OpenAI from 'openai'\nfetch('https://api.openai.com/v1')")
+    write('services/production-broker/request.mjs', 'export const validate = x => x')
+    write('tools/client.mjs', "import { validate } from '../services/production-broker/request.mjs'")
     write('test/broker.test.mjs', "assert(url !== 'https://api.openai.com')")
     expect(gate().ok).toBe(true)
 
@@ -414,7 +416,9 @@ describe('creative-workbench — gate native-policy', () => {
     expect(result.ok).toBe(false)
     expect(result.out).toContain('tools/provider-doctor.ts: contiene api.openai.com')
     expect(result.out).toContain('tools/gen.mjs: importa el SDK @google/genai')
-    expect(result.out).toContain('tools/via-broker.mjs: importa código de services/production-broker')
+    expect(result.out).toContain(
+      'tools/via-broker.mjs: importa services/production-broker/openai.mjs, que llama al proveedor'
+    )
     expect(result.out).toContain('tools/tests/sneaky.test.mjs: contiene api.anthropic.com')
     expect(result.out).toContain('package.json: declara openai')
     remove('tools')
