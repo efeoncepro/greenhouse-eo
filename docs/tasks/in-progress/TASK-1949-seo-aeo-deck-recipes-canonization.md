@@ -1,5 +1,21 @@
 # TASK-1949 — Canonizar el deck SEO/AEO (Search Visibility 360) de «La órbita»: 6 recetas nuevas, slots opcionales de submarca/equipo, usos aprobados, Composer y AXIS
 
+## Delta 2026-09-30 (f) — la portada de la línea Engine lleva el polo del kit bordado (WB1c)
+
+- Operador, al enviar el deck a un cliente: «la portada está muy mal armado el logo y ahí ni siquiera tiene que estar
+  pintado sino BORDADO en el pecho»; «tenemos el polo piqué que tiene la referencia en distintos ángulos»; «busca la
+  receta de ese prompt». `WB1b` llevaba el isotipo plano compuesto al costado; `WB1c` edita `WB1` con su ficha y las
+  vistas del kit del polo, y sube el emblema bordado al pecho con una edición con máscara (receta en
+  `ai-generations/2026-09-26_deck-web/fichas/WB1c/LEEME.md`).
+- Greenhouse `e9ebd2cea`: todo el canon apunta a `WB1c` (ejemplos, catálogo, goldens, snapshot, deck-studio, registro
+  cine con delta, composición por superficie, render-src del deck SEO/AEO). Portadas del Completo y el Brochure
+  recompuestas (texto idéntico), PDFs y canvas (versión 36) actualizados; comentario del canvas respondido y resuelto.
+- AXIS `f82b232` (push a main, sin release de paquetes): referencias del Lab `cover-brochure-line-engine` y
+  `proposal-cinematic-web` recompuestas con `WB1c`; `deck-recipes.json` y el ejemplo del brochure de servicios con la
+  ruta nueva.
+- Pendiente de revisión (no se tocó): los demás plates con isotipo compuesto (`CR2b`, `RV1b` con personas del equipo;
+  `NX5b`, `NX6b`, `AE2b`, `BR1b`, `BR2b`).
+
 ## Delta 2026-09-30 (e) — logos de clientes en paquetes, TODO AXIS retirados y brochure HubSpot descartado
 
 - Operador: «Los logos súbelos, te autorizo pero solo a packages». AXIS `afb7f26` (tag `v0.4.8`, release verde):
