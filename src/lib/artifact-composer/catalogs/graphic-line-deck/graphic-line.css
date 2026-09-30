@@ -8941,3 +8941,1249 @@ body {
 }
 
 /* ── ancla TASK-1942 · content-day-live-approval (prefijo .gl-cla) ── */
+
+/* ══ productMark: el lockup de submarca (TASK-1949, deck SEO/AEO) ═══════════════════════════════════════════════════
+ *
+ * Slot OPCIONAL de las recetas que el deck SEO/AEO usa con el logo de su submarca (SV360, AEO, AEO Assessment, AI Visibility
+ * Report, Insights): el archivo oficial de @efeoncepro/axis-brand-assets a su alto, sin recolorear. El lugar y el alto
+ * llegan del builder (`src/lib/brand-surfaces/recipes/product-mark.ts`); sin el slot el nodo se vacía y no pinta nada.
+ */
+
+.gl-product-mark {
+  position: absolute;
+  left: var(--gl-pmk-left);
+  top: var(--gl-pmk-top);
+  z-index: 9;
+}
+
+.gl-product-mark img {
+  display: block;
+  width: auto;
+  height: var(--gl-pmk-height);
+}
+
+/* ── ancla TASK-1949 · productMark ── */
+
+/* ══ section-cine · team: la bajada opcional del equipo (TASK-1949, deck SEO/AEO) ═══════════════════════════════════
+ *
+ * Al pie de la columna, bajo la respuesta: 22 px, Poppins 300, interlineado 1,4, ancho 540, arriba en 900 y la negrita
+ * a 600 en blanco, como en la lámina aprobada del 2026-09-30. TODO AXIS TASK-1949: estos valores pasan a la reserva
+ * `body` y a `type.body` de `section-cine.layouts.team` cuando AXIS abra la bajada; entonces llegan del builder.
+ */
+
+.gl-sec-cine .gl-sec-body {
+  top: 900px;
+  width: 540px;
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+.gl-sec-cine .gl-sec-body strong {
+  color: var(--gl-ink-dark);
+}
+
+/* ── ancla TASK-1949 · section-cine team body ── */
+
+/* ══ Deck SEO/AEO · las seis láminas nativas de Search Visibility 360 (TASK-1949, prefijo .gl-sv) ══════════════════
+ *
+ * La familia de marcas, los servicios con maquetas, el informe vivo, el PPT del comité, las industrias y los mercados,
+ * aprobados por el operador el 2026-09-30 en el estilo «vivo» del deck: fondo de producto, plataforma de luz, fichas de
+ * vidrio en perspectiva con UNA sola sombra profunda en la protagonista y haces de luz. La voz (`.gl-live-voice`) y la
+ * burbuja URL son las de la familia `.gl-ls`; las capas del escenario, la plataforma, los haces y las columnas de luz
+ * llegan del builder (`src/lib/brand-surfaces/recipes/sv360/`). Los colores llegan como `--gl-sv-*-color` desde la paleta
+ * del builder; nunca un HEX aquí.
+ *
+ * TODO AXIS TASK-1949: la geometría fina de cada maqueta (px, radios, sombras, giros y perspectivas) se midió en las
+ * láminas aprobadas (`ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/native/`) y vive en este bloque
+ * hasta que AXIS la publique en `efeonceGraphicLine.surfaces.deck.recipes.<receta>`; entonces el builder la entrega como
+ * custom properties, como en las recetas de TASK-1942.
+ */
+
+.gl-sv {
+  background: var(--gl-sv-bg-color);
+}
+
+.gl-sv p {
+  margin: 0;
+}
+
+/* ── content-brand-family (prefijo .gl-sbf) ── */
+
+.gl-sbf .gl-live-body {
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--gl-sv-soft-color);
+}
+
+.gl-sbf .gl-live-body strong {
+  font-weight: 700;
+}
+
+.gl-sbf .gl-sbf-family {
+  position: absolute;
+  left: 900px;
+  top: 190px;
+  z-index: 3;
+  width: 880px;
+}
+
+.gl-sbf .gl-sbf-kicker,
+.gl-sbf .gl-sbf-role {
+  font: 500 18px var(--gl-text-family);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gl-sv-soft-color);
+}
+
+.gl-sbf .gl-sbf-lockup {
+  display: block;
+  width: 760px;
+  height: auto;
+  margin-top: 22px;
+}
+
+.gl-sbf .gl-sbf-pieces {
+  position: absolute;
+  left: 900px;
+  top: 334px;
+  z-index: 3;
+  width: 880px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-sbf .gl-sbf-piece {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 26px 0;
+  border-top: 1px solid color-mix(in srgb, var(--gl-sv-halo-color) 16%, transparent);
+}
+
+.gl-sbf .gl-sbf-piece:last-child {
+  border-bottom: 1px solid color-mix(in srgb, var(--gl-sv-halo-color) 16%, transparent);
+}
+
+.gl-sbf .gl-sbf-piece-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.gl-sbf .gl-sbf-mark {
+  display: block;
+  width: auto;
+  height: 39px;
+}
+
+.gl-sbf .gl-sbf-description {
+  font: 400 22px / 1.35 var(--gl-text-family);
+  color: var(--gl-sv-soft-color);
+}
+
+/* ── content-service-mockups (prefijo .gl-ssm) ── */
+
+.gl-ssm .gl-ssm-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  perspective: 1900px;
+  perspective-origin: 1270px 440px;
+}
+
+.gl-ssm .gl-ssm-card {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 26px 28px 28px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, var(--gl-sv-card-from-color) 0%, var(--gl-sv-card-to-color) 100%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gl-ink-dark) 18%, transparent),
+    0 22px 44px color-mix(in srgb, var(--gl-sv-shadow-color) 60%, transparent);
+}
+
+.gl-ssm .gl-ssm-technical {
+  left: 690px;
+  top: 214px;
+  width: 340px;
+  transform: rotateY(20deg);
+  transform-origin: 100% 50%;
+}
+
+.gl-ssm .gl-ssm-links {
+  left: 1470px;
+  top: 214px;
+  width: 330px;
+  transform: rotateY(-20deg);
+  transform-origin: 0% 50%;
+}
+
+/* La protagonista: el cluster de contenido, de frente, con el filo en el halo y la única sombra profunda. */
+.gl-ssm .gl-ssm-hero {
+  left: 1040px;
+  top: 112px;
+  width: 440px;
+  padding: 30px 32px 32px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, var(--gl-sv-hero-from-color) 0%, var(--gl-sv-card-to-color) 100%);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--gl-sv-halo-color) 85%, transparent),
+    0 50px 110px color-mix(in srgb, var(--gl-sv-shadow-color) 75%, transparent),
+    0 0 120px color-mix(in srgb, var(--gl-sv-halo-color) 42%, transparent);
+}
+
+.gl-ssm .gl-ssm-kicker {
+  font: 600 15px var(--gl-text-family);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gl-sv-halo-color);
+}
+
+.gl-ssm .gl-ssm-hero .gl-ssm-kicker {
+  font-size: 16px;
+}
+
+.gl-ssm .gl-ssm-score {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.gl-ssm .gl-ssm-ring {
+  position: relative;
+  flex: none;
+  width: 120px;
+  height: 120px;
+}
+
+.gl-ssm .gl-ssm-ring svg {
+  display: block;
+  width: 120px;
+  height: 120px;
+}
+
+.gl-ssm .gl-ssm-ring-track,
+.gl-ssm .gl-ssm-ring-value {
+  fill: none;
+  stroke-width: 12px;
+}
+
+.gl-ssm .gl-ssm-ring-track {
+  stroke: color-mix(in srgb, var(--gl-ink-dark) 12%, transparent);
+}
+
+.gl-ssm .gl-ssm-ring-value {
+  stroke: var(--gl-sv-halo-color);
+  stroke-linecap: round;
+  stroke-dasharray: var(--gl-ssm-score-dash) 314.2;
+}
+
+.gl-ssm .gl-ssm-ring-number {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: 42px;
+  line-height: 1;
+  color: var(--gl-ink-dark);
+}
+
+.gl-ssm .gl-ssm-score-label {
+  font: 400 17px / 1.3 var(--gl-text-family);
+  color: var(--gl-sv-soft-color);
+}
+
+.gl-ssm .gl-ssm-score-label strong {
+  font-weight: 600;
+  color: var(--gl-sv-halo-color);
+}
+
+.gl-ssm .gl-ssm-checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-ssm .gl-ssm-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 500 19px var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+.gl-ssm .gl-ssm-tick {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--gl-sv-teal-color);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gl-ink-dark);
+}
+
+.gl-ssm .gl-ssm-note {
+  margin-top: 16px;
+  font: 400 17px / 1.35 var(--gl-text-family);
+  color: var(--gl-sv-muted-color);
+}
+
+.gl-ssm .gl-ssm-note-rule {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--gl-ink-dark) 14%, transparent);
+}
+
+.gl-ssm .gl-ssm-note-hero {
+  margin-top: 18px;
+  font-size: 19px;
+  color: var(--gl-text-dark);
+}
+
+.gl-ssm .gl-ssm-note-hero strong {
+  font-weight: 600;
+  color: var(--gl-ink-dark);
+}
+
+.gl-ssm .gl-ssm-figure {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.gl-ssm .gl-ssm-figure-value {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: 84px;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--gl-ink-dark);
+}
+
+.gl-ssm .gl-ssm-figure-label {
+  padding-bottom: 6px;
+  font: 400 17px / 1.25 var(--gl-text-family);
+  color: var(--gl-sv-soft-color);
+}
+
+.gl-ssm .gl-ssm-spark {
+  display: block;
+  width: 274px;
+  height: 64px;
+  margin-top: 12px;
+  overflow: visible;
+}
+
+.gl-ssm .gl-ssm-spark-area {
+  fill: url(#gl-ssm-spark-fade);
+}
+
+.gl-ssm .gl-ssm-spark-line {
+  fill: none;
+  stroke: var(--gl-sv-halo-color);
+  stroke-width: 4px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gl-ssm .gl-ssm-spark-dot {
+  fill: var(--gl-ink-dark);
+}
+
+.gl-ssm .gl-ssm-sources {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-ssm .gl-ssm-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--gl-ink-dark) 7%, transparent);
+  font: 500 17px var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+.gl-ssm .gl-ssm-arrow {
+  color: var(--gl-sv-halo-color);
+}
+
+.gl-ssm .gl-ssm-cluster {
+  position: relative;
+  width: 376px;
+  height: 286px;
+  margin-top: 16px;
+}
+
+.gl-ssm .gl-ssm-cluster svg {
+  position: absolute;
+  inset: 0;
+  width: 376px;
+  height: 286px;
+}
+
+.gl-ssm .gl-ssm-cluster-links line {
+  stroke: color-mix(in srgb, var(--gl-sv-halo-color) 55%, transparent);
+  stroke-width: 2.5px;
+}
+
+.gl-ssm .gl-ssm-pillar-disc {
+  fill: var(--gl-accent);
+  stroke: var(--gl-sv-halo-color);
+  stroke-width: 3px;
+}
+
+.gl-ssm .gl-ssm-pillar {
+  position: absolute;
+  left: 124px;
+  top: 79px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 128px;
+  height: 128px;
+  text-align: center;
+}
+
+.gl-ssm .gl-ssm-pillar-kicker {
+  font: 500 14px var(--gl-text-family);
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--gl-sv-soft-color);
+}
+
+.gl-ssm .gl-ssm-pillar-name {
+  margin-top: 2px;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: 26px;
+  line-height: 1.05;
+  color: var(--gl-ink-dark);
+}
+
+/* Los seis nodos del cluster, sobre la maqueta de la protagonista: esquinas en 120 px, el par del medio en 92 px. */
+.gl-ssm .gl-ssm-nodes {
+  position: absolute;
+  left: 1072px;
+  top: 182px;
+  z-index: 1;
+  width: 376px;
+  height: 286px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-ssm .gl-ssm-node {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 120px;
+  height: 36px;
+  border-radius: 18px;
+  background: var(--gl-sv-chip-color);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gl-ink-dark) 22%, transparent);
+  font: 500 16px var(--gl-text-family);
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-ssm .gl-ssm-node:nth-child(1) {
+  left: 8px;
+  top: 22px;
+}
+
+.gl-ssm .gl-ssm-node:nth-child(2) {
+  left: 248px;
+  top: 22px;
+}
+
+.gl-ssm .gl-ssm-node:nth-child(3) {
+  left: 0;
+  top: 142px;
+  width: 92px;
+}
+
+.gl-ssm .gl-ssm-node:nth-child(4) {
+  left: 284px;
+  top: 142px;
+  width: 92px;
+}
+
+.gl-ssm .gl-ssm-node:nth-child(5) {
+  left: 44px;
+  top: 234px;
+}
+
+.gl-ssm .gl-ssm-node:nth-child(6) {
+  left: 212px;
+  top: 234px;
+}
+
+.gl-ssm .gl-ssm-chips,
+.gl-scd .gl-scd-features {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-ssm .gl-ssm-chips {
+  left: 700px;
+  top: 740px;
+  width: 1100px;
+  column-gap: 20px;
+}
+
+.gl-ssm .gl-ssm-chip,
+.gl-scd .gl-scd-feature {
+  padding: 16px 18px 18px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, var(--gl-sv-mini-from-color) 0%, var(--gl-sv-card-to-color) 100%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gl-ink-dark) 16%, transparent),
+    0 18px 36px color-mix(in srgb, var(--gl-sv-shadow-color) 55%, transparent);
+}
+
+.gl-ssm .gl-ssm-chip-title,
+.gl-scd .gl-scd-feature-title {
+  font: 600 22px var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+.gl-ssm .gl-ssm-chip-detail,
+.gl-scd .gl-scd-feature-detail {
+  margin-top: 4px;
+  font: 400 16px / 1.35 var(--gl-text-family);
+  color: var(--gl-sv-muted-color);
+}
+
+/* ── content-report-formats (prefijo .gl-srf) ── */
+
+.gl-srf .gl-srf-beams {
+  z-index: 1;
+}
+
+.gl-srf .gl-srf-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  perspective: 2200px;
+  perspective-origin: 1310px 380px;
+}
+
+/* El informe vivo en interfaz blanca: la protagonista, con el filo en el halo y la única sombra profunda. */
+.gl-srf .gl-srf-report {
+  position: absolute;
+  left: 860px;
+  top: 116px;
+  box-sizing: border-box;
+  width: 900px;
+  padding: 26px 30px;
+  border-radius: 26px;
+  background: linear-gradient(180deg, var(--gl-ink-dark) 0%, var(--gl-sv-doc-to-color) 100%);
+  color: var(--gl-sv-doc-ink-color);
+  transform: rotateX(6deg);
+  transform-origin: 50% 100%;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--gl-sv-halo-color) 85%, transparent),
+    0 50px 110px color-mix(in srgb, var(--gl-sv-shadow-color) 75%, transparent),
+    0 0 120px color-mix(in srgb, var(--gl-sv-halo-color) 40%, transparent);
+}
+
+.gl-srf .gl-srf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gl-srf .gl-srf-label {
+  font: 600 16px var(--gl-text-family);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gl-sv-teal-dark-color);
+}
+
+.gl-srf .gl-srf-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--gl-sv-teal-dark-color) 12%, transparent);
+  font: 600 15px var(--gl-text-family);
+  color: var(--gl-sv-teal-dark-color);
+}
+
+.gl-srf .gl-srf-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gl-sv-teal-dark-color);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gl-sv-teal-dark-color) 60%, transparent);
+}
+
+.gl-srf .gl-srf-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-srf .gl-srf-kpi,
+.gl-srf .gl-srf-panel {
+  border-radius: 14px;
+  background: var(--gl-sv-doc-panel-color);
+}
+
+.gl-srf .gl-srf-kpi {
+  padding: 14px 18px;
+}
+
+.gl-srf .gl-srf-kpi-label,
+.gl-srf .gl-srf-panel-title {
+  font: 400 15px var(--gl-text-family);
+  color: var(--gl-sv-doc-muted-color);
+}
+
+.gl-srf .gl-srf-kpi-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.gl-srf .gl-srf-kpi-value {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: 52px;
+  letter-spacing: -0.03em;
+}
+
+.gl-srf .gl-srf-kpi-delta {
+  font: 600 18px var(--gl-text-family);
+  color: var(--gl-sv-teal-dark-color);
+}
+
+.gl-srf .gl-srf-row {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.gl-srf .gl-srf-trend {
+  padding: 14px 18px 10px;
+}
+
+.gl-srf .gl-srf-ranking {
+  padding: 14px 18px;
+}
+
+.gl-srf .gl-srf-chart {
+  display: block;
+  width: 440px;
+  height: 150px;
+  margin-top: 6px;
+  overflow: visible;
+}
+
+.gl-srf .gl-srf-grid line {
+  stroke: color-mix(in srgb, var(--gl-sv-doc-ink-color) 10%, transparent);
+  stroke-width: 1px;
+}
+
+.gl-srf .gl-srf-area {
+  fill: url(#gl-srf-area-fade);
+}
+
+.gl-srf .gl-srf-line {
+  fill: none;
+  stroke: var(--gl-accent);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.gl-srf .gl-srf-sector {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gl-sv-doc-dash-color) 80%, transparent);
+  stroke-width: 2.5px;
+  stroke-dasharray: 6 6;
+}
+
+.gl-srf .gl-srf-dot {
+  fill: var(--gl-accent);
+}
+
+.gl-srf .gl-srf-dot-ring {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gl-accent) 60%, transparent);
+  stroke-width: 2px;
+}
+
+.gl-srf .gl-srf-legend {
+  display: flex;
+  gap: 18px;
+  font: 400 13px var(--gl-text-family);
+  color: var(--gl-sv-doc-muted-color);
+}
+
+.gl-srf .gl-srf-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--gl-accent);
+  vertical-align: middle;
+}
+
+.gl-srf .gl-srf-swatch-dash {
+  height: 0;
+  border-top: 2px dashed var(--gl-sv-doc-dash-color);
+  border-radius: 0;
+  background: none;
+}
+
+.gl-srf .gl-srf-rows {
+  display: grid;
+  gap: 11px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font: 400 15px var(--gl-text-family);
+}
+
+.gl-srf .gl-srf-rank {
+  display: grid;
+  grid-template-columns: 96px 1fr 44px;
+  align-items: center;
+  gap: 10px;
+  color: var(--gl-sv-doc-muted-color);
+}
+
+.gl-srf .gl-srf-bar {
+  width: var(--gl-srf-bar);
+  height: 14px;
+  border-radius: 7px;
+  background: var(--gl-sv-doc-bar-color);
+}
+
+.gl-srf .gl-srf-share {
+  text-align: right;
+}
+
+.gl-srf .gl-srf-rank.gl-item-lead {
+  font-weight: 600;
+  color: var(--gl-sv-doc-ink-color);
+}
+
+.gl-srf .gl-srf-rank.gl-item-lead .gl-srf-bar {
+  background: linear-gradient(90deg, var(--gl-accent), color-mix(in srgb, var(--gl-accent), var(--gl-ink-dark) 25%));
+}
+
+.gl-srf .gl-srf-reading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--gl-sv-doc-note-color);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gl-accent) 28%, transparent);
+}
+
+/* El destello de la lectura: una forma, no un ícono (la estrella de cuatro puntas de la lámina aprobada). */
+.gl-srf .gl-srf-spark {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-top: 2px;
+  background: var(--gl-accent);
+  clip-path: polygon(50% 6.67%, 60% 40%, 93.33% 50%, 60% 60%, 50% 93.33%, 40% 60%, 6.67% 50%, 40% 40%);
+}
+
+/* En la aprobada el rótulo iba en el acento a 13 px: la regla accent-text-min-size (< 24 px) lo lleva al teal del informe. */
+.gl-srf .gl-srf-reading-kicker {
+  font: 600 13px var(--gl-text-family);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gl-sv-teal-dark-color);
+}
+
+.gl-srf .gl-srf-reading-text {
+  margin-top: 3px;
+  font: 400 18px / 1.35 var(--gl-text-family);
+  color: var(--gl-sv-doc-ink-color);
+}
+
+.gl-srf .gl-srf-formats {
+  position: absolute;
+  left: 862px;
+  top: 780px;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  width: 896px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-srf .gl-srf-format {
+  padding: 16px 14px;
+  border-radius: 16px;
+  text-align: center;
+  background: linear-gradient(160deg, var(--gl-sv-mini-from-color) 0%, var(--gl-sv-card-to-color) 100%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gl-ink-dark) 16%, transparent),
+    0 18px 36px color-mix(in srgb, var(--gl-sv-shadow-color) 55%, transparent);
+}
+
+.gl-srf .gl-srf-format.gl-item-lead {
+  background: linear-gradient(160deg, var(--gl-sv-mini-hero-from-color) 0%, var(--gl-sv-hero-card-to-color) 100%);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--gl-sv-halo-color) 80%, transparent),
+    0 18px 36px color-mix(in srgb, var(--gl-sv-shadow-color) 55%, transparent),
+    0 0 40px color-mix(in srgb, var(--gl-sv-halo-color) 30%, transparent);
+}
+
+.gl-srf .gl-srf-format-icon {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 7px;
+}
+
+.gl-srf .gl-srf-format-title {
+  margin-top: 6px;
+  font: 600 20px var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+.gl-srf .gl-srf-format-detail {
+  margin-top: 2px;
+  font: 400 14px / 1.3 var(--gl-text-family);
+  color: var(--gl-sv-muted-color);
+}
+
+.gl-srf .gl-srf-format.gl-item-lead .gl-srf-format-detail {
+  color: var(--gl-ink-dark);
+}
+
+/* ── content-committee-deck (prefijo .gl-scd) ── */
+
+.gl-scd .gl-scd-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  perspective: 2000px;
+  perspective-origin: 1270px 420px;
+}
+
+.gl-scd .gl-scd-back,
+.gl-scd .gl-scd-slide {
+  position: absolute;
+  box-sizing: border-box;
+  width: 840px;
+  height: 472px;
+  border-radius: 22px;
+  transform: rotateY(-12deg);
+}
+
+.gl-scd .gl-scd-back-far {
+  left: 910px;
+  top: 92px;
+  background: var(--gl-sv-slide-back-color);
+  opacity: 0.45;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gl-ink-dark) 16%, transparent);
+}
+
+.gl-scd .gl-scd-back-near {
+  left: 885px;
+  top: 116px;
+  background: var(--gl-sv-slide-mid-color);
+  opacity: 0.7;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gl-ink-dark) 18%, transparent);
+}
+
+.gl-scd .gl-scd-slide {
+  left: 860px;
+  top: 140px;
+  padding: 34px 40px 30px;
+  background: linear-gradient(160deg, var(--gl-sv-slide-from-color) 0%, var(--gl-sv-card-to-color) 100%);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--gl-sv-halo-color) 85%, transparent),
+    0 50px 110px color-mix(in srgb, var(--gl-sv-shadow-color) 75%, transparent),
+    0 0 120px color-mix(in srgb, var(--gl-sv-halo-color) 42%, transparent);
+}
+
+.gl-scd .gl-scd-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gl-scd .gl-scd-kicker {
+  font: 600 15px var(--gl-text-family);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gl-sv-halo-color);
+}
+
+.gl-scd .gl-scd-page {
+  font: 400 14px var(--gl-text-family);
+  color: var(--gl-sv-soft-color);
+}
+
+.gl-scd .gl-scd-headline {
+  width: 560px;
+  margin-top: 14px;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: 44px;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--gl-ink-dark);
+}
+
+.gl-scd .gl-scd-figure {
+  position: absolute;
+  right: 40px;
+  top: 84px;
+  text-align: right;
+}
+
+.gl-scd .gl-scd-figure-value {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: 88px;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--gl-sv-halo-color);
+}
+
+.gl-scd .gl-scd-figure-label {
+  margin-top: 4px;
+  font: 400 16px var(--gl-text-family);
+  color: var(--gl-sv-soft-color);
+}
+
+.gl-scd .gl-scd-chart {
+  position: absolute;
+  left: 40px;
+  bottom: 30px;
+  width: 760px;
+  height: 230px;
+}
+
+.gl-scd .gl-scd-chart svg {
+  display: block;
+  width: 760px;
+  height: 230px;
+  overflow: visible;
+}
+
+.gl-scd .gl-scd-grid line {
+  stroke: color-mix(in srgb, var(--gl-ink-dark) 8%, transparent);
+}
+
+.gl-scd .gl-scd-area {
+  fill: url(#gl-scd-area-fade);
+}
+
+.gl-scd .gl-scd-line {
+  fill: none;
+  stroke: var(--gl-sv-halo-color);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.gl-scd .gl-scd-mark-line {
+  stroke: color-mix(in srgb, var(--gl-ink-dark) 50%, transparent);
+  stroke-width: 2px;
+  stroke-dasharray: 4 5;
+}
+
+.gl-scd .gl-scd-dot {
+  fill: var(--gl-ink-dark);
+}
+
+.gl-scd .gl-scd-dot-ring {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gl-sv-halo-color) 60%, transparent);
+  stroke-width: 2px;
+}
+
+/* La píldora que anota la curva: centrada sobre el punto de la pieza (x 420 de la maqueta). */
+.gl-scd .gl-scd-annotation {
+  position: absolute;
+  left: 420px;
+  top: 4px;
+  box-sizing: border-box;
+  min-width: 176px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 16px;
+  background: var(--gl-accent);
+  transform: translateX(-50%);
+  font: 600 15px / 32px var(--gl-text-family);
+  text-align: center;
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-scd .gl-scd-control {
+  position: absolute;
+  left: 960px;
+  top: 650px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--gl-sv-card-to-color) 90%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gl-sv-halo-color) 50%, transparent),
+    0 14px 30px color-mix(in srgb, var(--gl-sv-shadow-color) 50%, transparent);
+}
+
+.gl-scd .gl-scd-arrow {
+  font: 400 20px var(--gl-text-family);
+  color: var(--gl-sv-soft-color);
+}
+
+.gl-scd .gl-scd-play {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gl-sv-halo-color);
+}
+
+.gl-scd .gl-scd-play-shape {
+  width: 16px;
+  height: 18px;
+  margin-left: 3px;
+  background: var(--gl-sv-bg-color);
+  clip-path: polygon(12.5% 5.56%, 93.75% 50%, 12.5% 94.44%);
+}
+
+.gl-scd .gl-scd-divider {
+  width: 1px;
+  height: 26px;
+  background: color-mix(in srgb, var(--gl-ink-dark) 20%, transparent);
+}
+
+.gl-scd .gl-scd-control-label {
+  font: 600 18px var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+.gl-scd .gl-scd-features {
+  left: 820px;
+  top: 740px;
+  width: 960px;
+  gap: 18px;
+}
+
+/* La pregunta en dos líneas con sangría colgante: la segunda arranca donde el texto, no bajo el anillo. */
+.gl-scd .gl-live-voice .gl-question {
+  box-sizing: border-box;
+  padding-left: 1.04em;
+  text-indent: -1.04em;
+}
+
+/* ── content-industries (prefijo .gl-sin) ── */
+
+.gl-sin .gl-sin-columns {
+  z-index: 2;
+}
+
+.gl-sin .gl-sin-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  perspective: 2200px;
+  perspective-origin: 1290px 440px;
+}
+
+.gl-sin .gl-sin-grid {
+  position: absolute;
+  left: 800px;
+  top: 240px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  width: 950px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform-style: preserve-3d;
+  transform: rotateY(-10deg) rotateX(5deg);
+  transform-origin: 0% 100%;
+}
+
+.gl-sin .gl-sin-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 256px;
+  padding: 22px 24px 20px;
+  border-radius: 22px;
+  background: linear-gradient(170deg, var(--gl-sv-card-from-color) 0%, var(--gl-sv-card-to-color) 100%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gl-ink-dark) 16%, transparent),
+    0 20px 40px color-mix(in srgb, var(--gl-sv-shadow-color) 55%, transparent);
+}
+
+/* La industria del cliente: adelante, con el filo en el halo y la única sombra profunda. */
+.gl-sin .gl-sin-card.gl-item-lead {
+  background: linear-gradient(170deg, var(--gl-sv-hero-card-from-color) 0%, var(--gl-sv-hero-card-to-color) 100%);
+  transform: translateZ(90px) translateY(-18px);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--gl-sv-halo-color) 85%, transparent),
+    0 40px 90px color-mix(in srgb, var(--gl-sv-shadow-color) 70%, transparent),
+    0 0 90px color-mix(in srgb, var(--gl-sv-halo-color) 40%, transparent);
+}
+
+.gl-sin .gl-sin-number {
+  font: 600 15px var(--gl-text-family);
+  letter-spacing: 0.14em;
+  color: var(--gl-sv-halo-color);
+}
+
+.gl-sin .gl-sin-name {
+  margin-top: 8px;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: 36px;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--gl-ink-dark);
+}
+
+.gl-sin .gl-sin-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: auto;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--gl-ink-dark) 8%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gl-sv-soft-color) 18%, transparent);
+  font: 400 17px / 1.3 var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-sin .gl-sin-icon {
+  display: block;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
+}
+
+/* ── content-markets (prefijo .gl-smk) ── */
+
+.gl-smk {
+  background: var(--gl-sv-space-bg-color);
+}
+
+.gl-smk .gl-smk-markets {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-smk .gl-smk-label {
+  position: absolute;
+  top: var(--gl-smk-top);
+  padding: 8px 14px 9px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--gl-sv-label-bg-color) 72%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gl-sv-halo-color) 55%, transparent),
+    0 10px 24px color-mix(in srgb, var(--gl-sv-shadow-color) 50%, transparent);
+}
+
+.gl-smk .gl-smk-label.gl-side-start {
+  left: var(--gl-smk-x);
+  text-align: left;
+}
+
+.gl-smk .gl-smk-label.gl-side-end {
+  right: var(--gl-smk-x);
+  text-align: right;
+}
+
+.gl-smk .gl-smk-country {
+  font: 600 22px / 1.1 var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+.gl-smk .gl-smk-city {
+  margin-top: 2px;
+  font: 400 14px / 1.2 var(--gl-text-family);
+  color: var(--gl-sv-city-color);
+}
+
+/* Los degradés de las áreas bajo las curvas: la plantilla declara el <linearGradient> y el color sale de aquí. */
+.gl-ssm .gl-ssm-fade-top {
+  stop-color: var(--gl-sv-halo-color);
+  stop-opacity: 0.35;
+}
+
+.gl-scd .gl-scd-fade-top {
+  stop-color: var(--gl-sv-halo-color);
+  stop-opacity: 0.5;
+}
+
+.gl-srf .gl-srf-fade-top {
+  stop-color: var(--gl-accent);
+  stop-opacity: 0.28;
+}
+
+.gl-ssm .gl-ssm-fade-bottom,
+.gl-scd .gl-scd-fade-bottom {
+  stop-color: var(--gl-sv-halo-color);
+  stop-opacity: 0;
+}
+
+.gl-srf .gl-srf-fade-bottom {
+  stop-color: var(--gl-accent);
+  stop-opacity: 0;
+}
+
+/* ── ancla TASK-1949 · deck SEO/AEO, las seis láminas nativas (prefijo .gl-sv) ── */

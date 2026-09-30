@@ -80,6 +80,12 @@ const proposalCinematicService: RecipeBuilder = ({ intent, manifest, recipe }) =
 
   const voice = voiceSlots(manifest)
   const content = contentOf(manifest)
+
+  // El eyebrow es obligatorio salvo que el lockup de submarca ocupe su lugar (TASK-1949, `requiredUnless: productMark`).
+  if (!voice.eyebrow && (intent as { productMark?: unknown }).productMark === undefined) {
+    throw new SurfacePieceError('`proposal-cinematic` lleva eyebrow, o el lockup de submarca (`productMark`) en su lugar.', 'invalid-intent')
+  }
+
   const answerRange: [number, number] = [lower(type.answer?.px, 140), upper(type.answer?.px, 176)]
   const answerPx = answerPxWithinRange(voice.answer!, answerRange, textShare * width - margin)
 

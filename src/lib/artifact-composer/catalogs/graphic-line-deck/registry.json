@@ -78,7 +78,13 @@
     "deck.decision-diagnosis-verdict",
     "deck.method-waves",
     "deck.content-day-live-console",
-    "deck.content-day-live-approval"
+    "deck.content-day-live-approval",
+    "deck.content-brand-family",
+    "deck.content-service-mockups",
+    "deck.content-report-formats",
+    "deck.content-committee-deck",
+    "deck.content-industries",
+    "deck.content-markets"
   ],
   "templates": [
     {
@@ -883,6 +889,72 @@
       "contentTypes": ["deck.content-day-live-approval"],
       "prototype": "content-day-live-approval.html",
       "slotsRef": "content-day-live-approval.slots.json"
+    },
+    {
+      "name": "ContentBrandFamily",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-brand-family"],
+      "prototype": "content-brand-family.html",
+      "slotsRef": "content-brand-family.slots.json"
+    },
+    {
+      "name": "ContentServiceMockups",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-service-mockups"],
+      "prototype": "content-service-mockups.html",
+      "slotsRef": "content-service-mockups.slots.json"
+    },
+    {
+      "name": "ContentReportFormats",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-report-formats"],
+      "prototype": "content-report-formats.html",
+      "slotsRef": "content-report-formats.slots.json"
+    },
+    {
+      "name": "ContentCommitteeDeck",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-committee-deck"],
+      "prototype": "content-committee-deck.html",
+      "slotsRef": "content-committee-deck.slots.json"
+    },
+    {
+      "name": "ContentIndustries",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-industries"],
+      "prototype": "content-industries.html",
+      "slotsRef": "content-industries.slots.json"
+    },
+    {
+      "name": "ContentMarkets",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-markets"],
+      "prototype": "content-markets.html",
+      "slotsRef": "content-markets.slots.json"
     }
   ],
   "selector": {
@@ -961,7 +1033,13 @@
       "deck.decision-diagnosis-verdict": "DecisionDiagnosisVerdict",
       "deck.method-waves": "MethodWaves",
       "deck.content-day-live-console": "ContentDayLiveConsole",
-      "deck.content-day-live-approval": "ContentDayLiveApproval"
+      "deck.content-day-live-approval": "ContentDayLiveApproval",
+      "deck.content-brand-family": "ContentBrandFamily",
+      "deck.content-service-mockups": "ContentServiceMockups",
+      "deck.content-report-formats": "ContentReportFormats",
+      "deck.content-committee-deck": "ContentCommitteeDeck",
+      "deck.content-industries": "ContentIndustries",
+      "deck.content-markets": "ContentMarkets"
     }
   }
 }

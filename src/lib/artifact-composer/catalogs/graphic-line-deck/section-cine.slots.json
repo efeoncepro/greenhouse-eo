@@ -167,6 +167,17 @@
         }
       }
     },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "rich-string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 136,
+        "maxLines": 4,
+        "overflow": "reject"
+      },
+      "example": "Lo ejecutan <strong>expertos multidisciplinarios</strong>: copywriters, especialistas en SEO técnico, relacionistas públicos, diseñadores y creativos."
+    },
     "cta": {
       "selector": "[data-slot='cta']",
       "type": "object",

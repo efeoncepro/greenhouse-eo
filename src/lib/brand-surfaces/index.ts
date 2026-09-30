@@ -27,7 +27,9 @@ import { OVERLAY_BUILDERS } from './recipes/overlays'
 import { STILL_BUILDERS } from './recipes/stills'
 import { SEO_AEO_BUILDERS } from './recipes/seo-aeo'
 import { LINE_STAGE_BUILDERS } from './recipes/line-stage'
-import type { SurfaceIntent, SurfaceManifest } from './shared'
+import { SV360_BUILDERS } from './recipes/sv360'
+import { applyExistingProductMark } from './recipes/product-mark'
+import { contentOf, type SurfaceIntent, type SurfaceManifest } from './shared'
 import { SurfacePieceError, type GraphicLineCatalogName, type SurfacePiecePlan } from './types'
 
 export { SurfacePieceError } from './types'
@@ -56,7 +58,7 @@ const OUTSIDE_COMPOSER: Record<string, string> = {
 
 /** Builders por superficie. Una receta aprobada sin builder falla con `recipe-without-template`. */
 const BUILDERS: Record<string, Record<string, RecipeBuilder>> = {
-  deck: { ...DECK_BUILDERS, ...METHOD_BUILDERS, ...CLOSE_BUILDERS, ...PROOF_BUILDERS, ...SECTION_BUILDERS, ...CONTENT_BUILDERS, ...SEO_AEO_BUILDERS, ...LINE_STAGE_BUILDERS },
+  deck: { ...DECK_BUILDERS, ...METHOD_BUILDERS, ...CLOSE_BUILDERS, ...PROOF_BUILDERS, ...SECTION_BUILDERS, ...CONTENT_BUILDERS, ...SEO_AEO_BUILDERS, ...LINE_STAGE_BUILDERS, ...SV360_BUILDERS },
   web: STILL_BUILDERS.web ?? {},
   dooh: STILL_BUILDERS.dooh ?? {},
   motion: STILL_BUILDERS.motion ?? {},
@@ -128,7 +130,13 @@ export const planFromManifest = (intent: SurfaceIntent, manifest: SurfaceManifes
     )
   }
 
-  const built = builder({ intent, manifest, recipe })
+  // El lockup de submarca (`productMark`, TASK-1949) es opcional en las recetas existentes que lo admiten: sin él, la
+  // lámina es exactamente la de siempre.
+  const built = applyExistingProductMark(builder({ intent, manifest, recipe }), intent.recipe, (intent as { productMark?: unknown }).productMark, {
+    layout: manifest.layout ?? null,
+    eyebrow: Boolean(contentOf(manifest).eyebrow)
+  })
+
   const { slots, assets } = built
   const contentType = built.contentType ?? `${intent.surface}.${intent.recipe}`
 

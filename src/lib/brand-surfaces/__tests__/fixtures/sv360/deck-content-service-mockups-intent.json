@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "line": "engine",
+  "theme": "dark",
+  "recipe": "content-service-mockups",
+  "voice": {
+    "eyebrow": "SEO · qué incluye",
+    "question": "¿Y qué hace ese equipo?",
+    "answer": [
+      "Todo esto"
+    ]
+  },
+  "body": "Contenido, técnica y autoridad, hechos y **desplegados** por nuestro equipo en tu CMS. No te dejamos una lista de tareas.",
+  "productMark": {
+    "asset": "sv360-lockup-negative",
+    "alt": "Efeonce | SV360"
+  },
+  "technicalTitle": "SEO técnico",
+  "technicalScore": 98,
+  "technicalScoreLabel": "Core Web\nVitals\n**en verde**",
+  "technicalChecks": [
+    "Rastreo",
+    "Índice",
+    "Schema",
+    "Metas"
+  ],
+  "technicalCaption": "Que Google y la IA puedan leer, entender y confiar en tu sitio",
+  "contentTitle": "Contenido SEO",
+  "contentPillar": "Tu tema",
+  "contentNodes": [
+    "Qué es",
+    "Cómo elegir",
+    "Precios",
+    "Casos",
+    "Comparativa",
+    "Preguntas"
+  ],
+  "contentCaption": "Un cluster por tema: la guía y las respuestas a cada pregunta, **listas para que la IA las cite**",
+  "authorityTitle": "PR y link building",
+  "authorityMetric": {
+    "value": "+18",
+    "label": "dominios\nque te enlazan"
+  },
+  "authorityOutlets": [
+    "Medio de tu sector",
+    "Gremio o asociación",
+    "Prensa de negocios"
+  ],
+  "authorityCaption": "Enlaces reales, sin granjas ni PBN",
+  "chips": [
+    {
+      "title": "Landing pages",
+      "detail": "SEO on-page y copy que convierte"
+    },
+    {
+      "title": "Banners optimizados",
+      "detail": "Livianos y con ALT: no rompen tu velocidad"
+    },
+    {
+      "title": "Despliegue multi-CMS",
+      "detail": "WordPress, Webflow, Shopify o el que uses"
+    }
+  ]
+}

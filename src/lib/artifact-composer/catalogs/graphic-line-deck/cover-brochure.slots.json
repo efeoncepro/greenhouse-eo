@@ -422,6 +422,44 @@
           "example": "--gl-pm-logo-height=64px"
         }
       }
+    },
+    "productMark": {
+      "selector": "[data-slot='productMark']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 40,
+          "resolver": "gl-alt",
+          "example": "Efeonce | SV360"
+        },
+        "left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pmk-left=140px"
+        },
+        "top": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pmk-top=790px"
+        },
+        "height": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pmk-height=64px"
+        }
+      }
     }
   }
 }

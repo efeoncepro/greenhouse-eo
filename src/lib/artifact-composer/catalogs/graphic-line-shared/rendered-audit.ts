@@ -50,7 +50,14 @@ export const ANSWER_RATIO_CONTENT_TYPES: ReadonlySet<string> = new Set([
   'deck.decision-diagnosis-verdict',
   'deck.method-waves',
   'deck.content-day-live-console',
-  'deck.content-day-live-approval'
+  'deck.content-day-live-approval',
+  // TASK-1949: las seis láminas nativas del deck SEO/AEO (respuesta de 124 a 176 px sobre la pregunta de 40).
+  'deck.content-brand-family',
+  'deck.content-service-mockups',
+  'deck.content-report-formats',
+  'deck.content-committee-deck',
+  'deck.content-industries',
+  'deck.content-markets'
 ])
 
 export interface RenderedAuditViolation {

@@ -103,13 +103,9 @@ const mapped = Object.entries(map.recipes).filter(([, entry]) => entry.slots !==
  * de abajo falla si una entrada ya está mapeada, así que no puede quedar olvidada.
  */
 const PENDING_TEMPLATE_SLOTS: Record<string, string[]> = {
-  'content-text': ['productMark'],
-  'proposal-service-seo': ['productMark'],
-  'proposal-service-aeo': ['productMark'],
-  'method-score-ring': ['productMark'],
-  'decision-diagnosis-map': ['productMark'],
-  'content-day-live-results': ['productMark'],
-  'section-cine-team': ['body']
+  // Ninguna lámina aprobada del deck SEO/AEO usa `content-text` con lockup: el Artifact Composer no suma el slot a la
+  // plantilla y el catálogo lo retira (decisión del operador relayada el 2026-09-30); hasta entonces queda pendiente.
+  'content-text': ['productMark']
 }
 
 const isPending = (id: string, name: string) => PENDING_TEMPLATE_SLOTS[id]?.includes(name) === true

@@ -11,7 +11,8 @@
     <!--
       Receta `section-cine`, composiciones `team` y `services` (surface deck, tema oscuro, TASK-1928). Foto de cine a
       sangre y la voz en la mitad baja de la columna izquierda. Lámina interior con foto: sin logo (el eyebrow vuelve al
-      margen) y sin velo. `services` suma el cursor propio del lector con ocho manijas sobre la respuesta (slot `cta`).
+      margen) y sin velo. `services` suma el cursor propio del lector con ocho manijas sobre la respuesta (slot `cta`). `team` admite una
+      bajada OPCIONAL al pie de la columna (slot `body`, TASK-1949).
       Referencias: DeckBrochurePortadaEquipo (team) y DeckBrochurePortadaOrbita (services).
     -->
     <main class="gl-slide gl-sec gl-sec-cine" data-gl-root data-slot="frame">
@@ -24,6 +25,9 @@
         <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quién hace crecer tu marca?</span></p>
         <p class="gl-answer" data-gl-cta-target><span class="gl-answer-lead" data-slot-field="answerLead">Este</span><span data-slot-field="answer">equipo</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
       </div>
+
+      <!-- La bajada OPCIONAL del equipo (TASK-1949, deck SEO/AEO), al pie de la columna. Sin `body` el nodo queda vacío. -->
+      <p class="gl-body gl-sec-body" data-slot="body">Lo ejecutan <strong>expertos multidisciplinarios</strong>: copywriters, especialistas en SEO técnico, relacionistas públicos, diseñadores y creativos.</p>
 
       <div class="gl-hidden" data-slot="cta"></div>
     </main>

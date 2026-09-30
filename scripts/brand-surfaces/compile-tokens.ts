@@ -11,6 +11,8 @@ import path from 'node:path'
 
 import { AXIS_PARTNER_ASSETS } from '@efeoncepro/axis-brand-assets'
 
+import { PRODUCT_MARK_FILES } from '@/lib/brand-surfaces/recipes/product-mark'
+
 import { buildGraphicLineTokenArtifacts } from './graphic-line-tokens'
 
 const CATALOGS = path.resolve('src/lib/artifact-composer/catalogs')
@@ -35,7 +37,9 @@ const BRAND_ASSETS: Record<string, string[]> = {
     'url-bubble-source.svg',
     'efeonce-logo-negative.svg',
     'efeonce-isotype-negative.svg',
-    ...AXIS_PARTNER_ASSETS.map(asset => asset.file)
+    ...AXIS_PARTNER_ASSETS.map(asset => asset.file),
+    // Los lockups de submarca del deck SEO/AEO (TASK-1949, slot `productMark` y la lámina de la familia de marcas).
+    ...PRODUCT_MARK_FILES
   ],
   'graphic-line-stills': ['url-bubble-baked-dark.svg', 'efeonce-logo-negative.svg', 'efeonce-isotype-negative.svg'],
   'graphic-line-overlays': ['url-bubble-baked-dark.svg']

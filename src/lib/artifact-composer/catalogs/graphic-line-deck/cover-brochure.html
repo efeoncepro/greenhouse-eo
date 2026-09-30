@@ -43,6 +43,11 @@
         <p class="gl-pm-label" data-slot-field="label">Operamos sobre</p>
         <img class="gl-pm-logo" data-slot-field="logo" alt="" />
       </div>
+      <!-- El lockup de submarca OPCIONAL (TASK-1949, deck SEO/AEO): archivo oficial de axis-brand-assets; su lugar y su alto
+           llegan del builder. Sin `productMark` el nodo queda vacío y la lámina es la de siempre. -->
+      <div class="gl-product-mark" data-slot="productMark">
+        <img data-slot-field="src" alt="" />
+      </div>
     </main>
   </body>
 </html>

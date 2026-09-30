@@ -80,7 +80,7 @@
     "section-cine-team": {
       "contentType": "deck.section-cine",
       "example": "src/lib/brand-surfaces/examples/deck-section-cine-team-intent.json",
-      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "photo": "photo"}
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "photo": "photo", "body": "body"}
     },
     "section-cine-about": {
       "contentType": "deck.section-cine.about",
@@ -135,7 +135,7 @@
     "content-day-live-results": {
       "contentType": "deck.content-day.live-results",
       "example": "src/lib/brand-surfaces/examples/deck-content-day-live-results-intent.json",
-      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "panel": "panel", "meeting": "meeting.title", "reportTitle": "report.title", "metrics": "kpis"}
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "panel": "panel", "meeting": "meeting.title", "reportTitle": "report.title", "metrics": "kpis", "productMark": "productMark"}
     },
     "decision-agenda": {
       "contentType": "deck.decision-agenda",
@@ -160,7 +160,7 @@
     "method-score-ring": {
       "contentType": "deck.method-score-ring",
       "example": "src/lib/brand-surfaces/examples/deck-method-score-ring-intent.json",
-      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "dimensions": "labels", "total": "total", "cta": "cta.text", "ctaUrl": "cta.url"}
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "dimensions": "labels", "total": "total", "cta": "cta.text", "ctaUrl": "cta.url", "productMark": "productMark"}
     },
     "decision-plan": {
       "contentType": "deck.decision-plan",
@@ -175,12 +175,12 @@
     "proposal-service-aeo": {
       "contentType": "deck.proposal-service",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-service-aeo-intent.json",
-      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite"}
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite", "productMark": "productMark"}
     },
     "proposal-service-seo": {
       "contentType": "deck.proposal-service",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-service-seo-intent.json",
-      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite"}
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite", "productMark": "productMark"}
     },
     "proposal-service-creative": {
       "contentType": "deck.proposal-service",
@@ -370,7 +370,7 @@
     "decision-diagnosis-map": {
       "contentType": "deck.decision-diagnosis-map",
       "example": "src/lib/brand-surfaces/examples/deck-decision-diagnosis-map-intent.json",
-      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "reportTitle": "report.title", "engineScores": "engineScores", "shareOfVoice": "shareOfVoice", "lostPrompts": "lostPrompts", "plan": "plan", "sampleMark": "report.mark", "expertNote": "expertNote.text"}
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "reportTitle": "report.title", "engineScores": "engineScores", "shareOfVoice": "shareOfVoice", "lostPrompts": "lostPrompts", "plan": "plan", "sampleMark": "report.mark", "expertNote": "expertNote.text", "productMark": "productMark"}
     },
     "proposal-cinematic-revops": {
       "contentType": "deck.proposal-cinematic",
