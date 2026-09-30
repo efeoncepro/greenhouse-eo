@@ -172,10 +172,11 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   `src/lib/brand-surfaces/examples/deck-seo-{completo,brochure,propuesta}-document.json`. Seis recetas nuevas **sin
   plantilla todavía** (`content-brand-family`, `content-service-mockups`, `content-report-formats`,
   `content-committee-deck`, `content-industries`, `content-markets`: el plan avisa `recipe-without-template` y el PDF
-  aprobado se hornea con `ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/bake.cjs`). **No sale a un
-  cliente** con las cifras de ejemplo de los tres casos, con logos de clientes sin autorización (TASK-1937) ni
-  prometiendo un formato de Insights que no está vivo (el correo, al 2026-09-30). Anotaciones «de ejemplo» fuera de la
-  lámina; una sola sección partida. Detalle: norma §4.6 «Deck SEO/AEO», manual «El deck SEO/AEO» y
+  aprobado se hornea con `ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/bake.cjs`). **Los datos van
+  tal cual** por decisión del operador (2026-09-30: «Deja esos datos... No marques nada en el deck como provisional,
+  asumo la responsabilidad»): cifras de los casos, su fuente, formatos de Insights, industrias y Bresler, sin rotular
+  ni quitar; el contexto queda como registro en `DECISIONES.md`. Logos de clientes sólo con su autorización
+  (TASK-1937). Anotaciones «de ejemplo» fuera de la lámina; una sola sección partida. Detalle: norma §4.6 «Deck SEO/AEO», manual «El deck SEO/AEO» y
   `efeonce-graphic-line` (`references/applications.md` §L); el uso comercial por objeción, en `seo-aeo-practice`.
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.

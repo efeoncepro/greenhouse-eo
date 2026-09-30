@@ -215,8 +215,8 @@ Task: [TASK-1949](../../../tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-cano
 |---|---|---|---|---|
 | 07 · 06 · 06 · Cuatro piezas | `content-brand-family` | `content` | abrir la parte de producto: qué hay dentro de SV360 antes de explicar cada pieza | lockups oficiales, nunca dibujados; `productMark` obligatorio; una fila por pieza que el cliente de verdad recibe |
 | 10 · 08 · 09 · Todo esto | `content-service-mockups` | `content` | justo después de presentar al equipo: qué hace, en concreto | maquetas nativas grandes, nunca capturas chicas; cifras de la maqueta ilustrativas; autoridad con tipos de medio reales, sin granjas de enlaces |
-| 22 · 16 · 17 · Como la necesites | `content-report-formats` | `content` | después de `content-day-live-results`: cómo llega la edición mensual | informe vivo en interfaz blanca; **sólo formatos vivos** para el cliente; rivales genéricos |
-| 23 · 17 · 18 · Ya está | `content-committee-deck` | `content` | cuando el comité o el directorio decide la inversión | el titular lo escribe la IA y lo revisa el equipo; cifra ilustrativa; sólo formatos vivos |
+| 22 · 16 · 17 · Como la necesites | `content-report-formats` | `content` | después de `content-day-live-results`: cómo llega la edición mensual | informe vivo en interfaz blanca; rivales genéricos; en este deck, los formatos tal cual (decisión 15) |
+| 23 · 17 · 18 · Ya está | `content-committee-deck` | `content` | cuando el comité o el directorio decide la inversión | el titular lo escribe la IA y lo revisa el equipo; en este deck, tal cual (decisión 15) |
 | 27 · 20 · 21 · Por dentro | `content-industries` | `content` | mostrar que el equipo entiende el negocio del cliente; su industria destacada | preguntas de ejemplo; nunca afirma casos por industria ni nombra a un competidor real |
 | 28 · 21 · 22 · Cinco países | `content-markets` | `content` | cliente regional o multinacional; cerrar el «por qué nosotros» con la escala | países de `EFEONCE_OPERATING_MARKETS`; mercados, nunca oficinas; un nodo por país en el plate MK2 |
 
@@ -247,9 +247,13 @@ prueba falla si una entrada ya está mapeada).
 intents de documento aprobados están como ejemplos en `src/lib/brand-surfaces/examples/deck-seo-{completo,brochure,propuesta}-document.json`
 (sin las seis nativas todavía).
 
-**Antes de mostrarlo a un cliente:** las cifras de los tres casos son de ejemplo y su fuente provisoria no es cierta;
-los logos de BICECORP, Banco BICE y Berel necesitan su autorización (TASK-1937); y los formatos de Insights que no están
-vivos (el correo; el modo presentación sin verificar) se quitan o se rotulan «próximamente», con decisión del operador.
+**Los datos quedan tal cual (decisión del operador, 2026-09-30):** «Deja esos datos... No marques nada en el deck como
+provisional, asumo la responsabilidad.» Las cifras de los tres casos, su fuente, los formatos de Insights, las
+industrias y la cifra de Bresler se usan como están, sin marca de «provisional» ni «próximamente»; un agente no los
+rotula ni los quita. En este deck, esa decisión manda sobre las reglas de receta «sólo formatos vivos» y «cifras
+ilustrativas». Contexto (sólo registro, en `DECISIONES.md`): las cifras reales de los casos no se han cargado; al
+2026-09-30 el correo de Insights que llega solo no está vivo y el modo presentación no se ha probado con una edición
+real. Los logos de BICECORP, Banco BICE y Berel siguen condicionados a su autorización (TASK-1937).
 
 ## Anatomía de una receta (campos del JSON)
 
@@ -372,11 +376,14 @@ Registradas en `ai-generations/2026-09-29_deck-seo-aeo-documentos/DECISIONES.md`
 8. **Una sola sección partida por deck.**
 9. **Navegación por cinco capítulos**, el mismo `progress.sections` en todas las páginas.
 10. **Desarrollo end to end** con una persona de Efeonce (`proposal-cinematic-web`, plate DV1).
-11. **Casos:** BICECORP, Banco BICE y Berel, con **cifras de ejemplo** hasta tener las reales.
+11. **Casos:** BICECORP, Banco BICE y Berel.
 12. **Industrias** (seis, con la pregunta que ese comprador le hace a la IA) y **mercados** (cinco) de forma épica.
 13. **Anotaciones fuera del deck;** se quedan las marcas que exige el contrato (`mark`, `sampleMark`, `report.sample`).
 14. **Imágenes de ambiente para casos de cliente** en puesta en escena; el logo del cliente se compone desde el archivo
     oficial, nunca lo genera el modelo.
+15. **Los datos quedan tal cual:** «Deja esos datos... No marques nada en el deck como provisional, asumo la
+    responsabilidad.» Cifras de los casos, su fuente, formatos de Insights, industrias y la cifra de Bresler, sin marca
+    de «provisional» ni «próximamente».
 
 ### Notas del JSON que quedaron atrás
 
@@ -396,7 +403,8 @@ arriba (el JSON no se corrigió en este cambio):
   aprobado y no se usa.
 - `content-report-formats.avoidWhen` y `.notes` dicen que el correo, el PDF A4 y el deck 16:9 están «por verificar»:
   la sesión de Insights los verificó el 2026-09-30 (web y celular, PDF A4 y deck 16:9 vivos; modo presentación
-  desplegado sin probar; correo que llega solo NO vivo). Manda ese estado (norma §4.6, «Deck SEO/AEO»).
+  desplegado sin probar; correo que llega solo no vivo). En el deck SEO/AEO la lámina va tal cual por decisión del
+  operador (decisión 15); el estado queda como registro (norma §4.6, «Deck SEO/AEO»).
 
 ## Pendientes de QA
 

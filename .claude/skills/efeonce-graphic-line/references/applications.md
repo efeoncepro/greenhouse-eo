@@ -1286,11 +1286,13 @@ Assessment, AI Visibility Report e Insights. Recorrido, reglas y pendientes: nor
 - **Fotos:** cine sólo en `section-split` (SX4) y `proposal-cinematic-web` (DV1); casos en **puesta en escena** con la
   imagen de ambiente del cliente y su logo **compuesto** desde el archivo oficial (excepción `caso` de `foto:prompt`,
   `bb7e34b37`); MK2 de `content-markets` no es cine. Plates por ruta local hasta TASK-1931.
-- **Condiciones para mostrarlo a un cliente:** cifras de los tres casos = de ejemplo (fuente provisoria falsa hasta
-  reemplazarla); logos de BICECORP, Banco BICE y Berel con su autorización (TASK-1937; el BICE argentino, descartado);
-  formatos de Insights sólo si están vivos (al 2026-09-30, el correo que llega solo NO y el modo presentación sin
-  probar; decisión del operador pendiente). Anotaciones «de ejemplo» fuera de la lámina; se quedan `mark`, `sampleMark`
-  y `report.sample`.
+- **Los datos van tal cual (decisión del operador, 2026-09-30):** «Deja esos datos... No marques nada en el deck como
+  provisional, asumo la responsabilidad.» Cifras de los casos, su fuente, formatos de Insights, industrias y la cifra
+  de Bresler, sin marca de «provisional» ni «próximamente»; un agente no los rotula ni los quita. Contexto, sólo como
+  registro (`DECISIONES.md`): las cifras reales de los casos no se han cargado; al 2026-09-30 el correo de Insights que
+  llega solo no está vivo y el modo presentación no se ha probado con una edición real. Sigue la condición de los logos
+  de BICECORP, Banco BICE y Berel (autorización, TASK-1937; el BICE argentino, descartado). Anotaciones «de ejemplo»
+  fuera de la lámina; se quedan `mark`, `sampleMark` y `report.sample`.
 - **Una sola sección partida por deck;** contraportadas sin cambios; cuatro usos pasan un largo (el `fit` lo dice).
 
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck

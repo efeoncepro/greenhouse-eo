@@ -1,5 +1,23 @@
 # TASK-1949 — Canonizar el deck SEO/AEO (Search Visibility 360) de «La órbita»: 6 recetas nuevas, slots opcionales de submarca/equipo, usos aprobados, Composer y AXIS
 
+## Delta 2026-09-30 (b) — el operador deja los datos del deck tal cual
+
+- **Decisión del operador**, textual: «Deja esos datos... No marques nada en el deck como provisional, asumo la
+  responsabilidad.» Las cifras de los tres casos, su fuente, los formatos de Insights, las industrias y la cifra de
+  Bresler quedan **tal cual** en el deck, sin marca de «provisional» ni «próximamente». Registrada en `DECISIONES.md`,
+  «Decisión del operador sobre los pendientes» (`8ceb2418f`).
+- Consecuencia para esta task: esos datos dejan de ser un bloqueo para mostrar el deck; su contexto (cifras reales no
+  cargadas, correo de Insights no vivo y modo presentación sin probar al 2026-09-30, sin prueba por industria, Bresler no
+  es cifra de SEO) queda sólo como registro. La fila de riesgo «Las cifras de ejemplo de los casos salen a un cliente» y
+  el follow-up de reemplazarlas pasan a ser riesgo aceptado por el operador. Sigue vigente la condición de los logos de
+  clientes (TASK-1937), que la decisión no nombra.
+- La decisión es sobre este deck. Si alcanza a las reglas generales de `content-report-formats` y
+  `content-committee-deck` («sólo formatos vivos») y a la regla de casos citables de la skill `seo-aeo-practice` en otros
+  decks es pregunta abierta. Los textos de esas recetas (`avoidWhen`, `rules`) no se cambiaron.
+- Slice 4 (docs y skills) aplicado con esta decisión: norma §4.6 v1.17 (`10c4907cb`), catálogo v1.11 (`a9a1de87e`),
+  manual v1.12 (`ae657aa9c`), funcional 2.8 y arquitectura 1.6 (`afcd2b93d`) y skills (`0aab8e802`), más el ajuste por la
+  decisión.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -20,7 +38,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Slice 1 hecho (2026-09-30): 100 recetas (6 nuevas sin plantilla), productMark y section-cine-team.body opcionales, requiredUnless en el eyebrow de proposal-cinematic seo/aeo, 27 usos aprobados en 25 recetas, tres planes golden validados y los intents de documento como ejemplos; Composer (Slice 2), AXIS (Slice 3) y docs (Slice 4) los llevan otras sesiones`
+- Status real: `Slice 1 y Slice 4 hechos (2026-09-30): 100 recetas (6 nuevas sin plantilla), productMark y section-cine-team.body opcionales, requiredUnless en el eyebrow de proposal-cinematic seo/aeo, 27 usos aprobados, tres planes golden validados e intents de documento; norma, catálogo, manual, doc funcional, arquitectura y skills al día; el operador deja los datos del deck tal cual (delta b). Composer (Slice 2), AXIS (Slice 3) y gates de cierre (Slice 5) pendientes`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -308,7 +326,7 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-seo-aeo-document
 - [ ] `validateDeckPlan` honra `requiredUnless`; `PENDING_TEMPLATE_SLOTS` quedó vacío.
 - [ ] Gate `graphic-line` a 0 px con el freeze declarado en `BASELINE_DELTAS.md`.
 - [ ] AXIS publica las recetas, las referencias del Lab y los logos de BICE y BICECORP con procedencia.
-- [ ] Norma, README, manual, doc funcional, arquitectura y skills describen el deck SEO/AEO.
+- [x] Norma, README, manual, doc funcional, arquitectura y skills describen el deck SEO/AEO (norma §4.6 v1.17, catálogo v1.11, manual v1.12, funcional 2.8, arquitectura 1.6; skills `efeonce-graphic-line`, `deck-studio`, `seo-aeo-practice`, `efeonce-insights`, `axis-design-system` con espejo `.codex`; 2026-09-30).
 - [ ] Gates de cierre: `pnpm test` completo y `pnpm build` de producción en el último commit.
 
 ## Verification

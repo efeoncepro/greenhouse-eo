@@ -3,7 +3,7 @@
 > **Tipo de documento:** Norma de marca (composición por superficie)
 > **Versión:** 1.17
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-30 por Claude (1.17: el deck SEO/AEO (Search Visibility 360) aprobado por el operador — tres documentos (completo 33, brochure 24, propuesta 29) en cinco capítulos, seis recetas nuevas sin plantilla todavía (100 en el catálogo, 94 con plantilla), `productMark` opcional con los lockups de submarca, el eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark`, `section-cine-team.body` opcional, 27 usos aprobados y tres planes validados; reglas de casos (imagen de ambiente puesta en escena, logo compuesto, cifras de ejemplo, logos con autorización) y de los formatos de Insights; delta del 2026-09-30, §4.6 «Deck SEO/AEO» y §7 (TASK-1949). Antes, 1.16: la insignia «Salesforce Partner» está autorizada por Salesforce y el deck Salesforce la lleva por defecto; SF20 aprobada como cierre de brochure; largos de SF6 y SF7 aprobados (máximos subidos); costo de color de los íconos de producto aprobado; delta (d). Antes, 1.15: las 94 recetas del deck tienen plantilla — las dieciséis del deck Salesforce componen sobre AXIS 0.3.33 y el baseline `graphic-line` quedó sellado (sección (s)); SF20 compuesta y pendiente del visto bueno; los dos planes validan sin avisos; PDF de la propuesta sin insignia; §4.6. Antes, 1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-09-30 por Claude (1.17: el deck SEO/AEO (Search Visibility 360) aprobado por el operador — tres documentos (completo 33, brochure 24, propuesta 29) en cinco capítulos, seis recetas nuevas sin plantilla todavía (100 en el catálogo, 94 con plantilla), `productMark` opcional con los lockups de submarca, el eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark`, `section-cine-team.body` opcional, 27 usos aprobados y tres planes validados; reglas de casos (imagen de ambiente puesta en escena, logo compuesto, logos con autorización) y la decisión del operador de dejar tal cual las cifras de los casos, su fuente, los formatos de Insights, las industrias y la cifra de Bresler («asumo la responsabilidad»); delta del 2026-09-30, §4.6 «Deck SEO/AEO» y §7 (TASK-1949). Antes, 1.16: la insignia «Salesforce Partner» está autorizada por Salesforce y el deck Salesforce la lleva por defecto; SF20 aprobada como cierre de brochure; largos de SF6 y SF7 aprobados (máximos subidos); costo de color de los íconos de producto aprobado; delta (d). Antes, 1.15: las 94 recetas del deck tienen plantilla — las dieciséis del deck Salesforce componen sobre AXIS 0.3.33 y el baseline `graphic-line` quedó sellado (sección (s)); SF20 compuesta y pendiente del visto bueno; los dos planes validan sin avisos; PDF de la propuesta sin insignia; §4.6. Antes, 1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -65,8 +65,9 @@ las páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»).
 - **27 usos aprobados en 25 recetas existentes** (`approvedUses`, cada uno con su `fit`) y tres planes validados como
   fixtures (`golden-{completo,brochure,proposal}-seo.json`).
 - **Reglas nuevas** (detalle en §4.6, «Deck SEO/AEO»): anotaciones fuera del deck; una sola sección partida; casos de
-  cliente con imagen de ambiente puesta en escena y el logo del cliente compuesto; cifras de los casos de ejemplo hasta
-  tener las reales; logos de clientes condicionados a su autorización; formatos de Insights sólo si están vivos.
+  cliente con imagen de ambiente puesta en escena y el logo del cliente compuesto; logos de clientes condicionados a su
+  autorización. Por decisión del operador («Deja esos datos… asumo la responsabilidad»), las cifras de los casos, su
+  fuente, los formatos de Insights, las industrias y la cifra de Bresler quedan tal cual, sin marca de «provisional».
 
 
 
@@ -1224,11 +1225,11 @@ páginas de un documento llevan el mismo `progress.sections` (5); si no, AXIS re
 | 22 · 16 · 17 | ¿Cómo te llega? Como la necesites. | **`content-report-formats`** (nueva) |
 | 23 · 17 · 18 | ¿Y el PPT del comité? Ya está. | **`content-committee-deck`** (nueva) |
 | 24 · — · — | ¿Cómo sabes que funciona? Lo medimos. | `content-measure-formulas` (uso; cinco métricas SEO/AEO) |
-| 25 · — · 19 | ¿Qué cambió con BICECORP? Más visible. | `decision-case` (uso; plate CS2; cifras de ejemplo) |
-| 26 · — · 20 | ¿Qué logró Banco BICE? Más cuentas. | `decision-case` (uso; plate CS1b; cifras de ejemplo) |
+| 25 · — · 19 | ¿Qué cambió con BICECORP? Más visible. | `decision-case` (uso; plate CS2) |
+| 26 · — · 20 | ¿Qué logró Banco BICE? Más cuentas. | `decision-case` (uso; plate CS1b) |
 | 27 · 20 · 21 | ¿Conocemos tu industria? Por dentro. | **`content-industries`** (nueva) |
 | 28 · 21 · 22 | ¿Dónde operamos? Cinco países. | **`content-markets`** (nueva; plate MK2) |
-| 29 · — · 23 | ¿Qué cambió con Berel? Lo eligen. | `decision-case` (uso; plate CS3b; cifras de ejemplo) |
+| 29 · — · 23 | ¿Qué cambió con Berel? Lo eligen. | `decision-case` (uso; plate CS3b) |
 | 30 · 18 · 24 | ¿Qué nos hace distintos? Lo puedes ver. | `decision-difference` |
 | 31 · 19 · — | ¿Quién confía en nosotros? Marcas líderes. | `content-clients` (uso; selección «SEO») |
 | — · — · 25 | ¿Y si no funciona? Empiezas chico. | `decision-risk` (uso; línea growth en papel) |
@@ -1252,6 +1253,9 @@ de `ai-generations/` hasta el banco de TASK-1931.
 | `content-committee-deck` | el PPT del comité ya armado: titular escrito por la IA y revisado por el equipo, en modo presentación | el modo presentación, el deck o el PDF no están vivos; la cifra de ejemplo podría leerse como del cliente |
 | `content-industries` | seis fichas con la pregunta que el comprador de cada industria le hace a la IA; la del cliente, destacada | para afirmar experiencia probada por industria; hay un caso real (usar `decision-case`) |
 | `content-markets` | las Américas de noche desde la órbita con los cinco mercados de `EFEONCE_OPERATING_MARKETS` | para mostrar oficinas o direcciones; un mercado sin nodo en el plate |
+
+«Cuándo no» resume el `avoidWhen` de cada receta. En este deck, la decisión del operador del 2026-09-30 (abajo) manda
+sobre los de formatos de Insights y cifras de ejemplo: las láminas aprobadas se usan tal cual.
 
 **Slots opcionales** (ningún `contentType` ni slot previo cambia):
 
@@ -1288,18 +1292,19 @@ de `ai-generations/` hasta el banco de TASK-1931.
 - **Logos de BICECORP, Banco BICE y Berel:** su uso depende de la autorización de cada cliente, que se archiva en la
   biblioteca de TASK-1937. Procedencia de los archivos en `logos/PROCEDENCIA.txt`; el BICE argentino de Wikimedia está
   descartado.
-- **Cifras de los tres casos = de EJEMPLO** hasta tener las reales (cuatro por caso, con fuente, período, servicio y
-  permiso de uso). La fuente provisoria («Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses») afirma algo
-  que no es cierto hasta reemplazarla: **ningún deck con esas cifras sale a un cliente.** Si los casos vienen de la
-  época de Grupo Security (fusionado con BICECORP en septiembre de 2025, marca BICE), el pie debe decirlo.
-- **Formatos de Insights** (`content-report-formats`, `content-committee-deck`): se muestran sólo los vivos para el
-  cliente. Estado verificado el 2026-09-30 por la sesión de Insights: web y celular **vivo** (modelo 1.0 en producción),
-  PDF A4 **vivo**, deck 16:9 **vivo**, modo presentación **desplegado sin probar** con una edición real, **correo que
-  llega solo NO vivo** (flags de entrega y programación apagados). Recomendación de esa sesión: rotular «próximamente»
-  el correo (y el modo presentación salvo verificación). **Decisión del operador pendiente**: las láminas aprobadas no
-  lo rotulan. Este estado manda sobre el `avoidWhen` de la receta, escrito antes de verificar.
-- **Industrias:** las preguntas son de ejemplo, escritas como las haría un comprador; la lámina **no** afirma casos por
-  industria (hoy no hay clientes de banca, seguros ni SaaS en la lámina de clientes).
+- **Los datos del deck quedan tal cual, por decisión del operador (2026-09-30):** «Deja esos datos... No marques nada en
+  el deck como provisional, asumo la responsabilidad.» Las cifras de los tres casos, su fuente, los formatos de Insights,
+  las industrias y la cifra de Bresler se usan como están, **sin marca de «provisional» ni «próximamente»**; el operador
+  asume la responsabilidad (registrado en `DECISIONES.md`, «Decisión del operador sobre los pendientes»). Un agente no
+  los rotula ni los quita por su cuenta. La decisión es sobre este deck: si alcanza a las reglas generales de
+  `content-report-formats` y `content-committee-deck` («sólo formatos vivos») en otros decks es pregunta abierta.
+  **Contexto, sólo como registro:** la fuente de los casos dice «Google Search Console, GA4 y Efeonce AEO Assessment,
+  12 meses» y las cifras reales (cuatro por caso, con fuente, período, servicio y permiso de uso) no se han cargado; si
+  los casos vienen de la época de Grupo Security (fusionado con BICECORP en septiembre de 2025, marca BICE), el pie lo
+  diría. Formatos de Insights verificados el 2026-09-30 por la sesión de Insights: web y celular vivo (modelo 1.0 en
+  producción), PDF A4 vivo, deck 16:9 vivo, modo presentación desplegado sin probar con una edición real y correo que
+  llega solo no vivo (flags de entrega y programación apagados). Industrias: las preguntas son de ejemplo y hoy no hay
+  clientes de banca, seguros ni SaaS en la lámina de clientes. Bresler: +180 % de ventas digitales no es una cifra de SEO.
 - **Mercados:** los países salen de `EFEONCE_OPERATING_MARKETS` (`src/config/efeonce-brand.ts`); la lámina marca
   mercados, nunca oficinas inventadas.
 - **Contraportadas sin cambios** (`close-brochure-orbit`, `close-proposal-horizon`); el delta del eslogan de TASK-1933 no
@@ -1309,11 +1314,11 @@ de `ai-generations/` hasta el banco de TASK-1931.
   cine (respuesta 11/10). Subir el máximo o acortar se decide en el Slice 2 con el operador; hasta entonces, un plan que
   ligue esos textos falla con `slot-over-max-chars`.
 
-**Pendientes** (no bloquean la canonización; los tres primeros sí bloquean mostrar el deck a un cliente): las cifras
-reales de los casos; la autorización de los logos de clientes; la decisión sobre los formatos de Insights no vivos; la
-prueba por industria; la cifra de Bresler (+180 % de ventas digitales, no es de SEO); las fechas de la agenda de
-próximos pasos (5–9 oct, se mueven al usar el deck); la URL `think.efeoncepro.com/brand-visibility`, que sigue
-llamándose «Brand Visibility Grader»; y confirmar que el equipo SEO aprueba en Frame.io. **Preguntas abiertas** (en la
+**Pendientes** (no bloquean la canonización): la autorización de los logos de clientes (TASK-1937); las fechas de la
+agenda de próximos pasos (5–9 oct, se mueven al usar el deck); la URL `think.efeoncepro.com/brand-visibility`, que
+sigue llamándose «Brand Visibility Grader»; y confirmar que el equipo SEO aprueba en Frame.io. Las cifras de los casos,
+su fuente, los formatos de Insights, las industrias y Bresler **ya no son pendientes**: el operador decidió dejarlos
+tal cual (arriba). **Preguntas abiertas** (en la
 task): si el lockup SV360 cuenta como firma en una lámina con foto a sangre (`content-markets`); si `content-text`
 mantiene `productMark` sin lámina de referencia; y si las ciudades de `content-markets` son sedes o sólo la ciudad de
 referencia del mercado.

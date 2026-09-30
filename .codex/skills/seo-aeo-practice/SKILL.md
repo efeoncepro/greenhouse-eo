@@ -396,28 +396,32 @@ decide **qué lámina sostiene qué conversación**; `deck-studio` la arma.
 | «¿Me garantizas que voy a rankear?» | `proposal-cinematic-seo` o `proposal-service-seo` | la nota «No prometemos rankings…» es obligatoria (§2, regla 8) |
 | «Ya tuve una agencia» · «Un freelancer me cobra menos» · «Semrush y lo hago yo» | `decision-difference`, `section-cine-team` → `content-service-mockups` | la alternativa siempre genérica, nunca un competidor real; las maquetas son ilustrativas |
 | «¿Y si hay que tocar el sitio?» (IT / Dev) | `proposal-cinematic-web` («Lo hacemos») | alcance técnico por escrito en la propuesta |
-| «¿Cómo sé qué pasa y quién arma el reporte?» | `content-day-live-progress` → `content-day-live-results` → `content-report-formats` → `content-committee-deck` | **sólo formatos vivos** (abajo) |
+| «¿Cómo sé qué pasa y quién arma el reporte?» | `content-day-live-progress` → `content-day-live-results` → `content-report-formats` → `content-committee-deck` | tal cual (decisión del operador, abajo); conoce el estado real de cada formato por si preguntan |
 | «¿Cómo sé que funciona?» | `content-measure-formulas` | sin cifras: fórmula, fuente y dueño |
-| «Muéstrame casos» | `decision-case` (BICECORP, Banco BICE, Berel) | 🔴 **bloqueada hoy** (abajo); mientras tanto, `content-clients` + el Grader o la Radiografía en vivo (§4b) |
+| «Muéstrame casos» | `decision-case` (BICECORP, Banco BICE, Berel) + `content-clients` | cifras tal cual (decisión del operador, abajo); logos con autorización; el Grader o la Radiografía en vivo (§4b) los complementan |
 | «¿Entienden mi industria?» | `content-industries` | preguntas de ejemplo, **no** prueba por industria |
 | «¿Cubren fuera de Chile?» | `content-markets` | mercados de `EFEONCE_OPERATING_MARKETS`, nunca oficinas |
 | «¿Y si no funciona?» (propuesta) | `decision-risk` → `decision-plan` → `content-pricing` | montos `[MONTO]` hasta la cotización |
 | Cierre | brochure: `decision-diagnosis-map` → `decision-next-steps`; propuesta: `decision-diagnosis-map` (salvo diagnóstico ya hecho) | las fechas de la agenda (5–9 oct) son de ejemplo |
 
-🔴 **Lo que hoy impide mostrárselo a un cliente** (pendientes de `ai-generations/2026-09-29_deck-seo-aeo-documentos/DECISIONES.md`):
+**Decisión del operador sobre los datos (2026-09-30):** «Deja esos datos... No marques nada en el deck como
+provisional, asumo la responsabilidad.» Las cifras de los tres casos, su fuente, los formatos de Insights, las
+industrias y la cifra de Bresler **quedan tal cual**, sin marca de «provisional» ni «próximamente». El operador asume la
+responsabilidad; esta skill no los rotula, no los quita y no los presenta como bloqueo para mostrar el deck.
+Lo que sí condiciona: los logos de BICECORP, Banco BICE y Berel se usan con su autorización (TASK-1937) y las fechas de
+la agenda (5–9 oct) se mueven al usar el deck.
 
-1. **Las cifras de los tres casos son de EJEMPLO** y la fuente provisoria («Google Search Console, GA4 y Efeonce AEO
-   Assessment, 12 meses») afirma algo falso. Coherente con §5 de `modules/12_ACTIVOS.md`: **cero casos citables**; un
-   caso sin las tres condiciones no se muestra, ni como «ilustrativo». Si los casos vienen de Grupo Security
-   (fusionado con BICECORP en sep-2025), el pie lo dice.
-2. **Logos de BICECORP, Banco BICE y Berel** sin autorización archivada (TASK-1937).
-3. **Formatos de Insights** (verificado el 2026-09-30): web y celular, PDF A4 y deck 16:9 vivos; modo presentación
-   desplegado sin probar con una edición real; **el correo que llega solo NO está vivo**. Ningún cliente real ha
-   recibido todavía una edición. Se quita o se rotula «próximamente» lo que no esté vivo (decisión del operador
-   pendiente); prometerlo es vender humo (§0).
-4. **Industrias sin prueba:** no hay clientes de banca, seguros ni SaaS en `content-clients`.
-5. **Bresler (+180 % de ventas digitales) no es una cifra de SEO**: cambiarla por una de SEO publicada si existe.
-6. La URL `think.efeoncepro.com/brand-visibility` todavía dice «Brand Visibility Grader» (alias histórico).
+**Contexto, sólo como registro** (`ai-generations/2026-09-29_deck-seo-aeo-documentos/DECISIONES.md`) — para que quien
+presente sepa qué hay detrás si el cliente pregunta:
+
+- Las cifras reales de los casos (cuatro por caso, con fuente, período, servicio y permiso) no se han cargado; la fuente
+  de la lámina dice «Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses». Grupo Security se fusionó con
+  BICECORP en sep-2025 (marca BICE).
+- Formatos de Insights (2026-09-30): web y celular, PDF A4 y deck 16:9 vivos; modo presentación desplegado sin probar
+  con una edición real; el correo que llega solo no está vivo; ningún cliente real ha recibido una edición todavía.
+- Industrias: no hay clientes de banca, seguros ni SaaS en `content-clients`. Bresler (+180 % de ventas digitales) no
+  es una cifra de SEO.
+- La URL `think.efeoncepro.com/brand-visibility` todavía dice «Brand Visibility Grader» (alias histórico).
 
 Las láminas nativas (familia de marcas, servicios, formatos, comité, industrias y mercados) todavía no se componen
 solas: el PDF aprobado vive en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/` (fuera de git).

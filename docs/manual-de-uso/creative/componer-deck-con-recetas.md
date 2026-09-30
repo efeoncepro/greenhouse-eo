@@ -234,14 +234,18 @@ el documento compondrá entero con `pnpm brand:compose` y ese post-proceso desap
 Mientras la plantilla no tenga estos slots, `pnpm brand:compose` no los dibuja: el lockup y la bajada salen sólo del
 horneado de `render-src/`.
 
-**5. Antes de enviarlo a un cliente**, revisa estas cuatro cosas; si una falla, el deck **no sale**:
+**5. Los datos van tal cual.** El operador decidió el 2026-09-30: «Deja esos datos... No marques nada en el deck como
+provisional, asumo la responsabilidad.» Las cifras de los casos (BICECORP, Banco BICE, Berel), su fuente, los formatos
+de Insights, las industrias y la cifra de Bresler se usan como están: **no los rotules como «provisional» ni
+«próximamente» y no los quites por tu cuenta.** Si el operador cambia un dato, se cambia en el intent. Contexto que
+queda sólo como registro (`ai-generations/2026-09-29_deck-seo-aeo-documentos/DECISIONES.md`): las cifras reales de los
+casos no se han cargado; al 2026-09-30 el correo de Insights que llega solo no está vivo y el modo presentación no se ha
+probado con una edición real.
 
-- **Cifras de los casos** (BICECORP, Banco BICE, Berel): son de ejemplo. Reemplázalas por las reales (cuatro por caso,
-  con fuente, período, servicio y permiso de uso) o quita las láminas de caso. La fuente provisoria no es cierta.
-- **Logos de clientes:** BICECORP, Banco BICE y Berel necesitan su autorización archivada (TASK-1937).
-- **Formatos de Insights:** el correo que llega solo **no está vivo** y el modo presentación no está verificado con
-  una edición real (estado del 2026-09-30). Quítalos o rotúlalos «próximamente» en `content-report-formats` y
-  `content-committee-deck`, según decida el operador.
+Lo que sí revisas antes de enviarlo:
+
+- **Logos de clientes:** el uso de los de BICECORP, Banco BICE y Berel sigue condicionado a su autorización
+  (TASK-1937).
 - **Fechas de la agenda** de próximos pasos (5–9 oct): muévelas a fechas reales.
 
 ### Paso 4 · Revisa pares y ritmo
@@ -706,8 +710,9 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 - **No dibujes ni recolorees un lockup de submarca** (SV360, AEO, AEO Assessment, AI Visibility Report, Insights): sale
   de `@efeoncepro/axis-brand-assets`, uno por lámina.
 - **No pongas dos secciones partidas** en el deck SEO/AEO (`section-split` y `section-split-panel-end` son alternativas).
-- **No envíes el deck SEO/AEO con las cifras de ejemplo de los casos**, ni con un logo de cliente sin autorización, ni
-  prometiendo un formato de Insights que no está vivo.
+- **No rotules ni quites por tu cuenta** los datos del deck SEO/AEO (cifras de los casos, su fuente, formatos de
+  Insights, industrias, Bresler): el operador decidió dejarlos tal cual. Tampoco uses un logo de cliente sin su
+  autorización.
 - **No generes con IA el logo de un cliente dentro de una foto de caso:** se compone desde el archivo oficial.
 - **No inventes oficinas** en `content-markets`: los países salen de `EFEONCE_OPERATING_MARKETS`.
 

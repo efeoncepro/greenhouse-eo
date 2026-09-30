@@ -337,7 +337,8 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
    modelo 1.0; el 1.1 sale con el próximo release), PDF A4 **vivo**, deck 16:9 **vivo**, modo presentación
    **desplegado** sin probar con una edición real sobre el modelo 1.0, **correo que llega solo NO vivo**
    (`INSIGHTS_DELIVERY_ENABLED` / `INSIGHTS_SCHEDULES_ENABLED` OFF; TASK-1944 bloqueada por TASK-1774). Ningún cliente
-   real ha recibido una edición (canaries sobre Greenhouse Demo). Recomendación: rotular «próximamente» el correo (y el
-   modo presentación salvo verificación) y prometer «se habilita al abrir el servicio». **Sin decisión del operador**:
-   las láminas aprobadas no lo rotulan. Si cambia el estado de un formato, avisa en la norma
-   `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO».
+   real ha recibido una edición (canaries sobre Greenhouse Demo). La sesión de Insights recomendó rotular
+   «próximamente» el correo (y el modo presentación salvo verificación). **Decidido por el operador el 2026-09-30:** las
+   láminas van tal cual, sin «próximamente» («Deja esos datos... No marques nada en el deck como provisional, asumo la
+   responsabilidad»); el estado de arriba queda como registro. Si cambia el estado de un formato (por ejemplo, se
+   enciende el correo), actualízalo aquí y en la norma `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO».
