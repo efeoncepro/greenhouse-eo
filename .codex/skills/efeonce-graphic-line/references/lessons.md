@@ -462,6 +462,13 @@
   recortarse en horizontal o vertical y pide alejar lo clave de los bordes, **sobre todo de la esquina inferior
   derecha**; el logo de la página se monta abajo a la izquierda. **Regla:** portada de página en 5,9:1, lo esencial en
   el centro, nada importante en las esquinas inferiores.
+- **«No me parece» sobre una portada con cliente es un no al cliente, no a la pieza.** Síntoma: el operador dijo «la de
+  Sky no me parece», se reemplazó la portada 6 y el 88 % de Sky quedó en la 1; tuvo que repetirlo: «no puedo poner eso
+  en una portada». **Regla:** una portada de perfil (LinkedIn, YouTube, Facebook) no lleva nombres, casos ni cifras de
+  clientes; ante un rechazo que nombra a un cliente, se retira el cliente de **todas** las piezas del set.
+- **Higgsfield: «daily generation limit for your grace period» no es falta de créditos.** Con 1.118 créditos y plan
+  Ultra, la cuenta en período de gracia corta las generaciones del día. **Regla:** reportarlo como límite del plan,
+  no como saldo, y no cambiar de motor sin preguntar.
 - **Los conectores no reemplazan la CLI.** Higgsfield topó su límite diario a mitad de ronda y Magnific cobraba 1.000
   créditos por GPT Image 2; ningún conector genera 6:1 nativo. **Regla:** producir con `pnpm ai:image` (GPT Image 2.5)
   según la decisión del 2026-09-30; si el entorno no tiene la clave, se declara el bloqueo en vez de cambiar de motor.
