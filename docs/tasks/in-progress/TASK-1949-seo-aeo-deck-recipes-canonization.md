@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Slice 1 en curso (2026-09-30): catálogo con las 6 recetas nuevas, los slots opcionales y los usos aprobados; Composer (Slice 2) y AXIS (Slice 3) los llevan otras sesiones`
+- Status real: `Slice 1 hecho (2026-09-30): 100 recetas (6 nuevas sin plantilla), productMark y section-cine-team.body opcionales, requiredUnless en el eyebrow de proposal-cinematic seo/aeo, 27 usos aprobados en 25 recetas, tres planes golden validados y los intents de documento como ejemplos; Composer (Slice 2), AXIS (Slice 3) y docs (Slice 4) los llevan otras sesiones`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -135,6 +135,8 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-seo-aeo-document
 - `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` (generado)
 - `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-{brochure,proposal,completo}-seo.json`
 - `src/lib/brand-surfaces/examples/deck-seo-{completo,brochure,propuesta}-document.json`
+- `src/lib/brand-surfaces/deck-recipes/bindings/map.ts` (exclusiones de `productMark` y de las cifras de maqueta)
+- `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` (`PENDING_TEMPLATE_SLOTS` temporal hasta el Slice 2)
 - `src/lib/artifact-composer/catalogs/graphic-line-deck/**` (plantillas nuevas y slots opcionales, Slice 2) [verificar con la sesión del composer]
 - Repo `axis-design-system` (recetas, referencias `references/surfaces/deck/<id>.jpg`, logos de clientes, Slice 3)
 
@@ -296,12 +298,12 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-seo-aeo-document
 
 - [x] `foto:prompt` acepta la excepción declarada de caso de cliente (campo `caso`, sólo puesta en escena y sólo el rubro de ese cliente) sin debilitar la guarda general, con test (`bb7e34b37`; lenguaje fotográfico y regla en `8f7d66457`).
 - [x] Inventario, decisiones, fichas, logos con procedencia y fuentes de render del deck versionados (`541eadf69`).
-- [ ] Las seis recetas nuevas están en el catálogo con slots medidos, pares, prompts, reglas y referencia a su lámina aprobada.
-- [ ] `productMark` es opcional en las recetas de la brecha 1, con la lista cerrada de lockups; `section-cine-team.body` es opcional; ningún `contentType` ni slot previo cambió.
-- [ ] El eyebrow de `proposal-cinematic-seo` y `-aeo` declara `requiredUnless: "productMark"` y la regla está escrita.
-- [ ] Las recetas existentes que el deck usa con contenido, plate o lockup propio tienen `approvedUses` con su `fit`.
-- [ ] Los tres planes del deck validan sin errores como fixtures probados en `validate.test.ts`.
-- [ ] `pnpm brand:deck-recipes --check` pasa y `pnpm vitest run src/lib/brand-surfaces` está en verde.
+- [x] Las seis recetas nuevas están en el catálogo con slots medidos, pares, prompts, reglas y referencia a su lámina aprobada (`content-brand-family`, `content-service-mockups`, `content-report-formats`, `content-committee-deck`, `content-industries`, `content-markets`; 2026-09-30).
+- [x] `productMark` es opcional en las recetas de la brecha 1, con la lista cerrada de lockups; `section-cine-team.body` es opcional; ningún `contentType` ni slot previo cambió (sólo notas y `requiredUnless`; exclusiones de binding en `bindings/map.ts`).
+- [x] El eyebrow de `proposal-cinematic-seo` y `-aeo` declara `requiredUnless: "productMark"` y la regla está escrita (en `rules` y en la nota del slot).
+- [x] Las recetas existentes que el deck usa con contenido, plate o lockup propio tienen `approvedUses` con su `fit` (27 usos en 25 recetas; cuatro pasan un largo y el `fit` lo dice: portada de línea, portada de propuesta, `content-day-tools` y la AEO de cine).
+- [x] Los tres planes del deck validan sin errores como fixtures probados en `validate.test.ts` (`golden-{completo,brochure,proposal}-seo.json`; sólo los seis avisos `recipe-without-template`).
+- [x] `pnpm brand:deck-recipes --check` pasa y `pnpm vitest run src/lib/brand-surfaces` está en verde (824/825 el 2026-09-30: el rojo es el snapshot de `deck-proposal-service-revops-intent.json`, causado por un cambio ajeno sin commitear en `recipes/proposal-service.ts`, no por esta task).
 - [ ] Las seis recetas nuevas tienen plantilla y componen con `pnpm brand:compose`; los slots opcionales componen con y sin el slot.
 - [ ] `validateDeckPlan` honra `requiredUnless`; `PENDING_TEMPLATE_SLOTS` quedó vacío.
 - [ ] Gate `graphic-line` a 0 px con el freeze declarado en `BASELINE_DELTAS.md`.
