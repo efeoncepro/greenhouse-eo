@@ -44,6 +44,9 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 | Cloud Run recibe token IAM pero aplicativo no obtiene JWT íntegro | Dos controles consumen el transporte firmado | Header aplicativo propio X-Workbench-Identity + X-Serverless-Authorization IAM, sin fallback Authorization; exigir readback tras corrección |
 | Aprobación del operador se usa para aceptar audiencia compartida | Comentario PR7 identifica riesgo MEDIO sin aceptación específica | OIDC propio antes de habilitar otros tres integrantes; no inferir aceptación del riesgo |
 | Miembros GitHub/correos se presentan como productores habilitados | API de equipo no certifica binding Google ni IAM | Evidencia por persona y cuenta; correos sólo referencia, no grant |
+| Perfil legacy malformed se interpreta como firma eliminada | Rechazo Cloud Run400 no describe transformación exacta de bytes | Registrar conducta medida y header propio íntegro; no inferir mecanismo no observado |
+| Primer token válido se extiende a todos los miembros | Canary9/9 probó sólo al operador, scope de un repo y revocación de cuatro tokens | Separar mint/token/identidad positiva del operador y admisión individual del resto |
+| Canary sin pago se presenta como readiness para gastar | IA OFF y quotes0 no prueban quote/budget o ruta pagada | OAuth propio, presupuesto admitido y autorización del pago antes de cualquier canary de costo |
 | Fusionar nueva CLI para probar endpoint aún ausente | Cliente requiere contrato que runtime no admite | PR draft, backend admitido/readback IA OFF antes de merge; sin broad-token fallback |
 
 ## Propuestas rechazadas o retiradas

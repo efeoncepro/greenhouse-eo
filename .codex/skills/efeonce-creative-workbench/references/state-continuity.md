@@ -1,6 +1,66 @@
 # Corte de continuidad: 2026-09-30
 
-## Corte vigente: PR 7 draft y revisión candidata sin tráfico — 2026-09-30
+## Corte vigente: canary de identidad 9/9, candidato sin promoción — 2026-09-30
+
+**Git y CI:** Greenhouse registró documentos propios en `ccabbbf1e9e24e4760700bbad2bea052f4a31756`
+y luego `95125d8a6`, ambos **sin push**. Este corte nuevo no está commiteado. Workbench
+[PR 7 draft](https://github.com/efeoncepro/creative-workbench/pull/7), head
+`2629ab4ea8ac5a5ed6aa3bf04d3db1fef2e04aef`: cinco checks SUCCESS. **Sin merge/promoción**,
+main continúa `96eab1eff46f77e6cd6f242fc243957bbdbee1c1`; no instalación del equipo acreditada.
+
+**Pruebas:** harness 303 y SKY 7. Privado **310 PASS/0 SKIP**; público harness 287 PASS/16 SKIP
+y SKY 5 PASS/2 SKIP, total **292 PASS/18 SKIP licenciados**, cero fallos; cuatro gates PASS.
+Dependencia pública runtime `google-auth-library` **10.9.1** fijada en producción. Son pruebas
+de este candidato; no habilitan pagos ni certifican toda la matriz de controles reales.
+
+**Build y revisión candidata:** Cloud Build `0d726072-992b-4cf2-b1db-6c3d60c99846` SUCCESS; imagen
+`8ba42f191cfbdf39fa16f4fbf8e47e9900154225560a95635208f51e9d74d995`, UID1000. Google overlay SHA256
+`d60ead18c9e5da3e3e9ccf4aa74e56ed00a6637df5640c61102a67c504572e92`. Revisión `00010-cof` READY,
+**0% tráfico**, tag `bound-identity`, generación false. `00008-tv6` conserva **100%** del tráfico.
+
+**Canary real 9/9 PASS, sin pago:**
+
+| Caso medido en candidata | Resultado |
+| --- | --- |
+| Identity del operador | 200; ID87578376, login cesargrowth11 |
+| Firma alterada / token truncado | 400 / 400 |
+| Authorization legacy solo / junto al header propio | 400 / 400 |
+| Bearer GitHub falso | 400 |
+| Body con otro ID | 400 |
+| Validate SKY | 200, providerInvocations0 |
+| Execute con IA OFF | 400, sin paid call |
+
+**Primer mint real medido:** audit/readback de cuatro tokens, GET de scope para cada uno con
+un único repo **1395425041**, `members:read` y `metadata:read`; cuatro DELETE **204** al finalizar
+usos. App **5138627**, instalación **166592362** fijadas. Transporte aplicativo íntegro en
+`X-Workbench-Identity` + IAM en `X-Serverless-Authorization`, sin fallback Authorization, y
+revocación tras usos implementados/probados en esta candidata. No guardar tokens, llave,
+subjects o claims. Cloud Run reporta perfil malformed en Authorization legacy: el rechazo medido
+no prueba exactamente cómo transformó los bytes ni permite afirmar que eliminó la firma.
+
+**Límite del logro:** sólo el operador está probado en canary. Membresía GitHub verificada:
+
+| Login | ID GitHub | Admisión individual |
+| --- | --- | --- |
+| cesargrowth11 | 87578376 | Operador probado en canary; candidata sin promoción |
+| AndresCarlosamaDev | 117703586 | Binding/IAM pendientes |
+| daniela349 | 335077130 | Binding/IAM pendientes |
+| MelkinH77 | 335077253 | Binding/IAM pendientes |
+
+Correos siguen como referencia histórica, nunca permisos. Los otros tres mantienen bindings/IAM
+pendientes; no hubo mutación API/IAM al equipo. [Documento propuesto de admisión](architecture.md) enruta la fuente Workbench de
+IDs y referencias; no autoriza permisos por inferencia.
+
+Audiencia gcloud compartida: riesgo **MEDIO NO aceptado específicamente**. OAuth/OIDC propio
+sigue propuesto **antes de otros tres integrantes o gasto**. No se certificaron reales: otro
+SUB Google, token vencido firmado, binding revocado, retirada de equipo; fixtures sí los cubren.
+Sin recovery real nuevo ni paid calls. Policy budget v2 draft 50 USD/persona y 500 USD/organización
+por mes UTC, quotes0, IA OFF. Pendientes OAuth propio, bindings individuales, matriz real
+restante, promoción autorizada, cotizaciones/presupuesto/canary pago y QA Figma/Packages/Lab.
+Los cortes inferiores preservan historia; no tomar identity400 previo, token no probado o
+trabajo en curso de headers/revocación como estado actual.
+
+## Histórico: Corte vigente: PR 7 draft y revisión candidata sin tráfico — 2026-09-30
 
 **Greenhouse:** los 50 documentos propios se registraron en commit
 `ccabbbf1e9e24e4760700bbad2bea052f4a31756`, **sin push**. Este corte posterior sigue sin commit.

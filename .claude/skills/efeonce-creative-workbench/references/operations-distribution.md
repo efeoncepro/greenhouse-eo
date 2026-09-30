@@ -1,6 +1,26 @@
 # Instalación, distribución y runtime
 
-## Corte vigente de distribución y revisión candidata
+## Corte vigente: candidata validada para un operador, sin promoción
+
+Docs Greenhouse commits ccabbbf1 y95125d8a6, ambos sin push; este corte nuevo sin commit.
+Workbench PR 7 draft/head2629ab4ea8ac5a5ed6aa3bf04d3db1fef2e04aef, cinco checks SUCCESS.
+Build SUCCESS/revisión00010-cof READY/tag bound-identity con0% tráfico;00008-tv6 mantiene100%.
+Main96eab1e; sin merge, promoción o instalación de equipo. [Pins/evidencia](state-continuity.md).
+
+Canary real9/9 PASS: identidad owner200, validate SKY200/provider0, execute IAOFF400 y
+rechazos de firma/token/legacy/GitHubbearer/body ajeno. Primer mint REAL: cuatro tokens y scopes
+GET de único repo1395425041 membersread/metadataread, revocados con cuatro DELETE204.
+JWT aplicativo en X-Workbench-Identity + IAM X-Serverless-Authorization y revocación App tras
+usos implementados/probados en candidata; no guardar tokens/llaves/claims. Legacymalformed
+prueba rechazo, no la transformación exacta de bytes. Runtime google-auth-library10.9.1 pin.
+
+Privado310 PASS/0 SKIP; público292 PASS/18 SKIP licenciados; cuatro gates PASS. Sólo un
+operador probado, otros tres sin bindings/IAM verificados. Riesgo MEDIO de audiencia compartida
+NO aceptado específicamente: OAuth propio aún propuesto antes de otros tres o gasto. Matriz
+real restante y recovery real nuevo no certificados; ninguna paid call. Budget v2 draft50/500USD,
+quotes0 e IA OFF. Los cortes inferiores preservan historia y no rigen el estado vigente.
+
+## Histórico: Corte vigente de distribución y revisión candidata
 
 Los 50 documentos propios de Greenhouse están en commit
 `ccabbbf1e9e24e4760700bbad2bea052f4a31756`, sin push. Workbench PR 7 permanece draft, head

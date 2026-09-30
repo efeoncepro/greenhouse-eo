@@ -1,6 +1,26 @@
 # Arquitectura y mapa de fuentes
 
-## Estado posterior: candidato construido, transporte en corrección
+## Estado vigente: transporte y revocación probados en candidata
+
+Head `2629ab4ea8ac5a5ed6aa3bf04d3db1fef2e04aef`, PR 7 draft/cinco checks SUCCESS. Nuevo
+transporte implementado/probado: JWT aplicativo íntegro en `X-Workbench-Identity`, IAM en
+`X-Serverless-Authorization`, sin fallback aplicativo Authorization. Revocación App tras usos:
+cuatro GET scope de repo1395425041 con members/metadata read y cuatro DELETE204 medidos.
+Primer mint real acreditado; identidad del operador200 en canary9/9, validate SKY200/provider0
+y execute IA OFF400. Dependencia pública google-auth-library10.9.1 fijada en producción.
+
+Build/image/policies y revisión00010-cof READY/0% están en [continuidad](state-continuity.md).
+No merge/promoción: main96eab1e y00008-tv6 al100%. Legacy Authorization rechazado con perfil
+malformed no explica qué ocurrió a sus bytes; no afirmar eliminación exacta de firma.
+
+Audiencia gcloud compartida sigue riesgo MEDIO no aceptado; OAuth/OIDC propio propuesto antes
+de otros tres integrantes o gasto. Binding/IAM de los otros tres pendientes, un operador probado.
+Matriz real de otro SUB/token vencido firmado/binding revocado/team withdrawal y nuevo recovery
+no certificados. Sin paid calls. Documento propuesto Workbench:
+`docs/architecture/workbench-team-identity-admission.md`, fuente de IDs/correos históricos y
+admisión individual, no grants. Presupuesto v2 draft, cotizaciones0 e IA OFF permanecen.
+
+## Histórico: Estado posterior: candidato construido, transporte en corrección
 
 El código del head `344c8bafea9ecb1e618330e1e7fc8e6a2e334876` está publicado en PR 7 draft con
 CI/Vercel SUCCESS y una imagen candidata construida. Revisión 00009-cep READY/0% tráfico, tag

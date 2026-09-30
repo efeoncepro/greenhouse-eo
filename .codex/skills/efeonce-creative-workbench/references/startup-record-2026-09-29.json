@@ -88,6 +88,130 @@
         "X-Workbench-Identity application JWT with X-Serverless-Authorization IAM and no Authorization fallback",
         "revoke App tokens after uses"
       ]
+    },
+    {
+      "observationDate": "2026-09-30",
+      "state": "candidate-single-operator-canary-passed-not-promoted",
+      "canonicalReference": "state-continuity.md",
+      "greenhouse": {
+        "commits": [
+          "ccabbbf1e9e24e4760700bbad2bea052f4a31756",
+          "95125d8a6"
+        ],
+        "pushed": false,
+        "currentDocumentationCutCommitted": false
+      },
+      "workbench": {
+        "pr": 7,
+        "draft": true,
+        "head": "2629ab4ea8ac5a5ed6aa3bf04d3db1fef2e04aef",
+        "successfulChecks": 5,
+        "merged": false,
+        "main": "96eab1eff46f77e6cd6f242fc243957bbdbee1c1"
+      },
+      "tests": {
+        "harness": 303,
+        "sky": 7,
+        "privatePass": 310,
+        "privateSkip": 0,
+        "publicHarnessPass": 287,
+        "publicSkyPass": 5,
+        "publicPass": 292,
+        "publicSkip": 18,
+        "failed": 0,
+        "gatesPassed": 4
+      },
+      "runtimeDependency": {
+        "name": "google-auth-library",
+        "version": "10.9.1",
+        "productionPinned": true
+      },
+      "candidate": {
+        "cloudBuild": "0d726072-992b-4cf2-b1db-6c3d60c99846",
+        "buildStatus": "SUCCESS",
+        "imageDigest": "8ba42f191cfbdf39fa16f4fbf8e47e9900154225560a95635208f51e9d74d995",
+        "runtimeUid": 1000,
+        "googleOverlaySha256": "d60ead18c9e5da3e3e9ccf4aa74e56ed00a6637df5640c61102a67c504572e92",
+        "revision": "00010-cof",
+        "state": "READY",
+        "trafficPercent": 0,
+        "tag": "bound-identity",
+        "generationEnabled": false
+      },
+      "serving": {
+        "revision": "00008-tv6",
+        "trafficPercent": 100
+      },
+      "realCanary": {
+        "passed": 9,
+        "total": 9,
+        "operator": {
+          "githubId": 87578376,
+          "login": "cesargrowth11",
+          "identityStatus": 200
+        },
+        "skyValidateStatus": 200,
+        "validateProviderInvocations": 0,
+        "executeIaOffStatus": 400,
+        "negativeRejections": [
+          "altered signature",
+          "truncated token",
+          "legacy Authorization only",
+          "legacy Authorization alongside own header",
+          "fake GitHub bearer",
+          "other ID body"
+        ]
+      },
+      "appTokenReadback": {
+        "appId": 5138627,
+        "installationId": 166592362,
+        "realTokens": 4,
+        "scopeGet": 4,
+        "repositoryIds": [
+          1395425041
+        ],
+        "permissions": {
+          "members": "read",
+          "metadata": "read"
+        },
+        "revocations": 4,
+        "revocationStatus": 204
+      },
+      "transport": {
+        "applicationHeader": "X-Workbench-Identity",
+        "iamHeader": "X-Serverless-Authorization",
+        "authorizationFallback": false,
+        "implementedAndCandidateTested": true,
+        "appTokensRevokedAfterUses": true
+      },
+      "sharedAudienceRisk": {
+        "severity": "MEDIUM",
+        "specificallyAccepted": false,
+        "ownOAuthProposedBeforeOtherMembersOrSpending": true
+      },
+      "team": {
+        "realCanaryOperators": 1,
+        "otherBindingsPending": 3,
+        "otherIamUnverified": 3,
+        "emailsAreHistoricalReferenceOnly": true,
+        "permissionsMutatedForTeam": false
+      },
+      "notRealCertified": [
+        "other Google sub",
+        "signed expired token",
+        "revoked binding",
+        "team withdrawal",
+        "new paid-output recovery"
+      ],
+      "budget": {
+        "version": 2,
+        "state": "draft",
+        "personUsdPerMonth": 50,
+        "organizationUsdPerMonth": 500,
+        "quotes": 0,
+        "generationEnabled": false,
+        "newPaidCalls": 0
+      }
     }
   ]
 }

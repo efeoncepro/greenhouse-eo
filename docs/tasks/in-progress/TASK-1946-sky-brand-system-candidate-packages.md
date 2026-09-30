@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Docs propias GH commit ccabbbf1 sin push; WB PR 7 draft head344c8baf CI/Vercel SUCCESS; candidata00009-cep READY 0%, producción00008-tv6 100%; identity400 previo a Google/mint, token/scopes no probado; transporte/revocación en corrección, audiencia MEDIO no aceptada, OIDC propio antes de otros3; IA OFF`
+- Status real: `GH docs ccabbbf1 y95125d8a6 sin push; WB PR 7 draft/head2629ab4e, cinco checks SUCCESS; candidata00010-cof READY/0%,00008-tv6 al100%; canary real9/9 y primer mint/scope/revocación medidos; privado310 PASS,público292 PASS/18 SKIP; OAuth propio y tres bindings/IAM pendientes; IA OFF, sin paid calls/merge/promoción`
 - Rank: `1`
 - Domain: `platform|tooling|content`
 - Blocked by: `none`
@@ -234,3 +234,21 @@ Riesgo MEDIO de audiencia compartida no aceptado específicamente; OIDC propio a
 tres integrantes, sin bindings/IAM verificados. Policy budget v2 draft 50 USD/persona y 500 USD/organización, quotes0,
 IA OFF; sin nuevos gastos USD ni paid canaries, merge o promoción. La tarea conserva in-progress; sin
 marcar acceptance no auditados. [Corte y pins](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md).
+
+## Corte final 2026-09-30 — canary real de un operador, sin promoción
+
+PR 7 draft/head2629ab4ea8ac5a5ed6aa3bf04d3db1fef2e04aef: cinco checks SUCCESS. Harness303 +
+SKY7: privado310 PASS/0 SKIP, público292 PASS/18 SKIP licenciados, cuatro gates PASS.
+Runtime google-auth-library10.9.1 fijado en producción. Candidata00010-cof READY/0% tráfico,
+IAfalse;00008-tv6 sigue100%. Canary real9/9 PASS: identity owner200 (cesargrowth11/87578376),
+negativos de firma/token/header/body, SKY validate200/provider0 y execute IAOFF400.
+Primer mint real: cuatro scopes GET de único repo1395425041 members/metadata read y cuatro
+revocaciones DELETE204. App5138627/instalación166592362. Header aplicativo íntegro y revocación
+App implementados/probados en candidata. No explicar bytes legacy desde perfil malformed.
+
+Sólo operador probado. Riesgo MEDIO audiencia compartida NO aceptado; OAuth propio propuesto
+antes de los otros tres o gasto. Tres bindings/IAM pendientes; sin nuevas mutaciones al equipo.
+Otro SUB, token vencido firmado, binding revocado y team withdrawal sólo fixtures, no matriz
+real certificada; sin recovery real nuevo ni paid calls. Policy budgetv2 draft50USD/persona500org,
+quotes0 e IA OFF. Sin merge/promoción; main96eab1e. Docs GH ccabbbf1 y95125d8a6 sin push.
+Tarea in-progress, criterios no auditados sin marcar. [Evidencia/pins y pendientes](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md).
