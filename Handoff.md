@@ -1,10 +1,12 @@
 # Handoff activo
 
+**Deck SEO/AEO — Search Visibility 360 (30/09):** [TASK-1949](docs/tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-canonization.md) in-progress, code complete parcial: Slices 1 y 4 hechos (catálogo a 100 recetas, planes golden, docs y skills); Slice 2 (plantillas) y 3 (AXIS) en otras sesiones. Datos del deck tal cual por decisión del operador; logos de clientes con TASK-1937.
+
 **DataForSEO CLI (30/09):** [TASK-1948](docs/tasks/complete/TASK-1948-dataforseo-url-keyword-relevance-cli.md) complete local, CLI 1.1.0: URL/host, JSON/CSV, techo y resume. [Evidencia](docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md): 96 tests; prueba corregida MX para Berel USD 0,0284 reconciliados, 20 keywords/2 páginas y resume USD 0. Guías/skills sincronizadas; sugerencias con ruido editorial, CL separado. Typecheck global con WIP ajeno; sin push/deploy.
 
 **HubSpot Agent CLI / MCP (29/09):** CLI 0.15.0 instalada; OAuth `hubspot whoami` en Efeonce/Kortex `48713323` con lectura CRM live positiva. El conector MCP es el carril alternativo para operación directa, con identidad y permisos propios. `pipelines list` pide service key; HubSQL devolvió 403; `properties create` no ofrece `--dry-run` en esta versión. [Runbook](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) y skills espejo actualizados. ANAM `19893546` no quedó autenticado por esta sesión CLI; verificar portal antes de cualquier operación.
 
-**Deck de práctica Salesforce (29/09, cierre):** [TASK-1942](docs/tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md) **complete**. Deck aprobado por el operador (20 láminas, dos cierres: brochure y propuesta) e insignia «Salesforce Partner» autorizada por Salesforce y por defecto; 94/94 recetas con plantilla; AXIS `v0.3.36` (`302f7f7`, brand-assets 0.4.5) publicado con autorización y fijado en Greenhouse; develop `814255694` con CI 9/9 en verde; `pnpm test` completo (16 917 tests) y `pnpm build` en verde. PDF de propuesta y de brochure con insignia en `ai-generations/2026-09-29_deck-salesforce/out/` (`render-src/pdf-propuesta.mjs`, `DOC=brochure`, `SIN_BADGE=1`). Pendiente externo: autorización escrita de Anthropic para Claude/Claudeforce en SF16 (TASK-1937; los slots fallan cerrados). Siguiente: serie HubSpot (TASK-1943).
+**Deck de práctica Salesforce (29/09, cierre):** [TASK-1942](docs/tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md) **complete** (94/94 con plantilla, AXIS `v0.3.36`, insignia autorizada). Pendiente externo: autorización de Anthropic para Claude/Claudeforce en SF16 (TASK-1937). Siguiente: serie HubSpot (TASK-1943).
 
 **AI Visibility Report y módulos de correo en AXIS (29/09):** AXIS `v0.3.38` publicado (`c92160b`; antes `v0.3.30`, `26097c5`): contrato `efeonce.ai-visibility-report` 0.1.0, `efeonce.email-modules` 0.1.0 (pie, CTA principal, agenda y bloque de marca por línea; «Suscribirme» retirado; el correo de Insights es una aplicación, no la plantilla), `graphic-line-orbit` 0.5.0 con el **recorrido desde las 12 en toda medida** (decidido por el operador), graphic-line 0.13.0 y brand-assets 0.4.6 (PNG de correo; logo y eslogan separados). Lab `/references/ai-visibility-report/` y `/references/email/`. Greenhouse fija 0.3.37 y **el adapter de la órbita (`scripts/creative/layout-compiler/graphic-line.mjs`, sólo acepta 0.3.1) ya da 0/7 en `develop`** desde `9289cab0c`; lo arregla el bump de [TASK-1944](docs/tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md) o [TASK-1938](docs/tasks/to-do/TASK-1938-ai-visibility-report-pdf-la-orbita.md). **Decide el operador:** propósito del correo de Insights frente a la política de TASK-1764 (el contrato exige agenda, preferencias y baja en todo pie).
 
@@ -395,12 +397,6 @@ tras drenar esa carrera. No existe todavía un nuevo canary humano directo compl
 
 Notas del 02–05/09 archivadas en [2026-09](docs/operations/agent-context-history/handoff/2026-09.md). Siguen abiertas: TASK-1829/1830 (rollout pendiente; magic link muerto en prod), TASK-1349 (Finance), TASK-1814 y TASK-1815.
 
-## 2026-09-16 — TASK-1846 COMPLETE: render durable de Efeonce Insights en producción
+## 2026-09-30 — Deck SEO/AEO: docs y skills (TASK-1949 Slice 4, Claude)
 
-Release `917491fd02e4` (PR #237, run `35154555317`, manifest `917491fd02e4-9231b87b-20da-43c3-abce-4348dccdda99`
-`released` 22:02:41Z, un solo intento; watchdog `ok` 6/6, primer Job `artifact-worker` en el orquestador).
-`INSIGHTS_RENDER_ENABLED` ON en Vercel Production (redeploy `greenhouse-d6l33zils`) + Job + `ops-worker`. Gateway
-`efeonce-mcp` v1.6.0 desplegado (`00054-n78`). Canary productivo: render `202` → dispatcher automático → `completed`.
-Estado histórico al cierre de TASK-1846: `INSIGHTS_ISSUANCE_ENABLED` seguía OFF y `report_pdf`/`web` pasaban a
-TASK-1847/1848. Supersedido el 2026-09-28: emisión ON con canary humano sintético; detalle en los ledgers de flags y
-tiempos y en la skill `efeonce-insights`.
+Norma §4.6 v1.17, catálogo v1.11, manual v1.12, funcional 2.8, arquitectura 1.6 y cinco skills con espejo. Decisión del operador aplicada (datos tal cual, delta b de la task). `brand:compose` del documento SEO falla hoy en `section-cine` (`gl-px-bodyTop`) por el Slice 2 sin commitear.

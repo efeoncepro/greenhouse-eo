@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-30 — Deck SEO/AEO (Search Visibility 360) aprobado y en el catálogo de recetas (TASK-1949)
+
+- El operador aprobó el deck SEO/AEO de «La órbita» en tres documentos (completo 33, brochure 24, propuesta 29; cinco capítulos, línea Engine). Catálogo `efeonce.deck-slide-recipes.v1` a 100 recetas: seis nuevas sin plantilla todavía (`content-brand-family`, `content-service-mockups`, `content-report-formats`, `content-committee-deck`, `content-industries`, `content-markets`), `productMark` opcional (lockups de submarca), eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark`, `section-cine-team.body` opcional y 27 usos aprobados; tres planes golden validados e intents de documento de ejemplo.
+- Reglas: anotaciones fuera del deck, una sola sección partida, casos con imagen de ambiente puesta en escena y el logo del cliente compuesto, logos de clientes con autorización. Por decisión del operador, las cifras de los casos, su fuente, los formatos de Insights, las industrias y la cifra de Bresler quedan tal cual, sin marca de «provisional» («asumo la responsabilidad»). Norma §4.6, catálogo, manual, doc funcional, arquitectura y skills al día. Plantillas del Composer (Slice 2) y AXIS (Slice 3) en curso.
+
 ## 2026-09-30 — Keywords relevantes por URL en DataForSEO CLI 1.1.0 (TASK-1948)
 
 - `site-keywords` y `quick keywords-for-site` aceptan dominio, subdominio o URL con tipo explícito. Conservan path/query y entregan relevancia con categorías, tendencias y métricas Ads en JSON/CSV; no declaran rankings. Paginación acotada, entitlement SEO, techo progresivo y checkpoint bloquean recompra silenciosa tras fallo o costo desconocido.
@@ -621,10 +626,6 @@ Política optativa con archivo/hash, paleta AXIS y tratamientos explícitos; com
 ## 2026-09-24 — ANAM: foto oficial de Emma, avatar de chat y cargo comercial
 
 La landing pública sirve `kortex-cms-react/30` con el retrato PNG enviado por María Paz y el cargo `Ejecutivo comercial ANAM`. El avatar derivado con fondo menta se guardó en la identidad de Customer Agent y en el chatflow `96601133`; el widget público mostró la nueva imagen sin enviar mensajes. Se actualizaron el [caso ANAM](docs/architecture/kortex/hubspot-cms/anam-chat-landing.md), la documentación funcional, el manual y las referencias espejo de `hubspot-as-a-service`. La QA completa móvil y conversacional del build #30 no se repitió.
-
-## 2026-09-24 — Insights: renderer local de familias de gráficos
-
-Los catálogos `insights-deck` e `insights-report` componen line, pie, donut y scatter desde `ChartSpec`; las suites dirigidas pasan (114/114) y un PDF sintético A4 de 30 páginas valida fuentes embebidas, pie/folio 30/30 y lectura en grises. Evidencia y gates pendientes en [TASK-1847](docs/tasks/in-progress/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md); sin deploy ni release.
 
 ## 2026-09-24 — SKY: producción, correcciones y método de video
 
