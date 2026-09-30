@@ -170,12 +170,9 @@ describe('lockup de submarca, propuesta de cine sin eyebrow y bajada del equipo 
     expectCode(() => planSurfacePiece({ ...example('deck-cover-brochure-cine-orbit-intent.json'), productMark: 'sv360-logo-negative' } as Intent, { artifactId: 'x' }), 'invalid-intent')
     expectCode(() => planSurfacePiece({ ...example('deck-method-staircase-flat-intent.json'), productMark: 'aeo-lockup-negative' } as Intent, { artifactId: 'x' }), 'invalid-intent')
 
-    // La lista de AXIS (`surfaces.deck.productMark.assets`) y la del slot difieren sólo en lo conocido: AXIS no lista el
-    // logo con que abre la familia (`sv360-logo-negative`) y sí el nombre completo de su cabecera, que no es del slot.
-    const slot = Object.keys(PRODUCT_MARKS)
-
-    expect(slot.filter(id => !AXIS_PRODUCT_MARK_ASSETS.includes(id))).toEqual(['sv360-logo-negative'])
-    expect(AXIS_PRODUCT_MARK_ASSETS.filter(id => !slot.includes(id))).toEqual(['sv360-name-lockup-negative'])
+    // La lista cerrada del slot es la de AXIS (`surfaces.deck.productMark.assets`, corregida en axis-tokens 0.3.41), en
+    // el mismo orden; Greenhouse sólo agrega el texto alternativo de cada lockup.
+    expect(Object.keys(PRODUCT_MARKS)).toEqual([...AXIS_PRODUCT_MARK_ASSETS])
   })
 
   it('la propuesta de cine sin eyebrow lleva el lockup en su lugar (140, 112, alto 40); sin ninguno de los dos, no compone', async () => {
