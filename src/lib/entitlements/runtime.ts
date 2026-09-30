@@ -3107,6 +3107,23 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1950 — prospect demonstrations are internal. Client roles receive no grant.
+  if (subject.tenantType === 'efeonce_internal' &&
+      (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT))) {
+    for (const grant of [
+      { capability: 'growth.xray.case.read', action: 'read' },
+      { capability: 'growth.xray.draft.manage', action: 'create' },
+      { capability: 'growth.xray.draft.manage', action: 'update' },
+      { capability: 'growth.xray.edition.issue', action: 'approve' },
+      { capability: 'growth.xray.edition.issue', action: 'update' },
+      { capability: 'growth.xray.share.manage', action: 'create' },
+      { capability: 'growth.xray.share.manage', action: 'read' },
+      { capability: 'growth.xray.share.manage', action: 'update' }
+    ] as const) {
+      addEntitlement(entries, { module: 'growth', ...grant, scope: 'tenant', source: 'role' })
+    }
+  }
+
   // TASK-1845 — Efeonce Insights. La PUERTA real es el entitlement per-ORG
   // (module_assignments: insights_v1) que verifica el command; estos grants autorizan
   // DENTRO de una org habilitada y el target se revalida en cada command. Admin + Account

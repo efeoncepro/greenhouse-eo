@@ -144,3 +144,11 @@ La reunión dura una hora; el guion de 20 minutos de [SALES-POD.md](SALES-POD.md
 ### Lectura comercial
 
 Intención alta y encaje fuerte: Jesús buscó públicamente, respondió en minutos y fijó la fecha. El caso tiene buenas probabilidades de llegar a propuesta y probabilidades medias de ganarse, porque es un proceso competitivo en el que las credenciales funcionan como primer filtro. Lo que más mueve la probabilidad esta semana es enviar credenciales sólidas antes del martes y llegar con la explicación del informe preparada. Diferenciar por la medición de visibilidad en IA y por la conexión con la captación de ahorro, no por precio. No cotizar en la primera reunión.
+
+## 10. Entrega previa a reunión y etapa comercial — 30-09-2026
+
+El operador aceptó la demo X-Ray y solicitó redactar el correo robusto previo a la reunión ya agendada. La versión preparada incluye brochure como enlace ([PDF alojado en HubSpot](https://hubs.ly/Q04yMxFj0), proporcionado por Julio), enlace privado del X-Ray y [muestra pública de Efeonce Insights](https://think.efeoncepro.com/insights/muestra). Insights utiliza datos de ejemplo, no resultados de Pichincha. El enlace de la edición del banco se conserva fuera de Git en su expediente; no copiarlo al documento ni a logs.
+
+HubSpot MCP verificó identidad Julio75788512, portal48713323 y permiso DEAL write. Se leyó deal65352884246 «Banco Pichincha Perú - Agencia SEO/AEO», pipeline `default`, etapa `appointmentscheduled`; se confirmó la opción `presentationscheduled` = «Presentación de soluciones». Por instrucción expresa de Julio se actualizó **únicamente dealstage** y una búsqueda independiente confirmó `presentationscheduled`, lastmodified `2026-09-30T17:59:28.427Z`. [Deal](https://app.hubspot.com/contacts/48713323/record/0-3/65352884246?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=search).
+
+La reunión sigue agendada; el cambio de etapa no acredita una presentación ya celebrada. El correo está redactado, pero esta sesión no lo envió ni verificó su envío. Se preserva el checklist histórico fechado del §9 y no se marca credenciales enviadas sin evidencia. La demo fue aceptada por el operador como material de Efeonce; no constituye aprobación del banco ni publicación en su sitio/redes. Implementación y documentación: [dossier](../../../think/aeo-xray-implementation-dossier-2026-09-30.md).

@@ -1,16 +1,58 @@
 # Radiografía AEO — Arquitectura
 
 > **Tipo de documento:** Documentación técnica / arquitectura
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-09-23
+> **Última actualización:** 2026-09-30
 > **Owner:** Growth / Think · Comercial (es una herramienta de venta)
 > **Task:** [`TASK-1410`](../tasks/complete/TASK-1410-aeo-article-xray.md)
 > **Repo del runtime:** `efeonce-think` (NO `greenhouse-eo`)
-> **Vive en:** `think.efeoncepro.com/muestras/<slug>-<token>`
+> **Vive en:** `think.efeoncepro.com/muestras/<slug>-<token>` (legacy) y `/aeo-xray/r/<key>` (multipieza)
 > **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
 
 ---
+
+## Extensión multipieza publicada — 30/09/2026
+
+La experiencia original se extiende con landing/artículo, iconografía editorial, exploración de valor,
+medios sociales reales, telón de entrada y coreografía más rica. `Experience.astro` comparte los cuatro
+pasos y el instrumento con legacy. `artifact.experience` preserva narrativa/evidencia/derivados;
+el adapter es aditivo. El selector mantiene paso y el linaje retorna al bloque de origen.
+
+La muestra Banco Pichincha está publicada **sólo en Think** desde `main`
+`be8d4841e1124818bd7f4c88d0d7ad7b970e5122`; deployment `dpl_7AEWYHEiiWWUyCiwrcTj1US1e3vB`,
+alias `think.efeoncepro.com`. El enlace concreto queda en el expediente privado de entrega.
+El [dossier de implementación](aeo-xray-implementation-dossier-2026-09-30.md) es la referencia detallada
+para componentes, contratos, seguridad, medios, SEO/AEO, motion y evidencia del cierre.
+
+**Hay tres carriles y no comparten garantías:** legacy estático, sample empaquetado en Think
+(`sample_`, distribución no listada independiente, assets 302 a archivos públicos y retiro por redeploy),
+y grant Greenhouse (`xrg_`, dominio revocable preparado, sin rollout compartido). El sample publicado
+no depende de provider Greenhouse, no autentica destinatario ni aplica expiración/revocación por request.
+La compatibilidad `expiresAt` de su envelope no es una garantía de lifecycle.
+
+AXIS posee tokens/contrato0.1.0 y Think valida el snapshot congelado antes de renderizar. Greenhouse
+posee en el **diseño preparado** caso/borrador/edición/grant/media privada: organización operativa activa,
+actor interno y capability por request, sin autoridad por etiqueta de prospecto. Esa foundation tiene
+pruebas locales; migración, permisos, storage/flags/canary productivos siguen pendientes y no fueron
+promovidos para enviar la demo. No declarar TASK-1950/1951 completas por el éxito del sample.
+
+SSR multipieza aplica private/no-store, no-referrer, noindex/nofollow, nosniff, canonical genérico y
+analyticsfalse. SEO/schema del cliente se exhiben de forma inerte. La oportunidad usa una secuencia
+ilustrativa pregunta→respuesta→fuente, identificada como tal; no representa una cita real de buscador.
+Los estados proposed/implemented/verified/measured conservan ámbito y evidencia; implemented se refiere
+a la muestra, no al sitio del banco. DataForSEO sale de fuentes editoriales y conserva provenance de research.
+
+La ruta multipieza usa `ClientRouter` para navegación por query y View Transitions nativas. Telón 1400 ms,
+easing simétrico, focus/scroll y fallback noJS/reduced-motion; el fix de segundos/ms del CSS compilado
+se verificó en producción. Los cuatro pasos visibles se llaman **La oportunidad, La pieza,
+La radiografía, Dónde más vive**. Landing incluye módulos completos; artículo dos banners contextuales;
+la atomización contiene 3 feeds,Story y MP4 real. No se publicó en redes del banco.
+
+Estado y siguiente paso: [auditoría](aeo-xray-completion-audit-2026-09-30.md) y
+[handoff de entrega/provider](aeo-xray-release-handoff.md). Los detalles SKY de las secciones siguientes
+son contrato legacy/historia del original; sus benchmarks no acreditan Pichincha. El siguiente cliente
+usa [kit portable](aeo-xray-nuevo-cliente.md), no un fork del renderer.
 
 ## Qué es
 
@@ -507,7 +549,7 @@ Ver el **[manual](radiografia-aeo-manual.md)**. Resumen: `openssl rand -hex 6` +
 - **Probe a nivel de artículo en el AI Visibility Grader.** Hoy los probes son **site-level**. No existe *"dame la URL de un artículo y evalúa su capa AEO"*. Esa capacidad convertiría esta muestra estática en una **herramienta** — y ya existe la mitad del motor (`src/lib/growth/site-substrate/html.ts` sabe extraer y aplanar JSON-LD — sustrato de sitio extraído por TASK-1697, 2026-08-27, consumible vía `@/lib/growth/site-substrate`).
 - **Versión genérica sin marca de cliente**, indexable, como activo de captación en Think.
 - **Pantalla ⑤ "Cómo se mide"** — los 8 indicadores que promete la oferta. Cierra el ciclo: propuesta → pieza → capa → distribución → **prueba**.
-- **Un segundo payload comercial real.** Ya existe una fixture no publicada para probar el motor/gate sin IDs de SKY, pero falta una muestra completa de otro cliente para validar contenido, marca, imágenes, venta y operación end-to-end.
+- **Segundo caso comercial entregado:** Banco Pichincha Perú valida composición, landing/artículo, marca, medios y navegación en Think. Pendiente separado: operación end-to-end de grants Greenhouse y medición después de publicar en el canal real del cliente.
 
 ## Cross-links
 

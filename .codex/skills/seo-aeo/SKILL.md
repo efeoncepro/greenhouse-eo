@@ -66,6 +66,13 @@ description: >-
    explica los comandos y la [decisión técnica](../../../docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md)
    gobierna transporte, allowlist, costos y lifecycle.
 
+### AEO X-Ray / Radiografía AEO
+
+Para preparar, extender o revisar una muestra de trabajo, cargar
+[`references/aeo-xray.md`](references/aeo-xray.md): cuatro pasos, landing/artículo completos,
+evidencia por bloque, composición neutral, distribución, telón y QA. Es una demostración;
+Assessment, AI Visibility Report e Insights conservan su función y metodología propias.
+
 ### SEO/AEO como competencia de selección
 
 Cuando SEO/AEO se evalúa como parte de una contratación, esta skill aporta el oficio y la evidencia técnica; la

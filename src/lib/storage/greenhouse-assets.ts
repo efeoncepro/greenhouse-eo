@@ -153,6 +153,7 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   // TASK-1846 — una edición de Insights es un INFORME de engagement, no un contrato:
   // misma clase que sample_sprint_report, no la de quote_pdf/master_agreement.
   insight_output: 'commercial_engagement_report',
+  xray_source: 'commercial_engagement_report',
   brand_render_source_draft: 'organization_brand_asset',
   brand_render_source: 'organization_brand_asset',
   brand_render_output: 'organization_brand_asset'
@@ -205,6 +206,7 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   proposal_deliverable_draft: 'proposal-deliverables',
   proposal_deliverable: 'proposal-deliverables',
   insight_output: 'insight-outputs',
+  xray_source: 'xray-sources',
   brand_render_source_draft: 'brand-render-sources',
   brand_render_source: 'brand-render-sources',
   brand_render_output: 'brand-render-outputs'
@@ -894,7 +896,7 @@ export const upsertSystemGeneratedAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output' | 'brand_render_output'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output' | 'brand_render_output' | 'xray_source'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -1007,7 +1009,7 @@ export const storeSystemGeneratedPrivateAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output' | 'brand_render_output'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output' | 'brand_render_output' | 'xray_source'
   >
   ownerAggregateId: string
   ownerClientId?: string | null

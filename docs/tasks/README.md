@@ -2556,3 +2556,9 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 | TBD | `TASK-1550` | [TASK-1550-globe-storyboard-realization-orchestrator.md](to-do/TASK-1550-globe-storyboard-realization-orchestrator.md) | P1 | Muy alto | Alto | Diseño gobernado · blocked 1543/1546 | ProductionPlan multi-shot, DAG, unidades humanas y coordinación con Producer |
 | TBD | `TASK-1551` | [TASK-1551-globe-identity-avatar-parity.md](to-do/TASK-1551-globe-identity-avatar-parity.md) | P1 | Alto | Medio | Diseño gobernado · avatar no implementado | Avatar canónico Greenhouse→Globe por broker/BFF con iniciales fallback |
 | wip | `TASK-1552` | [TASK-1552-globe-producer-composer-focused-creation.md](in-progress/TASK-1552-globe-producer-composer-focused-creation.md) | P1 | Alto | Medio | UI ready no; slice route-driven bloqueado por TASK-1633 | Única dueña del composer: prompt persistente, referencias transversales, controles derivados de ruta, modelo estable y GVC/regresión UI Seedance+Omni |
+
+## AEO X-Ray — composición y experiencia
+
+- `TASK-1950` — in-progress: [X-Ray contratos, ediciones y sharing](in-progress/TASK-1950-aeo-xray-foundation.md). Foundation local verificada; provider/grant compartido pendiente.
+
+- `TASK-1951` — in-progress: [X-Ray experiencia Pichincha](in-progress/TASK-1951-aeo-xray-experience.md). Demo autónoma Think publicada y aceptada; integración gobernada dependiente de TASK-1950.

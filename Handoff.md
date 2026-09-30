@@ -400,3 +400,9 @@ Notas del 02–05/09 archivadas en [2026-09](docs/operations/agent-context-histo
 ## 2026-09-30 — Deck SEO/AEO: docs y skills (TASK-1949 Slice 4, Claude)
 
 Norma §4.6 v1.17, catálogo v1.11, manual v1.12, funcional 2.8, arquitectura 1.6 y cinco skills con espejo. Decisión del operador aplicada (datos tal cual, delta b de la task). `brand:compose` del documento SEO falla hoy en `section-cine` (`gl-px-bodyTop`) por el Slice 2 sin commitear.
+
+### AEO X-Ray — demo publicada y cierre documental (2026-09-30)
+
+Think `be8d484`, deployment `dpl_7AEWYHEiiWWUyCiwrcTj1US1e3vB` READY; demo aceptada. [Dossier](docs/think/aeo-xray-implementation-dossier-2026-09-30.md), [manual](docs/think/radiografia-aeo-manual.md), [kit multicliente](docs/think/aeo-xray-nuevo-cliente.md): contenido, assets, motion y evidencia.
+
+TASK-1950/1951: integración Greenhouse pendiente; `sample_` no acredita grant. Sin promoción ni migración compartida. Próximo paso autorizado: actor/provider/storage reales y canary de revocación. Deal 65352884246 en `presentationscheduled` con readback; correo redactado, envío no verificado.

@@ -246,9 +246,9 @@ panorama, límites y reunión)*
 
 ## 4b. 🔴 La Radiografía AEO — el activo que ya tenemos (educa Y vende)
 
-En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es la pieza que la hace **tangible**. Escribe un artículo **real** para el cliente y lo **abre en canal** en cuatro pantallas: el hueco de búsqueda medido · el artículo · la capa de máquina **acoplada** (tocas un párrafo y ves qué produce) · dónde más vive.
+En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es la pieza que la hace **tangible**. Escribe un artículo **real** para el cliente y lo **abre en canal** en cuatro pantallas: **La oportunidad · La pieza · La radiografía · Dónde más vive**. Desde el 2026-09-30 compone landing y artículo, conecta sus bloques con evidencia y mantiene derivados y motion en el Experience original. La oportunidad declara qué es medido, estimado o ilustrativo.
 
-**Live:** `think.efeoncepro.com/muestras/<slug>-<token>` · runtime en el repo **`efeonce-think`** (NO `greenhouse-eo`) · **el cliente es un payload JSON, cero código.**
+**Rutas:** legacy `/muestras/<slug>-<token>`; composición `/aeo-xray/r/<token>?artifact=<id>&step=<paso>`, en `think.efeoncepro.com`. Runtime en **`efeonce-think`**; el cliente se configura en un intent JSON resuelto por AXIS, sin copiar código del caso anterior. Las muestras publicadas Think y los grants Greenhouse tienen lifecycles diferentes: un enlace `sample_…` distribuye una demo no listada, no acceso privado/revocable de un grant.
 
 **Cadena comercial:** **Grader mide → diagnóstico SEO de prospecto cuantifica (§4c) → Radiografía demuestra → propuesta/deck convierte → servicio opera.** Si el prospecto todavía no tiene evidencia, primero Grader. Si ya vio un score y pregunta *"¿cómo se arregla?"*, entra la Radiografía. En licitaciones y QBR se registra como evidencia `client_facing` sólo si el enlace tokenizado puede viajar al comité.
 
@@ -273,7 +273,7 @@ En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es
 
 🔴 **NUNCA** prometer el rich snippet de FAQ de Google (restringido desde 2023 a gobierno/salud). 🔴 **NUNCA** dejar que la pieza cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola**. 🔴 **Gate humano:** el operador elige el ángulo del artículo.
 
-**Cargar al tocarla:** `docs/think/radiografia-aeo-architecture.md` (invariantes vigentes + gate de 46 asserts) · `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente) · `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` (encuadre funcional) · `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` (playbook comercial).
+**Cargar al tocarla:** [`../seo-aeo/references/aeo-xray.md`](../seo-aeo/references/aeo-xray.md) (criterios reutilizables y boundaries con Assessment, Report e Insights) · `docs/think/radiografia-aeo-architecture.md` (invariantes vigentes y gates legacy/composición) · `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente) · `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` (encuadre funcional) · `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` (playbook comercial).
 
 ---
 

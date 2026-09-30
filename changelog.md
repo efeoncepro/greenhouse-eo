@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-30 — AEO X-Ray: demo multipieza aceptada, publicada y documentada
+
+- Think conserva y extiende el X-Ray original: landing y artículo por manifiesto, cuatro etapas, radiografía acoplada, oportunidad evidenciada, banners y derivados sociales/video, marcas oficiales, footer, iconografía, transiciones nativas, selector y telón de 1400 ms. Fix productivo de unidades CSS optimizadas `s`/`ms`; 44 checks de apertura pasaron también en producción.
+- Think `be8d484`, deployment `dpl_7AEWYHEiiWWUyCiwrcTj1US1e3vB` READY con alias; entrega comercial autónoma `sample_` aceptada. Foundation Greenhouse/contrato AXIS preparados y probados; migración/grant/runtime compartido pendientes, sin promoción Greenhouse. [Dossier](docs/think/aeo-xray-implementation-dossier-2026-09-30.md), triple documentación, kit multicliente y skills espejo actualizados.
+- HubSpot: deal 65352884246 → Presentación de soluciones por instrucción y readback; brochure alojado en HubSpot, correo previo a reunión redactado con enlaces X-Ray e Insights. Envío del correo no verificado.
+
 ## 2026-09-30 — Deck SEO/AEO (Search Visibility 360) aprobado y en el catálogo de recetas (TASK-1949)
 
 - El operador aprobó el deck SEO/AEO de «La órbita» en tres documentos (completo 33, brochure 24, propuesta 29; cinco capítulos, línea Engine). Catálogo `efeonce.deck-slide-recipes.v1` a 100 recetas: seis nuevas sin plantilla todavía (`content-brand-family`, `content-service-mockups`, `content-report-formats`, `content-committee-deck`, `content-industries`, `content-markets`), `productMark` opcional (lockups de submarca), eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark`, `section-cine-team.body` opcional y 27 usos aprobados; tres planes golden validados e intents de documento de ejemplo.
@@ -632,23 +638,3 @@ La landing pública sirve `kortex-cms-react/30` con el retrato PNG enviado por M
 Profundización con tres subagentes: [método completo](docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md), companions de preproducción/cámaras/piezas, posproducción/sonido y 13 aciertos/20 fallas; dos plantillas. Incluye preparación con Claude, corrige reglas universales de planos/tramos y límites estimados, y conecta skills espejo Motion/Audio. Motion/Audio incorporados al gate de espejos. Sin nuevos renders ni gasto.
 
 [CDR-008](docs/campaigns/decisions/CDR-008-cmp003-cartelas-postproduccion-y-audio-separado.md) registra aprobación de punch-v3 y su alcance: cartelas/cierre, película generativa. Fuentes y hashes congelados; guion/cámaras/audio/costos en el plan V10 de OneDrive. Skills motion/audio espejadas incorporan alpha, URL Luminosidad, música instrumental limpia y controles actuales de ElevenLabs/Omni. [Método y evidencia](docs/operations/social/2026-09-24-sky-generative-film-title-overlay-method.md). Tras autorización condicionada, un piloto Omni de 9,5 s fue rechazado por discontinuidad (228 cuadros revisados, ~USD 1,54 estimados desde uso). Master sin integrar; audio posterior al cierre de imagen. No se encadenaron intentos. V11 posterior: un intento completo 1080p rechazado tras 713 cuadros; costo individual confirmado USD34,162558 excedió USD25 autorizados. Informe en CDR-008. V12 posterior rescata fuentes existentes y compone cartelas/cierre: 30 s/1080p/720 cuadros, música/SFX originales sincronizados, USD0 adicionales. V13 corrige portal, URL, morado y recupera música V7; export y QA en CDR-008. Escucha y aprobación final pendientes. V14 integra Omni localizado y Heroic Ascent Music2.5 elegido por el operador, tras rechazar el puente local genera Heroic Ascent Finale con referencia nativa, sin empalmes, y mezcla cinco SFXv2; master30s/1080p revisable, escucha pendiente. Costos y errores en CDR-008. V15 adopta el rock aportado por el operador; V16 reemplaza el acento de marca y restaura metraje con Topaz, luego recompone capas aprobadas. Entregas30s/4K restaurado y1080p verificadas; coste de restauraciónUSD5,59944 dentro deUSD5,60. V17 posterior, autorizado: reduce lectura0,5s y corrige la flecha del logo blanco; entregas29,5s/4K restaurado y1080p revisadas, música sin empalmes, USD0. Escucha/aprobación pendientes; evidencia en CDR-008. [Retrospectiva integral](docs/operations/social/2026-09-24-sky-retrospectiva-produccion-v17.md): historia, fuentes finales, errores, aciertos, herramientas y límites de costos.
-
-## 2026-09-23 — Compositor de piezas con CTA: tramo 16 y corte de la novena auditoría
-
-`pnpm foto:componer:cta` y `pnpm foto:cta:gate`, auditados nueve veces por pares de subagentes adversariales (diseño y
-arquitectura) y robustecidos sin cambiar ninguna pieza aprobada (regresión: 132 de 132 idénticas):
-
-- el gate distingue falla (1) de **no certificable (3)** y certifica por reproducción (`--reproducir`);
-- contraste sobre el trazo; CTA a 4,5:1 siempre, con APCA y daltonismo bloqueantes; `placement` sólo endurece;
-  el dominante es la voz mayor;
-- excepciones con aprobador del registro (`scripts/foto/aprobadores.json`), sha256 del plate y tope (`hasta`);
-- firma automática sólo en la banda del pie; firma externa declarada y leída de `signatureY` (v03–v07 la declaran);
-- entradas con errores que nombran pieza y campo; texto alternativo con el rol del CTA siempre;
-- proceso: bloqueo sin carreras, regresión que compara el veredicto del gate, mutantes contra corrida base y canarios.
-
-Docs: [contrato §18–§19](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md), funcional y manual en `creative/`,
-skill `efeonce-advertising-creative`. La novena auditoría no emitió informes por límite semanal de Claude; no habrá
-más rondas por instrucción del operador. La segunda corrida completa de 175 mutantes se detuvo con 81 detecciones
-registradas, sin puntuación final. Persiste la intermitencia de P10; decisiones y cobertura faltante en §19.10.
-CMP001-04 se reemplazó en la carpeta local sincronizada de OneDrive con respaldo y hash de lectura posterior;
-sin readback del servidor, publicación ni pauta.

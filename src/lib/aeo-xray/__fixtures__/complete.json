@@ -1,0 +1,432 @@
+{
+  "contract": "efeonce.aeo-xray",
+  "version": "0.1.0",
+  "locale": "es-PE",
+  "title": "Demostración editorial",
+  "preparedFor": "Organización de ejemplo",
+  "preparedAt": "2026-09-30",
+  "sources": [
+    {
+      "id": "source",
+      "label": "Referencia de ejemplo",
+      "url": "https://example.com/",
+      "accessedAt": "2026-09-30"
+    }
+  ],
+  "assets": [],
+  "brand": {
+    "name": "Ejemplo",
+    "accent": "#0F265C",
+    "action": "#FFDD00",
+    "actionText": "#0F265C",
+    "fontFamily": "system-sans",
+    "displayFontFamily": "system-serif"
+  },
+  "artifacts": [
+    {
+      "id": "landing",
+      "kind": "landing",
+      "title": "Una decisión informada",
+      "summary": "Una muestra, sin resultados atribuidos.",
+      "seo": {
+        "title": "Una decisión informada",
+        "description": "Demostración de estructura editorial.",
+        "canonical": "https://example.com/landing",
+        "robots": "index,follow",
+        "lang": "es-PE"
+      },
+      "blocks": [
+        {
+          "id": "hero",
+          "kind": "hero",
+          "title": "Decide con información",
+          "text": "Una muestra de contenido.",
+          "cta": {
+            "label": "Leer la guía",
+            "artifactId": "article"
+          }
+        }
+      ],
+      "annotations": [
+        {
+          "id": "answer",
+          "scope": "block",
+          "blockId": "hero",
+          "category": "aeo",
+          "title": "Respuesta directa",
+          "explanation": "Estructura propuesta para responder con claridad.",
+          "status": "proposed",
+          "sourceIds": []
+        }
+      ],
+      "experience": {
+        "thesis": "This synthetic fixture preserves the original instrument contract.",
+        "gap": {
+          "kicker": "Opportunity",
+          "headline": "Make the answer clear",
+          "serpTitle": "Search evidence",
+          "serpNote": "No measured ranking in this synthetic fixture.",
+          "serp": [],
+          "punch": "Show the answer",
+          "punchNote": "Proposed structure",
+          "aside": "Synthetic contract fixture"
+        },
+        "machine": {
+          "seo": [
+            {
+              "id": "title",
+              "coupleId": "hero",
+              "label": "Title",
+              "value": "Una decisión informada",
+              "why": "Match the question and the answer.",
+              "tier": 2,
+              "sourceStatus": "proposed"
+            }
+          ],
+          "og": [],
+          "headings": {
+            "coupleId": "hero",
+            "why": "Describe the document structure.",
+            "tree": [
+              {
+                "coupleId": "hero",
+                "level": 1,
+                "text": "Decide con información"
+              }
+            ]
+          },
+          "alts": [],
+          "jsonld": [],
+          "craft": []
+        },
+        "flow": [
+          {
+            "step": "",
+            "label": "Opportunity",
+            "next": "Continue"
+          },
+          {
+            "step": "articulo",
+            "label": "articulo",
+            "next": "Continue"
+          },
+          {
+            "step": "radiografia",
+            "label": "radiografia",
+            "next": "Continue"
+          },
+          {
+            "step": "atomizacion",
+            "label": "atomizacion",
+            "next": ""
+          }
+        ],
+        "atomsIntro": "The original content can be adapted with traceable origin.",
+        "atoms": [
+          {
+            "id": "social",
+            "coupleId": "hero",
+            "kind": "social",
+            "bornFrom": "Una decisión informada",
+            "why": "A derivative with a clear source.",
+            "honesty": "Draft specification only; this fixture is not published.",
+            "deliverable": [
+              {
+                "k": "Format",
+                "v": "social"
+              },
+              {
+                "k": "Status",
+                "v": "Draft"
+              }
+            ]
+          },
+          {
+            "id": "script",
+            "coupleId": "hero",
+            "kind": "script",
+            "bornFrom": "Una decisión informada",
+            "why": "A derivative with a clear source.",
+            "honesty": "Draft specification only; this fixture is not published.",
+            "deliverable": [
+              {
+                "k": "Format",
+                "v": "script"
+              },
+              {
+                "k": "Status",
+                "v": "Draft"
+              }
+            ]
+          }
+        ],
+        "evidence": {
+          "intro": "Evidence of scope",
+          "facts": [],
+          "fanOut": {
+            "title": "Question coverage",
+            "note": "Coverage in the demonstration",
+            "items": [
+              {
+                "q": "Primary question",
+                "coveredBy": "hero",
+                "covered": true
+              }
+            ]
+          },
+          "honesty": "No measured performance result."
+        },
+        "ui": {
+          "disclaimerLabel": "Synthetic fixture copy",
+          "disclaimerBody": "Synthetic fixture copy",
+          "paneArticleTitle": "Synthetic fixture copy",
+          "paneArticleSubtitle": "Synthetic fixture copy",
+          "paneMachineTab": "Synthetic fixture copy",
+          "paneEvidenceTab": "Synthetic fixture copy",
+          "hintDesktop": "Synthetic fixture copy",
+          "hintMobile": "Synthetic fixture copy",
+          "whyLabel": "Synthetic fixture copy",
+          "schemaNote": "Synthetic fixture copy",
+          "sourceLabel": "Synthetic fixture copy",
+          "thesisLabel": "Synthetic fixture copy",
+          "licenseTitle": "Synthetic fixture copy",
+          "licenseNote": "Synthetic fixture copy",
+          "backToArticle": "Synthetic fixture copy",
+          "bylineBy": "Synthetic fixture copy",
+          "readTime": "Synthetic fixture copy",
+          "instrumentTitle": "Synthetic fixture copy",
+          "specimenChip": "Synthetic fixture copy",
+          "producesLabel": "Synthetic fixture copy",
+          "producesLabelOne": "Synthetic fixture copy",
+          "flowNext": "Synthetic fixture copy",
+          "flowOf": "Synthetic fixture copy",
+          "srProduces": "Synthetic fixture copy",
+          "closing": "Synthetic fixture copy",
+          "verifyTitle": "Synthetic fixture copy",
+          "verifyNote": "Synthetic fixture copy",
+          "verifySteps": [
+            {
+              "what": "Heading",
+              "how": "Inspect the heading"
+            },
+            {
+              "what": "Metadata",
+              "how": "Inspect the values"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "article",
+      "kind": "article",
+      "title": "Guía para decidir",
+      "summary": "Una pieza editorial de ejemplo.",
+      "byline": {
+        "author": "Equipo editorial de ejemplo",
+        "publishedAt": "2026-09-30"
+      },
+      "seo": {
+        "title": "Guía para decidir",
+        "description": "Una guía de demostración.",
+        "canonical": "https://example.com/article",
+        "robots": "index,follow",
+        "lang": "es-PE"
+      },
+      "blocks": [
+        {
+          "id": "article-title",
+          "kind": "hero",
+          "title": "Guía para decidir",
+          "text": "Una pieza editorial de ejemplo."
+        },
+        {
+          "id": "intro",
+          "kind": "paragraph",
+          "text": "Contenido ilustrativo, sin afirmar un resultado medido.",
+          "sourceIds": [
+            "source"
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "id": "canonical",
+          "scope": "page",
+          "category": "technical",
+          "title": "URL canónica propuesta",
+          "explanation": "La URL del dominio de destino es una recomendación; la muestra queda noindex.",
+          "status": "proposed",
+          "sourceIds": []
+        }
+      ],
+      "experience": {
+        "thesis": "This synthetic fixture preserves the original instrument contract.",
+        "gap": {
+          "kicker": "Opportunity",
+          "headline": "Make the answer clear",
+          "serpTitle": "Search evidence",
+          "serpNote": "No measured ranking in this synthetic fixture.",
+          "serp": [],
+          "punch": "Show the answer",
+          "punchNote": "Proposed structure",
+          "aside": "Synthetic contract fixture"
+        },
+        "machine": {
+          "seo": [
+            {
+              "id": "title",
+              "coupleId": "intro",
+              "label": "Title",
+              "value": "Guía para decidir",
+              "why": "Match the question and the answer.",
+              "tier": 2,
+              "sourceStatus": "proposed"
+            }
+          ],
+          "og": [],
+          "headings": {
+            "coupleId": "intro",
+            "why": "Describe the document structure.",
+            "tree": [
+              {
+                "coupleId": "article-title",
+                "level": 1,
+                "text": "Guía para decidir"
+              }
+            ]
+          },
+          "alts": [],
+          "jsonld": [],
+          "craft": []
+        },
+        "flow": [
+          {
+            "step": "",
+            "label": "Opportunity",
+            "next": "Continue"
+          },
+          {
+            "step": "articulo",
+            "label": "articulo",
+            "next": "Continue"
+          },
+          {
+            "step": "radiografia",
+            "label": "radiografia",
+            "next": "Continue"
+          },
+          {
+            "step": "atomizacion",
+            "label": "atomizacion",
+            "next": ""
+          }
+        ],
+        "atomsIntro": "The original content can be adapted with traceable origin.",
+        "atoms": [
+          {
+            "id": "social",
+            "coupleId": "intro",
+            "kind": "social",
+            "bornFrom": "Guía para decidir",
+            "why": "A derivative with a clear source.",
+            "honesty": "Draft specification only; this fixture is not published.",
+            "deliverable": [
+              {
+                "k": "Format",
+                "v": "social"
+              },
+              {
+                "k": "Status",
+                "v": "Draft"
+              }
+            ]
+          },
+          {
+            "id": "script",
+            "coupleId": "intro",
+            "kind": "script",
+            "bornFrom": "Guía para decidir",
+            "why": "A derivative with a clear source.",
+            "honesty": "Draft specification only; this fixture is not published.",
+            "deliverable": [
+              {
+                "k": "Format",
+                "v": "script"
+              },
+              {
+                "k": "Status",
+                "v": "Draft"
+              }
+            ]
+          }
+        ],
+        "evidence": {
+          "intro": "Evidence of scope",
+          "facts": [],
+          "fanOut": {
+            "title": "Question coverage",
+            "note": "Coverage in the demonstration",
+            "items": [
+              {
+                "q": "Primary question",
+                "coveredBy": "intro",
+                "covered": true
+              }
+            ]
+          },
+          "honesty": "No measured performance result."
+        },
+        "ui": {
+          "disclaimerLabel": "Synthetic fixture copy",
+          "disclaimerBody": "Synthetic fixture copy",
+          "paneArticleTitle": "Synthetic fixture copy",
+          "paneArticleSubtitle": "Synthetic fixture copy",
+          "paneMachineTab": "Synthetic fixture copy",
+          "paneEvidenceTab": "Synthetic fixture copy",
+          "hintDesktop": "Synthetic fixture copy",
+          "hintMobile": "Synthetic fixture copy",
+          "whyLabel": "Synthetic fixture copy",
+          "schemaNote": "Synthetic fixture copy",
+          "sourceLabel": "Synthetic fixture copy",
+          "thesisLabel": "Synthetic fixture copy",
+          "licenseTitle": "Synthetic fixture copy",
+          "licenseNote": "Synthetic fixture copy",
+          "backToArticle": "Synthetic fixture copy",
+          "bylineBy": "Synthetic fixture copy",
+          "readTime": "Synthetic fixture copy",
+          "instrumentTitle": "Synthetic fixture copy",
+          "specimenChip": "Synthetic fixture copy",
+          "producesLabel": "Synthetic fixture copy",
+          "producesLabelOne": "Synthetic fixture copy",
+          "flowNext": "Synthetic fixture copy",
+          "flowOf": "Synthetic fixture copy",
+          "srProduces": "Synthetic fixture copy",
+          "closing": "Synthetic fixture copy",
+          "verifyTitle": "Synthetic fixture copy",
+          "verifyNote": "Synthetic fixture copy",
+          "verifySteps": [
+            {
+              "what": "Heading",
+              "how": "Inspect the heading"
+            },
+            {
+              "what": "Metadata",
+              "how": "Inspect the values"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "flow": {
+    "entryArtifactId": "landing",
+    "links": [
+      {
+        "fromArtifactId": "landing",
+        "toArtifactId": "article",
+        "label": "Leer la guía"
+      }
+    ]
+  }
+}

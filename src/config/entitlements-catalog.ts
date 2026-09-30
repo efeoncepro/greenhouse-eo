@@ -2448,6 +2448,11 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'hiring.candidate.review.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.talent_pool.manage', module: 'hiring', actions: ['update'] as const, defaultScope: 'tenant' },
   { key: 'hiring.talent_pool.invite', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1950 — commercial X-Ray cases belong to the internal owner tenant.
+  { key: 'growth.xray.case.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'growth.xray.draft.manage', module: 'growth', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
+  { key: 'growth.xray.edition.issue', module: 'growth', actions: ['approve', 'update'] as const, defaultScope: 'tenant' },
+  { key: 'growth.xray.share.manage', module: 'growth', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' },
   // TASK-1845 — Efeonce Insights. Crear y emitir son autoridades DISTINTAS (arquitectura
   // §7.1); `review` es interno (preparar/revisar/recuperar fases). Scope `own` = la org del
   // actor cliente derivada server-side; `tenant` = colaborador interno sobre cuentas a cargo,

@@ -287,3 +287,7 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 ## Creative Workbench: aislamiento multimarcas
 
 [ADR Accepted](EFEONCE_CREATIVE_WORKBENCH_MULTIBRAND_ISOLATION_DECISION_V1.md), 2026-09-29: taller común del equipo; recursos y corridas separados. TASK-1945 en implementación, sin rollout.
+
+## AEO X-Ray — 2026-09-30
+
+- Accepted: [composición multipieza y sharing por edición](EFEONCE_AEO_XRAY_COMPOSITION_AND_SHARING_DECISION_V1.md). Goal del operador; AXIS composición, Greenhouse dominio, Think renderer. TASK-1950/1951; demo autónoma Think publicada y aceptada; integración gobernada Greenhouse pendiente.

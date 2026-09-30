@@ -2430,3 +2430,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro Codex 2026-09-30: TASK-1948 reservada para capacidad URL de Keywords for Site por pedido del operador. TASK-1935 conserva CLI general cerrada; TASK-1776 conserva visibilidad por rankings y TASK-1651 AI Optimization. Siguiente ID libre `TASK-1949`.
 
 > Nota 2026-09-30 (deck SEO/AEO): `TASK-1949` reservada por pedido del operador (canonizar el deck SEO/AEO aprobado, como TASK-1942 con el Salesforce). **Barrido por DOMINIO y SUPERFICIE** (catálogo `deck-recipes`, `graphic-line-deck`, tasks del deck 1927–1943, `docs/ui/**` sin `TASK-1949*`): `TASK-1934` (las nueve láminas SEO/AEO del 2026-09-28) está complete y no es dueña de este deck; `TASK-1930` (binding), `TASK-1931` (plates), `TASK-1932` (Proposal Studio), `TASK-1933` (pendientes del catálogo) y `TASK-1937` (autorizaciones) son consumidoras o reciben delta. Sin UI en el portal: no declara wireframe. Siguiente ID libre `TASK-1950`.
+
+| `TASK-1950` | `in-progress` | AEO X-Ray: contratos, ediciones y sharing | `docs/tasks/in-progress/TASK-1950-aeo-xray-foundation.md` |
+
+> Registro Codex 2026-09-30: TASK-1950 foundation X-Ray por goal confirmado; TASK-1951 reservada para consumer UI dependiente. TASK-1410 permanece complete como legacy. Siguiente ID libre `TASK-1952`.
+
+| `TASK-1951` | `in-progress` | AEO X-Ray: demo inmersiva Pichincha publicada; integración pendiente | `docs/tasks/in-progress/TASK-1951-aeo-xray-experience.md` |

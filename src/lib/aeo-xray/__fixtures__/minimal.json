@@ -1,0 +1,10 @@
+{
+  "contract": "efeonce.aeo-xray", "version": "0.1.0", "locale": "es-PE", "title": "Demostración editorial", "preparedFor": "Organización de ejemplo", "preparedAt": "2026-09-30",
+  "sources": [{"id":"source","label":"Referencia de ejemplo","url":"https://example.com/","accessedAt":"2026-09-30"}], "assets": [],
+  "brand": {"name":"Ejemplo","accent":"#0F265C","action":"#FFDD00","actionText":"#0F265C","fontFamily":"system-sans","displayFontFamily":"system-serif"},
+  "artifacts": [
+    {"id":"landing","kind":"landing","title":"Una decisión informada","summary":"Una muestra, sin resultados atribuidos.","seo":{"title":"Una decisión informada","description":"Demostración de estructura editorial.","canonical":"https://example.com/landing","robots":"index,follow","lang":"es-PE"},"blocks":[{"id":"hero","kind":"hero","title":"Decide con información","text":"Una muestra de contenido.","cta":{"label":"Leer la guía","artifactId":"article"}}],"annotations":[{"id":"answer","scope":"block","blockId":"hero","category":"aeo","title":"Respuesta directa","explanation":"Estructura propuesta para responder con claridad.","status":"proposed","sourceIds":[]}]},
+    {"id":"article","kind":"article","title":"Guía para decidir","summary":"Una pieza editorial de ejemplo.","byline":{"author":"Equipo editorial de ejemplo","publishedAt":"2026-09-30"},"seo":{"title":"Guía para decidir","description":"Una guía de demostración.","canonical":"https://example.com/article","robots":"index,follow","lang":"es-PE"},"blocks":[{"id":"intro","kind":"paragraph","text":"Contenido ilustrativo, sin afirmar un resultado medido.","sourceIds":["source"]}],"annotations":[{"id":"canonical","scope":"page","category":"technical","title":"URL canónica propuesta","explanation":"La URL del dominio de destino es una recomendación; la muestra queda noindex.","status":"proposed","sourceIds":[]}]}
+  ],
+  "flow":{"entryArtifactId":"landing","links":[{"fromArtifactId":"landing","toArtifactId":"article","label":"Leer la guía"}]}
+}

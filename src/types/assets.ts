@@ -83,6 +83,8 @@ export type GreenhouseAssetContext =
   // TASK-1846 — outputs de una edición de Efeonce Insights (deck/informe). System-generated:
   // nunca los sube una persona, por eso NO entra en DraftUploadContext.
   | 'insight_output'
+  // TASK-1950 — original media bound to one X-Ray case, served only through its edition grant.
+  | 'xray_source'
   // TASK-1921 — render de piezas de marca (La órbita y Glitch). Las FUENTES (plates, fotos, logos) las sube una
   // persona interna y el command las adjunta al pedido; las SALIDAS (PDF/PNG) las genera el artifact-worker.
   | 'brand_render_source_draft'
