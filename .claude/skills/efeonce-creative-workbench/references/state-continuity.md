@@ -1,5 +1,51 @@
 # Corte de continuidad: 2026-09-30
 
+## Corte vigente: PR 7 draft y revisión candidata sin tráfico — 2026-09-30
+
+**Greenhouse:** los 50 documentos propios se registraron en commit
+`ccabbbf1e9e24e4760700bbad2bea052f4a31756`, **sin push**. Este corte posterior sigue sin commit.
+**Workbench:** [PR 7 draft](https://github.com/efeoncepro/creative-workbench/pull/7), head
+`344c8bafea9ecb1e618330e1e7fc8e6a2e334876`, CI y Vercel SUCCESS. Sin merge ni promoción;
+esos checks no acreditan endpoint, token de instalación, piezas SKY o canary pagado.
+
+**Imagen candidata:** Cloud Build `eee0b541-659a-45fd-8905-beec23249d60` SUCCESS, digest
+`ee9df4997fb995223a3ab616c7d704ab41fdb006fd4a5f7701f855f009fae45e`. Runtime UID1000;
+Google overlay SHA256 `d60ead18c9e5da3e3e9ccf4aa74e56ed00a6637df5640c61102a67c504572e92`.
+Revisión `00009-cep` READY, **0% tráfico**, tag `bound-identity`; `00008-tv6` conserva **100%**.
+Prueba positiva real de identity: **400 request-rejected**, rechazada en el filtro **antes**
+de verificar Google o emitir token App. No es autenticación positiva ni prueba del primer token/scopes.
+La policy monetaria v2 permanece draft: 50 USD/persona y 500 USD/organización/mes UTC,
+cero cotizaciones, IA OFF. No se agregaron gastos USD ni paid canaries.
+
+**Correcciones en curso, no verificadas como entregadas:** transporte aplicativo con JWT íntegro
+en `X-Workbench-Identity` y token IAM en `X-Serverless-Authorization`, sin fallback aplicativo
+a Authorization; otro agente prepara revocación de tokens App al terminar sus usos. No atribuir
+estas correcciones a la imagen/revisión anterior ni declarar nuevos tests/CI por trabajo en curso.
+
+[Comentario de revisión](https://github.com/efeoncepro/creative-workbench/pull/7#issuecomment-5916472410):
+audiencia gcloud compartida es un riesgo **MEDIO**, **no aceptado específicamente**. Separar
+OIDC propio antes de habilitar a los otros tres integrantes; una aprobación del vínculo del operador
+no acepta este riesgo por inferencia. API de equipo: cuatro integrantes; sólo el vínculo del
+operador está aprobado/preparado. Los otros tres no tienen bindings verificados ni IAM comprobado.
+Correos son referencia histórica, nunca grant. Subjects/JWT/claims no se copian al repo.
+
+| Login GitHub verificado | ID GitHub | Estado Google/IAM |
+| --- | --- | --- |
+| cesargrowth11 | 87578376 | Vínculo del operador aprobado/preparado; identity positiva y token/scopes aún no probados |
+| AndresCarlosamaDev | 117703586 | Binding no verificado; IAM no comprobado |
+| daniela349 | 335077130 | Binding no verificado; IAM no comprobado |
+| MelkinH77 | 335077253 | Binding no verificado; IAM no comprobado |
+
+Membresía comprobada por API en esta vuelta; no amplía autoridad a GCP, Packages, broker o Vercel.
+El diagnóstico de audiencia cubre sólo un owner, IA OFF y candidato con 0% tráfico; el riesgo
+MEDIO sigue sin aceptación específica.
+
+Los bloques siguientes preservan cortes anteriores (incluidos sin PR, identity404 y policies
+preparadas); prevalece este corte para estado vigente. Falta identidad positiva/token/scopes,
+OIDC propio, controles negativos/recovery, rollout individual y promoción autorizada;
+cotizaciones, presupuesto admitido, canary, Figma, Packages y Lab conservan gates separados.
+
+
 ## Candidata de identidad vinculada: código preparado, sin PR — 2026-09-30
 
 Baseline main **96eab1eff46f77e6cd6f242fc243957bbdbee1c1**, PR 3/4/5/6 fusionados y CI del

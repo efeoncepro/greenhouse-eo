@@ -39,6 +39,11 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 | Resultado pagado desaparece al revocar durante complete | Delivery y persistencia se confundieron | Complete durable antes de reauth de entrega; negar lectura preserva receipt/ZIP/UUID |
 | Ticket consumido antes del adapter y otra vez en OpenAI | Kernel y adapter llamaban el mismo guard de uso único | Sólo adapter real invoca una vez tras secreto/body; kernel rechaza guard ausente, denegado o repetido |
 | Ticket vigente antes de auth, vencido al terminar await | Ledger durable se comprobaba antes de esperar identidad viva | assertAtProvider síncrono después de reauth: exacto WeakSet privado, uso único, dueño/hash/período/quote; sin nuevo pago |
+| Revisión READY/tagged se informa como rollout completo | 00009-cep tiene 0% tráfico y producción sigue en 00008-tv6 al 100% | Verificar revisión/tráfico y endpoint; separar build, deploy candidato y promoción |
+| Identity400 se atribuye a token App o vínculo Google | Filtro rechaza antes de ambos lectores | No afirmar primer token/scopes o binding positivo; corregir transporte y volver a medir |
+| Cloud Run recibe token IAM pero aplicativo no obtiene JWT íntegro | Dos controles consumen el transporte firmado | Header aplicativo propio X-Workbench-Identity + X-Serverless-Authorization IAM, sin fallback Authorization; exigir readback tras corrección |
+| Aprobación del operador se usa para aceptar audiencia compartida | Comentario PR7 identifica riesgo MEDIO sin aceptación específica | OIDC propio antes de habilitar otros tres integrantes; no inferir aceptación del riesgo |
+| Miembros GitHub/correos se presentan como productores habilitados | API de equipo no certifica binding Google ni IAM | Evidencia por persona y cuenta; correos sólo referencia, no grant |
 | Fusionar nueva CLI para probar endpoint aún ausente | Cliente requiere contrato que runtime no admite | PR draft, backend admitido/readback IA OFF antes de merge; sin broad-token fallback |
 
 ## Propuestas rechazadas o retiradas

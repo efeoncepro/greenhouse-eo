@@ -1,5 +1,20 @@
 # Arquitectura y mapa de fuentes
 
+## Estado posterior: candidato construido, transporte en corrección
+
+El código del head `344c8bafea9ecb1e618330e1e7fc8e6a2e334876` está publicado en PR 7 draft con
+CI/Vercel SUCCESS y una imagen candidata construida. Revisión 00009-cep READY/0% tráfico, tag
+bound-identity; 00008-tv6 mantiene 100%. Identity400 se rechaza antes de Google/mint: la imagen
+no acredita binding aplicado ni token/scopes. [Estado y pins](state-continuity.md).
+
+El transporte de ambos headers descrito abajo corresponde al candidato anterior: un agente
+prepara `X-Workbench-Identity` con JWT aplicativo íntegro y `X-Serverless-Authorization` para
+IAM, sin fallback aplicativo a Authorization. Otro prepara revocación al terminar usos de tokens
+App. No se declaran implementados/admitidos por esta documentación. Audiencia gcloud compartida:
+riesgo MEDIO no aceptado específicamente; requiere OIDC propio antes de los otros tres integrantes.
+Presupuesto v2 draft, cotizaciones0, IA OFF y ninguna generación pagada nueva.
+
+
 ## Separación de espacios
 
 | Espacio | Responsabilidad | Frontera |

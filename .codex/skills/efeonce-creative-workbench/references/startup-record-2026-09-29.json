@@ -5,5 +5,89 @@
   "preservedAt": "2026-09-30",
   "state": "historical-superseded-not-current-instructions",
   "sourceText": "**Creative Workbench (29/09):** [ADR](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md). Repo `efeoncepro/creative-workbench` creado, sincronizado por PR (#1, CI `gates` verde) y equipo GitHub `creative-workbench` vacío. Control: `pnpm creative:{status,sync,access,provision,assets:publish}`. Pendiente: `creative:provision apply` (autorización del operador), llaves dedicadas con tope, miembros en `control.json`, re-sync desde commit limpio. `main` sin protección por plan GitHub Free.\n",
-  "utf8Sha256": "7b89b58bdf5004c0a938c05b342852936db32c5ff688376c4df6200175cd4e35"
+  "utf8Sha256": "7b89b58bdf5004c0a938c05b342852936db32c5ff688376c4df6200175cd4e35",
+  "continuityUpdates": [
+    {
+      "observationDate": "2026-09-30",
+      "state": "candidate-draft-not-promoted",
+      "canonicalReference": "state-continuity.md",
+      "greenhouse": {
+        "ownedDocuments": 50,
+        "commit": "ccabbbf1e9e24e4760700bbad2bea052f4a31756",
+        "pushed": false
+      },
+      "workbench": {
+        "pr": 7,
+        "draft": true,
+        "head": "344c8bafea9ecb1e618330e1e7fc8e6a2e334876",
+        "ci": "SUCCESS",
+        "vercel": "SUCCESS",
+        "merged": false
+      },
+      "candidate": {
+        "cloudBuild": "eee0b541-659a-45fd-8905-beec23249d60",
+        "buildStatus": "SUCCESS",
+        "imageDigest": "ee9df4997fb995223a3ab616c7d704ab41fdb006fd4a5f7701f855f009fae45e",
+        "runtimeUid": 1000,
+        "googleOverlaySha256": "d60ead18c9e5da3e3e9ccf4aa74e56ed00a6637df5640c61102a67c504572e92",
+        "revision": "00009-cep",
+        "state": "READY",
+        "trafficPercent": 0,
+        "tag": "bound-identity"
+      },
+      "serving": {
+        "revision": "00008-tv6",
+        "trafficPercent": 100
+      },
+      "identityProbe": {
+        "httpStatus": 400,
+        "result": "request-rejected",
+        "rejectedBeforeGoogleAndAppMint": true,
+        "firstAppTokenScopeVerified": false
+      },
+      "budget": {
+        "version": 2,
+        "state": "draft",
+        "personUsdPerMonth": 50,
+        "organizationUsdPerMonth": 500,
+        "quotes": 0,
+        "generationEnabled": false,
+        "newPaidCanaries": 0
+      },
+      "team": {
+        "githubMembers": 4,
+        "otherMembersGoogleBindingsVerified": 0,
+        "otherMembersIamVerified": 0,
+        "emailIsGrant": false,
+        "members": [
+          {
+            "login": "cesargrowth11",
+            "githubId": 87578376
+          },
+          {
+            "login": "AndresCarlosamaDev",
+            "githubId": 117703586
+          },
+          {
+            "login": "daniela349",
+            "githubId": 335077130
+          },
+          {
+            "login": "MelkinH77",
+            "githubId": 335077253
+          }
+        ],
+        "emailStatus": "historical-reference-only-not-grant"
+      },
+      "sharedAudienceRisk": {
+        "severity": "MEDIUM",
+        "specificallyAccepted": false,
+        "requiredBeforeOtherMembers": "own OIDC"
+      },
+      "inProgress": [
+        "X-Workbench-Identity application JWT with X-Serverless-Authorization IAM and no Authorization fallback",
+        "revoke App tokens after uses"
+      ]
+    }
+  ]
 }

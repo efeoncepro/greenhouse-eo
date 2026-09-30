@@ -1,5 +1,23 @@
 # Instalación, distribución y runtime
 
+## Corte vigente de distribución y revisión candidata
+
+Los 50 documentos propios de Greenhouse están en commit
+`ccabbbf1e9e24e4760700bbad2bea052f4a31756`, sin push. Workbench PR 7 permanece draft, head
+344c8bafea9ecb1e618330e1e7fc8e6a2e334876 con CI/Vercel SUCCESS; sin merge/promoción.
+Cloud Build SUCCESS y revisión 00009-cep READY con tag bound-identity no equivalen a rollout:
+0% tráfico, mientras 00008-tv6 conserva 100%. Identity real400 en filtro previo a Google/mint;
+primer token/scopes NO probados. [Evidencia y pins](state-continuity.md).
+
+Transporte de JWT íntegro en X-Workbench-Identity + IAM en X-Serverless-Authorization, sin
+Authorization fallback, y revocación de tokens App después de usos están en trabajo de agentes.
+OIDC propio previo a onboarding del resto del equipo: riesgo MEDIO de audiencia compartida
+no aceptado específicamente. API de equipo no constituye binding ni IAM individual; los otros
+tres integrantes siguen sin verificar ambos. Presupuesto v2 draft 50/500 USD, quotes0, IA OFF;
+no nuevos gastos ni canaries pagados. Conservar criterios de merge/backend/rollout y recuperación.
+Los cortes anteriores de esta referencia son historia y no sustituyen el estado vigente.
+
+
 ## Candidata de transporte y rollout: no confundir con el baseline
 
 Main verificado sigue 96eab1e y los merges 3/4/5/6 están cerrados. La unidad siguiente prepara

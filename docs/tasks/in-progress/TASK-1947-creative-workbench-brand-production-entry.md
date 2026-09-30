@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Entrada nativa y candidata Google-only validadas localmente (301PASS privados,283PASS/18SKIP públicos); App instalada/pins admitidos, vínculo operador aprobado/preparado; primer token pendiente sin grant impersonación SA, identity runtime404 e IAOFF; rollout sin acreditar`
+- Status real: `Docs propias GH commit ccabbbf1 sin push; WB PR 7 draft head344c8baf CI/Vercel SUCCESS; candidata00009-cep READY 0%, producción00008-tv6 100%; identity400 previo a Google/mint, token/scopes no probado; transporte/revocación en corrección, audiencia MEDIO no aceptada, OIDC propio antes de otros3; IA OFF`
 - Rank: `1`
 - Domain: `platform|tooling|identity`
 - Blocked by: `none`
@@ -282,3 +282,15 @@ Evidencias de merges, suites y pendientes:
 [continuidad Workbench](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md).
 La tarea conserva `in-progress`; acceptance criteria no auditados permanecen sin marcar.
 Este corte no borra estados/pruebas históricos ni convierte tests locales en evidencia live.
+
+## Corte posterior 2026-09-30 — PR 7 draft y candidato sin promoción
+
+Los 50 documentos propios se commitearon en Greenhouse como ccabbbf1e9e24e4760700bbad2bea052f4a31756
+sin push. Workbench PR 7 draft/head 344c8bafea9ecb1e618330e1e7fc8e6a2e334876 con CI/Vercel SUCCESS.
+Cloud Build SUCCESS, candidata 00009-cep READY/tag bound-identity/0% tráfico; 00008-tv6 sigue al 100%.
+Identity real400 request-rejected en filtro anterior a Google/mint: token/scopes no probado.
+Corrección de transporte y revocación App en curso; no atribuirlas a candidato construido.
+Riesgo MEDIO de audiencia compartida no aceptado específicamente; OIDC propio antes de otros
+tres integrantes, sin bindings/IAM verificados. Policy budget v2 draft 50 USD/persona y 500 USD/organización, quotes0,
+IA OFF; sin nuevos gastos USD ni paid canaries, merge o promoción. La tarea conserva in-progress; sin
+marcar acceptance no auditados. [Corte y pins](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md).
