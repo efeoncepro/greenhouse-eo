@@ -41,7 +41,7 @@ exports[`planes de los intents de ejemplo > audiovisual-cartela-intent.json comp
     {
       "kind": "svg",
       "ref": "asset-ref:layer:cartela-progress-growth-1-of-3",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="120" data-axis-value="0.3333333333333333"><circle data-axis-part="ring" cx="1420.03" cy="520.02" r="380.05" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="2.42"/><path data-axis-part="arc" data-axis-length="795.98" pathLength="1" d="M 1420.03 139.97 A 380.05 380.05 0 0 1 1749.17 710.05" fill="none" stroke="#36c8bf" stroke-width="14" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1749.17" cy="710.05" r="22" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="120" data-axis-value="0.3333333333333333"><circle data-axis-part="ring" cx="1420.03" cy="520.02" r="380.05" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="2.42"/><path data-axis-part="arc" data-axis-length="795.98" pathLength="1" d="M 1420.03 139.97 A 380.05 380.05 0 0 1 1749.17 710.05" fill="none" stroke="#36c8bf" stroke-width="14" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1749.17" cy="710.05" r="22" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-overlays",
@@ -98,7 +98,7 @@ exports[`planes de los intents de ejemplo > audiovisual-data-super-intent.json c
     {
       "kind": "svg",
       "ref": "asset-ref:layer:data-super-growth-620",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="measure" data-axis-kind="measure" data-axis-trajectory="measure" data-axis-sweep="223.2" data-axis-value="0.62"><circle data-axis-part="ring" cx="300.1" cy="760" r="150.01" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="2.42"/><path data-axis-part="arc" data-axis-length="130.91" pathLength="1" d="M 317.86 908.95 A 150.01 150.01 0 0 1 197.41 869.35" fill="none" stroke="#36c8bf" stroke-width="9" stroke-linecap="round"/><line data-axis-part="origin" x1="300.1" y1="616.03" x2="300.1" y2="603.93" stroke="#72ded8" stroke-opacity="0.6" stroke-width="2.42" stroke-linecap="round"/><circle data-axis-part="sphere" cx="197.41" cy="869.35" r="14" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="measure" data-axis-kind="measure" data-axis-trajectory="measure" data-axis-sweep="223.2" data-axis-value="0.62"><circle data-axis-part="ring" cx="300.1" cy="760" r="150.01" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="2.42"/><path data-axis-part="arc" data-axis-length="130.91" pathLength="1" d="M 317.86 908.95 A 150.01 150.01 0 0 1 197.41 869.35" fill="none" stroke="#36c8bf" stroke-width="9" stroke-linecap="round"/><line data-axis-part="origin" x1="300.1" y1="616.03" x2="300.1" y2="603.93" stroke="#72ded8" stroke-opacity="0.6" stroke-width="2.42" stroke-linecap="round"/><circle data-axis-part="sphere" cx="197.41" cy="869.35" r="14" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-overlays",
@@ -386,7 +386,7 @@ exports[`planes de los intents de ejemplo > deck-breather-intent.json compone el
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-br-progress-4-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.4" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="201.06" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1721.96 117.64" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1721.96" cy="117.64" r="7.7" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.4" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="201.06" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1721.96 117.64" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1721.96" cy="117.64" r="7.7" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -1188,7 +1188,7 @@ exports[`planes de los intents de ejemplo > deck-content-bullets-intent.json com
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-cb-progress-2-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1783.51 162.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1783.51" cy="162.36" r="7.7" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1783.51 162.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1783.51" cy="162.36" r="7.7" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -1281,7 +1281,7 @@ exports[`planes de los intents de ejemplo > deck-content-clients-intent.json com
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-cc-progress-4-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="201.06" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1721.96 117.64" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1721.96" cy="117.64" r="7.7" fill="#0e8c82"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="201.06" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1721.96 117.64" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1721.96" cy="117.64" r="7.7" fill="#0e8c82"/></g></svg>",
     },
     {
       "inkArea": 4200,
@@ -3928,7 +3928,7 @@ exports[`planes de los intents de ejemplo > deck-content-measure-intent.json com
     {
       "kind": "svg",
       "ref": "asset-ref:layer:measure-620-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="measure" data-axis-kind="measure" data-axis-trajectory="measure" data-axis-sweep="223.2" data-axis-value="0.62"><circle data-axis-part="ring" cx="1420" cy="600" r="403.16" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.39"/><path data-axis-part="arc" data-axis-length="1570.56" pathLength="1" d="M 1420 196.84 A 403.16 403.16 0 1 1 1144.02 893.89" fill="none" stroke="#36c8bf" stroke-width="6.77" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1144.02" cy="893.89" r="13.54" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="measure" data-axis-kind="measure" data-axis-trajectory="measure" data-axis-sweep="223.2" data-axis-value="0.62"><circle data-axis-part="ring" cx="1420" cy="600" r="403.16" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.39"/><path data-axis-part="arc" data-axis-length="1570.56" pathLength="1" d="M 1420 196.84 A 403.16 403.16 0 1 1 1144.02 893.89" fill="none" stroke="#36c8bf" stroke-width="6.77" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1144.02" cy="893.89" r="13.54" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -4244,7 +4244,7 @@ exports[`planes de los intents de ejemplo > deck-content-partners-intent.json co
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-cpt-progress-4-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="201.06" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1721.96 117.64" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1721.96" cy="117.64" r="7.7" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="201.06" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1721.96 117.64" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1721.96" cy="117.64" r="7.7" fill="#36c8bf"/></g></svg>",
     },
     {
       "inkArea": 4600,
@@ -6001,7 +6001,7 @@ exports[`planes de los intents de ejemplo > deck-content-text-intent.json compon
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-ct-progress-1-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="72" data-axis-value="0.2"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1798.04 117.64" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1798.04" cy="117.64" r="7.7" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="72" data-axis-value="0.2"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1798.04 117.64" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1798.04" cy="117.64" r="7.7" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -7250,7 +7250,7 @@ exports[`planes de los intents de ejemplo > deck-decision-agenda-intent.json com
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-ag-progress-0-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="50" data-axis-value="0"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="34.91" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1790.64 104.29" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1790.64" cy="104.29" r="7.7" fill="#0e8c82"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="50" data-axis-value="0"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="34.91" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1790.64 104.29" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1790.64" cy="104.29" r="7.7" fill="#0e8c82"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -7973,7 +7973,7 @@ exports[`planes de los intents de ejemplo > deck-decision-chart-intent.json comp
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-dch-progress-3-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="216" data-axis-value="0.6"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="150.8" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1736.49 162.36" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1736.49" cy="162.36" r="7.7" fill="#0e8c82"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="216" data-axis-value="0.6"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="150.8" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1736.49 162.36" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1736.49" cy="162.36" r="7.7" fill="#0e8c82"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -9790,7 +9790,7 @@ exports[`planes de los intents de ejemplo > deck-decision-risk-intent.json compo
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-dr-progress-5-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="360" data-axis-value="1"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><circle data-axis-part="arc" data-axis-length="251.33" pathLength="1" cx="1760" cy="130" r="40" fill="none" stroke="#0e8c82" stroke-width="3.96"/><circle data-axis-part="sphere" cx="1760" cy="90" r="7.7" fill="#0e8c82"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="360" data-axis-value="1"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><circle data-axis-part="arc" data-axis-length="251.33" pathLength="1" cx="1760" cy="130" r="40" fill="none" stroke="#0e8c82" stroke-width="3.96"/><circle data-axis-part="sphere" cx="1760" cy="90" r="7.7" fill="#0e8c82"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -9895,7 +9895,7 @@ exports[`planes de los intents de ejemplo > deck-decision-testimonial-intent.jso
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-dt-progress-3-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="216" data-axis-value="0.6"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="150.8" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1736.49 162.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1736.49" cy="162.36" r="7.7" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="216" data-axis-value="0.6"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="150.8" pathLength="1" d="M 1760 90 A 40 40 0 1 1 1736.49 162.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1736.49" cy="162.36" r="7.7" fill="#36c8bf"/></g></svg>",
     },
     {
       "inkArea": 5200,
@@ -10193,7 +10193,7 @@ exports[`planes de los intents de ejemplo > deck-decision-why-us-intent.json com
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-dw-progress-1-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="72" data-axis-value="0.2"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1798.04 117.64" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1798.04" cy="117.64" r="7.7" fill="#0e8c82"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="72" data-axis-value="0.2"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1798.04 117.64" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1798.04" cy="117.64" r="7.7" fill="#0e8c82"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -10813,7 +10813,7 @@ exports[`planes de los intents de ejemplo > deck-method-hybrid-workforce-intent.
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-hw-progress-2-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1783.51 162.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1783.51" cy="162.36" r="7.7" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="1760" cy="130" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 1760 90 A 40 40 0 0 1 1783.51 162.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1783.51" cy="162.36" r="7.7" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -12965,7 +12965,7 @@ exports[`planes de los intents de ejemplo > deck-section-bleed-intent.json compo
     {
       "kind": "svg",
       "ref": "asset-ref:layer:gl-sb-progress-2-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="180" cy="190" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.4" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 180 150 A 40 40 0 0 1 203.51 222.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="203.51" cy="222.36" r="7.7" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="180" cy="190" r="40" fill="none" stroke="#72ded8" stroke-opacity="0.4" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 180 150 A 40 40 0 0 1 203.51 222.36" fill="none" stroke="#36c8bf" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="203.51" cy="222.36" r="7.7" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -13311,7 +13311,7 @@ exports[`planes de los intents de ejemplo > deck-section-classic-intent.json com
     {
       "kind": "svg",
       "ref": "asset-ref:layer:section-progress-2-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="1420" cy="540" r="300" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="753.98" pathLength="1" d="M 1420 240 A 300 300 0 0 1 1596.34 782.71" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1596.34" cy="782.71" r="7.7" fill="#0e8c82"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="1420" cy="540" r="300" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="753.98" pathLength="1" d="M 1420 240 A 300 300 0 0 1 1596.34 782.71" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1596.34" cy="782.71" r="7.7" fill="#0e8c82"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -13369,7 +13369,7 @@ exports[`planes de los intents de ejemplo > deck-section-lens-intent.json compon
         "path": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
       },
       "ref": "asset-ref:layer:section-lens-growth-2-of-5",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><rect width="1920" height="1080" fill="#001a33"/><g data-axis-element="lens" data-axis-kind="lens"><image href="asset-photo:gl-section-lens" width="1920" height="1080" preserveAspectRatio="xMidYMid slice" style="filter:grayscale(1) contrast(1.1) brightness(0.5)"/><rect width="1920" height="1080" fill="#001a33" opacity="0.8" style="mix-blend-mode:multiply"/><defs><clipPath id="sl-lens-clip"><circle cx="1420" cy="600" r="360"/></clipPath></defs><image data-axis-part="lens" href="asset-photo:gl-section-lens" x="0" y="0" width="1920" height="1080" preserveAspectRatio="xMidYMid slice" clip-path="url(#sl-lens-clip)"/><circle data-axis-part="ring" cx="1420" cy="600" r="403.2" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.39"/><path data-axis-part="arc" data-axis-length="1013.35" pathLength="1" d="M 1420 196.8 A 403.2 403.2 0 0 1 1657 926.2" fill="none" stroke="#36c8bf" stroke-width="6.77" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1657" cy="926.2" r="13.54" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><rect width="1920" height="1080" fill="#001a33"/><g data-axis-element="lens" data-axis-kind="lens"><image href="asset-photo:gl-section-lens" width="1920" height="1080" preserveAspectRatio="xMidYMid slice" style="filter:grayscale(1) contrast(1.1) brightness(0.5)"/><rect width="1920" height="1080" fill="#001a33" opacity="0.8" style="mix-blend-mode:multiply"/><defs><clipPath id="sl-lens-clip"><circle cx="1420" cy="600" r="360"/></clipPath></defs><image data-axis-part="lens" href="asset-photo:gl-section-lens" x="0" y="0" width="1920" height="1080" preserveAspectRatio="xMidYMid slice" clip-path="url(#sl-lens-clip)"/><circle data-axis-part="ring" cx="1420" cy="600" r="403.2" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.39"/><path data-axis-part="arc" data-axis-length="1013.35" pathLength="1" d="M 1420 196.8 A 403.2 403.2 0 0 1 1657 926.2" fill="none" stroke="#36c8bf" stroke-width="6.77" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1657" cy="926.2" r="13.54" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -13421,7 +13421,7 @@ exports[`planes de los intents de ejemplo > deck-section-split-corner-bottom-int
     {
       "kind": "svg",
       "ref": "asset-ref:layer:section-split-indicator-corner-bottom-3-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="216" data-axis-value="0.6"><circle data-axis-part="ring" cx="180" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 143.75 186.9 A 40 40 0 0 1 199.39 135.02" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="199.39" cy="135.02" r="7.7" fill="#0e8c82"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="216" data-axis-value="0.6"><circle data-axis-part="ring" cx="180" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 143.75 186.9 A 40 40 0 0 1 199.39 135.02" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="199.39" cy="135.02" r="7.7" fill="#0e8c82"/></g></svg>",
     },
     {
       "fit": {
@@ -13489,7 +13489,7 @@ exports[`planes de los intents de ejemplo > deck-section-split-intent.json compo
     {
       "kind": "svg",
       "ref": "asset-ref:layer:section-split-indicator-corner-top-2-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="180" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 143.75 186.9 A 40 40 0 0 1 152.72 140.75" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="152.72" cy="140.75" r="7.7" fill="#0e8c82"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="180" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 143.75 186.9 A 40 40 0 0 1 152.72 140.75" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="152.72" cy="140.75" r="7.7" fill="#0e8c82"/></g></svg>",
     },
     {
       "fit": {
@@ -13557,7 +13557,7 @@ exports[`planes de los intents de ejemplo > deck-section-split-panel-end-intent.
     {
       "kind": "svg",
       "ref": "asset-ref:layer:section-split-indicator-panel-end-4-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1140" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="150.8" pathLength="1" d="M 1103.75 186.9 A 40 40 0 1 1 1179.27 177.63" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1179.27" cy="177.63" r="7.7" fill="#0e8c82"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1140" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="150.8" pathLength="1" d="M 1103.75 186.9 A 40 40 0 1 1 1179.27 177.63" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1179.27" cy="177.63" r="7.7" fill="#0e8c82"/></g></svg>",
     },
     {
       "fit": {
@@ -13727,7 +13727,7 @@ exports[`planes de los intents de ejemplo > dooh-caminero-lens-intent.json compo
     {
       "kind": "svg",
       "ref": "asset-ref:layer:caminero-orbit-growth-3000x1000",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3000 1000" width="3000" height="1000" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="caminero-orbit" data-axis-kind="orbit"><circle data-axis-part="ring" cx="2100" cy="500" r="448" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="5.29"/><path data-axis-part="arc" data-axis-length="390.95" pathLength="1" d="M 1679.02 346.77 A 448 448 0 0 1 1946.77 79.02" fill="none" stroke="#36c8bf" stroke-width="10.58" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1946.77" cy="79.02" r="21.16" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3000 1000" width="3000" height="1000" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="caminero-orbit" data-axis-kind="orbit"><circle data-axis-part="ring" cx="2100" cy="500" r="448" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="5.29"/><path data-axis-part="arc" data-axis-length="390.95" pathLength="1" d="M 1679.02 346.77 A 448 448 0 0 1 1946.77 79.02" fill="none" stroke="#36c8bf" stroke-width="10.58" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1946.77" cy="79.02" r="21.16" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-stills",
@@ -13795,7 +13795,7 @@ exports[`planes de los intents de ejemplo > motion-loop-lens-reveal-intent.json 
     {
       "kind": "svg",
       "ref": "asset-ref:layer:loop-orbit-growth-1920x1080",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="loop-orbit" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="392.04" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><path data-axis-part="arc" data-axis-length="342.12" pathLength="1" d="M 781.68 285.93 A 392.04 392.04 0 0 1 1015.99 51.61" fill="none" stroke="#36c8bf" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1015.99" cy="51.61" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="loop-orbit" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="392.04" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><path data-axis-part="arc" data-axis-length="342.12" pathLength="1" d="M 781.68 285.93 A 392.04 392.04 0 0 1 1015.99 51.61" fill="none" stroke="#36c8bf" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1015.99" cy="51.61" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-stills",
@@ -13864,22 +13864,22 @@ exports[`planes de los intents de ejemplo > motion-storyboard-intent.json compon
     {
       "kind": "svg",
       "ref": "asset-ref:layer:storyboard-hold-growth-1920x1080",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="storyboard-hold" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="392.04" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><path data-axis-part="arc" data-axis-length="342.12" pathLength="1" d="M 781.68 285.93 A 392.04 392.04 0 0 1 1015.99 51.61" fill="none" stroke="#36c8bf" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1015.99" cy="51.61" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="storyboard-hold" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="392.04" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><path data-axis-part="arc" data-axis-length="342.12" pathLength="1" d="M 781.68 285.93 A 392.04 392.04 0 0 1 1015.99 51.61" fill="none" stroke="#36c8bf" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1015.99" cy="51.61" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
     },
     {
       "kind": "svg",
       "ref": "asset-ref:layer:storyboard-anticipation-growth-1920x1080",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="storyboard-anticipation" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="70" fill="none" stroke="#72ded8" stroke-opacity="0.35" stroke-width="3.3903459183673474"/><circle data-axis-part="sphere" cx="1123.86" cy="355.11" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="storyboard-anticipation" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="70" fill="none" stroke="#72ded8" stroke-opacity="0.35" stroke-width="3.3903459183673474"/><circle data-axis-part="sphere" cx="1123.86" cy="355.11" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
     },
     {
       "kind": "svg",
       "ref": "asset-ref:layer:storyboard-lens-opens-growth-1920x1080",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="storyboard-lens-opens" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="227.38" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><path data-axis-part="arc" data-axis-length="71.43" pathLength="1" d="M 936.41 342.24 A 227.38 227.38 0 0 1 970.9 280.02" fill="none" stroke="#36c8bf" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="970.9" cy="280.02" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="storyboard-lens-opens" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="227.38" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><path data-axis-part="arc" data-axis-length="71.43" pathLength="1" d="M 936.41 342.24 A 227.38 227.38 0 0 1 970.9 280.02" fill="none" stroke="#36c8bf" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="970.9" cy="280.02" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
     },
     {
       "kind": "svg",
       "ref": "asset-ref:layer:storyboard-arc-runs-sphere-hits-growth-1920x1080",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="storyboard-arc-runs-sphere-hits" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="392.04" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><defs><linearGradient id="gl-storyboard-arc-runs-sphere-hits-storyboard-arc-runs-sphere-hits-arc" gradientUnits="userSpaceOnUse" x1="781.68" y1="285.93" x2="1015.99" y2="51.61"><stop offset="0" stop-color="#36c8bf" stop-opacity="0"/><stop offset="1" stop-color="#36c8bf" stop-opacity="1"/></linearGradient></defs><path data-axis-part="arc" data-axis-length="342.12" pathLength="1" d="M 781.68 285.93 A 392.04 392.04 0 0 1 1015.99 51.61" fill="none" stroke="url(#gl-storyboard-arc-runs-sphere-hits-storyboard-arc-runs-sphere-hits-arc)" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1015.99" cy="51.61" r="13.541381632653062" fill="#36c8bf"/><circle data-axis-part="sphere-ring" cx="1015.99" cy="51.61" r="35.20759224489796" fill="none" stroke="#36c8bf" stroke-opacity="0.55"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="storyboard-arc-runs-sphere-hits" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="392.04" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><defs><linearGradient id="gl-storyboard-arc-runs-sphere-hits-storyboard-arc-runs-sphere-hits-arc" gradientUnits="userSpaceOnUse" x1="781.68" y1="285.93" x2="1015.99" y2="51.61"><stop offset="0" stop-color="#36c8bf" stop-opacity="0"/><stop offset="1" stop-color="#36c8bf" stop-opacity="1"/></linearGradient></defs><path data-axis-part="arc" data-axis-length="342.12" pathLength="1" d="M 781.68 285.93 A 392.04 392.04 0 0 1 1015.99 51.61" fill="none" stroke="url(#gl-storyboard-arc-runs-sphere-hits-storyboard-arc-runs-sphere-hits-arc)" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1015.99" cy="51.61" r="13.541381632653062" fill="#36c8bf"/><circle data-axis-part="sphere-ring" cx="1015.99" cy="51.61" r="35.20759224489796" fill="none" stroke="#36c8bf" stroke-opacity="0.55"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-stills",
@@ -14109,7 +14109,7 @@ exports[`planes de los intents de ejemplo > web-hero-lens-intent.json compone el
     {
       "kind": "svg",
       "ref": "asset-ref:layer:hero-lens-orbit-growth-1440x900",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" aria-hidden="true" focusable="false" data-axis-graphic-line="0.4.0"><g data-axis-element="hero-lens-orbit" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1050.05" cy="500.04" r="369.63" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.107782500000001"/><path data-axis-part="arc" data-axis-length="322.57" pathLength="1" d="M 702.71 373.62 A 369.63 369.63 0 0 1 923.63 152.7" fill="none" stroke="#36c8bf" stroke-width="6.2063975000000005" stroke-linecap="round"/><circle data-axis-part="sphere" cx="923.63" cy="152.7" r="12.412795000000001" fill="#36c8bf"/></g></svg>",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" aria-hidden="true" focusable="false" data-axis-graphic-line="0.5.0"><g data-axis-element="hero-lens-orbit" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1050.05" cy="500.04" r="369.63" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.107782500000001"/><path data-axis-part="arc" data-axis-length="322.57" pathLength="1" d="M 702.71 373.62 A 369.63 369.63 0 0 1 923.63 152.7" fill="none" stroke="#36c8bf" stroke-width="6.2063975000000005" stroke-linecap="round"/><circle data-axis-part="sphere" cx="923.63" cy="152.7" r="12.412795000000001" fill="#36c8bf"/></g></svg>",
     },
   ],
   "catalog": "graphic-line-stills",

@@ -2,6 +2,8 @@
 
 ## 2026-09-30 (u) — TASK-1949: las seis láminas nativas del deck SEO/AEO y el lockup de submarca
 
+<!-- sealed-by-freeze: a631ba6cb06ad22d6dafa63c8fa09d09293f5631b1b5c49d41cfc2f6b1c360e9 -->
+
 El deck SEO/AEO «La órbita» sobre Search Visibility 360 (aprobado completo por el operador el 2026-09-30, sesión «SEO deck
 para brochure y propuestas»; láminas en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/`) compone en el
 catálogo `graphic-line-deck` sin post-proceso: las seis láminas que se armaban fuera del compositor tienen plantilla, y el
@@ -1147,7 +1149,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 6c5b56126801a849edaf1c4c3c4863ecc181eda2072977487d8b920ffbfb8278 -->
+<!-- manifest-digest: a631ba6cb06ad22d6dafa63c8fa09d09293f5631b1b5c49d41cfc2f6b1c360e9 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

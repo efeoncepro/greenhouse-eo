@@ -14,8 +14,8 @@ describe('AXIS Glitch line packages', () => {
     expect(JSON.stringify(efeonceGraphicLine)).not.toContain(glitchLine.color.accent)
   })
 
-  it('exports the candidate contract and resolves an approved piece', () => {
-    expect(AXIS_GLITCH_LINE_CONTRACT).toMatchObject({ id: 'efeonce.glitch-line', version: '0.2.0', lifecycle: 'candidate' })
+  it('exports the stable contract (sub-línea de La órbita desde axis 0.3.37) and resolves an approved piece', () => {
+    expect(AXIS_GLITCH_LINE_CONTRACT).toMatchObject({ id: 'efeonce.glitch-line', version: '0.2.0', lifecycle: 'stable' })
 
     const resolved = resolveGlitchLineIntent({
       franchise: 'glitch',

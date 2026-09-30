@@ -19,8 +19,8 @@ describe('AXIS Marketing con Manzanitas packages', () => {
     expect(manzanitasRegister.teamPeople.rosterSource).toBe('greenhouse-team-roster')
   })
 
-  it('exports the candidate contract and resolves a carousel that opens with its cover and closes with its back cover', () => {
-    expect(AXIS_MANZANITAS_REGISTER_CONTRACT).toMatchObject({ id: 'efeonce.manzanitas-register', version: '0.3.0', lifecycle: 'candidate' })
+  it('exports the stable contract (sub-línea de La órbita desde axis 0.3.37) and resolves a carousel that opens with its cover and closes with its back cover', () => {
+    expect(AXIS_MANZANITAS_REGISTER_CONTRACT).toMatchObject({ id: 'efeonce.manzanitas-register', version: '0.3.0', lifecycle: 'stable' })
 
     const intent = {
       register: 'marketing-con-manzanitas' as const,
