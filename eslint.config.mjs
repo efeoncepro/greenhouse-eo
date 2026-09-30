@@ -45,6 +45,8 @@ export default [
     ignores: [
       'next-env.d.ts',
       'src/types/db.d.ts',
+      // TASK-1950: immutable AXIS export; verify hashes, never reformat consumer bytes.
+      'src/lib/axis/aeo-xray/**',
       // Glob, no una lista de variantes: cada dev server con distDir propio
       // (`.next-local`, `.next-task1741`, …) es build output y NUNCA se lintea. Con una
       // lista, el primero que elegía un nombre nuevo hacía que ESLint analizara código

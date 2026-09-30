@@ -1,6 +1,5 @@
-import type { aeoXray } from './aeo-xray-tokens.js';
+import { aeoXray } from './aeo-xray-tokens.js';
 import { type AxisAeoXrayExperience } from "./aeo-xray-experience.js";
-
 export type { AxisAeoXrayExperience } from "./aeo-xray-experience.js";
 export declare const AXIS_AEO_XRAY_CONTRACT: {
     readonly id: "efeonce.aeo-xray";

@@ -375,3 +375,7 @@ Pendiente aparte: rollout gobernado de provider, migración, storage/actor/flags
 media completa para grants. Registro de tareas conserva esos pendientes; el cierre comercial de
 Pichincha no equivale a completar foundation compartida. Ver [handoff](aeo-xray-release-handoff.md)
 y [auditoría](aeo-xray-completion-audit-2026-09-30.md).
+
+## Verificación posterior al commit y distribución generada
+
+El hook `lint-staged` reformateó el snapshot generado de AXIS en el primer commit de cierre; el gate posterior detectó drift de hashes en `aeo-xray-experience.js`. Se restauraron los ocho archivos desde el exportador AXIS y se excluyó únicamente `src/lib/axis/aeo-xray/**` de ESLint. El código fuente continúa lintado en AXIS; el snapshot se valida con `node scripts/qa/verify-aeo-xray-distribution.mjs`, no se edita ni formatea manualmente. Las 22 pruebas de foundation y el test del kit pasaron tras el hook; la restauración debe comprobarse otra vez después del commit correctivo.
