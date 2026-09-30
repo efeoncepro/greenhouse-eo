@@ -1903,12 +1903,110 @@ const FICHA_EJEMPLO = {
 // **[decisión del operador, 2026-09-19]** «nosotros NO somos Berel». Una sesión igual generó, el
 // 2026-09-20, un macro de un rodillo aplicando pintura azul: la regla estaba escrita en los docs y no
 // la ejecutaba nada. Tabla extensible; se agrega sólo lo que el operador declare, nunca por inferencia.
-const ANCLAS_PROHIBIDAS = [
+//
+// Cada ancla declara de qué CLIENTE es el rubro: es lo que permite la única excepción, un `caso` de ese
+// mismo cliente (ver `validarCaso`). La segunda alternativa del patrón (muestrarios, cartas y latas de
+// PINTURA) se agregó el 2026-09-30 porque la escena del caso Berel del deck SEO/AEO —«paint color swatch
+// cards» y un «paint fan deck» sobre la mesa— es la categoría de Berel y la guarda no la veía [medido].
+// Exige la palabra `paint`: los muestrarios de color impresos son oficio de Efeonce y siguen permitidos.
+export const ANCLAS_PROHIBIDAS = [
   {
-    patron: /\b(paint roller|rodillo|fresh paint|wet paint|painting the wall|paint(s|ing)? (a|the) wall)\b/i,
+    cliente: 'Berel',
+    patron:
+      /\b(paint roller|rodillo|fresh paint|wet paint|painting the wall|paint(s|ing)? (a|the) wall|paint (colou?r )?(swatch(es)?|cards?|chips?|fan ?decks?|samples?)|paint (cans?|buckets?|tins?))\b/i,
     porque: 'la pintura es la categoría de Berel, un cliente. La fotografía de Efeonce NUNCA se ancla en el rubro de un cliente'
   }
 ]
+
+// ── Excepción declarada: el caso de un cliente ─────────────────────────────────────────────────────
+// **[decisión del operador, 2026-09-30, deck SEO/AEO (TASK-1949), decisión 14]** En un CASO DE ÉXITO se
+// aceptan imágenes de ambiente generadas asociadas al cliente —la sesión del squad con el equipo de
+// Berel entre muestrarios de pintura—. No es una regla nueva: es UNA excepción que la ficha declara
+// (`caso`), sólo para ese cliente y sólo en el registro de puesta en escena. Sin `caso`, el ancla sigue
+// abortando igual que antes: la fotografía PROPIA de Efeonce nunca se ancla en el rubro de un cliente.
+// El logo del cliente jamás lo pinta el modelo: se compone después desde el archivo oficial (caso CS1b,
+// tarjeta en blanco + logo Banco BICE compuesto con sharp), y usar la marca del cliente queda sujeto a
+// su autorización (TASK-1937).
+const normalizar = t =>
+  String(t ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+
+const escaparRegex = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+export const REGISTRO_DE_CASO = 'puesta-en-escena'
+
+export const validarCaso = ficha => {
+  const id = ficha.id ?? 'esta ficha'
+  const anclas = ANCLAS_PROHIBIDAS.filter(a => a.patron.test(ficha.escena))
+  const caso = ficha.caso
+
+  if (caso === undefined) {
+    if (anclas.length) {
+      throw new Error(
+        `La escena de "${id}" usa un ancla prohibida: ${anclas[0].porque}. ` +
+          'Cambia la materia de la escena; esto no se corrige regenerando. ' +
+          '(Sólo si la pieza es el CASO de ese cliente —registro puesta en escena— la ficha puede declararlo en `caso`.)'
+      )
+    }
+
+    return null
+  }
+
+  if (typeof caso !== 'object' || caso === null || caso.tipo !== 'cliente') {
+    throw new Error(`"${id}": \`caso\` sólo admite { "tipo": "cliente", "cliente": "<nombre>", "registro": "${REGISTRO_DE_CASO}" }.`)
+  }
+
+  if (caso.registro !== REGISTRO_DE_CASO) {
+    throw new Error(
+      `"${id}": un caso de cliente sólo existe en el registro \`${REGISTRO_DE_CASO}\` (declaraste "${caso.registro ?? '—'}"). ` +
+        'El registro documental retrata el oficio de Efeonce, y ahí el rubro de un cliente nunca es el ancla.'
+    )
+  }
+
+  const conocidos = [...new Set(ANCLAS_PROHIBIDAS.map(a => a.cliente))]
+  const cliente = conocidos.find(c => normalizar(c) === normalizar(caso.cliente))
+
+  if (!cliente) {
+    throw new Error(
+      `"${id}": el cliente "${caso.cliente ?? '—'}" no tiene rubro declarado en ANCLAS_PROHIBIDAS (${conocidos.join(', ')}). ` +
+        'La excepción sólo abre el rubro de un cliente que el operador declaró; no se infiere.'
+    )
+  }
+
+  const ajenas = anclas.filter(a => a.cliente !== cliente)
+
+  if (ajenas.length) {
+    throw new Error(
+      `"${id}": el caso declara a ${cliente}, pero la escena se ancla en el rubro de ${ajenas.map(a => a.cliente).join(', ')}: ` +
+        `${ajenas[0].porque}. La excepción abre sólo el rubro del cliente del caso.`
+    )
+  }
+
+  // El nombre del cliente en la escena es cómo el modelo termina escribiendo su marca en un cartel,
+  // una lata o una pantalla. La escena lo evoca por su rubro; el logo se compone después.
+  if (new RegExp(`\\b${escaparRegex(normalizar(cliente))}\\b`, 'i').test(normalizar(ficha.escena))) {
+    throw new Error(
+      `"${id}": la escena nombra a ${cliente}. Descríbelo por su rubro («the client's marketing lead»), nunca por su nombre: ` +
+        'el modelo lo escribe como marca. Si la pieza lleva el logo del cliente, se COMPONE después desde el archivo oficial.'
+    )
+  }
+
+  return {
+    cliente,
+    anclado: anclas.length > 0,
+    bloque:
+      `CLIENT CASE (staged scene): the scene only evokes the client's category. No logo, brand name, wordmark, label, ` +
+      `signage or packaging of the client anywhere in the frame, and no invented brand names on any product; ` +
+      `any client logo is composited later from its official file, never drawn here.`,
+    aviso:
+      `caso de cliente declarado (${cliente}, registro ${REGISTRO_DE_CASO}): la guarda del rubro ` +
+      `${anclas.length ? 'se abre SÓLO para esta ficha' : 'no se disparó, pero el prompt igual prohíbe su marca'}. ` +
+      'El logo del cliente se compone desde el archivo oficial y su uso requiere la autorización del cliente (TASK-1937).'
+  }
+}
 
 // Vocabulario con el que una escena declara LUZ y MOMENTO. La ronda que el operador aprobó el 19/09
 // los tiene en el 100% de sus escenas; la tanda de 34 que perdió calidad, en 64% y 26%. No es una
@@ -1993,14 +2091,7 @@ export const construirPrompt = ficha => {
   if (!fmt) throw new Error(`Formato "${ficha.formato}" desconocido. Usa uno de: ${Object.keys(FORMATOS).join(', ')}.`)
   if (!ficha.escena) throw new Error('La ficha necesita `escena`: el modelo no inventa la escena por vos.')
 
-  const ancla = ANCLAS_PROHIBIDAS.find(a => a.patron.test(ficha.escena))
-
-  if (ancla) {
-    throw new Error(
-      `La escena de "${ficha.id ?? 'esta ficha'}" usa un ancla prohibida: ${ancla.porque}. ` +
-        `Cambia la materia de la escena; esto no se corrige regenerando.`
-    )
-  }
+  const caso = validarCaso(ficha)
 
   // El canon contempla tomas SIN lecho —dron y todo-enfocadas— y el comando no lo sabía: abortaba
   // una toma legítima (caso: cenital perpendicular, 2026-09-20). Se declara `lecho: "sin-lecho"` con
@@ -2079,6 +2170,8 @@ export const construirPrompt = ficha => {
 
   partes.push(ficha.escena)
 
+  if (caso) partes.push(caso.bloque)
+
   // El lecho, con el porcentaje del formato. Nunca escrito a mano.
   if (ficha.lecho === 'sin-lecho') {
     return {
@@ -2089,6 +2182,7 @@ export const construirPrompt = ficha => {
       avisosObjeto: objetos?.avisos ?? [],
       llevaSuspendido: Boolean(suspendido),
       sinMomento: Boolean(palanca?.sinMomento),
+      avisoCaso: caso?.aviso ?? null,
       sinLecho: true
     }
   }
@@ -2104,7 +2198,8 @@ export const construirPrompt = ficha => {
     imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
     avisosObjeto: objetos?.avisos ?? [],
     llevaSuspendido: Boolean(suspendido),
-    sinMomento: Boolean(palanca?.sinMomento)
+    sinMomento: Boolean(palanca?.sinMomento),
+    avisoCaso: caso?.aviso ?? null
   }
 }
 
@@ -2188,6 +2283,11 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
       `  ⚠ acción suspendida en ${conSuspendido} de ${resueltas.length} fichas (dosis: 1 de cada ${DOSIS_SUSPENDIDO}). ` +
         'Si vuela algo en casi todas, deja de leerse como un momento y se lee como un recurso repetido.'
     )
+  }
+
+  // La excepción de caso se anuncia siempre, fuerte: es una puerta que se abrió a propósito.
+  for (const { ficha, avisoCaso } of resueltas) {
+    if (avisoCaso) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${avisoCaso}`)
   }
 
   for (const { ficha, avisosObjeto, sinMomento } of resueltas) {

@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest'
 // hace falta `@ts-expect-error` — al exportar OBJETOS y PALANCAS, TS resuelve el módulo y la
 // directiva quedaría sin uso (TS2578 rompe el pre-push).
 import {
+  ANCLAS_PROHIBIDAS,
   auditarAcentoDeTanda,
   auditarColor,
   auditarContradicciones,
@@ -32,6 +33,7 @@ import {
   PERSONAS,
   referenciasDeclaradas,
   ROLES_DE_REFERENCIA,
+  validarCaso,
   validarVestuarioDeLinea
 } from './build-prompt.mjs'
 
@@ -222,6 +224,17 @@ describe('foto:prompt · anclas prohibidas y auditoría de escena', () => {
 
   it('no dispara con una escena legítima del oficio', () => {
     expect(() => construirPrompt(fichaBase)).not.toThrow()
+  })
+
+  // La escena del caso Berel del deck SEO/AEO (2026-09-29) pasaba la guarda sin tocarla: muestrarios y
+  // abanico de PINTURA sobre la mesa. Los muestrarios de color IMPRESOS siguen siendo oficio de Efeonce.
+  it('ve también los muestrarios de pintura, sin tocar los muestrarios impresos del oficio', () => {
+    const patron = ANCLAS_PROHIBIDAS.find(a => a.cliente === 'Berel')?.patron ?? /(?!)/
+
+    expect(patron.test('dozens of large paint color swatch cards and an open paint fan deck')).toBe(true)
+    expect(patron.test('the paint buckets carry no labels')).toBe(true)
+    expect(patron.test('printed proofs, sticky notes, color swatches and a coffee cup')).toBe(false)
+    expect(patron.test('a big handful of printed color swatch cards thrown into the air')).toBe(false)
   })
 
   // Avisos, no bloqueos: la medición es débil (la ronda aprobada da 100/100, mis pilotos aprobados
@@ -1534,5 +1547,63 @@ conAssets('foto:prompt · la guarda de vestuario está cableada', () => {
 
     expect(() => construirPrompt(ficha(['hoodie-efeonce']))).toThrow(/bomber o la softshell/)
     expect(() => construirPrompt(ficha(['chaqueta-bomber-efeonce']))).not.toThrow()
+  })
+})
+
+// **[decisión del operador, 2026-09-30, TASK-1949]** Un caso de éxito puede anclarse en el rubro de SU
+// cliente, en puesta en escena, si la ficha lo declara. Cada `it` cierra una forma de abrir la puerta de más.
+describe('foto:prompt · excepción declarada de caso de cliente', () => {
+  const escenaBerel =
+    'SCENE (a working session with the client\'s marketing lead, evening): paint color swatch cards spread on a walnut table, a single warm pendant lamp as key light, two women pointing at the same card. 85mm.'
+
+  const casoBerel = { tipo: 'cliente', cliente: 'Berel', registro: 'puesta-en-escena' }
+
+  it('sin `caso`, el rubro del cliente sigue abortando (regresión)', () => {
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel })).toThrow(/ancla prohibida.*categoría de Berel/s)
+  })
+
+  it('con `caso` del cliente correcto compila, prohíbe su marca en el prompt y avisa', () => {
+    const r = construirPrompt({ ...fichaBase, escena: escenaBerel, caso: casoBerel })
+
+    expect(r.prompt).toContain('CLIENT CASE (staged scene)')
+    expect(r.prompt).toMatch(/No logo, brand name, wordmark.*composited later from its official file/s)
+    expect(r.avisoCaso).toMatch(/caso de cliente declarado \(Berel.*se abre SÓLO para esta ficha.*TASK-1937/s)
+
+    // el nombre se compara sin mayúsculas ni tildes
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel, caso: { ...casoBerel, cliente: 'BEREL' } })).not.toThrow()
+  })
+
+  it('con `caso` de OTRO cliente aborta: la excepción no es un pase general', () => {
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel, caso: { ...casoBerel, cliente: 'Banco BICE' } })).toThrow(
+      /no tiene rubro declarado/
+    )
+  })
+
+  it('con otro registro aborta: el documental retrata el oficio de Efeonce', () => {
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel, caso: { ...casoBerel, registro: 'documental' } })).toThrow(
+      /sólo existe en el registro `puesta-en-escena`/
+    )
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel, caso: { tipo: 'cliente', cliente: 'Berel' } })).toThrow(
+      /puesta-en-escena/
+    )
+  })
+
+  it('un `caso` mal formado aborta', () => {
+    expect(() => validarCaso({ ...fichaBase, escena: escenaBerel, caso: { tipo: 'marca', cliente: 'Berel', registro: 'puesta-en-escena' } })).toThrow(
+      /sólo admite/
+    )
+  })
+
+  it('la escena no puede nombrar al cliente: el modelo lo escribe como marca', () => {
+    expect(() =>
+      construirPrompt({ ...fichaBase, escena: escenaBerel.replace("the client's", "Berel's"), caso: casoBerel })
+    ).toThrow(/la escena nombra a Berel/)
+  })
+
+  it('sin `caso` y sin rubro de cliente, nada cambia en el prompt', () => {
+    const r = construirPrompt(fichaBase)
+
+    expect(r.prompt).not.toContain('CLIENT CASE')
+    expect(r.avisoCaso).toBeNull()
   })
 })

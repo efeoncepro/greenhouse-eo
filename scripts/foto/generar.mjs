@@ -30,7 +30,10 @@ marca y el MACRO DEL BORDADO de cada prenda con emblema. Nadie copia rutas a man
 }
 
 const ficha = JSON.parse(readFileSync(fichaPath, 'utf8'))
-const { prompt, size, imagenes } = construirPrompt(ficha)
+const { prompt, size, imagenes, avisoCaso } = construirPrompt(ficha)
+
+// Excepción declarada de caso de cliente: se anuncia antes de gastar.
+if (avisoCaso) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${avisoCaso}`)
 
 const valor = k => {
   const i = args.indexOf(`--${k}`)
