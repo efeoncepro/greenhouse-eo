@@ -294,3 +294,12 @@ si un comando está retirado no se busca rodeo; equivalencias (`ai:*` → `marca
 disponible mientras Efeonce no esté admitida. Es compatible con sellos anteriores: un commit sin `skillOverlay`
 se recalcula sin nota.
 
+### 8.8 El sync no toca el checkout local (2026-09-30)
+
+El checkout local del workbench lo comparten la persona y los agentes (Codex trabaja ahí en otra rama). Antes,
+`creative:sync --pr` hacía `checkout main` + `reset --hard` en ese checkout. Ahora `creative:sync` y
+`creative:status` trabajan en un **clon temporal** de `main` que se borra al terminar (sin flags, el sync es una
+vista previa). `--in-place` existe para quien lo pida explícitamente y se niega si el checkout no está limpio, en
+`main` y al día con origin: nunca cambia de rama ni resetea. Verificado: tras una vista previa y un `status`, el
+checkout local conserva commit, rama, archivos y refs idénticos.
+

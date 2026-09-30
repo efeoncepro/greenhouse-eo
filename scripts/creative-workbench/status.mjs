@@ -1,9 +1,10 @@
-// pnpm creative:status [--ref <ref>] [--target <dir>]
+// pnpm creative:status [--ref <ref>]
 //
 // Tablero del workbench visto desde greenhouse-eo:
 //   · sello íntegro: el sello publicado en main es el que este repo habría escrito para su commit;
 //   · sync pendiente: archivos que el plan de hoy cambiaría respecto del último sello publicado;
-//   · drift: archivos gestionados que alguien editó en main del workbench (no deberían existir);
+//   · drift: archivos gestionados que alguien editó en main del workbench (no deberían existir). Se
+//     mide en un clon temporal: el checkout local de la persona no se toca, ni siquiera con fetch;
 //   · rutas nativas y dependencias que los engines entregados necesitan del package.json nativo;
 //   · PRs abiertos, marcando los que tocan archivos gestionados o el sello;
 //   · último CI de main, miembros del equipo en GitHub y skills que citan docs que no viajan.
@@ -15,11 +16,11 @@ import path from 'node:path'
 
 import {
   buildPlan,
+  cloneTarget,
   isNative,
   LOCK_REL,
   loadControl,
   loadManifest,
-  resolveTarget,
   run,
   sha256,
   verifySeal
@@ -32,7 +33,6 @@ const manifest = loadManifest()
 const control = loadControl()
 const repo = manifest.target.repo
 const branch = manifest.target.defaultBranch
-const target = resolveTarget(manifest, value('--target'))
 const gh = (...a) => run('gh', a, { allowFail: true })
 const firstLine = r => (r.stderr || r.stdout || '').trim().split('\n')[0]
 
@@ -145,35 +145,30 @@ for (const rel of retiring) console.log(`   - ${rel} (se retira)`)
 for (const rel of handingOff) console.log(`   → ${rel} (pasa a nativo)`)
 if (nativeChanged) console.log(`   native: [${sealedNative.join(', ')}] → [${report.native.join(', ')}]`)
 
-// 3. Drift: sólo se puede medir contra un checkout al día con main.
-if (existsSync(path.join(target, '.git'))) {
-  run('git', ['fetch', '-q', 'origin', branch], { cwd: target, allowFail: true })
+// 3. Drift: archivos gestionados de main que no calzan con su huella. Se mide en un clon temporal de
+//    main, no en el checkout local (que puede estar en otra rama o con trabajo en curso).
+try {
+  const { dir, cleanup } = cloneTarget(manifest, { depth: 1 })
 
-  const behind = run('git', ['rev-list', '--count', `HEAD..origin/${branch}`], {
-    cwd: target,
-    allowFail: true
-  }).stdout.trim()
+  try {
+    const lockFile = path.join(dir, LOCK_REL)
 
-  const lockFile = path.join(target, LOCK_REL)
+    if (!existsSync(lockFile)) console.log('\nDrift: main no tiene sello')
+    else {
+      const lock = JSON.parse(readFileSync(lockFile, 'utf8'))
 
-  if (behind === '0' && existsSync(lockFile)) {
-    const lock = JSON.parse(readFileSync(lockFile, 'utf8'))
+      const drift = Object.entries(lock.files ?? {}).filter(
+        ([rel, hash]) => !existsSync(path.join(dir, rel)) || sha256(readFileSync(path.join(dir, rel))) !== hash
+      )
 
-    const drift = Object.entries(lock.files).filter(
-      ([rel, hash]) => !existsSync(path.join(target, rel)) || sha256(readFileSync(path.join(target, rel))) !== hash
-    )
-
-    console.log(`\nDrift en archivos gestionados: ${drift.length ? drift.length : 'ninguno ✓'}`)
-    for (const [rel] of drift.slice(0, 15)) console.log(`   ! ${rel}`)
-  } else {
-    const why = !existsSync(lockFile)
-      ? 'el checkout local no tiene sello'
-      : `checkout local ${behind || '?'} commits atrás de main`
-
-    console.log(`\nDrift: no medido (${why}; haz git pull en ${target})`)
+      console.log(`\nDrift en archivos gestionados de main: ${drift.length ? drift.length : 'ninguno ✓'}`)
+      for (const [rel] of drift.slice(0, 15)) console.log(`   ! ${rel}`)
+    }
+  } finally {
+    cleanup()
   }
-} else {
-  console.log(`\nDrift: no medido (no hay checkout en ${target})`)
+} catch (error) {
+  console.log(`\nDrift: no medido (${error.message.split('\n')[0]})`)
 }
 
 // 4. Contrato con el package.json nativo: los engines que greenhouse-eo sigue entregando necesitan

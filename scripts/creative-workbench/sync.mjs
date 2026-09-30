@@ -1,7 +1,7 @@
-// pnpm creative:sync [--ref <ref>] [--target <dir>] [--pr | --bootstrap] [--no-install]
+// pnpm creative:sync [--ref <ref>] [--pr | --bootstrap] [--no-install] [--in-place [--target <dir>]]
 //
-// Materializa el plan de exportación de un ref de greenhouse-eo (HEAD por defecto) en el checkout
-// local del creative-workbench:
+// Materializa el plan de exportación de un ref de greenhouse-eo (HEAD por defecto) en el
+// creative-workbench:
 //   · escribe cada archivo gestionado (plantilla, skills, CLIs, docs, package.json, config);
 //   · borra los que el sello anterior gestionaba y el plan nuevo ya no trae, salvo los que pasaron a
 //     ser NATIVOS (manifest → native.paths): esos se sueltan del sello sin borrarlos;
@@ -11,14 +11,19 @@
 // Nunca toca lo que no gestiona: `projects/**` del equipo y el harness nativo quedan intactos, y si
 // una ruta del plan ya existe sin estar en el sello, aborta en vez de pisarla.
 //
-// Sin flags sólo escribe en disco y muestra el diff. `--pr` crea rama, commit, push y PR (el camino
-// normal). `--bootstrap` hace el primer commit directo en main (sólo para un repo sin commits).
+// 🔴 Por defecto trabaja en un CLON TEMPORAL de `main` del workbench, que se borra al terminar: el
+// checkout local de la persona (donde pueden estar trabajando ella o un agente, en otra rama) no se
+// toca. Sin flags es una vista previa (calcula y muestra el diff). `--pr` crea rama, commit, push y PR
+// desde el clon. `--bootstrap` hace el primer commit directo en main (sólo para un repo sin commits).
+// `--in-place` usa el checkout local (`--target` o el del manifest) y sólo si está limpio, en `main` y
+// al día con origin: nunca cambia de rama ni resetea.
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
 import {
   buildPlan,
+  cloneTarget,
   isNative,
   LOCK_REL,
   loadManifest,
@@ -35,14 +40,46 @@ const flag = name => args.includes(name)
 const value = name => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined)
 
 const manifest = loadManifest()
-const target = resolveTarget(manifest, value('--target'))
 const ref = value('--ref') ?? 'HEAD'
+const inPlace = flag('--in-place')
+const defaultBranch = manifest.target.defaultBranch
 
-if (!existsSync(path.join(target, '.git'))) {
-  console.error(
-    `✗ ${target} no es un checkout git del workbench. Clónalo primero:\n  gh repo clone ${manifest.target.repo} ${target}`
-  )
+if (value('--target') && !inPlace) {
+  console.error('✗ --target sólo aplica con --in-place. Por defecto el sync trabaja en un clon temporal.')
   process.exit(1)
+}
+
+let target
+let cleanup = () => {}
+
+if (inPlace) {
+  target = resolveTarget(manifest, value('--target'))
+
+  if (!existsSync(path.join(target, '.git'))) {
+    console.error(`✗ ${target} no es un checkout git del workbench.`)
+    process.exit(1)
+  }
+
+  const git = (...a) => run('git', a, { cwd: target, allowFail: true }).stdout.trim()
+  const dirtyTarget = git('status', '--porcelain')
+  const branchNow = git('rev-parse', '--abbrev-ref', 'HEAD')
+
+  run('git', ['fetch', '-q', 'origin', defaultBranch], { cwd: target, allowFail: true })
+  const upToDate = git('rev-parse', 'HEAD') === git('rev-parse', `origin/${defaultBranch}`)
+
+  if (dirtyTarget || branchNow !== defaultBranch || !upToDate) {
+    console.error(
+      `✗ --in-place exige el checkout limpio, en ${defaultBranch} y al día con origin (está en ${branchNow}` +
+        `${dirtyTarget ? ', con cambios sin commitear' : ''}${upToDate ? '' : ', desfasado de origin'}).\n` +
+        '  No cambio de rama ni reseteo tu checkout: corre el sync sin --in-place (usa un clon temporal).'
+    )
+    process.exit(1)
+  }
+} else {
+  // Historia suficiente para ramificar y empujar; el clon vive sólo lo que dura el comando.
+  ;({ dir: target, cleanup } = cloneTarget(manifest, { depth: 50 }))
+  process.on('exit', cleanup)
+  console.log(`→ Trabajo en un clon temporal de ${manifest.target.repo}; tu checkout local no se toca.`)
 }
 
 const hasCommits = run('git', ['rev-parse', '--verify', 'HEAD'], { cwd: target, allowFail: true }).status === 0
@@ -50,21 +87,6 @@ const hasCommits = run('git', ['rev-parse', '--verify', 'HEAD'], { cwd: target, 
 if (flag('--bootstrap') && hasCommits) {
   console.error('✗ --bootstrap es sólo para un repo sin commits. Para un workbench existente usa --pr.')
   process.exit(1)
-}
-
-const targetStatus = run('git', ['status', '--porcelain'], { cwd: target }).stdout.trim()
-
-if (targetStatus && flag('--pr')) {
-  console.error(
-    `✗ El checkout del workbench tiene cambios sin commitear; no mezclo un sync con trabajo ajeno:\n${targetStatus}`
-  )
-  process.exit(1)
-}
-
-if (flag('--pr')) {
-  run('git', ['fetch', 'origin', manifest.target.defaultBranch], { cwd: target })
-  run('git', ['checkout', manifest.target.defaultBranch], { cwd: target })
-  run('git', ['reset', '--hard', `origin/${manifest.target.defaultBranch}`], { cwd: target })
 }
 
 const dirty = uncommittedExportable()
@@ -268,8 +290,10 @@ if (flag('--bootstrap')) {
       { cwd: target }
     ).stdout.trim()
 
-  run('git', ['checkout', manifest.target.defaultBranch], { cwd: target })
+  if (inPlace) run('git', ['checkout', defaultBranch], { cwd: target })
   console.log(`\n✓ PR de sync: ${url}`)
+} else if (inPlace) {
+  console.log('\n  Cambios escritos en tu checkout, sin commit. Para publicarlos por PR: pnpm creative:sync --pr')
 } else {
-  console.log('\n  Cambios escritos en disco, sin commit. Para publicarlos: pnpm creative:sync --pr')
+  console.log('\n  Vista previa: nada se publicó y el clon temporal se borra. Para publicar: pnpm creative:sync --pr')
 }

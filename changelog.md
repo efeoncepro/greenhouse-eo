@@ -24,6 +24,8 @@
   cambian el sello sin ser sync (CI compara contra la base) y rutas nativas no canónicas.
 - Nota «En el Workbench»: el sync la inserta al inicio del `SKILL.md` de las 12 skills que mencionan `foto:*`, `ai:*`
   o `assets:pull`, con sus equivalencias en el harness (`marca:*`); la fuente de la skill no cambia (ADR §8.7).
+- `creative:sync` y `creative:status` trabajan en un clon temporal del workbench: el checkout local (donde trabajan
+  la persona o Codex) no se toca; `--in-place` es opt-in y se niega si no está limpio, en `main` y al día (§8.8).
 - `control.json → clientesPorDefecto: "todos"`: por decisión del operador, todo el equipo produce para todas las
   marcas (ADR §8.6).
 - 33 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests

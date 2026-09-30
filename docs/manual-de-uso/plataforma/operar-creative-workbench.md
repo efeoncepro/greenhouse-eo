@@ -22,9 +22,10 @@ y reglas recibe, quién entra, a qué clientes y con qué acceso a IA y buckets.
 
 | Comando | Qué hace | Toca algo |
 |---|---|---|
-| `pnpm creative:status` | Sello publicado y si está íntegro, sync pendiente (incluye rutas que pasan a nativas), drift, dependencias que faltan en el `package.json` nativo, PRs que tocan lo gestionado, último CI, equipo y skills con docs que no viajan. Sólo usa la API REST de GitHub | No |
-| `pnpm creative:sync` | Escribe el plan de `HEAD` en el checkout local, sin commit | Sólo el disco local |
-| `pnpm creative:sync --pr` | Lo mismo, con rama, commit, push y PR en el workbench | GitHub |
+| `pnpm creative:status` | (Sólo lectura, drift medido en un clon temporal) Sello publicado y si está íntegro, sync pendiente (incluye rutas que pasan a nativas), drift, dependencias que faltan en el `package.json` nativo, PRs que tocan lo gestionado, último CI, equipo y skills con docs que no viajan. Sólo usa la API REST de GitHub | No |
+| `pnpm creative:sync` | Vista previa: calcula el plan de `HEAD` sobre un **clon temporal** de `main` del workbench y muestra el diff | Nada (el clon se borra) |
+| `pnpm creative:sync --pr` | Lo mismo, con rama, commit, push y PR desde el clon temporal | GitHub (tu checkout local no se toca) |
+| `pnpm creative:sync --in-place` | Escribe en tu checkout local, sólo si está limpio, en `main` y al día con origin; si no, se niega | Tu checkout |
 | `pnpm creative:sync --ref origin/develop --pr` | Exporta otro ref | GitHub |
 | `pnpm creative:access plan` / `apply` | Reconcilia GitHub y GCP con `control.json` | `apply` sí |
 | `pnpm creative:provision plan` / `apply` | Crea proyecto, APIs, buckets y secretos vacíos | `apply` sí (cobro) |
@@ -120,6 +121,8 @@ reciben lo lista `.workbench/export-report.json → skillOverlays`.
 ## Qué no hacer
 
 - No edites archivos del workbench directamente, ni siquiera tú: el siguiente sync los pisa.
+- No uses `--in-place` mientras tú o un agente trabajan en tu checkout del workbench: el sync por defecto (clon
+  temporal) no lo necesita.
 - No aceptes en el workbench una declaración de propiedad propia (como `.workbench/native-ownership.json`):
   lo nativo sólo se decide en el manifest de aquí.
 - No des IAM a mano en `efeonce-creative-workbench` ni en `efeonce-group` para el equipo.

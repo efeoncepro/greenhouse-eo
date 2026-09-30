@@ -169,6 +169,29 @@ export function run(cmd, args, opts = {}) {
   return r
 }
 
+/**
+ * Clon temporal y desechable del workbench. `creative:sync` y `creative:status` trabajan aquí por
+ * defecto, nunca en el checkout local de la persona: ese checkout puede tener trabajo en curso (de
+ * ella o de un agente en otra rama) y un sync no debe cambiarle la rama, resetearlo ni escribirle.
+ * Devuelve { dir, cleanup }; el llamador borra el clon con cleanup().
+ */
+export function cloneTarget(manifest, { depth = 1 } = {}) {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'creative-workbench-clone-'))
+  const cleanup = () => rmSync(dir, { recursive: true, force: true })
+  const url = `https://github.com/${manifest.target.repo}.git`
+  const r = run('git', ['clone', '--quiet', '--no-tags', '--depth', String(depth), url, dir], { allowFail: true })
+
+  if (r.status !== 0) {
+    cleanup()
+    throw new Error(
+      `No pude clonar ${manifest.target.repo} en un directorio temporal: ${(r.stderr || '').trim().split('\n')[0]}\n` +
+        '  ¿git tiene credenciales de GitHub? Prueba: gh auth setup-git'
+    )
+  }
+
+  return { dir, cleanup }
+}
+
 export function resolveRef(ref = 'HEAD') {
   return run('git', ['rev-parse', '--verify', `${ref}^{commit}`], { cwd: ROOT }).stdout.trim()
 }
