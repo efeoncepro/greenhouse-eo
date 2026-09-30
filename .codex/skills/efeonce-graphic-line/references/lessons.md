@@ -469,6 +469,15 @@
 - **Higgsfield: «daily generation limit for your grace period» no es falta de créditos.** Con 1.118 créditos y plan
   Ultra, la cuenta en período de gracia corta las generaciones del día. **Regla:** reportarlo como límite del plan,
   no como saldo, y no cambiar de motor sin preguntar.
+- **Una portada de perfil también habla con la voz de la línea.** Síntoma: el operador rechazó las portadas diseñadas
+  «no estás siguiendo lo que pide la línea gráfica». Causa: se escribieron como titulares de publicidad (entrada en
+  Bricolage 420 + titular de cuatro palabras), sin pregunta, sin la esfera en la respuesta cuando había órbita, con la
+  evidencia sin su palabra en negrita, con halo sin órbita (YouTube, avatar) y texto centrado sin que la órbita fuera la
+  pieza. **Regla:** antes de componer, aplicar `criteria.md` §4 tal cual: pregunta (Poppins 300 + anillo) · respuesta
+  de 1 a 3 palabras (Bricolage 760, ≥ 3×) con su esfera y su hueco óptico · evidencia en Poppins con **una** palabra en
+  negrita. La esfera de la respuesta convive con la de la órbita, como en el post con lente (A1). El halo sólo existe con
+  su órbita; el avatar es A7 tal cual. En una franja 5,9:1 la órbita no cabe alrededor de la respuesta con aire: la
+  pieza va sin órbita o la órbita rodea un objeto.
 - **Los conectores no reemplazan la CLI.** Higgsfield topó su límite diario a mitad de ronda y Magnific cobraba 1.000
   créditos por GPT Image 2; ningún conector genera 6:1 nativo. **Regla:** producir con `pnpm ai:image` (GPT Image 2.5)
   según la decisión del 2026-09-30; si el entorno no tiene la clave, se declara el bloqueo en vez de cambiar de motor.
