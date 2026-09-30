@@ -4,7 +4,7 @@ const vb=f=>{const m=fs.readFileSync(A+f+'.svg','utf8').match(/viewBox="([^"]+)"
 const L=(logo,x=140,y=44,h=40)=>({logo,x,y,h});
 const docs={
  completo:{file:'Efeonce-Deck-SEO-AEO-Completo',fam:6,ins:19,srv:8,ind:22,ov:{1:L('sv360-logo-negative',140,790,64),9:L('sv360-lockup-negative'),11:L('aeo-lockup-negative',140,112),12:L('aeo-lockup-negative'),13:L('aeo-assessment-lockup-negative'),14:L('ai-visibility-report-lockup-negative'),19:L('insights-lockup-negative')}},
- brochure:{file:'Efeonce-Brochure-SEO-AEO',fam:5,ins:13,srv:6,ind:14,ov:{1:L('sv360-logo-negative',140,790,64),7:L('sv360-lockup-negative'),9:L('aeo-lockup-negative',140,112),13:L('insights-lockup-negative'),16:L('ai-visibility-report-lockup-negative')}},
+ brochure:{file:'Efeonce-Brochure-SEO-AEO',fam:5,ins:13,srv:6,ind:15,ov:{1:L('sv360-logo-negative',140,790,64),7:L('sv360-lockup-negative'),9:L('aeo-lockup-negative',140,112),13:L('insights-lockup-negative'),16:L('ai-visibility-report-lockup-negative')}},
  propuesta:{file:'Efeonce-Propuesta-SEO-AEO',fam:5,ins:14,srv:7,ind:16,ov:{1:L('sv360-logo-negative',140,880,56),8:L('sv360-lockup-negative'),9:L('aeo-lockup-negative'),14:L('insights-lockup-negative'),22:L('ai-visibility-report-lockup-negative')}}};
 (async()=>{for(const [n,d] of Object.entries(docs)){const dir=path.join(S,'out-'+n);const files=fs.readdirSync(dir).filter(f=>/^\d\d-.*\.png$/.test(f)).sort();
  const pdf=await PDFDocument.create();const pages=[];const EXP=process.env.EXPORT;
