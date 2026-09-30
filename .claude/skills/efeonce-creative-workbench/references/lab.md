@@ -1,5 +1,38 @@
 # Lab premium · operación para Codex y Claude
 
+## Corte local de demostración productiva — 2026-09-30
+
+El Lab en `http://127.0.0.1:4194/` se recargó y comprobó con una captura real: muestra las
+cuatro corridas de los nodos 2630, 2611, 4616 y 3378. El nodo 4616 se corrigió en la nueva
+corrida `dc16001d-13d1-476f-8a82-b68321362f8b`, completada sin proveedor y con PNG nativo
+limpio confirmado. La corrida defectuosa `fc4dfeeb-afe3-4ab3-9f9a-3bc4b3dfe850` se preservó
+y excluyó de la selección. Los nombres visibles son «Sur · Cuadrado», «Sur · Retrato» (1080 × 1920),
+«Vuela al sur · Banner» y «Sur · Retrato» (1080 × 1350). Vienen de la intención propia; la fuente
+«Calama» permanece intacta.
+
+El snapshot `d8045ab5dae18557be6610c9e7a2e5ae502365e7e8705cf37588aa1701a7fcc5` contiene
+307 archivos, ninguna fuente licenciada SKY y cinco fuentes host admitidas. Las cuatro corridas
+se archivaron fuera de Git; se comprobaron 68 archivos idénticos. Las 250 pruebas privadas de
+la unidad productiva pasaron sin omisiones. En público, 232 pruebas pasaron y 18 se omitieron
+por recursos licenciados. Astro comprobó 34 archivos sin diagnósticos; la comprobación de
+tipos con TS7 y las 11 pruebas del Lab pasaron. Es una superficie compilada y revisada
+localmente; no acredita despliegue en Vercel.
+
+Los cuatro jobs conservan fotografía histórica y no invocan al proveedor. No representan
+fotografías nuevas ni ofertas vigentes. El QA de la reparación registra `content-arrow`
+versión `1.0.0` y sus referencias exactas de fuente: 74 admisiones intactas más 25 nuevas,
+99 en total. La selección propia `lab-selection.json` incorpora las corridas revisadas sin
+reemplazar el historial.
+
+La corrida primaria `6f609e8e-2775-42e5-a318-a69fe5b85252` se restauró con bytes idénticos.
+Conserva `outcomeExecutionLink: legacy-not-recorded`; no fabricar el
+`executionLockSha256` que falta en el outcome histórico. El
+[comando reproducible de build y revisión](../../../../docs/manual-de-uso/creative/creative-workbench-brand-preflight.md#4-compilar-snapshot-propio-y-mostrarlo-en-el-lab)
+está en el manual. Cambiar selección, texto o referencias de reparación exige otro snapshot
+y revisión del PNG. La autenticación Efeonce ID está diferida: la base first-party sigue
+pendiente y no se creó un cliente OAuth propio. El PR 7 permanece draft, con runtime IA
+apagada y sin promoción.
+
 Referencia del pedido de 2026-09-30: el visor se llama **Lab**, es el trabajo de Efeonce para un
 cliente y debe construirse con Astro vigente, TypeScript 7 cuando sea compatible, CSS compilado,
 componentes reutilizables y una experiencia premium funcional. Este documento sirve a Codex y

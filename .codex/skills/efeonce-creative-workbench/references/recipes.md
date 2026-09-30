@@ -1,5 +1,35 @@
 # Composiciones nombradas y recetas · Codex y Claude
 
+## Prueba de composición a cuatro formatos — 2026-09-30
+
+La pieza `projects/sky/always-on-modular-demo`, en `/tmp/cw-sky-production-flow`, usa tres
+composiciones: «Marco · título y tarifa» para los nodos 2630 y 2611; «Destino flecha · claro
+con servicios» para el nodo 4616; y «Banners · Chile y tarifa» para el nodo 3378. Cada job usa
+su plantilla, geometría, campos, información legal y espacio fotográfico propios. Son
+adaptaciones nativas, no escalados de un único dibujo. El texto se declara por formato; `$0`
+y DEMO son marcadores internos. La fotografía histórica se conserva con `source-reference`.
+Las cuatro corridas completadas sin proveedor no equivalen a cuatro piezas aprobadas.
+
+Los nodos 2630, 2611 y 3378 fueron revisados. El nodo 4616 se corrigió en la nueva corrida
+`dc16001d-13d1-476f-8a82-b68321362f8b`, completada sin llamadas al proveedor. La revisión
+del agente principal confirmó el PNG limpio y las uniones medidas. El QA registra
+`content-arrow` versión `1.0.0` y referencias exactas de fuente. Las 25 admisiones nuevas
+conservan intactas las 74 anteriores, para un total de 99. La corrida defectuosa
+`fc4dfeeb-afe3-4ab3-9f9a-3bc4b3dfe850` se conserva sin seleccionar.
+
+La selección contiene cuatro corridas. La recarga y captura real del Lab en el puerto 4194
+confirmaron el snapshot
+`d8045ab5dae18557be6610c9e7a2e5ae502365e7e8705cf37588aa1701a7fcc5`. Los nombres proceden
+de la intención «Sur»; la fuente «Calama» permanece intacta. El archivo privado de las cuatro
+corridas contiene 68 archivos idénticos a los originales. En la suite productiva, 250 pruebas
+privadas pasaron sin omisiones; en público, 232 pasaron y 18 se omitieron por recursos
+licenciados. Eso no constituye aprobación comercial.
+
+El recorrido plan → job → validación → ejecución → PNG → Lab está documentado en
+[producción SKY](sky-production.md) y su manual. La receta describe la construcción; no
+hereda información comercial ni inicia lotes o pagos. La autenticación Efeonce ID está diferida,
+IA permanece apagada y el PR 7 sigue draft, sin promoción.
+
 El operador pidió que cada composición tenga nombre, una receta que explique su construcción y
 varias adaptaciones cuando existan en su fuente. La organización es **marca → composición → receta
 versionada → adaptación → corrida**. Esta referencia documenta cómo operarla en Creative Workbench;

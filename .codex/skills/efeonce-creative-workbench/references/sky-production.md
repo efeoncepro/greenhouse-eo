@@ -1,5 +1,56 @@
 # SKY: producir una campaña y sus adaptaciones
 
+## Corte productivo probado — 2026-09-30
+
+El [PR 8 de producción](https://github.com/efeoncepro/creative-workbench/pull/8) se fusionó
+en main con commit `c26d8afcad9a573bf6e2299a8ecf4e88783843ae` el 2026-09-30; los checks
+del head `4de9414` pasaron antes del merge. Esto no acredita despliegue del Lab ni autenticación.
+
+La prioridad actual es la producción modular. La autenticación mediante Efeonce ID se difirió:
+no se creó un cliente OAuth propio y la base de acceso first-party sigue pendiente. El PR 7
+permanece draft, con IA apagada y sin promoción; esta prueba no modifica esos límites ni permisos.
+
+La pieza `projects/sky/always-on-modular-demo`, en `/tmp/cw-sky-production-flow`, contiene jobs
+explícitos para los nodos 2630 (cuadrado), 2611 (story), 4616 (4:5) y 3378 (banner). Las cuatro
+corridas terminaron en estado `completed`, con `providerInvocations: 0`. Usan la marca
+`sky-airline`, el pack `0.1.0`, la operación `reference.compose` y el propósito `internal-proof`.
+La fotografía es histórica y se declara mediante `source-reference`. Todos los textos del job
+son explícitos; `$0` y DEMO son marcadores de prueba, no una oferta. La fuente determina la
+geometría y los módulos; el job determina el contenido nuevo. No se generaron fotografías ni se
+activó IA.
+
+Los PNG de los nodos 2630, 2611 y 3378 fueron revisados. El nodo 4616 se corrigió en una nueva
+corrida, `dc16001d-13d1-476f-8a82-b68321362f8b`, completada sin llamadas al proveedor. La
+revisión del agente principal confirmó el PNG nativo limpio y 16 píxeles de las uniones en
+x = 274 y x = 807, con valores RGB 255. El QA registra `content-arrow` versión `1.0.0`,
+contorno continuo y referencias exactas de fuente. Se añadieron 25 admisiones y se conservaron
+las 74 anteriores: 99 en total, sin modificar la fuente, fotografía, texto ni color. La corrida
+defectuosa `fc4dfeeb-afe3-4ab3-9f9a-3bc4b3dfe850` se preservó fuera de la selección.
+
+Las cuatro corridas están archivadas en el canon privado. Se comprobaron **68 archivos
+idénticos**; el manual contiene la ubicación y los hashes de la reparación. La selección contiene
+las cuatro corridas revisadas. El Lab local, recargado en el puerto 4194 y comprobado con una
+captura real, muestra «Sur · Cuadrado», «Sur · Retrato» (1080 × 1920), «Vuela al sur · Banner» y
+«Sur · Retrato» (1080 × 1350). Los nombres vienen de la intención propia; la referencia «Calama»
+permanece intacta. El snapshot
+`d8045ab5dae18557be6610c9e7a2e5ae502365e7e8705cf37588aa1701a7fcc5` contiene 307 archivos,
+ninguna fuente licenciada SKY y cinco fuentes de la interfaz host.
+
+En esta unidad productiva local, **250 pruebas privadas pasaron, sin omisiones**. En público,
+232 pruebas pasaron y 18 se omitieron por el contrato de recursos licenciados. Astro revisó
+34 archivos sin diagnósticos; la comprobación de tipos con TS7 y las 11 pruebas del Lab pasaron.
+Estos resultados pertenecen a la unidad productiva, no a la suite de identidad. La captura local
+no acredita Vercel, una fotografía nueva ni una oferta comercial.
+
+El [manual de flujo productivo](../../../../docs/manual-de-uso/creative/creative-workbench-brand-preflight.md#flujo-productivo-nativo-verificado--2026-09-30)
+contiene los comandos reproducibles. El recorrido es: leer el plan y los campos, completar el
+job, ejecutar `marca:disenar --validate`, ejecutar `--execute`, revisar PNG y QA, seleccionar
+las corridas, compilar mediante `reference:build` y revisar el Lab. Si el texto desborda, el
+compositor rechaza el job antes de crear la corrida e identifica el campo y la zona exactos.
+Corregir el texto o elegir otra variante admitida; no inventar geometría ni reducir la fuente.
+Validar y renderizar no aprueba derechos, contraste u oferta. Una fotografía nueva mediante
+`broker-run` y su recuperación requieren pruebas separadas.
+
 ## Antes del diseño
 
 Identificar cliente `sky`, marca `sky-airline`, pieza y campaña. Recoger objetivo, mercado,
