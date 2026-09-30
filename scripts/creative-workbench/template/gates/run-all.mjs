@@ -1,9 +1,10 @@
 // pnpm gates — los mismos gates que corre el CI en cada PR.
 import { hygiene } from './hygiene.mjs'
 import { managedDrift } from './managed-drift.mjs'
+import { nativePolicy } from './native-policy.mjs'
 import { piezas } from './piezas.mjs'
 
-const results = [managedDrift(), hygiene(), piezas()]
+const results = [managedDrift(), nativePolicy(), hygiene(), piezas()]
 
 if (results.includes(false)) {
   console.log('\nHay gates en rojo. Corrige lo indicado y vuelve a correr pnpm gates.')
