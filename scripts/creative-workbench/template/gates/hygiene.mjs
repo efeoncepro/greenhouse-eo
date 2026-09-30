@@ -1,5 +1,6 @@
 // Gate hygiene: lo que entra a git es texto de trabajo, no binarios ni secretos.
-import { readFileSync, statSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 
 import { readLock, report, ROOT, trackedFiles } from './lib.mjs'
@@ -24,7 +25,18 @@ export function hygiene() {
   const managed = readLock()?.files ?? {}
   const problems = []
 
-  for (const rel of trackedFiles()) {
+  // También lo no versionado (sin ignorados): en `pnpm gates` local atrapa un binario o una llave antes del
+  // commit. En CI no hay archivos sin versionar, así que no cambia nada ahí.
+  const untracked = execFileSync('git', ['ls-files', '--others', '--exclude-standard', '-z'], {
+    cwd: ROOT,
+    encoding: 'utf8'
+  })
+    .split('\0')
+    .filter(Boolean)
+
+  for (const rel of new Set([...trackedFiles(), ...untracked])) {
+    if (!existsSync(path.join(ROOT, rel))) continue
+
     const base = path.basename(rel)
 
     if (/^\.env(\..+)?$/.test(base) && base !== '.env.example') problems.push(`${rel}: un .env no se versiona`)

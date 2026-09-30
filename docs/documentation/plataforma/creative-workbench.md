@@ -1,9 +1,9 @@
 # Creative Workbench — Taller del equipo creativo
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-29 por Claude
-> **Ultima actualizacion:** 2026-09-29 por Claude
+> **Ultima actualizacion:** 2026-09-30 por Claude
 > **Documentacion tecnica:** [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](../../architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md)
 
 ## Qué es
@@ -31,6 +31,18 @@ Greenhouse tiene:
 
 Lo que llega desde Greenhouse queda **sellado**: si alguien lo edita en el workbench, la revisión automática
 lo detecta y la siguiente sincronización lo restaura.
+
+Desde el 2026-09-30 el workbench tiene además un **harness propio** (sus comandos de producción por marca,
+su guardarraíl y su `package.json`). Esos archivos son **nativos**: los mantiene el workbench y la
+sincronización no los toca. Qué archivos son nativos lo decide Greenhouse y queda escrito en el sello, así
+que el workbench no puede declararse dueño de algo por su cuenta. Las revisiones automáticas (gates) siguen
+siendo siempre de Greenhouse.
+
+| Tipo de archivo | Quién lo mantiene |
+|---|---|
+| Skills, herramientas de IA y fotografía, documentos de marca, revisiones automáticas | Greenhouse (sellado) |
+| Harness del workbench (comandos `marca:*`, guardarraíl, dependencias) | El workbench (nativo) |
+| Piezas en `projects/` | El equipo |
 
 ## Qué puede y qué no puede el equipo
 

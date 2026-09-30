@@ -1,9 +1,12 @@
 // Núcleo compartido del plano de control del creative-workbench.
 //
 // El workbench es un CLIENTE gobernado de greenhouse-eo: todo lo que el equipo creativo recibe
-// (skills, CLIs, docs, guardarraíles) sale de acá por un único camino — `buildPlan()` — y queda
-// sellado con su sha256 en `.workbench/sync.lock.json` del repo destino. Lo que el lock declara,
-// el equipo no lo edita: el gate `managed-drift` de su CI lo detecta y el próximo sync lo pisa.
+// (skills, CLIs, docs, gates) sale de acá por un único camino — `buildPlan()` — y queda sellado con
+// su sha256 en `.workbench/sync.lock.json` del repo destino. Lo que el lock declara, el equipo no lo
+// edita: el gate `managed-drift` de su CI lo detecta y el próximo sync lo pisa.
+//
+// Desde 2026-09-30 hay una segunda clase: rutas NATIVAS (el harness propio del workbench). Las
+// declara el manifest de acá, viajan selladas en el lock y el sync no las escribe ni las borra.
 //
 // 🔴 Se exporta desde un REF de git (HEAD por defecto), nunca desde el working tree. El checkout es
 // compartido por varias sesiones: exportar el disco arrastraría trabajo sin commitear de otra sesión
@@ -44,6 +47,107 @@ export function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf8'))
 }
 
+/**
+ * Rutas NATIVAS: las posee el workbench (su harness), no greenhouse-eo. El sync no las escribe ni las
+ * borra, y el gate managed-drift no las compara. La lista la decide greenhouse-eo en el manifest y
+ * viaja SELLADA en `sync.lock.json` (`native`): el workbench no puede eximirse a sí mismo.
+ *
+ * Formas admitidas: ruta exacta (`AGENTS.md`) o carpeta completa (`brands/**`). Nada más: un patrón
+ * más expresivo es una frontera que nadie puede leer de un vistazo. Mismo matcher en
+ * `template/gates/lib.mjs` (los gates corren sin dependencias).
+ */
+export function validateNativePatterns(patterns, reserved = []) {
+  const stem = p => (p.endsWith('/**') ? p.slice(0, -2) : p)
+
+  for (const p of patterns) {
+    // Forma canónica y nada más: sin './', sin segmentos vacíos o '.', sin '/' final ni '\\'. Una ruta
+    // no canónica no calza con ninguna ruta del plan: se creería nativa y el sync la pisaría igual.
+    const segments = typeof p === 'string' ? stem(p).replace(/\/$/, '').split('/') : []
+
+    const bad =
+      typeof p !== 'string' ||
+      !p ||
+      p.startsWith('/') ||
+      p.includes('\\') ||
+      (p.endsWith('/') && !p.endsWith('/**')) ||
+      segments.some(seg => seg === '' || seg === '.' || seg === '..') ||
+      (/[*?[{]/.test(p) && !/^[^*?[{]+\/\*\*$/.test(p))
+
+    if (bad) throw new Error(`native.paths: "${p}" no es una ruta exacta ni una carpeta "dir/**"`)
+    if (p === '.workbench/**' || p.startsWith('.workbench/'))
+      throw new Error('native.paths: .workbench/ es del plano de control y no puede ser nativo')
+
+    // Reservado = cómo greenhouse-eo controla el workbench (gates, su workflow, el sello).
+    const clash = reserved.find(r => isNative(stem(p), [r]) || isNative(stem(r), [p]))
+
+    if (clash) throw new Error(`native.paths: "${p}" se cruza con la ruta reservada "${clash}"`)
+  }
+
+  // package.json y su lockfile van juntos: con sólo uno nativo, el sync escribiría un package.json sin
+  // poder regenerar el lock (o regeneraría y sellaría un lock que resuelve el manifest del workbench).
+  if (isNative('package.json', patterns) !== isNative('pnpm-lock.yaml', patterns))
+    throw new Error('native.paths: package.json y pnpm-lock.yaml son nativos los dos o ninguno')
+
+  return patterns
+}
+
+/**
+ * Clientes que puede producir un miembro. `"todos"` (en el miembro, o `clientesPorDefecto` si el miembro
+ * no declara) = todos los de `control.clientes`, incluidos los que se agreguen después.
+ */
+export function memberClients(member, control) {
+  const declared = member.clientes ?? control.clientesPorDefecto ?? []
+
+  return declared === 'todos' ? [...control.clientes] : declared
+}
+
+export function isNative(rel, patterns = []) {
+  return patterns.some(p => (p.endsWith('/**') ? rel.startsWith(p.slice(0, -2)) : rel === p))
+}
+
+/**
+ * Qué hace un sync sobre el checkout del workbench, sin tocar el disco.
+ *
+ * - `added` / `changed`: rutas del plan que se escriben.
+ * - `removed`: gestionadas en el sello anterior que el plan ya no trae (se borran).
+ * - `handedOff`: gestionadas en el sello anterior que pasaron a nativas: se sueltan del sello SIN
+ *   borrarlas (borrarlas destruiría el harness del workbench).
+ * - `collisions`: rutas del plan que existen en el workbench sin haber sido gestionadas. El sync no
+ *   pisa trabajo que no es suyo: aborta y hay que decidir de quién es la ruta.
+ *
+ * `targetHash(rel)` devuelve el sha256 del archivo en el workbench, o null si no existe.
+ *
+ * @param {{ plan: Map<string, { content: Buffer }>, previous: { files?: Record<string, string> } | null, native?: string[], targetHash: (rel: string) => string | null }} args
+ */
+export function reconcile({ plan, previous, native = [], targetHash }) {
+  const previousFiles = previous?.files ?? {}
+  const out = { added: [], changed: [], removed: [], handedOff: [], collisions: [] }
+
+  for (const [rel, { content }] of plan) {
+    const current = targetHash(rel)
+
+    if (current === null) out.added.push(rel)
+    else if (current !== sha256(content)) {
+      // Sin sello previo (bootstrap) todo es del plan; con sello, sólo lo que el sello gestionaba.
+      if (previous && !(rel in previousFiles)) out.collisions.push(rel)
+      else out.changed.push(rel)
+    }
+  }
+
+  for (const rel of Object.keys(previousFiles)) {
+    if (plan.has(rel) || rel === 'pnpm-lock.yaml') continue
+    if (isNative(rel, native)) out.handedOff.push(rel)
+    else out.removed.push(rel)
+  }
+
+  // El lockfile de pnpm no está en el plan: se regenera. Si pasó a nativo, también se suelta.
+  if ('pnpm-lock.yaml' in previousFiles && isNative('pnpm-lock.yaml', native)) out.handedOff.push('pnpm-lock.yaml')
+
+  for (const list of Object.values(out)) list.sort()
+
+  return out
+}
+
 /** Manifest y control del working tree: lo usan access/provision, que aplican estado deseado local. */
 export function loadManifest(root = ROOT) {
   return readJson(path.join(root, 'scripts/creative-workbench/export-manifest.json'))
@@ -65,6 +169,29 @@ export function run(cmd, args, opts = {}) {
   }
 
   return r
+}
+
+/**
+ * Clon temporal y desechable del workbench. `creative:sync` y `creative:status` trabajan aquí por
+ * defecto, nunca en el checkout local de la persona: ese checkout puede tener trabajo en curso (de
+ * ella o de un agente en otra rama) y un sync no debe cambiarle la rama, resetearlo ni escribirle.
+ * Devuelve { dir, cleanup }; el llamador borra el clon con cleanup().
+ */
+export function cloneTarget(manifest, { depth = 1 } = {}) {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'creative-workbench-clone-'))
+  const cleanup = () => rmSync(dir, { recursive: true, force: true })
+  const url = `https://github.com/${manifest.target.repo}.git`
+  const r = run('git', ['clone', '--quiet', '--no-tags', '--depth', String(depth), url, dir], { allowFail: true })
+
+  if (r.status !== 0) {
+    cleanup()
+    throw new Error(
+      `No pude clonar ${manifest.target.repo} en un directorio temporal: ${(r.stderr || '').trim().split('\n')[0]}\n` +
+        '  ¿git tiene credenciales de GitHub? Prueba: gh auth setup-git'
+    )
+  }
+
+  return { dir, cleanup }
 }
 
 export function resolveRef(ref = 'HEAD') {
@@ -232,6 +359,37 @@ export function pinnedVersion(name, src = ROOT) {
 
 const REF_PATTERN = /(?:docs|src|scripts)\/[A-Za-z0-9_./-]+\.(?:md|ts|mjs|json|tsx)/g
 
+/** Comandos retirados (p. ej. `pnpm foto:generar`) que mencionan los archivos de texto de una skill. */
+export function retiredCommandsIn(files, src, config) {
+  const pattern = new RegExp(
+    `pnpm (?:run )?((?:${config.retiredPrefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})[A-Za-z0-9:-]*)`,
+    'g'
+  )
+
+  const found = new Set()
+
+  for (const rel of files) {
+    if (!/\.(md|ya?ml|json|txt)$/.test(rel)) continue
+
+    for (const m of readFileSync(path.join(src, rel), 'utf8').matchAll(pattern)) {
+      // `pnpm foto:*` se lee como la familia completa; `pnpm ai:image,` pierde la puntuación final.
+      const command = m[1].replace(/-+$/, '')
+
+      found.add(command.endsWith(':') ? `${command}*` : command)
+    }
+  }
+
+  return [...found].sort()
+}
+
+/** Inserta la nota de workbench justo después del frontmatter del SKILL.md (o al inicio si no hay). */
+export function withOverlay(text, overlay, commands) {
+  const note = overlay.replace('{{comandos}}', commands.map(c => `\`pnpm ${c}\``).join(', ')).trimEnd()
+  const fm = text.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/)
+
+  return Buffer.from(fm ? `${fm[0]}\n${note}\n\n${text.slice(fm[0].length)}` : `${note}\n\n${text}`)
+}
+
 /**
  * El plan completo para un ref: ruta destino → { content: Buffer, kind }.
  * Lee todo del ref extraído y lo carga en memoria; el directorio temporal se borra antes de volver.
@@ -253,10 +411,24 @@ export async function buildPlan({ ref = 'HEAD' } = {}) {
  */
 export async function planFromSource(src, commit) {
   const manifest = loadManifest(src)
+  const native = validateNativePatterns(manifest.native?.paths ?? [], manifest.native?.reserved ?? [])
   const plan = new Map()
+  const nativeSkipped = new Set()
 
   const add = (rel, kind, content) => {
     if (plan.has(rel)) throw new Error(`Colisión en el plan: ${rel} lo aportan ${plan.get(rel).kind} y ${kind}`)
+
+    // Lo nativo es del workbench: greenhouse-eo no lo entrega aunque su plantilla lo tenga.
+    if (isNative(rel, native)) {
+      if (kind !== 'template' && kind !== 'generated')
+        throw new Error(
+          `${rel} (${kind}) cae en una ruta nativa: una skill, un CLI o un doc exportado no puede ser del workbench`
+        )
+      nativeSkipped.add(rel)
+
+      return
+    }
+
     plan.set(rel, { kind, content })
   }
 
@@ -275,8 +447,12 @@ export async function planFromSource(src, commit) {
     add(rel, 'template', readFileSync(path.join(templateDir, rel)))
   }
 
-  // 2. Skills, espejadas para Claude y Codex desde la misma fuente.
+  // 2. Skills, espejadas para Claude y Codex desde la misma fuente. Si el manifest declara una nota de
+  //    workbench, se inserta al inicio del SKILL.md de cada skill que menciona comandos que allá
+  //    pueden estar retirados (la fuente de la skill en greenhouse-eo no cambia).
   const skillFiles = new Map()
+  const skillOverlays = {}
+  const overlay = manifest.skillOverlay ? readFileSync(path.join(src, manifest.skillOverlay.path), 'utf8') : null
 
   for (const skill of manifest.skills) {
     const claudeRel = `.claude/skills/${skill}`
@@ -285,11 +461,23 @@ export async function planFromSource(src, commit) {
     const codexRel = existsSync(path.join(src, `.codex/skills/${skill}`)) ? `.codex/skills/${skill}` : claudeRel
 
     const claudeFiles = walk(path.join(src, claudeRel)).map(r => `${claudeRel}/${r}`)
+    const codexFiles = walk(path.join(src, codexRel)).map(r => [`.codex/skills/${skill}/${r}`, `${codexRel}/${r}`])
 
     skillFiles.set(skill, claudeFiles)
-    for (const r of claudeFiles) add(r, 'skill', fromSrc(r))
-    for (const r of walk(path.join(src, codexRel)))
-      add(`.codex/skills/${skill}/${r}`, 'skill', fromSrc(`${codexRel}/${r}`))
+
+    const commands = overlay
+      ? retiredCommandsIn([...claudeFiles, ...codexFiles.map(([, from]) => from)], src, manifest.skillOverlay)
+      : []
+
+    if (commands.length) skillOverlays[skill] = commands
+
+    const content = (rel, from) =>
+      commands.length && path.basename(rel) === 'SKILL.md'
+        ? withOverlay(readFileSync(path.join(src, from), 'utf8'), overlay, commands)
+        : fromSrc(from)
+
+    for (const r of claudeFiles) add(r, 'skill', content(r, r))
+    for (const [to, from] of codexFiles) add(to, 'skill', content(to, from))
   }
 
   // 3. Código de los CLIs: cierre de imports + datos declarados.
@@ -376,6 +564,12 @@ export async function planFromSource(src, commit) {
     ),
     entrypoints: closure.entries,
     externalPackages: Object.keys(deps),
+    // Si package.json es nativo, el workbench declara sus dependencias; estas son las que necesitan
+    // los engines que greenhouse-eo sigue entregando. `creative:status` compara contra ellas.
+    requiredDependencies: deps,
+    skillOverlays,
+    native,
+    nativeSkipped: [...nativeSkipped].sort(),
     unresolvedSkillRefs: unresolved
   }
 
@@ -387,6 +581,46 @@ export async function planFromSource(src, commit) {
   }
 
   return { plan, report, manifest }
+}
+
+/**
+ * ¿El sello publicado es el que greenhouse-eo habría escrito para su commit de origen?
+ *
+ * El gate managed-drift del workbench confía en el sello, y el sello vive en el workbench: alguien
+ * podría eximirse agregando una ruta a `native` o reescribir una huella. Esto lo detecta desde acá,
+ * recalculando el plan del commit que el propio sello declara. `expected` es `planFromSource` de ese
+ * commit. Devuelve la lista de anomalías (vacía = íntegro).
+ */
+// Lo generado que depende de algo más que el commit: el reporte (versión del generador) y package.json
+// (versiones transitivas que se resuelven del node_modules de quien sincroniza). El resto de lo generado
+// (workbench.config.json, .env.example) sale sólo de control.json y se compara exacto: ahí viven el
+// proyecto GCP, los buckets y los nombres de secreto.
+const GENERATED_UNVERIFIABLE = new Set([REPORT_REL, 'package.json'])
+
+export function verifySeal(lock, expected) {
+  const problems = []
+
+  if (!lock?.source?.commit) return ['el sello no declara su commit de origen: no se puede verificar']
+
+  const sealedNative = [...(lock.native ?? [])].sort()
+  const expectedNative = [...(expected.report.native ?? [])].sort()
+
+  if (JSON.stringify(sealedNative) !== JSON.stringify(expectedNative))
+    problems.push(`native sellado [${sealedNative.join(', ')}] ≠ manifest de ese commit [${expectedNative.join(', ')}]`)
+
+  for (const [rel, hash] of Object.entries(lock.files ?? {})) {
+    if (rel === 'pnpm-lock.yaml') continue
+    const entry = expected.plan.get(rel)
+
+    if (!entry) problems.push(`${rel}: sellado, pero ese commit no lo exporta`)
+    else if (!GENERATED_UNVERIFIABLE.has(rel) && sha256(entry.content) !== hash)
+      problems.push(`${rel}: la huella sellada no es la del commit`)
+  }
+
+  for (const rel of expected.plan.keys())
+    if (!(rel in (lock.files ?? {}))) problems.push(`${rel}: el commit lo exporta y el sello no lo tiene`)
+
+  return problems
 }
 
 export function readLock(target) {
