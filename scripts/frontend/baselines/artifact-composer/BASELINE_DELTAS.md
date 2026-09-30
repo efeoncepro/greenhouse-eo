@@ -1,5 +1,41 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-30 (u) — TASK-1949: las seis láminas nativas del deck SEO/AEO y el lockup de submarca
+
+El deck SEO/AEO «La órbita» sobre Search Visibility 360 (aprobado completo por el operador el 2026-09-30, sesión «SEO deck
+para brochure y propuestas»; láminas en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/`) compone en el
+catálogo `graphic-line-deck` sin post-proceso: las seis láminas que se armaban fuera del compositor tienen plantilla, y el
+lockup de submarca, la propuesta de cine sin eyebrow y la bajada del equipo son slots opcionales de las recetas que ya
+existían. Los frames nuevos son el probe de cada plantilla (los `example` de su `slots.json`, sacados de la lámina aprobada;
+los lockups, íconos y capas llegan como `asset-ref:<kind>:probe`).
+
+Diferencias con las láminas aprobadas, todas regla o sistema, no estética:
+- La voz es la canónica de la familia `.gl-ls` (anillo, esfera y color suave del token) en vez de la copia a mano de las
+  nativas: la pregunta y el eyebrow van en el suave de AXIS, no en `#cfe4fa`.
+- `content-report-formats`: el rótulo «La lectura del mes» iba en el acento a 13 px; la regla `accent-text-min-size` manda
+  y va en el teal del informe. Los cinco íconos de formato son glifos Trazo de AXIS en reposo (el catálogo nunca dibuja
+  un ícono); las nativas los dibujaban a mano en el acento suave.
+
+Frames que cambian (existían): el probe llena el slot opcional nuevo; sin el slot la lámina no cambia, lo prueba
+`product-mark.test.ts` componiendo los intents aprobados.
+- `templates-graphic-line-deck/CoverBrochure.png` — cambia: `productMark` (el logo de SV360 al pie de la columna)
+- `templates-graphic-line-deck/CoverProposalOrbit.png` — cambia: `productMark`
+- `templates-graphic-line-deck/ProposalCinematic.png` — cambia: `productMark`
+- `templates-graphic-line-deck/ProposalService.png` — cambia: `productMark`
+- `templates-graphic-line-deck/MethodStaircase.png` — cambia: `productMark`
+- `templates-graphic-line-deck/MethodScoreRing.png` — cambia: `productMark`
+- `templates-graphic-line-deck/DecisionDiagnosisMap.png` — cambia: `productMark`
+- `templates-graphic-line-deck/ContentDayResults.png` — cambia: `productMark`
+- `templates-graphic-line-deck/SectionCine.png` — cambia: la bajada opcional del equipo (`body`, 22 px en 900)
+
+Frames nuevos:
+- `templates-graphic-line-deck/ContentBrandFamily.png` — 🆕 deck.content-brand-family: SV360 y sus cuatro piezas, cada una con su lockup oficial (content-brand-family)
+- `templates-graphic-line-deck/ContentServiceMockups.png` — 🆕 deck.content-service-mockups: SEO técnico, contenido y PR con maquetas nativas y tres entregables (content-service-mockups)
+- `templates-graphic-line-deck/ContentReportFormats.png` — 🆕 deck.content-report-formats: el informe vivo en interfaz blanca y sus cinco formatos (content-report-formats)
+- `templates-graphic-line-deck/ContentCommitteeDeck.png` — 🆕 deck.content-committee-deck: la lámina de comité armada, en perspectiva (content-committee-deck)
+- `templates-graphic-line-deck/ContentIndustries.png` — 🆕 deck.content-industries: seis industrias con la pregunta de su comprador (content-industries)
+- `templates-graphic-line-deck/ContentMarkets.png` — 🆕 deck.content-markets: las Américas desde la órbita con los cinco mercados (content-markets)
+
 ## 2026-09-29 (t) — Avatares nuevos del equipo y deriva de Chromium en deck-axis
 
 <!-- sealed-by-freeze: 6c5b56126801a849edaf1c4c3c4863ecc181eda2072977487d8b920ffbfb8278 -->
