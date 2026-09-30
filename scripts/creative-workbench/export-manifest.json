@@ -89,6 +89,23 @@
       "docs/finance"
     ]
   },
+  "native": {
+    "_comentario": "Rutas que posee el workbench (su harness nativo): el sync no las escribe ni las borra y el gate managed-drift no las compara. La lista viaja SELLADA en .workbench/sync.lock.json; una declaración nativa hecha en el workbench no exime nada. Sólo rutas exactas o carpetas 'dir/**'. Los gates (gates/**) y el workflow de gates NUNCA son nativos: son la forma en que greenhouse-eo controla el workbench. Ver §8 del ADR.",
+    "paths": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "README.md",
+      ".gitignore",
+      ".claude/hooks/guard.mjs",
+      ".claude/settings.json",
+      "package.json",
+      "pnpm-lock.yaml",
+      "tools/doctor.mjs",
+      "tools/instalar.mjs",
+      "clients/sky/README.md"
+    ],
+    "reserved": ["gates/**", ".github/workflows/gates.yml", ".github/CODEOWNERS", ".workbench/**"]
+  },
   "limits": {
     "maxFileBytes": 15000000
   }

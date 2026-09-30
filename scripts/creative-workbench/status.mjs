@@ -1,14 +1,29 @@
 // pnpm creative:status [--ref <ref>] [--target <dir>]
 //
 // Tablero del workbench visto desde greenhouse-eo:
+//   · sello íntegro: el sello publicado en main es el que este repo habría escrito para su commit;
 //   · sync pendiente: archivos que el plan de hoy cambiaría respecto del último sello publicado;
 //   · drift: archivos gestionados que alguien editó en main del workbench (no deberían existir);
-//   · PRs abiertos, último CI de main y miembros del equipo en GitHub;
-//   · skills que citan docs que no viajan.
+//   · rutas nativas y dependencias que los engines entregados necesitan del package.json nativo;
+//   · PRs abiertos, marcando los que tocan archivos gestionados o el sello;
+//   · último CI de main, miembros del equipo en GitHub y skills que citan docs que no viajan.
+//
+// Sólo usa la API REST de GitHub (`gh api repos/...`): GraphQL no está disponible en todos los
+// entornos donde corre esto, y un tablero que se cae en la primera llamada no controla nada.
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
-import { buildPlan, LOCK_REL, loadControl, loadManifest, resolveTarget, run, sha256 } from './lib.mjs'
+import {
+  buildPlan,
+  isNative,
+  LOCK_REL,
+  loadControl,
+  loadManifest,
+  resolveTarget,
+  run,
+  sha256,
+  verifySeal
+} from './lib.mjs'
 
 const args = process.argv.slice(2)
 const value = name => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined)
@@ -16,29 +31,59 @@ const value = name => (args.includes(name) ? args[args.indexOf(name) + 1] : unde
 const manifest = loadManifest()
 const control = loadControl()
 const repo = manifest.target.repo
+const branch = manifest.target.defaultBranch
 const target = resolveTarget(manifest, value('--target'))
 const gh = (...a) => run('gh', a, { allowFail: true })
+const firstLine = r => (r.stderr || r.stdout || '').trim().split('\n')[0]
 
-const exists = gh('repo', 'view', repo, '--json', 'name')
+const exists = gh('api', `repos/${repo}`, '--jq', '.full_name')
 
 if (exists.status !== 0) {
-  console.error(`✗ ${repo} no existe o no tengo acceso.`)
+  console.error(`✗ ${repo} no existe o no tengo acceso: ${firstLine(exists)}`)
   process.exit(1)
 }
 
 // Sello publicado en main (fuente: GitHub, no el checkout local, que puede estar atrasado).
-const lockRes = gh('api', `repos/${repo}/contents/${LOCK_REL}?ref=${manifest.target.defaultBranch}`, '--jq', '.content')
+const lockRes = gh('api', `repos/${repo}/contents/${LOCK_REL}?ref=${branch}`, '--jq', '.content')
 
 const remoteLock =
   lockRes.status === 0 ? JSON.parse(Buffer.from(lockRes.stdout.trim(), 'base64').toString('utf8')) : null
 
+const sealedNative = remoteLock?.native ?? []
+
 console.log(`Workbench ${repo}`)
 console.log(
-  `  sello en main: ${remoteLock ? `greenhouse-eo@${remoteLock.source.commit?.slice(0, 9)} · ${Object.keys(remoteLock.files).length} archivos` : 'sin sello (nunca sincronizado)'}`
+  `  sello en main: ${remoteLock ? `greenhouse-eo@${remoteLock.source.commit?.slice(0, 9)} · ${Object.keys(remoteLock.files).length} archivos · ${sealedNative.length} rutas nativas` : 'sin sello (nunca sincronizado)'}`
 )
 
 const ref = value('--ref') ?? 'HEAD'
-const { plan, report, commit } = await buildPlan({ ref })
+const current = await buildPlan({ ref })
+const { plan, report, commit } = current
+
+// 1. Integridad del sello: se recalcula el plan del commit que el sello declara y se compara.
+if (remoteLock?.source?.commit) {
+  const sealedCommit = remoteLock.source.commit
+  let expected = null
+
+  if (sealedCommit === commit) expected = current
+  else {
+    try {
+      expected = await buildPlan({ ref: sealedCommit })
+    } catch (error) {
+      console.log(`\nSello: no pude recalcular greenhouse-eo@${sealedCommit.slice(0, 9)} (${error.message.split('\n')[0]})`)
+    }
+  }
+
+  if (expected) {
+    const anomalies = verifySeal(remoteLock, expected)
+
+    console.log(`\nSello íntegro: ${anomalies.length ? `✗ ${anomalies.length} anomalías (alguien lo editó a mano)` : '✓'}`)
+    for (const a of anomalies.slice(0, 15)) console.log(`   ! ${a}`)
+    if (anomalies.length > 15) console.log(`   … y ${anomalies.length - 15} más`)
+  }
+}
+
+// 2. Sync pendiente contra el ref pedido.
 const pending = []
 
 for (const [rel, { content }] of plan) {
@@ -46,19 +91,27 @@ for (const [rel, { content }] of plan) {
   if (remoteLock?.files[rel] !== sha256(content)) pending.push(rel)
 }
 
-const retiring = Object.keys(remoteLock?.files ?? {}).filter(rel => rel !== 'pnpm-lock.yaml' && !plan.has(rel))
+const retiring = Object.keys(remoteLock?.files ?? {}).filter(
+  rel => rel !== 'pnpm-lock.yaml' && !plan.has(rel) && !isNative(rel, report.native)
+)
+
+const handingOff = Object.keys(remoteLock?.files ?? {}).filter(rel => isNative(rel, report.native))
+
+const nativeChanged = JSON.stringify([...sealedNative].sort()) !== JSON.stringify([...report.native].sort())
 
 console.log(
-  `\nSync pendiente contra ${ref} (${commit.slice(0, 9)}): ${pending.length + retiring.length ? `${pending.length} a escribir · ${retiring.length} a retirar → pnpm creative:sync --pr` : 'ninguno ✓'}`
+  `\nSync pendiente contra ${ref} (${commit.slice(0, 9)}): ${pending.length + retiring.length + handingOff.length || nativeChanged ? `${pending.length} a escribir · ${retiring.length} a retirar · ${handingOff.length} a entregar al workbench → pnpm creative:sync --pr` : 'ninguno ✓'}`
 )
 for (const rel of pending.slice(0, 15)) console.log(`   ~ ${rel}`)
 if (pending.length > 15) console.log(`   … y ${pending.length - 15} más`)
+for (const rel of handingOff) console.log(`   → ${rel} (pasa a nativo)`)
+if (nativeChanged) console.log(`   native: [${sealedNative.join(', ')}] → [${report.native.join(', ')}]`)
 
-// Drift: sólo se puede medir contra un checkout al día con main.
+// 3. Drift: sólo se puede medir contra un checkout al día con main.
 if (existsSync(path.join(target, '.git'))) {
-  run('git', ['fetch', '-q', 'origin', manifest.target.defaultBranch], { cwd: target, allowFail: true })
+  run('git', ['fetch', '-q', 'origin', branch], { cwd: target, allowFail: true })
 
-  const behind = run('git', ['rev-list', '--count', `HEAD..origin/${manifest.target.defaultBranch}`], {
+  const behind = run('git', ['rev-list', '--count', `HEAD..origin/${branch}`], {
     cwd: target,
     allowFail: true
   }).stdout.trim()
@@ -79,36 +132,69 @@ if (existsSync(path.join(target, '.git'))) {
       `\nDrift: no medido (checkout local ${behind ? `${behind} commits atrás de main` : 'sin sello'}; haz git pull en ${target})`
     )
   }
+} else {
+  console.log(`\nDrift: no medido (no hay checkout en ${target})`)
 }
 
+// 4. Contrato con el package.json nativo: los engines que greenhouse-eo sigue entregando necesitan
+//    sus dependencias. Si el workbench las quitó, esos engines no corren allá (puede ser a propósito).
+if (isNative('package.json', report.native)) {
+  const pkgRes = gh('api', `repos/${repo}/contents/package.json?ref=${branch}`, '--jq', '.content')
+
+  if (pkgRes.status === 0) {
+    const pkg = JSON.parse(Buffer.from(pkgRes.stdout.trim(), 'base64').toString('utf8'))
+    const declared = { ...pkg.dependencies, ...pkg.devDependencies }
+    const missing = Object.keys(report.requiredDependencies).filter(name => !(name in declared))
+
+    console.log(
+      `\nDependencias de los engines entregados en el package.json nativo: ${missing.length ? `faltan ${missing.length}` : 'completas ✓'}`
+    )
+    for (const name of missing) console.log(`   - ${name}@${report.requiredDependencies[name]}`)
+  }
+}
+
+// 5. PRs abiertos: los que no vienen del sync y tocan lo gestionado o el sello son la señal temprana
+//    de una edición que el gate va a rechazar (o que intenta eximirse).
 const prs = gh(
-  'pr',
-  'list',
-  '--repo',
-  repo,
-  '--state',
-  'open',
-  '--json',
-  'number,title,author,headRefName',
+  'api',
+  `repos/${repo}/pulls?state=open&per_page=50`,
   '--jq',
-  '.[] | "#\\(.number) \\(.title) — \\(.author.login) (\\(.headRefName))"'
+  '.[] | [.number, .head.ref, .user.login, .draft, .title] | @tsv'
 )
 
-console.log(`\nPRs abiertos:${prs.stdout.trim() ? `\n   ${prs.stdout.trim().split('\n').join('\n   ')}` : ' ninguno'}`)
+const openPrs = prs.stdout
+  .split('\n')
+  .filter(Boolean)
+  .map(line => {
+    const [number, head, author, draft, title] = line.split('\t')
+
+    return { number, head, author, draft: draft === 'true', title }
+  })
+
+console.log(`\nPRs abiertos: ${openPrs.length || 'ninguno'}`)
+
+for (const pr of openPrs) {
+  const files = gh('api', '--paginate', `repos/${repo}/pulls/${pr.number}/files?per_page=100`, '--jq', '.[].filename')
+  const touched = files.stdout.split('\n').filter(Boolean)
+  const managed = touched.filter(rel => rel in (remoteLock?.files ?? {}))
+  const sealTouched = touched.filter(rel => rel.startsWith('.workbench/'))
+  const isSync = pr.head.startsWith('sync/')
+
+  const flag =
+    isSync || (!managed.length && !sealTouched.length)
+      ? ''
+      : ` — ⚠ toca ${managed.length} gestionados${sealTouched.length ? ` y ${sealTouched.join(', ')}` : ''}`
+
+  console.log(`   #${pr.number}${pr.draft ? ' [draft]' : ''} ${pr.title} — ${pr.author} (${pr.head})${flag}`)
+  if (flag) for (const rel of managed.slice(0, 8)) console.log(`       ~ ${rel}`)
+  if (flag && managed.length > 8) console.log(`       … y ${managed.length - 8} más`)
+}
 
 const ci = gh(
-  'run',
-  'list',
-  '--repo',
-  repo,
-  '--branch',
-  manifest.target.defaultBranch,
-  '--limit',
-  '1',
-  '--json',
-  'conclusion,status,displayTitle,createdAt',
+  'api',
+  `repos/${repo}/actions/runs?branch=${branch}&per_page=1`,
   '--jq',
-  '.[0] | "\\(.status)/\\(.conclusion // "-") · \\(.displayTitle) · \\(.createdAt)"'
+  '.workflow_runs[0] | "\\(.status)/\\(.conclusion // "-") · \\(.display_title) · \\(.created_at)"'
 )
 
 console.log(`\nÚltimo CI en main: ${ci.stdout.trim() || 'sin corridas'}`)
@@ -116,9 +202,14 @@ console.log(`\nÚltimo CI en main: ${ci.stdout.trim() || 'sin corridas'}`)
 const team = gh('api', `orgs/${control.github.org}/teams/${control.github.team}/members`, '--jq', '.[].login')
 const desired = control.members.filter(m => m.activo !== false).map(m => m.github)
 
-console.log(
-  `\nEquipo @${control.github.org}/${control.github.team}: ${team.status === 0 ? team.stdout.trim().split('\n').filter(Boolean).join(', ') || '(vacío)' : 'no existe todavía'}`
-)
+const teamLine =
+  team.status === 0
+    ? team.stdout.trim().split('\n').filter(Boolean).join(', ') || '(vacío)'
+    : /404/.test(firstLine(team))
+      ? 'no existe todavía'
+      : `no disponible desde este entorno (${firstLine(team)})`
+
+console.log(`\nEquipo @${control.github.org}/${control.github.team}: ${teamLine}`)
 console.log(`  declarado en control.json: ${desired.join(', ') || '(nadie)'} → pnpm creative:access plan`)
 
 const gaps = Object.entries(report.unresolvedSkillRefs)

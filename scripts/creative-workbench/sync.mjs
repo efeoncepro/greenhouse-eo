@@ -3,11 +3,13 @@
 // Materializa el plan de exportación de un ref de greenhouse-eo (HEAD por defecto) en el checkout
 // local del creative-workbench:
 //   · escribe cada archivo gestionado (plantilla, skills, CLIs, docs, package.json, config);
-//   · borra los que el sello anterior gestionaba y el plan nuevo ya no trae;
-//   · regenera pnpm-lock.yaml con las versiones fijadas;
-//   · sella todo en `.workbench/sync.lock.json` (sha256 + commit de origen).
+//   · borra los que el sello anterior gestionaba y el plan nuevo ya no trae, salvo los que pasaron a
+//     ser NATIVOS (manifest → native.paths): esos se sueltan del sello sin borrarlos;
+//   · regenera pnpm-lock.yaml con las versiones fijadas (si no es nativo);
+//   · sella todo en `.workbench/sync.lock.json` (sha256 + commit de origen + lista nativa).
 //
-// Nunca toca lo que no gestiona: `projects/**` del equipo queda intacto.
+// Nunca toca lo que no gestiona: `projects/**` del equipo y el harness nativo quedan intactos, y si
+// una ruta del plan ya existe sin estar en el sello, aborta en vez de pisarla.
 //
 // Sin flags sólo escribe en disco y muestra el diff. `--pr` crea rama, commit, push y PR (el camino
 // normal). `--bootstrap` hace el primer commit directo en main (sólo para un repo sin commits).
@@ -17,9 +19,11 @@ import path from 'node:path'
 
 import {
   buildPlan,
+  isNative,
   LOCK_REL,
   loadManifest,
   readLock,
+  reconcile,
   resolveTarget,
   run,
   sha256,
@@ -76,26 +80,45 @@ if (dirty.length) {
 console.log(`→ Calculando plan de exportación desde ${ref}…`)
 const { plan, report, commit } = await buildPlan({ ref })
 const previous = readLock(target)
+const { native } = report
 
-const changed = []
-const added = []
+const { added, changed, removed, handedOff, collisions } = reconcile({
+  plan,
+  previous,
+  native,
+  targetHash: rel => {
+    const abs = path.join(target, rel)
 
-for (const [rel, { content }] of plan) {
-  const dest = path.join(target, rel)
+    return existsSync(abs) ? sha256(readFileSync(abs)) : null
+  }
+})
 
-  if (!existsSync(dest)) added.push(rel)
-  else if (sha256(readFileSync(dest)) !== sha256(content)) changed.push(rel)
-  else continue
-
-  mkdirSync(path.dirname(dest), { recursive: true })
-  writeFileSync(dest, content)
+// Antes de escribir nada: el sync no pisa archivos que no gestionaba. Si una ruta del plan ya existe
+// en el workbench sin estar en el sello, es trabajo de otro (típicamente el harness nativo): hay que
+// decidir de quién es — declararla nativa en el manifest o moverla allá — no sobrescribirla.
+if (collisions.length) {
+  console.error(
+    `✗ ${collisions.length} rutas del plan ya existen en el workbench y no las gestiona el sello. No las piso:`
+  )
+  for (const rel of collisions) console.error(`   ! ${rel}`)
+  console.error('  Decide su dueño: declárala en export-manifest.json → native.paths o quítala de la plantilla.')
+  process.exit(1)
 }
 
-const removed = Object.keys(previous?.files ?? {}).filter(rel => rel !== 'pnpm-lock.yaml' && !plan.has(rel))
+for (const rel of [...added, ...changed]) {
+  const dest = path.join(target, rel)
+
+  mkdirSync(path.dirname(dest), { recursive: true })
+  writeFileSync(dest, plan.get(rel).content)
+}
 
 for (const rel of removed) rmSync(path.join(target, rel), { force: true })
 
-if (!flag('--no-install')) {
+const lockfileNative = isNative('pnpm-lock.yaml', native)
+
+if (lockfileNative) {
+  console.log('→ pnpm-lock.yaml es nativo: lo mantiene el workbench, no se regenera.')
+} else if (!flag('--no-install')) {
   console.log('→ Regenerando pnpm-lock.yaml…')
 
   // Misma credencial efímera que `pnpm instalar` del workbench: userconfig temporal, borrado siempre.
@@ -114,10 +137,12 @@ if (!flag('--no-install')) {
   }
 }
 
-// Sello: cada archivo gestionado con su huella. El lockfile de pnpm también es gestionado.
+// Sello: cada archivo gestionado con su huella (el lockfile de pnpm también, salvo que sea nativo),
+// más la lista nativa vigente. El gate managed-drift del workbench lee `native` DE ACÁ: una
+// declaración nativa que no pasó por greenhouse-eo no exime nada.
 const files = {}
 
-for (const rel of [...plan.keys(), 'pnpm-lock.yaml'].sort()) {
+for (const rel of [...plan.keys(), ...(lockfileNative ? [] : ['pnpm-lock.yaml'])].sort()) {
   const abs = path.join(target, rel)
 
   if (existsSync(abs)) files[rel] = sha256(readFileSync(abs))
@@ -125,8 +150,9 @@ for (const rel of [...plan.keys(), 'pnpm-lock.yaml'].sort()) {
 
 const lock = {
   _comentario:
-    'Generado por `pnpm creative:sync` en greenhouse-eo. No se edita: el gate managed-drift compara cada archivo contra esta huella.',
+    'Generado por `pnpm creative:sync` en greenhouse-eo. No se edita: el gate managed-drift compara cada archivo contra esta huella; `native` lista lo que es del workbench y sólo cambia por un sync.',
   source: { repo: 'efeoncepro/greenhouse-eo', ref, commit },
+  native,
   files
 }
 
@@ -139,12 +165,15 @@ console.log(
     .map(([k, n]) => `${k}=${n}`)
     .join('  ')}`
 )
-console.log(`  nuevos=${added.length}  cambiados=${changed.length}  retirados=${removed.length}`)
+console.log(
+  `  nuevos=${added.length}  cambiados=${changed.length}  retirados=${removed.length}  entregados=${handedOff.length}`
+)
 
 for (const [label, list] of [
   ['+', added],
   ['~', changed],
-  ['-', removed]
+  ['-', removed],
+  ['→', handedOff]
 ]) {
   for (const rel of list.slice(0, 25)) console.log(`   ${label} ${rel}`)
   if (list.length > 25) console.log(`   ${label} … y ${list.length - 25} más`)
@@ -183,17 +212,25 @@ if (flag('--bootstrap')) {
   const body = [
     `Sincronización gestionada desde \`efeoncepro/greenhouse-eo@${commit}\` (${ref}).`,
     '',
-    `- nuevos: ${added.length} · cambiados: ${changed.length} · retirados: ${removed.length}`,
+    `- nuevos: ${added.length} · cambiados: ${changed.length} · retirados: ${removed.length} · entregados al workbench: ${handedOff.length}`,
     `- ${Object.entries(report.counts)
       .map(([k, n]) => `${k}=${n}`)
       .join(' · ')}`,
+    `- rutas nativas selladas: ${native.length ? native.join(', ') : 'ninguna'}`,
+    ...(handedOff.length
+      ? [`- pasan a ser nativas (el sync deja de gestionarlas y NO las borra): ${handedOff.join(', ')}`]
+      : []),
     '',
     'Este PR sólo toca archivos gestionados (ver `.workbench/sync.lock.json`). No se edita a mano.'
   ].join('\n')
 
+  // REST y no `gh pr list/create`: esos usan GraphQL, que no está disponible en todos los entornos
+  // donde corre esto (p. ej. sesiones remotas de agentes).
+  const [owner] = manifest.target.repo.split('/')
+
   const existing = run(
     'gh',
-    ['pr', 'list', '--repo', manifest.target.repo, '--head', branch, '--json', 'url', '--jq', '.[0].url'],
+    ['api', `repos/${manifest.target.repo}/pulls?state=open&head=${owner}:${branch}`, '--jq', '.[0].html_url // ""'],
     { cwd: target }
   ).stdout.trim()
 
@@ -202,18 +239,20 @@ if (flag('--bootstrap')) {
     run(
       'gh',
       [
-        'pr',
-        'create',
-        '--repo',
-        manifest.target.repo,
-        '--base',
-        manifest.target.defaultBranch,
-        '--head',
-        branch,
-        '--title',
-        message,
-        '--body',
-        body
+        'api',
+        '-X',
+        'POST',
+        `repos/${manifest.target.repo}/pulls`,
+        '-f',
+        `title=${message}`,
+        '-f',
+        `head=${branch}`,
+        '-f',
+        `base=${manifest.target.defaultBranch}`,
+        '-f',
+        `body=${body}`,
+        '--jq',
+        '.html_url'
       ],
       { cwd: target }
     ).stdout.trim()
