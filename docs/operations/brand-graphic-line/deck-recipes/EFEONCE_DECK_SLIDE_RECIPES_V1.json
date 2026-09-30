@@ -7931,8 +7931,8 @@
           "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
           "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
           "line": "engine",
-          "slide": "C31 · B21",
-          "board": "canvas de revisión SEO/AEO (Design), Completo 31, Brochure 21",
+          "slide": "C31 · B19",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 31, Brochure 19",
           "document": "brochure",
           "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/31.jpg",
           "renderSource": {
@@ -17173,7 +17173,7 @@
         "Respuesta ≥ 3× la pregunta (128/40 = 3,2).",
         "Español neutro, sin voseo."
       ],
-      "notes": "Aprobada por el operador el 2026-09-30, lámina 27 del deck SEO/AEO completo (19 en brochure, 21 en propuesta). Decisión 12: seis industrias (Banca y finanzas, Seguros, Retail, Manufactura, Servicios profesionales, SaaS) con la pregunta que ese comprador le hace a la IA. Pendiente de DECISIONES.md: prueba por industria (no hay clientes de banca, seguros ni SaaS en la lámina de clientes). Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/27.jpg · brochure/19.jpg · propuesta/21.jpg."
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 27 del deck SEO/AEO completo (20 en brochure, 21 en propuesta). Decisión 12: seis industrias (Banca y finanzas, Seguros, Retail, Manufactura, Servicios profesionales, SaaS) con la pregunta que ese comprador le hace a la IA. Pendiente de DECISIONES.md: prueba por industria (no hay clientes de banca, seguros ni SaaS en la lámina de clientes). Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/27.jpg · brochure/19.jpg · propuesta/21.jpg."
     },
     {
       "id": "content-markets",
@@ -17365,7 +17365,7 @@
         "Respuesta ≥ 3× la pregunta (128/40 = 3,2).",
         "Español neutro, sin voseo."
       ],
-      "notes": "Aprobada por el operador el 2026-09-30, lámina 28 del deck SEO/AEO completo (20 en brochure, 22 en propuesta). Decisión 12: los mercados (Chile, EE. UU., Colombia, México, Perú) de forma épica. Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/28.jpg · brochure/20.jpg · propuesta/22.jpg."
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 28 del deck SEO/AEO completo (21 en brochure, 22 en propuesta). Decisión 12: los mercados (Chile, EE. UU., Colombia, México, Perú) de forma épica. Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/28.jpg · brochure/20.jpg · propuesta/22.jpg."
     }
   ]
 }

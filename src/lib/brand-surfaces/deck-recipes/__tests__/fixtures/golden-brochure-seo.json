@@ -82,6 +82,10 @@
       "purpose": "18 · ¿Qué nos hace distintos? Lo puedes ver."
     },
     {
+      "recipeId": "content-clients",
+      "purpose": "21 · ¿Quién confía en nosotros? Marcas líderes."
+    },
+    {
       "recipeId": "content-industries",
       "purpose": "19 · ¿Conocemos tu industria? Por dentro. (receta nueva, nativa)"
     },
@@ -89,10 +93,6 @@
       "recipeId": "content-markets",
       "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
       "purpose": "20 · ¿Dónde operamos? Cinco países. (receta nueva, plate MK2)"
-    },
-    {
-      "recipeId": "content-clients",
-      "purpose": "21 · ¿Quién confía en nosotros? Marcas líderes."
     },
     {
       "recipeId": "decision-diagnosis-map",

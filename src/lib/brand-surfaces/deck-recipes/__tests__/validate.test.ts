@@ -75,7 +75,7 @@ describe('validateDeckPlan — planes golden', () => {
   // «Empower your Engine». Sin errores; los únicos avisos son las seis láminas nativas que esperan plantilla (Slice 2).
   const SEO_NATIVE = {
     'golden-completo-seo.json': [7, 10, 22, 23, 27, 28],
-    'golden-brochure-seo.json': [6, 8, 16, 17, 19, 20],
+    'golden-brochure-seo.json': [6, 8, 16, 17, 20, 21],
     'golden-proposal-seo.json': [6, 9, 17, 18, 21, 22]
   }
 
