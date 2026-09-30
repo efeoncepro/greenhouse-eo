@@ -303,3 +303,44 @@ vista previa). `--in-place` existe para quien lo pida explícitamente y se niega
 `main` y al día con origin: nunca cambia de rama ni resetea. Verificado: tras una vista previa y un `status`, el
 checkout local conserva commit, rama, archivos y refs idénticos.
 
+### 8.9 Evaluación de arquitectura del delta (2026-09-30)
+
+**Frontera de dominio.** Tooling de plataforma: `scripts/creative-workbench/**` y su plantilla. Ningún archivo de
+`src/**` lo importa (verificado: 0 referencias), no entra al bundle de Next ni a los workers y no toca PostgreSQL,
+BigQuery ni entitlements. El workbench es un repo cliente; Globe, Marketing Studio y Brand Workshop mantienen las
+fronteras del §3. **Full API Parity no aplica:** no es una capacidad del portal sino un plano de control por CLI,
+cuyos consumidores son el operador y el CI del workbench.
+
+**Puertas y reversibilidad.** Todo es de doble vía: una ruta nativa vuelve a ser gestionada quitándola de
+`native.paths` (el sync aborta con colisión y exige decidir qué versión queda, en vez de pisar); el sello agrega un
+campo (`native`) y es compatible hacia atrás (un sello anterior se verifica íntegro con el generador nuevo, medido);
+la nota de skills se retira borrando `skillOverlay` del manifest. La única decisión de una vía es de proceso: el
+workbench deja de ser «todo gestionado» y pasa a tener harness propio, y eso quedó escrito aquí.
+
+**Cuatro pilares.**
+
+| Pilar | Cómo lo cumple |
+|---|---|
+| Seguridad | Lista nativa decidida en greenhouse-eo y sellada; rutas reservadas; `managed-drift` compara el sello del PR contra la base; `creative:status` recalcula el sello; `native-policy` prueba el guard por comportamiento en una copia; la barrera real sigue siendo IAM (§2.3). |
+| Robustez | El sync aborta antes de escribir ante colisiones; entrega sin borrar; `package.json` y lockfile nativos juntos; formas canónicas de ruta; staging forzado del plan. |
+| Resiliencia | Sólo REST de GitHub y paginación explícita (funciona detrás de proxies de agentes); 404 ≠ error de acceso; un sello no recalculable cuenta como anomalía, no como silencio. |
+| Escalabilidad | Cada sync/status calcula 1–2 planes (esbuild, segundos) y un clon superficial temporal; costo lineal en archivos exportados. Suficiente para 1 workbench; si hubiera varios, el plan por commit ya está memoizado en `status`. |
+
+**Patrones canónicos que extiende.** (1) *Enforcement de helper canónico* (TASK-721): el manifest es la única
+fuente y los gates son la aplicación mecánica, con un verificador real (`creative:status`) detrás de cada guarda
+textual, según la regla de guardas textuales del overlay de arquitectura. (2) *Defensa en profundidad* (TASK-742):
+hook del agente → gates de CI → comparación con la base → integridad desde greenhouse-eo → IAM. (3) *Fuente única,
+muchos consumidores*: `planFromSource` alimenta sync, status, la verificación del sello y las pruebas; nada recalcula
+el plan por su cuenta.
+
+**Riesgos residuales aceptados.** `native-policy` es un lint (un guard malicioso puede engañar sondas; lo mitiga que
+el equipo no tenga llaves). La comparación de sello en CI confía en el nombre de rama `sync/*`; lo cubre
+`creative:status`, que no confía en nombres. `sync --pr` y `status` no tienen pruebas unitarias de extremo a extremo:
+se validaron contra el repo real y contra copias desechables.
+
+**Descartado por el operador (2026-09-30).** La zona «ventana de viaje» mezclada con «origen» en 20 adaptaciones SKY
+no bloquea: son textos de ejemplo que se reemplazan al crear el flujo productivo.
+
+**Seguimiento que requiere implementación.** §8.4.4 (broker, cuentas de servicio, Vercel y paquetes al plano de
+control) necesita una task formal antes de ejecutarse.
+
