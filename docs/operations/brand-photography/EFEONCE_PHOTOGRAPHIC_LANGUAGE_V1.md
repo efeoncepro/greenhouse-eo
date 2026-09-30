@@ -1,9 +1,9 @@
 # Lenguaje Fotográfico Efeonce V1 — «El oficio a la vista»
 
 > **Tipo de documento:** Especificación canónica de marca (documento maestro)
-> **Versión:** 1.6
+> **Versión:** 1.7
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-27 por Claude — el registro cine se amplía a la receta de deck `proposal-cinematic` con personas del equipo y uniforme por registro (delta 2026-09-27). Antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada entera (decisión del operador; §9, §10 y P-5). Antes, el mismo día: §11: el operador aprueba las reglas de sinergia P1–P12 y resuelve los nueve conflictos P-1..P-9 con la línea gráfica (la lente cuenta como reserva del texto; capa gráfica sobre la foto aprobada sólo en los casos declarados de la línea; retrato de perfil como categoría propia, barra por redactar); §9 ajustado. Antes (mismo día): §11 «La línea gráfica en la foto»: cómo se prepara una foto que llevará la órbita y qué puede hacer la órbita sobre ella, con enlace al contrato de convergencia. Antes (mismo día): la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
+> **Última actualización:** 2026-09-30 por Claude — excepción declarada de **caso de cliente** en puesta en escena: una ficha con `caso` puede anclar la escena en el rubro de SU cliente; sin el campo, la guarda del rubro aborta igual (delta 2026-09-30). Antes, el 2026-09-27: el registro cine se amplía a la receta de deck `proposal-cinematic` con personas del equipo y uniforme por registro (delta 2026-09-27). Antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada entera (decisión del operador; §9, §10 y P-5). Antes, el mismo día: §11: el operador aprueba las reglas de sinergia P1–P12 y resuelve los nueve conflictos P-1..P-9 con la línea gráfica (la lente cuenta como reserva del texto; capa gráfica sobre la foto aprobada sólo en los casos declarados de la línea; retrato de perfil como categoría propia, barra por redactar); §9 ajustado. Antes (mismo día): §11 «La línea gráfica en la foto»: cómo se prepara una foto que llevará la órbita y qué puede hacer la órbita sobre ella, con enlace al contrato de convergencia. Antes (mismo día): la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
 > **Estado:** Aprobado por el operador (Julio Reyes, dueño de Efeonce) el 2026-09-19. Sistema consistente; **no** es todavía un activo distintivo medido.
 > **Documentación relacionada:** [Índice](./README.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) · [Marca de agencia](../../context/09_marca-agencia.md) · [Quiénes somos](../../context/01_quienes-somos.md) · [Marca en escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md)
 
@@ -164,6 +164,8 @@ compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el
 
 - Se varían industrias que **no** sean de clientes reales: café, bebidas, panadería, retail, finanzas, gastronomía,
   eventos **[decisión del operador]** tras «nosotros NO somos Berel».
+  Única excepción: el **caso de éxito de un cliente** declarado en la ficha, en puesta en escena (ver el
+  [delta 2026-09-30](#delta-2026-09-30--excepción-declarada-caso-de-cliente-en-puesta-en-escena)).
 - Se varían cámaras y ángulos: ojo de pez, dron, tilt-shift, contrapicado, reflejo, tele 200 mm, macro, retrato,
   barrido, noche (catálogo en [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md)).
 - Se varía la forma de integrar el color: la misma taza azul apareció en 3–4 piezas (persianas, noche, KV café,
@@ -174,6 +176,8 @@ compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el
 
 - Nada que Efeonce no haga. Nada de stock.
 - Nunca insinuar trabajo con un cliente real ni etiquetar con su nombre (se corrigió la etiqueta «Berel» → «Cliente»).
+  Salvo en la pieza que **es** el caso de ese cliente, declarada en la ficha ([delta 2026-09-30](#delta-2026-09-30--excepción-declarada-caso-de-cliente-en-puesta-en-escena)); aun ahí, la escena no
+  nombra al cliente y su logo nunca lo genera el modelo.
 - Sin marcas de terceros en objetos (la cámara salió con una inscripción tipo «Blackmagic»; se pide «completely
   unbranded, no brand names» y se revisa al zoom).
 - Para piezas publicables con personas: equipo real (Run & Gun) como base; IA para explorar, espacios, objetos y 3D
@@ -666,3 +670,41 @@ inventado por el modelo), la lámina de Nexa con un director de arte mirándose 
 versión en Plastilina de servicios creativos (no era digital ni artística). Fichas y placas:
 `ai-generations/2026-09-26_deck-creativo/`, `ai-generations/2026-09-26_deck-web/`, `ai-generations/2026-09-26_deck-revops/`,
 `ai-generations/2026-09-26_deck-aeo/` y `ai-generations/2026-09-26_deck-nexa/`.
+
+## Delta 2026-09-30 — excepción declarada: caso de cliente en puesta en escena
+
+**[decisión del operador, 2026-09-29/30, deck SEO/AEO (TASK-1949), decisión 14 de
+`ai-generations/2026-09-29_deck-seo-aeo-documentos/DECISIONES.md`]** En los **casos de éxito** de un cliente se
+aceptan **imágenes de ambiente generadas** asociadas a ese cliente, en el registro **B · puesta en escena**, en lugar
+de una «foto real del caso». Caso fuente: la sesión de trabajo del squad Efeonce con la líder de marketing del
+cliente entre muestrarios de pintura (Berel, placa `CS3b-berel-squad`).
+
+No es una regla nueva ni relaja la de §4.3: la fotografía **propia** de Efeonce sigue sin anclarse jamás en el rubro de
+un cliente. Es **una excepción que la ficha declara**, sólo para ese cliente y sólo en esa ficha:
+
+```json
+"caso": { "tipo": "cliente", "cliente": "Berel", "registro": "puesta-en-escena" }
+```
+
+| Con `caso` declarado | No cambia |
+|---|---|
+| La escena puede anclarse en el rubro **de ese cliente** (el que la tabla `ANCLAS_PROHIBIDAS` de `scripts/foto/build-prompt.mjs` le asigna) | Sin `caso`, el ancla del rubro **aborta igual que antes** |
+| El comando imprime un aviso visible con la excepción | Otro cliente, otro registro (documental, C, cine) o un `caso` mal formado **abortan** |
+| El prompt suma un bloque `CLIENT CASE` que prohíbe logo, nombre, etiqueta, cartel y packaging del cliente | La escena **no nombra al cliente** («the client's marketing lead»): un nombre en el prompt es cómo el modelo escribe una marca |
+| | Identidad, vestuario por línea, lecho, firma, colorimetría y bloque de impacto: todo lo del registro B |
+
+Tres condiciones que viajan con la excepción:
+
+1. **El logo del cliente se COMPONE, nunca lo genera el modelo.** Si la pieza lo necesita, la placa nace sin él y el
+   logo oficial se compone después desde su archivo. Caso `CS1b` (Banco BICE): tarjeta en blanco generada + logo
+   oficial blanco compuesto con sharp (rotado 4,22°, opacidad 0,93). Es la misma regla que el emblema de Efeonce.
+2. **El uso de la marca del cliente depende de su autorización** (TASK-1937): la excepción habilita la **imagen**, no
+   el permiso de mostrar al cliente; eso se resuelve antes de que la pieza salga a un tercero.
+3. **Las cifras del caso son reales o no van** (pendiente del mismo deck): una foto de ambiente no vuelve verdadera
+   una cifra de ejemplo.
+
+Guarda mecánica (`pnpm foto:prompt` y `pnpm foto:generar`): `validarCaso` en `scripts/foto/build-prompt.mjs`, con
+pruebas en `scripts/foto/build-prompt.test.ts` (sin campo aborta, cliente correcto pasa, cliente o registro distinto
+abortan, la escena no nombra al cliente). El mismo día el ancla de pintura pasó a ver también **muestrarios,
+abanicos y latas de pintura**: la escena de `CS3b` los usaba y la guarda no la veía **[medido]**; los muestrarios de
+color impresos, oficio de Efeonce, siguen permitidos. Ficha: `ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS3b-berel-squad.json`.

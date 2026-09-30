@@ -614,6 +614,12 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   cinta; el yoyo 1,6 veces) y el **arte plano sirve para PRODUCIR vistas del kit, la foto del producto
   terminado para USARLO en escena**.
 - **Nunca ancles la serie en la categoría de un cliente** (pintura = Berel). El comando aborta.
+  **Única excepción, declarada** **[operador, 2026-09-30, TASK-1949]**: la pieza que **es** el caso de éxito de ese
+  cliente, en puesta en escena, con `"caso": { "tipo": "cliente", "cliente": "Berel", "registro": "puesta-en-escena" }`
+  en la ficha. Sólo abre el rubro de ESE cliente; otro cliente u otro registro abortan, la escena no lo nombra, el
+  prompt le prohíbe al modelo su logo y el comando avisa. El logo del cliente se **compone** desde el archivo oficial
+  (caso `CS1b`, Banco BICE compuesto con sharp) y usarlo depende de su autorización (TASK-1937). Nunca en la foto
+  propia de Efeonce. Detalle: `EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md` → delta 2026-09-30.
 
 ## Los assets viven fuera de git — y el lock los vigila
 

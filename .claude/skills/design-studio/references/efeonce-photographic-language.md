@@ -598,6 +598,12 @@ El lenguaje se probó en **4:5 1152×1440**, **9:16 1152×2048** y **16:9 2048×
 se leyó como Berel («nosotros NO somos Berel»). Variar: café, bebidas, panadería, retail, finanzas, gastronomía,
 eventos. Tampoco repetir el mismo objeto de acento ni el mismo panel azul de fondo entre piezas.
 
+**Única excepción, declarada en la ficha** **[operador, 2026-09-30, TASK-1949]**: la imagen de ambiente del **caso de
+éxito** de un cliente, en puesta en escena (`"caso": { "tipo": "cliente", "cliente": "<nombre>", "registro":
+"puesta-en-escena" }`). Abre sólo el rubro de ese cliente y sólo en esa ficha; la escena no lo nombra, su logo se
+**compone** desde el archivo oficial (nunca lo genera el modelo) y mostrar su marca depende de su autorización
+(TASK-1937). La foto propia de Efeonce no cambia.
+
 ## 10. Pantallas: curación generativa, nunca UI pegada
 
 Las composiciones deterministas sólo sirven **como referencia** para curar con IA. Método: plate con la pantalla en
@@ -722,6 +728,9 @@ impacto. Medido sobre sus escenas contra la ronda que el operador aprobó: luz 6
 - **Anclas de categoría de cliente:** hoy **pintura**. **[decisión del operador]** «nosotros NO somos Berel». La
   regla estaba escrita desde el 19/09 y una sesión generó igual un macro de un rodillo aplicando pintura azul.
   **Un doc no impide nada; un comando que aborta, sí.** Se amplía sólo con lo que el operador declare.
+  Cada ancla lleva su `cliente`; la ficha que declara `caso` de **ese** cliente en registro `puesta-en-escena` pasa
+  con aviso y un bloque `CLIENT CASE` que prohíbe su marca (`validarCaso`, 2026-09-30). Desde ese día el ancla de
+  pintura ve también muestrarios, abanicos y latas **de pintura**; los muestrarios impresos siguen permitidos.
 - **Avisos que no bloquean:** escena sin **fuente de luz** o sin **momento**. El aviso automático que cuestionaba
   paneles, pantallas y otras áreas azules se retiró: también hay campos azules naturales en las fotos aprobadas.
   La revisión visual decide si el color tiene razón de estar en la composición o si parece una pieza añadida.
