@@ -412,6 +412,35 @@ describe('creative-workbench — guardarraíl de Claude', () => {
     for (const command of ['pnpm ai:image --prompt x', 'git push -u origin pieza/fix-main-banner'])
       expect(call({ tool_name: 'Bash', tool_input: { command } })).toBe(0)
   })
+
+  it('bloquea el push a main escondido en otro shell, en xargs, con la ruta del binario o configurado', () => {
+    for (const command of [
+      '/usr/bin/git push origin main',
+      "sh -c 'git push origin main'",
+      'bash -c "git push origin HEAD:main"',
+      '$(git push origin +main)',
+      'git -C . push origin refs/heads/main',
+      'echo main | xargs git push origin',
+      'git config remote.origin.push HEAD:refs/heads/main',
+      'git push --mirror'
+    ]) {
+      expect(call({ tool_name: 'Bash', tool_input: { command } }), command).toBe(2)
+    }
+  })
+
+  it('en main bloquea cualquier push, aunque no nombre el destino; en otra rama lo deja pasar', () => {
+    const git = (...args: string[]) => spawnSync('git', args, { cwd: dir })
+
+    git('init', '-q', '-b', 'main')
+    git('-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '--allow-empty', '-m', 'x')
+
+    for (const command of ['git push', 'git push -u origin HEAD'])
+      expect(call({ tool_name: 'Bash', tool_input: { command } }), command).toBe(2)
+
+    git('checkout', '-q', '-b', 'pieza/x')
+    expect(call({ tool_name: 'Bash', tool_input: { command: 'git push -u origin HEAD' } })).toBe(0)
+    rmSync(path.join(dir, '.git'), { recursive: true, force: true })
+  })
 })
 
 describe('creative-workbench — gate native-policy', () => {
@@ -475,6 +504,19 @@ describe('creative-workbench — gate native-policy', () => {
     write('tools/secret.sh', 'gcloud secrets versions access latest --secret=workbench-openai-api-key')
     write('tools/rest.mjs', "fetch('https://secretmanager.googleapis.com/v1/projects/x/secrets/y')")
     write('tools/tests/sneaky.test.mjs', "fetch('https://api.anthropic.com/v1')")
+    write('tools/via-template.mjs', 'const m = await import(`../src/lib/ai/openai-image`)')
+    write('scripts/ai/generate-image.ts', "import { gen } from '../../src/lib/ai/openai-image'\ngen()")
+    write('tools/spawn.mjs', "spawnSync('pnpm', ['exec', 'tsx', 'scripts/ai/generate-image.ts'])")
+    write('apps/lab/package.json', JSON.stringify({ scripts: { gen: 'tsx ../../scripts/ai/generate-image.ts' } }))
+    write('src/lib/ai/fal-pricing.ts', 'export const PRICES = { image: 0.04 }')
+    write('tools/pricing.mjs', "readFileSync('src/lib/ai/fal-pricing.ts')")
+    write(
+      '.workbench/sync.lock.json',
+      JSON.stringify({
+        native: ['.claude/hooks/guard.mjs'],
+        files: { 'gates/lib.mjs': 'x', 'gates/hygiene.mjs': 'y', 'scripts/ai/fal-image.ts': 'z' }
+      })
+    )
     write(
       'package.json',
       JSON.stringify({ dependencies: { openai: '5.0.0', '@google-cloud/secret-manager': '6.0.0' } })
@@ -493,6 +535,9 @@ describe('creative-workbench — gate native-policy', () => {
       'tools/secret.sh: gcloud secrets',
       'tools/rest.mjs: secretmanager.googleapis.com',
       'tools/tests/sneaky.test.mjs: api.anthropic.com',
+      'tools/via-template.mjs: importa src/lib/ai/openai-image.ts',
+      'tools/spawn.mjs: nombra scripts/ai/generate-image.ts',
+      'apps/lab/package.json: nombra scripts/ai/generate-image.ts',
       'package.json: declara openai'
     ])
       expect(result.out).toContain(expected)
@@ -500,8 +545,14 @@ describe('creative-workbench — gate native-policy', () => {
     // Los engines gestionados necesitan el SDK de Secret Manager: declararlo no es una falta.
     expect(result.out).not.toContain('declara @google-cloud/secret-manager')
     expect(result.out).not.toContain('tools/client.mjs')
+    // Nombrar un módulo que no llega al proveedor (una tabla de precios) no es una falta.
+    expect(result.out).not.toContain('tools/pricing.mjs')
+    // El sello lista las rutas de los engines que entrega: nombrarlas ahí no es una falta.
+    expect(result.out).not.toContain('.workbench/sync.lock.json')
     remove('tools')
     remove('src')
+    remove('scripts')
+    remove('apps')
     remove('package.json')
   })
 

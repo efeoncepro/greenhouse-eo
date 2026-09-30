@@ -11,7 +11,14 @@
       "git push origin pieza/{rand}:main",
       "cat .env.local",
       "curl https://api.openai.com/v1/images/{rand}",
-      "git commit --no-verify -m {rand}"
+      "git commit --no-verify -m {rand}",
+      "/usr/bin/git push origin main",
+      "sh -c 'git push origin main'",
+      "bash -c \"git push origin HEAD:main\"",
+      "$(git push origin +main)",
+      "echo main | xargs git push origin",
+      "git config remote.origin.push HEAD:refs/heads/main",
+      "git push --mirror"
     ],
     "mustAllowBash": ["git status", "git push -u origin pieza/{rand}-main-banner"],
     "mustBlockEdit": [".workbench/sync.lock.json", "@managed", "@managed"],
@@ -30,7 +37,7 @@
     "hookCommand": "^node \"?\\$CLAUDE_PROJECT_DIR/\\.claude/hooks/guard\\.mjs\"?$"
   },
   "providers": {
-    "_comentario": "Ningún código ni configuración del workbench llega a un proveedor de IA ni a sus llaves salvo el broker: ni directo (host, SDK, lectura de llaves) ni importando un módulo que lo haga (el adaptador del broker, los engines históricos src/lib/ai/*). Se omiten los engines gestionados y gates/ (son de greenhouse-eo), el guard y settings.json (citan hosts y comandos para bloquearlos; los prueba la sección guard), docs/ y los tests *.test.* dentro de una carpeta test/. Es un lint: un texto ofuscado lo evade; la barrera real es que el equipo no tiene llaves. secretPackages se detecta al importarse, no como dependencia: los engines gestionados lo necesitan en package.json.",
+    "_comentario": "Ningún código ni configuración del workbench llega a un proveedor de IA ni a sus llaves salvo el broker: ni directo (host, SDK, lectura de llaves) ni importando un módulo que lo haga (el adaptador del broker, los engines históricos src/lib/ai/*), ni nombrando la ruta de un engine gestionado (enginePaths) para ejecutarlo como proceso o desde un script de package.json. Se omiten los engines gestionados, gates/ y .workbench/ (son de greenhouse-eo; el sello lista las rutas de los engines), el guard y settings.json (citan hosts y comandos para bloquearlos; los prueba la sección guard), docs/ y los tests *.test.* dentro de una carpeta test/. Es un lint: un texto ofuscado lo evade; la barrera real es que el equipo no tiene llaves. secretPackages se detecta al importarse, no como dependencia: los engines gestionados lo necesitan en package.json.",
     "hosts": [
       "api.openai.com",
       "fal.run",
@@ -55,7 +62,7 @@
       "replicate"
     ],
     "allowedIn": ["services/production-broker/**"],
-    "skipIn": ["docs/**", "gates/**", ".claude/settings.json", ".claude/hooks/guard.mjs"],
+    "skipIn": ["docs/**", "gates/**", ".workbench/**", ".claude/settings.json", ".claude/hooks/guard.mjs"],
     "extensions": [
       ".mjs",
       ".js",
@@ -75,6 +82,7 @@
       "gcloud\\s+secrets\\b",
       "\\b(?:OPENAI|FAL|HIGGSFIELD|ANTHROPIC|GEMINI|GOOGLE_GENAI|REPLICATE)_API_KEY\\b"
     ],
-    "secretPackages": ["@google-cloud/secret-manager"]
+    "secretPackages": ["@google-cloud/secret-manager"],
+    "enginePaths": ["scripts/ai/", "src/lib/ai/", "src/lib/secrets/"]
   }
 }

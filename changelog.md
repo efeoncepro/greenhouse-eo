@@ -30,7 +30,13 @@
   la persona o Codex) no se toca; `--in-place` es opt-in y se niega si no está limpio, en `main` y al día (§8.8).
 - `control.json → clientesPorDefecto: "todos"`: por decisión del operador, todo el equipo produce para todas las
   marcas (ADR §8.6).
-- 33 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests
+- Cierre de la revisión (tercera pasada): el guardarraíl debe bloquear también el push a `main` escondido (`/usr/bin/git`,
+  `sh -c`, `$(…)`, `+main`, `xargs`, `remote.origin.push`, `--mirror`) y, en la plantilla, cualquier push estando en
+  `main`; `native-policy` sigue imports con backticks y marca un archivo que nombra la ruta de un engine que llega al
+  proveedor (se ejecuta sin import). `clients/brands.json` queda nativo con riesgo residual documentado (§8.5). Sobre el
+  head `289a12e` del PR #3 la política nueva no da falsos positivos y sólo marca las seis formas de push que su guard
+  todavía deja pasar: el sync de transición espera a que el PR #3 las porte.
+- 37 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests
   del harness de Codex iguales antes y después. Decisión: §8 de
   [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
 

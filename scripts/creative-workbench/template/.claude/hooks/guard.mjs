@@ -7,6 +7,7 @@
 //
 // No es la barrera de seguridad (esa son las llaves que el equipo no tiene y el IAM): es la señal
 // temprana que evita que un agente bienintencionado rompa algo antes de que el CI lo vea.
+import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
@@ -40,15 +41,33 @@ if (['Edit', 'Write', 'MultiEdit', 'NotebookEdit'].includes(tool)) {
   }
 }
 
+// Rama actual del checkout, para `git push` sin destino explícito estando en main. Sin git: null.
+const currentBranch = () => {
+  const r = spawnSync('git', ['-C', root, 'rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8', timeout: 5_000 })
+
+  return r.status === 0 ? r.stdout.trim() : null
+}
+
 if (tool === 'Bash') {
   const cmd = String(params.command ?? '')
+  const push = /\bgit\b.*\bpush\b/
 
   const rules = [
     [/gcloud\s+secrets\b/, 'los secretos no se leen ni se administran desde el workbench.'],
     [/(gcloud\s+storage\s+rm|gsutil\s+(-m\s+)?rm)\b/, 'los assets no se borran desde el workbench.'],
-    [/git\s+push\b.*(--force|\s-f\b|--force-with-lease)/, 'no se fuerza un push. Todo entra por PR.'],
-    // `main` como destino, también en refspecs (`rama:main`, `HEAD:refs/heads/main`).
-    [/git\s+push\b.*[\s:](refs\/heads\/)?main(\s|$)/, 'no se empuja a main. Crea una rama y abre un PR.'],
+    [
+      /\bgit\b.*\bpush\b.*(--force|\s-f\b|--force-with-lease|--mirror|--all\b)/,
+      'no se fuerza un push. Todo entra por PR.'
+    ],
+    // `main` como destino, también en refspecs (`rama:main`, `+main`, `HEAD:refs/heads/main`) y dentro de
+    // `sh -c '…'`, `$(…)` o con la ruta del binario (`/usr/bin/git`): el cierre puede ser comilla o paréntesis.
+    [
+      /\bgit\b.*\bpush\b.*(?:[\s:'"(]\+?|refs\/heads\/)main(?=$|[\s'"`);&|])/,
+      'no se empuja a main. Crea una rama y abre un PR.'
+    ],
+    // El destino puede llegar por la entrada estándar o quedar configurado para un `git push` posterior.
+    [/\bxargs\b.*\bgit\b.*\bpush\b/, 'no se empuja con xargs: escribe el destino explícito, en una rama.'],
+    [/\bgit\b.*\bconfig\b.*\bremote\.[^\s]*\.push\b/, 'no se configura el destino del push. Todo entra por PR.'],
     [/\.env\.local/, 'no se lee ni se muestra .env.local.'],
     [
       /\b(api\.openai\.com|fal\.run|queue\.fal\.run|higgsfield\.ai|generativelanguage\.googleapis\.com)\b/,
@@ -58,6 +77,10 @@ if (tool === 'Bash') {
   ]
 
   for (const [pattern, reason] of rules) if (pattern.test(cmd)) block(reason)
+
+  // `git push` o `git push -u origin HEAD` sin nombrar main: el destino es la rama actual.
+  if (push.test(cmd) && currentBranch() === 'main')
+    block('estás en main: cualquier push iría a main. Crea una rama y abre un PR.')
 }
 
 process.exit(0)

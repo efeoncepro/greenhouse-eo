@@ -80,17 +80,33 @@ function resolveImport(fromRel, spec) {
   return null
 }
 
+// Una ruta relativa a la raíz del repo, con las mismas extensiones omitibles que un import.
+function resolveFromRoot(ref) {
+  for (const suffix of RESOLVE_SUFFIXES) {
+    const abs = path.join(ROOT, ref + suffix)
+
+    if (existsSync(abs) && statSync(abs).isFile()) return path.relative(ROOT, abs).split(path.sep).join('/')
+  }
+
+  return null
+}
+
 function checkProviders(policy, lock, problems) {
   const managed = lock?.files ?? {}
   const where = policy.allowedIn.join(', ')
   const importPrefix = String.raw`(?:from\s*|import\s*|require\(\s*|import\(\s*)`
+  // Comilla simple, doble o backtick: `import(\`../src/lib/ai/x\`)` también es un import.
+  const q = '[\'"`]'
 
   const sdkImport = new RegExp(
-    `${importPrefix}['"](${[...policy.sdkPackages, ...(policy.secretPackages ?? [])].map(escape).join('|')})(?:/[^'"]*)?['"]`
+    `${importPrefix}${q}(${[...policy.sdkPackages, ...(policy.secretPackages ?? [])].map(escape).join('|')})(?:/[^'"\`]*)?${q}`
   )
 
-  const localImport = new RegExp(`${importPrefix}['"]((?:\\.{1,2}/|@/)[^'"]+)['"]`, 'g')
+  const localImport = new RegExp(`${importPrefix}${q}((?:\\.{1,2}/|@/)[^'"\`$]+)${q}`, 'g')
   const secretAccess = policy.secretAccess.map(p => new RegExp(p))
+
+  // Referencia a la ruta de un engine gestionado (`scripts/ai/…`, `src/lib/ai/…`), aunque no sea un import.
+  const enginePath = new RegExp(`(?:${(policy.enginePaths ?? []).map(escape).join('|') || '(?!)'})[\\w./-]*`, 'g')
 
   // Qué hace un archivo de código por sí mismo: llamar a un proveedor, usar un SDK de IA o leer llaves.
   const directHit = text =>
@@ -141,7 +157,24 @@ function checkProviders(policy, lock, problems) {
         .map(m => resolveImport(rel, m[1]))
         .find(target => target && reachesProvider(target))
 
+      // Sin import que seguir, un engine también se ejecuta como proceso (spawn, `tsx`, un script de
+      // package.json): basta con que el archivo nombre su ruta. Nombrar un módulo que no llega al proveedor
+      // (p. ej. una tabla de precios) está bien; una ruta que no resuelve a un archivo se trata como engine.
+      const named = via
+        ? null
+        : [...text.matchAll(enginePath)]
+            .map(m => m[0].replace(/[./]+$/, ''))
+            .find(ref => {
+              const target = resolveFromRoot(ref)
+
+              return !target || reachesProvider(target)
+            })
+
       if (via) problems.push(`${rel}: importa ${via}, que llega al proveedor o a las llaves; el broker se usa por HTTP`)
+      else if (named)
+        problems.push(
+          `${rel}: nombra ${named}, un engine gestionado que llega al proveedor; la IA pasa por el broker (${where})`
+        )
     }
 
     if (path.basename(rel) === 'package.json') {

@@ -251,16 +251,21 @@ omitidos requieren canon licenciado).
 
 `gates/native-policy.json` (reservado, sellado) declara lo que el harness nativo debe cumplir, y el gate
 `native-policy` lo verifica **por comportamiento**, sin leer el código del workbench. Es un **lint**, no una
-frontera de seguridad: la barrera real es IAM (el equipo no tiene llaves) y la revisión de PRs.
+frontera de seguridad: la barrera real es IAM (el equipo no tiene llaves). La revisión de PRs **no** es una barrera
+mientras la org siga en GitHub Free (§6): `main` acepta push directo y CODEOWNERS sólo solicita revisión.
 
 - **Proveedores (primero):** ningún archivo de código o configuración (`.mjs/.ts/.jsx/.sh/.py/.json/.yml`…) fuera de
   `services/production-broker/**` llega a un proveedor de IA o a sus llaves: ni directo (host, SDK de IA importado o
   declarado, `import 'openai'`, `*_API_KEY`, `gcloud secrets`, `secretmanager.googleapis.com`, el SDK de Secret
   Manager importado) ni importando —relativo o con alias `@/`, transitivamente— un módulo que lo haga: el adaptador
   del broker o los engines históricos `src/lib/ai/*`. Importar validadores que no llegan al proveedor está bien.
-  Se omiten los archivos gestionados, `gates/`, el guard y `settings.json` (los prueba la sección siguiente),
-  `docs/` y los tests `*.test.*` dentro de una carpeta `test/`. Un texto ofuscado (`"api.openai" + ".com"`) lo
-  evade: es un lint.
+  El import puede ir entre comillas o backticks (`` import(`../src/lib/ai/x`) ``). Tampoco puede **nombrar** la ruta
+  de un engine gestionado (`enginePaths`: `scripts/ai/`, `src/lib/ai/`, `src/lib/secrets/`) que llegue al
+  proveedor: así se ejecuta sin import, con `spawn`, `tsx` o un script de `package.json`. Nombrar un módulo que
+  no llega al proveedor (una tabla de precios) está bien, y una ruta que no resuelve a un archivo se trata como
+  engine. Se omiten los archivos gestionados, `gates/`, `.workbench/` (el sello lista las rutas de los engines),
+  el guard y `settings.json` (los prueba la sección siguiente), `docs/` y los tests `*.test.*` dentro de una
+  carpeta `test/`. Un texto ofuscado (`"api.openai" + ".com"`) lo evade: es un lint.
 - **Settings de Claude:** `permissions.deny` conserva las denegaciones mínimas, `disableAllHooks` no está activo y
   el hook `PreToolUse` corre exactamente `node "$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs"` para `Bash|Edit|Write`.
 - **Guardarraíl (al final, en una copia):** ejecuta `.claude/hooks/guard.mjs` sobre una copia temporal de lo
@@ -268,6 +273,10 @@ frontera de seguridad: la barrera real es IAM (el equipo no tiene llaves) y la r
   buckets, push forzado o a `main` (también `rama:main`), leer `.env.local`, llamar a un proveedor y
   `--no-verify`; debe impedir editar el sello y dos archivos gestionados elegidos al azar; debe dejar pasar
   `git status`, un push a una rama y escribir en `projects/`. `native-policy` corre último en `run-all`.
+  Desde el 2026-09-30 el push a `main` también se prueba escondido: con la ruta del binario (`/usr/bin/git`),
+  dentro de `sh -c '…'`, `bash -c "…"` o `$(…)`, con `+main`, por `xargs`, configurándolo en
+  `remote.origin.push` y con `--mirror`. El `git push` sin destino estando en `main` no se puede sondear en una
+  copia sin git; la plantilla lo bloquea leyendo la rama actual y el workbench debería hacer lo mismo.
 
 Además, `managed-drift` compara en CI el sello del PR con el de la rama base: sólo un PR de sync puede cambiarlo, y
 `creative:status` reconoce un PR de sync porque re-sella con el sello exacto que greenhouse-eo habría escrito (no por
@@ -278,6 +287,19 @@ Verificado 2026-09-30 sobre copias (sync + gates): el estado del PR #3 (`7c4024d
 guard que no bloquea `git push origin rama:main`; `main` falla sólo por lo segundo. Los tests del harness de
 Codex no cambian (152 pasan, 14 omitidos por canon licenciado). Ambas correcciones deben entrar en el PR #3 antes
 del sync de transición.
+
+**Verificado 2026-09-30 sobre el head `289a12e` del PR #3** (copia con los gates de este PR): con la política
+anterior, `native-policy` en verde; con las sondas y `enginePaths` nuevas, cero falsos positivos en el código
+nativo y seis fallas, todas del guard nativo (las seis formas escondidas de push a `main` de arriba). El sync de
+transición queda en rojo hasta que el PR #3 porte esos casos a su `.claude/hooks/guard.mjs`; la plantilla de
+este repo es la referencia.
+
+**El catálogo de marcas es nativo (decisión 2026-09-30).** `clients/brands.json` decide qué pack está `ready`, y
+las activaciones de pack (revisiones SKY con rollback del mantenedor) viven en el workbench. Si fuera gestionado,
+la copia de la plantilla —con SKY `gated`— lo pisaría en el sync. Riesgo residual aceptado: sin protección de
+rama, quien pueda empujar al workbench puede habilitar un pack. Lo acota que el pack declare su SHA y que el broker
+sólo cargue lo que `admission.json` admite; el ruleset `main-gobernado` de §6 lo cierra. Supersede la frase «el
+owner del catálogo es el plano de control Greenhouse» del ADR multimarcas (TASK-1945) mientras no se revise.
 
 ### 8.6 Acceso a marcas: todo el equipo, todas las marcas (decisión 2026-09-30)
 
