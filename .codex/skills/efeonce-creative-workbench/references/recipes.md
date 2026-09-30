@@ -243,3 +243,39 @@ No afirmar actualización de Packages, broker o Vercel por implementar metadata 
 sus superficies reales si es necesario reportarlas. La unidad tampoco cierra los 121 controles
 Figma independientes pendientes del corte anterior ni habilita packs propios de Berel/Efeonce.
 Consultar [continuidad](state-continuity.md) antes de retomar y verificar situación actual.
+
+## Lotes para agentes — unidad local 2026-09-30
+
+El objetivo del operador es componer campañas mediante agentes, con el Lab como revisión.
+Workbench añade `marca:lote <pieza> --validate|--prepare <manifiesto>` y
+`marca:lote <pieza> --execute|--receipt <UUID>`. El manifiesto
+`workbench.design-batch.v1` contiene marca, versión, nombre y hasta 126 `{id,job}` completos.
+Una marca/pieza/versión por lote; contenido por campo y foto propia por UUID admitido o
+referencia histórica explícita. Ningún estilo, coordenada, código, token ni path de foto.
+
+Leer primero los dueños Workbench `docs/manual/design-batches.md` y
+`docs/architecture/workbench-design-batches.md`. Consultar receta/planes de cada adaptación,
+completar copy y legal desde el brief y validar toda la campaña antes de preparar. El snapshot
+pinneado fija dueño GitHub ID/login, política, pieza, pack, recursos, adapter y runtime.
+Cambiar manifiesto original no modifica el snapshot. Cambios de versiones/permisos se rechazan;
+una preparación nueva requiere la acción explícita del operador.
+
+Se ejecuta secuencialmente y reserva un UUID durable antes de cada run. Repetir el mismo UUID
+devuelve completados verificados y continúa sólo entradas pendientes. Un run reservado ausente,
+parcial o fallido detiene el lote, sin retries automáticos ni otro UUID por defecto. Lease
+abandonado requiere revisión de maintainer; nunca quitarlo por timeout. Journal local no es
+autoridad contra quien pueda reescribir disco. Outputs, fuentes y snapshots privados fuera de Git.
+
+La unidad `codex/agent-composition-batches`, base main `8b6bfe9`, produjo lote real
+`35977d6b-6f25-44d0-a165-347fa7cea9ac` en cuatro formatos nativos. Nueva ejecución devolvió
+el mismo receipt sin nuevas corridas. 267 tests harness + 7 SKY privados PASS sin skips;
+públicos 251 + 5 PASS y exactamente 16 + 2 SKIP licenciados. 10 tests de lote cubren
+aislamiento, autoridad, cambios de código/pack, carreras, crash y recuperación, foto por UUID
+con resolver simulado y corrupción. Prueba CLI real usa foto histórica; no prueba broker live
+de foto por lote ni generación. Binarios y logs están en el canon privado de operaciones
+`2026-09-30-agent-composition-batches`. Estado de push/PR/main se verifica aparte.
+
+Receipt conserva PNG/SVG/QA y selección de runs para el Lab, con revisión humana/comercial
+pendiente. 126 es límite y catálogo, no garantía de cualquier copy/foto ni fidelidad final.
+SKY es el único driver productivo hoy; no arrastrar sus recursos a otra marca. IA/autenticación
+no se activan por añadir lote; Efeonce ID conserva TASK-1952 diferida.
