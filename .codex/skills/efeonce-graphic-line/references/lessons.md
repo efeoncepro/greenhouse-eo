@@ -447,6 +447,25 @@
   `assets/partners/` (marcas de terceros), `graphic-line-tokens-sync.test.ts` reventó con EISDIR. **Regla:** recorrer
   recursivo y comparar también lo anidado byte a byte (`94eb4e4b0`), no filtrar los directorios fuera.
 
+## 2026-09-30 (portadas y avatar de redes sociales)
+
+- **«Persona real, sin maquillaje, no modelo» produjo una cara cansada.** Síntoma: el operador rechazó la toma de la
+  portada «En vivo»: «se ve con sueño y desmaquillada». Causa: el prompt pedía «no makeup look», «not a model» y luz
+  sólo de pantalla, de noche; el modelo lo leyó como agotamiento. **Regla:** en piezas de marca propia la persona es
+  **Nexa** (o Julio), con su identidad aprobada y resuelta por `foto:prompt`; nunca una desconocida genérica. «Piel
+  real» no es «desmaquillada», y una toma de noche con luz de pantalla se lee como cansancio.
+- **Una metáfora analógica contradice a una agencia digital.** Síntoma: rechazadas las tazas hechas a mano frente a
+  las tazas en serie para «lo irrepetible»: «muy análogo para lo digitales que somos». **Regla:** la metáfora sale del
+  oficio digital de Efeonce (pantallas, piezas, datos, agentes, el equipo en su trabajo), no de artesanía física.
+- **La portada de página de LinkedIn no es 4:1.** La tarjeta A6 trabajaba 1584 × 396 (portada de perfil personal). La
+  ayuda oficial de LinkedIn (consultada 2026-09-30) pide **1512 × 256 (5,9:1)**, avisa que en celular la imagen puede
+  recortarse en horizontal o vertical y pide alejar lo clave de los bordes, **sobre todo de la esquina inferior
+  derecha**; el logo de la página se monta abajo a la izquierda. **Regla:** portada de página en 5,9:1, lo esencial en
+  el centro, nada importante en las esquinas inferiores.
+- **Los conectores no reemplazan la CLI.** Higgsfield topó su límite diario a mitad de ronda y Magnific cobraba 1.000
+  créditos por GPT Image 2; ningún conector genera 6:1 nativo. **Regla:** producir con `pnpm ai:image` (GPT Image 2.5)
+  según la decisión del 2026-09-30; si el entorno no tiene la clave, se declara el bloqueo en vez de cambiar de motor.
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

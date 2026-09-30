@@ -204,6 +204,13 @@ vale en toda aplicación:
 
 ### A6. Banner / portada de perfil de LinkedIn 1584 × 396
 
+> **Delta 2026-09-30.** La portada de una **página de empresa** no es 1584 × 396 (eso es la portada de un perfil
+> personal): la ayuda oficial de LinkedIn pide **1512 × 256 (5,9:1)**, avisa que en celular puede recortarse en
+> horizontal o vertical y pide alejar lo clave de los bordes, sobre todo de la esquina inferior derecha; el logo de la
+> página se monta abajo a la izquierda. Si una persona aparece, es **Nexa** (decisión del 2026-09-30, `ledger.md`). Las
+> seis opciones de la primera ronda están en el canvas «Efeonce · Perfiles sociales»; la 2 y la 5 quedaron
+> rechazadas (persona y metáfora, `lessons.md` 2026-09-30).
+
 - **Para qué:** portada de la página o del perfil (el tamaño 1584 × 396 es el de portada; la lámina lo llama «Banner
   de LinkedIn»; que sea la portada de perfil es **inferido** por el tamaño).
 - **Va:** respuesta-promesa grande con su esfera («Te hacemos visible.») + una línea de mecanismo en Poppins («Crecimiento
