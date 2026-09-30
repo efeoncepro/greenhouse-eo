@@ -1,5 +1,24 @@
 # TASK-1949 — Canonizar el deck SEO/AEO (Search Visibility 360) de «La órbita»: 6 recetas nuevas, slots opcionales de submarca/equipo, usos aprobados, Composer y AXIS
 
+## Delta 2026-09-30 (e) — logos de clientes en paquetes, TODO AXIS retirados y brochure HubSpot descartado
+
+- Operador: «Los logos súbelos, te autorizo pero solo a packages». AXIS `afb7f26` (tag `v0.4.8`, release verde):
+  `axis-brand-assets` 0.4.8 con `client-bicecorp-logo` y `client-banco-bice-logo-{color,white}` (kind `client-logo`,
+  status `operator-authorized`, procedencia declarada: Banco BICE oficial + `viewBox`, la blanca recoloreada; BICECORP
+  vectorizado con potrace). El Lab no los lista (sólo quedan sus metadatos dentro del bundle JS de una página, igual que
+  las marcas de Salesforce). Greenhouse sigue en 0.4.7 hasta que un builder los consuma.
+- Greenhouse `d29130950`: los tests de las seis recetas pasan por `planSurfacePiece` (el fixture `axis-voice.ts` se
+  borró; plan idéntico byte a byte), los intents viven en `examples/` con snapshot, `PRODUCT_MARK_PLACEMENTS` y el lugar
+  de cada receta nativa se leen de AXIS, el equipo con bajada compone por el contrato, `recipe-map.json` suma las seis
+  filas y el índice queda en 100 de 100 con plantilla. Suite 1462/1463 (el rojo: snapshot revops del WIP HubSpot).
+- Hallazgos de contrato para el próximo release de AXIS: `productMark.assets` omite `sv360-logo-negative` e incluye
+  `sv360-name-lockup-negative` (Greenhouse mantiene su lista y un test fija la diferencia); el contrato no valida el id
+  de `productMark`; `content-brand-family` declara `productMark.optional: true` y `voice.eyebrow: false`, pero la lámina
+  abre con el lockup y usa el eyebrow como rótulo de la columna.
+- Operador: «Si descarta eso del Brochure HubSpot». El descarte del WIP (Greenhouse: close-brochure, graphic-line.css,
+  recipes y el svg del catálogo; AXIS: los hunks de `tokens.ts` y `tokens.test.ts`) lo bloqueó el clasificador por ser
+  irreversible; queda para que el operador lo ejecute. Respaldo de los diffs en el scratchpad de la sesión.
+
 ## Delta 2026-09-30 (d) — AXIS v0.3.40 publicado y Greenhouse lo fija
 
 - AXIS `7986233` (tag `v0.3.40`, release y CI verdes): las seis recetas nativas aprobadas, `surfaces.deck.productMark`
