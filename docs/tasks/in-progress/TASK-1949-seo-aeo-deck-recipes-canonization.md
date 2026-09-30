@@ -1,5 +1,22 @@
 # TASK-1949 — Canonizar el deck SEO/AEO (Search Visibility 360) de «La órbita»: 6 recetas nuevas, slots opcionales de submarca/equipo, usos aprobados, Composer y AXIS
 
+## Delta 2026-09-30 (d) — AXIS v0.3.40 publicado y Greenhouse lo fija
+
+- AXIS `7986233` (tag `v0.3.40`, release y CI verdes): las seis recetas nativas aprobadas, `surfaces.deck.productMark`
+  (lockups y lugares medidos; ocupa el lugar del eyebrow en `proposal-cinematic`), `section-cine` `team` con `body`
+  opcional, referencias y miniaturas del Lab, `deck-recipes.json` a 100 recetas y delta (t) en el ADR de superficies.
+  Commit con índice temporal y verificado en un árbol aislado (build, typecheck y test completos): no arrastra el WIP
+  ajeno de AXIS.
+- Decisión del operador (2026-09-30): «La insignia de HubSpot hay que mandarla a axis pero el deck de hubspot que hizo
+  codex quedó horrible, así que ese no va». Entró la insignia HubSpot Solutions Partner Gold en `axis-brand-assets` 0.4.7
+  tal como la dejó Codex (`operator-internal-review`, claim `internal-review`: tier no verificado, sin publicación
+  externa); el `partnerMark` del cierre y la paleta vinotinto de RevOps HubSpot no entraron y siguen sin commitear en AXIS
+  y en Greenhouse (close-brochure). Descartarlos es decisión del operador o de su dueño.
+- Greenhouse `f363de357`: pines 0.3.40/0.3.40/0.4.7, sellos regenerados (sólo versión), snapshots con la órbita
+  `data-axis-graphic-line="0.5.0"` (mismo dibujo), Glitch y Manzanitas `stable`, y baseline graphic-line congelado (u).
+- En curso: retirar los `TODO AXIS TASK-1949` de Greenhouse que AXIS ya resuelve (fixture sv360, lugares de
+  `productMark`, bajada del equipo). Quedan como seguimiento el escenario, la plataforma y la paleta de las seis recetas.
+
 ## Delta 2026-09-30 (c) — requiredUnless en el validador y largos de la aprobada
 
 - `validateDeckPlan` honra `requiredUnless` (catálogo de runtime, tipo y `render-index.mjs`, que además valida que apunte a un slot
@@ -336,8 +353,8 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-seo-aeo-document
 - [x] `pnpm brand:deck-recipes --check` pasa y `pnpm vitest run src/lib/brand-surfaces` está en verde (824/825 el 2026-09-30: el rojo es el snapshot de `deck-proposal-service-revops-intent.json`, causado por un cambio ajeno sin commitear en `recipes/proposal-service.ts`, no por esta task).
 - [ ] Las seis recetas nuevas tienen plantilla y componen con `pnpm brand:compose`; los slots opcionales componen con y sin el slot.
 - [x] `validateDeckPlan` honra `requiredUnless`; `PENDING_TEMPLATE_SLOTS` quedó vacío (ff3cca87e, 2026-09-30; test «el eyebrow cede su lugar al lockup de submarca»).
-- [ ] Gate `graphic-line` a 0 px con el freeze declarado en `BASELINE_DELTAS.md`.
-- [ ] AXIS publica las recetas, las referencias del Lab y los logos de BICE y BICECORP con procedencia.
+- [x] Gate `graphic-line` a 0 px con el freeze declarado en `BASELINE_DELTAS.md` (sección (u) sellada, 95 frames, 15 re-promovidos; congelado en un árbol aislado porque el WIP ajeno de close-brochure cambia CloseBrochure y CloseBrochurePhoto).
+- [x] AXIS publica las recetas y las referencias del Lab (v0.3.40, 7986233, release y CI verdes: axis-tokens 0.3.40, axis-ui-contracts 0.3.40, axis-brand-assets 0.4.7; Greenhouse lo fija en f363de357). Los logos de BICE y BICECORP quedan fuera de AXIS hasta que exista una autorización de uso registrada (pregunta abierta al operador).
 - [x] Norma, README, manual, doc funcional, arquitectura y skills describen el deck SEO/AEO (norma §4.6 v1.17, catálogo v1.11, manual v1.12, funcional 2.8, arquitectura 1.6; skills `efeonce-graphic-line`, `deck-studio`, `seo-aeo-practice`, `efeonce-insights`, `axis-design-system` con espejo `.codex`; 2026-09-30).
 - [ ] Gates de cierre: `pnpm test` completo y `pnpm build` de producción en el último commit.
 
