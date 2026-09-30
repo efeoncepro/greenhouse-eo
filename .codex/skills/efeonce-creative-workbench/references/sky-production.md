@@ -51,9 +51,10 @@ Corregir el texto o elegir otra variante admitida; no inventar geometría ni red
 Validar y renderizar no aprueba derechos, contraste u oferta. Una fotografía nueva mediante
 `broker-run` y su recuperación requieren pruebas separadas.
 
-## Sustitución fotográfica probada — candidato PR 9, 2026-09-30
+## Sustitución fotográfica probada — PR 9 integrado, 2026-09-30
 
-[PR 9](https://github.com/efeoncepro/creative-workbench/pull/9), head `ed043f4`, prepara
+[PR 9](https://github.com/efeoncepro/creative-workbench/pull/9) integrado en main
+`609d876feeef46b5785171d321fb4898ad9973cf` el 2026-09-30; implementación `ed043f4`. Admite
 `sky-airline.photograph.native-focus-cover` 1.0.0 para tres pins/slots exactos: 2611, 3378 y 4616.
 Los STRETCH preservan el foco normalizado de la fuente; el FIT admitido usa cover central.
 Escala proporcional y recorte dentro de la caja nativa, sin bandas. El FILL de 2630 sigue nativo.
@@ -72,9 +73,12 @@ y el hito se recorta en verticales. Las pruebas requieren otra foto apropiada an
 No modificar estilos, añadir scrim ni afirmar aprobación porque el contrato técnico validó.
 La variante banner conserva el CTA legible; tampoco concede aprobación comercial.
 
-Pruebas locales del candidato: 258 privadas PASS sin skips; 240 públicas PASS y exactamente 18 SKIP
-licenciadas. Gates PASS. El merge/deploy se verifica separadamente; estos datos no prueban runtime
-ni activan IA. Leer en Workbench `docs/architecture/workbench-sky-photo-frame.md` y el README de
+Pruebas locales de esta unidad: 258 privadas PASS sin skips; 240 públicas PASS y exactamente 18 SKIP
+licenciadas. Gates PASS. El merge se confirmó por API. Los checks del head `6be05b2` y su preview Vercel
+pasaron; no acredita publicación de estas cuatro corridas privadas ni activación IA. El Lab local
+con cuatro pruebas está en `http://127.0.0.1:49511/#composiciones`, snapshot
+`937829acda62d5887d5e2aa248c6dc5ed1038f24925bd6f17b8a25d7c0c41891`, 307 archivos,
+cero fonts licenciadas SKY y cinco fonts host; readback HTTP 200. Estos datos no prueban runtime IA. Leer en Workbench `docs/architecture/workbench-sky-photo-frame.md` y el README de
 la pieza para reproducción, procedencia, recorte y diagnóstico. La recuperación exige conservar
 la intención original; otra persona necesita un UUID propio, no copiar el binding/dueño.
 
@@ -155,7 +159,7 @@ componer. La regla predecessor activa debe autorizar ese SHA y todos sus recurso
 seguir admitidos sin cambios. No crear la regla desde el job.
 
 FILL conserva encuadre nativo y registra recorte; FIT exige proporción compatible fuera de
-las tres admisiones del candidato PR 9. No asumir que ese candidato esté en main: verificar head/merge. Una imagen
+las tres admisiones del PR 9 integrado. Verificar los pins del checkout activo antes de producir. Una imagen
 correcta aislada puede perder foreground, rostro, hito o reserva de texto al entrar en el slot.
 Inspeccionar cada adaptación. Para crear/admitir una foto leer `sky-photography.md`.
 
