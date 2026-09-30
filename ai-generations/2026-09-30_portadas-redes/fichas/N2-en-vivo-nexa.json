@@ -1,0 +1,11 @@
+{
+  "id": "N2-en-vivo-nexa",
+  "formato": "3:1",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "escena": "SCENE (Efeonce studio in Santiago, late afternoon, bright, rested and alive): she stands in a calm modern studio holding an iPad Pro with Apple Pencil angled slightly toward herself; its screen shows a live operations dashboard, softly out of focus, abstract and unbranded, and its cool light adds a gentle glow on her hands. A warm, soft key light from a large window at the left falls on her face; she looks fresh and alert, natural-elevated make-up, a confident, warm half-smile, and she looks straight into the camera. She wears a light heather-grey fine knit t-shirt; no jacket, no navy or blue clothing. A current-generation smartwatch is on her left wrist, screen on. MEDIUM SHOT from the waist up, 85mm lens at f/2, focus on her eyes. Her head, shoulders, hands and the iPad all sit inside the central horizontal band of the frame, between 25% and 75% of the frame height, with air above her head. Everything is completely unbranded, no brand names, no logos, no readable text anywhere.",
+  "sinLechoPorque": "portada de página de LinkedIn: la firma es el logo de la página que LinkedIn monta encima; la pieza no lleva logo",
+  "reservas": {
+    "zonaTexto": { "muro": "a smooth matte dark ink-blue painted plaster wall in soft shadow", "tinta": "DARK, even, low sheen" }
+  }
+}

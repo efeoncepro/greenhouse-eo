@@ -1,0 +1,11 @@
+{
+  "id": "N5-irrepetible-nexa",
+  "formato": "3:1",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "escena": "SCENE (Efeonce creative studio in Santiago, daytime, focused and energetic): behind her, softly out of focus, a large wall of screens shows a dense grid of dozens of near-identical generated image variations of the same abstract composition, cool and repetitive; in her hands an iPad Pro shows one single variation, the chosen one, glowing with a warm orange accent, and with the Apple Pencil she has just tapped it to mark the choice. She looks straight into the camera with a calm, confident, knowing half-smile; fresh and alert, natural-elevated make-up. She wears a light heather-grey fine knit t-shirt; no jacket, no navy or blue clothing. A current-generation smartwatch is on her left wrist, screen on. MEDIUM SHOT from the waist up, 85mm lens at f/2, focus on her eyes and the iPad. Her head, shoulders, hands and the iPad all sit inside the central horizontal band of the frame, between 25% and 75% of the frame height, with air above her head. The screens carry no letters, numbers or logos. Everything is completely unbranded, no brand names, no readable text anywhere.",
+  "sinLechoPorque": "portada de página de LinkedIn: la firma es el logo de la página que LinkedIn monta encima; la pieza no lleva logo",
+  "reservas": {
+    "zonaTexto": { "muro": "the out-of-focus wall of screens dimmed into deep shadow on the left, dark matte bezels only", "tinta": "DARK, even, almost no light" }
+  }
+}
