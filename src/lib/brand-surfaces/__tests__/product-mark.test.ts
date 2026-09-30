@@ -13,7 +13,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
-import { resolveSurfaceComposition } from '@efeoncepro/axis-ui-contracts'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { Browser } from 'playwright'
 
@@ -24,13 +23,14 @@ import { createCatalog } from '@/lib/artifact-composer/catalogs/graphic-line-dec
 import { validateSlide } from '@/lib/artifact-composer/validate'
 
 import { planSurfacePiece, SurfacePieceError, type SurfaceIntent } from '../index'
-import { sectionCine } from '../recipes/sections'
-import { PRODUCT_MARK_EXISTING_RECIPES } from '../recipes/product-mark'
-import type { SurfaceManifest } from '../shared'
+import { AXIS_PRODUCT_MARK_ASSETS, PRODUCT_MARK_EXISTING_RECIPES, PRODUCT_MARKS } from '../recipes/product-mark'
 
 const EXAMPLES = path.join(__dirname, '..', 'examples')
 
 type Intent = SurfaceIntent & Record<string, unknown>
+
+/** La composición `team` de `section-cine` en AXIS: reserva y tipo de la bajada. */
+type TeamLayout = { reserves: { body: { fromTop: number } }; type: { body: { px: number; maxWidthPx: number } } }
 
 const example = (file: string): Intent => JSON.parse(fs.readFileSync(path.join(EXAMPLES, file), 'utf8')) as Intent
 
@@ -169,6 +169,13 @@ describe('lockup de submarca, propuesta de cine sin eyebrow y bajada del equipo 
     expectCode(() => planSurfacePiece({ ...example('deck-content-text-intent.json'), productMark: 'sv360-lockup-negative' } as Intent, { artifactId: 'x' }), 'invalid-intent')
     expectCode(() => planSurfacePiece({ ...example('deck-cover-brochure-cine-orbit-intent.json'), productMark: 'sv360-logo-negative' } as Intent, { artifactId: 'x' }), 'invalid-intent')
     expectCode(() => planSurfacePiece({ ...example('deck-method-staircase-flat-intent.json'), productMark: 'aeo-lockup-negative' } as Intent, { artifactId: 'x' }), 'invalid-intent')
+
+    // La lista de AXIS (`surfaces.deck.productMark.assets`) y la del slot difieren sólo en lo conocido: AXIS no lista el
+    // logo con que abre la familia (`sv360-logo-negative`) y sí el nombre completo de su cabecera, que no es del slot.
+    const slot = Object.keys(PRODUCT_MARKS)
+
+    expect(slot.filter(id => !AXIS_PRODUCT_MARK_ASSETS.includes(id))).toEqual(['sv360-logo-negative'])
+    expect(AXIS_PRODUCT_MARK_ASSETS.filter(id => !slot.includes(id))).toEqual(['sv360-name-lockup-negative'])
   })
 
   it('la propuesta de cine sin eyebrow lleva el lockup en su lugar (140, 112, alto 40); sin ninguno de los dos, no compone', async () => {
@@ -195,17 +202,19 @@ describe('lockup de submarca, propuesta de cine sin eyebrow y bajada del equipo 
     expect(without.slots.body).toBeUndefined()
     expect(without.dom.teamBody).toBeNull()
 
-    // TODO AXIS TASK-1949: el contrato de AXIS todavía prohíbe `body` en `team`, así que el camino «con bajada» se prueba
-    // en el builder con el manifest que AXIS resuelve para el equipo más la bajada (lo que resolverá al abrirla).
-    const manifest = resolveSurfaceComposition(team as never) as unknown as SurfaceManifest
+    // Con bajada pasa por el contrato de AXIS (0.3.40 admite `body` en `team`: reserva 900/1080, cuerpo 22/300, 540 px de
+    // ancho) y la plantilla la pinta donde AXIS la reserva.
     const body = 'Lo ejecutan **expertos multidisciplinarios**: copywriters, especialistas en SEO técnico, relacionistas públicos, diseñadores y creativos.'
-    const recipe = (efeonceGraphicLine.surfaces as unknown as { deck: { recipes: Record<string, Record<string, unknown>> } }).deck.recipes['section-cine']!
-    const built = sectionCine({ intent: team, manifest: { ...manifest, content: { ...manifest.content, body } }, recipe })
-    const slide = { slideId: 'deck-section-cine', contentType: 'deck.section-cine', slots: built.slots } as unknown as SlideSpec
-    const withBody = await fill('deck.section-cine', slide, built.assets)
+    const teamTokens = (efeonceGraphicLine.surfaces as unknown as { deck: { recipes: Record<string, { layouts: Record<string, TeamLayout> }> } }).deck.recipes['section-cine']!.layouts.team!
+    const withBody = await compose({ ...team, body })
 
     expect(withBody.violations).toEqual([])
-    expect((built.slots.body as string).includes('<strong>expertos multidisciplinarios</strong>')).toBe(true)
+    expect((withBody.slots.body as string).includes('<strong>expertos multidisciplinarios</strong>')).toBe(true)
+    expect(withBody.dom.teamBody).toEqual({
+      top: Math.round(teamTokens.reserves.body.fromTop * 1080),
+      px: `${teamTokens.type.body.px}px`,
+      width: teamTokens.type.body.maxWidthPx
+    })
     expect(withBody.dom.teamBody).toEqual({ top: 900, px: '22px', width: 540 })
   }, 60_000)
 })

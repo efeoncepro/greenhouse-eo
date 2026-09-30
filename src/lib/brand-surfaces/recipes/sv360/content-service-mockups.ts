@@ -18,7 +18,7 @@ import type { RecipeBuilder } from '../deck'
 import { evidenceHtml } from '../frame'
 import { css } from '../kit'
 import { req, uniqueAssets } from '../line-stage/kit'
-import { productMarkSlot } from '../product-mark'
+import { productMarkSlot, recipeProductMarkPlacement } from '../product-mark'
 
 import { listOf, strings, sv360Frame, sv360Layers, sv360Platform, sv360Stage } from './kit'
 
@@ -46,7 +46,7 @@ export const contentServiceMockups: RecipeBuilder = ({ intent, manifest, recipe 
 
   const metric = (intent.authorityMetric ?? {}) as Obj
   const { stage, platform } = sv360Layers(manifest, line, 'ssm', STAGE, PLATFORM)
-  const mark = productMarkSlot(intent.productMark)
+  const mark = productMarkSlot(intent.productMark, recipeProductMarkPlacement(recipe))
 
   const frame = {
     ...sv360Frame(manifest, recipe, line, ['bg', 'soft', 'muted', 'halo', 'teal', 'shadow', 'cardFrom', 'cardTo', 'heroFrom', 'chip', 'miniFrom']),

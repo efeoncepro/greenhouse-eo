@@ -4,9 +4,10 @@
  * 2026-09-30 en el estilo «vivo» del deck (plataforma de luz, fichas de vidrio en perspectiva, una sola sombra profunda en
  * la protagonista y haces de luz) y en el fondo de producto (`productInk`).
  *
- * La voz sale del contrato de AXIS (reservas y tipos de la receta, `lineVoiceFrame`). El escenario, la plataforma, los
- * haces, las columnas de luz y la paleta de las maquetas se midieron en las láminas aprobadas
- * (`ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/native/`) y viven aquí mientras AXIS los publica:
+ * La voz, la firma y el lugar del lockup salen del contrato de AXIS (0.3.40 publica las seis recetas: reservas, tipos,
+ * `signature` y `productMark`; `lineVoiceFrame`). El escenario, la plataforma, los haces, las columnas de luz y la paleta
+ * de las maquetas se midieron en las láminas aprobadas (`ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/native/`)
+ * y AXIS todavía no los publica, así que viven aquí:
  * TODO AXIS TASK-1949 — pasan a `efeonceGraphicLine.surfaces.deck.recipes.<receta>` (`stage`, `platform`, `beams`,
  * `pillars`, `palette`, `plate`) y los builders los leen del token. La geometría fina de cada maqueta (px) vive en el
  * bloque de la receta en `graphic-line.css`, con el mismo TODO.

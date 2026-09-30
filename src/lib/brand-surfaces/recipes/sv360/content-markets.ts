@@ -15,7 +15,7 @@ import type { RecipeBuilder } from '../deck'
 import { evidenceHtml } from '../frame'
 import { css } from '../kit'
 import { req, uniqueAssets } from '../line-stage/kit'
-import { productMarkSlot } from '../product-mark'
+import { productMarkSlot, recipeProductMarkPlacement } from '../product-mark'
 
 import { listOf, sv360Frame } from './kit'
 
@@ -71,7 +71,7 @@ export const contentMarkets: RecipeBuilder = ({ intent, manifest, recipe }) => {
     }
   })
 
-  const mark = productMarkSlot(intent.productMark)
+  const mark = productMarkSlot(intent.productMark, recipeProductMarkPlacement(recipe))
   const frame = sv360Frame(manifest, recipe, line, ['spaceBg', 'halo', 'shadow', 'labelBg', 'city'])
 
   return {

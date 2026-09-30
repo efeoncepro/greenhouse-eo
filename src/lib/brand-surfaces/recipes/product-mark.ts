@@ -9,6 +9,8 @@
  * de cine sin eyebrow en el lugar del eyebrow y el resto arriba a la izquierda, sobre el margen.
  */
 
+import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
+
 import { SurfacePieceError, type SurfaceAssetRequest } from '../types'
 import { css } from './kit'
 
@@ -38,21 +40,33 @@ export const PRODUCT_MARK_FILES = [...Object.keys(PRODUCT_MARKS), 'sv360-name-lo
 
 export type ProductMarkPlacement = { xPx: number; topPx: number; heightPx: number }
 
+/** El bloque `productMark` que AXIS publica para el deck (0.3.40): los lockups que una lámina puede llevar y dónde van. */
+type AxisProductMark = { assets: readonly string[]; placements: Record<string, ProductMarkPlacement>; replacesEyebrowIn: readonly string[] }
+
+const AXIS_PRODUCT_MARK = (efeonceGraphicLine.surfaces as unknown as { deck: { productMark: AxisProductMark } }).deck.productMark
+
 /**
- * Dónde va el lockup en cada receta, medido en las láminas aprobadas del 2026-09-30 (`render-src/bake.cjs`, `ov`).
- * TODO AXIS TASK-1949: estos lugares pasan a `efeonceGraphicLine.surfaces.deck.recipes.<receta>.productMark` y este
- * mapa se borra cuando AXIS los publique.
+ * Dónde va el lockup en cada receta, de `efeonceGraphicLine.surfaces.deck.productMark.placements` (medidos en las láminas
+ * aprobadas del 2026-09-30): `default` arriba a la izquierda, sobre el margen (contenido, método y decisión);
+ * `cover-brochure` al pie de la columna de la portada de línea; `cover-proposal` bajo la columna del cliente;
+ * `proposal-cinematic-no-eyebrow` en el lugar del eyebrow, y `content-brand-family` abriendo la voz de la familia.
  */
-export const PRODUCT_MARK_PLACEMENTS: Record<string, ProductMarkPlacement> = {
-  // Arriba a la izquierda, sobre el margen: el lugar común de las láminas de contenido, método y decisión.
-  default: { xPx: 140, topPx: 44, heightPx: 40 },
-  // Portada de línea (`cover-brochure`, composición `line`): al pie de la columna, bajo la bajada.
-  'cover-brochure': { xPx: 140, topPx: 790, heightPx: 64 },
-  // Portada de propuesta (`cover-proposal`, órbita): bajo la columna del cliente.
-  'cover-proposal': { xPx: 140, topPx: 880, heightPx: 56 },
-  // Propuesta de cine sin eyebrow: el lockup toma el lugar del eyebrow.
-  'proposal-cinematic-no-eyebrow': { xPx: 140, topPx: 112, heightPx: 40 }
-}
+export const PRODUCT_MARK_PLACEMENTS: Readonly<Record<string, ProductMarkPlacement>> = AXIS_PRODUCT_MARK.placements
+
+/**
+ * Los lockups que AXIS declara para el deck (`productMark.assets`). NO reemplaza a `PRODUCT_MARKS`: AXIS no lista
+ * `sv360-logo-negative` (el logo con que abre la familia de marcas) y sí `sv360-name-lockup-negative` (el nombre completo
+ * que la familia usa como cabecera de columna, fuera del slot). La lista cerrada del slot sigue siendo `PRODUCT_MARKS`; el
+ * test de `product-mark` vigila que ambas no se separen más.
+ */
+export const AXIS_PRODUCT_MARK_ASSETS: readonly string[] = AXIS_PRODUCT_MARK.assets
+
+/**
+ * El lugar del lockup que declara la receta en AXIS (`recipes.<receta>.productMark.placement`); sin declaración, arriba a
+ * la izquierda (`default`). Lo usan las recetas nativas del deck SEO/AEO, que resuelven su lockup en el builder.
+ */
+export const recipeProductMarkPlacement = (recipe: Record<string, unknown>): string =>
+  (recipe.productMark as { placement?: string } | undefined)?.placement ?? 'default'
 
 /** Un archivo de submarca como asset externo (copiado byte a byte al catálogo por `pnpm brand:tokens`). */
 export const productMarkFile = (id: string): { ref: string; asset: SurfaceAssetRequest } => {
@@ -87,13 +101,16 @@ export const productMarkId = (value: unknown): ProductMarkId | undefined => {
  */
 export const productMarkSlot = (
   value: unknown,
-  placement: keyof typeof PRODUCT_MARK_PLACEMENTS = 'default'
+  placement: string = 'default'
 ): { slot: Record<string, string>; asset: SurfaceAssetRequest } | null => {
   const id = productMarkId(value)
 
   if (!id) return null
 
-  const at = PRODUCT_MARK_PLACEMENTS[placement]!
+  const at = PRODUCT_MARK_PLACEMENTS[placement]
+
+  if (!at) throw new SurfacePieceError(`AXIS no publica el lugar «${placement}» del lockup de submarca (\`productMark.placements\`).`, 'invalid-intent')
+
   const file = productMarkFile(id)
 
   return {
@@ -112,7 +129,7 @@ export const productMarkSlot = (
 export const withProductMark = <T extends { slots: Record<string, unknown>; assets: SurfaceAssetRequest[] }>(
   built: T,
   value: unknown,
-  placement: keyof typeof PRODUCT_MARK_PLACEMENTS = 'default'
+  placement: string = 'default'
 ): T => {
   const mark = productMarkSlot(value, placement)
 
@@ -121,7 +138,7 @@ export const withProductMark = <T extends { slots: Record<string, unknown>; asse
   return { ...built, slots: { ...built.slots, productMark: mark.slot }, assets: [...built.assets, mark.asset] }
 }
 
-type PlacementRule = (ctx: { layout: string | null; eyebrow: boolean }) => keyof typeof PRODUCT_MARK_PLACEMENTS | null
+type PlacementRule = (ctx: { layout: string | null; eyebrow: boolean }) => string | null
 
 /**
  * Las recetas EXISTENTES que admiten el lockup (brecha 1 del inventario del deck SEO/AEO) y dónde lo llevan según su

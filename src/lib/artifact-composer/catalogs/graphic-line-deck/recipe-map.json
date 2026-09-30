@@ -471,6 +471,36 @@
       "contentType": "deck.content-day-live-approval",
       "example": "src/lib/brand-surfaces/examples/deck-content-day-live-approval-intent.json",
       "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "channelIcon": "channel.icon", "channel": "channel.name", "agentIcon": "agentIcon", "agentName": "agent.name", "agentBadge": "agent.badge", "agentMessage": "message", "evidenceChips": "chips", "actions": "actions", "executedIcon": "executedIcon", "executedTitle": "executed.title", "executedText": "executed.text", "loop": "loop", "currentLoopStep": "loop[].state"}
+    },
+    "content-brand-family": {
+      "contentType": "deck.content-brand-family",
+      "example": "src/lib/brand-surfaces/examples/deck-content-brand-family-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "family.kicker", "question": "voice.question", "answer": "voice.answer", "body": "body", "familyMark": "family.lockup", "pieces": "pieces"}
+    },
+    "content-service-mockups": {
+      "contentType": "deck.content-service-mockups",
+      "example": "src/lib/brand-surfaces/examples/deck-content-service-mockups-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "technicalTitle": "technical.title", "technicalScore": "technical.score", "technicalScoreLabel": "technical.scoreLabel", "technicalChecks": "checks", "technicalCaption": "technical.caption", "contentTitle": "cluster.title", "contentPillar": "cluster.pillar", "contentNodes": "nodes", "contentCaption": "cluster.caption", "authorityTitle": "authority.title", "authorityMetric": "authority.value", "authorityOutlets": "outlets", "authorityCaption": "authority.caption", "chips": "chips"}
+    },
+    "content-report-formats": {
+      "contentType": "deck.content-report-formats",
+      "example": "src/lib/brand-surfaces/examples/deck-content-report-formats-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "reportLabel": "report.label", "kpis": "kpis", "trendTitle": "report.trendTitle", "rankingTitle": "report.rankingTitle", "ranking": "ranking", "reading": "report.reading", "formats": "formats", "highlightedFormat": "formats[].role"}
+    },
+    "content-committee-deck": {
+      "contentType": "deck.content-committee-deck",
+      "example": "src/lib/brand-surfaces/examples/deck-content-committee-deck-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "slideKicker": "slide.kicker", "slideHeadline": "slide.headline", "slideFigure": "slide.figure+slide.figureLabel", "annotation": "slide.annotation", "features": "features"}
+    },
+    "content-industries": {
+      "contentType": "deck.content-industries",
+      "example": "src/lib/brand-surfaces/examples/deck-content-industries-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "industries": "industries", "highlightedIndustry": "industries[].role"}
+    },
+    "content-markets": {
+      "contentType": "deck.content-markets",
+      "example": "src/lib/brand-surfaces/examples/deck-content-markets-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "markets": "markets", "photo": "photo"}
     }
   }
 }

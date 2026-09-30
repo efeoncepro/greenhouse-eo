@@ -16,7 +16,7 @@ import type { RecipeBuilder } from '../deck'
 import { evidenceHtml } from '../frame'
 import { layerAsset } from '../kit'
 import { indexIn, req, uniqueAssets } from '../line-stage/kit'
-import { productMarkSlot } from '../product-mark'
+import { productMarkSlot, recipeProductMarkPlacement } from '../product-mark'
 
 import { lightColumnsSvg, listOf, sv360Frame, sv360Layers, sv360Platform, sv360Stage, type LightColumns } from './kit'
 
@@ -53,7 +53,7 @@ export const contentIndustries: RecipeBuilder = ({ intent, manifest, recipe }) =
   const icon = iconAsset(QUESTION_GLYPH, line, QUESTION_ICON_PX, 'Pregunta a la IA')
   const { stage, platform } = sv360Layers(manifest, line, 'sin', STAGE, PLATFORM)
   const columns = layerAsset('sin-columns', lightColumnsSvg(manifest, COLUMNS, line, 'sin'))
-  const mark = productMarkSlot(intent.productMark)
+  const mark = productMarkSlot(intent.productMark, recipeProductMarkPlacement(recipe))
 
   const frame = sv360Frame(manifest, recipe, line, ['bg', 'soft', 'halo', 'shadow', 'cardFrom', 'cardTo', 'heroCardFrom', 'heroCardTo'])
 

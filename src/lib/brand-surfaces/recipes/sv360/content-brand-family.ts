@@ -14,20 +14,13 @@ import { contentOf, voiceSlots } from '../../shared'
 import { SurfacePieceError } from '../../types'
 import type { RecipeBuilder } from '../deck'
 import { evidenceHtml } from '../frame'
-import { css } from '../kit'
 import { req, uniqueAssets } from '../line-stage/kit'
-import { PRODUCT_MARKS, productMarkFile, productMarkId } from '../product-mark'
+import { PRODUCT_MARKS, productMarkFile, productMarkId, productMarkSlot, recipeProductMarkPlacement } from '../product-mark'
 
 import { listOf, sv360Frame } from './kit'
 
 /** Los nombres completos que pueden encabezar la columna de la familia (archivos de axis-brand-assets). */
 const FAMILY_LOCKUPS = { 'sv360-name-lockup-negative': 'Efeonce | Search Visibility 360' } as const
-
-/**
- * El logo que abre la voz: arriba de la pregunta, a 44 px de alto.
- * TODO AXIS TASK-1949: `content-brand-family.productMark` ({ xPx: 140, topPx: 250, heightPx: 44 }).
- */
-const OPENING_MARK = { xPx: 140, topPx: 250, heightPx: 44 } as const
 
 type PieceIntent = { mark?: unknown; role?: unknown; description?: unknown }
 
@@ -58,7 +51,7 @@ export const contentBrandFamily: RecipeBuilder = ({ intent, manifest, recipe }) 
 
   if (new Set(members.map(m => m.id)).size !== members.length) throw new SurfacePieceError('Cada pieza de la familia lleva su propio lockup.', 'invalid-intent')
 
-  const openingFile = productMarkFile(opening)
+  const openingMark = productMarkSlot(opening, recipeProductMarkPlacement(recipe))!
   const lockupFile = productMarkFile(lockupId)
 
   const frame = sv360Frame(manifest, recipe, String(intent.line), ['bg', 'soft', 'halo'], { eyebrowInVoice: false })
@@ -72,13 +65,9 @@ export const contentBrandFamily: RecipeBuilder = ({ intent, manifest, recipe }) 
       frame,
       voice: voiceWithoutEyebrow,
       body: evidenceHtml(content.body, 'none'),
-      productMark: {
-        src: openingFile.ref,
-        alt: PRODUCT_MARKS[opening],
-        left: css('pmk-left', OPENING_MARK.xPx),
-        top: css('pmk-top', OPENING_MARK.topPx),
-        height: css('pmk-height', OPENING_MARK.heightPx)
-      },
+      // El logo que abre la voz, arriba de la pregunta: en el lugar que AXIS declara para la receta
+      // (`productMark.placement: content-brand-family` → 140, 250, alto 44).
+      productMark: openingMark.slot,
       family: {
         kicker: eyebrow,
         lockup: lockupFile.ref,
@@ -86,6 +75,6 @@ export const contentBrandFamily: RecipeBuilder = ({ intent, manifest, recipe }) 
       },
       pieces: members.map(member => ({ mark: member.file.ref, markAlt: PRODUCT_MARKS[member.id], role: member.role, description: member.text }))
     },
-    assets: uniqueAssets([openingFile.asset, lockupFile.asset, ...members.map(member => member.file.asset)])
+    assets: uniqueAssets([openingMark.asset, lockupFile.asset, ...members.map(member => member.file.asset)])
   }
 }

@@ -14,7 +14,7 @@ import { SurfacePieceError } from '../../types'
 import type { RecipeBuilder } from '../deck'
 import { evidenceHtml } from '../frame'
 import { req, uniqueAssets } from '../line-stage/kit'
-import { productMarkSlot } from '../product-mark'
+import { productMarkSlot, recipeProductMarkPlacement } from '../product-mark'
 
 import { listOf, sv360Frame, sv360Layers, sv360Platform, sv360Stage } from './kit'
 
@@ -33,7 +33,7 @@ export const contentCommitteeDeck: RecipeBuilder = ({ intent, manifest, recipe }
 
   const figure = (intent.slideFigure ?? {}) as Obj
   const { stage, platform } = sv360Layers(manifest, line, 'scd', STAGE, PLATFORM)
-  const mark = productMarkSlot(intent.productMark)
+  const mark = productMarkSlot(intent.productMark, recipeProductMarkPlacement(recipe))
 
   const frame = sv360Frame(manifest, recipe, line, ['bg', 'soft', 'muted', 'halo', 'shadow', 'cardTo', 'miniFrom', 'slideFrom', 'slideBack', 'slideMid'])
 

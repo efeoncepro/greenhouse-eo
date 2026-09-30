@@ -1182,6 +1182,119 @@ exports[`planes de los intents de ejemplo > deck-contact-sheet-intent.json compo
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-content-brand-family-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/sv360-logo-negative.svg",
+      "ref": "asset-ref:file:sv360-logo-negative",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/sv360-name-lockup-negative.svg",
+      "ref": "asset-ref:file:sv360-name-lockup-negative",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/aeo-lockup-negative.svg",
+      "ref": "asset-ref:file:aeo-lockup-negative",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/aeo-assessment-lockup-negative.svg",
+      "ref": "asset-ref:file:aeo-assessment-lockup-negative",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/ai-visibility-report-lockup-negative.svg",
+      "ref": "asset-ref:file:ai-visibility-report-lockup-negative",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/insights-lockup-negative.svg",
+      "ref": "asset-ref:file:insights-lockup-negative",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-brand-family",
+  "plan": {
+    "artifactId": "deck-content-brand-family",
+    "slides": [
+      {
+        "contentType": "deck.content-brand-family",
+        "slideId": "deck-content-brand-family",
+        "slots": {
+          "body": "SV360 es SEO y AEO en un solo sistema: una capacidad, un proceso, un entregable y una edición mensual, todo firmado por <strong>Efeonce</strong>.",
+          "family": {
+            "kicker": "El producto · SEO + AEO",
+            "lockup": "asset-ref:file:sv360-name-lockup-negative",
+            "lockupAlt": "Efeonce | Search Visibility 360",
+          },
+          "frame": {
+            "answerInset": "--gl-ls-answer-inset=0px",
+            "answerLeading": "--gl-ls-answer-leading=0.95",
+            "answerPx": 124,
+            "answerTop": 390,
+            "answerTracking": "--gl-ls-answer-tracking=-0.035em",
+            "bodyPx": 28,
+            "bodyTop": 666,
+            "bodyWidth": 640,
+            "line": "engine",
+            "lumBottom": "--gl-lum-bottom=62px",
+            "lumWidth": "--gl-lum-width=160px",
+            "margin": 140,
+            "questionTop": 324,
+            "questionWidth": "--gl-ls-question-width=640px",
+            "svBg": "--gl-sv-bg-color=#091951",
+            "svHalo": "--gl-sv-halo-color=#72ded8",
+            "svSoft": "--gl-sv-soft-color=#cfe4fa",
+          },
+          "pieces": [
+            {
+              "description": "Que la IA te encuentre, te entienda y te recomiende.",
+              "mark": "asset-ref:file:aeo-lockup-negative",
+              "markAlt": "Efeonce | AEO",
+              "role": "Capacidad",
+            },
+            {
+              "description": "Mide cómo te ven los motores de IA, en siete dimensiones.",
+              "mark": "asset-ref:file:aeo-assessment-lockup-negative",
+              "markAlt": "Efeonce | AEO Assessment",
+              "role": "Proceso",
+            },
+            {
+              "description": "Lo que recibes y compartes: dónde estás y qué hacer primero.",
+              "mark": "asset-ref:file:ai-visibility-report-lockup-negative",
+              "markAlt": "Efeonce | AI Visibility Report",
+              "role": "Entregable",
+            },
+            {
+              "description": "Cada mes, qué se movió en tu SEO y tu AEO, y qué sigue.",
+              "mark": "asset-ref:file:insights-lockup-negative",
+              "markAlt": "Efeonce | Insights",
+              "role": "Edición mensual",
+            },
+          ],
+          "productMark": {
+            "alt": "SV360 · Search Visibility 360",
+            "height": "--gl-pmk-height=44px",
+            "left": "--gl-pmk-left=140px",
+            "src": "asset-ref:file:sv360-logo-negative",
+            "top": "--gl-pmk-top=250px",
+          },
+          "voice": {
+            "answer": "piezas",
+            "answerLead": "Cuatro",
+            "question": "¿Qué hay dentro?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-content-bullets-intent.json compone el mismo plan 1`] = `
 {
   "assets": [
@@ -1504,6 +1617,109 @@ exports[`planes de los intents de ejemplo > deck-content-clients-intent.json com
             "answerLead": "Marcas",
             "eyebrow": "Clientes",
             "question": "¿Quién confía en nosotros?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-content-committee-deck-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:scd-stage",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><radialGradient id="scd-halo" cx="1270" cy="420" r="900" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#72ded8" stop-opacity="0.3"/><stop offset="0.35" stop-color="#1f9e94" stop-opacity="0.11"/><stop offset="1" stop-color="#1f9e94" stop-opacity="0"/></radialGradient><linearGradient id="scd-floor" x1="0" y1="778" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000814" stop-opacity="0"/><stop offset="1" stop-color="#000814" stop-opacity="0.55"/></linearGradient></defs><rect width="1920" height="1080" fill="url(#scd-halo)"/><rect y="778" width="1920" height="302" fill="url(#scd-floor)"/></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:scd-platform",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><radialGradient id="scd-pf" cx="1270" cy="905" r="520" gradientUnits="userSpaceOnUse" gradientTransform="translate(0 776.21) scale(1 0.14)"><stop offset="0" stop-color="#72ded8" stop-opacity="0.3"/><stop offset="0.7" stop-color="#1f9e94" stop-opacity="0.06"/><stop offset="1" stop-color="#1f9e94" stop-opacity="0"/></radialGradient><filter id="scd-pfg" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="9"/></filter></defs><ellipse cx="1270" cy="905" rx="520" ry="74" fill="url(#scd-pf)"/><ellipse cx="1270" cy="905" rx="520" ry="74" fill="none" stroke="#72ded8" stroke-opacity="0.55" stroke-width="3"/><path d="M 789.99 933 A 520 74 0 0 0 1632.02 958" fill="none" stroke="#1f9e94" stroke-width="14" opacity="0.45" filter="url(#scd-pfg)"/><path d="M 789.99 933 A 520 74 0 0 0 1632.02 958" fill="none" stroke="#1f9e94" stroke-width="6" stroke-linecap="round"/></svg>",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/insights-lockup-negative.svg",
+      "ref": "asset-ref:file:insights-lockup-negative",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-committee-deck",
+  "plan": {
+    "artifactId": "deck-content-committee-deck",
+    "slides": [
+      {
+        "contentType": "deck.content-committee-deck",
+        "slideId": "deck-content-committee-deck",
+        "slots": {
+          "body": "La IA escribe el titular y destaca lo que importa; nuestro equipo lo revisa. Tú entras a la reunión y <strong>presentas</strong>.",
+          "features": [
+            {
+              "detail": "Desde el informe, con los datos al día",
+              "title": "Presentas en vivo",
+            },
+            {
+              "detail": "Las láminas del comité, ya armadas",
+              "title": "Deck 16:9",
+            },
+            {
+              "detail": "Para mandarlo al directorio",
+              "title": "PDF A4",
+            },
+          ],
+          "frame": {
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "answerLeading": "--gl-ls-answer-leading=0.9",
+            "answerPx": 176,
+            "answerTop": 330,
+            "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+            "bodyPx": 26,
+            "bodyTop": 690,
+            "bodyWidth": 560,
+            "eyebrowTop": 130,
+            "line": "engine",
+            "lumBottom": "--gl-lum-bottom=62px",
+            "lumWidth": "--gl-lum-width=160px",
+            "margin": 140,
+            "questionTop": 196,
+            "questionWidth": "--gl-ls-question-width=440px",
+            "svBg": "--gl-sv-bg-color=#091951",
+            "svCardTo": "--gl-sv-card-to-color=#081c30",
+            "svHalo": "--gl-sv-halo-color=#72ded8",
+            "svMiniFrom": "--gl-sv-mini-from-color=#12344f",
+            "svMuted": "--gl-sv-muted-color=#c9d6e2",
+            "svShadow": "--gl-sv-shadow-color=#000610",
+            "svSlideBack": "--gl-sv-slide-back-color=#0a2138",
+            "svSlideFrom": "--gl-sv-slide-from-color=#0f3556",
+            "svSlideMid": "--gl-sv-slide-mid-color=#0c2640",
+            "svSoft": "--gl-sv-soft-color=#cfe4fa",
+          },
+          "platform": {
+            "src": "asset-ref:layer:scd-platform",
+          },
+          "productMark": {
+            "alt": "Efeonce | Insights",
+            "height": "--gl-pmk-height=40px",
+            "left": "--gl-pmk-left=140px",
+            "src": "asset-ref:file:insights-lockup-negative",
+            "top": "--gl-pmk-top=44px",
+          },
+          "slide": {
+            "annotation": "Guía de precios",
+            "figure": "+38%",
+            "figureLabel": "visibilidad en el trimestre",
+            "headline": "La IA ya te nombra en 4 de cada 10 respuestas",
+            "kicker": "Comité · tercer trimestre",
+          },
+          "stage": {
+            "src": "asset-ref:layer:scd-stage",
+          },
+          "voice": {
+            "answer": "está",
+            "answerLead": "Ya",
+            "eyebrow": "Sin armar láminas",
+            "question": "¿Y el PPT del comité?",
           },
         },
       },
@@ -3459,6 +3675,143 @@ exports[`planes de los intents de ejemplo > deck-content-focus-intent.json compo
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-content-industries-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:sin-stage",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><radialGradient id="sin-halo" cx="1290" cy="420" r="900" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#72ded8" stop-opacity="0.3"/><stop offset="0.35" stop-color="#1f9e94" stop-opacity="0.11"/><stop offset="1" stop-color="#1f9e94" stop-opacity="0"/></radialGradient><linearGradient id="sin-floor" x1="0" y1="778" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000814" stop-opacity="0"/><stop offset="1" stop-color="#000814" stop-opacity="0.55"/></linearGradient></defs><rect width="1920" height="1080" fill="url(#sin-halo)"/><rect y="778" width="1920" height="302" fill="url(#sin-floor)"/></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:sin-platform",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><radialGradient id="sin-pf" cx="1290" cy="905" r="520" gradientUnits="userSpaceOnUse" gradientTransform="translate(0 776.21) scale(1 0.14)"><stop offset="0" stop-color="#72ded8" stop-opacity="0.3"/><stop offset="0.7" stop-color="#1f9e94" stop-opacity="0.06"/><stop offset="1" stop-color="#1f9e94" stop-opacity="0"/></radialGradient><filter id="sin-pfg" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="9"/></filter></defs><ellipse cx="1290" cy="905" rx="520" ry="74" fill="url(#sin-pf)"/><ellipse cx="1290" cy="905" rx="520" ry="74" fill="none" stroke="#72ded8" stroke-opacity="0.55" stroke-width="3"/><path d="M 809.99 933 A 520 74 0 0 0 1652.02 958" fill="none" stroke="#1f9e94" stroke-width="14" opacity="0.45" filter="url(#sin-pfg)"/><path d="M 809.99 933 A 520 74 0 0 0 1652.02 958" fill="none" stroke="#1f9e94" stroke-width="6" stroke-linecap="round"/></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:sin-columns",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><linearGradient id="sin-col" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#72ded8" stop-opacity="0.35"/><stop offset="1" stop-color="#72ded8" stop-opacity="0"/></linearGradient><filter id="sin-colb"><feGaussianBlur stdDeviation="14"/></filter></defs><g filter="url(#sin-colb)"><rect x="930" y="160" width="60" height="760" fill="url(#sin-col)"/><rect x="1265" y="120" width="44" height="800" fill="url(#sin-col)" opacity="0.7"/><rect x="1590" y="180" width="36" height="740" fill="url(#sin-col)" opacity="0.6"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:composer-engine-dark-26",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" role="img" aria-label="Pregunta a la IA"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 5h11a3.5 3.5 0 0 1 3.5 3.5v7a3.5 3.5 0 0 1 -3.5 3.5h-11a3.5 3.5 0 0 1 -3.5 -3.5v-7a3.5 3.5 0 0 1 3.5 -3.5z"/><path d="M7 10h10"/><path d="M7 14h4"/><path d="M17 16.25v-3.5"/><path d="M15.5 14.25l1.5 -1.5l1.5 1.5"/></g></svg>",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/sv360-lockup-negative.svg",
+      "ref": "asset-ref:file:sv360-lockup-negative",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-industries",
+  "plan": {
+    "artifactId": "deck-content-industries",
+    "slides": [
+      {
+        "contentType": "deck.content-industries",
+        "slideId": "deck-content-industries",
+        "slots": {
+          "body": "Seis industrias donde tu comprador ya le pregunta a la IA antes de llamarte. Nosotros sabemos <strong>qué pregunta</strong>.",
+          "columns": {
+            "src": "asset-ref:layer:sin-columns",
+          },
+          "frame": {
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "answerLeading": "--gl-ls-answer-leading=0.95",
+            "answerPx": 128,
+            "answerTop": 280,
+            "answerTracking": "--gl-ls-answer-tracking=-0.045em",
+            "bodyPx": 26,
+            "bodyTop": 560,
+            "bodyWidth": 540,
+            "eyebrowTop": 130,
+            "line": "engine",
+            "lumBottom": "--gl-lum-bottom=62px",
+            "lumWidth": "--gl-lum-width=160px",
+            "margin": 140,
+            "questionTop": 196,
+            "questionWidth": "--gl-ls-question-width=600px",
+            "svBg": "--gl-sv-bg-color=#091951",
+            "svCardFrom": "--gl-sv-card-from-color=#10304b",
+            "svCardTo": "--gl-sv-card-to-color=#081c30",
+            "svHalo": "--gl-sv-halo-color=#72ded8",
+            "svHeroCardFrom": "--gl-sv-hero-card-from-color=#134066",
+            "svHeroCardTo": "--gl-sv-hero-card-to-color=#0a2640",
+            "svShadow": "--gl-sv-shadow-color=#000610",
+            "svSoft": "--gl-sv-soft-color=#cfe4fa",
+          },
+          "industries": [
+            {
+              "icon": "asset-ref:icon:composer-engine-dark-26",
+              "name": "Banca y finanzas",
+              "number": "01",
+              "question": "¿Qué banco tiene la mejor cuenta para pymes?",
+              "role": "lead",
+            },
+            {
+              "icon": "asset-ref:icon:composer-engine-dark-26",
+              "name": "Seguros",
+              "number": "02",
+              "question": "¿Qué seguro de auto cubre más por menos?",
+              "role": "rest",
+            },
+            {
+              "icon": "asset-ref:icon:composer-engine-dark-26",
+              "name": "Retail",
+              "number": "03",
+              "question": "¿Dónde compro buenas zapatillas de running?",
+              "role": "rest",
+            },
+            {
+              "icon": "asset-ref:icon:composer-engine-dark-26",
+              "name": "Manufactura",
+              "number": "04",
+              "question": "¿Qué proveedor de envases cumple la norma?",
+              "role": "rest",
+            },
+            {
+              "icon": "asset-ref:icon:composer-engine-dark-26",
+              "name": "Servicios profesionales",
+              "number": "05",
+              "question": "¿Qué estudio contable me recomiendas?",
+              "role": "rest",
+            },
+            {
+              "icon": "asset-ref:icon:composer-engine-dark-26",
+              "name": "SaaS",
+              "number": "06",
+              "question": "¿Qué CRM me sirve para una pyme B2B?",
+              "role": "rest",
+            },
+          ],
+          "platform": {
+            "src": "asset-ref:layer:sin-platform",
+          },
+          "productMark": {
+            "alt": "Efeonce | SV360",
+            "height": "--gl-pmk-height=40px",
+            "left": "--gl-pmk-left=140px",
+            "src": "asset-ref:file:sv360-lockup-negative",
+            "top": "--gl-pmk-top=44px",
+          },
+          "stage": {
+            "src": "asset-ref:layer:sin-stage",
+          },
+          "voice": {
+            "answer": "dentro",
+            "answerLead": "Por",
+            "eyebrow": "Industrias",
+            "question": "¿Conocemos tu industria?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-content-live-chat-intent.json compone el mismo plan 1`] = `
 {
   "assets": [
@@ -3712,6 +4065,117 @@ exports[`planes de los intents de ejemplo > deck-content-live-chat-intent.json c
             "answerLead": "Te",
             "eyebrow": "Claudeforce · Enablement conversacional",
             "question": "¿Y si le preguntas a tu CRM?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-content-markets-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
+      "ref": "asset-ref:plate:MK2-mercados",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/sv360-lockup-negative.svg",
+      "ref": "asset-ref:file:sv360-lockup-negative",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-markets",
+  "plan": {
+    "artifactId": "deck-content-markets",
+    "slides": [
+      {
+        "contentType": "deck.content-markets",
+        "slideId": "deck-content-markets",
+        "slots": {
+          "body": "Chile, Estados Unidos, Colombia, México y Perú, con <strong>un solo equipo</strong> y un solo interlocutor.",
+          "frame": {
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "answerLeading": "--gl-ls-answer-leading=0.95",
+            "answerPx": 128,
+            "answerTop": 280,
+            "answerTracking": "--gl-ls-answer-tracking=-0.045em",
+            "bodyPx": 26,
+            "bodyTop": 560,
+            "bodyWidth": 520,
+            "eyebrowTop": 130,
+            "line": "engine",
+            "lumBottom": "--gl-lum-bottom=62px",
+            "lumWidth": "--gl-lum-width=160px",
+            "margin": 140,
+            "questionTop": 196,
+            "questionWidth": "--gl-ls-question-width=600px",
+            "svCity": "--gl-sv-city-color=#9fd7ff",
+            "svHalo": "--gl-sv-halo-color=#72ded8",
+            "svLabelBg": "--gl-sv-label-bg-color=#041028",
+            "svShadow": "--gl-sv-shadow-color=#000610",
+            "svSpaceBg": "--gl-sv-space-bg-color=#020716",
+          },
+          "markets": [
+            {
+              "city": "Miami",
+              "country": "EE. UU.",
+              "side": "start",
+              "top": "--gl-smk-top=143px",
+              "x": "--gl-smk-x=1412px",
+            },
+            {
+              "city": "Ciudad de México",
+              "country": "México",
+              "side": "end",
+              "top": "--gl-smk-top=228px",
+              "x": "--gl-smk-x=744px",
+            },
+            {
+              "city": "Bogotá",
+              "country": "Colombia",
+              "side": "start",
+              "top": "--gl-smk-top=380px",
+              "x": "--gl-smk-x=1437px",
+            },
+            {
+              "city": "Lima",
+              "country": "Perú",
+              "side": "end",
+              "top": "--gl-smk-top=583px",
+              "x": "--gl-smk-x=569px",
+            },
+            {
+              "city": "Santiago",
+              "country": "Chile",
+              "side": "start",
+              "top": "--gl-smk-top=840px",
+              "x": "--gl-smk-x=1498px",
+            },
+          ],
+          "photo": {
+            "alt": "Las Américas de noche vistas desde la órbita; cinco puntos de luz azul unidos por arcos en Miami, Ciudad de México, Bogotá, Lima y Santiago",
+            "src": "asset-ref:plate:MK2-mercados",
+          },
+          "productMark": {
+            "alt": "Efeonce | SV360",
+            "height": "--gl-pmk-height=40px",
+            "left": "--gl-pmk-left=140px",
+            "src": "asset-ref:file:sv360-lockup-negative",
+            "top": "--gl-pmk-top=44px",
+          },
+          "voice": {
+            "answer": "países",
+            "answerLead": "Cinco",
+            "eyebrow": "Mercados",
+            "question": "¿Dónde operamos?",
           },
         },
       },
@@ -5006,6 +5470,201 @@ exports[`planes de los intents de ejemplo > deck-content-pricing-stage-intent.js
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-content-report-formats-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:srf-stage",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><radialGradient id="srf-halo" cx="1310" cy="400" r="900" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#72ded8" stop-opacity="0.3"/><stop offset="0.35" stop-color="#1f9e94" stop-opacity="0.11"/><stop offset="1" stop-color="#1f9e94" stop-opacity="0"/></radialGradient><linearGradient id="srf-floor" x1="0" y1="778" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000814" stop-opacity="0"/><stop offset="1" stop-color="#000814" stop-opacity="0.55"/></linearGradient></defs><rect width="1920" height="1080" fill="url(#srf-halo)"/><rect y="778" width="1920" height="302" fill="url(#srf-floor)"/></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:srf-beams",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><linearGradient id="srf-fan" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#72ded8" stop-opacity="0.85"/><stop offset="1" stop-color="#72ded8" stop-opacity="0"/></linearGradient><filter id="srf-fanb"><feGaussianBlur stdDeviation="4"/></filter></defs><g fill="none" stroke="url(#srf-fan)" stroke-linecap="round"><g stroke-width="8" opacity="0.45" filter="url(#srf-fanb)"><path d="M 1310 690 C 1310 730 952 730 952 780"/><path d="M 1310 690 C 1310 730 1131 730 1131 780"/><path d="M 1310 690 L 1310 780"/><path d="M 1310 690 C 1310 730 1489 730 1489 780"/><path d="M 1310 690 C 1310 730 1668 730 1668 780"/></g><g stroke-width="2.5"><path d="M 1310 690 C 1310 730 952 730 952 780"/><path d="M 1310 690 C 1310 730 1131 730 1131 780"/><path d="M 1310 690 L 1310 780"/><path d="M 1310 690 C 1310 730 1489 730 1489 780"/><path d="M 1310 690 C 1310 730 1668 730 1668 780"/></g></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:correo-engine-dark-40",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" role="img" aria-label="Correo"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2z"/><path d="M3 7l9 5.5l9 -5.5"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:web-engine-dark-40",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" role="img" aria-label="Web y celular"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3z"/><path d="M4 10h16"/><path d="M7.25 7h.01"/><path d="M10.5 7h.01"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:presentacion-engine-dark-40",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" role="img" aria-label="Presentación"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3.5h15a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1 -1.5 1.5h-15a1.5 1.5 0 0 1 -1.5 -1.5v-8.5a1.5 1.5 0 0 1 1.5 -1.5z"/><path d="M7 8h5"/><path d="M7 11h8"/><path d="M12 15v6"/><path d="M8.5 15l-2.5 6"/><path d="M15.5 15l2.5 6"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:contrato-engine-dark-40",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" role="img" aria-label="PDF A4"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14h-12z"/><path d="M14 3v4h4"/><path d="M9 8.5h2"/><path d="M9 12h6"/><path d="M9 17h6"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:informe-engine-dark-40",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" role="img" aria-label="Deck 16:9"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14h-12z"/><path d="M14 3v4h4"/><path d="M9 17v-3"/><path d="M12 17v-5.5"/><path d="M15 17v-2"/></g></svg>",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/insights-lockup-negative.svg",
+      "ref": "asset-ref:file:insights-lockup-negative",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-report-formats",
+  "plan": {
+    "artifactId": "deck-content-report-formats",
+    "slides": [
+      {
+        "contentType": "deck.content-report-formats",
+        "slideId": "deck-content-report-formats",
+        "slots": {
+          "beams": {
+            "src": "asset-ref:layer:srf-beams",
+          },
+          "body": "Cada mes la IA cruza tus datos y escribe la lectura; nuestro equipo la revisa. Tú solo la abres y la usas, <strong>sin armar</strong> reportes ni láminas.",
+          "formats": [
+            {
+              "detail": "Te llega solo",
+              "icon": "asset-ref:icon:correo-engine-dark-40",
+              "role": "rest",
+              "title": "Correo",
+            },
+            {
+              "detail": "Lo revisas donde estés",
+              "icon": "asset-ref:icon:web-engine-dark-40",
+              "role": "rest",
+              "title": "Web y celular",
+            },
+            {
+              "detail": "Presentas sin PPT",
+              "icon": "asset-ref:icon:presentacion-engine-dark-40",
+              "role": "lead",
+              "title": "Presentación",
+            },
+            {
+              "detail": "Listo para circular",
+              "icon": "asset-ref:icon:contrato-engine-dark-40",
+              "role": "rest",
+              "title": "PDF A4",
+            },
+            {
+              "detail": "El del comité, armado",
+              "icon": "asset-ref:icon:informe-engine-dark-40",
+              "role": "rest",
+              "title": "Deck 16:9",
+            },
+          ],
+          "frame": {
+            "answerInset": "--gl-ls-answer-inset=0px",
+            "answerLeading": "--gl-ls-answer-leading=0.95",
+            "answerPx": 124,
+            "answerTop": 351,
+            "answerTracking": "--gl-ls-answer-tracking=-0.035em",
+            "bodyPx": 26,
+            "bodyTop": 627,
+            "bodyWidth": 600,
+            "eyebrowTop": 230,
+            "line": "engine",
+            "lumBottom": "--gl-lum-bottom=62px",
+            "lumWidth": "--gl-lum-width=160px",
+            "margin": 140,
+            "questionTop": 285,
+            "questionWidth": "--gl-ls-question-width=640px",
+            "svBg": "--gl-sv-bg-color=#091951",
+            "svCardTo": "--gl-sv-card-to-color=#081c30",
+            "svDocBar": "--gl-sv-doc-bar-color=#d3dce8",
+            "svDocDash": "--gl-sv-doc-dash-color=#8a9bb3",
+            "svDocInk": "--gl-sv-doc-ink-color=#023c70",
+            "svDocMuted": "--gl-sv-doc-muted-color=#5b6b82",
+            "svDocNote": "--gl-sv-doc-note-color=#e8f2fd",
+            "svDocPanel": "--gl-sv-doc-panel-color=#eef3f9",
+            "svDocTo": "--gl-sv-doc-to-color=#f3f6fa",
+            "svHalo": "--gl-sv-halo-color=#72ded8",
+            "svHeroCardTo": "--gl-sv-hero-card-to-color=#0a2640",
+            "svMiniFrom": "--gl-sv-mini-from-color=#12344f",
+            "svMiniHeroFrom": "--gl-sv-mini-hero-from-color=#0f4a6e",
+            "svMuted": "--gl-sv-muted-color=#c9d6e2",
+            "svShadow": "--gl-sv-shadow-color=#000610",
+            "svSoft": "--gl-sv-soft-color=#cfe4fa",
+            "svTealDark": "--gl-sv-teal-dark-color=#0e8c82",
+          },
+          "kpis": [
+            {
+              "delta": "▲ 9 pts",
+              "label": "Visibilidad en IA",
+              "value": "64%",
+            },
+            {
+              "delta": "▲ 18%",
+              "label": "Clics orgánicos",
+              "value": "12,4 k",
+            },
+            {
+              "delta": "▲ 11",
+              "label": "Te citan en respuestas",
+              "value": "37",
+            },
+          ],
+          "productMark": {
+            "alt": "Efeonce | Insights",
+            "height": "--gl-pmk-height=40px",
+            "left": "--gl-pmk-left=140px",
+            "src": "asset-ref:file:insights-lockup-negative",
+            "top": "--gl-pmk-top=44px",
+          },
+          "ranking": [
+            {
+              "bar": "--gl-srf-bar=100%",
+              "name": "Tu marca",
+              "role": "lead",
+              "share": "34%",
+            },
+            {
+              "bar": "--gl-srf-bar=82.35%",
+              "name": "Rival A",
+              "role": "rest",
+              "share": "28%",
+            },
+            {
+              "bar": "--gl-srf-bar=61.76%",
+              "name": "Rival B",
+              "role": "rest",
+              "share": "21%",
+            },
+            {
+              "bar": "--gl-srf-bar=50%",
+              "name": "Rival C",
+              "role": "rest",
+              "share": "17%",
+            },
+          ],
+          "report": {
+            "label": "Informe vivo · septiembre",
+            "rankingTitle": "Quién aparece en las respuestas",
+            "reading": "Subes por tus guías nuevas. En «precios» el rival A todavía te gana: ahí va el próximo contenido.",
+            "trendTitle": "Visibilidad en IA · 6 meses",
+          },
+          "stage": {
+            "src": "asset-ref:layer:srf-stage",
+          },
+          "voice": {
+            "answer": "necesites",
+            "answerLead": "Como la",
+            "eyebrow": "Un informe, cinco formatos",
+            "question": "¿Cómo te llega?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-content-season-launches-intent.json compone el mismo plan 1`] = `
 {
   "assets": [
@@ -5394,6 +6053,165 @@ exports[`planes de los intents de ejemplo > deck-content-service-lanes-intent.js
             "answer": "Todo el ciclo",
             "eyebrow": "Nuestros servicios Salesforce",
             "question": "¿Qué hacemos en Salesforce?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-content-service-mockups-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:ssm-stage",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><radialGradient id="ssm-halo" cx="1270" cy="430" r="900" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#72ded8" stop-opacity="0.3"/><stop offset="0.35" stop-color="#1f9e94" stop-opacity="0.11"/><stop offset="1" stop-color="#1f9e94" stop-opacity="0"/></radialGradient><linearGradient id="ssm-floor" x1="0" y1="778" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000814" stop-opacity="0"/><stop offset="1" stop-color="#000814" stop-opacity="0.55"/></linearGradient></defs><rect width="1920" height="1080" fill="url(#ssm-halo)"/><rect y="778" width="1920" height="302" fill="url(#ssm-floor)"/></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:ssm-platform",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><defs><radialGradient id="ssm-pf" cx="1250" cy="912" r="500" gradientUnits="userSpaceOnUse" gradientTransform="translate(0 780.67) scale(1 0.14)"><stop offset="0" stop-color="#72ded8" stop-opacity="0.3"/><stop offset="0.7" stop-color="#1f9e94" stop-opacity="0.06"/><stop offset="1" stop-color="#1f9e94" stop-opacity="0"/></radialGradient><filter id="ssm-pfg" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="9"/></filter></defs><ellipse cx="1250" cy="912" rx="500" ry="72" fill="url(#ssm-pf)"/><ellipse cx="1250" cy="912" rx="500" ry="72" fill="none" stroke="#72ded8" stroke-opacity="0.55" stroke-width="3"/><path d="M 790 941 A 500 72 0 0 0 1600 966" fill="none" stroke="#1f9e94" stroke-width="14" opacity="0.45" filter="url(#ssm-pfg)"/><path d="M 790 941 A 500 72 0 0 0 1600 966" fill="none" stroke="#1f9e94" stroke-width="6" stroke-linecap="round"/></svg>",
+    },
+    {
+      "kind": "file",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/sv360-lockup-negative.svg",
+      "ref": "asset-ref:file:sv360-lockup-negative",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-service-mockups",
+  "plan": {
+    "artifactId": "deck-content-service-mockups",
+    "slides": [
+      {
+        "contentType": "deck.content-service-mockups",
+        "slideId": "deck-content-service-mockups",
+        "slots": {
+          "authority": {
+            "caption": "Enlaces reales, sin granjas ni PBN",
+            "label": "dominios<br>que te enlazan",
+            "title": "PR y link building",
+            "value": "+18",
+          },
+          "body": "Contenido, técnica y autoridad, hechos y <strong>desplegados</strong> por nuestro equipo en tu CMS. No te dejamos una lista de tareas.",
+          "checks": [
+            {
+              "label": "Rastreo",
+            },
+            {
+              "label": "Índice",
+            },
+            {
+              "label": "Schema",
+            },
+            {
+              "label": "Metas",
+            },
+          ],
+          "chips": [
+            {
+              "detail": "SEO on-page y copy que convierte",
+              "title": "Landing pages",
+            },
+            {
+              "detail": "Livianos y con ALT: no rompen tu velocidad",
+              "title": "Banners optimizados",
+            },
+            {
+              "detail": "WordPress, Webflow, Shopify o el que uses",
+              "title": "Despliegue multi-CMS",
+            },
+          ],
+          "cluster": {
+            "caption": "Un cluster por tema: la guía y las respuestas a cada pregunta, <strong>listas para que la IA las cite</strong>",
+            "pillar": "Tu tema",
+            "title": "Contenido SEO",
+          },
+          "frame": {
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "answerLeading": "--gl-ls-answer-leading=0.95",
+            "answerPx": 128,
+            "answerTop": 280,
+            "answerTracking": "--gl-ls-answer-tracking=-0.045em",
+            "bodyPx": 26,
+            "bodyTop": 470,
+            "bodyWidth": 460,
+            "eyebrowTop": 130,
+            "line": "engine",
+            "lumBottom": "--gl-lum-bottom=62px",
+            "lumWidth": "--gl-lum-width=160px",
+            "margin": 140,
+            "questionTop": 196,
+            "questionWidth": "--gl-ls-question-width=560px",
+            "scoreDash": "--gl-ssm-score-dash=307.88",
+            "svBg": "--gl-sv-bg-color=#091951",
+            "svCardFrom": "--gl-sv-card-from-color=#10304b",
+            "svCardTo": "--gl-sv-card-to-color=#081c30",
+            "svChip": "--gl-sv-chip-color=#163f60",
+            "svHalo": "--gl-sv-halo-color=#72ded8",
+            "svHeroFrom": "--gl-sv-hero-from-color=#12385a",
+            "svMiniFrom": "--gl-sv-mini-from-color=#12344f",
+            "svMuted": "--gl-sv-muted-color=#c9d6e2",
+            "svShadow": "--gl-sv-shadow-color=#000610",
+            "svSoft": "--gl-sv-soft-color=#cfe4fa",
+            "svTeal": "--gl-sv-teal-color=#1f9e94",
+          },
+          "nodes": [
+            {
+              "label": "Qué es",
+            },
+            {
+              "label": "Cómo elegir",
+            },
+            {
+              "label": "Precios",
+            },
+            {
+              "label": "Casos",
+            },
+            {
+              "label": "Comparativa",
+            },
+            {
+              "label": "Preguntas",
+            },
+          ],
+          "outlets": [
+            {
+              "label": "Medio de tu sector",
+            },
+            {
+              "label": "Gremio o asociación",
+            },
+            {
+              "label": "Prensa de negocios",
+            },
+          ],
+          "platform": {
+            "src": "asset-ref:layer:ssm-platform",
+          },
+          "productMark": {
+            "alt": "Efeonce | SV360",
+            "height": "--gl-pmk-height=40px",
+            "left": "--gl-pmk-left=140px",
+            "src": "asset-ref:file:sv360-lockup-negative",
+            "top": "--gl-pmk-top=44px",
+          },
+          "stage": {
+            "src": "asset-ref:layer:ssm-stage",
+          },
+          "technical": {
+            "caption": "Que Google y la IA puedan leer, entender y confiar en tu sitio",
+            "score": "98",
+            "scoreLabel": "Core Web<br>Vitals<br><strong>en verde</strong>",
+            "title": "SEO técnico",
+          },
+          "voice": {
+            "answer": "Todo esto",
+            "eyebrow": "SEO · qué incluye",
+            "question": "¿Y qué hace ese equipo?",
           },
         },
       },

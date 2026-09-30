@@ -173,8 +173,8 @@ export const sectionCine: RecipeBuilder = ({ intent, manifest, recipe: base }) =
     frame.questionWidth = css('sc-question-width', measured(question.maxWidthPx, 'el ancho de la pregunta'))
 
     // La bajada OPCIONAL del equipo (TASK-1949, deck SEO/AEO: «Lo ejecutan expertos multidisciplinarios…»), al pie de la
-    // columna; su lugar y su cuerpo los fija la plantilla (`.gl-sec-cine`). Sin `body` la lámina es la de siempre.
-    // TODO AXIS TASK-1949: el contrato de AXIS todavía prohíbe `body` en `team` y rechaza el intent antes de llegar aquí.
+    // columna; su lugar y su cuerpo los fija la plantilla (`.gl-sec-cine`) con los valores que AXIS publica para `team`
+    // (reserva 900/1080, cuerpo 22/300, 540 px). Sin `body` la lámina es la de siempre.
     const teamBody = contentOf(manifest).body
 
     if (layout === 'team' && teamBody) slots.body = evidenceHtml(teamBody, 'none')

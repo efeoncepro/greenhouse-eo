@@ -11535,8 +11535,59 @@
           "maxChars": 74
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.content-brand-family",
+      "axis": {
+        "recipe": "content-brand-family",
+        "layout": null,
+        "role": "content",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "content",
+          "line": "engine",
+          "theme": "dark",
+          "recipe": "content-brand-family",
+          "voice": {
+            "eyebrow": "El producto · SEO + AEO",
+            "question": "¿Qué hay dentro?",
+            "answer": [
+              "Cuatro",
+              "piezas"
+            ]
+          },
+          "body": "SV360 es SEO y AEO en un solo sistema: una capacidad, un proceso, un entregable y una edición mensual, todo firmado por **Efeonce**.",
+          "productMark": {
+            "asset": "sv360-logo-negative",
+            "alt": "SV360 · Search Visibility 360"
+          },
+          "familyMark": "sv360-name-lockup-negative",
+          "pieces": [
+            {
+              "mark": "aeo-lockup-negative",
+              "role": "Capacidad",
+              "description": "Que la IA te encuentre, te entienda y te recomiende."
+            },
+            {
+              "mark": "aeo-assessment-lockup-negative",
+              "role": "Proceso",
+              "description": "Mide cómo te ven los motores de IA, en siete dimensiones."
+            },
+            {
+              "mark": "ai-visibility-report-lockup-negative",
+              "role": "Entregable",
+              "description": "Lo que recibes y compartes: dónde estás y qué hacer primero."
+            },
+            {
+              "mark": "insights-lockup-negative",
+              "role": "Edición mensual",
+              "description": "Cada mes, qué se movió en tu SEO y tu AEO, y qué sigue."
+            }
+          ]
+        }
+      }
     },
     {
       "id": "content-service-mockups",
@@ -11676,8 +11727,81 @@
           "maxChars": 73
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.content-service-mockups",
+      "axis": {
+        "recipe": "content-service-mockups",
+        "layout": null,
+        "role": "content",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "content",
+          "line": "engine",
+          "theme": "dark",
+          "recipe": "content-service-mockups",
+          "voice": {
+            "eyebrow": "SEO · qué incluye",
+            "question": "¿Y qué hace ese equipo?",
+            "answer": [
+              "Todo esto"
+            ]
+          },
+          "body": "Contenido, técnica y autoridad, hechos y **desplegados** por nuestro equipo en tu CMS. No te dejamos una lista de tareas.",
+          "productMark": {
+            "asset": "sv360-lockup-negative",
+            "alt": "Efeonce | SV360"
+          },
+          "technicalTitle": "SEO técnico",
+          "technicalScore": 98,
+          "technicalScoreLabel": "Core Web\nVitals\n**en verde**",
+          "technicalChecks": [
+            "Rastreo",
+            "Índice",
+            "Schema",
+            "Metas"
+          ],
+          "technicalCaption": "Que Google y la IA puedan leer, entender y confiar en tu sitio",
+          "contentTitle": "Contenido SEO",
+          "contentPillar": "Tu tema",
+          "contentNodes": [
+            "Qué es",
+            "Cómo elegir",
+            "Precios",
+            "Casos",
+            "Comparativa",
+            "Preguntas"
+          ],
+          "contentCaption": "Un cluster por tema: la guía y las respuestas a cada pregunta, **listas para que la IA las cite**",
+          "authorityTitle": "PR y link building",
+          "authorityMetric": {
+            "value": "+18",
+            "label": "dominios\nque te enlazan"
+          },
+          "authorityOutlets": [
+            "Medio de tu sector",
+            "Gremio o asociación",
+            "Prensa de negocios"
+          ],
+          "authorityCaption": "Enlaces reales, sin granjas ni PBN",
+          "chips": [
+            {
+              "title": "Landing pages",
+              "detail": "SEO on-page y copy que convierte"
+            },
+            {
+              "title": "Banners optimizados",
+              "detail": "Livianos y con ALT: no rompen tu velocidad"
+            },
+            {
+              "title": "Despliegue multi-CMS",
+              "detail": "WordPress, Webflow, Shopify o el que uses"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "content-report-formats",
@@ -11781,8 +11905,103 @@
           "maxChars": null
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.content-report-formats",
+      "axis": {
+        "recipe": "content-report-formats",
+        "layout": null,
+        "role": "content",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "content",
+          "line": "engine",
+          "theme": "dark",
+          "recipe": "content-report-formats",
+          "voice": {
+            "eyebrow": "Un informe, cinco formatos",
+            "question": "¿Cómo te llega?",
+            "answer": [
+              "Como la",
+              "necesites"
+            ]
+          },
+          "body": "Cada mes la IA cruza tus datos y escribe la lectura; nuestro equipo la revisa. Tú solo la abres y la usas, **sin armar** reportes ni láminas.",
+          "productMark": {
+            "asset": "insights-lockup-negative",
+            "alt": "Efeonce | Insights"
+          },
+          "reportLabel": "Informe vivo · septiembre",
+          "kpis": [
+            {
+              "label": "Visibilidad en IA",
+              "value": "64%",
+              "delta": "▲ 9 pts"
+            },
+            {
+              "label": "Clics orgánicos",
+              "value": "12,4 k",
+              "delta": "▲ 18%"
+            },
+            {
+              "label": "Te citan en respuestas",
+              "value": "37",
+              "delta": "▲ 11"
+            }
+          ],
+          "trendTitle": "Visibilidad en IA · 6 meses",
+          "rankingTitle": "Quién aparece en las respuestas",
+          "ranking": [
+            {
+              "name": "Tu marca",
+              "share": 34
+            },
+            {
+              "name": "Rival A",
+              "share": 28
+            },
+            {
+              "name": "Rival B",
+              "share": 21
+            },
+            {
+              "name": "Rival C",
+              "share": 17
+            }
+          ],
+          "reading": "Subes por tus guías nuevas. En «precios» el rival A todavía te gana: ahí va el próximo contenido.",
+          "formats": [
+            {
+              "icon": "mail",
+              "title": "Correo",
+              "detail": "Te llega solo"
+            },
+            {
+              "icon": "web-mobile",
+              "title": "Web y celular",
+              "detail": "Lo revisas donde estés"
+            },
+            {
+              "icon": "presentation",
+              "title": "Presentación",
+              "detail": "Presentas sin PPT"
+            },
+            {
+              "icon": "pdf",
+              "title": "PDF A4",
+              "detail": "Listo para circular"
+            },
+            {
+              "icon": "deck",
+              "title": "Deck 16:9",
+              "detail": "El del comité, armado"
+            }
+          ],
+          "highlightedFormat": 3
+        }
+      }
     },
     {
       "id": "content-committee-deck",
@@ -11868,8 +12087,57 @@
           "maxChars": 62
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.content-committee-deck",
+      "axis": {
+        "recipe": "content-committee-deck",
+        "layout": null,
+        "role": "content",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "content",
+          "line": "engine",
+          "theme": "dark",
+          "recipe": "content-committee-deck",
+          "voice": {
+            "eyebrow": "Sin armar láminas",
+            "question": "¿Y el PPT del comité?",
+            "answer": [
+              "Ya",
+              "está"
+            ]
+          },
+          "body": "La IA escribe el titular y destaca lo que importa; nuestro equipo lo revisa. Tú entras a la reunión y **presentas**.",
+          "productMark": {
+            "asset": "insights-lockup-negative",
+            "alt": "Efeonce | Insights"
+          },
+          "slideKicker": "Comité · tercer trimestre",
+          "slideHeadline": "La IA ya te nombra en 4 de cada 10 respuestas",
+          "slideFigure": {
+            "value": "+38%",
+            "label": "visibilidad en el trimestre"
+          },
+          "annotation": "Guía de precios",
+          "features": [
+            {
+              "title": "Presentas en vivo",
+              "detail": "Desde el informe, con los datos al día"
+            },
+            {
+              "title": "Deck 16:9",
+              "detail": "Las láminas del comité, ya armadas"
+            },
+            {
+              "title": "PDF A4",
+              "detail": "Para mandarlo al directorio"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "content-industries",
@@ -11937,8 +12205,63 @@
           "maxChars": null
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.content-industries",
+      "axis": {
+        "recipe": "content-industries",
+        "layout": null,
+        "role": "content",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "content",
+          "line": "engine",
+          "theme": "dark",
+          "recipe": "content-industries",
+          "voice": {
+            "eyebrow": "Industrias",
+            "question": "¿Conocemos tu industria?",
+            "answer": [
+              "Por",
+              "dentro"
+            ]
+          },
+          "body": "Seis industrias donde tu comprador ya le pregunta a la IA antes de llamarte. Nosotros sabemos **qué pregunta**.",
+          "productMark": {
+            "asset": "sv360-lockup-negative",
+            "alt": "Efeonce | SV360"
+          },
+          "industries": [
+            {
+              "name": "Banca y finanzas",
+              "question": "¿Qué banco tiene la mejor cuenta para pymes?"
+            },
+            {
+              "name": "Seguros",
+              "question": "¿Qué seguro de auto cubre más por menos?"
+            },
+            {
+              "name": "Retail",
+              "question": "¿Dónde compro buenas zapatillas de running?"
+            },
+            {
+              "name": "Manufactura",
+              "question": "¿Qué proveedor de envases cumple la norma?"
+            },
+            {
+              "name": "Servicios profesionales",
+              "question": "¿Qué estudio contable me recomiendas?"
+            },
+            {
+              "name": "SaaS",
+              "question": "¿Qué CRM me sirve para una pyme B2B?"
+            }
+          ],
+          "highlightedIndustry": 1
+        }
+      }
     },
     {
       "id": "content-markets",
@@ -12006,8 +12329,89 @@
           "maxChars": null
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.content-markets",
+      "axis": {
+        "recipe": "content-markets",
+        "layout": null,
+        "role": "content",
+        "theme": "dark",
+        "uses": [
+          "brochure"
+        ],
+        "progress": false,
+        "page": {
+          "role": "content",
+          "line": "engine",
+          "theme": "dark",
+          "recipe": "content-markets",
+          "voice": {
+            "eyebrow": "Mercados",
+            "question": "¿Dónde operamos?",
+            "answer": [
+              "Cinco",
+              "países"
+            ]
+          },
+          "body": "Chile, Estados Unidos, Colombia, México y Perú, con **un solo equipo** y un solo interlocutor.",
+          "productMark": {
+            "asset": "sv360-lockup-negative",
+            "alt": "Efeonce | SV360"
+          },
+          "photo": {
+            "register": "puesta-en-escena",
+            "subject": "place",
+            "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
+            "alt": "Las Américas de noche vistas desde la órbita; cinco puntos de luz azul unidos por arcos en Miami, Ciudad de México, Bogotá, Lima y Santiago"
+          },
+          "markets": [
+            {
+              "country": "EE. UU.",
+              "city": "Miami",
+              "node": [
+                1112,
+                215
+              ],
+              "side": "right"
+            },
+            {
+              "country": "México",
+              "city": "Ciudad de México",
+              "node": [
+                958,
+                283
+              ],
+              "side": "left"
+            },
+            {
+              "country": "Colombia",
+              "city": "Bogotá",
+              "node": [
+                1132,
+                405
+              ],
+              "side": "right"
+            },
+            {
+              "country": "Perú",
+              "city": "Lima",
+              "node": [
+                1098,
+                567
+              ],
+              "side": "left"
+            },
+            {
+              "country": "Chile",
+              "city": "Santiago",
+              "node": [
+                1181,
+                773
+              ],
+              "side": "right"
+            }
+          ]
+        }
+      }
     }
   ]
 }

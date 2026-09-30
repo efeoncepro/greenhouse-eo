@@ -4,8 +4,9 @@
  * contrato de slots limpio y la plantilla real se rellena en Chromium; lo que falta o sobra falla cerrado; el lockup de
  * submarca es opcional (salvo en la familia, que abre con él) y todo color del plan sale de la paleta medida o de AXIS.
  *
- * TODO AXIS TASK-1949: AXIS todavía no publica estas recetas, así que el test llama al builder con el manifest que
- * resolvería el contrato (`fixtures/sv360/axis-voice.ts`). Cuando AXIS publique, pasa a `planSurfacePiece`.
+ * Cada lámina pasa por `planSurfacePiece` con su intent de ejemplo (`examples/deck-<receta>-intent.json`): AXIS 0.3.40
+ * publica las seis recetas (reservas, tipos, firma y lugar del lockup) y el contrato resuelve el manifest que lee el
+ * builder. Los planes de esos intents también los vigila `example-plans.test.ts`.
  */
 
 import fs from 'node:fs'
@@ -21,12 +22,12 @@ import { fillSlide, launchComposerBrowser } from '@/lib/artifact-composer/render
 import { graphicLineDeckCatalog } from '@/lib/artifact-composer/catalogs/graphic-line-deck'
 import { validateSlide } from '@/lib/artifact-composer/validate'
 
-import { SV360_BUILDERS } from '../recipes/sv360'
+import { planSurfacePiece, type SurfaceIntent } from '../index'
 import { SV360_PALETTE, svColor } from '../recipes/sv360/kit'
 import { SurfacePieceError } from '../types'
-import { sv360Intent, sv360Manifest, sv360RecipeTokens } from './fixtures/sv360/axis-voice'
 
 const CATALOG = path.join(__dirname, '..', '..', 'artifact-composer', 'catalogs', 'graphic-line-deck')
+const EXAMPLES = path.join(__dirname, '..', 'examples')
 
 const TEMPLATES: Record<string, string> = {
   'content-brand-family': 'ContentBrandFamily',
@@ -37,14 +38,18 @@ const TEMPLATES: Record<string, string> = {
   'content-markets': 'ContentMarkets'
 }
 
-type Intent = ReturnType<typeof sv360Intent>
+type Intent = SurfaceIntent & Record<string, unknown>
+
+const sv360Intent = (id: string): Intent => JSON.parse(fs.readFileSync(path.join(EXAMPLES, `deck-${id}-intent.json`), 'utf8')) as Intent
 
 const plan = (id: string, intent: Intent = sv360Intent(id)) => {
-  const built = SV360_BUILDERS[id]!({ intent: intent as never, manifest: sv360Manifest(id, intent), recipe: sv360RecipeTokens(id) })
+  const piece = planSurfacePiece(intent, { artifactId: `deck-${id}` })
+  const planned = piece.plan.slides[0]!
+  const built = { contentType: piece.contentType, slots: planned.slots as Record<string, unknown>, assets: piece.assets }
   const contract = JSON.parse(fs.readFileSync(path.join(CATALOG, `${id}.slots.json`), 'utf8')) as TemplateContract
-  const slide = { slideId: `deck-${id}`, contentType: built.contentType!, slots: built.slots, template: TEMPLATES[id]! } as unknown as SlideSpec
+  const slide = { slideId: `deck-${id}`, contentType: built.contentType, slots: built.slots, template: TEMPLATES[id]! } as unknown as SlideSpec
 
-  return { built, slots: built.slots as Record<string, unknown>, violations: validateSlide(slide, contract), slide }
+  return { built, slots: built.slots, violations: validateSlide(slide, contract), slide }
 }
 
 const expectCode = (fn: () => unknown, code: SurfacePieceError['code']) => {
