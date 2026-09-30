@@ -1,9 +1,15 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.10
+> **Versión:** 1.11
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-29 por Claude (1.10: decisiones del operador al canonizar el deck Salesforce — cuatro
+> **Última actualización:** 2026-09-30 por Claude (1.11: el deck SEO/AEO (Search Visibility 360) aprobado por el
+> operador — seis recetas nuevas sin plantilla todavía (`content-brand-family`, `content-service-mockups`,
+> `content-report-formats`, `content-committee-deck`, `content-industries`, `content-markets`; 100 en el catálogo, 94 con
+> plantilla), `productMark` opcional, `requiredUnless` en el eyebrow de `proposal-cinematic-seo`/`-aeo`,
+> `section-cine-team.body` opcional, 27 usos aprobados y los tres planes validados; sección «El deck SEO/AEO» y
+> decisiones del 2026-09-30 (TASK-1949).
+> Antes, 1.10: decisiones del operador al canonizar el deck Salesforce — cuatro
 > recetas nuevas más (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`,
 > `content-day-live-approval`) para las láminas que no cabían (94 en el catálogo, 16 sin plantilla), los dos planes del
 > deck (brochure y propuesta) como fixtures validados, el logo de 700 px sólo en la contraportada Salesforce y el
@@ -30,7 +36,7 @@
 > estado tras el cierre de TASK-1927 — qué recetas tienen plantilla, equivalencia de nombres con el contrato de AXIS,
 > pendientes de QA resueltos y abiertos, cómo cambiar la foto, el copy o la sección)
 > **Fuente de verdad:** [`EFEONCE_DECK_SLIDE_RECIPES_V1.json`](./EFEONCE_DECK_SLIDE_RECIPES_V1.json) (esquema
-> `efeonce.deck-slide-recipes.v1`, 94 recetas). Este README explica cómo usarlo; el índice del final se **genera**
+> `efeonce.deck-slide-recipes.v1`, 100 recetas). Este README explica cómo usarlo; el índice del final se **genera**
 > desde el JSON con `pnpm brand:deck-recipes` y no se edita a mano.
 > **Canon que manda:** [composición por superficie §4.6](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) (reglas del
 > deck, portadas y contraportadas, decisiones del 2026-09-27) · [manual de la línea gráfica](../EFEONCE_GRAPHIC_LINE_V1.md)
@@ -56,8 +62,10 @@ selección lleva, de qué foto sale (ficha, prompt y post-proceso), con qué pro
 El **2026-09-28** el operador aprobó **nueve láminas más, sobre SEO y AEO** (tabla en «Las láminas SEO/AEO»), y el
 catálogo quedó en **78 recetas**. El **2026-09-29** aprobó las 19 láminas del **deck de práctica Salesforce**: doce son
 recetas nuevas (sin plantilla todavía) y ocho eran datos de recetas existentes; al canonizar, el operador decidió que las
-cuatro que no cabían en sus slots nacen como recetas propias (sección «El deck de práctica Salesforce»). El catálogo
-tiene **94 recetas**.
+cuatro que no cabían en sus slots nacen como recetas propias (sección «El deck de práctica Salesforce»). El
+**2026-09-30** aprobó el **deck SEO/AEO** (Search Visibility 360) en sus tres documentos: seis láminas nativas son
+recetas nuevas (sin plantilla todavía) y el resto usa recetas existentes (sección «El deck SEO/AEO»). El catálogo
+tiene **100 recetas**.
 
 Sirve para que una persona o un agente arme un deck de **marca propia de Efeonce** (brochure, propuesta comercial,
 pitch o QBR) eligiendo láminas aprobadas en vez de inventarlas. No aplica a decks con la marca de un cliente, al
@@ -76,7 +84,7 @@ catálogo `deck-axis` de las ofertas a comité ni a la interfaz de Greenhouse.
 4. **Llena los slots** con datos reales: textos dentro de su `maxChars` medido, montos siempre `[MONTO]`, cifras con
    fuente (cada cifra con su `source`), logos sólo de clientes que autorizan su uso, fotos de ejemplo reemplazadas y
    datos de muestra marcados como tales («Ejemplo ilustrativo», «Datos de muestra»).
-5. **Compón con la plantilla.** **90 de las 94** recetas tienen plantilla (las 4 de la segunda ronda Salesforce todavía no: el
+5. **Compón con la plantilla.** **94 de las 100** recetas tienen plantilla (las seis del deck SEO/AEO todavía no: el
    plan avisa `recipe-without-template`) (columna «Plantilla» del índice y tabla de «Qué
    sale hoy con un comando»). **Escribe el intent** en un archivo propio, partiendo del intent de ejemplo de la receta
    (`src/lib/brand-surfaces/examples/deck-<receta>-intent.json`), con la receta y el `layout` de AXIS que le
@@ -90,7 +98,7 @@ El paso a paso para el equipo está en el
 
 ## Cómo elegir por documento
 
-Las 78 láminas no traen portada ni cierre propios para **pitch** y **QBR**. El JSON y el índice generado todavía citan
+Las láminas del catálogo no traen portada ni cierre propios para **pitch** y **QBR**. El JSON y el índice generado todavía citan
 las clásicas de AXIS (`cover-classic`, `close-classic`) como alternativa, pero **no se usan**: el operador no las
 aprobó, en AXIS quedan `supersededBy` y Greenhouse no tiene plantilla para ellas. Para un pitch o un QBR, el marco se
 le pregunta al operador.
@@ -194,6 +202,55 @@ contraportadas del 2026-09-27 siguen con el logo a 500 px.
 
 **Deck HubSpot pendiente:** [TASK-1943](../../../tasks/to-do/TASK-1943-hubspot-deck-content-series.md).
 
+## El deck SEO/AEO (aprobado el 2026-09-30)
+
+El deck de la práctica SEO/AEO, sobre **Search Visibility 360 (SV360)** y sus piezas (AEO Assessment, AI Visibility
+Report y Efeonce Insights), en línea Engine y en tres documentos: **completo** (33 láminas, brochure extendido),
+**brochure** (24) y **propuesta** (29), con cinco capítulos (el problema · SV360 y SEO · AEO · cómo trabajamos · por qué
+nosotros). Recorrido completo, reglas y pendientes: [norma §4.6, «Deck SEO/AEO»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+Task: [TASK-1949](../../../tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-canonization.md). Fuente de hechos:
+`ai-generations/2026-09-29_deck-seo-aeo-documentos/CANON-INVENTARIO.md` y `DECISIONES.md`.
+
+| Lámina (C · B · P) | id | Familia | Cuándo usarla | Qué no se negocia |
+|---|---|---|---|---|
+| 07 · 06 · 06 · Cuatro piezas | `content-brand-family` | `content` | abrir la parte de producto: qué hay dentro de SV360 antes de explicar cada pieza | lockups oficiales, nunca dibujados; `productMark` obligatorio; una fila por pieza que el cliente de verdad recibe |
+| 10 · 08 · 09 · Todo esto | `content-service-mockups` | `content` | justo después de presentar al equipo: qué hace, en concreto | maquetas nativas grandes, nunca capturas chicas; cifras de la maqueta ilustrativas; autoridad con tipos de medio reales, sin granjas de enlaces |
+| 22 · 16 · 17 · Como la necesites | `content-report-formats` | `content` | después de `content-day-live-results`: cómo llega la edición mensual | informe vivo en interfaz blanca; **sólo formatos vivos** para el cliente; rivales genéricos |
+| 23 · 17 · 18 · Ya está | `content-committee-deck` | `content` | cuando el comité o el directorio decide la inversión | el titular lo escribe la IA y lo revisa el equipo; cifra ilustrativa; sólo formatos vivos |
+| 27 · 20 · 21 · Por dentro | `content-industries` | `content` | mostrar que el equipo entiende el negocio del cliente; su industria destacada | preguntas de ejemplo; nunca afirma casos por industria ni nombra a un competidor real |
+| 28 · 21 · 22 · Cinco países | `content-markets` | `content` | cliente regional o multinacional; cerrar el «por qué nosotros» con la escala | países de `EFEONCE_OPERATING_MARKETS`; mercados, nunca oficinas; un nodo por país en el plate MK2 |
+
+Las seis **no tienen plantilla todavía**: el plan avisa `recipe-without-template` y el PDF aprobado las hornea fuera
+del compositor (`render-src/bake.cjs`) hasta el Slice 2 de TASK-1949.
+
+**Datos de recetas existentes** (campo `approvedUses`, con su `fit`): 27 usos en 25 recetas, entre ellos la portada de
+línea y la de propuesta con el logo SV360, `section-split` con el plate SX4, `section-cine-team` con la bajada del
+equipo, las propuestas SEO y AEO (de cine y sobrias) con su lockup, `proposal-cinematic-web` con el plate DV1, los
+«vívelo», los tres `decision-case` (BICECORP, Banco BICE y Berel) y `content-clients` con la selección «SEO». Cuatro
+pasan un largo de su receta y el `fit` lo dice (portada de línea, portada de propuesta, `content-day-tools` y la AEO de
+cine); subir el máximo o acortar se decide en el Slice 2 con el operador.
+
+**Slots opcionales nuevos** (ninguna receta cambia `contentType` ni slots previos):
+
+- `productMark`: el lockup de submarca de `@efeoncepro/axis-brand-assets` (lista cerrada: `sv360-lockup-negative`,
+  `sv360-logo-negative`, `aeo-lockup-negative`, `aeo-assessment-lockup-negative`,
+  `ai-visibility-report-lockup-negative`, `insights-lockup-negative`), sólo donde la lámina habla de esa pieza.
+- El eyebrow de `proposal-cinematic-seo` y `-aeo` declara `requiredUnless: "productMark"`: con el lockup, el eyebrow
+  sale y el lockup ocupa su lugar.
+- `section-cine-team.body`: la bajada con los roles del equipo en personas.
+
+Hasta que la plantilla los tenga, `recipe-slot-parity.test.ts` los lista en `PENDING_TEMPLATE_SLOTS` (temporal; la
+prueba falla si una entrada ya está mapeada).
+
+**Tres planes validados** en `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/`: `golden-completo-seo.json`,
+`golden-brochure-seo.json` y `golden-proposal-seo.json` (0 errores; sólo los seis avisos de las láminas nativas). Los
+intents de documento aprobados están como ejemplos en `src/lib/brand-surfaces/examples/deck-seo-{completo,brochure,propuesta}-document.json`
+(sin las seis nativas todavía).
+
+**Antes de mostrarlo a un cliente:** las cifras de los tres casos son de ejemplo y su fuente provisoria no es cierta;
+los logos de BICECORP, Banco BICE y Berel necesitan su autorización (TASK-1937); y los formatos de Insights que no están
+vivos (el correo; el modo presentación sin verificar) se quitan o se rotulan «próximamente», con decisión del operador.
+
 ## Anatomía de una receta (campos del JSON)
 
 | Campo | Para qué |
@@ -202,14 +259,14 @@ contraportadas del 2026-09-27 siguen con el logo a 500 px.
 | `communicates` | la idea que deja en quien la ve, en una frase |
 | `useWhen` · `avoidWhen` · `preferInstead` | cuándo sí, cuándo no y qué receta conviene en su lugar (con su «cuándo») |
 | `pairsWith` | pares `cover↔close`, `variant` y `sequence` |
-| `slots` | data slots del Artifact Composer: `name`, `type` (`text`, `richText`, `number`, `metric`, `list`, `image`, `logo`, `person`, `money`, `date`, `enum`, `section`), `required`, `maxChars` medido, `example`, `notes` |
+| `slots` | data slots del Artifact Composer: `name`, `type` (`text`, `richText`, `number`, `metric`, `list`, `image`, `logo`, `person`, `money`, `date`, `enum`, `section`), `required`, `requiredUnless` (desde 2026-09-30: obligatorio salvo que otro slot venga; hoy sólo el eyebrow de `proposal-cinematic-seo`/`-aeo` con `productMark`), `maxChars` medido, `example`, `notes` |
 | `fixed` | lo que no se edita: órbita, firma, burbuja, grilla, estilo de fichas |
 | `selection` | `none`, `collaborator`, `local-cta` o `multi`, con su etiqueta y su objetivo (contrato AXIS `efeonce.collaboration-selection`) |
 | `photo` | registro, plate, ficha, prompt compilado, post-proceso (`foto:isotipo`, `foto:emblema`) y qué se reemplaza por cliente |
 | `prompts.composition` | el prompt para componer la lámina desde datos, con tokens AXIS y medidas del canon, sin HEX ni px crudos |
 | `renderSource` · `reference` · `referenceSource` | el prototipo de dirección que la compuso y la referencia aprobada (en AXIS: `references/surfaces/deck/<id>.jpg`) |
 | `rules` · `notes` | reglas que la lámina hace cumplir y matices del operador |
-| `approvedUses` (opcional, desde 2026-09-29) | láminas aprobadas que son datos de la receta (deck Salesforce): contenido por slot, foto con ficha y prompt, selección, respaldo sin badge, condiciones y `fit` (qué cabe en los slots y qué no). No lo lee el runtime |
+| `approvedUses` (opcional, desde 2026-09-29) | láminas aprobadas que son datos de la receta (decks Salesforce y SEO/AEO): contenido por slot, foto con ficha y prompt, selección, respaldo sin badge, condiciones y `fit` (qué cabe en los slots y qué no). No lo lee el runtime |
 
 ## Reglas transversales
 
@@ -297,6 +354,30 @@ decisión** (ver «Notas del JSON que quedaron atrás»).
 8. **Columna de la portada en 190**, como se aprobó: AXIS `v0.3.32` le da a la línea `revenue-salesforce` su propia
    reserva del logo (190–300) sin tocar la de las demás portadas.
 
+### Decisiones del operador (2026-09-30, deck SEO/AEO, TASK-1949)
+
+Registradas en `ai-generations/2026-09-29_deck-seo-aeo-documentos/DECISIONES.md` («esto está aprobado todo»).
+
+1. **SEO al mismo nivel que AEO:** SV360 es la marca paraguas; sus piezas son AEO Assessment, AI Visibility Report y
+   Efeonce Insights, con su lockup en las láminas que corresponden (`productMark`).
+2. **La AEO de cine va sin eyebrow** y el lockup Efeonce | AEO en su lugar (`requiredUnless`).
+3. **Estilo «vive»** en las láminas nativas: plataforma de luz, fichas de vidrio en perspectiva, una sola sombra profunda
+   en la protagonista y haces de luz.
+4. **Nada de capturas chicas de la web:** los servicios se muestran con maquetas nativas grandes y legibles.
+5. **Insights cuenta el valor** (sin armar el PPT, en vivo, con lectura escrita por la IA) y el informe vivo va en
+   interfaz blanca.
+6. **Día a día:** herramientas + «vívelo» 1 (Notion y Frame.io con una landing en revisión) + «vívelo» 2 (resultados).
+7. **Secciones de cine:** «Quiénes somos», «Nuestro equipo» (con la bajada de roles en personas) y la sección partida
+   con la imagen de búsqueda y composer (SX4). Rechazada la sección del dolor: ataca al cliente.
+8. **Una sola sección partida por deck.**
+9. **Navegación por cinco capítulos**, el mismo `progress.sections` en todas las páginas.
+10. **Desarrollo end to end** con una persona de Efeonce (`proposal-cinematic-web`, plate DV1).
+11. **Casos:** BICECORP, Banco BICE y Berel, con **cifras de ejemplo** hasta tener las reales.
+12. **Industrias** (seis, con la pregunta que ese comprador le hace a la IA) y **mercados** (cinco) de forma épica.
+13. **Anotaciones fuera del deck;** se quedan las marcas que exige el contrato (`mark`, `sampleMark`, `report.sample`).
+14. **Imágenes de ambiente para casos de cliente** en puesta en escena; el logo del cliente se compone desde el archivo
+    oficial, nunca lo genera el modelo.
+
 ### Notas del JSON que quedaron atrás
 
 El JSON se escribió antes de que el operador cerrara estas decisiones. Estas notas se leen a la luz de la lista de
@@ -313,6 +394,9 @@ arriba (el JSON no se corrigió en este cambio):
   hoy Greenhouse.
 - Varias recetas citan `cover-classic` o `close-classic` como alternativa (`preferInstead`): el marco clásico no fue
   aprobado y no se usa.
+- `content-report-formats.avoidWhen` y `.notes` dicen que el correo, el PDF A4 y el deck 16:9 están «por verificar»:
+  la sesión de Insights los verificó el 2026-09-30 (web y celular, PDF A4 y deck 16:9 vivos; modo presentación
+  desplegado sin probar; correo que llega solo NO vivo). Manda ese estado (norma §4.6, «Deck SEO/AEO»).
 
 ## Pendientes de QA
 
@@ -380,9 +464,11 @@ unos píxeles más ajustada.
 
 ## Qué sale hoy con un comando
 
-**Las 78 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer (57 plantillas) y
-salen con `pnpm brand:compose`. La columna «Plantilla» del índice lo dice por receta y se lee de `registry.json`;
-`recipe-map.json` ya no tiene recetas `blocked`. Las últimas en llegar fueron las nueve SEO/AEO (tabla de abajo).
+**94 de las 100 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer (73 plantillas
+en `registry.json`) y salen con `pnpm brand:compose`. La columna «Plantilla» del índice lo dice por receta y se lee de
+`registry.json`; `recipe-map.json` no tiene recetas `blocked`. Las últimas con plantilla fueron las dieciséis del deck
+Salesforce (TASK-1942); las seis del deck SEO/AEO la esperan (TASK-1949 Slice 2). Las nueve SEO/AEO del 2026-09-28,
+en la tabla de abajo.
 Antes, `cover-brochure-cine-lines-selection` (2026-09-28): contentType `deck.cover-brochure.document-selection`, sobre la misma plantilla `CoverBrochure`, que marca
 la respuesta como objetivo de la selección y tiene un slot `selection` opcional.
 
@@ -672,7 +758,7 @@ obligatorio.
 Sin binder, con su razón escrita en el mapa: las cifras de `decision-ai-market` (dato de mercado citado con fuente
 pública), el puntaje de `method-score-ring` (se calcula del scoring de Efeonce), el horizonte de `decision-plan` y los
 slots que eligen qué destaca la selección. Un test exige que todo slot `logo`, `money`, `metric`, `person` o de prueba
-de las 78 recetas tenga binder o exclusión.
+de las 100 recetas tenga binder o exclusión (las del deck SEO/AEO excluyen `productMark` y las cifras de maqueta).
 
 Reglas que no se negocian:
 
