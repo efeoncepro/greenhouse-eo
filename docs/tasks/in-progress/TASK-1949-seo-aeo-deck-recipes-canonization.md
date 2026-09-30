@@ -1,5 +1,17 @@
 # TASK-1949 — Canonizar el deck SEO/AEO (Search Visibility 360) de «La órbita»: 6 recetas nuevas, slots opcionales de submarca/equipo, usos aprobados, Composer y AXIS
 
+## Delta 2026-09-30 (c) — requiredUnless en el validador y largos de la aprobada
+
+- `validateDeckPlan` honra `requiredUnless` (catálogo de runtime, tipo y `render-index.mjs`, que además valida que apunte a un slot
+  de la receta); `content-text` ya no declara `productMark` y `PENDING_TEMPLATE_SLOTS` quedó vacío.
+- Máximos subidos al largo de la aprobada: `cover-brochure-line-engine` 33/30/48, `cover-proposal-orbit` answer 14,
+  `content-day-tools` answer 10 (receta y `slots.json`), `proposal-cinematic-aeo` answer 11; los `fit` lo dicen.
+- `content-report-formats`: estado verificado de los formatos de Insights y la decisión del operador de mostrarlos.
+- `pnpm vitest run src/lib/brand-surfaces scripts/creative`: 858/859; el rojo sigue siendo el snapshot revops del WIP ajeno.
+- Slice 3 (AXIS) bloqueado: el clasificador de permisos rechazó el push a `main` de AXIS y el release v0.3.40; espera la
+  autorización del operador. Los logos de BICE y BICECORP no entran a AXIS sin una autorización de uso registrada (a
+  diferencia de los partners); queda para el operador.
+
 ## Delta 2026-09-30 (b) — el operador deja los datos del deck tal cual
 
 - **Decisión del operador**, textual: «Deja esos datos... No marques nada en el deck como provisional, asumo la
@@ -323,7 +335,7 @@ Reglas obligatorias (inventario `ai-generations/2026-09-29_deck-seo-aeo-document
 - [x] Los tres planes del deck validan sin errores como fixtures probados en `validate.test.ts` (`golden-{completo,brochure,proposal}-seo.json`; sólo los seis avisos `recipe-without-template`).
 - [x] `pnpm brand:deck-recipes --check` pasa y `pnpm vitest run src/lib/brand-surfaces` está en verde (824/825 el 2026-09-30: el rojo es el snapshot de `deck-proposal-service-revops-intent.json`, causado por un cambio ajeno sin commitear en `recipes/proposal-service.ts`, no por esta task).
 - [ ] Las seis recetas nuevas tienen plantilla y componen con `pnpm brand:compose`; los slots opcionales componen con y sin el slot.
-- [ ] `validateDeckPlan` honra `requiredUnless`; `PENDING_TEMPLATE_SLOTS` quedó vacío.
+- [x] `validateDeckPlan` honra `requiredUnless`; `PENDING_TEMPLATE_SLOTS` quedó vacío (ff3cca87e, 2026-09-30; test «el eyebrow cede su lugar al lockup de submarca»).
 - [ ] Gate `graphic-line` a 0 px con el freeze declarado en `BASELINE_DELTAS.md`.
 - [ ] AXIS publica las recetas, las referencias del Lab y los logos de BICE y BICECORP con procedencia.
 - [x] Norma, README, manual, doc funcional, arquitectura y skills describen el deck SEO/AEO (norma §4.6 v1.17, catálogo v1.11, manual v1.12, funcional 2.8, arquitectura 1.6; skills `efeonce-graphic-line`, `deck-studio`, `seo-aeo-practice`, `efeonce-insights`, `axis-design-system` con espejo `.codex`; 2026-09-30).
