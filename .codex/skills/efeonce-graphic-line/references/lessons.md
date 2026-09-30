@@ -478,6 +478,12 @@
   negrita. La esfera de la respuesta convive con la de la órbita, como en el post con lente (A1). El halo sólo existe con
   su órbita; el avatar es A7 tal cual. En una franja 5,9:1 la órbita no cabe alrededor de la respuesta con aire: la
   pieza va sin órbita o la órbita rodea un objeto.
+- **El copy de una portada se escribe con la skill `copywriting`, no de corrido.** Síntoma: «los copies muchos están
+  malos, sobre todo el de lo irrepetible»; la frase de compromiso se había diluido en «Lo irrepetible» + una evidencia
+  explicativa. **Regla:** cargar `copywriting` (voz Efeonce: 7 creencias) antes de escribir la voz de una portada; cada
+  par necesita un recurso de memoria (antítesis, paralelismo, metáfora extendida) y la frase memorable puede partirse
+  entre respuesta y evidencia («¿Qué hace la IA por tu marca? **Lo repetible.** Para que tu equipo haga lo
+  **irrepetible**.»). Auditar la serie de corrido: respuestas distintas entre sí, ninguna negación en cadena.
 - **Los conectores no reemplazan la CLI.** Higgsfield topó su límite diario a mitad de ronda y Magnific cobraba 1.000
   créditos por GPT Image 2; ningún conector genera 6:1 nativo. **Regla:** producir con `pnpm ai:image` (GPT Image 2.5)
   según la decisión del 2026-09-30; si el entorno no tiene la clave, se declara el bloqueo en vez de cambiar de motor.
