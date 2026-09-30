@@ -484,6 +484,15 @@
   par necesita un recurso de memoria (antítesis, paralelismo, metáfora extendida) y la frase memorable puede partirse
   entre respuesta y evidencia («¿Qué hace la IA por tu marca? **Lo repetible.** Para que tu equipo haga lo
   **irrepetible**.»). Auditar la serie de corrido: respuestas distintas entre sí, ninguna negación en cadena.
+- **Un juego de palabras no reemplaza la lectura humana.** La segunda ronda («Lo repetible / lo irrepetible», «Una
+  orquesta», «Más manos») fue rechazada como «pésima fórmula»: sonaba ingeniosa en la mesa y, leída en dos segundos por
+  un CMO, no nombraba su problema. **Regla:** la pregunta es una escena en primera persona que el comprador ya vivió,
+  tomada del VOC de `docs/context/13_icp-buyer-personas-jtbd.md` («¿Otra reunión para alinear agencias?», «¿Y cuánto
+  vendió marketing?»); la respuesta es el alivio en 1–3 palabras comunes («Nunca más», «Aquí está»), y la evidencia
+  nombra sustantivos concretos (Google, ChatGPT, Gemini; pipeline; ventas). Prueba antes de entregar: léela en voz alta
+  como la vería alguien que no sabe quién es Efeonce; si hay que explicarla, se reescribe. Los mecanismos
+  (autorreferencia, tensión y alivio, concreción) son hipótesis de diseño, no garantía de recuerdo. La pregunta cabe en
+  una línea a 38/128 del dominante: en 5,9:1 eso son ~40 caracteres.
 - **Los conectores no reemplazan la CLI.** Higgsfield topó su límite diario a mitad de ronda y Magnific cobraba 1.000
   créditos por GPT Image 2; ningún conector genera 6:1 nativo. **Regla:** producir con `pnpm ai:image` (GPT Image 2.5)
   según la decisión del 2026-09-30; si el entorno no tiene la clave, se declara el bloqueo en vez de cambiar de motor.
