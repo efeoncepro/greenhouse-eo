@@ -1,9 +1,9 @@
 # Composición de decks y brochures de marca propia
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.7
+> **Version:** 2.8
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-29 por Claude (2.7: el operador aprobó todo el deck Salesforce, incluida la contraportada de brochure; la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto. Antes, 2.6: las 94 láminas se componen solas, incluidas las dieciséis del deck Salesforce; la contraportada de brochure Salesforce ya está compuesta y espera el visto bueno; la propuesta Salesforce existe como PDF sin insignia de partner (TASK-1942). Antes, 2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
+> **Ultima actualizacion:** 2026-09-30 por Claude (2.8: el deck SEO/AEO (Search Visibility 360) aprobado en tres documentos — seis láminas nuevas que todavía no se componen solas, logos de submarca opcionales, casos con cifras de ejemplo y logos que esperan autorización, formatos de Insights sólo si están vivos (TASK-1949). Antes, 2.7: el operador aprobó todo el deck Salesforce, incluida la contraportada de brochure; la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto. Antes, 2.6: las 94 láminas se componen solas, incluidas las dieciséis del deck Salesforce; la contraportada de brochure Salesforce ya está compuesta y espera el visto bueno; la propuesta Salesforce existe como PDF sin insignia de partner (TASK-1942). Antes, 2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
 > **Documentacion tecnica:** [Arquitectura de la composición de piezas de marca](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) · [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
 > **Manual de uso:** [Componer un deck con las recetas por lámina](../../manual-de-uso/creative/componer-deck-con-recetas.md) · [Componer una pieza por superficie con AXIS](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
 
@@ -21,7 +21,7 @@ y dice qué falló.
 | --- | --- |
 | ¿Para qué marca sirve? | Sólo para la marca propia de Efeonce. No es para piezas con la marca de un cliente, para las ofertas a comité ni para la interfaz de Greenhouse |
 | ¿Qué documentos arma? | Láminas sueltas y documentos completos: un **brochure** (presenta a Efeonce) o una **propuesta comercial** (va dirigida a un cliente). Las láminas también sirven para un pitch o un QBR |
-| ¿Cuántas láminas puede componer? | **Las 94** que el operador aprobó: 69 el 2026-09-27, nueve de SEO y AEO el 2026-09-28 y dieciséis del deck Salesforce el 2026-09-29 |
+| ¿Cuántas láminas puede componer? | **94 de las 100** que el operador aprobó: 69 el 2026-09-27, nueve de SEO y AEO el 2026-09-28, dieciséis del deck Salesforce el 2026-09-29 y seis del deck SEO/AEO el 2026-09-30. Esas seis todavía no se componen solas |
 | ¿Quién lo usa hoy? | Una persona o un agente, desde su equipo, con un comando |
 | ¿Está en el portal? | No. Hoy es un taller local. La ruta dentro de la plataforma (con permisos, cola y acceso para agentes) es TASK-1921, **en curso** |
 
@@ -33,8 +33,9 @@ y dice qué falló.
 
 ## Qué láminas se componen
 
-Las 94 láminas del deck están aprobadas y **las 94 se componen solas** (las del deck Salesforce desde el 2026-09-29;
-ver abajo, «El deck de la práctica Salesforce»). Cada una tiene una **receta** en el catálogo del
+Las 100 láminas del deck están aprobadas y **94 se componen solas** (las del deck Salesforce desde el 2026-09-29;
+ver abajo, «El deck de la práctica Salesforce»). Las seis láminas nuevas del deck SEO/AEO todavía no (ver «El deck
+SEO/AEO»). Cada una tiene una **receta** en el catálogo del
 deck: qué comunica, cuándo usarla, cuándo no y cuál conviene en su lugar, qué textos e imágenes se cambian y qué queda
 fijo. Las recetas se agrupan en familias:
 
@@ -83,7 +84,7 @@ Lo que **no** se usa, aunque el catálogo todavía lo nombre:
 | La portada y la contraportada «clásicas» | No fueron aprobadas; las reemplazan las portadas y contraportadas de arriba. No tienen plantilla |
 | Una portada o un cierre propios para pitch o QBR | No hay uno aprobado: se le pregunta al operador |
 
-> Detalle técnico: [catálogo de las 94 recetas](../../operations/brand-graphic-line/deck-recipes/README.md) (índice por
+> Detalle técnico: [catálogo de las 100 recetas](../../operations/brand-graphic-line/deck-recipes/README.md) (índice por
 > familia y JSON `efeonce.deck-slide-recipes.v1`) · 57 plantillas en
 > [`src/lib/artifact-composer/catalogs/graphic-line-deck/`](../../../src/lib/artifact-composer/catalogs/graphic-line-deck/)
 > (`registry.json`; varias recetas comparten plantilla) · correspondencia receta → plantilla en
@@ -130,6 +131,38 @@ láminas que no cabían en la receta que usaban tengan la suya.
 > Detalle técnico: [norma §4.6, «Deck de práctica Salesforce»](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) ·
 > [catálogo de recetas](../../operations/brand-graphic-line/deck-recipes/README.md) ·
 > [TASK-1942](../../tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md).
+
+## El deck SEO/AEO
+
+El 2026-09-30 el operador aprobó el deck que presenta **Search Visibility 360 (SV360)**, el servicio de visibilidad en
+Google y en los motores de IA, con sus piezas: el diagnóstico (AEO Assessment), su entregable (AI Visibility Report) y
+la edición mensual (Efeonce Insights). Se entrega de tres formas: **completo** (33 láminas), **brochure** (24) y
+**propuesta** (29), en cinco capítulos: el problema, SV360 y SEO, AEO, cómo trabajamos y por qué nosotros.
+
+- **Seis láminas nuevas:** la familia de marcas (qué hay dentro de SV360), lo que hace el equipo (con maquetas grandes
+  del trabajo técnico, del contenido y de la autoridad), cómo llega el informe (en qué formatos), el informe para el
+  comité ya armado, las industrias (la pregunta que cada comprador le hace a la IA) y los mercados (los cinco países,
+  vistos desde la órbita). **Todavía no se componen solas**: hoy se arman aparte y se insertan en el PDF.
+- **El resto usa láminas que ya existían**, con su contenido propio: las portadas con el logo de SV360, las propuestas
+  de SEO y AEO, el equipo con una bajada que nombra los roles, el día a día, los casos de éxito y los clientes.
+- **Logos de submarca:** cada lámina que habla de una pieza puede llevar su logo oficial (SV360, AEO, AEO Assessment,
+  AI Visibility Report o Insights), tal cual lo publica el sistema de diseño y nunca dibujado. En la propuesta AEO de
+  cine, el logo reemplaza la etiqueta de arriba.
+- **Casos de éxito:** BICECORP, Banco BICE y Berel, con imágenes de ambiente generadas para cada cliente y su logo
+  oficial puesto encima (nunca dibujado por la IA). **Las cifras son de ejemplo** y el uso de cada logo depende de la
+  autorización del cliente: con cualquiera de las dos cosas pendiente, el deck no sale a un cliente.
+- **Formatos del informe:** la lámina promete que el informe llega por varios canales. Al 2026-09-30 están vivos la web
+  y el celular, el PDF y el deck; el modo presentación no se ha probado con una edición real y **el correo que llega
+  solo todavía no existe**. Antes de mostrarlo a un cliente, lo que no está vivo se quita o se marca «próximamente»
+  (decisión pendiente del operador).
+- **Las notas quedan fuera de la lámina:** «datos de ejemplo» o «maqueta» van en las notas del plan; sólo se quedan
+  las marcas de muestra que el sistema exige.
+- **Una sola sección partida por deck** y las industrias como preguntas de ejemplo, no como casos.
+
+> Detalle técnico: [norma §4.6, «Deck SEO/AEO»](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) ·
+> [catálogo de recetas](../../operations/brand-graphic-line/deck-recipes/README.md) ·
+> [manual, «El deck SEO/AEO»](../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
+> [TASK-1949](../../tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-canonization.md).
 
 ## La portada con la selección de Nexa
 

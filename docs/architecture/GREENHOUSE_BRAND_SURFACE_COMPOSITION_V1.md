@@ -1,14 +1,14 @@
 # GREENHOUSE — Composición por superficie de «La órbita» en el Artifact Composer V1
 
 > **Tipo de documento:** Spec técnica (arquitectura del lado Greenhouse)
-> **Versión:** 1.5
+> **Versión:** 1.6
 > **Creado:** 2026-09-28 por Claude
-> **Última actualización:** 2026-09-29 por Claude (1.5: la insignia «Salesforce Partner» autorizada por Salesforce va por defecto en los intents del deck Salesforce con `readbackRef: salesforce-partner-authorization-2026-09-29`; la falla cerrada sigue para otros partners; SF20 con intent de ejemplo; nombre de paso de `proposal-service` a 28. Antes, 1.4: TASK-1942 — el deck de práctica Salesforce: 94 de 94 recetas con plantilla (familia `line-stage`, 16 recetas nuevas), marcas de terceros desde `AXIS_PARTNER_ASSETS` con falla cerrada (`readbackRef`, `authorizationRef`), `reservesByLine` y `sloganBlock`; pines AXIS 0.3.33 / brand-assets 0.4.4; §4.2, §6, §10 y §14. Antes, 1.3: TASK-1930 — §13 nueva, datos reales en los slots del deck: `bindDeckSlots`, mapa declarado, binders, regla de evidencia (ningún deck usa evidencia `internal`), rastro por slot y `pnpm brand:deck-plan -- --bind`; §9, §12.9 y §14 al día. Antes, 1.2: TASK-1934 — las nueve láminas SEO/AEO: 78 recetas y 57 plantillas (§4), builders en `recipes/seo-aeo/` (§5), prefijos CSS (§7.3), 3× y reglas nuevas (§8), AXIS `v0.3.22`/`v0.3.23` (§10), catálogo de runtime y códigos `variant-both-in-deck` y `figure-source-missing` (§12), pendientes (§13). Antes, 1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
+> **Última actualización:** 2026-09-30 por Claude (1.6: TASK-1949 Slice 1 — el deck SEO/AEO en el catálogo: 100 recetas y 94 con plantilla (seis nuevas sin plantilla), slots opcionales `productMark` y `section-cine-team.body`, campo `requiredUnless` en el eyebrow de `proposal-cinematic-seo`/`-aeo` (el validador y AXIS lo leen desde los Slices 2 y 3), `PENDING_TEMPLATE_SLOTS` temporal en la paridad, exclusiones de binding y tres planes golden SEO; §4.2, §4.3, §12.8, §13.3 y §14. Antes, 1.5: la insignia «Salesforce Partner» autorizada por Salesforce va por defecto en los intents del deck Salesforce con `readbackRef: salesforce-partner-authorization-2026-09-29`; la falla cerrada sigue para otros partners; SF20 con intent de ejemplo; nombre de paso de `proposal-service` a 28. Antes, 1.4: TASK-1942 — el deck de práctica Salesforce: 94 de 94 recetas con plantilla (familia `line-stage`, 16 recetas nuevas), marcas de terceros desde `AXIS_PARTNER_ASSETS` con falla cerrada (`readbackRef`, `authorizationRef`), `reservesByLine` y `sloganBlock`; pines AXIS 0.3.33 / brand-assets 0.4.4; §4.2, §6, §10 y §14. Antes, 1.3: TASK-1930 — §13 nueva, datos reales en los slots del deck: `bindDeckSlots`, mapa declarado, binders, regla de evidencia (ningún deck usa evidencia `internal`), rastro por slot y `pnpm brand:deck-plan -- --bind`; §9, §12.9 y §14 al día. Antes, 1.2: TASK-1934 — las nueve láminas SEO/AEO: 78 recetas y 57 plantillas (§4), builders en `recipes/seo-aeo/` (§5), prefijos CSS (§7.3), 3× y reglas nuevas (§8), AXIS `v0.3.22`/`v0.3.23` (§10), catálogo de runtime y códigos `variant-both-in-deck` y `figure-source-missing` (§12), pendientes (§13). Antes, 1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
 > **Estado:** vigente. Taller local (`pnpm brand:compose`) en `develop`; la ruta productiva gobernada es TASK-1921, en curso.
 > **Contrato y valores (AXIS):** ADR [`SURFACE_COMPOSITION_DECISION_V1.md`](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md) del repo `efeoncepro/axis-design-system` (contrato `efeonce.surface-composition` 0.1.2, deltas (b)…(n)); guía `docs/agent-composition/surfaces/deck.md` del mismo repo.
 > **Norma de marca:** [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (qué se aprobó por superficie, §2.1 ruta por el composer, §4.6 deck) · catálogo de recetas [`deck-recipes/`](../operations/brand-graphic-line/deck-recipes/README.md).
 > **Motor:** [`GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`](GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md) (el composer es domain-free; las superficies son catálogos) · invariantes [`COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`](agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md).
-> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69) · [TASK-1929](../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) (plan de deck contra el catálogo, §12; code complete, en cierre) · [TASK-1934](../tasks/complete/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) (las nueve láminas SEO/AEO: 78 de 78; complete) · [TASK-1930](../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md) (datos reales en los slots, §13; en curso).
+> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69) · [TASK-1929](../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) (plan de deck contra el catálogo, §12; code complete, en cierre) · [TASK-1934](../tasks/complete/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) (las nueve láminas SEO/AEO: 78 de 78; complete) · [TASK-1930](../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md) (datos reales en los slots, §13; en curso) · [TASK-1942](../tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md) (deck Salesforce: 94 de 94; complete) · [TASK-1949](../tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-canonization.md) (deck SEO/AEO: 100 recetas, 94 con plantilla; en curso).
 > **Manuales:** [componer por superficie con AXIS](../manual-de-uso/creative/componer-por-superficie-con-axis.md) · [componer un deck con las recetas](../manual-de-uso/creative/componer-deck-con-recetas.md) · runbook del gate [`composer-visual-gate.md`](../operations/runbooks/composer-visual-gate.md).
 
 ## 1. Qué es y dónde termina
@@ -193,6 +193,11 @@ catálogo de ofertas a comité y del deck SKY): mezclarlos degradaría lo que es
   plantilla más `cover-brochure-cine-lines-selection`, que estaba bloqueada hasta AXIS `v0.3.21`) y 9 con TASK-1934
   (siete plantillas nuevas y dos reutilizadas).
 
+- **Deck SEO/AEO (TASK-1949, 2026-09-30):** el catálogo pasa a **100 recetas, 94 con plantilla**. Las seis nuevas
+  (`content-brand-family`, `content-service-mockups`, `content-report-formats`, `content-committee-deck`,
+  `content-industries`, `content-markets`) no tienen fila en `recipe-map.json` todavía: el plan las avisa con
+  `recipe-without-template` y las plantillas llegan con el Slice 2 (sesión del Artifact Composer).
+
 ### 4.3 `recipe-map.json` y la paridad de slots
 
 Cada entrada: `{ contentType, example, slots }`. `example` apunta a un intent de pieza o a una página de un documento
@@ -211,6 +216,16 @@ Cada entrada: `{ contentType, example, slots }`. `example` apunta a un intent de
 Las 38 recetas de TASK-1928 y ocho de las nueve de TASK-1934 declaran `slots`; las 31 anteriores declaran
 `slots: null` porque su contrato sale del manifest de AXIS, y también `proposal-cinematic-seo`, como sus cuatro
 hermanas de cine: su plantilla compartida no admite los largos menores de una sola receta. Ejemplo (`decision-chart`): `"source": "source#composite"`, `"nav": "indicator"`.
+
+**Slots opcionales que esperan su plantilla (TASK-1949, temporal).** El catálogo declara `productMark` en recetas con
+plantilla y `section-cine-team.body`; mientras la plantilla no los tenga, `recipe-slot-parity.test.ts` los lista en
+`PENDING_TEMPLATE_SLOTS` (`content-text`, `proposal-service-seo`/`-aeo`, `method-score-ring`, `decision-diagnosis-map`,
+`content-day-live-results` y `section-cine-team.body`; las recetas con `slots: null` toman su contrato del manifest de
+AXIS). Sólo un slot **opcional** puede esperar, y la prueba falla si una entrada ya está mapeada: la lista se vacía
+en el Slice 2, con un test que compone cada receta **sin** el slot. **`requiredUnless`** (campo nuevo del esquema de
+slot, hoy sólo el eyebrow de `proposal-cinematic-seo`/`-aeo` con `productMark`): el slot es obligatorio salvo que venga
+el otro; el catálogo lo declara desde el Slice 1 y `validateDeckPlan` y el contrato AXIS lo hacen cumplir desde los
+Slices 2 y 3.
 
 ### 4.4 Las 78 recetas
 
@@ -740,6 +755,11 @@ aviso `rhythm-paper-run`.
 | `catalog-drift.test.ts` | corre `pnpm brand:deck-recipes -- --check`: el artefacto coincide con el JSON aprobado y los ejemplos |
 | `propose.test.ts` | con el cliente canónico simulado: golden, el enum de ids del documento, reintento, rechazo tras el reintento, proveedor caído, receta inventada y la allowlist del contexto |
 
+Planes del deck SEO/AEO (TASK-1949): `golden-completo-seo.json` (33), `golden-brochure-seo.json` (24) y
+`golden-proposal-seo.json` (29); `validate.test.ts` exige 0 errores y sólo los avisos `recipe-without-template` de las
+seis láminas nativas, en sus posiciones (`SEO_NATIVE`). Los intents de documento aprobados están como ejemplos en
+`src/lib/brand-surfaces/examples/deck-seo-{completo,brochure,propuesta}-document.json` (sin las seis nativas).
+
 Fixtures: `golden-brochure.json` (7 láminas), `golden-proposal.json` (9), `golden-pitch.json` (6; desde TASK-1934
 lleva `content-measure` en vez de `content-text`, que es variante de `decision-why-us`), `golden-qbr.json`
 (5), `adversarial.json` (15 casos) y `context-brochure.json` (el contexto de la corrida real). La task registra 52 tests
@@ -821,7 +841,7 @@ nunca «completa» un slot para que pase.
 
 ### 13.3 El mapa declarado y los binders
 
-`DECK_SLOT_BINDING_MAP` (`map.ts`) cubre las **78** recetas: todo slot `logo`, `money`, `metric` o `person` del
+`DECK_SLOT_BINDING_MAP` (`map.ts`) cubre las **100** recetas (`map.test.ts`): todo slot `logo`, `money`, `metric` o `person` del
 catálogo, y cada slot de prueba o de datos de muestra, tiene un binder o una exclusión con su razón. `map.test.ts` lo
 exige contra el catálogo de runtime: una receta nueva con un slot de datos sin fila rompe el test. Los slots de voz no
 están en el mapa: los propone TASK-1929 y los confirma una persona.
@@ -838,7 +858,10 @@ están en el mapa: los propone TASK-1929 y los confirma una persona.
 
 **Exclusiones con razón:** las cifras de `decision-ai-market` (dato de mercado citado), el puntaje de
 `method-score-ring` (se calcula desde la configuración del scoring), el horizonte de `decision-plan` y los slots de
-selección (una decisión de presentación, no un dato).
+selección (una decisión de presentación, no un dato). Deck SEO/AEO (TASK-1949): `productMark` en todas las recetas que
+lo declaran (marca propia de Efeonce que elige quien arma la lámina, `PRODUCT_MARK`) y las cifras de maqueta del
+producto (`content-service-mockups.authorityMetric`, `content-committee-deck.slideFigure`, `MOCKUP_FIGURE`): con datos
+reales salen de la edición de Insights del cliente con su fuente.
 
 **Muro de logos** (`content-clients`, `content-partners`): como mínimo **nueve** logos autorizados (`LOGO_WALL_MIN`,
 decisión del operador); con menos, `below-minimum`.
@@ -950,6 +973,13 @@ montos (Slice 5) esperan a TASK-1417 y el equipo (Slice 6), a TASK-1418; hasta e
   las marcas de Salesforce están autorizadas por Salesforce (declarado por el operador); sigue pendiente la autorización
   escrita de Anthropic para Claude y Claudeforce (TASK-1937); los plates `NXSF1`–`NXSF3` son rutas locales hasta
   TASK-1931. La serie HubSpot equivalente es TASK-1943.
+- **Deck SEO/AEO (TASK-1949, en curso):** Slice 1 hecho (catálogo, fixtures, exclusiones de binding, intents de
+  documento). Faltan: las plantillas de las seis recetas nuevas y de los slots opcionales, `requiredUnless` en
+  `validateDeckPlan` y en AXIS, el vaciado de `PENDING_TEMPLATE_SLOTS` y el freeze del gate `graphic-line` (Slice 2); las
+  recetas, referencias del Lab y logos de clientes en AXIS (Slice 3). Hasta entonces el PDF aprobado se hornea fuera del
+  compositor (`ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/`). Cuatro usos aprobados pasan un largo de
+  su receta (portada de línea, portada de propuesta, `content-day-tools`, AEO de cine): subir el máximo o acortar se
+  decide en el Slice 2. Los plates SX4, DV1, CS1b, CS2, CS3b y MK2 son rutas locales hasta TASK-1931.
 - **Largo en slots de texto con negrita:** `validateDeckPlan` mide un slot `text` con su marcado (`**`): el cuerpo
   aprobado de SF6 mide 124 visibles pero 128 con marcado contra un máximo de 125, así que un plan con el contenido
   literal de SF6 da `slot-over-max-chars` en `body`. Los planes golden no llevan ese contenido; decidir si los slots
