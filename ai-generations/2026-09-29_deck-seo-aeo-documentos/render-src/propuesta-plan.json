@@ -1,0 +1,85 @@
+{
+  "document": "proposal",
+  "line": "engine",
+  "diagnosisDone": false,
+  "slides": [
+    {
+      "recipeId": "cover-proposal-orbit"
+    },
+    {
+      "recipeId": "decision-ai-market"
+    },
+    {
+      "recipeId": "decision-ai-answer"
+    },
+    {
+      "recipeId": "decision-traffic-to-revenue"
+    },
+    {
+      "recipeId": "section-split",
+      "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/SX4-busqueda-y-respuesta.png"
+    },
+    {
+      "recipeId": "method-eeat"
+    },
+    {
+      "recipeId": "section-cine-team",
+      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png"
+    },
+    {
+      "recipeId": "proposal-service-seo",
+      "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png"
+    },
+    {
+      "recipeId": "proposal-service-aeo",
+      "plateRef": "ai-generations/2026-09-26_ooh-caminero-lente/plates/D2-led-medicion.png"
+    },
+    {
+      "recipeId": "proposal-cinematic-web",
+      "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/DV1-lo-hacemos.png"
+    },
+    {
+      "recipeId": "method-surround-cycle"
+    },
+    {
+      "recipeId": "content-day-tools"
+    },
+    {
+      "recipeId": "content-day-live-progress"
+    },
+    {
+      "recipeId": "content-day-live-results"
+    },
+    {
+      "recipeId": "decision-case",
+      "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS2-banco-bice.png"
+    },
+    {
+      "recipeId": "decision-case",
+      "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS1b-bice-tarjeta.png"
+    },
+    {
+      "recipeId": "decision-case",
+      "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS3b-berel-squad.png"
+    },
+    {
+      "recipeId": "decision-difference"
+    },
+    {
+      "recipeId": "decision-risk"
+    },
+    {
+      "recipeId": "decision-plan"
+    },
+    {
+      "recipeId": "content-pricing"
+    },
+    {
+      "recipeId": "decision-diagnosis-map"
+    },
+    {
+      "recipeId": "close-proposal-horizon",
+      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png"
+    }
+  ]
+}

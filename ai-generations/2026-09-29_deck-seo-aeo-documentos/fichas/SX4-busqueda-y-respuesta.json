@@ -1,0 +1,10 @@
+{
+  "id": "SX4-busqueda-y-respuesta",
+  "formato": "1:1",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (epic cinematic still, a vast dark architectural hall at night, the moment where search and the AI answer meet): two enormous glowing interface objects float in the air in the RIGHT two thirds of the frame, each as big as a bus, physical objects made of thick frosted white glass with softly rounded edges, slightly turned toward the camera. The first, lower and further back, is a long pill-shaped search bar with a simple magnifying-glass symbol cut into its left end and an empty field with a thin vertical caret. The second, higher and closer, is a wide rounded chat composer box with an empty input line and a round button with an up-arrow at its right end. Both are completely unbranded: no logos, no brand colors, no letters, no words, no numbers anywhere. Each object glows from inside with cool white light and casts a tall column of azure (#0375DB) light down through the haze onto a polished wet black floor; the two columns meet on the floor in one single small solid point of bright light between them, not a ring or circle. The glass shows real imperfections: fine dust on its surfaces, micro scratches, soft reflections of the hall. A single person in dark clothes stands small on the floor below them, seen from behind, looking up, giving the scale. The camera is far away with a long lens, low, compressing the space, focus on the objects. The LEFT 30% of the frame, from top to bottom, is only deep dark hall with faint haze: no objects, no light, no bright edges. Rich contrast, deep navy blacks, real film grain, photographic, not a 3D render.",
+  "lecho": { "objeto": "the dark blurred edge of the wet floor close to the lens at the bottom, outside every light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the deep dark hall on the left 30% of the frame", "tinta": "blanca" } }
+}

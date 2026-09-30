@@ -1,0 +1,11 @@
+{
+  "id": "SX1-seo-o-aeo",
+  "formato": "1:1",
+  "impacto": true,
+  "linea": "engine",
+  "objetos": [{ "objeto": "chaqueta-softshell-efeonce" }],
+  "palanca": "luz-motivada",
+  "escena": "SCENE (documentary still, an Efeonce SEO strategist at work late in the evening, the moment she compares how Google and an AI assistant answer the same question): a Latin American woman in her early thirties, dark hair tied back, wearing the Efeonce softshell jacket from the reference, seated at a dark desk in the RIGHT 65% of the frame, turned three-quarters toward the LEFT, leaning in toward a current thin laptop whose screen faces away from camera at a steep angle, so nothing on it can be read; its cool white glow is the key light on her face, hands and jacket from below and in front; her eyes focused, one hand on the trackpad, the other holding a pen just above the desk, mid-thought. A hard low rim from a second source behind her right shoulder separates her hair and shoulder from the wall. 85mm lens at f/2, camera at her eye level about two meters away, focus on her eyes. Contemporary room: a bare, evenly shadowed dark plaster wall behind her; no plants, no books, no printed paper, no lamps, no shelves anywhere in the frame, not even out of focus. The desk holds only the laptop and a plain azure-blue (#0375DB) notebook, closed. Nobody looks at the lens. The LEFT 30% of the frame, from top to bottom, is only the bare, evenly shadowed dark plaster wall: no light, no bright edge, nothing in it. Rich contrast, deep blacks, no readable text, no logos of any other brand.",
+  "lecho": { "objeto": "the edge of the dark oiled-wood desk on the camera side, dissolved into blur and outside every light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, evenly shadowed plaster wall on the left 30% of the frame", "tinta": "blanca" } }
+}

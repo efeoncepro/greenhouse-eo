@@ -1,0 +1,973 @@
+{
+ "v": 3,
+ "attachments": {},
+ "boards": {
+  "Brochure-01.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B01 · Portada · ¿Te encuentran Google y la IA? Visible.",
+   "w": 1920,
+   "x": 0,
+   "y": 0
+  },
+  "Brochure-02.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B02 · ¿Dónde busca tu cliente? En la IA.",
+   "w": 1920,
+   "x": 2000,
+   "y": 0
+  },
+  "Brochure-03.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B03 · ¿A quién recomienda la IA? A tu competencia.",
+   "w": 1920,
+   "x": 4000,
+   "y": 0
+  },
+  "Brochure-04.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B05 · Sección · ¿SEO o AEO? Ambos.",
+   "w": 1920,
+   "x": 0,
+   "y": 1200
+  },
+  "Brochure-05.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B09 · SEO · ¿Te encuentra Google? Y la IA.",
+   "w": 1920,
+   "x": 0,
+   "y": 2400
+  },
+  "Brochure-06.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B10 · ¿Por qué te citaría la IA? Porque confía.",
+   "w": 1920,
+   "x": 2000,
+   "y": 2400
+  },
+  "Brochure-07.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B11 · AEO · ¿Te distingue la IA? Entre miles.",
+   "w": 1920,
+   "x": 4000,
+   "y": 2400
+  },
+  "Brochure-08.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B12 · ¿Cómo se sostiene? En ciclo.",
+   "w": 1920,
+   "x": 6000,
+   "y": 2400
+  },
+  "Brochure-09.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B15 · Insights · ¿Cómo avanza? Cada mes.",
+   "w": 1920,
+   "x": 4000,
+   "y": 3600
+  },
+  "Brochure-10.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B18 · ¿Qué nos hace distintos? Lo puedes ver.",
+   "w": 1920,
+   "x": 2000,
+   "y": 4800
+  },
+  "Brochure-11.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B22 · AI Visibility Report · ¿Qué recibes primero? El mapa.",
+   "w": 1920,
+   "x": 2000,
+   "y": 6000
+  },
+  "Brochure-12.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B24 · Contraportada · ¿Conversamos? Cuando quieras.",
+   "w": 1920,
+   "x": 6000,
+   "y": 6000
+  },
+  "Brochure-About.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B04 · Quiénes somos · ¿Quiénes somos? Un solo equipo.",
+   "w": 1920,
+   "x": 6000,
+   "y": 0
+  },
+  "Brochure-Clientes.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B19 · Clientes · ¿Quién confía en nosotros? Marcas líderes.",
+   "w": 1920,
+   "x": 4000,
+   "y": 4800
+  },
+  "Brochure-Equipo.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B07 · Nuestro equipo · ¿Quién ejecuta tu SEO? Este equipo.",
+   "w": 1920,
+   "x": 4000,
+   "y": 1200
+  },
+  "Brochure-Pasos.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B23 · Próximos pasos · ¿Y ahora qué sigue? Empecemos.",
+   "w": 1920,
+   "x": 4000,
+   "y": 6000
+  },
+  "Brochure-Vivelo.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B14 · Vívelo · ¿Cómo avanza tu SEO? A la vista.",
+   "w": 1920,
+   "x": 2000,
+   "y": 3600
+  },
+  "Completo-01.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C01 · Portada · ¿Te encuentran Google y la IA? Visible.",
+   "w": 1920,
+   "x": 0,
+   "y": 0
+  },
+  "Completo-02.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C02 · ¿Dónde busca tu cliente? En la IA.",
+   "w": 1920,
+   "x": 2000,
+   "y": 0
+  },
+  "Completo-03.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C03 · ¿A quién recomienda la IA? A tu competencia.",
+   "w": 1920,
+   "x": 4000,
+   "y": 0
+  },
+  "Completo-04.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C04 · ¿Dónde termina el SEO? En ingresos.",
+   "w": 1920,
+   "x": 6000,
+   "y": 0
+  },
+  "Completo-05.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C06 · Sección · ¿SEO o AEO? Ambos.",
+   "w": 1920,
+   "x": 2000,
+   "y": 1200
+  },
+  "Completo-06.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C08 · SEO · ¿Qué mueve tu SEO? La base.",
+   "w": 1920,
+   "x": 6000,
+   "y": 1200
+  },
+  "Completo-07.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C11 · SEO · ¿Te encuentra Google? Y la IA.",
+   "w": 1920,
+   "x": 4000,
+   "y": 2400
+  },
+  "Completo-08.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C12 · ¿Por qué te citaría la IA? Porque confía.",
+   "w": 1920,
+   "x": 6000,
+   "y": 2400
+  },
+  "Completo-09.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C13 · AEO · ¿Te distingue la IA? Entre miles.",
+   "w": 1920,
+   "x": 0,
+   "y": 3600
+  },
+  "Completo-10.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C14 · ¿Te recomienda la IA? Capa por capa.",
+   "w": 1920,
+   "x": 2000,
+   "y": 3600
+  },
+  "Completo-11.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C15 · AEO Assessment · ¿Cómo te ve la IA? Mídelo.",
+   "w": 1920,
+   "x": 4000,
+   "y": 3600
+  },
+  "Completo-12.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C16 · AI Visibility Report · ¿Qué recibes primero? El mapa.",
+   "w": 1920,
+   "x": 6000,
+   "y": 3600
+  },
+  "Completo-13.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C18 · ¿Cómo se sostiene? En ciclo.",
+   "w": 1920,
+   "x": 2000,
+   "y": 4800
+  },
+  "Completo-14.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C21 · Insights · ¿Cómo avanza? Cada mes.",
+   "w": 1920,
+   "x": 0,
+   "y": 6000
+  },
+  "Completo-15.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C24 · ¿Cómo sabes que funciona? Lo medimos.",
+   "w": 1920,
+   "x": 6000,
+   "y": 6000
+  },
+  "Completo-16.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C30 · ¿Qué nos hace distintos? Lo puedes ver.",
+   "w": 1920,
+   "x": 2000,
+   "y": 8400
+  },
+  "Completo-17.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C33 · Contraportada · ¿Conversamos? Cuando quieras.",
+   "w": 1920,
+   "x": 0,
+   "y": 9600
+  },
+  "Completo-About.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C05 · Quiénes somos · ¿Quiénes somos? Un solo equipo.",
+   "w": 1920,
+   "x": 0,
+   "y": 1200
+  },
+  "Completo-Caso1.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C25 · Caso de éxito · ¿Qué cambió con BICECORP? Más visible.",
+   "w": 1920,
+   "x": 0,
+   "y": 7200
+  },
+  "Completo-Caso2.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C26 · Caso de éxito · ¿Qué logró Banco BICE? Más cuentas.",
+   "w": 1920,
+   "x": 2000,
+   "y": 7200
+  },
+  "Completo-Caso3.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C29 · Caso de éxito · ¿Qué cambió con Berel? Lo eligen.",
+   "w": 1920,
+   "x": 0,
+   "y": 8400
+  },
+  "Completo-Clientes.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C31 · Clientes · ¿Quién confía en nosotros? Marcas líderes.",
+   "w": 1920,
+   "x": 4000,
+   "y": 8400
+  },
+  "Completo-Equipo.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C09 · Nuestro equipo · ¿Quién ejecuta tu SEO? Este equipo.",
+   "w": 1920,
+   "x": 0,
+   "y": 2400
+  },
+  "Completo-Herramientas.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C19 · ¿Dónde ves lo que pasa? Todo junto.",
+   "w": 1920,
+   "x": 4000,
+   "y": 4800
+  },
+  "Completo-Pasos.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C32 · Próximos pasos · ¿Y ahora qué sigue? Empecemos.",
+   "w": 1920,
+   "x": 6000,
+   "y": 8400
+  },
+  "Completo-Vivelo.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C20 · Vívelo · ¿Cómo avanza tu SEO? A la vista.",
+   "w": 1920,
+   "x": 6000,
+   "y": 4800
+  },
+  "Familia-SV360-Brochure.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B06 · Familia de marcas · ¿Qué hay dentro? Cuatro piezas.",
+   "w": 1920,
+   "x": 2000,
+   "y": 1200
+  },
+  "Familia-SV360-Propuesta.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P06 · Familia de marcas · ¿Qué hay dentro? Cuatro piezas.",
+   "w": 1920,
+   "x": 2000,
+   "y": 1200
+  },
+  "Familia-SV360.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C07 · Familia de marcas · ¿Qué hay dentro? Cuatro piezas.",
+   "w": 1920,
+   "x": 4000,
+   "y": 1200
+  },
+  "Industrias-Brochure.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B20 · Industrias · ¿Conocemos tu industria? Por dentro.",
+   "w": 1920,
+   "x": 6000,
+   "y": 4800
+  },
+  "Industrias-Propuesta.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P21 · Industrias · ¿Conocemos tu industria? Por dentro.",
+   "w": 1920,
+   "x": 0,
+   "y": 6000
+  },
+  "Industrias.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C27 · Industrias · ¿Conocemos tu industria? Por dentro.",
+   "w": 1920,
+   "x": 4000,
+   "y": 7200
+  },
+  "Insights-Formatos-Brochure.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B17 · Insights · ¿Y el PPT del comité? Ya está.",
+   "w": 1920,
+   "x": 0,
+   "y": 4800
+  },
+  "Insights-Formatos-Propuesta.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P18 · Insights · ¿Y el PPT del comité? Ya está.",
+   "w": 1920,
+   "x": 2000,
+   "y": 4800
+  },
+  "Insights-Formatos.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C23 · Insights · ¿Y el PPT del comité? Ya está.",
+   "w": 1920,
+   "x": 4000,
+   "y": 6000
+  },
+  "Insights-Llega-Brochure.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B16 · Insights · ¿Cómo te llega? Como la necesites.",
+   "w": 1920,
+   "x": 6000,
+   "y": 3600
+  },
+  "Insights-Llega-Propuesta.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P17 · Insights · ¿Cómo te llega? Como la necesites.",
+   "w": 1920,
+   "x": 0,
+   "y": 4800
+  },
+  "Insights-Llega.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C22 · Insights · ¿Cómo te llega? Como la necesites.",
+   "w": 1920,
+   "x": 2000,
+   "y": 6000
+  },
+  "Main.dc.html": {
+   "h": 1080,
+   "page": "aprobadas",
+   "title": "01 · ¿Dónde busca tu cliente? En la IA.",
+   "w": 1920,
+   "x": 0,
+   "y": 0
+  },
+  "Propuesta-01.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P01 · Portada · ¿Qué movemos en 2027? Tu visibilidad.",
+   "w": 1920,
+   "x": 0,
+   "y": 0
+  },
+  "Propuesta-02.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P02 · ¿Dónde busca tu cliente? En la IA.",
+   "w": 1920,
+   "x": 2000,
+   "y": 0
+  },
+  "Propuesta-03.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P03 · ¿A quién recomienda la IA? A tu competencia.",
+   "w": 1920,
+   "x": 4000,
+   "y": 0
+  },
+  "Propuesta-04.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P04 · ¿Dónde termina el SEO? En ingresos.",
+   "w": 1920,
+   "x": 6000,
+   "y": 0
+  },
+  "Propuesta-05.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P05 · Sección · ¿SEO o AEO? Ambos.",
+   "w": 1920,
+   "x": 0,
+   "y": 1200
+  },
+  "Propuesta-06.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P07 · ¿Por qué te citaría la IA? Porque confía.",
+   "w": 1920,
+   "x": 4000,
+   "y": 1200
+  },
+  "Propuesta-07.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P10 · Propuesta SEO · ¿Cómo te encuentran? Con método.",
+   "w": 1920,
+   "x": 2000,
+   "y": 2400
+  },
+  "Propuesta-08.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P11 · Propuesta AEO · ¿Te distingue la IA? Entre miles.",
+   "w": 1920,
+   "x": 4000,
+   "y": 2400
+  },
+  "Propuesta-09.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P13 · ¿Cómo se sostiene? En ciclo.",
+   "w": 1920,
+   "x": 0,
+   "y": 3600
+  },
+  "Propuesta-10.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P16 · Insights · ¿Cómo avanza? Cada mes.",
+   "w": 1920,
+   "x": 6000,
+   "y": 3600
+  },
+  "Propuesta-11.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P24 · ¿Qué nos hace distintos? Lo puedes ver.",
+   "w": 1920,
+   "x": 6000,
+   "y": 6000
+  },
+  "Propuesta-12.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P25 · ¿Y si no funciona? Empiezas chico.",
+   "w": 1920,
+   "x": 0,
+   "y": 7200
+  },
+  "Propuesta-13.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P26 · ¿Qué pasa al empezar? Movimiento.",
+   "w": 1920,
+   "x": 2000,
+   "y": 7200
+  },
+  "Propuesta-14.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P27 · ¿Cómo se cotiza? Por capacidad.",
+   "w": 1920,
+   "x": 4000,
+   "y": 7200
+  },
+  "Propuesta-15.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P28 · AI Visibility Report · ¿Qué recibes primero? El mapa.",
+   "w": 1920,
+   "x": 6000,
+   "y": 7200
+  },
+  "Propuesta-16.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P29 · Contraportada · Empower your Engine",
+   "w": 1920,
+   "x": 0,
+   "y": 8400
+  },
+  "Propuesta-Caso1.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P19 · Caso de éxito · ¿Qué cambió con BICECORP? Más visible.",
+   "w": 1920,
+   "x": 4000,
+   "y": 4800
+  },
+  "Propuesta-Caso2.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P20 · Caso de éxito · ¿Qué logró Banco BICE? Más cuentas.",
+   "w": 1920,
+   "x": 6000,
+   "y": 4800
+  },
+  "Propuesta-Caso3.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P23 · Caso de éxito · ¿Qué cambió con Berel? Lo eligen.",
+   "w": 1920,
+   "x": 4000,
+   "y": 6000
+  },
+  "Propuesta-Equipo.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P08 · Nuestro equipo · ¿Quién ejecuta tu SEO? Este equipo.",
+   "w": 1920,
+   "x": 6000,
+   "y": 1200
+  },
+  "Propuesta-Herramientas.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P14 · ¿Dónde ves lo que pasa? Todo junto.",
+   "w": 1920,
+   "x": 2000,
+   "y": 3600
+  },
+  "Propuesta-Vivelo.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P15 · Vívelo · ¿Cómo avanza tu SEO? A la vista.",
+   "w": 1920,
+   "x": 4000,
+   "y": 3600
+  },
+  "SEO-02-ia-responde.dc.html": {
+   "h": 1080,
+   "page": "aprobadas",
+   "title": "02 · ¿A quién recomienda la IA? A tu competencia.",
+   "w": 1920,
+   "x": 2000,
+   "y": 0
+  },
+  "SEO-03-trafico-negocio.dc.html": {
+   "h": 1080,
+   "page": "aprobadas",
+   "title": "03 · ¿Dónde termina el SEO? En ingresos.",
+   "w": 1920,
+   "x": 4000,
+   "y": 0
+  },
+  "SEO-04-diferencia.dc.html": {
+   "h": 1080,
+   "page": "aprobadas",
+   "title": "04 · ¿Qué nos hace distintos? Lo puedes ver.",
+   "w": 1920,
+   "x": 0,
+   "y": 1200
+  },
+  "SEO-05-eeat.dc.html": {
+   "h": 1080,
+   "page": "aprobadas",
+   "title": "05 · ¿Por qué te citaría la IA? Porque confía.",
+   "w": 1920,
+   "x": 2000,
+   "y": 1200
+  },
+  "SEO-06-ciclo.dc.html": {
+   "h": 1080,
+   "page": "aprobadas",
+   "title": "06 · ¿Cómo se sostiene? En ciclo.",
+   "w": 1920,
+   "x": 4000,
+   "y": 1200
+  },
+  "SEO-07-propuesta-sobria.dc.html": {
+   "h": 1080,
+   "page": "aprobadas",
+   "title": "07a · Propuesta SEO sobria (variante de 07b)",
+   "w": 1920,
+   "x": 0,
+   "y": 2400
+  },
+  "SEO-08-propuesta-cine.dc.html": {
+   "h": 1080,
+   "page": "aprobadas",
+   "title": "07b · Propuesta SEO cine (variante de 07a)",
+   "w": 1920,
+   "x": 2000,
+   "y": 2400
+  },
+  "SEO-09-diagnostico.dc.html": {
+   "h": 1080,
+   "page": "aprobadas",
+   "title": "08 · ¿Qué recibes primero? El mapa.",
+   "w": 1920,
+   "x": 4000,
+   "y": 2400
+  },
+  "SEO-Servicios-Brochure.dc.html": {
+   "h": 1080,
+   "page": "brochure",
+   "title": "B08 · ¿Y qué hace ese equipo? Todo esto.",
+   "w": 1920,
+   "x": 6000,
+   "y": 1200
+  },
+  "SEO-Servicios-Propuesta.dc.html": {
+   "h": 1080,
+   "page": "propuesta",
+   "title": "P09 · ¿Y qué hace ese equipo? Todo esto.",
+   "w": 1920,
+   "x": 0,
+   "y": 2400
+  },
+  "SEO-Servicios.dc.html": {
+   "h": 1080,
+   "page": "completo",
+   "title": "C10 · ¿Y qué hace ese equipo? Todo esto.",
+   "w": 1920,
+   "x": 2000,
+   "y": 2400
+  },
+  "Completo-Dev.dc.html": {
+   "h": 1080,
+   "w": 1920,
+   "page": "completo",
+   "title": "C17 · Desarrollo web · ¿Y si hay que tocar código? Lo hacemos.",
+   "x": 0,
+   "y": 4800
+  },
+  "Brochure-Dev.dc.html": {
+   "h": 1080,
+   "w": 1920,
+   "page": "brochure",
+   "title": "B13 · Desarrollo web · ¿Y si hay que tocar código? Lo hacemos.",
+   "x": 0,
+   "y": 3600
+  },
+  "Propuesta-Dev.dc.html": {
+   "h": 1080,
+   "w": 1920,
+   "page": "propuesta",
+   "title": "P12 · Desarrollo web · ¿Y si hay que tocar código? Lo hacemos.",
+   "x": 6000,
+   "y": 2400
+  },
+  "Mercados.dc.html": {
+   "h": 1080,
+   "w": 1920,
+   "page": "completo",
+   "title": "C28 · Mercados · ¿Dónde operamos? Cinco países.",
+   "x": 6000,
+   "y": 7200
+  },
+  "Mercados-Brochure.dc.html": {
+   "h": 1080,
+   "w": 1920,
+   "page": "brochure",
+   "title": "B21 · Mercados · ¿Dónde operamos? Cinco países.",
+   "x": 0,
+   "y": 6000
+  },
+  "Mercados-Propuesta.dc.html": {
+   "h": 1080,
+   "w": 1920,
+   "page": "propuesta",
+   "title": "P22 · Mercados · ¿Dónde operamos? Cinco países.",
+   "x": 2000,
+   "y": 6000
+  }
+ },
+ "createdOnFiles": {
+  "at": "2026-09-29T21:10:00Z",
+  "v": 1
+ },
+ "designSystems": [
+  {
+   "artifact": "https://claude.ai/code/artifact/0f7107f2-2ef1-460c-af82-5bf59e2f8785",
+   "copiedAt": "2026-09-29T21:10:00Z",
+   "namespace": "la-orbita",
+   "title": "Efeonce — La órbita",
+   "version": "1790588630-c5a0"
+  }
+ ],
+ "launch": {
+  "page": "completo",
+  "view": "canvas"
+ },
+ "notes": {
+  "n-anotaciones-brochure": {
+   "fill": "blue",
+   "page": "brochure",
+   "size": 22,
+   "text": "NOTAS (fuera del deck): Industrias: preguntas de ejemplo. · Servicios SEO e Insights: maquetas con datos de muestra. · Vívelo: landing «norte» ficticia. · Próximos pasos: fechas del 5 al 9 de octubre. · Marcas obligatorias del compositor: «Ejemplo ilustrativo» (B03) y «Datos de muestra» en el mapa y el reporte mensual.",
+   "w": 2000,
+   "x": 0,
+   "y": -560
+  },
+  "n-anotaciones-completo": {
+   "fill": "blue",
+   "page": "completo",
+   "size": 22,
+   "text": "NOTAS (fuera del deck): Casos BICECORP, Banco BICE y Berel: cifras, fuente y período son de EJEMPLO hasta recibir los datos reales; las fotos son imágenes de ambiente generadas, no del caso. · Industrias: las preguntas son de ejemplo. · Servicios SEO e Insights (vivo, llega, formatos): maquetas con datos de muestra. · Vívelo: la landing «norte» es ficticia. · Próximos pasos: fechas del 5 al 9 de octubre, moverlas al usarla. · Marcas que exige el compositor y no se pueden quitar: «Ejemplo ilustrativo» (C03), «Datos de muestra» en el mapa del AI Visibility Report y en el reporte mensual.",
+   "w": 2000,
+   "x": 2000,
+   "y": -560
+  },
+  "n-anotaciones-propuesta": {
+   "fill": "blue",
+   "page": "propuesta",
+   "size": 22,
+   "text": "NOTAS (fuera del deck): Casos BICECORP, Banco BICE y Berel: cifras, fuente y período son de EJEMPLO hasta recibir los datos reales; las fotos son imágenes de ambiente generadas. · Industrias: preguntas de ejemplo. · Servicios SEO e Insights: maquetas con datos de muestra. · Vívelo: landing «norte» ficticia. · Marcas obligatorias del compositor: «Ejemplo ilustrativo» (P03) y «Datos de muestra» en el mapa y el reporte mensual.",
+   "w": 2000,
+   "x": 0,
+   "y": -560
+  },
+  "s-marcas": {
+   "fill": "blue",
+   "page": "completo",
+   "size": 24,
+   "text": "Los logos de producto (SV360, AEO, AEO Assessment, AI Visibility Report, Insights) son capas encima de cada lámina, con los archivos oficiales sin editar: se pueden mover. La lámina de la familia de marcas es nueva y está fuera del catálogo del compositor.",
+   "w": 1400,
+   "x": 0,
+   "y": -560
+  },
+  "t-aprobadas": {
+   "kind": "title1",
+   "maxW": 5920,
+   "page": "aprobadas",
+   "text": "SEO/AEO · las 9 láminas aprobadas el 28-09",
+   "w": 240,
+   "x": 0,
+   "y": -330
+  },
+  "t-brochure": {
+   "kind": "title1",
+   "maxW": 7920,
+   "page": "brochure",
+   "text": "SEO y AEO · Brochure (24) · se lee sin presentador",
+   "w": 240,
+   "x": 0,
+   "y": -330
+  },
+  "t-completo": {
+   "kind": "title1",
+   "maxW": 7920,
+   "page": "completo",
+   "text": "SEO y AEO · Deck completo (33) · con las marcas SV360, AEO, AEO Assessment, AI Visibility Report e Insights",
+   "w": 240,
+   "x": 0,
+   "y": -330
+  },
+  "t-propuesta": {
+   "kind": "title1",
+   "maxW": 7920,
+   "page": "propuesta",
+   "text": "SEO y AEO · Propuesta comercial (29) · logo del cliente y montos en [MONTO]",
+   "w": 240,
+   "x": 0,
+   "y": -330
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "SEO-02-ia-responde.dc.html",
+  "SEO-03-trafico-negocio.dc.html",
+  "SEO-04-diferencia.dc.html",
+  "SEO-05-eeat.dc.html",
+  "SEO-06-ciclo.dc.html",
+  "SEO-07-propuesta-sobria.dc.html",
+  "SEO-08-propuesta-cine.dc.html",
+  "SEO-09-diagnostico.dc.html",
+  "Completo-01.dc.html",
+  "Completo-02.dc.html",
+  "Completo-03.dc.html",
+  "Completo-04.dc.html",
+  "Completo-About.dc.html",
+  "Completo-05.dc.html",
+  "Familia-SV360.dc.html",
+  "Completo-06.dc.html",
+  "Completo-Equipo.dc.html",
+  "SEO-Servicios.dc.html",
+  "Completo-07.dc.html",
+  "Completo-08.dc.html",
+  "Completo-09.dc.html",
+  "Completo-10.dc.html",
+  "Completo-11.dc.html",
+  "Completo-12.dc.html",
+  "Completo-Dev.dc.html",
+  "Completo-13.dc.html",
+  "Completo-Herramientas.dc.html",
+  "Completo-Vivelo.dc.html",
+  "Completo-14.dc.html",
+  "Insights-Llega.dc.html",
+  "Insights-Formatos.dc.html",
+  "Completo-15.dc.html",
+  "Completo-Caso1.dc.html",
+  "Completo-Caso2.dc.html",
+  "Industrias.dc.html",
+  "Mercados.dc.html",
+  "Completo-Caso3.dc.html",
+  "Completo-16.dc.html",
+  "Completo-Clientes.dc.html",
+  "Completo-Pasos.dc.html",
+  "Completo-17.dc.html",
+  "Brochure-01.dc.html",
+  "Brochure-02.dc.html",
+  "Brochure-03.dc.html",
+  "Brochure-About.dc.html",
+  "Brochure-04.dc.html",
+  "Familia-SV360-Brochure.dc.html",
+  "Brochure-Equipo.dc.html",
+  "SEO-Servicios-Brochure.dc.html",
+  "Brochure-05.dc.html",
+  "Brochure-06.dc.html",
+  "Brochure-07.dc.html",
+  "Brochure-08.dc.html",
+  "Brochure-Dev.dc.html",
+  "Brochure-Vivelo.dc.html",
+  "Brochure-09.dc.html",
+  "Insights-Llega-Brochure.dc.html",
+  "Insights-Formatos-Brochure.dc.html",
+  "Brochure-10.dc.html",
+  "Brochure-Clientes.dc.html",
+  "Industrias-Brochure.dc.html",
+  "Mercados-Brochure.dc.html",
+  "Brochure-11.dc.html",
+  "Brochure-Pasos.dc.html",
+  "Brochure-12.dc.html",
+  "Propuesta-01.dc.html",
+  "Propuesta-02.dc.html",
+  "Propuesta-03.dc.html",
+  "Propuesta-04.dc.html",
+  "Propuesta-05.dc.html",
+  "Familia-SV360-Propuesta.dc.html",
+  "Propuesta-06.dc.html",
+  "Propuesta-Equipo.dc.html",
+  "SEO-Servicios-Propuesta.dc.html",
+  "Propuesta-07.dc.html",
+  "Propuesta-08.dc.html",
+  "Propuesta-Dev.dc.html",
+  "Propuesta-09.dc.html",
+  "Propuesta-Herramientas.dc.html",
+  "Propuesta-Vivelo.dc.html",
+  "Propuesta-10.dc.html",
+  "Insights-Llega-Propuesta.dc.html",
+  "Insights-Formatos-Propuesta.dc.html",
+  "Propuesta-Caso1.dc.html",
+  "Propuesta-Caso2.dc.html",
+  "Industrias-Propuesta.dc.html",
+  "Mercados-Propuesta.dc.html",
+  "Propuesta-Caso3.dc.html",
+  "Propuesta-11.dc.html",
+  "Propuesta-12.dc.html",
+  "Propuesta-13.dc.html",
+  "Propuesta-14.dc.html",
+  "Propuesta-15.dc.html",
+  "Propuesta-16.dc.html"
+ ],
+ "pages": [
+  {
+   "id": "completo",
+   "name": "Completo · 33"
+  },
+  {
+   "id": "brochure",
+   "name": "Brochure · 24"
+  },
+  {
+   "id": "propuesta",
+   "name": "Propuesta · 29"
+  },
+  {
+   "id": "aprobadas",
+   "name": "Aprobadas 28-09"
+  }
+ ],
+ "title": "Deck SEO Efeonce"
+}

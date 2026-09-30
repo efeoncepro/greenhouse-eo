@@ -1,0 +1,2 @@
+banco_bice_logo_color.svg <- https://bice.modyocdn.com/uploads/d70af71e-08c4-4931-bd15-44afe0db6bd5/original/banco_bice_logo_color.svg (banco.bice.cl, 2026-09-30)
+bicecorp_logo.svg <- https://bice.modyocdn.com/uploads/e4dbeec1-00dc-41e3-bba6-bc6a4a2bb35b/original/bicecorp_logo.svg (bicecorp.com, 2026-09-30)
