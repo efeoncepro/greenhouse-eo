@@ -51,6 +51,33 @@ Corregir el texto o elegir otra variante admitida; no inventar geometría ni red
 Validar y renderizar no aprueba derechos, contraste u oferta. Una fotografía nueva mediante
 `broker-run` y su recuperación requieren pruebas separadas.
 
+## Sustitución fotográfica probada — candidato PR 9, 2026-09-30
+
+[PR 9](https://github.com/efeoncepro/creative-workbench/pull/9), head `ed043f4`, prepara
+`sky-airline.photograph.native-focus-cover` 1.0.0 para tres pins/slots exactos: 2611, 3378 y 4616.
+Los STRETCH preservan el foco normalizado de la fuente; el FIT admitido usa cover central.
+Escala proporcional y recorte dentro de la caja nativa, sin bandas. El FILL de 2630 sigue nativo.
+Originales y referencias no cambian. Fuera de esos pins, STRETCH sigue gated y FIT necesita proporción compatible.
+El job no puede elegir crop/foco/receta; plan y `qa.photoFit` muestran admisión y ventana visible.
+
+La descarga real del UUID `2024a611-873e-4c69-a651-09290408c345` recuperó el run broker
+`ef508e41-8a29-4cb4-bead-6a8950851bd7`. La imagen SHA
+`1dd0f3230549e0fbaec33fe7fe0077b18274bbfcbd84427921213ca65ab42172` es distinta del PNG que
+el operador aprobó inicialmente: no hereda esa revisión. Se compuso con copy explícito Norte en
+`projects/sky/always-on-photo-demo`; cuatro validaciones/corridas reales completadas, cero proveedores.
+Canon privado: `/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-30/always-on-photo-demo/`.
+
+Revisión de píxeles: cuadrado/story pierden contraste en texto blanco; legal de 4:5 cruza zonas claras,
+y el hito se recorta en verticales. Las pruebas requieren otra foto apropiada antes de una campaña.
+No modificar estilos, añadir scrim ni afirmar aprobación porque el contrato técnico validó.
+La variante banner conserva el CTA legible; tampoco concede aprobación comercial.
+
+Pruebas locales del candidato: 258 privadas PASS sin skips; 240 públicas PASS y exactamente 18 SKIP
+licenciadas. Gates PASS. El merge/deploy se verifica separadamente; estos datos no prueban runtime
+ni activan IA. Leer en Workbench `docs/architecture/workbench-sky-photo-frame.md` y el README de
+la pieza para reproducción, procedencia, recorte y diagnóstico. La recuperación exige conservar
+la intención original; otra persona necesita un UUID propio, no copiar el binding/dueño.
+
 ## Antes del diseño
 
 Identificar cliente `sky`, marca `sky-airline`, pieza y campaña. Recoger objetivo, mercado,
@@ -127,7 +154,8 @@ Si la foto se generó con un pack anterior, su recuperación no la admite autom�
 componer. La regla predecessor activa debe autorizar ese SHA y todos sus recursos originales
 seguir admitidos sin cambios. No crear la regla desde el job.
 
-FILL conserva encuadre nativo y registra recorte; FIT exige proporción compatible. Una imagen
+FILL conserva encuadre nativo y registra recorte; FIT exige proporción compatible fuera de
+las tres admisiones del candidato PR 9. No asumir que ese candidato esté en main: verificar head/merge. Una imagen
 correcta aislada puede perder foreground, rostro, hito o reserva de texto al entrar en el slot.
 Inspeccionar cada adaptación. Para crear/admitir una foto leer `sky-photography.md`.
 

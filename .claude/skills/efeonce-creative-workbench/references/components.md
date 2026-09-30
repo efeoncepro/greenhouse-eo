@@ -122,3 +122,12 @@ registrar metadata/pins/version/hash. No identificar CTA por texto o rectángulo
 metadata pública y comparación privada; sin canon, un test no certifica una extracción nueva.
 No re-sellar pack ni reescribir QA/outcomes antiguos. Procedimiento detallado y límites de tokens
 disponibles frente a bindings Figma en [recetas](recipes.md).
+
+## Fotografía sustituible: candidato PR 9
+
+`photo-frame.mjs` se incorpora al digest del adapter; admite exactamente story 2611, banner 3378
+ y 4:5 4616 por SHA y slot propios de SKY. Receta native-focus-cover 1.0.0: ventana proporcional
+sobre bytes broker verificados, foco fuente o centro FIT, clamping dentro del archivo, sin bandas
+ni opciones de crop en un job. Plan/QA registran receta y fracción visible. FILL no cambia;
+las demás fuentes no heredan admisión. Ver `sky-production.md` para pruebas y problemas visuales
+pendientes; el encuadre técnico no concede legibilidad o aprobación. PR/head/merge se verifican aparte.
