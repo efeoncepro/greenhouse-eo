@@ -1,5 +1,37 @@
 # Corte de continuidad: 2026-09-30
 
+## Corte nuevo: producción SKY y guard de pago — 2026-09-30
+
+Baseline de esta unidad: `609d876feeef46b5785171d321fb4898ad9973cf`; incluye PR 8 y PR 9,
+pruebas modulares y reemplazo de foto proporcional por fuente exacta. Efeonce ID continúa diferido
+por decisión del operador; TASK-1952 creada/localmente validada, sin implementación.
+
+Nueva unidad independiente [PR 10](https://github.com/efeoncepro/creative-workbench/pull/10),
+head `4d3cd8cfd1933f53f87112143d2adf9a2abd7749`, branch codex/broker-final-payment-guard:
+extrae el guard monetario final del candidato de identidad sin activar su autenticación.
+62 focales PASS; privado 264 PASS/0 SKIP; público 246 PASS/18 SKIP exactos; cuatro gates PASS.
+PR 10 MERGED en main `8b6bfe926ccd22cde4f700bb85d24d0ed2b69fef` a las 19:50:57 UTC, árbol
+idéntico al head. CI postmerge gates/native-harness/lab-checks SUCCESS y estado Vercel SUCCESS,
+verificados por APIs. Broker sin deploy nuevo; esos checks no acreditan contenido público del Lab.
+
+Cloud Run revalidado: 00008-tv6 mantiene 100% del tráfico y generación false; candidata
+00010-cof con tag bound-identity mantiene 0%. No confundir main mergeado con revisión productiva.
+Faltan techos verificables de inputs/output, cotizaciones/reserva admitidas, deploy monetario,
+canary autorizado y cierre del flujo IA. Efeonce ID se retomará mediante la task, después del flujo.
+
+Prueba de foto Always On anterior recupera una corrida existente sin nuevo pago y compone cuatro
+formatos: fotografía recibida SHA1dd0f323… (distinta de la aprobada originalmente), runs separados
+para cuadrado/story/4:5/banner; entregables privados bajo el canon 2026-09-30/always-on-photo-demo.
+La selección del Lab muestra esa prueba; legibilidad de texto blanco sobre cielo/terreno falla
+en partes. No heredar aprobación visual ni comercial; sigue pendiente una fotografía adecuada
+para las reservas nativas. Ver verification.json del proyecto y references/sky-production.md.
+
+Los cortes inferiores son historia, especialmente cualquier main96eab1e, propuesta OAuth propia
+y obligación de terminar identidad antes de composición: la prioridad posterior del operador es
+producción, conservando IA OFF y controles monetarios. La autenticación definitiva reutilizará
+Efeonce ID, nunca un AUTH paralelo. Ver [budget.md](budget.md) para el port y sus límites.
+
+
 ## Corte vigente: canary de identidad 9/9, candidato sin promoción — 2026-09-30
 
 **Git y CI:** Greenhouse registró documentos propios en `ccabbbf1e9e24e4760700bbad2bea052f4a31756`

@@ -312,3 +312,11 @@ Otro SUB, token vencido firmado, binding revocado y team withdrawal sólo fixtur
 real certificada; sin recovery real nuevo ni paid calls. Policy budgetv2 draft50USD/persona500org,
 quotes0 e IA OFF. Sin merge/promoción; main96eab1e. Docs GH ccabbbf1 y95125d8a6 sin push.
 Tarea in-progress, criterios no auditados sin marcar. [Evidencia/pins y pendientes](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md).
+
+## Delta 2026-09-30 — consumer Efeonce ID diferido
+
+Por decisión posterior de Julio, priorizar el flujo productivo y reutilizar el AUTH común de Efeonce.
+[TASK-1952](../to-do/TASK-1952-creative-workbench-efeonce-id-integration.md) queda como dueña del consumer
+backend/CLI Efeonce ID, dependiente de TASK-1834 Slices 0–1. No construir otro OAuth Google propio como
+solución definitiva. Esta task conserva entrada IA, GitHub App, cupos y gates de producción; el registro
+del follow-up no altera los canaries históricos ni demuestra sesiones Efeonce ID o promoción de runtime.

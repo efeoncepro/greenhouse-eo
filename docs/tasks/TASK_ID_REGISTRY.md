@@ -2436,3 +2436,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro Codex 2026-09-30: TASK-1950 foundation X-Ray por goal confirmado; TASK-1951 reservada para consumer UI dependiente. TASK-1410 permanece complete como legacy. Siguiente ID libre `TASK-1952`.
 
 | `TASK-1951` | `in-progress` | AEO X-Ray: demo inmersiva Pichincha publicada; integración pendiente | `docs/tasks/in-progress/TASK-1951-aeo-xray-experience.md` |
+
+| `TASK-1952` | `to-do` | Creative Workbench: integración backend con Efeonce ID | `docs/tasks/to-do/TASK-1952-creative-workbench-efeonce-id-integration.md` |
+
+> Registro Codex 2026-09-30: TASK-1952 por pedido de Julio para diferir la integración Workbench/Efeonce ID hasta después del flujo productivo. Barrido por dominio identity y superficies issuer/broker/transporte: TASK-1834 conserva foundation first-party común; TASK-1947 conserva entrada IA, GitHub App y cupos; TASK-1898 es consumer Studio, no Workbench. Esta unidad es consumer backend standalone, sin nuevas cuentas, cambios a CLI locales ni activación IA. Siguiente ID libre `TASK-1953`.

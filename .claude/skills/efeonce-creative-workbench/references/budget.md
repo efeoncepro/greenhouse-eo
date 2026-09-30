@@ -1,5 +1,32 @@
 # Presupuesto del broker — continuidad 2026-09-30
 
+## Corte nuevo: port monetario independiente mergeado en PR 10 — 2026-09-30
+
+[Workbench PR 10](https://github.com/efeoncepro/creative-workbench/pull/10), head
+`4d3cd8cfd1933f53f87112143d2adf9a2abd7749`, parte de main `609d876feeef46b5785171d321fb4898ad9973cf`.
+Merge verificado `8b6bfe926ccd22cde4f700bb85d24d0ed2b69fef` (19:50:57 UTC); gates, native-harness,
+lab-checks y Vercel SUCCESS en ese main. Se porta sólo el guard final de pago, sin
+minter/binding/headers/sesión Google del candidato PR 7.
+La integración Efeonce ID se difirió expresamente y tiene TASK-1952 en Greenhouse.
+
+Contrato implementado en esta rama: secreto/body → callback server-owned exactamente una vez →
+ledger durable → GitHub vivo y policy/pack del canon → ticket exacto consumido síncronamente → POST.
+Se preserva el transporte vigente; no se lo certifica como autenticación definitiva. Un guard
+omitido/denegado/repetido/concurrente invalida outputs, incluso si se captura la denegación.
+El marcador de repetición es irreversible, también si la primera llamada termina después.
+
+Focal final 62 PASS. Privado 257 harness + 7 SKY PASS/0 SKIP; público 241 + 5 PASS, exactamente
+16 + 2 SKIP licenciados. Revisión independiente sin fallo de implementación; se corrigió el test
+para separar vencimiento de cotización dentro del mismo mes de rollover y contar invocaciones
+reales del adapter en replay. Cuatro gates verdes. Fixtures no leen secretos reales ni pagan.
+
+Readback Cloud Run en este corte: 00008-tv6, 100% tráfico, WORKBENCH_GENERATION_ENABLED=false;
+00010-cof, tag bound-identity y 0%. Guard nuevo no desplegado; policy draft, quotes vacías y
+reserva cero. Techos demostrados/admisión, deploy y canary monetario siguen pendientes.
+La secuencia detallada inferior incluye capacidades de la candidata PR 7; su reauth antes de
+entrega no se porta en PR 10 ni debe darse por desplegada. Revalidar PR/CI/runtime antes de operar.
+
+
 Canon: `creative-workbench/docs/architecture/workbench-broker-budget.md`; implementación
 `services/production-broker/budget.mjs`, esquema policy v2. El operador aprobó **50 USD por
 integrante y 500 USD para toda la organización por mes UTC**, compartidos entre todas las marcas.

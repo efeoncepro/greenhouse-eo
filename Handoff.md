@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Workbench:** [TASK-1952](docs/tasks/to-do/TASK-1952-creative-workbench-efeonce-id-integration.md), Efeonce ID diferido; primero producción.
+
 **Deck SEO/AEO — Search Visibility 360 (30/09):** [TASK-1949](docs/tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-canonization.md) in-progress, code complete parcial: Slices 1 y 4 hechos (catálogo a 100 recetas, planes golden, docs y skills); Slice 2 (plantillas) y 3 (AXIS) en otras sesiones. Datos del deck tal cual por decisión del operador; logos de clientes con TASK-1937.
 
 **DataForSEO CLI (30/09):** [TASK-1948](docs/tasks/complete/TASK-1948-dataforseo-url-keyword-relevance-cli.md) complete local, CLI 1.1.0: URL/host, JSON/CSV, techo y resume. [Evidencia](docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md): 96 tests; prueba corregida MX para Berel USD 0,0284 reconciliados, 20 keywords/2 páginas y resume USD 0. Guías/skills sincronizadas; sugerencias con ruido editorial, CL separado. Typecheck global con WIP ajeno; sin push/deploy.
