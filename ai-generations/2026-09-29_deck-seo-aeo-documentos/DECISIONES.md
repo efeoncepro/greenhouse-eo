@@ -35,6 +35,12 @@ enviar a axis packages y al lab, esto está aprobado todo» (2026-09-30).
     archivo oficial, nunca lo genera el modelo. La guarda «no anclar en el rubro de un cliente» del pipeline de foto de
     marca aplica a la fotografía propia de Efeonce; en un caso del cliente se generó con `pnpm ai:image` (caso Berel).
 
+15. **Portada con el polo del kit bordado** (2026-09-30): «la portada está muy mal armado el logo y ahí ni siquiera tiene
+    que estar pintado sino BORDADO en el pecho». El plate `WB1b` (isotipo plano compuesto al costado) se reemplaza por
+    `WB1c` (`ai-generations/2026-09-26_deck-web/plates/`): el polo piqué del kit editado con su receta y el emblema
+    bordado completo en el pecho izquierdo. Receta: `2026-09-26_deck-web/fichas/WB1c/LEEME.md`. Portadas del Completo y
+    del Brochure recompuestas (texto idéntico), PDFs y canvas actualizados.
+
 ## Decisión del operador sobre los pendientes (2026-09-30)
 
 > «Deja esos datos... No marques nada en el deck como provisional, asumo la responsabilidad.»

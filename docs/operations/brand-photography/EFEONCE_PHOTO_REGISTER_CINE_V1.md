@@ -31,6 +31,23 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 
 ---
 
+## Delta 2026-09-30 — `WB1c`: el polo del kit se EDITA con su receta; el isotipo compuesto de `WB1b` se retira
+
+**Operador (2026-09-30, al enviar el deck SEO/AEO a un cliente):** «la portada está muy mal armado el logo y ahí ni
+siquiera tiene que estar pintado sino BORDADO en el pecho»; «No es el emblema, tenemos el polo piqué que tiene la
+referencia en distintos ángulos»; «Busca la receta de ese prompt».
+
+- `WB1b` llevaba el isotipo **compuesto plano, al costado y bajo el brazo**, sobre un emblema que el modelo había
+  inventado en `WB1`. Se reemplaza por **`WB1c`** en todo el canon (portada `cover-brochure-line-engine`, lámina
+  `proposal-cinematic-web`, brochure general y deck SEO/AEO). Receta: `ai-generations/2026-09-26_deck-web/fichas/WB1c/LEEME.md`.
+- **El orden correcto cuando el uniforme sale mal en un plate aprobado:** (1) buscar la ficha del plate
+  (`fichas/<id>.json`) y resolverla con `pnpm foto:prompt`; (2) **editar** el plate con esa misma receta y las vistas
+  del kit (puesto, macro del bordado, isotipo oficial), 16:9 paddeado espejado para no reencuadrar; (3) si el cuerpo
+  tapa el emblema, una edición **con máscara sólo sobre la tela libre**; (4) `pnpm foto:emblema` al 100 %. **Nunca**
+  parchar el emblema en un recorte ni componerlo encima: los dos caminos se probaron ese día y se leen pegados.
+- Los demás plates con isotipo compuesto (`NX5b`, `NX6b`, `CR2b`, `RV1b`, `AE2b`, `BR1b`, `BR2b`) no se revisaron en
+  esta pasada: la ropa de `CR2b` y `RV1b` (personas del equipo) merece la misma revisión antes de enviarlos a un cliente.
+
 ## Delta 2026-09-27 (c) — excepción para secciones y láminas «about» del deck
 
 **[decisión del operador, 2026-09-27]** Al aprobar las 69 láminas del deck, el operador aprobó también las fotos de
@@ -320,7 +337,7 @@ escena con `foto:generar`, nunca injertar la cara).
 |---|---|---|---|
 | `RV1b` | Líder de RevOps | **Chaqueta softshell** sobre el polo | Instancia importante: se presenta el motor de revenue |
 | `AE2b` | Estratega SEO | **Polo** piqué | Oficina casual, trabajo de escritorio |
-| `WB1b` | Líder web | **Polo** piqué | Oficina casual |
+| `WB1c` | Líder web | **Polo** piqué | Oficina casual |
 | `CR2b` | Directora creativa | **Hoodie** | Estudio creativo, jornada de producción |
 | `BR2b` | Estratega · director de arte · desarrollador | **Polo · hoodie · polo** (Nexa al frente con la softshell) | Cada uno en su registro dentro del mismo equipo |
 
@@ -683,7 +700,7 @@ Antes de mostrar una pieza cine, las doce, en orden:
 | La carrera de Nexa · «¿Listos para la carrera? Vamos.» | `NX5b` | `ai-generations/2026-09-26_deck-nexa/` | ✅ **Aprobada** [operador, 2026-09-27] |
 | Líneas de servicio con Nexa (cinco esferas, la naranja en su palma) | `NX6b` | `2026-09-26_deck-nexa/` | ✅ **Aprobada** [operador, 2026-09-27, 01:46] |
 | Servicios creativos digitales · «¿Tu marca en cada pantalla? En todas.» | `CR2b` | `2026-09-26_deck-creativo/` | ✅ **Aprobada** [operador, 2026-09-27] |
-| Web · «¿Para quién es tu web? Para todos.» | `WB1b` | `2026-09-26_deck-web/` | ✅ **Aprobada** [operador, 2026-09-27] |
+| Web · «¿Para quién es tu web? Para todos.» | `WB1c` | `2026-09-26_deck-web/` | ✅ **Aprobada** [operador, 2026-09-27] |
 | RevOps · «¿Tu CRM vende contigo? Con agentes.» | `RV1b` | `2026-09-26_deck-revops/` | ✅ **Aprobada** [operador, 2026-09-27, 01:46] |
 | AEO · «¿Te encuentra la IA? Visible.» | `AE2b` | `2026-09-26_deck-aeo/` | ✅ **Aprobada** [operador, 2026-09-27, 01:46]; `AE1` es la versión previa, superada por la del foco |
 | Brochure, portada «Nexa frente a la órbita» | `BR1b` | `2026-09-27_brochure/` | ✅ **Aprobada** como opción de portada [operador, 2026-09-27] (§16) |
@@ -790,7 +807,7 @@ Rutas relativas a `ai-generations/`. Las placas son locales (gitignoreadas); lo 
 |---|---|---|---|---|
 | Growth Strategy & Measurement (`growth`) | teal `#36c8bf` | ¿Lo medimos? **Siempre.** | `HW1` | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
 | Creative Services (`brand`) | naranja `#ff6500` | ¿Quién crea mi contenido? **Tu squad.** | `CR4` (nueva, §16.7) | `2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` |
-| Digital Services & Engineering (`engine`) | azul `#0375db` | ¿Te encuentra la IA? **Visible.** | `WB1b` | `2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png` |
+| Digital Services & Engineering (`engine`) | azul `#0375db` | ¿Te encuentra la IA? **Visible.** | `WB1c` | `2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png` |
 | Media & Distribution (`voice`) | rojo anaranjado `#f83902` | ¿Dónde invierto? **Donde rinde.** | `LN4` (nueva, §16.4) | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |
 | RevOps & CRM (`revenue-hubspot`) | magenta HubSpot `#e86bd0` | ¿Y el reporte del viernes? **Ya lo viste.** | `RV1b` | `2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png` |
 
@@ -868,7 +885,7 @@ Amplía §9.5: se prueba contra el borde real del haz, la mano o el anillo más 
 
 | # | Pendiente | Dueño |
 |---|---|---|
-| 1 | **Alcance del registro:** las portadas de línea del brochure usan personas del equipo (`CR2b`, `WB1b`, `RV1b`, hechas para `proposal-cinematic`, y `LN4`, hecha para el brochure). §2 y el issue AXIS `cine-requires-nexa-or-proposal` sólo admiten Nexa o la receta `proposal-cinematic`: una portada de brochure declarada como cine con persona del equipo hoy la rechazaría el contrato. El operador las aprobó; falta llevarlo al contrato. **Cerrado el 2026-09-27 (TASK-1927):** `cover-brochure` está en `photo.cine.recipes` (`axis-tokens` 0.3.14) | Cerrado |
+| 1 | **Alcance del registro:** las portadas de línea del brochure usan personas del equipo (`CR2b`, `WB1c`, `RV1b`, hechas para `proposal-cinematic`, y `LN4`, hecha para el brochure). §2 y el issue AXIS `cine-requires-nexa-or-proposal` sólo admiten Nexa o la receta `proposal-cinematic`: una portada de brochure declarada como cine con persona del equipo hoy la rechazaría el contrato. El operador las aprobó; falta llevarlo al contrato. **Cerrado el 2026-09-27 (TASK-1927):** `cover-brochure` está en `photo.cine.recipes` (`axis-tokens` 0.3.14) | Cerrado |
 | 2 | **`LN4` sin isotipo compuesto.** Sigue el orden de las invariantes de fotografía (`.claude/rules/brand-photography.md`: referencias → `foto:emblema` al 100 % → `foto:isotipo` **sólo si el emblema difiere**), pero choca con §7.3 de este registro («el publicable lleva el isotipo oficial», todas las aprobadas con `b`). Decidir cuál manda en cine y alinear el otro. **Segundo caso, `CR4` (2026-09-28, §16.7):** el bordado generado ya coincidía con el isotipo oficial al 100 %, y la `b` que dejó `foto:isotipo` traía un parche plano sobre la cinta de luz; se publicó la placa sin componer, con el precedente de `LN4`. El caso suma un argumento: cuando un fenómeno de luz cruza la zona del emblema, la limpieza de la herramienta no respeta esa luz **Cerrado el 2026-09-28 (decisión del operador):** manda la referencia del uniforme; si `foto:emblema` la confirma al 100 %, se publica sin `b`; `foto:isotipo` sólo si difiere y siempre en el traje de Nexa (§7.3) | Cerrado |
 | 3 | **Regenerar desde las fichas:** hoy `foto:generar` vuelve a cobrar en cada corrida y la voz y la firma salieron de scripts de sesión que no están en el repo. El pipeline cine idempotente debe poder regenerar estos plates desde sus fichas | TASK-1926 |
 | 4 | Variante opcional de RevOps con Salesforce (cielo `#2fb8ff`) | Operador |

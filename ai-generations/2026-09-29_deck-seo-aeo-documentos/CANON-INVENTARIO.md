@@ -30,7 +30,7 @@ Ids: `C` completo, `B` brochure, `P` propuesta. «receta» = id del catálogo `E
 
 | Lámina | C | B | P | Receta | Qué la hace propia |
 |---|---|---|---|---|---|
-| Portada «¿Te encuentran Google y la IA? Visible.» | 01 | 01 | — | `cover-brochure-line-engine` (uso) | logo SV360 (sv360-logo-negative) en 140,790 h64 |
+| Portada «¿Te encuentran Google y la IA? Visible.» | 01 | 01 | — | `cover-brochure-line-engine` (uso) | logo SV360 (sv360-logo-negative) en 140,790 h64; plate `WB1c` (polo del kit bordado, desde 2026-09-30; antes `WB1b`) |
 | Portada propuesta «¿Qué movemos en 2027? Tu visibilidad.» | — | — | 01 | `cover-proposal-orbit` (uso) | logo SV360 en 140,880 h56 |
 | «¿Dónde busca tu cliente? En la IA.» | 02 | 02 | 02 | `decision-ai-market` | sin cambios |
 | «¿A quién recomienda la IA? A tu competencia.» | 03 | 03 | 03 | `decision-ai-answer` | cuerpo «…la **próxima** respuesta te nombre» |

@@ -7267,8 +7267,8 @@ exports[`planes de los intents de ejemplo > deck-cover-brochure-line-engine-inte
         "width": 1920,
       },
       "kind": "plate",
-      "path": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
-      "ref": "asset-ref:plate:WB1b-web-para-todos-isotipo",
+      "path": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png",
+      "ref": "asset-ref:plate:WB1c-web-para-todos-bordado",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -7282,7 +7282,7 @@ exports[`planes de los intents de ejemplo > deck-cover-brochure-line-engine-inte
         "slots": {
           "backdrop": {
             "alt": "Un ingeniero de Efeonce con polo toca una web holográfica que usan personas y pequeños agentes robot",
-            "src": "asset-ref:plate:WB1b-web-para-todos-isotipo",
+            "src": "asset-ref:plate:WB1c-web-para-todos-bordado",
           },
           "evidence": "<strong>Cinco</strong> capacidades:<br>Search Visibility · Web Experience · Medición<br>Sistemas de agentes · Automatización",
           "frame": {

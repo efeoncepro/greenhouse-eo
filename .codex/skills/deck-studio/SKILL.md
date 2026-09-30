@@ -266,7 +266,7 @@ la evidencia en 2–3 líneas.
   |---|---|---|
   | Growth Strategy & Measurement (`growth`) | ¿Lo medimos? **Siempre.** | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
   | Creative Services (`brand`) | ¿Quién crea mi contenido? **Tu squad.** | `2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` |
-  | Digital Services & Engineering (`engine`) | ¿Te encuentra la IA? **Visible.** | `2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png` |
+  | Digital Services & Engineering (`engine`) | ¿Te encuentra la IA? **Visible.** | `2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png` |
   | Media & Distribution (`voice`) | ¿Dónde invierto? **Donde rinde.** | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |
   | RevOps & CRM (`revenue-hubspot`) | ¿Y el reporte del viernes? **Ya lo viste.** | `2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png` |
 

@@ -753,7 +753,7 @@ La lámina que vende un servicio con una imagen que se recuerda. Seis aprobadas:
 | Lámina | Voz | Escena |
 |---|---|---|
 | Servicios creativos digitales | «¿Tu marca en cada pantalla? En todas.» | la directora dirige una órbita de pantallas |
-| Web | «¿Para quién es tu web? Para todos.» | la web en acción con el estratega en polo (placa `WB1b`; ver la página «Deck» del canvas) |
+| Web | «¿Para quién es tu web? Para todos.» | la web en acción con el estratega en polo (placa `WB1c`, que reemplaza a `WB1b` desde el 2026-09-30; ver la página «Deck» del canvas) |
 | La carrera de Nexa | «¿Listos para la carrera? Vamos.» | Nexa biónica con lentes y luces de partida (Nexa protagonista) |
 | RevOps | «¿Tu CRM vende contigo? Con agentes.» | un moño de luz que capta, cierra y hace crecer, con los agentes en el flujo; la líder de RevOps con la chaqueta Efeonce |
 | AEO | «¿Te encuentra la IA? Visible.» | entre miles de tarjetas oscuras, el haz de una burbuja de respuesta de IA ilumina una sola; la estratega SEO con el polo Efeonce |
@@ -926,7 +926,7 @@ quedaron **aprobados** y salen del estado de candidatos del banco del
 |---|---|---|---|---|---|
 | Growth Strategy & Measurement (`growth`) | teal `#36c8bf` | Brochure · Growth Strategy | ¿Lo medimos? **Siempre.** | **Seis** capacidades: Estrategia · GTM · Revenue enablement · Analítica · Medición · Orquestación | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
 | Creative Services (`brand`) | naranja `#ff6500` | Brochure · Creative Services | ¿Quién crea mi contenido? **Tu squad.** | **Seis** capacidades: Squad creativo · Brand systems · Campañas · Contenido y social · Audiovisual · Run & Gun | `2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` (plate propio desde el 2026-09-28; antes compartía `CR2b` con `proposal-cinematic-creative` y un brochure con las dos marcaba `plate-repeated`. Caso: [registro cine §16.7](../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto)) |
-| Digital Services & Engineering (`engine`) | azul `#0375db` | Brochure · Digital Services | ¿Te encuentra la IA? **Visible.** | **Cinco** capacidades: Search Visibility · Web Experience · Medición · Sistemas de agentes · Automatización | `2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png` |
+| Digital Services & Engineering (`engine`) | azul `#0375db` | Brochure · Digital Services | ¿Te encuentra la IA? **Visible.** | **Cinco** capacidades: Search Visibility · Web Experience · Medición · Sistemas de agentes · Automatización | `2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png` |
 | Media & Distribution (`voice`) | rojo anaranjado `#f83902` | Brochure · Media & Distribution | ¿Dónde invierto? **Donde rinde.** | **Tres** soluciones y una operación: Estrategia de distribución · Performance · Influencia y earned · Managed Media | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` (nueva; ficha `2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json`, USD ~0,04; bordado revisado al 100 % = isotipo oficial) |
 | RevOps & CRM (`revenue-hubspot`) | magenta HubSpot `#e86bd0` | Brochure · RevOps & CRM | ¿Y el reporte del viernes? **Ya lo viste.** | **Seis** soluciones: Marketing y AEO · Ventas y pipeline · Revenue lifecycle · Servicio · Datos y CRM · Operación con agentes | `2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png` |
 

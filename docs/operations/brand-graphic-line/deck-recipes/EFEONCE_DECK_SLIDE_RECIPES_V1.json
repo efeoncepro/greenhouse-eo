@@ -999,7 +999,7 @@
           "name": "photo",
           "type": "image",
           "required": true,
-          "example": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
+          "example": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png",
           "notes": "Plate aprobado de la línea: un líder web con polo que toca una web holográfica usada por personas y agentes robot. Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
         },
         {
@@ -1029,12 +1029,12 @@
       "photo": {
         "uses": true,
         "register": "cine",
-        "plate": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
+        "plate": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png",
         "ficha": "ai-generations/2026-09-26_deck-web/fichas/WB1-web-para-todos.json",
         "prompt": "ai-generations/2026-09-26_deck-web/prompts/WB1-web-para-todos.txt",
         "postprocess": [
-          "pnpm foto:emblema ai-generations/2026-09-26_deck-web/plates/WB1-web-para-todos.png (100 %)",
-          "pnpm foto:isotipo sobre WB1-web-para-todos.png (caja no registrada: no hay .json de procedencia de WB1b en plates/)"
+          "Edición del plate WB1-web-para-todos.png con el polo del kit (13-puesto-frente, macro 10-detalle-bordado e isotipo oficial) y, con máscara, el emblema bordado completo en el pecho → WB1c (receta en ai-generations/2026-09-26_deck-web/fichas/WB1c/LEEME.md, operador 2026-09-30)",
+          "pnpm foto:emblema sobre WB1c al 100 %: nave con tres ventanas y aleta, órbita con su corte y esfera; un solo emblema, bordado. WB1b (isotipo plano compuesto al costado) quedó retirado."
         ],
         "replaceable": "No es foto de ejemplo: es la placa aprobada de la línea."
       },
@@ -1089,9 +1089,9 @@
           },
           "photo": {
             "register": "cine",
-            "plate": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
+            "plate": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png",
             "alt": "Un ingeniero de Efeonce con polo toca una web holográfica que usan personas y pequeños agentes robot",
-            "notes": "El plate WB1b de la portada web de la línea engine (plateRef en los planes golden); DV1 queda para proposal-cinematic-web, así no se repite."
+            "notes": "El plate WB1c de la portada web de la línea engine (plateRef en los planes golden); DV1 queda para proposal-cinematic-web, así no se repite."
           },
           "fit": "Aprobada tal cual por el operador. Los máximos de eyebrow (33), question (30) y evidence (48) se subieron el 2026-09-30 al largo de la aprobada (como SF6 y SF7 en TASK-1942). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). La columna en 220 y el logo SV360 al pie (productMark) vienen de la aprobada."
         }
@@ -10782,7 +10782,7 @@
           "name": "photo",
           "type": "image",
           "required": true,
-          "example": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png"
+          "example": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png"
         }
       ],
       "fixed": [
@@ -10799,17 +10799,17 @@
       "photo": {
         "uses": true,
         "register": "cine",
-        "plate": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
+        "plate": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png",
         "ficha": "ai-generations/2026-09-26_deck-web/fichas/WB1-web-para-todos.json",
         "prompt": "ai-generations/2026-09-26_deck-web/prompts/WB1-web-para-todos.txt",
         "postprocess": [
-          "pnpm foto:emblema ai-generations/2026-09-26_deck-web/plates/WB1-web-para-todos.png",
-          "pnpm foto:isotipo ai-generations/2026-09-26_deck-web/plates/WB1-web-para-todos.png --centro x,y --ancho w --prenda oscura → WB1b (caja no registrada: falta el .json de procedencia)"
+          "Edición del plate WB1-web-para-todos.png con el polo del kit (13-puesto-frente, macro 10-detalle-bordado e isotipo oficial) y, con máscara, el emblema bordado completo en el pecho → WB1c (receta en ai-generations/2026-09-26_deck-web/fichas/WB1c/LEEME.md, operador 2026-09-30)",
+          "pnpm foto:emblema sobre WB1c al 100 %: nave con tres ventanas y aleta, órbita con su corte y esfera; un solo emblema, bordado. WB1b (isotipo plano compuesto al costado) quedó retirado."
         ],
         "replaceable": "no se reemplaza: escena aprobada"
       },
       "prompts": {
-        "composition": "Resuelve el intent con `efeonce.surface-composition` (deck, 16x9, role proposal, recipe `proposal-cinematic`, layout `service`, line engine, theme dark): voice {eyebrow, question, answer}, body, steps (cuatro {glyph, kicker, name}) y photo {register: 'cine', subject: 'person', plateRef: WB1b}; sin prueba si no hay cifra con fuente. Foto a sangre; voz en la reserva izquierda del 45 % (eyebrow a 120, pregunta con anillo azul a 186, respuesta de una línea en la banda 285–318 a ~140 px con la esfera, bajada de 26 px en ~560 px) y pasos en columnas (`columns-4`: ícono de 44 px arriba, kicker de 12 px en el suave, nombre de 21 px en blanco) con `resolveIcon` en voz Trazo y en reposo. Selección sobre la respuesta con el colaborador «Cliente» en top-end, overlay subtle, escala 1,2; su etiqueta no puede tocar la cara del sujeto. Sin logo ni indicador; burbuja URL en el pie."
+        "composition": "Resuelve el intent con `efeonce.surface-composition` (deck, 16x9, role proposal, recipe `proposal-cinematic`, layout `service`, line engine, theme dark): voice {eyebrow, question, answer}, body, steps (cuatro {glyph, kicker, name}) y photo {register: 'cine', subject: 'person', plateRef: WB1c}; sin prueba si no hay cifra con fuente. Foto a sangre; voz en la reserva izquierda del 45 % (eyebrow a 120, pregunta con anillo azul a 186, respuesta de una línea en la banda 285–318 a ~140 px con la esfera, bajada de 26 px en ~560 px) y pasos en columnas (`columns-4`: ícono de 44 px arriba, kicker de 12 px en el suave, nombre de 21 px en blanco) con `resolveIcon` en voz Trazo y en reposo. Selección sobre la respuesta con el colaborador «Cliente» en top-end, overlay subtle, escala 1,2; su etiqueta no puede tocar la cara del sujeto. Sin logo ni indicador; burbuja URL en el pie."
       },
       "renderSource": {
         "script": "ai-generations/2026-09-27_deck-recetas/render-src/deck2.mjs",
@@ -10822,7 +10822,7 @@
         "Ningún texto cruza al sujeto ni a la web holográfica",
         "Selección y cursor nunca sobre la persona"
       ],
-      "notes": "Receta AXIS `proposal-cinematic`, referencia `proposal-cinematic-web` (placa WB1b). La lámina aprobada no lleva prueba: el builder de `pnpm brand:compose` hoy (0.1.1) exige prueba con fuente y la rechaza; la prueba pasa a opcional con 0.1.2 (TASK-1927). La etiqueta «Cliente» quedó cerca del rostro en la referencia: vigilarla al componer.",
+      "notes": "Receta AXIS `proposal-cinematic`, referencia `proposal-cinematic-web` (placa WB1c, que reemplaza a WB1b desde el 2026-09-30). La lámina aprobada no lleva prueba: el builder de `pnpm brand:compose` hoy (0.1.1) exige prueba con fuente y la rechaza; la prueba pasa a opcional con 0.1.2 (TASK-1927). La etiqueta «Cliente» quedó cerca del rostro en la referencia: vigilarla al componer.",
       "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaWebCine.jpg",
       "approvedUses": [
         {
