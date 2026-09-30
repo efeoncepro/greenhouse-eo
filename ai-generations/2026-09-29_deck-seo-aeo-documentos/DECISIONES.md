@@ -35,7 +35,15 @@ enviar a axis packages y al lab, esto está aprobado todo» (2026-09-30).
     archivo oficial, nunca lo genera el modelo. La guarda «no anclar en el rubro de un cliente» del pipeline de foto de
     marca aplica a la fotografía propia de Efeonce; en un caso del cliente se generó con `pnpm ai:image` (caso Berel).
 
-## Pendientes (no bloquean la canonización; sí bloquean mostrar el deck a un cliente)
+## Decisión del operador sobre los pendientes (2026-09-30)
+
+> «Deja esos datos... No marques nada en el deck como provisional, asumo la responsabilidad.»
+
+Las cifras de los casos, la fuente, los formatos de Insights, las industrias y la cifra de Bresler quedan **tal cual** en
+el deck, sin marca de «provisional» ni «próximamente». El operador asume la responsabilidad. Lo que sigue queda como
+registro de contexto, no como bloqueo.
+
+## Contexto de los datos (registro; el operador decidió no marcarlos)
 
 - **Cifras reales de los tres casos** (4 por caso, con fuente, período, servicio y permiso de uso). Hoy la fuente dice
   «Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses» como provisoria: afirma algo que no es cierto hasta
