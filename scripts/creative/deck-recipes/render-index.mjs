@@ -197,6 +197,13 @@ recipes.forEach((recipe, index) => {
       if (!SLOT_TYPES.has(slot?.type)) errors.push(`${slotWhere}: type desconocido «${slot?.type}»`)
       if (typeof slot?.required !== 'boolean') errors.push(`${slotWhere}: required debe ser booleano`)
 
+      if (slot?.requiredUnless !== undefined) {
+        if (slot.required !== true) errors.push(`${slotWhere}: requiredUnless sólo aplica a un slot obligatorio`)
+        else if (!recipe.slots.some(other => other?.name === slot.requiredUnless && other !== slot)) {
+          errors.push(`${slotWhere}: requiredUnless apunta a «${slot.requiredUnless}», que no es un slot de la receta`)
+        }
+      }
+
       if (slot?.maxChars !== undefined && !(Number.isInteger(slot.maxChars) && slot.maxChars > 0)) {
         errors.push(`${slotWhere}: maxChars debe ser un entero positivo`)
       }
@@ -415,7 +422,13 @@ const runtimeRecipe = recipe => {
     surface: recipe.surface,
     photo: { uses: recipe.photo?.uses === true, plate: recipe.photo?.uses === true ? (recipe.photo.plate ?? null) : null },
     pairs: { coverClose: related('cover↔close'), variant: related('variant'), sequence: related('sequence') },
-    slots: recipe.slots.map(slot => ({ name: slot.name, type: slot.type, required: slot.required === true, maxChars: slot.maxChars ?? null })),
+    slots: recipe.slots.map(slot => ({
+      name: slot.name,
+      type: slot.type,
+      required: slot.required === true,
+      maxChars: slot.maxChars ?? null,
+      ...(slot.requiredUnless ? { requiredUnless: slot.requiredUnless } : {})
+    })),
     template: templateOf(recipe.id),
     axis: example
       ? {

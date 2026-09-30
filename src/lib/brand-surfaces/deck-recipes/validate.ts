@@ -342,7 +342,9 @@ export const validateDeckPlan = (plan: DeckPlan): DeckPlanValidation => {
       const value = slide.slots[slot.name]
 
       if (isEmpty(value)) {
-        if (slot.required) add('slot-required-missing', `Falta «${slot.name}», obligatorio en «${recipe.id}».`, { index, recipeId: recipe.id, slot: slot.name })
+        const waived = slot.requiredUnless !== undefined && !isEmpty(slide.slots[slot.requiredUnless])
+
+        if (slot.required && !waived) add('slot-required-missing', `Falta «${slot.name}», obligatorio en «${recipe.id}».`, { index, recipeId: recipe.id, slot: slot.name })
 
         continue
       }

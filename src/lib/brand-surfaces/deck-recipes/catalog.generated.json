@@ -605,13 +605,13 @@
           "name": "eyebrow",
           "type": "text",
           "required": true,
-          "maxChars": 32
+          "maxChars": 33
         },
         {
           "name": "question",
           "type": "text",
           "required": true,
-          "maxChars": 26
+          "maxChars": 30
         },
         {
           "name": "answer",
@@ -623,7 +623,7 @@
           "name": "evidence",
           "type": "richText",
           "required": true,
-          "maxChars": 42
+          "maxChars": 48
         },
         {
           "name": "line",
@@ -923,7 +923,7 @@
           "name": "answer",
           "type": "text",
           "required": true,
-          "maxChars": 10
+          "maxChars": 14
         },
         {
           "name": "clientName",
@@ -3156,12 +3156,6 @@
           "type": "section",
           "required": true,
           "maxChars": null
-        },
-        {
-          "name": "productMark",
-          "type": "logo",
-          "required": false,
-          "maxChars": null
         }
       ],
       "template": "deck.content-text",
@@ -3505,7 +3499,7 @@
           "name": "answer",
           "type": "text",
           "required": true,
-          "maxChars": 5
+          "maxChars": 10
         },
         {
           "name": "body",
@@ -7623,7 +7617,8 @@
           "name": "eyebrow",
           "type": "text",
           "required": true,
-          "maxChars": 40
+          "maxChars": 40,
+          "requiredUnless": "productMark"
         },
         {
           "name": "question",
@@ -7635,7 +7630,7 @@
           "name": "answer",
           "type": "text",
           "required": true,
-          "maxChars": 10
+          "maxChars": 11
         },
         {
           "name": "body",
@@ -8011,7 +8006,8 @@
           "name": "eyebrow",
           "type": "text",
           "required": true,
-          "maxChars": 40
+          "maxChars": 40,
+          "requiredUnless": "productMark"
         },
         {
           "name": "question",

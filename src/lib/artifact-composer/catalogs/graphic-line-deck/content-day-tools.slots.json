@@ -680,7 +680,7 @@
         "answer": {
           "type": "string",
           "required": true,
-          "maxCharacters": 5,
+          "maxCharacters": 10,
           "resolver": "gl-answer",
           "example": "Así"
         }

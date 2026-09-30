@@ -31,6 +31,8 @@ export interface DeckRecipeSlot {
   required: boolean
   /** Largo máximo medido en la lámina aprobada; en `richText` es por línea y en `list`, por ítem. */
   maxChars: number | null
+  /** Deja de ser obligatorio cuando la lámina trae este otro slot (p. ej. el eyebrow cede su lugar al lockup `productMark`). */
+  requiredUnless?: string
 }
 
 /** La receta como la lee el runtime: sólo campos estructurados, nunca las notas en prosa. */

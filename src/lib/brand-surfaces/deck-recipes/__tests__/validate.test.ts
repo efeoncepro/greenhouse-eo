@@ -234,6 +234,18 @@ describe('láminas SEO/AEO (TASK-1934)', () => {
     expect(slotIssues([stat('+2.000', 'caso'), stat('39')])).toEqual(['figure-source-missing'])
     expect(slotIssues([['anidada']])).toEqual(['slot-type-invalid'])
   })
+
+  // TASK-1949 (decisión 2): en la lámina de cine AEO el lockup Efeonce | AEO ocupa el lugar del eyebrow, así que el
+  // eyebrow deja de ser obligatorio cuando la lámina trae productMark (requiredUnless) y lo sigue siendo sin él.
+  it('el eyebrow cede su lugar al lockup de submarca (requiredUnless)', () => {
+    const missing = (slots: Record<string, unknown>) =>
+      validateDeckPlan({ document: 'proposal', slides: [{ recipeId: 'proposal-cinematic-aeo', slots }] }).issues
+        .filter(issue => issue.code === 'slot-required-missing')
+        .map(issue => issue.slot)
+
+    expect(missing({ question: '¿Te cita la IA?' })).toContain('eyebrow')
+    expect(missing({ question: '¿Te cita la IA?', productMark: 'aeo' })).not.toContain('eyebrow')
+  })
 })
 
 describe('una regla, una voz: el catálogo no duplica a AXIS', () => {

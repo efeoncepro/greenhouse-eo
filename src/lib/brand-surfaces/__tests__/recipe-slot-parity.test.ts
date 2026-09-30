@@ -102,11 +102,7 @@ const mapped = Object.entries(map.recipes).filter(([, entry]) => entry.slots !==
  * `recipe-map.json`; ese día se borran de aquí. Dueña: TASK-1949 Slice 2. Condición de retiro: la lista vacía; la prueba
  * de abajo falla si una entrada ya está mapeada, así que no puede quedar olvidada.
  */
-const PENDING_TEMPLATE_SLOTS: Record<string, string[]> = {
-  // Ninguna lámina aprobada del deck SEO/AEO usa `content-text` con lockup: el Artifact Composer no suma el slot a la
-  // plantilla y el catálogo lo retira (decisión del operador relayada el 2026-09-30); hasta entonces queda pendiente.
-  'content-text': ['productMark']
-}
+const PENDING_TEMPLATE_SLOTS: Record<string, string[]> = {}
 
 const isPending = (id: string, name: string) => PENDING_TEMPLATE_SLOTS[id]?.includes(name) === true
 

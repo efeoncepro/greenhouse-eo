@@ -186,7 +186,6 @@ export const DECK_SLOT_BINDING_MAP: Record<string, Record<string, DeckSlotMapEnt
 
   // Deck SEO/AEO (2026-09-30, TASK-1949): lockups de submarca de Efeonce y cifras de maqueta del producto.
   'cover-brochure-line-engine': { productMark: { excluded: true, reason: PRODUCT_MARK } },
-  'content-text': { productMark: { excluded: true, reason: PRODUCT_MARK } },
   'proposal-cinematic-seo': { productMark: { excluded: true, reason: PRODUCT_MARK } },
   'proposal-cinematic-aeo': { productMark: { excluded: true, reason: PRODUCT_MARK } },
   'proposal-service-seo': { productMark: { excluded: true, reason: PRODUCT_MARK } },

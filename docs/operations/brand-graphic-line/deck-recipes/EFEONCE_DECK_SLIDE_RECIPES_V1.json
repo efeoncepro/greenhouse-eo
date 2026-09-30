@@ -960,7 +960,7 @@
           "name": "eyebrow",
           "type": "text",
           "required": true,
-          "maxChars": 32,
+          "maxChars": 33,
           "example": "Brochure · Digital Services",
           "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
         },
@@ -968,7 +968,7 @@
           "name": "question",
           "type": "text",
           "required": true,
-          "maxChars": 26,
+          "maxChars": 30,
           "example": "¿Te encuentra la IA?",
           "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
         },
@@ -984,7 +984,7 @@
           "name": "evidence",
           "type": "richText",
           "required": true,
-          "maxChars": 42,
+          "maxChars": 48,
           "example": "**Cinco** capacidades:\nSearch Visibility · Web Experience · Medición\nSistemas de agentes · Automatización",
           "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 3 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
         },
@@ -1093,7 +1093,7 @@
             "alt": "Un ingeniero de Efeonce con polo toca una web holográfica que usan personas y pequeños agentes robot",
             "notes": "El plate WB1b de la portada web de la línea engine (plateRef en los planes golden); DV1 queda para proposal-cinematic-web, así no se repite."
           },
-          "fit": "Aprobada tal cual por el operador, pero pasa el largo de la receta: eyebrow mide 33 y la receta admite 32; question mide 30 y la receta admite 26; evidence mide 48 y la receta admite 42. Subir el máximo (como SF6 y SF7 en TASK-1942) o acortar es decisión del Slice 2 con el operador; hasta entonces un plan que ligue este texto falla con slot-over-max-chars (error). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). La columna en 220 y el logo SV360 al pie (productMark) vienen de la aprobada."
+          "fit": "Aprobada tal cual por el operador. Los máximos de eyebrow (33), question (30) y evidence (48) se subieron el 2026-09-30 al largo de la aprobada (como SF6 y SF7 en TASK-1942). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). La columna en 220 y el logo SV360 al pie (productMark) vienen de la aprobada."
         }
       ]
     },
@@ -1554,7 +1554,7 @@
           "name": "answer",
           "type": "text",
           "required": true,
-          "maxChars": 10,
+          "maxChars": 14,
           "example": "Con foco",
           "notes": "Copy aprobado «Con foco.»; se escribe sin punto, lo pone la esfera teal. Bricolage 760 a 124 px."
         },
@@ -1675,7 +1675,7 @@
             "label": "Cliente",
             "target": "client-logo"
           },
-          "fit": "Aprobada tal cual por el operador, pero pasa el largo de la receta: answer mide 14 (con el salto de línea, como lo mide validateDeckPlan) y la receta admite 10. Subir el máximo (como SF6 y SF7 en TASK-1942) o acortar es decisión del Slice 2 con el operador; hasta entonces un plan que ligue este texto falla con slot-over-max-chars (error). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+          "fit": "Aprobada tal cual por el operador. El máximo de answer se subió a 14 el 2026-09-30 (medido con el salto de línea, como lo mide validateDeckPlan). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
         }
       ]
     },
@@ -4928,16 +4928,6 @@
           "required": true,
           "example": "1 de 5",
           "notes": "Alimenta el indicador de navegación de la esquina."
-        },
-        {
-          "name": "productMark",
-          "type": "logo",
-          "required": false,
-          "example": {
-            "asset": "sv360-lockup-negative",
-            "alt": "Efeonce | SV360"
-          },
-          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Figura en la brecha 1 del inventario del deck SEO/AEO, pero ninguna lámina aprobada del deck la usa con lockup (pregunta abierta de TASK-1949). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot; hasta entonces la paridad receta ↔ plantilla lo lista como pendiente (recipe-slot-parity.test.ts, PENDING_TEMPLATE_SLOTS)."
         }
       ],
       "fixed": [
@@ -5358,7 +5348,7 @@
           "name": "answer",
           "type": "text",
           "required": true,
-          "maxChars": 5,
+          "maxChars": 10,
           "example": "Así"
         },
         {
@@ -5448,7 +5438,7 @@
             ],
             "panel": "Tu panel en Greenhouse"
           },
-          "fit": "Aprobada tal cual por el operador, pero pasa el largo de la receta: answer mide 10 (con el salto de línea, como lo mide validateDeckPlan) y la receta admite 5. Subir el máximo (como SF6 y SF7 en TASK-1942) o acortar es decisión del Slice 2 con el operador; hasta entonces un plan que ligue este texto falla con slot-over-max-chars (error). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+          "fit": "Aprobada tal cual por el operador. El máximo de answer se subió a 10 el 2026-09-30 (medido con el salto de línea, como lo mide validateDeckPlan), en la receta y en content-day-tools.slots.json. Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
         }
       ]
     },
@@ -10967,7 +10957,7 @@
           "name": "answer",
           "type": "text",
           "required": true,
-          "maxChars": 10,
+          "maxChars": 11,
           "example": "Visible",
           "notes": "Una palabra a 160 px con la esfera azul."
         },
@@ -11132,7 +11122,7 @@
             "label": "Cliente",
             "target": "answer"
           },
-          "fit": "Aprobada tal cual por el operador, pero pasa el largo de la receta: answer mide 11 y la receta admite 10. Subir el máximo (como SF6 y SF7 en TASK-1942) o acortar es decisión del Slice 2 con el operador; hasta entonces un plan que ligue este texto falla con slot-over-max-chars (error). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). SIN eyebrow (decisión 2): el lockup AEO ocupa su lugar. El intent todavía trae «Visibilidad en IA» porque el contrato de hoy exige el eyebrow; se tapa con render-src/patch-eyebrow.cjs hasta que requiredUnless llegue al validador y a AXIS (TASK-1949 Slices 2 y 3)."
+          "fit": "Aprobada tal cual por el operador. El máximo de answer se subió a 11 el 2026-09-30. Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). SIN eyebrow (decisión 2): el lockup AEO ocupa su lugar. validateDeckPlan ya acepta la lámina sin eyebrow cuando trae productMark (requiredUnless, 2026-09-30); el contrato de AXIS todavía exige el eyebrow, así que el intent sigue trayendo «Visibilidad en IA» y se tapa con render-src/patch-eyebrow.cjs hasta que AXIS publique requiredUnless (TASK-1949 Slice 3)."
         }
       ]
     },
@@ -16610,7 +16600,7 @@
         "Propuesta o brochure con Efeonce Insights incluido en el servicio."
       ],
       "avoidWhen": [
-        "Algún formato no está vivo para el cliente: se quita o se rotula «próximamente» antes de mostrarla (correo, PDF A4 y deck 16:9 están por verificar con la sesión de Insights).",
+        "Se promete a un cliente real un formato que el servicio no habilita al abrirse: estado verificado 2026-09-30 → web y celular, PDF A4 y deck 16:9 vivos; modo presentación desplegado sin prueba con edición real; correo automático no vivo (TASK-1944). Mostrarlos es decisión del operador (asumida el 2026-09-30); si no la tomas tú, quita o rotula el formato.",
         "El servicio no incluye Efeonce Insights: la lámina promete algo que no se entrega.",
         "Se quiere mostrar el panel en vivo con la reunión: usar content-day-live-results."
       ],
@@ -16832,7 +16822,7 @@
         "Respuesta ≥ 3× la pregunta (124/40 = 3,1).",
         "Español neutro, sin voseo."
       ],
-      "notes": "Aprobada por el operador el 2026-09-30, lámina 22 del deck SEO/AEO completo (16 en brochure, 17 en propuesta). Decisión 5: la lámina cuenta el valor (sin armar el PPT, en vivo, con lectura escrita por la IA) y el informe vivo va en interfaz blanca. Pendiente de DECISIONES.md: verificar con la sesión de Insights qué formatos están vivos hoy. Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/22.jpg · brochure/16.jpg · propuesta/17.jpg."
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 22 del deck SEO/AEO completo (16 en brochure, 17 en propuesta). Decisión 5: la lámina cuenta el valor (sin armar el PPT, en vivo, con lectura escrita por la IA) y el informe vivo va en interfaz blanca. Formatos verificados por la sesión de Insights el 2026-09-30 (ver avoidWhen); el operador decidió mostrarlos sin marca de «próximamente» y asume la responsabilidad. Plantilla: content-report-formats.html (TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/22.jpg · brochure/16.jpg · propuesta/17.jpg."
     },
     {
       "id": "content-committee-deck",
