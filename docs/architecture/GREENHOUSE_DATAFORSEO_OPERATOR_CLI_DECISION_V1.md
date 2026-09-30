@@ -347,3 +347,72 @@ también corrige las conclusiones de cobertura que no declararon el dominio can�
 - Se propone una séptima familia.
 - El catálogo supera el costo aceptable de sync o la portada deja de enumerar rutas concretas.
 - DataForSEO cambia el contrato de tokens de paginación, precios Standard o shapes AI normalizados.
+
+## Architecture Decision 2026-09-30 — Keywords for Site por sujeto explícito
+
+- **Status:** Accepted — implementación local y canary live México de `TASK-1948` validados.
+- **Owner:** Growth SEO / Platform.
+- **Scope:** presets/CLI local de relevancia Labs, sin familia o schema nuevo.
+- **Reversibility:** two-way.
+- **Confidence:** high sobre contrato y paginación/resume live; calidad editorial requiere selección.
+- **Validated as of:** 2026-09-30 (contrato oficial, código local y prueba pagada de Berel México).
+
+### Context
+
+El proveedor amplió Keywords for Site a páginas específicas. El endpoint ya estaba autorizado, pero falta
+una entrada que declare scope y obtenga sólo relevancia sin mezclarla con research SEO/SERP completo.
+
+### Decision
+
+`quick keywords-for-site` y `site-keywords` comparten builder server-side; `--target-kind domain|subdomain|url`
+es requerido. URL exige https o www (prefija https), preserva path/query/trailing slash y rechaza credentials,
+puertos, fragmentos y wildcards. Hosts envían `include_subdomains:false`; URL no envía ese parámetro. Es
+política de petición, no garantía de canonicalización del proveedor.
+
+El compuesto consulta únicamente Keywords for Site; sin seeds, Overview, Competitors o SERP. Limits 1–1000
+(default 100) por página y max-pages 1–20 (default 1) limitan gasto. Orden relevance desc no crea score propio.
+Preview muestra plan/estimación; ejecución exige org real, ceiling, entitlement SEO y checkpoint; reuse fresco
+no recompra y cada POST nuevo revalida costo observado + estimación siguiente. Comparación de `result.target`
+con target solicitado declara matched/mismatch/unreported; request echo no demuestra scope. Divergencia no
+produce filas normalizadas. Más de un bloque por página aborta sin combinar alcance; un único bloque sin
+`result.target` conserva unreported. El checkpoint persiste `httpOk` y costo conocido/desconocido; todo fallo de
+transporte/task, pending inesperado, scope o múltiples bloques y costo desconocido constituye barrera durable:
+antes de cualquier página se revisa el checkpoint completo, previo a TTL/reuse/nueva compra. Expirar un paso no
+autoriza repetir POST incierto. Costos desconocidos se reportan NULL y detienen gasto progresivo.
+
+`plan.source` declara proveedor, documentación, lente, semántica, significado Ads de competencia y fecha del
+precio. Outputs conservan relevancia separada de rankings, CPC/competition Ads,
+NULL/missing/cero/invalid, cobertura parcial y JSON completo compañero del CSV. Con output de archivos stdout
+es un recibo compacto y el raw queda en JSON. No añade flags/capturas productivas.
+
+### Alternatives Considered
+
+- Reusar research completo: compra señales adicionales y mezcla preguntas; queda para investigación editorial integral.
+- Inferir target-kind desde string: un esquema ausente puede ampliar a dominio sin advertirlo.
+- Otro cliente/transporte: rompe allowlist, presupuesto y ledger; se reutilizan los existentes.
+
+### Consequences
+
+Agrega capacidad compatible (minor SemVer 1.1.0, helper incluido en governedPaths). Una muestra relevante apoya un brief, pero no prueba posición,
+canonicalización o calidad. La muestra live de Berel México valida el transporte y la paginación; el ruido
+observado obliga a revisar candidatas contra contenido/GSC. `totalCount` es metadata del proveedor, no cantidad
+de keywords exclusivas ni demanda demostrada del sujeto. La selección de mercado e idioma es explícita:
+confirmarla contra el brief antes de comprar; un cambio de país produce otra observación, no una sustitución
+silenciosa ni una mutación del target existente.
+
+### Runtime Contract
+
+Builder/normalizador: `src/lib/ai/dataforseo-site-keywords.ts`; orquestación: `scripts/dataforseo/cli.ts`.
+Checkpoint/spend siguen sus primitives existentes; manual CLI declara sintaxis y salida. SemVer fuente
+`data/dataforseo/cli-versions.json`. Provider: [Keywords for Site](https://docs.dataforseo.com/v3/dataforseo_labs-google-keywords_for_site-live/)
+y [precios Labs Google](https://dataforseo.com/pricing/dataforseo-labs/dataforseo-google-api).
+
+La [evidencia live México y sus límites](../audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md#corrección-de-mercado-del-operador--berel-méxico)
+centraliza los recibos de filas/páginas, scope, JSON/CSV, resume y ledger. La captura chilena precedente queda
+supersedida para el pedido Berel; no se extrapola esa muestra a otros sujetos/mercados ni se atribuye un
+hostname distinto a `berel.com` sin verificarlo.
+
+### Revisit When
+
+Proveedor cambia scope, paginación, precios o shape; se requiere captura recurrente/writer/API/MCP;
+la evaluación de URLs reales muestra ampliación inesperada de alcance.

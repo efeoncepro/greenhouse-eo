@@ -208,6 +208,13 @@ gobierna transporte, catálogo, lifecycle, seguridad y límites.
 - Ofrece presets `quick` para SERP orgánico, AI Mode, Labs, Backlinks, OnPage y las cuatro capacidades principales
   de AI Optimization; `run` cubre cualquier GET o POST ejecutable con JSON; `task wait` hace polling GET acotado
   sin reenviar el POST.
+- Consulta relevancia temática por dominio/subdominio/URL con `quick keywords-for-site` y `site-keywords`.
+  Declara `--target-kind`, conserva URL https/path/query y usa org/ceiling; el compuesto añade checkpoint/resume
+  y paginación sin Overview, Competitors ni SERP. Son sugerencias, no rankings; CPC/competition son Ads.
+  Scope reportado y cobertura parcial quedan en JSON; CSV viaja con él. Antes del preview verifica mercado,
+  idioma, organización y propiedad del target del cliente; el país de la máquina/default no los determina.
+  Selecciona sugerencias por intención y corpus: scope coincidente no certifica pertinencia y `totalCount`
+  no mide demanda propia. Detalle y prueba live Berel México: manual CLI y reference 02 §2.1a.
 - Compone minería SEO con `research`: Suggestions + Related, Ideas sólo mediante `--include-ideas`, Keywords for
   Site y competidores cuando hay `--target`, Overview para enriquecer, paginación acotada y SERP Standard por
   defecto sólo para finalistas aprobadas. Checkpoint, TTL y `--resume` evitan recomprar pasos. El CSV normaliza

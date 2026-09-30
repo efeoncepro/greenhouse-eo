@@ -276,6 +276,14 @@ Grupo Berel):
     prioriza Content Analysis para brand monitoring y Business Data acotada para local/reputación;
     Keywords Data sólo para paid/trends/clickstream cuando Labs no alcance; Merchant y App Data
     esperan un caso e-commerce/app. El registro orienta discovery, no habilita gasto.
+  - `quick keywords-for-site` / `site-keywords`: investiga relevancia de contenido por URL o host para
+    preparar/actualizar briefs. Declara `--target-kind domain|subdomain|url`; URL con https o www conserva
+    path/query. Sólo compra Keywords for Site, sin Overview/Competitors/SERP. Usa preview, org/ceiling y
+    checkpoint/resume para el compuesto; JSON conserva scope/cobertura/provenance y acompaña al CSV.
+    Relevancia no es ranking ni consultas GSC; CPC/competition son métricas Ads. Verifica país/idioma y
+    propiedad del cliente antes del preview; filtra editorialmente ruido y separa comparativas de productos
+    de intención local de tiendas. `totalCount` no representa demanda propia. Método de selección en
+    `modules/02_SEO_CONTENT.md`; contrato/caso live en manual CLI + Labs §2.1a.
   - `research`: keyword mining compuesto. Usa Suggestions + Related, agrega
     Keywords for Site y competidores con `--target`, enriquece candidatas con Labs y
     reserva SERP Standard para finalistas gobernadas. Revisa la matriz candidata y

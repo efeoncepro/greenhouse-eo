@@ -20,10 +20,7 @@ import {
   DATAFORSEO_CLI_PRESETS,
   isDataForSeoCliPreset
 } from '@/lib/ai/dataforseo-cli-presets'
-import {
-  DATAFORSEO_CLI_VERSION,
-  DATAFORSEO_CLI_VERSION_REGISTRY
-} from '@/lib/ai/dataforseo-cli-version'
+import { DATAFORSEO_CLI_VERSION, DATAFORSEO_CLI_VERSION_REGISTRY } from '@/lib/ai/dataforseo-cli-version'
 import {
   buildDataForSeoSerpCompareTasks,
   dataForSeoSerpCompareRowsToCsv,
@@ -63,6 +60,13 @@ import {
   type DataForSeoResearchCheckpoint
 } from '@/lib/ai/dataforseo-research-checkpoint'
 import { requestDataForSeo, type DataForSeoRequestInput } from '@/lib/ai/dataforseo'
+import {
+  buildDataForSeoSiteKeywordsPlan,
+  DATAFORSEO_SITE_KEYWORDS_ENDPOINT,
+  dataForSeoSiteKeywordsRowsToCsv,
+  normalizeDataForSeoSiteKeywordsResponse,
+  summarizeDataForSeoSiteKeywordsScope
+} from '@/lib/ai/dataforseo-site-keywords'
 import { resolveAeoBudget } from '@/lib/growth/ai-visibility/budget'
 import { enforceSeoRunEntitlement } from '@/lib/growth/seo/entitlement'
 
@@ -81,7 +85,7 @@ export const CLI_EXIT = {
   pending: 7
 } as const
 
-const parseArgs = (argv: string[]) => {
+export const parseArgs = (argv: string[]) => {
   const positional: string[] = []
   const flags: Flags = {}
 
@@ -95,7 +99,9 @@ const parseArgs = (argv: string[]) => {
       continue
     }
 
-    const [rawName, inline] = token.slice(2).split('=', 2)
+    const assignment = token.indexOf('=')
+    const rawName = token.slice(2, assignment === -1 ? undefined : assignment)
+    const inline = assignment === -1 ? undefined : token.slice(assignment + 1)
     const next = argv[index + 1]
     const value = inline ?? (next && !next.startsWith('--') ? argv[++index] : true)
     const previous = flags[rawName]
@@ -185,6 +191,14 @@ Consultas rápidas
   pnpm dataforseo -- quick organic --keyword "..." --market US --locale en-US --target example.com --depth 20 --load-ai-overview --yes --max-usd 0.01
   pnpm dataforseo -- quick keyword-overview --keyword "uno,dos" --market PE --org <uuid> --estimated-usd <n> --max-usd <n> --yes
   pnpm dataforseo -- quick ranked-keywords|competitors|backlinks|onpage-instant|onpage-audit --target <dominio|url> ...
+  pnpm dataforseo -- quick keywords-for-site --target-kind url --target https://example.com/article --market MX --dry-run
+
+Keywords relevantes por dominio, subdominio o URL
+  pnpm dataforseo -- site-keywords --target-kind url --target https://example.com/article --market MX --dry-run
+  pnpm dataforseo -- site-keywords --target-kind domain --target example.com --market CL --limit 100 --max-pages 2 --org <uuid> --max-usd 0.05 --checkpoint site.json --yes --out keywords.json --csv keywords.csv
+  --target-kind domain|subdomain|url es obligatorio. URL exige https:// o www.; preserva path, query y slash.
+  Relevancia temática, métricas Ads y tendencias; no posiciones SEO. Sin seeds, SERP ni competidores.
+  --resume reutiliza páginas frescas; la paginación se detiene cuando se agotan los resultados.
 
 Research compuesto
   pnpm dataforseo -- research --keyword "seed uno,seed dos" --market CL --target ejemplo.com --dry-run
@@ -337,6 +351,8 @@ const execute = async (input: {
   buildResult?: (tasks: unknown[]) => unknown
   buildCsv?: (result: unknown) => string
   requestBatchSize?: number
+  responseProblem?: (tasks: unknown[]) => string | null
+  responseHasData?: (tasks: unknown[]) => boolean
 }) => {
   const { endpoint, tasks, flags } = input
   const organizationId = flag(flags, 'org')
@@ -484,12 +500,21 @@ const execute = async (input: {
   }
 
   const taskCodes = summarizeTaskCodes(responseTasks)
-  const outcome = classifyDataForSeoOutcome({ httpOk: allHttpOk, taskCodes })
+  const responseProblem = allHttpOk ? (input.responseProblem?.(responseTasks) ?? null) : null
+  let outcome = responseProblem
+    ? { kind: 'provider_task_error', exitCode: CLI_EXIT.providerError }
+    : classifyDataForSeoOutcome({ httpOk: allHttpOk, taskCodes })
+
+  if (outcome.kind === 'success' && input.responseHasData && !input.responseHasData(responseTasks)) {
+    outcome = { kind: 'no_data', exitCode: CLI_EXIT.noData }
+  }
+
   const normalizedResult = input.buildResult?.(responseTasks)
 
   const artifact = {
     ok: outcome.kind === 'success',
     outcome: outcome.kind,
+    ...(responseProblem ? { reason: responseProblem } : {}),
     queriedAt: new Date().toISOString(),
     surface: input.surface ?? 'dataforseo-cli',
     request: preview,
@@ -571,6 +596,7 @@ type ResearchStepArtifact = {
   taskCount: number
   outcome: ReturnType<typeof classifyDataForSeoOutcome>['kind']
   costUsd: number
+  costKnown?: boolean
   reused: boolean
   taskCodes: ReturnType<typeof summarizeTaskCodes>
   tasks: unknown[]
@@ -656,6 +682,7 @@ const executeResearchStep = async (input: {
   allowPending?: boolean
   cacheable?: boolean
   resolvedEndpointPath?: string
+  captureTerminalErrors?: boolean
 }): Promise<ResearchStepArtifact> => {
   const endpoint = findDataForSeoEndpoint(input.endpointPath)
 
@@ -682,8 +709,9 @@ const executeResearchStep = async (input: {
       name: input.name,
       endpoint: cached.endpoint,
       taskCount: input.tasks.length,
-      outcome: classifyDataForSeoOutcome({ httpOk: true, taskCodes }).kind,
+      outcome: classifyDataForSeoOutcome({ httpOk: cached.httpOk ?? true, taskCodes }).kind,
       costUsd: 0,
+      costKnown: cached.costKnown ?? true,
       reused: true,
       taskCodes,
       tasks: cached.tasks
@@ -709,9 +737,10 @@ const executeResearchStep = async (input: {
   const outcome = classifyDataForSeoOutcome({ httpOk: response.ok, taskCodes })
 
   if (
-    outcome.kind === 'transport_error' ||
-    outcome.kind === 'provider_task_error' ||
-    (outcome.kind === 'pending' && !input.allowPending)
+    !input.captureTerminalErrors &&
+    (outcome.kind === 'transport_error' ||
+      outcome.kind === 'provider_task_error' ||
+      (outcome.kind === 'pending' && !input.allowPending))
   ) {
     throw new Error(
       `Research se detuvo en ${input.name}: ${outcome.kind} (${taskCodes.map(task => task.statusCode).join(', ')}).`
@@ -734,9 +763,13 @@ const executeResearchStep = async (input: {
 
   const completedAt = new Date().toISOString()
 
-  const expiresAt = input.cacheable
-    ? new Date(Date.now() + input.context.cacheMaxAgeHours * 60 * 60 * 1000).toISOString()
-    : null
+  const terminalEvidence =
+    input.captureTerminalErrors && (response.cost === null || !['success', 'no_data'].includes(outcome.kind))
+
+  const expiresAt =
+    input.cacheable && !terminalEvidence
+      ? new Date(Date.now() + input.context.cacheMaxAgeHours * 60 * 60 * 1000).toISOString()
+      : null
 
   input.context.checkpoint = recordDataForSeoCheckpointStep(input.context.checkpoint, {
     key: input.key,
@@ -745,6 +778,7 @@ const executeResearchStep = async (input: {
     completedAt,
     expiresAt,
     costUsd: response.cost ?? 0,
+    ...(input.captureTerminalErrors ? { costKnown: response.cost !== null, httpOk: response.ok } : {}),
     cursor: extractResearchCursor(response.tasks),
     taskIds: taskCodes.flatMap(task => (task.id ? [task.id] : [])),
     tasks: response.tasks
@@ -761,6 +795,7 @@ const executeResearchStep = async (input: {
     taskCount: input.tasks.length,
     outcome: outcome.kind,
     costUsd: response.cost ?? 0,
+    ...(input.captureTerminalErrors ? { costKnown: response.cost !== null } : {}),
     reused: false,
     taskCodes,
     tasks: response.tasks
@@ -887,6 +922,317 @@ const labsRequestEstimate = (tasks: Record<string, unknown>[]) =>
       .reduce((sum, task) => sum + 0.012 + (typeof task.limit === 'number' ? task.limit : 1000) * 0.00012, 0)
       .toFixed(6)
   )
+
+const SITE_KEYWORDS_DECLARATIONS = [
+  'Keywords relevantes por categoría; no demuestra posiciones ni conversiones de la página.',
+  'Volumen, CPC y competencia corresponden a una lente estimada de Google Ads.',
+  'Se conserva el orden de relevancia del proveedor, sin score editorial inventado.',
+  'La URL conserva su path, query y slash; el proveedor no garantiza equivalencias canónicas.',
+  'El límite y las páginas producen una muestra; la cobertura se declara por separado.'
+]
+
+const buildSiteKeywordsCliPlan = (flags: Flags, quick = false) =>
+  buildDataForSeoSiteKeywordsPlan({
+    target: flag(flags, 'target') ?? '',
+    targetKind: flag(flags, 'target-kind') ?? '',
+    market: flag(flags, 'market'),
+    locale: flag(flags, 'locale'),
+    limit: numberFlag(flags, 'limit'),
+    maxPages: quick ? 1 : numberFlag(flags, 'max-pages'),
+    cacheMaxAgeHours: numberFlag(flags, 'cache-max-age-hours')
+  })
+
+const validateSiteKeywordsSpendFlags = (flags: Flags, minimumEstimate: number) => {
+  if (flag(flags, 'consumer') && flag(flags, 'consumer') !== 'seo') {
+    throw new Error('Keywords for Site usa consumer=seo; no permite cambiar su atribución de gasto.')
+  }
+
+  const estimate = numberFlag(flags, 'estimated-usd')
+
+  if (estimate !== undefined && estimate < minimumEstimate) {
+    throw new Error(`--estimated-usd no puede reducir la estimación conservadora USD ${minimumEstimate}.`)
+  }
+
+  const maxUsd = numberFlag(flags, 'max-usd')
+
+  if (maxUsd !== undefined && maxUsd <= 0) throw new Error('Keywords for Site exige --max-usd > 0.')
+}
+
+const siteKeywordsResponseProblem = (
+  tasks: unknown[],
+  subject: ReturnType<typeof buildDataForSeoSiteKeywordsPlan>['subject']
+) => {
+  const codes = summarizeTaskCodes(tasks)
+
+  if (codes.length !== 1 || codes.some(task => task.statusCode !== 20000)) {
+    return 'Keywords for Site no devolvió una task exitosa con status_code=20000.'
+  }
+
+  const scope = summarizeDataForSeoSiteKeywordsScope(tasks, subject)
+
+  if (scope.resultCount > 1) return 'Keywords for Site devolvió múltiples bloques de resultado; no se mezclan alcances.'
+
+  return scope.status === 'mismatch'
+    ? 'El target devuelto no coincide con el alcance solicitado; se conserva raw y se omiten filas normalizadas.'
+    : null
+}
+
+export const getSiteKeywordsPageInfo = (tasks: unknown[]) => {
+  const results = tasks.flatMap(task => {
+    if (!task || typeof task !== 'object') return []
+    const row = task as Record<string, unknown>
+
+    return row.status_code === 20000 && Array.isArray(row.result)
+      ? row.result.filter((result): result is Record<string, unknown> => Boolean(result && typeof result === 'object'))
+      : []
+  })
+
+  return {
+    returnedRows: results.reduce((sum, result) => sum + (Array.isArray(result.items) ? result.items.length : 0), 0),
+    totalCount: typeof results[0]?.total_count === 'number' ? results[0].total_count : null,
+    offsetToken:
+      typeof results[0]?.offset_token === 'string' && results[0].offset_token ? results[0].offset_token : null
+  }
+}
+
+export const runSiteKeywords = async (flags: Flags) => {
+  const plan = buildSiteKeywordsCliPlan(flags)
+  const dryRun = boolFlag(flags, 'dry-run') || !boolFlag(flags, 'yes')
+
+  validateSiteKeywordsSpendFlags(flags, plan.estimatedCostUsd)
+
+  const preview = {
+    ok: true,
+    dryRun,
+    surface: 'dataforseo-site-keywords',
+    consumer: 'seo',
+    plan,
+    declarations: SITE_KEYWORDS_DECLARATIONS
+  }
+
+  if (dryRun) return printJson(preview)
+
+  const organizationId = flag(flags, 'org')
+  const maxUsd = numberFlag(flags, 'max-usd')
+
+  if (!organizationId) throw new Error('site-keywords exige --org para ejecutar; no se inventan organizaciones.')
+  if (maxUsd === undefined || maxUsd <= 0) throw new Error('site-keywords exige --max-usd > 0 para ejecutar.')
+
+  const context = await initializeResearchContext({
+    flags,
+    kind: 'keyword-research',
+    plan: { surface: preview.surface, ...plan },
+    organizationId,
+    maxUsd,
+    cacheMaxAgeHours: plan.cacheMaxAgeHours
+  })
+
+  const steps: ResearchStepArtifact[] = []
+  const seenTokens = new Set<string>()
+  let tasks: Record<string, unknown>[] = [plan.task]
+  let totalCount: number | null = null
+  let returnedRows = 0
+  let hasMore = false
+  let outcome = 'success'
+  let reason: string | null = null
+  let exitCode: number = CLI_EXIT.ok
+
+  try {
+    const blockedSteps = Object.values(context.checkpoint.steps).filter(
+      step => step.costKnown === false || step.httpOk === false || siteKeywordsResponseProblem(step.tasks, plan.subject)
+    )
+
+    if (blockedSteps.length > 0) {
+      steps.push(
+        ...Object.values(context.checkpoint.steps).map(step => ({
+          key: step.key,
+          name: step.key,
+          endpoint: step.endpoint,
+          taskCount: 1,
+          outcome: classifyDataForSeoOutcome({ httpOk: step.httpOk ?? true, taskCodes: summarizeTaskCodes(step.tasks) })
+            .kind,
+          costUsd: 0,
+          costKnown: step.costKnown ?? true,
+          reused: true,
+          taskCodes: summarizeTaskCodes(step.tasks),
+          tasks: step.tasks
+        }))
+      )
+      outcome = blockedSteps.some(step => step.httpOk === false)
+        ? 'transport_error'
+        : blockedSteps.some(
+              step =>
+                classifyDataForSeoOutcome({ httpOk: step.httpOk ?? true, taskCodes: summarizeTaskCodes(step.tasks) })
+                  .kind === 'pending'
+            )
+          ? 'pending'
+          : blockedSteps.some(step => step.costKnown === false)
+            ? 'cost_unavailable'
+            : 'provider_task_error'
+      reason = 'El checkpoint contiene una respuesta fallida o costo desconocido; no se repite el POST al reanudar.'
+      exitCode =
+        outcome === 'transport_error'
+          ? CLI_EXIT.transportError
+          : outcome === 'pending'
+            ? CLI_EXIT.pending
+            : CLI_EXIT.providerError
+      hasMore = true
+    } else
+      for (let page = 0; page < plan.maxPages; page += 1) {
+        const step = await executeResearchStep({
+          key: `site-keywords:${page}`,
+          name: `site-keywords:page:${page + 1}`,
+          endpointPath: DATAFORSEO_SITE_KEYWORDS_ENDPOINT,
+          tasks,
+          context,
+          estimatedCostUsd: Math.max(plan.pageEstimateUsd, (numberFlag(flags, 'estimated-usd') ?? 0) / plan.maxPages),
+          cacheable: true,
+          captureTerminalErrors: true
+        })
+
+        steps.push(step)
+        const problem = siteKeywordsResponseProblem(step.tasks, plan.subject)
+
+        if (step.outcome === 'transport_error' || step.outcome === 'pending' || problem || step.costKnown === false) {
+          outcome =
+            step.outcome === 'transport_error'
+              ? 'transport_error'
+              : step.outcome === 'pending'
+                ? 'pending'
+                : problem
+                  ? 'provider_task_error'
+                  : 'cost_unavailable'
+          reason =
+            step.outcome === 'transport_error'
+              ? 'El transporte falló; no se reenvía automáticamente el POST.'
+              : step.outcome === 'pending'
+                ? 'Keywords for Site Live devolvió un estado pending inesperado.'
+                : (problem ?? 'El proveedor no reportó costo; se detiene antes de comprar otra página.')
+          exitCode =
+            step.outcome === 'transport_error'
+              ? CLI_EXIT.transportError
+              : step.outcome === 'pending'
+                ? CLI_EXIT.pending
+                : CLI_EXIT.providerError
+          context.checkpoint.steps[step.key].expiresAt = null
+          context.checkpoint = await writeDataForSeoResearchCheckpoint(context.checkpointPath, context.checkpoint)
+          break
+        }
+
+        const info = getSiteKeywordsPageInfo(step.tasks)
+
+        totalCount = info.totalCount ?? totalCount
+        returnedRows += info.returnedRows
+
+        if (info.returnedRows === 0 && totalCount !== null && returnedRows < totalCount) {
+          outcome = 'pagination_inconsistent'
+          reason =
+            'El proveedor devolvió una página vacía antes de alcanzar total_count; la cobertura queda incompleta.'
+          exitCode = CLI_EXIT.providerError
+          hasMore = true
+          break
+        }
+
+        hasMore =
+          info.returnedRows > 0 &&
+          (totalCount !== null
+            ? returnedRows < totalCount
+            : Boolean(info.offsetToken) || info.returnedRows === plan.limit)
+
+        if (!hasMore) break
+
+        if (info.offsetToken && seenTokens.has(info.offsetToken)) {
+          outcome = 'pagination_stalled'
+          reason = 'El proveedor repitió offset_token; no se vuelve a comprar la misma página.'
+          exitCode = CLI_EXIT.providerError
+          break
+        }
+
+        if (info.offsetToken) seenTokens.add(info.offsetToken)
+
+        tasks = buildNextResearchPageTasks(
+          tasks,
+          info.offsetToken ? { offsetToken: info.offsetToken } : null,
+          plan.limit,
+          page + 1
+        )
+      }
+  } catch (error) {
+    if (!(error instanceof ResearchStoppedError)) throw error
+    outcome = 'stopped'
+    reason = error.message
+    exitCode = error.exitCode
+    hasMore = true
+  }
+
+  if (reason) await persistResearchStop(context, reason)
+
+  const responseTasks = steps.flatMap(step => step.tasks)
+  const observedPages = steps.map(step => getSiteKeywordsPageInfo(step.tasks))
+
+  returnedRows = observedPages.reduce((sum, page) => sum + page.returnedRows, 0)
+  totalCount = observedPages.findLast(page => page.totalCount !== null)?.totalCount ?? totalCount
+  const scope = summarizeDataForSeoSiteKeywordsScope(responseTasks, plan.subject)
+
+  const rows =
+    scope.status === 'mismatch' ||
+    steps.some(step => summarizeDataForSeoSiteKeywordsScope(step.tasks, plan.subject).resultCount > 1)
+      ? []
+      : normalizeDataForSeoSiteKeywordsResponse(responseTasks)
+
+  if (outcome === 'success' && rows.length === 0) {
+    outcome = 'no_data'
+    exitCode = CLI_EXIT.noData
+  }
+
+  const costKnown = Object.values(context.checkpoint.steps).every(step => step.costKnown !== false)
+
+  const artifact = withCliVersion({
+    ...preview,
+    ok: outcome === 'success' || outcome === 'no_data',
+    dryRun: false,
+    outcome,
+    reason,
+    queriedAt: new Date().toISOString(),
+    organizationId,
+    runId: context.checkpoint.runId,
+    checkpoint: context.checkpointPath,
+    result: {
+      scope,
+      keywordCount: rows.length,
+      actualCostUsd: costKnown ? context.checkpoint.actualCostUsd : null,
+      incrementalCostUsd: costKnown ? Number(steps.reduce((sum, step) => sum + step.costUsd, 0).toFixed(6)) : null,
+      coverage: {
+        pagesFetched: steps.length,
+        returnedRows,
+        totalCount,
+        hasMore,
+        exhausted: ['success', 'no_data'].includes(outcome) && !hasMore
+      },
+      keywords: rows
+    },
+    steps
+  })
+
+  if (flag(flags, 'out')) await writeFile(flag(flags, 'out')!, `${JSON.stringify(artifact, null, 2)}\n`, { flag: 'wx' })
+  if (flag(flags, 'csv')) await writeFile(flag(flags, 'csv')!, dataForSeoSiteKeywordsRowsToCsv(rows), { flag: 'wx' })
+
+  printJson(
+    flag(flags, 'out') || flag(flags, 'csv')
+      ? {
+          ok: artifact.ok,
+          outcome,
+          reason,
+          surface: preview.surface,
+          runId: context.checkpoint.runId,
+          checkpoint: context.checkpointPath,
+          artifacts: { json: flag(flags, 'out') ?? null, csv: flag(flags, 'csv') ?? null },
+          result: { ...artifact.result, keywords: undefined }
+        }
+      : artifact
+  )
+  process.exitCode = exitCode
+}
 
 const writeResearchArtifact = async (input: {
   artifact: Record<string, unknown>
@@ -1370,9 +1716,9 @@ const runAiResearch = async (flags: Flags) => {
   }
 }
 
-const run = async () => {
+export const run = async (argv = process.argv.slice(2)) => {
   loadGreenhouseToolEnv()
-  const { positional, flags } = parseArgs(process.argv.slice(2))
+  const { positional, flags } = parseArgs(argv)
   const [command, subcommand, selector] = positional
 
   if (command === 'version' || boolFlag(flags, 'version')) {
@@ -1443,6 +1789,7 @@ const run = async () => {
       preset: subcommand,
       keyword: flag(flags, 'keyword'),
       target: flag(flags, 'target'),
+      targetKind: flag(flags, 'target-kind'),
       market: flag(flags, 'market'),
       locale: flag(flags, 'locale'),
       device: flag(flags, 'device'),
@@ -1459,6 +1806,38 @@ const run = async () => {
       platform: flag(flags, 'platform')
     })
 
+    if (subcommand === 'keywords-for-site') {
+      const plan = buildSiteKeywordsCliPlan(flags, true)
+
+      validateSiteKeywordsSpendFlags(flags, plan.pageEstimateUsd)
+
+      if (numberFlag(flags, 'max-pages') !== undefined || flag(flags, 'resume') || flag(flags, 'checkpoint')) {
+        throw new Error('quick keywords-for-site consulta una página; usa site-keywords para paginación y checkpoint.')
+      }
+
+      return execute({
+        endpoint,
+        tasks,
+        flags,
+        estimatedCostUsd: plan.pageEstimateUsd,
+        defaultConsumer: 'seo',
+        surface: 'dataforseo-site-keywords',
+        previewExtra: { subject: plan.subject, declarations: SITE_KEYWORDS_DECLARATIONS },
+        responseProblem: responseTasks => siteKeywordsResponseProblem(responseTasks, plan.subject),
+        responseHasData: responseTasks => normalizeDataForSeoSiteKeywordsResponse(responseTasks).length > 0,
+        buildResult: responseTasks => ({
+          scope: summarizeDataForSeoSiteKeywordsScope(responseTasks, plan.subject),
+          keywords: siteKeywordsResponseProblem(responseTasks, plan.subject)
+            ? []
+            : normalizeDataForSeoSiteKeywordsResponse(responseTasks)
+        }),
+        buildCsv: result =>
+          dataForSeoSiteKeywordsRowsToCsv(
+            (result as { keywords: ReturnType<typeof normalizeDataForSeoSiteKeywordsResponse> }).keywords
+          )
+      })
+    }
+
     const estimate =
       preset.estimatePerTaskUsd === null
         ? null
@@ -1471,6 +1850,7 @@ const run = async () => {
   }
 
   if (command === 'research') return runKeywordResearch(flags)
+  if (command === 'site-keywords') return runSiteKeywords(flags)
   if (command === 'ai-research') return runAiResearch(flags)
   if (command === 'serp-compare') return runSerpCompare(flags)
 
@@ -1520,7 +1900,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       await closeGreenhousePostgres()
     })
     .catch(error => {
-      console.error(`No se pudieron cerrar los recursos de la CLI: ${error instanceof Error ? error.message : String(error)}`)
+      console.error(
+        `No se pudieron cerrar los recursos de la CLI: ${error instanceof Error ? error.message : String(error)}`
+      )
       process.exitCode = CLI_EXIT.transportError
     })
 }

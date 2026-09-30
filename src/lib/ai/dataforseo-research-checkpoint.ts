@@ -10,6 +10,8 @@ export type DataForSeoResearchCheckpointStep = {
   completedAt: string
   expiresAt: string | null
   costUsd: number
+  costKnown?: boolean
+  httpOk?: boolean
   cursor: {
     offset?: number
     offsetToken?: string
@@ -167,6 +169,8 @@ export const recordDataForSeoCheckpointStep = (
       completedAt: input.completedAt,
       expiresAt: input.expiresAt,
       costUsd: input.costUsd,
+      ...(input.costKnown === undefined ? {} : { costKnown: input.costKnown }),
+      ...(input.httpOk === undefined ? {} : { httpOk: input.httpOk }),
       cursor: input.cursor,
       taskIds: input.taskIds,
       tasks: input.tasks

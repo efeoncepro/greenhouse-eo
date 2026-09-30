@@ -9,6 +9,7 @@ entitlement y ledger que los consumers productivos; no es un SDK alternativo. La
 Comportamiento funcional: [`dataforseo-research-cli.md`](../../documentation/growth/dataforseo-research-cli.md).
 Contrato técnico: [`GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md`](../../architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md).
 Evidencia de campo: [validación transversal del 2026-09-28](../../audits/seo/2026-09-28-dataforseo-cli-production-validation.md).
+Relevancia por URL, CLI 1.1.0: [validación local del 2026-09-30](../../audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md).
 
 ```bash
 pnpm dataforseo -- help
@@ -199,6 +200,7 @@ resultado correcto es `cached_provider_result` en los cuatro registros.
 | Observar Google AI Mode y sus referencias                | `quick ai-mode`                               | SERP con `consumer=aeo`                                              |
 | Volumen, intent y dificultad                             | `quick keyword-overview`                      | Labs; DataForSEO es lente estimada                                   |
 | Keywords de un dominio / competidores                    | `quick ranked-keywords` / `quick competitors` | Labs                                                                 |
+| Keywords relevantes de una URL o host                    | `quick keywords-for-site` / `site-keywords`    | Labs; requiere `--target-kind`; relevancia temática, no posiciones |
 | Perfil agregado de enlaces                               | `quick backlinks`                             | Backlinks; usa `run` para referring domains, anchors o link gap      |
 | Diagnóstico inmediato de una URL                         | `quick onpage-instant`                        | OnPage live                                                          |
 | Crawl técnico completo                                   | `quick onpage-audit` + `task wait`            | OnPage asíncrono; JS/browser multiplican costo                       |
@@ -211,6 +213,101 @@ resultado correcto es `cached_provider_result` en los cuatro registros.
 `quick` sólo cubre operaciones frecuentes. Para cualquier otra ruta autorizada usa `catalog describe` y `run`;
 no conviertas la ausencia de preset en permiso para usar `curl`.
 
+### Keywords relevantes de una página, dominio o subdominio
+
+`quick keywords-for-site` consulta una sola página de resultados. `site-keywords` consulta exclusivamente
+`/v3/dataforseo_labs/google/keywords_for_site/live` y añade paginación acotada, checkpoint/resume y JSON/CSV.
+Sirve para preparar o actualizar un brief desde una URL propia o referente, sin seeds ni compras de Overview,
+Competitors o SERP. Son **sugerencias relevantes para el contenido**, no keywords por las que la página posiciona.
+Para posiciones usa `ranked_keywords`; para consultas realmente observadas de tu propiedad, Search Console.
+
+Declara siempre `--target-kind domain|subdomain|url`; la CLI no adivina el alcance. Para URL exige `https://` o
+`www.` (añade `https://`), preserva ruta, trailing slash y query, y rechaza fragmentos, credentials, puertos y
+comodines. `domain` y `subdomain` reciben sólo hostname; `domain` no admite prefijo `www.`. Los targets de host
+envían `include_subdomains:false` para no solicitar expansión a subdominios. URL omite ese flag. Esto declara
+la petición; no certifica canonicalización ni que el proveedor haya identificado todas las keywords del sujeto.
+
+Preview por URL, sin credenciales, organización ni gasto:
+
+```bash
+pnpm dataforseo -- quick keywords-for-site \
+  --target-kind url --target https://example.com/articulo \
+  --market MX --locale es-MX --limit 100 --dry-run
+
+pnpm dataforseo -- site-keywords \
+  --target-kind url --target https://example.com/articulo \
+  --market MX --locale es-MX --limit 100 --max-pages 2 --dry-run
+```
+
+`--limit` es el máximo comprado **por página**, default 100, rango 1–1000. `--max-pages` del compuesto tiene
+default 1 y rango 1–20. Ordena por `relevance,desc`, criterio del proveedor sin score numérico propio. Con
+clickstream desactivado, el estimador conservador usa USD 0,012 por request + USD 0,00012 por fila máxima;
+100 filas y dos páginas estiman USD 0,048. Los filtros no se cobran por separado. El costo real queda en JSON.
+
+Ejecuta sólo después de revisar el preview, con una organización real y ceiling que cubra el plan:
+
+```bash
+pnpm dataforseo -- site-keywords \
+  --target-kind url --target https://example.com/articulo \
+  --market MX --locale es-MX --limit 100 --max-pages 2 \
+  --org <uuid> --max-usd 0.05 \
+  --checkpoint /tmp/site-keywords.checkpoint.json --yes \
+  --out /tmp/site-keywords.json --csv /tmp/site-keywords.csv
+```
+
+Para reanudar, conserva sujeto, tipo, mercado y límites y reemplaza `--checkpoint` por
+`--resume /tmp/site-keywords.checkpoint.json`. Usa nuevos nombres `--out`/`--csv`: la CLI crea outputs de forma
+exclusiva para preservar evidencia. `--cache-max-age-hours` controla TTL, default 24, rango 1–720 horas.
+Cada página nueva revalida entitlement SEO y gasto acumulado + estimación antes del POST; un paso fresco
+reutilizado no recompra. El ceiling no es una reserva transaccional dentro del proveedor.
+
+El JSON conserva sujeto solicitado, mercado, `cliVersion`, fuente explícita en `plan.source` (proveedor,
+documentación, lente `market_estimate`, semántica `category_relevance`, competencia `google_ads` y fecha de
+verificación del precio), timestamp, tasks crudas, costo y
+`result.coverage` (`pagesFetched`, `returnedRows`, `totalCount`, `hasMore`, `exhausted`). Una muestra truncada no
+se declara exhaustiva. `result.scope` compara sólo `result.target` devuelto: `matched`, `mismatch` o `unreported`.
+Un eco del request no es evidencia de scope; un mismatch no genera filas que aparenten relevancia de esa URL.
+Más de un bloque de resultado en una página aborta sin combinar alcances. Un único bloque sin target mantiene
+`unreported`, sin inventar evidencia de coincidencia.
+Un target coincidente no demuestra posición, canonicalización ni calidad editorial.
+
+CSV contiene keywords, métricas, estado de volumen, categorías, estacionalidad, tendencias y task ID; conserva
+el JSON compañero para procedencia completa, mercado y alcance. CPC, `competition` y `competitionLevel` son
+**métricas publicitarias**, no dificultad SEO. Missing, NULL y cero conservan estados diferentes; no rellenes
+métricas ausentes con cero. `searchVolumeState` distingue `value`, `missing`, `null` e `invalid`; un valor
+inválido del proveedor se conserva como `searchVolume:null` con estado `invalid`, sin convertirlo en cero.
+Las tendencias no son posiciones ni tráfico observado.
+
+Si hay costo desconocido, `actualCostUsd`/`incrementalCostUsd` quedan NULL y el compuesto se detiene. Transporte
+fallido, task fallida o pending inesperada, scope divergente y múltiples bloques quedan registrados como barrera
+durable en el checkpoint, incluyendo `httpOk`. Antes de reutilizar o recomprar **cualquier** página, `--resume`
+revisa todo el checkpoint: una respuesta fallida o con costo desconocido bloquea nuevas compras incluso si venció
+el TTL. No renueves el checkpoint ni cambies el TTL para repetir un POST incierto; primero revisa su evidencia.
+Cambiar flags no elimina la incertidumbre de si el proveedor aceptó o cobró. Un resultado parcial no se presenta
+como plan completado. Con `--out` o `--csv`, stdout entrega un recibo compacto; el JSON guarda las tasks crudas.
+
+Contrato oficial verificado el 2026-09-30:
+[Keywords for Site](https://docs.dataforseo.com/v3/dataforseo_labs-google-keywords_for_site-live/) y
+[precios Labs Google](https://dataforseo.com/pricing/dataforseo-labs/dataforseo-google-api).
+La [prueba live Berel México del 2026-09-30](../../audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md#corrección-de-mercado-del-operador--berel-méxico)
+validó resultados reales, dos páginas, JSON/CSV y resume sin recompra. Las sugerencias incluyeron ruido de
+hoteles y bancos: revisa cada candidata frente al contenido y objetivo del brief. `totalCount` es metadata del
+proveedor; no lo traduzcas a keywords propias ni demanda del cliente, ni compres más páginas sólo por ese valor.
+
+Para repetir el caso de Berel, confirma **México (`MX`, location `2484`) / español** y la URL exacta antes de
+comprar. La comparación inicial en Chile queda como antecedente; no sustituye el mercado solicitado por el
+cliente. No atribuyas `berelmexico.com` a `berel.com` sin verificar su relación.
+
+```bash
+pnpm dataforseo -- site-keywords \
+  --target-kind url --target https://berel.com/ubica-tienda \
+  --market MX --locale es-MX --limit 10 --max-pages 2 --dry-run
+```
+
+Este preview reproduce el plan, sin repetir el gasto. Para analizar «mejor pinturería de México», usa SERP como
+una captura separada de `site-keywords`: distingue la visibilidad recibida de una valoración objetiva de la
+mejor tienda y limita cualquier ausencia al bloque orgánico efectivamente capturado.
+
 ### Keyword research compuesto
 
 `research` encadena descubrimiento, enriquecimiento y validación sin bajar todo el universo a SERP. Por defecto
@@ -222,7 +319,7 @@ opt-in.
 pnpm dataforseo -- research \
   --keyword "seo con ia,visibilidad en chatgpt" \
   --market CL \
-  --target efeonce.org \
+  --target efeoncepro.com \
   --limit 50 \
   --candidate-limit 500 \
   --serp-limit 10 \
@@ -239,7 +336,7 @@ exige un checkpoint persistente, porque un POST aceptado nunca se vuelve a envia
 pnpm dataforseo -- research \
   --keyword "seo con ia,visibilidad en chatgpt" \
   --market CL \
-  --target efeonce.org \
+  --target efeoncepro.com \
   --org <uuid> \
   --max-usd 0.25 \
   --checkpoint /tmp/keyword-research.checkpoint.json \
@@ -270,7 +367,7 @@ Reanuda sin recomprar Suggestions, Related ni Overview:
 pnpm dataforseo -- research \
   --keyword "seo con ia,visibilidad en chatgpt" \
   --market CL \
-  --target efeonce.org \
+  --target efeoncepro.com \
   --org <uuid> \
   --max-usd 0.25 \
   --resume /tmp/keyword-research.checkpoint.json \

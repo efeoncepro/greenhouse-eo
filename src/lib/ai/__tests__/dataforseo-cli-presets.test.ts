@@ -3,6 +3,30 @@ import { describe, expect, it } from 'vitest'
 import { buildDataForSeoPresetPayload } from '../dataforseo-cli-presets'
 
 describe('DataForSEO CLI presets', () => {
+  it('builds exact page keyword research with an explicitly declared scope', () => {
+    expect(
+      buildDataForSeoPresetPayload({
+        preset: 'keywords-for-site',
+        target: 'https://www.example.com/Article/?id=A',
+        targetKind: 'url',
+        market: 'MX',
+        limit: 25
+      })
+    ).toEqual([
+      {
+        target: 'https://www.example.com/Article/?id=A',
+        location_code: 2484,
+        language_code: 'es',
+        limit: 25,
+        order_by: ['relevance,desc'],
+        include_clickstream_data: false
+      }
+    ])
+    expect(() => buildDataForSeoPresetPayload({ preset: 'keywords-for-site', target: 'example.com' })).toThrow(
+      '--target-kind'
+    )
+  })
+
   it('uses the shared market resolver and never sends a localized label as provider identity', () => {
     expect(
       buildDataForSeoPresetPayload({

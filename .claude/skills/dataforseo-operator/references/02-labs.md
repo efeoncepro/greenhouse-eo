@@ -29,7 +29,7 @@ Fuente: https://docs.dataforseo.com/v3/dataforseo_labs-google-overview/ (+ índi
 
 | Endpoint | Path | Qué hace |
 |---|---|---|
-| Keywords For Site | `/keywords_for_site/live/` | Keywords relevantes para un dominio target |
+| Keywords For Site | `/keywords_for_site/live/` | Keywords relevantes para dominio, subdominio o URL (con esquema o www.; ver §2.1a) |
 | Related Keywords | `/related_keywords/live/` | Keywords del elemento "searches related to" del SERP |
 | Keyword Suggestions | `/keyword_suggestions/live/` | Frases que contienen la seed + términos añadidos (long-tail) |
 | Keyword Ideas | `/keyword_ideas/live/` | Keywords de la misma categoría que las seeds |
@@ -64,6 +64,55 @@ Fuente: https://docs.dataforseo.com/v3/dataforseo_labs-google-overview/ (+ índi
 | Historical Rank Overview | `/historical_rank_overview/live/` | Rankings + tráfico del dominio en el tiempo |
 | Bulk Traffic Estimation | `/bulk_traffic_estimation/live/` | Tráfico mensual estimado para hasta 1,000 dominios |
 | Historical Bulk Traffic Estimation | `/historical_bulk_traffic_estimation/live/` | Versión histórica del anterior (listado en el índice general; pricing propio, ver §5) |
+
+### 2.1a Keywords for Site por URL — contrato verificado 2026-09-30
+
+Fuente primaria: https://docs.dataforseo.com/v3/dataforseo_labs-google-keywords_for_site-live/
+
+- `target` acepta dominio, subdominio o página. Para URL exige prefijo de esquema o `www.`; sin prefijo,
+  el proveedor puede investigar el dominio completo. La CLI adopta https explícito (`www.` → `https://`).
+- No confundas **relevancia del contenido** con `ranked_keywords`: las sugerencias no prueban que esa URL
+  posicione por ellas. `competition`/`competition_level` y CPC son métricas Ads, no dificultad SEO.
+- `include_subdomains` tiene default true; false pide ignorar subdominios. En la CLI, hosts declaran false
+  y URL omite el flag. La documentación no garantiza equivalencia canonical ni tratamiento de sub-subdominios.
+- `limit` máx 1000 por task. Paginación mediante `offset`/`offset_token`, token ligado al request original.
+  `relevance,desc` ordena pertinencia del proveedor; no fabricar score numérico de relevancia.
+- La estimación local sin clickstream es USD 0,012/request + USD 0,00012/fila; costo final desde respuesta,
+  nunca desde la estimación. Fuente: https://dataforseo.com/pricing/dataforseo-labs/dataforseo-google-api
+- Usa `pnpm dataforseo -- quick keywords-for-site` o `site-keywords` con `--target-kind` explícito;
+  compuesto sólo compra este endpoint. Previsualiza, limita páginas, declara org/ceiling/checkpoint y reanuda.
+- Preview/artefacto declara `plan.source`; volumen inválido no es cero (`searchVolumeState: invalid`).
+  Checkpoint con costo desconocido o respuesta fallida bloquea nuevas compras antes de TTL/reuse; no recomprar
+  un POST incierto con otro checkpoint. Conserva evidencia raw y costo desconocido como NULL.
+- Scope se certifica sólo contra `result.target` reportado: coincidencia, divergencia o sin reporte.
+  Un eco request no prueba target retornado; coincidencia tampoco prueba ranking o calidad editorial.
+
+**Procedimiento de lectura y selección, probado live el 2026-09-30:**
+
+1. Verifica organización, mercado/idioma y URL de la propiedad del cliente antes del preview. Declara
+   `--market`/`--locale`; no heredes el país del operador ni el default de la CLI. Para Berel corresponde
+   México (`MX`, `location_code:2484`, `language_code:es`), salvo comparación de otro mercado autorizada.
+   Un hostname parecido no demuestra propiedad: `berelmexico.com` no se atribuye a `berel.com` por el nombre.
+2. Empieza con una muestra acotada, conserva plan/raw/JSON y acompaña el CSV con ese JSON. Revisa tasks,
+   scope, filas/cobertura y costo. `hasMore:true`/`exhausted:false` significa muestra parcial; `totalCount`
+   es metadata de la base del proveedor, no keywords exclusivas, demanda propia ni mandato de comprar todo.
+3. Clasifica las candidatas por decisión del lector y relación con el contenido: marca propia, necesidad
+   genérica pertinente, otra marca del sector o ruido fuera de foco. Conserva el motivo de selección/exclusión
+   en una matriz derivada sin borrar el raw. Hoteles/bancos/tiendas ajenas pueden aparecer con scope `matched`:
+   éxito técnico no equivale a calidad de todas las filas, ni el orden de relevancia sustituye la curaduría.
+4. Distingue intención observada en SERP de intención propuesta por el agente. «Mejor pinturería» puede
+   devolver comparativas de pinturas/marcas; «pinturas cerca de mí» apunta a localizar tiendas. Una captura
+   no establece superioridad objetiva ni autoriza recomendar un artículo para ambas intenciones.
+5. Contrasta candidatas con consultas GSC, corpus y canibalización antes de proponer brief/optimización.
+   Volúmenes son estimaciones Ads por keyword: no posiciones ni visitas ni usuarios únicos sumables.
+   La consulta no activa tracking, publicación, CMS ni captura recurrente por sí sola.
+6. Prueba resume del mismo plan/organización con nuevas rutas de salida: verifica task IDs originales,
+   `reused:true`, filas y costo incremental cero. Reconciliar gasto con el reader/ledger existente; no
+   deducirlo sólo del máximo autorizado o de una estimación. No repetir un POST para resolver incertidumbre.
+
+La [auditoría TASK-1948](../../../../docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md)
+conserva la evidencia live, paginación/resume y costos reconciliados. La captura mexicana prueba filas reales;
+la chilena es un antecedente de `no_data`, no el baseline del cliente ni evidencia de demanda cero en México.
 
 ### 2.2 Bing — `/v3/dataforseo_labs/bing/...`
 Fuente: https://docs.dataforseo.com/v3/dataforseo_labs-bing-overview/ — **US/English only**.

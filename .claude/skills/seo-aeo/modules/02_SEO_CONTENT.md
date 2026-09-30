@@ -27,6 +27,33 @@ y esfuerzo defendibles; si faltan, declarar prioridad estratégica provisional, 
 Procedimiento: docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md §2.3.
 Para Berel: berel-content-production/modules/14_PLANEACION_TEMATICA_Y_COBERTURA.md.
 
+## Relevancia por URL como insumo de briefs
+
+Con `dataforseo-operator`, usar `quick keywords-for-site` para una consulta puntual o `site-keywords`
+para una muestra paginada con checkpoint. Verificar organización, mercado, idioma y propiedad del target,
+leer el preview y mantener presupuesto/páginas acotados. El país del cliente gobierna la investigación;
+el default de la herramienta o la ubicación del operador no lo sustituyen.
+
+El resultado aporta candidatas de relevancia/categoría con métricas Ads estimadas. No prueba que la URL
+posicione por ellas, reciba sus visitas o aparezca en GSC. Scope `matched` confirma sólo el target reportado:
+puede convivir con sugerencias fuera del negocio. Mantener raw y JSON/CSV y derivar una matriz con keyword,
+intención/decisión, relación con página/corpus, motivo de selección o exclusión, fuente y fecha. Distinguir
+marca propia, necesidad pertinente, otra marca sectorial y ruido; el orden del proveedor no es prioridad editorial.
+
+Antes del brief, contrastar corpus, consultas GSC/canibalización y SERP de finalistas autorizadas. Una búsqueda
+«mejor X» puede mostrar comparativas de productos; una variante «cerca de mí» puede exigir tienda/localizador.
+Describir la intención observada en esa captura y la propuesta editorial por separado. La posición de una
+página no certifica que su empresa sea objetivamente la mejor. Hostnames similares requieren evidencia de
+propiedad antes de atribuir cobertura a la marca.
+
+`hasMore`/`exhausted` y filas/páginas definen cobertura. `totalCount` no mide keywords exclusivas, demanda propia
+ni usuarios únicos; no sumar volúmenes para prometer audiencia ni comprar toda la base para simular completitud.
+La propuesta puede ser optimizar localizador/ficha, ampliar contenido o descartar el tema; no fuerza un artículo.
+Discovery no modifica tracking, CMS, calendario ni autorización de publicación.
+
+Contrato y selección reusable: `.claude/skills/dataforseo-operator/references/02-labs.md` §2.1a.
+Caso live y límites: [auditoría TASK-1948](../../../../docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md).
+
 ## Principio raíz: intención > keyword
 
 Google y los motores IA resuelven **intención**, no cadenas de texto. Antes de

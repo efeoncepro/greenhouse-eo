@@ -1,0 +1,428 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "task-1948-berel-mx-live-2026-09-30",
+  "cliVersion": "1.1.0",
+  "capturedAt": {
+    "serp": "2026-09-30T13:28:51.621Z",
+    "siteKeywords": "2026-09-30T13:28:41.474Z",
+    "resume": "2026-09-30T13:29:29.516Z"
+  },
+  "market": {
+    "code": "MX",
+    "locationCode": 2484,
+    "languageCode": "es"
+  },
+  "siteKeywords": {
+    "target": "https://berel.com/ubica-tienda",
+    "targetKind": "url",
+    "limitPerPage": 10,
+    "maxPages": 2,
+    "outcome": "success",
+    "scope": "matched",
+    "coverage": {
+      "pagesFetched": 2,
+      "returnedRows": 20,
+      "totalCount": 1452960,
+      "hasMore": true,
+      "exhausted": false
+    },
+    "reportedTotalCountMeaning": "Provider metadata; not Berel-exclusive keywords or demonstrated client demand",
+    "sourceSemantics": {
+      "provider": "DataForSEO Labs",
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs-google-keywords_for_site-live/",
+      "lens": "market_estimate",
+      "semantics": "category_relevance",
+      "competitionMeaning": "google_ads",
+      "estimatePriceVerifiedAt": "2026-09-30"
+    },
+    "costUsd": 0.0264,
+    "taskCodes": [
+      [
+        {
+          "id": "09301328-1987-0398-0000-fef3d3e7c989",
+          "statusCode": 20000,
+          "statusMessage": "Ok.",
+          "resultCount": 1,
+          "cost": 0.0132,
+          "hasResult": true
+        }
+      ],
+      [
+        {
+          "id": "09301328-1987-0398-0000-61f3aa561192",
+          "statusCode": 20000,
+          "statusMessage": "Ok.",
+          "resultCount": 1,
+          "cost": 0.0132,
+          "hasResult": true
+        }
+      ]
+    ],
+    "keywords": [
+      {
+        "keyword": "pinturas berel cerca de mi",
+        "searchVolume": 33100,
+        "searchVolumeState": "value",
+        "categories": [
+          10013,
+          13388,
+          13595
+        ],
+        "lastUpdatedTime": "2026-09-13 21:24:49 +00:00"
+      },
+      {
+        "keyword": "tienda parisina cerca de mi ubicación",
+        "searchVolume": 590,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-12 08:36:44 +00:00"
+      },
+      {
+        "keyword": "pinturas berel los mochis",
+        "searchVolume": 140,
+        "searchVolumeState": "value",
+        "categories": [
+          10013,
+          13388,
+          13595
+        ],
+        "lastUpdatedTime": "2026-09-15 14:51:38 +00:00"
+      },
+      {
+        "keyword": "pinturas berel más cercana",
+        "searchVolume": 40,
+        "searchVolumeState": "value",
+        "categories": [
+          10013,
+          13388,
+          13595
+        ],
+        "lastUpdatedTime": "2026-09-25 21:33:48 +00:00"
+      },
+      {
+        "keyword": "buen fin pinturas berel",
+        "searchVolume": 10,
+        "searchVolumeState": "value",
+        "categories": [
+          10013,
+          13388,
+          13595
+        ],
+        "lastUpdatedTime": "2026-09-12 03:09:54 +00:00"
+      },
+      {
+        "keyword": "sabadell cerca de mi",
+        "searchVolume": 390,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-15 03:06:37 +00:00"
+      },
+      {
+        "keyword": "hotel baratos cerca de mi ubicación",
+        "searchVolume": 1600,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-12 22:27:24 +00:00"
+      },
+      {
+        "keyword": "alojamiento cerca de mi ubicación",
+        "searchVolume": 30,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-17 23:10:30 +00:00"
+      },
+      {
+        "keyword": "google hoteles cerca de mí",
+        "searchVolume": 10,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-13 02:41:44 +00:00"
+      },
+      {
+        "keyword": "buscar hotel cerca de mi ubicación",
+        "searchVolume": 110,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-14 10:05:34 +00:00"
+      },
+      {
+        "keyword": "tiendas bara cerca de mi ubicación",
+        "searchVolume": 480,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-15 05:40:54 +00:00"
+      },
+      {
+        "keyword": "hoteles cerca de mi ubicación en un área de 400m",
+        "searchVolume": 10,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-16 20:53:50 +00:00"
+      },
+      {
+        "keyword": "restaurantes roma cerca de mí",
+        "searchVolume": 10,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-17 16:48:08 +00:00"
+      },
+      {
+        "keyword": "tiendas italika cerca de mi ubicación",
+        "searchVolume": 320,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-17 02:03:33 +00:00"
+      },
+      {
+        "keyword": "pinturas cerca de mi",
+        "searchVolume": 60500,
+        "searchVolumeState": "value",
+        "categories": [
+          10013,
+          13388,
+          13595
+        ],
+        "lastUpdatedTime": "2026-09-15 05:03:43 +00:00"
+      },
+      {
+        "keyword": "hotel con cocina cerca de mi ubicación",
+        "searchVolume": 10,
+        "searchVolumeState": "value",
+        "categories": [
+          10017,
+          10017,
+          10142,
+          10142,
+          10769,
+          12067
+        ],
+        "lastUpdatedTime": "2026-09-17 08:01:36 +00:00"
+      },
+      {
+        "keyword": "pinturas casther cerca de mí",
+        "searchVolume": 3600,
+        "searchVolumeState": "value",
+        "categories": [
+          10013,
+          13388,
+          13595
+        ],
+        "lastUpdatedTime": "2026-09-13 10:16:39 +00:00"
+      },
+      {
+        "keyword": "pinturas prisa cerca de mi",
+        "searchVolume": 2400,
+        "searchVolumeState": "value",
+        "categories": [
+          10013,
+          13388,
+          13595
+        ],
+        "lastUpdatedTime": "2026-09-13 08:25:05 +00:00"
+      },
+      {
+        "keyword": "pinturas osel cerca de mi",
+        "searchVolume": 4400,
+        "searchVolumeState": "value",
+        "categories": [
+          10013,
+          13388,
+          13595
+        ],
+        "lastUpdatedTime": "2026-09-16 17:10:42 +00:00"
+      },
+      {
+        "keyword": "pinturas sayer cerca de mí",
+        "searchVolume": 8100,
+        "searchVolumeState": "value",
+        "categories": [
+          10013,
+          13388,
+          13595
+        ],
+        "lastUpdatedTime": "2026-09-17 21:28:42 +00:00"
+      }
+    ]
+  },
+  "serp": {
+    "query": "mejor pinturería de México",
+    "device": "desktop",
+    "requestedDepth": 10,
+    "outcome": "success",
+    "costUsd": 0.002,
+    "taskCodes": [
+      {
+        "id": "09301328-1987-0139-0000-72539c5375d3",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.002,
+        "hasResult": true
+      }
+    ],
+    "organicResults": [
+      {
+        "rankGroup": 1,
+        "domain": "blog.paqsa.com.mx",
+        "title": "Las pinturas de mejor desempeño y blancura – PROFECO"
+      },
+      {
+        "rankGroup": 2,
+        "domain": "revistadelconsumidor.profeco.gob.mx",
+        "title": "PINTURAS ARQUITECTÓNICAS - Revista del consumidor"
+      },
+      {
+        "rankGroup": 3,
+        "domain": "www.facebook.com",
+        "title": "¿Cuáles pinturas para la casa rinden más? - #rafacarbajal"
+      },
+      {
+        "rankGroup": 4,
+        "domain": "juanitoelpintor.com",
+        "title": "Mejores Marcas de Pintura Top 10"
+      },
+      {
+        "rankGroup": 5,
+        "domain": "www.mercadolibre.com.mx",
+        "title": "Pinturas vinílicas y acrílicas más vendidas"
+      },
+      {
+        "rankGroup": 6,
+        "domain": "www.berelmexico.com",
+        "title": "¿Cuál es la mejor pintura para exteriores en México?"
+      },
+      {
+        "rankGroup": 7,
+        "domain": "www.homedepot.com.mx",
+        "title": "Pinturas, máquinas y materiales para pintar"
+      },
+      {
+        "rankGroup": 8,
+        "domain": "www.youtube.com",
+        "title": "cual es la mejor marca de pintura"
+      }
+    ],
+    "officialDomain": "berel.com",
+    "officialDomainInReceivedOrganicResults": false,
+    "similarDomainOwnershipVerified": false
+  },
+  "resume": {
+    "outcome": "success",
+    "rowsUnchanged": true,
+    "reusedPages": [
+      true,
+      true
+    ],
+    "sameTaskIds": true,
+    "incrementalCostUsd": 0
+  },
+  "export": {
+    "jsonKeywordRows": 20,
+    "csvRows": 20,
+    "csvKeywordsMatch": true
+  },
+  "spend": {
+    "mexicoOnlyCostUsd": 0.0284,
+    "declaredCeilingUsd": 0.03,
+    "ledgerReadbackDuringSmoke": {
+      "consumer": "seo",
+      "costBasis": "invoiced",
+      "labs": {
+        "beforeCalls": 2,
+        "afterCalls": 4,
+        "beforeUsd": 0.024,
+        "afterUsd": 0.0504
+      },
+      "serp": {
+        "beforeCalls": 32,
+        "afterCalls": 33,
+        "beforeUsd": 0.116,
+        "afterUsd": 0.118
+      }
+    },
+    "chileCostIsSeparate": true
+  },
+  "sourceArtifactHashes": {
+    "serp-mexico.json": "3bdaf5a0fdaba64029cde34519096adade770bc20fc75fe5e976edca097f9fbd",
+    "berel-url-mexico.json": "318b33e64eaa30815795a058dc6204493de3b501ddf901c6ffd1c4f3abb79fd6",
+    "berel-url-mexico.csv": "e100a4fa065faaee7684cea22312d3088834b82006493057d3df8103101e4e16",
+    "berel-url-mexico-resume.json": "cdb0bdcdfa01e8fc7395749e8132c1e2e3fb86b87e0dd11250dcf0ff690036ce"
+  },
+  "limitations": [
+    "Category relevance suggestions require editorial review; sample includes unrelated hotels/banks/stores",
+    "Search volumes are estimated Ads data, not rankings, traffic, or unique users",
+    "No Search Console validation or editorial publication measured",
+    "Truncated sample; provider total_count is not evidence of exhaustiveness",
+    "Ledger values were independently read during smoke; no additional provider or DB call for this documentation pass"
+  ]
+}

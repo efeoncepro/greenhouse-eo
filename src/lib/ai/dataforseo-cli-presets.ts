@@ -1,5 +1,7 @@
 import { resolveGrowthMarket } from '@/lib/growth/markets'
 
+import { buildDataForSeoSiteKeywordsPlan, DATAFORSEO_SITE_KEYWORDS_ENDPOINT } from './dataforseo-site-keywords'
+
 export const DATAFORSEO_CLI_PRESETS = {
   organic: {
     endpoint: '/v3/serp/google/organic/live/advanced',
@@ -17,6 +19,12 @@ export const DATAFORSEO_CLI_PRESETS = {
     endpoint: '/v3/dataforseo_labs/google/keyword_overview/live',
     estimatePerTaskUsd: null,
     description: 'Volumen, dificultad e intent de keywords',
+    consumer: 'seo'
+  },
+  'keywords-for-site': {
+    endpoint: DATAFORSEO_SITE_KEYWORDS_ENDPOINT,
+    estimatePerTaskUsd: null,
+    description: 'Keywords relevantes para dominio, subdominio o URL exacta; no posiciones',
     consumer: 'seo'
   },
   'ranked-keywords': {
@@ -108,6 +116,7 @@ export const buildDataForSeoPresetPayload = (input: {
   preset: DataForSeoCliPreset
   keyword?: string
   target?: string
+  targetKind?: string
   market?: string
   locale?: string
   device?: string
@@ -123,6 +132,18 @@ export const buildDataForSeoPresetPayload = (input: {
   forceWebSearch?: boolean
   platform?: string
 }) => {
+  if (input.preset === 'keywords-for-site') {
+    return [
+      buildDataForSeoSiteKeywordsPlan({
+        target: input.target ?? '',
+        targetKind: input.targetKind ?? '',
+        market: input.market,
+        locale: input.locale,
+        limit: input.limit
+      }).task
+    ]
+  }
+
   const market = resolveGrowthMarket(input.market ?? 'CL', input.locale)
   const location = market.locationCode
 
@@ -217,7 +238,15 @@ export const buildDataForSeoPresetPayload = (input: {
       {
         target: [
           ...(input.target?.trim()
-            ? [{ domain: input.target.trim().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '') }]
+            ? [
+                {
+                  domain: input.target
+                    .trim()
+                    .replace(/^https?:\/\//, '')
+                    .replace(/^www\./, '')
+                    .replace(/\/$/, '')
+                }
+              ]
             : []),
           ...(input.keyword?.trim() ? [{ keyword: input.keyword.trim(), search_scope: ['any'] }] : [])
         ],

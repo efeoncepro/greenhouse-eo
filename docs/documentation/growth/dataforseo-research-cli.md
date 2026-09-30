@@ -26,6 +26,35 @@ Una capacidad compatible incrementa `minor`; un fix o guardrail compatible incre
 rompe comandos, flags, outputs o checkpoints incrementa `major`. Las correcciones puramente editoriales no crean
 releases vacías. El digest gateado obliga a registrar cualquier cambio material en las fuentes de la CLI.
 
+### Relevancia de keywords por URL o host
+
+`quick keywords-for-site` permite una consulta de relevancia; `site-keywords` añade muestra paginada y
+reanudable con JSON/CSV. El sujeto se declara como `domain`, `subdomain` o `url` mediante `--target-kind`, sin
+inferirlo de la cadena. La URL conserva path, query y trailing slash; exige `https://` o prefijo `www.`.
+Hosts piden `include_subdomains:false` para no solicitar expansión; URL omite el flag.
+
+La operación sólo compra Keywords for Site. No pide seeds, Overview, Competitors ni SERP y no altera el
+research compuesto existente. Devuelve sugerencias relevantes para preparar briefs o revisar contenido;
+no prueba posiciones de la URL. CPC y competencia son métricas publicitarias. Search Console conserva la
+verdad de consultas observadas, y `ranked_keywords` el papel de posiciones estimadas del proveedor.
+
+Preview libre de gasto, ejecución con org/entitlement SEO/ceiling y checkpoint tenant-safe siguen el mismo
+contrato de la CLI. Scope retornado, cobertura parcial y ausencia/error se declaran explícitamente. El CSV
+viaja con su JSON para conservar fuente, mercado, sujeto, fecha, versión, tasks y costo. La capacidad es local;
+no crea capturas recurrentes, writer productivo ni flags. `plan.source` declara proveedor, URL documental,
+lente de mercado, semántica de relevancia y significado Ads de competencia. Volumen `invalid`, NULL, missing y
+cero permanecen distintos. Un checkpoint con costo desconocido, fallo de transporte/task, scope divergente o
+múltiples bloques no reabre compras al vencer el TTL: la barrera se revisa antes de cualquier página, para evitar
+repetir un POST incierto. `httpOk` queda durable; costos desconocidos se reportan NULL. Los artefactos guardan
+raw y stdout se vuelve compacto con `--out`/`--csv`. La
+[prueba live de Berel México](../../audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md#corrección-de-mercado-del-operador--berel-méxico)
+validó filas reales, paginación y reutilización; el ruido observado exige revisión editorial. El `totalCount`
+del proveedor no representa keywords exclusivas ni demanda del sujeto.
+
+Mercado, idioma y sujeto se confirman contra el brief antes de comprar. Para Berel, el caso corregido usa
+México (`MX`/`2484`) y español; Chile queda como antecedente separado. Un hostname parecido no acredita la
+propiedad del sitio ni permite sumar su visibilidad al dominio confirmado.
+
 ### Research SEO/SERP
 
 `research` combina descubrimiento de keywords, métricas, cobertura propia, competidores y SERP. Antes de comprar
@@ -100,6 +129,16 @@ convierte una observación AI en medición recurrente. Snapshots, readers, MCP, 
 `TASK-1651-B`. Tampoco autoriza publicación ni amplía el allowlist a las demás familias del proveedor.
 
 ## Estado verificado
+
+El 2026-09-30, TASK-1948 agregó la capacidad local `site-keywords` / `quick keywords-for-site` en CLI 1.1.0.
+Verificación: 96 tests en nueve archivos (23 de integración), lint propio, digest y dry-run URL/domain/subdomain.
+Typecheck del proyecto heredado excluyendo sólo `ai-generations` WIP ajeno pasó; el global conserva 17 errores
+en ese WIP. La [auditoría local](../../audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md) registra
+barreras de gasto/resume, scope, parser query y límites de evidencia. Después del cierre local se ejecutó la
+prueba pagada de Berel México, reconciliada con el ledger: resultados reales y paginación/resume verificados.
+La auditoría conserva cifras, recibos y límites de esa muestra. La selección editorial y el contraste con
+contenido/GSC siguen siendo necesarios; la prueba no activa capturas productivas ni despliegue.
+
 
 El 2026-09-28 quedó aplicado y validado el CHECK de `ai_optimization`. Un canary API con techo USD 0,012 costó
 USD 0,0101 y produjo una sola imputación `consumer=aeo`, `cost_basis=invoiced`; su repetición con el mismo

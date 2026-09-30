@@ -8,7 +8,8 @@ import {
 
 describe('DataForSEO CLI version contract', () => {
   it('keeps the current version aligned with the append-only release registry', () => {
-    expect(DATAFORSEO_CLI_VERSION).toBe('1.0.0')
+    expect(DATAFORSEO_CLI_VERSION).toBe(DATAFORSEO_CLI_VERSION_REGISTRY.currentVersion)
+    expect(DATAFORSEO_CLI_VERSION).toMatch(/^\d+\.\d+\.\d+$/)
     expect(DATAFORSEO_CLI_VERSION_REGISTRY.releases.at(-1)?.version).toBe(DATAFORSEO_CLI_VERSION)
     expect(DATAFORSEO_CLI_VERSION_REGISTRY.sourceDigest).toMatch(/^[a-f0-9]{64}$/)
   })
