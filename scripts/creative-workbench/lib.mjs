@@ -116,6 +116,8 @@ export function isNative(rel, patterns = []) {
  *   pisa trabajo que no es suyo: aborta y hay que decidir de quién es la ruta.
  *
  * `targetHash(rel)` devuelve el sha256 del archivo en el workbench, o null si no existe.
+ *
+ * @param {{ plan: Map<string, { content: Buffer }>, previous: { files?: Record<string, string> } | null, native?: string[], targetHash: (rel: string) => string | null }} args
  */
 export function reconcile({ plan, previous, native = [], targetHash }) {
   const previousFiles = previous?.files ?? {}
@@ -368,6 +370,7 @@ export function retiredCommandsIn(files, src, config) {
 
   for (const rel of files) {
     if (!/\.(md|ya?ml|json|txt)$/.test(rel)) continue
+
     for (const m of readFileSync(path.join(src, rel), 'utf8').matchAll(pattern)) {
       // `pnpm foto:*` se lee como la familia completa; `pnpm ai:image,` pierde la puntuación final.
       const command = m[1].replace(/-+$/, '')

@@ -38,7 +38,10 @@ describe('creative-workbench — plan de exportación', () => {
 
   beforeAll(async () => {
     // El sync real exporta un ref de git; aquí se valida la forma del plan sobre el working tree.
-    ;({ plan, report } = await planFromSource(ROOT, 'working-tree'))
+    ;({ plan, report } = (await planFromSource(ROOT, 'working-tree')) as unknown as {
+      plan: typeof plan
+      report: typeof report
+    })
   }, 120_000)
 
   it('trae las cinco clases de archivo', () => {
@@ -262,6 +265,7 @@ describe('creative-workbench — reconciliación del sync', () => {
 describe('creative-workbench — integridad del sello', () => {
   const plan = new Map([['gates/lib.mjs', { kind: 'template', content: Buffer.from('g') }]])
   const expected = { plan, report: { native: ['AGENTS.md'] } }
+
   const good = {
     source: { commit: 'a'.repeat(40) },
     native: ['AGENTS.md'],

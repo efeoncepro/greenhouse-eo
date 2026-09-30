@@ -215,6 +215,7 @@ for (const pr of openPrs) {
     // para el commit que declara. Tocar gestionados sin re-sellar es editarlos a mano.
     const reseals = sealTouched.includes(LOCK_REL)
     const headLock = reseals && pr.headRepo === repo ? readRemoteJson(LOCK_REL, pr.head) : null
+
     const anomalies = !reseals
       ? ['edita archivos gestionados sin re-sellar']
       : headLock?.ok
