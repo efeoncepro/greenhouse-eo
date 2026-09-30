@@ -193,11 +193,22 @@ if (!pending) {
   process.exit(0)
 }
 
+// `git add -A` respeta el .gitignore, y el .gitignore puede ser nativo: una ruta del plan que el
+// workbench ignore se quedaría sin commitear y el sello la declararía igual. Se fuerza el plan y el sello.
+function stageAll() {
+  run('git', ['add', '-A'], { cwd: target })
+
+  const forced = [...plan.keys(), LOCK_REL].filter(rel => existsSync(path.join(target, rel)))
+
+  for (let i = 0; i < forced.length; i += 200)
+    run('git', ['add', '-f', '--', ...forced.slice(i, i + 200)], { cwd: target })
+}
+
 const shortSha = commit.slice(0, 9)
 const message = `chore(sync): workbench desde greenhouse-eo@${shortSha}`
 
 if (flag('--bootstrap')) {
-  run('git', ['add', '-A'], { cwd: target })
+  stageAll()
   run('git', ['commit', '-q', '-m', message], { cwd: target })
   run('git', ['push', '-u', 'origin', `HEAD:${manifest.target.defaultBranch}`], { cwd: target, stdio: 'inherit' })
   console.log(`\n✓ Bootstrap empujado a ${manifest.target.repo}@${manifest.target.defaultBranch}`)
@@ -205,7 +216,7 @@ if (flag('--bootstrap')) {
   const branch = `sync/${new Date().toISOString().slice(0, 10)}-${shortSha}`
 
   run('git', ['checkout', '-B', branch], { cwd: target })
-  run('git', ['add', '-A'], { cwd: target })
+  stageAll()
   run('git', ['commit', '-q', '-m', message], { cwd: target })
   run('git', ['push', '-u', '--force-with-lease', 'origin', branch], { cwd: target, stdio: 'inherit' })
 

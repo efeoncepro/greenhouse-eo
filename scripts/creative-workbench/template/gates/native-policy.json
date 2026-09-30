@@ -1,20 +1,21 @@
 {
-  "_comentario": "Reglas que el harness NATIVO del workbench debe cumplir. Las decide greenhouse-eo (scripts/creative-workbench/template/gates/) y llegan selladas: el workbench implementa como quiera, pero no puede dejar de cumplir esto. El gate native-policy las verifica por comportamiento (ejecuta el guardarraíl con sondas), no leyendo su código.",
+  "_comentario": "Reglas que el harness NATIVO del workbench debe cumplir. Las decide greenhouse-eo (scripts/creative-workbench/template/gates/) y llegan selladas: el workbench implementa como quiera, pero no puede dejar de cumplir esto. El gate native-policy es un lint de comportamiento, no una frontera de seguridad: la barrera real sigue siendo IAM (el equipo no tiene llaves) y la revisión de PRs. {rand} se reemplaza por un valor aleatorio en cada corrida.",
   "guard": {
     "path": ".claude/hooks/guard.mjs",
     "mustBlockBash": [
-      "gcloud secrets versions access latest --secret=workbench-openai-api-key",
-      "gcloud storage rm gs://efeonce-creative-work/x",
-      "gsutil rm gs://efeonce-creative-canon/x",
+      "gcloud secrets versions access latest --secret=workbench-{rand}",
+      "gcloud storage rm gs://efeonce-creative-work/{rand}.png",
+      "gsutil rm gs://efeonce-creative-canon/{rand}.png",
       "git push --force",
       "git push origin main",
+      "git push origin pieza/{rand}:main",
       "cat .env.local",
-      "curl https://api.openai.com/v1/images/generations",
-      "git commit --no-verify -m x"
+      "curl https://api.openai.com/v1/images/{rand}",
+      "git commit --no-verify -m {rand}"
     ],
-    "mustAllowBash": ["git status", "git push -u origin pieza/sonda-main-banner"],
-    "mustBlockEdit": [".workbench/sync.lock.json", "@managed"],
-    "mustAllowEdit": ["projects/_sonda/brief.md"]
+    "mustAllowBash": ["git status", "git push -u origin pieza/{rand}-main-banner"],
+    "mustBlockEdit": [".workbench/sync.lock.json", "@managed", "@managed"],
+    "mustAllowEdit": ["projects/_sonda-{rand}/brief.md"]
   },
   "settings": {
     "path": ".claude/settings.json",
@@ -25,20 +26,35 @@
       "Edit(./.workbench/**)",
       "Edit(./gates/**)"
     ],
-    "hookMatcherIncludes": ["Bash", "Edit", "Write"],
-    "hookCommandIncludes": ".claude/hooks/guard.mjs"
+    "hookMatcherTools": ["Bash", "Edit", "Write"],
+    "hookCommand": "^node \"?\\$CLAUDE_PROJECT_DIR/\\.claude/hooks/guard\\.mjs\"?$"
   },
   "providers": {
-    "_comentario": "Ningún código del workbench llama a un proveedor de IA salvo el broker. Los engines gestionados (scripts/**, src/**) no se revisan acá: son de greenhouse-eo. Los tests se omiten porque citan hosts para probar rechazos.",
+    "_comentario": "Ningún código ni configuración del workbench llama a un proveedor de IA salvo el broker. Se omiten los engines gestionados y gates/ (son de greenhouse-eo), docs/ y los tests que viven en una carpeta test/.",
     "hosts": [
       "api.openai.com",
       "fal.run",
-      "queue.fal.run",
+      "api.fal.ai",
       "higgsfield.ai",
       "generativelanguage.googleapis.com",
-      "aiplatform.googleapis.com"
+      "aiplatform.googleapis.com",
+      "api.anthropic.com",
+      "openrouter.ai",
+      "api.replicate.com"
+    ],
+    "sdkPackages": [
+      "openai",
+      "@anthropic-ai/sdk",
+      "@fal-ai/client",
+      "@fal-ai/serverless-client",
+      "@google/genai",
+      "@google/generative-ai",
+      "@google-cloud/vertexai",
+      "@google-cloud/aiplatform",
+      "replicate"
     ],
     "allowedIn": ["services/production-broker/**"],
-    "codeExtensions": [".mjs", ".js", ".cjs", ".ts", ".tsx", ".mts", ".cts", ".sh", ".py"]
+    "skipIn": ["docs/**", "gates/**"],
+    "extensions": [".mjs", ".js", ".cjs", ".ts", ".tsx", ".mts", ".cts", ".sh", ".py", ".json", ".yml", ".yaml"]
   }
 }

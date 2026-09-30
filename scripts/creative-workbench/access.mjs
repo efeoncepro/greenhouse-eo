@@ -10,7 +10,7 @@
 //
 // `plan` (por defecto) sólo muestra la diferencia. `apply` la ejecuta.
 import { ALWAYS, bindingCommand, bindingKey, gcloud, managedBindings, principal, readPolicy } from './gcp.mjs'
-import { loadControl, run } from './lib.mjs'
+import { loadControl, memberClients, run } from './lib.mjs'
 
 const mode = process.argv[2] ?? 'plan'
 
@@ -28,8 +28,13 @@ for (const m of control.members) {
   if (!/^[A-Za-z0-9-]+$/.test(m.github ?? '')) errors.push(`miembro sin usuario GitHub válido: ${JSON.stringify(m)}`)
   if (!m.gcp) errors.push(`${m.github}: falta su identidad Google (gcp), p. ej. nombre@efeonce.org`)
 
-  for (const c of m.clientes ?? [])
-    if (!control.clientes.includes(c)) errors.push(`${m.github}: cliente ${c} no está en control.clientes`)
+  const clientes = m.clientes ?? control.clientesPorDefecto ?? []
+
+  if (typeof clientes === 'string' && clientes !== 'todos')
+    errors.push(`${m.github}: clientes debe ser una lista o "todos"`)
+  else
+    for (const c of memberClients(m, control))
+      if (!control.clientes.includes(c)) errors.push(`${m.github}: cliente ${c} no está en control.clientes`)
 }
 
 if (errors.length) {
@@ -134,7 +139,7 @@ if (!projectOk) {
       expression: `resource.name.startsWith("projects/_/buckets/${gcp.canonBucket}/objects/")`
     })
 
-    for (const c of m.clientes ?? []) {
+    for (const c of memberClients(m, control)) {
       const expression = `resource.name.startsWith("projects/_/buckets/${gcp.workBucket}/objects/${c}/")`
 
       desired.push({

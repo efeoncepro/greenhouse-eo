@@ -59,48 +59,65 @@ if (exists.status !== 0) {
   process.exit(1)
 }
 
+// Lee un JSON del workbench por la API de contenidos. Distingue "no existe" (404) de "no pude leer"
+// (403, proxy, red): confundirlos haría pasar un error de acceso por un repo nunca sincronizado.
+function readRemoteJson(file, ref) {
+  const r = gh('api', `repos/${repo}/contents/${file}?ref=${encodeURIComponent(ref)}`, '--jq', '.content')
+
+  if (r.status === 0) return { ok: true, value: JSON.parse(Buffer.from(r.stdout.trim(), 'base64').toString('utf8')) }
+
+  return { ok: false, missing: /404|Not Found/i.test(r.stderr || r.stdout), error: firstLine(r) }
+}
+
 // Sello publicado en main (fuente: GitHub, no el checkout local, que puede estar atrasado).
-const lockRes = gh('api', `repos/${repo}/contents/${LOCK_REL}?ref=${branch}`, '--jq', '.content')
+const lockRes = readRemoteJson(LOCK_REL, branch)
 
-const remoteLock =
-  lockRes.status === 0 ? JSON.parse(Buffer.from(lockRes.stdout.trim(), 'base64').toString('utf8')) : null
+if (!lockRes.ok && !lockRes.missing) {
+  console.error(`✗ No pude leer ${LOCK_REL} de ${repo}@${branch}: ${lockRes.error}`)
+  process.exit(1)
+}
 
+const remoteLock = lockRes.ok ? lockRes.value : null
 const sealedNative = remoteLock?.native ?? []
 
 console.log(`Workbench ${repo}`)
 console.log(
-  `  sello en main: ${remoteLock ? `greenhouse-eo@${remoteLock.source.commit?.slice(0, 9)} · ${Object.keys(remoteLock.files).length} archivos · ${sealedNative.length} rutas nativas` : 'sin sello (nunca sincronizado)'}`
+  `  sello en main: ${remoteLock ? `greenhouse-eo@${remoteLock.source?.commit?.slice(0, 9) ?? '¿sin commit?'} · ${Object.keys(remoteLock.files ?? {}).length} archivos · ${sealedNative.length} rutas nativas` : 'sin sello (nunca sincronizado)'}`
 )
 
 const ref = value('--ref') ?? 'HEAD'
 const current = await buildPlan({ ref })
 const { plan, report, commit } = current
 
+// Planes por commit, para verificar varios sellos (main y PRs de sync) sin recalcular dos veces.
+const plans = new Map([[commit, current]])
+
+async function planFor(sealedCommit) {
+  if (!plans.has(sealedCommit)) plans.set(sealedCommit, await buildPlan({ ref: sealedCommit }))
+
+  return plans.get(sealedCommit)
+}
+
+/** Anomalías de un sello: vacío = íntegro. Un sello que no se puede recalcular NO es íntegro. */
+async function sealAnomalies(lock) {
+  if (!lock?.source?.commit) return ['el sello no declara su commit de origen: no se puede verificar']
+
+  try {
+    return verifySeal(lock, await planFor(lock.source.commit))
+  } catch (error) {
+    return [
+      `no pude recalcular greenhouse-eo@${String(lock.source.commit).slice(0, 9)}: ${error.message.split('\n')[0]} (¿commit inexistente? haz git fetch)`
+    ]
+  }
+}
+
 // 1. Integridad del sello: se recalcula el plan del commit que el sello declara y se compara.
-if (remoteLock?.source?.commit) {
-  const sealedCommit = remoteLock.source.commit
-  let expected = null
+if (remoteLock) {
+  const anomalies = await sealAnomalies(remoteLock)
 
-  if (sealedCommit === commit) expected = current
-  else {
-    try {
-      expected = await buildPlan({ ref: sealedCommit })
-    } catch (error) {
-      console.log(
-        `\nSello: no pude recalcular greenhouse-eo@${sealedCommit.slice(0, 9)} (${error.message.split('\n')[0]})`
-      )
-    }
-  }
-
-  if (expected) {
-    const anomalies = verifySeal(remoteLock, expected)
-
-    console.log(
-      `\nSello íntegro: ${anomalies.length ? `✗ ${anomalies.length} anomalías (alguien lo editó a mano)` : '✓'}`
-    )
-    for (const a of anomalies.slice(0, 15)) console.log(`   ! ${a}`)
-    if (anomalies.length > 15) console.log(`   … y ${anomalies.length - 15} más`)
-  }
+  console.log(`\nSello íntegro: ${anomalies.length ? `✗ ${anomalies.length} anomalías` : '✓'}`)
+  for (const a of anomalies.slice(0, 15)) console.log(`   ! ${a}`)
+  if (anomalies.length > 15) console.log(`   … y ${anomalies.length - 15} más`)
 }
 
 // 2. Sync pendiente contra el ref pedido.
@@ -108,7 +125,7 @@ const pending = []
 
 for (const [rel, { content }] of plan) {
   if (rel === '.workbench/export-report.json') continue
-  if (remoteLock?.files[rel] !== sha256(content)) pending.push(rel)
+  if (remoteLock?.files?.[rel] !== sha256(content)) pending.push(rel)
 }
 
 const retiring = Object.keys(remoteLock?.files ?? {}).filter(
@@ -124,6 +141,7 @@ console.log(
 )
 for (const rel of pending.slice(0, 15)) console.log(`   ~ ${rel}`)
 if (pending.length > 15) console.log(`   … y ${pending.length - 15} más`)
+for (const rel of retiring) console.log(`   - ${rel} (se retira)`)
 for (const rel of handingOff) console.log(`   → ${rel} (pasa a nativo)`)
 if (nativeChanged) console.log(`   native: [${sealedNative.join(', ')}] → [${report.native.join(', ')}]`)
 
@@ -148,9 +166,11 @@ if (existsSync(path.join(target, '.git'))) {
     console.log(`\nDrift en archivos gestionados: ${drift.length ? drift.length : 'ninguno ✓'}`)
     for (const [rel] of drift.slice(0, 15)) console.log(`   ! ${rel}`)
   } else {
-    console.log(
-      `\nDrift: no medido (checkout local ${behind ? `${behind} commits atrás de main` : 'sin sello'}; haz git pull en ${target})`
-    )
+    const why = !existsSync(lockFile)
+      ? 'el checkout local no tiene sello'
+      : `checkout local ${behind || '?'} commits atrás de main`
+
+    console.log(`\nDrift: no medido (${why}; haz git pull en ${target})`)
   }
 } else {
   console.log(`\nDrift: no medido (no hay checkout en ${target})`)
@@ -159,10 +179,10 @@ if (existsSync(path.join(target, '.git'))) {
 // 4. Contrato con el package.json nativo: los engines que greenhouse-eo sigue entregando necesitan
 //    sus dependencias. Si el workbench las quitó, esos engines no corren allá (puede ser a propósito).
 if (isNative('package.json', report.native)) {
-  const pkgRes = gh('api', `repos/${repo}/contents/package.json?ref=${branch}`, '--jq', '.content')
+  const pkgRes = readRemoteJson('package.json', branch)
 
-  if (pkgRes.status === 0) {
-    const pkg = JSON.parse(Buffer.from(pkgRes.stdout.trim(), 'base64').toString('utf8'))
+  if (pkgRes.ok) {
+    const pkg = pkgRes.value
     const declared = { ...pkg.dependencies, ...pkg.devDependencies }
     const missing = Object.keys(report.requiredDependencies).filter(name => !(name in declared))
 
@@ -175,21 +195,14 @@ if (isNative('package.json', report.native)) {
 
 // 5. PRs abiertos: los que no vienen del sync y tocan lo gestionado o el sello son la señal temprana
 //    de una edición que el gate va a rechazar (o que intenta eximirse).
-const prs = gh(
-  'api',
-  `repos/${repo}/pulls?state=open&per_page=50`,
-  '--jq',
-  '.[] | [.number, .head.ref, .user.login, .draft, .title] | @tsv'
-)
+const openPrs = pagedLines(
+  `repos/${repo}/pulls`,
+  '.[] | [.number, .head.ref, .head.repo.full_name // "", .user.login, .draft, .title] | @tsv'
+).map(line => {
+  const [number, head, headRepo, author, draft, title] = line.split('\t')
 
-const openPrs = prs.stdout
-  .split('\n')
-  .filter(Boolean)
-  .map(line => {
-    const [number, head, author, draft, title] = line.split('\t')
-
-    return { number, head, author, draft: draft === 'true', title }
-  })
+  return { number, head, headRepo, author, draft: draft === 'true', title }
+})
 
 console.log(`\nPRs abiertos: ${openPrs.length || 'ninguno'}`)
 
@@ -197,16 +210,32 @@ for (const pr of openPrs) {
   const touched = pagedLines(`repos/${repo}/pulls/${pr.number}/files`, '.[].filename')
   const managed = touched.filter(rel => rel in (remoteLock?.files ?? {}))
   const sealTouched = touched.filter(rel => rel.startsWith('.workbench/'))
-  const isSync = pr.head.startsWith('sync/')
+  let flag = ''
 
-  const flag =
-    isSync || (!managed.length && !sealTouched.length)
-      ? ''
-      : ` — ⚠ toca ${managed.length} gestionados${sealTouched.length ? ` y ${sealTouched.join(', ')}` : ''}`
+  const notes = []
+
+  if (managed.length || sealTouched.length) {
+    // El nombre de rama no prueba nada (cualquiera con push puede llamarla sync/x). Un PR de sync
+    // re-sella: trae un sello NUEVO y ese sello es exactamente el que greenhouse-eo habría escrito
+    // para el commit que declara. Tocar gestionados sin re-sellar es editarlos a mano.
+    const reseals = sealTouched.includes(LOCK_REL)
+    const headLock = reseals && pr.headRepo === repo ? readRemoteJson(LOCK_REL, pr.head) : null
+    const anomalies = !reseals
+      ? ['edita archivos gestionados sin re-sellar']
+      : headLock?.ok
+        ? await sealAnomalies(headLock.value)
+        : ['sello de la rama ilegible']
+
+    notes.push(...anomalies.slice(0, 3))
+    flag = anomalies.length
+      ? ` — ⚠ toca ${managed.length} gestionados${sealTouched.length ? ` y ${sealTouched.join(', ')}` : ''}`
+      : ` — sync íntegro (greenhouse-eo@${headLock.value.source.commit.slice(0, 9)})`
+  }
 
   console.log(`   #${pr.number}${pr.draft ? ' [draft]' : ''} ${pr.title} — ${pr.author} (${pr.head})${flag}`)
-  if (flag) for (const rel of managed.slice(0, 8)) console.log(`       ~ ${rel}`)
-  if (flag && managed.length > 8) console.log(`       … y ${managed.length - 8} más`)
+  for (const note of notes) console.log(`       ! ${note}`)
+  if (flag.includes('⚠')) for (const rel of managed.slice(0, 8)) console.log(`       ~ ${rel}`)
+  if (flag.includes('⚠') && managed.length > 8) console.log(`       … y ${managed.length - 8} más`)
 }
 
 const ci = gh(

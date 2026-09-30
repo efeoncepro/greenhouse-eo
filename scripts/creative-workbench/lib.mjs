@@ -60,11 +60,17 @@ export function validateNativePatterns(patterns, reserved = []) {
   const stem = p => (p.endsWith('/**') ? p.slice(0, -2) : p)
 
   for (const p of patterns) {
+    // Forma canónica y nada más: sin './', sin segmentos vacíos o '.', sin '/' final ni '\\'. Una ruta
+    // no canónica no calza con ninguna ruta del plan: se creería nativa y el sync la pisaría igual.
+    const segments = typeof p === 'string' ? stem(p).replace(/\/$/, '').split('/') : []
+
     const bad =
       typeof p !== 'string' ||
       !p ||
       p.startsWith('/') ||
-      p.split('/').includes('..') ||
+      p.includes('\\') ||
+      (p.endsWith('/') && !p.endsWith('/**')) ||
+      segments.some(seg => seg === '' || seg === '.' || seg === '..') ||
       (/[*?[{]/.test(p) && !/^[^*?[{]+\/\*\*$/.test(p))
 
     if (bad) throw new Error(`native.paths: "${p}" no es una ruta exacta ni una carpeta "dir/**"`)
@@ -77,7 +83,22 @@ export function validateNativePatterns(patterns, reserved = []) {
     if (clash) throw new Error(`native.paths: "${p}" se cruza con la ruta reservada "${clash}"`)
   }
 
+  // package.json y su lockfile van juntos: con sólo uno nativo, el sync escribiría un package.json sin
+  // poder regenerar el lock (o regeneraría y sellaría un lock que resuelve el manifest del workbench).
+  if (isNative('package.json', patterns) !== isNative('pnpm-lock.yaml', patterns))
+    throw new Error('native.paths: package.json y pnpm-lock.yaml son nativos los dos o ninguno')
+
   return patterns
+}
+
+/**
+ * Clientes que puede producir un miembro. `"todos"` (en el miembro, o `clientesPorDefecto` si el miembro
+ * no declara) = todos los de `control.clientes`, incluidos los que se agreguen después.
+ */
+export function memberClients(member, control) {
+  const declared = member.clientes ?? control.clientesPorDefecto ?? []
+
+  return declared === 'todos' ? [...control.clientes] : declared
 }
 
 export function isNative(rel, patterns = []) {
@@ -497,8 +518,17 @@ export async function planFromSource(src, commit) {
  * recalculando el plan del commit que el propio sello declara. `expected` es `planFromSource` de ese
  * commit. Devuelve la lista de anomalías (vacía = íntegro).
  */
+// Lo generado que depende de algo más que el commit: el reporte (versión del generador) y package.json
+// (versiones transitivas que se resuelven del node_modules de quien sincroniza). El resto de lo generado
+// (workbench.config.json, .env.example) sale sólo de control.json y se compara exacto: ahí viven el
+// proyecto GCP, los buckets y los nombres de secreto.
+const GENERATED_UNVERIFIABLE = new Set([REPORT_REL, 'package.json'])
+
 export function verifySeal(lock, expected) {
   const problems = []
+
+  if (!lock?.source?.commit) return ['el sello no declara su commit de origen: no se puede verificar']
+
   const sealedNative = [...(lock.native ?? [])].sort()
   const expectedNative = [...(expected.report.native ?? [])].sort()
 
@@ -510,9 +540,7 @@ export function verifySeal(lock, expected) {
     const entry = expected.plan.get(rel)
 
     if (!entry) problems.push(`${rel}: sellado, pero ese commit no lo exporta`)
-    // Lo generado (package.json, config, reporte) depende también de la versión del generador, que
-    // puede ser posterior al commit sellado: sólo se exige que exista. Lo copiado debe ser idéntico.
-    else if (entry.kind !== 'generated' && sha256(entry.content) !== hash)
+    else if (!GENERATED_UNVERIFIABLE.has(rel) && sha256(entry.content) !== hash)
       problems.push(`${rel}: la huella sellada no es la del commit`)
   }
 

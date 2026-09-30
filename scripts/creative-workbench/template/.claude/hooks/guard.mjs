@@ -47,7 +47,8 @@ if (tool === 'Bash') {
     [/gcloud\s+secrets\b/, 'los secretos no se leen ni se administran desde el workbench.'],
     [/(gcloud\s+storage\s+rm|gsutil\s+(-m\s+)?rm)\b/, 'los assets no se borran desde el workbench.'],
     [/git\s+push\b.*(--force|\s-f\b|--force-with-lease)/, 'no se fuerza un push. Todo entra por PR.'],
-    [/git\s+push\b.*\s(origin\s+)?(HEAD:)?main(\s|$)/, 'no se empuja a main. Crea una rama y abre un PR.'],
+    // `main` como destino, también en refspecs (`rama:main`, `HEAD:refs/heads/main`).
+    [/git\s+push\b.*[\s:](refs\/heads\/)?main(\s|$)/, 'no se empuja a main. Crea una rama y abre un PR.'],
     [/\.env\.local/, 'no se lee ni se muestra .env.local.'],
     [
       /\b(api\.openai\.com|fal\.run|queue\.fal\.run|higgsfield\.ai|generativelanguage\.googleapis\.com)\b/,

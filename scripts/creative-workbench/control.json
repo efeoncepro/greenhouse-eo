@@ -28,5 +28,7 @@
     }
   },
   "clientes": ["efeonce", "berel", "sky"],
+  "clientesPorDefecto": "todos",
+  "_clientesPorDefecto": "Decisión del operador 2026-09-30: por ahora todo el equipo produce para todas las marcas. Un miembro puede restringirse con \"clientes\": [\"sky\"]. Ver §8.6 del ADR.",
   "members": []
 }

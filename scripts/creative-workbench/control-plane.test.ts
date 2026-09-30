@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -8,6 +8,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import {
   isNative,
   loadControl,
+  memberClients,
   loadManifest,
   planFromSource,
   reconcile,
@@ -112,6 +113,11 @@ describe('creative-workbench — rutas nativas', () => {
 
   it('rechaza globs, rutas que escapan, el sello y lo reservado', () => {
     for (const bad of [
+      './AGENTS.md',
+      'brands/',
+      'a/./b',
+      'a//b',
+      'a\\b',
       'tools/*.mjs',
       '../x',
       '/abs',
@@ -121,6 +127,11 @@ describe('creative-workbench — rutas nativas', () => {
       '.github/**'
     ])
       expect(() => validateNativePatterns([bad], reserved), bad).toThrow()
+  })
+
+  it('package.json y pnpm-lock.yaml son nativos juntos o ninguno', () => {
+    expect(() => validateNativePatterns(['package.json'], reserved)).toThrow(/los dos o ninguno/)
+    expect(() => validateNativePatterns(['package.json', 'pnpm-lock.yaml'], reserved)).not.toThrow()
   })
 
   it('el matcher de los gates y el del plano de control son el mismo', () => {
@@ -196,7 +207,11 @@ describe('creative-workbench — reconciliación del sync', () => {
 describe('creative-workbench — integridad del sello', () => {
   const plan = new Map([['gates/lib.mjs', { kind: 'template', content: Buffer.from('g') }]])
   const expected = { plan, report: { native: ['AGENTS.md'] } }
-  const good = { native: ['AGENTS.md'], files: { 'gates/lib.mjs': sha256(Buffer.from('g')), 'pnpm-lock.yaml': 'x' } }
+  const good = {
+    source: { commit: 'a'.repeat(40) },
+    native: ['AGENTS.md'],
+    files: { 'gates/lib.mjs': sha256(Buffer.from('g')), 'pnpm-lock.yaml': 'x' }
+  }
 
   it('acepta el sello que el sync habría escrito', () => expect(verifySeal(good, expected)).toEqual([]))
 
@@ -208,7 +223,24 @@ describe('creative-workbench — integridad del sello', () => {
     expect(verifySeal({ ...good, files: { 'pnpm-lock.yaml': 'x' } }, expected).join(' ')).toMatch(/sello no lo tiene/)
   })
 
-  it('lo generado sólo tiene que existir: depende también de la versión del generador', () => {
+  it('un sello sin commit de origen no es íntegro', () => {
+    expect(verifySeal({ ...good, source: {} }, expected)).toEqual([
+      'el sello no declara su commit de origen: no se puede verificar'
+    ])
+  })
+
+  it('workbench.config.json se compara exacto: ahí viven proyecto y buckets', () => {
+    const withConfig = {
+      plan: new Map([...plan, ['workbench.config.json', { kind: 'generated', content: Buffer.from('{"p":"a"}') }]]),
+      report: expected.report
+    }
+
+    const lock = { ...good, files: { ...good.files, 'workbench.config.json': sha256(Buffer.from('{"p":"otro"}')) } }
+
+    expect(verifySeal(lock, withConfig).join(' ')).toMatch(/workbench.config.json: la huella/)
+  })
+
+  it('el reporte de exportación sólo tiene que existir: depende de la versión del generador', () => {
     const withReport = {
       plan: new Map([...plan, ['.workbench/export-report.json', { kind: 'generated', content: Buffer.from('nuevo') }]]),
       report: expected.report
@@ -227,8 +259,17 @@ describe('creative-workbench — control.json', () => {
     for (const m of control.members) {
       expect(m.github).toMatch(/^[A-Za-z0-9-]+$/)
       expect(m.gcp).toBeTruthy()
-      for (const c of m.clientes ?? []) expect(control.clientes).toContain(c)
+      for (const c of memberClients(m, control)) expect(control.clientes).toContain(c)
     }
+  })
+
+  it('"todos" da acceso a todos los clientes, y un miembro puede restringirse', () => {
+    const control = { clientes: ['efeonce', 'berel', 'sky'], clientesPorDefecto: 'todos' }
+
+    expect(memberClients({}, control)).toEqual(['efeonce', 'berel', 'sky'])
+    expect(memberClients({ clientes: ['sky'] }, control)).toEqual(['sky'])
+    expect(memberClients({}, { clientes: ['sky'] })).toEqual([])
+    expect(loadControl().clientesPorDefecto).toBe('todos')
   })
 })
 
@@ -301,6 +342,7 @@ describe('creative-workbench — guardarraíl de Claude', () => {
       'gcloud secrets versions access latest --secret=x',
       'gcloud storage rm gs://b/o',
       'git push origin main',
+      'git push origin pieza/x:main',
       'git push --force',
       'cat .env.local',
       'curl https://api.openai.com/v1/images'
@@ -322,6 +364,8 @@ describe('creative-workbench — gate native-policy', () => {
     writeFileSync(path.join(dir, rel), text)
   }
 
+  const remove = (rel: string) => rmSync(path.join(dir, rel), { recursive: true, force: true })
+
   const gate = () => {
     spawnSync('git', ['add', '-A'], { cwd: dir })
 
@@ -334,13 +378,17 @@ describe('creative-workbench — gate native-policy', () => {
     return { ok: r.status === 0, out: r.stdout }
   }
 
+  const restoreHarness = () => {
+    cpSync(path.join(template, '.claude'), path.join(dir, '.claude'), { recursive: true })
+  }
+
   beforeAll(() => {
     dir = mkdtempSync(path.join(os.tmpdir(), 'wb-policy-'))
     cpSync(path.join(template, 'gates'), path.join(dir, 'gates'), { recursive: true })
-    cpSync(path.join(template, '.claude'), path.join(dir, '.claude'), { recursive: true })
+    restoreHarness()
     write(
       '.workbench/sync.lock.json',
-      JSON.stringify({ native: ['.claude/hooks/guard.mjs'], files: { 'gates/lib.mjs': 'x' } })
+      JSON.stringify({ native: ['.claude/hooks/guard.mjs'], files: { 'gates/lib.mjs': 'x', 'gates/hygiene.mjs': 'y' } })
     )
     spawnSync('git', ['init', '-q'], { cwd: dir })
   })
@@ -351,28 +399,103 @@ describe('creative-workbench — gate native-policy', () => {
     expect(gate()).toMatchObject({ ok: true })
   })
 
-  it('rechaza código fuera del broker que llama a un proveedor, y admite el broker y los tests', () => {
-    write('services/production-broker/openai.mjs', "fetch('https://api.openai.com/v1/images')")
+  it('admite el broker y los tests en test/, y rechaza hosts, SDKs e imports del broker fuera de él', () => {
+    write('services/production-broker/openai.mjs', "import OpenAI from 'openai'\nfetch('https://api.openai.com/v1')")
     write('test/broker.test.mjs', "assert(url !== 'https://api.openai.com')")
     expect(gate().ok).toBe(true)
 
     write('tools/provider-doctor.ts', "fetch('https://api.openai.com/v1/models')")
+    write('tools/gen.mjs', "import { GoogleGenAI } from '@google/genai'")
+    write('tools/via-broker.mjs', "import { run } from '../services/production-broker/openai.mjs'")
+    write('tools/tests/sneaky.test.mjs', "fetch('https://api.anthropic.com/v1')")
+    write('package.json', JSON.stringify({ dependencies: { openai: '5.0.0' } }))
     const result = gate()
 
     expect(result.ok).toBe(false)
-    expect(result.out).toContain('tools/provider-doctor.ts: llama a api.openai.com')
-    rmSync(path.join(dir, 'tools'), { recursive: true, force: true })
+    expect(result.out).toContain('tools/provider-doctor.ts: contiene api.openai.com')
+    expect(result.out).toContain('tools/gen.mjs: importa el SDK @google/genai')
+    expect(result.out).toContain('tools/via-broker.mjs: importa código de services/production-broker')
+    expect(result.out).toContain('tools/tests/sneaky.test.mjs: contiene api.anthropic.com')
+    expect(result.out).toContain('package.json: declara openai')
+    remove('tools')
+    remove('package.json')
   })
 
-  it('rechaza un guardarraíl que deja pasar todo y settings sin denegaciones', () => {
+  it('rechaza un guardarraíl que deja pasar todo, settings sin denegaciones y hooks apagados', () => {
     write('.claude/hooks/guard.mjs', 'process.exit(0)\n')
-    write('.claude/settings.json', JSON.stringify({ permissions: { deny: [] }, hooks: {} }))
+    write(
+      '.claude/settings.json',
+      JSON.stringify({
+        disableAllHooks: true,
+        permissions: { deny: [] },
+        hooks: {
+          PreToolUse: [
+            { matcher: 'Bashx|Editx|Writex', hooks: [{ type: 'command', command: 'true # .claude/hooks/guard.mjs' }] }
+          ]
+        }
+      })
+    )
     const result = gate()
 
     expect(result.ok).toBe(false)
     expect(result.out).toContain('guard: debe bloquear `gcloud secrets')
     expect(result.out).toContain('guard: debe impedir editar .workbench/sync.lock.json')
+    expect(result.out).toContain('disableAllHooks apaga el guardarraíl')
     expect(result.out).toContain('falta "Read(./.env.local)"')
-    expect(result.out).toContain('el hook PreToolUse debe correr')
+    expect(result.out).toContain('el hook PreToolUse debe correr el guardarraíl')
+    restoreHarness()
+  })
+
+  it('el guardarraíl corre en una copia: no puede tocar lo que revisan los demás gates', () => {
+    write('tools/leak.mjs', "fetch('https://api.openai.com/v1')")
+    write(
+      '.claude/hooks/guard.mjs',
+      "import { rmSync } from 'node:fs'\nrmSync(process.env.CLAUDE_PROJECT_DIR + '/tools/leak.mjs', { force: true })\nprocess.exit(2)\n"
+    )
+    const result = gate()
+
+    expect(result.out).toContain('tools/leak.mjs: contiene api.openai.com')
+    expect(existsSync(path.join(dir, 'tools/leak.mjs'))).toBe(true)
+    remove('tools')
+    restoreHarness()
+  })
+})
+
+describe('creative-workbench — managed-drift compara el sello del PR con el de la base', () => {
+  let dir: string
+  const template = path.join(ROOT, TEMPLATE_REL)
+  const git = (...args: string[]) => spawnSync('git', args, { cwd: dir, encoding: 'utf8' })
+
+  const drift = (headRef: string) =>
+    spawnSync(
+      process.execPath,
+      ['-e', "import('./gates/managed-drift.mjs').then(m => process.exit(m.managedDrift() ? 0 : 1))"],
+      { cwd: dir, encoding: 'utf8', env: { ...process.env, GITHUB_BASE_REF: 'main', GITHUB_HEAD_REF: headRef } }
+    )
+
+  beforeAll(() => {
+    dir = mkdtempSync(path.join(os.tmpdir(), 'wb-drift-'))
+    cpSync(path.join(template, 'gates'), path.join(dir, 'gates'), { recursive: true })
+    mkdirSync(path.join(dir, '.workbench'))
+    writeFileSync(path.join(dir, '.workbench/sync.lock.json'), JSON.stringify({ native: [], files: {} }))
+    git('init', '-q')
+    git('-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-qam', 'x', '--allow-empty')
+    git('add', '-A')
+    git('-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-qm', 'base')
+    git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+    writeFileSync(path.join(dir, '.workbench/sync.lock.json'), JSON.stringify({ native: ['gates/**'], files: {} }))
+  })
+
+  afterAll(() => rmSync(dir, { recursive: true, force: true }))
+
+  it('un PR que no es de sync no puede cambiar el sello', () => {
+    const r = drift('codex/feature')
+
+    expect(r.status).toBe(1)
+    expect(r.stdout).toContain('este PR cambia el sello y no es un sync de greenhouse-eo')
+  })
+
+  it('un PR de sync sí (su autenticidad la verifica creative:status)', () => {
+    expect(drift('sync/2026-09-30-abc').status).toBe(0)
   })
 })
