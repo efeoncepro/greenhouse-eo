@@ -1,6 +1,6 @@
 # Efeonce Insights — marca, informe y UI (cómo se ve y dónde vive)
 
-> Verificado contra código el 2026-09-28 (greenhouse-eo `develop`, efeonce-think `main@544ecd4`, en producción; AXIS `main@5b3056f`; la página del Lab de Insights, publicada en `main@3dfbf0e`).
+> Verificado contra código el 2026-09-28 (greenhouse-eo `develop`, y el 2026-09-30 para las láminas del deck SEO/AEO de §7.8; efeonce-think `main@544ecd4`, en producción; AXIS `main@5b3056f`; la página del Lab de Insights, publicada en `main@3dfbf0e`).
 > Este archivo describe lo que EXISTE. Donde algo falta, está en §7 «Gaps» y no se decide aquí: esas decisiones son del
 > operador.
 
@@ -101,7 +101,9 @@ edición. **Decisión abierta sobre el acento de esas portadas: §7.7.**
 **Dónde NO está** (gaps, sin decisión del operador): el archivo oficial `insights-lockup-*` en PDF y deck (hoy la
 versión tipográfica de arriba); correo (`src/emails/InsightsEditionDeliveryEmail.tsx:76`, `brand='efeonce'`); favicon de
 Think (genérico, `src/layouts/BaseLayout.astro:64`); receta de deck `content-day-live-results`, cuya ficha de Insights
-usa el isotipo de Efeonce (`docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json:4954`);
+usa el isotipo de Efeonce (`docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json:4954`;
+desde el 2026-09-30 la receta suma un `productMark` **opcional** que admite `insights-lockup-negative` arriba de la
+lámina, sin cambiar la ficha; la plantilla todavía no lo dibuja, TASK-1949 Slice 2);
 portal y MCP. Greenhouse fijaba `@efeoncepro/axis-brand-assets` 0.3.5 al escribir esto; al 2026-09-29 fija 0.4.5, que
 ya trae los archivos de Insights (ninguna de estas superficies los usa todavía).
 
@@ -328,3 +330,14 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
    Eso choca con la regla del 2026-09-28 (junto a Efeonce, Insights **baja su brillo**; sólo la esfera conserva el
    acento) y con «el acento nunca en texto < 24 px». Pendiente de decisión del operador; cambiarlo toca el contrato de
    fidelidad de TASK-1889 (`pnpm insights:canvas-fidelity`). No lo cambies por tu cuenta.
+8. **Láminas de marca que prometen formatos de Insights (deck SEO/AEO, 2026-09-30, TASK-1949).** Las recetas
+   `content-report-formats` («¿Cómo te llega? Como la necesites.»: correo, web y celular, presentación destacada, PDF A4
+   y deck 16:9) y `content-committee-deck` («¿Y el PPT del comité? Ya está.»: modo presentación, deck, PDF) prometen
+   formatos. Estado verificado el 2026-09-30 contra el ledger de flags: web y celular **vivo** (producción sirve el
+   modelo 1.0; el 1.1 sale con el próximo release), PDF A4 **vivo**, deck 16:9 **vivo**, modo presentación
+   **desplegado** sin probar con una edición real sobre el modelo 1.0, **correo que llega solo NO vivo**
+   (`INSIGHTS_DELIVERY_ENABLED` / `INSIGHTS_SCHEDULES_ENABLED` OFF; TASK-1944 bloqueada por TASK-1774). Ningún cliente
+   real ha recibido una edición (canaries sobre Greenhouse Demo). Recomendación: rotular «próximamente» el correo (y el
+   modo presentación salvo verificación) y prometer «se habilita al abrir el servicio». **Sin decisión del operador**:
+   las láminas aprobadas no lo rotulan. Si cambia el estado de un formato, avisa en la norma
+   `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO».

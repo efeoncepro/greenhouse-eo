@@ -8,7 +8,8 @@ TASK-1927 — 2026-09-27 · §L «Recetas con plantilla desde TASK-1928»: árbo
 (AXIS `v0.3.20`) — 2026-09-27 · portada con selección (`document-selection`, AXIS `v0.3.21`) — 2026-09-28 · §L
 «Láminas SEO/AEO con plantilla desde TASK-1934» (AXIS `v0.3.23`, `develop` tras `af32d9353`) — 2026-09-28 · versiones
 vigentes de §L (AXIS `v0.3.24`, greenhouse-eo@53002b352) — 2026-09-28 · §C4 (módulos de correo) y el camino recorrido
-de la medida: AXIS `main` `c92160b`, tag `v0.3.38` — 2026-09-29
+de la medida: AXIS `main` `c92160b`, tag `v0.3.38` — 2026-09-29 · §L «El deck SEO/AEO» (catálogo `2f2784d93`,
+intents `2382ed624`, orden `b84ec7084`; sin plantillas ni AXIS todavía) — 2026-09-30
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -1259,6 +1260,38 @@ cierra con SF20; `SIN_BADGE=1` para el respaldo sin insignia) desde las láminas
 `SF0-portada-propuesta` se genera antes con `DOC=propuesta ONLY=SF0-portada node …/salesforce.mjs`). Es el artefacto de
 dirección, no la salida del Composer; `out/` no está en git. Antes de enviarlo, SF16 sigue sujeta a la autorización de
 Anthropic.
+
+**El deck SEO/AEO (Search Visibility 360; TASK-1949, aprobado el 2026-09-30).** El operador aprobó el deck de la
+práctica SEO/AEO (línea Engine) en tres documentos —**completo** (33, brochure extendido), **brochure** (24) y
+**propuesta** (29)— con cinco capítulos (el problema · SV360 y SEO · AEO · cómo trabajamos · por qué nosotros; el mismo
+`progress.sections` en todas las páginas). SEO va al nivel de AEO: SV360 es la marca paraguas y sus piezas, AEO
+Assessment, AI Visibility Report e Insights. Recorrido, reglas y pendientes: norma §4.6 «Deck SEO/AEO»; fuente de hechos
+`ai-generations/2026-09-29_deck-seo-aeo-documentos/{CANON-INVENTARIO,DECISIONES}.md`.
+
+| Documento | Portada | Cierre | Plan golden | Intent de documento (ejemplo) |
+|---|---|---|---|---|
+| Completo | `cover-brochure-line-engine` (logo SV360 en 140,790 h64) | `close-brochure-orbit` | `golden-completo-seo.json` | `deck-seo-completo-document.json` |
+| Brochure | la misma | `close-brochure-orbit` | `golden-brochure-seo.json` | `deck-seo-brochure-document.json` |
+| Propuesta | `cover-proposal-orbit` (logo SV360 en 140,880 h56) | `close-proposal-horizon` «Empower your Engine» | `golden-proposal-seo.json` | `deck-seo-propuesta-document.json` |
+
+- **Seis recetas nuevas, sin plantilla todavía** (Slice 2): `content-brand-family`, `content-service-mockups`,
+  `content-report-formats`, `content-committee-deck`, `content-industries`, `content-markets` (100 recetas; 94 con
+  plantilla). Estilo «vive» (plataforma de luz, fichas de vidrio, una sola sombra profunda, haces de luz) y maquetas
+  nativas grandes, nunca capturas chicas. Hasta el Slice 2 el PDF aprobado se hornea con `render-src/bake.cjs`.
+- **Slots opcionales:** `productMark` (lista cerrada de lockups de `axis-brand-assets` 0.4.5: SV360, AEO, AEO Assessment,
+  AI Visibility Report, Insights; uno por lámina, donde la lámina habla de esa pieza; obligatorio sólo en
+  `content-brand-family`); el eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark` (el lockup
+  ocupa su lugar en 140,112 h40); `section-cine-team.body` (roles en personas). Pendientes de plantilla en
+  `PENDING_TEMPLATE_SLOTS` (`recipe-slot-parity.test.ts`).
+- **Fotos:** cine sólo en `section-split` (SX4) y `proposal-cinematic-web` (DV1); casos en **puesta en escena** con la
+  imagen de ambiente del cliente y su logo **compuesto** desde el archivo oficial (excepción `caso` de `foto:prompt`,
+  `bb7e34b37`); MK2 de `content-markets` no es cine. Plates por ruta local hasta TASK-1931.
+- **Condiciones para mostrarlo a un cliente:** cifras de los tres casos = de ejemplo (fuente provisoria falsa hasta
+  reemplazarla); logos de BICECORP, Banco BICE y Berel con su autorización (TASK-1937; el BICE argentino, descartado);
+  formatos de Insights sólo si están vivos (al 2026-09-30, el correo que llega solo NO y el modo presentación sin
+  probar; decisión del operador pendiente). Anotaciones «de ejemplo» fuera de la lámina; se quedan `mark`, `sampleMark`
+  y `report.sample`.
+- **Una sola sección partida por deck;** contraportadas sin cambios; cuatro usos pasan un largo (el `fit` lo dice).
 
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
 en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de

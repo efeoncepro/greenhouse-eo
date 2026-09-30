@@ -1,6 +1,7 @@
 # Lecciones (trampas que ya costaron tiempo)
 
-> Verificado contra: AXIS `c92160b` (tag `v0.3.38`) — 2026-09-29, noche (última entrada: el camino recorrido y los
+> Verificado contra: greenhouse-eo `develop` en `b84ec7084` — 2026-09-30 (última entrada: el deck SEO/AEO, TASK-1949);
+> antes, AXIS `c92160b` (tag `v0.3.38`) — 2026-09-29, noche (el camino recorrido y los
 > módulos de correo); antes, greenhouse-eo@f05c26e2f (`develop`) — 2026-09-29, noche (el deck de práctica
 > Salesforce, TASK-1942; antes, greenhouse-eo@2c95e60b2: la órbita del AI
 > Visibility Report, canonizada en AXIS `v0.3.30`, `26097c5`, con la pregunta abierta del camino recorrido; antes, los
@@ -503,6 +504,26 @@
   aprobado, nunca regenerando; un cambio de arquitectura (oficina moderna) sí exige regenerar.
 - **Los íconos de Plastilina en volumen no se regeneran** dentro de una pieza: en la mesa de producción va plastilina
   genérica; para una pantalla, el render oficial (la nave 3D) entra como arte exacto de la pantalla.
+
+## 2026-09-30 (el deck SEO/AEO, TASK-1949)
+
+- **El PDF horneado no es la fuente del orden: es el canvas.** Síntoma: el brochure SEO/AEO exportado ponía industrias y
+  mercados antes que clientes, y el plan golden lo copió. Causa: un índice sin actualizar en `render-src/bake.cjs`.
+  **Regla:** al canonizar un deck, el orden se toma del canvas aprobado y se compara contra el PDF; si difieren, manda
+  el canvas y se corrige el plan y el horneado (`b84ec7084`).
+- **Una anotación y una marca del contrato no son lo mismo.** El operador sacó de las láminas «datos de ejemplo»,
+  «preguntas de ejemplo» y «maquetas» (decisión 13), pero `mark`, `sampleMark` y `report.sample` se quedan: el
+  compositor rechaza la lámina sin ellas. **Regla:** antes de borrar un rótulo de muestra, mira si el contrato lo exige;
+  la anotación va a las notas del plan, la marca se queda.
+- **Un elemento que reemplaza a otro no se resuelve haciendo opcional al primero.** La AEO de cine va sin eyebrow porque
+  el lockup ocupa su lugar; volver opcional el eyebrow habría permitido una lámina sin ninguno de los dos. **Regla:**
+  `requiredUnless: <slot>` en el catálogo (y el validador y AXIS lo hacen cumplir), nunca `required: false`.
+- **Un slot opcional nuevo en una receta con plantilla deja la paridad en rojo hasta que la plantilla lo tenga.**
+  **Regla:** una lista temporal (`PENDING_TEMPLATE_SLOTS` en `recipe-slot-parity.test.ts`) con dueña y condición de
+  retiro, que sólo admite slots opcionales y falla si la entrada ya está mapeada: así no se olvida.
+- **El logo de un cliente dentro de una foto de caso se compone, nunca se genera.** La tarjeta de Banco BICE salió en
+  blanco del modelo y el logo oficial se compuso con sharp (rotación, opacidad y posición medidas). Cuidado con la
+  procedencia: el `Bice-logo.svg` de Wikimedia es del BICE argentino.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

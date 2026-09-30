@@ -14,7 +14,8 @@ description: >-
   "descuento", "prospección SEO", "outbound de SEO", "canales para vender SEO",
   "objeción SEO", "el cliente dice que es caro", "competimos con un freelancer",
   "AI Visibility Grader como venta", "licitación de contenido", "vender ASO",
-  "ASO para un cliente con app", "servicios complementarios de ASO".
+  "ASO para un cliente con app", "servicios complementarios de ASO", "deck SEO",
+  "deck SV360", "brochure SEO", "qué lámina muestro".
 ---
 
 # SEO/AEO Practice — el negocio, no el oficio
@@ -377,6 +378,49 @@ Tres reglas al mandar tráfico —pagado u orgánico— a una landing de la prá
 
 **Canon:** `docs/campaigns/decisions/CDR-007-cmp001-bofu-conversion-a-landing.md` (destinos verificados en vivo,
 bloqueos B1/B2 y su delta) · `docs/campaigns/CMP-001-MEDIA-PLAN-Q4-2026.md` (estructura de campañas y medición).
+
+---
+
+## 4f. 🎯 El deck SEO/AEO (Search Visibility 360) — el activo comercial aprobado (2026-09-30)
+
+El operador aprobó el deck de la práctica en tres documentos: **completo** (33 láminas), **brochure** (24) y
+**propuesta** (29), línea Engine, con SV360 como marca paraguas y sus piezas (AEO Assessment, AI Visibility Report,
+Insights). Se compone desde el catálogo de «La órbita» (`deck-studio`; norma
+`docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO»; TASK-1949). Esta skill
+decide **qué lámina sostiene qué conversación**; `deck-studio` la arma.
+
+| Objeción o momento | Lámina (receta) | Cuidado |
+|---|---|---|
+| «Mi tráfico cae y no sé si es Google, la IA o la agencia» (CMO) | `decision-ai-market` → `decision-ai-answer` | cifras de mercado con fuente y año; la respuesta de IA es un ejemplo y lo dice |
+| «El SEO trae visitas, no ventas» | `decision-traffic-to-revenue` | sin CRM ni medición de leads, no se promete el escalón |
+| «¿Me garantizas que voy a rankear?» | `proposal-cinematic-seo` o `proposal-service-seo` | la nota «No prometemos rankings…» es obligatoria (§2, regla 8) |
+| «Ya tuve una agencia» · «Un freelancer me cobra menos» · «Semrush y lo hago yo» | `decision-difference`, `section-cine-team` → `content-service-mockups` | la alternativa siempre genérica, nunca un competidor real; las maquetas son ilustrativas |
+| «¿Y si hay que tocar el sitio?» (IT / Dev) | `proposal-cinematic-web` («Lo hacemos») | alcance técnico por escrito en la propuesta |
+| «¿Cómo sé qué pasa y quién arma el reporte?» | `content-day-live-progress` → `content-day-live-results` → `content-report-formats` → `content-committee-deck` | **sólo formatos vivos** (abajo) |
+| «¿Cómo sé que funciona?» | `content-measure-formulas` | sin cifras: fórmula, fuente y dueño |
+| «Muéstrame casos» | `decision-case` (BICECORP, Banco BICE, Berel) | 🔴 **bloqueada hoy** (abajo); mientras tanto, `content-clients` + el Grader o la Radiografía en vivo (§4b) |
+| «¿Entienden mi industria?» | `content-industries` | preguntas de ejemplo, **no** prueba por industria |
+| «¿Cubren fuera de Chile?» | `content-markets` | mercados de `EFEONCE_OPERATING_MARKETS`, nunca oficinas |
+| «¿Y si no funciona?» (propuesta) | `decision-risk` → `decision-plan` → `content-pricing` | montos `[MONTO]` hasta la cotización |
+| Cierre | brochure: `decision-diagnosis-map` → `decision-next-steps`; propuesta: `decision-diagnosis-map` (salvo diagnóstico ya hecho) | las fechas de la agenda (5–9 oct) son de ejemplo |
+
+🔴 **Lo que hoy impide mostrárselo a un cliente** (pendientes de `ai-generations/2026-09-29_deck-seo-aeo-documentos/DECISIONES.md`):
+
+1. **Las cifras de los tres casos son de EJEMPLO** y la fuente provisoria («Google Search Console, GA4 y Efeonce AEO
+   Assessment, 12 meses») afirma algo falso. Coherente con §5 de `modules/12_ACTIVOS.md`: **cero casos citables**; un
+   caso sin las tres condiciones no se muestra, ni como «ilustrativo». Si los casos vienen de Grupo Security
+   (fusionado con BICECORP en sep-2025), el pie lo dice.
+2. **Logos de BICECORP, Banco BICE y Berel** sin autorización archivada (TASK-1937).
+3. **Formatos de Insights** (verificado el 2026-09-30): web y celular, PDF A4 y deck 16:9 vivos; modo presentación
+   desplegado sin probar con una edición real; **el correo que llega solo NO está vivo**. Ningún cliente real ha
+   recibido todavía una edición. Se quita o se rotula «próximamente» lo que no esté vivo (decisión del operador
+   pendiente); prometerlo es vender humo (§0).
+4. **Industrias sin prueba:** no hay clientes de banca, seguros ni SaaS en `content-clients`.
+5. **Bresler (+180 % de ventas digitales) no es una cifra de SEO**: cambiarla por una de SEO publicada si existe.
+6. La URL `think.efeoncepro.com/brand-visibility` todavía dice «Brand Visibility Grader» (alias histórico).
+
+Las láminas nativas (familia de marcas, servicios, formatos, comité, industrias y mercados) todavía no se componen
+solas: el PDF aprobado vive en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/` (fuera de git).
 
 ---
 

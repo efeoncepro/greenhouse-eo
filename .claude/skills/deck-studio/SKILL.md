@@ -13,11 +13,12 @@ description: >-
   Triggers: "deck", "láminas", "slides", "presentación", "pitch", "propuesta visual",
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
   "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "portada",
-  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce". En marca propia Efeonce, elige
-  láminas del catálogo de 94 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/; incluye las
-  nueve SEO/AEO y las 16 del deck de práctica Salesforce), valida el plan con pnpm brand:deck-plan (o pídele al
-  agente que lo proponga con --propose), liga los datos reales de los slots con --bind (TASK-1930) y compón las 94
-  (todas tienen plantilla), o el documento completo, con pnpm brand:compose.
+  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck SEO", "deck SV360". En marca
+  propia Efeonce, elige láminas del catálogo de 100 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/;
+  incluye las nueve SEO/AEO, las 16 del deck de práctica Salesforce y las seis del deck SEO/AEO), valida el plan con
+  pnpm brand:deck-plan (o pídele al agente que lo proponga con --propose), liga los datos reales de los slots con
+  --bind (TASK-1930) y compón las 94 que tienen plantilla (las seis del deck SEO/AEO todavía no), o el documento
+  completo, con pnpm brand:compose.
 ---
 
 # deck-studio — el deck es un ARGUMENTO, no una pila de láminas
@@ -100,8 +101,9 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   el Artifact Composer (catálogo `graphic-line-deck`, PDF 16:9; ejemplos en
   `src/lib/brand-surfaces/examples/deck-*-intent.json`; desde TASK-1927 sobre el contrato
   `efeonce.surface-composition` 0.1.2, y un intent 0.1.0 o 0.1.1 resuelve igual). Qué tiene plantilla y con qué
-  `layout`: subsección «Componer hoy con `pnpm brand:compose`» más abajo. Si una receta no tuviera plantilla (hoy no
-  pasa en el deck: las 78 la tienen),
+  `layout`: subsección «Componer hoy con `pnpm brand:compose`» más abajo. Si una receta no tuviera plantilla (hoy
+  sólo las seis nativas del deck SEO/AEO, que tampoco están en AXIS todavía: se hornean fuera del compositor hasta
+  TASK-1949),
   `pnpm surface:resolve` en AXIS → los `delegates` van a `pnpm creative:orbit:render` (voz, órbita), la selección y
   `resolveIcon`. Valores desde `efeonceGraphicLine.surfaces.deck` y `pieces.deck`; **nunca coordenadas en la lámina**.
 - **Recetas aprobadas: las 78 láminas de la página «Deck»** (69 el 2026-09-27 y nueve SEO/AEO el 2026-09-28). Ya no
@@ -161,6 +163,20 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   edición interpretativa, sólo por ruta local. Detalle y condiciones: norma §4.6 «Deck de práctica Salesforce», manual
   `docs/manual-de-uso/creative/componer-deck-con-recetas.md` y skill `efeonce-graphic-line`
   (`references/applications.md` §L). La serie HubSpot equivalente es TASK-1943.
+- **Deck SEO/AEO — Search Visibility 360 (aprobado 2026-09-30, TASK-1949; 100 recetas, 94 con plantilla).** El
+  ejemplo de **deck de práctica con submarcas**: SV360 es la marca paraguas y cada lámina que habla de una pieza lleva
+  su lockup (`productMark`: SV360, AEO, AEO Assessment, AI Visibility Report, Insights; uno por lámina; en la AEO de
+  cine reemplaza el eyebrow con `requiredUnless`). Tres documentos: **completo** (33, brochure extendido), **brochure**
+  (24) y **propuesta** (29), cinco capítulos con el mismo `progress.sections`. Parte de los planes
+  `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-{completo,brochure,proposal}-seo.json` y de los intents
+  `src/lib/brand-surfaces/examples/deck-seo-{completo,brochure,propuesta}-document.json`. Seis recetas nuevas **sin
+  plantilla todavía** (`content-brand-family`, `content-service-mockups`, `content-report-formats`,
+  `content-committee-deck`, `content-industries`, `content-markets`: el plan avisa `recipe-without-template` y el PDF
+  aprobado se hornea con `ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/bake.cjs`). **No sale a un
+  cliente** con las cifras de ejemplo de los tres casos, con logos de clientes sin autorización (TASK-1937) ni
+  prometiendo un formato de Insights que no está vivo (el correo, al 2026-09-30). Anotaciones «de ejemplo» fuera de la
+  lámina; una sola sección partida. Detalle: norma §4.6 «Deck SEO/AEO», manual «El deck SEO/AEO» y
+  `efeonce-graphic-line` (`references/applications.md` §L); el uso comercial por objeción, en `seo-aeo-practice`.
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
   **Integrado en Greenhouse** (TASK-1927 y TASK-1928, ambas `complete` y en `origin/develop`): `pnpm brand:compose`

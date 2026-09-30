@@ -651,6 +651,12 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
   (publicado el 2026-09-29, AXIS `main` `7f9c8bb`), nunca editados a mano (`scripts/brand/build-seo-aeo-logos.mjs`). Norma: manual §7.2;
   aplicaciones: [applications.md](applications.md) §B3c; naming: ADR `EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md` §Delta
   2026-09-29.
+- **Submarcas dentro de una lámina del deck (deck SEO/AEO, operador 2026-09-30):** el lockup va como `productMark`,
+  **uno por lámina** y sólo donde la lámina habla de esa pieza (SV360 = el sistema; AEO = la capacidad; AEO Assessment =
+  el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual). En la AEO de cine reemplaza el
+  eyebrow (`requiredUnless`), nunca se suma a él. El logo de un **cliente** dentro de una foto de caso se compone desde
+  su archivo oficial y viaja con su autorización (TASK-1937); nunca lo genera el modelo. **Abierto:** si el lockup SV360
+  cuenta como firma en una lámina con foto a sangre (`content-markets`), donde la regla general dice «sin logo».
 
 - **La firma de una pieza gráfica es el logo de Efeonce centrado, abajo al centro.** Cierra la composición al pie
   (manual §8.1; Tres voces, «la firma debe cerrar la composición al pie»).

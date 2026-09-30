@@ -721,6 +721,16 @@ Efeonce in a lockup and **never sign alone**. Naming: Greenhouse ADR `EFEONCE_AE
   application is TASK-1938 (Grader report PDF with the «Efeonce | AI Visibility Report» lockup, Engine palette).
 - Criterion and application map: `efeonce-graphic-line` → `criteria.md` («Submarcas de producto SEO/AEO») and
   `applications.md` §B3c; Greenhouse norm `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §7.2.
+- **In the SEO/AEO deck (operator-approved 2026-09-30, TASK-1949):** the lockups enter deck slides as the optional
+  slot `productMark` (closed list `sv360-lockup-negative`, `sv360-logo-negative`, `aeo-lockup-negative`,
+  `aeo-assessment-lockup-negative`, `ai-visibility-report-lockup-negative`, `insights-lockup-negative`; one per slide),
+  and the eyebrow of `proposal-cinematic-seo`/`-aeo` becomes `requiredUnless: productMark`. Declared so far only in the
+  Greenhouse recipe catalog (`EFEONCE_DECK_SLIDE_RECIPES_V1.json`, 100 recipes). **AXIS side pending (TASK-1949
+  Slice 3):** the six new recipes in `efeonceGraphicLine.surfaces.deck.recipes`, `requiredUnless` in the contract, Lab
+  references `apps/lab/public/references/surfaces/deck/<id>.jpg` and the BICECORP and Banco BICE client logos with
+  provenance (`ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/PROCEDENCIA.txt`) and authorization state
+  (client logos are third-party marks: never generated, used only with the client's authorization, TASK-1937). Norm:
+  `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO».
 
 ### Efeonce AI Visibility Report (0.3.30 set)
 
