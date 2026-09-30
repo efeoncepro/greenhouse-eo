@@ -34,9 +34,7 @@ export function managedDrift() {
 
   // Una declaración de propiedad fuera del sello no tiene efecto; se avisa para que nadie la crea vigente.
   if (existsSync(path.join(ROOT, '.workbench/native-ownership.json')))
-    console.log(
-      '  ℹ .workbench/native-ownership.json no exime nada: las rutas nativas son las del sello (native).'
-    )
+    console.log('  ℹ .workbench/native-ownership.json no exime nada: las rutas nativas son las del sello (native).')
 
   if (native.length) console.log(`  ${native.length} rutas nativas selladas (del workbench, no se comparan).`)
 

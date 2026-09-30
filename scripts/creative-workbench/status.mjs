@@ -36,6 +36,22 @@ const target = resolveTarget(manifest, value('--target'))
 const gh = (...a) => run('gh', a, { allowFail: true })
 const firstLine = r => (r.stderr || r.stdout || '').trim().split('\n')[0]
 
+// Paginación explícita y no `gh --paginate`: los enlaces `next` de GitHub apuntan a
+// `repositories/{id}/...`, que algunos proxies de egress rechazan. Página a página siempre funciona.
+function pagedLines(endpoint, jq) {
+  const out = []
+
+  for (let page = 1; page <= 50; page++) {
+    const r = gh('api', `${endpoint}?per_page=100&page=${page}`, '--jq', jq)
+    const lines = r.status === 0 ? r.stdout.split('\n').filter(Boolean) : []
+
+    out.push(...lines)
+    if (lines.length < 100) break
+  }
+
+  return out
+}
+
 const exists = gh('api', `repos/${repo}`, '--jq', '.full_name')
 
 if (exists.status !== 0) {
@@ -70,14 +86,18 @@ if (remoteLock?.source?.commit) {
     try {
       expected = await buildPlan({ ref: sealedCommit })
     } catch (error) {
-      console.log(`\nSello: no pude recalcular greenhouse-eo@${sealedCommit.slice(0, 9)} (${error.message.split('\n')[0]})`)
+      console.log(
+        `\nSello: no pude recalcular greenhouse-eo@${sealedCommit.slice(0, 9)} (${error.message.split('\n')[0]})`
+      )
     }
   }
 
   if (expected) {
     const anomalies = verifySeal(remoteLock, expected)
 
-    console.log(`\nSello íntegro: ${anomalies.length ? `✗ ${anomalies.length} anomalías (alguien lo editó a mano)` : '✓'}`)
+    console.log(
+      `\nSello íntegro: ${anomalies.length ? `✗ ${anomalies.length} anomalías (alguien lo editó a mano)` : '✓'}`
+    )
     for (const a of anomalies.slice(0, 15)) console.log(`   ! ${a}`)
     if (anomalies.length > 15) console.log(`   … y ${anomalies.length - 15} más`)
   }
@@ -174,8 +194,7 @@ const openPrs = prs.stdout
 console.log(`\nPRs abiertos: ${openPrs.length || 'ninguno'}`)
 
 for (const pr of openPrs) {
-  const files = gh('api', '--paginate', `repos/${repo}/pulls/${pr.number}/files?per_page=100`, '--jq', '.[].filename')
-  const touched = files.stdout.split('\n').filter(Boolean)
+  const touched = pagedLines(`repos/${repo}/pulls/${pr.number}/files`, '.[].filename')
   const managed = touched.filter(rel => rel in (remoteLock?.files ?? {}))
   const sealTouched = touched.filter(rel => rel.startsWith('.workbench/'))
   const isSync = pr.head.startsWith('sync/')

@@ -503,16 +503,17 @@ export function verifySeal(lock, expected) {
   const expectedNative = [...(expected.report.native ?? [])].sort()
 
   if (JSON.stringify(sealedNative) !== JSON.stringify(expectedNative))
-    problems.push(
-      `native sellado [${sealedNative.join(', ')}] ≠ manifest de ese commit [${expectedNative.join(', ')}]`
-    )
+    problems.push(`native sellado [${sealedNative.join(', ')}] ≠ manifest de ese commit [${expectedNative.join(', ')}]`)
 
   for (const [rel, hash] of Object.entries(lock.files ?? {})) {
     if (rel === 'pnpm-lock.yaml') continue
     const entry = expected.plan.get(rel)
 
     if (!entry) problems.push(`${rel}: sellado, pero ese commit no lo exporta`)
-    else if (sha256(entry.content) !== hash) problems.push(`${rel}: la huella sellada no es la del commit`)
+    // Lo generado (package.json, config, reporte) depende también de la versión del generador, que
+    // puede ser posterior al commit sellado: sólo se exige que exista. Lo copiado debe ser idéntico.
+    else if (entry.kind !== 'generated' && sha256(entry.content) !== hash)
+      problems.push(`${rel}: la huella sellada no es la del commit`)
   }
 
   for (const rel of expected.plan.keys())

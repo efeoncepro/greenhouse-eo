@@ -111,7 +111,15 @@ describe('creative-workbench — rutas nativas', () => {
   })
 
   it('rechaza globs, rutas que escapan, el sello y lo reservado', () => {
-    for (const bad of ['tools/*.mjs', '../x', '/abs', '.workbench/sync.lock.json', 'gates/**', 'gates/lib.mjs', '.github/**'])
+    for (const bad of [
+      'tools/*.mjs',
+      '../x',
+      '/abs',
+      '.workbench/sync.lock.json',
+      'gates/**',
+      'gates/lib.mjs',
+      '.github/**'
+    ])
       expect(() => validateNativePatterns([bad], reserved), bad).toThrow()
   })
 
@@ -138,7 +146,12 @@ describe('creative-workbench — reconciliación del sync', () => {
     const plan = new Map([['gates/lib.mjs', entry('v2')]])
 
     const previous = {
-      files: { 'gates/lib.mjs': hash('v1'), 'AGENTS.md': hash('a'), 'tools/viejo.mjs': hash('x'), 'pnpm-lock.yaml': 'h' }
+      files: {
+        'gates/lib.mjs': hash('v1'),
+        'AGENTS.md': hash('a'),
+        'tools/viejo.mjs': hash('x'),
+        'pnpm-lock.yaml': 'h'
+      }
     }
 
     const out = reconcile({
@@ -193,6 +206,17 @@ describe('creative-workbench — integridad del sello', () => {
       /huella/
     )
     expect(verifySeal({ ...good, files: { 'pnpm-lock.yaml': 'x' } }, expected).join(' ')).toMatch(/sello no lo tiene/)
+  })
+
+  it('lo generado sólo tiene que existir: depende también de la versión del generador', () => {
+    const withReport = {
+      plan: new Map([...plan, ['.workbench/export-report.json', { kind: 'generated', content: Buffer.from('nuevo') }]]),
+      report: expected.report
+    }
+
+    const lock = { ...good, files: { ...good.files, '.workbench/export-report.json': sha256(Buffer.from('viejo')) } }
+
+    expect(verifySeal(lock, withReport)).toEqual([])
   })
 })
 

@@ -1,8 +1,9 @@
 # Efeonce Creative Workbench — repo del equipo creativo gobernado desde Greenhouse (ADR)
 
 > **Tipo:** decisión de arquitectura (ADR)
-> **Versión:** 1.0
-> **Estado:** **Accepted** (2026-09-29) — decisión del operador (Julio Reyes)
+> **Versión:** 1.1
+> **Estado:** **Accepted** (2026-09-29) — decisión del operador (Julio Reyes). **Delta 2026-09-30 (§8):**
+> el workbench pasa a tener un harness propio (rutas nativas); greenhouse-eo conserva la frontera.
 > **Creado:** 2026-09-29 por Claude
 > **Repo:** [`efeoncepro/creative-workbench`](https://github.com/efeoncepro/creative-workbench) (privado, `main`)
 > **Plano de control:** [`scripts/creative-workbench/`](../../scripts/creative-workbench/) en este repo
@@ -34,6 +35,9 @@ Team/Enterprise están en evaluación, así que el diseño **no depende de manag
 
 `efeoncepro/creative-workbench` es un **cliente gobernado** de `greenhouse-eo`. El equipo trabaja en
 `projects/`; todo lo demás llega desde aquí por un único camino y queda sellado.
+
+> **Delta 2026-09-30:** «todo lo demás» ya no es literal. Hay rutas **nativas** (el harness del workbench) que
+> greenhouse-eo declara, sella y deja de escribir. Ver §8, que prevalece sobre §2.1, §2.2 y §5 donde choquen.
 
 ### 2.1 Un solo camino de entrada: el plan de exportación
 
@@ -163,9 +167,83 @@ otra persona. **Publicar nunca ocurre desde el workbench.**
 | Plano de control (`scripts/creative-workbench/`, `pnpm creative:*`) + 12 pruebas | ✅ 2026-09-29 |
 | Repo creado, bootstrap y primer sync por PR (#1), CI `gates` en verde | ✅ 2026-09-29 |
 | Equipo GitHub `creative-workbench` con permiso `push` (vacío) | ✅ 2026-09-29 |
-| Proyecto GCP, buckets y secretos (`creative:provision apply`) | ⏳ pendiente de autorización del operador (crea infraestructura con cobro) |
+| Proyecto GCP, buckets y secretos (`creative:provision apply`) | ⚠ superado: según `HARNESS_STATUS.md` del PR #3, Codex los creó con `gcloud` (ver más abajo) |
 | Llaves dedicadas con tope en cada proveedor | ⏳ operador |
 | Publicar referencias en canon (`creative:assets:publish apply`) | ⏳ tras provision |
 | Alta de miembros en `control.json` | ⏳ operador |
-| Re-sync desde un commit limpio (el bootstrap arrastró working tree) | ⏳ al commitear este plano de control |
 | Ruleset de `main` | ⛔ requiere GitHub Team |
+| Re-sync desde commit limpio (`greenhouse-eo@1185cbf68`, PR #2 del workbench) | ✅ 2026-09-29 |
+| Proyecto GCP, buckets, secreto OpenAI y broker Cloud Run (creados por Codex en el PR #3, fuera de `creative:provision`) | ⚠ existen; falta llevarlos a `control.json` (§8.4) |
+| Rutas nativas selladas, sync que no pisa, `creative:status` por REST con integridad del sello (§8) | ✅ 2026-09-30 en greenhouse-eo; ⏳ sync de transición tras el PR #3 |
+
+## 8. Delta 2026-09-30 — harness nativo y frontera sellada
+
+### 8.1 Contexto
+
+El 2026-09-29 el operador pidió a Codex construir en el workbench y no alterar los CLIs de Greenhouse. Codex
+construyó un harness propio (PR #3 del workbench, en borrador): comandos `marca:*`, brand pack SKY con las 126
+adaptaciones, broker privado en Cloud Run y desactivación de `ai:*`/`foto:*` en el workbench. Para que el CI
+pasara, el PR editó 13 archivos sellados y cambió el gate `managed-drift` para no compararlos, declarando la
+exención en `.workbench/native-ownership.json`, un archivo que el mismo PR podía editar. Además, un
+`creative:sync` posterior habría pisado el harness (y el harness, bloqueado el sync).
+
+### 8.2 Decisión
+
+Se adopta el modelo **harness nativo con frontera gobernada**:
+
+| Clase | Quién escribe | Qué hace el sync | Cómo se controla |
+|---|---|---|---|
+| Gestionado (skills, engines, docs, gates) | greenhouse-eo | Escribe y sella | `managed-drift` + integridad del sello |
+| Nativo (harness: `package.json`, lockfile, guard, `AGENTS.md`…) | El workbench | No lo escribe ni lo borra | La lista la decide greenhouse-eo y viaja sellada |
+| Reservado (`gates/**`, workflow `gates`, `CODEOWNERS`, `.workbench/**`) | greenhouse-eo | Siempre gestionado | Nunca puede declararse nativo |
+| `projects/**` | El equipo | Nunca lo toca | Gate `piezas` |
+
+Mecánica (`scripts/creative-workbench/`):
+
+- `export-manifest.json → native.paths` (rutas exactas o `dir/**`) y `native.reserved`. `planFromSource`
+  excluye lo nativo del plan; si una skill, un engine o un doc cae en ruta nativa, falla.
+- `creative:sync` escribe `native` dentro de `.workbench/sync.lock.json`. Lo gestionado que pasa a nativo se
+  **entrega**: sale del sello sin borrarse. Si una ruta del plan ya existe en el workbench y el sello no la
+  gestionaba, el sync **aborta** en vez de pisarla. Si `pnpm-lock.yaml` es nativo, no se regenera.
+- El gate `managed-drift` lee `native` **sólo del sello**. `.workbench/native-ownership.json` no exime nada;
+  el gate avisa que existe.
+- `creative:status` (sólo REST de GitHub) recalcula el plan del commit que el sello declara y verifica que el
+  sello publicado sea el que greenhouse-eo habría escrito (**sello íntegro**). También marca los PRs abiertos
+  que tocan archivos gestionados o `.workbench/`, y lista las dependencias que los engines entregados
+  necesitan y que el `package.json` nativo no declara.
+
+Rutas nativas iniciales, las 11 que el PR #3 necesita poseer: `AGENTS.md`, `CLAUDE.md`, `README.md`,
+`.gitignore`, `.claude/hooks/guard.mjs`, `.claude/settings.json`, `package.json`, `pnpm-lock.yaml`,
+`tools/doctor.mjs`, `tools/instalar.mjs`, `clients/sky/README.md`. De los 13 archivos que el PR editó,
+`gates/managed-drift.mjs` y `gates/hygiene.mjs` **no** pasan a nativos: los gates son la forma de controlar
+el workbench. El sync de transición los reemplaza por la versión de greenhouse-eo, que lee `native` del sello.
+
+Verificado 2026-09-30 sobre copias locales: sync contra `main` y contra el estado del PR #3 → 11 entregados
+sin borrar, gates verdes, y los tests del harness de Codex iguales antes y después (104/105 y 5/7; los
+omitidos requieren canon licenciado).
+
+### 8.3 Reglas duras que agrega
+
+- **NUNCA** declarar nativa una ruta desde el workbench: se pide por issue allá y se decide en el manifest de
+  greenhouse-eo. Declararla en otro archivo no tiene efecto.
+- **NUNCA** declarar nativos `gates/**`, el workflow `gates`, `CODEOWNERS` ni `.workbench/**`.
+- **NUNCA** quitar una ruta del manifest para "soltarla": el sync la **borraría**. Se suelta declarándola
+  nativa.
+- **NUNCA** editar a mano `.workbench/sync.lock.json`: `creative:status` lo detecta como sello no íntegro.
+
+### 8.4 Pendiente (siguientes pasos, no cubiertos por este delta)
+
+1. Codex termina el PR #3; se mergea (idealmente dividido).
+2. Sync de transición `pnpm creative:sync --pr`: entrega las 11 rutas, instala los gates que leen `native` y
+   pone al día los engines (`isotipo`, línea gráfica). Después, el workbench puede retirar
+   `native-ownership.json` y su test.
+3. **Política de lo nativo:** reglas selladas que un gate verifica sobre el harness (el guard sigue
+   bloqueando secretos y push a `main`, ningún script llama directo a un proveedor, marcas coherentes con
+   `control.json`).
+4. **Broker e IAM a `control.json`:** hoy la cuenta de servicio, los bindings del broker, el proyecto de
+   Vercel y `production-policy.json` («todas las marcas para todo el equipo», distinto del acceso por
+   cliente de §2.4) se crearon fuera de `creative:access`/`creative:provision`. `deployment-plan.json` del
+   PR #3 aún apunta al bundle `877f5806…` y el vivo es otro.
+5. **Skills vs. harness:** las 17 skills siguen indicando `pnpm foto:*`/`ai:*`, desactivados en el
+   workbench; Efeonce y Berel quedaron cerrados («gated»). Hay que decidir si se entrega una capa por repo o
+   si `AGENTS.md` nativo lo resuelve.
