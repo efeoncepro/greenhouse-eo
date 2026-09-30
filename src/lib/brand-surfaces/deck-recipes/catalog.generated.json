@@ -636,6 +636,12 @@
           "type": "image",
           "required": true,
           "maxChars": null
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.cover-brochure",
@@ -942,6 +948,12 @@
           "type": "text",
           "required": true,
           "maxChars": 12
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.cover-proposal",
@@ -2214,6 +2226,12 @@
           "type": "image",
           "required": true,
           "maxChars": null
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": false,
+          "maxChars": 136
         }
       ],
       "template": "deck.section-cine",
@@ -3138,6 +3156,12 @@
           "type": "section",
           "required": true,
           "maxChars": null
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.content-text",
@@ -3829,6 +3853,12 @@
           "type": "metric",
           "required": true,
           "maxChars": 18
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.content-day.live-results",
@@ -4506,6 +4536,12 @@
           "type": "text",
           "required": true,
           "maxChars": 45
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.method-score-ring",
@@ -4760,6 +4796,12 @@
           "type": "text",
           "required": true,
           "maxChars": 12
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.method-staircase",
@@ -6869,6 +6911,12 @@
           "type": "text",
           "required": false,
           "maxChars": 70
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.proposal-service",
@@ -7612,6 +7660,12 @@
           "type": "image",
           "required": true,
           "maxChars": null
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.proposal-cinematic",
@@ -7857,6 +7911,12 @@
           "type": "text",
           "required": false,
           "maxChars": 70
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.proposal-service",
@@ -7987,6 +8047,12 @@
           "name": "photo",
           "type": "image",
           "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
           "maxChars": null
         }
       ],
@@ -8699,6 +8765,12 @@
           "type": "text",
           "required": true,
           "maxChars": 92
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
         }
       ],
       "template": "deck.decision-diagnosis-map",
@@ -11400,6 +11472,546 @@
           "currentLoopStep": 2
         }
       }
+    },
+    {
+      "id": "content-brand-family",
+      "name": "Familia de marcas · el producto y sus piezas con sus lockups oficiales, cada una con su papel",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "section-split",
+          "content-service-mockups"
+        ]
+      },
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 28
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 20
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 169
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 71
+        },
+        {
+          "name": "familyMark",
+          "type": "enum",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "pieces",
+          "type": "list",
+          "required": true,
+          "maxChars": 74
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-service-mockups",
+      "name": "Qué hace el equipo · tres fichas con maquetas nativas del servicio (técnica, contenido, autoridad) y tres entregables",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "section-cine-team",
+          "proposal-cinematic-seo"
+        ]
+      },
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 45
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 24
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 9
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 131
+        },
+        {
+          "name": "technicalTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 25
+        },
+        {
+          "name": "technicalScore",
+          "type": "number",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "technicalScoreLabel",
+          "type": "richText",
+          "required": true,
+          "maxChars": 47
+        },
+        {
+          "name": "technicalChecks",
+          "type": "list",
+          "required": true,
+          "maxChars": 9
+        },
+        {
+          "name": "technicalCaption",
+          "type": "text",
+          "required": true,
+          "maxChars": 62
+        },
+        {
+          "name": "contentTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 31
+        },
+        {
+          "name": "contentPillar",
+          "type": "text",
+          "required": true,
+          "maxChars": 8
+        },
+        {
+          "name": "contentNodes",
+          "type": "list",
+          "required": true,
+          "maxChars": 11
+        },
+        {
+          "name": "contentCaption",
+          "type": "richText",
+          "required": true,
+          "maxChars": 109
+        },
+        {
+          "name": "authorityTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 24
+        },
+        {
+          "name": "authorityMetric",
+          "type": "metric",
+          "required": true,
+          "maxChars": 4
+        },
+        {
+          "name": "authorityOutlets",
+          "type": "list",
+          "required": true,
+          "maxChars": 24
+        },
+        {
+          "name": "authorityCaption",
+          "type": "text",
+          "required": true,
+          "maxChars": 59
+        },
+        {
+          "name": "chips",
+          "type": "list",
+          "required": true,
+          "maxChars": 73
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-report-formats",
+      "name": "Cómo te llega el informe · el informe vivo en interfaz blanca y los cinco formatos en que se entrega",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-day-live-results",
+          "content-committee-deck"
+        ]
+      },
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 53
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 28
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 20
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 171
+        },
+        {
+          "name": "reportLabel",
+          "type": "text",
+          "required": true,
+          "maxChars": 58
+        },
+        {
+          "name": "kpis",
+          "type": "list",
+          "required": true,
+          "maxChars": 28
+        },
+        {
+          "name": "trendTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 54
+        },
+        {
+          "name": "rankingTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 38
+        },
+        {
+          "name": "ranking",
+          "type": "list",
+          "required": true,
+          "maxChars": 11
+        },
+        {
+          "name": "reading",
+          "type": "text",
+          "required": true,
+          "maxChars": 155
+        },
+        {
+          "name": "formats",
+          "type": "list",
+          "required": true,
+          "maxChars": 37
+        },
+        {
+          "name": "highlightedFormat",
+          "type": "number",
+          "required": true,
+          "maxChars": null
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-committee-deck",
+      "name": "El PPT del comité · la lámina de comité ya armada por la IA, en modo presentación, con tres formas de llevarla",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-report-formats",
+          "content-measure-formulas"
+        ]
+      },
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 46
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 37
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 12
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 159
+        },
+        {
+          "name": "slideKicker",
+          "type": "text",
+          "required": true,
+          "maxChars": 62
+        },
+        {
+          "name": "slideHeadline",
+          "type": "text",
+          "required": true,
+          "maxChars": 48
+        },
+        {
+          "name": "slideFigure",
+          "type": "metric",
+          "required": true,
+          "maxChars": 27
+        },
+        {
+          "name": "annotation",
+          "type": "text",
+          "required": true,
+          "maxChars": 17
+        },
+        {
+          "name": "features",
+          "type": "list",
+          "required": true,
+          "maxChars": 62
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-industries",
+      "name": "Industrias · seis fichas de vidrio con la pregunta que ese comprador le hace a la IA",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-markets",
+          "decision-case"
+        ]
+      },
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 50
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 26
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 20
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 154
+        },
+        {
+          "name": "industries",
+          "type": "list",
+          "required": true,
+          "maxChars": 62
+        },
+        {
+          "name": "highlightedIndustry",
+          "type": "number",
+          "required": true,
+          "maxChars": null
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "content-markets",
+      "name": "Mercados · las Américas de noche desde la órbita con los cinco países donde opera Efeonce",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "photo-bleed",
+      "photo": {
+        "uses": true,
+        "plate": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png"
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "content-industries",
+          "decision-case"
+        ]
+      },
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "maxChars": null
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 50
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 26
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 20
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 148
+        },
+        {
+          "name": "markets",
+          "type": "list",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "photo",
+          "type": "image",
+          "required": true,
+          "maxChars": null
+        }
+      ],
+      "template": null,
+      "axis": null
     }
   ]
 }

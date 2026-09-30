@@ -27,13 +27,24 @@ const withCoverSlots = (slots: Record<string, unknown>): DeckPlan => ({
   slides: [{ recipeId: 'cover-brochure-cine-lines', slots }, { recipeId: 'proposal-cinematic-creative' }, { recipeId: 'close-brochure-orbit' }]
 })
 
+// Las seis láminas nativas del deck SEO/AEO (TASK-1949) entran al catálogo sin plantilla ni página de AXIS hasta el
+// Slice 2: cuando la tengan, esta lista queda vacía.
+const SEO_DECK_WITHOUT_TEMPLATE = [
+  'content-brand-family',
+  'content-service-mockups',
+  'content-report-formats',
+  'content-committee-deck',
+  'content-industries',
+  'content-markets'
+]
+
 describe('catálogo de runtime', () => {
-  // Las 94 recetas componen: las doce de la primera ronda del deck Salesforce desde 84c83a044 y las cuatro de la
-  // segunda (SF5, SF10, SF11 y SF18) desde que el Artifact Composer las implementó (TASK-1942, tanda 2).
-  it('trae las 94 recetas aprobadas, todas con plantilla y página de AXIS', () => {
-    expect(deckRecipeCatalog.recipes).toHaveLength(94)
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template).map(recipe => recipe.id)).toEqual([])
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id)).toEqual([])
+  // Las 94 recetas previas componen: las doce de la primera ronda del deck Salesforce desde 84c83a044 y las cuatro de
+  // la segunda (SF5, SF10, SF11 y SF18) desde que el Artifact Composer las implementó (TASK-1942, tanda 2).
+  it('trae las 100 recetas aprobadas; sólo las seis nativas del deck SEO/AEO esperan plantilla y página de AXIS', () => {
+    expect(deckRecipeCatalog.recipes).toHaveLength(100)
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template).map(recipe => recipe.id)).toEqual(SEO_DECK_WITHOUT_TEMPLATE)
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id)).toEqual(SEO_DECK_WITHOUT_TEMPLATE)
   })
 
   it('acepta la portada y el cierre clásicos de AXIS sólo en pitch y QBR', () => {
@@ -56,6 +67,26 @@ describe('validateDeckPlan — planes golden', () => {
   for (const name of ['golden-brochure-salesforce.json', 'golden-proposal-salesforce.json']) {
     it(`${name} no tiene errores ni advertencias`, () => {
       expect(validateDeckPlan(read<DeckPlan>(name))).toEqual({ ok: true, issues: [] })
+    })
+  }
+
+  // El deck SEO/AEO (Search Visibility 360) aprobado el 2026-09-30 en sus tres documentos (TASK-1949): completo y
+  // brochure cierran con la contraportada de brochure; la propuesta abre con la portada de propuesta y cierra con
+  // «Empower your Engine». Sin errores; los únicos avisos son las seis láminas nativas que esperan plantilla (Slice 2).
+  const SEO_NATIVE = {
+    'golden-completo-seo.json': [7, 10, 22, 23, 27, 28],
+    'golden-brochure-seo.json': [6, 8, 16, 17, 19, 20],
+    'golden-proposal-seo.json': [6, 9, 17, 18, 21, 22]
+  }
+
+  for (const [name, slides] of Object.entries(SEO_NATIVE)) {
+    it(`${name} es válido y sólo avisa que sus seis láminas nativas esperan plantilla`, () => {
+      const result = validateDeckPlan(read<DeckPlan>(name))
+
+      expect(result.ok).toBe(true)
+      expect(result.issues.map(issue => [issue.code, issue.slideIndex! + 1, issue.recipeId])).toEqual(
+        slides.map((slide, i) => ['recipe-without-template', slide, SEO_DECK_WITHOUT_TEMPLATE[i]])
+      )
     })
   }
 

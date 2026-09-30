@@ -96,11 +96,31 @@ const COMPATIBLE: Record<string, (field: Field) => boolean> = {
 
 const mapped = Object.entries(map.recipes).filter(([, entry]) => entry.slots !== null)
 
+/**
+ * TEMPORAL (TASK-1949, deck SEO/AEO): slots OPCIONALES que el catálogo ya declara y que la plantilla todavía no tiene.
+ * El Artifact Composer los suma en el Slice 2 (con un test que compone cada receta SIN el slot) y los mapea en
+ * `recipe-map.json`; ese día se borran de aquí. Dueña: TASK-1949 Slice 2. Condición de retiro: la lista vacía; la prueba
+ * de abajo falla si una entrada ya está mapeada, así que no puede quedar olvidada.
+ */
+const PENDING_TEMPLATE_SLOTS: Record<string, string[]> = {
+  'content-text': ['productMark'],
+  'proposal-service-seo': ['productMark'],
+  'proposal-service-aeo': ['productMark'],
+  'method-score-ring': ['productMark'],
+  'decision-diagnosis-map': ['productMark'],
+  'content-day-live-results': ['productMark'],
+  'section-cine-team': ['body']
+}
+
+const isPending = (id: string, name: string) => PENDING_TEMPLATE_SLOTS[id]?.includes(name) === true
+
 /** En una plantilla que comparten varias recetas, el largo del campo es el mayor que piden. */
 const sharedCap = new Map<string, number>()
 
 for (const [id, entry] of mapped) {
   for (const slot of recipes.get(id)?.slots ?? []) {
+    if (isPending(id, slot.name)) continue
+
     const route = entry.slots![slot.name]
 
     if (!route || route.includes('+') || route.includes('#') || slot.maxChars === undefined || !['text', 'richText', 'list', 'metric'].includes(slot.type)) continue
@@ -112,6 +132,19 @@ for (const [id, entry] of mapped) {
 }
 
 describe('paridad de slots receta ↔ plantilla', () => {
+  it('los slots pendientes de plantilla existen en el catálogo y todavía no están mapeados', () => {
+    const stale: string[] = []
+
+    for (const [id, names] of Object.entries(PENDING_TEMPLATE_SLOTS)) {
+      for (const name of names) {
+        if (!recipes.get(id)?.slots.some(slot => slot.name === name)) stale.push(`${id}.${name} no está en el catálogo`)
+        if (map.recipes[id]?.slots?.[name]) stale.push(`${id}.${name} ya está mapeado: bórralo de PENDING_TEMPLATE_SLOTS`)
+      }
+    }
+
+    expect(stale).toEqual([])
+  })
+
   it('las 38 recetas de TASK-1928 declaran su mapa de slots', () => {
     expect(mapped.length).toBeGreaterThanOrEqual(38)
   })
@@ -122,11 +155,15 @@ describe('paridad de slots receta ↔ plantilla', () => {
     expect(recipe, `${id} no está en el catálogo de recetas`).toBeDefined()
 
     const slots = slotsOf(entry.contentType!)
-    const names = recipe!.slots.map(slot => slot.name)
+    const pending = recipe!.slots.filter(slot => isPending(id, slot.name))
+    const names = recipe!.slots.filter(slot => !isPending(id, slot.name)).map(slot => slot.name)
 
     expect(Object.keys(entry.slots!).sort(), `${id}: el mapa no cubre exactamente los slots de la receta`).toEqual([...names].sort())
 
-    for (const slot of recipe!.slots) {
+    // Lo pendiente sólo puede ser opcional: la paridad no se relaja para un slot obligatorio.
+    for (const slot of pending) expect(slot.required, `${id}.${slot.name}: sólo un slot opcional puede esperar su plantilla`).toBe(false)
+
+    for (const slot of recipe!.slots.filter(candidate => !isPending(id, candidate.name))) {
       const [route, marker] = entry.slots![slot.name]!.split('#')
       const parts = route!.split('+')
       const found = parts.map(part => fieldAt(slots, part))

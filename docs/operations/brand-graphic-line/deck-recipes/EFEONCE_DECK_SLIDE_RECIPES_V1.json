@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "approvedAt": "2026-09-27",
   "approvedBy": "operador (canvas «La órbita», página Deck)",
-  "count": 94,
+  "count": 100,
   "axisRecipeFamilies": {
     "cover-classic": "portada clásica AXIS (deckSlideHtml cover)",
     "close-classic": "cierre clásico AXIS (deckSlideHtml close)",
@@ -1001,6 +1001,16 @@
           "required": true,
           "example": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
           "notes": "Plate aprobado de la línea: un líder web con polo que toca una web holográfica usada por personas y agentes robot. Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "sv360-logo-negative",
+            "alt": "SV360 · Search Visibility 360"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Al pie de la columna de voz de la portada de línea: x 140, top 790, alto 64 px. Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot; (la receta no declara mapa de slots: su contrato sale del manifest de AXIS)."
         }
       ],
       "fixed": [
@@ -1049,7 +1059,43 @@
         "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %."
       ],
       "notes": "Título previo: «✅ APROBADA · FOTO · Brochure Digital Services & Engineering · «¿Te encuentra la IA? Visible.»». El plate nació para proposal-cinematic (WB1b). La evidencia llega a x ≈ 750, justo antes del codo del sujeto: tres líneas es el máximo. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPortadaLineaEngine.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPortadaLineaEngine.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C01 · B01",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 01, Brochure 01",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/01.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 1
+          },
+          "content": {
+            "eyebrow": "Search Visibility 360 · SEO y AEO",
+            "question": "¿Te encuentran Google y la IA?",
+            "answer": "Visible",
+            "evidence": "**SV360**: SEO y AEO en un solo sistema\nAEO Assessment · AI Visibility Report · Insights",
+            "column.topPx": 220,
+            "productMark": {
+              "asset": "sv360-logo-negative",
+              "alt": "SV360 · Search Visibility 360",
+              "position": "x 140, top 790, alto 64"
+            }
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
+            "alt": "Un ingeniero de Efeonce con polo toca una web holográfica que usan personas y pequeños agentes robot",
+            "notes": "El plate WB1b de la portada web de la línea engine (plateRef en los planes golden); DV1 queda para proposal-cinematic-web, así no se repite."
+          },
+          "fit": "Aprobada tal cual por el operador, pero pasa el largo de la receta: eyebrow mide 33 y la receta admite 32; question mide 30 y la receta admite 26; evidence mide 48 y la receta admite 42. Subir el máximo (como SF6 y SF7 en TASK-1942) o acortar es decisión del Slice 2 con el operador; hasta entonces un plan que ligue este texto falla con slot-over-max-chars (error). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). La columna en 220 y el logo SV360 al pie (productMark) vienen de la aprobada."
+        }
+      ]
     },
     {
       "id": "cover-brochure-line-voice",
@@ -1542,6 +1588,16 @@
           "maxChars": 12,
           "example": "Cliente",
           "notes": "Etiqueta del cursor del colaborador: «Cliente» en la plantilla, el nombre corto del cliente en la versión final."
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "sv360-logo-negative",
+            "alt": "SV360 · Search Visibility 360"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Al pie de la columna de voz de la portada de propuesta: x 140, top 880, alto 56 px. Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot (la receta no declara mapa de slots: su contrato sale del manifest de AXIS)."
         }
       ],
       "fixed": [
@@ -1586,7 +1642,42 @@
         "Los montos no van en la portada; en la propuesta se escriben como [MONTO] hasta cerrar la cifra."
       ],
       "notes": "Título previo: «✅ APROBADA · SIN FOTO · propuesta: la órbita gigante sostiene el logo del cliente (plantilla)». PLANTILLA: el marcador punteado y «[Cliente]» no se envían nunca así. La voz «¿Cómo crecemos en 2027? Con foco.» está aprobada; el año se actualiza con la fecha del envío. El render dibuja la órbita con giantOrbit(1640, 540, 820, 212 °) en propuesta.mjs; el token la redondea a 1638 · 540 · 818. Las portadas clásicas de propuesta (logo de 230 px) y el anillo completo con el cliente al centro (PC3 en propuesta.mjs) están descartados: no volver a proponer.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaPortadaCliente1.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaPortadaCliente1.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "P01",
+          "board": "canvas de revisión SEO/AEO (Design), Propuesta 01",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/propuesta/01.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/propuesta-document.json",
+            "page": 1
+          },
+          "content": {
+            "eyebrow": "Propuesta comercial · Octubre 2026",
+            "question": "¿Qué movemos en 2027?",
+            "answer": "Tu\nvisibilidad",
+            "evidence": "Preparada para **[Cliente]** · Confidencial",
+            "column.topPx": 220,
+            "productMark": {
+              "asset": "sv360-logo-negative",
+              "alt": "SV360 · Search Visibility 360",
+              "position": "x 140, top 880, alto 56"
+            }
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "client-logo"
+          },
+          "fit": "Aprobada tal cual por el operador, pero pasa el largo de la receta: answer mide 14 (con el salto de línea, como lo mide validateDeckPlan) y la receta admite 10. Subir el máximo (como SF6 y SF7 en TASK-1942) o acortar es decisión del Slice 2 con el operador; hasta entonces un plan que ligue este texto falla con slot-over-max-chars (error). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "cover-proposal-orbit-sky",
@@ -3248,7 +3339,44 @@
         "Sobre papel: tinta navy y acento `accentOnLight`."
       ],
       "notes": "Aprobada el 2026-09-27 con la corrección del operador: la órbita-indicador sube por la izquierda. Choca con lo escrito: la norma §4.6 («el arco sube por la derecha»), el token AXIS (`progress.flipped`, referencia «el arco sube por la derecha», archivo DeckSeccionMedia) y la plantilla de `src/lib/brand-surfaces/recipes/deck.ts` (`sectionSplit`) describen la versión anterior; hay que actualizar los tres. Medido en los scripts: el arco barre (n−1) × 72° en un deck de 5 (72° en la 2 de 5, 144° en la 3, 216° en la 4), mientras la lente y la clásica barren n/N; está sin decidir si se unifica. El gris del rótulo «Sección n de N» no tiene token (pregunta abierta de TASK-1919).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckSeccionMedia72.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckSeccionMedia72.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C06 · B05 · P05",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 06, Brochure 05, Propuesta 05",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/06.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 6
+          },
+          "content": {
+            "question": "¿SEO o AEO?",
+            "answer": "Ambos",
+            "section": {
+              "sections": 5,
+              "current": 2
+            }
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/SX4-busqueda-y-respuesta.png",
+            "alt": "Una caja de búsqueda y un composer de IA flotan en una nave oscura; sus haces de luz se unen en un solo punto sobre el piso",
+            "ficha": "ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/SX4-busqueda-y-respuesta.json",
+            "prompt": "ai-generations/2026-09-29_deck-seo-aeo-documentos/prompts/SX4-busqueda-y-respuesta.txt",
+            "postprocess": [
+              "pnpm foto:generar ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/SX4-busqueda-y-respuesta.json --quality high (sin marcas ni texto)"
+            ],
+            "notes": "Plate nuevo SX4 (1:1): caja de búsqueda y composer de vidrio con haces que se unen. Registro cine dentro del alcance de la sección partida. Descartados: SX1 y SX1c (reemplazados por SX4) y SX3 (rechazado: «ataca al cliente»). Ruta local hasta el banco de plates (TASK-1931)."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Navegación por capítulos: 5 secciones en todo el documento (build.mjs, CH), la misma en todas las páginas. Una sola sección partida por deck (decisión 8)."
+        }
+      ]
     },
     {
       "id": "section-split-corner-bottom",
@@ -3680,6 +3808,14 @@
           "required": true,
           "example": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
           "notes": "Registro cine: Nexa al frente del equipo en uniformes y los agentes mini robots, todos mirando al lente, en la mitad derecha."
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": false,
+          "maxChars": 136,
+          "example": "Lo ejecutan **expertos multidisciplinarios**: copywriters, especialistas en SEO técnico, relacionistas públicos, diseñadores y creativos.",
+          "notes": "Medido: caja 540 px × 3 líneas a 300 22px Pop (≈11.26 px/carácter, 5 % de holgura). OPCIONAL (decisión 7 del deck SEO/AEO, 2026-09-30): la bajada bajo la respuesta, en la columna izquierda (x 140, top 900, ancho 540, interlineado 1,4), con una expresión en negrita blanca; roles en personas, nunca «recursos». Hoy se superpone fuera del compositor (render-src/patch-team.cjs). Sin el slot, la sección queda como la aprobada del 2026-09-27. Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot; hasta entonces la paridad receta ↔ plantilla lo lista como pendiente (recipe-slot-parity.test.ts, PENDING_TEMPLATE_SLOTS)."
         }
       ],
       "fixed": [
@@ -3715,7 +3851,36 @@
         "Isotipo del uniforme compuesto, nunca el del modelo."
       ],
       "notes": "Aprobada como sección interior (norma §4.6, «Láminas de sección»; AXIS `section-cine`, layout `team`, `approved`). Misma pregunta abierta que la de servicios: la referencia conserva el logo chico de cuando era portada.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckBrochurePortadaEquipo.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckBrochurePortadaEquipo.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C09 · B07 · P08",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 09, Brochure 07, Propuesta 08",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/09.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 8
+          },
+          "content": {
+            "eyebrow": "Nuestro equipo",
+            "question": "¿Quién ejecuta tu SEO?",
+            "answer": "Este\nequipo",
+            "body": "Lo ejecutan **expertos multidisciplinarios**: copywriters, especialistas en SEO técnico, relacionistas públicos, diseñadores y creativos."
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+            "alt": "Nexa al frente del equipo de Efeonce con sus uniformes y cinco agentes mini robots, todos mirando a cámara"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). La bajada es el slot opcional nuevo body (decisión 7); hoy se superpone con render-src/patch-team.cjs."
+        }
+      ]
     },
     {
       "id": "section-cine-about",
@@ -3845,7 +4010,53 @@
         "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita."
       ],
       "notes": "Receta nueva del 2026-09-27 (operador): «quiénes somos» y «por qué lo hacemos» expresan la pasión por el trabajo; «+10 años» es un dato, no el centro. No existe en AXIS: id nuevo. Las tres cifras no traen fuente en la lámina; confirmarlas contra el context pack (`docs/context/`) antes de usarlas. El script oscurece el lado izquierdo con un degradado sobre el plate; la norma de fotografía prohíbe velos: verificar que la columna se lea sin él o rehacer el plate con la reserva.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckQuienesSomos.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckQuienesSomos.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C05 · B04",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 05, Brochure 04",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/05.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 5
+          },
+          "content": {
+            "eyebrow": "Quiénes somos",
+            "question": "¿Quiénes somos?",
+            "answer": "Un solo\nequipo",
+            "body": "Creatividad, datos, medios y tecnología en una misma mesa, con un solo interlocutor.",
+            "figures": [
+              {
+                "value": "+10",
+                "label": "años como agencia",
+                "source": "Efeonce, 2026"
+              },
+              {
+                "value": "5",
+                "label": "países",
+                "source": "Efeonce, 2026"
+              },
+              {
+                "value": "1",
+                "label": "interlocutor",
+                "source": "Efeonce, 2026"
+              }
+            ]
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png",
+            "alt": "El equipo de Efeonce en el taller de noche, en pleno trabajo alrededor de una mesa de luz"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Cifras +10 años, 5 países y 1 interlocutor verificadas en docs/context/01_quienes-somos.md."
+        }
+      ]
     },
     {
       "id": "section-cine-purpose",
@@ -4717,6 +4928,16 @@
           "required": true,
           "example": "1 de 5",
           "notes": "Alimenta el indicador de navegación de la esquina."
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "sv360-lockup-negative",
+            "alt": "Efeonce | SV360"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Figura en la brecha 1 del inventario del deck SEO/AEO, pero ninguna lámina aprobada del deck la usa con lockup (pregunta abierta de TASK-1949). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot; hasta entonces la paridad receta ↔ plantilla lo lista como pendiente (recipe-slot-parity.test.ts, PENDING_TEMPLATE_SLOTS)."
         }
       ],
       "fixed": [
@@ -4885,7 +5106,54 @@
         "La respuesta mide al menos tres veces la pregunta (en la referencia, exactamente tres)."
       ],
       "notes": "Estado: aprobada el 2026-09-27; la norma v1.3 y los tokens de AXIS quedaron sincronizados (lo que sigue sobre «option» es histórico). En AXIS es content-bullets (status option); aprobada por el operador el 2026-09-27.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVinetas.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVinetas.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C08",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 08",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/08.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 7
+          },
+          "content": {
+            "eyebrow": "SEO",
+            "question": "¿Qué mueve tu SEO?",
+            "answer": "La base",
+            "items": [
+              {
+                "title": "Base técnica",
+                "desc": "Rastreo, indexación, Core Web Vitals y datos estructurados en orden."
+              },
+              {
+                "title": "Contenido por intención",
+                "desc": "Clusters que responden lo que tu comprador busca y que la IA puede citar."
+              },
+              {
+                "title": "Autoridad",
+                "desc": "PR y link building real: menciones que se ganan, no enlaces que se compran."
+              },
+              {
+                "title": "Entidad",
+                "desc": "Que Google y la IA entiendan quién eres: organización, autores y schema."
+              }
+            ],
+            "selectedItem": 3
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "SEO",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "content-day",
@@ -5143,7 +5411,46 @@
         "Ningún texto sobre el panel ni cruzando la plataforma."
       ],
       "notes": "Receta nueva (no existe en AXIS). Matiz del operador: es la alternativa del día a día con herramientas (Frame.io, Notion, Teams, Efeonce Insights y el panel de Greenhouse); la desarrollan los dos «vívelo». Antecedente sin impacto: D4b-dia-herramientas en render-src/deck-interior.mjs (órbita circular con cuatro paradas).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckDiaADiaHerramientas.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckDiaADiaHerramientas.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C19 · P14",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 19, Propuesta 14",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/19.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 17
+          },
+          "content": {
+            "eyebrow": "Tu día a día con Efeonce",
+            "question": "¿Dónde ves lo que pasa?",
+            "answer": "Todo\njunto",
+            "body": "Cada cosa en su herramienta y **todo** tu SEO y AEO a la vista en tu panel, sin esperar el informe.",
+            "tools": [
+              {
+                "name": "Microsoft Teams",
+                "label": "Nos reunimos"
+              },
+              {
+                "name": "Notion",
+                "label": "Plan editorial"
+              },
+              {
+                "name": "Frame.io",
+                "label": "Revisas las landings"
+              }
+            ],
+            "panel": "Tu panel en Greenhouse"
+          },
+          "fit": "Aprobada tal cual por el operador, pero pasa el largo de la receta: answer mide 10 (con el salto de línea, como lo mide validateDeckPlan) y la receta admite 5. Subir el máximo (como SF6 y SF7 en TASK-1942) o acortar es decisión del Slice 2 con el operador; hasta entonces un plan que ligue este texto falla con slot-over-max-chars (error). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "content-day-live-progress",
@@ -5312,7 +5619,34 @@
         "El isotipo del uniforme en la pieza de ejemplo es el compuesto, nunca el del modelo."
       ],
       "notes": "Receta nueva (no existe en AXIS). Primer «vívelo» del día a día (matiz del operador: «que quien lo ve VIVA la experiencia de trabajar con nosotros»). Antecedente sin 3D: V1-avanza-a-la-vista en el mismo script. Hallazgo: dentro del tablero, la etiqueta «Esperando tu visto bueno» va en color.tealDark a 13 px (D1 reserva el acento para 24 px o más). Delta 2026-09-29: la lámina Salesforce SF18-supervision-vivo no cabía en los slots de esta receta; el operador la canonizó como receta propia `content-day-live-approval` (esta receta no cambia).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVivoAvanza.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVivoAvanza.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C20 · B14 · P15",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 20, Brochure 14, Propuesta 15",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/20.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 18
+          },
+          "content": {
+            "eyebrow": "Tu día a día con Efeonce",
+            "question": "¿Cómo avanza tu SEO?",
+            "answer": "A la\nvista",
+            "body": "Sigues el plan en Notion y apruebas cada landing en Frame.io, comentando **sobre** la página.",
+            "boardTitle": "Plan editorial",
+            "reviewTitle": "Landing de precios",
+            "reviewImage": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/landing-precios-45.png"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). La landing «norte» de la revisión es ficticia (render-src/native/plate-landing.html). Frame.io como canal de aprobación del equipo SEO: pendiente menor de DECISIONES.md."
+        }
+      ]
     },
     {
       "id": "content-day-live-results",
@@ -5421,6 +5755,16 @@
           "maxChars": 18,
           "example": "+22 % · tráfico orgánico",
           "notes": "Tres cifras: valor ≤ 6, etiqueta ≤ 18; con fuente o con el rótulo «Datos de muestra»."
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "insights-lockup-negative",
+            "alt": "Efeonce | Insights"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot; hasta entonces la paridad receta ↔ plantilla lo lista como pendiente (recipe-slot-parity.test.ts, PENDING_TEMPLATE_SLOTS)."
         }
       ],
       "fixed": [
@@ -5451,7 +5795,52 @@
         "Cursor local del cliente, sin etiqueta."
       ],
       "notes": "Receta nueva (no existe en AXIS). Segundo «vívelo» del día a día. Antecedente sin 3D: V2-resultados-en-vivo en el mismo script. Las cifras de la referencia (+22 %, +14, 61 %) son de la vista de muestra y así lo dice la tarjeta. Delta 2026-09-29: la lámina Salesforce SF11-operacion no cabía en los slots de esta receta; el operador la canonizó como receta propia `content-day-live-console` (esta receta no cambia).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVivoResultados.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckVivoResultados.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C21 · B15 · P16",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 21, Brochure 15, Propuesta 16",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/21.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 19
+          },
+          "content": {
+            "eyebrow": "Tu reporte mensual",
+            "question": "¿Cómo avanza?",
+            "answer": "Cada\nmes",
+            "body": "Cada mes, Efeonce Insights arma tu reporte de SEO y AEO **solo**, y lo conversamos en Teams.",
+            "reportTitle": "Tu edición del mes está lista",
+            "metrics": [
+              {
+                "value": "+22 %",
+                "label": "tráfico orgánico"
+              },
+              {
+                "value": "+14",
+                "label": "keywords top 10"
+              },
+              {
+                "value": "61 %",
+                "label": "citabilidad IA"
+              }
+            ],
+            "sampleMark": "Datos de muestra",
+            "productMark": {
+              "asset": "insights-lockup-negative",
+              "alt": "Efeonce | Insights",
+              "position": "x 140, top 44, alto 40"
+            }
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). El rótulo report.sample («Datos de muestra») se queda (lo exige el contrato; decisión 13)."
+        }
+      ]
     },
     {
       "id": "decision-agenda",
@@ -5796,7 +6185,50 @@
         "Una sola parada marcada como actual."
       ],
       "notes": "En AXIS es decision-plan, pero el token (la órbita circular mide el plan alrededor del 90) y su referencia describen la versión anterior (E3-plan en render-src/deck2.mjs). El operador pidió mejorarla y aprobó el 2026-09-27 la trayectoria (PL-plan-impacto); AXIS debe actualizar token y referencia. Hallazgos: la respuesta mide 2,8 veces la pregunta (112 contra 40; la regla pide 3×); los rangos de las fichas van en color.halo a 15 px, revisar contra D1.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPlan.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPlan.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "P26",
+          "board": "canvas de revisión SEO/AEO (Design), Propuesta 26",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/propuesta/26.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/propuesta-document.json",
+            "page": 20
+          },
+          "content": {
+            "eyebrow": "Plan de trabajo",
+            "question": "¿Qué pasa al empezar?",
+            "answer": "Movimiento",
+            "body": "**90** días a la primera lectura medible, en tres tramos de 30. Desde la primera semana ya hay trabajo en marcha.",
+            "horizon": 90,
+            "stops": [
+              {
+                "range": "Días 1–30",
+                "title": "Fundación",
+                "desc": "Línea base, auditoría técnica, entidad y schema: la casa en orden."
+              },
+              {
+                "range": "Días 31–60",
+                "title": "Contenido",
+                "desc": "Clusters por intención y activos que los motores de IA pueden citar."
+              },
+              {
+                "range": "Días 61–90",
+                "title": "Evidencia",
+                "desc": "Visibilidad, share of voice y clics contra la línea base del diagnóstico."
+              }
+            ],
+            "currentStop": 1
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "method-hybrid-workforce",
@@ -6289,6 +6721,16 @@
           "maxChars": 45,
           "example": "think.efeoncepro.com/brand-visibility",
           "notes": "Descriptor bajo el cursor."
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "aeo-assessment-lockup-negative",
+            "alt": "Efeonce | AEO Assessment"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot; hasta entonces la paridad receta ↔ plantilla lo lista como pendiente (recipe-slot-parity.test.ts, PENDING_TEMPLATE_SLOTS)."
         }
       ],
       "fixed": [
@@ -6329,7 +6771,38 @@
         "El CTA se selecciona con corchetes y cursor propio; no con cursor de colaborador"
       ],
       "notes": "No existe en AXIS: id nuevo, sin plantilla en `pnpm brand:compose` (sólo maqueta en deck2). Verificado el 2026-09-27: los siete pesos de la referencia coinciden con `SCORE_DIMENSIONS` (pesos «arch V1», marcados en el código como hipótesis calibrada); si la calibración cambia, la lámina cambia con ella.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckGrader.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckGrader.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C15",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 15",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/15.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 13
+          },
+          "content": {
+            "eyebrow": "El diagnóstico",
+            "question": "¿Cómo te ve la IA?",
+            "answer": "Mídelo",
+            "body": "Cómo los motores de respuesta entienden y recomiendan tu marca, frente a tu competencia. El informe es privado.",
+            "cta": "Mide tu marca gratis",
+            "ctaUrl": "think.efeoncepro.com/brand-visibility",
+            "productMark": {
+              "asset": "aeo-assessment-lockup-negative",
+              "alt": "Efeonce | AEO Assessment",
+              "position": "x 140, top 44, alto 40"
+            }
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). La URL del CTA (think.efeoncepro.com/brand-visibility) todavía se llama «Brand Visibility Grader»: pendiente de DECISIONES.md."
+        }
+      ]
     },
     {
       "id": "method-hybrid-workforce-scene",
@@ -6612,6 +7085,16 @@
           "required": true,
           "maxChars": 12,
           "example": "SEO · AEO"
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "aeo-lockup-negative",
+            "alt": "Efeonce | AEO"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot (la receta no declara mapa de slots: su contrato sale del manifest de AXIS)."
         }
       ],
       "fixed": [
@@ -6653,7 +7136,64 @@
         "Si el último nivel es aspiración, la nota lo dice"
       ],
       "notes": "Receta formal de AXIS `method-staircase` (aprobada con BeX «escalera» el 2026-09-27); es la única del grupo con plantilla en `pnpm brand:compose` que compone tal cual. Lámina interior, junto a la BeX original (variante plana). Referencia del Lab: `apps/lab/public/references/surfaces/deck/method-staircase.jpg`. Delta 2026-09-29: la lámina Salesforce SF10-equipo-hibrido no cabía en los slots de esta receta; el operador la canonizó como receta propia `method-waves` (esta receta no cambia).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckBexEscalera.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckBexEscalera.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C14",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 14",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/14.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 12
+          },
+          "content": {
+            "eyebrow": "Metodología BeX",
+            "question": "¿Te recomienda la IA?",
+            "answer": "Capa\npor capa",
+            "body": "ChatGPT, Claude, Perplexity, Gemini y Google AI Overviews. Subimos tu marca nivel por nivel.",
+            "levels": [
+              {
+                "name": "Be Found",
+                "descriptor": "que te encuentre"
+              },
+              {
+                "name": "Be Readable",
+                "descriptor": "que te entienda"
+              },
+              {
+                "name": "Be Correct",
+                "descriptor": "que te represente bien"
+              },
+              {
+                "name": "Be Actionable",
+                "descriptor": "que pueda actuar"
+              },
+              {
+                "name": "Be Intrinsic",
+                "descriptor": "que te prefiera"
+              }
+            ],
+            "note": "Be Intrinsic es una trayectoria, no una garantía.",
+            "productMark": {
+              "asset": "aeo-lockup-negative",
+              "alt": "Efeonce | AEO",
+              "position": "x 140, top 44, alto 40"
+            }
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "SEO · AEO",
+            "target": "level"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "proposal-cinematic-nexa",
@@ -7384,7 +7924,49 @@
         "Sólo logos de clientes que autorizan su uso."
       ],
       "notes": "Estado: aprobada el 2026-09-27; la norma v1.3 y los tokens de AXIS quedaron sincronizados (lo que sigue sobre «option» es histórico). En AXIS es content-clients (status option, voice none; la referencia sí lleva voz). Matiz del operador (2026-09-27): logos en un solo tono navy salvo Aguas Andinas y UC Temuco, en tonos de navy. Hallazgo: la referencia no muestra la fuente de +127 % ni de +180 %; al componer hay que agregarla (nota bajo la grilla o en la etiqueta). La respuesta mide 2,9 veces la pregunta (116 contra 40): la regla pide 3×.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckClientes.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckClientes.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C31 · B21",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 31, Brochure 21",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/31.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 25
+          },
+          "content": {
+            "eyebrow": "Clientes",
+            "question": "¿Quién confía en nosotros?",
+            "answer": "Marcas\nlíderes",
+            "proofs": [
+              {
+                "value": "+127%",
+                "label": "tráfico orgánico de Sky frente a LATAM Airlines",
+                "source": "caso publicado de Sky Airlines"
+              },
+              {
+                "value": "+180%",
+                "label": "ventas digitales de Bresler",
+                "source": "caso publicado de Bresler"
+              }
+            ],
+            "selectedProof": 1,
+            "markets": "Chile, EE. UU., Colombia, México y Perú"
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "SEO",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Cifras publicadas de Sky (+127 %) y Bresler (+180 %). La de Bresler (ventas digitales) no es de SEO: cambiarla por una de SEO publicada si existe (pendiente de DECISIONES.md)."
+        }
+      ]
     },
     {
       "id": "content-partners",
@@ -7637,7 +8219,59 @@
         "Exactamente cuatro filas y una sola selección."
       ],
       "notes": "Estado: aprobada el 2026-09-27; la norma v1.3 y los tokens de AXIS quedaron sincronizados (lo que sigue sobre «option» es histórico). En AXIS es decision-risk (status option); aprobada el 2026-09-27.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckSeguro.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckSeguro.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "P25",
+          "board": "canvas de revisión SEO/AEO (Design), Propuesta 25",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/propuesta/25.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/propuesta-document.json",
+            "page": 19
+          },
+          "content": {
+            "eyebrow": "Riesgo controlado",
+            "question": "¿Y si no funciona?",
+            "answer": "Empiezas\nchico",
+            "body": "Cada riesgo tiene su cobertura escrita. Y el primer paso es un diagnóstico sin costo.",
+            "rows": [
+              {
+                "risk": "Promesas sin respaldo",
+                "name": "Sin promesas vacías",
+                "how": "Estimamos desde tu punto de partida y reportamos lo que se mueve, mes a mes."
+              },
+              {
+                "risk": "Que no encajemos",
+                "name": "Diagnóstico primero",
+                "how": "Ves tu mapa antes de firmar: score por motor, share of voice y plan."
+              },
+              {
+                "risk": "No ver qué pasa",
+                "name": "Entregables a la vista",
+                "how": "Cada ciclo con sus entregables, y tu visibilidad en IA en tu portal."
+              },
+              {
+                "risk": "Depender de una persona",
+                "name": "Traspaso documentado",
+                "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+              }
+            ],
+            "selectedRow": 1
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Línea growth en papel, como la aprobada."
+        }
+      ]
     },
     {
       "id": "decision-case",
@@ -7733,7 +8367,7 @@
           "type": "image",
           "required": true,
           "example": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
-          "notes": "Foto REAL del caso; la de la referencia es de ejemplo."
+          "notes": "Foto REAL del caso; la de la referencia es de ejemplo. Delta 2026-09-30 (TASK-1949, decisión 14 del deck SEO/AEO): la foto del caso también puede ser una imagen de ambiente en registro puesta en escena asociada al cliente (CS2, CS1b y CS3b); el logo del cliente dentro de la imagen se compone desde el archivo oficial, nunca lo genera el modelo, y la ficha declara el caso de cliente (campo caso en foto:prompt)."
         },
         {
           "name": "selectedStat",
@@ -7775,10 +8409,211 @@
         "La lámina con foto no lleva el logo de Efeonce (photo-slide-no-logo); el logo del cliente va en un tono.",
         "Cifras sólo con fuente citada (figures-with-source).",
         "La foto de ejemplo se marca para reemplazo y no sale a una pieza final.",
-        "Ningún texto ni cursor sobre la persona de la foto."
+        "Ningún texto ni cursor sobre la persona de la foto.",
+        "La foto del caso es una foto real del caso o una imagen de ambiente puesta en escena asociada al cliente (decisión del operador del 2026-09-30); en la imagen de ambiente, el logo del cliente se compone desde el archivo oficial y la ficha declara el caso de cliente.",
+        "Logo del cliente sólo con su autorización de uso (TASK-1937); cifras con fuente real, período y permiso, nunca las de ejemplo en un deck enviado."
       ],
       "notes": "Estado: aprobada el 2026-09-27; la norma v1.3 y los tokens de AXIS quedaron sincronizados (lo que sigue sobre «option» es histórico). En AXIS es decision-case (status option). Matiz del operador (2026-09-27): la foto es de EJEMPLO y se reemplaza por una del caso real. La composición es la sección partida aprobada aplicada a un caso.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckCaso.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckCaso.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C25 · P19",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 25, Propuesta 19",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/25.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 21
+          },
+          "content": {
+            "eyebrow": "Caso de éxito",
+            "question": "¿Qué cambió con BICECORP?",
+            "answer": "Más visible",
+            "clientLogo": {
+              "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/bicecorp.svg",
+              "alt": "BICECORP"
+            },
+            "stats": [
+              {
+                "value": "+48 %",
+                "label": "tráfico orgánico"
+              },
+              {
+                "value": "×3",
+                "label": "citas en respuestas IA"
+              },
+              {
+                "value": "+35 %",
+                "label": "leads orgánicos"
+              },
+              {
+                "value": "−22 %",
+                "label": "costo por lead"
+              }
+            ],
+            "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses.",
+            "selectedStat": 2
+          },
+          "photo": {
+            "register": "puesta-en-escena",
+            "plate": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS2-banco-bice.png",
+            "alt": "Una clienta mira Santiago al amanecer desde una terraza, con su teléfono en la mano",
+            "ficha": "ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS2-banco-bice.json",
+            "prompt": "ai-generations/2026-09-29_deck-seo-aeo-documentos/prompts/CS2-banco-bice.txt",
+            "postprocess": [
+              "pnpm foto:generar ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS2-banco-bice.json (sin marcas)"
+            ],
+            "notes": "Plate CS2 (1:1): una clienta en una terraza con Santiago al amanecer. Selección «AEO». Descartado: CS1-bicecorp (Santiago, reemplazado). Ruta local hasta el banco de plates (TASK-1931)."
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "AEO",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Imagen de ambiente puesta en escena asociada a BICECORP (decisión 14): el logo del cliente dentro de la imagen se compone desde el archivo oficial, nunca lo genera el modelo.",
+          "conditions": [
+            "Logo de BICECORP: uso condicionado a la autorización del cliente (biblioteca de autorizaciones TASK-1937, primer caso pendiente). Procedencia del archivo en ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/PROCEDENCIA.txt (Berel: deck-axis/assets/clients/berel.svg).",
+            "Cifras de EJEMPLO: las cuatro son ilustrativas hasta que el operador pase las reales, con fuente, período, servicio y permiso de uso. La fuente provisoria «Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses» afirma algo que no es cierto hasta reemplazarla: ningún deck con esta lámina sale a un cliente."
+          ]
+        },
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C26 · P20",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 26, Propuesta 20",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/26.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 22
+          },
+          "content": {
+            "eyebrow": "Caso de éxito",
+            "question": "¿Qué logró Banco BICE?",
+            "answer": "Más cuentas",
+            "clientLogo": {
+              "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/banco-bice.svg",
+              "alt": "Banco BICE"
+            },
+            "stats": [
+              {
+                "value": "+62 %",
+                "label": "búsquedas de la marca"
+              },
+              {
+                "value": "Top 3",
+                "label": "en «cuenta corriente»"
+              },
+              {
+                "value": "+41 %",
+                "label": "solicitudes online"
+              },
+              {
+                "value": "8 de 10",
+                "label": "respuestas IA lo citan"
+              }
+            ],
+            "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses.",
+            "selectedStat": 2
+          },
+          "photo": {
+            "register": "puesta-en-escena",
+            "plate": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS1b-bice-tarjeta.png",
+            "alt": "Una tarjeta de crédito Banco BICE flota en la oscuridad; una caja de búsqueda y un composer de IA la iluminan con dos haces de luz",
+            "ficha": "ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS1b-bice-tarjeta.prompt.txt",
+            "prompt": "ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS1b-bice-tarjeta.prompt.txt",
+            "postprocess": [
+              "pnpm ai:image --prompt-file ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS1b-bice-tarjeta.prompt.txt → tarjeta en blanco (ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS1b-bice-tarjeta-plate.png)",
+              "logo oficial Banco BICE blanco (logos/banco-bice-blanco.svg) compuesto con sharp: rotado 4,22°, opacidad 0,93, en 520,372, ancho 236"
+            ],
+            "notes": "Plate CS1b (1:1): tarjeta Banco BICE con una caja de búsqueda y un composer que la iluminan; el logo de la tarjeta es el oficial compuesto, no generado. Selección «SEO». Ruta local hasta el banco de plates (TASK-1931)."
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "SEO",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Imagen de ambiente puesta en escena asociada a Banco BICE (decisión 14): el logo del cliente dentro de la imagen se compone desde el archivo oficial, nunca lo genera el modelo.",
+          "conditions": [
+            "Logo de Banco BICE: uso condicionado a la autorización del cliente (biblioteca de autorizaciones TASK-1937, primer caso pendiente). Procedencia del archivo en ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/PROCEDENCIA.txt (Berel: deck-axis/assets/clients/berel.svg).",
+            "Cifras de EJEMPLO: las cuatro son ilustrativas hasta que el operador pase las reales, con fuente, período, servicio y permiso de uso. La fuente provisoria «Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses» afirma algo que no es cierto hasta reemplazarla: ningún deck con esta lámina sale a un cliente."
+          ]
+        },
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C29 · P23",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 29, Propuesta 23",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/29.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 23
+          },
+          "content": {
+            "eyebrow": "Caso de éxito",
+            "question": "¿Qué cambió con Berel?",
+            "answer": "Lo eligen",
+            "clientLogo": {
+              "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg",
+              "alt": "Berel"
+            },
+            "stats": [
+              {
+                "value": "+54 %",
+                "label": "tráfico orgánico"
+              },
+              {
+                "value": "+120",
+                "label": "páginas de color"
+              },
+              {
+                "value": "×2",
+                "label": "citas en respuestas IA"
+              },
+              {
+                "value": "+38 %",
+                "label": "búsquedas de la marca"
+              }
+            ],
+            "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses.",
+            "selectedStat": 2
+          },
+          "photo": {
+            "register": "puesta-en-escena",
+            "plate": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS3b-berel-squad.png",
+            "alt": "La líder de marketing de Berel y una estratega de Efeonce eligen juntas un color entre las muestras de la temporada",
+            "ficha": "ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS3b-berel-squad.json",
+            "prompt": "ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS3b-berel-squad.prompt.txt",
+            "postprocess": [
+              "pnpm ai:image --image <softshell del kit> --prompt-file ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS3b-berel-squad.prompt.txt",
+              "pnpm foto:emblema → ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS3b-emblema-al-100.png (OK)"
+            ],
+            "notes": "Plate CS3b (1:1): la líder de marketing de Berel y una estratega de Efeonce con la softshell eligen un color entre las muestras de la temporada. La ficha declara el caso de cliente (campo caso, registro puesta-en-escena: TASK-1949, bb7e34b37). Selección «SEO». Descartado: CS3-berel (pintor, reemplazado). Ruta local hasta el banco de plates (TASK-1931)."
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "SEO",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Imagen de ambiente puesta en escena asociada a Berel (decisión 14): el logo del cliente dentro de la imagen se compone desde el archivo oficial, nunca lo genera el modelo.",
+          "conditions": [
+            "Logo de Berel: uso condicionado a la autorización del cliente (biblioteca de autorizaciones TASK-1937, primer caso pendiente). Procedencia del archivo en ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/PROCEDENCIA.txt (Berel: deck-axis/assets/clients/berel.svg).",
+            "Cifras de EJEMPLO: las cuatro son ilustrativas hasta que el operador pase las reales, con fuente, período, servicio y permiso de uso. La fuente provisoria «Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses» afirma algo que no es cierto hasta reemplazarla: ningún deck con esta lámina sale a un cliente."
+          ]
+        }
+      ]
     },
     {
       "id": "decision-chart",
@@ -8405,7 +9240,36 @@
         "Interfaz de IA genérica; nunca la UI de un proveedor real",
         "Contenido ilustrativo siempre marcado"
       ],
-      "notes": "Aprobada el 2026-09-28 (canvas «La órbita», página Deck). Nace de la landing /aeo-2/ (hero «Tu marca no aparece»)."
+      "notes": "Aprobada el 2026-09-28 (canvas «La órbita», página Deck). Nace de la landing /aeo-2/ (hero «Tu marca no aparece»).",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C03 · B03 · P03",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 03, Brochure 03, Propuesta 03",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/03.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 3
+          },
+          "content": {
+            "eyebrow": "Visibilidad en IA",
+            "question": "¿A quién recomienda la IA?",
+            "answer": "A tu\ncompetencia",
+            "evidence": "Cuando tu comprador pregunta por tu categoría, la IA ya tiene favoritas. El AEO trabaja para que la **próxima** respuesta te nombre."
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Cambio aprobado: el cuerpo dice «…la **próxima** respuesta te nombre». La marca «Ejemplo ilustrativo» se queda (la exige el contrato; decisión 13)."
+        }
+      ]
     },
     {
       "id": "decision-ai-market",
@@ -9009,6 +9873,16 @@
           "maxChars": 70,
           "example": "Sin promesas de ranking: medimos y mostramos el avance.",
           "notes": "En AEO es obligatoria mientras exista riesgo de leerse como promesa de posición."
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "aeo-lockup-negative",
+            "alt": "Efeonce | AEO"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot; hasta entonces la paridad receta ↔ plantilla lo lista como pendiente (recipe-slot-parity.test.ts, PENDING_TEMPLATE_SLOTS)."
         }
       ],
       "fixed": [
@@ -9050,7 +9924,69 @@
         "El acento nunca en texto menor de 24 px"
       ],
       "notes": "Versión sobria de la propuesta AEO, para cuando la propuesta pide más datos; la cine (`proposal-cinematic-aeo`) es para cuando pide impacto. No existe en AXIS: id nuevo (familia `proposal-service-<línea>`), sin plantilla en `pnpm brand:compose`. Hallazgo: en la referencia aprobada el kicker de la primera tarjeta («Empieza aquí · sin costo») va en el acento sobre papel a 15 px, contra D1; la regla aplicada a `proposal-cinematic` fue pasarlo a blanco o suave, así que aquí corresponde navy sobre papel. Confirmar con el operador. La lámina lleva dos esferas (la punta del arco de la lente y el cierre de la respuesta) y así fue aprobada.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaAEO.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaAEO.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "P11",
+          "board": "canvas de revisión SEO/AEO (Design), Propuesta 11",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/propuesta/11.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/propuesta-document.json",
+            "page": 9
+          },
+          "content": {
+            "eyebrow": "Nuestra propuesta · Visibilidad en IA",
+            "question": "¿Te distingue la IA?",
+            "answer": "Entre miles",
+            "body": "Que Google y los motores de respuesta te encuentren, te entiendan y te recomienden, sobre una base SEO sólida.",
+            "steps": [
+              {
+                "kicker": "Empieza aquí · sin costo",
+                "name": "Diagnóstico",
+                "desc": "Efeonce AEO Assessment: tu marca en ChatGPT, Claude, Perplexity, Gemini y Google."
+              },
+              {
+                "kicker": "Proyecto",
+                "name": "Fundación",
+                "desc": "Proyecto de precio fijo: base técnica, entidad y contenido."
+              },
+              {
+                "kicker": "On-Going",
+                "name": "Operación",
+                "desc": "Retainer mensual de visibilidad por capacidad declarada."
+              },
+              {
+                "kicker": "Greenhouse",
+                "name": "Plataforma",
+                "desc": "Tu visibilidad en IA en tu portal, cada mes."
+              }
+            ],
+            "note": "Sin promesas de ranking: medimos y mostramos el avance.",
+            "productMark": {
+              "asset": "aeo-lockup-negative",
+              "alt": "Efeonce | AEO",
+              "position": "x 140, top 44, alto 40"
+            }
+          },
+          "photo": {
+            "register": "documental",
+            "plate": "ai-generations/2026-09-26_ooh-caminero-lente/plates/D2-led-medicion.png",
+            "alt": "Un analista de growth de una cervecería artesanal se inclina sobre el laptop y toca con el dedo la curva que sube en la medición de la primera semana"
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "proposal-service-creative",
@@ -9897,7 +10833,70 @@
         "Selección y cursor nunca sobre la persona"
       ],
       "notes": "Receta AXIS `proposal-cinematic`, referencia `proposal-cinematic-web` (placa WB1b). La lámina aprobada no lleva prueba: el builder de `pnpm brand:compose` hoy (0.1.1) exige prueba con fuente y la rechaza; la prueba pasa a opcional con 0.1.2 (TASK-1927). La etiqueta «Cliente» quedó cerca del rostro en la referencia: vigilarla al componer.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaWebCine.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaWebCine.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C17 · B13 · P12",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 17, Brochure 13, Propuesta 12",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/17.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 15
+          },
+          "content": {
+            "eyebrow": "Desarrollo web",
+            "question": "¿Y si hay que tocar código?",
+            "answer": "Lo hacemos",
+            "body": "No sólo lo recomendamos: armamos la landing y aplicamos el fix en tu stack, de punta a punta.",
+            "steps": [
+              {
+                "glyph": "codigo",
+                "kicker": "Apps y landings",
+                "name": "React y Next.js"
+              },
+              {
+                "glyph": "web",
+                "kicker": "Shopify",
+                "name": "Liquid"
+              },
+              {
+                "glyph": "nube",
+                "kicker": "CMS",
+                "name": "Drupal y WordPress"
+              },
+              {
+                "glyph": "checklist",
+                "kicker": "El fix",
+                "name": "HTML, CSS y schema"
+              }
+            ]
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/DV1-lo-hacemos.png",
+            "alt": "Una ingeniera front-end de Efeonce, con la chaqueta del equipo, mira a cámara mientras arrastra un bloque de código dentro de una landing holográfica de luz azul",
+            "ficha": "ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/DV1-lo-hacemos.json",
+            "prompt": "ai-generations/2026-09-29_deck-seo-aeo-documentos/prompts/DV1-lo-hacemos.txt",
+            "postprocess": [
+              "pnpm foto:generar ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/DV1-lo-hacemos.json (softshell del kit, linea engine)",
+              "pnpm foto:emblema ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/DV1-lo-hacemos.png → ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/DV1-emblema-al-100.png: nave, órbita, esfera y tres ventanas (se publica el bordado generado)"
+            ],
+            "notes": "Plate nuevo DV1 (16:9, 1792×1024): una ingeniera front-end de Efeonce con la softshell del kit y una landing holográfica. Registro cine dentro del alcance de proposal-cinematic. Ruta local hasta el banco de plates (TASK-1931)."
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Engine",
+            "target": "answer"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "proposal-cinematic-aeo",
@@ -9952,7 +10951,9 @@
           "type": "text",
           "required": true,
           "maxChars": 40,
-          "example": "Nuestra propuesta · AEO"
+          "example": "Nuestra propuesta · AEO",
+          "requiredUnless": "productMark",
+          "notes": "Delta 2026-09-30 (TASK-1949, decisión 2 del deck SEO/AEO): obligatorio SALVO que la lámina lleve productMark; con el lockup, el eyebrow puede salir y el lockup ocupa su lugar (x 140, top 112, alto 40). Sin productMark sigue obligatorio. validateDeckPlan y el contrato AXIS lo hacen cumplir desde TASK-1949 (Slices 2 y 3)."
         },
         {
           "name": "question",
@@ -10019,6 +11020,16 @@
           "type": "image",
           "required": true,
           "example": "ai-generations/2026-09-26_deck-aeo/plates/AE2b-la-ia-te-elige-isotipo.png"
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "aeo-lockup-negative",
+            "alt": "Efeonce | AEO"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Con eyebrow: arriba a la izquierda, x 140, top 44, alto 40 px (la aprobada SEO de cine). Sin eyebrow: en su lugar, x 140, top 112, alto 40 px (la aprobada AEO de cine, decisión 2). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot (la receta no declara mapa de slots: su contrato sale del manifest de AXIS, que hoy exige el eyebrow: TASK-1949 Slice 3)."
         }
       ],
       "fixed": [
@@ -10057,10 +11068,73 @@
         "Isotipo del polo compuesto con el oficial",
         "Nunca una promesa de ranking: la nota es obligatoria",
         "Pasos con íconos Trazo en reposo; primer kicker nunca en el acento",
-        "Ningún texto cruza al sujeto ni al haz; la selección nunca sobre la persona"
+        "Ningún texto cruza al sujeto ni al haz; la selección nunca sobre la persona",
+        "Eyebrow o lockup de submarca: sin productMark, el eyebrow es obligatorio; con productMark puede salir y el lockup ocupa su lugar (decisión del operador del 2026-09-30, deck SEO/AEO)."
       ],
       "notes": "Receta AXIS `proposal-cinematic`, referencia `proposal-cinematic-aeo` (placa AE2b, aprobada el 2026-09-27 a la 01:46). Sin prueba en la referencia: igual que web, el builder 0.1.1 de `pnpm brand:compose` la rechaza hasta TASK-1927. La foto AE2b no se reutiliza como portada: la portada de Engine usa WB1b.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaAEOCine.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaAEOCine.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C13 · B11",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 13, Brochure 11",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/13.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 11
+          },
+          "content": {
+            "eyebrow": "Visibilidad en IA",
+            "question": "¿Te distingue la IA?",
+            "answer": "Entre miles",
+            "body": "Entre miles de marcas, que ChatGPT, Claude, Perplexity, Gemini y Google te encuentren, te entiendan y te recomienden.",
+            "steps": [
+              {
+                "glyph": "busqueda",
+                "kicker": "Sin costo",
+                "name": "Diagnóstico"
+              },
+              {
+                "glyph": "contenido",
+                "kicker": "Proyecto",
+                "name": "Fundación"
+              },
+              {
+                "glyph": "medicion",
+                "kicker": "On-Going",
+                "name": "Operación"
+              },
+              {
+                "glyph": "informe",
+                "kicker": "Greenhouse",
+                "name": "Plataforma"
+              }
+            ],
+            "note": "Sin promesas de ranking: medimos y mostramos el avance.",
+            "productMark": {
+              "asset": "aeo-lockup-negative",
+              "alt": "Efeonce | AEO",
+              "position": "x 140, top 112, alto 40 (en el lugar del eyebrow)"
+            }
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-26_deck-aeo/plates/AE2b-la-ia-te-elige-isotipo.png",
+            "alt": "Una estratega SEO con el polo de Efeonce mira a cámara; detrás, entre miles de tarjetas oscuras que se pierden en la distancia, el haz azul de una burbuja de respuesta de IA ilumina una sola tarjeta, que brilla y se adelanta"
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "answer"
+          },
+          "fit": "Aprobada tal cual por el operador, pero pasa el largo de la receta: answer mide 11 y la receta admite 10. Subir el máximo (como SF6 y SF7 en TASK-1942) o acortar es decisión del Slice 2 con el operador; hasta entonces un plan que ligue este texto falla con slot-over-max-chars (error). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). SIN eyebrow (decisión 2): el lockup AEO ocupa su lugar. El intent todavía trae «Visibilidad en IA» porque el contrato de hoy exige el eyebrow; se tapa con render-src/patch-eyebrow.cjs hasta que requiredUnless llegue al validador y a AXIS (TASK-1949 Slices 2 y 3)."
+        }
+      ]
     },
     {
       "id": "proposal-cinematic-revops",
@@ -10401,6 +11475,16 @@
           "maxChars": 70,
           "example": "No prometemos rankings. Reportamos lo que se mueve.",
           "notes": "En AEO es obligatoria mientras exista riesgo de leerse como promesa de posición."
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "sv360-lockup-negative",
+            "alt": "Efeonce | SV360"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot; hasta entonces la paridad receta ↔ plantilla lo lista como pendiente (recipe-slot-parity.test.ts, PENDING_TEMPLATE_SLOTS)."
         }
       ],
       "fixed": [
@@ -10443,7 +11527,73 @@
         "El acento nunca en texto menor de 24 px"
       ],
       "notes": "Aprobada el 2026-09-28. Misma plantilla que proposal-service-aeo (deck.proposal-service, línea engine). Copy de /servicios/posicionamiento-seo/.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/P5-seo.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/P5-seo.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "P10",
+          "board": "canvas de revisión SEO/AEO (Design), Propuesta 10",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/propuesta/10.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/propuesta-document.json",
+            "page": 8
+          },
+          "content": {
+            "eyebrow": "Nuestra propuesta · SEO",
+            "question": "¿Cómo te encuentran?",
+            "answer": "Con método",
+            "body": "Que te encuentren en Google y que la IA no te ignore: base técnica, autoridad temática y entidad, trabajadas y medidas como un sistema.",
+            "steps": [
+              {
+                "kicker": "Empieza aquí · sin costo",
+                "name": "Diagnóstico",
+                "desc": "Tu punto de partida en búsqueda y en IA: sin ese mapa no hay plan honesto."
+              },
+              {
+                "kicker": "Proyecto",
+                "name": "Base técnica",
+                "desc": "Rastreo, indexación, Core Web Vitals y datos estructurados."
+              },
+              {
+                "kicker": "On-Going",
+                "name": "Contenido y autoridad",
+                "desc": "Clusters por intención, landings que convierten, PR y link building real."
+              },
+              {
+                "kicker": "Cada mes",
+                "name": "Insights",
+                "desc": "Tu edición mensual de SEO y AEO en Efeonce Insights: qué se movió y qué sigue."
+              }
+            ],
+            "note": "No prometemos rankings. Reportamos lo que se mueve.",
+            "productMark": {
+              "asset": "sv360-lockup-negative",
+              "alt": "Efeonce | SV360",
+              "position": "x 140, top 44, alto 40"
+            }
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+            "alt": "Un estratega SEO con el polo de Efeonce mira a cámara frente a un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita",
+            "focus": {
+              "xOfWidth": 1,
+              "yOfHeight": 0.5
+            }
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "proposal-cinematic-seo",
@@ -10498,7 +11648,9 @@
           "type": "text",
           "required": true,
           "maxChars": 40,
-          "example": "Nuestra propuesta · SEO"
+          "example": "Nuestra propuesta · SEO",
+          "requiredUnless": "productMark",
+          "notes": "Delta 2026-09-30 (TASK-1949, decisión 2 del deck SEO/AEO): obligatorio SALVO que la lámina lleve productMark; con el lockup, el eyebrow puede salir y el lockup ocupa su lugar (x 140, top 112, alto 40). Sin productMark sigue obligatorio. validateDeckPlan y el contrato AXIS lo hacen cumplir desde TASK-1949 (Slices 2 y 3)."
         },
         {
           "name": "question",
@@ -10565,6 +11717,16 @@
           "type": "image",
           "required": true,
           "example": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png"
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "sv360-lockup-negative",
+            "alt": "Efeonce | SV360"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Con eyebrow: arriba a la izquierda, x 140, top 44, alto 40 px (la aprobada SEO de cine). Sin eyebrow: en su lugar, x 140, top 112, alto 40 px (la aprobada AEO de cine, decisión 2). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot (la receta no declara mapa de slots: su contrato sale del manifest de AXIS, que hoy exige el eyebrow: TASK-1949 Slice 3)."
         }
       ],
       "fixed": [
@@ -10603,10 +11765,74 @@
         "Isotipo del polo compuesto con el oficial",
         "Nunca una promesa de ranking: la nota es obligatoria",
         "Pasos con íconos Trazo en reposo; primer kicker nunca en el acento",
-        "Ningún texto cruza al sujeto ni al haz; la selección nunca sobre la persona"
+        "Ningún texto cruza al sujeto ni al haz; la selección nunca sobre la persona",
+        "Eyebrow o lockup de submarca: sin productMark, el eyebrow es obligatorio; con productMark puede salir y el lockup ocupa su lugar (decisión del operador del 2026-09-30, deck SEO/AEO)."
       ],
       "notes": "Aprobada el 2026-09-28. Receta AXIS proposal-cinematic, layout service. Colaborador anclado abajo a la derecha (en top-end tapaba la pregunta). El anillo de luz alrededor del núcleo cuenta como la única órbita (registro cine). Polo en azul rey: revisar colorimetría contra el canon si se regenera.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/P5b-seo-te-encuentran.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/P5b-seo-te-encuentran.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C11 · B09",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 11, Brochure 09",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/11.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 9
+          },
+          "content": {
+            "eyebrow": "SEO",
+            "question": "¿Te encuentra Google?",
+            "answer": "Y la IA",
+            "body": "Posicionamiento SEO con método: base técnica, autoridad temática y entidad, para que Google te encuentre y la IA no te ignore.",
+            "steps": [
+              {
+                "glyph": "busqueda",
+                "kicker": "Sin costo",
+                "name": "Diagnóstico"
+              },
+              {
+                "glyph": "contenido",
+                "kicker": "Proyecto",
+                "name": "Técnica y contenido"
+              },
+              {
+                "glyph": "medicion",
+                "kicker": "On-Going",
+                "name": "Autoridad y entidad"
+              },
+              {
+                "glyph": "informe",
+                "kicker": "Cada mes",
+                "name": "Insights"
+              }
+            ],
+            "note": "No prometemos rankings. Reportamos lo que se mueve.",
+            "productMark": {
+              "asset": "sv360-lockup-negative",
+              "alt": "Efeonce | SV360",
+              "position": "x 140, top 44, alto 40"
+            }
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+            "alt": "Un estratega SEO con el polo de Efeonce mira a cámara; detrás, un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita al que todo se conecta"
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "answer",
+            "anchor": "bottom-end"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "content-pricing",
@@ -10738,7 +11964,71 @@
         "Una sola ficha recomendada y una sola selección."
       ],
       "notes": "Estado: aprobada el 2026-09-27; la norma v1.3 y los tokens de AXIS quedaron sincronizados (lo que sigue sobre «option» es histórico). En AXIS es content-pricing (status option). El operador aprobó TRES variantes de cotización el 2026-09-27: esta tabla, la «en escena» en 3D con Pro al frente (content-pricing-stage) y la «en vivo» con la cotización y el cursor en «Aprobar propuesta» (content-pricing-live). Hallazgos para el operador: la respuesta mide 2,95 veces la pregunta (118 contra 40 en el script; la regla pide 3×); «Recomendado» va en el acento a 15 px (D1 pide 24 px o más).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckCotizacion.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckCotizacion.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "P27",
+          "board": "canvas de revisión SEO/AEO (Design), Propuesta 27",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/propuesta/27.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/propuesta-document.json",
+            "page": 21
+          },
+          "content": {
+            "eyebrow": "Inversión",
+            "question": "¿Cómo se cotiza?",
+            "answer": "Por\ncapacidad",
+            "body": "Se cotiza por capacidad declarada, nunca por artículo. La fundación es un proyecto con fin; la operación, un retainer.",
+            "plans": [
+              {
+                "name": "Fundación",
+                "tagline": "Proyecto de precio fijo",
+                "features": [
+                  "Auditoría técnica",
+                  "Entidad y schema",
+                  "Arreglo de la base",
+                  "Línea base de visibilidad"
+                ]
+              },
+              {
+                "name": "SV360",
+                "tagline": "Fundación + operación",
+                "features": [
+                  "Todo lo de Fundación",
+                  "Operación SEO y AEO",
+                  "Contenido citable",
+                  "PR y autoridad",
+                  "Efeonce Insights"
+                ]
+              },
+              {
+                "name": "Operación",
+                "tagline": "Si la base ya está",
+                "features": [
+                  "Estrategia editorial",
+                  "Producción y on-page",
+                  "Citabilidad en IA",
+                  "Efeonce Insights"
+                ]
+              }
+            ],
+            "amounts": "[MONTO]",
+            "recommendedPlan": 2
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Finanzas",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Montos siempre [MONTO]."
+        }
+      ]
     },
     {
       "id": "content-pricing-stage",
@@ -11128,7 +12418,46 @@
         "Los horarios son de muestra; el contacto sale del SSOT de marca."
       ],
       "notes": "En AXIS es decision-next-steps, pero el token (tres columnas de 500 px, CTA con el descriptor bajo el cursor) y su referencia describen la versión anterior (E7-pasos en render-src/deck2.mjs). El operador aprobó el 2026-09-27 la versión con impacto (la agenda abierta); AXIS debe actualizar token y referencia. Hallazgo: el rótulo «01 · Diagnóstico · Sin costo» va en color.tealDark a 14 px (D1).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckProximosPasos.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckProximosPasos.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C32 · B23",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 32, Brochure 23",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/32.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 26
+          },
+          "content": {
+            "eyebrow": "Próximos pasos",
+            "question": "¿Y ahora qué sigue?",
+            "answer": "Empecemos",
+            "body": "Un diagnóstico **sin costo**: cómo te ven Google y la IA.",
+            "cardDescriptor": "45 min por videollamada · Efeonce AEO Assessment",
+            "nextSteps": [
+              {
+                "number": "02",
+                "label": "Proyecto",
+                "title": "Fundación",
+                "desc": "La base técnica, la entidad y el schema en orden, a precio fijo."
+              },
+              {
+                "number": "03",
+                "label": "On-Going",
+                "title": "SV360",
+                "desc": "SEO y AEO cada mes, con tus métricas en Efeonce Insights."
+              }
+            ]
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Fechas de la agenda de ejemplo (5–9 oct): se mueven al usar el deck (pendiente de DECISIONES.md)."
+        }
+      ]
     },
     {
       "id": "decision-diagnosis-map",
@@ -11322,6 +12651,16 @@
           "maxChars": 92,
           "example": "El dato lo da la máquina; el criterio lo pone nuestro equipo.",
           "notes": "Medido: caja 290 px × 3 línea(s) a 500 17px Pop (≈8.9 px/carácter, 5 % de holgura). Ficha «Lectura experta» flotante."
+        },
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "ai-visibility-report-lockup-negative",
+            "alt": "Efeonce | AI Visibility Report"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). Slot NUEVO en una receta con plantilla: el Artifact Composer lo suma en TASK-1949 Slice 2 con un test que compone la receta SIN el slot; hasta entonces la paridad receta ↔ plantilla lo lista como pendiente (recipe-slot-parity.test.ts, PENDING_TEMPLATE_SLOTS)."
         }
       ],
       "fixed": [
@@ -11359,7 +12698,44 @@
         "Datos de muestra siempre marcados",
         "El share of voice suma 100"
       ],
-      "notes": "Aprobada el 2026-09-28. Entregables de /aeo-2/ (Empieza con tu diagnóstico gratis). Delta 2026-09-29: la lámina Salesforce SF5-diagnostico-decision no cabía en los slots de esta receta; el operador la canonizó como receta propia `decision-diagnosis-verdict` (esta receta no cambia)."
+      "notes": "Aprobada el 2026-09-28. Entregables de /aeo-2/ (Empieza con tu diagnóstico gratis). Delta 2026-09-29: la lámina Salesforce SF5-diagnostico-decision no cabía en los slots de esta receta; el operador la canonizó como receta propia `decision-diagnosis-verdict` (esta receta no cambia).",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C16 · B22 · P28",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 16, Brochure 22, Propuesta 28",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/16.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 14
+          },
+          "content": {
+            "eyebrow": "Tu primer entregable",
+            "question": "¿Qué recibes primero?",
+            "answer": "El mapa",
+            "evidence": "En 24–48 h sabes en qué nivel estás y por dónde empezamos a **subirte**. Gratis y sin compromiso.",
+            "reportKicker": "Efeonce AI Visibility Report",
+            "reportTitle": "Tu marca · Chile",
+            "sampleMark": "Datos de muestra",
+            "productMark": {
+              "asset": "ai-visibility-report-lockup-negative",
+              "alt": "Efeonce | AI Visibility Report",
+              "position": "x 140, top 44, alto 40"
+            }
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). La marca «Datos de muestra» se queda (la exige el contrato; decisión 13)."
+        }
+      ]
     },
     {
       "id": "breather",
@@ -13806,7 +15182,69 @@
         "Cada métrica con fórmula, fuente y dueño (un rol).",
         "Íconos Trazo de AXIS (resolveIcon), no íconos de producto."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 18 del deck Salesforce (acto IV). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta de la práctica: sirve en HubSpot cambiando las fuentes por las de HubSpot."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 18 del deck Salesforce (acto IV). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta de la práctica: sirve en HubSpot cambiando las fuentes por las de HubSpot.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-09-30",
+          "approvedBy": "operador, 2026-09-30 («esto está aprobado todo»; canvas de revisión https://claude.ai/artifact/KDkuVM5nvX6uAyBeo3Td9n, páginas «Completo · 33», «Brochure · 24» y «Propuesta · 29»)",
+          "deck": "SEO/AEO · Search Visibility 360 (línea engine)",
+          "line": "engine",
+          "slide": "C24",
+          "board": "canvas de revisión SEO/AEO (Design), Completo 24",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/24.jpg",
+          "renderSource": {
+            "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/build.mjs",
+            "intent": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/completo-document.json",
+            "page": 20
+          },
+          "content": {
+            "eyebrow": "Qué medimos",
+            "question": "¿Cómo sabes que funciona?",
+            "answer": "Lo\nmedimos",
+            "evidence": "Cada métrica con su fórmula, su fuente y un **dueño**, y cada mes en Efeonce Insights.",
+            "note": "Sin cifras de promesa: la línea base se mide en el diagnóstico",
+            "metrics": [
+              {
+                "glyph": "ia",
+                "name": "Visibilidad en IA",
+                "formula": "Prompts donde te citan ÷ prompts medidos",
+                "source": "AEO Assessment",
+                "owner": "Efeonce"
+              },
+              {
+                "glyph": "medicion",
+                "name": "Share of voice",
+                "formula": "Tus menciones ÷ menciones de la categoría",
+                "source": "AEO Assessment",
+                "owner": "Efeonce"
+              },
+              {
+                "glyph": "busqueda",
+                "name": "Clics orgánicos",
+                "formula": "Clics desde Google en páginas objetivo",
+                "source": "Search Console",
+                "owner": "Tu equipo"
+              },
+              {
+                "glyph": "embudo",
+                "name": "Leads orgánicos",
+                "formula": "Leads con origen orgánico o IA",
+                "source": "Tu CRM",
+                "owner": "Líder comercial"
+              },
+              {
+                "glyph": "informe",
+                "name": "Ingresos",
+                "formula": "Negocios ganados de origen orgánico",
+                "source": "Tu CRM",
+                "owner": "Líder comercial"
+              }
+            ]
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        }
+      ]
     },
     {
       "id": "decision-diagnosis-verdict",
@@ -14726,6 +16164,1208 @@
         "Montos como [MONTO]; el canal es el que usa la cuenta (Slack o Teams)."
       ],
       "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 09 del deck Salesforce (acto III). Al canonizar, el operador decidió que no cabe en content-day-live-progress y nace como receta propia (antes registrada como approvedUses de content-day-live-progress, que no cambia). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template); de respuesta grande: entra a la auditoría 3× de rendered-audit.ts. Su modelo es method-agent-supervisor (lámina 08). Sirve en HubSpot con los agentes de HubSpot y su ícono oficial, sólo si existe y se autoriza."
+    },
+    {
+      "id": "content-brand-family",
+      "board": "Familia-SV360",
+      "name": "Familia de marcas · el producto y sus piezas con sus lockups oficiales, cada una con su papel",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-30",
+      "reference": "references/surfaces/deck/content-brand-family.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/07.jpg",
+      "communicates": "SV360 es un solo sistema con piezas que tienen nombre y papel: la capacidad, el proceso, el entregable y la edición mensual, todas de Efeonce.",
+      "useWhen": [
+        "Abrir la parte de producto de un deck SEO/AEO: qué hay dentro de SV360 antes de explicar cada pieza.",
+        "El cliente confunde el diagnóstico, el informe y la edición mensual: la lámina les da nombre y papel.",
+        "Brochure o propuesta donde después aparecen los lockups de cada pieza (method-score-ring, decision-diagnosis-map, content-day-live-results)."
+      ],
+      "avoidWhen": [
+        "La oferta no tiene submarcas oficiales en @efeoncepro/axis-brand-assets: no se dibujan lockups; usar content-bullets.",
+        "Se vende una sola pieza (por ejemplo, sólo el diagnóstico): usar method-score-ring o decision-diagnosis-map.",
+        "Una pieza de la familia no está disponible para el cliente: se quita la fila, no se promete."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-bullets",
+          "when": "la oferta es una lista de capacidades sin marcas propias"
+        },
+        {
+          "recipe": "method-score-ring",
+          "when": "basta con explicar el diagnóstico y sus dimensiones"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "section-split",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "content-service-mockups",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": true,
+          "example": {
+            "asset": "sv360-logo-negative",
+            "alt": "SV360 · Search Visibility 360"
+          },
+          "notes": "La marca paraguas de la familia, arriba de la voz (x 140, top 250, alto 44 px): sv360-logo-negative de @efeoncepro/axis-brand-assets, sin editar. En esta receta es obligatorio: la lámina presenta esa familia."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 28,
+          "example": "¿Qué hay dentro?",
+          "notes": "Medido: caja 606 px × 1 línea a 300 40px Pop (≈20.48 px/carácter, 5 % de holgura). Descontado el anillo en el acento (18 px + 16 de separación). Una línea."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 20,
+          "example": "Cuatro\npiezas",
+          "notes": "Medido: caja 640 px por línea a 760 124px Bric (≈55.92 px/carácter, 5 % de holgura). Hasta 10 caracteres por línea y 20 entre las dos; 1–3 palabras partidas en dos líneas con salto manual (\\n); sin punto final: cierra con la esfera en el acento. 124/40 = 3,10× la pregunta."
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 169,
+          "example": "SV360 es SEO y AEO en un solo sistema: una capacidad, un proceso, un entregable y una edición mensual, todo firmado por **Efeonce**.",
+          "notes": "Medido: caja 640 px × 4 líneas a 400 28px Pop (≈14.36 px/carácter, 5 % de holgura). Hasta 4 líneas; una sola expresión en negrita blanca (**…**). A 28 px (no 26): la columna de voz es ancha y no hay evidencia aparte."
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 71,
+          "example": "El producto · SEO + AEO",
+          "notes": "Medido: caja 880 px × 1 línea a 500 18px Pop en mayúsculas con tracking .08em (≈11.70 px/carácter, 5 % de holgura). Kicker de la columna derecha, sobre el lockup del producto (x 900, top 190)."
+        },
+        {
+          "name": "familyMark",
+          "type": "enum",
+          "required": true,
+          "example": "sv360-name-lockup-negative",
+          "notes": "El lockup con el nombre completo del producto (760 × 50,8 px) bajo el kicker: sv360-name-lockup-negative de @efeoncepro/axis-brand-assets, sin editar. Si la familia es otra, su lockup con nombre del mismo paquete; nunca armado a mano."
+        },
+        {
+          "name": "pieces",
+          "type": "list",
+          "required": true,
+          "maxChars": 74,
+          "example": [
+            {
+              "mark": "aeo-lockup-negative",
+              "role": "Capacidad",
+              "description": "Que la IA te encuentre, te entienda y te recomiende."
+            },
+            {
+              "mark": "aeo-assessment-lockup-negative",
+              "role": "Proceso",
+              "description": "Mide cómo te ven los motores de IA, en siete dimensiones."
+            },
+            {
+              "mark": "ai-visibility-report-lockup-negative",
+              "role": "Entregable",
+              "description": "Lo que recibes y compartes: dónde estás y qué hacer primero."
+            },
+            {
+              "mark": "insights-lockup-negative",
+              "role": "Edición mensual",
+              "description": "Cada mes, qué se movió en tu SEO y tu AEO, y qué sigue."
+            }
+          ],
+          "notes": "Exactamente 4 filas separadas por hilos (en el orden capacidad → proceso → entregable → edición mensual). Por ítem: mark (enum, lockup de la lista cerrada: aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative; 39 px de alto) · role (≤ 25; caja 316 px × 1 línea a 500 18px Pop en mayúsculas con tracking .08em (≈11.70 px/carácter, 5 % de holgura). alineado a la derecha) · description (≤ 74; caja 880 px × 1 línea a 400 22px Pop (≈11.29 px/carácter, 5 % de holgura).)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (efeonceGraphicLine.color.dark), sin halo ni plataforma: la lámina es tipográfica.",
+        "Voz a la izquierda en el margen de deck (140 px), columna de 640: la marca paraguas, pregunta con anillo, respuesta en dos líneas con esfera y cuerpo.",
+        "Columna derecha desde x 900 (880 px): kicker, lockup con nombre y las cuatro filas con hilos teal al 16 %.",
+        "Pie con la burbuja URL (url-bubble-baked-dark)."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Cuatro piezas» sobre fondo Efeonce oscuro, sin plataforma. A la izquierda: el logo SV360 de la familia, la pregunta con anillo, la respuesta en dos líneas a 124 px con la esfera y el cuerpo a 28 px con «Efeonce» en negrita. A la derecha: el kicker, el lockup con el nombre del producto y cuatro filas separadas por hilos, cada una con el lockup oficial de la pieza, su papel en mayúsculas a la derecha y una línea de descripción. Sin selección; burbuja URL en el pie."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/native/familia.html",
+        "slideId": "familia"
+      },
+      "rules": [
+        "Lockups oficiales de @efeoncepro/axis-brand-assets, sin editar ni recolorear; nunca dibujados.",
+        "Una fila por pieza que el cliente de verdad recibe; ninguna pieza prometida que no exista.",
+        "Respuesta ≥ 3× la pregunta (124/40 = 3,1).",
+        "Acento sólo en texto de 24 px o más (el anillo y la esfera).",
+        "Español neutro, sin voseo."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 07 del deck SEO/AEO completo (06 en brochure y propuesta). Decisión 1: SEO al mismo nivel que AEO; SV360 es la marca paraguas y sus piezas son AEO Assessment, AI Visibility Report y Efeonce Insights. Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/07.jpg · brochure/06.jpg · propuesta/06.jpg."
+    },
+    {
+      "id": "content-service-mockups",
+      "board": "SEO-Servicios",
+      "name": "Qué hace el equipo · tres fichas con maquetas nativas del servicio (técnica, contenido, autoridad) y tres entregables",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-30",
+      "reference": "references/surfaces/deck/content-service-mockups.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/10.jpg",
+      "communicates": "El equipo no deja una lista de tareas: hace y despliega la técnica, el contenido y la autoridad en el CMS del cliente, y cada ficha lo muestra en una maqueta que se lee.",
+      "useWhen": [
+        "Justo después de presentar al equipo (section-cine-team): qué hace ese equipo, en concreto.",
+        "La objeción es «nos van a dejar un informe con tareas»: la lámina muestra el trabajo hecho y desplegado.",
+        "Brochure o propuesta SEO donde el servicio tiene tres frentes con resultado visible."
+      ],
+      "avoidWhen": [
+        "Capturas chicas de la web o del CMS: la regla es maqueta nativa grande y legible (decisión 4).",
+        "Una ficha muestra algo que el equipo no entrega en ese contrato: se cambia la ficha, no se promete.",
+        "Práctica de plataforma con productos de partner (Salesforce, HubSpot): usar content-service-lanes."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-service-lanes",
+          "when": "la práctica es una plataforma con productos que nombrar"
+        },
+        {
+          "recipe": "content-bullets",
+          "when": "basta con listar los frentes, sin maquetas"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "section-cine-team",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "proposal-cinematic-seo",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "sv360-lockup-negative",
+            "alt": "Efeonce | SV360"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina)."
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 45,
+          "example": "SEO · qué incluye",
+          "notes": "Medido: caja 550 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.36 px/carácter, 5 % de holgura). Color suave de la voz."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 24,
+          "example": "¿Y qué hace ese equipo?",
+          "notes": "Medido: caja 526 px × 1 línea a 300 40px Pop (≈20.48 px/carácter, 5 % de holgura). Descontado el anillo en el acento (18 px + 16 de separación). Una línea."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 9,
+          "example": "Todo esto",
+          "notes": "Medido: caja 550 px × 1 línea a 760 128px Bric (≈57.73 px/carácter, 5 % de holgura). Una línea a 128 px en top 280, sin partir, antes de las fichas (x 690): 128/40 = 3,2× la pregunta. Sin punto: cierra con la esfera."
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 131,
+          "example": "Contenido, técnica y autoridad, hechos y **desplegados** por nuestro equipo en tu CMS. No te dejamos una lista de tareas.",
+          "notes": "Medido: caja 460 px × 4 líneas a 300 26px Pop (≈13.31 px/carácter, 5 % de holgura). Hasta 4 líneas; una sola expresión en negrita blanca (**…**)."
+        },
+        {
+          "name": "technicalTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 25,
+          "example": "SEO técnico",
+          "notes": "Medido: caja 284 px × 1 línea a 600 15px Pop en mayúsculas con tracking .14em (≈10.65 px/carácter, 5 % de holgura). En el acento suave sobre vidrio."
+        },
+        {
+          "name": "technicalScore",
+          "type": "number",
+          "required": true,
+          "example": 98,
+          "notes": "Puntaje del anillo (0–100, 760 42px Bric dentro de un anillo de 120 px en el acento suave). Valor ilustrativo de la maqueta: con datos del cliente sale de su medición con fuente."
+        },
+        {
+          "name": "technicalScoreLabel",
+          "type": "richText",
+          "required": true,
+          "maxChars": 47,
+          "example": "Core Web\nVitals\n**en verde**",
+          "notes": "Medido: caja 146 px × 3 líneas a 400 17px Pop (≈8.72 px/carácter, 5 % de holgura). Junto al anillo; la última línea en negrita va en el acento suave."
+        },
+        {
+          "name": "technicalChecks",
+          "type": "list",
+          "required": true,
+          "maxChars": 9,
+          "example": [
+            "Rastreo",
+            "Índice",
+            "Schema",
+            "Metas"
+          ],
+          "notes": "Medido: caja 99 px × 1 línea a 500 19px Pop (≈9.88 px/carácter, 5 % de holgura). Dos columnas de 135 px menos el círculo del check (26 px + 10). Exactamente 4 checks en dos columnas."
+        },
+        {
+          "name": "technicalCaption",
+          "type": "text",
+          "required": true,
+          "maxChars": 62,
+          "example": "Que Google y la IA puedan leer, entender y confiar en tu sitio",
+          "notes": "Medido: caja 284 px × 2 líneas a 400 17px Pop (≈8.72 px/carácter, sin holgura: la aprobada mide 62 y cabe medida en la lámina). Bajo un hilo, al pie de la ficha."
+        },
+        {
+          "name": "contentTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 31,
+          "example": "Contenido SEO",
+          "notes": "Medido: caja 376 px × 1 línea a 600 16px Pop en mayúsculas con tracking .14em (≈11.36 px/carácter, 5 % de holgura). En el acento suave sobre vidrio."
+        },
+        {
+          "name": "contentPillar",
+          "type": "text",
+          "required": true,
+          "maxChars": 8,
+          "example": "Tu tema",
+          "notes": "Medido: caja 110 px × 1 línea a 760 26px Bric (≈12.92 px/carácter, 5 % de holgura). Dentro del círculo del pillar (r 64, en el azul de la voz), bajo el rótulo fijo «PILLAR»."
+        },
+        {
+          "name": "contentNodes",
+          "type": "list",
+          "required": true,
+          "maxChars": 11,
+          "example": [
+            "Qué es",
+            "Cómo elegir",
+            "Precios",
+            "Casos",
+            "Comparativa",
+            "Preguntas"
+          ],
+          "notes": "Exactamente 6 nodos del cluster unidos al pillar: los de las esquinas (1, 2, 5 y 6) en píldoras de 120 px (≤ 11; caja 104 px × 1 línea a 500 16px Pop (≈8.32 px/carácter, 5 % de holgura).) y los del medio (3 y 4) en píldoras de 92 px (≤ 9; caja 80 px × 1 línea a 500 16px Pop (≈8.32 px/carácter, 5 % de holgura).)."
+        },
+        {
+          "name": "contentCaption",
+          "type": "richText",
+          "required": true,
+          "maxChars": 109,
+          "example": "Un cluster por tema: la guía y las respuestas a cada pregunta, **listas para que la IA las cite**",
+          "notes": "Medido: caja 376 px × 3 líneas a 400 19px Pop (≈9.75 px/carácter, 5 % de holgura). Una expresión en negrita blanca."
+        },
+        {
+          "name": "authorityTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 24,
+          "example": "PR y link building",
+          "notes": "Medido: caja 274 px × 1 línea a 600 15px Pop en mayúsculas con tracking .14em (≈10.65 px/carácter, 5 % de holgura). En el acento suave sobre vidrio."
+        },
+        {
+          "name": "authorityMetric",
+          "type": "metric",
+          "required": true,
+          "maxChars": 4,
+          "example": {
+            "value": "+18",
+            "label": "dominios\nque te enlazan"
+          },
+          "notes": "La cifra grande (760 84px Bric, ≤ 4 caracteres) y su etiqueta en dos líneas (400 17px Pop, ≤ 12 por línea), sobre una curva que sube. Valor ilustrativo de la maqueta: con datos del cliente va con su fuente (Search Console o la herramienta de backlinks)."
+        },
+        {
+          "name": "authorityOutlets",
+          "type": "list",
+          "required": true,
+          "maxChars": 24,
+          "example": [
+            "Medio de tu sector",
+            "Gremio o asociación",
+            "Prensa de negocios"
+          ],
+          "notes": "Medido: caja 230 px × 1 línea a 500 17px Pop (≈8.84 px/carácter, 5 % de holgura). Fila de vidrio con la flecha ↗ en el acento suave. Exactamente 3 tipos de medio, nunca un medio real sin su enlace ganado."
+        },
+        {
+          "name": "authorityCaption",
+          "type": "text",
+          "required": true,
+          "maxChars": 59,
+          "example": "Enlaces reales, sin granjas ni PBN",
+          "notes": "Medido: caja 274 px × 2 líneas a 400 17px Pop (≈8.72 px/carácter, 5 % de holgura)."
+        },
+        {
+          "name": "chips",
+          "type": "list",
+          "required": true,
+          "maxChars": 73,
+          "example": [
+            {
+              "title": "Landing pages",
+              "detail": "SEO on-page y copy que convierte"
+            },
+            {
+              "title": "Banners optimizados",
+              "detail": "Livianos y con ALT: no rompen tu velocidad"
+            },
+            {
+              "title": "Despliegue multi-CMS",
+              "detail": "WordPress, Webflow, Shopify o el que uses"
+            }
+          ],
+          "notes": "Exactamente 3 entregables en fichas de vidrio sobre la plataforma de luz (rejilla de 1100 px, columnas de 353). Por ítem: title (≤ 25; caja 317 px × 1 línea a 600 22px Pop (≈11.66 px/carácter, 5 % de holgura).) · detail (≤ 73; caja 317 px × 2 líneas a 400 16px Pop (≈8.21 px/carácter, 5 % de holgura).)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro con el halo del acento suave detrás de las fichas y la sombra del pie.",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta de una línea con esfera y cuerpo.",
+        "Estilo «vive» (decisión 3): tres fichas de vidrio en perspectiva sobre la plataforma de luz; la del medio (contenido) es la protagonista, sin rotar, con la única sombra profunda y el contorno en el acento suave; las laterales rotadas ±20° hacia ella.",
+        "Una sola órbita: la plataforma de luz bajo las fichas, con su arco en el acento.",
+        "Maquetas nativas grandes, nunca capturas de pantalla (decisión 4).",
+        "Pie con la burbuja URL (url-bubble-baked-dark)."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Todo esto» sobre fondo Efeonce oscuro, en el estilo «vive». A la izquierda: lockup SV360 opcional arriba, eyebrow, pregunta con anillo, respuesta a 128 px con la esfera y cuerpo con «desplegados» en negrita. A la derecha, sobre la plataforma de luz: tres fichas de vidrio en perspectiva — SEO técnico (anillo con el puntaje, rótulo, cuatro checks y bajada), Contenido SEO al centro y adelante (el pillar con seis nodos del cluster y la bajada con negrita) y PR y link building (la cifra grande con su curva, tres tipos de medio con flecha y bajada). Debajo, tres fichas de entregables. Sin selección; burbuja URL en el pie."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/native/SEO-Servicios.html",
+        "slideId": "SEO-Servicios"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Ningún texto cruza la órbita ni las fichas.",
+        "Respuesta ≥ 3× la pregunta (128/40 = 3,2).",
+        "Acento sólo en texto de 24 px o más; los rótulos chicos van en el acento suave sobre vidrio.",
+        "Las cifras de las maquetas (el puntaje, los dominios) son ilustrativas: con datos del cliente van con su fuente. La anotación «maqueta» vive fuera de la lámina (decisión 13).",
+        "Sin granjas de enlaces ni PBN: la autoridad se muestra con tipos de medio reales, nunca con un medio con nombre sin su enlace ganado.",
+        "Español neutro, sin voseo."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 10 del deck SEO/AEO completo (08 en brochure, 09 en propuesta). Decisiones 3 y 4: estilo «vive» y maquetas nativas grandes, nada de capturas chicas de la web. Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/10.jpg · brochure/08.jpg · propuesta/09.jpg."
+    },
+    {
+      "id": "content-report-formats",
+      "board": "Insights-Llega",
+      "name": "Cómo te llega el informe · el informe vivo en interfaz blanca y los cinco formatos en que se entrega",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-30",
+      "reference": "references/surfaces/deck/content-report-formats.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/22.jpg",
+      "communicates": "El informe mensual se arma solo: la IA escribe la lectura, el equipo la revisa y el cliente lo recibe en el formato que necesite, sin armar reportes ni láminas.",
+      "useWhen": [
+        "Después de content-day-live-results: cómo llega la edición mensual y en qué formatos.",
+        "La objeción es el trabajo de reportar: quién arma el informe y en qué formato lo necesita cada área.",
+        "Propuesta o brochure con Efeonce Insights incluido en el servicio."
+      ],
+      "avoidWhen": [
+        "Algún formato no está vivo para el cliente: se quita o se rotula «próximamente» antes de mostrarla (correo, PDF A4 y deck 16:9 están por verificar con la sesión de Insights).",
+        "El servicio no incluye Efeonce Insights: la lámina promete algo que no se entrega.",
+        "Se quiere mostrar el panel en vivo con la reunión: usar content-day-live-results."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-day-live-results",
+          "when": "basta el panel en vivo y la reunión mensual"
+        },
+        {
+          "recipe": "content-committee-deck",
+          "when": "la objeción concreta es el PPT del comité"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-day-live-results",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "content-committee-deck",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "insights-lockup-negative",
+            "alt": "Efeonce | Insights"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina)."
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 53,
+          "example": "Un informe, cinco formatos",
+          "notes": "Medido: caja 640 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.36 px/carácter, 5 % de holgura). Color suave de la voz."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 28,
+          "example": "¿Cómo te llega?",
+          "notes": "Medido: caja 606 px × 1 línea a 300 40px Pop (≈20.48 px/carácter, 5 % de holgura). Descontado el anillo en el acento (18 px + 16 de separación). Una línea."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 20,
+          "example": "Como la\nnecesites",
+          "notes": "Medido: caja 640 px por línea a 760 124px Bric (≈55.92 px/carácter, 5 % de holgura). Hasta 10 caracteres por línea y 20 entre las dos; 1–3 palabras partidas en dos líneas con salto manual (\\n); sin punto final: cierra con la esfera en el acento. 124/40 = 3,10× la pregunta."
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 171,
+          "example": "Cada mes la IA cruza tus datos y escribe la lectura; nuestro equipo la revisa. Tú solo la abres y la usas, **sin armar** reportes ni láminas.",
+          "notes": "Medido: caja 600 px × 4 líneas a 300 26px Pop (≈13.31 px/carácter, 5 % de holgura). Hasta 4 líneas; una sola expresión en negrita blanca (**…**)."
+        },
+        {
+          "name": "reportLabel",
+          "type": "text",
+          "required": true,
+          "maxChars": 58,
+          "example": "Informe vivo · septiembre",
+          "notes": "Medido: caja 700 px × 1 línea a 600 16px Pop en mayúsculas con tracking .14em (≈11.36 px/carácter, 5 % de holgura). Cabecera del informe en teal oscuro, junto a la píldora fija «En vivo»."
+        },
+        {
+          "name": "kpis",
+          "type": "list",
+          "required": true,
+          "maxChars": 28,
+          "example": [
+            {
+              "label": "Visibilidad en IA",
+              "value": "64%",
+              "delta": "▲ 9 pts"
+            },
+            {
+              "label": "Clics orgánicos",
+              "value": "12,4 k",
+              "delta": "▲ 18%"
+            },
+            {
+              "label": "Te citan en respuestas",
+              "value": "37",
+              "delta": "▲ 11"
+            }
+          ],
+          "notes": "Medido: caja 234 px × 1 línea a 400 15px Pop (≈7.70 px/carácter, 5 % de holgura). Exactamente 3 cifras en tarjetas de papel suave. Por ítem: label (≤ 28) · value (760 52px Bric, ≤ 6) · delta (600 18px Pop en teal oscuro, ≤ 8, con ▲ o ▼). Datos ilustrativos de la maqueta: con datos del cliente salen de su edición de Insights con fuente; la anotación «datos de ejemplo» vive fuera de la lámina (decisión 13)."
+        },
+        {
+          "name": "trendTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 54,
+          "example": "Visibilidad en IA · 6 meses",
+          "notes": "Medido: caja 438 px × 1 línea a 400 15px Pop (≈7.70 px/carácter, 5 % de holgura). Sobre la curva de seis meses de la marca contra el promedio del sector (leyenda fija «Tu marca» y «Promedio del sector»)."
+        },
+        {
+          "name": "rankingTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 38,
+          "example": "Quién aparece en las respuestas",
+          "notes": "Medido: caja 315 px × 1 línea a 400 15px Pop (≈7.70 px/carácter, 5 % de holgura)."
+        },
+        {
+          "name": "ranking",
+          "type": "list",
+          "required": true,
+          "maxChars": 11,
+          "example": [
+            {
+              "name": "Tu marca",
+              "share": 34
+            },
+            {
+              "name": "Rival A",
+              "share": 28
+            },
+            {
+              "name": "Rival B",
+              "share": 21
+            },
+            {
+              "name": "Rival C",
+              "share": 17
+            }
+          ],
+          "notes": "Medido: caja 96 px × 1 línea a 600 15px Pop (≈7.95 px/carácter, 5 % de holgura). Exactamente 4 filas con barra: la primera es la marca del cliente, en azul y negrita; las demás, rivales genéricos (Rival A, B, C), nunca un competidor real. Por ítem: name (≤ 11) · share (porcentaje entero; las barras son proporcionales a la primera)."
+        },
+        {
+          "name": "reading",
+          "type": "text",
+          "required": true,
+          "maxChars": 155,
+          "example": "Subes por tus guías nuevas. En «precios» el rival A todavía te gana: ahí va el próximo contenido.",
+          "notes": "Medido: caja 758 px × 2 líneas a 400 18px Pop (≈9.23 px/carácter, 5 % de holgura). La lectura escrita por la IA y revisada por el equipo, bajo el rótulo fijo «La lectura del mes» con el destello en azul."
+        },
+        {
+          "name": "formats",
+          "type": "list",
+          "required": true,
+          "maxChars": 37,
+          "example": [
+            {
+              "icon": "mail",
+              "title": "Correo",
+              "detail": "Te llega solo"
+            },
+            {
+              "icon": "web-mobile",
+              "title": "Web y celular",
+              "detail": "Lo revisas donde estés"
+            },
+            {
+              "icon": "presentation",
+              "title": "Presentación",
+              "detail": "Presentas sin PPT"
+            },
+            {
+              "icon": "pdf",
+              "title": "PDF A4",
+              "detail": "Listo para circular"
+            },
+            {
+              "icon": "deck",
+              "title": "Deck 16:9",
+              "detail": "El del comité, armado"
+            }
+          ],
+          "notes": "Exactamente 5 formatos en fichas de vidrio (168 px), unidas al informe por haces de luz. Por ítem: icon (enum: mail · web-mobile · presentation · pdf · deck; ícono de trazo en el acento suave, 40 px) · title (≤ 13; caja 140 px × 1 línea a 600 20px Pop (≈10.60 px/carácter, sin holgura: la aprobada mide 13 y cabe medida en la lámina).) · detail (≤ 37; caja 140 px × 2 líneas a 400 14px Pop (≈7.18 px/carácter, 5 % de holgura).). Sólo formatos vivos para el cliente."
+        },
+        {
+          "name": "highlightedFormat",
+          "type": "number",
+          "required": true,
+          "example": 3,
+          "notes": "Índice (1–5) del formato destacado con contorno en el acento suave y halo (en la aprobada, 3 · Presentación)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro con el halo del acento suave detrás del informe.",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta en dos líneas con esfera y cuerpo.",
+        "El informe vivo en INTERFAZ BLANCA (decisión 5), inclinado hacia atrás (rotateX 6°) con la única sombra profunda y el contorno en el acento suave: cabecera con la píldora «En vivo», tres cifras, la curva de seis meses contra el promedio del sector, el ranking de respuestas y «La lectura del mes».",
+        "Los cinco formatos en fila bajo el informe, unidos a él por haces de luz (la órbita de la lámina).",
+        "Interfaz genérica del producto: nunca el cromo de un motor de IA.",
+        "Pie con la burbuja URL (url-bubble-baked-dark)."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Como la necesites» sobre fondo Efeonce oscuro. A la izquierda: lockup de Insights opcional arriba, eyebrow, pregunta con anillo, respuesta en dos líneas a 124 px con la esfera y cuerpo con «sin armar» en negrita. A la derecha, el informe vivo en interfaz blanca, inclinado hacia atrás: cabecera con la píldora «En vivo», tres cifras con su variación, la curva de seis meses contra el promedio del sector, el ranking de quién aparece en las respuestas (la marca primero, rivales genéricos) y la lectura del mes. Debajo, cinco fichas de formatos unidas al informe por haces de luz, con la de presentación destacada. Sin selección; burbuja URL en el pie."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/native/Insights-Llega.html",
+        "slideId": "Insights-Llega"
+      },
+      "rules": [
+        "Una sola órbita por lámina: los haces de luz que unen el informe con los formatos.",
+        "El informe vivo va en interfaz blanca, coherente con las demás UI del deck (decisión 5).",
+        "Sólo formatos vivos para el cliente; lo que no esté vivo se quita o se rotula «próximamente» antes de mostrarla.",
+        "Rivales genéricos; nunca un competidor real.",
+        "Las cifras son ilustrativas de la maqueta; la anotación «datos de ejemplo» vive fuera de la lámina (decisión 13). Con datos reales, salen de la edición de Insights del cliente.",
+        "Respuesta ≥ 3× la pregunta (124/40 = 3,1).",
+        "Español neutro, sin voseo."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 22 del deck SEO/AEO completo (16 en brochure, 17 en propuesta). Decisión 5: la lámina cuenta el valor (sin armar el PPT, en vivo, con lectura escrita por la IA) y el informe vivo va en interfaz blanca. Pendiente de DECISIONES.md: verificar con la sesión de Insights qué formatos están vivos hoy. Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/22.jpg · brochure/16.jpg · propuesta/17.jpg."
+    },
+    {
+      "id": "content-committee-deck",
+      "board": "Insights-Formatos",
+      "name": "El PPT del comité · la lámina de comité ya armada por la IA, en modo presentación, con tres formas de llevarla",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-30",
+      "reference": "references/surfaces/deck/content-committee-deck.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/23.jpg",
+      "communicates": "El cliente no arma el PPT del comité: la lámina ya viene con el titular escrito por la IA y revisado por el equipo, y se presenta en vivo, como deck o como PDF.",
+      "useWhen": [
+        "Justo después de content-report-formats, cuando el comité o el directorio es quien decide la inversión.",
+        "La objeción es el tiempo que el equipo del cliente pierde armando reportes para arriba.",
+        "Propuesta o brochure con Efeonce Insights incluido."
+      ],
+      "avoidWhen": [
+        "El modo presentación, el deck 16:9 o el PDF A4 no están vivos para el cliente: se quitan de las fichas o se rotulan «próximamente» (por verificar con la sesión de Insights).",
+        "El servicio no incluye Efeonce Insights.",
+        "La cifra del ejemplo podría leerse como un resultado del cliente: con datos reales, sale de su edición con fuente; si no, el titular queda genérico."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-report-formats",
+          "when": "hace falta mostrar todos los formatos, no sólo el del comité"
+        },
+        {
+          "recipe": "content-day-live-results",
+          "when": "basta el reporte mensual y la reunión"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-report-formats",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "content-measure-formulas",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "insights-lockup-negative",
+            "alt": "Efeonce | Insights"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina)."
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 46,
+          "example": "Sin armar láminas",
+          "notes": "Medido: caja 560 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.36 px/carácter, 5 % de holgura). Color suave de la voz."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 37,
+          "example": "¿Y el PPT del comité?",
+          "notes": "Medido: caja 406 px × 2 líneas a 300 40px Pop (≈20.48 px/carácter, 5 % de holgura). Descontado el anillo en el acento (18 px + 16 de separación). Hasta dos líneas."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 12,
+          "example": "Ya\nestá",
+          "notes": "Medido: caja 568 px por línea a 760 176px Bric (≈79.38 px/carácter, 5 % de holgura). Hasta 6 caracteres por línea y 12 entre las dos; 1–3 palabras partidas en dos líneas con salto manual (\\n); sin punto final: cierra con la esfera en el acento. 176/40 = 4,40× la pregunta."
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 159,
+          "example": "La IA escribe el titular y destaca lo que importa; nuestro equipo lo revisa. Tú entras a la reunión y **presentas**.",
+          "notes": "Medido: caja 560 px × 4 líneas a 300 26px Pop (≈13.31 px/carácter, 5 % de holgura). Hasta 4 líneas; una sola expresión en negrita blanca (**…**)."
+        },
+        {
+          "name": "slideKicker",
+          "type": "text",
+          "required": true,
+          "maxChars": 62,
+          "example": "Comité · tercer trimestre",
+          "notes": "Medido: caja 700 px × 1 línea a 600 15px Pop en mayúsculas con tracking .14em (≈10.65 px/carácter, 5 % de holgura). Cabecera de la lámina de comité en el acento suave; la numeración de ejemplo («04 / 12») la pone la plantilla."
+        },
+        {
+          "name": "slideHeadline",
+          "type": "text",
+          "required": true,
+          "maxChars": 48,
+          "example": "La IA ya te nombra en 4 de cada 10 respuestas",
+          "notes": "Medido: caja 560 px × 2 líneas a 760 44px Bric (≈21.87 px/carácter, 5 % de holgura). El titular que escribe la IA y revisa el equipo."
+        },
+        {
+          "name": "slideFigure",
+          "type": "metric",
+          "required": true,
+          "maxChars": 27,
+          "example": {
+            "value": "+38%",
+            "label": "visibilidad en el trimestre"
+          },
+          "notes": "La cifra grande a la derecha del titular (760 88px Bric en el acento suave, ≤ 5 caracteres) y su etiqueta (400 16px Pop, ≤ 27: la aprobada, sin holgura). Valor ilustrativo: con datos del cliente sale de su edición de Insights con fuente."
+        },
+        {
+          "name": "annotation",
+          "type": "text",
+          "required": true,
+          "maxChars": 17,
+          "example": "Guía de precios",
+          "notes": "Medido: caja 150 px × 1 línea a 600 15px Pop (≈7.95 px/carácter, 5 % de holgura). Píldora azul que anota el punto de la curva donde algo cambió, con su línea punteada."
+        },
+        {
+          "name": "features",
+          "type": "list",
+          "required": true,
+          "maxChars": 62,
+          "example": [
+            {
+              "title": "Presentas en vivo",
+              "detail": "Desde el informe, con los datos al día"
+            },
+            {
+              "title": "Deck 16:9",
+              "detail": "Las láminas del comité, ya armadas"
+            },
+            {
+              "title": "PDF A4",
+              "detail": "Para mandarlo al directorio"
+            }
+          ],
+          "notes": "Exactamente 3 fichas de vidrio sobre la plataforma de luz. Por ítem: title (≤ 22; caja 272 px × 1 línea a 600 22px Pop (≈11.66 px/carácter, 5 % de holgura).) · detail (≤ 62; caja 272 px × 2 líneas a 400 16px Pop (≈8.21 px/carácter, 5 % de holgura).). Sólo formatos vivos para el cliente."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro con el halo del acento suave detrás del escenario.",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta en dos líneas con anillo, respuesta a 176 px en dos líneas con esfera y cuerpo.",
+        "La lámina de comité en perspectiva (rotateY −12°) con dos láminas apiladas detrás, la única sombra profunda y el contorno en el acento suave: cabecera, titular, cifra con su etiqueta y la curva anotada.",
+        "La barra «Modo presentación» (anterior, reproducir, siguiente) bajo la lámina.",
+        "Una sola órbita: la plataforma de luz bajo las fichas.",
+        "Pie con la burbuja URL (url-bubble-baked-dark)."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Ya está» sobre fondo Efeonce oscuro. A la izquierda: lockup de Insights opcional arriba, eyebrow, la pregunta en dos líneas con anillo, la respuesta a 176 px en dos líneas con la esfera y el cuerpo con «presentas» en negrita. A la derecha, en perspectiva, la lámina de comité con dos láminas apiladas detrás: cabecera, titular escrito por la IA, la cifra grande en el acento suave con su etiqueta y la curva con una anotación. Debajo, la barra «Modo presentación» y tres fichas sobre la plataforma de luz. Sin selección; burbuja URL en el pie."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/native/Insights-Formatos.html",
+        "slideId": "Insights-Formatos"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Respuesta ≥ 3× la pregunta (176/40 = 4,4).",
+        "El titular lo escribe la IA y lo revisa el equipo: la lámina nunca dice que sale sin revisión.",
+        "La cifra y la anotación son ilustrativas; la anotación «datos de ejemplo» vive fuera de la lámina (decisión 13).",
+        "Sólo formatos vivos para el cliente.",
+        "Español neutro, sin voseo."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 23 del deck SEO/AEO completo (17 en brochure, 18 en propuesta). Decisión 5: la lámina cuenta el valor sin armar el PPT. Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/23.jpg · brochure/17.jpg · propuesta/18.jpg."
+    },
+    {
+      "id": "content-industries",
+      "board": "Industrias",
+      "name": "Industrias · seis fichas de vidrio con la pregunta que ese comprador le hace a la IA",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-30",
+      "reference": "references/surfaces/deck/content-industries.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/27.jpg",
+      "communicates": "Efeonce conoce cómo busca el comprador de cada industria: cada ficha muestra la pregunta que ese comprador ya le hace a la IA antes de llamar.",
+      "useWhen": [
+        "Brochure o propuesta que tiene que mostrar que el equipo entiende el negocio del cliente, no sólo la técnica.",
+        "Antes o después de los casos de éxito, para abrir la conversación a la industria del cliente.",
+        "Propuesta a un cliente de una de las seis industrias: su ficha va destacada."
+      ],
+      "avoidWhen": [
+        "Se usa para afirmar experiencia probada por industria: la lámina muestra preguntas de ejemplo, no casos, y hoy no hay prueba por industria en la lámina de clientes (banca, seguros, SaaS).",
+        "El cliente es de una industria fuera de las seis: se cambia una ficha por la suya con su pregunta, no se deja una ajena destacada.",
+        "Hay un caso real de la industria del cliente: usar decision-case."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "decision-case",
+          "when": "hay un caso real de la industria del cliente con cifras y fuente"
+        },
+        {
+          "recipe": "content-clients",
+          "when": "la prueba es el muro de marcas que confían"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-markets",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-case",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "sv360-lockup-negative",
+            "alt": "Efeonce | SV360"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina)."
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 50,
+          "example": "Industrias",
+          "notes": "Medido: caja 600 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.36 px/carácter, 5 % de holgura). Color suave de la voz."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 26,
+          "example": "¿Conocemos tu industria?",
+          "notes": "Medido: caja 566 px × 1 línea a 300 40px Pop (≈20.48 px/carácter, 5 % de holgura). Descontado el anillo en el acento (18 px + 16 de separación). Una línea."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 20,
+          "example": "Por\ndentro",
+          "notes": "Medido: caja 648 px por línea a 760 128px Bric (≈57.73 px/carácter, 5 % de holgura). Hasta 10 caracteres por línea y 20 entre las dos; 1–3 palabras partidas en dos líneas con salto manual (\\n); sin punto final: cierra con la esfera en el acento. 128/40 = 3,20× la pregunta."
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 154,
+          "example": "Seis industrias donde tu comprador ya le pregunta a la IA antes de llamarte. Nosotros sabemos **qué pregunta**.",
+          "notes": "Medido: caja 540 px × 4 líneas a 300 26px Pop (≈13.31 px/carácter, 5 % de holgura). Hasta 4 líneas; una sola expresión en negrita blanca (**…**)."
+        },
+        {
+          "name": "industries",
+          "type": "list",
+          "required": true,
+          "maxChars": 62,
+          "example": [
+            {
+              "name": "Banca y finanzas",
+              "question": "¿Qué banco tiene la mejor cuenta para pymes?"
+            },
+            {
+              "name": "Seguros",
+              "question": "¿Qué seguro de auto cubre más por menos?"
+            },
+            {
+              "name": "Retail",
+              "question": "¿Dónde compro buenas zapatillas de running?"
+            },
+            {
+              "name": "Manufactura",
+              "question": "¿Qué proveedor de envases cumple la norma?"
+            },
+            {
+              "name": "Servicios profesionales",
+              "question": "¿Qué estudio contable me recomiendas?"
+            },
+            {
+              "name": "SaaS",
+              "question": "¿Qué CRM me sirve para una pyme B2B?"
+            }
+          ],
+          "notes": "Exactamente 6 fichas de vidrio en rejilla de 3 × 2 (950 px, rotada −10° y 5°); la numeración 01–06 la pone la plantilla. Por ítem: name (≤ 27; caja 256 px × 2 líneas a 760 36px Bric (≈17.89 px/carácter, 5 % de holgura).) · question (≤ 62; caja 192 px × 3 líneas a 400 17px Pop (≈8.72 px/carácter, 5 % de holgura).; la pregunta que ese comprador le hace a la IA, con el ícono Trazo «composer»). Preguntas de ejemplo: la anotación vive fuera de la lámina (decisión 13)."
+        },
+        {
+          "name": "highlightedIndustry",
+          "type": "number",
+          "required": true,
+          "example": 1,
+          "notes": "Índice (1–6) de la ficha adelantada con contorno y halo en el acento suave: la industria del cliente (en la aprobada, 1 · Banca y finanzas)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro con el halo del acento suave y tres haces de luz verticales que suben desde la plataforma.",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta en dos líneas a 128 px con esfera y cuerpo.",
+        "Seis fichas de vidrio en perspectiva; la destacada adelantada con la única sombra profunda.",
+        "Ícono Trazo «composer» en cada pregunta (de la biblioteca de íconos de AXIS).",
+        "Una sola órbita: la plataforma de luz bajo las fichas.",
+        "Pie con la burbuja URL (url-bubble-baked-dark)."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Por dentro» sobre fondo Efeonce oscuro. A la izquierda: lockup SV360 opcional arriba, eyebrow, pregunta con anillo, respuesta en dos líneas a 128 px con la esfera y cuerpo con «qué pregunta» en negrita. A la derecha, seis fichas de vidrio en perspectiva sobre la plataforma de luz, cada una con su número, el nombre de la industria y la pregunta que ese comprador le hace a la IA con el ícono composer; la industria del cliente adelantada y destacada. Sin selección; burbuja URL en el pie."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/native/industrias-gen.mjs",
+        "slideId": "Industrias"
+      },
+      "rules": [
+        "Una sola órbita por lámina: la plataforma de luz.",
+        "Preguntas de ejemplo, escritas como las haría un comprador; nunca una marca de un competidor real en la pregunta.",
+        "La lámina no afirma casos por industria: la prueba va en decision-case o content-clients.",
+        "Respuesta ≥ 3× la pregunta (128/40 = 3,2).",
+        "Español neutro, sin voseo."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 27 del deck SEO/AEO completo (19 en brochure, 21 en propuesta). Decisión 12: seis industrias (Banca y finanzas, Seguros, Retail, Manufactura, Servicios profesionales, SaaS) con la pregunta que ese comprador le hace a la IA. Pendiente de DECISIONES.md: prueba por industria (no hay clientes de banca, seguros ni SaaS en la lámina de clientes). Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/27.jpg · brochure/19.jpg · propuesta/21.jpg."
+    },
+    {
+      "id": "content-markets",
+      "board": "Mercados",
+      "name": "Mercados · las Américas de noche desde la órbita con los cinco países donde opera Efeonce",
+      "family": "content",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "photo-bleed",
+      "status": "approved",
+      "approvedAt": "2026-09-30",
+      "reference": "references/surfaces/deck/content-markets.jpg",
+      "referenceSource": "ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/completo/28.jpg",
+      "communicates": "Efeonce opera en cinco países con un solo equipo y un solo interlocutor: la escala se ve desde la órbita.",
+      "useWhen": [
+        "Brochure o propuesta a un cliente regional o multinacional: dónde operamos, de forma épica.",
+        "Después de las industrias, para cerrar el «por qué nosotros» con la escala.",
+        "Cuando la objeción es la cobertura fuera de Chile."
+      ],
+      "avoidWhen": [
+        "Los mercados de la lámina no coinciden con EFEONCE_OPERATING_MARKETS (src/config/efeonce-brand.ts): se corrige la fuente, no la lámina.",
+        "Se quiere mostrar oficinas o direcciones: la lámina marca mercados, no sedes; nunca inventar oficinas.",
+        "Un mercado nuevo sin nodo en el plate: se regenera el plate con su nodo, no se agrega una etiqueta sin nodo."
+      ],
+      "preferInstead": [
+        {
+          "recipe": "section-cine-about",
+          "when": "basta la cifra «5 países» dentro de quiénes somos"
+        },
+        {
+          "recipe": "content-clients",
+          "when": "los mercados van como celda del muro de clientes"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "content-industries",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-case",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "productMark",
+          "type": "logo",
+          "required": false,
+          "example": {
+            "asset": "sv360-lockup-negative",
+            "alt": "Efeonce | SV360"
+          },
+          "notes": "OPCIONAL (decisión del operador del 2026-09-30, deck SEO/AEO, TASK-1949): el lockup de submarca de Efeonce, tal cual sale de @efeoncepro/axis-brand-assets (0.4.5, sin editar ni recolorear). Lista cerrada: sv360-lockup-negative · sv360-logo-negative · aeo-lockup-negative · aeo-assessment-lockup-negative · ai-visibility-report-lockup-negative · insights-lockup-negative. Arriba a la izquierda sobre el margen de deck: x 140, top 44, alto 40 px (ancho por la proporción del SVG). Va sólo donde la lámina habla de esa pieza del producto (SV360 = el sistema; AEO = la capacidad; AEO Assessment = el diagnóstico; AI Visibility Report = el entregable; Insights = la edición mensual); nunca un lockup dibujado a mano ni la marca de otro. Sin el slot, la lámina es la aprobada sin lockup (una sola marca por lámina). En esta lámina el lockup va sobre la foto a sangre: ver la pregunta abierta de TASK-1949 sobre la regla «lámina con foto a sangre sin logo»."
+        },
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 50,
+          "example": "Mercados",
+          "notes": "Medido: caja 600 px × 1 línea a 500 16px Pop en mayúsculas con tracking .14em (≈11.36 px/carácter, 5 % de holgura). Color suave de la voz."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 26,
+          "example": "¿Dónde operamos?",
+          "notes": "Medido: caja 566 px × 1 línea a 300 40px Pop (≈20.48 px/carácter, 5 % de holgura). Descontado el anillo en el acento (18 px + 16 de separación). Una línea."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 20,
+          "example": "Cinco\npaíses",
+          "notes": "Medido: caja 648 px por línea a 760 128px Bric (≈57.73 px/carácter, 5 % de holgura). Hasta 10 caracteres por línea y 20 entre las dos; 1–3 palabras partidas en dos líneas con salto manual (\\n); sin punto final: cierra con la esfera en el acento. 128/40 = 3,20× la pregunta."
+        },
+        {
+          "name": "body",
+          "type": "richText",
+          "required": true,
+          "maxChars": 148,
+          "example": "Chile, Estados Unidos, Colombia, México y Perú, con **un solo equipo** y un solo interlocutor.",
+          "notes": "Medido: caja 520 px × 4 líneas a 300 26px Pop (≈13.31 px/carácter, 5 % de holgura). Hasta 4 líneas; una sola expresión en negrita blanca (**…**). La lista de países sale de EFEONCE_OPERATING_MARKETS, en su orden."
+        },
+        {
+          "name": "markets",
+          "type": "list",
+          "required": true,
+          "maxChars": 16,
+          "example": [
+            {
+              "country": "EE. UU.",
+              "city": "Miami",
+              "node": [
+                1112,
+                215
+              ],
+              "side": "right"
+            },
+            {
+              "country": "México",
+              "city": "Ciudad de México",
+              "node": [
+                958,
+                283
+              ],
+              "side": "left"
+            },
+            {
+              "country": "Colombia",
+              "city": "Bogotá",
+              "node": [
+                1132,
+                405
+              ],
+              "side": "right"
+            },
+            {
+              "country": "Perú",
+              "city": "Lima",
+              "node": [
+                1098,
+                567
+              ],
+              "side": "left"
+            },
+            {
+              "country": "Chile",
+              "city": "Santiago",
+              "node": [
+                1181,
+                773
+              ],
+              "side": "right"
+            }
+          ],
+          "notes": "Exactamente 5 etiquetas de vidrio oscuro con contorno teal, compuestas sobre los nodos del plate (medidos en MK2 1536×1024: Miami 1112,215 · Ciudad de México 958,283 · Bogotá 1132,405 · Lima 1098,567 · Santiago 1181,773; en la lámina ×1,25 y −100 px arriba). Por ítem: country (600 22px Pop, ≤ 10; «EE. UU.» abrevia Estados Unidos) · city (400 14px Pop, ≤ 16: «Ciudad de México», la más larga aprobada, sin holgura) · node (coordenadas del plate, no se editan) · side (la etiqueta a la izquierda o a la derecha del nodo, sin cruzar el vecino). Los países salen de EFEONCE_OPERATING_MARKETS; la ciudad marca el mercado, no declara una oficina."
+        },
+        {
+          "name": "photo",
+          "type": "image",
+          "required": true,
+          "example": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
+          "notes": "Plate MK2 a sangre (1536×1024 escalado a 1920×1280, top −100 px): las Américas de noche vistas desde la órbita, con exactamente cinco nodos de luz azul unidos por arcos. Los nodos están en la foto: cambiar un mercado es regenerar el plate."
+        }
+      ],
+      "fixed": [
+        "Foto a sangre del plate MK2; la voz a la izquierda en el espacio oscuro del cielo.",
+        "Voz en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta en dos líneas a 128 px con esfera y cuerpo.",
+        "Los arcos de luz entre los nodos son la órbita de la lámina (luz de la foto); sin órbita gráfica encima.",
+        "Etiquetas de país compuestas sobre cada nodo, nunca generadas por el modelo.",
+        "Pie con la burbuja URL (url-bubble-baked-dark)."
+      ],
+      "selection": {
+        "kind": "none",
+        "label": null,
+        "target": "nada"
+      },
+      "photo": {
+        "uses": true,
+        "register": "puesta-en-escena",
+        "plate": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
+        "ficha": "ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/MK2-mercados.prompt.txt",
+        "prompt": "ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/MK2-mercados.prompt.txt",
+        "postprocess": [
+          "pnpm ai:image --prompt-file ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/MK2-mercados.prompt.txt (cinco nodos exactos; se miden sus coordenadas en el plate antes de componer las etiquetas)."
+        ],
+        "replaceable": "No se cambia por cliente: es una lámina de marca propia. Se regenera sólo si cambian los mercados de EFEONCE_OPERATING_MARKETS. Descartado: MK1-mercados (sexto nodo en Brasil).",
+        "notes": "Sin personas. No es registro cine (el cine no entra en recetas de contenido): imagen puesta en escena de la órbita. Ruta local hasta el banco de plates (TASK-1931)."
+      },
+      "prompts": {
+        "composition": "Compón «Cinco países» sobre el plate MK2 a sangre (las Américas de noche desde la órbita, cinco nodos de luz unidos por arcos). A la izquierda, en el cielo oscuro: lockup SV360 opcional arriba, eyebrow, pregunta con anillo, respuesta en dos líneas a 128 px con la esfera y el cuerpo con los cinco países y «un solo equipo» en negrita. Sobre cada nodo, una etiqueta de vidrio oscuro con el país y la ciudad, sin cruzar el nodo vecino. Sin selección; burbuja URL en el pie."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/native/mercados-gen.mjs",
+        "slideId": "Mercados"
+      },
+      "rules": [
+        "Los países salen de EFEONCE_OPERATING_MARKETS; nunca un país sin nodo en el plate ni un nodo sin país.",
+        "La lámina marca mercados, no oficinas: nunca inventar sedes ni direcciones.",
+        "Una sola órbita: los arcos de luz de la foto.",
+        "Ningún texto cruza un nodo ni un arco.",
+        "Respuesta ≥ 3× la pregunta (128/40 = 3,2).",
+        "Español neutro, sin voseo."
+      ],
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 28 del deck SEO/AEO completo (20 en brochure, 22 en propuesta). Decisión 12: los mercados (Chile, EE. UU., Colombia, México, Perú) de forma épica. Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/28.jpg · brochure/20.jpg · propuesta/22.jpg."
     }
   ]
 }

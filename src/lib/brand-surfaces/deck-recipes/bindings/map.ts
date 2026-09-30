@@ -57,13 +57,19 @@ const COMPUTED_SCORE =
 
 const PRESENTATION_CHOICE = 'Elige qué destaca la lámina: es una decisión de presentación, no un dato.'
 
+const PRODUCT_MARK =
+  'Lockup de submarca de Efeonce (SV360, AEO, AEO Assessment, AI Visibility Report o Insights, de @efeoncepro/axis-brand-assets, lista cerrada): marca propia que elige quien arma la lámina según la pieza del producto de la que habla; no es dato del cliente ni de la propuesta (TASK-1949).'
+
+const MOCKUP_FIGURE =
+  'Cifra ilustrativa de la maqueta del producto (deck SEO/AEO, TASK-1949): no se liga desde un hecho del cliente. Con datos reales sale de la edición de Efeonce Insights del cliente con su fuente; la anotación «datos de ejemplo» vive fuera de la lámina.'
+
 const PARTNER_CLAIM =
   'Claim de partner de Efeonce, no dato del cliente ni de la propuesta: la insignia va con la referencia de su autorización o readback vigente (docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md; la de Salesforce, autorizada por Salesforce: `salesforce-partner-authorization-2026-09-29`, declarado por el operador); sin ella, el respaldo «Operamos sobre» + logo corporativo o nada.'
 
 /** `recipeId → slot → regla o exclusión`. */
 export const DECK_SLOT_BINDING_MAP: Record<string, Record<string, DeckSlotMapEntry>> = {
   // Portadas de propuesta: el logo del cliente de la `Proposal` (Account 360), en su versión para fondo oscuro.
-  'cover-proposal-orbit': { clientLogo },
+  'cover-proposal-orbit': { clientLogo, productMark: { excluded: true, reason: PRODUCT_MARK } },
   'cover-proposal-orbit-sky': { clientLogo },
   'cover-proposal-dawn': { clientLogo },
   'cover-proposal-dawn-sky': { clientLogo },
@@ -89,7 +95,7 @@ export const DECK_SLOT_BINDING_MAP: Record<string, Record<string, DeckSlotMapEnt
     source: { binder: 'metric-source', of: 'facts' },
     selectedFact: { excluded: true, reason: PRESENTATION_CHOICE }
   },
-  'content-day-live-results': { metrics: { binder: 'metric', count: exactly(3) } },
+  'content-day-live-results': { metrics: { binder: 'metric', count: exactly(3) }, productMark: { excluded: true, reason: PRODUCT_MARK } },
   'section-cine-about': { figures: { binder: 'metric', count: exactly(3) } },
   'proposal-service-creative': { proof: { binder: 'metric', count: optionalOne } },
   'proposal-cinematic-creative': { proof: { binder: 'metric', count: optionalOne } },
@@ -148,7 +154,8 @@ export const DECK_SLOT_BINDING_MAP: Record<string, Record<string, DeckSlotMapEnt
     shareOfVoice: { binder: 'sample-data', mark: 'sampleMark' },
     lostPrompts: { binder: 'sample-data', mark: 'sampleMark' },
     plan: { binder: 'sample-data', mark: 'sampleMark' },
-    sampleMark: { binder: 'sample-data', mark: 'sampleMark' }
+    sampleMark: { binder: 'sample-data', mark: 'sampleMark' },
+    productMark: { excluded: true, reason: PRODUCT_MARK }
   },
   'decision-ai-market': {
     figures: {
@@ -160,10 +167,11 @@ export const DECK_SLOT_BINDING_MAP: Record<string, Record<string, DeckSlotMapEnt
   // Cifras que no son datos de nadie: se calculan o las decide quien presenta.
   'method-score-ring': {
     total: { excluded: true, reason: COMPUTED_SCORE },
-    dimensions: { excluded: true, reason: COMPUTED_SCORE }
+    dimensions: { excluded: true, reason: COMPUTED_SCORE },
+    productMark: { excluded: true, reason: PRODUCT_MARK }
   },
   'decision-plan': { horizon: { excluded: true, reason: 'Horizonte del plan: lo decide quien propone y lo confirma una persona.' } },
-  'method-staircase': { selectedLevel: { excluded: true, reason: PRESENTATION_CHOICE } },
+  'method-staircase': { selectedLevel: { excluded: true, reason: PRESENTATION_CHOICE }, productMark: { excluded: true, reason: PRODUCT_MARK } },
   'method-staircase-flat': { selectedLevel: { excluded: true, reason: PRESENTATION_CHOICE } },
 
   // Deck Salesforce (2026-09-29): marcas de terceros que no son datos del cliente ni de la propuesta.
@@ -174,7 +182,27 @@ export const DECK_SLOT_BINDING_MAP: Record<string, Record<string, DeckSlotMapEnt
       excluded: true,
       reason: 'Marca de un proveedor de la práctica (Claude, de Anthropic) sujeta a su autorización de uso de marca, pendiente de archivar (biblioteca de autorizaciones: TASK-1937): no es dato del cliente ni de la propuesta.'
     }
-  }
+  },
+
+  // Deck SEO/AEO (2026-09-30, TASK-1949): lockups de submarca de Efeonce y cifras de maqueta del producto.
+  'cover-brochure-line-engine': { productMark: { excluded: true, reason: PRODUCT_MARK } },
+  'content-text': { productMark: { excluded: true, reason: PRODUCT_MARK } },
+  'proposal-cinematic-seo': { productMark: { excluded: true, reason: PRODUCT_MARK } },
+  'proposal-cinematic-aeo': { productMark: { excluded: true, reason: PRODUCT_MARK } },
+  'proposal-service-seo': { productMark: { excluded: true, reason: PRODUCT_MARK } },
+  'proposal-service-aeo': { productMark: { excluded: true, reason: PRODUCT_MARK } },
+  'content-brand-family': { productMark: { excluded: true, reason: PRODUCT_MARK } },
+  'content-service-mockups': {
+    productMark: { excluded: true, reason: PRODUCT_MARK },
+    authorityMetric: { excluded: true, reason: MOCKUP_FIGURE }
+  },
+  'content-report-formats': { productMark: { excluded: true, reason: PRODUCT_MARK } },
+  'content-committee-deck': {
+    productMark: { excluded: true, reason: PRODUCT_MARK },
+    slideFigure: { excluded: true, reason: MOCKUP_FIGURE }
+  },
+  'content-industries': { productMark: { excluded: true, reason: PRODUCT_MARK } },
+  'content-markets': { productMark: { excluded: true, reason: PRODUCT_MARK } }
 }
 
 /** Las filas con binder de una receta, en el orden del mapa. */
