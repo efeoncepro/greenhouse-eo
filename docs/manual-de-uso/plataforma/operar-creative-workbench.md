@@ -50,8 +50,11 @@ y reglas recibe, quién entra, a qué clientes y con qué acceso a IA y buckets.
 1. Agrega un miembro en `scripts/creative-workbench/control.json`:
 
    ```json
-   { "github": "usuario-github", "gcp": "nombre@efeonce.org", "clientes": ["berel", "sky"], "ia": true }
+   { "github": "usuario-github", "gcp": "nombre@efeonce.org", "ia": true }
    ```
+
+   Sin `clientes`, la persona recibe todos (`clientesPorDefecto: "todos"`, decisión del 2026-09-30). Para
+   restringirla, agrega `"clientes": ["berel", "sky"]`.
 
 2. `pnpm creative:access plan`: debe listar el alta en el equipo y los bindings de canon, clientes y, si
    `ia: true`, las llaves y Vertex.
@@ -101,9 +104,10 @@ plantilla, el sync aborta con una colisión: decide qué versión queda antes de
 | `⚠ N rutas exportables tienen cambios sin commitear` | Tu disco tiene cambios que **no** viajan | Normal en checkout compartido; commitea lo tuyo si debía viajar |
 | Skills que citan docs que no viajan | Rutas internas referidas por skills | Decide caso a caso: allowlist o nada |
 | `Sello íntegro: ✗ N anomalías` | El sello publicado no es el que greenhouse-eo habría escrito para su commit (una exención o una huella editada a mano) | Revisa el historial de `.workbench/sync.lock.json` y re-sincroniza |
-| `PR #N … ⚠ toca N gestionados` | Un PR que no viene del sync edita archivos sellados o el sello | Si el cambio es legítimo, pórtalo aquí o declara la ruta nativa; si no, pide revertirlo |
+| `PR #N … ⚠ toca N gestionados` | Un PR edita archivos sellados sin re-sellar, o re-sella con un sello que no es el de greenhouse-eo (`sync íntegro` = PR de sync auténtico) |
+| `managed-drift`: «este PR cambia el sello y no es un sync» | Un PR que no viene de `creative:sync` modificó `.workbench/sync.lock.json` | Revertir ese cambio; lo nativo se pide por issue | Si el cambio es legítimo, pórtalo aquí o declara la ruta nativa; si no, pide revertirlo |
 | `Dependencias … faltan N` | El `package.json` nativo no declara lo que necesitan los engines que se siguen entregando | Puede ser a propósito (engine desactivado); si no, pide agregarlas |
-| `native-policy` rojo en el workbench | El harness nativo dejó de cumplir una regla sellada: el guard ya no bloquea algo, `settings.json` perdió una denegación o hay código fuera del broker que llama a un proveedor | Corregirlo en el workbench; si la regla debe cambiar, se cambia en `template/gates/native-policy.json` aquí |
+| `native-policy` rojo en el workbench | El harness nativo dejó de cumplir una regla sellada: el guard ya no bloquea algo, `settings.json` perdió una denegación o apagó los hooks, o hay código fuera del broker que llama a un proveedor, importa un SDK de IA o importa el adaptador del broker | Corregirlo en el workbench; si la regla debe cambiar, se cambia en `template/gates/native-policy.json` aquí |
 | `✗ N rutas del plan ya existen en el workbench y no las gestiona el sello` (sync) | La plantilla trae un archivo que el workbench ya tiene como propio | Decláralo nativo o quítalo de la plantilla; el sync no lo pisa |
 
 ## Qué no hacer

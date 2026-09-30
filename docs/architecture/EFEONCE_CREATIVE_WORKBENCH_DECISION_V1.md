@@ -240,7 +240,7 @@ omitidos requieren canon licenciado).
 3. ~~**Política de lo nativo**~~ ✅ 2026-09-30 (§8.5).
 4. **Broker e IAM a `control.json`:** hoy la cuenta de servicio, los bindings del broker, el proyecto de
    Vercel y `production-policy.json` («todas las marcas para todo el equipo», distinto del acceso por
-   cliente de §2.4) se crearon fuera de `creative:access`/`creative:provision`. `deployment-plan.json` del
+   cliente de §2.4; resuelto en §8.6) se crearon fuera de `creative:access`/`creative:provision`. `deployment-plan.json` del
    PR #3 aún apunta al bundle `877f5806…` y el vivo es otro.
 5. **Skills vs. harness:** las 17 skills siguen indicando `pnpm foto:*`/`ai:*`, desactivados en el
    workbench; Efeonce y Berel quedaron cerrados («gated»). Hay que decidir si se entrega una capa por repo o
@@ -249,17 +249,36 @@ omitidos requieren canon licenciado).
 ### 8.5 Política de lo nativo (gate `native-policy`)
 
 `gates/native-policy.json` (reservado, sellado) declara lo que el harness nativo debe cumplir, y el gate
-`native-policy` lo verifica **por comportamiento**, sin leer el código del workbench:
+`native-policy` lo verifica **por comportamiento**, sin leer el código del workbench. Es un **lint**, no una
+frontera de seguridad: la barrera real es IAM (el equipo no tiene llaves) y la revisión de PRs.
 
-- **Guardarraíl:** ejecuta `.claude/hooks/guard.mjs` con sondas. Debe bloquear leer secretos, borrar en buckets,
-  push forzado o a `main`, leer `.env.local`, llamar a un proveedor y `--no-verify`; debe impedir editar el
-  sello y un archivo gestionado; debe dejar pasar `git status`, un push a una rama y escribir en `projects/`.
-- **Settings de Claude:** `permissions.deny` conserva las denegaciones mínimas y el hook `PreToolUse` sigue
-  corriendo el guard para Bash, Edit y Write.
-- **Proveedores:** ningún código del workbench fuera de `services/production-broker/**` contiene un host de
-  proveedor de IA. Se omiten los engines gestionados (son de greenhouse-eo) y los tests.
+- **Proveedores (primero):** ningún archivo de código o configuración (`.mjs/.ts/.sh/.py/.json/.yml`…) fuera de
+  `services/production-broker/**` contiene un host de proveedor de IA, importa un SDK de IA ni lo declara como
+  dependencia, ni importa un módulo del broker que llegue al proveedor (importar sus validadores compartidos está
+  bien). Se omiten los archivos gestionados, `gates/`, `docs/` y los tests `*.test.*` dentro de una carpeta `test/`.
+- **Settings de Claude:** `permissions.deny` conserva las denegaciones mínimas, `disableAllHooks` no está activo y
+  el hook `PreToolUse` corre exactamente `node "$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs"` para `Bash|Edit|Write`.
+- **Guardarraíl (al final, en una copia):** ejecuta `.claude/hooks/guard.mjs` sobre una copia temporal de lo
+  versionado, con un payload como el de Claude Code y valores aleatorios. Debe bloquear leer secretos, borrar en
+  buckets, push forzado o a `main` (también `rama:main`), leer `.env.local`, llamar a un proveedor y
+  `--no-verify`; debe impedir editar el sello y dos archivos gestionados elegidos al azar; debe dejar pasar
+  `git status`, un push a una rama y escribir en `projects/`. `native-policy` corre último en `run-all`.
 
-Verificado 2026-09-30 sobre copias: `main` en verde; el estado del PR #3 cumple guard y settings y falla sólo
-por `tools/provider-doctor.ts`, un archivo sin script que lo invoque que lee la llave de OpenAI de Secret Manager
-y llama a `api.openai.com` directo. Hay que retirarlo antes del sync de transición o el gate queda en rojo.
+Además, `managed-drift` compara en CI el sello del PR con el de la rama base: sólo un PR de sync puede cambiarlo, y
+`creative:status` reconoce un PR de sync porque re-sella con el sello exacto que greenhouse-eo habría escrito (no por
+el nombre de la rama).
 
+Verificado 2026-09-30 sobre copias (sync + gates): el estado del PR #3 (`7c4024d`) falla sólo por
+`tools/provider-doctor.ts` (lee la llave de OpenAI de Secret Manager y llama a `api.openai.com` directo) y por un
+guard que no bloquea `git push origin rama:main`; `main` falla sólo por lo segundo. Los tests del harness de
+Codex no cambian (152 pasan, 14 omitidos por canon licenciado). Ambas correcciones deben entrar en el PR #3 antes
+del sync de transición.
+
+### 8.6 Acceso a marcas: todo el equipo, todas las marcas (decisión 2026-09-30)
+
+El operador decidió que, por ahora, todo el equipo produce para todas las marcas. Reemplaza el acceso por cliente
+de §2.4 como valor por defecto: `control.json → clientesPorDefecto: "todos"` y `creative:access` otorga a cada
+miembro los prefijos de todos los clientes de `control.clientes` (también los que se agreguen). Un miembro puede
+restringirse declarando `"clientes": ["sky"]`. Coincide con `production-policy.json` del PR #3 («all-clients»),
+que ahora tiene respaldo en greenhouse-eo. Que una marca esté cerrada («gated», p. ej. Efeonce y Berel en el
+harness) es otra cosa: depende de que su pack esté admitido, no del acceso de las personas.

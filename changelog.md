@@ -19,7 +19,12 @@
 - Gate nuevo `native-policy` (reglas selladas para lo nativo): prueba el guardarraíl con sondas, exige denegaciones y
   hook en `settings.json` y rechaza código fuera del broker que llame a un proveedor de IA. Sobre el estado del PR #3
   sólo marca `tools/provider-doctor.ts` (llama a OpenAI directo con la llave de Secret Manager).
-- 26 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests
+- Tras una revisión adversarial con subagentes se endureció todo: el guard corre al final y en una copia con sondas
+  aleatorias, se detectan SDKs e imports del adaptador del broker, `disableAllHooks`, sellos sin commit, PRs que
+  cambian el sello sin ser sync (CI compara contra la base) y rutas nativas no canónicas.
+- `control.json → clientesPorDefecto: "todos"`: por decisión del operador, todo el equipo produce para todas las
+  marcas (ADR §8.6).
+- 33 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests
   del harness de Codex iguales antes y después. Decisión: §8 de
   [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
 
