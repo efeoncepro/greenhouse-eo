@@ -22,6 +22,8 @@
 - Tras una revisión adversarial con subagentes se endureció todo: el guard corre al final y en una copia con sondas
   aleatorias, se detectan SDKs e imports del adaptador del broker, `disableAllHooks`, sellos sin commit, PRs que
   cambian el sello sin ser sync (CI compara contra la base) y rutas nativas no canónicas.
+- Nota «En el Workbench»: el sync la inserta al inicio del `SKILL.md` de las 12 skills que mencionan `foto:*`, `ai:*`
+  o `assets:pull`, con sus equivalencias en el harness (`marca:*`); la fuente de la skill no cambia (ADR §8.7).
 - `control.json → clientesPorDefecto: "todos"`: por decisión del operador, todo el equipo produce para todas las
   marcas (ADR §8.6).
 - 33 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests

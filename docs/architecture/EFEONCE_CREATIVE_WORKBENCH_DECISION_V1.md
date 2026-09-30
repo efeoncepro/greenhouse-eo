@@ -242,9 +242,8 @@ omitidos requieren canon licenciado).
    Vercel y `production-policy.json` («todas las marcas para todo el equipo», distinto del acceso por
    cliente de §2.4; resuelto en §8.6) se crearon fuera de `creative:access`/`creative:provision`. `deployment-plan.json` del
    PR #3 aún apunta al bundle `877f5806…` y el vivo es otro.
-5. **Skills vs. harness:** las 17 skills siguen indicando `pnpm foto:*`/`ai:*`, desactivados en el
-   workbench; Efeonce y Berel quedaron cerrados («gated»). Hay que decidir si se entrega una capa por repo o
-   si `AGENTS.md` nativo lo resuelve.
+5. ~~**Skills vs. harness**~~ ✅ 2026-09-30 con la nota «En el Workbench» (§8.7). Sigue pendiente admitir
+   Efeonce (y Berel) en el harness para que la fotografía de marca vuelva a ser posible allá.
 
 ### 8.5 Política de lo nativo (gate `native-policy`)
 
@@ -282,3 +281,16 @@ miembro los prefijos de todos los clientes de `control.clientes` (también los q
 restringirse declarando `"clientes": ["sky"]`. Coincide con `production-policy.json` del PR #3 («all-clients»),
 que ahora tiene respaldo en greenhouse-eo. Que una marca esté cerrada («gated», p. ej. Efeonce y Berel en el
 harness) es otra cosa: depende de que su pack esté admitido, no del acceso de las personas.
+
+### 8.7 Nota «En el Workbench» en las skills (2026-09-30)
+
+Las skills exportadas mandan a `pnpm foto:*`, `ai:*` y `assets:pull`, que el harness nativo retira (la IA pasa por
+`marca:*` y el broker). La fuente de la skill no se toca: `export-manifest.json → skillOverlay` apunta a
+`scripts/creative-workbench/skill-overlay.md`, y `planFromSource` inserta esa nota justo después del frontmatter
+del `SKILL.md` (espejo Claude y Codex) de cada skill que menciona alguno de esos comandos, con la lista exacta que
+usa. Hoy son 12 de 17 (`export-report.json → skillOverlays`). La nota dice: el criterio de la skill sigue valiendo;
+si un comando está retirado no se busca rodeo; equivalencias (`ai:*` → `marca:producir`, `foto:componer*` →
+`marca:componer`/`marca:disenar`, `assets:pull` → `marca:instalar`); y la fotografía de marca Efeonce no está
+disponible mientras Efeonce no esté admitida. Es compatible con sellos anteriores: un commit sin `skillOverlay`
+se recalcula sin nota.
+

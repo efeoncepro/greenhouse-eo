@@ -87,6 +87,13 @@ Cuando el workbench necesita poseer un archivo que hoy recibe sellado (por ejemp
 Para devolverla a greenhouse-eo, quítala de `native.paths`. Si el archivo del workbench difiere de la
 plantilla, el sync aborta con una colisión: decide qué versión queda antes de reintentar.
 
+### Cambiar la nota «En el Workbench» de las skills
+
+Las skills que mencionan `pnpm foto:*`, `ai:*` o `assets:pull` llegan al workbench con una nota al inicio que
+traduce esos comandos al harness (`marca:*`). Para cambiarla, edita `scripts/creative-workbench/skill-overlay.md`
+(`{{comandos}}` se reemplaza por los comandos de cada skill), commitea y corre `creative:sync --pr`. Qué skills la
+reciben lo lista `.workbench/export-report.json → skillOverlays`.
+
 ### Agregar un cliente
 
 1. Agrégalo a `clientes` en `control.json`.
