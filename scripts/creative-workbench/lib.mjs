@@ -334,6 +334,36 @@ export function pinnedVersion(name, src = ROOT) {
 
 const REF_PATTERN = /(?:docs|src|scripts)\/[A-Za-z0-9_./-]+\.(?:md|ts|mjs|json|tsx)/g
 
+/** Comandos retirados (p. ej. `pnpm foto:generar`) que mencionan los archivos de texto de una skill. */
+export function retiredCommandsIn(files, src, config) {
+  const pattern = new RegExp(
+    `pnpm (?:run )?((?:${config.retiredPrefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})[A-Za-z0-9:-]*)`,
+    'g'
+  )
+
+  const found = new Set()
+
+  for (const rel of files) {
+    if (!/\.(md|ya?ml|json|txt)$/.test(rel)) continue
+    for (const m of readFileSync(path.join(src, rel), 'utf8').matchAll(pattern)) {
+      // `pnpm foto:*` se lee como la familia completa; `pnpm ai:image,` pierde la puntuación final.
+      const command = m[1].replace(/-+$/, '')
+
+      found.add(command.endsWith(':') ? `${command}*` : command)
+    }
+  }
+
+  return [...found].sort()
+}
+
+/** Inserta la nota de workbench justo después del frontmatter del SKILL.md (o al inicio si no hay). */
+export function withOverlay(text, overlay, commands) {
+  const note = overlay.replace('{{comandos}}', commands.map(c => `\`pnpm ${c}\``).join(', ')).trimEnd()
+  const fm = text.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/)
+
+  return Buffer.from(fm ? `${fm[0]}\n${note}\n\n${text.slice(fm[0].length)}` : `${note}\n\n${text}`)
+}
+
 /**
  * El plan completo para un ref: ruta destino → { content: Buffer, kind }.
  * Lee todo del ref extraído y lo carga en memoria; el directorio temporal se borra antes de volver.
@@ -391,8 +421,12 @@ export async function planFromSource(src, commit) {
     add(rel, 'template', readFileSync(path.join(templateDir, rel)))
   }
 
-  // 2. Skills, espejadas para Claude y Codex desde la misma fuente.
+  // 2. Skills, espejadas para Claude y Codex desde la misma fuente. Si el manifest declara una nota de
+  //    workbench, se inserta al inicio del SKILL.md de cada skill que menciona comandos que allá
+  //    pueden estar retirados (la fuente de la skill en greenhouse-eo no cambia).
   const skillFiles = new Map()
+  const skillOverlays = {}
+  const overlay = manifest.skillOverlay ? readFileSync(path.join(src, manifest.skillOverlay.path), 'utf8') : null
 
   for (const skill of manifest.skills) {
     const claudeRel = `.claude/skills/${skill}`
@@ -401,11 +435,23 @@ export async function planFromSource(src, commit) {
     const codexRel = existsSync(path.join(src, `.codex/skills/${skill}`)) ? `.codex/skills/${skill}` : claudeRel
 
     const claudeFiles = walk(path.join(src, claudeRel)).map(r => `${claudeRel}/${r}`)
+    const codexFiles = walk(path.join(src, codexRel)).map(r => [`.codex/skills/${skill}/${r}`, `${codexRel}/${r}`])
 
     skillFiles.set(skill, claudeFiles)
-    for (const r of claudeFiles) add(r, 'skill', fromSrc(r))
-    for (const r of walk(path.join(src, codexRel)))
-      add(`.codex/skills/${skill}/${r}`, 'skill', fromSrc(`${codexRel}/${r}`))
+
+    const commands = overlay
+      ? retiredCommandsIn([...claudeFiles, ...codexFiles.map(([, from]) => from)], src, manifest.skillOverlay)
+      : []
+
+    if (commands.length) skillOverlays[skill] = commands
+
+    const content = (rel, from) =>
+      commands.length && path.basename(rel) === 'SKILL.md'
+        ? withOverlay(readFileSync(path.join(src, from), 'utf8'), overlay, commands)
+        : fromSrc(from)
+
+    for (const r of claudeFiles) add(r, 'skill', content(r, r))
+    for (const [to, from] of codexFiles) add(to, 'skill', content(to, from))
   }
 
   // 3. Código de los CLIs: cierre de imports + datos declarados.
@@ -495,6 +541,7 @@ export async function planFromSource(src, commit) {
     // Si package.json es nativo, el workbench declara sus dependencias; estas son las que necesitan
     // los engines que greenhouse-eo sigue entregando. `creative:status` compara contra ellas.
     requiredDependencies: deps,
+    skillOverlays,
     native,
     nativeSkipped: [...nativeSkipped].sort(),
     unresolvedSkillRefs: unresolved

@@ -12,11 +12,13 @@ import {
   loadManifest,
   planFromSource,
   reconcile,
+  retiredCommandsIn,
   ROOT,
   sha256,
   TEMPLATE_REL,
   validateNativePatterns,
-  verifySeal
+  verifySeal,
+  withOverlay
 } from './lib.mjs'
 import { isNative as gateIsNative } from './template/gates/lib.mjs'
 import { validarPieza } from './template/gates/piezas.mjs'
@@ -31,6 +33,7 @@ describe('creative-workbench — plan de exportación', () => {
     requiredDependencies: Record<string, string>
     native: string[]
     nativeSkipped: string[]
+    skillOverlays: Record<string, string[]>
   }
 
   beforeAll(async () => {
@@ -101,6 +104,58 @@ describe('creative-workbench — plan de exportación', () => {
     for (const line of env.split('\n').filter(l => l.includes('_SECRET_REF=')))
       expect(line).toMatch(/_SECRET_REF=projects\/[^/]+\/secrets\/[^/]+\/versions\/latest$/)
     expect(env).not.toMatch(/sk-|AIza/)
+  })
+})
+
+describe('creative-workbench — nota de workbench en las skills', () => {
+  it('se inserta después del frontmatter del SKILL.md de las skills que usan comandos retirados', () => {
+    let plan: Map<string, Entry>
+    let report: { skillOverlays: Record<string, string[]> }
+
+    return planFromSource(ROOT, 'working-tree').then(result => {
+      ;({ plan, report } = result as unknown as {
+        plan: Map<string, Entry>
+        report: { skillOverlays: Record<string, string[]> }
+      })
+
+      expect(report.skillOverlays['greenhouse-ai-image-generator']).toEqual(
+        expect.arrayContaining(['ai:image', 'foto:*'])
+      )
+
+      for (const mirror of ['.claude', '.codex']) {
+        const text = plan.get(`${mirror}/skills/design-studio/SKILL.md`)!.content.toString()
+
+        expect(text.startsWith('---\n')).toBe(true)
+        expect(text).toContain('> **En el Creative Workbench, lee esto primero.**')
+        expect(text.indexOf('En el Creative Workbench')).toBeGreaterThan(text.indexOf('\n---\n', 3))
+        expect(text).toContain('`pnpm ai:image`')
+      }
+
+      expect(report.skillOverlays.copywriting).toBeUndefined()
+      expect(plan.get('.claude/skills/copywriting/SKILL.md')!.content.toString()).not.toContain(
+        'En el Creative Workbench'
+      )
+    })
+  }, 120_000)
+
+  it('normaliza los comandos y funciona sin frontmatter', () => {
+    const dir = mkdtempSync(path.join(os.tmpdir(), 'wb-overlay-'))
+
+    writeFileSync(
+      path.join(dir, 'a.md'),
+      'Corre `pnpm foto:*`, luego pnpm ai:image, y pnpm run assets:pull. No pnpm build.'
+    )
+    writeFileSync(path.join(dir, 'b.ts'), 'pnpm ai:fal')
+    expect(retiredCommandsIn(['a.md', 'b.ts'], dir, { retiredPrefixes: ['foto:', 'ai:', 'assets:pull'] })).toEqual([
+      'ai:image',
+      'assets:pull',
+      'foto:*'
+    ])
+    rmSync(dir, { recursive: true, force: true })
+
+    expect(withOverlay('# Skill', 'Nota: {{comandos}}', ['ai:image']).toString()).toBe(
+      'Nota: `pnpm ai:image`\n\n# Skill'
+    )
   })
 })
 

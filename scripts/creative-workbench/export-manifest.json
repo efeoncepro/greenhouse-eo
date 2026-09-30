@@ -25,6 +25,11 @@
     "higgsfield-provider",
     "dataviz-design"
   ],
+  "skillOverlay": {
+    "_comentario": "Nota que el sync inserta al inicio del SKILL.md de cada skill que menciona comandos que en el workbench pueden estar retirados (el harness nativo usa marca:* y el broker). La fuente de la skill no cambia. Ver §8.7 del ADR.",
+    "path": "scripts/creative-workbench/skill-overlay.md",
+    "retiredPrefixes": ["foto:", "ai:", "assets:pull"]
+  },
   "scripts": {
     "_comentario": "Scripts de package.json de greenhouse-eo que se exportan con el mismo nombre. Sus archivos de entrada definen el cierre de código.",
     "include": ["foto:*", "ai:image", "ai:fal", "ai:omni", "ai:image:rmbg"],
