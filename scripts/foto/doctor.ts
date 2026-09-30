@@ -99,6 +99,9 @@ const main = async () => {
   // ── 3. ADC de gcloud vigentes ────────────────────────────────────────────────────────────────────
   // Se ejercita pidiendo un token de verdad: que el archivo de credenciales exista no prueba que sirva.
   let adcOk = false
+  // En un entorno sin gcloud (sesión cloud) la clave llega directa en OPENAI_API_KEY y el resolver la toma del
+  // entorno: ahí el ADC no hace falta y su ausencia no bloquea.
+  const claveDirecta = Boolean(process.env.OPENAI_API_KEY?.trim())
 
   try {
     execFileSync('gcloud', ['auth', 'application-default', 'print-access-token'], { stdio: 'pipe', timeout: 30_000 })
@@ -106,13 +109,19 @@ const main = async () => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
 
-    añadir({
-      nombre: 'ADC de gcloud',
-      estado: 'falla',
-      detalle: /ENOENT/.test(msg) ? 'el CLI `gcloud` no está instalado' : 'no emite token (expiradas o sin configurar)',
-      arreglo: 'pnpm gcloud:auth:playwright -- --force   (renueva los DOS planos: CLI y ADC)',
-      bloquea: true
-    })
+    const causa = /ENOENT/.test(msg) ? 'el CLI `gcloud` no está instalado' : 'no emite token (expiradas o sin configurar)'
+
+    añadir(
+      claveDirecta
+        ? { nombre: 'ADC de gcloud', estado: 'aviso', detalle: `${causa}; no hace falta: OPENAI_API_KEY viene del entorno`, bloquea: false }
+        : {
+            nombre: 'ADC de gcloud',
+            estado: 'falla',
+            detalle: causa,
+            arreglo: 'pnpm gcloud:auth:playwright -- --force   (renueva los DOS planos: CLI y ADC)',
+            bloquea: true
+          }
+    )
   }
 
   // ── 4. La referencia al secreto está declarada ───────────────────────────────────────────────────
@@ -137,7 +146,7 @@ const main = async () => {
   // ── 5. El secreto resuelve de verdad ─────────────────────────────────────────────────────────────
   let clave: string | null = null
 
-  if (declarada && adcOk) {
+  if (declarada && (adcOk || claveDirecta)) {
     try {
       const r = await resolveSecret({ envVarName: 'OPENAI_API_KEY' })
 
