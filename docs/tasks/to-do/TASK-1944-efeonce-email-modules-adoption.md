@@ -367,8 +367,8 @@ Reglas obligatorias:
 
 - Fijar `@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts` `0.3.39` (contrato `efeonce.email-modules`
   `0.2.0`) y `@efeoncepro/axis-ui-registry` `0.3.4`, con `@efeoncepro/axis-graphic-line` `0.13.0` y
-  `@efeoncepro/axis-brand-assets` `0.4.6` salvo que `v0.3.39` publique otras [verificar al publicar]. `v0.3.39` está en
-  publicación: el slice se toma cuando esté en el registro. Instalar con una credencial efímera autorizada por el
+  `@efeoncepro/axis-brand-assets` `0.4.6` (publicadas el 2026-09-29: `v0.3.38` y `v0.3.39`, verificadas en el
+  registro). Instalar con una credencial efímera autorizada por el
   operador (userconfig temporal fuera del repo, borrado al terminar), según
   `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`.
 - En el mismo commit, llevar `scripts/creative/layout-compiler/graphic-line.mjs` al contrato
@@ -376,6 +376,13 @@ Reglas obligatorias:
   `severity`, `severityLabel`, `scaleVisible` y `glow`) y el `0.5.0` (recorrido de la medida, parte `travelled` del
   manifiesto) agregan. El pintor del adapter dibuja el recorrido bajo la estela con los valores de
   `efeonceGraphicLine.trajectory.measure.travelledPath`.
+- Sumar `pnpm creative:layout:test` a la CI: hoy no corre en ningún workflow y por eso el adapter quedó en 0/7 desde
+  `9289cab0c` sin que nadie lo viera.
+- Efecto visual esperado, no regresión: con `axis-graphic-line` `0.13.0` el gráfico de medida de Marketing con
+  Manzanitas (`manzanitasChartSvg`, que reutiliza `measureSvg`) dibuja el recorrido desde las 12. El gate
+  `pnpm composer:visual-gate --catalog=manzanitas` mostrará esa diferencia; se declara en una sección sin sellar de
+  `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` como cambio aprobado por el operador (2026-09-29,
+  «aplícalo en todas») y se re-congela. El resto de la línea gráfica no cambia de geometría.
 - Correr `pnpm brand:tokens`, `pnpm glitch:tokens` y `pnpm manzanitas:tokens`, con sus `--check` (regla de todo bump de
   `axis-tokens`), y `pnpm creative:layout:test`.
 
