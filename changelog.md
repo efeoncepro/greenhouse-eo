@@ -9,6 +9,12 @@
 
 ## 2026-09-30 — Creative Workbench: rutas nativas selladas y `creative:status` por REST
 
+- Delta documental posterior: skill `efeonce-creative-workbench` completa y espejada Codex/Claude,
+  ADR de aislamiento, planes y evidencia SKY, TASK-1945/1946/1947 y TASK-1952 (Efeonce ID diferido).
+  Routers y [continuidad fechada](.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
+  apuntan al harness activo en Workbench. Lotes PR 11 y contornos PR 12 integrados allí; referencias
+  corregidas con `--native-previews`, corridas antiguas requieren una ejecución nueva. Sólo docs en
+  Greenhouse: sin engines, auth nueva, sync total, broker deploy ni IA habilitada.
 - `export-manifest.json` gana `native.paths` (harness propio del workbench) y `native.reserved` (gates, workflow
   `gates`, `CODEOWNERS`, `.workbench/**`). Lo nativo sale del plan; el sync lo **entrega** (lo suelta del sello sin
   borrarlo), sella la lista en `sync.lock.json → native` y aborta si una ruta del plan ya existe en el workbench sin

@@ -1,0 +1,526 @@
+{
+  "status": "observed-not-approved",
+  "observedOn": "2026-09-29",
+  "fileKey": "ZhnJUPqzvYqy7nTcLLKLr1",
+  "pages": [
+    {
+      "id": "0:1",
+      "name": "Page 1"
+    },
+    {
+      "id": "112:6",
+      "name": "Page 2"
+    },
+    {
+      "id": "2099:7760",
+      "name": "Color Tokens"
+    }
+  ],
+  "total": 24,
+  "styles": [
+    {
+      "id": "S:932ba9711402df2a2a34103d58ed0c06140e97f0,",
+      "name": "Display/3XL",
+      "font": {
+        "family": "Inter",
+        "style": "Black",
+        "variationSettings": {
+          "wght": 900,
+          "slnt": 0
+        }
+      },
+      "size": 128,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 128
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:c1cf3d07167001c9a899ce89b3c27db67e670f56,",
+      "name": "Display/2XL",
+      "font": {
+        "family": "Inter",
+        "style": "Black",
+        "variationSettings": {
+          "wght": 900,
+          "slnt": 0
+        }
+      },
+      "size": 120,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 120
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:4828602340772629c4d07b8c8ed6d439587357d1,",
+      "name": "Display/XL",
+      "font": {
+        "family": "Inter",
+        "style": "Bold",
+        "variationSettings": {
+          "wght": 700,
+          "slnt": 0
+        }
+      },
+      "size": 112,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 112
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:28083a28107b1a033bb6e4e1c4e0ca3b0905a418,",
+      "name": "Display/LG",
+      "font": {
+        "family": "Inter",
+        "style": "Bold",
+        "variationSettings": {
+          "wght": 700,
+          "slnt": 0
+        }
+      },
+      "size": 96,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 96
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:f9fc166b9a91b9e16ea94128f1dbbcc563aceb49,",
+      "name": "Display/MD",
+      "font": {
+        "family": "Inter",
+        "style": "Bold",
+        "variationSettings": {
+          "wght": 700,
+          "slnt": 0
+        }
+      },
+      "size": 80,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 80
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:20e1c3ca350cdbae95bf2f08a177665ce7a6c9f2,",
+      "name": "Display/SM",
+      "font": {
+        "family": "Inter",
+        "style": "Bold",
+        "variationSettings": {
+          "wght": 700,
+          "slnt": 0
+        }
+      },
+      "size": 72,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 72
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:6d0b347edbc142718baee5bc2506dae6679f2d29,",
+      "name": "Display/XS",
+      "font": {
+        "family": "Inter",
+        "style": "Bold",
+        "variationSettings": {
+          "wght": 700,
+          "slnt": 0
+        }
+      },
+      "size": 64,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 64
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:f429fb161d95fc1bebb1c194c78562659672bcaa,",
+      "name": "Heading/2XL",
+      "font": {
+        "family": "Inter",
+        "style": "Black",
+        "variationSettings": {
+          "wght": 900,
+          "slnt": 0
+        }
+      },
+      "size": 56,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 56
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:7af1e5db8d58100d9152db01c8eeae155052c298,",
+      "name": "Heading/XL",
+      "font": {
+        "family": "Inter",
+        "style": "Black",
+        "variationSettings": {
+          "wght": 900,
+          "slnt": 0
+        }
+      },
+      "size": 48,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 48
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:d6858f2326e4af7b088bdc08d558eba8c38a6209,",
+      "name": "Heading/LG",
+      "font": {
+        "family": "Inter",
+        "style": "Black",
+        "variationSettings": {
+          "wght": 900,
+          "slnt": 0
+        }
+      },
+      "size": 40,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 40
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:1f2b0efb0a6c8db7fbfce5147419b5cc9018cbaa,",
+      "name": "Heading/MD",
+      "font": {
+        "family": "Inter",
+        "style": "Bold",
+        "variationSettings": {
+          "wght": 700,
+          "slnt": 0
+        }
+      },
+      "size": 32,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 32
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:5843451f3d313bf2c148a0d2c6a471650e5d73bd,",
+      "name": "Heading/SM",
+      "font": {
+        "family": "Inter",
+        "style": "Bold",
+        "variationSettings": {
+          "wght": 700,
+          "slnt": 0
+        }
+      },
+      "size": 28,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 28
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:f7da1c4d107bf82706eff74f5df900ef8a8106c2,",
+      "name": "Heading/XS",
+      "font": {
+        "family": "Inter",
+        "style": "Bold",
+        "variationSettings": {
+          "wght": 700,
+          "slnt": 0
+        }
+      },
+      "size": 24,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 24
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:7f571f21a4fc8eb41f34e297517abe68a82630bb,",
+      "name": "Label/LG",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 28,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 28
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:69dc14d0ee4df03362837626cf1f9aa2cd85da81,",
+      "name": "Label/MD",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 24,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 24
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:a8d617fe902a44310da5a88ee0837ebde2e8e231,",
+      "name": "Label/SM",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 20,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 20
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:3ff8568aa78834b546e59a77042bd83ff3cb55df,",
+      "name": "Label/XS",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 16,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 16
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:c3cea2454c13d9b275466f382f88b648167d09c3,",
+      "name": "Label/2XS",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 12,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 12
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:1d5eddb1fb639a32ad9d61b7da97b9e9bcf0c386,",
+      "name": "Body/LG",
+      "font": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "size": 24,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 24
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:2c7b2cf920b99515eefc5c670fba98c6d23057fa,",
+      "name": "Body/MD",
+      "font": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "size": 20,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 20
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:d3bcb164d5a3e837cb2670705b86609d918e3628,",
+      "name": "Body/SM",
+      "font": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "size": 16,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 16
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:9a2e8635eee905725006e7e80e9365104d426982,",
+      "name": "Body/XS",
+      "font": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400,
+          "slnt": 0
+        }
+      },
+      "size": 12,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 12
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:6f9436dfcdd368b4383fead208627e318ec74e55,",
+      "name": "Subtitle/LG",
+      "font": {
+        "family": "Inter",
+        "style": "Semi Bold",
+        "variationSettings": {
+          "wght": 600,
+          "slnt": 0
+        }
+      },
+      "size": 32,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 32
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    },
+    {
+      "id": "S:31c6438a12cd80ddc32419debcdb765cde117e0a,",
+      "name": "Subtitle/MD",
+      "font": {
+        "family": "Inter",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "slnt": 0
+        }
+      },
+      "size": 30,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 35
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 0
+      }
+    }
+  ]
+}

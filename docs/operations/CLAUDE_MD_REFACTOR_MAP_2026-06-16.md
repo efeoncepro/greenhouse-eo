@@ -320,3 +320,10 @@ Repetidos inline ~8-12× cada uno; consolidar en `docs/architecture/GREENHOUSE_C
 | 475 | KEEP | Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI | (stays — trim to résumé where flagged) |
 | 446 | KEEP | Avatares de usuario — helper canónico (fuente única, desde 2026-06-05) | (stays — trim to résumé where flagged) |
 | 53 | KEEP | Otras convenciones | (stays — trim to résumé where flagged) |
+
+## Router de dominios — regla conservada 2026-09-30
+
+Al registrar Creative Workbench, se trasladó aquí la introducción del router sin editar su
+contenido. CLAUDE.md mantiene un enlace a este bloque y carga skill/invariantes por dominio.
+
+> **`CLAUDE.md` es un ROUTER, no un spec-store.** Inline queda lo transversal. Los **invariantes operativos por dominio** (`NUNCA`/`SIEMPRE` específicos de un subsistema) viven **load-on-demand** en su spec/companion — esta tabla dice dónde. Al tocar un dominio: cargar su skill **y** su doc de invariantes. Cada dominio también tiene un pointer inline (con sus reglas más peligrosas) más abajo. **Auto-load nativo (Claude):** `.claude/rules/<dominio>.md` (frontmatter `paths:`) carga el pointer al companion automáticamente al tocar `src/lib/<dominio>/**` — no cuentan al budget (cargan solo al tocar el path). **Subagentes:** si un spawn falla por límite de contexto (el Explore built-in hereda ~170k de tool defs MCP), usar el subagente `explore-lite` (`.claude/agents/`, sin MCP). CLI de gobernanza: `pnpm claude-md {inventory\|budget\|audit\|check}` (`check` = budget `--strict` + rule-audit; gate de no-pérdida + anti-re-acreción @35k, workflow `claude-md-governance.yml`). Mapa completo del refactor: `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md`.
