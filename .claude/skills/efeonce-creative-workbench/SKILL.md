@@ -1,6 +1,6 @@
 ---
 name: efeonce-creative-workbench
-description: Operar y mantener Creative Workbench, el harness multimarcas del equipo Efeonce; producir KV y adaptaciones SKY con sus componentes nativos, fotografía admitida, paquetes privados y corridas gobernadas, y conservar sus decisiones y continuidad. Aplicar a creative-workbench; no sustituye las skills de identidad Efeonce ni de contenidos Berel.
+description: Operar y mantener Creative Workbench, el harness multimarcas del equipo Efeonce; producir KV y adaptaciones SKY con sus componentes nativos, fotografía admitida, paquetes privados y corridas gobernadas; consultar íconos SKY y variantes en el Lab, y conservar sus decisiones y continuidad. Aplicar a creative-workbench; no sustituye las skills de identidad Efeonce ni de contenidos Berel.
 ---
 
 # Efeonce Creative Workbench
@@ -19,6 +19,8 @@ SKY v6 fue publicado y cotejado en el alias protegido `creative-workbench-sky.ve
 Greenhouse incorporó la base documental mediante PR246
 sobre `develop`; no es una promoción de Greenhouse a producción. La implementación modular
 ya permite componer mediante agentes; IA, acceso definitivo y distribución tienen gates aparte.
+La extensión de [íconos SKY](references/icons.md) añade selección exacta y `/iconos/`
+con QA local; sigue candidata, sin admisión productiva ni nueva publicación acreditada.
 Leer primero [flujo de agentes](references/agent-production.md), luego la referencia del paso.
 [Estado y pendientes](references/state-continuity.md) distingue código, evidencias y runtime.
 
@@ -49,6 +51,7 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 | Componer por módulos, corregir logo/flecha/CTA/texto/máscara/círculos | [components.md](references/components.md) |
 | Inspeccionar cada capa, tokens/bindings, descomponer, extraer o reconstruir SKY por receta | [autonomous-components.md](references/autonomous-components.md) |
 | Identificar una composición nombrada, leer su receta y producir adaptaciones por lotes de agentes | [recipes.md](references/recipes.md) |
+| Consultar íconos SKY, variantes `kind`/tamaño, fuente Figma, `/iconos/` o admitirlos a una receta | [icons.md](references/icons.md) |
 | Usar, mantener o presentar el Lab premium Astro/TS/Tailwind, Efeonce + cliente | [lab.md](references/lab.md) |
 | Configurar/verificar identidad Git de cada persona, hooks y evitar rechazo de autor en Vercel | [operations-distribution.md](references/operations-distribution.md), sección de identidad Git |
 | Instalar canon, consumir/publicar paquetes, broker, archivo y Vercel | [operations-distribution.md](references/operations-distribution.md) |
@@ -63,6 +66,8 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 
 - Resolver cliente → `brandId` → pack/version/SHA → operación/IDs. Sin marca por defecto;
   no arrastrar fuentes, prompts, skills, fotos o componentes de la pieza anterior.
+- Consultar o descargar una fuente candidata no admite un recurso productivo. Los íconos
+  SKY usan IDs y variantes nativas exactas, sin recolor/default/fallback de marca; ver [íconos](references/icons.md).
 - Compartir motores neutrales no comparte identidad visual. AXIS no es un default de SKY.
   Un pack gated o recurso ausente falla cerrado; no alterar hashes/cache/policy para aprobarlo.
 - Mantener CLIs de Greenhouse intactas. Producción y ports autorizados se hacen en Workbench.

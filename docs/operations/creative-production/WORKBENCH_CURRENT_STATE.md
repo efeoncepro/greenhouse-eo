@@ -7,6 +7,31 @@ por sí solo flags, presupuesto, permisos o un despliegue del broker.
 
 ## Cambios integrados y sus fuentes
 
+### Unidad nueva local: íconos SKY — 2026-10-01
+
+El corte publicado PR17 indicado arriba permanece separado de la nueva colección:
+101 familias, 1.919 variantes nativas y 303 originales/alternativas (2.222 SVG).
+La importación y `/iconos/` del Lab están implementadas/validadas en Workbench local,
+con acceso desde Recursos y navegación. Commit local `af6f5e273249f8902c9bae8fb0334667b3cc23dc` en
+`codex/workbench-docs-consolidation`; no se acredita push, merge ni deployment
+de esta unidad. `productionAdmitted: false`: consulta/selección/descarga disponibles,
+sin nuevos IDs de recurso admitidos en los jobs de campaña.
+
+El selector `marca:iconos`/`selectSkyIcon` exige familia, kind y canvas nativo exactos;
+no sustituye combinaciones ausentes, recolorea ni cruza marcas. Son 1.200 exports
+directos y 1.022 SVG proyectados de los trazados REST completos tras HTTP 429.
+Los 1.200 controles técnicos pasan; faltan exports SVG independientes de los otros
+1.022 y su revisión/admisión productiva. No se reintentó ni eludió el límite.
+
+Fuentes canónicas de Workbench: `docs/manual/sky-icon-library.md`,
+`docs/architecture/workbench-lab-navigation.md` y
+`docs/ui/reviews/workbench-sky-icons-2026-10-01.md`.
+[Skill de operación](../../../.codex/skills/efeonce-creative-workbench/references/icons.md) ·
+[Cierre documental](../../audits/creative-workbench/2026-10-01-sky-icons-documentation-closure.md).
+IA, Efeonce ID, Packages y licencias Metric mantienen sus pendientes propios.
+
+### Unidades integradas anteriores
+
 | Unidad | Evidencia integrada | Dueño canónico |
 |---|---|---|
 | Corrección frente a Figma | [PR 14](https://github.com/efeoncepro/creative-workbench/pull/14), `be57032`; revisión técnica de 126 pares independientes | Workbench `docs/architecture/workbench-sky-reference-comparison.md` |

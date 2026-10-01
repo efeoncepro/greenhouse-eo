@@ -88,6 +88,7 @@ nativas; `.workbench/sync.lock.json` conserva el sello histórico, no se regener
 | Consumidor del broker | `tools/broker-client.mjs`, `tools/marca-producir.mjs` |
 | Composición propia | `tools/marca-disenar.mjs`, `tools/brand-design.mjs` |
 | Catálogo/zonas | `tools/kv-zones.mjs`, `docs/architecture/workbench-kv-zones.md` |
+| Colección candidata de íconos SKY, distinta del pack Brandlift | `brands/sky-airline/icon-library/`, `tools/marca-iconos.mjs`, `docs/manual/sky-icon-library.md`; [operación](icons.md) |
 | Componentes SKY | `brands/sky-airline/components/index.mjs`, `native-graph.mjs`, `assemble.mjs` |
 | Biblioteca modular ejecutada y tokens | `brands/sky-airline/components/autonomous-scene.mjs`, `property-tokens.mjs`, `figma-property-bindings.mjs`, `docs/architecture/workbench-sky-autonomous-components.md` |
 | Lotes productivos | `tools/marca-lote.mjs`, `docs/architecture/workbench-design-batches.md`, `docs/manual/design-batches.md` |

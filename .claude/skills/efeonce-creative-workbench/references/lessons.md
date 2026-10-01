@@ -17,6 +17,11 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 
 | Síntoma o afirmación | Causa / evidencia útil | Acción correcta |
 | --- | --- | --- |
+| Descargar una librería se anuncia como íconos operativos en campañas | Candidata importada y selector de lectura no amplían IDs/slots del pack | Admitir recurso/placement por revisión, nueva corrida y QA; [íconos](icons.md) |
+| Duotone 24 devuelve otro tamaño o familia homónima | Selección implícita por parecido/nombre y fallback | ID de familia/nodo + kind/tamaño exactos; vacío/rechazo y alternativa sólo explícita |
+| 2.222 SVG se anuncian como exports directos cotejados | 429 tras 1.200; 1.022 proceden de paths REST sin control SVG directo | Conservar representation y cobertura; 1.200 controles PASS no certifican los restantes |
+| Token o binding de íconos se asume igual a Brandlift | Fuente Figma diferente y coincidencia de hex/nombre | IDs y recibos propios, sin traducción visual automática ni recolor libre |
+| Archivo parcial importado tras 429 se copia como colección completa | Export incompleto sin cobertura | Respetar Retry-After, canon privado nuevo y validación de cobertura; no eludir cuota ni sobrescribir |
 | Lab cliente usa titulares de venta de vuelos | Confundir marca presentada con autoría/objetivo del producto | Design System Lab de Efeonce para SKY; títulos funcionales, host Bricolage/Poppins y artwork Metric separados |
 | Card dentro de card en recetas, fuente y metadatos | Interpretar contención como un borde/fondo/radio por dato; v4 rechazada | V5: panel por tarea y card sólo para entidad seleccionable; interiores planos con espacio/reglas |
 | Bibliotecas animan cada card al abrir details | Extender coreografía narrativa a lectura densa | Escena de composición localizada; bibliotecas estáticas, reduced/reactivo y HTML visible |

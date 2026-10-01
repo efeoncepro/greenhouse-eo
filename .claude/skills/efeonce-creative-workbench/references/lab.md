@@ -66,6 +66,16 @@ manual, `workbench-lab-navigation.md`, `design-qa.md`, dirección/QA
 `workbench-surface-economy-v5` y `workbench-filter-selects-v6`. Los cortes históricos
 inferiores conservan los hechos de su fecha y no sustituyen este estado.
 
+## Extensión local: íconos SKY — 2026-10-01
+
+La página `/iconos/` queda enlazada desde Recursos y sidebar del cliente; la
+colección es candidata y no cambia los siete vectores permitidos por la biblioteca
+anterior ni el pack. Reutiliza `FilterSelect` para kind/tamaño, filtro por nombre/ID,
+24 iniciales/más/reset, SVG/Figma/selector y archivo de originales. Host Efeonce y
+SVG SKY separados. HTML sin JS conserva familias y todas las variantes.
+[Íconos](icons.md) conserva fuente, API/CLI, procedencia, admisión pendiente y QA
+local; el deploy v6 anterior no acredita esta extensión ni se modifica por ella.
+
 ## Histórico: demostración productiva local — 2026-09-30
 
 El Lab en `http://127.0.0.1:4194/` se recargó y comprobó con una captura real: muestra las
@@ -114,6 +124,7 @@ Dentro del checkout `creative-workbench`, abrir:
 | Cómo está construido y por qué | `docs/architecture/workbench-lab-astro.md` |
 | Identidad Efeonce host, fonts OFL y galerías de altura variable | `docs/architecture/workbench-lab-efeonce-host.md` |
 | Cómo lo usa una persona y cómo compilarlo | `docs/manual/workbench-lab.md` |
+| Colección candidata de íconos y variantes nativas | `docs/manual/sky-icon-library.md`, `docs/ui/reviews/workbench-sky-icons-2026-10-01.md`; [referencia](icons.md) |
 | Navegación, mesa opción 2 y filtros | `docs/architecture/workbench-lab-navigation.md` |
 | Dirección vigente de superficies y menús | `docs/ui/visual-directions/workbench-surface-economy-v5.md`, `workbench-filter-selects-v6.md`; v1–v4 son antecedentes |
 | Coreografía host y sus modos | `docs/ui/motion/workbench-premium-v2.md` y corrección de alcance v5 |
@@ -187,20 +198,22 @@ archivo privado y lectura de bytes servidos. No enviar assets de SKY a un Lab de
 
 Bajo `apps/brand-reference`:
 
-- `src/pages/index.astro`, `lab-guide.astro`, `tokens.astro`, `tipografia.astro` y `recursos.astro`: portada, ayuda y bibliotecas dedicadas; consumen
+- `src/pages/index.astro`, `lab-guide.astro`, `tokens.astro`, `tipografia.astro`, `recursos.astro` e `iconos.astro`: portada, ayuda y bibliotecas dedicadas; consumen
   `readLabData()` de `src/lib/lab-data.ts`.
 - `src/layouts/LabLayout.astro`: documento, landmarks, imports compilados de `src/styles/global.css` y `galleries.css`, y
   entrada `src/scripts/lab.ts` para páginas de biblioteca; cada módulo inicializa sólo sus controles presentes.
 - `src/components/`: `LabHeader`, `LabFooter`, `LabHero`, `DesignGallery`, `AdaptationGallery`,
   `ZoneInspector`, `TokenLibrary`, `BrandResources`, `MetricSpecimen`, `AssetGallery`, `ProductionGuide`, `PieceDialog`,
-  `CompositionLibrary`, `RecipeAdaptation`, `RecipeDialog` y `FilterSelect`, todos `.astro`.
+  `CompositionLibrary`, `RecipeAdaptation`, `RecipeDialog`, `FilterSelect` e `IconLibrary`, todos `.astro`.
   Usan props `LabData` y escaping normal; no insertar strings de markup con `set:html`.
+  `IconLibrary` serializa sólo datos en `application/json`, escapando `<`; el cliente
+  los valida por schema antes de usar DOM. Esa serialización no admite HTML de la fuente.
 - `src/scripts/`: `tokens.ts`, `gallery.ts`, `compositions.ts`, `dialog.ts`, `navigation.ts`, `zones.ts`, `catalog.ts`,
   separados por responsabilidad; `filter-select.ts` mejora ambos selectores y `motion.ts`
   limita la coreografía host. `src/lib/gallery-model.ts` posee el filtrado puro tipado.
 - `src/scripts/masonry.ts` inicializa/refresca spans de galería y `src/lib/masonry-model.ts` posee
   `masonrySpan`; el layout no pertenece a geometría/recetas productivas.
-- `build.mjs`, `design-samples.mjs`, `host-assets.mjs`: admisión gobernada, datos/bytes de build,
+- `build.mjs`, `design-samples.mjs`, `host-assets.mjs`, `icon-projection.mjs`: admisión gobernada, datos/bytes de build,
   galería seleccionada y host. No llevar esa lectura privada a componentes o módulos navegador.
 
 El body fija marca, packVersion, catalogVersion y SHA de los bytes exactos servidos de `kv-zones.json`.

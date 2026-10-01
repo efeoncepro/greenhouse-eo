@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Corte 2026-10-01: sistema SKY activo en creative-workbench/brands/sky-airline; PR14 corrige 126 referencias independientes y PR15 integra componentes autónomos/recibos de propiedades preservando PNG y SVG exactos. Lab PR16 integrado main c3e85b6; skill PR246 integrado develop d4dad02. Figma126 revisión técnica completada, sin aprobación comercial. Contratos 0.2.0 preparados localmente; publicación/consumo de esa versión y distribución licenciada Metric/onboarding pendientes. El sistema inicial sky-brand-system es histórico; ver WORKBENCH_CURRENT_STATE.`
+- Status real: `Corte 2026-10-01: sistema SKY activo en creative-workbench/brands/sky-airline; PR14 corrige 126 referencias independientes y PR15 integra componentes autónomos/recibos de propiedades preservando PNG y SVG exactos. Lab PR16/17 integrado main 7e4c617; íconos adicionales/componentes y página Lab en commit local af6f5e2, candidatos sin admisión productiva ni deploy. Skill PR246 integrado develop d4dad02; actualización documental/skill de íconos local. Figma126 revisión técnica completada, sin aprobación comercial. Contratos 0.2.0 preparados localmente; publicación/consumo de esa versión y distribución licenciada Metric/onboarding pendientes. El sistema inicial sky-brand-system es histórico; ver WORKBENCH_CURRENT_STATE.`
 - Rank: `1`
 - Domain: `platform|tooling|content`
 - Blocked by: `none`
@@ -34,6 +34,15 @@ y la [skill espejo](../../../.codex/skills/efeonce-creative-workbench/SKILL.md).
 PR15/PR16 Workbench y PR246 Greenhouse están integrados; los cortes fechados inferiores conservan
 historia y no sustituyen el estado actual. Esta actualización no cierra onboarding, distribución,
 IA ni Efeonce ID por inferencia y no mueve la task a complete.
+
+Actualización documental 2026-10-01: biblioteca adicional de íconos SKY importada y
+componentizada en Workbench local (101 familias, 1.919 variantes y 303 originales/
+alternativas), con `/iconos/` en el Lab. Se documentó consulta/selección exacta;
+`productionAdmitted: false` y no hay release de paquete ni admisión en jobs por
+este avance. Pendientes: exports independientes para las 1.022 proyecciones REST,
+revisión/admisión de recursos/placement y publicación autorizada del snapshot.
+[Evidencia y owners](../../audits/creative-workbench/2026-10-01-sky-icons-documentation-closure.md).
+Los acceptance criteria de distribución/licencias/producción no cambian de estado.
 
 ## Summary
 

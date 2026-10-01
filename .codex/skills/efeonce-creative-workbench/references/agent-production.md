@@ -18,6 +18,11 @@ copy/foto. Una biblioteca exportada permite inspección y roundtrip, **no** un J
 agente edita para cambiar geometría. Nuevas estructuras, estilos o fuentes requieren admisión
 de mantenimiento. Una nueva campaña cambia contenido de slots propios, no el pack de marca.
 
+La [biblioteca de íconos SKY](icons.md) se puede consultar/seleccionar por ID,
+kind y canvas nativo, y presentar en `/iconos/`. Sigue candidata: si el brief
+pide incorporarla a una pieza, detener ese cambio de estructura para admisión de
+mantenimiento; no pasar SVG/URL/path libre ni confundir selector readonly con job.
+
 ## 1. Preparar persona, máquina y marca
 
 1. Leer Workbench `AGENTS.md`, `CLAUDE.md`, README, catálogo, pack, brief y estado Git. Preservar

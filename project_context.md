@@ -275,7 +275,7 @@ Todo trabajo formal sigue `intake -> taxonomy -> plan -> execution -> verificati
 ## Contexto por dominio
 
 Router: [AGENTS.md](AGENTS.md#router-de-dominios) y `docs/operations/agent-context-router.json`.
-Cargar skill, invariantes y task. Workbench: [estado/Lab](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md), skill `efeonce-creative-workbench`.
+Workbench: [estado/Lab](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md) y [skill](.codex/skills/efeonce-creative-workbench/SKILL.md).
 Si falta una regla:
 
 1. buscar keyword en arquitectura, operations y skills;

@@ -30,8 +30,32 @@ revisión de PNG → selección y snapshot Lab. No necesita editor visual ni act
 Usar [flujo de agentes](agent-production.md), [SKY](sky-production.md),
 [autónomos](autonomous-components.md) y [Lab](lab.md) según el paso.
 
+### Extensión local de íconos — 2026-10-01
+
+Sobre integración de PR17, la fuente adicional SKY está importada/componentizada:
+101 familias, 1.919 variantes exactas y 303 originales/alternativas; 2.222 SVG.
+1.200 exports directos y 1.022 proyecciones REST; comparación técnica de 1.200
+controles PASS, sin controles SVG directos de los restantes. CLI/API readonly,
+`kind`/canvas obligatorios, SHA/IDs propios, sin default/cross-brand/recolor.
+`/iconos/` queda enlazada desde Recursos/sidebar Efeonce, con búsqueda, filtros,
+descargas, selector y fallback HTML. Fuente y flujo completos en [íconos](icons.md).
+
+Snapshot local `97833101dac0cd43824982f2ffea9605dc01d12e78282f4ebc7955a462b0bfe2`,
+2.537 archivos, cero fuentes licenciadas; QA Workbench registra 20 tests Lab, tres
+componentes, cuatro Python, cuatro gates, TS7/Astro y browser desktop/móvil.
+Preview fechado 49732 y QA `docs/ui/reviews/workbench-sky-icons-2026-10-01.md`.
+Commit local Workbench `af6f5e273249f8902c9bae8fb0334667b3cc23dc` en
+`codex/workbench-docs-consolidation`; no acredita push/merge/CI remoto/deploy
+de esta unidad. La publicación v6 anterior no la contiene por inferencia.
+La colección permanece `imported-source-candidate`, `productionAdmitted: false`;
+no cambia jobs, pack, 108 tokens, 126 adaptaciones ni Packages.
+
 ### Pendientes vigentes y siguiente evidencia
 
+- **Íconos nuevos:** commit local registrado arriba; push/CI/deploy/readback
+  son pasos posteriores. Para campaña, maintainer admite recurso y placement propios
+  en revisión del pack/receta y revisa nueva corrida; no ampliar el activador de fuentes
+  ni transportar SVG/path/URL libres en jobs. Ver [íconos](icons.md).
 - **IA/broker:** el último estado fechado continúa IA OFF; no hubo deploy monetario por PR15/16/17.
   Refrescar revisión/tráfico/policy, demostrar techos/cotizaciones/reservas y hacer canary autorizado
   antes de anunciar generación operativa. 50 USD/persona y 500 USD/organización por mes UTC,

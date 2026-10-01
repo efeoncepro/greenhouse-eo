@@ -17,6 +17,11 @@ comprobar escala y máscara; no agrandarlo con CSS del Lab ni dibujar otro avió
 Canon Workbench: `docs/architecture/workbench-sky-modular-components.md` y
 `brands/sky-airline/components/`. La composición no redibuja cada adaptación a mano.
 
+La biblioteca adicional de [íconos SKY](icons.md) contiene 101 familias y variantes
+nativas `kind`/tamaño, con receta `sky.icon.native-variant.v1`. Es una colección
+candidata separada del grafo productivo: seleccionar una variante no sustituye
+las instancias admitidas ni amplía recursos/slots de una campaña.
+
 ## Biblioteca y grafo
 
 Las 21 familias son canvas, photo, brand-logo, cta, offer-arrow, fare-price, fare-conditions,

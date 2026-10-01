@@ -28,6 +28,14 @@ carriles propios. Otro cliente requiere su pack y snapshot admitidos.
 | Tipografía `/tipografia/` | Cinco muestras Metric trazadas a SVG desde caras verificadas; los binarios privados no se distribuyen. |
 | Recursos `/recursos/` | Recursos admitidos y relaciones con componentes/composiciones/recetas. Un módulo semántico no se confunde con un logo oficial. |
 | Guía `/lab-guide/` | Recorrido funcional del Lab y límites de referencia/producción. |
+| Íconos `/iconos/` — unidad local | 101 familias SKY, 1.919 variantes por kind/tamaño y archivo de 303 originales/alternativas; búsqueda, SVG y selector para agentes. Candidatos separados del pack; no admite recursos al producir. |
+
+La sexta página es una extensión local posterior al snapshot PR17 publicado. Su
+presencia en localhost no acredita disponibilidad en Vercel. Recursos y navegación
+la enlazan en el build nuevo; su estado/cobertura se leen en
+[continuidad vigente](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md).
+Los SVG conservan color/geometría SKY, mientras controles y tipografía usan Efeonce.
+No se atribuye licencia abierta ni aprobación de campaña a la importación.
 
 La mesa seleccionada en Product Design, opción 2, continúa como tres regiones de trabajo.
 Las variantes vienen de la receta admitida; compartir destino o dimensiones no crea esa relación.

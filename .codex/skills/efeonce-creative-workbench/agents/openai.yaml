@@ -1,4 +1,4 @@
 interface:
   display_name: "Efeonce Creative Workbench"
-  short_description: "Operar Workbench y producir campañas SKY por módulos"
-  default_prompt: "Usa $efeonce-creative-workbench para retomar el harness y producir una pieza SKY con fuentes admitidas y revisión del resultado."
+  short_description: "Operar Workbench, componentes SKY y biblioteca Lab"
+  default_prompt: "Usa $efeonce-creative-workbench para retomar el harness, resolver la marca y operar componentes o bibliotecas del Lab; producir SKY sólo con recursos admitidos y revisión del resultado."

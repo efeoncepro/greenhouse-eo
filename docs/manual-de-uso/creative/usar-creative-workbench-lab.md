@@ -61,6 +61,29 @@ no a la pieza SKY. No copiar estilos de la UI para reconstruir contenido del cli
 
 ## Motion y fallbacks
 
+### Explorar la nueva biblioteca de íconos (unidad local)
+
+En el snapshot nuevo de Workbench, abrir **Recursos → Explorar íconos** o **Íconos**
+en la navegación; la ruta es `/iconos/`. No agregar esa ruta al alias publicado
+como si ya estuviera desplegada: comprobar primero su estado/build actual.
+
+1. Buscar nombre, ID de componente o nodo Figma **de familia**, sin exigir tildes.
+2. Elegir kind (Outline, Filled o Duotone) y tamaño nativo. Si no existe la
+   combinación, usar otro tamaño o pulsar la sugerencia explícita; no hay fallback.
+3. Descargar el SVG exacto; abrir **Variantes y receta** para sus 19 combinaciones,
+   fuente y selector de agente. **Mostrar más** agrega 24 familias; reset vuelve
+   a Outline / 24 y limpia la búsqueda.
+4. Abrir **Originales y alternativas** para los otros 303 vectores por nodo.
+   Sin JS quedan visibles todas las familias y descargas/disclosures HTML;
+   filtros, paginación y copia requieren la mejora cliente.
+
+Consulta API/CLI, tamaños admitidos, procedencia y mantenimiento en Workbench
+`docs/manual/sky-icon-library.md` y la
+[skill](../../../.codex/skills/efeonce-creative-workbench/references/icons.md).
+Los candidatos no se insertan en jobs por path/SVG libre. Para nuevos KV se
+necesita una revisión propia de recurso/placement/receta y QA, conservando marca,
+fuente y hashes. La página no altera las 126 adaptaciones ni los 108 tokens.
+
 La portada se compone con scroll manual en desktop; las bibliotecas mantienen lectura estable.
 Reduced motion ofrece la misma información sin ensamblaje/entradas. En móvil la escena es compacta.
 Sin JavaScript o Popover API el selector nativo conserva su etiqueta/valor; recetas y galerías

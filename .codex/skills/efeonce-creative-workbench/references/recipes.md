@@ -14,6 +14,11 @@ fills/strokes originales (4.684 efectivos); no cambiar retroactivamente la semá
 ni declarar sus diez tokens curados como bindings. Ver [autónomos](autonomous-components.md).
 El [flujo de agentes](agent-production.md) organiza plan, reparto, ejecución y cierre.
 
+La receta candidata `sky.icon.native-variant.v1` pertenece a la nueva
+[biblioteca de íconos](icons.md): resuelve un recurso por `componentId`/`kind`/`size`.
+No es una composición adicional, no altera las 37 recetas ni añade slots a sus
+126 adaptaciones. Admitir un ícono/placement a esas escenas sigue siendo mantenimiento.
+
 ## Prueba de composición a cuatro formatos — 2026-09-30
 
 La pieza `projects/sky/always-on-modular-demo`, en `/tmp/cw-sky-production-flow`, usa tres
