@@ -15,6 +15,7 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 | SKY se ve “S > I Y” o Y recortada | Paths escalados, offsets/clip de master sin escalar | Pins nativos de escala en logo.mjs, paths oficiales intactos |
 | Línea blanca en unión de flecha | Fills independientes con antialias | Un contorno exterior continuo, no ampliar/retocar PNG |
 | Flecha blanca detectada como color incorrecto | Cuatro paints blancos legítimos de fuente | Conservar variante nativa; test sobre fondo contrastante |
+| Fondo de sticker redondo deforme, borde circular correcto | FRAME plenamente redondeado aproximado con curvas Q en vez de su `fillGeometry` | Preservar trazado/winding/transformación; baseline 126 por fuente; referencias con `--native-previews`, corridas viejas se recomponen en run nuevo |
 | Premio recortado / sticker rectangular | Precedencia de tamaño de instancia y OUTLINE mask | Contenedor/máscara source-specific, no modificar artwork |
 | Legal pierde énfasis / cuotas uniformes | Mixed styles olvidados durante shapeado | Regular/Semibold y Black/Medium exactos, case nativo |
 | Cielo correcto aislado pero texto ilegible | Reserva no proyectada al FILL/crop o nubes bajo texto blanco | Medir pieza final; foto/variante apropiada, sin scrim que esconda fallo |

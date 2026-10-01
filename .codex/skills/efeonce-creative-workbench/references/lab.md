@@ -274,6 +274,34 @@ Tokens: búsqueda, conteo/empty y copiar con feedback visible/anunciado; error d
 Sin JavaScript el catálogo HTML completo conserva navegación, imágenes y links; modal, filtros e
 inspector interactivos dependen de sus módulos y datos, con aviso explícito de esa dependencia. Reduced-motion mantiene el estado final y evita desplazamientos innecesarios.
 
+## Referencias con contornos nativos y muestras productivas
+
+Desde PR 12 (main `2bb761aa2f76a22a0e9ca8530cfdcc064cf64a91`), el build admite
+`--native-previews` como último argumento, después de `--design-runs` si hay selección.
+El default sigue mostrando los originales históricos. Para el modo corregido:
+
+```sh
+pnpm reference:build sky-airline projects/sky/always-on-reference/runs/<uuid> \
+  --kv-exports /ruta/privada/kv-source-exports \
+  --design-runs projects/sky/always-on-modular-demo/lab-selection.json \
+  --native-previews
+```
+
+Resolver las rutas y el UUID existente; omitir la selección para un Lab sin muestras productivas.
+El modo verifica todos los previews originales y recompone 126 referencias con el pack SKY
+admitido por marca/versión/SHA/procedencia. No usa proveedores ni crea corridas de campaña.
+`reference-projections.json` liga original, template, PNG/SVG nuevo y renderer por formato;
+`manifest.json.nativeReferenceProjection` sella el documento. El baseline geométrico del renderer
+conserva hashes originales y nuevos: 21 PNG cambian, 105 conservan sus bytes. No comparar un
+PNG proyectado con el SHA del preview original ni alterar el catálogo para hacerlos coincidir.
+
+El flag no recompone los outputs seleccionados por `--design-runs`. Una muestra antigua con
+círculos deformados necesita una nueva corrida autorizada y una selección revisada; nunca editar
+el run completado, su UUID, output o evidencia. La proyección mantiene aprobación comercial
+`none` y no prueba fidelidad visual 126/126. Dueños Workbench: `docs/manual/workbench-lab.md`
+(«Previews originales y contornos corregidos») y `docs/architecture/workbench-sky-vector-containers.md`.
+Las máscaras OUTLINE de dos fuentes mantienen sus pins aparte; no confundirlas con el fondo circular.
+
 ## Procedimiento de build, revisión y despliegue
 
 En Workbench, con canon propio instalado y corrida primaria existente:

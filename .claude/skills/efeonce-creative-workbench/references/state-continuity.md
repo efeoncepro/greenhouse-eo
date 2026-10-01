@@ -1,6 +1,42 @@
 # Corte de continuidad: 2026-09-30
 
-## Corte nuevo: producción SKY y guard de pago — 2026-09-30
+## Corte vigente: lotes de agentes y círculos nativos integrados — 2026-09-30 (Chile)
+
+Workbench [PR 11](https://github.com/efeoncepro/creative-workbench/pull/11) está mergeado en
+`b8e944dd3e8b6717a7690cfb705a3d2820156b5d`. [PR 12](https://github.com/efeoncepro/creative-workbench/pull/12)
+está mergeado en `2bb761aa2f76a22a0e9ca8530cfdcc064cf64a91`, el 2026-10-01T00:06:54Z.
+Este es el baseline de código verificado al corte; refrescar GitHub antes de asumir que sigue
+siendo el último. `marca:lote` ya permite componer campañas con jobs completos y aislados;
+la prueba real fue de cuatro formatos, no 126 campañas ni generación pagada.
+
+Los contenedores cuadrados plenamente redondeados con `fillGeometry` conservan el círculo
+nativo y su transformación. Contenedores ordinarios mantienen su fallback; los dos pins de
+máscara OUTLINE no se amplían. El baseline geométrico sella 126 fuentes contra FIG/pack/renderer:
+21 PNG cambian y 105 conservan sus bytes. Privado **277 PASS/0 SKIP**; público
+**259 PASS/18 SKIP licenciados exactos**; cuatro gates PASS. CI PR 12: gates `36794450982` y
+native-harness/lab-checks `36794451041` SUCCESS. Vercel informó preview SUCCESS; no acredita
+inspección del sitio público ni el dominio creative.efeonce.org.
+
+Lab local recompilado con `--native-previews`: 126 referencias y cuatro muestras de corridas
+anteriores, 308 archivos, digest `d68376a194183bc17b55949ca8dd59f8874fdc148f7c30a2ecefeee59eebc408`.
+Se inspeccionó el círculo de Calama en PNG y navegador. Evidencia privada en el canon del
+maintainer `operations/2026-09-30-circular-contours/`: site, logs, verification.json y comparación
+antes/después. No mover binarios a Git. Ver [lab.md](lab.md) y [components.md](components.md).
+
+**Pendientes concretos:** las muestras productivas antiguas cuadrado/story requieren corridas
+nuevas: el intento fue rechazado antes de ejecución por falta de sesión propia GitHub o Google,
+sin llamadas pagadas. `--native-previews` no cambia sus outputs. No editar una corrida cerrada ni
+inventar revisión visual. Fidelidad Figma 126/126, foto nueva adecuada, habilitación monetaria y
+onboarding de cada integrante siguen pendientes. Efeonce ID permanece diferido (TASK-1952),
+sin AUTH paralelo. No hubo deploy del broker en esta unidad; el estado IA OFF de los cortes
+anteriores es evidencia fechada, debe revalidarse antes de operar.
+
+Este corte documental no certifica su propio push: comprobar commit remoto y PR. Los cortes
+inferiores son historia, incluidos estados «sin push», hashes anteriores, OAuth propio propuesto
+y pruebas del candidato de identidad. No usarlos como autoridad actual.
+
+
+## Histórico: producción SKY y guard de pago — 2026-09-30
 
 Baseline de esta unidad: `609d876feeef46b5785171d321fb4898ad9973cf`; incluye PR 8 y PR 9,
 pruebas modulares y reemplazo de foto proporcional por fuente exacta. Efeonce ID continúa diferido
@@ -32,7 +68,7 @@ producción, conservando IA OFF y controles monetarios. La autenticación defini
 Efeonce ID, nunca un AUTH paralelo. Ver [budget.md](budget.md) para el port y sus límites.
 
 
-## Corte vigente: canary de identidad 9/9, candidato sin promoción — 2026-09-30
+## Histórico: canary de identidad 9/9, candidato sin promoción — 2026-09-30
 
 **Git y CI:** Greenhouse registró documentos propios en `ccabbbf1e9e24e4760700bbad2bea052f4a31756`
 y luego `95125d8a6`, ambos **sin push**. Este corte nuevo no está commiteado. Workbench

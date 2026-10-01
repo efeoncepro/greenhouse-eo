@@ -33,7 +33,7 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 | Comprender motores, autoridad, packs, locks y límites entre repos | [architecture.md](references/architecture.md) |
 | Crear una campaña SKY, cambiar imagen/copy, obtener todos los formatos | [sky-production.md](references/sky-production.md) |
 | Producir o evaluar fotografía SKY, blur, cielo, color y reservas de texto | [sky-photography.md](references/sky-photography.md) y skill original admitida de SKY |
-| Componer por módulos, corregir logo/flecha/CTA/texto/máscara | [components.md](references/components.md) |
+| Componer por módulos, corregir logo/flecha/CTA/texto/máscara/círculos | [components.md](references/components.md) |
 | Identificar una composición nombrada, leer su receta y producir adaptaciones por lotes de agentes | [recipes.md](references/recipes.md) |
 | Usar, mantener o presentar el Lab premium Astro/TS/Tailwind, Efeonce + cliente | [lab.md](references/lab.md) |
 | Instalar canon, consumir/publicar paquetes, broker, archivo y Vercel | [operations-distribution.md](references/operations-distribution.md) |
