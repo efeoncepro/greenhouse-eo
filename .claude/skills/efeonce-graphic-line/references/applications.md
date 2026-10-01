@@ -9,7 +9,9 @@ TASK-1927 — 2026-09-27 · §L «Recetas con plantilla desde TASK-1928»: árbo
 «Láminas SEO/AEO con plantilla desde TASK-1934» (AXIS `v0.3.23`, `develop` tras `af32d9353`) — 2026-09-28 · versiones
 vigentes de §L (AXIS `v0.3.24`, greenhouse-eo@53002b352) — 2026-09-28 · §C4 (módulos de correo) y el camino recorrido
 de la medida: AXIS `main` `c92160b`, tag `v0.3.38` — 2026-09-29 · §L «El deck SEO/AEO» (catálogo `2f2784d93`,
-intents `2382ed624`, orden `b84ec7084`; sin plantillas ni AXIS todavía) — 2026-09-30
+intents `2382ed624`, orden `b84ec7084`; sin plantillas ni AXIS todavía) — 2026-09-30 · §A11 (perfiles sociales de
+Efeonce): `develop` en `d1a41babb` (commits `877165732`, `9e8f5feda`, `d8cb83b9a`, `4e362bb8b`, `d1a41babb`, sin
+push) — 2026-10-01
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -219,6 +221,9 @@ vale en toda aplicación:
   dejarla libre es **inferido**; verificar en la vista real.
 - **Cómo se produce:** no hay receta: se compone con `composeGraphicLine` tomando la lámina como referencia.
 - **Fuente:** L 4.1; L 1.4.
+- **Superada el 2026-10-01 para los perfiles de Efeonce:** las portadas aprobadas (página y perfil personal, con
+  medidas, logo y zonas seguras verificadas) están en **A11**; «Te hacemos visible.» quedó objetada como portada.
+  Esta tarjeta queda como antecedente de la lámina 4.1.
 
 ### A7. Avatar e ícono
 
@@ -228,6 +233,8 @@ vale en toda aplicación:
   corta · logo completo en un avatar.
 - **Tamaño mínimo:** isotipo 24 px en pantalla; a 16 px el favicon se valida aparte.
 - **Fuente:** L 3.3, L 5.5; M §8.4.
+- **Avatar de redes (2026-10-01):** el canónico de LinkedIn, Instagram, Facebook y YouTube va sobre el oscuro
+  Efeonce con el halo de la órbita, sin anillo ni arco; ficha en **A11**.
 
 ### A8. Anuncios con CTA (paid media, con foto de marca)
 
@@ -281,6 +288,101 @@ vale en toda aplicación:
 - **Errores comunes:** usarlo como ícono de fila «porque se ve mejor» · agrandar un volumen a partir del plano en la
   pieza · un volumen bajo 160 px.
 - **Fuente:** guía de iconografía de AXIS §«Plastilina en volumen»; T `icons.volume`; decisión D24.
+
+### A11. Perfiles sociales de Efeonce: portadas, avatar y destacados de Instagram (aprobado 2026-10-01)
+
+- **Para qué:** la cara de Efeonce en sus redes —portadas de la página de LinkedIn, de Facebook y de YouTube, el avatar,
+  los destacados de Instagram— y la portada de LinkedIn que cada persona del equipo puede usar en su perfil. El
+  operador lo declaró parte del universo gráfico de Efeonce («ya forma parte del universo gráfico de Efeonce»). Para
+  estas superficies reemplaza A6 y A7.
+- **Piezas y lienzos** (medidas y zonas seguras verificadas en la sesión; las de cada red cambian: reverificar antes
+  de una pieza nueva):
+
+  | Pieza | Lienzo | Variantes | Lo que tapa o recorta la red |
+  |---|---|---|---|
+  | LinkedIn, página de empresa | 1128 × 191 | 8 | el logo de la página tapa la esquina inferior izquierda |
+  | LinkedIn, perfil personal (equipo) | 1584 × 396 | 8 | la foto de perfil, abajo a la izquierda: ≈ 3–22 % del ancho en escritorio y hasta ≈ 29 % en el celular |
+  | Facebook | se sube 1640 × 624 | 8 | escritorio 820 × 312; el celular (640 × 360) recorta los costados: franja segura central de 1110 px; la foto de perfil va abajo a la izquierda y el texto termina antes |
+  | YouTube | 2560 × 1440, ≤ 6 MB | 8 | mínimo 2048 × 1152; zona segura 1235 × 338 sobre el mínimo (≈ 1546 × 423 a 2560: x 508–2052, y 509–931); en escritorio se ve la franja 2560 × 423: la cara de Nexa centrada en y ≈ 690 |
+  | Avatar de redes | 1080 × 1080 | 1 | un solo archivo para LinkedIn, Instagram, Facebook y YouTube |
+  | Destacado de Instagram, portada | 1080 × 1920 con el cuadro aprobado al centro (`v01`) | 9 | sirve para **cambiar** la portada de un destacado que ya existe |
+  | Destacado de Instagram, historia completa | 1080 × 1920, escena completa (`v02`) | 9 | sirve para **crear** el destacado |
+
+- **Las ocho portadas** son 2 mensajes × 4 fotos cine de Nexa:
+  - «¿Cuántos formatos? **Todos.**» — línea Growth (`#36c8bf`); fotos `PS1b` (base; «Esa de Nexa queda»), `PS7b`
+    (desliza), `PS6` (estallido) y `PS8` (mosaico).
+  - «¿Entre cientos de marcas, a quién cita la IA? **A ti.**» — línea Engine (`#0375db`); fotos `PS2c` (base, la
+    tarjeta repintada como horizontal), `PS3` (elige), `PS5` (pasillo) y `PS4` (respuesta).
+- **Va:** la voz de la línea —pregunta en Poppins 300 con el anillo del acento, respuesta en Bricolage 760 con su
+  esfera, al menos 3× la pregunta— sobre el oscuro `#001a33`, y la foto cine de Nexa. **La portada lleva una idea
+  propia**, no un par del catálogo ([criteria.md](criteria.md) §4).
+- **Logo:**
+  - **Página de Efeonce:** abajo; centrado si el centro queda libre, si no (las ocho aprobadas) bajo la columna de
+    texto. Anchos reales: Facebook 156 px (25 % del lado corto de 624), YouTube 200 px dentro de la zona segura,
+    LinkedIn de la página 96 px.
+  - **Perfil personal:** pequeño (120 px), bajo el texto y fuera de la órbita.
+  - Nunca dentro de la órbita (§0.2).
+- **Registro cine con Nexa protagonista:** aprobado en estas portadas y en los destacados (amplía el §2 del
+  [registro cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) para estas
+  superficies). No alcanza a piezas sociales con personas del equipo. Fotografía: skill `design-studio`,
+  `efeonce-photographic-language.md` §«Cine · La marca en su película».
+- **Avatar de redes:** el isotipo de Efeonce en negativo al 60 % del ancho sobre `#001a33`, con el halo de la órbita
+  (paradas del token), **sin anillo ni arco** («Y sobre el avatar ok, es el que mejor ves? Si es así Ok»).
+- **Destacados de Instagram** («Aprobadas todas.»): **mezcla de recursos, no nueve tomas iguales** (ojo, Nexa,
+  objetos del oficio, cada uno con su escena; [criteria.md](criteria.md) §7):
+  01 Glitch (el ojo de Nexa con la manzana de Glitch en bytes; sub-línea Glitch, [glitch.md](glitch.md)) · 02 AEO
+  (Nexa con la tarjeta que eligió la IA) · 03 Creatividad a escala (Nexa con una órbita de pantallas) · 04 Portafolio
+  (abanico de piezas bajo un foco) · 05 Studio (Run & Gun, detrás de cámara filmando a Nexa) · 06 Agents (tres Sparks,
+  los mini bots de Nexa) · 07 Podcast (micrófono macro con onda de luz) · 08 Recetas (mise en place de chef con luz,
+  pigmento y fotogramas: IA generativa) · 09 Behind the build (manos construyendo una interfaz sobre un plano). Un
+  color de luz por destacada sobre oscuro; **sin firma en el círculo** (a ese tamaño no se lee: la marca la pone el
+  avatar).
+- **Cómo funciona un destacado** (operador, 2026-10-01): para **cambiar** la portada de un destacado existente basta la
+  imagen de portada; para **crearlo** hay que publicar primero una historia 9:16 **completa** y agregarla. Instagram
+  toma la portada del **círculo central** (franja y 420–1500 de 1920). Una historia con bandas lisas arriba y abajo no
+  sirve. Zonas calmas: arriba ≈ 14 % y abajo ≈ 20 % (nombre de la cuenta y barra de respuesta).
+- **Historia completa desde la portada aprobada:** se extiende la foto aprobada a 9:16 y se repone el cuadro aprobado
+  por el borde del círculo, nunca por una línea recta; dentro del radio 488 px los píxeles son los aprobados, byte a
+  byte (verificado en las 9). Receta: skill `design-studio`, `efeonce-photographic-language.md` §«Extender una foto
+  aprobada a 9:16 conservando el centro»; trampas en [lessons.md](lessons.md) (2026-10-01).
+- **Portada de LinkedIn personal, derivada de la corporativa:** 1584 × 396; el texto empieza en x 480 (deja libre la
+  foto de perfil); la foto se corre a la derecha y el hueco se llena **reflejando su propio borde** (un fondo plano o un
+  fundido dejan una franja de otro tono); donde las pantallas tocan el texto, la foto se corre más (Formatos 240 px,
+  Estallido 220 px; el resto 80 px); logo de 120 px bajo el texto, fuera de la órbita.
+- **Nitidez de un destacado blando:** una edición con GPT Image que pide sólo detalle y conserva la composición
+  funcionó (Glitch, Portafolio, Recetas). En Portafolio y Recetas el modelo metió personas ajenas al roster: se
+  sacaron con recorte. **Nunca** personas fuera del roster en una foto de marca.
+- **Cómo se produce:** fichas `foto:*` y plates de la corrida; composición en el canvas de Claude Design (las fuentes
+  se suben como asset `/_blob/`); render final desde un HTML local con Playwright abierto como archivo
+  (`page.goto('file://…')`) tras `document.fonts.ready`. Las personales salen de
+  `personal/linkedin-personal.mjs`.
+- **Nunca:** un par del catálogo como portada social («¿Qué hace Efeonce? Crecer.» se rechazó: «Really? WTF?»; «Te
+  hacemos visible.» ya estaba objetada) · el logo dentro de la órbita · nueve destacados con la misma toma, o íconos
+  planos («eso lo podría hacer mi hija de 10 años») · firma dentro del círculo del destacado · una historia con bandas
+  lisas para crear un destacado · personas fuera del roster · un fondo plano o un fundido para llenar el hueco al
+  correr la foto.
+- **Dónde está:**
+  - Canvas [«Portadas sociales Efeonce»](https://claude.ai/artifact/THt6cp3Pc2njxN7Takevuu) (páginas mezcla, híbrido,
+    ojos, punch, linkedin, avatar, destacados, conceptos, variaciones, ronda-1); sistema de diseño en Claude
+    [«Efeonce — La órbita»](https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc) (namespace `EfeonceOrbit`).
+  - Repo: `ai-generations/2026-09-30_portadas-sociales/` → `fichas/` (PS*, PX*, PH*), `plates/`, `nitidez/`,
+    `finales/{linkedin,linkedin-personal,facebook,youtube,avatar,destacados-instagram,historias-destacados}/`,
+    `historias/` (bases, máscaras, extensiones), `personal/linkedin-personal.mjs` y `personal/avisos-linkedin-1a1.ts`.
+  - Kit del equipo: sección «Tu portada de LinkedIn» (`#linkedin`) con las 8 personales en la página de cada persona
+    (`https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html`; generador
+    `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs`). Archivos:
+    `gs://efeonce-group-axis-public-media/team/linkedin-covers/v1/efeonce-linkedin-perfil-<id>-1584x396.png` (+
+    `min/…jpg` 792 × 198); ids `formatos`, `formatos-desliza`, `formatos-estallido`, `formatos-mosaico`, `aeo`,
+    `aeo-elige`, `aeo-pasillo`, `aeo-respuesta`.
+  - OneDrive (`Alineación/`): `5. Contenidos/05. Highlights/2026-10 Destacados La órbita/` (`v01` portadas, para
+    cambiar; `v02` historias completas, para crear; LEEME y manifiesto SHA-256) ·
+    `5. Contenidos/13- Branding/Redes sociales Efeonce/2026-10 La órbita/v01/{LinkedIn,Facebook,YouTube,Avatar,LinkedIn perfil personal}/`
+    · `6. Marca/Kit media/Portadas de LinkedIn/2026-10 La órbita/` (las 8 personales).
+- **Estado:** aprobado y entregado. Aviso 1:1 por TeamBot a Andrés, Daniela, Melkin, Humberly y Valentina el
+  2026-10-01 (identidad confirmada en Entra antes de cada envío; los cinco ok). **Pendiente, del operador:** publicar
+  en cada red del perfil de Efeonce y crear los destacados en Instagram; las historias de adentro de cada destacado
+  (más allá de la de portada).
+- **Fuente:** [ledger.md](ledger.md), filas 2026-10-01, (b), (c) y (d).
 
 ---
 
@@ -807,8 +909,10 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Story 9:16 | lente con órbita | foto, voz, firma; zonas de interfaz libres | `lensRecipe('story')` |
 | Carrusel | sin regla (inferido: una por lámina) | como post | consultar |
 | LinkedIn 1200×627 | lente a la derecha | voz + prueba a la izquierda | `lensRecipe('linkedin')` |
-| Portada LinkedIn 1584×396 | órbita a la derecha con halo, un solo anillo, sin el logo adentro | promesa con esfera + mecanismo | `composeGraphicLine` desde L 4.1 |
-| Avatar / favicon | ninguna (el isotipo ya es órbita) | isotipo al 60 % | archivo oficial |
+| Portadas de perfil de Efeonce (LinkedIn página y personal, Facebook, YouTube) | — (la voz lleva anillo y esfera; el logo nunca va dentro de una órbita) | voz con idea propia, foto cine de Nexa, logo abajo (página) o de 120 px bajo el texto (personal) | A11; finales en `ai-generations/2026-09-30_portadas-sociales/` |
+| Avatar de redes | ninguna (el isotipo ya es órbita); halo sin anillo ni arco | isotipo negativo al 60 % sobre `#001a33` | A11 |
+| Favicon / ícono de app | ninguna (el isotipo ya es órbita) | isotipo al 60 % | archivo oficial |
+| Destacados de Instagram | — | mezcla de recursos, un color de luz por destacada, sin firma en el círculo; portada (cambiar) e historia completa 9:16 (crear) | A11 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |
 | Objeto de Plastilina en volumen (portada, KV, social de un objeto, escenario, merch) | la que pida la pieza (combinación con la órbita sesgada, por decidir) | un objeto protagonista, desde 160 px, voz y firma | `volumeIconUrl(glyph)` |
@@ -854,11 +958,12 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 
 ## Lo inferido en este archivo (confirmar con el operador)
 
-1. Dónde va el logo en la portada de LinkedIn, ahora que no va dentro de la órbita (A6). *(La tensión «logo dentro de
-   la órbita» quedó decidida el 2026-09-26, D5: §0.2.)*
+1. ~~Dónde va el logo en la portada de LinkedIn~~ **decidido el 2026-10-01** (A11): abajo en la página, de 120 px bajo
+   el texto en el perfil personal. *(La tensión «logo dentro de la órbita» quedó decidida el 2026-09-26, D5: §0.2.)*
 2. La grilla y la existencia del post 1:1 como aplicación de la línea (A2).
 3. Todo el carrusel (A4): no hay regla.
-4. Que el banner 1584 × 396 sea la portada de perfil/página, y dejar libre la zona de la foto de perfil (A6).
+4. ~~Que el banner 1584 × 396 sea la portada de perfil/página~~ **resuelto el 2026-10-01** (A11): 1584 × 396 es la
+   del perfil personal (texto desde x 480, libre la foto de perfil); la página de empresa usa 1128 × 191.
 5. El webinar/transmisión (B5) y que la pantalla de recepción siga con el cierre de marca y no con el reveal.
 6. Que el marcador de estado de sala se produzca con `stateMarkerSvg` / elemento `state` (D2).
 7. Que la cocina no lleve logo en el muro (D3).
@@ -920,7 +1025,8 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 3. El acento nunca en texto de menos de 24 px: el rótulo del primer paso de una propuesta va en blanco o en el suave.
 4. El isotipo de la prenda se compone desde `@efeoncepro/axis-brand-assets`; el que dibuja el modelo se rechaza.
 5. Registro cine sólo con Nexa protagonista, en `proposal-cinematic` (personas del equipo con su uniforme por
-   registro) y, por excepción aprobada el 2026-09-27, en las láminas de sección y «about» del deck; cámara a ~2 m,
+   registro) y, por excepción aprobada el 2026-09-27, en las láminas de sección y «about» del deck (fuera del deck,
+   sólo las portadas de perfil y los destacados de Efeonce con Nexa, A11); cámara a ~2 m,
    85 mm; nunca dos personas mirándose de cerca.
 6. Motion: se anima la línea, no la foto; la foto sólo se acerca, en escala logarítmica y nunca mientras entra la
    voz; tiempos desde `efeonceGraphicLine.motion` y `efeonceGraphicLine.surfaces.motion`, nunca en un script.

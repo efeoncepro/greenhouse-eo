@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.20
+> **Versión:** 1.21
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-29 por Claude (1.20: §1.3 — la medida dibuja su recorrido desde las 12, en su color, al 60 % y con 0,75 × el trazo de la estela (`efeonceGraphicLine.trajectory.measure.travelledPath`, contrato `efeonce.graphic-line-orbit` 0.5.0); §10.2.1 nueva — módulos canónicos de correo (pie, CTA principal, agenda y bloque de marca), «Suscribirme» retirado, PNG para correo y contrato `efeonce.email-modules` 0.1.0; §13.1 con AXIS `v0.3.38`; Greenhouse aún fija 0.3.37 y lo adopta TASK-1944. Antes, 1.19: §1 — el color de la medida apunta al token `efeonceGraphicLine.measureSeverity` y al contrato `efeonce.graphic-line-orbit` 0.4.0, publicados en AXIS `v0.3.30`; §7.2, §8.5, §8.6 y §13.1 con ese juego y el contrato `efeonce.ai-visibility-report` 0.1.0 del AI Visibility Report; Greenhouse aún fija 0.3.29. Antes, 1.18: §1 — color de la medida con gravedad, excepción aprobada para la portada del AI Visibility Report. Antes, 1.17: §7.2 nueva — submarcas de producto SEO/AEO (SV360, AEO, AEO Assessment, AI Visibility Report), «la órbita vive en la O», línea Engine, lockups y variante `white`; §8.6 con `axis-brand-assets` 0.4.2 publicado el 2026-09-29. Antes, 2026-09-28, 1.16: §7.1 precisada contra el código — página del Lab de Insights aún sin publicar, variante negativa también en la portada de presentación, mini-lockups de capítulo, tamaños en uso en Think, imagen OG, pantallas de estado, recetas del deck y la decisión abierta del color de «INSIGHTS» en las portadas PDF. Antes, 1.15: §7.1 nueva — Insights, marca de producto que acompaña: construcción, reglas, lockup, dónde se aplica y gaps; §8.6 con `axis-brand-assets` 0.4.0. Antes, 1.14: §10.0 al día con el cierre de TASK-1928 — las 69 recetas del deck con plantilla en el Artifact Composer, AXIS fijado en `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19, enlace a la spec técnica `GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`. Antes, 2026-09-27, 1.13: §10.0 al día con el cierre de TASK-1927 — contrato `efeonce.surface-composition` 0.1.2 publicado en AXIS `v0.3.14` y fijado en Greenhouse; el deck con sus 16 plantillas, incluidas las portadas y contraportadas, y el documento completo con `pnpm brand:compose`; el contenido de una lámina es dato del intent. Antes, 1.12: portadas y contraportadas aprobadas por el operador — pares aprobados para portadas y contraportada de brochure, §4; el eslogan como mensaje principal de la contraportada de propuesta y nunca en la portada, §5; puntero de §10.1 a la composición por superficie §4.6. Antes, el mismo día: IA, social y staff, D26: §14 y §14.1, 19 íconos nuevos, set en 36 Trazo + 43 Plastilina = 79 y 43 volúmenes; `axis-graphic-line` 0.6.0 y `axis-brand-assets` 0.3.4, publicados con el tag `v0.6.0`; Greenhouse fija esas versiones. Antes, el mismo día: oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-10-01 por Claude (1.21: §10.1.1 nueva — perfiles sociales de Efeonce aprobados por el operador: portadas de LinkedIn (página y perfil personal), Facebook y YouTube en dos mensajes × cuatro fotos de cine con Nexa, avatar de redes, nueve destacados de Instagram como mezcla de recursos y su historia completa 9:16, medidas y zonas seguras verificadas, reglas del logo, la idea propia y el registro cine con Nexa; §10.1 y §12 remiten. Antes, 2026-09-29, 1.20: §1.3 — la medida dibuja su recorrido desde las 12, en su color, al 60 % y con 0,75 × el trazo de la estela (`efeonceGraphicLine.trajectory.measure.travelledPath`, contrato `efeonce.graphic-line-orbit` 0.5.0); §10.2.1 nueva — módulos canónicos de correo (pie, CTA principal, agenda y bloque de marca), «Suscribirme» retirado, PNG para correo y contrato `efeonce.email-modules` 0.1.0; §13.1 con AXIS `v0.3.38`; Greenhouse aún fija 0.3.37 y lo adopta TASK-1944. Antes, 1.19: §1 — el color de la medida apunta al token `efeonceGraphicLine.measureSeverity` y al contrato `efeonce.graphic-line-orbit` 0.4.0, publicados en AXIS `v0.3.30`; §7.2, §8.5, §8.6 y §13.1 con ese juego y el contrato `efeonce.ai-visibility-report` 0.1.0 del AI Visibility Report; Greenhouse aún fija 0.3.29. Antes, 1.18: §1 — color de la medida con gravedad, excepción aprobada para la portada del AI Visibility Report. Antes, 1.17: §7.2 nueva — submarcas de producto SEO/AEO (SV360, AEO, AEO Assessment, AI Visibility Report), «la órbita vive en la O», línea Engine, lockups y variante `white`; §8.6 con `axis-brand-assets` 0.4.2 publicado el 2026-09-29. Antes, 2026-09-28, 1.16: §7.1 precisada contra el código — página del Lab de Insights aún sin publicar, variante negativa también en la portada de presentación, mini-lockups de capítulo, tamaños en uso en Think, imagen OG, pantallas de estado, recetas del deck y la decisión abierta del color de «INSIGHTS» en las portadas PDF. Antes, 1.15: §7.1 nueva — Insights, marca de producto que acompaña: construcción, reglas, lockup, dónde se aplica y gaps; §8.6 con `axis-brand-assets` 0.4.0. Antes, 1.14: §10.0 al día con el cierre de TASK-1928 — las 69 recetas del deck con plantilla en el Artifact Composer, AXIS fijado en `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19, enlace a la spec técnica `GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`. Antes, 2026-09-27, 1.13: §10.0 al día con el cierre de TASK-1927 — contrato `efeonce.surface-composition` 0.1.2 publicado en AXIS `v0.3.14` y fijado en Greenhouse; el deck con sus 16 plantillas, incluidas las portadas y contraportadas, y el documento completo con `pnpm brand:compose`; el contenido de una lámina es dato del intent. Antes, 1.12: portadas y contraportadas aprobadas por el operador — pares aprobados para portadas y contraportada de brochure, §4; el eslogan como mensaje principal de la contraportada de propuesta y nunca en la portada, §5; puntero de §10.1 a la composición por superficie §4.6. Antes, el mismo día: IA, social y staff, D26: §14 y §14.1, 19 íconos nuevos, set en 36 Trazo + 43 Plastilina = 79 y 43 volúmenes; `axis-graphic-line` 0.6.0 y `axis-brand-assets` 0.3.4, publicados con el tag `v0.6.0`; Greenhouse fija esas versiones. Antes, el mismo día: oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Hoy AXIS publica el contrato 0.5.0 y `axis-graphic-line` 0.13.0 (tag `v0.3.38`, 2026-09-29; §13.1). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -682,7 +682,9 @@ el deck, el cierre de marca y las animaciones del logo.
   de la contraportada según el documento, voz en la portada, logo a 500 px en 1920): ver la
   [composición por superficie §4.6](./EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck), «Portadas y contraportadas».
 - **Banner de LinkedIn (lámina 4.1) y fondo de Teams (lámina 4.3):** un solo anillo, sin órbitas interiores (§1.3). En
-  el banner **nunca** va el logo dentro de la órbita (§8.3 n.º 8).
+  el banner **nunca** va el logo dentro de la órbita (§8.3 n.º 8). Las portadas de perfil aprobadas el 2026-10-01
+  (LinkedIn de la página y del perfil personal, Facebook y YouTube), el avatar de redes y los destacados de Instagram
+  están en [§10.1.1](#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01).
 - **Campaña:** la órbita rodea la lente con aire; la esfera va arriba a la izquierda, lejos de la cara.
 - **Movimiento (cierre de marca 4,5 s):** anillo 0–0,5 s · arco 0,4–1,4 s · la esfera asienta 1,4–1,7 s · halo
   1,2–2,0 s · logo 1,9–2,5 s · eslogan 2,5–3,0 s. Con movimiento reducido, cuadro final fijo. Desde AXIS 0.2.7 estos
@@ -725,6 +727,117 @@ el deck, el cierre de marca y las animaciones del logo.
   script.
 - **Grillas:** margen del 9 % del lado corto en redes (96 px sobre 1080) y 140 px en 16:9; en 9:16 se respeta la
   zona que tapa la interfaz de cada red.
+
+### 10.1.1 Perfiles sociales de Efeonce (aprobados el 2026-10-01)
+
+Las portadas de perfil, el avatar de redes y los destacados de Instagram de la cuenta de Efeonce, más las portadas de
+LinkedIn para el perfil personal de cada persona del equipo. **[decisión del operador, 2026-10-01]** El operador los
+declaró parte del universo gráfico de Efeonce («ya forma parte del universo gráfico de Efeonce»). Aprobaciones, en sus
+palabras: la portada de Nexa, «Esa de Nexa queda»; «Las portadas de LinkedIn también están aprobadas»; los destacados,
+«Aprobadas todas.»; el avatar, «Y sobre el avatar ok, es el que mejor ves? Si es así Ok»; las historias completas de
+los destacados, «ahora si estamos Ok». YouTube y Facebook se pidieron con investigación de medidas y zonas seguras y se
+entregaron («Subelo»). Las portadas personales del equipo se pidieron el mismo día y derivan de las corporativas
+aprobadas. Cómo operarlas (qué subir, cómo cambiar una portada, cómo crear un destacado):
+[manual de uso](../../manual-de-uso/creative/usar-portadas-y-destacados-sociales-efeonce.md).
+
+| Pieza | Formato | Variantes |
+|---|---|---|
+| Portada de LinkedIn, página de empresa | 1128 × 191 | 8 |
+| Portada de LinkedIn, perfil personal (equipo) | 1584 × 396 | 8 |
+| Portada de Facebook | 1640 × 624 (se sube así; se ve a 820 × 312 en escritorio y 640 × 360 en el celular) | 8 |
+| Banner de YouTube | 2560 × 1440, hasta 6 MB | 8 |
+| Avatar de redes | 1080 × 1080, un solo archivo para LinkedIn, Instagram, Facebook y YouTube | 1 |
+| Portada de destacado de Instagram (`v01`, para **cambiar** la portada) | 1080 × 1920 con el cuadro aprobado al centro | 9 |
+| Historia completa del destacado (`v02`, para **crear** el destacado) | 1080 × 1920, escena completa | 9 |
+
+**Las portadas: dos mensajes, cuatro fotos cada uno.** Las ocho variantes de cada red son 2 mensajes × 4 fotos de cine
+con Nexa:
+
+- **«¿Cuántos formatos? Todos.»** — línea Growth (acento `#36c8bf`). Fotos `PS1b` (base), `PS7b` (desliza), `PS6`
+  (estallido) y `PS8` (mosaico).
+- **«¿Entre cientos de marcas, a quién cita la IA? A ti.»** — línea Engine (acento `#0375db`). Fotos `PS2c` (base, con
+  la tarjeta repintada como horizontal), `PS3` (elige), `PS5` (pasillo) y `PS4` (respuesta).
+- La voz es la de §4: la pregunta en Poppins 300 con el anillo del acento y la respuesta en Bricolage Grotesque 760 con
+  su esfera; la respuesta mide al menos 3× la pregunta; fondo `#001a33`.
+
+**Reglas que nacieron con estas piezas [decisión del operador, 2026-10-01]:**
+
+1. **Logo.** Las portadas de la página de Efeonce llevan el logo abajo: centrado si el centro queda libre o, como en
+   las ocho aprobadas, bajo la columna de texto porque el centro cae sobre Nexa. Medidas reales de las aprobadas:
+   Facebook 156 px de ancho (25 % del lado corto de 624), YouTube 200 px dentro de la zona segura y LinkedIn de la
+   página 96 px. Las portadas de perfil personal lo llevan **pequeño (120 px), bajo el texto y fuera de la órbita**.
+2. **La portada necesita una idea propia, no un par del catálogo.** Se rechazó «¿Qué hace Efeonce? Crecer.» («Really?
+   WTF?») y «Te hacemos visible.» ya estaba objetada.
+3. **Registro cine con Nexa protagonista** aprobado en portadas sociales y destacados. Amplía el alcance del registro
+   para estas superficies y sigue sin aplicar a piezas sociales con personas del equipo
+   ([registro cine, delta 2026-10-01](../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram)).
+4. **Destacados = mezcla de recursos**, cada uno con su escena: el ojo de Nexa, Nexa con el objeto de su mundo y los
+   objetos del oficio. No es una plantilla repetida ni un juego de íconos planos («eso lo podría hacer mi hija de 10
+   años»); «somos agencia de marketing, no una óptica».
+5. **Avatar de redes:** el isotipo de Efeonce en negativo al 60 % del ancho sobre el oscuro `#001a33`, con el halo de la
+   órbita (las paradas del token), sin anillo ni arco. Un solo archivo para las cuatro redes.
+
+**Los nueve destacados.** Un color de luz por destacada sobre oscuro y **sin firma en el círculo** (a ese tamaño no se
+lee; la marca la pone el avatar): 01 Glitch (el ojo de Nexa con la manzana de Glitch en bytes, sub-línea Glitch) · 02
+AEO (Nexa con la tarjeta que eligió la IA) · 03 Creatividad a escala (Nexa con una órbita de pantallas) · 04
+Portafolio (abanico de piezas bajo un foco) · 05 Studio (Run & Gun, detrás de cámara filmando a Nexa) · 06 Agents (tres
+Sparks, los mini bots de Nexa) · 07 Podcast (micrófono macro con onda de luz) · 08 Recetas (mise en place de chef con
+luz, pigmento y fotogramas: IA generativa) · 09 Behind the build (manos construyendo una interfaz sobre un plano).
+
+**Medidas y zonas seguras verificadas:**
+
+| Red | Se sube | Zona segura y qué tapa la interfaz |
+|---|---|---|
+| LinkedIn, página de empresa | 1128 × 191 | el logo de la página tapa la esquina inferior izquierda |
+| LinkedIn, perfil personal | 1584 × 396 | la foto de perfil ocupa ≈ 3–22 % del ancho en escritorio y hasta ≈ 29 % en el celular, abajo a la izquierda: el texto empieza en x 480 |
+| Facebook | 1640 × 624 | escritorio 820 × 312; el celular (640 × 360) recorta los costados: franja segura central de 1110 px. La foto de perfil va abajo a la izquierda: el texto termina antes |
+| YouTube | 2560 × 1440 (mínimo 2048 × 1152, hasta 6 MB) | zona segura 1235 × 338 sobre el mínimo (≈ 1546 × 423 a 2560: x 508–2052, y 509–931). En escritorio se ve la franja 2560 × 423: la cara de Nexa se centra en y ≈ 690 |
+| Instagram, destacado | 1080 × 1920 | Instagram toma la portada del **círculo central** (y 420–1500). Zonas calmas: arriba ≈ 14 % y abajo ≈ 20 % (nombre de la cuenta y barra de respuesta) |
+
+**Destacados de Instagram: cambiar la portada no es crear el destacado** (operador, 2026-10-01). Para **cambiar** la
+portada de un destacado que ya existe basta la imagen de portada (`v01`). Para **crearlo** hay que publicar primero una
+historia 9:16 **completa** y agregarla al destacado (`v02`). Una historia con bandas lisas arriba y abajo no sirve.
+
+- **Método medido para pasar de la portada aprobada a la historia completa:** extender la foto aprobada a 9:16 con GPT
+  Image 2.5 (relleno con máscara sobre una base espejada a 1152 × 2048), igualar el tono de la extensión con el cuadro
+  aprobado en baja frecuencia y reponer el aprobado **por el borde del círculo** (radio 488 → 540 px desde el centro
+  x 540, y 960). Dentro del radio 488 los píxeles son los aprobados, byte a byte (verificado en las nueve).
+- Una unión **recta** en y 420 / 1500 se ve a tamaño real aunque el tono calce (cambia la nitidez). Una **segunda pasada
+  de relleno sobre la unión** posteriza las sombras y copia la línea de la entrada: no sirve.
+- La «posterización» que se ve en hojas grandes leídas por el agente era de la vista previa, no del archivo (24 562
+  colores en la zona): antes de concluir, mirar un recorte pequeño a tamaño real.
+- **Recuperar nitidez en un destacado blando:** una edición con GPT Image que pide sólo detalle y conserva la
+  composición funcionó en Glitch, Portafolio y Recetas. En Portafolio y Recetas el modelo metió personas ajenas al
+  roster y se sacaron con recorte: nunca personas fuera del [roster](../brand-photography/EFEONCE_TEAM_ROSTER_V1.md)
+  en fotos de marca.
+
+**Portada de LinkedIn para el perfil personal.** Deriva de la corporativa aprobada: 1584 × 396, texto desde x 480 y
+logo de 120 px bajo el texto. La foto se corre a la derecha y el hueco se llena **reflejando su propio borde** (un fondo
+plano o un fundido dejan una franja de otro tono); donde las pantallas tocan el texto, la foto se corre más (Formatos
+240 px, Estallido 220 px; el resto, 80 px). Cada persona las elige en su página del kit, sección «Tu portada de
+LinkedIn» ([roster, portadas de LinkedIn](../brand-photography/EFEONCE_TEAM_ROSTER_V1.md#portadas-de-linkedin-del-equipo-2026-10-01)).
+
+**Cómo se produjo (para regenerar).** En el canvas de Claude Design las fuentes se suben como asset `/_blob/` (la ruta
+relativa al sistema de diseño no carga Poppins). El render final es un HTML local con Playwright abierto como archivo
+(`page.goto('file://…')`; con `setContent` las imágenes `file://` no cargan) y esperando `document.fonts.ready`. Las
+portadas personales salen de `ai-generations/2026-09-30_portadas-sociales/personal/linkedin-personal.mjs`.
+
+**Dónde está:**
+
+- Canvas [«Portadas sociales Efeonce»](https://claude.ai/artifact/THt6cp3Pc2njxN7Takevuu) (páginas mezcla, híbrido,
+  ojos, punch, linkedin, avatar, destacados, conceptos, variaciones y ronda-1) y el sistema de diseño en Claude
+  [«Efeonce — La órbita»](https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc) (namespace `EfeonceOrbit`).
+- Repo: `ai-generations/2026-09-30_portadas-sociales/` → `fichas/` (`PS*`, `PX*`, `PH*`), `plates/`, `nitidez/`,
+  `historias/` (bases, máscaras, extensiones) y `finales/{linkedin,linkedin-personal,facebook,youtube,avatar,destacados-instagram,historias-destacados}/`.
+  Los PNG son locales (el repo ignora `ai-generations/**/*.png`): la copia del equipo es la de OneDrive.
+- OneDrive (`Alineación/`): `5. Contenidos/13- Branding/Redes sociales Efeonce/2026-10 La órbita/v01/{LinkedIn,Facebook,YouTube,Avatar,LinkedIn perfil personal}/`
+  y `5. Contenidos/05. Highlights/2026-10 Destacados La órbita/` (`v01/` portadas, `v02/` historias completas), con
+  `LEEME` y manifiesto SHA-256; las ocho portadas personales también en `6. Marca/Kit media/Portadas de LinkedIn/2026-10 La órbita/`.
+- Bucket público de AXIS: `gs://efeonce-group-axis-public-media/team/linkedin-covers/v1/` (portadas personales).
+
+**Pendiente:** publicar en cada red del perfil de Efeonce y crear los destacados en Instagram (decisión y acción del
+operador); las historias de adentro de cada destacado, más allá de la historia de portada; sumar estas piezas a la
+fuente del manual en PDF.
 
 ### 10.2 Firma de mail
 
@@ -999,6 +1112,11 @@ material real (vinilo, pintura, cerámica, impresión). Runner, ediciones y prom
 | D13 | Archivos de impresión: primero la tarjeta y el muro de recepción, PDF vectorial desde las recetas | abajo |
 | D14 | La prueba sin logo corre **antes** de que la órbita entre a medios pagados con presupuesto | abajo |
 | D15 | «Te hacemos visible»: revisión legal antes de cualquier pauta, sin excepción | §1.4 |
+
+**Decidido por el operador (2026-10-01):** los perfiles sociales de Efeonce (portadas de LinkedIn, Facebook y YouTube,
+avatar de redes, destacados de Instagram y su historia completa, y las portadas de LinkedIn personales del equipo) son
+parte del universo gráfico de la marca; sus reglas (logo, idea propia, registro cine con Nexa, destacados como mezcla
+de recursos y avatar) están en §10.1.1.
 
 **Prueba sin logo (kit listo para campo):** fase de aprendizaje con logo y atribución de piezas nuevas sin logo;
 600 personas (300 por versión), decisores de marketing y comercial en Chile, empresas de 50+ personas. Métrica: %

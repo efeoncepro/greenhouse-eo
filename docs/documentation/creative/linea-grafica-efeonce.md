@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.16
+> **Version:** 1.17
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-10-01 por Claude (1.17: delta — los perfiles sociales de Efeonce (portadas de LinkedIn, Facebook y YouTube, avatar de redes, destacados de Instagram y las portadas de LinkedIn personales del equipo) entran a la línea; fila nueva en «Dónde está cada cosa» y pendiente de publicación. Antes, 2026-09-28, 1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -367,6 +367,7 @@ el arco del dato, la burbuja URL en algunas láminas, un gris sin valor oficial 
 | Canvas de trabajo (taller, privado; 40 láminas) | [Canvas «Línea gráfica Efeonce»](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) | quien explora nuevas aplicaciones |
 | Burbujas de URL listas para visores y correo | `docs/operations/brand-graphic-line/deliverables/assets/url-lum-{light,dark}.svg` | quien arma PDF, correo o referencias para IA |
 | Banco de fotos para la lente | `ai-generations/2026-09-25_banco-lente-orbita/` (fichas y prompts versionados; las imágenes son locales) | quien compone una lente |
+| Portadas, avatar y destacados de las redes de Efeonce (y portadas de LinkedIn personales del equipo) | OneDrive `Alineación/5. Contenidos/13- Branding/Redes sociales Efeonce/2026-10 La órbita/` y `05. Highlights/2026-10 Destacados La órbita/` · página del kit de cada persona · [cómo usarlas](../../manual-de-uso/creative/usar-portadas-y-destacados-sociales-efeonce.md) | quien administra las redes de Efeonce y cada persona del equipo |
 
 Los valores (colores, grosores, medidas) **se toman de los tokens de AXIS**, no se copian de un documento. Si un valor
 cambia, cambia el token y su prueba.
@@ -521,6 +522,34 @@ confirmación humana, es TASK-1932.
 > código: `src/lib/brand-surfaces/deck-recipes/bindings/` ·
 > [TASK-1930](../../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md)
 
+## Delta 2026-10-01 — los perfiles sociales de Efeonce
+
+El 2026-10-01 el operador aprobó las piezas de perfil de las redes de Efeonce y las declaró parte del universo gráfico de
+la marca:
+
+- **Portadas** de LinkedIn (página de empresa), Facebook y YouTube, ocho por red: dos mensajes con cuatro fotos de Nexa
+  cada uno. «¿Cuántos formatos? Todos.» (línea Growth) y «¿Entre cientos de marcas, a quién cita la IA? A ti.» (línea
+  Engine). Cada red tiene su medida y su zona segura: el texto nunca queda bajo la foto de perfil, el logo de la página
+  ni la interfaz de la red.
+- **Avatar de redes:** un solo archivo para LinkedIn, Instagram, Facebook y YouTube, el isotipo de Efeonce sobre el
+  oscuro con el halo de la órbita.
+- **Nueve destacados de Instagram**, cada uno con su escena (el ojo de Nexa, Nexa con algo de su mundo y objetos del
+  oficio) y un color de luz propio, sin firma en el círculo. Un destacado se **crea** publicando primero una historia
+  9:16 completa; la imagen de portada sólo sirve para **cambiar** la de uno que ya existe.
+- **Portadas de LinkedIn para el perfil personal** del equipo: las mismas ocho, adaptadas para dejar libre la foto de
+  perfil y con el logo pequeño bajo el texto. Cada persona elige la suya en su página del kit; el aviso le llegó 1:1
+  por el TeamBot.
+- Las portadas llevan el estilo de cine con Nexa como protagonista; las piezas sociales con personas del equipo siguen
+  fuera de ese estilo. Una portada necesita una idea propia, no un par de copy del catálogo.
+
+Las piezas están aprobadas y listas en OneDrive; publicarlas en cada red y crear los destacados es decisión del
+operador.
+
+> Detalle técnico: [manual §10.1.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01) ·
+> [registro cine, delta 2026-10-01](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram) ·
+> [roster del equipo, portadas de LinkedIn](../../operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md#portadas-de-linkedin-del-equipo-2026-10-01) ·
+> [cómo usarlas](../../manual-de-uso/creative/usar-portadas-y-destacados-sociales-efeonce.md)
+
 ## Estado y pendientes
 
 **Estado:** canónica desde el 2026-09-25. Es un **sistema consistente**, pero **todavía no un activo distintivo
@@ -537,6 +566,7 @@ la órbita se reconozca sola.
 | Versión en inglés | producción | el copy de la línea está sólo en español |
 | Íconos: voz de la línea Voice y reemplazo de los Tabler en las firmas | decisión del operador | la línea Voice no tiene voz fija; la firma de correo y la de equipo siguen con Tabler hasta que se decida |
 | Revisión legal de «Te hacemos visible» | legal | obligatoria antes de cualquier pauta, sin excepción |
+| Perfiles sociales de Efeonce | decisión del operador | publicar las portadas y el avatar en cada red y crear los destacados de Instagram; las historias de adentro de cada destacado siguen por hacer |
 | Ajustes de `foto:prompt` y chequeos de la lente | producción | una task nueva lleva al comando lo decidido para las fotos con lente (formato 1200 × 627, límite de cabezas sólo con reserva de texto, chequeos contra lecho y reservas) |
 
 > Detalle técnico: [manual §12](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#12-decisiones-y-validación) · [ADR, pendiente](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md#pendiente) · [manual §13, contrato y herramientas](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-03): contrato `efeonce.graphic-line-orbit` 0.3.0 (estable desde el 2026-09-26: un agente describe qué quiere hacer y el sistema pinta la pieza, la firma y mide que cumpla) en AXIS 0.3.0, `pnpm creative:orbit:render`, `pnpm creative:layout` y `pnpm foto:componer:cta` (tramo 17)

@@ -10,7 +10,8 @@
 > las láminas SEO/AEO, `variant-both-in-deck`, `figure-source-missing` y el camino «ausente» de un slot opcional —
 > `develop` tras `af32d9353` (TASK-1934, AXIS `v0.3.23`), 2026-09-28; §9, filas del bump de AXIS y de Glitch —
 > greenhouse-eo@24e4c72ee, 2026-09-28; fila de la medida con gravedad (§3) — AXIS `v0.3.30` (`main` `26097c5`),
-> 2026-09-29; fila del camino recorrido (§1) y §7b (módulos de correo) — AXIS `v0.3.38` (`main` `c92160b`), 2026-09-29.
+> 2026-09-29; fila del camino recorrido (§1) y §7b (módulos de correo) — AXIS `v0.3.38` (`main` `c92160b`), 2026-09-29;
+> §7c (portadas de perfil social y destacados de Instagram) — `develop` en `d1a41babb`, 2026-10-01.
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -150,6 +151,26 @@ Para un **correo** (no la firma de una persona, que es §7 y el contrato `efeonc
 | [ ] | Correo seguro: tablas, estilos en línea, PNG @2x con `width`/`height` y `alt`, sin SVG en línea, botones a prueba de Outlook (VML), filetes precompuestos, fondo oscuro declarado en la celda, texto del pie ≥ 4,5:1 | Automático en el adapter: `images-png-with-dimensions`, `no-inline-svg-in-email`, `bulletproof-buttons`, `footer-contrast`, `dark-mode-safe` |
 | [ ] | El cuerpo es propio de cada correo: nunca el de Insights como plantilla | Revisión |
 | [ ] | En Greenhouse, hasta que se adopten los módulos (plantillas en `src/emails/`), el pie de un correo nuevo no inventa su propia versión: se sigue la dirección `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` y se deja registrada la tensión con TASK-1764 | Revisión |
+
+## 7c. Portadas de perfil social y destacados de Instagram (2026-10-01)
+
+Piezas, medidas y dónde están: [applications.md §A11](applications.md). Las zonas de cada red se verificaron el
+2026-10-01; en una pieza nueva se reverifican.
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | La portada tiene una idea propia, no un par del catálogo ni «Te hacemos visible.» | Revisión del copy ([criteria.md](criteria.md) §4) |
+| [ ] | Lienzo de la red: LinkedIn página 1128 × 191 · LinkedIn personal 1584 × 396 · Facebook 1640 × 624 · YouTube 2560 × 1440 y ≤ 6 MB · avatar 1080 × 1080 | Dimensiones y peso del archivo final |
+| [ ] | Nada de texto ni logo bajo lo que tapa la red: el logo de la página en LinkedIn (abajo a la izquierda); la foto de perfil en Facebook y en el perfil personal (texto desde x 480); el celular de Facebook (franja central de 1110 px); YouTube dentro de ≈ x 508–2052, y 509–931 a 2560, con la cara de Nexa en la franja de escritorio (y ≈ 690) | Superponer las zonas sobre el archivo final y mirarlo como se verá en escritorio y en celular |
+| [ ] | Logo: en la página, abajo (centrado si el centro queda libre; si no, bajo la columna de texto) con los anchos de las aprobadas: Facebook 156 px, YouTube 200 px en la zona segura, LinkedIn de la página 96 px; en el perfil personal, 120 px bajo el texto; nunca dentro de la órbita | Medir posición y ancho |
+| [ ] | Portada personal: el hueco que deja la foto al correrse se llenó reflejando su borde, sin franja de otro tono | Revisión al 100 % en la unión |
+| [ ] | Avatar: isotipo negativo al 60 % sobre `#001a33` con el halo, sin anillo ni arco | Revisión contra el archivo aprobado |
+| [ ] | Destacados: mezcla de recursos (ninguna toma repetida, ningún ícono plano), un color de luz por destacada, sin firma en el círculo | Revisión de la serie completa, no pieza por pieza |
+| [ ] | Para **crear** un destacado: historia 9:16 completa, sin bandas lisas; la portada vive en el círculo central (y 420–1500) y las zonas calmas (arriba ≈ 14 %, abajo ≈ 20 %) quedan libres | Revisión del archivo `v02` |
+| [ ] | Historia derivada de una portada aprobada: dentro del radio 488 px (centro x 540, y 960) los píxeles son los aprobados, byte a byte; la unión va por el borde del círculo, nunca por una línea recta | Comparar los píxeles del círculo contra la portada aprobada; mirar la unión a tamaño real |
+| [ ] | La posterización o la unión se juzgan sobre un recorte pequeño a tamaño real, nunca sobre una hoja grande reducida | Revisión ([lessons.md](lessons.md), 2026-10-01) |
+| [ ] | Ninguna persona fuera del roster del equipo en la foto (una edición de nitidez puede meterla) | Revisión al 100 % |
+| [ ] | Render final desde HTML local abierto como archivo (`page.goto('file://…')`) tras `document.fonts.ready`; Poppins cargó | Revisión del PNG: sin fuente de respaldo |
 
 ## 8. Accesibilidad
 

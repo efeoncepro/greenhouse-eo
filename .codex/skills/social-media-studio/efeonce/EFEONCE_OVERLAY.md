@@ -214,6 +214,15 @@ tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transc
   `@efeoncepro/axis-brand-assets` (o descarga del Lab `iconography/#volumen` mientras el paquete no se publique), en
   respuesta con el acento de Brand, uno por pieza, ≥ 160 px, sin sombra de contacto salvo que la composición la pida.
   Nunca en carruseles de listas ni junto a íconos planos o Trazo, y nunca regenerado con un modelo.
+- **Perfiles sociales de Efeonce (aprobados 2026-10-01):** portadas de LinkedIn (página 1128 × 191 y perfil personal
+  del equipo 1584 × 396), Facebook (1640 × 624) y YouTube (2560 × 1440), avatar de redes (un solo 1080 × 1080) y nueve
+  destacados de Instagram, con «La órbita»; las portadas, con Nexa en registro cine. La portada lleva una idea
+  propia, no un par del catálogo; los destacados son una mezcla de recursos, sin firma en el círculo. **Mecánica de un destacado:** la
+  imagen de portada sólo sirve para **cambiar** la de un destacado existente; para **crearlo** se publica antes una
+  historia 9:16 **completa** (sin bandas lisas) y se agrega, e Instagram toma la portada del círculo central. Piezas,
+  medidas, zonas seguras, logo y archivos (finales, kit del equipo, OneDrive): `efeonce-graphic-line` →
+  [`applications.md` §A11](../../efeonce-graphic-line/references/applications.md). Publicar en cada red y crear los
+  destacados lo decide y lo hace el operador.
 - **«Te hacemos visible»** siempre con su prueba y sin pauta mientras falte la revisión legal (§1.4). La prueba de
   atribución sin logo sigue sin medir: no afirmes que la órbita ya se reconoce sola.
 

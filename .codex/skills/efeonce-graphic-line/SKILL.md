@@ -70,6 +70,7 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
 | **El criterio**: qué significa cada elemento (anillo, arco, esfera, halo, lente, foco, voces, eslogan, firma), cuándo usar la órbita y cuándo no, con qué se combina y qué delata que no se entendió la línea — **léelo primero** | [references/criteria.md](references/criteria.md) |
 | Saber qué existe: tokens, contratos, funciones del paquete, assets, comandos, versiones, el mapa del Lab | [references/package-and-tokens.md](references/package-and-tokens.md) |
 | **Una aplicación concreta**: post, story, banner de LinkedIn, ads, deck, informe, firma de correo (personal y de equipo), oficina y uso del espacio, objetos, merch, vestir, credenciales, papelería, eventos, video — qué elementos van, dónde y cómo se produce | [references/applications.md](references/applications.md) |
+| **Perfiles sociales de Efeonce** (aprobados 2026-10-01): portadas de LinkedIn (página y perfil personal del equipo), Facebook y YouTube, avatar de redes, destacados de Instagram y su historia completa 9:16 — medidas, zonas seguras, logo, dónde están los archivos | [applications.md §A11](references/applications.md) + [qa-checklist.md §7c](references/qa-checklist.md) |
 | Decidir qué forma o receta usar y componer la pieza, con ejemplos completos | [references/composition.md](references/composition.md) |
 | Una pieza con foto, o briefear una foto que llevará la órbita | [references/photography-convergence.md](references/photography-convergence.md) |
 | Animar (la órbita sola o las animaciones del logo) | [references/motion.md](references/motion.md) |
@@ -136,7 +137,8 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
     `pnpm surface:resolve` en AXIS; los `delegates` del manifest van a los compositores de Greenhouse. **Nunca
     coordenadas ni canal elegidos a mano.** El registro cine sólo con Nexa protagonista, en `proposal-cinematic` y, por
     excepción aprobada el 2026-09-27, en las láminas de **sección y «about»** del deck (nunca en social, web, publicidad
-    ni contenido; [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md), delta
+    ni contenido, salvo las portadas de perfil y los destacados de Efeonce con Nexa, aprobados el 2026-10-01,
+    [applications.md §A11](references/applications.md); [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md), delta
     (c)); **ahí la luz de la
     línea es un fenómeno fotográfico (anillo, esfera, moño, esferas de acento) y cuenta como órbita: una sola órbita por
     pieza**, así que no se agrega otra gráfica encima. Contrato vigente: 0.1.2 (usos, marco de portadas y

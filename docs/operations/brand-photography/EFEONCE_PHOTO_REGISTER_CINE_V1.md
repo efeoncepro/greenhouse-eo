@@ -1,7 +1,7 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.4 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.4: la portada de Creative Services pasa a su plate propio `CR4`,
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.5 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-10-01 por Claude (1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
 > «El squad te la entrega», y queda el caso de cómo cambiar el plate de una pieza aprobada sin perder su concepto,
 > [§16.7](#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto). Antes, 1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
@@ -30,6 +30,25 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 **[pendiente]** = no resuelto. Las frases de prompt entre comillas son **verbatim** de fichas aprobadas.
 
 ---
+
+## Delta 2026-10-01 — registro cine con Nexa en portadas sociales y destacados de Instagram
+
+**[decisión del operador, 2026-10-01]** Al aprobar las portadas de perfil (LinkedIn de la página y del perfil
+personal, Facebook y YouTube) y los nueve destacados de Instagram de Efeonce, el operador aprobó el **registro cine con
+Nexa protagonista en esas superficies** («Esa de Nexa queda»; «Las portadas de LinkedIn también están aprobadas»;
+«Aprobadas todas.»). Se registra como el quinto caso de §2.
+
+- **Portadas:** dos mensajes × cuatro fotos de cine con Nexa — «¿Cuántos formatos? Todos.» (`PS1b`, `PS7b`, `PS6`,
+  `PS8`) y «¿Entre cientos de marcas, a quién cita la IA? A ti.» (`PS2c`, `PS3`, `PS5`, `PS4`). Fichas en
+  `ai-generations/2026-09-30_portadas-sociales/fichas/`.
+- **Destacados:** mezcla de recursos, cada uno con su escena (el ojo de Nexa, Nexa con el objeto de su mundo, sus
+  Sparks y objetos del oficio), un color de luz por destacada sobre oscuro; no una plantilla repetida.
+- **Qué no abre:** sigue sin aplicar a piezas sociales con **personas del equipo**, que siguen en A, B o C (la
+  publicidad con el equipo en cine sigue en prueba, §11; las fotos de Marketing con Manzanitas son el caso 4). Las
+  guardas no cambian. En las destacadas de Portafolio y Recetas el modelo metió personas ajenas al roster y se sacaron
+  con recorte: nunca personas fuera del [roster](./EFEONCE_TEAM_ROSTER_V1.md) en fotos de marca.
+- Piezas, medidas, reglas del logo y la historia completa 9:16:
+  [línea gráfica §10.1.1](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01).
 
 ## Delta 2026-09-30 — `WB1c`: el polo del kit se EDITA con su receta; el isotipo compuesto de `WB1b` se retira
 
@@ -114,7 +133,7 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 
 ## 2. Cuándo se usa — y cuándo no
 
-**Permitido en cuatro casos, y sólo en esos [decisión del operador, 2026-09-27; el cuarto, 2026-09-29]:**
+**Permitido en cinco casos, y sólo en esos [decisión del operador, 2026-09-27; el cuarto, 2026-09-29; el quinto, 2026-10-01]:**
 
 | Caso | Quién protagoniza | Vestuario | Dónde vive la regla |
 |---|---|---|---|
@@ -122,6 +141,7 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 | **2 · Receta de deck `proposal-cinematic`** | Personas del equipo **o** Nexa | Personas: **uniforme correcto por registro de escena**; el traje de ficción queda sólo para Nexa | Delta 2026-09-27 del maestro + [superficie §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) |
 | **3 · Láminas de sección y «about» del deck** (excepción, 2026-09-27) | Personas del equipo (o del cliente, en la sección con el panel a la derecha), con o sin Nexa | Equipo: uniforme por registro de escena; cliente: su propia ropa, sin marca Efeonce | [Delta (c) de arriba](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck) + [superficie §3, regla 5](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) |
 | **4 · Fotos de Marketing con Manzanitas** (decisión del operador, 2026-09-29, `cine-team-people-social`) | **Personas reales del equipo actual**, con su identidad (`identidad` en la ficha), desde el [roster del equipo](./EFEONCE_TEAM_ROSTER_V1.md) | La de la **línea de la pieza** (`linea` en la ficha): **hoodie** Efeonce en Servicios creativos (`brand`); **bomber o softshell** del uniforme corporativo, con el polo debajo si se quiere, en las líneas de negocio. Para todo el equipo, Julio y Valentina incluidos; `foto:prompt` lo exige | [Roster](./EFEONCE_TEAM_ROSTER_V1.md) · token AXIS `manzanitasRegister.teamPeople` |
+| **5 · Portadas de perfil social y destacados de Instagram de Efeonce** (decisión del operador, 2026-10-01) | Nexa protagonista; en los destacados, la mezcla aprobada (su ojo, sus Sparks y objetos del oficio) | Nexa: traje de ficción o uniforme, como en el caso 1. **Nunca** personas fuera del roster | [Delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram) · [línea gráfica §10.1.1](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01) |
 
 **El contrato lo vigila [medido]:** AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue
 **`cine-requires-nexa-or-proposal`** (`@efeoncepro/axis-ui-contracts`, `surface-composition.js`): pasa si la receta
@@ -134,7 +154,8 @@ esas láminas sirven también para el **brochure** (formato elegido: **PDF horiz
 cinematográficas». Las portadas del brochure llevan a Nexa como protagonista (caso 1) y por eso caben en el registro.
 
 **Cuándo NO [decisión del operador, 2026-09-27]:** una pieza social, un hero web o una lámina de contenido con
-personas del equipo **siguen en A, B o C**. La publicidad con personas del equipo en cine **no está aprobada**: queda
+personas del equipo **siguen en A, B o C** (las portadas de perfil y los destacados del caso 5 llevan a Nexa, no al
+equipo). La publicidad con personas del equipo en cine **no está aprobada**: queda
 en prueba (§11).
 
 ⚠️ **No todo lo aprobado esa noche es cine [medido en archivos]:** «BEX escalera» es la receta

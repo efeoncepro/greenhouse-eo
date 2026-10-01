@@ -71,7 +71,9 @@ ni fotos fuente/descartes como anclas. Canon:
 **Registro cine (2026-09-27): fuera de social salvo con Nexa protagonista.** El registro cine de la fotografía
 Efeonce —el servicio como fenómeno de luz, ficción declarada— sólo está aprobado con **Nexa protagonista**, en la
 receta de deck `proposal-cinematic` y en las láminas de sección y «about» del deck (excepción del 2026-09-27, que no
-alcanza a social). Una pieza social con personas del equipo **sigue en A, B o C**, y sus formatos
+alcanza a social). **Excepción social (2026-10-01):** las portadas de perfil y los destacados de Instagram de
+Efeonce con Nexa protagonista, aprobados (overlay §Marca, «Perfiles sociales de Efeonce»). Una pieza social con
+personas del equipo **sigue en A, B o C**, y sus formatos
 9:16 y 4:5 están **en prueba**: nada se publica como cine sin decisión del operador. Canon:
 [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) §2 y §11; lecciones de la
 primera tanda publicitaria en `efeonce-advertising-creative` §«Registro cine en publicidad».

@@ -1,9 +1,9 @@
 # Equipo en la fotografía de marca — roster V1
 
 > **Tipo de documento:** Norma operativa (fotografía de marca)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-29 por Claude (decisión del operador `cine-team-people-social`)
-> **Ultima actualizacion:** 2026-09-29 por Claude (avatares oficiales con bomber y halo; firmas del equipo; Luis sale del equipo)
+> **Ultima actualizacion:** 2026-10-01 por Claude (1.4: portadas de LinkedIn personales en la página del kit y aviso 1:1 del 2026-10-01. Antes, 2026-09-29: avatares oficiales con bomber y halo; firmas del equipo; Luis sale del equipo)
 > **Documentacion tecnica:** [`PERSONAS` de `scripts/foto/build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs) ·
 > [bloques de identidad del canon §3.6](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · token AXIS
 > `manzanitasRegister.teamPeople` (`rosterSource: 'greenhouse-team-roster'`)
@@ -78,7 +78,7 @@ con Vision (distancia ojos → mentón); Daniela y Humberly un poco más lejos d
 | --- | --- |
 | GCP (público) | `gs://efeonce-group-axis-public-media/team/avatars/v1/1080/<nombre-apellido>.png` (maestros) y `…/v1/800/` (web). URL: `https://storage.googleapis.com/efeonce-group-axis-public-media/team/avatars/v1/1080/<nombre-apellido>.png` |
 | OneDrive del equipo | `Alineación/6. Marca/Kit media/Avatar/2026-09 La órbita/` (los seis) y la carpeta de cada persona (`Kit media/<Nombre>/`): `EO_Avatar-<Nombre-Apellido>-2026-09.png` y `firma-<nombre-apellido>.zip`; lo anterior, en `Viejo/` |
-| Página de descarga | `https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html` (una por persona, el kit completo: el avatar con descarga en un clic y dónde cambiarlo en Teams, Outlook, Notion, Frame.io y HubSpot; los nueve fondos de Teams aprobados, publicados en `…/team/teams-backgrounds/v1/`; y el enlace a su firma) e `…/team/kit/index.html` (el equipo). Generador: `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs` |
+| Página de descarga | `https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html` (una por persona, el kit completo: el avatar con descarga en un clic y dónde cambiarlo en Teams, Outlook, Notion, Frame.io y HubSpot; los nueve fondos de Teams aprobados, publicados en `…/team/teams-backgrounds/v1/`; desde el 2026-10-01, la sección «Tu portada de LinkedIn» (`#linkedin`); y el enlace a su firma) e `…/team/kit/index.html` (el equipo). Generador: `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs` |
 | Repo (800 px) | `src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-<persona>.png` (deck) y `public/images/greenhouse/team/` (portal; Julio en `EO_Avatar-Julio-Reyes.png`) |
 | Proceso | `ai-generations/2026-09-29_avatares-equipo/` (`componer-avatares.mjs`, `extender*.mjs`, `medir-rostro.swift`) |
 
@@ -88,6 +88,30 @@ Aviso al equipo (2026-09-29, pedido del operador): tarjeta 1:1 del TeamBot a And
 con su página (runs `teams-avatar-*`, correlación `manual-avatar-announcement-2026-09-29-avatar-orbita`, identidad
 verificada en Entra antes de cada envío) y mensaje en EO Team con las cinco menciones reconocidas por Teams y la página
 del equipo.
+
+## Portadas de LinkedIn del equipo (2026-10-01)
+
+**[decisión del operador, 2026-10-01]** «agrega también las portadas de LinkedIn para que ellos elijan la que quieran y
+se las envías 1:1 por Teambot». Son las ocho portadas aprobadas de la página de Efeonce adaptadas al perfil personal
+(1584 × 396): el texto empieza en x 480 para dejar libre la foto de perfil, el logo va pequeño (120 px) bajo el texto y
+fuera de la órbita, y la foto se extiende reflejando su propio borde. Las reglas y las medidas están en la
+[línea gráfica §10.1.1](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01).
+
+| Dónde | Qué hay |
+| --- | --- |
+| Página del kit | sección **«Tu portada de LinkedIn»** (`#linkedin`) de `https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html`: las ocho con vista previa, descarga y los pasos para cambiarla en LinkedIn. Generador: `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs` |
+| GCP (público) | `gs://efeonce-group-axis-public-media/team/linkedin-covers/v1/efeonce-linkedin-perfil-<id>-1584x396.png` y su vista previa `…/v1/min/…jpg` (792 × 198) |
+| OneDrive del equipo | `Alineación/6. Marca/Kit media/Portadas de LinkedIn/2026-10 La órbita/` (las ocho) |
+| Proceso | `ai-generations/2026-09-30_portadas-sociales/personal/linkedin-personal.mjs` (genera las ocho) |
+
+Ids: `formatos`, `formatos-desliza`, `formatos-estallido`, `formatos-mosaico`, `aeo`, `aeo-elige`, `aeo-pasillo`,
+`aeo-respuesta`. Son las mismas para todo el equipo: cada persona elige la suya.
+
+Aviso al equipo (2026-10-01, pedido del operador): tarjeta 1:1 del TeamBot a Andrés, Daniela, Melkin, Humberly y
+Valentina con el enlace a la sección `#linkedin` de su página (runs `teams-linkedin-cover-*`, correlación
+`manual-linkedin-cover-announcement-2026-10-01-linkedin-portadas`, identidad confirmada en Entra antes de cada envío);
+los cinco envíos quedaron ok. Script: `ai-generations/2026-09-30_portadas-sociales/personal/avisos-linkedin-1a1.ts`
+(commit `d1a41babb`).
 
 ## Firmas de correo del equipo (2026-09-29)
 

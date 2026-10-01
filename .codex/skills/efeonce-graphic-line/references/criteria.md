@@ -10,6 +10,7 @@
 > `EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`; `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md` («Tres
 > voces»); `docs/context/05_voz-tono-estilo.md` y `09_marca-agencia.md`; decisiones del operador del 2026-09-26.
 > §3.4 «El camino recorrido» (operador, 2026-09-29): AXIS `main@c92160b`, tag `v0.3.38` — 2026-09-29.
+> §4 «Portadas de perfil social» y §7 «Destacados» (operador, 2026-10-01): `develop` en `d1a41babb` — 2026-10-01.
 > Lo que no está en una fuente va marcado **«inferido»**: tómalo como lectura razonada, no como regla.
 
 Este archivo no repite números: esos viven en los tokens `efeonceGraphicLine` y los explica
@@ -506,6 +507,13 @@ pregunta o la evidencia cruzarían la órbita o al sujeto de la foto, **se acort
 marca?» → «¿Qué hace Efeonce?»; «¿Dónde pongo el presupuesto?» → «¿Dónde invierto?») o se parte la evidencia en 2–3
 líneas.
 
+**Portadas de perfil social: una idea propia, no un par del catálogo (operador, 2026-10-01).** La portada de una red
+es lo primero que se ve de Efeonce y no puede sonar a plantilla. «¿Qué hace Efeonce? **Crecer.**» —aprobada para la
+portada general del brochure— se rechazó como portada social («Really? WTF?»), y «Te hacemos visible.» ya estaba
+objetada (el operador notó que Efeonce no hace sólo eso; ledger, 2026-09-29). Lo aprobado: «¿Cuántos formatos?
+**Todos.**» y «¿Entre cientos de marcas, a quién cita la IA? **A ti.**», con Nexa en registro cine. Un par aprobado en una lámina o en otra pieza no se traslada solo a una portada social: se escribe para
+ella ([applications.md](applications.md) §A11).
+
 **Pares aprobados en las láminas del deck (operador, 2026-09-27;** catálogo
 `docs/operations/brand-graphic-line/deck-recipes/`**).** Las 69 láminas quedaron aprobadas con su voz; estos pares son
 copy aprobado dentro de su lámina (textos exactos del JSON; la respuesta se escribe sin punto porque el punto es la
@@ -704,6 +712,11 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
 - **Márgenes y zonas:** respeta el margen del formato y, en 9:16, la zona que tapa la interfaz de cada red (lámina 5.1).
 - **Densidad:** una órbita, una esfera, un acento, una luz, máximo dos herramientas del oficio (sección 2.2). La
   continuación de un documento baja el volumen, no lo repite.
+- **Una serie de destacados es una mezcla de recursos, no una plantilla** (operador, 2026-10-01: «una del ojo puede
+  servir, una de Nexa puede servir… podemos tener híbridos»; «somos agencia de marketing, no una óptica»). Cada
+  destacado tiene su escena —el ojo, Nexa, un objeto del oficio— y su color de luz sobre oscuro; nueve tomas iguales o
+  íconos planos se rechazaron («eso lo podría hacer mi hija de 10 años»). El círculo va sin firma: a ese tamaño no se
+  lee y la marca la pone el avatar ([applications.md](applications.md) §A11).
 - **La órbita no se mete debajo del texto:** nunca detrás del texto (láminas 4.7 2/3, 5.6). En la hoja membretada, la
   órbita recortada en la esquina y la carta en Poppins, sin tocarse.
 - **Oficio a la vista:** guía, marcas de corte, selección, nota al margen (una por pieza, firmada) y cursores; las guías y
@@ -812,6 +825,8 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **Todos los íconos respondiendo**, o un ícono respondiendo junto a otra esfera | responde uno solo y sólo si la pieza no tiene otra esfera | operador 2026-09-26 (D17); `auditIconGroup` |
 | **Un acento por objeto** en los íconos («el pincel en naranja») | el acento es de la línea de la pieza y va sólo en la esfera | operador 2026-09-26 (D18) |
 | **La línea aplicada a un cliente o a la interfaz de Greenhouse** | es marca propia de Efeonce | ADR, decisión 6 |
+| **Un par del catálogo como portada de perfil social** («¿Qué hace Efeonce? Crecer.») | la portada pide una idea propia | operador 2026-10-01 (§4) |
+| **Destacados de Instagram con la misma toma o con íconos planos**, o firma en el círculo | mezcla de recursos, una escena y un color de luz por destacado; la marca la pone el avatar | operador 2026-10-01 (§7) |
 
 ---
 

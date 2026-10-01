@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-01 — La órbita: perfiles sociales de Efeonce aprobados y documentados
+
+Portadas de LinkedIn (página y perfil personal), Facebook y YouTube, avatar de redes y nueve destacados de Instagram con su historia completa 9:16, aprobados por el operador; kit del equipo con «Tu portada de LinkedIn» y aviso 1:1. [Línea gráfica §10.1.1](docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01) · [manual de uso](docs/manual-de-uso/creative/usar-portadas-y-destacados-sociales-efeonce.md). Publicación en las redes pendiente.
+
 ## 2026-10-01 — Workbench: producción modular y Lab premium integral documentados
 
 PR15 integra producción modular SKY e identidad Git; PR16/17 integran el Lab premium completo, superficies equilibradas, coreografía de scroll y menús de familias/tokens con teclado y fallback nativo. Snapshot v6 publicado y verificado en Vercel protegido. Skills espejo, [continuidad vigente](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md), funcional y manuales enlazan contratos/evidencia del repo Workbench. Base documental PR246 integrada en develop; contratos 0.2, Metric/onboarding/IA y Efeonce ID conservan sus pendientes independientes. Este cierre documental no cambia runtime ni CLIs de Greenhouse.
@@ -632,7 +636,3 @@ Nuevo producto `studio.efeonce.org` (EPIC-049 / TASK-1887). Repo `efeoncepro/efe
 ## 2026-09-25 — CTA: política cromática por campaña
 
 Política optativa con archivo/hash, paleta AXIS y tratamientos explícitos; compositor y gate validan la decisión y conservan contraste/guardas. Legacy mantiene comportamiento: 13 piezas idénticas frente a HEAD. 39 tests, 14 verificaciones de integración y cuatro candidatas CMP-004 reproducidas; aprobación creativa pendiente. [Contrato](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#20-política-cromática-por-campaña-optativa) · [ADR](docs/architecture/EFEONCE_ADVERTISING_CAMPAIGN_COLOR_POLICY_DECISION_V1.md) · [evidencia](docs/audits/social/2026-09-25-cmp004-typography-grouping-review.md). Sin modificación del motor tipográfico/espacial, commit o publicación.
-
-## 2026-09-24 — ANAM: foto oficial de Emma, avatar de chat y cargo comercial
-
-La landing pública sirve `kortex-cms-react/30` con el retrato PNG enviado por María Paz y el cargo `Ejecutivo comercial ANAM`. El avatar derivado con fondo menta se guardó en la identidad de Customer Agent y en el chatflow `96601133`; el widget público mostró la nueva imagen sin enviar mensajes. Se actualizaron el [caso ANAM](docs/architecture/kortex/hubspot-cms/anam-chat-landing.md), la documentación funcional, el manual y las referencias espejo de `hubspot-as-a-service`. La QA completa móvil y conversacional del build #30 no se repitió.

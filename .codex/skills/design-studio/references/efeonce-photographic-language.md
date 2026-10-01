@@ -141,6 +141,33 @@ caso 3 ya está en el contrato (desde `axis-tokens` 0.3.14, TASK-1927): admite c
 o C (salvo las fotos de MCM, caso 4): la excepción del caso 3 no se extiende. Detalle: registro cine, delta (c); receta de cada lámina en
 `docs/operations/brand-graphic-line/deck-recipes/`.
 
+**Portadas de perfil y destacados de Instagram de Efeonce [operador, 2026-10-01].** El caso 1 (Nexa protagonista) quedó
+aprobado también en estas superficies sociales al aprobar las piezas («Esa de Nexa queda»; «Aprobadas todas.»):
+portadas de LinkedIn, Facebook y YouTube con Nexa, y destacados que la tienen como protagonista. Amplía el §2 del
+registro cine **sólo para estas superficies**; una pieza social con personas del equipo sigue en A, B o C. Los
+destacados mezclan recursos (el ojo, Nexa, objetos del oficio), cada uno con su escena. Piezas, medidas y archivos:
+`efeonce-graphic-line` → `applications.md` §A11.
+
+#### Extender una foto aprobada a 9:16 conservando el centro **[medido en 9 destacados, 2026-10-01]**
+
+Caso: la historia completa de un destacado de Instagram, que necesita la escena entera en 1080 × 1920 a partir de un
+cuadro ya aprobado (Instagram toma la portada del círculo central).
+
+1. **Base espejada:** la foto aprobada al centro de un lienzo de 1152 × 2048 con sus bordes reflejados (el mismo
+   principio del padeo de §11: un relleno liso invita al modelo a inventar).
+2. **Relleno con máscara** (GPT Image 2.5) sólo sobre la extensión.
+3. **Igualar el tono** de la extensión al cuadro aprobado en baja frecuencia.
+4. **Reponer el aprobado por el borde del círculo**, no por una línea: en la historia de 1080 × 1920, con centro en
+   x 540, y 960, la unión va del radio 488 al 540 px. Dentro del radio 488 los píxeles son los aprobados, byte a byte:
+   se verifica, no se supone.
+
+Lo que no funcionó: una unión **recta** en y 420/1500 se ve a tamaño real aunque el tono calce (cambia la nitidez), y
+una **segunda pasada de relleno sobre la unión** posteriza las sombras y copia la línea. Antes de concluir que algo
+posterizó, mira **un recorte pequeño a tamaño real**: en una hoja grande la «posterización» era de la vista previa (el
+archivo tenía 24 562 colores en esa zona). Deja calmas las zonas que tapa la interfaz: arriba ≈ 14 %, abajo ≈ 20 %.
+Si el plate aprobado está blando, una edición con GPT Image que pide **sólo detalle** y conserva la composición lo
+recupera; mira al 100 % después, porque puede meter personas ajenas al roster (se sacan con recorte).
+
 **Publicidad 9:16 y 4:5: en prueba, no aprobada.** La tanda del 2026-09-27
 (`ai-generations/2026-09-27_ads-cine/`, §11.1 del registro) tiene cuatro piezas y ninguna está autorizada para pauta;
 con personas del equipo el contrato la rechaza hasta que el operador amplíe la excepción. Lo que dejó medido:

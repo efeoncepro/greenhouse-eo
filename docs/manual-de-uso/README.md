@@ -31,6 +31,11 @@ La diferencia con otras capas de documentacion:
   con el logo en la imagen), componer con un agente, usar las animaciones de marca (la órbita y las animaciones del
   logo V1.1: qué archivo para qué editor y dónde bajar los masters), usar y pedir un ícono de la marca (Trazo y Plastilina), fotografiar merch u oficina, checklist de revisión, regenerar el
   PDF del manual y problemas comunes (burbuja negra en visores, burbuja-firma bajo 4,5:1, texto que cruza la órbita).
+- [Usar las portadas, el avatar y los destacados sociales de Efeonce](creative/usar-portadas-y-destacados-sociales-efeonce.md) —
+  qué archivo subir en LinkedIn (página y perfil personal), Facebook, YouTube e Instagram, cómo cambiar una portada,
+  el avatar único de las cuatro redes, **crear** un destacado (publicar primero la historia completa 9:16, `v02`) frente
+  a **cambiar** su portada (`v01`), cómo cada persona del equipo elige su portada de LinkedIn desde su página del kit,
+  dónde están los archivos en OneDrive, qué no hacer y problemas comunes. Aprobado el 2026-10-01; publicación pendiente.
 - [Usar la identidad sonora de Efeonce](creative/usar-identidad-sonora-efeonce.md) — elegir registro (fondo o energía) y
   pieza (logo, etiqueta con voz, sting/reveal/apertura, pieza larga, cierre de energía), bajar el archivo del kit en AXIS,
   sincronizar la esfera al golpe o a la palabra final, nivelar al destino y qué no hacer. Estado recomendada; Glitch no usa

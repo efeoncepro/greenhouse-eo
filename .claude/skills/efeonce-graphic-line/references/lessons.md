@@ -1,7 +1,7 @@
 # Lecciones (trampas que ya costaron tiempo)
 
-> Verificado contra: greenhouse-eo `develop` en `b84ec7084` — 2026-09-30 (última entrada: el deck SEO/AEO, TASK-1949);
-> antes, AXIS `c92160b` (tag `v0.3.38`) — 2026-09-29, noche (el camino recorrido y los
+> Verificado contra: greenhouse-eo `develop` en `d1a41babb` — 2026-10-01 (última entrada: los perfiles sociales y los
+> destacados de Instagram); antes, `b84ec7084` — 2026-09-30 (el deck SEO/AEO, TASK-1949); antes, AXIS `c92160b` (tag `v0.3.38`) — 2026-09-29, noche (el camino recorrido y los
 > módulos de correo); antes, greenhouse-eo@f05c26e2f (`develop`) — 2026-09-29, noche (el deck de práctica
 > Salesforce, TASK-1942; antes, greenhouse-eo@2c95e60b2: la órbita del AI
 > Visibility Report, canonizada en AXIS `v0.3.30`, `26097c5`, con la pregunta abierta del camino recorrido; antes, los
@@ -524,6 +524,30 @@
 - **El logo de un cliente dentro de una foto de caso se compone, nunca se genera.** La tarjeta de Banco BICE salió en
   blanco del modelo y el logo oficial se compuso con sharp (rotación, opacidad y posición medidas). Cuidado con la
   procedencia: el `Bice-logo.svg` de Wikimedia es del BICE argentino.
+
+## 2026-10-01 (perfiles sociales y destacados de Instagram)
+
+- **Una unión recta se ve aunque el tono calce.** Síntoma: al pasar la portada aprobada de un destacado a la historia
+  completa 9:16, la línea de y 420/1500 se veía a tamaño real. Causa: la extensión generada y el cuadro aprobado
+  difieren en nitidez, no sólo en tono. Regla: reponer el aprobado **por el borde del círculo** (radio 488 → 540 px
+  desde x 540, y 960), con el tono de la extensión igualado en baja frecuencia; nunca por una línea recta.
+- **Una segunda pasada de relleno sobre la unión la empeora.** Síntoma: sombras posterizadas y la línea copiada en la
+  zona nueva. Causa: el modelo toma la unión como parte de la escena y la reproduce. Regla: no se repara la unión con
+  otro relleno; se rehace la reposición por el círculo.
+- **La «posterización» era de la vista previa.** Síntoma: en hojas grandes leídas por el agente, las sombras parecían
+  en bandas. Causa: la reducción de la hoja; el archivo tenía 24 562 colores en esa zona. Regla: antes de concluir que
+  algo posterizó, mira un recorte pequeño a tamaño real.
+- **`setContent` no carga imágenes `file://`.** Síntoma: el render de Playwright salía sin fotos. Regla: abrir el HTML
+  local como archivo (`page.goto('file://…')`) y esperar `document.fonts.ready` antes de capturar.
+- **En el canvas de Claude Design, Poppins no carga por ruta relativa.** Síntoma: la fuente del sistema de diseño no
+  aparecía. Regla: subir las fuentes como asset `/_blob/` del canvas.
+- **Correr la foto deja una franja.** Síntoma: en la portada de LinkedIn personal, al mover la foto a la derecha para
+  liberar la foto de perfil, el hueco quedaba con otro tono. Causa: un fondo plano o un fundido no tienen la textura de
+  la foto. Regla: llenar el hueco **reflejando el propio borde** de la foto; donde las pantallas tocan el texto, se
+  corre más (Formatos 240 px, Estallido 220 px; el resto 80 px).
+- **Una edición de nitidez puede meter personas.** En Portafolio y Recetas, la edición con GPT Image que pedía sólo
+  detalle agregó personas ajenas al roster; se sacaron con recorte. Regla: después de una edición, mirar al 100 % si
+  apareció alguien; nunca personas fuera del roster en una foto de marca.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

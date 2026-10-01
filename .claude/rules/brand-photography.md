@@ -436,6 +436,8 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   registro**; cámara ~2 m y 85 mm, isotipo compuesto (nunca el del modelo) y nunca dos personas mirándose de cerca.
   Tercer caso (excepción del 2026-09-27, ya en el contrato AXIS): láminas de sección y «about» del deck, y portadas y
   contraportadas con foto. Fuera de esos casos no se usa. Canon vigente: `EFEONCE_PHOTO_REGISTER_CINE_V1.md` §2.
+  **Portadas de perfil y destacados de Instagram de Efeonce con Nexa protagonista: aprobados (2026-10-01)**; con
+  personas del equipo, no. Receta 9:16: design-studio, `efeonce-photographic-language.md` §Cine.
 - 🔴 **Una referencia que no se usa NO avisa** **[medido 2026-09-21]**. Con DOS personas el cupo baja a 2 por
   cabeza y recortaba **por orden de lista**: Julio se quedaba sin cuerpo entero siempre (sus dos primeras son
   de rostro) y Nexa lo perdía al pedir una vista. El modelo **inventaba la silueta y la pieza salía igual**.

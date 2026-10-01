@@ -117,6 +117,17 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
   `axis-brand-assets` 0.4.6, Lab https://axis.efeonce.org/references/email/. Greenhouse **no** los adoptó; queda
   abierta la tensión con la policy de footer de TASK-1764. Detalle: `efeonce-graphic-line` → `applications.md` §C4.
 
+## Perfiles sociales de Efeonce (aprobados 2026-10-01)
+
+- Portadas de LinkedIn (página y perfil personal del equipo), Facebook y YouTube, avatar de redes y nueve destacados de
+  Instagram con su historia completa 9:16. El operador los declaró parte del universo gráfico de Efeonce.
+- Lo que más cuesta romper: la portada lleva **una idea propia**, no un par del catálogo («¿Cuántos formatos?
+  Todos.» y «¿Entre cientos de marcas, a quién cita la IA? A ti.», con Nexa en registro cine); **logo abajo** en las de
+  la página y **de 120 px bajo el texto, fuera de la órbita**, en las personales; avatar = isotipo negativo al 60 %
+  sobre el oscuro con el halo, sin anillo ni arco; destacados como **mezcla de recursos**, sin firma en el círculo.
+- Piezas, medidas, zonas seguras, mecánica de los destacados y archivos: `efeonce-graphic-line` → `applications.md`
+  §A11; criterio en `criteria.md` §4 y §7.
+
 ## Reglas duras (las más caras de romper)
 
 1. **Ningún texto cruza la órbita.** Texto en el tercio inferior izquierdo; órbita fuera de eje, arriba a la derecha.
