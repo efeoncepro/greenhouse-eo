@@ -301,11 +301,11 @@ Reglas obligatorias (decisiones del operador del 2026-09-29):
 
 ## Acceptance Criteria
 
-- [ ] El operador eligió una dirección y aprobó la hoja de modelo de los cinco Sparks.
+- [ ] El operador eligió una dirección y aprobó la hoja de modelo de los cinco Sparks. (Parcial 2026-10-01: dirección elegida —B + ventanas de C— y Spark base aprobado («Me encanta»); falta la hoja de los cinco.)
 - [ ] Cada Spark tiene giro, expresiones y biblioteca de poses en fondo de estudio y transparente.
 - [ ] Ningún Spark tiene un parecido señalado con personajes de terceros en la revisión del Slice 1.
 - [ ] `foto:prompt` resuelve los cinco Sparks por catálogo y aborta cuando una escena describe robots sin declarar un Spark.
-- [ ] `scripts/foto/assets.lock.json` quedó resellado y `pnpm foto:assets:check` pasa.
+- [x] `scripts/foto/assets.lock.json` quedó resellado y `pnpm foto:assets:check` pasa. (2026-10-01, `04a662f78`: 200 assets, incluidas las 26 vistas del Spark base; se vuelve a sellar cuando entren los cinco del plantel.)
 - [ ] `SPARKS_V1.md` documenta relato, plantel, reglas, escala, registro y la búsqueda de colisiones del nombre.
 - [ ] El lenguaje fotográfico, el registro cine, la oferta de Transformación humano-agente y `09_marca-agencia.md` citan a los Sparks, y las skills tienen sus espejos `.codex`.
 
