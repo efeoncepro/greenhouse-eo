@@ -1,5 +1,27 @@
 # Corte de continuidad: 2026-09-30
 
+## Exportación REST independiente completa — 2026-09-30 (Chile)
+
+El operador autorizó guardar su nuevo PAT en Secret Manager de Workbench. Se creó
+`projects/efeonce-creative-workbench/secrets/workbench-figma-api-token`, versión 1 ENABLED,
+con escritura por stdin y readback exacto en memoria. Sin valor local/Git, grants nuevos
+al equipo/broker ni lectura del PAT antiguo expirado. Vencimiento nuevo no verificado.
+El consumer de mantenimiento puede transmitirlo por stdin al exporter; un job nunca
+selecciona secretos. La autenticación GCP se renovó con el runner autorizado.
+
+Figma REST devolvió HTTP 200 en 2 segundos para los 126 nodos en una llamada de imágenes,
+fijada a la versión `2404786957900889048` del JSON previamente sellado. Se descargaron
+y verificaron 126/126 PNG (nodos, dimensiones, SHA y versión), en 91 segundos.
+El MCP había respondido límite de llamadas; no confundirlo con este resultado REST ni
+atribuir una causa confirmada al fallo histórico sin diagnóstico.
+
+Canon privado SKY `2026-09-30/figma-rest-retry-2026-10-01T01-34-27-808Z/`: `exports.json`,
+`verification.json` y `attempt.json`; sufijo UTC, fecha local 30/09. Manifest SHA
+`615c6adb60be867820e465240366b952fd75cb1d469d6275c60fa178c24d94c8`.
+Los cortes inferiores «PNG incompleto» son historia. Comparación visual individual,
+aprobación comercial y actualización del Lab NO se cierran por descargar los PNG.
+No cambió pack, broker, IA, Packages ni Vercel. No certificar push de este corte local.
+
 ## Corte vigente: lotes de agentes y círculos nativos integrados — 2026-09-30 (Chile)
 
 Workbench [PR 11](https://github.com/efeoncepro/creative-workbench/pull/11) está mergeado en
@@ -563,3 +585,26 @@ Source `387a441` pusheado y validado: gates 36723761793 / native-harness 3672376
 CI: 193 pass / 18 skips / 0 fail (harness 177/16, SKY 5/2, Lab 11/0), con allowlist exigido. Locales
 211 pass / 0 skips (193 harness, 7 SKY, 11 Lab conservados). Los cuatro bloqueos de merge siguen
 abiertos; no activación, provider, IAM, broker, Packages ni snapshot Lab nuevos.
+
+
+## Comparación completa y corrección modular — verificada 2026-09-30
+
+Los 126 exports REST independientes están disponibles y sellados. Se compararon todas
+las piezas por nodo y se localizaron causas compartidas de logos, flechas, círculos,
+máscaras, premios, iconos y tipografía. Ver [components.md](components.md) para método
+portable y `docs/architecture/workbench-sky-reference-comparison.md` en Workbench
+para controles, findings y cierre verificado. Fuente REST 2404786957900889048,
+SHA JSON 288435cb5b29b687c2e242dbaa1cee9e1ada820703a1d2ddba060a214ba1288f.
+
+No ejecutar CLIs Greenhouse para reproducir esto. No re-sellar pack/catálogo ni cambiar
+PNGs/QA/outcomes de UUID anteriores. La auditoría actual se genera en el canon privado,
+sin IA ni acceso productivo; las decisiones CTA Metric se distinguen de diferencias
+Figma. Verificación: 126 renders, 126 nodos revisados técnicamente, cero defectos detectados
+pendientes, 305 tests locales sin SKIP. Modo público: 273 PASS y 21 SKIP licenciados
+exactos. Lab local 308 archivos/126 proyecciones, digest
+f61406d21a5accc9cd729316eb5868ced422dbb9dd99af4ebc25ddc322a82136; conserva
+las cuatro muestras de producción antiguas como corridas originales. Audit
+3d77325e5f1fcf4df30046dd0c3dfc7856834354fd3d3689406798c6a930d242 y review
+a81b8a2a81f4814bccbb170f9b00de5513e2df63917f76bd643258a5123a45a7, privados
+en `comparison-final-02` del canon SKY. Registro completo en HARNESS_STATUS; un
+cambio local no implica push, merge, Packages o publicación en creative.efeonce.org.

@@ -1,5 +1,27 @@
 # Instalación, distribución y runtime
 
+## Exportación REST independiente completa — 2026-09-30 (Chile)
+
+El operador autorizó guardar su nuevo PAT en Secret Manager de Workbench. Se creó
+`projects/efeonce-creative-workbench/secrets/workbench-figma-api-token`, versión 1 ENABLED,
+con escritura por stdin y readback exacto en memoria. Sin valor local/Git, grants nuevos
+al equipo/broker ni lectura del PAT antiguo expirado. Vencimiento nuevo no verificado.
+El consumer de mantenimiento puede transmitirlo por stdin al exporter; un job nunca
+selecciona secretos. La autenticación GCP se renovó con el runner autorizado.
+
+Figma REST devolvió HTTP 200 en 2 segundos para los 126 nodos en una llamada de imágenes,
+fijada a la versión `2404786957900889048` del JSON previamente sellado. Se descargaron
+y verificaron 126/126 PNG (nodos, dimensiones, SHA y versión), en 91 segundos.
+El MCP había respondido límite de llamadas; no confundirlo con este resultado REST ni
+atribuir una causa confirmada al fallo histórico sin diagnóstico.
+
+Canon privado SKY `2026-09-30/figma-rest-retry-2026-10-01T01-34-27-808Z/`: `exports.json`,
+`verification.json` y `attempt.json`; sufijo UTC, fecha local 30/09. Manifest SHA
+`615c6adb60be867820e465240366b952fd75cb1d469d6275c60fa178c24d94c8`.
+Los cortes inferiores «PNG incompleto» son historia. Comparación visual individual,
+aprobación comercial y actualización del Lab NO se cierran por descargar los PNG.
+No cambió pack, broker, IA, Packages ni Vercel. No certificar push de este corte local.
+
 ## Corte vigente: candidata validada para un operador, sin promoción
 
 Docs Greenhouse commits ccabbbf1 y95125d8a6, ambos sin push; este corte nuevo sin commit.
@@ -215,3 +237,19 @@ reintento. La CLI indica --receipt con el UUID incluso si pierde respuesta de re
 [revisión y límites](review-remediation.md); no confundir estos cambios locales con broker desplegado.
 El planIAM versionado se genera desde el admission exacto con deployment-plan.mjs; no ejecuta
 GCP ni modifica permisos. El presupuesto por persona/período continúa pendiente.
+
+
+### Auditoría actual de las 126 piezas
+
+`tools/sky-current-reference-comparison.mjs --manifest … --out …` admite únicamente
+126 controles REST SKY 1x y el source JSON sellado/versionado. Renderiza internamente
+recursos del pack y copia fuente normalizada, fuera de Git y sin proveedores. No acepta
+PNG arbitrarios del motor, jobs, credenciales ni sustitución de fotografía. Conserva
+los registros históricos; el comparador antiguo mantiene sus propios sellos.
+
+La nueva proyección nativa del Lab registra SHA de cada módulo y receipts de geometría,
+además de originalPreview/template/renderer/PNG/SVG. Una muestra de producción anterior
+permanece como tal: actualizar el visor no modifica la corrida de la muestra.
+El contrato CI exige 21 SKIP licenciados exactos en público (19 harness + dos SKY),
+con inventario revisado de 48 archivos/287 tests harness y dos archivos/siete tests SKY.
+En privado todos deben ejecutarse. No certificar píxeles únicamente desde CI público.

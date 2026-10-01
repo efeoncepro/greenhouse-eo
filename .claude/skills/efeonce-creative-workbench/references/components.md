@@ -139,7 +139,7 @@ pendientes; el encuadre técnico no concede legibilidad o aprobación. Merge con
 El renderer de SKY conserva `fillGeometry` en contenedores cuadrados plenamente redondeados
 (FRAME/INSTANCE/SYMBOL/ROUNDED_RECTANGLE). No reconstruir sus círculos con curvas cuadráticas
 ni cambiar proporciones por CSS. La rotación debe afectar por igual fondo, borde y contenido.
-Los contenedores ordinarios y las formas no circulares mantienen su comportamiento anterior.
+Los contenedores ordinarios también conservan los trazados disponibles, incluidos corner smoothing y radios independientes; el fallback sólo opera cuando no hay trazado fuente.
 
 `reference:build … --native-previews` verifica primero los previews históricos sellados y
 produce un snapshot nuevo desde templates/imágenes del pack SKY. `reference-projections.json`
@@ -151,3 +151,46 @@ revisión y conserva el SHA histórico en los formatos no afectados. No equivale
 Una muestra de producción antigua sigue siendo su corrida original: para aplicar una corrección
 del renderer a copy/foto propios hace falta una corrida nueva con la autoridad viva habitual.
 No modificar PNG/SVG/QA de un UUID completado ni presentar un render local como ejecución productiva.
+
+
+## Comparación independiente y recetas adicionales — 2026-09-30
+
+Canon actualizado en Workbench: `workbench-sky-reference-comparison.md`. La inspección
+usa 126 PNG REST independientes, versión 2404786957900889048, y recompone la copia
+histórica con el motor actual en un carril de mantenimiento. Cero invocaciones de IA;
+no genera UUID productivo ni hereda autorización comercial.
+
+El registro efectivo contiene 12 logos reparados (seis grandes + seis pequeños),
+105 flechas (74 + 25 + seis unions nativos), 21 bordes circulares `2 INSIDE`, un
+premio 2910 de 380 × 69 y tres grupos sin clip heredado de 4697. Los dos CYBERSKY
+2640/2845 restauran metadata de 15 descendientes cada uno; sus paths ya escalados
+no se escalan dos veces. Todos los pins son específicos de template, nodo y marca.
+
+Las seis unions deben tener winding coherente: contornos opuestos cancelan pintura
+en su intersección. `native-paint.mjs` integra exactamente el área Bézier y revierte
+control points cuando corresponde; nunca expande bordes ni redibuja una silueta.
+La regresión raster inspecciona también el primer join, no sólo el centro del cuerpo.
+
+Las máscaras OUTLINE heredadas conservan contornos de hojas y transforms compuestos.
+Los círculos y chips bancarios usan curvas originales; nunca cajas sintéticas que
+eliminen radios independientes. La referencia del Lab puede proyectar estas recetas
+con `--native-previews`, conservando los glyphs originales y la procedencia histórica.
+
+27 campos tienen overhang presente en la fuente; sus caps se ligan a field, template,
+ancestro, cara Metric y límite medido. No modifican el clip ni admiten nuevas regiones.
+El `$` de 4678 usa Regular 32 efectivo en lugar del descriptor heredado Bold 56.
+El ajuste de altura respeta el primer baseline y usa el baseline real para cada línea
+adicional; jamás clamping general que permita otra línea fuera de caja. El URL canónico
+legal prefiere `/` y `-` como cortes; conserva cada carácter y su índice de estilo.
+
+Comando reproducible, **desde Workbench**, tras instalar su canon privado:
+
+```sh
+node tools/sky-current-reference-comparison.mjs --manifest /ruta/privada/exports.json --out /ruta/privada/nueva/comparacion
+```
+
+`audit.json` registra 126 nodos, métricas por zona, SHA de controles/PNG/SVG, copia,
+recetas, fuentes y módulos. `index.html` permite inspeccionar las dos piezas en tamaño
+nativo y la diferencia amplificada. La revisión humana/técnica se registra aparte:
+una métrica o un render exitoso no aprueba una campaña. Para fotografía/copy nuevos,
+usar `marca:disenar`/`marca:lote` con la autoridad normal y contenido explícito.
