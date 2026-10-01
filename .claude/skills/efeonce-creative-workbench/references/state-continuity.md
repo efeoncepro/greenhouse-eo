@@ -12,8 +12,14 @@ Workbench añade configurador/chequeo por cuenta activa, hooks de commit/push ve
 instalación sin credenciales y protección de hooks previos. 19 tests de identidad + tres de
 instalación PASS, con Git real y comprobación negativa live de GIT_AUTHOR_EMAIL y
 GIT_COMMITTER_EMAIL del Mac. Ver [operations-distribution.md](operations-distribution.md).
-Baseline anterior PR15 head 8b61711: GitHub gates/native-harness/lab-checks y Vercel SUCCESS;
-la corrección persistente requiere readback del nuevo head, no hereda ese resultado.
+Código de identidad commiteado/pusheado normalmente con hooks activos: PR15 head `531c6de`.
+GitHub vincula autor y committer a cesargrowth11; Vercel SUCCESS para ese mismo head observado
+live. GitHub gates, native-harness y lab-checks SUCCESS también para el mismo head; no se
+atribuye ese resultado a commits posteriores ni a la promoción de main.
+Verificación local final: 348 harness + 7 SKY + 11 Lab = 366 PASS/0 SKIP. Pública: 325 PASS/30
+SKIP exactos (56+2 archivos). Skills commiteadas/pusheadas en
+[PR246 draft Greenhouse](https://github.com/efeoncepro/greenhouse-eo/pull/246), base develop.
+Ambos PR abiertos, sin merge ni nueva publicación de Packages/producción. Shared Lab WIP preservado.
 
 ## Componentes autónomos — unidad local 2026-10-01
 

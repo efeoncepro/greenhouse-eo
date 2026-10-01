@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Corte 2026-10-01: baseline Workbench PR14 en main be57032. Goal local de componentes autónomos SKY sobre rama codex/sky-autonomous-components: 126 árboles y renders exactos; privado 344 PASS, público 303 PASS/30 SKIP. Lectores, descomposición/extracción/roundtrip, tokens de propiedades y pipeline modular verificados; contratos 0.2.0 preparados sin publicación; código 1d48c26 commiteado/pusheado en PR15 draft sin merge. Onboarding completo del equipo y runtime IA siguen pendientes; Efeonce ID diferido en TASK-1952, sin AUTH paralelo. No ejecutar sync total heredado ni alterar CLIs Greenhouse.`
+- Status real: `Corte 2026-10-01: baseline Workbench PR14 en main be57032. Goal local de componentes autónomos SKY sobre rama codex/sky-autonomous-components: 126 árboles y renders exactos; privado 344 PASS, público 303 PASS/30 SKIP. Lectores, descomposición/extracción/roundtrip, tokens de propiedades y pipeline modular verificados; contratos 0.2.0 preparados sin publicación; código modular/identidad Git 531c6de commiteado/pusheado en PR15 draft; Vercel SUCCESS, sin merge. Skill espejo en PR246 draft, sin merge. Onboarding completo del equipo y runtime IA siguen pendientes; Efeonce ID diferido en TASK-1952, sin AUTH paralelo. No ejecutar sync total heredado ni alterar CLIs Greenhouse.`
 - Rank: `1`
 - Domain: `platform|tooling|content`
 - Blocked by: `none`
