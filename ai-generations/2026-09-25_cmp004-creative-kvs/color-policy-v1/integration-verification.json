@@ -1,0 +1,124 @@
+[
+  {
+    "case": "contextual compone",
+    "passed": true,
+    "exit": 0,
+    "expected": 0,
+    "evidence": []
+  },
+  {
+    "case": "contextual reproduce y verifica",
+    "passed": true,
+    "exit": 0,
+    "expected": 0,
+    "evidence": [
+      "✓ lo entregado es idéntico a la reproducción. Veredicto sobre el QA reproducido:",
+      "✓ 1 pieza(s) con CTA certificadas por reproducción: lo entregado es idéntico a lo que produce el comando del repo · huellas del plan, el plate, el PNG, el layout, el texto alternativo y el comando · texto ≥4.5:1 · superficie ≥3:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon."
+    ]
+  },
+  {
+    "case": "política modificada invalida QA",
+    "passed": true,
+    "exit": 1,
+    "expected": 1,
+    "evidence": [
+      "✗ C01-color-policy-v1: cta.colorPolicy.sha256: la política cambió; revisa la decisión, actualiza su referencia y recompón"
+    ]
+  },
+  {
+    "case": "evidencia faltante bloquea",
+    "passed": true,
+    "exit": 1,
+    "expected": 1,
+    "evidence": [
+      "✗ C01-color-policy-v1: la evidencia de política cromática falta o no coincide; recompón"
+    ]
+  },
+  {
+    "case": "evidencia manipulada bloquea",
+    "passed": true,
+    "exit": 1,
+    "expected": 1,
+    "evidence": [
+      "✗ C01-color-policy-v1: la evidencia de política cromática falta o no coincide; recompón"
+    ]
+  },
+  {
+    "case": "auto no sustituye decisión contextual",
+    "passed": true,
+    "exit": 1,
+    "expected": 1,
+    "evidence": [
+      "Error: plan inválido — C01-color-policy-v1: cta.variant: debe coincidir con el tratamiento editorial-outline; no se sustituye automáticamente"
+    ]
+  },
+  {
+    "case": "legacy neutro se compone",
+    "passed": true,
+    "exit": 0,
+    "expected": 0,
+    "evidence": []
+  },
+  {
+    "case": "legacy mantiene exigencia de acento",
+    "passed": true,
+    "exit": 1,
+    "expected": 1,
+    "evidence": [
+      "✗ C01-color-policy-v1: `surfaceToken: inkOnDark` no es un acento (accentSurface · growthOnDark · accentInkOnLight). En `solid`/`outline` el acento lo porta la superficie; lo que se degrada por contraste es la tinta. Si el acento no alcanza el mínimo, se regenera el plate — no se apaga el color.",
+      "✗ 1 fallo(s) en 1 pieza(s) con CTA."
+    ]
+  },
+  {
+    "case": "text contextual compone con tinta explícita",
+    "passed": true,
+    "exit": 0,
+    "expected": 0,
+    "evidence": []
+  },
+  {
+    "case": "text contextual conserva guarda de zona segura",
+    "passed": true,
+    "exit": 1,
+    "expected": 1,
+    "evidence": [
+      "✗ C01-color-policy-v1: fuera de la zona segura feed de AXIS: cta-boton. La zona ya es la de AXIS: acorta el texto, baja su tamaño o sube el bloque",
+      "✗ 1 fallo(s) en 1 pieza(s) con CTA."
+    ]
+  },
+  {
+    "case": "text con reserva de marco compone",
+    "passed": true,
+    "exit": 0,
+    "expected": 0,
+    "evidence": []
+  },
+  {
+    "case": "text con reserva de marco verifica",
+    "passed": true,
+    "exit": 0,
+    "expected": 0,
+    "evidence": [
+      "✓ 1 pieza(s) con CTA cumplen el canon según su QA (verificación rápida: confía en el QA; la imagen se certifica con `--reproducir`) · huellas del plan, el plate, el PNG, el layout, el texto alternativo y el comando · texto ≥4.5:1 · superficie ≥3:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon."
+    ]
+  },
+  {
+    "case": "política válida con tinta blanca sobre relleno blanco compone",
+    "passed": true,
+    "exit": 0,
+    "expected": 0,
+    "evidence": []
+  },
+  {
+    "case": "política nunca exime contraste insuficiente",
+    "passed": true,
+    "exit": 1,
+    "expected": 1,
+    "evidence": [
+      "✗ C01-color-policy-v1: CTA 1:1 < 4.5:1",
+      "✗ C01-color-policy-v1: «cta» mide 1:1 y necesita 4.5:1 (WCAG 2.2 AA, 11.8 px en pantalla).",
+      "✗ C01-color-policy-v1: el CTA no alcanza el piso perceptual — cta APCA Lc 0/60 · cta con daltonismo P 1 · D 1 · T 1 (necesita 4.5:1). Prueba `variant: \"auto\"`, otra tinta u otro acento",
+      "✗ 3 fallo(s) en 1 pieza(s) con CTA."
+    ]
+  }
+]

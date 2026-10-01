@@ -1,0 +1,27 @@
+{
+  "formato": "9:16",
+  "impacto": true,
+  "id": "T1-escucha",
+  "palanca": "luz-motivada",
+  "objetos": [
+    {
+      "objeto": "polo-efeonce",
+      "color": "navy"
+    },
+    {
+      "objeto": "lanyard-efeonce",
+      "usoDe": "generico"
+    }
+  ],
+  "escena": "SCENE (documentary, on location at a client's family bakery before opening): an Efeonce strategist in the navy Efeonce polo with the Efeonce lanyard, badge card turned away and unreadable, sits on a flour sack across from the baker and listens, caught at the exact moment she leans in and writes a single word in her notebook while he explains with floury hands; nobody looks at the lens. A hard warm light from the open oven mouth behind them, the brightest thing in the frame and warms their faces; cool dawn light from the shop window rims them from the side. One plain azure-blue (#0375DB) notebook in her hands carries the only blue. White tiled wall above them, plain and evenly shadowed. 35mm f/2. No readable signs or labels.",
+  "lecho": {
+    "objeto": "the floury wooden counter edge right at the lens, dissolved into blur and outside the oven light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the plain, evenly shadowed white tiled wall high above them",
+      "tinta": "blanca"
+    }
+  }
+}

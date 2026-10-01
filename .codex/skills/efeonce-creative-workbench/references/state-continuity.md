@@ -1,5 +1,11 @@
 # Estado y continuidad de Workbench
 
+**Último feedback visual — 2026-10-01:** [handoff de alineación](layout-feedback-handoff.md).
+LEFT global de legales fue invalidado; el código local 1.3.0 todavía lo aplica. El PDF v3
+queda parcial/rechazado en los aspectos señalados. Las correcciones de03-2668, 01-2611
+y 23-4685 se ejecutan en un chat nuevo; este cambio sólo registra documentación.
+El corte al final de esta referencia prevalece sobre la declaración de regla vigente anterior.
+
 ## Corte consolidado — 2026-10-01
 
 **Acceso/runtime posterior:** [estado vigente del visor abierto](../../../../docs/operations/creative-production/WORKBENCH_LAB_ACCESS_STATE.md).
@@ -836,3 +842,55 @@ Capturas `families-vercel-desktop.png` y `tokens-vercel-desktop.png`, readbacks 
 checks en el dossier privado `2026-10-01-workbench-filter-selects-v6` del canon local.
 16 recorridos interactivos locales desktop/móvil/reduced/no-JS respaldan el contrato.
 No se infiere aceptación visual del operador. Sin cambios de broker/paquetes/pack.
+
+### Reglas SKY de la diseñadora + siete Calama — 2026-10-01, local
+
+En /private/tmp/cw-sky-production-flow, rama codex/lab-efeonce-favicon, extensión nativa content-layout designer-rules@1.0.0: centrado por tinta, precio Metric Black, condiciones sentence case, badge proporcional, origen reflow y tarifa/condiciones contenidas en flecha. 104 fuentes fijadas con cobertura por elemento; packs/FIG/assets originales intactos. Contrato docs/architecture/workbench-sky-designer-content-rules.md, sin fallback de geometría o reducción de fuente.
+
+Siete Calama desde Santiago/$999.999/tasas incluidas, más siete Buenos Aires anteriores corregidas. Producción con autoridad viva, cero providers. Fotografías históricas ilustrativas, datos de prueba y ninguna aprobación comercial. Corridas/selección propias de cada proyecto, PDF ocho páginas/campaña, 7 PNG + 7 SVG y ZIP. Revisados visualmente ambos documentos. Canon privado /Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-10-01/calama-reglas-diseno y buenos-aires-prueba-v3; versiones previas preservadas.
+
+Harness privado 362/362 sin skips y cuatro gates PASS. Diagnóstico copy histórico 123/126: dos URLs partidas y una condición demasiado larga rechazadas; siete jobs Calama completos sí pasan. No afirmar revisión visual completa de 126 ni admisión de copy arbitrario. Skills mirrors validadas. Código local; no commit/push/deploy de esta extensión. No ejecutar/alterar CLIs Greenhouse.
+
+## SKY — 24 adaptaciones y badges tarifarios — 2026-10-01, local
+
+Receta content-layout designer-rules@1.1.0: condiciones compactas centradas en una línea, con tamaño fijo por formato (12/10/8 px), sin autofit por longitud. El paint efectivo se toma del precio sellado para conservar contraste sobre la flecha. Las dobles monedas respetan orientación y contenedor nativo; QA verifica separación de tinta. Badges tarifarios adaptativos: 42 ofertas simples más 16 Tags adicionales fijados por fuente; ancho por tinta y padding, altura preservada y centrado real. En 3638, DESDE pasa de 121 a 55,8 px de ancho manteniendo altura 24 px. Packs, FIG, fotografías y fuentes originales intactos.
+
+24 piezas seleccionadas de 24 variantes fuente, ocho dimensiones y datos explícitos ficticios; autoridad viva y cero providers. Proyecto projects/sky/prueba-modular-24-adaptaciones, recetas/jobs/locks/outcomes/QA y selección reproducible. Canon privado /Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-10-01/prueba-modular-24: PDF A4 de 25 páginas, HTML autocontenido, 24 PNG + 24 SVG y ZIP. Revisión visual de las 24 piezas y las 25 páginas rasterizadas del PDF; surround oscuro preservado. Fotografías históricas ilustrativas, no aprobación comercial.
+
+Harness privado 366/366 PASS, cero skips, 58 archivos; cuatro gates PASS. Skills Codex/Claude espejadas y validadas. Extensión local sin commit/push/deploy, sin publicación de paquete ni ejecución/alteración de CLIs Greenhouse. Las corridas previas permanecen inmutables; receipts.json selecciona los outcomes finales y preserva sus locks particulares.
+
+## SKY — promociones en flecha alineadas a la izquierda — 2026-10-01, local
+
+Feedback del operador: el titular del20% debe seguir el eje de la referencia50%. Causa corregida: promotion-sticker incluía bloques editoriales a los que se aplicaba CENTER. Receta content-layout designer-rules@1.2.0 distingue seis fuentes3032/3040/3051/3059/3070/3078: todas las líneas del titular y condiciones alineadas por tinta al eje izquierdo nativo del badge HASTA, con texto del badge centrado dentro. Geometría, tamaño y tipografía nativos preservados; QA promotion-arrow-left-axis y clipping final obligatorios. Packs/FIG/fuentes históricos intactos.
+
+Regeneradas09-3032 (ea7067ad-4b57-49d8-93fd-ad3e7aa9c755) y10-3059 (3bb0f914-1652-4a9e-be81-88dfc77c451a), identidad viva, cero providers. Las otras22 piezas seleccionadas conservan sus bytes; corridas y documento anterior intactos. Revisión visual de ambos PNG, portada y páginas10/11 del PDF nuevo. PDF25páginas con QA de geometría/fuentes/imágenes en todas; canon privado sky-airline/2026-10-01/prueba-modular-24-v2.
+
+Harness privado367/367 PASS, cero skips/58archivos; cuatro gates PASS. Skills Codex/Claude byte-equivalentes (18archivos,256links) y diff sin whitespaceerrors. Local, sin commit/push/deploy ni aprobación comercial. No ejecutar/alterar CLIs Greenhouse.
+
+## Histórico técnico: destinos adaptativos y feedback PDF — 2026-10-01, local
+
+Content-layout1.3.0 sustituye CENTER por LEFT para169 campos legales de 104 fuentes; condiciones compactas siguen tamaños fijos 12/10/8 px y una línea. Destino content-flow1.0.0 admite95 fuentes: tamaños Metric finitos, dos líneas por palabras, origen/precio por tinta y banda limitada, banners centrados y panel blanco refluido. Fotos, ventanas, logo, CTA, fidelidad y servicios conservan posición. El PDF Mesa de trabajo2 copia2 aporta los tres criterios; no contiene lógica ejecutable. Leer [destinos y espacios](destination-content-flow.md) y el contrato en Workbench.
+
+Verificación:377/377 harness privado PASS sin skips (59archivos),10/10 suite SKY y cuatro gates PASS. Regresiones propias25/25: short/long/acento, fuente/sello ajeno, overflow explícito, ventanas/fotos fijas, legales por línea y footer preservado. Inventario CI explícito:53casos licenciados en ambas suites, sin afirmar ejecución de public mode.
+
+24/24 corridas nuevas completadas con autoridad real, cero providers; selecciones previas/runs/documentos inmutables. Export v3:24PNG+24SVG coinciden con outcomes; ZIP48 originales. PDF25páginas A4, fuentes listas/imágenes decodificadas, mínimo margen cuerpo-footer75,9375px. Revisado contacto24, detalles de destino/panel y páginas12/15 del PDF real. Matriz adicional de9 renders de diagnóstico: Calama/Buenos Aires/San Pedro de Atacama en banner/fidelidad/servicios; no son recibos productivos. Canon privado: sky-airline/2026-10-01/prueba-modular-24-v3. Sin commit/push/deploy ni aprobación comercial. CLIs de Greenhouse intactas.
+
+
+## Corte vigente: feedback visual pendiente para chat nuevo — 2026-10-01
+
+El operador pidió actualizar docs/skills con subagentes ahora y corregir en otro chat.
+[Handoff de alineación](layout-feedback-handoff.md) y el canon Workbench
+`docs/operations/sky-layout-feedback-handoff-2026-10-01.md` gobiernan la continuación.
+LEFT global de legales ya no es la regla visual aprobada: centrar los pies señalados,
+separar footer/condiciones/cláusulas/ejes editoriales y fijar cada decisión por source pin.
+La implementación 1.3.0 sigue forzando LEFT; no se corrigió código ni se regeneraron piezas
+por registrar este feedback. No deducir CENTER global para todos los contenidos.
+
+Casos: 03-2668 hueco entre destino/origen y pie legal;01-2611 badge DESDE y eje de la
+pila precio/condiciones;23-4685 conjunto HASTA/5%/DE DCTO./CTA y relación con destino.
+El PDF v3 está parcial/rechazado en estos aspectos. Los 377 tests/gates anteriores son
+evidencia técnica histórica, no aceptación visual. Preservar v1/v2/v3, locks, outcomes,
+corridas y selección para comparaciones posteriores, sin declarar nueva entrega corregida.
+
+Documentación únicamente; sin commit/push/deploy ni comprobación nueva de runtime.
+Greenhouse sólo contiene la skill espejo; sus CLIs y el resto del WIP permanecen intactos.

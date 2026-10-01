@@ -1,0 +1,40 @@
+{
+  "ref": "HEAD",
+  "refSha": "19a00465c",
+  "candidato": "scripts/foto/componer-cta.mjs",
+  "resultados": [
+    {
+      "clave": "3037130462f35700",
+      "id": "p2-cta-relleno",
+      "planes": [
+        "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta.json#p2-cta-relleno"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-CsXm8J/3037130462f35700"
+    },
+    {
+      "clave": "9937bbb8e10274cb",
+      "id": "p1-cta-contorno",
+      "planes": [
+        "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta.json#p1-cta-contorno"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-CsXm8J/9937bbb8e10274cb"
+    },
+    {
+      "clave": "c21cadbd14d89f7b",
+      "id": "p3-cta-texto",
+      "planes": [
+        "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta.json#p3-cta-texto"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-CsXm8J/c21cadbd14d89f7b"
+    }
+  ]
+}

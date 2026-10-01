@@ -166,3 +166,7 @@ Actualizar dueños Workbench, HARNESS_STATUS y evaluación; actualizar la refere
 si cambió la operación. Comparar ambos bundles con `scripts/validate.py`. No copiar secretos,
 fonts Metric, biblioteca serializada ni outputs a la skill. Dejar pendientes con siguiente evidencia
 y owner; no cerrar IA, onboarding de todos o Efeonce ID por producir un lote sin proveedor.
+
+## Implementación local y feedback de alineación pendiente — 2026-10-01
+
+Leer [destinos y espacios adaptativos](destination-content-flow.md) para conocer la implementación local y sus límites. **Antes de continuar, leer [feedback pendiente de alineación](layout-feedback-handoff.md)**: el operador invalidó LEFT global de legales y señaló huecos/ejes en 03-2668, 01-2611 y 23-4685. Corregir en el próximo chat por función y source pin; no aplicar CENTER global por deducción. El código 1.3.0 sigue LEFT, los 377 tests no certifican aceptación visual y el documento v3 queda parcial/rechazado en esos aspectos. No mover fotos/ventanas como origen, aplicar autofit a otros componentes ni sustituir corridas históricas.

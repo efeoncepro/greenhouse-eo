@@ -1,0 +1,120 @@
+=== lapiz
+· área visible 439 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (15.69, 33.5) r≈4.44 · (26.99, 19.06) r≈2.13
+· la esfera no cae en un calado: confirma a ojo que esté donde ocurre la acción
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/lapiz
+✓ lapiz pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== rodillo
+· área visible 491 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: ninguno
+· la esfera no cae en un calado: confirma a ojo que esté donde ocurre la acción
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/rodillo
+✓ rodillo pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== aerosol
+· área visible 559 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (32.57, 7.41) r≈1.24
+· la esfera cae en el calado (32.57, 7.41); si el calado es más chico que la esfera está bien: el anillo de 4.5 la separa
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/aerosol
+✓ aerosol pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== escuadra
+· área visible 506 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (19.85, 27.53) r≈5.5
+· la esfera cae en el calado (19.85, 27.53); si el calado es más chico que la esfera está bien: el anillo de 4.5 la separa
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/escuadra
+✓ escuadra pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== postit
+· área visible 560 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (27.63, 32.18) r≈1.97
+· la esfera no cae en un calado: confirma a ojo que esté donde ocurre la acción
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/postit
+✓ postit pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== encuadre
+· área visible 560 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (23.86, 24.19) r≈7.05
+· la esfera cae en el calado (23.86, 24.19); si el calado es más chico que la esfera está bien: el anillo de 4.5 la separa
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/encuadre
+✓ encuadre pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== pelicula
+· área visible 560 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (22.36, 16.43) r≈2.5 · (23.24, 13.2) r≈1.75 · (31.18, 24.91) r≈1.54 · (35.87, 26.18) r≈1.52
+· la esfera cae en el calado (22.36, 16.43); si el calado es más chico que la esfera está bien: el anillo de 4.5 la separa
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/pelicula
+✓ pelicula pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== vinilo
+· área visible 560 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (23.53, 23.38) r≈3.92 · (23.51, 23.22) r≈1.53
+· la esfera cae en el calado (23.53, 23.38); si el calado es más chico que la esfera está bien: el anillo de 4.5 la separa
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/vinilo
+✓ vinilo pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== guitarra
+· área visible 546 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (22.73, 24.47) r≈3.72 · (16.96, 31.34) r≈2.35
+· la esfera cae en el calado (22.73, 24.47); si el calado es más chico que la esfera está bien: el anillo de 4.5 la separa
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/guitarra
+✓ guitarra pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== reproducir
+· área visible 560 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (23.89, 23.76) r≈5.65
+· la esfera cae en el calado (23.89, 23.76); si el calado es más chico que la esfera está bien: el anillo de 4.5 la separa
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/reproducir
+✓ reproducir pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== varita
+· área visible 409 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: ninguno
+· la esfera no cae en un calado: confirma a ojo que esté donde ocurre la acción
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/varita
+✓ varita pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== taza
+· área visible 560 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (32.98, 26.38) r≈2.88
+· la esfera no cae en un calado: confirma a ojo que esté donde ocurre la acción
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/taza
+✓ taza pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== lampara
+· área visible 559 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (30.92, 23.06) r≈3.47
+· la esfera cae en el calado (30.92, 23.06); si el calado es más chico que la esfera está bien: el anillo de 4.5 la separa
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/lampara
+✓ lampara pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== trofeo
+· área visible 560 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: (34.77, 17.91) r≈2.42 · (13.06, 22) r≈2.39
+· la esfera no cae en un calado: confirma a ojo que esté donde ocurre la acción
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/trofeo
+✓ trofeo pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0
+=== estrella
+· área visible 560 u² (set aprobado: 394–559; los alargados, como pincel y cuentagotas, quedan bajo 560 porque manda el radio)
+· calados: ninguno
+· la esfera no cae en un calado: confirma a ojo que esté donde ocurre la acción
+· revisa a ojo: que la esfera esté donde ocurre la acción, que no choque con el objeto y que los calados se lean a 32 px
+· hojas de control en /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_iconos-oficio/plastilina/control/estrella
+✓ estrella pasa las reglas medibles. Falta la revisión visual y el alta (docs/agent-composition/iconography.md).
+exit=0

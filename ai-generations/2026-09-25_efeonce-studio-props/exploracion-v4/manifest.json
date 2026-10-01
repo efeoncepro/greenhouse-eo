@@ -1,0 +1,40 @@
+{
+  "status": "open_not_approved",
+  "recommended_for_development": null,
+  "approval": false,
+  "brand_lift_measured": false,
+  "format": "vector_concept_boards_and_schematic_views",
+  "photographic_generation": false,
+  "pdf_pages": 10,
+  "individual_png_views": 48,
+  "routes": [
+    "a-memoria",
+    "b-encuentro",
+    "c-criterio"
+  ],
+  "source_brief": "BRIEF.md",
+  "files": [
+    "00-comparacion.png",
+    "01-a-ruta.png",
+    "01-a-objetos.png",
+    "02-b-ruta.png",
+    "02-b-objetos.png",
+    "03-c-ruta.png",
+    "03-c-objetos.png",
+    "04-colores-encuentro.png",
+    "05-acrilico.png",
+    "06-materia.png"
+  ],
+  "selected_route": null,
+  "operator_feedback": "../FEEDBACK-ABIERTO.md",
+  "retained_preferences": [
+    "low_logo_with_space",
+    "words_using_mug_surface",
+    "agenda_word_field_with_one_emphasis_as_exploration",
+    "outline_words_filled_inside_circle"
+  ],
+  "unresolved": [
+    "word_field_pattern_execution",
+    "overall_graphic_line"
+  ]
+}

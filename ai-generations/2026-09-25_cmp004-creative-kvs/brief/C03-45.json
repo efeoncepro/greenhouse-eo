@@ -1,0 +1,16 @@
+{
+  "id": "CMP004-C03-45",
+  "formato": "4:5",
+  "impacto": true,
+  "escena": "SCENE: extremely focused craft in a real digital edit suite. The main calibrated monitor dominates the middle of frame and shows a FINISHED premium six-second product film frame: a clear glass fragrance bottle standing on a warm stone plinth, a single crisp cobalt-blue light edge defining its silhouette, and one small orange refracted glint in the glass. On the smaller screen directly beneath, a physically plausible video-edit timeline with exactly one short highlighted clip and six unnumbered beat divisions; NO readable interface labels, NO text and no logos. A colorist’s hand is at a real editing dial in the foreground, turning it to align the glint with the product reveal; only the hand and hardware, no generic people-at-computer portrait. Side-by-side large preview and small editing timeline make finished work versus precise intervention legible. Black acoustic fabric has visible texture, orange motivated light from the product image, blue from the physical monitor edge. 65mm photographic lens, tactile reflections, intentional depth. The screen artwork is an original fictional Efeonce exploration, not a client case. THE EXACT MOMENT: the colorist turns the dial until the small orange glint lands precisely on the bottle edge in the finished frame.",
+  "lecho": {
+    "objeto": "the edge of the dark grading control panel with its trackballs directly beneath the lens",
+    "tono": "DARK near black, matte instrument surface"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "a continuous area of charcoal acoustic fabric wall above the entire scene, in deep warm shadow with subtle visible woven texture",
+      "tinta": "blanca"
+    }
+  }
+}

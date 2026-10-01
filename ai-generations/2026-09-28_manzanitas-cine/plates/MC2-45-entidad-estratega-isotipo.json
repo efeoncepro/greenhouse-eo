@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.foto.isotipo.v1",
+  "plate": "MC2-45-entidad-estratega.png",
+  "salida": "MC2-45-entidad-estratega-isotipo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.3.5",
+  "archivo": "assets/efeonce-isotype-negative.svg",
+  "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74",
+  "prenda": "oscura",
+  "caja": {
+    "centro": [
+      0.652,
+      0.67
+    ],
+    "ancho": 0.09,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": null,
+  "creado": "2026-09-28T11:05:46.349Z"
+}

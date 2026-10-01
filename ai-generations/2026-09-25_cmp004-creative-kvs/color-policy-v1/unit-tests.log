@@ -1,0 +1,47 @@
+✔ legacy permanece sin política ni tokens nuevos (1.033958ms)
+✔ resuelve roles reales sin modificar el plan y mantiene revisión visual pendiente (2.716417ms)
+✔ reproducción desde otra carpeta conserva exactamente la decisión (0.639334ms)
+✔ política alterada, ausente o JSON inválido falla sin fallback (0.674583ms)
+✔ no acepta campaña distinta, tratamiento inexistente ni versiones desconocidas (1.490291ms)
+✔ tokens, variante y prominencia deben coincidir; no rellena omisiones ni acepta auto (0.888458ms)
+✔ todos los tratamientos de campaña deben pertenecer a su paleta (0.673916ms)
+✔ IDs duplicados, campos desconocidos y tintas inventadas son inválidos (0.561417ms)
+✔ text sólo tiene tinta; solid registra relleno y tinta por separado (0.783292ms)
+✔ no simula superficies que no se pintan ni omite las que sí se pintan (0.820625ms)
+✔ el esquema de pieza reconoce la referencia estricta y rechaza URLs y campos desconocidos (2.038542ms)
+✔ La pieza mínima es válida (2.169667ms)
+✔ La zona de la firma tiene forma: una zona incompleta o invertida se rechaza (antes era z.any()) (1.215375ms)
+✔ Un campo interno del compositor en la raíz se rechaza (no se inyecta estado resuelto) (0.223666ms)
+✔ Las escalas de la selección tienen techo (una etiqueta de 148 px pasaba con escala 5) (0.770291ms)
+✔ Las aprobaciones que apagan una medición aceptan el sha del plate (0.190666ms)
+✔ Sin velo: scrimTop y scrimBottom se rechazan (el lecho sale del prompt) (0.541334ms)
+✔ El canon declarado sólo puede ser el vigente, y la nota nunca sube con un gap negativo (0.236917ms)
+✔ Las reglas del canon nuevo se pueden exceptuar con aprobación (0.236208ms)
+✔ Marcado, entidades, saltos de línea y placement chico se rechazan donde se dibujarían mal (tramo 12) (0.742125ms)
+✔ Entidades sin punto y coma con la lista oficial de HTML5, y el CTA en la columna del bloque (tramo 15) (0.5885ms)
+✔ Se valida lo que se dibuja: invisibles, marcado vacío, la barra en la etiqueta de un cursor y el alternativo (tramo 16) (0.539792ms)
+✔ Reclamar un bloqueo muerto deja un solo dueño: sin el reclamo, nadie lo borra (1321.877667ms)
+✔ Ctrl-C suelta el bloqueo: un proceso interrumpido no deja la carpeta tomada (26.642291ms)
+✔ Un bloqueo VACÍO huérfano se reclama; uno recién creado no se pisa, y el error nombra el archivo (1342.300542ms)
+✔ La ruta REAL decide si un plan está en el repo: otras mayúsculas o un enlace no lo sacan (0.645167ms)
+✔ La marca de la suite vale sólo con el valor que exporta la suite, en la carpeta del plan o más arriba (0.979334ms)
+✔ El canon de una pieza lo decide su huella en el registro, no un campo del plan (0.641792ms)
+✔ Escena oscura y calma: la intención discreta se respeta (texto) (3.345542ms)
+✔ Escena rayada: el texto no se sostiene solo y se ESCALA, nunca se baja (5.024666ms)
+✔ Intención destacada sobre fondo oscuro: relleno, con tinta legible sobre el relleno (0.758166ms)
+✔ Cada variante porta el acento donde corresponde (0.430292ms)
+✔ El contorno exige tinta Y borde legibles (2.037792ms)
+✔ Naranja sobre un gris oscuro de foto: con protanopía no alcanza ninguna sin degradar la tinta (4.612833ms)
+✔ Degradación canónica: antes del relleno, el contorno con tinta blanca y el acento en el borde (3.539708ms)
+✔ La tinta del CTA de TEXTO nunca se degrada: sin acento no hay CTA (4.382791ms)
+✔ APCA también decide: una tinta que pasa WCAG con margen pero no APCA no es viable (0.83175ms)
+✔ Sin margen en ninguna: queda la que MÁS separa, no siempre el relleno (4.171167ms)
+✔ El CTA grande también exige 4,5:1 (canon), aunque WCAG aceptaría 3:1 por su tamaño (0.688459ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2737.420584

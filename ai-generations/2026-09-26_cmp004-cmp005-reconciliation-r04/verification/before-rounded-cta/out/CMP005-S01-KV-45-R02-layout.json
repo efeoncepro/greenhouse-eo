@@ -1,0 +1,201 @@
+{
+  "graphicVoice": {
+    "contract": "efeonce.graphic-line-orbit",
+    "questionWeight": 300,
+    "answerWeight": 760,
+    "questionRing": {
+      "left": 291.72,
+      "right": 306.7769230769231,
+      "top": 87.6,
+      "bottom": 102.65692307692308
+    },
+    "answerText": {
+      "left": 291.72,
+      "right": 861.2888380952381,
+      "top": 130.148,
+      "bottom": 231.996
+    },
+    "answerSphere": {
+      "left": 865.3488380952381,
+      "right": 888.5488380952381,
+      "top": 190.236,
+      "bottom": 213.436
+    },
+    "answerSize": 116,
+    "sphereCssPx": 8.064171122994654,
+    "answerGroup": {
+      "left": 291.72,
+      "right": 888.5488380952381,
+      "top": 130.148,
+      "bottom": 231.996
+    }
+  },
+  "canvas": {
+    "width": 1122,
+    "height": 1402
+  },
+  "elements": [
+    {
+      "id": "entrada",
+      "box": {
+        "left": 316.9269230769231,
+        "right": 911.4269230769232,
+        "top": 84.11999999999999,
+        "bottom": 111.148
+      }
+    },
+    {
+      "id": "dominante",
+      "box": {
+        "left": 291.72,
+        "right": 861.2888380952381,
+        "top": 130.148,
+        "bottom": 231.996
+      }
+    },
+    {
+      "id": "cierre-frase",
+      "box": {
+        "left": 291.72,
+        "right": 751.179,
+        "top": 248.996,
+        "bottom": 269.786
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 313.72,
+        "right": 733.926,
+        "top": 302.786,
+        "bottom": 339.37
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 291.72,
+        "right": 552.76,
+        "top": 372.224,
+        "bottom": 399.57599999999996
+      }
+    },
+    {
+      "id": "logo",
+      "box": {
+        "left": 449,
+        "right": 673,
+        "top": 1262,
+        "bottom": 1315
+      }
+    }
+  ],
+  "typography": {
+    "lead": 29,
+    "dominant": 116,
+    "closure": 27,
+    "cta": 34,
+    "descriptor": 26
+  },
+  "selection": null,
+  "maquetacion": {
+    "elementos": [
+      {
+        "id": "entrada",
+        "tipo": "texto",
+        "box": {
+          "left": 316.9269230769231,
+          "right": 911.4269230769232,
+          "top": 84.11999999999999,
+          "bottom": 111.148
+        }
+      },
+      {
+        "id": "dominante",
+        "tipo": "texto",
+        "box": {
+          "left": 291.72,
+          "right": 861.2888380952381,
+          "top": 130.148,
+          "bottom": 231.996
+        }
+      },
+      {
+        "id": "cierre-frase",
+        "tipo": "texto",
+        "box": {
+          "left": 291.72,
+          "right": 751.179,
+          "top": 248.996,
+          "bottom": 269.786
+        }
+      },
+      {
+        "id": "cta",
+        "tipo": "texto",
+        "box": {
+          "left": 313.72,
+          "right": 733.926,
+          "top": 302.786,
+          "bottom": 339.37
+        },
+        "dentroDe": "cta-boton"
+      },
+      {
+        "id": "descriptor",
+        "tipo": "texto",
+        "box": {
+          "left": 291.72,
+          "right": 552.76,
+          "top": 372.224,
+          "bottom": 399.57599999999996
+        }
+      },
+      {
+        "id": "cta-boton",
+        "tipo": "cta",
+        "box": {
+          "left": 291.72,
+          "top": 293.786,
+          "right": 755.926,
+          "bottom": 348.37
+        }
+      },
+      {
+        "id": "logo",
+        "tipo": "firma",
+        "box": {
+          "left": 449,
+          "right": 673,
+          "top": 1262,
+          "bottom": 1315
+        }
+      },
+      {
+        "id": "cursor «usuario» del CTA",
+        "tipo": "seleccion",
+        "box": {
+          "left": 763.219,
+          "top": 319.395,
+          "right": 796.364,
+          "bottom": 353.471
+        },
+        "destino": "cta-boton"
+      }
+    ]
+  },
+  "columna": 291.72,
+  "ctaMarco": {
+    "left": 282.744,
+    "top": 285.932,
+    "right": 764.902,
+    "bottom": 356.224
+  },
+  "zonaSegura": {
+    "perfil": "feed",
+    "x0": 0.26,
+    "y0": 0.06,
+    "x1": 0.925,
+    "y1": 0.94
+  }
+}

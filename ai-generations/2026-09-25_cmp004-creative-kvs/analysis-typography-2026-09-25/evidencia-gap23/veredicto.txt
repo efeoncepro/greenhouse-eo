@@ -1,0 +1,1 @@
+foto:cta:gate exit 1: 4 piezas con gap23 fallan solamente ritmo: entre concepto y acción 23px <= espacio interior 24.064px. C01 semántica con gap34 pasa. Ejecución 2026-09-25. Este snapshot conserva evidencia; no es un plan autónomo relocatable.

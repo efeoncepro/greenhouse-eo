@@ -1,0 +1,12 @@
+file:///Users/jreye/Documents/greenhouse-eo/scripts/foto/build-prompt.mjs:1999
+    throw new Error(
+          ^
+
+Error: La escena de "CS3-berel" usa un ancla prohibida: la pintura es la categoría de Berel, un cliente. La fotografía de Efeonce NUNCA se ancla en el rubro de un cliente. Cambia la materia de la escena; esto no se corrige regenerando.
+    at construirPrompt (file:///Users/jreye/Documents/greenhouse-eo/scripts/foto/build-prompt.mjs:1999:11)
+    at file:///Users/jreye/Documents/greenhouse-eo/scripts/foto/generar.mjs:33:36
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:633:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.17.0

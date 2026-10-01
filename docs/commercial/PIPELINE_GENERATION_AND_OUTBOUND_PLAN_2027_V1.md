@@ -107,9 +107,11 @@ ruta de expansión:
 | Empresa con brecha de visibilidad orgánica o en respuestas de IA | Search / AI Visibility Diagnostic + sprint       | Search & Content Operations |
 | Equipo de marketing con presión de producción creativa           | Creative Velocity Sprint                         | Managed Creative Capacity   |
 
-Una cuenta entra al universo outbound si razonablemente puede comprar **USD 8.000–15.000 Spot** o **USD 3.000–5.000
-MRR**, existe una señal verificable y se pueden identificar 2–3 integrantes del buying group. Se excluyen listas
-genéricas de PYME sin trigger, fit económico o capacidad de decisión.
+Una cuenta entra al universo outbound si tiene **al menos 50 personas** según el
+[criterio de tamaño del ICP](../context/13_icp-buyer-personas-jtbd.md#tamaño-de-la-cuenta-en-la-calificación-comercial),
+razonablemente puede comprar **USD 8.000–15.000 Spot** o **USD 3.000–5.000 MRR**, existe una señal verificable y se
+pueden identificar 2–3 integrantes del buying group. Un presupuesto potencial no compensa estar bajo el piso de
+tamaño. Se excluyen listas genéricas de PYME sin trigger, fit económico o capacidad de decisión.
 
 ## 6. Baseline Apollo al corte
 

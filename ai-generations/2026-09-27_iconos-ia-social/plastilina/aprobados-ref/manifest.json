@@ -1,0 +1,1088 @@
+{
+  "schema": "axis.iconography-export.v1",
+  "tokens": "efeonceGraphicLine.icons",
+  "surface": "dark",
+  "size": 48,
+  "icons": [
+    {
+      "file": "stroke-busqueda-rest.svg",
+      "key": "busqueda",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Búsqueda",
+      "use": "Engine · SEO, AEO, búsqueda"
+    },
+    {
+      "file": "stroke-busqueda-response.svg",
+      "key": "busqueda",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Búsqueda",
+      "use": "Engine · SEO, AEO, búsqueda"
+    },
+    {
+      "file": "stroke-medicion-rest.svg",
+      "key": "medicion",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Medición",
+      "use": "Growth · datos, analítica"
+    },
+    {
+      "file": "stroke-medicion-response.svg",
+      "key": "medicion",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Medición",
+      "use": "Growth · datos, analítica"
+    },
+    {
+      "file": "stroke-contenido-rest.svg",
+      "key": "contenido",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Contenido",
+      "use": "Brand · contenido, redacción"
+    },
+    {
+      "file": "stroke-contenido-response.svg",
+      "key": "contenido",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Contenido",
+      "use": "Brand · contenido, redacción"
+    },
+    {
+      "file": "stroke-medios-rest.svg",
+      "key": "medios",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Medios",
+      "use": "Voice · medios, distribución"
+    },
+    {
+      "file": "stroke-medios-response.svg",
+      "key": "medios",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Medios",
+      "use": "Voice · medios, distribución"
+    },
+    {
+      "file": "stroke-revenue-rest.svg",
+      "key": "revenue",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Revenue",
+      "use": "RevOps · crecimiento de ingresos"
+    },
+    {
+      "file": "stroke-revenue-response.svg",
+      "key": "revenue",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Revenue",
+      "use": "RevOps · crecimiento de ingresos"
+    },
+    {
+      "file": "stroke-web-rest.svg",
+      "key": "web",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Web",
+      "use": "Engine · web, sitios"
+    },
+    {
+      "file": "stroke-web-response.svg",
+      "key": "web",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Web",
+      "use": "Engine · web, sitios"
+    },
+    {
+      "file": "stroke-talent-rest.svg",
+      "key": "talent",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Talent",
+      "use": "Área · personas, equipo"
+    },
+    {
+      "file": "stroke-talent-response.svg",
+      "key": "talent",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Talent",
+      "use": "Área · personas, equipo"
+    },
+    {
+      "file": "stroke-finanzas-rest.svg",
+      "key": "finanzas",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Finance",
+      "use": "Área · finanzas"
+    },
+    {
+      "file": "stroke-finanzas-response.svg",
+      "key": "finanzas",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Finance",
+      "use": "Área · finanzas"
+    },
+    {
+      "file": "stroke-embudo-rest.svg",
+      "key": "embudo",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Embudo",
+      "use": "Revenue · funnel, conversión"
+    },
+    {
+      "file": "stroke-embudo-response.svg",
+      "key": "embudo",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Embudo",
+      "use": "Revenue · funnel, conversión"
+    },
+    {
+      "file": "stroke-crm-rest.svg",
+      "key": "crm",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "CRM",
+      "use": "Revenue · CRM, contactos"
+    },
+    {
+      "file": "stroke-crm-response.svg",
+      "key": "crm",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "CRM",
+      "use": "Revenue · CRM, contactos"
+    },
+    {
+      "file": "stroke-automatizacion-rest.svg",
+      "key": "automatizacion",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Automatización",
+      "use": "Revenue · RevOps, flujos"
+    },
+    {
+      "file": "stroke-automatizacion-response.svg",
+      "key": "automatizacion",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Automatización",
+      "use": "Revenue · RevOps, flujos"
+    },
+    {
+      "file": "stroke-informe-rest.svg",
+      "key": "informe",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Informe",
+      "use": "Growth · reportes, informes"
+    },
+    {
+      "file": "stroke-informe-response.svg",
+      "key": "informe",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Informe",
+      "use": "Growth · reportes, informes"
+    },
+    {
+      "file": "stroke-correo-rest.svg",
+      "key": "correo",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Correo",
+      "use": "Revenue · email marketing, correo"
+    },
+    {
+      "file": "stroke-correo-response.svg",
+      "key": "correo",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Correo",
+      "use": "Revenue · email marketing, correo"
+    },
+    {
+      "file": "stroke-llamada-rest.svg",
+      "key": "llamada",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Llamada",
+      "use": "Área · llamadas, contacto"
+    },
+    {
+      "file": "stroke-llamada-response.svg",
+      "key": "llamada",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Llamada",
+      "use": "Área · llamadas, contacto"
+    },
+    {
+      "file": "stroke-calendario-rest.svg",
+      "key": "calendario",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Calendario",
+      "use": "Growth · agenda, fechas"
+    },
+    {
+      "file": "stroke-calendario-response.svg",
+      "key": "calendario",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Calendario",
+      "use": "Growth · agenda, fechas"
+    },
+    {
+      "file": "stroke-reunion-rest.svg",
+      "key": "reunion",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Reunión",
+      "use": "Área · reuniones, conversación"
+    },
+    {
+      "file": "stroke-reunion-response.svg",
+      "key": "reunion",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Reunión",
+      "use": "Área · reuniones, conversación"
+    },
+    {
+      "file": "stroke-objetivo-rest.svg",
+      "key": "objetivo",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Objetivo",
+      "use": "Growth · objetivos, metas, KPI"
+    },
+    {
+      "file": "stroke-objetivo-response.svg",
+      "key": "objetivo",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Objetivo",
+      "use": "Growth · objetivos, metas, KPI"
+    },
+    {
+      "file": "stroke-presentacion-rest.svg",
+      "key": "presentacion",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Presentación",
+      "use": "Growth · presentaciones, workshops"
+    },
+    {
+      "file": "stroke-presentacion-response.svg",
+      "key": "presentacion",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Presentación",
+      "use": "Growth · presentaciones, workshops"
+    },
+    {
+      "file": "stroke-contrato-rest.svg",
+      "key": "contrato",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Contrato",
+      "use": "Área · contratos, acuerdos"
+    },
+    {
+      "file": "stroke-contrato-response.svg",
+      "key": "contrato",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Contrato",
+      "use": "Área · contratos, acuerdos"
+    },
+    {
+      "file": "stroke-checklist-rest.svg",
+      "key": "checklist",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Checklist",
+      "use": "Área · tareas, entregables"
+    },
+    {
+      "file": "stroke-checklist-response.svg",
+      "key": "checklist",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Checklist",
+      "use": "Área · tareas, entregables"
+    },
+    {
+      "file": "stroke-codigo-rest.svg",
+      "key": "codigo",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Código",
+      "use": "Engine · desarrollo, código"
+    },
+    {
+      "file": "stroke-codigo-response.svg",
+      "key": "codigo",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Código",
+      "use": "Engine · desarrollo, código"
+    },
+    {
+      "file": "stroke-base-de-datos-rest.svg",
+      "key": "base-de-datos",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Base de datos",
+      "use": "Engine · datos, bases de datos"
+    },
+    {
+      "file": "stroke-base-de-datos-response.svg",
+      "key": "base-de-datos",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Base de datos",
+      "use": "Engine · datos, bases de datos"
+    },
+    {
+      "file": "stroke-nube-rest.svg",
+      "key": "nube",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Nube",
+      "use": "Engine · nube, hosting"
+    },
+    {
+      "file": "stroke-nube-response.svg",
+      "key": "nube",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Nube",
+      "use": "Engine · nube, hosting"
+    },
+    {
+      "file": "stroke-integracion-rest.svg",
+      "key": "integracion",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Integración",
+      "use": "Revenue · integraciones, conectores"
+    },
+    {
+      "file": "stroke-integracion-response.svg",
+      "key": "integracion",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Integración",
+      "use": "Revenue · integraciones, conectores"
+    },
+    {
+      "file": "stroke-seguridad-rest.svg",
+      "key": "seguridad",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Seguridad",
+      "use": "Engine · seguridad, privacidad"
+    },
+    {
+      "file": "stroke-seguridad-response.svg",
+      "key": "seguridad",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Seguridad",
+      "use": "Engine · seguridad, privacidad"
+    },
+    {
+      "file": "stroke-ubicacion-rest.svg",
+      "key": "ubicacion",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Ubicación",
+      "use": "Área · ubicación, oficinas"
+    },
+    {
+      "file": "stroke-ubicacion-response.svg",
+      "key": "ubicacion",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Ubicación",
+      "use": "Área · ubicación, oficinas"
+    },
+    {
+      "file": "stroke-reloj-rest.svg",
+      "key": "reloj",
+      "voice": "stroke",
+      "state": "rest",
+      "line": "brand",
+      "label": "Reloj",
+      "use": "Área · plazos, tiempo"
+    },
+    {
+      "file": "stroke-reloj-response.svg",
+      "key": "reloj",
+      "voice": "stroke",
+      "state": "response",
+      "line": "brand",
+      "label": "Reloj",
+      "use": "Área · plazos, tiempo"
+    },
+    {
+      "file": "plastilina-rayo-rest.svg",
+      "key": "rayo",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Rayo",
+      "use": "energía, velocidad, impulso"
+    },
+    {
+      "file": "plastilina-rayo-response.svg",
+      "key": "rayo",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Rayo",
+      "use": "energía, velocidad, impulso"
+    },
+    {
+      "file": "plastilina-paleta-rest.svg",
+      "key": "paleta",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Paleta",
+      "use": "color, dirección de arte"
+    },
+    {
+      "file": "plastilina-paleta-response.svg",
+      "key": "paleta",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Paleta",
+      "use": "color, dirección de arte"
+    },
+    {
+      "file": "plastilina-pincel-rest.svg",
+      "key": "pincel",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Pincel",
+      "use": "diseño, ilustración"
+    },
+    {
+      "file": "plastilina-pincel-response.svg",
+      "key": "pincel",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Pincel",
+      "use": "diseño, ilustración"
+    },
+    {
+      "file": "plastilina-cuentagotas-rest.svg",
+      "key": "cuentagotas",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Cuentagotas",
+      "use": "color exacto, sistema de marca"
+    },
+    {
+      "file": "plastilina-cuentagotas-response.svg",
+      "key": "cuentagotas",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Cuentagotas",
+      "use": "color exacto, sistema de marca"
+    },
+    {
+      "file": "plastilina-bombillo-rest.svg",
+      "key": "bombillo",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Bombillo",
+      "use": "idea, concepto creativo"
+    },
+    {
+      "file": "plastilina-bombillo-response.svg",
+      "key": "bombillo",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Bombillo",
+      "use": "idea, concepto creativo"
+    },
+    {
+      "file": "plastilina-tablet-rest.svg",
+      "key": "tablet",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Tablet",
+      "use": "diseño digital, piezas en pantalla"
+    },
+    {
+      "file": "plastilina-tablet-response.svg",
+      "key": "tablet",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Tablet",
+      "use": "diseño digital, piezas en pantalla"
+    },
+    {
+      "file": "plastilina-laptop-rest.svg",
+      "key": "laptop",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Laptop",
+      "use": "producción digital, web"
+    },
+    {
+      "file": "plastilina-laptop-response.svg",
+      "key": "laptop",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Laptop",
+      "use": "producción digital, web"
+    },
+    {
+      "file": "plastilina-escritorio-rest.svg",
+      "key": "escritorio",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Mac de escritorio",
+      "use": "estudio, producción"
+    },
+    {
+      "file": "plastilina-escritorio-response.svg",
+      "key": "escritorio",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Mac de escritorio",
+      "use": "estudio, producción"
+    },
+    {
+      "file": "plastilina-telefono-rest.svg",
+      "key": "telefono",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Teléfono",
+      "use": "social, móvil, contenido vertical"
+    },
+    {
+      "file": "plastilina-telefono-response.svg",
+      "key": "telefono",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Teléfono",
+      "use": "social, móvil, contenido vertical"
+    },
+    {
+      "file": "plastilina-camara-rest.svg",
+      "key": "camara",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Cámara",
+      "use": "fotografía"
+    },
+    {
+      "file": "plastilina-camara-response.svg",
+      "key": "camara",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Cámara",
+      "use": "fotografía"
+    },
+    {
+      "file": "plastilina-claqueta-rest.svg",
+      "key": "claqueta",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Claqueta",
+      "use": "video, producción audiovisual"
+    },
+    {
+      "file": "plastilina-claqueta-response.svg",
+      "key": "claqueta",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Claqueta",
+      "use": "video, producción audiovisual"
+    },
+    {
+      "file": "plastilina-microfono-rest.svg",
+      "key": "microfono",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Micrófono",
+      "use": "podcast, audio, voz"
+    },
+    {
+      "file": "plastilina-microfono-response.svg",
+      "key": "microfono",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Micrófono",
+      "use": "podcast, audio, voz"
+    },
+    {
+      "file": "plastilina-pluma-rest.svg",
+      "key": "pluma",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Pluma vectorial",
+      "use": "vector, identidad, logotipo"
+    },
+    {
+      "file": "plastilina-pluma-response.svg",
+      "key": "pluma",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Pluma vectorial",
+      "use": "vector, identidad, logotipo"
+    },
+    {
+      "file": "plastilina-cursor-rest.svg",
+      "key": "cursor",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Cursor",
+      "use": "experiencia digital, UI"
+    },
+    {
+      "file": "plastilina-cursor-response.svg",
+      "key": "cursor",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Cursor",
+      "use": "experiencia digital, UI"
+    },
+    {
+      "file": "plastilina-tijeras-rest.svg",
+      "key": "tijeras",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Tijeras",
+      "use": "edición, recorte, adaptación"
+    },
+    {
+      "file": "plastilina-tijeras-response.svg",
+      "key": "tijeras",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Tijeras",
+      "use": "edición, recorte, adaptación"
+    },
+    {
+      "file": "plastilina-megafono-rest.svg",
+      "key": "megafono",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Megáfono",
+      "use": "anuncio, campaña, difusión"
+    },
+    {
+      "file": "plastilina-megafono-response.svg",
+      "key": "megafono",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Megáfono",
+      "use": "anuncio, campaña, difusión"
+    },
+    {
+      "file": "plastilina-audifonos-rest.svg",
+      "key": "audifonos",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Audífonos",
+      "use": "audio, música, sonido"
+    },
+    {
+      "file": "plastilina-audifonos-response.svg",
+      "key": "audifonos",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Audífonos",
+      "use": "audio, música, sonido"
+    },
+    {
+      "file": "plastilina-corazon-rest.svg",
+      "key": "corazon",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Corazón",
+      "use": "comunidad, engagement"
+    },
+    {
+      "file": "plastilina-corazon-response.svg",
+      "key": "corazon",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Corazón",
+      "use": "comunidad, engagement"
+    },
+    {
+      "file": "plastilina-lapiz-rest.svg",
+      "key": "lapiz",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Lápiz",
+      "use": "boceto, escritura, idea en papel"
+    },
+    {
+      "file": "plastilina-lapiz-response.svg",
+      "key": "lapiz",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Lápiz",
+      "use": "boceto, escritura, idea en papel"
+    },
+    {
+      "file": "plastilina-rodillo-rest.svg",
+      "key": "rodillo",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Rodillo",
+      "use": "pintura, cobertura, gran formato"
+    },
+    {
+      "file": "plastilina-rodillo-response.svg",
+      "key": "rodillo",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Rodillo",
+      "use": "pintura, cobertura, gran formato"
+    },
+    {
+      "file": "plastilina-aerosol-rest.svg",
+      "key": "aerosol",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Aerosol",
+      "use": "arte urbano, grafiti, intervención"
+    },
+    {
+      "file": "plastilina-aerosol-response.svg",
+      "key": "aerosol",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Aerosol",
+      "use": "arte urbano, grafiti, intervención"
+    },
+    {
+      "file": "plastilina-escuadra-rest.svg",
+      "key": "escuadra",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Escuadra",
+      "use": "diseño técnico, grilla, precisión"
+    },
+    {
+      "file": "plastilina-escuadra-response.svg",
+      "key": "escuadra",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Escuadra",
+      "use": "diseño técnico, grilla, precisión"
+    },
+    {
+      "file": "plastilina-postit-rest.svg",
+      "key": "postit",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Post-it",
+      "use": "ideación, taller, notas"
+    },
+    {
+      "file": "plastilina-postit-response.svg",
+      "key": "postit",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Post-it",
+      "use": "ideación, taller, notas"
+    },
+    {
+      "file": "plastilina-encuadre-rest.svg",
+      "key": "encuadre",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Encuadre",
+      "use": "encuadre, composición, formatos"
+    },
+    {
+      "file": "plastilina-encuadre-response.svg",
+      "key": "encuadre",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Encuadre",
+      "use": "encuadre, composición, formatos"
+    },
+    {
+      "file": "plastilina-pelicula-rest.svg",
+      "key": "pelicula",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Película",
+      "use": "cine, fotografía analógica, rodaje"
+    },
+    {
+      "file": "plastilina-pelicula-response.svg",
+      "key": "pelicula",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Película",
+      "use": "cine, fotografía analógica, rodaje"
+    },
+    {
+      "file": "plastilina-vinilo-rest.svg",
+      "key": "vinilo",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Vinilo",
+      "use": "música, discografía, playlist"
+    },
+    {
+      "file": "plastilina-vinilo-response.svg",
+      "key": "vinilo",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Vinilo",
+      "use": "música, discografía, playlist"
+    },
+    {
+      "file": "plastilina-guitarra-rest.svg",
+      "key": "guitarra",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Guitarra",
+      "use": "música en vivo, composición, jingle"
+    },
+    {
+      "file": "plastilina-guitarra-response.svg",
+      "key": "guitarra",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Guitarra",
+      "use": "música en vivo, composición, jingle"
+    },
+    {
+      "file": "plastilina-reproducir-rest.svg",
+      "key": "reproducir",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Reproducir",
+      "use": "video, estreno, reproducción"
+    },
+    {
+      "file": "plastilina-reproducir-response.svg",
+      "key": "reproducir",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Reproducir",
+      "use": "video, estreno, reproducción"
+    },
+    {
+      "file": "plastilina-varita-rest.svg",
+      "key": "varita",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Varita mágica",
+      "use": "magia, efectos, transformación"
+    },
+    {
+      "file": "plastilina-varita-response.svg",
+      "key": "varita",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Varita mágica",
+      "use": "magia, efectos, transformación"
+    },
+    {
+      "file": "plastilina-taza-rest.svg",
+      "key": "taza",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Taza de café",
+      "use": "pausa, conversación, equipo"
+    },
+    {
+      "file": "plastilina-taza-response.svg",
+      "key": "taza",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Taza de café",
+      "use": "pausa, conversación, equipo"
+    },
+    {
+      "file": "plastilina-lampara-rest.svg",
+      "key": "lampara",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Lámpara de escritorio",
+      "use": "foco, estudio, trabajo creativo"
+    },
+    {
+      "file": "plastilina-lampara-response.svg",
+      "key": "lampara",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Lámpara de escritorio",
+      "use": "foco, estudio, trabajo creativo"
+    },
+    {
+      "file": "plastilina-trofeo-rest.svg",
+      "key": "trofeo",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Trofeo",
+      "use": "premios, logros, reconocimiento"
+    },
+    {
+      "file": "plastilina-trofeo-response.svg",
+      "key": "trofeo",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Trofeo",
+      "use": "premios, logros, reconocimiento"
+    },
+    {
+      "file": "plastilina-estrella-rest.svg",
+      "key": "estrella",
+      "voice": "plastilina",
+      "state": "rest",
+      "line": "brand",
+      "label": "Estrella",
+      "use": "destacado, favorito, calidad"
+    },
+    {
+      "file": "plastilina-estrella-response.svg",
+      "key": "estrella",
+      "voice": "plastilina",
+      "state": "response",
+      "line": "brand",
+      "label": "Estrella",
+      "use": "destacado, favorito, calidad"
+    }
+  ]
+}

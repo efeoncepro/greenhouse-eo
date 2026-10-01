@@ -250,7 +250,41 @@ En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es
 
 **Rutas:** legacy `/muestras/<slug>-<token>`; composición `/aeo-xray/r/<token>?artifact=<id>&step=<paso>`, en `think.efeoncepro.com`. Runtime en **`efeonce-think`**; el cliente se configura en un intent JSON resuelto por AXIS, sin copiar código del caso anterior. Las muestras publicadas Think y los grants Greenhouse tienen lifecycles diferentes: un enlace `sample_…` distribuye una demo no listada, no acceso privado/revocable de un grant.
 
-**Cadena comercial:** **Grader mide → diagnóstico SEO de prospecto cuantifica (§4c) → Radiografía demuestra → propuesta/deck convierte → servicio opera.** Si el prospecto todavía no tiene evidencia, primero Grader. Si ya vio un score y pregunta *"¿cómo se arregla?"*, entra la Radiografía. En licitaciones y QBR se registra como evidencia `client_facing` sólo si el enlace tokenizado puede viajar al comité.
+**Cadena comercial:** **Assessment diagnostica → diagnóstico SEO de prospecto contextualiza (§4c) → Radiografía demuestra → operación y reportería hacen visible la continuidad → propuesta define el alcance.** Elegir el punto de entrada según la evidencia y el avance de la cuenta; no reiniciar un Assessment ya presentado ni exigir todos los artefactos. Si ya vio un score y pregunta *"¿cómo se arregla?"*, entra la Radiografía. En licitaciones y QBR se registra como evidencia `client_facing` sólo si el enlace tokenizado puede viajar al comité.
+
+### Diferenciador comercial Efeonce: experimentar la capacidad antes de comprar
+
+**Hacer que el cliente experimente nuestra capacidad antes de comprarla** es un diferenciador que el operador
+reconoce en su proceso comercial (2026-09-30). Su aplicación es la **venta con demostración contextual**:
+elegir una necesidad relevante de la cuenta y mostrar criterio, ejecución y continuidad con trabajo concreto.
+No afirmar que somos los únicos que lo hacemos ni que esto garantiza adjudicación, rankings, citación o revenue.
+Canon y registro de casos: `docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md`.
+
+| Momento | Qué debe poder evaluar el comprador | Aplicación SEO/AEO |
+|---|---|---|
+| Diagnóstico | ¿Entienden nuestra oportunidad? | Hallazgo con fuente, fecha, mercado, método y límites; Assessment/Report si aportan evidencia pertinente |
+| Muestra | ¿Cómo la abordarían y con qué criterio? | Una intención → contenido representativo → decisiones editoriales/técnicas → fuentes; X-Ray o formato adecuado |
+| Operación | ¿Cómo trabajaríamos y revisaríamos el avance? | Responsables, validación, plan de medición y muestra de Insights claramente ilustrativa |
+| Alcance | ¿Qué contrataríamos y cuál es el siguiente paso? | Necesidad validada, capacidad, responsabilidades e inversión; acuerdo bilateral con responsable y fecha |
+
+**El método precede a la herramienta.** Berel recibió Notion, artículo, banners y video con IA: el operador
+reporta que funcionó comercialmente; falta completar su evidencia original. SKY recibió X-Ray, informe y propuesta;
+la adjudicación está documentada, mientras que la contribución de la «milla extra» es interpretación del operador,
+sin atribución causal aislada. Pichincha aplica el patrón y sigue abierto: preparación no prueba envío, lectura ni
+compra. Estos ejemplos son aprendizajes internos; no convertirlos en casos públicos de desempeño sin evidencia
+y autorización de cada cuenta.
+
+**La demostración se dimensiona como inversión de preventa.** Antes de producir, declarar incertidumbre a
+resolver, audiencia, siguiente interacción, owner, plazo y presupuesto proporcional. Reutilizar estructura y
+componentes, personalizar necesidad y contenido, preservar aislamiento entre clientes. No hay horas, montos ni
+intensidad obligatorios aprobados para este método; no inventarlos. Ampliar sólo si responde a una duda concreta
+del comprador. La demo no crea obligaciones de implementación o revisiones ilimitadas.
+
+Registrar versión y entrega efectiva, costo/horas reales, feedback del comprador y próximo paso bilateral;
+aprender también de oportunidades perdidas o detenidas. Una experiencia visual demuestra capacidad; una respuesta
+simulada no demuestra aparición en un motor y un dashboard de muestra no demuestra resultados del prospecto.
+Para producir, cargar la referencia X-Ray y el kit `docs/think/aeo-xray-nuevo-cliente.md`; aquí vive su propósito
+comercial, no otro manual técnico.
 
 **Dos trabajos — no los confundas:**
 

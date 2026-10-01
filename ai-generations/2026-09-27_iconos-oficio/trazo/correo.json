@@ -1,0 +1,19 @@
+{
+  "key": "correo",
+  "label": "Correo",
+  "use": "Revenue · email marketing, correo",
+  "mode": "replace",
+  "rest": [
+    "M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2z",
+    "M3 7l9 5.5l9 -5.5"
+  ],
+  "response": [
+    "M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2z",
+    "M3 7L9.35 10.88",
+    "M21 7L14.65 10.88"
+  ],
+  "dot": [
+    12,
+    12.5
+  ]
+}

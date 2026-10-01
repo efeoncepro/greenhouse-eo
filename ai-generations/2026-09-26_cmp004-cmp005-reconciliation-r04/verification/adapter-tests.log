@@ -1,0 +1,17 @@
+✔ presentation vacío reproduce el contrato por defecto (2.040833ms)
+✔ collaboratorScale agranda etiqueta y cursor sin mover el anclaje semántico (0.210583ms)
+✔ participantColors aplica el color del participante con tinta que alcanza 4,5:1 (0.132166ms)
+✔ participantColors rechaza colores inválidos o sin contraste suficiente (0.190041ms)
+✔ cada cursor declara su caja en el lienzo, con la punta en el hotspot, y crece con la escala (0.14775ms)
+✔ presentation.frame=false omite el marco y conserva el cursor anclado (0.127708ms)
+✔ voice is opt-in and fails unsupported or contradictory declarations (1.737667ms)
+✔ sphere follows final line baseline and AXIS optical kerning (0.093792ms)
+✔ CTA brand aliases resolve to the canonical graphic-line tokens (0.037709ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 66.51125

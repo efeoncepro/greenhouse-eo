@@ -1,0 +1,18 @@
+{
+  "formato": "1:1",
+  "impacto": true,
+  "id": "Q4-objeto-camara-cine",
+  "palanca": "luz-motivada",
+  "escena": "SCENE (production set, the exact moment before a take, no faces): a cinema camera on a tripod head seen from its left side at lens height, the follow-focus wheel and its white marking ring in sharp focus, one hand of the focus puller resting on the wheel at the edge of the frame; a small LED panel on a low stand at the far right, visible and the brightest thing in the frame, throws a hard low backlight that rims the metal edges and the lens barrel, and a thin haze in the air makes that beam visible crossing BELOW the middle of the frame. Matte black equipment, gaffer tape, one plain azure-blue (#0375DB) cable tie carries the only blue. The set behind is dark and out of focus.",
+  "lecho": {
+    "objeto": "a matte black apple box right at the lens, dissolved into blur and outside the beam",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, evenly shadowed plaster wall",
+      "tinta": "blanca"
+    }
+  },
+  "atmosfera": "bruma"
+}

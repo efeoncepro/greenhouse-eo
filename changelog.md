@@ -21,6 +21,10 @@ PR15 integra producción modular SKY e identidad Git; PR16/17 integran el Lab pr
 
 Colección candidata de 101 familias / 1.919 variantes nativas y 303 originales, selección exacta por kind/tamaño y página `/iconos/` enlazada desde Recursos. Código/docs Workbench en commit local `af6f5e2`; skills Codex/Claude y manuales/continuidad sincronizados. [Cierre y evidencia](docs/audits/creative-workbench/2026-10-01-sky-icons-documentation-closure.md). Sin push/deploy ni admisión nueva a jobs; CLIs Greenhouse intactas.
 
+## 2026-09-30 — Efeonce: demostración contextual como diferenciador comercial
+
+El operador reconoce «hacer que el cliente experimente nuestra capacidad antes de comprarla» como diferenciador. [Metodología](docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md) documenta Berel, SKY y Pichincha; canon de marca y estrategia, skills Agency/Brand/SEO con espejos y referencias actualizados. Intensidad, presupuestos y métricas siguen propuestas; no se promete conversión ni se cambia el pipeline.
+
 ## 2026-09-30 — AEO X-Ray: demo multipieza aceptada, publicada y documentada
 
 - Think conserva y extiende el X-Ray original: landing y artículo por manifiesto, cuatro etapas, radiografía acoplada, oportunidad evidenciada, banners y derivados sociales/video, marcas oficiales, footer, iconografía, transiciones nativas, selector y telón de 1400 ms. Fix productivo de unidades CSS optimizadas `s`/`ms`; 44 checks de apertura pasaron también en producción.
@@ -90,6 +94,22 @@ Colección candidata de 101 familias / 1.919 variantes nativas y 303 originales,
 - Barrido de skills (`efeonce-graphic-line`, `deck-studio`, Salesforce ×3, `hubspot-solutions-partner`,
   `axis-design-system`) y de las tres capas de docs. Rollout pendiente: test/build de cierre, visto bueno de SF20,
   autorizaciones escritas y readback de la insignia.
+
+## 2026-09-29 — Creative Workbench: repo del equipo creativo gobernado desde Greenhouse
+
+- Nuevo repo privado `efeoncepro/creative-workbench` para el equipo creativo (Claude y Codex; clientes Efeonce, Berel
+  y SKY). Recibe por `pnpm creative:sync` 17 skills espejadas, los CLIs `foto:*`/`ai:*` (cierre de imports calculado
+  con esbuild, falla si alcanza dominios prohibidos), docs de marca por allowlist y brand packs; todo sellado por
+  sha256 con gate `managed-drift` y hook `PreToolUse` de Claude.
+- El sync exporta un **ref de git**, nunca el working tree (el bootstrap arrastró trabajo sin commitear de otra
+  sesión; corregido el mismo día).
+- Acceso declarativo en `scripts/creative-workbench/control.json` (`creative:access`); infraestructura idempotente en
+  un proyecto GCP propio con llaves de IA dedicadas (`creative:provision`, aún sin aplicar).
+- ADR [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
+- TASK-1945/1946: preflight neutral con snapshots por corrida (14 pruebas Node y 13 Vitest); tres paquetes
+  SKY `0.1.0` candidatos con 108 tokens, logo sellado y contrato Always On (4 pruebas, build determinista).
+  ZIP Metric del operador verificado: 14 OTF fuera de repos; metadata portable sin fuentes binarias.
+  Sin publicación, sync o deploy; wrappers IA e identidad autenticada siguen pendientes.
 
 ## 2026-09-29 — Efeonce AI Visibility Report canonizado en AXIS (TASK-1938)
 
@@ -630,11 +650,3 @@ Banco propio de 8 fotos para la lente, hecho con el lenguaje fotográfico (`pnpm
 ## 2026-09-25 — Insights: el diseño aprobado llega al informe y al deck (TASK-1889)
 
 Los catálogos `insights-report` (A4) e `insights-deck` (16:9) componen sólo con el canvas aprobado el mismo día: portada navy o blanca con el logo privado del cliente (sellado como referencia, bytes autorizados por el worker), índice, «Lo esencial» con el folio real de su evidencia, aperturas de capítulo, una página de figura por familia (comparación de períodos, columnas por canal, metas con banda del registro ICO, tendencia), tabla, límites y contraportada desde el SSOT de marca. Se retiraron la página analítica y la lámina de evidencia v1. Fidelidad al canvas 20/21 ≤ 1 % (Deck-Agrupadas con excepción aprobada); gate visual de Insights a 0 px; ediciones reales de Berel y Sky compuestas en local, que revelaron y corrigieron cinco defectos. Code complete en develop, sin push; rollout pendiente. [Dossier](docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).
-
-## 2026-09-25 — Efeonce Marketing Studio: fundación en producción
-
-Nuevo producto `studio.efeonce.org` (EPIC-049 / TASK-1887). Repo `efeoncepro/efeonce-marketing-studio`, solo código, con docs en este repo. Next.js en Vercel con `/api/v1` (OpenAPI 3.1, 12 rutas) y dominio sin framework. Bases `marketing_studio` y `marketing_studio_staging` en `greenhouse-pg-dev`, con roles propios. Renditions WebP en buckets privados servidas por la API. UI aprobada en claro y oscuro con tema generado desde `@efeoncepro/axis-tokens`. Import idempotente de CMP-001 a CMP-005 aplicado en prod. Acceso abierto de solo lectura; el login es task aparte y el CNAME del dominio está pendiente. [Arquitectura](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [runbook](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
-
-## 2026-09-25 — CTA: política cromática por campaña
-
-Política optativa con archivo/hash, paleta AXIS y tratamientos explícitos; compositor y gate validan la decisión y conservan contraste/guardas. Legacy mantiene comportamiento: 13 piezas idénticas frente a HEAD. 39 tests, 14 verificaciones de integración y cuatro candidatas CMP-004 reproducidas; aprobación creativa pendiente. [Contrato](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#20-política-cromática-por-campaña-optativa) · [ADR](docs/architecture/EFEONCE_ADVERTISING_CAMPAIGN_COLOR_POLICY_DECISION_V1.md) · [evidencia](docs/audits/social/2026-09-25-cmp004-typography-grouping-review.md). Sin modificación del motor tipográfico/espacial, commit o publicación.

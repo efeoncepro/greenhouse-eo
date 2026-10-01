@@ -8,6 +8,18 @@ por sí solo flags, presupuesto, permisos o un despliegue del broker.
 **Acceso vigente:** [sitio sin login, autorizado y verificado](WORKBENCH_LAB_ACCESS_STATE.md).
 El alias sirve una publicación posterior al corte PR17 de abajo; los readbacks protegidos son históricos.
 
+## Revisión visual local posterior — pendiente de corrección
+
+2026-10-01. El operador pidió documentar con subagentes y corregir en el próximo chat.
+El export local de24adaptaciones `prueba-modular-24-v3` sigue en revisión: footer centrado
+por función, hueco destino/origen03-2668, eje DESDE/tarifa01-2611 y bloque editorial
+HASTA/porcentaje/DE DCTO.23-4685. El comportamiento local1.3.0 LEFT global no es norma
+visual aprobada;377tests previos no equivalen a aceptación de esos detalles.
+
+Canon en Workbench: `docs/operations/sky-layout-feedback-handoff-2026-10-01.md`.
+[Skill y diagnóstico para retomar](../../../.codex/skills/efeonce-creative-workbench/references/layout-feedback-handoff.md).
+Este corte documental no cambia código, resultados, selección, main ni runtime publicado.
+
 ## Cambios integrados y sus fuentes
 
 ### Unidad nueva local: íconos SKY — 2026-10-01

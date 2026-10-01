@@ -1,0 +1,24 @@
+{
+  "key": "checklist",
+  "label": "Checklist",
+  "use": "Área · tareas, entregables",
+  "mode": "complete",
+  "rest": [
+    "M3.5 6l1.75 1.75l3 -3",
+    "M11 6h9.5",
+    "M3.5 12l1.75 1.75l3 -3",
+    "M11 12h9.5",
+    "M11 18h9.5"
+  ],
+  "response": [
+    "M3.5 6l1.75 1.75l3 -3",
+    "M11 6h9.5",
+    "M3.5 12l1.75 1.75l3 -3",
+    "M11 12h9.5",
+    "M11 18h9.5"
+  ],
+  "dot": [
+    5.75,
+    18
+  ]
+}

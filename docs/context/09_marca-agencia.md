@@ -41,6 +41,7 @@ El Why sin mecanismo es humo de agencia. Cada faceta se sostiene en algo concret
 - **Automatización con autoría** — en Creative Studio automatizamos fricción y repetición, ampliamos exploración y reservamos criterio/aprobación para las personas.
 - **Educación como sistema** — Think educa al mercado; el protocolo de transparencia + los frameworks compartidos educan al cliente.
 - **Experiencia Efeonce** — el cliente no entra solo a una agencia: entra a un ecosistema de crecimiento con operación, software, aprendizaje, contenido, tools, networking y memoria.
+- **Capacidad que se puede experimentar antes de contratar** — en oportunidades seleccionadas, mostramos cómo entendemos el negocio y cómo trabajaríamos mediante un diagnóstico y una muestra contextual. El comprador puede evaluar criterio, ejecución y operación sobre su caso. Diferenciador reconocido por el operador el 2026-09-30; método y evidencia en [Venta con demostración contextual](../commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md). El formato puede ser X-Ray, Notion, contenido o prototipo; la herramienta no define el diferencial. No implica demostraciones ilimitadas, resultados garantizados ni exclusividad de mercado.
 
 ### WHAT — lo tangible
 

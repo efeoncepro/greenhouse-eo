@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.foto.isotipo.v1",
+  "plate": "MCB3-45-lente-explorar.png",
+  "salida": "MCB3-isotipo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.3.5",
+  "archivo": "assets/efeonce-isotype-positive.svg",
+  "sha256": "e8204298df02608e0edd9717a17317a84239b5c6d63b4db31104babba1bcd4d2",
+  "prenda": "clara",
+  "caja": {
+    "centro": [
+      0.6006,
+      0.5117
+    ],
+    "ancho": 0.035,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": null,
+  "creado": "2026-09-28T13:34:52.463Z"
+}

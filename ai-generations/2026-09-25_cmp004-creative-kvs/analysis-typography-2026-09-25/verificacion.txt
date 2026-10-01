@@ -1,0 +1,12 @@
+2026-09-25
+Plan: cuatro-candidatas.json
+Composición: exit 0.
+Gate con --reproducir: exit 0.
+Salida observada: 4 piezas con CTA certificadas por reproducción; lo entregado es idéntico a lo que produce el comando del repo.
+Inspección visual: cuatro previsualizaciones de 390 px.
+Cinco módulos del comando: SHA-256 sin cambios respecto del inicio del análisis.
+Alcance: cuatro candidatas 4:5, no aprobación creativa ni certificación global.
+
+Intentos anteriores:
+- gap 23 px: fallo de ritmo en cuatro piezas. Evidencia en evidencia-gap23/.
+- comparativas.json (cinco piezas con plate C01 repetido): exit 3; reproducción idéntica, pero la máscara reutilizada del control se clasificó como caché externa.

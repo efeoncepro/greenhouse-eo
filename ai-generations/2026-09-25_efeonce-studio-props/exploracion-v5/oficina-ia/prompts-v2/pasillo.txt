@@ -1,0 +1,3 @@
+Remove the small line of text printed low on the right part of the navy wall panel (it reads «v07 · aprobada por dirección de arte»). Where it was, the navy panel continues plain, with the same matte texture and the same faint bottle silhouettes behind.
+
+Change ONLY what is described. Keep everything else exactly as it is: framing, camera, light, materials, people, colors, every other word, ring, arc and sphere. Documentary photograph, no new text anywhere.

@@ -1,0 +1,2 @@
+✓ 4 pieza(s) con CTA cumplen el canon según su QA (verificación rápida: confía en el QA; la imagen se certifica con `--reproducir`) · huellas del plan, el plate, el PNG, el layout, el texto alternativo y el comando · texto ≥4.5:1 · superficie ≥3:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon.
+  Política cromática verificada en 4 pieza(s); armonía, jerarquía del conjunto y aprobación creativa requieren revisión visual.

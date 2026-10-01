@@ -1,0 +1,17 @@
+// ================= F-06 · Firma de correo =================
+const {firma:FIRMA}=await import('/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/firma/firma.mjs');
+const FPERS=JSON.parse(readFileSync('/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/firma/personas.json','utf8'));
+const FBLOB={'foto-julio-reyes':'/_blob/34f2c24378e9f021256a6e197472892b','logo-efeonce':'/_blob/7a7d2ec5a1f04676ffd7a4d0f6e65ef7','logo-globe':'/_blob/a38be0bd00678c161793a8dea6eb1319','logo-wave':'/_blob/05bd13281af6ec439c223757267f8790','logo-reach':'/_blob/7d79453f5ceabea2d833e8c84fda4726'};
+const fp=id=>FIRMA(FPERS.find(p=>p.id===id),n=>FBLOB[n]);
+const mailPane=(x,y,w,h,id,scale=1)=>abs(x,y,w,h,{background:C.white,border:`1px solid ${C.line}`,boxSizing:'border-box',overflow:'hidden'},
+ div({position:'absolute',left:28,top:24,width:(w-56)/scale,transform:`scale(${scale})`,transformOrigin:'0 0'},`<p style="font:14px Arial, Helvetica, sans-serif;color:#222;margin:0 0 20px">Quedo atento.</p>`+fp(id)));
+boards['F-06-firma-correo.dc.html']=board('F-06 · Firma de correo',
+ head('F-06 · Firma de correo','La firma también cierra con la esfera.','HTML de correo con texto vivo: se selecciona, se llama y se busca, y no desaparece cuando el cliente bloquea imágenes. La esfera es el punto final del nombre, en el color de cada marca; debajo, el logo y el eslogan con su palabra de producto. Una línea opcional lleva la pregunta de la campaña vigente con su anillo.')+
+ lab(64,320,'Persona · con línea de campaña (opcional)')+mailPane(64,320,700,330,'julio-reyes-campana')+
+ lab(800,320,'Área · sin foto')+mailPane(800,320,440,330,'ventas')+
+ lab(1276,320,'Móvil · 360 px')+mailPane(1276,320,260,330,'julio-reyes',.62)+
+ lab(64,720,'Globe')+mailPane(64,720,464,300,'globe')+lab(568,720,'Wave')+mailPane(568,720,464,300,'wave')+lab(1072,720,'Reach')+mailPane(1072,720,464,300,'reach')+
+ lab(64,1100,'Antes · firma 2025 (una sola imagen)')+`<img src="/_blob/ae0b2bc237a479c05ab191a8305668cc" alt="Firma de correo 2025 de Efeonce: imagen con foto, degradado, íconos naranjos, logos de productos y franja de partners" style="position: absolute; left: 64px; top: 1100px; width: 520px; height: 180px">`+
+ col(64,1300,520,160,'Qué corrige',list(['Era una imagen: sin texto seleccionable ni enlaces, y en blanco si el cliente bloquea imágenes.','Mostraba Nexus, que ya no es parte de la familia.','La franja de partners declara Meta, Truora y ActiveCampaign sin respaldo en el registro de partnerships.'],12.5))+
+ col(640,1100,420,380,'Reglas',list(['Nombre en Bricolage con el punto en el color de la marca; resto en Arial para que se vea igual en Outlook.','Máximo dos imágenes: foto opcional y logo. Sin íconos ni banners.','La foto va sin punto al lado: en un avatar se lee como estado «disponible».','La línea de campaña es una sola, con pregunta real del cliente y un enlace; se cambia por campaña o se quita.','Partners: sólo con estado «Partnership activo» en el registro; hoy ninguno se muestra.'],12.5))+
+ col(1100,1100,436,380,'Para instalarla',list(['Generador: exploracion-v5/firma (build.mjs + personas.json).','Logos y fotos se alojan en greenhouse.efeoncepro.com/branding/email/firma/ (pendiente de publicar).','En Outlook se pega el HTML de out/<persona>.html; en M365 conviene firma centralizada para todo el equipo.','Fotos: retrato real de cada persona, fondo gris oscuro, recorte en círculo.'],12.5)),1600,1520);

@@ -1,0 +1,9 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/m1/render.py:11: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  sc.world.use_nodes=True;bg=sc.world.node_tree.nodes['Background'];bg.inputs['Color'].default_value=(0.93,0.91,0.88,1);bg.inputs['Strength'].default_value=0.22
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/m1/render.py:15: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name);m.use_nodes=True;p=m.node_tree.nodes['Principled BSDF'];p.inputs['Base Color'].default_value=lin(col);p.inputs['Roughness'].default_value=rough
+00:16.300  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/m1/m1-post.png'
+M1_DONE
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

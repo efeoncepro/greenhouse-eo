@@ -1,0 +1,2566 @@
+[
+  {
+    "id": "cover-brochure-cine-orbit",
+    "board": "DeckPortadaPrincipal3",
+    "name": "Portada de brochure · Nexa frente a la órbita · «¿Qué hace Efeonce? Crecer.»",
+    "family": "cover",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPortadaPrincipal3.jpg",
+    "communicates": "Efeonce hace una sola cosa, hacer crecer, y Nexa la encarna frente a su órbita.",
+    "useWhen": [
+      "Portada del brochure GENERAL de servicios (las cinco líneas), en PDF que se lee sin presentador.",
+      "Cuando se quiere la portada más sobria de las tres generales: un solo sujeto, una sola órbita teal.",
+      "Cuando la contraportada del mismo documento será la órbita gigante sin foto (close-brochure-orbit)."
+    ],
+    "avoidWhen": [
+      "En una propuesta comercial: la portada de propuesta va SIN foto y con el logo del cliente.",
+      "En un brochure de UNA línea de servicio: esa línea tiene su propia portada con su acento.",
+      "Si la contraportada elegida también lleva foto (rompe la alternancia).",
+      "Como lámina interior que abre la sección de servicios: para eso está la sección de cine con 8 manijas sobre «Crecer.».",
+      "En un deck que se presenta y no es brochure ni propuesta."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "El documento es una propuesta comercial para un cliente."
+      },
+      {
+        "recipe": "cover-brochure-line-growth",
+        "when": "El brochure es de una sola línea (usar la portada de esa línea: growth, brand, engine, voice o revenue)."
+      },
+      {
+        "recipe": "section-cine-services",
+        "when": "Se necesita abrir la sección de servicios dentro de un documento, no la portada."
+      },
+      {
+        "recipe": "cover-classic",
+        "when": "Es un deck de presentación que no es brochure ni propuesta."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-cine-lines",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-cine-team",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "Brochure · Servicios 2026",
+        "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Qué hace Efeonce?",
+        "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Crecer",
+        "notes": "Bricolage 760 a 124 px (interlineado 0,95), 1 a 3 palabras, en top + 300. Se escribe SIN punto final: el punto lo pone la esfera de 0,2 em en el acento (answerHtml). Medido: «Donde rinde» (11) + esfera termina en x ≈ 780, el máximo que tolera la columna."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 42,
+        "example": "**Cinco** líneas de servicio:\nGrowth · Brand · Engine · Voice · Revenue",
+        "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 2 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png",
+        "notes": "Plate fijo de esta receta (Nexa, registro cine). Sólo se reemplaza por otro plate que cumpla la receta de toma de portada (§16.1 del registro cine)."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo (efeonce-logo-negative.svg de @efeoncepro/axis-brand-assets) a 500 px en x = 140, top = 300.",
+      "Columna de voz en x = 140 con los desfases de frameColumn: eyebrow +190, pregunta +238, respuesta +300, evidencia 34 px bajo la respuesta.",
+      "Acento teal de Growth (efeonceGraphicLine.lines growth.accentOnDark) en el anillo de la pregunta y la esfera de la respuesta.",
+      "Foto a sangre 1920 × 1080 sobre el fondo oscuro de Efeonce; la órbita es la de la foto, no se dibuja otra.",
+      "Sin burbuja URL, sin eslogan, sin cliente, sin selección ni cursor.",
+      "El copy de la voz general está aprobado tal cual: «¿Qué hace Efeonce? Crecer.» (la pregunta nació de acortar «¿Qué hacemos por tu marca?» porque cruzaba la órbita)."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto de cine va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png",
+      "ficha": "ai-generations/2026-09-27_brochure/fichas/BR1-portada-orbita.json",
+      "prompt": "ai-generations/2026-09-27_brochure/prompts/BR1-portada-orbita.txt",
+      "postprocess": [
+        "pnpm foto:emblema ai-generations/2026-09-27_brochure/plates/BR1-portada-orbita.png (revisión al 100 %)",
+        "pnpm foto:isotipo ai-generations/2026-09-27_brochure/plates/BR1-portada-orbita.png --centro 0.753,0.5625 --ancho 0.058 (procedencia en plates/BR1b-portada-orbita-isotipo.json: axis-brand-assets 0.3.4, efeonce-isotype-negative.svg, prenda oscura, brillo 0,85, limpieza 38)"
+      ],
+      "replaceable": "No es foto de ejemplo: es la placa aprobada. No lleva datos del cliente."
+    },
+    "prompts": {
+      "composition": "Compón la portada de un brochure general con la receta efeonceGraphicLine.surfaces.deck.recipes[\"cover-brochure\"], layout \"document\", en 1920 × 1080 sobre efeonceGraphicLine.color.dark. Pon a sangre el plate BR1b (Nexa frente a la órbita teal, registro cine); no lo recortes ni lo muevas. A la izquierda, en x = 140 (frameColumn.insetPx), arma la columna de voz con top = 300: logo negativo de Efeonce a 500 px; eyebrow en top + 190 (22 px, Poppins 500, mayúsculas, color suave de la voz); pregunta en top + 238 (Poppins Light 40 px, una línea) con el anillo en el acento de la línea growth; respuesta en top + 300 (Bricolage 760, 124 px, interlineado 0,95) cerrada con su esfera de 0,2 em en el mismo acento (answerHtml); evidencia Poppins 400 28/1,3, 34 px debajo, con UNA palabra en negrita y partida en dos líneas. No agregues burbuja URL, eslogan, cliente, selección ni cursor. Antes de entregar, verifica que ninguna palabra toque la órbita ni a Nexa y que la respuesta mida al menos 3× la pregunta."
+    },
+    "renderSource": {
+      "script": "render-src/portadas-izq.mjs",
+      "slideId": "PP3-brochure-cine-nexa"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "Una sola órbita por lámina: la que trae la foto (luz de la escena) o la gigante sin foto; no se suma otra órbita ni indicador de deck.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "La placa reserva el 45 % izquierdo como estudio oscuro y calmo (photo-reserves-start-45): sin haces, objetos ni órbita; el sujeto en la mitad derecha.",
+      "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %.",
+      "La portada de brochure no lleva cliente ni logo de cliente.",
+      "Registro cine permitido: Nexa es la protagonista."
+    ],
+    "notes": "Título previo: «OPCIÓN · FOTO · Brochure: Nexa frente a la órbita · «¿Qué hace Efeonce? Crecer.»». El 2026-09-27 el operador aprobó las 69 láminas del canvas, pero §4.6 de EFEONCE_SURFACE_COMPOSITION_V1 y el token AXIS (surfaceReference «option») todavía la registran como una de las tres OPCIONES de portada general sin elegida: sincronizar el canon. Pregunta abierta en §6 fila 19: esta misma foto también abre la sección de servicios como lámina interior. El render aprobado usa la columna de voz.mjs (COPY.brochure) con top = 300; la versión de portadas.mjs con «Servicios 2026» como título suelto quedó descartada (regla 3)."
+  },
+  {
+    "id": "cover-brochure-cine-lines",
+    "board": "DeckPortadaPrincipal6",
+    "name": "Portada de brochure · Nexa y las cinco líneas · «¿Qué hace Efeonce? Crecer.»",
+    "family": "cover",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPortadaPrincipal6.jpg",
+    "communicates": "Crecer es la promesa, y las cinco líneas de servicio orbitan alrededor de Nexa como una sola familia.",
+    "useWhen": [
+      "Portada del brochure general cuando el documento recorre las cinco líneas y conviene mostrarlas desde la tapa.",
+      "Cuando se quiere la portada de mayor impacto de color de las tres generales.",
+      "Cuando la contraportada será la órbita gigante sin foto (close-brochure-orbit)."
+    ],
+    "avoidWhen": [
+      "En una propuesta comercial (portada sin foto con el logo del cliente).",
+      "En un brochure de una sola línea: los cinco acentos se admiten sólo en esta lámina, que presenta la familia de líneas.",
+      "Con una contraportada con foto (rompe la alternancia).",
+      "Si el documento no presenta las cinco líneas: la foto promete una familia completa."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "Se quiere una portada más sobria, de un solo acento teal."
+      },
+      {
+        "recipe": "cover-brochure-line-brand",
+        "when": "El brochure es de una sola línea (usar la portada de esa línea)."
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "El documento es una propuesta comercial."
+      },
+      {
+        "recipe": "cover-brochure-cine-lines-selection",
+        "when": "El brochure se presenta como producto colaborativo y se quiere que Nexa «esté trabajando» sobre la respuesta."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-cine-lines-selection",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-cine-team",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "Brochure · Servicios 2026",
+        "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Qué hace Efeonce?",
+        "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Crecer",
+        "notes": "Bricolage 760 a 124 px (interlineado 0,95), 1 a 3 palabras, en top + 300. Se escribe SIN punto final: el punto lo pone la esfera de 0,2 em en el acento (answerHtml). Medido: «Donde rinde» (11) + esfera termina en x ≈ 780, el máximo que tolera la columna."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 42,
+        "example": "**Cinco** líneas de servicio:\nGrowth · Brand · Engine · Voice · Revenue",
+        "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 2 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+        "notes": "Plate fijo de esta receta (Nexa y cinco esferas de luz, una por línea)."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 250.",
+      "Columna de voz con los desfases de frameColumn (eyebrow +190, pregunta +238, respuesta +300, evidencia +34 bajo la respuesta).",
+      "Acento teal de Growth en el anillo y la esfera de la voz; las cinco esferas de color son luz de la foto, no la esfera de la voz.",
+      "Burbuja URL de luminosidad (catalogs/deck-axis/assets/url-lum.svg) abajo a la izquierda, x = 140, a 51 px del borde inferior, 216 px de ancho, fusión luminosity a opacidad 1.",
+      "Sin eslogan, sin cliente, sin selección ni cursor."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto de cine va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+      "ficha": "ai-generations/2026-09-26_deck-nexa/fichas/NX6-nexa-cinco-orbitas.json",
+      "prompt": "ai-generations/2026-09-26_deck-nexa/prompts/NX6-nexa-cinco-orbitas.txt",
+      "postprocess": [
+        "pnpm foto:emblema ai-generations/2026-09-26_deck-nexa/plates/NX6-nexa-cinco-orbitas.png (revisión al 100 %)",
+        "pnpm foto:isotipo sobre NX6-nexa-cinco-orbitas.png (la caja usada no quedó registrada: no hay .json de procedencia de NX6b en plates/; medirla con foto:emblema antes de recomponer)"
+      ],
+      "replaceable": "No es foto de ejemplo: es la placa aprobada."
+    },
+    "prompts": {
+      "composition": "Compón la portada de un brochure general con efeonceGraphicLine.surfaces.deck.recipes[\"cover-brochure\"], layout \"document\", 1920 × 1080 sobre efeonceGraphicLine.color.dark. Pon a sangre el plate NX6b (Nexa con cinco esferas de luz, una por línea, la naranja en su palma). Columna de voz en x = 140 con top = 250: logo negativo de Efeonce a 500 px; eyebrow +190; pregunta +238 con anillo en el acento growth; respuesta +300 a 124 px cerrada con UNA esfera teal (las esferas de la foto no cuentan como esfera de la voz); evidencia 34 px debajo, en dos líneas, con una palabra en negrita. Firma abajo a la izquierda con la burbuja url-lum.svg de 216 px en x = 140, 51 px sobre el borde, fusión luminosity a opacidad 1. Sin eslogan, sin cliente, sin selección. Verifica que la evidencia no toque la esfera naranja ni el haz que entra por la izquierda de la foto."
+    },
+    "renderSource": {
+      "script": "render-src/portadas-izq.mjs",
+      "slideId": "PP6-deck-cine-lineas"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %.",
+      "La portada de brochure no lleva cliente ni logo de cliente.",
+      "Las esferas de color de la foto son luz de la escena (photo-light-spheres-not-voice): la respuesta cierra con una sola esfera, en teal.",
+      "Cinco acentos sólo porque la foto presenta la familia de líneas; en ninguna otra portada.",
+      "Registro cine permitido: Nexa es la protagonista."
+    ],
+    "notes": "Título previo: «OPCIÓN · FOTO · Brochure: Nexa y las cinco líneas · «¿Qué hace Efeonce? Crecer.»». Aprobada en el canvas el 2026-09-27; §4.6 y el token AXIS aún la listan como «opción» de portada general: sincronizar. Es la única portada general que lleva la burbuja URL (el token cover-brochure declara urlBubble: false y anota la excepción). El plate nació para proposal-cinematic (NX6b); el haz naranja de la foto entra hasta x ≈ 620 cerca de la evidencia: la columna aprobada lo libra, pero con evidencias más largas hay que partir antes."
+  },
+  {
+    "id": "cover-brochure-cine-lines-selection",
+    "board": "DeckPortadaPrincipal6Sel",
+    "name": "Portada de brochure · Nexa y las cinco líneas, con selección y cursor de Nexa sobre «Crecer.»",
+    "family": "cover",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPortadaPrincipal6Sel.jpg",
+    "communicates": "Nexa no sólo aparece en la foto: está trabajando en el documento, eligiendo la respuesta «Crecer.».",
+    "useWhen": [
+      "Portada del brochure general cuando se quiere contar que Efeonce trabaja con personas y agentes sobre el mismo documento.",
+      "Brochure que se comparte como documento vivo (canvas, PDF interactivo) donde el gesto colaborativo tiene sentido.",
+      "Con la órbita gigante sin foto como contraportada, que también lleva un cursor (propio)."
+    ],
+    "avoidWhen": [
+      "Si otra lámina del documento ya repite el mismo gesto de selección sobre «Crecer.» (la sección de servicios lo lleva con cursor propio): no dos veces seguidas.",
+      "En propuesta comercial: allí la selección va sobre el logo del cliente.",
+      "Si se necesita una portada limpia sin interfaz: usar la misma foto sin selección.",
+      "Nunca poner la selección o el cursor sobre la persona."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-lines",
+        "when": "Se quiere la misma portada limpia, sin interfaz (el defecto de las fotos de cine)."
+      },
+      {
+        "recipe": "section-cine-services",
+        "when": "La selección sobre «Crecer.» debe vivir en la apertura de la sección de servicios, no en la tapa."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-cine-lines",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "Brochure · Servicios 2026",
+        "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Qué hace Efeonce?",
+        "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Crecer",
+        "notes": "Bricolage 760 a 124 px (interlineado 0,95), 1 a 3 palabras, en top + 300. Se escribe SIN punto final: el punto lo pone la esfera de 0,2 em en el acento (answerHtml). Medido: «Donde rinde» (11) + esfera termina en x ≈ 780, el máximo que tolera la columna."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 42,
+        "example": "**Cinco** líneas de servicio:\nGrowth · Brand · Engine · Voice · Revenue",
+        "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 2 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
+      },
+      {
+        "name": "selectionLabel",
+        "type": "text",
+        "required": true,
+        "maxChars": 8,
+        "example": "Nexa",
+        "notes": "Etiqueta del cursor del colaborador (participantKind person). En la lámina aprobada es «Nexa»; otra persona sólo si la foto la muestra y el operador lo pide."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+        "notes": "El mismo plate de cover-brochure-cine-lines."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 200 (sube 50 px respecto de la versión limpia para dar aire al marco).",
+      "Respuesta en top + 300 + 28 (answerWithSelectionExtraPx) y evidencia 130 px bajo la respuesta (bodyBelowAnswerPx.withSelection) para que quepa la etiqueta del colaborador.",
+      "Marco de ocho manijas (variant eight-handles, padding standard, overlay none) sobre «Crecer.» y un solo cursor de colaborador en bottom-end, escala 1,1, con la etiqueta «Nexa».",
+      "Burbuja url-lum.svg abajo a la izquierda (x = 140, 51 px del borde, 216 px).",
+      "Acento teal de Growth en anillo y esfera; sin eslogan ni cliente."
+    ],
+    "selection": {
+      "kind": "collaborator",
+      "label": "Nexa",
+      "target": "La respuesta «Crecer.» (texto de la columna), con marco de 8 manijas; nunca la persona de la foto."
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+      "ficha": "ai-generations/2026-09-26_deck-nexa/fichas/NX6-nexa-cinco-orbitas.json",
+      "prompt": "ai-generations/2026-09-26_deck-nexa/prompts/NX6-nexa-cinco-orbitas.txt",
+      "postprocess": [
+        "Igual que cover-brochure-cine-lines: foto:emblema al 100 % y foto:isotipo (caja no registrada en plates/)."
+      ],
+      "replaceable": "No es foto de ejemplo."
+    },
+    "prompts": {
+      "composition": "Parte de cover-brochure-cine-lines (plate NX6b a sangre, columna de voz en x = 140, burbuja url-lum abajo a la izquierda) con top = 200. Marca la respuesta con [data-sel], súbela 28 px (top + 328) y deja la evidencia 130 px bajo la respuesta. Pinta la selección SOLO con el contrato AXIS efeonce.collaboration-selection: resolveCollaborationSelectionIntent con targetKind \"text\", variant \"eight-handles\", padding \"standard\", overlay \"none\" y un cursor de colaborador anclado en \"bottom-end\", participantKind \"person\", label \"Nexa\", escala 1,1; renderízalo con renderCollaborationSelection midiendo la caja real del texto en el DOM. Comprueba evidence.withinCanvas y que la etiqueta no pise la evidencia ni la mano de Nexa. Un solo cursor; nada sobre la persona."
+    },
+    "renderSource": {
+      "script": "render-src/portadas-izq.mjs",
+      "slideId": "PP6-sel"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "Selección y cursor (frame-selection-text-or-client-logo): sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona; en 16:9 un solo cursor; pintados con el contrato AXIS efeonce.collaboration-selection, nunca a mano.",
+      "La selección toma una sola cosa por lámina (selection-one-thing-per-slide).",
+      "Con selección, la etiqueta del colaborador va en bottom-end: en top-end cae sobre la pregunta.",
+      "Las esferas de color de la foto son luz de la escena, no la esfera de la voz.",
+      "La portada de brochure no lleva cliente ni logo de cliente."
+    ],
+    "notes": "Título previo: «PRUEBA · FOTO · la de las cinco líneas, con selección y cursor de Nexa en «Crecer.»». El brief de recetas la da por aprobada el 2026-09-27, pero §4.6 («Selección y cursores en portadas») y el comentario del token cover-brochure en AXIS la registran como «prueba, no aprobada»: hay que confirmarlo con el operador y sincronizar el canon; hasta entonces no hay id AXIS (id nuevo propuesto: cover-brochure-cine-lines-selection). Choca con el defecto «foto de cine sin interfaz»; la regla 10 lo admite porque la selección va sobre el texto. Selección pintada con sel.mjs (paintSelection)."
+  },
+  {
+    "id": "cover-brochure-cine-team",
+    "board": "DeckPortadaPrincipal4",
+    "name": "Portada de brochure · Nexa y el equipo con agentes · «¿Qué hace Efeonce? Crecer.»",
+    "family": "cover",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPortadaPrincipal4.jpg",
+    "communicates": "Detrás de «Crecer.» hay un equipo real, personas y agentes, uniformado y mirando al cliente.",
+    "useWhen": [
+      "Portada del brochure general cuando el argumento principal es el equipo (personas + agentes), por ejemplo para compradores que temen perder control o conocer a quién les atiende.",
+      "Con la órbita gigante sin foto como contraportada."
+    ],
+    "avoidWhen": [
+      "Si la sección del equipo del mismo documento abre con esta misma foto («¿Quién hace crecer tu marca? Este equipo.»): no repetirla.",
+      "En propuesta comercial.",
+      "Con contraportada con foto.",
+      "Si hay que presentar a personas reales con nombre: esta foto es de puesta en escena, no un retrato del equipo real."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "section-cine-team",
+        "when": "El equipo debe abrir su sección interior, no la tapa."
+      },
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "La portada debe centrarse en la marca y no en el equipo."
+      },
+      {
+        "recipe": "content-team",
+        "when": "Hay que mostrar al equipo real asignado con nombres y cargos."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-cine-lines",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "Brochure · Servicios 2026",
+        "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Qué hace Efeonce?",
+        "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Crecer",
+        "notes": "Bricolage 760 a 124 px (interlineado 0,95), 1 a 3 palabras, en top + 300. Se escribe SIN punto final: el punto lo pone la esfera de 0,2 em en el acento (answerHtml). Medido: «Donde rinde» (11) + esfera termina en x ≈ 780, el máximo que tolera la columna."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 42,
+        "example": "**Cinco** líneas de servicio:\nGrowth · Brand · Engine · Voice · Revenue",
+        "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 2 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+        "notes": "Plate fijo (Nexa al frente del equipo con polo, chaqueta y hoodie, y cinco agentes)."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 250.",
+      "Columna de voz con los desfases de frameColumn; acento teal de Growth.",
+      "Sin burbuja URL, sin eslogan, sin cliente, sin selección.",
+      "El grupo ocupa desde x ≈ 700: la evidencia no puede pasar de x ≈ 700 (el robot de abajo a la izquierda)."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto de cine va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+      "ficha": "ai-generations/2026-09-27_brochure/fichas/BR2-portada-equipo.json",
+      "prompt": "ai-generations/2026-09-27_brochure/prompts/BR2-portada-equipo.txt",
+      "postprocess": [
+        "pnpm foto:emblema ai-generations/2026-09-27_brochure/plates/BR2-portada-equipo.png (revisión al 100 %)",
+        "pnpm foto:isotipo sobre BR2-portada-equipo.png en tres pechos: --centro 0.498,0.443 --ancho 0.033 · --centro 0.685,0.430 --ancho 0.036 · --centro 0.835,0.441 --ancho 0.034 (el desarrollador desenfocado del fondo se dejó como salió)"
+      ],
+      "replaceable": "No es foto de ejemplo; las personas del equipo son casting de puesta en escena, no el equipo real con nombre."
+    },
+    "prompts": {
+      "composition": "Compón la portada del brochure general con efeonceGraphicLine.surfaces.deck.recipes[\"cover-brochure\"], layout \"document\", sobre efeonceGraphicLine.color.dark. Pon a sangre el plate BR2b (Nexa al frente del equipo y los agentes, todos al lente). Columna de voz en x = 140 con top = 250: logo negativo de Efeonce a 500 px, eyebrow +190, pregunta +238 con anillo teal (acento growth), respuesta +300 a 124 px con su esfera, evidencia 34 px debajo en dos líneas con una palabra en negrita. Sin burbuja, eslogan, cliente ni selección. Verifica que la evidencia termine antes del robot de la izquierda y de la manga de la primera persona."
+    },
+    "renderSource": {
+      "script": "render-src/portadas-izq.mjs",
+      "slideId": "PP4-brochure-cine-equipo"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %.",
+      "La portada de brochure no lleva cliente ni logo de cliente.",
+      "Nunca dos personas mirándose de cerca: todos miran al lente.",
+      "Registro cine permitido: Nexa protagonista al frente del grupo."
+    ],
+    "notes": "Título previo: «OPCIÓN · FOTO · Brochure: Nexa y el equipo · «¿Qué hace Efeonce? Crecer.»». Aprobada el 2026-09-27; §4.6 y el token AXIS aún la tratan como opción de portada y la misma foto abre la sección del equipo como interior (pregunta abierta §6 fila 19). La ficha pide al sujeto «de las rodillas arriba» a ≈ 3 m: es el único plate de portada que no sigue la cintura arriba a 2 m de §16.1, por el grupo."
+  },
+  {
+    "id": "cover-brochure-line-growth",
+    "board": "DeckPortadaLineaGrowth",
+    "name": "Portada de brochure por línea · Growth Strategy & Measurement · «¿Lo medimos? Siempre.»",
+    "family": "cover",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "photo-bleed",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPortadaLineaGrowth.jpg",
+    "communicates": "Con Efeonce todo lo que se hace se mide, siempre: estrategia con número.",
+    "useWhen": [
+      "Portada del brochure de la línea Growth Strategy & Measurement (documento de una sola línea de servicio).",
+      "Cuando la contraportada del documento será la órbita gigante sin foto (close-brochure-orbit).",
+      "Cuando el lector debe reconocer la línea por su acento teal (lines growth) desde la tapa."
+    ],
+    "avoidWhen": [
+      "En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»).",
+      "En una propuesta comercial, aunque sea de esta línea: la portada de propuesta va sin foto con el logo del cliente.",
+      "Con una contraportada con foto (rompe la alternancia).",
+      "Mezclando el acento de otra línea o cambiando el fondo por línea: sólo cambia el acento."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "El brochure presenta las cinco líneas."
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "Es una propuesta comercial de esta línea para un cliente."
+      },
+      {
+        "recipe": "proposal-cinematic",
+        "when": "Se necesita la lámina interior que propone el servicio de esta línea dentro de un deck."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-brand",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-engine",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-voice",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-revenue",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "Brochure · Growth Strategy",
+        "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Lo medimos?",
+        "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Siempre",
+        "notes": "Bricolage 760 a 124 px (interlineado 0,95), 1 a 3 palabras, en top + 300. Se escribe SIN punto final: el punto lo pone la esfera de 0,2 em en el acento (answerHtml). Medido: «Donde rinde» (11) + esfera termina en x ≈ 780, el máximo que tolera la columna."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 42,
+        "example": "**Seis** capacidades:\nEstrategia · GTM · Revenue enablement\nAnalítica · Medición · Orquestación",
+        "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 3 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
+      },
+      {
+        "name": "line",
+        "type": "enum",
+        "required": true,
+        "example": "growth",
+        "notes": "Clave de efeonceGraphicLine.lines que da el acento del anillo y la esfera: growth · brand · engine · voice · revenue-hubspot (revenue-salesforce pendiente, no aprobada). Debe coincidir con la luz de acento del plate."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+        "notes": "Plate aprobado de la línea: una estratega con polo y lanyard revisando un tablero en un monitor (no mira al lente). Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 220.",
+      "Columna de voz con los desfases de frameColumn (eyebrow +190, pregunta +238, respuesta +300, evidencia +34 bajo la respuesta).",
+      "Anillo de la pregunta y esfera de la respuesta en el acento de la línea (teal (lines growth), accentOnDark); el resto del texto en blanco y el suave de la voz.",
+      "Fondo oscuro de Efeonce: no cambia por línea.",
+      "Sin burbuja URL, sin eslogan, sin cliente, sin selección ni cursor.",
+      "Las categorías de la evidencia salen del catálogo docs/services/ de la línea, no se inventan."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+      "ficha": "ai-generations/2026-09-26_deck-hibrido/fichas/HW1-mismo-trabajo.json",
+      "prompt": "ai-generations/2026-09-26_deck-hibrido/prompts/HW1-mismo-trabajo.txt",
+      "postprocess": [
+        "Sin isotipo compuesto (no hay versión b de HW1). Antes de reutilizar: pnpm foto:emblema sobre HW1-mismo-trabajo.png al 100 % (polo y lanyard) y, si el emblema difiere del oficial, pnpm foto:isotipo."
+      ],
+      "replaceable": "No es foto de ejemplo: es la placa aprobada de la línea."
+    },
+    "prompts": {
+      "composition": "Compón la portada del brochure de Growth Strategy & Measurement con efeonceGraphicLine.surfaces.deck.recipes[\"cover-brochure\"], layout \"line\", 1920 × 1080 sobre efeonceGraphicLine.color.dark. Pon a sangre el plate de la línea (una estratega con polo y lanyard revisando un tablero en un monitor (no mira al lente)). Toma el acento de efeonceGraphicLine.lines[\"growth\"].accentOnDark y úsalo SOLO en el anillo de la pregunta y la esfera de la respuesta. Columna en x = 140 con top = 220: logo negativo de Efeonce a 500 px; eyebrow «Brochure · Growth Strategy» en top + 190; pregunta «¿Lo medimos?» en top + 238 (Poppins Light 40 px, una línea); respuesta «Siempre» en top + 300 (Bricolage 760, 124 px) cerrada con su esfera; evidencia Poppins 400 28/1,3 en 3 líneas con UNA palabra en negrita y las categorías del catálogo docs/services/ de la línea. Sin burbuja, eslogan, cliente ni selección. Si una línea toca al sujeto, un haz o una pieza de la foto, acorta la pregunta o parte la evidencia; no muevas la foto."
+    },
+    "renderSource": {
+      "script": "render-src/lineas.mjs",
+      "slideId": "LN1-growth"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "La portada de brochure no lleva cliente ni logo de cliente.",
+      "Cada portada de línea toma el acento de su línea en anillo y esfera y lista las categorías de la línea (line-cover-takes-line-accent).",
+      "Un solo acento por lámina (five-accents-only-in-lines): no se mezclan colores de otras líneas en la voz.",
+      "Registro documental: nadie mira al lente; revisar emblema y lanyard al 100 % antes de publicar."
+    ],
+    "notes": "Título previo: «✅ APROBADA · FOTO · Brochure Growth Strategy & Measurement · «¿Lo medimos? Siempre.»». HW1 NO es registro cine (medido en su ficha: «nobody looks at the lens», reserva de pared oscura, 35 mm): es la toma documental. El operador la aprobó igual como portada de Growth, pero no cumple la receta de toma de portada (§16.1 del registro cine) y no sirve de modelo para una portada nueva. El lanyard de la foto lleva texto de marca generado por el modelo («Empower your Growth», «efeonce»): revisarlo al 100 % antes de publicar."
+  },
+  {
+    "id": "cover-brochure-line-brand",
+    "board": "DeckPortadaLineaBrand",
+    "name": "Portada de brochure por línea · Creative Services · «¿Quién crea mi contenido? Tu squad.»",
+    "family": "cover",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPortadaLineaBrand.jpg",
+    "communicates": "El contenido lo crea un squad creativo propio que dirige la producción, no un proveedor suelto.",
+    "useWhen": [
+      "Portada del brochure de la línea Creative Services (documento de una sola línea de servicio).",
+      "Cuando la contraportada del documento será la órbita gigante sin foto (close-brochure-orbit).",
+      "Cuando el lector debe reconocer la línea por su acento naranja (lines brand) desde la tapa."
+    ],
+    "avoidWhen": [
+      "En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»).",
+      "En una propuesta comercial, aunque sea de esta línea: la portada de propuesta va sin foto con el logo del cliente.",
+      "Con una contraportada con foto (rompe la alternancia).",
+      "Mezclando el acento de otra línea o cambiando el fondo por línea: sólo cambia el acento."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "El brochure presenta las cinco líneas."
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "Es una propuesta comercial de esta línea para un cliente."
+      },
+      {
+        "recipe": "proposal-cinematic",
+        "when": "Se necesita la lámina interior que propone el servicio de esta línea dentro de un deck."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-growth",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-engine",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-voice",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-revenue",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "Brochure · Creative Services",
+        "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Quién crea mi contenido?",
+        "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Tu squad",
+        "notes": "Bricolage 760 a 124 px (interlineado 0,95), 1 a 3 palabras, en top + 300. Se escribe SIN punto final: el punto lo pone la esfera de 0,2 em en el acento (answerHtml). Medido: «Donde rinde» (11) + esfera termina en x ≈ 780, el máximo que tolera la columna."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 42,
+        "example": "**Seis** capacidades:\nSquad creativo · Brand systems · Campañas\nContenido y social · Audiovisual · Run & Gun",
+        "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 3 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
+      },
+      {
+        "name": "line",
+        "type": "enum",
+        "required": true,
+        "example": "brand",
+        "notes": "Clave de efeonceGraphicLine.lines que da el acento del anillo y la esfera: growth · brand · engine · voice · revenue-hubspot (revenue-salesforce pendiente, no aprobada). Debe coincidir con la luz de acento del plate."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png",
+        "notes": "Plate aprobado de la línea: una directora creativa con hoodie dirigiendo una constelación de piezas. Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 220.",
+      "Columna de voz con los desfases de frameColumn (eyebrow +190, pregunta +238, respuesta +300, evidencia +34 bajo la respuesta).",
+      "Anillo de la pregunta y esfera de la respuesta en el acento de la línea (naranja (lines brand), accentOnDark); el resto del texto en blanco y el suave de la voz.",
+      "Fondo oscuro de Efeonce: no cambia por línea.",
+      "Sin burbuja URL, sin eslogan, sin cliente, sin selección ni cursor.",
+      "Las categorías de la evidencia salen del catálogo docs/services/ de la línea, no se inventan."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png",
+      "ficha": "ai-generations/2026-09-26_deck-creativo/fichas/CR2-constelacion-digital.json",
+      "prompt": "ai-generations/2026-09-26_deck-creativo/prompts/CR2-constelacion-digital.txt",
+      "postprocess": [
+        "pnpm foto:emblema ai-generations/2026-09-26_deck-creativo/plates/CR2-constelacion-digital.png (100 %)",
+        "pnpm foto:isotipo sobre CR2-constelacion-digital.png (caja no registrada: no hay .json de procedencia de CR2b en plates/)"
+      ],
+      "replaceable": "No es foto de ejemplo: es la placa aprobada de la línea."
+    },
+    "prompts": {
+      "composition": "Compón la portada del brochure de Creative Services con efeonceGraphicLine.surfaces.deck.recipes[\"cover-brochure\"], layout \"line\", 1920 × 1080 sobre efeonceGraphicLine.color.dark. Pon a sangre el plate de la línea (una directora creativa con hoodie dirigiendo una constelación de piezas). Toma el acento de efeonceGraphicLine.lines[\"brand\"].accentOnDark y úsalo SOLO en el anillo de la pregunta y la esfera de la respuesta. Columna en x = 140 con top = 220: logo negativo de Efeonce a 500 px; eyebrow «Brochure · Creative Services» en top + 190; pregunta «¿Quién crea mi contenido?» en top + 238 (Poppins Light 40 px, una línea); respuesta «Tu squad» en top + 300 (Bricolage 760, 124 px) cerrada con su esfera; evidencia Poppins 400 28/1,3 en 3 líneas con UNA palabra en negrita y las categorías del catálogo docs/services/ de la línea. Sin burbuja, eslogan, cliente ni selección. Si una línea toca al sujeto, un haz o una pieza de la foto, acorta la pregunta o parte la evidencia; no muevas la foto."
+    },
+    "renderSource": {
+      "script": "render-src/lineas.mjs",
+      "slideId": "LN2-brand"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "La portada de brochure no lleva cliente ni logo de cliente.",
+      "Cada portada de línea toma el acento de su línea en anillo y esfera y lista las categorías de la línea (line-cover-takes-line-accent).",
+      "Un solo acento por lámina (five-accents-only-in-lines): no se mezclan colores de otras líneas en la voz.",
+      "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %."
+    ],
+    "notes": "Título previo: «✅ APROBADA · FOTO · Brochure Creative Services · «¿Quién crea mi contenido? Tu squad.»». El plate nació para proposal-cinematic (CR2b). Las piezas flotantes de la izquierda llegan a x ≈ 760 a la altura de la pregunta: «¿Quién crea mi contenido?» (25) es el máximo que cabe; no alargar. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927)."
+  },
+  {
+    "id": "cover-brochure-line-engine",
+    "board": "DeckPortadaLineaEngine",
+    "name": "Portada de brochure por línea · Digital Services & Engineering · «¿Te encuentra la IA? Visible.»",
+    "family": "cover",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPortadaLineaEngine.jpg",
+    "communicates": "Efeonce construye la web y la visibilidad para que personas, buscadores y agentes de IA te encuentren.",
+    "useWhen": [
+      "Portada del brochure de la línea Digital Services & Engineering (documento de una sola línea de servicio).",
+      "Cuando la contraportada del documento será la órbita gigante sin foto (close-brochure-orbit).",
+      "Cuando el lector debe reconocer la línea por su acento azul (lines engine) desde la tapa."
+    ],
+    "avoidWhen": [
+      "En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»).",
+      "En una propuesta comercial, aunque sea de esta línea: la portada de propuesta va sin foto con el logo del cliente.",
+      "Con una contraportada con foto (rompe la alternancia).",
+      "Mezclando el acento de otra línea o cambiando el fondo por línea: sólo cambia el acento."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "El brochure presenta las cinco líneas."
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "Es una propuesta comercial de esta línea para un cliente."
+      },
+      {
+        "recipe": "proposal-cinematic",
+        "when": "Se necesita la lámina interior que propone el servicio de esta línea dentro de un deck."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-growth",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-brand",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-voice",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-revenue",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "Brochure · Digital Services",
+        "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Te encuentra la IA?",
+        "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Visible",
+        "notes": "Bricolage 760 a 124 px (interlineado 0,95), 1 a 3 palabras, en top + 300. Se escribe SIN punto final: el punto lo pone la esfera de 0,2 em en el acento (answerHtml). Medido: «Donde rinde» (11) + esfera termina en x ≈ 780, el máximo que tolera la columna."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 42,
+        "example": "**Cinco** capacidades:\nSearch Visibility · Web Experience · Medición\nSistemas de agentes · Automatización",
+        "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 3 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
+      },
+      {
+        "name": "line",
+        "type": "enum",
+        "required": true,
+        "example": "engine",
+        "notes": "Clave de efeonceGraphicLine.lines que da el acento del anillo y la esfera: growth · brand · engine · voice · revenue-hubspot (revenue-salesforce pendiente, no aprobada). Debe coincidir con la luz de acento del plate."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
+        "notes": "Plate aprobado de la línea: un líder web con polo que toca una web holográfica usada por personas y agentes robot. Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 220.",
+      "Columna de voz con los desfases de frameColumn (eyebrow +190, pregunta +238, respuesta +300, evidencia +34 bajo la respuesta).",
+      "Anillo de la pregunta y esfera de la respuesta en el acento de la línea (azul (lines engine), accentOnDark); el resto del texto en blanco y el suave de la voz.",
+      "Fondo oscuro de Efeonce: no cambia por línea.",
+      "Sin burbuja URL, sin eslogan, sin cliente, sin selección ni cursor.",
+      "Las categorías de la evidencia salen del catálogo docs/services/ de la línea, no se inventan."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
+      "ficha": "ai-generations/2026-09-26_deck-web/fichas/WB1-web-para-todos.json",
+      "prompt": "ai-generations/2026-09-26_deck-web/prompts/WB1-web-para-todos.txt",
+      "postprocess": [
+        "pnpm foto:emblema ai-generations/2026-09-26_deck-web/plates/WB1-web-para-todos.png (100 %)",
+        "pnpm foto:isotipo sobre WB1-web-para-todos.png (caja no registrada: no hay .json de procedencia de WB1b en plates/)"
+      ],
+      "replaceable": "No es foto de ejemplo: es la placa aprobada de la línea."
+    },
+    "prompts": {
+      "composition": "Compón la portada del brochure de Digital Services & Engineering con efeonceGraphicLine.surfaces.deck.recipes[\"cover-brochure\"], layout \"line\", 1920 × 1080 sobre efeonceGraphicLine.color.dark. Pon a sangre el plate de la línea (un líder web con polo que toca una web holográfica usada por personas y agentes robot). Toma el acento de efeonceGraphicLine.lines[\"engine\"].accentOnDark y úsalo SOLO en el anillo de la pregunta y la esfera de la respuesta. Columna en x = 140 con top = 220: logo negativo de Efeonce a 500 px; eyebrow «Brochure · Digital Services» en top + 190; pregunta «¿Te encuentra la IA?» en top + 238 (Poppins Light 40 px, una línea); respuesta «Visible» en top + 300 (Bricolage 760, 124 px) cerrada con su esfera; evidencia Poppins 400 28/1,3 en 3 líneas con UNA palabra en negrita y las categorías del catálogo docs/services/ de la línea. Sin burbuja, eslogan, cliente ni selección. Si una línea toca al sujeto, un haz o una pieza de la foto, acorta la pregunta o parte la evidencia; no muevas la foto."
+    },
+    "renderSource": {
+      "script": "render-src/lineas.mjs",
+      "slideId": "LN3-engine"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "La portada de brochure no lleva cliente ni logo de cliente.",
+      "Cada portada de línea toma el acento de su línea en anillo y esfera y lista las categorías de la línea (line-cover-takes-line-accent).",
+      "Un solo acento por lámina (five-accents-only-in-lines): no se mezclan colores de otras líneas en la voz.",
+      "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %."
+    ],
+    "notes": "Título previo: «✅ APROBADA · FOTO · Brochure Digital Services & Engineering · «¿Te encuentra la IA? Visible.»». El plate nació para proposal-cinematic (WB1b). La evidencia llega a x ≈ 750, justo antes del codo del sujeto: tres líneas es el máximo. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927)."
+  },
+  {
+    "id": "cover-brochure-line-voice",
+    "board": "DeckPortadaLineaVoice",
+    "name": "Portada de brochure por línea · Media & Distribution · «¿Dónde invierto? Donde rinde.»",
+    "family": "cover",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPortadaLineaVoice.jpg",
+    "communicates": "La inversión en medios va donde rinde: un mensaje que llega a muchas audiencias desde una sola estrategia.",
+    "useWhen": [
+      "Portada del brochure de la línea Media & Distribution (documento de una sola línea de servicio).",
+      "Cuando la contraportada del documento será la órbita gigante sin foto (close-brochure-orbit).",
+      "Cuando el lector debe reconocer la línea por su acento rojo anaranjado (lines voice) desde la tapa."
+    ],
+    "avoidWhen": [
+      "En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»).",
+      "En una propuesta comercial, aunque sea de esta línea: la portada de propuesta va sin foto con el logo del cliente.",
+      "Con una contraportada con foto (rompe la alternancia).",
+      "Mezclando el acento de otra línea o cambiando el fondo por línea: sólo cambia el acento."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "El brochure presenta las cinco líneas."
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "Es una propuesta comercial de esta línea para un cliente."
+      },
+      {
+        "recipe": "proposal-cinematic",
+        "when": "Se necesita la lámina interior que propone el servicio de esta línea dentro de un deck."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-growth",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-brand",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-engine",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-revenue",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "Brochure · Media & Distribution",
+        "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Dónde invierto?",
+        "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Donde rinde",
+        "notes": "Bricolage 760 a 124 px (interlineado 0,95), 1 a 3 palabras, en top + 300. Se escribe SIN punto final: el punto lo pone la esfera de 0,2 em en el acento (answerHtml). Medido: «Donde rinde» (11) + esfera termina en x ≈ 780, el máximo que tolera la columna."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 42,
+        "example": "**Tres** soluciones y una operación:\nEstrategia de distribución · Performance\nInfluencia y earned · Managed Media",
+        "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 3 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
+      },
+      {
+        "name": "line",
+        "type": "enum",
+        "required": true,
+        "example": "voice",
+        "notes": "Clave de efeonceGraphicLine.lines que da el acento del anillo y la esfera: growth · brand · engine · voice · revenue-hubspot (revenue-salesforce pendiente, no aprobada). Debe coincidir con la luz de acento del plate."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png",
+        "notes": "Plate aprobado de la línea: una líder de medios con chaqueta que sostiene una esfera de luz de la que salen haces a muchas pantallas. Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 300.",
+      "Columna de voz con los desfases de frameColumn (eyebrow +190, pregunta +238, respuesta +300, evidencia +34 bajo la respuesta).",
+      "Anillo de la pregunta y esfera de la respuesta en el acento de la línea (rojo anaranjado (lines voice), accentOnDark); el resto del texto en blanco y el suave de la voz.",
+      "Fondo oscuro de Efeonce: no cambia por línea.",
+      "Sin burbuja URL, sin eslogan, sin cliente, sin selección ni cursor.",
+      "Las categorías de la evidencia salen del catálogo docs/services/ de la línea, no se inventan."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png",
+      "ficha": "ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json",
+      "prompt": "ai-generations/2026-09-27_portadas-lineas/prompts/LN4-voice-distribucion.txt",
+      "postprocess": [
+        "pnpm foto:emblema ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png: el bordado se revisó al 100 % y coincide con el isotipo oficial, por eso NO se corrió foto:isotipo (sin sufijo b)."
+      ],
+      "replaceable": "No es foto de ejemplo: es la placa aprobada de la línea."
+    },
+    "prompts": {
+      "composition": "Compón la portada del brochure de Media & Distribution con efeonceGraphicLine.surfaces.deck.recipes[\"cover-brochure\"], layout \"line\", 1920 × 1080 sobre efeonceGraphicLine.color.dark. Pon a sangre el plate de la línea (una líder de medios con chaqueta que sostiene una esfera de luz de la que salen haces a muchas pantallas). Toma el acento de efeonceGraphicLine.lines[\"voice\"].accentOnDark y úsalo SOLO en el anillo de la pregunta y la esfera de la respuesta. Columna en x = 140 con top = 300: logo negativo de Efeonce a 500 px; eyebrow «Brochure · Media & Distribution» en top + 190; pregunta «¿Dónde invierto?» en top + 238 (Poppins Light 40 px, una línea); respuesta «Donde rinde» en top + 300 (Bricolage 760, 124 px) cerrada con su esfera; evidencia Poppins 400 28/1,3 en 3 líneas con UNA palabra en negrita y las categorías del catálogo docs/services/ de la línea. Sin burbuja, eslogan, cliente ni selección. Si una línea toca al sujeto, un haz o una pieza de la foto, acorta la pregunta o parte la evidencia; no muevas la foto."
+    },
+    "renderSource": {
+      "script": "render-src/lineas.mjs",
+      "slideId": "LN4-voice"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "La portada de brochure no lleva cliente ni logo de cliente.",
+      "Cada portada de línea toma el acento de su línea en anillo y esfera y lista las categorías de la línea (line-cover-takes-line-accent).",
+      "Un solo acento por lámina (five-accents-only-in-lines): no se mezclan colores de otras líneas en la voz.",
+      "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %."
+    ],
+    "notes": "Título previo: «✅ APROBADA · FOTO · Brochure Media & Distribution · «¿Dónde invierto? Donde rinde.»». Es la única portada con plate nacido para el brochure (ficha LN4, ≈ USD 0,04) y es la receta de prompt reutilizable para una portada de línea nueva (§16.4 del registro cine). Top = 300 (las demás de línea, 220) para que la columna quede bajo el haz más bajo. La pregunta nació de acortar «¿Dónde pongo el presupuesto?», que cruzaba un haz. Tensión abierta: LN4 no lleva isotipo compuesto porque el bordado salió fiel, y §7.3 del registro cine pide que todo publicable lleve el oficial compuesto (§16.6 #2, decide el operador). Registro: protagonista del equipo en una portada de brochure, misma tensión con el contrato cine (§16.6 #1)."
+  },
+  {
+    "id": "cover-brochure-line-revenue",
+    "board": "DeckPortadaLineaRevenue",
+    "name": "Portada de brochure por línea · RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.»",
+    "family": "cover",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPortadaLineaRevenue.jpg",
+    "communicates": "Con RevOps bien operado el reporte ya está hecho: el motor de revenue corre con datos y agentes.",
+    "useWhen": [
+      "Portada del brochure de la línea RevOps & CRM (documento de una sola línea de servicio).",
+      "Cuando la contraportada del documento será la órbita gigante sin foto (close-brochure-orbit).",
+      "Cuando el lector debe reconocer la línea por su acento magenta HubSpot (lines revenue-hubspot) desde la tapa."
+    ],
+    "avoidWhen": [
+      "En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»).",
+      "En una propuesta comercial, aunque sea de esta línea: la portada de propuesta va sin foto con el logo del cliente.",
+      "Con una contraportada con foto (rompe la alternancia).",
+      "Mezclando el acento de otra línea o cambiando el fondo por línea: sólo cambia el acento."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "El brochure presenta las cinco líneas."
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "Es una propuesta comercial de esta línea para un cliente."
+      },
+      {
+        "recipe": "proposal-cinematic",
+        "when": "Se necesita la lámina interior que propone el servicio de esta línea dentro de un deck."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-growth",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-brand",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-engine",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-brochure-line-voice",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "Brochure · RevOps & CRM",
+        "notes": "Poppins 500 a 22 px, mayúsculas con tracking 0,24 em, en top + 190. Forma «Brochure · <Servicios año | nombre corto de la línea>». Medido: «BROCHURE · MEDIA & DISTRIBUTION» (31) llega a x ≈ 680 sin tocar el sujeto."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Y el reporte del viernes?",
+        "notes": "Poppins Light a 40 px en una sola línea (nowrap), con su anillo en el acento, en top + 238. Medido: «¿Y el reporte del viernes?» (26) termina en x ≈ 670. Si cruza un haz, una mano o la órbita se ACORTA, nunca se mueve la foto."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Ya lo viste",
+        "notes": "Bricolage 760 a 124 px (interlineado 0,95), 1 a 3 palabras, en top + 300. Se escribe SIN punto final: el punto lo pone la esfera de 0,2 em en el acento (answerHtml). Medido: «Donde rinde» (11) + esfera termina en x ≈ 780, el máximo que tolera la columna."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 42,
+        "example": "**Seis** soluciones:\nMarketing y AEO · Ventas y pipeline\nRevenue lifecycle · Servicio\nDatos y CRM · Operación con agentes",
+        "notes": "Poppins 400 a 28 px, interlineado 1,3, 34 px bajo la respuesta. UNA palabra en negrita (el número de capacidades o líneas). 4 líneas; maxChars es por línea (medido: «Squad creativo · Brand systems · Campañas», 41, termina en x ≈ 760). Se parte con salto manual, no con ajuste automático."
+      },
+      {
+        "name": "line",
+        "type": "enum",
+        "required": true,
+        "example": "revenue-hubspot",
+        "notes": "Clave de efeonceGraphicLine.lines que da el acento del anillo y la esfera: growth · brand · engine · voice · revenue-hubspot (revenue-salesforce pendiente, no aprobada). Debe coincidir con la luz de acento del plate."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png",
+        "notes": "Plate aprobado de la línea: una líder de RevOps con chaqueta que dirige el nudo de un moño de luz magenta y azul con agentes robot. Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 220.",
+      "Columna de voz con los desfases de frameColumn (eyebrow +190, pregunta +238, respuesta +300, evidencia +34 bajo la respuesta).",
+      "Anillo de la pregunta y esfera de la respuesta en el acento de la línea (magenta HubSpot (lines revenue-hubspot), accentOnDark); el resto del texto en blanco y el suave de la voz.",
+      "Fondo oscuro de Efeonce: no cambia por línea.",
+      "Sin burbuja URL, sin eslogan, sin cliente, sin selección ni cursor.",
+      "Las categorías de la evidencia salen del catálogo docs/services/ de la línea, no se inventan."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png",
+      "ficha": "ai-generations/2026-09-26_deck-revops/fichas/RV1-motor-de-revenue.json",
+      "prompt": "ai-generations/2026-09-26_deck-revops/prompts/RV1-motor-de-revenue.txt",
+      "postprocess": [
+        "pnpm foto:emblema ai-generations/2026-09-26_deck-revops/plates/RV1-motor-de-revenue.png (100 %)",
+        "pnpm foto:isotipo sobre RV1-motor-de-revenue.png (caja no registrada: no hay .json de procedencia de RV1b en plates/)"
+      ],
+      "replaceable": "No es foto de ejemplo: es la placa aprobada de la línea."
+    },
+    "prompts": {
+      "composition": "Compón la portada del brochure de RevOps & CRM con efeonceGraphicLine.surfaces.deck.recipes[\"cover-brochure\"], layout \"line\", 1920 × 1080 sobre efeonceGraphicLine.color.dark. Pon a sangre el plate de la línea (una líder de RevOps con chaqueta que dirige el nudo de un moño de luz magenta y azul con agentes robot). Toma el acento de efeonceGraphicLine.lines[\"revenue-hubspot\"].accentOnDark y úsalo SOLO en el anillo de la pregunta y la esfera de la respuesta. Columna en x = 140 con top = 220: logo negativo de Efeonce a 500 px; eyebrow «Brochure · RevOps & CRM» en top + 190; pregunta «¿Y el reporte del viernes?» en top + 238 (Poppins Light 40 px, una línea); respuesta «Ya lo viste» en top + 300 (Bricolage 760, 124 px) cerrada con su esfera; evidencia Poppins 400 28/1,3 en 4 líneas con UNA palabra en negrita y las categorías del catálogo docs/services/ de la línea. Sin burbuja, eslogan, cliente ni selección. Si una línea toca al sujeto, un haz o una pieza de la foto, acorta la pregunta o parte la evidencia; no muevas la foto."
+    },
+    "renderSource": {
+      "script": "render-src/lineas.mjs",
+      "slideId": "LN5-revenue"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "La portada de brochure no lleva cliente ni logo de cliente.",
+      "Cada portada de línea toma el acento de su línea en anillo y esfera y lista las categorías de la línea (line-cover-takes-line-accent).",
+      "Un solo acento por lámina (five-accents-only-in-lines): no se mezclan colores de otras líneas en la voz.",
+      "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %."
+    ],
+    "notes": "Título previo: «✅ APROBADA · FOTO · Brochure RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.»». Variante HubSpot (acento magenta). La variante Salesforce (revenue-salesforce, acento cielo) es un pendiente opcional y no existe todavía. Las partículas del moño entran al 45 % izquierdo por debajo de la evidencia (x < 700, y > 820): la columna aprobada las libra, pero la evidencia de cuatro líneas es el máximo. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927)."
+  },
+  {
+    "id": "close-brochure-horizon",
+    "board": "DeckBrochureContraHorizonte",
+    "name": "Contraportada de brochure · Nexa camina hacia la órbita · «¿Conversamos? Cuando quieras.»",
+    "family": "close",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckBrochureContraHorizonte.jpg",
+    "communicates": "El recorrido sigue: Nexa camina hacia la órbita y la conversación queda abierta cuando el lector quiera.",
+    "useWhen": [
+      "Contraportada de un brochure cuya portada va SIN foto (regla de alternancia).",
+      "Cierre del brochure cuando se quiere un último fotograma cinematográfico y simétrico."
+    ],
+    "avoidWhen": [
+      "Con cualquiera de las portadas de brochure aprobadas hoy: todas llevan foto, así que esta contraportada no tiene pareja válida.",
+      "En una propuesta comercial: allí «¿Conversamos?» no aplica (se envía después de conversar).",
+      "En un deck presentado en vivo que termina en próximos pasos."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "close-brochure-orbit",
+        "when": "La portada del brochure lleva foto (hoy, siempre)."
+      },
+      {
+        "recipe": "close-proposal-horizon",
+        "when": "El documento es una propuesta comercial: la misma foto con «Empower your Growth» como mensaje."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-dawn",
+        "relation": "variant"
+      },
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "variant"
+      },
+      {
+        "recipe": "close-proposal-horizon",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "sloganLineWord",
+        "type": "enum",
+        "required": true,
+        "example": "Growth",
+        "notes": "Palabra final del eslogan en el acento: Growth (marca madre) por defecto. Brand · Engine · Voice · Revenue existen en el manual §7, pero la lámina aprobada sólo trae Growth y la luz del plate es teal: no cambiarla sin el operador."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+        "notes": "Plate fijo (Nexa de espaldas hacia un anillo teal vertical)."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 140.",
+      "Pregunta «¿Conversamos?» (Poppins Light 40 px con anillo teal) en top + 240 ≈ 380 y respuesta «Cuando quieras.» en dos líneas, Bricolage 760, cerrada con la esfera teal.",
+      "Eslogan como firma debajo, a 28 px, en top 720 (medido en la referencia).",
+      "Eslogan en sus pesos oficiales (sloganRuns): «Empower» Poppins 800 itálica · «your» Poppins 800 en el suave de la voz · la palabra de la línea Poppins 900 itálica en el acento.",
+      "Bloque de contacto (frameContact): la burbuja URL horneada (url-bubble-baked-dark.svg) en la fila de redes, seguida de los íconos Spotify · Instagram · LinkedIn · Threads · YouTube · TikTok (src/lib/artifact-composer/catalogs/deck-axis/assets/social/), y debajo correo, dos teléfonos y dirección con sus íconos (assets/contact/). Los datos salen de EFEONCE_CONTACT en src/config/efeonce-brand.ts, no se escriben por lámina. Empieza en top 780.",
+      "Sin eyebrow, sin evidencia (el layout los prohíbe)."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+      "ficha": "ai-generations/2026-09-27_brochure/fichas/BR3-contra-horizonte.json",
+      "prompt": "ai-generations/2026-09-27_brochure/prompts/BR3-contra-horizonte.txt",
+      "postprocess": [
+        "Sin versión b: de espaldas no hay pecho donde componer el isotipo. PENDIENTE: pnpm foto:emblema al 100 % sobre la espalda (logotipo + «Empower your Growth» de la vista puesta «espalda» del kit) antes de publicar; foto:isotipo no compone el logotipo de la espalda."
+      ],
+      "replaceable": "No es foto de ejemplo."
+    },
+    "prompts": {
+      "composition": "Compón la contraportada de un brochure con efeonceGraphicLine.surfaces.deck.recipes[\"close-brochure\"], layout \"photo\", sobre efeonceGraphicLine.color.dark. Pon a sangre el plate BR3 (Nexa de espaldas camina hacia un anillo teal vertical). Columna en x = 140: logo negativo de Efeonce a 500 px en top 140; «¿Conversamos?» en Poppins Light 40 px con anillo teal en top ≈ 380; «Cuando quieras» en dos líneas, Bricolage 760 a 124 px (≥ 3× la pregunta) cerrada con la esfera teal; el eslogan «Empower your Growth» a 28 px en top 720 con sloganRuns; desde top 780 el bloque de contacto: burbuja URL horneada oscura con los seis íconos de redes en una fila y debajo correo, dos teléfonos y dirección de EFEONCE_CONTACT con sus íconos. Sin eyebrow ni evidencia. Verifica que nada cruce la órbita ni la silueta de Nexa."
+    },
+    "renderSource": {
+      "script": "render-src/brochure.mjs",
+      "slideId": "BRO-contraportada-horizonte"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Mensaje por documento (close-message-by-use): en el brochure, «¿Conversamos? Cuando quieras.» con el eslogan como firma debajo.",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "La contraportada con foto es el último fotograma: sujeto de espaldas hacia la órbita, nunca mirando al lente.",
+      "Registro cine permitido: Nexa protagonista."
+    ],
+    "notes": "Título previo: «✅ APROBADA · FOTO · Nexa camina hacia la órbita». Pendiente del operador (§6 fila 15): aprobada, pero por la alternancia sólo empareja con una portada de brochure SIN foto y hoy no existe ninguna aprobada. La lámina se compuso con la respuesta a 118 px (2,95× la pregunta, bajo el piso de 3×); el token close-brochure declara 124 px: al recomponer usar 124. El plate cae en la trampa 6 del compilador (reserva arriba en 16:9): para una contraportada nueva partir de la geometría de BR4. La dirección de la referencia dice «71 OF 1105»; la fuente es EFEONCE_CONTACT («71, of. 1105»)."
+  },
+  {
+    "id": "close-brochure-dawn",
+    "board": "DeckBrochureContraAmanecer",
+    "name": "Contraportada de brochure · Nexa y un agente hacia la órbita al amanecer · «¿Conversamos? Cuando quieras.»",
+    "family": "close",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckBrochureContraAmanecer.jpg",
+    "communicates": "Persona y agente caminan juntos hacia lo que viene; la conversación empieza cuando el lector quiera.",
+    "useWhen": [
+      "Contraportada de un brochure con portada SIN foto, cuando se quiere subrayar que personas y agentes trabajan juntos.",
+      "Alternativa cálida (hora azul, amanecer) a la del horizonte."
+    ],
+    "avoidWhen": [
+      "Con cualquiera de las portadas de brochure aprobadas hoy (todas con foto): no tiene pareja válida.",
+      "En una propuesta comercial.",
+      "Si la portada del documento ya usa agentes robot en primer plano y se quiere variar."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "close-brochure-orbit",
+        "when": "La portada del brochure lleva foto (hoy, siempre)."
+      },
+      {
+        "recipe": "close-proposal-dawn",
+        "when": "El documento es una propuesta comercial."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-brochure-horizon",
+        "relation": "variant"
+      },
+      {
+        "recipe": "close-brochure-orbit",
+        "relation": "variant"
+      },
+      {
+        "recipe": "close-proposal-dawn",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "sloganLineWord",
+        "type": "enum",
+        "required": true,
+        "example": "Growth",
+        "notes": "Palabra final del eslogan en el acento: Growth (marca madre) por defecto. Brand · Engine · Voice · Revenue existen en el manual §7, pero la lámina aprobada sólo trae Growth y la luz del plate es teal: no cambiarla sin el operador."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_brochure/plates/BR4-contra-amanecer.png",
+        "notes": "Plate fijo (Nexa y un agente por una pasarela hacia una órbita inclinada que sale como el sol)."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 140.",
+      "Pregunta «¿Conversamos?» (Poppins Light 40 px con anillo teal) en top + 240 ≈ 380 y respuesta «Cuando quieras.» en dos líneas, Bricolage 760, cerrada con la esfera teal.",
+      "Eslogan como firma debajo, a 28 px, en top 720 (medido en la referencia).",
+      "Eslogan en sus pesos oficiales (sloganRuns): «Empower» Poppins 800 itálica · «your» Poppins 800 en el suave de la voz · la palabra de la línea Poppins 900 itálica en el acento.",
+      "Bloque de contacto (frameContact): la burbuja URL horneada (url-bubble-baked-dark.svg) en la fila de redes, seguida de los íconos Spotify · Instagram · LinkedIn · Threads · YouTube · TikTok (src/lib/artifact-composer/catalogs/deck-axis/assets/social/), y debajo correo, dos teléfonos y dirección con sus íconos (assets/contact/). Los datos salen de EFEONCE_CONTACT en src/config/efeonce-brand.ts, no se escriben por lámina. Empieza en top 780.",
+      "Sin eyebrow, sin evidencia (el layout los prohíbe)."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_brochure/plates/BR4-contra-amanecer.png",
+      "ficha": "ai-generations/2026-09-27_brochure/fichas/BR4-contra-amanecer.json",
+      "prompt": "ai-generations/2026-09-27_brochure/prompts/BR4-contra-amanecer.txt",
+      "postprocess": [
+        "Sin versión b (de espaldas). Revisar la espalda con pnpm foto:emblema al 100 % antes de publicar (logotipo + «Empower your Growth» del kit)."
+      ],
+      "replaceable": "No es foto de ejemplo."
+    },
+    "prompts": {
+      "composition": "Igual que close-brochure-horizon con el plate BR4 (Nexa y un agente de espaldas por una pasarela hacia una órbita teal inclinada que sale al amanecer, en la mitad derecha). Columna en x = 140 sobre el 45 % izquierdo de cielo y agua oscuros: logo 500 px en top 140, «¿Conversamos?» con anillo teal, «Cuando quieras» a 124 px en dos líneas con su esfera, eslogan a 28 px en top 720 y el bloque de contacto (burbuja + seis redes + EFEONCE_CONTACT) desde top 780. Verifica que la dirección, la línea más larga, termine antes del borde de la pasarela."
+    },
+    "renderSource": {
+      "script": "render-src/brochure.mjs",
+      "slideId": "BRO-contraportada-amanecer"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Mensaje por documento (close-message-by-use): en el brochure, «¿Conversamos? Cuando quieras.» con el eslogan como firma debajo.",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "Sujeto de espaldas hacia la órbita; el agente camina a su lado, no se miran."
+    ],
+    "notes": "Título previo: «✅ APROBADA · FOTO · Nexa y un agente hacia la órbita al amanecer (alternativa de la aprobada)»: es la alternativa de close-brochure-horizon. Misma pregunta abierta de pareja (§6 fila 15). BR4 es la geometría recomendada para contraportadas nuevas (sujeto a la derecha, reserva izquierda del 45 %). Respuesta compuesta a 118 px en la lámina; el token pide 124."
+  },
+  {
+    "id": "close-brochure-orbit",
+    "board": "DeckBrochureContraOrbitaGigante",
+    "name": "Contraportada de brochure sin foto · la órbita gigante · «¿Conversamos? Cuando quieras.»",
+    "family": "close",
+    "documents": [
+      "brochure"
+    ],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckBrochureContraOrbitaGigante.jpg",
+    "communicates": "La conversación está a un clic: «Cuando quieras.» queda marcado como una invitación a actuar.",
+    "useWhen": [
+      "Contraportada por defecto de TODO brochure: es la pareja sin foto de las portadas con foto (las tres generales y las cinco por línea).",
+      "Cuando el brochure se envía como PDF para abrir la conversación."
+    ],
+    "avoidWhen": [
+      "En una propuesta comercial: la propuesta cierra con foto y con «Empower your Growth».",
+      "Si la portada del brochure fuera sin foto (hoy no hay ninguna aprobada): entonces el cierre va con foto.",
+      "Como portada de brochure: la órbita gigante sin foto se retiró como portada de brochure (es recurso de la portada de propuesta)."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "close-proposal-horizon",
+        "when": "El documento es una propuesta comercial."
+      },
+      {
+        "recipe": "close-brochure-horizon",
+        "when": "Algún día la portada del brochure vaya sin foto."
+      },
+      {
+        "recipe": "close-classic",
+        "when": "Es un deck de presentación que no es brochure ni propuesta."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-cine-lines",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-cine-lines-selection",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-cine-team",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-growth",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-brand",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-engine",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-voice",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-brochure-line-revenue",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "close-brochure-horizon",
+        "relation": "variant"
+      },
+      {
+        "recipe": "close-brochure-dawn",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "sloganLineWord",
+        "type": "enum",
+        "required": true,
+        "example": "Growth",
+        "notes": "Palabra final del eslogan en el acento: Growth (marca madre) por defecto. Brand · Engine · Voice · Revenue existen en el manual §7, pero la lámina aprobada sólo trae Growth y la luz del plate es teal: no cambiarla sin el operador."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 140.",
+      "Pregunta «¿Conversamos?» (Poppins Light 40 px con anillo teal) en top + 240 ≈ 380 y respuesta «Cuando quieras.» en dos líneas, Bricolage 760, cerrada con la esfera teal.",
+      "Eslogan como firma debajo, a 28 px, en top 720 (medido en la referencia).",
+      "Eslogan en sus pesos oficiales (sloganRuns): «Empower» Poppins 800 itálica · «your» Poppins 800 en el suave de la voz · la palabra de la línea Poppins 900 itálica en el acento.",
+      "Bloque de contacto (frameContact): la burbuja URL horneada (url-bubble-baked-dark.svg) en la fila de redes, seguida de los íconos Spotify · Instagram · LinkedIn · Threads · YouTube · TikTok (src/lib/artifact-composer/catalogs/deck-axis/assets/social/), y debajo correo, dos teléfonos y dirección con sus íconos (assets/contact/). Los datos salen de EFEONCE_CONTACT en src/config/efeonce-brand.ts, no se escriben por lámina. Empieza en top 780.",
+      "Sin eyebrow, sin evidencia (el layout los prohíbe).",
+      "Órbita gigante (giantOrbitReserve): anillo en el acento teal con resplandor, centro en 1638 · 540 y radio 818 sobre 1920 × 1080, cortado por el borde derecho, con su esfera encendida arriba (región upper-center) y un halo radial tenue; la misma órbita que la portada de propuesta.",
+      "Corchetes abiertos (variant open-brackets) sobre «Cuando quieras.» y el cursor PROPIO (local) en end-center: la invitación a hacer clic."
+    ],
+    "selection": {
+      "kind": "local-cta",
+      "label": null,
+      "target": "La respuesta «Cuando quieras.» con corchetes abiertos y el cursor propio a su derecha."
+    },
+    "photo": {
+      "uses": false,
+      "register": "none",
+      "plate": null,
+      "ficha": null,
+      "prompt": null,
+      "postprocess": [],
+      "replaceable": "No lleva foto (SVG)."
+    },
+    "prompts": {
+      "composition": "Compón la contraportada del brochure con efeonceGraphicLine.surfaces.deck.recipes[\"close-brochure\"], layout \"orbit\" (el defecto), sobre efeonceGraphicLine.color.dark sin foto. Dibuja UNA órbita gigante con giantOrbitReserve (centro 1638 · 540, radio 818, cortada por el borde derecho) en el acento teal con resplandor suave y su esfera encendida en la región superior; nada de texto la cruza. Columna en x = 140: logo negativo a 500 px en top 140; «¿Conversamos?» con anillo teal; «Cuando quieras» a 124 px en dos líneas, marcada con [data-sel] y cerrada con su esfera; eslogan a 28 px en top 720; contacto desde top 780 (burbuja + seis redes + EFEONCE_CONTACT). Pinta la selección con el contrato AXIS efeonce.collaboration-selection: variant \"open-brackets\", overlay \"none\", un cursor local en \"end-center\" (modo CTA). Verifica evidence.withinCanvas y que el cursor no toque la órbita."
+    },
+    "renderSource": {
+      "script": "render-src/brochure.mjs",
+      "slideId": "BRO-contraportada-orbita-gigante"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Mensaje por documento (close-message-by-use): «¿Conversamos? Cuando quieras.» con el eslogan como firma.",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "Selección y cursor (frame-selection-text-or-client-logo): sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona; en 16:9 un solo cursor; pintados con el contrato AXIS efeonce.collaboration-selection, nunca a mano.",
+      "La órbita gigante sin foto es recurso de la portada de propuesta; en el brochure va SOLO como contraportada (giant-orbit-cover-is-proposal).",
+      "Una sola órbita por lámina: la que trae la foto (luz de la escena) o la gigante sin foto; no se suma otra órbita ni indicador de deck."
+    ],
+    "notes": "Título previo: «✅ APROBADA · SIN FOTO · la órbita gigante (pareja de las portadas con foto)». Es hoy la ÚNICA pareja válida de cualquier portada de brochure. Respuesta compuesta a 118 px en la lámina (2,95× la pregunta); el token pide 124. El render dibuja la órbita con giantOrbitBg(1640, 540, 820, 212 °) en brochure.mjs; el token la redondea a 1638 · 540 · 818. §6 fila 17 (pendiente): el manual dice que el cierre lleva el logo dentro de la órbita; esta receta no lo hace."
+  },
+  {
+    "id": "cover-proposal-orbit",
+    "board": "DeckPropuestaPortadaCliente1",
+    "name": "Portada de propuesta sin foto · la órbita gigante sostiene el logo del cliente (plantilla)",
+    "family": "cover",
+    "documents": [
+      "proposal"
+    ],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPropuestaPortadaCliente1.jpg",
+    "communicates": "El cliente queda dentro de la órbita de Efeonce: la propuesta está hecha para él y es confidencial.",
+    "useWhen": [
+      "Portada de una propuesta comercial enviada a un cliente con nombre (después de conversar).",
+      "Cuando se quiere la columna de voz a la izquierda, como el resto de portadas y contraportadas (lectura continua con el cierre).",
+      "Cuando la contraportada será una de las dos con foto y «Empower your Growth».",
+      "Como plantilla base: se llena con el logo y el nombre corto del cliente."
+    ],
+    "avoidWhen": [
+      "En un brochure: la portada de brochure lleva foto y no lleva cliente.",
+      "Sin un logo aprobado del cliente para fondo oscuro: no se envía con el marcador punteado.",
+      "Con una contraportada sin foto (rompe la alternancia).",
+      "Si el cliente pide anonimato total (licitación ciega): el logo y el nombre no pueden ir.",
+      "Si se busca un tono ceremonial de inicio: la versión del amanecer lo da mejor."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "El documento es un brochure sin cliente."
+      },
+      {
+        "recipe": "cover-proposal-dawn",
+        "when": "Se quiere una portada centrada, de nuevo comienzo."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-proposal-horizon",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "close-proposal-dawn",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-orbit-sky",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-proposal-dawn",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-proposal-dawn-sky",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 34,
+        "example": "Propuesta comercial · Octubre 2026",
+        "notes": "Forma fija «Propuesta comercial · <Mes Año>»; sólo cambia la fecha de envío. Medido: 34 caracteres llegan a x ≈ 750, a 70 px de la órbita."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "¿Cómo crecemos en 2027?",
+        "notes": "Copy aprobado; sólo se actualiza el año. Poppins Light 40 px con anillo teal, una línea; «¿Cómo crecemos en 2027?» (23) termina en x ≈ 720."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 10,
+        "example": "Con foco",
+        "notes": "Copy aprobado «Con foco.»; se escribe sin punto, lo pone la esfera teal. Bricolage 760 a 124 px."
+      },
+      {
+        "name": "clientName",
+        "type": "text",
+        "required": true,
+        "maxChars": 18,
+        "example": "[Cliente]",
+        "notes": "Nombre corto del cliente, en negrita dentro de la evidencia «Preparada para **[Cliente]** · Confidencial». Nunca como título."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 44,
+        "example": "Preparada para **[Cliente]** · Confidencial",
+        "notes": "Poppins 400 28 px, una línea, la única negrita es el nombre del cliente."
+      },
+      {
+        "name": "clientLogo",
+        "type": "logo",
+        "required": true,
+        "example": "marcador «Logo del cliente» (caja punteada)",
+        "notes": "Versión para fondo oscuro del logo del cliente desde la biblioteca del composer (src/lib/artifact-composer/catalogs/deck-axis/assets/clients/, p. ej. sky-on-dark.svg), object-fit contain dentro de su caja fija. Sin logo aprobado: el marcador punteado «Logo del cliente»."
+      },
+      {
+        "name": "selectionLabel",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Cliente",
+        "notes": "Etiqueta del cursor del colaborador: «Cliente» en la plantilla, el nombre corto del cliente en la versión final."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 220; columna de voz con los desfases de frameColumn.",
+      "Órbita gigante (giantOrbitReserve): centro 1638 · 540, radio 818 sobre 1920 × 1080, cortada por el borde derecho, acento teal con resplandor y su esfera arriba; la misma que la contraportada sin foto del brochure.",
+      "Caja fija del logo del cliente de 460 × 200 centrada en 1400 · 540, dentro de la órbita.",
+      "Marco de ocho manijas sobre la caja del cliente y UN cursor de colaborador anclado en top-end.",
+      "Burbuja url-lum.svg de 216 px abajo a la izquierda, x = 140, a 72 px del borde, alineada con la columna.",
+      "Acento teal; sin foto, sin eslogan."
+    ],
+    "selection": {
+      "kind": "collaborator",
+      "label": "Cliente",
+      "target": "El logo del cliente dentro de la órbita, con marco de 8 manijas; nunca el texto ni otra cosa."
+    },
+    "photo": {
+      "uses": false,
+      "register": "none",
+      "plate": null,
+      "ficha": null,
+      "prompt": null,
+      "postprocess": [],
+      "replaceable": "El marcador «Logo del cliente» y «[Cliente]» se reemplazan por el logo y el nombre corto reales."
+    },
+    "prompts": {
+      "composition": "Compón la portada de propuesta con efeonceGraphicLine.surfaces.deck.recipes[\"cover-proposal\"], layout \"orbit\", 1920 × 1080 sobre efeonceGraphicLine.color.dark, sin foto. Dibuja UNA órbita gigante con giantOrbitReserve (centro 1638 · 540, radio 818, cortada por el borde derecho) en el acento teal con resplandor y su esfera arriba. Pon el logo del cliente (o el marcador punteado «Logo del cliente») en su caja fija de 460 × 200 centrada en 1400 · 540, con object-fit contain y marcado con [data-sel]. Columna en x = 140 con top = 220: logo negativo de Efeonce a 500 px; eyebrow «Propuesta comercial · <Mes Año>»; «¿Cómo crecemos en <año>?» con anillo teal; «Con foco» a 124 px con su esfera; evidencia «Preparada para <b>[Cliente]</b> · Confidencial». Burbuja url-lum.svg de 216 px en x = 140, 72 px sobre el borde. Pinta la selección con el contrato AXIS efeonce.collaboration-selection: targetKind \"object\", variant \"eight-handles\", overlay \"none\", un cursor de colaborador en \"top-end\" con label «Cliente» (participantKind \"role\"). Sin foto ni eslogan; ninguna palabra toca la órbita."
+    },
+    "renderSource": {
+      "script": "render-src/propuesta.mjs",
+      "slideId": "PC1-propuesta-orbita-cliente"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Portada de propuesta: espacio fijo para el logo del cliente dentro de la órbita y burbuja URL alineada; el nombre del cliente no se repite como título, vive en la evidencia y en su logo (proposal-cover-client-logo).",
+      "La órbita gigante sin foto es el recurso de la portada de propuesta (giant-orbit-cover-is-proposal).",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "Selección y cursor (frame-selection-text-or-client-logo): sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona; en 16:9 un solo cursor; pintados con el contrato AXIS efeonce.collaboration-selection, nunca a mano.",
+      "Una sola órbita por lámina: la que trae la foto (luz de la escena) o la gigante sin foto; no se suma otra órbita ni indicador de deck.",
+      "Los montos no van en la portada; en la propuesta se escriben como [MONTO] hasta cerrar la cifra."
+    ],
+    "notes": "Título previo: «✅ APROBADA · SIN FOTO · propuesta: la órbita gigante sostiene el logo del cliente (plantilla)». PLANTILLA: el marcador punteado y «[Cliente]» no se envían nunca así. La voz «¿Cómo crecemos en 2027? Con foco.» está aprobada; el año se actualiza con la fecha del envío. El render dibuja la órbita con giantOrbit(1640, 540, 820, 212 °) en propuesta.mjs; el token la redondea a 1638 · 540 · 818. Las portadas clásicas de propuesta (logo de 230 px) y el anillo completo con el cliente al centro (PC3 en propuesta.mjs) están descartados: no volver a proponer."
+  },
+  {
+    "id": "cover-proposal-orbit-sky",
+    "board": "DeckPropuestaPortadaCliente2",
+    "name": "Portada de propuesta sin foto · la órbita gigante con el logo de SKY (ejemplo)",
+    "family": "cover",
+    "documents": [
+      "proposal"
+    ],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPropuestaPortadaCliente2.jpg",
+    "communicates": "Así se ve la plantilla ya llenada: SKY dentro de la órbita de Efeonce, con su nombre sólo en la evidencia.",
+    "useWhen": [
+      "Portada de una propuesta comercial enviada a un cliente con nombre (después de conversar).",
+      "Cuando se quiere la columna de voz a la izquierda, como el resto de portadas y contraportadas (lectura continua con el cierre).",
+      "Cuando la contraportada será una de las dos con foto y «Empower your Growth».",
+      "Como ejemplo para mostrar al equipo cómo queda la plantilla llenada; en un envío real se reemplaza SKY por el cliente."
+    ],
+    "avoidWhen": [
+      "En un brochure: la portada de brochure lleva foto y no lleva cliente.",
+      "Sin un logo aprobado del cliente para fondo oscuro: no se envía con el marcador punteado.",
+      "Con una contraportada sin foto (rompe la alternancia).",
+      "Si el cliente pide anonimato total (licitación ciega): el logo y el nombre no pueden ir.",
+      "Si se busca un tono ceremonial de inicio: la versión del amanecer lo da mejor."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "El documento es un brochure sin cliente."
+      },
+      {
+        "recipe": "cover-proposal-dawn",
+        "when": "Se quiere una portada centrada, de nuevo comienzo."
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "Se prepara una propuesta real: partir de la plantilla, no del ejemplo con SKY."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-proposal-horizon",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "close-proposal-dawn",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-proposal-dawn",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-proposal-dawn-sky",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 34,
+        "example": "Propuesta comercial · Octubre 2026",
+        "notes": "Forma fija «Propuesta comercial · <Mes Año>»; sólo cambia la fecha de envío. Medido: 34 caracteres llegan a x ≈ 750, a 70 px de la órbita."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "¿Cómo crecemos en 2027?",
+        "notes": "Copy aprobado; sólo se actualiza el año. Poppins Light 40 px con anillo teal, una línea; «¿Cómo crecemos en 2027?» (23) termina en x ≈ 720."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 10,
+        "example": "Con foco",
+        "notes": "Copy aprobado «Con foco.»; se escribe sin punto, lo pone la esfera teal. Bricolage 760 a 124 px."
+      },
+      {
+        "name": "clientName",
+        "type": "text",
+        "required": true,
+        "maxChars": 18,
+        "example": "SKY",
+        "notes": "Nombre corto del cliente, en negrita dentro de la evidencia «Preparada para **[Cliente]** · Confidencial». Nunca como título."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 44,
+        "example": "Preparada para **SKY** · Confidencial",
+        "notes": "Poppins 400 28 px, una línea, la única negrita es el nombre del cliente."
+      },
+      {
+        "name": "clientLogo",
+        "type": "logo",
+        "required": true,
+        "example": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky-on-dark.svg",
+        "notes": "Versión para fondo oscuro del logo del cliente desde la biblioteca del composer (src/lib/artifact-composer/catalogs/deck-axis/assets/clients/, p. ej. sky-on-dark.svg), object-fit contain dentro de su caja fija. Sin logo aprobado: el marcador punteado «Logo del cliente»."
+      },
+      {
+        "name": "selectionLabel",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "SKY",
+        "notes": "Etiqueta del cursor del colaborador: «Cliente» en la plantilla, el nombre corto del cliente en la versión final."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 220; columna de voz con los desfases de frameColumn.",
+      "Órbita gigante (giantOrbitReserve): centro 1638 · 540, radio 818 sobre 1920 × 1080, cortada por el borde derecho, acento teal con resplandor y su esfera arriba; la misma que la contraportada sin foto del brochure.",
+      "Caja fija del logo del cliente de 460 × 200 centrada en 1400 · 540, dentro de la órbita.",
+      "Marco de ocho manijas sobre la caja del cliente y UN cursor de colaborador anclado en top-end.",
+      "Burbuja url-lum.svg de 216 px abajo a la izquierda, x = 140, a 72 px del borde, alineada con la columna.",
+      "Acento teal; sin foto, sin eslogan."
+    ],
+    "selection": {
+      "kind": "collaborator",
+      "label": "SKY",
+      "target": "El logo del cliente dentro de la órbita, con marco de 8 manijas; nunca el texto ni otra cosa."
+    },
+    "photo": {
+      "uses": false,
+      "register": "none",
+      "plate": null,
+      "ficha": null,
+      "prompt": null,
+      "postprocess": [],
+      "replaceable": "El logo y el nombre de SKY son EJEMPLO: se reemplazan por los del cliente real (logo para fondo oscuro de la biblioteca del composer)."
+    },
+    "prompts": {
+      "composition": "Compón la portada de propuesta con efeonceGraphicLine.surfaces.deck.recipes[\"cover-proposal\"], layout \"orbit\", 1920 × 1080 sobre efeonceGraphicLine.color.dark, sin foto. Dibuja UNA órbita gigante con giantOrbitReserve (centro 1638 · 540, radio 818, cortada por el borde derecho) en el acento teal con resplandor y su esfera arriba. Pon el logo del cliente (sky-on-dark.svg) en su caja fija de 460 × 200 centrada en 1400 · 540, con object-fit contain y marcado con [data-sel]. Columna en x = 140 con top = 220: logo negativo de Efeonce a 500 px; eyebrow «Propuesta comercial · <Mes Año>»; «¿Cómo crecemos en <año>?» con anillo teal; «Con foco» a 124 px con su esfera; evidencia «Preparada para <b>SKY</b> · Confidencial». Burbuja url-lum.svg de 216 px en x = 140, 72 px sobre el borde. Pinta la selección con el contrato AXIS efeonce.collaboration-selection: targetKind \"object\", variant \"eight-handles\", overlay \"none\", un cursor de colaborador en \"top-end\" con label «SKY» (participantKind \"department\"). Sin foto ni eslogan; ninguna palabra toca la órbita."
+    },
+    "renderSource": {
+      "script": "render-src/propuesta.mjs",
+      "slideId": "PC2-propuesta-orbita-sky"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Portada de propuesta: espacio fijo para el logo del cliente dentro de la órbita y burbuja URL alineada; el nombre del cliente no se repite como título, vive en la evidencia y en su logo (proposal-cover-client-logo).",
+      "La órbita gigante sin foto es el recurso de la portada de propuesta (giant-orbit-cover-is-proposal).",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "Selección y cursor (frame-selection-text-or-client-logo): sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona; en 16:9 un solo cursor; pintados con el contrato AXIS efeonce.collaboration-selection, nunca a mano.",
+      "Una sola órbita por lámina: la que trae la foto (luz de la escena) o la gigante sin foto; no se suma otra órbita ni indicador de deck.",
+      "Los montos no van en la portada; en la propuesta se escriben como [MONTO] hasta cerrar la cifra."
+    ],
+    "notes": "Título previo: «✅ APROBADA · SIN FOTO · propuesta: la misma con SKY (ejemplo)». EJEMPLO con SKY (Caso Sky): marcar para reemplazo; nunca enviar a otro cliente con el logo de SKY. La voz «¿Cómo crecemos en 2027? Con foco.» está aprobada; el año se actualiza con la fecha del envío. El render dibuja la órbita con giantOrbit(1640, 540, 820, 212 °) en propuesta.mjs; el token la redondea a 1638 · 540 · 818. Las portadas clásicas de propuesta (logo de 230 px) y el anillo completo con el cliente al centro (PC3 en propuesta.mjs) están descartados: no volver a proponer."
+  },
+  {
+    "id": "cover-proposal-dawn-sky",
+    "board": "DeckPropuestaPortadaAmanecerSky",
+    "name": "Portada de propuesta sin foto · la órbita sale como el sol con SKY dentro (ejemplo)",
+    "family": "cover",
+    "documents": [
+      "proposal"
+    ],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPropuestaPortadaAmanecerSky.jpg",
+    "communicates": "Para SKY empieza algo nuevo: la órbita de Efeonce sale como el sol y lo lleva dentro.",
+    "useWhen": [
+      "Portada de una propuesta comercial enviada a un cliente con nombre (después de conversar).",
+      "Cuando se quiere una portada centrada y ceremonial, de «nuevo comienzo» (inicio de relación, año nuevo, relanzamiento).",
+      "Cuando la contraportada será una de las dos con foto y «Empower your Growth».",
+      "Como ejemplo para mostrar al equipo cómo queda la plantilla llenada; en un envío real se reemplaza SKY por el cliente."
+    ],
+    "avoidWhen": [
+      "En un brochure: la portada de brochure lleva foto y no lleva cliente.",
+      "Sin un logo aprobado del cliente para fondo oscuro: no se envía con el marcador punteado.",
+      "Con una contraportada sin foto (rompe la alternancia).",
+      "Si el cliente pide anonimato total (licitación ciega): el logo y el nombre no pueden ir.",
+      "Con logos de cliente muy horizontales o con mucho texto: la caja del domo mide 340 × 130 y los achica; mejor la órbita gigante (460 × 200)."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "El documento es un brochure sin cliente."
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "El logo del cliente es muy horizontal o se prefiere la columna a la izquierda."
+      },
+      {
+        "recipe": "cover-proposal-dawn",
+        "when": "Se prepara una propuesta real: partir de la plantilla, no del ejemplo con SKY."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-proposal-horizon",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "close-proposal-dawn",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-dawn",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-proposal-orbit-sky",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 34,
+        "example": "Propuesta comercial · Octubre 2026",
+        "notes": "Forma fija «Propuesta comercial · <Mes Año>»; sólo cambia la fecha de envío. Medido: 34 caracteres llegan a x ≈ 750, a 70 px de la órbita."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "¿Cómo crecemos en 2027?",
+        "notes": "Copy aprobado; sólo se actualiza el año. Poppins Light 40 px con anillo teal, una línea; «¿Cómo crecemos en 2027?» (23) termina en x ≈ 720."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 10,
+        "example": "Con foco",
+        "notes": "Copy aprobado «Con foco.»; se escribe sin punto, lo pone la esfera teal. Bricolage 760 a 124 px."
+      },
+      {
+        "name": "clientName",
+        "type": "text",
+        "required": true,
+        "maxChars": 18,
+        "example": "SKY",
+        "notes": "Nombre corto del cliente, en negrita dentro de la evidencia «Preparada para **[Cliente]** · Confidencial». Nunca como título."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 44,
+        "example": "Preparada para **SKY** · Confidencial",
+        "notes": "Poppins 400 28 px, una línea, la única negrita es el nombre del cliente."
+      },
+      {
+        "name": "clientLogo",
+        "type": "logo",
+        "required": true,
+        "example": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky-on-dark.svg",
+        "notes": "Versión para fondo oscuro del logo del cliente desde la biblioteca del composer (src/lib/artifact-composer/catalogs/deck-axis/assets/clients/, p. ej. sky-on-dark.svg), object-fit contain dentro de su caja fija. Sin logo aprobado: el marcador punteado «Logo del cliente»."
+      },
+      {
+        "name": "selectionLabel",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "SKY",
+        "notes": "Etiqueta del cursor del colaborador: «Cliente» en la plantilla, el nombre corto del cliente en la versión final."
+      }
+    ],
+    "fixed": [
+      "Eje central: logo de Efeonce negativo a 480 px en 56; eyebrow en 209, pregunta en 257, respuesta en 316, evidencia en 447 y la burbuja url-lum.svg de 216 px en 522 (medidas de tinta del token, layout dawn).",
+      "La órbita sale como el sol: centro 960 · 1377, radio 761, el domo asoma desde y ≈ 616, con su esfera en el punto más alto y un resplandor radial teal hacia arriba.",
+      "Caja fija del logo del cliente de 340 × 130 centrada en 960 · 948, dentro del domo.",
+      "Marco de ocho manijas sobre la caja del cliente y UN cursor de colaborador en top-end, escala 1,1.",
+      "Acento teal; sin foto, sin eslogan."
+    ],
+    "selection": {
+      "kind": "collaborator",
+      "label": "SKY",
+      "target": "El logo del cliente dentro de la órbita, con marco de 8 manijas; nunca el texto ni otra cosa."
+    },
+    "photo": {
+      "uses": false,
+      "register": "none",
+      "plate": null,
+      "ficha": null,
+      "prompt": null,
+      "postprocess": [],
+      "replaceable": "El logo y el nombre de SKY son EJEMPLO: se reemplazan por los del cliente real (logo para fondo oscuro de la biblioteca del composer)."
+    },
+    "prompts": {
+      "composition": "Compón la portada de propuesta con efeonceGraphicLine.surfaces.deck.recipes[\"cover-proposal\"], layout \"dawn\", sobre efeonceGraphicLine.color.dark, sin foto y en eje central. Dibuja la órbita que sale como el sol (centro 960 · 1377, radio 761; el domo asoma desde y ≈ 616) en el acento teal con su esfera en el punto más alto y un resplandor radial hacia arriba. Arriba, centrados: logo negativo de Efeonce a 480 px en 56; eyebrow en 209; pregunta con anillo teal en 257; «Con foco» a 124 px con su esfera en 316; evidencia «Preparada para <b>SKY</b> · Confidencial» en 447; burbuja url-lum.svg de 216 px en 522, sobre la esfera. Dentro del domo, el logo del cliente en su caja de 340 × 130 centrada en 960 · 948, marcado con [data-sel]. Pinta la selección con efeonce.collaboration-selection: targetKind \"object\", \"eight-handles\", overlay \"none\", un cursor de colaborador en \"top-end\" con label «SKY», escala 1,1. Verifica que la etiqueta del cursor quede dentro del domo y no toque el anillo."
+    },
+    "renderSource": {
+      "script": "render-src/amanecer.mjs",
+      "slideId": "PA1-propuesta-amanecer-sky"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Portada de propuesta: espacio fijo para el logo del cliente dentro de la órbita y burbuja URL alineada; el nombre del cliente no se repite como título, vive en la evidencia y en su logo (proposal-cover-client-logo).",
+      "La órbita gigante sin foto es el recurso de la portada de propuesta (giant-orbit-cover-is-proposal).",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "Selección y cursor (frame-selection-text-or-client-logo): sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona; en 16:9 un solo cursor; pintados con el contrato AXIS efeonce.collaboration-selection, nunca a mano.",
+      "Una sola órbita por lámina: la que trae la foto (luz de la escena) o la gigante sin foto; no se suma otra órbita ni indicador de deck.",
+      "Los montos no van en la portada; en la propuesta se escriben como [MONTO] hasta cerrar la cifra."
+    ],
+    "notes": "Título previo: «✅ APROBADA · SIN FOTO · propuesta: la órbita sale como el sol, con SKY dentro (ejemplo)». EJEMPLO con SKY (Caso Sky): marcar para reemplazo; nunca enviar a otro cliente con el logo de SKY. La voz «¿Cómo crecemos en 2027? Con foco.» está aprobada; el año se actualiza con la fecha del envío. El render (amanecer.mjs) dibuja el domo con centro 960 · 1380 y radio 760; el token mide 1377 y 761 sobre la referencia. Las portadas clásicas de propuesta (logo de 230 px) y el anillo completo con el cliente al centro (PC3 en propuesta.mjs) están descartados: no volver a proponer."
+  },
+  {
+    "id": "cover-proposal-dawn",
+    "board": "DeckPropuestaPortadaAmanecerCliente",
+    "name": "Portada de propuesta sin foto · la órbita sale como el sol con el logo del cliente (plantilla)",
+    "family": "cover",
+    "documents": [
+      "proposal"
+    ],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPropuestaPortadaAmanecerCliente.jpg",
+    "communicates": "Un nuevo comienzo para el cliente: la órbita sale como el sol y lo contiene.",
+    "useWhen": [
+      "Portada de una propuesta comercial enviada a un cliente con nombre (después de conversar).",
+      "Cuando se quiere una portada centrada y ceremonial, de «nuevo comienzo» (inicio de relación, año nuevo, relanzamiento).",
+      "Cuando la contraportada será una de las dos con foto y «Empower your Growth».",
+      "Como plantilla base: se llena con el logo y el nombre corto del cliente."
+    ],
+    "avoidWhen": [
+      "En un brochure: la portada de brochure lleva foto y no lleva cliente.",
+      "Sin un logo aprobado del cliente para fondo oscuro: no se envía con el marcador punteado.",
+      "Con una contraportada sin foto (rompe la alternancia).",
+      "Si el cliente pide anonimato total (licitación ciega): el logo y el nombre no pueden ir.",
+      "Con logos de cliente muy horizontales o con mucho texto: la caja del domo mide 340 × 130 y los achica; mejor la órbita gigante (460 × 200)."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "cover-brochure-cine-orbit",
+        "when": "El documento es un brochure sin cliente."
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "when": "El logo del cliente es muy horizontal o se prefiere la columna a la izquierda."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "close-proposal-horizon",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "close-proposal-dawn",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-dawn-sky",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-proposal-orbit",
+        "relation": "variant"
+      },
+      {
+        "recipe": "cover-proposal-orbit-sky",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 34,
+        "example": "Propuesta comercial · Octubre 2026",
+        "notes": "Forma fija «Propuesta comercial · <Mes Año>»; sólo cambia la fecha de envío. Medido: 34 caracteres llegan a x ≈ 750, a 70 px de la órbita."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "¿Cómo crecemos en 2027?",
+        "notes": "Copy aprobado; sólo se actualiza el año. Poppins Light 40 px con anillo teal, una línea; «¿Cómo crecemos en 2027?» (23) termina en x ≈ 720."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 10,
+        "example": "Con foco",
+        "notes": "Copy aprobado «Con foco.»; se escribe sin punto, lo pone la esfera teal. Bricolage 760 a 124 px."
+      },
+      {
+        "name": "clientName",
+        "type": "text",
+        "required": true,
+        "maxChars": 18,
+        "example": "[Cliente]",
+        "notes": "Nombre corto del cliente, en negrita dentro de la evidencia «Preparada para **[Cliente]** · Confidencial». Nunca como título."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 44,
+        "example": "Preparada para **[Cliente]** · Confidencial",
+        "notes": "Poppins 400 28 px, una línea, la única negrita es el nombre del cliente."
+      },
+      {
+        "name": "clientLogo",
+        "type": "logo",
+        "required": true,
+        "example": "marcador «Logo del cliente» (caja punteada)",
+        "notes": "Versión para fondo oscuro del logo del cliente desde la biblioteca del composer (src/lib/artifact-composer/catalogs/deck-axis/assets/clients/, p. ej. sky-on-dark.svg), object-fit contain dentro de su caja fija. Sin logo aprobado: el marcador punteado «Logo del cliente»."
+      },
+      {
+        "name": "selectionLabel",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Cliente",
+        "notes": "Etiqueta del cursor del colaborador: «Cliente» en la plantilla, el nombre corto del cliente en la versión final."
+      }
+    ],
+    "fixed": [
+      "Eje central: logo de Efeonce negativo a 480 px en 56; eyebrow en 209, pregunta en 257, respuesta en 316, evidencia en 447 y la burbuja url-lum.svg de 216 px en 522 (medidas de tinta del token, layout dawn).",
+      "La órbita sale como el sol: centro 960 · 1377, radio 761, el domo asoma desde y ≈ 616, con su esfera en el punto más alto y un resplandor radial teal hacia arriba.",
+      "Caja fija del logo del cliente de 340 × 130 centrada en 960 · 948, dentro del domo.",
+      "Marco de ocho manijas sobre la caja del cliente y UN cursor de colaborador en top-end, escala 1,1.",
+      "Acento teal; sin foto, sin eslogan."
+    ],
+    "selection": {
+      "kind": "collaborator",
+      "label": "Cliente",
+      "target": "El logo del cliente dentro de la órbita, con marco de 8 manijas; nunca el texto ni otra cosa."
+    },
+    "photo": {
+      "uses": false,
+      "register": "none",
+      "plate": null,
+      "ficha": null,
+      "prompt": null,
+      "postprocess": [],
+      "replaceable": "El marcador «Logo del cliente» y «[Cliente]» se reemplazan por el logo y el nombre corto reales."
+    },
+    "prompts": {
+      "composition": "Compón la portada de propuesta con efeonceGraphicLine.surfaces.deck.recipes[\"cover-proposal\"], layout \"dawn\", sobre efeonceGraphicLine.color.dark, sin foto y en eje central. Dibuja la órbita que sale como el sol (centro 960 · 1377, radio 761; el domo asoma desde y ≈ 616) en el acento teal con su esfera en el punto más alto y un resplandor radial hacia arriba. Arriba, centrados: logo negativo de Efeonce a 480 px en 56; eyebrow en 209; pregunta con anillo teal en 257; «Con foco» a 124 px con su esfera en 316; evidencia «Preparada para <b>[Cliente]</b> · Confidencial» en 447; burbuja url-lum.svg de 216 px en 522, sobre la esfera. Dentro del domo, el logo del cliente en su caja de 340 × 130 centrada en 960 · 948, marcado con [data-sel]. Pinta la selección con efeonce.collaboration-selection: targetKind \"object\", \"eight-handles\", overlay \"none\", un cursor de colaborador en \"top-end\" con label «Cliente», escala 1,1. Verifica que la etiqueta del cursor quede dentro del domo y no toque el anillo."
+    },
+    "renderSource": {
+      "script": "render-src/amanecer.mjs",
+      "slideId": "PA2-propuesta-amanecer-cliente"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Voz completa (cover-full-voice): eyebrow Poppins 500 en mayúsculas espaciadas · pregunta Poppins Light con su anillo en el acento · respuesta Bricolage 760 de 1 a 3 palabras con su esfera, al menos 3× la pregunta (124/40 = 3,1) · evidencia Poppins 400 con UNA palabra en negrita. Nada de títulos sueltos sin voz.",
+      "El eslogan va sólo en el cierre, nunca en la portada (slogan-only-in-close).",
+      "Portada de propuesta: espacio fijo para el logo del cliente dentro de la órbita y burbuja URL alineada; el nombre del cliente no se repite como título, vive en la evidencia y en su logo (proposal-cover-client-logo).",
+      "La órbita gigante sin foto es el recurso de la portada de propuesta (giant-orbit-cover-is-proposal).",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "Selección y cursor (frame-selection-text-or-client-logo): sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona; en 16:9 un solo cursor; pintados con el contrato AXIS efeonce.collaboration-selection, nunca a mano.",
+      "Una sola órbita por lámina: la que trae la foto (luz de la escena) o la gigante sin foto; no se suma otra órbita ni indicador de deck.",
+      "Los montos no van en la portada; en la propuesta se escriben como [MONTO] hasta cerrar la cifra."
+    ],
+    "notes": "Título previo: «✅ APROBADA · SIN FOTO · propuesta: la órbita sale como el sol, con el logo del cliente dentro (plantilla)». PLANTILLA: el marcador punteado y «[Cliente]» no se envían nunca así. La voz «¿Cómo crecemos en 2027? Con foco.» está aprobada; el año se actualiza con la fecha del envío. El render (amanecer.mjs) dibuja el domo con centro 960 · 1380 y radio 760; el token mide 1377 y 761 sobre la referencia. Las portadas clásicas de propuesta (logo de 230 px) y el anillo completo con el cliente al centro (PC3 en propuesta.mjs) están descartados: no volver a proponer."
+  },
+  {
+    "id": "close-proposal-horizon",
+    "board": "DeckPropuestaContraHorizonte",
+    "name": "Contraportada de propuesta · «Empower your Growth» hacia la órbita",
+    "family": "close",
+    "documents": [
+      "proposal"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPropuestaContraHorizonte.jpg",
+    "communicates": "Después de conversar, la promesa queda sola y grande: Empower your Growth, y Nexa camina hacia ella.",
+    "useWhen": [
+      "Contraportada de toda propuesta comercial: es la pareja CON foto de las portadas de propuesta sin foto.",
+      "Cuando la propuesta se envía después de una conversación y el cierre debe dejar la marca, no pedir una reunión.",
+      "Cuando se quiere un cierre simétrico y sobrio, que funciona con cualquiera de las cuatro portadas."
+    ],
+    "avoidWhen": [
+      "En un brochure: su contraportada abre la conversación con «¿Conversamos? Cuando quieras.».",
+      "Con una portada con foto (rompe la alternancia).",
+      "Para pedir una reunión o una respuesta: eso va en la lámina de próximos pasos, antes del cierre.",
+      "Agregando «¿Conversamos?»: en la propuesta no aplica."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "close-brochure-orbit",
+        "when": "El documento es un brochure."
+      },
+      {
+        "recipe": "decision-next-steps",
+        "when": "Hay que pedir una acción concreta al cliente (fechas, responsables, firma)."
+      },
+      {
+        "recipe": "close-proposal-dawn",
+        "when": "Se quiere el tono de nuevo comienzo o mostrar persona y agente juntos."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "cover-proposal-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-orbit-sky",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-dawn",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-dawn-sky",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "close-proposal-dawn",
+        "relation": "variant"
+      },
+      {
+        "recipe": "close-brochure-horizon",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "sloganLineWord",
+        "type": "enum",
+        "required": true,
+        "example": "Growth",
+        "notes": "Palabra final del eslogan en el acento. La lámina aprobada lleva Growth (marca madre) con luz teal en la foto. Las palabras por línea (Brand, Engine, Voice, Revenue) existen en el manual §7, pero no hay contraportada aprobada con ellas ni plate con esa luz: no cambiarla sin el operador."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+        "notes": "Plate fijo (Nexa de espaldas camina hacia un anillo teal vertical); es el mismo de close-brochure-horizon."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 230.",
+      "Eslogan «Empower your Growth» como mensaje principal a 72 px en top 420, en sus pesos oficiales (sloganRuns): «Empower» 800 itálica y «your» 800 en el suave de la voz, «Growth» 900 itálica en el acento teal.",
+      "Bloque de contacto (frameContact): la burbuja URL horneada (url-bubble-baked-dark.svg) en la fila de redes, seguida de los íconos Spotify · Instagram · LinkedIn · Threads · YouTube · TikTok (src/lib/artifact-composer/catalogs/deck-axis/assets/social/), y debajo correo, dos teléfonos y dirección con sus íconos (assets/contact/). Los datos salen de EFEONCE_CONTACT en src/config/efeonce-brand.ts, no se escriben por lámina. Empieza en top 600.",
+      "Sin voz pregunta–respuesta: sin «¿Conversamos?», sin eyebrow ni evidencia."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+      "ficha": "ai-generations/2026-09-27_brochure/fichas/BR3-contra-horizonte.json",
+      "prompt": "ai-generations/2026-09-27_brochure/prompts/BR3-contra-horizonte.txt",
+      "postprocess": [
+        "Sin versión b (de espaldas). PENDIENTE: pnpm foto:emblema al 100 % sobre la espalda (logotipo + «Empower your Growth» del kit) antes de publicar."
+      ],
+      "replaceable": "No es foto de ejemplo; no lleva datos del cliente."
+    },
+    "prompts": {
+      "composition": "Compón la contraportada de propuesta con efeonceGraphicLine.surfaces.deck.recipes[\"close-proposal\"] sobre efeonceGraphicLine.color.dark. Pon a sangre el plate BR3-contra-horizonte (Nexa de espaldas camina hacia un anillo teal vertical). Columna en x = 140: logo negativo de Efeonce a 500 px en top 230; el eslogan «Empower your Growth» a 72 px en top 420 con sloganRuns (Empower 800 itálica, your 800, Growth 900 itálica en el acento teal); desde top 600 el bloque de contacto: burbuja URL horneada oscura con los seis íconos de redes en una fila y debajo correo, dos teléfonos y dirección de EFEONCE_CONTACT con sus íconos. No escribas «¿Conversamos?», eyebrow ni evidencia (voice mode none). Verifica que «Growth» termine antes de la órbita y de la silueta."
+    },
+    "renderSource": {
+      "script": "render-src/brochure.mjs",
+      "slideId": "PRO-contraportada-horizonte"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Mensaje por documento (close-message-by-use): en la propuesta el mensaje es el eslogan grande y protagonista; «¿Conversamos?» no aplica porque la propuesta se envía después de conversar.",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "El eslogan va sólo en el cierre.",
+      "Sujeto de espaldas hacia la órbita: el último fotograma, nunca mirando al lente."
+    ],
+    "notes": "Título previo: «✅ APROBADA · FOTO · contraportada de propuesta: Empower your Growth (hacia la órbita)». Comparte plate con close-brochure-horizon; lo que cambia es el mensaje por documento. El render vive en brochure.mjs (bloque PRO-contraportada-*), no en propuesta.mjs. §6 fila 17 (pendiente): el manual pide el logo dentro de la órbita en el cierre; esta receta lo lleva arriba en la columna."
+  },
+  {
+    "id": "close-proposal-dawn",
+    "board": "DeckPropuestaContraAmanecer",
+    "name": "Contraportada de propuesta · «Empower your Growth» al amanecer",
+    "family": "close",
+    "documents": [
+      "proposal"
+    ],
+    "surface": "cine",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPropuestaContraAmanecer.jpg",
+    "communicates": "La relación que empieza: persona y agente caminan hacia la órbita que sale, bajo la promesa Empower your Growth.",
+    "useWhen": [
+      "Contraportada de toda propuesta comercial: es la pareja CON foto de las portadas de propuesta sin foto.",
+      "Cuando la propuesta se envía después de una conversación y el cierre debe dejar la marca, no pedir una reunión.",
+      "Cuando se quiere subrayar que personas y agentes trabajan juntos, o reforzar el «nuevo comienzo» de la portada del amanecer."
+    ],
+    "avoidWhen": [
+      "En un brochure: su contraportada abre la conversación con «¿Conversamos? Cuando quieras.».",
+      "Con una portada con foto (rompe la alternancia).",
+      "Para pedir una reunión o una respuesta: eso va en la lámina de próximos pasos, antes del cierre.",
+      "Agregando «¿Conversamos?»: en la propuesta no aplica."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "close-brochure-orbit",
+        "when": "El documento es un brochure."
+      },
+      {
+        "recipe": "decision-next-steps",
+        "when": "Hay que pedir una acción concreta al cliente (fechas, responsables, firma)."
+      },
+      {
+        "recipe": "close-proposal-horizon",
+        "when": "Se quiere el cierre más sobrio y simétrico."
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "cover-proposal-orbit",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-orbit-sky",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-dawn",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "cover-proposal-dawn-sky",
+        "relation": "cover↔close"
+      },
+      {
+        "recipe": "close-proposal-horizon",
+        "relation": "variant"
+      },
+      {
+        "recipe": "close-brochure-dawn",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "sloganLineWord",
+        "type": "enum",
+        "required": true,
+        "example": "Growth",
+        "notes": "Palabra final del eslogan en el acento. La lámina aprobada lleva Growth (marca madre) con luz teal en la foto. Las palabras por línea (Brand, Engine, Voice, Revenue) existen en el manual §7, pero no hay contraportada aprobada con ellas ni plate con esa luz: no cambiarla sin el operador."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_brochure/plates/BR4-contra-amanecer.png",
+        "notes": "Plate fijo (Nexa y un agente de espaldas por una pasarela hacia una órbita inclinada que sale al amanecer); es el mismo de close-brochure-dawn."
+      }
+    ],
+    "fixed": [
+      "Logo de Efeonce negativo a 500 px en x = 140, top = 230.",
+      "Eslogan «Empower your Growth» como mensaje principal a 72 px en top 420, en sus pesos oficiales (sloganRuns): «Empower» 800 itálica y «your» 800 en el suave de la voz, «Growth» 900 itálica en el acento teal.",
+      "Bloque de contacto (frameContact): la burbuja URL horneada (url-bubble-baked-dark.svg) en la fila de redes, seguida de los íconos Spotify · Instagram · LinkedIn · Threads · YouTube · TikTok (src/lib/artifact-composer/catalogs/deck-axis/assets/social/), y debajo correo, dos teléfonos y dirección con sus íconos (assets/contact/). Los datos salen de EFEONCE_CONTACT en src/config/efeonce-brand.ts, no se escriben por lámina. Empieza en top 600.",
+      "Sin voz pregunta–respuesta: sin «¿Conversamos?», sin eyebrow ni evidencia."
+    ],
+    "selection": {
+      "kind": "none",
+      "label": null,
+      "target": "nada: la foto va limpia"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_brochure/plates/BR4-contra-amanecer.png",
+      "ficha": "ai-generations/2026-09-27_brochure/fichas/BR4-contra-amanecer.json",
+      "prompt": "ai-generations/2026-09-27_brochure/prompts/BR4-contra-amanecer.txt",
+      "postprocess": [
+        "Sin versión b (de espaldas). Revisar la espalda con pnpm foto:emblema al 100 % antes de publicar."
+      ],
+      "replaceable": "No es foto de ejemplo; no lleva datos del cliente."
+    },
+    "prompts": {
+      "composition": "Compón la contraportada de propuesta con efeonceGraphicLine.surfaces.deck.recipes[\"close-proposal\"] sobre efeonceGraphicLine.color.dark. Pon a sangre el plate BR4-contra-amanecer (Nexa y un agente de espaldas por una pasarela hacia una órbita inclinada que sale al amanecer). Columna en x = 140: logo negativo de Efeonce a 500 px en top 230; el eslogan «Empower your Growth» a 72 px en top 420 con sloganRuns (Empower 800 itálica, your 800, Growth 900 itálica en el acento teal); desde top 600 el bloque de contacto: burbuja URL horneada oscura con los seis íconos de redes en una fila y debajo correo, dos teléfonos y dirección de EFEONCE_CONTACT con sus íconos. No escribas «¿Conversamos?», eyebrow ni evidencia (voice mode none). Verifica que «Growth» termine antes de la órbita y de la silueta."
+    },
+    "renderSource": {
+      "script": "render-src/brochure.mjs",
+      "slideId": "PRO-contraportada-amanecer"
+    },
+    "rules": [
+      "Portada y contraportada alternan foto y sin foto (frame-photo-alternates): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.",
+      "Portadas y contraportadas no se cruzan de documento (frame-bound-to-use): la de brochure sólo en brochure, la de propuesta sólo en propuesta.",
+      "Mensaje por documento (close-message-by-use): en la propuesta el mensaje es el eslogan grande y protagonista; «¿Conversamos?» no aplica porque la propuesta se envía después de conversar.",
+      "Logo de Efeonce negativo a 500 px en 1920 (frame-logo-min-screen): se lee a 96 px o más en un teléfono de 390 px; 230 o 220 px no llegan.",
+      "Ningún texto cruza la órbita ni al sujeto, un haz o una mano (text-clears-orbit-and-subject): si una línea cruza, no se mueve la foto: se acorta la pregunta o se parte la evidencia en 2 o 3 líneas.",
+      "La foto de cine va sin interfaz por defecto: sin selección ni cursor.",
+      "El eslogan va sólo en el cierre.",
+      "Sujeto de espaldas hacia la órbita: el último fotograma, nunca mirando al lente."
+    ],
+    "notes": "Título previo: «✅ APROBADA · FOTO · contraportada de propuesta: Empower your Growth (amanecer)». Comparte plate con close-brochure-dawn; lo que cambia es el mensaje por documento. El render vive en brochure.mjs (bloque PRO-contraportada-*), no en propuesta.mjs. §6 fila 17 (pendiente): el manual pide el logo dentro de la órbita en el cierre; esta receta lo lleva arriba en la columna."
+  }
+]

@@ -1,0 +1,21 @@
+{
+ "id": "MC5b-169-blog-foco",
+ "formato": "16:9",
+ "impacto": true,
+ "identidad": [
+  "nexa"
+ ],
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, a vast dark cathedral-like space at night): she stands at the far RIGHT of the frame, framed from the waist up, her whole body between 62% and 92% of the frame width (nothing of her crosses the center line of the frame), wearing a sleek, form-fitting BIONIC SUIT in deep navy with matte white armored plates on the shoulders, chest and forearms, thin glowing azure-blue (#0375DB) light seams along the plates; the chest plate is plain, smooth white with NO emblem, NO logo, NO symbol, NO rocket, NO lettering; no watch, no bracelet and no ring, sleek futuristic wraparound glasses with CLEAR TRANSPARENT lenses lightly tinted azure blue, a thin frameless edge and a fine glowing azure line along the top of the lenses; her eyes are clearly visible through the transparent lenses, no mirror reflection covers her eyes. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. She looks straight into the lens with a quiet, confident half-smile. Behind her, on the right, receding for hundreds of meters into the darkness, floats an immense field of THOUSANDS of identical thin dark glass cards in endless rows and columns, all unlit and anonymous, like every brand nobody sees. From above, OUTSIDE the frame, a WIDE volumetric azure-blue (#0375DB) follow-spot beam cuts down through thick haze and lands on ONE single card just beside her shoulder: that card blazes brilliant white with an azure core, lifted forward, radiating fine particles; its light floods her face. The beam is the brightest element; every other card stays in darkness. The LEFT 58% of the frame, including the whole lower center in front of the table, is calm, deep dark space with only faint haze, no cards, no beam, no objects. Close to the lens, the dark blurred edge of a matte black presentation table crosses the bottom of the frame, outside every light. The space is an empty dark studio at night: no desks other than the foreground table, no monitors, no plants, no lamps, no mugs, no notebooks. Enormous contrast, no text, no logos of any other brand.",
+ "lecho": {
+  "objeto": "the dark blurred edge of a matte black presentation table close to the lens across the lowest fifth, in front of her, outside every light",
+  "tono": "DARK near black"
+ },
+ "reservas": {
+  "texto": {
+   "muro": "calm, deep dark space with only faint haze",
+   "tinta": "blanca"
+  }
+ }
+}

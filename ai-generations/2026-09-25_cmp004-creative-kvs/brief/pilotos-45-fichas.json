@@ -1,0 +1,66 @@
+[
+  {
+    "id": "CMP004-C01-45",
+    "formato": "4:5",
+    "impacto": true,
+    "escena": "SCENE: a real digital creative review inside an ambitious contemporary studio at night. Three REAL physical screens at different depths, all entirely visible and facing camera: a large calibrated wall display with a striking abstract cobalt-blue ribbon shape crossing an warm ivory field with a subtle lime-green focal mark; a vertical phone held by a hand in the middle ground showing a CROP and motion-like continuation of that SAME distinctive cobalt ribbon on a deep warm background; a laptop in the right middle ground showing a web hero using the same authored visual grammar in a radically different layout. No logos, no writing, no user interface, no fake holograms. One art director at the far right edge, seen in profile from behind, is comparing the three outcomes, hand poised to adjust the phone. The design is the subject, the person performs a specific decision. Real screen reflections on dark brushed metal and warm concrete; restrained lime-green light comes from the artwork itself, not decoration. A deep cobalt anodized aluminum frame carries blue structurally. 50mm lens, eye-level, shallow enough for depth but every screen composition reads as one family. Avoid printed matter, coffee, floating cards and stock-agency meetings. THE EXACT MOMENT: the art director lifts the phone to align its abstract ribbon against the two larger applications, judging whether the visual language survives without a wordmark.",
+    "lecho": {
+      "objeto": "the matte-black near edge of the art director’s real review desk on the camera side",
+      "tono": "DARK near black, textured anodized metal"
+    },
+    "reservas": {
+      "texto": {
+        "muro": "a continuous area of charcoal acoustic fabric wall above the entire scene, in deep warm shadow with subtle visible woven texture",
+        "tinta": "blanca"
+      }
+    }
+  },
+  {
+    "id": "CMP004-C02-45",
+    "formato": "4:5",
+    "impacto": true,
+    "escena": "SCENE: a founder at the physical threshold of a newly opened digital product-launch installation, one step forward and looking directly into camera with calm conviction. Behind the person, a giant real LED architectural wall bends around a corner and reveals a singular new brand world: saturated cobalt-blue topographic ribbons on warm pale mineral, with one vivid orange aperture that continues onto a second real vertical display deeper in the room. The composition feels like a tangible commercial launch, not a sci-fi portal. No words, logos or recognizable brands on the displays. The blue structure is a continuous designed system, not generic blue walls. The person is dressed in understated warm neutral tailoring, no navy outfit. An orange practical light from the LED aperture grazes the face; no floating interface. Wide 35mm environmental portrait, carefully controlled perspective, the human inside the visual world. Show actual material, seams, reflections and spatial scale, not a clean 3D render. THE EXACT MOMENT: the founder has just stepped across the physical LED threshold, one foot still behind, taking ownership of the new public expression.",
+    "lecho": {
+      "objeto": "the pale polished concrete floor directly below the lens at the threshold",
+      "tono": "VERY LIGHT warm concrete, almost white, with real fine grain"
+    },
+    "reservas": {
+      "texto": {
+        "muro": "a continuous area of charcoal acoustic fabric wall above the entire scene, in deep warm shadow with subtle visible woven texture",
+        "tinta": "blanca"
+      }
+    }
+  },
+  {
+    "id": "CMP004-C03-45",
+    "formato": "4:5",
+    "impacto": true,
+    "escena": "SCENE: extremely focused craft in a real digital edit suite. The main calibrated monitor dominates the middle of frame and shows a FINISHED premium six-second product film frame: a clear glass fragrance bottle standing on a warm stone plinth, a single crisp cobalt-blue light edge defining its silhouette, and one small orange refracted glint in the glass. On the smaller screen directly beneath, a physically plausible video-edit timeline with exactly one short highlighted clip and six unnumbered beat divisions; NO readable interface labels, NO text and no logos. A colorist’s hand is at a real editing dial in the foreground, turning it to align the glint with the product reveal; only the hand and hardware, no generic people-at-computer portrait. Side-by-side large preview and small editing timeline make finished work versus precise intervention legible. Black acoustic fabric has visible texture, orange motivated light from the product image, blue from the physical monitor edge. 65mm photographic lens, tactile reflections, intentional depth. The screen artwork is an original fictional Efeonce exploration, not a client case. THE EXACT MOMENT: the colorist turns the dial until the small orange glint lands precisely on the bottle edge in the finished frame.",
+    "lecho": {
+      "objeto": "the edge of the dark grading control panel with its trackballs directly beneath the lens",
+      "tono": "DARK near black, matte instrument surface"
+    },
+    "reservas": {
+      "texto": {
+        "muro": "a continuous area of charcoal acoustic fabric wall above the entire scene, in deep warm shadow with subtle visible woven texture",
+        "tinta": "blanca"
+      }
+    }
+  },
+  {
+    "id": "CMP004-C04-45",
+    "formato": "4:5",
+    "impacto": true,
+    "escena": "SCENE: a real large digital production review wall seen obliquely in a premium creative operations room. Twelve mounted, flat, physical displays form a visible grid across the middle band, each displaying a DIFFERENT useful application of ONE fictional brand world: product hero, social vertical ad, ecommerce card, event invitation, app onboarding frame, email header, web landing, motion end-frame, retail screen, localized campaign crop, sales deck cover and story frame. They share a distinctive cobalt-blue curved geometry and warm ivory material language, with small occasional lime-green touches, yet vary in hierarchy and purpose; NO logos, NO readable words, NO clone tiles. A lead designer in the right foreground selects ONE frame with a hand near the physical display while a second teammate studies a different frame and references a real tablet showing the same system. They are checking differences and consistency, not celebrating a magic one-click system. Warm concrete, anodized blue aluminum rails and actual LED reflections give material depth; no floating UI, no futuristic HUD. 35mm lens, cinematic motivated lateral light, a moment of human judgment in active production. The art wall is the subject; faces are secondary. No paper, sticky notes, charts or counters. THE EXACT MOMENT: the lead designer reaches toward one display to reject its mismatched crop while the teammate checks a different format against the same system.",
+    "lecho": {
+      "objeto": "the TOP OF THE BACKREST OF THE EMPTY REVIEW CHAIR in front of the camera, charcoal fabric upholstery forming a soft gentle curve",
+      "tono": "DARK charcoal with subtle fabric weave"
+    },
+    "reservas": {
+      "texto": {
+        "muro": "a continuous area of charcoal acoustic fabric wall above the entire scene, in deep warm shadow with subtle visible woven texture",
+        "tinta": "blanca"
+      }
+    }
+  }
+]

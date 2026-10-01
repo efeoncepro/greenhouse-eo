@@ -1,0 +1,17 @@
+{
+ "lapiz": { "src": "vector-C/lapiz-c2.json", "label": "Lápiz", "use": "boceto, escritura, idea en papel", "dot": [8.6, 41.4] },
+ "rodillo": { "src": "vector-A/rodillo.json", "label": "Rodillo", "use": "pintura, cobertura, gran formato", "dot": [26.8, 14] },
+ "aerosol": { "src": "vector-A/aerosol.json", "label": "Aerosol", "use": "arte urbano, grafiti, intervención", "dot": [32.6, 7.4] },
+ "escuadra": { "src": "vector-B/escuadra-b.json", "label": "Escuadra", "use": "diseño técnico, grilla, precisión", "dot": [19.85, 27.53] },
+ "postit": { "src": "vector-A/postit.json", "label": "Post-it", "use": "ideación, taller, notas", "dot": [22.8, 21.2] },
+ "encuadre": { "src": "vector-B/encuadre-b.json", "label": "Encuadre", "use": "encuadre, composición, formatos", "dot": [23.86, 24.19] },
+ "pelicula": { "src": "vector-C/pelicula-c1.json", "label": "Película", "use": "cine, fotografía analógica, rodaje", "dot": [19.2, 26.8] },
+ "vinilo": { "src": "vector-B/vinilo-b.json", "label": "Vinilo", "use": "música, discografía, playlist", "dot": [23.53, 23.38] },
+ "guitarra": { "src": "vector-C/guitarra-c2.json", "label": "Guitarra", "use": "música en vivo, composición, jingle", "dot": [22.73, 24.47] },
+ "reproducir": { "src": "vector-B/reproducir.json", "label": "Reproducir", "use": "video, estreno, reproducción", "dot": [28.2, 24.4] },
+ "varita": { "src": "vector-C/varita-c2.json", "label": "Varita mágica", "use": "magia, efectos, transformación", "dot": [30.8, 12.8] },
+ "taza": { "src": "vector-B/taza.json", "label": "Taza de café", "use": "pausa, conversación, equipo", "dot": [20, 25.2] },
+ "lampara": { "src": "vector-B/lampara.json", "label": "Lámpara de escritorio", "use": "foco, estudio, trabajo creativo", "dot": [30.92, 23.06] },
+ "trofeo": { "src": "vector-B/trofeo.json", "label": "Trofeo", "use": "premios, logros, reconocimiento", "dot": [24, 20.4] },
+ "estrella": { "src": "vector-B/estrella.json", "label": "Estrella", "use": "destacado, favorito, calidad", "dot": [23.2, 24.4] }
+}

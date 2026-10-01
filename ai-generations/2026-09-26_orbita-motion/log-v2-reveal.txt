@@ -1,0 +1,16 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.screenshot: Target page, context or browser has been closed
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+  - fonts loaded
+
+    at shoot (/Users/jreye/Documents/greenhouse-eo/scripts/creative/brand-motion/render-orbit-motion.mjs:111:32)
+    at async shootBlurred (/Users/jreye/Documents/greenhouse-eo/scripts/creative/brand-motion/render-orbit-motion.mjs:81:34)
+    at async main (/Users/jreye/Documents/greenhouse-eo/scripts/creative/brand-motion/render-orbit-motion.mjs:148:82)
+    at async file:///Users/jreye/Documents/greenhouse-eo/scripts/creative/brand-motion/render-orbit-motion.mjs:172:57
+
+Node.js v24.17.0

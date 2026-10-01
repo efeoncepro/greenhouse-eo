@@ -7526,6 +7526,15 @@ export interface GreenhouseGrowthFormVersion {
   version: number;
 }
 
+export interface GreenhouseGrowthGraderBrandAliasHistory {
+  aliases_json: Json;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  history_id: Generated<string>;
+  profile_id: string;
+  reason: string;
+}
+
 export interface GreenhouseGrowthGraderBrandIntelligence {
   brand_intelligence_id: Generated<string>;
   candidate_business_model: string | null;
@@ -7553,6 +7562,17 @@ export interface GreenhouseGrowthGraderBusinessModelHistory {
   reason: string | null;
   to_business_model: string;
   to_source: string;
+}
+
+export interface GreenhouseGrowthGraderCompetitorSets {
+  competitor_set_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  market_id: string;
+  members_json: Json;
+  reason: string;
+  status: string;
+  version: number;
 }
 
 export interface GreenhouseGrowthGraderIntakeEvents {
@@ -7606,7 +7626,25 @@ export interface GreenhouseGrowthGraderProbeResults {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseGrowthGraderProfileMarkets {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  is_primary: Generated<boolean>;
+  locale: string;
+  market_code: string;
+  market_id: Generated<string>;
+  profile_id: string;
+  recurring_regrade_cadence: Generated<string>;
+  recurring_regrade_enabled: Generated<boolean>;
+  recurring_regrade_last_at: Timestamp | null;
+  recurring_regrade_last_run_id: string | null;
+  recurring_regrade_next_at: Timestamp | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseGrowthGraderProfiles {
+  brand_aliases: Generated<Json>;
   brand_name: string;
   business_model: string | null;
   business_model_confidence: Numeric | null;
@@ -7631,7 +7669,6 @@ export interface GreenhouseGrowthGraderProfiles {
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
   website_url: string | null;
-  brand_aliases: Generated<Json>;
 }
 
 export interface GreenhouseGrowthGraderPromptSets {
@@ -7643,6 +7680,7 @@ export interface GreenhouseGrowthGraderPromptSets {
   created_by: string;
   generation_strategy: string;
   grounding_sources_json: Generated<Json>;
+  market_id: string | null;
   model: string | null;
   profile_id: string;
   prompts_json: Generated<Json>;
@@ -7651,7 +7689,6 @@ export interface GreenhouseGrowthGraderPromptSets {
   system_prompt_version: string | null;
   updated_at: Generated<Timestamp>;
   version: number;
-  market_id: string | null;
 }
 
 export interface GreenhouseGrowthGraderRecommendationStatus {
@@ -7751,8 +7788,25 @@ export interface GreenhouseGrowthGraderReportShortLinks {
   use_count: Generated<number>;
 }
 
+export interface GreenhouseGrowthGraderRunBatches {
+  batch_id: Generated<string>;
+  cost_ceiling_total_usd: Numeric;
+  created_at: Generated<Timestamp>;
+  idempotency_key: string;
+  market_ids: string[];
+  mode: string;
+  organization_id: string | null;
+  profile_id: string;
+  public_id: Generated<string>;
+  request_channel: string;
+  request_hash: string;
+  requested_by_user_id: string;
+}
+
 export interface GreenhouseGrowthGraderRuns {
   assignment_id: string | null;
+  batch_id: string | null;
+  competitor_set_id: string | null;
   cost_attribution: string | null;
   cost_ceiling_usd: Numeric | null;
   created_at: Generated<Timestamp>;
@@ -7760,6 +7814,10 @@ export interface GreenhouseGrowthGraderRuns {
   execution_prompts: Generated<Json>;
   finished_at: Timestamp | null;
   idempotency_key: string | null;
+  locale: string | null;
+  market_code: string | null;
+  market_id: string | null;
+  matching_snapshot: Json | null;
   mode: string;
   organization_id: string | null;
   poll_token: Generated<string>;
@@ -7776,12 +7834,6 @@ export interface GreenhouseGrowthGraderRuns {
   run_source: string | null;
   started_at: Timestamp | null;
   status: Generated<string>;
-  matching_snapshot: Json | null;
-  competitor_set_id: string | null;
-  batch_id: string | null;
-  locale: string | null;
-  market_code: string | null;
-  market_id: string | null;
 }
 
 export interface GreenhouseGrowthGraderScores {
@@ -7917,6 +7969,8 @@ export interface GreenhouseGrowthProviderObservations {
   citations: Generated<Json>;
   created_at: Generated<Timestamp>;
   error_code: string | null;
+  geo_country: string | null;
+  geo_mode: string | null;
   latency_ms: Generated<number>;
   model: string;
   observation_id: string;
@@ -7929,8 +7983,6 @@ export interface GreenhouseGrowthProviderObservations {
   run_id: string;
   status: string;
   usage: Generated<Json>;
-  geo_country: string | null;
-  geo_mode: string | null;
 }
 
 export interface GreenhouseGrowthSearchConsoleConnections {
@@ -13661,58 +13713,6 @@ export interface Pgmigrations {
   run_on: Timestamp;
 }
 
-export interface GreenhouseGrowthGraderProfileMarkets {
-  created_at: Generated<Timestamp>;
-  created_by: string;
-  is_primary: Generated<boolean>;
-  locale: string;
-  market_code: string;
-  market_id: Generated<string>;
-  profile_id: string;
-  recurring_regrade_cadence: Generated<string>;
-  recurring_regrade_enabled: Generated<boolean>;
-  recurring_regrade_last_at: Timestamp | null;
-  recurring_regrade_last_run_id: string | null;
-  recurring_regrade_next_at: Timestamp | null;
-  status: Generated<string>;
-  updated_at: Generated<Timestamp>;
-}
-
-export interface GreenhouseGrowthGraderCompetitorSets {
-  competitor_set_id: Generated<string>;
-  created_at: Generated<Timestamp>;
-  created_by: string;
-  market_id: string;
-  members_json: Json;
-  reason: string;
-  status: string;
-  version: number;
-}
-
-export interface GreenhouseGrowthGraderBrandAliasHistory {
-  aliases_json: Json;
-  created_at: Generated<Timestamp>;
-  created_by: string;
-  history_id: Generated<string>;
-  profile_id: string;
-  reason: string;
-}
-
-export interface GreenhouseGrowthGraderRunBatches {
-  batch_id: Generated<string>;
-  cost_ceiling_total_usd: Numeric;
-  created_at: Generated<Timestamp>;
-  idempotency_key: string;
-  market_ids: string[];
-  mode: string;
-  organization_id: string | null;
-  profile_id: string;
-  public_id: Generated<string>;
-  request_channel: string;
-  request_hash: string;
-  requested_by_user_id: string;
-}
-
 export interface DB {
   "greenhouse_ai.cloud_cost_ai_observations": GreenhouseAiCloudCostAiObservations;
   "greenhouse_ai.cloud_cost_alert_dispatches": GreenhouseAiCloudCostAlertDispatches;
@@ -14066,11 +14066,14 @@ export interface DB {
   "greenhouse_growth.form_submission": GreenhouseGrowthFormSubmission;
   "greenhouse_growth.form_submission_consent_snapshot": GreenhouseGrowthFormSubmissionConsentSnapshot;
   "greenhouse_growth.form_version": GreenhouseGrowthFormVersion;
+  "greenhouse_growth.grader_brand_alias_history": GreenhouseGrowthGraderBrandAliasHistory;
   "greenhouse_growth.grader_brand_intelligence": GreenhouseGrowthGraderBrandIntelligence;
   "greenhouse_growth.grader_business_model_history": GreenhouseGrowthGraderBusinessModelHistory;
+  "greenhouse_growth.grader_competitor_sets": GreenhouseGrowthGraderCompetitorSets;
   "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
   "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
   "greenhouse_growth.grader_probe_results": GreenhouseGrowthGraderProbeResults;
+  "greenhouse_growth.grader_profile_markets": GreenhouseGrowthGraderProfileMarkets;
   "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
   "greenhouse_growth.grader_prompt_sets": GreenhouseGrowthGraderPromptSets;
   "greenhouse_growth.grader_recommendation_status": GreenhouseGrowthGraderRecommendationStatus;
@@ -14080,6 +14083,7 @@ export interface DB {
   "greenhouse_growth.grader_report_send_log": GreenhouseGrowthGraderReportSendLog;
   "greenhouse_growth.grader_report_short_links": GreenhouseGrowthGraderReportShortLinks;
   "greenhouse_growth.grader_reports": GreenhouseGrowthGraderReports;
+  "greenhouse_growth.grader_run_batches": GreenhouseGrowthGraderRunBatches;
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
   "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
   "greenhouse_growth.lead_pii_reveal_audit": GreenhouseGrowthLeadPiiRevealAudit;
@@ -14366,8 +14370,4 @@ export interface DB {
   "greenhouse_sync.webhook_inbox_events": GreenhouseSyncWebhookInboxEvents;
   "greenhouse_sync.webhook_subscriptions": GreenhouseSyncWebhookSubscriptions;
   pgmigrations: Pgmigrations;
-  "greenhouse_growth.grader_profile_markets": GreenhouseGrowthGraderProfileMarkets;
-  "greenhouse_growth.grader_competitor_sets": GreenhouseGrowthGraderCompetitorSets;
-  "greenhouse_growth.grader_brand_alias_history": GreenhouseGrowthGraderBrandAliasHistory;
-  "greenhouse_growth.grader_run_batches": GreenhouseGrowthGraderRunBatches;
 }

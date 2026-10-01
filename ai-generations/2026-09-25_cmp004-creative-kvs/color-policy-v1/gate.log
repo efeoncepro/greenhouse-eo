@@ -1,0 +1,8 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 foto:cta:gate /Users/jreye/Documents/greenhouse-eo
+> node scripts/foto/componer-cta.gate.mjs ai-generations/2026-09-25_cmp004-creative-kvs/color-policy-v1/piezas.json --reproducir
+
+Reproduciendo 4 pieza(s) con el comando vigente y segmentación nueva…
+✓ lo entregado es idéntico a la reproducción. Veredicto sobre el QA reproducido:
+✓ 4 pieza(s) con CTA certificadas por reproducción: lo entregado es idéntico a lo que produce el comando del repo · huellas del plan, el plate, el PNG, el layout, el texto alternativo y el comando · texto ≥4.5:1 · superficie ≥3:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon.
+  Política cromática verificada en 4 pieza(s); armonía, jerarquía del conjunto y aprobación creativa requieren revisión visual.

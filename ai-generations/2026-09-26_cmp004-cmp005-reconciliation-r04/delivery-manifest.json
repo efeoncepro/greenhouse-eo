@@ -1,0 +1,221 @@
+{
+  "round": "2026-09-26 reconciliation R04",
+  "status": "pilots-awaiting-creative-review",
+  "published": false,
+  "generatedPhotography": true,
+  "people": "Fictional illustrative casting; not identified as real Efeonce staff",
+  "clientWork": "Fictional digital identity; not a client case or performance claim",
+  "renderer": "scripts/foto/componer-cta.mjs with opt-in graphicVoice efeonce",
+  "technicalVerification": {
+    "reproduction": "4/4 byte-identical, gate passed",
+    "tests": "39/39",
+    "legacyPixelCompatibility": "4/4 unchanged",
+    "warning": null,
+    "photoReserveGate": {
+      "C01": "4/5; deep margin fails",
+      "C04": "3/5; lateral cursor air and deep margin fail",
+      "S01": "3/5; lateral cursor air and deep margin fail",
+      "S02": "5/5"
+    },
+    "scope": "The composed 4:5 outputs passed; do not treat plates as approved universal templates or certified adaptations.",
+    "brackets": "Opt-in optical floor: 1.04 CSS px; warning resolved"
+  },
+  "pieces": [
+    {
+      "id": "CMP004-C01-KV-45-R04",
+      "campaign": "CMP-004",
+      "register": "C — respuesta a la vista",
+      "question": "¿Cómo nos reconocerán sin el logo?",
+      "answer": "Por tu identidad",
+      "emphasis": "answer and terminal sphere",
+      "cta": {
+        "variant": "outline",
+        "variantReason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida.",
+        "radius": 14,
+        "text": "Hablemos de tu marca",
+        "descriptor": "Agencia creativa",
+        "align": "left",
+        "x": "columna",
+        "gapAfterNote": 24,
+        "paddingX": 22,
+        "paddingY": 9,
+        "fontSize": 34,
+        "descriptorSize": 26,
+        "descriptorGap": 6,
+        "inkToken": "inkOnDark",
+        "cursorScale": 0.6,
+        "seleccion": {
+          "padding": "compact",
+          "marco": "ninguno"
+        },
+        "prominencia": "delimitada",
+        "colorPolicy": {
+          "version": 1,
+          "campaignId": "CMP-004",
+          "source": "CMP-004-color-policy.json",
+          "sha256": "8022b55e57e4077fe3d923cb139f958a1ab74b14fd670cd94fc6595608bc07ae",
+          "treatment": "outline",
+          "reason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida."
+        },
+        "surfaceToken": "brandAccentSoft"
+      },
+      "plate": "plates/CMP004-C01-KV-45-R04-plate.png",
+      "plateSha256": "707b875fc7b3a9fc98b6d1643d4b8be83202d5c95697d3e5a5f684a3944645ab",
+      "export": "out/CMP004-C01-KV-45-R04.png",
+      "exportSha256": "9779f7291ef9d51fb739650d9e767c5c104de2f217c09276ea98e67b1abe015b",
+      "humanApproval": "pending",
+      "publication": "none",
+      "deliveryExport": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/CMP-004/4x5/CMP004-C01-KV-45-R04.png"
+    },
+    {
+      "id": "CMP004-C04-KV-45-R04",
+      "campaign": "CMP-004",
+      "register": "A — documental de oficio",
+      "question": "¿Cómo producimos más sin perder calidad?",
+      "answer": "Con criterio",
+      "emphasis": "answer and terminal sphere",
+      "cta": {
+        "variant": "text",
+        "variantReason": "Servicio de continuidad: enlace editorial prolonga la revisión experta y deja protagonismo al criterio seleccionado.",
+        "radius": 0,
+        "text": "Escala tu producción",
+        "descriptor": "Agencia creativa",
+        "align": "left",
+        "x": "columna",
+        "gapAfterNote": 26,
+        "paddingX": 22,
+        "paddingY": 3,
+        "fontSize": 34,
+        "descriptorSize": 26,
+        "descriptorGap": 6,
+        "inkToken": "brandAccentSoft",
+        "cursorScale": 0.6,
+        "seleccion": {
+          "padding": "compact",
+          "marco": "open-brackets"
+        },
+        "prominencia": "discreta",
+        "colorPolicy": {
+          "version": 1,
+          "campaignId": "CMP-004",
+          "source": "CMP-004-color-policy.json",
+          "sha256": "8022b55e57e4077fe3d923cb139f958a1ab74b14fd670cd94fc6595608bc07ae",
+          "treatment": "text",
+          "reason": "Servicio de continuidad: enlace editorial prolonga la revisión experta y deja protagonismo al criterio seleccionado."
+        }
+      },
+      "plate": "plates/CMP004-C04-KV-45-R04-plate.png",
+      "plateSha256": "8954ffd8756e29485c7283577f621837e0e2bdb032cc52be538d593cd93d0a09",
+      "export": "out/CMP004-C04-KV-45-R04.png",
+      "exportSha256": "f4a1de4ffaeafc6379fc46d0f4b194056b4c42e606501acf6d25ffd3da7fb888",
+      "humanApproval": "pending",
+      "publication": "none",
+      "deliveryExport": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/CMP-004/4x5/CMP004-C04-KV-45-R04.png"
+    },
+    {
+      "id": "CMP005-S01-KV-45-R02",
+      "campaign": "CMP-005",
+      "register": "A — diagnóstico documental",
+      "question": "¿Qué está frenando nuestro crecimiento?",
+      "answer": "Diagnóstico",
+      "emphasis": "typography and terminal sphere",
+      "cta": {
+        "variant": "outline",
+        "variantReason": "Diagnóstico de negocio: contorno señala una entrada acotada a revisar la estrategia, sin fingir una compra inmediata.",
+        "radius": 14,
+        "text": "Revisemos tu estrategia",
+        "descriptor": "Agencia estratégica",
+        "align": "left",
+        "x": "columna",
+        "gapAfterNote": 24,
+        "paddingX": 22,
+        "paddingY": 9,
+        "fontSize": 34,
+        "descriptorSize": 26,
+        "descriptorGap": 6,
+        "inkToken": "inkOnDark",
+        "cursorScale": 0.6,
+        "seleccion": {
+          "padding": "compact",
+          "marco": "ninguno"
+        },
+        "prominencia": "delimitada",
+        "colorPolicy": {
+          "version": 1,
+          "campaignId": "CMP-005",
+          "source": "CMP-005-color-policy.json",
+          "sha256": "0c8bee7fdd805a24b71807bebe316b0ea3c2631403f807b7c4ac112b724ed8ef",
+          "treatment": "outline",
+          "reason": "Diagnóstico de negocio: contorno señala una entrada acotada a revisar la estrategia, sin fingir una compra inmediata."
+        },
+        "surfaceToken": "brandAccentOnDark"
+      },
+      "plate": "plates/CMP005-S01-KV-45-R02-plate.png",
+      "plateSha256": "86c39c9fa318e334620bebc243512bc6e2dd682266e8e60daedf4f14c054f3f2",
+      "export": "out/CMP005-S01-KV-45-R02.png",
+      "exportSha256": "1cf85f08ea7982773572d642f991893b84a2b5f06700c833e800e9022f91514e",
+      "humanApproval": "pending",
+      "publication": "none",
+      "deliveryExport": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/CMP-005/4x5/CMP005-S01-KV-45-R02.png"
+    },
+    {
+      "id": "CMP005-S02-KV-45-R02",
+      "campaign": "CMP-005",
+      "register": "B — puesta en escena",
+      "question": "¿Dónde conviene invertir primero?",
+      "answer": "Con foco",
+      "emphasis": "typography and terminal sphere",
+      "cta": {
+        "variant": "solid",
+        "variantReason": "Decisión y próximo paso: superficie sólida concentra la acción después de la respuesta breve y la mirada directa.",
+        "radius": 14,
+        "text": "Definamos prioridades",
+        "descriptor": "Agencia estratégica",
+        "align": "left",
+        "x": "columna",
+        "gapAfterNote": 24,
+        "paddingX": 22,
+        "paddingY": 9,
+        "fontSize": 34,
+        "descriptorSize": 26,
+        "descriptorGap": 6,
+        "inkToken": "brandDark",
+        "cursorScale": 0.6,
+        "seleccion": {
+          "padding": "compact",
+          "marco": "ninguno"
+        },
+        "prominencia": "destacada",
+        "colorPolicy": {
+          "version": 1,
+          "campaignId": "CMP-005",
+          "source": "CMP-005-color-policy.json",
+          "sha256": "0c8bee7fdd805a24b71807bebe316b0ea3c2631403f807b7c4ac112b724ed8ef",
+          "treatment": "solid",
+          "reason": "Decisión y próximo paso: superficie sólida concentra la acción después de la respuesta breve y la mirada directa."
+        },
+        "surfaceToken": "brandAccentOnDark"
+      },
+      "plate": "plates/CMP005-S02-KV-45-R02-plate.png",
+      "plateSha256": "3f3d1b98808fd9f40c757d1f2b3bad8bf28b5567d8d722db480dc6362a955eb6",
+      "export": "out/CMP005-S02-KV-45-R02.png",
+      "exportSha256": "24ad33049326a79fec138f87b74ea282c6365abd00721c504dc4ef5c68d43f2f",
+      "humanApproval": "pending",
+      "publication": "none",
+      "deliveryExport": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/CMP-005/4x5/CMP005-S02-KV-45-R02.png"
+    }
+  ],
+  "delivery": "Copied to OneDrive local campaign resources and pilot folders, hashes verified; remote sync not verified",
+  "corrections": [
+    {
+      "date": "2026-09-26",
+      "scope": "all outline and solid CTAs in this four-piece round",
+      "radius": 14,
+      "fontSize": 34,
+      "reason": "Efeonce requires rounded rectangle corners. User correction.",
+      "renderer": "pnpm foto:componer:cta",
+      "textVariant": "unchanged, identical PNG hash",
+      "preflight": "graphicVoice efeonce rejects radius <= 0 for outline/solid"
+    }
+  ]
+}

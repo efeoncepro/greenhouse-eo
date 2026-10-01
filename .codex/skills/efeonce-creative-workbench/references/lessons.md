@@ -99,3 +99,53 @@ Identificar capa: **fuente** (datos/fonts/template), **admisión** (pack/receta)
 resuelve cambiando silenciosamente otra. Conservar error redactado, identidad del recurso/run y
 evidencia suficiente sin secretos; corregir causa en dueño canónico y volver a verificar el paso
 afectado. No repetir todos los tests ni llamadas pagadas si no aportan evidencia nueva.
+
+## Aprendizajes del feedback de composición — 2026-10-01
+
+- Una caja de texto heredada no centra el nuevo contenido. Centrar por tinta shapeada, no por
+  cantidad de caracteres, advance de la cifra anterior o el ancho original de una cápsula.
+- Cambiar Bold a Black altera el ancho: reservar la zona efectiva y comprobar ambas filas cuando
+  hay dos monedas. Posponer clipping sólo para campos admitidos que se recolocan, con check final obligatorio.
+- Un origen de una línea no conserva el hueco de un destino largo. Refluir el badge/wrapper exclusivo;
+  jamás mover el frame que también contiene la ciudad.
+- Un badge de tarifa y un badge de origen tienen recetas distintas. El primero centra su label y
+  participa en la pila de oferta; el segundo conserva su icono y su padding nativo.
+- Condiciones en mayúsculas, fuera de la flecha o pegadas al precio son errores de componente,
+  no algo que se arregle recortando el PNG. Actualizar receta, probar y crear otra corrida.
+- Convertir feedback en regla no significa render QA de todo el catálogo ni aprobación comercial.
+  Registrar cobertura de pins, tests y fuentes rechazadas con su razón.
+
+- Condiciones de una flecha compacta: preferir una línea con un tamaño aprobado por variante. Un tamaño fijo versionado y autorizado no equivale a un bucle de reducción automática. Mostrar el tamaño efectivo y comprobar tinta final; si excede, rechazar. No importar esta política a un pie legal o financiación por semejanza.
+
+- La prueba visual descubrió condiciones invisibles aunque su caja cabía: al reparentar hay que considerar la pintura del nuevo fondo y los overrides de `styleTable`, no sólo coordenadas. Usar la pintura de precio del propio source pin.
+- Doble moneda no significa siempre dos filas. Un banner conserva sus dos slots laterales; centrar ambas parejas en el mismo contenedor provoca solapamiento sin overflow. Conservar orientación de fuente y comprobar intersección de tinta entre parejas.
+
+### No confundir titulares de promoción con stickers
+
+La zona semántica promotion-sticker contenía también el titular porcentual en la flecha de Cyber. Aplicar CENTER por ese nombre centró sus líneas y rompió la referencia de50%. Clasificar por receta/pin y función visual: sticker circular centrado; bloque editorial porcentual con eje izquierdo compartido por badge y condiciones. La extensión1.2.0 separa seis fuentes y prueba20%/50% en todas.
+
+## Implementación local y feedback de alineación pendiente — 2026-10-01
+
+Leer [destinos y espacios adaptativos](destination-content-flow.md) para conocer la implementación local y sus límites. **Antes de continuar, leer [feedback pendiente de alineación](layout-feedback-handoff.md)**: el operador invalidó LEFT global de legales y señaló huecos/ejes en 03-2668, 01-2611 y 23-4685. Corregir en el próximo chat por función y source pin; no aplicar CENTER global por deducción. El código 1.3.0 sigue LEFT, los 377 tests no certifican aceptación visual y el documento v3 queda parcial/rechazado en esos aspectos. No mover fotos/ventanas como origen, aplicar autofit a otros componentes ni sustituir corridas históricas.
+
+
+### No convertir «legal» en una alineación global
+
+El PDF de feedback se interpretó como LEFT para169 campos, incluyendo pies legales que el
+operador luego señaló que deben ir centrados. Un comentario sobre condiciones dentro de
+una flecha no autoriza trasladar esa alineación a un footer de otra composición. Clasificar
+por función/source pin y revisar la relación del conjunto: un badge puede ser adaptativo
+y estar centrado dentro de sí mismo, pero seguir en un eje incorrecto respecto del precio.
+Tampoco un fit de destino/origen elimina por sí mismo el vacío hasta el pie legal o equilibra
+un panel HASTA/porcentaje/CTA. Los 377 tests no cerraron esos problemas de diseño.
+[Handoff pendiente](layout-feedback-handoff.md) conserva los tres casos y cómo verificarlos.
+
+
+Diagnóstico de las fuentes selladas para el handoff: footer1387 CENTER en01-2611/03-2668,
+condiciones1241/1242/1254 LEFT. La oferta compleja de01-2611 carece de `offer-stack`;
+el centrado del badge1231 en un parent ancho pierde el eje nativo de precio/condiciones.
+En23-4685, `pin.stickers` aplica centros individuales a HASTA4692/porcentaje4694/
+DE DCTO.4695, aunque la fuente LEFT define un conjunto editorial con eje compartido.
+Y el hueco de03-2668 conserva dependencias con altura de fila/flecha/posición de footer:
+no se corrige desplazando una sola capa sin comprobar colisiones. Diagnóstico no
+equivale a corrección implementada ni autoriza geometría en un job.

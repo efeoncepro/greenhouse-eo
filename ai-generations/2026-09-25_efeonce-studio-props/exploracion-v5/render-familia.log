@@ -1,0 +1,28 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/render-tazas.py:25: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world.use_nodes=True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/render-tazas.py:33: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name);m.use_nodes=True
+00:05.211  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-efeonce/01-frente.png'
+00:09.043  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-efeonce/02-tres-cuartos.png'
+00:12.357  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-efeonce/05-perfil.png'
+00:15.591  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-efeonce/06-reverso.png'
+00:18.765  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-globe/01-frente.png'
+00:22.167  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-globe/02-tres-cuartos.png'
+00:25.471  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-globe/05-perfil.png'
+00:28.770  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-globe/06-reverso.png'
+00:32.276  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-wave/01-frente.png'
+00:36.233  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-wave/02-tres-cuartos.png'
+00:39.773  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-wave/05-perfil.png'
+00:43.015  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-wave/06-reverso.png'
+00:46.083  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-reach/01-frente.png'
+00:49.457  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-reach/02-tres-cuartos.png'
+00:52.948  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-reach/05-perfil.png'
+00:56.295  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-reach/06-reverso.png'
+00:59.896  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-globe-color/01-frente.png'
+01:03.447  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-globe-color/02-tres-cuartos.png'
+01:07.166  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-globe-color/05-perfil.png'
+01:11.523  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/f-globe-color/06-reverso.png'
+RENDER_FINISHED
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

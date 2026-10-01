@@ -1,0 +1,30 @@
+{
+  "CMP004-C01-KV-45-R03": {
+    "generatedSource": "/Users/jreye/.codex/generated_images/01a0d78e-9d19-7db3-94b2-77a950ef7b3b/exec-99d12324-7a5e-46ec-aadb-a5a63134065c.png",
+    "plate": "ai-generations/2026-09-26_cmp004-cmp005-premium-pilots/plates/CMP004-C01-KV-45-R03-plate.png",
+    "sha256": "48387d667a3789d2e216c1679b8b82cba67e8cfbbaa758a47853e94103c4af1e",
+    "provider": "image_gen",
+    "state": "pilot_for_review"
+  },
+  "CMP004-C04-KV-45-R03": {
+    "generatedSource": "/Users/jreye/.codex/generated_images/01a0d78e-9d19-7db3-94b2-77a950ef7b3b/exec-1625126e-aace-42aa-998c-910396eaf6da.png",
+    "plate": "ai-generations/2026-09-26_cmp004-cmp005-premium-pilots/plates/CMP004-C04-KV-45-R03-plate.png",
+    "sha256": "6fe143d54855a4ba531dd77b8df581944f9734850e78135b858d54821fa41371",
+    "provider": "image_gen",
+    "state": "pilot_for_review"
+  },
+  "CMP005-S01-KV-45-R01": {
+    "generatedSource": "/Users/jreye/.codex/generated_images/01a0d78e-9d19-7db3-94b2-77a950ef7b3b/exec-2e2d9d78-0081-4f55-9985-726ca023cd93.png",
+    "plate": "ai-generations/2026-09-26_cmp004-cmp005-premium-pilots/plates/CMP005-S01-KV-45-R01-plate.png",
+    "sha256": "aefde1ee01948b78337ed3832dc6c31534c0bc396c8de6613bc5d7ef2e7e26f3",
+    "provider": "image_gen",
+    "state": "pilot_for_review"
+  },
+  "CMP005-S02-KV-45-R01": {
+    "generatedSource": "/Users/jreye/.codex/generated_images/01a0d78e-9d19-7db3-94b2-77a950ef7b3b/exec-5e7d819a-1f79-463d-b437-d7ec043ad1e1.png",
+    "plate": "ai-generations/2026-09-26_cmp004-cmp005-premium-pilots/plates/CMP005-S02-KV-45-R01-plate.png",
+    "sha256": "0b0e4be8e858c8fd418f06b54e19a4e771760f7caf8be45462976688b822dfe5",
+    "provider": "image_gen",
+    "state": "pilot_for_review"
+  }
+}

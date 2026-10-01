@@ -1,0 +1,383 @@
+{
+  "title": "Ideas con dirección",
+  "version": 2,
+  "status": "propuesta-para-aprobacion",
+  "date": "2026-09-25",
+  "masterbrand": "Efeonce",
+  "subbrands": [
+    "Globe",
+    "Wave",
+    "Reach"
+  ],
+  "sources": [
+    {
+      "path": "public/branding/logo-full.svg",
+      "sha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e"
+    },
+    {
+      "path": "public/branding/logo-negative.svg",
+      "sha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f"
+    },
+    {
+      "path": "public/branding/SVG/isotipo-full-efeonce.svg",
+      "sha256": "e8204298df02608e0edd9717a17317a84239b5c6d63b4db31104babba1bcd4d2"
+    },
+    {
+      "path": "public/branding/SVG/isotipo-goble-full.svg",
+      "sha256": "4e6c58b0236b36e75eabaf6cba82372ef8237aa1ac49cda54b06a05c939c08bb"
+    },
+    {
+      "path": "public/branding/SVG/isotipo-wave.svg",
+      "sha256": "a24bddd9414586395e8bde5ce7c2cdddbb19863e51f9ab80d527e2640f375d8f"
+    },
+    {
+      "path": "public/branding/SVG/isotipo-reach-full.svg",
+      "sha256": "9d5fe2b0f39c4834efbfb585c57ef26a6ddf4875c4c874c3a2a7d0ce47d77edd"
+    }
+  ],
+  "views": [
+    {
+      "id": "mug-blanco-hacer-frente",
+      "object": "mug-blanco-hacer",
+      "view": "frente",
+      "file": "individuales/mug-blanco-hacer-frente.png",
+      "source": "final/03-mugs.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-blanco-hacer-tres-cuartos",
+      "object": "mug-blanco-hacer",
+      "view": "tres-cuartos",
+      "file": "individuales/mug-blanco-hacer-tres-cuartos.png",
+      "source": "final/03-mugs.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-blanco-hacer-reverso",
+      "object": "mug-blanco-hacer",
+      "view": "reverso",
+      "file": "individuales/mug-blanco-hacer-reverso.png",
+      "source": "final/03-mugs.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-blanco-hacer-cenital",
+      "object": "mug-blanco-hacer",
+      "view": "cenital",
+      "file": "individuales/mug-blanco-hacer-cenital.png",
+      "source": "final/03-mugs.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-azul-frente",
+      "object": "mug-azul",
+      "view": "frente",
+      "file": "individuales/mug-azul-frente.png",
+      "source": "final/03-mugs.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-azul-tres-cuartos",
+      "object": "mug-azul",
+      "view": "tres-cuartos",
+      "file": "individuales/mug-azul-tres-cuartos.png",
+      "source": "final/03-mugs.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-azul-reverso",
+      "object": "mug-azul",
+      "view": "reverso",
+      "file": "individuales/mug-azul-reverso.png",
+      "source": "final/03-mugs.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-azul-cenital",
+      "object": "mug-azul",
+      "view": "cenital",
+      "file": "individuales/mug-azul-cenital.png",
+      "source": "final/03-mugs.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-globe-magenta-frente",
+      "object": "mug-globe-magenta",
+      "view": "frente",
+      "file": "individuales/mug-globe-magenta-frente.png",
+      "source": "final/07-globe-colores.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-globe-magenta-tres-cuartos",
+      "object": "mug-globe-magenta",
+      "view": "tres-cuartos",
+      "file": "individuales/mug-globe-magenta-tres-cuartos.png",
+      "source": "final/07-globe-colores.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-globe-magenta-reverso",
+      "object": "mug-globe-magenta",
+      "view": "reverso",
+      "file": "individuales/mug-globe-magenta-reverso.png",
+      "source": "final/07-globe-colores.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-globe-magenta-cenital",
+      "object": "mug-globe-magenta",
+      "view": "cenital",
+      "file": "individuales/mug-globe-magenta-cenital.png",
+      "source": "final/07-globe-colores.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-globe-naranja-frente",
+      "object": "mug-globe-naranja",
+      "view": "frente",
+      "file": "individuales/mug-globe-naranja-frente.png",
+      "source": "final/07-globe-colores.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-globe-naranja-tres-cuartos",
+      "object": "mug-globe-naranja",
+      "view": "tres-cuartos",
+      "file": "individuales/mug-globe-naranja-tres-cuartos.png",
+      "source": "final/07-globe-colores.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-globe-naranja-reverso",
+      "object": "mug-globe-naranja",
+      "view": "reverso",
+      "file": "individuales/mug-globe-naranja-reverso.png",
+      "source": "final/07-globe-colores.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mug-globe-naranja-cenital",
+      "object": "mug-globe-naranja",
+      "view": "cenital",
+      "file": "individuales/mug-globe-naranja-cenital.png",
+      "source": "final/07-globe-colores.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "agenda-frente",
+      "object": "agenda",
+      "view": "frente",
+      "file": "individuales/agenda-frente.png",
+      "source": "final/02-agenda.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "agenda-tres-cuartos",
+      "object": "agenda",
+      "view": "tres-cuartos",
+      "file": "individuales/agenda-tres-cuartos.png",
+      "source": "final/02-agenda.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "agenda-reverso",
+      "object": "agenda",
+      "view": "reverso",
+      "file": "individuales/agenda-reverso.png",
+      "source": "final/02-agenda.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "agenda-abierta",
+      "object": "agenda",
+      "view": "abierta",
+      "file": "individuales/agenda-abierta.png",
+      "source": "final/02-agenda.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mac-tapa-cenital",
+      "object": "mac",
+      "view": "tapa-cenital",
+      "file": "individuales/mac-tapa-cenital.png",
+      "source": "final/04-mac.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mac-cerrado-tres-cuartos",
+      "object": "mac",
+      "view": "cerrado-tres-cuartos",
+      "file": "individuales/mac-cerrado-tres-cuartos.png",
+      "source": "final/04-mac.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mac-abierto-reverso",
+      "object": "mac",
+      "view": "abierto-reverso",
+      "file": "individuales/mac-abierto-reverso.png",
+      "source": "final/04-mac.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "mac-abierto-frente",
+      "object": "mac",
+      "view": "abierto-frente",
+      "file": "individuales/mac-abierto-frente.png",
+      "source": "final/04-mac.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "pizarra-frente",
+      "object": "pizarra",
+      "view": "frente",
+      "file": "individuales/pizarra-frente.png",
+      "source": "final/05-pizarra.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "pizarra-tres-cuartos",
+      "object": "pizarra",
+      "view": "tres-cuartos",
+      "file": "individuales/pizarra-tres-cuartos.png",
+      "source": "final/05-pizarra.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "pizarra-perfil",
+      "object": "pizarra",
+      "view": "perfil",
+      "file": "individuales/pizarra-perfil.png",
+      "source": "final/05-pizarra.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "pizarra-reverso",
+      "object": "pizarra",
+      "view": "reverso",
+      "file": "individuales/pizarra-reverso.png",
+      "source": "final/05-pizarra.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "lapicero-frente",
+      "object": "lapicero",
+      "view": "frente",
+      "file": "individuales/lapicero-frente.png",
+      "source": "final/06-escritorio.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "lapicero-tres-cuartos",
+      "object": "lapicero",
+      "view": "tres-cuartos",
+      "file": "individuales/lapicero-tres-cuartos.png",
+      "source": "final/06-escritorio.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "lapicero-superior",
+      "object": "lapicero",
+      "view": "superior",
+      "file": "individuales/lapicero-superior.png",
+      "source": "final/06-escritorio.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "bandeja-frente",
+      "object": "bandeja",
+      "view": "frente",
+      "file": "individuales/bandeja-frente.png",
+      "source": "final/06-escritorio.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "bandeja-tres-cuartos",
+      "object": "bandeja",
+      "view": "tres-cuartos",
+      "file": "individuales/bandeja-tres-cuartos.png",
+      "source": "final/06-escritorio.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "bandeja-superior",
+      "object": "bandeja",
+      "view": "superior",
+      "file": "individuales/bandeja-superior.png",
+      "source": "final/06-escritorio.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "sujetalibros-frente",
+      "object": "sujetalibros",
+      "view": "frente",
+      "file": "individuales/sujetalibros-frente.png",
+      "source": "final/06-escritorio.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "sujetalibros-tres-cuartos",
+      "object": "sujetalibros",
+      "view": "tres-cuartos",
+      "file": "individuales/sujetalibros-tres-cuartos.png",
+      "source": "final/06-escritorio.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "sujetalibros-elevada",
+      "object": "sujetalibros",
+      "view": "elevada",
+      "file": "individuales/sujetalibros-elevada.png",
+      "source": "final/06-escritorio.png",
+      "status": "concepto-para-aprobacion"
+    },
+    {
+      "id": "ship-frente",
+      "object": "ship",
+      "view": "frente",
+      "file": "individuales/ship-frente.png",
+      "source": "final/08-ship.png",
+      "status": "forma-aprobada-2026-09-17-aplicacion-pendiente"
+    },
+    {
+      "id": "ship-tres-cuartos",
+      "object": "ship",
+      "view": "tres-cuartos",
+      "file": "individuales/ship-tres-cuartos.png",
+      "source": "final/08-ship.png",
+      "status": "forma-aprobada-2026-09-17-aplicacion-pendiente"
+    },
+    {
+      "id": "ship-posterior",
+      "object": "ship",
+      "view": "posterior",
+      "file": "individuales/ship-posterior.png",
+      "source": "final/08-ship.png",
+      "status": "forma-aprobada-2026-09-17-aplicacion-pendiente"
+    },
+    {
+      "id": "ship-cenital",
+      "object": "ship",
+      "view": "cenital",
+      "file": "individuales/ship-cenital.png",
+      "source": "final/08-ship.png",
+      "status": "forma-aprobada-2026-09-17-aplicacion-pendiente"
+    }
+  ],
+  "production": "Renders conceptuales multivista; no planos acotados ni especificaciones de fabricación.",
+  "typography": {
+    "source": "axisAdvertising (trial)",
+    "advisor": "Brochure / 1–3 palabras / Impactar",
+    "main": "Bricolage Grotesque",
+    "structure": "Poppins",
+    "render": "Contornos derivados de archivos de fuente reales"
+  },
+  "provenance": {
+    "baseRenders": "../apertura-v1/prompts.json",
+    "officePrompt": "../apertura-v1/office-batch.json",
+    "officeFicha": "../apertura-v1/office-ficha.json",
+    "notebookEdit": "bases/agenda.png - generación editada a tela azul lisa; composición tipográfica posterior",
+    "branding": "SVG oficiales compuestos después de generar"
+  }
+}

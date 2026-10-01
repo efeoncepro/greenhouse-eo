@@ -218,3 +218,46 @@ recetas, fuentes y módulos. `index.html` permite inspeccionar las dos piezas en
 nativo y la diferencia amplificada. La revisión humana/técnica se registra aparte:
 una métrica o un render exitoso no aprueba una campaña. Para fotografía/copy nuevos,
 usar `marca:disenar`/`marca:lote` con la autoridad normal y contenido explícito.
+
+## Reglas de la diseñadora para contenido variable — 2026-10-01
+
+Canon: Workbench `docs/architecture/workbench-sky-designer-content-rules.md`.
+La receta local `sky-airline.content-layout.designer-rules@1.0.0` tiene 104 fuentes selladas:
+119 campos de precio, 126 de sticker, 76 relaciones destino/origen y 42 pilas simples en flecha.
+Cada variante sólo recibe las reglas de sus elementos admitidos.
+
+- Medir tinta real de Metric para centrar stickers y alinear cada moneda con su precio.
+- Importes en Metric Black sellado, tamaño nativo; sin shrinking ni fallback.
+- Condiciones debajo del precio en estilo de oración, conservando acrónimos y URLs.
+- Origen tras las líneas efectivas del destino con gap nativo; badge de origen con icono, altura
+  y padding nativos, ancho adaptativo. No mover un frame compartido que también contiene la ciudad.
+- Badge de tarifa adaptativo y centrado; badge/precio/condiciones en una pila con separación.
+  El legal de tarifa permanece dentro de la flecha. `footer-legal` sigue independiente.
+- Filas dobles de moneda se resuelven por pares fuente; un overflow se rechaza, no se omite la moneda.
+
+El plan declara `contentLayoutRecipe` y la fuente efectiva Black. QA expone `contentLayouts`,
+`badgeLayouts`, `measurements[].conditionCopyTransform` y `finalSceneSha256`. La escena modular
+es la base; la extensión registra aparte sus ajustes productivos. Los checks finales de tinta
+contra clips efectivos son obligatorios incluso para los campos que se recolocan.
+
+Revisión recibida: `ajustes.pdf`, SHA c6fe9d463a74a119d314e030e3513b176f7d890f6b07a0f69811f60afd42c24a.
+Prueba nueva: `projects/sky/calama-reglas-diseno-7-formatos` (7 formatos, copy completo, fotos
+históricas, cero proveedores). No inventar fechas, descuentos ni código monetario desde `$`.
+Leer `review.md` de esa pieza para corridas seleccionadas, documento y verificación.
+Cambios locales sin publicación acreditada; nunca modificar los CLIs de Greenhouse para producir.
+
+### Condiciones compactas, regla 1.1.0 — local 2026-10-01
+
+El operador autorizó una sola línea y tamaño menor en condiciones de la flecha compacta. `content-layout-admissions.mjs` fija 24 ofertas: display 12 px, banners 10 px y verticales 8 px; se conserva Metric/peso/color. La implementación 1.3.0 aplica LEFT, pendiente de corregir por función/source pin según [feedback nuevo](layout-feedback-handoff.md); lineHeight1,2; sin selección desde job ni cálculo de autofit por longitud. Máximo una línea: copy excesivo falla explícitamente. Plan `conditionTypography` y QA `offer-stack.conditionTypography` + `measurements.size`. No aplicar a pies legales, doble moneda o financiación. Prueba `projects/sky/prueba-modular-24-adaptaciones/`, incluyendo condiciones completas en display/vertical. Leer contrato Workbench actualizado, no redibujar la pieza o corregir PNG.
+
+La prueba de 24 variantes añadió dos reglas de visibilidad/separación: al mover condiciones dentro de una flecha, heredar la pintura sellada del precio (también en los estilos de glifos), para evitar morado sobre morado; las dobles monedas conservan la orientación fijada por fuente y sus slots laterales o filas, con cajas finales que no se intersectan. QA `conditionPaintFromPrice`, `dual-currency-row` y `dual-currency-separation`. No aceptar fit como evidencia de visibilidad.
+
+El badge DESDE de tarifas dobles/complejas usa ahora 16 pins adicionales, además de las 42 pilas simples: ancho de tinta + padding fuente, altura fija, extremos reales y centros de tinta comprobados. Plan `contentLayoutRecipe.fareBadges`; QA `fare-badge-adaptive`. No asumir que el badge de una doble moneda participa en `offer-stack`; revisar su admisión propia. Overflow se rechaza.
+
+### Titular porcentual en flecha: eje izquierdo
+
+Receta local1.2.0: seis fuentes3032/3040/3051/3059/3070/3078. El bloque «20% Dcto. / en rutas de prueba» sigue la referencia «50% Dcto. / en todos los destinos»: titular multilineal LEFT, todas las líneas y condiciones sobre el eje izquierdo nativo del badge HASTA. HASTA permanece centrado dentro de su badge. Se conservan tamaños, fuentes y bandas verticales; no centrar el titular como sticker. Pins exactos y `promotion-arrow-left-axis` en QA; ancho y clips finales obligatorios.
+
+## Implementación local y feedback de alineación pendiente — 2026-10-01
+
+Leer [destinos y espacios adaptativos](destination-content-flow.md) para conocer la implementación local y sus límites. **Antes de continuar, leer [feedback pendiente de alineación](layout-feedback-handoff.md)**: el operador invalidó LEFT global de legales y señaló huecos/ejes en 03-2668, 01-2611 y 23-4685. Corregir en el próximo chat por función y source pin; no aplicar CENTER global por deducción. El código 1.3.0 sigue LEFT, los 377 tests no certifican aceptación visual y el documento v3 queda parcial/rechazado en esos aspectos. No mover fotos/ventanas como origen, aplicar autofit a otros componentes ni sustituir corridas históricas.

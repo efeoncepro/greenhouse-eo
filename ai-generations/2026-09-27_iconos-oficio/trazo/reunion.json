@@ -1,0 +1,18 @@
+{
+  "key": "reunion",
+  "label": "Reunión",
+  "use": "Área · reuniones, conversación",
+  "mode": "complete",
+  "rest": [
+    "M5 8h8a2 2 0 0 1 2 2v5a2 2 0 0 1 -2 2h-5l-3 3v-3a2 2 0 0 1 -2 -2v-5a2 2 0 0 1 2 -2z",
+    "M9 8v-3a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v5a2 2 0 0 1 -2 2v3l-3 -3h-1"
+  ],
+  "response": [
+    "M5 8h8a2 2 0 0 1 2 2v5a2 2 0 0 1 -2 2h-5l-3 3v-3a2 2 0 0 1 -2 -2v-5a2 2 0 0 1 2 -2z",
+    "M9 8v-3a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v5a2 2 0 0 1 -2 2v3l-3 -3h-1"
+  ],
+  "dot": [
+    9,
+    12.5
+  ]
+}

@@ -1,0 +1,12 @@
+{
+ "chispa": { "src": "vector-A/chispa.json", "label": "Chispa", "use": "inteligencia artificial, IA generativa, ideas", "dot": [35.2, 11.6] },
+ "prompt": { "src": "vector-A/prompt-a2.json", "label": "Prompt", "use": "prompt, composer, conversación con IA", "dot": [32.16, 29.49] },
+ "barra-busqueda": { "src": "vector-A/barra-busqueda.json", "label": "Barra de búsqueda", "use": "búsqueda, buscadores, respuestas de IA", "dot": [12.83, 26.57] },
+ "aro-de-luz": { "src": "vector-B/aro-de-luz-b.json", "label": "Aro de luz", "use": "influencers, creadores, contenido en vivo", "dot": [30, 5.8] },
+ "television": { "src": "vector-A/television.json", "label": "Televisión", "use": "medios, prensa, noticias", "dot": [22.94, 27.05] },
+ "like": { "src": "vector-A/like.json", "label": "Me gusta", "use": "redes sociales, reacciones, comunidad", "dot": [23.76, 21.41] },
+ "galeria": { "src": "vector-B/galeria.json", "label": "Galería", "use": "multimedia, fotos y video, contenido", "dot": [25.79, 16.05] },
+ "biblioteca": { "src": "vector-C/biblioteca-c5.json", "label": "Biblioteca de assets", "use": "assets creativos, archivo, entregables", "dot": [29.48, 17.98] },
+ "hoodie": { "src": "vector-B/hoodie.json", "label": "Hoodie Efeonce", "use": "staff augmentation, talento, equipo en terreno", "dot": [25.41, 14.93] },
+ "gorra": { "src": "vector-B/gorra.json", "label": "Gorra Efeonce", "use": "staff augmentation, equipo en terreno, merch", "dot": [23.2, 20.4] }
+}

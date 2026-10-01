@@ -1,0 +1,23 @@
+{
+ "id": "MC2g-45-estratega-mesa-cliente",
+ "formato": "4:5",
+ "impacto": true,
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark studio at night): an EFEONCE SEO strategist, a Latin American woman in her early thirties, dark hair in a low bun, wearing the NAVY EFEONCE POLO, stands centered across the meeting table, framed from the waist up and a little SMALLER in the frame: the WHOLE UPPER THIRD of the frame above her head is calm dark space and the TOP OF HER HAIR is at 42% of the frame height. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. She looks straight into the lens with calm confidence, holding up at chest height, in both hands, ONE single thin, plain glass card that glows brilliant white with an azure (#0375DB) core, like a passport of light, with NO mark, NO logo, NO symbol and NO lettering on it; from the card, a fine azure scan line of light sweeps across its surface. The glowing card is the only strong light: it lights her face and hands from below, with a cool rim light behind her and thin haze catching the glow. Far behind her, out of focus, faint rows of dark unlit cards disappear into the darkness. The TOP 30% of the frame is calm, deep dark space with only faint haze, no cards, no light, no objects. Rich contrast, deep navy blacks, no text, no logos of any other brand. We sit on the client’s side of a dark meeting table: in the lowest fifth, so close to the lens that they dissolve into soft abstract shapes, the dark back of the client’s open laptop and a closed notebook on the table edge, outside every light; the laptop screen faces away and throws no light. No monitors, no plants, no lamps.",
+ "lecho": {
+  "objeto": "the dark back of the client’s open laptop and a closed notebook on the edge of the meeting table, seen from the client’s seat, outside every light",
+  "tono": "DARK near black"
+ },
+ "reservas": {
+  "texto": {
+   "muro": "calm, deep dark space with only faint haze",
+   "tinta": "blanca"
+  }
+ },
+ "objetos": [
+  {
+   "objeto": "polo-efeonce"
+  }
+ ]
+}

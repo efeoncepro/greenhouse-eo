@@ -1,0 +1,16 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/render-tazas.py:25: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world.use_nodes=True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/render-tazas.py:33: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name);m.use_nodes=True
+00:05.428  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/r2-blanco/01-frente.png'
+00:09.494  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/r2-blanco/02-tres-cuartos.png'
+00:13.374  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/r2-blanco/05-perfil.png'
+00:17.577  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/r2-blanco/06-reverso.png'
+00:21.261  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/r2-navy/01-frente.png'
+00:24.585  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/r2-navy/02-tres-cuartos.png'
+00:27.814  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/r2-navy/05-perfil.png'
+00:31.250  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/renders/r2-navy/06-reverso.png'
+RENDER_FINISHED
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

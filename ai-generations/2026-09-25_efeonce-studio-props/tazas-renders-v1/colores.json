@@ -1,0 +1,26 @@
+[
+  {
+    "id": "blanco",
+    "base": "#F7F8F6",
+    "ink": "#023C70",
+    "interior": "#0375DB"
+  },
+  {
+    "id": "azul",
+    "base": "#0375DB",
+    "ink": "#FFFFFF",
+    "interior": "#F7F8F6"
+  },
+  {
+    "id": "magenta",
+    "base": "#BB1954",
+    "ink": "#FFFFFF",
+    "interior": "#F7F8F6"
+  },
+  {
+    "id": "naranja",
+    "base": "#FF6500",
+    "ink": "#023C70",
+    "interior": "#F7F8F6"
+  }
+]

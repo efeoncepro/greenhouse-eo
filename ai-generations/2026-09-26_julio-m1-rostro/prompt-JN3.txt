@@ -1,0 +1,9 @@
+Image 1 is the original scene. Images 2 and 3 are identity references of the same real man (Julio).
+
+Edit image 1 and change ONLY the face of the man on the LEFT (linen shirt, navy trousers, laptop under his arm) so it is unmistakably the man in images 2 and 3: his real facial proportions (width of the face, jaw and cheekbones), eye shape and spacing, eyebrows, nose, mouth and lips, the shape, density and salt-and-pepper color of his full beard and moustache, his hairline and the texture and grey of his short curly hair, and his thin metal half-rim glasses as in image 2.
+
+Do NOT change the woman on the right in any way: her face, hair, expression, camel coat, black top, bag and pose stay exactly as in image 1.
+
+Keep EVERYTHING else from image 1 exactly as it is: his walking pose, the open-hand gesture, his smile toward her, the linen shirt, belt, watch and laptop, the street with jacaranda trees, the pink facade, the people in the background, the blurred foreground, the framing, the crop and the warm afternoon light. Do not change the size of any head.
+
+Photographic realism: a real photograph of real people, not a render. Skin shows irregular pores and fine facial hair with an even, healthy tone; no plastic smoothing, no beauty retouch. No new text, no logos.

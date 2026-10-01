@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.foto.isotipo.v1",
+  "plate": "MCB1b-45-portada-tres-pasos.png",
+  "salida": "MCB1b-isotipo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.3.5",
+  "archivo": "assets/efeonce-isotype-positive.svg",
+  "sha256": "e8204298df02608e0edd9717a17317a84239b5c6d63b4db31104babba1bcd4d2",
+  "prenda": "clara",
+  "caja": {
+    "centro": [
+      0.5908,
+      0.5469
+    ],
+    "ancho": 0.036,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": null,
+  "creado": "2026-09-28T13:33:34.504Z"
+}

@@ -1,0 +1,45 @@
+{
+  "document": "brochure",
+  "line": "engine",
+  "slides": [
+    {
+      "recipeId": "cover-brochure-line-engine",
+      "plateRef": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png"
+    },
+    {
+      "recipeId": "decision-ai-market"
+    },
+    {
+      "recipeId": "decision-ai-answer"
+    },
+    {
+      "recipeId": "content-text"
+    },
+    {
+      "recipeId": "proposal-cinematic-seo",
+      "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png"
+    },
+    {
+      "recipeId": "method-eeat"
+    },
+    {
+      "recipeId": "proposal-cinematic-aeo",
+      "plateRef": "ai-generations/2026-09-26_deck-aeo/plates/AE2b-la-ia-te-elige-isotipo.png"
+    },
+    {
+      "recipeId": "method-surround-cycle"
+    },
+    {
+      "recipeId": "content-day-live-results"
+    },
+    {
+      "recipeId": "decision-difference"
+    },
+    {
+      "recipeId": "decision-diagnosis-map"
+    },
+    {
+      "recipeId": "close-brochure-orbit"
+    }
+  ]
+}

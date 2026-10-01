@@ -1,0 +1,50 @@
+[
+  {
+    "align": "left",
+    "top": 0.045,
+    "textWidth": 0.84,
+    "label": null,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 31,
+    "leadGap": 0.1,
+    "dominantSize": 95,
+    "dominantMax": 0.84,
+    "dominantTracking": -0.03,
+    "after": "Identidad propia en cada canal.",
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.89,
+      "variant": "negative"
+    },
+    "cta": {
+      "variant": "outline",
+      "variantReason": "CTA delimitado para identificar la acción sin competir con el fotograma terminado.",
+      "radius": 12,
+      "text": "Conoce nuestro trabajo",
+      "descriptor": "Efeonce · Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 34,
+      "paddingX": 20,
+      "paddingY": 10,
+      "fontSize": 35,
+      "descriptorSize": 27,
+      "descriptorGap": 10,
+      "surfaceToken": "accentSurface",
+      "inkToken": "inkOnDark"
+    },
+    "safeArea": "axis",
+    "id": "C01-frase-completa-espacio-original",
+    "plate": "../plates/CMP004-C01-45-plate.png",
+    "lead": "Podrías tapar el logo.",
+    "dominant": "Seguiría siendo tu marca.",
+    "altText": "Tres pantallas reales muestran una familia visual azul y lima en soportes de tamaños distintos; una directora de arte sostiene el móvil.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 28,
+    "afterGap": 0.1,
+    "styleReason": "Experimento local de lectura semántica y proximidad: frase dominante completa, apoyo de servicio independiente y grupo de acción compacto. No cambia el comando ni aprueba el piloto."
+  }
+]

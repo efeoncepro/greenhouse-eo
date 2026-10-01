@@ -10,6 +10,17 @@ Guía operativa viva del harness compartido. Su implementación pertenece al rep
 SKY es el primer cliente habilitado, no el alcance completo del espacio. Todo el equipo puede
 trabajar para todas las marcas; cada ejecución tiene una sola identidad visual explícita.
 
+## Feedback visual pendiente: corregir en el próximo chat — 2026-10-01
+
+Leer primero [handoff de alineación](references/layout-feedback-handoff.md). El operador
+invalidó LEFT global de legales y señaló huecos/ejes en 03-2668, 01-2611 y 23-4685.
+Los pies legales indicados deben ir centrados, con alineación admitida por función/source pin;
+no inferir CENTER global para todos los textos. El código local 1.3.0 todavía aplica LEFT.
+Los 377 tests no prueban aceptación visual y el PDF v3 queda parcial/rechazado en esos aspectos.
+Este corte prepara un chat nuevo; no se corrigió código, regeneró arte ni publicó por documentarlo.
+Canon de la continuación: `docs/operations/sky-layout-feedback-handoff-2026-10-01.md`
+en el repo Workbench. Conservar resultados previos y WIP ajeno.
+
 ## Corte integrado y recorrido recomendado — 2026-10-01
 
 Workbench `main` integra componentes autónomos e identidad Git por PR15 (`2392758`) y
@@ -61,6 +72,7 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 | Diagnosticar un fallo o evitar repetir propuestas rechazadas | [lessons.md](references/lessons.md) |
 | Presupuesto persona/organización, aumentos del operador, CAS y recuperación sin pago | [budget.md](references/budget.md) |
 | Resolver comentarios del PR, gobierno, identidades, presupuesto y errores posreserva | [review-remediation.md](references/review-remediation.md) |
+| Retomar los detalles visuales pendientes: legales, huecos, badge/ejes, promoción | [layout-feedback-handoff.md](references/layout-feedback-handoff.md) |
 | Retomar, registrar progreso o actualizar esta skill | [state-continuity.md](references/state-continuity.md) |
 
 ## Invariantes de operación
@@ -117,3 +129,24 @@ La escena productiva usa componentes, tokens de propiedades y recetas; los agent
 componer campañas con copy/foto explícitos y revisar cada resultado. Esta disponibilidad de
 código no aprueba campañas nuevas, habilita pagos ni certifica acceso de cada integrante.
 Refrescar estado, rama y runtime antes de atribuir un rollout o una aprobación actuales.
+
+## Reglas de contenido SKY recibidas de la diseñadora — 2026-10-01
+
+Para producir nuevos KV, leer en Workbench
+`docs/architecture/workbench-sky-designer-content-rules.md`. La extensión local
+`sky-airline.content-layout.designer-rules@1.0.0` aplica por source pins el centrado de
+stickers y moneda, importes Metric Black, condiciones en estilo de oración, espaciado
+de destino/origen y pilas simples de tarifa con badge adaptativo y legal dentro de la flecha.
+`contentLayoutRecipe` aparece en el plan; `contentLayouts` y transformaciones de copy en QA.
+No reescribir geometría desde un job ni retocar PNGs. Pack y referencias históricas intactos.
+Esta extensión se verifica localmente; no equivale a merge, publicación del paquete ni deploy.
+
+La extensión local 1.1.0 fija condiciones compactas en una línea (el código 1.3.0 aplica LEFT, ahora pendiente de corregir por función/source pin), con tamaños 12/10/8 px según la variante admitida. Es una regla explícita por fuente, nunca autofit ni permiso para disminuir otros textos. Ver [componentes](references/components.md) y el contrato Workbench.
+
+La extensión local1.2.0 distingue titulares porcentuales en flecha de stickers. En seis fuentes SKY, conserva el eje izquierdo nativo de HASTA para todas las líneas del titular y las condiciones. No aplicar el centrado de sticker a bloques editoriales; ver contrato de contenido y [componentes](references/components.md).
+
+La implementación de [destinos y espacios adaptativos](references/destination-content-flow.md)
+selecciona perfiles Metric finitos en 95 fuentes y refluye por tinta. **La generalización de
+169 legales LEFT en1.3.0 fue invalidada por el feedback posterior**; sigue en el código y
+requiere corrección por función/source pin. Leer [handoff pendiente](references/layout-feedback-handoff.md)
+antes de continuar. No concede autofit a otros textos ni aceptación visual del documento v3.

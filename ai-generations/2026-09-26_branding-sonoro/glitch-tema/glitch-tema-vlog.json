@@ -1,0 +1,10 @@
+{
+ "version": "vlog",
+ "bpm": 150,
+ "preBars": 2,
+ "aperturaAt": 3.2,
+ "apple": 4.8,
+ "seAbre": 5.5,
+ "silence": 6.8,
+ "durationSec": 7.2
+}

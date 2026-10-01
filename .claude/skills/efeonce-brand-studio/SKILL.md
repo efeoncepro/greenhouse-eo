@@ -31,6 +31,67 @@ No produce identidad visual detallada, UI, motion, piezas, medios ni contenido d
 
 Para Efeonce, cargar primero `docs/context/00_INDEX.md`, `docs/context/09_marca-agencia.md`, `docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`, `docs/business-models/EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md` y `docs/services/README.md`. `efeonce-agency` sigue siendo el router de negocio; esta skill gobierna el trabajo de marca.
 
+## Diferenciador comercial: experimentar la capacidad antes de comprarla
+
+**Decisión del operador, 2026-09-30:** Efeonce incorpora como diferenciador de su experiencia comercial
+**hacer que el cliente experimente nuestra capacidad antes de comprarla**. Se materializa mediante
+**venta con demostración contextual**: entender una necesidad de la cuenta, mostrar una oportunidad
+con evidencia, construir una muestra pertinente y explicar cómo se ejecutaría y evaluaría el trabajo.
+Canon de marca: [`docs/context/09_marca-agencia.md`](../../../docs/context/09_marca-agencia.md).
+Método, casos y medición: [metodología comercial](../../../docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md).
+
+Es un mecanismo para vivir la marca durante la evaluación comercial. No reemplaza el Why, la categoría
+Integrated Growth Partner, el tagline ni la arquitectura de ofertas; tampoco crea una nueva submarca.
+El valor está en hacer evaluables el criterio, la calidad de ejecución y la forma de colaboración.
+Una muestra pertinente permite que el comprador formule mejores preguntas y comparta evidencia con
+su comité. Reducir incertidumbre es una **hipótesis de mecanismo**, no un efecto causal ya medido.
+
+### Mensaje y razones para creer
+
+- **Núcleo interno aprobado:** «Hacemos que el cliente experimente nuestra capacidad antes de comprarla».
+- **Traducción al comprador:** «Preparamos una muestra para tu negocio para que puedas evaluar cómo
+  pensamos, qué calidad de trabajo entregamos y cómo lo implementaríamos contigo».
+- **Prueba que acompaña el mensaje:** un hallazgo trazable, una muestra identificada como demo y una
+  explicación de decisiones, condiciones de implementación y medición. En una oportunidad real,
+  adaptar el tiempo verbal al estado: «preparamos» requiere una muestra existente y revisada;
+  una propuesta de producirla se expresa como tal.
+- **Límite de atribución:** Berel es aprendizaje declarado por el operador; SKY es un caso adjudicado
+  en cuyo éxito el operador identifica la milla extra como factor; Pichincha es una aplicación abierta.
+  Consultar los expedientes fechados antes de usar estados. No atribuir un cierre exclusivamente a la
+  muestra ni presentar Pichincha como cliente ganado. Usar nombres, material y testimonios públicos
+  sólo cuando exista autorización; una referencia interna no autoriza su publicación.
+
+No comunicar «somos los únicos», «ganamos por dar la milla extra» o «garantizamos resultados».
+Diferenciador de Efeonce significa una conducta que elegimos sostener; no prueba exclusividad frente a
+competidores. No presentar este mecanismo como win rate, mayor revenue o menor ciclo sin medición.
+
+### Aplicación en la experiencia de marca
+
+1. Identificar qué necesita evaluar el comprador: comprensión de su negocio, criterio, ejecución,
+   implementación o continuidad. Elegir una incertidumbre antes de elegir un formato.
+2. Conectar oportunidad, muestra y explicación de trabajo; el comprador debe poder reconocer su
+   contexto y comprender por qué se eligió esa solución. Personalizar sólo el logo no demuestra esto.
+3. Distinguir diagnóstico observado, contenido ilustrativo, propuesta y desempeño medido. Una
+   animación de respuesta de IA no es evidencia de una citación real; una muestra de Insights no
+   son resultados del prospecto.
+4. Crear un recorrido breve y compartible para la reunión y su comité: qué vemos, qué proponemos,
+   por qué y qué debemos validar juntos. Evaluar si cada elemento facilita una decisión.
+5. Mantener continuidad entre demo, propuesta y servicio: aclarar qué muestra la capacidad y qué
+   entregables, revisiones, publicación y condiciones se contratan. La demo no obliga a producir o
+   implementar gratuitamente; fijar inversión de preventa proporcional desde el método comercial.
+6. Recoger feedback específico y el siguiente paso bilateral. Separar aprobación visual, interés,
+   intención de compra y contratación; una reunión o un cambio de stage no acredita las cuatro.
+
+X-Ray, Efeonce AI Visibility Report, Notion, piezas y Efeonce Insights son vehículos posibles.
+La metodología precede a esos vehículos y puede aplicarse a otras prácticas con una muestra adecuada.
+Esta skill gobierna mensaje, coherencia y prueba de marca; `efeonce-agency` y los modelos comerciales
+rutean calificación y alcance, y las skills de oficio producen y verifican cada artefacto.
+
+**Gate de marca:** antes de llamar diferenciadora a una demo, comprobar contexto real, criterio visible,
+calidad revisada, límites explícitos y utilidad para decidir. Medir feedback, objeciones resueltas,
+avance bilateral y costo de preventa junto al resultado comercial. Un acabado premium por sí solo
+no demuestra comprensión del negocio, ventaja competitiva ni brand equity.
+
 ## Modos de operación
 
 ### Efeonce Brand Governance
@@ -115,6 +176,11 @@ Leer solo lo necesario:
 
 Usar las plantillas de `templates/` cuando el usuario necesite un artefacto formal. Ejecutar `scripts/validate-brand-artifact.py` antes de cerrar entregables estructurados.
 
+## Dónde viven los archivos de `ai-generations/`
+
+Las rutas `ai-generations/…` de esta skill son lógicas. **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json` o citado por recetas de deck y `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: identidades, prendas, logo 3D, mascotas y Sparks sellados (`pnpm creative:assets:publish`). **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes.
+Si falta en disco: `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer. **NUNCA** regenerar, sustituir ni aproximar un asset aprobado, resellar el lock para taparlo ni archivar o borrar a mano; promover exploración = sellarla o citarla en la receta + publicar a canon. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ## Activación cultural y social
 
 Para seasonality, trendjacking, memes o marca integrada en piezas, `social-media-studio` conserva el
@@ -176,11 +242,6 @@ Kortex y Verk, fuera por ahora. Operar con
 - **Firma de una pieza gráfica** (operador, 2026-09-26): **logo de Efeonce centrado abajo**, sin URL. La burbuja
   `efeoncepro.com` **no se agrega por defecto**: sólo **reemplaza** al logo cuando el logo ya aparece dentro de la
   imagen (mockup, objeto, merch), centrada, sola, con fusión de luminosidad a opacidad 1 y ≥ 4,5:1 medido (sólo pasa
-## Dónde viven los archivos de `ai-generations/`
-
-Las rutas `ai-generations/…` de esta skill son lógicas. **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json` o citado por recetas de deck y `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: identidades, prendas, logo 3D, mascotas y Sparks sellados (`pnpm creative:assets:publish`). **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes.
-Si falta en disco: `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer. **NUNCA** regenerar, sustituir ni aproximar un asset aprobado, resellar el lock para taparlo ni archivar o borrar a mano; promover exploración = sellarla o citarla en la receta + publicar a canon. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
-
   sobre lechos muy oscuros). Nunca a un costado ni junto al logo. Como pie de deck, informe, papelería o mail sigue
   como antes (horneada donde no hay fusión). Umbral 4,5 vs 3:1: pendiente del operador.
 - **Firma de correo v3.1** (aprobada por el operador, 2026-09-26): versiones A papel y B tarjeta navy, sin decisión

@@ -1,6 +1,6 @@
 ---
 name: efeonce-agency
-description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la agencia) para que toda feature/decisión de Greenhouse apunte en la dirección del negocio. Invocar ANTES de proponer, priorizar o construir cualquier cosa que toque producto, UX/copy visible, naming, métricas, ICO, HubSpot/Account 360, Salesforce, onboarding/experiencia de cliente, GTM, marca, switching cost, tiers/ASaaS, Creative Studio/Studio Credits o estrategia comercial. Triggers léxicos — Efeonce, agencia, North Star, switching cost, Revenue Enabled, ASaaS, ICO, Loop Marketing, GTM, ICP, buyer persona, JTBD, HubSpot, Salesforce CRM, Marketing Cloud Engagement, Marketing Cloud Next, Kortex, Verk, Creative Studio, Studio Credits, Globe Credits, Managed Squad, Staff Augmentation, Studio Access, Nexa, Pulse, Bow-tie, NRR, cross-sell, "vale la pena esta feature", "a qué tier pertenece", voz/tono, glosario de métricas, RpA/OTD/FTR naming, casos (Sky/Bresler/Berel/SSilva), Globe/Reach/Wave, marca/branding del portal.
+description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la agencia) para que toda feature/decisión de Greenhouse apunte en la dirección del negocio. Invocar ANTES de proponer, priorizar o construir cualquier cosa que toque producto, UX/copy visible, naming, métricas, ICO, HubSpot/Account 360, Salesforce, onboarding/experiencia de cliente, GTM, marca, switching cost, tiers/ASaaS, Creative Studio/Studio Credits o estrategia comercial y venta con demostración contextual. Triggers léxicos — Efeonce, agencia, North Star, switching cost, Revenue Enabled, ASaaS, ICO, Loop Marketing, GTM, ICP, buyer persona, JTBD, HubSpot, Salesforce CRM, Marketing Cloud Engagement, Marketing Cloud Next, Kortex, Verk, Creative Studio, Studio Credits, Globe Credits, Managed Squad, Staff Augmentation, Studio Access, Nexa, Pulse, Bow-tie, NRR, cross-sell, "vale la pena esta feature", "a qué tier pertenece", voz/tono, glosario de métricas, RpA/OTD/FTR naming, casos (Sky/Bresler/Berel/SSilva), Globe/Reach/Wave, marca/branding del portal.
 ---
 
 # Efeonce Agency — Contexto de negocio para construir Greenhouse
@@ -71,6 +71,43 @@ El crecimiento no se entrega: se **co-construye**. Tres pilares (una creencia):
 **El Why como VISIÓN DE PRODUCTO (la frontera a alcanzar).** El Why no es solo copy de marca: es el **norte del producto Greenhouse**. Hoy el producto cumple bien la cara de *ver* (transparencia ~90%), pero las caras de **co-crear** (el cliente *actúa*: aprueba/pide/brifea — hoy el portal cliente es casi todo `.read`, gap #1 self-service ~55%; la aprobación de entregables aún vive fuera, en Frame.io/Notion/email) y **educar** (hacer al cliente *más capaz*: Nexa Insights cerrado al tenant externo, Nexa como Q&A con flags coach default-OFF, cero señal de capacidad longitudinal del cliente) están **sin construir para el cliente**. Cerrarlas = que el Why se **viva**, no solo se declare. **Al priorizar features, esta es la dirección de producto:** acercar al cliente a *actuar* y *volverse más capaz* dentro del portal, no solo a mirar. Programa: **EPIC-025** (`docs/epics/to-do/EPIC-025-vivir-el-why-cocreacion-educacion-cliente.md`) — epic de *extensión* (reusa la plantilla del AEO run gobernado TASK-1277 + Nexa Insights; Full API Parity), no de invención.
 
 **El Why como DIFERENCIADOR DE MERCADO GLOBAL.** La ambición es **LATAM-first, no LATAM-limited**: construir una agencia grande y reconocida en toda Latinoamérica desde el inicio, con operación ya iniciada en Estados Unidos y proyección hacia otros mercados internacionales (cobertura vigente: `docs/context/01_quienes-somos.md`). El diferencial defendible no es "co-creación" como claim ni "AI agency" como moda; es **co-creación convertida en software, método, datos y memoria acumulada**. Categoría: **Growth Operating System / ASaaS**. Frase interna: *Efeonce es un sistema operativo de crecimiento: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación.* En inglés: *Efeonce is a Growth Operating System for ambitious brands: strategy, creative, media, data and proprietary software working as one system.* Decisión pública: `docs/public-site/decisions/PDR-012-growth-operating-system-global-positioning.md`.
+
+### Diferenciador comercial: experimentar la capacidad antes de comprarla
+
+**Diferenciador reconocido por el operador el 2026-09-30:** hacer que el cliente experimente nuestra
+capacidad antes de comprarla. Se ejecuta mediante la **venta con demostración contextual**: una muestra
+pertinente para su negocio que permite evaluar comprensión, criterio, ejecución y forma de trabajo.
+Es un mecanismo comercial del posicionamiento de Efeonce; no una nueva categoría, product brand ni
+oferta. Conserva el marco del context pack: Integrated Growth Partner, ASaaS y la visión Growth
+Operating System.
+
+El canon del método es [EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md](../../../docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md).
+La formulación del diferenciador está aprobada por el operador; la intensidad, presupuestos y medición
+del método siguen en sistematización. No convertirlos en una política obligatoria para cada prospecto.
+
+**Al preparar una venta, propuesta, licitación o expansión:**
+
+1. Identifica una incertidumbre del comprador, la necesidad observable y la próxima conversación.
+   Formula qué podrá evaluar con la muestra y fija un esfuerzo de preventa proporcional a la cuenta.
+2. Une **oportunidad + criterio + ejecución + operación**: un hallazgo trazable, una respuesta concreta,
+   la explicación de sus decisiones y una muestra de cómo revisaremos y mediremos el trabajo. Una
+   pieza representativa puede bastar; cada ampliación debe resolver una duda del comprador.
+3. Elige el vehículo según el job y el decisor. X-Ray, informe de visibilidad de IA, Insights, Notion,
+   prototipo, artículo o video son herramientas del método; ninguna es requisito universal. El método
+   precede a las herramientas: no reducirlo a un tour de plataformas o a producción gratuita.
+4. Entrega una guía breve y usa la reunión para validar prioridad, pertinencia, participantes y proceso
+   de decisión. Traduce el feedback a un alcance y un siguiente paso bilateral con responsable y fecha.
+5. Conserva tesis, versión, entrega efectiva, costo, feedback y resultado en el expediente de la cuenta.
+   Reutiliza componentes y aprendizaje; mantén privados los datos y materiales de otros clientes.
+
+**Evidencia y límites:** Berel es un aprendizaje comercial relatado por el operador (Notion, artículo,
+banners y video antes de X-Ray); SKY es una licitación ganada acompañada por X-Ray, informe de
+visibilidad de IA y propuesta, con otros factores de éxito; Banco Pichincha es la aplicación actual,
+con oportunidad abierta al corte. Consultar sus expedientes para estado vigente. No afirmar causalidad,
+uplift de conversión ni éxito de Pichincha sin evidencia. Demos, datos ilustrativos, alcance propuesto y
+resultados medidos deben distinguirse; no prometer ventas, posicionamiento ni desempeño por enseñar
+una muestra. La demo tampoco crea compromisos de implementación, publicación o revisión ilimitada.
+En licitación se respetan bases y canales; preparar material no autoriza enviarlo ni modificar el CRM.
 
 **El Why como CULTURA OPERATIVA.** El contrato interno vive en `docs/operations/EFEONCE_OPERATING_CODE_V1.md`: en Efeonce se valora a quien deja al cliente más capaz, deja el sistema con más memoria y conecta su trabajo con crecimiento real. Usarlo para hiring, onboarding, performance reviews, rituales de proyecto y coaching de equipo. People/Talent aplica el detalle con `greenhouse-talent-people-operator`.
 
@@ -215,6 +252,7 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 | Trabajar un módulo de Greenhouse | `04_greenhouse-producto` |
 | Entender cómo Greenhouse conversa con Kortex/Verk/Creative Studio/HubSpot | `03_ecosistema-producto` |
 | Priorizar features con justificación comercial (cuentas, cross-sell, Pulse) | `08_estrategia-comercial` |
+| Preparar demostración contextual, milla extra o evidencia para una venta | `08_estrategia-comercial` + `09_marca-agencia` + `docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md`; skill de la práctica que ejecuta la muestra |
 | Cuidar marca/branding en el portal (Ecosystem Tour, onboarding, naming) | `09_marca-agencia` |
 | Definir Content Engineering como territorio, método u oferta | `09_marca-agencia` + `docs/public-site/decisions/PDR-017-content-engineering-territorio-editorial.md` + skill `content-marketing-studio` |
 | Diseñar la experiencia/onboarding del cliente | `10_experiencia-cliente` |

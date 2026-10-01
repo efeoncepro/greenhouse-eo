@@ -1,0 +1,245 @@
+{
+  "status": "design-reference-prototype",
+  "views": [
+    {
+      "object": "agenda-navy",
+      "view": "01-frente",
+      "white": "references/agenda-navy/01-frente.png",
+      "alpha": "references-transparent/agenda-navy/01-frente.png"
+    },
+    {
+      "object": "agenda-navy",
+      "view": "02-tres-cuartos",
+      "white": "references/agenda-navy/02-tres-cuartos.png",
+      "alpha": "references-transparent/agenda-navy/02-tres-cuartos.png"
+    },
+    {
+      "object": "agenda-navy",
+      "view": "03-perfil",
+      "white": "references/agenda-navy/03-perfil.png",
+      "alpha": "references-transparent/agenda-navy/03-perfil.png"
+    },
+    {
+      "object": "agenda-navy",
+      "view": "04-reverso",
+      "white": "references/agenda-navy/04-reverso.png",
+      "alpha": "references-transparent/agenda-navy/04-reverso.png"
+    },
+    {
+      "object": "bandeja-tecnica",
+      "view": "01-frente",
+      "white": "references/bandeja-tecnica/01-frente.png",
+      "alpha": "references-transparent/bandeja-tecnica/01-frente.png"
+    },
+    {
+      "object": "bandeja-tecnica",
+      "view": "02-tres-cuartos",
+      "white": "references/bandeja-tecnica/02-tres-cuartos.png",
+      "alpha": "references-transparent/bandeja-tecnica/02-tres-cuartos.png"
+    },
+    {
+      "object": "bandeja-tecnica",
+      "view": "03-perfil",
+      "white": "references/bandeja-tecnica/03-perfil.png",
+      "alpha": "references-transparent/bandeja-tecnica/03-perfil.png"
+    },
+    {
+      "object": "bandeja-tecnica",
+      "view": "04-cenital",
+      "white": "references/bandeja-tecnica/04-cenital.png",
+      "alpha": "references-transparent/bandeja-tecnica/04-cenital.png"
+    },
+    {
+      "object": "lapicero-navy",
+      "view": "01-frente",
+      "white": "references/lapicero-navy/01-frente.png",
+      "alpha": "references-transparent/lapicero-navy/01-frente.png"
+    },
+    {
+      "object": "lapicero-navy",
+      "view": "02-tres-cuartos",
+      "white": "references/lapicero-navy/02-tres-cuartos.png",
+      "alpha": "references-transparent/lapicero-navy/02-tres-cuartos.png"
+    },
+    {
+      "object": "lapicero-navy",
+      "view": "03-perfil",
+      "white": "references/lapicero-navy/03-perfil.png",
+      "alpha": "references-transparent/lapicero-navy/03-perfil.png"
+    },
+    {
+      "object": "lapicero-navy",
+      "view": "04-cenital",
+      "white": "references/lapicero-navy/04-cenital.png",
+      "alpha": "references-transparent/lapicero-navy/04-cenital.png"
+    },
+    {
+      "object": "laptop-stickers",
+      "view": "01-frente",
+      "white": "references/laptop-stickers/01-frente.png",
+      "alpha": "references-transparent/laptop-stickers/01-frente.png"
+    },
+    {
+      "object": "laptop-stickers",
+      "view": "02-tres-cuartos",
+      "white": "references/laptop-stickers/02-tres-cuartos.png",
+      "alpha": "references-transparent/laptop-stickers/02-tres-cuartos.png"
+    },
+    {
+      "object": "laptop-stickers",
+      "view": "03-perfil",
+      "white": "references/laptop-stickers/03-perfil.png",
+      "alpha": "references-transparent/laptop-stickers/03-perfil.png"
+    },
+    {
+      "object": "laptop-stickers",
+      "view": "04-cenital",
+      "white": "references/laptop-stickers/04-cenital.png",
+      "alpha": "references-transparent/laptop-stickers/04-cenital.png"
+    },
+    {
+      "object": "mug-azul-efeonce",
+      "view": "01-frente",
+      "white": "references/mug-azul-efeonce/01-frente.png",
+      "alpha": "references-transparent/mug-azul-efeonce/01-frente.png"
+    },
+    {
+      "object": "mug-azul-efeonce",
+      "view": "02-tres-cuartos",
+      "white": "references/mug-azul-efeonce/02-tres-cuartos.png",
+      "alpha": "references-transparent/mug-azul-efeonce/02-tres-cuartos.png"
+    },
+    {
+      "object": "mug-azul-efeonce",
+      "view": "03-perfil",
+      "white": "references/mug-azul-efeonce/03-perfil.png",
+      "alpha": "references-transparent/mug-azul-efeonce/03-perfil.png"
+    },
+    {
+      "object": "mug-azul-efeonce",
+      "view": "04-reverso",
+      "white": "references/mug-azul-efeonce/04-reverso.png",
+      "alpha": "references-transparent/mug-azul-efeonce/04-reverso.png"
+    },
+    {
+      "object": "mug-azul-efeonce",
+      "view": "05-cenital",
+      "white": "references/mug-azul-efeonce/05-cenital.png",
+      "alpha": "references-transparent/mug-azul-efeonce/05-cenital.png"
+    },
+    {
+      "object": "mug-blanco",
+      "view": "01-frente",
+      "white": "references/mug-blanco/01-frente.png",
+      "alpha": "references-transparent/mug-blanco/01-frente.png"
+    },
+    {
+      "object": "mug-blanco",
+      "view": "02-tres-cuartos",
+      "white": "references/mug-blanco/02-tres-cuartos.png",
+      "alpha": "references-transparent/mug-blanco/02-tres-cuartos.png"
+    },
+    {
+      "object": "mug-blanco",
+      "view": "03-perfil",
+      "white": "references/mug-blanco/03-perfil.png",
+      "alpha": "references-transparent/mug-blanco/03-perfil.png"
+    },
+    {
+      "object": "mug-blanco",
+      "view": "04-reverso",
+      "white": "references/mug-blanco/04-reverso.png",
+      "alpha": "references-transparent/mug-blanco/04-reverso.png"
+    },
+    {
+      "object": "mug-blanco",
+      "view": "05-cenital",
+      "white": "references/mug-blanco/05-cenital.png",
+      "alpha": "references-transparent/mug-blanco/05-cenital.png"
+    },
+    {
+      "object": "mug-magenta-globe",
+      "view": "01-frente",
+      "white": "references/mug-magenta-globe/01-frente.png",
+      "alpha": "references-transparent/mug-magenta-globe/01-frente.png"
+    },
+    {
+      "object": "mug-magenta-globe",
+      "view": "02-tres-cuartos",
+      "white": "references/mug-magenta-globe/02-tres-cuartos.png",
+      "alpha": "references-transparent/mug-magenta-globe/02-tres-cuartos.png"
+    },
+    {
+      "object": "mug-magenta-globe",
+      "view": "03-perfil",
+      "white": "references/mug-magenta-globe/03-perfil.png",
+      "alpha": "references-transparent/mug-magenta-globe/03-perfil.png"
+    },
+    {
+      "object": "mug-magenta-globe",
+      "view": "04-reverso",
+      "white": "references/mug-magenta-globe/04-reverso.png",
+      "alpha": "references-transparent/mug-magenta-globe/04-reverso.png"
+    },
+    {
+      "object": "mug-magenta-globe",
+      "view": "05-cenital",
+      "white": "references/mug-magenta-globe/05-cenital.png",
+      "alpha": "references-transparent/mug-magenta-globe/05-cenital.png"
+    },
+    {
+      "object": "mug-naranja-globe",
+      "view": "01-frente",
+      "white": "references/mug-naranja-globe/01-frente.png",
+      "alpha": "references-transparent/mug-naranja-globe/01-frente.png"
+    },
+    {
+      "object": "mug-naranja-globe",
+      "view": "02-tres-cuartos",
+      "white": "references/mug-naranja-globe/02-tres-cuartos.png",
+      "alpha": "references-transparent/mug-naranja-globe/02-tres-cuartos.png"
+    },
+    {
+      "object": "mug-naranja-globe",
+      "view": "03-perfil",
+      "white": "references/mug-naranja-globe/03-perfil.png",
+      "alpha": "references-transparent/mug-naranja-globe/03-perfil.png"
+    },
+    {
+      "object": "mug-naranja-globe",
+      "view": "04-reverso",
+      "white": "references/mug-naranja-globe/04-reverso.png",
+      "alpha": "references-transparent/mug-naranja-globe/04-reverso.png"
+    },
+    {
+      "object": "mug-naranja-globe",
+      "view": "05-cenital",
+      "white": "references/mug-naranja-globe/05-cenital.png",
+      "alpha": "references-transparent/mug-naranja-globe/05-cenital.png"
+    },
+    {
+      "object": "pizarra-acrilica",
+      "view": "01-frente",
+      "white": "references/pizarra-acrilica/01-frente.png",
+      "alpha": "references-transparent/pizarra-acrilica/01-frente.png"
+    },
+    {
+      "object": "pizarra-acrilica",
+      "view": "02-tres-cuartos",
+      "white": "references/pizarra-acrilica/02-tres-cuartos.png",
+      "alpha": "references-transparent/pizarra-acrilica/02-tres-cuartos.png"
+    },
+    {
+      "object": "pizarra-acrilica",
+      "view": "03-perfil",
+      "white": "references/pizarra-acrilica/03-perfil.png",
+      "alpha": "references-transparent/pizarra-acrilica/03-perfil.png"
+    },
+    {
+      "object": "pizarra-acrilica",
+      "view": "04-reverso",
+      "white": "references/pizarra-acrilica/04-reverso.png",
+      "alpha": "references-transparent/pizarra-acrilica/04-reverso.png"
+    }
+  ]
+}

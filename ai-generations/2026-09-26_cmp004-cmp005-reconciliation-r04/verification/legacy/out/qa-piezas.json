@@ -1,0 +1,1050 @@
+[
+  {
+    "id": "CMP004-C01-KV-45-R03",
+    "canon": "2026-09-23",
+    "firmaCanto": 7.66,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Sigue siendo tuya."
+    ],
+    "ratioDominanteEntrada": 3.7,
+    "contraste": {
+      "entrada": 12.13,
+      "dominante": 11.94,
+      "cierre-frase": 12.13,
+      "cta": 12.4,
+      "descriptor": 12.7,
+      "logo": 15.21
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 12,
+        "ratioDominante": 0.103
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 12,
+        "ratioDominante": 0.103
+      }
+    ],
+    "seleccion": null,
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Sin el logo?"
+      ],
+      "cierre": [
+        "Branding para cada punto de contacto."
+      ],
+      "cta": [
+        "Hablemos de tu marca"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "entrada": {
+          "cssPx": 10.8,
+          "grande": false,
+          "wcag": 12.13,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -101.3,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 11.89,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1208,
+            "caja": [
+              97,
+              84,
+              285,
+              117
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 40.3,
+          "grande": true,
+          "wcag": 11.94,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -100.9,
+          "umbralApca": 45,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 11.47,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 31727,
+            "caja": [
+              97,
+              128,
+              779,
+              228
+            ]
+          }
+        },
+        "cierre-frase": {
+          "cssPx": 10.1,
+          "grande": false,
+          "wcag": 12.13,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -101.3,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 11.94,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3330,
+            "caja": [
+              97,
+              239,
+              672,
+              269
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 12.2,
+          "grande": false,
+          "wcag": 12.4,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -101.7,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 12.45,
+            "deutan": 12.44,
+            "tritan": 12.41
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 12.15,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 4743,
+            "caja": [
+              119,
+              316,
+              526,
+              344
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 4.2,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 3.15,
+            "deutan": 4.9,
+            "tritan": 3.54
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 3.61,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.04
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.4,
+          "grande": false,
+          "wcag": 12.7,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -102.1,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 12.34,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1295,
+            "caja": [
+              97,
+              378,
+              325,
+              407
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Identidad reconocible en diferentes experiencias digitales, ilustrada mediante una exploración de marca ficticia. Texto en la imagen: «¿Sin el logo?» «Sigue siendo tuya.» «Branding para cada punto de contacto.» Llamado a la acción: «Hablemos de tu marca» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "2bb90a39cf1b4f88c23ce524ad25242680fa728a4b5d51a37fa488cec80022e9",
+      "cobertura": 0.1042
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.9001,
+      "trazo": {
+        "wcag": 16.19,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      }
+    },
+    "huellas": {
+      "pieza": "fc35e513663da259a93211887639803f129ca9cb055e9b5a65029ecd4f0ddd84",
+      "plate": "48387d667a3789d2e216c1679b8b82cba67e8cfbbaa758a47853e94103c4af1e",
+      "compositor": "19195283d72c3407cfde566c389a8c86099fb24bb39de23f80cde2bd6d54c6db",
+      "png": "e9e24880af66f59c6e433b9fd036f6f9103f01fd8943daec59eeaf73af32a5da",
+      "layout": "e64e1c570814fc06893b18a5899b532b12df7d38f0b8ba0ec65686363776536d",
+      "alt": "fdcaceab14b69292fa4560efff70ca3dfd1d17fa2eaa0ab13683d2b0c4a8cc4a"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Branding: la acción propone conversar sobre la marca que el titular invita a reconocer. El naranja retoma el signo del sistema de identidad; la selección con controles convierte el CTA en parte del lenguaje de diseño.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-C04-KV-45-R03",
+    "canon": "2026-09-23",
+    "firmaCanto": 4.55,
+    "marcaEnEscena": false,
+    "dominante": [
+      "El mismo criterio."
+    ],
+    "ratioDominanteEntrada": 3.7,
+    "contraste": {
+      "entrada": 7.86,
+      "dominante": 7.91,
+      "cierre-frase": 7.68,
+      "cta": 5.76,
+      "descriptor": 7.27,
+      "logo": 17.58
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 12,
+        "ratioDominante": 0.103
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 12,
+        "ratioDominante": 0.103
+      }
+    ],
+    "seleccion": null,
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Más entregas?"
+      ],
+      "cierre": [
+        "Design Ops, IA y dirección humana."
+      ],
+      "cta": [
+        "Escala tu producción"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "entrada": {
+          "cssPx": 10.8,
+          "grande": false,
+          "wcag": 7.86,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -92,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 7.68,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1662,
+            "caja": [
+              119,
+              84,
+              361,
+              117
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 40.3,
+          "grande": true,
+          "wcag": 7.91,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -92.2,
+          "umbralApca": 45,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 7.53,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 28822,
+            "caja": [
+              119,
+              128,
+              759,
+              213
+            ]
+          }
+        },
+        "cierre-frase": {
+          "cssPx": 10.1,
+          "grande": false,
+          "wcag": 7.68,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -91.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 7.46,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2873,
+            "caja": [
+              119,
+              224,
+              626,
+              255
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 12.2,
+          "grande": false,
+          "wcag": 5.76,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -71.8,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 5.88,
+            "deutan": 5.66,
+            "tritan": 5.8
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 5.44,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 4406,
+            "caja": [
+              119,
+              302,
+              493,
+              342
+            ]
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.4,
+          "grande": false,
+          "wcag": 7.28,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -90.2,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 6.81,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1284,
+            "caja": [
+              119,
+              377,
+              347,
+              406
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Producción creativa consistente entre formatos con revisión humana; nunca automatización sin criterio. Texto en la imagen: «¿Más entregas?» «El mismo criterio.» «Design Ops, IA y dirección humana.» Llamado a la acción: «Escala tu producción» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "60c2cadae57eefe9c232750994dcf77942624a9def88be31df0fbe4a02cd840c",
+      "cobertura": 0.2266
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.9001,
+      "trazo": {
+        "wcag": 17.69,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      }
+    },
+    "huellas": {
+      "pieza": "e5e2062667a8a16adbd3796603bf5733e81ab0a9ce952868c3edbe4bd2d69fa3",
+      "plate": "6fe143d54855a4ba531dd77b8df581944f9734850e78135b858d54821fa41371",
+      "compositor": "19195283d72c3407cfde566c389a8c86099fb24bb39de23f80cde2bd6d54c6db",
+      "png": "d5ecb080a838cad47eaff5f6d9b15fa639c49e28edd657d584afea6cee68f846",
+      "layout": "83ec37ec7ab981a251b85b15336b46a74707a70d5a3c718f985653caad1db97c",
+      "alt": "faef5544411b5c04c2658a94c2ff8a33195a0d94c1b1612d1eff4dcc78f92f6e"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "system-cool-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "text",
+      "reason": "Escala: la acción lleva directamente de más entregas con el mismo criterio a escalar producción. Azul claro conectado con la familia digital; una sola caja de selección AXIS comunica el sistema y la intervención humana.",
+      "treatmentReason": "Texto azul claro relacionado con el sistema digital; bounding box y cursor aportan la gramática de selección sin otro rectángulo de botón.",
+      "roles": {
+        "ink": {
+          "token": "softOnDark",
+          "value": "#cfe4fa"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP005-S01-KV-45-R01",
+    "canon": "2026-09-23",
+    "firmaCanto": 1.25,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Falta una pregunta."
+    ],
+    "ratioDominanteEntrada": 3.7,
+    "contraste": {
+      "entrada": 13.32,
+      "dominante": 13.16,
+      "cierre-frase": 13.57,
+      "cta": 13.94,
+      "descriptor": 14.19,
+      "logo": 18.08
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 12,
+        "ratioDominante": 0.103
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 12,
+        "ratioDominante": 0.103
+      }
+    ],
+    "seleccion": null,
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Todo en verde?"
+      ],
+      "cierre": [
+        "Del dato a la decisión de negocio."
+      ],
+      "cta": [
+        "Revisemos tu estrategia"
+      ],
+      "descriptor": [
+        "Agencia estratégica"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "entrada": {
+          "cssPx": 10.8,
+          "grande": false,
+          "wcag": 13.32,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -102.9,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 13.02,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1534,
+            "caja": [
+              97,
+              84,
+              349,
+              112
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 40.3,
+          "grande": true,
+          "wcag": 13.16,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -102.7,
+          "umbralApca": 45,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 12.82,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 32349,
+            "caja": [
+              97,
+              123,
+              807,
+              221
+            ]
+          }
+        },
+        "cierre-frase": {
+          "cssPx": 10.1,
+          "grande": false,
+          "wcag": 13.57,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -103.2,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 13.24,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2833,
+            "caja": [
+              97,
+              232,
+              585,
+              264
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 12.2,
+          "grande": false,
+          "wcag": 13.94,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -103.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 13.95,
+            "deutan": 13.95,
+            "tritan": 13.92
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 13.73,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 5231,
+            "caja": [
+              119,
+              311,
+              553,
+              349
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 4.67,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 3.48,
+            "deutan": 5.43,
+            "tritan": 3.94
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 4.14,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.04
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.4,
+          "grande": false,
+          "wcag": 14.19,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -103.9,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 14.2,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1654,
+            "caja": [
+              97,
+              384,
+              369,
+              413
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "El diagnóstico contrasta un resumen de métricas con una fricción concreta del cliente. Escena ilustrativa, sin cifras ni caso atribuido. Texto en la imagen: «¿Todo en verde?» «Falta una pregunta.» «Del dato a la decisión de negocio.» Llamado a la acción: «Revisemos tu estrategia» Agencia estratégica Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "392c2964bf2ac8be0c53176e4f5e3f2d13aacf67fd12e5a2ba9d054771b0610c",
+      "cobertura": 0.1669
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.9001,
+      "trazo": {
+        "wcag": 18.08,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      }
+    },
+    "huellas": {
+      "pieza": "1e0cf98d0c95ec7cd99ae0787b15c0a986c3db8d0f9e8b484ccb752ddefa4f54",
+      "plate": "aefde1ee01948b78337ed3832dc6c31534c0bc396c8de6613bc5d7ef2e7e26f3",
+      "compositor": "19195283d72c3407cfde566c389a8c86099fb24bb39de23f80cde2bd6d54c6db",
+      "png": "554860236fdd6deb56a3169d9745a842db0a164b0e337f32576f94bdb0cdf734",
+      "layout": "7c3e8046feb4841f0f29a7d646008f98ad8ee43c502da9959e6f7699577cab0c",
+      "alt": "d031253a60ad69cd1d48a90029654fac96f76976d7f3084d256f82a9f5a02801"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-005-pilots-color-v2",
+      "campaignId": "CMP-005",
+      "sha256": "e99af71dcd7fac343323c3ca2d2c21314528f2eff45a08119e4ef9140304afb6",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Diagnóstico: la acción invita a revisar la estrategia tras descubrir una pregunta ausente. El naranja relaciona el siguiente paso con la fricción que señala la mano; la selección AXIS evita el botón blanco genérico.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP005-S02-KV-45-R01",
+    "canon": "2026-09-23",
+    "firmaCanto": 1.98,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Primero, decidir."
+    ],
+    "ratioDominanteEntrada": 3.7,
+    "contraste": {
+      "entrada": 7.6,
+      "dominante": 8.05,
+      "cierre-frase": 8.46,
+      "cta": 7.17,
+      "descriptor": 10.36,
+      "logo": 18.7
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 12,
+        "ratioDominante": 0.103
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 12,
+        "ratioDominante": 0.103
+      }
+    ],
+    "seleccion": null,
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Lanzarlo todo?"
+      ],
+      "cierre": [
+        "Prioridades claras antes de invertir."
+      ],
+      "cta": [
+        "Definamos el siguiente paso"
+      ],
+      "descriptor": [
+        "Agencia estratégica"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "entrada": {
+          "cssPx": 10.8,
+          "grande": false,
+          "wcag": 7.6,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -91.2,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 7.4,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1477,
+            "caja": [
+              119,
+              84,
+              358,
+              112
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 40.3,
+          "grande": true,
+          "wcag": 8.05,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -92.6,
+          "umbralApca": 45,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 7.88,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 27842,
+            "caja": [
+              119,
+              123,
+              714,
+              221
+            ]
+          }
+        },
+        "cierre-frase": {
+          "cssPx": 10.1,
+          "grande": false,
+          "wcag": 8.46,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -93.7,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 8,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2957,
+            "caja": [
+              119,
+              232,
+              625,
+              255
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 12.2,
+          "grande": false,
+          "wcag": 7.17,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -76.8,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 7.43,
+            "deutan": 7.05,
+            "tritan": 7.21
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 7.04,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 6105,
+            "caja": [
+              119,
+              302,
+              625,
+              341
+            ]
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.4,
+          "grande": false,
+          "wcag": 10.37,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -98.1,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 10.07,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1641,
+            "caja": [
+              119,
+              375,
+              391,
+              405
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Estrategia como elección y renuncia: concentrar el esfuerzo antes de ejecutar todas las rutas. Texto en la imagen: «¿Lanzarlo todo?» «Primero, decidir.» «Prioridades claras antes de invertir.» Llamado a la acción: «Definamos el siguiente paso» Agencia estratégica Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "0f90f8c06954ef9e3568deb96abd90806e2d7d8f949d85ef8ac25bcb65dec130",
+      "cobertura": 0.1101
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.9001,
+      "trazo": {
+        "wcag": 18.79,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      }
+    },
+    "huellas": {
+      "pieza": "791edd99c9309c9078c5455828799dac219630cbcf1895a22f73b229a1ba1c1e",
+      "plate": "0b0e4be8e858c8fd418f06b54e19a4e771760f7caf8be45462976688b822dfe5",
+      "compositor": "19195283d72c3407cfde566c389a8c86099fb24bb39de23f80cde2bd6d54c6db",
+      "png": "dfcdf0d0b6bf0fae645035b76b7e721ad881ffe3ce216c44d048393d8fdc88c8",
+      "layout": "c0534f2eb8f1e626359aa82ca6d4d0bdbdc0516abb70619bb0465da4722dc6f8",
+      "alt": "a1feb87f0dd728f84ef6b7ea7826e24b44bd988d6e3c331d691b90302f6960ee"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-005-pilots-color-v2",
+      "campaignId": "CMP-005",
+      "sha256": "e99af71dcd7fac343323c3ca2d2c21314528f2eff45a08119e4ef9140304afb6",
+      "treatment": "system-cool-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "text",
+      "reason": "Prioridades: la acción concreta la elección antes de invertir. Azul claro ligado a las rutas digitales; la caja seleccionada prolonga el gesto de decidir qué seguir y qué dejar fuera.",
+      "treatmentReason": "Texto azul claro relacionado con el sistema digital; bounding box y cursor aportan la gramática de selección sin otro rectángulo de botón.",
+      "roles": {
+        "ink": {
+          "token": "softOnDark",
+          "value": "#cfe4fa"
+        }
+      },
+      "visualReview": "required"
+    }
+  }
+]

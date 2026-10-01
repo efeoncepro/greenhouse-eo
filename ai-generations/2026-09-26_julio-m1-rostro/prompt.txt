@@ -1,0 +1,7 @@
+Image 1 is the original scene. Images 2 and 3 are identity references of the same real man (Julio).
+
+Edit image 1 and change ONLY the man's face so it is unmistakably the man in images 2 and 3: his real facial proportions (the width of the face, jaw and cheekbones), eye shape and spacing, eyebrows, nose, mouth and lips, the shape, density and salt-and-pepper color of his full beard and moustache, his hairline and the texture and grey of his short curly hair, and his thin metal half-rim glasses as they appear in image 2.
+
+Keep EVERYTHING else from image 1 exactly as it is: the pose, the hand resting on the cheek, the warm smile and the eyes looking down at the two small figures on the desk, the head angle, the dark knit sweater, the orange block figure and the blue cloud-shaped figure, the laptop, the lamp, the bookshelf, the city window at dusk, the framing, the depth of field and the warm window light with fill. Do not change the size of the head or the crop.
+
+Photographic realism: a real photograph of a real person, not a render. Skin shows irregular pores and fine facial hair with an even, healthy tone; no plastic smoothing, no beauty retouch, no added blemishes, no redness, no dark circles. Natural catchlights. No text, no logos.
