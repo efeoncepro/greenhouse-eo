@@ -132,3 +132,22 @@ ni opciones de crop en un job. Plan/QA registran receta y fracción visible. FIL
 las demás fuentes no heredan admisión. Ver `sky-production.md` para pruebas y problemas visuales
 pendientes; el encuadre técnico no concede legibilidad o aprobación. Merge confirmado en main
 `609d876feeef46b5785171d321fb4898ad9973cf`; un deploy o una entrega requieren su propio readback.
+
+
+### Contornos circulares y previews del Lab
+
+El renderer de SKY conserva `fillGeometry` en contenedores cuadrados plenamente redondeados
+(FRAME/INSTANCE/SYMBOL/ROUNDED_RECTANGLE). No reconstruir sus círculos con curvas cuadráticas
+ni cambiar proporciones por CSS. La rotación debe afectar por igual fondo, borde y contenido.
+Los contenedores ordinarios y las formas no circulares mantienen su comportamiento anterior.
+
+`reference:build … --native-previews` verifica primero los previews históricos sellados y
+produce un snapshot nuevo desde templates/imágenes del pack SKY. `reference-projections.json`
+liga SHA original, template, renderer y PNG/SVG nuevos; el manifest liga ese archivo por SHA.
+Los originales y outputs anteriores no se sobrescriben. El baseline
+`brands/sky-airline/adaptations/native-geometry-baseline.json` fija los 126 resultados de esta
+revisión y conserva el SHA histórico en los formatos no afectados. No equivale a aprobación visual.
+
+Una muestra de producción antigua sigue siendo su corrida original: para aplicar una corrección
+del renderer a copy/foto propios hace falta una corrida nueva con la autoridad viva habitual.
+No modificar PNG/SVG/QA de un UUID completado ni presentar un render local como ejecución productiva.
