@@ -1,0 +1,1232 @@
+{
+  "status": "observed-not-approved",
+  "observedOn": "2026-09-29",
+  "fileKey": "ZhnJUPqzvYqy7nTcLLKLr1",
+  "collections": [
+    {
+      "id": "VariableCollectionId:2099:7691",
+      "name": "Primitives",
+      "modes": [
+        {
+          "name": "Default",
+          "modeId": "2099:0"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:2099:7726",
+      "name": "Semantic",
+      "modes": [
+        {
+          "name": "Default",
+          "modeId": "2099:1"
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:2102:7741",
+      "name": "Typography",
+      "modes": [
+        {
+          "name": "Default",
+          "modeId": "2102:1"
+        }
+      ]
+    }
+  ],
+  "total": 107,
+  "variables": [
+    {
+      "id": "VariableID:2099:7692",
+      "name": "purple/50",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.9725490212440491,
+          "g": 0.8627451062202454,
+          "b": 0.9921568632125854,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7693",
+      "name": "purple/100",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.9450980424880981,
+          "g": 0.729411780834198,
+          "b": 0.9882352948188782,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7694",
+      "name": "purple/200",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.7529411911964417,
+          "g": 0.1568627506494522,
+          "b": 0.8627451062202454,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7695",
+      "name": "purple/300",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.6705882549285889,
+          "g": 0.07450980693101883,
+          "b": 0.772549033164978,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7696",
+      "name": "purple/400",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.572549045085907,
+          "g": 0.027450980618596077,
+          "b": 0.6627451181411743,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7697",
+      "name": "purple/500",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.47058823704719543,
+          "g": 0.007843137718737125,
+          "b": 0.5411764979362488,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7698",
+      "name": "purple/600",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.4470588266849518,
+          "g": 0.08627451211214066,
+          "b": 0.47843137383461,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7699",
+      "name": "purple/700",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.40392157435417175,
+          "g": 0.11764705926179886,
+          "b": 0.4588235318660736,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7700",
+      "name": "purple/800",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.3137255012989044,
+          "g": 0.003921568859368563,
+          "b": 0.3607843220233917,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7701",
+      "name": "purple/muted",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.6431372761726379,
+          "g": 0.48235294222831726,
+          "b": 0.6666666865348816,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7702",
+      "name": "purple/surface",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.9411764740943909,
+          "g": 0.9098039269447327,
+          "b": 0.9450980424880981,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7703",
+      "name": "green/50",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.886274516582489,
+          "g": 0.9921568632125854,
+          "b": 0.8627451062202454,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7704",
+      "name": "green/100",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.772549033164978,
+          "g": 0.9882352948188782,
+          "b": 0.729411780834198,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7705",
+      "name": "green/200",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.49803921580314636,
+          "g": 0.8745098114013672,
+          "b": 0.2078431397676468,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7706",
+      "name": "green/300",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.27450981736183167,
+          "g": 0.8627451062202454,
+          "b": 0.1568627506494522,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7707",
+      "name": "green/400",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.14901961386203766,
+          "g": 0.8705882430076599,
+          "b": 0,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7708",
+      "name": "green/700",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.09803921729326248,
+          "g": 0.5411764979362488,
+          "b": 0.007843137718737125,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7715",
+      "name": "neutral/white",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7716",
+      "name": "neutral/50",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.9882352948188782,
+          "g": 0.9882352948188782,
+          "b": 0.9882352948188782,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7717",
+      "name": "neutral/100",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.9372549057006836,
+          "g": 0.9372549057006836,
+          "b": 0.9372549057006836,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7718",
+      "name": "neutral/200",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.8509804010391235,
+          "g": 0.8509804010391235,
+          "b": 0.8509804010391235,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7719",
+      "name": "neutral/300",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.772549033164978,
+          "g": 0.772549033164978,
+          "b": 0.772549033164978,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7720",
+      "name": "neutral/400",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.7019608020782471,
+          "g": 0.7019608020782471,
+          "b": 0.7019608020782471,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7721",
+      "name": "neutral/500",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.6000000238418579,
+          "g": 0.6000000238418579,
+          "b": 0.6000000238418579,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7722",
+      "name": "neutral/600",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.45490196347236633,
+          "g": 0.45490196347236633,
+          "b": 0.45490196347236633,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7725",
+      "name": "neutral/black",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7727",
+      "name": "background/primary",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7699"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7728",
+      "name": "background/secondary",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7702"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7729",
+      "name": "background/dark",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7700"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7730",
+      "name": "background/accent",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7707"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7731",
+      "name": "background/accent-soft",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7703"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7732",
+      "name": "background/highlight",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7697"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7733",
+      "name": "background/surface",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7715"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7734",
+      "name": "text/on-dark",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7715"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7735",
+      "name": "text/on-light",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7700"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7736",
+      "name": "text/primary",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7715"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7737",
+      "name": "text/secondary",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7722"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7738",
+      "name": "text/tertiary",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7719"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7739",
+      "name": "text/accent",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7706"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7740",
+      "name": "text/accent-soft",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7704"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7741",
+      "name": "text/brand",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7693"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7742",
+      "name": "text/brand-soft",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7692"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7743",
+      "name": "text/highlight",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7711"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7744",
+      "name": "border/primary",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7699"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7745",
+      "name": "border/accent",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7697"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7746",
+      "name": "border/light",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7693"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7747",
+      "name": "border/green",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7707"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7748",
+      "name": "border/subtle",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7718"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7749",
+      "name": "action/primary",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7697"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7750",
+      "name": "action/primary-hover",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7698"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7751",
+      "name": "action/secondary",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7707"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7752",
+      "name": "action/secondary-hover",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7706"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7753",
+      "name": "surface/card",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7692"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7754",
+      "name": "surface/card-alt",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7702"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7755",
+      "name": "surface/muted",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7701"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7756",
+      "name": "surface/page",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7715"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7757",
+      "name": "surface/disabled",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7718"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7758",
+      "name": "status/success",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7707"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2099:7759",
+      "name": "status/info",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7726",
+      "values": {
+        "2099:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2099:7711"
+        }
+      }
+    },
+    {
+      "id": "VariableID:2102:7742",
+      "name": "font-size/display/3xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 128
+      }
+    },
+    {
+      "id": "VariableID:2102:7743",
+      "name": "font-size/display/2xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 120
+      }
+    },
+    {
+      "id": "VariableID:2102:7744",
+      "name": "font-size/display/xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 112
+      }
+    },
+    {
+      "id": "VariableID:2102:7745",
+      "name": "font-size/display/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 96
+      }
+    },
+    {
+      "id": "VariableID:2102:7746",
+      "name": "font-size/display/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 80
+      }
+    },
+    {
+      "id": "VariableID:2102:7747",
+      "name": "font-size/display/sm",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 72
+      }
+    },
+    {
+      "id": "VariableID:2102:7748",
+      "name": "font-size/display/xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 64
+      }
+    },
+    {
+      "id": "VariableID:2102:7749",
+      "name": "font-size/heading/2xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 56
+      }
+    },
+    {
+      "id": "VariableID:2102:7750",
+      "name": "font-size/heading/xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 48
+      }
+    },
+    {
+      "id": "VariableID:2102:7751",
+      "name": "font-size/heading/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 40
+      }
+    },
+    {
+      "id": "VariableID:2102:7752",
+      "name": "font-size/heading/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 32
+      }
+    },
+    {
+      "id": "VariableID:2102:7753",
+      "name": "font-size/heading/sm",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 28
+      }
+    },
+    {
+      "id": "VariableID:2102:7754",
+      "name": "font-size/heading/xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 24
+      }
+    },
+    {
+      "id": "VariableID:2102:7755",
+      "name": "font-size/label/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 28
+      }
+    },
+    {
+      "id": "VariableID:2102:7756",
+      "name": "font-size/label/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 24
+      }
+    },
+    {
+      "id": "VariableID:2102:7757",
+      "name": "font-size/label/sm",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 20
+      }
+    },
+    {
+      "id": "VariableID:2102:7758",
+      "name": "font-size/label/xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 16
+      }
+    },
+    {
+      "id": "VariableID:2102:7759",
+      "name": "font-size/label/2xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 12
+      }
+    },
+    {
+      "id": "VariableID:2102:7760",
+      "name": "font-size/body/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 24
+      }
+    },
+    {
+      "id": "VariableID:2102:7761",
+      "name": "font-size/body/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 20
+      }
+    },
+    {
+      "id": "VariableID:2102:7762",
+      "name": "font-size/body/sm",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 16
+      }
+    },
+    {
+      "id": "VariableID:2102:7763",
+      "name": "font-size/body/xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 12
+      }
+    },
+    {
+      "id": "VariableID:2102:7764",
+      "name": "font-size/subtitle/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 32
+      }
+    },
+    {
+      "id": "VariableID:2102:7765",
+      "name": "font-size/subtitle/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 30
+      }
+    },
+    {
+      "id": "VariableID:2102:7766",
+      "name": "line-height/display/3xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 128
+      }
+    },
+    {
+      "id": "VariableID:2102:7767",
+      "name": "line-height/display/2xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 120
+      }
+    },
+    {
+      "id": "VariableID:2102:7768",
+      "name": "line-height/display/xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 112
+      }
+    },
+    {
+      "id": "VariableID:2102:7769",
+      "name": "line-height/display/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 96
+      }
+    },
+    {
+      "id": "VariableID:2102:7770",
+      "name": "line-height/display/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 80
+      }
+    },
+    {
+      "id": "VariableID:2102:7771",
+      "name": "line-height/display/sm",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 72
+      }
+    },
+    {
+      "id": "VariableID:2102:7772",
+      "name": "line-height/display/xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 64
+      }
+    },
+    {
+      "id": "VariableID:2102:7773",
+      "name": "line-height/heading/2xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 56
+      }
+    },
+    {
+      "id": "VariableID:2102:7774",
+      "name": "line-height/heading/xl",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 48
+      }
+    },
+    {
+      "id": "VariableID:2102:7775",
+      "name": "line-height/heading/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 40
+      }
+    },
+    {
+      "id": "VariableID:2102:7776",
+      "name": "line-height/heading/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 32
+      }
+    },
+    {
+      "id": "VariableID:2102:7777",
+      "name": "line-height/heading/sm",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 28
+      }
+    },
+    {
+      "id": "VariableID:2102:7778",
+      "name": "line-height/heading/xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 24
+      }
+    },
+    {
+      "id": "VariableID:2102:7779",
+      "name": "line-height/label/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 28
+      }
+    },
+    {
+      "id": "VariableID:2102:7780",
+      "name": "line-height/label/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 24
+      }
+    },
+    {
+      "id": "VariableID:2102:7781",
+      "name": "line-height/label/sm",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 20
+      }
+    },
+    {
+      "id": "VariableID:2102:7782",
+      "name": "line-height/label/xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 16
+      }
+    },
+    {
+      "id": "VariableID:2102:7783",
+      "name": "line-height/label/2xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 12
+      }
+    },
+    {
+      "id": "VariableID:2102:7784",
+      "name": "line-height/body/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 24
+      }
+    },
+    {
+      "id": "VariableID:2102:7785",
+      "name": "line-height/body/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 20
+      }
+    },
+    {
+      "id": "VariableID:2102:7786",
+      "name": "line-height/body/sm",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 16
+      }
+    },
+    {
+      "id": "VariableID:2102:7787",
+      "name": "line-height/body/xs",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 12
+      }
+    },
+    {
+      "id": "VariableID:2102:7788",
+      "name": "line-height/subtitle/lg",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 32
+      }
+    },
+    {
+      "id": "VariableID:2102:7789",
+      "name": "line-height/subtitle/md",
+      "type": "FLOAT",
+      "collectionId": "VariableCollectionId:2102:7741",
+      "values": {
+        "2102:1": 35
+      }
+    }
+  ]
+}

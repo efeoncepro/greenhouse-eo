@@ -14,6 +14,17 @@
 > Manual: [operar el creative workbench](../manual-de-uso/plataforma/operar-creative-workbench.md) ·
 > Funcional: [creative workbench](../documentation/plataforma/creative-workbench.md)
 
+## Nota de continuidad — 2026-09-30
+
+El bootstrap y la transición sellada descritos abajo conservan su historia. Para operación
+productiva actual, cargar el [aislamiento multimarcas](EFEONCE_CREATIVE_WORKBENCH_MULTIBRAND_ISOLATION_DECISION_V1.md),
+la [skill del Workbench](../../.codex/skills/efeonce-creative-workbench/SKILL.md) y su corte fechado.
+El harness activo, las recetas y el broker se implementan en `creative-workbench`; no se requiere
+copiar o modificar motores Greenhouse ni ejecutar el sync total heredado para componer SKY.
+Efeonce ID definitivo está diferido en TASK-1952, sin crear otro AUTH. Las afirmaciones históricas
+de equipo vacío, PR 3 draft y broker rechazado no describen el flujo nativo posterior; código/CI
+integrados no acreditan activación IA, onboarding completo o deploy del broker.
+
 ## 1. Contexto
 
 El operador quiere que el equipo creativo (diseño, redacción, dirección de arte) trabaje con agentes —Claude

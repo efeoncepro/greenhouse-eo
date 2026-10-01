@@ -2420,3 +2420,16 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Nota 2026-09-29 (traje de Nexa y Sparks): `TASK-1940` y `TASK-1941` reservadas por decisión del operador (kit del traje biónico de Nexa y los agentes de Agent Ops como personajes). **Barrido por DOMINIO y SUPERFICIE** (kits de marca en `ai-generations/`, catálogo `scripts/foto/build-prompt.mjs`, canon `docs/operations/brand-photography/**`, tasks de foto y registro cine): ninguna dueña. `TASK-1926` (registro cine), `TASK-1931` (banco de plates) y `TASK-1925` (repo taller) son consumidoras o reciben delta; `TASK-989` (avatar vivo de Nexa) no se solapa. Sin UI en el portal: no declaran wireframe. Siguiente ID libre `TASK-1942`.
 
 > Nota 2026-09-29 (deck Salesforce y HubSpot): `TASK-1942` y `TASK-1943` reservadas por pedido del operador (canonizar las 19 láminas Salesforce aprobadas y documentar el deck HubSpot faltante). **Barrido por DOMINIO y SUPERFICIE** (catálogo `deck-recipes`, `graphic-line-deck`, tasks del deck 1927–1934): ninguna dueña de las láminas Salesforce ni de la serie HubSpot; `TASK-1932` (Proposal Studio), `TASK-1933` (pendientes del catálogo), `TASK-1930` (binding) y `TASK-1931` (plates) son consumidoras o reciben delta. Sin UI en el portal: no declaran wireframe. Siguiente ID libre `TASK-1944`.
+
+## Reservas Creative Workbench — publicación documental 2026-09-30
+
+IDs estables ya asignados localmente; no reciclar. Este corte publica sólo las cuatro reservas
+del Workbench y no declara un siguiente ID libre global. Las notas fechadas anteriores sobre
+disponibilidad son históricas; reconciliar el registro completo antes de reservar otro ID.
+
+| Task ID | Lifecycle actual | Brief | Archivo actual |
+| --- | --- | --- | --- |
+| `TASK-1945` | `in-progress` | Creative Workbench multimarcas: foundation neutral | `docs/tasks/in-progress/TASK-1945-creative-workbench-multibrand-foundation.md` |
+| `TASK-1946` | `in-progress` | SKY Airline paquetes candidatos | `docs/tasks/in-progress/TASK-1946-sky-brand-system-candidate-packages.md` |
+| `TASK-1947` | `in-progress` | Creative Workbench entrada IA con contexto de marca | `docs/tasks/in-progress/TASK-1947-creative-workbench-brand-production-entry.md` |
+| `TASK-1952` | `to-do` | Creative Workbench: integración backend con Efeonce ID | `docs/tasks/to-do/TASK-1952-creative-workbench-efeonce-id-integration.md` |

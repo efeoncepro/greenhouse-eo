@@ -1,0 +1,21 @@
+{
+  "status": "observed-not-approved",
+  "observedOn": "2026-09-29",
+  "variables": [
+    {
+      "id": "VariableID:2099:7711",
+      "name": "blue/500",
+      "type": "COLOR",
+      "collectionId": "VariableCollectionId:2099:7691",
+      "values": {
+        "2099:0": {
+          "r": 0.2235294133424759,
+          "g": 0,
+          "b": 1,
+          "a": 1
+        }
+      },
+      "remote": false
+    }
+  ]
+}

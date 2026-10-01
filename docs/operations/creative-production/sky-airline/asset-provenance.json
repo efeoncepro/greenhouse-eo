@@ -1,0 +1,24 @@
+[
+  {
+    "name": "logo-sky-80px.png",
+    "path": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/logo-sky-80px.png",
+    "sha256": "12f8b996e6f953e53ff9f75bd55396ccec08330ec83bd91431d022819166a89d",
+    "bytes": 3732,
+    "source": {
+      "fileKey": "ZhnJUPqzvYqy7nTcLLKLr1",
+      "nodeId": "2001:1130"
+    },
+    "status": "candidate"
+  },
+  {
+    "name": "logo-sky-80px.svg",
+    "path": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/logo-sky-80px.svg",
+    "sha256": "1e3f9c0bbc06ecee26bbfd2a8d26e436077e96180c1157d55d92f8221a3e409a",
+    "bytes": 1208,
+    "source": {
+      "fileKey": "ZhnJUPqzvYqy7nTcLLKLr1",
+      "nodeId": "2001:1130"
+    },
+    "status": "candidate"
+  }
+]
