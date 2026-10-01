@@ -651,15 +651,17 @@ export const OBJETOS = {
     // Variante por línea de negocio (operador, 2026-10-01: «Aprobados todos»): el MISMO Spark con el LED en el acento
     // de la línea (tokens efeonceGraphicLine.lines). El azul de Engine es el defecto; las demás sólo cuando la pieza es
     // de esa línea. Brand y Voice (cálidos) se prueban en cine antes de usarse en una foto oscura.
-    base: 'ai-generations/2026-10-01_sparks/',
-    patron: 'transparente/spark-<V>.png',
+    // Fuente: el paquete versionado y sellado @efeoncepro/axis-brand-assets (≥ 0.4.10, recortes de 1024 px), no
+    // ai-generations/ (fuera de git). Los masters de 1600 px viven en el bucket de AXIS (sparks/v1/).
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
+    patron: 'spark-<V>.png',
     patronPorColor: {
-      engine: 'transparente/spark-<V>.png',
-      growth: 'lineas-transparente/spark-growth-<V>.png',
-      brand: 'lineas-transparente/spark-brand-<V>.png',
-      voice: 'lineas-transparente/spark-voice-<V>.png',
-      'revenue-hubspot': 'lineas-transparente/spark-revenue-hubspot-<V>.png',
-      'revenue-salesforce': 'lineas-transparente/spark-revenue-salesforce-<V>.png'
+      engine: 'spark-<V>.png',
+      growth: 'spark-growth-<V>.png',
+      brand: 'spark-brand-<V>.png',
+      voice: 'spark-voice-<V>.png',
+      'revenue-hubspot': 'spark-revenue-hubspot-<V>.png',
+      'revenue-salesforce': 'spark-revenue-salesforce-<V>.png'
     },
     colorDefecto: 'engine',
     vistas: {
@@ -685,7 +687,7 @@ export const OBJETOS = {
       'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small magnifying glass (white handle, thin navy rim, faintly azure lens) BESIDE its body, never in front of its visor; it reads and summarises sources. Copy its shape, accessory and colours ' +
       'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
       'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
-    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
     patron: 'spark-investigacion-<V>.png',
     vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
     vistaDefecto: 'heroe'
@@ -700,7 +702,7 @@ export const OBJETOS = {
       'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small thin white card with one azure brush stroke (no letters) and offers it; it proposes drafts. Copy its shape, accessory and colours ' +
       'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
       'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
-    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
     patron: 'spark-contenido-<V>.png',
     vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
     vistaDefecto: 'heroe'
@@ -715,7 +717,7 @@ export const OBJETOS = {
       'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a neat stack of small rounded white and navy tiles and places one more on top; it keeps records in order. Copy its shape, accessory and colours ' +
       'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
       'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
-    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
     patron: 'spark-crm-datos-<V>.png',
     vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
     vistaDefecto: 'heroe'
@@ -730,7 +732,7 @@ export const OBJETOS = {
       'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small white speech-bubble object with three azure dots and waves with the other hand; it answers and routes. Copy its shape, accessory and colours ' +
       'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
       'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
-    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
     patron: 'spark-servicio-<V>.png',
     vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
     vistaDefecto: 'heroe'
@@ -745,7 +747,7 @@ export const OBJETOS = {
       'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small desk model of a bar chart with three rising bars (the tallest azure) and points at the tallest bar; it measures and reports. Copy its shape, accessory and colours ' +
       'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
       'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
-    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
     patron: 'spark-reportes-<V>.png',
     vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
     vistaDefecto: 'heroe'
@@ -757,7 +759,7 @@ export const OBJETOS = {
       'Reproduce EXACTLY these five figures as real, physical, finely made small hovering companions about 22 cm wide each, identical in body ' +
       'and colour, each with its own accessory (magnifying glass, card with a stroke, stack of tiles, speech-bubble object, bar-chart model). ' +
       'Their orbit rings never intersect. SCALE: each one never larger than the head of a person. They work WITH people who supervise them.',
-    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
     patron: 'sparks-<V>.png',
     vistas: { frente: 'frente' },
     vistaDefecto: 'frente'

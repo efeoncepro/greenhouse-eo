@@ -1,7 +1,7 @@
 # Sparks V1 — los agentes de Efeonce
 
 > **Tipo de documento:** Especificación canónica de marca (personajes)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-10-01 por Claude
 > **Última actualización:** 2026-10-01 por Claude
 > **Estado:** nombre, plantel y relato aprobados por el operador (Julio Reyes) el 2026-09-29; diseño elegido y Spark
@@ -160,7 +160,7 @@ brillo bajo la esfera—, siempre de un solo color. El azul de **Engine** (`#037
   antes de usarse en una foto oscura.
 - **Salesforce y Engine casi no se distinguen** en un LED pequeño (celeste contra azul): en una pieza de Salesforce, el
   Spark no carga la identificación de la línea; la pieza la da por otro lado. Lo mismo, en menor medida, Brand y Voice.
-- Disponible para las 26 vistas del Spark base (transparentes en `ai-generations/2026-10-01_sparks/lineas-transparente/`);
+- Disponible para las 26 vistas del Spark base (en el paquete `@efeoncepro/axis-brand-assets` ≥ 0.4.10, `spark-<línea>-<NN>-<vista>.png`);
   el plantel de cinco sigue en azul.
 
 ## 7. La guarda contra robots
@@ -182,10 +182,11 @@ son historia: regenerarlas con Sparks es una decisión aparte (§11).
 | Qué | Dónde |
 |---|---|
 | Corrida, prompts, fichas y LEEME (las imágenes no se versionan) | Repo: [`ai-generations/2026-10-01_sparks/`](../../../ai-generations/2026-10-01_sparks/LEEME.md) |
-| Spark base con fondo de estudio · transparente | `angulos/` · `transparente/` (esta es la que lee el catálogo) |
+| Spark base con fondo de estudio · transparente | `angulos/` · `transparente/` (masters de 1600 px; el catálogo lee el paquete, ver abajo) |
 | Fuentes editadas para recortar | `fuente-recorte/` |
 | Escenas con Nexa | `escenas/` |
-| Plantel con fondo de estudio · transparente | `plantel/` · `plantel-transparente/` (la que lee el catálogo) |
+| Plantel con fondo de estudio · transparente | `plantel/` · `plantel-transparente/` (masters de 1600 px) |
+| **Fuente del catálogo de `foto:prompt`** (desde 2026-10-01) | Paquete versionado y sellado `@efeoncepro/axis-brand-assets` 0.4.10, fijado en Greenhouse: `node_modules/@efeoncepro/axis-brand-assets/assets/sparks/` (recortes de 1024 px, mismos nombres). Lab: [axis.efeonce.org/references/sparks/](https://axis.efeonce.org/references/sparks/) · masters en el bucket `sparks/v1/` |
 | Direcciones de diseño y vistas base de la v01 | `direcciones/` · `base/` |
 | Copia del equipo, Spark base | OneDrive `Alineación/5. Contenidos/13- Branding/Sparks/2026-10 Spark base/v02/`: 59 archivos en «Fondo de estudio», «Transparente», «Con Nexa» y «Diseño», con LEEME y manifiesto |
 | Copia del equipo, plantel | OneDrive `…/Sparks/2026-10 Plantel/v01/`, con LEEME y manifiesto |
