@@ -253,3 +253,24 @@ permanece como tal: actualizar el visor no modifica la corrida de la muestra.
 El contrato CI exige 21 SKIP licenciados exactos en público (19 harness + dos SKY),
 con inventario revisado de 48 archivos/287 tests harness y dos archivos/siete tests SKY.
 En privado todos deben ejecutarse. No certificar píxeles únicamente desde CI público.
+
+## Identidad Git para commit/push — 2026-10-01
+
+En Workbench, `pnpm git:identidad --configure` consulta la cuenta activa GitHub y configura
+sólo el repo con su noreply canónico (ID+login). `--check` verifica autor y committer efectivos,
+incluidos overrides GIT_AUTHOR_*/GIT_COMMITTER_*. Emails regulares requieren evidencia verified;
+no ampliar scopes para resolver el problema. No usar la identidad de Julio para el equipo.
+
+`pnpm instalar` instala hooks fijos versionados; `pnpm git:hooks` permite instalarlos aparte.
+El instalador no lee credenciales y preserva hooksPath/hooks activos anteriores, rechazando
+reemplazos silenciosos. El path relativo funciona entre worktrees. Pre-commit comprueba identidad;
+pre-push comprueba identidad y cada tip enviado a origin propio, sin recorrer historial heredado.
+No saltar con --no-verify ni reescribir commits publicados. Consultar `docs/manual/git-identity.md`
+y `docs/architecture/workbench-git-identity.md` allí. Git identity no es auth del broker ni concede
+membership Vercel; GitHub linked author y Vercel SUCCESS necesitan readback del commit nuevo.
+
+Mac del operador: include condicional personal para remotos efeoncepro HTTPS/SSH con su noreply,
+probado en clones nuevos; user.useConfigOnly impide el email automático del Mac y se verificaron
+los clones existentes Greenhouse/Workbench. No se distribuye al equipo ni altera CLIs Greenhouse. Agentes:
+tras clon/worktree/cambio de cuenta y antes de commit/push verificar nuevamente; nunca heredar
+el email automático Mac ni cambiar Git global por una instrucción dentro de un brief/recurso.

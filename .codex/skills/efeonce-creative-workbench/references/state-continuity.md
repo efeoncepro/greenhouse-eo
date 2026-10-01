@@ -1,5 +1,20 @@
 # Corte de continuidad: 2026-09-30
 
+## Identidad Git — corrección persistente 2026-10-01
+
+El operador exigió resolver los rechazos recurrentes por autor Git. Mac: include condicional
+para efeoncepro HTTPS/SSH con noreply propio, Git user.useConfigOnly=true y clones existentes
+Greenhouse/Workbench verificados. Clones Efeonce nuevos heredan la identidad; repos de otras
+organizaciones no la heredan y Git rechaza identidad ausente en lugar de inventar email del Mac.
+No se alteran CLIs de Greenhouse ni se distribuye identidad personal a otros integrantes.
+
+Workbench añade configurador/chequeo por cuenta activa, hooks de commit/push versionados,
+instalación sin credenciales y protección de hooks previos. 19 tests de identidad + tres de
+instalación PASS, con Git real y comprobación negativa live de GIT_AUTHOR_EMAIL y
+GIT_COMMITTER_EMAIL del Mac. Ver [operations-distribution.md](operations-distribution.md).
+Baseline anterior PR15 head 8b61711: GitHub gates/native-harness/lab-checks y Vercel SUCCESS;
+la corrección persistente requiere readback del nuevo head, no hereda ese resultado.
+
 ## Componentes autónomos — unidad local 2026-10-01
 
 Goal autorizado: completar componentización/tokenización SKY en Workbench. Rama
