@@ -1,5 +1,19 @@
 # Composiciones nombradas y recetas · Codex y Claude
 
+## Recetas y producción disponibles en main — 2026-10-01
+
+El registro identifica 37 composiciones y relaciona 126 adaptaciones; las 21 familias semánticas
+no sustituyen las 11.096 instancias estructurales. PR15 integra la escena ejecutable, sus tokens
+y readers; PR16 integra el Lab premium. `marca:lote` ya existe: usar esa entrada, no escribir
+un executor nuevo o correr subprocesos productivos paralelos sobre un directorio compartido.
+La composición sigue siendo por variantes nativas, no resize automático de un maestro.
+
+Los `tokenReferences` del catálogo compositivo continúan curados con basis disponible y
+`bindingEvidence: not-established`. El inventario autónomo separado corrobora 4.996 bindings
+fills/strokes originales (4.684 efectivos); no cambiar retroactivamente la semántica del catálogo
+ni declarar sus diez tokens curados como bindings. Ver [autónomos](autonomous-components.md).
+El [flujo de agentes](agent-production.md) organiza plan, reparto, ejecución y cierre.
+
 ## Prueba de composición a cuatro formatos — 2026-09-30
 
 La pieza `projects/sky/always-on-modular-demo`, en `/tmp/cw-sky-production-flow`, usa tres
@@ -150,8 +164,9 @@ pnpm marca:recetas sky <compositionId> --plan projects/sky/<pieza>
 Resolver IDs y pieza propios antes de ejecutar. La consulta es de lectura local, no producción.
 El reader devuelve `workbench.composition-reader.v1`, brandId/version/catalogSha256, sourcePins y
 compositions, con `authorization: read-only-reference` y `commercialApproval: none`. El modo
-plan agrega `productionAuthority: not-verified` y `batchExecution: false`. No implementar un batch
-de ejecución por iniciativa del agente ni confundir planes de un grupo con piezas autorizadas.
+plan agrega `productionAuthority: not-verified` y `batchExecution: false`. Son atributos del reader;
+la ejecución de un lote autorizado pertenece a `marca:lote`, no al reader ni a un executor inventado.
+No confundir planes de un grupo con piezas autorizadas.
 
 `--plan` exige composición explícita y pieza existente de la misma marca; devuelve planes por
 adaptación sin crear corrida, llamar proveedores o acreditar autoridad. Un plan bloqueado debe
@@ -219,12 +234,13 @@ para pasar estilos libres al compositor ni readmitir packs a escondidas.
 
 ## Lab y criterios de revisión
 
-La sección `#recetas` muestra fichas de nombre/propósito/count desplegables derivadas del registro, pasos, componentes,
-tokens disponibles y adaptaciones del cliente. Buscar nombre, destino o formato, abrir la ficha y
-consultar cuatro variantes inicialmente; desplegar las restantes si el grupo tiene más. Conteo,
-vacío y reset orientan la consulta. Descargar `/composition-recipes.json` para conservar IDs,
+La sección `#recetas` muestra seis recetas inicialmente y amplía de seis en seis. Búsqueda
+antes de paginar, conteo, vacío y reset orientan la consulta. La ficha abre `RecipeDialog` con
+pasos, componentes, tokens disponibles y adaptaciones propias; sin JS conserva details.
+Un enlace profundo `#recipe-…` revela la receta aunque estuviera fuera de la página visible.
+Ampliar una pieza abre la segunda capa; Escape la cierra antes del detalle y devuelve el foco. Descargar `/composition-recipes.json` para conservar IDs,
 versiones y relación exacta de formatos. **Muestras del Workbench** en `#composiciones` presenta
-las seis corridas seleccionadas aparte, no todo el catálogo de recetas. Efeonce firma el chrome y el cliente posee el artwork. IDs, versiones y fuente están
+las corridas seleccionadas aparte (cuatro en la mesa premium), no todo el catálogo de recetas. Efeonce firma el chrome y el cliente posee el artwork. IDs, versiones y fuente están
 disponibles para agentes sin dominar la experiencia del cliente. Elegir un formato debe conducir
 a sus zonas y preservar la fuente activa; no perder la relación al filtrar/abrir una composición.
 
@@ -240,11 +256,12 @@ evidencia. Actualizar manual y esta referencia espejo cuando cambie cómo operar
 push/Preview/promoción se registran aparte. No copiar assets, fuentes, outputs o secretos a la skill.
 
 No afirmar actualización de Packages, broker o Vercel por implementar metadata local; comprobar
-sus superficies reales si es necesario reportarlas. La unidad tampoco cierra los 121 controles
-Figma independientes pendientes del corte anterior ni habilita packs propios de Berel/Efeonce.
+sus superficies reales si es necesario reportarlas. La comparación técnica independiente de 126/126 quedó cerrada por PR14 y se conservó por
+regresión PNG/SVG en PR15; no quedan 121 controles pendientes. Ese cierre no habilita packs
+propios de Berel/Efeonce ni aprueba campañas nuevas.
 Consultar [continuidad](state-continuity.md) antes de retomar y verificar situación actual.
 
-## Lotes para agentes — unidad local 2026-09-30
+## Lotes para agentes — contrato integrado y prueba histórica 2026-09-30
 
 El objetivo del operador es componer campañas mediante agentes, con el Lab como revisión.
 Workbench añade `marca:lote <pieza> --validate|--prepare <manifiesto>` y

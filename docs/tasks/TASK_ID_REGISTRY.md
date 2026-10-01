@@ -2425,6 +2425,20 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 > Nota 2026-09-29 (módulos de correo Efeonce): `TASK-1944` reservada por pedido del operador (canonizar el correo de Efeonce Insights aprobado en el canvas v21: pie, CTA y bloque de marca como módulos; AXIS `v0.3.38` publicado, `main` `c92160b`). **Barrido por DOMINIO y SUPERFICIE** (`src/emails/**`, `src/lib/email/**`, `EmailLayout`/`EmailButton`, footers, `docs/ui/**` sin `TASK-1944*`): `TASK-1764` es la umbrella de perfiles de pie por `EmailType` (política, no componentes) y recibe delta; `TASK-1849` conserva biblioteca, portal y el cableado de datos de la edición al correo de Insights (esta task construye la presentación); `TASK-1057` (paleta `EMAIL_COLORS`) y `TASK-1043` (tipografía de correo) no se tocan; `TASK-1274` es deuda de copy de marca; `TASK-1774` repara la baja y bloquea los Slices 4 y 5; `TASK-1938` comparte el bump de AXIS y el adapter de la órbita. Siguiente ID libre `TASK-1945`.
 
+> Continuidad Workbench 2026-10-01: [estado integrado y pendientes](../operations/creative-production/WORKBENCH_CURRENT_STATE.md). TASK-1945/1946/1947 mantienen `in-progress`; TASK-1952 `to-do`. Merges PR15/16/246 no cierran onboarding, contratos 0.2, IA ni Efeonce ID.
+
+| `TASK-1945` | `in-progress` | Creative Workbench multimarcas: foundation neutral | `docs/tasks/in-progress/TASK-1945-creative-workbench-multibrand-foundation.md` |
+
+> Registro Codex 2026-09-29: TASK-1945 reservado para foundation neutral del workbench; goal multimarcas y multipersona confirmado por Julio. Siguiente ID libre `TASK-1946`.
+
+| `TASK-1946` | `in-progress` | SKY Airline paquetes candidatos | `docs/tasks/in-progress/TASK-1946-sky-brand-system-candidate-packages.md` |
+
+> Registro Codex 2026-09-29: TASK-1946 onboarding de paquetes SKY, dependiente de foundation TASK-1945. Siguiente ID libre `TASK-1947`.
+
+| `TASK-1947` | `in-progress` | Creative Workbench entrada IA con contexto de marca | `docs/tasks/in-progress/TASK-1947-creative-workbench-brand-production-entry.md` |
+
+> Registro Codex 2026-09-29: TASK-1947 entrada IA neutral y authority; todas las marcas para todo el equipo confirmado por Julio. Siguiente ID libre `TASK-1948`.
+
 | `TASK-1948` | `complete` | DataForSEO: relevancia de keywords por URL/sujeto explícito, CLI 1.1.0 e integración live MX verificadas; resume sin recompra, gasto reconciliado; sin push/deploy | `docs/tasks/complete/TASK-1948-dataforseo-url-keyword-relevance-cli.md` |
 
 > Registro Codex 2026-09-30: TASK-1948 reservada para capacidad URL de Keywords for Site por pedido del operador. TASK-1935 conserva CLI general cerrada; TASK-1776 conserva visibilidad por rankings y TASK-1651 AI Optimization. Siguiente ID libre `TASK-1949`.

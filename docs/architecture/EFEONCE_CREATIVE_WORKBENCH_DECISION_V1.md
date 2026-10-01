@@ -13,6 +13,17 @@
 > Manual: [operar el creative workbench](../manual-de-uso/plataforma/operar-creative-workbench.md) ·
 > Funcional: [creative workbench](../documentation/plataforma/creative-workbench.md)
 
+## Aplicabilidad vigente — 2026-10-01
+
+Este ADR conserva el contrato de distribución sellada y su bootstrap de 2026-09-29. La evolución
+admitida de rutas nativas se rige por el [ADR multimarcas](EFEONCE_CREATIVE_WORKBENCH_MULTIBRAND_ISOLATION_DECISION_V1.md),
+el inventario/sello vigente y `creative-workbench/docs/architecture/workbench-native-harness.md`.
+El motor de producción, componentes SKY, Lab y broker se desarrollan en Workbench; las rutas gestionadas
+siguen sujetas al sello. Los apartados históricos de CLIs crudos y llaves vía ADC de la persona no son
+el contrato operativo actual del broker, ni autorizan reactivarlos o ejecutar un sync total.
+Fuentes, adopción y pendientes: [continuidad vigente](../operations/creative-production/WORKBENCH_CURRENT_STATE.md).
+Efeonce ID es la identidad definitiva diferida en TASK-1952; no crear AUTH paralelo.
+
 ## 1. Contexto
 
 El operador quiere que el equipo creativo (diseño, redacción, dirección de arte) trabaje con agentes —Claude

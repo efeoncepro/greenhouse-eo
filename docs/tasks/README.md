@@ -2559,10 +2559,12 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 
 ## Creative Workbench multimarcas
 
-- [TASK-1945](in-progress/TASK-1945-creative-workbench-multibrand-foundation.md): foundation neutral verificada localmente; integración operativa pendiente.
-- [TASK-1946](in-progress/TASK-1946-sky-brand-system-candidate-packages.md): tres paquetes SKY candidatos; Metric verificado; distribución y referencia web pendientes.
-- [TASK-1952](to-do/TASK-1952-creative-workbench-efeonce-id-integration.md): integración backend/CLI con Efeonce ID, P2 y diferida por el operador; depende de TASK-1834 Slices 0–1, conserva autoridad/cupos de TASK-1947. Sin implementación ni activación IA.
+[Corte vigente 2026-10-01](../operations/creative-production/WORKBENCH_CURRENT_STATE.md): PR15/PR16 Workbench y PR246 Greenhouse integrados; capacidades y rollout se verifican por separado.
 
+- [TASK-1945](in-progress/TASK-1945-creative-workbench-multibrand-foundation.md): motor nativo y SKY modular integrados; onboarding completo/segunda marca pendientes.
+- [TASK-1946](in-progress/TASK-1946-sky-brand-system-candidate-packages.md): 126 referencias revisadas, paquetes 0.1 publicados y Lab integrado; contratos 0.2 y distribución licenciada Metric pendientes.
+- [TASK-1947](in-progress/TASK-1947-creative-workbench-brand-production-entry.md): composición local/lotes con cero IA probados; rollout del broker, cotizaciones/canary monetario y equipo pendientes.
+- [TASK-1952](to-do/TASK-1952-creative-workbench-efeonce-id-integration.md): consumer backend/CLI Efeonce ID P2 diferido; depende de TASK-1834 Slices 0–1; sin implementación ni activación IA.
 
 ## AEO X-Ray — composición y experiencia
 

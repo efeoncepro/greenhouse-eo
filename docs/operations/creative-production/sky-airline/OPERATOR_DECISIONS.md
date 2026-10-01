@@ -1,14 +1,20 @@
 # SKY Airline — decisiones del operador
 
-## Continuidad posterior — 2026-09-30
+## Continuidad vigente — 2026-10-01
 
-El operador priorizó producción por agentes; Efeonce ID definitivo queda diferido en TASK-1952,
-sin otro AUTH. Workbench PR 11 (lotes) y PR 12 (contornos) están integrados; el
-[estado vigente fechado](../../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
-separa ese código de la candidata de identidad y del runtime. El bloque de identidad siguiente
-preserva una observación previa: su token pendiente, identity404 y «sin PR» no son estado actual.
-La corrección circular conserva trazados de fuente; no modifica los dos pins de máscara ni
-actualiza outputs de corridas antiguas. Nuevas marcas y miembros mantienen admisión explícita.
+Julio priorizó producción por agentes y confirmó una marca por corrida; todo el equipo puede producir
+para todas las marcas admitidas. Efeonce ID sigue diferido en TASK-1952, sin otro AUTH.
+PR15 modular/identidad Git y PR16 Lab están integrados en Workbench main `c3e85b6`; skill PR246 en Greenhouse
+develop. [Estado verificable y pendientes](../WORKBENCH_CURRENT_STATE.md).
+
+Metric gobierna SKY; el host del Lab usa identidad Efeonce. La tokenización de propiedades preserva
+procedencia sin inventar bindings Figma. Los topes aprobados son USD50 por integrante y USD500 por
+organización al mes, compartidos entre marcas y aumentables por decisión del operador. No confundir
+esta autorización de política con IA activada. La configuración Git del operador no se copia a otras personas.
+Cada uno usa su cuenta GitHub verificada; esos hooks no son la identidad definitiva del broker.
+
+Los cortes inferiores preservan decisiones y observaciones históricas. No tratan emails como bindings,
+no acreditan onboarding del equipo ni conceden aprobación comercial de los controles Figma.
 
 ## Histórico: identidad del Workbench — corte inicial 2026-09-30
 

@@ -3,8 +3,37 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.0
 > **Creado:** 2026-09-29 por Claude
-> **Ultima actualizacion:** 2026-09-29 por Claude
+> **Ultima actualizacion:** 2026-10-01 — continuidad vigente y bootstrap preservado
 > **Documentacion tecnica:** [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](../../architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md)
+
+## Operación vigente — 2026-10-01
+
+Fuente activa: `efeoncepro/creative-workbench`; Greenhouse conserva gobernanza y skills, sin alterar
+sus engines. Consultar [continuidad actual](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md)
+y [skill Codex/Claude](../../../.codex/skills/efeonce-creative-workbench/SKILL.md) antes de operar.
+
+Para producir una campaña SKY, ejecutar desde Workbench el flujo documentado en
+`docs/manual/native-design.md` y `docs/manual/design-batches.md` y `docs/manual/autonomous-components.md`: recetas/adaptaciones/zonas,
+copy y fotografía admitidos, validación, ejecución exclusiva y QA. Los nombres/argumentos actuales
+salen de `package.json` y del manual de ese repo. Para Git usar `git:identidad`/`git:hooks` por persona,
+sin copiar la configuración del operador. Para el Lab usar `docs/manual/workbench-lab.md`; revisar
+variante/receta y sus zonas, no producir desde un payload visual libre.
+
+Sólo los archivos gestionados van por su mecanismo de distribución sellada. Cambios en motor,
+componentes, Lab y broker nativos se hacen por PR en Workbench. No restaurar mirrors de template
+ni ejecutar un sync total heredado. En mantenimiento del control plane, inspeccionar el plan y
+ownership actuales antes de cualquier acción; este manual no autoriza cambios IAM/cloud/secrets.
+
+No entregar llaves de proveedor al equipo ni reactivar `ai:*`/`foto:*` legacy para saltarse el broker.
+La producción local cero IA está probada; flujo pagado y onboarding requieren su cierre separado.
+Auth definitivo usa Efeonce ID (TASK-1952 diferida), no Google OAuth paralelo ni binding por email.
+Los topes50/500 admiten aumentos por decisión del operador; nadie los eleva automáticamente.
+
+## Bootstrap histórico — 2026-09-29
+
+El bloque siguiente preserva el procedimiento original. Sus instrucciones de sync total, templates,
+CLIs crudos y secreto por ADC personal quedaron superadas en el carril nativo. **No ejecutarlo como
+procedimiento de producción vigente**. Source de verdad actual y pendientes están enlazados arriba.
 
 ## Para qué sirve
 

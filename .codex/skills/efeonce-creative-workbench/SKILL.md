@@ -10,6 +10,15 @@ Guía operativa viva del harness compartido. Su implementación pertenece al rep
 SKY es el primer cliente habilitado, no el alcance completo del espacio. Todo el equipo puede
 trabajar para todas las marcas; cada ejecución tiene una sola identidad visual explícita.
 
+## Corte integrado y recorrido recomendado — 2026-10-01
+
+Workbench `main` integra componentes autónomos e identidad Git por PR15 (`2392758`) y
+el Lab premium por PR16 (`c3e85b6`). Greenhouse incorporó la base documental mediante PR246
+sobre `develop`; no es una promoción de Greenhouse a producción. La implementación modular
+ya permite componer mediante agentes; IA, acceso definitivo y distribución tienen gates aparte.
+Leer primero [flujo de agentes](references/agent-production.md), luego la referencia del paso.
+[Estado y pendientes](references/state-continuity.md) distingue código, evidencias y runtime.
+
 ## Arranque y fuentes
 
 1. Localizar el checkout de Workbench sin crear otro ni cambiar ramas ajenas. En la máquina
@@ -31,13 +40,17 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 | Pedido | Leer |
 | --- | --- |
 | Comprender motores, autoridad, packs, locks y límites entre repos | [architecture.md](references/architecture.md) |
+| Preparar una producción a escala, repartir jobs, ejecutar y cerrar con evidencia | [agent-production.md](references/agent-production.md) |
 | Crear una campaña SKY, cambiar imagen/copy, obtener todos los formatos | [sky-production.md](references/sky-production.md) |
 | Producir o evaluar fotografía SKY, blur, cielo, color y reservas de texto | [sky-photography.md](references/sky-photography.md) y skill original admitida de SKY |
 | Componer por módulos, corregir logo/flecha/CTA/texto/máscara/círculos | [components.md](references/components.md) |
+| Inspeccionar cada capa, tokens/bindings, descomponer, extraer o reconstruir SKY por receta | [autonomous-components.md](references/autonomous-components.md) |
 | Identificar una composición nombrada, leer su receta y producir adaptaciones por lotes de agentes | [recipes.md](references/recipes.md) |
 | Usar, mantener o presentar el Lab premium Astro/TS/Tailwind, Efeonce + cliente | [lab.md](references/lab.md) |
+| Configurar/verificar identidad Git de cada persona, hooks y evitar rechazo de autor en Vercel | [operations-distribution.md](references/operations-distribution.md), sección de identidad Git |
 | Instalar canon, consumir/publicar paquetes, broker, archivo y Vercel | [operations-distribution.md](references/operations-distribution.md) |
 | Identidad Google↔GitHub, App mínima, transporte sin bearer GitHub y gate de rollout | [architecture.md](references/architecture.md), [operations-distribution.md](references/operations-distribution.md) y [state-continuity.md](references/state-continuity.md) |
+| Comparar las 126 piezas SKY contra Figma y mantener recetas nativas | [components.md](references/components.md) y arquitectura Workbench `workbench-sky-reference-comparison.md` |
 | Diagnosticar un fallo o evitar repetir propuestas rechazadas | [lessons.md](references/lessons.md) |
 | Presupuesto persona/organización, aumentos del operador, CAS y recuperación sin pago | [budget.md](references/budget.md) |
 | Resolver comentarios del PR, gobierno, identidades, presupuesto y errores posreserva | [review-remediation.md](references/review-remediation.md) |
@@ -83,6 +96,8 @@ ambos bundles, links internos y registro del router sin modificar archivos ni ll
 Este chequeo específico cubre la skill nueva; no atribuir su cobertura al allowlist histórico
 de `pnpm skills:mirrors` mientras no se haya registrado allí.
 
-Esta versión documental ya sirve para continuar el trabajo. El cierre productivo global,
-la fidelidad Figma de todas las piezas y el onboarding de cada persona siguen pendientes según
-el corte fechado; verificar su situación antes de actuar.
+La base integrada contiene 126 adaptaciones y comparación técnica independiente completa.
+La escena productiva usa componentes, tokens de propiedades y recetas; los agentes pueden
+componer campañas con copy/foto explícitos y revisar cada resultado. Esta disponibilidad de
+código no aprueba campañas nuevas, habilita pagos ni certifica acceso de cada integrante.
+Refrescar estado, rama y runtime antes de atribuir un rollout o una aprobación actuales.

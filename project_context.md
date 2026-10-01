@@ -274,9 +274,9 @@ Todo trabajo formal sigue `intake -> taxonomy -> plan -> execution -> verificati
 
 ## Contexto por dominio
 
-El mapa canónico está en [AGENTS.md](AGENTS.md#router-de-dominios): cargar solo la fila aplicable (skill,
-invariantes, arquitectura, task). Su versión machine-readable vive en
-`docs/operations/agent-context-router.json`. Si una regla no aparece en el router:
+Router: [AGENTS.md](AGENTS.md#router-de-dominios) y `docs/operations/agent-context-router.json`.
+Cargar skill, invariantes, arquitectura y task aplicables. Workbench: `efeonce-creative-workbench` en su repo.
+Si falta una regla:
 
 1. buscar keyword en arquitectura, operations y skills;
 2. buscar en el snapshot `docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md`;

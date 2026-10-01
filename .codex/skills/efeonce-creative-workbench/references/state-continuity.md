@@ -1,6 +1,132 @@
-# Corte de continuidad: 2026-09-30
+# Estado y continuidad de Workbench
 
-## Corte vigente: lotes de agentes y círculos nativos integrados — 2026-09-30 (Chile)
+## Corte consolidado — 2026-10-01
+
+Este corte prevalece sobre los registros históricos inferiores. Fuentes: código Workbench,
+GitHub PR/CI y evidencia privada enlazada; el [estado operativo Greenhouse](../../../../docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md)
+conserva la matriz de entregado/pendiente. Revalidar el proveedor antes de una nueva operación.
+
+| Superficie | Estado y alcance verificados |
+| --- | --- |
+| Código SKY y Git | [PR15](https://github.com/efeoncepro/creative-workbench/pull/15) MERGED en `2392758ab47966e422570ac813551e3597ac5efb`; 126 variantes modulares, readers/extracción/roundtrip y hooks de identidad incluidos |
+| Código Lab | [PR16](https://github.com/efeoncepro/creative-workbench/pull/16) MERGED en `c3e85b6cb1927fdeb13fea9aeddbdfbefc857852` (2026-10-01T10:02:29Z); premium v5 integrado sobre el motor vigente |
+| Skills/base documental | [PR246 Greenhouse](https://github.com/efeoncepro/greenhouse-eo/pull/246) MERGED en `develop` `d4dad02f994c2bc0493b24a2e810c1a1485c7532`; esta consolidación posterior requiere su propio commit/readback |
+| CI de main c3e85b6 | gates `36846606818` y native-harness/Lab `36846606907` SUCCESS; harness 320 PASS/28 SKIP, SKY 5 PASS/2 SKIP, Lab 17 PASS: total público 342 PASS/30 SKIP, cero fallos |
+| Pruebas privadas de integración | 348 harness + 7 SKY + 17 Lab = 372 PASS/0 SKIP; Astro 45 archivos/0 diagnósticos y TS7 PASS según dossier de integración; no confundir con una ejecución nueva de esta revisión documental |
+| Producción SKY demostrada | 126 PNG y SVG byte-idénticos a la comparación completa previa; 11.096 instancias/1.196 campos. Run con copy nuevo `6f287c46-574a-49a3-9351-51fc259f9f1e`, fotografía histórica, cero proveedores; no aprobación comercial |
+| GitHub/Vercel automático | Deployment GitHub Production `6781523756` success para c3e85b6; no certifica por sí solo el snapshot privado SKY ni acceso de todos |
+| Lab SKY protegido | Registro v5 conserva deployment `dpl_2sJFNXzxEdVFBykzKsnbtQVqr56x`, build `335e56a10c11833951de2055135c072c58ad9e89795303f436b47a78a8c97985` y readback de 28 archivos; la lectura actual de `creative-workbench-sky.vercel.app` devuelve 302 SSO anónimo. Alcances separados: evidencia fechada de bytes y rechazo anónimo actual |
+| Dominio institucional | `creative.efeonce.org` es destino previsto. No resuelve DNS desde la máquina en el corte; falta conexión/TLS/protección/readback, no anunciarlo operativo |
+
+Disponibilidad actual de código: receta/planes → jobs explícitos → validación/lote → runs y QA →
+revisión de PNG → selección y snapshot Lab. No necesita editor visual ni activar IA para componer.
+Usar [flujo de agentes](agent-production.md), [SKY](sky-production.md),
+[autónomos](autonomous-components.md) y [Lab](lab.md) según el paso.
+
+### Pendientes vigentes y siguiente evidencia
+
+- **IA/broker:** el último estado fechado continúa IA OFF; no hubo deploy monetario por PR15/16.
+  Refrescar revisión/tráfico/policy, demostrar techos/cotizaciones/reservas y hacer canary autorizado
+  antes de anunciar generación operativa. 50 USD/persona y 500 USD/organización por mes UTC,
+  ampliables por decisión explícita del operador; límites aprobados no autorizan un pago.
+- **Acceso de equipo/Efeonce ID:** TASK-1952 diferida, reusar Efeonce ID. No crear OAuth/AUTH propio
+  ni inferir bindings de correos; canary del operador no acredita al equipo. Git identity es aparte.
+- **Packages:** registro GitHub Packages leído el 2026-10-01: tokens/assets/contracts sólo tienen
+  0.1.0 publicada el 29/09. `sky-creative-contracts@0.2.0` quedó preparado/verificado localmente,
+  no publicado. Verificar el registro antes de distribuir otra versión; no cambiar sellos del pack.
+- **Fotografía/campañas nuevas:** nueva foto con guards sólo fue fixture en la unidad autónoma.
+  La fotografía histórica y las cuatro muestras antiguas no son nuevas ofertas aprobadas. Validar
+  reservas/contraste/crop y aprobación comercial por formato/run; renovar selección con nuevos UUID.
+- **Otras marcas y operación global:** SKY es el primer driver; admitir packs propios y canaries,
+  completar onboarding individual y certificar recuperación/retención donde aún no hay evidencia.
+- **Aceptación/publicación:** premium v5 tiene QA técnico; no atribuir aceptación visual del operador,
+  entrega al cliente ni dominio institucional a tests/merge. La comparación Figma de 126/126 sí
+  está cerrada técnicamente: no volver a declarar 121 referencias faltantes.
+
+### Cómo leer la historia preservada
+
+Todos los cortes siguientes registran lo observado en su momento. «Sin merge», «main96eab1e»,
+«11 managed-drift», «PR246 draft», «cinco controles/121 pendientes» y propuestas OAuth propias
+quedaron supersedidos donde este corte lo indica; no repetirlos como instrucciones vigentes.
+Conservar hashes, rechazos, outcomes y evidencias privadas originales sin reescribirlos.
+
+## Histórico de entrega: identidad Git — 2026-10-01
+
+El operador exigió resolver los rechazos recurrentes por autor Git. Mac: include condicional
+para efeoncepro HTTPS/SSH con noreply propio, Git user.useConfigOnly=true y clones existentes
+Greenhouse/Workbench verificados. Clones Efeonce nuevos heredan la identidad; repos de otras
+organizaciones no la heredan y Git rechaza identidad ausente en lugar de inventar email del Mac.
+No se alteran CLIs de Greenhouse ni se distribuye identidad personal a otros integrantes.
+
+Workbench añade configurador/chequeo por cuenta activa, hooks de commit/push versionados,
+instalación sin credenciales y protección de hooks previos. 19 tests de identidad + tres de
+instalación PASS, con Git real y comprobación negativa live de GIT_AUTHOR_EMAIL y
+GIT_COMMITTER_EMAIL del Mac. Ver [operations-distribution.md](operations-distribution.md).
+Código de identidad commiteado/pusheado normalmente con hooks activos: PR15 head `531c6de`.
+GitHub vincula autor y committer a cesargrowth11; Vercel SUCCESS para ese mismo head observado
+live. GitHub gates, native-harness y lab-checks SUCCESS también para el mismo head; no se
+atribuye ese resultado a commits posteriores ni a la promoción de main.
+Verificación local final: 348 harness + 7 SKY + 11 Lab = 366 PASS/0 SKIP. Pública: 325 PASS/30
+SKIP exactos (56+2 archivos). Skills commiteadas/pusheadas en
+[PR246 draft Greenhouse](https://github.com/efeoncepro/greenhouse-eo/pull/246), base develop.
+Ambos PR abiertos, sin merge ni nueva publicación de Packages/producción. Shared Lab WIP preservado.
+
+## Histórico de preparación: componentes autónomos — 2026-10-01
+
+Goal autorizado: completar componentización/tokenización SKY en Workbench. Rama
+`codex/sky-autonomous-components` desde main PR14 `be57032`; contrato y manual propios allí.
+11.096 instancias/1.196 campos/126 variantes; 193.920 recibos de propiedades de producción.
+4.996 bindings fills/strokes originales verificables; 4.684 conservados en escenas productivas
+efectivas. Resto derivado nativo, sin inferencias ni cambio del pack/tokens originales.
+
+El pipeline recompone las definiciones/instancias/tokens antes de copy/foto. Nuevos readers:
+componentes/descomponer/extraer/recomponer; ver [autonomous-components.md](autonomous-components.md).
+Privado 326 harness + 7 SKY + 11 Lab = 344 PASS, cero SKIP; público 303 PASS/30 SKIP exactos.
+126 PNG/SVG idénticos a comparison-final-02; auditoría final SHA
+`2dd4e9b5426b836e8b5366c40333ad187f91fa94714dc36aa3ad79c4f371db84`.
+Prueba real con copy nuevo y foto histórica declarada, UUID
+`6f287c46-574a-49a3-9351-51fc259f9f1e`; cero proveedores, sin aprobación comercial.
+Foto nueva con slots/guards se probó mediante fixture, no mediante generación pagada nueva.
+
+Contratos 0.2.0 preparados localmente (compiler/bindings/tokens), no publicados.
+Código commiteado y pusheado en `1d48c26`; [PR15 draft](https://github.com/efeoncepro/creative-workbench/pull/15)
+abierto sobre main. No merge, Packages, broker, Efeonce ID ni UI nuevos de esta unidad.
+La apertura del PR no confirma CI ni publicación Vercel; verificar sus estados live.
+No sobreescribir WIP de UI v3 ni interpretar la prueba como campaña lista para entregar.
+
+## Histórico: UI local v3 — 2026-10-01
+
+Corrección integral de superficies autorizada: shell, paneles, cards, RecipeDialog,
+tokens/Metric/recursos y coreografía; ver [lab.md](lab.md), sección v3. Preview 49617,
+digest `1c71d3bc88826327ed288dbd1e8d653f30da7abb3b9711deab306a2e4beef2a5`;
+QA actual en `creative-workbench/docs/ui/reviews/workbench-surfaces-v3-qa.md`.
+Checks de UI y browser local verificados; 296 recursos preservados. Gate general
+mantiene 11 managed-drift anteriores. Sin commit/push/deploy de esta unidad.
+Este corte no modifica el baseline de producción/motor descrito abajo.
+
+## Exportación REST independiente completa — 2026-09-30 (Chile)
+
+El operador autorizó guardar su nuevo PAT en Secret Manager de Workbench. Se creó
+`projects/efeonce-creative-workbench/secrets/workbench-figma-api-token`, versión 1 ENABLED,
+con escritura por stdin y readback exacto en memoria. Sin valor local/Git, grants nuevos
+al equipo/broker ni lectura del PAT antiguo expirado. Vencimiento nuevo no verificado.
+El consumer de mantenimiento puede transmitirlo por stdin al exporter; un job nunca
+selecciona secretos. La autenticación GCP se renovó con el runner autorizado.
+
+Figma REST devolvió HTTP 200 en 2 segundos para los 126 nodos en una llamada de imágenes,
+fijada a la versión `2404786957900889048` del JSON previamente sellado. Se descargaron
+y verificaron 126/126 PNG (nodos, dimensiones, SHA y versión), en 91 segundos.
+El MCP había respondido límite de llamadas; no confundirlo con este resultado REST ni
+atribuir una causa confirmada al fallo histórico sin diagnóstico.
+
+Canon privado SKY `2026-09-30/figma-rest-retry-2026-10-01T01-34-27-808Z/`: `exports.json`,
+`verification.json` y `attempt.json`; sufijo UTC, fecha local 30/09. Manifest SHA
+`615c6adb60be867820e465240366b952fd75cb1d469d6275c60fa178c24d94c8`.
+Los cortes inferiores «PNG incompleto» son historia. Comparación visual individual,
+aprobación comercial y actualización del Lab NO se cierran por descargar los PNG.
+No cambió pack, broker, IA, Packages ni Vercel. No certificar push de este corte local.
+
+## Histórico: lotes de agentes y círculos nativos integrados — 2026-09-30 (Chile)
 
 Workbench [PR 11](https://github.com/efeoncepro/creative-workbench/pull/11) está mergeado en
 `b8e944dd3e8b6717a7690cfb705a3d2820156b5d`. [PR 12](https://github.com/efeoncepro/creative-workbench/pull/12)
@@ -277,7 +403,7 @@ y `docs/operations/HARNESS_STATUS.md`. Unidad 6 cerrada en Git/main/CI; objetivo
 Continuar admisión semántica, minting/binding/transporte, cotizaciones, runtime y comparación
 Figma completa por sus carriles propios, con pruebas y readback antes de habilitar IA.
 
-## Estado vigente · transición fusionada 244 → 3 → 4 — 2026-09-30
+## Histórico: transición fusionada 244 → 3 → 4 — 2026-09-30
 
 Este bloque supersede «PR 3 abierto/draft», «sin merge», «transición sin publicar» y la
 reautenticación pendiente y «PR 4 abierto» descritos anteriormente. Los bloques inferiores conservan historia
@@ -475,7 +601,7 @@ Doce corridas anteriores de texto/artwork archivadas remotamente y releídas por
 Fuente de evidencia: Workbench `docs/audits/sky-native-archives-2026-09-30.json`.
 Las seis corridas modulares tienen archivo privado local, no afirmar nuevo archivo GCS.
 
-## Pendientes concretos
+## Histórico: pendientes del arranque, supersedidos por el corte consolidado
 
 | Pendiente | Próximo paso y evidencia necesaria |
 | --- | --- |
@@ -563,3 +689,91 @@ Source `387a441` pusheado y validado: gates 36723761793 / native-harness 3672376
 CI: 193 pass / 18 skips / 0 fail (harness 177/16, SKY 5/2, Lab 11/0), con allowlist exigido. Locales
 211 pass / 0 skips (193 harness, 7 SKY, 11 Lab conservados). Los cuatro bloqueos de merge siguen
 abiertos; no activación, provider, IAM, broker, Packages ni snapshot Lab nuevos.
+
+
+## Comparación completa y corrección modular — verificada 2026-09-30
+
+Los 126 exports REST independientes están disponibles y sellados. Se compararon todas
+las piezas por nodo y se localizaron causas compartidas de logos, flechas, círculos,
+máscaras, premios, iconos y tipografía. Ver [components.md](components.md) para método
+portable y `docs/architecture/workbench-sky-reference-comparison.md` en Workbench
+para controles, findings y cierre verificado. Fuente REST 2404786957900889048,
+SHA JSON 288435cb5b29b687c2e242dbaa1cee9e1ada820703a1d2ddba060a214ba1288f.
+
+No ejecutar CLIs Greenhouse para reproducir esto. No re-sellar pack/catálogo ni cambiar
+PNGs/QA/outcomes de UUID anteriores. La auditoría actual se genera en el canon privado,
+sin IA ni acceso productivo; las decisiones CTA Metric se distinguen de diferencias
+Figma. Verificación: 126 renders, 126 nodos revisados técnicamente, cero defectos detectados
+pendientes, 305 tests locales sin SKIP. Modo público: 273 PASS y 21 SKIP licenciados
+exactos. Lab local 308 archivos/126 proyecciones, digest
+f61406d21a5accc9cd729316eb5868ced422dbb9dd99af4ebc25ddc322a82136; conserva
+las cuatro muestras de producción antiguas como corridas originales. Audit
+3d77325e5f1fcf4df30046dd0c3dfc7856834354fd3d3689406798c6a930d242 y review
+a81b8a2a81f4814bccbb170f9b00de5513e2df63917f76bd643258a5123a45a7, privados
+en `comparison-final-02` del canon SKY. Registro completo en HARNESS_STATUS; un
+cambio local no implica push, merge, Packages o publicación en creative.efeonce.org.
+
+
+### Biblioteca del cliente y disclosures v4 — 2026-10-01
+
+El operador precisó que SKY es cliente del Design System Lab de Efeonce, no un sitio de
+la aerolínea. Dirección/QA actuales en creative-workbench:
+`docs/ui/visual-directions/workbench-client-library-v4.md` y
+`docs/ui/reviews/workbench-client-library-v4-qa.md`. v2/v3 ampliaron el shell general;
+la opción 2 conserva la mesa de tres regiones. No reclamar fidelidad literal al mock ni
+inventar variantes de otras recetas para replicarlo.
+
+Títulos funcionales y details nativo con `.disclosure-body` explícito, incluidos los
+campos/fuentes/Más zonas dinámicos. Cabecera/chevron con inset, interior suave, registros,
+metadatos y acciones de 44 px. Móvil reduce capas redundantes. No envolver con JS ni
+perder fallback/teclado; preservar originales y relaciones reales.
+Preview local 49617, digest `891eeb3743bfab8971a6eec6b6935045993ce04fdd8fcfc6cf8d8a0f19817f19`.
+296 recursos idénticos a v3; 45 Astro files sin diagnósticos, TypeScript y 17 tests passed.
+QA local no acredita aceptación del operador/publicación. Sin commit/push/CI/deploy;
+no bypass, sync total ni CLIs Greenhouse. El gate general previo sigue separado.
+
+### Equilibrio de superficies v5 — 2026-10-01
+
+V4 fue cuestionada por el operador por cards sucesivas. Criterio vigente: panel de tarea
++ entidad cuando hay decisión propia; cuerpos, fuentes y registros internos planos con
+espacio y reglas. Recetas/resources/inspector/tokens/guía corregidos; tipografía conserva
+specimens. No reintroducir fondos/bordes/radios por dato. Bibliotecas sin entradas por
+card ni refresh global de motion al abrir details; coreografía sólo escena original.
+Opción 2 conserva tres regiones. Preview 49617, digest `12ed9ba1da11e0c0b5399c914c92c494055347cdb332ef2a6dfc5ab50603798e`.
+QA en `docs/ui/reviews/workbench-surface-economy-v5-qa.md`; dirección homónima bajo
+`docs/ui/visual-directions/`. Desktop/móvil, reduced y fallback sin JS verificados;
+Astro/TypeScript y 17 pruebas pasan; 298 archivos no código iguales a v4. No aceptación
+visual del operador acreditada, ni commit/push/deploy. V4 es historia, no criterio vigente.
+
+### Publicación de la modernización en main — 2026-10-01
+
+El operador autorizó main. PR 16 fusionado por squash, main `c3e85b6cb1927fdeb13fea9aeddbdfbefc857852`,
+readback GitHub y ls-remote comprobados; árbol igual al head probado b77031d. Integración
+sobre 2392758 mediante unidad UI ecf0b15, no historia vieja completa. Constructor conserva
+native-previews y projection por SHA, excluyentes, con regresión. Gate drift viejo resuelto
+por la base vigente, sin editar sello. Gates, harness y Lab CI postmerge SUCCESS
+(36846606818/36846606907). Local: 348 harness +7 SKY, cero omisiones privadas; 17 Lab,
+Astro45/0 y TypeScript. Build335e56a10c11833951de2055135c072c58ad9e89795303f436b47a78a8c97985,
+285 imágenes/previews/fonts intactos. Preview49617 ahora sirve esa integración.
+Worktree aislado /Users/jreye/Documents/creative-workbench-lab-main, rama codex/lab-premium-main;
+checkout original y WIP fotográfico intactos. Evidencia privada en canon operations/
+2026-10-01-workbench-main-integration. Código main y CI verificados; estado Vercel SUCCESS
+leído, pero no reclamar un snapshot nuevo del sitio ni broker/paquetes publicados por eso.
+
+
+### SKY premium v5 publicado en Vercel — 2026-10-01
+
+Publicado el snapshot revisado de main `c3e85b6cb1927fdeb13fea9aeddbdfbefc857852`,
+build `335e56a10c11833951de2055135c072c58ad9e89795303f436b47a78a8c97985`, en el proyecto
+SKY `prj_7D9AODtfOOEf1su21wqyQASOdzOc` del scope `efeonce-7670142f`.
+Deployment `dpl_2sJFNXzxEdVFBykzKsnbtQVqr56x` READY/production, promovido y alias corto
+asignado explícitamente: https://creative-workbench-sky.vercel.app.
+
+Readback de 28 archivos remotos coincide por SHA con el snapshot local (cinco páginas,
+CSS/JS, catálogos, cinco WOFF2 host OFL y artwork seleccionado). Después de promover,
+seis respuestas autenticadas en deployment y alias estable coinciden por bytes; ocho
+requests anónimos a raíz/manifest/PNG/WOFF2 devuelven 302. Protección `all` verificada;
+no se desprotege el visor ni se amplía acceso. La URL localhost anterior era sólo local.
+
+Evidencia privada: `/Users/jreye/Documents/creative/creative-workbench-canon/operations/2026-10-01-workbench-vercel-premium-v5`.
+Publicación del Lab únicamente; sin cambio de broker, paquetes ni aprobación comercial SKY.

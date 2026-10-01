@@ -1,5 +1,14 @@
 # Fotografía SKY: estilo, producción y revisión
 
+## Relación con la producción modular — 2026-10-01
+
+La skill SKY original sigue siendo el canon fotográfico. PR15 recompone componentes/tokens y
+**después** aplica una fotografía propia por slot, con provenance/guards; no convierte fotografía
+en vector o token ni serializa imágenes post-sustitución en la biblioteca exportada.
+Cada adaptación tiene su encuadre/reservas: una sola foto aprobada no prueba todos sus crops.
+[Flujo de agentes](agent-production.md) distingue composición sin IA de generación por broker.
+La unidad autónoma no hizo paid canary nuevo; comprobar estado monetario/autoridad antes de generar.
+
 ## Dueño y selección de fuentes
 
 El canon es la skill del equipo `brands/sky-airline/skills/sky-fotografia/SKILL.md` 1.0.0,

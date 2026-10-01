@@ -4,6 +4,26 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "creative-workbench",
+      "triggers": [
+        "Creative Workbench",
+        "creative-workbench",
+        "KV SKY en Workbench",
+        "adaptaciones SKY en Workbench",
+        "componentes SKY en Workbench",
+        "harness multimarcas",
+        "paquetes privados SKY"
+      ],
+      "skills": [
+        "efeonce-creative-workbench"
+      ],
+      "sources": [
+        ".codex/skills/efeonce-creative-workbench/SKILL.md",
+        ".codex/skills/efeonce-creative-workbench/references/architecture.md",
+        ".codex/skills/efeonce-creative-workbench/references/state-continuity.md"
+      ]
+    },
+    {
       "id": "efeonce-brand-photography",
       "triggers": [
         "fotografía de marca",

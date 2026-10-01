@@ -1,6 +1,25 @@
 # Arquitectura y mapa de fuentes
 
-## Estado vigente: transporte y revocación probados en candidata
+## Arquitectura activa y límites de adopción — 2026-10-01
+
+El source integrado Workbench es main `c3e85b6` (PR15 + PR16). Los componentes autónomos,
+recetas, propiedades tokenizadas y Git identity se consumen en el flujo actual; el Lab es
+su proyección de revisión readonly. Ver [continuidad](state-continuity.md) para evidencia y
+[flujo de agentes](agent-production.md) para operar. Los 108 tokens del pack, las propiedades
+nativas derivadas y los bindings Figma corroborados son tres inventarios distintos.
+
+La prioridad del operador es producción. Efeonce ID se retomará mediante TASK-1952;
+**no crear AUTH ni cliente OAuth paralelo**. PR7/candidatas de identidad y sus transportes son
+antecedentes, no requisito para componer ni autoridad para habilitar IA o el resto del equipo.
+Main integra el guard final de pago del PR10, no la totalidad de identidad vinculada del PR7.
+`tools/broker-transport.mjs` de main conserva transporte legacy: token GitHub de sesión en
+Authorization y Google IAM en X-Serverless-Authorization. Esa deuda es explícita; el transporte
+bound del PR7 es una candidata separada. No afirmar que ya se retiró el bearer de main ni
+introducir un fallback nuevo al migrar a Efeonce ID.
+Git identity verifica autor/committer para commit/push; no sustituye auth del broker, invoker
+Google, permisos Packages/Vercel ni membresía del productor. Refrescar runtime antes de usar IA.
+
+## Histórico: transporte y revocación probados en candidata
 
 Head `2629ab4ea8ac5a5ed6aa3bf04d3db1fef2e04aef`, PR 7 draft/cinco checks SUCCESS. Nuevo
 transporte implementado/probado: JWT aplicativo íntegro en `X-Workbench-Identity`, IAM en
@@ -70,6 +89,9 @@ nativas; `.workbench/sync.lock.json` conserva el sello histórico, no se regener
 | Composición propia | `tools/marca-disenar.mjs`, `tools/brand-design.mjs` |
 | Catálogo/zonas | `tools/kv-zones.mjs`, `docs/architecture/workbench-kv-zones.md` |
 | Componentes SKY | `brands/sky-airline/components/index.mjs`, `native-graph.mjs`, `assemble.mjs` |
+| Biblioteca modular ejecutada y tokens | `brands/sky-airline/components/autonomous-scene.mjs`, `property-tokens.mjs`, `figma-property-bindings.mjs`, `docs/architecture/workbench-sky-autonomous-components.md` |
+| Lotes productivos | `tools/marca-lote.mjs`, `docs/architecture/workbench-design-batches.md`, `docs/manual/design-batches.md` |
+| Identidad Git local del equipo | `tools/git-identity.mjs`, `tools/git-hooks.mjs`, `.githooks/`, `docs/manual/git-identity.md` |
 | Lectura Figma nativa | `tools/sky-import-fig.mjs` y sus dependencias, inventario SKY |
 | Revisión de recursos | `docs/architecture/workbench-resource-revisions.md` |
 | Estado observado y evidencia | `docs/operations/HARNESS_STATUS.md`, `docs/audits/`, evaluaciones de proyectos |
@@ -125,11 +147,13 @@ run para cambiar copy, marca o versión. Una corrección del adapter produce una
 | Entrada | Resultado y autoridad |
 | --- | --- |
 | `marca:preflight` | Contexto local; incluso `--run` no concede autoridad productiva |
-| `marca:adaptaciones`, `marca:zonas` | Lectura local de referencia; plan/borrador sin generación |
+| `marca:adaptaciones`, `marca:zonas`, `marca:recetas` | Lectura local de referencia; plan/borrador sin generación |
+| `marca:componentes`, `marca:descomponer`, `marca:extraer`, `marca:recomponer` | Inspección/export privado y reconstrucción verificada; no campaña por JSON editado |
 | `marca:instalar`, `marca:doctor` | Instalar/verificar canon propio; no generar |
 | `marca:producir` | IA por broker privado, intención durable y autoridad viva |
 | `marca:componer` | Reproduce referencia histórica, no nueva campaña |
 | `marca:disenar` | Composición con copy completo y foto declarada, autoridad viva |
+| `marca:lote` | Snapshot/UUID durables, hasta 126 jobs de una marca, ejecución secuencial por autoridad viva |
 | `reference:build` | Catálogo web de una marca/run; build no acredita deploy |
 
 Schemas vigentes se inspeccionan en código/manual. IA usa `workbench.image-job.v1`;
@@ -168,7 +192,7 @@ se conserva si fue explícitamente reportado. El callback se cierra al concluir 
 `outcome.providerAudit` entra en el ZIP cuyo SHA sella el recibo, sin ampliar acceso de recovery.
 Usage es consumo posterior; no admite una cotización, presupuesto o costo máximo por sí solo.
 
-## Candidata de identidad: código integrado, admisión parcial sin runtime
+## Histórico: candidata de identidad preparada, admisión parcial en aquel corte
 
 La rama preparada sobre main 96eab1e ya implementa minter App, consumer Secret Manager,
 lector Google, puente de autoridad y wiring server/HTTP/kernel/history/bundle/CLI. No tiene PR,

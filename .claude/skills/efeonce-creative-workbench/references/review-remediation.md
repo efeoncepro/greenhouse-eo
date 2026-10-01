@@ -1,6 +1,20 @@
 # Revisión de gobierno, identidad y recuperación — 2026-09-30
 
-## Candidata posterior de identidad, aún sin PR
+## Cómo usar esta revisión en el corte integrado — 2026-10-01
+
+Registro histórico de remediación, no lista automática de bloqueos vigentes. La secuencia de
+integración cerró gobierno/transición, guard, reserva previa/carrera/policy y CI exacta; el
+main actual incluye PR14 comparación Figma, PR15 componentes/identidad Git y PR16 premium Lab.
+Ver [continuidad](state-continuity.md) y canon actual Workbench antes de aplicar otro parche.
+
+Siguen abiertos en su carril: identidad definitiva Efeonce ID (TASK-1952), onboarding real,
+admisión/cotizaciones/despliegue monetario, retención/recuperación donde falta evidencia y
+revisión semántica candidata travel-window 2.1.1. No ejecutar otra transición total ni tocar
+CLIs Greenhouse para replicar el orden ya cerrado del PR244. No restaurar 2.1.0 ni OAuth propio.
+CI pública actual exige 30 SKIP exactos (28 harness + 2 SKY), 56 + 2 archivos y 348 + 7 tests;
+Lab 17 PASS. Los 18 SKIP y bloqueos del PR3 de abajo pertenecen al momento de su revisión.
+
+## Histórico: candidata posterior de identidad, aún sin PR en aquel corte
 
 Código preparado sobre main 96eab1e: minter/Secret Manager, Google bound identity, puente,
 HTTP/server/kernel/history/bundle y transporte CLI sin token GitHub remoto. Pins App admitidos
@@ -31,7 +45,7 @@ Vínculo del operador aprobado/preparado; token/scopes, consumer/runtime, víncu
 equipo y cotizaciones siguen pendientes separados;
 IDs y límites en [state-continuity.md](state-continuity.md).
 
-## Lectura vigente del follow-up de producción
+## Histórico: follow-up de producción integrado
 
 La secuencia de merges 244→3→4→5 y main 4f868c6a con CI verde están acreditados en
 [state-continuity.md](state-continuity.md). Los cortes históricos de abajo conservan sus estados
@@ -106,7 +120,7 @@ ejecutar sync, publicar o fusionar. Canon de la unidad: Workbench
   original, sin default. Se corrigió un fixture sintético que omitía el dato, con regresión de
   plan/render. Los 126 compositores históricos mantienen sus hashes y el pack activo no cambia.
 
-## Lo que permanece abierto
+## Histórico: lo que permanecía abierto en la primera revisión
 
 1. Ownership/gates: sync.lock histórico tiene 838 archivos y no native. La lista local exime sus
    propios gates; el inventario native-ownership no acredita autoridad. El §8 está en una rama

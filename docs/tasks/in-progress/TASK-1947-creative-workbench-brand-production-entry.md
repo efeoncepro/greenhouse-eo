@@ -21,19 +21,19 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Corte 2026-09-30: lotes de agentes PR 11 y contornos PR 12 integrados en main 2bb761a; prueba real de cuatro formatos, cero proveedores. Privado277 PASS, público259 PASS/18 SKIP exactos. Guard final de pago PR 10 integrado pero sin deploy de esta unidad; flujo IA/cotizaciones/canary monetario y admisión de cada integrante pendientes. Efeonce ID diferido en TASK-1952; no AUTH paralelo.`
+- Status real: `Corte 2026-10-01: producción modular SKY PR15 integrado main 2392758 y Lab premium PR16 c3e85b6; skill PR246 integrado Greenhouse develop d4dad02. Corrida nueva 6f287c46 completed con copy explícito y cero proveedores; 126 PNG/SVG conservados. Flujo IA, cotizaciones/canary monetario, revisión efectiva del broker y admisión de cada integrante pendientes. Topes autorizados 50 USD/persona y 500 USD/organización al mes, aumentables por decisión del operador. Efeonce ID diferido TASK-1952; sin AUTH paralelo; contratos 0.2.0 locales, publicación no acreditada.`
 - Rank: `1`
 - Domain: `platform|tooling|identity`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 
-## Continuidad documental — 2026-09-30 (corte posterior a PR 12)
+## Continuidad vigente — 2026-10-01
 
-Consultar el [estado fechado del Workbench](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
-para código, evidencia y pendientes. Los cortes de PR 7/canary de identidad y cifras anteriores
-registrados abajo son historia; no obligan a terminar OAuth propio antes de componer ni acreditan
-rollout nuevo. Esta publicación documental no mueve la task a complete.
-
+Consultar [estado consolidado del Workbench](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md)
+y la [skill espejo](../../../.codex/skills/efeonce-creative-workbench/SKILL.md).
+PR15/PR16 Workbench y PR246 Greenhouse están integrados; los cortes fechados inferiores conservan
+historia y no sustituyen el estado actual. Esta actualización no cierra onboarding, distribución,
+IA ni Efeonce ID por inferencia y no mueve la task a complete.
 
 ## Summary
 
@@ -43,9 +43,9 @@ para todas las marcas por confirmación de Julio; cada corrida conserva contexto
 
 ## Why This Task Exists
 
-Los scripts exportados invocan CLIs crudos con paths y prompts libres. El preflight de TASK-1945
-es opt-in. Falta conectar el contrato a una entrada de producción y reducir la exposición accidental
-de CLIs y skills específicos de otras marcas.
+El bootstrap inicial exportaba CLIs crudos con paths/prompts libres. El harness nativo vigente
+usa contexto obligatorio y wrappers, y mantiene desactivadas las entradas legacy. Falta cerrar
+el rollout IA/broker/equipo con evidencia real; no reactivar esos CLIs para resolverlo.
 
 ## Goal
 
@@ -77,7 +77,8 @@ El adapter es infraestructura gestionada, no una ruta o comando suministrado por
 
 ### Depends on
 
-- TASK-1945 y su resolver en `scripts/creative-workbench/template/tools/brand-context.mjs`.
+- TASK-1945 y su resolver nativo `creative-workbench/tools/brand-context.mjs`; no el mirror retirado del template.
+- TASK-1952 conserva integración Efeonce ID diferida; no crear AUTH paralelo para cerrar esta entrada.
 
 ### Blocks / Impacts
 
@@ -85,28 +86,30 @@ El adapter es infraestructura gestionada, no una ruta o comando suministrado por
 
 ### Files owned
 
-- `scripts/creative-workbench/template/tools/brand-production.mjs`
-- `scripts/creative-workbench/template/tools/production-authority.mjs`
-- `scripts/creative-workbench/template/tools/marca-producir.mjs`
-- `scripts/creative-workbench/brand-production.test.mjs`
-- Delta en export, template de package y hooks gestionados.
+- En `creative-workbench`: `tools/brand-production.mjs`, `tools/production-authority.mjs`,
+  `tools/marca-producir.mjs`, `tools/broker-transport.mjs` y sus pruebas bajo `test/`.
+- `services/production-broker/` con policy/ledger/cupos y pruebas del runtime.
+- Este archivo y la continuidad de operación; no portar esos engines al template Greenhouse.
 
 ## Current Repo State
 
 ### Already exists
 
-- Resolver/locks, templates y sync desde ref de Git.
+- Resolver/locks nativos, corridas exclusivas, composición y lotes SKY integrados.
+- Broker candidato/GitHub App y policy de cupos; pruebas locales/históricas no acreditan promoción actual.
 - Equipo GitHub confirmado con cuatro miembros; Julio confirmó todas las marcas para todos.
+- Hooks de identidad Git verificada por persona; este guardarraíl no reemplaza la identidad del broker.
 
 ### Gap
 
-- CLIs y skills de múltiples marcas accesibles sin contexto obligatorio.
-- Permisos GCP de IA y eliminación del bypass no acreditados.
+- Cotizaciones, policy efectiva/runtime nuevo, agotamiento y canary monetario no cerrados.
+- Admisión/canaries reales de todos los integrantes y acceso vigente requieren readback.
+- Credenciales directas del operador siguen fuera de la garantía del harness; sin garantía de bypass imposible.
 
 ## Modular Placement Contract
 
 - Topology impact: `tooling`
-- Current home: `scripts/creative-workbench/template/tools/`
+- Current home: `creative-workbench/tools/` y `services/production-broker/`
 - Future candidate home: `remain-shared`
 - Boundary: `entrada neutral gestionada y adapters permitidos; cero defaults visuales`
 - Server/browser split: `Node local; sin consumer browser`
@@ -119,13 +122,13 @@ El adapter es infraestructura gestionada, no una ruta o comando suministrado por
 
 - Backend rigor: `backend-standard`
 - Impacto principal: `integration`
-- Source of truth afectado: `GitHub membership vivo y catálogo gestionado`
+- Source of truth afectado: `membresía GitHub viva, policy/identidad del broker y catálogo nativo; Efeonce ID definitivo diferido`
 - Consumidores afectados: `CLI workbench; sin UI ni portal`
-- Runtime target: `local`
+- Runtime target: `local y Cloud Run; configuración/IA efectivas por verificar antes de rollout`
 
 ### Contract surface
 
-- Contrato existente a respetar: `template/tools/brand-context.mjs` dentro del plano de control.
+- Contrato existente a respetar: `creative-workbench/tools/brand-context.mjs`, lock y contrato broker nativos.
 - Contrato nuevo o modificado: `production-authority.mjs` y `brand-production.mjs`.
 - Backward compatibility: `gated`
 - Full API parity: command compartido con CLI; no lógica de producción en UI.
@@ -144,7 +147,7 @@ El adapter es infraestructura gestionada, no una ruta o comando suministrado por
 ### Migration, backfill and rollout
 
 - Migration posture: `none`
-- Default state: `disabled mediante packs gated`
+- Default state: `IA permanece OFF durante cierre de autoridad; packs admitidos conservan composición local sin proveedores`
 - Backfill plan: `none`
 - Rollback path: `revert export/entrada; no convertir a otra marca`
 - External coordination: `restricción de credenciales antes del rollout operativo completo`
@@ -159,10 +162,10 @@ El adapter es infraestructura gestionada, no una ruta o comando suministrado por
 ### Runtime evidence
 
 - Local checks: `Node/Vitest negativos, concurrencia y export`
-- DB/runtime checks: `N/A; sin DB ni servicio desplegado`
-- Integration checks: `GitHub readback del equipo; adapter mock hasta canary autorizado posterior`
+- DB/runtime checks: `readback de revisión/configuración/ledger del broker; canaries históricos no prueban revisión activa actual`
+- Integration checks: `membresía y scopes GitHub App vivos; operador tiene canary histórico, resto del equipo y gasto requieren evidencia real`
 - Reliability signals/logs: `outcome de corrida completed/failed sin aprobación implícita`
-- Production verification sequence: `local → sync commit → canary negativo → canary real → readback`
+- Production verification sequence: `pruebas locales → PR nativo → canaries de candidata con IA OFF → promoción autorizada → readback efectivo; gasto por gate separado`
 
 ### Acceptance criteria additions
 
@@ -262,7 +265,8 @@ Restricción de secretos directos y proveedor gobernado antes de garantía opera
 
 ## Verification
 
-- Suite Node `brand-production.test.mjs` y control-plane Vitest.
+- En Workbench, suites focales de `test/brand-production.test.mjs`, broker/autoridad/cupos y contrato público exacto.
+- No ejecutar suite/template Greenhouse retirados como prueba del harness nativo.
 - `pnpm task:lint --task TASK-1947`.
 - `git diff --check`.
 

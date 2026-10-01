@@ -1,6 +1,18 @@
 # Aprendizajes y errores que no deben repetirse
 
-Registro de causas verificadas durante el onboarding SKY, hasta 2026-09-30. Aplicar a la variante/
+## Aplicación vigente — 2026-10-01
+
+El [corte actual](state-continuity.md) prevalece sobre estados históricos de esta tabla.
+La comparación independiente de 126/126 está completa; las propuestas OAuth propias se
+retiraron en favor de Efeonce ID diferido. Git identity ya tiene configuración/hook por persona,
+pero presupuesto/broker y acceso de todo el equipo no se cierran por un merge de componentes.
+
+Aprendizajes nuevos: conservar identidades visuales por ejecución; reconstruir el árbol completo
+con dependencias antes de copy/foto; inferencia por hex no prueba binding; un snapshot editado
+con SHA recalculado no se auto-admite; extracción con fondo/Multiply requiere contexto. El
+PNG de un icono no cambia su fuente vectorial. Ver [autónomos](autonomous-components.md).
+
+Registro de causas verificadas durante el onboarding SKY, con cortes hasta 2026-10-01. Aplicar a la variante/
 contrato que respalda cada caso, sin transformar un ejemplo en excepción general de marca.
 
 | Síntoma o afirmación | Causa / evidencia útil | Acción correcta |
@@ -20,7 +32,7 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 | Legal pierde énfasis / cuotas uniformes | Mixed styles olvidados durante shapeado | Regular/Semibold y Black/Medium exactos, case nativo |
 | Cielo correcto aislado pero texto ilegible | Reserva no proyectada al FILL/crop o nubes bajo texto blanco | Medir pieza final; foto/variante apropiada, sin scrim que esconda fallo |
 | “Sí, la imagen sigue el criterio” | Confirmación humana de fotografía | No extenderla a KV, contraste, precio, derechos o publicación |
-| 126 renders coinciden con source propio | Regresión interna, no referencia independiente | Mantener 5 controles Figma y 121 faltantes explícitos |
+| 126 renders coinciden con source propio | Regresión interna no basta como referencia independiente | Usar los 126 controles REST sellados y comparación por nodo; PR14 cerró esa revisión y PR15 conserva PNG/SVG exactos |
 | 4,495581 se presenta como 4,5 aprobado | Redondeo oculta fallo del umbral | Registrar valor real y límite del método |
 | “Vercel está bloqueado” | Sesión/scope equivocada no es build roto | Verificar identidad y project exactos, no mezclar cuentas |
 | Vercel CI genérico verde | Otro proyecto/alias que visor SKY separado | Readback del deployment y superficie SKY concretos |
@@ -43,11 +55,11 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 | Revisión READY/tagged se informa como rollout completo | 00009-cep tiene 0% tráfico y producción sigue en 00008-tv6 al 100% | Verificar revisión/tráfico y endpoint; separar build, deploy candidato y promoción |
 | Identity400 se atribuye a token App o vínculo Google | Filtro rechaza antes de ambos lectores | No afirmar primer token/scopes o binding positivo; corregir transporte y volver a medir |
 | Cloud Run recibe token IAM pero aplicativo no obtiene JWT íntegro | Dos controles consumen el transporte firmado | Header aplicativo propio X-Workbench-Identity + X-Serverless-Authorization IAM, sin fallback Authorization; exigir readback tras corrección |
-| Aprobación del operador se usa para aceptar audiencia compartida | Comentario PR7 identifica riesgo MEDIO sin aceptación específica | OIDC propio antes de habilitar otros tres integrantes; no inferir aceptación del riesgo |
+| Aprobación del operador se usa para aceptar audiencia compartida | Comentario PR7 identifica riesgo MEDIO sin aceptación específica | Reusar Efeonce ID mediante TASK-1952 y demostrar admisión individual; no crear OIDC propio ni inferir aceptación del riesgo |
 | Miembros GitHub/correos se presentan como productores habilitados | API de equipo no certifica binding Google ni IAM | Evidencia por persona y cuenta; correos sólo referencia, no grant |
 | Perfil legacy malformed se interpreta como firma eliminada | Rechazo Cloud Run400 no describe transformación exacta de bytes | Registrar conducta medida y header propio íntegro; no inferir mecanismo no observado |
 | Primer token válido se extiende a todos los miembros | Canary9/9 probó sólo al operador, scope de un repo y revocación de cuatro tokens | Separar mint/token/identidad positiva del operador y admisión individual del resto |
-| Canary sin pago se presenta como readiness para gastar | IA OFF y quotes0 no prueban quote/budget o ruta pagada | OAuth propio, presupuesto admitido y autorización del pago antes de cualquier canary de costo |
+| Canary sin pago se presenta como readiness para gastar | IA OFF y quotes0 no prueban quote/budget o ruta pagada | Autoridad definitiva conforme Efeonce ID, presupuesto/cotizaciones admitidos y autorización del pago antes del canary de costo |
 | Fusionar nueva CLI para probar endpoint aún ausente | Cliente requiere contrato que runtime no admite | PR draft, backend admitido/readback IA OFF antes de merge; sin broad-token fallback |
 
 ## Propuestas rechazadas o retiradas
@@ -58,7 +70,7 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 - Primera implementación de texto mixto: legal URL Regular y headings sin UPPER. Rechazada;
   nuevas corridas v2, no sobrescritura de v1 ni etiqueta de aprobación retroactiva.
 - Parche de seam por expandir piezas separadas o retocar imagen final: resuelve una escala,
-  no la topología compartida. Biblioteca continua verificable en las 74 variantes.
+  no la topología compartida. Biblioteca continua verificable con los 105 pins efectivos (74 iniciales, 25 ampliaciones y seis unions); no una regla libre para fuentes nuevas.
 - Reconstruir logo con letras, redibujar icono o copiar uno distinto por adaptación: pierde fuente
   oficial y repite errores de escala. Reparar instancia admitida, no cambiar artwork.
 - Prompt+ancla correctos como certificación visual: faltan inspección del PNG/encuadre y mediciones
