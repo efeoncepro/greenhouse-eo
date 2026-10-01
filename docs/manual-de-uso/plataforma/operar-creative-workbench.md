@@ -16,12 +16,17 @@ Para producir una campaña SKY, ejecutar desde Workbench el flujo documentado en
 `docs/manual/native-design.md` y `docs/manual/design-batches.md` y `docs/manual/autonomous-components.md`: recetas/adaptaciones/zonas,
 copy y fotografía admitidos, validación, ejecución exclusiva y QA. Los nombres/argumentos actuales
 salen de `package.json` y del manual de ese repo. Para Git usar `git:identidad`/`git:hooks` por persona,
-sin copiar la configuración del operador. Para el Lab usar `docs/manual/workbench-lab.md`; revisar
-variante/receta y sus zonas, no producir desde un payload visual libre.
+sin copiar la configuración del operador. Para el Lab consultar
+[usar Creative Workbench Lab](../creative/usar-creative-workbench-lab.md) y su manual nativo
+`docs/manual/workbench-lab.md`; revisar variante/receta y sus zonas. PR17/main `7e4c617` y el
+[alias Vercel protegido](https://creative-workbench-sky.vercel.app/) tienen evidencia propia de
+publicación del snapshot SKY; un servidor local o status CI Vercel genérico no la sustituye.
 
 Sólo los archivos gestionados van por su mecanismo de distribución sellada. Cambios en motor,
 componentes, Lab y broker nativos se hacen por PR en Workbench. No restaurar mirrors de template
-ni ejecutar un sync total heredado. En mantenimiento del control plane, inspeccionar el plan y
+ni ejecutar un sync total heredado. La prohibición genérica de edición del bootstrap histórico
+sólo corresponde hoy a rutas gestionadas según su sello; no impide cambios nativos revisados por PR.
+En mantenimiento del control plane, inspeccionar el plan y
 ownership actuales antes de cualquier acción; este manual no autoriza cambios IAM/cloud/secrets.
 
 No entregar llaves de proveedor al equipo ni reactivar `ai:*`/`foto:*` legacy para saltarse el broker.

@@ -286,7 +286,7 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 
 ## Creative Workbench: aislamiento multimarcas
 
-[ADR Accepted](EFEONCE_CREATIVE_WORKBENCH_MULTIBRAND_ISOLATION_DECISION_V1.md), 2026-09-29: taller común del equipo; recursos y corridas separados. TASK-1945 en implementación, sin rollout.
+[ADR Accepted](EFEONCE_CREATIVE_WORKBENCH_MULTIBRAND_ISOLATION_DECISION_V1.md), 2026-09-29: taller común del equipo; recursos y corridas separados. Producción modular y Lab premium integrados; [readbacks y pendientes de onboarding/distribución/IA](../operations/creative-production/WORKBENCH_CURRENT_STATE.md) se verifican por superficie.
 
 ## AEO X-Ray — 2026-09-30
 

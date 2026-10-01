@@ -7,9 +7,9 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-10-01 — Workbench: documentación de producción modular integrada
+## 2026-10-01 — Workbench: producción modular y Lab premium integral documentados
 
-PR15 integra composición/descomposición SKY, tokens de propiedades e identidad Git persistente; PR16 integra el Lab premium. Skill/docs PR246 integrados en develop. [Continuidad vigente](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md), manuales y TASK-1945/1946/1947 corrigen estados antiguos y separan capacidades de rollout: contratos 0.2 sin publicar, distribución Metric/onboarding/IA pendientes y TASK-1952 Efeonce ID diferida. No cambia runtime, cloud ni las CLI locales Greenhouse.
+PR15 integra producción modular SKY e identidad Git; PR16/17 integran el Lab premium completo, superficies equilibradas, coreografía de scroll y menús de familias/tokens con teclado y fallback nativo. Snapshot v6 publicado y verificado en Vercel protegido. Skills espejo, [continuidad vigente](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md), funcional y manuales enlazan contratos/evidencia del repo Workbench. Base documental PR246 integrada en develop; contratos 0.2, Metric/onboarding/IA y Efeonce ID conservan sus pendientes independientes. Este cierre documental no cambia runtime ni CLIs de Greenhouse.
 
 ## 2026-09-30 — AEO X-Ray: demo multipieza aceptada, publicada y documentada
 

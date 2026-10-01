@@ -17,6 +17,13 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 
 | Síntoma o afirmación | Causa / evidencia útil | Acción correcta |
 | --- | --- | --- |
+| Lab cliente usa titulares de venta de vuelos | Confundir marca presentada con autoría/objetivo del producto | Design System Lab de Efeonce para SKY; títulos funcionales, host Bricolage/Poppins y artwork Metric separados |
+| Card dentro de card en recetas, fuente y metadatos | Interpretar contención como un borde/fondo/radio por dato; v4 rechazada | V5: panel por tarea y card sólo para entidad seleccionable; interiores planos con espacio/reglas |
+| Bibliotecas animan cada card al abrir details | Extender coreografía narrativa a lectura densa | Escena de composición localizada; bibliotecas estáticas, reduced/reactivo y HTML visible |
+| “Interior del desplegable optimizado”, pero picker sigue del sistema | QA del campo cerrado/disclosure no revisó menú de select abierto | Abrir familia y colección: primitive host compartida, teclado/reset/collision y fallback nativo; [contrato](lab.md#selectores-y-desplegables) |
+| Popover se ve bien pero no filtra o reset muestra valor viejo | Botón decorativo separado del select dueño de eventos | Mantener select/IDs, confirmar con change y sincronizar etiqueta/aria-selected; Escape no aplica navegación |
+| Localhost entregado como Vercel actualizado | URL del servidor local no prueba publicación remota | Source/main/build → deployment de marca → bytes/alias → navegador real; comunicar URL verificada |
+| Promoción READY deja alias corto con versión anterior | Alias manual no se reasigna necesariamente al promover | Comprobar/asignar alias explícito y repetir readback autenticado/anónimo en ambos hosts |
 | “Está en carpeta SKY, por tanto es SKY” | Folder no valida procedencia de dependencia | Resolver cliente, pack exacto y cada ID/SHA; rechazar cruces |
 | Root instala AXIS aunque cliente es SKY | Herencia de identidad en dependencias raíz | Runtime neutral y biblioteca propia; no sync total antiguo |
 | “El productor está en el JSON” | Campo local es atribución falsificable | Identidad GitHub viva y autoridad del ingreso |
@@ -63,6 +70,10 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 | Fusionar nueva CLI para probar endpoint aún ausente | Cliente requiere contrato que runtime no admite | PR draft, backend admitido/readback IA OFF antes de merge; sin broad-token fallback |
 
 ## Propuestas rechazadas o retiradas
+
+- UI v4 con cards sucesivas: contención excesiva cuestionada por el operador. V5 conserva
+  límites de tarea/entidad y aplana registros; no volver a proponer nested cards ni animación
+  individual como acabado premium. V6 completa menús de filtros y conserva ese equilibrio.
 
 - Prompt canary genérico de SKY: sirvió para probar infraestructura, luego retirado al admitir la
   skill fotográfica. No seguir generando con ese recurso antiguo ni adoptar su quality low como

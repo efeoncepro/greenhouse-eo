@@ -22,10 +22,14 @@ Hay 126 adaptaciones nativas SKY y componentes autónomos con tokens, slots, dep
 Se pueden descomponer, inspeccionar, extraer y recomponer dentro de su contrato admitido. Las nuevas
 campañas mantienen QA propio: una escena técnicamente correcta no autentica tarifas, vigencias o derechos.
 
-El Lab premium muestra composiciones, adaptaciones y recetas relacionadas, zonas y subpáginas de
-tokens, tipografía y recursos. Usa identidad Efeonce en el host y Metric/recursos SKY en sus piezas.
-Sirve para explorar y revisar; la producción escalable ocurre mediante la CLI y los contratos, sin exigir
-un editor visual. El objetivo de dominio es `creative.efeonce.org`; su disponibilidad debe verificarse.
+El [Lab premium integral](../creative/creative-workbench-lab.md) muestra composiciones, adaptaciones,
+recetas e inspector, con subpáginas de tokens, tipografía y recursos. La opción 2 conserva variantes
+propias/original proporcional/zonas, y v6 completa los menús abiertos de familias y colecciones.
+Host Efeonce (Bricolage/Poppins y roles AXIS) y piezas SKY (Metric/recursos cliente) mantienen
+admisiones separadas. Sirve para explorar y revisar; la producción escalable ocurre mediante la CLI
+y los contratos. El corte publicado es [Vercel protegido](https://creative-workbench-sky.vercel.app/),
+PR17/main `7e4c617`, con readback del snapshot SKY; CI genérico no acredita ese deployment.
+`creative.efeonce.org` sigue previsto, sin disponibilidad acreditada por este cierre.
 
 ## Personas, aprobación y costos
 

@@ -1,7 +1,7 @@
 # Creative Workbench — continuidad operativa vigente
 
 Corte: 2026-10-01. Fuente activa: [`efeoncepro/creative-workbench`](https://github.com/efeoncepro/creative-workbench),
-main `c3e85b6cb1927fdeb13fea9aeddbdfbefc857852` (PR 16). Este documento separa capacidades
+main `7e4c6177992785c02430dd238c267991e097c4c9` (PR 17). Este documento separa capacidades
 integradas, pruebas fechadas y trabajo pendiente; verificar el runtime al ejecutar, porque un merge no acredita
 por sí solo flags, presupuesto, permisos o un despliegue del broker.
 
@@ -12,7 +12,8 @@ por sí solo flags, presupuesto, permisos o un despliegue del broker.
 | Corrección frente a Figma | [PR 14](https://github.com/efeoncepro/creative-workbench/pull/14), `be57032`; revisión técnica de 126 pares independientes | Workbench `docs/architecture/workbench-sky-reference-comparison.md` |
 | Producción por componentes autónomos y tokens | [PR 15](https://github.com/efeoncepro/creative-workbench/pull/15), main `2392758`, merge 2026-10-01 08:10:24Z | Workbench `docs/architecture/workbench-sky-autonomous-components.md`, `docs/documentation/autonomous-components.md`, `docs/manual/autonomous-components.md` |
 | Identidad Git persistente | PR 15: comprobación de persona GitHub activa, autor/committer efectivos y hooks por repo | Workbench `docs/architecture/workbench-git-identity.md`, `docs/manual/git-identity.md` |
-| Lab premium | [PR 16](https://github.com/efeoncepro/creative-workbench/pull/16), main `c3e85b6`; bibliotecas de composiciones, adaptaciones, recetas y zonas, subpáginas de tokens/tipografía/recursos | Workbench `docs/manual/workbench-lab.md`, `docs/ui/reviews/workbench-main-integration-2026-10-01.md` |
+| Lab premium integral | [PR 16](https://github.com/efeoncepro/creative-workbench/pull/16), main `c3e85b6`; navegación, composiciones, adaptaciones, recetas, inspector, tokens/tipografía/recursos y economía de superficies v5 | [Funcional del Lab](../../documentation/creative/creative-workbench-lab.md), Workbench `docs/architecture/workbench-lab-navigation.md` y `docs/ui/motion/workbench-premium-v2.md` |
+| Interior de selectores v6 | [PR 17](https://github.com/efeoncepro/creative-workbench/pull/17), main `7e4c617`; familias y colecciones con panel host compartido, teclado, reset, móvil y fallback nativo | [Manual del Lab](../../manual-de-uso/creative/usar-creative-workbench-lab.md), Workbench `docs/ui/reviews/workbench-filter-selects-v6-qa.md` |
 | Skills, ADR y tasks Greenhouse | [PR 246](https://github.com/efeoncepro/greenhouse-eo/pull/246), develop `d4dad02`, merge 2026-10-01 08:10:52Z | Skill espejo `.codex/.claude/skills/efeonce-creative-workbench/` |
 
 Greenhouse conserva gobernanza y enseñanza; la implementación activa se mantiene en Workbench.
@@ -43,7 +44,8 @@ mantienen tipos distintos; no reconstruir el logo ni los iconos mediante IA.
 
 Una marca por corrida; equipo autorizado para todas las marcas no permite mezclar SKY, Berel y Efeonce.
 UI del host Efeonce y contenido de SKY usan sistemas separados. Metric gobierna las composiciones SKY,
-Inter es auxiliar; el host del Lab usa recursos Efeonce. Nuevos contenidos comerciales y legales exigen
+Inter es auxiliar; el host del Lab usa Bricolage Grotesque para títulos y Poppins para lectura/controles,
+con roles y recursos Efeonce materializados desde AXIS. Sus tokens no reemplazan los 108 tokens cliente. Nuevos contenidos comerciales y legales exigen
 aprobación explícita: las fuentes Figma conservan información histórica.
 
 ## Evidencia fechada y límites
@@ -73,9 +75,43 @@ requiere preparación/UUID nuevo y QA; no sobrescribir corridas antiguas ni decl
 se regeneraron por un merge. La foto nueva se probó mediante fixture; no hubo nueva generación pagada
 ni canary monetario en la unidad modular.
 
-## Readback remoto — 2026-10-01
+## Lab publicado v6 — 2026-10-01
 
-[Auditoría de reconciliación](../../audits/creative-workbench/2026-10-01-documentation-reconciliation.md) conserva las consultas y verificaciones de este corte.
+[Auditoría de cierre v6](../../audits/creative-workbench/2026-10-01-lab-premium-v6-documentation-closure.md)
+reconcilia código, QA y evidencia de publicación. PR 17 quedó merged a las 11:05:43 UTC en
+`7e4c6177992785c02430dd238c267991e097c4c9`, con tree idéntico al head revisado `2b0bf8b`.
+Los checks postmerge [gates 36853208420](https://github.com/efeoncepro/creative-workbench/actions/runs/36853208420)
+y [native-harness/Lab 36853208477](https://github.com/efeoncepro/creative-workbench/actions/runs/36853208477)
+quedaron completed/success.
+
+El sitio vigente del corte es [creative-workbench-sky.vercel.app](https://creative-workbench-sky.vercel.app/),
+proyecto SKY `prj_7D9AODtfOOEf1su21wqyQASOdzOc`, deployment
+`dpl_139Fyz3vV85jfHBHXw7CNuMqAE2d` READY/production. Su metadata fija el SHA de main de este corte
+y el build `0b815c5e7ee07a56a24d24d1e4962ad378a235726325138105098daa250118e2`:
+310 archivos, cinco WOFF2 host OFL y cero binarios privados Metric. Promoción y asignación explícita
+del alias se verificaron por separado. El status Vercel genérico de GitHub no prueba este snapshot SKY.
+
+La evidencia guardada registra 29 archivos críticos remotos con SHA idéntico al snapshot; tras
+promover, seis respuestas autenticadas idénticas entre deployment/alias y cuatro anónimas HTTP 302.
+Protección `all` conservada: publicación verificada no significa acceso público. Navegador en el alias:
+menús de familias y tokens abiertos, Always On filtra a siete, reset vuelve a 126 y consola sin errores/warnings.
+La QA local v6 añade 16 recorridos desktop/móvil/teclado/reduced/no-JS, 17 pruebas Lab, Astro 47 archivos
+sin diagnósticos, TypeScript estricto y cuatro gates; 298 archivos no HTML/CSS/JS idénticos al build v5.
+No se infiere aprobación comercial ni aceptación visual formal del cliente.
+
+Evidencia privada fuera de Git:
+`/Users/jreye/Documents/creative/creative-workbench-canon/operations/2026-10-01-workbench-filter-selects-v6/`
+(`merge-readback.json`, `main-checks.json`, `local-validation.json`, `snapshot-readback.json`,
+`production-readback.json`, `browser-production.json` y capturas). Durante este cierre se revalidaron PR/main/checks y tres archivos autenticados del alias
+(raíz, Tokens y CSS del selector), todos con SHA exacto del dossier. No se repitieron los 29 archivos
+ni los recorridos de navegador de publicación. El cierre no repite el deploy ni habilita broker, IA,
+Packages o permisos. `creative.efeonce.org` continúa como dominio
+previsto; este corte no verifica DNS/TLS/alias de ese hostname.
+
+## Antecedente de readback PR 16 — 2026-10-01
+
+El bloque siguiente es histórico; el alias actual está identificado arriba. La
+[auditoría de reconciliación](../../audits/creative-workbench/2026-10-01-documentation-reconciliation.md) conserva las consultas y verificaciones de este corte.
 
 PR 16 quedó merged a las 10:02:29Z. Sobre `c3e85b6`, GitHub Actions:
 [gates 36846606818](https://github.com/efeoncepro/creative-workbench/actions/runs/36846606818) SUCCESS y

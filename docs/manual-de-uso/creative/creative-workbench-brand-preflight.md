@@ -1,7 +1,8 @@
 # Preflight de marca en Creative Workbench
 
 > Estado actual 2026-10-01: [continuidad vigente](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md)
-> y manuales nativos de Workbench. PR14/15/16 integrados; revisión técnica126/126 completada.
+> y [manual del Lab](usar-creative-workbench-lab.md). PR14/15/16/17 integrados; revisión técnica 126/126
+> completada. Lab v6 publicado en el alias Vercel protegido; UUID y pruebas del demo de abajo son históricos.
 > Este manual conserva la prueba fechada del demo y sus UUID inmutables; sus cifras, selecciones y
 > pendientes históricos no describen el último renderer/Lab, ni autorizan reejecutar samples como campaña.
 > Flujo IA y Efeonce ID siguen separados; no modificar CLIs Greenhouse ni sync total.
