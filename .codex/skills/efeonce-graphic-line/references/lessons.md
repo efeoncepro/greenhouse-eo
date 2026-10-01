@@ -543,8 +543,11 @@
   aparecía. Regla: subir las fuentes como asset `/_blob/` del canvas.
 - **Correr la foto deja una franja.** Síntoma: en la portada de LinkedIn personal, al mover la foto a la derecha para
   liberar la foto de perfil, el hueco quedaba con otro tono. Causa: un fondo plano o un fundido no tienen la textura de
-  la foto. Regla: llenar el hueco **reflejando el propio borde** de la foto; donde las pantallas tocan el texto, se
-  corre más (Formatos 240 px, Estallido 220 px; el resto 80 px).
+  la foto. Regla: llenar el hueco **reflejando el propio borde** de la foto.
+- **Correr la foto para liberar el texto empuja al sujeto al borde.** La primera versión de las portadas personales
+  corría la foto hasta 240 px: el operador, al verla en su perfil, notó a Nexa pegada al borde con la mano cortada y el
+  logo flotando lejos del texto. Regla: no correr a ciegas; medir dónde está la cara en cada foto y ubicarla en un mismo
+  punto (x ≈ 1190), achicando la foto lo necesario (1300 px), y pegar el logo al bloque de texto.
 - **Una edición de nitidez puede meter personas.** En Portafolio y Recetas, la edición con GPT Image que pedía sólo
   detalle agregó personas ajenas al roster; se sacaron con recorte. Regla: después de una edición, mirar al 100 % si
   apareció alguien; nunca personas fuera del roster en una foto de marca.

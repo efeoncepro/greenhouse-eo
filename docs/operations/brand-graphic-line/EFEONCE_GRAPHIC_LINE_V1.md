@@ -813,10 +813,12 @@ historia 9:16 **completa** y agregarla al destacado (`v02`). Una historia con ba
   roster y se sacaron con recorte: nunca personas fuera del [roster](../brand-photography/EFEONCE_TEAM_ROSTER_V1.md)
   en fotos de marca.
 
-**Portada de LinkedIn para el perfil personal.** Deriva de la corporativa aprobada: 1584 × 396, texto desde x 480 y
-logo de 120 px bajo el texto. La foto se corre a la derecha y el hueco se llena **reflejando su propio borde** (un fondo
-plano o un fundido dejan una franja de otro tono); donde las pantallas tocan el texto, la foto se corre más (Formatos
-240 px, Estallido 220 px; el resto, 80 px). Cada persona las elige en su página del kit, sección «Tu portada de
+**Portada de LinkedIn para el perfil personal.** Deriva de la corporativa aprobada: 1584 × 396, texto desde x 480,
+pregunta de 32 px, respuesta de 120–124 px y el logo de 120 px **pegado bajo el mensaje** (no fijo al pie). La foto va a
+1300 px de ancho, sin recortar arriba, con la cara de Nexa en x ≈ 1190 (1130–1140 en «La IA te cita» y «La
+respuesta», para que la burbuja no se corte); los huecos a los lados se llenan **reflejando su propio borde** (un fondo
+plano o un fundido dejan una franja de otro tono). Ajuste del operador al verla puesta en su perfil (2026-10-01): en la
+primera versión Nexa quedaba pegada al borde, con la mano cortada, y el logo flotaba lejos del texto. Cada persona las elige en su página del kit, sección «Tu portada de
 LinkedIn» ([roster, portadas de LinkedIn](../brand-photography/EFEONCE_TEAM_ROSTER_V1.md#portadas-de-linkedin-del-equipo-2026-10-01)).
 
 **Cómo se produjo (para regenerar).** En el canvas de Claude Design las fuentes se suben como asset `/_blob/` (la ruta
@@ -835,7 +837,7 @@ portadas personales salen de `ai-generations/2026-09-30_portadas-sociales/person
 - OneDrive (`Alineación/`): `5. Contenidos/13- Branding/Redes sociales Efeonce/2026-10 La órbita/v01/{LinkedIn,Facebook,YouTube,Avatar,LinkedIn perfil personal}/`
   y `5. Contenidos/05. Highlights/2026-10 Destacados La órbita/` (`v01/` portadas, `v02/` historias completas), con
   `LEEME` y manifiesto SHA-256; las ocho portadas personales también en `6. Marca/Kit media/Portadas de LinkedIn/2026-10 La órbita/`.
-- Bucket público de AXIS: `gs://efeonce-group-axis-public-media/team/linkedin-covers/v1/` (portadas personales).
+- Bucket público de AXIS: `gs://efeonce-group-axis-public-media/team/linkedin-covers/v2/` (portadas personales; `v1` es la primera versión).
 
 **Pendiente:** publicar en cada red del perfil de Efeonce y crear los destacados en Instagram (decisión y acción del
 operador); las historias de adentro de cada destacado, más allá de la historia de portada; sumar estas piezas a la

@@ -100,7 +100,7 @@ fuera de la órbita, y la foto se extiende reflejando su propio borde. Las regla
 | Dónde | Qué hay |
 | --- | --- |
 | Página del kit | sección **«Tu portada de LinkedIn»** (`#linkedin`) de `https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html`: las ocho con vista previa, descarga y los pasos para cambiarla en LinkedIn. Generador: `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs` |
-| GCP (público) | `gs://efeonce-group-axis-public-media/team/linkedin-covers/v1/efeonce-linkedin-perfil-<id>-1584x396.png` y su vista previa `…/v1/min/…jpg` (792 × 198) |
+| GCP (público) | `gs://efeonce-group-axis-public-media/team/linkedin-covers/v2/efeonce-linkedin-perfil-<id>-1584x396.png` y su vista previa `…/v2/min/…jpg` (792 × 198); `v1` es la primera versión, antes del ajuste del operador |
 | OneDrive del equipo | `Alineación/6. Marca/Kit media/Portadas de LinkedIn/2026-10 La órbita/` (las ocho) |
 | Proceso | `ai-generations/2026-09-30_portadas-sociales/personal/linkedin-personal.mjs` (genera las ocho) |
 

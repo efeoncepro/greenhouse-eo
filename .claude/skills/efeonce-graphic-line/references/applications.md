@@ -347,9 +347,10 @@ vale en toda aplicación:
   byte (verificado en las 9). Receta: skill `design-studio`, `efeonce-photographic-language.md` §«Extender una foto
   aprobada a 9:16 conservando el centro»; trampas en [lessons.md](lessons.md) (2026-10-01).
 - **Portada de LinkedIn personal, derivada de la corporativa:** 1584 × 396; el texto empieza en x 480 (deja libre la
-  foto de perfil); la foto se corre a la derecha y el hueco se llena **reflejando su propio borde** (un fondo plano o un
-  fundido dejan una franja de otro tono); donde las pantallas tocan el texto, la foto se corre más (Formatos 240 px,
-  Estallido 220 px; el resto 80 px); logo de 120 px bajo el texto, fuera de la órbita.
+  foto de perfil); pregunta 32 px, respuesta 120–124 px y logo de 120 px **pegado bajo el mensaje**, fuera de la órbita;
+  la foto a 1300 px de ancho, sin recortar arriba, con la cara de Nexa en x ≈ 1190 (1130–1140 en las dos AEO con
+  burbuja) y los huecos llenos **reflejando su propio borde**. Ajuste del operador al verla en su perfil (2026-10-01):
+  Nexa no puede quedar pegada al borde ni con la mano cortada, y el logo no flota lejos del texto.
 - **Nitidez de un destacado blando:** una edición con GPT Image que pide sólo detalle y conserva la composición
   funcionó (Glitch, Portafolio, Recetas). En Portafolio y Recetas el modelo metió personas ajenas al roster: se
   sacaron con recorte. **Nunca** personas fuera del roster en una foto de marca.
@@ -372,7 +373,7 @@ vale en toda aplicación:
   - Kit del equipo: sección «Tu portada de LinkedIn» (`#linkedin`) con las 8 personales en la página de cada persona
     (`https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html`; generador
     `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs`). Archivos:
-    `gs://efeonce-group-axis-public-media/team/linkedin-covers/v1/efeonce-linkedin-perfil-<id>-1584x396.png` (+
+    `gs://efeonce-group-axis-public-media/team/linkedin-covers/v2/efeonce-linkedin-perfil-<id>-1584x396.png` (+
     `min/…jpg` 792 × 198); ids `formatos`, `formatos-desliza`, `formatos-estallido`, `formatos-mosaico`, `aeo`,
     `aeo-elige`, `aeo-pasillo`, `aeo-respuesta`.
   - OneDrive (`Alineación/`): `5. Contenidos/05. Highlights/2026-10 Destacados La órbita/` (`v01` portadas, para

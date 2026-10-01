@@ -24,7 +24,7 @@ const TEAMS = [
 // Portadas de LinkedIn para el perfil personal (operador, 2026-10-01: «agrega también las portadas de LinkedIn para que
 // ellos elijan la que quieran»): las ocho aprobadas de la página de Efeonce, adaptadas a 1584 × 396 con el logo pequeño
 // y el texto fuera de la foto de perfil. Generador: ai-generations/2026-09-30_portadas-sociales/personal/linkedin-personal.mjs
-const PORTADAS = `${BASE}/team/linkedin-covers/v1`
+const PORTADAS = `${BASE}/team/linkedin-covers/v2`
 const LINKEDIN = [
   ['formatos', 'Todos los formatos'], ['formatos-desliza', 'Todos los formatos · Desliza'],
   ['formatos-estallido', 'Todos los formatos · Estallido'], ['formatos-mosaico', 'Todos los formatos · Mosaico'],
