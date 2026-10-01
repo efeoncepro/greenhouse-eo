@@ -1,0 +1,75 @@
+{
+  "schema": "efeonce.foto.isotipo.v1",
+  "plate": "PS2b-nexa-la-ia-te-cita.png",
+  "salida": "PS2b-nexa-la-ia-te-cita-isotipo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.4.7",
+  "archivo": "assets/efeonce-isotype-negative.svg",
+  "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74",
+  "prenda": "oscura",
+  "caja": {
+    "centro": [
+      0.667,
+      0.564
+    ],
+    "ancho": 0.0295,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": {
+    "umbral": 38
+  },
+  "creado": "2026-10-01T02:26:58.064Z",
+  "acabado": {
+    "veredicto": "aprobado",
+    "salida": "PS2b-nexa-la-ia-te-cita-isotipo-acabado.png",
+    "sha256": "8d65ea3c88f849e975b02200bdaaf4585e6b5838b5b32470249a3f1406e9f1bf",
+    "recorte": {
+      "archivo": "PS2b-nexa-la-ia-te-cita-isotipo-acabado-recorte.png",
+      "sha256": "1320678e8aff15b150778905d6439dd2f71ea9c31008c33962404b399ab8f870",
+      "caja": {
+        "lado": 512,
+        "left": 1281,
+        "top": 177
+      },
+      "ampliadoA": 1024
+    },
+    "edicion": {
+      "archivo": "PS2b-nexa-la-ia-te-cita-isotipo-acabado-edicion.png",
+      "sha256": "dfca77c28856b9b7393c95fbc0e97f7816b59403f8bab3160e657fb4558205cf"
+    },
+    "modelo": {
+      "solicitado": "gpt-image-2.5-sunburst",
+      "devuelto": "gpt-image-2.5-sunburst",
+      "calidad": "high",
+      "tamano": "1024x1024",
+      "uso": {
+        "entrada": 1273,
+        "salida": 1756,
+        "total": 3029
+      },
+      "costoEstimadoUsd": 0.053
+    },
+    "prompt": "This is a crop of a real photograph: the chest of a navy blue technical softshell jacket, the mark embroidered flat in light grey thread. A small white Efeonce mark (a rocket with three round windows inside an elliptical orbit, with a small sphere on top) was placed flat on it. It is finished, official artwork: keep its shape, every part, its proportions, its white colour, its exact size and its exact position — do NOT redraw, restyle, re-letter, simplify, resize or move it. You are only adding MATERIAL and LIGHT so it reads as a real mark applied to that surface: let it follow the gentle curvature of the surface, pick up the same lighting gradient, the soft rim light and the faint reflections of the scene, lie perfectly flush with the surface as a thin printed decal — NO relief, NO bevel, NO emboss, NO highlight rim around it — with only a tiny edge softness, and carry the same grain, softness and depth of field as the surface around it. Keep everything else in the image exactly as it is: same framing, same surface, same colours. No text, no extra marks.",
+    "promptSha256": "cb700861fe10b614f746b60352e49a35f4efc0b46afa6872116ea4733e5f1a95",
+    "superficie": "the chest of a navy blue technical softshell jacket, the mark embroidered flat in light grey thread",
+    "mezcla": {
+      "umbralSilueta": 10,
+      "siluetaPx": 1435,
+      "dilatacionPx": 3,
+      "sigmaAlfa": 1.6,
+      "anilloColorPx": 14,
+      "desplazamientoColor": [
+        2.41,
+        1.75,
+        0.25
+      ]
+    },
+    "verificacion": {
+      "zonaMarcaPx": 8,
+      "cambiadosFueraDeLaMarca": 0,
+      "cambiadosEnLaMarca": 2769
+    },
+    "comparacion": "PS2b-nexa-la-ia-te-cita-isotipo-acabado-comparar.png",
+    "creado": "2026-10-01T02:27:33.554Z"
+  }
+}

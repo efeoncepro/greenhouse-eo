@@ -1,0 +1,26 @@
+{
+  "id": "PS4-nexa-aeo-a-la-respuesta",
+  "formato": "3:1",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, a vast dark space at night, low camera angle): she stands at about 66% of the frame width, framed from the waist up. High above her, at the top right, floats a colossal glowing AI answer bubble made of pure azure light with three luminous typing dots. With one open hand raised she has just LAUNCHED ONE wide horizontal glass card in landscape orientation that BLAZES: brilliant white glass face with an intense azure-blue (#0375DB) core glow, a thin teal (#36C8BF) rim, on its face only a soft round placeholder circle on the left and three soft horizontal bars of light, no letters, no logos, no phone shape upward: it rises from her palm along a trail of light toward the bubble, caught in the wide volumetric azure-blue (#0375DB) beam that the bubble pours down, as if the answer were pulling it in. Behind her, an endless field of thin dark glass cards in LANDSCAPE orientation, each about twice as wide as it is tall, like anonymous search-result cards, with square-ish corners — never vertical, never shaped like phones or tablets floats unlit in the haze on the right side. She looks straight into the lens with a confident half-smile, her other hand relaxed at her side. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. She wears the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings. Her head stays almost frontal, both eyes and both eyebrows visible, and stays in the middle band of the frame height, never touching the top edge. The LEFT HALF of the frame (from 0% to 50% of the width) is calm, deep dark space with only faint haze: no cards, no screens, no beams, no light and no objects there; nothing crosses the vertical center line. The beam and the rising card are the brightest elements of the frame. Enormous contrast, punchy, cinematic, no logos of any other brand, no readable text, no letters or numbers anywhere.",
+  "lecho": {
+    "objeto": "the dark concrete ledge of a stage close to the lens with a coiled black cable lying on it, the lens only a few centimetres behind its near edge, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 50% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

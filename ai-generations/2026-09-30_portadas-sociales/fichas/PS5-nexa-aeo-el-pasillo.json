@@ -1,0 +1,26 @@
+{
+  "id": "PS5-nexa-aeo-el-pasillo",
+  "formato": "3:1",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, tracking shot, a vast dark hall at night): she WALKS toward the camera mid-stride at about 66% of the frame width, framed from the waist up, down a long aisle between two towering walls of THOUSANDS of thin dark glass cards in LANDSCAPE orientation, each about twice as wide as it is tall, like anonymous search-result cards, with square-ish corners — never vertical, never shaped like phones or tablets that recede in deep perspective into the darkness behind her on the right. Far behind her, at the vanishing point of the aisle, a wide volumetric azure-blue (#0375DB) spotlight beam falls from above onto ONE wide horizontal glass card in landscape orientation that BLAZES: brilliant white glass face with an intense azure-blue (#0375DB) core glow, a thin teal (#36C8BF) rim, on its face only a soft round placeholder circle on the left and three soft horizontal bars of light, no letters, no logos, no phone shape, the only lit card in the whole hall, glowing like a destination; its light rims her hair and shoulders from behind. She looks straight into the lens with determination and a slight smile while walking, one hand holding a thin tablet at her side. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. She wears the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings. Her head stays almost frontal, both eyes and both eyebrows visible, and stays in the middle band of the frame height, never touching the top edge. The LEFT HALF of the frame (from 0% to 50% of the width) is calm, deep dark space with only faint haze: no cards, no screens, no beams, no light and no objects there; nothing crosses the vertical center line. Slight motion blur on the nearest cards at the edge of the aisle. Enormous contrast, punchy, cinematic, no logos of any other brand, no readable text, no letters or numbers anywhere.",
+  "lecho": {
+    "objeto": "the dark polished stone floor of the aisle in the lowest fifth, close to the lens, outside the beam and outside every reflection",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 50% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

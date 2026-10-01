@@ -1,0 +1,26 @@
+{
+  "id": "PS7-nexa-formatos-desliza",
+  "formato": "3:1",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "palanca": "larga-exposicion",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark creative studio at night, long-exposure photograph): she stands at about 64% of the frame width, framed from the waist up, her arm sweeping horizontally through the air at shoulder height in one fluid gesture, and following her hand a long continuous STREAM of thin frameless glowing screens of every real digital format — tall vertical 9:16 story screens, square 1:1 and 4:5 feed posts, wide 16:9 video frames, long horizontal web banners — all showing the SAME bold, vivid, art-directed campaign adapted to each format: saturated color-block graphics, a product close-up splashed with paint, a dancer mid-jump; they throw colored light in vivid orange, hot magenta, deep azure-blue (#0375DB), violet and teal (#36C8BF); any tiny text on them is too small and blurred to read slides past her like a film strip flowing toward the right edge of the frame, leaving long luminous light trails of color behind each screen. Her body and face are sharp; only the stream and her moving hand carry motion blur. She looks straight into the lens with a confident half-smile. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. She wears the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings. Her head stays almost frontal, both eyes and both eyebrows visible, and stays in the middle band of the frame height, never touching the top edge. The LEFT HALF of the frame (from 0% to 50% of the width) is calm, deep dark space with only faint haze: no cards, no screens, no beams, no light and no objects there; nothing crosses the vertical center line. Hard cool rim light from behind; the colored trails light the haze. Enormous contrast, punchy, cinematic, no logos of any other brand, no readable text, no letters or numbers anywhere.",
+  "lecho": {
+    "objeto": "the dark polished studio floor in the lowest fifth, close to the lens, outside every trail and every reflection",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 50% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}
