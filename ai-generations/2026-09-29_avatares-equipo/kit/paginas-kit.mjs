@@ -21,6 +21,17 @@ const TEAMS = [
   ['07-todos-los-formatos', 'Todos los formatos'], ['09-una-toma', 'Una toma'], ['10-intacta', 'Intacta']
 ]
 
+// Portadas de LinkedIn para el perfil personal (operador, 2026-10-01: «agrega también las portadas de LinkedIn para que
+// ellos elijan la que quieran»): las ocho aprobadas de la página de Efeonce, adaptadas a 1584 × 396 con el logo pequeño
+// y el texto fuera de la foto de perfil. Generador: ai-generations/2026-09-30_portadas-sociales/personal/linkedin-personal.mjs
+const PORTADAS = `${BASE}/team/linkedin-covers/v1`
+const LINKEDIN = [
+  ['formatos', 'Todos los formatos'], ['formatos-desliza', 'Todos los formatos · Desliza'],
+  ['formatos-estallido', 'Todos los formatos · Estallido'], ['formatos-mosaico', 'Todos los formatos · Mosaico'],
+  ['aeo', 'A ti · La IA te cita'], ['aeo-elige', 'A ti · La elegida'], ['aeo-pasillo', 'A ti · El pasillo'],
+  ['aeo-respuesta', 'A ti · La respuesta']
+]
+
 const EQUIPO = [
   { slug: 'andres-carlosama', nombre: 'Andrés', completo: 'Andrés Carlosama', archivo: 'Andres-Carlosama' },
   { slug: 'daniela-ferreira', nombre: 'Daniela', completo: 'Daniela Ferreira', archivo: 'Daniela-Ferreira' },
@@ -65,6 +76,8 @@ const estilos = `
   .fondo img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
   .fondo div { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; font-size: 14px; font-weight: 600; }
   .fondo a { font-size: 13px; color: var(--teal); text-decoration: none; white-space: nowrap; }
+  .portadas { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .portadas .fondo img { aspect-ratio: 4 / 1; }
 `
 
 const cabeza = titulo => `<!doctype html>
@@ -83,7 +96,7 @@ const cabeza = titulo => `<!doctype html>
 
 const pagina = p => `${cabeza(`Tu kit Efeonce · ${p.nombre}`)}
   <h1>Tu kit Efeonce, ${p.nombre}<span class="punto">.</span></h1>
-  <p class="bajada">Tu kit Efeonce con la nueva línea gráfica: tu avatar, tus fondos de Teams y tu firma de correo, todo en un lugar.</p>
+  <p class="bajada">Tu kit Efeonce con la nueva línea gráfica: tu avatar, tus fondos de Teams, tu portada de LinkedIn y tu firma de correo, todo en un lugar.</p>
 
   <section class="tarjeta" aria-label="Tu avatar">
     <img class="retrato" src="${AVATAR}/800/${p.slug}.png" width="200" height="200" alt="Avatar de ${p.completo}">
@@ -103,6 +116,12 @@ ${DONDE.map(([d, t]) => `    <dt>${d}</dt>\n    <dd>${t}</dd>`).join('\n')}
   <p class="bajada">La oficina de Efeonce detrás de ti. En Teams: antes o durante la reunión, Efectos de fondo → Agregar nuevo → elige el archivo. Cada uno está pensado para que tú quedes al centro y lo importante a los lados.</p>
   <div class="fondos">
 ${TEAMS.map(([id, n]) => `    <div class="fondo"><img src="${FONDOS}/min/efeonce-teams-${id}.jpg" width="640" height="360" alt="Fondo de Teams: ${n}" loading="lazy"><div>${n}<a href="${FONDOS}/efeonce-teams-${id}.jpg" download="efeonce-teams-${id}.jpg">Descargar</a></div></div>`).join('\n')}
+  </div>
+
+  <h2 id="linkedin">Tu portada de LinkedIn<span class="punto">.</span></h2>
+  <p class="bajada">Elige la que más te guste. Todas dejan libre el espacio de tu foto de perfil. En LinkedIn: entra a tu perfil, toca el lápiz o la cámara sobre la portada, elige cambiar la foto y sube el archivo. Ya viene en 1584 × 396, así que no hace falta recortarla.</p>
+  <div class="portadas">
+${LINKEDIN.map(([id, n]) => `    <div class="fondo"><img src="${PORTADAS}/min/efeonce-linkedin-perfil-${id}-1584x396.jpg" width="792" height="198" alt="Portada de LinkedIn: ${n}" loading="lazy"><div>${n}<a href="${PORTADAS}/efeonce-linkedin-perfil-${id}-1584x396.png" download="efeonce-linkedin-perfil-${id}.png">Descargar</a></div></div>`).join('\n')}
   </div>
 
   <h2>Tu firma de correo<span class="punto">.</span></h2>
