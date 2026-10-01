@@ -81,6 +81,9 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     // Faltar en disco NO es error: en CI los assets no están, y es esperado.
     if (r.faltanEnDisco.length) {
       console.log(`  ${r.faltanEnDisco.length} asset(s) no están en esta máquina (esperado en CI y sin assets).`)
+      const carpetas = [...new Set(r.faltanEnDisco.map(f => f.split('/').slice(0, 2).join('/')))]
+
+      console.log(`  Para bajarlos y verificar su sha256: pnpm ai-gen:pull ${carpetas.join(' ')}`)
     }
 
     if (r.sinDeclarar.length) {

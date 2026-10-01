@@ -68,6 +68,14 @@ Read the minimal set:
 
 If several domains apply, load the smallest union. Do not preload every reference.
 
+### Dónde viven los archivos de `ai-generations/`
+
+Los paquetes fuente citados en `references/landings/*` (`ai-generations/...`: keyframes, scripts, masters) son rutas
+**lógicas**: local, canon `gs://efeonce-creative-canon/ai-generations/<ruta>` o archivo
+`gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador). Antes de re-renderizar o re-codificar desde uno
+que no está en disco: `pnpm ai-gen:where <ruta>` → `pnpm ai-gen:pull <carpeta>`; **NUNCA** regenerar ni aproximar un
+asset aprobado porque falta, ni archivar/borrar a mano. Los assets públicos del runtime WP no cambian. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ## Canonical Docs
 
 Use repo docs as source of truth for long-lived contracts:

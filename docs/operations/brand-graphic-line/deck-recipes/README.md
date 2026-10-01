@@ -96,6 +96,8 @@ catálogo `deck-axis` de las ofertas a comité ni a la interfaz de Greenhouse.
 El paso a paso para el equipo está en el
 [manual de uso](../../../manual-de-uso/creative/componer-deck-con-recetas.md).
 
+**Dónde viven los plates:** los plates que citan las recetas viven en `ai-generations/**`, fuera de git. Este catálogo los protege (se quedan en disco), pero en otra máquina o tras una limpieza pueden faltar: `pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>` antes de `pnpm brand:compose`. Nunca reemplazar un plate aprobado por otro parecido ([contrato](../../AI_GENERATIONS_STORAGE_V1.md)).
+
 ## Cómo elegir por documento
 
 Las láminas del catálogo no traen portada ni cierre propios para **pitch** y **QBR**. El JSON y el índice generado todavía citan

@@ -454,9 +454,9 @@ marca), 1152×1440, `high`, ≈ USD 2–2,5 en total.
   canon es 4:5 y el modelo entrega 1:1, 2:3 y 3:2, así que **hay que padear, editar y recortar**. Receta en
   [bloques y pipeline](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 - **Nexa en estilo pintado: pedir el navy explícito.** Con la referencia de cuerpo completo
-  (hoy `ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png`; en esa corrida era
+  (hoy `ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png`, `pnpm ai-gen:pull` si falta; en esa corrida era
   `2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`) + la vista frontal transparente
-  del kit hoodie (`ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-…-transparente.png`), la
+  del kit hoodie (`ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-…-transparente.png`; idem), la
   v1 salió con hoodie **azul rey**. Corrigió «deep navy (#023c70), not royal blue». La identidad de Nexa se conservó
   en el estilo pintado; aun así el hoodie quedó algo más brillante que `#023c70`: revisar el color al 100 %.
 
@@ -618,7 +618,8 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   y fue rechazada; la recoloreada desde cada render navy conservó geometría, cortes y cámara.
 - **Ángulos extremos (gusano, picado, gran angular, sobrevuelo) necesitan guía de perspectiva como imagen 1.** Con
   la cámara sólo en texto el modelo devuelve casi frontal. Guía = silueta oficial extruida y proyectada con cámara
-  real (`ai-generations/2026-09-17_efeonce-ship-3d/guias/proyectar.mjs`), «copiar cámara, no su aspecto plano»;
+  real (`ai-generations/2026-09-17_efeonce-ship-3d/guias/proyectar.mjs`, en git; la base 3D, con `pnpm ai-gen:pull`
+  si falta), «copiar cámara, no su aspecto plano»;
   base 3D aprobada como imagen 2 y logo como 3. La isométrica siguió frontal; una vista inferior pura de un logo
   plano sólo muestra su canto.
 - **Recorte de objeto claro sobre fondo oscuro:** `pnpm ai:image:rmbg` deja OPACOS los huecos que muestran el fondo
@@ -974,6 +975,15 @@ This skill executes image operations; it does not define price, packages or cred
 
 The lifecycle is `estimate → reservation → approval → execution → settlement | release | refund adjustment`.
 Do not publish `1 credit = money`, vendor→credit conversion, per-piece tables or illustrative bands as approved.
+
+## Dónde viven los archivos de `ai-generations/`
+
+- **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas de deck y por `src/**`/`scripts/**` (`pnpm ai-gen:protected`).
+- **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
+- **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
+- Una ruta `ai-generations/…` usada como `--image`, máscara o guía es lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` (verifica sha256) **antes** de generar o componer.
+- **NUNCA** regenerar, sustituir ni aproximar una referencia aprobada porque falta (es justo la deriva de identidad que el kit evita); **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. Las salidas nuevas siguen en `ai-generations/<AAAA-MM-DD>_<slug>/`.
+- SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## Workflow
 

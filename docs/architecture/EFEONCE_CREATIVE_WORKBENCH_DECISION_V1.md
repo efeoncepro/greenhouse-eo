@@ -24,6 +24,18 @@ el contrato operativo actual del broker, ni autorizan reactivarlos o ejecutar un
 Fuentes, adopción y pendientes: [continuidad vigente](../operations/creative-production/WORKBENCH_CURRENT_STATE.md).
 Efeonce ID es la identidad definitiva diferida en TASK-1952; no crear AUTH paralelo.
 
+## Delta 2026-10-01 — canon como respaldo de los kits sellados; la exploración se archiva fuera del Workbench
+
+- **Canon como respaldo:** además de distribuir al equipo las referencias aprobadas, `efeonce-creative-canon` respalda
+  también los kits sellados en `scripts/foto/assets.lock.json` de greenhouse-eo. Se publican con
+  `pnpm creative:assets:publish apply` (pendiente de correr). Una copia en canon no autoriza borrar el original local
+  mientras el lock lo declare.
+- **La exploración de greenhouse-eo se archiva fuera del Workbench:** va al bucket privado de Greenhouse
+  (`gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta relativa>`) con `pnpm ai-gen:archive`, y su
+  inventario es el `artifacts.remote.json` de cada carpeta. Este ADR no crea buckets: siguen siendo `canon` y `work`.
+- **El equipo no la baja:** el archivo no forma parte de `assets:pull` ni del harness del Workbench.
+- Contrato completo: [`AI_GENERATIONS_STORAGE_V1.md`](../operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ## 1. Contexto
 
 El operador quiere que el equipo creativo (diseño, redacción, dirección de arte) trabaje con agentes —Claude

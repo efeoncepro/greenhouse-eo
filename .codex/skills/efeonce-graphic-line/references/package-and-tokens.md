@@ -721,7 +721,8 @@ línea de la superficie y `sphereColor` = acento), `sectionRule`, `endorsement` 
 
 Imágenes publicadas: `https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1/`
 (`shared/<dark|light>/`, `people/<persona>-<dark|light>.png`, `areas/<área>-<dark|light>.png`). Generador vigente en
-Greenhouse: `ai-generations/2026-09-26_firma-partners/build4.mjs` (`HOST_BASE=…`, `AREA=<área>`).
+Greenhouse: `ai-generations/2026-09-26_firma-partners/build4.mjs` (`HOST_BASE=…`, `AREA=<área>`; sin versionar en git: si
+no está en disco, `pnpm ai-gen:pull ai-generations/2026-09-26_firma-partners`).
 
 ---
 

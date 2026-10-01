@@ -409,6 +409,11 @@
     "creative:access": "node scripts/creative-workbench/access.mjs",
     "creative:provision": "node scripts/creative-workbench/provision.mjs",
     "creative:assets:publish": "node scripts/creative-workbench/assets-publish.mjs",
+    "ai-gen:protected": "node scripts/ai-generations/protected.mjs",
+    "ai-gen:where": "node scripts/ai-generations/where.mjs",
+    "ai-gen:pull": "node scripts/ai-generations/pull.mjs",
+    "ai-gen:archive": "node scripts/ai-generations/archive.mjs",
+    "ai-gen:test": "node --test scripts/ai-generations/*.test.mjs",
     "security:public-burst-guard": "tsx scripts/security/public-burst-guard.ts",
     "security:public-burst-guard:verify": "tsx --require ./scripts/lib/server-only-shim.cjs --env-file=.env.local scripts/security/public-burst-guard-verify.ts"
   },

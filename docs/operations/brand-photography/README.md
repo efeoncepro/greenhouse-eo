@@ -78,6 +78,10 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | Quien produce una pieza **con Nexa** | **9** → **10** → 6 → 2 → **7** |
 | Quien quiere entender por qué es así | Bitácora → 1 |
 
+## Dónde viven los archivos de `ai-generations/`
+
+Las rutas `ai-generations/...` de este documento son **rutas lógicas**: el binario puede estar en disco, en el canon (`gs://efeonce-creative-canon`) o en el archivo (`gs://efeonce-group-greenhouse-private-assets-prod`, inventario en su `artifacts.remote.json`). Si falta en disco, `pnpm ai-gen:where <ruta>` y `pnpm ai-gen:pull <carpeta>` antes de componer; nunca regenerar, sustituir ni resellar el lock para tapar el faltante. Contrato: [`AI_GENERATIONS_STORAGE_V1.md`](../AI_GENERATIONS_STORAGE_V1.md).
+
 ## Reglas de la carpeta
 
 - El documento maestro manda sobre los demás en alcance y principios; cada documento temático manda en su tema.

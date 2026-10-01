@@ -38,7 +38,8 @@ rama propia: `main` se despliega solo y otras sesiones empujan la rama compartid
 ## Preflight visual obligatorio antes de generar
 
 **Leer esta guía no sustituye mirar las imágenes que aprobó el operador.** Empieza por el [banco de AXIS](https://axis.efeonce.org/references/photography/) (sección anterior). Abre la hoja
-`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg` cuando salgan
+`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg` (si no está en disco,
+`pnpm ai-gen:where` + `pnpm ai-gen:pull`) cuando salgan
 Julio o Nexa, la hoja `rondas/curado/set-curado-12.jpg` para la serie de color y al menos dos finales individuales
 comparables a tamaño completo. Antes del prompt, registra los archivos que viste y la comparación concreta:
 oficio/momento, cómo viven el azul activo y el naranja **o** lima en la composición, lecho desenfocado, firma y rasgos
@@ -234,17 +235,18 @@ plate se pide para esa columna:
   al sujeto); **lecho oscuro abajo**; la luz de acento es la de la **línea de servicio** de la portada (una portada de
   brochure por línea, cada una con su acento).
 - **Contraportada con foto:** el sujeto **de espaldas, caminando hacia la órbita** (Nexa hacia el horizonte o al
-  amanecer: `ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png` y `BR4-contra-amanecer.png`), con el
+  amanecer: `ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png` y `BR4-contra-amanecer.png`; si faltan,
+  `pnpm ai-gen:pull`, nunca regenerarlos), con el
   mismo lado oscuro para el bloque de cierre. Recuerda la regla foto ↔ sin foto: una contraportada con foto va con una
   portada sin foto, y al revés.
 - **Ficha de ejemplo** (portada de Media & Distribution, acento Voice, chaqueta Efeonce; USD ~0,04;
   bordado revisado al 100 % = isotipo oficial):
   `ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json` → plate
-  `…/plates/LN4-voice-distribucion.png`. Sigue la ruta de comandos de arriba.
+  `…/plates/LN4-voice-distribucion.png` (rehidratar con `pnpm ai-gen:pull` si falta). Sigue la ruta de comandos de arriba.
 - **Cambiar el plate de una pieza ya aprobada [operador, 2026-09-28, caso `CR4`].** La portada de Creative Services
   («¿Quién crea mi contenido? Tu squad.») compartía `CR2b` con su lámina de servicio y se le hizo un plate propio:
   `ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` (ficha y prompt en la misma
-  carpeta). Lo que dejó la búsqueda (3 generaciones, ≈ USD 0,11):
+  carpeta; `pnpm ai-gen:pull` si no está en disco). Lo que dejó la búsqueda (3 generaciones, ≈ USD 0,11):
   - **Se conserva el concepto de impacto y se cambia la toma**, no al revés. `CR3` siguió la receta de portada al pie
     (validador 4/5, zona de texto 0,40) y se rechazó por «perdió impacto visual»: se leía como retrato con la oficina
     detrás. **La receta fija geometría y luz, no concepto**; el impacto de la línea estaba en el contenido vivo en
@@ -648,7 +650,8 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
 - Referencias: Julio `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` —11 retratos aprobados, `julio-ap-04` primero para rostro y `julio-ap-11` para cuerpo, según `MANIFIESTO.json`— más seis ángulos en `set-identidad/angulos/`; selección por `foto:prompt`. `julio-ap-02.png` es pieza compuesta y no sirve de ancla; las fotos fuente y descartes permanecen aparte. El set de 2026-09-17 quedó retirado como ancla de identidad;
   Nexa `ai-generations/_identidad-nexa/1-anclas/` y sus ocho ángulos fotorrealistas confirmados por el operador
   el 2026-09-24 en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` (polera gris neutra,
-  vista resuelta mediante `foto:prompt`). Esa ropa no es obligatoria en todas las escenas. 🔴 Las rutas anteriores
+  vista resuelta mediante `foto:prompt`; si alguna referencia no está en disco, `pnpm ai-gen:pull`, nunca sustituirla).
+  Esa ropa no es obligatoria en todas las escenas. 🔴 Las rutas anteriores
   —`nexa-the-point.png`, `nexa-the-listen.png`— **son identidad B y quedan retiradas como ancla de rostro**
   [2026-09-21]. Identidad sostenida en 5 tomas (135/24/200/50/200 mm) con el set anterior.
 - Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar. El
@@ -823,7 +826,8 @@ sesión las tenía delante al armar.
 
 - La zona del titular se pide en la toma con **tono declarado** («DEEP warm shadow… for white text» / «VERY LIGHT warm-white wall… for dark text») y **límite de cabezas** (verticales: bajo 36% del alto; 16:9: gente dentro del 55% derecho).
 - Zonas: 4:5 tercio superior; 9:16 franja 11–31% (la firma de esa ronda estaba a 0,875); 16:9 costado izquierdo 42% en `foto:prompt`. Para una pieza nueva con CTA en 16:9, el piso de legibilidad requiere cerca del 57% del ancho: reservar 58% o reducir el copy sigue pendiente de decisión, así que el comando conserva 42%. La firma de una pieza nueva es 25% del lado corto en horizontales y 20% en verticales/cuadrados; no se regeneran las aprobadas por ese cambio. [Contrato y corte](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
-- Compositor `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/titular.mjs` (Bricolage `ideaImpact` a trazos, color por contraste, autoajuste de zona ≥4,5:1).
+- Compositor `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/titular.mjs` (en git; sus plates, con
+  `pnpm ai-gen:pull` si faltan; Bricolage `ideaImpact` a trazos, color por contraste, autoajuste de zona ≥4,5:1).
 - **Canon operativo (aprobado, capa fotográfica):** [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — las seis reservas, tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
 - Bitácora de la ronda (composición **no aprobada**): [zonas de composición y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
 

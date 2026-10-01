@@ -9,6 +9,8 @@
 > punta a punta, plantilla de plan que pasa el gate, códigos de salida y problemas comunes. El estado de la
 > certificación adversarial y de sus tramos vive en **§18**. Nada de esto autoriza publicar: el gate certifica la
 > pieza, no la campaña.
+>
+> **Dónde viven los archivos de `ai-generations/`:** las rutas `ai-generations/...` son lógicas; si una falta en disco, `pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>` antes de componer, nunca regenerarla ni sustituirla ([contrato](AI_GENERATIONS_STORAGE_V1.md)).
 
 ## Mapa técnico vigente · lectura rápida
 

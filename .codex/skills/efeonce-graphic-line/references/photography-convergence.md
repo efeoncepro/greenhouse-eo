@@ -89,7 +89,8 @@ Regla madre **[vigente]**: la foto conserva su composición; la órbita se suma 
 
 Se briefea **con los campos de `pnpm foto:prompt`**, nunca concatenando bloques a mano [vigente] (regla auto-load).
 `foto:prompt` **no tiene hoy un campo para la lente ni para el foco**: el encuadre se escribe en la `escena`, como hizo el
-banco de la lente del 2026-09-25 (`ai-generations/2026-09-25_banco-lente-orbita/fichas/_armar.mjs`). El campo propio
+banco de la lente del 2026-09-25 (`ai-generations/2026-09-25_banco-lente-orbita/fichas/_armar.mjs`, en git; sus
+plates, con `pnpm ai-gen:pull` si faltan). El campo propio
 `reservas.lente` está aprobado (§6, P9) y es [código pendiente].
 
 ### 4.1 Tabla ficha ↔ necesidad de la órbita

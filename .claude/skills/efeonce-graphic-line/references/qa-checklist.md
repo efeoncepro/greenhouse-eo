@@ -237,7 +237,7 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | [ ] | La receta tiene plantilla y el `layout` va explícito en el intent | Automático: el comando falla con `recipe-not-approved`, `recipe-without-template`, `layout-invalid` o `layout-not-in-recipe` |
 | [ ] | La pieza nace de un intent propio, fuera de `src/lib/brand-surfaces/examples/` | Revisión; automático: `src/lib/brand-surfaces/__tests__/example-plans.test.ts` falla si se editó un ejemplo |
 | [ ] | La foto viene declarada con `photo.plateRef` y `photo.alt`; el `alt` describe la escena, no el copy | Automático: `missing-photo`; revisión del texto del `alt` |
-| [ ] | El plate existe en disco (vive fuera de git, en `ai-generations/**`) | Automático: el CLI falla antes de crear la salida |
+| [ ] | El plate existe en disco o se rehidrata con `pnpm ai-gen:pull <ruta>` (vive fuera de git, en `ai-generations/**`; nunca se regenera ni se sustituye) | Automático: el CLI falla antes de crear la salida |
 | [ ] | El recorte no corta al sujeto (el CLI cubre el área y centra; la sección partida no tiene control de foco) | Revisión sobre la lámina compuesta; si corta, se cambia la foto |
 | [ ] | En `panel-end`, la foto espejada no muestra texto ni logos al revés, y el isotipo del uniforme se lee bien | Revisión al 100 % sobre la lámina compuesta |
 | [ ] | En portadas con columna, `column.topPx` se revisó con la foto final y ningún texto cruza al sujeto ni a la órbita | Automático: fuera de la reserva falla con `invalid-intent`; revisión de lo demás |

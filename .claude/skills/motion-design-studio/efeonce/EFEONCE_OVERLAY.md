@@ -62,7 +62,8 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   mano (si el token cambia, el cierre cambia con él). `brand-close` no va en canal print; con movimiento reducido,
   cuadro final fijo. Hay versión 16:9 y variante 1:1; referencias renderizadas y generador en
   `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/motion/` (`cierre-16x9.mp4`, `cierre-1x1.mp4`,
-  `orbita-motion.mjs`; ese generador de exploración trae los tiempos escritos a mano: es referencia visual, no
+  `orbita-motion.mjs`; los MP4 pueden no estar en disco: `pnpm ai-gen:pull ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/motion`;
+  ese generador de exploración trae los tiempos escritos a mano: es referencia visual, no
   fuente de valores). Se construye en mograph desde tokens `efeonceGraphicLine` y el logo real de
   `@efeoncepro/axis-brand-assets`, nunca con un modelo de video. El eslogan «Empower your …» sólo cierra: nunca en
   mayúsculas ni con esfera. El foco (§1.4) se anima barriendo la escena hasta posarse sobre el cliente, una sola luz.

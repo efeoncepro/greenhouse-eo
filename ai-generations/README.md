@@ -2,7 +2,7 @@
 
 Registro navegable de **corridas visuales generadas con IA** en Greenhouse — para poder ver propósito, prompts, metadata, decisiones y rutas publicadas sin re-descubrir el pipeline cada vez.
 
-> No confundir con `public/images/generated/` (assets de producto ya integrados) ni con `.captures/` (efímero, gitignoreado, GC>30d). Esta carpeta es **durable y versionada**: es el cuaderno de bitácora de generación.
+> No confundir con `public/images/generated/` (assets de producto ya integrados) ni con `.captures/` (efímero, gitignoreado, GC>30d). Esta carpeta es **durable**: su texto (README, manifests, prompts, scripts) está versionado en git y sus binarios viven en disco, en el canon o en el archivo según el [contrato de almacenamiento](../docs/operations/AI_GENERATIONS_STORAGE_V1.md). Es el cuaderno de bitácora de generación.
 >
 > Regla de peso vigente: los binarios pesados generados (`png`, `jpg`, `webp`, `mp4`, `webm`, `mov`, etc.) son artefactos locales o de runtime/CDN, no source del portal Greenhouse. El repo versiona manifiestos, prompts, scripts reproducibles, README e índices. Los assets aprobados para sitios públicos viven en el runtime WordPress/CDN correspondiente y se referencian desde la documentación.
 
@@ -39,6 +39,14 @@ El bucket por defecto es privado:
 ```text
 gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<run>/
 ```
+
+Ese comando es la **etapa de copia**: sube y escribe el manifest, pero no borra lo local. Para archivar
+exploración y liberar disco se usa `pnpm ai-gen:archive plan|apply`, que lo extiende con guardas (rehúsa lo
+sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas del deck o por `src/**`/`scripts/**` y lo
+modificado hace menos de 3 días), readback por sha256 y borrado local **sólo de los binarios gitignoreados**.
+`artifacts.remote.json` (versionado) es el inventario de cada carpeta; si una ruta citada falta en disco,
+`pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>`, nunca regenerarla. Contrato completo:
+[`AI_GENERATIONS_STORAGE_V1.md`](../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 Los binarios dentro de `ai-generations/` están gitignoreados y la carpeta queda
 excluida del upload Vercel mediante `.vercelignore`.

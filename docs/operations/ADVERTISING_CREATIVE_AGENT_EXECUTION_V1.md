@@ -31,6 +31,10 @@ Si el brief pide evocar búsqueda con IA, una conversación LLM o citabilidad, c
 
 Esta biblioteca **no** modifica `axisAdvertising` ni implica que los gráficos estén aprobados o publicados como paquete/adapter/MCP. Cada pieza conserva brief, procedencia, verificación de fuentes, revisión visual y gate comercial. Nunca conviertas una muestra editorial en una supuesta respuesta real ni mezcles controles, citas o logos de proveedores. La lupa de Modo IA de Google no lleva aro arcoíris; la selección de búsqueda de ChatGPT no se añade al texto de la burbuja enviada.
 
+## Dónde viven los archivos de `ai-generations/`
+
+Las rutas `ai-generations/...` de este documento son **rutas lógicas**: el binario puede estar en disco, en el canon (`gs://efeonce-creative-canon`) o en el archivo (`gs://efeonce-group-greenhouse-private-assets-prod`, inventario en su `artifacts.remote.json`). Si falta en disco, `pnpm ai-gen:where <ruta>` y `pnpm ai-gen:pull <carpeta>` antes de componer; nunca regenerar, sustituir ni resellar el lock para tapar el faltante. Contrato: [`AI_GENERATIONS_STORAGE_V1.md`](AI_GENERATIONS_STORAGE_V1.md).
+
 ## Activación
 
 Los routers raíz y el manifiesto machine-readable cargan `efeonce-advertising-creative` cuando el pedido menciona

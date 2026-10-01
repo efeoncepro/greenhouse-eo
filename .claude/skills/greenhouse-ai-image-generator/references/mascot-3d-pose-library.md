@@ -192,7 +192,8 @@ Codex con su **laptop** canónica.
 - **Referencias (transparentes, OneDrive `5. Contenidos/14. Mascotas de partners/`):**
   `Clawd (Claude)/Poses 3D con accesorios/v01/efeonce-clawd-3d-01-detective-lupa-1x1-1600x1600-v01-transparente.png` y
   `Codex (OpenAI)/Poses 3D con accesorios/v01/efeonce-codex-3d-08-laptop-1x1-1600x1600-v01-transparente.png`, junto
-  al logo monumental blanco del kit + `ai-generations/2026-09-17_efeonce-logo-3d/ref/logo-silueta.png`: **4 `--image`
+  al logo monumental blanco del kit + `ai-generations/2026-09-17_efeonce-logo-3d/ref/logo-silueta.png` (`pnpm ai-gen:pull`
+  si falta): **4 `--image`
   en una sola pasada** `gpt-image-2.5-sunburst` (1152×1440, `high`), con el bloque STYLE de la serie (key art
   pintado). Cada imagen con su rol declarado y su lugar en la escena.
 - **Fidelidad conseguida (revisión visual, sin medición de color):** Clawd conservó el cuerpo de cubos, los ojos,

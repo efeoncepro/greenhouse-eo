@@ -50,6 +50,10 @@ es un referente de fechas e ideas para Efeonce y clientes. No es el calendario d
 scheduler. Cargar esa referencia para investigar ocasiones, verificar mercado/año y resolver el destino
 editorial; sólo las oportunidades seleccionadas dentro de un encargo pasan a brief y planificación.
 
+## Dónde viven los archivos de `ai-generations/`
+
+Las rutas `ai-generations/...` de este documento son **rutas lógicas**: el binario puede estar en disco, en el canon (`gs://efeonce-creative-canon`) o en el archivo (`gs://efeonce-group-greenhouse-private-assets-prod`, inventario en su `artifacts.remote.json`). Si falta en disco, `pnpm ai-gen:where <ruta>` y `pnpm ai-gen:pull <carpeta>` antes de componer; nunca regenerar, sustituir ni resellar el lock para tapar el faltante. Contrato: [`AI_GENERATIONS_STORAGE_V1.md`](AI_GENERATIONS_STORAGE_V1.md).
+
 ## 2. Responder al pedido que existe
 
 | Pedido del operador | Acción requerida | Cierre esperado |

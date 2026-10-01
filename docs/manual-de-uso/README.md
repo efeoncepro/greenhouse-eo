@@ -40,6 +40,10 @@ La diferencia con otras capas de documentacion:
   Efeonce, único robot permitido en una foto de marca) en una ficha de `foto:prompt`: elegir el Spark del plantel y la
   vista, declararlo en `objetos`, escala y registro (cine o puesta en escena, nunca documental), qué frena la guarda
   contra robots, qué no hacer y problemas comunes. Kit aprobado el 2026-10-01 (TASK-1941).
+- [Recuperar y archivar archivos de `ai-generations/`](creative/recuperar-y-archivar-ai-generations.md) — qué hacer
+  cuando una composición no encuentra un plate o una referencia (`pnpm ai-gen:where` y `pnpm ai-gen:pull` a la misma
+  ruta, nunca regenerar), qué está protegido, cómo el operador archiva exploración con `pnpm ai-gen:archive` y cómo se
+  promueve algo a referencia aprobada (sellar + publicar al canon). Contrato vigente desde el 2026-10-01.
 - [Usar la identidad sonora de Efeonce](creative/usar-identidad-sonora-efeonce.md) — elegir registro (fondo o energía) y
   pieza (logo, etiqueta con voz, sting/reveal/apertura, pieza larga, cierre de energía), bajar el archivo del kit en AXIS,
   sincronizar la esfera al golpe o a la palabra final, nivelar al destino y qué no hacer. Estado recomendada; Glitch no usa

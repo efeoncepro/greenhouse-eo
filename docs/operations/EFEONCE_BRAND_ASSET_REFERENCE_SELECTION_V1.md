@@ -47,6 +47,8 @@ búsqueda y AEO** que ninguna otra mascota tiene (ver delta al final). El logo 3
 resuelto por **escala** (pequeña, mediana, grande, monumental) **y color** (blanco, navy), porque una
 pieza monumental y una de sobremesa no se iluminan igual.
 
+> **Dónde viven los archivos de `ai-generations/`:** las rutas `ai-generations/...` son lógicas; si una falta en disco, `pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>` antes de componer, nunca regenerarla ni sustituirla ([contrato](AI_GENERATIONS_STORAGE_V1.md)). Los kits sellados en `scripts/foto/assets.lock.json` también están en el canon; una copia en canon no autoriza borrar el original local.
+
 ## 2. Las tres clases de asset, y para qué sirve cada una
 
 🔴 **No son intercambiables.** Confundirlas es lo que hace que el modelo reinvente la marca.

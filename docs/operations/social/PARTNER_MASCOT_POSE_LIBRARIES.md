@@ -22,6 +22,8 @@ en Unicode: resolver con listado real, no renombrar originales.
 Nombre de cada pose: `efeonce-<mascota>-3d-<nn>-<pose>-1x1-1600x1600-v01-{fondo-estudio|transparente}.png`
 (PNG 1600×1600). Una versión nueva va a `v02/`, sin sobrescribir `v01/`.
 
+**Dónde viven los archivos de `ai-generations/`:** las rutas `ai-generations/...` son lógicas; si una falta en disco, `pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>` antes de componer, nunca regenerarla ni sustituirla ([contrato](../AI_GENERATIONS_STORAGE_V1.md)).
+
 ## Inventario por mascota
 
 | Campo | Clawd (Claude · Anthropic) | Codex (Codex/ChatGPT · OpenAI) | Gigi (Gemini · Google) |

@@ -30,4 +30,5 @@ la etiqueta con voz, el sonido del motion del logo y las piezas largas. No aplic
 - La norma manda en reglas; los archivos del kit mandan en el sonido. Nunca se regeneran el logo, la voz ni la esfera.
 - Mientras no se canonice, los valores no viven en `@efeoncepro/axis-tokens`; al canonizar pasan a tokens junto a
   `efeonceGraphicLine.motion.sound`.
+- Si un archivo de `ai-generations/2026-09-26_branding-sonoro/` falta en disco: `pnpm ai-gen:where` + `pnpm ai-gen:pull`, nunca regenerarlo ([almacenamiento de `ai-generations/`](../AI_GENERATIONS_STORAGE_V1.md)).
 - Relacionados: [línea gráfica «La órbita»](../brand-graphic-line/README.md).

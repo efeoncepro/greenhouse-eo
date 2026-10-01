@@ -728,7 +728,8 @@ Efeonce in a lockup and **never sign alone**. Naming: Greenhouse ADR `EFEONCE_AE
   Greenhouse recipe catalog (`EFEONCE_DECK_SLIDE_RECIPES_V1.json`, 100 recipes). **AXIS side pending (TASK-1949
   Slice 3):** the six new recipes in `efeonceGraphicLine.surfaces.deck.recipes`, `requiredUnless` in the contract, Lab
   references `apps/lab/public/references/surfaces/deck/<id>.jpg` and the BICECORP and Banco BICE client logos with
-  provenance (`ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/PROCEDENCIA.txt`) and authorization state
+  provenance (`ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/PROCEDENCIA.txt`; if missing on disk,
+  `pnpm ai-gen:pull` in Greenhouse) and authorization state
   (client logos are third-party marks: never generated, used only with the client's authorization, TASK-1937). Norm:
   `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO».
 
@@ -911,6 +912,11 @@ active revision, smoke/health result, canary result and the previous known-good 
 Verify the artifact contains neither \`.npmrc\` nor the package credential. If a canary or runtime
 check fails, stop promotion or restore the previous deployment, then verify health and smoke again;
 preserve both digests and the build/credential configuration needed to reproduce the rollback.
+
+## Dónde viven los archivos de `ai-generations/`
+
+Greenhouse `ai-generations/…` paths cited here are logical. **Local (protected):** sealed in `scripts/foto/assets.lock.json`, cited by `EFEONCE_DECK_SLIDE_RECIPES_V1.json` or by `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/ai-generations/<path>` (sealed identities, garments, 3D logo, mascots, Sparks; `pnpm creative:assets:publish`). **Archive** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<path>` (operator only: exploration, rounds, discards).
+If a file is not on disk, run `pnpm ai-gen:where` + `pnpm ai-gen:pull` in Greenhouse before building an AXIS asset from it. Never regenerate or approximate an approved asset, reseal the lock to hide a gap, or archive/delete by hand. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## Stop conditions
 

@@ -183,7 +183,8 @@ tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transc
   dato real; sin dato, no hay arco.
 - **Campaña con foto y lente declarada:** la órbita rodea la lente con aire y la esfera va arriba a la izquierda, lejos de la cara.
   La foto sale del banco propio `ai-generations/2026-09-25_banco-lente-orbita/` (8 tomas, una por palanca, fichas
-  en `fichas/`) o del pipeline `foto:*`; sin velo navy, sin emblema legible, sujeto dentro de un círculo del 55 %
+  en `fichas/`; si no está en disco: `pnpm ai-gen:pull ai-generations/2026-09-25_banco-lente-orbita`) o del pipeline
+  `foto:*`; sin velo navy, sin emblema legible, sujeto dentro de un círculo del 55 %
   del lado corto.
 - **La órbita no reemplaza la composición fotográfica.** Se declara a propósito en casos concretos (lente,
   medida, progreso, foco), nunca por defecto ni en todo post, y nunca cruza el sujeto, las reservas de texto, el

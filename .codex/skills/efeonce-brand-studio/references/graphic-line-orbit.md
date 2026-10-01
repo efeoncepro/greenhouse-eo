@@ -364,8 +364,8 @@ GPT Image 2.5 Sunburst en `xhigh` sólo pone espacio, material y luz. Registro d
 
 | Banco | Dónde | Qué |
 |---|---|---|
-| Lente propia (8 tomas) | `ai-generations/2026-09-25_banco-lente-orbita/` | `pnpm foto:generar`; registro documental; palancas manos, variantes, sombra, quien-sostiene, cenital, escucha, proyección, ausencia; fichas, prompts, LEEME |
-| Merch en foto (17, lámina 4.8, manual §10.8) | `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/merch-ia/` | método en el [kit de prendas](../../greenhouse-ai-image-generator/references/garment-reference-kit.md) |
+| Lente propia (8 tomas) | `ai-generations/2026-09-25_banco-lente-orbita/` (`pnpm ai-gen:pull` si falta) | `pnpm foto:generar`; registro documental; palancas manos, variantes, sombra, quien-sostiene, cenital, escucha, proyección, ausencia; fichas, prompts, LEEME |
+| Merch en foto (17, lámina 4.8, manual §10.8) | `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/merch-ia/` (`pnpm ai-gen:pull` si falta) | método en el [kit de prendas](../../greenhouse-ai-image-generator/references/garment-reference-kit.md) |
 | Oficina en foto (9, lámina 4.9, manual §10.9) | `…/exploracion-v5/oficina-ia/` (`items.mjs`, `edits.mjs`) | recepción, sala, pasillo, pizarra, estado de sala, muro de voz, cocina, puesto de bienvenida, cabinas |
 
 **Lecciones medidas en la oficina:**
@@ -379,7 +379,10 @@ GPT Image 2.5 Sunburst en `xhigh` sólo pone espacio, material y luz. Registro d
 
 La media pesada de `ai-generations/` vive en GCS: `pnpm media:archive-ai-generation -- --run <dir> --apply`
 (sube a `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<run>/` y deja `artifacts.remote.json`);
-el pre-push `scripts/ci/large-blob-gate.mjs` bloquea blobs grandes.
+el pre-push `scripts/ci/large-blob-gate.mjs` bloquea blobs grandes. El reparto vigente de `ai-generations/` (local
+protegido, canon `gs://efeonce-creative-canon`, archivo `gs://efeonce-group-greenhouse-private-assets-prod`) y sus comandos `pnpm ai-gen:*`
+viven en [`AI_GENERATIONS_STORAGE_V1.md`](../../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md): si una ruta no
+está en disco, `pnpm ai-gen:pull`; nunca regenerar lo aprobado ni archivar a mano.
 
 ## Dónde está cada cosa
 

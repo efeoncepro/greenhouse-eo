@@ -244,6 +244,17 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 > Todo spend sigue `estimate → reservation → approval → execution → settlement/release/refund`, y
 > entregar/publicar pasa SIEMPRE por confirmación humana. Ver módulo 13.
 
+### Dónde viven los archivos de `ai-generations/`
+
+Una ruta `ai-generations/...` en esta skill (plate, master, stem, ref, script de una corrida) es **lógica**: el archivo
+vive local (protegido), en el canon `gs://efeonce-creative-canon/ai-generations/<ruta>` (lo sellado en
+`scripts/foto/assets.lock.json`; el equipo lo baja con `pnpm assets:pull`) o en el archivo
+`gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (exploración, rondas, renders pesados; sólo operador). Scripts y
+`.md` van en git; los binarios, no siempre. **Antes de componer, editar o re-renderizar** desde un asset que no está en
+disco: `pnpm ai-gen:where <ruta>` → `pnpm ai-gen:pull <carpeta|ruta>` (misma ruta, sha256 verificado). **NUNCA**
+regenerar, sustituir ni aproximar un asset aprobado porque falta; **NUNCA** resellar el lock para tapar un faltante ni
+archivar/borrar a mano. Salidas nuevas: `ai-generations/<AAAA-MM-DD>_<slug>/` local. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ## 5. Boundaries duros (lo que esta skill NO hace)
 
 - **NUNCA** diseñes motion de **UI runtime** acá (transición, scroll, micro-interacción, view

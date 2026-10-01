@@ -55,6 +55,7 @@ manual, la decisión y los entregables para personas.
 - El manual técnico manda en reglas y medidas; los tokens de AXIS mandan en valores. Cambiar un valor exige cambiar el
   token y su prueba, no sólo el documento.
 - Si cambia una regla, se actualizan el manual, la fuente del PDF y, cuando corresponde, se regenera el PDF.
+- Las rutas `ai-generations/...` de esta carpeta son lógicas: si una falta en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer ([almacenamiento de `ai-generations/`](../AI_GENERATIONS_STORAGE_V1.md)).
 - Relacionados: [identidad sonora](../brand-sonic/README.md) (recomendada, no canon; re-sonoriza el motion del logo) ·
   [lenguaje fotográfico](../brand-photography/README.md) ·
   [selección de referencias de marca](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) ·

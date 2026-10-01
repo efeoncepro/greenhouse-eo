@@ -25,6 +25,8 @@ de vestuario contienen dos espacios. Resolver con listado real, no normalizar/re
 | Voz final/voice_preview_influencer nexa.mp3 | Muestra de voz existente; no prueba por sí sola un voice ID o autorización de clonación. |
 | 02. Contenidos Nexa | Derivados existentes, incluidos NEXA_AVATAR_EFEONCE_POST.mp4, NEXA_AVATAR_EFEONCE_YT.mp4 y NEXA_AVATAR_EFEONCE_STORY.mp4. |
 
+**Dónde viven los archivos de `ai-generations/`:** las rutas `ai-generations/...` son lógicas; si una falta en disco, `pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>` antes de componer, nunca regenerarla ni sustituirla ([contrato](../AI_GENERATIONS_STORAGE_V1.md)).
+
 ## Identidad visual aprobada — 2026-09-24
 
 El operador confirmó como Nexa la **identidad humana fotorrealista de rostro real y polera gris** que aparece en

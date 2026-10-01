@@ -7,6 +7,8 @@ paths:
 
 # Fotografía de marca Efeonce — invariantes (auto-load por path)
 
+**Archivos de `ai-generations/` que no están en disco** (plates, kits, identidades): `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer; nunca regenerar ni resellar el lock. Regla [`ai-generations-storage.md`](./ai-generations-storage.md) · SSOT [`AI_GENERATIONS_STORAGE_V1.md`](../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 **Antes de producir, abre el banco aprobado y la guía «El porqué» en AXIS** ([banco](https://axis.efeonce.org/references/photography/) · [por qué](https://axis.efeonce.org/references/photography/why/) · agentes: `manifest.json`, `recipes/<slug>.json` y `why.json`): parte de la receta de la foto más cercana y cierra con su lista de control. Detalle en la referencia `design-studio/references/efeonce-photographic-language.md` §«Banco aprobado y guía «El porqué» en AXIS».
 
 🔴 **El DEFAULT del bloque compartido gana cuando la escena calla** *(medido 3 veces el 2026-09-22)*:

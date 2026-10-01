@@ -29,10 +29,12 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    `motion-design-studio`; para copy, con `copywriting`; para marca Efeonce, con `efeonce-brand-studio`.
    Si una de esas skills ya inició el encargo, no la vuelvas a cargar ni reinicies el brief.
    En piezas con Nexa, usa la identidad humana fotorrealista confirmada el 2026-09-24 y su set de ocho vistas
-   de polera gris en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`, resuelto con
+   de polera gris en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` (si no está en disco,
+   `pnpm ai-gen:pull` esa carpeta; nunca regenerarla), resuelto con
    `foto:prompt`. La polera es una referencia neutral, no vestuario obligatorio. Las poses OneDrive guían gesto
    y cuerpo, no el rostro; el set sintético previo no es ancla facial.
    Si la pieza muestra a Julio, usa las 11 referencias aprobadas de `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`
+   (rehidratarlas con `pnpm ai-gen:pull` si faltan)
    y sus seis ángulos en `set-identidad/angulos/`; consulta `refs-aprobadas/MANIFIESTO.json` y resuelve la vista
    con `foto:prompt`. No uses `julio-ap-02.png` (composición publicitaria) ni mezcles fuentes y descartes con
    el set aprobado. Canon: [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
@@ -668,6 +670,14 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
   en texto ≥ 24 px, a ≥ 3:1 contra su fondo y nunca como superficie; el contraste de la firma se mide sobre la foto
   real (la burbuja URL sobre la mesa de la estratega no pasó: 3,80:1 en el 1 % peor, y esa lámina sigue con el logo).
   Medido a 390 px: el cuerpo de las láminas de texto denso queda en 10–11,5 px y los rótulos en 9 px.
+
+## Dónde viven los archivos de `ai-generations/`
+
+- **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas de deck y por `src/**`/`scripts/**` (`pnpm ai-gen:protected`).
+- **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: identidades, prendas, logo 3D, mascotas y Sparks sellados; `pnpm creative:assets:publish`.
+- **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
+- Plate, referencia o banco citado como `ai-generations/…` es una ruta lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` antes de componer o certificar.
+- **NUNCA** regenerar, sustituir ni aproximar un asset aprobado porque falta; **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## Reglas duras
 

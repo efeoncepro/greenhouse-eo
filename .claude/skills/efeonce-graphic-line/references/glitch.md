@@ -923,7 +923,7 @@ En `web/` (hashes en `index.json`): MP3 de escucha (`glitch-cama-3-vueltas.mp3`,
 masculina «BRYAN LOCUTOR 2» de ElevenLabs sobre una foto de host); en producción va la voz del host real.
 
 **Producción** (reproducible; `greenhouse-eo`, `ai-generations/2026-09-26_branding-sonoro/`, audio pesado fuera de
-git, scripts y LEEME en git; detalle en `audio-studio` → `efeonce/STUDIO_TOOLING.md`):
+git, scripts y LEEME en git; si el audio no está en disco, `pnpm ai-gen:pull ai-generations/2026-09-26_branding-sonoro`; detalle en `audio-studio` → `efeonce/STUDIO_TOOLING.md`):
 
 - `motor/glitch-theme.mjs`: `--stage maqueta` (banda propia) → re-grabación con IA → `--stage final --piece
   intro|cortina|salida --version vlog|podcast --from <regrabado> [--apertura|--cierre glitch-sfx/b/…]` (cortes,

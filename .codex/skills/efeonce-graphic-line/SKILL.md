@@ -187,6 +187,15 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
 4. Corre los chequeos del adapter y el QA de `qa-checklist.md` sobre los píxeles finales.
 5. Si aprendiste algo, actualiza esta skill (abajo).
 
+## Dónde viven los archivos de `ai-generations/`
+
+- **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas de deck y por `src/**`/`scripts/**` (`pnpm ai-gen:protected`).
+- **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
+- **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
+- Toda ruta `ai-generations/…` de esta skill y sus referencias es lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` **antes** de componer.
+- **NUNCA** regenerar, sustituir ni aproximar un plate o asset aprobado porque falta; **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano (`pnpm ai-gen:archive plan|apply`). Promover exploración = sellarla o citarla en la receta + publicar a canon. Salidas nuevas: `ai-generations/<AAAA-MM-DD>_<slug>/`.
+- SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ## Skills vecinas
 
 - `efeonce-brand-studio` — estrategia y gobierno de marca; decide el papel de la marca en la pieza.

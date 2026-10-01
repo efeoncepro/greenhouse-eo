@@ -8,7 +8,8 @@ Mismo contrato que el [kit 3D del logo](logo-3d-reference-kit.md): **la referenc
 persona y la escena**. Sin la vista correcta el modelo inventa la espalda, la capucha, el puño y la caída, y cada
 pieza queda con un hoodie distinto.
 
-Casos ejecutados, ambos aprobados 2026-09-17:
+Casos ejecutados, ambos aprobados 2026-09-17 (sus vistas son canon sellado: si no están en disco,
+`pnpm ai-gen:pull <carpeta del kit>`; nunca se regeneran):
 
 - [hoodie Efeonce](../../../../ai-generations/2026-09-17_hoodie-efeonce/LEEME.md) — 21 vistas a partir de un asset
   oficial ya existente. OneDrive `5. Contenidos/13- Branding/Hoodie Efeonce/v01/`.
@@ -47,7 +48,7 @@ puntos antes de generar nada — son el bloque «imagen 1 es la prenda oficial»
    con la tinta en navy `#023c70` en vez de blanca).
 
 **De dónde sale la prenda base.** El hoodie partió de un **asset oficial ya existente** del sitio público
-(`ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/efeonce-hoodie.png`), que fue la imagen 1 de todas las vistas.
+(`ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/efeonce-hoodie.png`; `pnpm ai-gen:pull` si falta), que fue la imagen 1 de todas las vistas.
 Cuando no existe ese asset —polera y chaqueta— hay que **parirlo primero** (§8): una prenda base aprobada por el
 operador, y recién entonces la serie.
 
@@ -142,7 +143,7 @@ verbatim en `prompts/softshell-02-espalda.txt`. Los marcadores que funcionaron c
 
 **El texto nunca se le pide al modelo**, tampoco acá. El arte de espalda —logotipo + «Empower your Growth»— entra
 como **imagen 2** desde el archivo determinístico
-`ai-generations/2026-09-17_chaqueta-efeonce/ref/estampa-espalda.png`, con la instrucción de reproducirlo exacto
+`ai-generations/2026-09-17_chaqueta-efeonce/ref/estampa-espalda.png` (`pnpm ai-gen:pull` si falta), con la instrucción de reproducirlo exacto
 (§3). Lo que cambia entre estampado y bordado es **cómo se aplica**, no de dónde sale el arte.
 
 ⚠️ **Deuda declarada.** De las vistas de espalda de las **dos chaquetas** (softshell y bomber), en cada una
@@ -265,6 +266,8 @@ efeonce-<prenda>-<nn>-<id-vista>-<ancho>x<alto>-v01-<fondo-estudio|transparente>
 ## 10. Reproducir
 
 ```bash
+# el .mjs está en git; las vistas y refs pueden estar en archivo o canon:
+pnpm ai-gen:pull ai-generations/<fecha>_<prenda>-efeonce
 # estampa determinística (si la prenda lleva texto)
 node ai-generations/<fecha>_<prenda>-efeonce/estampa-espalda.mjs
 
@@ -317,7 +320,7 @@ carnet que cuelga en la misma toma».
 
 El método vale para merch, no sólo ropa. Caso aprobado 2026-09-17:
 [lanyard con yoyo, portacarnet y carnet](../../../../ai-generations/2026-09-17_lanyard-efeonce/LEEME.md) — 12 vistas
-+ 3 artes canónicas.
++ 3 artes canónicas (si no están en disco, `pnpm ai-gen:pull` esa carpeta).
 
 **El arte se compone, el producto se genera.** Patrón de la cinta, cara del yoyo y carnet se arman con un script
 desde los archivos oficiales y entran como referencia; el texto exacto nunca se genera. El **paso del patrón se
@@ -342,7 +345,7 @@ producto generadas con `gpt-image-2.5-sunburst` bajo este mismo método:
   Declarar lo que la pieza NO lleva, igual que en el caso de la gorra.
 - **Sólo marca propia Efeonce y su familia**, nunca merch de un cliente.
 - Prompts, artes y runner: `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/merch-ia/`
-  (`items.mjs`, `arte/`, `prompts/`, `out/`).
+  (`items.mjs`, `arte/`, `prompts/`, `out/`; si faltan en disco, `pnpm ai-gen:pull`).
 - **Firma de la foto:** si el logo de Efeonce ya se ve en el objeto, la pieza no repite el logo como firma; la
   burbuja URL lo reemplaza centrada, sola y fusionada (≥ 4,5:1 medido), nunca junto al logo
   ([regla de la firma](../../efeonce-brand-studio/references/graphic-line-orbit.md)).
@@ -352,7 +355,7 @@ producto generadas con `gpt-image-2.5-sunburst` bajo este mismo método:
 Nueve espacios (recepción, sala, pasillo, pizarra, estado de sala, muro de voz, cocina, puesto de bienvenida,
 cabinas) con el mismo método: arte plano como referencia exacta, GPT Image 2.5 Sunburst `xhigh` sólo pone espacio,
 material y luz. Scripts: `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/oficina-ia/` (`items.mjs`,
-`edits.mjs`). Lo que costó y aplica a cualquier arte de marca dentro de una foto generada:
+`edits.mjs`; artes con `pnpm ai-gen:pull` si faltan). Lo que costó y aplica a cualquier arte de marca dentro de una foto generada:
 
 1. **El modelo imprime todo lo que ve en el arte**, incluidas las notas y leyendas de la lámina. El arte de
    referencia va **sin leyendas** ni anotaciones.
@@ -534,6 +537,6 @@ corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida
 > igual que el hoodie y las chaquetas, pero **BORDADO** en puntada satinada con relieve —no
 > serigrafiado—, porque es la prenda más formal frente a cliente y su emblema de pecho ya es bordado.
 > Motivo: de espaldas, un polo sin marca no se reconoce como Efeonce. El arte se compone con
-> `ai-generations/2026-09-17_polo-efeonce/estampa-espalda.mjs` (hilo blanco sobre el navy, hilo navy
+> `ai-generations/2026-09-17_polo-efeonce/estampa-espalda.mjs` (en git; vistas con `pnpm ai-gen:pull`; hilo blanco sobre el navy, hilo navy
 > sobre el blanco) y las cinco vistas de espalda están rehechas como `-v02-`; **las `-v01-` de espalda
 > quedan obsoletas**.

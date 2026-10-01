@@ -371,10 +371,11 @@ vale en toda aplicación:
     [«Efeonce — La órbita»](https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc) (namespace `EfeonceOrbit`).
   - Repo: `ai-generations/2026-09-30_portadas-sociales/` → `fichas/` (PS*, PX*, PH*), `plates/`, `nitidez/`,
     `finales/{linkedin,linkedin-personal,facebook,youtube,avatar,destacados-instagram,historias-destacados}/`,
-    `historias/` (bases, máscaras, extensiones), `personal/linkedin-personal.mjs` y `personal/avisos-linkedin-1a1.ts`.
+    `historias/` (bases, máscaras, extensiones), `personal/linkedin-personal.mjs` y `personal/avisos-linkedin-1a1.ts`
+    (scripts en git; los binarios, con `pnpm ai-gen:pull ai-generations/2026-09-30_portadas-sociales` si faltan).
   - Kit del equipo: sección «Tu portada de LinkedIn» (`#linkedin`) con las 8 personales en la página de cada persona
     (`https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html`; generador
-    `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs`). Archivos:
+    `ai-generations/2026-09-29_avatares-equipo/kit/paginas-kit.mjs`, en git; sus insumos, con `pnpm ai-gen:pull`). Archivos:
     `gs://efeonce-group-axis-public-media/team/linkedin-covers/v2/efeonce-linkedin-perfil-<id>-1584x396.png` (+
     `min/…jpg` 792 × 198); ids `formatos`, `formatos-desliza`, `formatos-estallido`, `formatos-mosaico`, `aeo`,
     `aeo-elige`, `aeo-pasillo`, `aeo-respuesta`.
@@ -563,7 +564,7 @@ todavía AXIS 0.3.29: la adopción y el renderer son de TASK-1938.
   stickers, órbita de plastilina); Nexa siempre con el uniforme; ironía sobre nosotros, nunca sobre el cliente, sin
   logros inventados. Se producen con `foto:prompt` (formato `teams`), arte exacto de cada texto y prueba de silueta a
   480/1280 px. Archivos: OneDrive `Kit media/Fondos de Teams/2026-09 La órbita/`, GCS `team/teams-backgrounds/v1/`,
-  fuentes `ai-generations/2026-09-29_fondos-teams/`.
+  fuentes `ai-generations/2026-09-29_fondos-teams/` (si no están en disco, `pnpm ai-gen:pull` esa carpeta).
 
 ---
 
@@ -590,7 +591,7 @@ todavía AXIS 0.3.29: la adopción y el renderer son de TASK-1938.
   80 × 24), filas de hasta cinco, **una sola imagen** con alt que nombra a todos.
 - **Retrato** (T `portrait`, caja de 208 px): anillo r 96, foto recortada en círculo r 78, arco 200°–250° trazo 4,
   esfera r 7; anillo 2 px navy al 22 % sobre claro, halo al 40 % sobre oscuro.
-- **Cómo se produce:** `ai-generations/2026-09-26_firma-partners/build4.mjs` con `HOST_BASE=https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1/`
+- **Cómo se produce:** `ai-generations/2026-09-26_firma-partners/build4.mjs` (sin versionar; `pnpm ai-gen:pull` si falta) con `HOST_BASE=https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1/`
   → `out/v3.1/hosted/` (se sube con `gcloud storage cp -r`) y los HTML `outlook-a.html` / `outlook-b.html`. Todo lo que
   no es texto va en PNG 2×–3×. Contrato `efeonce.email-signature`.
 - **Errores comunes:** revisarla sólo con fuentes web (Outlook y Gmail muestran **Arial**: revisar también así) · la
@@ -724,7 +725,7 @@ completa la oficina. Todo con prueba de color sobre el material real.
 | **Tarjetas de mesa y avisos** | la voz: pregunta con anillo y respuesta corta («¿Clave del wifi? [clave]», «¿Primera vez aquí? Pasa.») | datos inventados: los completa la oficina |
 
 - **Cómo se produce (toda la oficina):** hoy no hay receta de paquete salvo la lente de muro. El arte plano de
-  referencia es la lámina 4.3 (generador del canvas en `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/`);
+  referencia es la lámina 4.3 (generador del canvas en `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/`; `pnpm ai-gen:pull` si falta);
   los archivos de impresión y plantillas editables están **pendientes** (M §12): se empieza por el muro de recepción y
   la tarjeta de presentación, en PDF vectorial salido de las recetas, **bloqueado** hasta tener la especificación de la
   imprenta (D13). Para mostrarlo en un espacio real, §K.
@@ -1255,7 +1256,7 @@ no de la plantilla: nunca edites una plantilla ni retoques la salida para cambia
 
    | Qué | Campo | Regla |
    |---|---|---|
-   | Foto | `photo.plateRef` (ruta) + `photo.alt` | `alt` obligatorio, describe la escena y no el copy; sin ruta o sin `alt`, `missing-photo`. El plate vive fuera de git (`ai-generations/**`): si falta, el CLI falla antes de crear la salida |
+   | Foto | `photo.plateRef` (ruta) + `photo.alt` | `alt` obligatorio, describe la escena y no el copy; sin ruta o sin `alt`, `missing-photo`. El plate vive fuera de git (`ai-generations/**`): si falta, el CLI falla antes de crear la salida; se rehidrata con `pnpm ai-gen:pull`, nunca se regenera |
    | Copy | `voice`, `body` | reglas de voz de la receta |
    | Sección | `progress` | sección n de N |
 
@@ -1362,7 +1363,8 @@ que viajan con el deck y que un agente no resuelve solo:
   marcado, y el cuerpo de SF6 (124 visibles, 128 con `**`) pasa el máximo de 125 si se liga literal.
 - **Datos de muestra** marcados en SF11, SF13 y SF15; SF17 sin cifras; montos `[MONTO]`; SF9 con corte 2026-09-18 y
   fuera de un brochure evergreen.
-- **Plates** `NXSF1`–`NXSF3` son rutas locales de `ai-generations/` hasta el banco de plates (TASK-1931): el Job
+- **Plates** `NXSF1`–`NXSF3` son rutas locales de `ai-generations/` hasta el banco de plates (TASK-1931; si faltan,
+  `pnpm ai-gen:pull`): el Job
   `artifact-worker` no los lee. El plate SF1 de la arquitecta está rechazado y no entra.
 
 **PDF de la propuesta y del brochure (con insignia):** `ai-generations/2026-09-29_deck-salesforce/out/Efeonce-Propuesta-Servicios-Salesforce.pdf`
@@ -1370,7 +1372,8 @@ y `Efeonce-Brochure-Servicios-Salesforce.pdf` (19 páginas 1920×1080), generado
 `node ai-generations/2026-09-29_deck-salesforce/render-src/pdf-propuesta.mjs` (`DOC=brochure` para el brochure, que
 cierra con SF20; `SIN_BADGE=1` para el respaldo sin insignia) desde las láminas aprobadas en `out/` (la portada
 `SF0-portada-propuesta` se genera antes con `DOC=propuesta ONLY=SF0-portada node …/salesforce.mjs`). Es el artefacto de
-dirección, no la salida del Composer; `out/` no está en git. Antes de enviarlo, SF16 sigue sujeta a la autorización de
+dirección, no la salida del Composer; `out/` no está en git (los `.mjs` de `render-src/` sí; si `out/` falta,
+`pnpm ai-gen:pull ai-generations/2026-09-29_deck-salesforce`). Antes de enviarlo, SF16 sigue sujeta a la autorización de
 Anthropic.
 
 **El deck SEO/AEO (Search Visibility 360; TASK-1949, aprobado el 2026-09-30).** El operador aprobó el deck de la

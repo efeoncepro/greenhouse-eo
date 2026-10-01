@@ -50,7 +50,8 @@ Nexa) o un cliente Globe. Para audio genérico basta `../modules/`.
 - **Dónde vive:** página AXIS `https://axis.efeonce.org/references/sonic-brand/` y JSON para agentes
   `https://axis.efeonce.org/references/sonic-brand.json` (esquema `axis.efeonce-sonic-brand.v1`; se publican
   publicado 2026-09-26, PR AXIS #4 squash `55486aa`) · bucket `gs://efeonce-group-axis-public-media/sonic/v1/` (`masters/` + `web/`) ·
-  producción en Greenhouse `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/`, `entrega/`, `guia/`).
+  producción en Greenhouse `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/`, `entrega/`, `guia/`;
+  scripts y `.md` en git, los WAV de `entrega/` pueden estar en archivo: `pnpm ai-gen:pull ai-generations/2026-09-26_branding-sonoro/entrega`).
 - **Pendiente para canonizar:** licencias (Stable Audio vía
   fal; voz ElevenLabs) · prueba de reconocimiento sin logo antes de pautar · tokens AXIS + reemplazo del
   sonido de los masters V1.1. Glitch ya no es pendiente de esta identidad: tiene su diseño sonoro propio, aprobado (B),

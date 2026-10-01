@@ -91,7 +91,8 @@ node scripts/creative/brand-motion/orbit-sound.mjs --anim reveal --out <run>/sou
 node scripts/creative/brand-motion/encode-orbit-motion.mjs --frames <run>/frames --sound <run>/sound --out <run>/deliverables
 ```
 
-Cola de 30 variantes: `ai-generations/2026-09-26_orbita-motion/run-all.sh` (tres workers, candado de una sola
+Cola de 30 variantes: `ai-generations/2026-09-26_orbita-motion/run-all.sh` (sin versionar en git: si no está en
+disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull ai-generations/2026-09-26_orbita-motion`; tres workers, candado de una sola
 instancia, marcas `.done`/`.encoded`, `< /dev/null` en node). Cierre: `finalize.sh` sube todo al bucket, copia lo
 liviano a OneDrive, verifica archivo por archivo y sólo entonces borra `frames/` y `deliverables/`. `chain.sh` espera un
 cierre, marca lo ya subido y relanza.

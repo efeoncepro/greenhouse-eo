@@ -199,7 +199,8 @@ El titular y la firma editorial se componen después con activos exactos. No con
 logo generado con identidad vectorial garantizada. Si falla, corregir soporte/escala/ruta, no duplicar marcas.
 
 **Marca en escena desde activos canónicos.** Si la marca aparece dentro del mundo del trend, entrar con los
-activos canónicos como referencia de forma (edición con `--image`, intención en el prompt), nunca de memoria:
+activos canónicos como referencia de forma (edición con `--image`, intención en el prompt), nunca de memoria; si una
+ruta `ai-generations/` no está en disco, `pnpm ai-gen:pull <carpeta>` antes de editar, nunca un sustituto:
 
 | Activo | Referencia usada el 2026-09-19 | Lo que se exige |
 |---|---|---|

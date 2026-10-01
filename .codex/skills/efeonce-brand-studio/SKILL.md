@@ -176,6 +176,11 @@ Kortex y Verk, fuera por ahora. Operar con
 - **Firma de una pieza gráfica** (operador, 2026-09-26): **logo de Efeonce centrado abajo**, sin URL. La burbuja
   `efeoncepro.com` **no se agrega por defecto**: sólo **reemplaza** al logo cuando el logo ya aparece dentro de la
   imagen (mockup, objeto, merch), centrada, sola, con fusión de luminosidad a opacidad 1 y ≥ 4,5:1 medido (sólo pasa
+## Dónde viven los archivos de `ai-generations/`
+
+Las rutas `ai-generations/…` de esta skill son lógicas. **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json` o citado por recetas de deck y `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: identidades, prendas, logo 3D, mascotas y Sparks sellados (`pnpm creative:assets:publish`). **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes.
+Si falta en disco: `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer. **NUNCA** regenerar, sustituir ni aproximar un asset aprobado, resellar el lock para taparlo ni archivar o borrar a mano; promover exploración = sellarla o citarla en la receta + publicar a canon. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
   sobre lechos muy oscuros). Nunca a un costado ni junto al logo. Como pie de deck, informe, papelería o mail sigue
   como antes (horneada donde no hay fusión). Umbral 4,5 vs 3:1: pendiente del operador.
 - **Firma de correo v3.1** (aprobada por el operador, 2026-09-26): versiones A papel y B tarjeta navy, sin decisión

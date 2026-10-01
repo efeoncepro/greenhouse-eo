@@ -92,6 +92,13 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 - Separar preparado, validado, ejecutado, revisado, aprobado, archivado, publicado y entregado.
   No anunciar el harness completo por cerrar una unidad de componentes.
 
+## Dónde viven los archivos de `ai-generations/`
+
+- Origen: `ai-generations/` de **greenhouse-eo**. Lo **local protegido** (sellado en `scripts/foto/assets.lock.json`, citado por recetas de deck o por `src/**`/`scripts/**`) queda en disco; la exploración, rondas y descartes van al **archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`, sólo para el operador.
+- **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: lo sellado (identidades, prendas, logo 3D, mascotas, Sparks). Greenhouse lo publica con `pnpm creative:assets:publish`; Workbench lo consume y no lo publica.
+- Bajada en Workbench: el contrato de Greenhouse (plantilla y `assets-publish.mjs`) declara `pnpm assets:pull` con sha256; el checkout vigente lo mapea a `tools/legacy-disabled.mjs` ([arquitectura](references/architecture.md)). Verificar la ruta vigente antes de indicarla al equipo; no reactivar un script retirado.
+- En Greenhouse, una ruta ausente se rehidrata con `pnpm ai-gen:where` + `pnpm ai-gen:pull`. **NUNCA** regenerar ni aproximar un asset aprobado porque falta, resellar el lock para taparlo ni archivar o borrar a mano. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ## Mantener la memoria operativa
 
 Después de un avance relevante: registrar el contrato en su dueño de Workbench, el resultado

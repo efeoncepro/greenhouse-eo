@@ -114,7 +114,8 @@ La secuencia de fallas fue: balbuceo → banda de gaitas → suena a portugués 
 ## Plantilla de prompt
 
 El prompt validado íntegro es el artefacto reproducible:
-`ai-generations/2026-09-22_motion-codex-rueda-prensa/brief/loop-9x16-FINAL.prompt.txt`. Su esqueleto:
+`ai-generations/2026-09-22_motion-codex-rueda-prensa/brief/loop-9x16-FINAL.prompt.txt` (en git; las refs y masters
+de la corrida, si no están en disco: `pnpm ai-gen:pull ai-generations/2026-09-22_motion-codex-rueda-prensa`). Su esqueleto:
 
 1. **Declaración del marco sonoro** en la primera línea (qué clase de pieza es en términos de audio).
 2. **Qué es cada referencia** y para qué sirve (look del texto / set / pose A / pose B).

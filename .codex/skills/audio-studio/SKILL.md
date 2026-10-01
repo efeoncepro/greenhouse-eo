@@ -103,6 +103,17 @@ Cierra el loop **idear → guion/brief → producir → editar → mezclar → m
 > creativa y publicación. Entregar una revisión pedida está dentro del encargo; publicar necesita autorización
 > correspondiente. La aprobación existente y los límites del operador prevalecen sobre un gate genérico.
 
+### Dónde viven los archivos de `ai-generations/`
+
+Una ruta `ai-generations/...` en esta skill (máster, stem, maqueta, toma re-grabada, motor) es **lógica**: el archivo
+vive local (protegido), en el canon `gs://efeonce-creative-canon/ai-generations/<ruta>` (lo sellado en
+`scripts/foto/assets.lock.json`; el equipo lo baja con `pnpm assets:pull`) o en el archivo
+`gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (exploración, rondas, renders pesados; sólo operador). Los
+scripts del motor y los `.md` van en git; los WAV/MP3, no. **Antes de re-mezclar, re-masterizar o montar** sobre un
+audio que no está en disco: `pnpm ai-gen:where <ruta>` → `pnpm ai-gen:pull <carpeta|ruta>` (misma ruta, sha256
+verificado). **NUNCA** regenerar ni aproximar un máster aprobado porque falta; **NUNCA** resellar el lock para tapar un
+faltante ni archivar/borrar a mano. Salidas nuevas: `ai-generations/<AAAA-MM-DD>_<slug>/` local. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ## 5. Boundaries duros (lo que esta skill NO hace)
 
 - **NUNCA** hagas el sonido *sincronizado a un video* como pieza final acá — eso lo coordina

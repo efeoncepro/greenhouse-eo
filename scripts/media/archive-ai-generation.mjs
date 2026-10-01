@@ -1,40 +1,25 @@
 #!/usr/bin/env node
-import { createHash } from 'node:crypto'
-import { spawnSync } from 'node:child_process'
-import { readdir, readFile, stat, writeFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
+import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
-const BINARY_EXTENSIONS = new Set([
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.webp',
-  '.gif',
-  '.mp4',
-  '.webm',
-  '.mov',
-  '.m4v',
-  // Audio, video sin comprimir y comprimidos: tampoco se versionan. Faltaban aquí y en `.gitignore`, y el
-  // 2026-09-25 un checkpoint arrastró 91 de ellos (985 MB, un MKV de 470 MB) y GitHub cortó el push.
-  '.mkv',
-  '.avi',
-  '.wav',
-  '.aif',
-  '.aiff',
-  '.flac',
-  '.mp3',
-  '.m4a',
-  '.aac',
-  '.ogg',
-  '.zip'
-])
+import {
+  ARTIFACTS_MANIFEST_NAME,
+  buildArtifactsManifest,
+  collectFiles,
+  DEFAULT_PREFIX,
+  describeFile,
+  objectPrefixFor,
+  resolveArchiveBucket,
+  syncBinaries
+} from './ai-generation-artifacts.mjs'
 
 const usage = `Usage:
   pnpm media:archive-ai-generation -- --run ai-generations/<run> [--apply]
 
 Options:
   --run <dir>       Required. ai-generations run directory.
-  --bucket <name>   GCS bucket. Defaults to GREENHOUSE_AI_GENERATIONS_BUCKET or efeonce-group-greenhouse-private-assets-prod.
+  --bucket <name>   GCS bucket. Defaults to GREENHOUSE_AI_GENERATIONS_BUCKET or ${resolveArchiveBucket({})}.
   --prefix <path>   GCS prefix. Defaults to ai-generations.
   --apply           Upload files and write artifacts.remote.json. Without this, dry-run only.
 
@@ -43,8 +28,8 @@ versionable as README/prompts/scripts/manifests. Local files are not deleted.`
 
 function parseArgs(argv) {
   const args = {
-    bucket: process.env.GREENHOUSE_AI_GENERATIONS_BUCKET || 'efeonce-group-greenhouse-private-assets-prod',
-    prefix: 'ai-generations',
+    bucket: resolveArchiveBucket(),
+    prefix: DEFAULT_PREFIX,
     apply: false
   }
 
@@ -78,60 +63,11 @@ function parseArgs(argv) {
   return args
 }
 
-async function collectFiles(rootDir, currentDir = rootDir) {
-  const entries = await readdir(currentDir, { withFileTypes: true })
-  const files = []
-
-  for (const entry of entries) {
-    if (entry.name === '.DS_Store') continue
-    const fullPath = path.join(currentDir, entry.name)
-
-    if (entry.isDirectory()) {
-      files.push(...await collectFiles(rootDir, fullPath))
-      continue
-    }
-
-    const ext = path.extname(entry.name).toLowerCase()
-
-    if (!BINARY_EXTENSIONS.has(ext)) continue
-
-    const relativePath = path.relative(rootDir, fullPath)
-
-    files.push({ fullPath, relativePath })
-  }
-
-  return files
-}
-
-async function describeFile(file) {
-  const bytes = await readFile(file.fullPath)
-  const info = await stat(file.fullPath)
-
-  return {
-    path: file.relativePath,
-    sizeBytes: info.size,
-    sha256: createHash('sha256').update(bytes).digest('hex')
-  }
-}
-
-function runGcloud(args, { stream = false } = {}) {
-  // `stream`: la salida va directo a la terminal. Una sincronización de miles de archivos imprime más de
-  // 1 MB y `spawnSync` con buffer mata al proceso (ENOBUFS) a mitad de la subida.
-  const result = spawnSync('gcloud', args, stream ? { stdio: ['ignore', 'inherit', 'inherit'] } : { encoding: 'utf8' })
-
-  if (result.status !== 0) {
-    throw new Error(`gcloud ${args.join(' ')} failed (status ${result.status}, ${result.error?.code ?? 'sin código'}):\n${result.stderr || result.stdout || ''}`)
-  }
-
-  
-return result.stdout
-}
-
 async function main() {
   const args = parseArgs(process.argv.slice(2))
   const rootDir = path.resolve(process.cwd(), args.run)
   const runName = path.basename(rootDir)
-  const objectPrefix = `${args.prefix.replace(/^\/+|\/+$/g, '')}/${runName}`
+  const objectPrefix = objectPrefixFor(args.prefix, runName)
   const files = await collectFiles(rootDir)
   const described = []
 
@@ -155,26 +91,30 @@ async function main() {
 return
   }
 
-  // Una sola sincronización paralela en vez de un `gcloud` por archivo: una corrida de video tiene miles de
-  // frames y subirlos uno a uno tomaba horas. `rsync` conserva las rutas relativas, omite lo ya subido
-  // (reanudable) y sólo considera las extensiones del archivo: todo lo demás queda excluido por regex.
-  const onlyBinaries = `(?i)^(?!.*\\.(${[...BINARY_EXTENSIONS].map(ext => ext.slice(1)).join('|')})$).*$`
+  // Guarda: si `ai-gen:archive` ya liberó binarios locales, reescribir `files` sólo con lo que hay en disco
+  // dejaría el inventario sin los archivos que viven en el bucket. Esa carpeta se re-archiva con `ai-gen:archive`,
+  // que une el inventario anterior con el actual.
+  const manifestPath = path.join(rootDir, ARTIFACTS_MANIFEST_NAME)
 
-  runGcloud(['storage', 'rsync', rootDir, `gs://${args.bucket}/${objectPrefix}`, '--recursive', '--quiet', `--exclude=${onlyBinaries}`], { stream: true })
-  console.log(`uploaded ${described.length} files -> gs://${args.bucket}/${objectPrefix}/`)
+  if (existsSync(manifestPath)) {
+    const previous = JSON.parse(await readFile(manifestPath, 'utf8'))
+    const present = new Set(described.map(item => item.path))
+    const missing = (previous.files ?? []).filter(item => !present.has(item.path))
 
-  const manifest = {
-    schema: 'greenhouse.aiGenerationArtifacts.v1',
-    generatedAt: new Date().toISOString(),
-    run: args.run,
-    bucket: args.bucket,
-    prefix: objectPrefix,
-    totalBytes,
-    fileCount: described.length,
-    files: described
+    if (missing.length) {
+      throw new Error(
+        `${ARTIFACTS_MANIFEST_NAME} declara ${missing.length} archivo(s) que ya no están en disco (p. ej. ${missing[0].path}). ` +
+          `Usa \`pnpm ai-gen:archive apply --folder ${runName}\`, que conserva el inventario anterior.`
+      )
+    }
   }
 
-  const manifestPath = path.join(rootDir, 'artifacts.remote.json')
+  // Una sola sincronización paralela (ver `syncBinaries`): reanudable y sólo con las extensiones binarias.
+  syncBinaries({ rootDir, bucket: args.bucket, objectPrefix })
+  console.log(`uploaded ${described.length} files -> gs://${args.bucket}/${objectPrefix}/`)
+
+  const manifest = buildArtifactsManifest({ run: args.run, bucket: args.bucket, objectPrefix, files: described })
+
 
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
   console.log(`\nWrote ${path.relative(process.cwd(), manifestPath)}`)

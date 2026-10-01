@@ -29,6 +29,12 @@ Use a public runtime/CDN bucket only for approved delivery assets. Use the
 private bucket for prompts, masters, references, review sheets and exploratory
 outputs.
 
+> This command is the **copy stage** of the `ai-generations/` archive lane. `pnpm ai-gen:archive plan|apply` wraps it
+> with protection guards (sealed, recipe-cited, code-cited and <3-day-old folders are refused), sha256 readback and
+> deletion of the local gitignored binaries only (versioned `.md`/`.json`/`.mjs` stay). If a run folder is missing
+> locally, use `pnpm ai-gen:where` + `pnpm ai-gen:pull`, which read `artifacts.remote.json`. Contract:
+> [`AI_GENERATIONS_STORAGE_V1.md`](AI_GENERATIONS_STORAGE_V1.md).
+
 ### Video For Web
 
 Use this for autoplay or inline landing videos. It emits a primary WebM, an MP4

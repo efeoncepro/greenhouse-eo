@@ -156,7 +156,7 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   `src/lib/brand-surfaces/deck-recipes/__tests__/fixtures/golden-{brochure,proposal}-salesforce.json` (validar con
   `pnpm brand:deck-plan -- --plan <fixture>`). **PDF de la propuesta y del brochure ya renderizados, con la insignia
   de partner:** `ai-generations/2026-09-29_deck-salesforce/out/Efeonce-{Propuesta,Brochure}-Servicios-Salesforce.pdf`
-  (`render-src/pdf-propuesta.mjs`; no están en git). La insignia «Salesforce Partner» está **autorizada por
+  (`render-src/pdf-propuesta.mjs`; no están en git: si no están en disco, `pnpm ai-gen:pull`). La insignia «Salesforce Partner» está **autorizada por
   Salesforce** (operador, 2026-09-29) y va por defecto en portada y contraportada de propuesta
   (`partnerMark.readbackRef: "salesforce-partner-authorization-2026-09-29"`); logo e íconos de producto, también autorizados. Antes de
   enviarlo: Claude y Claudeforce (SF16) exigen la autorización escrita de Anthropic, hoy pendiente; Agent Astro es una
@@ -172,7 +172,8 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   `src/lib/brand-surfaces/examples/deck-seo-{completo,brochure,propuesta}-document.json`. Seis recetas nuevas **sin
   plantilla todavía** (`content-brand-family`, `content-service-mockups`, `content-report-formats`,
   `content-committee-deck`, `content-industries`, `content-markets`: el plan avisa `recipe-without-template` y el PDF
-  aprobado se hornea con `ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/bake.cjs`). **Los datos van
+  aprobado se hornea con `ai-generations/2026-09-29_deck-seo-aeo-documentos/render-src/bake.cjs`, en git; sus insumos,
+  con `pnpm ai-gen:pull` si faltan). **Los datos van
   tal cual** por decisión del operador (2026-09-30: «Deja esos datos... No marques nada en el deck como provisional,
   asumo la responsabilidad»): cifras de los casos, su fuente, formatos de Insights, industrias y Bresler, sin rotular
   ni quitar; el contexto queda como registro en `DECISIONES.md`. Logos de clientes sólo con su autorización
@@ -245,7 +246,7 @@ sujeto**: la columna vive en el 45 % izquierdo oscuro; si cruza un haz, una mano
 («¿Qué hacemos por tu marca?» → «¿Qué hace Efeonce?»; «¿Dónde pongo el presupuesto?» → «¿Dónde invierto?») o se parte
 la evidencia en 2–3 líneas.
 
-**Catálogo aprobado (compacto; plates bajo `ai-generations/`).**
+**Catálogo aprobado (compacto; plates bajo `ai-generations/`, rehidratables con `pnpm ai-gen:pull`).**
 
 - **Brochure, portada general con foto** (registro cine, sin cliente): logo 500 · «Brochure · Servicios 2026» ·
   «¿Qué hace Efeonce?» (anillo teal) · **«Crecer.»** (esfera teal) · «**Cinco** líneas de servicio: Growth · Brand ·
@@ -306,7 +307,7 @@ Cierre de propuesta: eslogan 72 px en top 420 y bloque de contacto en 600.
 **Plate de portada** (registro cine; la foto la dirige `design-studio` y se pide por ficha `pnpm foto:*`): sujeto en
 la mitad derecha, de la cintura arriba, 85 mm a ~2 m, mirando al lente; el 45 % izquierdo, estudio oscuro y calmo (sin
 haces, objetos ni órbita); lecho oscuro abajo; la luz de acento es la de la línea. Ficha de ejemplo:
-`ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json`.
+`ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json` (`pnpm ai-gen:pull` si falta).
 
 **Selección y cursores en portada:** sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona; en
 16:9, un solo cursor (propio o de un colaborador). Quedaron en: portadas de propuesta (marco de 8 manijas sobre el logo
@@ -321,7 +322,8 @@ como contraportada; portadas genéricas (clásica de brochure, sólo logo); cont
 
 **Estado (2026-09-27, TASK-1927):** el set es receta del contrato y tiene plantilla en `graphic-line-deck`. Se
 compone con `pnpm brand:compose` (subsección siguiente); ya no se arma como maqueta. La producción idempotente de los
-plates sigue siendo TASK-1926 (registro cine / `foto:*`): los plates viven fuera de git, bajo `ai-generations/`.
+plates sigue siendo TASK-1926 (registro cine / `foto:*`): los plates viven fuera de git, bajo `ai-generations/`
+(si faltan en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull`; nunca se regeneran).
 Diferencias conocidas contra los prototipos: el tamaño de «Cuando quieras.» (la plantilla usa el valor del token, algo
 mayor que el prototipo), la burbuja URL sale horneada en vez de la de luminosidad, y la caja de selección sale del
 pintor canónico y queda unos píxeles más ajustada. El operador aprobó a ojo las láminas compuestas el 2026-09-27.
@@ -487,7 +489,7 @@ campos propios — `plans`, `risks`, `bars`, `team`, `tools`, `topics`, `partner
   primera); los saltos de línea se respetan.
 - `lines` (sólo `proposal-cinematic` layout `lines`): cuáles líneas entran a la pila; el contenido sale de los tokens.
 - `photo`: `{ register, subject, plateRef, alt, focus? }`. `plateRef` es el plate bajo `ai-generations/` (sin el
-  archivo, el CLI falla antes de crear la salida); `alt` obligatorio; `focus: { xOfWidth, yOfHeight }` (0–1) dirige
+  archivo, el CLI falla antes de crear la salida: rehidratarlo con `pnpm ai-gen:pull`); `alt` obligatorio; `focus: { xOfWidth, yOfHeight }` (0–1) dirige
   el recorte hacia ese punto sólo en las recetas que lo leen (sin él, recorte centrado; `section-split` no lo lee).
 - `progress`: `{ sections, current }` en las láminas con indicador.
 - **Documento:** `pages` (ver «Documento completo» abajo).
@@ -530,8 +532,8 @@ pnpm brand:compose -- --intent <tu-intent>.json
 Qué cuidar al cambiar la foto:
 
 - **`photo.alt` es obligatorio** y describe la escena, no el copy. Sin él falla con `missing-photo`.
-- **El plate debe existir en disco.** Vive fuera de git, bajo `ai-generations/**`; si falta, el CLI falla antes de
-  crear la salida.
+- **El plate debe existir en disco o rehidratarse con `pnpm ai-gen:pull <ruta>`.** Vive fuera de git, bajo
+  `ai-generations/**`; si falta, el CLI falla antes de crear la salida. Nunca se regenera ni se sustituye.
 - **El recorte es centrado.** El CLI ajusta la foto al tamaño que pide la receta, cubriendo el área y centrada. En la
   sección partida la franja de foto mide 1.260 × 1.080 px sobre un lienzo de 1.920 × 1.080; en las láminas a sangre,
   el lienzo completo.
@@ -586,6 +588,11 @@ TASK-1930 (datos reales en los slots: `bindDeckSlots` y `--bind`) está **`in-pr
 entregados; montos y equipo esperan TASK-1417 y TASK-1418 (subsección «Datos reales en los slots»). Siguen TASK-1931 (banco de plates gobernado), TASK-1932 (Proposal Studio arma
 el deck desde recetas: confirmación humana, API, Nexa y MCP del plan) y TASK-1933 (pendientes de QA del catálogo).
 El documento completo no tiene frame propio en el gate visual (usa fotos reales): lo cubren sus páginas.
+
+#### Dónde viven los archivos de `ai-generations/`
+
+Las rutas `ai-generations/…` (plates, fichas, PDF de dirección) son lógicas. **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por `EFEONCE_DECK_SLIDE_RECIPES_V1.json` y por `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>` (identidades, prendas, logo 3D, mascotas, Sparks; `pnpm creative:assets:publish`). **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador: exploración, rondas, descartes).
+Si falta: `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer. **NUNCA** regenerar ni aproximar un plate aprobado, resellar el lock para taparlo ni archivar o borrar a mano; citar un plate en la receta lo protege. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 #### Recetas por lámina: el catálogo de las 78 (aprobado 2026-09-27 y 2026-09-28)
 

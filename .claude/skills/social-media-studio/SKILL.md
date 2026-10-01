@@ -59,7 +59,8 @@ Para fotohistorias, globos y PDF social, cargar
 [dialogue-carousel-and-document-delivery.md](references/dialogue-carousel-and-document-delivery.md).
 Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes de generar. La identidad humana
 fotorrealista aprobada el 2026-09-24 es la familia Avatar A con continuidad de polera gris; sus ocho vistas
-están en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` y se resuelven por `foto:prompt`.
+están en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` y se resuelven por `foto:prompt`
+(si no están en disco: `pnpm ai-gen:pull ai-generations/2026-09-20_identidad-julio-nexa`).
 Las poses de OneDrive son guías de actuación/cuerpo, no anclas faciales. No reutilizar el set sintético anterior
 como rostro de Nexa.
 Cuando Julio aparezca como vocero o personaje de una pieza, aplicar el mismo preflight de identidad: usar las 11
@@ -230,6 +231,17 @@ herramientas conectadas (detalle en `efeonce/STUDIO_TOOLING.md`):
     para un cliente internacional** (as-a-service). **NUNCA** hardcodees un HEX de marca en una plantilla.
   - Frontera con **Media Foundry**: Foundry **genera** el pixel (IA); el Composer **compone** el frame. Un
     carrusel puede usar los dos. **NO** se fusionan.
+
+### Dónde viven los archivos de `ai-generations/`
+
+Una ruta `ai-generations/...` en esta skill (ancla de identidad, plate, kit 3D, pieza vigente, master) es **lógica**: el
+archivo vive local (protegido), en el canon `gs://efeonce-creative-canon/ai-generations/<ruta>` (lo sellado en
+`scripts/foto/assets.lock.json`; el equipo lo baja con `pnpm assets:pull`) o en el archivo
+`gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (exploración, rondas, descartes; sólo operador). Los `.md` van en
+git; los PNG/MP4, no. **Antes de componer, editar o adaptar** desde un asset que no está en disco:
+`pnpm ai-gen:where <ruta>` → `pnpm ai-gen:pull <carpeta|ruta>` (misma ruta, sha256 verificado). **NUNCA** regenerar,
+sustituir ni aproximar un asset aprobado porque falta; **NUNCA** resellar el lock para tapar un faltante ni archivar/borrar
+a mano. Salidas nuevas: `ai-generations/<AAAA-MM-DD>_<slug>/` local. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ### Reportes y evidencia de producto
 

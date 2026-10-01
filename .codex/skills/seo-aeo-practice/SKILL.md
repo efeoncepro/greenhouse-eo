@@ -424,7 +424,12 @@ presente sepa qué hay detrás si el cliente pregunta:
 - La URL `think.efeoncepro.com/brand-visibility` todavía dice «Brand Visibility Grader» (alias histórico).
 
 Las láminas nativas (familia de marcas, servicios, formatos, comité, industrias y mercados) todavía no se componen
-solas: el PDF aprobado vive en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/` (fuera de git).
+solas: el PDF aprobado vive en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/` (fuera de git; si no está en
+disco: `pnpm ai-gen:pull ai-generations/2026-09-29_deck-seo-aeo-documentos/out`, nunca re-exportar uno aproximado).
+
+**Dónde viven los archivos de `ai-generations/`:** toda ruta `ai-generations/...` es lógica (local, canon
+`gs://efeonce-creative-canon/ai-generations/<ruta>` o archivo `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`);
+si falta en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull`, nunca sustituirla. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ---
 

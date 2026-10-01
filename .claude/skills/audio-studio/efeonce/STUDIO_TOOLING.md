@@ -49,7 +49,8 @@ o multi-voz rápido. Verificar términos de licencia antes de uso comercial.
 ## Rutas vía fal verificadas (2026-09-26)
 
 Medidas al producir la identidad sonora de Efeonce (`EFEONCE_OVERLAY.md` §Identidad sonora). Scripts en
-`ai-generations/2026-09-26_branding-sonoro/motor/` (binarios fuera de git):
+`ai-generations/2026-09-26_branding-sonoro/motor/` (los scripts están en git; maquetas, tomas re-grabadas y masters
+que leen, no: si faltan en disco, `pnpm ai-gen:pull ai-generations/2026-09-26_branding-sonoro/<subcarpeta>` antes de correrlos):
 
 | Ruta | Modelo fal | Lo medido | Script |
 |---|---|---|---|
@@ -89,7 +90,7 @@ Los scripts de arriba produjeron los másteres; **quien los entrega hoy es el ta
 | Taller `efeonce-brand-workshop` → `tools/glitch-motion/src/music.mjs` | fija los siete másteres por URL + sha256 (`MUSIC_V1`, bucket `glitch/music/v1/`); los baja y verifica; si el bucket cambia, falla | lo usan `render` (pre-roll animado de la intro, intro y salida con sus efectos ya montados, versiones de podcast; **sin** `apertura.wav` ni `cierre.wav`) y `kit` (cama, cortina y animatic de 48,4 s). **`--music off`** apaga la música. Comando tipo: `pnpm -C ../efeonce-brand-workshop --filter glitch-motion kit -- …`. README: `tools/glitch-motion/README.md` §«Música» |
 | Taller → `tools/glitch-motion/src/sound.mjs` sobre `tools/brand-sound` | el diseño sonoro (golpes y falla) | suma un animatic sin apertura ni cierre para la mezcla con música |
 | AXIS | `https://axis.efeonce.org/references/glitch/#sonido` y `#musica`; `/references/glitch.json` → `sound` y `music`; buckets `glitch/sound/v1/` y `glitch/music/v1/` (éste con `index.json`) | la fuente por URL + sha256 para agentes y editores |
-| Greenhouse `ai-generations/2026-09-26_branding-sonoro/` | `motor/glitch-theme.mjs`, `motor/ai-music.ts` (`--route sa`, `el-bed`, `sa-bed`), `motor/glitch-cama-bucle.mjs`, `motor/master.sh`; `glitch-sfx.mjs` y `dsp.mjs` históricos; `LEEME.md` | producción de una **ronda nueva** (la aprueba el operador), nunca para rehacer un máster aprobado |
+| Greenhouse `ai-generations/2026-09-26_branding-sonoro/` | `motor/glitch-theme.mjs`, `motor/ai-music.ts` (`--route sa`, `el-bed`, `sa-bed`), `motor/glitch-cama-bucle.mjs`, `motor/master.sh`; `glitch-sfx.mjs` y `dsp.mjs` históricos; `LEEME.md` | producción de una **ronda nueva** (la aprueba el operador), nunca para rehacer un máster aprobado; si un `--from` no está en disco, `pnpm ai-gen:pull`, nunca regenerarlo |
 
 Comandos del taller para el audio de Glitch (desde `greenhouse-eo`, prefijo
 `pnpm -C ../efeonce-brand-workshop --filter glitch-motion`): `render`, `kit`, `transiciones` y `heroe` entregan el WAV

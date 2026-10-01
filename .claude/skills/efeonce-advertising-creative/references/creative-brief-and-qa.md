@@ -134,7 +134,7 @@ lenguaje fotográfico: se usa en casos específicos y nunca cruza sujeto, reserv
 | Texto | Vive fuera de la órbita (tercio inferior izquierdo) | Titular, CTA o URL cruzando el anillo |
 | Cantidad | Una lente u órbita por pieza | Órbitas repetidas como patrón o textura |
 | Arco de avance | Mide un dato real citable | Arco decorativo o dato inventado |
-| Foto en la lente | Toma del banco `ai-generations/2026-09-25_banco-lente-orbita/` o del pipeline `foto:*`; sujeto en un círculo del 55 % del lado corto; sin emblema legible | Velo navy sobre una foto de banco; foto débil sin punto de interés |
+| Foto en la lente | Toma del banco `ai-generations/2026-09-25_banco-lente-orbita/` (`pnpm ai-gen:pull` si falta) o del pipeline `foto:*`; sujeto en un círculo del 55 % del lado corto; sin emblema legible | Velo navy sobre una foto de banco; foto débil sin punto de interés |
 | Grosor y margen | ×1,75 en lienzos ≤ 1200 px; margen 9 % del lado corto en redes y 140 px en 16:9; en 9:16 fuera de la zona de la interfaz | Grosor del informe A4 llevado a un post de 1080 |
 | Uso de la órbita | Declarada a propósito (lente, medida con fuente, progreso, foco); la foto conserva su composición | Órbita por defecto en toda pieza, o sobre sujeto, reservas, lecho o firma |
 | URL | Firma: burbuja sólo con el logo en la imagen (ver Firma). Pie de deck, informe, papelería o mail: burbuja, horneada donde la fusión no está garantizada | `efeoncepro.com` como texto suelto; burbuja como firma por defecto |

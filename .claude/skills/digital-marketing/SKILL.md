@@ -289,6 +289,12 @@ Usar los templates versionados `templates/campaign-brief.md`, `campaign-assets.m
 sus copias operativas viven en OneDrive `2. Campañas/_templates/`. Distinguir canal, placement, medio y ratio;
 presupuesto, fechas y metas pendientes no se inventan. Cada export tiene fila estable en ASSETS y receta en canal.
 
+**Dónde viven los archivos de `ai-generations/`:** las referencias y kits que cita una pieza (`ai-generations/<kit>/...`)
+son rutas lógicas: local, canon `gs://efeonce-creative-canon/ai-generations/<ruta>` (lo sellado en
+`scripts/foto/assets.lock.json`; `pnpm assets:pull`) o archivo `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`.
+Antes de adjuntarlas a un modelo o componer: `pnpm ai-gen:where` + `pnpm ai-gen:pull` si faltan; **NUNCA** sustituir ni
+aproximar una referencia aprobada ni resellar el lock para tapar un faltante. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ## Manifiesto de pauta y continuidad MCP
 
 Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).

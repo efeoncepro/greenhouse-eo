@@ -13,6 +13,8 @@ paths:
 
 # Glitch — sub-línea gráfica (auto-load por path)
 
+**Archivos de `ai-generations/` que no están en disco** (plates, kits, identidades): `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer; nunca regenerar ni resellar el lock. Regla [`ai-generations-storage.md`](./ai-generations-storage.md) · SSOT [`AI_GENERATIONS_STORAGE_V1.md`](../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 Glitch (el magazine semanal de Efeonce: portadas, carrusel, blog, vlog/reel) tiene una **sub-línea complementaria de
 «La órbita» que aplica SÓLO a Glitch**. Carga la skill **`efeonce-graphic-line`** → `references/glitch.md` (+
 `efeonce-advertising-creative` si lleva texto, `social-media-studio`, `motion-design-studio` para video). Canon:
