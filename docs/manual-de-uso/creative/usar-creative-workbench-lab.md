@@ -7,9 +7,9 @@ Corte: 2026-10-01. Cliente admitido de este sitio: SKY Airline.
 ## Abrir la versión publicada
 
 Abrir [creative-workbench-sky.vercel.app](https://creative-workbench-sky.vercel.app/).
-El deployment SKY vigente de este corte es PR17/main `7e4c617`, snapshot `0b815c5e…`.
-Vercel mantiene protección `all`; la redirección SSO para una sesión anónima es esperada.
-Usar acceso ya autorizado. Este manual no concede permisos ni crea un login alternativo.
+El sitio abre sin login tras la autorización del operador para compartirlo con el equipo.
+[Estado de acceso y deployment actual](../../operations/creative-production/WORKBENCH_LAB_ACCESS_STATE.md):
+cinco páginas y manifiesto HTTP 200 anónimos. PR17/v6 es el corte funcional histórico de este manual.
 Un enlace `127.0.0.1` identifica una preview local; no abre la versión publicada en Vercel.
 
 La navegación lateral organiza Vista general, Composiciones, Adaptaciones, Tokens, Tipografía,

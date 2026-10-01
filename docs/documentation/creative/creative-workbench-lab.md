@@ -82,10 +82,11 @@ La evolución v3/v4 con más envoltorios se conserva como historia; no es el cri
 
 ## Publicación y fuentes canónicas
 
-El corte v6 está en [Vercel protegido](https://creative-workbench-sky.vercel.app/), PR17/main
-`7e4c617`. Evidencia de build, CI, protección, readback remoto y navegador:
+El sitio [Vercel](https://creative-workbench-sky.vercel.app/) abre sin login por autorización del
+operador: [acceso/deployment vigente](../../operations/creative-production/WORKBENCH_LAB_ACCESS_STATE.md).
+El corte v6 original fue publicado protegido, PR17/main `7e4c617`. Evidencia de build, CI, protección, readback remoto y navegador:
 [auditoría v6](../../audits/creative-workbench/2026-10-01-lab-premium-v6-documentation-closure.md).
-La publicación no habilita acceso anónimo, IA, Efeonce ID ni nuevos Packages. El dominio
+La apertura del visor no habilita IA, Efeonce ID ni nuevos Packages. El dominio
 institucional previsto `creative.efeonce.org` necesita su verificación independiente.
 
 La implementación activa pertenece al repo Workbench: `docs/architecture/workbench-lab-navigation.md`,

@@ -2,6 +2,9 @@
 
 ## Lab integrado y criterio vigente — 2026-10-01
 
+**Acceso actual:** [visor sin login autorizado por el operador](../../../../docs/operations/creative-production/WORKBENCH_LAB_ACCESS_STATE.md).
+Deployment actual y seis respuestas anónimas 200 verificados; la protección v6 siguiente es histórica.
+
 PR17 integra selectores v6 en main `7e4c617`, encima de premium v5 (PR16) y componentes
 autónomos (PR15). El contrato de superficies v5 y la mesa opción 2 siguen vigentes. El
 [estado Greenhouse](../../../../docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md)

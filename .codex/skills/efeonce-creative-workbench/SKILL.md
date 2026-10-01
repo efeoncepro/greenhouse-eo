@@ -14,7 +14,8 @@ trabajar para todas las marcas; cada ejecución tiene una sola identidad visual 
 
 Workbench `main` integra componentes autónomos e identidad Git por PR15 (`2392758`) y
 el Lab premium por PR16 (`c3e85b6`) y selectores compartidos por PR17 (`7e4c617`). El snapshot
-SKY v6 fue publicado y cotejado en el alias protegido `creative-workbench-sky.vercel.app`;
+SKY v6 fue publicado y cotejado con protección inicial; el [acceso actual sin login autorizado](../../../docs/operations/creative-production/WORKBENCH_LAB_ACCESS_STATE.md)
+se verifica por separado en `creative-workbench-sky.vercel.app`;
 [Lab](references/lab.md) conserva el contrato host/cliente, superficies, motion y menús abiertos.
 Greenhouse incorporó la base documental mediante PR246
 sobre `develop`; no es una promoción de Greenhouse a producción. La implementación modular

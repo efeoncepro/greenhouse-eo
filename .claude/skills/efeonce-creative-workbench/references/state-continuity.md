@@ -2,6 +2,10 @@
 
 ## Corte consolidado — 2026-10-01
 
+**Acceso/runtime posterior:** [estado vigente del visor abierto](../../../../docs/operations/creative-production/WORKBENCH_LAB_ACCESS_STATE.md).
+SSO retirado por autorización explícita; alias/deployment existente preservado y seis rutas anónimas 200.
+Los readbacks protegidos de v6 de la tabla siguiente conservan su fecha, no son el acceso actual.
+
 Este corte prevalece sobre los registros históricos inferiores. Fuentes: código Workbench,
 GitHub PR/CI y evidencia privada enlazada; el [estado operativo Greenhouse](../../../../docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md)
 conserva la matriz de entregado/pendiente. Revalidar el proveedor antes de una nueva operación.
