@@ -635,6 +635,34 @@ export const OBJETOS = {
     vistas: { frente: '01-frente-heroe', 'tres-cuartos-izq': '02-tres-cuartos-izquierda', perfil: '03-perfil' },
     vistaDefecto: 'tres-cuartos-izq'
   },
+  spark: {
+    // Spark base v01 (TASK-1941, decisión del operador 2026-10-01: «Agents refinado» = dirección B «La órbita» + las
+    // tres ventanas de C «La nave»). Es un personaje PROPIO de Efeonce, no una mascota de partner: no lleva aviso de
+    // uso interno. El plantel de cinco (investigación, contenido, CRM/datos, servicio, reportes) sigue pendiente.
+    etiqueta: 'the official 3D figure of a Spark, the small agent companion of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide: a glossy white sphere ' +
+      'with a navy visor showing two azure LED eyes and a small smile, the four-pointed azure sparkle antenna on top, the tilted white ' +
+      'orbit ring with its small sphere, three round azure windows on the belly, short white arms with dark hands, and NO legs — it ' +
+      'floats a few centimetres above the surface with a soft azure glow under it. Copy its shape, proportions and colours exactly; ' +
+      'only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist (on the shoulder, beside the head, over the desk). It works WITH a person who supervises it: it never replaces ' +
+      'a person and never appears deciding alone. It is the only robot allowed in an Efeonce photograph.',
+    base: 'ai-generations/2026-10-01_sparks/transparente/',
+    patron: 'spark-<V>.png',
+    vistas: {
+      frente: '01-frente', 'tres-cuartos-izq': '02-tres-cuartos-izquierda', 'tres-cuartos-der': '03-tres-cuartos-derecha',
+      perfil: '04-perfil', 'perfil-der': '10-perfil-derecho', espalda: '05-espalda', 'espalda-recta': '11-espalda-recta',
+      'trasero-izq': '12-tres-cuartos-trasero-izquierdo', contrapicado: '06-contrapicado', picado: '07-picado',
+      'mira-arriba': '08-mira-arriba', 'mira-abajo': '09-mira-abajo',
+      atento: '20-expresion-atento', trabajando: '21-expresion-trabajando', 'pide-revision': '22-expresion-pide-revision',
+      listo: '23-expresion-listo', sorprendido: '24-expresion-sorprendido', pensando: '25-expresion-pensando',
+      'cine-frente': '30-cine-frente', 'cine-tres-cuartos': '31-cine-tres-cuartos', 'cine-mira-arriba': '32-cine-mira-arriba',
+      volando: '40-accion-volando', senalando: '41-accion-senalando', presenta: '42-accion-presenta-en-la-palma',
+      'entrega-tarjeta': '43-accion-entrega-tarjeta', grupo: '50-grupo-tres'
+    },
+    vistaDefecto: 'tres-cuartos-izq'
+  },
   clawd: {
     // Gobernanza que antes sólo vivía en los docs y nunca llegaba al operador en el momento de generar:
     // el sprocket llevaba aviso y las tres mascotas de partner no (detectado 2026-09-21).

@@ -15,9 +15,18 @@
 - **Lección del recorte:** el blanco del cuerpo en sombra queda del gris del fondo de estudio y el matting lo vuelve
   semitransparente (100–200 mil píxeles en espalda y contrapicado). Se corrigió editando la fuente a fondo gris medio
   `#7F7F7F` antes de recortar (≈ 20 mil píxeles, sólo el borde).
-- **Sigue pendiente:** la hoja de modelo formal, el plantel de cinco con accesorio y gesto, expresiones, poses con una
-  persona, entrada de catálogo con la guarda contra robots, `SPARKS_V1.md` y la revisión de colisión del nombre. La task
-  sigue en `to-do` hasta tomar esos slices.
+- **v02 (mismo día, «Vamos con todas las que falten»):** 26 vistas del Spark base (giro completo con los dos perfiles,
+  espalda recta y trasera, seis expresiones —atento, trabajando, pide revisión, listo, sorprendido, pensando—, tres en
+  luz cine, cuatro acciones y grupo de tres), cada una con fondo de estudio y transparente, y 4 escenas de escala con
+  Nexa en registro cine (hombro, palma, escritorio, entrega de tarjeta; bordado verificado al 100 %). Entrega en
+  OneDrive `…/Sparks/2026-10 Spark base/v02/` (59 archivos con manifiesto). Costo total del día ≈ USD 5.
+- **Adelanto del Slice 4:** `spark` ya es una entrada del catálogo de `foto:prompt` (`scripts/foto/build-prompt.mjs`,
+  26 vistas, instrucción de escala y supervisión humana); `assets.lock.json` resellado (200 assets) y
+  `build-prompt.test.ts` en verde (674). Falta la guarda que aborta cuando una escena describe robots sin declarar un
+  Spark, y las entradas por Spark del plantel.
+- **Sigue pendiente:** el plantel de cinco con accesorio y gesto (y sus entradas de catálogo), la guarda contra robots,
+  `SPARKS_V1.md`, deltas de canon y oferta, y la revisión de colisión del nombre. La task sigue en `to-do` hasta tomar
+  esos slices.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -39,7 +48,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Diseno — dirección B + ventanas de C elegida y Spark base v01 producido (2026-10-01)`
+- Status real: `Diseno — dirección B + ventanas de C elegida y Spark base v02 (26 vistas + 4 escenas con Nexa) y entrada `spark` en el catálogo (2026-10-01)`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`

@@ -1,6 +1,6 @@
 {
   "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
-  "sellado": "2026-09-29",
+  "sellado": "2026-10-01",
   "assets": {
     "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
       "rol": "persona:julio",
@@ -357,6 +357,110 @@
     "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-03-perfil-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:nave-efeonce/perfil",
       "sha256": "49a210d22337d2bec973f1f6f8ca81162177559e734e32e8ee6728e0fd4c1a9a"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-01-frente.png": {
+      "rol": "kit:spark/frente",
+      "sha256": "ca81af3bbb89efaf669357468e14077335024194953b5bd06fd28eb669bd34d2"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/tres-cuartos-izq",
+      "sha256": "e654bb4d5e202897ad9a1df05602919f8317e305fbffdd8ddb0346f4a1345040"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/tres-cuartos-der",
+      "sha256": "f5a7446179793f98c1df49b71b087f2eb672a53e84e2d323d941672f12cd17ab"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-04-perfil.png": {
+      "rol": "kit:spark/perfil",
+      "sha256": "15965217b5c7becf6f4987261c9794c689dd29b51e2c51bebb92b1d7bbca6b7c"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-10-perfil-derecho.png": {
+      "rol": "kit:spark/perfil-der",
+      "sha256": "d99c97495af90cb51be899df9884c0306a9c5b77b7e0c62331391a46e6e370c8"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-05-espalda.png": {
+      "rol": "kit:spark/espalda",
+      "sha256": "5f0e5df84b7fcd4923af723fc530407f31bcb0ccb27309eabc7a6063a5918e55"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-11-espalda-recta.png": {
+      "rol": "kit:spark/espalda-recta",
+      "sha256": "b353e7b72d3f7b65baf7c74dd6d38d497db1968fe37e5f3980df523c45d205ba"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/trasero-izq",
+      "sha256": "50f4a5f81b42efbffbe1b9b1aff7bc649550db15d01310de71622045b6c26f77"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-06-contrapicado.png": {
+      "rol": "kit:spark/contrapicado",
+      "sha256": "c1d6347ff4d047a3bb5090e05e6afd1e2a6274ef11518f8214f69301c1407399"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-07-picado.png": {
+      "rol": "kit:spark/picado",
+      "sha256": "d2b344bb49fd1f07fbc290e5f7d02cbfe142ea9dc574901eb4f03d801473b3ad"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-08-mira-arriba.png": {
+      "rol": "kit:spark/mira-arriba",
+      "sha256": "203cefb70975f9217513cf1f8dfc92fbbb667e3f73c138c891bb0800780b27ce"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-09-mira-abajo.png": {
+      "rol": "kit:spark/mira-abajo",
+      "sha256": "11823aeef178bc4f868c478a275a5ac9bd4addfcb1ec3fae1c7fa03fdf178e35"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-20-expresion-atento.png": {
+      "rol": "kit:spark/atento",
+      "sha256": "c86c9ebe0c9c9d1dce839d1387a397f86e7c976d848c9118cab3986deac70e08"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-21-expresion-trabajando.png": {
+      "rol": "kit:spark/trabajando",
+      "sha256": "dbb5ff0a5c9541740072e82f16c3c8b94e046ecb109a26e1e9503857a21bbd73"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/pide-revision",
+      "sha256": "9ea91e942e80e0911086ebf9d62d708bfa2901048d6542ccb497cc79026e08ea"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-23-expresion-listo.png": {
+      "rol": "kit:spark/listo",
+      "sha256": "8234cefc0139ea060f79322b09420af92c64a409204e11b886bd624a021a9c09"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/sorprendido",
+      "sha256": "f995cd5b3cb8272529009634ce39bc6e017623713ec0050eb67b36cbf300d82e"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-25-expresion-pensando.png": {
+      "rol": "kit:spark/pensando",
+      "sha256": "8f68497e81e3dbd3449e6d5781564e737b405bc3b6a4fb328e3b290d50857789"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-30-cine-frente.png": {
+      "rol": "kit:spark/cine-frente",
+      "sha256": "a286fc36bd0435c8bc3e34937e083e0c0b7e0b02eb4a970969d4da564054d601"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/cine-tres-cuartos",
+      "sha256": "a9e4680b8eb9c7b87cb7ff1269a65ce8c847835a3853019b41a1864763913af4"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/cine-mira-arriba",
+      "sha256": "dcab5f8307be4189584f80826627e200c77fc9a46933c099e00f5d4672413505"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-40-accion-volando.png": {
+      "rol": "kit:spark/volando",
+      "sha256": "dfc662534c2f0376cd4fc114b49f61f9794a58829dd8b02014ecc33dca1da1f1"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-41-accion-senalando.png": {
+      "rol": "kit:spark/senalando",
+      "sha256": "0d7ba5b9ebb644276c7357c7b1665acea528f270e4fcdd851e10e57129816410"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/presenta",
+      "sha256": "9de70678c3afd5775fd0f5799ccbf16f124de816f0847e0129fae51c01bb5e81"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/entrega-tarjeta",
+      "sha256": "6de193b8b74549c40ebad9be9eef9e28bb18355b9a1a2133af2ef0c70f73b876"
+    },
+    "ai-generations/2026-10-01_sparks/transparente/spark-50-grupo-tres.png": {
+      "rol": "kit:spark/grupo",
+      "sha256": "b54672904474926ca571ae337739a202e711e7b986b429201fa5a6ceb0cbae1b"
     },
     "ai-generations/2026-09-17_clawd-poses-3d/final/efeonce-clawd-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:clawd/frente",

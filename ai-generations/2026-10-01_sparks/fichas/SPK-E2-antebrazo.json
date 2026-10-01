@@ -1,0 +1,22 @@
+{
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "lecho": "sin-lecho",
+  "sinLechoPorque": "referencia de escala del kit de los Sparks: no lleva firma ni texto, sirve para componer y para casting",
+  "id": "SPK-E2-antebrazo",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    },
+    {
+      "objeto": "spark",
+      "vista": "mira-arriba"
+    }
+  ],
+  "escena": "SCENE (cinematic still, a dark modern creative studio at night): Nexa stands slightly left of centre, framed from the waist up, her left forearm raised horizontally in front of her chest, palm up. The Spark HOVERS a few centimetres above her open palm and forearm, facing her; Nexa looks at the Spark with her eyes and a warm smile (her head stays almost frontal), and the Spark looks up at her with curious LED eyes. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens; her head stays almost frontal, both eyes and both eyebrows visible, and only her eyes move. She wears the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings. The Spark is copied EXACTLY from its reference image: the glossy white hovering sphere with navy visor, azure LED eyes and smile, sparkle antenna, tilted white orbit ring with its small sphere and three azure belly windows; it is about the size of her head, never larger, and floats above her waist. The Spark's own azure LEDs are a real light source that lights her face softly. A cool rim light from behind outlines both of them; light haze. No logos of any other brand, no readable text."
+}
