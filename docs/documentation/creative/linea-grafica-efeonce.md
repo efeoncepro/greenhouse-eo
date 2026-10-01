@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.17
+> **Version:** 1.18
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-10-01 por Claude (1.17: delta — los perfiles sociales de Efeonce (portadas de LinkedIn, Facebook y YouTube, avatar de redes, destacados de Instagram y las portadas de LinkedIn personales del equipo) entran a la línea; fila nueva en «Dónde está cada cosa» y pendiente de publicación. Antes, 2026-09-28, 1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-10-01 por Claude (1.18: delta — los Sparks, los agentes de Efeonce, entran como personajes propios de la marca y único robot permitido en una foto. Antes, 1.17: delta — los perfiles sociales de Efeonce (portadas de LinkedIn, Facebook y YouTube, avatar de redes, destacados de Instagram y las portadas de LinkedIn personales del equipo) entran a la línea; fila nueva en «Dónde está cada cosa» y pendiente de publicación. Antes, 2026-09-28, 1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -549,6 +549,28 @@ operador.
 > [registro cine, delta 2026-10-01](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram) ·
 > [roster del equipo, portadas de LinkedIn](../../operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md#portadas-de-linkedin-del-equipo-2026-10-01) ·
 > [cómo usarlas](../../manual-de-uso/creative/usar-portadas-y-destacados-sociales-efeonce.md)
+
+## Delta 2026-10-01 (b) — los Sparks, los agentes de Efeonce
+
+El 2026-10-01 la marca sumó a sus personajes los **Sparks**: los agentes de Efeonce, que ponen cara al trabajo de
+Agent Ops. Son cinco —investigación, contenido, CRM y datos, servicio y reportes— con el mismo cuerpo hecho de
+formas de la marca: una esfera blanca que flota, un visor con dos ojos y una sonrisa azul, la chispa de Nexa como
+antena, el anillo de la órbita y las tres ventanas de la nave. Cada uno se reconoce por un objeto que sostiene y un
+gesto.
+
+- **Siempre con una persona a cargo.** Un Spark trabaja con contexto y junto a alguien que lo supervisa; nunca
+  reemplaza a una persona ni decide solo. Nexa puede liderarlos en la ficción, pero las piezas que venden Agent Ops
+  muestran al equipo humano.
+- **Chicos y arriba.** Nunca más grandes que la cabeza de la persona y siempre por encima de la cintura.
+- **Sólo en piezas de cine o de puesta en escena**, nunca en las fotos documentales del oficio.
+- **Son el único robot permitido** en una foto de Efeonce. Se piden desde el catálogo de fotos y el comando frena
+  cualquier escena que describa un robot inventado.
+- **El nombre es interno.** En público se dice «los Sparks de Efeonce»; no es un producto.
+
+> Detalle técnico: [canon de los Sparks](../../operations/brand-characters/SPARKS_V1.md) ·
+> [registro cine, delta 2026-10-01 (b)](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes) ·
+> [lenguaje fotográfico, delta 2026-10-01](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-10-01--los-robots-siguen-prohibidos-salvo-los-sparks-del-kit) ·
+> [cómo usarlos](../../manual-de-uso/creative/usar-sparks-en-fotos-de-marca.md)
 
 ## Estado y pendientes
 

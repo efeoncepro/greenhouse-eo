@@ -50,6 +50,10 @@
   y `proposal-cinematic-seo` (a sangre). Son variantes (`variant-both-in-deck`): nunca van juntas, así que no chocan con
   `plate-repeated`. Las siete láminas nuevas no usan plate (íconos y logos van como assets `file`/`logo` del repo).
 
+## Delta 2026-10-01
+
+- las fotos nuevas con agentes entran con Sparks del kit (catálogo `spark-*`, lock 226 assets); las aprobadas con robots genéricos (NX5b, PH7) quedan marcadas para que el operador decida su regeneración — cerrado por trabajo en TASK-1941.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

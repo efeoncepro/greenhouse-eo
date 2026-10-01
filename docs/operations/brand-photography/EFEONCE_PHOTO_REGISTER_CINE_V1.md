@@ -1,7 +1,7 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.5 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-01 por Claude (1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.6 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-10-01 por Claude (1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
 > «El squad te la entrega», y queda el caso de cómo cambiar el plate de una pieza aprobada sin perder su concepto,
 > [§16.7](#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto). Antes, 1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
@@ -30,6 +30,33 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 **[pendiente]** = no resuelto. Las frases de prompt entre comillas son **verbatim** de fichas aprobadas.
 
 ---
+
+## Delta 2026-10-01 (b) — los Sparks reemplazan a los mini robots agentes
+
+**[decisión del operador, 2026-09-29 y 2026-10-01, TASK-1941]** Los «mini robots agentes» de [§8](#8-los-mini-robots-agentes)
+dejan de describirse a mano: desde hoy son los **Sparks**, los agentes de Efeonce, con diseño propio (esfera blanca que
+flota, visor navy con dos ojos y sonrisa azul, la chispa del Nexa Mark como antena, anillo de órbita y tres ventanas) y
+un kit cerrado. Canon completo: [`SPARKS_V1.md`](../brand-characters/SPARKS_V1.md).
+
+- **Se declaran por catálogo**, nunca con la frase de §8: `"objetos": [{ "objeto": "spark", "vista": "cine-tres-cuartos" }]`
+  o un Spark del plantel (`spark-investigacion`, `spark-contenido`, `spark-crm-datos`, `spark-servicio`,
+  `spark-reportes`, `sparks-plantel`). Esto cierra el pendiente 7 de [§15](#15-pendientes): una sola descripción, la
+  del kit.
+- **Puesta en escena en cine:** el Spark base tiene tres vistas con luz cine (`cine-frente`, `cine-tres-cuartos`,
+  `cine-mira-arriba`), en ambiente oscuro iluminado por su propio LED, y cada Spark del plantel una vista `cine`. Sus
+  ojos y ventanas siguen siendo fuente de luz y cuentan en el presupuesto de luz de la línea.
+- **Escala:** nunca más grande que la cabeza de la persona, siempre por encima de la cintura (hombro, palma y
+  antebrazo, escritorio, entrega en la mano). Las cuatro escenas con Nexa del kit la fijan
+  (`ai-generations/2026-10-01_sparks/fichas/SPK-E1` a `SPK-E4`, bordado verificado al 100 %) **[medido]**.
+- **Siguen las reglas de §8** que no dependían de la frase: cada Spark hace una cosa distinta, viven dentro del flujo
+  del servicio, nunca en la reserva y ningún logo de otra marca. Y nunca aparecen solos decidiendo: hay una persona
+  que supervisa, y las piezas de venta de Agent Ops llevan al equipo humano.
+- **No abren el registro:** un Spark no habilita el cine en una pieza que no está en los casos de §2. El documental no
+  los admite: `foto:prompt` aborta con un Spark en `registro: "documental"` o con una palanca documental, y aborta
+  también una escena que describe robots sin declarar un Spark (`validarRobots`).
+- Las piezas aprobadas con robots descritos a mano (`NX5b` y sus derivadas, la destacada «Agents» `PH7`) quedan como
+  están; regenerarlas con Sparks es decisión del operador. Sus fichas, y las demás que describen robots (`NX3`–`NX5`,
+  `RV1`, `WB1`, `AD2`, `AD4*`, `BR2`, `BR4`), hoy abortan en `foto:prompt` **[medido: 13 de 301 fichas]**.
 
 ## Delta 2026-10-01 — registro cine con Nexa en portadas sociales y destacados de Instagram
 

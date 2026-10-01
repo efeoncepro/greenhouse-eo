@@ -34,6 +34,8 @@ import {
   referenciasDeclaradas,
   ROLES_DE_REFERENCIA,
   validarCaso,
+  validarRobots,
+  robotsSinNegar,
   validarVestuarioDeLinea
 } from './build-prompt.mjs'
 
@@ -1605,5 +1607,38 @@ describe('foto:prompt · excepción declarada de caso de cliente', () => {
 
     expect(r.prompt).not.toContain('CLIENT CASE')
     expect(r.avisoCaso).toBeNull()
+  })
+})
+
+describe('foto:prompt · robots: sólo Sparks del kit (TASK-1941)', () => {
+  const base = { id: 'T', formato: '4:5', lecho: 'sin-lecho', sinLechoPorque: 'prueba de la guarda de robots' }
+
+  it('aborta si la escena describe robots sin declarar un Spark', () => {
+    expect(() => validarRobots({ ...base, escena: 'three small friendly robot agents ride the streams' })).toThrow(/sin declarar un Spark/)
+    expect(() => validarRobots({ ...base, escena: 'a cute droid beside her' })).toThrow(/Spark/)
+  })
+
+  it('ignora las negaciones', () => {
+    expect(robotsSinNegar('There is NO object, NO creature, NO robot, NO toy')).toEqual([])
+    expect(robotsSinNegar('calm dark space with no hologram, no robots and no objects')).toEqual([])
+    expect(() => validarRobots({ ...base, escena: 'empty studio, without robots' })).not.toThrow()
+  })
+
+  it('acepta robots cuando la ficha declara un Spark', () => {
+    expect(validarRobots({ ...base, escena: 'the small robot hovers by her shoulder', objetos: [{ objeto: 'spark', vista: 'frente' }] })).toBe(true)
+  })
+
+  it('aborta un Spark en registro documental', () => {
+    expect(() => validarRobots({ ...base, escena: 'x', objetos: [{ objeto: 'spark' }], palanca: 'escucha' })).toThrow(/documental/)
+    expect(() => validarRobots({ ...base, escena: 'x', objetos: [{ objeto: 'spark' }], registro: 'documental' })).toThrow(/documental/)
+  })
+
+  it('las fichas del kit de los Sparks compilan', () => {
+    const dir = 'ai-generations/2026-10-01_sparks/fichas'
+    if (!existsSync(dir)) return
+    for (const f of readdirSync(dir).filter(x => x.endsWith('.json'))) {
+      const ficha = JSON.parse(readFileSync(path.join(dir, f), 'utf8'))
+      expect(validarRobots(ficha)).toBe(true)
+    }
   })
 })

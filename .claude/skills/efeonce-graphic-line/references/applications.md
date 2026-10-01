@@ -337,7 +337,9 @@ vale en toda aplicación:
   los mini bots de Nexa) · 07 Podcast (micrófono macro con onda de luz) · 08 Recetas (mise en place de chef con luz,
   pigmento y fotogramas: IA generativa) · 09 Behind the build (manos construyendo una interfaz sobre un plano). Un
   color de luz por destacada sobre oscuro; **sin firma en el círculo** (a ese tamaño no se lee: la marca la pone el
-  avatar).
+  avatar). **06 Agents** se aprobó con robots genéricos descritos a mano (`PH7`), anteriores al diseño de los Sparks:
+  los Sparks oficiales son los del kit ([`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.md),
+  TASK-1941) y regenerar esta destacada con ellos es decisión del operador.
 - **Cómo funciona un destacado** (operador, 2026-10-01): para **cambiar** la portada de un destacado existente basta la
   imagen de portada; para **crearlo** hay que publicar primero una historia 9:16 **completa** y agregarla. Instagram
   toma la portada del **círculo central** (franja y 420–1500 de 1920). Una historia con bandas lisas arriba y abajo no
@@ -1039,7 +1041,9 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 acción y el color saliendo de la escena; voz a la izquierda en el espacio oscuro; selección «Cliente» sobre la
 respuesta; bajada; prueba con fuente; hasta cuatro pasos con íconos de la voz de la línea (Brand = Plastilina, el
 resto Trazo), en reposo; burbuja URL en el pie; sin logo ni indicador. Los mini robots agentes son el hilo visual
-entre láminas. Aprobadas: servicios creativos («¿Tu marca en cada pantalla? En todas.»), web («¿Para quién es tu
+entre láminas (robots genéricos de `NX5b`, anteriores a los Sparks: una lámina nueva con agentes los declara por
+catálogo según [`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.md); regenerar las aprobadas lo
+decide el operador). Aprobadas: servicios creativos («¿Tu marca en cada pantalla? En todas.»), web («¿Para quién es tu
 web? Para todos.»), la carrera de Nexa («¿Listos para la carrera? Vamos.»), RevOps («¿Tu CRM vende contigo? Con
 agentes.»), AEO («¿Te encuentra la IA? Visible.») y líneas de servicio con Nexa. Sin pendientes. **Excepción de
 esta última:** sus cinco esferas de luz (una por línea, la naranja en la palma de Nexa) son luz de la foto, no la

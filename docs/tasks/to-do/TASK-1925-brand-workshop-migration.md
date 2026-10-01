@@ -1,5 +1,9 @@
 # TASK-1925 — Migrar la producción de marca al taller `efeonce-brand-workshop`
 
+## Delta 2026-10-01
+
+- el catálogo de `foto:*` suma los Sparks (`spark`, `spark-*`, `sparks-plantel`) y la guarda `validarRobots`, y sus kits viven en `ai-generations/2026-10-01_sparks/`: migran con `scripts/foto` — cerrado por trabajo en TASK-1941.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

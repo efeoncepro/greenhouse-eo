@@ -108,6 +108,19 @@ Nexa es la personificación del Why dentro de Greenhouse. No es un chatbot ni un
 
 Regla de marca: Nexa nunca debe presentarse como "asistente virtual" genérico ni usarse decorativamente. Su identidad aparece cuando hay contexto, evidencia, permiso, intención y siguiente paso. El rostro aprobado vive en `NexaFace` / `public/images/avatar-nexa/nexa-face.webp`; el sistema de marca vive en `GreenhouseNexaBrandMark` y `public/images/nexa-mark/*`. En CTAs o superficies que invocan a Nexa, usar Nexa Mark (arco + sparkle), no iconos genéricos. Canon: `docs/architecture/nexa-intelligence/voice/nexa-identity-canon.md`.
 
+### Personajes de marca: Nexa y los Sparks (2026-10-01)
+
+La marca propia tiene dos clases de personaje. **Nexa** es la personificación del Why (arriba). Los **Sparks** (un
+Spark) son los agentes de Efeonce: cinco personajes propios —investigación, contenido, CRM y datos, servicio y
+reportes— con el mismo cuerpo derivado de la marca (la esfera, la órbita, las tres ventanas de la nave y la chispa
+del Nexa Mark como antena) y un accesorio y un gesto por familia. Son la cara de Agent Ops en la Transformación
+humano-agente. Reglas que no se negocian: trabajan con contexto y siempre con una persona que supervisa, nunca
+reemplazan personas ni deciden solos; Nexa puede liderarlos en la ficción, pero las piezas que venden Agent Ops llevan
+al equipo humano; nunca más grandes que la cabeza de la persona; registro cine o puesta en escena, nunca documental.
+Son el único robot permitido en una foto de Efeonce y se declaran desde el catálogo de `foto:prompt`. En público,
+«los Sparks de Efeonce»; el nombre no es producto ni marca registrada. Canon:
+[`SPARKS_V1.md`](../operations/brand-characters/SPARKS_V1.md).
+
 ---
 
 ## Arquitectura de marca: masterbrand con capabilities

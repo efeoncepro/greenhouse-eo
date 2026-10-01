@@ -220,6 +220,36 @@ con estas diferencias:
   es facial.
 - **Destino:** `10. Nexa (Influencer IA)`, nunca `Mascotas de partners`.
 
+## 11. Personaje propio: los Sparks (TASK-1941, 2026-10-01)
+
+Los **Sparks**, los agentes de Efeonce, son el primer personaje **propio** producido con este método. Canon (relato,
+plantel, reglas de uso): [`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.md). Registro de la
+corrida: `ai-generations/2026-10-01_sparks/LEEME.md`. Diferencias con una mascota de partner:
+
+- **No hay fuente oficial que extraer: la fuente es el diseño aprobado.** El operador eligió la dirección (anillo de
+  órbita + las tres ventanas de la nave) y el Spark base; desde ahí se edita cada vista, nunca se regenera de cero.
+  Invariantes: esfera blanca de ≈ 22 cm con paneles navy, sin piernas (flota con brillo azul debajo), visor navy con
+  **exactamente dos ojos** y la sonrisa en arco de LED azul, la chispa del Nexa Mark como antena, anillo de órbita
+  inclinado ~25° con una esfera, tres ventanas en la panza; sólo blanco, navy `#001A33` y azul `#0375DB`. No debe
+  parecerse a Astro Bot, EVE ni BB-8.
+- **El giro no se espeja.** El anillo está inclinado (más alto en su lado izquierdo): espejar el perfil izquierdo
+  invertiría la inclinación, así que el perfil derecho se genera aparte (el giro trae los dos perfiles).
+- **El plantel cambia accesorio y gesto, nunca forma ni color.** Los cinco accesorios son objetos físicos, sin texto,
+  y **siempre tocándolo** (§7: un prop suelto se pierde en el recorte); la lupa del Spark de investigación va al
+  costado, **nunca delante del visor** (la regla de Gigi). No usan los 8 accesorios de §6: cada uno lleva el de su
+  familia de Agent Ops (tabla en el canon).
+- **Recorte: blanco en sombra sobre fondo de estudio claro.** El blanco del cuerpo en sombra queda del mismo gris que
+  el fondo y el matting lo vuelve semitransparente (100–200 mil píxeles en espalda y contrapicado). Se corrige
+  **editando la fuente a fondo gris medio `#7F7F7F` antes de recortar** (queda ≈ 20 mil, sólo el borde); las fuentes
+  editadas viven en `fuente-recorte/`. Es el reverso de la trampa de Gigi: allá se cambia el tono del
+  prop en la generación, acá el fondo antes del matting. En «volando» la estela no sobrevive al recorte: queda sólo en
+  la versión de estudio.
+- **Catálogo completo desde el día uno:** `spark` (26 vistas), una entrada por Spark del plantel (5 vistas cada una)
+  y `sparks-plantel`, todas en `OBJETOS` de `scripts/foto/build-prompt.mjs`; se sellan con `pnpm foto:assets:lock` (ver
+  «Declarar TODAS las vistas»).
+- **Destino:** OneDrive `5. Contenidos/13- Branding/Sparks/` (`2026-10 Spark base/v02/`, `2026-10 Plantel/v01/`), con
+  LEEME y manifiesto; nunca `Mascotas de partners`. Costo total del día ≈ USD 8.
+
 ## Logos de partners en 3D (caso sprocket de HubSpot)
 
 Un logo no es una mascota: no se personifica, no se recolorea ni se le agregan partes. Fuente de forma = SVG oficial

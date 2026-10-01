@@ -176,7 +176,8 @@ con personas del equipo el contrato la rechaza hasta que el operador amplíe la 
    piernas.** Sin él, la firma cae sobre el sujeto **aunque el contraste pase** (16–18:1 sobre un pantalón negro).
 2. **Equipo en una sola línea, hombro con hombro**, cámara a ≈ 4 m y cabezas entre el **38 % y el 52 %** del alto: la
    V escalonada rompe la franja de texto en 4:5.
-3. **Robots arriba de la cintura** (hombros, brazos, costados), **nunca a los pies**: ensucian el lecho.
+3. **Robots arriba de la cintura** (hombros, brazos, costados), **nunca a los pies**: ensucian el lecho. Hoy esos
+   robots son sólo Sparks declarados por catálogo (§11 «Sparks»); `foto:prompt` aborta un robot descrito a mano.
 
 El script de esa tanda (`componer-ads-cine.mjs`) fue **de sesión, no un compositor canónico**. En producción, la capa
 va por `pnpm foto:componer` o `pnpm foto:componer:cta`; la receta de anuncio cine **todavía no existe** en AXIS.
@@ -517,7 +518,8 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 
 > **El oficio con IA no está en la máquina, está en la decisión.** Generar es barato y no se ve; elegir,
 > descartar, corregir y dirigir es el trabajo. **Nunca robots, circuitos ni interfaces flotantes**: es la parte
-> que no vale nada y la que hace todo el mundo. Cuatro palancas fotografían el juicio:
+> que no vale nada y la que hace todo el mundo (única excepción: los Sparks del kit, §11).
+> Cuatro palancas fotografían el juicio:
 
 - **Variantes** (`palanca: variantes`) — la misma pieza repetida con diferencias **mínimas** y **una** apartada.
   El sujeto es la elección, no el objeto.
@@ -668,6 +670,30 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
   · [ficha del Character Bible](../../../../docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md)
   · [el Bible completo](../../../../docs/operations/social/NEXA_CHARACTER_BIBLE_V1.md).
 
+### Sparks: la única excepción a «nunca robots» **[operador, 2026-09-29 y 2026-10-01; TASK-1941]**
+
+Los **Sparks** son los agentes de Efeonce: personajes propios que dan cara a Agent Ops. El canon sigue prohibiendo
+robots; **los únicos permitidos son los Sparks del kit**, nunca un robot descrito a mano (eso daba uno distinto en
+cada foto y parecido a personajes ajenos: `NX3`, `NX5`, `AD2`, `AD4*`, `RV1`, `WB1`, `BR4`). Canon, relato, plantel y
+fichas: [`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.md).
+
+- **Se declaran por catálogo**, en `objetos` de la ficha: `spark` (base, 26 vistas: giro completo, seis expresiones,
+  tres en luz cine, cuatro acciones y grupo de tres), uno de los cinco del plantel —`spark-investigacion`,
+  `spark-contenido`, `spark-crm-datos`, `spark-servicio`, `spark-reportes`, con vistas `heroe`, `frente`,
+  `tres-cuartos-der`, `mira-arriba` y `cine`— o `sparks-plantel` (los cinco juntos). Ejemplo:
+  `"objetos": [{ "objeto": "spark-servicio", "vista": "heroe" }]`. La escena nombra lo que hacen, no cómo son.
+- **Escala:** nunca más grandes que la cabeza de la persona y siempre **arriba de la cintura** (hombro, palma,
+  escritorio, entregando algo).
+- **Registro:** cine o puesta en escena; **nunca documental**. Siempre con una persona que supervisa: nunca solos
+  decidiendo ni reemplazando a alguien. Nexa puede liderarlos en la ficción; las piezas de venta de Agent Ops llevan
+  al equipo humano.
+- **La guarda** (`validarRobots` en `foto:prompt`): aborta si la escena describe robots, droides o bots sin declarar
+  un Spark (las negaciones como «no robots» se ignoran), y aborta un Spark con `registro: "documental"` o con una
+  palanca documental (`escucha`, `manos`, `sombra`, `silueta`, `marcado`, `quien-sostiene`). Medida sobre 301 fichas:
+  frena 13, todas con robots escritos a mano, sin falsos positivos.
+- Las fotos aprobadas que todavía llevan robots genéricos (`NX5b` y derivadas, la destacada «Agents» `PH7`) se
+  regeneran con Sparks sólo si el operador lo decide.
+
 ## 12. Flujo de producción (resumen)
 
 Ficha de toma (servicio/oficio, industria no-cliente, mercado, cámara/lente/ángulo, luz y hora, momento, acento y su
@@ -700,7 +726,8 @@ Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloque
   [Bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) ·
   [Personas y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) ·
   [Registro C](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_C_V1.md) ·
-  [Registro cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
+  [Registro cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) ·
+  [Sparks, los agentes de Efeonce](../../../../docs/operations/brand-characters/SPARKS_V1.md)
 - [Bitácora del método](../../../../docs/operations/social/2026-09-19-efeonce-photographic-language-production-method.md) ·
   [Manual de uso](../../../../docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 - Corrida: `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/` (rondas, prompts, scripts `medir.mjs`,

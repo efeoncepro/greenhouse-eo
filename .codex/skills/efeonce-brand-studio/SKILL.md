@@ -340,6 +340,18 @@ Encendidos y en uso, nunca de adorno; la silueta sí, **ningún logotipo de terc
 por escena. No es atrezzo: el valor §1.3 del Character Bible es «tecnología con criterio», y los objetos son
 donde eso se ve sin decirlo. Canon: [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
 
+### Sparks, los agentes de Efeonce **[operador, 2026-09-29 y 2026-10-01; TASK-1941]**
+
+Personajes propios que dan cara a Agent Ops: cinco Sparks (investigación, contenido, CRM y datos, servicio y reportes)
+con la misma forma y color —esfera blanca, órbita, chispa del Nexa Mark, tres ventanas de la nave— que se distinguen
+por accesorio y gesto. **No son Nexa**: Nexa puede liderarlos en la ficción. Relato: trabajan con contexto y siempre
+con una persona que supervisa; nunca reemplazan personas ni aparecen solos decidiendo, y las piezas de venta de Agent
+Ops llevan al equipo humano. **Nombre:** «Sparks» sirve como nombre interno de personajes; en uso público, siempre
+«los Sparks de Efeonce», nunca como nombre de producto o servicio ni para registrarlo sin revisión de Legal (hay
+«Sparks AI», «Gemini Spark», «SPARK AI» de LogicGate y Spark Mail). Son la única excepción del canon a «nunca robots»
+y salen del kit: reglas de foto en `design-studio` (`efeonce-photographic-language.md` §11 «Sparks»). Canon:
+[`SPARKS_V1.md`](../../../docs/operations/brand-characters/SPARKS_V1.md).
+
 ### Sistema de credencial (lanyard, yoyo, portacarnet y carnet — aprobado 2026-09-17)
 
 La credencial es un asset de marca más, en OneDrive `5. Contenidos/13- Branding/Lanyard Efeonce/v01/`: cinta navy

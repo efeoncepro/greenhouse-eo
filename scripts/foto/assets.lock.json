@@ -462,6 +462,110 @@
       "rol": "kit:spark/grupo",
       "sha256": "b54672904474926ca571ae337739a202e711e7b986b429201fa5a6ceb0cbae1b"
     },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-investigacion-01-heroe.png": {
+      "rol": "kit:spark-investigacion/heroe",
+      "sha256": "93f76360483eb4bc981298481c8dcab0c6908ebff93d959d9f2c40e5626ee7b4"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-investigacion-02-frente.png": {
+      "rol": "kit:spark-investigacion/frente",
+      "sha256": "1322b66a3cabf8a1ae1c8d8deebb2842fe93cf149de5f53c999d13435216bdbd"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-investigacion-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-investigacion/tres-cuartos-der",
+      "sha256": "8063546106f179c46ca105b30d06bc401b33e753dc59ac1e1ca0024614023df0"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-investigacion-04-mira-arriba.png": {
+      "rol": "kit:spark-investigacion/mira-arriba",
+      "sha256": "31885eca13762c365d33a3afc9db75c0449b7c40dc9082be7bd6295d7bd955de"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-investigacion-05-cine.png": {
+      "rol": "kit:spark-investigacion/cine",
+      "sha256": "de8ee3be8d9e8776eb361452318c080de0d5c8ed0b3aa1ae8db0486be904e423"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-contenido-01-heroe.png": {
+      "rol": "kit:spark-contenido/heroe",
+      "sha256": "af7bedd7f02a2f80f763ea561719fcb7138474a5a27e6da08eb9898d488caa98"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-contenido-02-frente.png": {
+      "rol": "kit:spark-contenido/frente",
+      "sha256": "c299c84e82d572bd5847c6b43b006c5fcece569bf67267e641f52dfe52ad50f7"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-contenido-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-contenido/tres-cuartos-der",
+      "sha256": "23d26433ec10d7414fe40e3c9aeca66492d3ab90308b688c2ac14eb758f86806"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-contenido-04-mira-arriba.png": {
+      "rol": "kit:spark-contenido/mira-arriba",
+      "sha256": "0764eaaab4431bad04a9cad0cf81bebaf0011a7bfe03d0894d6b763eb605c4f1"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-contenido-05-cine.png": {
+      "rol": "kit:spark-contenido/cine",
+      "sha256": "d321a3fa907ca10da683a080f474aae3b0e325a7b444ff90fc80d58391d07241"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-crm-datos-01-heroe.png": {
+      "rol": "kit:spark-crm-datos/heroe",
+      "sha256": "371b02bd4803d8b7ab90febbdb3fbe4b8786b84f7162ec65fd44eacc70e2fdb1"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-crm-datos-02-frente.png": {
+      "rol": "kit:spark-crm-datos/frente",
+      "sha256": "dc8f3975aaf4067827718758070c7870d5b1bb39182e8c595976161cae0dae8c"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-crm-datos-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-crm-datos/tres-cuartos-der",
+      "sha256": "c934898701d84a273bef08415af5685fcdc059c2653cfb96d2dd6127b6a99c5c"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-crm-datos-04-mira-arriba.png": {
+      "rol": "kit:spark-crm-datos/mira-arriba",
+      "sha256": "b0999174aaa63966e93ca7a87bd151dd1dc5a1548a3cfd6d019825160b07f095"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-crm-datos-05-cine.png": {
+      "rol": "kit:spark-crm-datos/cine",
+      "sha256": "f396c44c22690fb6fcb82b7e304b1ec56af4f0a7bd920b9ae513186dc33f8c81"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-servicio-01-heroe.png": {
+      "rol": "kit:spark-servicio/heroe",
+      "sha256": "89053ffdd37590869718c587e18afd044b707980a099141e37e9b68baf9cac20"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-servicio-02-frente.png": {
+      "rol": "kit:spark-servicio/frente",
+      "sha256": "d6d824265555edc0c4a0f1e464da7b35826b40345cc9f60258708d9f5e221539"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-servicio-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-servicio/tres-cuartos-der",
+      "sha256": "e7723a4286734037a49bcf05bf8aeffc751de3bdaf7c661e73ea5a3a0ee28bd5"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-servicio-04-mira-arriba.png": {
+      "rol": "kit:spark-servicio/mira-arriba",
+      "sha256": "c083789311cabdfcf691fa0254cf5799fbf1dfd05cdbb78dd0d20a89e0d919f3"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-servicio-05-cine.png": {
+      "rol": "kit:spark-servicio/cine",
+      "sha256": "062d78a67bfb0bec82940f9822cee4bc56a5de3826dda3ee0912d8d3f59a70ca"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-reportes-01-heroe.png": {
+      "rol": "kit:spark-reportes/heroe",
+      "sha256": "4062e662735e9edf15a1dfccfb82cc1bfb55addd99aa971ef305a9e7f2f70861"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-reportes-02-frente.png": {
+      "rol": "kit:spark-reportes/frente",
+      "sha256": "e70a48fd81de706f04c56b5bf08345ebd762273e04bb19ec6165cea4336edd85"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-reportes-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-reportes/tres-cuartos-der",
+      "sha256": "a154b9aede53c99dc142182ac038cb54748f253ac245e3a9a4f13fe38c8d56c8"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-reportes-04-mira-arriba.png": {
+      "rol": "kit:spark-reportes/mira-arriba",
+      "sha256": "3920ba8ffc367fac224b5307c452b63ac22d0e24ed485f49967b70e038867e5e"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/spark-reportes-05-cine.png": {
+      "rol": "kit:spark-reportes/cine",
+      "sha256": "09713dc5a470cfb704829f6aa2bfd55d0fa682f3d6b118b8ad4d0a3e3f887776"
+    },
+    "ai-generations/2026-10-01_sparks/plantel-transparente/sparks-frente.png": {
+      "rol": "kit:sparks-plantel/frente",
+      "sha256": "c4d2379240e014880c0b190835e65ca6e8ac51104e6490d508239ef8cd223739"
+    },
     "ai-generations/2026-09-17_clawd-poses-3d/final/efeonce-clawd-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:clawd/frente",
       "sha256": "f93da26cbbc4595e381fda24c0ea88350af976157a09272927618c447d8af792"

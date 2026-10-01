@@ -1,5 +1,20 @@
 # TASK-1941 — Sparks: los agentes de Agent Ops como personajes propios de la marca
 
+## Delta 2026-10-01 (b) — Slices 1–5 ejecutados («Termina todos los pendientes»)
+
+- **Plantel (Slice 3):** los cinco Sparks con accesorio físico y gesto —investigación (lupa al costado), contenido
+  (tarjeta con trazo), CRM y datos (pila de fichas), servicio (burbuja de conversación) y reportes (gráfico de barras)—,
+  5 vistas cada uno con estudio y transparente, más el plantel completo. OneDrive `…/Sparks/2026-10 Plantel/v01/`
+  (52 archivos, manifiesto).
+- **Catálogo y guarda (Slice 4):** entradas `spark-*` y `sparks-plantel`; `validarRobots` en `construirPrompt` (aborta
+  robots sin Spark, ignora negaciones, y aborta un Spark documental) con pruebas; lock 226 assets.
+- **Canon (Slice 5):** `SPARKS_V1.md`, manual de uso, deltas en lenguaje fotográfico, registro cine, oferta de
+  Transformación humano-agente y `09_marca-agencia.md`, funcional de la línea gráfica; skills con espejo.
+- **Nombre:** colisiones encontradas (Sparks AI, Gemini Spark, marca SPARK AI de LogicGate, Spark Mail): nombre
+  interno de personajes; público, «los Sparks de Efeonce»; nunca producto ni registro sin Legal.
+- **Queda para el operador:** aprobar el plantel; decidir si se regeneran con Sparks las piezas aprobadas con robots
+  genéricos (NX5b y derivadas, la destacada «Agents» PH7); AXIS y animación como follow-ups.
+
 ## Delta 2026-10-01
 
 - **Dirección de diseño elegida por el operador (adelanto de los Slices 1–2):** pidió ángulos aislados de los Sparks
@@ -36,7 +51,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -48,7 +63,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Diseno — dirección B + ventanas de C elegida y Spark base v02 (26 vistas + 4 escenas con Nexa) y entrada `spark` en el catálogo (2026-10-01)`
+- Status real: `Diseno — dirección B + ventanas de C elegida y Slices 1–5 ejecutados el 2026-10-01; falta sólo que el operador apruebe el plantel de cinco`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -301,13 +316,13 @@ Reglas obligatorias (decisiones del operador del 2026-09-29):
 
 ## Acceptance Criteria
 
-- [ ] El operador eligió una dirección y aprobó la hoja de modelo de los cinco Sparks. (Parcial 2026-10-01: dirección elegida —B + ventanas de C— y Spark base aprobado («Me encanta»); falta la hoja de los cinco.)
-- [ ] Cada Spark tiene giro, expresiones y biblioteca de poses en fondo de estudio y transparente.
-- [ ] Ningún Spark tiene un parecido señalado con personajes de terceros en la revisión del Slice 1.
-- [ ] `foto:prompt` resuelve los cinco Sparks por catálogo y aborta cuando una escena describe robots sin declarar un Spark.
-- [x] `scripts/foto/assets.lock.json` quedó resellado y `pnpm foto:assets:check` pasa. (2026-10-01, `04a662f78`: 200 assets, incluidas las 26 vistas del Spark base; se vuelve a sellar cuando entren los cinco del plantel.)
-- [ ] `SPARKS_V1.md` documenta relato, plantel, reglas, escala, registro y la búsqueda de colisiones del nombre.
-- [ ] El lenguaje fotográfico, el registro cine, la oferta de Transformación humano-agente y `09_marca-agencia.md` citan a los Sparks, y las skills tienen sus espejos `.codex`.
+- [ ] El operador eligió una dirección y aprobó la hoja de modelo de los cinco Sparks. (Parcial 2026-10-01: dirección elegida —B + ventanas de C— y Spark base aprobado («Me encanta»); el plantel de cinco está producido y entregado, **pendiente de su aprobación**.)
+- [ ] Cada Spark tiene giro, expresiones y biblioteca de poses en fondo de estudio y transparente. (Parcial: el Spark base tiene 26 vistas —giro completo, 6 expresiones, cine, acciones, grupo— y 4 escenas con Nexa; cada uno de los cinco tiene 5 vistas —héroe, frente, tres cuartos derecha, mira arriba, cine—. Las expresiones son del cuerpo común y sirven a los cinco; una biblioteca por Spark se amplía si el operador la pide tras aprobar el plantel.)
+- [x] Ningún Spark tiene un parecido señalado con personajes de terceros en la revisión del Slice 1. (El diseño de «Agents», parecido a Astro Bot, se descartó; el elegido flota sin piernas ni casco y lleva chispa, órbita y ventanas de la marca.)
+- [x] `foto:prompt` resuelve los cinco Sparks por catálogo y aborta cuando una escena describe robots sin declarar un Spark. (`spark`, `spark-{investigacion,contenido,crm-datos,servicio,reportes}`, `sparks-plantel`; guarda `validarRobots`: frena 13 de 301 fichas existentes, todas con robots a mano, y un Spark documental; `scripts/foto` 777 pruebas en verde.)
+- [x] `scripts/foto/assets.lock.json` quedó resellado y `pnpm foto:assets:check` pasa. (2026-10-01: 226 assets, con las 26 vistas del Spark base y las 26 del plantel.)
+- [x] `SPARKS_V1.md` documenta relato, plantel, reglas, escala, registro y la búsqueda de colisiones del nombre. (`docs/operations/brand-characters/SPARKS_V1.md` v1.0, más el manual `docs/manual-de-uso/creative/usar-sparks-en-fotos-de-marca.md`.)
+- [x] El lenguaje fotográfico, el registro cine, la oferta de Transformación humano-agente y `09_marca-agencia.md` citan a los Sparks, y las skills tienen sus espejos `.codex`. (Deltas 2026-10-01; skills design-studio, greenhouse-ai-image-generator, efeonce-brand-studio, social-media-studio y efeonce-graphic-line con espejo; regla de fotografía de marca.)
 
 ## Verification
 
@@ -325,7 +340,7 @@ Reglas obligatorias (decisiones del operador del 2026-09-29):
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] TASK-1926, TASK-1931 y TASK-1925 quedaron con delta: los agentes se declaran como Sparks por catálogo
+- [x] TASK-1926, TASK-1931 y TASK-1925 quedaron con delta: los agentes se declaran como Sparks por catálogo
 
 ## Follow-ups
 

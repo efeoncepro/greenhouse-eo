@@ -1,0 +1,19 @@
+High quality photorealistic 3D product photograph of this exact character: a SPARK, the small robot agent companion of the brand Efeonce. Keep its identity EXACTLY as described here in every view:
+
+- BODY: one perfect glossy white sphere about the size of a football, with a few small deep-navy (#001A33) panels and vents, tiny visible seams and screws, realistic glossy plastic with very fine micro-scratches.
+- FACE: a horizontal oval deep-navy glass visor across the front upper half of the sphere; inside it, exactly TWO glowing azure (#0375DB) LED eyes shaped as soft upward arcs and ONE small azure smile arc below them, made of fine LED dots. Never more eyes, never a mouth outside the visor.
+- BELLY: below the visor, on the front lower half, THREE small round porthole windows in a horizontal row, evenly spaced, glowing softly azure from inside (like the three windows of the Efeonce ship).
+- ANTENNA: on the very top of the sphere, a tiny glowing azure four-pointed sparkle star on a short base.
+- ORBIT: a clean thick glossy white ring circles the sphere at its equator, tilted about 25 degrees (higher on its left side, lower on its right side), floating a few centimetres away from the body with no visible supports, with ONE small glossy white sphere riding on the ring at the front-right.
+- ARMS: two short white arms with deep-navy joints and dark articulated four-fingered hands, attached at the sides below the ring.
+- NO LEGS: it hovers a few centimetres above the floor, with a soft azure glow under the bottom of the sphere.
+- COLOURS: only glossy white, deep navy and glowing azure (#0375DB); no cyan, no teal, no other colours, no text, no logos, no letters.
+- It must never look like a third-party robot (not Astro Bot, not EVE, not BB-8).
+
+Image 1 (front view) and image 2 (three-quarter view) are the approved Spark: copy its shape, proportions, visor, eyes, smile, three belly windows, sparkle antenna, orbit ring with its small sphere, arms, hands and colours EXACTLY. This Spark is one member of the team of five Sparks: same body and colours as all the others; only its ACCESSORY and its GESTURE make it recognisable. The accessory is a real, physical, finely made small object (not a hologram, not a floating interface), always held in its hands or touching its body, never floating free in the air, never in front of its visor or its eyes, and with no text, letters or numbers on it.
+
+SERVICE SPARK — ACCESSORY: a small solid white speech-bubble shaped object with three small azure dots on it, held up in one hand beside its body; GESTURE: the other hand waves hello, friendly welcoming eyes looking at the viewer.
+
+POSE AND CAMERA: THREE-QUARTER FRONT VIEW from the left at eye level.
+
+Lighting and render (CINE): a dark, moody studio at night, deep navy-black background with soft haze; the Spark is lit mostly by its OWN light — the azure glow of its eyes, windows, antenna and the hover light under it — plus a cool rim light from behind outlining the sphere, the ring and the arms, and a very soft dim fill from the front so the white body still reads as glossy white. Real photographic depth and texture, crisp focus on the whole figure. Nothing else in the frame, no text. The whole figure fully visible with generous margin, centered.

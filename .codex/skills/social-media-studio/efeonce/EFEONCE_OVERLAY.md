@@ -242,6 +242,10 @@ negocio»**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../.
 - En piezas del servicio usar artefactos auténticos anonimizados (work chart, ficha, registro de excepción),
   escenas/entrevistas reales y baseline. Un mockup se rotula ilustrativo; métricas, nombres y logos de cliente
   exigen permiso específico. No usar robots/cerebros genéricos como sustituto de prueba.
+- Si la pieza personifica a los agentes, sólo con los **Sparks** del kit (los agentes de Efeonce, TASK-1941), siempre
+  con una persona que supervisa y nunca como prueba; en venta de Agent Ops, con el equipo humano. Canon:
+  [`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.md). La destacada «Agents» de Instagram
+  todavía lleva robots genéricos: regenerarla con Sparks es decisión del operador.
 - Salesforce sólo se nombra en orgánico de liderazgo de opinión, con respeto; nunca en pauta.
 - La cuenta regresiva a la Ley 21.719 (1 dic 2026) es orientación, no asesoría legal.
 - Seasonalities conservan su línea propia; no se les fuerza un capítulo.

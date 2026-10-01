@@ -589,6 +589,8 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   something small were there asking her a question*» hizo que el modelo **materializara un robot blanco flotando**.
   Si la criatura se compone después, la mirada se describe como **geometría** y el vacío se **declara**: «*the air
   above that shoulder is EMPTY: no object, no creature, no robot, no toy, no figure*».
+- 🔴 **Robots, sólo los Sparks del kit** (`objetos: spark…`; nunca descritos a mano ni en documental): si no,
+  `foto:prompt` aborta. Canon: [`SPARKS_V1.md`](../../docs/operations/brand-characters/SPARKS_V1.md) (TASK-1941).
 - 🔴 **Recorrido de la vista** **[operador, 2026-09-21]**: la mirada entra por el titular, baja por el **eje central**
   a la escena y sale por la firma. Un elemento al **margen y a media altura** queda fuera de ese recorrido: es un
   desvío lateral sin destino y se lee como adorno pegado, **aunque no tape nada y aunque su contraste pase**. Si va,

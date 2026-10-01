@@ -39,6 +39,10 @@
 - Dos cosas que el orquestador no debe asumir: `HW1` es documental, no cine (registro cine §2 y §16.3); y `BR3` pide
   reserva arriba, que el compilador todavía convierte en reserva izquierda (trampa 6).
 
+## Delta 2026-10-01
+
+- los agentes del registro cine (antes «mini robots agentes» descritos a mano) se declaran como Sparks por catálogo (`spark`, `spark-*`, `sparks-plantel`); `foto:prompt` aborta una escena con robots sin Spark (`validarRobots`) — cerrado por trabajo en TASK-1941.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

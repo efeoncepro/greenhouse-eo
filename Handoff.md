@@ -46,7 +46,7 @@ TASK-1863: staging; main retenido.
 
 **Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/complete/TASK-1922-glitch-axis-franchise-token-contract.md) complete (AXIS `v0.3.12`).
 
-**La órbita (26/09–01/10):** [índice](docs/operations/brand-graphic-line/README.md); perfiles sociales aprobados 01/10 (§10.1.1), sin publicar. Pendiente: 5 preguntas del operador y TASK-1926.
+**La órbita (26/09–01/10):** [índice](docs/operations/brand-graphic-line/README.md); perfiles sociales aprobados 01/10 (§10.1.1), sin publicar; Sparks: TASK-1941. Pendiente: 5 preguntas del operador y TASK-1926.
 
 **Registro cine + taller (27/09):** [registro cine](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (ads 9:16/4:5 en prueba); repo taller [`efeonce-brand-workshop`](docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) + [TASK-1925](docs/tasks/to-do/TASK-1925-brand-workshop-migration.md).
 

@@ -36,6 +36,10 @@ La diferencia con otras capas de documentacion:
   el avatar único de las cuatro redes, **crear** un destacado (publicar primero la historia completa 9:16, `v02`) frente
   a **cambiar** su portada (`v01`), cómo cada persona del equipo elige su portada de LinkedIn desde su página del kit,
   dónde están los archivos en OneDrive, qué no hacer y problemas comunes. Aprobado el 2026-10-01; publicación pendiente.
+- [Usar los Sparks en fotos de marca](creative/usar-sparks-en-fotos-de-marca.md) — poner a un Spark (los agentes de
+  Efeonce, único robot permitido en una foto de marca) en una ficha de `foto:prompt`: elegir el Spark del plantel y la
+  vista, declararlo en `objetos`, escala y registro (cine o puesta en escena, nunca documental), qué frena la guarda
+  contra robots, qué no hacer y problemas comunes. Kit aprobado el 2026-10-01 (TASK-1941).
 - [Usar la identidad sonora de Efeonce](creative/usar-identidad-sonora-efeonce.md) — elegir registro (fondo o energía) y
   pieza (logo, etiqueta con voz, sting/reveal/apertura, pieza larga, cierre de energía), bajar el archivo del kit en AXIS,
   sincronizar la esfera al golpe o a la palabra final, nivelar al destino y qué no hacer. Estado recomendada; Glitch no usa

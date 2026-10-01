@@ -663,6 +663,93 @@ export const OBJETOS = {
     },
     vistaDefecto: 'tres-cuartos-izq'
   },
+  'spark-investigacion': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the Research Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small magnifying glass (white handle, thin navy rim, faintly azure lens) BESIDE its body, never in front of its visor; it reads and summarises sources. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    patron: 'spark-investigacion-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'spark-contenido': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the Content Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small thin white card with one azure brush stroke (no letters) and offers it; it proposes drafts. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    patron: 'spark-contenido-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'spark-crm-datos': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the CRM and Data Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a neat stack of small rounded white and navy tiles and places one more on top; it keeps records in order. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    patron: 'spark-crm-datos-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'spark-servicio': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the Service Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small white speech-bubble object with three azure dots and waves with the other hand; it answers and routes. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    patron: 'spark-servicio-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'spark-reportes': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the Reports Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small desk model of a bar chart with three rising bars (the tallest azure) and points at the tallest bar; it measures and reports. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    patron: 'spark-reportes-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'sparks-plantel': {
+    // Los cinco Sparks juntos, cada uno con su accesorio (investigación, contenido, CRM/datos, servicio, reportes).
+    etiqueta: 'the official 3D group of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY these five figures as real, physical, finely made small hovering companions about 22 cm wide each, identical in body ' +
+      'and colour, each with its own accessory (magnifying glass, card with a stroke, stack of tiles, speech-bubble object, bar-chart model). ' +
+      'Their orbit rings never intersect. SCALE: each one never larger than the head of a person. They work WITH people who supervise them.',
+    base: 'ai-generations/2026-10-01_sparks/plantel-transparente/',
+    patron: 'sparks-<V>.png',
+    vistas: { frente: 'frente' },
+    vistaDefecto: 'frente'
+  },
   clawd: {
     // Gobernanza que antes sólo vivía en los docs y nunca llegaba al operador en el momento de generar:
     // el sprocket llevaba aviso y las tres mascotas de partner no (detectado 2026-09-21).
@@ -2113,6 +2200,56 @@ export const validarVestuarioDeLinea = ficha => {
   }
 }
 
+// ── Robots: sólo los Sparks del kit (TASK-1941, decisión del operador 2026-09-29/10-01) ────────────────
+// El canon prohíbe fotografiar «robots, circuitos ni interfaces flotantes». La única excepción son los
+// Sparks, los agentes de Efeonce, y salen SIEMPRE del kit (`objetos: [{ objeto: "spark…" }]`): describir
+// «three small friendly robot agents» a mano daba un robot distinto en cada foto, parecido a personajes
+// ajenos (NX3, AD4, RV1, WB1, BR4). Las negaciones («no robots», «NO robot») son legítimas: se ignoran.
+// Y los Sparks viven en cine o puesta en escena, nunca en el registro documental.
+export const PATRON_ROBOT = /\b(robots?|robotic|droids?|droides?|bots?|androids?|androides?|cyborgs?|mechas?)\b/gi
+const NEGACION_PREVIA = /\b(no|not|never|nor|without|sin|nunca|ni)\b(\s+[\w-]+){0,2}[\s,]*$/i
+export const PALANCAS_DOCUMENTALES = ['escucha', 'manos', 'sombra', 'silueta', 'marcado', 'quien-sostiene']
+
+export const declaraSpark = ficha =>
+  (ficha.objetos ?? []).some(o => String(typeof o === 'string' ? o : o?.objeto ?? '').startsWith('spark'))
+
+export const robotsSinNegar = escena => {
+  const texto = String(escena ?? '')
+  const hallados = []
+
+  for (const m of texto.matchAll(PATRON_ROBOT)) {
+    const clausula = texto.slice(Math.max(0, m.index - 60), m.index).split(/[.;:!?]/).pop()
+
+    if (!NEGACION_PREVIA.test(clausula)) hallados.push(m[0])
+  }
+
+  return hallados
+}
+
+export const validarRobots = ficha => {
+  const id = ficha.id ?? 'esta ficha'
+  const robots = robotsSinNegar(ficha.escena)
+  const spark = declaraSpark(ficha)
+
+  if (robots.length && !spark) {
+    throw new Error(
+      `La escena de "${id}" describe un robot («${robots[0]}») sin declarar un Spark. El único robot permitido en una ` +
+        'foto de Efeonce es un Spark del kit, y se declara en `objetos` (por ejemplo `{ "objeto": "spark", "vista": ' +
+        '"tres-cuartos-izq" }`), nunca se describe a mano: a mano sale distinto en cada foto y parecido a personajes ajenos.'
+    )
+  }
+
+  if (spark && (ficha.registro === 'documental' || PALANCAS_DOCUMENTALES.includes(ficha.palanca))) {
+    throw new Error(
+      `"${id}": los Sparks viven en el registro cine o de puesta en escena, nunca en el documental ` +
+        `(${ficha.registro === 'documental' ? 'declaraste `registro: "documental"`' : `la palanca "${ficha.palanca}" es documental`}). ` +
+        'El documental retrata el oficio real de Efeonce, y ahí un personaje de ficción no tiene lugar.'
+    )
+  }
+
+  return spark
+}
+
 export const construirPrompt = ficha => {
   const fmt = FORMATOS[ficha.formato]
 
@@ -2120,6 +2257,8 @@ export const construirPrompt = ficha => {
   if (!ficha.escena) throw new Error('La ficha necesita `escena`: el modelo no inventa la escena por vos.')
 
   const caso = validarCaso(ficha)
+
+  validarRobots(ficha)
 
   // El canon contempla tomas SIN lecho —dron y todo-enfocadas— y el comando no lo sabía: abortaba
   // una toma legítima (caso: cenital perpendicular, 2026-09-20). Se declara `lecho: "sin-lecho"` con

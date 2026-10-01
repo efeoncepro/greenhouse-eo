@@ -600,6 +600,10 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   [Gasta](https://www.gasta.org/portfolio/gemini-free/), el estudio que la creó para el back-to-school de Gemini.
   Sus tres reglas duras de utilería (tono hueso, prop que toca al personaje, nada translúcido sobre la cara) están en
   la misma biblioteca.
+- **Personaje propio: los Sparks** (agentes de Efeonce, TASK-1941). Mismo método, con fuente = diseño aprobado; dos
+  lecciones: el blanco en sombra sobre fondo de estudio claro se recorta editando antes la fuente a gris medio
+  `#7F7F7F`, y el giro no se espeja (el anillo inclinado se invertiría). Detalle:
+  [biblioteca §11](references/mascot-3d-pose-library.md#11-personaje-propio-los-sparks-task-1941-2026-10-01).
 - **Cambiar el fondo detrás de una persona o mascota: regenerar, no recortar.** Repintar un muro alrededor de un
   sujeto con matte + máscara deja bordes «mordidos» en pelo y deforma partes finas o sueltas (el «?» de Clawd).
   Acabado profesional = plate nativo con el set nuevo, guiado por un **boceto de composición** de formas planas

@@ -1,9 +1,9 @@
 # Lenguaje Fotográfico Efeonce V1 — «El oficio a la vista»
 
 > **Tipo de documento:** Especificación canónica de marca (documento maestro)
-> **Versión:** 1.7
+> **Versión:** 1.8
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-30 por Claude — excepción declarada de **caso de cliente** en puesta en escena: una ficha con `caso` puede anclar la escena en el rubro de SU cliente; sin el campo, la guarda del rubro aborta igual (delta 2026-09-30). Antes, el 2026-09-27: el registro cine se amplía a la receta de deck `proposal-cinematic` con personas del equipo y uniforme por registro (delta 2026-09-27). Antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada entera (decisión del operador; §9, §10 y P-5). Antes, el mismo día: §11: el operador aprueba las reglas de sinergia P1–P12 y resuelve los nueve conflictos P-1..P-9 con la línea gráfica (la lente cuenta como reserva del texto; capa gráfica sobre la foto aprobada sólo en los casos declarados de la línea; retrato de perfil como categoría propia, barra por redactar); §9 ajustado. Antes (mismo día): §11 «La línea gráfica en la foto»: cómo se prepara una foto que llevará la órbita y qué puede hacer la órbita sobre ella, con enlace al contrato de convergencia. Antes (mismo día): la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
+> **Última actualización:** 2026-10-01 por Claude — los robots siguen prohibidos salvo los **Sparks** del kit, los agentes de Efeonce, y `foto:prompt` lo hace cumplir (delta 2026-10-01; canon en [`SPARKS_V1.md`](../brand-characters/SPARKS_V1.md)). Antes, el 2026-09-30: excepción declarada de **caso de cliente** en puesta en escena: una ficha con `caso` puede anclar la escena en el rubro de SU cliente; sin el campo, la guarda del rubro aborta igual (delta 2026-09-30). Antes, el 2026-09-27: el registro cine se amplía a la receta de deck `proposal-cinematic` con personas del equipo y uniforme por registro (delta 2026-09-27). Antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada entera (decisión del operador; §9, §10 y P-5). Antes, el mismo día: §11: el operador aprueba las reglas de sinergia P1–P12 y resuelve los nueve conflictos P-1..P-9 con la línea gráfica (la lente cuenta como reserva del texto; capa gráfica sobre la foto aprobada sólo en los casos declarados de la línea; retrato de perfil como categoría propia, barra por redactar); §9 ajustado. Antes (mismo día): §11 «La línea gráfica en la foto»: cómo se prepara una foto que llevará la órbita y qué puede hacer la órbita sobre ella, con enlace al contrato de convergencia. Antes (mismo día): la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
 > **Estado:** Aprobado por el operador (Julio Reyes, dueño de Efeonce) el 2026-09-19. Sistema consistente; **no** es todavía un activo distintivo medido.
 > **Documentación relacionada:** [Índice](./README.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) · [Marca de agencia](../../context/09_marca-agencia.md) · [Quiénes somos](../../context/01_quienes-somos.md) · [Marca en escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md)
 
@@ -708,3 +708,23 @@ pruebas en `scripts/foto/build-prompt.test.ts` (sin campo aborta, cliente correc
 abortan, la escena no nombra al cliente). El mismo día el ancla de pintura pasó a ver también **muestrarios,
 abanicos y latas de pintura**: la escena de `CS3b` los usaba y la guarda no la veía **[medido]**; los muestrarios de
 color impresos, oficio de Efeonce, siguen permitidos. Ficha: `ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS3b-berel-squad.json`.
+
+## Delta 2026-10-01 — los robots siguen prohibidos, salvo los Sparks del kit
+
+**[decisión del operador, 2026-09-29 y 2026-10-01, TASK-1941]** La prohibición de fotografiar «robots, circuitos ni
+interfaces flotantes» ([palancas, «De la relación con la máquina»](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md)) **sigue
+vigente**. La única excepción son los **Sparks**, los agentes de Efeonce: personajes propios de la marca, con un kit
+cerrado y una entrada en el catálogo de `foto:prompt`. Canon completo: [`SPARKS_V1.md`](../brand-characters/SPARKS_V1.md).
+
+| Se permite | No cambia |
+|---|---|
+| Un Spark (o varios) declarado en `objetos` desde el catálogo: `spark`, `spark-investigacion`, `spark-contenido`, `spark-crm-datos`, `spark-servicio`, `spark-reportes` o `sparks-plantel` | Un robot descrito a mano en la escena **aborta**: salía distinto en cada foto y parecido a personajes ajenos (`NX3`, `NX5b`, `AD2b`, `AD4f`) **[medido]** |
+| Registro cine y puesta en escena | El **documental** no admite Sparks: retrata el oficio real de Efeonce |
+| Un Spark junto a una persona que lo supervisa, nunca más grande que su cabeza y siempre por encima de la cintura | Los Sparks nunca reemplazan personas ni aparecen solos decidiendo |
+
+**La guarda lo hace cumplir.** `validarRobots` en `scripts/foto/build-prompt.mjs` aborta cuando la escena describe
+robots, droides o bots sin declarar un Spark (ignora negaciones como «no robots») y cuando un Spark va con
+`registro: "documental"` o con una palanca documental (`escucha`, `manos`, `sombra`, `silueta`, `marcado`,
+`quien-sostiene`). Medido sobre 301 fichas: frena 13, todas con robots descritos a mano, sin falsos positivos
+**[medido]**. Pruebas en `scripts/foto/build-prompt.test.ts`. Regenerar las piezas aprobadas que llevan robots
+genéricos es una decisión aparte del operador.
