@@ -291,6 +291,7 @@ vale en toda aplicación:
 
 ### A11. Perfiles sociales de Efeonce: portadas, avatar y destacados de Instagram (aprobado 2026-10-01)
 
+- **En AXIS:** Lab [`/references/social-profiles/`](https://axis.efeonce.org/references/social-profiles/) y su JSON [`social-profiles.json`](https://axis.efeonce.org/references/social-profiles.json) (51 piezas con URL y SHA-256, masters en `gs://efeonce-group-axis-public-media/social-profiles/v1/`); sin token: las medidas son de cada plataforma.
 - **Para qué:** la cara de Efeonce en sus redes —portadas de la página de LinkedIn, de Facebook y de YouTube, el avatar,
   los destacados de Instagram— y la portada de LinkedIn que cada persona del equipo puede usar en su perfil. El
   operador lo declaró parte del universo gráfico de Efeonce («ya forma parte del universo gráfico de Efeonce»). Para

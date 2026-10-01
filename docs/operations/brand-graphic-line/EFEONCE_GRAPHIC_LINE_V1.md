@@ -730,6 +730,8 @@ el deck, el cierre de marca y las animaciones del logo.
 
 ### 10.1.1 Perfiles sociales de Efeonce (aprobados el 2026-10-01)
 
+> Referencia visual y datos para agentes en el Lab de AXIS: [axis.efeonce.org/references/social-profiles/](https://axis.efeonce.org/references/social-profiles/) · [`social-profiles.json`](https://axis.efeonce.org/references/social-profiles.json) (AXIS `450d3b9`; las medidas por red viven ahí y aquí, no en un token, porque son de cada plataforma y cambian sin aviso).
+
 Las portadas de perfil, el avatar de redes y los destacados de Instagram de la cuenta de Efeonce, más las portadas de
 LinkedIn para el perfil personal de cada persona del equipo. **[decisión del operador, 2026-10-01]** El operador los
 declaró parte del universo gráfico de Efeonce («ya forma parte del universo gráfico de Efeonce»). Aprobaciones, en sus
