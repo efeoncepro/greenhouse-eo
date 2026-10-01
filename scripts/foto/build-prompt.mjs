@@ -642,14 +642,26 @@ export const OBJETOS = {
     etiqueta: 'the official 3D figure of a Spark, the small agent companion of Efeonce',
     instruccion:
       'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide: a glossy white sphere ' +
-      'with a navy visor showing two azure LED eyes and a small smile, the four-pointed azure sparkle antenna on top, the tilted white ' +
-      'orbit ring with its small sphere, three round azure windows on the belly, short white arms with dark hands, and NO legs — it ' +
-      'floats a few centimetres above the surface with a soft azure glow under it. Copy its shape, proportions and colours exactly; ' +
+      'with a navy visor showing two LED eyes and a small smile, the four-pointed sparkle antenna on top, the tilted white ' +
+      'orbit ring with its small sphere, three round windows on the belly, short white arms with dark hands, and NO legs — it ' +
+      'floats a few centimetres above the surface with a soft glow under it. All its lights (eyes, smile, windows, antenna, seams, glow) are ONE colour, exactly the colour of the reference: azure by default, or the accent of the business line the reference shows. Copy its shape, proportions and colours exactly; ' +
       'only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
       'above the waist (on the shoulder, beside the head, over the desk). It works WITH a person who supervises it: it never replaces ' +
       'a person and never appears deciding alone. It is the only robot allowed in an Efeonce photograph.',
-    base: 'ai-generations/2026-10-01_sparks/transparente/',
-    patron: 'spark-<V>.png',
+    // Variante por línea de negocio (operador, 2026-10-01: «Aprobados todos»): el MISMO Spark con el LED en el acento
+    // de la línea (tokens efeonceGraphicLine.lines). El azul de Engine es el defecto; las demás sólo cuando la pieza es
+    // de esa línea. Brand y Voice (cálidos) se prueban en cine antes de usarse en una foto oscura.
+    base: 'ai-generations/2026-10-01_sparks/',
+    patron: 'transparente/spark-<V>.png',
+    patronPorColor: {
+      engine: 'transparente/spark-<V>.png',
+      growth: 'lineas-transparente/spark-growth-<V>.png',
+      brand: 'lineas-transparente/spark-brand-<V>.png',
+      voice: 'lineas-transparente/spark-voice-<V>.png',
+      'revenue-hubspot': 'lineas-transparente/spark-revenue-hubspot-<V>.png',
+      'revenue-salesforce': 'lineas-transparente/spark-revenue-salesforce-<V>.png'
+    },
+    colorDefecto: 'engine',
     vistas: {
       frente: '01-frente', 'tres-cuartos-izq': '02-tres-cuartos-izquierda', 'tres-cuartos-der': '03-tres-cuartos-derecha',
       perfil: '04-perfil', 'perfil-der': '10-perfil-derecho', espalda: '05-espalda', 'espalda-recta': '11-espalda-recta',
@@ -2208,6 +2220,7 @@ export const validarVestuarioDeLinea = ficha => {
 // Y los Sparks viven en cine o puesta en escena, nunca en el registro documental.
 export const PATRON_ROBOT = /\b(robots?|robotic|droids?|droides?|bots?|androids?|androides?|cyborgs?|mechas?)\b/gi
 const NEGACION_PREVIA = /\b(no|not|never|nor|without|sin|nunca|ni)\b(\s+[\w-]+){0,2}[\s,]*$/i
+
 export const PALANCAS_DOCUMENTALES = ['escucha', 'manos', 'sombra', 'silueta', 'marcado', 'quien-sostiene']
 
 export const declaraSpark = ficha =>

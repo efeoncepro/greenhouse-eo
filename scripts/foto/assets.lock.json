@@ -359,108 +359,628 @@
       "sha256": "49a210d22337d2bec973f1f6f8ca81162177559e734e32e8ee6728e0fd4c1a9a"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-01-frente.png": {
-      "rol": "kit:spark/frente",
+      "rol": "kit:spark/engine/frente",
       "sha256": "ca81af3bbb89efaf669357468e14077335024194953b5bd06fd28eb669bd34d2"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-02-tres-cuartos-izquierda.png": {
-      "rol": "kit:spark/tres-cuartos-izq",
+      "rol": "kit:spark/engine/tres-cuartos-izq",
       "sha256": "e654bb4d5e202897ad9a1df05602919f8317e305fbffdd8ddb0346f4a1345040"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-03-tres-cuartos-derecha.png": {
-      "rol": "kit:spark/tres-cuartos-der",
+      "rol": "kit:spark/engine/tres-cuartos-der",
       "sha256": "f5a7446179793f98c1df49b71b087f2eb672a53e84e2d323d941672f12cd17ab"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-04-perfil.png": {
-      "rol": "kit:spark/perfil",
+      "rol": "kit:spark/engine/perfil",
       "sha256": "15965217b5c7becf6f4987261c9794c689dd29b51e2c51bebb92b1d7bbca6b7c"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-10-perfil-derecho.png": {
-      "rol": "kit:spark/perfil-der",
+      "rol": "kit:spark/engine/perfil-der",
       "sha256": "d99c97495af90cb51be899df9884c0306a9c5b77b7e0c62331391a46e6e370c8"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-05-espalda.png": {
-      "rol": "kit:spark/espalda",
+      "rol": "kit:spark/engine/espalda",
       "sha256": "5f0e5df84b7fcd4923af723fc530407f31bcb0ccb27309eabc7a6063a5918e55"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-11-espalda-recta.png": {
-      "rol": "kit:spark/espalda-recta",
+      "rol": "kit:spark/engine/espalda-recta",
       "sha256": "b353e7b72d3f7b65baf7c74dd6d38d497db1968fe37e5f3980df523c45d205ba"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-12-tres-cuartos-trasero-izquierdo.png": {
-      "rol": "kit:spark/trasero-izq",
+      "rol": "kit:spark/engine/trasero-izq",
       "sha256": "50f4a5f81b42efbffbe1b9b1aff7bc649550db15d01310de71622045b6c26f77"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-06-contrapicado.png": {
-      "rol": "kit:spark/contrapicado",
+      "rol": "kit:spark/engine/contrapicado",
       "sha256": "c1d6347ff4d047a3bb5090e05e6afd1e2a6274ef11518f8214f69301c1407399"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-07-picado.png": {
-      "rol": "kit:spark/picado",
+      "rol": "kit:spark/engine/picado",
       "sha256": "d2b344bb49fd1f07fbc290e5f7d02cbfe142ea9dc574901eb4f03d801473b3ad"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-08-mira-arriba.png": {
-      "rol": "kit:spark/mira-arriba",
+      "rol": "kit:spark/engine/mira-arriba",
       "sha256": "203cefb70975f9217513cf1f8dfc92fbbb667e3f73c138c891bb0800780b27ce"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-09-mira-abajo.png": {
-      "rol": "kit:spark/mira-abajo",
+      "rol": "kit:spark/engine/mira-abajo",
       "sha256": "11823aeef178bc4f868c478a275a5ac9bd4addfcb1ec3fae1c7fa03fdf178e35"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-20-expresion-atento.png": {
-      "rol": "kit:spark/atento",
+      "rol": "kit:spark/engine/atento",
       "sha256": "c86c9ebe0c9c9d1dce839d1387a397f86e7c976d848c9118cab3986deac70e08"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-21-expresion-trabajando.png": {
-      "rol": "kit:spark/trabajando",
+      "rol": "kit:spark/engine/trabajando",
       "sha256": "dbb5ff0a5c9541740072e82f16c3c8b94e046ecb109a26e1e9503857a21bbd73"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-22-expresion-pide-revision.png": {
-      "rol": "kit:spark/pide-revision",
+      "rol": "kit:spark/engine/pide-revision",
       "sha256": "9ea91e942e80e0911086ebf9d62d708bfa2901048d6542ccb497cc79026e08ea"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-23-expresion-listo.png": {
-      "rol": "kit:spark/listo",
+      "rol": "kit:spark/engine/listo",
       "sha256": "8234cefc0139ea060f79322b09420af92c64a409204e11b886bd624a021a9c09"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-24-expresion-sorprendido.png": {
-      "rol": "kit:spark/sorprendido",
+      "rol": "kit:spark/engine/sorprendido",
       "sha256": "f995cd5b3cb8272529009634ce39bc6e017623713ec0050eb67b36cbf300d82e"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-25-expresion-pensando.png": {
-      "rol": "kit:spark/pensando",
+      "rol": "kit:spark/engine/pensando",
       "sha256": "8f68497e81e3dbd3449e6d5781564e737b405bc3b6a4fb328e3b290d50857789"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-30-cine-frente.png": {
-      "rol": "kit:spark/cine-frente",
+      "rol": "kit:spark/engine/cine-frente",
       "sha256": "a286fc36bd0435c8bc3e34937e083e0c0b7e0b02eb4a970969d4da564054d601"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-31-cine-tres-cuartos.png": {
-      "rol": "kit:spark/cine-tres-cuartos",
+      "rol": "kit:spark/engine/cine-tres-cuartos",
       "sha256": "a9e4680b8eb9c7b87cb7ff1269a65ce8c847835a3853019b41a1864763913af4"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-32-cine-mira-arriba.png": {
-      "rol": "kit:spark/cine-mira-arriba",
+      "rol": "kit:spark/engine/cine-mira-arriba",
       "sha256": "dcab5f8307be4189584f80826627e200c77fc9a46933c099e00f5d4672413505"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-40-accion-volando.png": {
-      "rol": "kit:spark/volando",
+      "rol": "kit:spark/engine/volando",
       "sha256": "dfc662534c2f0376cd4fc114b49f61f9794a58829dd8b02014ecc33dca1da1f1"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-41-accion-senalando.png": {
-      "rol": "kit:spark/senalando",
+      "rol": "kit:spark/engine/senalando",
       "sha256": "0d7ba5b9ebb644276c7357c7b1665acea528f270e4fcdd851e10e57129816410"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-42-accion-presenta-en-la-palma.png": {
-      "rol": "kit:spark/presenta",
+      "rol": "kit:spark/engine/presenta",
       "sha256": "9de70678c3afd5775fd0f5799ccbf16f124de816f0847e0129fae51c01bb5e81"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-43-accion-entrega-tarjeta.png": {
-      "rol": "kit:spark/entrega-tarjeta",
+      "rol": "kit:spark/engine/entrega-tarjeta",
       "sha256": "6de193b8b74549c40ebad9be9eef9e28bb18355b9a1a2133af2ef0c70f73b876"
     },
     "ai-generations/2026-10-01_sparks/transparente/spark-50-grupo-tres.png": {
-      "rol": "kit:spark/grupo",
+      "rol": "kit:spark/engine/grupo",
       "sha256": "b54672904474926ca571ae337739a202e711e7b986b429201fa5a6ceb0cbae1b"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-01-frente.png": {
+      "rol": "kit:spark/growth/frente",
+      "sha256": "a77aa0910ca6edc9bd5970f485a57f6cc1810aa5718120c707a5d5faf71f92a0"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/growth/tres-cuartos-izq",
+      "sha256": "0493f1bff683193a4f16f9f3a223a73625353d8cc7b9ec9852a33a346e6f603f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/growth/tres-cuartos-der",
+      "sha256": "449b51866de5b03c2b9b787be0777c0d4b15a66e17732e5631fadd139d9623e9"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-04-perfil.png": {
+      "rol": "kit:spark/growth/perfil",
+      "sha256": "2f01834c37da6c6841b2a825437fb0812906a234a04d791f78832969a9584124"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-10-perfil-derecho.png": {
+      "rol": "kit:spark/growth/perfil-der",
+      "sha256": "daa08653120164cbe8c94a22eaf75af9971737c6263dff2703df5d801fdfc7fc"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-05-espalda.png": {
+      "rol": "kit:spark/growth/espalda",
+      "sha256": "12362575dc7175a2929521f4ae9c259bf9de7a84c7391ed9ee228bc47e5f4efc"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-11-espalda-recta.png": {
+      "rol": "kit:spark/growth/espalda-recta",
+      "sha256": "3439c6d40e66f076f3b1d5d5eecb37309e65de8c060a40de8fc8a7936616348f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/growth/trasero-izq",
+      "sha256": "119f5e0316718bb7237b8ac38ad2227a3776d105defaacc9b3a053ccf0eb84c6"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-06-contrapicado.png": {
+      "rol": "kit:spark/growth/contrapicado",
+      "sha256": "9ac803eb50d9e2e8a6fe5eb49c94fc0c9fbb33d2324c8702ffb7268c9f258c53"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-07-picado.png": {
+      "rol": "kit:spark/growth/picado",
+      "sha256": "0ba79019b384266c8e24d23745fc5595fc94ad60e33e68b1f1eeee874dc13dc9"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-08-mira-arriba.png": {
+      "rol": "kit:spark/growth/mira-arriba",
+      "sha256": "908adb6e02ebc2d4322d57189f357179bf4de4025a9fb9f7df77954b4db8082a"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-09-mira-abajo.png": {
+      "rol": "kit:spark/growth/mira-abajo",
+      "sha256": "18e78ffa1e93858b4a43c68fbdad9f87ecf7fa96d68e208d19792734a1e2ed42"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-20-expresion-atento.png": {
+      "rol": "kit:spark/growth/atento",
+      "sha256": "332c18de375017ebd98af00c65d54459a50fafcbd6eb4e7d872954337a8dfa9f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-21-expresion-trabajando.png": {
+      "rol": "kit:spark/growth/trabajando",
+      "sha256": "f15975bdae0960a719cb99317ab79a6cb60c9698823f06e119d0ed8f194b0691"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/growth/pide-revision",
+      "sha256": "54156aeeddc26971d66b97b7ce3dcac32685aeb5ac7d22094ef113f539a76cb5"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-23-expresion-listo.png": {
+      "rol": "kit:spark/growth/listo",
+      "sha256": "2820a8b8b32928ba642855ad46fb2698b422a874d77234cc47937aa051e56666"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/growth/sorprendido",
+      "sha256": "278032c75e104bf5c9e7da8e548e312868496bc530aa085d40ea7f52957e459e"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-25-expresion-pensando.png": {
+      "rol": "kit:spark/growth/pensando",
+      "sha256": "62fc1861c273f4baa78ff7067e1202972fff4075b236c2519bca9b5b0ddd75b7"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-30-cine-frente.png": {
+      "rol": "kit:spark/growth/cine-frente",
+      "sha256": "3bd9ad776ea2fcad251e9baf012045100f75b27b659ad211bb00210610394794"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/growth/cine-tres-cuartos",
+      "sha256": "e3d885bfc8c730cf6cd26c3ca95d0f28f652552480bbb70cfee1d5f85c057198"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/growth/cine-mira-arriba",
+      "sha256": "6a8016cb60242d94a5b22cfea91d6906605a5d0ee80ba3e6a99a81b2c5a8d0ff"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-40-accion-volando.png": {
+      "rol": "kit:spark/growth/volando",
+      "sha256": "9f6941c5ad92d7d3d5d0aeb173070e6d314c0828637e50ed97570b537fc82973"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-41-accion-senalando.png": {
+      "rol": "kit:spark/growth/senalando",
+      "sha256": "fdece860edf01901a81bb5536f4c2e63913f252a293f2e4c2cd789881862bd5c"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/growth/presenta",
+      "sha256": "b87d06894fdd456c1a833609c1c068418fa586bbf0496d6341bf48b743572cad"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/growth/entrega-tarjeta",
+      "sha256": "1af03840d0b01d4a590c8d93e2563213ca5fc4a24ef73e5a1458b8cc8cb7697a"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-growth-50-grupo-tres.png": {
+      "rol": "kit:spark/growth/grupo",
+      "sha256": "4956fd72fc23d039927f9fbb9062da98212d03e7a52837456fc3d6e2c61d26da"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-01-frente.png": {
+      "rol": "kit:spark/brand/frente",
+      "sha256": "e62cb035ffdf865794cb4bce1e097079921350a95dc0670f72b4f8dfd98b2cbf"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/brand/tres-cuartos-izq",
+      "sha256": "c2d187a93da4de453431a6995c08480b1ce7beff1a136d8063b6b29002018b82"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/brand/tres-cuartos-der",
+      "sha256": "d7686c975e7ea460b8a5699f5e56177b892740ac919bd2c00f8051c88b4e72a4"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-04-perfil.png": {
+      "rol": "kit:spark/brand/perfil",
+      "sha256": "b0402ccb36aa16f6c475ae9e1701163d2bdd2f14b6690252b8bd754be5f21914"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-10-perfil-derecho.png": {
+      "rol": "kit:spark/brand/perfil-der",
+      "sha256": "2becf9a65c99e3fabf2f9ae30703632b8722ec2529c48b19503b25c51a2a7f02"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-05-espalda.png": {
+      "rol": "kit:spark/brand/espalda",
+      "sha256": "385e8077f425d999da06f92e11881d506d89a469de2641d080f1143c2dbc25c1"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-11-espalda-recta.png": {
+      "rol": "kit:spark/brand/espalda-recta",
+      "sha256": "b651ddee19a69af501d21d1ec10028ca3dec4d259d9fb9d19afcb02f9f061583"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/brand/trasero-izq",
+      "sha256": "ce1817cd784c7028d5516a4c724a93ca689733679ea9c0d7387f0e39c69e7513"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-06-contrapicado.png": {
+      "rol": "kit:spark/brand/contrapicado",
+      "sha256": "f96c754b7b581e2a3e54652bb194932eb303092ac2bcb884b007d96331ae1789"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-07-picado.png": {
+      "rol": "kit:spark/brand/picado",
+      "sha256": "8b406f605922cb793099e33e60725ca0338280777a9cd58865745d09be945e9e"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-08-mira-arriba.png": {
+      "rol": "kit:spark/brand/mira-arriba",
+      "sha256": "4ea67d87b78f66390822b508c34b2a75596fef3a01f4b5cc4e6939fa354b1ba8"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-09-mira-abajo.png": {
+      "rol": "kit:spark/brand/mira-abajo",
+      "sha256": "17820bb38cdbe4593c19b1b50a079a785143f1128e5373be09d9da1458c1d08f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-20-expresion-atento.png": {
+      "rol": "kit:spark/brand/atento",
+      "sha256": "3490b558b52dac9912ef8f13555b3e700b1b71d935eeca06d15d90546079751b"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-21-expresion-trabajando.png": {
+      "rol": "kit:spark/brand/trabajando",
+      "sha256": "ba7f84764cbaa3a053da8349a876beb7a7ed051c4d1e63143066541a5523bc67"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/brand/pide-revision",
+      "sha256": "2443b636bb32e0408a53c72feacb1ee44ef9d8f83002bd563a894082a368a46d"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-23-expresion-listo.png": {
+      "rol": "kit:spark/brand/listo",
+      "sha256": "805fdb794aa09d08484823faefbb90db22fcb05706741a97137bae8e0da7ddbf"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/brand/sorprendido",
+      "sha256": "c4e6fcd846761f822837e6409c6bf8e3517afd256e6cbb52c6601b591b016578"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-25-expresion-pensando.png": {
+      "rol": "kit:spark/brand/pensando",
+      "sha256": "6b47810c2a6865a2f36281e553ce1540355cff28ba1767044c1c91f6e6dd5b03"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-30-cine-frente.png": {
+      "rol": "kit:spark/brand/cine-frente",
+      "sha256": "04b5cc185f7b69dfc91f4319a2bc8c6d20f0f1db234c77b3216b84d145586fd7"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/brand/cine-tres-cuartos",
+      "sha256": "6bf1203fadf6953b5bc8fd70ddbce1060e55a86dc8f11770ebe21e0cfe26bab4"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/brand/cine-mira-arriba",
+      "sha256": "c4c99ca9e8af5a0708f381a764c927720b3b12f44482479c5f96ff768499c1b3"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-40-accion-volando.png": {
+      "rol": "kit:spark/brand/volando",
+      "sha256": "9eb155bdd2d1b338d97d2ecee562d5a6675234a324a9f40e23ef7d1b60b20b60"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-41-accion-senalando.png": {
+      "rol": "kit:spark/brand/senalando",
+      "sha256": "c46db9b1396d9ccfc8937de4472b1c941b13fe9a18a4af7282e0873cbd8f8ce5"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/brand/presenta",
+      "sha256": "506b8d481f906de7c23ae04e367f57ac3491acae0d01176b2cbe17f43eacefcb"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/brand/entrega-tarjeta",
+      "sha256": "e5dfb944aa9f2f687ec44164478b2440e7a00eb095a982d8c43fb86ad32d2cb4"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-brand-50-grupo-tres.png": {
+      "rol": "kit:spark/brand/grupo",
+      "sha256": "b3e7103a7a5f618db11e6b1ac96a97e60e379b4b45de2e91c3c2ab7c09319d8f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-01-frente.png": {
+      "rol": "kit:spark/voice/frente",
+      "sha256": "460ed4f5957e3190951916b3eac593cd0ab71b29c968b999d12c98591e6f4f16"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/voice/tres-cuartos-izq",
+      "sha256": "9b8abadb51c75b3c1e2516179c3f3976b04c07203f1fa293ed77f2311d6c43bb"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/voice/tres-cuartos-der",
+      "sha256": "e091c4fe0cbd7d4d8aaeaf329f1501ab6828b581e1c143ace47bd590eaeb0584"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-04-perfil.png": {
+      "rol": "kit:spark/voice/perfil",
+      "sha256": "e75977f1c6d76fcd8992808c6022782a248fb128890dad12ee7760e30d1e6507"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-10-perfil-derecho.png": {
+      "rol": "kit:spark/voice/perfil-der",
+      "sha256": "0767a575a9096fe6ff98745cd5b15ab93ef3ac4a5b1af1ccc77b12391a675777"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-05-espalda.png": {
+      "rol": "kit:spark/voice/espalda",
+      "sha256": "82deb75f80ef5e5b50e0109bcc1c7b5282e7c517b22f53df10c823fe125d8f59"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-11-espalda-recta.png": {
+      "rol": "kit:spark/voice/espalda-recta",
+      "sha256": "5fbd4c7fdc22da4b9abe6231bff005d0f1374a3ace1771cdca672c5dd4ec3561"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/voice/trasero-izq",
+      "sha256": "655eae3c0f86e3b81222aba3eccc48f36ed281cad63e0a77d5ee440f06efd65d"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-06-contrapicado.png": {
+      "rol": "kit:spark/voice/contrapicado",
+      "sha256": "8f2f9b56e424bffaa4db4fd21e1c16f8dab196b75267593e95a3a2ea3fb73bfc"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-07-picado.png": {
+      "rol": "kit:spark/voice/picado",
+      "sha256": "06160ff9e8fd583a1b5490e446a95c213f7794e2a8c6c6f29845b2fef62ef9bc"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-08-mira-arriba.png": {
+      "rol": "kit:spark/voice/mira-arriba",
+      "sha256": "e25d8188f8d934b7eef5ad910ad5521675fc4881a76945d839fb926c4f8e2c85"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-09-mira-abajo.png": {
+      "rol": "kit:spark/voice/mira-abajo",
+      "sha256": "c971701b47420cbaf67d811381f4ae2f5cd1d853622a5987efb90a61d318f177"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-20-expresion-atento.png": {
+      "rol": "kit:spark/voice/atento",
+      "sha256": "de9d67b63ebc2497210f4d259218dab1b07096cb584a5ef55f9a853a7ed2df97"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-21-expresion-trabajando.png": {
+      "rol": "kit:spark/voice/trabajando",
+      "sha256": "6cdee27e9035cae05fd9b3fb7cd57f382aff20fc1696e883479689bb16770f7d"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/voice/pide-revision",
+      "sha256": "0078c210c7acb9ba46d0a455e0337c257c8f61ef31cfc5d5c5b756ebea8ed483"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-23-expresion-listo.png": {
+      "rol": "kit:spark/voice/listo",
+      "sha256": "246ca8dd4a6b3c3b8197b024ea798ac9b2ff9718d4b74d1f4dde98ddac173bd4"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/voice/sorprendido",
+      "sha256": "e205835ab115bd833a677b3cca171786ef4fa814429322c8f2aef2d1486f751b"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-25-expresion-pensando.png": {
+      "rol": "kit:spark/voice/pensando",
+      "sha256": "305e5c60d149a1308bfdbcd0e286207210e300643bf1bcb046e8c33d7ce48c47"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-30-cine-frente.png": {
+      "rol": "kit:spark/voice/cine-frente",
+      "sha256": "aba136f159e371097adfe813fc32242f5a6d2ffc136a052a6ba5ba55d9477899"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/voice/cine-tres-cuartos",
+      "sha256": "5c408c5a466fe32c8dca72ac15b407f3f0de855be9bab221078e5bf79a5f0060"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/voice/cine-mira-arriba",
+      "sha256": "749c4dbb785d76607c2996d61fa41d6e1f91a4590ff481a795058c12a8f230dd"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-40-accion-volando.png": {
+      "rol": "kit:spark/voice/volando",
+      "sha256": "bef4ccee6610831a532b1305b8e3cafd7d100bafcae42cb56c6ddcbb0ebab7ea"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-41-accion-senalando.png": {
+      "rol": "kit:spark/voice/senalando",
+      "sha256": "21d4471bbb42b7fdbde4c1085b7fabc598d0614401632f119c70c555901823ae"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/voice/presenta",
+      "sha256": "dc197150be7c764752cdfad66421d036330d58aa2970571eebdd2d8acc23211f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/voice/entrega-tarjeta",
+      "sha256": "8eb4109c7ea6948041e34e564dea234e8b4a387403a4f1131da0c0836663d95b"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-voice-50-grupo-tres.png": {
+      "rol": "kit:spark/voice/grupo",
+      "sha256": "a5e98e90219c185d2d35ac27d110375d4a7fa54dce2d482186d9c048e25870a7"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-01-frente.png": {
+      "rol": "kit:spark/revenue-hubspot/frente",
+      "sha256": "bae06e0b44c0086d2614e9bc5ea407c85a67b06a9a1d9e4b8064f66cf943a4c7"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/revenue-hubspot/tres-cuartos-izq",
+      "sha256": "113ab31d3e24aa25261423f79e1b19f346b95948a1b414d7572d742c20160db0"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/revenue-hubspot/tres-cuartos-der",
+      "sha256": "48fc388ac250769dffda2fd5e8417cd3891404d87031b56d8e7181582301f3a2"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-04-perfil.png": {
+      "rol": "kit:spark/revenue-hubspot/perfil",
+      "sha256": "baceb9bc8f544aac1bc4490630b22bee648b0691985743b3f727c86a4d12242e"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-10-perfil-derecho.png": {
+      "rol": "kit:spark/revenue-hubspot/perfil-der",
+      "sha256": "42a819bbd0b2efae2f62b20c253f9dbb8106ad4f98e523ee1286a6318c31ab94"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-05-espalda.png": {
+      "rol": "kit:spark/revenue-hubspot/espalda",
+      "sha256": "21ce75e51c514e0911ae9f883f3ab3793679fb7ebb614e4d14742c31ef535887"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-11-espalda-recta.png": {
+      "rol": "kit:spark/revenue-hubspot/espalda-recta",
+      "sha256": "cc8ae5a806ef2834e088aec34a839e6952c2838274cc63c41e4b87b709669517"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/revenue-hubspot/trasero-izq",
+      "sha256": "bfb0dd6b171a3c3add71cce8b4c00ebb0e5096566145119a1f005e26666f79bd"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-06-contrapicado.png": {
+      "rol": "kit:spark/revenue-hubspot/contrapicado",
+      "sha256": "8af1e2c85d065f1cd18e54dc1f0852585218fdc4f0a6e9a873436db74d692b49"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-07-picado.png": {
+      "rol": "kit:spark/revenue-hubspot/picado",
+      "sha256": "118b28adb82fbb1bd6da248fc9914f38a7076dfba926a97c3a9e36417796a991"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-08-mira-arriba.png": {
+      "rol": "kit:spark/revenue-hubspot/mira-arriba",
+      "sha256": "77ba830d314fd829890cb27ab2cc4694239f535c582138c9fe4ec78dcfb987ad"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-09-mira-abajo.png": {
+      "rol": "kit:spark/revenue-hubspot/mira-abajo",
+      "sha256": "42e3600d523afb86f82e5530c0ed68663150ee73460e214a8292d5eb993ddebd"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-20-expresion-atento.png": {
+      "rol": "kit:spark/revenue-hubspot/atento",
+      "sha256": "e066775809a62eef9e6ddf26784e52f4f1a5045b641a371d7c1f43036c9820b8"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-21-expresion-trabajando.png": {
+      "rol": "kit:spark/revenue-hubspot/trabajando",
+      "sha256": "3cf4649653dd47b6699928b83f9f78cd0b859f058787a62fd3ffe62c3ab185e9"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/revenue-hubspot/pide-revision",
+      "sha256": "cfc0a6baea7fe33dfad797d66d0d13e21a1ddf62dfcc3b6cce5d13ee8899ddb6"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-23-expresion-listo.png": {
+      "rol": "kit:spark/revenue-hubspot/listo",
+      "sha256": "161bf570ff0580ed601a49ed44ad84ea6847246710fa29bffd3e46c0bd8932ff"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/revenue-hubspot/sorprendido",
+      "sha256": "6437fe459873f68d4fd1c5949a3528021fdf8fca79c266485ce058795a51a674"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-25-expresion-pensando.png": {
+      "rol": "kit:spark/revenue-hubspot/pensando",
+      "sha256": "30f804ed95dc98ccc8beb49b558d2b9c8bd6a851411eaf7615c220d5510c1c9b"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-30-cine-frente.png": {
+      "rol": "kit:spark/revenue-hubspot/cine-frente",
+      "sha256": "a38177fa39ebf33a603db82c2d24a690545aeb425c87e199753045bd9c814d74"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/revenue-hubspot/cine-tres-cuartos",
+      "sha256": "813528f5021e2b47c53711646bbc0135a4495e36e8149497cb9ccee644d55103"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/revenue-hubspot/cine-mira-arriba",
+      "sha256": "07529a53540e462b78caea51fc78a7ec3d07210d5e312ae84fb092f054f19e0e"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-40-accion-volando.png": {
+      "rol": "kit:spark/revenue-hubspot/volando",
+      "sha256": "9bb47e4b41de18f1c17b9e79a4193c2dd12bab936182a082c6bf702f60a2bca9"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-41-accion-senalando.png": {
+      "rol": "kit:spark/revenue-hubspot/senalando",
+      "sha256": "36e0455f99d31a696e8e3509f6c1798cc44322f04d1ba8b817be608ccdfe5061"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/revenue-hubspot/presenta",
+      "sha256": "57a4211bb09a5d775c0328bfb7b3b6a699e0c7a2d657d99c9b4a1e805884e6cf"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/revenue-hubspot/entrega-tarjeta",
+      "sha256": "730da913d329d76b90fc7d1bad37238f5e57acd4c937cef9c08b1cfdce4ae77d"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-hubspot-50-grupo-tres.png": {
+      "rol": "kit:spark/revenue-hubspot/grupo",
+      "sha256": "81514defad16618d2d405a6aafef5b9fbe79077152d842cdd4de71cfe46f26cc"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-01-frente.png": {
+      "rol": "kit:spark/revenue-salesforce/frente",
+      "sha256": "7c392e614949804ed7891be325da2213d50fe1a961dd0f92a2c421404d663c13"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/revenue-salesforce/tres-cuartos-izq",
+      "sha256": "0419fa43ea8ad57322bdc44b290aa98dd7ec579e51bdbda24116866f8cb0a42f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/revenue-salesforce/tres-cuartos-der",
+      "sha256": "af46a5c54bc42c4b5dd811a6fdd3393d12c447918e741d46f3ea73f263a892c7"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-04-perfil.png": {
+      "rol": "kit:spark/revenue-salesforce/perfil",
+      "sha256": "5ab6c8a9f30bd006ac0cdaf130c625eaff064543444b841d82c18849fb8c2fc1"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-10-perfil-derecho.png": {
+      "rol": "kit:spark/revenue-salesforce/perfil-der",
+      "sha256": "6629ee567ab881881344f1859064e08d1a8071fdfdf3c310a1a2698ce6802e9a"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-05-espalda.png": {
+      "rol": "kit:spark/revenue-salesforce/espalda",
+      "sha256": "fcff1af62d828579e125da9e1906cb3b6146a52df5c520695489cd9bd76dd90f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-11-espalda-recta.png": {
+      "rol": "kit:spark/revenue-salesforce/espalda-recta",
+      "sha256": "7a00152224bf2e47e26a38e4b387d624481d13f525c568f716a7a44b29880e83"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/revenue-salesforce/trasero-izq",
+      "sha256": "94a69ad50183999c1c534fdbec46cb9e6b11919b27975ab0b10ec21ef2b7ebe6"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-06-contrapicado.png": {
+      "rol": "kit:spark/revenue-salesforce/contrapicado",
+      "sha256": "ad2ac7c1df3d1771d99db009aa441b02654ccf6aaaed838bd2f377cd78ee6ea0"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-07-picado.png": {
+      "rol": "kit:spark/revenue-salesforce/picado",
+      "sha256": "72fe2b291ce89da0726ecb1e22659501750cff85d540a46d1961a125c77dd6b1"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-08-mira-arriba.png": {
+      "rol": "kit:spark/revenue-salesforce/mira-arriba",
+      "sha256": "d511c66bb31653dc2625a7efbb3dc1b7e30bae2292a795353381c5c96814ef64"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-09-mira-abajo.png": {
+      "rol": "kit:spark/revenue-salesforce/mira-abajo",
+      "sha256": "46685909c2cd1b235c2a1b77180d62cbf9ca5fd7e2cdd52fb15bbf6a0ee57fa9"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-20-expresion-atento.png": {
+      "rol": "kit:spark/revenue-salesforce/atento",
+      "sha256": "ac1c3c475d12051653700c0c975ac0f18f0d953ad509604478da9b8b2407a9bc"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-21-expresion-trabajando.png": {
+      "rol": "kit:spark/revenue-salesforce/trabajando",
+      "sha256": "d8d06cc0cc4c77c9084baec791caf17766d79f1302ab4f818549436ea4644dc7"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/revenue-salesforce/pide-revision",
+      "sha256": "7eea6d6002a197dbf7d0f78af6628e37d26591cd2a0961b7ec7b03564ce01f60"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-23-expresion-listo.png": {
+      "rol": "kit:spark/revenue-salesforce/listo",
+      "sha256": "ec6a27d2f52a96944fbf18d98595cc81474976e4ef5a7695e48fb083c4b2bb0e"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/revenue-salesforce/sorprendido",
+      "sha256": "74ecaebdc1a5ed6bf8ae4f960f1d883c337c59b711324d142e136dd1fdd374b4"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-25-expresion-pensando.png": {
+      "rol": "kit:spark/revenue-salesforce/pensando",
+      "sha256": "91d9deb5cccae3e92f5ae9bf7d283335890d0dec2570f66f06339d72e1e7a297"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-30-cine-frente.png": {
+      "rol": "kit:spark/revenue-salesforce/cine-frente",
+      "sha256": "3109bf17c43c900d0469efcd94e44a18e5dc8c3992a800e10b33538ef1c09a8f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/revenue-salesforce/cine-tres-cuartos",
+      "sha256": "784d0a962a5fac9d02f74da0bf8912bfc61fef42c3f10ea1730d65f337e8c934"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/revenue-salesforce/cine-mira-arriba",
+      "sha256": "6f90920bf77f5dce8f8600b2aed84166314de2d87577b3fb1ebdaefc3dbdf8a2"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-40-accion-volando.png": {
+      "rol": "kit:spark/revenue-salesforce/volando",
+      "sha256": "50b28d8babf1f5655e03e1a1fecd777a5201645cc8ce6cd91a909aaaa51b1630"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-41-accion-senalando.png": {
+      "rol": "kit:spark/revenue-salesforce/senalando",
+      "sha256": "da6d06fa180287880377c934029d4e53510a459ec9b93564741f294816e64418"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/revenue-salesforce/presenta",
+      "sha256": "0d62c8379702b9243acbb4fc06faecabcccf1054d4759496e4368846fb61bf3f"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/revenue-salesforce/entrega-tarjeta",
+      "sha256": "2cc128ca7f75825b8abb20e0731fefaf7dd8b440a16f863fda51b6bbe42f6294"
+    },
+    "ai-generations/2026-10-01_sparks/lineas-transparente/spark-revenue-salesforce-50-grupo-tres.png": {
+      "rol": "kit:spark/revenue-salesforce/grupo",
+      "sha256": "c837c7c372e0e298fc06bf58ba12d9853cb5a67c31c65e46ad048e63bdb4a3cd"
     },
     "ai-generations/2026-10-01_sparks/plantel-transparente/spark-investigacion-01-heroe.png": {
       "rol": "kit:spark-investigacion/heroe",

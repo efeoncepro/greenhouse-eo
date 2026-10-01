@@ -244,6 +244,10 @@ corrida: `ai-generations/2026-10-01_sparks/LEEME.md`. Diferencias con una mascot
   editadas viven en `fuente-recorte/`. Es el reverso de la trampa de Gigi: allá se cambia el tono del
   prop en la generación, acá el fondo antes del matting. En «volando» la estela no sobrevive al recorte: queda sólo en
   la versión de estudio.
+- **Variante de color por línea: editar la luz, no regenerar.** El color de una línea se obtiene editando la vista
+  aprobada y pidiendo cambiar SÓLO el color de toda la luz (ojos, sonrisa, ventanas, antena, costuras, brillo) con el
+  cuerpo blanco neutro y el estudio frío; para el transparente se recolorea la fuente gris de `fuente-recorte/` y se
+  recorta desde ahí. Se declara en el catálogo con `patronPorColor` (`colorDefecto: 'engine'`).
 - **Catálogo completo desde el día uno:** `spark` (26 vistas), una entrada por Spark del plantel (5 vistas cada una)
   y `sparks-plantel`, todas en `OBJETOS` de `scripts/foto/build-prompt.mjs`; se sellan con `pnpm foto:assets:lock` (ver
   «Declarar TODAS las vistas»).

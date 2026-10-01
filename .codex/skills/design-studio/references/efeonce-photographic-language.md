@@ -691,6 +691,9 @@ fichas: [`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.
   un Spark (las negaciones como «no robots» se ignoran), y aborta un Spark con `registro: "documental"` o con una
   palanca documental (`escucha`, `manos`, `sombra`, `silueta`, `marcado`, `quien-sostiene`). Medida sobre 301 fichas:
   frena 13, todas con robots escritos a mano, sin falsos positivos.
+- **Color por línea** (aprobado 2026-10-01): el Spark base admite `"color"` con el acento de la línea (`engine`
+  —defecto, azul—, `growth`, `brand`, `voice`, `revenue-hubspot`, `revenue-salesforce`); sólo en piezas de esa línea.
+  Brand y Voice son cálidos: probarlos en cine antes de una foto oscura. Detalle: `SPARKS_V1.md` §6.1.
 - Las fotos aprobadas que todavía llevan robots genéricos (`NX5b` y derivadas, la destacada «Agents» `PH7`) se
   regeneran con Sparks sólo si el operador lo decide.
 

@@ -72,6 +72,11 @@ En la `escena`, ubícalo respecto de la persona y dale una acción, pero **no lo
 palabras: el catálogo ya trae su forma exacta. Fichas de ejemplo con Nexa (hombro, palma, escritorio, entrega):
 `ai-generations/2026-10-01_sparks/fichas/SPK-E1-hombro.json` a `SPK-E4-entrega.json`.
 
+**Si la pieza es de una línea de negocio**, puedes pedir el Spark base con el LED en el acento de esa línea con el
+campo `color`: `engine` (defecto, azul), `growth`, `brand`, `voice`, `revenue-hubspot` o `revenue-salesforce`. Por
+ejemplo `{ "objeto": "spark", "vista": "mira-arriba", "color": "growth" }`. Brand y Voice (cálidos) pruébalos primero en
+una foto oscura. Detalle en [`SPARKS_V1.md` §6.1](../../operations/brand-characters/SPARKS_V1.md).
+
 ### Paso 4 · Respeta la escala
 
 Nunca más grande que la cabeza de la persona y siempre por encima de la cintura: sobre el hombro, junto a la cabeza,

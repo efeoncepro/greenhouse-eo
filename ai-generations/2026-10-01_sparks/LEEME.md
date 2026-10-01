@@ -35,6 +35,23 @@ Sobre el hombro · sobre la palma y el antebrazo · en el escritorio · entregá
 más grande que la cabeza de la persona, siempre por encima de la cintura**. Nexa con la chaqueta del uniforme; bordado
 verificado al 100 %.
 
+## Por línea de negocio (aprobado 2026-10-01: «Aprobados todos»)
+
+El **mismo** Spark con el LED en el acento de cada línea, en la carpeta «Por línea»: las 26 vistas con fondo
+transparente y frente y tres cuartos con fondo de estudio. Engine (el azul de las carpetas de arriba) es el defecto; las
+demás se usan sólo en piezas de esa línea.
+
+| Carpeta | Línea | Acento |
+|---|---|---|
+| `growth` | Growth | `#36C8BF` |
+| `brand` | Brand | `#FF6500` |
+| `voice` | Voice | `#F83902` |
+| `revenue-hubspot` | Revenue HubSpot | `#E86BD0` |
+| `revenue-salesforce` | Revenue Salesforce | `#2FB8FF` |
+
+En `foto:prompt`: `{ "objeto": "spark", "vista": "…", "color": "growth" }`. Brand y Voice son cálidos: pruébalos en una
+foto oscura antes de usarlos ahí. Salesforce casi no se distingue de Engine en un LED pequeño.
+
 ## Cómo usarlo
 
 En una foto de marca el Spark se declara desde el catálogo (`"objetos": [{ "objeto": "spark", "vista": "…" }]` en la

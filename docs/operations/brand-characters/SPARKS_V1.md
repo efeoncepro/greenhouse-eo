@@ -1,7 +1,7 @@
 # Sparks V1 — los agentes de Efeonce
 
 > **Tipo de documento:** Especificación canónica de marca (personajes)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-10-01 por Claude
 > **Última actualización:** 2026-10-01 por Claude
 > **Estado:** nombre, plantel y relato aprobados por el operador (Julio Reyes) el 2026-09-29; diseño elegido y Spark
@@ -133,6 +133,34 @@ forma exacta desde la imagen de referencia y lleva en su instrucción la escala 
 Las cuatro escenas de escala con Nexa (`ai-generations/2026-10-01_sparks/fichas/SPK-E1` a `SPK-E4`: hombro, palma y
 antebrazo, escritorio, entrega de tarjeta) son las fichas de ejemplo: registro cine, Nexa con la chaqueta del
 uniforme y el bordado verificado al 100 % **[medido]**.
+
+### 6.1 El Spark en el color de una línea de negocio **[operador, 2026-10-01: «Aprobados todos»]**
+
+El **mismo** Spark puede llevar el LED en el acento de una línea de negocio (tokens `efeonceGraphicLine.lines`): no es
+un personaje nuevo ni cambia el plantel, sólo el color de toda su luz —ojos, sonrisa, ventanas, antena, costuras y el
+brillo bajo la esfera—, siempre de un solo color. El azul de **Engine** (`#0375DB`) es el defecto.
+
+| Línea | Acento | `color` en la ficha |
+|---|---|---|
+| Engine (defecto) | `#0375DB` | `engine` |
+| Growth | `#36C8BF` | `growth` |
+| Brand | `#FF6500` | `brand` |
+| Voice | `#F83902` | `voice` |
+| Revenue HubSpot | `#E86BD0` | `revenue-hubspot` |
+| Revenue Salesforce | `#2FB8FF` | `revenue-salesforce` |
+
+```json
+"objetos": [{ "objeto": "spark", "vista": "mira-arriba", "color": "growth" }]
+```
+
+- **Sólo cuando la pieza es de esa línea**; en cualquier otra, el azul de Engine.
+- **Brand y Voice son cálidos:** en estudio no tiñen la escena, pero en una foto cine oscura el LED puede llevar la cara
+  de la persona al ámbar (la trampa de la criatura cálida, `.claude/rules/brand-photography.md`). Se prueban en cine
+  antes de usarse en una foto oscura.
+- **Salesforce y Engine casi no se distinguen** en un LED pequeño (celeste contra azul): en una pieza de Salesforce, el
+  Spark no carga la identificación de la línea; la pieza la da por otro lado. Lo mismo, en menor medida, Brand y Voice.
+- Disponible para las 26 vistas del Spark base (transparentes en `ai-generations/2026-10-01_sparks/lineas-transparente/`);
+  el plantel de cinco sigue en azul.
 
 ## 7. La guarda contra robots
 
