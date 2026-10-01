@@ -1,6 +1,37 @@
 # SKY: producir una campaña y sus adaptaciones
 
-## Corte productivo probado — 2026-09-30
+## Producción con las correcciones Figma — 2026-09-30
+
+La unidad Workbench integrada en main por PR14 (`be57032`) incorpora las correcciones contrastadas contra las
+126 referencias Figma independientes. `marca:disenar` y el driver de `marca:lote` usan
+el mismo adapter modular corregido. No son reparaciones manuales que deba repetir el
+agente en cada campaña. Consultar [components.md](components.md) y, en Workbench,
+`docs/manual/native-design.md`, sección «Producir después de una corrección del motor».
+
+Alcance: doce instancias de logo, 105 flechas, contornos circulares/máscaras, CYBERSKY,
+metadata de fuente y límites de tinta por fuente exacta. QA registra las recetas aplicadas,
+incluidos `sourceFontRecipes` y `sourceInkRecipes`. Las 27 admisiones de tinta no permiten
+ampliar la caja ni tolerar copy más largo; conservan únicamente el límite de la fuente
+sellada. Multilínea usa baseline real. La URL legal canónica prefiere `/` y `-` como
+separadores de wrap, sin eliminar caracteres ni cambiar pesos. No pasar overrides al job.
+
+Verificar que el checkout contiene esta unidad o un sucesor integrado antes de producir.
+Una corrección posterior local no demuestra push/merge ni que el equipo ya la recibió. Tokens, fuentes,
+assets y pack `sky-airline@0.1.0` conservan sus sellos; estas correcciones de código no
+requieren publicar un paquete nuevo ni cambiar el broker para componer.
+
+Preparar jobs completos con nuevo copy y fotografía explícita; validar, ejecutar y revisar
+PNG/QA por adaptación. Para sustituir muestras antiguas, crear corridas nuevas y actualizar
+su selección del Lab después de revisarlas. No editar UUIDs cerrados ni reanudar lotes
+pendientes con el digest anterior: revisar y preparar de nuevo. El Lab conserva cuatro
+muestras productivas anteriores; las 126 proyecciones reparadas no las regeneran.
+
+La comparación final produjo 126 renders, cero rechazos y revisión técnica por nodo.
+Ese resultado de mantenimiento reemplaza el diagnóstico histórico de 95/31 citado abajo;
+no garantiza fit de cualquier copy nuevo ni aprobación comercial. Se verificaron 305
+pruebas locales sin SKIP. Evidencia y límites en [state-continuity.md](state-continuity.md).
+
+## Histórico: corte productivo probado — 2026-09-30
 
 El [PR 8 de producción](https://github.com/efeoncepro/creative-workbench/pull/8) se fusionó
 en main con commit `c26d8afcad9a573bf6e2299a8ecf4e88783843ae` el 2026-09-30; los checks
@@ -189,8 +220,9 @@ coordenadas para fabricar horizontales/verticales. Reutilizar contenido comercia
 como dato del brief, pero asignarlo explícitamente a cada campo del formato.
 
 `pnpm sky:design-audit projects/sky/always-on-pipeline-proof` diagnostica cobertura del canon
-instalado en memoria; no produce, autoriza ni asegura fit de un copy nuevo. El histórico tenía
-95 copys shapeados y 31 rechazados; no confundir 126 planes compatibles con 126 ofertas válidas.
+instalado en memoria; no produce, autoriza ni asegura fit de un copy nuevo. El reporte histórico
+tenía 95 copys shapeados y 31 rechazados antes de las correcciones; la comparación posterior
+indicada al inicio renderizó las 126 referencias. Ninguno certifica 126 ofertas nuevas válidas.
 Para un lote autorizado, enumerar resultados y fallos por ID. No rellenar formatos fallidos
 con otra marca/fuente o declararlos “traídos” sólo porque su miniatura existe.
 

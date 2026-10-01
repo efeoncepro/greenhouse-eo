@@ -1,5 +1,28 @@
 # Corte de continuidad: 2026-09-30
 
+## Componentes autónomos — unidad local 2026-10-01
+
+Goal autorizado: completar componentización/tokenización SKY en Workbench. Rama
+`codex/sky-autonomous-components` desde main PR14 `be57032`; contrato y manual propios allí.
+11.096 instancias/1.196 campos/126 variantes; 193.920 recibos de propiedades de producción.
+4.996 bindings fills/strokes originales verificables; 4.684 conservados en escenas productivas
+efectivas. Resto derivado nativo, sin inferencias ni cambio del pack/tokens originales.
+
+El pipeline recompone las definiciones/instancias/tokens antes de copy/foto. Nuevos readers:
+componentes/descomponer/extraer/recomponer; ver [autonomous-components.md](autonomous-components.md).
+Privado 326 harness + 7 SKY + 11 Lab = 344 PASS, cero SKIP; público 303 PASS/30 SKIP exactos.
+126 PNG/SVG idénticos a comparison-final-02; auditoría final SHA
+`2dd4e9b5426b836e8b5366c40333ad187f91fa94714dc36aa3ad79c4f371db84`.
+Prueba real con copy nuevo y foto histórica declarada, UUID
+`6f287c46-574a-49a3-9351-51fc259f9f1e`; cero proveedores, sin aprobación comercial.
+Foto nueva con slots/guards se probó mediante fixture, no mediante generación pagada nueva.
+
+Contratos 0.2.0 preparados localmente (compiler/bindings/tokens), no publicados.
+Código commiteado y pusheado en `1d48c26`; [PR15 draft](https://github.com/efeoncepro/creative-workbench/pull/15)
+abierto sobre main. No merge, Packages, broker, Efeonce ID ni UI nuevos de esta unidad.
+La apertura del PR no confirma CI ni publicación Vercel; verificar sus estados live.
+No interpretar la prueba como campaña lista para entregar ni sobreescribir WIP ajeno del Lab.
+
 ## Exportación REST independiente completa — 2026-09-30 (Chile)
 
 El operador autorizó guardar su nuevo PAT en Secret Manager de Workbench. Se creó

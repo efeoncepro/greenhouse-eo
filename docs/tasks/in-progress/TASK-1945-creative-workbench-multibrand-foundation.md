@@ -21,13 +21,22 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Corte 2026-09-30: harness nativo y lotes PR 11 integrados; contornos PR 12 en main 2bb761a. Skill Codex/Claude espejada y routers preparados para publicación aislada. Onboarding completo del equipo y runtime IA siguen pendientes; Efeonce ID diferido en TASK-1952, sin AUTH paralelo. No ejecutar sync total heredado ni alterar CLIs Greenhouse.`
+- Status real: `Corte 2026-10-01: baseline Workbench PR14 en main be57032. Goal local de componentes autónomos SKY sobre rama codex/sky-autonomous-components: 126 árboles y renders exactos; privado 344 PASS, público 303 PASS/30 SKIP. Lectores, descomposición/extracción/roundtrip, tokens de propiedades y pipeline modular verificados; contratos 0.2.0 preparados sin publicación; código 1d48c26 commiteado/pusheado en PR15 draft sin merge. Onboarding completo del equipo y runtime IA siguen pendientes; Efeonce ID diferido en TASK-1952, sin AUTH paralelo. No ejecutar sync total heredado ni alterar CLIs Greenhouse.`
 - Rank: `1`
 - Domain: `platform|tooling|content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 
 ## Continuidad documental — 2026-09-30 (corte posterior a PR 12)
+
+### Delta local 2026-10-01: componentes autónomos
+
+Arquitectura y triple documentación pertenecen a Workbench: `workbench-sky-autonomous-components.md`,
+`docs/documentation/autonomous-components.md`, `docs/manual/autonomous-components.md`.
+Skill Codex/Claude añade `references/autonomous-components.md`. Se conserva el ADR de aislamiento;
+no se cambia fuente de recursos, pack, broker ni CLIs Greenhouse. Evidencia detallada en
+HARNESS_STATUS de Workbench y continuidad de la skill. La task permanece in-progress por su
+rollout/alcance superior; pruebas locales no cierran onboarding/IA/Efeonce ID/distribución.
 
 Consultar el [estado fechado del Workbench](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
 para código, evidencia y pendientes. Los cortes de PR 7/canary de identidad y cifras anteriores

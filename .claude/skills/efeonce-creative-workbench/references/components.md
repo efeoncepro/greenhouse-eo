@@ -16,6 +16,11 @@ en componentes semánticos sin duplicar dibujo. Los 1196 campos de las 126 escen
 exactamente un módulo responsable, incluido CTA. Un footer ausente no aparece por herencia.
 Plan y QA exponen `components`, `contentSlots` y `nativeInstances`.
 
+La unidad local 2026-10-01 añade la representación ejecutable de cada capa, definiciones,
+tokens tipados, assets y recetas. Consultar [autonomous-components.md](autonomous-components.md)
+para readers/export/extracción/roundtrip y evidencia de bindings. No confundir el grafo semántico
+anterior con esa biblioteca estructural, ni una implementación local con disponibilidad en main.
+
 La variante es la escena realmente admitida, con jerarquía, orden, placement, clips, masks y
 paints originales. El job cambia contenido, no define módulos ejecutables ni geometría nueva.
 El grafo no concede acceso ni demuestra que el copy actual o la foto elegida sean adecuados.
@@ -39,7 +44,7 @@ El grafo no concede acceso ni demuestra que el copy actual o la foto elegida sea
 
 Los entrypoints antiguos `adaptations/*-repairs.mjs`, `cta-recipes.mjs`, `text-recipes.mjs` y
 `production-template.mjs` exportan compatibilidad, sin segunda lógica. `render-design.mjs`
-orquesta ensamblado, grafo, contenido, foto, renderer y contraste. Los trece módulos participan
+orquesta ensamblado, compilación/recomposición modular, contenido, foto, renderer y contraste. Los módulos participan
 de `skyComponentModulePaths`, del SHA del adapter y de auditorías; cambiar uno exige nueva corrida.
 
 ## Bugs y solución causal

@@ -34,6 +34,7 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 | Crear una campaña SKY, cambiar imagen/copy, obtener todos los formatos | [sky-production.md](references/sky-production.md) |
 | Producir o evaluar fotografía SKY, blur, cielo, color y reservas de texto | [sky-photography.md](references/sky-photography.md) y skill original admitida de SKY |
 | Componer por módulos, corregir logo/flecha/CTA/texto/máscara/círculos | [components.md](references/components.md) |
+| Inspeccionar cada capa, tokens/bindings, descomponer, extraer o reconstruir SKY por receta | [autonomous-components.md](references/autonomous-components.md) |
 | Identificar una composición nombrada, leer su receta y producir adaptaciones por lotes de agentes | [recipes.md](references/recipes.md) |
 | Usar, mantener o presentar el Lab premium Astro/TS/Tailwind, Efeonce + cliente | [lab.md](references/lab.md) |
 | Instalar canon, consumir/publicar paquetes, broker, archivo y Vercel | [operations-distribution.md](references/operations-distribution.md) |
@@ -84,6 +85,7 @@ ambos bundles, links internos y registro del router sin modificar archivos ni ll
 Este chequeo específico cubre la skill nueva; no atribuir su cobertura al allowlist histórico
 de `pnpm skills:mirrors` mientras no se haya registrado allí.
 
-Esta versión documental ya sirve para continuar el trabajo. El cierre productivo global,
-la fidelidad Figma de todas las piezas y el onboarding de cada persona siguen pendientes según
-el corte fechado; verificar su situación antes de actuar.
+Esta versión documental ya sirve para continuar el trabajo. La comparación técnica de las
+126 referencias está registrada; no aprueba campañas nuevas. Verificar el corte fechado y
+el checkout activo: distribución del código, cierre productivo global y onboarding de cada
+persona conservan sus propios estados.
