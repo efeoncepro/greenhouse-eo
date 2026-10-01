@@ -5,9 +5,9 @@
 > **Creado:** 2026-10-01 por Claude
 > **Última actualización:** 2026-10-01 por Claude
 > **Estado:** nombre, plantel y relato aprobados por el operador (Julio Reyes) el 2026-09-29; diseño elegido y Spark
-> base aprobado el 2026-10-01 («Me encanta»). Kit producido (Spark base v02 y plantel v01) y catálogo de `foto:prompt`
+> base aprobado el 2026-10-01 («Me encanta»). Kit producido (Spark base v02 y plantel v01, aprobado el 2026-10-01: «Aprobados») y catálogo de `foto:prompt`
 > con guarda contra robots. Sin publicar en AXIS; sin prueba de reconocimiento.
-> **Task:** [TASK-1941](../../tasks/to-do/TASK-1941-sparks-agent-ops-characters.md)
+> **Task:** [TASK-1941](../../tasks/complete/TASK-1941-sparks-agent-ops-characters.md)
 > **Documentación relacionada:** [Lenguaje fotográfico](../brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) ·
 > [Registro cine](../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) ·
 > [Ficha de Nexa](../brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md) ·

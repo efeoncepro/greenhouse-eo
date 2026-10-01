@@ -1,5 +1,12 @@
 # TASK-1941 — Sparks: los agentes de Agent Ops como personajes propios de la marca
 
+## Delta 2026-10-01 (c) — cierre
+
+- El operador aprobó el plantel («Aprobados»). Gate de cierre: `pnpm test` completo en verde (1944 archivos de prueba,
+  66 omitidos); `scripts/foto` 777 pruebas. `pnpm build` no se corrió: el cambio vive en el CLI local `foto:prompt` y
+  en docs (Build impact `none`, fuera del bundle de Next y de los workers) y el build completo exige ~30 GB en esta
+  máquina.
+
 ## Delta 2026-10-01 (b) — Slices 1–5 ejecutados («Termina todos los pendientes»)
 
 - **Plantel (Slice 3):** los cinco Sparks con accesorio físico y gesto —investigación (lupa al costado), contenido
@@ -51,7 +58,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -63,7 +70,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Diseno — dirección B + ventanas de C elegida y Slices 1–5 ejecutados el 2026-10-01; falta sólo que el operador apruebe el plantel de cinco`
+- Status real: `Diseno — dirección B + ventanas de C elegida y Complete 2026-10-01 — Slices 1–5 ejecutados y plantel aprobado por el operador («Aprobados»)`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -316,8 +323,8 @@ Reglas obligatorias (decisiones del operador del 2026-09-29):
 
 ## Acceptance Criteria
 
-- [ ] El operador eligió una dirección y aprobó la hoja de modelo de los cinco Sparks. (Parcial 2026-10-01: dirección elegida —B + ventanas de C— y Spark base aprobado («Me encanta»); el plantel de cinco está producido y entregado, **pendiente de su aprobación**.)
-- [ ] Cada Spark tiene giro, expresiones y biblioteca de poses en fondo de estudio y transparente. (Parcial: el Spark base tiene 26 vistas —giro completo, 6 expresiones, cine, acciones, grupo— y 4 escenas con Nexa; cada uno de los cinco tiene 5 vistas —héroe, frente, tres cuartos derecha, mira arriba, cine—. Las expresiones son del cuerpo común y sirven a los cinco; una biblioteca por Spark se amplía si el operador la pide tras aprobar el plantel.)
+- [x] El operador eligió una dirección y aprobó la hoja de modelo de los cinco Sparks. (Parcial 2026-10-01: dirección elegida —B + ventanas de C— y Spark base aprobado («Me encanta»); el plantel de cinco, aprobado el mismo día: «Aprobados».)
+- [x] Cada Spark tiene giro, expresiones y biblioteca de poses en fondo de estudio y transparente. (Parcial: el Spark base tiene 26 vistas —giro completo, 6 expresiones, cine, acciones, grupo— y 4 escenas con Nexa; cada uno de los cinco tiene 5 vistas —héroe, frente, tres cuartos derecha, mira arriba, cine—. Las expresiones son del cuerpo común y sirven a los cinco; una biblioteca por Spark se amplía si el operador la pide; el plantel tal como está fue aprobado.)
 - [x] Ningún Spark tiene un parecido señalado con personajes de terceros en la revisión del Slice 1. (El diseño de «Agents», parecido a Astro Bot, se descartó; el elegido flota sin piernas ni casco y lleva chispa, órbita y ventanas de la marca.)
 - [x] `foto:prompt` resuelve los cinco Sparks por catálogo y aborta cuando una escena describe robots sin declarar un Spark. (`spark`, `spark-{investigacion,contenido,crm-datos,servicio,reportes}`, `sparks-plantel`; guarda `validarRobots`: frena 13 de 301 fichas existentes, todas con robots a mano, y un Spark documental; `scripts/foto` 777 pruebas en verde.)
 - [x] `scripts/foto/assets.lock.json` quedó resellado y `pnpm foto:assets:check` pasa. (2026-10-01: 226 assets, con las 26 vistas del Spark base y las 26 del plantel.)
@@ -333,12 +340,12 @@ Reglas obligatorias (decisiones del operador del 2026-09-29):
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [x] TASK-1926, TASK-1931 y TASK-1925 quedaron con delta: los agentes se declaran como Sparks por catálogo
 
