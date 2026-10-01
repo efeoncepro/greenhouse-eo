@@ -1,5 +1,24 @@
 # TASK-1941 — Sparks: los agentes de Agent Ops como personajes propios de la marca
 
+## Delta 2026-10-01
+
+- **Dirección de diseño elegida por el operador (adelanto de los Slices 1–2):** pidió ángulos aislados de los Sparks
+  para componerlos con Nexa y en casting. Ante la tensión con el diseño de la destacada «Agents» (parecido a Astro Bot)
+  eligió «Agents refinado» y, entre tres refinamientos (A la marca en la cara, B la órbita, C la nave), **B + las tres
+  ventanas de C**: esfera blanca que flota sin piernas, visor navy con dos ojos y sonrisa en arco de LED azul, la chispa
+  del Nexa Mark como antena, anillo de órbita inclinado con su esfera y tres ventanas en la panza; sólo blanco, navy
+  `#001A33` y azul `#0375DB`.
+- **Spark base v01 producido:** dos vistas base y nueve ángulos (frente, tres cuartos izquierda y derecha, perfil,
+  espalda, contrapicado, picado, mira arriba, mira abajo) a 1600 px, con fondo de estudio y transparente. Trabajo en
+  `ai-generations/2026-10-01_sparks/` (prompts versionados, imágenes fuera de git); entrega en OneDrive
+  `5. Contenidos/13- Branding/Sparks/2026-10 Spark base/v01/` con LEEME y manifiesto. Costo ≈ USD 1,3.
+- **Lección del recorte:** el blanco del cuerpo en sombra queda del gris del fondo de estudio y el matting lo vuelve
+  semitransparente (100–200 mil píxeles en espalda y contrapicado). Se corrigió editando la fuente a fondo gris medio
+  `#7F7F7F` antes de recortar (≈ 20 mil píxeles, sólo el borde).
+- **Sigue pendiente:** la hoja de modelo formal, el plantel de cinco con accesorio y gesto, expresiones, poses con una
+  persona, entrada de catálogo con la guarda contra robots, `SPARKS_V1.md` y la revisión de colisión del nombre. La task
+  sigue en `to-do` hasta tomar esos slices.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -20,7 +39,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Diseno`
+- Status real: `Diseno — dirección B + ventanas de C elegida y Spark base v01 producido (2026-10-01)`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
