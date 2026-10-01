@@ -1,6 +1,16 @@
 # SKY Airline — decisiones del operador
 
-## Identidad del Workbench — corte 2026-09-30
+## Continuidad posterior — 2026-09-30
+
+El operador priorizó producción por agentes; Efeonce ID definitivo queda diferido en TASK-1952,
+sin otro AUTH. Workbench PR 11 (lotes) y PR 12 (contornos) están integrados; el
+[estado vigente fechado](../../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
+separa ese código de la candidata de identidad y del runtime. El bloque de identidad siguiente
+preserva una observación previa: su token pendiente, identity404 y «sin PR» no son estado actual.
+La corrección circular conserva trazados de fuente; no modifica los dos pins de máscara ni
+actualiza outputs de corridas antiguas. Nuevas marcas y miembros mantienen admisión explícita.
+
+## Histórico: identidad del Workbench — corte inicial 2026-09-30
 
 El harness es multimarcas; la App de autoridad pertenece al Workbench, no a SKY. Julio
 confirmó creada/instalada `efeonce-workbench-authority`: App **5138627**, instalación

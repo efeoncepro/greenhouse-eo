@@ -21,11 +21,19 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `GH docs ccabbbf1 y95125d8a6 sin push; WB PR 7 draft/head2629ab4e, cinco checks SUCCESS; candidata00010-cof READY/0%,00008-tv6 al100%; canary real9/9 y primer mint/scope/revocación medidos; privado310 PASS,público292 PASS/18 SKIP; OAuth propio y tres bindings/IAM pendientes; IA OFF, sin paid calls/merge/promoción`
+- Status real: `Corte 2026-09-30: harness nativo y lotes PR 11 integrados; contornos PR 12 en main 2bb761a. Skill Codex/Claude espejada y routers preparados para publicación aislada. Onboarding completo del equipo y runtime IA siguen pendientes; Efeonce ID diferido en TASK-1952, sin AUTH paralelo. No ejecutar sync total heredado ni alterar CLIs Greenhouse.`
 - Rank: `1`
 - Domain: `platform|tooling|content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
+
+## Continuidad documental — 2026-09-30 (corte posterior a PR 12)
+
+Consultar el [estado fechado del Workbench](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
+para código, evidencia y pendientes. Los cortes de PR 7/canary de identidad y cifras anteriores
+registrados abajo son historia; no obligan a terminar OAuth propio antes de componer ni acreditan
+rollout nuevo. Esta publicación documental no mueve la task a complete.
+
 
 ## Summary
 
@@ -109,7 +117,7 @@ excepciones al sello; la reconciliación con el control plane sigue separada.
 
 - Topology impact: `tooling`
 - Current home: `creative-workbench/tools/` (checkout propio)
-- Future candidate home: `harness nativo de Creative Workbench`
+- Future candidate home: `remain-shared`
 - Boundary: `preflight neutral; consumidores CLI del workbench`
 - Server/browser split: `Node filesystem; sin browser ni runtime portal`
 - Build impact: `Node puro; sin dependencias nuevas`
