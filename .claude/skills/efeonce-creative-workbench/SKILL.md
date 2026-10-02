@@ -10,7 +10,20 @@ Guía operativa viva del harness compartido. Su implementación pertenece al rep
 SKY es el primer cliente habilitado, no el alcance completo del espacio. Todo el equipo puede
 trabajar para todas las marcas; cada ejecución tiene una sola identidad visual explícita.
 
-## SKY: feedback corregido localmente — 2026-10-01
+## SKY: composición v7 corregida contra Figma — 2026-10-01
+
+Contenido `designer-rules@1.6.0` y destino `content-flow@1.3.0` (commit local Workbench `695b701`,
+sin push). Cada `footer-legal` sigue la alineación de su texto fuente sellado (56 CENTER, 6 LEFT;
+antes 54 quedaban LEFT). El origen y los seguidores del destino siguen la **caja de línea** efectiva
+más el gap admitido, como el autolayout de Figma (antes, la tinta: badge pegado a ciudades de una
+línea); acercamiento acotado al piso de tinta sólo si cruza el borde admitido. 3311 se re-centra en
+su frame. Las 42 pilas simples alinean la fila moneda+importe al eje de badge/condiciones. La doble
+moneda usa el gap de tinta nativo. El estilo oración preserva PEN, BRL, ARS, UYU, `US$`, `R$`, `S/`, `$U`.
+No cambiaron las condiciones 8 px dentro de la flecha en 160×600 (regla 1.1.0 del operador).
+Export `prueba-modular-24-v7`; [handoff](references/layout-feedback-handoff.md) y auditoría Workbench
+`docs/audits/sky-layout-correction-v7-2026-10-01.md`. Aceptación del operador pendiente.
+
+## SKY: feedback corregido localmente (corte anterior v6) — 2026-10-01
 
 Contenido `designer-rules@1.5.0` y destino `content-flow@1.2.0` en Workbench.
 **TODOS los 76 badges tarifarios** usan ancla LEFT (42 pilas simples + 34 Tags complejos/dobles),

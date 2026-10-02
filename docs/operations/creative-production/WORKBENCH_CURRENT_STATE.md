@@ -1,6 +1,6 @@
 # Creative Workbench — continuidad operativa vigente
 
-Corte: 2026-10-01. Fuente activa: [`efeoncepro/creative-workbench`](https://github.com/efeoncepro/creative-workbench),
+Corte: 2026-10-01 (v7 local). Fuente activa: [`efeoncepro/creative-workbench`](https://github.com/efeoncepro/creative-workbench),
 main `7e4c6177992785c02430dd238c267991e097c4c9` (PR 17). Este documento separa capacidades
 integradas, pruebas fechadas y trabajo pendiente; verificar el runtime al ejecutar, porque un merge no acredita
 por sí solo flags, presupuesto, permisos o un despliegue del broker.
@@ -8,7 +8,17 @@ por sí solo flags, presupuesto, permisos o un despliegue del broker.
 **Acceso vigente:** [sitio sin login, autorizado y verificado](WORKBENCH_LAB_ACCESS_STATE.md).
 El alias sirve una publicación posterior al corte PR17 de abajo; los readbacks protegidos son históricos.
 
-## Corrección SKY local — verificada, aceptación visual pendiente
+## Corrección SKY v7 — commit local, aceptación visual pendiente
+
+2026-10-01. Contenido `1.6.0` y destino `1.3.0` en Workbench (`695b701` sobre `codex/lab-efeonce-favicon`,
+sin push ni deploy). Revisión de las 24 piezas v6 contra Figma: 54 pies legales vuelven a CENTER según
+su fuente sellada; el origen del destino sigue la caja de línea como el autolayout (antes la tinta);
+3311 se re-centra; eje común en las 42 pilas tarifarias simples; gap nativo de doble moneda; estilo
+oración que preserva las monedas de venta SKY. 24 runs nuevos, cero proveedores, export
+`prueba-modular-24-v7` (PDF de 25 páginas). Harness 392/392, SKY 10/10 y cuatro gates PASS.
+Canon Workbench: `docs/audits/sky-layout-correction-v7-2026-10-01.md`. Datos ficticios; sin aprobación comercial.
+
+## Corrección SKY local v6 — verificada, aceptación visual pendiente
 
 2026-10-01. Contenido `1.5.0` y destino `1.2.0` corrigen el feedback posterior:
 los 76 badges tarifarios (42 pilas simples y 34 complejos/dobles) se anclan a la izquierda

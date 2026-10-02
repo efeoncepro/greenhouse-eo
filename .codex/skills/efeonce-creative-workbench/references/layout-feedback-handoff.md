@@ -1,5 +1,29 @@
 # SKY: feedback de alineación y corrección local
 
+## Corte v7 — 2026-10-01 (vigente)
+
+**Status real: implementado, verificado y commiteado localmente en Workbench (`695b701`); aceptación del operador pendiente.**
+Revisión pieza a pieza de v6 contra los PNG de Figma. Reglas derivadas de la fuente sellada:
+
+- `footer-legal`: alineación = `text.align` de la fuente (`alignmentSource: sealed-source-text-align`);
+  56 CENTER, 6 LEFT. Condiciones siguen LEFT.
+- Destino 1.3.0: primera línea en el baseline nativo escalado; origen/seguidores en
+  `líneas × interlineado + gap` (QA `lineBox`). Con copy fuente reproduce Figma (2698 → 140, 2707 → 220).
+  Si cruza `maxFlowBottom` o la fila 2668, `flowPull`/`originPull` acercan sólo el excedente con piso
+  tinta + gap. 3311 único `horizontalFrame: parent-center`.
+- 42 pilas simples: `priceRowAlignment: fare-left-axis` (reemplaza «la fila se centra»).
+- Doble moneda: `nativeInkGap` por pareja (3,9/3,3 px a 28 px; 11,7/10,3 px a 120 px), con mínimo 1 px
+  si el medio no tiene espacio. SKY vende en USD, CLP, PEN, BRL, ARS y UYU: el estilo oración preserva
+  códigos y símbolos (`US$`, `R$`, `S/`, `$U`).
+- No cambiar sin pedido: condiciones 8 px dentro de la flecha en 160×600 y badge de origen en dos líneas.
+
+Evidencia: 24 runs nuevos sin proveedores (un duplicado de diagnóstico de 05 no seleccionado),
+19 PNG cambian y 5 son idénticos a v6; harness 392/392, sky 10/10, gates PASS; PDF v7 de 25 páginas
+rasterizado y revisado. Canon `sky-airline/2026-10-01/prueba-modular-24-v7/` y `layout-correction-v7/`
+(mapa de selección e historia previa). `projects/sky/prueba-modular-24-adaptaciones/` sigue fuera de Git.
+
+## Corte v6 (histórico)
+
 **Status real: corregido en componentes del Workbench; pendiente aceptación visual del operador.**
 El pedido posterior «Corrígela en TODAS» amplió el alcance a los 76 badges tarifarios admitidos,
 no sólo al 2611 inicial. Contenido 1.5.0 / destino 1.2.0. Export v6 conserva v3/v4/v5.
