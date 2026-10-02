@@ -26,6 +26,8 @@ export interface InsightModuleCopy {
   readonly label: string
   /** Nombre dentro del título de un informe que junta módulos («Visibilidad orgánica y respuestas de IA»). */
   readonly inTitle: string
+  /** TASK-1962 — nombre de navegación y filtro del informe web («SEO», «Respuestas de IA»). */
+  readonly navLabel: string
 }
 
 export const GH_INSIGHTS = {
@@ -61,9 +63,9 @@ export const GH_INSIGHTS = {
   } as Readonly<Record<string, string>>,
 
   modules: {
-    seo: { title: 'Visibilidad orgánica', label: 'Visibilidad orgánica', inTitle: 'visibilidad orgánica' },
-    aeo: { title: 'Visibilidad en motores de respuesta', label: 'Motores de respuesta', inTitle: 'respuestas de IA' },
-    ico: { title: 'Entrega y cumplimiento', label: 'Entrega', inTitle: 'entrega y cumplimiento' }
+    seo: { title: 'Visibilidad orgánica', label: 'Visibilidad orgánica', inTitle: 'visibilidad orgánica', navLabel: 'SEO' },
+    aeo: { title: 'Visibilidad en motores de respuesta', label: 'Motores de respuesta', inTitle: 'respuestas de IA', navLabel: 'Respuestas de IA' },
+    ico: { title: 'Entrega y cumplimiento', label: 'Entrega', inTitle: 'entrega y cumplimiento', navLabel: 'Entrega' }
   } satisfies Record<InsightModule, InsightModuleCopy>,
 
   /**
@@ -197,6 +199,8 @@ export const GH_INSIGHTS = {
     highest: 'La cifra más alta es',
     outOf: 'de',
     previousPeriod: 'período anterior',
+    /** TASK-1962 — nota de una figura con una escala por métrica (modelo web 1.3, `chart.note`). */
+    ownScaleNote: 'Cada métrica en su propia escala: compara cada par actual contra anterior, no entre métricas.',
     variation: 'variación',
     againstPrevious: 'Contra el período anterior',
     rose: 'subió',

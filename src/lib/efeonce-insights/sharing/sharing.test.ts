@@ -122,13 +122,42 @@ describe('buildInsightWebModel', () => {
     expect(projected).not.toHaveProperty('channelId')
   })
 
+  it('1.3 — el API resuelve módulo, figura de respaldo, esenciales por módulo, nombre de capítulo y período anterior (TASK-1962)', async () => {
+    const { buildInsightWebModel } = await import('./web-model')
+    const base = plan()
+
+    const withEssentials: EditorialPlanV1 = {
+      ...base,
+      chapters: [...base.chapters, { chapterId: 'chapter.aeo', module: 'aeo', title: 'IA', claims: [], tables: [], limits: [], charts: [] }],
+      essentials: [{ claimId: 'e1', text: 'Los clics crecieron.', factIds: ['seo.clicks.current'] }]
+    }
+
+    const model = buildInsightWebModel({ plan: withEssentials, facts: [fact({ comparisonFactId: 'seo.clicks.previous' }), fact({ factId: 'seo.clicks.previous', value: 10000 })] })
+
+    // El consumer no recorre capítulos ni infiere el módulo por la primera cifra: viene resuelto.
+    expect(model.essentials![0]).toMatchObject({ module: 'seo', evidence: { chapterId: 'chapter.seo', chartId: 'ch1' } })
+    expect(model.executiveSummary[0]).toMatchObject({ module: 'seo', evidence: { chapterId: 'chapter.seo', chartId: 'ch1' } })
+    // Un módulo sin esenciales se declara con 0: el filtro oculta su tablero porque el modelo lo dice.
+    expect(model.essentialsByModule).toEqual({ seo: 1, aeo: 0 })
+    expect(model.chapters.map(chapter => chapter.label)).toEqual(['SEO', 'Respuestas de IA'])
+    expect(model.facts['seo.clicks.current']!.priorLabel).toBe(`período anterior: ${model.facts['seo.clicks.previous']!.display}`)
+    // Sin comparable con valor no hay frase de período anterior.
+    expect(model.facts['seo.clicks.previous']).not.toHaveProperty('priorLabel')
+    // La nota de escala sólo existe cuando la figura declara una escala por métrica.
+    expect(model.chapters[0]!.charts[0]).not.toHaveProperty('note')
+
+    const ownScale = { ...withEssentials, chapters: [{ ...withEssentials.chapters[0]!, charts: [{ ...withEssentials.chapters[0]!.charts[0]!, scale: { kind: 'linear' as const, baseline: 0 as const, perDimension: true as const } }] }] }
+
+    expect(buildInsightWebModel({ plan: ownScale, facts: [fact()] }).chapters[0]!.charts[0]!.note).toMatch(/propia escala/)
+  })
+
   it('1.1 — un plan v1 no trae campos v2 (aditivo: el consumer 1.0 ve lo mismo)', async () => {
     const { buildInsightWebModel } = await import('./web-model')
     const { INSIGHT_WEB_MODEL_VERSION } = await import('../contracts/web-model')
     const model = buildInsightWebModel({ plan: plan(), facts: [fact(), fact({ factId: 'seo.clicks.previous', value: null })] })
 
-    expect(INSIGHT_WEB_MODEL_VERSION).toBe('1.2')
-    expect(model.modelVersion).toBe('1.2')
+    expect(INSIGHT_WEB_MODEL_VERSION).toBe('1.3')
+    expect(model.modelVersion).toBe('1.3')
     expect(model).not.toHaveProperty('essentials')
     expect(model).not.toHaveProperty('decision')
     expect(model.chapters[0]).not.toHaveProperty('readings')

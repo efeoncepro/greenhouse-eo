@@ -7,9 +7,12 @@
 import { chapterProductMark } from '../presentation/product-marks'
 import { funnelGeometry } from '@/lib/artifact-composer/pure'
 
-import type { ChartSpecV1 } from '../contracts/chart-spec'
+import { GH_INSIGHTS } from '@/lib/copy/insights'
+
+import { chartSpecFactIds, type ChartSpecV1 } from '../contracts/chart-spec'
 import type { EvidenceFactV1 } from '../contracts/evidence'
-import type { EditorialPlanV1, PlanFigureReadingV1 } from '../contracts/plan'
+import type { EditorialPlanV1, PlanChapterV1, PlanFigureReadingV1 } from '../contracts/plan'
+import type { InsightModule } from '../contracts/request'
 import {
   INSIGHT_WEB_MODEL_VERSION,
   type InsightWebChartDerivedV1,
@@ -118,6 +121,45 @@ const deriveChart = (spec: ChartSpecV1, facts: Record<string, InsightWebFactV1>,
   }
 }
 
+/**
+ * TASK-1962 — módulo y figura de respaldo de una frase del resumen o de las esenciales. El módulo es el del primer hecho
+ * citado que existe; la figura, primero la que tiene ese hecho como cifra principal y si no la primera que lo dibuja.
+ * Antes lo deducía Think recorriendo capítulos; ahora es parte del contrato y todos los consumers reciben lo mismo.
+ */
+const claimContext = (chapters: PlanChapterV1[], byId: Map<string, EvidenceFactV1>) =>
+  (claim: { factIds: string[] }): Pick<InsightWebClaimV1, 'module' | 'evidence'> => {
+    const cited = claim.factIds.map(id => byId.get(id)).find(Boolean)
+
+    if (!cited) return {}
+
+    const byKeyFigure = chapters.flatMap(chapter =>
+      (chapter.readings ?? []).filter(reading => reading.keyFigure && claim.factIds.includes(reading.keyFigure.factId)).map(reading => ({ chapterId: chapter.chapterId, chartId: reading.chartId }))
+    )[0]
+
+    const byDrawing = chapters.flatMap(chapter =>
+      chapter.charts.filter(spec => chartSpecFactIds(spec).some(id => claim.factIds.includes(id))).map(spec => ({ chapterId: chapter.chapterId, chartId: spec.chartId }))
+    )[0]
+
+    const evidence = byKeyFigure ?? byDrawing
+
+    return { module: cited.module, ...(evidence ? { evidence } : {}) }
+  }
+
+/** Esenciales por módulo de la edición, incluidos los que no tienen ninguna (0). */
+const essentialsByModuleOf = (plan: EditorialPlanV1, byId: Map<string, EvidenceFactV1>): Partial<Record<InsightModule, number>> => {
+  const counts: Partial<Record<InsightModule, number>> = {}
+
+  for (const chapter of plan.chapters) counts[chapter.module] = 0
+
+  for (const claim of plan.essentials ?? []) {
+    const owner = claim.factIds.map(id => byId.get(id)?.module).find(Boolean)
+
+    if (owner) counts[owner] = (counts[owner] ?? 0) + 1
+  }
+
+  return counts
+}
+
 export interface BuildInsightWebModelInput {
   plan: EditorialPlanV1
   facts: EvidenceFactV1[]
@@ -128,6 +170,13 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
   const factMap: Record<string, InsightWebFactV1> = {}
 
   for (const fact of facts) factMap[fact.factId] = projectFact(fact, locale)
+
+  // TASK-1962 — el período anterior listo para imprimir: el consumer no arma la frase ni busca el comparable.
+  for (const fact of Object.values(factMap)) {
+    const previous = fact.comparisonFactId ? factMap[fact.comparisonFactId] : undefined
+
+    if (previous && previous.value !== null) fact.priorLabel = `${GH_INSIGHTS.reading.previousPeriod}: ${previous.display}`
+  }
 
   const sealedById = new Map(facts.map(fact => [fact.factId, fact]))
 
@@ -146,15 +195,20 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
           rows: spec.tabularEquivalent.rows.map(row => row.map(cell => resolveCell(cell, factMap)))
         },
         ...(derived ? { derived } : {}),
-        ...(unitLabelOf(spec.unit) ? { unitLabel: unitLabelOf(spec.unit) } : {})
+        ...(unitLabelOf(spec.unit) ? { unitLabel: unitLabelOf(spec.unit) } : {}),
+        ...(spec.scale.perDimension ? { note: GH_INSIGHTS.reading.ownScaleNote } : {})
       }
     }),
     tables: chapter.tables.map(table => ({ tableId: table.tableId, title: table.title, columns: [...table.columns], rows: table.rows.map(row => [...row]) })),
     limits: [...chapter.limits],
     ...(chapter.opening ? { opening: projectClaim(chapter.opening) } : {}),
     ...(chapter.readings?.length ? { readings: chapter.readings.map(projectReading) } : {}),
-    ...((mark => (mark ? { productMark: mark } : {}))(chapterProductMark(chapter.module)))
+    ...((mark => (mark ? { productMark: mark } : {}))(chapterProductMark(chapter.module))),
+    label: GH_INSIGHTS.modules[chapter.module].navLabel
   }))
+
+  const findingContext = claimContext(plan.chapters, sealedById)
+
 
   return {
     modelVersion: INSIGHT_WEB_MODEL_VERSION,
@@ -164,11 +218,15 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
     executiveSummary: plan.executiveSummary.map(claim => {
       const figure = essentialFigure(claim, sealedById, locale)
 
-      return { ...projectClaim(claim), ...(figure ? { figure } : {}) }
+      return { ...projectClaim(claim), ...(figure ? { figure } : {}), ...findingContext(claim) }
     }),
     chapters,
     // `ownerRef` es una referencia interna de responsabilidad: no viaja al visitante del enlace.
-    actions: plan.actions.map(action => ({ actionId: action.actionId, text: action.text, factIds: [...action.factIds] })),
+    actions: plan.actions.map(action => {
+      const owner = action.factIds.map(id => sealedById.get(id)?.module).find(Boolean)
+
+      return { actionId: action.actionId, text: action.text, factIds: [...action.factIds], ...(owner ? { module: owner } : {}) }
+    }),
     limits: [...plan.limits],
     methodology: [...plan.methodology],
     // `evidenceRef` apunta al origen interno (runId, spaceId…): sólo viaja la etiqueta.
@@ -180,8 +238,9 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
           essentials: plan.essentials.map(claim => {
             const figure = essentialFigure(claim, sealedById, locale)
 
-            return { ...projectClaim(claim), ...(figure ? { figure } : {}) }
-          })
+            return { ...projectClaim(claim), ...(figure ? { figure } : {}), ...findingContext(claim) }
+          }),
+          essentialsByModule: essentialsByModuleOf(plan, sealedById)
         }
       : {}),
     ...(plan.decision ? { decision: projectClaim(plan.decision) } : {}),

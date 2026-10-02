@@ -24,7 +24,7 @@ import type { ChartSpecV1 } from './chart-spec'
 import type { EvidenceObservationKind, EvidenceUnit } from './evidence'
 import type { InsightModule, InsightOutput } from './request'
 
-export const INSIGHT_WEB_MODEL_VERSION = '1.2' as const
+export const INSIGHT_WEB_MODEL_VERSION = '1.3' as const
 
 /** Motivo por el que un hecho no tiene valor. Ausente ≠ cero: Think lo muestra como límite. */
 export type InsightWebAbsentReason = 'no_data'
@@ -58,6 +58,8 @@ export interface InsightWebFactV1 {
    * anterior como una tarjeta suelta junto a la actual (caso Berel: «#6,6» y «#5,8» con la misma etiqueta).
    */
   comparisonFactId?: string
+  /** 1.3 — el período anterior listo para imprimir («período anterior: 21»); ausente sin comparable con valor. */
+  priorLabel?: string
   absentReason: InsightWebAbsentReason | null
 }
 
@@ -73,6 +75,13 @@ export interface InsightWebClaimV1 {
    * 512.113 en grande junto a «Las impresiones bajaron…».
    */
   figure?: { display: string; direction: 'up' | 'down' | 'flat'; kind?: 'change' | 'level' }
+  /**
+   * 1.3 — módulo al que pertenece la frase (resumen y esenciales). Lo resuelve el API: el consumer filtra y agrupa por
+   * este campo, nunca lo infiere de la primera cifra citada.
+   */
+  module?: InsightModule
+  /** 1.3 — figura que respalda la frase (la de su cifra principal o la que dibuja su hecho). Ausente = sin figura. */
+  evidence?: { chapterId: string; chartId: string }
 }
 
 export interface InsightWebTableV1 {
@@ -96,6 +105,8 @@ export interface InsightWebChartV1 {
   derived?: InsightWebChartDerivedV1
   /** 1.2 — unidad legible de la figura (la de `spec.unit` traducida). */
   unitLabel?: string
+  /** 1.3 — nota de lectura de la figura (p. ej. «cada métrica en su propia escala»), redactada por el API. */
+  note?: string
 }
 
 /** 1.1 — lectura de una figura (TASK-1888): cifra principal, conclusión, lo que significa y el próximo paso. */
@@ -124,6 +135,8 @@ export interface InsightWebChapterV1 {
    * respuesta → AEO). Reemplaza la etiqueta del capítulo; el consumer dibuja el lockup oficial de esa clave.
    */
   productMark?: { key: string; label: string }
+  /** 1.3 — nombre corto del capítulo para navegación y filtros («SEO», «Respuestas de IA»), del copy de Greenhouse. */
+  label?: string
 }
 
 export interface InsightWebModelV1 {
@@ -131,13 +144,19 @@ export interface InsightWebModelV1 {
   locale: string
   executiveSummary: InsightWebClaimV1[]
   chapters: InsightWebChapterV1[]
-  actions: Array<{ actionId: string; text: string; factIds: string[] }>
+  /** 1.3 — `module`: módulo de la acción (el de su primera cifra citada), resuelto por el API. */
+  actions: Array<{ actionId: string; text: string; factIds: string[]; module?: InsightModule }>
   limits: string[]
   methodology: string[]
   references: Array<{ referenceId: string; label: string }>
   facts: Record<string, InsightWebFactV1>
   /** 1.1 — «Lo esencial del mes». */
   essentials?: InsightWebClaimV1[]
+  /**
+   * 1.3 — cuántas esenciales tiene cada módulo de la edición, incluido 0. Decide el API, no el consumer: un filtro por
+   * módulo sin esenciales oculta el tablero porque el modelo lo dice, no porque la UI contó.
+   */
+  essentialsByModule?: Partial<Record<InsightModule, number>>
   /** 1.1 — «Para decidir en la reunión». */
   decision?: InsightWebClaimV1
   /** 1.1 — «Cómo lo mediremos». */
