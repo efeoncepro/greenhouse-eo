@@ -1,0 +1,6 @@
+Keep this image EXACTLY the same: the same white glossy sphere body of the Spark character, the same front camera, the same size and position of the sphere in the frame, the same empty dark navy visor, the same navy panels, vents, seams and screws, the same three glowing belly windows, the same navy base disc on top, the same glow under the bottom, the same materials, lighting, reflections and the same flat medium gray background.
+Remove ONLY three things, completely:
+1. The white orbit ring and the small white sphere riding on it. Where the ring passed in front of the body, continue the body exactly as it would look behind it: the glossy white shell with its fine seams and the lower rim of the navy visor, matching the surrounding curvature, light and reflections. Outside the body, show only the flat gray background.
+2. Both arms with their hands. On each side of the sphere, where an arm attached, leave a small round deep-navy joint socket flush with the shell (the shoulder joint), with a thin glowing azure ring like the other seams. Outside the body, only flat gray background.
+3. The small glowing four-pointed sparkle star on top of the navy base disc: remove the star, keep the base disc.
+Nothing else changes. No new details, no text, no logos.

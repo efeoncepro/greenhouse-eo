@@ -200,54 +200,27 @@ matting lo vuelve semitransparente (100 a 200 mil píxeles). Se corrige editando
 `#7F7F7F` antes de recortar: quedan cerca de 20 mil, sólo el borde. En «volando» la estela de luz no sobrevive al
 recorte; está en la versión de estudio.
 
-### 8.1 El rig: el Spark que mira **[operador, 2026-10-01: «me encantó»]**
+### 8.1 El rig: el Spark que mira **[operador, 2026-10-01: «me encantó»; v2 por capas: «vamos con todo»]**
 
-Para superficies interactivas (el Lab, Greenhouse, sitios, demos) existe un rig 2.5D: el componente web
+Para superficies interactivas (el Lab, Greenhouse, sitios, demos) existe un rig 2.5D por capas: el componente web
 `<efeonce-spark-rig>`, publicado en el Lab de AXIS ([`/references/sparks/#rig`](https://axis.efeonce.org/references/sparks/#rig);
 datos en `/references/sparks.json` → `rig`).
 
-- **Capas:** el Spark base de frente con el visor vacío, uno por línea (bucket `sparks/v1/{web,masters}/rig/`); la cara
-  de LED dibujada en vivo y recortada al visor; un giro de hasta 9° con flotación.
-- **Comportamiento:** sigue el puntero con la mirada, parpadea, vaga sola cuando nadie mueve el puntero y tiene seis
-  expresiones: feliz, atento, trabajando, sorprendido, pensando y listo. Respeta el movimiento reducido.
+- **Piezas:** el render aprobado del Spark base separado en 14 capas alineadas: cuerpo, mitades trasera y delantera
+  del anillo, antena, dos brazos y cuatro poses de mano por lado (palma, abierta, señala, puño). Una carpeta por línea
+  (bucket `sparks/v1/web/rig/v2/<línea>/`).
+- **Movimiento:** cada pieza gira desde su pivote con resortes (inercia y rebote). Además, inclinación al girar,
+  estiramiento al flotar, salto con anticipación, antena que se sacude y chispa que pulsa.
+- **Lenguaje corporal:** saluda al aparecer, salta con un clic y señala el puntero cuando se queda quieto a un lado.
+  Cada expresión tiene su gesto: atento, trabajando (tecleando), sorprendido, pensando (índice arriba) y listo (puños
+  arriba). La cara de LED se dibuja en vivo; los ojos se adelantan al cuerpo. Respeta el movimiento reducido.
 - **Color:** el componente no escribe colores; quien lo usa le pasa el acento de la línea desde los tokens.
-- **Reglas:** es el mismo Spark del kit (no se le agregan formas, expresiones ni colores fuera del componente); un rig
-  por pantalla; en una foto, el Spark sale del catálogo de `foto:prompt`, nunca de una captura del rig.
-- Producción en `ai-generations/2026-10-01_sparks/rig/` (prompt `prompts/rig-sin-cara.txt`).
-
-### 8.2 La versión 2D (ilustración plana) **[operador, 2026-10-01: «la idea no es reemplazar los 3d, es tener una versión alternativa en 2d»; «Bien, me gusta, canonízalos y mándalos al lab»; «no sustituyen […], son una clase 2D de los Sparks»]**
-
-Para composiciones gráficas planas de la línea (posts, stories, láminas, piezas sin foto) existe un Spark en 2D:
-el mismo personaje dibujado en vector, **una clase aparte de los Sparks**. **Es una alternativa, no un reemplazo:** foto, cine, escenas con Nexa y el
-rig siguen saliendo del kit 3D.
-
-- **Misma anatomía:** esfera blanca, visor navy con dos ojos y sonrisa, la chispa de cuatro puntas, el anillo
-  inclinado más alto a la izquierda con su esfera, las tres ventanas y la luz debajo. Plano: un solo tono de sombra,
-  sin degradados, brillos ni glow. Las seis expresiones y los seis colores de línea son los mismos de §6.1 y §8.1.
-- **Sin brazos ni manos** por defecto **[operador, 2026-10-01]**: la silueta queda en esfera, visor, anillo y chispa,
-  que es lo que conecta con la órbita, y se lee mejor en chico. Los brazos existen como opción, no como norma.
-- **El accesorio flota** junto al cuerpo, a su izquierda, sin tocar el visor. Es la única diferencia con §5
-  («siempre tocándolo»), que sigue valiendo para el 3D.
-- **El Spark cuenta como la órbita de la pieza:** ya trae anillo y esfera, así que no se le agrega otra órbita ni una
-  lente. **La voz es la de la línea**: pregunta en Poppins 300 con su anillo chico en el acento, respuesta en Bricolage
-  760 de 1 a 3 palabras, al menos 3× la pregunta, que cierra con la esfera en el acento, y evidencia en Poppins con una
-  palabra en negrita; todo entero fuera del anillo, en el tercio inferior. Mismo criterio que las portadas de perfil con
-  Nexa, donde la luz de la línea cuenta como órbita y la respuesta conserva su esfera (efeonce-graphic-line,
-  applications §A11). **[operador, 2026-10-01: corrección «no siguen tanto el estilo de /efeonce-graphic-line»,
-  confirmada con «me gusta, canonízalos»]**.
-- **Pesos que combinan** (línea gráfica): Bricolage 760/740 con Poppins 500, 620 con 400, 500 con 300. Etiquetas en
-  Poppins 600, mayúsculas, tracking 0,08 em, nunca en el acento bajo 24 px.
-- **Sobre papel lleva contorno navy**; sobre oscuro, no.
-- **Versión simple a 72 px o menos:** sin paneles, tornillos, brillo del visor ni ventanas, y con el anillo más grueso.
-- Siguen valiendo §2 y §10: una persona supervisa en el relato de la pieza y el accesorio no lleva texto. La escala de
-  §5 aplica cuando hay una persona en la pieza; la firma es la de la línea gráfica.
-- **Archivos canónicos (2026-10-01):** 94 SVG en `@efeoncepro/axis-brand-assets` **0.4.11** (AXIS tag `v0.4.11`,
-  `d54c873`), `assets/sparks-2d/`: el Spark base en 6 expresiones × 6 líneas × oscuro/papel, el detalle simple por línea
-  y superficie, y el plantel. API `AXIS_SPARK_2D_ASSETS`, `findSpark2dAsset({ character, expression, line, surface,
-  sizePx })`, `spark2dAssetUrl`. Navy y acentos salen de `efeonceGraphicLine` al generarlos. **Nunca se redibuja a mano**:
-  se usa el SVG del paquete. Lab: [axis.efeonce.org/references/sparks/#en-2d](https://axis.efeonce.org/references/sparks/#en-2d)
-  (`sparks.json` → `flat2d`). Greenhouse todavía fija 0.4.10: adoptarlo es un bump aparte.
-- Fuente y canvas de exploración: `ai-generations/2026-10-01_sparks/2d/` (LEEME y componente).
+- **Reglas:** es el mismo Spark del kit (no se le agregan formas, poses, expresiones ni colores fuera del componente;
+  una pose nueva se produce como capa alineada y se publica en AXIS); un rig por pantalla; en una foto, el Spark sale
+  del catálogo de `foto:prompt`, nunca de una captura del rig.
+- **Límite:** es 2.5D, gira poco a propósito. El Spark en 3D real (giro completo) está en exploración
+  (`ai-generations/2026-10-01_sparks/3d/`).
+- Producción y receta en `ai-generations/2026-10-01_sparks/rig/LEEME.md`.
 
 ## 9. El nombre: revisión de colisión
 
@@ -288,7 +261,7 @@ La task nombraba también Adobe Spark (hoy Adobe Express); no está entre los re
 |---|---|---|
 | 1 | Regenerar con Sparks las fotos aprobadas que llevan robots genéricos (`NX5b` y derivadas, la destacada «Agents» `PH7`) | Decisión del operador |
 | 2 | El Spark en 3D real (que gire completo): en exploración con un modelo generado desde las vistas del kit. Rive no sirve para esto, porque es 2D | Producción + aprobación del operador |
-| 3 | Pasar el rig (§8.1) a un paquete de AXIS cuando Greenhouse u otro dominio lo use | AXIS |
+| 3 | Pasar el rig (§8.1) a un paquete de AXIS cuando Greenhouse u otro dominio lo use (hoy vive en el Lab) | AXIS |
 | 4 | Revisión de Legal si se decide registrar el nombre | Legal |
 | 5 | ¿Las cinco familias calzan con lo que Agent Ops vende hoy? (pregunta abierta de la task) | Operador |
 | 6 | Prueba de reconocimiento: son un sistema consistente, no un activo distintivo medido | Operador |
