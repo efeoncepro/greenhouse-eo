@@ -3365,6 +3365,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1963 — novedades del login. Las administran quienes operan la relación con clientes y la marca:
+  // administración, cuentas y operaciones de Efeonce. Nunca roles `client_*`.
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    for (const action of ['create', 'update'] as const) {
+      addEntitlement(entries, {
+        module: 'login_announcements',
+        capability: 'login_announcements.manage',
+        action,
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+  }
+
   // TASK-1120 — Design Handoff Registry. Read is internal-wide because Design
   // System itself is view-accessible to internal collaborators; create/transition
   // stays with DESIGNER ∪ EFEONCE_ADMIN.

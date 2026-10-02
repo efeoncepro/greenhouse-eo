@@ -1074,3 +1074,9 @@ OIDC nativo para la cohorte. Las pruebas técnicas usan fixtures, separadas del 
   providers directos; hasta entonces permanecen como recovery Greenhouse.
 - Los nombres finales de flags, SLA de revocación, umbral/ventana de retiro del fallback e IDs de las unidades
   nuevas se fijan antes de Slice 1.
+
+## Delta 2026-10-02 — Login V4 premium (TASK-1964)
+
+El operador aprobó el 2026-10-02 la dirección **V4 premium** del login (canvas «Login Greenhouse · La órbita»): papel con Efeonce como marca principal, Greenhouse como sello secundario y escenario fotográfico con la Lente de «La órbita» y novedades gobernadas (`TASK-1963`/`TASK-1964`). Mientras esta task no active el redirect para una cohorte, `/login` de Greenhouse renderiza el V4. Cuando Efeonce ID presente el único login visible, su pantalla debería adoptar la misma dirección y puede leer las novedades desde `GET /api/public/login-announcements`.
+
+- [ ] La pantalla de login de Efeonce ID adopta la dirección V4 premium aprobada (o registra por qué difiere).

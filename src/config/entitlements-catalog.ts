@@ -69,7 +69,9 @@ export const ENTITLEMENT_MODULES = [
   // TASK-1921 — render gobernado de piezas de marca de Efeonce (La órbita por superficie y Glitch) en el
   // artifact-worker. Dueño Greenhouse por ahora; nace extraíble hacia Marketing Studio o Globe (decisión del
   // operador, 2026-09-28). Distinto de `design_system` (operar AXIS) y de `marketing_studio` (registrar campañas).
-  'brand_render'
+  'brand_render',
+  // TASK-1963 — novedades del login (carrusel del login V4). Leer lo publicado es público; administrar es esta capability.
+  'login_announcements'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -2530,7 +2532,14 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   },
   // TASK-1921 — pedir el render de una pieza de marca (endpoint, MCP y Nexa llaman al mismo command) y leer su estado.
   { key: 'brand_render.request.create', module: 'brand_render', actions: ['create'] as const, defaultScope: 'tenant' },
-  { key: 'brand_render.request.read', module: 'brand_render', actions: ['read'] as const, defaultScope: 'tenant' }
+  { key: 'brand_render.request.read', module: 'brand_render', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1963 — crear, editar, publicar y archivar las novedades del login. La lectura de lo publicado no necesita capability.
+  {
+    key: 'login_announcements.manage',
+    module: 'login_announcements',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]
