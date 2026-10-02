@@ -352,6 +352,12 @@ acción, en las piezas nuevas).
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.
 
+**Acento por línea en la voz (2026-10-02).** Con `graphicVoice: "efeonce"`, declara `graphicLine` (`brand` en Servicios
+creativos, `engine`, `voice`, `revenue-*`; sin él queda `growth`, teal): el anillo y la esfera toman el acento de esa línea desde
+AXIS y el gate lo verifica. Elige en la política un CTA del mismo color para que la pieza tenga un solo acento. En ads con
+respuesta de una o dos palabras, el contorno es la variante que no compite con el titular. Detalle: contrato del compositor,
+§«Acento por línea de servicio».
+
 ### Componer y certificar una pieza con CTA
 
 `pnpm foto:componer:cta` compone; `pnpm foto:cta:gate` **certifica** que lo que hay en disco es lo que se compuso y que

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { GL, answerSphere, ctaColors, validateGraphicVoice } from './cta-graphic-voice.mjs'
+import { GL, LINEAS, acentoVozValido, answerSphere, ctaColors, graphicLineAccent, validateGraphicVoice } from './cta-graphic-voice.mjs'
 import { validarPiezaEsquema } from './cta-esquema.mjs'
 
 test('voice is opt-in and fails unsupported or contradictory declarations', () => {
@@ -40,4 +40,26 @@ test('CTA brand aliases resolve to the canonical graphic-line tokens', () => {
   assert.equal(ctaColors.brandAccentOnDark, GL.color.teal)
   assert.equal(ctaColors.brandDark, GL.color.dark)
   assert.equal(ctaColors.inkOnDark, '#ffffff')
+})
+
+test('the service line decides the voice accent; without it the voice stays growth teal', () => {
+  const brand = GL.lines.find(l => l.key === 'brand')
+
+  assert.equal(graphicLineAccent(), GL.color.teal)
+  assert.equal(graphicLineAccent(undefined, 'dark'), GL.color.tealDark)
+  assert.equal(graphicLineAccent('brand'), brand.accentOnDark)
+  assert.equal(graphicLineAccent('brand', 'dark'), brand.accentOnLight)
+  assert.throws(() => graphicLineAccent('inventada'))
+  assert.ok(LINEAS.includes('brand') && LINEAS.includes('growth'))
+
+  const p = { graphicVoice: 'efeonce', align: 'left', lead: '¿Por qué?', dominant: 'Con criterio' }
+
+  assert.deepEqual(validateGraphicVoice({ ...p, graphicLine: 'brand' }), [])
+  assert.ok(validateGraphicVoice({ dominant: 'x', graphicLine: 'brand' }).length)
+  assert.ok(validarPiezaEsquema({ ...p, graphicLine: 'inventada' }).errores.length)
+
+  assert.equal(acentoVozValido(p, {}), true)
+  assert.equal(acentoVozValido({ ...p, graphicLine: 'brand' }, { line: 'brand', accent: brand.accentOnDark }), true)
+  assert.equal(acentoVozValido({ ...p, graphicLine: 'brand' }, { line: 'brand', accent: GL.color.teal }), false)
+  assert.equal(acentoVozValido({ ...p, graphicLine: 'brand' }, {}), false)
 })

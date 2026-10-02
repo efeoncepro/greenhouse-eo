@@ -31,7 +31,7 @@ import { compositeLuminosity } from '../../scripts/creative/layout-compiler/comp
 import { ANCHO_PANTALLA, DPR_REFERENCIA, TECHO_CANTO, UMBRALES, hexARgb, medicionImposible, pendienteBajoCaja, medirAnillo, medirContraColor, medirGlifos, medirVoz, tamanoEnPantalla, textoAlternativo, umbralWcag } from './accesibilidad.mjs'
 import { ORDEN as ORDEN_VARIANTES, elegirVariante } from './cta-variantes.mjs'
 import { validarPiezaEsquema } from './cta-esquema.mjs'
-import { GL, ctaColors, answerSphere, questionRing } from './cta-graphic-voice.mjs'
+import { GL, ctaColors, answerSphere, questionRing, graphicLineAccent } from './cta-graphic-voice.mjs'
 import { resolveCtaColorPolicy } from './cta-color-policy.mjs'
 import { fueraDeReserva, invariantesMaquetacion, recorteFinalEnPlate } from './cta-invariantes.mjs'
 import { desescaparXml } from './svg-texto.mjs'
@@ -1140,8 +1140,9 @@ async function composePiece(s, opts = {}) {
     y = lab.box.bottom + Math.round((s.labelGap ?? 0.10) * (s.dominantSize ?? 160))
   }
 
-  const graphicVoice = s.graphicVoice ? { contract: 'efeonce.graphic-line-orbit', questionWeight: GL.type.question.weight, answerWeight: GL.type.answer.weight } : null
-  const graphicAccent = s.ink === 'dark' ? GL.color.tealDark : GL.color.teal
+  // El acento de la voz lo decide la línea de servicio (La órbita, regla 8); sin `graphicLine`, growth (teal), como siempre.
+  const graphicAccent = graphicLineAccent(s.graphicLine, s.ink)
+  const graphicVoice = s.graphicVoice ? { contract: 'efeonce.graphic-line-orbit', questionWeight: GL.type.question.weight, answerWeight: GL.type.answer.weight, ...(s.graphicLine ? { line: s.graphicLine, accent: graphicAccent } : {}) } : null
 
   // 2 · entrada
   if (s.lead) {

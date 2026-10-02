@@ -2369,3 +2369,22 @@ final se registran por separado: una prueba 4:5 legible no certifica adaptacione
 El adapter de selección admite `presentation.minBracketStrokePx` (cero por defecto). La voz optativa lo fija a un píxel CSS mínimo a escala de referencia, y QA mide ese mismo trazo; el cursor y sus anclas no cambian.
 
 En el modo `graphicVoice: "efeonce"`, los CTA `outline` y `solid` requieren `cta.radius > 0`: contorno y relleno son rectángulos redondeados según Tres voces + acción. Radio cero o ausente falla en el preflight; el tratamiento `text` no dibuja superficie. El radio se declara proporcional a cada composición y se revisa en el export; no se fija un valor universal ni se alteran planes legacy.
+
+### Acento por línea de servicio (`graphicLine`, 2026-10-02)
+
+**Decisión del operador (2026-10-02, CMP-004):** el anillo de la pregunta y la esfera de la respuesta usan el acento de la
+**línea de servicio** de la pieza, como pide la regla 8 de La órbita. Antes la voz quedaba siempre en teal (growth), y en
+los ads de Servicios creativos sumaba un tercer matiz que no estaba en la escena.
+
+- `graphicLine` (optativo, sólo con `graphicVoice: "efeonce"`): una de las líneas de `efeonceGraphicLine.lines`
+  (`growth`, `brand`, `engine`, `voice`, `revenue-hubspot`, `revenue-salesforce`). El color sale de su `accentOnDark`, o de
+  `accentOnLight` con `ink: "dark"`; nunca de un HEX en el plan. Sin el campo, la voz sigue en growth y los planes existentes
+  componen idénticos (regresión: 183 de 184 iguales; la única diferencia fue el origen de la caché de máscara).
+- El QA registra `graphicVoice.line` y `graphicVoice.accent`. El gate rechaza la pieza si declara una línea y la evidencia no
+  la nombra o no pintó su acento (`acentoVozValido`, `scripts/foto/cta-graphic-voice.mjs`; mutante `voz-acento-de-linea`).
+- El CTA sigue gobernado por la política de campaña: para que la pieza tenga **un solo acento**, elegir un tratamiento cuyo
+  color coincida con el de la línea (CMP-004: `decision-warm-selection` de `CMP-004-pilots-color-v2.json`, contorno
+  `accentSurface`, el mismo naranja de Brand). El compositor no cruza los dos campos: es una decisión de dirección.
+- Evidencia de la decisión: 40 composiciones (8 ads × 5 tratamientos) en
+  `ai-generations/2026-10-02_cmp004-cine-nativo/comparativa-cta/`. El contorno fue la única variante que pasó en los 8; el
+  relleno y el texto superaron el área del titular cuando la respuesta tiene una o dos palabras (`cta-tamano`).

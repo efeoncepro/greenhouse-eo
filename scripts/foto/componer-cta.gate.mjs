@@ -17,6 +17,7 @@ import { CANON_ANTERIOR, CANON_VIGENTE, COMPOSITOR, REPO, canonDe, dentroDelRepo
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 import { TECHO_CANTO, copiaEnEscena } from './accesibilidad.mjs'
 import { resolveCtaColorPolicy, resolveColorPolicyPath } from './cta-color-policy.mjs'
+import { acentoVozValido } from './cta-graphic-voice.mjs'
 
 // Ancho y alto de un PNG, leídos de su cabecera (IHDR): el gate verifica el tamaño ENTREGADO sin decodificar la imagen.
 const dimensionesPng = b => (b.length >= 24 && b.readUInt32BE(12) === 0x49484452 ? [b.readUInt32BE(16), b.readUInt32BE(20)] : null)
@@ -720,6 +721,7 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
       && r.accesibilidad?.voces?.['pregunta-anillo']?.cumpleWcag && r.accesibilidad?.voces?.['respuesta-esfera']?.cumpleWcag
 
     if (!valid) { console.error(`✗ ${r.id}: falta evidencia válida de la pregunta con anillo y respuesta con esfera AXIS`); fallos++ }
+    if (!acentoVozValido(p, g)) { console.error(`✗ ${r.id}: el acento de la voz no es el de la línea «${p.graphicLine}» (La órbita, regla 8): recompón la pieza`); fallos++ }
   }
 
   for (const z of r.zonasIgnoradas ?? []) {

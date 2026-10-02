@@ -13,7 +13,7 @@ import {
   AXIS_COLLABORATION_SELECTION_ANCHORS
 } from '@efeoncepro/axis-ui-contracts'
 
-import { ctaColors, validateGraphicVoice } from './cta-graphic-voice.mjs'
+import { LINEAS, ctaColors, validateGraphicVoice } from './cta-graphic-voice.mjs'
 
 
 import { colorPolicyReferenceSchema } from './cta-color-policy.mjs'
@@ -229,6 +229,7 @@ export const esquemaPieza = z
     textWidth: z.number().finite().positive().max(1).optional(),
     ink: z.enum(['light', 'dark']).optional(),
     graphicVoice: z.literal('efeonce').optional(),
+    graphicLine: z.enum(LINEAS).optional(),
     label: texto.optional(),
     labelSize: positivo.optional(),
     labelGap: noNegativo.optional(),
