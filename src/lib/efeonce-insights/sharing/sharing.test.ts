@@ -105,13 +105,24 @@ describe('buildInsightWebModel', () => {
     expect(serialized).not.toContain('evidenceRef')
   })
 
+  it('1.2 — la fuente viaja legible y la unidad y el corte con su etiqueta; nunca el reader interno (TASK-1957)', async () => {
+    const { buildInsightWebModel } = await import('./web-model')
+    // El método real del adapter SEO (el que mapea `GH_INSIGHTS.sources`).
+    const model = buildInsightWebModel({ plan: plan(), facts: [fact({ method: { name: 'gsc_window_aggregate', version: '1' } }), fact({ factId: 'seo.clicks.previous', value: null })] })
+    const projected = model.facts['seo.clicks.current'] ?? Object.values(model.facts)[0]!
+
+    expect(projected.source).toBe('Google Search Console')
+    expect(projected.unitLabel).toBe('Cantidad')
+    expect(JSON.stringify(model)).not.toContain('readSeoOverviewKpisForWindow')
+  })
+
   it('1.1 — un plan v1 no trae campos v2 (aditivo: el consumer 1.0 ve lo mismo)', async () => {
     const { buildInsightWebModel } = await import('./web-model')
     const { INSIGHT_WEB_MODEL_VERSION } = await import('../contracts/web-model')
     const model = buildInsightWebModel({ plan: plan(), facts: [fact(), fact({ factId: 'seo.clicks.previous', value: null })] })
 
-    expect(INSIGHT_WEB_MODEL_VERSION).toBe('1.1')
-    expect(model.modelVersion).toBe('1.1')
+    expect(INSIGHT_WEB_MODEL_VERSION).toBe('1.2')
+    expect(model.modelVersion).toBe('1.2')
     expect(model).not.toHaveProperty('essentials')
     expect(model).not.toHaveProperty('decision')
     expect(model.chapters[0]).not.toHaveProperty('readings')

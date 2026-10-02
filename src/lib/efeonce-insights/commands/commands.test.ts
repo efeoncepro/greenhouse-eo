@@ -231,6 +231,9 @@ describe('TASK-1845 — issue / withdraw / recover', () => {
 
     try {
       stores.getInsightEditionById.mockResolvedValue(edition({ state: 'ready_for_review' }))
+      stores.getInsightEvidenceSnapshotByEdition.mockResolvedValue({ snapshotId: 'inssn-1', snapshotHash: 'a'.repeat(64), sealedAt: 's', facts: [], sources: [], rejections: [] })
+      stores.getInsightEditorialPlanByEdition.mockResolvedValue({ planId: 'inspl-1', plan: { planVersion: 'editorial_plan_v1', locale: 'es-CL', executiveSummary: [], chapters: [], actions: [], limits: [], methodology: [], references: [] }, frozenAt: 'f', planHash: 'b'.repeat(64) })
+      stores.getInsightReportById.mockResolvedValue({ reportId: 'insr-1', title: 'Visibilidad orgánica · agosto de 2026' })
 
       const result = await issueInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'aprobado por el account', env: ENV_ON })
 
@@ -243,6 +246,26 @@ describe('TASK-1845 — issue / withdraw / recover', () => {
 
       stores.getInsightEditionById.mockResolvedValue(edition({ state: 'issued' }))
       expect((await issueInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'reintento', env: ENV_ON })).idempotent).toBe(true)
+    } finally {
+      setInsightOutputsPort(null)
+    }
+  })
+
+  it('issue de una edición cliente con texto no apto para cliente se rechaza con not_ready/client_fit (TASK-1957)', async () => {
+    const { issueInsightEdition } = await import('./lifecycle')
+    const { setInsightOutputsPort } = await import('../ports')
+
+    setInsightOutputsPort({ assertOutputsValidated: async () => ({ outputs: [{ output: 'report_pdf', assetId: 'asset-1', manifestHash: 'c'.repeat(64) }] }) })
+
+    try {
+      stores.getInsightEditionById.mockResolvedValue(edition({ state: 'ready_for_review' }))
+      stores.getInsightEvidenceSnapshotByEdition.mockResolvedValue({ snapshotId: 'inssn-1', snapshotHash: 'a'.repeat(64), sealedAt: 's', facts: [], sources: [], rejections: [] })
+      stores.getInsightEditorialPlanByEdition.mockResolvedValue({ planId: 'inspl-1', plan: { planVersion: 'editorial_plan_v1', locale: 'es-CL', executiveSummary: [], chapters: [], actions: [], limits: ['Tráfico orgánico estimado: ' + 'la fuente no sirve esta ventana con exactitud.'], methodology: [], references: [] }, frozenAt: 'f', planHash: 'b'.repeat(64) })
+      stores.getInsightReportById.mockResolvedValue({ reportId: 'insr-1', title: 'Insights seo 2026-08-01–2026-09-01' })
+      stores.transitionInsightEditionState.mockClear()
+
+      await expect(issueInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'aprobado', env: ENV_ON })).rejects.toMatchObject({ code: 'not_ready', details: { reason: 'client_fit' } })
+      expect(stores.transitionInsightEditionState).not.toHaveBeenCalled()
     } finally {
       setInsightOutputsPort(null)
     }

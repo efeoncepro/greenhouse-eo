@@ -19,6 +19,7 @@ import {
   type InsightWebReadingV1
 } from '../contracts/web-model'
 import { formatFactValue } from '../editorial/format'
+import { asOfLabelOf, sourceLabelOf, unitLabelOf } from '../presentation/vocabulary'
 
 const projectFact = (fact: EvidenceFactV1, locale: string): InsightWebFactV1 => ({
   factId: fact.factId,
@@ -28,15 +29,19 @@ const projectFact = (fact: EvidenceFactV1, locale: string): InsightWebFactV1 => 
   unit: fact.unit,
   display: formatFactValue(fact.value, fact.unit, locale),
   observation: fact.observation,
-  source: fact.source,
+  // TASK-1957 — `fact.source` es la tabla lectora (dato interno del snapshot): al lector viaja sólo el nombre legible.
+  source: sourceLabelOf(fact),
+  unitLabel: unitLabelOf(fact.unit),
   asOf: fact.freshness.asOf,
+  asOfLabel: asOfLabelOf(fact.freshness.asOf, locale),
   absentReason: fact.value === null ? 'no_data' : null
 })
 
-const projectClaim = (claim: { claimId: string; text: string; factIds: string[] }): InsightWebClaimV1 => ({
+const projectClaim = (claim: { claimId: string; text: string; factIds: string[]; role?: 'finding' | 'backing' }): InsightWebClaimV1 => ({
   claimId: claim.claimId,
   text: claim.text,
-  factIds: [...claim.factIds]
+  factIds: [...claim.factIds],
+  ...(claim.role ? { role: claim.role } : {})
 })
 
 /** Una celda del equivalente tabular es un factId: se resuelve a su cifra formateada. */
@@ -107,7 +112,8 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
           columns: [...spec.tabularEquivalent.columns],
           rows: spec.tabularEquivalent.rows.map(row => row.map(cell => resolveCell(cell, factMap)))
         },
-        ...(derived ? { derived } : {})
+        ...(derived ? { derived } : {}),
+        ...(unitLabelOf(spec.unit) ? { unitLabel: unitLabelOf(spec.unit) } : {})
       }
     }),
     tables: chapter.tables.map(table => ({ tableId: table.tableId, title: table.title, columns: [...table.columns], rows: table.rows.map(row => [...row]) })),

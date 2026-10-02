@@ -243,7 +243,7 @@ export const humanFactSentence = (fact: EvidenceFactV1, byId: Map<string, Eviden
 }
 
 /** ¿El hecho cambió en lo que el documento IMPRIME? Una variación de 0,0 % no es un hallazgo. */
-const printedChange = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string) => {
+export const printedChange = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string) => {
   const change = changeOf(fact, byId, locale)
 
   return change && fmt(change.previous, locale) !== fmt(fact, locale) ? change : null
@@ -379,8 +379,8 @@ const lineReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, loca
 
 /**
  * «La cifra más alta» con el verbo de su familia: un motor que menciona, una dimensión evaluada, o genérico. Un
- * superlativo exige un máximo ÚNICO en lo impreso: con empate se dice el empate («Todos los motores mencionan la marca
- * en 2 de 6.», «Gemini y ChatGPT son los motores que…»), nunca «el que más» (Berel p. 11, 2026-09-25).
+ * superlativo exige un máximo ÚNICO en lo impreso: con empate se dice el empate («La marca aparece en 2 de 6 consultas
+ * en cada motor.» — TASK-1957 —, «Gemini y ChatGPT son los motores que…»), nunca «el que más» (Berel p. 11, 2026-09-25).
  */
 const highestText = (facts: EvidenceFactV1[], context: ChapterContext, locale: string): string | null => {
   const highest = [...facts].sort((a, b) => (b.value as number) - (a.value as number))[0]!
@@ -392,7 +392,7 @@ const highestText = (facts: EvidenceFactV1[], context: ChapterContext, locale: s
     const engine = (fact: EvidenceFactV1) => (fact.channelId ? GH_INSIGHTS.channels[fact.channelId] : undefined) ?? fact.label.replace(/^Presencia en\s+/i, '')
 
     if (tied.length === 1) return firstFitting(L.conclusion, `${engine(highest)} ${R.mostMentions}: ${value}.`)
-    if (all) return firstFitting(L.conclusion, `${R.allEnginesMention} ${value}.`)
+    if (all) return firstFitting(L.conclusion, `${R.allEnginesMention} ${value} ${R.allEnginesMentionTail}.`)
 
     return firstFitting(L.conclusion, `${listOf(tied.map(engine))} ${R.mostMentionsTied}: ${value}.`, `${R.severalEnginesShare}: ${value}.`)
   }

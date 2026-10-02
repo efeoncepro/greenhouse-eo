@@ -13,13 +13,17 @@
  * cómo lo mediremos, qué necesitamos, qué mide el informe, la apertura y la lectura por figura), las tasas de paso del
  * embudo calculadas por la MISMA geometría de los PDF (`funnelGeometry`), y el logo del cliente por proxy. Todo
  * opcional: un plan v1 sellado se proyecta igual que antes y un consumer 1.0 ignora lo nuevo.
+ *
+ * 1.2 (TASK-1957, 2026-10-02) — ADITIVO y correctivo: `source` vuelve a cumplir su contrato (fuente LEGIBLE, del
+ * vocabulario común con el PDF; hasta 1.1 viajaba la tabla lectora interna) y se suman `unitLabel`/`asOfLabel` en los
+ * hechos y `unitLabel` en las figuras, para que ningún consumer imprima un código (`count`) ni una fecha ISO.
  */
 
 import type { ChartSpecV1 } from './chart-spec'
 import type { EvidenceObservationKind, EvidenceUnit } from './evidence'
 import type { InsightModule, InsightOutput } from './request'
 
-export const INSIGHT_WEB_MODEL_VERSION = '1.1' as const
+export const INSIGHT_WEB_MODEL_VERSION = '1.2' as const
 
 /** Motivo por el que un hecho no tiene valor. Ausente ≠ cero: Think lo muestra como límite. */
 export type InsightWebAbsentReason = 'no_data'
@@ -34,9 +38,13 @@ export interface InsightWebFactV1 {
   /** Cifra formateada por locale: lo ÚNICO que el hub imprime como texto. */
   display: string
   observation: EvidenceObservationKind
-  /** Fuente legible (nombre del reader dueño), sin referencia interna. */
+  /** Fuente legible para el lector (vocabulario común con el PDF). Nunca la tabla ni el reader interno. */
   source: string
+  /** 1.2 — unidad legible («Cantidad», «Porcentaje»); vacía si la unidad no tiene nombre de cara al lector. */
+  unitLabel: string
   asOf: string | null
+  /** 1.2 — corte legible por locale («20 sept 2026»); null sin fecha. `asOf` queda como dato estructurado. */
+  asOfLabel: string | null
   absentReason: InsightWebAbsentReason | null
 }
 
@@ -44,6 +52,8 @@ export interface InsightWebClaimV1 {
   claimId: string
   text: string
   factIds: string[]
+  /** 1.2 — en afirmaciones de capítulo: hallazgo destacado o respaldo para la tabla. Ausente en planes previos. */
+  role?: 'finding' | 'backing'
 }
 
 export interface InsightWebTableV1 {
@@ -65,6 +75,8 @@ export interface InsightWebChartV1 {
   table: { columns: string[]; rows: Array<Array<string | null>> }
   /** 1.1 */
   derived?: InsightWebChartDerivedV1
+  /** 1.2 — unidad legible de la figura (la de `spec.unit` traducida). */
+  unitLabel?: string
 }
 
 /** 1.1 — lectura de una figura (TASK-1888): cifra principal, conclusión, lo que significa y el próximo paso. */

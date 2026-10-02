@@ -222,7 +222,8 @@ describe('TASK-1888 — canales y matriz', () => {
 
   it('si todo el gráfico mide UN canal (SEO: todo es Google), el canal va en la serie, no en cada dimensión', () => {
     const seo = (metricId: string, value: number): EvidenceFactV1 => ({ ...aeo(metricId, value), factId: `seo.${metricId}.w`, module: 'seo', metricId, label: metricId, numerator: null, denominator: null, dimension: undefined, channelId: 'google' })
-    const snapshot = { facts: [seo('clicks', 9377), seo('impressions', 512113)], sources: [], rejections: [] }
+    // Magnitudes comparables (TASK-1957 separa por banda las que no lo son: 9.377 junto a 512.113 no se leía).
+    const snapshot = { facts: [seo('clicks', 9377), seo('sessions', 12480)], sources: [], rejections: [] }
     const chart = v2(snapshot, ['seo']).chapters[0]!.charts[0]!
 
     expect(chart.dimensionChannelIds).toBeUndefined()
@@ -266,7 +267,9 @@ describe('TASK-1888 — topes, varios spaces y verbos por familia', () => {
     const snapshot = { facts: [position('p.cur', 6.6, 'p.prev'), position('p.prev', 5.8, null), ctr('r.cur', 3.1, 'r.prev'), ctr('r.prev', 3.0, null)], sources: [], rejections: [] }
     const seo = v2(snapshot, ['seo'])
 
-    expect(seo.chapters[0]!.readings![0]!.conclusion!.text).toBe('El mayor cambio fue en posición media: de #5,8 a #6,6 (+0,8 pos.).')
+    // TASK-1957 — una posición (menor es mejor) nunca va en barras desde cero: no hay figura; el cambio lo dice la afirmación.
+    expect(seo.chapters[0]!.charts).toEqual([])
+    expect(seo.chapters[0]!.claims.map(claim => claim.text).join(' ')).toMatch(/#5,8.*#6,6/)
     expect(validateEditorialPlan(seo, snapshot)).toEqual([])
   })
 
@@ -325,19 +328,17 @@ describe('TASK-1888 — autoría IA v2', () => {
 describe('TASK-1888 — superlativos únicos, esenciales sólo de hallazgos y afirmaciones humanas (Berel 2026-09-25)', () => {
   const conclusionOf = (plan: ReturnType<typeof v2>, chartId: string) => plan.chapters.flatMap(chapter => chapter.readings ?? []).find(reading => reading.chartId === chartId)?.conclusion
 
-  it('cuatro motores empatados en 2 de 6 se dicen como empate, nunca «el que más»', () => {
+  it('cuatro motores empatados en 2 de 6: sin figura (no informa) y una frase con la proporción por motor', () => {
     const tie = { facts: [aeo('gemini', 2, 'gemini'), aeo('google_ai_overview', 2, 'google_ai_overview'), aeo('openai', 2, 'chatgpt'), aeo('perplexity', 2, 'perplexity')].map(fact => ({ ...fact, denominator: 6 })), sources: [], rejections: [] }
     const plan = v2(tie, ['aeo'])
-    const texts = [conclusionOf(plan, 'chart.aeo.count')?.text, ...plan.essentials!.map(item => item.text), ...plan.executiveSummary.map(item => item.text)]
+    const chapter = plan.chapters[0]!
+    const texts = [...chapter.claims.map(item => item.text), ...plan.essentials!.map(item => item.text), ...plan.executiveSummary.map(item => item.text)]
 
-    expect(conclusionOf(plan, 'chart.aeo.count')?.text).toBe('Todos los motores mencionan la marca en 2 de 6.')
-    expect(texts.join(' ')).not.toMatch(/el motor que más/)
-
-    // La bajada de la cifra principal es la figura (el empate no tiene dueño), nunca «Presencia en gemini.».
-    const reading = plan.chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.count')!
-
-    expect(reading.keyFigure!.caption.text).toBe('Presencia por motor.')
-    expect(reading.keyFigure!.caption.text).not.toMatch(/Presencia en/)
+    // TASK-1957 — cuatro barras a la misma altura no dicen nada (revisión del operador con Berel, 2026-10-02).
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.count')).toBeUndefined()
+    expect(chapter.claims[0]).toMatchObject({ text: 'La marca aparece en 2 de 6 consultas en cada motor.', role: 'finding' })
+    expect(texts.join(' ')).not.toMatch(/el motor que más|Todos los motores/)
+    expect(validateEditorialPlan(plan, tie)).toEqual([])
   })
 
   it('un empate parcial nombra a los empatados; un máximo único conserva el superlativo', () => {

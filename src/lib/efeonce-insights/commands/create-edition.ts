@@ -19,6 +19,7 @@ import { findInsightEditionByIdempotencyKey, getInsightEditionById, insertInsigh
 import type { InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { insertInsightReport, lockInsightReport } from '../stores/report-store'
 import { runInsightGeneration, type RunGenerationResult } from './generation'
+import { defaultReportTitle } from '../presentation/vocabulary'
 import { validateInsightRequest } from './validate-request'
 
 export interface CreateInsightEditionInput {
@@ -81,7 +82,8 @@ export const createInsightEdition = async (input: CreateInsightEditionInput): Pr
     } else {
       report = await insertInsightReport(client, {
         organizationId: grant.organizationId,
-        title: request.title ?? `Insights ${request.modules.join('+')} ${request.period.start}–${request.period.endExclusive}`,
+        // TASK-1957 — el título llega a la portada: módulos por su nombre y el mes, nunca códigos ni fechas ISO.
+        title: request.title ?? defaultReportTitle(request.modules, request.period, request.locale),
         purpose: request.purpose ?? 'Edición generada desde el encargo',
         actor: grant.actor
       })

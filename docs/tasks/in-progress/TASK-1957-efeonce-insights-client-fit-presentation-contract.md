@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Diseno`
+- Status real: `En implementación local (Claude, 2026-10-02)`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery`
 - Blocked by: `none`

@@ -39,6 +39,18 @@ export const GH_INSIGHTS = {
    * Se redactan como hecho, nunca como disculpa ni como error del lector: el límite es información
    * del informe, no una falla que reportar.
    */
+  /**
+   * TASK-1957 — límites EN LENGUAJE DEL LECTOR. Un límite dice qué no trae la edición, sin exponer el diagnóstico del
+   * adapter (que sigue completo en la evidencia sellada) ni sonar a falla: «la fuente no sirve esta ventana» nos dejaba
+   * mal frente al cliente (revisión del operador, 2026-10-02). Una línea por tema; si falta el período actual, la línea
+   * de comparación no se agrega.
+   */
+  readerLimits: {
+    outOfScope: 'no forma parte de esta edición',
+    noComparison: 'sin comparación con el período anterior en esta edición',
+    insufficientData: 'sin datos suficientes en este período'
+  },
+
   rejections: {
     unsupported_window: 'la fuente no sirve esta ventana con exactitud',
     method_mismatch: 'la metodología disponible no es comparable',
@@ -160,7 +172,9 @@ export const GH_INSIGHTS = {
     changedMany: 'cambiaron',
     and: 'y',
     // Un superlativo exige un máximo ÚNICO; con empate se dice el empate (revisión de 1846, 2026-09-25).
-    allEnginesMention: 'Todos los motores mencionan la marca en',
+    // TASK-1957 — «Todos los motores mencionan la marca en 2 de 6» se leía como contradicción: la proporción es por motor.
+    allEnginesMention: 'La marca aparece en',
+    allEnginesMentionTail: 'consultas en cada motor',
     mostMentionsTied: 'son los motores que más mencionan la marca',
     severalEnginesShare: 'Varios motores comparten la mención más alta',
     allDimensions: 'Todas las dimensiones marcan',

@@ -9,6 +9,7 @@ import 'server-only'
  */
 
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 import { assertInsightsAccess } from '../authz'
@@ -22,6 +23,9 @@ import { revokeActiveInsightShareGrantsForEdition } from '../sharing/store'
 import { hashCanonical } from '../request-hash'
 import { getInsightEditionById, transitionInsightEditionState } from '../stores/edition-store'
 import { getInsightEditorialPlanByEdition } from '../stores/plan-store'
+import { getInsightReportById } from '../stores/report-store'
+import { clientFitViolations } from '../presentation/client-fit-gate'
+import { buildInsightWebModel } from '../sharing/web-model'
 import type { InsightEditionRecord } from '../stores/records'
 import { getInsightEvidenceSnapshotByEdition } from '../stores/snapshot-store'
 import { runInsightGeneration, type RunGenerationResult } from './generation'
@@ -52,6 +56,19 @@ export const issueInsightEdition = async (input: LifecycleInput): Promise<{ edit
   ])
 
   if (!snapshot?.snapshotHash || !plan?.planHash) throw new InsightsNotReadyError('Snapshot o plan sin congelar', { editionId: edition.editionId })
+
+  // TASK-1957 — gate «apto para cliente»: una edición de cliente no se emite con identificadores internos, límites con
+  // diagnóstico de adapter o figuras sin información. Se corrige con `revise` (edición nueva), nunca con un bypass.
+  if (edition.audience === 'client') {
+    const report = await getInsightReportById(undefined, grant.organizationId, edition.reportId)
+    const violations = clientFitViolations({ model: buildInsightWebModel({ plan: plan.plan, facts: snapshot.facts }), reportTitle: report?.title, facts: snapshot.facts })
+
+    if (violations.length > 0) {
+      captureWithDomain(new Error('insights_client_fit_violation'), 'insights', { tags: { source: 'insights_client_fit_violation' }, extra: { editionId: edition.editionId, count: violations.length, rules: [...new Set(violations.map(v => v.rule))] } })
+
+      throw new InsightsNotReadyError('La edición tiene textos o figuras que no pueden llegar a un cliente; revísala antes de emitir', { reason: 'client_fit', violations: violations.slice(0, 20) })
+    }
+  }
 
   const issuedHash = hashCanonical({ requestHash: edition.requestHash, snapshotHash: snapshot.snapshotHash, planHash: plan.planHash, outputs: outputs.outputs })
 

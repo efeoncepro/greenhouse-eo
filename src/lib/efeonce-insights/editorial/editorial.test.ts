@@ -48,8 +48,11 @@ describe('TASK-1845 — plan editorial determinista + validación de cifras', ()
     expect(clicks.text).toBe('Clics orgánicos: 1.250 (período anterior 1.000, variación +25,0 %).')
     expect(clicks.factIds).toEqual(['seo.clicks.cur', 'seo.clicks.prev'])
     expect(chapter.claims.find(claim => claim.claimId === 'claim.seo.position.cur')!.text).toContain('sin dato')
-    expect(chapter.charts.map(chart => [chart.family, chart.series.length])).toEqual([['bar_grouped', 2], ['bar', 1]])
-    expect(chapter.limits).toEqual(['Tráfico orgánico estimado: la fuente no sirve esta ventana con exactitud.'])
+    // TASK-1957 — el CTR solo (una barra sin comparación) no informa: no se dibuja; su cifra queda en la afirmación.
+    expect(chapter.charts.map(chart => [chart.family, chart.series.length])).toEqual([['bar_grouped', 2]])
+    expect(clicks.role).toBe('finding')
+    expect(chapter.claims.find(claim => claim.claimId === 'claim.seo.ctr.cur')!.role).toBe('backing')
+    expect(chapter.limits).toEqual(['Tráfico orgánico estimado: no forma parte de esta edición.'])
     expect(plan.methodology).toEqual(['Visibilidad orgánica: corte al 31 de agosto de 2026.'])
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
@@ -180,10 +183,11 @@ describe('TASK-1847 — límites y metodología sin identificadores internos', (
 
   it('redacta con nombres legibles, cae al módulo si no conoce la métrica y colapsa duplicados', () => {
     expect(plan.limits).toEqual([
-      'Posiciones en buscadores: sin datos.',
-      'Tráfico orgánico estimado: la fuente no sirve esta ventana con exactitud.',
-      'Motores de respuesta: la fuente no sirve esta ventana con exactitud.',
-      'Entrega: la métrica está suprimida por su política de evidencia.'
+      // TASK-1957 — en lenguaje del lector: el diagnóstico (ventana, supresión) sigue sólo en la evidencia sellada.
+      'Posiciones en buscadores: sin datos suficientes en este período.',
+      'Tráfico orgánico estimado: no forma parte de esta edición.',
+      'Motores de respuesta: no forma parte de esta edición.',
+      'Entrega: no forma parte de esta edición.'
     ])
     expect(plan.methodology).toEqual([
       'Visibilidad orgánica: Google Search Console, corte al 31 de agosto de 2026.',
@@ -199,12 +203,20 @@ describe('TASK-1847 — límites y metodología sin identificadores internos', (
       { modules: ['aeo'], locale: 'es-CL' }
     )
 
-    expect(withComparison.limits).toEqual(['Motores de respuesta: en el período anterior, la fuente no sirve esta ventana con exactitud.'])
+    expect(withComparison.limits).toEqual(['Motores de respuesta: sin comparación con el período anterior en esta edición.'])
+
+    // Actual + comparación del mismo tema: una sola línea (Berel, 2026-10-02: «Tráfico orgánico estimado» salía dos veces).
+    const both = buildDeterministicPlan(
+      { facts: leaky.facts, sources: [], rejections: [{ module: 'seo', metricId: 'organic_etv', reason: 'unsupported_window', detail: 'x' }, { module: 'seo', metricId: 'organic_etv', reason: 'unsupported_window', detail: 'x', scope: 'comparison' }] },
+      { modules: ['seo'], locale: 'es-CL' }
+    )
+
+    expect(both.limits).toEqual(['Tráfico orgánico estimado: no forma parte de esta edición.'])
   })
 
   it('toda causa de límite, también la de comparación, cabe en el presupuesto más estrecho (96, lámina del deck)', () => {
-    for (const reason of Object.values(GH_INSIGHTS.rejections)) {
-      expect(`${GH_INSIGHTS.document.comparisonLimitPrefix} ${reason}`.length, reason).toBeLessThanOrEqual(96)
+    for (const reason of Object.values(GH_INSIGHTS.readerLimits)) {
+      expect(reason.length, reason).toBeLessThanOrEqual(96)
     }
   })
 
