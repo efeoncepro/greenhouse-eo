@@ -228,9 +228,16 @@ rig siguen saliendo del kit 3D.
   que es lo que conecta con la órbita, y se lee mejor en chico. Los brazos existen como opción, no como norma.
 - **El accesorio flota** junto al cuerpo, a su izquierda, sin tocar el visor. Es la única diferencia con §5
   («siempre tocándolo»), que sigue valiendo para el 3D.
-- **El Spark cuenta como la órbita de la pieza.** Ya trae anillo y esfera, así que en una composición no se le agrega
-  otra órbita ni una esfera de cierre: no lleva el par pregunta-respuesta del componente `Voice` (su respuesta cierra
-  con la esfera). El texto va en titular y apoyo, entero fuera del anillo.
+- **El Spark cuenta como la órbita de la pieza:** ya trae anillo y esfera, así que no se le agrega otra órbita ni una
+  lente. **La voz es la de la línea**: pregunta en Poppins 300 con su anillo chico en el acento, respuesta en Bricolage
+  760 de 1 a 3 palabras, al menos 3× la pregunta, que cierra con la esfera en el acento, y evidencia en Poppins con una
+  palabra en negrita; todo entero fuera del anillo, en el tercio inferior. Mismo criterio que las portadas de perfil con
+  Nexa, donde la luz de la línea cuenta como órbita y la respuesta conserva su esfera (efeonce-graphic-line,
+  applications §A11). **[criterio, a partir de la corrección del operador del 2026-10-01: «no siguen tanto el estilo de
+  /efeonce-graphic-line»; pendiente su confirmación]** — reemplaza la regla anterior de esta sección, que dejaba el
+  Spark sin la voz por la regla de una esfera por pieza.
+- **Pesos que combinan** (línea gráfica): Bricolage 760/740 con Poppins 500, 620 con 400, 500 con 300. Etiquetas en
+  Poppins 600, mayúsculas, tracking 0,08 em, nunca en el acento bajo 24 px.
 - **Sobre papel lleva contorno navy**; sobre oscuro, no.
 - **Versión simple a 72 px o menos:** sin paneles, tornillos, brillo del visor ni ventanas, y con el anillo más grueso.
 - Siguen valiendo §2 y §10: una persona supervisa en el relato de la pieza y el accesorio no lleva texto. La escala de
