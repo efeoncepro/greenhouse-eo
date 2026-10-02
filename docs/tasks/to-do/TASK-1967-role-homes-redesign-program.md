@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseño aprobado por el operador el 2026-10-02 en canvas; discovery de 4 frentes hecho; TASK-1854 absorbida como hija G; resto de hijas por crear; sin implementación`
+- Status real: `Diseño aprobado por el operador el 2026-10-02 en canvas; discovery de 4 frentes hecho; hijas creadas (TASK-1968…1972 + TASK-1854); sin implementación`
 - Rank: `TBD`
 - Domain: `platform|delivery|crm`
 - Blocked by: `none`
@@ -157,51 +157,32 @@ Reglas obligatorias:
 
 ## Scope
 
-Cada slice de este umbrella es una task hija que se crea con `greenhouse-task-planner` (con su ID, su addendum UI o backend y su propio rollout). El orden está en «Slice ordering hard rule».
+Cada slice de este umbrella es una task hija con su ID, su addendum UI o backend y su propio rollout (creadas el 2026-10-02). El orden está en «Slice ordering hard rule».
 
-### Slice 1 — Hija A · Correcciones de seguridad y datos de la Home actual (backend-data, P0)
+### Slice 1 — Hija A · Seguridad de la Home actual = `TASK-1968` (backend-data, P0)
 
-- Cerrar la posible fuga de `loadHomeAiInsightsBento` (pasar contexto de tenant o sacar `client` de su audiencia) con test de no-fuga.
-- Quitar del cliente los enlaces `/admin` del pulse-strip y dejar de exponer costo laboral y margen en `account-summary`.
-- Si la fuga se confirma en runtime, abrir el `ISSUE-###` correspondiente antes de corregir.
+- Posible fuga entre clientes en `loadHomeAiInsightsBento`, enlaces `/admin` del pulse-strip cliente y costo/margen en `account-summary`; test de no-fuga y `ISSUE-###` si se confirma.
 
-### Slice 2 — Hija B · Chrome compartido y saludo con Spark (ui-ux, primitive)
+### Slice 2 — Hija B · Chrome del portal y saludo con Elio = `TASK-1969` (ui-ux, primitive)
 
-- Bump de `@efeoncepro/axis-graphic-line`, `axis-brand-assets` y `axis-ui-contracts`; capas del rig como estáticos versionados; primitive de saludo con `<SparkRig line="engine">`, indicador de pensamiento bajo el Spark (rotulado «Elio · <estado>», nunca «Nexa») y halo sin anillo.
-- Composer de Nexa (runtime existente) que abre la conversación debajo del saludo sobre el runtime existente (reemplaza el `router.push('/home?nexa=…')` muerto), sugerencias como burbujas pequeñas.
-- Logo Efeonce en el menú con isotipo al colapsar; Greenhouse al footer con estado de plataforma y versión; topbar flotante; menú de teléfono como barra con botón.
+- Bump AXIS y Elio (Spark rig); `GreenhouseGreetingHero` con composer de Nexa in-place; logo Efeonce arriba e isotipo al colapsar; Greenhouse al footer con estado y versión; topbar flotante; menú móvil; tarjeta de novedades compartida.
 
-### Slice 3 — Hija C · Readers de la Home interna (backend-data)
+### Slice 3 — Hija C · API de la Home por rol = `TASK-1970` (backend-data)
 
-- Reader de «Performance del equipo» sobre snapshots materializados (OTD, FTR, RpA, Cycle Time, throughput semanal con cycle time, piezas trabadas, utilización, headcount) con filtro todo el equipo / equipo / cliente, respetando metric trust policy.
-- Contador unificado de aprobaciones; countdown de cierre corregido (nómina y fecha límite desde el calendario operacional).
-- Reader de portafolio «Señales de tus clientes» (AEO, SEO, comercial) con `asOf` y estado sin datos.
-- Recientes con nombre resuelto en el servidor + recálculo de filas guardadas; fuente de versión; novedades reutilizando `listActiveLoginAnnouncements`.
-- Clima: adapter provider-neutral en `src/lib/integrations/weather/` con un proveedor gratuito sin API key, caché y timeout; ciudad desde `greenhouse_core.members.location_city` resuelta en el servidor (nunca desde direcciones personales); bloque con `fallback: 'hide'`.
+- Extiende `GET /api/home/snapshot/v2` con los bloques de las tres Homes; cada bloque usa el reader canónico de su dominio y los faltantes se crean en su dominio. Partes: ICO para las tres Homes (serie semanal con cycle time, filtro por equipo y cliente, proyecciones PG), bloques internos, bloques cliente vía client-portal, bloques de colaborador. Corrige el countdown de cierre, los recientes y suma clima con proveedor gratuito.
+- Reemplaza a las antiguas hijas C, D y E (decisión con el operador 2026-10-02: una sola API de la Home en vez de tareas de datos por Home).
 
-### Slice 4 — Hija D · Readers de la Home de clientes vía client-portal (backend-data)
+### Slice 4 — Hija F · Home interna = `TASK-1971` (ui-ux)
 
-- Resolver de mezcla de servicios desde módulos (`creative_hub_globe_v1` → creativo; `seo_v2` o `ai_visibility_v1` → SEO/AEO).
-- ICO por organización expuesto en client-portal + serie semanal de entregas; SEO/AEO cliente (tráfico orgánico desde `readSeoOverviewKpis`, citas en IA, posiciones de valor, presencia por motor) con el gobierno de cada fuente.
-- Cola de revisión extraída a `src/lib/**`; entregas recientes; equipo con `resolveAvatarUrl` y director de cuenta; próximos hitos.
+- Según `Main.dc.html`: Performance del equipo con filtro, Tu foco hoy, Señales de tus clientes, novedades, capacidad y Continúa donde lo dejaste.
 
-### Slice 5 — Hija E · Readers de la Home de colaboradores (backend-data)
-
-- Lista de tareas por persona sobre `greenhouse_delivery.tasks` con `task-status-canonical` (vence hoy, ronda 2 con feedback, mañana).
-- Serie semanal personal de piezas con cycle time; piezas en revisión del cliente por persona.
-- Próximo pago desde `scheduled_for` (sin inventar política); próxima evaluación con plazo del ciclo; sacar campos de costo de lo que consume la Home; errores canónicos en `/api/my/*`.
-
-### Slice 6 — Hija F · Home interna (ui-ux)
-
-- Bloques del registro de Home v2 para admin/interno según el artboard `Main.dc.html`: saludo, Performance del equipo con filtro desplegable, Tu foco hoy, Señales de tus clientes, novedades, capacidad, Continúa donde lo dejaste.
-
-### Slice 7 — Hija G · Home de clientes (ui-ux) = `TASK-1854`
+### Slice 5 — Hija G · Home de clientes = `TASK-1854` (ui-ux)
 
 - `TASK-1854` es esta hija (absorbida 2026-10-02). Según `Cliente.dc.html`: panel «Rendimiento de tu servicio» que cambia entre creativo y SEO/AEO (selector sólo si tiene ambos), Tu foco hoy del ciclo, entregas recientes, novedades como venta cruzada, tu equipo Efeonce y próximos hitos; conserva su alcance de «Mis servicios» y sus bloqueos de EPIC-046 (`TASK-1852`, `TASK-1853`).
 
-### Slice 8 — Hija H · Home de colaboradores (ui-ux)
+### Slice 6 — Hija H · Home de colaboradores = `TASK-1972` (ui-ux)
 
-- Según `Colaborador.dc.html`: Mi desempeño, Tu foco hoy, Mis tareas, novedades, mis asignaciones y mi ficha; reemplaza `MyDashboardView` en `/my` (la ruta y la política de inicio no cambian).
+- Según `Colaborador.dc.html`, en `/my`: Mi desempeño, Tu foco hoy, Mis tareas, novedades, mis asignaciones y mi ficha.
 
 ## Out of Scope
 
@@ -209,7 +190,7 @@ Cada slice de este umbrella es una task hija que se crea con `greenhouse-task-pl
 - Cambiar la política de inicio por rol (HR → `/hr/payroll`, Finance → `/finance`): es de `TASK-402`.
 - Borrar la Home legacy: es de `TASK-1133`.
 - Producir el 3D real del Spark o nuevas poses: es de AXIS y `TASK-1941`.
-- Construir la recurrencia del AEO Grader (`TASK-1707`) o el reader de indexación por URL de Search Console fuera de lo que la hija D necesite.
+- Construir la recurrencia del AEO Grader (`TASK-1707`) o el reader de indexación por URL de Search Console fuera de lo que `TASK-1970` necesite.
 - Calcular montos de nómina o permisos en la Home.
 
 ## Detailed Spec
@@ -234,11 +215,12 @@ Umbrella: el runtime lo define cada hija. Aquí sólo el impacto y el orden que 
 
 ### Slice ordering hard rule
 
-- Hija A (seguridad) va primero y no espera a nadie.
-- Hija B (chrome + saludo) puede correr en paralelo con C, D y E.
-- Hija F (UI interna) requiere B y C cerradas.
-- Hija G (`TASK-1854`, UI clientes) requiere A, B y D cerradas, además de sus bloqueos propios de EPIC-046 (`TASK-1852`, `TASK-1853`).
-- Hija H (UI colaboradores) requiere B y E cerradas; vive en `/my`.
+- `TASK-1968` (A, seguridad) va primero y no espera a nadie.
+- `TASK-1969` (B, chrome + saludo) puede correr en paralelo con `TASK-1970`.
+- `TASK-1970` (C, API de la Home) espera a `TASK-1968` para sus bloques cliente.
+- `TASK-1971` (F, UI interna) requiere `TASK-1969` y `TASK-1970` cerradas.
+- `TASK-1854` (G, UI clientes) requiere `TASK-1968`, `TASK-1969` y `TASK-1970` cerradas, además de sus bloqueos propios de EPIC-046 (`TASK-1852`, `TASK-1853`).
+- `TASK-1972` (H, UI colaboradores) requiere `TASK-1969` y `TASK-1970` cerradas; vive en `/my`.
 - Ninguna hija ui-ux prende su variante en producción sin la fila correspondiente en `home_rollout_flags`.
 
 ### Risk matrix
@@ -246,7 +228,7 @@ Umbrella: el runtime lo define cada hija. Aquí sólo el impacto y el orden que 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Fuga de datos entre clientes en la Home | identity / UI | medium (inferido del código) | Hija A primero, test de no-fuga por tenant | no signal — emerge en revisión; abrir ISSUE si se confirma |
-| Dos dueños de `/home` cliente | UI | low (resuelto: `TASK-1854` es la hija G) | Un solo dueño de la UI cliente; los readers son de la hija D | no signal — conflicto de archivos owned |
+| Dos dueños de `/home` cliente | UI | low (resuelto: `TASK-1854` es la hija G) | Un solo dueño de la UI cliente; los datos son de `TASK-1970` | no signal — conflicto de archivos owned |
 | Métricas ICO lentas en el render de la Home (BigQuery en vivo) | UI / data | medium | Readers sobre proyecciones materializadas en PostgreSQL; timeouts y `fallback` por bloque | `captureHomeShellError` / tag `home_version` |
 | Paquetes AXIS ≥ 0.14.0 no publicados o incompatibles | release | medium | Hija B verifica publicación antes del bump; build de producción | build rojo |
 | Cliente ve un servicio que no contrató | UI | low | Mezcla de servicios sólo desde módulos asignados | test del resolver |
@@ -262,7 +244,7 @@ Umbrella: el runtime lo define cada hija. Aquí sólo el impacto y el orden que 
 |---|---|---|---|
 | Hija A | revert PR + redeploy | < 15 min | sí |
 | Hija B | revert PR (bump y chrome) + redeploy | < 15 min | sí |
-| Hijas C, D, E | readers aditivos: revert PR; sin migraciones destructivas | < 15 min | sí |
+| Hija C (`TASK-1970`) | readers y bloques aditivos: revert PR; sin migraciones destructivas | < 15 min | sí |
 | Hijas F, G, H | apagar su fila en `home_rollout_flags` | < 1 min | sí |
 
 ### Production verification sequence
@@ -285,7 +267,7 @@ Umbrella: el runtime lo define cada hija. Aquí sólo el impacto y el orden que 
 
 ## Acceptance Criteria
 
-- [ ] Las hijas A–F y H existen como tasks registradas (G ya existe: `TASK-1854`), cada una con su perfil (`backend-data` o `ui-ux`), su addendum completo y `pnpm task:lint --task TASK-###` sin hallazgos.
+- [x] Las hijas existen como tasks registradas (`TASK-1968` A, `TASK-1969` B, `TASK-1970` C, `TASK-1971` F, `TASK-1854` G, `TASK-1972` H), cada una con su perfil (`backend-data` o `ui-ux`), su addendum completo y `pnpm task:lint --task TASK-###` sin hallazgos.
 - [ ] Cada hija UI apunta al artboard aprobado del canvas que le corresponde y registra wireframe, flow y motion bajo `docs/ui/`.
 - [ ] `TASK-1854`, `TASK-402`, `TASK-1133`, `TASK-1110` y `TASK-878` tienen un `## Delta` que referencia este programa.
 - [x] La decisión sobre `TASK-1854` está registrada: absorbida como hija G (operador, 2026-10-02).
@@ -306,11 +288,10 @@ Umbrella: el runtime lo define cada hija. Aquí sólo el impacto y el orden que 
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] todas las hijas A–H están en `complete/`
+- [ ] todas las hijas (`TASK-1968`, `TASK-1969`, `TASK-1970`, `TASK-1971`, `TASK-1854`, `TASK-1972`) están en `complete/`
 
 ## Follow-ups
 
-- Crear las hijas A–F y H con `greenhouse-task-planner` (empezar por A); la G es `TASK-1854`.
 - Si la fuga de `loadHomeAiInsightsBento` se confirma, `ISSUE-###` en `docs/issues/open/`.
 - Alinear `docs/context/06_glosario-metricas.md` (hoy dice 80–90 %) a la banda del código, que es la que manda (decisión del operador 2026-10-02).
 - Taxonomía de equipos para el filtro de performance (creativo, contenido, estrategia).
@@ -319,6 +300,7 @@ Umbrella: el runtime lo define cada hija. Aquí sólo el impacto y el orden que 
 ## Delta 2026-10-02
 
 - Decisiones del operador del mismo día: el Spark se llama **Elio** y el asistente sigue siendo **Nexa** (reemplazarlo queda para otra decisión); la Home de colaboradores sigue en `/my`; el clima va con un proveedor gratuito sin API key; la banda de capacidad que manda es la del código (`getCapacityHealth` en `src/lib/team-capacity/units.ts`: alta desde 85 %, equilibrada 35–85 %, baja bajo 35 %). Los artboards del canvas ya lo reflejan.
+- Hijas creadas el mismo día tras acordar con el operador una sola API de la Home (las antiguas C, D y E se fusionaron en `TASK-1970`): A `TASK-1968`, B `TASK-1969`, C `TASK-1970`, F `TASK-1971`, G `TASK-1854`, H `TASK-1972`.
 - El operador decidió absorber `TASK-1854` como hija G de este programa. Mantiene su ID, su epic (EPIC-046), sus bloqueos `TASK-1852`/`TASK-1853` y su alcance de «Mis servicios»; su dirección visual se reemplaza por el artboard `Cliente.dc.html` aprobado.
 
 ## Open Questions
