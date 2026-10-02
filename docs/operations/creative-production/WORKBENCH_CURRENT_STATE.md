@@ -21,6 +21,7 @@ Archivo (2026-10-01): corridas, export y evidencia v7 en `gs://efeonce-creative-
 (`runs/<runId>/<sha256>/run.zip`, `exports/prueba-modular-24-v7/…`, `evidence/layout-correction-v7/…`), borrados del disco
 tras verificar CRC32C/SHA. Índice: `pieza.json` y `archivo.md` del proyecto en Workbench (`8295130`). Los `run.zip` no llevan
 las entradas del pack ni los binarios Metric (TASK-1946).
+También se archivaron los exports v1–v6 y sus 97 corridas (`da18d49`); v7 es la vigente.
 
 ## Corrección SKY local v6 — verificada, aceptación visual pendiente
 
