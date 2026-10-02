@@ -103,6 +103,7 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U10 | [TASK-1957](../../tasks/in-progress/TASK-1957-efeonce-insights-client-fit-presentation-contract.md) | contrato de presentación apto para cliente: vocabulario único, modelo web 1.2 sin identificadores internos, selección de hallazgos, límites de cliente, elegibilidad de gráficos y gate — pedido del operador 2026-10-02 | none |
 | U11 | [TASK-1958](../../tasks/to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md) | jerarquía visual apta para cliente en Think y PDF (hallazgos, respaldo, alcance) | TASK-1957 |
 | U12 | [TASK-1960](../../tasks/to-do/TASK-1960-efeonce-insights-report-per-contracted-service.md) | un informe por servicio contratado: vínculo proyecto↔servicio, evidencia acotada y destinatarios por informe (Sky: Diseño digital y Blog SEO/AEO) | — |
+| U13 | [TASK-1961](../../tasks/to-do/TASK-1961-efeonce-insights-aeo-per-market.md) | visibilidad en IA por país: un run por mercado en la ventana, lectura por país sin promedio (Sky: siete mercados) | TASK-1863 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 
