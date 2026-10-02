@@ -337,3 +337,11 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   `count_without_denominator`, `rank_as_bars_from_zero`. Claves estructurales (ids, `unit`, `asOf`, `spec.data`,
   `spec.tabularEquivalent`…) no se leen como texto. Emitir una edición cliente con violaciones ⇒ `409 not_ready`
   con `details.reason = client_fit` y hasta 20 violaciones.
+
+- **AEO evidence v2** (`aeo_report_adapter_v2`, TASK-1957 Slice 6): `mention_rate.<provider>` (percent, num = present,
+  den = resolved, `channelId`), `share_of_model` (percent over all measured engines), `sov.brand` /
+  `sov.competitor.<slug>` (percent of total mentions, `buildCompetitiveBenchmark`, top 5 competitors) and
+  `citation_share` (percent of answers with citations that cite the own site). No competitors ⇒ rejection
+  `share_of_voice`/`insufficient_data`. `presence.*` is only read from snapshots sealed before v2.
+- Planner: AEO percent facts group by family (`mention_rate`, `sov`, `single`); `single` never charts; headline
+  metrics (`share_of_model`, `sov.brand`, `citation_share`) are always `finding`.

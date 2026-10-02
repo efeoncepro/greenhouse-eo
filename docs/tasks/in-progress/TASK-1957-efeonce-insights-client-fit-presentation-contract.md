@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Code complete local (commit c56f62d09, sin push): vocabulario, modelo web 1.2, límites de lector, elegibilidad de figuras, roles y gate client-fit; 280 pruebas + typecheck + lint + canvas-fidelity verdes; Berel y Sky regenerados pasan el gate. Pendiente: release, canary 1.2 en producción y revise de ediciones internas`
+- Status real: `Code complete local (Slices 1–6; commits c56f62d09, df9ddd298 y Slice 6), sin push: vocabulario, modelo web 1.2, límites de lector, elegibilidad de figuras, roles, gate client-fit e indicadores AEO estándar (tasa de mención, Share of Model, Share of Voice, citation share). Pendiente: pnpm build autorizado, release, canary 1.2 en producción y revise de ediciones internas`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery`
 - Blocked by: `none`
@@ -237,7 +237,7 @@ Reglas obligatorias:
 
 - [x] Source of truth, contract surface and consumers are named with real paths or objects.
 - [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se completa al final. Esta task no crea tablas.
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se completa al final. Esta task no crea tablas *(no aplica: sin tablas ni migraciones)*.
 - [x] Migration/backfill/rollback posture is explicit and proportional to risk.
 - [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
@@ -296,6 +296,14 @@ Reglas obligatorias:
   fechas `YYYY-MM-DD`, nombres de función lectora), figuras no elegibles y límites con vocabulario interno.
 - Se ejecuta en tests (fixtures derivados de snapshots reales) y en `plan-validation.ts` antes de permitir emitir una
   edición de cliente (error canónico, no warning).
+
+### Slice 6 — Indicadores estándar de visibilidad en motores de respuesta (pedido del operador, 2026-10-02)
+
+- Adapter AEO v2: tasa de mención por motor (% de respuestas, con canal), Share of Model, Share of Voice frente a
+  competidores (`buildCompetitiveBenchmark` del Grader) y citation share, con numerador y denominador. Sin
+  competidores en el panel, Share of Voice se declara como límite.
+- Planner: cada familia AEO es su figura; Share of Model y citas son hallazgos con su base de respuestas; tasa igual en
+  todos los motores se dice en una frase; empates nombran a los empatados antes del genérico.
 
 ## Out of Scope
 
@@ -406,8 +414,8 @@ valor inicial lo fija el agente en Discovery con los datos reales de Berel y Sky
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` registra el vocabulario de presentación, el modelo 1.2 y el gate client-fit.
-- [ ] `TASK-1958` recibe un Delta con los campos nuevos disponibles.
+- [x] `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` registra el vocabulario de presentación, el modelo 1.2 y el gate client-fit. *(§14.11)*
+- [x] `TASK-1958` recibe un Delta con los campos nuevos disponibles.
 
 ## Delta 2026-10-02
 
@@ -420,9 +428,19 @@ valor inicial lo fija el agente en Discovery con los datos reales de Berel y Sky
 - Los informes ya creados conservan su título técnico (no hay comando de renombre); la primera edición de cliente debe
   nacer en un informe nuevo o con `title` explícito.
 
+## Delta 2026-10-02 (b) — indicadores AEO
+
+- Pedido del operador: «la presencia en motores se mide con el Share of Voice o Share of Model; usemos los indicadores
+  adecuados». Con la skill `seo-aeo` (§07: presence %, citation share, SoV frente a competidores) y la definición del
+  informe público del Grader, se agregó el Slice 6 (commit local del 2026-10-02). La presencia deja de ser un conteo
+  «2 de 6» y pasa a porcentaje con su base.
+- Hallazgo para el Grader (fuera de esta task): la dimensión «Participación frente a competencia» marca 100 cuando el
+  panel no detectó competidores (Berel). Para un cliente se lee como liderazgo; requiere revisión del scoring del Grader.
+
 ## Follow-ups
 
 - Llevar el gate client-fit a otros documentos públicos por token (Grader, X-Ray) si comparten la misma frontera.
+- Grader: revisar la dimensión `competitive_sov` cuando el panel no detecta competidores (hoy 100); en Insights ese caso ya se declara como límite de Share of Voice.
 
 ## Open Questions
 

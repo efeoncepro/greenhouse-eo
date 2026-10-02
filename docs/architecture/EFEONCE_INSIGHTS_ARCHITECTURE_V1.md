@@ -1460,6 +1460,11 @@ lectora (`greenhouse_growth.seo_gsc_daily`) aunque su contrato decía «fuente l
   capítulo (1 pp · 0,5 pos. · 5 % relativo).
 - **Gate client-fit** (`presentation/client-fit-gate.ts`): reglas derivadas del payload y del copy; `issueInsightEdition`
   lo corre para audiencia cliente y responde `409 not_ready` con `details.reason=client_fit`.
+- **Indicadores AEO estándar** (adapter `aeo_report_adapter_v2`): tasa de mención por motor (`mention_rate.<proveedor>`,
+  % de respuestas con canal), `share_of_model`, Share of Voice frente a competidores (`sov.brand` + `sov.competitor.*`,
+  vía `buildCompetitiveBenchmark` del Grader) y `citation_share`, todos con numerador/denominador; reemplazan los
+  conteos `presence.*`. Sin competidores en el panel, Share of Voice es un límite declarado. Cada familia es su figura;
+  Share of Model y citas son hallazgos con su base de respuestas, nunca barras comparadas entre sí.
 - **Título por defecto**: «Módulo · mes» (`defaultReportTitle`), no `Insights ico 2026-08-01–2026-09-01`. Los
   informes ya creados conservan su título: no existe comando de renombre.
 

@@ -452,3 +452,11 @@ running»). Regla: parar el servidor de fixtures antes de levantar el de staging
 - Vista previa local con datos reales sin emitir: mock del lector público (sirve el JSON armado por
   `buildInsightWebModel` sobre un plan regenerado desde el snapshot sellado) + Think dev con
   `GREENHOUSE_API_BASE` apuntando al mock. No escribe nada salvo la bitácora de acceso al logo.
+
+- **El indicador tiene nombre estándar y una sola fórmula.** «Presencia 2 de 6» era un dato correcto con la forma
+  equivocada: el operador pidió Share of Voice / Share of Model (skill `seo-aeo` §07). La definición se toma del Grader
+  (misma fórmula), no se reescribe en Insights; el roster del Grader NO se reusó porque descarta motores desconocidos y
+  el contrato de canales de Insights promete mostrarlos sin isotipo.
+- **Un `$` en el texto de reemplazo de `String.replace` es un patrón**, y una búsqueda de ancla con `indexOf` puede
+  casar antes de tiempo (`"  return {…"` dentro de `"      return {…"`). En ediciones por script: reemplazo por
+  función o por `slice`, y anclas únicas.
