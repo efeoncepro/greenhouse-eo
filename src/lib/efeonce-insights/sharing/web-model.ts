@@ -34,6 +34,7 @@ const projectFact = (fact: EvidenceFactV1, locale: string): InsightWebFactV1 => 
   unitLabel: unitLabelOf(fact.unit),
   asOf: fact.freshness.asOf,
   asOfLabel: asOfLabelOf(fact.freshness.asOf, locale),
+  ...(fact.channelId ? { channelId: fact.channelId } : {}),
   absentReason: fact.value === null ? 'no_data' : null
 })
 

@@ -42,6 +42,32 @@ Capítulo (`ModuleScene.astro`), de arriba abajo:
    información (no el círculo punteado de advertencia), título según copy aprobado («Qué no incluye este capítulo»
    propuesto).
 
+### Isotipos de motor y buscador (pedido del operador, 2026-10-02)
+
+Donde el informe nombra un canal (ChatGPT, Gemini, Perplexity, Claude, Google AI Overview, Google), va su isotipo
+oficial a la izquierda del nombre, nunca un emoji ni una letra suelta. Fuente y reglas:
+
+- **Think ya tiene el componente**: `efeonce-think/src/components/EngineMark.astro` (logos en
+  `public/logos/engines/{chatgpt,gemini,perplexity,claude,google}.svg`; `google_ai_overview` usa el de Google) y
+  `src/components/primitives/EngineAvatarGroup.astro` (grupo apilado). Los usa el informe del Grader; el informe de
+  Insights todavía no.
+- **Los PDF ya lo hacen** con el mismo vocabulario: `artifact-composer/catalogs/insights-shared/channels.ts` y
+  `assets/channels/*.svg` en los catálogos A4/deck («Medimos la marca en» y columnas por canal).
+- **El dato**: `InsightWebFactV1.channelId` (modelo 1.2, TASK-1957) y `spec.dimensionChannelIds`/serie
+  `channelId` en las figuras. Mismo vocabulario que `contracts/channels.ts`; sin canal, sólo el nombre.
+
+Dónde se aplican:
+
+| Región | Isotipo |
+|---|---|
+| Fila de hallazgo con un solo canal | `EngineMark` 20 px junto al nombre de la métrica |
+| Frase de empate («La marca aparece en 2 de 6 consultas en cada motor.») | `EngineAvatarGroup` con los motores citados por la frase (sus `factIds` → `channelId`) |
+| Etiquetas de dimensión de una figura por canal (columnas) | `EngineMark` 16 px antes de la etiqueta del eje |
+| Tabla «Todas las cifras», fila de un hecho con canal | `EngineMark` 16 px en la celda Métrica |
+| Métricas SEO | **sin isotipo**: todas miden Google; repetir el logo en cada fila es ruido (misma regla que el PDF: canal en la serie, no en cada dimensión) |
+
+Accesibilidad: el isotipo es decorativo (`aria-hidden`); el nombre del canal siempre va en texto.
+
 ## Mobile Target
 
 - La fila de hallazgo apila: métrica + pastilla de cambio en una línea; cifra debajo; lectura al final.
@@ -93,6 +119,8 @@ Capítulo (`ModuleScene.astro`), de arriba abajo:
   `src/components/insights/`; `ChartFigure.astro` toma `unitLabel`/`asOfLabel` y mueve la nota de origen a la
   descripción accesible.
 - Datos: `InsightWebModelV1` 1.2 vía `src/lib/insights.ts` (tipos copiados del contrato de Greenhouse; fallback 1.1).
+- Isotipos: reuso de `EngineMark.astro` y `EngineAvatarGroup.astro` del hub (ya en producción para el Grader), alimentados
+  por `fact.channelId` y `spec.dimensionChannelIds`; sin assets nuevos.
 - PDF: `src/lib/efeonce-insights/render/report-mapper.ts` y plantillas de `insights-report`/`insights-deck` en
   `src/lib/artifact-composer/catalogs/` (vía slots, sin HEX ni fuentes literales).
 - Sin acciones de negocio nuevas: la superficie es de sólo lectura; no hay command que agregar.

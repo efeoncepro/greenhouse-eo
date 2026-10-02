@@ -256,6 +256,8 @@ Reglas obligatorias:
   conserva el render actual con 1.1.
 - `ChartFigure.astro` con `unitLabel`/`asOfLabel`; nota del eje sólo en la descripción accesible salvo eje sin cero.
 - Alcance con ícono informativo y copy aprobado.
+- Isotipos de canal (ChatGPT, Gemini, Perplexity, Claude, Google AI Overview) con `EngineMark`/`EngineAvatarGroup` del hub
+  en filas de hallazgo, frase de empate, etiquetas de figura por canal y tabla; nunca en métricas SEO (todas son Google).
 
 ### Slice 3 — PDF A4 y deck
 
@@ -336,6 +338,7 @@ GVC).
 - [ ] GVC desktop + mobile capturado y mirado; scorecard con promedio ≥ 4,2.
 - [ ] Sin scroll horizontal de pagina en 1440 ni 390, con tabla abierta y cerrada.
 - [ ] Ningún texto visible casa con los patrones del gate de TASK-1957.
+- [ ] Todo canal nombrado en el capítulo AEO lleva su isotipo oficial de `EngineMark` (o el grupo en la frase de empate); ninguna métrica SEO lo repite.
 - [ ] PDF reales de Berel y Sky aprobados por el operador; fidelidad al canvas ≤1 % en regiones no modificadas.
 
 ## Verification
@@ -361,6 +364,13 @@ GVC).
   todavía imprime `spec.unit` («Unidad count»), su propia fecha corta («20-09-2026») y la grilla `ins-facts` incluye los
   hechos del período ANTERIOR como cifras sueltas (aparecen «#6,6» y «#5,8» con la misma etiqueta) y la presencia sin
   denominador («2»). Esos tres puntos son de esta task.
+
+## Delta 2026-10-02 (b)
+
+- Pedido del operador: «donde va ChatGPT, Gemini, etc. tenemos íconos para todos en el repo». Verificado: Think ya tiene
+  `EngineMark.astro` + `EngineAvatarGroup.astro` con los SVG de los cinco canales (los usa el Grader) y los catálogos PDF
+  ya pintan isotipos por `channelId`. El informe live de Insights no los usaba y el modelo no traía el canal por hecho;
+  TASK-1957 agregó `InsightWebFactV1.channelId` (1.2). El uso queda en el Slice 2 y en el wireframe.
 
 ## Follow-ups
 

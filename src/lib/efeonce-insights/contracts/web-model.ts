@@ -19,6 +19,7 @@
  * hechos y `unitLabel` en las figuras, para que ningún consumer imprima un código (`count`) ni una fecha ISO.
  */
 
+import type { InsightChannelId } from './channels'
 import type { ChartSpecV1 } from './chart-spec'
 import type { EvidenceObservationKind, EvidenceUnit } from './evidence'
 import type { InsightModule, InsightOutput } from './request'
@@ -45,6 +46,11 @@ export interface InsightWebFactV1 {
   asOf: string | null
   /** 1.2 — corte legible por locale («20 sept 2026»); null sin fecha. `asOf` queda como dato estructurado. */
   asOfLabel: string | null
+  /**
+   * 1.2 — canal que el hecho representa (motor de respuesta, buscador), con el vocabulario estable de
+   * `contracts/channels.ts`. Ausente = no es un canal. El consumer lo traduce a su isotipo (Think: `EngineMark`).
+   */
+  channelId?: InsightChannelId
   absentReason: InsightWebAbsentReason | null
 }
 

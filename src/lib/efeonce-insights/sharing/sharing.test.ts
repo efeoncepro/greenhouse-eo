@@ -114,6 +114,12 @@ describe('buildInsightWebModel', () => {
     expect(projected.source).toBe('Google Search Console')
     expect(projected.unitLabel).toBe('Cantidad')
     expect(JSON.stringify(model)).not.toContain('readSeoOverviewKpisForWindow')
+
+    // El canal viaja para que el consumer pinte su isotipo (ChatGPT, Gemini…); un hecho sin canal no lo trae.
+    const withChannel = buildInsightWebModel({ plan: plan(), facts: [fact({ channelId: 'gemini' })] })
+
+    expect(Object.values(withChannel.facts)[0]!.channelId).toBe('gemini')
+    expect(projected).not.toHaveProperty('channelId')
   })
 
   it('1.1 — un plan v1 no trae campos v2 (aditivo: el consumer 1.0 ve lo mismo)', async () => {
