@@ -1430,9 +1430,9 @@
       "rol": "kit:traje-bionico-nexa/frente",
       "sha256": "ec182dfae3a7b39e1ba5ba3c2683d963406c34b0eaac3c6fb1feadd28e1aa803"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-02-espalda-1024x1536-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-02-espalda-1024x1536-v02-fondo-estudio.png": {
       "rol": "kit:traje-bionico-nexa/espalda",
-      "sha256": "0030d31b14d101b940f5f2348643162302c73638c701df95cbbd4bb0b60b2109"
+      "sha256": "fc526a2906c497a3c8188dd25e85fc3cc52f6ce76747830c9c73a7c2a4815377"
     },
     "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1024x1536-v01-fondo-estudio.png": {
       "rol": "kit:traje-bionico-nexa/tres-cuartos-izq",

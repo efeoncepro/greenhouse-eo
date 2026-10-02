@@ -75,6 +75,19 @@ describe('foto:isotipo', () => {
     expect(oficial.variante).toBe('efeonce-isotype-positive')
   })
 
+  it('con --marca logotipo usa el logo completo y su proporción sale del viewBox', async () => {
+    const oficial = await isotipoOficial('clara', 'logotipo')
+
+    expect(oficial.variante).toBe('efeonce-logo-positive')
+    expect(oficial.vbW / oficial.vbH).toBeCloseTo(837.07 / 196.68, 2)
+    expect((await isotipoOficial('oscura')).vbW).toBeCloseTo(727.4, 1)
+  })
+
+  it('--marca sólo admite isotipo o logotipo, y --tecnica exige --acabado', () => {
+    expect(() => parseArgs(['p.png', '--centro', '0.5,0.5', '--ancho', '0.1', '--marca', 'wordmark'])).toThrow(IsotipoError)
+    expect(() => parseArgs(['p.png', '--centro', '0.5,0.5', '--ancho', '0.1', '--tecnica', 'screen-printed'])).toThrow(/--acabado/)
+  })
+
   it('un plate inexistente falla con el error del comando, no con una traza de sharp', async () => {
     await expect(componerIsotipo({ plate: '/no/existe.png', centro: [0.5, 0.5], ancho: 0.1 })).rejects.toThrow(IsotipoError)
   })

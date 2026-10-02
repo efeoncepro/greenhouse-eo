@@ -1043,7 +1043,8 @@ export const OBJETOS = {
     vistas: {},
     vistasPorNombre: {
       frente: 'efeonce-traje-bionico-nexa-01-frente-1024x1536-v01-fondo-estudio.png',
-      espalda: 'efeonce-traje-bionico-nexa-02-espalda-1024x1536-v01-fondo-estudio.png',
+      // v02: el logo completo serigrafiado en tinta navy metálica en la placa dorsal [operador, 2026-10-02].
+      espalda: 'efeonce-traje-bionico-nexa-02-espalda-1024x1536-v02-fondo-estudio.png',
       'tres-cuartos-izq': 'efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1024x1536-v01-fondo-estudio.png'
     },
     vistaDefecto: 'frente',

@@ -67,6 +67,9 @@ pnpm foto:isotipo <plate.png> --centro x,y --ancho w [opciones]
                    sobre la silueta del isotipo. Escribe <salida>-acabado.png, el recorte, su edición, la hoja
                    antes/después al 300 % y la procedencia en el .json. Falla si cambia un píxel fuera de la marca.
                    Gasta una edición de gpt-image-2.5-sunburst (high, 1024×1024): ≈ USD 0,05 por marca
+  --marca m        isotipo (la nave sola, default) | logotipo (el logo completo «efeonce» con la nave en la «o»)
+  --tecnica t      (con --acabado) cómo está aplicada la marca, en inglés, para el prompt. P. ej. "screen-printed
+                   with a slightly metallic navy ink, as on an aerospace metal panel". Default: impresión fina al ras
   --superficie t   (con --acabado) qué superficie lleva la marca, en inglés, para el prompt. P. ej.
                    "a white armored chest plate of a futuristic suit". Default: la superficie al centro del recorte
   --lado px        (con --acabado) lado del recorte que ve el modelo. Default: 512
@@ -84,7 +87,14 @@ export class IsotipoError extends Error {
   }
 }
 
-const validar = ({ centro, ancho, prenda, rotacion, brillo, umbral, acabado = false, superficie = null, lado = LADO_RECORTE }) => {
+const validar = ({ centro, ancho, prenda, rotacion, brillo, umbral, acabado = false, superficie = null, lado = LADO_RECORTE, marca = 'isotipo', tecnica = null }) => {
+  if (!['isotipo', 'logotipo'].includes(marca)) throw new IsotipoError('--marca es isotipo o logotipo.')
+  if (!acabado && tecnica !== null) throw new IsotipoError('--tecnica sólo aplica con --acabado.')
+
+  if (tecnica !== null && (typeof tecnica !== 'string' || tecnica.trim().length < 3 || tecnica.length > 300 || /[\r\n]/.test(tecnica))) {
+    throw new IsotipoError('--tecnica es una frase de 3 a 300 caracteres, en una línea.')
+  }
+
   if (centro.length !== 2 || centro.some(v => !(v >= 0 && v <= 1))) throw new IsotipoError('--centro debe ser x,y entre 0 y 1.')
   if (!(ancho > 0 && ancho < 0.5)) throw new IsotipoError('--ancho debe estar entre 0 y 0,5 del ancho del plate.')
   if (!['oscura', 'clara'].includes(prenda)) throw new IsotipoError('--prenda es oscura o clara.')
@@ -134,6 +144,8 @@ export const parseArgs = argv => {
     limpiar: !args.includes('--sin-limpiar'),
     acabado: args.includes('--acabado'),
     superficie: opt('superficie', null),
+    marca: opt('marca', 'isotipo'),
+    tecnica: opt('tecnica', null),
     lado: Number(opt('lado', String(LADO_RECORTE))),
     out: opt('out', plate.replace(/\.png$/i, '') + '-isotipo.png')
   }
@@ -144,13 +156,16 @@ export const parseArgs = argv => {
 }
 
 /** El SVG oficial del paquete de marca y su huella. */
-export const isotipoOficial = async prenda => {
+export const isotipoOficial = async (prenda, marca = 'isotipo') => {
   const pkgJson = require.resolve('@efeoncepro/axis-brand-assets/package.json')
   const pkg = JSON.parse(await readFile(pkgJson, 'utf8'))
-  const variante = prenda === 'oscura' ? 'efeonce-isotype-negative' : 'efeonce-isotype-positive'
+  const familia = marca === 'logotipo' ? 'efeonce-logo' : 'efeonce-isotype'
+  const variante = `${familia}-${prenda === 'oscura' ? 'negative' : 'positive'}`
   const svg = await readFile(path.join(path.dirname(pkgJson), 'assets', `${variante}.svg`))
+  // Las proporciones salen del viewBox del archivo oficial, no de una constante: isotipo 727,4 × 516,12, logo 837,07 × 196,68.
+  const [, , vbW, vbH] = String(svg).match(/viewBox="([^"]+)"/)[1].trim().split(/[\s,]+/).map(Number)
 
-  return { svg, variante, paquete: `${pkg.name}@${pkg.version}`, sha256: createHash('sha256').update(svg).digest('hex') }
+  return { svg, variante, marca, vbW, vbH, paquete: `${pkg.name}@${pkg.version}`, sha256: createHash('sha256').update(svg).digest('hex') }
 }
 
 /**
@@ -259,7 +274,7 @@ const limpiarZona = async (raw, { W, H, ch, box, umbral, embW }) => {
  * @returns {Promise<{ out: string, procedencia: object, embW: number, variante: string, acabado?: Acabado }>}
  */
 export const componerIsotipo = async opciones => {
-  const { plate, centro, ancho, prenda, rotacion, umbral, brillo, limpiar, out, acabado, superficie, lado, editar, zonaMarcaPx } = {
+  const { plate, centro, ancho, prenda, rotacion, umbral, brillo, limpiar, out, acabado, superficie, lado, editar, zonaMarcaPx, marca, tecnica } = {
     prenda: 'oscura',
     rotacion: 0,
     umbral: 38,
@@ -268,10 +283,12 @@ export const componerIsotipo = async opciones => {
     acabado: false,
     superficie: null,
     lado: LADO_RECORTE,
+    marca: 'isotipo',
+    tecnica: null,
     ...opciones
   }
 
-  validar({ centro, ancho, prenda, rotacion, brillo, umbral, acabado, superficie, lado })
+  validar({ centro, ancho, prenda, rotacion, brillo, umbral, acabado, superficie, lado, marca, tecnica })
 
   if (!plate || !existsSync(plate)) throw new IsotipoError(`no existe el plate ${plate ?? '(vacío)'}.`)
 
@@ -279,7 +296,7 @@ export const componerIsotipo = async opciones => {
 
   // La procedencia se escribe junto a la salida cambiando la extensión: sin `.png`, el .json pisaba la imagen.
   if (!/\.png$/i.test(destino)) throw new IsotipoError('--out debe terminar en .png.')
-  const oficial = await isotipoOficial(prenda)
+  const oficial = await isotipoOficial(prenda, marca)
 
   const { data: raw, info } = await sharp(plate).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
   const W = info.width
@@ -292,7 +309,7 @@ export const componerIsotipo = async opciones => {
 
   // El isotipo es 727,4 × 516,12: la caja de limpieza toma el emblema con holgura para cubrir la marca
   // inventada, que suele ser más grande que la oficial.
-  const embH = Math.round(embW * (516.12 / 727.4))
+  const embH = Math.round(embW * (oficial.vbH / oficial.vbW))
   const pad = Math.round(embW * 0.35)
 
   const box = {
@@ -305,7 +322,7 @@ export const componerIsotipo = async opciones => {
 
   const limpio = limpiar ? await limpiarZona(raw, { W, H, ch, box, umbral, embW }) : raw
 
-  let emblema = sharp(oficial.svg, { density: 72 * Math.max(1, (embW * 2) / 727.4) })
+  let emblema = sharp(oficial.svg, { density: 72 * Math.max(1, (embW * 2) / oficial.vbW) })
     .resize({ width: embW })
     .png()
 
@@ -340,6 +357,7 @@ export const componerIsotipo = async opciones => {
     paquete: oficial.paquete,
     archivo: `assets/${oficial.variante}.svg`,
     sha256: oficial.sha256,
+    marca: oficial.marca,
     prenda,
     caja: { centro, ancho, rotacion },
     brillo,
@@ -367,6 +385,8 @@ export const componerIsotipo = async opciones => {
     prenda,
     superficie,
     lado,
+    marca,
+    tecnica,
     ...(editar ? { editar } : {}),
     ...(zonaMarcaPx !== undefined ? { zonaMarcaPx } : {})
   })
@@ -391,18 +411,22 @@ export const componerIsotipo = async opciones => {
 const lum = (d, i) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]
 
 /** Prompt de acabado. `superficie` nombra lo que muestra el recorte; el color de la marca sale de la prenda. */
-export const promptAcabado = ({ prenda, superficie = null }) => {
+export const promptAcabado = ({ prenda, superficie = null, marca = 'isotipo', tecnica = null }) => {
   const color = prenda === 'clara' ? 'navy' : 'white'
   const sobre = superficie?.trim() || 'the surface at the centre of this crop'
 
   return (
-    `This is a crop of a real photograph: ${sobre}. A small ${color} Efeonce mark (a rocket with three round windows ` +
-    'inside an elliptical orbit, with a small sphere on top) was placed flat on it. It is finished, official artwork: ' +
+    `This is a crop of a real photograph: ${sobre}. A small ${color} Efeonce mark (` +
+    (marca === 'logotipo'
+      ? 'the full wordmark: the letters e-f-e-o-n-c-e where the o is a rocket with three round windows inside an elliptical orbit, with a small sphere on top'
+      : 'a rocket with three round windows inside an elliptical orbit, with a small sphere on top') +
+    ') was placed flat on it. It is finished, official artwork: ' +
     `keep its shape, every part, its proportions, its ${color} colour, its exact size and its exact position — do NOT ` +
     'redraw, restyle, re-letter, simplify, resize or move it. You are only adding MATERIAL and LIGHT so it reads as a ' +
     'real mark applied to that surface: let it follow the gentle curvature of the surface, pick up the same lighting ' +
     'gradient, the soft rim light and the faint reflections of the scene, lie perfectly flush with the surface as a ' +
-    'thin printed decal — NO relief, NO bevel, NO emboss, NO highlight rim around it — with only a tiny edge softness, ' +
+    (tecnica?.trim() ? `mark ${tecnica.trim()}` : 'thin printed decal') +
+    ' — NO relief, NO bevel, NO emboss, NO highlight rim around it — with only a tiny edge softness, ' +
     'and carry the same grain, softness and depth of field as the surface around it. Keep everything else in the ' +
     'image exactly as it is: same framing, same surface, same colours. No text, no extra marks.'
   )
@@ -569,7 +593,7 @@ const hojaComparacion = async ({ antes, despues, cx, cy, embW, destino }) => {
  * procedencia; falla si cambió un píxel fuera de la marca (y deja el archivo como `.rechazado.png`).
  * `editar` y `zonaMarcaPx` existen para las pruebas; el comando usa los valores por defecto.
  */
-export const terminarIsotipo = async ({ base, compuesto, rutaProcedencia, centro, ancho, prenda, superficie = null, lado: ladoPedido = LADO_RECORTE, editar = editarConAiImage, zonaMarcaPx = ZONA_MARCA_PX }) => {
+export const terminarIsotipo = async ({ base, compuesto, rutaProcedencia, centro, ancho, prenda, superficie = null, marca = 'isotipo', tecnica = null, lado: ladoPedido = LADO_RECORTE, editar = editarConAiImage, zonaMarcaPx = ZONA_MARCA_PX }) => {
   const raiz = compuesto.replace(/\.png$/i, '') + '-acabado'
   const salida = `${raiz}.png`
   const rechazado = `${raiz}.rechazado.png`
@@ -616,7 +640,7 @@ export const terminarIsotipo = async ({ base, compuesto, rutaProcedencia, centro
     .png()
     .toFile(recorte)
 
-  const prompt = promptAcabado({ prenda, superficie })
+  const prompt = promptAcabado({ prenda, superficie, marca, tecnica })
   const modelo = await editar({ recorte, edicion, prompt })
 
   const metaEdicion = await sharp(edicion).metadata()
