@@ -470,19 +470,48 @@ function resolverIdentidad(ficha) {
 
     const pedidas = typeof pedido === 'string' ? [] : DIMENSIONES_DE_IDENTIDAD.filter(d => pedido?.[d.campo])
 
-    if (pedidas.length > 1) {
+    // `vista` + `expresion` juntas [operador, 2026-10-02]: las 12 expresiones fotográficas de Nexa comparten el mismo
+    // tres cuartos del ancla, así que con una sola ranura la expresión arrastraba siempre ese ángulo. Con una persona
+    // sola en la toma se admite el par: la vista va primera y manda en el ángulo; la expresión, segunda, sólo en el
+    // gesto. Con dos personas el cupo no alcanza, y `vestuario` sigue sin combinarse.
+    const parAngulo = pedidas.length === 2 && pedidas.every(d => d.campo === 'vista' || d.campo === 'expresion')
+
+    if (pedidas.length > 1 && !(parAngulo && cupo >= 3)) {
       throw new Error(
-        `Para ${persona.etiqueta} se pidió ${pedidas.map(d => `\`${d.campo}\``).join(' y ')} a la vez, y las tres ` +
-          'dimensiones ocupan la MISMA ranura: la referencia que se antepone. Elige una.'
+        `Para ${persona.etiqueta} se pidió ${pedidas.map(d => `\`${d.campo}\``).join(' y ')} a la vez. ` +
+          (parAngulo
+            ? '`vista` + `expresion` sólo se combinan con una persona sola en la toma: con dos, el cupo de referencias no alcanza.'
+            : 'Esas dimensiones ocupan la MISMA ranura (la referencia que se antepone): elige una. Sólo `vista` + `expresion` se combinan.')
       )
     }
 
-    const dimension = pedidas[0] ?? null
+    // Con el par, la vista va primera (es la decisiva para el ángulo).
+    const ordenadas = parAngulo ? [...pedidas].sort(d => (d.campo === 'vista' ? -1 : 1)) : pedidas
+    const dimension = ordenadas[0] ?? null
     const pedidaEnDimension = dimension ? pedido[dimension.campo] : null
 
     // La dimensión manda: si la toma es de perfil, mandar sólo retratos frontales obliga al modelo a
     // inventar el giro, y lo que inventa ensancha la cara. Va PRIMERA por ser la decisiva.
     let refs = persona.refs.slice(0, cupo)
+
+    for (const d of ordenadas) {
+      const disponibles = persona[d.mapa] ?? {}
+      const valor = pedido[d.campo]
+
+      if (!disponibles[valor]) {
+        const esKit = Object.keys(OBJETOS).includes(valor)
+
+        throw new Error(
+          `La ${d.campo} "${valor}" no existe para ${persona.etiqueta}. ` +
+            `${d.etiqueta} disponibles: ${Object.keys(disponibles).join(', ') || 'ninguna'}.` +
+            (esKit
+              ? ` — "${valor}" SÍ existe, pero es un kit de marca: la ropa con marca se pide ` +
+                `por \`objetos\`, no por \`${d.campo}\`. Por ejemplo: ` +
+                `{ "objetos": [{ "objeto": "${valor}", "usoDe": "${clave}" }] }.`
+              : '')
+        )
+      }
+    }
 
     if (dimension) {
       const disponibles = persona[dimension.mapa] ?? {}
@@ -506,7 +535,10 @@ function resolverIdentidad(ficha) {
         )
       }
 
-      refs = [disponibles[pedidaEnDimension], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
+      refs = parAngulo
+        ? // vista + expresión + el ancla frontal (la cara); el cuerpo se suma abajo como cuarta si la vista no lo es.
+          [disponibles[pedidaEnDimension], persona[ordenadas[1].mapa][pedido[ordenadas[1].campo]], persona.refs[0]]
+        : [disponibles[pedidaEnDimension], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
     }
 
     // El CUERPO ENTERO tiene que viajar siempre que quepa. Con una persona sola el cupo es 3 y entra
@@ -520,7 +552,9 @@ function resolverIdentidad(ficha) {
     )
 
     if (persona.cuerpo && cupo >= 2 && !yaEsDeCuerpo && !refs.includes(persona.cuerpo)) {
-      refs[refs.length - 1] = persona.cuerpo
+      // Con el par vista + expresión el cuerpo entra como CUARTA: sustituir la última quitaría el ancla frontal.
+      if (parAngulo) refs.push(persona.cuerpo)
+      else refs[refs.length - 1] = persona.cuerpo
     }
 
     for (const ref of refs) {
@@ -536,7 +570,8 @@ function resolverIdentidad(ficha) {
     const hasta = imagenes.length + refs.length
 
     imagenes.push(...refs)
-    tramos.push({ persona, desde, hasta, dimension: dimension?.campo ?? null })
+    // Qué imagen manda en qué: la primera (o las dos primeras, con el par) son la vista y/o la expresión pedidas.
+    tramos.push({ persona, desde, hasta, marcas: ordenadas.map((d, i) => ({ campo: d.campo, imagen: desde + i })) })
   }
 
   // Texto verbatim de §3.7: una persona lo lleva todo en una frase; dos lo dicen por tramo y cierran
@@ -555,9 +590,11 @@ function resolverIdentidad(ficha) {
   // 2026-10-02). La imagen que la ficha pide como ángulo manda en el ángulo; la de expresión, SÓLO en el gesto: las 12
   // expresiones de `5-expresiones/` comparten el mismo tres cuartos del ancla (se editaron desde ella), así que copiarlas
   // enteras arrastraba también la pose (medido en el A/B NX7f, 2026-10-02).
-  const queManda = tramos
-    .filter(t => t.dimension === 'vista' || t.dimension === 'expresion')
-    .map(t => `Image ${t.desde} is ${t.persona.etiqueta}'s ${t.dimension === 'vista' ? 'ANGLE reference: it sets the head angle of this shot' : 'EXPRESSION reference: copy only its facial expression (eyes, brows, mouth), NOT its head angle or tilt'}, still with the face of the identity references.`)
+  const queManda = tramos.flatMap(t =>
+    t.marcas
+      .filter(m => m.campo === 'vista' || m.campo === 'expresion')
+      .map(m => `Image ${m.imagen} is ${t.persona.etiqueta}'s ${m.campo === 'vista' ? 'ANGLE reference: it sets the head angle of this shot' : 'EXPRESSION reference: copy only its facial expression (eyes, brows, mouth), NOT its head angle or tilt'}, still with the face of the identity references.`)
+  )
 
   const pose =
     ' The references define WHO each person is — features, proportions, skin and hair — never how they hold their head: ' +
@@ -1472,6 +1509,13 @@ function bloqueSuspendido(ficha) {
       '`suspendido` debe decir QUÉ está en el aire, por ejemplo "the coffee beans tipped from the scoop". ' +
         'Un valor vacío o genérico deja que el modelo elija, y elige confeti.'
     )
+  }
+
+  // En cine el `suspendido` suele describir ya el congelado («frozen mid-air…», «hanging still…») y la plantilla de
+  // abajo lo volvía una frase rota («…hanging still along them is FROZEN IN MID-AIR at the peak of its arc», NX7d,
+  // prueba ciega 2026-10-02). En cine va como frase propia; fuera de cine queda igual para no mover la regresión.
+  if (ficha.registro === 'cine') {
+    return `SUSPENDED ACTION (one frozen, decisive instant): ${que.trim().replace(/[.\s]+$/, '')}. Every piece is sharp and clearly in flight, caught at a frozen shutter speed, with its real weight and trajectory — never a decorative scatter and never confetti.`
   }
 
   return `SUSPENDED ACTION: ${que} is FROZEN IN MID-AIR at the peak of its arc — every piece sharp and clearly in flight, caught at a frozen shutter speed, with its real weight and trajectory. It is a single decisive instant, not a decorative scatter and never confetti.`
@@ -2536,6 +2580,18 @@ export const AJUSTES_CINE = [
 /** @param {string} texto @returns {string} */
 export const ajustarParaCine = texto => AJUSTES_CINE.reduce((/** @type {string} */ t, [de, a]) => t.split(de).join(a), texto)
 
+// Con el traje biónico, Nexa NO lleva smartwatch ni anillo [operador, 2026-10-02, TASK-1940]: los antebrazos son placas, y
+// la prueba ciega del mismo día mostró que la «bright rectangular screen» del reloj competía con la única fuente de luz
+// de la escena. Se reemplaza sólo esa cláusula del bloque de accesorios; los aretes quedan literales para que
+// AJUSTES_CINE los siga cambiando a dorados.
+export const CLAUSULA_RELOJ_ANILLO =
+  'a geometric matte-silver statement ring on the INDEX finger of her right hand — not a plain band, not gold, not on another finger; a modern SMARTWATCH on her LEFT wrist — a rounded-square aluminium or titanium case with a bright rectangular screen and a plain sport or woven band in navy or graphite, NEVER a round analogue dial with hands; '
+
+export const ajustarParaTraje = (/** @type {any} */ ficha, /** @type {string} */ texto) =>
+  clavesDeObjetos(ficha).includes('traje-bionico-nexa')
+    ? texto.split(CLAUSULA_RELOJ_ANILLO).join('NO ring and NO watch of any kind (with the bionic suit her forearms are armored plates); ')
+    : texto
+
 // En una sección partida 1:1 del deck la reserva va a la IZQUIERDA, no arriba (prueba ciega A, 2026-10-02:
 // el formato 1:1 sólo sabía reservar la banda superior y la frase salía rota). Sólo en cine.
 const SECCION_PARTIDA_1_1 = {
@@ -2591,7 +2647,9 @@ export const bloqueCine = (ficha, formato) => {
     partes.push('GAZE: the person looks toward the empty dark side of the frame where the text will sit, never into the lens.')
   }
 
-  if (clavesDeObjetos(ficha).some(k => PRENDAS_CON_EMBLEMA.includes(k))) {
+  // El traje biónico de Nexa también es navy profundo (TASK-1940): la prueba ciega del 2026-10-02 mostró que no recibía
+  // la línea porque no está en PRENDAS_CON_EMBLEMA (que dispara el aviso de bordado, que no le aplica).
+  if (clavesDeObjetos(ficha).some(k => PRENDAS_CON_EMBLEMA.includes(k) || k === 'traje-bionico-nexa')) {
     partes.push('UNIFORM COLOUR: every Efeonce garment is deep navy, never royal blue, cobalt or bright blue.')
   }
 
@@ -2700,7 +2758,7 @@ export const construirPrompt = ficha => {
   // El lecho, con el porcentaje del formato. Nunca escrito a mano.
   if (ficha.lecho === 'sin-lecho') {
     return {
-      prompt: ficha.registro === 'cine' ? ajustarParaCine(partes.join('\n\n')) : partes.join('\n\n'),
+      prompt: ajustarParaTraje(ficha, ficha.registro === 'cine' ? ajustarParaCine(partes.join('\n\n')) : partes.join('\n\n')),
       size: fmt.size,
       sinValidar: Boolean(fmt.sinValidar),
       imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
@@ -2723,7 +2781,7 @@ export const construirPrompt = ficha => {
   )
 
   return {
-    prompt: ficha.registro === 'cine' ? ajustarParaCine(partes.join('\n\n')) : partes.join('\n\n'),
+    prompt: ajustarParaTraje(ficha, ficha.registro === 'cine' ? ajustarParaCine(partes.join('\n\n')) : partes.join('\n\n')),
     size: fmt.size,
     sinValidar: Boolean(fmt.sinValidar),
     imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],

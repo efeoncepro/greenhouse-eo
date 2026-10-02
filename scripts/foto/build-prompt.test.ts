@@ -308,6 +308,34 @@ conAssets('foto:prompt · identidad', () => {
     expect(r.prompt).toContain("Image 1 is Nexa's EXPRESSION reference: copy only its facial expression")
   })
 
+  it('vista + expresión conviven con una persona sola: ángulo primero, gesto segundo, cara y cuerpo después', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: '45-izq', expresion: 'curiosa' }] })
+
+    expect(r.imagenes[0]).toMatch(/nexa-45-izq/)
+    expect(r.imagenes[1]).toMatch(/nexa-expr-10-curiosa/)
+    expect(r.imagenes[2]).toMatch(/nexa-ancla-1-rostro-frontal/)
+    expect(r.imagenes[3]).toMatch(/nexa-ancla-5-cuerpo-frontal/)
+    expect(r.prompt).toContain("Image 1 is Nexa's ANGLE reference")
+    expect(r.prompt).toContain("Image 2 is Nexa's EXPRESSION reference")
+  })
+
+  it('vista + expresión con dos personas, o vestuario con otra dimensión, abortan explicando por qué', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: '45-izq', expresion: 'curiosa' }, 'julio'] })).toThrow(/persona sola/)
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: '45-izq', vestuario: Object.keys(PERSONAS.nexa.vestuario)[0] }] })).toThrow(/Sólo `vista` \+ `expresion`/)
+  })
+
+  it('con el traje, Nexa no lleva reloj ni anillo, el traje recibe la línea de navy y la acción suspendida se lee como frase propia', () => {
+    const ficha = JSON.parse(readFileSync(path.join(raiz, 'ai-generations/2026-10-01_traje-bionico-nexa/fichas/NX7d-nexa-despliega-squad.json'), 'utf8'))
+    const p = construirPrompt(ficha).prompt
+
+    expect(p).not.toContain('SMARTWATCH')
+    expect(p).toContain('NO ring and NO watch of any kind')
+    expect(p).toContain('small gold earrings') // AJUSTES_CINE sigue aplicándose
+    expect(p).toContain('deep navy, never royal blue')
+    expect(p).toContain('SUSPENDED ACTION (one frozen, decisive instant):')
+    expect(p).not.toMatch(/hanging still along them is FROZEN IN MID-AIR/)
+  })
+
   it('avisa cuando Nexa no trae expresión ni vista', () => {
     expect(auditarExpresion(['nexa'])).toMatch(/gesto por defecto/)
     expect(auditarExpresion([{ persona: 'nexa', expresion: 'curiosa' }])).toBeNull()
@@ -452,10 +480,15 @@ conAssets('foto:prompt · expresiones y vestuario de Nexa', () => {
 
   // Las tres dimensiones ocupan la MISMA ranura —la referencia que se antepone— así que pedir dos es
   // ambiguo y el comando tiene que decirlo en vez de elegir por su cuenta.
-  it('aborta si se piden dos dimensiones a la vez', () => {
+  // Desde el 2026-10-02 `vista` + `expresion` se combinan con una persona sola (el ángulo y el gesto son ejes distintos);
+  // las otras combinaciones siguen ocupando la misma ranura.
+  it('aborta si se piden dos dimensiones que comparten ranura (vestuario con otra)', () => {
+    expect(() =>
+      construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: 'perfil-izq', vestuario: 'prof-1' }] })
+    ).toThrow(/MISMA ranura/)
     expect(() =>
       construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: 'perfil-izq', expresion: 'the-read' }] })
-    ).toThrow(/MISMA ranura/)
+    ).not.toThrow()
   })
 
   it('un vestuario que ya es de cuerpo entero no duplica cuerpo', () => {

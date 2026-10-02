@@ -45,9 +45,12 @@ cada uno corresponde a una falla medida.
 | `fondo` | luces prácticas grandes y frías al fondo, fundidas en bokeh: dan escala | `"a row of large cold practical lights far behind, melted into round bokeh"` (NX5b, NX7d) |
 | `fenomeno` | `{ que, esServicio }`: el fenómeno de luz y **una frase que diga por qué ES el servicio**. En vertical, el comando lo baja del 36 % | `{ "que": "one azure beam picks a single card out of thousands", "esServicio": "AEO: la IA te elige a ti" }` (AE2b) |
 | `alcance` | uno de `nexa` · `proposal-cinematic` · `deck-seccion` · `deck-portada` · `manzanitas` · `social-nexa` · `publicidad-prueba` | `"proposal-cinematic"` |
+| `identidad` con `vista` + `expresion` | desde el 2026-10-02 conviven (una persona sola en la toma): la `vista` manda en el ángulo de la cabeza y la `expresion` sólo en el gesto (las 12 fotográficas de Nexa comparten el mismo tres cuartos, así que solas no cambian el ángulo). `vestuario` sigue sin combinarse | `[{ "persona": "nexa", "vista": "45-izq", "expresion": "curiosa" }]` |
 
 Además, en cine el comando **inyecta solo** lo que se olvida siempre: el uniforme «deep navy, not royal blue» cuando
-hay una prenda del kit, y el lecho «matte, non-reflective, outside the reach of the key light».
+hay una prenda del kit **o el traje biónico de Nexa**, y el lecho «matte, non-reflective, outside the reach of the key
+light». Con el traje, además, quita el smartwatch y el anillo de los accesorios de Nexa (los antebrazos son placas y la
+pantalla del reloj competía con la única fuente de luz; prueba ciega del 2026-10-02).
 
 ## Las diez fallas, con su corrección
 
