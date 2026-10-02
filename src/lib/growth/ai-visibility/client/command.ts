@@ -15,7 +15,7 @@ import 'server-only'
  * domain `growth` y recibe la `organizationId` ya resuelta (no importa `@/lib/client-portal/*`).
  */
 
-import { getClientGraderRunById, getLatestClientGraderRun } from '../store'
+import { getClientGraderRunById, getLatestClientGraderRun, getLatestClientGraderRunInWindow } from '../store'
 import { readGraderReport, GraderReportError } from '../report/command'
 import { type ClientGraderReport } from '../report/contracts'
 import { toClientGraderReport } from '../report/builder'
@@ -35,6 +35,8 @@ export interface ReadClientGraderReportInput {
   organizationId: string
   /** Run específico; si se omite, el run reportable más reciente de la org. */
   runId?: string
+  /** Sin `runId`: el run más reciente que terminó dentro de `[startUtc, endUtc)` (informes de período). */
+  finishedWithin?: { startUtc: string; endUtc: string }
 }
 
 export interface ClientGraderReportResult {
@@ -51,7 +53,9 @@ export const readClientGraderReport = async (
 ): Promise<ClientGraderReportResult> => {
   const run = input.runId
     ? await getClientGraderRunById({ runId: input.runId, organizationId: input.organizationId })
-    : await getLatestClientGraderRun(input.organizationId)
+    : input.finishedWithin
+      ? await getLatestClientGraderRunInWindow({ organizationId: input.organizationId, ...input.finishedWithin })
+      : await getLatestClientGraderRun(input.organizationId)
 
   if (!run) {
     // Sin revelar si el run no existe o es de otra org (tenant boundary).

@@ -18,12 +18,13 @@ import {
   type InsightWebModelV1,
   type InsightWebReadingV1
 } from '../contracts/web-model'
-import { formatFactValue } from '../editorial/format'
+import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { asOfLabelOf, sourceLabelOf, unitLabelOf } from '../presentation/vocabulary'
 
 const projectFact = (fact: EvidenceFactV1, locale: string): InsightWebFactV1 => ({
   factId: fact.factId,
   module: fact.module,
+  metricId: fact.metricId,
   label: fact.label,
   value: fact.value,
   unit: fact.unit,
@@ -35,8 +36,36 @@ const projectFact = (fact: EvidenceFactV1, locale: string): InsightWebFactV1 => 
   asOf: fact.freshness.asOf,
   asOfLabel: asOfLabelOf(fact.freshness.asOf, locale),
   ...(fact.channelId ? { channelId: fact.channelId } : {}),
+  ...(fact.comparisonFactId ? { comparisonFactId: fact.comparisonFactId } : {}),
   absentReason: fact.value === null ? 'no_data' : null
 })
+
+/**
+ * TASK-1957 — cifra de una esencial: el cambio del hecho que cita contra su período anterior, cuando la frase lo dice.
+ * Sin comparable, sin cambio impreso o con una frase sobre otra cosa (una meta), no hay cifra: el consumer muestra el
+ * nivel.
+ */
+const essentialFigure = (claim: { text: string; factIds: string[] }, byId: Map<string, EvidenceFactV1>, locale: string): InsightWebClaimV1['figure'] | undefined => {
+  const fact = claim.factIds.map(id => byId.get(id)).find(item => item?.comparisonFactId)
+  const previous = fact?.comparisonFactId ? byId.get(fact.comparisonFactId) : undefined
+
+  const change = fact && previous && fact.value !== null && previous.value !== null ? formatDeltaForUnit(fact.value, previous.value, fact.unit, locale) : null
+
+  // El cambio sólo si la frase lo dice: una esencial sobre una meta («1,33 (meta 1,50)») con «-7,6 %» en grande
+  // mostraba una cifra que la frase no dice (Sky, 2026-10-02).
+  if (fact && previous && change && claim.text.includes(change)) {
+    return { display: change, direction: fact.value! > previous.value! ? 'up' : fact.value! < previous.value! ? 'down' : 'flat', kind: 'change' }
+  }
+
+  // Si no, el valor del primer hecho que la frase cita («83,8 % (meta 90,0 %)»).
+  const cited = byId.get(claim.factIds[0] ?? '')
+
+  if (!cited || cited.value === null) return undefined
+
+  const level = formatFactValue(cited.value, cited.unit, locale)
+
+  return claim.text.includes(level) ? { display: level, direction: 'flat', kind: 'level' } : undefined
+}
 
 const projectClaim = (claim: { claimId: string; text: string; factIds: string[]; role?: 'finding' | 'backing' }): InsightWebClaimV1 => ({
   claimId: claim.claimId,
@@ -99,6 +128,8 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
 
   for (const fact of facts) factMap[fact.factId] = projectFact(fact, locale)
 
+  const sealedById = new Map(facts.map(fact => [fact.factId, fact]))
+
   const chapters = plan.chapters.map(chapter => ({
     chapterId: chapter.chapterId,
     module: chapter.module,
@@ -126,7 +157,13 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
   return {
     modelVersion: INSIGHT_WEB_MODEL_VERSION,
     locale,
-    executiveSummary: plan.executiveSummary.map(projectClaim),
+    // La cifra de cambio también acompaña al resumen: un consumer que no recibe esenciales muestra sus frases como
+    // hallazgos y, sin ella, ponía el nivel en grande (9.377) en vez del cambio (-12,1 %).
+    executiveSummary: plan.executiveSummary.map(claim => {
+      const figure = essentialFigure(claim, sealedById, locale)
+
+      return { ...projectClaim(claim), ...(figure ? { figure } : {}) }
+    }),
     chapters,
     // `ownerRef` es una referencia interna de responsabilidad: no viaja al visitante del enlace.
     actions: plan.actions.map(action => ({ actionId: action.actionId, text: action.text, factIds: [...action.factIds] })),
@@ -136,7 +173,15 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
     references: plan.references.map(reference => ({ referenceId: reference.referenceId, label: reference.label })),
     facts: factMap,
     // Campos editoriales v2 (TASK-1888): sólo si el plan sellado los trae; un plan v1 se proyecta igual que en 1.0.
-    ...(plan.essentials?.length ? { essentials: plan.essentials.map(projectClaim) } : {}),
+    ...(plan.essentials?.length
+      ? {
+          essentials: plan.essentials.map(claim => {
+            const figure = essentialFigure(claim, sealedById, locale)
+
+            return { ...projectClaim(claim), ...(figure ? { figure } : {}) }
+          })
+        }
+      : {}),
     ...(plan.decision ? { decision: projectClaim(plan.decision) } : {}),
     ...(plan.measurement ? { measurement: projectClaim(plan.measurement) } : {}),
     ...(plan.ask ? { ask: projectClaim(plan.ask) } : {}),

@@ -314,7 +314,27 @@ const withRoles = (claims: PlanClaimV1[], facts: EvidenceFactV1[], byId: Map<str
 }
 
 /** Clave de agrupación de figuras: unidad, y en AEO además la familia del indicador porcentual. */
+/**
+ * TASK-1957 — título de una figura que compara métricas: las nombra («Clics orgánicos, impresiones y keywords con
+ * medición», o «CTR» si es una sola) en vez de «Visibilidad orgánica · Cantidad». Sólo si cabe en una línea; si no, el
+ * título por unidad.
+ */
+const METRICS_TITLE_MAX = 60
+
+const metricsTitle = (group: EvidenceFactV1[]): string | null => {
+  const labels = [...new Set(group.map(fact => fact.label))]
+  const lower = (text: string) => (/^\p{Lu}\p{Ll}/u.test(text) ? `${text.charAt(0).toLocaleLowerCase('es')}${text.slice(1)}` : text)
+  const names = labels.map((label, index) => (index === 0 ? label : lower(label)))
+  const joined = names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} ${GH_INSIGHTS.reading.and} ${names.at(-1)}`
+
+  return labels.length >= 1 && joined.length <= METRICS_TITLE_MAX ? joined : null
+}
+
 const chartGroupKeyOf = (moduleKey: InsightModule, fact: EvidenceFactV1): string => {
+  // TASK-1957 — los puntajes internos del Grader (global y dimensiones) no se grafican en un informe de cliente: son
+  // una lectura del método, no un indicador del mercado, y en barras se leían como notas (Berel: «lideran con 100»).
+  // Quedan en la tabla de respaldo.
+  if (moduleKey === 'aeo' && fact.unit === 'score') return 'score:single'
   if (moduleKey !== 'aeo' || fact.unit !== 'percent') return fact.unit
 
   const family = fact.metricId.includes('.') ? fact.metricId.split('.')[0]! : 'single'
@@ -356,7 +376,13 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     const referenceFacts = snapshot.facts.filter(fact => fact.module === moduleKey && isReferenceFact(fact))
     const rejections = snapshot.rejections.filter(rejection => rejection.module === moduleKey)
     const v2Context = editorialV2 ? contextOfFacts(facts) : null
-    const factClaims = facts.map(fact => claimFor(fact, byId, input.locale, v2Context))
+
+    // TASK-1957 — las dimensiones internas del Grader (claridad de entidad, dominio de categoría…) son lecturas del
+    // método, no indicadores para el cliente: no se dicen ni van como tarjeta; quedan en la tabla de respaldo.
+    const factClaims = facts
+      .filter(fact => !(moduleKey === 'aeo' && fact.metricId.startsWith('dimension.')))
+      .map(fact => claimFor(fact, byId, input.locale, v2Context))
+
     const uniformClaims: PlanClaimV1[] = []
     const charts: ChartSpecV1[] = []
     const byUnit = new Map<string, EvidenceFactV1[]>()
@@ -378,7 +404,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       const { groups, uniform } = family === 'single' ? { groups: [], uniform: null } : chartableGroupsFor(unit, unitFacts, byId, input.locale)
 
       groups.forEach((group, index) => {
-        const chart = chartFor(moduleKey, group, byId, unit, index === 0 ? baseId : `${baseId}.${index + 1}`, title, editorialV2)
+        const chart = chartFor(moduleKey, group, byId, unit, index === 0 ? baseId : `${baseId}.${index + 1}`, familyTitle ?? metricsTitle(group) ?? title, editorialV2)
 
         if (chart) charts.push(chart)
       })

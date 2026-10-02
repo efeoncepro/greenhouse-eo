@@ -83,7 +83,7 @@ export const createInsightEdition = async (input: CreateInsightEditionInput): Pr
       report = await insertInsightReport(client, {
         organizationId: grant.organizationId,
         // TASK-1957 — el título llega a la portada: módulos por su nombre y el mes, nunca códigos ni fechas ISO.
-        title: request.title ?? defaultReportTitle(request.modules, request.period, request.locale),
+        title: request.title ?? defaultReportTitle(request.modules),
         purpose: request.purpose ?? 'Edición generada desde el encargo',
         actor: grant.actor
       })

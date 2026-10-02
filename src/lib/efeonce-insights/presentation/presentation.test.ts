@@ -87,7 +87,9 @@ describe('TASK-1957 — vocabulario de presentación', () => {
     expect(windowLabelOf({ start: '2026-08-01', endExclusive: '2026-09-01', granularity: 'month' }, 'es-CL')).toBe('agosto de 2026')
     // Ventana mal formada (fin = inicio, visto en Sky): se nombra por su inicio, nunca «2026-08-01 a 2026-08-01».
     expect(windowLabelOf({ start: '2026-08-01', endExclusive: '2026-08-01', granularity: 'month' }, 'es-CL')).toBe('agosto de 2026')
-    expect(defaultReportTitle(['ico'], { start: '2026-08-01', endExclusive: '2026-09-01' }, 'es-CL')).toBe('Entrega y cumplimiento · agosto de 2026')
+    expect(defaultReportTitle(['ico'])).toBe('Entrega y cumplimiento')
+    expect(defaultReportTitle(['seo', 'aeo'])).toBe('Visibilidad orgánica y respuestas de IA')
+    expect(defaultReportTitle(['seo', 'aeo', 'ico'])).toBe('Visibilidad orgánica, respuestas de IA y entrega y cumplimiento')
   })
 })
 
@@ -96,7 +98,17 @@ describe('TASK-1957 — plan apto para cliente', () => {
   const model = buildInsightWebModel({ plan, facts: berelLike.facts })
 
   it('el plan nuevo pasa el gate: sin tablas, fechas ISO, límites internos ni figuras sin información', () => {
-    expect(clientFitViolations({ model, reportTitle: defaultReportTitle(['seo', 'aeo'], { start: '2026-09-01', endExclusive: '2026-09-21' }, 'es-CL'), facts: berelLike.facts })).toEqual([])
+    expect(clientFitViolations({ model, reportTitle: defaultReportTitle(['seo', 'aeo']), facts: berelLike.facts })).toEqual([])
+  })
+
+  it('la cifra protagonista es el cambio cuando la frase lo dice, y el período anterior viaja como vínculo', () => {
+    const thesis = model.executiveSummary[0]!
+
+    expect(thesis.text).toContain('-12,1 %')
+    expect(thesis.figure).toEqual({ display: '-12,1 %', direction: 'down', kind: 'change' })
+    expect(model.facts['seo.clicks']!.comparisonFactId).toBe('seo.clicks.prev')
+    // Una frase que no dice el cambio no recibe cifra de cambio.
+    expect(model.executiveSummary.filter(claim => claim.figure).every(claim => claim.text.includes(claim.figure!.display))).toBe(true)
   })
 
   it('el gate rechaza magnitudes incomparables en un eje compartido', () => {
@@ -140,14 +152,13 @@ describe('TASK-1957 — plan apto para cliente', () => {
 })
 
 describe('TASK-1957 — empates con dueño', () => {
-  it('nombra a las dimensiones empatadas en corto antes de caer al genérico «Varias… comparten»', () => {
-    const dimension = (key: string, label: string, value: number): EvidenceFactV1 => fact({ factId: `aeo.dimension.${key}`, module: 'aeo', metricId: `dimension.${key}`, label, value, unit: 'score', source: 'x', method: { name: 'ai_visibility_grader', version: '1' } })
-    const snapshot = { facts: [dimension('entity_clarity', 'Claridad de entidad', 100), dimension('competitive_sov', 'Participación frente a competencia', 100), dimension('citation_quality', 'Calidad de las citas', 29)], sources: [], rejections: [] }
+  it('el empate de mención por motor se dice en una frase, sin figura de barras iguales', () => {
+    const rate = (provider: string, label: string): EvidenceFactV1 => fact({ factId: `aeo.mention_rate.${provider}`, module: 'aeo', metricId: `mention_rate.${provider}`, label, value: 33.3, unit: 'percent', numerator: 2, denominator: 6, source: 'x', method: { name: 'ai_visibility_grader', version: '1' } })
+    const snapshot = { facts: [rate('gemini', 'Mención en Gemini'), rate('openai', 'Mención en ChatGPT')], sources: [], rejections: [] }
     const plan = buildDeterministicPlan(snapshot, { modules: ['aeo'], locale: 'es-CL', editorialV2: true })
-    const conclusion = plan.chapters[0]!.readings!.find(reading => reading.chartId === 'chart.aeo.score')!.conclusion!.text
 
-    expect(conclusion).toBe('Claridad de entidad y participación frente a competencia lideran con 100.')
-    expect(conclusion).not.toMatch(/Varias dimensiones/)
+    expect(plan.chapters[0]!.charts).toEqual([])
+    expect(plan.chapters[0]!.claims[0]).toMatchObject({ text: 'La marca aparece en el 33,3 % de las respuestas de cada motor.', role: 'finding' })
   })
 })
 

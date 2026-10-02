@@ -24,13 +24,15 @@ export interface InsightModuleCopy {
   readonly title: string
   /** Etiqueta corta, para lámina y marginalia. */
   readonly label: string
+  /** Nombre dentro del título de un informe que junta módulos («Visibilidad orgánica y respuestas de IA»). */
+  readonly inTitle: string
 }
 
 export const GH_INSIGHTS = {
   modules: {
-    seo: { title: 'Visibilidad orgánica', label: 'Visibilidad orgánica' },
-    aeo: { title: 'Visibilidad en motores de respuesta', label: 'Motores de respuesta' },
-    ico: { title: 'Entrega y cumplimiento', label: 'Entrega' }
+    seo: { title: 'Visibilidad orgánica', label: 'Visibilidad orgánica', inTitle: 'visibilidad orgánica' },
+    aeo: { title: 'Visibilidad en motores de respuesta', label: 'Motores de respuesta', inTitle: 'respuestas de IA' },
+    ico: { title: 'Entrega y cumplimiento', label: 'Entrega', inTitle: 'entrega y cumplimiento' }
   } satisfies Record<InsightModule, InsightModuleCopy>,
 
   /**

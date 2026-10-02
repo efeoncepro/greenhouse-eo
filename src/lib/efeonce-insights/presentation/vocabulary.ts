@@ -72,27 +72,13 @@ export const windowLabelOf = (window: { start: string; endExclusive: string; gra
 }
 
 /**
- * Título por defecto de un informe cuando el encargo no lo trae: los módulos por su nombre y el mes del período
- * («Entrega y cumplimiento · agosto de 2026»). Reemplaza `Insights ico 2026-08-01–2026-09-01`, que llegaba a portada.
- * Un período que no cae en un solo mes se nombra por su rango («1 al 20 de septiembre de 2026»).
+ * Título por defecto de un informe cuando el encargo no lo trae: los módulos por su nombre, en una frase («Visibilidad
+ * orgánica y respuestas de IA»). Sin período: un informe vive muchas ediciones y el período de cada una ya va en su
+ * propio lugar; con el mes en el título, la portada lo repetía dos veces (revisión del operador, Berel 2026-10-02).
  */
-export const defaultReportTitle = (modules: readonly InsightModule[], period: { start: string; endExclusive: string }, locale: string): string => {
-  const names = modules.map(moduleKey => GH_INSIGHTS.modules[moduleKey].title).join(' · ')
-  const start = new Date(`${period.start}T00:00:00Z`)
-  const last = new Date(new Date(`${period.endExclusive}T00:00:00Z`).getTime() - 86_400_000)
-  const wholeMonth = start.getUTCDate() === 1 && last.getUTCMonth() === start.getUTCMonth() && new Date(last.getTime() + 86_400_000).getUTCDate() === 1
+export const defaultReportTitle = (modules: readonly InsightModule[]): string => {
+  const names = modules.map(moduleKey => GH_INSIGHTS.modules[moduleKey].inTitle)
+  const joined = names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} ${GH_INSIGHTS.reading.and} ${names.at(-1)}`
 
-  const when = wholeMonth
-    ? new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(start)
-    : (() => {
-        const formatter = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
-
-        try {
-          return formatter.formatRange(start, last)
-        } catch {
-          return `${formatter.format(start)} – ${formatter.format(last)}`
-        }
-      })()
-
-  return `${names} · ${when}`
+  return upperFirst(joined)
 }

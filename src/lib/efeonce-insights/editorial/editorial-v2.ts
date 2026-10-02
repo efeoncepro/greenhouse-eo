@@ -529,7 +529,16 @@ export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, 
   const bullets = chapters.flatMap(chapter => chapter.charts.filter(chart => chart.family === 'bullet' && (chapter.readings ?? []).some(reading => reading.chartId === chart.chartId)))
   const statuses = bullets.map(chart => ({ chart, status: bulletStatus(chart, byId)! })).filter(entry => entry.status)
   const missed = statuses.filter(entry => entry.status.missing.length > 0)
-  const ordered = chapters.flatMap(conclusionsOf).filter(item => !item.claimId.endsWith('.value'))
+
+  // Conclusiones de figuras primero; después los hallazgos de capítulo (TASK-1957: un capítulo sin figura —AEO con
+  // menciones parejas— igual aporta su hallazgo al resumen). Cada candidato recuerda su módulo para que la bajada
+  // hable de OTRO capítulo cuando lo hay.
+  const candidates = chapters.flatMap(chapter => [
+    ...conclusionsOf(chapter).filter(item => !item.claimId.endsWith('.value')),
+    ...chapter.claims.filter(item => item.role === 'finding')
+  ].map(item => ({ item, module: chapter.module })))
+
+  const ordered = candidates.map(entry => entry.item)
   let thesis: PlanClaimV1 | null = null
 
   if (missed.length === 1 && statuses.length > 1 && missed[0]!.status.metricName) {
@@ -547,7 +556,11 @@ export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, 
 
   if (!thesis) return []
 
-  const lead = ordered.find(item => item.factIds[0] !== thesis!.factIds[0] && item.text.length <= L.summaryLead)
+  const thesisModule = candidates.find(entry => entry.item.factIds[0] === thesis!.factIds[0])?.module
+  const fits = (item: PlanClaimV1) => item.factIds[0] !== thesis!.factIds[0] && item.text.length <= L.summaryLead
+
+  const lead =
+    candidates.find(entry => entry.module !== thesisModule && fits(entry.item))?.item ?? ordered.find(fits)
 
   return [thesis, ...(lead ? [{ ...lead, claimId: 'summary.lead' }] : [])]
 }

@@ -31,10 +31,20 @@ const collectForWindow = async (organizationId: string, window: ResolvedInsightW
   let report
 
   try {
-    report = (await readClientGraderReport({ organizationId })).report
+    // El análisis que corresponde al período: terminó dentro de la ventana. El último de la organización podía ser
+    // posterior y dejaba el capítulo vacío (Berel, corrida del 2026-10-02 frente a la edición de septiembre).
+    report = (await readClientGraderReport({ organizationId, finishedWithin: { startUtc: window.startUtc, endUtc: window.endUtc } })).report
   } catch (error) {
     if (error instanceof ClientGraderReportError) {
-      rejections.push({ module: 'aeo', metricId: null, reason: error.code === 'not_found' ? 'not_connected' : 'no_data', detail: `Grader: ${error.code}` })
+      // Sin análisis dentro del período: si la organización sí tiene análisis (fuera de la ventana), es una ventana sin
+      // run propio, no un Grader desconectado.
+      const outsideWindow = error.code === 'not_found' && (await readClientGraderReport({ organizationId }).then(() => true, () => false))
+
+      rejections.push(
+        outsideWindow
+          ? { module: 'aeo', metricId: null, reason: 'unsupported_window', detail: `Sin análisis AEO terminado entre ${window.start} y ${window.endInclusive}`, alternative: { granularity: 'period', note: 'Correr el grader dentro del período o elegir una ventana que contenga un run.' } }
+          : { module: 'aeo', metricId: null, reason: error.code === 'not_found' ? 'not_connected' : 'no_data', detail: `Grader: ${error.code}` }
+      )
 
       return { facts, rejections, source: null as EvidenceSourceV1 | null }
     }

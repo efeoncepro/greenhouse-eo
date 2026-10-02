@@ -349,22 +349,15 @@ describe('TASK-1888 — superlativos únicos, esenciales sólo de hallazgos y af
     expect(conclusionOf(unique, 'chart.aeo.count')?.text).toMatch(/^ChatGPT es el motor que más menciona la marca/)
   })
 
-  it('dos dimensiones en 100 no producen «la mejor evaluada»', () => {
+  it('los puntajes internos del Grader no se grafican: ni figura, ni lectura, ni «la mejor evaluada» (Berel 2026-10-02)', () => {
     const dimension = (key: string, label: string, value: number): EvidenceFactV1 => ({ ...aeo(key, value), factId: `aeo.dimension.${key}.w`, metricId: `dimension.${key}`, label, unit: 'score', numerator: null, denominator: null, dimension: { dimension: key } })
     const snapshot = { facts: [dimension('entity_clarity', 'Claridad de entidad', 100), dimension('competitive_sov', 'Share of voice competitivo', 100), dimension('ai_visibility', 'Visibilidad en IA', 0)], sources: [], rejections: [] }
     const plan = v2(snapshot, ['aeo'])
-    const text = conclusionOf(plan, 'chart.aeo.score')?.text ?? ''
 
-    expect(text).not.toMatch(/La dimensión mejor evaluada es/)
-    expect(text).toBe('Las dimensiones mejor evaluadas son claridad de entidad y share of voice competitivo: 100.')
-    // Bajada del empate sin «(0 a 100)»: cifras que ningún hecho citado respalda (violación vista en Berel real).
-    expect(plan.chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.score')!.keyFigure!.caption.text).toBe('Dimensiones evaluadas.')
-    // La cifra principal es el valor empatado, aunque la figura traiga antes otro hecho (el puntaje global, 39).
-    const withOverall = { ...snapshot, facts: [{ ...dimension('overall', 'Puntaje de visibilidad en IA', 39), factId: 'aeo.overall_score.w', metricId: 'overall_score', dimension: undefined }, ...snapshot.facts] }
-    const key = v2(withOverall, ['aeo']).chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.score')!.keyFigure!
-
-    expect(key.value).toBe('100')
-    expect(key.caption.text).toBe('Dimensiones evaluadas.')
+    expect(plan.chapters[0]!.charts.some(chart => chart.unit === 'score')).toBe(false)
+    expect(conclusionOf(plan, 'chart.aeo.score')).toBeUndefined()
+    // Los puntajes siguen en la tabla de respaldo del capítulo.
+    expect(plan.chapters[0]!.tables[0]!.rows.length).toBe(3)
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 

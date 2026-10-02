@@ -418,6 +418,31 @@ export const getLatestClientGraderRun = async (organizationId: string): Promise<
   return rows[0] ? projectRun(rows[0]) : null
 }
 
+/**
+ * Run reportable más reciente de una organización cliente que TERMINÓ dentro de `[startUtc, endUtc)`, del mercado
+ * principal del perfil (o de runs previos al modelo por mercado). Lo consume un informe de período (Insights): sin
+ * esto, una corrida posterior al período sacaba del informe la que sí le correspondía (Berel 2026-10-02).
+ */
+export const getLatestClientGraderRunInWindow = async (input: {
+  organizationId: string
+  startUtc: string
+  endUtc: string
+}): Promise<GraderRunRow | null> => {
+  const rows = await runGreenhousePostgresQuery<RawRun>(
+    `SELECT r.* FROM greenhouse_growth.grader_runs r
+       JOIN greenhouse_growth.grader_profiles p ON p.profile_id = r.profile_id
+      WHERE p.organization_id = $1 AND r.status = ANY($2::text[])
+        AND r.finished_at >= $3::timestamptz AND r.finished_at < $4::timestamptz
+        AND (r.market_id IS NULL OR r.market_id IN (
+          SELECT m.market_id FROM greenhouse_growth.grader_profile_markets m WHERE m.profile_id = p.profile_id AND m.is_primary))
+      ORDER BY r.finished_at DESC, r.created_at DESC
+      LIMIT 1`,
+    [input.organizationId, [...CLIENT_REPORTABLE_RUN_STATUSES], input.startUtc, input.endUtc]
+  )
+
+  return rows[0] ? projectRun(rows[0]) : null
+}
+
 export const listGraderRuns = async (input: { limit?: number; profileId?: string } = {}): Promise<GraderRunRow[]> => {
   const limit = Math.max(1, Math.min(200, input.limit ?? 50))
 

@@ -32,6 +32,8 @@ export type InsightWebAbsentReason = 'no_data'
 export interface InsightWebFactV1 {
   factId: string
   module: InsightModule
+  /** 1.2 — métrica del hecho (`clicks`, `mention_rate.gemini`): el consumer elige su ícono; nunca se imprime. */
+  metricId?: string
   label: string
   /** Valor numérico para dibujar; null = ausente (nunca 0 disfrazado). */
   value: number | null
@@ -51,6 +53,11 @@ export interface InsightWebFactV1 {
    * `contracts/channels.ts`. Ausente = no es un canal. El consumer lo traduce a su isotipo (Think: `EngineMark`).
    */
   channelId?: InsightChannelId
+  /**
+   * 1.2 — hecho del período anterior con que se compara (si lo hay). Un consumer lo usa para no mostrar la cifra
+   * anterior como una tarjeta suelta junto a la actual (caso Berel: «#6,6» y «#5,8» con la misma etiqueta).
+   */
+  comparisonFactId?: string
   absentReason: InsightWebAbsentReason | null
 }
 
@@ -60,6 +67,12 @@ export interface InsightWebClaimV1 {
   factIds: string[]
   /** 1.2 — en afirmaciones de capítulo: hallazgo destacado o respaldo para la tabla. Ausente en planes previos. */
   role?: 'finding' | 'backing'
+  /**
+   * 1.2 — cifra protagonista de la frase: el CAMBIO frente al período anterior («-9,6 %», `kind: 'change'`) cuando la
+   * frase lo dice; si no, el valor que la frase cita («83,8 %», `kind: 'level'`). Sin ella el consumer mostraba
+   * 512.113 en grande junto a «Las impresiones bajaron…».
+   */
+  figure?: { display: string; direction: 'up' | 'down' | 'flat'; kind?: 'change' | 'level' }
 }
 
 export interface InsightWebTableV1 {
