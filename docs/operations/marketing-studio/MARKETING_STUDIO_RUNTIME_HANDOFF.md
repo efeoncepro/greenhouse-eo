@@ -489,7 +489,7 @@ bearer → `approval_requires_person`; CMP-004 → 409; brief literal (comillas 
 ### Pendiente (operador)
 
 1. **Push de Studio a `main`** (= deploy de producción): `git push origin main` en `~/Documents/efeonce-marketing-studio`.
-2. **Sync del gateway** `efeonce-mcp`: el gateway federaba todas las tools del manifiesto y su proveedor llama siempre
+2. **Sync del gateway** `efeonce-mcp` — **hecho 2026-10-02** ([efeoncepro/efeonce-mcp#23](https://github.com/efeoncepro/efeonce-mcp/pull/23), `1ddc7db`, v1.10.0; falta lanzar `deploy.yml`, que es manual). Contexto: el gateway federaba todas las tools del manifiesto y su proveedor llama siempre
    con GET, así que sincronizar el manifiesto con escrituras las federaría rotas. Cambio preparado sin commit (rama
    `task-1894-studio-write-manifest` desde `origin/main` `8ff029d`): `MARKETING_STUDIO_FEDERATED_TOOLS` = sólo
    lecturas; `call()` rechaza escrituras y métodos no-GET; `write_tool_without_scope_class` sólo si una escritura se

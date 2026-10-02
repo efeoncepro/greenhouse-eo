@@ -13,7 +13,11 @@
   → `version 1.4.0`. Smoke de producción de sólo lectura: `GET /campaigns/CMP-004` → `permissions` `writable false`,
   `lockReason open_mode`, `sourceOfTruth onedrive`, `ETag "1"`; `POST …/states/launch` anónimo → `403 write_not_allowed`;
   `GET /campaigns/CMP-004/brief` → `brief null`. Ningún `api_client` de producción tiene `studio:write`.
-- Siguen pendientes: sync del gateway (cambio preparado), release de Greenhouse a producción, Entregable C.
+- Gateway sincronizado (autorizado por el operador): [efeoncepro/efeonce-mcp#23](https://github.com/efeoncepro/efeonce-mcp/pull/23)
+  mergeada (`1ddc7db`), v1.10.0, superficie 72 → 74 (`studio.asset.download`, `studio.campaign.brief.get`); las 30
+  escrituras viajan en el manifiesto y no se federan (`MARKETING_STUDIO_FEDERATED_TOOLS`); `pnpm check` + CI verdes.
+  Deploy del gateway (manual, `deploy.yml`) NO lanzado: producción sigue con el manifiesto anterior hasta que se despliegue.
+- Siguen pendientes: deploy del gateway, release de Greenhouse a producción, Entregable C.
 
 ## Delta 2026-10-02 (noche) — Entregable B y cierre de A en Greenhouse
 
@@ -345,7 +349,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Entregable A (Slices 1–3) en producción desde 2026-10-02 (Studio 1.3.0; CMP-004 con 44 piezas aprobadas). Entregable B (Slices 4–7) en producción desde 2026-10-02 (Studio a8c7886, health 1.4.0, smoke de producción de sólo lectura; verificado antes en staging; API 1.4.0, 44 tools; migración 1790967435017 aplicada en staging y producción; sandbox CMP-900). Greenhouse: capabilities asset.write y campaign.write en develop (9d0d698d4), sin release a producción. Pendientes del operador: release de Greenhouse, sync del gateway (cambio preparado, sin commit). Entregable C (Slices 8–10) diferido por el operador`
+- Status real: `Entregable A (Slices 1–3) en producción desde 2026-10-02 (Studio 1.3.0; CMP-004 con 44 piezas aprobadas). Entregable B (Slices 4–7) en producción desde 2026-10-02 (Studio a8c7886, health 1.4.0, smoke de producción de sólo lectura; verificado antes en staging; API 1.4.0, 44 tools; migración 1790967435017 aplicada en staging y producción; sandbox CMP-900). Greenhouse: capabilities asset.write y campaign.write en develop (9d0d698d4), sin release a producción. Gateway sincronizado (efeonce-mcp#23, v1.10.0; deploy pendiente). Pendientes del operador: release de Greenhouse, deploy del gateway. Entregable C (Slices 8–10) diferido por el operador`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` (2026-09-26: TASK-1890, TASK-1893 y TASK-1896 complete)
@@ -1097,7 +1101,7 @@ Entregable A — puerta de ingreso:
 - [ ] Tras una subida, `pnpm import:catalog` (dry-run y apply) no inserta, adopta ni renumera versiones de esa pieza y reporta `skipped_studio_owned_asset`. — *Sin tildar: guarda implementada (`skipped_studio_owned_asset`); falta correr el import después de las subidas.*
 - [ ] La SA del runtime web no puede crear objetos fuera de `originals/sha256/` ni borrar objetos; la SA del worker no puede borrar fuera de `originals/sha256/` (pruebas negativas registradas). — *Sin tildar: IAM condicionado aplicado en staging y producción; pruebas negativas no registradas.*
 - [ ] `marketing_studio.asset.write` existe en catálogo TS y `capabilities_registry` con `allowed_actions = ['create','update']`, scope `tenant` y grant de ambas acciones a `efeonce_admin`, `efeonce_account`, `efeonce_operations` y `designer` (coverage test verde). — *Parcial, sin tildar: catálogo TS, seed (`migrations/20261002185625608_task-1894-marketing-studio-write-capabilities.sql`, aplicada en la instancia compartida y verificada con SELECT: `allowed_actions={create,update}`, `allowed_scopes={tenant}`, vigente) y grants a los cuatro roles quedaron commiteados en `develop` el 2026-10-02, junto con `marketing_studio.campaign.write` (misma forma); `capability-grant-coverage.test.ts` verde. Falta el release a producción, pendiente de decisión del operador (el 2026-10-02 autorizó sólo hasta develop/staging).*
-- [ ] Las dos operaciones figuran en el manifiesto como tools de clase `write` con su scope y capability; guard de paridad y leak test verdes; gateway sincronizado sin federarlas. — *Sin tildar: tools en el manifiesto (15 tools, hash regenerado) y `pnpm check` verde; falta `pnpm studio:manifest:sync` en el gateway.*
+- [x] Las dos operaciones figuran en el manifiesto como tools de clase `write` con su scope y capability; guard de paridad y leak test verdes; gateway sincronizado sin federarlas. — *Verificado 2026-10-02: gateway sincronizado sin federarlas (efeonce-mcp#23, `1ddc7db`, test `las escrituras de Studio viajan en el manifiesto pero no se federan`); deploy del gateway pendiente.*
 - [ ] El manifiesto generado exporta, por cada tool de escritura, `method`, `path`, `class`, `requiresPerson`, `destructive`, `idempotent`, `capability`, `capabilityAction`, `apiScope` y `transport` (`pathParams`, `Idempotency-Key` desde `idempotencyKey`, `If-Match` desde `expectedRevision` con su obligatoriedad, `dryRun` en query, resto en cuerpo); un test falla si una tool de escritura no lo declara. — *Sin tildar: `ToolSpec` de escritura y `WriteTransport` existen; no se verificó en esta pasada el test que falla sin la declaración.*
 - [ ] La respuesta de `requestAssetVersionUpload` expone `inference` con lo deducido del nombre y `missing` con lo que falta preguntar. — *Sin tildar: falta evidencia.*
 - [x] `STUDIO_UPLOADS_ENABLED` y `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` tienen fila en `FEATURE_FLAG_STATE_LEDGER.md` con su estado real por runtime. — *Hecho 2026-10-02: filas espejo en el ledger con su estado por runtime.*
