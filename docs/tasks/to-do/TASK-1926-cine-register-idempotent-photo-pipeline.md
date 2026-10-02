@@ -33,7 +33,12 @@ con la condición de no tocar los comandos de los demás registros. Se suma a es
   vertical, sección partida 1:1 a la izquierda, `--formato`/`--alcance`). Siete contradicciones del canon quedan para
   el operador (casebook, «Prueba ciega»). El criterio de la prueba sigue abierto hasta repetirla con el compilador
   corregido.
-- Pendiente: repetir la prueba ciega y el orquestador idempotente.
+- **Segunda prueba ciega y experimento de luz** (`2026-10-02_prueba-ciega-cine-2/`, `2026-10-02_experimento-luz-cine/`):
+  las tres sesiones llegaron solas usando el revisor; las tres CORREGIR por «relleno». El experimento mostró que la barra
+  de luz del revisor era más estricta que las fotos aprobadas (también tienen luz suave de frente) y quedó recalibrada
+  contra ellas; la diferencia que sí se ve es el escenario con escala. Hoodie royal, restos documentales y revisor más
+  barato corregidos. El criterio de la prueba ciega queda a juicio del operador sobre los plates de la segunda ronda.
+- Pendiente: decisión del operador sobre los plates de la segunda ronda y el orquestador idempotente.
 
 ## Delta 2026-10-02
 

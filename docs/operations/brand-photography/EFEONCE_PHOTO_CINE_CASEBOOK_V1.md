@@ -59,7 +59,7 @@ Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 | # | Síntoma | Causa medida | Corrección (frase o regla) | Caso | Chequeo |
 |---|---|---|---|---|---|
 | 1 | **Objetos como stickers**: nítidos, del mismo tamaño, con luz propia, en abanico | Demasiadas **referencias de objeto**: cada una dice «Reproduce EXACTLY» con su foto de estudio y el modelo copia también su nitidez y su luz | **Máximo dos referencias de objeto** de personaje en la toma (las del plano cercano); el resto, sin imagen: «the same figures as the references, far, small and out of focus, their LED eyes as glowing dots» | NX7b (10 ref.) → NX7d (8, dos Sparks) | `foto:prompt` avisa si hay más de 2 objetos-personaje; `cine-reviewer` sobre el plate |
-| 2 | **Luz plana**: la cara pareja, sin modelado | La fuente es una línea fina o no tiene lado; hay relleno implícito | Fuente **con tamaño y cerca**, con lado; «the only key light, NO fill, NO front light: the far side of the face falls into deep shadow, nose shadow legible on the cheek» | NX7b → NX7d; NX5 «a hard key light from the left sculpts her face» | `foto:prompt` avisa sin `llave`; `foto:validar:cine` sólo atrapa el cuadro claro y parejo; `cine-reviewer` |
+| 2 | **Luz plana**: la cara pareja, sin modelado ni dirección (juzgar contra las aprobadas: también llevan luz suave de frente) | La fuente es una línea fina o no tiene lado; hay relleno implícito | Fuente **con tamaño y cerca**, con lado; «the only key light, NO fill, NO front light: the far side of the face falls into deep shadow, nose shadow legible on the cheek» | NX7b → NX7d; NX5 «a hard key light from the left sculpts her face» | `foto:prompt` avisa sin `llave`; `foto:validar:cine` sólo atrapa el cuadro claro y parejo; `cine-reviewer` |
 | 3 | **Sin profundidad**: todo en un plano | Falta primer plano junto al lente y fondo con bokeh; «some are out of focus» no basta | **Tres planos con distancia en metros** y apertura (cerca nítido · ~1 m · 4–6 m desenfocado, 85 mm f/1.8–2); un objeto **junto al lente** | NX5b (robot en la cornisa), NX7d | `foto:prompt` avisa sin `primerPlano` ni `fondo`; `cine-reviewer` (los píxeles no lo separan: ver [Medidor](#medidor-qué-mide-foto-validar-cine-y-qué-no)) |
 | 4 | **El fenómeno está al lado del servicio** | Se eligió un objeto lindo (cinta, perfume, pantallas) en vez de la luz que ES el servicio | Prueba de quitarlo: si sin la luz la idea sigue en pie, la luz sobra. Declara `fenomeno.esServicio`. En ads, **luz dura con la sombra como logo** y **larga exposición real** tienen respaldo; freeze y levitación no | CA1/CA3 (CMP-004); AE2 «un haz elige UNA» | `foto:prompt` avisa sin `fenomeno`; `cine-reviewer` |
 | 5 | **En vertical, el fenómeno sube a la reserva** | La fuente está riggeada alta; el fenómeno no se nombró en la prohibición | Nombrar el fenómeno: «the [vortex] stays entirely BELOW 36 % of the frame height; the top third is calm deep dark space»; fuente baja (rodilla–pecho); vórtices hacia el fondo, no hacia arriba | AD1d; CA4 (hasta el 15 %) | `foto:prompt` lo inyecta en 4:5 y 9:16; `foto:validar:cine` mide la luz en la reserva |
@@ -157,6 +157,20 @@ demás registros siguen idénticos, regresión: 332 fichas, 0 no cine cambiadas)
 
 **Lo que el medidor sigue sin ver y mira el revisor:** relleno en la cara, Sparks lejanos demasiado nítidos y la
 reserva lateral en 16:9 y 1:1 (`foto:validar` mide la banda de arriba).
+
+**Segunda prueba y experimento de luz (2026-10-02, tarde) — la barra estaba mal calibrada.** Tres sesiones nuevas más
+(`2026-10-02_prueba-ciega-cine-2/`) llegaron solas a un plate y el revisor les dio CORREGIR por «cara con relleno».
+Un experimento con una sola variable por toma (`2026-10-02_experimento-luz-cine/`: fuente grande por delante de la cara,
+cuerpo girado hacia la fuente, aviso de que la luz de las referencias no es la de la escena) **no cambió la cara en
+ninguna toma**. Al comparar con las aprobadas se vio por qué: **AE2b, SE1, RV1b, WB1c y NX5b también tienen la cara
+modelada con luz suave de frente**; la «mitad casi negra» era una barra escrita, no la que el operador aprobó.
+
+- **Falla 2 se juzga contra las aprobadas:** la cara modelada por la fuente, con un lado algo más oscuro y la dirección
+  legible. Sólo es falla si la cara queda pareja y sin dirección, o iluminada desde el lado contrario a la fuente.
+- **Lo que separa de verdad una prueba de una aprobada es el escenario** [observado, a confirmar]: las aprobadas tienen
+  un espacio grande y con profundidad (auditorio, escenario con luces, hangar, piso de grilla) y un fenómeno que ocupa
+  buena parte del cuadro; las pruebas eran una persona en un vacío negro con una hoja de luz chica. «Empty dark studio»
+  evita la oficina, pero no reemplaza el lugar: declara un espacio real, oscuro y profundo, con escala.
 
 **Decisiones del operador (2026-10-02)** sobre las siete contradicciones que encontró la prueba: aros de Nexa dorados;
 el destacado «Agents» aprobado se queda (tres Sparks, sin Nexa ni texto); escala vertical por encuadre (9:16 de la

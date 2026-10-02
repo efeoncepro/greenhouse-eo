@@ -21,6 +21,11 @@ La prueba ciega del 2026-10-02 midió entre 160 y 270 mil tokens por pasada leye
    - color de línea: §6 del mismo; personajes: `docs/operations/brand-characters/SPARKS_V1.md`.
 4. **No leas** `.claude/rules/brand-photography.md` completo: lo que aplica al cine ya está en el casebook.
 
+**Calibra contra las aprobadas, no contra el texto:** antes de juzgar la luz de una cara, mira el plate de la receta de
+partida (`plate` en `cine-recetas.json`). Las aprobadas tienen la cara modelada con luz suave de frente; no exijas «casi
+negro». Mira también si el plate tiene un espacio real con escala y un fenómeno grande, como las aprobadas: una persona
+en un vacío negro con una luz chica es la diferencia que más pesa (segunda prueba ciega, 2026-10-02).
+
 **Tus correcciones de luz son inferencias:** dilo en el veredicto («a probar») salvo que el casebook traiga la frase
 como probada. No propongas antes de generar una luz que contradiga la de la receta aprobada de partida.
 

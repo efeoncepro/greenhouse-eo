@@ -2624,7 +2624,7 @@ export const bloqueCine = (ficha, formato) => {
 
   if (ficha.llave) {
     partes.push(
-      `KEY LIGHT: ${textoLlave(ficha.llave)}. It is the ONLY key light: NO fill light, NO front light, NO bounce. The face is a two-tone portrait: the half of the face turned away from the key falls into near-black shadow, as dark as the background, and the nose shadow is legible on the cheek.`
+      `KEY LIGHT: ${textoLlave(ficha.llave)}. It is the ONLY key light: NO fill light, NO front light, NO bounce. The face is modelled by that one source: the half turned away from it falls into clearly deeper shadow, the direction of the light reads at a glance and the nose shadow is legible on the cheek.`
     )
   }
 
