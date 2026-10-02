@@ -134,6 +134,11 @@ un kit cerrado. Canon completo: [`SPARKS_V1.md`](../brand-characters/SPARKS_V1.m
 - Las piezas aprobadas con robots descritos a mano (`NX5b` y sus derivadas, la destacada «Agents» `PH7`) quedan como
   están; regenerarlas con Sparks es decisión del operador. Sus fichas, y las demás que describen robots (`NX3`–`NX5`,
   `RV1`, `WB1`, `AD2`, `AD4*`, `BR2`, `BR4`), hoy abortan en `foto:prompt` **[medido: 13 de 301 fichas]**.
+  **Migradas el 2026-10-02 (TASK-1940):** las 13 compilan. Sparks por catálogo (dos con referencia como máximo; el resto
+  «the same figures as the Spark references», lejos y desenfocados, con el total declarado), ninguno bajo la cintura
+  (se reubicaron los que estaban a los pies o las rodillas), `NX3`–`NX5` con el traje y los lentes por catálogo y
+  `"registro": "cine"`; las demás **sin** `registro`, para no cambiar el encuadre con que se aprobaron; en `RV1` y `AD2`
+  el Spark base va en `revenue-hubspot`. Los plates aprobados no se regeneraron: si se rehacen, salen de estas fichas.
 
 ## Delta 2026-10-01 — registro cine con Nexa en portadas sociales y destacados de Instagram
 
@@ -730,7 +735,9 @@ fue de sesión (no es un compositor canónico; quedó como evidencia en
 
 ## 12. Plantilla de ficha comentada
 
-Ficha real y aprobada (`ai-generations/2026-09-26_deck-revops/fichas/RV1-motor-de-revenue.json`), verbatim:
+Ficha real y aprobada (`ai-generations/2026-09-26_deck-revops/fichas/RV1-motor-de-revenue.json`), verbatim **en su
+versión aprobada** (desde el 2026-10-02 la ficha en disco declara Sparks por catálogo en vez de los robots descritos a
+mano: ver el delta de §8 arriba; el resto de esta plantilla sigue valiendo):
 
 ```json
 {

@@ -3,16 +3,30 @@
   "formato": "16:9",
   "impacto": true,
   "objetos": [
-    { "objeto": "chaqueta-softshell-efeonce" }
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    },
+    {
+      "objeto": "spark",
+      "vista": "volando",
+      "color": "revenue-hubspot"
+    },
+    {
+      "objeto": "spark-contenido",
+      "vista": "cine"
+    }
   ],
   "palanca": "luz-motivada",
   "atmosfera": "bruma",
-  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark studio at night): a Latin American RevOps lead in her mid thirties, dark wavy shoulder-length hair, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands on the RIGHT half of the frame, framed from the waist up, looking straight into the lens with a confident half-smile, one open hand raised toward a glowing knot of light beside her as if steering it. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. Around her flows a huge horizontal BOW-TIE made of streams of light: from the far right background thousands of tiny glowing particles pour in and converge, narrowing into one brilliant knot of light next to her raised hand, and from that knot the streams open out again toward the foreground, wider and brighter, like a revenue engine that keeps growing after the sale. The streams are vivid magenta-pink (#E86BD0) with azure (#0375DB) and a few teal (#36C8BF) particles; the knot blazes white-magenta and lights her face, hand and jacket. Riding along the streams, three small friendly robot agents, each the size of a football, round glossy white bodies with navy panels and big expressive LED eyes, with cheerful comic faces: one surfs a stream toward the knot, one carries a tiny glowing card, one gives a thumbs-up. Cool rim light from behind, haze catching the colored streams. The LEFT 45% of the frame is calm, deep dark studio space with only faint haze, no streams, no robots, no objects. Rich contrast, punchy color, no text, no logos of any other brand.",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark studio at night): a Latin American RevOps lead in her mid thirties, dark wavy shoulder-length hair, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands on the RIGHT half of the frame, framed from the waist up, looking straight into the lens with a confident half-smile, one open hand raised toward a glowing knot of light beside her as if steering it. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. Around her flows a huge horizontal BOW-TIE made of streams of light: from the far right background thousands of tiny glowing particles pour in and converge, narrowing into one brilliant knot of light next to her raised hand, and from that knot the streams open out again toward the foreground, wider and brighter, like a revenue engine that keeps growing after the sale. The streams are vivid magenta-pink (#E86BD0) with azure (#0375DB) and a few teal (#36C8BF) particles; the knot blazes white-magenta and lights her face, hand and jacket. Riding along the streams, THREE Sparks, each smaller than her head and above her waist: one, copied EXACTLY from the first Spark reference, surfs a stream toward the knot, sharp; one, the Content Spark copied EXACTLY from its reference, carries its small glowing card, sharp; and ONE more Spark (THREE in total, never more), the same figure as the Spark references, farther back along the stream, smaller and out of focus, gives a thumbs-up. Cool rim light from behind, haze catching the colored streams. The LEFT 45% of the frame is calm, deep dark studio space with only faint haze, no streams, no Sparks, no objects. Rich contrast, punchy color, no text, no logos of any other brand.",
   "lecho": {
     "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
     "tono": "DARK near black"
   },
   "reservas": {
-    "texto": { "muro": "the calm, deep dark studio space on the left 45% of the frame", "tinta": "blanca" }
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
   }
 }

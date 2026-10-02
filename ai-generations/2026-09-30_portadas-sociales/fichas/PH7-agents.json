@@ -3,7 +3,13 @@
   "formato": "1:1",
   "impacto": true,
   "palanca": "luz-motivada",
-  "escena": "SCENE (cinematic still, a dark studio at night): a close group portrait of THREE small friendly robot agents, each the size of a football, round glossy white bodies with navy panels and big expressive azure-blue LED eyes, with comic, cheerful faces, standing together on a dark polished table and looking straight into the lens: the one in the centre waves at the camera, the one on the left holds up a tiny glowing card, the one on the right gives a thumbs-up. Their LED eyes are the main light sources and glow intensely; a soft teal (#36C8BF) rim light from behind outlines their round bodies; light haze. Realistic materials: glossy plastic with tiny scratches, visible seams and screws, real reflections on the table. COMPOSITION FOR A CIRCULAR CROP: everything important stays inside the central circle of the square; the four corners are only dark empty space.  Rich contrast, punchy saturated colour, real photographic detail and texture (dust, micro-scratches, real depth of field), no text, no readable letters or numbers, no logos of any other brand.",
+  "objetos": [
+    {
+      "objeto": "spark",
+      "vista": "grupo"
+    }
+  ],
+  "escena": "SCENE (cinematic still, a dark studio at night): a close group portrait of THREE Sparks, copied EXACTLY from their group reference, hovering together a few centimetres above a dark polished table and looking straight into the lens: the one in the centre waves at the camera, the one on the left holds up a small thin white card with one glowing azure brush stroke (no letters), the one on the right gives a thumbs-up. Their LED eyes are the main light sources and glow intensely; a soft teal (#36C8BF) rim light from behind outlines their round bodies; light haze. Realistic materials: glossy plastic with tiny scratches, visible seams and screws, real reflections on the table. COMPOSITION FOR A CIRCULAR CROP: everything important stays inside the central circle of the square; the four corners are only dark empty space.  Rich contrast, punchy saturated colour, real photographic detail and texture (dust, micro-scratches, real depth of field), no text, no readable letters or numbers, no logos of any other brand.",
   "lecho": "sin-lecho",
   "sinLechoPorque": "portada de destacada de Instagram: sólo se ve el círculo central y no lleva firma (la marca la pone el avatar del perfil), así que no hay primer plano que reservar"
 }
