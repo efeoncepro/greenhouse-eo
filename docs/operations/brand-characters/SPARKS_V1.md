@@ -1,7 +1,7 @@
 # Sparks V1 — los agentes de Efeonce
 
 > **Tipo de documento:** Especificación canónica de marca (personajes)
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-10-01 por Claude
 > **Última actualización:** 2026-10-01 por Claude
 > **Estado:** nombre, plantel y relato aprobados por el operador (Julio Reyes) el 2026-09-29; diseño elegido y Spark
@@ -215,10 +215,10 @@ datos en `/references/sparks.json` → `rig`).
   por pantalla; en una foto, el Spark sale del catálogo de `foto:prompt`, nunca de una captura del rig.
 - Producción en `ai-generations/2026-10-01_sparks/rig/` (prompt `prompts/rig-sin-cara.txt`).
 
-### 8.2 La versión 2D (ilustración plana) **[operador, 2026-10-01: «la idea no es reemplazar los 3d, es tener una versión alternativa en 2d»; reglas aprobadas: «Bien, haz todo eso»]**
+### 8.2 La versión 2D (ilustración plana) **[operador, 2026-10-01: «la idea no es reemplazar los 3d, es tener una versión alternativa en 2d»; «Bien, me gusta, canonízalos y mándalos al lab»; «no sustituyen […], son una clase 2D de los Sparks»]**
 
 Para composiciones gráficas planas de la línea (posts, stories, láminas, piezas sin foto) existe un Spark en 2D:
-el mismo personaje dibujado en vector. **Es una alternativa, no un reemplazo:** foto, cine, escenas con Nexa y el
+el mismo personaje dibujado en vector, **una clase aparte de los Sparks**. **Es una alternativa, no un reemplazo:** foto, cine, escenas con Nexa y el
 rig siguen saliendo del kit 3D.
 
 - **Misma anatomía:** esfera blanca, visor navy con dos ojos y sonrisa, la chispa de cuatro puntas, el anillo
@@ -233,15 +233,20 @@ rig siguen saliendo del kit 3D.
   760 de 1 a 3 palabras, al menos 3× la pregunta, que cierra con la esfera en el acento, y evidencia en Poppins con una
   palabra en negrita; todo entero fuera del anillo, en el tercio inferior. Mismo criterio que las portadas de perfil con
   Nexa, donde la luz de la línea cuenta como órbita y la respuesta conserva su esfera (efeonce-graphic-line,
-  applications §A11). **[criterio, a partir de la corrección del operador del 2026-10-01: «no siguen tanto el estilo de
-  /efeonce-graphic-line»; pendiente su confirmación]** — reemplaza la regla anterior de esta sección, que dejaba el
-  Spark sin la voz por la regla de una esfera por pieza.
+  applications §A11). **[operador, 2026-10-01: corrección «no siguen tanto el estilo de /efeonce-graphic-line»,
+  confirmada con «me gusta, canonízalos»]**.
 - **Pesos que combinan** (línea gráfica): Bricolage 760/740 con Poppins 500, 620 con 400, 500 con 300. Etiquetas en
   Poppins 600, mayúsculas, tracking 0,08 em, nunca en el acento bajo 24 px.
 - **Sobre papel lleva contorno navy**; sobre oscuro, no.
 - **Versión simple a 72 px o menos:** sin paneles, tornillos, brillo del visor ni ventanas, y con el anillo más grueso.
 - Siguen valiendo §2 y §10: una persona supervisa en el relato de la pieza y el accesorio no lleva texto. La escala de
   §5 aplica cuando hay una persona en la pieza; la firma es la de la línea gráfica.
+- **Archivos canónicos (2026-10-01):** 94 SVG en `@efeoncepro/axis-brand-assets` **0.4.11** (AXIS tag `v0.4.11`,
+  `d54c873`), `assets/sparks-2d/`: el Spark base en 6 expresiones × 6 líneas × oscuro/papel, el detalle simple por línea
+  y superficie, y el plantel. API `AXIS_SPARK_2D_ASSETS`, `findSpark2dAsset({ character, expression, line, surface,
+  sizePx })`, `spark2dAssetUrl`. Navy y acentos salen de `efeonceGraphicLine` al generarlos. **Nunca se redibuja a mano**:
+  se usa el SVG del paquete. Lab: [axis.efeonce.org/references/sparks/#en-2d](https://axis.efeonce.org/references/sparks/#en-2d)
+  (`sparks.json` → `flat2d`). Greenhouse todavía fija 0.4.10: adoptarlo es un bump aparte.
 - Fuente y canvas de exploración: `ai-generations/2026-10-01_sparks/2d/` (LEEME y componente).
 
 ## 9. El nombre: revisión de colisión
@@ -287,4 +292,4 @@ La task nombraba también Adobe Spark (hoy Adobe Express); no está entre los re
 | 4 | Revisión de Legal si se decide registrar el nombre | Legal |
 | 5 | ¿Las cinco familias calzan con lo que Agent Ops vende hoy? (pregunta abierta de la task) | Operador |
 | 6 | Prueba de reconocimiento: son un sistema consistente, no un activo distintivo medido | Operador |
-| 7 | Exportar el Spark 2D (§8.2) a SVG estáticos y publicarlos en `@efeoncepro/axis-brand-assets` | AXIS + aprobación del operador |
+| 7 | ~~Exportar el Spark 2D a SVG y publicarlo en AXIS~~ — hecho el 2026-10-01 (`axis-brand-assets` 0.4.11). Queda: que Greenhouse fije 0.4.11 cuando una pieza lo use | Greenhouse |
