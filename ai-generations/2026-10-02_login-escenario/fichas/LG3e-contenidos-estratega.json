@@ -1,0 +1,38 @@
+{
+  "id": "LG3e-contenidos-estratega",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "chaqueta-bomber-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "polvo",
+  "suspendido": "a whole editorial content plan thrown into the air from the table — printed article pages, storyboard frames, index cards, a few instant photos and loose sticky notes — FROZEN mid-air in an upward burst, every sheet razor sharp and perfectly still, shot at 1/8000 s with a fast flash, not a trace of motion blur",
+  "escena": "SCENE (staged editorial photograph, freeze-frame at 1/8000 s, a real content studio in Santiago at dusk, warm wood table, NO fantasy, NO glowing effects): the content strategist from the reference portrait, wearing the deep navy EFEONCE BOMBER (deep navy, never royal blue) over the navy Efeonce polo, stands behind a long wooden editorial table, his face centred at about 58% of the frame width and at about 36% of the frame height (NOT higher), his head about one fifth of the frame height, framed from the waist up, camera about two meters away at chest height, 85mm f/2.8. He has just slapped both palms down on ONE printed master article lying on the table, and at that instant the whole content plan around it LEAPS into the air: printed article pages, storyboard frames of a short video, index cards with headlines, a few instant photos of a podcast mic and a camera, loose sticky notes — all FROZEN mid-air in an upward burst around his hands and shoulders, every sheet sharp and perfectly still, some catching the light. He looks straight into the lens with a quick, delighted grin, eyes sharp, head almost frontal. Real skin exactly as in the reference portrait: irregular pores and fine vellus hair, healthy even tone, natural sheen with micro-texture in the highlights; never waxy, airbrushed or CGI-smooth. The ONE color accent of the frame is TEAL (#36C8BF): the sticky notes and the cover of the master article are teal, nothing else is teal. The BLUE of the frame is carried ONLY by his deep navy Efeonce bomber; there is NO monitor, NO screen and NO blue panel anywhere in the room; the ONLY light is a small daylight LED panel standing LOW on the table at the right edge of the frame, at hand height, the brightest thing in the frame, raking across his hands, the flying pages and the right side of his face, while the far side of his face falls into open shadow with the nose shadow legible on his cheek; every other lamp in the room is switched OFF, nothing warm, no amber glow. His face, both hands and the burst of pages all fit inside a circle centred at about 58% of the width and one third of the height, with air around them; nothing important sits in the upper-left of that circle. The LEFT 40% of the frame and the lower-left quarter are calm: the dim end of the table and an unlit plain wall, no pages, no objects, no people. Natural white balance, no color grade, completely unbranded except his bomber.",
+  "lecho": {
+    "objeto": "the near, out-of-focus edge of the wooden table at the bottom of the frame, in shadow",
+    "tono": "DARK, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, unlit plain wall and the dim end of the table on the left 40% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "nota": "Casting (no es del roster): el operador prefirió otra persona en vez de Andrés (2026-10-02). Casting anclado a un retrato con la receta de piel v3 (2026-10-02).",
+  "casting": {
+    "estratega": {
+      "etiqueta": "Estratega de contenidos (casting)",
+      "identity": "IDENTITY (critical): the man is the SAME person shown in the reference portrait: a Chilean content strategist in his mid thirties with short black hair neatly cut with a slight side part, a short well-groomed full beard, warm brown skin, dark brown eyes and thick straight brows, no glasses. Preserve his face, skin, beard and hair exactly; his pose, expression, clothing and light come from the scene. Do not age, beautify or smooth him.",
+      "refs": [
+        "ai-generations/2026-10-02_login-escenario/casting/ancla-estratega.png"
+      ],
+      "cuerpo": "ai-generations/2026-10-02_login-escenario/casting/ancla-estratega.png"
+    }
+  },
+  "identidad": [
+    "estratega"
+  ]
+}
