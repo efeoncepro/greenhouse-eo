@@ -81,7 +81,7 @@ Pedido del operador (2026-10-02): «El informe de Sky además debe contemplar m�
 
 ### Depends on
 
-- Runs por mercado de TASK-1863 (en staging; `main` retenido a 2026-10-02).
+- Runs por mercado de TASK-1863 (código en producción; flag multimercado ON en Vercel y ops-worker desde 2026-10-02).
 
 ### Blocks / Impacts
 
@@ -231,7 +231,7 @@ Slice 1 → 2 → 3; el plan no consume mercados hasta que el adapter los selle.
 |---|---|---|---|---|
 | Promedio implícito entre países | plan/render | Media | invariante + test + gate | tests |
 | País sin corrida en el mes | Insights | Alta al inicio | límite por país | límites del borrador |
-| Mercados no primarios fuera de producción | Grader | Media | depender del release de TASK-1863 | estado de TASK-1863 |
+| Mercados no primarios sin corrida aún | Grader | Baja | primera corrida mensual 2026-10-03 08:00 | grader_runs por mercado |
 
 ### Feature flags / cutover
 
@@ -249,7 +249,7 @@ Release → primera corrida mensual de los siete mercados de Sky → borrador �
 
 ### Out-of-band coordination required
 
-Release de TASK-1863 a producción.
+Ninguna: TASK-1863 en producción con flag ON desde 2026-10-02.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
