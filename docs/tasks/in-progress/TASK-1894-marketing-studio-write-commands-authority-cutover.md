@@ -6,6 +6,15 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-02 (cierre) — Entregable B en producción
+
+- `a8c7886` llegó a `origin/main` de Studio (lo empujó otra sesión junto con sus commits de la barra de estado); el
+  operador confirmó con `git push origin main` → «Everything up-to-date». `https://studio.efeonce.org/api/v1/health`
+  → `version 1.4.0`. Smoke de producción de sólo lectura: `GET /campaigns/CMP-004` → `permissions` `writable false`,
+  `lockReason open_mode`, `sourceOfTruth onedrive`, `ETag "1"`; `POST …/states/launch` anónimo → `403 write_not_allowed`;
+  `GET /campaigns/CMP-004/brief` → `brief null`. Ningún `api_client` de producción tiene `studio:write`.
+- Siguen pendientes: sync del gateway (cambio preparado), release de Greenhouse a producción, Entregable C.
+
 ## Delta 2026-10-02 (noche) — Entregable B y cierre de A en Greenhouse
 
 - **Decisiones del operador (2026-10-02):** alcance «cerrar A + Entregable B»; el Entregable C (corte de campañas a
@@ -336,7 +345,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Entregable A (Slices 1–3) en producción desde 2026-10-02 (Studio 1.3.0; CMP-004 con 44 piezas aprobadas). Entregable B (Slices 4–7) code complete y verificado en staging (Studio a8c7886 en main local sin empujar, rama task-1894-entregable-b con preview; API 1.4.0, 44 tools; migración 1790967435017 aplicada en staging y producción; sandbox CMP-900). Greenhouse: capabilities asset.write y campaign.write en develop (9d0d698d4), sin release a producción. Pendientes del operador: push de Studio a main, release de Greenhouse, sync del gateway (cambio preparado, sin commit). Entregable C (Slices 8–10) diferido por el operador`
+- Status real: `Entregable A (Slices 1–3) en producción desde 2026-10-02 (Studio 1.3.0; CMP-004 con 44 piezas aprobadas). Entregable B (Slices 4–7) en producción desde 2026-10-02 (Studio a8c7886, health 1.4.0, smoke de producción de sólo lectura; verificado antes en staging; API 1.4.0, 44 tools; migración 1790967435017 aplicada en staging y producción; sandbox CMP-900). Greenhouse: capabilities asset.write y campaign.write en develop (9d0d698d4), sin release a producción. Pendientes del operador: release de Greenhouse, sync del gateway (cambio preparado, sin commit). Entregable C (Slices 8–10) diferido por el operador`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` (2026-09-26: TASK-1890, TASK-1893 y TASK-1896 complete)

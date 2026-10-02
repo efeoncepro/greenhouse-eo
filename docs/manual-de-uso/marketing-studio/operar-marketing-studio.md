@@ -192,8 +192,8 @@ Sólo una persona puede aprobar: una integración o un agente con token de API n
 
 ## Editar una campaña gobernada por Studio
 
-> **Estado (2026-10-02):** probado en staging con la campaña de pruebas `CMP-900`. Todavía no está en producción:
-> falta que el operador publique la versión nueva de Studio. Hasta entonces, úsalo sólo contra staging.
+> **Estado (2026-10-02):** en producción desde el 2026-10-02, tras probarse en staging con la campaña de pruebas
+> `CMP-900`. Las campañas reales siguen gobernadas por OneDrive (responden 409) hasta su corte a Studio.
 
 Cada campaña tiene un **dueño de sus datos**: OneDrive o Studio. Las campañas que existían antes (CMP-001 a CMP-005)
 siguen gobernadas por OneDrive: sus datos se actualizan con el import. Las campañas nuevas creadas en Studio nacen

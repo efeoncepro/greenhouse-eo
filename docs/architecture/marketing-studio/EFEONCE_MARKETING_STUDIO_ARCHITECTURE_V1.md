@@ -579,8 +579,8 @@ unitarias (kernel, inferencia, derechos, firma V4) e integración `upload.integr
 
 ## 7.4 Commands del catálogo (TASK-1894, Entregable B)
 
-Estado: **code complete y verificado en staging; no está en producción.** Studio `a8c7886` en `main` local, sin
-empujar (empujar `main` es el deploy de producción de Studio y lo hace el operador); la rama `task-1894-entregable-b`
+Estado: **en producción desde 2026-10-02** (Studio `a8c7886` en `main`, health 1.4.0, smoke de sólo lectura), tras
+verificarse en staging; la rama `task-1894-entregable-b`
 (mismo commit) está en origin con su preview sobre la base de staging. API **1.4.0**, manifiesto de 44 tools (hash
 `6478cab73538`). Greenhouse: capabilities en `develop` (`9d0d698d4`), sin release a producción. Gateway: cambio
 preparado, sin sincronizar. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Commands del catálogo.

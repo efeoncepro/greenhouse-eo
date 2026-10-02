@@ -260,7 +260,7 @@ was verified.
 | Greenhouse | two write capabilities | `develop` only | coverage test green; no prod release |
 | Gateway | read-only federation filter | prepared | not committed, not synced |
 
-**Pending (operator):** push Studio `main`; Greenhouse production release; gateway sync (apply change → sync → test →
+**Pending (operator):** Greenhouse production release; gateway sync (apply change → sync → test →
 PR → merge → deploy). Deferred: Entregable C (Slices 8–10); TASK-1898/1899 (session person, T2 confirmation by API,
 write federation). CMP-004 media authorization stays in the OneDrive catalog until its cutover (C); in Studio it can
 only be authorized on Studio-governed campaigns, by a person, with `pnpm studio:write authorizeMedia … --apply --confirm`.

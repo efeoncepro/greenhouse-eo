@@ -295,8 +295,8 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
   `pnpm studio:review` (operator only); flags `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` + `STUDIO_UPLOADS_ENABLED` ON; 33
   CMP-004 finals uploaded and `pending_review`. Greenhouse capability `marketing_studio.asset.write` not seeded (not
   authorized yet). Entregables B and C pending.
-- TASK-1894 **Entregable B (catalog commands) code complete 2026-10-02, verified in staging, NOT in production**:
-  Studio `a8c7886` on local `main` (not pushed — operator), preview of branch `task-1894-entregable-b`; API 1.4.0, 44
+- TASK-1894 **Entregable B (catalog commands) in production since 2026-10-02** (health 1.4.0, read-only prod smoke):
+  Studio `a8c7886` on `main`, preview of branch `task-1894-entregable-b`; API 1.4.0, 44
   tools (29 write routes + `studio.campaign.brief.get`), state machines, `CampaignDetail.permissions`, `ETag`, CLI
   `pnpm studio:write`; migration `1790967435017` applied on staging and prod (5 real campaigns stay `onedrive`);
   sandbox `CMP-900`. Greenhouse write capabilities on `develop` only. Gateway: read-only federation filter prepared,
