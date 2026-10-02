@@ -367,3 +367,10 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
 - Portada con UNA fecha (el período); el título por defecto no lleva período (`defaultReportTitle(modules)`).
 - El adapter AEO lee el análisis que TERMINÓ dentro de la ventana, del mercado principal
   (`readClientGraderReport({ finishedWithin })` → `getLatestClientGraderRunInWindow`).
+- **Submarcas de producto** (`presentation/product-marks.ts`, línea gráfica «La órbita», aprobadas 2026-09-29): cada
+  capítulo con producto trae `chapter.productMark {key, label}` (`seo`→`sv360`, `aeo`→`aeo`; ICO no tiene). Think
+  dibuja el lockup oficial `/branding/products/<clave-con-guion>-lockup-positive.svg` EN LUGAR de la etiqueta del
+  módulo (reemplaza, nunca se suma; una por sección; nunca firma). La fuente de los hechos AEO se nombra
+  «Efeonce AEO Assessment» (`GH_INSIGHTS.sources.ai_visibility_grader`). Los lockups (`positive|negative|white`) se
+  exportan con `pnpm insights:think-icons` desde `@efeoncepro/axis-brand-assets`; nunca se copian ni se arman a mano.
+  Reservado: `ai_visibility_report` (enlazar el entregable cuando exista el vínculo) y portadas PDF/deck.

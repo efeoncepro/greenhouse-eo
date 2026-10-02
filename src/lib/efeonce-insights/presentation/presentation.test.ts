@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 import { INSIGHT_SCOPE_CATALOG, INSIGHT_SCOPE_KEYS, scopeChipsFor } from './scope-catalog'
+import { INSIGHT_PRODUCT_MARK_KEYS, chapterProductMark, productMarkFileStem } from './product-marks'
 
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { InsightWebModelV1 } from '../contracts/web-model'
@@ -283,5 +284,20 @@ describe('alcance de la portada por servicio', () => {
       { key: 'creative', label: 'Servicios creativos', glyph: 'contenido', line: 'brand' },
       { key: 'performance', label: 'Performance', glyph: 'medios', line: 'voice' }
     ])
+  })
+})
+
+describe('marcas de producto por capítulo (submarcas SEO/AEO)', () => {
+  it('cada capítulo con producto lleva su lockup y su nombre accesible; ICO no lleva marca', () => {
+    expect(chapterProductMark('seo')).toEqual({ key: 'sv360', label: GH_INSIGHTS.productMarks.sv360 })
+    expect(chapterProductMark('aeo')).toEqual({ key: 'aeo', label: GH_INSIGHTS.productMarks.aeo })
+    expect(chapterProductMark('ico')).toBeNull()
+  })
+
+  it('toda clave tiene nombre en el copy y archivo con guion', () => {
+    for (const key of INSIGHT_PRODUCT_MARK_KEYS) {
+      expect(GH_INSIGHTS.productMarks[key]).toMatch(/^Efeonce /)
+      expect(productMarkFileStem(key)).not.toContain('_')
+    }
   })
 })

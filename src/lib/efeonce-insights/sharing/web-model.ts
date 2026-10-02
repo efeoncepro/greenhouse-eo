@@ -4,6 +4,7 @@
  * `formatFactValue`, la MISMA función que validó el plan: el web model no inventa formato.
  */
 
+import { chapterProductMark } from '../presentation/product-marks'
 import { funnelGeometry } from '@/lib/artifact-composer/pure'
 
 import type { ChartSpecV1 } from '../contracts/chart-spec'
@@ -151,7 +152,8 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
     tables: chapter.tables.map(table => ({ tableId: table.tableId, title: table.title, columns: [...table.columns], rows: table.rows.map(row => [...row]) })),
     limits: [...chapter.limits],
     ...(chapter.opening ? { opening: projectClaim(chapter.opening) } : {}),
-    ...(chapter.readings?.length ? { readings: chapter.readings.map(projectReading) } : {})
+    ...(chapter.readings?.length ? { readings: chapter.readings.map(projectReading) } : {}),
+    ...((mark => (mark ? { productMark: mark } : {}))(chapterProductMark(chapter.module)))
   }))
 
   return {

@@ -33,6 +33,15 @@ export const GH_INSIGHTS = {
    * Alcance del informe en la portada (chips): servicio o módulo que cubre. Lo elige quien compone el encargo
    * (`request.scope`); sin elección, se deriva de los módulos. Ícono y línea en `presentation/scope-catalog.ts`.
    */
+  /** Nombre accesible de cada marca de producto (texto alternativo del lockup oficial). */
+  productMarks: {
+    sv360: 'Efeonce Search Visibility 360',
+    aeo: 'Efeonce AEO',
+    aeo_assessment: 'Efeonce AEO Assessment',
+    ai_visibility_report: 'Efeonce AI Visibility Report',
+    insights: 'Efeonce Insights'
+  } as Readonly<Record<string, string>>,
+
   scopeChips: {
     seo: 'SEO',
     aeo: 'Respuestas de IA',
@@ -272,7 +281,8 @@ export const GH_INSIGHTS = {
     gsc_window_aggregate: 'Google Search Console',
     dataforseo_serp_rank: 'mediciones de posiciones en buscadores',
     dataforseo_etv: 'estimación de tráfico orgánico',
-    ai_visibility_grader: 'análisis de visibilidad en motores de respuesta',
+    // Nombre de producto del diagnóstico (ADR de naming Efeonce AEO): la fuente se nombra como lo conoce el cliente.
+    ai_visibility_grader: 'Efeonce AEO Assessment',
     ico_engine_monthly: 'métricas mensuales de entrega'
   } as Readonly<Record<string, string>>,
 

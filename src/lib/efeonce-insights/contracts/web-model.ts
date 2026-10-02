@@ -119,6 +119,11 @@ export interface InsightWebChapterV1 {
   opening?: InsightWebClaimV1
   /** 1.1 — una lectura por figura, a lo más una por `chartId`. */
   readings?: InsightWebReadingV1[]
+  /**
+   * 1.2 — marca de producto Efeonce que encabeza el capítulo (`presentation/product-marks.ts`: SEO → SV360, motores de
+   * respuesta → AEO). Reemplaza la etiqueta del capítulo; el consumer dibuja el lockup oficial de esa clave.
+   */
+  productMark?: { key: string; label: string }
 }
 
 export interface InsightWebModelV1 {
