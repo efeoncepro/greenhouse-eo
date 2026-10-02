@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Release 02/10 (`6ea157e6e641`, PR #247, run `37003281899`):** develop→main `released` 12:04Z; watchdog ok 6/6; canary prod web Insights 1.1 (crear→leer `modelVersion=1.1`→revocar). Migración TASK-1950 aplicada antes del merge. `INSIGHTS_DELIVERY/SCHEDULES_ENABLED` ON en Production + EmailTypes de Insights ON (redeploy `dpl_B1v1vReWS44UYMi7u9LHKqSPpJ7K`); falta canary con sesión humana (lane `app`). `BRAND_RENDER_ENABLED` sigue OFF en prod (canary Proposal pendiente). [Tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md).
+
 **CMP-004 por servicios (02/10):** [CDR-012](docs/campaigns/decisions/CDR-012-cmp004-reorientacion-por-servicios.md) — 8 pilotos N2 certificados (`graphicLine`, `fde62f05d`); pendientes y artefactos en el CDR §6. Sin push.
 
 **Registro cine sin consultor (02/10):** [TASK-1926](docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md) delta b en develop (último `00e53ef53`), AXIS en vivo. Dos pruebas ciegas: las sesiones llegan solas usando `cine-reviewer`; barra de luz recalibrada contra las aprobadas. Pendiente: veredicto del operador sobre `ai-generations/2026-10-02_prueba-ciega-cine-2/` y el orquestador idempotente. [Casebook](docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).
