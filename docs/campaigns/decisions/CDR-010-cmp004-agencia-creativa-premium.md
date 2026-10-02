@@ -62,3 +62,7 @@ El operador aprobó el método por campaña → elección por pieza → validaci
 La [política ejecutable CMP-004](../policies/CMP-004-color-v1.json) conserva paleta y tratamientos explícitos. Su aplicación produce cuatro candidatas 4:5: C01/C03 contorno neutro, C02 superficie clara con tinta azul, C04 contorno azul pálido. Son decisiones de dirección propuestas para revisión, no aprobación final del operador. La documentación de campaña conserva el razonamiento y las rutas a los assets en su canal; el JSON es el contrato ejecutable único.
 
 El gate técnico no decide armonía ni eficacia. Las decisiones tipográficas/espaciales del análisis anterior se mantienen como propuestas separadas; esta implementación sólo habilita la política de color. Sin pauta, envíos, commit o deploy implícitos.
+
+## 9. Delta 2026-10-02 — reorientación por servicios
+
+El operador reorientó la campaña por servicio: [CDR-012](CDR-012-cmp004-reorientacion-por-servicios.md). Los conceptos C01–C04 aceptados aquí siguen vivos dentro de S01, S02, S04 y S07; los pilotos R01–R04 quedan como historia y el teal de su CTA se reemplaza por el acento de la línea Brand.
