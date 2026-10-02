@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-02 — Inpainting de imagen y video en los CLIs (TASK-1965)
+
+- Nuevos `pnpm ai:mask` (máscara canónica con fuentes, operaciones y guardas de cobertura) y `pnpm ai:inpaint image|video`:
+  recorte con contexto, generación por adaptador (OpenAI, `fal:flux-pro-fill`, Seedream edit; video `fal:flux3-edit`),
+  recomposición obligatoria y verificación del archivo en delta máximo 0, dry-run, caché por hash y manifiesto.
+- Medido: Sunburst con máscara devuelve un panel negro plano (3 de 3) → default Flare con máscara y Sunburst sin máscara
+  con corrección de color en anillo; modo boceto y referencias (como el Markup de ChatGPT). `ai:image --mask` avisa que
+  no recompone. Canario en `ai-generations/2026-10-02_task-1965-canary/`. Herramienta out-of-band: no toca runtime.
+
 ## 2026-10-02 — Marketing Studio: commands del catálogo verificados en staging (TASK-1894, Entregable B)
 
 - Studio suma escrituras gobernadas del catálogo: máquinas de estado (revisión, creativo, medios, lanzamiento),
@@ -663,15 +672,3 @@ lectura, todo operable por agentes con niveles de riesgo (T0 lectura, T1 borrado
 gastar con confirmación humana). La operación híbrida reparte cada campaña en work items asignables a personas o a roles
 de agente (planificador de medios, SEO/AEO, copywriter, QA creativo, analista), con un despachador en Studio y
 adaptadores Claude y OpenAI detrás de flags. Tasks TASK-1905–1916 en to-do; sin cambios de runtime todavía.
-
-## 2026-09-26 — Firma de correo v3.1 aprobada: zona de partners y contrato `efeonce.email-signature`
-
-El operador aprobó la firma de correo en sus dos versiones (A sobre papel, B tarjeta navy). La línea que termina en la
-esfera va una vez; los partners (HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y BytePlus)
-abren su propia zona con una regla fina sin esfera, en logos oficiales de un solo tono y el mismo peso óptico. Sin
-«Quedo atento» y todo el texto que no es el nombre en Poppins. AXIS `c7717ef`: tokens
-`efeonceGraphicLine.emailSignature`, contrato `efeonce.email-signature` 0.3.0 (`stable`) con `pnpm signature:resolve`,
-guía para agentes y lámina 4.5 del Lab. Greenhouse: manual §10.2, ADR, documentación funcional, manual de uso y las
-skills `efeonce-brand-studio` y `axis-design-system`. Después: paquetes AXIS publicados (0.3.2 y 0.3.4), imágenes en
-el bucket público `email-signature/v3.1/`, HTML listo para Outlook y **firma de equipo** aprobada (Talent, Finance,
-Commercial: sin foto, la órbita rodea el ícono del área; variante `team`). Pendiente: instalar en Outlook.

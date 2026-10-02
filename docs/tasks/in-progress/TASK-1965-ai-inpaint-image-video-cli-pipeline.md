@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `En implementación 2026-10-02 (Claude, develop local-first, sin push)`
+- Status real: `Code complete local 2026-10-02 (Slices 1–6 + boceto/referencias + Sunburst sin máscara, commits c215c16d3…9528d5301 en develop, sin push). Pendiente: canario real de Sunburst sin máscara y de boceto (requiere autorización de gasto) y de Seedream edit`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -342,19 +342,19 @@ Autorización explícita del operador para el gasto de los canarios reales (imag
 
 ## Acceptance Criteria
 
-- [ ] `pnpm ai:mask` construye máscaras desde rectángulo, polígono, alfa, luminancia y sujeto, y aplica dilatar, erosionar, difuminar, invertir, unir e intersectar.
-- [ ] `pnpm ai:mask` rechaza una máscara 0 % o 100 % editable sin flag explícito, y una prueba reproduce la trampa de 1 canal de `sharp` y la ve rechazada.
-- [ ] La conversión a `alpha-transparent-editable` y a `white-editable` tiene pruebas de ida y vuelta.
-- [ ] `pnpm ai:inpaint image` sale con código distinto de 0 si el delta máximo en zona protegida no es 0 tras recomponer, con prueba sintética que lo demuestra.
-- [ ] `--dry-run` produce máscara, recorte, payload sin secretos y costo sin llamar al proveedor (prueba con fetch simulado que verifica cero llamadas).
-- [ ] Una segunda corrida idéntica no llama al proveedor (caché por hash) salvo con `--force`.
-- [ ] Cada corrida escribe `manifest.json` con los campos de la Detailed Spec y sin secretos.
-- [ ] El catálogo fal declara convención de máscara por endpoint, y ninguna fila con máscara existe sin `verifiedAt` real.
-- [ ] La edición sin máscara de Seedream pasa por el mismo pipeline y queda en delta 0 en la zona protegida.
-- [ ] `pnpm ai:inpaint video` aborta ante deriva de encuadre o diferencia de duración, y en el camino feliz la secuencia PNG queda en delta 0 en la zona protegida y conserva el audio original.
-- [ ] `ai:image --mask` conserva su comportamiento e imprime el aviso hacia `ai:inpaint image`.
-- [ ] Ningún archivo de `src/app/**` ni del runtime de `src/lib/**` importa `scripts/ai/inpaint/**`, y no existe `src/lib/media/`.
-- [ ] Manuales de imagen y video, documentación funcional, guía de selección, spec del generador y las tres skills (+ espejos) describen los comandos.
+- [x] `pnpm ai:mask` construye máscaras desde rectángulo, polígono, alfa, luminancia y sujeto, y aplica dilatar, erosionar, difuminar, invertir, unir e intersectar. — `mask.test.ts` (fuentes y operaciones); sujeto corrido en vivo sobre la base del canario (taza y cuaderno detectados, IMG.LY local, gratis). Intersectar existe en el núcleo; el CLI une fuentes y aplica el resto.
+- [x] `pnpm ai:mask` rechaza una máscara 0 % o 100 % editable sin flag explícito, y una prueba reproduce la trampa de 1 canal de `sharp` y la ve rechazada. — `mask.test.ts` «trampa de canales»; además se encontró y cubrió la trampa del lado de la escritura (PNG de 3 canales desde 1).
+- [x] La conversión a `alpha-transparent-editable` y a `white-editable` tiene pruebas de ida y vuelta. — `mask.test.ts` «convenciones de proveedor».
+- [x] `pnpm ai:inpaint image` sale con código distinto de 0 si el delta máximo en zona protegida no es 0 tras recomponer, con prueba sintética que lo demuestra. — `recompose.test.ts` (un byte basta para FAIL) + `exitCodeFor` (2 con algún FAIL); el CLI propaga el código.
+- [x] `--dry-run` produce máscara, recorte, payload sin secretos y costo sin llamar al proveedor (prueba con fetch simulado que verifica cero llamadas). — `pipeline-image.test.ts` (adaptador simulado, 0 llamadas) y dry-run real sobre 4500×4500 y sobre el canario.
+- [x] Una segunda corrida idéntica no llama al proveedor (caché por hash) salvo con `--force`. — `pipeline-image.test.ts` y `pipeline-video.test.ts`; el hash incluye `adapter.revision`.
+- [x] Cada corrida escribe `manifest.json` con los campos de la Detailed Spec y sin secretos. — prueba «no guarda secretos» + manifiestos reales en `ai-generations/2026-10-02_task-1965-canary/`.
+- [x] El catálogo fal declara convención de máscara por endpoint, y ninguna fila con máscara existe sin `verifiedAt` real. — `flux-pro-fill` con `mask` y `verifiedAt: 2026-10-02` tras canario real (planta puesta, delta 0).
+- [ ] La edición sin máscara de Seedream pasa por el mismo pipeline y queda en delta 0 en la zona protegida. — **sin canario real de Seedream**: el camino sin máscara está probado con adaptador simulado y en vivo con OpenAI; falta una corrida de `fal:seedream5-*-edit`.
+- [x] `pnpm ai:inpaint video` aborta ante deriva de encuadre o diferencia de duración, y en el camino feliz la secuencia PNG queda en delta 0 en la zona protegida y conserva el audio original. — `pipeline-video.test.ts` con ffmpeg real (abort por encuadre corrido, ±1 cuadro, audio copiado) + canario `flux3-edit` 5 s: 120 cuadros PASS, deriva 11,16/255.
+- [x] `ai:image --mask` conserva su comportamiento e imprime el aviso hacia `ai:inpaint image`. — `scripts/ai/generate-image.ts`, sólo se agregó el aviso.
+- [x] Ningún archivo de `src/app/**` ni del runtime de `src/lib/**` importa `scripts/ai/inpaint/**`, y no existe `src/lib/media/`. — `grep -rl scripts/ai/inpaint src` vacío; `src/lib/media` no existe (2026-10-02).
+- [x] Manuales de imagen y video, documentación funcional, guía de selección, spec del generador y las tres skills (+ espejos) describen los comandos. — commits `510053612` y `9528d5301`; `pnpm skills:mirrors` y `pnpm models:inventory` verdes.
 
 ## Verification
 
@@ -382,8 +382,14 @@ Autorización explícita del operador para el gasto de los canarios reales (imag
 - `scripts/foto/expandir.mjs` sobre el núcleo de recomposición.
 - Endpoint de imagen con máscara en fal si el Slice 4 no encuentra uno verificable.
 
+## Delta 2026-10-02
+
+- Alcance agregado durante la ejecución, por hallazgos medidos y pedido del operador: Sunburst con máscara devuelve un panel negro plano (3 de 3), así que `--provider-mask auto` lo hace editar sin máscara, con `--color-match` en anillo (método de `foto:isotipo --acabado`) y detector `suspectFlatPanel`; modo `--sketch` / `--reference` (equivalente por API del Markup de ChatGPT), respaldado por la documentación oficial de OpenAI leída el 2026-10-02 (la máscara es guía; para zonas idénticas, componer sobre el original).
+- Follow-ups confirmados con esquema OpenAPI: `fal-ai/wan-vace-14b/inpainting` (video con `mask_video_url`) y `fal-ai/sam2/video` (seguimiento) existen; no se conectaron.
+
 ## Open Questions
 
-- Umbral de cobertura para activar el recorte automático (propuesta inicial: zona < 25 % del área); se ajusta con el
-  canario.
-- Umbral de deriva de encuadre que aborta la recomposición de video; se fija con el canario de video.
+- Umbral de cobertura para activar el recorte automático: queda en 25 % (los canarios 1536×1024 cayeron en imagen
+  completa con 45–55 %, y un recorte sobre 4500² se activó con 8 %). Resuelta.
+- Umbral de deriva que aborta la recomposición de video: queda en 12/255. El canario `flux3-edit` midió 11,16 con
+  cámara quieta: el margen es estrecho y se revisa con más clips. Resuelta con reserva.
