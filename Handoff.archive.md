@@ -13,6 +13,7 @@ verificado.
 - [Home: checkpoint previo a consolidación](docs/operations/agent-context-history/handoff/2026-08-30-home-before-consolidation.md)
 
 - [2026-09](docs/operations/agent-context-history/handoff/2026-09.md)
+- [Compactación previa al release 2026-10-02](docs/operations/agent-context-history/handoff/2026-10-02-release-compaction.md)
 
 No volver a pegar historia completa en este índice.
 

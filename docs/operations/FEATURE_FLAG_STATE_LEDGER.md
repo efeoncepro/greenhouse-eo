@@ -21,6 +21,22 @@
 > cinco veces. **Una fila de esta tabla NO es evidencia de rollout pendiente sin leer el valor live.**
 
 
+> ## Delta 2026-10-02 — auditoría live previa al release `develop→main` (PR #247)
+>
+> `pnpm flags:audit` (176 flags en código) contra el valor live de Production, antes de promover:
+>
+> - **`ISSUE-150` limpio:** 0 flags ON en Production sin su código lector en `origin/main`; 0 filas del ledger que
+>   declaren `prod: OFF` con valor live `true`; 0 flags sin registrar.
+> - **33 flags ON en Production cuyo lector DIFIERE de `main`** (Grader AI Visibility, SEO del `ops-worker`,
+>   `INSIGHTS_RENDER_ENABLED`/`ARTIFACT_RENDER_JOBS_ENABLED`, writebacks Notion): es el contenido de esta promoción.
+> - **Candidatos staging→prod (4):** `INSIGHTS_DELIVERY_ENABLED` e `INSIGHTS_SCHEDULES_ENABLED` se prenden con este
+>   release (decisión del operador del 2026-10-02: dejar Insights operable; ambos exigen acción humana por envío o
+>   schedule). `BRAND_RENDER_ENABLED` NO: TASK-1921 aún exige canary de Proposal y aprobación propia.
+>   `HIRING_FAIRNESS_MONITOR_ENABLED` NO: bloqueado por datos (TASK-1365).
+> - **Punto ciego del auditor:** reporta `INSIGHTS_GENERATION/ISSUANCE/AUTHORING_AI_ENABLED` como «sin referencia en
+>   código» aunque `src/lib/efeonce-insights/flags.ts` los lee como `env.FLAG` sobre un parámetro `env`. Los flags
+>   son reales; el escaneo no reconoce esa forma de acceso.
+
 > ## Delta 2026-09-02 — auditoría live previa al release `develop→main`
 >
 > Corrida de `pnpm flags:audit` **antes** de promover (161 flags en código), como paso 10 del
