@@ -64,6 +64,8 @@ Content + Distribution Operating System. Donde la estrategia de distribución se
 
 ## Efeonce Globe — Creative Studio de producción agentic (plataforma hermana)
 
+> **Nombres (2026-10-02):** hacia afuera, Globe se llama **Globe**; «Creative Studio» sólo lo acompaña como descriptor y nunca se abrevia a «Studio». «Studio» a secas es **Efeonce Marketing Studio**. Ver [ADR](../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md).
+
 Capability para dirigir y operar generación de imagen, video, audio y extensiones futuras mediante templates, referencias, assets, review y crédito gobernado. Nace con una superficie UI y una superficie MCP/agente sobre el mismo contrato; no es una galería de prompts ni un módulo de Greenhouse.
 
 **Boundary con Wave:** Globe posee la producción de contenido y assets creativos. Wave puede consumir esos outputs para Search Visibility 360, web o sistemas de agentes; no absorbe la identidad ni el ownership de Globe.
