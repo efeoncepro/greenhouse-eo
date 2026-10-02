@@ -51,12 +51,12 @@ legend { padding: 0; margin-bottom: 10px; font-size: 12px; letter-spacing: .08em
   <header>
     <span class="eyebrow">Los Sparks de Efeonce · 3D</span>
     <h1>El Spark en 3D: te mira y gira completo<span class="dot">.</span></h1>
-    <p class="lede">Un modelo 3D generado desde las vistas aprobadas del kit, con la cara de LED dibujada en vivo sobre el visor. Mueve el cursor y gira todo el cuerpo hacia ti; arrástralo para verlo por todos lados. Al soltarlo, vuelve a mirarte.</p>
+    <p class="lede">Un modelo 3D del kit separado en piezas —cuerpo, anillo, brazos y antena— y animado como personaje. Mueve el cursor: primero te miran los ojos y después gira el cuerpo, con inercia. Haz clic para que salte; arrástralo para verlo por todos lados.</p>
   </header>
 
   <div class="stage" id="stage" role="img" aria-label="Spark de Efeonce en 3D siguiendo el cursor">
     <div class="loading" id="loading">Cargando el modelo…</div>
-    <span class="hint" id="hint">Mueve el cursor · arrastra para girar</span>
+    <span class="hint" id="hint">Mueve el cursor · clic para saltar · arrastra para girar</span>
     <span class="readout" id="readout"></span>
   </div>
 
@@ -66,9 +66,9 @@ legend { padding: 0; margin-bottom: 10px; font-size: 12px; letter-spacing: .08em
   </div>
 
   <section class="notes" aria-label="Cómo está armado">
-    <div><h2>Modelo</h2><p>Malla con textura generada desde cuatro vistas del kit: frente sin cara, perfiles izquierdo y derecho, y espalda.</p></div>
-    <div><h2>Cara</h2><p>Ojos y sonrisa con textura de matriz de puntos, dibujados en vivo sobre un casquete que calza con el visor. Parpadean y cambian de expresión.</p></div>
-    <div><h2>Color de línea</h2><p>La luz azul del modelo (ventanas, antena, costuras) se lleva al acento de la línea en el shader, sin regenerar el modelo.</p></div>
+    <div><h2>Piezas</h2><p>El modelo se separa al cargar: el anillo es una pieza propia y orbita; los antebrazos y la antena se cortan del cuerpo y giran desde articulaciones navy, como en el diseño.</p></div>
+    <div><h2>Movimiento</h2><p>Resortes con inercia y rebote, inclinación al girar, estiramiento al flotar y al saltar, y la antena que se sacude con el movimiento. Los ojos se adelantan al cuerpo.</p></div>
+    <div><h2>Reacciones</h2><p>Saluda cuando vuelves, se sorprende si mueves el cursor muy rápido, ladea la cabeza cuando te detienes y se pone pensativo si lo dejas solo. Con movimiento reducido, sólo mira.</p></div>
   </section>
 </div>
 
@@ -84,7 +84,11 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 
 const GLB = '__GLB__'
-const CAL = {"rotX": 0, "rotY": 0, "rotZ": 0, "scale": 2.4, "offX": 0.0026, "offY": 0.1273, "offZ": 0.0291, "visor": {"r": 0.8426, "w": 1.478, "top": 0.48, "bottom": 0.1035, "x": 0, "y": 0, "z": 0}} // calibración del modelo: orientación, centro de la esfera y casquete del visor
+// Calibración del modelo (medida con calibrar-visor.html): escala, centro de la esfera del visor y casquete de la cara.
+const CAL = { scale: 2.4, off: [0.0026, 0.1273, 0.0291], visor: { r: 0.8426, w: 1.478, top: 0.48, bottom: 0.1035 } }
+// Cortes de las piezas (origen = centro de la esfera del visor): antebrazos fuera del radio RA, a los lados y bajo YA;
+// antena sobre YT. El anillo ya viene como pieza propia del modelo.
+const CUT = { RA: 0.86, XA: 0.55, YA: 0.2, YT: 0.86 }
 
 const LINES = [
   { key: 'engine', name: 'Engine', hex: '#0375db' },
@@ -104,9 +108,12 @@ const stage = document.getElementById('stage')
 const hint = document.getElementById('hint')
 const readout = document.getElementById('readout')
 let led = new THREE.Color(LINES[0].hex)
-let expression = 'feliz'
+let expression = 'feliz'          // la que eligió la persona
+let mood = null                   // reacción pasajera: { key, until }
+const face = () => (mood && performance.now() < mood.until ? mood.key : expression)
+const react = (key, ms) => { mood = { key, until: performance.now() + ms } }
 
-// --- Escena ---------------------------------------------------------------------------------------------------
+// --- Escena ---------------------------------------------------------------------------------------------------------
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
 renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -114,77 +121,64 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping
 renderer.toneMappingExposure = 1.05
 stage.prepend(renderer.domElement)
 const scene = new THREE.Scene()
-const pmrem = new THREE.PMREMGenerator(renderer)
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture
 scene.environmentIntensity = 0.8
 const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100)
-camera.position.set(0, 0.05, 4.4)
+camera.position.set(0, 0.05, 4.6)
 const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-2, 3, 4); scene.add(key)
 const rim = new THREE.PointLight(led, 6, 6); rim.position.set(0, -1.0, 0.5); scene.add(rim)
 
-// Brillo bajo la esfera (en el color de la línea).
 const glowCanvas = document.createElement('canvas'); glowCanvas.width = glowCanvas.height = 128
-const gctx = glowCanvas.getContext('2d')
-const glowTex = new THREE.CanvasTexture(glowCanvas)
-function paintGlow() {
-  const g = gctx.createRadialGradient(64, 64, 0, 64, 64, 64)
-  g.addColorStop(0, `#${led.getHexString()}`); g.addColorStop(1, 'rgba(0,0,0,0)')
-  gctx.clearRect(0, 0, 128, 128); gctx.fillStyle = g; gctx.fillRect(0, 0, 128, 128); glowTex.needsUpdate = true
-}
-const glow = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.5), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending }))
-glow.rotation.x = -Math.PI / 2; glow.position.y = -0.92; scene.add(glow)
+const gctx = glowCanvas.getContext('2d'); const glowTex = new THREE.CanvasTexture(glowCanvas)
+function paintGlow() { const g = gctx.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, `#${led.getHexString()}`); g.addColorStop(1, 'rgba(0,0,0,0)'); gctx.clearRect(0, 0, 128, 128); gctx.fillStyle = g; gctx.fillRect(0, 0, 128, 128); glowTex.needsUpdate = true }
+const glow = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 0.55), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending }))
+glow.rotation.x = -Math.PI / 2; glow.position.y = -1.0; scene.add(glow)
 
-// --- Cara LED: canvas con matriz de puntos, mapeado a un casquete esférico sobre el visor -------------------------
+// --- Cara LED -------------------------------------------------------------------------------------------------------
 const FW = 1024, FH = 384
-const face = document.createElement('canvas'); face.width = FW; face.height = FH
-const fctx = face.getContext('2d')
+const faceCanvas = document.createElement('canvas'); faceCanvas.width = FW; faceCanvas.height = FH
+const fctx = faceCanvas.getContext('2d')
 const strokeCanvas = document.createElement('canvas'); strokeCanvas.width = FW; strokeCanvas.height = FH
 const sctx = strokeCanvas.getContext('2d')
 const dots = document.createElement('canvas'); dots.width = FW; dots.height = FH
 { const d = dots.getContext('2d'); d.fillStyle = '#fff'; const s = 9; for (let y = s / 2; y < FH; y += s) for (let x = s / 2; x < FW; x += s) { d.beginPath(); d.arc(x, y, s * 0.38, 0, Math.PI * 2); d.fill() } }
-const faceTex = new THREE.CanvasTexture(face); faceTex.colorSpace = THREE.SRGBColorSpace
+const faceTex = new THREE.CanvasTexture(faceCanvas); faceTex.colorSpace = THREE.SRGBColorSpace
 
-function faceShapes(ctx, t, blink, gx, gy) {
+function faceShapes(ctx, expr, t, blink, gx, gy, squint) {
   const cx = FW / 2 + gx * 120, cy = FH / 2 + gy * 46
   const ex = 205, ey = cy - 26, my = cy + 74
   ctx.lineCap = 'round'; ctx.lineJoin = 'round'
   const arc = (x, y, w, h, up, lw) => { ctx.lineWidth = lw; ctx.beginPath(); if (up) { ctx.moveTo(x - w, y + h * 0.45); ctx.quadraticCurveTo(x, y - h, x + w, y + h * 0.45) } else { ctx.moveTo(x - w, y - h * 0.2); ctx.quadraticCurveTo(x, y + h, x + w, y - h * 0.2) } ctx.stroke() }
-  const ring = (x, y, r, lw) => { ctx.lineWidth = lw; ctx.beginPath(); ctx.ellipse(x, y, r, r * blink, 0, 0, Math.PI * 2); ctx.stroke() }
-  const eyeArc = (x, w, h, lw) => { ctx.save(); ctx.translate(0, ey); ctx.scale(1, blink); ctx.translate(0, -ey); arc(x, ey, w, h, true, lw); ctx.restore() }
-  switch (expression) {
+  const eyeScale = blink * (1 - squint * 0.35)
+  const ring = (x, y, r, lw) => { ctx.lineWidth = lw; ctx.beginPath(); ctx.ellipse(x, y, r, Math.max(2, r * eyeScale), 0, 0, Math.PI * 2); ctx.stroke() }
+  const eyeArc = (x, w, h, lw) => { ctx.save(); ctx.translate(0, ey); ctx.scale(1, Math.max(0.08, eyeScale)); ctx.translate(0, -ey); arc(x, ey, w, h, true, lw); ctx.restore() }
+  switch (expr) {
     case 'atento': ring(cx - ex, ey, 46, 38); ring(cx + ex, ey, 46, 38); arc(cx, my, 40, 34, false, 32); break
-    case 'sorprendido': ring(cx - ex, ey - 6, 60, 38); ring(cx + ex, ey - 6, 60, 38); ring(cx, my + 8, 26, 30); break
+    case 'sorprendido': ring(cx - ex, ey - 6, 62, 38); ring(cx + ex, ey - 6, 62, 38); ring(cx, my + 8, 26, 30); break
     case 'trabajando':
-      for (const s of [-1, 1]) for (let i = -1; i <= 1; i++) { ctx.globalAlpha = ((t / 260 + i + 1) % 3) < 1 ? 1 : 0.35; ctx.beginPath(); ctx.ellipse(cx + s * ex + i * 48, ey, 22, 22 * blink, 0, 0, Math.PI * 2); ctx.fill() }
+      for (const s of [-1, 1]) for (let i = -1; i <= 1; i++) { ctx.globalAlpha = ((t / 220 + i + 1) % 3) < 1 ? 1 : 0.3; ctx.beginPath(); ctx.ellipse(cx + s * ex + i * 48, ey, 22, Math.max(2, 22 * blink), 0, 0, Math.PI * 2); ctx.fill() }
       ctx.globalAlpha = 1; ctx.lineWidth = 30; ctx.beginPath(); ctx.moveTo(cx - 48, my); ctx.lineTo(cx + 48, my); ctx.stroke(); break
     case 'pensando': eyeArc(cx - ex, 56, 34, 32); eyeArc(cx + ex, 56, 34, 32); ctx.lineWidth = 30; ctx.beginPath(); ctx.moveTo(cx - 10, my + 8); ctx.quadraticCurveTo(cx + 22, my - 8, cx + 56, my + 4); ctx.stroke(); break
     case 'listo': eyeArc(cx - ex, 72, 72, 38); eyeArc(cx + ex, 72, 72, 38); arc(cx, my - 8, 80, 62, false, 35); break
-    default: eyeArc(cx - ex, 68, 62, 38); eyeArc(cx + ex, 68, 62, 38); arc(cx, my, 56, 44, false, 32)
+    default: eyeArc(cx - ex, 68, 62, 38); eyeArc(cx + ex, 68, 62, 38); arc(cx, my, 56 + squint * 10, 44 + squint * 10, false, 32)
   }
 }
-
-function drawFace(t, blink, gx, gy) {
+function drawFace(expr, t, blink, gx, gy, squint) {
   const col = `#${led.getHexString()}`
-  sctx.clearRect(0, 0, FW, FH); sctx.globalCompositeOperation = 'source-over'
-  sctx.strokeStyle = sctx.fillStyle = col
-  faceShapes(sctx, t, blink, gx, gy)
+  sctx.globalCompositeOperation = 'source-over'; sctx.clearRect(0, 0, FW, FH); sctx.strokeStyle = sctx.fillStyle = col
+  faceShapes(sctx, expr, t, blink, gx, gy, squint)
   fctx.clearRect(0, 0, FW, FH)
   fctx.save(); fctx.beginPath(); fctx.ellipse(FW / 2, FH / 2, FW / 2 - 4, FH / 2 - 4, 0, 0, Math.PI * 2); fctx.clip()
-  // brillo: el trazo desenfocado con sombra
   fctx.save(); fctx.globalAlpha = 0.7; fctx.shadowColor = col; fctx.shadowBlur = 44; fctx.drawImage(strokeCanvas, 0, 0); fctx.restore()
-  // LED: el trazo pasado por la matriz de puntos
   sctx.globalCompositeOperation = 'destination-in'; sctx.drawImage(dots, 0, 0); sctx.globalCompositeOperation = 'source-over'
-  fctx.drawImage(strokeCanvas, 0, 0)
-  fctx.restore()
+  fctx.drawImage(strokeCanvas, 0, 0); fctx.restore()
   faceTex.needsUpdate = true
 }
 
-// --- Modelo -------------------------------------------------------------------------------------------------------
-const rig = new THREE.Group(); scene.add(rig)       // gira hacia el cursor y con el arrastre
-const floater = new THREE.Group(); rig.add(floater) // flota
+// --- Jerarquía: rig (gira) → floater (flota, se estira, se inclina) → piezas -----------------------------------------
+const rig = new THREE.Group(); scene.add(rig)
+const floater = new THREE.Group(); rig.add(floater)
 const lineUniforms = { uLed: { value: new THREE.Color(led) }, uSwap: { value: 0 } }
-
-// La luz azul del modelo se lleva al acento de la línea: píxeles azules saturados → tono de la línea.
 function patchMaterial(m) {
   m.onBeforeCompile = (shader) => {
     shader.uniforms.uLed = lineUniforms.uLed; shader.uniforms.uSwap = lineUniforms.uSwap
@@ -196,100 +190,253 @@ vec3 gh_swap(vec3 c){ if(uSwap<0.5) return c; vec3 h=gh_rgb2hsv(c); float blue=s
 `
     shader.fragmentShader = fn + shader.fragmentShader
       .replace('#include <map_fragment>', '#include <map_fragment>\n diffuseColor.rgb = gh_swap(diffuseColor.rgb);')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance = gh_swap(totalEmissiveRadiance);')
   }
   m.needsUpdate = true
 }
 
+const parts = {}          // { body, ring, armL, armR, ant } → { pivot (Group) }
+let ringAxis = new THREE.Vector3(0, 1, 0)
+
+function splitModel(mesh) {
+  // 1. Componentes conexas (soldando vértices por posición): la mayor es el cuerpo; el resto, el anillo.
+  const ig = mesh.geometry.clone().applyMatrix4(mesh.matrixWorld)
+  const ip = ig.attributes.position, idx = ig.index.array, v = new THREE.Vector3()
+  const weld = new Map(), wid = new Int32Array(ip.count)
+  for (let i = 0; i < ip.count; i++) { v.fromBufferAttribute(ip, i); const k = `${v.x.toFixed(4)},${v.y.toFixed(4)},${v.z.toFixed(4)}`; if (!weld.has(k)) weld.set(k, weld.size); wid[i] = weld.get(k) }
+  const par = new Int32Array(weld.size).map((_, i) => i)
+  const find = (x) => { while (par[x] !== x) { par[x] = par[par[x]]; x = par[x] } return x }
+  for (let t = 0; t < idx.length; t += 3) { const a = find(wid[idx[t]]); par[find(wid[idx[t + 1]])] = a; par[find(wid[idx[t + 2]])] = a }
+  const roots = [], sizes = new Map()
+  for (let t = 0; t < idx.length; t += 3) { const r = find(wid[idx[t]]); roots.push(r); sizes.set(r, (sizes.get(r) || 0) + 1) }
+  const bodyRoot = [...sizes.entries()].sort((a, b) => b[1] - a[1])[0][0]
+  // 2. Clasifica cada triángulo.
+  const geo = ig.toNonIndexed(), pos = geo.attributes.position
+  const buckets = { body: [], ring: [], armL: [], armR: [], ant: [] }
+  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), ce = new THREE.Vector3()
+  for (let t = 0; t < pos.count; t += 3) {
+    a.fromBufferAttribute(pos, t); b.fromBufferAttribute(pos, t + 1); c.fromBufferAttribute(pos, t + 2); ce.copy(a).add(b).add(c).divideScalar(3)
+    let cls = 'body'
+    if (roots[t / 3] !== bodyRoot) cls = 'ring'
+    else if (ce.y > CUT.YT && Math.hypot(ce.x, ce.z) < 0.35) cls = 'ant'
+    else if (ce.length() > CUT.RA && Math.abs(ce.x) > CUT.XA && ce.y < CUT.YA) cls = ce.x < 0 ? 'armL' : 'armR'
+    buckets[cls].push(t)
+  }
+  const sub = (tris) => {
+    const g = new THREE.BufferGeometry()
+    for (const name of Object.keys(geo.attributes)) {
+      const src = geo.attributes[name], n = src.itemSize, out = new Float32Array(tris.length * 3 * n)
+      tris.forEach((t, i) => { for (let k = 0; k < 3 * n; k++) out[i * 3 * n + k] = src.array[t * n + k] })
+      g.setAttribute(name, new THREE.BufferAttribute(out, n))
+    }
+    return g
+  }
+  const joint = new THREE.MeshPhysicalMaterial({ color: 0x0a1f3c, roughness: 0.25, metalness: 0.1, clearcoat: 1, clearcoatRoughness: 0.1 })
+  for (const [name, tris] of Object.entries(buckets)) {
+    const g = sub(tris), m = new THREE.Mesh(g, mesh.material)
+    const pivot = new THREE.Group(); floater.add(pivot)
+    // Pivote: el borde del corte (los vértices más cercanos al centro); en el anillo, su centro, y su eje = la normal.
+    const p = g.attributes.position, pts = []
+    for (let i = 0; i < p.count; i++) pts.push(new THREE.Vector3().fromBufferAttribute(p, i))
+    let origin = new THREE.Vector3()
+    if (name === 'body') origin.set(0, 0, 0)
+    else if (name === 'ring') {
+      pts.forEach((q) => origin.add(q)); origin.divideScalar(pts.length)
+      // normal del plano del anillo por PCA (la dirección de menor varianza)
+      const cov = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+      pts.forEach((q) => { const d = q.clone().sub(origin).toArray(); for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) cov[i][j] += d[i] * d[j] })
+      // plano por mínimos cuadrados: y = a·x + b·z + d (el anillo es casi horizontal) → normal (−a, 1, −b)
+      let sxx = 0, sxz = 0, szz = 0, sx = 0, sz = 0, sy = 0, sxy = 0, szy = 0
+      pts.forEach((q) => { sxx += q.x * q.x; sxz += q.x * q.z; szz += q.z * q.z; sx += q.x; sz += q.z; sy += q.y; sxy += q.x * q.y; szy += q.z * q.y })
+      const N = pts.length, M = [[sxx, sxz, sx], [sxz, szz, sz], [sx, sz, N]], R = [sxy, szy, sy]
+      const det = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
+      const D = det(M), col = (k) => M.map((row, i) => row.map((x, j) => (j === k ? R[i] : x)))
+      const pa = det(col(0)) / D, pb = det(col(1)) / D
+      const n = new THREE.Vector3(-pa, 1, -pb).normalize()
+      if (n.y < 0) n.negate()
+      ringAxis = n
+      window.RING_AXIS = n.toArray()
+    } else {
+      const sorted = pts.map((q) => ({ q, d: q.length() })).sort((x, y) => x.d - y.d).slice(0, Math.max(20, Math.floor(pts.length * 0.04)))
+      sorted.forEach((s) => origin.add(s.q)); origin.divideScalar(sorted.length)
+      if (name !== 'ant') { // articulación navy que cubre el corte
+        const rad = Math.max(...sorted.map((s) => s.q.distanceTo(origin))) * 1.05
+        const ball = new THREE.Mesh(new THREE.SphereGeometry(Math.min(0.14, rad), 32, 16), joint)
+        ball.position.copy(origin); floater.add(ball)
+      }
+    }
+    pivot.position.copy(origin)
+    m.position.copy(origin).negate()
+    pivot.add(m)
+    parts[name] = pivot
+  }
+}
+
 let faceMesh = null
-// El visor de artifacts bloquea fetch (también de data: y blob:): el GLB se decodifica en memoria y las texturas se
-// cargan como <img> (sin createImageBitmap, que GLTFLoader usaría con fetch).
 function onModel(gltf) {
   const model = gltf.scene
-  model.traverse((o) => { if (o.isMesh) { const mats = Array.isArray(o.material) ? o.material : [o.material]; mats.forEach(patchMaterial) } })
-  // Normaliza: centro de la esfera en el origen, radio de la esfera = 1, frente hacia +Z.
-  model.rotation.set(CAL.rotX, CAL.rotY, CAL.rotZ)
-  model.updateMatrixWorld(true)
+  let mesh = null
+  model.traverse((o) => { if (o.isMesh) { mesh = o; patchMaterial(o.material) } })
   const box = new THREE.Box3().setFromObject(model)
-  const size = box.getSize(new THREE.Vector3())
-  const s = CAL.scale / size.x
-  model.scale.setScalar(s)
-  model.updateMatrixWorld(true)
+  model.scale.setScalar(CAL.scale / box.getSize(new THREE.Vector3()).x); model.updateMatrixWorld(true)
   const box2 = new THREE.Box3().setFromObject(model)
-  const c = box2.getCenter(new THREE.Vector3())
-  model.position.sub(c).add(new THREE.Vector3(CAL.offX, CAL.offY, CAL.offZ))
-  floater.add(model)
-  // Casquete del visor: un trozo de esfera un poco más grande que la del cuerpo.
+  model.position.sub(box2.getCenter(new THREE.Vector3())).add(new THREE.Vector3(...CAL.off)); model.updateMatrixWorld(true)
+  splitModel(mesh)
   const V = CAL.visor
-  const geo = new THREE.SphereGeometry(V.r, 96, 48, Math.PI / 2 - V.w / 2, V.w, Math.PI / 2 - V.top, V.top + V.bottom)
-  faceMesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: faceTex, transparent: true, depthWrite: false, toneMapped: false }))
-  faceMesh.position.set(V.x, V.y, V.z)
-  faceMesh.renderOrder = 2
-  floater.add(faceMesh)
+  faceMesh = new THREE.Mesh(new THREE.SphereGeometry(V.r, 96, 48, Math.PI / 2 - V.w / 2, V.w, Math.PI / 2 - V.top, V.top + V.bottom),
+    new THREE.MeshBasicMaterial({ map: faceTex, transparent: true, depthWrite: false, toneMapped: false }))
+  faceMesh.renderOrder = 2; floater.add(faceMesh)
   document.getElementById('loading').remove()
+  react('feliz', 1600); wave.start = performance.now()   // saluda al aparecer
 }
 function onModelError(e) { document.getElementById('loading').textContent = 'No se pudo cargar el modelo.'; console.error(e) }
 try {
+  // El visor de artifacts bloquea fetch (también de data: y blob:): GLB en memoria y texturas como <img>.
   const bin = atob(GLB.slice(GLB.indexOf(',') + 1)); const bytes = new Uint8Array(bin.length)
   for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-  const cib = window.createImageBitmap
-  window.createImageBitmap = undefined
+  const cib = window.createImageBitmap; window.createImageBitmap = undefined
   try { new GLTFLoader().parse(bytes.buffer, '', onModel, onModelError) } finally { window.createImageBitmap = cib }
 } catch (e) { onModelError(e) }
 
-// --- Interacción ------------------------------------------------------------------------------------------------
-const target = { x: 0, y: 0 }, cur = { x: 0, y: 0 }
-let lastMove = 0, dragging = false, dragYaw = 0, dragPitch = 0, spin = { yaw: 0, pitch: 0 }, dragStart = null
+// --- Resortes ---------------------------------------------------------------------------------------------------------
+// x'' = k (objetivo - x) - c x'. Con c bajo, rebota (overshoot): eso da peso y vida.
+const spring = (k, c) => ({ x: 0, v: 0, k, c, step(target, dt) { const a = this.k * (target - this.x) - this.c * this.v; this.v += a * dt; this.x += this.v * dt; return this.x } })
+const yaw = spring(55, 8), pitch = spring(55, 8)          // cuerpo: lento, con rebote
+const eyeX = spring(260, 26), eyeY = spring(260, 26)     // ojos: rápidos, se adelantan
+const roll = spring(40, 6), antX = spring(90, 4), antZ = spring(90, 4)
+const squash = spring(180, 9), hopY = spring(120, 10)
+const armL = spring(70, 7), armR = spring(70, 7)
+
+// --- Entrada ----------------------------------------------------------------------------------------------------------
+const target = { x: 0, y: 0 }
+let lastMove = performance.now(), lastPos = null, speed = 0, lastSurprise = 0, inside = false, absentSince = 0
+let dragging = false, dragStart = null, spin = { yaw: 0, pitch: 0 }, dragYaw = 0, dragPitch = 0
+const hop = { start: 0 }, wave = { start: 0 }
 function toTarget(e) {
   const r = stage.getBoundingClientRect()
-  target.x = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width * 0.5)))
+  target.x = Math.max(-1.2, Math.min(1.2, (e.clientX - (r.left + r.width / 2)) / (r.width * 0.5)))
   target.y = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height * 0.45)) / (r.height * 0.6)))
-  lastMove = performance.now()
+  const now = performance.now()
+  if (lastPos) { const dt = Math.max(8, now - lastPos.t); speed = speed * 0.7 + 0.3 * Math.hypot(e.clientX - lastPos.x, e.clientY - lastPos.y) / dt }
+  lastPos = { x: e.clientX, y: e.clientY, t: now }
+  // Movimiento brusco → sorpresa (como mucho cada 5 s).
+  if (!reduce && speed > 3.2 && now - lastSurprise > 5000) { react('sorprendido', 700); lastSurprise = now; squash.v -= 3 }
+  lastMove = now
 }
 addEventListener('pointermove', (e) => {
   if (dragging && dragStart) { spin.yaw = dragYaw + (e.clientX - dragStart.x) * 0.012; spin.pitch = Math.max(-0.6, Math.min(0.6, dragPitch + (e.clientY - dragStart.y) * 0.006)); return }
   toTarget(e)
 })
-stage.addEventListener('pointerdown', (e) => { dragging = true; dragStart = { x: e.clientX, y: e.clientY, t: performance.now() }; dragYaw = spin.yaw; dragPitch = spin.pitch; stage.classList.add('dragging'); stage.setPointerCapture(e.pointerId); hint.textContent = 'Girando' })
+stage.addEventListener('pointerenter', () => { inside = true; if (!reduce && performance.now() - absentSince > 6000 && absentSince) { wave.start = performance.now(); react('feliz', 1600) } })
+stage.addEventListener('pointerleave', () => { inside = false; absentSince = performance.now() })
+stage.addEventListener('pointerdown', (e) => { dragging = true; dragStart = { x: e.clientX, y: e.clientY }; dragYaw = spin.yaw; dragPitch = spin.pitch; stage.classList.add('dragging'); stage.setPointerCapture(e.pointerId) })
 stage.addEventListener('pointerup', (e) => {
   const moved = dragStart && Math.hypot(e.clientX - dragStart.x, e.clientY - dragStart.y) > 6
-  dragging = false; stage.classList.remove('dragging'); hint.textContent = 'Mueve el cursor · arrastra para girar'
-  if (!moved) { const i = EXPRESSIONS.findIndex((x) => x.key === expression); setExpression(EXPRESSIONS[(i + 1) % EXPRESSIONS.length].key) }
+  dragging = false; stage.classList.remove('dragging')
+  if (!moved && !reduce) { hop.start = performance.now(); react('listo', 1300) }   // clic: salta de alegría
   toTarget(e)
 })
 
-// --- Bucle --------------------------------------------------------------------------------------------------------
-let blink = 1, nextBlink = performance.now() + 2500, blinkStart = 0
-function resize() { const r = stage.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.position.z = r.width / r.height < 1 ? 7 : 4.4; camera.updateProjectionMatrix() }
+// --- Bucle ------------------------------------------------------------------------------------------------------------
+let blink = 1, nextBlink = performance.now() + 2500, blinkStart = 0, doubleBlink = false
+let saccade = { x: 0, y: 0, next: 0 }
+let prev = performance.now(), prevYawVel = 0, ringPhase = 0
+function resize() { const r = stage.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.position.z = r.width / r.height < 1 ? 7.2 : 4.6; camera.updateProjectionMatrix() }
 new ResizeObserver(resize).observe(stage); resize()
 
 function frame(now) {
-  let tx = target.x, ty = target.y
-  if (expression === 'pensando') { tx = 0.6; ty = -0.8 }
-  else if (!reduce && now - lastMove > 4000) { const s = now / 1000; tx = Math.sin(s * 0.6) * 0.6 + Math.sin(s * 1.7) * 0.15; ty = Math.cos(s * 0.45) * 0.35 }
-  const k = reduce ? 1 : 0.08
-  cur.x += (tx - cur.x) * k; cur.y += (ty - cur.y) * k
-  // Al soltar, el giro libre vuelve a cero por el camino corto.
-  if (!dragging) { spin.yaw = Math.atan2(Math.sin(spin.yaw), Math.cos(spin.yaw)) * (reduce ? 0 : 0.93); spin.pitch *= reduce ? 0 : 0.93 }
-  rig.rotation.y = cur.x * 0.62 + spin.yaw
-  rig.rotation.x = cur.y * 0.32 + spin.pitch
-  floater.position.y = reduce ? 0 : Math.sin(now / 900) * 0.045
-  floater.rotation.z = reduce ? 0 : Math.sin(now / 1300) * 0.03
+  const dt = Math.min(0.05, (now - prev) / 1000); prev = now
+  const idle = now - lastMove
+  const expr = face()
+  speed *= 0.92
+
+  // Hacia dónde mira: el cursor; si está quieto, ladea la cabeza; si lo dejan solo, mira alrededor y se aburre.
+  let tx = target.x, ty = target.y, tilt = 0
+  if (expr === 'pensando') { tx = 0.55; ty = -0.75 }
+  else if (!reduce && idle > 9000) {
+    const s = now / 1000; tx = Math.sin(s * 0.45) * 0.7; ty = Math.cos(s * 0.33) * 0.3 - 0.1
+    if (!mood && expression === 'feliz' && Math.sin(s * 0.2) > 0.85) react('pensando', 2500)
+  } else if (!reduce && idle > 1200 && inside) tilt = Math.sign(target.x || 1) * 0.14   // curiosidad: ladea la cabeza
+
+  // Sacadas: los ojos saltan a puntos cercanos al objetivo, no se deslizan.
+  if (now > saccade.next) { saccade = { x: (Math.random() - 0.5) * 0.25, y: (Math.random() - 0.5) * 0.18, next: now + 600 + Math.random() * 1400 } }
+  const gx = eyeX.step(reduce ? tx : tx + saccade.x * (idle > 800 ? 1 : 0.2), dt)
+  const gy = eyeY.step(reduce ? ty : ty + saccade.y * (idle > 800 ? 1 : 0.2), dt)
+
+  // Cuerpo con resortes: llega tarde y se pasa un poco.
+  const by = reduce ? (yaw.x = tx * 0.6) : yaw.step(tx * 0.6, dt)
+  const bp = reduce ? (pitch.x = ty * 0.3) : pitch.step(ty * 0.3, dt)
+  const yawVel = yaw.v, yawAcc = (yawVel - prevYawVel) / Math.max(dt, 1e-3); prevYawVel = yawVel
+
+  if (!dragging) { spin.yaw = Math.atan2(Math.sin(spin.yaw), Math.cos(spin.yaw)) * (reduce ? 0 : 0.92); spin.pitch *= reduce ? 0 : 0.92 }
+  rig.rotation.y = by + spin.yaw
+  rig.rotation.x = bp + spin.pitch
+
+  // Salto: anticipación (se agacha), impulso, aterrizaje con aplastamiento.
+  let hopLift = 0, hopSquash = 0
+  if (hop.start) {
+    const p = (now - hop.start) / 900
+    if (p < 0.15) hopSquash = -0.12 * (p / 0.15)
+    else if (p < 0.75) { const q = (p - 0.15) / 0.6; hopLift = Math.sin(q * Math.PI) * 0.42; hopSquash = q < 0.3 ? 0.1 : 0 }
+    else if (p < 1) hopSquash = -0.08 * Math.sin(((p - 0.75) / 0.25) * Math.PI)
+    else hop.start = 0
+  }
+  const bob = reduce ? 0 : Math.sin(now / 820) * 0.05 + Math.sin(now / 2300) * 0.02
+  const bobVel = reduce ? 0 : Math.cos(now / 820) * 0.05 / 0.82
+  const sq = reduce ? 0 : squash.step(hopSquash + bobVel * 0.05, dt)
+  floater.position.y = bob + (reduce ? 0 : hopY.step(hopLift, dt))
+  floater.scale.set(1 - sq * 0.5, 1 + sq, 1 - sq * 0.5)
+  // Inclinación: se ladea hacia donde gira y por curiosidad.
+  floater.rotation.z = reduce ? 0 : roll.step(-yawVel * 0.09 + tilt, dt)
+  floater.rotation.x = reduce ? 0 : -Math.abs(yawVel) * 0.02
+
+  if (parts.ring) {
+    // El anillo del modelo no es plano: en vez de un giro completo (se vería volcar), se mece sobre su eje,
+    // más rápido cuando trabaja o salta, y con un empujón de la inercia del giro.
+    ringPhase += dt * (expr === 'trabajando' ? 5.5 : 1.3) * (hop.start ? 2.2 : 1)
+    const amp = reduce ? 0 : (expr === 'trabajando' ? 0.32 : 0.2)
+    parts.ring.quaternion.setFromAxisAngle(ringAxis, Math.sin(ringPhase) * amp + (reduce ? 0 : yawVel * 0.12))
+  }
+  if (parts.ant) {
+    // Antena: se sacude con la aceleración del giro y del salto.
+    parts.ant.rotation.z = reduce ? 0 : antZ.step(-yawAcc * 0.004, dt)
+    parts.ant.rotation.x = reduce ? 0 : antX.step(-(squash.v) * 0.04, dt)
+  }
+  if (parts.armL && parts.armR) {
+    // Brazos: balanceo leve, siguen el giro con retraso; arriba al saltar o al terminar; la derecha saluda.
+    let l = Math.sin(now / 900) * 0.06 - yawVel * 0.08, r = Math.sin(now / 900 + 1.4) * 0.06 + yawVel * 0.08
+    if (expr === 'listo' || hop.start) { l += 0.9; r += 0.9 }
+    if (expr === 'sorprendido') { l += 0.45; r += 0.45 }
+    let waveZ = 0
+    if (wave.start) { const p = (now - wave.start) / 1800; if (p < 1) { r += 1.05 * Math.sin(Math.min(1, p * 4) * Math.PI / 2); waveZ = Math.sin(p * Math.PI * 6) * 0.35 * (1 - p) } else wave.start = 0 }
+    parts.armL.rotation.z = reduce ? 0 : -armL.step(l, dt)
+    parts.armR.rotation.z = reduce ? 0 : armR.step(r, dt) + waveZ
+  }
+
+  // Parpadeo (a veces doble).
   if (!reduce && now > nextBlink && !blinkStart) blinkStart = now
-  if (blinkStart) { const p = (now - blinkStart) / 150; blink = p < 1 ? Math.max(0.08, Math.abs(1 - p * 2)) : 1; if (p >= 1) { blinkStart = 0; nextBlink = now + 2200 + Math.random() * 3800 } }
-  // Los ojos también se mueven dentro del visor (lo que falta al giro del cuerpo).
-  drawFace(now, blink, dragging ? 0 : cur.x * 0.5, dragging ? 0 : cur.y * 0.5)
+  if (blinkStart) {
+    const p = (now - blinkStart) / 140; blink = p < 1 ? Math.max(0.08, Math.abs(1 - p * 2)) : 1
+    if (p >= 1) { blinkStart = 0; if (!doubleBlink && Math.random() < 0.25) { doubleBlink = true; nextBlink = now + 90 } else { doubleBlink = false; nextBlink = now + 2000 + Math.random() * 4000 } }
+  }
+  // Los ojos recorren lo que falta del giro: el cuerpo llega después.
+  const cl = (x) => Math.max(-1.1, Math.min(1.1, x))
+  const fx = dragging ? 0 : cl((gx - by / 0.6) * 0.9 + gx * 0.25)
+  const fy = dragging ? 0 : cl((gy - bp / 0.3) * 0.9 + gy * 0.25)
+  drawFace(expr, now, blink, fx, fy, expr === 'feliz' && speed < 0.2 && inside && idle < 1200 ? 0.4 : 0)
+
+  rim.intensity = 6 + Math.sin(now / 600) * (expr === 'trabajando' ? 2.5 : 0.8)
+  glow.scale.setScalar(1 - (floater.position.y) * 0.6); glow.material.opacity = 0.55 - floater.position.y * 0.5
   readout.textContent = `giro ${(rig.rotation.y * 57.3).toFixed(0)}° · ${(rig.rotation.x * 57.3).toFixed(0)}°`
   renderer.render(scene, camera)
   requestAnimationFrame(frame)
 }
 requestAnimationFrame(frame)
 
-// --- Controles ----------------------------------------------------------------------------------------------------
+// --- Controles --------------------------------------------------------------------------------------------------------
 const exprBox = document.getElementById('expressions'), lineBox = document.getElementById('lines')
 for (const e of EXPRESSIONS) { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.id = 'expr-' + e.key; b.textContent = e.name; b.addEventListener('click', () => setExpression(e.key)); exprBox.appendChild(b) }
 for (const l of LINES) { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.id = 'line-' + l.key; b.innerHTML = `<span class="swatch" style="background:${l.hex}"></span>${l.name}`; b.addEventListener('click', () => setLine(l.key)); lineBox.appendChild(b) }
-function setExpression(k) { expression = k; for (const b of exprBox.children) b.setAttribute('aria-pressed', String(b.id === 'expr-' + k)); try { localStorage.setItem('spark3d-expr', k) } catch {} }
+function setExpression(k) { expression = k; mood = null; for (const b of exprBox.children) b.setAttribute('aria-pressed', String(b.id === 'expr-' + k)); try { localStorage.setItem('spark3d-expr', k) } catch {} }
 function setLine(k) {
   const l = LINES.find((x) => x.key === k) ?? LINES[0]
   led = new THREE.Color(l.hex); lineUniforms.uLed.value.copy(led); lineUniforms.uSwap.value = l.key === 'engine' ? 0 : 1

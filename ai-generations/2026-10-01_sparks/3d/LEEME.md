@@ -21,3 +21,21 @@ Página publicada: https://claude.ai/artifact/HPyuWWHHZU8Pz4qFaxjhiH (privada). 
   modelo escalado a 2.4 de ancho y centrado en su caja.
 - **Color de línea:** en el shader, los píxeles azules saturados pasan al tono de la línea (sin regenerar el modelo).
 - **Rearmar:** reemplazar `'__GLB__'` en `spark-3d.template.html` por el data URI del GLB web y publicar.
+
+## Vida de personaje (2026-10-01, v3)
+
+Pedido del operador: «parece una bola o un globo, no tiene vida real». Una malla rígida que sólo gira se ve así. La v3:
+
+- **Piezas al cargar.** El anillo es la segunda componente conexa del modelo. Los antebrazos salen de un corte (radio > 0,86,
+  |x| > 0,55, y < 0,2) y la antena de otro (y > 0,86). Cada pieza gira desde su pivote; las articulaciones navy del diseño
+  cubren el corte de los brazos.
+- **Movimiento con resortes**, con rebote: cuerpo lento, ojos rápidos que se adelantan al giro. Además, inclinación al
+  girar, estiramiento al flotar, salto con anticipación y aterrizaje al hacer clic, antena que se sacude con la
+  aceleración, brazos con balanceo, saludo al volver y brazos arriba al saltar.
+- **Reacciones:** sorpresa ante un movimiento brusco (como mucho cada 5 s), ladeo de cabeza cuando el cursor se
+  detiene, pensativo y mirando alrededor si nadie lo mueve, sacadas de los ojos y doble parpadeo ocasional.
+- **El anillo se mece, no da la vuelta completa:** el anillo generado no es plano (está alabeado) y un giro completo lo
+  hace parecer que se vuelca. Para que la esfera orbite de verdad, el anillo y su esfera tienen que ser piezas limpias:
+  modelado manual o un modelo nuevo.
+- **Pendiente:** la separación tarda unos segundos al cargar (suelda 47 mil vértices en el navegador). Se puede guardar
+  ya separada en el GLB.
