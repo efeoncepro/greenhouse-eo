@@ -540,3 +540,17 @@ corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida
 > `ai-generations/2026-09-17_polo-efeonce/estampa-espalda.mjs` (en git; vistas con `pnpm ai-gen:pull`; hilo blanco sobre el navy, hilo navy
 > sobre el blanco) y las cinco vistas de espalda están rehechas como `-v02-`; **las `-v01-` de espalda
 > quedan obsoletas**.
+
+## Delta 2026-10-02 — el traje biónico de Nexa: kit de ficción y marcas armadas
+
+El traje biónico de Nexa (`ai-generations/2026-10-01_traje-bionico-nexa/`, TASK-1940) es el primer kit de una prenda de
+**ficción**: se diseñó desde una foto aprobada (`NX5b`), editando y nunca generando de cero, y sigue este mismo
+método (vistas aisladas, puestas, macro, manifiesto, transparentes). Tres cosas nuevas que valen para cualquier kit:
+
+- **La técnica se declara por marca, no por kit:** isotipo **incrustado** en la pechera y logo completo **serigrafiado**
+  en tinta metálica en la espalda. El catálogo la lleva en `acabadoMarca`, que reemplaza el «satin-stitch
+  embroidery» por defecto, y `macroEnUso: true` hace viajar el macro también con la pieza puesta.
+- **La marca viaja armada en la referencia** [operador, 2026-10-02]: la pechera lisa más un isotipo compuesto después
+  dejó dos escenas sin logo. `foto:isotipo` compone ahora también el logotipo (`--marca logotipo`, `--tecnica`).
+- **El matting confunde placas blancas con el fondo de estudio gris claro** y las deja semitransparentes: después de
+  `ai:image:rmbg`, opacar el interior de la silueta conservando los huecos reales (`entrega.mjs --opacar` del kit).

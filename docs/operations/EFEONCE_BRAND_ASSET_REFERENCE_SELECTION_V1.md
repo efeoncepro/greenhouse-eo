@@ -37,6 +37,7 @@ inventar una vista: casi siempre ya está.
 | `2026-09-17_codex-poses-3d` (mascota) | 16 | 8 | — | — |
 | `2026-09-17_sprocket-3d` (mascota HubSpot) | 16 | 8 | — | — |
 | `2026-09-21_gigi-poses-3d` (mascota Google Gemini) | 48 | 24 | — | — |
+| `2026-10-01_traje-bionico-nexa` (traje biónico + lentes de Nexa, sólo cine) | 18 en `final/` (10 vistas, 7 transparentes, manifiesto) | 10 | sí | **`13-puesto-frente`, `14-puesto-espalda`** (Nexa) |
 | `2026-09-17_efeonce-logo-3d` | 414 archivos en `kit/`, por **escala × color** | — | LEEME | `prueba/` |
 
 Los kits 3D traen **ocho poses o ángulos** cada uno —frente héroe, tres cuartos izquierda y derecha,
@@ -144,6 +145,7 @@ Comando: **`pnpm foto:lanyard --nombre "<N>" --cargo "<C>" --foto <retrato.png> 
 | **Lanyard** | el **carnet**, que cambia por persona — Julio, Nexa, cada quien el suyo | **Sí.** No puede existir una vista fija: se arma cada vez con `pnpm foto:lanyard` |
 | **Hoodie** | la estampa de espalda: logo + «Empower your Growth», **siempre la misma** | **No.** Se compuso una vez con `estampa-espalda.mjs`, entró como referencia a las 35 vistas del kit y quedó lista — incluida `16-puesto-espalda`, con la estampa impecable sobre la prenda puesta |
 | **Polo, chaqueta, gorra** | emblema o logotipo **fijo** | **No.** Mismo caso que el hoodie |
+| **Traje biónico de Nexa** | isotipo incrustado en el pecho y logo completo serigrafiado en la espalda, **fijos** | **No.** Se compusieron una vez con `foto:isotipo` (`--marca logotipo` en la espalda) y viajan armados en la referencia, con el macro de la placa en escena [operador, 2026-10-02]. TASK-1940 |
 
 **Este documento nació de un error de esta clase y estuvo a punto de repetirlo.** Tras resolver el
 lanyard se anotó «el parche de la espalda del hoodie es el siguiente candidato» — y el operador

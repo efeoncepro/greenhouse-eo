@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -20,11 +20,22 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Hoja de diseño aprobada con ajuste del isotipo (más a la derecha, sobre el pecho); vistas puestas 13-14 y lentes biónicos 20-21 en revisión del operador (2026-10-01)`
+- Status real: `Completa 2026-10-02: kit, catálogo con guarda, canon y escena NX7d aprobados por el operador; copia OneDrive pendiente del operador`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
+
+## Delta 2026-10-02 — cierre
+
+- Kit en `ai-generations/2026-10-01_traje-bionico-nexa/final/`: 10 vistas (01–05, 10, 13, 14, 20, 21) + 7 transparentes + manifiesto + LEEME; sellado en el lock (366) y publicado en `gs://efeonce-creative-canon`.
+- Cambios del operador durante la ejecución: isotipo «más a la derecha y hacia el pecho»; **logo completo serigrafiado en metal en la placa dorsal** (`foto:isotipo --marca logotipo --tecnica`, opción nueva); **las marcas viajan armadas en la referencia** y no se componen después (`acabadoMarca`, `macroEnUso`, `instruccionEnUso` en el catálogo); el nombre «lentes biónicos».
+- Guarda `validarTrajeNexa`: sólo Nexa y sólo con `"registro": "cine"` explícito (el registro cine no tenía campo propio).
+- Escena `NX7d` («Nexa despliega a su squad») aprobada y canonizada: registro cine 1.7 (delta 2026-10-02), Sparks §5 (dos con referencia como máximo), regla de fotografía, `design-studio` y `greenhouse-ai-image-generator` (con espejos `.codex`).
+- Criterio 2 con matiz: el isotipo se revisó al 100 % en todas las vistas que lo muestran (01, 03, 04, 10, 13); 02 y 14 llevan el logo dorsal, 05 lo muestra de canto y los lentes no llevan marca.
+- Fuera del repo, pendiente del operador: copia del kit en OneDrive `5. Contenidos/13- Branding/`.
+- Follow-ups detectados: (a) `NX7d` con titular falla columna de texto 0,38 y lecho 2,98 (rehacer con Nexa ≈ 70 % del ancho y consola negro mate no reflectante); (b) **Nexa sale casi siempre con la misma pose de cabeza**: el bloque `nexa` del catálogo pone primero el ancla de rostro en tres cuartos y pide «preserve her face EXACTLY», así que el modelo copia también el giro, la inclinación y la media sonrisa — fuera de alcance de esta task; (c) `creative:assets:publish` lista sólo `ai-generations/**` del bucket y cuenta los 182 Sparks de `node_modules` como faltantes en cada corrida.
+- Verificación: pruebas de `scripts/foto` (`build-prompt`, `isotipo`, `isotipo-acabado`) en verde, `foto:assets:check` OK, `pnpm local:check` (ver commit de cierre). Costo ≈ USD 1,3.
 
 ## Summary
 
@@ -248,12 +259,12 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] La hoja de diseño del traje quedó aprobada por el operador en el canvas.
-- [ ] El kit tiene las 10 vistas del Slice 2, cada una con el isotipo incrustado igual al SVG oficial, revisado al 100 %.
-- [ ] El manifiesto declara técnica `incrustado`, `cuando_usarla` por vista y la regla «sólo Nexa, sólo cine».
-- [ ] `foto:prompt` resuelve `traje-bionico-nexa` por catálogo y aborta si se pide para otra persona o fuera del cine.
-- [ ] `scripts/foto/assets.lock.json` quedó resellado y `pnpm foto:assets:check` pasa.
-- [ ] El registro cine, la selección de referencias y las skills citan el kit (con espejos `.codex`).
+- [x] La hoja de diseño del traje quedó aprobada por el operador en el canvas.
+- [x] El kit tiene las 10 vistas del Slice 2, cada una con el isotipo incrustado igual al SVG oficial, revisado al 100 %.
+- [x] El manifiesto declara técnica `incrustado`, `cuando_usarla` por vista y la regla «sólo Nexa, sólo cine».
+- [x] `foto:prompt` resuelve `traje-bionico-nexa` por catálogo y aborta si se pide para otra persona o fuera del cine.
+- [x] `scripts/foto/assets.lock.json` quedó resellado y `pnpm foto:assets:check` pasa.
+- [x] El registro cine, la selección de referencias y las skills citan el kit (con espejos `.codex`).
 
 ## Verification
 
@@ -264,14 +275,14 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] TASK-1926 y TASK-1925 quedaron con delta: el traje se declara por catálogo y migra con `foto:*`
+- [x] TASK-1926 y TASK-1925 quedaron con delta: el traje se declara por catálogo y migra con `foto:*`
 
 ## Follow-ups
 

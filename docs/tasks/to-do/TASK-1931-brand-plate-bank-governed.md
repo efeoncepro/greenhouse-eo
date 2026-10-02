@@ -1,5 +1,9 @@
 # TASK-1931 — Banco de plates gobernado para las recetas del deck «La órbita»
 
+## Delta 2026-10-02
+
+- Primera escena cine con el kit del traje y los Sparks aprobada: `NX7d` (`ai-generations/2026-10-01_traje-bionico-nexa/plates/`, ficha en `fichas/`). Candidata al banco con su procedencia; como pieza con titular aún falla columna de texto (0,38) y lecho (2,98) — registrado en TASK-1940.
+
 ## Delta 2026-09-30 — TASK-1949 suma seis plates aprobados y seis rechazados (deck SEO/AEO)
 
 - **Aprobados para el banco** (ruta local en `ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/`, declarados

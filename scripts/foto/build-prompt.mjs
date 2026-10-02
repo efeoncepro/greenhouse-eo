@@ -1040,19 +1040,24 @@ export const OBJETOS = {
       'no other logo or lettering. The PERSON in that image only shows how the suit sits: copy her face and hair only from ' +
       'the identity references. Ignore the background.',
     base: 'ai-generations/2026-10-01_traje-bionico-nexa/final/',
-    vistas: {},
+    // Entrega del kit (2026-10-02): vistas aisladas 1600×1600 transparentes (`entrega.mjs` + `ai:image:rmbg` + `--opacar`).
+    patron: 'efeonce-traje-bionico-nexa-<V>-1600x1600-v01-transparente.png',
+    vistas: {
+      frente: '01-frente',
+      'tres-cuartos-izq': '03-tres-cuartos-izquierda',
+      'tres-cuartos-der': '04-tres-cuartos-derecha',
+      lateral: '05-lateral'
+    },
     vistasPorNombre: {
-      frente: 'efeonce-traje-bionico-nexa-01-frente-1024x1536-v01-fondo-estudio.png',
       // v02: el logo completo serigrafiado en tinta navy metálica en la placa dorsal [operador, 2026-10-02].
-      espalda: 'efeonce-traje-bionico-nexa-02-espalda-1024x1536-v02-fondo-estudio.png',
-      'tres-cuartos-izq': 'efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1024x1536-v01-fondo-estudio.png'
+      espalda: 'efeonce-traje-bionico-nexa-02-espalda-1600x1600-v02-transparente.png'
     },
     vistaDefecto: 'frente',
-    assetDeUso: 'efeonce-traje-bionico-nexa-13-puesto-frente-1024x1536-v01-fondo-estudio.png',
+    assetDeUso: 'efeonce-traje-bionico-nexa-13-puesto-frente-1200x1600-v01-fondo-estudio.png',
     usoPorVista: {
-      espalda: 'efeonce-traje-bionico-nexa-14-puesto-espalda-1024x1536-v01-fondo-estudio.png'
+      espalda: 'efeonce-traje-bionico-nexa-14-puesto-espalda-1200x1600-v02-fondo-estudio.png'
     },
-    macroEmblema: 'efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1024x1024-v01-fondo-estudio.png',
+    macroEmblema: 'efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1600x1600-v01-fondo-estudio.png',
     macroEnUso: true,
     tipoEmblema: 'isotipo',
     acabadoMarca: 'inlaid flush into the matte white plate in navy, like a fine print set into the surface: no border, no relief, no bevel, no glow',
@@ -1070,11 +1075,8 @@ export const OBJETOS = {
       'pads and slim clear temple arms. Her eyes stay clearly visible through the lens: no mirror coating, no reflection ' +
       'covering her eyes. No logo, no lettering.',
     base: 'ai-generations/2026-10-01_traje-bionico-nexa/final/',
-    vistas: {},
-    vistasPorNombre: {
-      frente: 'efeonce-lentes-bionicos-nexa-20-frente-1024x1024-v01-fondo-estudio.png',
-      'tres-cuartos': 'efeonce-lentes-bionicos-nexa-21-tres-cuartos-1024x1024-v01-fondo-estudio.png'
-    },
+    patron: 'efeonce-lentes-bionicos-nexa-<V>-1600x1600-v01-transparente.png',
+    vistas: { frente: '20-frente', 'tres-cuartos': '21-tres-cuartos' },
     vistaDefecto: 'tres-cuartos'
   }
 }

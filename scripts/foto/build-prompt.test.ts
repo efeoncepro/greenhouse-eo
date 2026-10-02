@@ -669,7 +669,9 @@ conAssets('foto:prompt · el catálogo de kits apunta a archivos reales', () => 
 
   it.each(pares)('%s declara una vista por defecto que existe', (_clave, o) => {
     // El resolver acepta la vista por sufijo (`vistas`) o por nombre completo (`vistasPorNombre`).
-    expect([...Object.keys(o.vistas), ...Object.keys(o.vistasPorNombre ?? {})]).toContain(o.vistaDefecto)
+    const porNombre = (o as { vistasPorNombre?: Record<string, string> }).vistasPorNombre ?? {}
+
+    expect([...Object.keys(o.vistas), ...Object.keys(porNombre)]).toContain(o.vistaDefecto)
   })
 })
 

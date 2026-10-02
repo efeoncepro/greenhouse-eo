@@ -28,6 +28,10 @@ nadie lo notara.
 | `3-poses/` | 8 poses expresivas | 1152×2048 | sintético (deuda) |
 | `4-vestuario/` | 17 en 4 contextos | 1152×2048 | sintético (deuda) |
 | `5-expresiones/` | 12 registros de rostro | 2048×2560 | **fotográfico** |
+
+**Traje biónico (2026-10-01, TASK-1940):** el traje de ficción de Nexa ya no se describe en la ficha: se pide por
+catálogo (`traje-bionico-nexa` + `lentes-bionicos-nexa`, sólo con `"registro": "cine"`). Kit y vistas puestas en Nexa A
+en [`../2026-10-01_traje-bionico-nexa/`](../2026-10-01_traje-bionico-nexa/LEEME.md).
 | `_anterior-no-usar/` | 2 · para reconocer lo que NO es canónico | — | — |
 
 ### `1-anclas/` — el núcleo

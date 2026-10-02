@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-02 — Traje biónico de Nexa: kit, catálogo y escena cine con Sparks (TASK-1940)
+
+El traje de ficción de Nexa deja de describirse a mano: kit de 10 vistas desde `NX5b` (aisladas, puestas en Nexa A, macro de la placa y lentes biónicos), entradas `traje-bionico-nexa` y `lentes-bionicos-nexa` en `foto:prompt` con la guarda `validarTrajeNexa` (sólo Nexa, sólo `"registro": "cine"`), marcas armadas en la referencia (isotipo incrustado en el pecho y logo completo serigrafiado en la espalda, con `foto:isotipo --marca logotipo`) y la escena aprobada `NX7d`, canonizada en el registro cine 1.7.
+
 ## 2026-10-01 — Sparks: los agentes de Efeonce como personajes del kit (TASK-1941)
 
 Diseño elegido por el operador (el Spark de «Agents» alejado de Astro Bot: flota, chispa del Nexa Mark, órbita y tres ventanas de la nave). Spark base en 26 vistas + 4 escenas con Nexa, plantel de cinco con accesorio y gesto, entradas `spark-*` en `foto:prompt` con la guarda `validarRobots` (robots sólo como Sparks; nunca documental) y canon [`SPARKS_V1.md`](docs/operations/brand-characters/SPARKS_V1.md) con revisión de colisión del nombre. Kits en OneDrive `13- Branding/Sparks/`. Plantel aprobado; task cerrada.
@@ -648,7 +652,3 @@ Contrato candidate `efeonce.graphic-line-orbit` 0.1.0 en `@efeoncepro/axis-ui-co
 ## 2026-09-25 — Línea gráfica «La órbita»: banco de fotos y canon en AXIS
 
 Banco propio de 8 fotos para la lente, hecho con el lenguaje fotográfico (`pnpm foto:generar`, 11 generaciones, ~USD 0,55; tres rehechas por el lenguaje). Reemplaza a las tres fotos repetidas con emblema en canvas, estímulos de la prueba sin logo, PDF y AXIS. ADR de canonización y tokens `efeonceGraphicLine` pasados a `canonical` en AXIS. [ADR](docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [manual](docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). Atribución sin logo sin medir.
-
-## 2026-09-25 — Insights: el diseño aprobado llega al informe y al deck (TASK-1889)
-
-Los catálogos `insights-report` (A4) e `insights-deck` (16:9) componen sólo con el canvas aprobado el mismo día: portada navy o blanca con el logo privado del cliente (sellado como referencia, bytes autorizados por el worker), índice, «Lo esencial» con el folio real de su evidencia, aperturas de capítulo, una página de figura por familia (comparación de períodos, columnas por canal, metas con banda del registro ICO, tendencia), tabla, límites y contraportada desde el SSOT de marca. Se retiraron la página analítica y la lámina de evidencia v1. Fidelidad al canvas 20/21 ≤ 1 % (Deck-Agrupadas con excepción aprobada); gate visual de Insights a 0 px; ediciones reales de Berel y Sky compuestas en local, que revelaron y corrigieron cinco defectos. Code complete en develop, sin push; rollout pendiente. [Dossier](docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).

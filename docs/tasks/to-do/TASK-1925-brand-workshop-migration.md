@@ -1,5 +1,9 @@
 # TASK-1925 — Migrar la producción de marca al taller `efeonce-brand-workshop`
 
+## Delta 2026-10-02
+
+- `scripts/foto/` sumó en TASK-1940: catálogo del traje y los lentes, `validarTrajeNexa`, claves `acabadoMarca`/`macroEnUso`/`instruccionEnUso` y `foto:isotipo --marca logotipo --tecnica`. Migran con el resto de `foto:*`, junto al kit `ai-generations/2026-10-01_traje-bionico-nexa/` (sellado y publicado en el canon) — cerrado por trabajo en TASK-1940.
+
 ## Delta 2026-10-01
 
 - el catálogo de `foto:*` suma los Sparks (`spark`, `spark-*`, `sparks-plantel`) y la guarda `validarRobots`, y sus kits viven en `ai-generations/2026-10-01_sparks/`: migran con `scripts/foto` — cerrado por trabajo en TASK-1941.

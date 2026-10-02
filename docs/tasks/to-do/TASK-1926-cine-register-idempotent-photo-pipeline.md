@@ -1,5 +1,9 @@
 # TASK-1926 — Registro cine en el pipeline `foto:*` y comando idempotente de punta a punta
 
+## Delta 2026-10-02
+
+- El traje biónico de Nexa y sus lentes ya se declaran por catálogo (`traje-bionico-nexa`, `lentes-bionicos-nexa`) y `foto:prompt` exige `"registro": "cine"` en la ficha (`validarTrajeNexa`): es el primer campo explícito de registro cine; `foto:cine` debería emitirlo. Escena con Sparks: dos con referencia como máximo (registro cine 1.7) — cerrado por trabajo en TASK-1940.
+
 ## Delta 2026-09-27 (d) — banco de plates gobernado (TASK-1931)
 
 - TASK-1931 registra en un banco gobernado los plates aprobados por receta (sha256, ficha, emblema, isotipo, aprobación

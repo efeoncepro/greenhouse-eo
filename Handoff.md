@@ -1,6 +1,6 @@
 # Handoff activo
 
-**Traje biónico de Nexa (01/10):** [TASK-1940](docs/tasks/in-progress/TASK-1940-nexa-bionic-suit-reference-kit.md) in-progress, Slice 1: hoja de diseño (frente, espalda, tres cuartos y macro de la placa con isotipo incrustado vía `foto:isotipo --prenda clara --acabado`, 0 px fuera de la marca) en el canvas https://claude.ai/artifact/WqTLZG8m5yieAmTdhTgQcF. Trabajo en `ai-generations/2026-10-01_traje-bionico-nexa/` (briefs en git, PNG fuera). **Espera aprobación del operador** antes de las 10 vistas; abierto: placa dorsal nueva y piernas sin placas.
+**Traje biónico de Nexa (02/10):** [TASK-1940](docs/tasks/complete/TASK-1940-nexa-bionic-suit-reference-kit.md) complete: kit sellado y publicado, catálogo sólo Nexa/cine, marcas armadas, NX7d canonizada. Pendientes (OneDrive, NX7d con titular, pose repetida de Nexa, Sparks en el publicador) en el delta de cierre de la task.
 
 **Workbench:** Lab v6 publicado. Íconos: `af6f5e2` local, publicación pendiente. SKY local: 76 badges LEFT, 24 adaptaciones v6, 394 pruebas PASS; aceptación visual pendiente. [Estado](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md). Efeonce ID diferido.
 

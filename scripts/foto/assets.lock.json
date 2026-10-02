@@ -1426,37 +1426,45 @@
       "rol": "macro:hoodie-efeonce",
       "sha256": "05adae8b6b020bd3d4395c6f640d39cd3607336e10ca5d5c8db5c0f0363535f6"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-01-frente-1024x1536-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:traje-bionico-nexa/frente",
-      "sha256": "ec182dfae3a7b39e1ba5ba3c2683d963406c34b0eaac3c6fb1feadd28e1aa803"
+      "sha256": "081b81ca6c4c6a2bd42369299a79f6635acddbd2e6f6c2cf1f3e94355d3faee2"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-02-espalda-1024x1536-v02-fondo-estudio.png": {
-      "rol": "kit:traje-bionico-nexa/espalda",
-      "sha256": "fc526a2906c497a3c8188dd25e85fc3cc52f6ce76747830c9c73a7c2a4815377"
-    },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1024x1536-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
       "rol": "kit:traje-bionico-nexa/tres-cuartos-izq",
-      "sha256": "d2167d5f69442dd52a0d27a9fed6b17ee51beb2add0d15318beb8e7a73763e6b"
+      "sha256": "19d55f98c57ac5c3d8a0cd212ca0bf7629aca56da047cdbca3ab01fea7cd02af"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-1024x1536-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-04-tres-cuartos-derecha-1600x1600-v01-transparente.png": {
+      "rol": "kit:traje-bionico-nexa/tres-cuartos-der",
+      "sha256": "a3883e6c472b2f6160061b9ae584be665d7a1e12ece69f244844437d01b3e174"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-05-lateral-1600x1600-v01-transparente.png": {
+      "rol": "kit:traje-bionico-nexa/lateral",
+      "sha256": "2d3391f554e91bfd043f3bacdcc1cb81ebb351c14ea3604475ea307bf90b4684"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-02-espalda-1600x1600-v02-transparente.png": {
+      "rol": "kit:traje-bionico-nexa/espalda",
+      "sha256": "6dfacb8f292f054f1a0abbf8224138ce1f5c23514e45b2ab9ac652cfcb6c6092"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-1200x1600-v01-fondo-estudio.png": {
       "rol": "uso:traje-bionico-nexa/defecto",
-      "sha256": "7b4142ad8ef10e46502fc62862c1f7d099ae2ec125ac962b9e7a7e9b84bbbef0"
+      "sha256": "f60430e5c7c7d77fe4d6d4efd84771fa097c489bd60f01c85db7670fd72ab642"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-14-puesto-espalda-1024x1536-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-14-puesto-espalda-1200x1600-v02-fondo-estudio.png": {
       "rol": "uso:traje-bionico-nexa/usoPorVista:espalda",
-      "sha256": "3cea5bb210581c5041bb4c37aef30ce3dc823dfa566e73a6bb060995d92f1bf6"
+      "sha256": "21a875d6d5b92115a99c167fac003c6600cbb16aa851a5c3f98bd66bc4f4fa96"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1024x1024-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1600x1600-v01-fondo-estudio.png": {
       "rol": "macro:traje-bionico-nexa",
-      "sha256": "d47e16e23a453ed5c6239befce0b46b2ea3955c7a321a972c7e96ceefa406f2c"
+      "sha256": "77314300dfd9b36df54ed9eab8a50d8449c02ee76ec4cfe022ad3839a464b196"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-20-frente-1024x1024-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-20-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:lentes-bionicos-nexa/frente",
-      "sha256": "2bb2baf5c04b46435ba420718ad6e20c6e9ac31c9305f0a156df0e7600dadbdd"
+      "sha256": "3610a042d8c2e5be67d73a43ac1af918a38469204ecb6073ab53f4daabd2357b"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-21-tres-cuartos-1024x1024-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-21-tres-cuartos-1600x1600-v01-transparente.png": {
       "rol": "kit:lentes-bionicos-nexa/tres-cuartos",
-      "sha256": "34b4fa46feb53db7fbd3ed770cb593871ca61c79396f7f586a0ac66b79acb9f9"
+      "sha256": "524d6398be9ff3ad043595ce88995c7a62c125459415c7d3f62d6aaad57e9944"
     }
   }
 }
