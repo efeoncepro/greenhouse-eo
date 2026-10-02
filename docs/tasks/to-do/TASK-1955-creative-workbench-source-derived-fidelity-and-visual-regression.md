@@ -1,4 +1,4 @@
-# TASK-1955 — Creative Workbench: fidelidad derivada de la fuente y regresión visual del motor
+# TASK-1955 — Creative Workbench: incorporación de clientes por derivación de la fuente y regresión visual
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -29,12 +29,17 @@
 
 ## Summary
 
-Hace que las reglas de composición SKY salgan de la fuente Figma sellada por defecto, con overrides
-manuales sólo como excepciones registradas, y agrega una suite canónica de regresión visual que en CI
-dice qué piezas cambian con cada cambio del motor y bloquea los cambios no declarados. Además define las
-clases de revisión que permiten aprobar una receta una vez y heredar la aprobación en todas sus piezas.
+Construye el mecanismo neutral para **incorporar la marca de cualquier cliente** al Workbench: su adaptador
+de composición (alineaciones, ejes, espaciados, zonas) se deriva de su fuente de diseño sellada, y las
+decisiones que se apartan de la fuente quedan como excepciones registradas. Suma una suite de regresión
+visual por cliente que en CI dice qué piezas cambian con cada cambio del motor y bloquea lo no declarado, y
+clases de revisión para aprobar una vez por clase en lugar de pieza por pieza. SKY es el primer adaptador.
 
 ## Why This Task Exists
+
+Hoy sólo SKY tiene componentes de composición (`brands/sky-airline/components/`); Berel y Efeonce siguen
+`gated`. Sumar un cliente significa escribir a mano cientos de reglas por formato, lo que limita cuántos
+clientes puede atender el equipo creativo. El caso SKY muestra además el costo de hacerlo a mano:
 
 Las admisiones de contenido y destino del Workbench (`content-layout-admissions.mjs`,
 `destination-admissions.mjs`) son datos escritos por pin. En la revisión v6 eso produjo 54 pies legales
@@ -48,12 +53,13 @@ revisión humana tiene que repetirse pieza por pieza. A escala de campaña eso e
 
 ## Goal
 
-- Toda regla de alineación, eje y espaciado admitida se deriva de la fuente sellada o declara un override
-  con razón, y un gate falla si una regla contradice su fuente sin override.
-- Una suite canónica (las 24 adaptaciones + casos extremos) compara cada cambio del motor contra su base
-  sellada y bloquea el merge si cambia una pieza no declarada.
-- Las piezas se agrupan en clases de revisión deterministas; una aprobación por clase cubre todas las
-  piezas de la clase y sólo las anomalías van a revisión humana.
+- Un núcleo neutral deriva el adaptador de cualquier cliente desde su fuente sellada; sólo las excepciones
+  se escriben a mano, con razón, y un gate falla si una regla contradice su fuente sin excepción.
+- Incorporar un cliente nuevo tiene un procedimiento documentado y un tiempo medido, probado con SKY y con
+  un adaptador sintético que demuestra que el núcleo no conoce ninguna marca.
+- Una suite de regresión por cliente compara cada cambio del motor contra su base sellada y bloquea el merge
+  si cambia una pieza no declarada.
+- Las piezas se agrupan en clases de revisión deterministas; sólo las anomalías van a revisión humana.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -69,6 +75,8 @@ revisión humana tiene que repetirse pieza por pieza. A escala de campaña eso e
 
 Reglas obligatorias:
 
+- Núcleo neutral: `tools/` y los schemas `workbench.*` no nombran ninguna marca; lo específico vive en
+  `brands/<marca>/`. Un test con adaptador sintético lo comprueba.
 - La fuente sellada (`sourceSha256` del FIG) es la autoridad de geometría; un override nunca la reescribe,
   vive como dato aparte con razón, autor y fecha.
 - Los jobs no transportan geometría. Ninguna derivación lee datos del job.
@@ -93,12 +101,14 @@ Reglas obligatorias:
 
 - `TASK-1953` y `TASK-1954` producen a escala sobre este gate; no escalar sin él.
 - `TASK-1956` usa la derivación para el encuadre de foto por formato.
+- `TASK-1945` usa este mecanismo para habilitar Berel/Efeonce como marcas productivas.
 - Follow-up de revisión en el Lab: consume las clases y anomalías que esta task produce.
 
 ### Files owned
 
-- Workbench `tools/sky-derive-admissions.mjs` (nuevo) y su prueba.
-- Workbench `brands/sky-airline/components/*-admissions.mjs` (regeneración), `brands/sky-airline/components/admission-overrides.mjs` (nuevo).
+- Workbench `tools/derive-admissions.mjs` (núcleo neutral, nuevo) y su prueba con adaptador sintético.
+- Workbench `brands/sky-airline/derivation.mjs` (adaptador SKY, nuevo), `brands/sky-airline/components/*-admissions.mjs` (regeneración) y `brands/sky-airline/components/admission-overrides.mjs` (nuevo).
+- Workbench `docs/manual/client-onboarding-derivation.md` (nuevo): procedimiento para incorporar un cliente.
 - Workbench `tools/visual-regression.mjs` (nuevo), `test/visual-regression/` (suite y bases selladas, fuera de Git los binarios).
 - Workbench `tools/review-classes.mjs` (nuevo).
 - Workbench `.github/workflows/native-harness.yml` (job de regresión), `test/public-ci-policy.json`.
@@ -129,7 +139,7 @@ Reglas obligatorias:
 - Topology impact: `tooling`
 - Current home: `creative-workbench/tools/` y `creative-workbench/brands/sky-airline/components/`
 - Future candidate home: `remain-shared`
-- Boundary: `derivador y regresión como comandos del Workbench; el motor consume admisiones, nunca la fuente directa en runtime`
+- Boundary: `núcleo neutral (derivación, regresión, clases) + adaptador por marca; el motor consume admisiones, nunca la fuente directa en runtime`
 - Server/browser split: `Node local y CI; sin consumer browser`
 - Build impact: `lee el FIG sellado y los recursos instalados; binarios de bases fuera de Git`
 - Extraction blocker: `recursos licenciados (Metric) sólo en máquinas admitidas: la suite licenciada no corre en modo público`
@@ -148,7 +158,7 @@ Reglas obligatorias:
 
 - Contrato existente a respetar: schema de admisiones `sky-airline.content-layout-admissions.v1`,
   `sky-airline.destination-admissions.v1`; `workbench.design-job.v1`; `public-ci-policy.v2`.
-- Contrato nuevo o modificado: `sky-derive-admissions` (comando), `admission-overrides` (dato),
+- Contrato nuevo o modificado: `derive-admissions` (comando neutral) + interfaz de adaptador por marca, `admission-overrides` (dato por marca),
   `workbench.visual-regression.v1` (informe), `workbench.review-classes.v1` (clases y anomalías).
 - Backward compatibility: `compatible` — la regeneración debe reproducir byte a byte las admisiones 1.6.0/1.3.0 salvo diferencias declaradas.
 - Full API parity: comandos CLI reutilizables por agentes y CI; el Lab sólo consume informes.
@@ -205,10 +215,11 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Derivador versionado y overrides explícitos
+### Slice 1 — Núcleo de derivación, adaptador SKY y overrides explícitos
 
-- `tools/sky-derive-admissions.mjs`: genera las admisiones de contenido y destino desde el FIG sellado y el
-  catálogo (alineaciones `text.align`, ejes de frame, baselines y line boxes, gaps nativos de moneda,
+- `tools/derive-admissions.mjs` (neutral) define la interfaz de adaptador: lectura de la fuente sellada,
+  catálogo de zonas y reglas derivables. `brands/sky-airline/derivation.mjs` la implementa para SKY y
+  genera sus admisiones de contenido y destino desde el FIG sellado y el catálogo (alineaciones `text.align`, ejes de frame, baselines y line boxes, gaps nativos de moneda,
   frames hug-width centrados), aplicando después `admission-overrides.mjs`.
 - `admission-overrides.mjs`: cada override con pin, campo, valor, razón, autor y fecha. Migrar a overrides
   las decisiones del operador que se apartan de la fuente (76 badges LEFT, condiciones compactas 1.1.0,
@@ -227,7 +238,7 @@ Reglas obligatorias:
 
 ### Slice 4 — Suite canónica y regresión visual en CI
 
-- Suite: las 24 adaptaciones de `prueba-modular-24-adaptaciones` más una matriz de extremos (ciudad de una
+- Suite por cliente, declarada por su adaptador. Para SKY: las 24 adaptaciones de `prueba-modular-24-adaptaciones` más una matriz de extremos (ciudad de una
   y dos líneas, precio de 1–7 dígitos, cada moneda SKY, doble moneda, legal de 1–3 líneas, 5%/50%).
 - `tools/visual-regression.mjs`: compone la suite, compara por SHA y por geometría de `qa.json` contra la
   base sellada, y emite `workbench.visual-regression.v1` (cambiadas, idénticas, nuevas, con hojas de
@@ -242,13 +253,20 @@ Reglas obligatorias:
   mínimo, ejes fuera de tolerancia, márgenes al borde de flecha, contraste medido bajo umbral).
 - Informe por lote: clases, piezas por clase, una pieza representativa por clase y lista de anomalías.
 
+### Slice 6 — Neutralidad probada y procedimiento de incorporación
+
+- Adaptador sintético mínimo (marca ficticia, fuente sintética de pocos formatos) que pasa derivación,
+  gate, regresión y clases sin tocar el núcleo; test que falla si `tools/` nombra una marca real.
+- `docs/manual/client-onboarding-derivation.md`: pasos para incorporar un cliente (fuente sellada →
+  adaptador → overrides → suite → primera corrida) y medición del tiempo de incorporación.
+
 ## Out of Scope
 
 - Interfaz de revisión en el Lab (follow-up de EPIC-050).
 - Expansión de campañas, lotes sin tope y empaquetado (`TASK-1953`, `TASK-1954`).
 - Encuadre de fotografía por formato (`TASK-1956`).
 - Cambiar la regla de no achicar texto o las decisiones del operador (sólo se registran como overrides).
-- Segunda marca.
+- Habilitar Berel/Efeonce como productivas (TASK-1945 usa este mecanismo para hacerlo).
 
 ## Detailed Spec
 
@@ -266,6 +284,7 @@ Reglas obligatorias:
 - Slice 1 → Slice 2 (el gate necesita el derivador). Slice 3 en paralelo con 1–2.
 - Slice 4 requiere Slice 1 cerrado (la base se sella con las admisiones regeneradas).
 - Slice 5 requiere Slice 4 (usa su informe y su suite).
+- Slice 6 requiere Slices 1, 2, 4 y 5 (prueba de punta a punta con el adaptador sintético).
 
 ### Risk matrix
 
@@ -290,6 +309,7 @@ Reglas obligatorias:
 | Slice 3 | revert del catálogo de zonas | minutos | sí |
 | Slice 4 | volver el job a modo informe o retirarlo | minutos | sí |
 | Slice 5 | revert PR (sólo genera informes) | minutos | sí |
+| Slice 6 | revert PR (adaptador sintético y manual) | minutos | sí |
 
 ### Production verification sequence
 
@@ -307,7 +327,9 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] `sky-derive-admissions` regenera las admisiones de contenido y destino; el diff contra 1.6.0/1.3.0 es vacío o cada diferencia está explicada en la auditoría.
+- [ ] El núcleo `derive-admissions` no nombra ninguna marca, y un adaptador sintético pasa derivación, gate, regresión y clases sin cambios en `tools/` (test automatizado).
+- [ ] `docs/manual/client-onboarding-derivation.md` describe la incorporación de un cliente y registra el tiempo medido con SKY.
+- [ ] El adaptador SKY regenera las admisiones de contenido y destino; el diff contra 1.6.0/1.3.0 es vacío o cada diferencia está explicada en la auditoría.
 - [ ] Cada decisión del operador que se aparta de la fuente vive en `admission-overrides.mjs` con razón, autor y fecha.
 - [ ] `pnpm gates` falla ante una regla que contradice su fuente sin override y ante un override muerto (probado con casos negativos).
 - [ ] Los 175 campos `other-copy` quedan clasificados, o los que no se puedan clasificar quedan listados con razón.
@@ -337,9 +359,15 @@ Reglas obligatorias:
 ## Follow-ups
 
 - Superficie de revisión por clases en el Lab (consumer de los informes de esta task).
-- Extender el derivador a la segunda marca cuando TASK-1945 la admita.
+- Incorporar Berel y Efeonce con este mecanismo cuando TASK-1945 habilite sus fuentes.
 
 ## Open Questions
 
 - ¿El umbral de contraste para anomalías sigue AA (4,5:1) o una policy propia de SKY para texto sobre foto?
 - ¿Quién aprueba los overrides del lado de SKY además de la diseñadora de Efeonce?
+
+## Delta 2026-10-02
+
+- Reencuadre multicliente por decisión del operador: la capacidad es para todos los clientes de Efeonce,
+  SKY es el primer adaptador. Se agregan núcleo neutral, interfaz de adaptador, adaptador sintético y
+  procedimiento de incorporación (Slice 6).

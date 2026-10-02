@@ -29,14 +29,17 @@
 
 ## Summary
 
-Reemplaza la autoría de jobs campo por campo por un **plan de campaña**: un archivo con ofertas, mercados
-y formatos que el Workbench expande en todos los `workbench.design-job.v1` necesarios, usando las zonas
-semánticas del catálogo. Cada mercado aporta su moneda, su legal y su idioma; las tarifas se importan de
-una planilla. Antes de componer, un preflight dice qué copy no cabe en qué formato y qué variante usar.
+Reemplaza la autoría de jobs campo por campo por un **plan de campaña neutral**, válido para cualquier
+cliente habilitado: un archivo con variantes de oferta, mercados y formatos que el Workbench expande en
+todos los `workbench.design-job.v1` necesarios, usando las zonas semánticas del catálogo de cada marca.
+Cada cliente declara sus perfiles de mercado (moneda, legal, idioma) y el esquema de su planilla de oferta
+(tarifas para una aerolínea, productos y precios para retail). Antes de componer, un control previo dice
+qué copy no cabe en qué formato y qué variante usar. SKY es el primer cliente que lo consume.
 
 ## Why This Task Exists
 
-Hoy un job declara el copy con IDs de nodo Figma (`2026:2611/2026:2617/...`) para cada campo, y el
+El equipo creativo atiende campañas de muchos clientes con la misma presión de volumen; el ejemplo más
+exigente hoy es SKY. Hoy un job declara el copy con IDs de nodo Figma (`2026:2611/2026:2617/...`) para cada campo, y el
 catálogo SKY tiene 1.196 campos en 126 formatos. Un despliegue real de SKY multiplica ofertas por mercados
 (CLP, PEN, ARS, UYU, USD y BRL, con portugués en Brasil) y por formatos: son cientos o miles de jobs que
 nadie puede escribir a mano sin errores. Además, un copy que no cabe se descubre recién al componer,
@@ -44,11 +47,13 @@ pieza por pieza, porque el motor (con razón) no achica texto.
 
 ## Goal
 
-- Un plan de campaña declarativo genera todos los jobs de un despliegue sin escribir IDs de nodo.
-- Los mercados SKY quedan modelados como perfiles con moneda, formato de número, legal e idioma.
-- Las tarifas y condiciones se importan de una planilla validada, sin copiarlas a mano.
-- Un preflight produce la matriz copy × formato con ajustes, rechazos y la variante corta elegida, antes
-  de gastar una sola composición.
+- Un plan de campaña neutral genera todos los jobs de un despliegue, para cualquier cliente habilitado,
+  sin escribir IDs de nodo.
+- Cada cliente declara sus perfiles de mercado y el esquema de su planilla de oferta; el núcleo no conoce
+  ninguna marca. SKY (seis contextos de moneda) es el primer set.
+- Los datos de oferta se importan de una planilla validada contra el esquema del cliente.
+- Un control previo produce la matriz copy × formato con ajustes, rechazos y la variante corta elegida,
+  antes de gastar una sola composición.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -63,6 +68,8 @@ pieza por pieza, porque el motor (con razón) no achica texto.
 
 Reglas obligatorias:
 
+- Núcleo neutral: plan, expansión, importación y control previo no nombran ninguna marca; perfiles de
+  mercado y esquema de oferta viven en `clients/<cliente>/`.
 - El plan lleva contenido, nunca geometría, fuentes, colores ni rutas de salida.
 - Los datos comerciales (precios, fechas, condiciones, legales) vienen siempre de una fuente declarada
   (planilla o brief); nunca se infieren ni se completan con valores por defecto.
@@ -91,8 +98,8 @@ Reglas obligatorias:
 ### Files owned
 
 - Workbench `tools/campaign-plan.mjs` y `tools/marca-campana.mjs` (nuevos) con sus pruebas.
-- Workbench `clients/sky/markets.json` (nuevo, perfiles de mercado).
-- Workbench `tools/fare-import.mjs` (nuevo) y su esquema `workbench.fare-sheet.v1`.
+- Workbench `clients/<cliente>/markets.json` y `clients/<cliente>/offer-schema.json` (nuevos; primero `clients/sky/`).
+- Workbench `tools/offer-import.mjs` (nuevo, neutral) y su esquema `workbench.offer-sheet.v1`.
 - Workbench `tools/fit-preflight.mjs` (nuevo).
 - Workbench `docs/architecture/workbench-campaign-plan.md` y `docs/manual/campaign-plan.md` (nuevos).
 - Greenhouse skill espejo `efeonce-creative-workbench` (referencia de operación).
@@ -129,14 +136,14 @@ Reglas obligatorias:
 
 - Backend rigor: `backend-standard`
 - Impacto principal: `command`
-- Source of truth afectado: `plan de campaña (nuevo), perfiles de mercado (nuevo), planilla de tarifas importada`
+- Source of truth afectado: `plan de campaña (nuevo), perfiles de mercado y esquema de oferta por cliente (nuevos), planilla de oferta importada`
 - Consumidores afectados: `marca:lote, TASK-1954, agentes Codex/Claude que producen campañas`
 - Runtime target: `local`
 
 ### Contract surface
 
 - Contrato existente a respetar: `workbench.design-job.v1`, `workbench.design-batch.v1`, catálogo de zonas.
-- Contrato nuevo o modificado: `workbench.campaign-plan.v1`, `workbench.market-profile.v1`, `workbench.fare-sheet.v1`, `workbench.fit-preflight.v1`.
+- Contrato nuevo o modificado: `workbench.campaign-plan.v1`, `workbench.market-profile.v1`, `workbench.offer-schema.v1`, `workbench.offer-sheet.v1`, `workbench.fit-preflight.v1`.
 - Backward compatibility: `compatible` — los jobs generados son jobs normales; `marca:disenar` no cambia.
 - Full API parity: comando CLI (`marca:campana --plan|--preflight|--expand`) usable por personas y agentes.
 
@@ -192,24 +199,28 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Perfiles de mercado SKY
+### Slice 1 — Perfiles de mercado por cliente
 
-- `clients/sky/markets.json` con `workbench.market-profile.v1`: Chile, Perú, Argentina, Uruguay, Brasil y
+- `workbench.market-profile.v1` neutral (moneda, símbolo y posición, separadores, idioma, legal base, URL
+  de términos) en `clients/<cliente>/markets.json`. Primer set, `clients/sky/markets.json`: Chile, Perú, Argentina, Uruguay, Brasil y
   tarifas en USD; por mercado moneda, símbolo y posición, separadores de miles y decimales, idioma
   (`es-CL`, `es-PE`, `es-AR`, `es-UY`, `pt-BR`), legal base y URL de T&C por mercado.
 - Los valores comerciales (legal, URL) se cargan desde una fuente declarada; sin fuente, el mercado queda
   `incompleto` y el preflight lo rechaza.
 
-### Slice 2 — Planilla de tarifas
+### Slice 2 — Planilla de oferta con esquema por cliente
 
-- `workbench.fare-sheet.v1` (CSV/XLSX): oferta, origen, destino, mercado, moneda, importe, prefijo
-  (DESDE/POR TRAMO), condiciones y vigencia. Validación de tipos, monedas admitidas por mercado y
+- `workbench.offer-sheet.v1` (CSV/XLSX) neutral, validada contra `clients/<cliente>/offer-schema.json`:
+  cada cliente declara sus columnas y a qué zona semántica alimenta cada una. Para SKY: oferta, origen,
+  destino, mercado, moneda, importe, prefijo (DESDE/POR TRAMO), condiciones y vigencia; para un cliente
+  retail sería producto, SKU, precio, promoción y vigencia. Validación de tipos, monedas admitidas por mercado y
   duplicados; cada fila con SHA de la planilla de origen.
 
 ### Slice 3 — Plan de campaña y expansión
 
-- `workbench.campaign-plan.v1`: campaña (titular, bajada, fechas, sticker), ofertas (por referencia a la
-  planilla), mercados, familias/formatos y fotos por destino (IDs admitidos, `TASK-1956`).
+- `workbench.campaign-plan.v1` neutral: marca, campaña (titular, bajada, fechas, sticker), variantes de oferta
+  (por referencia a la planilla), mercados, familias/formatos y fotos (IDs admitidos de la biblioteca del
+  cliente, `TASK-1956`).
 - `marca:campana --expand`: produce los jobs llenando cada campo por su zona semántica, con id estable
   `oferta×mercado×formato`, y un lote `workbench.design-batch.v1` (o varios, ver `TASK-1954`).
 - Reproducir la prueba de 24 desde un plan: los jobs generados coinciden con los manuales o se explica cada diferencia.
@@ -284,8 +295,9 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
+- [ ] Plan, expansión, importación y control previo no nombran ninguna marca; un cliente sintético con su propio esquema de oferta se expande sin cambios en `tools/` (test automatizado).
 - [ ] `clients/sky/markets.json` define los seis contextos de moneda SKY con moneda, formato numérico, idioma y legal con fuente declarada.
-- [ ] `fare-import` rechaza monedas no admitidas por el mercado, duplicados y filas incompletas (probado con casos negativos).
+- [ ] `offer-import` rechaza monedas no admitidas por el mercado, duplicados y filas incompletas (probado con casos negativos).
 - [ ] La prueba de 24 se reproduce desde un plan y sus jobs coinciden con los manuales o cada diferencia está explicada.
 - [ ] Ningún job generado contiene un campo vacío o con valor por defecto; cada campo tiene origen trazable.
 - [ ] El preflight produce la matriz copy × formato y su veredicto coincide con el resultado de componer en toda la suite de TASK-1955.
@@ -311,10 +323,16 @@ Reglas obligatorias:
 ## Follow-ups
 
 - Conexión directa al sistema de pricing de SKY si la planilla resulta un cuello de botella.
-- Plantilla de plan por tipo de campaña (Cyber, SKY Week, Always On, eventos).
+- Plantillas de plan por tipo de campaña y por cliente (en SKY: Cyber, SKY Week, Always On, eventos).
+- Esquema de oferta y perfiles de mercado del segundo cliente habilitado por TASK-1945.
 
 ## Open Questions
 
-- ¿De dónde sale hoy la tarifa por mercado en SKY (planilla de cuentas, sistema de pricing, feed)?
+- Para SKY: ¿de dónde sale hoy la tarifa por mercado (planilla de cuentas, sistema de pricing, feed)?
 - ¿El legal y la URL de T&C los define SKY por mercado o Efeonce los redacta para aprobación?
 - ¿Las tarifas en USD se publican en todos los mercados o sólo en algunos?
+
+## Delta 2026-10-02
+
+- Reencuadre multicliente por decisión del operador: plan, perfiles de mercado y planilla de oferta son
+  neutrales con esquema por cliente (`offer-schema.json`); la planilla de tarifas SKY es el primer esquema.

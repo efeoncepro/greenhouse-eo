@@ -29,10 +29,11 @@
 
 ## Summary
 
-Lleva la ejecución de lotes al tamaño de un despliegue real: campañas de miles de piezas sin el tope de
-126 jobs, ejecución en paralelo con recuperación, reutilización de composiciones idénticas y una salida
-empaquetada por canal (Meta, Google/display, OOH) con nomenclatura, archivada en el bucket de trabajo con
-rutas y SHA y sin copiar binarios licenciados.
+Lleva la ejecución y la entrega al tamaño de la demanda real de los clientes de Efeonce: campañas de miles
+de piezas sin el tope de 126 jobs, ejecución en paralelo con recuperación, reutilización de composiciones
+idénticas y una salida empaquetada por canal, archivada en el espacio privado de cada cliente con rutas y
+SHA, sin copiar recursos licenciados, y con el tiempo de entrega medido de punta a punta. Es neutral; SKY es
+el primer cliente que la ejerce.
 
 ## Why This Task Exists
 
@@ -45,11 +46,12 @@ distribución remota está pendiente de derechos (TASK-1946).
 
 ## Goal
 
-- Una campaña completa se prepara y ejecuta como una unidad, sin tope de 126 y con recuperación por UUID.
+- Una campaña completa de cualquier cliente se prepara y ejecuta como una unidad, sin tope de 126 y con
+  recuperación por UUID.
 - La ejecución corre en paralelo de forma determinista y reutiliza composiciones idénticas.
 - La salida sale empaquetada por canal con nomenclatura de tráfico y specs de plataforma.
-- El archivo en el bucket queda gobernado: rutas con huella, verificación, registro en `pieza.json` y sin
-  binarios licenciados.
+- El archivo queda gobernado en el prefijo privado de cada cliente, sin recursos licenciados.
+- El tiempo desde brief hasta paquete entregado queda medido por campaña y por cliente.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -69,7 +71,9 @@ Reglas obligatorias:
   tenga el mismo hash; un cambio del motor invalida la caché.
 - El bucket de trabajo es privado, con rutas `<cliente>/<slug>/<sha>/<archivo>`; el equipo no puede borrar
   ni sobrescribir.
-- Ningún archivo que salga del equipo contiene binarios `sky-metric-*` ni otros recursos licenciados sin admisión.
+- Núcleo neutral: lotes, caché, paquetes y archivo no nombran ninguna marca; la lista de recursos licenciados
+  a excluir la declara el pack de cada cliente.
+- Ningún archivo que salga del equipo contiene recursos licenciados sin admisión (p. ej. `sky-metric-*` de SKY).
 - Esta task no publica en plataformas de medios ni gasta en proveedores.
 
 ## Normative Docs
@@ -151,7 +155,7 @@ Reglas obligatorias:
   - Una corrida reutilizada por caché tiene el mismo hash de entrada completa; sin coincidencia exacta, se compone.
   - El orden de ejecución en paralelo no cambia ningún byte de salida.
   - Una corrida incierta se recupera por su UUID; nunca se duplica.
-  - Ningún paquete ni `run.zip` subido contiene `sky-metric-*` ni otras entradas del pack; se referencian por SHA.
+  - Ningún paquete ni `run.zip` subido contiene recursos licenciados ni otras entradas del pack del cliente; se referencian por SHA.
   - Cada objeto subido se verifica (CRC32C y tamaño) antes de registrarse; nada se borra localmente sin esa verificación.
 - Write-target allowlist: `N/A — sin DB; destino GCS limitado al prefijo del cliente`
 - Tenant/space boundary: `una marca por campaña; prefijo de bucket por cliente`
@@ -207,6 +211,8 @@ Reglas obligatorias:
 
 - Pool de workers local con concurrencia configurable y límites de memoria; resultados byte-idénticos a la ejecución secuencial (probado sobre la suite de TASK-1955).
 - Métrica de throughput por pieza y por campaña en el receipt.
+- Tiempo de entrega por campaña (brief aprobado → plan → ejecución → paquete entregado) registrado en el
+  receipt, por cliente, para medir el delivery hacia el cliente.
 
 ### Slice 3 — Caché por contenido
 
@@ -297,9 +303,10 @@ Reglas obligatorias:
 - [ ] La ejecución paralela produce outputs byte-idénticos a la secuencial en toda la suite de TASK-1955.
 - [ ] Una segunda ejecución sin cambios reutiliza todas las corridas por caché, y un cambio de versión del motor la invalida.
 - [ ] Cada paquete por canal cumple su spec o la pieza queda rechazada con causa; los nombres siguen la nomenclatura declarada.
-- [ ] Ningún `run.zip` ni paquete subido contiene `sky-metric-*` u otras entradas del pack (test negativo).
+- [ ] Ningún `run.zip` ni paquete subido contiene los recursos licenciados declarados por el pack del cliente (test negativo con SKY y con un cliente sintético).
+- [ ] Lotes, caché, paquetes y archivo no nombran ninguna marca en `tools/` (test automatizado).
 - [ ] Cada objeto subido queda verificado por CRC32C y tamaño y registrado en `pieza.json` antes de liberar disco.
-- [ ] El receipt registra throughput y tiempo total de la campaña de prueba.
+- [ ] El receipt registra throughput y tiempo de entrega de punta a punta de la campaña de prueba, por cliente.
 
 ## Verification
 
@@ -321,8 +328,14 @@ Reglas obligatorias:
 
 - Worker remoto (Cloud Run Job) cuando TASK-1946 resuelva la distribución de recursos licenciados.
 - Revisión por clases en el Lab consumiendo el receipt de campaña.
+- Entrega en el portal cliente (Creative Hub, TASK-1857) consumiendo los paquetes por canal.
 
 ## Open Questions
 
-- ¿Qué canales y specs pide SKY en un despliegue típico (Meta, Google, DV360, OOH, otros)?
-- ¿La nomenclatura de tráfico la define la agencia de medios de SKY o Efeonce?
+- ¿Qué canales y specs piden los clientes en un despliegue típico (en SKY: Meta, Google, DV360, OOH, otros)?
+- ¿La nomenclatura de tráfico la define la agencia de medios de cada cliente o es un estándar de Efeonce?
+
+## Delta 2026-10-02
+
+- Reencuadre multicliente por decisión del operador: núcleo neutral, recursos licenciados declarados por el
+  pack de cada cliente, archivo por prefijo de cliente y medición del tiempo de entrega por cliente.
