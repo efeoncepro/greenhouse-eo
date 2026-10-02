@@ -8,6 +8,7 @@
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 
+import { planPublicacion, prefijosDeLock } from './assets-plan.mjs'
 import { gcloud, gcloudJson } from './gcp.mjs'
 import { loadControl, readJson, ROOT } from './lib.mjs'
 
@@ -22,28 +23,29 @@ const { gcp } = loadControl()
 const lock = readJson(path.join(ROOT, 'scripts/foto/assets.lock.json'))
 const declared = Object.entries(lock.assets)
 
-const remote = gcloudJson([
-  'storage',
-  'objects',
-  'list',
-  `gs://${gcp.canonBucket}/ai-generations/**`,
-  `--project=${gcp.project}`
-])
+// Se lista CADA prefijo que el lock declara, no sólo `ai-generations/`: el lock también sella referencias que vienen
+// de un paquete npm (`node_modules/…`, los Sparks) y, sin listarlas, cada corrida las daba por faltantes. Detalle en
+// `assets-plan.mjs`. Un prefijo sin objetos vuelve `[]`; `null` es un fallo real de gcloud.
+const remote = []
 
-if (remote === null) {
-  console.error(`✗ No pude listar gs://${gcp.canonBucket}. ¿Existe? → pnpm creative:provision plan`)
-  process.exit(1)
+for (const prefijo of prefijosDeLock(declared.map(([ruta]) => ruta))) {
+  const objetos = gcloudJson(['storage', 'objects', 'list', `gs://${gcp.canonBucket}/${prefijo}/**`, `--project=${gcp.project}`])
+
+  if (objetos === null) {
+    console.error(`✗ No pude listar gs://${gcp.canonBucket}/${prefijo}. ¿Existe el bucket? → pnpm creative:provision plan`)
+    process.exit(1)
+  }
+
+  remote.push(...objetos)
 }
 
 const remoteHash = new Map(remote.map(o => [o.name, o.metadata?.sha256 ?? o.custom_fields?.sha256]))
-const missingLocal = []
-const toUpload = []
 
-for (const [ruta, { sha256 }] of declared) {
-  if (remoteHash.get(ruta) === sha256) continue
-  if (!existsSync(path.join(ROOT, ruta))) missingLocal.push(ruta)
-  else toUpload.push({ ruta, sha256 })
-}
+const { aSubir: toUpload, faltanLocal: missingLocal } = planPublicacion({
+  declared,
+  remoteHash,
+  existe: ruta => existsSync(path.join(ROOT, ruta))
+})
 
 console.log(
   `Canon gs://${gcp.canonBucket}: ${declared.length} declarados · ${declared.length - toUpload.length - missingLocal.length} al día · ${toUpload.length} a subir`

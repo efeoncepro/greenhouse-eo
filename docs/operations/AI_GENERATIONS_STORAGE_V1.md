@@ -29,7 +29,7 @@ brand-surfaces, motion y audio).
 | Lugar | Dónde | Qué guarda | Quién lo lee | Quién escribe |
 |---|---|---|---|---|
 | **Local** | `ai-generations/<AAAA-MM-DD>_<slug>/` en el checkout | Lo **protegido** (§2), todo lo nuevo o reciente y los archivos versionados en git | Los procesos de composición y los agentes | Toda corrida nueva, como hoy |
-| **Canon** | `gs://efeonce-creative-canon/ai-generations/<ruta relativa>` (proyecto del Creative Workbench) | Lo **sellado** en `scripts/foto/assets.lock.json`: identidades, kits de prendas, logo 3D, mascotas, Sparks | El equipo del Creative Workbench (`pnpm assets:pull`) y greenhouse-eo como respaldo | Sólo `pnpm creative:assets:publish apply` (verifica sha256, nunca borra) |
+| **Canon** | `gs://efeonce-creative-canon/<la misma ruta del lock>`: `ai-generations/…` y, para referencias que vienen de un paquete npm (los Sparks), `node_modules/@efeoncepro/axis-brand-assets/…` (proyecto del Creative Workbench) | Lo **sellado** en `scripts/foto/assets.lock.json`: identidades, kits de prendas, logo 3D, mascotas, Sparks | El equipo del Creative Workbench (`pnpm assets:pull`) y greenhouse-eo como respaldo | Sólo `pnpm creative:assets:publish apply` (verifica sha256, nunca borra) |
 | **Archivo** | `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta relativa>` (proyecto `efeonce-group`, privado) | Exploración, rondas, descartes e historial | El operador y sus agentes; el equipo del Workbench **no** lo baja | `pnpm ai-gen:archive` (que extiende `pnpm media:archive-ai-generation`) |
 | **Work** | `gs://efeonce-creative-work/` | Entregables del equipo por cliente (ADR §2.4) | — | — |
 
@@ -93,7 +93,7 @@ esos kits para greenhouse-eo. Una copia en canon **no autoriza borrar el origina
 | `pnpm ai-gen:archive plan` | Muestra qué carpetas se archivarían, con su tamaño; no toca nada |
 | `pnpm ai-gen:archive apply [--folder X] [--keep-local]` | Extiende `media:archive-ai-generation`: sube, hace readback por sha256, escribe `artifacts.remote.json` y **recién entonces** borra los binarios locales (los `.md`/`.json`/`.mjs` versionados se quedan). Rehúsa carpetas protegidas y carpetas modificadas hace menos de 3 días. `--keep-local` sube y registra sin borrar |
 | `pnpm media:archive-ai-generation -- --run ai-generations/<carpeta> [--apply]` | El primitive del carril ([Web Media Delivery Tooling](web-media-delivery-tooling.md)): es la **etapa de copia** — sube los binarios al bucket y escribe `artifacts.remote.json`. No aplica guardas de protección ni readback, y no borra lo local; `ai-gen:archive` lo envuelve con esas tres cosas. Para archivar exploración y liberar disco se usa `ai-gen:archive` |
-| `pnpm creative:assets:publish plan\|apply` | Publica al canon lo sellado en el lock (verifica sha256, nunca borra) |
+| `pnpm creative:assets:publish plan\|apply` | Publica al canon lo sellado en el lock (verifica sha256, nunca borra). Lista **cada prefijo** que el lock declara; hasta el 2026-10-02 listaba sólo `ai-generations/**` y daba los 182 Sparks por faltantes en cada corrida |
 | `pnpm assets:pull` | En el repo `creative-workbench`: el equipo baja el canon |
 
 Después de un `ai-gen:archive apply`, los `artifacts.remote.json` nuevos o actualizados se commitean: sin ellos nadie
