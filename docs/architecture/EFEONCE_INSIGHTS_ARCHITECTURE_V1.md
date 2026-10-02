@@ -1479,3 +1479,38 @@ Estado: commit local `c56f62d09` sin push; 280 pruebas, typecheck, lint e `insig
 regenerados de Berel y Sky sobre su evidencia sellada validan y pasan el gate. Pendiente: release, canary 1.2 en
 producción, regenerar con `revise` las ediciones internas antes de emitir, y TASK-1958 (jerarquía visual).
 
+
+## 15. Contrato de contenido del informe (TASK-1962)
+
+Un informe de Insights responde ocho preguntas del cliente, en este orden. El registro canónico es
+`src/lib/efeonce-insights/presentation/content-contract.ts` (`CONTENT_CONTRACT_VERSION`), browser-safe.
+
+| # | Pregunta | Sección del plan | SEO | AEO | ICO |
+|---|---|---|---|---|---|
+| 1 | ¿Cómo nos fue? | resumen, esenciales, capítulos | productor | productor | productor |
+| 2 | ¿Por qué cambió? | capítulo | productor (consultas y páginas que más movieron los clics) | sin evidencia entregada | sin evidencia por cliente |
+| 3 | ¿Cómo estamos frente a la competencia? | capítulo | **bloqueada por política** (comparativa SEO nunca client-facing, auditoría §7 del módulo SEO) | productor (Share of Voice) | no aplica |
+| 4 | ¿Qué hicimos este mes? | capítulo | necesita registro de entregables | necesita registro de entregables | productor (piezas completadas, throughput) |
+| 5 | ¿Qué recomendamos? | `actions` | productor (cola SEO, sólo orígenes propios) | agente redactor (TASK-1903) | agente redactor |
+| 6 | ¿Qué necesitamos de ustedes? | `ask` | productor (fuente sin conectar) | productor | productor |
+| 7 | ¿Cómo lo mediremos? | `measurement` | necesita metas pactadas | necesita metas pactadas | productor (metas oficiales) |
+| 8 | ¿Qué no podemos afirmar? | `limits` | productor | productor | productor |
+
+Veredictos: `producer_now`, `no_evidence`, `policy_blocked`, `needs_input` (dato que pone una persona) y `agent_task`
+(redacción con aceptación humana). Una pregunta sin respuesta se declara; nunca se rellena con texto genérico.
+
+**Contrato de mantenimiento.** El contrato de contenido es hermano de la matriz familia × evidencia
+(`editorial/family-evidence-matrix.ts`): una dice qué figuras puede dibujar un productor, la otra qué preguntas
+responde. Agregar un dato nuevo al informe exige, en el mismo cambio:
+
+1. el hecho en el adapter del dominio dueño, leído de un reader dueño;
+2. su regla en `CONTENT_METRIC_RULES` (nombre exacto o espacio de nombres terminado en «.»);
+3. el veredicto `producer_now` de esa pregunta y módulo, con su evidencia;
+4. el productor del planner, y la fila de la matriz de familias si dibuja una figura nueva;
+5. subir `CONTENT_CONTRACT_VERSION`.
+
+Gate mecánico: `presentation/content-contract.test.ts` exige consistencia en las dos direcciones (ninguna regla apunta a
+una pregunta sin productor; ninguna pregunta de hechos con productor queda sin métrica) y `adapters/adapters.test.ts`
+(`expectContentContract`) ejercita los adapters reales: un hecho emitido sin regla rompe el test. `contentCoverageOf`
+calcula la cobertura de una edición (qué responde y por qué no lo demás) para la revisión interna y el agente
+redactor; nunca llega al cliente.

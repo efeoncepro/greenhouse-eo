@@ -3,7 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type * as AiVisibilityContracts from '@/lib/growth/ai-visibility/contracts'
 import type * as MetricRegistry from '@/lib/ico-engine/metric-registry'
 
+import { questionOfMetric } from '../presentation/content-contract'
 import { resolveInsightWindows } from '../window'
+
+/**
+ * TASK-1962 — gate de mantenimiento del informe: todo hecho que un adapter emite responde a una pregunta del contrato de
+ * contenido (`presentation/content-contract.ts`). Un dato nuevo sin su regla rompe aquí, no en el informe del cliente.
+ */
+const expectContentContract = (facts: ReadonlyArray<{ module: 'seo' | 'aeo' | 'ico'; metricId: string }>) => {
+  const orphans = facts.filter(fact => questionOfMetric(fact.module, fact.metricId) === null).map(fact => `${fact.module}:${fact.metricId}`)
+
+  expect(orphans, 'métricas sin contrato de contenido').toEqual([])
+}
 
 /**
  * TASK-1845 — adapters con readers mockeados: cubren unsupported_window (grano), método/gate
@@ -96,6 +107,7 @@ describe('SEO adapter', () => {
     expect(new Set(result.facts.map(fact => fact.channelId))).toEqual(new Set(['google']))
     // Sin v2, ningún hecho lleva dirección (evidencia v1 idéntica).
     expect(result.facts.some(fact => fact.dimension?.direction !== undefined)).toBe(false)
+    expectContentContract(result.facts)
   })
 
   it('SEO con v2: la posición media (y su comparable) lleva lower_is_better; las demás métricas quedan neutras', async () => {
@@ -182,6 +194,7 @@ describe('AEO adapter', () => {
     expect(result.facts.find(fact => fact.metricId === 'citation_share')).toMatchObject({ value: 25, numerator: 2, denominator: 8 })
     expect(result.facts.some(fact => fact.metricId.startsWith('presence.'))).toBe(false)
     expect(result.rejections).toEqual([])
+    expectContentContract(result.facts)
   })
 
   it('sin competidores detectados no entra la participación frente a competencia ni el puntaje global que la pondera', async () => {
@@ -362,6 +375,7 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
 
     expect(values).toEqual({ otd: direction('otd_pct'), ftr: direction('ftr_pct'), rpa: direction('rpa') })
     expect(values.rpa).toBe('lower_is_better')
+    expectContentContract(result.facts)
   })
 
   it('ICO sin v2 entrega exactamente la evidencia v1 (sin FTR ni metas)', async () => {
