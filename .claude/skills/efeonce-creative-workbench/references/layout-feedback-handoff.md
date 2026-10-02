@@ -20,7 +20,7 @@ Revisión pieza a pieza de v6 contra los PNG de Figma. Reglas derivadas de la fu
 Evidencia: 24 runs nuevos sin proveedores (un duplicado de diagnóstico de 05 no seleccionado),
 19 PNG cambian y 5 son idénticos a v6; harness 392/392, sky 10/10, gates PASS; PDF v7 de 25 páginas
 rasterizado y revisado. Canon `sky-airline/2026-10-01/prueba-modular-24-v7/` y `layout-correction-v7/`
-(mapa de selección e historia previa). `projects/sky/prueba-modular-24-adaptaciones/` sigue fuera de Git.
+(mapa de selección e historia previa) se archivaron en el bucket y se borraron del disco: corridas, export y evidencia v7 en `gs://efeonce-creative-work/sky/prueba-modular-24-adaptaciones/` (`runs/<runId>/<sha256>/run.zip`, `exports/prueba-modular-24-v7/…`, `evidence/layout-correction-v7/…`), borrados del disco tras verificar CRC32C/SHA. Índice: `pieza.json` y `archivo.md` del proyecto en Workbench (`8295130`). Los `run.zip` no llevan las entradas del pack ni los binarios Metric (TASK-1946).
 
 ## Corte v6 (histórico)
 

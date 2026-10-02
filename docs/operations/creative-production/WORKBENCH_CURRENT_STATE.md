@@ -17,6 +17,10 @@ su fuente sellada; el origen del destino sigue la caja de línea como el autolay
 oración que preserva las monedas de venta SKY. 24 runs nuevos, cero proveedores, export
 `prueba-modular-24-v7` (PDF de 25 páginas). Harness 392/392, SKY 10/10 y cuatro gates PASS.
 Canon Workbench: `docs/audits/sky-layout-correction-v7-2026-10-01.md`. Datos ficticios; sin aprobación comercial.
+Archivo (2026-10-01): corridas, export y evidencia v7 en `gs://efeonce-creative-work/sky/prueba-modular-24-adaptaciones/`
+(`runs/<runId>/<sha256>/run.zip`, `exports/prueba-modular-24-v7/…`, `evidence/layout-correction-v7/…`), borrados del disco
+tras verificar CRC32C/SHA. Índice: `pieza.json` y `archivo.md` del proyecto en Workbench (`8295130`). Los `run.zip` no llevan
+las entradas del pack ni los binarios Metric (TASK-1946).
 
 ## Corrección SKY local v6 — verificada, aceptación visual pendiente
 
