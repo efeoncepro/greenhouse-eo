@@ -1,144 +1,103 @@
 # Editar solo una zona de una imagen (inpainting con mascara)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.8
+> **Version:** 2.0
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-23 por Claude — (1.8) nueva trampa en «Que no hacer»: la mascara no sirve para mover material que ya esta en la foto (medido con el lecho desenfocado de una story: el modelo lleno la zona entera con un panel plano). Antes (1.7) el manual deja de prometer que la zona protegida queda igual: GPT Image 2.5 regenera la imagen entera aunque se pase `--mask` (delta maximo 221/255 en zona protegida con promedio de solo 4,85), asi que la seccion «La mascara NO preserva pixeles» pasa a ser el paso 5 del flujo, el criterio de aceptacion es el delta **maximo** 0 tras recomponer (no la diferencia media) y el halo tambien se recompone. Antes (1.6) la mascara de halo para integrar un objeto real es la **excepcion, no el default**: para una forma exacta de marca en una escena generada el camino por defecto es la pasada directa (render como referencia de forma + intencion en el prompt), y el halo solo aplica con material exacto del kit y logo chico o de detalle fino. Antes (1.5) segundo uso de la mascara: integrar un objeto real (render de marca) en una escena protegiendo objeto y escena y abriendo solo un halo de ~140 px; verificacion de pixeles protegidos antes de gastar y trampa de `sharp` de 1 canal (`toColourspace('b-w')`). Antes (1.4) `--key-background` para huecos opacos de objeto claro sobre fondo oscuro. Antes (1.3) `pnpm ai:image:rmbg` rellena huecos internos por defecto; cuándo usar `--no-fill-holes`. Antes (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
+> **Ultima actualizacion:** 2026-10-02 por Claude — (2.0, TASK-1965) el flujo pasa a dos comandos: `pnpm ai:mask` arma y valida la mascara y `pnpm ai:inpaint image` recorta, genera, **recompone y verifica solo**: la zona protegida queda en delta maximo 0 o el comando sale con codigo 2. Los snippets de `node -e` y el codigo de recomposicion a mano quedan retirados. Nuevo: Sunburst con mascara devuelve un panel negro plano (3 de 3 pasadas medidas); el default es Flare y Sunburst edita sin mascara (`--provider-mask auto`). Antes (1.8) la mascara no sirve para mover material que ya esta en la foto; (1.7) GPT Image 2.5 regenera la imagen entera aunque reciba la mascara; (1.6) el halo para integrar un objeto real es la excepcion, no el default; (1.2) validacion de `--size`/`--background` y costo estimado antes de pedir.
 > **Modulo:** AI Tooling / Asset Generation
-> **Comandos:** `pnpm ai:image --image ... --mask ...`, `pnpm ai:image:rmbg`
-> **Documentacion relacionada:** `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`
+> **Comandos:** `pnpm ai:mask`, `pnpm ai:inpaint image` (antes: `pnpm ai:image --image ... --mask ...`, que sigue funcionando pero no recompone), `pnpm ai:image:rmbg`
+> **Documentacion relacionada:** [editar una zona de un video](editar-una-zona-de-un-video.md), `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-10-02_task-1965-canary/`
 
 ## Para que sirve
 
-Para cambiar **una zona concreta** de una imagen que ya existe y dejar el resto igual: poner un objeto sobre
-una mesa vacia, reemplazar un elemento, corregir un detalle. La zona se marca con una segunda imagen llamada
-**mascara**.
+Para cambiar **una zona concreta** de una imagen que ya existe y dejar el resto **identico**: poner un objeto sobre una
+mesa vacia, reemplazar un elemento, corregir un detalle. La zona se marca con una **mascara**.
 
-Ojo con lo que la mascara hace y no hace: le dice al modelo **donde** trabajar, pero el modelo devuelve la imagen
-**entera redibujada**, tambien fuera de la zona. Que el resto quede igual lo garantizas tu en el paso 5, recomponiendo
-la zona protegida desde la original. Ver [La mascara NO preserva pixeles](#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu).
+Lo que la mascara hace y no hace: le dice al modelo **donde** trabajar, pero ningun modelo devuelve el resto intacto
+(GPT Image 2.5 cambio la zona protegida hasta 179/255, medido). Por eso `pnpm ai:inpaint image` vuelve a pegar **solo**
+lo que la mascara abre sobre la original y **relee el archivo escrito** para verificar que fuera de la zona no cambio
+ni un byte.
 
 ## Antes de empezar
 
-### Elige el modelo: GPT Image 2, 2.5 Sunburst o 2.5 Flare
+### Elige el adaptador y el modelo
 
-La guía canónica para elegir modelo (este comando y `pnpm ai:fal`) es
-[GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md).
-Resumen para `pnpm ai:image` (fuentes oficiales de OpenAI y mediciones propias del 2026-09-16):
+La guia canonica es [GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md).
+Lo medido en el canario del 2026-10-02 (`ai-generations/2026-10-02_task-1965-canary/`):
 
-| Modelo (`--model`) | Cuándo | Qué tener en cuenta |
+| `--adapter` / `--model` | Cuando | Que tener en cuenta |
 |---|---|---|
-| `gpt-image-2.5-sunburst` | Edición precisa con máscara o pieza final donde importa no tocar lo demás (lo que no se toca igual se recompone en el paso 5) | El más capaz según OpenAI; #1 en edición en Arena y Artificial Analysis (rankings externos, septiembre 2026). Más lento: 80,6 s vs 46,0 s de Flare en `max` a 1024² |
-| `gpt-image-2.5-flare` | Uso diario de calidad, iteraciones y pruebas | El rápido; mismo contrato, mismo costo y mismo consumo que Sunburst para igual `quality × size` |
-| `gpt-image-2` | Cuando necesitas Batch (mitad de precio) o reproducir un flujo existente | Sigue siendo el **default del comando** si no pasas `--model`; OpenAI ya recomienda 2.5 para integraciones nuevas. Calidad hasta `high` (sin `xhigh`/`max`) |
+| `openai` · `gpt-image-2.5-flare` (**default**, `medium`) | Edicion con mascara de uso diario | Puso el objeto con luz y sombra correctas; ≈ USD 0,01 a 1536×1024 `medium` |
+| `openai` · `gpt-image-2.5-sunburst` | Cuando la pieza necesita la calidad de Sunburst | **Con mascara devuelve la zona como un panel negro plano** (3 de 3 pasadas). Con `--provider-mask auto` (default) edita **sin mascara** —la imagen entera, por instruccion— y el comando recompone la zona. Ese modo aun no tiene canario propio |
+| `fal:flux-pro-fill` | Rellenar una zona con algo nuevo; buena alternativa a OpenAI | Mascara blanca = editable; USD 0,05 por megapixel (redondeado arriba). Puso el objeto limpio en el canario |
+| `fal:seedream5-pro-edit` / `fal:seedream5-lite-edit` | Edicion por instruccion de Seedream | No usan mascara: la mascara solo recompone |
 
-Equivalencias de costo (tokens de salida): 2.5 `high` = GPT Image 2 `medium`, y 2.5 `max` = GPT Image 2 `high`. Es
-decir, el default del comando (`gpt-image-2` · `high`) cuesta lo mismo que 2.5 en `max`.
+### Preparacion
 
-### Preparación
-
-- Necesitas la imagen original y saber que zona vas a reemplazar.
-- La mascara debe cumplir tres condiciones o el comando falla **antes** de gastar: mismo formato que la
-  imagen original, mismas dimensiones exactas, y las zonas a reemplazar en **transparente**.
-- Decide la calidad con criterio de costo (ver la advertencia de mas abajo).
+- La imagen original y una idea clara de la zona.
+- La mascara mide **exactamente** lo mismo que la imagen; `pnpm ai:mask --base` la construye ya del tamaño correcto.
+- La mascara debe cubrir el **objeto entero con margen**: lo que el modelo dibuje fuera de la zona se funde con la base
+  y queda cortado (en el canario, las hojas de la planta que salian del borde quedaron difuminadas).
 
 ## Paso a paso
 
-### 1. Crea la mascara
-
-La mascara es un PNG del mismo tamano que la imagen, opaco en todo salvo la zona que quieres cambiar.
-Este script la genera con un rectangulo transparente; ajusta las cuatro fracciones para mover la zona.
+### 1. Arma la mascara
 
 ```bash
-node -e "
-const sharp=require('sharp');
-(async()=>{
-  const src='BASE.png', out='MASK.png';
-  const {width:W,height:H}=await sharp(src).metadata();
-  const px=Buffer.alloc(W*H*4);
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
-    const i=(y*W+x)*4;
-    // zona a reemplazar: 33%-67% del ancho, 42%-72% del alto
-    const hole = x>W*0.33 && x<W*0.67 && y>H*0.42 && y<H*0.72;
-    px[i]=0; px[i+1]=0; px[i+2]=0; px[i+3]= hole?0:255;
-  }
-  await sharp(px,{raw:{width:W,height:H,channels:4}}).png().toFile(out);
-})()
-"
+pnpm ai:mask --base base.png --rect 0.33,0.42,0.67,0.72 --feather 24 --out mascara.png
 ```
 
-### 2. Corre la edicion
+Fuentes (se unen entre si): `--rect` y `--polygon` en fracciones, `--from-alpha` (por defecto lo transparente es
+editable), `--from-luma`, `--from-subject` (el sujeto con el matting local, gratis) y `--from-mask`. Operaciones, en
+este orden: `--invert`, `--erode`, `--dilate`, `--feather`. El comando imprime el porcentaje editable, de borde y
+protegido, y guarda `mascara-preview.png`: **mirala antes de gastar**.
+
+Rechaza una mascara **0 % o 100 % editable**. La segunda es el sintoma de la trampa de sharp: un plano de 1 canal leido
+como 3 sale todo transparente sin error y el modelo repinta la pieza entera. El comando verifica los canales en cada
+lectura, asi que esa trampa ya no pasa en silencio.
+
+Para revisar una mascara que ya tienes: `pnpm ai:mask --inspect mascara.png --base base.png`.
+
+### 2. Prueba gratis
 
 ```bash
-pnpm ai:image --image BASE.png --mask MASK.png \
-  --model gpt-image-2.5-flare --quality low --size 1024x1024 \
+pnpm ai:inpaint image --image base.png --mask mascara.png --prompt "<que va en la zona>" --dry-run
+```
+
+Muestra si recorta (zona chica: genera solo la zona con contexto, a mas resolucion) o usa la imagen completa, el tamaño
+que pide y el costo estimado. Escribe `mask-preview.png`, `provider-input.png` y `provider-mask.png` en la carpeta de
+la corrida. No llama al proveedor.
+
+### 3. Corre la edicion
+
+```bash
+pnpm ai:inpaint image --image base.png --mask mascara.png \
   --prompt "Que va en la zona. Keep everything else exactly the same." \
-  --out RESULTADO.png
+  --run ai-generations/2026-10-02_mi-pieza
 ```
 
-Antes de pedir, el comando imprime la estimación con la fórmula oficial de tokens de salida:
+Opciones utiles: `--count 3` (tres candidatos y `contact-sheet.png`; cada uno se paga), `--adapter fal:flux-pro-fill`,
+`--model`, `--quality`, `--crop auto|on|off`, `--max-usd`/`--yes` (tope de confirmacion, default USD 1).
+
+### 4. Lee lo que imprime
 
 ```
-  $ costo estimado ≈ USD 0.006 (1 × 196 tokens de salida × USD 30/1M; la entrada suma aparte)
+✂ recorte 1281x1281 en (0, 3219) → 1280x1280 · la zona con contexto ocupa 8.1 % de la imagen
+$ costo estimado ≈ USD 0.063 · 1 × salida 1280x1280 high (...)
+→ candidato 1/1 …
+  ✓ PASS · zona protegida identica bit a bit · el modelo habia movido la zona protegida hasta 179/255 · salida USD 0.0103
+✎ ./ai-generations/2026-10-02_mi-pieza/inpaint/e8f26fe6d7aa/manifest.json
 ```
 
-Es sólo informativa (no pide confirmación) y no incluye la imagen base de entrada. Con `--size auto` o un modelo sin
-grilla publicada imprime `$ costo: sin estimación …`. El formato del resultado sale de `--format png|jpeg|webp` o, si
-no lo pasas, de la extensión de `--out` (`.jpg` → JPEG, `.webp` → WebP; si no, PNG), y el archivo se guarda con esa
-extensión. `--background transparent` con JPEG se rechaza.
+Cada candidato deja `candidate-N.png` (final), `candidate-N-raw.png` (lo que devolvio el modelo) y `candidate-N-diff.png`
+(diferencia ×8). El `manifest.json` guarda hashes, parametros, costo estimado y real, el veredicto por zona y la deriva
+del modelo; nunca secretos ni URLs firmadas. **Repetir la misma entrada no vuelve a pagar**: reutiliza la corrida
+(`--force` para regenerar).
 
-### 3. Lee el `usage` que imprime
+### 5. Mira el resultado
 
-```
-✓ 1018KB · gpt-image-2.5-flare · 1024x1024 · low
-    usage: in 1056 (img 1024 · txt 32) · out 196 · total 1252
-```
-
-Ese `usage` **confirma** el costo real. Corrección 2026-09-16: el costo de la familia 2.5 **sí se puede estimar
-antes de gastar**: la guía oficial de OpenAI publica una calculadora que cubre 2.5 y su fórmula reproduce exactamente
-lo medido (196 / 1.756 / 7.024 tokens de salida en `low` / `high` / `max` a 1024²). La fórmula está en
-`docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` §GPT Image 2.5. Recuerda sumar la imagen base como
-entrada (1.024 tokens a 1024²).
-
-### 4. Revisa el resultado mirandolo
-
-Abre la imagen y comparala con la original. **No confies en una diferencia promedio de pixeles**: un objeto
-chico mueve muy poco el promedio y parece que no paso nada. Hay que mirar.
-
-### 5. Recompon la zona protegida: la mascara NO preserva pixeles
-
-<a id="la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu"></a>
-
-**Medido 2026-09-17** (`ai-generations/2026-09-17_claude-o-codex/`). GPT Image 2.5 **regenera la imagen completa**
-aunque le pases `--mask`. La zona protegida cambia: en una pasada que solo debia tocar una esquina, el delta maximo
-en la zona protegida fue **221/255** y la caja de los ojos del sujeto se movio **147/255**. El promedio de la zona
-protegida fue bajo (4,85) — por eso el promedio **no** sirve como criterio de aceptacion.
-
-**Regla dura:** si lo que esta fuera de la mascara no se puede tocar —una cara, un logo ya aprobado, un texto
-compuesto— no confies en el modelo. Compon tu el resultado: toma la salida, invierte el alfa de la misma mascara y
-apoyala sobre la base original. Asi la zona protegida queda **identica bit a bit** y el degradado de la mascara te
-da la union sin costura.
-
-```js
-const alfa = await sharp(MASCARA).extractChannel('alpha').raw().toBuffer()
-const nueva = await sharp(SALIDA_DEL_MODELO).ensureAlpha().raw().toBuffer()
-const parche = Buffer.alloc(W * H * 4)
-for (let i = 0; i < W * H; i++) {
-  parche[i * 4] = nueva[i * 4]
-  parche[i * 4 + 1] = nueva[i * 4 + 1]
-  parche[i * 4 + 2] = nueva[i * 4 + 2]
-  parche[i * 4 + 3] = 255 - alfa[i] // se trae SOLO lo que la mascara abrio
-}
-await sharp(BASE).composite([{ input: png(parche), left: 0, top: 0 }]).toFile(FINAL)
-```
-
-**Verificalo, no lo supongas:** compara base y final en una caja de la zona protegida y exige **delta maximo 0**.
-Cuidado al comparar: `.raw()` sobre un PNG sin alfa devuelve 3 canales y sobre uno con alfa devuelve 4; si mezclas
-los dos, los bytes se desalinean y el delta sale disparatado aunque la imagen este bien. Fuerza `.removeAlpha()` en
-ambos lados.
-
-**Para que sirve igual la mascara:** le dice al modelo donde trabajar y le da el contexto de alrededor, que es lo
-que hace que la zona nueva calce en luz, color y grano. El recorte fino es tuyo.
+El veredicto garantiza lo que **no** se toca; **no** dice si el pedido se cumplio. En el canario, una pasada salio
+`PASS` sin la planta. Abre `candidate-N.png` y mira la union al 100 %.
 
 ## Otro uso de la mascara: integrar un objeto real en una escena (**es la excepcion, no el default**)
 
@@ -159,7 +118,7 @@ que hace que la zona nueva calce en luz, color y grano. El recorte fino es tuyo.
 El caso de arriba abre un hueco para que el modelo **invente** algo. Este es el contrario: ya tienes un objeto exacto
 y lo que quieres del modelo es **solo la integracion**: la sombra de contacto, el reflejo en la superficie y el fundido
 de bordes. Ni el objeto ni la escena deben cambiar, y como el modelo igual los redibuja, **al final recompones las dos
-zonas protegidas** desde la base con el paso 5.
+zonas protegidas** desde la base: `pnpm ai:inpaint image` lo hace solo.
 
 La forma de conseguirlo es una mascara que **protege dos zonas** y deja editable **solo un halo** alrededor del objeto.
 Dentro de ese caso acotado se justifica porque pasar el objeto suelto al modelo deforma el detalle fino aunque el
@@ -175,35 +134,20 @@ prompt lo prohiba (medido: una orbita se encogio a un lazo dos veces seguidas).
 4. **Corre una pasada** pidiendo unicamente integracion:
 
 ```bash
-pnpm ai:image --image BASE.png --mask MASCARA-HALO.png \
-  --model gpt-image-2.5-sunburst \
+pnpm ai:inpaint image --image BASE.png --mask MASCARA-HALO.png --convention alpha-transparent-editable \
+  --model gpt-image-2.5-flare \
   --prompt "Add only contact shadow, surface reflection and bounce light around the object, matching the scene light direction, and blend the edges with the depth of field. Keep the object and the rest of the scene exactly the same." \
-  --out RESULTADO.png
+  --run ai-generations/<fecha>_<pieza>
 ```
 
-5. **Recompon** con el alfa invertido de la misma `MASCARA-HALO.png` sobre `BASE.png`, como en el
-   [paso 5](#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu), y exige delta maximo 0 en la zona protegida.
+5. La recomposicion y la verificacion las hace el comando: con `pnpm ai:inpaint image --image BASE.png --mask
+   MASCARA-HALO.png --convention alpha-transparent-editable …` la zona protegida queda en delta maximo 0 o sale con
+   codigo 2.
 
 ### Verifica los pixeles protegidos antes de gastar
 
-**Cuenta los pixeles opacos de la mascara antes de pedir nada.** Hay una trampa silenciosa: en `sharp`, aplicar
-`blur()` o `linear()` sobre un buffer raw de **1 canal devuelve 3 canales**. Si no cierras con
-`.toColourspace('b-w')`, el indice se corre y la mascara sale **100 % transparente** — todo editable — sin ningun
-error. El modelo te repinta la escena entera y lo pagas.
-
-```bash
-node -e "
-const sharp=require('sharp');
-(async()=>{
-  const {data,info}=await sharp('MASCARA-HALO.png').ensureAlpha().raw().toBuffer({resolveWithObject:true});
-  let op=0,tr=0;
-  for(let i=3;i<data.length;i+=4){ data[i]>127?op++:tr++; }
-  console.log('protegidos',op,'editables',tr,'=>',(100*tr/(op+tr)).toFixed(1)+'% editable');
-})()
-"
-```
-
-Si sale `100% editable`, la mascara esta mal: no la uses.
+`pnpm ai:mask --inspect MASCARA-HALO.png --base BASE.png` imprime el porcentaje protegido y editable; si dice 100 %
+editable, la mascara esta mal. `pnpm ai:inpaint image` la rechaza de todos modos antes de gastar.
 
 ### Como saber si funciono
 
@@ -213,8 +157,8 @@ Compara el resultado con la base **midiendo por zona**, no en promedio global:
   **4/255** en la zona protegida (objeto + escena) contra **40/255** en el halo, donde aparecieron la sombra y el
   reflejo. Si la zona protegida se parece al halo, la mascara no oriento nada: revisala. Una media de ~4/255 **no**
   significa intacta: en la corrida del 2026-09-17 una media de 4,85 escondia un delta maximo de **221/255**.
-- **Despues de recomponer** (paso 5), la zona protegida debe dar **delta maximo 0** contra la base. Ese es el criterio
-  de aceptacion.
+- **Despues de recomponer**, la zona protegida debe dar **delta maximo 0** contra la base: es el veredicto `PASS` del
+  comando.
 
 ### Que no hacer aqui
 
@@ -223,7 +167,7 @@ Compara el resultado con la base **midiendo por zona**, no en promedio global:
   escala).
 - **No vuelvas a pegar el render suelto del objeto encima del resultado** para "corregirlo": con su borde duro
   reintroduce el aspecto de recorte pegado y los bordes sucios que la pasada acababa de resolver. Esto **no** es lo
-  mismo que el paso 5: ahi se trae desde la base solo lo que la mascara protegio (el interior erosionado del objeto y
+  mismo que la recomposicion del comando: ahi se trae desde la base solo lo que la mascara protegio (el interior erosionado del objeto y
   la escena) con el alfa de la misma mascara, y la franja de ~8 px del borde mas el halo se quedan con lo que hizo el
   modelo. La union cae dentro del halo; mirala al 100 % (esta recomposicion en el caso del halo es inferida del
   metodo, no medida todavia en una pieza de logo).
@@ -242,9 +186,17 @@ Compara el resultado con la base **midiendo por zona**, no en promedio global:
 | `--background "…" no es válido…` / `--format "…" no es válido…` | Valor fuera de `auto|opaque|transparent` o de `png|jpeg|webp`. |
 | `$ costo estimado ≈ USD X (…)` | Estimación previa del output; la entrada suma aparte. No se cobró nada todavía. |
 | `⚠ --count N: son N pedidos separados…` | Vas a pagar N pedidos. |
+| `✓ PASS` / `✗ FAIL` (codigo 2) en `ai:inpaint image` | La zona protegida quedo identica / cambio. Con FAIL no uses el candidato. |
+| `⚠ … volvio negra y plana` (`suspectFlatPanel`) | El modelo devolvio un panel en vez de la edicion (la trampa de Sunburst con mascara). Descarta el candidato. |
+| `⚠ la zona editable casi no cambio` | El modelo probablemente ignoro el pedido. Reescribe el prompt o agranda la mascara. |
+| `⚠ el modelo movio la zona protegida en promedio …` | Puede haber corrido el encuadre: la costura se notara. Mira la union al 100 %. |
+| `↺ misma entrada ya generada` | Cache: no se paga de nuevo. `--force` para regenerar. |
+| `El prompt nombra "logo"…` | Guarda de marca: compone el SVG oficial despues; `--allow-brand` si la edicion solo toca el contexto. |
 
 ## Que no hacer
 
+- **No uses Sunburst con mascara** (`--provider-mask on`): devolvio la zona como un panel negro plano en 3 de 3
+  pasadas. Deja `--provider-mask auto` o usa Flare.
 - **No uses la mascara para mover material que ya esta en la foto** (subir un lecho, correr un objeto). Medido el
   2026-09-23 con GPT Image 2.5 Sunburst sobre la franja de primer plano oscuro y desenfocado de una story: los dos
   candidatos llenaron **toda** la zona transparente con un panel plano de borde superior recto, justo en el limite de
@@ -290,9 +242,8 @@ Lo que sigue abierto:
 
 ## Problemas comunes
 
-- **El modelo cambio cosas fuera de la zona.** Es lo esperado: 2.5 redibuja la imagen entera. Recompon la zona
-  protegida con el paso 5. Si el cambio fuera de la zona es enorme (encuadre o props distintos), revisa ademas que la
-  mascara sea realmente opaca fuera de la zona.
+- **El modelo cambio cosas fuera de la zona.** Es lo esperado: 2.5 redibuja la imagen entera. `pnpm ai:inpaint image`
+  ya lo recompone. Si `pnpm ai:image --mask` es el que usaste, ese comando no recompone: pasa a `ai:inpaint`.
 - **No se ve ningun cambio.** Confirma que el `usage` muestre `img` distinto de cero; si es cero, el comando
   corrio como generacion y la mascara no viajo.
 - **La zona quedo bien pero el estilo no calza.** Sube la calidad un escalon; el costo del output sube pero
@@ -303,5 +254,7 @@ Lo que sigue abierto:
 - Guía canónica de selección de modelos: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`
 - Contrato del proveedor: `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`
 - Cliente canonico: `src/lib/ai/openai-image.ts` (`editOpenAIImage`)
-- CLI: `scripts/ai/generate-image.ts`
+- Pipeline: `scripts/ai/inpaint/` (`mask.ts`, `recompose.ts`, `crop.ts`, `pipeline-image.ts`, `adapters/`)
+- CLI legado sin recomposicion: `scripts/ai/generate-image.ts`
+- Canario del pipeline: `ai-generations/2026-10-02_task-1965-canary/README.md`
 - Medicion de costo con evidencia: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`

@@ -681,6 +681,9 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | GPT Image 2 Edit | `openai/gpt-image-2/edit` ✅ | edición image-to-image |
 | FLUX.2 [pro] Edit | `fal-ai/flux-2-pro/edit` ✅ | |
 | FLUX.1 Kontext [pro] | `fal-ai/flux-pro/kontext` ✅ | edición contextual / reference |
+| FLUX.1 [pro] Fill | `fal-ai/flux-pro/v1/fill` ✅ | **inpainting con máscara** (`mask_url`, blanco = editable, mismas dimensiones que la imagen; sale al tamaño de la entrada); USD 0,05/MP (API de precios, 2026-10-02). Se opera con `pnpm ai:inpaint image --adapter fal:flux-pro-fill` (TASK-1965), que recompone y verifica la zona protegida; `pnpm ai:fal` lo deriva a ese comando. Canario 2026-10-02: objeto puesto, delta 0 |
+| Wan VACE 14B Inpainting | `fal-ai/wan-vace-14b/inpainting` 🔎 | video con máscara (`mask_video_url`); esquema leído 2026-10-02, sin conectar (follow-up de TASK-1965) |
+| SAM 2 Video | `fal-ai/sam2/video` 🔎 | segmentación con seguimiento por prompt o caja; esquema leído 2026-10-02, sin conectar (follow-up de TASK-1965) |
 | Seedream 4.5 Edit | `fal-ai/bytedance/seedream/v4.5/edit` ✅ | **CON** prefijo (corregido 2026-09-16) |
 | Seedream 5.0 Lite Edit | `bytedance/seedream/v5/lite/edit` ✅ | |
 | Seedream 5.0 Pro Edit | `bytedance/seedream/v5/pro/edit` ✅ | edición de alta fidelidad para desarrollo de look; hasta 10 referencias |

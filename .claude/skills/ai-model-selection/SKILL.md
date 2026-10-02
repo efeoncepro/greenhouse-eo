@@ -114,7 +114,7 @@ stateful `previous_interaction_id`, 720p/1080p/4K, 9:16, fidelidad temporal, C2P
 siguen sin verificar. Para operar, lee el manual antes del POST y usa el interaction ID con
 `--status`/`--wait` si necesitas retomar: no hagas un segundo envío por timeout.
 
-### Tres trampas que ya costaron dinero
+### Cuatro trampas que ya costaron dinero
 
 - 🔴 **El precio del registro es el escalón MÁS BARATO, no el de tu resolución.** Sin `--resolution`
   el CLI envía el escalón más barato y lo avisa. Presupuesta por la que vas a pedir.
@@ -122,6 +122,10 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
   reales). Si hay marca en cuadro, o eliges el motor sin filtro, o sondas barato primero.
 - 🔴 **«Verificado» no es «verificado a tu resolución».** Una familia puede estar verificada a 480p y
   su 1080p ser reescalado o no estar probado. La ficha lo dice; el titular no.
+- 🔴 **El mejor modelo para generar puede ser el peor para editar con máscara.** GPT Image 2.5 Sunburst
+  —el de las piezas más impactantes— devuelve la zona enmascarada como **panel negro plano** (3 de 3
+  pasadas, 2026-09-23 y 2026-10-02); Flare y Flux Pro Fill sí la editan. Para editar una zona usa
+  `pnpm ai:inpaint image` (TASK-1965), que elige el modo por modelo y recompone con verificación.
 
 ## 3. Quién decide qué (boundaries)
 

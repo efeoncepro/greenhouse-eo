@@ -124,12 +124,14 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
 1. **¿Necesitas vector real (SVG)?** → Recraft V4.1 vía Higgsfield (CLI con sesión desde 2026-09-24, SVG real aún sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator` (`ai_get_skill illustrator-vector-art`; estado en `higgsfield-provider`). GPT Image y Seedream son **raster siempre**.
 2. **¿La pieza lleva copy, logo, CTA, precio o legal finales?** → el modelo entrega **sólo el clean plate**;
    texto y marca se componen de forma determinística. Esto no cambia con ningún modelo.
-3. **¿Edición donde la precisión manda, zona protegida con máscara o entregable final?** →
-   `gpt-image-2.5-sunburst` en `xhigh`/`max`, con `--mask` si hay zona protegida. Sunburst es #1 en edición en
-   Arena y Artificial Analysis [tercero, 2026-09-07/16]; la máscara alfa tuvo menos deriva protegida que la
-   edición semántica de Seedream (MAE 0,0308 vs 0,0458, medido con GPT Image 2) [verificado 2026-07-18].
-   **Menos deriva no es cero:** la máscara orienta, no preserva (ver el bloque de `--mask` abajo); la zona protegida
-   se recompone desde la base.
+3. **¿Edición donde la precisión manda o entregable final?** → `gpt-image-2.5-sunburst` en `xhigh`/`max`, #1 en
+   edición en Arena y Artificial Analysis [tercero, 2026-09-07/16]. **¿Editar SÓLO una zona y dejar el resto
+   idéntico?** → **`pnpm ai:inpaint image`** (TASK-1965), nunca `ai:image --mask` a mano: arma la máscara con
+   `pnpm ai:mask`, recorta, genera, recompone y verifica el ARCHIVO en delta máximo 0 (código 2 si no). 🔴 **Sunburst
+   CON máscara devuelve la zona como PANEL NEGRO PLANO** [verificado 3 de 3: 2026-09-23 y dos el 2026-10-02]: el
+   pipeline usa Flare con máscara por defecto y, si eliges Sunburst, lo hace editar **sin máscara** (`--provider-mask
+   auto`), corrige el desplazamiento de color en un anillo (Sunburst aclara todo: −16 niveles medidos en MC1h) y
+   recompone — el mismo método de `pnpm foto:isotipo --acabado`. Alternativa con máscara: `fal:flux-pro-fill`.
 4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
    `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
    46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.
@@ -504,10 +506,11 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 🔴 **La máscara NO preserva píxeles — medido 2026-09-17** (`ai-generations/2026-09-17_claude-o-codex/`): GPT Image 2.5
 redibuja la imagen entera aunque se pase `--mask`. En una pasada que sólo debía tocar una esquina, la zona protegida
 tuvo delta máximo **221/255** (los ojos del sujeto, **147/255**) con una media de sólo **4,85**: la media no sirve de
-criterio. Si fuera de la máscara hay algo que no se puede tocar (cara, logo aprobado, texto compuesto), el recorte
-fino lo hace el agente: salida del modelo con el **alfa invertido de la misma máscara** sobre la base original, y
-verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales al comparar:
-[editar una zona de una imagen, paso 5](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu).
+criterio. Desde el 2026-10-02 la recomposición y la verificación las hace **`pnpm ai:inpaint image`** (TASK-1965):
+no escribas el pegado a mano. Además marca `suspectFlatPanel` (salida cruda negra: la trampa de Sunburst con
+máscara), avisa si la zona abierta casi no cambió (un `PASS` sin el objeto pedido es posible) y si el modelo corrió
+el encuadre. Para video: `pnpm ai:inpaint video` (aborta si el motor movió la cámara). Manual:
+[editar una zona de una imagen](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md).
 
 - El cliente acepta hasta **16** `--image` por request (`MAX_OPENAI_IMAGE_INPUTS = 16`, < 50 MB c/u) y conserva su orden. Cada referencia debe declarar en el
   prompt su rol: estructura, paleta, identidad, activo oficial o anti-referencia.
