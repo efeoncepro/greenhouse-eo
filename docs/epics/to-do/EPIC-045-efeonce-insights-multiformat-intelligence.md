@@ -100,6 +100,8 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U07 | [TASK-1888](../../tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) | contrato editorial v2: 15 familias de gráfico, lectura por figura, `channelId` y portada por cliente/encargo sellada — **complete 2026-09-26: en producción 2026-09-26: releases `0e87c7a443a2` + `f9257b9c94af`; `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y `ops-worker`; gateway efeonce-mcp v1.9.0; canary sintético de producción con plan v2 sellado y ediciones internas v2 de Berel y Sky en staging** | none |
 | U08 | [TASK-1889](../../tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25), verificación con Berel y Sky y release — **complete 2026-09-26, en producción** (releases `0e87c7a443a2` + `f9257b9c94af`; `insights-report` A4 e `insights-deck` 16:9 sólo con el diseño v2; fidelidad 20 de 21 páginas ≤1 % + Deck-Agrupadas aprobada; PDFs reales aprobados por el operador; primeras ediciones internas de Berel y Sky renderizadas en producción) | none |
 | U09 | [TASK-1903](../../tasks/to-do/TASK-1903-efeonce-insights-editorial-agent.md) | agente redactor de informes de clientes, operable por MCP en dos modos (operar el redactor; autor externo que envía la propuesta): propone interpretación, próximos pasos, decisión y plan de acción sobre evidencia sellada; aceptación humana por campo; modelo por comparación medida — pedido del operador 2026-09-25 | TASK-1888, TASK-1889 |
+| U10 | [TASK-1957](../../tasks/to-do/TASK-1957-efeonce-insights-client-fit-presentation-contract.md) | contrato de presentación apto para cliente: vocabulario único, modelo web 1.2 sin identificadores internos, selección de hallazgos, límites de cliente, elegibilidad de gráficos y gate — pedido del operador 2026-10-02 | none |
+| U11 | [TASK-1958](../../tasks/to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md) | jerarquía visual apta para cliente en Think y PDF (hallazgos, respaldo, alcance) | TASK-1957 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 
@@ -152,6 +154,8 @@ operador; se abren como task cuando la decisión exista):
   mínimo del lockup; subir `@efeoncepro/axis-brand-assets` en Greenhouse de 0.3.5 a 0.4.0 cuando algún render lo use.
 - **Tokens y geometría compartidos:** los roles de color de datos y la geometría de las 15 familias están copiados a
   mano entre Greenhouse (PDF) y Think (web); candidatos a extraer a AXIS (arquitectura §6.4).
+
+**Delta 2026-10-02 — release `6ea157e6e641` y estándar apto para cliente.** Producción sirve el modelo web 1.1 (canary verde) y `INSIGHTS_DELIVERY_ENABLED`/`INSIGHTS_SCHEDULES_ENABLED` quedaron ON en Vercel Production con los EmailTypes de Insights encendidos. La revisión del operador de las ediciones internas reales de Berel (`EO-INS-000027`) y Sky (`EO-INS-000029`) renderizadas en local encontró identificadores internos visibles, recital de cifras, límites con lenguaje interno, gráficos sin información y falta de jerarquía. Se abren `TASK-1957` (contrato, backend-data) y `TASK-1958` (UI, bloqueada por 1957). **Ninguna edición de cliente se emite antes de cerrar ambas.**
 
 ## Existing Related Work
 
