@@ -218,5 +218,5 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
 | Isabella | **Elegida: candidata D de la ronda 2** (`ronda-2/isabella-d.png`) **[decisión del operador, 2026-10-02]**. Siguen la marca de carácter y su set de vistas |
 | Karo | **Elegida: candidata A de la ronda 2** (`ronda-2/karo-a.png`) **[decisión del operador, 2026-10-02]**; reemplaza a la favorita previa (B de la ronda 1). Base de Sophia |
 | Antonio | **Elegido: candidato D de la ronda 2** (`ronda-2/antonio-d.png`) **[decisión del operador, 2026-10-02]**. Sigue su set de vistas |
-| Sophia | Cuatro candidatas por edición desde Karo A: `ai-generations/2026-10-02_elenco-efeonce/sophia/` |
+| Sophia | **Elegida: candidata C con pelo castaño oscuro** (`sophia/sophia-c-castano.png`, editada desde Karo A) **[decisión del operador, 2026-10-02]**. Sigue su set de vistas |
 | Catálogo `ELENCO` | Propuesto (§7.5) |
