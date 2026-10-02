@@ -19,6 +19,10 @@
   Deploy del gateway lanzado por el operador (run `37062592574`, success): revisión `efeonce-mcp-gateway-00064-q6w`
   al 100 %, construida desde `1ddc7db`; `/health` ok (el gateway no arranca si el hash del manifiesto no coincide).
 - Siguen pendientes: release de Greenhouse a producción, Entregable C.
+- Seguimiento: el manual servido por MCP (`docs/mcp/skills/marketing-studio/SKILL.md`) aún no menciona
+  `studio.campaign.brief.get` ni `studio.asset.download`; sumarlas al cuerpo y al `appliesTo` de
+  `src/mcp/greenhouse/skill-manifest.ts` exige `pnpm mcp:skills:generate` + `pnpm mcp:skills:check` y un release de
+  Greenhouse (el gateway sirve el manual en vivo desde la lane). Va con el próximo release de Greenhouse.
 
 ## Delta 2026-10-02 (noche) — Entregable B y cierre de A en Greenhouse
 

@@ -66,6 +66,15 @@ assets**, en OneDrive.
 **Regla:** si tiene **lifecycle** y alguien lo ejecuta y lo cierra → **repo**. Si es criterio, narrativa o
 entregable → **OneDrive**. 🔴 **Nada se escribe en los dos lados: se referencia.**
 
+> **Delta 2026-10-02 — Marketing Studio puede gobernar una campaña (TASK-1894, Entregable B).** Studio
+> (`studio.efeonce.org`) ya puede gobernar los datos de una campaña por commands: brief, conceptos, piezas, copy,
+> anuncios, plan de medios, posts planificados y estados. Cada campaña declara un solo dueño (`source_of_truth`:
+> `onedrive` | `studio`). **CMP-001…005 siguen gobernadas por su catálogo en OneDrive** hasta su corte explícito con
+> fecha (TASK-1894, Entregable C, diferido por el operador; primero CMP-004); mientras tanto Studio rechaza escribir
+> en ellas (`409 campaign_not_studio_owned`) y sólo las reimporta. Una campaña creada en Studio nace gobernada por
+> Studio y el importador ya no la toca. La regla de arriba se mantiene: **nunca hay copia de los datos en dos
+> lugares**; cada campaña tiene un solo lugar donde se edita.
+
 ### CDR · el ADR de las campañas
 
 | | Cuándo | Dónde |

@@ -476,3 +476,22 @@ clase nueva: la lectura del run va con el scope base (`insights.report.read`) y 
   (`--render-run <id>`), nunca creando trabajo desde el canary.
 
 Canon: `GREENHOUSE_MCP_ARCHITECTURE_V1.md` §27.
+
+### Provider hermano con escrituras en su manifiesto — TASK-1894 (Delta 2026-10-02, gateway `1.10.0`)
+
+Un provider hermano puede declarar escrituras en su manifiesto; el gateway sólo federa las que tienen clase de
+scope y confirmación (`TASK-1899`). Caso fuente: el manifiesto de Marketing Studio `1.4.0` trae 44 tools, 30 de
+ellas escrituras. Antes de este cambio el gateway federaba TODAS las tools del manifiesto y su provider llama
+siempre con GET, así que sincronizar ese manifiesto habría federado tools rotas. Desde la PR `efeonce-mcp#23`
+(`1ddc7db`, gateway `1.10.0`, superficie 72 → 74 con `studio.asset.download` y `studio.campaign.brief.get`),
+`MARKETING_STUDIO_FEDERATED_TOOLS` contiene sólo lecturas y es la lista que usan el provider, `tool-policy`,
+`src/surface.ts` y la paridad; `call()` rechaza escrituras y métodos no-GET, y la paridad marca
+`write_tool_without_scope_class` sólo si una escritura llega a registrarse.
+
+- **NUNCA** sincronices el manifiesto de un provider hermano que declare escrituras sin un filtro explícito de
+  federación: la existencia en el manifiesto no es autorización para cruzar (misma regla que §0 para Greenhouse).
+- **NUNCA** federes una escritura de un provider hermano sin clase de scope y sin confirmación humana por API; hasta
+  `TASK-1899`, las escrituras de Studio viajan en el manifiesto y quedan fuera de la federación.
+
+Canon: `AGENTS.md` del gateway (§Marketing Studio — escrituras en el manifiesto, fuera de la federación) · skill
+`efeonce-mcp-platform`.

@@ -1,5 +1,22 @@
 # Cuando existan las tools de escritura
 
+> **Delta 2026-10-02 (TASK-1894 Entregables A y B en producción).** Studio API `1.4.0` ya tiene los commands de
+> esta tabla marcados como de TASK-1894 (manifiesto de 44 tools; las de estrategia siguen por definir). Lo que cambia
+> para esta skill:
+> - **Por MCP siguen sin existir:** el gateway (v1.10.0) lleva las escrituras en el manifiesto pero **no las federa**
+>   hasta TASK-1899. En sesión MCP el modo sigue siendo documento.
+> - **Autoridad por campaña:** CMP-001…005 están gobernadas por su catálogo de OneDrive (`sourceOfTruth onedrive`)
+>   hasta su corte explícito (TASK-1894 Entregable C, diferido): toda escritura del catálogo responde
+>   `409 campaign_not_studio_owned`. Para ellas el plan se guarda en OneDrive; nunca se copia a Studio. Leer
+>   `permissions` (`writable`, `lockReason`, `sourceOfTruth`, `canApprove`) de `studio.campaign.get` antes de proponer
+>   una escritura. Una campaña creada con `createCampaign` nace gobernada por Studio.
+> - **`T2` hoy:** sólo una persona por la CLI del equipo (`pnpm studio:write <operationId> … --apply --confirm`); por API
+>   responde `403 confirmation_required` (no el `428` descrito abajo, que es el diseño de TASK-1899) y un `api_client`
+>   que aprueba recibe `approval_requires_person`. `approveCreative`/`authorizeMedia` son commands dedicados.
+> - **`T1` hoy:** sólo con un `api_client` con scope `studio:write` o la CLI; en producción ningún `api_client` lo tiene.
+>   La identidad delegada de la persona llega con TASK-1898/1899.
+> - Lectura nueva: `studio.campaign.brief.get` (`GET /api/v1/campaigns/{id}/brief`).
+
 Estado al 2026-09-26: **Studio no tiene escrituras** (API `1.2.0`, 13 tools de lectura). Los commands de abajo
 salen de la tabla «Operaciones y tools» de `TASK-1894` (to-do) y de `TASK-1899` (to-do, federación MCP con
 identidad delegada y `proposalDigest`); los de la capa de estrategia salen del ADR
