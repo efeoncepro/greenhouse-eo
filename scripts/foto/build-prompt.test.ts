@@ -35,6 +35,7 @@ import {
   ROLES_DE_REFERENCIA,
   validarCaso,
   validarRobots,
+  validarTrajeNexa,
   robotsSinNegar,
   validarVestuarioDeLinea
 } from './build-prompt.mjs'
@@ -667,7 +668,8 @@ conAssets('foto:prompt · el catálogo de kits apunta a archivos reales', () => 
   )
 
   it.each(pares)('%s declara una vista por defecto que existe', (_clave, o) => {
-    expect(Object.keys(o.vistas)).toContain(o.vistaDefecto)
+    // El resolver acepta la vista por sufijo (`vistas`) o por nombre completo (`vistasPorNombre`).
+    expect([...Object.keys(o.vistas), ...Object.keys(o.vistasPorNombre ?? {})]).toContain(o.vistaDefecto)
   })
 })
 
@@ -1635,10 +1637,49 @@ describe('foto:prompt · robots: sólo Sparks del kit (TASK-1941)', () => {
 
   it('las fichas del kit de los Sparks compilan', () => {
     const dir = 'ai-generations/2026-10-01_sparks/fichas'
+
     if (!existsSync(dir)) return
+
     for (const f of readdirSync(dir).filter(x => x.endsWith('.json'))) {
       const ficha = JSON.parse(readFileSync(path.join(dir, f), 'utf8'))
+
       expect(validarRobots(ficha)).toBe(true)
     }
+  })
+})
+
+describe('foto:prompt · traje biónico: sólo Nexa, sólo cine (TASK-1940)', () => {
+  const base = { id: 'T', formato: '16:9', escena: 'x', objetos: [{ objeto: 'traje-bionico-nexa' }] }
+
+  it('la escena que dice «wears the bionic suit» declara vestuario', () => {
+    expect(auditarVestuario('She wears the bionic suit', ['nexa'])).toBeNull()
+  })
+
+  it('no actúa si la ficha no pide el traje ni los lentes', () => {
+    expect(validarTrajeNexa({ id: 'T', identidad: ['julio'], objetos: [{ objeto: 'polo-efeonce' }] })).toBe(false)
+  })
+
+  it('acepta a Nexa en registro cine', () => {
+    expect(validarTrajeNexa({ ...base, identidad: [{ persona: 'nexa' }], registro: 'cine' })).toBe(true)
+    expect(validarTrajeNexa({ ...base, identidad: ['nexa'], registro: 'cine', objetos: ['lentes-bionicos-nexa'] })).toBe(true)
+  })
+
+  it('aborta en otra persona o con otra persona en cuadro', () => {
+    expect(() => validarTrajeNexa({ ...base, identidad: ['julio'], registro: 'cine' })).toThrow(/sólo de Nexa/)
+    expect(() => validarTrajeNexa({ ...base, identidad: ['nexa', 'julio'], registro: 'cine' })).toThrow(/julio/)
+    expect(() => validarTrajeNexa({ ...base, registro: 'cine' })).toThrow(/sin Nexa/)
+  })
+
+  it('aborta fuera del registro cine', () => {
+    expect(() => validarTrajeNexa({ ...base, identidad: ['nexa'] })).toThrow(/registro cine/)
+    expect(() => validarTrajeNexa({ ...base, identidad: ['nexa'], registro: 'puesta-en-escena' })).toThrow(/registro cine/)
+  })
+
+  it('la pieza puesta pide la pechera lisa: la marca se compone después', () => {
+    const traje = OBJETOS['traje-bionico-nexa']
+
+    expect(traje.tipoEmblema).toBe('sin-marca')
+    expect(traje.instruccionEnUso).toMatch(/NO emblem/)
+    expect(traje.assetDeUso).toMatch(/sin-marca/)
   })
 })

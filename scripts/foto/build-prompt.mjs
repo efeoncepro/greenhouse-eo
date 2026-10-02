@@ -1015,6 +1015,57 @@ export const OBJETOS = {
     },
     macroEmblema: 'efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
+  },
+  // Traje biónico de Nexa (TASK-1940, aprobado por el operador el 2026-10-01). Es FICCIÓN: sólo Nexa y sólo en
+  // registro cine (`validarTrajeNexa`). Su isotipo es INCRUSTADO y se COMPONE siempre después con
+  // `pnpm foto:isotipo --prenda clara --acabado`: por eso la referencia de escena es la pieza puesta SIN marca y la
+  // instrucción pide la pechera lisa. Las vistas del kit (`final/`) sí llevan el isotipo compuesto, como documentación.
+  'traje-bionico-nexa': {
+    etiqueta: "Nexa's bionic suit (navy knit bodysuit with matte white armored plates and azure light seams)",
+    tipo: 'prenda',
+    instruccion:
+      'THIS SUIT IS ALREADY DESIGNED: copy it EXACTLY — deep navy one-piece knit bodysuit, matte white armored plates on the ' +
+      'shoulders, chest, upper arms and forearms, one white back plate, thin glowing azure (#0375DB) LED seams along the plate ' +
+      'edges, the torso sides and the outer legs, dark navy waist band, no plates on the legs. The chest plate is PLAIN smooth ' +
+      'matte white: NO emblem, NO logo, NO symbol, NO rocket, NO lettering anywhere on the suit (the mark is added later).',
+    instruccionEnUso:
+      'shows this suit ALREADY WORN. Copy the SUIT exactly as it appears there — the navy knit, every white plate in the same ' +
+      'place and shape, the azure LED seams, the waist band, the way it sits on a body. The chest plate stays PLAIN smooth ' +
+      'matte white: NO emblem, NO logo, NO symbol, NO rocket, NO lettering (the mark is composed afterwards). The PERSON in ' +
+      'that image only shows how the suit sits: copy her face and hair only from the identity references. Ignore the background.',
+    base: 'ai-generations/2026-10-01_traje-bionico-nexa/final/',
+    vistas: {},
+    vistasPorNombre: {
+      frente: 'efeonce-traje-bionico-nexa-01-frente-1024x1536-v01-fondo-estudio.png',
+      espalda: 'efeonce-traje-bionico-nexa-02-espalda-1024x1536-v01-fondo-estudio.png',
+      'tres-cuartos-izq': 'efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1024x1536-v01-fondo-estudio.png'
+    },
+    vistaDefecto: 'frente',
+    assetDeUso: 'efeonce-traje-bionico-nexa-13-puesto-frente-sin-marca-1024x1536-v01-fondo-estudio.png',
+    usoPorVista: {
+      espalda: 'efeonce-traje-bionico-nexa-14-puesto-espalda-1024x1536-v01-fondo-estudio.png'
+    },
+    tipoEmblema: 'sin-marca',
+    nota:
+      'la pechera sale lisa a propósito: compón el isotipo con `pnpm foto:isotipo <plate> --centro x,y --ancho w --prenda clara ' +
+      '--acabado` sobre el pecho, en el lado izquierdo de quien lo lleva (≈ un cuarto del ancho de la pechera; ver el macro ' +
+      '`10-detalle-placa-isotipo` del kit) y míralo al 100 % con `pnpm foto:emblema`.'
+  },
+  // Lentes biónicos de Nexa (TASK-1940, 2026-10-01): parte del traje, misma regla de uso.
+  'lentes-bionicos-nexa': {
+    etiqueta: "Nexa's bionic glasses",
+    instruccion:
+      'Copy these glasses EXACTLY and put them ON HER FACE: one frameless wraparound shield lens in CLEAR transparent ' +
+      'polycarbonate, very lightly tinted azure, with a thin glowing azure (#0375DB) LED line along its TOP edge, clear nose ' +
+      'pads and slim clear temple arms. Her eyes stay clearly visible through the lens: no mirror coating, no reflection ' +
+      'covering her eyes. No logo, no lettering.',
+    base: 'ai-generations/2026-10-01_traje-bionico-nexa/final/',
+    vistas: {},
+    vistasPorNombre: {
+      frente: 'efeonce-lentes-bionicos-nexa-20-frente-1024x1024-v01-fondo-estudio.png',
+      'tres-cuartos': 'efeonce-lentes-bionicos-nexa-21-tres-cuartos-1024x1024-v01-fondo-estudio.png'
+    },
+    vistaDefecto: 'tres-cuartos'
   }
 }
 
@@ -1083,7 +1134,7 @@ export const CLAVES_DE_REFERENCIA = {
 // el detector de drift de forma falla pidiendo clasificarla — ésa es la red que faltaba.
 export const CLAVES_SIN_ARCHIVO = {
   persona: ['etiqueta', 'identity', 'accesorios', 'vistasDeCuerpo', 'vestuarioDeCuerpo'],
-  objeto: ['etiqueta', 'aviso', 'instruccion', 'nota', 'base', 'vistas', 'vistaDefecto', 'tipo', 'tipoEmblema', 'tipoPorVista', 'colorDefecto']
+  objeto: ['etiqueta', 'aviso', 'instruccion', 'instruccionEnUso', 'nota', 'base', 'vistas', 'vistaDefecto', 'tipo', 'tipoEmblema', 'tipoPorVista', 'colorDefecto']
 }
 
 /**
@@ -1263,7 +1314,11 @@ function resolverObjetos(ficha, desde) {
 
     // Con la prenda PUESTA, la referencia trae una persona que NO es la de la escena: hay que decirlo,
     // o el modelo mezcla identidades. Con la prenda aislada esto no hacía falta.
-    const instruccion = enUso
+    // Una pieza puesta SIN marca (el traje de Nexa: la marca se compone después) declara su propia
+    // instrucción; la genérica afirma que la marca ya está aplicada y le pediría al modelo copiarla.
+    const instruccion = enUso && objeto.instruccionEnUso
+      ? `Image ${n} ${objeto.instruccionEnUso}`
+      : enUso
       ? `Image ${n} shows this garment ALREADY WORN, with its Efeonce mark already applied. Copy the GARMENT ` +
         'exactly as it appears there — same colour, same cut, same mark at the same size and position, and the ' +
         'way it sits and creases on a body. The PERSON in that image is NOT the person in this scene and their ' +
@@ -2169,7 +2224,7 @@ return avisos
 // es vestir de navy» — y de paso empuja la escena al arquetipo consultora. Con identidad, el
 // vestuario se declara en la escena o lo decide la referencia por nosotros.
 const VESTUARIO =
-  /\b(wear|wearing|dressed|shirt|t-?shirt|sweater|jumper|hoodie|polo|blouse|apron|overall|coverall|jacket|vest|linen|denim|cotton|knit|sleeves?)\b/i
+  /\b(wears?|wearing|dressed|suit|bodysuit|shirt|t-?shirt|sweater|jumper|hoodie|polo|blouse|apron|overall|coverall|jacket|vest|linen|denim|cotton|knit|sleeves?)\b/i
 
 export const auditarVestuario = (escena, identidad) =>
   identidad?.length && !VESTUARIO.test(escena)
@@ -2265,6 +2320,41 @@ export const validarRobots = ficha => {
   return spark
 }
 
+// El traje biónico y sus lentes son ficción de Nexa (TASK-1940): sólo Nexa los lleva y sólo en el registro cine.
+// El registro cine no tenía campo propio en la ficha; para el traje se declara explícito, porque en un retrato de
+// oficina o en una persona del equipo el traje dice lo contrario de lo que la foto cuenta.
+export const PIEZAS_SOLO_NEXA_CINE = ['traje-bionico-nexa', 'lentes-bionicos-nexa']
+
+export const validarTrajeNexa = ficha => {
+  const id = ficha.id ?? 'esta ficha'
+
+  const pedidas = (ficha.objetos ?? [])
+    .map(o => String(typeof o === 'string' ? o : o?.objeto ?? ''))
+    .filter(o => PIEZAS_SOLO_NEXA_CINE.includes(o))
+
+  if (!pedidas.length) return false
+
+  const personas = (ficha.identidad ?? []).map(p => (typeof p === 'string' ? p : p?.persona))
+  const otras = personas.filter(p => p !== 'nexa')
+
+  if (!personas.includes('nexa') || otras.length) {
+    throw new Error(
+      `"${id}" pide ${pedidas.join(' y ')} ${otras.length ? `con ${otras.join(', ')} en cuadro` : 'sin Nexa en `identidad`'}. ` +
+        'El traje biónico y sus lentes son sólo de Nexa: nunca en una persona del equipo ni en una pieza sin ella.'
+    )
+  }
+
+  if (ficha.registro !== 'cine') {
+    throw new Error(
+      `"${id}" pide ${pedidas.join(' y ')} fuera del registro cine (declaraste \`registro: ${JSON.stringify(ficha.registro ?? null)}\`). ` +
+        'El traje es ficción y sólo vive en cine: declara `"registro": "cine"` en la ficha, o viste a Nexa con el uniforme ' +
+        'de su registro de escena.'
+    )
+  }
+
+  return true
+}
+
 export const construirPrompt = ficha => {
   const fmt = FORMATOS[ficha.formato]
 
@@ -2274,6 +2364,7 @@ export const construirPrompt = ficha => {
   const caso = validarCaso(ficha)
 
   validarRobots(ficha)
+  validarTrajeNexa(ficha)
 
   // El canon contempla tomas SIN lecho —dron y todo-enfocadas— y el comando no lo sabía: abortaba
   // una toma legítima (caso: cenital perpendicular, 2026-09-20). Se declara `lecho: "sin-lecho"` con

@@ -1,6 +1,6 @@
 {
   "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
-  "sellado": "2026-10-01",
+  "sellado": "2026-10-02",
   "assets": {
     "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
       "rol": "persona:julio",
@@ -1425,6 +1425,34 @@
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png": {
       "rol": "macro:hoodie-efeonce",
       "sha256": "05adae8b6b020bd3d4395c6f640d39cd3607336e10ca5d5c8db5c0f0363535f6"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-01-frente-1024x1536-v01-fondo-estudio.png": {
+      "rol": "kit:traje-bionico-nexa/frente",
+      "sha256": "ec182dfae3a7b39e1ba5ba3c2683d963406c34b0eaac3c6fb1feadd28e1aa803"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-02-espalda-1024x1536-v01-fondo-estudio.png": {
+      "rol": "kit:traje-bionico-nexa/espalda",
+      "sha256": "0030d31b14d101b940f5f2348643162302c73638c701df95cbbd4bb0b60b2109"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1024x1536-v01-fondo-estudio.png": {
+      "rol": "kit:traje-bionico-nexa/tres-cuartos-izq",
+      "sha256": "d2167d5f69442dd52a0d27a9fed6b17ee51beb2add0d15318beb8e7a73763e6b"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-sin-marca-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:traje-bionico-nexa/defecto",
+      "sha256": "31b7407a0ea129ba3e66cb08d8a252b58629a6de20ba2c20c7659a02c82f90d7"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-14-puesto-espalda-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:traje-bionico-nexa/usoPorVista:espalda",
+      "sha256": "3cea5bb210581c5041bb4c37aef30ce3dc823dfa566e73a6bb060995d92f1bf6"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-20-frente-1024x1024-v01-fondo-estudio.png": {
+      "rol": "kit:lentes-bionicos-nexa/frente",
+      "sha256": "2bb2baf5c04b46435ba420718ad6e20c6e9ac31c9305f0a156df0e7600dadbdd"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-21-tres-cuartos-1024x1024-v01-fondo-estudio.png": {
+      "rol": "kit:lentes-bionicos-nexa/tres-cuartos",
+      "sha256": "34b4fa46feb53db7fbd3ed770cb593871ca61c79396f7f586a0ac66b79acb9f9"
     }
   }
 }

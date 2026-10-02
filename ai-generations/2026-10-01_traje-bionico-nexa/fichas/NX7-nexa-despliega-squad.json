@@ -1,0 +1,30 @@
+{
+  "id": "NX7-nexa-despliega-squad",
+  "formato": "16:9",
+  "registro": "cine",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "suspendido": "the five streams of azure light frozen mid-air as they fan out from her palm, with fine glowing particles hanging still along each stream",
+  "objetos": [
+    { "objeto": "traje-bionico-nexa" },
+    { "objeto": "lentes-bionicos-nexa" },
+    { "objeto": "spark-reportes", "vista": "cine" },
+    { "objeto": "spark-contenido", "vista": "cine" },
+    { "objeto": "spark-investigacion", "vista": "cine" },
+    { "objeto": "spark-crm-datos", "vista": "cine" },
+    { "objeto": "spark-servicio", "vista": "cine" }
+  ],
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, the moment a leader deploys her squad inside a vast dark hangar-like studio at night): Nexa stands on the RIGHT half of the frame, framed from the waist up, a heroic medium shot. She raises her LEFT hand (on the right side of the frame) open, palm up, at shoulder height and slightly forward, and from her palm rises ONE stream of pure azure light that splits into FIVE thinner streams fanning upward and outward like the fingers of a hand, each stream ending exactly at one of the five Sparks. This is the work she hands out: the streams are the brightest element of the frame and the main light source, lighting her face and the white plates of her suit from below and the side with azure light. REALISTIC ADULT PROPORTIONS: the camera is about two meters away at chest height with an 85mm lens, so nothing is foreshortened and she does not lean toward the lens; her head is in natural proportion to her athletic body, about one quarter of the frame height, her shoulders clearly wider than two head-widths. Her head stays almost frontal, both eyes and both eyebrows visible, and she looks straight into the lens through her clear glasses with a fearless, confident half-smile, razor-thin focus on her eyes. She wears the bionic suit exactly as in its reference with its chest plate PLAIN smooth white (NO emblem, NO logo, NO rocket, NO lettering), the bionic glasses exactly as in their reference, small silver earrings, NO watch, NO bracelet, NO ring. THE FIVE SPARKS, each copied EXACTLY from its own reference, each smaller than her head and all of them above her waist, their orbit rings never crossing each other: the Reports Spark hovers just above her raised palm, sharp, the first stream lighting its bar-chart model from below as it points at the tallest bar; the Content Spark hovers at the height of her head on the right side of the frame, sharp, holding its card up into its stream; the Research Spark hovers just beside her right shoulder, a little lower than her chin, sharp, examining its stream through its magnifying glass held to its side; the CRM and Data Spark and the Service Spark hover further back behind her on the right, softly out of focus, each catching the end of its stream (one placing a tile on its stack, one holding its speech-bubble object). No Spark and no stream appears to the left of her right elbow. The Sparks' own azure eyes, windows and seams add small points of light; a cool rim light from behind outlines her hair, shoulders and the Sparks; thin haze catches the streams so each one reads as a volumetric beam. Far behind, out of focus, the dark steel structure of the hangar with a few tiny cold practical lights. The LEFT half of the frame is calm, dark, empty hangar space with soft haze, no objects, no light streams, no people. Rich contrast, deep navy blacks, awe-inspiring. No logos of any other brand, no readable text.",
+  "lecho": {
+    "objeto": "the dark matte edge of a steel launch console close to the lens, along the bottom of the frame, out of all light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, dark, empty hangar space on the left half",
+      "tinta": "blanca"
+    }
+  }
+}
