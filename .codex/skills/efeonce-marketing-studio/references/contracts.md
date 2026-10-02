@@ -189,6 +189,10 @@ writes) → terminal response stored in the same transaction.
 | `too_many_open_uploads` | 429 | true (20 open uploads per actor) |
 | `invalid_state_transition` | 409 | false |
 
+**Aspect ratio:** `aspectRatio` matches `^\d+x\d+$` (integers only): a decimal ratio is scaled, 1,91:1 → `191x100`.
+The worker checks the file's real ratio within 1 % (2048/1072 = 1,9104 passes); a mismatch is `upload_rejected` with
+`reason: aspect_ratio_mismatch`. The web labels it with `ratioLabel` (`191x100` → «1,91:1»).
+
 **Filename convention** (`filename-convention.ts`): `CMP###-<seq> - <title> - <WxH>.<ext>`, `seq` = 0–2 letters + 1–2
 digits (`S01`, `BF1`); inferred piece `<concept>-<imagen|video>-<WxH>`; workshop suffixes ⇒ `unmatched`.
 

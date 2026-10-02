@@ -147,3 +147,13 @@
 - **Spec deviation recorded, not hidden.** The spec had the CLI as `operator_cli` impersonating the ingest SA; it was
   built as an HTTP `api_client` (`studio:assets:write`) so CLI, UI and agents share one door. Rule: when the build
   departs from the spec, write it in the ledger and the architecture, not only in the commit.
+
+## 2026-10-02 — CMP-004 horizontals 1,91:1 in Studio
+
+- **Loaded and approved ≠ visible: the grid had fixed columns.** `PiecesWorkspace.tsx` drew only 16:9, 1:1, 4:5 and
+  9:16, so the 11 horizontals 1,91:1 were in the database, approved, and absent from the screen. `23e5787` makes the
+  grid add the ratios present in the campaign (widest to tallest). Rule: rows existing is not the surface showing them;
+  after an upload verify the real UI, not only the reader.
+- **Ratios with decimals are stored as integers.** The API demands `aspectRatio` `^\d+x\d+$`, so 1,91:1 is uploaded as
+  `--ratio 191x100`; `ratioLabel('191x100')` labels it «1,91:1» (`apps/web/src/copy.ts`). The worker's ratio check
+  accepts the real file (2048/1072 = 1,9104) within 1 %. Rule: never send `1.91x1`; scale to integers.

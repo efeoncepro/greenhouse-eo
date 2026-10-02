@@ -78,6 +78,10 @@ siguen siendo candidatos, sin aprobación de marca o publicación automática.
    - 🔴 **adaptar sin perder la pieza** (§0b): si la cara es la protagonista, **casting de campaña** desde la aprobada
      (`casting` en la ficha) antes de adaptar; la idea vive en la RELACIÓN entre elementos y se escribe obligatoria; si
      el sujeto queda alto, `pnpm foto:expandir` en vez de otra pasada; QA de caras al 100 % antes del gate;
+   - 🔴 **la horizontal 1,91:1 nace de la escena 1:1 aprobada** (§0c): `pnpm foto:expandir … --lienzo 2048x1072
+     --ancla derecha --fundido 120 --reponer no` con la escena al 80 % del alto, nunca generada de cero; la bajada pasa
+     al titular del anuncio con `conceptoReducido` sólo si el operador lo aprueba; firma a la izquierda, alineada a la
+     columna de texto y a altura fija en la serie (CMP-004: 11/11 aprobadas y certificadas);
    - 🔴 **la reserva del comando NO es la safe zone de la plataforma.** En 9:16 la banda del comando empieza
      en 10% y la UI del placement puede invadir esa banda; el14% es referencia de Meta, no regla de LinkedIn: obedecer sólo al comando pone el titular
      debajo del nombre de la cuenta. Manda la más restrictiva;
@@ -281,7 +285,7 @@ completo antes de escribir una ficha cine; para publicidad, sobre todo §2 (cuá
 
 ## Tres voces + acción — ads con CTA
 
-**Paid Media multiformato:** entregar cada key visual en **4:5, 1:1, 9:16 y 16:9**, salvo reducción explícita del brief. Matriz concepto×ratio, recomposición nativa y QA propio; ocho piezas de cuatro conceptos en dos ratios son cobertura parcial. Detalle y tamaños en el canon enlazado abajo.
+**Paid Media multiformato:** entregar cada key visual en **4:5, 1:1, 9:16 y 16:9**, salvo reducción explícita del brief; si el brief pide la horizontal de feed **1,91:1** (LinkedIn, Meta), se produce por expansión desde la 1:1 aprobada (referencia de formatos §0c). Matriz concepto×ratio, recomposición nativa y QA propio; ocho piezas de cuatro conceptos en dos ratios son cobertura parcial. Detalle y tamaños en el canon enlazado abajo.
 
 **Regla aprobada por el operador, 2026-09-22.** Cargar [Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md)
 al componer o auditar ads con CTA: Bricolage idea, Poppins estructura, Guttery gesto opcional y acción en Poppins.

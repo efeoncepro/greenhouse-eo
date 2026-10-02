@@ -29,6 +29,13 @@ probó la reserva de espacio para titular y los formatos **nativos** 4:5, 9:16 y
 > **Delta 2026-10-02 · multiformato:** un ad se diseña desde la ficha para el formato más estrecho (1:1 y 1,91:1); la
 > horizontal de imagen para pauta es 1,91:1 (`foto:prompt` la acepta, sin validar) y el 9:16 se recorta a 1008×1792
 > antes de componer. Regla y medición: `.claude/skills/efeonce-advertising-creative/references/paid-format-safe-zones-and-craft.md` §0.
+>
+> **Delta 2026-10-02 · horizontal 1,91:1 por expansión:** la horizontal de una pieza aprobada se produce desde la
+> escena 1:1 aprobada, no de cero: `pnpm foto:expandir <plate-1x1> <salida> 0.8 "<relleno>" 0.04 --lienzo 2048x1072
+> --ancla derecha --fundido 120 --reponer no` apoya la escena a la derecha al 80 % del alto y el modelo extiende sólo
+> la columna de texto. La fila `1.91:1` de `foto:prompt` sirve para generar de cero, y de cero el modelo centró al
+> sujeto (10 de 11 chocaban con el texto en CMP-004). Con el método nuevo, las 11 horizontales de CMP-004 quedaron
+> aprobadas y certificadas. Lecciones, concepto reducido, firma y parámetros: misma referencia, §0c.
 
 ## 1. Resultado (pruebas NO aprobadas; sólo evidencia de medición)
 

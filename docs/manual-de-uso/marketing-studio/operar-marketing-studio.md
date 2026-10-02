@@ -1,9 +1,9 @@
 # Operar Efeonce Marketing Studio
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-02 por Claude (TASK-1894: subir y revisar finales)
+> **Ultima actualizacion:** 2026-10-02 por Claude (TASK-1894: subir y revisar finales; proporciones con decimales)
 > **Documentacion tecnica:** [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) · [Arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Documentacion funcional:** [Efeonce Marketing Studio — Gestión de campañas](../../documentation/marketing-studio/efeonce-marketing-studio.md)
 
@@ -126,6 +126,10 @@ una persona la aprueba.
    pnpm studio:upload <archivo> --campaign CMP-004 --license ai_generated \
      --new-asset --concept CMP004-S01 --title "<título>" --ratio 4x5
    ```
+   **Proporciones con decimales:** `--ratio` sólo acepta enteros (`<ancho>x<alto>`). Una horizontal 1,91:1 (LinkedIn
+   1200×628 o Meta horizontal) se sube con `--ratio 191x100`; Studio la muestra como «1,91:1». No escribas `1.91x1`.
+   La grilla de piezas de la campaña muestra una columna por cada proporción que la campaña tiene; después de subir,
+   confirma que la pieza aparece en su columna.
 4. **Si el nombre no permite deducir la pieza** pero ya existe, indícala con `--asset <id de la pieza>`.
 5. Si tienes más datos de derechos, agrégalos: `--reference "…"`, `--from AAAA-MM-DD`, `--until AAAA-MM-DD`,
    `--territory CL`, `--channel <canal>`. Una nota para quien revisa va con `--note "…"`.

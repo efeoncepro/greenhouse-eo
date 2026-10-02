@@ -84,6 +84,25 @@
     "…"`).
   - Entregables B y C (Slices 4–10). La aprobación por API (`approveAssetVersion`) es Slice 4 + TASK-1899.
 
+## Delta 2026-10-02 (tarde) — CMP-004 completa en Studio y grilla corregida
+
+- **Aprobación de las 33 versiones (cierra el pendiente de arriba):** las 33 piezas se aprobaron con
+  `pnpm studio:review approve`; el operador aprobó él mismo `S01` 4:5 y las otras 32 se registraron a su nombre a
+  pedido suyo.
+- **11 horizontales 1,91:1 más (S01–S08, BF1–BF3):** subidas con `pnpm studio:upload … --new-asset --concept
+  CMP004-<clave> --title "<título> · 1,91:1" --ratio 191x100` y aprobadas con `pnpm studio:review approve`
+  (reviewer «Julio Reyes», nota «Aprobada por el operador en el canvas el 2026-10-02 (CDR-012)»). La proporción se
+  guarda como `191x100` porque la API exige `^\d+x\d+$`; la verificación de proporción del worker acepta 2048/1072 =
+  1,9104 dentro del 1 %. Campaña CMP-004: **44 piezas, 0 pendientes de revisión**.
+- **Bug de superficie encontrado y corregido:** la grilla de piezas (`apps/web/src/components/PiecesWorkspace.tsx`)
+  tenía columnas fijas (16:9, 1:1, 4:5, 9:16), así que las 1,91:1 estaban cargadas y aprobadas pero no se veían.
+  Ahora suma las proporciones presentes en la campaña y las ordena de la más ancha a la más alta;
+  `ratioLabel('191x100')` rotula «1,91:1» (`apps/web/src/copy.ts`, prueba en `copy.test.ts`). Commit `23e5787` en
+  `efeonce-marketing-studio` `main` (deploy de producción). `pnpm check` y `pnpm build` en verde; verificado en el
+  navegador en `studio.efeonce.org/campaigns/CMP-004` (columna «1,91:1» primera, con miniaturas).
+- **Lección:** filas existen ≠ alcanzable: cargado y aprobado en la base no significa visible en la superficie; se
+  verifica la UI real.
+
 ## Delta 2026-09-26 (capa de estrategia)
 
 - **Decisión nueva que también gobierna esta task:**

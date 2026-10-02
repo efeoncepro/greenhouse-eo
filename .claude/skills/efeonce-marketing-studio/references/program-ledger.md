@@ -164,7 +164,8 @@ rights columns); gateway federation of `studio.asset.download` needs its own cap
 
 **Studio commits (`main`, pushed = Vercel prod):** `a450a3c` ingest door · `3fe85a2` CMP-004 seed (concepts S01–S08,
 BF1–BF3; `creativeState approved`; CDR-012) · `aa91ce3` anonymous gets `write_not_allowed` before body validation ·
-`43e4711` CLI header: where the `studio:upload` token comes from. `GET https://studio.efeonce.org/api/v1/health` →
+`43e4711` CLI header: where the `studio:upload` token comes from · `23e5787` the pieces grid shows every ratio the
+campaign has (1,91:1). `GET https://studio.efeonce.org/api/v1/health` →
 `version 1.3.0`.
 
 - **Migration** `1790956839977_asset-ingest-door.sql` applied 2026-10-02 (migrator) on `marketing_studio_staging` and
@@ -196,9 +197,12 @@ BF1–BF3; `creativeState approved`; CDR-012) · `aa91ce3` anonymous gets `write
 | Staging | end-to-end canary (via `vercel curl`, previews have no bypass) | verified | anonymous 403 `write_not_allowed`; dry-run no writes; signed PUT 200; confirm 202→202→201 (`CMP004-S01-imagen-4x5` v1 `pending_review`); `worker_run` `versions_created 1, generated 5`; `studio:review approve` → `currentVersion` approved, `pendingVersionNo` null |
 | Production | seed import | applied | 11 new concepts; second apply 0 rows |
 | Production | 33 CMP-004 pieces via `studio:upload --new-asset`, license `ai_generated`, note «Aprobada por el operador el 2026-10-02 (CDR-012)» | done | 33 versions `origin=studio`, 33 unique sha256 = `CONTROL-DE-PIEZAS.csv` (OneDrive), 33 `pending_review`, 132 derivatives, 33 uploads `completed`; pieces `CMP004-<S01..S08\|BF1..BF3>-imagen-<4x5\|9x16\|1x1>` |
+| Production | 33 CMP-004 versions approved (`studio:review approve`) | done | the operator approved `S01` 4:5 himself; the other 32 were recorded in his name at his request |
+| Production | 11 horizontals 1,91:1 (S01–S08, BF1–BF3) via `studio:upload … --new-asset --concept CMP004-<key> --title "<title> · 1,91:1" --ratio 191x100`, approved with `studio:review approve` (reviewer «Julio Reyes», note «Aprobada por el operador en el canvas el 2026-10-02 (CDR-012)») | done | ratio stored as `191x100` (API demands `^\d+x\d+$`); worker ratio check accepts 2048/1072 = 1,9104 within 1 %. **CMP-004: 44 pieces approved, 0 pending review** |
+| Studio prod | grid of pieces showed fixed columns (16:9, 1:1, 4:5, 9:16): the 1,91:1 were loaded and approved but invisible | fixed `23e5787` | `PiecesWorkspace.tsx` adds the ratios present in the campaign, widest to tallest; `ratioLabel('191x100')` → «1,91:1» (`copy.ts`, test in `copy.test.ts`); `pnpm check` + `pnpm build` green; verified in browser at `studio.efeonce.org/campaigns/CMP-004` (column «1,91:1» first, with thumbnails) |
 
-The 33 versions stay `pending_review` (not current) until the operator runs `pnpm studio:review approve …`. Approving
-does not authorize media (`media_authorization` stays `pending`).
+Uploaded versions stay `pending_review` (not current) until `pnpm studio:review approve …` runs; all 44 CMP-004 pieces
+are approved as of 2026-10-02. Approving does not authorize media (`media_authorization` stays `pending`).
 
 **Pending (not done):**
 
@@ -223,3 +227,5 @@ does not authorize media (`media_authorization` stays `pending`).
   planned (`docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`). Docs only.
 - 2026-10-02 — TASK-1894 Entregable A (ingest door) shipped and rolled out to staging + production (Studio `a450a3c`,
   `3fe85a2`, `aa91ce3`, `43e4711`; API 1.3.0, 15 tools); 33 CMP-004 finals uploaded, pending operator review.
+- 2026-10-02 (later) — the 33 CMP-004 versions approved; 11 horizontals 1,91:1 uploaded (`--ratio 191x100`) and
+  approved: CMP-004 = 44 pieces approved, 0 pending. Studio grid bug (fixed ratio columns hid 1,91:1) fixed in `23e5787`.

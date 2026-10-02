@@ -1,9 +1,9 @@
 # Producir una foto de marca en registro cine — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-02 por Claude
-> **Ultima actualizacion:** 2026-10-02 por Claude (1.1: `--formato` y `--alcance` en `foto:cine:nueva`, la clave `__revisar`, la sección partida 1:1, las siete decisiones del operador, la luz juzgada contra la foto aprobada, el escenario con escala, las 12 recetas y el revisor sólo en Claude Code)
+> **Ultima actualizacion:** 2026-10-02 por Claude (1.1: `--formato` y `--alcance` en `foto:cine:nueva`, la clave `__revisar`, la sección partida 1:1, las siete decisiones del operador, la luz juzgada contra la foto aprobada, el escenario con escala, las 12 recetas y el revisor sólo en Claude Code; 1.2: cambiar de formato con `foto:expandir`)
 > **Modulo:** Creative · marca propia de Efeonce (fotografía de marca, registro cine)
 > **Ruta en portal:** no aplica — se usa desde la terminal con `pnpm foto:*` y el agente `cine-reviewer`
 > **Estado:** comandos y revisor disponibles desde el 2026-10-02 (TASK-1926, delta b). Dos pruebas ciegas hechas; falta el veredicto del operador sobre los plates de la segunda y el orquestador `pnpm foto:cine`
@@ -148,6 +148,25 @@ cambiaron y no reciben nada de esto.
    una cara modelada por la fuente, con un lado algo más oscuro y la dirección legible. Sólo es falla si la cara queda
    pareja y sin dirección, o iluminada desde el lado contrario a la fuente. La barra anterior, «mitad casi negra», era
    más estricta que lo aprobado y quedó recalibrada.
+
+### Cambiar de formato con `foto:expandir`
+
+Cuando la pieza ya está aprobada y necesitas la horizontal **1,91:1** (LinkedIn 1200×628 y Meta horizontal), no
+generes de cero: de cero el modelo centra al sujeto y el texto choca con él (10 de 11 en CMP-004). Parte de la escena
+**1:1 aprobada** y deja que el modelo extienda sólo la columna de texto a la izquierda:
+
+```bash
+pnpm foto:expandir <plate-1x1> <salida> 0.8 "<el mismo fondo continúa oscuro y calmo, el lecho continúa, sin luces ni objetos brillantes ni pantallas>" 0.04 --lienzo 2048x1072 --ancla derecha --fundido 120 --reponer no
+```
+
+- `--lienzo 2048x1072 --ancla derecha` apoya la escena a la derecha al 80 % del alto (escala `0.8`, lecho abajo `0.04`).
+- `--reponer no` entrega la salida del modelo sin pegar el original encima (pegarlo deja un recuadro visible). Como el
+  modelo rehace la escena, **revisa las caras al 100 %** contra la aprobada.
+- Si el borde de la escena trae luces, pide en el relleno que el muro termine donde termina la foto y baja la escala
+  (en un caso se usó `0.76`).
+
+La composición de la horizontal (bajada al titular del anuncio, firma a la izquierda y parámetros) está en
+`.claude/skills/efeonce-advertising-creative/references/paid-format-safe-zones-and-craft.md` §0c.
 
 ## Qué significan los estados y señales
 

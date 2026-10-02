@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-02 — CMP-004 completa: 44 piezas aprobadas, horizontales 1,91:1 y grilla de Studio corregida
+
+- Las 11 horizontales 1,91:1 (LinkedIn 1200×628 y Meta horizontal) se hacen desde la escena 1:1 aprobada:
+  `pnpm foto:expandir` gana `--lienzo`, `--ancla`, `--fundido` y `--reponer no` (`2ff39fe96`); la escena va a la
+  derecha al 80 % del alto y el modelo extiende sólo la columna de texto. Concepto reducido aprobado por el operador:
+  la bajada va en el titular del anuncio (CDR-012, `ec9e8a00d`). `foto:cta:gate --reproducir` exit 0 en las 11.
+- Entregadas en canvas, OneDrive Finales (`CONTROL-DE-PIEZAS` 44 filas), Marketing Studio y AXIS Lab (`25f1b40`).
+  En Studio se subieron con `--ratio 191x100` (la API exige `^\d+x\d+$`) y se aprobaron: 44 piezas, 0 pendientes.
+- La grilla de piezas de Studio tenía columnas fijas y escondía las 1,91:1 cargadas y aprobadas; ahora muestra las
+  proporciones presentes en la campaña y rotula `191x100` como «1,91:1» (Studio `23e5787`, verificado en el navegador).
+  Commits de este repo sin push.
+
 ## 2026-10-02 — Marketing Studio: puerta de ingreso de originales en producción (TASK-1894, Entregable A)
 
 - Studio 1.3.0 recibe finales por una sola puerta: `studio.asset.upload.request` (URL firmada V4 directo al bucket)
@@ -663,16 +675,3 @@ público `gs://efeonce-group-axis-public-media` y el Lab muestra versiones web c
 órbita sola. El lenguaje de movimiento quedó como norma (`EFEONCE_ORBIT_MOTION_LANGUAGE_V1`) y sus valores en los tokens
 `efeonceGraphicLine.motion` (`axis-tokens` 0.3.3), que el render lee: los 90 cuadros clave y los tres sonidos salen
 idénticos byte a byte. Rollback: fijar de nuevo los paquetes en 0.2.7.
-
-## 2026-09-26 — Marketing Studio: originales en GCS, worker de medios y restauración probada (TASK-1893, TASK-1896)
-
-Studio guarda en GCS una copia verificada (sha256 + crc32c, deduplicada) de los finales aprobados: 30 versiones por
-ambiente; las 24 imágenes de CMP-002 siguen en OneDrive porque el catálogo no trae su huella. Un worker de Cloud Run
-genera miniatura, preview, portada de video y recortes al llegar cada original, repara faltantes con un barrido horario
-y lee de Metricool la evidencia real de publicación. Un cliente autorizado descarga un original por URL firmada de
-10 min, auditada, con su estado de derechos (`STUDIO_ORIGINAL_DOWNLOADS_ENABLED` sólo en production). Studio además
-tiene Sentry propio, uptime check con email, health profundo, registro de corridas y una restauración lógica ensayada
-contra producción (job 49 s) con ensayo mensual programado; Greenhouse lo observa con la señal
-`platform.marketing_studio.health` y avisa a Teams «EO - Admin» en `error`. Release Greenhouse `92002873ced9` (PR #243).
-Pendientes en los Follow-ups de cada task. Rollback: flags a `false` + redeploy, pausar schedulers, `media:ingest
---revert-provider`.

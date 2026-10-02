@@ -281,4 +281,10 @@ pnpm studio:review request-changes <assetId> <versionNo> --reviewer "…" --note
 - Rollback: flags `false` + redeploy (web → 403 `upload_disabled`; worker via `deploy.sh`); `gcloud storage buckets
   remove-iam-policy-binding … --condition "<same condition>"` for both bindings; `--clear-cors`; `pnpm migrate down` only
   if no version has `origin = 'studio'`.
-- Production state (2026-10-02): 33 CMP-004 versions `origin=studio`, all `pending_review` until the operator approves.
+- **Ratios with decimals:** `--ratio` must be `WxH` integers (`^\d+x\d+$`); a 1,91:1 horizontal (LinkedIn 1200×628,
+  Meta horizontal) goes up as `--ratio 191x100` and the UI labels it «1,91:1». Example: `pnpm studio:upload <file>
+  --campaign CMP-### --license <…> --new-asset --concept CMP###-<seq> --title "<title> · 1,91:1" --ratio
+  191x100`. The grid shows every ratio the campaign has (since `23e5787`); after uploading, check the column in
+  `studio.efeonce.org/campaigns/CMP-###`.
+- Production state (2026-10-02): CMP-004 has 44 pieces (11 concepts × 4:5, 9:16, 1:1, 1,91:1) `origin=studio`, all
+  approved, 0 pending review.
