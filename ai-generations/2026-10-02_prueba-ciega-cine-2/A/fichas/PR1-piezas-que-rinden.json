@@ -1,0 +1,38 @@
+{
+  "id": "PR1-piezas-que-rinden",
+  "formato": "1:1",
+  "impacto": true,
+  "registro": "cine",
+  "desde": "SP2b",
+  "alcance": "deck-seccion",
+  "objetos": [
+    {
+      "objeto": "polo-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic drama still, a vast dark creative studio at night, the moment one campaign piece starts to perform): an EFEONCE creative director, a Latin American man in his early thirties, short dark hair and a trimmed beard, wearing the Efeonce team polo exactly as in its reference, deep navy, nearly black where the shadow falls, stands behind the far end of a long, bare worktable of matte, black-stained walnut, framed from the hips up, his head about one sixth of the frame height, his head almost frontal to the camera. He is placed well to the RIGHT: the side of his body nearest the left edge of the frame (his right shoulder and right elbow) is at about 56 % of the frame width, and between the left edge of the frame and his body there is a wide band of empty darkness. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm f/1.8, he does not lean toward the lens, focus on his eyes. Only his eyes turn toward the empty dark left side of the frame, with a calm, knowing half-smile, as if showing the result to someone standing there. His LEFT arm, the whole arm visible and anatomically correct, is raised and bent so that his left hand, on the frame-right side, holds ONE thin frameless vertical 9:16 screen beside his face, at the height of his cheekbone and about 15 cm from his cheek, turned about 45 degrees toward his face and toward the empty dark on the left so the camera sees its glowing face at an angle; his raised left elbow and the whole screen stay inside the frame, with a narrow band of dark space between the screen and the right edge of the frame; the screen shows a bold campaign image so bright it is almost washed to white, any tiny text on it far too small and too bright to read. His right hand rests flat and still on the table top in front of him; one hand action only. Out of the deep dark on the frame-right side of the room, five meters behind him, a slow river of thousands of tiny glowing particles of vivid orange light (#FF6500) drifts through the haze and converges, narrowing, into that one screen in his hand: the audience's attention pouring into the piece that performs. Where the particles arrive, the screen blazes almost white, and that screen is the only key light on his face. Behind him, four to six meters back and only on the right half of the frame, dozens of other campaign screens of real formats (square post, 4:5 post, wide 16:9 video frame, slim phone, web banner) hang in loose rows in the haze, all of them UNLIT and dark, no particles reaching them; far beyond them, only behind his head and to the right of it, a short row of large cold practical lights melts into round bokeh; no particle, screen or bokeh disc appears to the left of his right shoulder. A thin, cool neutral-white rim light from far behind traces his hair and shoulders and separates the navy polo from the dark; it never reaches his face. The embroidered mark on his chest stays fully visible, never covered by his raised left arm or the screen, lit only from the side, legible and not tinted orange. Apart from the orange particles, the whole frame is cool and contemporary: nothing else is warm, amber or golden, no tungsten. The whole LEFT 40 % of the frame, from top to bottom, is one bare, distant dark wall in calm deep shadow with only faint haze: no particles, no screens, no bokeh, no light, no objects. The space is bare: no books, no plants, no mugs, no notebooks, no paper, no lamps switched on near him. Rich contrast, deep navy blacks, no readable text anywhere, no logos of any other brand.",
+  "llave": {
+    "fuente": "the blazing thin vertical screen held in his left hand, turned about 45 degrees toward his face and toward the empty dark on the left, a palm-sized panel of nearly white light; the camera sees its glowing face at an angle",
+    "lado": "beside his face on the frame-right side, at the height of his cheekbone",
+    "distancia": "about 15 cm from his cheek"
+  },
+  "primerPlano": "the matte black arm and knuckle of an empty grip stand at the bottom right, very close to the lens, cut by the frame edge, holding nothing, with no lamp and no light on it",
+  "fondo": "four to six meters behind him and only on the right half of the frame, dozens of unlit dark campaign screens of different formats hanging in loose rows in the haze, and far beyond them, only behind his head and to the right of it, a short row of large cold practical lights melted into round bokeh discs, giving the space its scale; no particle, screen or bokeh disc appears to the left of his right shoulder",
+  "fenomeno": {
+    "que": "a slow river of thousands of tiny vivid orange (#FF6500) particles of light drifts out of the dark behind him and converges into the one campaign screen he holds beside his face, which blazes almost white, while dozens of other campaign screens hanging behind him stay unlit",
+    "esServicio": "Performance creativo: la atención de la audiencia fluye hacia la pieza que rinde y la enciende; las que no rinden quedan apagadas. Sin el río de luz, es un hombre con una pantalla."
+  },
+  "lecho": {
+    "objeto": "the near end of the long table of matte, black-stained walnut he stands behind, outside the reach of the screen's light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "lado": "izquierda",
+      "muro": "one bare, distant dark wall in calm deep shadow with only faint haze",
+      "tinta": "blanca"
+    }
+  }
+}

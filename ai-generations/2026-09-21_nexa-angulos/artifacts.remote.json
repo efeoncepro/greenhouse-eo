@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:11:04.985Z",
+  "run": "ai-generations/2026-09-21_nexa-angulos",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_nexa-angulos",
+  "totalBytes": 19725625,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "salidas/nexa-135-trasero-v02.png",
+      "sizeBytes": 1724279,
+      "sha256": "9bdff6dde641a10abfcd2e2e66228fac82a05e9d9a1379625f0a34116b12d530",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-angulos/salidas/nexa-135-trasero-v02.png"
+    },
+    {
+      "path": "salidas/nexa-45-der-v02.png",
+      "sizeBytes": 1542538,
+      "sha256": "f9f53cfd6d3ab08671039c122778a08c4659dccae8c6a8b85a55a59ad3c038b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-angulos/salidas/nexa-45-der-v02.png"
+    },
+    {
+      "path": "salidas/nexa-45-izq-v01.png",
+      "sizeBytes": 1608946,
+      "sha256": "e692db6f5bea7c010e3d7d5cb2fb601a8cc5dbb42cfce4568e3783df3b1733d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-angulos/salidas/nexa-45-izq-v01.png"
+    },
+    {
+      "path": "salidas/nexa-45-izq-v02.png",
+      "sizeBytes": 1615452,
+      "sha256": "505ec26df0c3755c498517c36764983321a2f6bdfeaf6bc48b491bf1c9b4dcbd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-angulos/salidas/nexa-45-izq-v02.png"
+    },
+    {
+      "path": "salidas/nexa-cuerpo-espalda-v01.png",
+      "sizeBytes": 4350099,
+      "sha256": "70e643fb200fba5b497d1ff038d02c281af174cf64f603ccc77616393ba12693",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-angulos/salidas/nexa-cuerpo-espalda-v01.png"
+    },
+    {
+      "path": "salidas/nexa-cuerpo-perfil-izq-v01.png",
+      "sizeBytes": 4068927,
+      "sha256": "d499480d4dafab2ee5605527ffb422fbac0e1bb59d6955449b29b6f3c3d3e7af",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-angulos/salidas/nexa-cuerpo-perfil-izq-v01.png"
+    },
+    {
+      "path": "salidas/nexa-espalda-v02.png",
+      "sizeBytes": 1616387,
+      "sha256": "01f1fd94e7470fd3b306b7b4b1409b0da47df89b7adbcc18f3395ca5798bb1df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-angulos/salidas/nexa-espalda-v02.png"
+    },
+    {
+      "path": "salidas/nexa-perfil-der-v02.png",
+      "sizeBytes": 1588702,
+      "sha256": "06148f4a74cc5264a3151c5987f7559a3c75f094417a5a0ffb6d809806718878",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-angulos/salidas/nexa-perfil-der-v02.png"
+    },
+    {
+      "path": "salidas/nexa-perfil-izq-v02.png",
+      "sizeBytes": 1610295,
+      "sha256": "7159cc484e9beb6b7ed555708a812e34a37cad8ef4fef25d5bc0a70f2d93576d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-angulos/salidas/nexa-perfil-izq-v02.png"
+    }
+  ]
+}

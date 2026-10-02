@@ -1,0 +1,53 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:08:51.639Z",
+  "run": "ai-generations/2026-09-20_vestuario-registros",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_vestuario-registros",
+  "totalBytes": 10377840,
+  "fileCount": 7,
+  "files": [
+    {
+      "path": "hoja-contacto.jpg",
+      "sizeBytes": 227512,
+      "sha256": "145546e7b6414224ff48e893308c961008a87712e20bc84bf6f8b0f9cca9233a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_vestuario-registros/hoja-contacto.jpg"
+    },
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 463229,
+      "sha256": "d69f4806c2e07c035663b01b91d1cf4af519da5ade9d8a11259f152483aa7cd0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_vestuario-registros/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/W1-oficina-julio.png",
+      "sizeBytes": 1472226,
+      "sha256": "b2ce7b34604330dd5b7866dea4e70bb6eec0ae5d72b7964e9340d2198a789999",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_vestuario-registros/plates/W1-oficina-julio.png"
+    },
+    {
+      "path": "plates/W2-reunion-nexa.png",
+      "sizeBytes": 1603855,
+      "sha256": "0109c05742c51cfa77f0794f7416d91cea2b681ddcb62bae6dc85a46ccb8009e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_vestuario-registros/plates/W2-reunion-nexa.png"
+    },
+    {
+      "path": "plates/W3-reunion-ambos.png",
+      "sizeBytes": 2098550,
+      "sha256": "c065402d1498669e9570a67c493a29ad62946f0bc39f8296b8b0d91e39fe4c7c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_vestuario-registros/plates/W3-reunion-ambos.png"
+    },
+    {
+      "path": "plates/W4-terreno-nexa.png",
+      "sizeBytes": 2343083,
+      "sha256": "14ba571b9f460ca28c303b662d49cff792ac9b62cf7f900dacc514d8ec103f6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_vestuario-registros/plates/W4-terreno-nexa.png"
+    },
+    {
+      "path": "plates/W5-terreno-julio.png",
+      "sizeBytes": 2169385,
+      "sha256": "cade5b0e9d3c8c6f26cdd5c7b33d3572fa8f9af0141459ca15e61ead9ad26100",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_vestuario-registros/plates/W5-terreno-julio.png"
+    }
+  ]
+}

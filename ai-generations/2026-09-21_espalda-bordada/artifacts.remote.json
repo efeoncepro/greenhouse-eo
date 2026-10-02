@@ -1,0 +1,17 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:09:39.320Z",
+  "run": "ai-generations/2026-09-21_espalda-bordada",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_espalda-bordada",
+  "totalBytes": 1302375,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "out/softshell-02-espalda-bordada-v01.png",
+      "sizeBytes": 1302375,
+      "sha256": "0e4b4634162b39a8fadf976865627f418ee6c19966911711a972d1845a9d30f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_espalda-bordada/out/softshell-02-espalda-bordada-v01.png"
+    }
+  ]
+}

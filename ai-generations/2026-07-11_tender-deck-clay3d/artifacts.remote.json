@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-09-23T12:27:06.184Z",
+  "generatedAt": "2026-10-01T22:00:14.406Z",
   "run": "ai-generations/2026-07-11_tender-deck-clay3d",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-11_tender-deck-clay3d",

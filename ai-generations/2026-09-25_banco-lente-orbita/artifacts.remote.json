@@ -1,0 +1,77 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:20:27.842Z",
+  "run": "ai-generations/2026-09-25_banco-lente-orbita",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-25_banco-lente-orbita",
+  "totalBytes": 18976016,
+  "fileCount": 11,
+  "files": [
+    {
+      "path": "plates/L1-manos-curva.png",
+      "sizeBytes": 1586359,
+      "sha256": "ebb2eb5486c08611645354adb0d30e286a655d74687c5635bd182b22adf33a96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L1-manos-curva.png"
+    },
+    {
+      "path": "plates/L2-variantes-etiqueta.png",
+      "sizeBytes": 1832556,
+      "sha256": "9d4fb72f9112f635a3b73a0c1dda81485810bcff771885f0ea8409fc084a002f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L2-variantes-etiqueta.png"
+    },
+    {
+      "path": "plates/L3-sombra-orbita.png",
+      "sizeBytes": 1413844,
+      "sha256": "1db7b52514dc5f87f10d791195551647958d916c144f0839bf3d7520bb281c31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L3-sombra-orbita.png"
+    },
+    {
+      "path": "plates/L4-quien-sostiene-rodaje.png",
+      "sizeBytes": 1675007,
+      "sha256": "5c73109aea0bd1479246ee3f7adec79765da2433847217aa3a0fa06bebd7a546",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L4-quien-sostiene-rodaje.png"
+    },
+    {
+      "path": "plates/L5-cenital-informe-v1-flatlay-stock.png",
+      "sizeBytes": 2133444,
+      "sha256": "2fa3d3dbf6f54c2af724b8c804fefd89ddd5e11e3c1a9169f6e1cafb48e42b7c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L5-cenital-informe-v1-flatlay-stock.png"
+    },
+    {
+      "path": "plates/L5-cenital-informe.png",
+      "sizeBytes": 2051656,
+      "sha256": "47dffa4ce935ad5eb988a22fd1f801c53034874d9bb12152c88369b81121cf18",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L5-cenital-informe.png"
+    },
+    {
+      "path": "plates/L6-escucha-llamada-v1-muro-navy.png",
+      "sizeBytes": 1584920,
+      "sha256": "7354bee0500a7437bdd41f44fe2432aace760c35b15f0108bbe17b244930058d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L6-escucha-llamada-v1-muro-navy.png"
+    },
+    {
+      "path": "plates/L6-escucha-llamada.png",
+      "sizeBytes": 1682753,
+      "sha256": "bf417b189d74d209f6a2342ab85c967e650872c1818d62a68d5fe9118aacca68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L6-escucha-llamada.png"
+    },
+    {
+      "path": "plates/L7-proyeccion-pieza.png",
+      "sizeBytes": 1846941,
+      "sha256": "694a3e930a10e8189ea95247e8ee69238ce044a8f655c083c0fa9b3e92929100",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L7-proyeccion-pieza.png"
+    },
+    {
+      "path": "plates/L8-ausencia-cierre-v1-oficina-ordenada.png",
+      "sizeBytes": 1597656,
+      "sha256": "bbec8446f8046391bfd08f0b19abd63661c6ac1ad63f63fbf07a04d35b0466ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L8-ausencia-cierre-v1-oficina-ordenada.png"
+    },
+    {
+      "path": "plates/L8-ausencia-cierre.png",
+      "sizeBytes": 1570880,
+      "sha256": "7f6757c48e0e47c4bbdc17836786e5b3c001a12260d3e2dca0619c3ff3122f96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_banco-lente-orbita/plates/L8-ausencia-cierre.png"
+    }
+  ]
+}

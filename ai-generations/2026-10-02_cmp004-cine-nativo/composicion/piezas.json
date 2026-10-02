@@ -1,0 +1,626 @@
+[
+  {
+    "id": "CMP004-S01-KV-45-N2",
+    "plate": "plates/N01b-45-marca-sombra.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Y si tapamos el logo?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Te reconocen",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Estrategia e identidad para tu marca en cada canal.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Hablemos de tu marca",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Una directora creativa tapa con cinta el logo de una pantalla mientras un foco naranja proyecta la pincelada de la marca sobre el muro y sobre ella.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: muro oscuro continuo arriba, mesa negra mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-S03-KV-45-N2",
+    "plate": "plates/N03-45-campana-abanico.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿En cuántos formatos funciona tu idea?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "En todos",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Campaña, key visual y adaptaciones desde una idea.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Hablemos de tu campaña",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Una directora creativa sostiene un key visual de luz del que se abre un abanico de formatos con la misma forma naranja.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: muro oscuro continuo arriba, mesa negra mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-S05-KV-45-N2",
+    "plate": "plates/N05-45-runandgun-jornada.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Contenido para todo el mes?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "En un día",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Una jornada de captura con equipo, luz y sonido.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Planifiquemos tu jornada",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Larga exposición de una jornada de rodaje: un camarógrafo quieto con su gimbal y la estela naranja de la cámara recorriendo cinco sets.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: techo oscuro continuo arriba, maleta de equipo negra mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-S06-KV-45-N2",
+    "plate": "plates/N06-45-social-personas.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Quién cuida tu conversación?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Personas",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Contenido, comunidad y escucha, operados por un equipo.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Conversemos de tu contenido",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Una community lead responde en su teléfono; de un río de mensajes de luz, solo el que ella contesta se enciende junto a su rostro.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: muro oscuro continuo arriba, escritorio negro mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-S02-KV-45-N2",
+    "plate": "plates/N02-45-capitulo-portal.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Tu marca ya cuenta lo que viene?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Imagen propia",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Marca y campañas para la siguiente etapa de tu negocio.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Hablemos de lo que viene",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Una ejecutiva camina de espaldas hacia un gran portal de luz naranja que se abre al fondo de un salón oscuro de pantallas apagadas.",
+    "styleReason": "Registro cine en composición nativa de ad: banda oscura continua arriba, acción al centro, cornisa negra mate al pie para la firma. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-S04-KV-45-N2",
+    "plate": "plates/N04-45-seis-segundos.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Qué cabe en seis segundos?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Cada detalle",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Dirección, edición, motion y audio en cada instante.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Descubre cómo lo hacemos",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Larga exposición en un set: un director de arte quieto y una estela de luz naranja que termina en el brillo de un frasco de perfume ficticio.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: banda oscura continua arriba, carro de monitor negro mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-S08-KV-45-N2",
+    "plate": "plates/N08-45-ia-memoria.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿IA en tu producción?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Con memoria",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Memoria de marca y revisión humana en cada pieza.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Conversemos de IA creativa",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Nexa, el personaje de Efeonce, sostiene una pieza elegida de un túnel de cientos de piezas creativas, con un Spark en su hombro.",
+    "styleReason": "Registro cine con Nexa protagonista en composición nativa de ad: techo oscuro continuo arriba, consola negra mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-S07-KV-45-N2",
+    "plate": "plates/N07b-45-squad-criterio.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Más piezas, mismo estándar?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Mismo criterio",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Un squad creativo gestionado, con dirección humana.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Escala tu producción",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Un squad de cuatro personas en línea frente a una cinta de luz con entregables; una de ellas revisa una pieza de cerca.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con personas del equipo: muro oscuro continuo arriba, tarima negra mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  }
+]

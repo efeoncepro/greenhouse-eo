@@ -1,0 +1,79 @@
+[
+  {
+    "id": "CMP004-C01-KV-45-CINE01",
+    "plate": "plates/CA1c-45-sombra-marca.png",
+    "align": "left",
+    "top": 0.035,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Y si tapamos el logo?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.15,
+    "dominant": "Sigue siendo tuya",
+    "dominantSize": 100,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Tu identidad, reconocible en cada canal.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.15,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.9,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida.",
+      "radius": 14,
+      "text": "Conoce nuestro trabajo",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 18,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-color-policy.json",
+        "sha256": "8022b55e57e4077fe3d923cb139f958a1ab74b14fd670cd94fc6595608bc07ae",
+        "treatment": "outline",
+        "reason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida."
+      },
+      "surfaceToken": "brandAccentSoft"
+    },
+    "safeArea": "axis",
+    "altText": "Una directora creativa sonríe junto a una pantalla con el logo tapado con cinta, mientras una luz naranja proyecta la forma de la marca en el muro; exploración de marca ficticia.",
+    "styleReason": "Registro cine, prueba con persona del equipo. La marca vive en la luz proyectada aunque el logo esté tapado. Pregunta con anillo, respuesta con esfera.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "bottom-end",
+          "action": "select"
+        }
+      ]
+    }
+  }
+]

@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-07-11T17:04:07Z",
+  "generatedAt": "2026-10-01T22:00:12.246Z",
   "run": "ai-generations/2026-07-11_glitch-microphone-intro",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-11_glitch-microphone-intro",

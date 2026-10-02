@@ -1,0 +1,101 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:10:45.097Z",
+  "run": "ai-generations/2026-09-21_nexa-anclas",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_nexa-anclas",
+  "totalBytes": 164463768,
+  "fileCount": 15,
+  "files": [
+    {
+      "path": "salidas/ancla-1-macro-frontal.png",
+      "sizeBytes": 11895683,
+      "sha256": "6e3d016bc0d1182f8d5620e45446defc1c24d231603b92f29dfb53ccb96af365",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/ancla-1-macro-frontal.png"
+    },
+    {
+      "path": "salidas/ancla-2-macro-tresquartos.png",
+      "sizeBytes": 10466835,
+      "sha256": "25fb3222c2c13994652db57fe087cd13a0bbcded266da9f7267feb76bfb7cd23",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/ancla-2-macro-tresquartos.png"
+    },
+    {
+      "path": "salidas/ancla-2-v3.png",
+      "sizeBytes": 10643604,
+      "sha256": "a0d4864f6ae1829de110af860a973e8b41a51b03fb3c58728e9c8a0c12ae4a6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/ancla-2-v3.png"
+    },
+    {
+      "path": "salidas/ancla-3-macro-perfil.png",
+      "sizeBytes": 10644345,
+      "sha256": "e93918350b4b2a57d28966e88431bf5029541502d4c86c89c71df1d4ac3d0434",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/ancla-3-macro-perfil.png"
+    },
+    {
+      "path": "salidas/ancla-4-busto-tresquartos.png",
+      "sizeBytes": 11821706,
+      "sha256": "676e6154f58c5d18ae6c99d4f190866b3e753b2a5a38c6d3eca149aec7166fb4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/ancla-4-busto-tresquartos.png"
+    },
+    {
+      "path": "salidas/ancla-8-manos.png",
+      "sizeBytes": 11978714,
+      "sha256": "64dccf358c0dd4c8626be5b34b45a82297c7db4b6895720205d5a9d1daa993b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/ancla-8-manos.png"
+    },
+    {
+      "path": "salidas/piloto-alto.png",
+      "sizeBytes": 10834693,
+      "sha256": "bbbf054395102d813ae464136b647cabfd25cf401c3fcf433f0c3ed54c9fcef1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/piloto-alto.png"
+    },
+    {
+      "path": "salidas/piloto-moderado.png",
+      "sizeBytes": 11080878,
+      "sha256": "3d14fd71cc1951844700ba9b05968f7aff989c001989cc3d8bcd8780fd5b6f14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/piloto-moderado.png"
+    },
+    {
+      "path": "salidas/v3-ancla-1-macro-frontal.png",
+      "sizeBytes": 11358221,
+      "sha256": "0903de95472ed4eb4c1029da00ec05dcd976628910d8f062961c17db7a29f219",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/v3-ancla-1-macro-frontal.png"
+    },
+    {
+      "path": "salidas/v3-ancla-3-macro-perfil.png",
+      "sizeBytes": 10994235,
+      "sha256": "0f44e931ee5a32fa9d03df110fa4a2afbe292140c18ab8d894bc31d1205b147d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/v3-ancla-3-macro-perfil.png"
+    },
+    {
+      "path": "salidas/v3-ancla-4-busto-tresquartos.png",
+      "sizeBytes": 11204823,
+      "sha256": "9222178fba792b103f185f809037e62bbc85876a45d5170112ec7fb0ec8a23ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/v3-ancla-4-busto-tresquartos.png"
+    },
+    {
+      "path": "salidas/v3-ancla-5-cuerpo-frontal.png",
+      "sizeBytes": 9981358,
+      "sha256": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/v3-ancla-5-cuerpo-frontal.png"
+    },
+    {
+      "path": "salidas/v3-ancla-6-cuerpo-tresquartos.png",
+      "sizeBytes": 10065917,
+      "sha256": "0a354d1f974188246925dc130cc60616d3bc66b63de0fe08f6b620debd9eef12",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/v3-ancla-6-cuerpo-tresquartos.png"
+    },
+    {
+      "path": "salidas/v3-ancla-7-cuerpo-perfil.png",
+      "sizeBytes": 9472042,
+      "sha256": "71b7cb619741a6bc7ddadbe89e3a1e9147f02e02f9b4bebfb1bf224c2dbfca85",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/v3-ancla-7-cuerpo-perfil.png"
+    },
+    {
+      "path": "salidas/v3-ancla-8-manos.png",
+      "sizeBytes": 12020714,
+      "sha256": "6211aed68c243821ad4a441e3678395f5843700c3efb8aa10508430996f495a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-anclas/salidas/v3-ancla-8-manos.png"
+    }
+  ]
+}

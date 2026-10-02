@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-09-23T12:29:44.039Z",
+  "generatedAt": "2026-10-01T22:00:17.169Z",
   "run": "ai-generations/2026-07-15_creative-workflows-pillar",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-15_creative-workflows-pillar",
@@ -146,42 +146,6 @@
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/live-desktop-1440x1000.png"
     },
     {
-      "path": "review/v5/desktop-autonomy-ladder.png",
-      "sizeBytes": 404829,
-      "sha256": "70719eb38816d9729d41b7024ee9f59978ef40b09c0f2d89431a847fe75ad670",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/desktop-autonomy-ladder.png"
-    },
-    {
-      "path": "review/v5/desktop-decision-boundary.png",
-      "sizeBytes": 444529,
-      "sha256": "5b5a7cd56e228fb86ddb08367be9687c79dad158672c4fa52d8971f33d589504",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/desktop-decision-boundary.png"
-    },
-    {
-      "path": "review/v5/desktop-measurement-table.png",
-      "sizeBytes": 307211,
-      "sha256": "90d42d2de032cf61f044e4b51c7482b1605c54788e48770ede381219261b9c6a",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/desktop-measurement-table.png"
-    },
-    {
-      "path": "review/v5/mobile-autonomy-ladder.png",
-      "sizeBytes": 125067,
-      "sha256": "e64553b82fabdee5b4659530f3468cb36086779b320d0d2989a4a2122c52b609",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/mobile-autonomy-ladder.png"
-    },
-    {
-      "path": "review/v5/mobile-decision-boundary.png",
-      "sizeBytes": 121646,
-      "sha256": "d705dada3a20730694ed918fa9b38ac57f80b70c7c79c7590c2bd5aa26128fa9",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/mobile-decision-boundary.png"
-    },
-    {
-      "path": "review/v5/mobile-measurement-table.png",
-      "sizeBytes": 83257,
-      "sha256": "e190190b4462ae1f0c2705852eca47ef45cb9c0c86a4c8397c188e17bca5dbbf",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/mobile-measurement-table.png"
-    },
-    {
       "path": "review/v5-diagrams-v3/desktop-autonomy-ladder.png",
       "sizeBytes": 367783,
       "sha256": "0c5729483138d8ffaf87aed3aa519cbe08d38bced9e7af60edc5338ee16c6845",
@@ -216,6 +180,42 @@
       "sizeBytes": 83257,
       "sha256": "e190190b4462ae1f0c2705852eca47ef45cb9c0c86a4c8397c188e17bca5dbbf",
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5-diagrams-v3/mobile-measurement-table.png"
+    },
+    {
+      "path": "review/v5/desktop-autonomy-ladder.png",
+      "sizeBytes": 404829,
+      "sha256": "70719eb38816d9729d41b7024ee9f59978ef40b09c0f2d89431a847fe75ad670",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/desktop-autonomy-ladder.png"
+    },
+    {
+      "path": "review/v5/desktop-decision-boundary.png",
+      "sizeBytes": 444529,
+      "sha256": "5b5a7cd56e228fb86ddb08367be9687c79dad158672c4fa52d8971f33d589504",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/desktop-decision-boundary.png"
+    },
+    {
+      "path": "review/v5/desktop-measurement-table.png",
+      "sizeBytes": 307211,
+      "sha256": "90d42d2de032cf61f044e4b51c7482b1605c54788e48770ede381219261b9c6a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/desktop-measurement-table.png"
+    },
+    {
+      "path": "review/v5/mobile-autonomy-ladder.png",
+      "sizeBytes": 125067,
+      "sha256": "e64553b82fabdee5b4659530f3468cb36086779b320d0d2989a4a2122c52b609",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/mobile-autonomy-ladder.png"
+    },
+    {
+      "path": "review/v5/mobile-decision-boundary.png",
+      "sizeBytes": 121646,
+      "sha256": "d705dada3a20730694ed918fa9b38ac57f80b70c7c79c7590c2bd5aa26128fa9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/mobile-decision-boundary.png"
+    },
+    {
+      "path": "review/v5/mobile-measurement-table.png",
+      "sizeBytes": 83257,
+      "sha256": "e190190b4462ae1f0c2705852eca47ef45cb9c0c86a4c8397c188e17bca5dbbf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/mobile-measurement-table.png"
     }
   ]
 }

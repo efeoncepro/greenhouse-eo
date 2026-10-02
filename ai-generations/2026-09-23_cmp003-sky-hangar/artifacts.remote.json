@@ -1,0 +1,587 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:16:56.313Z",
+  "run": "ai-generations/2026-09-23_cmp003-sky-hangar",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-23_cmp003-sky-hangar",
+  "totalBytes": 229992495,
+  "fileCount": 96,
+  "files": [
+    {
+      "path": "CANDIDATAS-efeonce-v1-A-B.jpg",
+      "sizeBytes": 242854,
+      "sha256": "f2d471d39399c731a9e53d58cbc461bd4fb41dd3bec917aa1ed308635333dbbb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/CANDIDATAS-efeonce-v1-A-B.jpg"
+    },
+    {
+      "path": "CONTACTO-9-vistas.jpg",
+      "sizeBytes": 518992,
+      "sha256": "6bd8b2386bfa79bb819a246beceebe00d7122fbc2bac6003651a4bc49fbc973e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/CONTACTO-9-vistas.jpg"
+    },
+    {
+      "path": "efeonce-v1-a.png",
+      "sizeBytes": 3473566,
+      "sha256": "6b07317d21f2164fef25af06ad69b7e27980306dacd4e6371e4465fddf90d525",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/efeonce-v1-a.png"
+    },
+    {
+      "path": "efeonce-v1-b.png",
+      "sizeBytes": 3504963,
+      "sha256": "b8ae2d32e561af60a2aedc70813a0e605d18b9dfd4e95e71077b1a78deb359cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/efeonce-v1-b.png"
+    },
+    {
+      "path": "escenas/E1-4x5-comp.png",
+      "sizeBytes": 4469497,
+      "sha256": "485c20cbcb904566fefc8ded808c2f833136169f58a6b378a6b5a7f590671d47",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/escenas/E1-4x5-comp.png"
+    },
+    {
+      "path": "escenas/E1-4x5-final.png",
+      "sizeBytes": 3167551,
+      "sha256": "cd6aafaf758e7ea7ac13af7590d549bfe8579a0a2a392acb50cceefc70b60731",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/escenas/E1-4x5-final.png"
+    },
+    {
+      "path": "escenas/E1-4x5-integrada-DESCARTADA-reinvento-escena.png",
+      "sizeBytes": 3659931,
+      "sha256": "96a8c7ba1be636bfc89218befeb6bcbcf77bdc2dedf6080bf33a7be66b6a9914",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/escenas/E1-4x5-integrada-DESCARTADA-reinvento-escena.png"
+    },
+    {
+      "path": "escenas/E1-4x5-integrada.png",
+      "sizeBytes": 3317650,
+      "sha256": "36048c59103094bca33a3eba53f660842a1c30df79c6d23938bd75b6708d8b35",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/escenas/E1-4x5-integrada.png"
+    },
+    {
+      "path": "escenas/mask-E1-logo.png",
+      "sizeBytes": 61033,
+      "sha256": "2d622ab88b95253260b00ad31cde06c348866a89a08b473ece4c4598a9ec8dc2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/escenas/mask-E1-logo.png"
+    },
+    {
+      "path": "escenas/mask-E1-protege-logo.png",
+      "sizeBytes": 13141,
+      "sha256": "a3cee43b3b0cfe26d8b238ac2001ffb479ee38e70bd42515dce23a22ea072a5e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/escenas/mask-E1-protege-logo.png"
+    },
+    {
+      "path": "escenas/mask-E1-silueta.png",
+      "sizeBytes": 57775,
+      "sha256": "a478b29c60966b8902d634b6d85aeefabda6a1f6c318a1d77a19c59bfc018477",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/escenas/mask-E1-silueta.png"
+    },
+    {
+      "path": "intermedios/v1-hero-4x5-a.png",
+      "sizeBytes": 3942470,
+      "sha256": "f86ddcd232a3bb9cf634703eb5b8555ff47d4ee79397d1a7e8c1512dbcd4ea10",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v1-hero-4x5-a.png"
+    },
+    {
+      "path": "intermedios/v1-hero-4x5-clean.png",
+      "sizeBytes": 3609169,
+      "sha256": "771453a676b3ddc35dc711683c74627d9029b99835926dc9fe65a71a3272a786",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v1-hero-4x5-clean.png"
+    },
+    {
+      "path": "intermedios/v1-hero-4x5-logo.png",
+      "sizeBytes": 5023285,
+      "sha256": "8b132161b523c16bfe5c78f58bf90e365a1e35dc321dadbd3b167d09fcf94b5c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v1-hero-4x5-logo.png"
+    },
+    {
+      "path": "intermedios/v2-9x16-a.png",
+      "sizeBytes": 2976339,
+      "sha256": "b5c8c0669c7e7edce1535e0250ddeefc15a0552b0bb5cb68fbf6745bf00cbb05",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v2-9x16-a.png"
+    },
+    {
+      "path": "intermedios/v2-9x16-clean.png",
+      "sizeBytes": 2858211,
+      "sha256": "76bb3f64b1d982b1b17c8a8d4ae6941834467152998bd90f6c812293a40dd1a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v2-9x16-clean.png"
+    },
+    {
+      "path": "intermedios/v2-9x16-final-colablanca.png",
+      "sizeBytes": 2832943,
+      "sha256": "3b1c798b7987e328e40d851962b2948b67d66871dca6a343680b815f9452f337",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v2-9x16-final-colablanca.png"
+    },
+    {
+      "path": "intermedios/v2-9x16-logo.png",
+      "sizeBytes": 4182820,
+      "sha256": "ebaa61e066775f5dc4ff30c25e6e1feb05a4a0828b2d9c6e3db437916cc677e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v2-9x16-logo.png"
+    },
+    {
+      "path": "intermedios/v3-16x9-a.png",
+      "sizeBytes": 4703256,
+      "sha256": "ac8a03f23e0d1cae6a46faf305f97751bb650bed2c4adc54ab85c094b2f17699",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v3-16x9-a.png"
+    },
+    {
+      "path": "intermedios/v3-16x9-clean.png",
+      "sizeBytes": 4375734,
+      "sha256": "101cb228456da2b1dcf21608c419af6074a579b018f17f29db4d83bdc25cc78d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v3-16x9-clean.png"
+    },
+    {
+      "path": "intermedios/v3-16x9-logo.png",
+      "sizeBytes": 6170719,
+      "sha256": "310e9fedea1db53a7238fe90a3a4e7f2b81e34849322f52ee143fc46296a40d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v3-16x9-logo.png"
+    },
+    {
+      "path": "intermedios/v4-detalle-16x9-a.png",
+      "sizeBytes": 2642931,
+      "sha256": "274ae5221829c9b3bcfe791446ab8653e6a1be2e0a329d0edf9faa508e79d0ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v4-detalle-16x9-a.png"
+    },
+    {
+      "path": "intermedios/v4-detalle-16x9-clean.png",
+      "sizeBytes": 2536420,
+      "sha256": "00d48843e4efc51f6452124cfa199dc53756fbd26af1ca9c164346c4aa6a8314",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v4-detalle-16x9-clean.png"
+    },
+    {
+      "path": "intermedios/v4-detalle-16x9-logo.png",
+      "sizeBytes": 3244438,
+      "sha256": "00cd5a7e445bdf01a82baf6ef6f00aa9ce7fc80a0f0b8c8375fb98e96b4dea36",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v4-detalle-16x9-logo.png"
+    },
+    {
+      "path": "intermedios/v6-tablero-16x9-a.png",
+      "sizeBytes": 4185179,
+      "sha256": "9585d567ab49a17ea265dce660bb92ad6beb139380c9b70a8aca277bba2c1456",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v6-tablero-16x9-a.png"
+    },
+    {
+      "path": "intermedios/v7-contraplano-16x9-a.png",
+      "sizeBytes": 4433290,
+      "sha256": "8fb8747f4a8f6a73261981dd1e31d7b1e15bafeb02ecae620692b803dcea196a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v7-contraplano-16x9-a.png"
+    },
+    {
+      "path": "intermedios/v9-tablero-9x16-a.png",
+      "sizeBytes": 2391271,
+      "sha256": "957a7d4818b67f310618c741b8b30bc3f53a1cb9cbd8d429eff90ce8fbf63d00",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/intermedios/v9-tablero-9x16-a.png"
+    },
+    {
+      "path": "kit-avion/A-blanco.png",
+      "sizeBytes": 2552349,
+      "sha256": "ad093fd0c204d37ffd0ef51056d019973e43a2b91f3130df2634e9e4fd03f460",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/A-blanco.png"
+    },
+    {
+      "path": "kit-avion/A-final.png",
+      "sizeBytes": 3422389,
+      "sha256": "ad717050f6cdc83707ccb6a3d196a91cc53b3877acbb3bb9a5592ca101eed953",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/A-final.png"
+    },
+    {
+      "path": "kit-avion/A-logo.png",
+      "sizeBytes": 2313100,
+      "sha256": "942d4b97c68d2982d096f0a8f253361add6e0bc08cadd566d096bb1bba66756a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/A-logo.png"
+    },
+    {
+      "path": "kit-avion/avion-A-kit.png",
+      "sizeBytes": 586002,
+      "sha256": "18ff90236d652a29ca16d065ae24b94aeea297d77145146d7c728057d418544f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/avion-A-kit.png"
+    },
+    {
+      "path": "kit-avion/avion-A.png",
+      "sizeBytes": 616349,
+      "sha256": "adbcaf659bc676abd1402c9c5e14615fb446eade7a0ca7a956b5829ef97ec171",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/avion-A.png"
+    },
+    {
+      "path": "kit-avion/avion-B-kit.png",
+      "sizeBytes": 701315,
+      "sha256": "a3ed444753ce15ed86c12e678e1f31585abef30856eec63b9859e1c12fe40e54",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/avion-B-kit.png"
+    },
+    {
+      "path": "kit-avion/avion-B.png",
+      "sizeBytes": 726634,
+      "sha256": "5febc0d7943cdbbdbdf1a72085255ce6766900cbc5b049c7175c3a6263e8e002",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/avion-B.png"
+    },
+    {
+      "path": "kit-avion/avion-C-kit.png",
+      "sizeBytes": 614237,
+      "sha256": "4b2a0496d9a07580e8880c18e008f0e4ef87d0f3e03487559471ff36fe0e03e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/avion-C-kit.png"
+    },
+    {
+      "path": "kit-avion/avion-C.png",
+      "sizeBytes": 647560,
+      "sha256": "e343aeb093ebe55c9b3a9910dc16e0799ea3fe493da424f6638d7c46daa61291",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/avion-C.png"
+    },
+    {
+      "path": "kit-avion/B-blanco.png",
+      "sizeBytes": 2702302,
+      "sha256": "a26af2b5d01babef53c3de924e6d4444b1e020c7b7714e1e561dfd51bc133cb6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/B-blanco.png"
+    },
+    {
+      "path": "kit-avion/B-final.png",
+      "sizeBytes": 3485130,
+      "sha256": "5ca88239882db4f0b0181a7e175e28886e7aa987ddcbfa5967a53359dc14c64d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/B-final.png"
+    },
+    {
+      "path": "kit-avion/B-logo.png",
+      "sizeBytes": 2614179,
+      "sha256": "27330670f753b78d12396d8f72c96daccf309c16117b71c8a397e7e2138da590",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/B-logo.png"
+    },
+    {
+      "path": "kit-avion/C-blanco.png",
+      "sizeBytes": 3079744,
+      "sha256": "435e6aa4d8c69f73458e61a8a8189d797dd6a8f7841748ae43ddd2260c26a368",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/C-blanco.png"
+    },
+    {
+      "path": "kit-avion/C-final.png",
+      "sizeBytes": 3409690,
+      "sha256": "16e767d83fc66a5698011cf2f577b29191680f251722d423ce4230a77edab404",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/C-final.png"
+    },
+    {
+      "path": "kit-avion/C-logo.png",
+      "sizeBytes": 2935912,
+      "sha256": "7e9f0188bc76595312a20e1a59f3115f3bb3a6886a26e8d523ec344601f3d10b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/C-logo.png"
+    },
+    {
+      "path": "kit-avion/C-motorok.png",
+      "sizeBytes": 3379781,
+      "sha256": "54bc3d4b8e5718363b1031981c178e1c42deadd2403d7801b6d0fce86d2022ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/C-motorok.png"
+    },
+    {
+      "path": "kit-avion/KIT-AVION-SKY.jpg",
+      "sizeBytes": 262010,
+      "sha256": "4903d8544b2370a8315b1d384e9bde1590aebb9fbb13d0b924af8600e8024462",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/KIT-AVION-SKY.jpg"
+    },
+    {
+      "path": "kit-avion/mask-A.png",
+      "sizeBytes": 74714,
+      "sha256": "46a2fec5053eaa2679aa44f481607071392151362744926b1a3f76f2a3a4fb7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/mask-A.png"
+    },
+    {
+      "path": "kit-avion/mask-B.png",
+      "sizeBytes": 74714,
+      "sha256": "46a2fec5053eaa2679aa44f481607071392151362744926b1a3f76f2a3a4fb7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/mask-B.png"
+    },
+    {
+      "path": "kit-avion/mask-C-motor.png",
+      "sizeBytes": 74714,
+      "sha256": "46a2fec5053eaa2679aa44f481607071392151362744926b1a3f76f2a3a4fb7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/mask-C-motor.png"
+    },
+    {
+      "path": "kit-avion/mask-C.png",
+      "sizeBytes": 74714,
+      "sha256": "46a2fec5053eaa2679aa44f481607071392151362744926b1a3f76f2a3a4fb7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/kit-avion/mask-C.png"
+    },
+    {
+      "path": "mask-v1-finish.png",
+      "sizeBytes": 61033,
+      "sha256": "2d622ab88b95253260b00ad31cde06c348866a89a08b473ece4c4598a9ec8dc2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/mask-v1-finish.png"
+    },
+    {
+      "path": "mask-v1-wordmark.png",
+      "sizeBytes": 61033,
+      "sha256": "2d622ab88b95253260b00ad31cde06c348866a89a08b473ece4c4598a9ec8dc2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/mask-v1-wordmark.png"
+    },
+    {
+      "path": "mask-v1n-tail-wm.png",
+      "sizeBytes": 61033,
+      "sha256": "2d622ab88b95253260b00ad31cde06c348866a89a08b473ece4c4598a9ec8dc2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/mask-v1n-tail-wm.png"
+    },
+    {
+      "path": "mask-v2-tail.png",
+      "sizeBytes": 49755,
+      "sha256": "80399d1acaf0ce44f1b82aac52ef68a6334e3f356ac9a33ebe6153f5146053e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/mask-v2-tail.png"
+    },
+    {
+      "path": "mask-v2.png",
+      "sizeBytes": 49755,
+      "sha256": "80399d1acaf0ce44f1b82aac52ef68a6334e3f356ac9a33ebe6153f5146053e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/mask-v2.png"
+    },
+    {
+      "path": "mask-v3.png",
+      "sizeBytes": 74714,
+      "sha256": "46a2fec5053eaa2679aa44f481607071392151362744926b1a3f76f2a3a4fb7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/mask-v3.png"
+    },
+    {
+      "path": "mask-v4.png",
+      "sizeBytes": 47719,
+      "sha256": "6e236cca484c3087b9e4e298b614814d5aad3b800e48c3634a054d80dbca39cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/mask-v4.png"
+    },
+    {
+      "path": "refs/A320neo_CFM_SKY_V02.png",
+      "sizeBytes": 845815,
+      "sha256": "d669dd73731f7b5168e5cccd3107e9222136ce9992643ced4f5f4a291f847dd8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/A320neo_CFM_SKY_V02.png"
+    },
+    {
+      "path": "refs/A320neo_CFM_SKY_V07.png",
+      "sizeBytes": 2156084,
+      "sha256": "27340f169f3f610848d4cc60bc72bba8a208a0274b204f5cdce781114c1f43aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/A320neo_CFM_SKY_V07.png"
+    },
+    {
+      "path": "refs/A320neo_CFM_SKY_V16.png",
+      "sizeBytes": 991000,
+      "sha256": "13adbcc03fbe78559c96ba245040d2e6c353c4e26c27f640a9fd908bd4415d0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/A320neo_CFM_SKY_V16.png"
+    },
+    {
+      "path": "refs/logo-SKY_3.png",
+      "sizeBytes": 11028,
+      "sha256": "af4319c7e2a35c255b18bc009e600ec0ee226638025ac87faa2456201a2fd6bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/logo-SKY_3.png"
+    },
+    {
+      "path": "refs/real-B57A0955.jpg",
+      "sizeBytes": 242996,
+      "sha256": "81756c506e747d5ebfc8c68356b0b7b7e074b496b262964560cf8561e8015d16",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/real-B57A0955.jpg"
+    },
+    {
+      "path": "refs/real-B57A1089.jpg",
+      "sizeBytes": 160503,
+      "sha256": "089bdd648f335be374ce40f368274d8b52ce4973bed6d3b0d53bd75d7cf555f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/real-B57A1089.jpg"
+    },
+    {
+      "path": "refs/real-p202103005-msn10532-sky-airlines-8781.jpg",
+      "sizeBytes": 217822,
+      "sha256": "26a45a262bacb0c80fc46c4cdaebc1d3cd886531c5d1be2288870feccc7c0eb4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/real-p202103005-msn10532-sky-airlines-8781.jpg"
+    },
+    {
+      "path": "refs/real-p202103005-msn10532-sky-airlines-8813.jpg",
+      "sizeBytes": 325051,
+      "sha256": "43054e16c81c85816cb12377373aebd11f544624a67ea229201c6590db1c65c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/real-p202103005-msn10532-sky-airlines-8813.jpg"
+    },
+    {
+      "path": "refs/real-p202103005-msn10532-sky-airlines-8939.jpg",
+      "sizeBytes": 242351,
+      "sha256": "4fe628836a8c2337e3af800cbdb68b054f8c77dfe26361de69d81f5fed616ec8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/real-p202103005-msn10532-sky-airlines-8939.jpg"
+    },
+    {
+      "path": "refs/sky-official-flat.png",
+      "sizeBytes": 6169,
+      "sha256": "c9d6469b31d3c7ce75f2431c661e2835da7be6b89217ec8174416e8b62f1acb6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/refs/sky-official-flat.png"
+    },
+    {
+      "path": "set/S1-a.png",
+      "sizeBytes": 3206009,
+      "sha256": "8fd6b450b3cc6bad8f5a5051f61487c7c384022073bcacd14eacb0ebd07e0de4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/set/S1-a.png"
+    },
+    {
+      "path": "set/S1-b.png",
+      "sizeBytes": 3333855,
+      "sha256": "ae7990cf0d8ce50b60e640178fd065db1f6ba2b94426f1db859073d86b0e18d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/set/S1-b.png"
+    },
+    {
+      "path": "set/S1-set-final.png",
+      "sizeBytes": 3333855,
+      "sha256": "ae7990cf0d8ce50b60e640178fd065db1f6ba2b94426f1db859073d86b0e18d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/set/S1-set-final.png"
+    },
+    {
+      "path": "v1-escala-descartada/CONTACTO-4-vistas.jpg",
+      "sizeBytes": 408888,
+      "sha256": "88bc67512ae61ea51cb49ea9cf4ff778b169c1b352966603dbf6b70ca4574521",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/CONTACTO-4-vistas.jpg"
+    },
+    {
+      "path": "v1-escala-descartada/v1-hero-4x5-a.png",
+      "sizeBytes": 3587750,
+      "sha256": "9e7a24a2f72f8ee66bea81f23e86e63a4b5aff39226d397b63c20b295a80b727",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v1-hero-4x5-a.png"
+    },
+    {
+      "path": "v1-escala-descartada/v1-hero-4x5-b-clean.png",
+      "sizeBytes": 3448529,
+      "sha256": "4a89b0c0cdf6b009c0666515b75b6336743457c92f807fd556095803cf04b7e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v1-hero-4x5-b-clean.png"
+    },
+    {
+      "path": "v1-escala-descartada/v1-hero-4x5-b-logo.png",
+      "sizeBytes": 4760397,
+      "sha256": "1c6d38d3b9289485645bdc9c19d76746640bfc33214a340940e9a90649bb25a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v1-hero-4x5-b-logo.png"
+    },
+    {
+      "path": "v1-escala-descartada/v1-hero-4x5-b.png",
+      "sizeBytes": 3808817,
+      "sha256": "24085d2df517d1e0776f32f2d6ff05a03bc5f6708b49dc589179fdb0f15d3a37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v1-hero-4x5-b.png"
+    },
+    {
+      "path": "v1-escala-descartada/v1-hero-4x5-c.png",
+      "sizeBytes": 3332508,
+      "sha256": "a803554c5fe02095490e109129097ac9d4829fd46bde1d8866a6db0f71af0dfd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v1-hero-4x5-c.png"
+    },
+    {
+      "path": "v1-escala-descartada/v1-hero-4x5-final.png",
+      "sizeBytes": 3332508,
+      "sha256": "a803554c5fe02095490e109129097ac9d4829fd46bde1d8866a6db0f71af0dfd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v1-hero-4x5-final.png"
+    },
+    {
+      "path": "v1-escala-descartada/v2-9x16-a.png",
+      "sizeBytes": 3100883,
+      "sha256": "8d5a7a36a89ccaefe28ecf917690ffbc173445d313c029a95566266bd4b322a6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v2-9x16-a.png"
+    },
+    {
+      "path": "v1-escala-descartada/v2-9x16-clean.png",
+      "sizeBytes": 2903315,
+      "sha256": "74cc889b71a25a665579692b04808b845225823dbd0b22babef493d263165702",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v2-9x16-clean.png"
+    },
+    {
+      "path": "v1-escala-descartada/v2-9x16-final.png",
+      "sizeBytes": 2885219,
+      "sha256": "47269c0d94ff76de8b62e3ad35bc4f50283e4cfcb9a081d8836219cbe0291283",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v2-9x16-final.png"
+    },
+    {
+      "path": "v1-escala-descartada/v2-9x16-logo.png",
+      "sizeBytes": 4032384,
+      "sha256": "8ab97da40e21f9800ebfdbeb3e9cd775419f56f2627d7c4d74d082827a2e18d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v2-9x16-logo.png"
+    },
+    {
+      "path": "v1-escala-descartada/v3-16x9-a.png",
+      "sizeBytes": 4720535,
+      "sha256": "7cd88bc0fb15d006a3fa373556dd21f2b4a082819e351f904cad7df6911220e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v3-16x9-a.png"
+    },
+    {
+      "path": "v1-escala-descartada/v3-16x9-clean.png",
+      "sizeBytes": 4416658,
+      "sha256": "b0feb3fb33dbdf5cd89d334ed675cbb692a5660745be376495201a0ce75f8257",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v3-16x9-clean.png"
+    },
+    {
+      "path": "v1-escala-descartada/v3-16x9-final.png",
+      "sizeBytes": 4337643,
+      "sha256": "bc7bf96a766731baae2f8dde6edba72e61d3489e8ac98be413af0fce9b1c1b29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v3-16x9-final.png"
+    },
+    {
+      "path": "v1-escala-descartada/v3-16x9-logo.png",
+      "sizeBytes": 6158417,
+      "sha256": "035a71d0ed17bce0c0ee6d84162d5e2d5efb91bbee21d7b5a830d25187e691b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v3-16x9-logo.png"
+    },
+    {
+      "path": "v1-escala-descartada/v4-detalle-16x9-a.png",
+      "sizeBytes": 2789021,
+      "sha256": "eeb73031a7824e341b949bb3fac85f2e24f73ec62ac1414984b7caa47f790e65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v4-detalle-16x9-a.png"
+    },
+    {
+      "path": "v1-escala-descartada/v4-detalle-16x9-clean.png",
+      "sizeBytes": 2636014,
+      "sha256": "8efc783cb34f700894c1a17280c3bb961fbf1fbc59cc3659bab949c6d48e2e30",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v4-detalle-16x9-clean.png"
+    },
+    {
+      "path": "v1-escala-descartada/v4-detalle-16x9-final.png",
+      "sizeBytes": 2696046,
+      "sha256": "cd469fd2be63ff6aa38a9abdaa1042ec3f9f79559e4e8d7ceef0656b9191590f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v4-detalle-16x9-final.png"
+    },
+    {
+      "path": "v1-escala-descartada/v4-detalle-16x9-logo.png",
+      "sizeBytes": 3621621,
+      "sha256": "9b10a41b18034e55b9d4787049782fc09ed0021413354e13fd7291143628ea75",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-escala-descartada/v4-detalle-16x9-logo.png"
+    },
+    {
+      "path": "v1-hero-4x5-final.png",
+      "sizeBytes": 3503295,
+      "sha256": "4b0b5d8efde30636857f65d7250970049bdc65d0c2fcd028b2392a9d7ca937f2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v1-hero-4x5-final.png"
+    },
+    {
+      "path": "v2-9x16-final.png",
+      "sizeBytes": 2842561,
+      "sha256": "6a704859186fcb69bf9c3fcbdd26105ce19929fb9fa73a6f0730a501d73a52f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v2-9x16-final.png"
+    },
+    {
+      "path": "v3-16x9-final.png",
+      "sizeBytes": 4353121,
+      "sha256": "7968a601e1dd7566c409d9e76b47968c5dc44d275ec4827348fc8bfef45eb531",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v3-16x9-final.png"
+    },
+    {
+      "path": "v4-detalle-16x9-final.png",
+      "sizeBytes": 2566567,
+      "sha256": "703d9067c28e410bfa0351ccc326cd7bd3f3622a822e68c95dfeb7d3d345b766",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v4-detalle-16x9-final.png"
+    },
+    {
+      "path": "v5-oscuro-16x9-final.png",
+      "sizeBytes": 3835710,
+      "sha256": "00217b799c3107204219ace69947fb227c0aeddc4ee6b053379c79fbe9cab8c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v5-oscuro-16x9-final.png"
+    },
+    {
+      "path": "v6-tablero-16x9-final.png",
+      "sizeBytes": 4185179,
+      "sha256": "9585d567ab49a17ea265dce660bb92ad6beb139380c9b70a8aca277bba2c1456",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v6-tablero-16x9-final.png"
+    },
+    {
+      "path": "v7-contraplano-16x9-final.png",
+      "sizeBytes": 4433290,
+      "sha256": "8fb8747f4a8f6a73261981dd1e31d7b1e15bafeb02ecae620692b803dcea196a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v7-contraplano-16x9-final.png"
+    },
+    {
+      "path": "v8-oscuro-9x16-final.png",
+      "sizeBytes": 2483801,
+      "sha256": "fee4ed6d00da004dabe1d9baf33fbc8db6e2e034e4fe5f63e6e7a843b4cbb133",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v8-oscuro-9x16-final.png"
+    },
+    {
+      "path": "v9-tablero-9x16-final.png",
+      "sizeBytes": 2391271,
+      "sha256": "957a7d4818b67f310618c741b8b30bc3f53a1cb9cbd8d429eff90ce8fbf63d00",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_cmp003-sky-hangar/v9-tablero-9x16-final.png"
+    }
+  ]
+}

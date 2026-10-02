@@ -1,0 +1,23 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:03:24.707Z",
+  "run": "ai-generations/2026-09-17_julio-con-mascotas",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-17_julio-con-mascotas",
+  "totalBytes": 5019461,
+  "fileCount": 2,
+  "files": [
+    {
+      "path": "out/hombros-v01.png",
+      "sizeBytes": 2515285,
+      "sha256": "327058d6ee1a21f44cae53b04d3f0777e1220ab4b22212d1ca1c8108297e29ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_julio-con-mascotas/out/hombros-v01.png"
+    },
+    {
+      "path": "out/hombros-v02.png",
+      "sizeBytes": 2504176,
+      "sha256": "0b5b622c0fd08938f4f51b2959bd4ab0648fa14341e42716dc302dd52d513edd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_julio-con-mascotas/out/hombros-v02.png"
+    }
+  ]
+}

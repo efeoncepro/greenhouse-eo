@@ -1,0 +1,37 @@
+{
+  "id": "RL1b-lead-correcto",
+  "formato": "16:9",
+  "impacto": true,
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "desde": "RL1 (corrige falla 2 y la reserva invadida)",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, an empty dark studio at night, no desks, no monitors, no plants, no lamps, nothing printed or analog anywhere, not even out of focus): a Latin American RevOps lead in her late thirties, dark straight hair pulled back in a low ponytail, wearing the NAVY EFEONCE SOFTSHELL JACKET exactly as in its reference over a navy polo, stands on the RIGHT side of the frame, her face at about 70% of the frame width and her whole body to the right of 55% of the frame width, framed from the waist up, looking straight into the lens with a calm, assured expression and only the trace of a smile; both arms relaxed, her left hand resting in her jacket pocket: she is not steering anything, the routing happens on its own beside her. REALISTIC ADULT PROPORTIONS: the camera is about two meters away at chest height with an 85mm lens at f/2, so nothing is foreshortened and she does not lean toward the lens; her head occupies about one quarter of the frame height and her shoulders are clearly wider than two head-widths. Just in front of her left shoulder, at the height of her chin, on the right side of the frame and only about 25 cm from her cheek, hovers a fist-sized ROUTING NODE of pure light, white-hot at the core with a vivid magenta-pink (#E86BD0) glow. From the dark far right background a steady stream of single glowing magenta points flows into the node, each point clearly separate from the next, like individual leads arriving one at a time. From the node, a few thin, precise threads of magenta light leave in different directions toward the depth of the studio, each thread carrying exactly ONE glowing point, and each thread ends at ONE different person standing far behind her, four to six meters away, ALL of them behind her and to the RIGHT of her head, between 72% and 96% of the frame width, none of them to the left of her body, small, dark and deeply out of focus: three or four anonymous silhouettes of salespeople, seen from a distance, each one with a small magenta glow landing in an open hand at the very instant the point arrives. The node is the only light on her face: it paints the near side of her face (frame right), her neck and the shoulder of the jacket with magenta-white light, while the far side of her face (frame left) falls into deep shadow; nothing lights her from the camera side; a thin cool rim light from behind separates her hair and shoulders from the dark; thin haze catches the threads and the incoming stream. Everything stays inside the RIGHT 55% of the frame: no thread, no point, no silhouette, no person and no light appears to the left of her right shoulder; the space to the left of her body is empty darkness. The LEFT 45% of the frame is calm, deep dark studio space with only faint haze, no threads, no points, no people, no objects. Rich contrast, deep navy blacks, one single accent colour (magenta), no text, no screens, no logos of any other brand.",
+  "llave": {
+    "fuente": "the fist-sized routing node of white-hot magenta-pink (#E86BD0) light hovering in front of her left shoulder",
+    "lado": "on her left side (frame right), slightly in front of her face at chin height",
+    "distancia": "about 25 cm from her cheek"
+  },
+  "primerPlano": "the near corner of the dark matte meeting table that stands between the camera and her, large and soft, cut by the bottom-right edge of the frame, outside every light",
+  "fondo": "far behind the salespeople, at about eight meters, a row of large cold-white practical lights melted into big round soft bokeh discs, all of them on the right half of the frame",
+  "fenomeno": {
+    "que": "a stream of single magenta points (the leads) pours into a fist-sized routing node beside her, and from the node thin threads of light carry each point, one by one, to a different person far behind who receives it in an open hand",
+    "esServicio": "Lead routing en HubSpot: cada lead que entra se asigna solo, al instante, al vendedor correcto; sin el nodo y sus hilos sólo queda una persona en un estudio oscuro."
+  },
+  "lecho": {
+    "objeto": "the near edge of the dark matte meeting table between the camera and her, the lens only a few centimetres behind its near edge, out of focus, non-reflective, outside every light and every reflection",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

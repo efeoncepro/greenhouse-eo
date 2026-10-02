@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-09-23T12:43:57.935Z",
+  "generatedAt": "2026-10-01T22:03:10.698Z",
   "run": "ai-generations/2026-09-17_fiestas-patrias-chile",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-09-17_fiestas-patrias-chile",

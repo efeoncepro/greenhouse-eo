@@ -1,0 +1,1 @@
+  ⚠ NE1b-nexa-respuesta-45: "traje-bionico-nexa": el isotipo viaja armado en la referencia: amplíalo con `pnpm foto:emblema <plate>` y compáralo con el macro `10-detalle-placa-isotipo` (nave a la derecha, tres ventanas, órbita con cortes, planeta arriba). Si difiere o falta, recompónlo con `pnpm foto:isotipo <plate> --centro x,y --ancho w --prenda clara --acabado`.

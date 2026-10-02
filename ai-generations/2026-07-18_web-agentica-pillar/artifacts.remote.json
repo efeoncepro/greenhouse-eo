@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-09-23T12:42:02.569Z",
+  "generatedAt": "2026-10-01T22:02:02.436Z",
   "run": "ai-generations/2026-07-18_web-agentica-pillar",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-18_web-agentica-pillar",
@@ -188,6 +188,12 @@
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-og-1440x756-v3.jpg"
     },
     {
+      "path": "cover-creation-of-adam-v1/proofs/anatomy-reference-index-pointing-source.png",
+      "sizeBytes": 780415,
+      "sha256": "fad256a2c8b3ed81615fceafb274717633c1205a0198e273318f086326cdebdb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/anatomy-reference-index-pointing-source.png"
+    },
+    {
       "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C07-og-proof.png",
       "sizeBytes": 1416831,
       "sha256": "c2a03a6521658b275eb297397b5e253d9583a0034f19a11e7280cd8f1773390d",
@@ -252,12 +258,6 @@
       "sizeBytes": 23916,
       "sha256": "b4229811c51db7bfa0c5f59b782d4fdd0b5e2d94c33ff5d13fc7f0db8c57b019",
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C15-thumbnail-160.png"
-    },
-    {
-      "path": "cover-creation-of-adam-v1/proofs/anatomy-reference-index-pointing-source.png",
-      "sizeBytes": 780415,
-      "sha256": "fad256a2c8b3ed81615fceafb274717633c1205a0198e273318f086326cdebdb",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/anatomy-reference-index-pointing-source.png"
     },
     {
       "path": "cover-iterations-v1/wag-cover-a-shared-threshold.png",
@@ -420,78 +420,6 @@
       "sizeBytes": 140494,
       "sha256": "f59b535afc7b64f80cb93bd0cf3ab868c5937bf5eea8ce9fce6aa386e5960470",
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v04-cadena-autoridad-mobile-light-master-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v02-frontera-operativa-desktop-dark-context-proof-v2.png",
-      "sizeBytes": 255334,
-      "sha256": "494678e7b9bac021726e36cc5b32af3e23ee6cfc289c179689dede7774e6beec",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-desktop-dark-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v02-frontera-operativa-desktop-light-context-proof-v2.png",
-      "sizeBytes": 311272,
-      "sha256": "32dde5e856326472883741f33af485f12013d9549adae22d37eb768f2afa9236",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-desktop-light-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v02-frontera-operativa-mobile-dark-context-proof-v2.png",
-      "sizeBytes": 60543,
-      "sha256": "7d23860054fa5b92d188fb545edc548e21c1faa72544d875b838e1fbcf9e62d6",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-mobile-dark-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v02-frontera-operativa-mobile-light-context-proof-v2.png",
-      "sizeBytes": 71981,
-      "sha256": "1b65edfd9efeca7d9bf8c835ed2116454860fa29601b38a8eb098c9dbb8db80b",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-mobile-light-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v03-arquitectura-compartida-desktop-dark-context-proof-v2.png",
-      "sizeBytes": 235492,
-      "sha256": "25feafff5b086b6a7f6654a56ee90ec80b9c6b7bcebf569492409fa293426f76",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-desktop-dark-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v03-arquitectura-compartida-desktop-light-context-proof-v2.png",
-      "sizeBytes": 286793,
-      "sha256": "242aa9bc8fc735d2623ad4d5729ce09e538a29bc1f75903b99131c4a7e9500f7",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-desktop-light-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v03-arquitectura-compartida-mobile-dark-context-proof-v2.png",
-      "sizeBytes": 59967,
-      "sha256": "108dfbeaff5b2c388853290ada6da1811e41edc57ef2ac0de8bee6eb74e87345",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-mobile-dark-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v03-arquitectura-compartida-mobile-light-context-proof-v2.png",
-      "sizeBytes": 70353,
-      "sha256": "51f5b44a692d98192c5779b1975d69f3e2532e2ebaad33742dd160147a4e4ad8",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-mobile-light-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v04-cadena-autoridad-desktop-dark-context-proof-v2.png",
-      "sizeBytes": 260272,
-      "sha256": "705b025064cb951beed4146067d47434a683fcc54d14c9c30e6d9b0d0ad32533",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-desktop-dark-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v04-cadena-autoridad-desktop-light-context-proof-v2.png",
-      "sizeBytes": 300307,
-      "sha256": "4c23d4dee2e240e4571b3ce0d7f57f4c8573a5033340ba8a307538942c5a2fa2",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-desktop-light-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v04-cadena-autoridad-mobile-dark-context-proof-v2.png",
-      "sizeBytes": 59163,
-      "sha256": "8a5954e3836d76823a5cc1e42ef98e704c5f4a0956c92cd736146896d4d7c867",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-mobile-dark-context-proof-v2.png"
-    },
-    {
-      "path": "review/web-agentica-v04-cadena-autoridad-mobile-light-context-proof-v2.png",
-      "sizeBytes": 65897,
-      "sha256": "b273b6bb8e19e4f6ba2fb12de12b61b7faa3c514adc83031d6dd49e03a8b1339",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-mobile-light-context-proof-v2.png"
     },
     {
       "path": "review-v3/web-agentica-arquitectura-compartida-desktop-dark-v6.png",
@@ -828,6 +756,78 @@
       "sizeBytes": 112568,
       "sha256": "24d785ed404a1d5e0ebea5cd422bb59be4a23c697b94af5c646f32777421a130",
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-mobile-light-v7.png"
+    },
+    {
+      "path": "review/web-agentica-v02-frontera-operativa-desktop-dark-context-proof-v2.png",
+      "sizeBytes": 255334,
+      "sha256": "494678e7b9bac021726e36cc5b32af3e23ee6cfc289c179689dede7774e6beec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-desktop-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v02-frontera-operativa-desktop-light-context-proof-v2.png",
+      "sizeBytes": 311272,
+      "sha256": "32dde5e856326472883741f33af485f12013d9549adae22d37eb768f2afa9236",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-desktop-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v02-frontera-operativa-mobile-dark-context-proof-v2.png",
+      "sizeBytes": 60543,
+      "sha256": "7d23860054fa5b92d188fb545edc548e21c1faa72544d875b838e1fbcf9e62d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-mobile-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v02-frontera-operativa-mobile-light-context-proof-v2.png",
+      "sizeBytes": 71981,
+      "sha256": "1b65edfd9efeca7d9bf8c835ed2116454860fa29601b38a8eb098c9dbb8db80b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-mobile-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v03-arquitectura-compartida-desktop-dark-context-proof-v2.png",
+      "sizeBytes": 235492,
+      "sha256": "25feafff5b086b6a7f6654a56ee90ec80b9c6b7bcebf569492409fa293426f76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-desktop-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v03-arquitectura-compartida-desktop-light-context-proof-v2.png",
+      "sizeBytes": 286793,
+      "sha256": "242aa9bc8fc735d2623ad4d5729ce09e538a29bc1f75903b99131c4a7e9500f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-desktop-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v03-arquitectura-compartida-mobile-dark-context-proof-v2.png",
+      "sizeBytes": 59967,
+      "sha256": "108dfbeaff5b2c388853290ada6da1811e41edc57ef2ac0de8bee6eb74e87345",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-mobile-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v03-arquitectura-compartida-mobile-light-context-proof-v2.png",
+      "sizeBytes": 70353,
+      "sha256": "51f5b44a692d98192c5779b1975d69f3e2532e2ebaad33742dd160147a4e4ad8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-mobile-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v04-cadena-autoridad-desktop-dark-context-proof-v2.png",
+      "sizeBytes": 260272,
+      "sha256": "705b025064cb951beed4146067d47434a683fcc54d14c9c30e6d9b0d0ad32533",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-desktop-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v04-cadena-autoridad-desktop-light-context-proof-v2.png",
+      "sizeBytes": 300307,
+      "sha256": "4c23d4dee2e240e4571b3ce0d7f57f4c8573a5033340ba8a307538942c5a2fa2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-desktop-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v04-cadena-autoridad-mobile-dark-context-proof-v2.png",
+      "sizeBytes": 59163,
+      "sha256": "8a5954e3836d76823a5cc1e42ef98e704c5f4a0956c92cd736146896d4d7c867",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-mobile-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v04-cadena-autoridad-mobile-light-context-proof-v2.png",
+      "sizeBytes": 65897,
+      "sha256": "b273b6bb8e19e4f6ba2fb12de12b61b7faa3c514adc83031d6dd49e03a8b1339",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-mobile-light-context-proof-v2.png"
     },
     {
       "path": "social-v3/web-agentica-arquitectura-compartida-mobile-dark-v6-social.png",

@@ -1,0 +1,17 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:04:19.440Z",
+  "run": "ai-generations/2026-09-17_nexa-vestuario",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-17_nexa-vestuario",
+  "totalBytes": 2118581,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "prueba/nexa-corporativo-v01.png",
+      "sizeBytes": 2118581,
+      "sha256": "2167c03df13ced766cea3ece0adba3e9749c3a754387c255aabada4a44de4c5c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_nexa-vestuario/prueba/nexa-corporativo-v01.png"
+    }
+  ]
+}

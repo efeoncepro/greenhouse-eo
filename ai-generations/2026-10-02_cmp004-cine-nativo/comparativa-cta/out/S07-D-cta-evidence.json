@@ -1,0 +1,122 @@
+{
+  "intent": {
+    "targetId": "cta",
+    "targetKind": "group",
+    "variant": "open-brackets",
+    "padding": "compact",
+    "overlay": "none",
+    "cursors": [
+      {
+        "id": "usuario",
+        "kind": "local",
+        "targetId": "cta",
+        "anchor": "end-center",
+        "action": "select"
+      }
+    ]
+  },
+  "manifest": {
+    "schema": "axis.collaboration-selection-composition.v1",
+    "contract": {
+      "id": "efeonce.collaboration-selection",
+      "version": "0.3.0"
+    },
+    "target": {
+      "id": "cta",
+      "kind": "group",
+      "bounds": "rendered-group-including-terminal-sphere"
+    },
+    "selection": {
+      "variant": "open-brackets",
+      "padding": "compact",
+      "paddingRatio": {
+        "inline": 0.008,
+        "block": 0.007
+      },
+      "overlay": "none",
+      "overlayOpacity": 0,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursors": [
+      {
+        "id": "usuario",
+        "kind": "local",
+        "targetId": "cta",
+        "anchor": "end-center",
+        "action": "select",
+        "orientation": "screen-fixed",
+        "direction": "north-west"
+      }
+    ]
+  },
+  "geometry": {
+    "schema": "axis.collaboration-selection-composition.v1",
+    "contract": {
+      "id": "efeonce.collaboration-selection",
+      "version": "0.3.0"
+    },
+    "target": {
+      "id": "cta",
+      "kind": "group",
+      "bounds": "rendered-group-including-terminal-sphere"
+    },
+    "selection": {
+      "variant": "open-brackets",
+      "padding": "compact",
+      "paddingRatio": {
+        "inline": 0.008,
+        "block": 0.007
+      },
+      "overlay": "none",
+      "overlayOpacity": 0,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursorEvidence": [
+      {
+        "id": "usuario",
+        "state": "acting",
+        "action": "select",
+        "direction": "north-west",
+        "anchor": "end-center",
+        "hotspot": {
+          "x": 503.55,
+          "y": 317.425
+        },
+        "bounds": {
+          "left": 502.014,
+          "top": 315.889,
+          "right": 532.264,
+          "bottom": 346.988
+        },
+        "touchesTarget": true
+      }
+    ],
+    "noFreeCoordinates": true,
+    "targetGeometrySource": "rendered-content-bounds",
+    "withinCanvas": true
+  },
+  "textBounds": {
+    "left": 111.088,
+    "right": 473.35799999999995,
+    "top": 298.725,
+    "bottom": 336.125
+  },
+  "descriptorBounds": {
+    "left": 89.088,
+    "right": 307.98199999999997,
+    "top": 368.293,
+    "bottom": 395.099
+  },
+  "surface": {
+    "left": 89.088,
+    "top": 289.725,
+    "right": 495.35799999999995,
+    "bottom": 345.125
+  },
+  "variant": "solid",
+  "colors": {
+    "surface": "#ffffff",
+    "ink": "#00284d"
+  },
+  "solidTextContrast": 14.886425957333296
+}

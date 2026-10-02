@@ -1,0 +1,53 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:08:42.495Z",
+  "run": "ai-generations/2026-09-20_unbound-charlas",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_unbound-charlas",
+  "totalBytes": 12894011,
+  "fileCount": 7,
+  "files": [
+    {
+      "path": "hoja-serie.jpg",
+      "sizeBytes": 173326,
+      "sha256": "8c70c3b4790af895e90ace75026de8d187ee859205d9f3c5ffc16b578c33caa5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_unbound-charlas/hoja-serie.jpg"
+    },
+    {
+      "path": "plates/U1-nexa-boston.png",
+      "sizeBytes": 2020965,
+      "sha256": "57cab939bd0732c966643e9966215746bd153dc42d55947d7f1412a223692ff1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_unbound-charlas/plates/U1-nexa-boston.png"
+    },
+    {
+      "path": "plates/U1-nexa.png",
+      "sizeBytes": 2036378,
+      "sha256": "869671bb0fe40cc32df5e81ba5d8756a898d0d29b7572ae41eb6a65af3410ee3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_unbound-charlas/plates/U1-nexa.png"
+    },
+    {
+      "path": "plates/U2-julio-boston.png",
+      "sizeBytes": 1915811,
+      "sha256": "2eb3456201a9f85ca306b85da1a2eb3497aad15648803cb3854816590e62f000",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_unbound-charlas/plates/U2-julio-boston.png"
+    },
+    {
+      "path": "plates/U3-juntos-boston.png",
+      "sizeBytes": 2263369,
+      "sha256": "196380f18e30d2411585b39ca2862d7f69b5b8ab1045d50bbf657b28fde57e73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_unbound-charlas/plates/U3-juntos-boston.png"
+    },
+    {
+      "path": "plates/U4-sprocket-boston.png",
+      "sizeBytes": 2364135,
+      "sha256": "540a347394f0a797147d4f51e51573aa1f02eb9e3d3535faa8073bcc0ce565bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_unbound-charlas/plates/U4-sprocket-boston.png"
+    },
+    {
+      "path": "plates/U5-uniforme.png",
+      "sizeBytes": 2120027,
+      "sha256": "9164b5e4efc3d2fc8e194fd01a363e0964d7053c20b7c6899271dcb617208096",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_unbound-charlas/plates/U5-uniforme.png"
+    }
+  ]
+}

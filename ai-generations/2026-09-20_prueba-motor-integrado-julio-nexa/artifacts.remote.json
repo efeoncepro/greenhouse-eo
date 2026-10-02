@@ -1,0 +1,35 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:08:15.935Z",
+  "run": "ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa",
+  "totalBytes": 8821987,
+  "fileCount": 4,
+  "files": [
+    {
+      "path": "final-v3-logo20.png",
+      "sizeBytes": 3027173,
+      "sha256": "55528ec093f255e3d07fc49458df53e287bfa79efcf52cf989e9704f1969cbb3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/final-v3-logo20.png"
+    },
+    {
+      "path": "plate-v2.png",
+      "sizeBytes": 1913411,
+      "sha256": "2489e0b9033e245a83152fe244407e6bc5d5aafa2267ba42cf5c7abc26eb665d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/plate-v2.png"
+    },
+    {
+      "path": "plate-v3.png",
+      "sizeBytes": 1854357,
+      "sha256": "f97c8bd344455f793d5cef6b6e09d9a6880689f301a6ab2e6b3371e9bdafaa2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/plate-v3.png"
+    },
+    {
+      "path": "plate.png",
+      "sizeBytes": 2027046,
+      "sha256": "7a50877fc8ac39a5dfaea0bdb15a85fd3a1d463810c258c4fa0709bc44f56202",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/plate.png"
+    }
+  ]
+}

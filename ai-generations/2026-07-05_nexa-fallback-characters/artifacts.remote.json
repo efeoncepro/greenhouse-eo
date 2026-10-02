@@ -1,0 +1,77 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T21:59:52.831Z",
+  "run": "ai-generations/2026-07-05_nexa-fallback-characters",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-05_nexa-fallback-characters",
+  "totalBytes": 8323407,
+  "fileCount": 11,
+  "files": [
+    {
+      "path": "_contact-sheet_navy.png",
+      "sizeBytes": 497322,
+      "sha256": "8bdab957b51229cf0324ae9b617a661a71014b0fa5f32bb58caff01e55cb3d77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/_contact-sheet_navy.png"
+    },
+    {
+      "path": "error_opaque.png",
+      "sizeBytes": 1316439,
+      "sha256": "4940e8c190e3d33871168eab033f0b40d81ac07a6d387203d1eeeeddffa7f03e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/error_opaque.png"
+    },
+    {
+      "path": "error.png",
+      "sizeBytes": 227579,
+      "sha256": "13da6a1978c46f745c51338f5002e3f244e07061a7468a4e9698770978095d21",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/error.png"
+    },
+    {
+      "path": "expired_opaque.png",
+      "sizeBytes": 1779575,
+      "sha256": "bc1150e98343146afcca1f9e9f0264a2467ea33dc1178ed8a5c702322bc1b0c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/expired_opaque.png"
+    },
+    {
+      "path": "expired.png",
+      "sizeBytes": 342363,
+      "sha256": "6e5c705b8c05c33a9c782333bde0b414abe3c6e35b54dde8678a49110738088a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/expired.png"
+    },
+    {
+      "path": "not-found.png",
+      "sizeBytes": 313186,
+      "sha256": "f3189e0f41dea1ea40c37fe32dd452ee8a25c540ddf45c995d8f15ec08977af9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/not-found.png"
+    },
+    {
+      "path": "rate-limited_opaque.png",
+      "sizeBytes": 1293610,
+      "sha256": "0dc8b49c9a4f0f4ad0a48162f2a42d64eb3ac629df047dd9d193352ceac87f53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/rate-limited_opaque.png"
+    },
+    {
+      "path": "rate-limited.png",
+      "sizeBytes": 202393,
+      "sha256": "467b7c0693bcc57fbe144876c4d5780cab52c9d5540e4210899fb43e6970d17c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/rate-limited.png"
+    },
+    {
+      "path": "revoked_opaque.png",
+      "sizeBytes": 1721501,
+      "sha256": "6992c1f2f559bd74a5131feb7a1773911b87c86677389c65349f939c80e07569",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/revoked_opaque.png"
+    },
+    {
+      "path": "revoked.png",
+      "sizeBytes": 316253,
+      "sha256": "c6541e5450a3e87ffc8396ac22d9e48202962e26376ffe16ad341dba7e6db59f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/revoked.png"
+    },
+    {
+      "path": "source_greenhouse-404.png",
+      "sizeBytes": 313186,
+      "sha256": "f3189e0f41dea1ea40c37fe32dd452ee8a25c540ddf45c995d8f15ec08977af9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_nexa-fallback-characters/source_greenhouse-404.png"
+    }
+  ]
+}

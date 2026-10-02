@@ -1,0 +1,35 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:11:42.602Z",
+  "run": "ai-generations/2026-09-21_nexa-hibrido",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_nexa-hibrido",
+  "totalBytes": 6235215,
+  "fileCount": 4,
+  "files": [
+    {
+      "path": "salidas/convergencia-1.png",
+      "sizeBytes": 1531260,
+      "sha256": "10b8fb889caa93548131b0c8be9ed8bc0dbd0534dea0da97f3c068d4f31d2424",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-hibrido/salidas/convergencia-1.png"
+    },
+    {
+      "path": "salidas/convergencia-2.png",
+      "sizeBytes": 1547192,
+      "sha256": "9a7c5d53da99a54bb9a38557bfb904d7c1984c8d9767b24b5adf1c4324796282",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-hibrido/salidas/convergencia-2.png"
+    },
+    {
+      "path": "salidas/mezcla-1.png",
+      "sizeBytes": 1582669,
+      "sha256": "149f0e64034e7e8bddf10cbbbe2237501b9991e0f5b99e0f42f36ef9198531a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-hibrido/salidas/mezcla-1.png"
+    },
+    {
+      "path": "salidas/mezcla-2.png",
+      "sizeBytes": 1574094,
+      "sha256": "b77bf18a34f3792e5fdc72e65b2563219d29df19e1a315c8847dcd9dcae1c1be",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-hibrido/salidas/mezcla-2.png"
+    }
+  ]
+}

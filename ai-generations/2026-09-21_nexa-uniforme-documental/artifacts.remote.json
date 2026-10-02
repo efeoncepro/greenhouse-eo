@@ -1,0 +1,23 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:12:41.561Z",
+  "run": "ai-generations/2026-09-21_nexa-uniforme-documental",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_nexa-uniforme-documental",
+  "totalBytes": 2441001,
+  "fileCount": 2,
+  "files": [
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 178785,
+      "sha256": "8caf5ef6ee90da9a9925be0664f4fc1c095ff745cf902074c448fa0c82a362ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-documental/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/nexa-control-v01.png",
+      "sizeBytes": 2262216,
+      "sha256": "51d2349237662a63a2dc0ee1d89693b344d97f85b6e13c9bfd338b99640dfbd4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-documental/plates/nexa-control-v01.png"
+    }
+  ]
+}

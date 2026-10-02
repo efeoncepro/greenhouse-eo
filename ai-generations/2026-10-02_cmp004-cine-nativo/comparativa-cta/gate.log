@@ -1,0 +1,15 @@
+⚠ S01-E: sobre los corchetes del CTA quedan 17 px de aire (piso: media altura del CTA).
+✗ S03-D: el CTA compite con el titular: mide 0.31× el titular y el botón 0.82× su área (techo: 0.5× y, para un CTA de relleno, 0.7× el área; mide 1.17× el techo)
+✗ S03-E: el CTA compite con el titular: mide 0.31× el titular y el botón 0.49× su área (techo: 0.5× y, para un CTA de texto, 0.45× el área; mide 1.09× el techo)
+⚠ S03-E: sobre los corchetes del CTA quedan 17 px de aire (piso: media altura del CTA).
+✗ S05-D: el CTA compite con el titular: mide 0.31× el titular y el botón 0.79× su área (techo: 0.5× y, para un CTA de relleno, 0.7× el área; mide 1.14× el techo)
+✗ S05-E: el CTA compite con el titular: mide 0.31× el titular y el botón 0.48× su área (techo: 0.5× y, para un CTA de texto, 0.45× el área; mide 1.07× el techo)
+⚠ S05-E: sobre los corchetes del CTA quedan 17 px de aire (piso: media altura del CTA).
+✗ S06-D: el CTA compite con el titular: mide 0.31× el titular y el botón 0.80× su área (techo: 0.5× y, para un CTA de relleno, 0.7× el área; mide 1.15× el techo)
+⚠ S06-E: sobre los corchetes del CTA quedan 17 px de aire (piso: media altura del CTA).
+⚠ S02-E: sobre los corchetes del CTA quedan 17 px de aire (piso: media altura del CTA).
+⚠ S04-E: sobre los corchetes del CTA quedan 17 px de aire (piso: media altura del CTA).
+⚠ S08-E: sobre los corchetes del CTA quedan 17 px de aire (piso: media altura del CTA).
+⚠ S07-E: sobre los corchetes del CTA quedan 17 px de aire (piso: media altura del CTA).
+
+✗ 5 fallo(s) en 40 pieza(s) con CTA.

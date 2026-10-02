@@ -1,0 +1,611 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:16:09.006Z",
+  "run": "ai-generations/2026-09-22_motion-codex-rueda-prensa",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-22_motion-codex-rueda-prensa",
+  "totalBytes": 290974636,
+  "fileCount": 100,
+  "files": [
+    {
+      "path": "out/c14.5.png",
+      "sizeBytes": 679654,
+      "sha256": "49aa734937fab984f9fce756573b438dbe85b0486efbd53f018a3218d4dc007f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/c14.5.png"
+    },
+    {
+      "path": "out/c2.0.png",
+      "sizeBytes": 777494,
+      "sha256": "268f2cde1c7d3c4d0a48a1cd0369bf9d372ca6983431938f11603af5243ddc00",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/c2.0.png"
+    },
+    {
+      "path": "out/c5.0.png",
+      "sizeBytes": 867624,
+      "sha256": "fa19221ac1958848077463d95ef04b5c82bb9e34322f79f51e90c5e73a0651e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/c5.0.png"
+    },
+    {
+      "path": "out/c9.0.png",
+      "sizeBytes": 990778,
+      "sha256": "36f10ebdc413a840be554beefb61104ca594dbb49bf56acbf3de74a2941432bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/c9.0.png"
+    },
+    {
+      "path": "out/ca.png",
+      "sizeBytes": 531982,
+      "sha256": "dce0a6b1886e07399d0c14b78fde3829e20d623fe30cf54b084e134b60acfe32",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/ca.png"
+    },
+    {
+      "path": "out/cara-v5.png",
+      "sizeBytes": 466414,
+      "sha256": "4e11b8d4fa94d6de11a777947030f8b56bee1d0ebd8ee6a4e213e1116f3cf9c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/cara-v5.png"
+    },
+    {
+      "path": "out/cb.png",
+      "sizeBytes": 719326,
+      "sha256": "2f42bf0d11a88cadc0b9bc5ba150c635960cd41fe5b89b06a111b048b7954ff6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/cb.png"
+    },
+    {
+      "path": "out/f0.png",
+      "sizeBytes": 2121442,
+      "sha256": "7048d1b5d98e1eb1f64c58e99cce342e0e1a9a88b27c6a44c35da278c83282da",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/f0.png"
+    },
+    {
+      "path": "out/f1.6.png",
+      "sizeBytes": 3103528,
+      "sha256": "a4dbc25c3fc8222ef3460df1747295e492ec0868cf68fa8b960ae8e37052f14c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/f1.6.png"
+    },
+    {
+      "path": "out/f3.0.png",
+      "sizeBytes": 4319713,
+      "sha256": "1637b66acd31ea02015590aba756509a65b8db555fd403a2345ac4e9cefaca29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/f3.0.png"
+    },
+    {
+      "path": "out/f4.2.png",
+      "sizeBytes": 4813764,
+      "sha256": "08644a1ac1825fd366a23a716a55f01825136e691a0b1d0dc164cbcbd62fb98d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/f4.2.png"
+    },
+    {
+      "path": "out/f5.9.png",
+      "sizeBytes": 4956035,
+      "sha256": "2962f7a2d3159db2a8a1cb097af0d83422be8715798784d208e174a69f5d6b3b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/f5.9.png"
+    },
+    {
+      "path": "out/h0.2.png",
+      "sizeBytes": 559182,
+      "sha256": "3ad49327e57bd7531f5c793eb71e020ad0fc31277ff7d72e6bff27b3800f3b96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/h0.2.png"
+    },
+    {
+      "path": "out/h1.2.png",
+      "sizeBytes": 704104,
+      "sha256": "79eb72485a396fd8ed806e641d5da28423ed5ffb50ccd8490eda5a112e4230a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/h1.2.png"
+    },
+    {
+      "path": "out/h2.4.png",
+      "sizeBytes": 773900,
+      "sha256": "4981de51b7820233f4b893188497e23a6df54b9e1824580c129910f03916670a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/h2.4.png"
+    },
+    {
+      "path": "out/h3.6.png",
+      "sizeBytes": 843683,
+      "sha256": "2c9342a3d0e168e9e220fae2dee701c398308fdeb26ad454d9d8332f3ac3db93",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/h3.6.png"
+    },
+    {
+      "path": "out/h4.4.png",
+      "sizeBytes": 828351,
+      "sha256": "af773e2aa5ee10ec18ea3e84e9dbf35bbce012e65622101778522d9332af9d6b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/h4.4.png"
+    },
+    {
+      "path": "out/h5.9.png",
+      "sizeBytes": 772899,
+      "sha256": "368f0d7d95d2c6f6a5ad238d1d95ae80ad8dd2e64c0157f94dc078f2d18842e3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/h5.9.png"
+    },
+    {
+      "path": "out/loop-1x1-15s.mp4",
+      "sizeBytes": 11809367,
+      "sha256": "ec018ac8b9833626d430eb25dc09e71f931d6581d745ecdfbdded7491fbc5d99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-1x1-15s.mp4"
+    },
+    {
+      "path": "out/loop-3x4-15s.mp4",
+      "sizeBytes": 14561395,
+      "sha256": "53c63d1d6ce9b4fa4994e923fa8faac29742dd2ebf06ba59b8e5f7c96d1ebecd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-3x4-15s.mp4"
+    },
+    {
+      "path": "out/loop-4x5-15s-FINAL.mp4",
+      "sizeBytes": 4583336,
+      "sha256": "a016e72f152583ec44b6f3aca6ea4fb01493f50b00547967d2542b4168ec977f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-4x5-15s-FINAL.mp4"
+    },
+    {
+      "path": "out/loop-4x5-15s.mp4",
+      "sizeBytes": 16482160,
+      "sha256": "82c7acaaf911b4ed4b89bb7b4f412e75d34e95111251b9fdb016f10457577ff3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-4x5-15s.mp4"
+    },
+    {
+      "path": "out/loop-9x16-1080p.mp4",
+      "sizeBytes": 250384,
+      "sha256": "3cb1793f58ea32f928d245bff352b1b9639260720df3a8f06a7fe315afc3863d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-9x16-1080p.mp4"
+    },
+    {
+      "path": "out/loop-h3max-1080p.mp4",
+      "sizeBytes": 6735318,
+      "sha256": "6a8478a8bab215fc59df56378d0ef58731858f0fe1e78385893281fb501c08a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-h3max-1080p.mp4"
+    },
+    {
+      "path": "out/loop-h3max-10s-v5_a.png",
+      "sizeBytes": 695682,
+      "sha256": "60c49e252fe7d2be5cf5f5c291c641e1efb1effe851ecc96efaca1d802f85bc4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-h3max-10s-v5_a.png"
+    },
+    {
+      "path": "out/loop-h3max-10s-v5_b.png",
+      "sizeBytes": 977567,
+      "sha256": "dc9cf5fd824eb0255f3f0bc3b05a8e1b0a843a548a6f6e72f92c9957efc757e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-h3max-10s-v5_b.png"
+    },
+    {
+      "path": "out/loop-h3max-10s-v5.mp4",
+      "sizeBytes": 11498363,
+      "sha256": "faf0618a1261577ad0614e85e49bd86cbc7315842f8bbb8724e47b15501ba1df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-h3max-10s-v5.mp4"
+    },
+    {
+      "path": "out/loop-h3max-10s.mp4",
+      "sizeBytes": 11722626,
+      "sha256": "35915c62145b654eef72c4f372e9acd8b491b0bd7d1da1ede57e6afcefd80b42",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-h3max-10s.mp4"
+    },
+    {
+      "path": "out/loop-h3max-9x16.mp4",
+      "sizeBytes": 7822252,
+      "sha256": "0e0770d64c142b235bc026fd3f3105ce3927a447cf6b50958c80ceefc50217d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-h3max-9x16.mp4"
+    },
+    {
+      "path": "out/loop-r2v-audio-1080p.mp4",
+      "sizeBytes": 762303,
+      "sha256": "2701417b0e3f18b5de9f66aa490bbd3f0163bc2fbbde91c632ee85bb71ac9ead",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-r2v-audio-1080p.mp4"
+    },
+    {
+      "path": "out/loop-v10-mudo.mp4",
+      "sizeBytes": 17920298,
+      "sha256": "772d79ee80d240c8ad71b78468430e4e928cdbd5656f866969471135f0fda644",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-v10-mudo.mp4"
+    },
+    {
+      "path": "out/loop-v11-solofoley.mp4",
+      "sizeBytes": 17690276,
+      "sha256": "594f545bd85a9288e82ddd0d850f6c9b8444e966b2601d06b85559b91b112e57",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-v11-solofoley.mp4"
+    },
+    {
+      "path": "out/loop-v6-sinvoz.mp4",
+      "sizeBytes": 12137669,
+      "sha256": "301cd1fbacc2b8565a9b5f5aa264e9078f016155ad052459e3980b0d5c539248",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-v6-sinvoz.mp4"
+    },
+    {
+      "path": "out/loop-v7-cmp.png",
+      "sizeBytes": 750053,
+      "sha256": "2eaaca7556d8aa1c266dd85744b1e31e62b23315bce91c351cc9904713d05613",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-v7-cmp.png"
+    },
+    {
+      "path": "out/loop-v7-sfx_a.png",
+      "sizeBytes": 690326,
+      "sha256": "9a22051825e3d1f0f978b34d9b136aff24c190b51b40b89102f36e3a329c9162",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-v7-sfx_a.png"
+    },
+    {
+      "path": "out/loop-v7-sfx_b.png",
+      "sizeBytes": 1058662,
+      "sha256": "da368400beb61e0ef36b713eb9eb038f4b29011bd38a7ab0bf9c5d73cbb80274",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-v7-sfx_b.png"
+    },
+    {
+      "path": "out/loop-v7-sfx.mp4",
+      "sizeBytes": 11877118,
+      "sha256": "0f8dd5eeffadd6c7fe05f832448fed777e99da35ae7ab6c25d61f9c2603c7ae8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-v7-sfx.mp4"
+    },
+    {
+      "path": "out/loop-v8-15s.mp4",
+      "sizeBytes": 17240905,
+      "sha256": "813c966c943e17bc435e43c756c0ef74d3c64fbb56fdbf27093f2b63c657d725",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-v8-15s.mp4"
+    },
+    {
+      "path": "out/loop-v9-15s.mp4",
+      "sizeBytes": 18248501,
+      "sha256": "07308d68ebc237d33de988f6ad63cdf60c45b44b8380debf3bac7b4cbabdd00d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/loop-v9-15s.mp4"
+    },
+    {
+      "path": "out/ma.png",
+      "sizeBytes": 700578,
+      "sha256": "da7f09fcb52b47ace10f99be90e005cb564c66dd3d19cee592277775e4edd146",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/ma.png"
+    },
+    {
+      "path": "out/mb.png",
+      "sizeBytes": 996310,
+      "sha256": "ced4a1ee1ce24b71c908fea89505f4ffb10d0b0c8cc1ce4f2406ef269fe15d6f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/mb.png"
+    },
+    {
+      "path": "out/na.png",
+      "sizeBytes": 693832,
+      "sha256": "21435eed309716490da04204fe438eef20ad6beafea5b3631424eb8528320579",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/na.png"
+    },
+    {
+      "path": "out/nb.png",
+      "sizeBytes": 1041044,
+      "sha256": "5793ad7f2d52891c2eb34cc573c64d194abbf2ff2ec4ee246e558ad85ce7ecea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/nb.png"
+    },
+    {
+      "path": "out/oa.png",
+      "sizeBytes": 690017,
+      "sha256": "5f0dcd5bdee0c7580d426d770a3493397818f06c4a065c6b09559c532ea69c20",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/oa.png"
+    },
+    {
+      "path": "out/ob.png",
+      "sizeBytes": 1002903,
+      "sha256": "9167d9d0b973c3571f8c8631b344996968c8ea082ca21c8a331a21f21c6f81b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/ob.png"
+    },
+    {
+      "path": "out/p10.wav",
+      "sizeBytes": 483406,
+      "sha256": "1b8269437f09ccede616be57177181a84048c267639a828f65ba2ce30062718b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/p10.wav"
+    },
+    {
+      "path": "out/p11.wav",
+      "sizeBytes": 483406,
+      "sha256": "af39f849a85964b8c5e97f483150fd2a52e0603953f61d6385bc050b3f05f247",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/p11.wav"
+    },
+    {
+      "path": "out/p7.wav",
+      "sizeBytes": 324686,
+      "sha256": "23581ae469c0c0f08e89e4b7890e512307922a7f0526f5403530547c198daac5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/p7.wav"
+    },
+    {
+      "path": "out/p9.wav",
+      "sizeBytes": 483406,
+      "sha256": "88a746d4d4ef98ba99df111f8c96bff758f0a0ebe3a33b55db2f0cc331fa0d3f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/p9.wav"
+    },
+    {
+      "path": "out/pista.wav",
+      "sizeBytes": 194754,
+      "sha256": "374f26e3703dde1182c7ad57322bdbe511b56ffa808f13bad1a0cd25c5a02aea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/pista.wav"
+    },
+    {
+      "path": "out/q11.0.png",
+      "sizeBytes": 1239277,
+      "sha256": "6d596cc900eac14c1735e1f15a628865d27ec45284ca5d5baae2a140af4d83f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/q11.0.png"
+    },
+    {
+      "path": "out/q12.5.png",
+      "sizeBytes": 1239764,
+      "sha256": "842861bd32832b1752d441b241f8e0bea16860c5345e20b0cdf011a83dfb492d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/q12.5.png"
+    },
+    {
+      "path": "out/q14.5.png",
+      "sizeBytes": 1004014,
+      "sha256": "9014e1abb235a2354b0f104b9615a11b159d3c2152be01775e44be82295faca5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/q14.5.png"
+    },
+    {
+      "path": "out/q2.0.png",
+      "sizeBytes": 1035648,
+      "sha256": "944abf64c06b148d7f8cd02d0b736197588102850ee047aaddfb9bf1fb8a6755",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/q2.0.png"
+    },
+    {
+      "path": "out/q3.5.png",
+      "sizeBytes": 1123363,
+      "sha256": "9be5f4afc0835051c914f4b7ff2bbd380c7db98d5857763b15101c2073555cbf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/q3.5.png"
+    },
+    {
+      "path": "out/q5.0.png",
+      "sizeBytes": 1126194,
+      "sha256": "e6996d1f616ec28afe02facd711eccd21c8e3fb668edcaaca9713c39d4c9bb3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/q5.0.png"
+    },
+    {
+      "path": "out/q7.0.png",
+      "sizeBytes": 1213950,
+      "sha256": "e1c51da14d71d315252dc5d3f015e3321040cf24568d88b20e771d14dfdf3eef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/q7.0.png"
+    },
+    {
+      "path": "out/q9.0.png",
+      "sizeBytes": 1235825,
+      "sha256": "a0648e34db7a57855f3164aeb67ac4f48a4163318584f925273e150cd3b747f6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/q9.0.png"
+    },
+    {
+      "path": "out/qa-3x4-tira.png",
+      "sizeBytes": 866837,
+      "sha256": "15c69b120497e684eae598823642b7e8a4489dba72e515ae09800914e8ef2538",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-3x4-tira.png"
+    },
+    {
+      "path": "out/qa-h3max-10s-tira.png",
+      "sizeBytes": 1265242,
+      "sha256": "53ca9f808e147548159bd93b26b5c980888b1bb6e896deb8c89e3ab3bd6468ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-h3max-10s-tira.png"
+    },
+    {
+      "path": "out/qa-h3max-9x16-tira.png",
+      "sizeBytes": 1256896,
+      "sha256": "a1d64ef06f7cc7ada8c011d99c8db710830c04cb05cef10edd6689d5e573a3ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-h3max-9x16-tira.png"
+    },
+    {
+      "path": "out/qa-h3max-tira.png",
+      "sizeBytes": 1393547,
+      "sha256": "c531f943e4857b73c272b8a9d4c90c17f1215263724f4c68720b9a35d6be8651",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-h3max-tira.png"
+    },
+    {
+      "path": "out/qa-r2v-tira.png",
+      "sizeBytes": 1049264,
+      "sha256": "1b60198554dcd917684c5dd64493efffd33ff582bba07694910e51782c52bfc8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-r2v-tira.png"
+    },
+    {
+      "path": "out/qa-t0.png",
+      "sizeBytes": 147638,
+      "sha256": "f4e32ebc1093e1ccf40946c0b4f577f91021d02bd598d69316edba3c3e6ab4d7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-t0.png"
+    },
+    {
+      "path": "out/qa-t1.6.png",
+      "sizeBytes": 225727,
+      "sha256": "1662b39ac1db2b326a2e2a29550cf6baa18d847c0a1e3e0781df5bd99148edf0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-t1.6.png"
+    },
+    {
+      "path": "out/qa-t3.0.png",
+      "sizeBytes": 253614,
+      "sha256": "16182103d31e3842d35c8b8c916102c6d9a65fa67b7cb8fcb7ba90ef6d0edc0e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-t3.0.png"
+    },
+    {
+      "path": "out/qa-t4.9.png",
+      "sizeBytes": 267611,
+      "sha256": "3138b5a67c39d6660af9f8feed7a80dd4a82aadbd00b6a0a3815a61b8b23764f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-t4.9.png"
+    },
+    {
+      "path": "out/qa-tira-1080p.png",
+      "sizeBytes": 1073075,
+      "sha256": "4f0c875c5a213d38c0ddb30e3356043541df9e664a9ba0417788e042a4fa5a3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-tira-1080p.png"
+    },
+    {
+      "path": "out/qa-tira.png",
+      "sizeBytes": 1216638,
+      "sha256": "9d6ef970840aed40b8312eaa0a53f6bfd4c604123201a11350ed937f6c29500f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-tira.png"
+    },
+    {
+      "path": "out/qa-v5-tira.png",
+      "sizeBytes": 1280348,
+      "sha256": "56c2d0590c089512e92bf2879cbfcced105b37052d3ee768b732ad4a2726e4b0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-v5-tira.png"
+    },
+    {
+      "path": "out/qa-v8-tira.png",
+      "sizeBytes": 1031325,
+      "sha256": "c10526e49aa55ad576f991ae4434c4d4ff2b913d88dfa814c6a0e68438e8f85e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/qa-v8-tira.png"
+    },
+    {
+      "path": "out/r0.2.png",
+      "sizeBytes": 2282134,
+      "sha256": "1806c0d15d0537f7842970f1a0830bb0e6eb2da7d776f642bada02a22abaa719",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/r0.2.png"
+    },
+    {
+      "path": "out/r1.2.png",
+      "sizeBytes": 3358079,
+      "sha256": "4426e8a8616d93ebdc92e29a3287067859744959625837947c48f9ae220c1972",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/r1.2.png"
+    },
+    {
+      "path": "out/r2.4.png",
+      "sizeBytes": 4595676,
+      "sha256": "992e5c24e23c4777292d33e07a97bcc8c1b30920934c7ed7fbf316a2db0bfb7c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/r2.4.png"
+    },
+    {
+      "path": "out/r3.6.png",
+      "sizeBytes": 4951439,
+      "sha256": "f64c4624de8654f818627dfa0e255801ac2112eeece78f4a05038093ff895bd0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/r3.6.png"
+    },
+    {
+      "path": "out/r4.4.png",
+      "sizeBytes": 5166664,
+      "sha256": "63e6fac8f041ed453748607382de2631a3a84d4bc106012507e5f38672a6f08d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/r4.4.png"
+    },
+    {
+      "path": "out/r5.9.png",
+      "sizeBytes": 4552260,
+      "sha256": "1a91c8b352709d0bb35f41ae1c6222efcc4359764ca41c999f4017fd19144768",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/r5.9.png"
+    },
+    {
+      "path": "out/sonda-filtro-480p.mp4",
+      "sizeBytes": 628239,
+      "sha256": "4ef282c618c438807966fa2ab87e10bb944158d0c474f66cbc9354613c6387d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/sonda-filtro-480p.mp4"
+    },
+    {
+      "path": "out/t1.0.png",
+      "sizeBytes": 930216,
+      "sha256": "e3e97afc59fcc29ff8ea64b517f596452a4892bf3e0aa9a61361634d969f565d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/t1.0.png"
+    },
+    {
+      "path": "out/t2.0.png",
+      "sizeBytes": 1088783,
+      "sha256": "31f9b2b162bd1d2662fefdd4416107ec5f924a4662bead3be3598778f5931f46",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/t2.0.png"
+    },
+    {
+      "path": "out/t4.0.png",
+      "sizeBytes": 1066382,
+      "sha256": "4dd36b67d49fe834169747da2168bccf1c078078776d7af8b0c1b5c0179a8eb1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/t4.0.png"
+    },
+    {
+      "path": "out/t6.5.png",
+      "sizeBytes": 1194672,
+      "sha256": "806f8bcc602b54765e121667e54bd122d543f41656739920eea7fdff6b2c6c42",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/t6.5.png"
+    },
+    {
+      "path": "out/t7.6.png",
+      "sizeBytes": 1254849,
+      "sha256": "3bed626b2cb4fb43f364a2109b56a76ddfeb55bb35d6b4b6a79740274e982d02",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/t7.6.png"
+    },
+    {
+      "path": "out/t9.7.png",
+      "sizeBytes": 1034744,
+      "sha256": "59e296b4a291b9b60d98529bab37e4925ed5a5c8e66fa6440f0d051f1529aa41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/t9.7.png"
+    },
+    {
+      "path": "out/v0.2.png",
+      "sizeBytes": 793247,
+      "sha256": "0c6db523af4cb332dea7dbb5bcb5fb4262db6dd32b54419f09cb01bbab44bf1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/v0.2.png"
+    },
+    {
+      "path": "out/v1.2.png",
+      "sizeBytes": 1004066,
+      "sha256": "e5a212358c81752c4eb790d6216a5d6c4a9c19d959346b6c38b5785578d5377d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/v1.2.png"
+    },
+    {
+      "path": "out/v2.4.png",
+      "sizeBytes": 1047878,
+      "sha256": "d68286c92c045ef664e0a2491a961dcaad87fcb29d22480b5e53eeae736e524a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/v2.4.png"
+    },
+    {
+      "path": "out/v3.6.png",
+      "sizeBytes": 1171123,
+      "sha256": "4dad1908c36a3cd2a18e14343fc251f7811a3815ed42aa480778ba665dbf7bf6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/v3.6.png"
+    },
+    {
+      "path": "out/v4.4.png",
+      "sizeBytes": 1180575,
+      "sha256": "54b4174f8b2dc2c1cd994a928140b3fa6541445a5e50fa39f791fca9ce1121de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/v4.4.png"
+    },
+    {
+      "path": "out/v5.9.png",
+      "sizeBytes": 1228457,
+      "sha256": "e04ffb2e7d1eed273d922af3c01c5b549ede0deec825b4466a71da4e3a51f4ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/v5.9.png"
+    },
+    {
+      "path": "out/va.png",
+      "sizeBytes": 694416,
+      "sha256": "2c7475bb99dcec9e3e79474c922dd4cd9ca3c6cac5c21e524b29215198085b0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/va.png"
+    },
+    {
+      "path": "out/vb.png",
+      "sizeBytes": 1028027,
+      "sha256": "03f0c49d2819045b8ff7db4c20fb3c1e7fb8f4fa7e583c7bc6139047cf2a52f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/vb.png"
+    },
+    {
+      "path": "out/w1.0.png",
+      "sizeBytes": 978892,
+      "sha256": "6e43e229c35b3128ac4486a909a960107cc3db4a8912cf09d272fd0512b95b11",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/w1.0.png"
+    },
+    {
+      "path": "out/w2.5.png",
+      "sizeBytes": 1088851,
+      "sha256": "1160e5d23d31b61d55c779d136d9457d3bd4f318f8d1b9d1c16ddd7d1e19c5a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/w2.5.png"
+    },
+    {
+      "path": "out/w4.5.png",
+      "sizeBytes": 1205849,
+      "sha256": "8bff29234b477024a122e0f9b93156f5d604b3d90e8889794f07c1e5ac30fa0d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/w4.5.png"
+    },
+    {
+      "path": "out/w6.8.png",
+      "sizeBytes": 1206742,
+      "sha256": "15f4aff407a10194f3cb9af24647aa360c79caa06f427d2a8f15035c0a7c3738",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/w6.8.png"
+    },
+    {
+      "path": "out/w8.0.png",
+      "sizeBytes": 1222271,
+      "sha256": "2c19cb016787635bd5b2885cf372b264c7598887b9942ad226f39e5a0ef1572a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/w8.0.png"
+    },
+    {
+      "path": "out/w9.7.png",
+      "sizeBytes": 1013623,
+      "sha256": "bf11fc3edbeb48c7d1b908c033fd8e29a1129e8314f07b9523c78843812aa010",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/w9.7.png"
+    },
+    {
+      "path": "out/z1.0.png",
+      "sizeBytes": 983853,
+      "sha256": "5684faa9c1621aeb4f3a419b7c35fea37eef598573f57bdfaad5477f91b32303",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/z1.0.png"
+    },
+    {
+      "path": "out/z9.7.png",
+      "sizeBytes": 1038056,
+      "sha256": "fde607dd3a9d414dd2b93e1c15c1caf974e527f25da7ace278e2266baf260129",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_motion-codex-rueda-prensa/out/z9.7.png"
+    }
+  ]
+}

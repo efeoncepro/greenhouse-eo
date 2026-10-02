@@ -1,0 +1,59 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:23:57.349Z",
+  "run": "ai-generations/2026-09-26_iconos-planos",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-26_iconos-planos",
+  "totalBytes": 9307770,
+  "fileCount": 8,
+  "files": [
+    {
+      "path": "calado.png",
+      "sizeBytes": 880771,
+      "sha256": "cae0a09b5f61f587eb8f79b20ab420288036ea8f448df0752aab66840516da51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-planos/calado.png"
+    },
+    {
+      "path": "oficio.png",
+      "sizeBytes": 867016,
+      "sha256": "8d6f40ea8d3c8b15b2a1ca1614c5d51d75ab6f9a1832569e0e05cdb44ecbe640",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-planos/oficio.png"
+    },
+    {
+      "path": "orbita.png",
+      "sizeBytes": 922220,
+      "sha256": "13487d08a1593e424d8e65a514b957ace60fdeae32676b5f3b1e706c4c30c620",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-planos/orbita.png"
+    },
+    {
+      "path": "plastilina-2/hoja.png",
+      "sizeBytes": 933123,
+      "sha256": "6c4b5611ef858ce17ca7f6c016d6266a2141eb9b39238512e15220adb1625825",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-planos/plastilina-2/hoja.png"
+    },
+    {
+      "path": "r2/disco.png",
+      "sizeBytes": 1015607,
+      "sha256": "650fb099738e6a28229c88f84821dd56e3b261052565eb227425b78b6e71a4bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-planos/r2/disco.png"
+    },
+    {
+      "path": "r2/estela.png",
+      "sizeBytes": 961463,
+      "sha256": "a2a9d33d67b1c546ec37fa168a1a3d8c8fc8a551eb314b6e7f17e0f2c4a03c73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-planos/r2/estela.png"
+    },
+    {
+      "path": "r2/inflado.png",
+      "sizeBytes": 951214,
+      "sha256": "6cc6286e4518224dfce8e299ac5969b8c5e5d4a18c296f56a39e54a1ea4630f6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-planos/r2/inflado.png"
+    },
+    {
+      "path": "r3/maestra.png",
+      "sizeBytes": 2776356,
+      "sha256": "13b37105f7f1ea156e4ca76a3e423c9097ca1d5b11728934220f99594701a49e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-planos/r3/maestra.png"
+    }
+  ]
+}

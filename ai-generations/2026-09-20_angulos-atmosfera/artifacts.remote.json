@@ -1,0 +1,77 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:06:16.454Z",
+  "run": "ai-generations/2026-09-20_angulos-atmosfera",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_angulos-atmosfera",
+  "totalBytes": 18292794,
+  "fileCount": 11,
+  "files": [
+    {
+      "path": "hoja-contacto.jpg",
+      "sizeBytes": 272705,
+      "sha256": "7632da83c83ba8bcf6181ea48e7c55c4bd2c5f90281a14410975265f09ab3b83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/hoja-contacto.jpg"
+    },
+    {
+      "path": "plates/A1-macro-cafe-suspendido.png",
+      "sizeBytes": 1831165,
+      "sha256": "765bd1e087f25f46d6e248c587e4bbeadddb64308f4a0814e415093b2a2454c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/plates/A1-macro-cafe-suspendido.png"
+    },
+    {
+      "path": "plates/A2-barrido-mercado-lima.png",
+      "sizeBytes": 2108206,
+      "sha256": "5017a958bc2aaeda3c93f349cb3c2db5835ccac6c4ae80a450bcde77252e2b9f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/plates/A2-barrido-mercado-lima.png"
+    },
+    {
+      "path": "plates/A3-tilt-shift-rodaje-cdmx.png",
+      "sizeBytes": 1940956,
+      "sha256": "7869ad9f207c1fa01fa67c5d74c86d629ccf5c161b3dff2b92d31b6f9919c67e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/plates/A3-tilt-shift-rodaje-cdmx.png"
+    },
+    {
+      "path": "plates/A4-reflejo-vidrio-julio-v2.png",
+      "sizeBytes": 2060343,
+      "sha256": "4fe1465ffdbad738a979ddf19edf8f720abcf423fd35d2922847347724842a0e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/plates/A4-reflejo-vidrio-julio-v2.png"
+    },
+    {
+      "path": "plates/A4-reflejo-vidrio-julio.png",
+      "sizeBytes": 1992441,
+      "sha256": "fd4efe7b8e748a160a7583e73fe31b3eb0ea4e8d9dd7a1ece8140a062585ceec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/plates/A4-reflejo-vidrio-julio.png"
+    },
+    {
+      "path": "plates/A5-escala-haz-nexa-v2.png",
+      "sizeBytes": 1972252,
+      "sha256": "a5c289cac99b56d65b9abc158b34b0546252f35c3d7f3890185c3f5b37596c07",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/plates/A5-escala-haz-nexa-v2.png"
+    },
+    {
+      "path": "plates/A5-escala-haz-nexa-v3.png",
+      "sizeBytes": 2021284,
+      "sha256": "6625ce67d91e97b56fba6f0d9357805db96b89aa4c3ffee2ca131504af7a3a67",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/plates/A5-escala-haz-nexa-v3.png"
+    },
+    {
+      "path": "plates/A5-escala-haz-nexa.png",
+      "sizeBytes": 1953398,
+      "sha256": "41fbadc111a90b954de04a48c8cc03336bff4919b1afe3d50c29b6e8f798cbe4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/plates/A5-escala-haz-nexa.png"
+    },
+    {
+      "path": "plates/A6-contrapicado-set-miami.png",
+      "sizeBytes": 1990256,
+      "sha256": "2772979e9ecd3e4f234679d631a6f8f418b8d61d3b290e48948380c5bdbb6a6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/plates/A6-contrapicado-set-miami.png"
+    },
+    {
+      "path": "zoom-A4-vidrio.jpg",
+      "sizeBytes": 149788,
+      "sha256": "f77d40e2c0d34fb55fb73bd93a289c5d9bc11e791c622d8b7de7230465153371",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_angulos-atmosfera/zoom-A4-vidrio.jpg"
+    }
+  ]
+}

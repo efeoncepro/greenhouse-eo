@@ -1,0 +1,77 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:20:17.241Z",
+  "run": "ai-generations/2026-09-24_design-context-lab-v4",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-24_design-context-lab-v4",
+  "totalBytes": 26247084,
+  "fileCount": 11,
+  "files": [
+    {
+      "path": "finales/01-slide-mision.png",
+      "sizeBytes": 2984641,
+      "sha256": "68fe47eb9d71c537c2075f9d60033071e7d52ccc90024e54df92db558bc02432",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/finales/01-slide-mision.png"
+    },
+    {
+      "path": "finales/02-slide-mezcla.png",
+      "sizeBytes": 3040050,
+      "sha256": "59ec9398fac83a913ed7d0f14be3592ccf43038eee6d9b04a5f7669bb9e13e6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/finales/02-slide-mezcla.png"
+    },
+    {
+      "path": "finales/03-slide-criterio.png",
+      "sizeBytes": 3031871,
+      "sha256": "3ccdd1bad666f7e81edb2067f51d2d49956ce24a220292fa8ab0024f81f462a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/finales/03-slide-criterio.png"
+    },
+    {
+      "path": "finales/preview-carrusel.png",
+      "sizeBytes": 1245789,
+      "sha256": "a0315e72bdff64bdfc80d026eba8d63410d30ae8c5e9b59acb36514be43d224d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/finales/preview-carrusel.png"
+    },
+    {
+      "path": "ilustraciones/01-mision-bruta.png",
+      "sizeBytes": 2046785,
+      "sha256": "8018bffaece99b12585883ecb791b6d1bc1b004ee510614df3f031d4591c82d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/ilustraciones/01-mision-bruta.png"
+    },
+    {
+      "path": "ilustraciones/01-mision-polo-credencial.png",
+      "sizeBytes": 2074855,
+      "sha256": "17689b14d244a84f1561739beb0a655ca56ebee5d52bbd8f44019743b83a3de1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/ilustraciones/01-mision-polo-credencial.png"
+    },
+    {
+      "path": "ilustraciones/01-mision-polo.png",
+      "sizeBytes": 2062977,
+      "sha256": "7f46a8aa90284088ddd3e11238c84a450f4c93bdb7b91e9594a95b1c65ace902",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/ilustraciones/01-mision-polo.png"
+    },
+    {
+      "path": "ilustraciones/02-ingredientes-bruta.png",
+      "sizeBytes": 2712260,
+      "sha256": "0281ad7f9ffa00b0b418ddf559cc346ef88d26c53004851321e84ba44c4d797c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/ilustraciones/02-ingredientes-bruta.png"
+    },
+    {
+      "path": "ilustraciones/02-ingredientes-polo-credencial.png",
+      "sizeBytes": 2182673,
+      "sha256": "cdec8223e3d85a985c36681b345f823b00f5c6aadfa10b63b7a2afb134e84660",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/ilustraciones/02-ingredientes-polo-credencial.png"
+    },
+    {
+      "path": "ilustraciones/03-revelacion-bruta.png",
+      "sizeBytes": 2691854,
+      "sha256": "f5bd7fd9715eb486fadc995fac6722059f8da7c90718d1d9ca54810258e5b65d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/ilustraciones/03-revelacion-bruta.png"
+    },
+    {
+      "path": "ilustraciones/03-revelacion-polo-credencial.png",
+      "sizeBytes": 2173329,
+      "sha256": "dfc03f44e3914c177240ec0db242a62595d7836a72b039bdb13420dcfe22fc2e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v4/ilustraciones/03-revelacion-polo-credencial.png"
+    }
+  ]
+}

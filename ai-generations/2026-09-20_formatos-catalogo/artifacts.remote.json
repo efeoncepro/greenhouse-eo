@@ -1,0 +1,341 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:07:59.476Z",
+  "run": "ai-generations/2026-09-20_formatos-catalogo",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_formatos-catalogo",
+  "totalBytes": 155359090,
+  "fileCount": 55,
+  "files": [
+    {
+      "path": "rondas/ab-impacto/T17-mesa-larga-en-profundidad-169-con-impacto.png",
+      "sizeBytes": 2327942,
+      "sha256": "e137998ba186d85952be85440ccfcb7b854b7cf032af176612969484b0d26a0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ab-impacto/T17-mesa-larga-en-profundidad-169-con-impacto.png"
+    },
+    {
+      "path": "rondas/ab-impacto/T6-tilt-shift-169-con-impacto.png",
+      "sizeBytes": 2855789,
+      "sha256": "97d4287f9d5dbaf4d9c6cf8ecea411c0327019c071e7216cc207db38c0d04381",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ab-impacto/T6-tilt-shift-169-con-impacto.png"
+    },
+    {
+      "path": "rondas/cobertura/_contactos-11.png",
+      "sizeBytes": 8515242,
+      "sha256": "e051d32c47575b4cbddb6e782acc882da16e621a416e2f9775a60ecb88de1654",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/_contactos-11.png"
+    },
+    {
+      "path": "rondas/cobertura/_contactos-169.png",
+      "sizeBytes": 4173541,
+      "sha256": "d939a6e635b545eaa7b549938ff99659e8c70c4fe60748c1680d840fcce1d7e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/_contactos-169.png"
+    },
+    {
+      "path": "rondas/cobertura/_contactos-916.png",
+      "sizeBytes": 14609489,
+      "sha256": "0c82006df642aa900dd877dc302f93ed102c2071b261fdc4043ea974c07ccf34",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/_contactos-916.png"
+    },
+    {
+      "path": "rondas/cobertura/T10-macro-11-plate.png",
+      "sizeBytes": 1808521,
+      "sha256": "b98959f3eaef27ebebd4c81f542a2005e4305393297f2154d721364388e0b266",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T10-macro-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T10-macro-169-plate.png",
+      "sizeBytes": 2953960,
+      "sha256": "19d785777d25c88f1759f34e6a92c8f2dc6a37d7c9e8d951bcf04987f71bc7e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T10-macro-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T10-macro-916-plate.png",
+      "sizeBytes": 3018982,
+      "sha256": "af4434a446e079a1c095871e30610de664dcfb6b24aa5edfa64082aac85b5a4c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T10-macro-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T12-marco-dentro-del-marco-11-plate.png",
+      "sizeBytes": 1317242,
+      "sha256": "a7ff269a0fcf6f3c878509a66f812a5f23ea067b6937265567ca7e7e7d08e9fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T12-marco-dentro-del-marco-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T12-marco-dentro-del-marco-169-plate.png",
+      "sizeBytes": 2442470,
+      "sha256": "a8a300ed7c4693693e69647884b910eef47f05cf6434459157ad215fb5093f22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T12-marco-dentro-del-marco-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T12-marco-dentro-del-marco-916-plate.png",
+      "sizeBytes": 2527173,
+      "sha256": "636c0903c6410290784acfd08c77c43f61b1446d95f9c12a3f28bed504159216",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T12-marco-dentro-del-marco-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T13-escala-11-plate.png",
+      "sizeBytes": 1395118,
+      "sha256": "de55141451e473bc4f3e1a3fd7ec7b4d37fe5ddb123ce07f48a6323256161291",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T13-escala-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T13-escala-916-plate.png",
+      "sizeBytes": 2434333,
+      "sha256": "e413ba1ef3f74c0c4c430c4a884dd51920b9f3021980f2d21fd180fed7a27479",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T13-escala-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T15-noche-11-plate.png",
+      "sizeBytes": 1523253,
+      "sha256": "79ab6b74601b584b950de6173e2dca5d25c46ba46be9c48bb52e5736105552ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T15-noche-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T15-noche-169-plate.png",
+      "sizeBytes": 2529108,
+      "sha256": "850949ec1fab28937051c20ac6526d932a482f94ac27d2e0710880f83d42e836",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T15-noche-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T15-noche-916-plate.png",
+      "sizeBytes": 2711081,
+      "sha256": "fd1f284099875f159c912396ff9630683a4fe446d67bc13b5aa184236beb9a5c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T15-noche-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T16-por-encima-del-respaldo-11-plate.png",
+      "sizeBytes": 1714259,
+      "sha256": "0227b41764986f94c68181c28fb8b03f0975915c07ecfaf7970d541f4732c033",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T16-por-encima-del-respaldo-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T16-por-encima-del-respaldo-169-plate.png",
+      "sizeBytes": 2804437,
+      "sha256": "3222f98e84d1e5618303a4297820a74f1af71496e8e4ad5c4383b2bdad76c43c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T16-por-encima-del-respaldo-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T16-por-encima-del-respaldo-916-plate.png",
+      "sizeBytes": 2905776,
+      "sha256": "f564dd8ffd4aea7c6216c936b074290611a33aa1f0fb8f2c13c5dce3f92d4c67",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T16-por-encima-del-respaldo-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T17-mesa-larga-en-profundidad-11-plate.png",
+      "sizeBytes": 1395414,
+      "sha256": "ff09cea0db3777da41e05ced449a439ca28aaa2d4e8a9ef111fb51e8ce9ae56d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T17-mesa-larga-en-profundidad-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T17-mesa-larga-en-profundidad-169-plate.png",
+      "sizeBytes": 2638779,
+      "sha256": "91a53c661eef319ec3c26b6abb75fdb34c8532ab9f54acbf58c73789177b76f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T17-mesa-larga-en-profundidad-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T17-mesa-larga-en-profundidad-916-plate.png",
+      "sizeBytes": 2617452,
+      "sha256": "f963fad58b3f6aa56741eb97581e68953584b6256b875c294cdc0b86373a5fcf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T17-mesa-larga-en-profundidad-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T18-por-encima-del-hombro-pant-11-plate.png",
+      "sizeBytes": 1622564,
+      "sha256": "b0de512c6388beab61948a55d16ed4e44da90abd15fa1817959c17a33392c334",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T18-por-encima-del-hombro-pant-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T18-por-encima-del-hombro-pant-169-plate.png",
+      "sizeBytes": 2874419,
+      "sha256": "e6d9669058d97bc275a03f0a49e45126f9de92d9c499a10173e4c8e51f8a5f9c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T18-por-encima-del-hombro-pant-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T18-por-encima-del-hombro-pant-916-plate.png",
+      "sizeBytes": 2766480,
+      "sha256": "246abda64b54fcf6c17983c0b9f155b7479a9965dc41034f2823b6b31ece322b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T18-por-encima-del-hombro-pant-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T19-picado-60-sobre-la-obra-11-plate.png",
+      "sizeBytes": 1609728,
+      "sha256": "6d3bb54fac82d4202a716e7b077ac508b1d26ac2f7a82b631ebb51039006530a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T19-picado-60-sobre-la-obra-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T19-picado-60-sobre-la-obra-916-plate.png",
+      "sizeBytes": 2612217,
+      "sha256": "0b710befe90743ee269c6edcbba5f6f441bf5268ce7cc6cf657c9506037fdd78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T19-picado-60-sobre-la-obra-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T4-ojo-de-pez-grupo-11-plate.png",
+      "sizeBytes": 1638199,
+      "sha256": "9d78fc95782f12d65445f088d407cd3eef2d3327b53277626e6959c4993657e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T4-ojo-de-pez-grupo-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T4-ojo-de-pez-grupo-169-plate.png",
+      "sizeBytes": 2972980,
+      "sha256": "7c85341658e3ce79fbc5036f5a67469b0b35456ba3865479b1f7b35fb055af93",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T4-ojo-de-pez-grupo-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T4-ojo-de-pez-grupo-916-plate.png",
+      "sizeBytes": 2789815,
+      "sha256": "8d40b2a0f2c068350416ad3d0b03aefdb4a0c666d812af8ea1d1bb798287b9d0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T4-ojo-de-pez-grupo-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T5-dron-cenital-11-plate.png",
+      "sizeBytes": 2079606,
+      "sha256": "f2b730d845f369820f3ab4d040bb8417e8c764ae7c97eb63280163de62a4b412",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T5-dron-cenital-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T5-dron-cenital-169-plate.png",
+      "sizeBytes": 3464530,
+      "sha256": "ecbe7701f2bc8568fab237dd06abe3b0f51329982fbbff6bfaaf51a6dc668b8e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T5-dron-cenital-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T5-dron-cenital-916-plate.png",
+      "sizeBytes": 3671911,
+      "sha256": "743d155437ee7763a260d1e4c9260c50711b30c70bcc1fca77cec45b99739547",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T5-dron-cenital-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T6-tilt-shift-11-plate.png",
+      "sizeBytes": 1784377,
+      "sha256": "0e4c228e5173ba188e16966d9e4fbab12e408798f6fa8168bbd44232ab04533f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T6-tilt-shift-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T6-tilt-shift-169-plate.png",
+      "sizeBytes": 2979579,
+      "sha256": "8e25c63b8e90e5ba6d9e588e6c7877b0285c13abac719c86e898fa1356f43c5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T6-tilt-shift-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T6-tilt-shift-916-plate.png",
+      "sizeBytes": 2951517,
+      "sha256": "d0c188c17a6d9d40a34676f6ea12d882a58dfbf75fb4b5a4130ff13150c78f41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T6-tilt-shift-916-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T8-reflejo-en-vidrio-11-plate.png",
+      "sizeBytes": 1481866,
+      "sha256": "16296ced53599ce7e13a17847045f900dc23b31c267850d8808b91f003ae4d9b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T8-reflejo-en-vidrio-11-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T8-reflejo-en-vidrio-169-plate.png",
+      "sizeBytes": 2703645,
+      "sha256": "6a1ae60c73b3c3c3e12aad62a55141325e19d6a9f975dd834b6e6e8e9b171f8f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T8-reflejo-en-vidrio-169-plate.png"
+    },
+    {
+      "path": "rondas/cobertura/T8-reflejo-en-vidrio-916-plate.png",
+      "sizeBytes": 2696978,
+      "sha256": "bc9cd8bc2d985f7518fc054b91da7feb7c2a7aaea04b275945e7df17ab5a3632",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/cobertura/T8-reflejo-en-vidrio-916-plate.png"
+    },
+    {
+      "path": "rondas/ola1/T12-marco-dentro-del-marco-169-plate.png",
+      "sizeBytes": 2512078,
+      "sha256": "73a926838ea81e5b80a9d2092f5e80a5826adce5a9094a5db5d107fcb8674649",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola1/T12-marco-dentro-del-marco-169-plate.png"
+    },
+    {
+      "path": "rondas/ola1/T13-escala-169-plate.png",
+      "sizeBytes": 2488403,
+      "sha256": "5b8ddca114dafa826a2130773dd9039d45d3c50e437a5476229665a080985aa7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola1/T13-escala-169-plate.png"
+    },
+    {
+      "path": "rondas/ola1/T19-picado-60-sobre-la-obra-169-plate.png",
+      "sizeBytes": 3011496,
+      "sha256": "66d080e01d41be0d89105e8388ddcbb4efdae6c4c0150489a172ecc710bfd607",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola1/T19-picado-60-sobre-la-obra-169-plate.png"
+    },
+    {
+      "path": "rondas/ola1/T8-reflejo-en-vidrio-169-plate.png",
+      "sizeBytes": 3040579,
+      "sha256": "c5d586b794f618411a108423bf5c55b4dd9afeb1c81e4cd318024e9a36b54075",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola1/T8-reflejo-en-vidrio-169-plate.png"
+    },
+    {
+      "path": "rondas/ola2/T12-marco-dentro-del-marco-169-plate.png",
+      "sizeBytes": 2538319,
+      "sha256": "15c5548eb59ca6b0762b4385e00556201080b3ef4c2caf0631975be83b011f31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola2/T12-marco-dentro-del-marco-169-plate.png"
+    },
+    {
+      "path": "rondas/ola2/T13-escala-169-plate.png",
+      "sizeBytes": 2354498,
+      "sha256": "58cb369f8fa9c46a7bf1b45e93d6c9900e9ada008110d01a0bd03bdc51544685",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola2/T13-escala-169-plate.png"
+    },
+    {
+      "path": "rondas/ola2/T19-picado-60-sobre-la-obra-169-plate.png",
+      "sizeBytes": 2716303,
+      "sha256": "d796da7ef2dac39b9cd86ede3b45cd0b1db3f465963d8ccb8955443b2a21c0d1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola2/T19-picado-60-sobre-la-obra-169-plate.png"
+    },
+    {
+      "path": "rondas/ola2/T8-reflejo-en-vidrio-169-plate.png",
+      "sizeBytes": 2715854,
+      "sha256": "d899bc42f5d07751f43cd85e5ddd2e91032dfac169fb627b110fc271b1dce392",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola2/T8-reflejo-en-vidrio-169-plate.png"
+    },
+    {
+      "path": "rondas/ola3/T19-picado-60-sobre-la-obra-169-plate.png",
+      "sizeBytes": 2444143,
+      "sha256": "177281d3dc867def23810f61aafc387dea632ee03d393463b2733b1949daaee0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola3/T19-picado-60-sobre-la-obra-169-plate.png"
+    },
+    {
+      "path": "rondas/ola4-claro/T13-escala-169-claro.png",
+      "sizeBytes": 2492029,
+      "sha256": "21275e3bd1c85c18459bdcce15d9901e5b6d2c6bb80c26282173c94978fd0362",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola4-claro/T13-escala-169-claro.png"
+    },
+    {
+      "path": "rondas/ola4-claro/T19-picado-169-claro.png",
+      "sizeBytes": 2646583,
+      "sha256": "f922a66a342cec3cc5f5b38ed9db6bbe3721f06ac9326267872fa387a02b4f13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola4-claro/T19-picado-169-claro.png"
+    },
+    {
+      "path": "rondas/ola5-oscuro/T13-escala-169-oscuro.png",
+      "sizeBytes": 2435491,
+      "sha256": "2222afffcc896aa66c4ecbd7a3e15b306c0cffd2648fbfa40e86ea71f6b4b7c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola5-oscuro/T13-escala-169-oscuro.png"
+    },
+    {
+      "path": "rondas/ola5-oscuro/T15-noche-169-oscuro.png",
+      "sizeBytes": 2654293,
+      "sha256": "55cb3c59ec82dd01338584a26554978fbe0e444ba653e8e30a44b795da2eb63f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/ola5-oscuro/T15-noche-169-oscuro.png"
+    },
+    {
+      "path": "rondas/piloto-dirigido/T1-julio-nexa-45-dirigido.png",
+      "sizeBytes": 2103774,
+      "sha256": "7d58946e7b5a24b60a4cdf6e7058b20f44a14ae1bf154a90a50bb22e8954b8bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/piloto-dirigido/T1-julio-nexa-45-dirigido.png"
+    },
+    {
+      "path": "rondas/piloto-dirigido/T1-julio-nexa-45-v2.png",
+      "sizeBytes": 2096325,
+      "sha256": "3eb84d7820220a47ba8a5dffad0e09097fe8c8501053cf42730b16289c8a7b66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/piloto-dirigido/T1-julio-nexa-45-v2.png"
+    },
+    {
+      "path": "rondas/piloto-dirigido/T16-respaldo-169-dirigido.png",
+      "sizeBytes": 3189150,
+      "sha256": "3c67944aba9ed39243cb0122741e8dd1af8fa6988b9e8ff8eda026b69c74b9b1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_formatos-catalogo/rondas/piloto-dirigido/T16-respaldo-169-dirigido.png"
+    }
+  ]
+}
