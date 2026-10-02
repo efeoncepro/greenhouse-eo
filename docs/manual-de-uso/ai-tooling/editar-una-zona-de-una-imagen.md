@@ -99,6 +99,33 @@ del modelo; nunca secretos ni URLs firmadas. **Repetir la misma entrada no vuelv
 El veredicto garantiza lo que **no** se toca; **no** dice si el pedido se cumplio. En el canario, una pasada salio
 `PASS` sin la planta. Abre `candidate-N.png` y mira la union al 100 %.
 
+## Editar con un boceto y referencias (como el Markup de ChatGPT)
+
+En ChatGPT se dibuja sobre la foto (Edit → Markup) y se escribe la instruccion; para incorporar un objeto se le pasa su
+imagen. En la API **no existe un parametro de boceto**: el dibujo viaja como una imagen de entrada mas, y la guia de
+OpenAI pide numerar el rol de cada imagen («Place the X from image 2 into image 1… Do not change anything else»).
+`pnpm ai:inpaint image` lo hace asi:
+
+```bash
+pnpm ai:inpaint image --image base.png --sketch boceto.png --reference lampara.png \
+  --model gpt-image-2.5-sunburst --prompt "Add the lamp from the reference where the sketch marks it." \
+  --run ai-generations/<fecha>_<pieza> --dry-run
+```
+
+- **`--sketch`**: del mismo tamaño que la base. Puede ser un PNG con fondo transparente y solo los trazos, o la foto con
+  los trazos dibujados encima (se detectan por diferencia con la base). Dibuja con un color que no exista en la foto
+  (magenta): silueta, caja o flecha de donde va, que tamaño tiene y, si importa, la linea de apoyo.
+- **Sin `--mask`**, la mascara para recomponer sale de la **caja del trazo** con 40 px de holgura (`--sketch-margin`) y
+  borde suave: el modelo suele dibujar el objeto un poco mas grande que la silueta.
+- **`--reference`** (repetible): imagen del objeto o elemento a incorporar, idealmente recortado sobre fondo neutro.
+- El comando antepone el rol de cada imagen (1 = la foto, 2 = el boceto como guia que no se reproduce, 3.. = las
+  referencias) y cierra con lo que se preserva. El `manifest.json` guarda tu prompt tal cual y el prompt enviado.
+- Funciona con OpenAI (la imagen 1 recibe la mascara si el modelo la acepta; con Sunburst, sin mascara) y con
+  `fal:seedream5-*-edit`. `fal:flux-pro-fill` no acepta referencias.
+
+**Estado:** contrato verificado contra la documentacion oficial (2026-10-02); que un trazo sobre una foto funcione como
+guia de posicion sin reproducirse **no esta documentado por OpenAI**: hay que mirarlo en cada pieza.
+
 ## Otro uso de la mascara: integrar un objeto real en una escena (**es la excepcion, no el default**)
 
 > **Antes de leer esto, descarta el camino normal.** Para poner una forma exacta de marca —el render 3D del logo de
@@ -224,7 +251,7 @@ Compara el resultado con la base **midiendo por zona**, no en promedio global:
   100 %; el gris azulado no deja ver restos de navy.
 - **No pagues por la mascara**: no cuesta nada. El `usage` es identico con y sin ella. Lo que se cobra es
   la imagen base.
-- No uses `--input-fidelity` con modelos 2.5: no lo transportan. La preservacion se pide por prompt.
+- No uses `--input-fidelity` con GPT Image 2 ni 2.5: desde el 2026-09-27 el comando **lo rechaza antes de gastar**. La preservacion se pide por prompt.
 
 ## Brechas conocidas del comando (2026-09-16)
 
@@ -236,7 +263,7 @@ Lo que sigue abierto:
 
 - **`--count N` sigue haciendo N pedidos separados de 1 imagen y pagas N veces** (ahora con aviso).
 - La estimación no pide confirmación ni suma la imagen de entrada; no hay control de compresión.
-- `--input-fidelity` con 2.5 o 2 se ignora en silencio, y no hay `--moderation`.
+- No hay `--moderation`. (`--input-fidelity` con 2 o 2.5 ya no se ignora en silencio: se rechaza antes de gastar.)
 - Sin `--out` ni `--out-dir`, guarda en `public/images/generated/`: para exploraciones usa `--out` a
   `ai-generations/` o al scratchpad.
 

@@ -132,6 +132,9 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
    pipeline usa Flare con máscara por defecto y, si eliges Sunburst, lo hace editar **sin máscara** (`--provider-mask
    auto`), corrige el desplazamiento de color en un anillo (Sunburst aclara todo: −16 niveles medidos en MC1h) y
    recompone — el mismo método de `pnpm foto:isotipo --acabado`. Alternativa con máscara: `fal:flux-pro-fill`.
+   **¿Incorporar un objeto o guiar con un dibujo, como el Markup de ChatGPT?** → `--sketch` (trazo sobre la foto; viaja
+   como imagen 2 de guía y la máscara sale del trazo) y `--reference` (el objeto, imágenes 3..N). En la API no hay
+   parámetro de boceto: es una imagen más con su rol numerado (guía de prompting 2.5, leída 2026-10-02).
 4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
    `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
    46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.
