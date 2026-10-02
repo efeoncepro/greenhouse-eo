@@ -172,12 +172,14 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
       'Entregas a tiempo es la única meta sin cumplir: 81,9 % (meta 90,0 %).',
       'Cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).'
     ])
-    // Un hecho, una esencial: ni los de la tesis y su bajada, ni FTR dos veces (mayor cambio y meta).
-    const essentialFacts = plan.essentials!.map(item => item.factIds[0])
+    // Un HALLAZGO, una esencial (revisión del operador 2026-10-02): la portada dijo las metas de OTD y FTR; «Lo esencial»
+    // puede decir sus CAMBIOS (citan su período anterior), nunca repetir la meta, y nunca el mismo hallazgo dos veces.
+    const findings = plan.essentials!.map(item => `${item.factIds[0]}:${item.factIds.some(id => id.endsWith('.prev')) ? 'change' : 'other'}`)
 
-    expect(essentialFacts).not.toContain('ico.otd.cur')
-    expect(essentialFacts).not.toContain('ico.ftr.cur')
-    expect(new Set(essentialFacts).size).toBe(essentialFacts.length)
+    expect(findings).not.toContain('ico.otd.cur:other')
+    expect(findings).not.toContain('ico.ftr.cur:other')
+    expect(findings).toContain('ico.ftr.cur:change')
+    expect(new Set(findings).size).toBe(findings.length)
   })
 
   it('con dos meses no hay línea (la matriz exige ≥ 3 puntos)', () => {
@@ -273,7 +275,7 @@ describe('TASK-1888 — topes, varios spaces y verbos por familia', () => {
     expect(validateEditorialPlan(seo, snapshot)).toEqual([])
   })
 
-  it('una esencial nunca cita un hecho sin página (caso Berel: CTR solo en su figura, que no se dibuja)', () => {
+  it('una esencial puede citar un hecho sin figura propia: se respalda en su narrativa o en su capítulo (Berel 2026-10-02)', () => {
     const seo = (metricId: string, value: number, unit: EvidenceFactV1['unit'], comparisonFactId: string | null = null): EvidenceFactV1 => ({ ...aeo(metricId, value), factId: `seo.${metricId}`, module: 'seo', metricId, label: metricId, unit, numerator: null, denominator: null, dimension: undefined, channelId: 'google', comparisonFactId })
 
     const snapshot = {
@@ -285,8 +287,9 @@ describe('TASK-1888 — topes, varios spaces y verbos por familia', () => {
     const plan = v2(snapshot, ['seo'])
 
     expect(plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.percent')).toBeDefined()
-    expect(plan.essentials!.flatMap(item => item.factIds)).not.toContain('seo.ctr')
-    expect(plan.executiveSummary.flatMap(item => item.factIds)).not.toContain('seo.ctr')
+    // El CTR (figura de una métrica, sin página) entra a «Lo esencial» como CAMBIO, con su período anterior citado;
+    // los dos mapeadores del PDF le resuelven folio por narrativa o capítulo (sus tests cubren el render).
+    expect(plan.essentials!.find(item => item.factIds[0] === 'seo.ctr')?.factIds).toEqual(['seo.ctr', 'seo.ctr.prev'])
   })
 
   it('el validador rechaza una conclusión que no cabe en el molde (90)', () => {

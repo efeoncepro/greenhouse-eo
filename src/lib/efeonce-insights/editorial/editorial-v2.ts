@@ -571,15 +571,30 @@ export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, 
  * mayor cambio y como meta cumplida). Primero las conclusiones (metas, tendencias, comparaciones); si no alcanzan,
  * cada hecho aún no citado en la misma forma compacta, nunca con la etiqueta interna.
  */
+/**
+ * Qué HALLAZGO dice una frase, no sólo de qué hecho habla: la misma métrica puede decir «cumple la meta» (portada) y
+ * «cayó 5,6 pp» («Lo esencial») sin repetirse (revisión del operador, Sky 2026-10-02). Cambio = cita su período
+ * anterior; referencia = cita otro hecho (una meta); valor = sólo el hecho.
+ */
+const findingKeyOf = (item: PlanClaimV1, byId: Map<string, EvidenceFactV1>): string => {
+  const [first, ...others] = item.factIds
+  const fact = first ? byId.get(first) : undefined
+  const kind = fact?.comparisonFactId && others.includes(fact.comparisonFactId) ? 'change' : others.length > 0 ? 'reference' : 'value'
+
+  return `${first}:${kind}`
+}
+
 export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, EvidenceFactV1>, locale: string, exclude: PlanClaimV1[] = []): PlanClaimV1[] => {
-  const cited = new Set<string>(exclude.flatMap(item => (item.factIds[0] ? [item.factIds[0]] : [])))
+  const cited = new Set<string>(exclude.map(item => findingKeyOf(item, byId)))
 
   const candidates = chapters.map(chapter => {
     const context = contextOf(chapter.charts, byId)
 
-    // Sólo hechos que alguna figura CON PÁGINA dibuja (mismo `hasFigurePage` del render): una esencial cuya cifra no
-    // tiene página no tiene folio que la respalde y el render falla cerrado (Berel CTR, 2026-09-25).
-    const paged = new Set(chapter.charts.filter(chart => hasFigurePage(chart, byId, locale)).flatMap(chartSpecFactIdsOf))
+    // Una esencial necesita dónde respaldarse en el documento. Ya no exige una figura propia: los dos mapeadores del PDF
+    // resuelven su folio a la figura, a la narrativa que la afirma o a la apertura de su capítulo (deck y A4). Exigir
+    // figura dejaba fuera la posición media (nunca va en barras) y el CTR (figura de una métrica, sin página): Berel
+    // quedaba con un solo hallazgo teniendo tres (revisión del operador, 2026-10-02).
+    const paged = new Set(chapter.claims.flatMap(item => item.factIds))
 
     // Sólo HALLAZGOS: un cambio que se imprime (con dirección), nunca un valor suelto ni una variación de 0,0 %. El tope
     // es un techo, no una cuota: menos esenciales es mejor que relleno (revisión de 1846, 2026-09-25).
@@ -603,8 +618,10 @@ export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, Evide
     for (const list of candidates) {
       const item = list[round]
 
-      if (!item || essentials.length >= PLAN_ESSENTIALS_MAX || item.text.length > PLAN_TEXT_LIMITS.essential || cited.has(item.factIds[0]!)) continue
-      cited.add(item.factIds[0]!)
+      const key = item ? findingKeyOf(item, byId) : ''
+
+      if (!item || essentials.length >= PLAN_ESSENTIALS_MAX || item.text.length > PLAN_TEXT_LIMITS.essential || cited.has(key)) continue
+      cited.add(key)
       essentials.push({ ...item, claimId: `essential.${item.claimId}` })
     }
   }
