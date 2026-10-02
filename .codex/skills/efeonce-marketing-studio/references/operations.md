@@ -288,3 +288,32 @@ pnpm studio:review request-changes <assetId> <versionNo> --reviewer "…" --note
   `studio.efeonce.org/campaigns/CMP-###`.
 - Production state (2026-10-02): CMP-004 has 44 pieces (11 concepts × 4:5, 9:16, 1:1, 1,91:1) `origin=studio`, all
   approved, 0 pending review.
+
+## Catalog commands (TASK-1894 Entregable B — verified in staging 2026-10-02, NOT in production)
+
+Studio `a8c7886` is on **local** `main`, not pushed (push = production deploy; the operator does it). Verified on the
+preview of branch `task-1894-entregable-b` (staging DB). Migration `1790967435017_catalog-write-commands.sql` is
+already applied on staging and production (additive; the 5 real campaigns stay `onedrive`). Full runbook:
+`docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` §Commands del catálogo.
+
+```bash
+# operator_cli with STUDIO_PG_* of the target DB (like import:catalog / studio:review); same primitives as the API
+pnpm studio:write --list                                     # operations, risk tier, method + path
+pnpm studio:write <operationId> [--param k=v …] [--file body.json] [--if-match N] [--key key]        # dry-run (default)
+pnpm studio:write <operationId> … --apply                    # T1 write
+pnpm studio:write <operationId> … --apply --confirm          # T2 (approval or destructive): a person, after the dry-run
+# e.g. staging sandbox
+pnpm studio:write authorizeMedia --param campaignId=CMP-900 --file autorizacion.json --if-match 4 --apply --confirm
+```
+
+- Sandbox: `CMP-900` on staging (org Efeonce, synthetic; ids 900+ reserved for sandbox/tests). Never write to CMP-004
+  or any `onedrive` campaign: 409 `campaign_not_studio_owned` (the next import would overwrite it).
+- Test `api_client` (staging): «Pruebas de escritura TASK-1894 B (staging)», `studio:read` + `studio:write` +
+  `studio:assets:write`, org Efeonce; token in `marketing-studio-write-tests-token-staging` (never print it). HTTP
+  canary through `vercel curl … --deployment <preview> --scope efeonce-7670142f`.
+- Rollback: revoke clients holding `studio:write` (`pnpm api-client:revoke --id … --reason …`); revert the Studio
+  deploy; `pnpm migrate down` of `1790967435017` only if no campaign is `source_of_truth = 'studio'` (staging has
+  `CMP-900`).
+- Pending (operator): `git push origin main` in Studio; gateway: apply the prepared read-only federation filter →
+  `pnpm studio:manifest:sync` → test → PR → merge → deploy (never sync the 1.4.0 manifest without the filter); Greenhouse
+  production release of `marketing_studio.asset.write` + `marketing_studio.campaign.write`.

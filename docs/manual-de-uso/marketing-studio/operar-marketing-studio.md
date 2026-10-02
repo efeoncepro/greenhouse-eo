@@ -1,9 +1,9 @@
 # Operar Efeonce Marketing Studio
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-02 por Claude (TASK-1894: subir y revisar finales; proporciones con decimales)
+> **Ultima actualizacion:** 2026-10-02 por Claude (TASK-1894: subir y revisar finales; proporciones con decimales; editar una campaña gobernada por Studio, probado en staging)
 > **Documentacion tecnica:** [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) · [Arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Documentacion funcional:** [Efeonce Marketing Studio — Gestión de campañas](../../documentation/marketing-studio/efeonce-marketing-studio.md)
 
@@ -189,6 +189,92 @@ Sólo una persona puede aprobar: una integración o un agente con token de API n
 | `Falta: STUDIO_API_TOKEN …` | No cargaste el token de subida en la terminal. Cárgalo como en «Antes de empezar». |
 | `rechazado: forbidden` | El token no tiene permiso de subida (`studio:assets:write`). Usa el de `marketing-studio-upload-cli-token`. |
 | `pendiente de verificación (retoma con --resume <id>)` | Espera unos minutos y corre `pnpm studio:upload --campaign CMP-### --resume <id>`. El barrido de Studio también retoma solo las verificaciones atascadas. |
+
+## Editar una campaña gobernada por Studio
+
+> **Estado (2026-10-02):** probado en staging con la campaña de pruebas `CMP-900`. Todavía no está en producción:
+> falta que el operador publique la versión nueva de Studio. Hasta entonces, úsalo sólo contra staging.
+
+Cada campaña tiene un **dueño de sus datos**: OneDrive o Studio. Las campañas que existían antes (CMP-001 a CMP-005)
+siguen gobernadas por OneDrive: sus datos se actualizan con el import. Las campañas nuevas creadas en Studio nacen
+gobernadas por Studio, y en ellas se puede editar todo desde Studio.
+
+### Qué se puede editar
+
+En una campaña gobernada por Studio:
+
+- **La campaña y su brief.** El brief se guarda tal como lo escribes (comillas, saltos de línea y espacios incluidos).
+  Si editas un brief ya aprobado, vuelve a borrador y hay que aprobarlo de nuevo.
+- **Conceptos y piezas** (crear y editar), y los **derechos** de una versión.
+- **Copys**, que se guardan letra por letra, sin cambios.
+- **Anuncios**: unen una pieza que ya tiene versión vigente con un copy y una audiencia de la misma campaña.
+- **Plan de medios**: el flight (uno por campaña) y las líneas de presupuesto. Una línea nueva siempre entra como
+  **propuesta**; aprobarla crea una línea aprobada aparte y conserva la propuesta.
+- **Calendario**: planificar y cancelar posts. Studio nunca publica, y un post que vino de la plataforma no se edita.
+- **Estados** de creatividad, autorización de medios y lanzamiento, con una nota obligatoria que explica el cambio.
+  «Activa» y «Pausada» no se marcan a mano: salen de lo que se observa en la plataforma.
+
+### Por qué una campaña de OneDrive responde 409
+
+Si intentas editar una campaña gobernada por OneDrive (por ejemplo CMP-004), Studio responde
+**`campaign_not_studio_owned` (409)** y no guarda nada. Es a propósito: el próximo import desde OneDrive sobrescribiría
+tu cambio. Esas campañas se siguen editando en OneDrive hasta su corte, que se hará más adelante. Las subidas de
+finales (sección anterior) sí funcionan en cualquier campaña.
+
+Esto incluye la **autorización de medios de CMP-004**: sigue en el catálogo de OneDrive hasta su corte.
+
+### Antes de empezar
+
+- El repo `efeonce-marketing-studio` instalado y la conexión a la base del ambiente (las variables `STUDIO_PG_*`,
+  igual que para el import y para `studio:review`).
+- El id de la campaña y la **revisión** actual de lo que vas a cambiar (ver «La revisión», abajo).
+- Un archivo JSON con los datos del cambio, si la operación los pide.
+
+### Paso a paso: aprobar o autorizar con la CLI
+
+Aprobar (una pieza, la creatividad, el brief o una línea de presupuesto) y autorizar medios son decisiones de una
+**persona**. Studio no deja que una integración ni un agente con token las tome (`approval_requires_person`).
+
+1. Mira qué operaciones existen y su nivel de riesgo:
+   ```bash
+   pnpm studio:write --list
+   ```
+2. **Prueba sin escribir.** Sin `--apply`, el comando sólo muestra qué haría:
+   ```bash
+   pnpm studio:write authorizeMedia --param campaignId=CMP-900 --file autorizacion.json --if-match 4
+   ```
+3. Lee el resultado. Si es lo que quieres, **aplica y confirma**. Una aprobación o una acción que borra exige las dos
+   banderas, `--apply` y `--confirm`:
+   ```bash
+   pnpm studio:write authorizeMedia --param campaignId=CMP-900 --file autorizacion.json --if-match 4 --apply --confirm
+   ```
+4. Los cambios de estado comunes (por ejemplo pasar la autorización de medios a «Pendiente») no son aprobaciones:
+   llevan nota obligatoria y sólo `--apply`.
+
+Para llevar la creatividad a «Aprobada» o los medios a «Autorizada» hay que usar su comando propio (`approveCreative`,
+`authorizeMedia`). El cambio de estado genérico lo rechaza con `approval_requires_dedicated_command`.
+
+### La revisión (If-Match), en simple
+
+Cada cosa que se puede editar tiene un número de **revisión** que sube cada vez que alguien la cambia. Cuando editas,
+le dices a Studio qué revisión viste (`--if-match <número>`). Si alguien la cambió mientras tanto, Studio no pisa su
+trabajo: responde `revision_conflict` y tienes que volver a leer y repetir. Si no indicas la revisión, responde
+`precondition_required`. La revisión aparece en la lectura de la campaña (también como `ETag` por la API).
+
+La lectura de la campaña también dice si puedes editarla (`writable`), por qué no (`lockReason`: modo abierto, sin
+permiso o gobernada por OneDrive), si puedes aprobar y a qué estados se puede pasar desde el actual.
+
+### Problemas comunes al editar
+
+| Síntoma | Qué hacer |
+|---|---|
+| `campaign_not_studio_owned` (409) | La campaña sigue gobernada por OneDrive. Edítala allá hasta su corte. |
+| `approval_requires_person` (403) | Una integración intentó aprobar. Lo hace una persona con la CLI. |
+| `confirmation_required` (403) | Una aprobación o borrado llegó por la API. Por ahora sólo se hace con la CLI, con `--confirm`. |
+| `approval_requires_dedicated_command` (422) | Usa `approveCreative` o `authorizeMedia` en vez del cambio de estado genérico. |
+| `invalid_state_transition` (409) | Ese cambio de estado no está permitido desde el estado actual. Revisa los estados posibles en la lectura de la campaña. |
+| `revision_conflict` (412) o `precondition_required` (428) | Vuelve a leer, toma la revisión actual y repite con `--if-match`. |
+| `budget_kind_violation` (422) | Una línea nueva sólo puede ser propuesta. Para aprobarla usa `approveBudgetLine`. |
 
 ## Paso a paso: dar acceso por API a una integración
 

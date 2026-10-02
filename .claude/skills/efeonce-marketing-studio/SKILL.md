@@ -189,9 +189,13 @@ runtime, memory or delegated authority.
 - **Native internal authority is `unsupported`** for Studio tools (`marketing_studio_native_policy_missing`): the
   native v2 grant only delegates `growth.seo.observation.read`; adding Studio needs new consent (D10), not a list edit.
 - Greenhouse capabilities (module `marketing_studio`): `.campaign.read` granted to `efeonce_admin`,
-  `efeonce_account`, `efeonce_operations` (live). `.write` (admin, operations, account, designer) and `.approve`
-  (admin, account, operations — designer writes but never approves) are planned in TASK-1894/1899, not seeded yet
-  (2026-10-02: Studio already enforces `studio:assets:write` for API clients; the Greenhouse seed awaits authorization).
+  `efeonce_account`, `efeonce_operations` (live). `.asset.write` and `.campaign.write` (`create`/`update`, scope
+  `tenant`; admin, operations, account, designer) are seeded and granted on `develop` (`9d0d698d4`, 2026-10-02) but
+  **not released to production**. `.approve` (admin, account, operations — designer writes but never approves) is
+  planned in TASK-1899. Studio enforces API scopes `studio:assets:write` / `studio:write` for API clients.
+- **Authority per campaign** (Entregable B): `campaign.source_of_truth` `onedrive` (default) | `studio`. Catalog writes
+  on an `onedrive` campaign ⇒ 409 `campaign_not_studio_owned`; T2 (approval/destructive) only for `operator_cli`
+  (`pnpm studio:write … --apply --confirm`), via API 403 `confirmation_required` until TASK-1899.
 
 ## Hard rules
 
@@ -291,6 +295,12 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
   `pnpm studio:review` (operator only); flags `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` + `STUDIO_UPLOADS_ENABLED` ON; 33
   CMP-004 finals uploaded and `pending_review`. Greenhouse capability `marketing_studio.asset.write` not seeded (not
   authorized yet). Entregables B and C pending.
+- TASK-1894 **Entregable B (catalog commands) code complete 2026-10-02, verified in staging, NOT in production**:
+  Studio `a8c7886` on local `main` (not pushed — operator), preview of branch `task-1894-entregable-b`; API 1.4.0, 44
+  tools (29 write routes + `studio.campaign.brief.get`), state machines, `CampaignDetail.permissions`, `ETag`, CLI
+  `pnpm studio:write`; migration `1790967435017` applied on staging and prod (5 real campaigns stay `onedrive`);
+  sandbox `CMP-900`. Greenhouse write capabilities on `develop` only. Gateway: read-only federation filter prepared,
+  not synced — **never sync the 1.4.0 manifest without it**. Entregable C deferred by the operator.
 - Complete: TASK-1887, TASK-1890, TASK-1891, TASK-1893 and TASK-1896 (the last two rolled out on 2026-09-26 with the
   Greenhouse release `92002873ced9`). Restore is proven in production (rehearsal job 49 s, monthly scheduler).
 - Open follow-ups: 24 CMP-002 images without sha256 (still only in OneDrive); gateway federation of

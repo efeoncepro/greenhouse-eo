@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-02 — Marketing Studio: commands del catálogo verificados en staging (TASK-1894, Entregable B)
+
+- Studio suma escrituras gobernadas del catálogo: máquinas de estado (revisión, creativo, medios, lanzamiento),
+  campaña, brief literal, conceptos, piezas, derechos, copy byte a byte, anuncios, flight, líneas de presupuesto
+  (sólo `proposed`; aprobar crea la `approved`) y posts planificados (Studio nunca publica). Las aprobaciones son T2:
+  sólo una persona por la CLI `pnpm studio:write … --apply --confirm`; por API, 403 `confirmation_required` hasta
+  TASK-1899.
+- Autoridad por campaña (`source_of_truth`): escribir en una campaña de OneDrive responde 409
+  `campaign_not_studio_owned`; el importador salta las campañas `studio`. API 1.4.0, 44 tools, permisos proyectados y
+  `ETag`. Migración `1790967435017` aplicada en staging y producción (aditiva); sandbox `CMP-900` en staging.
+- **No está en producción:** Studio `a8c7886` sin empujar a `main`; Greenhouse `9d0d698d4` (capabilities
+  `marketing_studio.asset.write` y `.campaign.write`) sólo en `develop`; gateway con filtro de sólo lecturas preparado
+  sin sincronizar. Entregable C diferido.
+
 ## 2026-10-02 — CMP-004 completa: 44 piezas aprobadas, horizontales 1,91:1 y grilla de Studio corregida
 
 - Las 11 horizontales 1,91:1 (LinkedIn 1200×628 y Meta horizontal) se hacen desde la escena 1:1 aprobada:
@@ -661,17 +675,3 @@ guía para agentes y lámina 4.5 del Lab. Greenhouse: manual §10.2, ADR, docume
 skills `efeonce-brand-studio` y `axis-design-system`. Después: paquetes AXIS publicados (0.3.2 y 0.3.4), imágenes en
 el bucket público `email-signature/v3.1/`, HTML listo para Outlook y **firma de equipo** aprobada (Talent, Finance,
 Commercial: sin foto, la órbita rodea el ícono del área; variante `team`). Pendiente: instalar en Outlook.
-
-## 2026-09-26 — Línea gráfica «La órbita»: AXIS 0.3, recetas fieles al canvas y motion V1.1
-
-AXIS publicó 0.3.0 (tokens, contratos, registro y assets) y el paquete nuevo `@efeoncepro/axis-graphic-line` 0.3.1,
-que pinta la órbita y sus recetas. Cada pieza de formato fijo (lente, foco, deck, firma de correo) quedó medida en el
-canvas y la receta la reproduce; la órbita genérica usa las medidas del canvas (arco centrado, 200°–250°). Reglas nuevas
-de contrato: la lente lleva arco y esfera, el foco siempre su anillo, un solo anillo alrededor del contenido y la esfera
-final es parte del texto (también en la selección colaborativa 0.3.0). Greenhouse adoptó 0.3.0 en develop: el
-compositor de campañas pinta la lente y el deck según el contrato nuevo (suite completa en verde). El motion del logo
-V1.1 (reveal 3,6 s, apertura 2,4 s, sting 1,6 s) quedó aprobado y documentado; sus masters se sirven desde el bucket
-público `gs://efeonce-group-axis-public-media` y el Lab muestra versiones web con su ficha, junto a la animación de la
-órbita sola. El lenguaje de movimiento quedó como norma (`EFEONCE_ORBIT_MOTION_LANGUAGE_V1`) y sus valores en los tokens
-`efeonceGraphicLine.motion` (`axis-tokens` 0.3.3), que el render lee: los 90 cuadros clave y los tres sonidos salen
-idénticos byte a byte. Rollback: fijar de nuevo los paquetes en 0.2.7.

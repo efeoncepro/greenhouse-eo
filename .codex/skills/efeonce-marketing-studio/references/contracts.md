@@ -201,9 +201,81 @@ an `api_client` gets `approval_requires_person`. API approval (`approveAssetVers
 `studio:review` has **no** `operations.ts` entry yet (operator CLI; exclusion pending decision).
 
 **Not in Studio's contract yet:** Greenhouse capability `marketing_studio.asset.write` (catalog + registry seed + grants
-admin/account/operations/designer) is NOT seeded; the gateway has not synced the manifest, and its parity guard would
+admin/account/operations/designer) is NOT seeded (*update 2026-10-02 night: seeded and granted on `develop`
+`9d0d698d4`, not released; the `ChannelValidator` port and `warnings` now exist — see §Catalog commands*); the gateway has not synced the manifest, and its parity guard would
 drop the write tools (`write_tool_without_scope_class`) until TASK-1899. `ChannelValidator` port and
 `CommandResult.warnings` are spec'd but not built (TASK-1905).
+
+## Catalog commands (TASK-1894 Entregable B, verified against code and staging 2026-10-02, Studio `a8c7886`, API `1.4.0`)
+
+> **Not in production:** `a8c7886` lives on local `main`, not pushed; verified on the preview of branch
+> `task-1894-entregable-b` (staging DB). Production serves API 1.3.0 until the operator pushes. Canon:
+> `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` §7.4.
+
+**Registry:** split by slice — `operations-review.ts`, `operations-catalog.ts`, `operations-plan.ts`, helper
+`operations-write.ts`. 29 write routes (POST/PATCH/PUT/DELETE) + new read `GET /api/v1/campaigns/{id}/brief` (tool
+`studio.campaign.brief.get`). Manifest **44 tools**, hash `6478cab73538` (read the live one; do not trust an old hash).
+
+**Authority per campaign:** `campaign.source_of_truth` ∈ {`onedrive` (default), `studio`} + `cutover_on` +
+`cutover_by`; CHECK `campaign_cutover_chk` (studio ⇔ `cutover_on`). Any catalog write on an `onedrive` campaign ⇒
+**409 `campaign_not_studio_owned`**, except `createCampaign`, the ingest door (§Writes above) and version review. The
+importer skips a whole `studio` campaign (`skipped_studio_owned_campaign`). `createCampaign` creates `studio` with
+`cutover_on` = today (Santiago); ids `CMP-###` free below 900; 900+ reserved for sandbox/tests.
+
+**State machines** (`packages/domain/src/state-machines`, table-driven; illegal ⇒ 409 `invalid_state_transition`):
+
+| State | Legal transitions |
+|---|---|
+| review | `pending_review → approved \| changes_requested` |
+| creative | `unknown → in_production → final_available → approved`; `final_available → in_production`; `approved → in_production` |
+| media | `unknown → pending \| not_applicable`; `pending → authorized \| blocked`; `blocked → pending`; `authorized → blocked` |
+| launch | `not_launched → launch_unverified`; `launch_unverified → not_launched \| ended`; `paused → ended`; `live_observed` and `paused` only by observation |
+
+Approval targets only via dedicated commands; a generic transition to them ⇒ 422 `approval_requires_dedicated_command`.
+
+**Commands and tiers:**
+
+| Slice | Command | Tier / notes |
+|---|---|---|
+| 4 | `approveAssetVersion` | T2 |
+| 4 | `requestAssetVersionChanges` | T1, note |
+| 4 | `transitionCreativeState`, `transitionMediaAuthorization`, `transitionLaunchState` | T1, note required, `decisionRefs` |
+| 4 | `approveCreative`, `authorizeMedia` | T2, person, dedicated command |
+| 5 | `createCampaign`, `updateCampaign` | `studio` at birth |
+| 5 | `upsertCampaignBrief` | literal text; editing an approved brief returns it to draft |
+| 5 | `approveCampaignBrief` | T2 |
+| 5 | `createConcept`, `updateConcept` | id `CMP###-NN` |
+| 5 | `createAsset`, `updateAsset` | id `<concept>-<imagen\|video>-<WxH>` |
+| 5 | `setAssetVersionRights` | scope `studio:assets:write`; no campaign guard (the importer does not write rights) |
+| 6 | `createCopyVariant`, `updateCopyVariant` | byte-for-byte |
+| 6 | `createAdConfiguration`, `updateAdConfiguration` | piece with current version, copy and audience of the same campaign |
+| 6 | `createMediaFlight`, `updateMediaFlight` | one per campaign |
+| 6 | `setBudgetLine` | only `proposed`; else 422 `budget_kind_violation` |
+| 6 | `approveBudgetLine` | T2; creates the `approved` line with `approvalRef`, keeps the proposal |
+| 6 | `removeBudgetLine` | T2, only `proposed` |
+| 6 | `createScheduledPost`, `updateScheduledPost`, `cancelScheduledPost` | Studio plans `PLANNED`, cancels `CANCELLED`, never publishes; a provider post is not editable. Readers and health ignore planned/cancelled as provider pending |
+
+**T2 rule (kernel):** T2 (approval or destructive) runs today only for `operator_cli`; via API ⇒ 403
+`confirmation_required` until TASK-1899; an `api_client` that approves ⇒ 403 `approval_requires_person`.
+
+**DTO/transport additions:** `CampaignDetail.permissions { writable, lockReason: open_mode | missing_capability |
+authority_onedrive | null, canApprove, sourceOfTruth, allowedTransitions, revision }`; `revision` on copy, ad, post,
+concept and plan reads (`flightId`, `budgetLineId`); `ETag` = revision on entity reads; empty body accepted (DELETE
+and approvals); replays answer `Idempotent-Replayed: true`. `ChannelValidator` port (default adapter, no validation,
+`catalogVersion null`) and `warnings` on every write result (real validator: TASK-1905).
+
+**New error codes:**
+
+| code | HTTP |
+|---|---|
+| `approval_requires_dedicated_command` | 422 |
+| `campaign_not_studio_owned` | 409 |
+| `budget_kind_violation` | 422 |
+| `confirmation_required` | 403 |
+| `already_exists` | 409 |
+
+**Greenhouse:** `marketing_studio.asset.write` + `marketing_studio.campaign.write` (`create`/`update`, scope `tenant`)
+seeded and granted (admin, account, operations, designer) on `develop` `9d0d698d4`; not released to production.
 
 ## Asset version ingest — decision record (ADR 2026-09-26)
 
@@ -257,6 +329,12 @@ names; TASK-1894/1899 fix the final ones in the registry.
 - Image tools return MCP `image` content (webp/png/jpeg, 1 byte – 2 MB).
 - Parity findings: `manifest_tool_not_registered`, `registered_tool_not_in_manifest`, `write_tool_without_scope_class`,
   `skill_governs_unknown_tool`.
+- **Write tools must be filtered before syncing (2026-10-02).** The provider federated EVERY manifest tool and always
+  calls Studio with GET, so syncing the API 1.4.0 manifest would federate the write tools broken. Prepared change
+  (not committed, not synced; branch `task-1894-studio-write-manifest` from `origin/main` `8ff029d`):
+  `MARKETING_STUDIO_FEDERATED_TOOLS` = reads only, used by the provider and `tool-policy`; `call()` rejects writes and
+  non-GET; parity flags `write_tool_without_scope_class` only if a write gets registered; the sync script accepts write
+  methods/fields in its type; new test. Only new federated read: `studio.campaign.brief.get`.
 - Policy: exact names from the manifest (never by prefix); Entra issuer only; native = `unsupported`
   (`marketing_studio_native_policy_missing`).
 

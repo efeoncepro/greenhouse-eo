@@ -6,6 +6,101 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-02 (noche) — Entregable B y cierre de A en Greenhouse
+
+- **Decisiones del operador (2026-10-02):** alcance «cerrar A + Entregable B»; el Entregable C (corte de campañas a
+  Studio y retiro de OneDrive) queda para después. Greenhouse sólo hasta `develop`/staging, no producción. La
+  autorización de medios es decisión de una persona: Claude no la ejecuta.
+- **Greenhouse (`develop`, commit `9d0d698d4`, ya en `origin/develop`):** capabilities `marketing_studio.asset.write` y
+  `marketing_studio.campaign.write` (`actions create/update`, scope `tenant`) en `src/config/entitlements-catalog.ts`;
+  migración `migrations/20261002185625608_task-1894-marketing-studio-write-capabilities.sql` aplicada en la instancia
+  compartida (SELECT confirma ambas vigentes); grants a `efeonce_admin`, `efeonce_account`, `efeonce_operations` y
+  `designer` en `src/lib/entitlements/runtime.ts`; `capability-grant-coverage.test.ts` verde. **Release a producción
+  no hecho** (pendiente de decisión del operador).
+- **Studio (repo `efeonce-marketing-studio`, commit `a8c7886` en `main` LOCAL, sin empujar):** empujar `main` es el
+  deploy de producción de Studio y el clasificador de permisos de la sesión lo bloqueó («Production Deploy»); lo hace
+  el operador con `git push origin main`. La rama `task-1894-entregable-b` (mismo commit) está en origin y su preview
+  (`efeonce-marketing-studio-62vtv3yrm…`, base staging) quedó verificada. **El Entregable B no está en producción.**
+  - Migración `packages/database/migrations/1790967435017_catalog-write-commands.sql` (aditiva) aplicada en
+    `marketing_studio_staging` y en `marketing_studio` (producción) el 2026-10-02: `campaign.source_of_truth`
+    (`onedrive` por defecto | `studio`) + `cutover_on` + `cutover_by` + CHECK `campaign_cutover_chk` (studio ⇔
+    `cutover_on`); `revision` en `concept`, `ad_configuration`, `media_flight` y `scheduled_post`;
+    `budget_line.updated_at/approval_ref/approved_by/approved_at`; tablas `campaign_brief`,
+    `campaign_brief_audience` y `campaign_brief_kpi`. Las 5 campañas reales quedan `onedrive`. (La columna de
+    autoridad, planificada en el Slice 8, entró con esta migración porque la guarda de los commands la necesita.)
+  - **Slice 4:** máquinas de estado tabla-driven (`packages/domain/src/state-machines`): revisión
+    (`pending_review → approved | changes_requested`); creativo (`unknown → in_production → final_available →
+    approved`; `final_available → in_production`; `approved → in_production`); medios (`unknown → pending |
+    not_applicable`; `pending → authorized | blocked`; `blocked → pending`; `authorized → blocked`); lanzamiento
+    (`not_launched → launch_unverified`; `launch_unverified → not_launched | ended`; `paused → ended`; `live_observed` y
+    `paused` sólo por observación). Commands: `approveAssetVersion` (T2), `requestAssetVersionChanges` (T1, nota),
+    `transitionCreativeState`/`transitionMediaAuthorization`/`transitionLaunchState` (T1, nota obligatoria,
+    `decisionRefs`), `approveCreative` y `authorizeMedia` (T2, persona, comando dedicado: la transición genérica a un
+    destino aprobatorio responde `approval_requires_dedicated_command`).
+  - **Kernel:** T2 (aprobación o destructiva) hoy sólo para `operator_cli`; por API responde `confirmation_required`
+    (403) hasta TASK-1899; un `api_client` que aprueba recibe `approval_requires_person`.
+  - **Slice 5:** `createCampaign` (nace `source_of_truth = 'studio'`, `cutover_on` = hoy en Santiago; id `CMP-###`
+    libre bajo 900; 900+ reservado a sandbox y pruebas), `updateCampaign`, `upsertCampaignBrief` (texto literal;
+    editar uno aprobado lo devuelve a borrador), `approveCampaignBrief` (T2), `createConcept`/`updateConcept` (id
+    `CMP###-NN`), `createAsset`/`updateAsset` (id `<concepto>-<imagen|video>-<WxH>`), `setAssetVersionRights` (scope
+    `studio:assets:write`; sin guarda de campaña porque el importador no escribe derechos).
+  - **Slice 6:** `createCopyVariant`/`updateCopyVariant` (byte a byte), `createAdConfiguration`/
+    `updateAdConfiguration` (pieza con versión vigente, copy y audiencia de la misma campaña),
+    `createMediaFlight`/`updateMediaFlight` (uno por campaña), `setBudgetLine` (sólo `proposed`; otra cosa ⇒
+    `budget_kind_violation`), `approveBudgetLine` (T2; crea la línea `approved` con `approvalRef` y conserva la
+    propuesta), `removeBudgetLine` (T2, sólo `proposed`), `createScheduledPost`/`updateScheduledPost`/
+    `cancelScheduledPost` (Studio planifica en `PLANNED` y cancela en `CANCELLED`; nunca publica; un post del
+    proveedor no se edita). Lectores y salud ignoran los planificados y cancelados como pendientes del proveedor.
+  - **Autoridad por campaña:** toda escritura del catálogo en una campaña `onedrive` ⇒ `409 campaign_not_studio_owned`
+    (salvo `createCampaign`, la puerta de ingreso y la revisión de versiones). El importador salta entera una campaña
+    `studio` (`skipped_studio_owned_campaign`).
+  - **Errores nuevos:** `approval_requires_dedicated_command` 422, `campaign_not_studio_owned` 409,
+    `budget_kind_violation` 422, `confirmation_required` 403, `already_exists` 409.
+  - **Slice 7:** 29 rutas de escritura (POST/PATCH/PUT/DELETE) + lectura nueva `GET /api/v1/campaigns/{id}/brief`
+    (tool `studio.campaign.brief.get`); registro por slice (`operations-review.ts`, `operations-catalog.ts`,
+    `operations-plan.ts`, helper `operations-write.ts`); `CampaignDetail.permissions` (`writable`, `lockReason`
+    `open_mode | missing_capability | authority_onedrive`, `canApprove`, `sourceOfTruth`, `allowedTransitions`,
+    `revision`); `revision` en las lecturas de copy, anuncio, post, concepto y plan (`flightId`, `budgetLineId`);
+    `ETag` = revisión en lecturas de entidad; cuerpo vacío aceptado (DELETE y aprobaciones); `API_VERSION` 1.4.0;
+    manifiesto de 44 tools (hash `6478cab73538`). CLI `pnpm studio:write <operationId> [--param k=v] [--file
+    cuerpo.json] [--if-match N] [--key llave] [--apply [--confirm]]` (dry-run por defecto; T2 exige `--confirm`;
+    `--list`). Puerto `ChannelValidator` (adaptador por defecto sin validar, `catalogVersion null`) y `warnings` en el
+    resultado de toda escritura.
+- **Evidencia:** gates, lint de los archivos del cambio, `mcp:manifest:check`, typecheck y 134 tests verdes
+  (contracts 9, domain 118 + 4 skipped, web 7); integraciones catalog/plan/upload contra staging verdes (transacción
+  revertida). `pnpm check` completo falla **sólo** por 2 errores de lint en `StatusBar.tsx`/`StatusLive.tsx` de otra
+  sesión (barra de estado, commits `aaed507`/`5756d2b`), ajenos a este cambio.
+  - Staging: sandbox `CMP-900` creada por `createCampaign` (organización Efeonce, datos sintéticos). Por CLI:
+    creativo `unknown → in_production → final_available → approved` (`approveCreative` con `--confirm`) y medios
+    `unknown → pending → authorized` (`authorizeMedia`); guardas observadas: `precondition_required`,
+    `invalid_state_transition`, `approval_requires_dedicated_command`, T2 sin `--confirm`, `revision_conflict` y
+    `campaign_not_studio_owned` en CMP-004.
+  - Por HTTP en la preview con el `api_client` de pruebas: permisos proyectados + `ETag`; anónimo 403
+    `write_not_allowed`; concepto 201 y replay `Idempotent-Replayed: true`; aprobación por bearer →
+    `approval_requires_person`; CMP-004 → 409; brief literal (comillas tipográficas, `\n\n`, espacio final) con
+    `ETag`; copy byte a byte; flight + plan con `flightId`/`revision`.
+  - `api_client` de pruebas en staging: «Pruebas de escritura TASK-1894 B (staging)», scopes `studio:read` +
+    `studio:write` + `studio:assets:write`, organización Efeonce; token en Secret Manager
+    `marketing-studio-write-tests-token-staging` (nunca impreso).
+- **Gateway `efeonce-mcp` — preparado, NO sincronizado.** Hallazgo: el gateway federaba **todas** las tools del
+  manifiesto y su proveedor llama siempre con GET; con las escrituras en el manifiesto se habrían federado rotas.
+  Cambio preparado en una copia aislada del scratchpad (rama `task-1894-studio-write-manifest` desde `origin/main`
+  `8ff029d`, sin commit): `MARKETING_STUDIO_FEDERATED_TOOLS` = sólo lecturas; el proveedor y `tool-policy` usan esa
+  lista; `call()` rechaza escrituras y métodos no-GET; la paridad marca `write_tool_without_scope_class` sólo si una
+  escritura se registra; el script de sync acepta métodos y campos de escritura en el tipo; test nuevo. El
+  clasificador de permisos («Merge Without Review») bloqueó `studio:manifest:sync`. Queda para el operador: aplicar el
+  cambio, sincronizar, test, PR, merge y deploy del gateway (las lecturas federadas no cambian salvo la nueva
+  `studio.campaign.brief.get`).
+- **Pendiente:**
+  - Push de Studio a `main` (deploy de producción del Entregable B) — operador.
+  - Release de Greenhouse a producción con las dos capabilities — operador (no autorizado).
+  - Sync del gateway — operador.
+  - Entregable C (Slices 8–10) — diferido por el operador.
+  - TASK-1898/1899: persona por sesión, confirmación T2 por API y federación de escrituras.
+  - Autorización de medios de CMP-004: sigue en el catálogo de OneDrive hasta su corte (Entregable C). En Studio sólo
+    se autoriza en campañas gobernadas por Studio, con `pnpm studio:write authorizeMedia … --apply --confirm` por una
+    persona.
+
 ## Delta 2026-10-02 — Entregable A en producción
 
 - **Qué se entregó** (repo `efeonce-marketing-studio`, `main`; push a `main` = deploy de producción en Vercel):
@@ -241,7 +336,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Entregable A (Slices 1–3) en producción desde 2026-10-02 (Studio 1.3.0, migración aplicada en staging y producción, flags ON, 33 piezas de CMP-004 en pending_review); pendientes: capability y release en Greenhouse (sin autorizar), sync del gateway, ChannelValidator/warnings, aprobación de las 33 versiones por el operador y Entregables B y C (Slices 4–10)`
+- Status real: `Entregable A (Slices 1–3) en producción desde 2026-10-02 (Studio 1.3.0; CMP-004 con 44 piezas aprobadas). Entregable B (Slices 4–7) code complete y verificado en staging (Studio a8c7886 en main local sin empujar, rama task-1894-entregable-b con preview; API 1.4.0, 44 tools; migración 1790967435017 aplicada en staging y producción; sandbox CMP-900). Greenhouse: capabilities asset.write y campaign.write en develop (9d0d698d4), sin release a producción. Pendientes del operador: push de Studio a main, release de Greenhouse, sync del gateway (cambio preparado, sin commit). Entregable C (Slices 8–10) diferido por el operador`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` (2026-09-26: TASK-1890, TASK-1893 y TASK-1896 complete)
@@ -1000,24 +1095,24 @@ Entregable A — puerta de ingreso:
 
 Entregable B — commands del catálogo:
 
-- [ ] Existe un command en `packages/domain/src/commands` por cada operación de la tabla del Detailed Spec, y el `domain-boundary-gate` falla si otro módulo escribe en `studio.*`.
-- [ ] `approveAssetVersion`, `approveCreative`, `authorizeMedia`, `approveCampaignBrief` y `approveBudgetLine` rechazan a un `api_client` con `403 approval_requires_person`; las transiciones genéricas rechazan destinos aprobatorios.
-- [ ] Toda transición legal pasa y toda ilegal devuelve `409 invalid_state_transition` sin escribir; un test verifica que ningún command modifica dos estados.
-- [ ] `setBudgetLine` escribe sólo `proposed`; ningún reader ni export suma `kind` distintos (test).
-- [ ] Un copy guardado y leído es idéntico byte a byte al enviado; ningún command deja un post publicado; `PATCH` omitido ≠ `null`.
-- [ ] `getCampaign` devuelve `permissions` (`writable`, `lockReason`, `allowedTransitions`, `canApprove`, `revision`) calculados con el mismo puerto de autoridad que los commands.
-- [ ] La campaña sandbox `CMP-900` y el `api_client` de pruebas existen en staging.
-- [ ] `marketing_studio.campaign.write` existe con `allowed_actions = ['create','update']`, scope `tenant` y grant de ambas acciones a `efeonce_admin`, `efeonce_operations`, `efeonce_account` y `designer` (coverage test verde).
-- [ ] El `dryRun` de toda operación `requiresPerson` o `destructive` pasa por el punto de extensión `confirmation` del kernel (probado con un doble en test), listo para el `proposalDigest` de TASK-1899.
-- [ ] Cada escritura exitosa deja exactamente un `audit_event` con actor, operación, entidad y `correlation_id`.
-- [ ] Toda entrada de `operations.ts` (lecturas, escrituras y exclusiones) declara `riskTier` según §«Nivel de riesgo por operación», el manifiesto lo exporta por tool y una entrada sin nivel rompe `pnpm check`.
-- [ ] El kernel toma el nivel del registro por `operationId`: `T1` sin `Idempotency-Key` o sin `If-Match` sobre entidad existente se rechaza; el `dryRun` de toda operación `T2` pasa por `confirmation`; un parámetro del request no cambia el nivel (test).
-- [ ] `studio.campaign_brief` guarda `channel_keys` (sin columna de canal libre) y todo DTO de escritura nombra el canal `channelKey`/`channelKeys`.
-- [ ] Los commands de copy, anuncio, línea de presupuesto por canal, post, derechos de versión, solicitud de subida y brief llaman al puerto `ChannelValidator`: con un doble que devuelve `blocking` responden `422` sin escribir; con uno que devuelve `warnings` escriben y los devuelven en `warnings[]`; con el adaptador por defecto dejan `channel_catalog_version = NULL`.
+- [ ] Existe un command en `packages/domain/src/commands` por cada operación de la tabla del Detailed Spec, y el `domain-boundary-gate` falla si otro módulo escribe en `studio.*`. — *Sin tildar (2026-10-02): los commands de los Slices 4–6 existen (29 rutas de escritura) y los gates pasan; no se cotejó operación por operación contra la tabla ni se registró una corrida en la que el gate falle.*
+- [x] `approveAssetVersion`, `approveCreative`, `authorizeMedia`, `approveCampaignBrief` y `approveBudgetLine` rechazan a un `api_client` con `403 approval_requires_person`; las transiciones genéricas rechazan destinos aprobatorios. — *Verificado 2026-10-02 en staging: el kernel responde `approval_requires_person` a todo `api_client` que aprueba (observado por HTTP con el bearer de pruebas) y la transición genérica a un destino aprobatorio responde `approval_requires_dedicated_command` (observado por CLI).*
+- [ ] Toda transición legal pasa y toda ilegal devuelve `409 invalid_state_transition` sin escribir; un test verifica que ningún command modifica dos estados. — *Sin tildar: máquinas tabla-driven y `invalid_state_transition` observado en staging; no quedó registrado el test exhaustivo ni el de «un solo estado por command».*
+- [ ] `setBudgetLine` escribe sólo `proposed`; ningún reader ni export suma `kind` distintos (test). — *Sin tildar: `setBudgetLine` rechaza otro `kind` con `budget_kind_violation`; falta evidencia del test de lectores y export.*
+- [ ] Un copy guardado y leído es idéntico byte a byte al enviado; ningún command deja un post publicado; `PATCH` omitido ≠ `null`. — *Sin tildar: copy byte a byte verificado por HTTP en la preview y los posts sólo quedan `PLANNED` o `CANCELLED`; falta evidencia de «`PATCH` omitido ≠ `null`».*
+- [ ] `getCampaign` devuelve `permissions` (`writable`, `lockReason`, `allowedTransitions`, `canApprove`, `revision`) calculados con el mismo puerto de autoridad que los commands. — *Sin tildar: la proyección (también con `sourceOfTruth`) y el `ETag` se verificaron por HTTP en la preview; no quedó registrada evidencia de que use el mismo puerto de autoridad que los commands. Además, no está en producción hasta el push de Studio.*
+- [x] La campaña sandbox `CMP-900` y el `api_client` de pruebas existen en staging. — *Hecho 2026-10-02: `CMP-900` creada por `createCampaign` (organización Efeonce, datos sintéticos); `api_client` «Pruebas de escritura TASK-1894 B (staging)» con `studio:read` + `studio:write` + `studio:assets:write`, token en Secret Manager `marketing-studio-write-tests-token-staging`.*
+- [ ] `marketing_studio.campaign.write` existe con `allowed_actions = ['create','update']`, scope `tenant` y grant de ambas acciones a `efeonce_admin`, `efeonce_operations`, `efeonce_account` y `designer` (coverage test verde). — *Parcial, sin tildar: catálogo, seed (aplicado en la instancia compartida y confirmado con SELECT) y grants en `develop` (`9d0d698d4`), coverage test verde; falta el release a producción (no autorizado; el operador autorizó sólo hasta develop/staging).*
+- [ ] El `dryRun` de toda operación `requiresPerson` o `destructive` pasa por el punto de extensión `confirmation` del kernel (probado con un doble en test), listo para el `proposalDigest` de TASK-1899. — *Sin tildar: hoy T2 por API responde `confirmation_required` (403) y por CLI exige `--confirm`; falta evidencia del test con doble del punto `confirmation`.*
+- [ ] Cada escritura exitosa deja exactamente un `audit_event` con actor, operación, entidad y `correlation_id`. — *Sin tildar: no quedó registrada evidencia (consulta a `studio.audit_event` tras las escrituras).*
+- [ ] Toda entrada de `operations.ts` (lecturas, escrituras y exclusiones) declara `riskTier` según §«Nivel de riesgo por operación», el manifiesto lo exporta por tool y una entrada sin nivel rompe `pnpm check`. — *Sin tildar: el registro (ahora repartido por slice) declara niveles T0/T1/T2 y el manifiesto de 44 tools pasa `mcp:manifest:check`; no se registró que una entrada sin nivel rompa `pnpm check`.*
+- [ ] El kernel toma el nivel del registro por `operationId`: `T1` sin `Idempotency-Key` o sin `If-Match` sobre entidad existente se rechaza; el `dryRun` de toda operación `T2` pasa por `confirmation`; un parámetro del request no cambia el nivel (test). — *Sin tildar: `precondition_required` (sin `If-Match`) observado en staging; falta evidencia del resto (sin `Idempotency-Key`, `confirmation` en T2 y nivel inmutable).*
+- [ ] `studio.campaign_brief` guarda `channel_keys` (sin columna de canal libre) y todo DTO de escritura nombra el canal `channelKey`/`channelKeys`. — *Sin tildar: `campaign_brief` existe en staging y producción; no se verificaron sus columnas ni los DTO en esta pasada.*
+- [ ] Los commands de copy, anuncio, línea de presupuesto por canal, post, derechos de versión, solicitud de subida y brief llaman al puerto `ChannelValidator`: con un doble que devuelve `blocking` responden `422` sin escribir; con uno que devuelve `warnings` escriben y los devuelven en `warnings[]`; con el adaptador por defecto dejan `channel_catalog_version = NULL`. — *Sin tildar: el puerto existe (adaptador por defecto sin validar, `catalogVersion null`) y toda escritura devuelve `warnings`; falta evidencia de las pruebas con doble `blocking`/`warnings` (el validador real llega con TASK-1905).*
 
 Entregable C — corte, señal y retiro:
 
-- [ ] El importador y `media:ingest` saltan toda campaña con `source_of_truth = 'studio'` y lo registran en `import_run`.
+- [ ] El importador y `media:ingest` saltan toda campaña con `source_of_truth = 'studio'` y lo registran en `import_run`. — *Sin tildar (adelanto 2026-10-02 desde el Entregable B): el importador ya salta una campaña `studio` (`skipped_studio_owned_campaign`); `media:ingest` sin evidencia.*
 - [ ] Import → export → import en dry-run no produce diferencias para las campañas reales.
 - [ ] `cutover:campaign` tiene `--dry-run`, `--apply` y `--revert`, exige fecha declarada y falla si alguna versión vigente no tiene original en Studio (salvo `--accept-missing-originals` auditado).
 - [ ] `/api/v1/health?deep=1` incluye `approved_without_original` y `platform.marketing_studio.health` lo muestra en su evidencia; Atención lista las campañas afectadas.

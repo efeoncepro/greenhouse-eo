@@ -157,3 +157,23 @@
 - **Ratios with decimals are stored as integers.** The API demands `aspectRatio` `^\d+x\d+$`, so 1,91:1 is uploaded as
   `--ratio 191x100`; `ratioLabel('191x100')` labels it «1,91:1» (`apps/web/src/copy.ts`). The worker's ratio check
   accepts the real file (2048/1072 = 1,9104) within 1 %. Rule: never send `1.91x1`; scale to integers.
+
+## 2026-10-02 — TASK-1894 Entregable B (catalog commands)
+
+- **The gateway federated every manifest tool and called them all with GET.** The assumed safety net
+  (`write_tool_without_scope_class` dropping writes until TASK-1899) did not hold: syncing the API 1.4.0 manifest would
+  have federated the write tools broken. Rule: before any `studio:manifest:sync` of a manifest with write tools, the
+  gateway must filter to reads (`MARKETING_STUDIO_FEDERATED_TOOLS`) and `call()` must reject writes and non-GET. Read
+  the provider's call path; do not trust a guard's name.
+- **A write on a OneDrive-governed campaign would be overwritten by the next import.** Hence every catalog write on a
+  `source_of_truth = 'onedrive'` campaign answers 409 `campaign_not_studio_owned` (except `createCampaign`, the ingest
+  door and version review), and the importer skips whole `studio` campaigns. Rule: never "fix" data of an `onedrive`
+  campaign in Studio; edit it in OneDrive until its dated cutover (Entregable C).
+- **Commands by slice in separate registry files let parallel work avoid conflicts.** The registry was split into
+  `operations-review.ts`, `operations-catalog.ts`, `operations-plan.ts` (+ helper `operations-write.ts`) so slices
+  could be built without colliding in one `operations.ts`. Rule: add new write operations in the slice file that owns
+  them.
+- **Session permission classifier blocks production-shaped actions.** Pushing Studio `main` («Production Deploy») and
+  running the gateway sync («Merge Without Review») were blocked by the classifier (the gateway one even though the
+  operator had authorized PR and merge); the work was left on a pushed branch + preview and a prepared isolated change. Rule: ask for the external-mutation authorization at the
+  start, or plan the hand-off to the operator from the beginning.

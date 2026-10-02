@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.9
+> **Versión:** 1.10
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-02 por Claude (TASK-1894 Entregable A en producción: puerta de ingreso de originales, kernel de commands, API 1.3.0, §7.3; antes, 2026-09-26: ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
+> **Última actualización:** 2026-10-02 (noche) por Claude (TASK-1894 Entregable B code complete y verificado en staging, sin desplegar en producción: commands del catálogo, autoridad por campaña, máquinas de estado, permisos proyectados, API 1.4.0, §7.4; antes, el mismo día: Entregable A en producción: puerta de ingreso de originales, kernel de commands, API 1.3.0, §7.3; antes, 2026-09-26: ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26) · operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -566,13 +566,124 @@ unitarias (kernel, inferencia, derechos, firma V4) e integración `upload.integr
 **Pendiente.**
 
 - Greenhouse: capability `marketing_studio.asset.write` en `entitlements-catalog.ts`, seed en `capabilities_registry`,
-  grants (`efeonce_admin`, `efeonce_account`, `efeonce_operations`, `designer`) y release — no autorizado aún. Hoy no
-  bloquea: el kernel no deja escribir a personas por sesión (TASK-1898) y los clientes de API usan scope.
+  grants (`efeonce_admin`, `efeonce_account`, `efeonce_operations`, `designer`) y release. *Actualizado 2026-10-02
+  (noche):* catálogo, seed y grants en `develop` (`9d0d698d4`) junto con `marketing_studio.campaign.write`; el release
+  a producción sigue sin autorizar (§7.4). Hoy no bloquea: el kernel no deja escribir a personas por sesión
+  (TASK-1898) y los clientes de API usan scope.
 - Gateway: `pnpm studio:manifest:sync` sin correr; las tools de escritura quedarían fuera por
   `write_tool_without_scope_class` hasta TASK-1899.
-- De la spec del Entregable A: puerto `ChannelValidator` y `CommandResult.warnings` (los enchufa TASK-1905); decidir la
+- De la spec del Entregable A: puerto `ChannelValidator` y `CommandResult.warnings` (*actualizado 2026-10-02 (noche):*
+  existen desde el Entregable B, con adaptador por defecto sin validar; el validador real lo enchufa TASK-1905); decidir la
   exclusión de `studio:review` en `operations.ts` (CLI de operador, hoy sin entrada).
 - Entregables B y C (Slices 4–10). La aprobación por API (`approveAssetVersion`) es Slice 4 + TASK-1899.
+
+## 7.4 Commands del catálogo (TASK-1894, Entregable B)
+
+Estado: **code complete y verificado en staging; no está en producción.** Studio `a8c7886` en `main` local, sin
+empujar (empujar `main` es el deploy de producción de Studio y lo hace el operador); la rama `task-1894-entregable-b`
+(mismo commit) está en origin con su preview sobre la base de staging. API **1.4.0**, manifiesto de 44 tools (hash
+`6478cab73538`). Greenhouse: capabilities en `develop` (`9d0d698d4`), sin release a producción. Gateway: cambio
+preparado, sin sincronizar. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Commands del catálogo.
+
+**Autoridad por campaña (`source_of_truth`).** Cada campaña tiene `source_of_truth` = `onedrive` (por defecto) o
+`studio`, con `cutover_on` y `cutover_by`; el CHECK `campaign_cutover_chk` exige `cutover_on` si y sólo si es
+`studio`. Las 5 campañas reales siguen en `onedrive`.
+
+- Toda escritura del catálogo sobre una campaña `onedrive` responde **409 `campaign_not_studio_owned`**: el próximo
+  import desde OneDrive la sobrescribiría. Excepciones: `createCampaign`, la puerta de ingreso (§7.3, autoridad por
+  pieza) y la revisión de versiones.
+- `createCampaign` crea la campaña ya en `studio`, con `cutover_on` = hoy (America/Santiago). Ids `CMP-###` libres
+  bajo 900; del 900 en adelante quedan reservados a sandbox y pruebas.
+- El importador salta entera una campaña `studio` (`skipped_studio_owned_campaign`).
+- El corte de las campañas existentes (export inverso, `cutover:campaign`, retiro de OneDrive) es el Entregable C,
+  diferido por el operador.
+
+**Máquinas de estado** (`packages/domain/src/state-machines`, tabla-driven). Las transiciones no listadas responden
+409 `invalid_state_transition`.
+
+| Estado | Transiciones |
+|---|---|
+| Revisión de versión | `pending_review → approved \| changes_requested` |
+| Creativo | `unknown → in_production → final_available → approved`; `final_available → in_production`; `approved → in_production` |
+| Autorización de medios | `unknown → pending \| not_applicable`; `pending → authorized \| blocked`; `blocked → pending`; `authorized → blocked` |
+| Lanzamiento | `not_launched → launch_unverified`; `launch_unverified → not_launched \| ended`; `paused → ended`. `live_observed` y `paused` sólo por observación |
+
+Los destinos aprobatorios (`creative_state → approved`, `media_authorization_state → authorized`) sólo se alcanzan por
+su comando dedicado (`approveCreative`, `authorizeMedia`); la transición genérica responde 422
+`approval_requires_dedicated_command`.
+
+**Commands** (todos por el kernel de §7.3):
+
+| Slice | Commands |
+|---|---|
+| 4 — revisión y estados | `approveAssetVersion` (T2), `requestAssetVersionChanges` (T1, nota), `transitionCreativeState` / `transitionMediaAuthorization` / `transitionLaunchState` (T1, nota obligatoria, `decisionRefs`), `approveCreative` y `authorizeMedia` (T2, persona) |
+| 5 — campaña, brief, concepto, pieza, derechos | `createCampaign`, `updateCampaign`, `upsertCampaignBrief` (texto literal; editar un brief aprobado lo devuelve a borrador), `approveCampaignBrief` (T2), `createConcept` / `updateConcept` (id `CMP###-NN`), `createAsset` / `updateAsset` (id `<concepto>-<imagen\|video>-<WxH>`), `setAssetVersionRights` (scope `studio:assets:write`; sin guarda de campaña porque el importador no escribe derechos) |
+| 6 — copy, anuncios, plan, calendario | `createCopyVariant` / `updateCopyVariant` (byte a byte), `createAdConfiguration` / `updateAdConfiguration` (pieza con versión vigente, copy y audiencia de la misma campaña), `createMediaFlight` / `updateMediaFlight` (uno por campaña), `setBudgetLine` (sólo `proposed`), `approveBudgetLine` (T2; crea la línea `approved` con `approvalRef` y conserva la propuesta), `removeBudgetLine` (T2, sólo `proposed`), `createScheduledPost` / `updateScheduledPost` / `cancelScheduledPost` |
+
+Calendario: Studio planifica en `PLANNED` y cancela en `CANCELLED`; nunca publica, y un post que vino del proveedor no
+se edita. Lectores y salud no cuentan los planificados ni los cancelados como pendientes del proveedor.
+
+**Regla T2.** Una operación T2 (aprobación o destructiva) hoy sólo la ejecuta `operator_cli`; por API responde 403
+`confirmation_required` hasta TASK-1899 (confirmación con persona). Un `api_client` que intenta aprobar recibe 403
+`approval_requires_person`. La CLI exige `--confirm` además de `--apply`.
+
+**Errores nuevos** (además de los de §7.3):
+
+| `code` | HTTP | Cuándo |
+|---|---|---|
+| `approval_requires_dedicated_command` | 422 | una transición genérica apunta a un destino aprobatorio |
+| `campaign_not_studio_owned` | 409 | escritura del catálogo en una campaña `onedrive` |
+| `budget_kind_violation` | 422 | `setBudgetLine` con un `kind` distinto de `proposed` |
+| `confirmation_required` | 403 | operación T2 por API (hasta TASK-1899) |
+| `already_exists` | 409 | el id a crear ya existe |
+
+**Proyección de permisos.** `CampaignDetail.permissions` = `writable`, `lockReason` (`open_mode` |
+`missing_capability` | `authority_onedrive`), `canApprove`, `sourceOfTruth`, `allowedTransitions` y `revision`. Las
+lecturas de copy, anuncio, post, concepto y plan (`flightId`, `budgetLineId`) exponen `revision`.
+
+**ETag e `If-Match`.** Las lecturas de entidad devuelven `ETag` = `revision`; una escritura sobre entidad existente
+manda `If-Match` con esa revisión (sin él, 428 `precondition_required`; con una vieja, 412 `revision_conflict`).
+DELETE y aprobaciones aceptan cuerpo vacío. Un replay con la misma `Idempotency-Key` responde
+`Idempotent-Replayed: true`.
+
+**Exposición.** 29 rutas de escritura (POST/PATCH/PUT/DELETE) + lectura nueva `GET /api/v1/campaigns/{id}/brief`
+(tool `studio.campaign.brief.get`). El registro se reparte por slice (`operations-review.ts`,
+`operations-catalog.ts`, `operations-plan.ts`, helper `operations-write.ts`). Puerto `ChannelValidator` con
+adaptador por defecto sin validar (`catalogVersion null`) y `warnings` en el resultado de toda escritura; el
+validador real llega con TASK-1905.
+
+**CLI de operador** `pnpm studio:write <operationId> [--param k=v] [--file cuerpo.json] [--if-match N] [--key llave]
+[--apply [--confirm]]` y `--list`: corre como `operator_cli` con las variables `STUDIO_PG_*` del ambiente, por los
+mismos primitives que la API. Dry-run por defecto; T2 exige `--confirm`.
+
+**Persistencia** (migración aditiva `1790967435017_catalog-write-commands.sql`, aplicada el 2026-10-02 en
+`marketing_studio_staging` y `marketing_studio`): `campaign.source_of_truth`, `cutover_on`, `cutover_by` + CHECK
+`campaign_cutover_chk`; `revision` en `concept`, `ad_configuration`, `media_flight` y `scheduled_post`;
+`budget_line.updated_at`, `approval_ref`, `approved_by` y `approved_at`; tablas `campaign_brief`,
+`campaign_brief_audience` y `campaign_brief_kpi`.
+
+**Permisos en Greenhouse.** `marketing_studio.asset.write` y `marketing_studio.campaign.write` (acciones
+`create`/`update`, scope `tenant`) en el catálogo, seed en `capabilities_registry` aplicado en la instancia compartida y
+grants a `efeonce_admin`, `efeonce_account`, `efeonce_operations` y `designer`, en `develop` (`9d0d698d4`). Release a
+producción pendiente de decisión del operador.
+
+**Gateway.** El gateway federaba todas las tools del manifiesto y su proveedor llama siempre con GET: sincronizar el
+manifiesto con escrituras las habría federado rotas. El cambio preparado (sin commit) federa sólo lecturas
+(`MARKETING_STUDIO_FEDERATED_TOOLS`), hace que `call()` rechace escrituras y métodos no-GET y marca
+`write_tool_without_scope_class` sólo si una escritura se registra. La única lectura federada nueva sería
+`studio.campaign.brief.get`. Queda para el operador.
+
+**Evidencia** (staging). 134 tests verdes (contracts 9, domain 118 + 4 skipped, web 7) e integraciones
+catalog/plan/upload contra staging (transacción revertida); `pnpm check` completo falla sólo por 2 errores de lint
+ajenos (barra de estado de otra sesión). Sandbox `CMP-900` creada por `createCampaign`; por CLI, creativo hasta
+`approved` (`approveCreative` con `--confirm`) y medios hasta `authorized` (`authorizeMedia`); guardas observadas:
+`precondition_required`, `invalid_state_transition`, `approval_requires_dedicated_command`, T2 sin `--confirm`,
+`revision_conflict` y `campaign_not_studio_owned` en CMP-004. Por HTTP en la preview: permisos y `ETag`, anónimo 403
+`write_not_allowed`, concepto 201 y replay idempotente, aprobación por bearer → `approval_requires_person`, CMP-004 →
+409, brief literal (comillas tipográficas, `\n\n`, espacio final), copy byte a byte, flight y plan con `revision`.
+
+**Pendiente.** Push de Studio a `main`; release de Greenhouse a producción; sync del gateway; Entregable C (corte de
+las campañas existentes); TASK-1898/1899 (persona por sesión, confirmación T2 por API, federación de escrituras).
 
 ## 8. Interfaz
 
@@ -692,7 +803,7 @@ romperlos si el registro falla. El worker de TASK-1893 registra en su propia `st
 | TASK-1893 | Originales en GCS + worker de medios | Complete 2026-09-26 (en producción) |
 | TASK-1896 | Observabilidad, alertas y restauración | Complete 2026-09-26 (en producción; restauración probada) |
 | TASK-1892 | Métricas desde Greenhouse (GA4 aún no en producción: TASK-1284) | To-do |
-| TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad por campaña, `createAssetVersion` con subida firmada, CLI `studio:upload`, derechos al subir y señal «pieza aprobada sin original en Studio» | Entregable A (puerta de ingreso, §7.3) en producción 2026-10-02; Entregables B y C pendientes |
+| TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad por campaña, `createAssetVersion` con subida firmada, CLI `studio:upload`, derechos al subir y señal «pieza aprobada sin original en Studio» | Entregable A (puerta de ingreso, §7.3) en producción 2026-10-02; Entregable B (§7.4) code complete y verificado en staging, sin desplegar en producción; Entregable C diferido |
 | TASK-1895 | UI de edición, revisión y métricas | To-do |
 | TASK-1899 | Escrituras, subida y aprobaciones por MCP (scopes `.write`/`.approve`, identidad delegada) | To-do |
 | TASK-1897 | Revocar `CONNECT` de PUBLIC en `greenhouse_app` | To-do |
