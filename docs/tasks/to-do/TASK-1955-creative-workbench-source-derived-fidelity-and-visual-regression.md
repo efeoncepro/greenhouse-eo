@@ -377,3 +377,12 @@ Reglas obligatorias:
 - El segundo cliente del EPIC-050 es Berel. La interfaz de adaptador debe admitir su fuente de diseño
   (plantillas de banners y social), que hoy no existe sellada en el Workbench; el adaptador sintético del
   Slice 6 debe parecerse a ese caso (pocos formatos, un mercado) además de al caso SKY.
+
+## Delta 2026-10-02 — dos tipos de fuente de diseño
+
+- Berel (segundo cliente) no tiene Figma; su fuente es Illustrator/Photoshop (`Guia de infografías y
+  Formatos.ai`, `Reticulas CHIP.ai`). La interfaz de adaptador debe declarar su tipo de fuente:
+  `derived` (FIG sellado, SKY) o `declared` (receta nativa como datos, con SHA, autor y aprobación de la
+  diseñadora). En ambos casos el gate de coherencia compara la regla con su fuente (FIG o receta declarada) y
+  la regresión usa como base piezas de referencia selladas (para Berel, entregables de agosto en adelante).
+  El adaptador sintético del Slice 6 debe cubrir el tipo `declared`.

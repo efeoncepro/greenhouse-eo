@@ -165,3 +165,22 @@ no hay `.fig`.
   `05_Guias` (guía de estilos y de componentes web 2024-02) y `02_Recursos` (983 archivos: íconos, producto,
   paletas, personaje Don Bere).
 - **Pendiente para derivar el adaptador:** el enlace a los archivos Figma de las plantillas de blog y social.
+
+## Delta 2026-10-02 — Berel no tiene Figma: fuente en Illustrator/Photoshop
+
+Corrección del operador: Berel **no tiene plantillas en Figma**. Su fuente de diseño vive en Illustrator y
+Photoshop, en `OneDrive/.../Workspace Oficial`: `02_Recursos/Guia de infografías y Formatos.ai`,
+`Reticulas CHIP.ai` (retículas de los marcadores de color), `CHIP.psd`, `01_Brand Assets/04_PaletaColor/
+Berel_Paleta-Color.ai` y logos SVG en `01_Brand Assets/02_Logotipo/SVG/`.
+
+Consecuencias para el programa:
+
+- **El núcleo no puede asumir Figma.** TASK-1955 admite dos tipos de fuente por adaptador: *derivada* (FIG
+  sellado, caso SKY) y *declarada* (receta nativa del Workbench definida como datos a partir de la guía de
+  formatos y las retículas, caso Berel), validada contra piezas entregadas de referencia y aprobada por la
+  diseñadora. Leer las mesas de trabajo de los `.ai` (tamaños, retículas) es un insumo, no un requisito.
+- **Licencia tipográfica:** la institucional es **Gotham Rounded** (comercial) y la complementaria Arial
+  Rounded. Igual que Metric en SKY, sus binarios no se distribuyen al equipo ni a buckets sin confirmar la
+  licencia; corresponde al onboarding de la marca (TASK-1945, criterio de TASK-1946).
+- **Referencia visual sellada:** las piezas de `04_Entregables` (agosto en adelante, nomenclatura estable)
+  sirven como base de regresión del adaptador declarado: la composición nativa debe reproducir su estructura.
