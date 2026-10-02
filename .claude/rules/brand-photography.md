@@ -126,7 +126,7 @@ registro**, que existía de facto y no estaba escrito. Lo mismo el KV de Clawd y
 
 **Qué COMPARTEN los dos, sin negociación:** identidad y set de referencias · código de vestuario por registro de
 escena · el bloque de realismo («no se siente IA», sin suciedad) · **la colorimetría entera** (sin grade, sin navy
-en ropa grande, sin paneles azules de fondo, lámparas prácticas apagadas, acento 1 de cada 2) · la firma · **las
+en ropa grande, sin paneles azules de fondo, lámparas prácticas apagadas (en cine, sólo como bokeh frío y lejano: delta 2026-10-02 b), acento 1 de cada 2) · la firma · **las
 seis reservas del plate** · **y el bloque de impacto**.
 
 **Qué los SEPARA:** qué se fotografía · con qué barra se juzga · si el sujeto mira al lente · si lleva capa gráfica.

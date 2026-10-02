@@ -2524,7 +2524,13 @@ export const AJUSTES_CINE = [
     'a restrained palette where the colour of the light phenomenon declared in the scene is the only accent; everything else deep cool navy and near-black'
   ],
   ['white balance warm-neutral, shadows never blue.', 'white balance cool-neutral; shadows deep navy-black, never amber, never warm tungsten, never saturated blue.'],
-  ['a DEEP, warm, evenly toned shadow', 'a DEEP, evenly toned near-black shadow']
+  ['a DEEP, warm, evenly toned shadow', 'a DEEP, evenly toned near-black shadow'],
+  // Decisión del operador 2026-10-02: los aros de Nexa son dorados, como en su ancla de identidad (pedir plata
+  // perdía siempre contra la referencia). Sólo en cine por ahora; el resto de los registros no cambia.
+  [
+    'small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate',
+    'small gold earrings, geometric studs or medium hoops depending on context, matching her identity reference, never ornate'
+  ]
 ]
 
 export const ajustarParaCine = texto => AJUSTES_CINE.reduce((t, [de, a]) => t.split(de).join(a), texto)
@@ -2535,6 +2541,11 @@ const SECCION_PARTIDA_1_1 = {
   limite: 'All people and objects stay entirely inside the RIGHT 60% of the frame.',
   zonaTexto: ({ muro, tinta }) =>
     `TEXT SPACE (planned, essential): the LEFT 40% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right part of the frame.`
+}
+
+const ESCALA_VERTICAL = {
+  '9:16': 'SUBJECT SCALE: framed from the waist up; the head is small in the frame, about one sixth of the frame height, with a tall calm dark space above the head.',
+  '4:5': 'SUBJECT SCALE: framed from the chest up; the head is about one fifth of the frame height, with calm dark space above the head.'
 }
 
 export const bloqueCine = (ficha, formato) => {
@@ -2569,6 +2580,14 @@ export const bloqueCine = (ficha, formato) => {
     }
 
     partes.push(f)
+  }
+
+  // Decisiones del operador 2026-10-02. Escala en vertical: la regla «cabeza ≈ ¼ del alto» es de 16:9; en vertical se
+  // pide por encuadre, con marcadores (el modelo ignora los porcentajes). Mirada: en la sección partida, al panel.
+  if (ficha.identidad && ESCALA_VERTICAL[formato]) partes.push(ESCALA_VERTICAL[formato])
+
+  if (ficha.alcance === 'deck-seccion') {
+    partes.push('GAZE: the person looks toward the empty dark side of the frame where the text will sit, never into the lens.')
   }
 
   if (clavesDeObjetos(ficha).some(k => PRENDAS_CON_EMBLEMA.includes(k))) {

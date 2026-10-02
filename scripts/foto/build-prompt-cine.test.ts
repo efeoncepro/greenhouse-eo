@@ -150,3 +150,23 @@ describe('bloques compartidos en cine', () => {
     expect(auditarCine({ ...completa, __completar: ['llave'] }).join('\n')).toContain('__completar')
   })
 })
+
+describe('decisiones del operador 2026-10-02 en cine', () => {
+  const conPersona = { ...completa, identidad: [{ persona: 'nexa', expresion: 'conviccion' }] }
+
+  it('en vertical la escala se pide por encuadre; en 16:9 no', () => {
+    expect(bloqueCine(conPersona, '9:16')).toContain('framed from the waist up')
+    expect(bloqueCine(conPersona, '4:5')).toContain('framed from the chest up')
+    expect(bloqueCine(conPersona, '16:9')).not.toContain('SUBJECT SCALE')
+    expect(bloqueCine(completa, '9:16')).not.toContain('SUBJECT SCALE')
+  })
+
+  it('en la sección partida la mirada va al lado del texto', () => {
+    expect(bloqueCine({ ...completa, alcance: 'deck-seccion' }, '1:1')).toContain('never into the lens')
+    expect(bloqueCine(completa, '16:9')).not.toContain('GAZE')
+  })
+
+  it('los aros de Nexa salen dorados en cine', () => {
+    expect(ajustarParaCine('small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate')).toContain('small gold earrings')
+  })
+})

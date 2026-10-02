@@ -153,18 +153,13 @@ demás registros siguen idénticos, regresión: 332 fichas, 0 no cine cambiadas)
 **Lo que el medidor sigue sin ver y mira el revisor:** relleno en la cara, Sparks lejanos demasiado nítidos y la
 reserva lateral en 16:9 y 1:1 (`foto:validar` mide la banda de arriba).
 
-**Decisiones abiertas del operador** (contradicciones del canon que las sesiones encontraron):
-
-1. **Aros de Nexa:** el bloque de identidad dice plata, «never gold», y el ancla `nexa-ancla-1-rostro-frontal` los
-   lleva dorados; salen dorados.
-2. **Destacado «Agents»:** la línea gráfica §10.1.1 lo aprobó con tres Sparks, sin Nexa ni texto; un encargo pidió
-   «Agentes» con Nexa y el nombre arriba.
-3. **Cabeza ≈ ¼ del alto** (registro cine §4) sólo vale en 16:9; falta su equivalente vertical.
-4. **Mirada en la sección partida:** al lente (canon §1) o hacia el panel (recetas `section-split*` y SP2b).
-5. **Vestuario en cine con personas:** código por registro de escena (canon §7.2) o prenda de la línea (roster).
-6. **Luces prácticas:** en cine están encendidas en bokeh (NX5b, NX7d aprobadas); la regla común las pide apagadas.
-   Aquí se trata el cine como excepción hasta que decidas.
-7. **Una sección partida por deck** (`DECISIONES.md` del deck SEO/AEO): ningún comando lo controla.
+**Decisiones del operador (2026-10-02)** sobre las siete contradicciones que encontró la prueba: aros de Nexa dorados;
+el destacado «Agents» aprobado se queda (tres Sparks, sin Nexa ni texto); escala vertical por encuadre (9:16 de la
+cintura arriba, 4:5 del pecho arriba); en la sección partida la mirada va al panel; personas reales del roster con la
+prenda de su línea y casting por rol con el código por escena; luces prácticas encendidas sólo como bokeh frío y lejano
+(excepción cine); una sección partida por deck la controla el validador del plan. Detalle en el
+[registro cine, delta 2026-10-02 (b)](EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega).
+`foto:prompt` aplica en cine las tres que son de toma (aros, escala, mirada).
 
 ## Lo que no se automatiza (y por eso existe el revisor)
 

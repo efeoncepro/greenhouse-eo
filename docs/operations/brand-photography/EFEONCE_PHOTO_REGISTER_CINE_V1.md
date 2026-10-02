@@ -1,7 +1,7 @@
 # Registro cine · la marca en su película — el lenguaje
 
 > **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.8 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-02 por Claude (1.8: [§7.1](#71-nexa) y la [plantilla de §12](#12-plantilla-de-ficha-comentada) alineadas con el kit del traje: traje y lentes por catálogo con `"registro": "cine"` y una `expresion` declarada; las descripciones a mano quedan marcadas como superadas. 1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
+> **Última actualización:** 2026-10-02 por Claude (1.9: siete decisiones del operador tras la prueba ciega — aros dorados, destacado «Agents», escala vertical, mirada en la sección partida, vestuario, luces prácticas y una sección partida por deck; [delta 2026-10-02 (b)](#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega). 1.8: [§7.1](#71-nexa) y la [plantilla de §12](#12-plantilla-de-ficha-comentada) alineadas con el kit del traje: traje y lentes por catálogo con `"registro": "cine"` y una `expresion` declarada; las descripciones a mano quedan marcadas como superadas. 1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
 > «El squad te la entrega», y queda el caso de cómo cambiar el plate de una pieza aprobada sin perder su concepto,
 > [§16.7](#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto). Antes, 1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
@@ -35,6 +35,33 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 **[pendiente]** = no resuelto. Las frases de prompt entre comillas son **verbatim** de fichas aprobadas.
 
 ---
+
+## Delta 2026-10-02 (b) — decisiones del operador tras la prueba ciega
+
+**[decisión del operador, 2026-10-02]** La prueba ciega del [casebook](EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#prueba-ciega-del-2026-10-02--lo-que-aprendimos)
+encontró siete contradicciones del canon. El operador aceptó las siete recomendaciones («Me voy con todas tus
+recomendaciones»). Prevalecen sobre lo que diga el resto de este documento:
+
+1. **Aros de Nexa: dorados**, como en su ancla de identidad (`_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png`);
+   pedir plata perdía siempre contra la referencia. `foto:prompt` lo aplica en cine (`AJUSTES_CINE`); el anillo sigue
+   plata mate. Las fichas aprobadas que dicen «small silver earrings» en su escena (NX7d) no se reescriben: al partir de
+   ellas, se cambia en la escena nueva.
+2. **Destacado «Agents»: se queda el aprobado** (línea gráfica §10.1.1): tres Sparks, sin Nexa y sin texto en el
+   círculo. Un destacado con Nexa usa otro nombre y otra destacada.
+3. **Escala en vertical, por encuadre:** «cabeza ≈ ¼ del alto» (§4) vale en 16:9. En 9:16, de la cintura hacia arriba,
+   cabeza ≈ 1/6 del alto y un tercio de espacio oscuro encima; en 4:5, del pecho hacia arriba, cabeza ≈ 1/5. Se pide
+   con marcadores, que `foto:prompt` inyecta cuando la ficha declara `identidad` (`SUBJECT SCALE`). **A confirmar en el
+   próximo piloto vertical.**
+4. **Mirada en la sección partida: hacia el panel del texto**, nunca al lente (como SP2b y las recetas `section-split`).
+   «Mira al lente» queda para portadas, contraportadas, `proposal-cinematic` y piezas sociales. `foto:prompt` lo inyecta
+   con `alcance: deck-seccion` (`GAZE`).
+5. **Vestuario con personas del equipo:** personas reales del roster → la prenda de su línea de servicio (lo exige
+   `foto:prompt` con `identidad` + `linea`); casting por rol (la «estratega», la «líder de RevOps» de las propuestas) →
+   el código por registro de escena, polo incluido (como AE2b, SE1 y SP2b).
+6. **Luces prácticas: excepción formal del cine.** Pueden estar encendidas sólo como bokeh grande, frío y lejano al
+   fondo; nunca nítidas, nunca cálidas y nunca dentro de la reserva del titular (NX5b, NX7d). En A, B y C siguen apagadas.
+7. **Una sola sección partida por deck:** ya la controla el validador del plan (`variant-both-in-deck`:
+   `section-split` y `section-split-panel-end` son alternativas). No va en `foto:*`.
 
 ## Delta 2026-10-02 — «Nexa despliega a su squad»: qué hace cine una escena con Sparks
 
