@@ -1,11 +1,11 @@
 # ADR — Efeonce Marketing Studio: «Studio» como nombre corto y su marca
 
-- **Status:** Accepted (nombre) · Proposed (marca, en revisión)
+- **Status:** Accepted (nombre y marca, 2026-10-02)
 - **Date:** 2026-10-02
 - **Owner:** Efeonce Brand / Product
 - **Scope:** cómo se nombra y abrevia Efeonce Marketing Studio frente a Efeonce Globe (Creative Studio), y el sistema de marca de producto que lo acompaña. No cambia rutas, dominios, código, datos ni contratos de API.
 - **Reversibility:** two-way-but-slow. Los rótulos se pueden cambiar; una vez en el portal, íconos de app y piezas comerciales, el cambio tendrá inercia de marca.
-- **Confidence:** high para la regla de nombres (decisión explícita del operador); medium para la marca, que espera aprobación del acento y del gris del ícono.
+- **Confidence:** high: nombre y marca aprobados explícitamente por el operador; falta verla montada en el portal real.
 - **Validated as of:** 2026-10-02. Decisión del operador en la sesión de diseño del logo (canvas «Logo Marketing Studio»), contrastada con el contexto de producto, la ADR de Globe y el dominio vivo.
 
 ## Context
@@ -26,18 +26,20 @@ Al diseñar el logo de Marketing Studio hizo falta una forma corta. «MKT» se d
 
 La documentación técnica interna (arquitectura, tasks, modelos de negocio, nombres de repos y skills) puede seguir usando «Creative Studio» como descriptor de Globe: la regla rige lo que ve un cliente o el público.
 
-## Marca de producto (Proposed)
+## Marca de producto
 
 Sigue la regla de la familia de submarcas (`axis-brand-assets` 0.4.2, «la órbita vive en la O»): «Marketing Studio» en Poppins Bold, la «o» de Studio cambiada por un anillo fino con la esfera a la 1:30 y un corte alrededor; junto a Efeonce, el producto en el gris medido de la marca y sólo la esfera en el acento.
 
-| Pieza | Dónde va |
-| --- | --- |
-| Lockup **Efeonce \| Marketing Studio** | Por defecto, siempre que quepa |
-| Lockup **Efeonce \| Studio** y compacto **efeonce Studio** | Espacios angostos, chips, junto a otros productos |
-| Ícono: la nave de Efeonce sobre «Studio» liso | Fuera del portal: ícono de app, avatar, sticker (una sola esfera: la de la nave) |
-| Símbolo: la **S** rodeada por la órbita | Sólo dentro del portal: favicon y barra colapsada; «Studio» solo encabeza la barra abierta |
+| Pieza | Archivo (`marketing-studio-*`) | Dónde va |
+| --- | --- | --- |
+| Lockup **Efeonce \| Marketing Studio** | `lockup` | Por defecto, siempre que quepa: encabezado del portal, correos, informes, decks |
+| Lockup **Efeonce \| Studio** y compacto **efeonce Studio** | `short-lockup`, `compact` | Espacios angostos, chips, junto a otros productos |
+| Lockup apilado (Efeonce arriba, el producto debajo y más pequeño) | `stacked-lockup`, `short-stacked-lockup` | Pantalla de ingreso, portadas, formatos cuadrados |
+| Símbolo: la **S** rodeada por la órbita | `isotype` | El símbolo del producto: favicon, pantalla de inicio del celular, barra lateral colapsada; nunca junto al nombre |
+| Ícono: la nave de Efeonce sobre «Studio» liso | `icon` | Sólo lo que circula suelto: avatar de un bot, sticker, merch (una sola esfera: la de la nave) |
+| La palabra sola | `logo` | Insumo de las anteriores; no se usa suelta fuera del portal |
 
-Pendiente para pasar a Accepted: el acento de la esfera (propuesto: Growth, el de la marca madre, como Insights; alternativas Voice y Brand; Engine queda para SV360/AEO) y si «Studio» va en gris o en blanco en el ícono. Al aprobarse, los archivos se generan con un script en `scripts/brand/` (mismo método que `build-seo-aeo-logos.mjs`), se publican en `@efeoncepro/axis-brand-assets` y se sellan; nunca se editan a mano.
+Aprobado el 2026-10-02: la esfera en el acento **Growth** (`#0e8c82` sobre papel, `#36c8bf` sobre oscuro, el de la marca madre, como Insights; Engine queda para SV360/AEO) y «Studio» en el gris de la marca en el ícono. Se descartaron el nombre solo como pieza del portal (el encabezado ya lleva el lockup) y un segundo símbolo para la pantalla de inicio. Los archivos los genera [`scripts/brand/build-marketing-studio-logos.mjs`](../../../scripts/brand/build-marketing-studio-logos.mjs) (24 SVG: 8 piezas × positivo, negativo y blanco), se publican en `@efeoncepro/axis-brand-assets` y se sellan; nunca se editan a mano.
 
 ## Consequences
 
