@@ -1,6 +1,6 @@
 {
   "schema": "efeonce.foto.cine-recetas.v1",
-  "nota": "Fotos cine aprobadas por el operador, desde las que se parte con `pnpm foto:cine:nueva --desde <id>`. Casebook: docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md. `isotipoPintado: true` = la foto aprobada lleva el isotipo compuesto plano (casebook, falla 8): sirve como receta de luz, encuadre y escena, no de bordado. No hay ninguna foto cine vertical aprobada todavía (2026-10-02): para 9:16 o 4:5 usa --formato y declara las reservas de nuevo.",
+  "nota": "Fotos cine aprobadas por el operador, desde las que se parte con `pnpm foto:cine:nueva --desde <id>`. Casebook: docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md. `isotipoPintado: true` = la foto aprobada lleva el isotipo compuesto plano (casebook, falla 8): sirve como receta de luz, encuadre y escena, no de bordado. Desde 2026-10-02 hay cine vertical aprobado: los 11 ads de CMP-004 (C4*) en 4:5, con sus versiones 9:16 y 1:1 nativas en el banco «finales» de AXIS. Para otro formato usa --formato y declara las reservas de nuevo.",
   "recetas": [
     {
       "id": "NX7d",
@@ -124,6 +124,116 @@
       "protagonista": "Nexa con la softshell del kit",
       "porque": "Portada de perfil social aprobada (2026-10-01): Nexa a la derecha, reserva izquierda para la voz, una sola fuente.",
       "ojo": "Formato de portada 3:1, con la softshell del kit: para Nexa con traje biónico, combínala con NX5b o NX7d."
+    },
+    {
+      "id": "C4S01",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/N01b-45-marca-sombra.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/N01b-45-marca-sombra.png",
+      "formato": "4:5",
+      "alcance": "publicidad-prueba",
+      "protagonista": "Directora creativa tapando con cinta el logo de una pantalla",
+      "porque": "La idea vive en la relación cinta-logo-pincelada: la cinta tapa el logo de una pantalla encendida y un foco naranja proyecta la pincelada de marca sobre el muro y sobre ella.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4S02",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/N02b-45-capitulo-reveal.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/N02b-45-capitulo-reveal.png",
+      "formato": "4:5",
+      "alcance": "publicidad-prueba",
+      "protagonista": "Un mural de marca monumental se revela mientras cae la tela que lo cubría",
+      "porque": "La tela a medio caer divide el muro entre lo viejo en sombra y la nueva expresión naranja: el antes y después en un solo instante.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4S03",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/N03b-45-campana-escala.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/N03b-45-campana-escala.png",
+      "formato": "4:5",
+      "alcance": "publicidad-prueba",
+      "protagonista": "Directora a cámara frente a una fachada LED curva con un solo key visual de campaña",
+      "porque": "Retrato a cámara: la cara es la pieza. Para otros formatos se usa su casting de campaña (formatos/casting/s03-directora), nunca se regenera sin ancla.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4S04",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/N04-45-seis-segundos.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/N04-45-seis-segundos.png",
+      "formato": "4:5",
+      "alcance": "publicidad-prueba",
+      "protagonista": "Director de arte quieto y nítido en un set, mirando a cámara con foco exigente",
+      "porque": "Él es lo único nítido y quieto; el detalle del oficio se lee en la calma del plano.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4S05",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/N05-45-runandgun-jornada.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/N05-45-runandgun-jornada.png",
+      "formato": "4:5",
+      "alcance": "publicidad-prueba",
+      "protagonista": "Cinco sets en una bodega unidos por la estela de luz de una cámara gimbal",
+      "porque": "La luz de tally naranja de la cámara traza UNA estela continua que une los cinco sets: la jornada entera en una larga exposición.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4S06",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/N06b-45-contenido-scroll.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/N06b-45-contenido-scroll.png",
+      "formato": "4:5",
+      "alcance": "publicidad-prueba",
+      "protagonista": "Ella frente a un muro LED donde el feed se derrite y un solo post se detiene",
+      "porque": "Muro frío de contenido derretido con UNA sola pieza cálida y nítida: esa gradación es la firma; al adaptar hay que pedirla explícita.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4S07",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/N07b-45-squad-criterio.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/N07b-45-squad-criterio.png",
+      "formato": "4:5",
+      "alcance": "publicidad-prueba",
+      "protagonista": "Squad de cuatro personas con hoodie Efeonce, hombro con hombro, cabezas en la misma banda",
+      "porque": "Escena de grupo: se aprueba aunque cambien los personajes si la anatomía y la esencia se mantienen.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4S08",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/N08-45-ia-memoria.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/N08-45-ia-memoria.png",
+      "formato": "4:5",
+      "alcance": "nexa",
+      "protagonista": "Nexa saca una pieza de un túnel de cientos, con un Spark en el hombro",
+      "porque": "La pieza elegida es la única llave cálida; el túnel nunca sube del 52 %. Al adaptar, exigir proporciones reales (hombros ~3 cabezas, lente 50 mm).",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4BF1",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/BF1b-45-sparks-refuerzos.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion-bf/plates/BF1b-45-sparks-refuerzos.png",
+      "formato": "4:5",
+      "alcance": "nexa",
+      "protagonista": "Nexa recibe a los Sparks que llegan volando con estelas naranjas",
+      "porque": "La estela del Spark junto a su mano es la llave; un Spark posado en el hombro y el resto del escuadrón al fondo.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4BF2",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/BF2b-45-squad-refuerzos.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion-bf/plates/BF2b-45-squad-refuerzos.png",
+      "formato": "4:5",
+      "alcance": "publicidad-prueba",
+      "protagonista": "El squad sale del portón del hangar con dos Sparks",
+      "porque": "El portón abierto a una luz naranja intensa es la llave; tarima alta para que el reflejo del piso deje firmar.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "C4BF3",
+      "ficha": "ai-generations/2026-10-02_cmp004-cine-nativo/fichas/BF3-45-escala-temporada.json",
+      "plate": "ai-generations/2026-10-02_cmp004-cine-nativo/composicion-bf/plates/BF3-45-escala-temporada.png",
+      "formato": "4:5",
+      "alcance": "publicidad-prueba",
+      "protagonista": "Ella aprueba una pieza en su tablet mientras cientos llegan como estelas",
+      "porque": "La pieza aprobada en la tablet es la llave desde abajo; la grilla consistente detrás dice escala.",
+      "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
     }
   ]
 }

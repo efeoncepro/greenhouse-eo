@@ -99,3 +99,16 @@ Aprendizaje canonizado a pedido del operador: un ad nace multiformato desde la f
   aprobada, generación a 2048 y zoom out por expansión (`pnpm foto:expandir`); quedan en revisión del operador.
   Método canónico: `efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0b.
 - **Pendientes:** S08 y BF1 en 1:1 y la horizontal 1,91:1 (el texto completo no cabe), recuperar el color de S06.
+
+## Delta 2026-10-02 (tarde) — set completo aprobado y canonizado
+
+- **Aprobadas por el operador las 33 piezas** (S01–S08 y BF1–BF3 en 4:5, 9:16 y 1:1), incluidas las nativas N2
+  (S01 1:1 con la pantalla real rehecha por edición enmascarada, S03 9:16 y 1:1 con casting, S08 y BF1 1:1 con escena
+  a 2048 y zoom out, S08 9:16 con proporciones corregidas). La horizontal 1,91:1 no se produce por ahora.
+- **Canon:** las 33 entran a la sección «finales» del banco de fotografía de AXIS (Lab, commit `d94695d`) con su
+  receta; las 11 escenas 4:5 entran a `scripts/foto/cine-recetas.json` como recetas cine (`C4*`) con la advertencia
+  de alcance de este CDR. El canon de `assets.lock` no aplica: es para referencias de prompt, no para piezas finales.
+- **Limpieza:** el canvas conserva sólo Estrategia y Formatos de pauta; los descartes de Finales en OneDrive se
+  borraron. La exploración local queda en `ai-generations/` (citada por las recetas cine, por lo tanto protegida).
+- **Pendiente:** cargar las piezas a Marketing Studio (la campaña existe; faltan las piezas). La autorización de
+  medios sigue `pending`: aprobar no autoriza pauta.
