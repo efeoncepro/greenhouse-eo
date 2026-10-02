@@ -25,7 +25,7 @@ Los pilotos R01–R04 de CMP-004 no generaban impacto para el operador («necesi
 | S05 | Run & Gun Production | ¿Contenido para todo el mes? · En un día | 3 |
 | S06 | Content & Social Operations | ¿Quién cuida tu conversación? · Personas | 2 |
 | S07 | Managed Creative Capacity | ¿Más piezas, mismo estándar? · Mismo criterio | 1 |
-| S08 | AI Creative Operations | ¿IA en tu producción? · Con memoria | 1 |
+| S08 | AI Creative Operations | ¿Producción con IA? · Marca intacta | 1 |
 
 Roles, bajadas, CTA y destino lógico viven en el BRIEF (§0b), no aquí.
 
@@ -49,7 +49,7 @@ Roles, bajadas, CTA y destino lógico viven en el BRIEF (§0b), no aquí.
 - [x] Pilotos 4:5 N2 producidos y certificados por el gate.
 - [ ] Revisión creativa del operador de los ocho pilotos.
 - [ ] Decisión sobre personas del equipo en registro cine (S01–S07; hoy en prueba). S08 (Nexa) está en el caso aprobado.
-- [ ] Claims por validar: «En un día» (S05) y «memoria de marca» (S08).
+- [ ] Claim por validar: «En un día» (S05). S08 corregido por el operador el 2026-10-02: la premisa es escalar producción creativa con IA sin perder consistencia de marca (pieza N3); «memoria de marca» deja de usarse.
 - [ ] Destino, formulario y atribución por ruta.
 - [ ] Export final 1440×1800 y formatos 1:1, 9:16 y 16:9 nativos.
 - [ ] Video, orgánico y documentos por servicio replanificados.
