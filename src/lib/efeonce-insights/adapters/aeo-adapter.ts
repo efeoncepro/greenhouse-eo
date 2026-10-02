@@ -24,7 +24,7 @@ export const AEO_ADAPTER_VERSION = 'aeo_report_adapter_v2'
 const competitorSlug = (name: string): string =>
   name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 
-const collectForWindow = async (organizationId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>) => {
+const collectForWindow = async (organizationId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, editorialV2 = false) => {
   const facts: EvidenceFactV1[] = []
   const rejections: EvidenceRejectionV1[] = []
 
@@ -164,6 +164,39 @@ const collectForWindow = async (organizationId: string, window: ResolvedInsightW
     facts.push({ ...base, factId: factId('aeo', 'citation_share', window), metricId: 'citation_share', label: GH_INSIGHTS.metrics.citation_share!, value: round1((citations.findingsCitingOwnDomain / citations.findingsWithCitations) * 100), unit: 'percent', numerator: citations.findingsCitingOwnDomain, denominator: citations.findingsWithCitations, comparisonFactId: comparisonIds.citation_share ?? null })
   }
 
+  // TASK-1962 — lo que el MISMO informe del Grader ya mide y el de Insights no usaba (contrato de contenido): qué sitios
+  // citan los motores y de qué tipo son («¿por qué?»: de dónde sale lo que dicen) y con qué tono hablan de la marca. Sólo
+  // con contrato v2, para que la evidencia v1 quede idéntica. Conteos del Grader tal cual; nada se recalcula.
+  if (editorialV2) {
+    const breakdown = report.citationSourceBreakdown
+
+    if (breakdown && breakdown.totalCitations > 0) {
+      breakdown.domains.slice(0, 5).forEach((source, index) => {
+        const key = `cited_source.${index + 1}`
+
+        facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: source.domain, value: source.count, unit: 'count', numerator: source.count, denominator: breakdown.totalCitations, comparisonFactId: comparisonIds[key] ?? null, dimension: { domain: source.domain, classification: source.classification, rank: String(index + 1) } })
+      })
+    }
+
+    for (const type of report.sourceTypeSummary ?? []) {
+      if (type.count <= 0) continue
+
+      const key = `source_type.${type.sourceType}`
+
+      facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: GH_INSIGHTS.aeoSourceTypes[type.sourceType] ?? type.sourceType, value: type.count, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds[key] ?? null, dimension: { sourceType: type.sourceType } })
+    }
+
+    const sentiment = report.sentimentSummary
+
+    if (sentiment && sentiment.evaluated > 0) {
+      for (const tone of ['positive', 'neutral', 'negative', 'mixed'] as const) {
+        const key = `sentiment.${tone}`
+
+        facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: GH_INSIGHTS.aeoSentiments[tone]!, value: sentiment[tone], unit: 'count', numerator: sentiment[tone], denominator: sentiment.evaluated, comparisonFactId: comparisonIds[key] ?? null, dimension: { tone } })
+      }
+    }
+  }
+
   return { facts, rejections, source: { module: 'aeo', adapterVersion: AEO_ADAPTER_VERSION, reader: 'readClientGraderReport', asOf, method, coverage, servedWindow: { start: asOf, endExclusive: asOf, granularity: 'period', partial: false } } as EvidenceSourceV1 }
 }
 
@@ -174,12 +207,12 @@ export const aeoReportAdapter: ModuleReportAdapterV1 = {
     let comparison: Awaited<ReturnType<typeof collectForWindow>> | null = null
 
     if (input.comparison) {
-      comparison = await collectForWindow(input.organizationId, input.comparison, {})
+      comparison = await collectForWindow(input.organizationId, input.comparison, {}, input.editorialV2 === true)
 
       for (const fact of comparison.facts) comparisonIds[fact.metricId] = fact.factId
     }
 
-    const current = await collectForWindow(input.organizationId, input.window, comparisonIds)
+    const current = await collectForWindow(input.organizationId, input.window, comparisonIds, input.editorialV2 === true)
 
     return {
       facts: [...current.facts, ...(comparison?.facts ?? [])],

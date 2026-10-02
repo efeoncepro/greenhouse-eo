@@ -57,7 +57,18 @@ const excerptOf = (text: string, match: RegExpMatchArray | null): string => {
   return text.slice(Math.max(0, match.index - 20), match.index + match[0].length + 20)
 }
 
-const scanText = (path: string, text: string, out: ClientFitViolation[]): void => {
+/**
+ * TASK-1962 — dominios PÚBLICOS que el informe nombra a propósito: los sitios que citan los motores (`cited_source.*`,
+ * etiqueta = dominio que el Grader midió). Un dominio tiene forma de identificador con punto («chocale.cl»), pero es
+ * contenido del cliente. Se enmascaran EXACTAMENTE esos dominios antes de buscar identificadores; cualquier otro token con
+ * punto sigue siendo una fuga.
+ */
+const publicDomainsOf = (facts: readonly EvidenceFactV1[]): string[] =>
+  [...new Set(facts.filter(fact => fact.metricId.startsWith('cited_source.')).map(fact => fact.label))].sort((a, b) => b.length - a.length)
+
+const scanText = (path: string, raw: string, out: ClientFitViolation[], publicDomains: readonly string[] = []): void => {
+  const text = publicDomains.reduce((masked, domain) => masked.split(domain).join(' '), raw)
+
   for (const pattern of [SNAKE_IDENTIFIER, DOTTED_IDENTIFIER, MATERIALIZED]) {
     const match = text.match(pattern)
 
@@ -75,15 +86,15 @@ const scanText = (path: string, text: string, out: ClientFitViolation[]): void =
   if (iso) out.push({ path, rule: 'raw_iso_date', excerpt: excerptOf(text, iso) })
 }
 
-const walk = (node: unknown, path: string, out: ClientFitViolation[]): void => {
+const walk = (node: unknown, path: string, out: ClientFitViolation[], publicDomains: readonly string[] = []): void => {
   if (typeof node === 'string') {
-    scanText(path, node, out)
+    scanText(path, node, out, publicDomains)
 
     return
   }
 
   if (Array.isArray(node)) {
-    node.forEach((item, index) => walk(item, `${path}[${index}]`, out))
+    node.forEach((item, index) => walk(item, `${path}[${index}]`, out, publicDomains))
 
     return
   }
@@ -94,7 +105,7 @@ const walk = (node: unknown, path: string, out: ClientFitViolation[]): void => {
       // El ChartSpec es contrato de render: sus textos visibles (título, etiquetas de serie y dimensión) se revisan;
       // `scale`, `data` y `tabularEquivalent` llevan ids y números (la tabla visible es `chart.table`, ya resuelta).
       if (path.endsWith('.spec') && (key === 'scale' || key === 'data' || key === 'tabularEquivalent')) continue
-      walk(value, path ? `${path}.${key}` : key, out)
+      walk(value, path ? `${path}.${key}` : key, out, publicDomains)
     }
   }
 }
@@ -170,7 +181,7 @@ export const clientFitViolations = ({ model, reportTitle, facts }: ClientFitInpu
 
   if (reportTitle !== undefined) scanText('header.reportTitle', reportTitle, out)
 
-  walk(model, '', out)
+  walk(model, '', out, publicDomainsOf(facts))
   limitViolations('limits', model.limits, out)
 
   model.chapters.forEach((chapter, chapterIndex) => {

@@ -84,8 +84,43 @@ export const GH_INSIGHTS = {
   aeoFamilyTitles: {
     mention_rate: 'Mención por motor (% de respuestas)',
     sov: 'Share of Voice frente a competidores',
-    single: 'Share of Model y citas a tu sitio'
+    single: 'Share of Model y citas a tu sitio',
+    // TASK-1962 — lo que el Grader ya mide y el informe no usaba.
+    cited_source: 'Sitios que más citan los motores',
+    source_type: 'Tipo de fuente que citan los motores',
+    sentiment: 'Cómo hablan de la marca los motores'
   } as Readonly<Record<string, string>>,
+
+  /** TASK-1962 — nombres de los tipos de fuente y tonos del Grader en el informe (nunca la clave cruda). */
+  aeoSourceTypes: {
+    news: 'Medios de noticias',
+    earned: 'Menciones ganadas',
+    social: 'Redes sociales',
+    marketplace: 'Marketplaces',
+    directory: 'Directorios',
+    owned: 'Sitios propios',
+    review: 'Sitios de reseñas',
+    forum: 'Foros',
+    unknown: 'Sin clasificar'
+  } as Readonly<Record<string, string>>,
+  aeoSentiments: { positive: 'Positivas', neutral: 'Neutras', negative: 'Negativas', mixed: 'Mixtas' } as Readonly<Record<string, string>>,
+  aeoFindings: {
+    topSource: 'El sitio más citado por los motores es',
+    citations: 'citas',
+    of: 'de',
+    sourceTypeLead: 'Los motores citan más',
+    sourceTypeThan: 'que',
+    sourceTypeOnly: 'Lo que más citan los motores son',
+    sentimentLead: 'De',
+    sentimentEvaluated: 'respuestas evaluadas',
+    sentimentPositive: 'son positivas y',
+    sentimentNegative: 'negativas',
+    sovLeader: 'concentra el',
+    sovOfMentions: 'de las menciones; tu marca, el',
+    sovBrandLeads: 'Tu marca lidera las menciones frente a competidores con el',
+    tableTitle: 'De dónde sale lo que dicen los motores',
+    tableLead: 'Los sitios que más citan los motores, el tipo de fuente y el tono de las respuestas, tal como los midió el análisis.'
+  },
 
   readerLimits: {
     outOfScope: 'no forma parte de esta edición',
@@ -270,6 +305,8 @@ export const GH_INSIGHTS = {
     leadWith: 'lideran con',
     // TASK-1957 — base de un indicador AEO porcentual: «33,3 % (8 de 24 respuestas)». Un % sin su base no se puede leer.
     answersNoun: 'respuestas',
+    /** TASK-1962 — el Share of Voice se mide sobre menciones (marca + competidores), no sobre respuestas. */
+    mentionsNoun: 'menciones',
     // TASK-1957 — tasa de mención igual en todos los motores: una frase con el porcentaje y su base.
     allRatesPrefix: 'La marca aparece en el',
     allRatesTail: 'de las respuestas de cada motor',

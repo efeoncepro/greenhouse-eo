@@ -237,7 +237,11 @@ describe('TASK-1957 — indicadores estándar de visibilidad en motores de respu
     const textOf = (metricId: string) => chapter.claims.find(claim => claim.claimId === `claim.aeo.${metricId}`)?.text
 
     expect(roleOf('share_of_model')).toBe('finding')
-    expect(roleOf('sov.brand')).toBe('finding')
+    // TASK-1962 — el Share of Voice lo dice la frase que compara a la marca con quien concentra las menciones; la cifra
+    // suelta de la marca queda de respaldo (dos hallazgos con la misma cifra se repetían).
+    expect(roleOf('sov.brand')).toBe('backing')
+    expect(roleOf('sov')).toBe('finding')
+    expect(textOf('sov')).toMatch(/de las menciones; tu marca, el|Tu marca lidera las menciones/)
     expect(roleOf('citation_share')).toBe('finding')
     // El porcentaje lleva su base de respuestas.
     expect(textOf('share_of_model')).toBe('Share of Model: 38,9 % (7 de 18 respuestas).')
@@ -299,5 +303,23 @@ describe('marcas de producto por capítulo (submarcas SEO/AEO)', () => {
       expect(GH_INSIGHTS.productMarks[key]).toMatch(/^Efeonce /)
       expect(productMarkFileStem(key)).not.toContain('_')
     }
+  })
+})
+
+describe('TASK-1962 — dominios citados en el gate client-fit', () => {
+  it('un sitio citado por los motores es contenido; cualquier otro token con punto sigue siendo fuga', () => {
+    const cited = { factId: 'aeo.cited_source.1.w', module: 'aeo', metricId: 'cited_source.1', label: 'chocale.cl' } as EvidenceFactV1
+
+    const model: InsightWebModelV1 = {
+      modelVersion: '1.3', locale: 'es-CL', chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {},
+      executiveSummary: [{ claimId: 'c1', text: 'El sitio más citado por los motores es «chocale.cl»: 11 de 246 citas.', factIds: [] }]
+    }
+
+    expect(clientFitViolations({ model, facts: [cited] })).toEqual([])
+    expect(clientFitViolations({ model, facts: [] }).map(item => item.rule)).toEqual(['internal_identifier'])
+
+    const leaky = { ...model, executiveSummary: [{ claimId: 'c1', text: 'Fuente «chocale.cl» y seo.clicks en el texto.', factIds: [] }] }
+
+    expect(clientFitViolations({ model: leaky, facts: [cited] }).map(item => item.excerpt)).toEqual([expect.stringContaining('seo.clicks')])
   })
 })

@@ -56,8 +56,14 @@ import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf 
 import { withDedupedLimits } from './plan-limits'
 
 /** Capacidades declaradas por plantilla (`*.slots.json`). Son del molde, no preferencias. */
+/**
+ * TASK-1962 — caracteres de la columna de la entidad que caben en una línea de la tabla A4 (medido con las tablas de
+ * Berel: «Mención en Google AI Overview», 29, ya parte en dos; «Páginas que más cambiaron», 25, no).
+ */
+const TABLE_ENTITY_LINE_CHARS = 26
+
 const CAPACITY = {
-  /** Filas por página de tabla (`tableRows.maxItems`). */
+  /** Filas por página de tabla (`tableRows.maxItems`), contando una fila de etiqueta larga como `tableLongRowWeight`. */
   tableRows: 16,
   /** Párrafos por página narrativa (`paragraphs.maxItems`). */
   paragraphs: 6,
@@ -269,7 +275,11 @@ const chapterBodyPages = (
     const secondColumn = sharedUnit ? table.columns[2] : L.tableVariation
     const drawnFacts = rowFacts.flatMap(fact => (fact ? [fact.factId] : []))
 
-    chunkByCapacity(table.rows.map((row, index) => ({ row, index })), CAPACITY.tableRows, (_r, i) => `${table.tableId}-r${i}`).forEach((rows, i) => {
+    // Una etiqueta que no cabe en una línea de la columna ocupa dos: pesa doble al repartir (nunca se recorta).
+    const rowHeight = ({ row }: { row: Array<string | null> }) => (String(row[0] ?? '').length > TABLE_ENTITY_LINE_CHARS ? 2 : 1)
+    const chunks = chunkByCapacity(table.rows.map((row, index) => ({ row, index })), CAPACITY.tableRows, (_r, i) => `${table.tableId}-r${i}`, rowHeight)
+
+    chunks.forEach((rows, i) => {
       pages.push({
         contentsTitle: table.title,
         factIds: drawnFacts,
@@ -282,7 +292,7 @@ const chapterBodyPages = (
             tableTitle: rejectIfLonger(table.title, BUDGET.tableTitle, `${table.tableId}.title`),
             lead: table.lead ?? L.tableLeadAll(periodInline, withPrevious),
             // La continuación se declara: una tabla que sigue sin decirlo obliga a retroceder.
-            ...(i > 0 ? { continuationLabel: L.tableContinued, rankOffset: String(i * CAPACITY.tableRows) } : {}),
+            ...(i > 0 ? { continuationLabel: L.tableContinued, rankOffset: String(rows[0]!.index) } : {}),
             boardTitle: rejectIfLonger(`${L.tableDetailBy} ${entityColumn.toLowerCase()}`, 48, `${table.tableId}.boardTitle`),
             // La leyenda describe la barra: sin barras no hay leyenda.
             ...(sharedUnit ? { legend: { label: rejectIfLonger(valueColumn || entityColumn, 24, `${table.tableId}.legend`) } } : {}),

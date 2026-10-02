@@ -508,3 +508,53 @@ describe('TASK-1962 — «¿qué recomendamos?» y «¿qué necesitamos de usted
     expect(v2({ ...snapshot, rejections: [{ module: 'aeo', metricId: null, reason: 'not_connected', detail: 'x' }] }, ['seo', 'aeo']).ask).toBeUndefined()
   })
 })
+
+describe('TASK-1962 — lo que el Grader ya mide: sitios citados, tipo de fuente, tono y Share of Voice', () => {
+  const count = (metricId: string, label: string, value: number, extra: Partial<EvidenceFactV1> = {}): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId: `aeo.${metricId}.w`, metricId, label, unit: 'count', numerator: null, denominator: null, comparisonFactId: null, dimension: undefined, channelId: undefined, ...extra })
+
+  const pct = (metricId: string, label: string, value: number, numerator: number, denominator: number): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId: `aeo.${metricId}.w`, metricId, label, unit: 'percent', numerator, denominator, comparisonFactId: null, dimension: undefined, channelId: undefined })
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      count('cited_source.1', 'chocale.cl', 11, { numerator: 11, denominator: 246 }),
+      count('cited_source.2', 'trustpilot.com', 9, { numerator: 9, denominator: 246 }),
+      count('source_type.unknown', 'Sin clasificar', 21),
+      count('source_type.news', 'Medios de noticias', 16),
+      count('source_type.owned', 'Sitios propios', 3),
+      count('sentiment.positive', 'Positivas', 3, { numerator: 3, denominator: 16 }),
+      count('sentiment.neutral', 'Neutras', 9, { numerator: 9, denominator: 16 }),
+      count('sentiment.negative', 'Negativas', 3, { numerator: 3, denominator: 16 }),
+      pct('sov.brand', 'Tu marca', 25, 10, 40),
+      pct('sov.competitor.latam', 'LATAM', 50, 20, 40),
+      pct('sov.competitor.jetsmart', 'JetSMART', 17.5, 7, 40)
+    ],
+    sources: [],
+    rejections: []
+  }
+
+  it('cada familia tiene su hallazgo, su figura y una lectura que dice lo mismo', () => {
+    const plan = v2(snapshot, ['aeo'])
+    const chapter = plan.chapters[0]!
+    const findings = chapter.claims.filter(claim => claim.role === 'finding').map(claim => claim.text)
+
+    expect(findings).toEqual(expect.arrayContaining([
+      'El sitio más citado por los motores es «chocale.cl»: 11 de 246 citas.',
+      'Los motores citan más medios de noticias (16) que sitios propios (3).',
+      'LATAM concentra el 50,0 % de las menciones; tu marca, el 25,0 %.',
+      'De 16 respuestas evaluadas, 3 son positivas y 3 negativas.'
+    ]))
+    // La cifra suelta del Share of Voice de la marca ya no es un hallazgo aparte, y lleva «menciones», no «respuestas».
+    expect(chapter.claims.find(claim => claim.claimId === 'claim.aeo.sov.brand.w')).toMatchObject({ role: 'backing', text: 'Tu marca: 25,0 % (10 de 40 menciones).' })
+    // «Sin clasificar» no encabeza la figura de tipos de fuente (sigue en la tabla).
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.count.source-type')!.dimensionLabels).toEqual(['Medios de noticias', 'Sitios propios'])
+    expect(chapter.tables.find(table => table.tableId === 'table.aeo.sources')!.rows.map(row => row[0])).toContain('Sin clasificar')
+    // Los dominios no van en columnas (una palabra larga no se puede partir): hallazgo y tabla.
+    expect(chapter.charts.some(chart => chart.chartId === 'chart.aeo.count.cited-source')).toBe(false)
+    expect(chapter.tables.find(table => table.tableId === 'table.aeo.sources')!.rows.map(row => row[0])).toContain('chocale.cl')
+    expect(chapter.tables.find(table => table.tableId === 'table.aeo')!.rows.map(row => row[0])).not.toContain('chocale.cl')
+    expect(chapter.readings!.find(reading => reading.chartId === 'chart.aeo.count.source-type')!.conclusion!.text).toBe('Los motores citan más medios de noticias (16) que sitios propios (3).')
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+})

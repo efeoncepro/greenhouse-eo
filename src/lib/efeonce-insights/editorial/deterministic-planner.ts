@@ -340,6 +340,8 @@ const chartGroupKeyOf = (moduleKey: InsightModule, fact: EvidenceFactV1): string
   // una lectura del método, no un indicador del mercado, y en barras se leían como notas (Berel: «lideran con 100»).
   // Quedan en la tabla de respaldo.
   if (moduleKey === 'aeo' && fact.unit === 'score') return 'score:single'
+  // TASK-1962 — conteos AEO distintos (sitios citados, tipos de fuente, tono) son figuras propias, nunca una sola.
+  if (moduleKey === 'aeo' && fact.unit === 'count' && isAeoSourceFact(fact)) return `count:${fact.metricId.split('.')[0]!}`
   if (moduleKey !== 'aeo' || fact.unit !== 'percent') return fact.unit
 
   const family = fact.metricId.includes('.') ? fact.metricId.split('.')[0]! : 'single'
@@ -369,6 +371,92 @@ const tableFor = (tableId: string, title: string, facts: EvidenceFactV1[], byId:
  * No entran a la tesis antes que el resultado (ver el rango de `.drivers.` en `conclusionsOf`).
  */
 const isDriverFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('driver.')
+
+/**
+ * TASK-1962 — lo que el Grader ya mide y el informe no usaba: sitios citados y tipo de fuente («¿por qué?»: de dónde sale
+ * lo que dicen los motores) y tono. Cada familia es su figura (`chartGroupKeyOf`) y un hallazgo propio con sus cifras;
+ * no producen una frase por cifra («chocale.cl: 11» no es un hallazgo).
+ */
+const AEO_SOURCE_PREFIXES = ['cited_source.', 'source_type.', 'sentiment.']
+const isAeoSourceFact = (fact: EvidenceFactV1): boolean => AEO_SOURCE_PREFIXES.some(prefix => fact.metricId.startsWith(prefix))
+
+/**
+ * TASK-1962 — lectura propia de las figuras AEO que la lectura genérica de barras dice mal («La cifra más alta es
+ * chocale.cl: 11 de 246»): la conclusión es el mismo hallazgo de la familia; la cifra principal, su primer hecho.
+ */
+const AEO_READING_CHARTS: Record<string, string> = {
+  'chart.aeo.count.source-type': 'claim.aeo.sources.type',
+  'chart.aeo.count.sentiment': 'claim.aeo.sentiment',
+  'chart.aeo.percent.sov': 'claim.aeo.sov'
+}
+
+const aeoReadings = (charts: ChartSpecV1[], claims: PlanClaimV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanFigureReadingV1[] =>
+  charts.flatMap(chart => {
+    const claim = claims.find(item => item.claimId === AEO_READING_CHARTS[chart.chartId])
+    const lead = claim ? byId.get(claim.factIds[0] ?? '') : undefined
+
+    if (!claim || !lead || claim.text.length > PLAN_TEXT_LIMITS.conclusion) return []
+
+    return [{
+      chartId: chart.chartId,
+      keyFigure: { factId: lead.factId, value: formatFactValue(lead.value, lead.unit, locale), caption: { claimId: `caption.${chart.chartId}`, text: lead.label, factIds: [lead.factId] } },
+      conclusion: { claimId: `conclusion.${chart.chartId}`, text: claim.text, factIds: claim.factIds },
+      nextStep: null
+    }].filter(reading => reading.keyFigure.caption.text.length <= PLAN_TEXT_LIMITS.keyFigureCaption)
+  })
+
+/** Share of Voice en una frase: quién concentra las menciones y cuánto tiene la marca. */
+const sovFinding = (facts: EvidenceFactV1[], locale: string): PlanClaimV1 | null => {
+  const F = GH_INSIGHTS.aeoFindings
+  const rows = facts.filter(fact => fact.metricId.startsWith('sov.') && fact.value !== null)
+  const brand = rows.find(fact => fact.metricId === 'sov.brand')
+  const leader = [...rows].sort((a, b) => b.value! - a.value!)[0]
+
+  if (!brand || !leader) return null
+
+  const pct = (fact: EvidenceFactV1) => formatFactValue(fact.value, 'percent', locale)
+
+  return leader === brand || leader.value === brand.value
+    ? { claimId: 'claim.aeo.sov', text: `${F.sovBrandLeads} ${pct(brand)}.`, factIds: [brand.factId], role: 'finding' }
+    : { claimId: 'claim.aeo.sov', text: `${leader.label} ${F.sovLeader} ${pct(leader)} ${F.sovOfMentions} ${pct(brand)}.`, factIds: [leader.factId, brand.factId], role: 'finding' }
+}
+
+const aeoSourceFindings = (facts: EvidenceFactV1[], locale: string): PlanClaimV1[] => {
+  const F = GH_INSIGHTS.aeoFindings
+  const n = (value: number | null) => formatFactValue(value, 'count', locale)
+  const lower = (text: string) => `${text.charAt(0).toLocaleLowerCase('es')}${text.slice(1)}`
+  const claims: PlanClaimV1[] = []
+  const top = facts.find(fact => fact.metricId === 'cited_source.1' && fact.value !== null)
+
+  if (top && top.denominator) {
+    claims.push({ claimId: 'claim.aeo.sources.top', text: `${F.topSource} «${top.label}»: ${n(top.value)} ${F.of} ${n(top.denominator)} ${F.citations}.`, factIds: [top.factId], role: 'finding' })
+  }
+
+  const types = facts.filter(fact => fact.metricId.startsWith('source_type.') && fact.metricId !== 'source_type.unknown' && fact.value !== null).sort((a, b) => b.value! - a.value!)
+  const leadType = types[0]
+  const owned = types.find(fact => fact.metricId === 'source_type.owned')
+
+  if (leadType) {
+    const text = owned && owned !== leadType && owned.value! < leadType.value!
+      ? `${F.sourceTypeLead} ${lower(leadType.label)} (${n(leadType.value)}) ${F.sourceTypeThan} ${lower(owned.label)} (${n(owned.value)}).`
+      : `${F.sourceTypeOnly} ${lower(leadType.label)} (${n(leadType.value)}).`
+
+    claims.push({ claimId: 'claim.aeo.sources.type', text, factIds: [leadType.factId, ...(owned && owned !== leadType ? [owned.factId] : [])], role: 'finding' })
+  }
+
+  const positive = facts.find(fact => fact.metricId === 'sentiment.positive')
+  const negative = facts.find(fact => fact.metricId === 'sentiment.negative')
+
+  const sov = sovFinding(facts, locale)
+
+  if (sov) claims.push(sov)
+
+  if (positive && negative && positive.denominator) {
+    claims.push({ claimId: 'claim.aeo.sentiment', text: `${F.sentimentLead} ${n(positive.denominator)} ${F.sentimentEvaluated}, ${n(positive.value)} ${F.sentimentPositive} ${n(negative.value)} ${F.sentimentNegative}.`, factIds: [positive.factId, negative.factId], role: 'finding' })
+  }
+
+  return claims
+}
 
 /** TASK-1962 — hechos que sólo sostienen el plan de acción (oportunidades de la cola SEO): no son hallazgos ni tabla. */
 const isPlanFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('opportunity.')
@@ -547,8 +635,12 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // TASK-1957 — las dimensiones internas del Grader (claridad de entidad, dominio de categoría…) son lecturas del
     // método, no indicadores para el cliente: no se dicen ni van como tarjeta; quedan en la tabla de respaldo.
     const factClaims = facts
-      .filter(fact => !(moduleKey === 'aeo' && fact.metricId.startsWith('dimension.')))
+      .filter(fact => !(moduleKey === 'aeo' && (fact.metricId.startsWith('dimension.') || isAeoSourceFact(fact))))
       .map(fact => claimFor(fact, byId, input.locale, v2Context))
+      // TASK-1962 — con v2, el Share of Voice de la marca lo dice la frase que lo compara con el líder: la cifra suelta
+      // («Tu marca: 25,0 %») queda como respaldo.
+      .map(claim => (editorialV2 && moduleKey === 'aeo' && claim.factIds.length === 1 && byId.get(claim.factIds[0]!)?.metricId === 'sov.brand' ? { ...claim, role: 'backing' as const } : claim))
+      .concat(moduleKey === 'aeo' && editorialV2 ? aeoSourceFindings(facts, input.locale) : [])
 
     const uniformClaims: PlanClaimV1[] = []
     const charts: ChartSpecV1[] = []
@@ -557,6 +649,11 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // TASK-1957 — en AEO los porcentajes son indicadores DISTINTOS (tasa de mención por motor, Share of Voice frente a
     // competidores, Share of Model y citas): cada familia es su propia figura, con su título. El resto agrupa por unidad.
     for (const fact of facts) {
+      // TASK-1962 — «sin clasificar» es la parte que el Grader no pudo tipificar: va a la tabla, no encabeza la figura.
+      // Los sitios citados tampoco van en columnas: un dominio es una sola palabra («greatplacetowork.com.mx») que la
+      // figura no puede partir y el render falla cerrado (Berel, 2026-10-02). Van en su hallazgo y en la tabla.
+      if (fact.metricId === 'source_type.unknown' || fact.metricId.startsWith('cited_source.')) continue
+
       const key = chartGroupKeyOf(moduleKey, fact)
 
       byUnit.set(key, [...(byUnit.get(key) ?? []), fact])
@@ -601,11 +698,13 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       charts,
       // v2: la tabla es el respaldo de TODO el capítulo, no un resumen (revisión del operador, 2026-09-25).
       tables: [
-        ...(facts.length > 0 ? [tableFor(`table.${moduleKey}`, editorialV2 ? `${MODULE_TITLES[moduleKey]}: ${GH_INSIGHTS.tableAllFigures}` : `${MODULE_TITLES[moduleKey]} · resumen`, facts, byId, input.locale)] : []),
+        ...((main => (main.length > 0 ? [tableFor(`table.${moduleKey}`, editorialV2 ? `${MODULE_TITLES[moduleKey]}: ${GH_INSIGHTS.tableAllFigures}` : `${MODULE_TITLES[moduleKey]} · resumen`, main, byId, input.locale)] : []))(facts.filter(fact => !isAeoSourceFact(fact)))),
+        // TASK-1962 — fuentes, tipos y tono del Grader en su propia tabla: no inflan la de los indicadores.
+        ...((sourceFacts => (sourceFacts.length > 0 ? [{ ...tableFor(`table.${moduleKey}.sources`, GH_INSIGHTS.aeoFindings.tableTitle, sourceFacts, byId, input.locale), lead: GH_INSIGHTS.aeoFindings.tableLead }] : []))(facts.filter(isAeoSourceFact))),
         ...(drivers?.tables ?? [])
       ],
       limits: limitsFor(rejections),
-      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: withDriverReadings(readingsFor(charts, byId, input.locale), drivers?.readings ?? []) } : {})
+      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: withDriverReadings(readingsFor(charts, byId, input.locale), [...(drivers?.readings ?? []), ...(moduleKey === 'aeo' ? aeoReadings(charts, claims, byId, input.locale) : [])]) } : {})
     })
   }
 

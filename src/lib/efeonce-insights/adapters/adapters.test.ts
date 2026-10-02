@@ -278,6 +278,29 @@ describe('AEO adapter', () => {
     expectContentContract(result.facts)
   })
 
+  it('TASK-1962 — con v2, sitios citados, tipo de fuente y tono del MISMO informe del Grader; sin v2, nada nuevo', async () => {
+    const rich = report('2026-08-20', 'ready')
+
+    Object.assign(rich.report, {
+      citationSourceBreakdown: { reason: null, totalCitations: 246, uniqueDomains: 80, domains: [{ domain: 'chocale.cl', count: 11, engines: ['gemini'], classification: 'third_party' }, { domain: 'trustpilot.com', count: 9, engines: ['openai'], classification: 'third_party' }] },
+      sourceTypeSummary: [{ sourceType: 'news', count: 16 }, { sourceType: 'owned', count: 3 }, { sourceType: 'unknown', count: 21 }],
+      sentimentSummary: { positive: 3, neutral: 9, negative: 3, mixed: 1, evaluated: 16, net: 'neutral' }
+    })
+    aeoMocks.readClientGraderReport.mockResolvedValue(rich)
+    const { aeoReportAdapter } = await import('./aeo-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const v2 = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(v2.facts.find(fact => fact.metricId === 'cited_source.1')).toMatchObject({ label: 'chocale.cl', value: 11, numerator: 11, denominator: 246, dimension: { domain: 'chocale.cl', rank: '1' } })
+    expect(v2.facts.find(fact => fact.metricId === 'source_type.news')).toMatchObject({ label: 'Medios de noticias', value: 16 })
+    expect(v2.facts.find(fact => fact.metricId === 'sentiment.negative')).toMatchObject({ label: 'Negativas', value: 3, numerator: 3, denominator: 16 })
+    expectContentContract(v2.facts)
+
+    const v1 = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+    expect(v1.facts.some(fact => /^(cited_source|source_type|sentiment)\./.test(fact.metricId))).toBe(false)
+  })
+
   it('sin competidores detectados no entra la participación frente a competencia ni el puntaje global que la pondera', async () => {
     // Caso real Berel 2026-09-03: competitive_sov = 100 contra nadie (marca / (marca + 0)) y pesa 15 % del global.
     const base = report('2026-08-20', 'ready')

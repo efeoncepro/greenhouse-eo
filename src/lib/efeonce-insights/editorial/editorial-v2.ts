@@ -40,7 +40,7 @@ const valueText = (fact: EvidenceFactV1, locale: string): string => {
   }
 
   if (fact.module === 'aeo' && fact.unit === 'percent' && fact.value !== null && fact.numerator !== null && fact.denominator !== null && fact.denominator > 0) {
-    return `${fmt(fact, locale)} (${formatFactValue(fact.numerator, 'count', locale)} ${GH_INSIGHTS.reading.outOf} ${formatFactValue(fact.denominator, 'count', locale)} ${GH_INSIGHTS.reading.answersNoun})`
+    return `${fmt(fact, locale)} (${formatFactValue(fact.numerator, 'count', locale)} ${GH_INSIGHTS.reading.outOf} ${formatFactValue(fact.denominator, 'count', locale)} ${fact.metricId.startsWith('sov.') ? GH_INSIGHTS.reading.mentionsNoun : GH_INSIGHTS.reading.answersNoun})`
   }
 
   return fmt(fact, locale)

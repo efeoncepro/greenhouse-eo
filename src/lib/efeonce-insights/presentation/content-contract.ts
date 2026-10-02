@@ -18,7 +18,7 @@
 
 import type { InsightModule } from '../contracts/request'
 
-export const CONTENT_CONTRACT_VERSION = 'content_contract_v1' as const
+export const CONTENT_CONTRACT_VERSION = 'content_contract_v2' as const
 
 /** Las ocho preguntas, en el orden en que un informe de agencia las responde. */
 export const INSIGHT_CONTENT_QUESTIONS = [
@@ -81,7 +81,7 @@ export const CONTENT_CONTRACT: readonly InsightContentQuestionRow[] = [
     answeredBy: 'facts',
     byModule: {
       seo: { verdict: 'producer_now', evidence: 'consultas y páginas de Search Console que más movieron los clics (`readSeoWindowMovers`): descomposición medida, nunca causalidad' },
-      aeo: { verdict: 'no_evidence', evidence: 'fuentes citadas por los motores y exactitud existen en el informe del Grader, pero el adapter no las entrega (follow-up de TASK-1901)' },
+      aeo: { verdict: 'producer_now', evidence: 'sitios que más citan los motores y tipo de fuente, del mismo informe del Grader (`citationSourceBreakdown`, `sourceTypeSummary`): de dónde sale lo que dicen de la marca' },
       ico: { verdict: 'no_evidence', evidence: 'atraso atribuible existe por persona y mes, no por cliente' }
     }
   },
@@ -173,6 +173,9 @@ export const CONTENT_METRIC_RULES: ReadonlyArray<{ module: InsightModule; prefix
   { module: 'aeo', prefix: 'share_of_model', question: 'outcome' },
   { module: 'aeo', prefix: 'citation_share', question: 'outcome' },
   { module: 'aeo', prefix: 'sov.', question: 'competition' },
+  { module: 'aeo', prefix: 'cited_source.', question: 'drivers' },
+  { module: 'aeo', prefix: 'source_type.', question: 'drivers' },
+  { module: 'aeo', prefix: 'sentiment.', question: 'outcome' },
   { module: 'ico', prefix: 'otd', question: 'outcome' },
   { module: 'ico', prefix: 'ftr', question: 'outcome' },
   { module: 'ico', prefix: 'rpa', question: 'outcome' },
