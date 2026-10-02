@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Diseno`
+- Status real: `Slice 1 en aprobación: hoja de diseño publicada en canvas (2026-10-01)`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
