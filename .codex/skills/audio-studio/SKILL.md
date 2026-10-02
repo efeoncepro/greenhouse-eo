@@ -106,7 +106,7 @@ Cierra el loop **idear → guion/brief → producir → editar → mezclar → m
 ### Dónde viven los archivos de `ai-generations/`
 
 Una ruta `ai-generations/...` en esta skill (máster, stem, maqueta, toma re-grabada, motor) es **lógica**: el archivo
-vive local (protegido), en el canon `gs://efeonce-creative-canon/ai-generations/<ruta>` (lo sellado en
+vive local (protegido), en el canon `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) (lo sellado en
 `scripts/foto/assets.lock.json`; el equipo lo baja con `pnpm assets:pull`) o en el archivo
 `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (exploración, rondas, renders pesados; sólo operador). Los
 scripts del motor y los `.md` van en git; los WAV/MP3, no. **Antes de re-mezclar, re-masterizar o montar** sobre un

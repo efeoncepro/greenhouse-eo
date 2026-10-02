@@ -247,7 +247,7 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 ### Dónde viven los archivos de `ai-generations/`
 
 Una ruta `ai-generations/...` en esta skill (plate, master, stem, ref, script de una corrida) es **lógica**: el archivo
-vive local (protegido), en el canon `gs://efeonce-creative-canon/ai-generations/<ruta>` (lo sellado en
+vive local (protegido), en el canon `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) (lo sellado en
 `scripts/foto/assets.lock.json`; el equipo lo baja con `pnpm assets:pull`) o en el archivo
 `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (exploración, rondas, renders pesados; sólo operador). Scripts y
 `.md` van en git; los binarios, no siempre. **Antes de componer, editar o re-renderizar** desde un asset que no está en

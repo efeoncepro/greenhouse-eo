@@ -446,6 +446,16 @@ marca), 1152×1440, `high`, ≈ USD 2–2,5 en total.
   cuerpo **Sony α** o **Canon EOS R**. Siempre la generación vigente, nunca un modelo descontinuado;
   encendidos y en uso; ningún logotipo de tercero legible. Canon:
   [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+- 🔴 **Las referencias de Nexa dicen QUIÉN es, no CÓMO está** **[operador, 2026-10-02; A/B `NX7d`→`NX7g`]**: sin
+  declararlo, casi todas sus fotos salían con el mismo gesto (tres cuartos, cabeza ladeada, media sonrisa) copiado de
+  la primera referencia. `foto:prompt` ya lo dice en REFERENCES; a la ficha le toca declarar **una** dimensión:
+  `{ "persona": "nexa", "expresion": "…" }` —12 fotográficas de `_identidad-nexa/5-expresiones/`: `carcajada`,
+  `risa-elegante`, `sorprendida`, `esceptica`, `pensativa`, `neutra`, `preocupada`, `conviccion`, `escucha-empatica`,
+  `curiosa`, `complicidad`, `mirada-lateral`— **o** `"vista"` para el ángulo; las dos a la vez aborta (ocupan la misma
+  ranura). Las 12 comparten el tres cuartos del ancla, así que sólo mandan en el gesto: **el giro se pide con `vista`**
+  (con `conviccion` copiada entera, `NX7f` no cambió nada). La escena describe la pose, y «confident half-smile» deja
+  de copiarse entre fichas; `foto:prompt` avisa si Nexa llega sin `expresion` ni `vista` (`auditarExpresion`). Canon:
+  [bloques y pipeline, delta 2026-10-02](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 - 🔴 **El DEDO del anillo se gana editando, no generando** [medido 2026-09-21]. Pedirlo por prompt en una
   generación desde cero da metal y forma correctos pero el dedo equivocado; editar una foto existente con
   instrucción posicional sí lo coloca. Es «editar conserva, generar reconstruye» aplicado a dos centímetros.
@@ -735,12 +745,31 @@ El registro cine («la marca en su película», 2026-09-27) sólo se usa con **N
   con su kit en `objetos` (sin `vista`: llega la prenda PUESTA) → `pnpm foto:emblema <plate.png>` al 100 % → si muestra
   nave, órbita y tres ventanas, **se publica tal como salió**, sin sufijo `b`. `pnpm foto:isotipo <plate.png> --centro x,y
   --ancho w [--prenda oscura|clara] --acabado` sólo si el emblema difiere (una vez por pecho; deja `<plate>-isotipo.png` y un
-  `.json` de procedencia con el SHA-256 del SVG) y **siempre en el traje biónico de Nexa**, que no tiene referencia
-  (`--prenda clara`, pechera del lado izquierdo de quien lo lleva, como `NX5b`). Componer por defecto dejó el isotipo
+  `.json` de procedencia con el SHA-256 del SVG). Componer por defecto dejó el isotipo
   impreso en vez de bordado y la limpieza tapó lo vecino: una cinta de luz en `CR4` ([registro cine §16.7](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)) y una mano en `MC2` (2026-09-28).
-  Si compones, mira la `b` al 100 % también después. `foto:isotipo` compone el isotipo del pecho, no el logotipo de una
-  espalda. Canon: `.claude/rules/brand-photography.md` y
+  Si compones, mira la `b` al 100 % también después. Desde el 2026-10-02 `foto:isotipo` compone también el **logotipo**
+  completo (`--marca logotipo`, proporción desde el `viewBox` del SVG oficial) y, con `--acabado`, declara la técnica
+  de aplicación con `--tecnica "<frase en inglés>"` (reemplaza la impresión fina por defecto); la procedencia registra
+  la `marca`. Canon: `.claude/rules/brand-photography.md` y
   [personas y vestuario](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+- 🔴 **El traje biónico de Nexa y sus lentes se piden por catálogo, nunca descritos a mano** **[operador, 2026-10-01 y
+  2026-10-02; TASK-1940]**: `"objetos": [{ "objeto": "traje-bionico-nexa" }, { "objeto": "lentes-bionicos-nexa" }]`
+  (`{ "objeto": "traje-bionico-nexa", "puesta": "espalda" }` para la toma de espaldas). Son ficción: **sólo Nexa** en `identidad`, sin otra persona con identidad, y **sólo con
+  `"registro": "cine"` explícito** en la ficha; `foto:prompt` aborta lo demás (`validarTrajeNexa`). Las marcas **viajan
+  armadas en la referencia** —isotipo oficial **incrustado** navy al ras de la pechera, del lado izquierdo de quien lo
+  lleva, y logo completo **serigrafiado** en tinta navy metálica en la placa dorsal— y el macro de la placa va también
+  a la escena (`macroEnUso`): la pechera lisa más un isotipo compuesto después dejó `NX7` y `NX7b` sin logo. Se
+  verifica con `pnpm foto:emblema` contra el macro `10-detalle-placa-isotipo`; `foto:isotipo --prenda clara --acabado`
+  (o `--marca logotipo --tecnica "…"` en la espalda) sólo si difiere o falta. Kit:
+  `ai-generations/2026-10-01_traje-bionico-nexa/LEEME.md`; método de kit:
+  [`references/garment-reference-kit.md`](references/garment-reference-kit.md), delta 2026-10-02.
+- 🔴 **Escena cine con Sparks: dos con referencia como máximo** **[operador, 2026-10-02; `NX7d` aprobada]**: con los
+  cinco Sparks con su foto de estudio salieron nítidos, del mismo tamaño y con luz propia (stickers en abanico). El
+  resto entra sin imagen propia («the same figures as the Spark references»), lejos y fuera de foco. La receta de
+  `NX7d` además declara planos con distancia y apertura (cerca · ~1 m · 4–6 m, 85 mm f/1.8), un Spark en contacto
+  (posado en el hombro), una fuente con tamaño cerca de la cara como única llave y sin relleno, bokeh de luces
+  prácticas, el conteo exacto («EXACTLY THREE more (FIVE in total, never more)») y la geografía de la reserva. Canon:
+  [registro cine, delta 2026-10-02](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
 - 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: compuesto solo se ve pegado. Se hace
   con **`pnpm foto:isotipo <plate.png> --centro x,y --ancho w --acabado [--superficie "<soporte, en inglés>"]`**, nunca a
   mano: recorta 512 px alrededor de la marca, pide a `gpt-image-2.5-sunburst` (high, 1024×1024) sólo materia y luz con
@@ -751,7 +780,7 @@ El registro cine («la marca en su película», 2026-09-27) sólo se usa con **N
   halo y escalar el desvío de color cambia el tono de la marca. Método y mediciones en
   `.claude/rules/brand-photography.md`.
 - **Nunca describir el emblema en la escena**: pedir *«the white Efeonce rocket emblem»* dio un cohete genérico. Se
-  prohíbe por nombre (*«NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*) cuando la prenda no tiene kit (el traje de Nexa) y se compone el oficial; en el uniforme, la marca la trae la referencia.
+  prohíbe por nombre (*«NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*) cuando la prenda no tiene kit y se compone el oficial; en el uniforme y en el traje biónico de Nexa, la marca la trae la referencia.
 - **Ubicación de la herramienta:** hoy `scripts/foto/` en Greenhouse;
   [TASK-1925](../../../docs/tasks/to-do/TASK-1925-brand-workshop-migration.md) la migra al repo taller
   `efeoncepro/efeonce-brand-workshop` con delegadores, y los comandos `pnpm foto:*` no cambian para el operador.
@@ -979,7 +1008,7 @@ Do not publish `1 credit = money`, vendor→credit conversion, per-piece tables 
 ## Dónde viven los archivos de `ai-generations/`
 
 - **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas de deck y por `src/**`/`scripts/**` (`pnpm ai-gen:protected`).
-- **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
+- **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
 - **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
 - Una ruta `ai-generations/…` usada como `--image`, máscara o guía es lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` (verifica sha256) **antes** de generar o componer.
 - **NUNCA** regenerar, sustituir ni aproximar una referencia aprobada porque falta (es justo la deriva de identidad que el kit evita); **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. Las salidas nuevas siguen en `ai-generations/<AAAA-MM-DD>_<slug>/`.

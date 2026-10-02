@@ -71,7 +71,7 @@ If several domains apply, load the smallest union. Do not preload every referenc
 ### Dónde viven los archivos de `ai-generations/`
 
 Los paquetes fuente citados en `references/landings/*` (`ai-generations/...`: keyframes, scripts, masters) son rutas
-**lógicas**: local, canon `gs://efeonce-creative-canon/ai-generations/<ruta>` o archivo
+**lógicas**: local, canon `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) o archivo
 `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador). Antes de re-renderizar o re-codificar desde uno
 que no está en disco: `pnpm ai-gen:where <ruta>` → `pnpm ai-gen:pull <carpeta>`; **NUNCA** regenerar ni aproximar un
 asset aprobado porque falta, ni archivar/borrar a mano. Los assets públicos del runtime WP no cambian. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).

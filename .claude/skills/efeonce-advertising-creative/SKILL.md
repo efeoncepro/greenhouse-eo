@@ -674,7 +674,7 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
 ## Dónde viven los archivos de `ai-generations/`
 
 - **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas de deck y por `src/**`/`scripts/**` (`pnpm ai-gen:protected`).
-- **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: identidades, prendas, logo 3D, mascotas y Sparks sellados; `pnpm creative:assets:publish`.
+- **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): identidades, prendas, logo 3D, mascotas y Sparks sellados; `pnpm creative:assets:publish`.
 - **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
 - Plate, referencia o banco citado como `ai-generations/…` es una ruta lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` antes de componer o certificar.
 - **NUNCA** regenerar, sustituir ni aproximar un asset aprobado porque falta; **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).

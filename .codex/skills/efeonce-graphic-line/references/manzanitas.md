@@ -154,7 +154,10 @@ Todos los gráficos y el texto denso son Pizarra.
   dentro de su materia, con aire sobre su borde.
 - **Rechazados como lecho:** mesa «matte black» en estudio vacío, cabezas del público, dorso de un portátil,
   «consola», piso que corta las piernas.
-- El isotipo del traje de Nexa **se compone** y el modelo sólo lo termina sobre su silueta (método en
+- El traje de Nexa tiene kit desde el 2026-10-01 (TASK-1940): se pide por catálogo (`traje-bionico-nexa` +
+  `lentes-bionicos-nexa`, sólo Nexa y con `"registro": "cine"`) y **su marca llega armada en la referencia**
+  (isotipo incrustado en la pechera, logo serigrafiado en la espalda). Se verifica con `pnpm foto:emblema`; sólo si
+  difiere se compone con `foto:isotipo --acabado` y el modelo lo termina sobre su silueta (método en
   `.claude/rules/brand-photography.md` y skill `design-studio`).
 - Cine con Nexa protagonista es el caso probado. **Personas del equipo (decidido el 2026-09-29, decisión 6
   `cine-team-people-social`):** las fotos cine de MCM pueden mostrar a personas reales del **equipo actual**, sólo desde

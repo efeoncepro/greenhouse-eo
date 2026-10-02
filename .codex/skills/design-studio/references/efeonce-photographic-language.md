@@ -131,7 +131,7 @@ de partículas, esferas—, nunca pintado encima ni puesto como grade.
 
 | Caso | Protagonista | Vestuario |
 |---|---|---|
-| 1 · Nexa protagonista | Nexa (identidad A) | Traje de ficción (biónico) o uniforme Efeonce |
+| 1 · Nexa protagonista | Nexa (identidad A) | Traje de ficción (biónico, por catálogo: `traje-bionico-nexa` + `lentes-bionicos-nexa` con `"registro": "cine"`) o uniforme Efeonce |
 | 2 · Receta de deck `proposal-cinematic` | Personas del equipo o Nexa | Personas: **uniforme por registro de escena**; el traje de ficción es sólo de Nexa |
 | 3 · **Excepción:** láminas de **sección** y **«about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») | Personas en luz dramática, con o sin Nexa (en la sección con el panel a la derecha, la persona del cliente) | Equipo: uniforme por registro de escena; cliente: su ropa, sin marca Efeonce |
 | 4 · **Fotos de Marketing con Manzanitas** (`cine-team-people-social`) | **Personas reales del equipo actual**, sólo las del [roster del equipo](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md), con `identidad` en la ficha; identidades aprobadas por el operador el 2026-09-29 | La de la línea de la pieza (`linea` en la ficha): hoodie Efeonce en Servicios creativos (`brand`); bomber o softshell, con el polo debajo si se quiere, en las líneas de negocio. Todo el equipo, sin excepción por persona; `foto:prompt` lo exige |
@@ -187,15 +187,15 @@ va por `pnpm foto:componer` o `pnpm foto:componer:cta`; la receta de anuncio cin
 acción como fenómeno de luz (quitarlo deja la escena vacía) · la luz fuerte es ese fenómeno, con el acento de la línea
 correcta y uno solo por pieza (salvo la lámina de líneas, con sus cinco esferas) · rim y bruma · proporciones reales ·
 mira al lente y nadie mira a otro de cerca · identidad (Nexa A contra sus anclas) · vestuario por registro · emblema
-revisado con `foto:emblema` e **isotipo oficial compuesto** (sufijo `b` y `.json` de procedencia) · reserva limpia y
+revisado con `foto:emblema` (el oficial llega armado en la referencia del kit; compuesto con `foto:isotipo` sólo si difiere, sufijo `b` y `.json` de procedencia) · reserva limpia y
 ningún texto cruza al sujeto · lecho `DARK near black` fuera de toda luz y de todo reflejo; en la lámina, sin logo y
 con la burbuja URL al pie · **una sola órbita**: el anillo, moño u órbita de la foto ya cuenta.
 
 **Trampas medidas más caras:**
 
 - **Cámara pegada al rostro** (`NX3`, cabeza ≈ 35 % del alto): se lee desproporcionada y se rechazó.
-- **Describir el emblema lo inventa**: salió un cohete genérico. Prohíbelo por nombre sin describir el nuestro y
-  compón el oficial.
+- **Describir el emblema lo inventa**: salió un cohete genérico. Pide la prenda por su kit, que trae la marca armada
+  (el traje de Nexa desde el 2026-10-02); sin kit, prohíbelo por nombre sin describir el nuestro y compón el oficial.
 - **Dos personas mirándose de cerca se leen románticas** (`NX2`, rechazada): todos a cámara o al trabajo.
 - **El compilador fuerza la reserva izquierda del 16:9**: una reserva «arriba» compila como izquierda (`BR3`), y la
   tabla escribe «LEFT 42%» contra el 0,45 del token. **Lee siempre el prompt compilado.**
@@ -213,7 +213,8 @@ pnpm foto:doctor
 pnpm foto:prompt <ficha.json>                               # LEE el resultado (trampas 6–8 del registro)
 pnpm foto:generar <ficha.json> --quality high --out <dir>
 pnpm foto:emblema <plate.png>                               # siempre, aunque el emblema parezca bien
-pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara] --acabado   # una vez por pecho; el modelo lo termina
+pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara] --acabado   # sólo si foto:emblema difiere; el modelo lo termina
+#   logo completo (p. ej. la espalda del traje de Nexa): --marca logotipo --acabado --tecnica "<cómo está aplicado, en inglés>"
 pnpm brand:compose -- --intent <intent.json>               # lámina o brochure: Artifact Composer
 ```
 
@@ -656,6 +657,14 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
   Esa ropa no es obligatoria en todas las escenas. 🔴 Las rutas anteriores
   —`nexa-the-point.png`, `nexa-the-listen.png`— **son identidad B y quedan retiradas como ancla de rostro**
   [2026-09-21]. Identidad sostenida en 5 tomas (135/24/200/50/200 mm) con el set anterior.
+- 🔴 **La pose y la expresión de Nexa salen de la escena, no de las referencias** **[operador, 2026-10-02]**: *«Nexa
+  en casi todas las fotos sale con la misma pose de cara de un lado teniendo tantas poses»*. Las referencias dicen
+  quién es; el giro, la inclinación y el gesto los dirige la ficha: declara **una** dimensión, `"expresion"` (12
+  fotográficas de `_identidad-nexa/5-expresiones/`, de `carcajada` a `mirada-lateral`) **o** `"vista"` (el ángulo),
+  nunca las dos. Las 12 comparten el tres cuartos del ancla y sólo mandan en el gesto: si la toma necesita otro
+  ángulo, pídelo con `vista`. Describe la pose en la escena y no copies «confident half-smile» de ficha en ficha;
+  `foto:prompt` avisa si Nexa llega sin ninguna. A/B y causa:
+  [bloques y pipeline, delta 2026-10-02](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 - Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar. El
   uniforme es el **contexto 6** del wardrobe de Nexa [operador, 2026-09-21]: los contextos son situaciones y
   la prenda la dicta la situación.
@@ -699,6 +708,15 @@ fichas: [`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.
 - **Color por línea** (aprobado 2026-10-01): el Spark base admite `"color"` con el acento de la línea (`engine`
   —defecto, azul—, `growth`, `brand`, `voice`, `revenue-hubspot`, `revenue-salesforce`); sólo en piezas de esa línea.
   Brand y Voice son cálidos: probarlos en cine antes de una foto oscura. Detalle: `SPARKS_V1.md` §6.1.
+- **En cine, dos Sparks con referencia como máximo** **[operador, 2026-10-02; `NX7d` «Nexa despliega a su squad»,
+  aprobada y canonizada]**. Una foto de estudio dice «Reproduce EXACTLY» y el modelo obedece también su nitidez, su
+  tamaño y su luz pareja: con los cinco referenciados (`NX7`, `NX7b`) salieron stickers en abanico. El resto entra sin
+  imagen propia («the same figures as the Spark references»), lejos y desenfocado; cinco Sparks legibles son otra
+  toma (`sparks-plantel`), no cine. El resto de la receta de `NX7d`: planos con distancia y apertura (cerca · ~1 m ·
+  4–6 m, 85 mm f/1.8), un Spark en contacto (posado en el hombro), una fuente con tamaño cerca de la cara como única
+  llave y **sin relleno**, bokeh de luces prácticas, conteo declarado («EXACTLY THREE more (FIVE in total, never
+  more)») y geografía para la reserva. Pendiente de esa toma: columna de texto 0,38 (pide 0,42) y lecho 2,98:1 —sirve
+  muda; con titular se rehace—. Canon: registro cine, delta 2026-10-02.
 - Las fotos aprobadas que todavía llevan robots genéricos (`NX5b` y derivadas, la destacada «Agents» `PH7`) se
   regeneran con Sparks sólo si el operador lo decide.
 
@@ -752,7 +770,7 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 
 - **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
   el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. La ficha declara
-  además `identidad` (personas, con vista por ángulo), `objetos` (kits de marca: logo, mascota, prenda, merch),
+  además `identidad` (personas, con `vista` por ángulo **o** `expresion`, una sola), `objetos` (kits de marca: logo, mascota, prenda, merch),
   `palanca` (**una sola** de las 24 de encuadre, con su campo obligatorio si lo pide), `atmosfera`
   (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
   bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un

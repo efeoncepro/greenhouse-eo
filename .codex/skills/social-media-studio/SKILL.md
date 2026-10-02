@@ -235,7 +235,7 @@ herramientas conectadas (detalle en `efeonce/STUDIO_TOOLING.md`):
 ### Dónde viven los archivos de `ai-generations/`
 
 Una ruta `ai-generations/...` en esta skill (ancla de identidad, plate, kit 3D, pieza vigente, master) es **lógica**: el
-archivo vive local (protegido), en el canon `gs://efeonce-creative-canon/ai-generations/<ruta>` (lo sellado en
+archivo vive local (protegido), en el canon `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) (lo sellado en
 `scripts/foto/assets.lock.json`; el equipo lo baja con `pnpm assets:pull`) o en el archivo
 `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (exploración, rondas, descartes; sólo operador). Los `.md` van en
 git; los PNG/MP4, no. **Antes de componer, editar o adaptar** desde un asset que no está en disco:

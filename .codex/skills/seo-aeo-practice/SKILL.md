@@ -462,7 +462,7 @@ solas: el PDF aprobado vive en `ai-generations/2026-09-29_deck-seo-aeo-documento
 disco: `pnpm ai-gen:pull ai-generations/2026-09-29_deck-seo-aeo-documentos/out`, nunca re-exportar uno aproximado).
 
 **Dónde viven los archivos de `ai-generations/`:** toda ruta `ai-generations/...` es lógica (local, canon
-`gs://efeonce-creative-canon/ai-generations/<ruta>` o archivo `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`);
+`gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) o archivo `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`);
 si falta en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull`, nunca sustituirla. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ---

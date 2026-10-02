@@ -95,6 +95,9 @@ La identidad vigente es la Nexa humana fotorrealista confirmada el 2026-09-24: r
 ocho vistas de continuidad con polera gris en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`
 (si no está en disco: `pnpm ai-gen:pull` esa carpeta; nunca regenerar la identidad).
 Resolver vistas por `pnpm foto:prompt`; usar las poses OneDrive para gesto/cuerpo, nunca como ancla facial.
+Las referencias dicen quién es, no cómo está: cada ficha declara `expresion` **o** `vista` y la escena describe la pose
+(sin copiar «confident half-smile»); su traje biónico y sus lentes sólo por catálogo y en registro cine
+(referencia, §11 y §Sparks).
 No recuperar el antiguo set sintético como rostro.
 Para globos fotorealistas y continuidad, cargar
 [la referencia de fotohistorias](../social-media-studio/references/dialogue-carousel-and-document-delivery.md).
@@ -362,7 +365,7 @@ conserva la metodología completa con evidencia y programación.
 ## Dónde viven los archivos de `ai-generations/`
 
 - **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas de deck y por `src/**`/`scripts/**` (`pnpm ai-gen:protected`).
-- **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
+- **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
 - **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
 - Una ruta `ai-generations/…` (referencia, plate, ficha) es lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` antes de dirigir o componer.
 - **NUNCA** regenerar, sustituir ni aproximar un asset aprobado porque falta; **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. Salidas nuevas: `ai-generations/<AAAA-MM-DD>_<slug>/`.

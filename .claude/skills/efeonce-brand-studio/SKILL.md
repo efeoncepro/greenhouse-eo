@@ -178,7 +178,7 @@ Usar las plantillas de `templates/` cuando el usuario necesite un artefacto form
 
 ## Dónde viven los archivos de `ai-generations/`
 
-Las rutas `ai-generations/…` de esta skill son lógicas. **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json` o citado por recetas de deck y `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>`: identidades, prendas, logo 3D, mascotas y Sparks sellados (`pnpm creative:assets:publish`). **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes.
+Las rutas `ai-generations/…` de esta skill son lógicas. **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json` o citado por recetas de deck y `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): identidades, prendas, logo 3D, mascotas y Sparks sellados (`pnpm creative:assets:publish`). **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes.
 Si falta en disco: `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer. **NUNCA** regenerar, sustituir ni aproximar un asset aprobado, resellar el lock para taparlo ni archivar o borrar a mano; promover exploración = sellarla o citarla en la receta + publicar a canon. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## Activación cultural y social
@@ -303,7 +303,9 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
 - **Registro cine «la marca en su película» [operador, 2026-09-27]:** ficción declarada donde el servicio aparece en
   acción y **el color de su línea sale de la escena como luz** (anillo, haz, holograma, moño, esferas), con el sujeto
   mirando al lente. Dónde entra en la marca propia, y sólo ahí:
-  - **Piezas con Nexa protagonista** (traje de ficción permitido sólo a ella) y la **receta de deck
+  - **Piezas con Nexa protagonista** (traje de ficción permitido sólo a ella: el traje biónico y sus lentes tienen kit
+    desde el 2026-10-01, se piden por catálogo con `"registro": "cine"` y su marca viaja armada en la referencia,
+    nunca descritos a mano; TASK-1940) y la **receta de deck
     `proposal-cinematic`**, con personas del equipo en su **uniforme por registro de escena** o con Nexa. AXIS rechaza
     el resto con `cine-requires-nexa-or-proposal`: una pieza social, un hero web o una lámina de contenido con el
     equipo sigue en A, B o C.
@@ -415,7 +417,8 @@ con una persona que supervisa; nunca reemplazan personas ni aparecen solos decid
 Ops llevan al equipo humano. **Nombre:** «Sparks» sirve como nombre interno de personajes; en uso público, siempre
 «los Sparks de Efeonce», nunca como nombre de producto o servicio ni para registrarlo sin revisión de Legal (hay
 «Sparks AI», «Gemini Spark», «SPARK AI» de LogicGate y Spark Mail). Son la única excepción del canon a «nunca robots»
-y salen del kit: reglas de foto en `design-studio` (`efeonce-photographic-language.md` §11 «Sparks»). Canon:
+y salen del kit: reglas de foto en `design-studio` (`efeonce-photographic-language.md` §11 «Sparks»; en cine, dos
+con referencia como máximo y el resto lejos y desenfocado, escena `NX7d` aprobada el 2026-10-02). Canon:
 [`SPARKS_V1.md`](../../../docs/operations/brand-characters/SPARKS_V1.md).
 
 ### Sistema de credencial (lanyard, yoyo, portacarnet y carnet — aprobado 2026-09-17)

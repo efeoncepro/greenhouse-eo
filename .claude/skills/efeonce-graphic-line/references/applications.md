@@ -1028,7 +1028,9 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 1. Fondo Efeonce siempre; la línea de servicio sólo aporta el acento.
 2. Una esfera por pieza (cierra la respuesta) y una órbita por pieza o lámina.
 3. El acento nunca en texto de menos de 24 px: el rótulo del primer paso de una propuesta va en blanco o en el suave.
-4. El isotipo de la prenda se compone desde `@efeoncepro/axis-brand-assets`; el que dibuja el modelo se rechaza.
+4. El isotipo de la prenda llega armado en la referencia de su kit (uniformes desde el 2026-09-28, traje de Nexa desde
+   el 2026-10-02) y se verifica con `pnpm foto:emblema` al 100 %; si difiere del oficial, se compone desde
+   `@efeoncepro/axis-brand-assets` con `foto:isotipo`. El que dibuja el modelo sin referencia se rechaza.
 5. Registro cine sólo con Nexa protagonista, en `proposal-cinematic` (personas del equipo con su uniforme por
    registro) y, por excepción aprobada el 2026-09-27, en las láminas de sección y «about» del deck (fuera del deck,
    sólo las portadas de perfil y los destacados de Efeonce con Nexa, A11); cámara a ~2 m,

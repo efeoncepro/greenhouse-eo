@@ -554,3 +554,10 @@ método (vistas aisladas, puestas, macro, manifiesto, transparentes). Tres cosas
   dejó dos escenas sin logo. `foto:isotipo` compone ahora también el logotipo (`--marca logotipo`, `--tecnica`).
 - **El matting confunde placas blancas con el fondo de estudio gris claro** y las deja semitransparentes: después de
   `ai:image:rmbg`, opacar el interior de la silueta conservando los huecos reales (`entrega.mjs --opacar` del kit).
+
+Al declarar un kit en el catálogo de `scripts/foto/build-prompt.mjs`, las claves nuevas son tres:
+`instruccionEnUso` (la instrucción propia de la pieza PUESTA: qué copiar de la prenda y su marca, y que la persona de
+esa imagen sólo muestra cómo cae, nunca su cara), `acabadoMarca` y `macroEnUso`. La vista puesta que viaja a la
+escena va **recortada bajo el mentón** (`13-puesto-frente-sin-rostro`): con la cara completa, la escena copiaba el
+gesto de esa foto. Una pieza de ficción con regla de uso lleva además su guarda (`validarTrajeNexa`: sólo Nexa, sólo
+con `"registro": "cine"` explícito) en vez de una advertencia en prosa.

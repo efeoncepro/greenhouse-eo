@@ -121,9 +121,11 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   selección «Cliente» sobre la respuesta; bajada; **prueba con fuente**; hasta cuatro pasos con íconos de la voz de la
   línea en reposo (Brand = Plastilina, el resto Trazo) y el **rótulo del primer paso en blanco o suave, nunca en el
   acento** (texto < 24 px); burbuja URL en el pie; sin logo ni indicador. Foto: registro cine con personas del equipo
-  en su **uniforme por registro** (o Nexa), cámara a ~2 m y 85 mm, **isotipo oficial compuesto** sobre la prenda
-  lisa (nunca el del modelo), nunca dos personas mirándose de cerca. Los **mini robots agentes** son el hilo visual
-  entre láminas. Aprobadas: servicios creativos («¿Tu marca en cada pantalla? En todas.»), web («¿Para quién es tu
+  en su **uniforme por registro** (o Nexa), cámara a ~2 m y 85 mm, nunca dos personas mirándose de cerca. El isotipo
+  oficial llega armado en la referencia del kit (uniformes desde el 2026-09-28; el traje biónico de Nexa, por
+  catálogo con `"registro": "cine"`, desde el 2026-10-02) y se verifica con `pnpm foto:emblema`; `foto:isotipo` sólo
+  si difiere, nunca el emblema que inventa el modelo. Los **mini robots agentes** son el hilo visual entre láminas;
+  desde el 2026-10-01 son los **Sparks** del kit (en cine, dos con referencia como máximo; `design-studio` §11). Aprobadas: servicios creativos («¿Tu marca en cada pantalla? En todas.»), web («¿Para quién es tu
   web? Para todos.»), carrera de Nexa («¿Listos para la carrera? Vamos.»), RevOps («¿Tu CRM vende contigo? Con
   agentes.»), AEO («¿Te encuentra la IA? Visible.») y líneas de servicio con Nexa; ninguna pendiente. En esta última,
   las cinco esferas de luz que orbitan a Nexa son **luz de la foto, no la esfera de la voz** (la respuesta cierra con
@@ -591,7 +593,7 @@ El documento completo no tiene frame propio en el gate visual (usa fotos reales)
 
 #### Dónde viven los archivos de `ai-generations/`
 
-Las rutas `ai-generations/…` (plates, fichas, PDF de dirección) son lógicas. **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por `EFEONCE_DECK_SLIDE_RECIPES_V1.json` y por `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/ai-generations/<ruta>` (identidades, prendas, logo 3D, mascotas, Sparks; `pnpm creative:assets:publish`). **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador: exploración, rondas, descartes).
+Las rutas `ai-generations/…` (plates, fichas, PDF de dirección) son lógicas. **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por `EFEONCE_DECK_SLIDE_RECIPES_V1.json` y por `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) (identidades, prendas, logo 3D, mascotas, Sparks; `pnpm creative:assets:publish`). **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador: exploración, rondas, descartes).
 Si falta: `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer. **NUNCA** regenerar ni aproximar un plate aprobado, resellar el lock para taparlo ni archivar o borrar a mano; citar un plate en la receta lo protege. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 #### Recetas por lámina: el catálogo de las 78 (aprobado 2026-09-27 y 2026-09-28)
