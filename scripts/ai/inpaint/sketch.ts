@@ -1,4 +1,4 @@
-import { createMask, feather, maskFromRect, maskStats, type CanonicalMask } from './mask'
+import { createMask, dilate, erode, feather, maskFromRect, maskStats, union, type CanonicalMask } from './mask'
 import { loadRgba, type RgbaImage } from './raw'
 
 /**
@@ -77,6 +77,53 @@ export const maskFromSketch = async (strokes: CanonicalMask, margin = 40, feathe
   const y1 = Math.min(strokes.height, box.top + box.height + margin) / strokes.height
 
   return feather(maskFromRect(strokes.width, strokes.height, { x0, y0, x1, y1 }), featherPx)
+}
+
+/**
+ * Hace crecer una máscara DERIVADA hasta cubrir el objeto que el modelo dibujó de verdad (TASK-1965). Caso fuente:
+ * canario 2026-10-02, Sunburst dibujó el helecho de la referencia más grande que el boceto y la caja del trazo + 40 px
+ * le cortó las hojas. Se agregan los píxeles donde la salida (ya con el color corregido) difiere fuerte de la base,
+ * SÓLO dentro de una ventana alrededor de la zona original, se cierran huecos y se difumina. Nunca se aplica a una
+ * máscara que el operador pasó explícita.
+ */
+export const growMaskToObject = async (
+  base: RgbaImage,
+  generated: RgbaImage,
+  mask: CanonicalMask,
+  options: { threshold?: number; windowFraction?: number; featherPx?: number } = {}
+): Promise<{ mask: CanonicalMask; addedPixels: number }> => {
+  const box = maskStats(mask).bbox
+
+  if (!box) return { mask, addedPixels: 0 }
+
+  const threshold = options.threshold ?? 40
+  const pad = Math.round(Math.max(box.width, box.height) * (options.windowFraction ?? 0.5))
+  const x0 = Math.max(0, box.left - pad)
+  const y0 = Math.max(0, box.top - pad)
+  const x1 = Math.min(mask.width, box.left + box.width + pad)
+  const y1 = Math.min(mask.height, box.top + box.height + pad)
+  const changed = createMask(mask.width, mask.height)
+
+  for (let y = y0; y < y1; y += 1) {
+    for (let x = x0; x < x1; x += 1) {
+      const i = y * mask.width + x
+      let delta = 0
+
+      for (let c = 0; c < 3; c += 1) delta = Math.max(delta, Math.abs(generated.data[i * 4 + c] - base.data[i * 4 + c]))
+
+      if (delta > threshold) changed.data[i] = 255
+    }
+  }
+
+  // Cerrar: dilatar y erosionar une las hojas sueltas al cuerpo; luego margen y borde suave.
+  const closed = erode(dilate(changed, 6), 6)
+  const grown = await feather(dilate(union(mask, closed), 10), options.featherPx ?? 16)
+  const merged = { ...grown, data: grown.data.map((value, i) => Math.max(value, mask.data[i])) }
+  let added = 0
+
+  for (let i = 0; i < merged.data.length; i += 1) if (merged.data[i] > 0 && mask.data[i] === 0) added += 1
+
+  return { mask: merged, addedPixels: added }
 }
 
 /**

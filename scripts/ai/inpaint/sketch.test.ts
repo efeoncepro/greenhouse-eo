@@ -95,3 +95,23 @@ describe('prompt con roles', () => {
     expect(text).toMatch(/Add the lamp\.\nChange only that area/)
   })
 })
+
+describe('máscara que crece hasta el objeto', () => {
+  it('cubre lo que el modelo dibujó fuera de la caja del boceto, sólo cerca de la zona', async () => {
+    const { growMaskToObject } = await import('./sketch')
+    const { maskFromRect: rect } = await import('./mask')
+    const base = await loadRgba(basePath)
+    const generated = { ...base, data: new Uint8Array(base.data) }
+
+    // El "modelo" dibujó un objeto verde de 60×60 en (30,20), más grande que la zona 40×40 en (40,30); y una mancha lejana.
+    for (let y = 20; y < 80; y += 1) for (let x = 30; x < 90; x += 1) generated.data.set([30, 160, 40], (y * 200 + x) * 4)
+    for (let y = 5; y < 10; y += 1) for (let x = 185; x < 195; x += 1) generated.data.set([30, 160, 40], (y * 200 + x) * 4)
+
+    const zone = rect(200, 100, { x0: 0.2, y0: 0.3, x1: 0.4, y1: 0.7 })
+    const { mask, addedPixels } = await growMaskToObject(base, generated, zone, { featherPx: 2 })
+
+    expect(addedPixels).toBeGreaterThan(0)
+    expect(mask.data[22 * 200 + 32]).toBeGreaterThan(200) // esquina del objeto, fuera de la caja original
+    expect(mask.data[7 * 200 + 190]).toBe(0) // la mancha lejana no entra
+  })
+})

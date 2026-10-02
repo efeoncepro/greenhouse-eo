@@ -32,6 +32,8 @@ Entrada:
                              con trazos encima. Viaja como imagen 2 (guía de posición); sin --mask, la máscara se deriva
                              del trazo (+ --sketch-margin px, default 40)
   --reference <img>          Referencia del objeto a incorporar (repetible): «Place the X from image N into image 1»
+  --grow-mask auto|off       Con máscara derivada del boceto: crece hasta cubrir el objeto que el modelo dibujó
+                             (auto, default; evita cortar lo que se sale del trazo). Una --mask explícita nunca crece
   --prompt <texto> | --prompt-file <txt>
 
 Proveedor:
@@ -75,6 +77,7 @@ interface ImageCliArgs {
   providerMask?: ProviderMaskMode
   colorMatch?: 'auto' | 'on' | 'off'
   guide?: 'auto' | 'off'
+  growMask?: 'auto' | 'off'
   count: number
   crop: CropMode
   run?: string
@@ -135,6 +138,14 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
       case '--quality': args.quality = next(); break
       case '--seed': args.seed = toNumber(next(), flag, true); break
       case '--count': args.count = toNumber(next(), flag, true); break
+
+      case '--grow-mask': {
+        const value = next()
+
+        if (!['auto', 'off'].includes(value)) throw new Error('--grow-mask espera auto | off.')
+        args.growMask = value as 'auto' | 'off'
+        break
+      }
 
       case '--guide': {
         const value = next()
@@ -215,6 +226,7 @@ const runImage = async (argv: string[]): Promise<number> => {
     providerMask: args.providerMask,
     colorMatch: args.colorMatch,
     guide: args.guide,
+    growMask: args.growMask,
     count: args.count,
     crop: args.crop,
     runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),

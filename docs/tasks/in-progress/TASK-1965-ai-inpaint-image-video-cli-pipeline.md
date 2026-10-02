@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete local 2026-10-02 (commits c215c16d3…3eee2cb2e en develop, sin push). Verificados en vivo: Flare, Flux Fill, flux3-edit y Sunburst sin máscara con guía de zona. Pendiente: canario de --sketch/--reference y de Seedream edit`
+- Status real: `Code complete local 2026-10-02, todos los criterios verificados (canarios Flare, Flux Fill, Sunburst con guía y con boceto + referencia, Seedream Lite y flux3-edit; ≈ USD 0,40). Falta el gate pnpm build de cierre (requiere autorización del operador: cuelga el equipo) y push`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -350,7 +350,7 @@ Autorización explícita del operador para el gasto de los canarios reales (imag
 - [x] Una segunda corrida idéntica no llama al proveedor (caché por hash) salvo con `--force`. — `pipeline-image.test.ts` y `pipeline-video.test.ts`; el hash incluye `adapter.revision`.
 - [x] Cada corrida escribe `manifest.json` con los campos de la Detailed Spec y sin secretos. — prueba «no guarda secretos» + manifiestos reales en `ai-generations/2026-10-02_task-1965-canary/`.
 - [x] El catálogo fal declara convención de máscara por endpoint, y ninguna fila con máscara existe sin `verifiedAt` real. — `flux-pro-fill` con `mask` y `verifiedAt: 2026-10-02` tras canario real (planta puesta, delta 0).
-- [ ] La edición sin máscara de Seedream pasa por el mismo pipeline y queda en delta 0 en la zona protegida. — **sin canario real de Seedream**: el camino sin máscara está probado con adaptador simulado y en vivo con OpenAI; falta una corrida de `fal:seedream5-*-edit`.
+- [x] La edición sin máscara de Seedream pasa por el mismo pipeline y queda en delta 0 en la zona protegida. — canario `fal:seedream5-lite-edit` 2026-10-02 (`inpaint/d95eef38fb58`): PASS delta 0, objeto dentro de la zona; con costura visible en la pared (hallazgo documentado: no es primera opción para pieza final).
 - [x] `pnpm ai:inpaint video` aborta ante deriva de encuadre o diferencia de duración, y en el camino feliz la secuencia PNG queda en delta 0 en la zona protegida y conserva el audio original. — `pipeline-video.test.ts` con ffmpeg real (abort por encuadre corrido, ±1 cuadro, audio copiado) + canario `flux3-edit` 5 s: 120 cuadros PASS, deriva 11,16/255.
 - [x] `ai:image --mask` conserva su comportamiento e imprime el aviso hacia `ai:inpaint image`. — `scripts/ai/generate-image.ts`, sólo se agregó el aviso.
 - [x] Ningún archivo de `src/app/**` ni del runtime de `src/lib/**` importa `scripts/ai/inpaint/**`, y no existe `src/lib/media/`. — `grep -rl scripts/ai/inpaint src` vacío; `src/lib/media` no existe (2026-10-02).

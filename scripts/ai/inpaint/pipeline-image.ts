@@ -7,7 +7,7 @@ import { assertBrandSafePrompt } from './brand'
 import { planCrop, type CropMode, type CropPlan } from './crop'
 import { assertMaskUsable, cropMask, encodeMaskPng, loadMask, renderMaskPreview, resizeMask, type MaskConvention } from './mask'
 import { estimateAlignment, renderZoneGuide, type AlignmentEstimate } from './alignment'
-import { buildRolePrompt, loadSketch, maskFromSketch } from './sketch'
+import { buildRolePrompt, growMaskToObject, loadSketch, maskFromSketch } from './sketch'
 import { cropRgba, matchColorInRing, measureZones, placePatch, recompose, renderDiff, resizeRgba, verifyRecomposition, type VerificationReport, type ZoneDelta } from './recompose'
 import { encodeRgbaPng, loadRgba } from './raw'
 import { exists, INPAINT_PIPELINE_VERSION, readJson, renderContactSheet, runDirFor, sha256, stableStringify, writeFileEnsured, writeJson } from './run-io'
@@ -41,6 +41,8 @@ export interface ImageInpaintOptions {
    * la máscara no viaja y no hay boceto (sin ella, Sunburst puso el objeto en otro lugar y reencuadró).
    */
   guide?: 'auto' | 'off'
+  /** Máscara derivada del boceto: crece hasta el objeto que el modelo dibujó (auto) o se queda como la caja (off). */
+  growMask?: 'auto' | 'off'
   /** Corrige el desplazamiento de color en un anillo antes de recomponer. auto = sólo si la máscara no viajó. */
   colorMatch?: 'auto' | 'on' | 'off'
   count?: number
@@ -70,6 +72,8 @@ export interface CandidateRecord {
   suspectFlatPanel: boolean
   /** El modelo reencuadró (detector de bordes): la zona pegada no corresponde a lo generado. */
   suspectMisaligned: boolean
+  /** Píxeles que la máscara derivada del boceto creció para cubrir el objeto dibujado (0 = sin crecer). */
+  maskGrownPixels: number
   alignment: AlignmentEstimate
   /** Si la máscara viajó al proveedor en este candidato. */
   providerMaskSent: boolean
@@ -249,6 +253,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       providerMask: options.providerMask ?? 'auto',
       colorMatch: options.colorMatch ?? 'auto',
       guide: zoneGuide,
+      growMask: !options.maskPath && sketch ? options.growMask ?? 'auto' : null,
       count,
       crop: { box: plan.box, target: plan.target }
     })
@@ -356,14 +361,21 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       const colorMode = options.colorMatch ?? 'auto'
       const corrected = colorMode === 'on' || (colorMode === 'auto' && !maskSent) ? matchColorInRing(base, generatedFull, mask) : null
       const toCompose = corrected?.image ?? generatedFull
+      // Sólo una máscara DERIVADA del boceto crece hasta el objeto real; la explícita del operador nunca se toca.
+      const grown = !options.maskPath && sketch && (options.growMask ?? 'auto') === 'auto' ? await growMaskToObject(base, toCompose, mask) : null
+      const candidateMask = grown?.mask ?? mask
 
-      await writeFileEnsured(join(runDir, finalName), await encodeRgbaPng(recompose(base, toCompose, mask)))
+      if (grown?.addedPixels) log(`    · máscara derivada crecida hasta el objeto dibujado: +${grown.addedPixels} px`)
+
+      await writeFileEnsured(join(runDir, finalName), await encodeRgbaPng(recompose(base, toCompose, candidateMask)))
+
+      if (grown?.addedPixels) await writeFileEnsured(join(runDir, `candidate-${index + 1}-mask.png`), await encodeMaskPng(candidateMask))
 
       if (corrected) log(`    · color corregido en el anillo (${corrected.ringPixels} px): desplazamiento RGB ${corrected.shift.map(v => (v > 0 ? '+' : '') + v.toFixed(1)).join(' / ')}`)
 
       // La verificación lee el ARCHIVO, no el buffer.
       const written = await loadRgba(join(runDir, finalName), 'resultado escrito')
-      const report = verifyRecomposition(base, written, mask)
+      const report = verifyRecomposition(base, written, candidateMask)
 
       await writeFileEnsured(join(runDir, diffName), await renderDiff(base, written))
 
@@ -377,6 +389,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
         editedMeanDelta: Math.round(editedMeanDelta(report) * 1000) / 1000,
         suspectFlatPanel: blackShare > FLAT_PANEL_THRESHOLD,
         suspectMisaligned: alignment.misaligned,
+        maskGrownPixels: grown?.addedPixels ?? 0,
         alignment,
         providerMaskSent: maskSent,
         colorShift: corrected?.shift ?? null,

@@ -30,7 +30,7 @@ Lo medido en el canario del 2026-10-02 (`ai-generations/2026-10-02_task-1965-can
 | `openai` · `gpt-image-2.5-flare` (**default**, `medium`) | Edicion con mascara de uso diario | Puso el objeto con luz y sombra correctas; ≈ USD 0,01 a 1536×1024 `medium` |
 | `openai` · `gpt-image-2.5-sunburst` ★ | **El mas potente**: la pieza final de mayor impacto | **Con mascara devuelve la zona como un panel negro plano** (3 de 3 pasadas). Con `--provider-mask auto` (default) edita **sin mascara**, recibe la zona marcada en magenta como guia (imagen 2) y el comando recompone y corrige el color. Verificado 2026-10-02: planta dentro de la zona, sin rastro del magenta. Sin la guia puso la planta fuera de la zona |
 | `fal:flux-pro-fill` | Rellenar una zona con algo nuevo; buena alternativa a OpenAI | Mascara blanca = editable; USD 0,05 por megapixel (redondeado arriba). Puso el objeto limpio en el canario |
-| `fal:seedream5-pro-edit` / `fal:seedream5-lite-edit` | Edicion por instruccion de Seedream | No usan mascara: la mascara solo recompone |
+| `fal:seedream5-pro-edit` / `fal:seedream5-lite-edit` | Edicion por instruccion de Seedream | No usan mascara: la mascara solo recompone. Canario Lite 2026-10-02: objeto dentro de la zona, pero **costura visible en superficies lisas** (cambia el tono local) e ignora `image_size`. No es la primera opcion para pieza final |
 
 ### Preparacion
 
@@ -116,15 +116,17 @@ pnpm ai:inpaint image --image base.png --sketch boceto.png --reference lampara.p
   los trazos dibujados encima (se detectan por diferencia con la base). Dibuja con un color que no exista en la foto
   (magenta): silueta, caja o flecha de donde va, que tamaño tiene y, si importa, la linea de apoyo.
 - **Sin `--mask`**, la mascara para recomponer sale de la **caja del trazo** con 40 px de holgura (`--sketch-margin`) y
-  borde suave: el modelo suele dibujar el objeto un poco mas grande que la silueta.
+  despues **crece hasta cubrir el objeto que el modelo dibujo** (`--grow-mask auto`, default): en el canario Sunburst
+  hizo el helecho mas grande que el trazo y la caja sola le cortaba las hojas. Una `--mask` explicita nunca crece.
 - **`--reference`** (repetible): imagen del objeto o elemento a incorporar, idealmente recortado sobre fondo neutro.
 - El comando antepone el rol de cada imagen (1 = la foto, 2 = el boceto como guia que no se reproduce, 3.. = las
   referencias) y cierra con lo que se preserva. El `manifest.json` guarda tu prompt tal cual y el prompt enviado.
 - Funciona con OpenAI (la imagen 1 recibe la mascara si el modelo la acepta; con Sunburst, sin mascara) y con
   `fal:seedream5-*-edit`. `fal:flux-pro-fill` no acepta referencias.
 
-**Estado:** contrato verificado contra la documentacion oficial (2026-10-02); que un trazo sobre una foto funcione como
-guia de posicion sin reproducirse **no esta documentado por OpenAI**: hay que mirarlo en cada pieza.
+**Estado:** verificado en vivo el 2026-10-02 con Sunburst (boceto + referencia de un helecho): el objeto de la referencia
+quedo en la posicion del trazo, sin rastro del magenta, con la zona protegida en delta 0. OpenAI no documenta que un
+trazo funcione como guia sin reproducirse: sigue siendo algo a mirar en cada pieza.
 
 ## Otro uso de la mascara: integrar un objeto real en una escena (**es la excepcion, no el default**)
 

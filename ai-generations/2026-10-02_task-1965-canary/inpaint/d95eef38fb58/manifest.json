@@ -1,0 +1,127 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "d95eef38fb58",
+  "key": "d95eef38fb58f119b64e68fa617a7cb94b74a8e26c96befb54c8c2ad89499ab7",
+  "status": "completed",
+  "createdAt": "2026-10-02T22:19:51.235Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/mask.png",
+    "maskSha256": "91fb8a55965123950ff4d656daae726ca48b813b27a6e00efa74f6b4a9e5d245",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:seedream5-lite-edit",
+    "provider": "fal",
+    "sendsMask": false,
+    "verifiedAt": "2026-09-16"
+  },
+  "request": {
+    "model": "bytedance/seedream/v5/lite/edit",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "A small green potted plant in a matte terracotta pot standing on the bare wooden desk, lit by the same soft window light from the right, with a soft contact shadow on the wood.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nA small green potted plant in a matte terracotta pot standing on the bare wooden desk, lit by the same soft window light from the right, with a soft contact shadow on the wood.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.17076810201009116,
+    "editable": 189567,
+    "soft": 79028,
+    "protected": 1304269
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 55 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.035,
+    "basis": "1 × 1 imagen(es) × USD 0.035"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 53.374,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.81,
+        "bestError": 2.81,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        1.29,
+        0.11,
+        1.56
+      ],
+      "protected": {
+        "pixels": 1304269,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 189567,
+        "maxDelta": 170,
+        "meanDelta": 69.506,
+        "worst": {
+          "x": 234,
+          "y": 682
+        }
+      },
+      "seam": {
+        "pixels": 79028,
+        "maxDelta": 177,
+        "meanDelta": 14.677,
+        "worst": {
+          "x": 248,
+          "y": 717
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1304269,
+        "maxDelta": 119,
+        "meanDelta": 10.756,
+        "worst": {
+          "x": 95,
+          "y": 729
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "bytedance/seedream/v5/lite/edit",
+      "usage": null,
+      "meta": {
+        "requestId": "01a0feb3-f66f-7ff0-9c8c-a119a58614e6",
+        "account": "FAL_API_KEY_B",
+        "seed": 1258032305
+      }
+    }
+  ]
+}
