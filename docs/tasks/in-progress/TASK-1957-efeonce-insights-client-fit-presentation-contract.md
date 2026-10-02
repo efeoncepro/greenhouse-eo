@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Code complete local (Slices 1–6; commits c56f62d09, df9ddd298 y Slice 6), sin push: vocabulario, modelo web 1.2, límites de lector, elegibilidad de figuras, roles, gate client-fit e indicadores AEO estándar (tasa de mención, Share of Model, Share of Voice, citation share). Pendiente: pnpm build autorizado, release, canary 1.2 en producción y revise de ediciones internas`
+- Status real: `Code complete local (Slices 1–6 + correcciones de figuras y puntaje del Grader); gate de cierre verde en 0256d818f: pnpm build exit 0 y pnpm test 17561 passed / 0 failed (2026-10-02). Pendiente: release, canary 1.2 en producción, revise de ediciones internas y aprobación del copy de límites`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery`
 - Blocked by: `none`
