@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Slice 1 en aprobación: hoja de diseño publicada en canvas (2026-10-01)`
+- Status real: `Hoja de diseño aprobada con ajuste del isotipo (más a la derecha, sobre el pecho); vistas puestas 13-14 y lentes biónicos 20-21 en revisión del operador (2026-10-01)`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
