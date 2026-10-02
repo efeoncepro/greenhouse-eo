@@ -485,4 +485,10 @@ running»). Regla: parar el servidor de fixtures antes de levantar el de staging
   hizo fallar cerrado el PDF de Berel. Las listas de dominios van a hallazgo y tabla, no a columnas.
 - **Una página de tabla se llena por altura, no por filas.** 16 filas con etiquetas de dos líneas se desbordaban; el
   mapper ahora pesa doble una etiqueta larga.
+- **El PDF rechazaba el informe entero ante una familia sin página.** Por eso todo salía en barras aunque Think dibuja
+  15 familias. Ahora los mappers filtran con `PDF_FIGURE_FAMILIES`: la web dibuja cascada y waffle, el PDF conserva
+  hallazgo y tabla. Una figura de familia nueva no debe tener lectura de página si no tiene página.
+- **Las preguntas del Grader importan más que el informe.** Berel aparecía citado por indeed y glassdoor porque su perfil
+  estaba en «Manufactura» y sus sets curados nunca se aprobaron: las corridas usaban el paquete genérico. Antes de leer un
+  resultado del Grader, mirar `prompt_set_id` de la corrida.
 - **Los PDF no dibujan el plan de acción**: Think sí. Al revisar «qué falta» en un formato, mirar el mapper, no el plan.

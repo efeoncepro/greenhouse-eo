@@ -365,6 +365,14 @@ Sky Blog: conectar Search Console del blog, set de keywords y competidores (oper
   Think `astro check` 0 errores y `test:insights` 18 verdes; previews Berel, Sky Diseño y Sky Blog contra la base
   compartida; PDF A4 y deck de Berel y Sky renderizados localmente sin rechazos.
 - Sin probar en runtime desplegado (no hubo release).
+- Pedido del operador («todos son gráficos de barra y tenemos 15 familias»): línea semanal de clics, cascada de
+  consultas y waffles de tono y tipo de fuente (commit `d6d4b7d19`, matriz v2); los mappers PDF omiten a propósito
+  las familias sin página. Berel pasó de 2 familias a 5 en el informe web.
+- Grader de Berel corregido de una vez (pedido del operador): set de preguntas v3 del rubro activo
+  (`gps-c168f7a0-5b15-461d-8491-69f20dbe12cf`), alias «Berel» y «Pinturas Berel», categoría «Pinturas y
+  recubrimientos» (`sector:paints_coatings`, override auditado), command + rutas API + CLI y migración
+  `20261002204831850` aplicada (commits `e36ea7e5c`, `d2e8fa701`). El análisis mensual del 03/10 08:00 ya usa las
+  preguntas nuevas.
 - Ampliación pedida por el operador («Sky puede tener al menos ya lo que arroja el Grader»): sitios citados, tipo de
   fuente, tono y Share of Voice en una frase, del mismo informe del Grader (commit `bccbe504f`,
   `content_contract_v2`). Preview Sky Blog con septiembre completo (corridas del 28/09): 7 hallazgos de IA, gate y

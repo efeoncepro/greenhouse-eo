@@ -1547,6 +1547,13 @@ corto (`GH_INSIGHTS.modules[*].navLabel`), cada figura su `note`, cada hecho su 
 cada acción su `module` y cada tabla su `lead`. Think resuelve referencias y dibuja; no deduce. La única
 transformación de texto que queda en Think es tipográfica (partir el titular en negrita y resto, TASK-1958).
 
+**Familias de gráfico (matriz v2).** Con evidencia hoy: barras y barras agrupadas, línea (ICO mensual, ETV mensual y
+clics por bloque de 7 días contra el mismo bloque del período anterior), bullet (metas ICO), cascada (aporte de cada
+consulta al cambio de clics, más el resto) y waffle (tono y tipo de fuente del Grader). Los catálogos PDF tienen página
+sólo para barras, línea y bullet (`PDF_FIGURE_FAMILIES` en `render/figure-slots.ts`): los mappers OMITEN a propósito
+las demás familias (la web las dibuja; el PDF conserva el hallazgo y la tabla), en vez de rechazar el informe entero.
+Una familia nueva en el PDF exige su plantilla en el catálogo y sumarla a ese conjunto.
+
 **Pendiente de render:** los catálogos PDF (`insights-report`, `insights-deck`) no dibujan todavía el plan de acción
 ni la petición (sólo la decisión); Think sí. Página de plan en los PDF y cascada para «qué explica el cambio» quedan
 como follow-up de UI (TASK-1958/TASK-1902).
