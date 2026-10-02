@@ -14,7 +14,7 @@ vi.mock('@/lib/ai/openai-image', async importOriginal => ({
   editOpenAIImage: (...args: unknown[]) => editOpenAIImage(...args)
 }))
 
-const { openAIInpaintAdapter, openAIPickSize } = await import('./openai')
+const { openAIInpaintAdapter, openAIPickSize, resolveOpenAIProviderMask } = await import('./openai')
 
 beforeEach(() => editOpenAIImage.mockReset())
 
@@ -40,10 +40,31 @@ describe('adaptador OpenAI', () => {
     expect(() => openAIInpaintAdapter.validate({ model: 'gpt-image-2.5-flare', quality: 'max' })).not.toThrow()
   })
 
-  it('default Flare · medium, y avisa si se elige Sunburst con máscara', () => {
+  it('default Flare con máscara; Sunburst en auto edita SIN máscara (su máscara devuelve un panel negro)', () => {
     expect(openAIInpaintAdapter.defaultModel).toBe('gpt-image-2.5-flare')
-    expect(openAIInpaintAdapter.advisories?.({ model: 'gpt-image-2.5-sunburst' })).toHaveLength(1)
+    expect(resolveOpenAIProviderMask('gpt-image-2.5-flare', 'auto')).toBe(true)
+    expect(resolveOpenAIProviderMask('gpt-image-2.5-sunburst', undefined)).toBe(false)
+    expect(resolveOpenAIProviderMask('gpt-image-2.5-sunburst', 'on')).toBe(true)
+    expect(openAIInpaintAdapter.advisories?.({ model: 'gpt-image-2.5-sunburst', providerMask: 'on' })?.[0]).toMatch(/panel negro/)
+    expect(openAIInpaintAdapter.advisories?.({ model: 'gpt-image-2.5-sunburst' })?.[0]).toMatch(/sin máscara/)
     expect(openAIInpaintAdapter.advisories?.({ model: 'gpt-image-2.5-flare' })).toEqual([])
+  })
+
+  it('Sunburst en auto no manda máscara al proveedor', async () => {
+    editOpenAIImage.mockResolvedValue({
+      imageBytesBase64: (await sharp({ create: { width: 1024, height: 1024, channels: 3, background: '#808080' } }).png().toBuffer()).toString('base64'),
+      model: 'gpt-image-2.5-sunburst',
+      size: '1024x1024',
+      quality: 'medium',
+      usage: null,
+      modelFallbackReason: null
+    })
+
+    const image = await sharp({ create: { width: 1024, height: 1024, channels: 3, background: '#000000' } }).png().toBuffer()
+    const output = await openAIInpaintAdapter.run({ prompt: 'x', image, mask: maskFromRect(1024, 1024, { x0: 0, y0: 0, x1: 0.5, y1: 0.5 }), size: { width: 1024, height: 1024 }, model: 'gpt-image-2.5-sunburst' })
+
+    expect(editOpenAIImage.mock.calls[0][0].mask).toBeUndefined()
+    expect(output.meta.providerMask).toBe(false)
   })
 
   it('estima con la fórmula oficial de tokens', async () => {
@@ -55,7 +76,7 @@ describe('adaptador OpenAI', () => {
   it('envía la máscara en convención alfa (transparente = editable) y mide el costo de salida', async () => {
     editOpenAIImage.mockResolvedValue({
       imageBytesBase64: (await sharp({ create: { width: 1024, height: 1024, channels: 3, background: '#808080' } }).png().toBuffer()).toString('base64'),
-      model: 'gpt-image-2.5-sunburst',
+      model: 'gpt-image-2.5-flare',
       size: '1024x1024',
       quality: 'high',
       usage: { output_tokens: 1756 },
@@ -64,7 +85,7 @@ describe('adaptador OpenAI', () => {
 
     const mask = maskFromRect(1024, 1024, { x0: 0.25, y0: 0.25, x1: 0.75, y1: 0.75 })
     const image = await sharp({ create: { width: 1024, height: 1024, channels: 3, background: '#000000' } }).png().toBuffer()
-    const output = await openAIInpaintAdapter.run({ prompt: 'x', image, mask, size: { width: 1024, height: 1024 }, model: 'gpt-image-2.5-sunburst', quality: 'high' })
+    const output = await openAIInpaintAdapter.run({ prompt: 'x', image, mask, size: { width: 1024, height: 1024 }, model: 'gpt-image-2.5-flare', quality: 'high' })
     const call = editOpenAIImage.mock.calls[0][0]
     const alpha = await sharp(call.mask.bytes).ensureAlpha().extractChannel(3).raw().toBuffer()
 

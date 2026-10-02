@@ -2,7 +2,7 @@ import { join } from 'node:path'
 
 import sharp from 'sharp'
 
-import type { InpaintImageAdapter } from './adapters/types'
+import type { InpaintImageAdapter, ProviderMaskMode } from './adapters/types'
 import { assertBrandSafePrompt } from './brand'
 import { planCrop, type CropMode, type CropPlan } from './crop'
 import { assertMaskUsable, cropMask, encodeMaskPng, loadMask, renderMaskPreview, resizeMask, type MaskConvention } from './mask'
@@ -26,6 +26,7 @@ export interface ImageInpaintOptions {
   model?: string
   quality?: string
   seed?: number
+  providerMask?: ProviderMaskMode
   count?: number
   crop?: CropMode
   /** Carpeta de la pieza (p. ej. `ai-generations/2026-10-02_mi-pieza`); la corrida vive en `<runRoot>/inpaint/<id>/`. */
@@ -107,6 +108,9 @@ export const flatBlackFraction = (generated: { data: Uint8Array }, mask: { data:
 
 export const FLAT_PANEL_THRESHOLD = 0.5
 
+/** Deriva media de la zona protegida sobre la que se avisa encuadre corrido (el video aborta con el mismo valor). */
+export const MISALIGNED_MEAN_DRIFT = 12
+
 /** Bajo este delta medio en la zona abierta, la edición probablemente no ocurrió (aviso, no veredicto). */
 export const LOW_EDIT_MEAN_DELTA = 12
 
@@ -136,9 +140,11 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
   if (!Number.isInteger(count) || count < 1 || count > 8) throw new Error('--count debe ser un entero entre 1 y 8.')
   if (!options.prompt.trim()) throw new Error('El prompt está vacío.')
 
-  adapter.validate({ model, quality: options.quality, seed: options.seed })
+  const params = { model, quality: options.quality, seed: options.seed, providerMask: options.providerMask }
 
-  for (const advisory of adapter.advisories?.({ model, quality: options.quality, seed: options.seed }) ?? []) log(`  ⚠ ${advisory}`)
+  adapter.validate(params)
+
+  for (const advisory of adapter.advisories?.(params) ?? []) log(`  ⚠ ${advisory}`)
   assertBrandSafePrompt(options.prompt, Boolean(options.allowBrand))
 
   const [imageBytes, baseMeta] = await Promise.all([sharp(options.imagePath).toBuffer(), sharp(options.imagePath).metadata()])
@@ -175,6 +181,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       model,
       quality: options.quality ?? null,
       seed: options.seed ?? null,
+      providerMask: options.providerMask ?? 'auto',
       count,
       crop: { box: plan.box, target: plan.target }
     })
@@ -250,6 +257,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
         size: plan.target,
         model,
         quality: options.quality,
+        providerMask: options.providerMask,
         seed: options.seed === undefined ? undefined : options.seed + index
       })
 
@@ -298,6 +306,12 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
 
       // La verificación garantiza lo que NO se toca; no juzga si el pedido se cumplió. Si la zona abierta casi no
       // cambió, el modelo probablemente ignoró el prompt (canario 2026-10-02: GPT Image `low` redibujó sin la planta).
+      // Sin máscara (o con un modelo que la ignora) el proveedor puede mover el encuadre: recomponer pegaría una zona
+      // corrida. Mismo umbral que el control de alineación del video.
+      if (drift.meanDelta > MISALIGNED_MEAN_DRIFT) {
+        log(`    ⚠ el modelo movió la zona protegida en promedio ${drift.meanDelta.toFixed(1)}/255: puede haber corrido el encuadre y la costura se notará. Mira la unión al 100 %.`)
+      }
+
       if (blackShare > FLAT_PANEL_THRESHOLD) {
         log(`    ⚠ el ${(blackShare * 100).toFixed(0)} % de la zona editable volvió negra y plana: el modelo devolvió un panel, no la edición. Descarta este candidato.`)
       } else if (editedMeanDelta(report) < LOW_EDIT_MEAN_DELTA) {

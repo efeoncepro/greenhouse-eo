@@ -6,9 +6,13 @@ import { isAbsolute, join } from 'node:path'
 import { config as loadEnv } from 'dotenv'
 
 import { IMAGE_ADAPTER_IDS, resolveImageAdapter } from './adapters'
+import type { ProviderMaskMode } from './adapters/types'
+import { resolveVideoEngine, VIDEO_ENGINE_IDS } from './adapters/video-fal'
 import type { CropMode } from './crop'
+import { assertFfmpeg } from './ffmpeg'
 import { MASK_CONVENTIONS, type MaskConvention } from './mask'
 import { runImageInpaint } from './pipeline-image'
+import { runVideoInpaint, type VideoStrategy } from './pipeline-video'
 import { localDate } from './run-io'
 
 loadEnv({ path: join(process.cwd(), '.env.local') })
@@ -31,6 +35,8 @@ Proveedor:
   --model <id>               Default del adaptador (openai: gpt-image-2.5-flare; Sunburst con máscara devuelve un panel negro)
   --quality <q>              openai: low | medium (default) | high | xhigh | max
   --seed <n>                 Sólo adaptadores que la acepten
+  --provider-mask auto|on|off  Si la máscara viaja al proveedor (openai). auto: Sunburst edita sin máscara —con
+                             máscara devuelve un panel negro— y el pipeline recompone; los demás, con máscara
   --count <n>                Candidatos (1–8); cada uno es un pedido pagado; con más de uno, contact-sheet.png
 
 Control:
@@ -53,6 +59,7 @@ interface ImageCliArgs {
   model?: string
   quality?: string
   seed?: number
+  providerMask?: ProviderMaskMode
   count: number
   crop: CropMode
   run?: string
@@ -111,6 +118,15 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
       case '--seed': args.seed = toNumber(next(), flag, true); break
       case '--count': args.count = toNumber(next(), flag, true); break
 
+      case '--provider-mask': {
+        const value = next()
+
+        if (!['auto', 'on', 'off'].includes(value)) throw new Error('--provider-mask espera auto | on | off.')
+        args.providerMask = value as ProviderMaskMode
+        break
+      }
+
+
       case '--crop': {
         const value = next()
 
@@ -159,6 +175,7 @@ const runImage = async (argv: string[]): Promise<number> => {
     model: args.model,
     quality: args.quality,
     seed: args.seed,
+    providerMask: args.providerMask,
     count: args.count,
     crop: args.crop,
     runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
@@ -177,12 +194,114 @@ const runImage = async (argv: string[]): Promise<number> => {
   return result.exitCode
 }
 
+const VIDEO_HELP = `pnpm ai:inpaint video — edita una zona de un clip y deja el resto idéntico cuadro a cuadro (TASK-1965)
+
+  pnpm ai:inpaint video --video clip.mp4 --mask mask.png --prompt "<qué cambia en la zona>" [opciones]
+
+El motor edita por instrucción; el comando normaliza su salida a la resolución, fps y duración del original, mide
+cuánto movió el encuadre (aborta sobre --max-drift: recomponer daría ghosting), recompone cada cuadro con la máscara,
+verifica la zona protegida en delta 0 sobre la secuencia PNG, mide el parpadeo, codifica y copia el audio original.
+
+Máscara:
+  --mask <png>               Fija (cámara quieta), del tamaño del video; --convention como en image
+  --mask-keyframes <json>    Por keyframes: { "keyframes": [{ "t": 0, "rect": [x0,y0,x1,y1] }, …], "feather": 16 }
+
+Motor y estrategia:
+  --engine <id>              ${VIDEO_ENGINE_IDS.join(' | ')} (default fal:flux3-edit)
+  --strategy edit-recompose | first-frame   first-frame edita un cuadro con el pipeline de imagen y lo pasa de
+                             referencia al motor (sólo motores que aceptan imágenes)
+  --frame-time <s>           Cuadro de referencia para first-frame (default 0)
+  --image-adapter / --image-model / --image-quality   Para el cuadro de first-frame
+
+Control: --run, --dry-run, --force, --max-usd/--yes, --allow-brand, --allow-full como en image;
+  --max-drift <n>            Deriva media aceptada de la zona protegida (0–255, default 12)
+  --keep-frames              Conserva las secuencias PNG (pesan: se borran por defecto)
+`
+
+const runVideo = async (argv: string[]): Promise<number> => {
+  const flags: Record<string, string | true> = {}
+
+  for (let i = 0; i < argv.length; i += 1) {
+    const flag = argv[i]
+
+    if (!flag.startsWith('--')) throw new Error(`Argumento inesperado: ${flag}.`)
+
+    const boolean = ['--dry-run', '--force', '--yes', '--allow-brand', '--allow-full', '--keep-frames', '--help'].includes(flag)
+
+    if (boolean) {
+      flags[flag] = true
+      continue
+    }
+
+    const value = argv[i + 1]
+
+    if (value === undefined || value.startsWith('--')) throw new Error(`${flag} necesita un valor.`)
+
+    flags[flag] = value
+    i += 1
+  }
+
+  const known = new Set(['--video', '--mask', '--mask-keyframes', '--convention', '--prompt', '--prompt-file', '--engine', '--strategy', '--frame-time', '--image-adapter', '--image-model', '--image-quality', '--run', '--dry-run', '--force', '--max-usd', '--yes', '--allow-brand', '--allow-full', '--max-drift', '--keep-frames', '--help'])
+
+  for (const flag of Object.keys(flags)) if (!known.has(flag)) throw new Error(`Flag desconocida: ${flag}. Ver pnpm ai:inpaint video --help.`)
+
+  if (flags['--help']) {
+    process.stdout.write(VIDEO_HELP)
+
+    return 0
+  }
+
+  const str = (flag: string) => (typeof flags[flag] === 'string' ? (flags[flag] as string) : undefined)
+  const num = (flag: string) => (str(flag) === undefined ? undefined : toNumber(str(flag)!, flag))
+
+  if (!str('--video')) throw new Error('--video es obligatorio.')
+  if (Boolean(str('--mask')) === Boolean(str('--mask-keyframes'))) throw new Error('Indica --mask o --mask-keyframes (uno de los dos).')
+
+  const prompt = str('--prompt-file') ? (await readFile(resolvePath(str('--prompt-file')!), 'utf8')).trim() : str('--prompt')?.trim()
+
+  if (!prompt) throw new Error('Falta --prompt o --prompt-file.')
+
+  const strategy = (str('--strategy') ?? 'edit-recompose') as VideoStrategy
+
+  if (!['edit-recompose', 'first-frame'].includes(strategy)) throw new Error('--strategy espera edit-recompose | first-frame.')
+
+  const convention = (str('--convention') ?? 'white-editable') as MaskConvention
+
+  await assertFfmpeg()
+
+  const result = await runVideoInpaint({
+    videoPath: resolvePath(str('--video')!),
+    mask: str('--mask') ? { kind: 'static', path: resolvePath(str('--mask')!), convention } : { kind: 'keyframes', path: resolvePath(str('--mask-keyframes')!) },
+    prompt,
+    engine: resolveVideoEngine(str('--engine')),
+    strategy,
+    frameTime: num('--frame-time'),
+    imageAdapter: strategy === 'first-frame' ? resolveImageAdapter(str('--image-adapter')) : undefined,
+    imageModel: str('--image-model'),
+    imageQuality: str('--image-quality'),
+    runRoot: resolvePath(str('--run') ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: Boolean(flags['--dry-run']),
+    force: Boolean(flags['--force']),
+    maxUsd: num('--max-usd'),
+    yes: Boolean(flags['--yes']),
+    allowBrand: Boolean(flags['--allow-brand']),
+    allowFull: Boolean(flags['--allow-full']),
+    maxDrift: num('--max-drift'),
+    keepFrames: Boolean(flags['--keep-frames'])
+  })
+
+  process.stdout.write(`  ✎ ${join(result.runDir, 'manifest.json').replace(process.cwd(), '.')}\n`)
+
+  return result.exitCode
+}
+
 const main = async () => {
   const [command, ...rest] = process.argv.slice(2).filter(arg => arg !== '--')
 
   if (command === 'image') return runImage(rest)
+  if (command === 'video') return runVideo(rest)
 
-  process.stdout.write(`Uso: pnpm ai:inpaint image …\n\n${HELP}`)
+  process.stdout.write(`Uso: pnpm ai:inpaint image|video … (--help en cada uno)\n\n${HELP}`)
 
   return command === '--help' || command === '-h' ? 0 : 1
 }

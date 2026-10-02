@@ -8,10 +8,18 @@ import type { CanonicalMask, MaskConvention } from '../mask'
  * CRUDA. Recomponer y verificar lo hace el pipeline, nunca el adaptador, así que ningún proveedor nuevo puede saltarse
  * la garantía de la zona protegida.
  */
+export type ProviderMaskMode = 'auto' | 'on' | 'off'
+
 export interface ImageAdapterParams {
   model: string
   quality?: string
   seed?: number
+  /**
+   * Si la máscara viaja al proveedor. `off`: el proveedor edita por instrucción la imagen entera y el pipeline
+   * recompone sólo la zona (lo que permite usar un modelo cuya edición con máscara falla). `auto`: lo decide el
+   * adaptador con lo medido.
+   */
+  providerMask?: ProviderMaskMode
 }
 
 export interface ImageAdapterRunInput extends ImageAdapterParams {

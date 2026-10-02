@@ -74,7 +74,9 @@ export const createFalInpaintAdapter = (capabilityId: string): InpaintImageAdapt
     maskConvention: capability.mask?.convention ?? null,
     verifiedAt: capability.verifiedAt,
     revision: 1,
-    validate({ model, quality, seed }: ImageAdapterParams) {
+    validate({ model, quality, seed, providerMask }: ImageAdapterParams) {
+      if (providerMask && providerMask !== 'auto') throw new Error(`fal:${capability.id} no admite --provider-mask: ${capability.mask ? 'su máscara siempre viaja' : 'edita sin máscara'}.`)
+
       if (model !== capability.slug) throw new Error(`fal:${capability.id} usa ${capability.slug}; quita --model.`)
       if (quality !== undefined) throw new Error(`fal:${capability.id} no tiene --quality.`)
       if (seed !== undefined && !capability.acceptsSeed) throw new Error(`fal:${capability.id} no declara semilla en su OpenAPI: quita --seed.`)
