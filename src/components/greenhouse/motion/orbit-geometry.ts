@@ -52,3 +52,18 @@ export const arcPath = (cx: number, cy: number, r: number, endDeg: number, sweep
 
   return `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)}`
 }
+
+/**
+ * La esfera que cierra la respuesta (la voz con esfera de «La órbita»): diámetro y aire óptico en em según la última
+ * letra, desde `efeonceGraphicLine.sphere`. Mismo cálculo que `answerSphere` de `@efeoncepro/axis-graphic-line`, sin
+ * arrastrar ese paquete (pinta SVG e íconos) al bundle del cliente.
+ */
+export const answerSphere = (text: string) => {
+  const { diameterEm, opticalGapEm, defaultGapEm } = efeonceGraphicLine.sphere
+  const gaps = opticalGapEm as Record<string, number>
+
+  return { diameterEm, gapEm: gaps[text.trim().slice(-1)] ?? defaultGapEm }
+}
+
+/** El anillo pequeño delante de la pregunta (receta `question` de AXIS): tamaño, trazo y aire en em. */
+export const QUESTION_RING = { sizeEm: 0.42, strokeEm: 0.06, gapEm: 0.35, baselineEm: 0.08 } as const

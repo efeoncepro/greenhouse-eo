@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import { alpha, keyframes } from '@mui/material/styles'
 
 import { MOTION_EASE, cssCubicBezier } from '@/components/greenhouse/motion/core/tokens'
-import { ORBIT_TOKENS, lineAccentOnDark } from '@/components/greenhouse/motion/orbit-geometry'
+import { ORBIT_TOKENS, QUESTION_RING, answerSphere, lineAccentOnDark } from '@/components/greenhouse/motion/orbit-geometry'
 import { GH_MESSAGES } from '@/lib/copy/client-portal'
 import type { LoginAnnouncementDto } from '@/lib/login-announcements/types'
 
@@ -108,6 +108,9 @@ const LoginStage = ({ announcements, variant, onActiveLensChange }: LoginStagePr
     onActiveLensChange(active ? (active.kind === 'banner' ? null : active.lens) : LOGIN_STAGE_FALLBACK.lens)
   }, [active, onActiveLensChange])
   const progress = Math.min(100, (elapsed / LOGIN_CAROUSEL_INTERVAL_MS) * 100)
+  const accent = lineAccentOnDark(active?.serviceLine)
+  const headline = (active?.title ?? '').replace(/\.+$/, '')
+  const sphere = answerSphere(headline)
 
   const layer = (
     item: Pick<LoginAnnouncementDto, 'image' | 'lens' | 'kind'> & { id: string; serviceLine?: string },
@@ -224,6 +227,20 @@ const LoginStage = ({ announcements, variant, onActiveLensChange }: LoginStagePr
             >
               {active.kicker ? (
                 <Typography variant='overline' sx={{ color: theme => alpha(theme.palette.common.white, 0.82) }}>
+                  {/* La voz que abre lleva el anillo pequeño delante, en el acento de la línea (`efeonce-graphic-line` §4). */}
+                  <Box
+                    component='span'
+                    aria-hidden='true'
+                    sx={{
+                      display: 'inline-block',
+                      width: `${QUESTION_RING.sizeEm}em`,
+                      height: `${QUESTION_RING.sizeEm}em`,
+                      border: `max(1px, ${QUESTION_RING.strokeEm}em) solid ${accent}`,
+                      borderRadius: '50%',
+                      mr: `${QUESTION_RING.gapEm}em`,
+                      verticalAlign: `${QUESTION_RING.baselineEm}em`
+                    }}
+                  />
                   {active.kicker}
                 </Typography>
               ) : null}
@@ -239,7 +256,20 @@ const LoginStage = ({ announcements, variant, onActiveLensChange }: LoginStagePr
                   ...(isPanel ? LOGIN_STAGE_TYPE.headline : LOGIN_STAGE_TYPE.headlineCard)
                 }}
               >
-                {active.title}
+                {/* La respuesta cierra con la esfera: es parte del texto y reemplaza al punto tipeado. */}
+                {headline}
+                <Box
+                  component='span'
+                  aria-hidden='true'
+                  sx={{
+                    display: 'inline-block',
+                    width: `${sphere.diameterEm}em`,
+                    height: `${sphere.diameterEm}em`,
+                    borderRadius: '50%',
+                    bgcolor: accent,
+                    ml: `${sphere.gapEm}em`
+                  }}
+                />
               </Typography>
               {active.body && isPanel ? (
                 <Typography variant='body1' sx={{ color: theme => alpha(theme.palette.common.white, 0.82), maxWidth: 440 }}>
