@@ -257,6 +257,17 @@ export const CATEGORY_TAXONOMY: CategoryTaxonomy = {
       status: 'active'
     },
     {
+      // TASK-1962 — fabricantes y marcas de pintura arquitectónica, esmaltes, barnices e impermeabilizantes (Berel).
+      // Sin este nodo un fabricante de pintura caía en «Manufactura» y el análisis preguntaba por empresas industriales.
+      id: 'sector:paints_coatings',
+      level: 'sector',
+      label: { es: 'Pinturas y recubrimientos', en: 'Paints and coatings' },
+      aliases: ['paint', 'paints', 'coatings', 'pintura', 'pinturas', 'recubrimientos', 'impermeabilizantes', 'esmaltes', 'barnices', 'selladores', 'solventes', 'adhesivos'],
+      parentIds: ['industry:consumer_goods'],
+      examples: ['architectural paint brands', 'waterproofing products', 'wood finishes'],
+      status: 'active'
+    },
+    {
       id: 'sector:apparel_fashion',
       level: 'sector',
       label: { es: 'Moda y vestuario', en: 'Apparel and fashion' },

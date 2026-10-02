@@ -2256,6 +2256,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1962 — profile.set_category: el operador corrige la categoría (nodo de la taxonomía canónica) de un perfil AEO
+  // cuando la clasificación automática se equivocó (Berel como «Manufactura»). Command `overrideProfileCategory`
+  // (historial append-only). Grant = set operador, como set_business_model.
+  {
+    key: 'growth.ai_visibility.profile.set_category',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1290 — prompt_set.manage: autorar (draft) + aprobar (draft→active) el set de prompts AEO
   // por marca. Commands gobernados `createGraderPromptSetDraft`/`approveGraderPromptSet`,
   // consumibles por la UI de review (TASK-1291) + Nexa. Grant = set operador (run.operator).

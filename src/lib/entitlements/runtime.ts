@@ -365,6 +365,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1962 — profile.set_category: el operador corrige la categoría canónica de un perfil AEO (mismo set operador).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.profile.set_category',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1290 — prompt_set.manage: el operador autora (draft) + aprueba (draft→active) el set
     // de prompts AEO por marca (define qué se le pregunta a los motores). Mismo set operador que
     // run.operator. El command self-guarda con can() (profileId/setId arbitrario).

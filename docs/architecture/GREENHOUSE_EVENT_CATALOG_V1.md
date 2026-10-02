@@ -1339,6 +1339,14 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 
 **Payload v1**: `{ schemaVersion: 1, profileId, organizationId, fromBusinessModel, toBusinessModel, updatedBy, reason }` — sin PII (ids + enum de modelo de negocio + user id + texto operativo). Emitido **transaccionalmente** (mismo `withGreenhousePostgresTransaction` que el `UPDATE grader_profiles` + el `INSERT grader_business_model_history` append-only), NUNCA best-effort fuera de la tx. Sólo en cambio real: la idempotencia no-op (mismo valor ya como `operator_override`) NO emite. El override fija `business_model_source='operator_override'` + `confidence=1.0` (human-asserted). `business_model` es el eje de buyer-intent ortogonal a la categoría que TASK-1290 consume para elegir el framing de los prompts (cierra ISSUE-110). Aún sin ProjectionDefinition (no hay consumer reactivo en V1). Signal: `growth.ai_visibility.profile_business_model_unresolved`.
 
+## Delta 2026-10-02 — TASK-1962: `growth.ai_visibility.category_overridden` (corrección de la categoría del perfil AEO)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.ai_visibility.category_overridden` | v1 | `growth_ai_visibility_category` (`profile_id`) | command gobernado `overrideProfileCategory` (ruta `PUT /api/admin/growth/ai-visibility/profiles/{profileId}/category`, CLI `pnpm growth:aeo-prompt-set set-category`) | sin consumer reactivo en V1 |
+
+**Payload v1**: `{ schemaVersion: 1, profileId, organizationId, fromCategoryNodeId, toCategoryNodeId, taxonomyVersion, updatedBy, reason }` — sin PII. Transaccional con el `UPDATE grader_profiles` y el `INSERT grader_category_history` (append-only). Sólo en cambio real. El override fija `category_source='operator_override'` y confianza 1.0; el backfill de categoría (`scripts/growth/backfill-canonical-category.ts`) no reclasifica esos perfiles. Caso fuente: Berel, de «Manufactura» a «Pinturas y recubrimientos» (`sector:paints_coatings`).
+
 ## Delta 2026-07-07 — TASK-353: `talent_demand.*` + `hiring.*` (Hiring / ATS domain foundation)
 
 | Evento | Versión | Aggregate | Emisor | Consumer |
