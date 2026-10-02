@@ -13707,6 +13707,69 @@ export interface GreenhouseSyncWebhookSubscriptions {
   webhook_subscription_id: string;
 }
 
+export interface GreenhouseXrayCases {
+  case_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  organization_id: string;
+  prospect_reference: string;
+  title: string;
+}
+
+export interface GreenhouseXrayDrafts {
+  case_id: string;
+  intent_json: Json;
+  organization_id: string;
+  revision: Generated<number>;
+  updated_at: Generated<Timestamp>;
+  updated_by: string;
+}
+
+export interface GreenhouseXrayEditions {
+  case_id: string;
+  content_hash: string;
+  contract_version: string;
+  draft_revision: number;
+  edition_id: Generated<string>;
+  idempotency_key: string;
+  issued_at: Generated<Timestamp>;
+  issued_by: string;
+  manifest_json: Json;
+  model_version: Generated<string>;
+  organization_id: string;
+  withdrawn_at: Timestamp | null;
+  withdrawn_by: string | null;
+}
+
+export interface GreenhouseXrayEvents {
+  action: string;
+  actor_id: string;
+  case_id: string;
+  created_at: Generated<Timestamp>;
+  event_id: Generated<Int8>;
+  organization_id: string;
+  resource_id: string;
+}
+
+export interface GreenhouseXrayRateBuckets {
+  hits: number;
+  subject_hash: string;
+  window_start: Timestamp;
+}
+
+export interface GreenhouseXrayShareGrants {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  edition_id: string;
+  expires_at: Timestamp;
+  grant_id: Generated<string>;
+  label: string | null;
+  organization_id: string;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  token_digest: string;
+}
+
 export interface Pgmigrations {
   id: Generated<number>;
   name: string;
@@ -14369,5 +14432,11 @@ export interface DB {
   "greenhouse_sync.webhook_endpoints": GreenhouseSyncWebhookEndpoints;
   "greenhouse_sync.webhook_inbox_events": GreenhouseSyncWebhookInboxEvents;
   "greenhouse_sync.webhook_subscriptions": GreenhouseSyncWebhookSubscriptions;
+  "greenhouse_xray.cases": GreenhouseXrayCases;
+  "greenhouse_xray.drafts": GreenhouseXrayDrafts;
+  "greenhouse_xray.editions": GreenhouseXrayEditions;
+  "greenhouse_xray.events": GreenhouseXrayEvents;
+  "greenhouse_xray.rate_buckets": GreenhouseXrayRateBuckets;
+  "greenhouse_xray.share_grants": GreenhouseXrayShareGrants;
   pgmigrations: Pgmigrations;
 }
