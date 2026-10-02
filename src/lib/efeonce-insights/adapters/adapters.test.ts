@@ -420,6 +420,8 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
 
     expect(values).toEqual({ otd: direction('otd_pct'), ftr: direction('ftr_pct'), rpa: direction('rpa') })
     expect(values.rpa).toBe('lower_is_better')
+    // TASK-1962 — «¿qué hicimos este mes?»: las piezas completadas del mismo snapshot, con su nombre humano.
+    expect(result.facts.find(fact => fact.metricId === 'delivered.completed')).toMatchObject({ value: 10, unit: 'count', label: 'Piezas entregadas', coverage: { populationSize: 12 } })
     expectContentContract(result.facts)
   })
 

@@ -124,7 +124,8 @@ export const GH_INSIGHTS = {
     overall_score: 'Puntaje de visibilidad en IA',
     rpa: 'Rondas de revisión por pieza',
     otd: 'Entregas a tiempo',
-    ftr: 'Primera entrega correcta'
+    ftr: 'Primera entrega correcta',
+    'delivered.completed': 'Piezas entregadas'
   } as Readonly<Record<string, string>>,
 
   /**
@@ -289,7 +290,8 @@ export const GH_INSIGHTS = {
     overall_score: { subject: 'El puntaje de visibilidad en IA', plural: false },
     otd: { subject: 'Las entregas a tiempo', plural: true },
     ftr: { subject: 'La primera entrega correcta', plural: false },
-    rpa: { subject: 'Las rondas de revisión por pieza', plural: true }
+    rpa: { subject: 'Las rondas de revisión por pieza', plural: true },
+    'delivered.completed': { subject: 'Las piezas entregadas', plural: true }
   } as Readonly<Record<string, { subject: string; plural: boolean }>>,
 
   /**
