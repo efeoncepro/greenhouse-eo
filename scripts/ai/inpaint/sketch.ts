@@ -84,11 +84,18 @@ export const maskFromSketch = async (strokes: CanonicalMask, margin = 40, feathe
  * purpose»; «Place the X from image 2 into image 1… Do not change anything else»). Sólo se agrega cuando hay boceto o
  * referencias; el prompt del operador va después, intacto.
  */
-export const buildRolePrompt = (params: { prompt: string; hasSketch: boolean; referenceCount: number }): string => {
-  if (!params.hasSketch && params.referenceCount === 0) return params.prompt
+export const buildRolePrompt = (params: { prompt: string; hasSketch: boolean; referenceCount: number; zoneGuide?: boolean }): string => {
+  if (!params.hasSketch && !params.zoneGuide && params.referenceCount === 0) return params.prompt
 
   const lines = ['Image 1 is the photo to edit; the result keeps its framing.']
   let index = 2
+
+  if (params.zoneGuide && !params.hasSketch) {
+    lines.push(
+      `Image ${index} is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.`
+    )
+    index += 1
+  }
 
   if (params.hasSketch) {
     lines.push(

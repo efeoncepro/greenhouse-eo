@@ -76,6 +76,10 @@ export const openAIInpaintAdapter: InpaintImageAdapter = {
   provider: 'openai',
   label: 'OpenAI GPT Image — edición con máscara',
   defaultModel: DEFAULT_MODEL,
+  strongestModel: {
+    id: 'gpt-image-2.5-sunburst',
+    why: 'el más potente de OpenAI, el de las piezas de mayor impacto (#1 en edición en Arena y Artificial Analysis)'
+  },
   sendsMask: true,
   maskConvention: 'alpha-transparent-editable',
   // Canario real con Flare a `medium`: planta puesta y zona protegida en delta 0 (TASK-1965, 2026-10-02).
@@ -87,6 +91,9 @@ export const openAIInpaintAdapter: InpaintImageAdapter = {
     assertOpenAIImageQualitySupported({ model: resolved, quality: asQuality(quality) })
 
     if (seed !== undefined) throw new Error('OpenAI no acepta semilla: quita --seed (cada candidato es una muestra distinta).')
+  },
+  willSendMask({ model, providerMask }) {
+    return resolveOpenAIProviderMask(model, providerMask)
   },
   advisories({ model, providerMask }) {
     if (!isSunburst(model)) return []

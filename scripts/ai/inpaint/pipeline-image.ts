@@ -6,6 +6,7 @@ import type { InpaintImageAdapter, ProviderMaskMode } from './adapters/types'
 import { assertBrandSafePrompt } from './brand'
 import { planCrop, type CropMode, type CropPlan } from './crop'
 import { assertMaskUsable, cropMask, encodeMaskPng, loadMask, renderMaskPreview, resizeMask, type MaskConvention } from './mask'
+import { estimateAlignment, renderZoneGuide, type AlignmentEstimate } from './alignment'
 import { buildRolePrompt, loadSketch, maskFromSketch } from './sketch'
 import { cropRgba, matchColorInRing, measureZones, placePatch, recompose, renderDiff, resizeRgba, verifyRecomposition, type VerificationReport, type ZoneDelta } from './recompose'
 import { encodeRgbaPng, loadRgba } from './raw'
@@ -35,6 +36,11 @@ export interface ImageInpaintOptions {
   quality?: string
   seed?: number
   providerMask?: ProviderMaskMode
+  /**
+   * Guía de zona cuando la máscara no viaja: la base con el contorno de la zona en magenta como imagen 2. auto = sólo si
+   * la máscara no viaja y no hay boceto (sin ella, Sunburst puso el objeto en otro lugar y reencuadró).
+   */
+  guide?: 'auto' | 'off'
   /** Corrige el desplazamiento de color en un anillo antes de recomponer. auto = sólo si la máscara no viajó. */
   colorMatch?: 'auto' | 'on' | 'off'
   count?: number
@@ -62,6 +68,9 @@ export interface CandidateRecord {
   editedMeanDelta: number
   /** La zona editable volvió como panel negro plano (salida cruda): el candidato no sirve aunque pase la verificación. */
   suspectFlatPanel: boolean
+  /** El modelo reencuadró (detector de bordes): la zona pegada no corresponde a lo generado. */
+  suspectMisaligned: boolean
+  alignment: AlignmentEstimate
   /** Si la máscara viajó al proveedor en este candidato. */
   providerMaskSent: boolean
   /** Desplazamiento medio RGB corregido antes de recomponer (null = sin corrección). */
@@ -145,11 +154,19 @@ export const editedMeanDelta = (report: Pick<VerificationReport, 'editable' | 's
   return pixels ? (report.editable.meanDelta * report.editable.pixels + report.seam.meanDelta * report.seam.pixels) / pixels : 0
 }
 
-/** 0 si todos los candidatos pasan; 2 si alguno falló la verificación. */
+/** Un candidato que pasó la verificación pero probablemente no sirve: panel negro, reencuadre o zona sin cambio. */
+export const isSuspect = (candidate: Pick<CandidateRecord, 'suspectFlatPanel' | 'suspectMisaligned' | 'editedMeanDelta'>): boolean =>
+  candidate.suspectFlatPanel || candidate.suspectMisaligned || candidate.editedMeanDelta < LOW_EDIT_MEAN_DELTA
+
+/**
+ * 0: todos pasan y al menos uno no es sospechoso · 2: alguno falló la verificación · 3: todos pasan pero todos son
+ * sospechosos («revisar»: la zona protegida está intacta, pero ningún candidato muestra la edición pedida) · 1: falló.
+ */
 export const exitCodeFor = (manifest: Pick<ImageInpaintManifest, 'status' | 'candidates'>): number => {
   if (manifest.status === 'failed') return 1
+  if (!manifest.candidates.every(candidate => candidate.verdict === 'PASS')) return 2
 
-  return manifest.candidates.every(candidate => candidate.verdict === 'PASS') ? 0 : 2
+  return manifest.candidates.some(candidate => !isSuspect(candidate)) ? 0 : 3
 }
 
 const resolveCostCap = (maxUsd: number | undefined) => maxUsd ?? Number(process.env.AI_COST_CONFIRM_USD ?? process.env.FAL_COST_CONFIRM_USD ?? 1)
@@ -165,6 +182,10 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
   if (!options.prompt.trim()) throw new Error('El prompt está vacío.')
 
   const params = { model, quality: options.quality, seed: options.seed, providerMask: options.providerMask }
+
+  if (!options.model && adapter.strongestModel && adapter.strongestModel.id !== model) {
+    log(`  ★ usando ${model} (default, verificado con máscara). Para la pieza final: --model ${adapter.strongestModel.id}, ${adapter.strongestModel.why}.`)
+  }
 
   adapter.validate(params)
 
@@ -186,7 +207,12 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
   if (sketch) log(`  ✎ boceto ${sketch.form === 'overlay' ? 'con fondo transparente' : 'dibujado sobre la foto'}${options.maskPath ? '' : `: máscara derivada del trazo (+${options.sketchMargin ?? 40} px)`}`)
   if (references.length) log(`  ⧉ ${references.length} referencia(s) del objeto`)
 
-  const providerPrompt = buildRolePrompt({ prompt: options.prompt, hasSketch: Boolean(sketch), referenceCount: references.length })
+  const maskWillTravel = adapter.willSendMask?.(params) ?? adapter.sendsMask
+  const zoneGuide = !sketch && !maskWillTravel && (options.guide ?? 'auto') === 'auto'
+
+  if (zoneGuide) log('  ◫ la máscara no viaja: se envía la zona marcada en magenta como guía de posición (imagen 2)')
+
+  const providerPrompt = buildRolePrompt({ prompt: options.prompt, hasSketch: Boolean(sketch), referenceCount: references.length, zoneGuide })
 
   if (mask.width !== base.width || mask.height !== base.height) {
     throw new Error(`La máscara mide ${mask.width}x${mask.height} y la base ${base.width}x${base.height}: deben medir lo mismo (pnpm ai:mask --base).`)
@@ -222,6 +248,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       seed: options.seed ?? null,
       providerMask: options.providerMask ?? 'auto',
       colorMatch: options.colorMatch ?? 'auto',
+      guide: zoneGuide,
       count,
       crop: { box: plan.box, target: plan.target }
     })
@@ -250,7 +277,13 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
   const cropImage = await resizeRgba(cropRgba(base, plan.box), plan.target.width, plan.target.height)
   const cropMaskTarget = await resizeMask(cropMask(mask, plan.box), plan.target.width, plan.target.height)
   const providerImage = await encodeRgbaPng(cropImage)
-  const guideImage = sketch ? await encodeRgbaPng(await resizeRgba(cropRgba(sketch.guide, plan.box), plan.target.width, plan.target.height)) : null
+
+  const guideImage = sketch
+    ? await encodeRgbaPng(await resizeRgba(cropRgba(sketch.guide, plan.box), plan.target.width, plan.target.height))
+    : zoneGuide
+      ? await encodeRgbaPng(renderZoneGuide(cropImage, cropMaskTarget, Math.max(3, Math.round(plan.target.width / 300))))
+      : null
+
   const extraImages = [...(guideImage ? [guideImage] : []), ...references.map(reference => reference.png)]
 
   if (guideImage) await writeFileEnsured(join(runDir, 'provider-sketch.png'), guideImage)
@@ -317,6 +350,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       const patch = await resizeRgba(await loadRgba(output.image, 'salida del proveedor'), plan.box.width, plan.box.height)
       const generatedFull = placePatch(base, { ...patch, hadAlpha: base.hadAlpha }, plan.box)
       const drift = measureZones(base, generatedFull, mask).protected
+      const alignment = await estimateAlignment(cropRgba(base, plan.box), patch, cropMask(mask, plan.box))
       const blackShare = flatBlackFraction(generatedFull, mask)
       const maskSent = typeof output.meta.providerMask === 'boolean' ? output.meta.providerMask : adapter.sendsMask
       const colorMode = options.colorMatch ?? 'auto'
@@ -325,7 +359,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
 
       await writeFileEnsured(join(runDir, finalName), await encodeRgbaPng(recompose(base, toCompose, mask)))
 
-      if (corrected) log(`    · color corregido en el anillo (${corrected.ringPixels} px): RGB −${corrected.shift.map(v => v.toFixed(1)).join(' / ')}`)
+      if (corrected) log(`    · color corregido en el anillo (${corrected.ringPixels} px): desplazamiento RGB ${corrected.shift.map(v => (v > 0 ? '+' : '') + v.toFixed(1)).join(' / ')}`)
 
       // La verificación lee el ARCHIVO, no el buffer.
       const written = await loadRgba(join(runDir, finalName), 'resultado escrito')
@@ -342,6 +376,8 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
         reason: report.reason,
         editedMeanDelta: Math.round(editedMeanDelta(report) * 1000) / 1000,
         suspectFlatPanel: blackShare > FLAT_PANEL_THRESHOLD,
+        suspectMisaligned: alignment.misaligned,
+        alignment,
         providerMaskSent: maskSent,
         colorShift: corrected?.shift ?? null,
         protected: report.protected,
@@ -361,10 +397,14 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
 
       // La verificación garantiza lo que NO se toca; no juzga si el pedido se cumplió. Si la zona abierta casi no
       // cambió, el modelo probablemente ignoró el prompt (canario 2026-10-02: GPT Image `low` redibujó sin la planta).
-      // Sin máscara (o con un modelo que la ignora) el proveedor puede mover el encuadre: recomponer pegaría una zona
-      // corrida. Mismo umbral que el control de alineación del video.
-      if (drift.meanDelta > MISALIGNED_MEAN_DRIFT) {
-        log(`    ⚠ el modelo movió la zona protegida en promedio ${drift.meanDelta.toFixed(1)}/255: puede haber corrido el encuadre y la costura se notará. Mira la unión al 100 %.`)
+      // Reencuadre medido por BORDES (la media no lo ve: 8,5/255 con la cámara corrida en el canario de Sunburst).
+      if (alignment.misaligned) {
+        log(
+          `    ⚠ el modelo REENCUADRÓ (≈ ${alignment.dx} px, ${alignment.dy} px, escala ${alignment.scale}): la zona pegada no corresponde a lo que generó. ` +
+            'Usa --sketch o describe la posición, o un modelo con máscara.'
+        )
+      } else if (drift.meanDelta > MISALIGNED_MEAN_DRIFT) {
+        log(`    ⚠ el modelo movió la zona protegida en promedio ${drift.meanDelta.toFixed(1)}/255: mira la unión al 100 %.`)
       }
 
       if (blackShare > FLAT_PANEL_THRESHOLD) {

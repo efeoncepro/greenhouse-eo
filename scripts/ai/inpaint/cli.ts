@@ -36,11 +36,15 @@ Entrada:
 
 Proveedor:
   --adapter <id>             ${IMAGE_ADAPTER_IDS.join(' | ')} (default openai)
-  --model <id>               Default del adaptador (openai: gpt-image-2.5-flare; Sunburst con máscara devuelve un panel negro)
+  --model <id>               Default del adaptador (openai: gpt-image-2.5-flare, el verificado con máscara).
+                             ★ gpt-image-2.5-sunburst es el MÁS POTENTE (las piezas de mayor impacto): úsalo para la
+                             pieza final. Con máscara devuelve un panel negro, así que el comando lo hace editar sin
+                             máscara, le manda la zona marcada como guía y recompone; revisa el aviso de reencuadre
   --quality <q>              openai: low | medium (default) | high | xhigh | max
   --seed <n>                 Sólo adaptadores que la acepten
   --provider-mask auto|on|off  Si la máscara viaja al proveedor (openai). auto: Sunburst edita sin máscara —con
                              máscara devuelve un panel negro— y el pipeline recompone; los demás, con máscara
+  --guide auto|off           Guía de zona en magenta (imagen 2) cuando la máscara no viaja; auto por defecto
   --color-match auto|on|off  Corrige el desplazamiento de color de la salida en un anillo alrededor de la zona antes de
                              recomponer (evita el halo). auto: sólo cuando la máscara no viajó (Sunburst)
   --count <n>                Candidatos (1–8); cada uno es un pedido pagado; con más de uno, contact-sheet.png
@@ -70,6 +74,7 @@ interface ImageCliArgs {
   seed?: number
   providerMask?: ProviderMaskMode
   colorMatch?: 'auto' | 'on' | 'off'
+  guide?: 'auto' | 'off'
   count: number
   crop: CropMode
   run?: string
@@ -130,6 +135,14 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
       case '--quality': args.quality = next(); break
       case '--seed': args.seed = toNumber(next(), flag, true); break
       case '--count': args.count = toNumber(next(), flag, true); break
+
+      case '--guide': {
+        const value = next()
+
+        if (!['auto', 'off'].includes(value)) throw new Error('--guide espera auto | off.')
+        args.guide = value as 'auto' | 'off'
+        break
+      }
 
       case '--color-match': {
         const value = next()
@@ -201,6 +214,7 @@ const runImage = async (argv: string[]): Promise<number> => {
     seed: args.seed,
     providerMask: args.providerMask,
     colorMatch: args.colorMatch,
+    guide: args.guide,
     count: args.count,
     crop: args.crop,
     runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
@@ -215,6 +229,7 @@ const runImage = async (argv: string[]): Promise<number> => {
   process.stdout.write(`  ✎ ${join(result.runDir, 'manifest.json').replace(process.cwd(), '.')}\n`)
 
   if (result.exitCode === 2) process.stderr.write('  ✗ al menos un candidato no pasó la verificación de la zona protegida.\n')
+  if (result.exitCode === 3) process.stderr.write('  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).\n')
 
   return result.exitCode
 }

@@ -55,6 +55,8 @@ export interface InpaintImageAdapter {
   provider: 'openai' | 'fal'
   label: string
   defaultModel: string
+  /** Modelo más potente del adaptador cuando no es el default; la CLI lo recuerda al operador o agente. */
+  strongestModel?: { id: string; why: string }
   /** `true` si la máscara viaja al proveedor; `false` si el proveedor edita por instrucción y la máscara sólo recompone. */
   sendsMask: boolean
   maskConvention: MaskConvention | null
@@ -64,6 +66,8 @@ export interface InpaintImageAdapter {
   revision: number
   /** Valida modelo, calidad y semilla ANTES de gastar. */
   validate(params: ImageAdapterParams): void
+  /** Si la máscara viajará con estos parámetros (default: `sendsMask`). Decide la guía automática de zona. */
+  willSendMask?(params: ImageAdapterParams): boolean
   /** Avisos medidos sobre la combinación pedida (no bloquean): se imprimen antes de gastar. */
   advisories?(params: ImageAdapterParams): string[]
   pickSize(model: string): PickTargetSize
