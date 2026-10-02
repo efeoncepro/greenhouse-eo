@@ -12,6 +12,16 @@ const load = async (f, ch) => sharp(path.join(D, f)).toColourspace('srgb')[ch ==
 ;(async () => {
   const cut = await load('../spark-engine-sin-cara.png', 4)
   const band = await sharp(path.join(D, '_comp-banda-1.png')).removeAlpha().raw().toBuffer()
+  // v2.1: el cuerpo completo (lo que tapaban anillo y brazos, con las articulaciones de hombro) y el anillo completo
+  // regenerado y aislado (anillo-completo-1-alfa.png): reemplazan el relleno de banda y el anillo recortado del render.
+  const full = await sharp(path.join(D, 'cuerpo-completo-b-1.png')).removeAlpha().raw().toBuffer()
+  const fullZone = await sharp(path.join(D, 'm-zona-cuerpo-2.png')).extractChannel(0).raw().toBuffer()
+  // borde de la zona difuminado 4 px: el relleno se funde con el original sin costura de color
+  const zoneSoft = await sharp(fullZone, { raw: { width: W, height: W, channels: 1 } }).blur(4).extractChannel(0).raw().toBuffer()
+  const ringFull = await sharp(path.join(D, 'anillo-completo-1-alfa.png')).ensureAlpha().raw().toBuffer()
+  let gray = [0, 0, 0]; for (let y = 1350; y < 1450; y++) for (let x = 1400; x < 1500; x++) for (let k = 0; k < 3; k++) gray[k] += full[(y * W + x) * 3 + k] / 10000
+  const lineY = (x) => 650 + (625 - 650) * (x - 230) / (1435 - 230)
+  const inSphere = (x, y, r) => (x - 1320) ** 2 + (y - 530) ** 2 < r ** 2
   const m = {}
   for (const k of ['cuerpo', 'anillo-atras', 'anillo-adelante', 'antena', 'brazo-izq', 'brazo-der', 'mano-izq', 'mano-der']) m[k] = await load(`m-${k}.png`, 1)
   const zone = await sharp(path.join(D, 'm-relleno.png')).greyscale().blur(7).threshold(10).blur(3).raw().toBuffer()
@@ -21,14 +31,32 @@ const load = async (f, ch) => sharp(path.join(D, f)).toColourspace('srgb')[ch ==
   const put = (buf, i, r, g, b, a) => { buf[i * 4] = r; buf[i * 4 + 1] = g; buf[i * 4 + 2] = b; buf[i * 4 + 3] = a }
   for (let y = 0; y < W; y++) for (let x = 0; x < W; x++) {
     const i = y * W + x, a = cut[i * 4 + 3]
-    for (const k of Object.keys(m)) if (m[k][i] > 127 && k !== 'cuerpo') put(L[k], i, cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2], a)
+    for (const k of Object.keys(m)) if (m[k][i] > 127 && k !== 'cuerpo' && !k.startsWith('anillo')) put(L[k], i, cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2], a)
+    // Anillo: del anillo completo; mitades solapadas en el corte (5 px) y en el borde de la esfera (8 px).
+    const ra = ringFull[i * 4 + 3]
+    if (ra > 0) {
+      if (inSphere(x, y, 103) || y > lineY(x) - 5) put(L['anillo-adelante'], i, ringFull[i * 4], ringFull[i * 4 + 1], ringFull[i * 4 + 2], ra)
+      if (!inSphere(x, y, 87) && y < lineY(x) + 5) put(L['anillo-atras'], i, ringFull[i * 4], ringFull[i * 4 + 1], ringFull[i * 4 + 2], ra)
+    }
     const r = er(x, y)
-    // Cuerpo: el recorte donde es cuerpo; bajo el anillo delantero, el relleno (opaco dentro de la elipse).
-    const z = zone[i] / 255
-    if (r < 0.997 && z > 0.01) {
-      const base = m.cuerpo[i] > 127 ? [cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2]] : [band[i * 3], band[i * 3 + 1], band[i * 3 + 2]]
-      put(L.cuerpo, i, ...[0, 1, 2].map((k) => Math.round(base[k] * (1 - z) + band[i * 3 + k] * z)), 255)
-    } else if (m.cuerpo[i] > 127) put(L.cuerpo, i, cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2], a)
+    // Cuerpo en la zona regenerada: color del relleno, alfa por distancia al gris del fondo (despremultiplicado).
+    if (fullZone[i] > 127) {
+      const d = Math.max(...[0, 1, 2].map((k) => Math.abs(full[i * 3 + k] - gray[k])))
+      const fa = Math.max(0, Math.min(1, (d - 10) / 26))
+      const zs = zoneSoft[i] / 255
+      if (zs < 0.97 && m.cuerpo[i] > 127 && a > 200) put(L.cuerpo, i, ...[0, 1, 2].map((k) => Math.round(cut[i * 4 + k] * (1 - zs) + full[i * 3 + k] * zs)), 255)
+      else if (fa > 0) put(L.cuerpo, i, ...[0, 1, 2].map((k) => Math.max(0, Math.min(255, Math.round((full[i * 3 + k] - gray[k] * (1 - fa)) / fa)))), Math.round(fa * 255))
+    } else {
+      // Cuerpo fuera de la zona: el recorte original (el relleno de banda queda como respaldo bajo el anillo).
+      const z = zone[i] / 255
+      if (r < 0.997 && z > 0.01) {
+        const base = m.cuerpo[i] > 127 ? [cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2]] : [band[i * 3], band[i * 3 + 1], band[i * 3 + 2]]
+        put(L.cuerpo, i, ...[0, 1, 2].map((k) => Math.round(base[k] * (1 - z) + band[i * 3 + k] * z)), 255)
+      } else if (m.cuerpo[i] > 127) {
+        const zs = zoneSoft[i] / 255
+        put(L.cuerpo, i, ...[0, 1, 2].map((k) => Math.round(cut[i * 4 + k] * (1 - zs) + full[i * 3 + k] * zs)), a)
+      }
+    }
     // Brazos: suman la parte navy de la articulación que queda dentro del borde del cuerpo, para que al girar el
     // brazo no aparezca un hueco.
     // Sólo cerca del hombro (≤ 80 px del pivote): más lejos son paneles oscuros del cuerpo que girarían con el brazo.

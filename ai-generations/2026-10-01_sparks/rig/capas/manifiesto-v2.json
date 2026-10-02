@@ -1,12 +1,12 @@
 {
  "masters": {
   "anillo-adelante": {
-   "sha256": "e118f24ef956d361ee3d870ac5dc598fcd1b7b463fb542e84c33fccbafe549f0",
-   "bytes": 67691
+   "sha256": "191631c24fc1de1dc0335e8fd724c41606a634ad48659edc718cceddaa53eaa3",
+   "bytes": 114325
   },
   "anillo-atras": {
-   "sha256": "80229d436c41cf5b6b0bd0937c862f150b70cb23ca416d4aeadbe4b4cf57a524",
-   "bytes": 21580
+   "sha256": "3246de0bbbb59ceee39bfd4562eb50aa790fe3df4b41001076e7e31749badbf7",
+   "bytes": 59444
   },
   "antena": {
    "sha256": "29c2dc1910d2b123abf08182d4cefa71d8990c205897d09299c0710071d230b9",
@@ -21,8 +21,8 @@
    "bytes": 37615
   },
   "cuerpo": {
-   "sha256": "59e721c40b95ffdb35c210050f786546ea83b0d7dc7ecaeffe0d158943cd462c",
-   "bytes": 413180
+   "sha256": "7f81fe996db05587643a8958455e21f65723ca6e17fa2e59170aa35a521d0796",
+   "bytes": 479527
   },
   "mano-der-abierta": {
    "sha256": "490a2dee25dadf0d4dd1392a66cecf74838f9e5c89a07cdb23f2b0fbddb63fd0",
@@ -58,11 +58,11 @@
   }
  },
  "webBytesPorLinea": {
-  "brand": 217282,
-  "engine": 216174,
-  "growth": 217158,
-  "revenue-hubspot": 216610,
-  "revenue-salesforce": 216732,
-  "voice": 217420
+  "brand": 230556,
+  "engine": 229452,
+  "growth": 230486,
+  "revenue-hubspot": 229912,
+  "revenue-salesforce": 230020,
+  "voice": 230700
  }
 }

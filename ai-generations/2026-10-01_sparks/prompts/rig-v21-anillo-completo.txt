@@ -1,0 +1,6 @@
+Inpaint ONLY the transparent zone of the mask. The opaque zone is the white orbit ring of this Spark character and must stay exactly as it is.
+Make the result show ONLY that orbit ring and the small white sphere riding on it, isolated on a flat uniform medium gray (#7F7F7F) background:
+- Remove completely the robot body, the visor, the antenna, both arms and hands, the glow under the body and every other object. Where they were, there is only flat gray background.
+- Complete the ring: draw the part of the ring that was hidden behind the robot's body, so the ring is ONE complete, continuous, closed elliptical glossy white tube, with the same thickness, the same tilt and perspective, the same material, reflections and studio lighting as the visible parts, and with clean, smooth, sharp edges everywhere.
+- The small glossy white sphere stays exactly where it is, sitting on the ring, joined to the tube smoothly with no gaps, no dark seams and no notches.
+No shadows on the background, no other objects, no text.

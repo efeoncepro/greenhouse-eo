@@ -34,7 +34,7 @@ Producción en `capas/` (en orden; todo reproducible):
    gris y crea las izquierdas en espejo, llevadas a su muñeca.
 6. `islas.cjs` quita motas; `lineas.cjs` recolorea la luz azul a las seis líneas y exporta WebP de 1000 px
    (`web/<línea>/`, ~190 KB por línea). `manifiesto-v2.json`: SHA-256 de los masters.
-7. Bucket: `sparks/v1/web/rig/v2.1/<línea>/` y `sparks/v1/masters/rig/v2.1/engine/` (la v2 quedó obsoleta: ver abajo).
+7. Bucket: `sparks/v1/web/rig/v2.2/<línea>/` y `sparks/v1/masters/rig/v2.2/engine/` (v2 y v2.1 quedaron obsoletas: ver abajo).
 
 ### v2.1 — las costuras que vio el operador (2026-10-01)
 
@@ -50,3 +50,24 @@ Producción en `capas/` (en orden; todo reproducible):
 - Capas nuevas en una carpeta nueva (`v2.1`): pisar `v2` mezclaba capas viejas en caché con pivotes nuevos.
 
 Costo: ~USD 2 (2 ediciones descartadas, 2 inpaints de banda, 6 de manos, 6 SAM).
+
+### v2.2 — anillo y cuerpo regenerados completos (2026-10-01): «que se vea muy pro»
+
+Lo que quedaba (extremo trasero del anillo, el tubo junto a la esfera, restos en el borde del cuerpo) venía de lo mismo:
+el anillo era un RECORTE del render, donde parte estaba tapada por el cuerpo y tenía bordes suaves. Se regeneró:
+
+1. **Anillo completo** (`prompts/rig-v21-anillo-completo.txt`): inpaint con el núcleo visible del anillo protegido
+   (`mask-anillo-aislar.png`) y todo lo demás editable, pidiendo sólo el anillo y su esfera aislados sobre gris, con el
+   arco de atrás reconstruido. Elegida la 1 (diferencia media 16 contra el original; la 2 se corrió: 49). Recorte con
+   `pnpm ai:image:rmbg … --model medium` → `anillo-completo-1-alfa.png`.
+2. **Cuerpo completo** (`prompts/rig-v21-cuerpo-completo.txt`): inpaint de todo lo que tapaban anillo y brazos dentro de
+   la silueta, más los hombros, con una articulación navy en cada uno (`mask-cuerpo-completo-2.png`; la zona se amplió a
+   1,12 de la elipse en los cruces del anillo porque las «orejas» laterales sobresalen de ella). Elegida `b-1`.
+3. `capas.cjs` arma el cuerpo con el original fuera de la zona y el relleno dentro (borde fundido 4 px), y el anillo
+   desde la pieza completa. Después: `manos.cjs` → `silueta.cjs` (recorta al radio medido del borde e interpola donde lo
+   tapaban anillo o brazos; cierra huecos de alfa sólo con color de cuerpo real) → `contorno.cjs` (mediana angular que
+   quita espolones) → `islas.cjs` → `lineas.cjs`.
+
+Trampas medidas: un `blur` de sharp sobre un buffer de un canal devuelve TRES (las máscaras salían casi vacías: usar
+`extractChannel(0)`); volver opaco un píxel casi transparente conserva un color que es ruido (puntos rojos): el color
+se toma del cuerpo completo.
