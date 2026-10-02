@@ -82,7 +82,6 @@ legend { padding: 0; margin-bottom: 10px; font-size: 12px; letter-spacing: .08em
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
-import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js'
 
 const GLB = '__GLB__'
 const CAL = {"rotX": 0, "rotY": 0, "rotZ": 0, "scale": 2.4, "offX": 0.0026, "offY": 0.1273, "offZ": 0.0291, "visor": {"r": 0.8426, "w": 1.478, "top": 0.48, "bottom": 0.1035, "x": 0, "y": 0, "z": 0}} // calibración del modelo: orientación, centro de la esfera y casquete del visor
@@ -203,7 +202,9 @@ vec3 gh_swap(vec3 c){ if(uSwap<0.5) return c; vec3 h=gh_rgb2hsv(c); float blue=s
 }
 
 let faceMesh = null
-new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(GLB, (gltf) => {
+// El visor de artifacts bloquea fetch (también de data: y blob:): el GLB se decodifica en memoria y las texturas se
+// cargan como <img> (sin createImageBitmap, que GLTFLoader usaría con fetch).
+function onModel(gltf) {
   const model = gltf.scene
   model.traverse((o) => { if (o.isMesh) { const mats = Array.isArray(o.material) ? o.material : [o.material]; mats.forEach(patchMaterial) } })
   // Normaliza: centro de la esfera en el origen, radio de la esfera = 1, frente hacia +Z.
@@ -226,7 +227,15 @@ new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(GLB, (gltf) => {
   faceMesh.renderOrder = 2
   floater.add(faceMesh)
   document.getElementById('loading').remove()
-}, undefined, (e) => { document.getElementById('loading').textContent = 'No se pudo cargar el modelo.'; console.error(e) })
+}
+function onModelError(e) { document.getElementById('loading').textContent = 'No se pudo cargar el modelo.'; console.error(e) }
+try {
+  const bin = atob(GLB.slice(GLB.indexOf(',') + 1)); const bytes = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+  const cib = window.createImageBitmap
+  window.createImageBitmap = undefined
+  try { new GLTFLoader().parse(bytes.buffer, '', onModel, onModelError) } finally { window.createImageBitmap = cib }
+} catch (e) { onModelError(e) }
 
 // --- Interacción ------------------------------------------------------------------------------------------------
 const target = { x: 0, y: 0 }, cur = { x: 0, y: 0 }
