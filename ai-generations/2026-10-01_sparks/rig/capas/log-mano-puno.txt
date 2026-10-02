@@ -1,0 +1,9 @@
+  ⚠ --count 2: son 2 pedidos separados por prompt y se paga cada uno
+  $ costo estimado ≈ USD 0.158 (2 × 2627 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-01_sparks/rig/capas/mano-puno-1.png (edit) …
+  ✓ 2523KB · gpt-image-2.5-sunburst · 1600x1600 · high
+    usage: in 1679 (img 1521 · txt 158) · out 2627 · total 4306
+→ ./ai-generations/2026-10-01_sparks/rig/capas/mano-puno-2.png (edit) …
+  ✓ 2509KB · gpt-image-2.5-sunburst · 1600x1600 · high
+    usage: in 1679 (img 1521 · txt 158) · out 2627 · total 4306
+done

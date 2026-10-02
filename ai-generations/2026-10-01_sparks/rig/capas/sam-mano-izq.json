@@ -1,0 +1,14 @@
+  $ costo: sin estimación (slug fuera del registro) · revisa fal.ai/models/fal-ai/sam2/image
+→ fal-ai/sam2/image · hasta 180s de espera
+  ⋯ encolado · request_id 01a0fa1b-02e3-7272-82d9-96267e3ef124 · cuenta FAL_API_KEY_B
+{
+  "image": {
+    "url": "https://v3b.fal.media/files/b/0aacb347/B0ak2TJjD7s7nof6FWRIq.png",
+    "content_type": "image/png",
+    "file_name": null,
+    "file_size": null,
+    "width": 1600,
+    "height": 1600
+  }
+}
+  ✓ sin assets descargables · 11117 ms
