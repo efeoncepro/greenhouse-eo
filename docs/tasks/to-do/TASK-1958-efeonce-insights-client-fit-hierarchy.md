@@ -354,6 +354,14 @@ GVC).
 
 - [ ] Skill `efeonce-insights` actualizada y espejada; dossier y scorecard en `docs/ui/reviews/`.
 
+## Delta 2026-10-02
+
+- `TASK-1957` code complete local (`c56f62d09`): el modelo 1.2 ya trae `source` legible, `unitLabel`/`asOfLabel` en hechos,
+  `unitLabel` por figura y `role` (`finding`|`backing`) en claims de capítulo. Observado en la vista previa local: Think
+  todavía imprime `spec.unit` («Unidad count»), su propia fecha corta («20-09-2026») y la grilla `ins-facts` incluye los
+  hechos del período ANTERIOR como cifras sueltas (aparecen «#6,6» y «#5,8» con la misma etiqueta) y la presencia sin
+  denominador («2»). Esos tres puntos son de esta task.
+
 ## Follow-ups
 
 - Reutilizar `FindingRows` en el detalle de edición del portal (`TASK-1849`).

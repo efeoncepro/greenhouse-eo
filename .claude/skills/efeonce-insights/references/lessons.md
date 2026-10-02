@@ -435,3 +435,20 @@ Síntoma: el servidor de Think contra staging salía con código 1 en 4 s («Ano
 running»). Regla: parar el servidor de fixtures antes de levantar el de staging; en `--mode staging` los tokens
 `fixture-*` siguen resolviendo porque `import.meta.env.DEV` sigue en `true`.
 
+
+
+## 2026-10-02 · TASK-1957 — la traducción vivía en el render, no en el contrato
+
+- **Dos humanizaciones divergen en silencio.** El PDF traducía la fuente en `figure-slots.ts`; el modelo web copiaba
+  `fact.source` (la tabla lectora) aunque su propio contrato decía «fuente legible». Nadie lo vio hasta mirar el
+  informe con datos reales. Regla: el vocabulario de cara al lector es UNA función que comparten todas las formas.
+- **El gate atrapó un fixture que mentía.** El primer fixture rotulaba la presencia con el código del proveedor
+  (`google_ai_overview`); el adapter real usa el nombre visible. Un gate derivado del payload no se ajusta para pasar:
+  se corrige el dato que lo viola.
+- **Una regla nueva puede producir su propio caso borde.** Las bandas de magnitud dejaban un cero en banda aparte y
+  dos puntajes empatados sin figura; se limitaron a unidades sin tope y el cero se lee en cualquier eje desde cero.
+- **Planner y gate deben compartir la regla, no parecerse.** «n de m junto a su total» pasaba el planner y lo marcaba el
+  gate; la salida fue UNA regla escrita en los dos con el mismo predicado.
+- Vista previa local con datos reales sin emitir: mock del lector público (sirve el JSON armado por
+  `buildInsightWebModel` sobre un plan regenerado desde el snapshot sellado) + Think dev con
+  `GREENHOUSE_API_BASE` apuntando al mock. No escribe nada salvo la bitácora de acceso al logo.

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `En implementación local (Claude, 2026-10-02)`
+- Status real: `Code complete local (commit c56f62d09, sin push): vocabulario, modelo web 1.2, límites de lector, elegibilidad de figuras, roles y gate client-fit; 280 pruebas + typecheck + lint + canvas-fidelity verdes; Berel y Sky regenerados pasan el gate. Pendiente: release, canary 1.2 en producción y revise de ediciones internas`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery`
 - Blocked by: `none`
@@ -235,12 +235,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
 - [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se completa al final. Esta task no crea tablas.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -378,15 +378,15 @@ valor inicial lo fija el agente en Discovery con los datos reales de Berel y Sky
 
 ## Acceptance Criteria
 
-- [ ] `web-model.ts` y `figure-slots.ts` consumen el mismo vocabulario de `src/lib/efeonce-insights/presentation/`; no queda traductor de fuente duplicado.
-- [ ] El modelo web 1.2 de las ediciones regeneradas de Berel y Sky no contiene ningún string que case con los patrones del gate.
-- [ ] `create-edition.ts` ya no produce títulos con módulos en código ni fechas ISO.
-- [ ] Los límites de una edición cliente no contienen texto de `GH_INSIGHTS.rejections` en forma interna y no repiten tema.
-- [ ] Ningún gráfico emitido tiene todos sus valores iguales sin comparación con cambio; la presencia AEO se grafica como proporción con «n de m».
-- [ ] Posición media nunca se emite como barras desde cero.
-- [ ] El gate corre en CI sobre fixtures derivados y en `plan-validation.ts` antes de emitir una edición cliente.
+- [x] `web-model.ts` y `figure-slots.ts` consumen el mismo vocabulario de `src/lib/efeonce-insights/presentation/`; no queda traductor de fuente duplicado.
+- [x] El modelo web 1.2 de las ediciones regeneradas de Berel y Sky no contiene ningún string que case con los patrones del gate.
+- [x] `create-edition.ts` ya no produce títulos con módulos en código ni fechas ISO.
+- [x] Los límites de una edición cliente no contienen texto de `GH_INSIGHTS.rejections` en forma interna y no repiten tema.
+- [ ] Ningún gráfico emitido tiene todos sus valores iguales sin comparación con cambio; la presencia AEO se grafica como proporción con «n de m». *(La primera mitad está cumplida y probada. La segunda se resolvió distinto: «n de m» sólo comparte figura con el mismo total y el empate se dice en una frase — ver Delta 2026-10-02; queda sin tildar hasta que el operador acepte el cambio.)*
+- [x] Posición media nunca se emite como barras desde cero.
+- [x] El gate corre en CI sobre fixtures derivados y antes de emitir una edición cliente. *(Vive en `commands/lifecycle.ts::issueInsightEdition`, no en `plan-validation.ts`: necesita el título del informe y el modelo proyectado, que la validación del plan no conoce.)*
 - [ ] Canary productivo 1.2 verde y registrado en el ledger de tiempos o en la task.
-- [ ] Skill `efeonce-insights` actualizada (ledger, contracts, lessons) y espejada a `.codex/`.
+- [x] Skill `efeonce-insights` actualizada (ledger, contracts, lessons) y espejada a `.codex/`.
 
 ## Verification
 
@@ -408,6 +408,17 @@ valor inicial lo fija el agente en Discovery con los datos reales de Berel y Sky
 
 - [ ] `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` registra el vocabulario de presentación, el modelo 1.2 y el gate client-fit.
 - [ ] `TASK-1958` recibe un Delta con los campos nuevos disponibles.
+
+## Delta 2026-10-02
+
+- Implementado local en la misma sesión que la creó (commit `c56f62d09`). Decisión durante la implementación: los
+  límites usan lenguaje del lector para TODA audiencia (no sólo cliente); el diagnóstico exacto sigue en
+  `snapshot.rejections`, así que no se pierde información interna y se evita una bifurcación por audiencia en el texto
+  sellado que comparten web y PDF.
+- Waffle descartado para «n de m» por motor: exige partes que suman un total (composición) y la presencia por motor no lo
+  es. La regla quedó: «n de m» sólo junto a otros del mismo total; el empate se dice en una frase.
+- Los informes ya creados conservan su título técnico (no hay comando de renombre); la primera edición de cliente debe
+  nacer en un informe nuevo o con `title` explícito.
 
 ## Follow-ups
 

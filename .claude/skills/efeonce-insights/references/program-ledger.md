@@ -13,6 +13,8 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | **complete** (2026-09-28, closure `df6f37ccd`) | Think `main` `544ecd4` (production); Greenhouse Production model 1.0 + `INSIGHTS_SHARING_ENABLED=true` in Ready deployment `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`); WAF exception applied without drift at 20 req/10 s/IP; ecosystem canary green on `EO-INS-000014`, grant revoked; Greenhouse 1.1 remains in staging (`13fd47381`), no production release performed | 2026-09-28 |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
 | TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af` (Job `artifact-worker` deployed); first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
+| TASK-1957 | Client-fit presentation contract: shared vocabulary, web model 1.2, editorial selection, chart eligibility, client-fit gate | **in-progress — code complete local (`c56f62d09`), release + canary pending** | local only (not pushed) | — |
+| TASK-1958 | Client-fit visual hierarchy in Think and PDF (findings rows, backing table, scope) | to-do (blocked by 1957) | — | — |
 
 ## TASK-1845 — foundation (complete 2026-09-16)
 
@@ -561,7 +563,31 @@ producción antes de compartir con clientes. Sin flag propio.
 
 **Hand-off planificado:** TASK-1849 y TASK-1875 mantienen en la web los mismos roles de color y la misma lectura.
 
+## TASK-1957 — contrato de presentación apto para cliente (in-progress; code complete local)
+
+Origen: el operador revisó el informe live con las ediciones internas reales de Berel (`EO-INS-000027`) y Sky
+(`EO-INS-000029`) renderizadas en local (2026-10-02) y encontró tablas internas como fuente, unidades en código,
+límites con diagnóstico interno y duplicados, recital de cifras, gráficos sin información y falta de jerarquía.
+
+Construido (commit `c56f62d09`, local, sin push):
+- `src/lib/efeonce-insights/presentation/vocabulary.ts`: `sourceLabelOf`/`sourcesLabelOf`, `unitLabelOf`,
+  `asOfLabelOf`, `windowLabelOf`, `defaultReportTitle`. Web y PDF los comparten (`figure-slots.sourcesOf` delega).
+- Modelo web **1.2** aditivo: `source` legible, `unitLabel`/`asOfLabel` en hechos, `unitLabel` en figuras, `role`
+  en claims. Think 1.x lo acepta sin cambios (`isSupportedModelVersion` acepta la familia 1.x).
+- Planner: `limitsFor` (lenguaje del lector, `GH_INSIGHTS.readerLimits`, una línea por tema), referencias y corte
+  sin ISO, `chartableGroupsFor` (sin varianza ⇒ sin figura; posición media sin barras; «n de m» sólo con el mismo
+  total y sin conteos sueltos; bandas de magnitud sólo en unidades sin tope), `withRoles` (≤ 5 hallazgos materiales:
+  1 pp, 0,5 pos., 5 % relativo), frase de empate de presencia «La marca aparece en 2 de 6 consultas en cada motor.».
+- `presentation/client-fit-gate.ts`: reglas derivadas del payload y del copy; `issueInsightEdition` lo corre para
+  audiencia cliente y rechaza con `not_ready` + `details.reason=client_fit`.
+
+Verificado: 280 pruebas, typecheck, lint, `insights:canvas-fidelity` sin cambios; planes regenerados de Berel y Sky
+sobre su evidencia sellada validan y pasan el gate. Pendiente: release, canary 1.2, regenerar (revise) las ediciones
+internas, y TASK-1958 para la jerarquía visual (Think todavía imprime `spec.unit` y fechas cortas propias).
+
 ## Sessions (append as you go; newest first)
+
+- 2026-10-02 · Claude («Sesión nocturna» b41c67) · release develop→main `6ea157e6e641` (web 1.1 en producción, canary verde; `INSIGHTS_DELIVERY/SCHEDULES_ENABLED` ON en Vercel Production + EmailTypes ON); revisión del informe live con datos reales en local (mock del lector + Think dev); TASK-1957/1958 creadas; TASK-1957 implementada local.
 
 - **2026-09-29 · Insights delivery email purpose decided (docs only; no code).** Operator: the email goes to clients,
   so it is a client service email, `relationship_transactional` in the presentation policy. As an explicit, documented

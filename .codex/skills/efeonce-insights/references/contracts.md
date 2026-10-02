@@ -322,3 +322,18 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
 - **Color** — only `fig-*` classes painted by each catalog; zero HEX in code. `delta-tone` = direction, not judgment.
 - **Composer contract** — `SlotContract.example?` / `SlotFieldContract.example?` (`artifact-composer/contracts.ts`): the
   visual-gate probe (`synthesize.ts`) uses it verbatim; catalog data, not engine data (runbook `composer-visual-gate.md`).
+
+
+## Client-fit presentation (TASK-1957 — code complete local 2026-10-02)
+
+- `InsightWebModelV1` **1.2** (aditivo): `InsightWebFactV1.source` = nombre legible (vocabulario común con el PDF;
+  hasta 1.1 viajaba la tabla lectora), `unitLabel`, `asOfLabel`; `InsightWebChartV1.unitLabel`;
+  `InsightWebClaimV1.role` (`finding`|`backing`, sólo en claims de capítulo de planes nuevos).
+- `PlanClaimV1.role` opcional; planes congelados antes de TASK-1957 no lo traen y se renderizan como antes.
+- Límites: `GH_INSIGHTS.readerLimits` (`outOfScope`, `noComparison`, `insufficientData`); `GH_INSIGHTS.rejections`
+  queda como vocabulario de diagnóstico interno y el gate lo trata como prohibido en límites.
+- Gate `clientFitViolations({ model, reportTitle, facts })`: reglas `internal_identifier`, `raw_unit_code`,
+  `raw_iso_date`, `internal_limit_wording`, `duplicated_limit`, `chart_without_information`,
+  `count_without_denominator`, `rank_as_bars_from_zero`. Claves estructurales (ids, `unit`, `asOf`, `spec.data`,
+  `spec.tabularEquivalent`…) no se leen como texto. Emitir una edición cliente con violaciones ⇒ `409 not_ready`
+  con `details.reason = client_fit` y hasta 20 violaciones.

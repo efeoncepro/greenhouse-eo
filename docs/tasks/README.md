@@ -2584,7 +2584,7 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 - [TASK-1954](to-do/TASK-1954-creative-workbench-scale-execution-and-delivery.md): EPIC-050; lotes de campaña sin tope, ejecución paralela, caché por contenido, paquetes por canal, archivo gobernado por cliente y tiempo de entrega medido; P1/Alto; bloqueada por TASK-1953/1955.
 - [TASK-1955](to-do/TASK-1955-creative-workbench-source-derived-fidelity-and-visual-regression.md): EPIC-050; incorporación de cualquier cliente derivando su adaptador de su fuente con excepciones explícitas, regresión visual por cliente en CI y clases de revisión; P1/Alto; primera del orden.
 - [TASK-1956](to-do/TASK-1956-creative-workbench-client-photo-library.md): EPIC-050; biblioteca neutral de fotos por cliente con derechos, sujeto, foco y zona segura, encuadre en todos los formatos con foto; P1/Alto; bloqueada por TASK-1955 Slice 1.
-- [TASK-1957](to-do/TASK-1957-efeonce-insights-client-fit-presentation-contract.md): EPIC-045; vocabulario de presentación único, modelo web 1.2 sin identificadores internos, selección de hallazgos, límites de cliente, elegibilidad de gráficos y gate client-fit; P1/Medio.
+- [TASK-1957](in-progress/TASK-1957-efeonce-insights-client-fit-presentation-contract.md): **In Progress** — code complete local, release pendiente; EPIC-045; vocabulario de presentación único, modelo web 1.2 sin identificadores internos, selección de hallazgos, límites de cliente, elegibilidad de gráficos y gate client-fit; P1/Medio.
 - [TASK-1958](to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md): EPIC-045; hallazgos estructurados, tabla de respaldo y alcance en Think y PDF; P1/Medio; bloqueada por TASK-1957.
 
 ## AEO X-Ray — composición y experiencia

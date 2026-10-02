@@ -1444,3 +1444,26 @@ respaldo, en-US, logo del cliente, tests (`pnpm test:insights`), auditoría AA y
 3. Release de Greenhouse a producción por el control plane.
 4. Push del `main` de Think (despliega producción).
 5. Encender `INSIGHTS_SHARING_ENABLED` en producción sólo con aprobación del operador.
+
+### 14.11 Estado de TASK-1957 — contrato de presentación apto para cliente (code complete local, 2026-10-02)
+
+**Decisión.** La frontera entre evidencia interna y documento de cliente tiene dueño y gate. El vocabulario de cara al
+lector (fuente, unidad, corte, ventana, título) vive en `src/lib/efeonce-insights/presentation/vocabulary.ts` y lo
+comparten el modelo web y el PDF; antes el PDF traducía la fuente en el render y el modelo web proyectaba la tabla
+lectora (`greenhouse_growth.seo_gsc_daily`) aunque su contrato decía «fuente legible». Think sigue siendo render tonto.
+
+- **Modelo web 1.2** (aditivo, compatible con Think 1.x): `source` legible, `unitLabel`/`asOfLabel`, `unitLabel` por
+  figura y `role` (`finding`|`backing`) en claims de capítulo.
+- **Planner**: límites en lenguaje del lector y una línea por tema (`GH_INSIGHTS.readerLimits`); referencias y corte
+  sin fechas ISO; elegibilidad de figuras (sin varianza ⇒ sin figura; posición media nunca en barras desde cero; «n de
+  m» sólo junto a otros del mismo total; bandas de magnitud en unidades sin tope); hasta 5 hallazgos materiales por
+  capítulo (1 pp · 0,5 pos. · 5 % relativo).
+- **Gate client-fit** (`presentation/client-fit-gate.ts`): reglas derivadas del payload y del copy; `issueInsightEdition`
+  lo corre para audiencia cliente y responde `409 not_ready` con `details.reason=client_fit`.
+- **Título por defecto**: «Módulo · mes» (`defaultReportTitle`), no `Insights ico 2026-08-01–2026-09-01`. Los
+  informes ya creados conservan su título: no existe comando de renombre.
+
+Estado: commit local `c56f62d09` sin push; 280 pruebas, typecheck, lint e `insights:canvas-fidelity` verdes; planes
+regenerados de Berel y Sky sobre su evidencia sellada validan y pasan el gate. Pendiente: release, canary 1.2 en
+producción, regenerar con `revise` las ediciones internas antes de emitir, y TASK-1958 (jerarquía visual).
+
