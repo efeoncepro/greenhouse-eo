@@ -45,6 +45,13 @@ export const GH_INSIGHTS = {
    * mal frente al cliente (revisión del operador, 2026-10-02). Una línea por tema; si falta el período actual, la línea
    * de comparación no se agrega.
    */
+  /** TASK-1957 — título de la figura por familia de indicador AEO (en vez de «Motores de respuesta · Porcentaje»). */
+  aeoFamilyTitles: {
+    mention_rate: 'Mención por motor (% de respuestas)',
+    sov: 'Share of Voice frente a competidores',
+    single: 'Share of Model y citas a tu sitio'
+  } as Readonly<Record<string, string>>,
+
   readerLimits: {
     outOfScope: 'no forma parte de esta edición',
     noComparison: 'sin comparación con el período anterior en esta edición',
@@ -68,6 +75,12 @@ export const GH_INSIGHTS = {
    * el límite habla del módulo: un identificador interno (`rank`, `gsc`) nunca llega al documento.
    */
   metrics: {
+    // TASK-1957 — indicadores de visibilidad en motores de respuesta con su nombre estándar (skill seo-aeo §07 y el
+    // informe público del Grader): Share of Model, Share of Voice competitivo y citation share.
+    share_of_model: 'Share of Model',
+    share_of_voice: 'Share of Voice',
+    'sov.brand': 'Tu marca',
+    citation_share: 'Respuestas que citan tu sitio',
     gsc: 'Search Console',
     rank: 'Posiciones en buscadores',
     organic_etv: 'Tráfico orgánico estimado',
@@ -180,6 +193,14 @@ export const GH_INSIGHTS = {
     allDimensions: 'Todas las dimensiones marcan',
     bestDimensionsTied: 'Las dimensiones mejor evaluadas son',
     severalDimensionsShare: 'Varias dimensiones comparten la mejor evaluación',
+    // TASK-1957 — antes del genérico «Varias… comparten», se nombra a los empatados en corto («Claridad de entidad y
+    // participación frente a competencia lideran con 100.»): un número sin dueño no le dice nada al cliente.
+    leadWith: 'lideran con',
+    // TASK-1957 — base de un indicador AEO porcentual: «33,3 % (8 de 24 respuestas)». Un % sin su base no se puede leer.
+    answersNoun: 'respuestas',
+    // TASK-1957 — tasa de mención igual en todos los motores: una frase con el porcentaje y su base.
+    allRatesPrefix: 'La marca aparece en el',
+    allRatesTail: 'de las respuestas de cada motor',
     allEqual: 'Todas las cifras de la figura son',
     highestTied: 'Las cifras más altas son',
     severalShare: 'Varias cifras comparten el valor más alto'
@@ -198,10 +219,15 @@ export const GH_INSIGHTS = {
 
   tieSubjects: {
     presence: 'Presencia por motor',
+    mention_rate: 'Mención por motor',
+    sov: 'Share of Voice',
     dimension: 'Dimensiones evaluadas'
   } as Readonly<Record<string, string>>,
 
   metricSubjects: {
+    share_of_model: { subject: 'El Share of Model', plural: false },
+    citation_share: { subject: 'Las respuestas que citan tu sitio', plural: true },
+    'sov.brand': { subject: 'El Share of Voice de tu marca', plural: false },
     clicks: { subject: 'Los clics orgánicos', plural: true },
     impressions: { subject: 'Las impresiones', plural: true },
     ctr: { subject: 'El CTR', plural: false },

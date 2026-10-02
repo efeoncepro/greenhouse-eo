@@ -213,7 +213,8 @@ const rankedBenchmarkRows = (competitiveSov: CompetitiveShareOfVoice): PublicCom
     }))
 }
 
-const buildCompetitiveBenchmark = (
+/** Exportada para Efeonce Insights (TASK-1957): el Share of Voice de un informe usa ESTA misma definición. */
+export const buildCompetitiveBenchmark = (
   competitiveSov: CompetitiveShareOfVoice
 ): PublicReportViewFacts['competitiveBenchmark'] => {
   const rows = rankedBenchmarkRows(competitiveSov)

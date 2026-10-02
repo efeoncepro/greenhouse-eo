@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { InsightWebModelV1 } from '../contracts/web-model'
 import { buildDeterministicPlan } from '../editorial/deterministic-planner'
+import { validateEditorialPlan } from '../editorial/plan-validation'
 import { buildInsightWebModel } from '../sharing/web-model'
 import { clientFitViolations } from './client-fit-gate'
 import { asOfLabelOf, defaultReportTitle, sourceLabelOf, unitLabelOf, windowLabelOf } from './vocabulary'
@@ -122,6 +123,18 @@ describe('TASK-1957 — plan apto para cliente', () => {
   })
 })
 
+describe('TASK-1957 — empates con dueño', () => {
+  it('nombra a las dimensiones empatadas en corto antes de caer al genérico «Varias… comparten»', () => {
+    const dimension = (key: string, label: string, value: number): EvidenceFactV1 => fact({ factId: `aeo.dimension.${key}`, module: 'aeo', metricId: `dimension.${key}`, label, value, unit: 'score', source: 'x', method: { name: 'ai_visibility_grader', version: '1' } })
+    const snapshot = { facts: [dimension('entity_clarity', 'Claridad de entidad', 100), dimension('competitive_sov', 'Participación frente a competencia', 100), dimension('citation_quality', 'Calidad de las citas', 29)], sources: [], rejections: [] }
+    const plan = buildDeterministicPlan(snapshot, { modules: ['aeo'], locale: 'es-CL', editorialV2: true })
+    const conclusion = plan.chapters[0]!.readings!.find(reading => reading.chartId === 'chart.aeo.score')!.conclusion!.text
+
+    expect(conclusion).toBe('Claridad de entidad y participación frente a competencia lideran con 100.')
+    expect(conclusion).not.toMatch(/Varias dimensiones/)
+  })
+})
+
 describe('TASK-1957 — gate client-fit (derivado del payload)', () => {
   const base: InsightWebModelV1 = {
     modelVersion: '1.2',
@@ -156,5 +169,69 @@ describe('TASK-1957 — gate client-fit (derivado del payload)', () => {
     }
 
     expect(clientFitViolations({ model: clean, reportTitle: 'Visibilidad orgánica · septiembre de 2026', facts: [] })).toEqual([])
+  })
+})
+
+describe('TASK-1957 — indicadores estándar de visibilidad en motores de respuesta (skill seo-aeo §07)', () => {
+  const pct = (metricId: string, label: string, numerator: number, denominator: number, extra: Partial<EvidenceFactV1> = {}): EvidenceFactV1 =>
+    fact({ factId: `aeo.${metricId}`, module: 'aeo', metricId, label, value: Math.round((numerator / denominator) * 1000) / 10, unit: 'percent', numerator, denominator, source: 'x', method: { name: 'ai_visibility_grader', version: '1' }, ...extra })
+
+  const indicators = (rates: number[]) => ({
+    facts: [
+      pct('mention_rate.openai', 'Mención en ChatGPT', rates[0]!, 6, { channelId: 'chatgpt' }),
+      pct('mention_rate.gemini', 'Mención en Gemini', rates[1]!, 6, { channelId: 'gemini' }),
+      pct('mention_rate.perplexity', 'Mención en Perplexity', rates[2]!, 6, { channelId: 'perplexity' }),
+      pct('share_of_model', 'Share of Model', rates[0]! + rates[1]! + rates[2]!, 18),
+      pct('sov.brand', 'Tu marca', 5, 20),
+      pct('sov.competitor.ñandu', 'Pinturas Ñandú', 10, 20),
+      pct('sov.competitor.otra', 'Otra Marca', 5, 20),
+      pct('citation_share', 'Respuestas que citan tu sitio', 1, 8)
+    ],
+    sources: [],
+    rejections: []
+  })
+
+  it('cada familia es su figura: mención por motor con canales y Share of Voice frente a competidores; SoM y citas no se comparan en barras', () => {
+    const snapshot = indicators([4, 2, 1])
+    const plan = buildDeterministicPlan(snapshot, { modules: ['aeo'], locale: 'es-CL', editorialV2: true })
+    const chapter = plan.chapters[0]!
+    const ids = chapter.charts.map(chart => chart.chartId)
+
+    expect(ids).toEqual(expect.arrayContaining(['chart.aeo.percent.mention-rate', 'chart.aeo.percent.sov']))
+    expect(ids).not.toContain('chart.aeo.percent')
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.percent.mention-rate')!.dimensionChannelIds).toEqual(['chatgpt', 'gemini', 'perplexity'])
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.percent.sov')!.title).toBe('Share of Voice frente a competidores')
+
+    const roleOf = (metricId: string) => chapter.claims.find(claim => claim.claimId === `claim.aeo.${metricId}`)?.role
+    const textOf = (metricId: string) => chapter.claims.find(claim => claim.claimId === `claim.aeo.${metricId}`)?.text
+
+    expect(roleOf('share_of_model')).toBe('finding')
+    expect(roleOf('sov.brand')).toBe('finding')
+    expect(roleOf('citation_share')).toBe('finding')
+    // El porcentaje lleva su base de respuestas.
+    expect(textOf('share_of_model')).toBe('Share of Model: 38,9 % (7 de 18 respuestas).')
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+    expect(clientFitViolations({ model: buildInsightWebModel({ plan, facts: snapshot.facts }), facts: snapshot.facts })).toEqual([])
+  })
+
+  it('la misma tasa en todos los motores se dice en una frase, sin figura', () => {
+    const snapshot = indicators([2, 2, 2])
+    const plan = buildDeterministicPlan(snapshot, { modules: ['aeo'], locale: 'es-CL', editorialV2: true })
+    const chapter = plan.chapters[0]!
+
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.percent.mention-rate')).toBeUndefined()
+    expect(chapter.claims[0]).toMatchObject({ text: 'La marca aparece en el 33,3 % de las respuestas de cada motor.', role: 'finding' })
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+})
+
+describe('TASK-1957 — el gate compara la razón del límite entera', () => {
+  it('«sin datos suficientes» (lector) no se confunde con «sin datos» (interno); la forma interna exacta sí se marca', () => {
+    const base: InsightWebModelV1 = { modelVersion: '1.2', locale: 'es-CL', executiveSummary: [], chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {} }
+    const rulesOf = (limits: string[]) => clientFitViolations({ model: { ...base, limits }, facts: [] }).map(violation => violation.rule)
+
+    expect(rulesOf(['Share of Voice: sin datos suficientes en este período.'])).toEqual([])
+    expect(rulesOf(['Share of Voice: sin datos.'])).toEqual(['internal_limit_wording'])
+    expect(rulesOf(['Motores de respuesta: en el período anterior, la fuente no sirve esta ventana con exactitud.'])).toEqual(['internal_limit_wording'])
   })
 })

@@ -228,9 +228,21 @@ export const chartableGroupsFor = (unit: string, facts: EvidenceFactV1[], byId: 
   return { groups, uniform: null }
 }
 
-/** Afirmación de una figura descartada por no tener varianza. Sólo para presencia por motor, con su «n de m». */
+/**
+ * Afirmación de una figura descartada por no tener varianza, para mención por motor: la tasa (`mention_rate.*`, TASK-1957)
+ * o el conteo «n de m» de snapshots previos (`presence.*`).
+ */
 const uniformClaimFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], locale: string): PlanClaimV1 | null => {
   const first = facts[0]
+
+  if (first && facts.every(fact => fact.metricId.startsWith('mention_rate.') && fact.value === first.value)) {
+    return {
+      claimId: `claim.${moduleKey}.uniform.mention_rate`,
+      text: `${GH_INSIGHTS.reading.allRatesPrefix} ${formatFactValue(first.value, 'percent', locale)} ${GH_INSIGHTS.reading.allRatesTail}.`,
+      factIds: facts.map(fact => fact.factId),
+      role: 'finding'
+    }
+  }
 
   if (!first || !facts.every(fact => fact.metricId.startsWith('presence.') && isPartOfTotal(fact) && fact.denominator === first.denominator)) return null
 
@@ -263,16 +275,33 @@ const materialityOf = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, 
   return change.magnitude >= threshold ? change.magnitude / threshold : null
 }
 
+/**
+ * Indicadores clave de visibilidad en motores de respuesta (skill seo-aeo §07): son hallazgos siempre que tengan valor,
+ * aunque no haya período anterior con qué compararlos. El resto compite por materialidad.
+ */
+const HEADLINE_METRICS = new Set(['share_of_model', 'sov.brand', 'citation_share'])
+
 const withRoles = (claims: PlanClaimV1[], facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanClaimV1[] => {
+  const headline = new Set(facts.filter(fact => HEADLINE_METRICS.has(fact.metricId) && fact.value !== null).map(fact => `claim.${fact.factId}`))
+
   const ranked = facts
     .map(fact => ({ factId: fact.factId, score: materialityOf(fact, byId, locale) }))
     .filter((item): item is { factId: string; score: number } => item.score !== null)
     .sort((a, b) => b.score - a.score)
     .slice(0, MAX_FINDINGS)
 
-  const findings = new Set(ranked.map(item => `claim.${item.factId}`))
+  const findings = new Set([...headline, ...ranked.map(item => `claim.${item.factId}`)].slice(0, MAX_FINDINGS))
 
   return claims.map(claim => (claim.role ? claim : { ...claim, role: findings.has(claim.claimId) ? 'finding' : 'backing' }))
+}
+
+/** Clave de agrupación de figuras: unidad, y en AEO además la familia del indicador porcentual. */
+const chartGroupKeyOf = (moduleKey: InsightModule, fact: EvidenceFactV1): string => {
+  if (moduleKey !== 'aeo' || fact.unit !== 'percent') return fact.unit
+
+  const family = fact.metricId.includes('.') ? fact.metricId.split('.')[0]! : 'single'
+
+  return `${fact.unit}:${family}`
 }
 
 const tableFor = (tableId: string, title: string, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanTableV1 => ({
@@ -314,14 +343,24 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     const charts: ChartSpecV1[] = []
     const byUnit = new Map<string, EvidenceFactV1[]>()
 
-    for (const fact of facts) byUnit.set(fact.unit, [...(byUnit.get(fact.unit) ?? []), fact])
+    // TASK-1957 — en AEO los porcentajes son indicadores DISTINTOS (tasa de mención por motor, Share of Voice frente a
+    // competidores, Share of Model y citas): cada familia es su propia figura, con su título. El resto agrupa por unidad.
+    for (const fact of facts) {
+      const key = chartGroupKeyOf(moduleKey, fact)
 
-    for (const [unit, unitFacts] of byUnit) {
-      const title = GH_INSIGHTS.units[unit] ? `${GH_INSIGHTS.modules[moduleKey].label} · ${GH_INSIGHTS.units[unit]}` : GH_INSIGHTS.modules[moduleKey].label
-      const { groups, uniform } = chartableGroupsFor(unit, unitFacts, byId, input.locale)
+      byUnit.set(key, [...(byUnit.get(key) ?? []), fact])
+    }
+
+    for (const [groupKey, unitFacts] of byUnit) {
+      const [unit, family] = groupKey.split(':') as [string, string | undefined]
+      const familyTitle = family ? GH_INSIGHTS.aeoFamilyTitles[family] : undefined
+      const title = familyTitle ?? (GH_INSIGHTS.units[unit] ? `${GH_INSIGHTS.modules[moduleKey].label} · ${GH_INSIGHTS.units[unit]}` : GH_INSIGHTS.modules[moduleKey].label)
+      const baseId = family && family !== 'single' ? `chart.${moduleKey}.${unit}.${family.replace(/_/g, '-')}` : `chart.${moduleKey}.${unit}`
+      // Indicadores AEO distintos (Share of Model, citas) no se comparan entre sí en barras: son hallazgos con su base.
+      const { groups, uniform } = family === 'single' ? { groups: [], uniform: null } : chartableGroupsFor(unit, unitFacts, byId, input.locale)
 
       groups.forEach((group, index) => {
-        const chart = chartFor(moduleKey, group, byId, unit, index === 0 ? `chart.${moduleKey}.${unit}` : `chart.${moduleKey}.${unit}.${index + 1}`, title, editorialV2)
+        const chart = chartFor(moduleKey, group, byId, unit, index === 0 ? baseId : `${baseId}.${index + 1}`, title, editorialV2)
 
         if (chart) charts.push(chart)
       })

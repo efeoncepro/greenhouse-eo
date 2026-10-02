@@ -29,11 +29,22 @@ const itemLabel = (fact: EvidenceFactV1): string => fact.dimension?.spaceName ??
 
 const fmt = (fact: EvidenceFactV1, locale: string): string => formatFactValue(fact.value, fact.unit, locale)
 
-/** Un conteo que es parte de un total se dice con su total («2 de 6»), como la afirmación del planner v1. */
-const valueText = (fact: EvidenceFactV1, locale: string): string =>
-  fact.unit === 'count' && fact.value !== null && fact.numerator === fact.value && fact.denominator !== null && fact.denominator > 0
-    ? `${fmt(fact, locale)} ${GH_INSIGHTS.reading.outOf} ${formatFactValue(fact.denominator, 'count', locale)}`
-    : fmt(fact, locale)
+/**
+ * Un conteo que es parte de un total se dice con su total («2 de 6»), como la afirmación del planner v1. TASK-1957: un
+ * indicador AEO porcentual (tasa de mención, Share of Model, Share of Voice, citas) lleva su base de respuestas
+ * («33,3 % (8 de 24 respuestas)»): el porcentaje solo no dice sobre cuántas respuestas se midió.
+ */
+const valueText = (fact: EvidenceFactV1, locale: string): string => {
+  if (fact.unit === 'count' && fact.value !== null && fact.numerator === fact.value && fact.denominator !== null && fact.denominator > 0) {
+    return `${fmt(fact, locale)} ${GH_INSIGHTS.reading.outOf} ${formatFactValue(fact.denominator, 'count', locale)}`
+  }
+
+  if (fact.module === 'aeo' && fact.unit === 'percent' && fact.value !== null && fact.numerator !== null && fact.denominator !== null && fact.denominator > 0) {
+    return `${fmt(fact, locale)} (${formatFactValue(fact.numerator, 'count', locale)} ${GH_INSIGHTS.reading.outOf} ${formatFactValue(fact.denominator, 'count', locale)} ${GH_INSIGHTS.reading.answersNoun})`
+  }
+
+  return fmt(fact, locale)
+}
 
 // ─── Familias nuevas ─────────────────────────────────────────────────────────────────────────────
 
@@ -388,26 +399,27 @@ const highestText = (facts: EvidenceFactV1[], context: ChapterContext, locale: s
   const value = valueText(highest, locale)
   const all = tied.length === facts.length
 
-  if (highest.metricId.startsWith('presence.')) {
-    const engine = (fact: EvidenceFactV1) => (fact.channelId ? GH_INSIGHTS.channels[fact.channelId] : undefined) ?? fact.label.replace(/^Presencia en\s+/i, '')
+  // `presence.*` (conteo, snapshots previos a TASK-1957) y `mention_rate.*` (tasa por motor) hablan de motores.
+  if (highest.metricId.startsWith('presence.') || highest.metricId.startsWith('mention_rate.')) {
+    const engine = (fact: EvidenceFactV1) => (fact.channelId ? GH_INSIGHTS.channels[fact.channelId] : undefined) ?? fact.label.replace(/^(Presencia|Mención) en\s+/i, '')
 
     if (tied.length === 1) return firstFitting(L.conclusion, `${engine(highest)} ${R.mostMentions}: ${value}.`)
     if (all) return firstFitting(L.conclusion, `${R.allEnginesMention} ${value} ${R.allEnginesMentionTail}.`)
 
-    return firstFitting(L.conclusion, `${listOf(tied.map(engine))} ${R.mostMentionsTied}: ${value}.`, `${R.severalEnginesShare}: ${value}.`)
+    return firstFitting(L.conclusion, `${listOf(tied.map(engine))} ${R.mostMentionsTied}: ${value}.`, `${listOf(tied.map(engine))} ${R.leadWith} ${value}.`, `${R.severalEnginesShare}: ${value}.`)
   }
 
   if (highest.metricId.startsWith('dimension.')) {
     if (tied.length === 1) return firstFitting(L.conclusion, `${R.bestDimension} ${lowerFirst(highest.label)}: ${value}.`)
     if (all) return firstFitting(L.conclusion, `${R.allDimensions} ${value}.`)
 
-    return firstFitting(L.conclusion, `${R.bestDimensionsTied} ${listOf(tied.map(fact => lowerFirst(fact.label)))}: ${value}.`, `${R.severalDimensionsShare}: ${value}.`)
+    return firstFitting(L.conclusion, `${R.bestDimensionsTied} ${listOf(tied.map(fact => lowerFirst(fact.label)))}: ${value}.`, `${upperFirst(listOf(tied.map(fact => lowerFirst(fact.label))))} ${R.leadWith} ${value}.`, `${R.severalDimensionsShare}: ${value}.`)
   }
 
   if (tied.length === 1) return firstFitting(L.conclusion, `${R.highest} ${subjectOf(highest, context)}: ${value}.`)
   if (all) return firstFitting(L.conclusion, `${R.allEqual} ${value}.`)
 
-  return firstFitting(L.conclusion, `${R.highestTied} ${listOf(tied.map(fact => lowerFirst(subjectOf(fact, context))))}: ${value}.`, `${R.severalShare}: ${value}.`)
+  return firstFitting(L.conclusion, `${R.highestTied} ${listOf(tied.map(fact => lowerFirst(subjectOf(fact, context))))}: ${value}.`, `${upperFirst(listOf(tied.map(fact => lowerFirst(subjectOf(fact, context)))))} ${R.leadWith} ${value}.`, `${R.severalShare}: ${value}.`)
 }
 
 /**

@@ -101,7 +101,10 @@ const limitViolations = (path: string, limits: readonly string[], out: ClientFit
   const seen = new Set<string>()
 
   limits.forEach((limit, index) => {
-    const phrase = INTERNAL_LIMIT_PHRASES.find(item => limit.includes(item))
+    // La razón (lo que va tras «Tema:») se compara ENTERA con la forma interna, actual o de comparación: una subcadena
+    // confundía «sin datos suficientes» (lector) con «sin datos» (diagnóstico interno).
+    const reason = limit.slice(limit.indexOf(':') + 1).trim().replace(/\.$/, '')
+    const phrase = INTERNAL_LIMIT_PHRASES.find(item => reason === item || reason === `${GH_INSIGHTS.document.comparisonLimitPrefix} ${item}`)
 
     if (phrase) out.push({ path: `${path}[${index}]`, rule: 'internal_limit_wording', excerpt: limit.slice(0, 120) })
 

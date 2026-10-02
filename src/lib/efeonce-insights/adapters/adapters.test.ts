@@ -159,20 +159,28 @@ describe('AEO adapter', () => {
       overallScore: 61,
       dimensions: [{ key: 'presence', label: 'Presencia', score: 70 }],
       providerPresence: [{ provider: 'chatgpt', resolved: 12, present: 5 }],
+      competitiveSov: { brandMentions: 5, competitors: [{ name: 'Pinturas Ñandú', mentions: 10 }, { name: 'Otra Marca', mentions: 5 }] },
+      citationInsight: { ownDomainShare: 25, findingsWithCitations: 8, findingsCitingOwnDomain: 2 },
       provenance: { asOfDate, promptPackVersion: 'pp-3', scoreVersion: 'score-2', providersSampled: ['chatgpt', 'gemini'], promptCount: 12 }
     }
   })
 
   beforeEach(() => vi.clearAllMocks())
 
-  it('un run dentro de la ventana produce score, dimensiones y presencia con numerador/denominador', async () => {
+  it('un run dentro de la ventana produce score, dimensiones e indicadores estándar (tasa de mención, Share of Model, Share of Voice, citas)', async () => {
     aeoMocks.readClientGraderReport.mockResolvedValue(report('2026-08-20', 'ready'))
     const { aeoReportAdapter } = await import('./aeo-adapter')
     const windows = month('2026-08-01', '2026-09-01')
     const result = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
 
     expect(result.facts.find(fact => fact.metricId === 'overall_score')).toMatchObject({ value: 61, unit: 'score', method: { version: 'score-2/pp-3' }, freshness: { asOf: '2026-08-20' } })
-    expect(result.facts.find(fact => fact.metricId === 'presence.chatgpt')).toMatchObject({ value: 5, numerator: 5, denominator: 12 })
+    // TASK-1957 — la presencia se expresa con los indicadores estándar (skill seo-aeo §07), no como conteo suelto.
+    expect(result.facts.find(fact => fact.metricId === 'mention_rate.chatgpt')).toMatchObject({ value: 41.7, unit: 'percent', numerator: 5, denominator: 12 })
+    expect(result.facts.find(fact => fact.metricId === 'share_of_model')).toMatchObject({ value: 41.7, unit: 'percent', numerator: 5, denominator: 12 })
+    expect(result.facts.find(fact => fact.metricId === 'sov.brand')).toMatchObject({ value: 25, unit: 'percent', numerator: 5, denominator: 20 })
+    expect(result.facts.find(fact => fact.metricId === 'sov.competitor.pinturas-nandu')).toMatchObject({ label: 'Pinturas Ñandú', value: 50 })
+    expect(result.facts.find(fact => fact.metricId === 'citation_share')).toMatchObject({ value: 25, numerator: 2, denominator: 8 })
+    expect(result.facts.some(fact => fact.metricId.startsWith('presence.'))).toBe(false)
     expect(result.rejections).toEqual([])
   })
 
@@ -376,7 +384,7 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
     const windows = month('2026-08-01', '2026-09-01')
     const result = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
 
-    expect(result.facts.find(fact => fact.metricId === 'presence.openai')!.channelId).toBe('chatgpt')
-    expect(result.facts.find(fact => fact.metricId === 'presence.nuevo_motor')).not.toHaveProperty('channelId')
+    expect(result.facts.find(fact => fact.metricId === 'mention_rate.openai')!.channelId).toBe('chatgpt')
+    expect(result.facts.find(fact => fact.metricId === 'mention_rate.nuevo_motor')).not.toHaveProperty('channelId')
   })
 })

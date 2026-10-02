@@ -10,13 +10,19 @@ import 'server-only'
 import { ClientGraderReportError, readClientGraderReport } from '@/lib/growth/ai-visibility/client/command'
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
+import { buildCompetitiveBenchmark } from '@/lib/growth/ai-visibility/report/view-facts'
 
 import { channelForAeoProvider } from '../contracts/channels'
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
 import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
 
-export const AEO_ADAPTER_VERSION = 'aeo_report_adapter_v1'
+// v2 (TASK-1957): tasa de mención por motor, Share of Model, Share of Voice y citation share en vez de conteos de presencia.
+export const AEO_ADAPTER_VERSION = 'aeo_report_adapter_v2'
+
+/** Clave estable de un competidor para comparar ediciones (sin tildes ni signos). */
+const competitorSlug = (name: string): string =>
+  name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 
 const collectForWindow = async (organizationId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>) => {
   const facts: EvidenceFactV1[] = []
@@ -78,12 +84,61 @@ const collectForWindow = async (organizationId: string, window: ResolvedInsightW
     facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label, value: dimension.score, unit: 'score', numerator: null, denominator: null, comparisonFactId: comparisonIds[key] ?? null, dimension: { dimension: dimension.key } })
   }
 
-  for (const presence of report.providerPresence) {
-    const key = `presence.${presence.provider}`
+  // TASK-1957 — indicadores estándar de visibilidad en motores de respuesta (skill seo-aeo §07), con la MISMA
+  // definición que el informe del Grader: la tasa de mención es su `mentionRate` (present / resolved) y el Share of Voice
+  // sale de su `buildCompetitiveBenchmark`. Un indicador, una fórmula.
+  //  - Tasa de mención por motor: % de respuestas de ese motor que mencionan la marca (antes: conteo «2 de 6»).
+  //  - Share of Model: % de respuestas que mencionan la marca en todos los motores medidos.
+  //  - Share of Voice: menciones de la marca frente a las de los competidores en el mismo panel.
+  //  - Citation share: % de respuestas con citas que citan el sitio propio.
+  const round1 = (value: number) => Math.round(value * 10) / 10
+  // Un motor sin respuestas resueltas no tiene tasa (sin dato ≠ 0 %). Un proveedor fuera del registro conserva su fila
+  // con el nombre crudo y sin isotipo (contrato de `contracts/channels.ts`).
+  const measured = report.providerPresence.filter(presence => presence.resolved > 0)
+  const providerLabels = GH_GROWTH_AI_VISIBILITY.provider_display_label as Readonly<Record<string, string>>
+
+  for (const presence of measured) {
+    const key = `mention_rate.${presence.provider}`
     // TASK-1888 — canal estable del motor; un proveedor fuera del registro queda sin channelId (nombre sin isotipo).
     const channelId = channelForAeoProvider(presence.provider)
 
-    facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: `Presencia en ${(GH_GROWTH_AI_VISIBILITY.provider_display_label as Readonly<Record<string, string>>)[presence.provider] ?? presence.provider}`, value: presence.present, unit: 'count', numerator: presence.present, denominator: presence.resolved, comparisonFactId: comparisonIds[key] ?? null, dimension: { provider: presence.provider }, ...(channelId ? { channelId } : {}) })
+    facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: `Mención en ${providerLabels[presence.provider] ?? presence.provider}`, value: round1((presence.present / presence.resolved) * 100), unit: 'percent', numerator: presence.present, denominator: presence.resolved, comparisonFactId: comparisonIds[key] ?? null, dimension: { provider: presence.provider }, ...(channelId ? { channelId } : {}) })
+  }
+
+  const totalResolved = measured.reduce((sum, presence) => sum + presence.resolved, 0)
+  const totalPresent = measured.reduce((sum, presence) => sum + presence.present, 0)
+
+  if (totalResolved > 0) {
+    facts.push({ ...base, factId: factId('aeo', 'share_of_model', window), metricId: 'share_of_model', label: GH_INSIGHTS.metrics.share_of_model!, value: round1((totalPresent / totalResolved) * 100), unit: 'percent', numerator: totalPresent, denominator: totalResolved, comparisonFactId: comparisonIds.share_of_model ?? null })
+  }
+
+  const benchmark = buildCompetitiveBenchmark(report.competitiveSov ?? { brandMentions: 0, competitors: [] })
+
+  // Share of Voice sólo con competidores en el panel: contra nadie, el 100 % no dice nada.
+  if (benchmark.totalMentions > 0 && benchmark.rows.some(row => !row.isBrand)) {
+    const brand = benchmark.rows.find(row => row.isBrand)
+
+    if (brand) {
+      facts.push({ ...base, factId: factId('aeo', 'sov.brand', window), metricId: 'sov.brand', label: GH_INSIGHTS.metrics['sov.brand']!, value: round1((brand.mentions / benchmark.totalMentions) * 100), unit: 'percent', numerator: brand.mentions, denominator: benchmark.totalMentions, comparisonFactId: comparisonIds['sov.brand'] ?? null, dimension: { competitor: 'brand' } })
+    }
+
+    // Los cinco competidores con más menciones; el resto queda en la evidencia del Grader.
+    for (const row of benchmark.rows.filter(item => !item.isBrand).slice(0, 5)) {
+      const key = `sov.competitor.${competitorSlug(row.name)}`
+
+      facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: row.name, value: round1((row.mentions / benchmark.totalMentions) * 100), unit: 'percent', numerator: row.mentions, denominator: benchmark.totalMentions, comparisonFactId: comparisonIds[key] ?? null, dimension: { competitor: row.name } })
+    }
+  }
+
+  // Sin competidores en el panel no hay Share of Voice: se declara como límite, nunca se omite en silencio.
+  if (!benchmark.rows.some(row => !row.isBrand)) {
+    rejections.push({ module: 'aeo', metricId: 'share_of_voice', reason: 'insufficient_data', detail: 'El panel del Grader no detectó competidores con menciones' })
+  }
+
+  const citations = report.citationInsight
+
+  if (citations && citations.ownDomainShare !== null && citations.findingsWithCitations > 0) {
+    facts.push({ ...base, factId: factId('aeo', 'citation_share', window), metricId: 'citation_share', label: GH_INSIGHTS.metrics.citation_share!, value: round1((citations.findingsCitingOwnDomain / citations.findingsWithCitations) * 100), unit: 'percent', numerator: citations.findingsCitingOwnDomain, denominator: citations.findingsWithCitations, comparisonFactId: comparisonIds.citation_share ?? null })
   }
 
   return { facts, rejections, source: { module: 'aeo', adapterVersion: AEO_ADAPTER_VERSION, reader: 'readClientGraderReport', asOf, method, coverage, servedWindow: { start: asOf, endExclusive: asOf, granularity: 'period', partial: false } } as EvidenceSourceV1 }
