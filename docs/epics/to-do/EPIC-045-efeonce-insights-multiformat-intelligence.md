@@ -102,6 +102,7 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U09 | [TASK-1903](../../tasks/to-do/TASK-1903-efeonce-insights-editorial-agent.md) | agente redactor de informes de clientes, operable por MCP en dos modos (operar el redactor; autor externo que envía la propuesta): propone interpretación, próximos pasos, decisión y plan de acción sobre evidencia sellada; aceptación humana por campo; modelo por comparación medida — pedido del operador 2026-09-25 | TASK-1888, TASK-1889 |
 | U10 | [TASK-1957](../../tasks/in-progress/TASK-1957-efeonce-insights-client-fit-presentation-contract.md) | contrato de presentación apto para cliente: vocabulario único, modelo web 1.2 sin identificadores internos, selección de hallazgos, límites de cliente, elegibilidad de gráficos y gate — pedido del operador 2026-10-02 | none |
 | U11 | [TASK-1958](../../tasks/to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md) | jerarquía visual apta para cliente en Think y PDF (hallazgos, respaldo, alcance) | TASK-1957 |
+| U12 | [TASK-1960](../../tasks/to-do/TASK-1960-efeonce-insights-report-per-contracted-service.md) | un informe por servicio contratado: vínculo proyecto↔servicio, evidencia acotada y destinatarios por informe (Sky: Diseño digital y Blog SEO/AEO) | — |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 
