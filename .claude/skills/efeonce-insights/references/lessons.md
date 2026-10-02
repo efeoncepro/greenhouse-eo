@@ -481,4 +481,8 @@ running»). Regla: parar el servidor de fixtures antes de levantar el de staging
 - **La regla de exposición competitiva vive en el dominio dueño.** El código de competidores SEO lo dice («la comparativa
   competitiva no se expone al cliente»): leer el dominio antes de sumar un dato evitó llevar la competencia SEO al
   informe sin decisión del operador.
+- **Un dominio es una sola palabra.** La figura de columnas parte etiquetas sólo por espacios: «greatplacetowork.com.mx»
+  hizo fallar cerrado el PDF de Berel. Las listas de dominios van a hallazgo y tabla, no a columnas.
+- **Una página de tabla se llena por altura, no por filas.** 16 filas con etiquetas de dos líneas se desbordaban; el
+  mapper ahora pesa doble una etiqueta larga.
 - **Los PDF no dibujan el plan de acción**: Think sí. Al revisar «qué falta» en un formato, mirar el mapper, no el plan.

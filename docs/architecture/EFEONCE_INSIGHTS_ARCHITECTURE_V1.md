@@ -1488,7 +1488,7 @@ Un informe de Insights responde ocho preguntas del cliente, en este orden. El re
 | # | Pregunta | Sección del plan | SEO | AEO | ICO |
 |---|---|---|---|---|---|
 | 1 | ¿Cómo nos fue? | resumen, esenciales, capítulos | productor | productor | productor |
-| 2 | ¿Por qué cambió? | capítulo | productor (consultas y páginas que más movieron los clics) | sin evidencia entregada | sin evidencia por cliente |
+| 2 | ¿Por qué cambió? | capítulo | productor (consultas y páginas que más movieron los clics) | productor (sitios que más citan los motores y tipo de fuente) | sin evidencia por cliente |
 | 3 | ¿Cómo estamos frente a la competencia? | capítulo | **bloqueada por política** (comparativa SEO nunca client-facing, auditoría §7 del módulo SEO) | productor (Share of Voice) | no aplica |
 | 4 | ¿Qué hicimos este mes? | capítulo | necesita registro de entregables | necesita registro de entregables | productor (piezas completadas, throughput) |
 | 5 | ¿Qué recomendamos? | `actions` | productor (cola SEO, sólo orígenes propios) | agente redactor (TASK-1903) | agente redactor |
@@ -1523,6 +1523,13 @@ redactor; nunca llega al cliente.
   causa), una figura sólo con las que comparten escala con la de mayor pico (10×) y una tabla única con bajada propia
   (`PlanTableV1.lead`). La lectura de la figura sale del mismo productor que el hallazgo (más clics movidos, no el mayor
   cambio relativo) y las causas van detrás del resultado en la tesis (rango de `.drivers.` en `conclusionsOf`).
+- **Lo que el Grader ya mide** (`cited_source.<n>`, `source_type.<tipo>`, `sentiment.<tono>`, del mismo
+  `readClientGraderReport`): hallazgos propios («El sitio más citado por los motores es «chocale.cl»: 11 de 246
+  citas», «Los motores citan más medios de noticias (16) que sitios propios (3)», «De 16 respuestas evaluadas, 3 son
+  positivas y 3 negativas»), figuras de tipo de fuente y tono (sin «sin clasificar»; los dominios no van en columnas
+  porque una palabra larga no se parte y el render falla cerrado) y una tabla aparte. El Share of Voice se dice
+  comparando con quien concentra las menciones y su base son menciones. El gate client-fit admite exactamente los
+  dominios citados. El mapper A4 reparte las filas de tabla por altura (una etiqueta de más de 26 caracteres pesa doble).
 - **Trabajo entregado ICO** (`delivered.completed`): piezas completadas por space y mes, del mismo snapshot
   (`context.completedTasks`).
 - **Plan de acción** (`opportunity.<n>.*`, hechos de PLAN que no compiten como hallazgo ni van a tablas): la cola SEO

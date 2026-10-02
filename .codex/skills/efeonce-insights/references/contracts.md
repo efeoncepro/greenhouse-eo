@@ -392,5 +392,7 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
 - **Modelo web 1.3**: `claim.module`, `claim.evidence`, `essentialsByModule`, `chapter.label`, `chart.note`,
   `fact.priorLabel`, `action.module`, `table.lead`. Think los consume y no deduce ninguno (la muestra de Think los
   emula SÓLO en fixtures).
+- **Grader ya medido** (`content_contract_v2`): `cited_source.*` y `source_type.*` responden «¿por qué?» y `sentiment.*`
+  «¿cómo nos fue?»; los dominios citados nunca van en columnas (sólo hallazgo y tabla `table.aeo.sources`).
 - **Peticiones**: sólo `gsc` `not_connected` (Search Console sin conectar) produce `ask`; lo interno no se le pide al
   cliente.

@@ -365,6 +365,11 @@ Sky Blog: conectar Search Console del blog, set de keywords y competidores (oper
   Think `astro check` 0 errores y `test:insights` 18 verdes; previews Berel, Sky Diseño y Sky Blog contra la base
   compartida; PDF A4 y deck de Berel y Sky renderizados localmente sin rechazos.
 - Sin probar en runtime desplegado (no hubo release).
+- Ampliación pedida por el operador («Sky puede tener al menos ya lo que arroja el Grader»): sitios citados, tipo de
+  fuente, tono y Share of Voice en una frase, del mismo informe del Grader (commit `bccbe504f`,
+  `content_contract_v2`). Preview Sky Blog con septiembre completo (corridas del 28/09): 7 hallazgos de IA, gate y
+  validación sin violaciones; PDF de Berel 20 páginas y deck 16 láminas sin rechazos. Multimercado de Sky sigue en
+  TASK-1961 (hoy sólo Chile, mercado principal).
 
 ## Follow-ups
 
