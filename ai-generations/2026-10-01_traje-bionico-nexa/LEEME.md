@@ -87,4 +87,8 @@ aprobó las vistas así. Es el conflicto ya registrado en el catálogo (`accesor
 **Costo de la corrida ≈ USD 1,3** (`gpt-image-2.5-sunburst`, `high`): ~25 generaciones y ediciones más 9 acabados de
 marca a ≈ USD 0,05.
 
+**En AXIS (2026-10-02):** `@efeoncepro/axis-brand-assets` 0.4.13 trae las 7 vistas aisladas a 1024 px
+(`AXIS_NEXA_SUIT`, `findNexaSuitAsset`); la página del Lab es https://axis.efeonce.org/references/nexa-suit/ y los masters,
+las vistas puestas, el macro y la escena `NX7d` están en `gs://efeonce-group-axis-public-media/nexa-suit/v1/`.
+
 **Pendiente fuera del repo:** copia del kit en OneDrive `5. Contenidos/13- Branding/` (la hace el operador).

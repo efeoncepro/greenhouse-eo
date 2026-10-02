@@ -6,7 +6,7 @@
 > **Ultima actualizacion:** 2026-10-02 por Claude
 > **Modulo:** Creative · marca propia de Efeonce (fotografía de marca, registro cine)
 > **Ruta en portal:** no aplica — se usa desde la ficha de toma de `pnpm foto:prompt` / `pnpm foto:generar`
-> **Estado:** kit aprobado por el operador el 2026-10-02 (TASK-1940); escena de referencia `NX7d` aprobada el mismo día. Sin publicar en AXIS
+> **Estado:** kit aprobado por el operador el 2026-10-02 (TASK-1940); escena de referencia `NX7d` aprobada el mismo día. Publicado en AXIS el 2026-10-02: `@efeoncepro/axis-brand-assets` 0.4.13 (`AXIS_NEXA_SUIT`, `findNexaSuitAsset`) y la página del Lab [/references/nexa-suit/](https://axis.efeonce.org/references/nexa-suit/) con su [JSON](https://axis.efeonce.org/references/nexa-suit.json); masters, vistas puestas y la escena en `gs://efeonce-group-axis-public-media/nexa-suit/v1/`
 > **Documentacion relacionada:** [Kit del traje (LEEME)](../../../ai-generations/2026-10-01_traje-bionico-nexa/LEEME.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) · [Personas, identidad y vestuario](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Ficha de Nexa](../../operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md) · [Prompts y pipeline](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Usar los Sparks](./usar-sparks-en-fotos-de-marca.md) · [Índice de fotografía de marca](../../operations/brand-photography/README.md) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md#delta-2026-10-02--el-traje-biónico-de-nexa-y-su-escena-con-los-sparks)
 
 ## Para qué sirve

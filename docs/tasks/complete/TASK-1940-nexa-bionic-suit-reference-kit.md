@@ -286,5 +286,5 @@ Reglas obligatorias:
 
 ## Follow-ups
 
-- Publicar el kit en `axis-brand-assets` si el operador lo pide.
+- ~~Publicar el kit en `axis-brand-assets` si el operador lo pide.~~ **Hecho el 2026-10-02** con autorización del operador: AXIS `7ea9555`, tag `v0.4.13` (`@efeoncepro/axis-brand-assets` 0.4.13, release y CI en verde), Lab https://axis.efeonce.org/references/nexa-suit/ (+ `.json`) y 38 archivos en `gs://efeonce-group-axis-public-media/nexa-suit/v1/`. Coordinado con la sesión del rig del Spark, que publicó 0.4.12 antes.
 - Revisar si `NX5b` y sus derivadas se regeneran con el kit (decisión del operador).
