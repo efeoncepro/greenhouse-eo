@@ -2533,7 +2533,8 @@ export const AJUSTES_CINE = [
   ]
 ]
 
-export const ajustarParaCine = texto => AJUSTES_CINE.reduce((t, [de, a]) => t.split(de).join(a), texto)
+/** @param {string} texto @returns {string} */
+export const ajustarParaCine = texto => AJUSTES_CINE.reduce((/** @type {string} */ t, [de, a]) => t.split(de).join(a), texto)
 
 // En una sección partida 1:1 del deck la reserva va a la IZQUIERDA, no arriba (prueba ciega A, 2026-10-02:
 // el formato 1:1 sólo sabía reservar la banda superior y la frase salía rota). Sólo en cine.
