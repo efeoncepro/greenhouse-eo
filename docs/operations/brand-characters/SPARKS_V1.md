@@ -107,6 +107,7 @@ Los casos de servicio y contenido siguen los dos ejemplos de la oferta (servicio
 | **Registro** | Cine y puesta en escena; **nunca documental**. El documental retrata el oficio real de Efeonce y un personaje de ficción no cabe ahí | [decisión del operador] · guarda §7 |
 | **Nunca solos decidiendo** | Siempre hay una persona que supervisa en la escena o en el relato de la pieza | [decisión del operador] |
 | **Venta de Agent Ops** | La pieza lleva al equipo humano | [decisión del operador] |
+| **Referencias en una toma cine** | **Dos Sparks con referencia como máximo**, los del plano cercano. El resto entra sin imagen propia («the same figures as the Spark references»), lejos y fuera de foco. Cinco con referencia salen nítidos, del mismo tamaño y con luz propia: stickers | [decisión del operador, 2026-10-02, `NX7d` aprobada] · [registro cine, delta 2026-10-02](../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) |
 | **Uno o varios** | Un Spark o varios. Con varios, cada uno con su accesorio o su acción: un grupo idéntico se lee como relleno. Con tres el flujo se lee; cinco ya es escuadrón | [criterio del registro cine §8] |
 | **Los cinco juntos** | Sus anillos de órbita nunca se cruzan | Catálogo `sparks-plantel` |
 | **El accesorio** | Siempre tocándolo, sin texto, y **nunca delante del visor** | [decisión del operador] |

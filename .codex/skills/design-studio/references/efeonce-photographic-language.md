@@ -557,8 +557,10 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 > 100 % → `foto:isotipo` sólo si difiere.
 > **Decisión del operador, 2026-09-28:** en uniformes (polo, hoodie, softshell, gorra) mandan las referencias puestas del
 > kit; si `foto:emblema` confirma el isotipo oficial al 100 %, se publica el bordado generado **sin `b`** (precedentes
-> `LN4` y `CR4`). `foto:isotipo` sólo si difiere y **siempre** en el traje biónico de Nexa, que no tiene referencia de
-> kit. Después de `foto:isotipo`, mirar otra vez al 100 %: su limpieza puede tapar luz de la escena (registro cine §16.7).
+> `LN4` y `CR4`). `foto:isotipo` sólo si difiere. El traje biónico de Nexa tiene kit desde el 2026-10-01 y su
+> referencia lleva el isotipo ya armado (decisión del operador, 2026-10-02): se pide por catálogo y se verifica con
+> `foto:emblema`, igual que el uniforme. Escena cine con Sparks: dos con referencia como máximo y el resto lejos y
+> desenfocado (registro cine, delta 2026-10-02, `NX7d`). Después de `foto:isotipo`, mirar otra vez al 100 %: su limpieza puede tapar luz de la escena (registro cine §16.7).
 
 > **Código de vestuario** **[operador, 2026-09-20]**: la prenda dice el REGISTRO. **Polera piqué** = oficina
 > casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno · **Hoodie** = terreno ·

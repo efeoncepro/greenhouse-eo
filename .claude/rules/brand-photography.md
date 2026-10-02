@@ -319,9 +319,12 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   tarjeta, cinta de luz). **`foto:isotipo` sólo si el emblema difiere**; si difiere y no se puede componer limpio,
   se rehace la toma. Medido antes (2026-09-20, sin referencias puestas): tres prendas dieron **tres emblemas
   distintos y ninguno era el de Efeonce**; por eso la referencia puesta es obligatoria, no opcional.
-  **Excepción: el traje biónico de Nexa no tiene referencia** (es ficción): su isotipo **se compone** con
-  `pnpm foto:isotipo --prenda clara --acabado`, pequeño, en la pechera del lado izquierdo de quien lo lleva (como `NX5b`),
-  y la ficha pide la pechera lisa. **NUNCA** cerrar sin `pnpm foto:emblema`: el QA sobre una hoja de contacto no
+  **El traje biónico de Nexa tiene kit desde el 2026-10-01** (`objetos: traje-bionico-nexa` + `lentes-bionicos-nexa`,
+  sólo Nexa y sólo con `"registro": "cine"`; TASK-1940): su referencia **lleva el isotipo ya armado** (incrustado, navy)
+  y el macro de la placa viaja a la escena **[operador, 2026-10-02: «dejarlo armado… para que no lo borre ni lo reinvente»]**;
+  la pechera lisa dejaba la escena sin logo (`NX7`, `NX7b`). En la espalda, el logo completo serigrafiado
+  (`foto:isotipo --marca logotipo`). Escena con Sparks que sí es cine: **dos Sparks con referencia como máximo**, el resto
+  lejos y desenfocado (registro cine, delta 2026-10-02). **NUNCA** cerrar sin `pnpm foto:emblema`: el QA sobre una hoja de contacto no
   sirve, a 520 px un bordado no se lee y pasa por bueno.
 - 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: «*cuando compones el isotipo no
   siempre queda bien; pásalo al modelo pidiéndole que haga el acabado sin alterar lo que está bien*». Compuesto

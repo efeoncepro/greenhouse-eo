@@ -1,7 +1,7 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.6 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-01 por Claude (1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.7 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-10-02 por Claude (1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
 > «El squad te la entrega», y queda el caso de cómo cambiar el plate de una pieza aprobada sin perder su concepto,
 > [§16.7](#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto). Antes, 1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
@@ -30,6 +30,51 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 **[pendiente]** = no resuelto. Las frases de prompt entre comillas son **verbatim** de fichas aprobadas.
 
 ---
+
+## Delta 2026-10-02 — «Nexa despliega a su squad»: qué hace cine una escena con Sparks
+
+**[decisión del operador, 2026-10-02]** *«Esta foto está aprobada, realmente se ve cinemática… canonízalo»*, sobre
+`NX7d` (`ai-generations/2026-10-01_traje-bionico-nexa/plates/NX7d-nexa-despliega-squad.png`, ficha y prompt en la misma
+corrida, TASK-1940). Es la primera escena cine con Nexa en su traje biónico y los Sparks del kit. La misma idea salió
+**correcta pero sin cine** en `NX7` y `NX7b`, y casi en `NX7c`; la comparación aísla qué la hizo funcionar
+**[medido en las cuatro fichas y plates]**. El diagnóstico de la causa principal es de la sesión de la línea gráfica,
+verificado en sus fichas aprobadas.
+
+| | `NX7` · `NX7b` (sin cine) | `NX7d` (aprobada) |
+|---|---|---|
+| Referencias | **10**: 3 de Nexa, traje, lentes y **los cinco Sparks**, cada uno con su foto de estudio | **8**: 3 de Nexa, traje + su macro, lentes y **sólo dos Sparks** |
+| Los demás Sparks | con referencia propia → nítidos, del mismo tamaño y con su propia luz: **stickers en abanico** | sin referencia propia: «the same figures as the two Spark references», **lejos, chicos y fuera de foco**, los ojos LED como puntos |
+| Profundidad | todo en un plano | **tres planos declarados en metros** (cerca · ~1 m · 4–6 m), 85 mm **f/1.8** |
+| Contacto | todos flotan en arco | un Spark **posado en su hombro**, la mano sobre la placa |
+| Fuente de luz | haces finos: una línea no ilumina una cara | **un núcleo del tamaño de un puño a ~30 cm de la cara**, «the only key light», **NO fill, NO front light**, sombra de la nariz legible |
+| Fondo | luces prácticas mínimas | **una hilera de luces prácticas grandes y frías** fundidas en bokeh |
+| Marca del traje | la pechera lisa (la marca se iba a componer después): salió sin logo | **el isotipo armado en la referencia + el macro en escena**: lo copió fiel, sin componer |
+
+**La regla madre que confirma [criterio, medido aquí y en `AE1`→`AE2`]:** cuando todo brilla parejo y todo está nítido,
+nada es cine. Una sola fuente con tamaño, una o dos cosas nítidas con luz, y el resto en sombra y desenfoque.
+
+Lo que queda como receta para cualquier escena cine con Sparks:
+
+1. **Con referencia, dos Sparks como máximo** por toma: los del plano cercano. Una referencia de estudio dice
+   «Reproduce EXACTLY» y el modelo obedece también su nitidez, su tamaño y su luz pareja, que es lo que la vuelve
+   sticker. El resto del plantel entra **sin imagen propia**, nombrado como «the same figures as the Spark references»,
+   lejos y desenfocado: a esa distancia no tiene que leerse, y el canon ya dice que la marca se pierde por el encuadre.
+   Cinco Sparks legibles son otra toma (un plano de grupo con `sparks-plantel`), no una foto cine.
+2. **Profundidad en planos con distancia**, no «some are out of focus»: cerca nítido, a ~1 m casi nítido y a 4–6 m
+   desenfocado, con la apertura declarada.
+3. **Contacto físico**: un Spark que toca a la persona (posado en el hombro) es el que «está ahí»; los que flotan en
+   arco se leen diagrama.
+4. **La fuente de ficción tiene tamaño y está cerca** de la cara, declarada como la única llave y **sin relleno**.
+5. **El conteo se declara**: «EXACTLY THREE more Sparks (FIVE in total, never more)». `NX7c` pidió «three more» y
+   salieron cuatro.
+6. **Geografía para la reserva**: el elemento iluminado más a la izquierda se nombra y se le niega todo lo que quede a
+   su izquierda (la regla de `CR4`, §10 #12).
+
+**Lo que la aprobada todavía no cumple [medido, `foto:validar --zona-texto`]:** columna de texto **0,38** (✗, pide 0,42)
+y lecho **2,98:1** (✗). Sirve tal cual como pieza muda; con titular se rehace con Nexa centrada cerca del 70 % del ancho
+y la consola del lecho en **negro mate no reflectante, fuera del alcance de la luz del núcleo** (el reflejo, no la luz
+directa, es lo que mata el lecho: [§10](#10-trampas-medidas-y-rechazos) y la regla del reflejo del maestro).
+Costo de la escena: **≈ USD 0,05 por plate** en `high` (1792×1024), cuatro plates.
 
 ## Delta 2026-10-01 (b) — los Sparks reemplazan a los mini robots agentes
 
