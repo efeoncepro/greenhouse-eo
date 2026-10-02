@@ -1438,13 +1438,17 @@
       "rol": "kit:traje-bionico-nexa/tres-cuartos-izq",
       "sha256": "d2167d5f69442dd52a0d27a9fed6b17ee51beb2add0d15318beb8e7a73763e6b"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-sin-marca-1024x1536-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-1024x1536-v01-fondo-estudio.png": {
       "rol": "uso:traje-bionico-nexa/defecto",
-      "sha256": "31b7407a0ea129ba3e66cb08d8a252b58629a6de20ba2c20c7659a02c82f90d7"
+      "sha256": "7b4142ad8ef10e46502fc62862c1f7d099ae2ec125ac962b9e7a7e9b84bbbef0"
     },
     "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-14-puesto-espalda-1024x1536-v01-fondo-estudio.png": {
       "rol": "uso:traje-bionico-nexa/usoPorVista:espalda",
       "sha256": "3cea5bb210581c5041bb4c37aef30ce3dc823dfa566e73a6bb060995d92f1bf6"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1024x1024-v01-fondo-estudio.png": {
+      "rol": "macro:traje-bionico-nexa",
+      "sha256": "d47e16e23a453ed5c6239befce0b46b2ea3955c7a321a972c7e96ceefa406f2c"
     },
     "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-20-frente-1024x1024-v01-fondo-estudio.png": {
       "rol": "kit:lentes-bionicos-nexa/frente",

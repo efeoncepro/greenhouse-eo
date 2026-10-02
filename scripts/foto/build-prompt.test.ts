@@ -1675,11 +1675,13 @@ describe('foto:prompt · traje biónico: sólo Nexa, sólo cine (TASK-1940)', ()
     expect(() => validarTrajeNexa({ ...base, identidad: ['nexa'], registro: 'puesta-en-escena' })).toThrow(/registro cine/)
   })
 
-  it('la pieza puesta pide la pechera lisa: la marca se compone después', () => {
+  it('la pieza puesta lleva el isotipo ya armado y el macro viaja con ella [operador, 2026-10-02]', () => {
     const traje = OBJETOS['traje-bionico-nexa']
 
-    expect(traje.tipoEmblema).toBe('sin-marca')
-    expect(traje.instruccionEnUso).toMatch(/NO emblem/)
-    expect(traje.assetDeUso).toMatch(/sin-marca/)
+    expect(traje.tipoEmblema).toBe('isotipo')
+    expect(traje.macroEnUso).toBe(true)
+    expect(traje.assetDeUso).not.toMatch(/sin-marca/)
+    expect(traje.instruccionEnUso).toMatch(/Do NOT remove it/)
+    expect(traje.acabadoMarca).toMatch(/inlaid/)
   })
 })

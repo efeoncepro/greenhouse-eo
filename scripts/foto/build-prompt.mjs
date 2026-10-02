@@ -1017,22 +1017,28 @@ export const OBJETOS = {
     tipoEmblema: 'isotipo',
   },
   // Traje biónico de Nexa (TASK-1940, aprobado por el operador el 2026-10-01). Es FICCIÓN: sólo Nexa y sólo en
-  // registro cine (`validarTrajeNexa`). Su isotipo es INCRUSTADO y se COMPONE siempre después con
-  // `pnpm foto:isotipo --prenda clara --acabado`: por eso la referencia de escena es la pieza puesta SIN marca y la
-  // instrucción pide la pechera lisa. Las vistas del kit (`final/`) sí llevan el isotipo compuesto, como documentación.
+  // registro cine (`validarTrajeNexa`). El isotipo va INCRUSTADO (navy, al ras de la placa) y llega YA ARMADO en la
+  // referencia: compuesto desde el SVG oficial con `foto:isotipo --prenda clara --acabado` sobre las vistas del kit, y
+  // el modelo lo copia en vez de inventarlo o borrarlo [operador, 2026-10-02: «dejarlo armado y con eso pasar la
+  // referencia al modelo para que no lo borre ni lo reinvente»]. Antes la pieza puesta iba lisa y la marca se componía
+  // después: las dos primeras escenas (NX7, NX7b) salieron sin logo. El macro viaja también en escena (`macroEnUso`).
+  // Si `foto:emblema` al 100 % muestra otra forma, se recompone con `foto:isotipo` como último recurso.
   'traje-bionico-nexa': {
     etiqueta: "Nexa's bionic suit (navy knit bodysuit with matte white armored plates and azure light seams)",
     tipo: 'prenda',
     instruccion:
-      'THIS SUIT IS ALREADY DESIGNED: copy it EXACTLY — deep navy one-piece knit bodysuit, matte white armored plates on the ' +
-      'shoulders, chest, upper arms and forearms, one white back plate, thin glowing azure (#0375DB) LED seams along the plate ' +
-      'edges, the torso sides and the outer legs, dark navy waist band, no plates on the legs. The chest plate is PLAIN smooth ' +
-      'matte white: NO emblem, NO logo, NO symbol, NO rocket, NO lettering anywhere on the suit (the mark is added later).',
+      'THIS SUIT IS ALREADY DESIGNED AND ALREADY CARRIES ITS EFEONCE MARK: copy it EXACTLY — deep navy one-piece knit ' +
+      'bodysuit, matte white armored plates on the shoulders, chest, upper arms and forearms, one white back plate, thin ' +
+      'glowing azure (#0375DB) LED seams along the plate edges, the torso sides and the outer legs, dark navy waist band, no ' +
+      'plates on the legs. The only mark is the small navy Efeonce isotype on the chest plate, on the wearer\'s left: copy ' +
+      'it as it is, never redraw it, never remove it, never add any other logo or lettering.',
     instruccionEnUso:
-      'shows this suit ALREADY WORN. Copy the SUIT exactly as it appears there — the navy knit, every white plate in the same ' +
-      'place and shape, the azure LED seams, the waist band, the way it sits on a body. The chest plate stays PLAIN smooth ' +
-      'matte white: NO emblem, NO logo, NO symbol, NO rocket, NO lettering (the mark is composed afterwards). The PERSON in ' +
-      'that image only shows how the suit sits: copy her face and hair only from the identity references. Ignore the background.',
+      'shows this suit ALREADY WORN, with its Efeonce mark already applied. Copy the SUIT exactly as it appears there — the ' +
+      'navy knit, every white plate in the same place and shape, the azure LED seams, the waist band, the way it sits on a ' +
+      'body — and copy its MARK exactly: the small navy Efeonce isotype inlaid flush on the chest plate, on the wearer\'s ' +
+      'left, at the same size and position. Do NOT remove it, redraw it, enlarge it or replace it with another symbol, and add ' +
+      'no other logo or lettering. The PERSON in that image only shows how the suit sits: copy her face and hair only from ' +
+      'the identity references. Ignore the background.',
     base: 'ai-generations/2026-10-01_traje-bionico-nexa/final/',
     vistas: {},
     vistasPorNombre: {
@@ -1041,15 +1047,18 @@ export const OBJETOS = {
       'tres-cuartos-izq': 'efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1024x1536-v01-fondo-estudio.png'
     },
     vistaDefecto: 'frente',
-    assetDeUso: 'efeonce-traje-bionico-nexa-13-puesto-frente-sin-marca-1024x1536-v01-fondo-estudio.png',
+    assetDeUso: 'efeonce-traje-bionico-nexa-13-puesto-frente-1024x1536-v01-fondo-estudio.png',
     usoPorVista: {
       espalda: 'efeonce-traje-bionico-nexa-14-puesto-espalda-1024x1536-v01-fondo-estudio.png'
     },
-    tipoEmblema: 'sin-marca',
+    macroEmblema: 'efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1024x1024-v01-fondo-estudio.png',
+    macroEnUso: true,
+    tipoEmblema: 'isotipo',
+    acabadoMarca: 'inlaid flush into the matte white plate in navy, like a fine print set into the surface: no border, no relief, no bevel, no glow',
     nota:
-      'la pechera sale lisa a propósito: compón el isotipo con `pnpm foto:isotipo <plate> --centro x,y --ancho w --prenda clara ' +
-      '--acabado` sobre el pecho, en el lado izquierdo de quien lo lleva (≈ un cuarto del ancho de la pechera; ver el macro ' +
-      '`10-detalle-placa-isotipo` del kit) y míralo al 100 % con `pnpm foto:emblema`.'
+      'el isotipo viaja armado en la referencia: amplíalo con `pnpm foto:emblema <plate>` y compáralo con el macro ' +
+      '`10-detalle-placa-isotipo` (nave a la derecha, tres ventanas, órbita con cortes, planeta arriba). Si difiere o falta, ' +
+      'recompónlo con `pnpm foto:isotipo <plate> --centro x,y --ancho w --prenda clara --acabado`.'
   },
   // Lentes biónicos de Nexa (TASK-1940, 2026-10-01): parte del traje, misma regla de uso.
   'lentes-bionicos-nexa': {
@@ -1134,7 +1143,7 @@ export const CLAVES_DE_REFERENCIA = {
 // el detector de drift de forma falla pidiendo clasificarla — ésa es la red que faltaba.
 export const CLAVES_SIN_ARCHIVO = {
   persona: ['etiqueta', 'identity', 'accesorios', 'vistasDeCuerpo', 'vestuarioDeCuerpo'],
-  objeto: ['etiqueta', 'aviso', 'instruccion', 'instruccionEnUso', 'nota', 'base', 'vistas', 'vistaDefecto', 'tipo', 'tipoEmblema', 'tipoPorVista', 'colorDefecto']
+  objeto: ['etiqueta', 'aviso', 'instruccion', 'instruccionEnUso', 'acabadoMarca', 'macroEnUso', 'nota', 'base', 'vistas', 'vistaDefecto', 'tipo', 'tipoEmblema', 'tipoPorVista', 'colorDefecto']
 }
 
 /**
@@ -1305,8 +1314,12 @@ function resolverObjetos(ficha, desde) {
     const tipoDeMarca = objeto.tipoPorVista?.[vista] ?? objeto.tipoEmblema
 
     const queMarca = tipoDeMarca && tipoDeMarca !== 'sin-marca'
-      ? ` The mark it carries is ${formaDeLaMarca(tipoDeMarca)} Render it as satin-stitch embroidery with visible ` +
-        'stitch direction, slightly raised over the knit — never flat ink. Do not resize or move it: it keeps ' +
+      ? ` The mark it carries is ${formaDeLaMarca(tipoDeMarca)} ` +
+        // El acabado lo decide la pieza: bordado en las prendas del uniforme, incrustado en el traje de Nexa.
+        (objeto.acabadoMarca
+          ? `It is ${objeto.acabadoMarca}. `
+          : 'Render it as satin-stitch embroidery with visible stitch direction, slightly raised over the knit — never flat ink. ') +
+        'Do not resize or move it: it keeps ' +
         'exactly the size and position it has in the reference — NO WIDER THAN A THIRD of the chest panel, ' +
         'barely wider than a lanyard badge hanging in the same shot. An oversized emblem is the most common ' +
         'failure of this kit.'
@@ -1333,7 +1346,9 @@ function resolverObjetos(ficha, desde) {
     // 2026-09-20: tres prendas dieron tres emblemas distintos y ninguno era el de Efeonce. Los kits
     // YA traían su macro; lo que faltaba era exponerlo. No se compone encima —probado y rechazado
     // por el operador: se ve impreso, no bordado—: se le da al modelo el emblema en grande.
-    if (objeto.macroEmblema && !enUso) {
+    // `macroEnUso`: la pieza puesta tampoco sostiene una marca chica sola (el traje de Nexa, TASK-1940), así que
+    // el macro viaja también con ella.
+    if (objeto.macroEmblema && (!enUso || objeto.macroEnUso)) {
       const macro = objeto.base + (objeto.macroPorColor?.[color] ?? objeto.macroEmblema)
 
       if (!existsSync(path.join(raiz, macro))) {
@@ -1349,7 +1364,7 @@ function resolverObjetos(ficha, desde) {
       bloques.push(
         `IMAGE ${nm} (detail reference): Image ${nm} shows, in macro, the mark THAT IS ALREADY ON that garment — ${formaDeLaMarca(objeto.tipoPorVista?.[vista] ?? objeto.tipoEmblema)} ` +
           `It is here only so the small mark in the previous image is not lost or reinterpreted at its real scale. ` +
-          'Keep its proportions, its thread colour and its embroidered relief exactly as in the macro. Do NOT invent, ' +
+          `Keep its proportions, ${objeto.acabadoMarca ? `its colour and its finish (${objeto.acabadoMarca})` : 'its thread colour and its embroidered relief'} exactly as in the macro. Do NOT invent, ` +
           'simplify, redraw or substitute it with a spiral, an @ or any other shape, and do NOT change which of the ' +
           'two forms it is. It sits at the scale it has in the real garment. Ignore its studio background.'
       )
