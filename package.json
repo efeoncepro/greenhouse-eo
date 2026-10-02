@@ -314,6 +314,7 @@
     "foto:validar:cine": "node scripts/foto/validar-cine.mjs",
     "foto:cine:nueva": "node scripts/foto/cine-nueva.mjs",
     "foto:componer": "node scripts/foto/componer.mjs",
+    "foto:expandir": "node scripts/foto/expandir.mjs",
     "foto:emblema": "node scripts/foto/emblema.mjs",
     "foto:isotipo": "node scripts/foto/isotipo.mjs",
     "brand:compose": "tsx scripts/brand-surfaces/compose.ts",

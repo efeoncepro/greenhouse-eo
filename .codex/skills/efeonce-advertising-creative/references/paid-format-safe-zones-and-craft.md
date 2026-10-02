@@ -52,6 +52,51 @@ plantearon después. Regenerar cada escena por formato desde su ficha costó ~60
    `composicion/armar-plan.py` + `formatos.json` + `ajustes.json` (el layout por formato y los ajustes por pieza a la
    vista).
 
+## 0b. 🔴 Adaptar sin perder la pieza: patrones medidos y método nativo *(operador, 2026-10-02)*
+
+> «Mientras armamos las referencias del casting, piensa si vas a adaptar la misma escena […] tal vez al referenciar
+> la misma imagen pierde la épica y calidad de la primera aprobada.» — operador, CMP-004.
+
+**Qué aprobó y qué descartó el operador [medido, CMP-004, 11 piezas × 3 formatos]:**
+
+| Resultado | Casos | Por qué |
+|---|---|---|
+| ✅ Aprobada aunque cambió la persona | S07 y BF3 (grupos), S02 (de espalda, escena similar), S04, S05 | «No veo defectos anatómicos y estructurales y mantiene la esencia»: la persona es parte del oficio, no el retrato. |
+| ⚠️ Aprobada de momento | S06 en 9:16 y 1:1 | Perdió la colorimetría cine del 4:5 (muro frío + una sola pieza cálida): el modelo repartió la luz de otra manera. |
+| ❌ Descartada | S03 9:16 · S03 1:1 | La cara ES la pieza (retrato a cámara): sin ancla de identidad envejeció o cambió. La ficha pedía «líneas en los ojos y canas» y el modelo lo exageró. |
+| ❌ Descartada | S01 1:1 | Se rompió la relación que dice la idea (cinta sobre el logo de una pantalla + pincelada proyectada): quedó un gesto sobre una pantalla apagada. |
+| ❌ No producible | S08 y BF1 en 1:1 (Nexa) · los 1,91:1 | El texto completo legible no cabe sin achicar o tapar al sujeto. |
+
+**Patrones:**
+
+1. **El cambio de personaje sólo reprueba cuando la cara es la protagonista.** En grupo, de espalda o en acción, se
+   acepta si la esencia y la anatomía están bien. En retrato a cámara, la identidad es la pieza.
+2. **La idea vive en la RELACIÓN entre elementos, no en los elementos sueltos.** Regenerar conserva los objetos y
+   pierde su relación (la cinta ya no tapa un logo encendido; la pincelada ya no cae sobre ella).
+3. **El 1:1 concentra las fallas** porque el bloque de texto empuja al sujeto: el sujeto se achica, la cara pierde
+   píxeles y aparece el estrabismo.
+4. **El modelo no respeta alturas con encuadres cerrados:** pedir «cara grande» y «cabeza al 46 %» a la vez da cabeza
+   al ~30 % (medido en 8 de 8 pasadas). Pedir «sujeto en la mitad derecha» tampoco se cumple con un sujeto solo.
+5. **La colorimetría no viaja sola:** si no se declara la gradación del aprobado, cada formato la reinventa.
+6. **Elegir variantes por el gate es insuficiente:** el gate no ve ojos, identidad ni idea.
+
+**Método nativo (aplicado a S01 1:1 y S03 9:16/1:1, certificado):**
+
+1. **Ficha de esencia** antes de adaptar: la idea en una frase y la relación de elementos que la sostiene, escrita
+   como obligatoria en la escena; la gradación de color del aprobado, explícita.
+2. **Casting de campaña** si una persona protagonista va a reaparecer (otros formatos u otros contextos): set de rostro
+   frente y tres cuartos creado por **edición** desde la pieza aprobada (luz neutra, fondo gris, sin escena), declarado
+   en `casting` de la ficha y pedido en `identidad` (`foto:prompt`, desde 2026-10-02). La edad sale del casting: nunca
+   «líneas» ni «canas» en la escena. Se arma **al hacer el casting de la pieza**, no después de que algo falle.
+3. **Escena escrita para el formato**, con la cara a resolución suficiente: un 1:1 con sujeto de cuerpo medio se
+   genera a **2048×2048** (`foto:generar --size 2048x2048`) y se compone a 1440.
+4. **Si el sujeto quedó alto, zoom out por expansión** en vez de otra pasada: `pnpm foto:expandir <plate> <salida>
+   <escala> "<qué hay alrededor>" [abajo]` achica la escena, el modelo SÓLO rellena muro o cielo y el lecho de la firma,
+   y los píxeles originales se reponen encima. La persona no se regenera. Medido: cabeza de 0,30 → 0,46 del alto con
+   escala 0,72 y `abajo` 0,08, sin costura visible.
+5. **QA antes del gate:** caras al 100 % contra el casting (ojos simétricos, misma edad), la idea leída en dos segundos
+   y la gradación contra el aprobado. Después, `foto:cta:gate --reproducir`.
+
 ## 1. 🔴 La reserva del comando NO es la safe zone de la plataforma
 
 Son dos cosas distintas y hay que cumplir **las dos**. `foto:prompt` reserva espacio **en la fotografía**

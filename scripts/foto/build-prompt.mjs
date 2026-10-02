@@ -448,6 +448,26 @@ const DIMENSIONES_DE_IDENTIDAD = [
   { campo: 'vestuario', mapa: 'vestuario', deCuerpo: 'vestuarioDeCuerpo', etiqueta: 'Vestuarios' }
 ]
 
+// Casting de campaña [operador, 2026-10-02]: un personaje ficticio que aparece en varias piezas o formatos de una
+// campaña se declara en la ficha con su set de casting (rostro y cuerpo de calidad, construidos desde la pieza
+// aprobada) y se pide en `identidad` igual que una persona del roster. Sin esto, cada formato regeneraba la escena sin
+// ancla y el modelo hacía un casting nuevo: en CMP-004 la protagonista de S03 envejeció en 9:16 y cambió en 1:1.
+// Forma: `"casting": { "<clave>": { "etiqueta": "…", "identity": "IDENTITY (critical): …", "refs": ["ruta", …], "cuerpo": "ruta" } }`.
+export function castingDeFicha(ficha, clave) {
+  const c = ficha?.casting?.[clave]
+
+  if (!c) return undefined
+  if (PERSONAS[clave]) throw new Error(`El casting "${clave}" choca con una identidad canónica del roster: usa otra clave.`)
+
+  if (typeof c.identity !== 'string' || !/^IDENTITY \(critical\):/.test(c.identity)) {
+    throw new Error(`El casting "${clave}" necesita \`identity\` que empiece con «IDENTITY (critical):» y describa la cara sin envejecerla.`)
+  }
+
+  if (!Array.isArray(c.refs) || !c.refs.length) throw new Error(`El casting "${clave}" necesita al menos una referencia en \`refs\`.`)
+
+  return { etiqueta: c.etiqueta ?? clave, identity: c.identity, refs: c.refs, ...(c.cuerpo ? { cuerpo: c.cuerpo } : {}) }
+}
+
 function resolverIdentidad(ficha) {
   const pedidas = ficha.identidad ?? []
 
@@ -474,10 +494,13 @@ function resolverIdentidad(ficha) {
     // Una entrada puede ser "julio" (vista frontal), { persona: 'julio', vista: 'perfil-izq' },
     // { persona: 'nexa', expresion: 'the-read' } o { persona: 'nexa', vestuario: 'speaker-1' }.
     const clave = typeof pedido === 'string' ? pedido : pedido?.persona
-    const persona = PERSONAS[clave]
+    const persona = PERSONAS[clave] ?? castingDeFicha(ficha, clave)
 
     if (!persona) {
-      throw new Error(`Persona "${clave}" desconocida. Personas con identidad canónica: ${Object.keys(PERSONAS).join(', ')}.`)
+      throw new Error(
+        `Persona "${clave}" desconocida. Personas con identidad canónica: ${Object.keys(PERSONAS).join(', ')}. ` +
+          'Para un personaje ficticio de campaña, declara su set en `casting` de la ficha.'
+      )
     }
 
     const pedidas = typeof pedido === 'string' ? [] : DIMENSIONES_DE_IDENTIDAD.filter(d => pedido?.[d.campo])

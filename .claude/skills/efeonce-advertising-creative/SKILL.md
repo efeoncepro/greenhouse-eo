@@ -75,6 +75,9 @@ siguen siendo candidatos, sin aprobación de marca o publicación automática.
      estrecho (1:1 y 1,91:1) **antes de la primera ficha**, con sujeto compacto y bajo, y prueba el piloto en todos los
      formatos antes de aprobar el 4:5. La horizontal de imagen es **1,91:1**, no 16:9 (16:9 es sólo video). Medido en
      CMP-004: adaptar después dio 1:1 en 9/11 y horizontal en 0/11 (§0 de la referencia);
+   - 🔴 **adaptar sin perder la pieza** (§0b): si la cara es la protagonista, **casting de campaña** desde la aprobada
+     (`casting` en la ficha) antes de adaptar; la idea vive en la RELACIÓN entre elementos y se escribe obligatoria; si
+     el sujeto queda alto, `pnpm foto:expandir` en vez de otra pasada; QA de caras al 100 % antes del gate;
    - 🔴 **la reserva del comando NO es la safe zone de la plataforma.** En 9:16 la banda del comando empieza
      en 10% y la UI del placement puede invadir esa banda; el14% es referencia de Meta, no regla de LinkedIn: obedecer sólo al comando pone el titular
      debajo del nombre de la cuenta. Manda la más restrictiva;

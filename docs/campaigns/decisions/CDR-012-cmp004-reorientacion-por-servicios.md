@@ -86,3 +86,16 @@ El operador aprobó los vigentes (S01–S08 Always On Q4, BF1–BF3 Black Friday
 - [ ] Aprobación creativa de las adaptaciones; permiso de medios.
 
 Aprendizaje canonizado a pedido del operador: un ad nace multiformato desde la ficha (`efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0).
+
+## Delta 2026-10-02 — revisión de formatos y método nativo
+
+- **Revisión del operador sobre las adaptaciones 9:16 y 1:1:** aprobadas S01 4:5/9:16, S02, S03 4:5, S04, S05, S07
+  (las tres), S08 y BF1 (4:5 y 9:16) y BF3; S06 aprobada de momento con la nota de que perdió la colorimetría cine
+  del 4:5. Descartadas S01 1:1 (la cinta tapa una pantalla apagada y se pierde la relación con el titular), S03 9:16
+  (la protagonista envejeció) y S03 1:1 (cambió aún más).
+- **Patrón:** el cambio de personaje sólo reprueba cuando la cara es la protagonista; la idea vive en la relación
+  entre elementos; el 1:1 concentra las fallas porque el texto achica al sujeto.
+- **Decisión:** las tres descartadas se rehacen como escenas nativas (N2) con casting de campaña desde la pieza
+  aprobada, generación a 2048 y zoom out por expansión (`pnpm foto:expandir`); quedan en revisión del operador.
+  Método canónico: `efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0b.
+- **Pendientes:** S08 y BF1 en 1:1 y la horizontal 1,91:1 (el texto completo no cabe), recuperar el color de S06.

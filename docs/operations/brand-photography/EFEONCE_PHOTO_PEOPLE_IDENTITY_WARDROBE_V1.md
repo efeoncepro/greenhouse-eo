@@ -854,3 +854,14 @@ En las vistas puestas del kit los **aretes salieron dorados**, como en las ancla
 operador **aprobó las vistas así** **[decisión del operador]**. La escena aprobada `NX7d` declara aretes plateados y
 quita reloj, pulsera y anillo. Si el traje lleva o no el smartwatch y el anillo sigue abierto, igual que en el resto del
 registro cine **[pendiente]**.
+
+## Delta 2026-10-02 — casting de campaña para personajes ficticios
+
+Una persona ficticia protagonista que va a reaparecer (otros formatos u otros contextos de la campaña) tiene **set de
+casting** desde el inicio: rostro frente y tres cuartos, luz neutra, fondo gris, creado por **edición** desde la pieza
+aprobada. La ficha lo declara en `casting` (`{ "<clave>": { "etiqueta", "identity": "IDENTITY (critical): …", "refs":
+[…] } }`) y lo pide en `identidad` igual que a una persona del roster; `foto:prompt` valida que no pise el roster y que
+haya identidad y referencias. La edad sale del casting: nunca pedir «líneas» o «canas» en la escena. Caso fuente:
+CMP-004, la protagonista de S03 envejeció en 9:16 y cambió en 1:1 al regenerar sin ancla; con casting, la misma
+persona en 4:5, 9:16 y 1:1. Método completo: `efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0b.
+
