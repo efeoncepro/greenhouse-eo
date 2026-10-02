@@ -48,10 +48,13 @@ La diferencia con otras capas de documentacion:
   --tecnica`), reproducir el kit y sellarlo y publicarlo al canon. Errores, avisos y problemas comunes. Kit aprobado el
   2026-10-02 (TASK-1940).
 - [Producir una foto de marca en registro cine](creative/producir-foto-cine-de-marca.md) — llegar a una foto cine
-  aprobable sin consultar a nadie: elegir la receta aprobada más cercana (`pnpm foto:cine:nueva --listar`), crear la
-  ficha desde ella, completar `llave`, `primerPlano`, `fondo`, `fenomeno` y `alcance`, revisar con el agente
-  `cine-reviewer` antes y después de generar y medir con `pnpm foto:validar:cine`. Qué significan los avisos, qué no
-  hacer y problemas comunes. Disponible desde el 2026-10-02 (TASK-1926).
+  aprobable sin consultar a nadie: elegir entre las 12 recetas aprobadas (`pnpm foto:cine:nueva --listar`), crear la
+  ficha desde ella (con `--formato` y `--alcance`; revisar lo heredado en `__revisar`), cuidar primero el escenario con
+  escala, completar `llave`, `primerPlano`, `fondo`, `fenomeno` y `alcance`, armar la sección partida 1:1 con la
+  reserva a la izquierda, aplicar las siete decisiones del operador, revisar con el agente `cine-reviewer` (sólo en
+  Claude Code; en Codex, su rúbrica) antes y después de generar, juzgar la luz contra la foto aprobada de la receta y
+  medir con `pnpm foto:validar:cine`. Qué significan los avisos, qué no hacer y problemas comunes. Disponible desde el
+  2026-10-02 (TASK-1926); v1.1 del mismo día.
 - [Recuperar y archivar archivos de `ai-generations/`](creative/recuperar-y-archivar-ai-generations.md) — qué hacer
   cuando una composición no encuentra un plate o una referencia (`pnpm ai-gen:where` y `pnpm ai-gen:pull` a la misma
   ruta, nunca regenerar), qué está protegido, cómo el operador archiva exploración con `pnpm ai-gen:archive` y cómo se

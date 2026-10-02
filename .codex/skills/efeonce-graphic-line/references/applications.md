@@ -339,7 +339,8 @@ vale en toda aplicación:
   color de luz por destacada sobre oscuro; **sin firma en el círculo** (a ese tamaño no se lee: la marca la pone el
   avatar). **06 Agents** se aprobó con robots genéricos descritos a mano (`PH7`), anteriores al diseño de los Sparks:
   los Sparks oficiales son los del kit ([`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.md),
-  TASK-1941) y regenerar esta destacada con ellos es decisión del operador.
+  TASK-1941). **Decisión del operador (2026-10-02): la destacada «Agents» aprobada se queda** (sin Nexa ni texto en el
+  círculo); un destacado con Nexa usa otro nombre y otra destacada. Sus robots no se copian como receta.
 - **Cómo funciona un destacado** (operador, 2026-10-01): para **cambiar** la portada de un destacado existente basta la
   imagen de portada; para **crearlo** hay que publicar primero una historia 9:16 **completa** y agregarla. Instagram
   toma la portada del **círculo central** (franja y 420–1500 de 1920). Una historia con bandas lisas arriba y abajo no
@@ -1031,10 +1032,13 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 4. El isotipo de la prenda llega armado en la referencia de su kit (uniformes desde el 2026-09-28, traje de Nexa desde
    el 2026-10-02) y se verifica con `pnpm foto:emblema` al 100 %; si difiere del oficial, se compone desde
    `@efeoncepro/axis-brand-assets` con `foto:isotipo`. El que dibuja el modelo sin referencia se rechaza.
-5. Registro cine sólo con Nexa protagonista, en `proposal-cinematic` (personas del equipo con su uniforme por
-   registro) y, por excepción aprobada el 2026-09-27, en las láminas de sección y «about» del deck (fuera del deck,
-   sólo las portadas de perfil y los destacados de Efeonce con Nexa, A11); cámara a ~2 m,
-   85 mm; nunca dos personas mirándose de cerca.
+5. Registro cine sólo con Nexa protagonista, en `proposal-cinematic` (casting por rol con el uniforme por registro;
+   personas reales del roster con la prenda de su línea) y, por excepción aprobada el 2026-09-27, en las láminas de
+   sección y «about» del deck (fuera del deck, las portadas de perfil y los destacados de Efeonce con Nexa, A11, y las
+   fotos de Marketing con Manzanitas con el roster); cámara a ~2 m, 85 mm; nunca dos personas mirándose de cerca; en
+   la sección partida la mirada va al panel, no al lente (operador, 2026-10-02). La foto se produce con el
+   [casebook cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) (`foto:cine:nueva`
+   → `cine-reviewer` → `foto:validar:cine` + `foto:validar` + `foto:emblema`); la dirige `design-studio`.
 6. Motion: se anima la línea, no la foto; la foto sólo se acerca, en escala logarítmica y nunca mientras entra la
    voz; tiempos desde `efeonceGraphicLine.motion` y `efeonceGraphicLine.surfaces.motion`, nunca en un script.
 7. pDOOH y vía pública: sin audio; la voz se arma en 2 s como máximo; el último cuadro es el estático de respaldo.

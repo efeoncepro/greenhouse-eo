@@ -87,7 +87,8 @@ un color fijo. **Registro de marca ≠ registro fotográfico:** dentro del regis
 dice el texto y el **lecho es nativo** (lo que de verdad hay entre la cámara y el sujeto, nunca un objeto agregado),
 con la firma dentro de su materia; la toma deja en calma el rincón de «Desliza» y, en la Lente, la cara y el objeto
 caben en el círculo fijo del formato y nadie mira al lente → `references/efeonce-photographic-language.md` §El lecho
-en el registro cine. El cine con personas del equipo en redes sigue pendiente de aprobación.
+en el registro cine. Con personas del equipo, el cine en redes vale en MCM (personas reales del roster con la prenda
+de su línea); la publicidad con personas sigue en prueba.
 
 Para Nexa como personaje creativo, cargar
 [su biblioteca de recursos](../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md).
@@ -392,13 +393,16 @@ fotografía.
 
 **Cuatro registros, y se decide cuál ANTES de generar:** A documental · B puesta en escena · C la respuesta a la vista
 · **cine** «la marca en su película» (2026-09-27). Cine es ficción declarada —el servicio en acción como fenómeno de
-luz con el acento de su línea, sujeto a la derecha mirando al lente, cámara ≈ 2 m y 85 mm, bruma y rim, reserva
+luz con el acento de su línea, sujeto a la derecha mirando al lente (en la sección partida, al panel), cámara ≈ 2 m y 85 mm, bruma y rim, reserva
 izquierda oscura en 16:9— y **sólo** se usa con **Nexa protagonista**, en la receta de deck **`proposal-cinematic`**
 (AXIS `cine-requires-nexa-or-proposal`) y, por **excepción aprobada el 2026-09-27**, en las láminas de **sección y
 «about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos»: personas en luz dramática; no se
 extiende a social, web, publicidad ni contenido); la publicidad 9:16 y 4:5 en cine está **en prueba**, no aprobada. Marcador,
 barra, trampas y comandos en la referencia (§Registros); canon vigente:
 [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
+**Para producir, el [casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)**
+(2026-10-02): `pnpm foto:cine:nueva --desde <receta aprobada>` → campos cine de la ficha (`alcance` incluido) → agente
+`cine-reviewer` → `foto:generar` → `pnpm foto:validar:cine` + `foto:validar` + `foto:emblema` → revisor sobre el plate.
 **Plate de portada de brochure o propuesta** (operador, 2026-09-27): sujeto a la derecha, 45 % izquierdo oscuro y
 calmo para la columna de texto, 85 mm, lecho oscuro y la luz de acento de la línea; en la contraportada con foto, el
 sujeto de espaldas caminando hacia la órbita. Receta y ficha de ejemplo

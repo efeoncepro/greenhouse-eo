@@ -47,12 +47,12 @@ cada uno corresponde a una falla medida.
 | `alcance` | uno de `nexa` · `proposal-cinematic` · `deck-seccion` · `deck-portada` · `manzanitas` · `social-nexa` · `publicidad-prueba` | `"proposal-cinematic"` |
 | `identidad` con `vista` + `expresion` | desde el 2026-10-02 conviven (una persona sola en la toma): la `vista` manda en el ángulo de la cabeza y la `expresion` sólo en el gesto (las 12 fotográficas de Nexa comparten el mismo tres cuartos, así que solas no cambian el ángulo). `vestuario` sigue sin combinarse | `[{ "persona": "nexa", "vista": "45-izq", "expresion": "curiosa" }]` |
 
-Además, en cine el comando **inyecta solo** lo que se olvida siempre: el uniforme «deep navy, not royal blue» cuando
+Además, en cine el comando **inyecta solo** lo que se olvida siempre: el uniforme «deep navy, never royal blue» (salvo el hoodie, que conserva el azul royal de su kit) cuando
 hay una prenda del kit **o el traje biónico de Nexa**, y el lecho «matte, non-reflective, outside the reach of the key
 light». Con el traje, además, quita el smartwatch y el anillo de los accesorios de Nexa (los antebrazos son placas y la
 pantalla del reloj competía con la única fuente de luz; prueba ciega del 2026-10-02).
 
-## Las diez fallas, con su corrección
+## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»)
 
 Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 
@@ -63,7 +63,7 @@ Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 | 3 | **Sin profundidad**: todo en un plano | Falta primer plano junto al lente y fondo con bokeh; «some are out of focus» no basta | **Tres planos con distancia en metros** y apertura (cerca nítido · ~1 m · 4–6 m desenfocado, 85 mm f/1.8–2); un objeto **junto al lente** | NX5b (robot en la cornisa), NX7d | `foto:prompt` avisa sin `primerPlano` ni `fondo`; `cine-reviewer` (los píxeles no lo separan: ver [Medidor](#medidor-qué-mide-foto-validar-cine-y-qué-no)) |
 | 4 | **El fenómeno está al lado del servicio** | Se eligió un objeto lindo (cinta, perfume, pantallas) en vez de la luz que ES el servicio | Prueba de quitarlo: si sin la luz la idea sigue en pie, la luz sobra. Declara `fenomeno.esServicio`. En ads, **luz dura con la sombra como logo** y **larga exposición real** tienen respaldo; freeze y levitación no | CA1/CA3 (CMP-004); AE2 «un haz elige UNA» | `foto:prompt` avisa sin `fenomeno`; `cine-reviewer` |
 | 5 | **En vertical, el fenómeno sube a la reserva** | La fuente está riggeada alta; el fenómeno no se nombró en la prohibición | Nombrar el fenómeno: «the [vortex] stays entirely BELOW 36 % of the frame height; the top third is calm deep dark space»; fuente baja (rodilla–pecho); vórtices hacia el fondo, no hacia arriba | AD1d; CA4 (hasta el 15 %) | `foto:prompt` lo inyecta en 4:5 y 9:16; `foto:validar:cine` mide la luz en la reserva |
-| 6 | **Uniforme azul rey** en vez de navy | El modelo satura el azul del polo y del hoodie | «deep navy, not royal blue» | AE2b, CR2b, CA1/CA3/CA3b, SE1 | `foto:prompt` lo inyecta; `cine-reviewer` (bajo una llave azul los píxeles no lo separan) |
+| 6 | **Uniforme azul rey** en vez de navy | El modelo satura el azul del polo, la softshell o el traje | «deep navy, never royal blue»; el hoodie es la excepción: su kit es azul royal y así se pide | AE2b, CR2b, CA1/CA3/CA3b, SE1 | `foto:prompt` lo inyecta; `cine-reviewer` (bajo una llave azul los píxeles no lo separan) |
 | 7 | **Lecho que falla**: banda de blur o contraste bajo | Objeto «matte black» en un estudio vacío = banda; o el **reflejo** de la fuente en una superficie clara o brillante | El lecho es **lo que de verdad hay entre la cámara y el sujeto** (la mesa de la reunión, la consola), con la cámara a centímetros de su borde, **negro mate no reflectante, fuera del alcance de la llave** | NX7d (2,98:1 por reflejo); SP1; CA4 (las placas del traje llegan al pie) | `foto:prompt` inyecta mate; `foto:validar` mide el lecho |
 | 8 | **Isotipo pintado** o en el lugar equivocado | Isotipo compuesto plano sobre la tela; o generado sin referencia (inventó un cohete) | La prenda **por su kit** en `objetos`: el bordado sale de la referencia. `foto:isotipo --acabado` sólo si difiere. El traje biónico ya trae el isotipo en su referencia | WB1b (bajo el brazo, retirado) → WB1c; NX3 (cohete) | `foto:emblema` al 100 % |
 | 9 | **Cara deformada** después de corregir algo | Se editó la foto entera con otra proporción: el modelo reencuadra y rehace la cara | Nunca editar la foto entera para un color o una posición: se corrige la ficha y se regenera; si hay que editar, máscara y misma proporción | SF1 (Salesforce, arquitecta) | `cine-reviewer` |

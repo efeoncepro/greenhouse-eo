@@ -233,6 +233,14 @@ completo antes de escribir una ficha cine; para publicidad, sobre todo §2 (cuá
   Con Nexa, la pieza cabe en el caso 1 del contrato; **con personas del equipo queda fuera del alcance aprobado hasta
   decisión del operador** —AXIS la rechaza con el issue `cine-requires-nexa-or-proposal`—. En los dos casos, nada se
   publica ni se pauta como cine sin esa decisión; una pieza social o de campaña con el equipo sigue en A, B o C.
+- **Para producir una prueba (2026-10-02):** el flujo del
+  [casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) con
+  `"alcance": "publicidad-prueba"`: `pnpm foto:cine:nueva --desde <receta> --formato <9:16|4:5> --alcance publicidad-prueba`
+  → campos cine → agente `cine-reviewer` → `foto:generar` → `pnpm foto:validar:cine` + `foto:validar` +
+  `foto:emblema` → revisor sobre el plate. Aún no hay ninguna foto cine vertical aprobada para partir. En 4:5 y 9:16,
+  `foto:prompt` deja el fenómeno y el fondo bajo el 36 % del alto y, con `identidad`, pide la escala por encuadre
+  (9:16 de la cintura arriba, 4:5 del pecho arriba; a confirmar en el próximo piloto vertical); `foto:validar:cine`
+  mide la reserva (L* p99 ≤ 45 en el 36 % superior). Un número de figuras no basta: ubica cada una por geografía.
 - **Primera tanda** (`ai-generations/2026-09-27_ads-cine/`, página «Publicidad · cine» del canvas por superficie).
   Las cuatro son prueba: ninguna aprobada ni autorizada para pauta.
 
@@ -252,7 +260,9 @@ completo antes de escribir una ficha cine; para publicidad, sobre todo §2 (cuá
     alto.** La V escalonada subió una cabeza al 17 % y rompió la franja de texto (`AD4d`).
   - **Robots agentes arriba de la cintura** (hombros, brazos, costados). A los pies ensucian el lecho (`AD4b`: 3,01).
   - **Declara el estudio vacío** (*«an empty dark studio at night, no desks, no monitors, no plants, no lamps»*): si
-    la escena calla, vuelve la oficina (planta, monitor, lámpara en `AD4`), el default del bloque de realismo.
+    la escena calla, vuelve la oficina (planta, monitor, lámpara en `AD4`), el default del bloque de realismo. Pero el
+    vacío no reemplaza el lugar: las aprobadas tienen un espacio real, oscuro y profundo, con escala, y un fenómeno
+    grande (observado en la prueba ciega del 2026-10-02, a confirmar; casebook).
   - La geometría 16:9 (sujeto a la derecha, voz a la izquierda) no existe en vertical: la reserva sube y el sujeto
     baja, y el fenómeno de luz vive **detrás o alrededor del sujeto, bajo la reserva**. El anillo de `BR1` sale como
     elipse plana; probar un anillo vertical como el de `BR3` es criterio sin probar.

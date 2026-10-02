@@ -62,9 +62,9 @@ visual transversal requiere validación en varias portadas.
   con **Nexa protagonista** (traje de ficción permitido) y la receta de deck **`proposal-cinematic`**, ahora también
   con **personas del equipo**, que conservan su **uniforme por registro de escena** (piqué, chaqueta, gorra y polo,
   hoodie). Guardas que no se relajan: identidad por ficha (nunca injerto de cara), **cámara a ~2 m y 85 mm** en plano
-  medio sin escorzo, prenda lisa con el **isotipo oficial compuesto** después desde `@efeoncepro/axis-brand-assets`
-  (revisar con `pnpm foto:emblema`), reserva de texto declarada (el espacio oscuro a la izquierda), sujeto a la derecha
-  mirando a cámara, lo digital o el servicio en acción y el color saliendo de la escena, y **nunca dos personas
+  medio sin escorzo, la prenda **por su kit**, que trae el isotipo oficial armado (revisar con `pnpm foto:emblema`;
+  `foto:isotipo --acabado` sólo si difiere), reserva de texto declarada (el espacio oscuro a la izquierda), sujeto a la
+  derecha mirando a cámara (en la sección partida, al panel del texto: operador, 2026-10-02), lo digital o el servicio en acción y el color saliendo de la escena, y **nunca dos personas
   mirándose de cerca** (se lee romántico). **Tercer caso, excepción aprobada el 2026-09-27:** las láminas de
   **sección y «about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») con personas en luz
   dramática; el contrato ya la conoce (desde TASK-1927, `axis-tokens` 0.3.14: `section-split`, `section-cine` y las
@@ -76,6 +76,11 @@ visual transversal requiere validación en varias portadas.
   y [composición por superficie §4.6](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
   En la lámina aprobada de líneas de servicio con Nexa, las cinco esferas de luz son **luz de la foto**, no la esfera
   de la voz.
+  **Producir cine (2026-10-02):** el alcance creció después (MCM con el roster, perfiles sociales con Nexa; la ficha lo
+  declara en `alcance`) y el flujo operable es el
+  [casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md): `pnpm foto:cine:nueva`
+  → campos cine → `cine-reviewer` → `foto:generar` → `foto:validar:cine` + `foto:validar` + `foto:emblema` → revisor
+  sobre el plate. Personas reales del roster llevan la prenda de su línea; el casting por rol, el código por registro.
 - **Ilustraciones propietarias** (`characters/greenhouse-*.png`, mascota **Nexa**) = obra del equipo
   creativo de Efeonce, **NO stock ni Vuexy**. Úsalas con criterio de marca; producción nueva → §tooling.
 

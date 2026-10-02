@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.19
+> **Version:** 1.20
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-10-02 por Claude (1.19: delta — el traje biónico de Nexa y sus lentes, sólo en fotos de cine, con las marcas ya puestas; sus 12 expresiones; la escena con los Sparks que sirve de modelo. Antes, 1.18: delta — los Sparks, los agentes de Efeonce, entran como personajes propios de la marca y único robot permitido en una foto. Antes, 1.17: delta — los perfiles sociales de Efeonce (portadas de LinkedIn, Facebook y YouTube, avatar de redes, destacados de Instagram y las portadas de LinkedIn personales del equipo) entran a la línea; fila nueva en «Dónde está cada cosa» y pendiente de publicación. Antes, 2026-09-28, 1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-10-02 por Claude (1.20: delta — registro cine: cómo se produce una foto de cine sin consultar a nadie (recetas aprobadas, ficha con los campos del oficio, revisor, medidor y las siete decisiones del operador). Antes, 1.19: delta — el traje biónico de Nexa y sus lentes, sólo en fotos de cine, con las marcas ya puestas; sus 12 expresiones; la escena con los Sparks que sirve de modelo. Antes, 1.18: delta — los Sparks, los agentes de Efeonce, entran como personajes propios de la marca y único robot permitido en una foto. Antes, 1.17: delta — los perfiles sociales de Efeonce (portadas de LinkedIn, Facebook y YouTube, avatar de redes, destacados de Instagram y las portadas de LinkedIn personales del equipo) entran a la línea; fila nueva en «Dónde está cada cosa» y pendiente de publicación. Antes, 2026-09-28, 1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -595,6 +595,55 @@ y las fotos la toman de ahí.
 > [personas y vestuario, delta 2026-10-02](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo) ·
 > [cómo usarlo](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md)
 
+## Delta 2026-10-02 (b) — Registro cine: cómo se produce sin consultar a nadie
+
+Hasta el 2026-10-02 ninguna sesión llegaba sola a una foto de cine aprobable: todas terminaban preguntándole a la
+sesión de la línea gráfica, y siempre por las mismas fallas. Desde ese día el oficio está escrito y una persona o un
+agente puede producir la foto por su cuenta. La condición del operador fue no cambiar nada de los otros estilos de
+foto (documental, puesta en escena y respuesta), y se cumplió: ninguna de sus fichas cambió.
+
+- **Se parte de una foto aprobada, no de cero.** Hay 12 fotos de cine aprobadas y cada una es una receta: dice su
+  formato, para qué pieza sirve, por qué funciona y qué cuidar. Un comando copia la de la receta más parecida, marca
+  la escena para reescribir y lista lo que falta completar y lo heredado que hay que revisar. Todavía no hay ninguna
+  foto de cine vertical aprobada.
+- **La ficha tiene los campos del oficio.** Una sola luz principal, algo oscuro y desenfocado junto al lente, luces
+  frías lejanas al fondo, el fenómeno de luz con una frase que diga por qué ES el servicio, y para qué pieza es. Si
+  falta uno, el comando avisa qué falla se va a cometer.
+- **Lo primero a cuidar es el lugar.** Las fotos aprobadas tienen un espacio grande, oscuro y con profundidad, y un
+  fenómeno de luz grande; las pruebas que fallaban eran una persona en un fondo negro con una luz chica. Es una
+  observación de las pruebas, todavía a confirmar.
+- **La luz se juzga contra la foto aprobada.** Las aprobadas también tienen la cara iluminada de frente con luz suave;
+  la exigencia anterior («media cara casi negra») era más dura que lo que el operador aprobó y quedó corregida.
+- **Un revisor mira antes y después de gastar.** Es un agente de Claude Code que dice si la foto es aprobable, qué
+  corregir y con qué frase, o si el caso no va en cine. **«Aprobable» no es aprobado: aprueba el operador.** En Codex
+  no hay agente; se aplica la misma pauta leyéndola.
+- **Un medidor revisa lo que se puede medir** (cuánta sombra tiene el cuadro y, en vertical, que nada brillante suba
+  a la zona del texto). No ve todo: lo demás lo mira el revisor.
+
+**Las siete decisiones del operador** del 2026-10-02 para las fotos de cine:
+
+1. Los aros de Nexa son dorados.
+2. El destacado «Agents» de Instagram ya aprobado se queda (tres Sparks, sin Nexa ni texto).
+3. En las fotos verticales, la escala va por encuadre: en 9:16 de la cintura arriba y en 4:5 del pecho arriba. Se
+   confirma en el próximo piloto.
+4. En la lámina de sección partida del deck la persona mira hacia el panel del texto; mirar al lente queda para
+   portadas, contraportadas, la lámina de propuesta de cine y redes.
+5. Aparecen personas reales del equipo, con la prenda de su línea; cuando se elige por rol, se usa el código de cada
+   escena.
+6. Las luces encendidas de la escena (lámparas, pantallas) sólo aparecen como luces grandes, frías, lejanas y
+   desenfocadas.
+7. Un deck lleva una sola lámina de sección partida, y lo controla el validador del plan del deck.
+
+Las fotos de prueba quedan en `ai-generations/2026-10-02_prueba-ciega-cine/`, `…prueba-ciega-cine-2/` y
+`…experimento-luz-cine/`. Falta que el operador dé su veredicto sobre las fotos de la segunda prueba y un comando que
+haga todo el recorrido de una vez (`pnpm foto:cine`). Las 10 primeras fotos aprobadas, con su receta, se pueden ver en
+el banco fotográfico de AXIS (sección «Registro cine»).
+
+> Detalle técnico: [casebook del registro cine](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) ·
+> [registro cine, delta 2026-10-02 (b)](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega) ·
+> recetas en `scripts/foto/cine-recetas.json` ·
+> [cómo producir una foto de cine](../../manual-de-uso/creative/producir-foto-cine-de-marca.md)
+
 ## Estado y pendientes
 
 **Estado:** canónica desde el 2026-09-25. Es un **sistema consistente**, pero **todavía no un activo distintivo
@@ -612,6 +661,7 @@ la órbita se reconozca sola.
 | Íconos: voz de la línea Voice y reemplazo de los Tabler en las firmas | decisión del operador | la línea Voice no tiene voz fija; la firma de correo y la de equipo siguen con Tabler hasta que se decida |
 | Revisión legal de «Te hacemos visible» | legal | obligatoria antes de cualquier pauta, sin excepción |
 | Perfiles sociales de Efeonce | decisión del operador | publicar las portadas y el avatar en cada red y crear los destacados de Instagram; las historias de adentro de cada destacado siguen por hacer |
+| Registro cine: cierre del criterio | decisión del operador | veredicto sobre las fotos de la segunda prueba ciega y comando `pnpm foto:cine` que haga el recorrido completo (resto de TASK-1926) |
 | Ajustes de `foto:prompt` y chequeos de la lente | producción | una task nueva lleva al comando lo decidido para las fotos con lente (formato 1200 × 627, límite de cabezas sólo con reserva de texto, chequeos contra lecho y reservas) |
 
 > Detalle técnico: [manual §12](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#12-decisiones-y-validación) · [ADR, pendiente](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md#pendiente) · [manual §13, contrato y herramientas](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-03): contrato `efeonce.graphic-line-orbit` 0.3.0 (estable desde el 2026-09-26: un agente describe qué quiere hacer y el sistema pinta la pieza, la firma y mide que cumpla) en AXIS 0.3.0, `pnpm creative:orbit:render`, `pnpm creative:layout` y `pnpm foto:componer:cta` (tramo 17)

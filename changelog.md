@@ -11,6 +11,10 @@
 
 CMP-004 pasa de cuatro conceptos a un ad por servicio de Creative Services (S01–S08). Los ocho pilotos 4:5 se regeneraron con geometría nativa de ad (banda oscura continua arriba, objeto negro mate al pie para la firma) y pasan `foto:cta:gate --reproducir`. El compositor de CTA suma `graphicLine`: el anillo y la esfera de la voz toman el acento de la línea desde AXIS (sin el campo, growth, idéntico a antes; regresión 183/184 iguales, mutante `voz-acento-de-linea`). El CTA queda en contorno naranja tras comparar 40 composiciones.
 
+## 2026-10-02 — Registro cine: siete decisiones del operador, segunda prueba ciega y barra de luz recalibrada (TASK-1926)
+
+El operador aceptó siete decisiones (aros de Nexa dorados, destacado «Agents» intacto, escala vertical por encuadre, mirada al panel en la sección partida, vestuario por persona real o por rol, luces prácticas como bokeh frío en cine, una sección partida por deck vía el validador del plan); `foto:prompt` aplica en cine las tres de toma. Segunda prueba ciega: tres sesiones nuevas llegaron solas usando `cine-reviewer`. Un experimento de luz mostró que las fotos aprobadas también llevan luz suave de frente: la barra del revisor quedó calibrada contra el plate de la receta. Además: hoodie royal en cine, restos documentales fuera, `__revisar` en `foto:cine:nueva` y revisor más barato. Demás registros sin cambio.
+
 ## 2026-10-02 — El registro cine se opera sin consultor (TASK-1926, delta b)
 
 Ninguna sesión llegaba sola a una foto cine aprobable. La ficha cine gana cinco campos propios (`llave`, `primerPlano`, `fondo`, `fenomeno`, `alcance`) que `foto:prompt` compila y avisa cuando faltan; `pnpm foto:cine:nueva` parte de una de las diez fotos aprobadas (`scripts/foto/cine-recetas.json`) y `foto:generar` no gasta con la escena de la receta; `pnpm foto:validar:cine` mide sombra y reserva vertical (calibrado: stickers, relleno y azul rey bajo luz azul no se separan en píxeles y los revisa el agente `cine-reviewer`); casebook, manual y punteros en canon, regla y skills. Los demás registros no cambian: `scripts/foto/regresion-prompt.mjs` compara todas las fichas en disco (0 no cine cambiadas). AXIS: sección «Registro cine» en el banco fotográfico (commit local).
@@ -674,16 +678,3 @@ empate se dice el empate). Código en los releases `0e87c7a443a2` y `f9257b9c94a
 `get/set_insight_cover_preference`; `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y en el
 `ops-worker`. Verificado con un canary sintético en producción que sella el plan v2. Emisión, sharing y correo siguen
 OFF en producción. Rollback: flag OFF en los dos runtimes.
-
-## 2026-09-26 — La órbita 0.2.0: firma por regla, assets oficiales y la oficina en foto
-
-Regla del operador: una pieza gráfica firma con el logo de Efeonce centrado; la burbuja URL lo reemplaza sólo si el
-logo ya está en la imagen (centrada, fusión de luminosidad, lecho muy oscuro). La órbita se usa en casos puntuales y no
-sustituye la composición fotográfica. AXIS 0.2.7: contrato `efeonce.graphic-line-orbit` 0.2.0 (`signature`, `slogan`,
-`state`, `brand-close`; checks de firma y de sujeto), tokens nuevos y paquete `@efeoncepro/axis-brand-assets` (19 SVG
-sellados); el Lab sincroniza los archivos, suma la sección 4.9 «Oficina en foto» y el banco de tipografía firma con el
-logo. Greenhouse pinnea 0.2.7: `creative:orbit:render` pinta y mide la firma; `creative:layout` acepta la capa
-`graphic_line` y `brand.signature`; `foto:componer:cta` tramo 17 (`marcaEnEscena`, gate `firma-burbuja`, P11, 3
-mutantes) sólo en piezas nuevas, sin recertificar las aprobadas (el gate las muestra 3 hasta recomponer; ningún CI lo
-corre). La oficina de 4.3 se fotografió con IA (9 fotos, 4 corregidas por edición); canvas 40 láminas, PDF 56 hojas.
-Pendiente: umbral de contraste de la burbuja (4,5:1 hoy, al límite) y la atribución sin logo.

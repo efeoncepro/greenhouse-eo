@@ -440,8 +440,8 @@ marca), 1152×1440, `high`, ≈ USD 2–2,5 en total.
   contexto y ropa; no insistir con la misma redacción ni forzar otro proveedor para saltarse el filtro.
 - 🔴 **Nexa: sus accesorios y su equipo son parte de la identidad, no atrezzo.** Los cuatro signature
   elements viajan solos en el bloque `accesorios` de `foto:prompt` —anillo geométrico plata mate en el
-  índice derecho, **SMARTWATCH** en la muñeca izquierda (nunca analógico), aretes de plata, uñas de un
-  color— y los **gadgets de escena** se declaran en la `escena`: Apple Watch, iPhone, iPad con Pencil,
+  índice derecho, **SMARTWATCH** en la muñeca izquierda (nunca analógico), aretes de plata (en cine,
+  dorados: operador, 2026-10-02), uñas de un color— y los **gadgets de escena** se declaran en la `escena`: Apple Watch, iPhone, iPad con Pencil,
   MacBook, AirPods, **DJI Osmo Pocket/Action**, **DJI Mic 3** o lavalier **Rode**, **Shure** en podcast,
   cuerpo **Sony α** o **Canon EOS R**. Siempre la generación vigente, nunca un modelo descontinuado;
   encendidos y en uso; ningún logotipo de tercero legible. Canon:
@@ -727,19 +727,29 @@ diagnostica sin costo.
 ### Registro cine: placas, emblema y tamaños
 
 🔴 **Para producir, el flujo es el del [casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)**
-(2026-10-02): `pnpm foto:cine:nueva --desde <id>` → campos cine de la ficha → agente `cine-reviewer` →
-`foto:generar --quality high` → `pnpm foto:validar:cine` → `cine-reviewer` sobre el plate. Lo de abajo son trampas de
-producción que el casebook referencia.
+(2026-10-02): `pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta> [--formato] [--alcance]` (`--listar`:
+12 recetas aprobadas en `scripts/foto/cine-recetas.json`, ninguna vertical) → reescribir la escena «REESCRIBIR»
+(`foto:generar` no gasta mientras siga así) y los `__completar`/`__revisar` → campos cine (`llave`, `primerPlano`,
+`fondo`, `fenomeno`, `alcance`) → `foto:prompt` → agente `cine-reviewer` → `foto:generar --quality high` →
+`pnpm foto:validar:cine` + `pnpm foto:validar` + `pnpm foto:emblema` → `cine-reviewer` sobre el plate (APROBABLE no
+es aprobado). `foto:validar:cine` es aparte de `foto:validar` (que no cambió) y sólo tiene dos gates: sombra ≥ 35 % del
+cuadro con L* < 20 y, en vertical, L* p99 ≤ 45 en el 36 % superior; no ve stickers, relleno ni azul rey bajo luz azul.
+En cine, `foto:prompt` reemplaza las frases documentales de los bloques compartidos (`AJUSTES_CINE`) e inyecta llave
+sin relleno, lecho mate, uniforme navy (el hoodie conserva su royal del kit), aros de Nexa dorados, escala y mirada;
+los demás registros quedan idénticos. Si tocas `build-prompt.mjs`, corre `scripts/foto/regresion-prompt.mjs --foto`
+antes y `--comparar` después. Lo de abajo son trampas de producción que el casebook referencia.
 
-El registro cine («la marca en su película», 2026-09-27) sólo se usa con **Nexa protagonista** o en la receta de deck
-**`proposal-cinematic`** (y, por excepción aprobada el 2026-09-27, en las láminas de sección y «about» del deck; no se extiende fuera del deck); fuera de eso, la foto es A, B o C. La dirección (idea, marcador, barra, trampas) vive en
+El registro cine («la marca en su película», 2026-09-27) sólo se usa en los alcances que la ficha declara en `alcance`:
+Nexa protagonista, la receta de deck **`proposal-cinematic`**, secciones y «about» del deck, portadas y contraportadas,
+Marketing con Manzanitas con el roster y perfiles sociales con Nexa; la publicidad, en prueba. Fuera de eso, la foto es A, B o C. La dirección (idea, marcador, barra, trampas) vive en
 [`design-studio` → §Registros](../design-studio/references/efeonce-photographic-language.md) y el canon vigente es
 [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
 (plantilla de ficha en su §12). Lo que toca a la mano:
 
 - **Se genera con `pnpm foto:generar <ficha.json> --quality high --out <dir>`**, después de `pnpm foto:prompt` y de
-  **leer el prompt compilado** (el compilador fuerza la reserva izquierda del 16:9 y le inyecta a Nexa un smartwatch
-  aunque la ficha lo niegue). Sin `--out`, deja el plate en `plates/` junto a la carpeta de fichas. Motor observado en
+  **leer el prompt compilado** (el compilador fuerza la reserva izquierda del 16:9 —en la sección partida 1:1, con
+  `"reservas": {"texto": {"lado": "izquierda", …}}`— y le inyecta a Nexa un smartwatch aunque la ficha lo niegue,
+  salvo en cine con el traje biónico, donde quita el reloj y el anillo). Sin `--out`, deja el plate en `plates/` junto a la carpeta de fichas. Motor observado en
   los logs: `gpt-image-2.5-sunburst` `high`, ≈ USD 0,037 de salida por placa más la entrada de 4–6 referencias.
 - **Las placas salen en el tamaño del motor, no en el de la tabla.** `foto:generar` traduce a propósito: 9:16
   1152×2048 → **1024×1792**, 4:5 1152×1440 → **1024×1280**, 16:9 2048×1152 → **1792×1024** (medido en los logs del

@@ -183,7 +183,7 @@ todos existían en disco el 2026-09-28):
 | Logos de clientes | `src/lib/artifact-composer/catalogs/deck-axis/assets/clients/*.svg` (`sky.svg`, `sky-on-dark.svg`, `aguas-andinas.svg`, `universidad-temuco.svg`, `carozzi.svg`, `berel.svg`, `anam.svg`…) | sólo de quienes autorizan su uso; el compositor los normaliza (asset `logo`) |
 | Logos de partners | `public/images/logos/partners/*` (HubSpot, Salesforce, Google Cloud, AWS, Microsoft, OpenAI, Claude, Adobe, BytePlus) | normalizados al componer |
 | Isotipos de herramientas y fotos del squad | `deck-axis/assets/tools/*-isotype.svg`, `deck-axis/assets/squad/squad-*.png`, `deck-axis/assets/product/greenhouse-seo-dashboard.png`, `public/images/greenhouse/SVG/negative-isotipo-green.svg` | leídos del catálogo `deck-axis` como archivo; la lámina de La órbita no los copia |
-| Isotipo compuesto sobre la ropa en los plates | lo compone la ficha fotográfica (`pnpm foto:*`) desde `@efeoncepro/axis-brand-assets` | abierto: procedencia sin registrar en algunos plates (`pnpm foto:emblema` antes de publicar) |
+| Isotipo sobre la ropa en los plates | lo trae la referencia del kit de la prenda en la ficha (`objetos`); `foto:isotipo --acabado` desde `@efeoncepro/axis-brand-assets` sólo si `pnpm foto:emblema` difiere. Varias recetas cine aprobadas llevan el isotipo compuesto plano: sirven como receta de luz y escena, no de bordado (casebook cine, falla 8) | abierto: procedencia sin registrar en algunos plates (`pnpm foto:emblema` antes de publicar) |
 
 El `axis-graphic-line` lo usa sólo `src/lib/brand-surfaces` (`paintGraphicLine`, `resolveIcon`) para los catálogos del
 Artifact Composer; las piezas de campaña siguen con el adapter propio raster-safe. Fuera de esa ruta, los SVG de

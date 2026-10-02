@@ -168,7 +168,9 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
     catálogo `graphic-line-deck`; detalle en las skills `deck-studio` y `efeonce-graphic-line`). Checklist de las decisiones de ese día: tríptico con **una esfera por palabra**
     («Escucha.» «Crea.» «Mide.»); sección partida con el indicador **por la izquierda** (tres variantes); cotización en
     tres variantes, sólo en propuesta y con `[MONTO]`; próximos pasos con la agenda abierta; clientes en un tono navy;
-    foto del caso Sky de ejemplo; registro cine también en secciones y «about», nunca fuera del deck.
+    foto del caso Sky de ejemplo; registro cine también en secciones y «about» (en la sección partida, la mirada al
+    panel), y fuera del deck sólo en sus alcances aprobados (perfiles sociales con Nexa, Marketing con Manzanitas con el
+    roster); se produce con el [casebook cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).
     **Datos reales (TASK-1930, en curso):** los slots de datos (logo del cliente, cifras, casos, testimonios, logos de
     terceros, montos, equipo, datos de muestra) nunca se escriben a mano: los liga `bindDeckSlots`
     (`src/lib/brand-surfaces/deck-recipes/bindings/`; CLI `pnpm brand:deck-plan -- --bind`) desde evidencia

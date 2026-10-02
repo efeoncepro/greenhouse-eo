@@ -221,7 +221,12 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   - **La foto** de estas láminas se rige por el
     [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (fuente vigente desde
     el 2026-09-27: cámara, la línea como luz, vestuario, robots, reservas, trampas y barra de juicio). Esta skill no
-    dirige la foto: la pide por ficha (`pnpm foto:*`).
+    dirige la foto: la pide por ficha (`pnpm foto:*`) siguiendo el
+    [casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) (2026-10-02):
+    `pnpm foto:cine:nueva --desde <receta aprobada>` → campos cine con `alcance` (`proposal-cinematic`,
+    `deck-seccion` o `deck-portada` en un deck) → agente `cine-reviewer` → `foto:generar` → `pnpm foto:validar:cine` +
+    `foto:validar` + `foto:emblema` → revisor sobre el plate. Personas reales del roster llevan la prenda de su línea;
+    el casting por rol («la estratega», «la líder de RevOps»), el código por registro de escena.
 
 #### Portadas y contraportadas (aprobado 2026-09-27)
 
@@ -545,7 +550,10 @@ Qué cuidar al cambiar la foto:
 - **En `panel-end` la foto va espejada** (la plantilla aplica el espejo que declara AXIS). Una foto con texto legible
   o con un logo saldría al revés. El isotipo del uniforme se compone aparte: revísalo en esa composición.
 - **El registro de la foto lo valida AXIS.** Las secciones partidas admiten personas en luz dramática (registro cine,
-  excepción aprobada) o documental.
+  excepción aprobada) o documental. En cine (operador, 2026-10-02): la mirada va **al panel del texto**, nunca al
+  lente (`alcance: deck-seccion` lo inyecta); el 1:1 pide la reserva con `"reservas": {"texto": {"lado":
+  "izquierda", …}}`; y va **una sola sección partida por deck** (`section-split` y `section-split-panel-end` son
+  alternativas: lo controla `variant-both-in-deck`, no `foto:*`).
 - **En portadas con columna, revisa `column.topPx`** al cambiar la foto: se elige según dónde queda el sujeto.
 
 Qué **no** cambia al cambiar la foto: el panel, la esquina curva, el indicador y la columna de voz. Eso lo fija la

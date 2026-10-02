@@ -74,10 +74,20 @@ Efeonce —el servicio como fenómeno de luz, ficción declarada— sólo está 
 receta de deck `proposal-cinematic` y en las láminas de sección y «about» del deck (excepción del 2026-09-27, que no
 alcanza a social). **Excepción social (2026-10-01):** las portadas de perfil y los destacados de Instagram de
 Efeonce con Nexa protagonista, aprobados (overlay §Marca, «Perfiles sociales de Efeonce»). Una pieza social con
-personas del equipo **sigue en A, B o C**, y sus formatos
+personas del equipo **sigue en A, B o C** (salvo las fotos de Marketing con Manzanitas con personas reales del roster,
+con la prenda de su línea), y sus formatos
 9:16 y 4:5 están **en prueba**: nada se publica como cine sin decisión del operador. Canon:
 [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) §2 y §11; lecciones de la
 primera tanda publicitaria en `efeonce-advertising-creative` §«Registro cine en publicidad».
+**Producir una foto cine social (2026-10-02):** el flujo del
+[casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md):
+`pnpm foto:cine:nueva --desde <receta> [--formato] [--alcance]` (para perfiles y destacados con Nexa, `PH2` o `PS1b`;
+`alcance: social-nexa`, o `manzanitas` en MCM) → campos cine → agente `cine-reviewer` → `foto:generar` →
+`pnpm foto:validar:cine` + `foto:validar` + `foto:emblema` → revisor sobre el plate. No hay todavía ninguna foto cine
+vertical aprobada; en 9:16 y 4:5, `foto:prompt` deja el fenómeno y el fondo bajo el 36 % del alto y, con `identidad`,
+pide la escala por encuadre (9:16 de la cintura arriba, 4:5 del pecho arriba; a confirmar en el próximo piloto
+vertical). En social, Nexa mira al lente. **El destacado «Agents» aprobado se queda** (operador, 2026-10-02): tres
+Sparks, sin Nexa ni texto en el círculo; un destacado con Nexa usa otro nombre y otra destacada.
 
 1. **Clasifica la intención** con el árbol de §2. ¿Es realmente social de ejecución
    profunda, o pertenece a una skill hermana? Si pertenece a otra, carga la skill dueña (§5). Para encargos sociales integrales,

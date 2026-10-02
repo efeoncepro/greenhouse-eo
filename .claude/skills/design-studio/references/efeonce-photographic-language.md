@@ -117,18 +117,33 @@ una película de gran presupuesto, y **el color de la línea sale de la escena c
 de partículas, esferas—, nunca pintado encima ni puesto como grade.
 
 🔴 **Producir cine (2026-10-02): sigue el [casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).**
-Parte de una foto aprobada con `pnpm foto:cine:nueva --desde <id>` (`--listar` muestra las diez), declara en la ficha
-`llave`, `primerPlano`, `fondo`, `fenomeno { que, esServicio }` y `alcance` (`foto:prompt` los compila y avisa los que
-faltan), pide revisión al agente `cine-reviewer` antes de gastar y después del plate, y mide con `pnpm foto:validar:cine`.
+El flujo: casebook → `pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta> [--formato] [--alcance]`
+(`--listar` muestra las 12 recetas aprobadas de `scripts/foto/cine-recetas.json`; ninguna vertical todavía) → reescribe la
+escena marcada «REESCRIBIR» (`foto:generar` no gasta mientras siga así) y completa `__completar` y `__revisar` → campos
+cine: `llave { fuente, lado, distancia, tamano }`, `primerPlano`, `fondo`, `fenomeno { que, esServicio }` y `alcance`
+(`nexa` · `proposal-cinematic` · `deck-seccion` · `deck-portada` · `manzanitas` · `social-nexa` · `publicidad-prueba`;
+uno inválido aborta) → `pnpm foto:prompt` (los compila en «CINEMATIC CRAFT» y avisa los que faltan) → agente
+`cine-reviewer` sobre la ficha → `pnpm foto:generar <ficha> --quality high` → `pnpm foto:validar:cine` +
+`pnpm foto:validar` + `pnpm foto:emblema` → `cine-reviewer` sobre el plate. El revisor calibra contra el plate de la
+receta de partida y su APROBABLE no es la aprobación del operador.
+En cine, `foto:prompt` reemplaza las frases documentales de los bloques compartidos (`AJUSTES_CINE`) e inyecta solo:
+llave única sin relleno, lecho mate y real (no banda) separado del primer plano, fenómeno y fondo bajo el 36 % del alto
+en 4:5 y 9:16, escala por encuadre con `identidad`, mirada al panel con `alcance: deck-seccion`, uniforme navy (el
+hoodie conserva su royal del kit), aros de Nexa dorados y la reserva izquierda de la sección partida 1:1 con
+`"reservas": {"texto": {"lado": "izquierda", …}}`. Los demás registros no cambian: si tocas `build-prompt.mjs`, corre
+`scripts/foto/regresion-prompt.mjs` antes (`--foto`) y después (`--comparar`).
 Nunca reconstruyas la receta de memoria ni consultes a otra sesión: si el casebook no cubre tu caso, agrégale la fila.
 
 **Marcador rápido — estás en cine si se cumple todo esto:**
 
 - La luz fuerte del cuadro **es un objeto imposible con el `accentOnDark` de una línea** (no una ventana, lámpara o
   monitor real). A, B y C no fabrican su fuente de luz.
-- El sujeto **mira al lente** desde la derecha del cuadro.
+- El sujeto **mira al lente** desde la derecha del cuadro; en la **sección partida**, mira al panel del texto
+  (operador, 2026-10-02). El lente queda para portadas, contraportadas, `proposal-cinematic` y social.
 - Cámara a **≈ 2 m, 85 mm, altura de pecho**, plano medio desde la cintura, sin escorzo: cabeza ≈ ¼ del alto,
   hombros más anchos que dos cabezas, el sujeto no se inclina hacia el lente.
+- Escala: «cabeza ≈ ¼ del alto» vale en 16:9; en 9:16, de la cintura arriba; en 4:5, del pecho arriba (a confirmar en
+  el próximo piloto vertical).
 - **Rim frío desde atrás + bruma** que atrapa el brillo, sobre un set navy-negro (`palanca: luz-motivada`,
   `atmosfera: bruma`).
 - En 16:9, la **izquierda (≈ 45 %) es una reserva oscura y calma**, sin fenómeno de luz ni robots.
@@ -138,7 +153,7 @@ Nunca reconstruyas la receta de memoria ni consultes a otra sesión: si el caseb
 | Caso | Protagonista | Vestuario |
 |---|---|---|
 | 1 · Nexa protagonista | Nexa (identidad A) | Traje de ficción (biónico, por catálogo: `traje-bionico-nexa` + `lentes-bionicos-nexa` con `"registro": "cine"`) o uniforme Efeonce |
-| 2 · Receta de deck `proposal-cinematic` | Personas del equipo o Nexa | Personas: **uniforme por registro de escena**; el traje de ficción es sólo de Nexa |
+| 2 · Receta de deck `proposal-cinematic` | Personas del equipo o Nexa | Personas: casting por rol → **uniforme por registro de escena**; persona real del roster → la prenda de su línea (operador, 2026-10-02); el traje de ficción es sólo de Nexa |
 | 3 · **Excepción:** láminas de **sección** y **«about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») | Personas en luz dramática, con o sin Nexa (en la sección con el panel a la derecha, la persona del cliente) | Equipo: uniforme por registro de escena; cliente: su ropa, sin marca Efeonce |
 | 4 · **Fotos de Marketing con Manzanitas** (`cine-team-people-social`) | **Personas reales del equipo actual**, sólo las del [roster del equipo](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md), con `identidad` en la ficha; identidades aprobadas por el operador el 2026-09-29 | La de la línea de la pieza (`linea` en la ficha): hoodie Efeonce en Servicios creativos (`brand`); bomber o softshell, con el polo debajo si se quiere, en las líneas de negocio. Todo el equipo, sin excepción por persona; `foto:prompt` lo exige |
 
@@ -192,7 +207,7 @@ va por `pnpm foto:componer` o `pnpm foto:componer:cta`; la receta de anuncio cin
 **Barra de juicio, resumida** (las doce preguntas completas en §13 del registro): caso permitido · el servicio en
 acción como fenómeno de luz (quitarlo deja la escena vacía) · la luz fuerte es ese fenómeno, con el acento de la línea
 correcta y uno solo por pieza (salvo la lámina de líneas, con sus cinco esferas) · rim y bruma · proporciones reales ·
-mira al lente y nadie mira a otro de cerca · identidad (Nexa A contra sus anclas) · vestuario por registro · emblema
+mira al lente (al panel en la sección partida) y nadie mira a otro de cerca · identidad (Nexa A contra sus anclas) · vestuario por registro · emblema
 revisado con `foto:emblema` (el oficial llega armado en la referencia del kit; compuesto con `foto:isotipo` sólo si difiere, sufijo `b` y `.json` de procedencia) · reserva limpia y
 ningún texto cruza al sujeto · lecho `DARK near black` fuera de toda luz y de todo reflejo; en la lámina, sin logo y
 con la burbuja URL al pie · **una sola órbita**: el anillo, moño u órbita de la foto ya cuenta.
@@ -205,7 +220,8 @@ con la burbuja URL al pie · **una sola órbita**: el anillo, moño u órbita de
 - **Dos personas mirándose de cerca se leen románticas** (`NX2`, rechazada): todos a cámara o al trabajo.
 - **El compilador fuerza la reserva izquierda del 16:9**: una reserva «arriba» compila como izquierda (`BR3`), y la
   tabla escribe «LEFT 42%» contra el 0,45 del token. **Lee siempre el prompt compilado.**
-- **El bloque de accesorios de Nexa inyecta un smartwatch** aunque la ficha pida «no watch» (pendiente del operador).
+- **El bloque de accesorios de Nexa inyecta un smartwatch** aunque la ficha pida «no watch». En cine con el traje
+  biónico, `foto:prompt` ya quita el smartwatch y el anillo (casebook); con otro vestuario, lee el prompt compilado.
 - **El motor no devuelve el tamaño de la tabla** (2048×1152 → 1792×1024): mide las cajas en fracciones.
 - **Plastilina no es cine**: el material plástico no es un fenómeno digital, aunque la escena sea imposible.
 - **Una reserva declarada por porcentaje no se respeta** (`CR4` v1): ánclala por geografía respecto del cuerpo.
@@ -471,7 +487,8 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
   técnica mínima sólo si es imprescindible.
 - **Neutro-cálido ~5200 K**, blancos levemente cálidos, **sombras neutras, nunca azules**. **Exponer para las altas
   luces** (un KV pasó de 31,5% quemado a 0,05%).
-- Lámparas prácticas encendidas dan look podcast-stock: en sets oscuros, apagadas o puntuales.
+- Lámparas prácticas encendidas dan look podcast-stock: en sets oscuros, apagadas o puntuales. **Excepción del cine**
+  (operador, 2026-10-02): encendidas sólo como bokeh grande, frío y lejano al fondo, nunca en la reserva del titular.
 - Rangos objetivo (script de métricas Lab, pieza a 576 px): quemado ≤ 0,5–1% (contraluz ≤ 2–3%); aplastado ≤ 5%
   (clave baja ≤ 8%, pedir «shadows deep but always with visible texture»); contraste p95−p5 70–90 en piezas de
   impacto; croma p95 ≤ ~40 salvo campo azul; b\* altas +2 a +12; b\* sombras −3 a +3; piel L 44–61, C 18–31.
@@ -676,7 +693,8 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
   la prenda la dicta la situación.
 - 🔴 **Los CUATRO signature elements de Nexa viajan en toda pieza suya** (los resuelve `foto:prompt`, no se
   escriben a mano): anillo geométrico plata mate en el **índice derecho** · **SMARTWATCH** en la muñeca
-  izquierda —**nunca** un reloj analógico— · aretes de **plata**, nunca dorados · uñas de un solo color.
+  izquierda —**nunca** un reloj analógico— · aretes de **plata**, nunca dorados (en **cine**, dorados como su ancla: operador, 2026-10-02; `foto:prompt`
+  lo aplica) · uñas de un solo color.
   Medido: el bloque gana metal, forma y presencia, pero **el DEDO sólo se gana editando**, no generando.
 - 🔴 **Gadgets y equipo: siempre tecnología premium y de la generación vigente.** Apple Watch, iPhone, iPad
   con Pencil, MacBook, Mac de escritorio, AirPods; para grabar **DJI Osmo Pocket/Action**, **DJI Mic 3** o

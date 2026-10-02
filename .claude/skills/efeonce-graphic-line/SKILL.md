@@ -138,8 +138,10 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
     coordenadas ni canal elegidos a mano.** El registro cine sólo con Nexa protagonista, en `proposal-cinematic` y, por
     excepción aprobada el 2026-09-27, en las láminas de **sección y «about»** del deck (nunca en social, web, publicidad
     ni contenido, salvo las portadas de perfil y los destacados de Efeonce con Nexa, aprobados el 2026-10-01,
-    [applications.md §A11](references/applications.md); [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md), delta
-    (c)); **ahí la luz de la
+    [applications.md §A11](references/applications.md), y las fotos de Marketing con Manzanitas con el roster;
+    [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md), delta
+    (c); la foto se produce con su [casebook](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)
+    y el agente `cine-reviewer`, dirigida por `design-studio`); **ahí la luz de la
     línea es un fenómeno fotográfico (anillo, esfera, moño, esferas de acento) y cuenta como órbita: una sola órbita por
     pieza**, así que no se agrega otra gráfica encima. Contrato vigente: 0.1.2 (usos, marco de portadas y
     contraportadas, layouts de `proposal-cinematic`, documento; [applications.md §L](references/applications.md));

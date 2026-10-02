@@ -1,9 +1,9 @@
 # Bloques de prompt y pipeline de producción — fotografía de marca Efeonce V1
 
 > **Tipo de documento:** Especificación técnica de producción (prompts, comandos, scripts, QA)
-> **Versión:** 1.5
+> **Versión:** 1.6
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-10-02 por Claude — 1.5: §3.7.1 lista el traje y los lentes biónicos de Nexa entre los kits y las tres claves de kit que estrenaron (`instruccionEnUso`, `acabadoMarca`, `macroEnUso`). 1.4: las referencias de identidad dicen QUIÉN es, no CÓMO está ([delta 2026-10-02](#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)). Antes, 2026-09-26: conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
+> **Última actualización:** 2026-10-02 por Claude — 1.6: el registro cine en `foto:prompt` — `AJUSTES_CINE`, el bloque `CINEMATIC CRAFT` y sus inyecciones, `foto:cine:nueva`, `foto:validar:cine` y `regresion-prompt.mjs` como gate de no-regresión ([delta 2026-10-02 (b)](#delta-2026-10-02-b--el-registro-cine-en-fotoprompt)). 1.5: §3.7.1 lista el traje y los lentes biónicos de Nexa entre los kits y las tres claves de kit que estrenaron (`instruccionEnUso`, `acabadoMarca`, `macroEnUso`). 1.4: las referencias de identidad dicen QUIÉN es, no CÓMO está ([delta 2026-10-02](#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)). Antes, 2026-09-26: conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este documento es el **cómo se produce**: los bloques de texto que incorpora `pnpm foto:prompt` en cada prompt, la ficha de
@@ -16,6 +16,77 @@ verbatim en `rondas/<ronda>/batch*.json` y `*.txt` (versionados); las imágenes 
 Marcas: **[medido]**, **[decisión del operador]**, **[criterio]**, **[pendiente]** (ver [índice](./README.md)).
 
 ---
+
+## Delta 2026-10-02 (b) — el registro cine en `foto:prompt`
+
+**[medido, TASK-1926]** Ninguna sesión llegaba sola a una foto cine aprobable: todas consultaban a la sesión de la línea
+gráfica. La primera prueba ciega (`ai-generations/2026-10-02_prueba-ciega-cine/`) mostró la causa en el compilador:
+tres sesiones nuevas llegaron solas a un plate, y las tres con la **cara rellena**, porque los bloques compartidos se
+escribieron para el registro documental y contradecían al cine. Todo lo de este delta actúa **sólo** con
+`"registro": "cine"` en la ficha; en los demás registros el prompt queda idéntico. La guía de oficio es el
+[casebook](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md); el canon, el [registro cine](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (1.9).
+
+**1. `AJUSTES_CINE` — frases de los bloques compartidos que en cine se reemplazan** (`scripts/foto/build-prompt.mjs`):
+
+| Frase documental | En cine pasa a | Por qué |
+|---|---|---|
+| «a real candid documentary photograph» | «a real cinematic film still» | El cine es ficción dirigida, no documental |
+| «a mug, a notebook» como detalles vividos | nada vivido ni analógico: sin tazas, cuadernos, libros ni papel | Utilería documental dentro de una escena de cine |
+| «shadows open» | sombras a casi negro con textura, sin relleno | Era la causa de la cara rellena |
+| «real sunlight» o una fuente fuerte | una sola fuente dura, cerca y de lado, sin relleno | Ídem |
+| Paleta «neutral-warm» con el azul emergiendo | el color del fenómeno de luz declarado es el único acento; el resto navy profundo y casi negro | El color del cine sale de la luz de la línea |
+| Balance «warm-neutral, shadows never blue» | «cool-neutral»; sombras navy-negro, nunca ámbar ni azul saturado | Una prueba salió con el fondo ámbar |
+| Sombra «warm» de la reserva | sombra casi negra pareja | Ídem |
+| PRINTED MATTER (lomos, etiquetas, pantallas legibles por medios físicos) | sin impresos, libros ni pantallas salvo que la escena los declare | La sala de trabajo real no existe en cine |
+| Personas latinoamericanas genéricas | sólo las personas que declara la escena, sin extras | Figuras sobrantes |
+| «real paper texture», desenfoque de manos, «DECISIVE MOMENT» | se quitan o pasan a «a single decisive instant» | Restos documentales que siguieron entrando en la segunda prueba ciega |
+| Luz motivada por un monitor, una lámpara o una ventana en cuadro | la fuente en cuadro es el objeto de luz que la escena declara como fenómeno | Ídem |
+| Aros de Nexa plateados | dorados, como su ancla de identidad | [decisión del operador, 2026-10-02] |
+
+**2. El bloque `CINEMATIC CRAFT (registro cine)`** se compila desde los campos cine de la ficha —nunca se escribe a
+mano— y va después de la escena. `foto:prompt` avisa cuando falta un campo y aborta con un `alcance` inválido:
+
+| Campo de la ficha | Qué inyecta |
+|---|---|
+| `llave {fuente, lado, distancia, tamano}` | `KEY LIGHT`: la única fuente, sin relleno, con la cara modelada por ella |
+| `primerPlano` | `DEPTH`: primer plano junto al lente, desenfocado y separado del lecho |
+| `fondo` | `BACKGROUND`; en 4:5 y 9:16, todo bajo el 36 % del alto |
+| `fenomeno {que, esServicio}` | `THE LIGHT PHENOMENON`; en 4:5 y 9:16, bajo el 36 % del alto con el tercio superior oscuro y calmo |
+| `alcance` (`nexa` · `proposal-cinematic` · `deck-seccion` · `deck-portada` · `manzanitas` · `social-nexa` · `publicidad-prueba`) | Con `deck-seccion`, `GAZE`: la mirada va al lado vacío del texto, nunca al lente |
+
+Además, sin campo propio: el lecho pedido **mate, no reflectante, como objeto real y no como banda**; la **escala
+vertical por encuadre** cuando la ficha trae `identidad` (`SUBJECT SCALE`: 9:16 de la cintura arriba, 4:5 del pecho
+arriba); el **uniforme navy** de las prendas Efeonce y del traje de Nexa, salvo el hoodie, que conserva el azul royal
+de su kit (`UNIFORM COLOUR`); y la **sección partida 1:1** con `"reservas": {"texto": {"lado": "izquierda", …}}`, que
+reserva el 40 % izquierdo en vez de la banda superior. Las decisiones que lo motivan están en el
+[registro cine, delta 2026-10-02 (b)](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega).
+
+**3. Comandos nuevos del registro cine:**
+
+```bash
+pnpm foto:cine:nueva --listar                               # las recetas aprobadas (scripts/foto/cine-recetas.json)
+pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta> [--formato <f>] [--alcance <a>]
+pnpm foto:validar:cine <plate.png>                          # aparte de foto:validar, que no cambió
+```
+
+- `foto:cine:nueva` copia la ficha de una foto aprobada, marca la escena «REESCRIBIR» y lista en `__completar` los campos
+  que faltan y en `__revisar` lo heredado (suspendido, objetos, identidad). **`foto:generar` no gasta mientras la escena
+  empiece con «REESCRIBIR»**, y `foto:prompt` avisa con `__completar` y `__revisar`. El índice tiene 12 fotos aprobadas,
+  ninguna vertical todavía.
+- `foto:validar:cine` tiene dos gates calibrados: sombra ≥ 35 % del cuadro con L\* < 20 y, en vertical, L\* p99 ≤ 45 en
+  el 36 % superior. Profundidad y llave son sólo informativas. No ve stickers, relleno ni azul rey bajo luz azul: eso lo
+  mira el agente `cine-reviewer` (sólo Claude Code; Codex aplica la rúbrica leyendo `.claude/agents/cine-reviewer.md`).
+
+**4. 🔴 Gate de no-regresión al tocar `build-prompt.mjs`.** La condición del operador fue no romper los comandos de los
+demás registros. Antes y después de cualquier cambio al compilador:
+
+```bash
+node scripts/foto/regresion-prompt.mjs --foto <scratchpad>/antes.json      # congela el prompt de todas las fichas en disco
+node scripts/foto/regresion-prompt.mjs --comparar <scratchpad>/antes.json  # sale con 1 si cambió una ficha NO cine
+```
+
+Las fichas viven fuera de git, así que la foto se guarda en el scratchpad de la sesión. Resultado de toda la
+iniciativa: **0 fichas no cine cambiadas** **[medido]**.
 
 ## Delta 2026-10-02 — las referencias dicen quién es, no cómo está
 
@@ -1116,6 +1187,10 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | `efeonce-look.mjs` | Ídem | **Descartado** (grade V0) |
 | Script de máscara | No persistido | Receta en §6.2 **[pendiente: persistir]** |
 | Comando `pnpm` (p. ej. `pnpm brand-photo:measure`) | — | **[pendiente]**: promover a `scripts/` del repo con tests y umbrales por contexto |
+| `cine-nueva.mjs` (`pnpm foto:cine:nueva`) + `cine-recetas.json` | `scripts/foto/` | Vigente desde 2026-10-02: ficha cine nueva desde una receta aprobada ([delta (b)](#delta-2026-10-02-b--el-registro-cine-en-fotoprompt)) |
+| `validar-cine.mjs` (`pnpm foto:validar:cine`) | `scripts/foto/` | Vigente desde 2026-10-02: gates de sombra y techo oscuro del registro cine |
+| `regresion-prompt.mjs` | `scripts/foto/` | Vigente desde 2026-10-02: gate de no-regresión, correrlo antes y después de tocar `build-prompt.mjs` |
+| Orquestador `pnpm foto:cine` | — | **[pendiente]**: resto de TASK-1926 |
 
 ## Ads: proporción del lecho y continuidad
 
