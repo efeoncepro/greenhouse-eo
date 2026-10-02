@@ -52,13 +52,6 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
 - [Manual](docs/manual-de-uso/growth/dataforseo-cli.md) y [auditoría](docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md): 96 tests verdes, dry-runs y SemVer verificados; typecheck sin WIP ajeno pasa, global conserva 17 errores en deck HubSpot. Implementación local sin POST pagado, commit/push ni deploy.
 - Validación posterior autorizada en Berel **MX**: 20 keywords en dos páginas, JSON/CSV coincidentes, scope `matched` y resume de ambas páginas sin recompra; USD 0,0284 reconciliados. Manual/ADR y skills DataForSEO, SEO/AEO y Berel incorporan selección editorial del ruido, mercado explícito y límites de `total_count` y atribución de dominios. La captura CL anterior queda separada del resultado mexicano aplicable al cliente.
 
-## 2026-09-29 — Glitch y Marketing con Manzanitas estables como sub-líneas de La órbita (AXIS `v0.3.37`)
-
-- El operador aprobó Manzanitas para usar y fijó su lugar: «no sustituye a la orbita es una sublinea dentro del design
-  system de la orbita igual que glitch». Con su autorización, AXIS `v0.3.37` pasa `glitchLine` y `manzanitasRegister` a
-  `canonical` y los contratos `efeonce.glitch-line` 0.2.0 y `efeonce.manzanitas-register` 0.3.0 a `stable`, sin cambio de
-  valores ni render. Greenhouse fija `axis-tokens` y `axis-ui-contracts` 0.3.37 y regenera los tokens compilados; los
-  catálogos del Artifact Composer siguen `candidate` hasta la ruta productiva (TASK-1921).
 ## 2026-09-30 — Creative Workbench: rutas nativas selladas y `creative:status` por REST
 
 - Delta documental posterior: skill `efeonce-creative-workbench` completa y espejada Codex/Claude,
@@ -97,6 +90,14 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
 - 37 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests
   del harness de Codex iguales antes y después. Decisión: §8 de
   [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
+
+## 2026-09-29 — Glitch y Marketing con Manzanitas estables como sub-líneas de La órbita (AXIS `v0.3.37`)
+
+- El operador aprobó Manzanitas para usar y fijó su lugar: «no sustituye a la orbita es una sublinea dentro del design
+  system de la orbita igual que glitch». Con su autorización, AXIS `v0.3.37` pasa `glitchLine` y `manzanitasRegister` a
+  `canonical` y los contratos `efeonce.glitch-line` 0.2.0 y `efeonce.manzanitas-register` 0.3.0 a `stable`, sin cambio de
+  valores ni render. Greenhouse fija `axis-tokens` y `axis-ui-contracts` 0.3.37 y regenera los tokens compilados; los
+  catálogos del Artifact Composer siguen `candidate` hasta la ruta productiva (TASK-1921).
 
 ## 2026-09-29 — HubSpot Agent CLI y MCP como carriles de operación directa
 
@@ -686,7 +687,3 @@ Pendiente: umbral de contraste de la burbuja (4,5:1 hoy, al límite) y la atribu
 ## 2026-09-26 — Marketing Studio por MCP en producción (release 0e87c7a443a2)
 
 Release develop→main PR #240 (run `36222331450`, released): canje RFC 8693 `efeonce-mcp-marketing-studio`, capability `marketing_studio.campaign.read`, manual MCP `marketing-studio` servido por el lane de skills (canary 200) y contrato editorial v2 de Insights con flag OFF (canary `cover-preference` 200). Gateway `efeonce-mcp` `958c9de30` con el provider `marketing-studio` encendido (`00061-sbc`). TASK-1890 y TASK-1891 complete: una sesión MCP real devolvió datos de producción, tras la migración correctiva `20260926071321910` (política del cliente de canje) y el fix `efeonce-mcp#20` (montaje del secreto). [Ledger de tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md).
-
-## 2026-09-25 — La órbita se compone por intención (AXIS 0.2.6)
-
-Contrato candidate `efeonce.graphic-line-orbit` 0.1.0 en `@efeoncepro/axis-ui-contracts` 0.2.6: un agente declara órbita, medida (con fuente o sin arco), progreso de deck, lente, foco, mapa de familia, burbuja de URL, voz o logo en frase, y AXIS valida las reglas y resuelve cada valor desde los tokens. Adapter de Greenhouse: `pnpm creative:orbit:resolve` y `pnpm creative:orbit:render` (SVG, PNG y `qa.json`; falla si un texto cruza el anillo). Pines AXIS a 0.2.6. [Manual](docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md) · [skill](.claude/skills/efeonce-brand-studio/references/graphic-line-orbit.md).
