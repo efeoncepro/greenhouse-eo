@@ -452,7 +452,7 @@ valor inicial lo fija el agente en Discovery con los datos reales de Berel y Sky
      (límite propio «Puntaje de visibilidad en IA: sin datos suficientes»). Verificado 2026-10-02 con tres subagentes
      adversariales (código + base, sólo lectura): 10 de 50 filas de `grader_scores` (10 runs) con competidores vacíos y la
      dimensión en 100; inflan el global entre +9,8 y +13,3 puntos frente a excluirla y redistribuir su peso. 9 tienen
-     informe público publicado, pero sólo 1 consta como enviado (Berel run 49, 2026-09-04); los 4 «restantes» son runs de
+     informe público publicado, pero el único envío registrado es interno (Berel run 49, 2026-09-04, a @efeoncepro.com); los 4 «restantes» son runs de
      smoke, no prospectos. Causa más frecuente: la lista de competidores estaba vacía (Berel ×2, Vercel, Banco de Chile)
      o el set de competidores del mercado nació sin miembros (Efeonce CO/MX/PE, aunque el perfil declara 4). Segunda
      fuente de inflación, aun CON competidores: la fórmula compara menciones de marca contra competidores DISTINTOS

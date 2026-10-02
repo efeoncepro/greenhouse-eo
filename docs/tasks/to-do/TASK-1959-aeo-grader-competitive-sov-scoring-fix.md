@@ -52,8 +52,8 @@ frente a competencia lideran con 100». Verificado con tres revisiones adversari
 3. **Puntaje global** (`engine.ts:276-281`): promedio ponderado sobre dimensiones no nulas, pesos renormalizados. El
    exceso frente a excluir la dimensión es `(15/W)·(100−S)`; medido entre +9,8 y +13,3 puntos en los 10 casos.
 4. **Alcance medido** (`greenhouse_growth`, 2026-10-02): 10 de 50 filas de `grader_scores` (10 runs) con competidores
-   vacíos y la dimensión en 100. 9 tienen informe público (`grader_reports`); sólo 1 consta como enviado (Berel
-   EO-GRUN-00049, 2026-09-04). Los demás publicados son Berel EO-GRUN-00047, Efeonce CO/MX/PE (EO-GRUN-00062/63/64) y
+   vacíos y la dimensión en 100. 9 tienen informe público (`grader_reports`); el único envío registrado es interno (Berel
+   EO-GRUN-00049, 2026-09-04, a una casilla @efeoncepro.com, tipo «expansión»); no consta envío a Berel. Los demás publicados son Berel EO-GRUN-00047, Efeonce CO/MX/PE (EO-GRUN-00062/63/64) y
    cuatro runs de smoke.
 5. **Por qué estaban vacíos:** el normalizer sólo reconoce competidores DECLARADOS (`normalization/normalizer.ts:172-190`);
    no los descubre en la respuesta. 7 de 10 no tenían lista (Berel ×2, Vercel, Banco de Chile) o corrían contra el set de
@@ -73,7 +73,7 @@ dimensión 80 («8 vs 2 competidores distintos») cuando la participación por m
 - Sin competidores declarados en el set del run ⇒ dimensión `null` («no medible»), fuera del global con pesos renormalizados.
 - El cambio es una versión de score nueva: la tendencia nunca compara la versión nueva con la anterior.
 - El informe y el preflight dicen cuándo falta declarar competidores, en vez de mostrar liderazgo.
-- Decisión explícita y registrada sobre los informes ya publicados.
+- Decisión explícita y registrada sobre los informes ya publicados (ninguno consta enviado a un cliente).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -340,4 +340,4 @@ Decisión del operador sobre los informes publicados y la comunicación a Berel 
 ## Open Questions
 
 - ¿Se regeneran los informes públicos ya publicados con la versión nueva, o sólo se marca la metodología vieja?
-- ¿Se le comunica a Berel la corrección del informe enviado el 2026-09-04 (puntaje 39,4 → ~28,7 sin la dimensión)?
+- Si el enlace del informe público de Berel (EO-GRUN-00049) se compartió fuera del registro de envíos, ¿se regenera con la versión nueva? (puntaje 39,4 → ~28,7 sin la dimensión).
