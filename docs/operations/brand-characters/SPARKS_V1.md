@@ -201,7 +201,16 @@ matting lo vuelve semitransparente (100 a 200 mil píxeles). Se corrige editando
 `#7F7F7F` antes de recortar: quedan cerca de 20 mil, sólo el borde. En «volando» la estela de luz no sobrevive al
 recorte; está en la versión de estudio.
 
-### 8.1 El rig: el Spark que mira **[operador, 2026-10-01: «me encantó»; v2 por capas: «vamos con todo»]**
+### 8.1 El rig: el Spark que mira **[operador, 2026-10-01: «me encantó»; v2 por capas: «vamos con todo»; canónico el 2026-10-02: «canonicemoslo»]**
+
+**Canónico y en paquetes versionados de AXIS** (tag `v0.4.12`): el componente en `@efeoncepro/axis-graphic-line`
+0.14.0 (`/spark-rig` → `defineSparkRigElement()` registra `<efeonce-spark-rig>`; `/react` → `<SparkRig line expression />`),
+el contrato `efeonce.spark-rig` 0.1.0 `stable` en `@efeoncepro/axis-ui-contracts` 0.3.41 (`resolveSparkRigIntent`: el
+acento de la línea sale de los tokens, nunca a mano) y las capas en `@efeoncepro/axis-brand-assets` 0.4.12
+(`AXIS_SPARK_RIG`, `sparkRigBase`). Para páginas sin empaquetador, el archivo único
+`https://axis.efeonce.org/references/sparks/rig/spark-rig.js` se genera del paquete. Una versión de capas nunca se
+pisa: un cambio es versión nueva. La adopción en Greenhouse (primitive propia y primeros usos) va por task aparte.
+
 
 Para superficies interactivas (el Lab, Greenhouse, sitios, demos) existe un rig 2.5D por capas: el componente web
 `<efeonce-spark-rig>`, publicado en el Lab de AXIS ([`/references/sparks/#rig`](https://axis.efeonce.org/references/sparks/#rig);
@@ -262,7 +271,7 @@ La task nombraba también Adobe Spark (hoy Adobe Express); no está entre los re
 |---|---|---|
 | 1 | Regenerar con Sparks las fotos aprobadas que llevan robots genéricos (`NX5b` y derivadas, la destacada «Agents» `PH7`) | Decisión del operador |
 | 2 | El Spark en 3D real (que gire completo): en exploración con un modelo generado desde las vistas del kit. Rive no sirve para esto, porque es 2D | Producción + aprobación del operador |
-| 3 | Pasar el rig (§8.1) a un paquete de AXIS cuando Greenhouse u otro dominio lo use (hoy vive en el Lab) | AXIS |
+| 3 | Adoptar el rig en Greenhouse: subir los paquetes de AXIS, primitive `GreenhouseSparkRig` y primeros usos (task aparte) | Greenhouse |
 | 4 | Revisión de Legal si se decide registrar el nombre | Legal |
 | 5 | ¿Las cinco familias calzan con lo que Agent Ops vende hoy? (pregunta abierta de la task) | Operador |
 | 6 | Prueba de reconocimiento: son un sistema consistente, no un activo distintivo medido | Operador |
