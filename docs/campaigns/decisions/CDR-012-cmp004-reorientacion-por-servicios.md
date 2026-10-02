@@ -47,8 +47,8 @@ Roles, bajadas, CTA y destino lógico viven en el BRIEF (§0b), no aquí. **Ajus
 
 - [x] Mapa servicio → ad decidido y documentado.
 - [x] Pilotos 4:5 N2 producidos y certificados por el gate.
-- [ ] Revisión creativa del operador de los ocho pilotos.
-- [ ] Decisión sobre personas del equipo en registro cine (S01–S07; hoy en prueba). S08 (Nexa) está en el caso aprobado.
+- [x] Revisión creativa del operador: **aprobados los ocho** (2026-10-02) como ads Always On de Q4 (S02, S03, S06 y S08 en N3).
+- [x] Personas del equipo en registro cine: aprobadas por el operador para estos ads de CMP-004 (no amplía el canon general del registro).
 - [ ] Claim por validar: «En un día» (S05). S08 corregido por el operador el 2026-10-02: la premisa es escalar producción creativa con IA sin perder consistencia de marca (pieza N3); «memoria de marca» deja de usarse.
 - [ ] Destino, formulario y atribución por ruta.
 - [ ] Export final 1440×1800 y formatos 1:1, 9:16 y 16:9 nativos.
@@ -56,3 +56,22 @@ Roles, bajadas, CTA y destino lógico viven en el BRIEF (§0b), no aquí. **Ajus
 - [ ] Monto, pagador, geografía, T0 y permiso de medios.
 
 No hay publicación, pauta ni envío. Aprobar la dirección no aprueba cada render ni autoriza medios.
+
+## Delta 2026-10-02 · serie táctica Black Friday
+
+El operador pidió tres ads más con la idea «¿Corriendo para el Black Friday? ¡Llegaron los refuerzos!»: uno con los Sparks, uno con el squad y sus agentes, y uno que muestre producción creativa a escala, rápida y consistente sin perder la marca. Es una serie de temporada que no reemplaza al Always On de Q4.
+
+| ID | Refuerzo | Bajada |
+|---|---|---|
+| CMP004-BF1-KV-45-N1 | Nexa y los Sparks | Refuerzos creativos: agentes que se suman a tu equipo. |
+| CMP004-BF2-KV-45-N2 | El squad y sus agentes | Refuerzos creativos: un squad y sus agentes para tu campaña. |
+| CMP004-BF3-KV-45-N1 | Producción a escala | Refuerzos creativos: producción a escala, rápida y consistente. |
+
+Copy común: «¿Corriendo para el Black Friday?» → «Ya llegamos» · CTA «Refuerza tu Black Friday». «Llegaron los refuerzos» no cabe como respuesta de la voz de la línea (1 a 3 palabras, cursor dentro de la zona), así que «refuerzos» va en la bajada. No se usa «garantizando» por los límites de promesa del brief (§11).
+
+Evidencia: `foto:cta:gate --reproducir` con código 0 en las tres piezas; contraste de texto 8–19:1, logo 19:1; bordados revisados al 100 %. BF2 se regeneró porque el reflejo naranja del portón en el piso llegaba al pie y la firma medía 2,63:1; una tarima negra mate más alta lo resolvió. Pilotos en OneDrive `5. Contenidos/15. Paid Media/02. Pilotos/CMP-004/4x5/BF-black-friday/`; receta en `01. Recursos/CMP-004 - Produccion y editables/2026-10-02-black-friday/`; registro en `ASSETS.md` §Black Friday y BRIEF §0c.
+
+- [x] Tres pilotos 4:5 producidos y certificados por el gate.
+- [ ] Aprobación creativa del operador.
+- [ ] Fechas de vuelo de temporada, destino y permiso de medios.
+- [ ] Formatos 1:1, 9:16 y 16:9 nativos y export final 1440×1800.
