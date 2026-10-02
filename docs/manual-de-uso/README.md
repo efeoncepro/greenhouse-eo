@@ -40,6 +40,13 @@ La diferencia con otras capas de documentacion:
   Efeonce, único robot permitido en una foto de marca) en una ficha de `foto:prompt`: elegir el Spark del plantel y la
   vista, declararlo en `objetos`, escala y registro (cine o puesta en escena, nunca documental), qué frena la guarda
   contra robots, qué no hacer y problemas comunes. Kit aprobado el 2026-10-01 (TASK-1941).
+- [Usar el traje biónico de Nexa en fotos](creative/usar-traje-bionico-de-nexa-en-fotos.md) — vestir a Nexa con su
+  traje y sus lentes biónicos desde el catálogo de `foto:prompt` (sólo Nexa y sólo con `"registro": "cine"`), elegir
+  una de sus 12 expresiones fotográficas o un ángulo (nunca los dos), escribir la escena sin describir el traje, la
+  receta de una escena con Sparks (dos con referencia como máximo, como `NX7d`), revisar las marcas con
+  `pnpm foto:emblema` y recomponerlas con `pnpm foto:isotipo` (incluido el logo de la espalda con `--marca logotipo
+  --tecnica`), reproducir el kit y sellarlo y publicarlo al canon. Errores, avisos y problemas comunes. Kit aprobado el
+  2026-10-02 (TASK-1940).
 - [Recuperar y archivar archivos de `ai-generations/`](creative/recuperar-y-archivar-ai-generations.md) — qué hacer
   cuando una composición no encuentra un plate o una referencia (`pnpm ai-gen:where` y `pnpm ai-gen:pull` a la misma
   ruta, nunca regenerar), qué está protegido, cómo el operador archiva exploración con `pnpm ai-gen:archive` y cómo se

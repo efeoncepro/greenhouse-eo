@@ -60,6 +60,24 @@ Portátiles genéricos de plástico · réflex antiguas · auriculares gamer con
 pantallas apagadas como decoración · dispositivos descontinuados · adhesivos de marcas en el portátil ·
 más de tres dispositivos en el mismo cuadro.
 
+## 5. Los lentes biónicos — sólo cine (delta 2026-10-02)
+
+**[decisión del operador, 2026-10-01/02, TASK-1940]** Los **lentes biónicos** son el único prop de ficción de Nexa:
+una mica envolvente sin marco, de policarbonato transparente apenas azul, con una línea de luz `#0375DB` en el borde
+superior, puente y patillas transparentes, **sin logo**. Se llaman así porque van con el traje biónico; «futuristas»
+era genérico.
+
+| Regla | Qué significa |
+|---|---|
+| **Por catálogo** | Se declaran en `objetos` como `lentes-bionicos-nexa` (vistas `frente` y `tres-cuartos`, ésta por defecto), nunca descritos en la escena. Kit: `ai-generations/2026-10-01_traje-bionico-nexa/final/` (vistas 20 y 21) |
+| **Sólo Nexa, sólo cine** | Comparten la guarda del traje (`validarTrajeNexa`): con otra persona, sin Nexa o sin `"registro": "cine"`, `foto:prompt` aborta |
+| **Los ojos se ven** | Mica transparente, sin espejado ni reflejo que tape los ojos: conservan la identidad |
+| **No son un dispositivo de la lista** | No reemplazan ningún prop de §1 y §2: son ficción de Efeonce, no un producto de tercero **[criterio]** |
+
+Si el smartwatch y el anillo van o no con el traje sigue **[pendiente]**: la escena aprobada `NX7d` los quita, y el
+registro cine tiene abierta esa trampa ([registro cine §7.1](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#71-nexa)). Paso a
+paso: [usar el traje biónico de Nexa en fotos](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
+
 ## Verificación
 
 Al cerrar una pieza con props tecnológicos, mirar al 100 %: que el dispositivo sea de la familia correcta,
@@ -72,5 +90,6 @@ render correcto de un objeto equivocado sigue siendo un objeto equivocado.
   catálogo ([`build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs)) y por lo tanto en toda pieza con
   Nexa.
 - El resto son **props de escena**: se declaran en la `escena` de la ficha, no en el bloque de identidad.
+- Los **lentes biónicos** son la excepción: objeto del catálogo, sólo en cine (§5).
 - Ficha del personaje: [`NEXA_CHARACTER_BIBLE_FICHA_V1.md`](./NEXA_CHARACTER_BIBLE_FICHA_V1.md) ·
   documento de marca: [`NEXA_CHARACTER_BIBLE_V1.md`](../social/NEXA_CHARACTER_BIBLE_V1.md).

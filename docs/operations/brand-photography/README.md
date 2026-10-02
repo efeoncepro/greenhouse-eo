@@ -1,9 +1,9 @@
 # Fotografía de marca Efeonce — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.8
+> **Versión:** 1.9
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-28 por Claude (portada de Creative Services con plate propio `CR4` y el caso de cambiar el plate de una pieza aprobada sin perder su concepto, [registro cine §16.7](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto); antes, el 2026-09-27: excepción del registro cine para las láminas de sección y «about» del deck, [delta (c)](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck); antes, el mismo día: plates para portada y contraportada del registro cine, [§16](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#16-plates-para-portada-y-contraportada-aprobado-2026-09-27); antes, el mismo día: el registro cine tiene documento propio, [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md); antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada; guía «El porqué» en AXIS; antes, el mismo día: convergencia con la línea gráfica, la lente como reserva del texto, P1–P12 y P-1..P-9; antes: regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
+> **Última actualización:** 2026-10-02 por Claude (1.9: el traje biónico y los lentes biónicos de Nexa tienen kit y se piden por catálogo, sólo Nexa y sólo cine; las referencias de identidad dicen quién es, no cómo está, y las 12 expresiones fotográficas de Nexa entran al catálogo; la escena cine `NX7d` queda como referencia, [delta 2026-10-02](#delta-2026-10-02--traje-biónico-de-nexa-pose-y-expresiones). Antes, el 2026-09-28: portada de Creative Services con plate propio `CR4` y el caso de cambiar el plate de una pieza aprobada sin perder su concepto, [registro cine §16.7](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto); antes, el 2026-09-27: excepción del registro cine para las láminas de sección y «about» del deck, [delta (c)](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck); antes, el mismo día: plates para portada y contraportada del registro cine, [§16](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#16-plates-para-portada-y-contraportada-aprobado-2026-09-27); antes, el mismo día: el registro cine tiene documento propio, [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md); antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada; guía «El porqué» en AXIS; antes, el mismo día: convergencia con la línea gráfica, la lente como reserva del texto, P1–P12 y P-1..P-9; antes: regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Bitácora del caso](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida de evidencia](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, aprobado por el operador (Julio
@@ -67,6 +67,8 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | Entrega en OneDrive | `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/` | Carpeta de entrega de la versión 1 para el equipo |
 | Banco de la lente (línea gráfica) | [`ai-generations/2026-09-25_banco-lente-orbita/`](../../../ai-generations/2026-09-25_banco-lente-orbita/LEEME.md) | Consumidor del lenguaje: 8 tomas documentales para la lente de [«La órbita»](../brand-graphic-line/README.md), hechas con `pnpm foto:generar`, sin emblema legible; reemplazaron a tres fotos repetidas. Plates locales |
 | Manual de uso | [`docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md`](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md) | Paso a paso para producir una foto de marca (lo escribe otro agente) |
+| Kit del traje biónico de Nexa | [`ai-generations/2026-10-01_traje-bionico-nexa/`](../../../ai-generations/2026-10-01_traje-bionico-nexa/LEEME.md) | El traje y los lentes biónicos como objeto (TASK-1940): 10 vistas en `final/` (fuera de git, selladas en el lock y publicadas en el canon), manifiesto con `cuando_usarla` y la técnica de cada marca, fichas y plates de la escena `NX7`–`NX7g`. Sólo Nexa, sólo registro cine. Manual: [usar el traje biónico de Nexa en fotos](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md) |
+| Expresiones fotográficas de Nexa | [`ai-generations/_identidad-nexa/5-expresiones/`](../../../ai-generations/_identidad-nexa/LEEME.md) | Las 12 expresiones de rostro con el acabado de las anclas, pedidas con `expresion` desde el 2026-10-02. Todas comparten el mismo tres cuartos: aportan sólo el gesto |
 
 ## Orden de lectura recomendado
 
@@ -75,7 +77,7 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | Quien decide o revisa la marca | 1 → 2 → bitácora |
 | Quien produce una foto con IA | Manual → 5 → **7** → 2 → 3 → 4 → 6 |
 | Quien produce una foto con personas reales o con Julio/Nexa | 6 → 2 → 4 → **7** |
-| Quien produce una pieza **con Nexa** | **9** → **10** → 6 → 2 → **7** |
+| Quien produce una pieza **con Nexa** | **9** → **10** → 6 → 2 → **7** (con el traje biónico: **11** y el [manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md)) |
 | Quien quiere entender por qué es así | Bitácora → 1 |
 
 ## Dónde viven los archivos de `ai-generations/`
@@ -107,6 +109,26 @@ Resultados: `MARGIN FIELD` pasa en 4:5 y en 16:9 nativo con **banda continua has
 aprobado «¿Claude o Codex?» llegaba a 0,35). `SELECTION TARGET` sirve **con padding de 0,02 del lienzo** (3,29:1);
 pegado al objeto falla (1,02:1) porque el objeto trae su propio borde claro, y con 0,04 vuelve a fallar porque la
 caja toca a las personas. Hay punto dulce, no monotonía.
+
+## Delta 2026-10-02 — traje biónico de Nexa, pose y expresiones
+
+- 🔴 **El traje biónico y los lentes biónicos de Nexa son objetos del catálogo** **[decisión del operador,
+  2026-10-01/02, TASK-1940]**. Nunca se vuelven a describir en la escena: se declaran en `objetos`
+  (`traje-bionico-nexa`, `lentes-bionicos-nexa`) con `"registro": "cine"` explícito, y `foto:prompt` aborta si la
+  ficha los pide para otra persona, sin Nexa o fuera del cine (`validarTrajeNexa`). Las marcas **viajan armadas en la
+  referencia**: el isotipo incrustado en la pechera y el logo completo «efeonce» serigrafiado en la placa dorsal. Kit:
+  [`ai-generations/2026-10-01_traje-bionico-nexa/`](../../../ai-generations/2026-10-01_traje-bionico-nexa/LEEME.md);
+  paso a paso: [manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md); vestuario:
+  [personas, delta 2026-10-02](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo).
+- **La pose de Nexa sale de la escena, no de la referencia** **[medido, A/B `NX7d`→`NX7g`]**: las referencias de
+  identidad dicen quién es, no cómo sostiene la cabeza. La ficha pide **una** expresión (`expresion`, 12 fotográficas
+  nuevas) **o** un ángulo (`vista`), nunca las dos, y `foto:prompt` avisa si Nexa llega sin ninguna. Detalle en
+  [prompts y pipeline, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)
+  y en la [ficha de Nexa](./NEXA_CHARACTER_BIBLE_FICHA_V1.md#delta-2026-10-02--traje-biónico-12-expresiones-fotográficas-y-la-pose).
+- **La escena de referencia con Nexa en el traje es `NX7d`**, «Nexa despliega a su squad» **[decisión del operador,
+  2026-10-02]**: dos Sparks con referencia como máximo y el resto lejos y desenfocado. Receta en el
+  [registro cine, delta 2026-10-02](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks).
+  **[pendiente]** su versión con titular (columna de texto 0,38 y lecho 2,98:1, ambos bajo el umbral).
 
 ## Delta 2026-09-27 (c) — excepción del registro cine para secciones y «about» del deck
 

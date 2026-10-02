@@ -36,7 +36,8 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   fotografiados, la línea en movimiento (la órbita y las animaciones del logo V1.1), los íconos (Trazo y Plastilina), dónde vive cada cosa y pendientes.
   Desde el 2026-09-27, las 69 láminas del deck aprobadas con su receta: [catálogo de recetas por lámina](../operations/brand-graphic-line/deck-recipes/README.md)
   y [cómo armar un deck con ellas](../manual-de-uso/creative/componer-deck-con-recetas.md); desde el 2026-09-28 las 69
-  se componen solas.
+  se componen solas. Desde el 2026-10-02, el traje biónico de Nexa (sólo en fotos de cine) y su escena modelo con los
+  Sparks: [cómo usarlo](../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
 - [Composición de decks y brochures de marca propia](creative/composicion-de-decks-y-brochures.md) — qué es pedir
   una lámina o un documento completo (brochure o propuesta) y recibirlo compuesto con «La órbita»: **las 69 láminas
   aprobadas se componen** (TASK-1927 y TASK-1928), sus familias y cómo elegir entre versiones, la portada de brochure

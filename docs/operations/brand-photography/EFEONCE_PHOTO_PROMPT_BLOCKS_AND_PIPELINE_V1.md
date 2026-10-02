@@ -1,9 +1,9 @@
 # Bloques de prompt y pipeline de producción — fotografía de marca Efeonce V1
 
 > **Tipo de documento:** Especificación técnica de producción (prompts, comandos, scripts, QA)
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-10-02 por Claude — 1.4: las referencias de identidad dicen QUIÉN es, no CÓMO está ([delta 2026-10-02](#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)). Antes, 2026-09-26: conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
+> **Última actualización:** 2026-10-02 por Claude — 1.5: §3.7.1 lista el traje y los lentes biónicos de Nexa entre los kits y las tres claves de kit que estrenaron (`instruccionEnUso`, `acabadoMarca`, `macroEnUso`). 1.4: las referencias de identidad dicen QUIÉN es, no CÓMO está ([delta 2026-10-02](#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)). Antes, 2026-09-26: conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este documento es el **cómo se produce**: los bloques de texto que incorpora `pnpm foto:prompt` en cada prompt, la ficha de
@@ -327,10 +327,18 @@ Kits en el catálogo, por tipo:
 | Tipo | Kits |
 |---|---|
 | Prenda (viste a la persona) | `polo-efeonce` · `hoodie-efeonce` · `chaqueta-softshell-efeonce` · `chaqueta-bomber-efeonce` · `gorra-efeonce` |
+| Ficción de Nexa (sólo Nexa, sólo `"registro": "cine"`; desde 2026-10-02) | `traje-bionico-nexa` (prenda: frente, tres cuartos izq./der., lateral, espalda; puesta por defecto y `puesta: "espalda"`) · `lentes-bionicos-nexa` (`frente`, `tres-cuartos` por defecto) |
 | Merch | `lanyard-efeonce` (cinta, yoyo y portacarnet de marco rígido) |
 | Marca propia | `nave-efeonce` · logo 3D completo: `logo-efeonce-3d-letrero-{blanco,navy}` (escala mediana ≈ 1,2 m, corpóreo de pared) y `logo-efeonce-3d-escritorio-{blanco,navy}` (escala pequeña, 24 cm, objeto de mesa; vistas `sentada`, `sentada-luz-izq`, `a-ras`, `tres-cuartos-izq/der`) |
 | Mascota de partner | `clawd` · `codex` · `gigi` (16 vistas) · `gigi-aeo` (8 vistas propias de búsqueda y AEO) |
 | Marca de tercero | `sprocket-hubspot` |
+
+**El traje de Nexa estrenó tres claves de kit (2026-10-02, TASK-1940)**, disponibles para cualquier prenda:
+`instruccionEnUso` (la instrucción propia de la pieza puesta, en vez de la genérica), `acabadoMarca` (cómo está
+aplicada la marca; reemplaza el «satin-stitch embroidery» por defecto, porque el isotipo del traje va incrustado y no
+bordado) y `macroEnUso` (el macro de la marca viaja también con la pieza puesta, no sólo al construir). La guarda
+`validarTrajeNexa` aborta si el traje o los lentes se piden para otra persona, sin Nexa o sin `"registro": "cine"`.
+Uso paso a paso: [manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
 
 **La vista de una prenda se elige por el ángulo de la toma**, no por costumbre: de espaldas → vista de espalda.
 Agregar un kit nuevo es una entrada de datos —base, patrón de archivo y tabla de vistas—, no un cambio de lógica.

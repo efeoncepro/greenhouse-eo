@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.18
+> **Version:** 1.19
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-10-01 por Claude (1.18: delta — los Sparks, los agentes de Efeonce, entran como personajes propios de la marca y único robot permitido en una foto. Antes, 1.17: delta — los perfiles sociales de Efeonce (portadas de LinkedIn, Facebook y YouTube, avatar de redes, destacados de Instagram y las portadas de LinkedIn personales del equipo) entran a la línea; fila nueva en «Dónde está cada cosa» y pendiente de publicación. Antes, 2026-09-28, 1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-10-02 por Claude (1.19: delta — el traje biónico de Nexa y sus lentes, sólo en fotos de cine, con las marcas ya puestas; sus 12 expresiones; la escena con los Sparks que sirve de modelo. Antes, 1.18: delta — los Sparks, los agentes de Efeonce, entran como personajes propios de la marca y único robot permitido en una foto. Antes, 1.17: delta — los perfiles sociales de Efeonce (portadas de LinkedIn, Facebook y YouTube, avatar de redes, destacados de Instagram y las portadas de LinkedIn personales del equipo) entran a la línea; fila nueva en «Dónde está cada cosa» y pendiente de publicación. Antes, 2026-09-28, 1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -571,6 +571,29 @@ gesto.
 > [registro cine, delta 2026-10-01 (b)](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes) ·
 > [lenguaje fotográfico, delta 2026-10-01](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-10-01--los-robots-siguen-prohibidos-salvo-los-sparks-del-kit) ·
 > [cómo usarlos](../../manual-de-uso/creative/usar-sparks-en-fotos-de-marca.md)
+
+## Delta 2026-10-02 — el traje biónico de Nexa y su escena con los Sparks
+
+Entre el 2026-10-01 y el 2026-10-02 el operador aprobó el **traje biónico de Nexa** como una pieza fija de la marca, con sus **lentes
+biónicos**: un body navy con placas blancas mate y costuras de luz azul, el isotipo incrustado en el pecho y el logo
+completo «efeonce» serigrafiado en la espalda; los lentes son una mica transparente apenas azul, sin logo. Antes el
+traje se describía con palabras en cada foto y salía distinto cada vez; ahora existe una sola versión, con sus vistas,
+y las fotos la toman de ahí.
+
+- **Sólo Nexa y sólo en las fotos de cine.** Nunca lo lleva una persona del equipo ni aparece en las fotos
+  documentales del oficio. El comando de fotos frena cualquier pedido que no cumpla.
+- **Las marcas ya vienen puestas en el traje** que se le pasa al modelo, para que no las borre ni las invente. Igual
+  se revisan de cerca en cada foto.
+- **Nexa cambia de gesto.** Cada foto elige una de sus 12 expresiones o un ángulo de cabeza; antes salía casi siempre
+  con la misma cara.
+- **La escena que sirve de modelo** es «Nexa despliega a su squad»: Nexa con el traje y dos Sparks cerca y nítidos
+  (uno sobre su palma, otro posado en su hombro); los demás, lejos y desenfocados. Con más Sparks nítidos parecen
+  pegatinas.
+
+> Detalle técnico: [kit del traje](../../../ai-generations/2026-10-01_traje-bionico-nexa/LEEME.md) ·
+> [registro cine, delta 2026-10-02](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks) ·
+> [personas y vestuario, delta 2026-10-02](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo) ·
+> [cómo usarlo](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md)
 
 ## Estado y pendientes
 

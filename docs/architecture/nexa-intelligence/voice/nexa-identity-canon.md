@@ -137,6 +137,17 @@ El rostro aprobado muestra a Nexa como presencia humana del equipo, con hoodie a
 - En CTAs que invocan a Nexa, usar Nexa Mark + palette Nexa; no usar `tabler-sparkles` suelto ni iconos genericos como sustituto.
 - La unidad minima del branding de Nexa es **arco + sparkle**. Separarlos convierte la marca en adorno generico.
 
+**Nexa en fotografia de marca (delta 2026-10-02).** Fuera de la UI, su identidad visual en fotos (rostro A, anclas,
+expresiones, vestuario por registro) vive en el canon de [fotografia de marca](../../../operations/brand-photography/README.md),
+no aqui. Dos reglas de ese canon tocan su identidad:
+
+- **Su traje bionico y sus lentes bionicos** son ficcion de Nexa, solo en el registro cine, con kit propio y pedidos
+  por catalogo (TASK-1940): [kit](../../../../ai-generations/2026-10-01_traje-bionico-nexa/LEEME.md) ·
+  [manual](../../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
+- **Su pose y su gesto salen de la escena, no de las referencias**: las referencias fijan quien es; cada pieza declara
+  una de sus 12 expresiones fotograficas o un angulo, para que no salga siempre con la misma cara
+  ([ficha de Nexa](../../../operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md)).
+
 ## Origen Narrativo
 
 Nexa debe tener origen porque tiene nombre. El origen no necesita convertirse en lore publico, pero si debe orientar producto, copy y decisiones visuales.

@@ -1,7 +1,7 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.7 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-02 por Claude (1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.8 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-10-02 por Claude (1.8: [§7.1](#71-nexa) y la [plantilla de §12](#12-plantilla-de-ficha-comentada) alineadas con el kit del traje: traje y lentes por catálogo con `"registro": "cine"` y una `expresion` declarada; las descripciones a mano quedan marcadas como superadas. 1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
 > «El squad te la entrega», y queda el caso de cómo cambiar el plate de una pieza aprobada sin perder su concepto,
 > [§16.7](#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto). Antes, 1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
@@ -399,11 +399,13 @@ el kit del hoodie declara la tela en **azul royal** (`ai-generations/2026-09-17_
 
 | Tema | Regla | Fuente |
 |---|---|---|
-| Identidad | **Siempre la A**, anclas de `ai-generations/_identidad-nexa/1-anclas/` (los logs del brochure muestran `nexa-ancla-2-rostro-tresquartos`, `nexa-ancla-5-cuerpo-frontal`, `nexa-ancla-1-rostro-frontal`) | Maestro · regla auto-load **[medido en logs]** |
+| Identidad | **Siempre la A**, anclas de `ai-generations/_identidad-nexa/1-anclas/` (los logs del brochure muestran `nexa-ancla-2-rostro-tresquartos`, `nexa-ancla-5-cuerpo-frontal`, `nexa-ancla-1-rostro-frontal`; desde el 2026-10-02 el orden es **frontal → tres cuartos → cuerpo**) | Maestro · regla auto-load **[medido en logs]** · [prompts, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está) |
 | Vestuario | **Traje de ficción permitido sólo a ella** (traje biónico) o el uniforme Efeonce (la softshell en `NX6`, `BR1`–`BR3`) | Delta 2026-09-26 noche **[decisión del operador]** |
-| El traje biónico | *«a sleek, form-fitting BIONIC SUIT in deep navy with matte white armored plates on the shoulders, chest and forearms, thin glowing azure-blue (#0375DB) light seams along the plates»* | `NX5` **[medido]** |
-| La pechera | 🔴 *«the chest plate is plain, smooth white with NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*. Sin esa frase salió un **cohete genérico**; con ella, lisa | Maestro, `NX3` → `NX5` **[medido]** |
-| Lentes | *«sleek futuristic wraparound glasses with CLEAR TRANSPARENT lenses lightly tinted azure blue, a thin frameless edge and a fine glowing azure line along the top of the lenses; her eyes are clearly visible through the transparent lenses, no mirror reflection covers her eyes»*. Conservaron ojos e identidad | `NX4`/`NX5` **[medido]** |
+| 🔴 Traje y lentes **por catálogo** (desde 2026-10-02) | La ficha declara `"registro": "cine"`, `"identidad": [{ "persona": "nexa", "expresion": "…" }]` y `"objetos": [{ "objeto": "traje-bionico-nexa" }, { "objeto": "lentes-bionicos-nexa" }]`; la escena sólo dice que lo lleva *«exactly as in its reference»*. Las marcas (isotipo incrustado en la pechera, logo serigrafiado en la espalda) llegan **armadas en la referencia**, con el macro de la placa en escena; de espaldas, `{ "objeto": "traje-bionico-nexa", "puesta": "espalda" }`. `foto:prompt` aborta con otra persona, sin Nexa o sin `"registro": "cine"` (`validarTrajeNexa`) | TASK-1940 · kit `ai-generations/2026-10-01_traje-bionico-nexa/` **[decisión del operador]** · [manual](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md) |
+| Pose y expresión (desde 2026-10-02) | Una `expresion` (12 fotográficas u 8 del Bible) **o** una `vista`, nunca las dos; la pose la describe la escena. Sin ninguna, `foto:prompt` avisa. No copiar «confident half-smile» de ficha en ficha | [Prompts, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está) **[medido]** |
+| El traje biónico | *«a sleek, form-fitting BIONIC SUIT in deep navy with matte white armored plates on the shoulders, chest and forearms, thin glowing azure-blue (#0375DB) light seams along the plates»* | `NX5` **[medido]** · **superado el 2026-10-02**: ya no se describe, se pide por catálogo |
+| La pechera | 🔴 *«the chest plate is plain, smooth white with NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*. Sin esa frase salió un **cohete genérico**; con ella, lisa | Maestro, `NX3` → `NX5` **[medido]** · **superado el 2026-10-02**: la pechera lisa dejó a `NX7` y `NX7b` sin logo; la marca viaja armada en la referencia |
+| Lentes | *«sleek futuristic wraparound glasses with CLEAR TRANSPARENT lenses lightly tinted azure blue, a thin frameless edge and a fine glowing azure line along the top of the lenses; her eyes are clearly visible through the transparent lenses, no mirror reflection covers her eyes»*. Conservaron ojos e identidad | `NX4`/`NX5` **[medido]** · **superado el 2026-10-02**: `lentes-bionicos-nexa` del catálogo |
 | Accesorios | Ver la trampa de §10 (el bloque de accesorios pide smartwatch y anillo; las fichas cine los quitan) | **[pendiente]** |
 
 ### 7.2 Personas del equipo (en `proposal-cinematic` y, con identidad real, en Marketing con Manzanitas)
@@ -446,6 +448,11 @@ sin `foto:isotipo` ni sufijo `b`** (los precedentes `LN4` y `CR4` pasan a ser la
 **sólo si el emblema difiere** y, **siempre, en el traje biónico de Nexa**, que no tiene referencia de kit (positivo
 sobre la pechera blanca, como `NX5b`). Fuente de la regla: `.claude/rules/brand-photography.md` y
 `EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md` (v1.1). **Mirar al 100 % también DESPUÉS de `foto:isotipo`** (§16.7).
+
+**Delta 2026-10-02 (TASK-1940):** el traje biónico **ya tiene kit** y sus marcas viajan armadas en la referencia, así
+que deja de ser la excepción de «siempre `foto:isotipo`»: se revisa con `foto:emblema` al 100 % contra el macro
+`10-detalle-placa-isotipo` y se recompone sólo si difiere o falta, como el uniforme. Ver §7.1 y el
+[manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
 
 **Regla anterior (2026-09-27, reemplazada):** el isotipo oficial se **componía** siempre encima con `pnpm foto:isotipo`
 desde `@efeoncepro/axis-brand-assets` —negativo (blanco) sobre prenda oscura, positivo sobre clara—. Todas las placas aprobadas llevan sufijo `b`: son la versión con el
@@ -720,7 +727,8 @@ Ficha real y aprobada (`ai-generations/2026-09-26_deck-revops/fichas/RV1-motor-d
 |---|---|---|
 | `formato` | `16:9` | La receta del deck es sólo 16:9 (token `formats: ['16x9']`). Vertical: §11 |
 | `impacto` | `true` | Bloque de impacto: luz con carácter, momento decisivo, tres planos. En cine siempre |
-| `identidad` | ausente | Casting por rol. Con Nexa: `["nexa"]` (trae anclas y bloque `IDENTITY`) |
+| `registro` | ausente | Obligatorio como `"cine"` cuando la ficha pide el traje o los lentes de Nexa: sin él `foto:prompt` aborta |
+| `identidad` | ausente | Casting por rol. Con Nexa: `["nexa"]` (trae anclas y bloque `IDENTITY`); desde el 2026-10-02, mejor `[{ "persona": "nexa", "expresion": "…" }]` o con `vista`, nunca las dos |
 | `objetos` | la prenda del registro de escena | Referencia de forma del kit: es lo que sostiene el emblema y el corte. Chaqueta = instancia importante |
 | `palanca` | `luz-motivada` | La única de encuadre del registro (§5) |
 | `atmosfera` | `bruma` | Exige haz declarado: aquí el moño y el rim |
@@ -736,7 +744,20 @@ Ficha real y aprobada (`ai-generations/2026-09-26_deck-revops/fichas/RV1-motor-d
 | `lecho` | canto oscuro *«outside every light»* + `DARK near black` | §9.2 |
 | `reservas.texto` | muro con nombre + `tinta: blanca` | La reserva nace en la toma; «reservar después no existe» |
 
-**Para Nexa en traje biónico**, sumar a la escena la pechera lisa y los lentes transparentes verbatim de §7.1.
+**Para Nexa en traje biónico** (desde el 2026-10-02; antes se sumaba a la escena la pechera lisa y los lentes
+verbatim de §7.1, y eso dejó las escenas sin logo), la ficha agrega tres cosas y la escena no describe el traje:
+
+```json
+"registro": "cine",
+"identidad": [{ "persona": "nexa", "expresion": "conviccion" }],
+"objetos": [{ "objeto": "traje-bionico-nexa" }, { "objeto": "lentes-bionicos-nexa" }]
+```
+
+`expresion` es una de las 12 fotográficas o de las ocho del Bible (o, en su lugar, una `vista` para el ángulo); sin
+ella `foto:prompt` avisa. Con Sparks en escena, dos con referencia como máximo
+([delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks)). Ficha aprobada
+de referencia: `ai-generations/2026-10-01_traje-bionico-nexa/fichas/NX7d-nexa-despliega-squad.json` (anterior a la
+corrección de pose: no declara `expresion`).
 
 **Los comandos, en orden:**
 

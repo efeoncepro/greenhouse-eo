@@ -29,6 +29,28 @@ actualizado. La polera gris funciona como ropa neutra de continuidad, no como ve
 poses OneDrive informa cuerpo y actuación; no define la cara. Las notas históricas que describen las vistas
 aprobadas como deuda sintética quedan superadas por esta confirmación.
 
+## Delta 2026-10-02 — traje biónico, 12 expresiones fotográficas y la pose
+
+- **Vestuario de cine: el traje biónico y los lentes biónicos** **[decisión del operador, 2026-10-01/02, TASK-1940]**.
+  No están en el Bible de febrero: son la ficción de Nexa en el registro cine, y desde hoy son objetos del catálogo
+  (`traje-bionico-nexa`, `lentes-bionicos-nexa`), con kit propio en `ai-generations/2026-10-01_traje-bionico-nexa/`.
+  Body navy de punto técnico, placas blancas mate (hombros, pecho, brazos, antebrazos y una placa dorsal), costuras de
+  luz azul `#0375DB`, cinturón navy, piernas sin placas; el isotipo **incrustado** en la pechera y el logo completo
+  **serigrafiado** en la espalda. Los lentes: una mica envolvente transparente apenas azul, sin marco ni logo, con una
+  línea de luz en el borde superior; los ojos se ven a través. **Sólo ella y sólo en cine**: `foto:prompt` aborta en
+  cualquier otro caso. Es un sexto contexto de vestuario, pero va por `objetos` y no por `vestuario`, igual que la
+  ropa con marca (§1).
+- **Las 12 expresiones fotográficas entran al catálogo** (tabla en §1). Existían en disco y ninguna ficha podía
+  pedirlas, así que casi todas caían en el gesto por defecto.
+- **La pose sale de la escena, no de la referencia** **[medido, A/B `NX7d`→`NX7g`]**. Las 12 comparten el **mismo
+  tres cuartos** del ancla (se editaron desde ella): copiadas enteras arrastraban también el giro (`NX7f`, con
+  `conviccion`, no cambió nada). Hoy la referencia de expresión aporta sólo ojos, cejas y boca; el ángulo se pide con
+  `vista`, nunca las dos a la vez. Causa completa en
+  [prompts y pipeline, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está).
+- **Aretes dorados en el traje, aprobados** **[decisión del operador, 2026-10-02]**: en las vistas puestas del kit los
+  aretes salieron dorados, como en las anclas, aunque §5.1 los pide de plata. El operador aprobó las vistas así. No
+  cambia §5.1 ni el bloque `accesorios`; es la misma brecha de las anclas que registra §2.
+
 ## 1. Mapeo — nombre del Bible → referencia del repo
 
 Las anclas y expresiones fotográficas de Nexa viven en `ai-generations/_identidad-nexa/`; el set de ocho
@@ -61,6 +83,30 @@ Las tres dimensiones ocupan **la misma ranura** —la referencia que se antepone
 | Mic Drop | `mic-drop` | `3-poses/nexa-pose-mic-drop.png` |
 
 Las ocho son **planos medios**: ninguna es de cuerpo entero.
+
+### Las 12 expresiones fotográficas (desde 2026-10-02)
+
+Viven en `ai-generations/_identidad-nexa/5-expresiones/` con el acabado de las anclas (no el sintético de `3-poses/`)
+y se piden igual, con `expresion`.
+
+| `expresion` | Archivo |
+|---|---|
+| `carcajada` | `5-expresiones/nexa-expr-01-carcajada.png` |
+| `risa-elegante` | `5-expresiones/nexa-expr-02-risa-elegante.png` |
+| `sorprendida` | `5-expresiones/nexa-expr-03-sorprendida.png` |
+| `esceptica` | `5-expresiones/nexa-expr-04-esceptica.png` |
+| `pensativa` | `5-expresiones/nexa-expr-05-pensativa.png` |
+| `neutra` | `5-expresiones/nexa-expr-06-neutra-reposo.png` |
+| `preocupada` | `5-expresiones/nexa-expr-07-preocupada.png` |
+| `conviccion` | `5-expresiones/nexa-expr-08-conviccion.png` |
+| `escucha-empatica` | `5-expresiones/nexa-expr-09-escucha-empatica.png` |
+| `curiosa` | `5-expresiones/nexa-expr-10-curiosa.png` |
+| `complicidad` | `5-expresiones/nexa-expr-11-complicidad.png` |
+| `mirada-lateral` | `5-expresiones/nexa-expr-12-mirada-lateral.png` |
+
+🔴 **Las 12 comparten el mismo tres cuartos del ancla.** `foto:prompt` les pide al modelo copiar sólo el gesto (ojos,
+cejas y boca), nunca el giro ni la inclinación; la pose la describe la escena y el ángulo se pide con `vista`. Si una
+ficha trae a Nexa sin `expresion` ni `vista`, el comando avisa: sale con el gesto por defecto y la serie se repite.
 
 ### Los cinco contextos de vestuario (Bible §5.3)
 
@@ -117,6 +163,9 @@ cuatro**, y un conteo que se asienta en tres deja la cuarta fuera del checklist.
 
 *Nota de método: en imágenes generadas no se puede garantizar izquierda/derecha por el espejado. Lo robusto
 es el **dedo** (anular en vez de índice) y el **metal**, que no dependen de eso.*
+
+**Delta 2026-10-02 · aretes en el traje biónico:** las vistas puestas del kit (`13`, `14`) repiten los aretes
+**dorados** de las anclas; el operador aprobó esas vistas tal como están. La regla de §5.1 (plata) no cambia.
 
 ### 🔴 Corrección a esa auditoría: `4-vestuario/` cumple, salvo el dedo
 
@@ -205,7 +254,7 @@ set fotorrealista de polera gris aprobado por el operador. La tabla de pendiente
 poses y vestuario; no debe usarse para sustituir la identidad fotográfica confirmada.
 
 ```bash
-pnpm foto:assets:check   # catálogo y lock coinciden por sha256 · 149 assets
+pnpm foto:assets:check   # catálogo y lock coinciden por sha256 · 149 assets al escribir esto; 378 al 2026-10-02
 pnpm vitest run scripts/foto/build-prompt.test.ts
 ```
 

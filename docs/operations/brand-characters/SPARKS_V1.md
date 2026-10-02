@@ -1,9 +1,9 @@
 # Sparks V1 — los agentes de Efeonce
 
 > **Tipo de documento:** Especificación canónica de marca (personajes)
-> **Versión:** 1.5
+> **Versión:** 1.6
 > **Creado:** 2026-10-01 por Claude
-> **Última actualización:** 2026-10-01 por Claude
+> **Última actualización:** 2026-10-02 por Claude (1.6: §5, dos Sparks con referencia como máximo en una toma cine; §6, `NX7d` como escena de referencia con Nexa en su traje biónico)
 > **Estado:** nombre, plantel y relato aprobados por el operador (Julio Reyes) el 2026-09-29; diseño elegido y Spark
 > base aprobado el 2026-10-01 («Me encanta»). Kit producido (Spark base v02 y plantel v01, aprobado el 2026-10-01: «Aprobados») y catálogo de `foto:prompt`
 > con guarda contra robots. Sin publicar en AXIS; sin prueba de reconocimiento.
@@ -135,6 +135,14 @@ forma exacta desde la imagen de referencia y lleva en su instrucción la escala 
 Las cuatro escenas de escala con Nexa (`ai-generations/2026-10-01_sparks/fichas/SPK-E1` a `SPK-E4`: hombro, palma y
 antebrazo, escritorio, entrega de tarjeta) son las fichas de ejemplo: registro cine, Nexa con la chaqueta del
 uniforme y el bordado verificado al 100 % **[medido]**.
+
+**La escena de referencia con Nexa en su traje biónico es `NX7d`, «Nexa despliega a su squad»** **[decisión del
+operador, 2026-10-02: «realmente se ve cinemática… canonízalo»]**: `spark-reportes` sobre el núcleo de luz en su palma
+y `spark-investigacion` posado en su hombro, los dos con `"vista": "cine"`, y tres Sparks más sin referencia propia,
+lejos y fuera de foco. Ficha y plate en `ai-generations/2026-10-01_traje-bionico-nexa/` (`fichas/` y `plates/`); lo
+que la hizo cine frente a `NX7` y `NX7b`, en el
+[registro cine, delta 2026-10-02](../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks).
+El traje y los lentes se piden por catálogo: [manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
 
 ### 6.1 El Spark en el color de una línea de negocio **[operador, 2026-10-01: «Aprobados todos»]**
 
