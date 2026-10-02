@@ -141,3 +141,27 @@ cambia respecto de SKY, según `creative-workbench/clients/berel/README.md` y la
 - **Pregunta abierta bloqueante:** ¿existe una fuente de diseño de Berel (plantillas Figma de banners y
   social) que se pueda sellar como se hizo con el FIG de SKY? Si no existe, el primer paso es crearla con la
   diseñadora; sin fuente no hay derivación.
+
+## Delta 2026-10-02 — inventario real de Berel
+
+Revisión de `OneDrive/Berel - Efeonce - Squad Berel/Workspace Oficial/04_Entregables` (sólo metadatos y una
+muestra de 7 piezas del artículo N41). El operador confirma que las plantillas existen en Figma; en OneDrive
+no hay `.fig`.
+
+- **Volumen:** 314 archivos de junio a octubre de 2026 (≈60 piezas/mes): 183 webp, 94 png, 29 mp4.
+- **Unidad de producción = artículo mensual.** Cada artículo genera imágenes de blog para
+  `berel.com/inspiracion` (1408×768 webp: portada, infografía, paleta, comparativa, producto, didáctico,
+  pasos, cierre) e insumo social (post 1080×1350, story 1080×1920, Pinterest 1000×1500 y reel mp4).
+  Desde agosto la nomenclatura es estable: `N##_BN_<rol>_n` y `N##_SM_<formato>`.
+- **Sistema visual modular:** interior fotográfico + componentes reutilizables — marcador de color
+  (círculo, línea guía, nombre y código, p. ej. «Comal 4-2103T»), bloque de título con regla vertical,
+  píldora `berel.com/inspiracion`, logo Berel, tarjetas de paleta (BASE CLARA / TRANSICIÓN / ACENTO) y
+  tarjetas de recorrido con ícono.
+- **Diferencia clave con SKY:** los marcadores de color se anclan a puntos de la foto (el muro pintado), no a
+  posiciones fijas del formato; la misma escena se recorta en post, story y Pinterest y los marcadores se
+  reubican con el recorte. Eso exige anclas por foto en la biblioteca (TASK-1956).
+- **Dato de oferta = catálogo de color Berel** (nombre, código, familia), no tarifas (TASK-1953).
+- **Recursos para el pack:** `01_Brand Assets` (brandbook, logos SVG/AI, tipografías, paleta),
+  `05_Guias` (guía de estilos y de componentes web 2024-02) y `02_Recursos` (983 archivos: íconos, producto,
+  paletas, personaje Don Bere).
+- **Pendiente para derivar el adaptador:** el enlace a los archivos Figma de las plantillas de blog y social.

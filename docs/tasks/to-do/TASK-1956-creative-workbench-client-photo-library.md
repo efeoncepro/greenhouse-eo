@@ -338,3 +338,11 @@ Reglas obligatorias:
 
 - La biblioteca de Berel tendrá sujetos de producto, color y espacios pintados; Berel entrega sus propios
   masters de campaña, que entran como fotos admitidas con su licencia.
+
+## Delta 2026-10-02 — anclas por foto (caso Berel)
+
+- En Berel los marcadores de color (círculo + línea guía + nombre/código) apuntan a un muro concreto de la
+  foto y se reubican cuando la misma escena se recorta en post, story y Pinterest. La biblioteca debe
+  registrar, además de foco y zona segura, **anclas con nombre** en coordenadas de la imagen (p. ej. «muro
+  principal», con el color aplicado), y el encuadre debe transformarlas a cada formato o rechazar el formato
+  si un ancla queda fuera del recorte o bajo texto. Va en el Slice 1 (schema) y Slice 3 (QA).

@@ -341,3 +341,10 @@ Reglas obligatorias:
 
 - Segundo esquema de oferta y perfil de mercado a validar: Berel (México, es-MX, MXN; variantes por
   producto/color). El esquema neutral debe expresarlo sin cambios en el núcleo.
+
+## Delta 2026-10-02 — catálogo de color Berel
+
+- Para Berel, el dato de oferta es el **catálogo de color** (nombre, código como `4-2103T`, familia, uso
+  sugerido) que alimenta marcadores y tarjetas de paleta; la unidad de campaña es el **artículo mensual**
+  (blog + social), no una oferta comercial. El esquema neutral de oferta debe cubrir ese caso sin cambios en
+  el núcleo.
