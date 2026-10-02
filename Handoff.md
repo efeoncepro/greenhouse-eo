@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Landing AI Visibility Report (02/10, noche):** [TASK-1966](docs/tasks/in-progress/TASK-1966-ai-visibility-report-landing-la-orbita.md) in-progress (Claude). Repo `efeonce-think` `main` local: renombre a «Efeonce AI Visibility Report», lockup oficial y hero «La órbita» línea Engine. **No pushear `efeonce-think`**: push a `main` = deploy de producción; requiere aprobación del operador.
+
 **Inpainting en los CLIs (02/10, noche):** [TASK-1965](docs/tasks/in-progress/TASK-1965-ai-inpaint-image-video-cli-pipeline.md) in-progress (Claude, develop, sin push): `pnpm ai:mask` + `pnpm ai:inpaint image|video` en `scripts/ai/inpaint/**`, recomposición obligatoria con delta máximo 0. `scripts/foto/expandir.mjs` tiene WIP de otra sesión y queda fuera.
 
 **Marketing Studio (02/10, noche):** [TASK-1894](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md) in-progress. A en producción. B (commands del catálogo, API 1.4.0, `pnpm studio:write`) en producción (`a8c7886`, health 1.4.0, smoke de sólo lectura); migración `1790967435017` en staging y prod. **Operador:** release de las capabilities de Greenhouse `9d0d698d4` (no autorizado) ; gateway sincronizado con el filtro de sólo lecturas (efeonce-mcp#23 mergeada, v1.10.0) y falta su deploy manual (`deploy.yml`). C diferido. [§7.4](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
