@@ -60,10 +60,10 @@ describe('registro cine en la ficha', () => {
     expect(construirPrompt(completa).prompt).not.toContain('BELOW 36% of the frame height')
   })
 
+  // bloqueCine y no construirPrompt: el bloque sólo lee las claves de `objetos`, así que corre en CI, donde los PNG de
+  // los kits no existen (están en .gitignore) y construirPrompt aborta al resolver la referencia.
   it('una prenda del uniforme pide navy, nunca azul rey', () => {
-    const { prompt } = construirPrompt({ ...completa, objetos: [{ objeto: 'polo-efeonce' }] })
-
-    expect(prompt).toContain('deep navy, never royal blue')
+    expect(bloqueCine({ ...completa, objetos: [{ objeto: 'polo-efeonce' }] }, '16:9')).toContain('deep navy, never royal blue')
   })
 
   it('cada campo faltante avisa con su falla del casebook', () => {
@@ -173,9 +173,11 @@ describe('decisiones del operador 2026-10-02 en cine', () => {
 
 describe('prueba ciega 2 (2026-10-02)', () => {
   it('el hoodie conserva su azul royal; las demás prendas van navy', () => {
-    expect(construirPrompt({ ...completa, objetos: [{ objeto: 'hoodie-efeonce' }] }).prompt).toContain('the hoodie keeps the exact royal blue')
-    expect(construirPrompt({ ...completa, objetos: [{ objeto: 'hoodie-efeonce' }] }).prompt).not.toContain('never royal blue')
-    expect(construirPrompt({ ...completa, objetos: [{ objeto: 'polo-efeonce' }] }).prompt).toContain('deep navy, never royal blue')
+    const hoodie = bloqueCine({ ...completa, objetos: [{ objeto: 'hoodie-efeonce' }] }, '16:9')
+
+    expect(hoodie).toContain('the hoodie keeps the exact royal blue')
+    expect(hoodie).not.toContain('never royal blue')
+    expect(bloqueCine({ ...completa, objetos: [{ objeto: 'polo-efeonce' }] }, '16:9')).toContain('deep navy, never royal blue')
   })
 
   it('una ficha con __revisar avisa', () => {
