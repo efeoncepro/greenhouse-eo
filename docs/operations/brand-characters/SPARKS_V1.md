@@ -1,7 +1,7 @@
 # Sparks V1 — los agentes de Efeonce
 
 > **Tipo de documento:** Especificación canónica de marca (personajes)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-10-01 por Claude
 > **Última actualización:** 2026-10-01 por Claude
 > **Estado:** nombre, plantel y relato aprobados por el operador (Julio Reyes) el 2026-09-29; diseño elegido y Spark
@@ -215,6 +215,28 @@ datos en `/references/sparks.json` → `rig`).
   por pantalla; en una foto, el Spark sale del catálogo de `foto:prompt`, nunca de una captura del rig.
 - Producción en `ai-generations/2026-10-01_sparks/rig/` (prompt `prompts/rig-sin-cara.txt`).
 
+### 8.2 La versión 2D (ilustración plana) **[operador, 2026-10-01: «la idea no es reemplazar los 3d, es tener una versión alternativa en 2d»; reglas aprobadas: «Bien, haz todo eso»]**
+
+Para composiciones gráficas planas de la línea (posts, stories, láminas, piezas sin foto) existe un Spark en 2D:
+el mismo personaje dibujado en vector. **Es una alternativa, no un reemplazo:** foto, cine, escenas con Nexa y el
+rig siguen saliendo del kit 3D.
+
+- **Misma anatomía:** esfera blanca, visor navy con dos ojos y sonrisa, la chispa de cuatro puntas, el anillo
+  inclinado más alto a la izquierda con su esfera, las tres ventanas y la luz debajo. Plano: un solo tono de sombra,
+  sin degradados, brillos ni glow. Las seis expresiones y los seis colores de línea son los mismos de §6.1 y §8.1.
+- **Sin brazos ni manos** por defecto **[operador, 2026-10-01]**: la silueta queda en esfera, visor, anillo y chispa,
+  que es lo que conecta con la órbita, y se lee mejor en chico. Los brazos existen como opción, no como norma.
+- **El accesorio flota** junto al cuerpo, a su izquierda, sin tocar el visor. Es la única diferencia con §5
+  («siempre tocándolo»), que sigue valiendo para el 3D.
+- **El Spark cuenta como la órbita de la pieza.** Ya trae anillo y esfera, así que en una composición no se le agrega
+  otra órbita ni una esfera de cierre: no lleva el par pregunta-respuesta del componente `Voice` (su respuesta cierra
+  con la esfera). El texto va en titular y apoyo, entero fuera del anillo.
+- **Sobre papel lleva contorno navy**; sobre oscuro, no.
+- **Versión simple a 72 px o menos:** sin paneles, tornillos, brillo del visor ni ventanas, y con el anillo más grueso.
+- Siguen valiendo §2 y §10: una persona supervisa en el relato de la pieza y el accesorio no lleva texto. La escala de
+  §5 aplica cuando hay una persona en la pieza; la firma es la de la línea gráfica.
+- Fuente y canvas de exploración: `ai-generations/2026-10-01_sparks/2d/` (LEEME y componente).
+
 ## 9. El nombre: revisión de colisión
 
 Búsqueda web del 2026-10-01 **[medido]**:
@@ -258,3 +280,4 @@ La task nombraba también Adobe Spark (hoy Adobe Express); no está entre los re
 | 4 | Revisión de Legal si se decide registrar el nombre | Legal |
 | 5 | ¿Las cinco familias calzan con lo que Agent Ops vende hoy? (pregunta abierta de la task) | Operador |
 | 6 | Prueba de reconocimiento: son un sistema consistente, no un activo distintivo medido | Operador |
+| 7 | Exportar el Spark 2D (§8.2) a SVG estáticos y publicarlos en `@efeoncepro/axis-brand-assets` | AXIS + aprobación del operador |
