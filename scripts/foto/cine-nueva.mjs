@@ -29,6 +29,12 @@ export const nuevaFichaDesde = (receta, original, id, { formato, alcance } = {})
 
   if (alcance) ficha.alcance = alcance
 
+  // Prueba ciega 2 (2026-10-02): la acción suspendida, los personajes y la identidad de la receta viajaban a la ficha
+  // nueva sin que nadie los mirara. Se marcan para revisar; `foto:prompt` avisa mientras la clave exista.
+  const revisar = ['suspendido', 'objetos', 'identidad'].filter(c => original[c] != null)
+
+  if (revisar.length) ficha.__revisar = revisar
+
   ficha.escena = `REESCRIBIR — escena de la receta ${receta.id}, como punto de partida: ${original.escena}`
   if (!ficha.alcance && receta.alcance) ficha.alcance = receta.alcance
 

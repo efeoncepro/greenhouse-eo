@@ -444,7 +444,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   el registro de la escena, NUNCA por variedad visual: una reunión importante en hoodie dice lo contrario de lo
   que la foto cuenta. **Registro cine** (operador, 2026-09-27): sólo con **Nexa protagonista** (traje de ficción
   permitido) o en la receta de deck **`proposal-cinematic`** con personas del equipo, que **conservan su uniforme por
-  registro**; cámara ~2 m y 85 mm, isotipo compuesto (nunca el del modelo) y nunca dos personas mirándose de cerca.
+  registro**; cámara ~2 m y 85 mm, el bordado del kit verificado con `foto:emblema` (compuesto sólo si difiere; regla del 2026-09-28) y nunca dos personas mirándose de cerca.
   Tercer caso (excepción del 2026-09-27, ya en el contrato AXIS): láminas de sección y «about» del deck, y portadas y
   contraportadas con foto. Fuera de esos casos no se usa. Canon vigente: `EFEONCE_PHOTO_REGISTER_CINE_V1.md` §2.
   **Portadas de perfil y destacados de Instagram de Efeonce con Nexa protagonista: aprobados (2026-10-01)**; con

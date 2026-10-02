@@ -2526,6 +2526,10 @@ export const auditarCine = ficha => {
     )
   }
 
+  if (ficha.__revisar) {
+    avisos.push(`\`__revisar\` (${[].concat(ficha.__revisar).join(', ')}): vienen de la receta; confirma que sirven a esta escena y borra la clave.`)
+  }
+
   if (ficha.__completar) {
     avisos.push(`la ficha todavía lista \`__completar\` (${[].concat(ficha.__completar).join(', ')}): complétalos y borra la clave antes de generar.`)
   }
@@ -2569,6 +2573,14 @@ export const AJUSTES_CINE = [
   ],
   ['white balance warm-neutral, shadows never blue.', 'white balance cool-neutral; shadows deep navy-black, never amber, never warm tungsten, never saturated blue.'],
   ['a DEEP, warm, evenly toned shadow', 'a DEEP, evenly toned near-black shadow'],
+  // Prueba ciega 2 (2026-10-02): restos documentales que seguían entrando en cine.
+  ['real paper texture, ', ''],
+  ['slight motion blur on moving hands, ', ''],
+  ['a DECISIVE MOMENT at the peak of the action', 'a single decisive instant'],
+  [
+    'a SOURCE THAT IS VISIBLE IN THE FRAME — a monitor, a screen, a practical lamp, a window — and that source is what lights them',
+    'a SOURCE THAT IS VISIBLE IN THE FRAME — the light object the scene declares as its phenomenon, never a monitor, a lamp or a window — and that source is what lights them'
+  ],
   // Decisión del operador 2026-10-02: los aros de Nexa son dorados, como en su ancla de identidad (pedir plata
   // perdía siempre contra la referencia). Sólo en cine por ahora; el resto de los registros no cambia.
   [
@@ -2650,7 +2662,15 @@ export const bloqueCine = (ficha, formato) => {
   // El traje biónico de Nexa también es navy profundo (TASK-1940): la prueba ciega del 2026-10-02 mostró que no recibía
   // la línea porque no está en PRENDAS_CON_EMBLEMA (que dispara el aviso de bordado, que no le aplica).
   if (clavesDeObjetos(ficha).some(k => PRENDAS_CON_EMBLEMA.includes(k) || k === 'traje-bionico-nexa')) {
-    partes.push('UNIFORM COLOUR: every Efeonce garment is deep navy, never royal blue, cobalt or bright blue.')
+    // El hoodie del kit es azul royal y es correcto (registro cine §6, medido): no se le pide navy.
+    const claves = clavesDeObjetos(ficha)
+    const navy = claves.filter(k => k !== 'hoodie-efeonce')
+
+    partes.push(
+      navy.length
+        ? `UNIFORM COLOUR: every Efeonce garment keeps the exact colour of its reference${claves.includes('hoodie-efeonce') ? ' (the hoodie is the royal blue of its reference)' : ''}; the others are deep navy, never royal blue, cobalt or bright blue.`
+        : 'UNIFORM COLOUR: the hoodie keeps the exact royal blue of its reference.'
+    )
   }
 
   return partes.length ? `CINEMATIC CRAFT (registro cine):\n${partes.join('\n')}` : null

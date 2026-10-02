@@ -94,6 +94,8 @@ foto cine nueva, se agrega ahí **y** en esta tabla.
 | `RV1b` | `proposal-cinematic-revops` | líder RevOps | la fuente modela a la persona; moño de luz | `2026-09-26_deck-revops/fichas/RV1-*.json` |
 | `CR2b` / `CR4` | creativa | directora creativa | constelación de piezas a varias profundidades / el squad entrega | `2026-09-26_deck-creativo/` · `2026-09-28_portada-creativa/` |
 | `SP2b` / `SP1` | sección partida | equipo / cliente (panel-end) | 1:1, reserva izquierda, luz dramática | `2026-09-27_secciones-partidas/fichas/` |
+| `PH2` | destacado de Instagram | Nexa | retrato centrado, un color de luz sobre oscuro | `2026-09-30_portadas-sociales/fichas/PH2-aeo.json` |
+| `PS1b` | portada de perfil 3:1 | Nexa (softshell) | reserva izquierda, una sola fuente | `2026-09-30_portadas-sociales/fichas/PS1b-*.json` |
 | `WB1c` | portada Engine, `proposal-cinematic-web` | desarrollador | el polo del kit editado: bordado en el pecho | `2026-09-26_deck-web/fichas/WB1c/` |
 
 ⚠️ Varias de estas (AE2b, CR2b, NX6b, RV1b, BR1b, BR2b, SP2b, SE1) llevan el **isotipo compuesto plano** (falla 8):

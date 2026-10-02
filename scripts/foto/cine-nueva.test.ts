@@ -21,6 +21,7 @@ describe('foto:cine:nueva', () => {
     expect(ficha.escena.startsWith('REESCRIBIR')).toBe(true)
     expect(ficha.piloto).toBeUndefined()
     expect(ficha.__completar).toEqual(['llave', 'primerPlano', 'fondo', 'fenomeno'])
+    expect(ficha.__revisar).toEqual(['objetos'])
   })
 
   it('conserva los campos cine que la receta ya trae', () => {

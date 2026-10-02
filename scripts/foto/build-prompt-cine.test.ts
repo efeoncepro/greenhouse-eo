@@ -170,3 +170,15 @@ describe('decisiones del operador 2026-10-02 en cine', () => {
     expect(ajustarParaCine('small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate')).toContain('small gold earrings')
   })
 })
+
+describe('prueba ciega 2 (2026-10-02)', () => {
+  it('el hoodie conserva su azul royal; las demás prendas van navy', () => {
+    expect(construirPrompt({ ...completa, objetos: [{ objeto: 'hoodie-efeonce' }] }).prompt).toContain('the hoodie keeps the exact royal blue')
+    expect(construirPrompt({ ...completa, objetos: [{ objeto: 'hoodie-efeonce' }] }).prompt).not.toContain('never royal blue')
+    expect(construirPrompt({ ...completa, objetos: [{ objeto: 'polo-efeonce' }] }).prompt).toContain('deep navy, never royal blue')
+  })
+
+  it('una ficha con __revisar avisa', () => {
+    expect(auditarCine({ ...completa, __revisar: ['suspendido'] }).join('\n')).toContain('__revisar')
+  })
+})

@@ -836,8 +836,8 @@ Antes de mostrar una pieza cine, las doce, en orden:
 6. **¿El sujeto mira al lente, y nadie mira a otro de cerca?** (§4, §7.4)
 7. **Identidad:** Nexa es la A, contra sus anclas al 100 %; una persona real, por su set aprobado.
 8. **Vestuario:** equipo con el uniforme del registro de escena; traje de ficción sólo para Nexa (§7.2).
-9. **Emblema:** `pnpm foto:emblema` mirado al 100 % e **isotipo oficial compuesto** (sufijo `b` y `.json` de
-   procedencia) (§7.3).
+9. **Emblema:** `pnpm foto:emblema` mirado al 100 %; si el bordado del kit coincide se publica tal cual, y
+   `foto:isotipo` sólo si difiere (regla del 2026-09-28, §7.3).
 10. **Reserva:** la izquierda (o la banda superior, en vertical) oscura, con textura y sin fenómeno de luz ni robots;
     **ningún texto cruza al sujeto** en la pieza compuesta (§9).
 11. **Lecho y firma:** lecho `DARK near black` fuera de toda luz y de todo reflejo; en la lámina, burbuja URL en el
