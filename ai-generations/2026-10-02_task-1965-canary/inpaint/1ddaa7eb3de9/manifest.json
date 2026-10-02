@@ -1,0 +1,114 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "1ddaa7eb3de9",
+  "key": "1ddaa7eb3de9a456f8fb9d458fbf350bb5bad72e9bdd42ab0fbf12394118a22a",
+  "status": "completed",
+  "createdAt": "2026-10-02T21:03:36.777Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/mask.png",
+    "maskSha256": "cb46972fcff6cdfebf5eaf006924d0501a5b3390cb2e90b6aec3e7dd5f79f86e",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-09-16"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "low",
+    "seed": null,
+    "count": 1,
+    "prompt": "A small green potted plant in a matte terracotta pot standing on the wooden desk, lit by the same soft window light from the right, with a soft contact shadow on the wood. Keep everything else exactly the same."
+  },
+  "mask": {
+    "touchedFraction": 0.17229906717936197,
+    "editable": 0,
+    "soft": 271003,
+    "protected": 1301861
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 55 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0047,
+    "basis": "1 × salida 1536x1024 low (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "protected": {
+        "pixels": 1301861,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 271003,
+        "maxDelta": 30,
+        "meanDelta": 6.029,
+        "worst": {
+          "x": 504,
+          "y": 595
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1301861,
+        "maxDelta": 174,
+        "meanDelta": 11.354,
+        "worst": {
+          "x": 730,
+          "y": 590
+        }
+      },
+      "outputUsd": 0.0047,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 1597,
+        "input_tokens_details": {
+          "image_tokens": 1536,
+          "text_tokens": 61
+        },
+        "output_tokens": 158,
+        "output_tokens_details": {
+          "image_tokens": 158,
+          "text_tokens": 0
+        },
+        "total_tokens": 1755
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "low"
+      }
+    }
+  ]
+}

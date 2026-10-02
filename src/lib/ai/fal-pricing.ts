@@ -107,6 +107,8 @@ export const estimateFalCost = (params: {
   apiPrice?: FalApiUnitPrice | null
   /** Duración del video de origen (edit/enhance), si se pudo medir localmente. */
   sourceSeconds?: number | null
+  /** Área en píxeles de la imagen de entrada, para endpoints que cobran por megapíxel y salen a su tamaño. */
+  sourceArea?: number | null
 }): FalCostEstimate => {
   const { capability, input, apiPrice } = params
   const rule = capability.pricing
@@ -150,6 +152,25 @@ export const estimateFalCost = (params: {
       usd: round(perSecond * seconds),
       basis: `${seconds} s × USD ${perSecond}/s${resolution ? ` (${resolution})` : ''} · precio ${source === 'publicado' ? 'publicado' : 'de la API (escalón más bajo)'}${isUpperBound ? ' · duración auto: cota superior' : ''}`,
       confidence: isUpperBound ? 'cota' : source
+    }
+  }
+
+  if (rule.unit === 'megapixel') {
+    const area = falImageArea(input.image_size) ?? params.sourceArea ?? null
+    const perMegapixel = rule.publishedUsdPerUnit ?? apiPrice?.unitPrice ?? null
+    const count = Math.max(1, Number(input.num_images ?? 1))
+
+    if (perMegapixel === null || area === null) {
+      return { usd: null, basis: 'cobra por megapíxel y falta el tamaño de la imagen de entrada', confidence: 'sin dato' }
+    }
+
+    // Se redondea el megapíxel hacia arriba: si fal cobra fraccionado, la estimación queda como cota superior.
+    const megapixels = Math.ceil(area / 1_000_000)
+
+    return {
+      usd: round(perMegapixel * megapixels * count),
+      basis: `${count} imagen(es) × ${megapixels} MP (redondeado arriba) × USD ${perMegapixel}/MP`,
+      confidence: 'cota'
     }
   }
 

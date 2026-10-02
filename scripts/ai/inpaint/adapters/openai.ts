@@ -21,12 +21,14 @@ import type { ImageAdapterParams, InpaintImageAdapter } from './types'
 /**
  * Adaptador OpenAI (`/v1/images/edits` con máscara) sobre el cliente canónico `editOpenAIImage`.
  *
- * Default `gpt-image-2.5-sunburst` · `high`: la guía de selección lo pone primero para edición precisa con máscara
- * (§5.1). Máscara en convención alfa: transparente = editable. El modelo redibuja la imagen entera aunque reciba la
- * máscara (medido 2026-09-17), por eso el pipeline recompone después.
+ * Default `gpt-image-2.5-flare` · `medium`. NO Sunburst: con máscara, Sunburst devolvió la zona totalmente editable
+ * como un PANEL NEGRO PLANO en las tres pasadas medidas (2026-09-23 y dos en el canario de TASK-1965 del 2026-10-02,
+ * con máscara de RGB negro y con RGB de la imagen: no depende del color bajo el alfa); Flare, mismo prompt y misma
+ * máscara, puso el objeto. Máscara en convención alfa: transparente = editable. El modelo redibuja la imagen entera
+ * aunque reciba la máscara (medido 2026-09-17: hasta 179/255 en la zona protegida), por eso el pipeline recompone.
  */
-const DEFAULT_MODEL: OpenAIImageModel = 'gpt-image-2.5-sunburst'
-const DEFAULT_QUALITY: OpenAIImageQuality = 'high'
+const DEFAULT_MODEL: OpenAIImageModel = 'gpt-image-2.5-flare'
+const DEFAULT_QUALITY: OpenAIImageQuality = 'medium'
 
 /** Grilla extendida sin pasar a la zona experimental (> 2560×1440, guía de OpenAI 2026-09-16). */
 const EXTENDED_GRID = { step: 16, minArea: 655_360, maxArea: 2560 * 1440, maxEdge: 3840, maxRatio: 3 }
@@ -69,14 +71,20 @@ export const openAIInpaintAdapter: InpaintImageAdapter = {
   defaultModel: DEFAULT_MODEL,
   sendsMask: true,
   maskConvention: 'alpha-transparent-editable',
-  // Edición con máscara medida con `pnpm ai:image --mask` (manual «editar una zona», 2026-09-16/17).
-  verifiedAt: '2026-09-16',
+  // Canario real con Flare a `medium`: planta puesta y zona protegida en delta 0 (TASK-1965, 2026-10-02).
+  verifiedAt: '2026-10-02',
+  revision: 1,
   validate({ model, quality, seed }: ImageAdapterParams) {
     const resolved = asModel(model)
 
     assertOpenAIImageQualitySupported({ model: resolved, quality: asQuality(quality) })
 
     if (seed !== undefined) throw new Error('OpenAI no acepta semilla: quita --seed (cada candidato es una muestra distinta).')
+  },
+  advisories({ model }) {
+    return model.startsWith('gpt-image-2.5-sunburst')
+      ? ['Sunburst con máscara devolvió la zona editable como un panel negro plano en 3 de 3 pasadas medidas: el default es gpt-image-2.5-flare.']
+      : []
   },
   pickSize: openAIPickSize,
   async estimate({ model, quality, size, count }) {

@@ -22,6 +22,7 @@ export type FalMediaKind = 'image' | 'video' | 'training'
 export type FalOperation =
   | 'text-to-image'
   | 'edit'
+  | 'inpaint'
   | 'layerize'
   | 'text-to-video'
   | 'image-to-video'
@@ -361,6 +362,11 @@ export interface FalCapability {
   imageOutput?: { formats: readonly ('jpeg' | 'png')[]; defaultFormat: 'jpeg' | 'png' }
   /** Regla para estimar el costo antes de encolar (ver FAL_PRICING_RULES y src/lib/ai/fal-pricing.ts). */
   pricing?: FalPricingRule
+  /**
+   * Inpainting con máscara: campo por el que viaja y su convención. Lo consume `pnpm ai:inpaint image`, que la
+   * convierte desde la máscara canónica y recompone después (TASK-1965); `pnpm ai:fal` no arma máscaras.
+   */
+  mask?: { field: 'mask_url'; convention: 'white-editable' }
 }
 
 /**
@@ -370,7 +376,7 @@ export interface FalCapability {
  * dice la API y Flux 3 el doble. Toda estimación es orientativa; `pnpm ai:fal --balance` antes y después es la medida.
  */
 export interface FalPricingRule {
-  unit: 'second' | 'token_1k' | 'image' | 'layer' | 'step'
+  unit: 'second' | 'token_1k' | 'image' | 'layer' | 'step' | 'megapixel'
   /** USD por unidad según la resolución pedida (claves = valores canónicos del contrato). */
   publishedUsdByResolution?: Readonly<Record<string, number>>
   /** USD por unidad fijo publicado (cuando no depende de resolución). */
@@ -453,6 +459,25 @@ const BASE_FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'images',
     verifiedAt: '2026-09-16'
+  },
+
+  // ── FLUX.1 Pro Fill — inpainting con máscara (TASK-1965) ──────────────────────────────────────────
+  {
+    id: 'flux-pro-fill',
+    slug: 'fal-ai/flux-pro/v1/fill',
+    kind: 'image',
+    operation: 'inpaint',
+    label: 'FLUX.1 Pro Fill — inpainting con máscara',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'images',
+    // Canario real con `pnpm ai:inpaint image` (TASK-1965): objeto puesto, zona protegida en delta 0.
+    verifiedAt: '2026-10-02',
+    mask: { field: 'mask_url', convention: 'white-editable' },
+    notes:
+      'Máscara blanca = editable, mismas dimensiones que la imagen; la salida sale al tamaño de la entrada. Esquema ' +
+      'OpenAPI verificado 2026-10-02 (image_url, mask_url, seed, output_format). Se opera con pnpm ai:inpaint image.'
   },
 
   // ── Seedance — video ──────────────────────────────────────────────────────────────────────────
@@ -1174,6 +1199,7 @@ const BASE_FAL_CAPABILITIES: readonly FalCapability[] = [
  * los entrenadores NO lo declaran: mandar `--seed` ahí tenía efecto desconocido.
  */
 export const FAL_SEED_CAPABILITY_IDS: readonly string[] = [
+  'flux-pro-fill',
   'seedance25-r2v',
   'h3-t2v', 'h3-i2v', 'h3-r2v', 'h3-t2v-lora', 'h3-i2v-lora', 'h3-r2v-lora',
   'h3max-t2v', 'h3max-i2v', 'h3max-r2v', 'h3max-camera', 'h3turbo-t2v', 'h3turbo-i2v',
@@ -1189,7 +1215,8 @@ const FAL_IMAGE_RULES: Readonly<Record<string, Pick<FalCapability, 'imageOutput'
   'seedream5-pro-edit': { imageOutput: SEEDREAM_PRO_OUTPUT, maxInputImages: 10 },
   'seedream5-pro-layerize': { imageOutput: { formats: [], defaultFormat: 'png' } },
   'seedream5-lite': { imageOutput: SEEDREAM_LITE_OUTPUT },
-  'seedream5-lite-edit': { imageOutput: SEEDREAM_LITE_OUTPUT, maxInputImages: 10 }
+  'seedream5-lite-edit': { imageOutput: SEEDREAM_LITE_OUTPUT, maxInputImages: 10 },
+  'flux-pro-fill': { imageOutput: { formats: ['jpeg', 'png'], defaultFormat: 'jpeg' } }
 }
 
 const SEEDANCE_TOKENS: FalPricingRule = { unit: 'token_1k', defaultResolution: '720p' }
@@ -1213,6 +1240,8 @@ export const FAL_PRICING_RULES: Readonly<Record<string, FalPricingRule>> = {
   'seedream5-pro-layerize': { unit: 'layer', publishedUsdByArea: { upTo1536sq: 0.03375, above1536sq: 0.0675 } },
   'seedream5-lite': { unit: 'image', publishedUsdPerUnit: 0.035 },
   'seedream5-lite-edit': { unit: 'image', publishedUsdPerUnit: 0.035 },
+  // API de precios de fal 2026-10-02: USD 0,05 por megapíxel de salida.
+  'flux-pro-fill': { unit: 'megapixel', publishedUsdPerUnit: 0.05 },
   ...Object.fromEntries(
     ['seedance25-t2v', 'seedance25-i2v', 'seedance25-r2v', 'seedance20-t2v', 'seedance20-i2v', 'seedance20-r2v']
       .concat(['fast', 'mini', 'us'].flatMap(v => ['t2v', 'i2v', 'r2v'].map(m => `seedance20-${v}-${m}`)))

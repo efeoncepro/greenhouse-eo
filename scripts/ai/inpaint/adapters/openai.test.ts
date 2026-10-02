@@ -40,6 +40,12 @@ describe('adaptador OpenAI', () => {
     expect(() => openAIInpaintAdapter.validate({ model: 'gpt-image-2.5-flare', quality: 'max' })).not.toThrow()
   })
 
+  it('default Flare · medium, y avisa si se elige Sunburst con máscara', () => {
+    expect(openAIInpaintAdapter.defaultModel).toBe('gpt-image-2.5-flare')
+    expect(openAIInpaintAdapter.advisories?.({ model: 'gpt-image-2.5-sunburst' })).toHaveLength(1)
+    expect(openAIInpaintAdapter.advisories?.({ model: 'gpt-image-2.5-flare' })).toEqual([])
+  })
+
   it('estima con la fórmula oficial de tokens', async () => {
     const estimate = await openAIInpaintAdapter.estimate({ model: 'gpt-image-2.5-sunburst', quality: 'low', size: { width: 1024, height: 1024 }, count: 2 })
 

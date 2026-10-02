@@ -50,8 +50,12 @@ export interface InpaintImageAdapter {
   maskConvention: MaskConvention | null
   /** Generación real verificada con este adaptador (YYYY-MM-DD); `null` = contrato verificado, generación no. */
   verifiedAt: string | null
+  /** Sube cuando cambia cómo el adaptador arma el pedido: entra al hash, así la caché no reutiliza una salida vieja. */
+  revision: number
   /** Valida modelo, calidad y semilla ANTES de gastar. */
   validate(params: ImageAdapterParams): void
+  /** Avisos medidos sobre la combinación pedida (no bloquean): se imprimen antes de gastar. */
+  advisories?(params: ImageAdapterParams): string[]
   pickSize(model: string): PickTargetSize
   estimate(params: ImageAdapterParams & { size: TargetSize; count: number }): Promise<CostEstimate>
   run(input: ImageAdapterRunInput): Promise<ImageAdapterRunOutput>

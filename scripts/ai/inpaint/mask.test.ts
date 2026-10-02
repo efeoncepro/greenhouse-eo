@@ -117,6 +117,16 @@ describe('operaciones', () => {
     expect(maskStats(soft).soft).toBeGreaterThan(0)
   })
 
+  it('el difuminado conserva el núcleo en 255 y los restos lejanos en 0 (regresión del canario 2026-10-02)', async () => {
+    const soft = await feather(maskFromRect(600, 400, { x0: 0.1, y0: 0.1, x1: 0.4, y1: 0.7 }), 24)
+    const stats = maskStats(soft)
+
+    expect(at(soft, 150, 160)).toBe(255)
+    // El núcleo erosionado (rect 180×240 menos 24 px por lado = 132×192) queda entero en 255.
+    expect(stats.editable).toBeGreaterThanOrEqual(132 * 192)
+    expect(at(soft, 590, 390)).toBe(0)
+  })
+
   it('reescala y recorta conservando 1 canal', async () => {
     const mask = maskFromRect(8, 8, { x0: 0, y0: 0, x1: 0.5, y1: 0.5 })
     const big = await resizeMask(mask, 16, 16)

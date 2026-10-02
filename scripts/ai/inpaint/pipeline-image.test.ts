@@ -47,6 +47,7 @@ const fakeAdapter = (overrides: Partial<InpaintImageAdapter> = {}) => {
     sendsMask: true,
     maskConvention: 'white-editable',
     verifiedAt: '2026-10-02',
+    revision: 1,
     validate: () => undefined,
     pickSize: () => (aspect, area) => pickGridSize(aspect, area, { step: 16, minArea: 65_536, maxArea: 1_048_576, maxEdge: 2048, maxRatio: 3 }),
     estimate: async ({ count }) => ({ usd: 0.01 * count, basis: 'fake' }),
@@ -159,6 +160,25 @@ describe('pnpm ai:inpaint image — pipeline', () => {
     const { adapter } = fakeAdapter({ run: async () => { throw new Error('proveedor caído') } })
 
     await expect(runImageInpaint(base(adapter))).rejects.toThrow('proveedor caído')
+  })
+
+  it('marca el panel negro plano de la salida cruda (trampa de Sunburst) aunque la verificación pase', async () => {
+    const { adapter } = fakeAdapter({
+      run: async ({ size }) => ({
+        image: await sharp({ create: { width: size.width, height: size.height, channels: 3, background: '#000000' } }).png().toBuffer(),
+        providerModel: 'fake-1',
+        outputUsd: null,
+        usage: null,
+        meta: {}
+      })
+    })
+
+    const lines: string[] = []
+    const result = await runImageInpaint({ ...base(adapter), log: line => lines.push(line) })
+
+    expect(result.manifest.candidates[0].verdict).toBe('PASS')
+    expect(result.manifest.candidates[0].suspectFlatPanel).toBe(true)
+    expect(lines.join('\n')).toMatch(/negra y plana/)
   })
 
   it('código de salida: 0 todo PASS, 2 si alguno FAIL, 1 si la corrida falló', () => {

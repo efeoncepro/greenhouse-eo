@@ -28,8 +28,8 @@ Entrada:
 
 Proveedor:
   --adapter <id>             ${IMAGE_ADAPTER_IDS.join(' | ')} (default openai)
-  --model <id>               Default del adaptador (openai: gpt-image-2.5-sunburst)
-  --quality <q>              openai: low | medium | high (default) | xhigh | max
+  --model <id>               Default del adaptador (openai: gpt-image-2.5-flare; Sunburst con máscara devuelve un panel negro)
+  --quality <q>              openai: low | medium (default) | high | xhigh | max
   --seed <n>                 Sólo adaptadores que la acepten
   --count <n>                Candidatos (1–8); cada uno es un pedido pagado; con más de uno, contact-sheet.png
 

@@ -1,19 +1,18 @@
+import { createFalInpaintAdapter, FAL_INPAINT_CAPABILITY_IDS } from './fal'
 import { openAIInpaintAdapter } from './openai'
 import type { InpaintImageAdapter } from './types'
 
 /**
  * Registro de adaptadores de imagen de `pnpm ai:inpaint image`. Un proveedor nuevo es un adaptador más aquí; el
- * pipeline (recorte, recomposición, verificación, manifiesto) no cambia.
+ * pipeline (recorte, recomposición, verificación, manifiesto) no cambia. Los de fal salen del catálogo verificado.
  */
-const IMAGE_ADAPTERS: readonly InpaintImageAdapter[] = [openAIInpaintAdapter]
-
-export const IMAGE_ADAPTER_IDS = IMAGE_ADAPTERS.map(adapter => adapter.id)
+export const IMAGE_ADAPTER_IDS = ['openai', ...FAL_INPAINT_CAPABILITY_IDS.map(id => `fal:${id}`)]
 
 export const resolveImageAdapter = (id: string | undefined): InpaintImageAdapter => {
   const wanted = id ?? 'openai'
-  const adapter = IMAGE_ADAPTERS.find(item => item.id === wanted)
 
-  if (!adapter) throw new Error(`Adaptador desconocido: "${wanted}". Disponibles: ${IMAGE_ADAPTER_IDS.join(', ')}.`)
+  if (wanted === 'openai') return openAIInpaintAdapter
+  if (wanted.startsWith('fal:')) return createFalInpaintAdapter(wanted.slice(4))
 
-  return adapter
+  throw new Error(`Adaptador desconocido: "${wanted}". Disponibles: ${IMAGE_ADAPTER_IDS.join(', ')}.`)
 }

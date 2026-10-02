@@ -298,15 +298,28 @@ export const erode = (mask: CanonicalMask, radius: number): CanonicalMask => {
   return { ...mask, data }
 }
 
-/** Difumina el borde. La lectura exige 1 canal: sin `toColourspace('b-w')`, sharp devolvería 3. */
+/**
+ * Difumina el borde hacia afuera y hacia adentro sin perder el núcleo: el blur de sharp redondea y deja el centro en
+ * 253–254 (medido 2026-10-02: una zona de 441×615 px quedó sin un solo píxel en 255, toda «borde», y la recomposición
+ * mezclaba restos de la base). El núcleo erosionado se repone en 255 y los restos ≤ 2 vuelven a 0 para que la zona
+ * protegida sea protegida de verdad. La lectura exige 1 canal: sin `toColourspace('b-w')`, sharp devolvería 3.
+ */
 export const feather = async (mask: CanonicalMask, radius: number): Promise<CanonicalMask> => {
   assertRadius(radius, 'difuminar')
   if (radius === 0) return mask
 
   const sigma = Math.min(1000, Math.max(0.3, radius / 2))
   const raw = await readRaw(singleChannel(mask.data, mask.width, mask.height).blur(sigma).toColourspace('b-w'), 1, 'máscara difuminada')
+  const core = erode(mask, radius)
+  const data = new Uint8Array(raw.data.length)
 
-  return { width: mask.width, height: mask.height, data: raw.data }
+  for (let i = 0; i < data.length; i += 1) {
+    const value = Math.max(raw.data[i], core.data[i])
+
+    data[i] = value <= 2 ? 0 : value >= 253 ? 255 : value
+  }
+
+  return { width: mask.width, height: mask.height, data }
 }
 
 export const invert = (mask: CanonicalMask): CanonicalMask => ({ ...mask, data: mask.data.map(value => 255 - value) })

@@ -47,6 +47,10 @@ export interface CandidateRecord {
   diff: string
   verdict: VerificationReport['verdict']
   reason: string
+  /** Cuánto cambió la zona abierta; bajo LOW_EDIT_MEAN_DELTA se avisa que el pedido quizá no se cumplió. */
+  editedMeanDelta: number
+  /** La zona editable volvió como panel negro plano (salida cruda): el candidato no sirve aunque pase la verificación. */
+  suspectFlatPanel: boolean
   protected: ZoneDelta
   editable: ZoneDelta
   seam: ZoneDelta
@@ -82,6 +86,37 @@ export interface ImageInpaintResult {
   exitCode: number
 }
 
+/**
+ * Fracción de la zona totalmente editable que vino casi negra y plana (≤ 8/255 en todo canal). Sobre la mitad, el
+ * modelo devolvió un panel en vez de la edición: la trampa de Sunburst con máscara (3 de 3 pasadas, 2026-09-23 y
+ * 2026-10-02). Se mide sobre la salida CRUDA, antes de recomponer.
+ */
+export const flatBlackFraction = (generated: { data: Uint8Array }, mask: { data: Uint8Array }): number => {
+  let open = 0
+  let black = 0
+
+  for (let i = 0; i < mask.data.length; i += 1) {
+    if (mask.data[i] !== 255) continue
+    open += 1
+
+    if (generated.data[i * 4] <= 8 && generated.data[i * 4 + 1] <= 8 && generated.data[i * 4 + 2] <= 8) black += 1
+  }
+
+  return open ? black / open : 0
+}
+
+export const FLAT_PANEL_THRESHOLD = 0.5
+
+/** Bajo este delta medio en la zona abierta, la edición probablemente no ocurrió (aviso, no veredicto). */
+export const LOW_EDIT_MEAN_DELTA = 12
+
+/** Delta medio de lo que la máscara abrió (núcleo + borde), ponderado por píxeles. */
+export const editedMeanDelta = (report: Pick<VerificationReport, 'editable' | 'seam'>): number => {
+  const pixels = report.editable.pixels + report.seam.pixels
+
+  return pixels ? (report.editable.meanDelta * report.editable.pixels + report.seam.meanDelta * report.seam.pixels) / pixels : 0
+}
+
 /** 0 si todos los candidatos pasan; 2 si alguno falló la verificación. */
 export const exitCodeFor = (manifest: Pick<ImageInpaintManifest, 'status' | 'candidates'>): number => {
   if (manifest.status === 'failed') return 1
@@ -102,6 +137,8 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
   if (!options.prompt.trim()) throw new Error('El prompt está vacío.')
 
   adapter.validate({ model, quality: options.quality, seed: options.seed })
+
+  for (const advisory of adapter.advisories?.({ model, quality: options.quality, seed: options.seed }) ?? []) log(`  ⚠ ${advisory}`)
   assertBrandSafePrompt(options.prompt, Boolean(options.allowBrand))
 
   const [imageBytes, baseMeta] = await Promise.all([sharp(options.imagePath).toBuffer(), sharp(options.imagePath).metadata()])
@@ -134,6 +171,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       size: [base.width, base.height],
       prompt: options.prompt,
       adapter: adapter.id,
+      adapterRevision: adapter.revision,
       model,
       quality: options.quality ?? null,
       seed: options.seed ?? null,
@@ -224,6 +262,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       const patch = await resizeRgba(await loadRgba(output.image, 'salida del proveedor'), plan.box.width, plan.box.height)
       const generatedFull = placePatch(base, { ...patch, hadAlpha: base.hadAlpha }, plan.box)
       const drift = measureZones(base, generatedFull, mask).protected
+      const blackShare = flatBlackFraction(generatedFull, mask)
 
       await writeFileEnsured(join(runDir, finalName), await encodeRgbaPng(recompose(base, generatedFull, mask)))
 
@@ -240,6 +279,8 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
         diff: diffName,
         verdict: report.verdict,
         reason: report.reason,
+        editedMeanDelta: Math.round(editedMeanDelta(report) * 1000) / 1000,
+        suspectFlatPanel: blackShare > FLAT_PANEL_THRESHOLD,
         protected: report.protected,
         editable: report.editable,
         seam: report.seam,
@@ -254,6 +295,14 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
         `    ${report.verdict === 'PASS' ? '✓' : '✗'} ${report.verdict} · ${report.reason} · el modelo había movido la zona protegida hasta ${drift.maxDelta}/255` +
           (output.outputUsd === null ? '' : ` · salida USD ${output.outputUsd.toFixed(4)}`)
       )
+
+      // La verificación garantiza lo que NO se toca; no juzga si el pedido se cumplió. Si la zona abierta casi no
+      // cambió, el modelo probablemente ignoró el prompt (canario 2026-10-02: GPT Image `low` redibujó sin la planta).
+      if (blackShare > FLAT_PANEL_THRESHOLD) {
+        log(`    ⚠ el ${(blackShare * 100).toFixed(0)} % de la zona editable volvió negra y plana: el modelo devolvió un panel, no la edición. Descarta este candidato.`)
+      } else if (editedMeanDelta(report) < LOW_EDIT_MEAN_DELTA) {
+        log(`    ⚠ la zona editable casi no cambió (delta medio ${editedMeanDelta(report).toFixed(1)}/255): mira si el modelo cumplió el pedido.`)
+      }
     }
 
     if (count > 1) {

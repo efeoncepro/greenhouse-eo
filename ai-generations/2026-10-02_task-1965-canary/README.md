@@ -1,0 +1,28 @@
+# Canario TASK-1965 — `pnpm ai:inpaint image` (2026-10-02)
+
+Base neutra sin personas ni marcas (`base.png`, `gpt-image-2.5-flare` low, 1536×1024) y máscara
+`pnpm ai:mask --rect 0.08,0.16,0.34,0.72 --feather 24`. Prompt: una planta en maceta de terracota sobre la
+mesa vacía. Gasto total de la jornada ≈ USD 0,14 (autorizado por el operador).
+
+| Corrida | Adaptador / modelo | Resultado | Zona protegida | Panel negro |
+|---|---|---|---|---|
+| `inpaint/1ddaa7eb3de9` | openai · Sunburst `low` (máscara sin núcleo en 255, bug ya corregido) | sin planta | delta 0 | — |
+| `inpaint/87034bf1773d` | openai · Sunburst `medium` | **rectángulo negro** donde la máscara abre | delta 0 | 99,3 % |
+| `inpaint/0df0cbbe0fc1` | openai · Sunburst `medium`, máscara con RGB de la imagen | **rectángulo negro** (hipótesis del RGB refutada) | delta 0 | 99,2 % |
+| `inpaint/e8f26fe6d7aa` | openai · **Flare** `medium` | planta bien puesta | delta 0 | 0,1 % |
+| `inpaint/52f4e5d799dd` | fal · **Flux Pro Fill** | planta bien puesta | delta 0 | 0,2 % |
+
+Hallazgos:
+
+1. La recomposición deja la zona protegida idéntica bit a bit en las cinco corridas, aunque el modelo la había
+   movido hasta 179/255. La garantía es del pipeline, no del proveedor.
+2. **Sunburst con máscara devuelve la zona totalmente editable como panel negro plano** (3 de 3 con la pasada
+   del 2026-09-23). Default del adaptador: Flare. El pipeline marca `suspectFlatPanel` sobre la salida cruda.
+3. El difuminado de sharp dejaba el centro de la máscara en 253: la zona quedaba toda «borde» y el modelo no
+   editaba. `feather` ahora repone el núcleo en 255.
+4. La verificación prueba lo que NO se toca, no si el pedido se cumplió: la primera corrida pasó sin planta.
+   El pipeline avisa cuando la zona abierta casi no cambió.
+5. Si el objeto generado excede la máscara (hojas de Flare al borde derecho), la recomposición lo funde con la
+   base: la máscara debe cubrir el objeto entero con margen.
+
+Los binarios (`*.png`) viven fuera de git; archivar con `pnpm ai-gen:archive`.
