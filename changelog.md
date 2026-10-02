@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-02 — Kortex profundamente hibernado y forecast GCP reconciliado
+
+- Kortex queda reversible y sin compute productivo: Vercel pausado, Cloud Run internal/IAM/min0, Cloud Tasks
+  pausado/vacío y SQL `STOPPED/NEVER`. Septiembre registró CLP 10.480,64 netos; el residual ~CLP 3.500/mes y el
+  forecast consolidado CLP 237.068,14/mes (rango 230k–245k) siguen modelados hasta contar con ventanas completas
+  post-corte. [Estado, método y evidencia](docs/audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
+
 ## 2026-10-02 — CMP-004 reorientada por servicios y voz con el acento de la línea (CDR-012)
 
 CMP-004 pasa de cuatro conceptos a un ad por servicio de Creative Services (S01–S08). Los ocho pilotos 4:5 se regeneraron con geometría nativa de ad (banda oscura continua arriba, objeto negro mate al pie para la firma) y pasan `foto:cta:gate --reproducir`. El compositor de CTA suma `graphicLine`: el anillo y la esfera de la voz toman el acento de la línea desde AXIS (sin el campo, growth, idéntico a antes; regresión 183/184 iguales, mutante `voz-acento-de-linea`). El CTA queda en contorno naranja tras comparar 40 composiciones.
@@ -668,13 +675,3 @@ y, con el tono, si el cambio es mejor o peor para esa métrica (posición y RpA:
 `0e87c7a443a2` y `f9257b9c94af`. Verificado en producción con las primeras ediciones internas de Berel (A4 16 páginas +
 deck 15 láminas) y Sky (A4 12 + deck 10), los cuatro PDF al primer intento. Emisión y compartir siguen OFF en
 producción. Rollback: revert del código de catálogos y release.
-
-## 2026-09-26 — Efeonce Insights: contrato editorial v2 encendido en producción (TASK-1888)
-
-Los informes nuevos de Insights salen con el contrato v2: lectura por figura (cifra principal, conclusión, próximo
-paso), «Lo esencial» sólo con hallazgos, líneas de alcance, tabla «<módulo>: todas las cifras» y portada sellada por
-organización (`auto`/navy/blanca; navy sólo con logo apto para fondo oscuro). Superlativos sólo con máximo único (con
-empate se dice el empate). Código en los releases `0e87c7a443a2` y `f9257b9c94af`; gateway efeonce-mcp v1.9.0 con
-`get/set_insight_cover_preference`; `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y en el
-`ops-worker`. Verificado con un canary sintético en producción que sella el plan v2. Emisión, sharing y correo siguen
-OFF en producción. Rollback: flag OFF en los dos runtimes.

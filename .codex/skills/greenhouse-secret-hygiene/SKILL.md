@@ -1,6 +1,8 @@
 ---
 name: greenhouse-secret-hygiene
 description: Audit, sanitize, rotate safely, and verify Greenhouse secrets across GCP Secret Manager, Vercel env vars, auth, webhooks, and PostgreSQL. Use when a task touches `*_SECRET_REF`, Secret Manager payloads, secret rotation, env drift, or runtime failures caused by secret/config publication.
+user-invocable: true
+argument-hint: "[describe the issue: which secret, which environment, what symptom]"
 ---
 
 # Greenhouse Secret Hygiene
@@ -26,6 +28,15 @@ If the task touches a specific secret family, also read:
 - Resend email lifecycle: `<repo>/docs/operations/runbooks/resend-email-lifecycle-rollout.md`
 - PostgreSQL passwords: `<repo>/docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 - recent incident context: `<repo>/docs/issues/resolved/ISSUE-032-secret-manager-payload-contamination-breaks-runtime-secrets.md`
+
+If the secret belongs to Kortex, first read `docs/architecture/kortex/README.md` and the canonical sibling runbook
+`/Users/jreye/Documents/dev/kortex/docs/ops/KORTEX_DEEP_HIBERNATION_RUNBOOK_V1.md`. While Kortex is deeply
+hibernated, that state overrides the normal consumer-verification rule below: do not call Cloud Run endpoints,
+connect to Cloud SQL, run a smoke, deploy, resume queues, or otherwise wake a consumer. Restrict inspection to
+redacted resource configuration and secret metadata; never print the inline sensitive configuration retained by
+the hibernated service. An approved rotation may prepare a new secret version, but mounting, deployment and real
+consumer verification belong to the explicitly approved ordered restart. Record consumer verification as deferred,
+not passed.
 
 If code is being changed, inspect the real consumers before acting:
 
@@ -108,6 +119,21 @@ The current operator-owned PAT is a temporary distribution credential with an ex
 
 For a migration from the legacy AXIS credential: (1) inventory all code, workflow, Cloud Build, IAM, and runtime references; (2) create/enable the replacement secret in the control-plane project; (3) grant only the required build identities; (4) publish the temporary credential by stdin; (5) run a non-leaking package-install/build verification; (6) deploy and verify the consumer digest/revision; and only then (7) disable the legacy secret version and revoke the legacy credential. Keep the legacy container disabled, rather than deleting it immediately, if a short recovery window is required. Never revoke the replacement credential or delete the legacy secret before production evidence is complete.
 
+### Auth server signing key (Cloud KMS HSM)
+
+The native authorization server (`services/auth-server`, `TASK-1828` / EPIC-044) signs with `auth-server-es256`
+(EC P-256, HSM) in Cloud KMS `us-east4/auth-server`. The private key never leaves KMS: signing goes through the
+KMS API and PostgreSQL stores only the public JWK and lifecycle. There is no secret value to publish, copy, export
+or rotate in Secret Manager; finding such a copy is an incident, not a backup.
+
+- Rotate only with `pnpm auth-server:rotate-key` (`--status`, `--register <version>`, `--retire <kid> [--force]`).
+  Register the new KMS version, retain the previous public key during the overlap window, then retire and disable
+  the previous version. Never write `greenhouse_auth.signing_keys` manually or leave a retiring version indefinitely.
+- Grant `roles/cloudkms.signerVerifier` only to the runtime service account at key scope. The deployer needs viewer
+  plus service-account-user, not signer access. Never grant these KMS roles at project scope.
+- Runtime key configuration belongs to `services/auth-server/deploy.sh`; do not mutate it ad hoc with
+  `gcloud run services update --update-env-vars`. Runbook: `docs/operations/runbooks/auth-server.md`.
+
 ## Workflow
 
 1. Identify the secret lane
@@ -116,6 +142,7 @@ For a migration from the legacy AXIS credential: (1) inventory all code, workflo
 - `webhook`: `WEBHOOK_*`, signing or bypass secrets
 - `database`: `GREENHOUSE_POSTGRES_*`
 - `provider`: Nubox, Slack, Sentry, SCIM, others
+- `signing key`: Cloud KMS HSM lifecycle; no exportable secret value exists
 
 2. Confirm the source of truth
 
@@ -166,6 +193,9 @@ configured`. `services/ops-worker/deploy.sh` works because it mounts it.
   - or a real connection through the intended profile
 - provider secrets:
   - the actual API route or integration request that was failing
+
+For Kortex, skip this step while its canonical state is `hibernated`; use only the non-waking evidence allowed by
+the Kortex deep-hibernation boundary above and defer runtime verification until an approved restart.
 
 **`gcloud secrets versions access` is not verification.** It proves the payload exists and is clean in
 Secret Manager; it says nothing about whether the runtime that needs it can see it. Exercise the **real

@@ -1,7 +1,7 @@
 # Monitorear Costos Cloud con FinOps
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-03 por Codex
 > **Modulo:** operaciones / cloud / FinOps
 > **Ruta en portal:** `/admin/integrations`
@@ -61,6 +61,16 @@ Si GCP Console muestra otra proyeccion, compara ambas:
 - Greenhouse explica su metodo con Billing Export.
 - GCP Console puede usar un metodo propietario.
 - Si ambas apuntan a crecimiento, trata el costo como riesgo real.
+
+Antes de reportar una optimización, clasifica la cifra:
+
+- `observado`: ya apareció en Billing Export o factura;
+- `modelado`: proyecta el estado nuevo, pero todavía no cerró una ventana completa;
+- `realizado`: compara ventanas UTC completas equivalentes después de absorber el desfase del export.
+
+Para recursos recién apagados, registra el timestamp de corte y no mezcles consumo anterior con el residual. En el
+caso de Kortex, usar `2026-10-02T13:44:27Z` y la
+[auditoría del corte](../../audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
 
 ## Como interpretar alertas tempranas
 

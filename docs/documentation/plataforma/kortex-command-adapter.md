@@ -1,7 +1,7 @@
 # Kortex Command Adapter
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-06-17 por Codex
 > **Modulo:** Plataforma / Integraciones / Kortex / HubSpot
 > **Contrato runtime:** `greenhouse-kortex-command-adapter.v1`
@@ -54,7 +54,18 @@ El source of truth del catalogo es `src/lib/kortex/commands/registry.ts`; el ada
 
 ## Estado operativo
 
-Al 2026-06-17, Greenhouse staging tiene el adapter completo desplegado contra Kortex/HubSpot portal `48713323`.
+Desde `2026-10-02T13:44:27Z`, Kortex está profundamente hibernado. El adapter y su catálogo siguen existiendo,
+pero la capacidad está **temporalmente no disponible**: no se deben iniciar conversaciones, auditorías, releases,
+smokes ni comandos admin contra el upstream hibernado.
+
+La hibernación conserva datos, instalaciones HubSpot y deployments. Volver a encender Kortex es una operación
+gobernada y reversible; debe completarse antes de usar el adapter. Ver
+[`runbook.md`](../../architecture/kortex/operations/runbook.md).
+
+El siguiente estado de 2026-06-17 se conserva como evidencia histórica del último rollout validado, no como
+prueba de disponibilidad actual.
+
+### Rollout validado el 2026-06-17 — histórico
 
 Estado de staging:
 

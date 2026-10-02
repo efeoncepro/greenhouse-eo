@@ -56,12 +56,17 @@ Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 
 ## Estado operativo vigente
 
+- **Kortex está profundamente hibernado desde `2026-10-02T13:44:27Z`.** Vercel está pausado; Cloud Run quedó
+  internal + IAM + min 0; Cloud Tasks está pausado y vacío; Cloud SQL `kortex-pg-dev` está `STOPPED/NEVER`.
+  No ejecutar readers, commands ni smokes hasta completar la secuencia de reactivación del
+  [`runbook`](operations/runbook.md).
 - Greenhouse staging actual: `https://greenhouse-9j6rau39c-efeonce-7670142f.vercel.app`
 - Alias staging: `https://dev-greenhouse.efeoncepro.com`
 - Kortex control-plane usado por Greenhouse: `https://kortex-control-plane-758246035804.us-central1.run.app`
 - HubSpot portal conectado para Kortex runtime: `48713323`
 - Binding Greenhouse/Kortex: `EO-SPB-0002`
-- Staging live/admin: prendidos por aprobacion explicita del operador para pruebas (`KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`, `KORTEX_COMMAND_ADMIN_TOKEN` sensitive provisionado).
+- Configuración Greenhouse staging retenida: los flags live/admin aprobados en junio pueden seguir provisionados,
+  pero no autorizan uso mientras el upstream esté hibernado.
 - Production live/admin: deshabilitado hasta aprobacion explicita.
 - Kortex GitHub commands: habilitados en staging para pruebas gobernadas (`KORTEX_GITHUB_COMMANDS_ENABLED=true`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`, `KORTEX_GITHUB_ALLOWED_WORKFLOWS=CI`, `KORTEX_GITHUB_ALLOWED_REFS=main,develop`); production sigue OFF.
 - Kortex OAuth adicional para ANAM: portal HubSpot `19893546`, `install_status=active`, documentado en [`hubspot-cms/anam-portal-access.md`](hubspot-cms/anam-portal-access.md). Este acceso es adicional al portal Efeonce `48713323`.

@@ -61,6 +61,8 @@ If the task is narrower, also read the domain-specific docs that apply:
 - contractor compensation, partial month or reentry: `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`, `docs/documentation/hr/contratistas-compensacion.md`, `docs/manual-de-uso/finance/pagos-a-contractors.md`; compose `greenhouse-talent-people-operator` / `greenhouse-payroll-auditor` for identity and lifecycle diagnosis.
 - payment operations: `docs/documentation/finance/ordenes-de-pago.md`, `docs/documentation/finance/payment-orders-bank-settlement-resilience.md`
 - Creative Studio pricing, credits, margin, recognition, or ledger: `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md`, `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`, and `docs/architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md`
+- Kortex cloud cost or hibernation: `docs/architecture/kortex/README.md` plus the canonical sibling runbook
+  `/Users/jreye/Documents/dev/kortex/docs/ops/KORTEX_DEEP_HIBERNATION_RUNBOOK_V1.md`
 
 ## References
 
@@ -134,6 +136,12 @@ If the task is narrower, also read the domain-specific docs that apply:
 9. Prefer root-cause fixes in the canonical primitive over local patches in a dashboard or single endpoint.
 
 10. If the correct treatment is ambiguous, surface the ambiguity explicitly instead of silently classifying it.
+
+11. For hibernated runtimes such as Kortex, keep three figures separate: pre-cut observed baseline, modeled
+    residual/projection, and realized post-cut cost. Never present a forecast or annualized run rate as savings
+    already achieved. Confirm realization only from complete Billing Export windows, separating gross, credits and
+    net and reconciling export totals against the invoice when both are available. Cost inspection must remain
+    read-only and must not wake Kortex; restart requires explicit operator approval and the ordered sibling runbook.
 
 ## Contractor compensation and reentry
 

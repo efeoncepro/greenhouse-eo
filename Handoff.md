@@ -1,5 +1,10 @@
 # Handoff activo
 
+**Kortex hibernado + corte FinOps (02/10):** desde `2026-10-02T13:44:27Z`, Vercel pausado, Cloud Run internal/IAM/min0,
+Cloud Tasks pausado/0 y `kortex-pg-dev` `STOPPED/NEVER`; no ejecutar adapter, smokes ni deploys para despertarlo.
+Septiembre observado: CLP 10.480,64 netos. Residual Kortex ~CLP 3.500/mes y total GCP CLP 237.068,14/mes
+(rango 230k–245k) son **modelos**, no ahorro realizado; confirmar con ventanas post-corte. [Runbook](docs/architecture/kortex/operations/runbook.md) · [auditoría](docs/audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
+
 **Insights apto para cliente (02/10):** [TASK-1957](docs/tasks/in-progress/TASK-1957-efeonce-insights-client-fit-presentation-contract.md) code complete local (Slices 1–6, sin push): vocabulario único web/PDF, modelo web 1.2, límites de lector, elegibilidad de figuras, roles, gate client-fit que bloquea emitir a cliente e indicadores AEO estándar (Share of Model, Share of Voice, tasa de mención, citas). Falta `pnpm build` autorizado, release y canary. [TASK-1958](docs/tasks/to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md) (jerarquía Think/PDF) bloqueada por 1957. Ninguna edición de cliente se emite antes de cerrar ambas.
 
 **Release 02/10 (`6ea157e6e641`, PR #247, run `37003281899`):** develop→main `released` 12:04Z; watchdog ok 6/6; canary prod web Insights 1.1 (crear→leer `modelVersion=1.1`→revocar). Migración TASK-1950 aplicada antes del merge. `INSIGHTS_DELIVERY/SCHEDULES_ENABLED` ON en Production + EmailTypes de Insights ON (redeploy `dpl_B1v1vReWS44UYMi7u9LHKqSPpJ7K`); falta canary con sesión humana (lane `app`). `BRAND_RENDER_ENABLED` sigue OFF en prod (canary Proposal pendiente). [Tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md).
