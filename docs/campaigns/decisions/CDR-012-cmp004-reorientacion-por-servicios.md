@@ -112,3 +112,17 @@ Aprendizaje canonizado a pedido del operador: un ad nace multiformato desde la f
   borraron. La exploración local queda en `ai-generations/` (citada por las recetas cine, por lo tanto protegida).
 - **Pendiente:** cargar las piezas a Marketing Studio (la campaña existe; faltan las piezas). La autorización de
   medios sigue `pending`: aprobar no autoriza pauta.
+
+## Delta 2026-10-02 (noche) — horizontales 1,91:1 aprobadas
+
+- **11 horizontales 1,91:1** (LinkedIn 1200×628 y Meta horizontal), una por concepto, **aprobadas por el operador**
+  en el canvas: el set queda en **44 piezas** (11 conceptos × 4:5, 9:16, 1:1 y 1,91:1).
+- **Método:** cada una parte de la escena 1:1 aprobada; la escena se apoya a la derecha (80 % del alto) y el modelo
+  extiende sólo la columna de texto (`pnpm foto:expandir … --lienzo 2048x1072 --ancla derecha --fundido 120 --reponer no`).
+  Reponer el original encima dejaba un recuadro visible; la salida del modelo conserva a la persona (verificado en S04).
+- **Concepto reducido aprobado:** con todo el copy al piso legible no cabía sobre la escena, así que la horizontal lleva
+  pregunta, titular, CTA y descriptor; **la bajada va en el titular del anuncio** de LinkedIn/Meta. Registrado como
+  `conceptoReducido` con `aprobadoPor: julio-reyes` y el sha256 de cada plate; certificadas por reproducción.
+- **Firma:** alineada al borde izquierdo de la columna de texto y a altura fija (0,86 del alto) en las 11.
+- **Destino:** OneDrive Finales `01 - Imagenes/1.91x1`, Marketing Studio (`CMP004-<clave>-imagen-191x100` v1 aprobada)
+  y banco «finales» del Lab de AXIS (`25f1b40`). La autorización de medios sigue pendiente.
