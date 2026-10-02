@@ -1,7 +1,7 @@
 # Sparks V1 — los agentes de Efeonce
 
 > **Tipo de documento:** Especificación canónica de marca (personajes)
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-10-01 por Claude
 > **Última actualización:** 2026-10-01 por Claude
 > **Estado:** nombre, plantel y relato aprobados por el operador (Julio Reyes) el 2026-09-29; diseño elegido y Spark
@@ -200,6 +200,21 @@ matting lo vuelve semitransparente (100 a 200 mil píxeles). Se corrige editando
 `#7F7F7F` antes de recortar: quedan cerca de 20 mil, sólo el borde. En «volando» la estela de luz no sobrevive al
 recorte; está en la versión de estudio.
 
+### 8.1 El rig: el Spark que mira **[operador, 2026-10-01: «me encantó»]**
+
+Para superficies interactivas (el Lab, Greenhouse, sitios, demos) existe un rig 2.5D: el componente web
+`<efeonce-spark-rig>`, publicado en el Lab de AXIS ([`/references/sparks/#rig`](https://axis.efeonce.org/references/sparks/#rig);
+datos en `/references/sparks.json` → `rig`).
+
+- **Capas:** el Spark base de frente con el visor vacío, uno por línea (bucket `sparks/v1/{web,masters}/rig/`); la cara
+  de LED dibujada en vivo y recortada al visor; un giro de hasta 9° con flotación.
+- **Comportamiento:** sigue el puntero con la mirada, parpadea, vaga sola cuando nadie mueve el puntero y tiene seis
+  expresiones: feliz, atento, trabajando, sorprendido, pensando y listo. Respeta el movimiento reducido.
+- **Color:** el componente no escribe colores; quien lo usa le pasa el acento de la línea desde los tokens.
+- **Reglas:** es el mismo Spark del kit (no se le agregan formas, expresiones ni colores fuera del componente); un rig
+  por pantalla; en una foto, el Spark sale del catálogo de `foto:prompt`, nunca de una captura del rig.
+- Producción en `ai-generations/2026-10-01_sparks/rig/` (prompt `prompts/rig-sin-cara.txt`).
+
 ## 9. El nombre: revisión de colisión
 
 Búsqueda web del 2026-10-01 **[medido]**:
@@ -238,8 +253,8 @@ La task nombraba también Adobe Spark (hoy Adobe Express); no está entre los re
 | # | Pendiente | Tipo |
 |---|---|---|
 | 1 | Regenerar con Sparks las fotos aprobadas que llevan robots genéricos (`NX5b` y derivadas, la destacada «Agents» `PH7`) | Decisión del operador |
-| 2 | Publicar los Sparks en AXIS (`axis-brand-assets` y el Lab) | Decisión del operador |
-| 3 | Animación de los Sparks | Decisión del operador |
+| 2 | El Spark en 3D real (que gire completo): en exploración con un modelo generado desde las vistas del kit. Rive no sirve para esto, porque es 2D | Producción + aprobación del operador |
+| 3 | Pasar el rig (§8.1) a un paquete de AXIS cuando Greenhouse u otro dominio lo use | AXIS |
 | 4 | Revisión de Legal si se decide registrar el nombre | Legal |
 | 5 | ¿Las cinco familias calzan con lo que Agent Ops vende hoy? (pregunta abierta de la task) | Operador |
 | 6 | Prueba de reconocimiento: son un sistema consistente, no un activo distintivo medido | Operador |
