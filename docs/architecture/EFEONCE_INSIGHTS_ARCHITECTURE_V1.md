@@ -1465,6 +1465,13 @@ lectora (`greenhouse_growth.seo_gsc_daily`) aunque su contrato decía «fuente l
   vía `buildCompetitiveBenchmark` del Grader) y `citation_share`, todos con numerador/denominador; reemplazan los
   conteos `presence.*`. Sin competidores en el panel, Share of Voice es un límite declarado. Cada familia es su figura;
   Share of Model y citas son hallazgos con su base de respuestas, nunca barras comparadas entre sí.
+- **Puntaje del Grader sin competidores**: `competitive_sov` vale 100 cuando el panel no detecta competidores
+  (marca / (marca + 0)) y pesa 15 % del global. En ese caso el adapter no emite la dimensión ni el puntaje global
+  (límite declarado) hasta que el Grader lo corrija.
+- **Escala por dimensión** (`ChartScaleV1.perDimension`, aditivo): métricas distintas de un canal, cada una contra su
+  período anterior, son UNA figura que se lee fila por fila en su escala (la página «comparación» del PDF; Think lo
+  adopta en TASK-1958). La separación por magnitud aplica sólo a figuras con eje compartido y nunca deja figuras de una
+  cifra: sin página no hay lectura y el capítulo pierde sus conclusiones. El gate suma `shared_axis_incomparable`.
 - **Título por defecto**: «Módulo · mes» (`defaultReportTitle`), no `Insights ico 2026-08-01–2026-09-01`. Los
   informes ya creados conservan su título: no existe comando de renombre.
 
