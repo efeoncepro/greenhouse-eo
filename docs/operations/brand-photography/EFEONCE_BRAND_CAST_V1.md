@@ -110,7 +110,7 @@ Vestuario propio: sobrio, camisa y neutros.
 
 | Rasgo | Ficha |
 |---|---|
-| Rostro | Pómulos altos y redondeados, sonrisa amplia con un **pequeño espacio entre los dientes delanteros** |
+| Rostro | Pómulos altos, labios llenos, sonrisa amplia con dientes parejos (el espacio entre los dientes de la ronda 1 quedó descartado por el operador) |
 | Ojos y cejas | Ojos grandes, café oscuro; cejas pobladas naturales |
 | Piel | Morena, Fitzpatrick V, subtono cálido |
 | Pelo | **Rizos 3C–4A** naturales, café muy oscuro, mucho volumen; suelto o en moño alto |
@@ -129,7 +129,7 @@ Vestuario propio: sobrio, camisa y neutros.
 | Pelo | **Liso, negro, sin canas**, corto a los lados, más largo arriba y peinado hacia atrás |
 | Barba | **Contenida**: 3–5 mm, cobertura completa, perfilada en mejillas y cuello |
 | Cuerpo | Atlético medio, hombros anchos · 1,78 m |
-| Carácter | Calma segura, sonrisa de boca cerrada. Bien parecido pero real: asimetría natural, poros |
+| Carácter | Calma segura, sonrisa de boca cerrada. Galán de campaña con piel real (§7) |
 | Firma propia | **Sin lentes**; reloj análogo con correa de cuero |
 | Vestuario propio | Camisa oxford, sobrecamisa |
 
@@ -177,6 +177,24 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
 1. **Ronda de casting.** Cuatro candidatos por personaje en retrato de casting (cabeza y hombros, frontal, mirando al
    lente, fondo gris medio, luz pareja, polera navy lisa sin logo, 85 mm, piel real). Motor `gpt-image-2.5-sunburst`
    high 1024×1024 (≈ USD 0,05 por imagen **[medido]**). Se presentan en hoja de contacto.
+   **El elenco de publicidad son modelos de campaña, fotografiados con piel real [decisiones del operador,
+   2026-10-02].** Primero: «necesito piel real, cabello real, manos reales, barba real». Después, sobre la ronda 1:
+   «Son gente muy fea, Isabella tiene incluso detalles en los dientes, necesito literal personas reales, pero al menos
+   modelos... se usarán para publicidad». Para este elenco **queda sin efecto** la regla de
+   [personas §2](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) («caras con carácter, no de modelo»), que sigue vigente
+   para el registro documental. Lo que se pide desde la `ronda-2`:
+   - **Rostro:** atractivo, de los que contrata una agencia de casting para una campaña nacional.
+   - **Marcas de carácter: sí, las que favorecen** («Las marcas de carácter estaban bien… el tema es que algunas eran
+     muy feas»). Valen pecas suaves, un lunar de belleza y rizos con personalidad; no valen el espacio entre los dientes,
+     las cicatrices ni los rasgos toscos. La marca se suma por edición sobre el candidato elegido.
+   - **Piel:** sana y luminosa, con poros finos y textura real; sin manchas ni rojeces; nunca aerografiada ni plástica.
+   - **Pelo:** real y cuidado, con mechones individuales y algún pelo suelto en el contorno.
+   - **Barba:** cuidada, con pelos individuales visibles y líneas limpias; nunca pintada.
+   - **Manos:** una en cuadro, bien formada, cinco dedos, uñas cuidadas.
+   - **Luz y encuadre:** luz comercial, una principal suave a 45° con relleno y luz de pelo; de pecho para arriba.
+
+   La pasada intermedia `ronda-1b` (luz lateral dura con manchas y rojeces pedidas) se detuvo antes de producir
+   imágenes: empujaba en la dirección contraria. Prompts verbatim en `ai-generations/2026-10-02_elenco-efeonce/ronda-2/*.txt`.
 2. **El operador elige uno por personaje.**
 3. **Set por edición** desde el elegido, nunca generado de cero (generar reconstruye el rostro): frente, 45° izquierda
    y derecha, perfil, cuerpo entero y tres o cuatro expresiones. Mismo método que el casting de CMP-004
