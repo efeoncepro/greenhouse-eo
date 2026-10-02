@@ -1,0 +1,499 @@
+/**
+ * Molde de «La órbita» para piezas fijas: web (hero de escritorio y teléfono), DOOH (caminero) y motion
+ * (el último cuadro del loop y la hoja del cuadro a cuadro). Catálogo `graphic-line-stills`.
+ *
+ * Todo color, familia y peso sale de `graphic-line-tokens.css` (compilado desde @efeoncepro/axis-tokens por
+ * `pnpm brand:tokens`). Toda medida de la receta llega del manifest de AXIS como custom property (`--gl-*`, vía
+ * los resolvers `gl-px-*` y `gl-css` del plan). El lienzo es el viewport de cada plantilla (`*.slots.json`), así
+ * que la raíz mide `100vw × 100vh`. Los valores escritos abajo son el RESPALDO: los de la pieza aprobada de
+ * referencia (hero con lente 1440 × 900), no un default de diseño.
+ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--gl-bg-dark);
+}
+
+:root {
+  /* Respaldo: el hero con lente aprobado (WebHeroAlLado). Los resolvers del plan las reescriben en la raíz. */
+  --gl-margin: 96px;
+  --gl-question-top: 250px;
+  --gl-question-px: 30px;
+  --gl-question-lh: 1.3;
+  --gl-answer-top: 300px;
+  --gl-answer-px: 200px;
+  --gl-answer-lh: 1;
+  --gl-answer-tracking: -0.045em;
+  --gl-answer-nudge: -0.02em;
+  --gl-body-top: 560px;
+  --gl-body-px: 20px;
+  --gl-body-lh: 1.55;
+  --gl-body-width: 470px;
+  --gl-cta-top: 676px;
+  --gl-cta-px: 22px;
+  --gl-cta-pad-y: 22px;
+  --gl-cta-pad-x: 40px;
+  --gl-cta-radius: 14px;
+  --gl-descriptor-px: 19px;
+  --gl-descriptor-lh: 1.45;
+  --gl-descriptor-width: 360px;
+  --gl-nav-height: 84px;
+  --gl-nav-pad-x: 56px;
+  --gl-nav-logo-width: 150px;
+  --gl-nav-link-px: 16px;
+  --gl-lens-cx: 1050px;
+  --gl-lens-cy: 500px;
+  --gl-lens-r: 330px;
+  --gl-lens-gray: 1;
+  --gl-lens-contrast: 1.1;
+  --gl-lens-brightness: 0.5;
+  --gl-lens-veil: 0.8;
+  --gl-lens-inside-x: 0px;
+  --gl-lens-inside-y: 0px;
+  --gl-photo-x: 0px;
+  --gl-photo-y: 0px;
+  --gl-signature-width: 500px;
+  --gl-signature-margin: 90px;
+}
+
+.gl-canvas {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--gl-bg-dark);
+  color: var(--gl-ink-dark);
+  font-family: var(--gl-text-family);
+}
+
+/* ── Foto: a sangre, o dentro de la lente con el afuera en penumbra ────────────────────────────── */
+
+/*
+ * Cada imagen ocupa el lienzo entero (su caja nunca se sale: el guard de geometría audita los nodos del
+ * contrato) y el encuadre lo da `object-position` sobre el plate ya recortado por quien compone.
+ */
+.gl-photo-layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: none;
+  object-position: var(--gl-photo-x) var(--gl-photo-y);
+}
+
+.gl-bleed {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* El afuera de la lente: la misma escena en gris y penumbra (valores de la lente de AXIS: `outside`). */
+.gl-lens-outside {
+  filter: grayscale(var(--gl-lens-gray)) contrast(var(--gl-lens-contrast)) brightness(var(--gl-lens-brightness));
+}
+
+.gl-lens-veil {
+  position: absolute;
+  inset: 0;
+  background: var(--gl-bg-dark);
+  opacity: var(--gl-lens-veil);
+  mix-blend-mode: multiply;
+}
+
+.gl-lens-clip {
+  position: absolute;
+  inset: 0;
+  clip-path: circle(var(--gl-lens-r) at var(--gl-lens-cx) var(--gl-lens-cy));
+}
+
+.gl-lens-inside {
+  object-position: var(--gl-lens-inside-x) var(--gl-lens-inside-y);
+}
+
+/* La órbita de la lente (anillo, arco y esfera): la pinta @efeoncepro/axis-graphic-line, nunca esta hoja. */
+.gl-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ── Voz: la pregunta con su anillo y la respuesta con su esfera ────────────────────────────────── */
+
+.gl-question {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-question-top);
+  z-index: 2;
+  margin: 0;
+  font-family: var(--gl-question-family);
+  font-weight: var(--gl-question-weight);
+  font-size: var(--gl-question-px);
+  line-height: var(--gl-question-lh);
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
+}
+
+/* El anillo abre la pregunta (mismo trazo que `recipeHtml` de AXIS): la órbita pregunta y la esfera responde. */
+.gl-ring {
+  display: inline-block;
+  width: 0.42em;
+  height: 0.42em;
+  margin-right: 0.35em;
+  border: max(1px, 0.06em) solid var(--gl-accent);
+  border-radius: 50%;
+  box-sizing: border-box;
+  vertical-align: 0.08em;
+}
+
+.gl-answer {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-answer-top);
+  z-index: 2;
+  margin: 0 0 0 var(--gl-answer-nudge);
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-answer-px);
+  line-height: var(--gl-answer-lh);
+  letter-spacing: var(--gl-answer-tracking);
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-answer-lead {
+  display: block;
+}
+
+.gl-answer-lead:empty {
+  display: none;
+}
+
+/* Una esfera por pieza: cierra la última línea de la respuesta. Nunca es viñeta. */
+.gl-sphere {
+  display: inline-block;
+  width: var(--gl-sphere-diameter);
+  height: var(--gl-sphere-diameter);
+  margin-left: var(--gl-sphere-gap);
+  border-radius: 50%;
+  background: var(--gl-accent);
+}
+
+.gl-body {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-body-top);
+  z-index: 2;
+  width: var(--gl-body-width);
+  margin: 0;
+  font-family: var(--gl-text-family);
+  font-weight: 300;
+  font-size: var(--gl-body-px);
+  line-height: var(--gl-body-lh);
+  color: var(--gl-text-dark);
+}
+
+/* ── Web: encabezado del sitio (la foto no lleva logo: firma el encabezado) ─────────────────────── */
+
+.gl-nav {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: var(--gl-nav-height);
+  padding: 0 var(--gl-nav-pad-x);
+  box-sizing: border-box;
+}
+
+.gl-nav-logo {
+  display: block;
+  width: var(--gl-nav-logo-width);
+  height: auto;
+}
+
+.gl-nav-menu {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--gl-nav-link-px) * 2.25);
+  font-family: var(--gl-text-family);
+  font-size: var(--gl-nav-link-px);
+  font-weight: 400;
+  color: var(--gl-soft-dark);
+}
+
+.gl-nav-links {
+  display: flex;
+  gap: calc(var(--gl-nav-link-px) * 2.25);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-nav-action {
+  padding: calc(var(--gl-nav-link-px) * 0.75) calc(var(--gl-nav-link-px) * 1.5);
+  border: 1.5px solid var(--gl-teal);
+  border-radius: 999px;
+  font-weight: 500;
+  color: var(--gl-ink-dark);
+}
+
+/* ── Web: el CTA (el grupo con corchetes y cursor lo pinta el hook) y su descriptor ─────────────── */
+
+.gl-cta {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-cta-top);
+  z-index: 4;
+  margin: 0;
+  padding: var(--gl-cta-pad-y) var(--gl-cta-pad-x);
+  border-radius: var(--gl-cta-radius);
+  background: var(--gl-teal);
+  color: var(--gl-bg-dark);
+  font-family: var(--gl-text-family);
+  font-size: var(--gl-cta-px);
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/* El descriptor va bajo el CURSOR, no bajo el botón: su `top` lo escribe el hook del CTA. */
+.gl-descriptor {
+  position: absolute;
+  left: var(--gl-margin);
+  top: calc(var(--gl-cta-top) + var(--gl-cta-px) * 5);
+  z-index: 4;
+  width: var(--gl-descriptor-width);
+  margin: 0;
+  font-family: var(--gl-text-family);
+  font-size: var(--gl-descriptor-px);
+  font-weight: 300;
+  line-height: var(--gl-descriptor-lh);
+  color: var(--gl-text-dark);
+}
+
+/* ── Teléfono: barra de estado, encabezado compacto e indicador de inicio (cromo del sistema) ────── */
+
+/* El cromo del sistema es del teléfono, no de la marca: se mide en `vw` (el lienzo es el viewport). */
+.gl-phone {
+  --gl-status-height: 47px;
+  --gl-status-px: 4.2vw;
+  --gl-status-pad-x: 8.5vw;
+  --gl-home-width: 34vw;
+}
+
+.gl-status {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  height: var(--gl-status-height);
+  padding: 0 var(--gl-status-pad-x) 6px;
+  box-sizing: border-box;
+  font-family: var(--gl-text-family);
+  font-size: var(--gl-status-px);
+  font-weight: 600;
+  color: var(--gl-ink-dark);
+}
+
+.gl-status-icons {
+  width: calc(var(--gl-status-px) * 4);
+  height: auto;
+}
+
+.gl-phone .gl-nav {
+  top: var(--gl-status-height);
+}
+
+.gl-nav-burger {
+  width: 26px;
+  height: 18px;
+  color: var(--gl-ink-dark);
+}
+
+.gl-home-indicator {
+  position: absolute;
+  left: calc(50% - var(--gl-home-width) / 2);
+  bottom: 5px;
+  z-index: 6;
+  width: var(--gl-home-width);
+  height: 5px;
+  border-radius: 3px;
+  background: var(--gl-ink-dark);
+}
+
+/* ── DOOH: la firma del caminero (logo abajo a la izquierda, al final del recorrido de lectura) ─── */
+
+.gl-signature {
+  position: absolute;
+  left: var(--gl-signature-margin);
+  bottom: var(--gl-signature-margin);
+  z-index: 3;
+  display: block;
+  width: var(--gl-signature-width);
+  height: auto;
+}
+
+/* ── Motion: la hoja del cuadro a cuadro (papel claro, cuadros 16:9 escalados) ──────────────────── */
+
+.gl-sheet {
+  --gl-sheet-pad: 40px;
+  --gl-sheet-col-gap: 28px;
+  --gl-sheet-row-gap: 34px;
+  --gl-sb-scale: 0.21823;
+
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  padding: var(--gl-sheet-pad);
+  overflow: hidden;
+  background: var(--gl-bg-paper);
+  font-family: var(--gl-text-family);
+}
+
+.gl-sheet-title {
+  margin: 0 0 22px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--gl-text-light);
+}
+
+.gl-sb-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gl-sheet-row-gap) var(--gl-sheet-col-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-sb-frame {
+  margin: 0;
+}
+
+.gl-sb-window {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--gl-bg-dark);
+}
+
+.gl-sb-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  transform: scale(var(--gl-sb-scale));
+  transform-origin: 0 0;
+  background: var(--gl-bg-dark);
+}
+
+/* Cada cuadro trae todas las capas; su escena (`gl-sb-kind-*`, del plan) enciende sólo las suyas. */
+.gl-sb-stage .gl-photo-layer,
+.gl-sb-stage .gl-lens-veil,
+.gl-sb-stage .gl-lens-clip,
+.gl-sb-stage .gl-layer,
+.gl-sb-stage .gl-question,
+.gl-sb-stage .gl-answer,
+.gl-sb-close {
+  display: none;
+}
+
+.gl-sb-kind-lens :is(.gl-photo-layer, .gl-lens-veil, .gl-lens-clip, .gl-layer),
+.gl-sb-kind-overshoot :is(.gl-photo-layer, .gl-lens-veil, .gl-lens-clip, .gl-layer, .gl-question, .gl-answer),
+.gl-sb-kind-voice :is(.gl-photo-layer, .gl-lens-veil, .gl-lens-clip, .gl-layer, .gl-question, .gl-answer),
+.gl-sb-kind-orbit .gl-layer {
+  display: block;
+}
+
+.gl-sb-kind-reveal .gl-sb-reveal,
+.gl-sb-kind-endcard .gl-sb-endcard {
+  display: flex;
+}
+
+.gl-sb-close {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gl-sb-isotype {
+  width: 1180px;
+  height: auto;
+  transform: translateX(-120px);
+}
+
+.gl-sb-logo {
+  width: 560px;
+  height: auto;
+}
+
+.gl-sb-slogan {
+  margin: 22px 0 0;
+  font-family: var(--gl-text-family);
+  font-size: 34px;
+  line-height: 1;
+  color: var(--gl-soft-dark);
+}
+
+.gl-slogan-empower {
+  font-weight: 800;
+  font-style: italic;
+}
+
+.gl-slogan-your {
+  font-weight: 800;
+}
+
+.gl-slogan-growth {
+  font-weight: 900;
+  font-style: italic;
+  color: var(--gl-accent);
+}
+
+/* «sí» llega un 12 % más grande y a medio asentar (segmento voice-enters). */
+.gl-sb-kind-overshoot .gl-answer-last {
+  display: inline-block;
+  opacity: 0.75;
+  transform: scale(1.12);
+  transform-origin: 0 70%;
+}
+
+.gl-sb-time {
+  margin: 10px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gl-text-light);
+}
+
+.gl-sb-caption {
+  margin: 3px 0 0;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--gl-soft-light);
+}
+
+.gl-hidden {
+  display: none;
+}

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · agentes con supervisora</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `method-agent-supervisor` (surface deck, tema oscuro, TASK-1942). «¿Quién responde por el agente? Una
+      persona.»: la persona responsable, por su rol, arriba en vidrio con el avatar anillado en el acento; tres agentes en
+      papel a distinta profundidad sobre la plataforma, cada uno con el ícono oficial de Agentforce y su ficha de
+      autonomía. La propuesta del primer agente espera aprobación: la selección «Supervisora» toma esa fila.
+      Referencia: DeckSalesforceAgentesSupervisor (SF2-agentes-supervisor).
+    -->
+    <main class="gl-slide gl-ls gl-mas" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-beams" data-slot="beams">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <section class="gl-ls-glass gl-mas-sup" data-slot="supervisor">
+        <span class="gl-mas-avatar" data-slot-field="initials">SV</span>
+        <span>
+          <span class="gl-mas-sup-kicker" data-slot-field="kicker">Persona responsable</span>
+          <span class="gl-mas-sup-role" data-slot-field="role">Supervisora de servicio</span>
+          <span class="gl-mas-sup-duty" data-slot-field="duty">Aprueba, corrige y detiene</span>
+        </span>
+      </section>
+
+      <ol class="gl-mas-agents" data-slot="agents">
+        <li class="gl-ls-doc gl-mas-card">
+          <div class="gl-mas-head">
+            <img class="gl-mas-icon" data-slot-field="icon" alt="Agentforce" />
+            <span>
+              <span class="gl-mas-kicker">Agente</span>
+              <span class="gl-mas-title" data-slot-field="title">Casos</span>
+            </span>
+          </div>
+          <p class="gl-mas-job" data-slot-field="job">Clasifica, enruta y propone la respuesta.</p>
+          <ol class="gl-mas-levels" data-slot-field="levels">
+            <li class="gl-mas-level">
+              <span class="gl-mas-dot" aria-hidden="true"></span>
+              <span class="gl-mas-key" data-slot-field="kind">Lee</span>
+              <span class="gl-mas-value" data-slot-field="value">Historial y knowledge</span>
+            </li>
+          </ol>
+          <div class="gl-mas-approval" data-gl-selection-target>
+            <span class="gl-mas-pending" data-slot-field="pending">Respuesta propuesta al caso</span>
+            <span class="gl-mas-button">Aprobar</span>
+          </div>
+        </li>
+      </ol>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Agentforce · equipos híbridos</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quién responde por el agente?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Una</span><span data-slot-field="answer">persona</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Cada agente nace con su ficha: qué lee, qué propone, qué ejecuta y <strong>quién</strong> lo aprueba.</p>
+
+      <p class="gl-ls-note" data-slot="note">Ejemplo ilustrativo · cada ficha se define con tu equipo</p>
+
+      <div class="gl-hidden" data-slot="approval"></div>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

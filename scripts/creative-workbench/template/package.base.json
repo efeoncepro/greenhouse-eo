@@ -1,0 +1,23 @@
+{
+  "name": "creative-workbench",
+  "private": true,
+  "description": "Taller del equipo creativo de Efeonce. Gestionado desde efeoncepro/greenhouse-eo: no editar archivos gestionados.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "instalar": "node tools/instalar.mjs",
+    "doctor": "node tools/doctor.mjs",
+    "assets:pull": "node tools/assets-pull.mjs",
+    "pieza:nueva": "node tools/pieza-nueva.mjs",
+    "pieza:subir": "node tools/pieza-subir.mjs",
+    "pieza:bajar": "node tools/pieza-bajar.mjs",
+    "gates": "node gates/run-all.mjs"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "onnxruntime-node",
+      "sharp"
+    ]
+  }
+}

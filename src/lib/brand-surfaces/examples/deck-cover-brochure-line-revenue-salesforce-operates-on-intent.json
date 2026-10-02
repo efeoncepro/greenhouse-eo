@@ -1,0 +1,36 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "line",
+  "line": "revenue-salesforce",
+  "voice": {
+    "eyebrow": "Brochure · Servicios Salesforce",
+    "question": "¿Tu Salesforce ya actúa?",
+    "answer": [
+      "Por ti"
+    ]
+  },
+  "body": "**Seis** servicios:\nVentas · Servicio · Marketing Cloud\nData 360 · Agentforce · Integración",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF2-nexa-portal.png",
+    "alt": "Nexa, con la chaqueta navy de Efeonce, mira a cámara; detrás de ella se alza un gran anillo vertical de luz celeste del que salen cientos de hilos de luz que llegan a las yemas de sus dedos"
+  },
+  "column": {
+    "topPx": 190
+  },
+  "partnerMark": {
+    "mode": "operates-on",
+    "logo": {
+      "path": "public/images/logos/partners/salesforce.com_logo.svg",
+      "alt": "Salesforce"
+    }
+  }
+}

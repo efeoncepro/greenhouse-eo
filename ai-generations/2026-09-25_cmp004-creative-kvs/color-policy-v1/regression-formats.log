@@ -1,0 +1,11 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 foto:componer:cta:regresion /Users/jreye/Documents/greenhouse-eo
+> node scripts/foto/componer-cta.regresion.mjs --solo piezas-cta-formatos.json --jobs 2
+
+Regresión del compositor de CTA — referencia HEAD (19a00465c, 10 archivos extraídos de git) contra scripts/foto/componer-cta.mjs
+6 piezas únicas de 1 planes · 2 en paralelo · /var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-PU7y9G
+  6/6
+
+Iguales: 6 de 6 (6 componen en la referencia, 0 abortan)
+
+Reporte: /var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-PU7y9G/reporte.json (se borraron las carpetas de las piezas iguales; --conservar las guarda)

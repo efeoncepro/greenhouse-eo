@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Marketing con Manzanitas · Gráfico con voz</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="manzanitas-tokens.css" />
+<link rel="stylesheet" href="manzanitas.css" />
+<style>
+.mcm-chart-voice .mcm-masthead { left: 80px; top: 72px; width: 200px; height: 90px; }
+.mcm-chart-voice .mcm-voice { --mcm-answer-px: var(--mcm-chart-answer-px); --mcm-voice-left: 80px; left: 80px; top: var(--mcm-chart-voice-top); width: var(--mcm-chart-voice-width); }
+</style>
+</head>
+<body>
+<main class="mcm-canvas mcm-canvas--4x5 mcm-tone-paper mcm-line-engine mcm-chart-voice" data-mcm-root data-slot="theme">
+  <div class="mcm-chart" data-slot="chart" data-mcm-chart aria-hidden="false"></div>
+  <img class="mcm-masthead" data-mcm-masthead src="assets/manzanitas-logo-positive-engine.svg" alt="Marketing con Manzanitas" />
+  <div class="mcm-voice mcm-voice--beside-swipe" data-slot="voice">
+    <p class="mcm-q mcm-q--one-line"><span class="mcm-ring" aria-hidden="true"></span><span data-slot-field="question">¿La pregunta?</span></p>
+    <p class="mcm-a"><span data-slot-field="answer">Respuesta</span><span class="mcm-sphere" aria-hidden="true"></span></p>
+  </div>
+  <img class="mcm-swipe mcm-swipe--interior" data-mcm-swipe src="assets/swipe-rest-paper-engine.svg" alt="Desliza" />
+  <img class="mcm-signature mcm-signature--carousel" data-mcm-signature src="assets/efeonce-logo-positive.svg" alt="Efeonce" />
+</main>
+</body>
+</html>

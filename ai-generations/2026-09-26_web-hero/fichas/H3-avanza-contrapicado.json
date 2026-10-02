@@ -1,0 +1,27 @@
+{
+  "formato": "16:9",
+  "impacto": true,
+  "id": "H3-avanza-contrapicado",
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    },
+    {
+      "objeto": "lanyard-efeonce",
+      "usoDe": "generico"
+    }
+  ],
+  "escena": "SCENE (staged, Efeonce studio corridor at night, heading into the client presentation): a Chilean growth strategist in her early thirties, dark hair tied back, wearing the Efeonce navy softshell jacket over the navy Efeonce polo, with the Efeonce lanyard and its badge card swinging, face of the card turned away and unreadable, caught mid-stride walking TOWARD the camera, a laptop in a plain azure-blue (#0375DB) sleeve held against her hip, looking straight into the lens with a determined half-smile. Low camera, a clear low angle looking up at her. A single practical light strip on the right wall, visible and the brightest thing in the frame, rakes across her from the side; a rim from behind separates her from the dark and its beam crosses a thin haze BELOW the middle of the frame. Bare dark walls, no plants, no framed art. 35mm f/2. She occupies the right half of the frame from the knees up.",
+  "lecho": {
+    "objeto": "a dark matte floor edge close to the lens, dissolved into blur and outside the beam",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, evenly shadowed bare dark wall",
+      "tinta": "blanca"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.053 (1 × 1756 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-09-27_plastilina-3d-gpt/out/bombillo.png (edit) …
+  ✓ 952KB · gpt-image-2.5-sunburst · 1024x1024 · high
+    usage: in 1235 (img 1024 · txt 211) · out 1756 · total 2991
+done

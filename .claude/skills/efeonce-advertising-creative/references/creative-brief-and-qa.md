@@ -122,7 +122,7 @@ lente, §8.5 URL, §9 foto, §10.1 campaña y grillas). Reglas completas y check
 [referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md). Valores desde los tokens
 `efeonceGraphicLine` de AXIS, nunca transcritos.
 
-Entradas: `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.2.0; `render` sale 1 si
+Entradas: `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.3.0; `render` sale 1 si
 falla un check como texto que cruza el anillo, firma descentrada o bajo 4,5:1, u órbita sobre el sujeto),
 `pnpm creative:layout` (capa opcional `graphic_line: { intent, protect }` por formato y `brand.signature: {
 brand_in_scene }`) y `pnpm foto:componer:cta` (`marcaEnEscena`). La órbita **no sustituye** la composición del
@@ -130,15 +130,17 @@ lenguaje fotográfico: se usa en casos específicos y nunca cruza sujeto, reserv
 
 | Elemento | DO | DON’T |
 |---|---|---|
-| Órbita en campaña | Rodea la lente con aire; esfera arriba a la izquierda, lejos de la cara | Esfera sobre el rostro o suelta, fuera de la punta del arco |
+| Órbita en campaña | Rodea la lente con aire, con anillo, arco corto y esfera en su punta arriba a la izquierda, lejos de la cara; un solo anillo | Esfera sobre el rostro, disco suelto sin arco, u órbitas interiores alrededor de la lente o del texto |
 | Texto | Vive fuera de la órbita (tercio inferior izquierdo) | Titular, CTA o URL cruzando el anillo |
 | Cantidad | Una lente u órbita por pieza | Órbitas repetidas como patrón o textura |
 | Arco de avance | Mide un dato real citable | Arco decorativo o dato inventado |
-| Foto en la lente | Toma del banco `ai-generations/2026-09-25_banco-lente-orbita/` o del pipeline `foto:*`; sujeto en un círculo del 55 % del lado corto; sin emblema legible | Velo navy sobre una foto de banco; foto débil sin punto de interés |
+| Foto en la lente | Toma del banco `ai-generations/2026-09-25_banco-lente-orbita/` (`pnpm ai-gen:pull` si falta) o del pipeline `foto:*`; sujeto en un círculo del 55 % del lado corto; sin emblema legible | Velo navy sobre una foto de banco; foto débil sin punto de interés |
 | Grosor y margen | ×1,75 en lienzos ≤ 1200 px; margen 9 % del lado corto en redes y 140 px en 16:9; en 9:16 fuera de la zona de la interfaz | Grosor del informe A4 llevado a un post de 1080 |
 | Uso de la órbita | Declarada a propósito (lente, medida con fuente, progreso, foco); la foto conserva su composición | Órbita por defecto en toda pieza, o sobre sujeto, reservas, lecho o firma |
 | URL | Firma: burbuja sólo con el logo en la imagen (ver Firma). Pie de deck, informe, papelería o mail: burbuja, horneada donde la fusión no está garantizada | `efeoncepro.com` como texto suelto; burbuja como firma por defecto |
 | Archivos | Logos y burbujas desde `@efeoncepro/axis-brand-assets` por id | SVG copiado o redibujado a mano |
+| Íconos | Del `ICON_CATALOG` vía `resolveIcon` (voz por la línea de la pieza); `auditIconGroup(items, { pieceHasSphere })` sin issues; responde uno solo y sólo sin otra esfera; Plastilina protagonista en su órbita sesgada | Ícono dibujado o generado suelto; Trazo y Plastilina en un mismo grupo; acento en el cuerpo del ícono; varios respondiendo |
+| Íconos en volumen (D24) | Plastilina en volumen sólo como objeto protagonista del KV: PNG de AXIS (`volumeIconUrl(glyph)`), **uno por pieza**, **≥ 160 px**, en respuesta con acento de Brand; sombra de contacto sólo si la compone la pieza | Volumen regenerado o creado directo en 3D; dos por pieza; bajo 160 px; en un grupo, lista o junto a plano/Trazo |
 | Claim | «Te hacemos visible» con su prueba al lado | Pautar el claim antes de la revisión legal pendiente |
 
 **Sin resolver (decisión del operador, no la tomes tú):** (1) si el CTA en naranja o lima de una política cromática

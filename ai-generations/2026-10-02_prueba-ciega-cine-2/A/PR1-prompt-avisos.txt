@@ -1,0 +1,1 @@
+  ⚠ PR1-piezas-que-rinden: la escena no declara un PORTADOR del azul de marca (el canon lo pide en todas: una pantalla, un panel, una luz, un objeto azul de la escena). Un HEX suelto no basta: el azul tiene que estar en algo

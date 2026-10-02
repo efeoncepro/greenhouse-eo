@@ -1,0 +1,444 @@
+{
+ "v": 3,
+ "attachments": {},
+ "boards": {
+  "00-indice.dc.html": {
+   "h": 1400,
+   "title": "0.1 · Empieza aquí",
+   "w": 1600,
+   "x": 0,
+   "y": 300
+  },
+  "00b-manual.dc.html": {
+   "h": 1320,
+   "title": "0.2 · Manual en una lámina",
+   "w": 1600,
+   "x": 1680,
+   "y": 300
+  },
+  "A3-2-lente.dc.html": {
+   "h": 1200,
+   "title": "1.3 · La lente",
+   "w": 1600,
+   "x": 3360,
+   "y": 2120
+  },
+  "A3-2b-foco.dc.html": {
+   "h": 1440,
+   "title": "1.4 · El foco: «Te hacemos visible»",
+   "w": 1600,
+   "x": 5066,
+   "y": 2120
+  },
+  "F-01-arquitectura.dc.html": {
+   "h": 1000,
+   "title": "3.1 · Familia de marcas",
+   "w": 1600,
+   "x": 0,
+   "y": 5740
+  },
+  "F-05-firma.dc.html": {
+   "h": 1000,
+   "title": "3.3 · Logo completo o isotipo",
+   "w": 1600,
+   "x": 3360,
+   "y": 5740
+  },
+  "F-06b-firma-correo-v2.dc.html": {
+   "h": 1440,
+   "title": "4.5 · Firma de mail",
+   "w": 1600,
+   "x": 5040,
+   "y": 7640
+  },
+  "O-01-orbita.dc.html": {
+   "h": 1460,
+   "title": "1.2 · La órbita",
+   "w": 1600,
+   "x": 1680,
+   "y": 2120
+  },
+  "O-02-orbita-aplicaciones.dc.html": {
+   "h": 1440,
+   "title": "4.1 · Aplicaciones",
+   "w": 1600,
+   "x": 0,
+   "y": 7640
+  },
+  "O-03-orbita-familia.dc.html": {
+   "h": 1400,
+   "title": "3.2 · La órbita en la familia",
+   "w": 1600,
+   "x": 1680,
+   "y": 5740
+  },
+  "O-04-orbita-deck-campana.dc.html": {
+   "h": 1600,
+   "title": "4.2 · Deck y campaña",
+   "w": 1600,
+   "x": 1680,
+   "y": 7640
+  },
+  "O-05-orbita-espacio.dc.html": {
+   "h": 1680,
+   "title": "4.3 · Oficina (1/3) · Llegar",
+   "w": 1600,
+   "x": 0,
+   "y": 9760
+  },
+  "O-06-orbita-objetos-motion.dc.html": {
+   "h": 1620,
+   "title": "4.4 · Objetos y video",
+   "w": 1600,
+   "x": 3360,
+   "y": 7640
+  },
+  "O-07-orbita-especificaciones.dc.html": {
+   "h": 1260,
+   "title": "5.1 · Grillas y especificaciones",
+   "w": 1600,
+   "x": 0,
+   "y": 19080
+  },
+  "O-08-orbita-fotografia.dc.html": {
+   "h": 1120,
+   "title": "5.2 · Fotografía para la lente",
+   "w": 1600,
+   "x": 1680,
+   "y": 19080
+  },
+  "O-09-orbita-decisiones.dc.html": {
+   "h": 1260,
+   "title": "6.1 · Decisiones tomadas",
+   "w": 1600,
+   "x": 0,
+   "y": 23640
+  },
+  "O-10-prueba-sin-logo.dc.html": {
+   "h": 1740,
+   "title": "6.2 · Prueba sin logo",
+   "w": 1600,
+   "x": 1680,
+   "y": 23640
+  },
+  "R2-02-esfera.dc.html": {
+   "h": 1000,
+   "title": "1.1 · El punto final",
+   "w": 1600,
+   "x": 0,
+   "y": 2120
+  },
+  "R2-03-oficio.dc.html": {
+   "h": 1000,
+   "title": "2.3 · Oficio a la vista",
+   "w": 1600,
+   "x": 3360,
+   "y": 4080
+  },
+  "R2-04-conversacion.dc.html": {
+   "h": 1000,
+   "title": "2.1 · Voz: pregunta y respuesta",
+   "w": 1600,
+   "x": 0,
+   "y": 4080
+  },
+  "R3-05-eslogan.dc.html": {
+   "h": 1160,
+   "title": "2.2 · Eslogan",
+   "w": 1600,
+   "x": 1680,
+   "y": 4080
+  },
+  "O-05b-oficina-trabajar.dc.html": {
+   "h": 1900,
+   "title": "4.3 · Oficina (2/3) · Trabajar",
+   "w": 1600,
+   "x": 1680,
+   "y": 9760
+  },
+  "O-05c-oficina-convivir.dc.html": {
+   "h": 1540,
+   "title": "4.3 · Oficina (3/3) · Convivir",
+   "w": 1600,
+   "x": 3360,
+   "y": 9760
+  },
+  "O-11-merch-llevar.dc.html": {
+   "h": 1580,
+   "title": "4.6 · Merch (1/3) · Llevar",
+   "w": 1600,
+   "x": 0,
+   "y": 12160
+  },
+  "O-12-merch-vestir.dc.html": {
+   "h": 1400,
+   "title": "4.6 · Merch (2/3) · Vestir",
+   "w": 1600,
+   "x": 1680,
+   "y": 12160
+  },
+  "O-13-merch-identificarse.dc.html": {
+   "h": 1260,
+   "title": "4.6 · Merch (3/3) · Identificarse",
+   "w": 1600,
+   "x": 3360,
+   "y": 12160
+  },
+  "O-14-bienvenida-envios.dc.html": {
+   "h": 2020,
+   "title": "4.7 · Bienvenida y envíos (1/3)",
+   "w": 1600,
+   "x": 0,
+   "y": 14240
+  },
+  "O-15-papeleria-llavero.dc.html": {
+   "h": 1500,
+   "title": "4.7 · Papelería y llavero (2/3)",
+   "w": 1600,
+   "x": 1680,
+   "y": 14240
+  },
+  "O-16-eventos.dc.html": {
+   "h": 1560,
+   "title": "4.7 · Eventos: stand y paraguas (3/3)",
+   "w": 1600,
+   "x": 3360,
+   "y": 14240
+  },
+  "D-01-logo-correcto.dc.html": {
+   "h": 2100,
+   "title": "5.3 · Logo: uso correcto",
+   "w": 1600,
+   "x": 0,
+   "y": 20940
+  },
+  "D-02-logo-incorrecto.dc.html": {
+   "h": 1420,
+   "title": "5.4 · Logo: usos incorrectos",
+   "w": 1600,
+   "x": 1680,
+   "y": 20940
+  },
+  "D-05-isotipo.dc.html": {
+   "h": 1740,
+   "title": "5.5 · Isotipo: correcto, incorrecto y tamaño mínimo",
+   "w": 1600,
+   "x": 3360,
+   "y": 20940
+  },
+  "D-03-elementos-si-no.dc.html": {
+   "h": 1720,
+   "title": "5.6 · Elementos: sí y no (1/2)",
+   "w": 1600,
+   "x": 5040,
+   "y": 20940
+  },
+  "D-04-elementos-si-no-2.dc.html": {
+   "h": 1720,
+   "title": "5.6 · Elementos: sí y no (2/2)",
+   "w": 1600,
+   "x": 6720,
+   "y": 20940
+  },
+  "M-01-merch-foto-llevar.dc.html": {
+   "h": 1340,
+   "title": "4.8 · Merch en foto (1/3) · Llevar y vestir",
+   "w": 1600,
+   "x": 0,
+   "y": 16860
+  },
+  "M-02-merch-foto-identificarse.dc.html": {
+   "h": 1430,
+   "title": "4.8 · Merch en foto (2/3) · Identificarse y bienvenida",
+   "w": 1600,
+   "x": 1680,
+   "y": 16860
+  },
+  "M-03-merch-foto-papeleria-eventos.dc.html": {
+   "h": 1620,
+   "title": "4.8 · Merch en foto (3/3) · Papelería y eventos",
+   "w": 1600,
+   "x": 3360,
+   "y": 16860
+  },
+  "P-01-insights-informe.dc.html": {
+   "h": 1200,
+   "title": "7.1 · Insights: informe",
+   "w": 1600,
+   "x": 0,
+   "y": 25980
+  },
+  "P-02-insights-plan-deck.dc.html": {
+   "h": 1540,
+   "title": "7.2 · Insights: plan, cierre, deck y correo",
+   "w": 1600,
+   "x": 1680,
+   "y": 25980
+  },
+  "M-04-oficina-foto.dc.html": {
+   "h": 2140,
+   "title": "4.9 · Oficina en foto",
+   "w": 1600,
+   "x": 5040,
+   "y": 16860
+  }
+ },
+ "createdOnFiles": {
+  "at": "2026-09-25T19:29:31Z",
+  "v": 1
+ },
+ "designSystems": [],
+ "launch": {
+  "view": "canvas"
+ },
+ "notes": {
+  "c0": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "0 · Empieza aquí",
+   "w": 240,
+   "x": 0,
+   "y": 0
+  },
+  "c1": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "1 · La esfera — lo que se reconoce aunque no esté el logo",
+   "w": 240,
+   "x": 0,
+   "y": 1820
+  },
+  "c2": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "2 · La voz y el oficio — cómo habla y cómo muestra su trabajo",
+   "w": 240,
+   "x": 0,
+   "y": 3780
+  },
+  "c3": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "3 · La familia — un lenguaje, cuatro acentos",
+   "w": 240,
+   "x": 0,
+   "y": 5440
+  },
+  "c4": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "4 · En uso — de la pantalla a la oficina",
+   "w": 240,
+   "x": 0,
+   "y": 7340
+  },
+  "c5": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "5 · Producción — cómo se hace bien",
+   "w": 240,
+   "x": 0,
+   "y": 18780
+  },
+  "c6": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "6 · Decisiones y validación — lo decidido y cómo se mide",
+   "w": 240,
+   "x": 0,
+   "y": 23340
+  },
+  "c4b": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "4.3 · La oficina de Efeonce — llegar, trabajar, convivir",
+   "w": 240,
+   "x": 0,
+   "y": 9460
+  },
+  "c4c": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "4.6 · Merch y credenciales — llevar, vestir, identificarse",
+   "w": 240,
+   "x": 0,
+   "y": 11860
+  },
+  "c4d": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "4.7 · Bienvenida, papelería y eventos — lo que se abre, se firma y se monta",
+   "w": 240,
+   "x": 0,
+   "y": 13940
+  },
+  "c5b": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "5.3 · Do's & Don'ts — logo, isotipo y elementos: lo correcto y lo que nunca",
+   "w": 240,
+   "x": 0,
+   "y": 20640
+  },
+  "c4e": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "4.8–4.9 · Merch y oficina en foto — el arte plano, fotografiado con IA sobre las referencias reales",
+   "w": 240,
+   "x": 0,
+   "y": 16560
+  },
+  "c7": {
+   "kind": "title1",
+   "maxW": 8000,
+   "text": "7 · Pruebas en producto — Efeonce Insights, en el canvas y sin tocar producción",
+   "w": 240,
+   "x": 0,
+   "y": 25680
+  }
+ },
+ "order": [
+  "00-indice.dc.html",
+  "00b-manual.dc.html",
+  "R2-02-esfera.dc.html",
+  "O-01-orbita.dc.html",
+  "A3-2-lente.dc.html",
+  "A3-2b-foco.dc.html",
+  "R2-04-conversacion.dc.html",
+  "R3-05-eslogan.dc.html",
+  "R2-03-oficio.dc.html",
+  "F-01-arquitectura.dc.html",
+  "O-03-orbita-familia.dc.html",
+  "F-05-firma.dc.html",
+  "O-02-orbita-aplicaciones.dc.html",
+  "O-04-orbita-deck-campana.dc.html",
+  "O-05-orbita-espacio.dc.html",
+  "O-05b-oficina-trabajar.dc.html",
+  "O-05c-oficina-convivir.dc.html",
+  "O-06-orbita-objetos-motion.dc.html",
+  "F-06b-firma-correo-v2.dc.html",
+  "O-11-merch-llevar.dc.html",
+  "O-12-merch-vestir.dc.html",
+  "O-13-merch-identificarse.dc.html",
+  "O-14-bienvenida-envios.dc.html",
+  "O-15-papeleria-llavero.dc.html",
+  "O-16-eventos.dc.html",
+  "M-01-merch-foto-llevar.dc.html",
+  "M-02-merch-foto-identificarse.dc.html",
+  "M-03-merch-foto-papeleria-eventos.dc.html",
+  "M-04-oficina-foto.dc.html",
+  "O-07-orbita-especificaciones.dc.html",
+  "O-08-orbita-fotografia.dc.html",
+  "D-01-logo-correcto.dc.html",
+  "D-02-logo-incorrecto.dc.html",
+  "D-05-isotipo.dc.html",
+  "D-03-elementos-si-no.dc.html",
+  "D-04-elementos-si-no-2.dc.html",
+  "O-09-orbita-decisiones.dc.html",
+  "O-10-prueba-sin-logo.dc.html",
+  "P-01-insights-informe.dc.html",
+  "P-02-insights-plan-deck.dc.html"
+ ],
+ "pages": [],
+ "title": "Línea gráfica Efeonce"
+}

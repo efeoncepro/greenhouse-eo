@@ -1,0 +1,215 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:02:46.115Z",
+  "run": "ai-generations/2026-09-16_viva-mexico",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-16_viva-mexico",
+  "totalBytes": 68384016,
+  "fileCount": 34,
+  "files": [
+    {
+      "path": "contact-sheet.jpg",
+      "sizeBytes": 473314,
+      "sha256": "d569cbb44009345df68e9dddd3750a7a718cea67e4e2bc02698bd021a15756fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/contact-sheet.jpg"
+    },
+    {
+      "path": "detail-03.jpg",
+      "sizeBytes": 97301,
+      "sha256": "e67834a6e139810931353f7593a0d2f1be5ce70b1a05df8e872c5407c631456b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/detail-03.jpg"
+    },
+    {
+      "path": "detail-04.jpg",
+      "sizeBytes": 103807,
+      "sha256": "6435badd81cbb1736387b9fe33130e4ac147e1903d93030ae4e79f085b53d689",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/detail-04.jpg"
+    },
+    {
+      "path": "entrega/viva-mexico-v02-01.jpg",
+      "sizeBytes": 782351,
+      "sha256": "554e65052ddccf68b4b66500fcc6c289bdd83bccfac82dff485f3ad1efeac623",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/entrega/viva-mexico-v02-01.jpg"
+    },
+    {
+      "path": "entrega/viva-mexico-v02-02.jpg",
+      "sizeBytes": 790671,
+      "sha256": "38db548e8dd16c84434e717c474332216a004691acef63a114057f788a9a5825",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/entrega/viva-mexico-v02-02.jpg"
+    },
+    {
+      "path": "entrega/viva-mexico-v02-03.jpg",
+      "sizeBytes": 789421,
+      "sha256": "1050bca503578bc3efe9a4f3ec35b29ace8bbe90ccaa9e286315e15f62a96b9c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/entrega/viva-mexico-v02-03.jpg"
+    },
+    {
+      "path": "entrega/viva-mexico-v02-04.jpg",
+      "sizeBytes": 792749,
+      "sha256": "f609e31c1486fcde585808b268f23ac1ce400852bfec13206c5c798ec2777dc2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/entrega/viva-mexico-v02-04.jpg"
+    },
+    {
+      "path": "entrega/viva-mexico-v02-05.jpg",
+      "sizeBytes": 800923,
+      "sha256": "2a16d518c0991278e302d57948f0351aea0e7873c6cbae0b7ed72810e1a0907d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/entrega/viva-mexico-v02-05.jpg"
+    },
+    {
+      "path": "entrega/viva-mexico-v02-06.jpg",
+      "sizeBytes": 796560,
+      "sha256": "90fd5d3cf04b0ab0944b6fd5467cbe91f7ca3f49f9534c440a0f0c68567c384d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/entrega/viva-mexico-v02-06.jpg"
+    },
+    {
+      "path": "entrega/viva-mexico-v02-07.jpg",
+      "sizeBytes": 1033581,
+      "sha256": "37874f8c3187a8cb64ca4faf8859606e3568f66d6add7de8116bcc620592da2b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/entrega/viva-mexico-v02-07.jpg"
+    },
+    {
+      "path": "mobile-preview.jpg",
+      "sizeBytes": 334434,
+      "sha256": "82546dd39a68dd231ea9e9d89458b7566f63810524bd34a84a36c2ec2df06b29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/mobile-preview.jpg"
+    },
+    {
+      "path": "plates/plate-a-v01-preview.jpg",
+      "sizeBytes": 149307,
+      "sha256": "90f3ed49ea6073eb5ff12291ff5fc8be88fdbec73e2a5e4fccab6dd1d544e52b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-a-v01-preview.jpg"
+    },
+    {
+      "path": "plates/plate-a-v01.png",
+      "sizeBytes": 4126783,
+      "sha256": "c7757c0ba99a7beeae5a1f1ad584118a514209948559b9fb4cb08ef01a9b11f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-a-v01.png"
+    },
+    {
+      "path": "plates/plate-a-v02-preview.jpg",
+      "sizeBytes": 209455,
+      "sha256": "5e01931dbe0d0f7f75cdaa35d3e8700ceff959258257b3a235db349a7f1f5b77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-a-v02-preview.jpg"
+    },
+    {
+      "path": "plates/plate-a-v02.png",
+      "sizeBytes": 4717690,
+      "sha256": "400e31d031f2ce306a833255c323fbea33f202a0bc2a87955d8c298bee7d4fbc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-a-v02.png"
+    },
+    {
+      "path": "plates/plate-b-v01-preview.jpg",
+      "sizeBytes": 228586,
+      "sha256": "81ba485229cc5388cb90e4c656feb62e1dad94f37c24e43857ebe237a417d367",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-b-v01-preview.jpg"
+    },
+    {
+      "path": "plates/plate-b-v01.png",
+      "sizeBytes": 4651659,
+      "sha256": "ab90595b59be503f1cdd826eae36a51826d4a3d8419f2402e42335a5af35eb5c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-b-v01.png"
+    },
+    {
+      "path": "plates/plate-b-v02-preview.jpg",
+      "sizeBytes": 297626,
+      "sha256": "0d26077c1f927caa55f38442e129d688e8b6de731af58a610f6507e21e3d54a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-b-v02-preview.jpg"
+    },
+    {
+      "path": "plates/plate-b-v02.png",
+      "sizeBytes": 5423703,
+      "sha256": "b5e736e9dc25d77af7d36d844477c742c36137710ace7ecd49ffe3ad4736ffc3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-b-v02.png"
+    },
+    {
+      "path": "plates/plate-b-v03-preview.jpg",
+      "sizeBytes": 296282,
+      "sha256": "a3d18fcb0c685ad7b5fa9e951c62cb366c65e12d6a7cc77006db4a74d2fad477",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-b-v03-preview.jpg"
+    },
+    {
+      "path": "plates/plate-b-v03.png",
+      "sizeBytes": 5133883,
+      "sha256": "2b786b89af49c53d2b499adcf66f881718e0debd32c284244794f9263e79a824",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/plates/plate-b-v03.png"
+    },
+    {
+      "path": "slide06-comparacion.jpg",
+      "sizeBytes": 239509,
+      "sha256": "719dc2920d4e11c6cf4e07cfb384c35f0a7cef2d76b9f77c214ae93efbd0faae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slide06-comparacion.jpg"
+    },
+    {
+      "path": "slides/01.png",
+      "sizeBytes": 3039664,
+      "sha256": "2ac54599fca21762040ad1d95405446538f7d386b0c193921bb8939452d2a865",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/01.png"
+    },
+    {
+      "path": "slides/02.png",
+      "sizeBytes": 3031321,
+      "sha256": "25547a3731f4f0ce13d5596d7e36c66a92b1a6769e0bb8980e14d3bc076c731b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/02.png"
+    },
+    {
+      "path": "slides/03.png",
+      "sizeBytes": 3029232,
+      "sha256": "a9e6748aea004b1caf99bfd887347cd8532a9ae7043dd1e7f96da4fc49eebdd4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/03.png"
+    },
+    {
+      "path": "slides/04.png",
+      "sizeBytes": 3029041,
+      "sha256": "925d5c5cdc9545e2b9c581c8ac49f98bf4474e65cde934e0e785b022b8d7ec83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/04.png"
+    },
+    {
+      "path": "slides/05.png",
+      "sizeBytes": 3054198,
+      "sha256": "ecbe53906e8e6117fc670b70b8df5474695e1cafbc288d468dafac58fa4cfc6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/05.png"
+    },
+    {
+      "path": "slides/06-graded.png",
+      "sizeBytes": 2876716,
+      "sha256": "bad3686548f260816232b50f28a80638b878e50f75657ee73bfd3b5cd11020eb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/06-graded.png"
+    },
+    {
+      "path": "slides/06-v1.png",
+      "sizeBytes": 3400424,
+      "sha256": "40072f04b9e7150c2049da7f81d125254e0fdd503cbc246c6c480aa025e190f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/06-v1.png"
+    },
+    {
+      "path": "slides/06.png",
+      "sizeBytes": 3368531,
+      "sha256": "1d0db764b9b199f9948576915c8d9fd2470f5793c7b33f6622451691017e8bba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/06.png"
+    },
+    {
+      "path": "slides/06b.png",
+      "sizeBytes": 3393477,
+      "sha256": "b42c786c4c7dcd90ee48f0ea2b5047b2dd9254a97508f3510969b3eb683c6ed5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/06b.png"
+    },
+    {
+      "path": "slides/07-v02.png",
+      "sizeBytes": 3630555,
+      "sha256": "c8a2178b676d2bea4c1fae8642a144e499b4d8095a22275d90754fe6b8f47ac0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/07-v02.png"
+    },
+    {
+      "path": "slides/07.png",
+      "sizeBytes": 3888355,
+      "sha256": "d2493c31ecfa17381f2c4203a660747a1b2d08fc5ee30765525e90d372c33617",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/slides/07.png"
+    },
+    {
+      "path": "transicion-06-07.jpg",
+      "sizeBytes": 372907,
+      "sha256": "f56e811e1c342f930f19750dd4ac83507502fe4388b0ec45cc374dbd02c8695a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_viva-mexico/transicion-06-07.jpg"
+    }
+  ]
+}

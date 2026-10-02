@@ -1,0 +1,240 @@
+{
+  "graphicVoice": {
+    "contract": "efeonce.graphic-line-orbit",
+    "questionWeight": 300,
+    "answerWeight": 760,
+    "questionRing": {
+      "left": 89.088,
+      "right": 103.89364102564103,
+      "top": 80.28,
+      "bottom": 95.08564102564104
+    },
+    "answerText": {
+      "left": 89.088,
+      "right": 521.107238095238,
+      "top": 128.973,
+      "bottom": 203.113
+    },
+    "answerSphere": {
+      "left": 524.407238095238,
+      "right": 546.407238095238,
+      "top": 179.573,
+      "bottom": 201.573
+    },
+    "answerSize": 110,
+    "sphereCssPx": 8.37890625,
+    "answerGroup": {
+      "left": 89.088,
+      "right": 546.407238095238,
+      "top": 128.973,
+      "bottom": 203.113
+    }
+  },
+  "canvas": {
+    "width": 1024,
+    "height": 1280
+  },
+  "elements": [
+    {
+      "id": "entrada",
+      "box": {
+        "left": 114.04364102564102,
+        "right": 554.611641025641,
+        "top": 76.80000000000001,
+        "bottom": 103.97300000000001
+      }
+    },
+    {
+      "id": "dominante",
+      "box": {
+        "left": 89.088,
+        "right": 521.107238095238,
+        "top": 128.973,
+        "bottom": 203.113
+      }
+    },
+    {
+      "id": "cierre-frase",
+      "box": {
+        "left": 89.088,
+        "right": 888.8819999999997,
+        "top": 228.113,
+        "bottom": 255.68
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 111.088,
+        "right": 632.7500000000001,
+        "top": 288.68,
+        "bottom": 316.186
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 89.088,
+        "right": 307.98199999999997,
+        "top": 348.354,
+        "bottom": 375.15999999999997
+      }
+    },
+    {
+      "id": "logo",
+      "box": {
+        "left": 410,
+        "right": 615,
+        "top": 1155,
+        "bottom": 1203
+      }
+    }
+  ],
+  "typography": {
+    "lead": 29,
+    "dominant": 110,
+    "closure": 27,
+    "cta": 34,
+    "descriptor": 26
+  },
+  "selection": {
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "paddingRatio": {
+        "inline": 0.008,
+        "block": 0.007
+      },
+      "overlay": "none",
+      "overlayOpacity": 0,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursores": [
+      {
+        "id": "criterio"
+      }
+    ]
+  },
+  "maquetacion": {
+    "elementos": [
+      {
+        "id": "entrada",
+        "tipo": "texto",
+        "box": {
+          "left": 114.04364102564102,
+          "right": 554.611641025641,
+          "top": 76.80000000000001,
+          "bottom": 103.97300000000001
+        }
+      },
+      {
+        "id": "dominante",
+        "tipo": "texto",
+        "box": {
+          "left": 89.088,
+          "right": 521.107238095238,
+          "top": 128.973,
+          "bottom": 203.113
+        }
+      },
+      {
+        "id": "cierre-frase",
+        "tipo": "texto",
+        "box": {
+          "left": 89.088,
+          "right": 888.8819999999997,
+          "top": 228.113,
+          "bottom": 255.68
+        }
+      },
+      {
+        "id": "cta",
+        "tipo": "texto",
+        "box": {
+          "left": 111.088,
+          "right": 632.7500000000001,
+          "top": 288.68,
+          "bottom": 316.186
+        },
+        "dentroDe": "cta-boton"
+      },
+      {
+        "id": "descriptor",
+        "tipo": "texto",
+        "box": {
+          "left": 89.088,
+          "right": 307.98199999999997,
+          "top": 348.354,
+          "bottom": 375.15999999999997
+        }
+      },
+      {
+        "id": "cta-boton",
+        "tipo": "cta",
+        "box": {
+          "left": 89.088,
+          "top": 279.68,
+          "right": 654.7500000000001,
+          "bottom": 325.186
+        }
+      },
+      {
+        "id": "logo",
+        "tipo": "firma",
+        "box": {
+          "left": 410,
+          "right": 615,
+          "top": 1155,
+          "bottom": 1203
+        }
+      },
+      {
+        "id": "cursor «criterio»",
+        "tipo": "seleccion",
+        "box": {
+          "left": 553.063,
+          "top": 164.507,
+          "right": 610.492,
+          "bottom": 223.634
+        },
+        "destino": "dominante"
+      },
+      {
+        "id": "cursor «usuario» del CTA",
+        "tipo": "seleccion",
+        "box": {
+          "left": 661.406,
+          "top": 300.897,
+          "right": 691.656,
+          "bottom": 331.996
+        },
+        "destino": "cta-boton"
+      },
+      {
+        "id": "marco de la selección del titular",
+        "tipo": "seleccion",
+        "box": {
+          "left": 76.8,
+          "top": 117.709,
+          "right": 558.695,
+          "bottom": 214.377
+        },
+        "destino": "dominante"
+      }
+    ]
+  },
+  "columna": 89.088,
+  "ctaMarco": {
+    "left": 80.896,
+    "top": 272.512,
+    "right": 662.942,
+    "bottom": 332.354
+  },
+  "zonaSegura": {
+    "perfil": "feed",
+    "x0": 0.075,
+    "y0": 0.06,
+    "x1": 0.925,
+    "y1": 0.94
+  }
+}

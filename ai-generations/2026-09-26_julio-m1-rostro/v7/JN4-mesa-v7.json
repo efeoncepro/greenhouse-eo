@@ -1,0 +1,11 @@
+{
+  "id": "JN4-mesa-v7",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio", { "persona": "nexa", "vista": "45-der" }],
+  "escena": "SCENE (selecting shots for a specialty coffee brand's campaign, bright studio with tall arched windows and a mountain view, midday): camera at the edge of the round oak table, a mild fisheye (about 14mm full-frame) so the table curves at the bottom of the frame, while both faces stay near the centre where the distortion is lowest and their proportions stay natural. Julio sits on the LEFT in a charcoal crew-neck sweater; Nexa sits on the RIGHT in a cream knit sweater. Printed photographs of coffee beans and cups are spread across the table. Caught at the exact moment Julio circles the chosen print with an orange marker and Nexa taps the same print with her fingertip: BOTH look at that SAME print, just below them between their hands — shared attention, their eye lines converge on the same point. Julio's head tilts gently down and slightly toward the print; Nexa's head is turned in three-quarter toward the left and tilted down toward it. Eyes: both open, each iris a full circle with white visible on both sides, upper eyelid above the iris with its own crease, lashes a defined dark line — never a slit, never half-moon irises. Both smile softly, relaxed, natural. Hard midday sun through the arched windows rakes across the table and their hands; faces lit with a soft fill from the white table; shadows warm-neutral, never blue. A white mug at the left edge. Everything unbranded; no readable text anywhere.",
+  "lecho": {
+    "objeto": "the curved near edge of the oak table in deep shadow right against the lens, spanning the full width of the bottom of the frame",
+    "tono": "DARK, matte, no highlights"
+  }
+}

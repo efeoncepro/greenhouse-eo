@@ -199,6 +199,10 @@ outbound.** *(→ `09_CANALES_OUTBOUND`.)*
 | **Berel** | Retainer SEO+AEO adjudicado *(licitación wherEX #5234, may-2026)* | 🔴 **Sin métrica de resultado.** Es el candidato natural para construirlo bien desde el baseline |
 
 🔴 **La regla no cambia: sin las 3 condiciones, NO se usa.** Ni "ilustrativo", ni redondeado.
+⚠️ **Delta 2026-09-30:** el deck SEO/AEO aprobado trae tres láminas de caso (BICECORP, Banco BICE, Berel) cuyas cifras
+reales no se han cargado. El operador decidió usarlas **tal cual** y asumir la responsabilidad («Deja esos datos… asumo
+la responsabilidad»): esta skill lo registra y no lo contradice al usar ese deck (`SKILL.md` §4f). Si la regla de
+arriba cambia en general es decisión del operador.
 🎯 **Pero el trabajo pendiente no es "conseguir un caso": es VERIFICAR dos números que ya tenemos.**
 
 ### Logos *(sin métrica, pero usables)*
@@ -219,7 +223,7 @@ Aguas Andinas · BeFUN · Gobierno de Santiago · Universidad de Temuco.**
 |---|---|
 | **Licitación SKY** *(`docs/commercial/tenders/sky-blog-2026/`)* | ✅ **El único artefacto real — y GANÓ (adjudicada 2026-09-23).** Oferta técnica + económica + `deck-plan.json` + benchmark competitivo + squad blueprint. ⚠️ Los precios y el squad del expediente son de la oferta original; las condiciones vigentes están en `efeonce/ESTADO_ACTUAL.md` § 1 |
 | 🔴 **Propuesta-tipo de SEO/AEO** | 🔴 **NO EXISTE.** Cada propuesta se arma de cero |
-| 🔴 **Catálogo del Artifact Composer para SEO/AEO** | 🔴 **NO EXISTE** *(solo `deck-axis`)* |
+| **Deck SEO/AEO de marca propia** *(catálogo «La órbita», `graphic-line-deck`)* | ✅ **Aprobado el 2026-09-30** (completo 33 · brochure 24 · propuesta 29; TASK-1949). ⚠️ Seis láminas nativas todavía sin plantilla. Los datos (cifras de los casos, formatos de Insights, industrias, Bresler) van tal cual por decisión del operador, que asume la responsabilidad; logos de clientes con autorización. Qué lámina para qué objeción: `SKILL.md` §4f |
 
 🎯 **Lo bueno del deck de SKY, y hay que reusarlo:** **usa el Grader corrido sobre SKY como diagnóstico** y
 **linkea el informe público live**. **Esa es la estructura de la propuesta-tipo.** → `templates/propuesta-tipo.md`

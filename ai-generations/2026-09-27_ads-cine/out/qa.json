@@ -1,0 +1,38 @@
+[
+  {
+    "id": "AD1-916-nexa-orbita",
+    "fmt": "9:16",
+    "dominante": 178,
+    "pregunta": 43,
+    "ratio": 4.14,
+    "vozFinAlto": 0.223,
+    "firmaContraste": 19.69
+  },
+  {
+    "id": "AD2-916-revops",
+    "fmt": "9:16",
+    "dominante": 168,
+    "pregunta": 43,
+    "ratio": 3.91,
+    "vozFinAlto": 0.218,
+    "firmaContraste": 20.28
+  },
+  {
+    "id": "AD3-45-aeo",
+    "fmt": "4:5",
+    "dominante": 164,
+    "pregunta": 41,
+    "ratio": 4,
+    "vozFinAlto": 0.237,
+    "firmaContraste": 19.83
+  },
+  {
+    "id": "AD4-45-equipo",
+    "fmt": "4:5",
+    "dominante": 164,
+    "pregunta": 41,
+    "ratio": 4,
+    "vozFinAlto": 0.237,
+    "firmaContraste": 17.53
+  }
+]

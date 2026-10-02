@@ -111,6 +111,46 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
    **documéntalo en `workflows/`** (es como crece la skill).
 5. **Aterriza a Efeonce** si es marca/canales propios o un cliente Globe:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
+   **Glitch** (vlog «Glitch en voz alta» y reel): sub-línea sólo de Glitch en `efeonce-graphic-line` →
+   `references/glitch.md` §6. El reel es un kit de **overlays con alfa encima de la toma del host** (mapa de zonas; la
+   cara y la interfaz de la app nunca se tapan) + tarjeta final en loop. El motion de Glitch está **APROBADO**
+   (2026-09-27, norma §7 y §13) y **producido con HyperFrames** en el taller (composiciones propias de
+   `tools/glitch-motion`; los catálogos `glitch-carousel`/`glitch-stills`/`glitch-overlays` del Composer, TASK-1923,
+   son otra cosa: piezas fijas y el cuadro fijo de cada overlay), igual que su sonido (§13.11) y su música (§13.12); lo
+   que sigue pendiente lo lista la norma §11. **La transición de la manzana en bytes es exclusiva de Glitch.** Nunca
+   animes a mano una pieza de Glitch: se corre `glitch-motion` (comandos y argumentos: norma §13.13; mínimo operable en
+   `references/glitch.md` §12). **Semanal vs Flash:** el taller sólo conoce la edición semanal («Edición #N» y el cierre
+   «el #N sale el lunes.» fijo); el **Glitch Flash** (2026-09-28: una noticia, sin número) todavía no tiene motion ni
+   cabecera Flash, y la muletilla del narrador varía por edición (`references/glitch.md` §14; pendiente en TASK-1924).
+   **Dónde:** repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (TASK-1924), operado desde
+   `greenhouse-eo` con `pnpm -C ../efeonce-brand-workshop`; nunca en Greenhouse ni en Globe.
+   **Sonido de Glitch (APROBADO, versión B, 2026-09-27; sólo Glitch):** cada pieza de motion de Glitch tiene una pista de sonido sidecar
+   (WAV con el mismo nombre y duración que su `.mov`); si cambian los tiempos del motion, vuelve a correr el motor de
+   sonido (`references/glitch.md` §13 de `efeonce-graphic-line`).
+   **Música de Glitch (APROBADA 2026-09-27; sólo Glitch):** tema B (intro, cortina, salida) y cama post-punk bajo la
+   noticia, a 150 BPM amarrados al motion. Se entrega **junto al motion consumiendo los másteres del bucket por URL +
+   sha256** (`glitch/music/v1/`; **nunca se regeneran**, y cambiar tiempos del motion no los rehace): intro con su
+   pre-roll, cortina 1,6 s antes de la cabecera siguiente, salida con la tarjeta final y la cama bajo cada noticia
+   (15 dB bajo la voz, ducking, sin recortar medios; nunca bajo el Drop ni la tarjeta final). **Integrada** en
+   `tools/glitch-motion` (`src/music.mjs`, commit `2c8f36c`; `--music on|off`, `on` por defecto) con el **pre-roll de
+   la intro** ya definido y hecho, **elegido por el operador**: «los tres puntos al ritmo» (3,2 s, opaco: aparecen,
+   laten Mi · Mi · Mi, se juntan en el tiempo fuerte y el tercero tartamudea en semicorcheas en el último tiempo; su
+   último cuadro = primero de la apertura, PSNR ∞). Con música, la intro y la salida reemplazan a
+   `apertura.wav`/`cierre.wav` (no se sueltan ambos). La cama nunca va bajo el host fuera de las noticias (tampoco en
+   el cierre sobre el host). **Único pendiente:** probar la mezcla con la voz real del host. Detalle:
+   `references/glitch.md` §12 y §13.7 de `efeonce-graphic-line`.
+   **Registro cine (2026-09-27):** es un registro **fotográfico** del lenguaje de Efeonce
+   ([`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)),
+   no un estilo de video. Un video con **Nexa protagonista** que tome ese look respeta la misma frontera (cine sólo con
+   Nexa protagonista o en láminas `proposal-cinematic`, más la excepción de las láminas de sección y «about» del deck,
+   que no alcanza al video; con personas del equipo en publicidad sigue en prueba) y el
+   mismo canon: identidad A de Nexa, proporciones reales (cámara a ~2 m, 85 mm, sin escorzo), la luz de la línea como
+   fenómeno de la escena y no como grade, rim + bruma, mirada al lente, nunca dos personas mirándose de cerca y el
+   isotipo compuesto, nunca generado. Esa luz cuenta como la órbita de la pieza: no se suma otra.
+   **Motion de marca («La órbita», Glitch):** su hogar es el repo taller `efeoncepro/efeonce-brand-workshop`
+   ([ADR](../../../docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md), Accepted 2026-09-27): `tools/brand-motion`
+   (las animaciones del logo, hoy todavía en `scripts/creative/brand-motion/` de Greenhouse hasta que las migre
+   TASK-1925) y `tools/glitch-motion` (TASK-1924).
 6. **Cierra con un artefacto** de `templates/` (brief, storyboard, animatic/shotlist, prompt sheet,
    EDL, brief de sonido, spec de entrega, crítica), no con prosa suelta.
 
@@ -203,6 +243,17 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 > conform, mix/master y export determinísticos consumen **0 credits** aunque sí requieren capacidad.
 > Todo spend sigue `estimate → reservation → approval → execution → settlement/release/refund`, y
 > entregar/publicar pasa SIEMPRE por confirmación humana. Ver módulo 13.
+
+### Dónde viven los archivos de `ai-generations/`
+
+Una ruta `ai-generations/...` en esta skill (plate, master, stem, ref, script de una corrida) es **lógica**: el archivo
+vive local (protegido), en el canon `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) (lo sellado en
+`scripts/foto/assets.lock.json`; el equipo lo baja con `pnpm assets:pull`) o en el archivo
+`gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (exploración, rondas, renders pesados; sólo operador). Scripts y
+`.md` van en git; los binarios, no siempre. **Antes de componer, editar o re-renderizar** desde un asset que no está en
+disco: `pnpm ai-gen:where <ruta>` → `pnpm ai-gen:pull <carpeta|ruta>` (misma ruta, sha256 verificado). **NUNCA**
+regenerar, sustituir ni aproximar un asset aprobado porque falta; **NUNCA** resellar el lock para tapar un faltante ni
+archivar/borrar a mano. Salidas nuevas: `ai-generations/<AAAA-MM-DD>_<slug>/` local. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## 5. Boundaries duros (lo que esta skill NO hace)
 

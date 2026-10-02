@@ -1,0 +1,30 @@
+# Gestionado desde efeoncepro/greenhouse-eo. Gates sin dependencias: corren con Node puro, sin
+# instalar paquetes privados, así el CI no necesita credenciales.
+name: gates
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          # Sin pnpm en este job: setup-node@v5 lo buscaría por `packageManager` para la caché y fallaría.
+          package-manager-cache: false
+      # En un PR, managed-drift compara el sello contra el de la rama base: un PR que no es de sync no
+      # puede cambiarlo (sería eximirse). Sólo se trae ese ref, sin historia.
+      - name: Sello de la rama base
+        if: github.event_name == 'pull_request'
+        run: git fetch --no-tags --depth=1 origin "+refs/heads/${GITHUB_BASE_REF}:refs/remotes/origin/${GITHUB_BASE_REF}"
+      - name: Gates del workbench
+        run: node gates/run-all.mjs

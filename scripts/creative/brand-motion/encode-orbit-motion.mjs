@@ -13,6 +13,7 @@ import { cpSync, existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:
 import path from 'node:path'
 
 import sharp from 'sharp'
+import { efeonceGraphicLine as GL } from '@efeoncepro/axis-tokens'
 
 const args = process.argv.slice(2)
 const opt = (n, f) => (args.includes(n) ? args[args.indexOf(n) + 1] : f)
@@ -21,16 +22,18 @@ const soundRoot = path.resolve(opt('--sound', 'sound'))
 const outRoot = path.resolve(opt('--out', 'deliverables'))
 const only = opt('--only', null)?.split(',')
 const FPS = 60
-const DUR = { reveal: 4.2, open: 2.8 }
+// Duraciones y fundido final del sonido: tokens `efeonceGraphicLine.motion`.
+const DUR = Object.fromEntries(Object.entries(GL.motion.pieces).map(([k, v]) => [k, v.durationMs / 1000]))
+const FADE = GL.motion.sound.fadeOutMs / 1000
 const ff = a => execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...a], { stdio: 'inherit' })
 
-const variants = readdirSync(framesRoot).filter(d => /^(reveal|open)_/.test(d) && (!only || only.includes(d)))
+const variants = readdirSync(framesRoot).filter(d => /^(reveal|open|sting)_/.test(d) && (!only || only.includes(d)))
 
 for (const v of variants) {
   const [anim, format, scheme] = v.split('_')
   const src = path.join(framesRoot, v)
-  const base = `efeonce-orbita-${anim === 'reveal' ? 'reveal' : 'apertura'}_${format}_${scheme === 'dark' ? 'navy' : 'claro'}`
-  const out = path.join(outRoot, anim === 'reveal' ? 'reveal' : 'apertura', format, scheme === 'dark' ? 'navy' : 'claro')
+  const base = `efeonce-orbita-${({ reveal: 'reveal', open: 'apertura', sting: 'sting' })[anim]}_${format}_${scheme === 'dark' ? 'navy' : 'claro'}`
+  const out = path.join(outRoot, ({ reveal: 'reveal', open: 'apertura', sting: 'sting' })[anim], format, scheme === 'dark' ? 'navy' : 'claro')
   const alphaTag = scheme === 'dark' ? 'alpha-para-fondo-oscuro' : 'alpha-para-fondo-claro'
 
   mkdirSync(out, { recursive: true })
@@ -52,7 +55,7 @@ for (const v of variants) {
   }
 
   const wav = path.join(soundRoot, `${anim}.wav`)
-  const audio = ['-i', wav, '-map', '0:v', '-map', '1:a', '-af', `atrim=0:${DUR[anim]},afade=t=out:st=${DUR[anim] - 0.45}:d=0.45`, '-c:a', 'aac', '-b:a', '256k', '-shortest']
+  const audio = ['-i', wav, '-map', '0:v', '-map', '1:a', '-af', `atrim=0:${DUR[anim]},afade=t=out:st=${DUR[anim] - FADE}:d=${FADE}`, '-c:a', 'aac', '-b:a', '256k', '-shortest']
   const seq = dir => ['-framerate', String(FPS), '-i', path.join(dir, '%04d.png')]
 
   // Con fondo: MP4 60 y 30 fps con sonido.

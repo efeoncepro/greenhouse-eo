@@ -1,0 +1,8 @@
+[
+ {"id":"julio-reyes","nombre":"Julio Reyes","cargo":"Managing & GTM Director · Efeonce","telefono":"+56 9 3732 3064","correo":"jreyes@efeoncepro.com","linkedin":"https://www.linkedin.com/company/efeoncecl","foto":"foto-julio-reyes","marca":"efeonce"},
+ {"id":"julio-reyes-campana","nombre":"Julio Reyes","cargo":"Managing & GTM Director · Efeonce","telefono":"+56 9 3732 3064","correo":"jreyes@efeoncepro.com","linkedin":"https://www.linkedin.com/company/efeoncecl","foto":"foto-julio-reyes","marca":"efeonce","campana":{"pregunta":"¿Apareces cuando le preguntan a la IA por tu categoría?","accion":"Mídelo","url":"https://efeoncepro.com"}},
+ {"id":"ventas","nombre":"Ventas","cargo":"Efeonce · Chile y Estados Unidos","telefono":"+56 9 3732 3064","correo":"sales@efeoncepro.com","marca":"efeonce"},
+ {"id":"globe","nombre":"Julio Reyes","cargo":"Managing & GTM Director · Globe","telefono":"+56 9 3732 3064","correo":"jreyes@efeoncepro.com","foto":"foto-julio-reyes","marca":"globe"},
+ {"id":"wave","nombre":"Julio Reyes","cargo":"Managing & GTM Director · Wave","telefono":"+56 9 3732 3064","correo":"jreyes@efeoncepro.com","foto":"foto-julio-reyes","marca":"wave"},
+ {"id":"reach","nombre":"Julio Reyes","cargo":"Managing & GTM Director · Reach","telefono":"+56 9 3732 3064","correo":"jreyes@efeoncepro.com","foto":"foto-julio-reyes","marca":"reach"}
+]

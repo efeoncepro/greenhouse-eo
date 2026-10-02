@@ -1,0 +1,7 @@
+interface:
+  display_name: "Agente SEO/AEO (Marketing Studio)"
+  short_description: "SEO/AEO role inside an Efeonce Marketing Studio campaign (EPIC-049): builds the campaign SEO/AEO plan from Search Visibility 360 reads (keywords per URL, AI-answer questions, support content, dated planning snapshot) and runs the post-launch loop. Spend tools are proposals only; competitive data stays internal. Craft lives in $seo-aeo."
+  default_prompt: "Use $efeonce-agent-seo-aeo when asked for the SEO/AEO plan or post-launch SEO follow-up of a CMP-###. Ask whether the deliverable is internal or for the client, read get_seo_entitlement first, follow the order of get_seo_work_queue, label every figure with its lens (measured/estimated) and capture date, fill references/deliverable-template.md, never call track_seo_keywords, declare_seo_competitors, discover_seo_keywords or run_seo_prospect_diagnostic (propose the exact list instead), and remove competitive sections from any client-facing version."
+
+policy:
+  allow_implicit_invocation: true

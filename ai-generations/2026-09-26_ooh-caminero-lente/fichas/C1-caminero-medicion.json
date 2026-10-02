@@ -1,0 +1,17 @@
+{
+  "formato": "3:1",
+  "impacto": true,
+  "id": "C1-caminero-medicion",
+  "palanca": "luz-motivada",
+  "escena": "SCENE (craft brewery office, late afternoon, the team checks the first week of a launch campaign): in focus, a growth analyst in a plain charcoal overshirt stands at a tall desk, leaning toward a large monitor, one hand on a trackpad and the other pointing at the rising line of a chart on screen; the cool blue light of the monitor is the brightest thing in the frame and lifts the analyst's face and hand. A small lime-green sticky note on the monitor bezel marks the target that was just reached. Behind, SOFT and out of focus, stacked brewery crates and a window with warm dusk light. 85mm f/1.8. LENS FRAMING (essential): everything essential — the analyst's face, the pointing hand and the monitor — sits inside ONE circle whose diameter is about 80% of the frame height, centred at 70% of the frame width and at mid height, with air around it; the LEFT 45% of the frame holds only a calm, evenly shadowed brick wall. Nobody looks at the lens. No readable text or numbers on the screen, completely unbranded.",
+  "lecho": {
+    "objeto": "the dark oiled-wood edge of the tall desk right at the lens",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, evenly shadowed brick wall",
+      "tinta": "blanca"
+    }
+  }
+}

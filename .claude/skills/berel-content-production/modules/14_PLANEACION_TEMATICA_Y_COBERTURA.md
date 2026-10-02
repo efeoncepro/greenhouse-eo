@@ -32,5 +32,29 @@ precedencia de pedidos del cliente ni autoriza publicación.
     artículos y 35 gráficas por mes, sin videos en el cupo. Estimado pendiente de aceptación y de confirmar al cierre
     de diciembre; ver el balance en el módulo 15.
 
+## Research por URL: mercado e intención de Berel
+
+Para enriquecer una URL propia, cargar `dataforseo-operator` y usar la CLI gobernada `site-keywords` o
+`quick keywords-for-site`; contrato en `.claude/skills/dataforseo-operator/references/02-labs.md` §2.1a.
+Verificar organización de Berel, URL y mercado antes del preview: `--market MX --locale es-MX` resuelve
+México (`2484`) y `language_code:es`. Otro mercado sólo sirve como comparación declarada y separada.
+Confirmar propiedad del target: no adjudicar `berelmexico.com` a `berel.com` por semejanza de hostname.
+
+La [prueba live del 30/09](../../../../docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md)
+validó filas, paginación y resume por URL mexicana. No reutilizar sus cifras como baseline mensual: conservar
+fecha/source/raw y refrescar cuando corresponda al plan autorizado. El caso chileno de cero filas no demuestra
+falta de demanda mexicana. Scope coincidente no valida pertinencia: aparecieron bancos, hoteles y otras tiendas
+junto con consultas de pinturas y de Berel; registrar selección/exclusión sin borrar la evidencia adquirida.
+
+Separar dos decisiones del lector: comparativas de marcas/desempeño (la SERP de «mejor pinturería de México»
+mostró esa intención) y localización de una tienda («pinturas cerca de mí», variantes de Berel/ciudad).
+Las segundas pueden conducir a mejorar el localizador/fichas, no necesariamente a escribir una comparativa.
+Una captura no elige objetivamente la mejor pinturería ni prueba ranking de la URL consultada en Labs.
+
+Cruzar candidatas con corpus, GSC y canibalización, etiquetar relación propia/genérica/otra marca/ruido y
+proponer sólo lo pertinente. Volumen/CPC/competencia son estimaciones Ads; `totalCount` del proveedor no es
+cantidad de keywords exclusivas de Berel ni demanda propia. Mantener cobertura parcial explícita y presupuesto
+acotado; no ampliar páginas automáticamente por un total grande ni mover slots, CMS o publicación durante research.
+
 El baseline fechado y las 49 asignaciones están en
 [la auditoría](../../../../docs/audits/seo/BEREL_EDITORIAL_COVERAGE_2026-09-02.md); refrescar antes de producir.

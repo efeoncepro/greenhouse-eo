@@ -52,6 +52,8 @@ Las tres plataformas posicionan a Efeonce **fuera del comparison set de agencias
 
 ### Selección de demo por buyer persona (clave v1.3)
 
+La [venta con demostración contextual](../commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md) documenta el aprendizaje del operador en Berel y SKY y su aplicación a Banco Pichincha: mostrar oportunidad, ejecución y operación antes de cerrar el alcance. El operador reconoció como diferenciador hacer que el cliente experimente nuestra capacidad antes de comprarla (30/09/2026; mecanismo de marca en `09`). La sistematización operativa sigue propuesta; no hay una tasa de conversión demostrada ni un requisito de demo para todas las cuentas.
+
 El demo ya no es genérico. Se elige la plataforma según el decisor:
 
 | Buyer persona | Demo primario | Argumento |

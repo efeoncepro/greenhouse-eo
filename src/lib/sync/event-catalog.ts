@@ -290,7 +290,10 @@ export const AGGREGATE_TYPES = {
   hiringAssessmentAiScoringRun: 'hiring_assessment_ai_scoring_run',
 
   // TASK-1365 — aggregate-only evidence snapshot. Raw self-ID never enters the outbox.
-  assessmentFairnessEvidence: 'assessment_fairness_evidence'
+  assessmentFairnessEvidence: 'assessment_fairness_evidence',
+
+  // TASK-1921 — pedido de render de una pieza de marca (La órbita o Glitch). Identity: request_id ('brq-{uuid}').
+  brandRenderRequest: 'brand_render_request'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -1297,7 +1300,13 @@ export const EVENT_TYPES = {
   internalAccessEnrolled: 'identity.internal_access.enrolled',
   internalAccessRevoked: 'identity.internal_access.revoked',
   internalAccessCapabilityGranted: 'identity.internal_access.capability_granted',
-  internalAccessCapabilityRevoked: 'identity.internal_access.capability_revoked'
+  internalAccessCapabilityRevoked: 'identity.internal_access.capability_revoked',
+
+  // TASK-1921 — render gobernado de piezas de marca. Payloads redactados: ids, familia, catálogo, hash, estado, asset
+  // ids; nunca el intent, el plan, bytes ni URLs.
+  brandRenderRequested: 'brand.render.requested',
+  brandRenderJobCompleted: 'brand.render.job_completed',
+  brandRenderJobFailed: 'brand.render.job_failed'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

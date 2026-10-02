@@ -1,0 +1,95 @@
+{
+  "document": "proposal",
+  "line": "revenue-salesforce",
+  "slides": [
+    {
+      "recipeId": "cover-proposal-orbit",
+      "purpose": "01 · portada de propuesta sin foto, con el logo del cliente"
+    },
+    {
+      "recipeId": "proposal-cinematic-revops",
+      "plateRef": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF1-nexa-conexion.png",
+      "purpose": "02 · ¿Qué le falta a tu Salesforce? Conexión. (SF6)"
+    },
+    {
+      "recipeId": "content-one-platform",
+      "purpose": "03 · Uno (SF1)"
+    },
+    {
+      "recipeId": "decision-provider-fit",
+      "purpose": "04 · El que encaje (SF4)"
+    },
+    {
+      "recipeId": "decision-platform-coexistence",
+      "purpose": "05 · No por defecto (SF3)"
+    },
+    {
+      "recipeId": "content-service-lanes",
+      "purpose": "06 · Todo el ciclo (SF8)"
+    },
+    {
+      "recipeId": "content-season-launches",
+      "purpose": "07 · Agentes (SF9; corte obligatorio; se quita en un brochure evergreen)"
+    },
+    {
+      "recipeId": "method-agent-supervisor",
+      "purpose": "08 · Una persona (SF2)"
+    },
+    {
+      "recipeId": "content-day-live-approval",
+      "purpose": "09 · Donde trabajas (SF18)"
+    },
+    {
+      "recipeId": "content-live-chat",
+      "purpose": "10 · Te responde (SF16, Enablement conversacional)"
+    },
+    {
+      "recipeId": "method-identity-consent",
+      "purpose": "11 · Con permiso (SF12)"
+    },
+    {
+      "recipeId": "method-migration-reconcile",
+      "purpose": "12 · Porque cuadra (SF13)"
+    },
+    {
+      "recipeId": "decision-diagnosis-verdict",
+      "purpose": "13 · Una decisión (SF5)"
+    },
+    {
+      "recipeId": "method-waves",
+      "purpose": "14 · Por olas (SF10)"
+    },
+    {
+      "recipeId": "content-day-release-cycle",
+      "purpose": "15 · Sin sorpresas (SF14)"
+    },
+    {
+      "recipeId": "content-day-live-library",
+      "purpose": "16 · A su ritmo (SF15)"
+    },
+    {
+      "recipeId": "content-day-live-console",
+      "purpose": "17 · Lo operamos (SF11)"
+    },
+    {
+      "recipeId": "content-measure-formulas",
+      "purpose": "18 · Lo medimos (SF17)"
+    },
+    {
+      "recipeId": "close-proposal-horizon",
+      "plateRef": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF3-nexa-contraportada-bordada.png",
+      "purpose": "19 · Empower your Revenue (SF19, composición sloganBlock, logo a 700 px; insignia «Salesforce Partner» por defecto, autorizada por Salesforce)",
+      "slots": {
+        "sloganLineWord": "Revenue",
+        "photo": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF3-nexa-contraportada-bordada.png",
+        "partnerMark": {
+          "kind": "partner-badge",
+          "mode": "badge",
+          "asset": "ai-generations/2026-09-29_deck-salesforce/logos/salesforce-partner-badge-horizontal.svg",
+          "alt": "Salesforce Partner",
+          "readbackRef": "salesforce-partner-authorization-2026-09-29"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+  ⚠ PR1b-piezas-que-rinden: la escena no declara un PORTADOR del azul de marca (el canon lo pide en todas: una pantalla, un panel, una luz, un objeto azul de la escena). Un HEX suelto no basta: el azul tiene que estar en algo
+  ⚠ PR1b-piezas-que-rinden: la escena CONTRADICE la referencia que ella misma declara: `objetos` resuelve "polo-efeonce" en NAVY y la escena lo describe en NEGRO. Acá gana la REFERENCIA, no la escena — una imagen pesa más que una frase— así que el plate saldrá navy. El kit no tiene ese color: navy, blanco.

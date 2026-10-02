@@ -1,0 +1,425 @@
+<title>Rig del Spark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,760&family=Poppins:wght@300;400;500&display=swap">
+<style>
+/* Layout: un escenario oscuro de estudio con el Spark al centro; controles debajo, en dos grupos (expresión y línea). Un solo look oscuro, el navy de la marca. */
+:root {
+  --bg: #001a33;          /* navy Efeonce */
+  --bg-raised: #062a4d;
+  --fg: #eef4fa;
+  --muted: #9fb3c8;
+  --hairline: rgba(159, 179, 200, 0.18);
+  --led: #0375db;         /* lo cambia el selector de línea */
+  --font-display: 'Bricolage Grotesque', 'Poppins', system-ui, sans-serif;
+  --font-body: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding-inline: 20px;
+  padding-block: 28px 40px;
+  display: grid;
+  gap: 22px;
+}
+header { display: grid; gap: 6px; }
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 760;
+  font-size: clamp(30px, 5vw, 46px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+h1 .dot { color: var(--led); transition: color .4s; }
+.lede { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 55% 60% at 50% 42%, rgba(255,255,255,0.07), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 0%, var(--bg-raised), var(--bg) 70%);
+  border: 1px solid var(--hairline);
+  touch-action: none;
+  cursor: crosshair;
+  perspective: 1100px;
+}
+.floor {
+  position: absolute;
+  left: 50%; bottom: 9%;
+  width: 34%; height: 7%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, var(--led), transparent 70%);
+  opacity: 0.45;
+  filter: blur(14px);
+  transition: background .4s;
+}
+.spark {
+  position: absolute;
+  left: 50%; top: 47%;
+  width: min(62%, 560px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.spark img, .spark svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.spark img { transition: opacity .35s; }
+.hint {
+  position: absolute; left: 16px; bottom: 14px;
+  font-size: 12px; color: var(--muted);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+.readout {
+  position: absolute; right: 16px; bottom: 14px;
+  font-size: 12px; color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.controls { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 700px) { .controls { grid-template-columns: 1fr; } }
+fieldset { margin: 0; padding: 0; border: 0; min-width: 0; display: grid; gap: 10px; }
+legend { padding: 0; margin-bottom: 10px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: inherit;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 8px 14px;
+  min-height: 40px;
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--bg-raised); border-color: var(--led); }
+.chip:focus-visible { outline: 2px solid var(--led); outline-offset: 2px; }
+.swatch { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+
+.notes {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 18px;
+}
+@media (max-width: 700px) { .notes { grid-template-columns: 1fr; } }
+.notes h2 { margin: 0 0 4px; font-family: var(--font-display); font-weight: 500; font-size: 16px; }
+.notes p { margin: 0; color: var(--muted); font-size: 13.5px; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .spark img, .floor, h1 .dot { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Los Sparks de Efeonce · rig 2.5D</span>
+    <h1>Mueve el cursor: el Spark te sigue<span class="dot">.</span></h1>
+    <p class="lede">El cuerpo es una imagen del kit aprobado. Los ojos y la sonrisa son LED dibujados en vivo: siguen el cursor dentro del visor, parpadean solos y cambian de expresión. En el celular, arrastra el dedo sobre el escenario.</p>
+  </header>
+
+  <div class="stage" id="stage" role="img" aria-label="Spark, el agente de Efeonce, siguiendo el cursor con la mirada">
+    <div class="floor" id="floor"></div>
+    <div class="spark" id="spark">
+      <img id="body" alt="" src="">
+      <svg viewBox="0 0 1000 1000" aria-hidden="true">
+        <defs>
+          <pattern id="dots" width="7" height="7" patternUnits="userSpaceOnUse">
+            <circle cx="3.5" cy="3.5" r="2.7" fill="#fff"></circle>
+          </pattern>
+          <mask id="matrix" maskUnits="userSpaceOnUse" x="0" y="0" width="1000" height="1000">
+            <rect width="1000" height="1000" fill="url(#dots)"></rect>
+          </mask>
+          <clipPath id="visor"><ellipse cx="496" cy="414" rx="252" ry="96"></ellipse></clipPath>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+        </defs>
+        <g clip-path="url(#visor)">
+          <g id="face">
+            <g id="faceGlow" filter="url(#glow)" opacity="0.85"></g>
+            <g id="faceLed" mask="url(#matrix)"></g>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <span class="hint" id="hint">Mira hacia el cursor</span>
+    <span class="readout" id="readout">x 0.00 · y 0.00</span>
+  </div>
+
+  <div class="controls">
+    <fieldset>
+      <legend>Expresión</legend>
+      <div class="chips" id="expressions"></div>
+    </fieldset>
+    <fieldset>
+      <legend>Color de línea</legend>
+      <div class="chips" id="lines"></div>
+    </fieldset>
+  </div>
+
+  <section class="notes" aria-label="Cómo está armado">
+    <div>
+      <h2>Capa 1 · cuerpo</h2>
+      <p>El Spark base del kit (vista frente), regenerado con el visor vacío, uno por color de línea. Ventanas, antena y costuras ya vienen en ese color.</p>
+    </div>
+    <div>
+      <h2>Capa 2 · cara</h2>
+      <p>Ojos y sonrisa en SVG con textura de matriz de puntos y brillo, recortados al óvalo del visor. Se mueven hasta 60 px a los lados y 28 px en alto.</p>
+    </div>
+    <div>
+      <h2>Capa 3 · cuerpo en 3D</h2>
+      <p>La esfera gira hasta 9° hacia el cursor y flota. Sin movimiento por 4 segundos, la mirada vaga sola. Con movimiento reducido, sólo siguen los ojos.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const BODIES = __BODIES__;
+  const LINES = [
+    { key: 'engine', name: 'Engine', hex: '#0375db' },
+    { key: 'growth', name: 'Growth', hex: '#36c8bf' },
+    { key: 'brand', name: 'Brand', hex: '#ff6500' },
+    { key: 'voice', name: 'Voice', hex: '#f83902' },
+    { key: 'revenue-hubspot', name: 'Revenue HubSpot', hex: '#e86bd0' },
+    { key: 'revenue-salesforce', name: 'Revenue Salesforce', hex: '#2fb8ff' }
+  ];
+  const EXPRESSIONS = [
+    { key: 'feliz', name: 'Feliz' },
+    { key: 'atento', name: 'Atento' },
+    { key: 'trabajando', name: 'Trabajando' },
+    { key: 'sorprendido', name: 'Sorprendido' },
+    { key: 'pensando', name: 'Pensando' },
+    { key: 'listo', name: 'Listo' }
+  ];
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stage = document.getElementById('stage');
+  const spark = document.getElementById('spark');
+  const body = document.getElementById('body');
+  const face = document.getElementById('face');
+  const faceGlow = document.getElementById('faceGlow');
+  const faceLed = document.getElementById('faceLed');
+  const readout = document.getElementById('readout');
+  const hint = document.getElementById('hint');
+  const root = document.documentElement;
+
+  // Centro del visor en el viewBox 0..1000 del cuerpo (medido sobre el render).
+  const C = { x: 496, y: 414 };
+  const EYE_DX = 100, EYE_Y = -14, MOUTH_Y = 50;
+
+  let line = 'engine';
+  let expression = 'feliz';
+  let led = '#0375db';
+
+  // Formas de la cara por expresión (coordenadas relativas al centro del visor).
+  const arcUp = (cx, cy, w, h) => `M ${cx - w} ${cy + h * 0.45} Q ${cx} ${cy - h} ${cx + w} ${cy + h * 0.45}`;
+  const arcDown = (cx, cy, w, h) => `M ${cx - w} ${cy - h * 0.2} Q ${cx} ${cy + h} ${cx + w} ${cy - h * 0.2}`;
+  const SW = 15;
+
+  function shapes(expr, t) {
+    const L = -EYE_DX, R = EYE_DX, ey = EYE_Y, my = MOUTH_Y;
+    const parts = [];
+    const stroke = (d, w = SW) => parts.push({ t: 'path', d, w });
+    const ring = (cx, cy, r, w = SW) => parts.push({ t: 'circle', cx, cy, r, w });
+    const dot = (cx, cy, r, o = 1) => parts.push({ t: 'dot', cx, cy, r, o });
+    switch (expr) {
+      case 'atento':
+        ring(L, ey, 26); ring(R, ey, 26); stroke(arcDown(0, my, 22, 18), 13); break;
+      case 'sorprendido':
+        ring(L, ey - 4, 34); ring(R, ey - 4, 34); ring(0, my + 4, 14, 12); break;
+      case 'trabajando': {
+        for (const ex of [L, R]) for (let i = -1; i <= 1; i++) {
+          const phase = (t / 260 + (i + 1)) % 3;
+          dot(ex + i * 26, ey, 9, phase < 1 ? 1 : 0.35);
+        }
+        stroke(`M ${-26} ${my} L ${26} ${my}`, 12); break;
+      }
+      case 'pensando':
+        stroke(arcUp(L, ey, 30, 18), 13); stroke(arcUp(R, ey, 30, 18), 13);
+        stroke(`M ${-6} ${my + 4} Q ${12} ${my - 4} ${30} ${my + 2}`, 12); break;
+      case 'listo':
+        stroke(arcUp(L, ey, 40, 40)); stroke(arcUp(R, ey, 40, 40)); stroke(arcDown(0, my - 4, 44, 34), 14); break;
+      default: // feliz
+        stroke(arcUp(L, ey, 38, 34)); stroke(arcUp(R, ey, 38, 34)); stroke(arcDown(0, my, 30, 24), 13);
+    }
+    return parts;
+  }
+
+  const NS = 'http://www.w3.org/2000/svg';
+  function render(parts, group, blink) {
+    group.replaceChildren();
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('transform', `translate(${C.x} ${C.y})`);
+    for (const p of parts) {
+      let el;
+      if (p.t === 'path') {
+        el = document.createElementNS(NS, 'path');
+        el.setAttribute('d', p.d);
+        el.setAttribute('fill', 'none');
+        el.setAttribute('stroke', led);
+        el.setAttribute('stroke-width', p.w);
+        el.setAttribute('stroke-linecap', 'round');
+      } else if (p.t === 'circle') {
+        el = document.createElementNS(NS, 'circle');
+        el.setAttribute('cx', p.cx); el.setAttribute('cy', p.cy); el.setAttribute('r', p.r);
+        el.setAttribute('fill', 'none'); el.setAttribute('stroke', led); el.setAttribute('stroke-width', p.w);
+      } else {
+        el = document.createElementNS(NS, 'circle');
+        el.setAttribute('cx', p.cx); el.setAttribute('cy', p.cy); el.setAttribute('r', p.r);
+        el.setAttribute('fill', led); el.setAttribute('opacity', p.o);
+      }
+      g.appendChild(el);
+    }
+    // Parpadeo: sólo los ojos (todo lo que está sobre la línea de la boca) se aplastan en vertical.
+    if (blink < 1) {
+      const eyes = document.createElementNS(NS, 'g');
+      const mouth = document.createElementNS(NS, 'g');
+      [...g.childNodes].forEach(n => {
+        const y = Number(n.getAttribute('cy') ?? (n.getAttribute('d')?.match(/^M [-\d.]+ ([-\d.]+)/)?.[1] ?? 0));
+        (y < MOUTH_Y - 20 ? eyes : mouth).appendChild(n);
+      });
+      eyes.setAttribute('transform', `translate(0 ${EYE_Y}) scale(1 ${blink}) translate(0 ${-EYE_Y})`);
+      g.append(eyes, mouth);
+    }
+    group.appendChild(g);
+  }
+
+  // Estado de seguimiento suavizado.
+  const target = { x: 0, y: 0 };
+  const cur = { x: 0, y: 0 };
+  let lastMove = performance.now();
+  let blink = 1, nextBlink = performance.now() + 2500, blinkStart = 0;
+
+  function setTargetFromEvent(e) {
+    const r = stage.getBoundingClientRect();
+    const sr = spark.getBoundingClientRect();
+    const cx = sr.left + sr.width * (C.x / 1000);
+    const cy = sr.top + sr.height * (C.y / 1000);
+    const nx = (e.clientX - cx) / (r.width * 0.5);
+    const ny = (e.clientY - cy) / (r.height * 0.6);
+    target.x = Math.max(-1, Math.min(1, nx));
+    target.y = Math.max(-1, Math.min(1, ny));
+    lastMove = performance.now();
+    hint.textContent = 'Te está mirando';
+  }
+  stage.addEventListener('pointermove', setTargetFromEvent);
+  stage.addEventListener('pointerdown', setTargetFromEvent);
+  window.addEventListener('pointermove', e => { if (e.target !== stage && !stage.contains(e.target)) setTargetFromEvent(e); });
+  stage.addEventListener('click', () => {
+    const i = EXPRESSIONS.findIndex(x => x.key === expression);
+    setExpression(EXPRESSIONS[(i + 1) % EXPRESSIONS.length].key);
+  });
+
+  function frame(now) {
+    // Mirada que vaga si nadie mueve el cursor.
+    let tx = target.x, ty = target.y;
+    if (expression === 'pensando') { tx = 0.75; ty = -0.85; }
+    else if (!reduce && now - lastMove > 4000) {
+      const s = now / 1000;
+      tx = Math.sin(s * 0.7) * 0.55 + Math.sin(s * 1.9) * 0.15;
+      ty = Math.cos(s * 0.5) * 0.35;
+      hint.textContent = 'Mira hacia el cursor';
+    }
+    const k = reduce ? 1 : 0.12;
+    cur.x += (tx - cur.x) * k;
+    cur.y += (ty - cur.y) * k;
+
+    // Parpadeo aleatorio (corto, sólo ojos).
+    if (!reduce && now > nextBlink && blinkStart === 0) blinkStart = now;
+    if (blinkStart) {
+      const p = (now - blinkStart) / 150;
+      blink = p < 1 ? Math.max(0.08, Math.abs(1 - p * 2)) : 1;
+      if (p >= 1) { blinkStart = 0; nextBlink = now + 2200 + Math.random() * 3800; }
+    }
+
+    const ex = cur.x * 60, ey = cur.y * 28;
+    face.setAttribute('transform', `translate(${ex.toFixed(2)} ${ey.toFixed(2)})`);
+    const parts = shapes(expression, now);
+    render(parts, faceGlow, blink);
+    render(parts, faceLed, blink);
+
+    if (!reduce) {
+      const bob = Math.sin(now / 900) * 8;
+      spark.style.transform = `translate3d(${(cur.x * 10).toFixed(2)}px, ${(cur.y * 6 + bob).toFixed(2)}px, 0) rotateY(${(cur.x * 9).toFixed(2)}deg) rotateX(${(-cur.y * 7).toFixed(2)}deg)`;
+    }
+    readout.textContent = `x ${cur.x.toFixed(2)} · y ${cur.y.toFixed(2)}`;
+    requestAnimationFrame(frame);
+  }
+
+  // Controles.
+  const exprBox = document.getElementById('expressions');
+  for (const e of EXPRESSIONS) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.id = 'expr-' + e.key; b.textContent = e.name;
+    b.setAttribute('aria-pressed', String(e.key === expression));
+    b.addEventListener('click', () => setExpression(e.key));
+    exprBox.appendChild(b);
+  }
+  const lineBox = document.getElementById('lines');
+  for (const l of LINES) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.id = 'line-' + l.key;
+    b.innerHTML = `<span class="swatch" style="background:${l.hex}"></span>${l.name}`;
+    b.setAttribute('aria-pressed', String(l.key === line));
+    b.addEventListener('click', () => setLine(l.key));
+    lineBox.appendChild(b);
+  }
+  function setExpression(key) {
+    expression = key;
+    for (const b of exprBox.children) b.setAttribute('aria-pressed', String(b.id === 'expr-' + key));
+    try { localStorage.setItem('spark-rig-expr', key); } catch {}
+  }
+  function setLine(key) {
+    const l = LINES.find(x => x.key === key) ?? LINES[0];
+    line = l.key; led = l.hex;
+    body.src = BODIES[l.key];
+    root.style.setProperty('--led', l.hex);
+    for (const b of lineBox.children) b.setAttribute('aria-pressed', String(b.id === 'line-' + l.key));
+    try { localStorage.setItem('spark-rig-line', l.key); } catch {}
+  }
+
+  let savedLine = 'engine', savedExpr = 'feliz';
+  try { savedLine = localStorage.getItem('spark-rig-line') || 'engine'; savedExpr = localStorage.getItem('spark-rig-expr') || 'feliz'; } catch {}
+  setLine(savedLine);
+  setExpression(EXPRESSIONS.some(e => e.key === savedExpr) ? savedExpr : 'feliz');
+  requestAnimationFrame(frame);
+})();
+</script>

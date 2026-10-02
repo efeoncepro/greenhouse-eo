@@ -202,6 +202,7 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 | Noche con negros planos | Sombras sin información | Regla de noche («shadows deep but ALWAYS with visible texture») |
 | Aparece una marca en una cámara o botella | Marca de terceros | «completely unbranded, generic … no brand names, no text, no logos anywhere on the body» + revisar al zoom |
 | La cara de Julio o Nexa cambió | Referencias sin rol o modelo Flare | Sunburst + bloque IDENTITY + «Images 1-3 are Julio (identity only…)» |
+| Nexa sale siempre con la misma pose (cabeza ladeada, media sonrisa) | La ficha no declara expresión y copia «confident half-smile» | Declarar `{ "persona": "nexa", "expresion": "…" }` (12 fotográficas) o una `vista`, y describir la pose en la escena; `foto:prompt` avisa si falta |
 | `pnpm ai:image` con varias `--image` en una variable falla | zsh no divide la variable | `pnpm ai:image ${=R} …` |
 | Un `cp` con `*` aborta entero | Glob sin coincidencias en zsh | `setopt nullglob` |
 | Las imágenes del lote aparecen en `public/images/generated` | Versión antigua del CLI | Actualizar el repo (arreglado en el commit `5946f14a0`) y pasar `--out <carpeta>` |
@@ -219,6 +220,8 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 | Tomas y lentes | [Catálogo](../../operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) |
 | Prompts, comandos, scripts, QA, costos | [Pipeline](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) |
 | Julio, Nexa y uniforme | [Personas](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) |
+| Producir una foto cine sin consultar a nadie | [Producir una foto de marca en registro cine](../creative/producir-foto-cine-de-marca.md) · [Casebook](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) |
+| Nexa con su traje biónico y lentes (sólo cine) | [Usar el traje biónico de Nexa en fotos](../creative/usar-traje-bionico-de-nexa-en-fotos.md) |
 | Evidencia (prompts y scripts) | `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/` |
 | CLI de imagen | `scripts/ai/generate-image.ts` (`pnpm ai:image --help`) |
 

@@ -1,5 +1,7 @@
 # PDR-001 — Landing SEO complementaria al AEO
 
+> **Nota de vigencia (2026-09-29):** la capacidad AEO se nombra **Efeonce AEO** y su diagnóstico público **Efeonce AEO Assessment**; `AI Visibility Grader` permanece como alias técnico/histórico. La URL, la decisión SEO complementaria y los datos de mercado fechados de este PDR no cambian por el naming. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo:** Product Decision Record (posicionamiento/GTM del sitio público).
 > No es un ADR — no fija arquitectura; cuando obliga arquitectura, cita el ADR.
 > **Estado:** Accepted (dirección) — arquitectura de información pendiente.

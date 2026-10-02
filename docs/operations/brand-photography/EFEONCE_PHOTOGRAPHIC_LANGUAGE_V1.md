@@ -1,9 +1,9 @@
 # Lenguaje Fotográfico Efeonce V1 — «El oficio a la vista»
 
 > **Tipo de documento:** Especificación canónica de marca (documento maestro)
-> **Versión:** 1.2
+> **Versión:** 1.10
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-26 por Claude — la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
+> **Última actualización:** 2026-10-02 por Claude — 1.10: el registro cine se opera sin consultor (casebook y comandos cine); sólo registra y enlaza ([delta 2026-10-02 (b)](#delta-2026-10-02-b--el-registro-cine-se-opera-sin-consultor)). Antes, el mismo día: el traje biónico de Nexa por catálogo, la escena cine `NX7d` como referencia y la pose de Nexa desde la escena; sólo registra y enlaza (delta 2026-10-02). Antes, el 2026-10-01: los robots siguen prohibidos salvo los **Sparks** del kit, los agentes de Efeonce, y `foto:prompt` lo hace cumplir (delta 2026-10-01; canon en [`SPARKS_V1.md`](../brand-characters/SPARKS_V1.md)). Antes, el 2026-09-30: excepción declarada de **caso de cliente** en puesta en escena: una ficha con `caso` puede anclar la escena en el rubro de SU cliente; sin el campo, la guarda del rubro aborta igual (delta 2026-09-30). Antes, el 2026-09-27: el registro cine se amplía a la receta de deck `proposal-cinematic` con personas del equipo y uniforme por registro (delta 2026-09-27). Antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada entera (decisión del operador; §9, §10 y P-5). Antes, el mismo día: §11: el operador aprueba las reglas de sinergia P1–P12 y resuelve los nueve conflictos P-1..P-9 con la línea gráfica (la lente cuenta como reserva del texto; capa gráfica sobre la foto aprobada sólo en los casos declarados de la línea; retrato de perfil como categoría propia, barra por redactar); §9 ajustado. Antes (mismo día): §11 «La línea gráfica en la foto»: cómo se prepara una foto que llevará la órbita y qué puede hacer la órbita sobre ella, con enlace al contrato de convergencia. Antes (mismo día): la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
 > **Estado:** Aprobado por el operador (Julio Reyes, dueño de Efeonce) el 2026-09-19. Sistema consistente; **no** es todavía un activo distintivo medido.
 > **Documentación relacionada:** [Índice](./README.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) · [Marca de agencia](../../context/09_marca-agencia.md) · [Quiénes somos](../../context/01_quienes-somos.md) · [Marca en escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md)
 
@@ -164,6 +164,8 @@ compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el
 
 - Se varían industrias que **no** sean de clientes reales: café, bebidas, panadería, retail, finanzas, gastronomía,
   eventos **[decisión del operador]** tras «nosotros NO somos Berel».
+  Única excepción: el **caso de éxito de un cliente** declarado en la ficha, en puesta en escena (ver el
+  [delta 2026-09-30](#delta-2026-09-30--excepción-declarada-caso-de-cliente-en-puesta-en-escena)).
 - Se varían cámaras y ángulos: ojo de pez, dron, tilt-shift, contrapicado, reflejo, tele 200 mm, macro, retrato,
   barrido, noche (catálogo en [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md)).
 - Se varía la forma de integrar el color: la misma taza azul apareció en 3–4 piezas (persianas, noche, KV café,
@@ -174,6 +176,8 @@ compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el
 
 - Nada que Efeonce no haga. Nada de stock.
 - Nunca insinuar trabajo con un cliente real ni etiquetar con su nombre (se corrigió la etiqueta «Berel» → «Cliente»).
+  Salvo en la pieza que **es** el caso de ese cliente, declarada en la ficha ([delta 2026-09-30](#delta-2026-09-30--excepción-declarada-caso-de-cliente-en-puesta-en-escena)); aun ahí, la escena no
+  nombra al cliente y su logo nunca lo genera el modelo.
 - Sin marcas de terceros en objetos (la cámara salió con una inscripción tipo «Blackmagic»; se pide «completely
   unbranded, no brand names» y se revisa al zoom).
 - Para piezas publicables con personas: equipo real (Run & Gun) como base; IA para explorar, espacios, objetos y 3D
@@ -246,9 +250,9 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 
 | Pendiente | Por qué importa | Condición de cierre |
 |---|---|---|
-| ~~Espacio para texto~~ **cerrado en el plate (2026-09-19)** | Pedido explícito del operador | Reglas de reserva en [`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md). **Ojo:** cerrado del lado de la TOMA; la capa gráfica encima NO está aprobada, y su retícula definitiva puede corregir los porcentajes por formato |
+| ~~Espacio para texto~~ **cerrado en el plate (2026-09-19)** | Pedido explícito del operador | Reglas de reserva en [`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md). **Ojo:** cerrado del lado de la TOMA; la capa gráfica encima está aprobada desde el 2026-09-26 (decisión del operador, §11), y su retícula definitiva puede corregir los porcentajes por formato |
 | ~~Formatos 9:16 y 16:9 nativos~~ **cerrado (2026-09-19)** | Ya NO es cierto que «todo se probó en 4:5»: hay **7 plates nativos 1152×2048 y 8 nativos 2048×1152** (`rondas/texto/S1|S1v2|S2|S2v2|S3|S3v2-*-{916,169}-plate.png`, `rondas/capas/CB-916-plate.png`, `rondas/capas/CC-169-plate.png`) **[medido con sharp]** | Falta sólo **1:1**. Propuesta original del subagente de composición, aún sin validar (propuesta del subagente de composición: lecho 4:5 22–28%; 9:16 18–22% con logo a 85–88%; 16:9 25–30%; 1:1 20–25%) |
-| 🔴 **El canon se contradice sobre la capa gráfica** **[2026-09-21]** | El canon declara que **la capa gráfica sobre la foto NO está aprobada** (2026-09-19, y así lo repiten la fila anterior de esta tabla y `.claude/rules/brand-photography.md`), pero **todas las piezas publicadas del registro B la usan**: titular, cursores, bounding box, chip. Hoy la documentación se contradice consigo misma, y quien llegue nuevo no sabe si una pieza con titular está permitida o prohibida | **Decisión del operador**: o **se aprueba** la capa gráfica —y entonces se retira el «sin aprobar» del canon, de la fila de espacio para texto y de la regla auto-load—, o **se declara que esas piezas viven bajo otro contrato** y el canon nombra cuál. Mientras no se decida, ninguna de las dos lecturas es la vigente |
+| ~~El canon se contradice sobre la capa gráfica~~ **resuelto (2026-09-26)** | El canon del 2026-09-19 declaraba la capa gráfica sobre la foto no aprobada mientras todas las piezas publicadas del registro B la usaban (titular, cursores, bounding box, chip) | **Resuelto por el operador el 2026-09-26: la capa gráfica sobre la foto está aprobada.** Primero se aprobó para los casos de la línea gráfica (P-5) y el mismo día entera. Se compone sobre las reservas de la toma, con los compositores canónicos y sin scrim; los ejemplos compuestos rechazados del 2026-09-19 siguen sin valer como referencia |
 | Firma en dron y tomas todo-enfocadas | Sin desenfoque, la franja se ve algo puesta | Decisión del operador sobre la firma alternativa (url-lum). *Desde el 2026-09-26 la burbuja sólo reemplaza al logo cuando la marca ya está en la imagen ([firma §5.1](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26)); lo abierto es cómo sostener el logo centrado sin lecho real* |
 | Promover scripts a comando `pnpm` | Hoy viven en la carpeta de la corrida | Comando canónico con tests |
 | Prueba de reconocimiento | Sin ella no hay «activo distintivo» | n ≥ 100 del público objetivo, distractores coherentes, medición antes y después |
@@ -263,6 +267,70 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 - Paleta de marca: `.claude/skills/content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` §2.
 - Evidencia: [`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md).
 - Propuesta intermedia descartada (grade navy): `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/PROPUESTA_LENGUAJE_FOTOGRAFICO_V1.md` (su §5 de prueba de reconocimiento sigue vigente como método).
+
+## 11. La línea gráfica en la foto
+
+**[decisión del operador, 2026-09-26]** Este lenguaje sigue vigente entero. La línea gráfica
+[«La órbita»](../brand-graphic-line/README.md) converge con él: la foto **muestra el oficio** y la órbita **señala lo que
+importa dentro de él**. Los dos canon comparten la idea al pie de la letra: este documento es «El oficio a la vista» y la
+línea tiene su propio §6 «Oficio a la vista». Esta sección dice cómo se prepara una foto que va a llevar la órbita y
+qué puede hacer la órbita sobre ella. Desde el 2026-09-26 recoge además las decisiones del operador que ajustan tres
+reglas de este lenguaje sólo para las piezas con lente o con la capa de la línea (nunca un scrim, capa gráfica,
+límite de cabezas) y abre una categoría nueva, el retrato de perfil (ver abajo).
+
+**Cómo se prepara la foto** (con la ficha de `pnpm foto:prompt`, nunca a mano):
+
+| Qué necesita la órbita | Cómo lo trae la foto |
+|---|---|
+| Un solo punto de interés | La escena concentra la obra o la decisión en un lugar; la lente de la línea exige una foto con un punto claro (línea §1.5) |
+| El sujeto dentro del círculo | La escena declara el encuadre de la lente del formato (el banco de 2026-09-25 lo escribe como `LENS FRAMING` en la `escena`); `foto:prompt` no tiene todavía un campo propio (llega con la task, P9). El sujeto cabe en el 55 % del **círculo visible** de la lente de ese formato; si no cabe, se rehace la toma (P-3) |
+| Formato | El nativo de la pieza final; nunca se recorta de otro formato (reserva §2, regla 4). El 1200 × 627 del banner de LinkedIn entra como formato nativo de `foto:prompt` (P-6, task) |
+| Registro | A, documental: nadie mira al lente (línea §9) |
+| Una sola marca | Sin emblema legible: la pieza firma (firma §6; línea §9) |
+| Color | El azul en un objeto del oficio, nunca un muro de fondo; el acento cálido nace de la acción, una de cada dos fotos |
+| Luz | Luz con carácter sobre el sujeto; con foco, sobre el sujeto que quedará dentro de la luz |
+| Firma | El lecho de siempre, con su tono declarado: ahí aterriza la firma que pone la línea |
+
+**Qué puede hacer la órbita sobre la foto:** rodear, medir (un dato real con fuente) o enfocar (la lente o el foco), una
+sola vez por pieza y declarada a propósito. **Qué no puede hacer:** ir por defecto; cruzar el sujeto, las reservas de
+texto, el lecho o la firma; velar u oscurecer la foto fuera del tratamiento propio de la lente y del foco; poner un halo
+sobre la foto; o sustituir la composición, las palancas o las reservas que este documento decide. La medición vive en
+`pnpm creative:orbit:render` (zonas `protect`: sujeto, reservas y lecho) y en la capa `graphic_line` de
+`pnpm creative:layout`; la revisión al 100 % sigue siendo humana.
+
+**Reglas de sinergia P1–P12 aprobadas** **[decisión del operador, 2026-09-26]**. Las doce reglas de la referencia de
+convergencia (§6: briefear para el círculo visible, el azul y el acento dentro del círculo, el barrido del foco atado a
+la luz, la luz dura del lado de la lámpara, una sola señal de atención, la foto del foco desde el registro C, el aire
+de la medida en la toma, la revisión al 100 % sobre la pieza compuesta, la cadencia en el feed y el lecho pedido igual
+en piezas con lente, entre otras) dejan de ser propuesta. **P5** (cerrar las brechas del chequeo de la órbita) y **P9**
+(campo `reservas.lente` en `foto:prompt`) necesitan código y van a la task de `foto:prompt` y chequeos de la lente;
+mientras tanto se revisan a mano.
+
+**Conflictos resueltos** **[decisión del operador, 2026-09-26]**. Los nueve puntos donde las dos reglas parecían chocar:
+
+| # | Choque | Resolución |
+|---|---|---|
+| **P-1** | «Nunca un scrim» frente al exterior apagado de la lente con texto encima | El exterior apagado de la lente **cuenta como la reserva del texto**: es un tratamiento de la línea, no un velo. **«Nunca un scrim» sigue vigente para toda pieza sin lente** |
+| **P-2** | La firma siempre necesita su lecho frente a la lente, que firma sobre la foto apagada | En piezas con lente **se pide el lecho igual** (P12) |
+| **P-3** | El círculo del 55 % frente a lo que muestra la lente del `post` (≈ 35 % del lado corto) | El 55 % es del **círculo visible** de la lente; se ajusta la toma, no la pieza |
+| **P-4** | Una sola órbita por pieza frente a un anillo dibujado en la escena | Un anillo dibujado dentro de la escena **cuenta como órbita**: en una pieza con lente se elige otro plate o se rehace la toma |
+| **P-5** | Capa gráfica sobre la foto no aprobada frente a la voz y la lente de la línea | La capa gráfica sobre la foto queda **aprobada en los casos declarados de la línea**: voz pregunta–respuesta, lente y medida con fuente. **Ampliado el mismo día: la capa gráfica sobre la foto queda aprobada entera** (§9) |
+| **P-6** | Nunca se recorta un formato desde otro frente al banner 1200 × 627 | Se agrega el **1200 × 627 nativo** a `foto:prompt` (task); nunca se recorta desde 16:9 |
+| **P-7** | Retrato con órbita (firma de correo, tarjetas de equipo) sin regla fotográfica | El retrato de perfil entra a este lenguaje como **categoría propia**, donde **mirar a cámara está permitido** (a diferencia del registro A). **Su barra está por redactar** en esa categoría **[pendiente]** |
+| **P-8** | «Cabezas y manos bajo el 36 %» frente al centro de la lente en 4:5 y 9:16 | El límite aplica **sólo cuando la toma tiene reserva de texto**; `foto:prompt` debe emitirlo sólo entonces (task) |
+| **P-9** | Palancas que llenan el cuadro (`variantes`, `manos`) frente al círculo de la lente | En piezas con lente **manda la cláusula de encuadre**; las palancas que llenan el cuadro sólo en piezas de sólo foto |
+
+Las reglas de la [reserva de espacio en la toma](./EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) (nunca un scrim,
+límite de cabezas, formato nativo) siguen escritas allí sin excepción; la excepción de la lente vale desde esta
+sección y la de la línea gráfica (§9.1), y el comando `foto:prompt` la reflejará con la task.
+
+- Paso a paso de producción: [manual de fotografía de marca](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
+  y [manual de la línea gráfica](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md).
+- Contrato completo de convergencia (quién manda por tipo de pieza, brief, lectura de la órbita, reglas de sinergia
+  vigentes y propuestas, QA conjunto, pendientes y un ejemplo de punta a punta):
+  [`photography-convergence.md`](../../../.claude/skills/efeonce-graphic-line/references/photography-convergence.md)
+  de la skill `efeonce-graphic-line`.
+- Canon de la línea sobre la foto: [línea gráfica §9](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#9-fotografía).
 
 ## Delta 2026-09-19 (tarde) — espacio para texto y formatos
 
@@ -440,9 +508,8 @@ La palanca es **una sola y dominante** por pieza. Lo siguiente **varía libre** 
 
 ### 10. Lo que queda abierto
 
-La **contradicción documental** sobre la capa gráfica: el canon la declara no aprobada y todas las piezas
-publicadas del registro B la usan. Queda registrada en §9 como pendiente con su condición de cierre; es del
-operador, no de esta documentación.
+~~La **contradicción documental** sobre la capa gráfica~~ **resuelta el 2026-09-26**: el operador aprobó la capa
+gráfica sobre la foto (§9).
 
 **Reservas sin cerrar en tres de las piezas nuevas** — se documentan, no se esconden:
 
@@ -528,3 +595,161 @@ La firma de la pieza sigue su propia regla: logo centrado; la burbuja URL sólo 
 ([firma §5.1](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26)).
 Canon de la órbita: [línea gráfica §1.3](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-la-órbita--anatomía-y-regla)
 y [ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md).
+
+## Delta 2026-09-26 (noche) — excepción declarada: registro cine para piezas de Nexa
+
+> **Fuente vigente desde el 2026-09-27:** [registro cine · la marca en su película](./EFEONCE_PHOTO_REGISTER_CINE_V1.md). Este delta queda como historia de la decisión.
+
+**Decisión del operador (2026-09-27, hilo del canvas «OOH La órbita — pruebas», lámina «fuerza híbrida, cine»).**
+Las piezas donde **Nexa es la protagonista** pueden usar un registro de **cine de ficción**: vestuario de ficción
+(traje biónico), agentes representados como mini robots con cara y la escena como set de película. Nexa mira al
+lente, igual que en el registro B.
+
+Qué se relaja y qué no:
+
+| Se relaja (sólo en piezas de Nexa) | No se relaja |
+|---|---|
+| Código de vestuario por registro de escena: el traje de ficción reemplaza la prenda corporativa | Identidad A de Nexa y su set de anclas (`_identidad-nexa/`) |
+| La escena puede ser físicamente imposible (robots, set de hangar) | Proporciones adultas reales: cámara a unos 2 m, 85 mm, sin escorzo hacia el lente |
+| | El emblema **no se genera**: la pechera nace lisa y el isotipo oficial se compone después (`@efeoncepro/axis-brand-assets`, `efeonce-isotype-positive.svg`, multiplicado sobre la placa) |
+| | Reserva de texto declarada en la toma, lecho oscuro, firma y capa gráfica con los compositores canónicos |
+
+**Medido en la misma ficha (2026-09-26):**
+
+- Con Nexa agachada hacia una cámara pegada al rostro (`NX3`), la cabeza ocupó cerca del 35 % del alto y se leyó
+  desproporcionada. Pasar a plano medio desde la cintura, con la cámara a unos 2 m y sin inclinarse hacia el lente
+  (`NX5`), la dejó en cerca de un cuarto del alto y el cuerpo se leyó atlético.
+- Sin prohibición explícita, el pecho salió con un **cohete genérico**. Con *«chest plate plain, NO emblem, NO logo,
+  NO symbol, NO rocket»* salió liso. Encima se compuso el isotipo oficial (`NX5b`).
+- Los lentes transparentes pedidos como *«CLEAR TRANSPARENT lenses lightly tinted azure… eyes clearly visible, no
+  mirror reflection»* conservaron los ojos visibles y la identidad.
+
+Fichas y plates: `ai-generations/2026-09-26_deck-nexa/` (`NX3` → `NX4` → `NX5` → `NX5b`).
+
+**Rechazo medido en la misma ronda (2026-09-27):** la pieza con Nexa y un director de arte, las manos sobre la
+misma prueba y mirándose de cerca (`NX2`), el operador la descartó porque se lee como escena romántica, aunque el
+realismo y la imagen estaban bien. Con dos personas en plano cercano, la mirada entre ellas manda sobre el objeto
+compartido. La cercanía y la tensión se dirigen al trabajo o a la cámara, no al otro. Esto matiza la receta de
+personas: «con dos personas, la mirada va al otro o al mismo objeto».
+
+## Delta 2026-09-27 — el registro cine se amplía a la receta `proposal-cinematic`
+
+> **Fuente vigente desde el 2026-09-27:** [registro cine · la marca en su película](./EFEONCE_PHOTO_REGISTER_CINE_V1.md). Este delta queda como historia de la decisión.
+
+**[decisión del operador, 2026-09-27, página «Deck» del [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7)]**
+El operador aprobó dos láminas de propuesta con **personas del equipo, no Nexa**, en registro de cine: servicios
+creativos digitales («¿Tu marca en cada pantalla? En todas.», placa `CR2b`) y web («¿Para quién es tu web? Para
+todos.», placa `WB1b`), junto a la carrera de Nexa («¿Listos para la carrera? Vamos.», `NX5b`); a la 01:46 del mismo
+día sumó RevOps («¿Tu CRM vende contigo? Con agentes.»), con la líder de RevOps en la chaqueta Efeonce, y AEO («¿Te
+encuentra la IA? Visible.»), con la estratega SEO en el polo Efeonce, y las líneas de servicio con Nexa (Nexa
+protagonista, caso 1: cinco esferas de luz en los acentos de las líneas la orbitan, la naranja en su palma). Esas
+esferas son **luz de la foto**, no la esfera de la voz. La excepción del delta
+anterior cubría sólo piezas con Nexa protagonista; desde hoy cubre **dos casos**:
+
+1. Piezas donde **Nexa es la protagonista** (sin cambios respecto del delta anterior).
+2. La receta de deck **`proposal-cinematic`**, con **personas del equipo** o con Nexa. La receta completa (regiones,
+   pasos, prueba y firma) vive en la [norma de composición por superficie §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
+
+Qué cambia y qué no en el caso 2:
+
+| Se permite (sólo en `proposal-cinematic`) | No se relaja |
+|---|---|
+| Tratamiento de cine: luz motivada con carácter, bruma, escena de alto impacto, el servicio o lo digital **en acción** y el color de la línea **saliendo de la escena** | **Uniforme correcto por registro de escena**: la persona del equipo viste el código de vestuario Efeonce (polera piqué, chaqueta, gorra y polo, hoodie) que corresponde a la escena; el traje de ficción queda sólo para Nexa |
+| El sujeto mira a cámara, a la derecha del cuadro | Identidad por ficha (anclas y ángulos aprobados); nunca injerto de cara |
+| Elementos de ficción al servicio de la idea (pantallas en órbita, mini robots agentes como hilo entre láminas) | **Proporciones reales:** cámara a unos 2 m, 85 mm, plano medio, sin escorzo hacia el lente |
+| | El emblema **no se genera**: la prenda nace lisa y el isotipo oficial se compone después desde `@efeoncepro/axis-brand-assets`; se revisa con `pnpm foto:emblema` |
+| | **Nunca dos personas mirándose de cerca** (rechazo del 2026-09-27): la cercanía y la tensión van al trabajo o a la cámara |
+| | Reserva de texto declarada en la ficha (el espacio oscuro a la izquierda), lecho oscuro, firma y capa gráfica con los compositores canónicos |
+
+Fuera de esos dos casos, el registro cine **no** se usa: una pieza social, un hero web o una lámina de contenido con
+personas del equipo siguen en los registros A, B o C. El contrato de superficie lo vigila con el issue
+`cine-requires-nexa-or-proposal` (AXIS, en `main` desde el 2026-09-27).
+
+Rechazos de la misma ronda que confirman las guardas: la carrera v1 (cámara pegada, cabeza desproporcionada y emblema
+inventado por el modelo), la lámina de Nexa con un director de arte mirándose de cerca (se lee romántica) y la
+versión en Plastilina de servicios creativos (no era digital ni artística). Fichas y placas:
+`ai-generations/2026-09-26_deck-creativo/`, `ai-generations/2026-09-26_deck-web/`, `ai-generations/2026-09-26_deck-revops/`,
+`ai-generations/2026-09-26_deck-aeo/` y `ai-generations/2026-09-26_deck-nexa/`.
+
+## Delta 2026-09-30 — excepción declarada: caso de cliente en puesta en escena
+
+**[decisión del operador, 2026-09-29/30, deck SEO/AEO (TASK-1949), decisión 14 de
+`ai-generations/2026-09-29_deck-seo-aeo-documentos/DECISIONES.md`]** En los **casos de éxito** de un cliente se
+aceptan **imágenes de ambiente generadas** asociadas a ese cliente, en el registro **B · puesta en escena**, en lugar
+de una «foto real del caso». Caso fuente: la sesión de trabajo del squad Efeonce con la líder de marketing del
+cliente entre muestrarios de pintura (Berel, placa `CS3b-berel-squad`).
+
+No es una regla nueva ni relaja la de §4.3: la fotografía **propia** de Efeonce sigue sin anclarse jamás en el rubro de
+un cliente. Es **una excepción que la ficha declara**, sólo para ese cliente y sólo en esa ficha:
+
+```json
+"caso": { "tipo": "cliente", "cliente": "Berel", "registro": "puesta-en-escena" }
+```
+
+| Con `caso` declarado | No cambia |
+|---|---|
+| La escena puede anclarse en el rubro **de ese cliente** (el que la tabla `ANCLAS_PROHIBIDAS` de `scripts/foto/build-prompt.mjs` le asigna) | Sin `caso`, el ancla del rubro **aborta igual que antes** |
+| El comando imprime un aviso visible con la excepción | Otro cliente, otro registro (documental, C, cine) o un `caso` mal formado **abortan** |
+| El prompt suma un bloque `CLIENT CASE` que prohíbe logo, nombre, etiqueta, cartel y packaging del cliente | La escena **no nombra al cliente** («the client's marketing lead»): un nombre en el prompt es cómo el modelo escribe una marca |
+| | Identidad, vestuario por línea, lecho, firma, colorimetría y bloque de impacto: todo lo del registro B |
+
+Tres condiciones que viajan con la excepción:
+
+1. **El logo del cliente se COMPONE, nunca lo genera el modelo.** Si la pieza lo necesita, la placa nace sin él y el
+   logo oficial se compone después desde su archivo. Caso `CS1b` (Banco BICE): tarjeta en blanco generada + logo
+   oficial blanco compuesto con sharp (rotado 4,22°, opacidad 0,93). Es la misma regla que el emblema de Efeonce.
+2. **El uso de la marca del cliente depende de su autorización** (TASK-1937): la excepción habilita la **imagen**, no
+   el permiso de mostrar al cliente; eso se resuelve antes de que la pieza salga a un tercero.
+3. **Las cifras del caso son reales o no van** (pendiente del mismo deck): una foto de ambiente no vuelve verdadera
+   una cifra de ejemplo.
+
+Guarda mecánica (`pnpm foto:prompt` y `pnpm foto:generar`): `validarCaso` en `scripts/foto/build-prompt.mjs`, con
+pruebas en `scripts/foto/build-prompt.test.ts` (sin campo aborta, cliente correcto pasa, cliente o registro distinto
+abortan, la escena no nombra al cliente). El mismo día el ancla de pintura pasó a ver también **muestrarios,
+abanicos y latas de pintura**: la escena de `CS3b` los usaba y la guarda no la veía **[medido]**; los muestrarios de
+color impresos, oficio de Efeonce, siguen permitidos. Ficha: `ai-generations/2026-09-29_deck-seo-aeo-documentos/fichas/CS3b-berel-squad.json`.
+
+## Delta 2026-10-01 — los robots siguen prohibidos, salvo los Sparks del kit
+
+**[decisión del operador, 2026-09-29 y 2026-10-01, TASK-1941]** La prohibición de fotografiar «robots, circuitos ni
+interfaces flotantes» ([palancas, «De la relación con la máquina»](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md)) **sigue
+vigente**. La única excepción son los **Sparks**, los agentes de Efeonce: personajes propios de la marca, con un kit
+cerrado y una entrada en el catálogo de `foto:prompt`. Canon completo: [`SPARKS_V1.md`](../brand-characters/SPARKS_V1.md).
+
+| Se permite | No cambia |
+|---|---|
+| Un Spark (o varios) declarado en `objetos` desde el catálogo: `spark`, `spark-investigacion`, `spark-contenido`, `spark-crm-datos`, `spark-servicio`, `spark-reportes` o `sparks-plantel` | Un robot descrito a mano en la escena **aborta**: salía distinto en cada foto y parecido a personajes ajenos (`NX3`, `NX5b`, `AD2b`, `AD4f`) **[medido]** |
+| Registro cine y puesta en escena | El **documental** no admite Sparks: retrata el oficio real de Efeonce |
+| Un Spark junto a una persona que lo supervisa, nunca más grande que su cabeza y siempre por encima de la cintura | Los Sparks nunca reemplazan personas ni aparecen solos decidiendo |
+
+**La guarda lo hace cumplir.** `validarRobots` en `scripts/foto/build-prompt.mjs` aborta cuando la escena describe
+robots, droides o bots sin declarar un Spark (ignora negaciones como «no robots») y cuando un Spark va con
+`registro: "documental"` o con una palanca documental (`escucha`, `manos`, `sombra`, `silueta`, `marcado`,
+`quien-sostiene`). Medido sobre 301 fichas: frena 13, todas con robots descritos a mano, sin falsos positivos
+**[medido]**. Pruebas en `scripts/foto/build-prompt.test.ts`. Regenerar las piezas aprobadas que llevan robots
+genéricos es una decisión aparte del operador.
+
+## Delta 2026-10-02 — el traje de Nexa por catálogo, la escena cine que sí funciona y la pose
+
+Tres cambios del mismo día, cada uno con su fuente vigente; aquí sólo se registran:
+
+- **El traje biónico y los lentes biónicos de Nexa tienen kit** y se piden por catálogo, sólo para Nexa y sólo en
+  registro cine; las marcas viajan armadas en la referencia **[decisión del operador, TASK-1940]**. Vestuario:
+  [personas, delta 2026-10-02](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo).
+- **`NX7d`, «Nexa despliega a su squad», queda como la escena cine de referencia con Sparks** **[decisión del
+  operador]**: dos Sparks con referencia como máximo, profundidad en planos con distancia y una fuente con tamaño
+  cerca de la cara. [Registro cine 1.7, delta 2026-10-02](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks).
+- **Las referencias de identidad dicen quién es una persona, no cómo sostiene la cabeza** **[medido]**: la pose sale de
+  la escena y Nexa tiene 12 expresiones fotográficas en el catálogo. [Prompts y pipeline 1.4, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está).
+
+Ninguno cambia los principios de este documento: el traje no abre el cine a otras piezas ni a otras personas.
+
+## Delta 2026-10-02 (b) — el registro cine se opera sin consultor
+
+Sólo se registra y se enlaza. El registro cine pasa a **1.9** con siete decisiones del operador tras la prueba ciega
+(aros de Nexa dorados, escala vertical por encuadre, mirada al panel en la sección partida, vestuario del equipo, luces
+prácticas como bokeh frío y lejano, entre otras): [registro cine, delta 2026-10-02 (b)](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega).
+Cómo se llega a una foto cine aprobable sin consultar a nadie, con sus 13 fallas y su corrección, está en el
+[casebook](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md); los comandos, en
+[prompts y pipeline, delta 2026-10-02 (b)](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02-b--el-registro-cine-en-fotoprompt).
+Todo actúa sólo con `"registro": "cine"`: no cambia los principios de este documento ni el alcance del cine.

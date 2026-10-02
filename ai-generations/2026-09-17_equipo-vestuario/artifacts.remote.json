@@ -1,0 +1,77 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:03:09.033Z",
+  "run": "ai-generations/2026-09-17_equipo-vestuario",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-17_equipo-vestuario",
+  "totalBytes": 23634433,
+  "fileCount": 11,
+  "files": [
+    {
+      "path": "julio-con-credencial.png",
+      "sizeBytes": 2276992,
+      "sha256": "092d653d2df5f89decc863d58bc54901fbcfb4233849592aadf4d2a73d3b355d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/julio-con-credencial.png"
+    },
+    {
+      "path": "prueba/julio-softshell-v01.png",
+      "sizeBytes": 2290484,
+      "sha256": "0e18dc70abf5043b992709a48f32f9316a31894338bca4808bace0fb833fbd82",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/prueba/julio-softshell-v01.png"
+    },
+    {
+      "path": "prueba/julio-softshell-v02.png",
+      "sizeBytes": 2145987,
+      "sha256": "147152256ecfd23bea9c01e2c9f2eefd66613168a2243f1f4af068678e0f3c5a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/prueba/julio-softshell-v02.png"
+    },
+    {
+      "path": "refs/julio-reyes-01.png",
+      "sizeBytes": 2088098,
+      "sha256": "844ff4043d1463990171a2f2b945696b9876259e360b6f4e5b5f9d89aa0d995a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png"
+    },
+    {
+      "path": "refs/julio-reyes-02.png",
+      "sizeBytes": 2148980,
+      "sha256": "bd741b77b5f2eae5b09ea8b49f5618a81a253e8ec80ca11a4b86e736db584131",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-02.png"
+    },
+    {
+      "path": "refs/julio-reyes-03.png",
+      "sizeBytes": 2123815,
+      "sha256": "aa5bdc2cd85ce480540d174706b327299c7ddab819d1788c0f820e65d0b80d26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-03.png"
+    },
+    {
+      "path": "refs/julio-reyes-04.png",
+      "sizeBytes": 2163797,
+      "sha256": "4aa5e355b481fadb21b868b867bc6e6fa684d8222ee586a1c306d9aa398a475e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-04.png"
+    },
+    {
+      "path": "refs/julio-reyes-05.png",
+      "sizeBytes": 2078659,
+      "sha256": "d7f807440abb624059f1f1fa6de84cd88286c30269a74ef966bd76d3fea0054b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-05.png"
+    },
+    {
+      "path": "refs/julio-reyes-06.png",
+      "sizeBytes": 1968321,
+      "sha256": "a01ae7f6177db1191e15cb7048b8685a8adfccd02f1a3efa4f17fd9c91894ec5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-06.png"
+    },
+    {
+      "path": "refs/julio-reyes-07.png",
+      "sizeBytes": 2223981,
+      "sha256": "7d07f7490e443911ca85eda6980b1d07e0929030ca91c9f68d40ed880ef7720a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-07.png"
+    },
+    {
+      "path": "refs/julio-reyes-08.png",
+      "sizeBytes": 2125319,
+      "sha256": "03c6eb028b832bf9fd73108cf29464c4a86d17fa962fef8ddd54aef77c9d5c52",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-08.png"
+    }
+  ]
+}

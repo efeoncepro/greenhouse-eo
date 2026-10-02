@@ -1,5 +1,28 @@
 # TASK-1849 — Efeonce Insights: biblioteca, creación y experiencia web compartida
 
+## Delta 2026-09-28
+
+- El enlace que emite esta capacidad — `buildInsightShareUrl` (`src/lib/efeonce-insights/sharing/token.ts`) →
+  `https://think.efeoncepro.com/insights/r/<token>`, usado por el correo (`delivery/dispatch.ts`) y por la respuesta
+  de crear enlace (`sharing/commands.ts`) — es la ruta que TASK-1875 implementó en `efeonce-think`
+  (`src/pages/insights/r/[token].astro`). El reader público ahora responde `InsightWebModelV1` **1.1, aditivo** (campos
+  editoriales v2 opcionales + logo del cliente por `GET /api/public/insights/shared/[token]/logo`); un consumidor 1.0
+  sigue funcionando.
+- **Todavía no está en vivo en producción:** los commits de Greenhouse y de Think son locales, sin push. Por defecto el
+  enlace apunta a Think de producción, que lee Greenhouse de producción: un token de staging da 404 allí. — por trabajo
+  en TASK-1875
+
+## Delta 2026-09-26
+
+- TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON (Vercel staging/Production y `ops-worker`): la
+  preferencia de portada (command, reader, lanes app/ecosystem y tools MCP `get_/set_insight_cover_preference`) ya es
+  consumible por el builder, y las ediciones nuevas sellan `plan.cover`. — por trabajo en TASK-1888
+- TASK-1889 complete y en producción (releases `0e87c7a443a2` y `f9257b9c94af`): el delta «code complete» de abajo ya
+  describe el render de producción. Las primeras ediciones internas con el diseño nuevo (Berel y Sky) se renderizaron
+  en producción; emitir y compartir siguen OFF. En tablas y figuras el triángulo sigue al valor y el tono dice si el
+  cambio es mejor o peor (`trendOf` en `render/figure-slots.ts`, clases `delta--better` / `delta--plain`); una vista
+  previa del builder debe mostrar esa misma regla. — cerrado por trabajo en TASK-1889
+
 ## Delta 2026-09-25 (TASK-1889 code complete)
 
 - **El render ya compone con el diseño aprobado:** los catálogos `insights-report` e `insights-deck` sólo tienen
@@ -10,7 +33,7 @@
 
 ## Delta 2026-09-25 (TASK-1888 code complete)
 
-- **Ya existe (flag `INSIGHTS_EDITORIAL_V2_ENABLED` OFF):** command `setInsightCoverPreference` + reader
+- **Ya existe (flag `INSIGHTS_EDITORIAL_V2_ENABLED` ON desde 2026-09-26, ver delta de arriba):** command `setInsightCoverPreference` + reader
   `getInsightCoverPreference` (`src/lib/efeonce-insights/commands/cover-preference.ts`), lanes
   `GET/POST /api/platform/app/insights/cover-preference` (capability `insights.cover_preference.manage` para fijar,
   `insights.report.read` para leer) y `brand.coverTheme` opcional en el encargo. El builder sólo los consume: la regla
@@ -73,6 +96,15 @@
 - Branch: `Greenhouse develop; sin branch dedicada ni worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-09-29 — diseño del correo de entrega aprobado
+
+- El operador aprobó el correo de entrega de Insights (canvas v21: enlace escritorio, celular y PDF adjunto) y canonizó sus
+  módulos en AXIS `v0.3.38` (`efeonce.email-modules` 0.1.0): pie, CTA principal, agenda y bloque de marca por línea.
+  «Suscribirme» queda retirado. Dirección: `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`.
+- La presentación del correo (módulos y cuerpo de Insights) la construye
+  [TASK-1944](TASK-1944-efeonce-email-modules-adoption.md); esta task conserva el cableado de datos de la edición y el
+  portal. El criterio que pide el preview con `EmailLayout` queda sustituido por el diseño aprobado.
 
 ## Summary
 

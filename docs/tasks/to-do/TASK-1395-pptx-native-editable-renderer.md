@@ -1,5 +1,26 @@
 # TASK-1395 — PPTX Native Editable Renderer for Artifact Composer
 
+## Delta 2026-09-28 — TASK-1934 suma siete plantillas a `graphic-line-deck`
+
+- TASK-1934 agrega `DecisionAiAnswer`, `DecisionAiMarket`, `MethodSurroundCycle`, `DecisionDifference`, `MethodEeat`,
+  `DecisionTrafficToRevenue` y `DecisionDiagnosisMap` (las láminas SEO/AEO; 78 recetas con plantilla). La matriz de
+  capacidad las declara (nativa o falla cerrada), igual que las de TASK-1928. Varias son escenas en perspectiva con capas
+  SVG y vidrio (monolitos, ventanas, escalones, informe girado): candidatas naturales a falla cerrada hasta que el
+  renderer nativo tenga equivalente.
+
+## Delta 2026-09-27 (b) — decks «La órbita» desde Proposal Studio
+
+- TASK-1928 suma 38 plantillas a `graphic-line-deck` y TASK-1932 pide PPTX de decks «La órbita» desde Proposal Studio.
+  TASK-1932 falla cerrado (`brand_deck_pptx_not_supported`) cuando la matriz de capacidad no cubre una plantilla; para
+  eso la matriz tiene que declararlas.
+
+## Delta 2026-09-27
+
+- El contrato de plantilla (`TemplateContract`) suma `render.background: 'opaque' | 'transparent'` (PNG con alfa para
+  capas que se montan sobre video) y existen tres catálogos nuevos de La órbita (`graphic-line-deck`, `-stills`,
+  `-overlays`). La matriz de capacidad del renderer PPTX debe declarar qué hace con una plantilla transparente (fallar
+  cerrado o exportarla como imagen con alfa) — cerrado por trabajo en TASK-1919.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -22,7 +43,7 @@
 - Status real: `Diseno`
 - Rank: `TBD — posterior a TASK-1393; habilita el primer target editable antes de su incorporación productiva en TASK-1391`
 - Domain: `commercial|platform|ops`
-- Blocked by: `TASK-1393 (Artifact Composer, catalog snapshot y ResolvedCompositionManifest)`
+- Blocked by: `none` (TASK-1393 complete)
 - Branch: `task/TASK-1395-pptx-native-editable-renderer`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -288,6 +309,7 @@ que cada content type tenga implementación y evidencia.
 - [ ] Existe evidencia PowerPoint macOS/Windows con diferencias aceptadas documentadas.
 - [ ] Error/access/idempotencia/migración/rollback tienen postura explícita y testeada.
 - [ ] Target no es publicable hasta TASK-1391 + rollout.
+- [ ] (Delta 2026-09-27 b) La matriz de capacidad declara cada plantilla de `graphic-line-deck` como nativa o no soportada (con código), sin rasterizar una lámina entera.
 
 ## Verification
 

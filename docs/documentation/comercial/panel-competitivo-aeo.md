@@ -1,5 +1,7 @@
 # Panel Competitivo AEO — Comparar marcas en las respuestas de IA
 
+> **Naming vigente:** este panel aplica el motor técnico `AI Visibility Grader` de la capacidad **Efeonce AEO**. El diagnóstico público individual se llama **Efeonce AEO Assessment** y su salida **Efeonce AI Visibility Report**; un panel multi-marca sigue siendo un artefacto comercial distinto. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.1
 > **Creado:** 2026-09-11 por Claude

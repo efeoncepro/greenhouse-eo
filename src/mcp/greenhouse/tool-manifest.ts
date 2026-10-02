@@ -37,7 +37,7 @@
 import { GREENHOUSE_MCP_SKILL_MANIFEST, type GreenhouseMcpSkillManifestEntry } from './skill-manifest'
 
 /** Dominio dueño de la capacidad. No es routing: es a quién le pertenece el contrato. */
-export type GreenhouseMcpToolDomain = 'platform' | 'webhooks' | 'knowledge' | 'commercial' | 'seo' | 'insights'
+export type GreenhouseMcpToolDomain = 'platform' | 'webhooks' | 'knowledge' | 'commercial' | 'seo' | 'insights' | 'brand'
 
 /** La tool que sirve los manuales (TASK-1804). Las `instructions` rutean a ella sólo si está en el inventario. */
 export const GREENHOUSE_MCP_SKILL_TOOL_NAME = 'get_greenhouse_skill'
@@ -524,6 +524,28 @@ export const GREENHOUSE_MCP_TOOL_MANIFEST: readonly GreenhouseMcpToolManifestEnt
     writes: true,
     spendsProviderBudget: false,
     purpose: 'Fija la portada preferida de los informes de una organización; aplica a las ediciones que se generen después.'
+  },
+  // ── Render de piezas de marca (TASK-1921) — «La órbita» y Glitch sobre el Artifact Worker ──
+  {
+    name: 'request_brand_render',
+    domain: 'brand',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Encola el render de una pieza, documento o edición de Glitch de la marca Efeonce; valida contrato AXIS y receta aprobada, asíncrono.'
+  },
+  {
+    name: 'get_brand_render_request',
+    domain: 'brand',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Estado de un pedido de render de marca y de cada job, con enlaces de descarga de las salidas listas.'
+  },
+  {
+    name: 'list_brand_render_requests',
+    domain: 'brand',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Pedidos recientes de render de la marca Efeonce con su estado.'
   }
 ] as const
 

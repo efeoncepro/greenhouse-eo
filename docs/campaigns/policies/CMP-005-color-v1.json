@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "id": "CMP-005-color-v1",
+  "campaignId": "CMP-005",
+  "direction": {
+    "paletteReason": "Pilotos de estrategia: fotografía digital azul con luz cálida. La acción retoma superficies y reflejos reales; no añade un color para simular éxito.",
+    "sceneRole": "La fotografía y las aplicaciones demostradas concentran el color y el oficio; no se recolorean para acomodar un CTA.",
+    "textRole": "El titular blanco conserva la jerarquía principal sobre la reserva oscura.",
+    "actionRole": "La acción se distingue por delimitación o relleno según protagonismo, sin sumar acentos saturados sin relación con el conjunto."
+  },
+  "palette": [
+    "inkOnDark",
+    "inkOnLight",
+    "softOnDark",
+    "accentSurface"
+  ],
+  "treatments": [
+    {
+      "id": "editorial-outline",
+      "strategy": "neutral",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "inkToken": "inkOnDark",
+      "surfaceToken": "inkOnDark",
+      "reason": "Delimita la acción sobre reserva oscura y conserva el protagonismo cromático de la fotografía."
+    },
+    {
+      "id": "scene-light-solid",
+      "strategy": "scene-related",
+      "prominence": "destacada",
+      "variant": "solid",
+      "inkToken": "inkOnLight",
+      "surfaceToken": "inkOnDark",
+      "reason": "Retoma superficies claras y azul de la escena; el relleno aporta protagonismo sin añadir un matiz ajeno."
+    },
+    {
+      "id": "scene-cool-outline",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "inkToken": "inkOnDark",
+      "surfaceToken": "softOnDark",
+      "reason": "Relaciona un contorno azul pálido con las aplicaciones digitales azules sin competir en saturación."
+    },
+    {
+      "id": "brand-warm-outline",
+      "strategy": "intentional-contrast",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "inkToken": "inkOnDark",
+      "surfaceToken": "accentSurface",
+      "reason": "Alternativa disponible sólo con una justificación de contraste cálido deliberado en la pieza; no es el default de campaña."
+    }
+  ]
+}

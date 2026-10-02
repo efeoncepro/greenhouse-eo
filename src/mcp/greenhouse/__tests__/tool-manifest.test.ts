@@ -86,6 +86,8 @@ describe('manifiesto de tools MCP (TASK-1780)', () => {
         'revoke_insight_share',
         // TASK-1888 — fijar la portada preferida de una organización escribe; leerla es lectura.
         'set_insight_cover_preference',
+        // TASK-1921 — encolar el render de una pieza de marca escribe (sin gasto de proveedor); leer es lectura.
+        'request_brand_render',
         'declare_seo_competitors',
         'discover_seo_keywords',
         'prepare_seo_grounded_queries',

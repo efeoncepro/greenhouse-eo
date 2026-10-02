@@ -1,0 +1,15 @@
+-- TASK-1863: CONTRACT futuro, deliberadamente fuera del runner de migraciones.
+-- NO EJECUTAR hasta que todos los readers/writers de grader_profiles.market/locale,
+-- competitors_declared y recurring_regrade_* consuman grader_profile_markets,
+-- el rollout esté verificado y un nuevo plan retire explícitamente el espejo.
+-- Owner: Growth. El código actual AÚN depende del espejo; este contract no está autorizado.
+-- La migración real se crea con pnpm migrate:create después de verificar cero consumidores legacy.
+ALTER TABLE greenhouse_growth.grader_profiles
+  DROP COLUMN market,
+  DROP COLUMN locale,
+  DROP COLUMN competitors_declared,
+  DROP COLUMN recurring_regrade_enabled,
+  DROP COLUMN recurring_regrade_cadence,
+  DROP COLUMN recurring_regrade_next_at,
+  DROP COLUMN recurring_regrade_last_run_id,
+  DROP COLUMN recurring_regrade_last_at;

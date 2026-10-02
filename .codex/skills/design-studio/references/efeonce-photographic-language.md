@@ -8,10 +8,38 @@ el contrato completo, las mediciones y los prompts verbatim viven en la document
 > **Estado honesto.** Es un **sistema consistente aprobado**, **no un activo distintivo medido**. Falta la prueba
 > de reconocimiento (n≥100, distractores coherentes, antes/después). NUNCA afirmar que «se reconoce como Efeonce».
 
+## Banco aprobado y guía «El porqué» en AXIS **[operador, 2026-09-26]**
+
+Complemento de esta guía, aprobado por el operador. Es lo primero que se abre antes de producir una foto de marca.
+
+| Qué | Dónde | Para qué |
+|---|---|---|
+| Banco de fotos aprobadas | [axis.efeonce.org/references/photography/](https://axis.efeonce.org/references/photography/) | 125 fotos en 11 secciones (finales, registros, cámaras, palancas, personas, mascotas, identidad de Julio y Nexa, firma). Cada foto abre su receta |
+| Receta de una foto | `https://axis.efeonce.org/media/photography/recipes/<slug>.json` | Prompt verbatim, ficha, comandos, referencias, notas y archivo de origen |
+| Índice para agentes | `https://axis.efeonce.org/media/photography/manifest.json` | Lista las 125 con URL de imagen y de receta (`axis.efeonce-photography-reference.v1`) |
+| Guía «El porqué» | [axis.efeonce.org/references/photography/why/](https://axis.efeonce.org/references/photography/why/) | 57 reglas en 14 capítulos: qué hacer, por qué funciona, cómo se aplica y cómo comprobarlo, más la lista de control «Antes de entregar» |
+| La misma guía, en datos | `https://axis.efeonce.org/references/photography/why.json` | `axis.efeonce-photography-why.v1`: `rule`, `why`, `apply`, `check`, `origin` por regla y `checklist` |
+
+**Cómo se usa.**
+1. Lee el capítulo de «El porqué» que toca a la pieza: registro, color, lecho, formato, personas.
+2. Busca en el banco la foto aprobada más cercana y parte de su receta; no reconstruyas el prompt de memoria.
+3. Escribe la ficha y genera con los comandos canónicos (`foto:prompt`, `foto:generar`, `foto:validar`).
+4. Antes de entregar, recorre las 11 preguntas de la lista de control.
+
+**Jerarquía.** El canon sigue siendo `docs/operations/brand-photography/`; «El porqué» lo explica para el equipo y el
+banco lo muestra aplicado. Si algo difiere, manda el canon y se corrige la guía en el mismo cambio.
+
+**Mantenimiento.** Todo vive en el repo `axis-design-system`: fotos en `apps/lab/public/media/photography/`, datos del
+banco en `apps/lab/src/data/photography.ts`, recetas en `public/media/photography/recipes/` y la guía en
+`apps/lab/src/data/photography-why.ts` (una sola fuente para la página y el JSON). Al aprobar una foto nueva o
+cambiar una regla del canon, actualiza el banco o la guía en el mismo trabajo. Lo que espera aprobación va en una
+rama propia: `main` se despliega solo y otras sesiones empujan la rama compartida.
+
 ## Preflight visual obligatorio antes de generar
 
-**Leer esta guía no sustituye mirar las imágenes que aprobó el operador.** Abre la hoja
-`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg` cuando salgan
+**Leer esta guía no sustituye mirar las imágenes que aprobó el operador.** Empieza por el [banco de AXIS](https://axis.efeonce.org/references/photography/) (sección anterior). Abre la hoja
+`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg` (si no está en disco,
+`pnpm ai-gen:where` + `pnpm ai-gen:pull`) cuando salgan
 Julio o Nexa, la hoja `rondas/curado/set-curado-12.jpg` para la serie de color y al menos dos finales individuales
 comparables a tamaño completo. Antes del prompt, registra los archivos que viste y la comparación concreta:
 oficio/momento, cómo viven el azul activo y el naranja **o** lima en la composición, lecho desenfocado, firma y rasgos
@@ -43,7 +71,7 @@ Arquetipos a evitar: **consultora** (talleres, post-its, mesas genéricas), **pe
 > Esta barra es la del **registro documental**. El de **puesta en escena** tiene la suya, y juzgar una pieza con la
 > barra del otro registro es el error que describe la sección siguiente.
 
-## Registros A/B y extensión C — la barra depende del mensaje
+## Registros A/B, extensión C y cine — la barra depende del mensaje
 
 El canon V1 describió **un** registro. Existían dos, y el segundo ya estaba publicado y aprobado sin estar escrito:
 de ahí la sensación del operador de que «el lenguaje me limita» al intentar meter una pieza del segundo por la
@@ -51,6 +79,11 @@ puerta del primero.
 
 **Se decide ANTES de producir, con una sola pregunta: ¿la foto ES el mensaje, o es el SOPORTE de una idea?**
 Y se reconoce a simple vista por **si el sujeto mira al lente**.
+
+> **No confundir con el registro Marketing con Manzanitas** (2026-09-28): ése es un registro de **marca editorial**
+> que complementa La órbita ([norma](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)),
+> no un registro fotográfico. Dentro de él, las fotos siguen estos registros; en MCM, **cine** (ver §El lecho en el
+> registro cine).
 
 ### A · Documental — «el oficio a la vista»
 
@@ -74,6 +107,192 @@ excepción ni un error: es el otro registro.
 ### C · La respuesta a la vista
 
 El [maestro, registro C](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-21-tarde--tercer-registro-c--la-respuesta-a-la-vista) incorpora como sujeto la respuesta y quien la encarna: Nexa, criatura del motor u objeto digital. Si hay persona, recibe la respuesta, sin protagonismo corporativo genérico. Debe significar sin titular y conservar identidad, materia, luz, color, reservas y firma. C no es un filtro ni una licencia para HUD/scrims. La mirada al lente distingue casos A/B; no basta para clasificar C.
+
+### Cine · La marca en su película
+
+**Fuente vigente:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
+(2026-09-27). Los dos deltas cine del maestro quedan como historia. **Cárgalo completo antes de escribir una ficha
+cine**: aquí va sólo lo operativo. Es **ficción declarada**: el servicio (o lo digital) en acción como fotograma de
+una película de gran presupuesto, y **el color de la línea sale de la escena como luz** —anillo, haz, holograma, moño
+de partículas, esferas—, nunca pintado encima ni puesto como grade.
+
+🔴 **Producir cine (2026-10-02): sigue el [casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).**
+El flujo: casebook → `pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta> [--formato] [--alcance]`
+(`--listar` muestra las 12 recetas aprobadas de `scripts/foto/cine-recetas.json`; ninguna vertical todavía) → reescribe la
+escena marcada «REESCRIBIR» (`foto:generar` no gasta mientras siga así) y completa `__completar` y `__revisar` → campos
+cine: `llave { fuente, lado, distancia, tamano }`, `primerPlano`, `fondo`, `fenomeno { que, esServicio }` y `alcance`
+(`nexa` · `proposal-cinematic` · `deck-seccion` · `deck-portada` · `manzanitas` · `social-nexa` · `publicidad-prueba`;
+uno inválido aborta) → `pnpm foto:prompt` (los compila en «CINEMATIC CRAFT» y avisa los que faltan) → agente
+`cine-reviewer` sobre la ficha → `pnpm foto:generar <ficha> --quality high` → `pnpm foto:validar:cine` +
+`pnpm foto:validar` + `pnpm foto:emblema` → `cine-reviewer` sobre el plate. El revisor calibra contra el plate de la
+receta de partida y su APROBABLE no es la aprobación del operador.
+En cine, `foto:prompt` reemplaza las frases documentales de los bloques compartidos (`AJUSTES_CINE`) e inyecta solo:
+llave única sin relleno, lecho mate y real (no banda) separado del primer plano, fenómeno y fondo bajo el 36 % del alto
+en 4:5 y 9:16, escala por encuadre con `identidad`, mirada al panel con `alcance: deck-seccion`, uniforme navy (el
+hoodie conserva su royal del kit), aros de Nexa dorados y la reserva izquierda de la sección partida 1:1 con
+`"reservas": {"texto": {"lado": "izquierda", …}}`. Los demás registros no cambian: si tocas `build-prompt.mjs`, corre
+`scripts/foto/regresion-prompt.mjs` antes (`--foto`) y después (`--comparar`).
+Nunca reconstruyas la receta de memoria ni consultes a otra sesión: si el casebook no cubre tu caso, agrégale la fila.
+
+**Marcador rápido — estás en cine si se cumple todo esto:**
+
+- La luz fuerte del cuadro **es un objeto imposible con el `accentOnDark` de una línea** (no una ventana, lámpara o
+  monitor real). A, B y C no fabrican su fuente de luz.
+- El sujeto **mira al lente** desde la derecha del cuadro; en la **sección partida**, mira al panel del texto
+  (operador, 2026-10-02). El lente queda para portadas, contraportadas, `proposal-cinematic` y social.
+- Cámara a **≈ 2 m, 85 mm, altura de pecho**, plano medio desde la cintura, sin escorzo: cabeza ≈ ¼ del alto,
+  hombros más anchos que dos cabezas, el sujeto no se inclina hacia el lente.
+- Escala: «cabeza ≈ ¼ del alto» vale en 16:9; en 9:16, de la cintura arriba; en 4:5, del pecho arriba (a confirmar en
+  el próximo piloto vertical).
+- **Rim frío desde atrás + bruma** que atrapa el brillo, sobre un set navy-negro (`palanca: luz-motivada`,
+  `atmosfera: bruma`).
+- En 16:9, la **izquierda (≈ 45 %) es una reserva oscura y calma**, sin fenómeno de luz ni robots.
+
+**Sólo cuatro casos permitidos [operador, 2026-09-27; el cuarto, 2026-09-29]:**
+
+| Caso | Protagonista | Vestuario |
+|---|---|---|
+| 1 · Nexa protagonista | Nexa (identidad A) | Traje de ficción (biónico, por catálogo: `traje-bionico-nexa` + `lentes-bionicos-nexa` con `"registro": "cine"`) o uniforme Efeonce |
+| 2 · Receta de deck `proposal-cinematic` | Personas del equipo o Nexa | Personas: casting por rol → **uniforme por registro de escena**; persona real del roster → la prenda de su línea (operador, 2026-10-02); el traje de ficción es sólo de Nexa |
+| 3 · **Excepción:** láminas de **sección** y **«about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») | Personas en luz dramática, con o sin Nexa (en la sección con el panel a la derecha, la persona del cliente) | Equipo: uniforme por registro de escena; cliente: su ropa, sin marca Efeonce |
+| 4 · **Fotos de Marketing con Manzanitas** (`cine-team-people-social`) | **Personas reales del equipo actual**, sólo las del [roster del equipo](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md), con `identidad` en la ficha; identidades aprobadas por el operador el 2026-09-29 | La de la línea de la pieza (`linea` en la ficha): hoodie Efeonce en Servicios creativos (`brand`); bomber o softshell, con el polo debajo si se quiere, en las líneas de negocio. Todo el equipo, sin excepción por persona; `foto:prompt` lo exige |
+
+AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue **`cine-requires-nexa-or-proposal`**; el
+caso 3 ya está en el contrato (desde `axis-tokens` 0.3.14, TASK-1927): admite cine en `section-split`, `section-cine`
+(composiciones `team`, `services`, `about` y `purpose`) y en `cover-brochure`, `close-brochure` y `close-proposal`. Una pieza social, un hero web, publicidad o una lámina de **contenido** con personas del equipo sigue en A, B
+o C (salvo las fotos de MCM, caso 4): la excepción del caso 3 no se extiende. Detalle: registro cine, delta (c); receta de cada lámina en
+`docs/operations/brand-graphic-line/deck-recipes/`.
+
+**Portadas de perfil y destacados de Instagram de Efeonce [operador, 2026-10-01].** El caso 1 (Nexa protagonista) quedó
+aprobado también en estas superficies sociales al aprobar las piezas («Esa de Nexa queda»; «Aprobadas todas.»):
+portadas de LinkedIn, Facebook y YouTube con Nexa, y destacados que la tienen como protagonista. Amplía el §2 del
+registro cine **sólo para estas superficies**; una pieza social con personas del equipo sigue en A, B o C. Los
+destacados mezclan recursos (el ojo, Nexa, objetos del oficio), cada uno con su escena. Piezas, medidas y archivos:
+`efeonce-graphic-line` → `applications.md` §A11.
+
+#### Extender una foto aprobada a 9:16 conservando el centro **[medido en 9 destacados, 2026-10-01]**
+
+Caso: la historia completa de un destacado de Instagram, que necesita la escena entera en 1080 × 1920 a partir de un
+cuadro ya aprobado (Instagram toma la portada del círculo central).
+
+1. **Base espejada:** la foto aprobada al centro de un lienzo de 1152 × 2048 con sus bordes reflejados (el mismo
+   principio del padeo de §11: un relleno liso invita al modelo a inventar).
+2. **Relleno con máscara** (GPT Image 2.5) sólo sobre la extensión.
+3. **Igualar el tono** de la extensión al cuadro aprobado en baja frecuencia.
+4. **Reponer el aprobado por el borde del círculo**, no por una línea: en la historia de 1080 × 1920, con centro en
+   x 540, y 960, la unión va del radio 488 al 540 px. Dentro del radio 488 los píxeles son los aprobados, byte a byte:
+   se verifica, no se supone.
+
+Lo que no funcionó: una unión **recta** en y 420/1500 se ve a tamaño real aunque el tono calce (cambia la nitidez), y
+una **segunda pasada de relleno sobre la unión** posteriza las sombras y copia la línea. Antes de concluir que algo
+posterizó, mira **un recorte pequeño a tamaño real**: en una hoja grande la «posterización» era de la vista previa (el
+archivo tenía 24 562 colores en esa zona). Deja calmas las zonas que tapa la interfaz: arriba ≈ 14 %, abajo ≈ 20 %.
+Si el plate aprobado está blando, una edición con GPT Image que pide **sólo detalle** y conserva la composición lo
+recupera; mira al 100 % después, porque puede meter personas ajenas al roster (se sacan con recorte).
+
+**Publicidad 9:16 y 4:5: en prueba, no aprobada.** La tanda del 2026-09-27
+(`ai-generations/2026-09-27_ads-cine/`, §11.1 del registro) tiene cuatro piezas y ninguna está autorizada para pauta;
+con personas del equipo el contrato la rechaza hasta que el operador amplíe la excepción. Lo que dejó medido:
+
+1. **En vertical, el lecho es un objeto oscuro en primer plano que cruza todo el ancho y tapa la cintura o las
+   piernas.** Sin él, la firma cae sobre el sujeto **aunque el contraste pase** (16–18:1 sobre un pantalón negro).
+2. **Equipo en una sola línea, hombro con hombro**, cámara a ≈ 4 m y cabezas entre el **38 % y el 52 %** del alto: la
+   V escalonada rompe la franja de texto en 4:5.
+3. **Robots arriba de la cintura** (hombros, brazos, costados), **nunca a los pies**: ensucian el lecho. Hoy esos
+   robots son sólo Sparks declarados por catálogo (§11 «Sparks»); `foto:prompt` aborta un robot descrito a mano.
+
+El script de esa tanda (`componer-ads-cine.mjs`) fue **de sesión, no un compositor canónico**. En producción, la capa
+va por `pnpm foto:componer` o `pnpm foto:componer:cta`; la receta de anuncio cine **todavía no existe** en AXIS.
+
+**Barra de juicio, resumida** (las doce preguntas completas en §13 del registro): caso permitido · el servicio en
+acción como fenómeno de luz (quitarlo deja la escena vacía) · la luz fuerte es ese fenómeno, con el acento de la línea
+correcta y uno solo por pieza (salvo la lámina de líneas, con sus cinco esferas) · rim y bruma · proporciones reales ·
+mira al lente (al panel en la sección partida) y nadie mira a otro de cerca · identidad (Nexa A contra sus anclas) · vestuario por registro · emblema
+revisado con `foto:emblema` (el oficial llega armado en la referencia del kit; compuesto con `foto:isotipo` sólo si difiere, sufijo `b` y `.json` de procedencia) · reserva limpia y
+ningún texto cruza al sujeto · lecho `DARK near black` fuera de toda luz y de todo reflejo; en la lámina, sin logo y
+con la burbuja URL al pie · **una sola órbita**: el anillo, moño u órbita de la foto ya cuenta.
+
+**Trampas medidas más caras:**
+
+- **Cámara pegada al rostro** (`NX3`, cabeza ≈ 35 % del alto): se lee desproporcionada y se rechazó.
+- **Describir el emblema lo inventa**: salió un cohete genérico. Pide la prenda por su kit, que trae la marca armada
+  (el traje de Nexa desde el 2026-10-02); sin kit, prohíbelo por nombre sin describir el nuestro y compón el oficial.
+- **Dos personas mirándose de cerca se leen románticas** (`NX2`, rechazada): todos a cámara o al trabajo.
+- **El compilador fuerza la reserva izquierda del 16:9**: una reserva «arriba» compila como izquierda (`BR3`), y la
+  tabla escribe «LEFT 42%» contra el 0,45 del token. **Lee siempre el prompt compilado.**
+- **El bloque de accesorios de Nexa inyecta un smartwatch** aunque la ficha pida «no watch». En cine con el traje
+  biónico, `foto:prompt` ya quita el smartwatch y el anillo (casebook); con otro vestuario, lee el prompt compilado.
+- **El motor no devuelve el tamaño de la tabla** (2048×1152 → 1792×1024): mide las cajas en fracciones.
+- **Plastilina no es cine**: el material plástico no es un fenómeno digital, aunque la escena sea imposible.
+- **Una reserva declarada por porcentaje no se respeta** (`CR4` v1): ánclala por geografía respecto del cuerpo.
+- **`foto:isotipo` puede dejar un parche** cuando un fenómeno de luz cruza la zona del emblema (`CR4` v2): mira al
+  100 % después, no sólo antes.
+
+**Comandos, en orden:**
+
+```bash
+pnpm foto:doctor
+pnpm foto:prompt <ficha.json>                               # LEE el resultado (trampas 6–8 del registro)
+pnpm foto:generar <ficha.json> --quality high --out <dir>
+pnpm foto:emblema <plate.png>                               # siempre, aunque el emblema parezca bien
+pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara] --acabado   # sólo si foto:emblema difiere; el modelo lo termina
+#   logo completo (p. ej. la espalda del traje de Nexa): --marca logotipo --acabado --tecnica "<cómo está aplicado, en inglés>"
+pnpm brand:compose -- --intent <intent.json>               # lámina o brochure: Artifact Composer
+```
+
+`brand:compose` sigue el contrato AXIS `efeonce.surface-composition` 0.1.2 (`candidate`), **ya integrado en
+Greenhouse** (TASK-1927; un intent 0.1.0 o 0.1.1 resuelve igual): `use: proposal|brochure`, el marco `cover-brochure`,
+`cover-proposal`, `close-brochure` y `close-proposal`, las composiciones `service|hero|lines` de `proposal-cinematic`
+y el documento multipágina (intent con `pages`). Desde TASK-1928 (2026-09-28) **las 69 recetas del deck componen**
+(AXIS `axis-tokens` 0.3.21 / `axis-ui-contracts` 0.3.19; intent de ejemplo por receta en
+`src/lib/brand-surfaces/examples/deck-<receta>-intent.json`); lo que va encima de la foto lo deciden `deck-studio` y
+`efeonce-graphic-line`, no esta skill. La ruta productiva (API, worker, MCP) es TASK-1921 y no está disponible: hoy se
+compone por CLI. `cover-classic` y `close-classic` no entran: el operador no las aprobó. La foto se cambia en el intent (`photo.plateRef` y `photo.alt`, obligatorio), no en la plantilla. La plantilla de ficha comentada (`RV1`, verbatim) está en §12 del registro.
+
+**Plate de portada y contraportada de brochure o propuesta [operador, 2026-09-27].** La portada con foto lleva texto
+encima (logo de Efeonce a 500 px, eyebrow, pregunta, respuesta, evidencia) en una columna a la izquierda, así que el
+plate se pide para esa columna:
+
+- **Portada:** sujeto en la **mitad derecha**, de la cintura arriba, a **85 mm y ~2 m**, mirando al lente; el **45 %
+  izquierdo es estudio oscuro y calmo** (sin haces, objetos ni órbita: ningún texto puede cruzar la luz, una mano o
+  al sujeto); **lecho oscuro abajo**; la luz de acento es la de la **línea de servicio** de la portada (una portada de
+  brochure por línea, cada una con su acento).
+- **Contraportada con foto:** el sujeto **de espaldas, caminando hacia la órbita** (Nexa hacia el horizonte o al
+  amanecer: `ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png` y `BR4-contra-amanecer.png`; si faltan,
+  `pnpm ai-gen:pull`, nunca regenerarlos), con el
+  mismo lado oscuro para el bloque de cierre. Recuerda la regla foto ↔ sin foto: una contraportada con foto va con una
+  portada sin foto, y al revés.
+- **Ficha de ejemplo** (portada de Media & Distribution, acento Voice, chaqueta Efeonce; USD ~0,04;
+  bordado revisado al 100 % = isotipo oficial):
+  `ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json` → plate
+  `…/plates/LN4-voice-distribucion.png` (rehidratar con `pnpm ai-gen:pull` si falta). Sigue la ruta de comandos de arriba.
+- **Cambiar el plate de una pieza ya aprobada [operador, 2026-09-28, caso `CR4`].** La portada de Creative Services
+  («¿Quién crea mi contenido? Tu squad.») compartía `CR2b` con su lámina de servicio y se le hizo un plate propio:
+  `ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` (ficha y prompt en la misma
+  carpeta; `pnpm ai-gen:pull` si no está en disco). Lo que dejó la búsqueda (3 generaciones, ≈ USD 0,11):
+  - **Se conserva el concepto de impacto y se cambia la toma**, no al revés. `CR3` siguió la receta de portada al pie
+    (validador 4/5, zona de texto 0,40) y se rechazó por «perdió impacto visual»: se leía como retrato con la oficina
+    detrás. **La receta fija geometría y luz, no concepto**; el impacto de la línea estaba en el contenido vivo en
+    órbita, y `CR4` lo mantuvo cambiando gesto (ofrece con las palmas arriba, no dirige), fenómeno y disposición.
+  - **La forma de la órbita cambia el significado**: la elipse cerrada de `CR2` rodea a la persona (ella dirige); el
+    trayecto abierto de `CR4`, del squad al lente, dice «el equipo te entrega». Una sola órbita por pieza.
+  - **Ancla la reserva por geografía, no por porcentaje.** «Inside the RIGHT 55%» no bastó (v1 metió a una persona y
+    la cinta a la izquierda; zona 0,34). Funcionó nombrar el lugar respecto del cuerpo —*«ONLY on the frame-RIGHT side
+    of the room (behind her right shoulder…)»*, *«nothing lit… appears to the left of her left elbow»*—: zona 0,46.
+  - **Mira al 100 % también después de `foto:isotipo`**: su limpieza pintó un rectángulo plano sobre la cinta de luz.
+    Como el bordado ya coincidía con el isotipo oficial, se publicó sin componer (precedente `LN4`; decisión pendiente
+    del registro §16.6 #2).
+  - **Aprueba con la pieza compuesta** (`pnpm brand:compose`) y su plate real, nunca con el frame del probe (silueta
+    sintética, ISSUE-122).
+  Caso completo y checklist: [registro cine §16.7](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto).
+- La producción idempotente de estos plates es TASK-1926; lo que va encima (voz, logo, selección) no lo decide esta
+  skill: norma `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y skill `deck-studio`
+  §«Portadas y contraportadas». Registro: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
+
+**Dónde viven las herramientas.** Hoy `pnpm foto:*` vive en Greenhouse (`scripts/foto/`).
+[TASK-1925](../../../../docs/tasks/to-do/TASK-1925-brand-workshop-migration.md) lo migra al repo taller
+`efeoncepro/efeonce-brand-workshop` y deja delegadores: los comandos no cambian para el operador. No se agrega un
+catálogo de publicidad en Greenhouse.
 
 ### Qué NO cambia entre uno y otro
 
@@ -141,6 +360,16 @@ pequeño— sube a **0,28**. **Con fuente visible en cuadro: lámpara baja, o no
 - **La órbita no es parte de la firma ni de la composición por defecto.** Si una pieza fotográfica lleva la línea
   gráfica, la órbita se declara a propósito y nunca cruza sujeto, reservas, lecho ni firma
   (`orbit-never-over-subject-or-reserves`); la composición sigue siendo la de este lenguaje.
+- **Pieza que combina foto y órbita** (lente, foco, una medida o una voz de la línea sobre la foto): carga además la
+  skill `efeonce-graphic-line` y su
+  [contrato de convergencia](../../efeonce-graphic-line/references/photography-convergence.md). Dice quién manda en cada
+  tipo de pieza, cómo se briefea la foto con los campos de `foto:prompt` (centro y diámetro visible de la lente por
+  formato), cómo la órbita lee la foto (`protect`, `signature.y` sobre el lecho) y el QA conjunto. **Decidido por el
+  operador (2026-09-26):** en piezas con lente el exterior apagado cuenta como reserva de texto (nunca un scrim sigue
+  vigente sin lente); el lecho se pide igual; el 55 % es del círculo visible de la lente; un anillo dibujado en la
+  escena cuenta como órbita; la capa gráfica sobre la foto sólo en los casos de la línea (voz, lente, dato con
+  fuente); el límite del 36 % sólo con reserva de texto; en lente manda el encuadre sobre las palancas que llenan el
+  cuadro; el retrato de perfil es una categoría propia. Código pendiente en TASK-1918.
 - En feed, **alternar lechos claros/oscuros y materiales**: la misma banda repetida se vuelve plantilla.
 
 Lechos probados: borde de mesa a ras del lente · respaldo de silla del espectador («tu lugar en la mesa») ·
@@ -153,6 +382,76 @@ no resuelve este caso: sólo firma si el logo ya está en la imagen, y sobre un 
 
 Detalle: [firma y primer plano](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md)
 y [brand-in-scene](../../social-media-studio/references/brand-in-scene.md).
+
+### El lecho en el registro cine: un objeto excusa, nunca una banda **[operador, 2026-09-28]**
+
+> «el lecho no es un simple blur sino un "objeto excusa" que permita poner de forma no forzada el logo (firma) abajo
+> en todas las dimensiones» — operador, canvas de Marketing con Manzanitas (2026-09-28).
+
+En cine rige la misma ley que en la documental: el lecho es **un objeto del oficio con nombre y materia**, planeado
+desde la toma, que explica **desde dónde miramos**. Los rechazos del 2026-09-28
+(`ai-generations/2026-09-28_manzanitas-cine/`) muestran cómo se rompe **[medido]**:
+
+| Intento | Qué salió | Regla que rompió |
+|---|---|---|
+| Mesa «matte black» en un «empty dark studio… no mugs, no notebooks», cámara a 2 m sin anclar al objeto | Banda negra sin materia: se lee como blur | La lista de vacíos le quitó la materia al objeto. Nombra el objeto y su materia, y ancla la cámara a él: *«the lens only a few centimetres behind its near edge»* (catálogo de cámaras: la posición pesa más que el lente) |
+| Cabezas del público de espaldas, a 2 m con 85 mm | Manchas enormes que suben al 68 % del alto y tapan al sujeto; entre ellas se ven las piernas justo donde va la firma | «Cabezas del público» sólo vale en **escenario con tele 200 mm desde lejos** (catálogo de lechos de la firma) |
+| Dorso del portátil abierto del cliente y un cuaderno | «Se ve como un cuadrado» | **Soporte prohibido** desde el 2026-09-17 («tapa de portátil asomando sobre la mesa», firma §9) |
+| Cubierta de mesa desenfocada en 16:9 (lecho del 16 %) | El canto quedó al 83 % y la firma del blog (25 % del lado corto, caja 85–91 %) casi sin aire | El porcentaje del formato no basta: se mide el canto contra la caja de la firma de ESE formato |
+
+**Rechazado también, y es la regla más fina: el lecho tiene que ser NATIVO de la imagen** **[operador,
+2026-09-28]**: *«esa consola que pusiste es en efecto una consola de sonido… El lecho debe ser una superficie no
+forzada, sea un objeto o lo que sea; no debe verse sólo compuesto sino sentirse nativo de la imagen»*. `MC1h` pedía
+«una consola de monitoreo con teclas y deslizadores» delante de Nexa: el modelo hizo una consola de sonido, un objeto
+que la escena no traía y que se lee agregado para sostener la firma. **La pregunta no es «qué objeto pongo», sino
+«qué hay de verdad entre la cámara y el sujeto en ESTA escena».** En un espacio abierto (Nexa de pie entre miles de
+tarjetas) lo único que existe es el **piso**; en una reunión, **la mesa**; en un rodaje, **el equipo**.
+
+**Rechazado `MC1i` (piso con cámara baja) — el lecho NUNCA oculta lo que físicamente no puede ocultar**
+**[operador, 2026-09-28]**: *«¿según tú era buena idea cortarle las piernas a Nexa para resolverlo? … piensa
+profundamente antes de resolver»*. La ficha pedía que el piso cercano *«hides her knees and feet»*: un piso plano no
+tapa las rodillas de quien está de pie sobre él, y el modelo obedeció cortándole las piernas. **El lecho nativo sale
+de la geometría real de la toma, de una de dos maneras (las dos aprobadas):**
+- **Cuerpo entero sobre el piso** (`BR3`): la figura completa, con los pies apoyados; el tramo de piso entre ella y la
+  cámara se desenfoca solo y la firma va ahí, bajo los pies. No se tapa nada.
+- **El sujeto USA el objeto** (`NX5b`): apoyada con las manos en el borde de la mesa; la mesa cercana al lente es el
+  lecho y tapa la cintura porque ella está detrás, apoyada, no porque se ponga para la firma.
+
+**Opción C, la que se usa (2026-09-28, `MC1m`): la imagen dice lo que dice el texto y el lecho sale de ella.** La
+lámina «¿Qué revisa una IA antes de recomendarte? 5 cosas» se fotografió como eso: Nexa **sentada** a una mesa de nogal
+mate (*«matte oiled walnut, no reflections»*) revisa **cinco** tarjetas de vidrio sin texto; una línea fina de luz de la
+línea recorre la fila y se detiene en la que toca, y ella levanta la vista a cámara. El borde cercano de esa mesa, en
+sombra, es el lecho: ella la usa. Firma en 1237–1288 a **17,8:1**; desde el 2026-09-28 el carrusel firma a
+una sola altura, la de las piezas de AXIS (logo arriba en y 1202), y ahí mide **15,5:1** **[medido; operador, 2026-09-28]**. Aprendido con la sesión que armó el registro cine:
+- **El modelo ignora los porcentajes de la cabeza** (pedido 40–44 %, salió 23–25 %). Lo que la baja es **la acción**
+  (sentarla a la mesa que usa) y el encuadre dicho en palabras de cámara (*«medium-wide shot, the whole table in frame,
+  a tall empty expanse above her head, camera tilted slightly upward»*); con la cabeza al 28 % la voz cabe si empieza
+  arriba (≈ 60 px). Si aun así choca, se acorta la voz, no se fuerza la foto.
+- **La órbita en cine sólo cuando aporta**: aquí sobra, porque la tarjeta encendida ya es el foco y la línea como luz
+  es el haz del escaneo; un anillo sería un segundo foco que compite con la esfera de la voz.
+- **Una fila de objetos puede caer donde vive la mano de «Desliza»**: el modelo ignoró dos veces *«the row spans only
+  the central two thirds»*. **Lo que sí funcionó (2026-09-28, `MCB1b`, a la primera): medir la fila con el cuerpo**
+  —*«the three cards are small, each about the width of her hand… the whole row fits between her two shoulders»*—;
+  la fila terminó en x ≈ 793 y la mano quedó libre **[medido]**. El porcentaje del cuadro no ancla; el cuerpo sí.
+- **Si la cabeza queda alta, se abre el plano; no se pide su altura.** En `MCB1b` la cabeza seguía en y 290 (la voz
+  de la portada termina en y 397). `MCB1c` pidió *«a WIDE shot from further back… she is small in the frame… above
+  her head a tall, empty expanse… fills the whole upper half»* y la bajó a y 441: 44 px de aire **[medido]**.
+- **La luz de la línea sigue al tema** (prueba de contenidos creativos, 2026-09-28, pendiente de revisión): en Brand la
+  línea de luz es naranja (`#FF6500`) y el traje de Nexa conserva sus costuras azules; la receta, el lecho y la firma
+  no cambian. Placas en `ai-generations/2026-09-28_manzanitas-cine/plates/` (`MCB1c`, `MCB3`).
+
+**Cómo se escribe y se verifica un lecho cine, en orden:**
+1. Preguntar **qué hay de verdad entre la cámara y el sujeto en esta escena** (el piso del espacio, la mesa de la
+   reunión, el equipo del rodaje) y elegir eso, no un objeto traído para sostener la firma; del catálogo de lechos o
+   de su familia; en un carrusel, **familias distintas** entre piezas.
+2. Escribirlo con **nombre, materia y la cámara anclada**; tono declarado; **fuera de toda luz y de todo reflejo**, y
+   sin pantallas encendidas que lo iluminen.
+3. No sumar listas de vacíos que le quiten materia al objeto; prohibir sólo lo que compite con el sujeto. **Nunca
+   pedirle al lecho que tape una parte del cuerpo que físicamente no puede tapar** (el piso no oculta rodillas).
+4. Tras generar, medir el **canto** (salto de luminancia por fila en la columna del logo) contra la **caja de la
+   firma del formato** y mirar el pie al 100 %: la firma va dentro de la materia calma, con aire, nunca montada en el
+   canto ni sobre el sujeto. Si no calza, se rehace la toma o se ubica la firma sobre el plate (centro ≈ 93,5 % en
+   4:5, norma de firma §5), nunca con scrim.
 
 ### Selección colaborativa AXIS (recurso, ~1 de 3 piezas)
 
@@ -188,7 +487,8 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
   técnica mínima sólo si es imprescindible.
 - **Neutro-cálido ~5200 K**, blancos levemente cálidos, **sombras neutras, nunca azules**. **Exponer para las altas
   luces** (un KV pasó de 31,5% quemado a 0,05%).
-- Lámparas prácticas encendidas dan look podcast-stock: en sets oscuros, apagadas o puntuales.
+- Lámparas prácticas encendidas dan look podcast-stock: en sets oscuros, apagadas o puntuales. **Excepción del cine**
+  (operador, 2026-10-02): encendidas sólo como bokeh grande, frío y lejano al fondo, nunca en la reserva del titular.
 - Rangos objetivo (script de métricas Lab, pieza a 576 px): quemado ≤ 0,5–1% (contraluz ≤ 2–3%); aplastado ≤ 5%
   (clave baja ≤ 8%, pedir «shadows deep but always with visible texture»); contraste p95−p5 70–90 en piezas de
   impacto; croma p95 ≤ ~40 salvo campo azul; b\* altas +2 a +12; b\* sombras −3 a +3; piel L 44–61, C 18–31.
@@ -244,7 +544,8 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 
 > **El oficio con IA no está en la máquina, está en la decisión.** Generar es barato y no se ve; elegir,
 > descartar, corregir y dirigir es el trabajo. **Nunca robots, circuitos ni interfaces flotantes**: es la parte
-> que no vale nada y la que hace todo el mundo. Cuatro palancas fotografían el juicio:
+> que no vale nada y la que hace todo el mundo (única excepción: los Sparks del kit, §11).
+> Cuatro palancas fotografían el juicio:
 
 - **Variantes** (`palanca: variantes`) — la misma pieza repetida con diferencias **mínimas** y **una** apartada.
   El sujeto es la elección, no el objeto.
@@ -274,6 +575,16 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 > ninguno era el de Efeonce. Mismo hecho que gobierna la firma. En orden: que **no se lea**, **componerlo**
 > después, o **editar con máscara**. **NUNCA** publicarlo como sale del generador; **NUNCA** cerrar sin
 > `pnpm foto:emblema <plate.png>`, que lo amplía — a tamaño de feed un bordado inventado pasa por bueno.
+> Si la revisión muestra un emblema distinto del oficial, **`pnpm foto:isotipo <plate.png> --centro x,y --ancho w`**
+> (2026-09-27) lo corrige: limpia la marca inventada y compone el isotipo de `@efeoncepro/axis-brand-assets` con la
+> luz de la escena y procedencia con SHA-256. El orden no cambia: vistas del kit en la ficha → `foto:emblema` al
+> 100 % → `foto:isotipo` sólo si difiere.
+> **Decisión del operador, 2026-09-28:** en uniformes (polo, hoodie, softshell, gorra) mandan las referencias puestas del
+> kit; si `foto:emblema` confirma el isotipo oficial al 100 %, se publica el bordado generado **sin `b`** (precedentes
+> `LN4` y `CR4`). `foto:isotipo` sólo si difiere. El traje biónico de Nexa tiene kit desde el 2026-10-01 y su
+> referencia lleva el isotipo ya armado (decisión del operador, 2026-10-02): se pide por catálogo y se verifica con
+> `foto:emblema`, igual que el uniforme. Escena cine con Sparks: dos con referencia como máximo y el resto lejos y
+> desenfocado (registro cine, delta 2026-10-02, `NX7d`). Después de `foto:isotipo`, mirar otra vez al 100 %: su limpieza puede tapar luz de la escena (registro cine §16.7).
 
 > **Código de vestuario** **[operador, 2026-09-20]**: la prenda dice el REGISTRO. **Polera piqué** = oficina
 > casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno · **Hoodie** = terreno ·
@@ -344,6 +655,12 @@ El lenguaje se probó en **4:5 1152×1440**, **9:16 1152×2048** y **16:9 2048×
 se leyó como Berel («nosotros NO somos Berel»). Variar: café, bebidas, panadería, retail, finanzas, gastronomía,
 eventos. Tampoco repetir el mismo objeto de acento ni el mismo panel azul de fondo entre piezas.
 
+**Única excepción, declarada en la ficha** **[operador, 2026-09-30, TASK-1949]**: la imagen de ambiente del **caso de
+éxito** de un cliente, en puesta en escena (`"caso": { "tipo": "cliente", "cliente": "<nombre>", "registro":
+"puesta-en-escena" }`). Abre sólo el rubro de ese cliente y sólo en esa ficha; la escena no lo nombra, su logo se
+**compone** desde el archivo oficial (nunca lo genera el modelo) y mostrar su marca depende de su autorización
+(TASK-1937). La foto propia de Efeonce no cambia.
+
 ## 10. Pantallas: curación generativa, nunca UI pegada
 
 Las composiciones deterministas sólo sirven **como referencia** para curar con IA. Método: plate con la pantalla en
@@ -359,15 +676,25 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
 - Referencias: Julio `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` —11 retratos aprobados, `julio-ap-04` primero para rostro y `julio-ap-11` para cuerpo, según `MANIFIESTO.json`— más seis ángulos en `set-identidad/angulos/`; selección por `foto:prompt`. `julio-ap-02.png` es pieza compuesta y no sirve de ancla; las fotos fuente y descartes permanecen aparte. El set de 2026-09-17 quedó retirado como ancla de identidad;
   Nexa `ai-generations/_identidad-nexa/1-anclas/` y sus ocho ángulos fotorrealistas confirmados por el operador
   el 2026-09-24 en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` (polera gris neutra,
-  vista resuelta mediante `foto:prompt`). Esa ropa no es obligatoria en todas las escenas. 🔴 Las rutas anteriores
+  vista resuelta mediante `foto:prompt`; si alguna referencia no está en disco, `pnpm ai-gen:pull`, nunca sustituirla).
+  Esa ropa no es obligatoria en todas las escenas. 🔴 Las rutas anteriores
   —`nexa-the-point.png`, `nexa-the-listen.png`— **son identidad B y quedan retiradas como ancla de rostro**
   [2026-09-21]. Identidad sostenida en 5 tomas (135/24/200/50/200 mm) con el set anterior.
+- 🔴 **La pose y la expresión de Nexa salen de la escena, no de las referencias** **[operador, 2026-10-02]**: *«Nexa
+  en casi todas las fotos sale con la misma pose de cara de un lado teniendo tantas poses»*. Las referencias dicen
+  quién es; el giro, la inclinación y el gesto los dirige la ficha: declara **una** dimensión, `"expresion"` (12
+  fotográficas de `_identidad-nexa/5-expresiones/`, de `carcajada` a `mirada-lateral`) **o** `"vista"` (el ángulo),
+  o las dos juntas con una persona sola (la vista da el ángulo, la expresión el gesto; `NX7j`). Las 12 comparten el tres cuartos del ancla y sólo mandan en el gesto: si la toma necesita otro
+  ángulo, pídelo con `vista`. Describe la pose en la escena y no copies «confident half-smile» de ficha en ficha;
+  `foto:prompt` avisa si Nexa llega sin ninguna. A/B y causa:
+  [bloques y pipeline, delta 2026-10-02](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 - Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar. El
   uniforme es el **contexto 6** del wardrobe de Nexa [operador, 2026-09-21]: los contextos son situaciones y
   la prenda la dicta la situación.
 - 🔴 **Los CUATRO signature elements de Nexa viajan en toda pieza suya** (los resuelve `foto:prompt`, no se
   escriben a mano): anillo geométrico plata mate en el **índice derecho** · **SMARTWATCH** en la muñeca
-  izquierda —**nunca** un reloj analógico— · aretes de **plata**, nunca dorados · uñas de un solo color.
+  izquierda —**nunca** un reloj analógico— · aretes de **plata**, nunca dorados (en **cine**, dorados como su ancla: operador, 2026-10-02; `foto:prompt`
+  lo aplica) · uñas de un solo color.
   Medido: el bloque gana metal, forma y presencia, pero **el DEDO sólo se gana editando**, no generando.
 - 🔴 **Gadgets y equipo: siempre tecnología premium y de la generación vigente.** Apple Watch, iPhone, iPad
   con Pencil, MacBook, Mac de escritorio, AirPods; para grabar **DJI Osmo Pocket/Action**, **DJI Mic 3** o
@@ -380,6 +707,42 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
 - Detalle: [personas, identidad y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)
   · [ficha del Character Bible](../../../../docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md)
   · [el Bible completo](../../../../docs/operations/social/NEXA_CHARACTER_BIBLE_V1.md).
+
+### Sparks: la única excepción a «nunca robots» **[operador, 2026-09-29 y 2026-10-01; TASK-1941]**
+
+Los **Sparks** son los agentes de Efeonce: personajes propios que dan cara a Agent Ops. El canon sigue prohibiendo
+robots; **los únicos permitidos son los Sparks del kit**, nunca un robot descrito a mano (eso daba uno distinto en
+cada foto y parecido a personajes ajenos: `NX3`, `NX5`, `AD2`, `AD4*`, `RV1`, `WB1`, `BR4`). Canon, relato, plantel y
+fichas: [`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.md).
+
+- **Se declaran por catálogo**, en `objetos` de la ficha: `spark` (base, 26 vistas: giro completo, seis expresiones,
+  tres en luz cine, cuatro acciones y grupo de tres), uno de los cinco del plantel —`spark-investigacion`,
+  `spark-contenido`, `spark-crm-datos`, `spark-servicio`, `spark-reportes`, con vistas `heroe`, `frente`,
+  `tres-cuartos-der`, `mira-arriba` y `cine`— o `sparks-plantel` (los cinco juntos). Ejemplo:
+  `"objetos": [{ "objeto": "spark-servicio", "vista": "heroe" }]`. La escena nombra lo que hacen, no cómo son.
+- **Escala:** nunca más grandes que la cabeza de la persona y siempre **arriba de la cintura** (hombro, palma,
+  escritorio, entregando algo).
+- **Registro:** cine o puesta en escena; **nunca documental**. Siempre con una persona que supervisa: nunca solos
+  decidiendo ni reemplazando a alguien. Nexa puede liderarlos en la ficción; las piezas de venta de Agent Ops llevan
+  al equipo humano.
+- **La guarda** (`validarRobots` en `foto:prompt`): aborta si la escena describe robots, droides o bots sin declarar
+  un Spark (las negaciones como «no robots» se ignoran), y aborta un Spark con `registro: "documental"` o con una
+  palanca documental (`escucha`, `manos`, `sombra`, `silueta`, `marcado`, `quien-sostiene`). Medida sobre 301 fichas:
+  frena 13, todas con robots escritos a mano, sin falsos positivos.
+- **Color por línea** (aprobado 2026-10-01): el Spark base admite `"color"` con el acento de la línea (`engine`
+  —defecto, azul—, `growth`, `brand`, `voice`, `revenue-hubspot`, `revenue-salesforce`); sólo en piezas de esa línea.
+  Brand y Voice son cálidos: probarlos en cine antes de una foto oscura. Detalle: `SPARKS_V1.md` §6.1.
+- **En cine, dos Sparks con referencia como máximo** **[operador, 2026-10-02; `NX7d` «Nexa despliega a su squad»,
+  aprobada y canonizada]**. Una foto de estudio dice «Reproduce EXACTLY» y el modelo obedece también su nitidez, su
+  tamaño y su luz pareja: con los cinco referenciados (`NX7`, `NX7b`) salieron stickers en abanico. El resto entra sin
+  imagen propia («the same figures as the Spark references»), lejos y desenfocado; cinco Sparks legibles son otra
+  toma (`sparks-plantel`), no cine. El resto de la receta de `NX7d`: planos con distancia y apertura (cerca · ~1 m ·
+  4–6 m, 85 mm f/1.8), un Spark en contacto (posado en el hombro), una fuente con tamaño cerca de la cara como única
+  llave y **sin relleno**, bokeh de luces prácticas, conteo declarado («EXACTLY THREE more (FIVE in total, never
+  more)») y geografía para la reserva. Pendiente de esa toma: columna de texto 0,38 (pide 0,42) y lecho 2,98:1 —sirve
+  muda; con titular se rehace—. Canon: registro cine, delta 2026-10-02.
+- Las fotos aprobadas que todavía llevan robots genéricos (`NX5b` y derivadas, la destacada «Agents» `PH7`) se
+  regeneran con Sparks sólo si el operador lo decide.
 
 ## 12. Flujo de producción (resumen)
 
@@ -411,7 +774,10 @@ Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloque
   [Colorimetría](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md) ·
   [Cámaras y ángulos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) ·
   [Bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) ·
-  [Personas y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)
+  [Personas y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) ·
+  [Registro C](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_C_V1.md) ·
+  [Registro cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) ·
+  [Sparks, los agentes de Efeonce](../../../../docs/operations/brand-characters/SPARKS_V1.md)
 - [Bitácora del método](../../../../docs/operations/social/2026-09-19-efeonce-photographic-language-production-method.md) ·
   [Manual de uso](../../../../docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 - Corrida: `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/` (rondas, prompts, scripts `medir.mjs`,
@@ -428,7 +794,7 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 
 - **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
   el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. La ficha declara
-  además `identidad` (personas, con vista por ángulo), `objetos` (kits de marca: logo, mascota, prenda, merch),
+  además `identidad` (personas, con `vista` por ángulo **o** `expresion`, una sola), `objetos` (kits de marca: logo, mascota, prenda, merch),
   `palanca` (**una sola** de las 24 de encuadre, con su campo obligatorio si lo pide), `atmosfera`
   (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
   bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un
@@ -466,6 +832,9 @@ impacto. Medido sobre sus escenas contra la ronda que el operador aprobó: luz 6
 - **Anclas de categoría de cliente:** hoy **pintura**. **[decisión del operador]** «nosotros NO somos Berel». La
   regla estaba escrita desde el 19/09 y una sesión generó igual un macro de un rodillo aplicando pintura azul.
   **Un doc no impide nada; un comando que aborta, sí.** Se amplía sólo con lo que el operador declare.
+  Cada ancla lleva su `cliente`; la ficha que declara `caso` de **ese** cliente en registro `puesta-en-escena` pasa
+  con aviso y un bloque `CLIENT CASE` que prohíbe su marca (`validarCaso`, 2026-09-30). Desde ese día el ancla de
+  pintura ve también muestrarios, abanicos y latas **de pintura**; los muestrarios impresos siguen permitidos.
 - **Avisos que no bloquean:** escena sin **fuente de luz** o sin **momento**. El aviso automático que cuestionaba
   paneles, pantallas y otras áreas azules se retiró: también hay campos azules naturales en las fotos aprobadas.
   La revisión visual decide si el color tiene razón de estar en la composición o si parece una pieza añadida.
@@ -501,7 +870,8 @@ sesión las tenía delante al armar.
 
 - La zona del titular se pide en la toma con **tono declarado** («DEEP warm shadow… for white text» / «VERY LIGHT warm-white wall… for dark text») y **límite de cabezas** (verticales: bajo 36% del alto; 16:9: gente dentro del 55% derecho).
 - Zonas: 4:5 tercio superior; 9:16 franja 11–31% (la firma de esa ronda estaba a 0,875); 16:9 costado izquierdo 42% en `foto:prompt`. Para una pieza nueva con CTA en 16:9, el piso de legibilidad requiere cerca del 57% del ancho: reservar 58% o reducir el copy sigue pendiente de decisión, así que el comando conserva 42%. La firma de una pieza nueva es 25% del lado corto en horizontales y 20% en verticales/cuadrados; no se regeneran las aprobadas por ese cambio. [Contrato y corte](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
-- Compositor `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/titular.mjs` (Bricolage `ideaImpact` a trazos, color por contraste, autoajuste de zona ≥4,5:1).
+- Compositor `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/titular.mjs` (en git; sus plates, con
+  `pnpm ai-gen:pull` si faltan; Bricolage `ideaImpact` a trazos, color por contraste, autoajuste de zona ≥4,5:1).
 - **Canon operativo (aprobado, capa fotográfica):** [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — las seis reservas, tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
 - Bitácora de la ronda (composición **no aprobada**): [zonas de composición y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
 

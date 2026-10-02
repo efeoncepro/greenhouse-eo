@@ -1,0 +1,35 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-day-live-approval",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Agentforce · supervisión en vivo",
+    "question": "¿Dónde apruebas al agente?",
+    "answer": ["Donde", "trabajas"]
+  },
+  "body": "El agente propone con evidencia, tú **apruebas** en Slack y el cambio queda ejecutado y registrado.",
+  "note": "Ejemplo ilustrativo · la política y los límites se definen con tu equipo",
+  "channel": { "tool": "slack", "name": "# servicio-aprobaciones" },
+  "agent": { "icon": "agentforce", "name": "Agente de casos", "badge": "Agentforce" },
+  "message": "Caso **#4821**: el cliente pide reembolso de **[MONTO]**. Según la política 3.2 corresponde aprobarlo.",
+  "evidenceChips": ["Historial del cliente", "Política 3.2"],
+  "actions": ["Aprobar", "Editar", "Rechazar"],
+  "executed": {
+    "icon": "service",
+    "title": "Ejecutado en Service Cloud",
+    "text": "Reembolso aplicado, cliente notificado y registro de quién aprobó y cuándo."
+  },
+  "loop": [
+    { "title": "Propone", "detail": "El agente, con evidencia" },
+    { "title": "Apruebas", "detail": "La supervisora, en Slack" },
+    { "title": "Ejecuta", "detail": "En Service Cloud" },
+    { "title": "Queda registrado", "detail": "Auditoría completa" }
+  ],
+  "currentLoopStep": 2
+}

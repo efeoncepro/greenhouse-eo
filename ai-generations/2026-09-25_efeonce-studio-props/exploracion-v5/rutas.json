@@ -1,0 +1,62 @@
+[
+  {
+    "id": "a-verbos",
+    "n": "A",
+    "name": "Verbos",
+    "idea": "Un verbo, un punto. El objeto dice qué se hace con él.",
+    "rule": "Infinitivo + punto en Bricolage, tan ancho como la cara del objeto. Nada más en esa cara; el logo vive en la otra, bajo y chico.",
+    "risk": "Depende del vocabulario: un verbo débil o motivacional («Soñar.») lo vuelve cartel de oficina genérico.",
+    "base": "#0375DB",
+    "interior": "#F7F8F6"
+  },
+  {
+    "id": "b-empower",
+    "n": "B",
+    "name": "Empower your ___",
+    "idea": "El sistema verbal que Efeonce ya tiene, llevado a los objetos.",
+    "rule": "«Empower your» chico en el gris canónico del eslogan; la palabra final grande (Growth · Brand · Voice · Engine) según el objeto o la zona.",
+    "risk": "En inglés sobre objetos de uso diario en Chile; si la palabra no se vincula con el objeto, es sólo un eslogan repetido.",
+    "base": "#F7F8F6",
+    "interior": "#023C70"
+  },
+  {
+    "id": "c-conversacion",
+    "n": "C",
+    "name": "Conversación",
+    "idea": "Cada objeto es media conversación: una pregunta y la respuesta con raya de diálogo.",
+    "rule": "Pregunta en Poppins Light, chica. Respuesta en Bricolage con raya (—), la voz del otro. En los soportes de trabajo, la respuesta queda en blanco para escribirla.",
+    "risk": "Si las frases se vuelven chistes de taza, se cae a merch genérico. Exige curar el vocabulario tanto como en Verbos.",
+    "base": "#023C70",
+    "interior": "#0375DB"
+  },
+  {
+    "id": "d-instrumento",
+    "n": "D",
+    "name": "Instrumento",
+    "idea": "Los objetos rotulados como equipo calibrado: número, ficha y regla.",
+    "rule": "Número grande en Bricolage, rótulos en Poppins Medium versales con tracking, filetes finos. Todo rótulo informa algo real del objeto o del espacio.",
+    "risk": "Cerca de la estética industrial/Teenage Engineering; sin contenido real se vuelve ficha falsa. No simular medidas que no existen.",
+    "base": "#F7F8F6",
+    "interior": "#023C70"
+  },
+  {
+    "id": "e-inmersion",
+    "n": "E",
+    "name": "Inmersión",
+    "idea": "Sin palabras: el azul Efeonce como material, siempre hasta la misma altura.",
+    "rule": "Cada objeto se «sumerge» en azul hasta el 38 % de su alto. La línea es la marca; el logo, cuando va, vive dentro del azul.",
+    "risk": "Es la más silenciosa: reconocible sólo con repetición y constancia de la proporción. Sola, una taza bicolor no es propia.",
+    "base": "#F7F8F6",
+    "interior": "#0375DB"
+  },
+  {
+    "id": "f-supergrafica",
+    "n": "F",
+    "name": "Supergráfica",
+    "idea": "El logotipo oficial a escala de arquitectura: nunca se ve entero de una vez.",
+    "rule": "Logo oficial intacto, escalado hasta desbordar el soporte. En la taza rodea todo el cuerpo: se lee girándola.",
+    "risk": "Recortar el logotipo (y la nave) requiere autorización del dueño de marca. Puede leerse como merch de logo grande si no se cuida el recorte.",
+    "base": "#0375DB",
+    "interior": "#F7F8F6"
+  }
+]

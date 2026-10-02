@@ -227,7 +227,11 @@ es aislamiento de proceso, no rasterización: **el gate visual a 0 píxeles lo p
 
 **El gate visual:** el catálogo tiene un **baseline de 40 frames** commiteado. Cualquier cambio al
 dominio debe pasar `pnpm composer:visual-gate` **a cero píxeles de diferencia**. Rebasar el baseline
-solo se permite **declarándolo** en `BASELINE_DELTAS.md`.
+solo se permite **declarándolo** en `BASELINE_DELTAS.md`: cada actualización necesita su propia entrada
+nueva, que nombre cada lámina que cambió. La actualización solo acepta las láminas de esa entrada y la cierra;
+una lámina mencionada en una entrada vieja no queda autorizada otra vez. Si un cambio movió láminas que no
+esperabas, la actualización se detiene y te las muestra
+([runbook §5](../../operations/runbooks/composer-visual-gate.md)).
 
 > Los tests verdes **no** son el gate de un deck. Cuatro pasos numerados todos como "01", los párrafos
 > aplanados y la firma sin fundido **pasaban los 92 tests**. Por eso el gate estético es **mecánico y

@@ -1,0 +1,155 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:17:57.215Z",
+  "run": "ai-generations/2026-09-23_v07-lecho-04-elegida",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-23_v07-lecho-04-elegida",
+  "totalBytes": 38032979,
+  "fileCount": 24,
+  "files": [
+    {
+      "path": "base.png",
+      "sizeBytes": 2038752,
+      "sha256": "8f68c0c5d0877cf418cab6c6389c02f8721a90422c0db83312929d58816403a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/base.png"
+    },
+    {
+      "path": "comparar-candidatos.png",
+      "sizeBytes": 1508423,
+      "sha256": "2d09db2e4635e590748c8456bfd2917ea909f0c8f26b692917749975a67911ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/comparar-candidatos.png"
+    },
+    {
+      "path": "comparar-capa.png",
+      "sizeBytes": 846983,
+      "sha256": "6e58623c0fa8581446ab8c89fc4a81a7aed8989e293910be3e634fd9d5c08a53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/comparar-capa.png"
+    },
+    {
+      "path": "comparar-hombro.png",
+      "sizeBytes": 1513810,
+      "sha256": "1cd7b4779bdacd663bc2a236b2e59069e32bf7a2dee7b8491c7df17b13156547",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/comparar-hombro.png"
+    },
+    {
+      "path": "comparar-subido.png",
+      "sizeBytes": 981084,
+      "sha256": "709320032606afef4f9c95b4534a5fab6a8791d3a623bb6ebf576c30d3e9e9fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/comparar-subido.png"
+    },
+    {
+      "path": "hombro-1.png",
+      "sizeBytes": 1378157,
+      "sha256": "f6529565010ae7c47e194355a9387d9ffc5d4797c5274a18e0e80aa42fe038f6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/hombro-1.png"
+    },
+    {
+      "path": "hombro-2.png",
+      "sizeBytes": 1386000,
+      "sha256": "a47e84d71c3e9f2196ff332a75afba76ba667c4cb12a0ef3e0e8b089ab897e80",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/hombro-2.png"
+    },
+    {
+      "path": "hombro-base.png",
+      "sizeBytes": 958971,
+      "sha256": "2bc04f4db502b116e877e702b94b94f54fbd107acb6077939337bc8e767a9664",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/hombro-base.png"
+    },
+    {
+      "path": "hombro-mask.png",
+      "sizeBytes": 33210,
+      "sha256": "f41545c169db08a94af55ccfe8858ab16378e4470b74f253243cc8bb2f209c8a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/hombro-mask.png"
+    },
+    {
+      "path": "lecho-1.png",
+      "sizeBytes": 1602636,
+      "sha256": "7e5809df29513fa3f461d6253ab9643f0bb6be9044ebe2dfd0492ba1bf593435",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/lecho-1.png"
+    },
+    {
+      "path": "lecho-2.png",
+      "sizeBytes": 1620630,
+      "sha256": "7c4e103d4bf63abb1d659a1a79bfc06345d815f527f4397feddb6462892ee41c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/lecho-2.png"
+    },
+    {
+      "path": "mask.png",
+      "sizeBytes": 17644,
+      "sha256": "07ae7e4e12b70bb9265cf7a5881c7e0fcfcf29c937abdbdd3ce470a0f59e7583",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/mask.png"
+    },
+    {
+      "path": "plate-capa.png",
+      "sizeBytes": 2651185,
+      "sha256": "c20ca2fbd8b827a2b5ce18fe55228f899f1d7671b1d5a573f7aceb50bb8b9879",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/plate-capa.png"
+    },
+    {
+      "path": "plate-hombro-1.png",
+      "sizeBytes": 2827780,
+      "sha256": "396634a334039c19b7aff737980503a2cd1690ceca5f4a3d5b111e3d10505013",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/plate-hombro-1.png"
+    },
+    {
+      "path": "plate-hombro-2.png",
+      "sizeBytes": 2829111,
+      "sha256": "3bdaf7800e30f5ea7b4e76584b68204218013774e38979a97cf5a67ed6c89b9a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/plate-hombro-2.png"
+    },
+    {
+      "path": "plate-lecho-1.png",
+      "sizeBytes": 2675719,
+      "sha256": "5afedcd4b098522d9c378946abd79c8969aa2e99a4af6600dc117ee66f3c8516",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/plate-lecho-1.png"
+    },
+    {
+      "path": "plate-lecho-2.png",
+      "sizeBytes": 2686807,
+      "sha256": "49869fcb292ed4fb29a6283c381b3ac516cdb7eed604c6178eb2e06636002686",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/plate-lecho-2.png"
+    },
+    {
+      "path": "plate-mate.png",
+      "sizeBytes": 2649066,
+      "sha256": "0d6be555419557b5966a6ba0a5b63d25d4d49b651aadbdd01fc1925cb9cdfb78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/plate-mate.png"
+    },
+    {
+      "path": "plate-subido.png",
+      "sizeBytes": 2680652,
+      "sha256": "4977e6e626fb5b1fef96c5130d4ee8afc420d74efe60f5a4db86926078755916",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/plate-subido.png"
+    },
+    {
+      "path": "plate-v4.png",
+      "sizeBytes": 2649434,
+      "sha256": "e49c32ecd6505ea67328fe4f015050c58dce7b9e82b7d2dce268c97b5b74330c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/plate-v4.png"
+    },
+    {
+      "path": "revision-v4.png",
+      "sizeBytes": 1127505,
+      "sha256": "477904097a89a4d7cc74663e88ff2e39ff41cec3de86fe69d08f601805eb258b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/revision-v4.png"
+    },
+    {
+      "path": "vista-mate.png",
+      "sizeBytes": 710602,
+      "sha256": "05c0fa10a54d9f826c972c211521c37103e63c98c11c6cd2f39e5b514d5229d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/vista-mate.png"
+    },
+    {
+      "path": "zoom-capa.png",
+      "sizeBytes": 240672,
+      "sha256": "7438b06cd5d889b14156df8fe7eb5fa5e6a67bff4ec0d4ec8be898a334c13192",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/zoom-capa.png"
+    },
+    {
+      "path": "zoom-contraste.png",
+      "sizeBytes": 418146,
+      "sha256": "0c821344f92580eb45d709ef509950e52840d7d188792fbc88bba986ba0fed1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-23_v07-lecho-04-elegida/zoom-contraste.png"
+    }
+  ]
+}

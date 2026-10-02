@@ -1,0 +1,12 @@
+Image 1 is the original scene. Images 2, 3 and 4 are identity references of the same real man (Julio): image 2 is his face, images 3 and 4 show his real body and build.
+
+Edit image 1 and change ONLY the man on the LEFT (white shirt, navy trousers) so he is unmistakably the man in images 2, 3 and 4:
+- Face: his real facial proportions (width of the face, jaw and cheekbones), eye shape and spacing, eyebrows, nose, mouth, the shape, density and salt-and-pepper color of his full beard, his hairline and the texture and grey of his short curly hair, and his thin metal half-rim glasses as in image 2.
+- Body: his real build and proportions from images 3 and 4: height relative to the woman, shoulder width, chest, waist and the way his torso fills a shirt, arm and leg proportions.
+- Keep HIS clothing from image 1, not the clothing of the references: the same white shirt with sleeves rolled as in image 1, the same navy trousers, belt and wristwatch. Keep his walking pose, the open-hand gesture while he talks, and his smile toward the woman.
+
+Do NOT change the woman on the right in any way: face, hair, expression, camel blazer, white top, navy trousers and pose stay exactly as in image 1.
+
+Keep EVERYTHING else from image 1 exactly as it is: the stone wall, the large 3D efeonce logo on the wall exactly as it is (do not redraw, retype or move any letter or the ship symbol), the window, the plant, the bench, the blurred foreground, the framing, the crop and the warm daylight with its shadows.
+
+Photographic realism: a real photograph of real people, not a render. Skin shows irregular pores and fine facial hair with an even, healthy tone; no plastic smoothing, no beauty retouch. No new text, no new logos.

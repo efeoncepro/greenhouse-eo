@@ -1,0 +1,54 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/render.py:24: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world.use_nodes=True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/render.py:32: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name);m.use_nodes=True
+00:05.943  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/01-frente-palabra.png'
+00:11.758  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/02-tres-cuartos-palabra-asa.png'
+00:17.202  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/03-tres-cuartos-palabra-opuesto.png'
+00:22.909  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/04-perfil-asa.png'
+00:28.880  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/05-perfil-sin-asa.png'
+00:34.607  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/06-reverso-logo.png'
+00:40.394  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/07-tres-cuartos-logo-asa.png'
+00:46.042  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/08-tres-cuartos-logo-opuesto.png'
+00:52.824  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/09-cenital.png'
+00:58.021  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/blanco/10-base-inferior.png'
+01:04.180  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/01-frente-palabra.png'
+01:10.022  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/02-tres-cuartos-palabra-asa.png'
+01:15.677  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/03-tres-cuartos-palabra-opuesto.png'
+01:20.876  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/04-perfil-asa.png'
+01:26.134  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/05-perfil-sin-asa.png'
+01:31.332  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/06-reverso-logo.png'
+01:36.802  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/07-tres-cuartos-logo-asa.png'
+01:42.591  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/08-tres-cuartos-logo-opuesto.png'
+01:49.409  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/09-cenital.png'
+01:54.489  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/azul/10-base-inferior.png'
+02:00.552  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/01-frente-palabra.png'
+02:06.388  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/02-tres-cuartos-palabra-asa.png'
+02:12.171  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/03-tres-cuartos-palabra-opuesto.png'
+02:17.533  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/04-perfil-asa.png'
+02:22.742  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/05-perfil-sin-asa.png'
+02:28.074  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/06-reverso-logo.png'
+02:33.672  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/07-tres-cuartos-logo-asa.png'
+02:39.160  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/08-tres-cuartos-logo-opuesto.png'
+02:46.205  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/09-cenital.png'
+02:51.313  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/magenta/10-base-inferior.png'
+02:57.361  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/01-frente-palabra.png'
+03:03.497  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/02-tres-cuartos-palabra-asa.png'
+03:09.363  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/03-tres-cuartos-palabra-opuesto.png'
+03:14.782  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/04-perfil-asa.png'
+03:20.179  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/05-perfil-sin-asa.png'
+03:25.701  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/06-reverso-logo.png'
+03:31.380  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/07-tres-cuartos-logo-asa.png'
+03:37.071  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/08-tres-cuartos-logo-opuesto.png'
+03:43.955  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/09-cenital.png'
+03:49.188  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/rgba/naranja/10-base-inferior.png'
+Info: Saved as "taza-master.blend"
+Info: Saved as "taza-master.blend"
+Info: Saved as "taza-master.blend"
+Info: Saved as "taza-master.blend"
+Info: Packed 4 file(s)
+Info: Saved as "taza-master.blend"
+RENDER_FINISHED 40
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

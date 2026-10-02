@@ -1,0 +1,387 @@
+{
+  "template": "MethodHybridWorkforce",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "engine"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 200
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 290
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 150
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 650
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 27
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 600
+        },
+        "ladderTitleLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-title-left=1070px"
+        },
+        "ladderTitleTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-title-top=260px"
+        },
+        "ladderTitlePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-title-px=18px"
+        },
+        "ladderX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-x=1070px"
+        },
+        "ladderBase": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-base=900px"
+        },
+        "barWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-bar-width=170px"
+        },
+        "barGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-bar-gap=14px"
+        },
+        "barFrom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-bar-from=150px"
+        },
+        "barStep": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-bar-step=110px"
+        },
+        "barRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-bar-radius=14px"
+        },
+        "barPadTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-bar-pad-top=20px"
+        },
+        "barPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-bar-pad-x=18px"
+        },
+        "glassFrom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-glass-from=8%"
+        },
+        "glassStep": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-glass-step=7%"
+        },
+        "glassColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-hw-glass-color=#72ded8"
+        },
+        "numberPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-number-px=44px"
+        },
+        "labelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-label-px=20px"
+        },
+        "labelGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-label-gap=10px"
+        },
+        "baselineWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-baseline-width=722px"
+        },
+        "baselineStroke": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-baseline-stroke=2px"
+        },
+        "pathLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-path-left=1070px"
+        },
+        "pathTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-path-top=922px"
+        },
+        "pathPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-path-px=19px"
+        },
+        "pathWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-hw-path-width=760px"
+        }
+      }
+    },
+    "indicator": {
+      "selector": "[data-slot='indicator']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "example": "Fuerza de trabajo híbrida"
+        },
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 30,
+          "example": "¿Quién hace el trabajo?"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 10,
+          "example": "Personas"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 10,
+          "resolver": "gl-answer",
+          "example": "y agentes"
+        }
+      }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 150,
+        "maxLines": 5,
+        "overflow": "reject"
+      },
+      "example": "Diseñamos, activamos y operamos equipos donde personas y agentes comparten un trabajo medible. Las personas conservan la responsabilidad."
+    },
+    "ladderTitle": {
+      "selector": "[data-slot='ladderTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 45,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "La autoridad del agente crece por tramos"
+    },
+    "ladder": {
+      "selector": "[data-slot='ladder']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 4,
+        "maxItems": 4,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 22
+          }
+        }
+      },
+      "example": [
+        {
+          "label": "Leer y resumir"
+        },
+        {
+          "label": "Proponer"
+        },
+        {
+          "label": "Ejecutar con límites"
+        },
+        {
+          "label": "Actuar con aprobación"
+        }
+      ]
+    },
+    "path": {
+      "selector": "[data-slot='path']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 130,
+        "maxLines": 2,
+        "overflow": "reject"
+      },
+      "example": "Blueprint → primer equipo híbrido → operación híbrida → operación agéntica gestionada"
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Estrategia"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "top-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "department"
+        },
+        "scale": {
+          "type": "number",
+          "required": true,
+          "consumer": "validation-only",
+          "example": 1.25
+        },
+        "also": {
+          "type": "array",
+          "required": true,
+          "consumer": "validation-only",
+          "example": [
+            {
+              "label": "Agente IA",
+              "anchor": "bottom-end",
+              "action": "resize",
+              "participantKind": "department"
+            }
+          ]
+        },
+        "textPad": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "per-line"
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-baked-dark.svg"
+    }
+  }
+}

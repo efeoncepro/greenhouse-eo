@@ -39,7 +39,7 @@ Casos que encajan bien:
 
 - **Geo / locale routing**: detectar idioma o pais y redirigir/cookie (complementa el
   `getLocale()` que hoy resuelve por ruta).
-- **Rate limiting / escudo anti-abuso** en el edge (con un store edge, no PostgreSQL).
+- **Rate limiting / escudo anti-abuso** en el edge (con un store edge, no PostgreSQL). Excepción vigente: el límite volumétrico de `/api/public/**` NO vive aquí sino en el Firewall de Vercel, porque un contador del proxy es por instancia y no ve una ráfaga repartida ([Protección de Rutas Públicas](proteccion-rutas-publicas-y-conexiones.md), TASK-1876).
 - **A/B testing y rollouts por cookie**: asignar variante antes del render.
 - **Bloqueo por bot / IP / pais**, allow/deny lists.
 - **Security headers globales** (CSP, HSTS, `X-Frame-Options`) en un solo lugar.

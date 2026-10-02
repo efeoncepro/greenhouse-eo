@@ -1,0 +1,12 @@
+✔ voice is opt-in and fails unsupported or contradictory declarations (33.707292ms)
+✔ sphere follows final line baseline and AXIS optical kerning (0.198917ms)
+✔ Efeonce rejects square outline and solid CTAs without changing text or legacy plans (0.149958ms)
+✔ CTA brand aliases resolve to the canonical graphic-line tokens (0.0725ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 526.839958

@@ -1,0 +1,403 @@
+{
+  "version": "0.1",
+  "status": "candidate",
+  "note": "Catálogos de Marketing con Manzanitas (sólo MCM; complementa La órbita, nunca se mezcla con Glitch; TASK-1939). Una carpeta, dos catálogos: `catalogs` dice a cuál pertenece cada plantilla (manzanitas.catalog-membership@1) y `pieces` qué piezas de manzanitasRegister.pieces de AXIS pinta; `approval` sale del token (test de drift). El autor nunca elige plantilla: el mapper decide el contentType por la pieza del intent del contrato efeonce.manzanitas-register.",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "contentTypeTaxonomy": [
+    "mcm.cover.pizarra",
+    "mcm.cover.pizarra.response",
+    "mcm.cover.escena",
+    "mcm.step",
+    "mcm.data.apples",
+    "mcm.interior.escena",
+    "mcm.interior.lente",
+    "mcm.chart.ranking",
+    "mcm.chart.before-after",
+    "mcm.chart.parts",
+    "mcm.chart.per-hundred",
+    "mcm.chart.venn-3",
+    "mcm.chart.matrix-2x2",
+    "mcm.chart.funnel",
+    "mcm.chart.measure",
+    "mcm.chart.trend",
+    "mcm.dense.concept",
+    "mcm.dense.comparison",
+    "mcm.dense.steps",
+    "mcm.back.a",
+    "mcm.story.escena",
+    "mcm.story.close",
+    "mcm.blog.banner",
+    "mcm.youtube.thumbnail",
+    "mcm.youtube.close",
+    "mcm.podcast.cover"
+  ],
+  "selector": {
+    "map": {
+      "mcm.cover.pizarra": "CoverPizarra",
+      "mcm.cover.pizarra.response": "CoverPizarra",
+      "mcm.cover.escena": "CoverEscena",
+      "mcm.step": "StepPizarra",
+      "mcm.data.apples": "DataApples",
+      "mcm.interior.escena": "InteriorEscena",
+      "mcm.interior.lente": "InteriorLente",
+      "mcm.chart.ranking": "ChartVoice",
+      "mcm.chart.before-after": "ChartVoice",
+      "mcm.chart.parts": "ChartVoice",
+      "mcm.chart.per-hundred": "ChartVoice",
+      "mcm.chart.venn-3": "ChartVoice",
+      "mcm.chart.matrix-2x2": "ChartVoice",
+      "mcm.chart.funnel": "ChartVoice",
+      "mcm.chart.measure": "ChartQuestion",
+      "mcm.chart.trend": "ChartQuestion",
+      "mcm.dense.concept": "DenseConcept",
+      "mcm.dense.comparison": "DenseComparison",
+      "mcm.dense.steps": "DenseSteps",
+      "mcm.back.a": "BackCover",
+      "mcm.story.escena": "StoryEscena",
+      "mcm.story.close": "StoryClose",
+      "mcm.blog.banner": "BlogBanner",
+      "mcm.youtube.thumbnail": "YoutubeThumbnail",
+      "mcm.youtube.close": "YoutubeClose",
+      "mcm.podcast.cover": "PodcastCover"
+    }
+  },
+  "templates": [
+    {
+      "name": "CoverPizarra",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.cover.pizarra",
+        "mcm.cover.pizarra.response"
+      ],
+      "prototype": "cover-pizarra.html",
+      "slotsRef": "cover-pizarra.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "cover-pizarra",
+        "cover-pizarra-swipe-response"
+      ]
+    },
+    {
+      "name": "CoverEscena",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.cover.escena"
+      ],
+      "prototype": "cover-escena.html",
+      "slotsRef": "cover-escena.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "cover-escena"
+      ]
+    },
+    {
+      "name": "StepPizarra",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.step"
+      ],
+      "prototype": "step-pizarra.html",
+      "slotsRef": "step-pizarra.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "step-pizarra"
+      ]
+    },
+    {
+      "name": "DataApples",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.data.apples"
+      ],
+      "prototype": "data-apples.html",
+      "slotsRef": "data-apples.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "data-apples-of-ten"
+      ]
+    },
+    {
+      "name": "InteriorEscena",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.interior.escena"
+      ],
+      "prototype": "interior-escena.html",
+      "slotsRef": "interior-escena.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "interior-escena"
+      ]
+    },
+    {
+      "name": "InteriorLente",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.interior.lente"
+      ],
+      "prototype": "interior-lente.html",
+      "slotsRef": "interior-lente.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "interior-lente"
+      ]
+    },
+    {
+      "name": "ChartVoice",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.chart.ranking",
+        "mcm.chart.before-after",
+        "mcm.chart.parts",
+        "mcm.chart.per-hundred",
+        "mcm.chart.venn-3",
+        "mcm.chart.matrix-2x2",
+        "mcm.chart.funnel"
+      ],
+      "prototype": "chart-voice.html",
+      "slotsRef": "chart-voice.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "chart-ranking",
+        "chart-before-after",
+        "chart-parts",
+        "chart-per-hundred",
+        "chart-venn-3",
+        "chart-matrix-2x2",
+        "chart-funnel"
+      ]
+    },
+    {
+      "name": "ChartQuestion",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.chart.measure",
+        "mcm.chart.trend"
+      ],
+      "prototype": "chart-question.html",
+      "slotsRef": "chart-question.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "chart-measure",
+        "chart-trend"
+      ]
+    },
+    {
+      "name": "DenseConcept",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.dense.concept"
+      ],
+      "prototype": "dense-concept.html",
+      "slotsRef": "dense-concept.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "dense-concept"
+      ]
+    },
+    {
+      "name": "DenseComparison",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.dense.comparison"
+      ],
+      "prototype": "dense-comparison.html",
+      "slotsRef": "dense-comparison.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "dense-comparison"
+      ]
+    },
+    {
+      "name": "DenseSteps",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.dense.steps"
+      ],
+      "prototype": "dense-steps.html",
+      "slotsRef": "dense-steps.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "dense-steps"
+      ]
+    },
+    {
+      "name": "BackCover",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.back.a"
+      ],
+      "prototype": "back-cover.html",
+      "slotsRef": "back-cover.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "pieces": [
+        "back-cover-a"
+      ]
+    },
+    {
+      "name": "StoryEscena",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.story.escena"
+      ],
+      "prototype": "story-escena.html",
+      "slotsRef": "story-escena.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "pieces": [
+        "story-escena"
+      ]
+    },
+    {
+      "name": "StoryClose",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.story.close"
+      ],
+      "prototype": "story-close.html",
+      "slotsRef": "story-close.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "pieces": [
+        "story-close"
+      ]
+    },
+    {
+      "name": "BlogBanner",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.blog.banner"
+      ],
+      "prototype": "blog-banner.html",
+      "slotsRef": "blog-banner.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "pieces": [
+        "blog-banner-escena"
+      ]
+    },
+    {
+      "name": "YoutubeThumbnail",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.youtube.thumbnail"
+      ],
+      "prototype": "youtube-thumbnail.html",
+      "slotsRef": "youtube-thumbnail.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "pieces": [
+        "youtube-thumbnail"
+      ]
+    },
+    {
+      "name": "YoutubeClose",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.youtube.close"
+      ],
+      "prototype": "youtube-close.html",
+      "slotsRef": "youtube-close.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "pieces": [
+        "youtube-close"
+      ]
+    },
+    {
+      "name": "PodcastCover",
+      "kind": "social",
+      "owner": "efeonce-brand-studio",
+      "contentTypes": [
+        "mcm.podcast.cover"
+      ],
+      "prototype": "podcast-cover.html",
+      "slotsRef": "podcast-cover.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "pieces": [
+        "podcast-cover"
+      ]
+    }
+  ]
+}

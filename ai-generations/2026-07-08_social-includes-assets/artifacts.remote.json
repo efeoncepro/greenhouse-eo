@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-07-08T09:07:09.193Z",
+  "generatedAt": "2026-10-01T22:00:05.491Z",
   "run": "ai-generations/2026-07-08_social-includes-assets",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-08_social-includes-assets",

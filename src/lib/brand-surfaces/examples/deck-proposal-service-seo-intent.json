@@ -1,0 +1,57 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "proposal",
+  "recipe": "proposal-service",
+  "line": "engine",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Nuestra propuesta · SEO",
+    "question": "¿Cómo te encuentran?",
+    "answer": [
+      "Con método"
+    ]
+  },
+  "body": "Que te encuentren en Google y que la IA no te ignore: base técnica, autoridad temática y entidad, trabajadas y medidas como un sistema.",
+  "steps": [
+    {
+      "kicker": "Empieza aquí · sin costo",
+      "name": "Diagnóstico",
+      "desc": "Tu punto de partida en búsqueda y en IA: sin ese mapa no hay plan honesto."
+    },
+    {
+      "kicker": "Proyecto",
+      "name": "Base técnica",
+      "desc": "Rastreo, indexación, Core Web Vitals y datos estructurados."
+    },
+    {
+      "kicker": "On-Going",
+      "name": "Contenido y autoridad",
+      "desc": "Clusters por intención, landings que convierten, PR y link building real."
+    },
+    {
+      "kicker": "Greenhouse",
+      "name": "Reporte vivo",
+      "desc": "Tráfico calificado, share of voice y visibilidad en IA, en Greenhouse."
+    }
+  ],
+  "note": "No prometemos rankings. Reportamos lo que se mueve.",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+    "alt": "Un estratega SEO con el polo de Efeonce mira a cámara frente a un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita",
+    "focus": {
+      "xOfWidth": 1,
+      "yOfHeight": 0.5
+    }
+  },
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  }
+}

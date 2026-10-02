@@ -1,5 +1,23 @@
 # TASK-1901 — Efeonce Insights: evidencia más rica para más familias de gráfico
 
+## Delta 2026-09-26
+
+- **Preguntas abiertas resueltas por el operador (2026-09-26), con recomendación de la skill `seo-aeo`:**
+  1. **Consulta «de marca»:** se usa el predicado canónico `isBrandQuery` de
+     `src/lib/growth/seo/work-queue/cannibalization.ts` (etiqueta del dominio + un error de tipeo), el mismo de la cola
+     SEO, nunca una regla propia de Insights; más una lista corta de términos de marca declarados por organización.
+     Medido 2026-09-26: la etiqueta basta para Berel (`berel`, `pinturas berel`, `bereñ` ⇒ marca) y NO para Sky (token
+     `skyairline`: `sky airline`, `vuelos sky`, `sky` ⇒ no-marca). La composición agrega por consulta (sin la dimensión
+     página, por el doble conteo de sitelinks) y se declara «sobre consultas con texto» (GSC oculta las anónimas).
+  2. **Keywords del mapa de calor:** sólo las del set monitoreado con intención `target` (TASK-1659, «compromiso con el
+     cliente»), nunca todas las medidas ni las `opportunity`. Posición semanal desde la captura diaria de ranking, no
+     desde la posición promedio de GSC. Se produce sólo con ≥ 3 keywords `target`; si no, se omite con causa. Medido
+     2026-09-26: Berel tiene 31 keywords vigentes y 0 clasificadas `target`; Sky no tiene set. Clasificarlas es trabajo
+     operativo de la cuenta, no de esta task.
+
+- TASK-1888 complete con `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y `ops-worker`: como esta task no
+  tiene flag propio, lo que agregue llega a ediciones nuevas de producción con su release; el rollback es revert o flag OFF en ambos runtimes. — por trabajo en TASK-1888
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +42,7 @@
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-1888` (contrato editorial v2 en develop) — puede empezar su Discovery en paralelo
+- Blocked by: `none` (el contrato editorial v2 quedó completo y en producción el 2026-09-26)
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -91,16 +109,16 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md` (contrato v2, lectura por figura, matriz)
-- `docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md` (páginas de figura y regla de familia del render)
+- `docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md` (contrato v2, lectura por figura, matriz)
+- `docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md` (páginas de figura y regla de familia del render)
 - `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md` (qué revelaron las ediciones reales)
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- `TASK-1888`: contrato v2 (`ChartSpecV1` con `data`, `dimensionChannelIds`, `readings`, `essentials`), en develop.
-- `TASK-1889`: render por familia (`src/lib/efeonce-insights/render/figure-slots.ts`, `hasFigurePage`), en develop.
+- `TASK-1888`: contrato v2 (`ChartSpecV1` con `data`, `dimensionChannelIds`, `readings`, `essentials`), en producción desde 2026-09-26.
+- `TASK-1889`: render por familia (`src/lib/efeonce-insights/render/figure-slots.ts`, `hasFigurePage`), código en producción desde el release `0e87c7a443a2`.
 - Tablas `greenhouse_growth.seo_gsc_daily`, `greenhouse_growth.seo_rank_snapshots` (vía `seo_targets`) y
   `greenhouse_growth.grader_runs`, verificadas con datos de Berel el 2026-09-25.
 
@@ -180,7 +198,8 @@ Reglas obligatorias:
   - un día sin dato es un hueco (`null`), nunca cero; la media móvil no rellena días faltantes;
   - un tramo de posición se cuenta sobre el **mismo conjunto de keywords** en los dos períodos, y si el conjunto cambió se declara en `coverage`;
   - el puntaje de IA «anterior» es el de la última medición **dentro** de la ventana de comparación; si no hay, el medidor no se produce;
-  - la marca frente a sin marca queda fuera hasta que el operador decida la regla (Open Questions).
+  - la marca frente a sin marca queda fuera de esta task: la regla está decidida (Delta 2026-09-26), pero exige términos de marca por organización gobernados, que esta task de sólo lectura no crea.
+  - el mapa de calor sólo incluye keywords vigentes con intención `target`; con menos de 3, no se produce y la exclusión se declara.
 - Write-target allowlist: `N/A` — sólo lectura; esta task no escribe tablas
 - Tenant/space boundary: todo reader filtra por `organization_id` resuelto por la autorización de Insights (módulo `insights_v1`); `seo_rank_snapshots` se une por `seo_targets.organization_id`
 - Idempotency/concurrency: la recolección es pura sobre la ventana; misma ventana ⇒ mismos hechos (determinista para el `request_hash`)
@@ -238,7 +257,7 @@ Reglas obligatorias:
 
 ### Slice 3 — SEO: tramos de posición y keyword × semana
 
-- Reader dueño sobre `readRankEvolution` [verificar]: conteo de keywords por tramo (1–3, 4–10, 11–20, 21–50) en el período y en el anterior, sobre el mismo conjunto; y posición por keyword × semana de la ventana (hasta el tope de keywords prioritarias).
+- Reader dueño sobre `readRankEvolution` [verificar]: conteo de keywords por tramo (1–3, 4–10, 11–20, 21–50) en el período y en el anterior, sobre el mismo conjunto; y posición por keyword × semana de la ventana, desde la captura diaria de ranking, sólo para las keywords vigentes con intención `target` (TASK-1659); con menos de 3, el mapa de calor no se produce.
 - Productores: columnas por tramo (`bar_grouped`, `dimensionKind: 'bucket'`) y `heatmap` keyword × semana.
 
 ### Slice 4 — AEO: historial de mediciones del grader
@@ -255,7 +274,7 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Plantillas del informe y del deck para medidor y mapa de calor, y la regla de columnas por tramo del render (TASK-1902).
-- Composición marca frente a sin marca (necesita decisión del operador; ver Open Questions).
+- Composición marca frente a sin marca: regla decidida (Delta 2026-09-26); necesita términos de marca por organización gobernados (Follow-up).
 - Metas acordadas por cliente para SEO y AEO (función de producto nueva; Follow-up).
 - Conjuntos por consulta del grader (Venn, UpSet) y embudo de CRM (Follow-up de TASK-1888).
 - Reescribir ediciones ya selladas.
@@ -293,7 +312,7 @@ Tramos por defecto: 1–3, 4–10, 11–20, 21–50; «primera página» = 1–1
 
 ### Feature flags / cutover
 
-- Sin flag propio: todo va detrás de `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888, OFF). Con OFF, el contrato v1 no cambia.
+- Sin flag propio: todo va detrás de `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888, ON en staging y Production desde 2026-09-26). Con OFF, el contrato v1 no cambia.
 
 ### Rollback plan per slice
 
@@ -307,11 +326,11 @@ Tramos por defecto: 1–3, 4–10, 11–20, 21–50; «primera página» = 1–1
 
 1. Local: `preview-edition --editorial-v2 --plan-only` y composición completa de Berel y Sky.
 2. Staging: edición interna con el flag de TASK-1888 ON; revisión del operador.
-3. Producción por el control plane junto con TASK-1888/1889; edición interna revisada antes de compartir con clientes.
+3. Producción por el control plane (TASK-1888 y el código de TASK-1889 ya están en producción); edición interna revisada antes de compartir con clientes.
 
 ### Out-of-band coordination required
 
-- Decisión del operador sobre la regla de marca (Open Questions), sólo si se quiere la composición marca / sin marca.
+- La cuenta clasifica como `target` las keywords prioritarias de cada cliente (Berel: 0 de 31 hoy; Sky: sin set). Sin eso, el mapa de calor se omite con causa.
 - Ninguna coordinación externa más: los readers son internos y de sólo lectura.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -355,11 +374,10 @@ Tramos por defecto: 1–3, 4–10, 11–20, 21–50; «primera página» = 1–1
 
 ## Follow-ups
 
-- Composición marca frente a sin marca, cuando el operador decida la regla.
+- Términos de marca por organización (command gobernado + reader, extensión de `isBrandQuery` que usen la cola SEO e Insights) y, sobre eso, la composición marca frente a sin marca. Regla decidida el 2026-09-26.
 - Metas acordadas por cliente y por mes para SEO y AEO (dónde se cargan, quién las aprueba), que habilitan metas fuera de ICO.
 - Conjuntos por consulta del grader (Venn, UpSet) y embudo de CRM.
 
 ## Open Questions
 
-- ¿Qué consulta de Search Console cuenta como «de marca»? Opciones: lista de términos de marca por organización, o el nombre de la organización y sus variantes. Sin esta decisión, la composición marca / sin marca queda fuera.
-- ¿Las keywords del mapa de calor son todas las medidas o una lista de prioritarias acordada con el cliente? El canvas muestra 8 «prioritarias acordadas».
+- Ninguna. Las dos preguntas (regla de marca y keywords del mapa de calor) quedaron decididas por el operador el 2026-09-26; ver Delta 2026-09-26.

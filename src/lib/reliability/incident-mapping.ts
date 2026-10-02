@@ -139,7 +139,8 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'greenhouse_hiring'
   ],
   // TASK-1845 — Efeonce Insights: ediciones congeladas (schema greenhouse_insights, eventos insights.*).
-  insights: ['insight_edition', 'insight_report', 'greenhouse_insights', 'insights.edition', 'efeonce insights']
+  insights: ['insight_edition', 'insight_report', 'greenhouse_insights', 'insights.edition', 'efeonce insights'],
+  brand_render: ['brand_render', 'greenhouse_brand', 'brand.render', 'glitch', 'graphic-line']
 }
 
 /**
@@ -173,6 +174,8 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   growth: 16,
   // TASK-1845 — Efeonce Insights: consume growth/delivery, pero un incidente insights_* es suyo.
   insights: 17,
+  // TASK-1921 — render de piezas de marca: un incidente brand_render_* es suyo, no del motor genérico.
+  brand_render: 16,
   home: 15,
   // TASK-773 — sync infraestructure: prioridad media-baja. Si un incident
   // matchea ambos `outbox` y `finance`, finance gana (el outbox es el medium,

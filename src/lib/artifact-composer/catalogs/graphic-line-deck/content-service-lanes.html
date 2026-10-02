@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · nuestros servicios Salesforce</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-service-lanes` (surface deck, tema oscuro, TASK-1942). «¿Qué hacemos en Salesforce? Todo el
+      ciclo.»: seis carriles de la práctica en vidrio (3 × 2), cada uno con el ícono oficial de su producto, y las cuatro
+      fases del ciclo unidas por un tramo en el acento. A la derecha, la plataforma de luz chica: vacía o con la mascota
+      del partner (slot opcional, sujeto a la autorización escrita de Salesforce). Sin bajada, sin nota y sin selección.
+      Referencia: DeckSalesforceServicios (SF8-servicios).
+    -->
+    <main class="gl-slide gl-ls gl-csl" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-csl-lanes" data-slot="lanes">
+        <li class="gl-ls-glass gl-csl-lane">
+          <div class="gl-csl-head">
+            <img class="gl-csl-icon" data-slot-field="icon" alt="" />
+            <div>
+              <p class="gl-csl-title" data-slot-field="title">Ventas y revenue</p>
+              <p class="gl-csl-product" data-slot-field="products">Sales Cloud</p>
+            </div>
+          </div>
+          <p class="gl-csl-desc" data-slot-field="description">Pipeline, forecast, territorios y la siguiente acción de cada oportunidad.</p>
+        </li>
+      </ol>
+
+      <ol class="gl-csl-phases" data-slot="phases">
+        <li class="gl-csl-phase"><span class="gl-csl-phase-text"><span data-slot-field="number">01</span> · <span data-slot-field="label">Diagnóstico y arquitectura</span></span></li>
+      </ol>
+
+      <figure class="gl-csl-mascot" data-slot="mascot">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Nuestros servicios Salesforce</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Qué hacemos en Salesforce?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">Todo el ciclo</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

@@ -1,24 +1,12 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-09-23T12:26:17.704Z",
+  "generatedAt": "2026-10-01T21:59:56.434Z",
   "run": "ai-generations/2026-07-05_task-1345-hero-interface",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-05_task-1345-hero-interface",
   "totalBytes": 8133812,
   "fileCount": 5,
   "files": [
-    {
-      "path": "UI-1-site-layers.png",
-      "sizeBytes": 1170774,
-      "sha256": "f7cb49f47d5baafce310bd5147b5e4885a465ac26342abd779f1dd69ba99af65",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/UI-1-site-layers.png"
-    },
-    {
-      "path": "UI-2-working-interface.png",
-      "sizeBytes": 1146904,
-      "sha256": "8ef919038246f4a7f97ac490582cd988330b980609b5d61b6e91a54130db3c60",
-      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/UI-2-working-interface.png"
-    },
     {
       "path": "_verify/desktop-1440.png",
       "sizeBytes": 2514978,
@@ -36,6 +24,18 @@
       "sizeBytes": 809693,
       "sha256": "b2521d89dbb0d1bf412d5f856e97c7929b7a77ea3859b569b048fd88aac8114f",
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/_verify/mobile-390.png"
+    },
+    {
+      "path": "UI-1-site-layers.png",
+      "sizeBytes": 1170774,
+      "sha256": "f7cb49f47d5baafce310bd5147b5e4885a465ac26342abd779f1dd69ba99af65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/UI-1-site-layers.png"
+    },
+    {
+      "path": "UI-2-working-interface.png",
+      "sizeBytes": 1146904,
+      "sha256": "8ef919038246f4a7f97ac490582cd988330b980609b5d61b6e91a54130db3c60",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/UI-2-working-interface.png"
     }
   ]
 }

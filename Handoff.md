@@ -1,12 +1,69 @@
 # Handoff activo
 
-**Línea gráfica «La órbita» (25/09):** canónica y componible por intención (AXIS 0.2.6, `pnpm creative:orbit:render`); [índice](docs/operations/brand-graphic-line/README.md). Pendiente: prueba sin logo y firma A/B.
+**CMP-004 por servicios (02/10):** [CDR-012](docs/campaigns/decisions/CDR-012-cmp004-reorientacion-por-servicios.md) — 8 pilotos N2 certificados (`graphicLine`, `fde62f05d`); pendientes y artefactos en el CDR §6. Sin push.
 
-**Marketing Studio (26/09):** lectura por MCP en producción y verificada. Release `0e87c7a443a2` (PR #240), [TASK-1890](docs/tasks/complete/TASK-1890-marketing-studio-agent-ready-contract.md) y [TASK-1891](docs/tasks/complete/TASK-1891-marketing-studio-mcp-federation.md) complete. Gateway `958c9de30` (fix #20) sirve `00061-sbc` con el provider encendido; migración correctiva `20260926071321910` (política del cliente de canje). La migración ya está aplicada, pero su archivo sólo está en develop: sale a main con el próximo release. Sin probar en vivo: la denegación a una persona sin capability (requiere un segundo login). Tras un deploy fallido del gateway, revisar `spec.traffic`.
+**Registro cine sin consultor (02/10):** [TASK-1926](docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md) delta b en develop (último `00e53ef53`), AXIS en vivo. Dos pruebas ciegas: las sesiones llegan solas usando `cine-reviewer`; barra de luz recalibrada contra las aprobadas. Pendiente: veredicto del operador sobre `ai-generations/2026-10-02_prueba-ciega-cine-2/` y el orquestador idempotente. [Casebook](docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).
 
-**Insights (25/09):** [TASK-1888](docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) code complete, rollout pendiente (flag OFF, migración aplicada, [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) sin deploy; sin push). Plan de rollout: arquitectura §14.8.
+**Traje biónico de Nexa (02/10):** [TASK-1940](docs/tasks/complete/TASK-1940-nexa-bionic-suit-reference-kit.md) complete: kit sellado y publicado, catálogo sólo Nexa/cine, marcas armadas, NX7d canonizada. Pendientes (OneDrive, NX7d con titular, pose repetida de Nexa, Sparks en el publicador) en el delta de cierre de la task.
 
-**Insights diseño (25/09):** [TASK-1889](docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md) Slices 1–5 code complete en develop (sin push): catálogos A4 y deck del canvas aprobado, páginas de figura por familia, «Lo esencial», portada con logo privado; legado v1 retirado. Canvas 20/21 ≤ 1 % + excepción Deck-Agrupadas aprobada; gate insights 27/27 a 0 px; `ui:quality` PASS. Ediciones reales Berel/Sky compuestas en local (PDFs en `.captures/insights-preview/`, no versionados). **Falta:** aprobación del operador de esos PDFs y de las piezas derivadas, push, staging con `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888) y release por el control plane (el Job `artifact-worker` es compartido). [Dossier](docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).
+**Workbench:** Lab v6 publicado. Íconos: `af6f5e2` local, publicación pendiente. SKY local: 76 badges LEFT, 24 adaptaciones v6, 394 pruebas PASS; aceptación visual pendiente. [Estado](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md). Efeonce ID diferido.
+
+**Deck SEO/AEO — Search Visibility 360 (30/09):** [TASK-1949](docs/tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-canonization.md) in-progress, code complete parcial: Slices 1 y 4 hechos (catálogo a 100 recetas, planes golden, docs y skills); Slice 2 (plantillas) y 3 (AXIS) en otras sesiones. Datos del deck tal cual por decisión del operador; logos de clientes con TASK-1937.
+
+**DataForSEO CLI (30/09):** [TASK-1948](docs/tasks/complete/TASK-1948-dataforseo-url-keyword-relevance-cli.md) complete local, CLI 1.1.0: URL/host, JSON/CSV, techo y resume. [Evidencia](docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md): 96 tests; prueba corregida MX para Berel USD 0,0284 reconciliados, 20 keywords/2 páginas y resume USD 0. Guías/skills sincronizadas; sugerencias con ruido editorial, CL separado. Typecheck global con WIP ajeno; sin push/deploy.
+**Creative Workbench (30/09, actualización):** el harness activo está en `creative-workbench`; PR 11 (lotes) y PR 12 (círculos) integrados en main `2bb761a`. Skills Codex/Claude y documentación de SKY se publican en una rama aislada para no arrastrar commits ajenos de develop. Cargar [skill](.codex/skills/efeonce-creative-workbench/SKILL.md) y [estado fechado](.codex/skills/efeonce-creative-workbench/references/state-continuity.md). **Siguiente:** recomponer en corridas nuevas las dos muestras antiguas afectadas, completar revisión visual y flujo IA. Efeonce ID diferido en [TASK-1952](docs/tasks/to-do/TASK-1952-creative-workbench-efeonce-id-integration.md); sin AUTH paralelo. No ejecutar sync total heredado ni alterar CLIs Greenhouse. El corte anterior del PR 3 borrador queda superado; CI/código no acreditan deploy del broker ni IA habilitada.
+
+**HubSpot Agent CLI / MCP (29/09):** CLI 0.15.0 instalada; OAuth `hubspot whoami` en Efeonce/Kortex `48713323` con lectura CRM live positiva. El conector MCP es el carril alternativo para operación directa, con identidad y permisos propios. `pipelines list` pide service key; HubSQL devolvió 403; `properties create` no ofrece `--dry-run` en esta versión. [Runbook](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) y skills espejo actualizados. ANAM `19893546` no quedó autenticado por esta sesión CLI; verificar portal antes de cualquier operación.
+
+**Deck de práctica Salesforce (29/09, cierre):** [TASK-1942](docs/tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md) **complete** (94/94 con plantilla, AXIS `v0.3.36`, insignia autorizada). Pendiente externo: autorización de Anthropic para Claude/Claudeforce en SF16 (TASK-1937). Siguiente: serie HubSpot (TASK-1943).
+
+**AI Visibility Report y módulos de correo en AXIS (29/09):** AXIS `v0.3.38` publicado (`c92160b`; antes `v0.3.30`, `26097c5`): contrato `efeonce.ai-visibility-report` 0.1.0, `efeonce.email-modules` 0.1.0 (pie, CTA principal, agenda y bloque de marca por línea; «Suscribirme» retirado; el correo de Insights es una aplicación, no la plantilla), `graphic-line-orbit` 0.5.0 con el **recorrido desde las 12 en toda medida** (decidido por el operador), graphic-line 0.13.0 y brand-assets 0.4.6 (PNG de correo; logo y eslogan separados). Lab `/references/ai-visibility-report/` y `/references/email/`. Greenhouse fija 0.3.37 y **el adapter de la órbita (`scripts/creative/layout-compiler/graphic-line.mjs`, sólo acepta 0.3.1) ya da 0/7 en `develop`** desde `9289cab0c`; lo arregla el bump de [TASK-1944](docs/tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md) o [TASK-1938](docs/tasks/to-do/TASK-1938-ai-visibility-report-pdf-la-orbita.md). **Decide el operador:** propósito del correo de Insights frente a la política de TASK-1764 (el contrato exige agenda, preferencias y baja en todo pie).
+
+**Naming Efeonce AEO (29/09):** el [ADR aceptado](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) fija **Efeonce AEO** → **Efeonce AEO Assessment** → **Efeonce AI Visibility Report**. Documentación y skills se alinean conservando aliases técnicos/históricos; el copy de los runtimes públicos sigue pendiente de edición y readback. Search Visibility 360 permanece como oferta SEO+AEO.
+
+TASK-1863: staging; main retenido.
+
+**Avatares y firmas del equipo (29/09, noche):** los seis con bomber sobre polo piqué y fondo oscuro con el halo de la órbita (sin anillo); caras medidas con Vision. GCP `gs://efeonce-group-axis-public-media/team/avatars/v1/{1080,800}/`; firmas v3.1 en `…/email-signature/v3.1/people/` y paquetes en OneDrive `Alineación/6. Marca/Kit media/Firmas/`. Repo: `squad/` y `public/images/greenhouse/team/` a 800 px; referencias de identidad en `ai-generations/_identidad-equipo/`. Luis fuera del roster y del dashboard de Efeonce. **Firma, opción C (29/09):** el avatar con órbita mide 130 px (la de área, 106 px), a la altura del bloque de texto; AXIS `v0.3.35` (`e22051d`) publicado y fijado en Greenhouse; 9 firmas, páginas «Copiar mi firma» y zips regenerados (fotos: `firmas/fotos-orbita.mjs`). El operador avisa al equipo que vuelva a copiar. **Fondos de Teams (29/09):** nueve aprobados en la oficina moderna de Efeonce (logo 3D como product placement, órbita sutil, formato `teams` y logo 3D en el catálogo de `foto:prompt`), en OneDrive `Kit media/Fondos de Teams/` y en la página del kit de cada persona; portadas de LinkedIn/YouTube y avatar de redes parqueados (canvas https://claude.ai/artifact/72TN9B5x5NEz34kevCJQn4; el operador pidió portadas por servicio, sin decidir). **Kit del avatar (29/09):** página de descarga por persona en `gs://efeonce-group-axis-public-media/team/kit/` (`kit/paginas-kit.mjs`), carpetas de OneDrive `Kit media/<Nombre>/` con avatar y zip de firma (lo viejo en `Viejo/`) y aviso por TeamBot 1:1 + EO Team. **Pendiente:** congelar el gate visual deck-axis (declarado en BASELINE_DELTAS 2026-09-29 (s); lo congela esta sesión cuando la de Salesforce termine sus láminas; la deriva de Chromium desde `0323fb933` también va ahí) y el LinkedIn de cada firma.
+
+**Manzanitas sin decisiones abiertas (29/09, tarde):** AXIS `v0.3.29` publicado con autorización (tokens/contracts 0.3.29, contrato 0.3.0, graphic-line 0.11.0: `closeCopy`, `teamPeople`, Trazo `republicar`/`enviar`, `slogan.widthEmByWord`). Greenhouse lo fija (`2c95e60b2`). El equipo real entra a las fotos de MCM: [roster](docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md), seis identidades nuevas en `PERSONAS` aprobadas por el operador. **La ropa la decide la línea de la pieza** (noche): hoodie en Servicios creativos, bomber o softshell en las líneas de negocio, para todo el equipo; `foto:prompt` lo exige con `linea` en la ficha. Falta foto actual de Humberly y Luis.
+
+**Manzanitas en el Composer (29/09):** [TASK-1939](docs/tasks/complete/TASK-1939-manzanitas-artifact-composer-catalog.md) **complete** (carruseles aprobados por el operador; `pnpm test` completo y `pnpm build` en verde sobre `814255694`, CI 9/9): `pnpm manzanitas:compose` compone carruseles (PDF + PNG), story, blog, YouTube y pódcast desde el intent del contrato; 18 plantillas / 26 piezas, gate `--catalog=manzanitas` congelado (sección `2026-09-29 (r)`). Decisión abierta del operador: el eslogan de los cierres sigue la regla del 29/09 (debajo del logo, 64 %) y con logo de 400 px sólo Voice conserva la palabra en el acento (~460 px la conservaría en todas). Hallazgos para un patch de AXIS en la task. Todo bump de `axis-tokens` corre también `pnpm manzanitas:tokens --check`.
+
+**Manzanitas en AXIS (28/09):** [TASK-1936](docs/tasks/complete/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md) **complete**. Publicado con autorización del operador: `v0.3.26` (tokens 0.3.26 `manzanitasRegister`, contracts 0.3.24, brand-assets 0.4.1, graphic-line 0.10.0 `/charts`) y el parche `v0.3.27` (contracts 0.3.27, contrato 0.1.1: el carrusel abre con su portada y cierra con su contraportada). En el mismo push salió `v0.3.25` de Glitch. AXIS `main` `6a1a912`; Lab https://axis.efeonce.org/references/manzanitas/. Greenhouse **no** fija estas versiones aún: la sesión de Glitch se ofreció a fijarlas (el par es tokens 0.3.26 + contracts 0.3.27). Pendiente de terceros: el e2e del deck del Lab espera 69 recetas y hay 78 (de TASK-1934; el CI de AXIS no corre e2e).
+
+**Glitch Flash (28/09):** primer Glitch lanzado con la nueva línea (Flash · Claude Sonnet 5.5: 4 redes vía Metricool + post 251941 en el blog). AXIS `v0.3.24` publicado; Greenhouse lo consume y el Composer compone el Flash (en `origin/develop` hasta `24b165816`, CI 9/9 verde). **Cierre de pendientes (noche):** ruta productiva TASK-1921 acepta el Flash (`c43862008`); muletilla del video como dato (`video.closingLine`), licencia `press` gobernada sólo en el Flash y numeración contra lo publicado — `pnpm glitch:editions`: última #17, **próxima semanal #18** (`05e75f0ed`); Content Factory con `kind: glitchDrop`, botones, caption de embed, tabla stripes y fix `wp_slash()` del write path (`c6f076e9f`). **AXIS 0.3.25 publicado** (29/09, junto al release de Manzanitas); Greenhouse fija 0.3.28 (`44f8db3f0`) y `glitch.css` lee `trail.contexts` (`76376274a`). **Pendiente del operador:** (2) taller de motion: rama local `feat/glitch-flash-motion` (`8061c93`, `ce63091`) con `closingLine` y el Flash en motion — PROPUESTA sin aprobar; el manifiesto Flash de Greenhouse hoy rechaza `video`, decidir cuál manda; (3) artifact-worker staging con plantillas `Flash*` + smoke real. Bitácora: [`2026-09-28-glitch-flash-sonnet-55-production-method.md`](docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md).
+
+**Insights emisión/envíos (28/09):** `INSIGHTS_ISSUANCE_ENABLED` está **ON en Vercel Production** (valor exacto `true`) en `greenhouse-onfkul43q` / `dpl_CGuQvQgbJR3UmSjPbertT3FHXg3T`, Ready y con alias `greenhouse.efeoncepro.com`. Canary secuencial sólo sobre Greenhouse Demo: ecosystem verificó `insed-5cbe87ef…` `ready_for_review` + `deck_pdf` completado (`irun-5995b21e…`), y la sesión humana App de Julio emitió con HTTP 200; readback ecosystem `issued`. No se tocó ninguna edición de cliente real. La condición de audiencias de EPIC-046 P01 quedó cubierta por TASK-1852 (personas y servicios definidos); resta apertura humana. [TASK-1848](docs/tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) sigue in-progress: sharing ON; delivery y schedules OFF.
+
+**Insights web en Think (28/09):** [TASK-1875](docs/tasks/complete/TASK-1875-efeonce-insights-shared-web-render-think.md) **complete**. Informe live en producción (`think.efeoncepro.com/insights/r/<token>`) y muestra pública para clientes (`/insights/muestra`); sharing ON en producción con canary verde; WAF con excepción de Think. Pendiente fuera de la task: el próximo release de Greenhouse lleva `InsightWebModelV1` 1.1 (hoy en staging). Idea del operador en evaluación: recomendación contextual de cross-selling en el informe (no carrusel), sin task todavía.
+
+**Rutas públicas / conexiones PG (28/09):** [TASK-1876](docs/tasks/in-progress/TASK-1876-public-route-connection-exhaustion-guard.md) rollout de staging completo y verificado (WAF sin drift, alerta `num_backends > 85`, `roles/monitoring.viewer`, ráfaga: 20×404 + 10×429 del borde, pico 26 → 6 en 1 min). **Próximo paso ≥ 2026-10-05:** revisar 7 días de logs de la regla de producción en Vercel Firewall y pasarla a `enforce` ([manual §3](docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md)); eso resuelve ISSUE-174. Excepción de Think transferida a TASK-1875.
+
+**DataForSEO (28/09):** TASK-1935/TASK-1651-A: [evidencia preservada](docs/operations/agent-context-history/handoff/2026-09.md). TASK-1651-B no iniciada.
+
+**Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) en staging (flag ON, 6 catálogos + Insights verdes); federación en efeonce-mcp#22 sin merge; no promover a main.
+
+**Composer `--freeze` (28/09):** sólo acepta la sección nueva sin sellar de `BASELINE_DELTAS.md` ([runbook §5](docs/operations/runbooks/composer-visual-gate.md)). Gate global rojo en 59 frames (ISSUE-122).
+
+**Deck «La órbita» (28/09):** TASK-1927–1929 y TASK-1934 complete (78 recetas, AXIS `v0.3.23`). [TASK-1930](docs/tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md) in-progress: `bindDeckSlots` + `--bind` en `develop`; montos/equipo esperan TASK-1417/1418; ningún deck usa evidencia interna y el muro pide 9 logos (decisiones 28/09). Siguen 1931–1933.
+
+**Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
+
+**Glitch en el Composer (27/09):** [TASK-1923](docs/tasks/complete/TASK-1923-glitch-artifact-composer-catalogs.md) complete en local (`pnpm glitch:compose`).
+
+**Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/complete/TASK-1922-glitch-axis-franchise-token-contract.md) complete (AXIS `v0.3.12`).
+
+**La órbita (26/09–01/10):** [índice](docs/operations/brand-graphic-line/README.md); perfiles sociales aprobados 01/10 (§10.1.1), sin publicar; Sparks: TASK-1941 complete. Pendiente: 5 preguntas del operador y TASK-1926.
+
+**Registro cine + taller (27/09):** [registro cine](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (ads 9:16/4:5 en prueba); repo taller [`efeonce-brand-workshop`](docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) + [TASK-1925](docs/tasks/to-do/TASK-1925-brand-workshop-migration.md).
+
+**Marketing Studio (26/09):** TASK-1890/1891/[1893](docs/tasks/complete/TASK-1893-marketing-studio-original-asset-store-media-worker.md)/[1896](docs/tasks/complete/TASK-1896-marketing-studio-observability-restore.md) complete en producción (`92002873ced9`, PR #243). Pendiente: denegación live sin capability (1891).
+
+**Marketing Studio — estrategia y agentes (26/09):** ADR de [estrategia](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) y [agentes híbridos](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) `Accepted`; TASK-1905–1916 to-do. Delegación `act`: [TASK-1917](docs/tasks/to-do/TASK-1917-efeonce-id-agent-run-delegation-act.md).
+
+**Insights (26/09):** [TASK-1888](docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) **complete**: contrato editorial v2 en producción (flag ON en Vercel staging/Production y `ops-worker-00719-gbm`, gateway v1.9.0, canary sintético `insed-f5768172…` con plan v2). Rollback = flag OFF en los dos runtimes (`FEATURE_FLAG_STATE_LEDGER.md`). Siguen TASK-1889 (catálogos) y TASK-1903 (agente redactor).
+
+**Insights diseño (26/09):** [TASK-1889](docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) complete en producción; primeras ediciones Berel/Sky verificadas. Emitir/compartir OFF; siguen TASK-1901/1902.
 
 **ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
 cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
@@ -28,6 +85,8 @@ SKY V17: companions Motion/Audio.
 **Fotografía:** [canon](docs/operations/brand-photography/README.md) aprobado; reserva 2 abierta.
 
 **CTA:** [corte](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#1910-regresión-y-mutantes-cómo-leerlos): tramo 16 local; novena sin informe, mutantes 81/175 parciales y P10 intermitente. No más rondas.
+
+**CTA color (25/09):** [política por campaña](docs/architecture/EFEONCE_ADVERTISING_CAMPAIGN_COLOR_POLICY_DECISION_V1.md) optativa local; 39 tests, 14 verificaciones, 13 regresiones idénticas y 4 candidatas CMP-004 reproducidas. Revisión visual del operador pendiente; tipografía/espaciado sin implementar. [Evidencia](docs/audits/social/2026-09-25-cmp004-typography-grouping-review.md).
 
 [EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): revisión adversarial aplicada; ADR Proposed, tasks to-do; sin runtime/bono.
 
@@ -65,15 +124,13 @@ beta, permiso, campaña, conexión ni write. Verificar elegibilidad por cliente 
 
 **Contacto:** TASK-1801 cerrada; [alcance y evidencia](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 
-**Creative/social 14/09:** AXIS `v0.2.5` publicó `supportingTagline` y selección colaborativa; Greenhouse fija
-los packages y `pnpm creative:layout` los adapta a texto/objeto/grupo. El harness agrega el SVG URL Bubble con
-blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-creative`. Globe/otros runtimes:
-`pending adapter`; tipografía: `trial`; selección: `candidate`.
+**Creative/social 14/09:** `pnpm creative:layout` adapta `supportingTagline` y la selección colaborativa (templates en
+`efeonce-advertising-creative`; Globe: `pending adapter`).
 [Fiestas Patrias/Muertos](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights:** 1845/1846/1848 en producción (emisión/IA OFF; flags 1848 OFF), gateway 1.7.0; 1849/1875/1876 abiertas. **TASK-1847:** en producción 24/09 (`ebb9212a32ce`); falta canary de render; [evidencia](docs/tasks/in-progress/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md).
+**Efeonce Insights (estado actualizado 28/09):** generación, render, editorial v2, IA, sharing y emisión están ON en Production; delivery y schedules siguen OFF. TASK-1875 está complete; 1849/1876 siguen abiertas. **TASK-1847:** complete y en producción desde 24/09 (`ebb9212a32ce`), con renders productivos verificados.
 Estado vivo: arquitectura §14 y la skill `efeonce-insights`.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
@@ -86,13 +143,7 @@ issues y el [contrato ATS](docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_
 `ISSUE-173`/`TASK-1872` (consumer Phase A), `TASK-1873`/`1874` (intake y Application 360), seis CV en cuarentena
 de `EO-OPN-0675`, readback del flag `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` y reader submissions↔postulaciones.
 
-**Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
-**no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
-`seo-aeo/references/competitor-methodologies-2026-09.md` (nuevo). `ai_optimization` sigue fuera del allowlist.
-Las 4 preguntas quedaron decididas el mismo día: `TASK-1870` (rotación SERP, costo cero) y `TASK-1871`
-(screening de toxicidad) en `to-do`; disavow descartado; gate de `rank_scale` ya en el repo. **Abierto:**
-`ISSUE-170` — el link gap del prospecto puede colapsar por intersección AND, con experimento definido y
-sin medir. Decisión y evidencia: `docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md`.
+**Revisión DataForSEO (11/09):** [investigación](docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md). TASK-1870/1871 en to-do; ISSUE-170 pendiente. El allowlist vigente está en la skill; [contexto histórico](docs/audits/platform/evidence/task-1863/context-history.md).
 
 **Portafolio de landings (2026-09-11, documental):** `EPIC-047` ordena las landings del sitio público en `Rank`;
 cuatro cerradas por el operador (1799, 1358, 1351, 1352). Decisiones pendientes en el epic.
@@ -108,46 +159,7 @@ medir la respuesta íntegra, score v3) y `TASK-1868` (P2: probes de `llms.txt`/`
 HTML de un SPA por archivo real + detector de lenguaje sensible por substring). La capacidad gobernada del panel queda
 en `TASK-1861` Delta (d).
 
-**Trendjacking «Nuestro Duo» (2026-09-11, operación):** pieza 4:5 + Short 9:16 (Seedance 2.5) programados vía
-Metricool en la marca Efeonce Group: Threads 11-09 12:30 · Instagram 11-09 19:00 · LinkedIn página 12-09 11:00 · YouTube
-Short 12-09 12:00 (todos `PENDING`; **falta confirmar publicación**). Skills `social-media-studio`, `copywriting`,
-`greenhouse-ai-image-generator` y `motion-design-studio` actualizadas con los aprendizajes. Detalle e ids:
-`docs/operations/social/2026-09-11-iphone-duo-trendjack.md`.
-
-**Vacantes en LinkedIn (2026-09-11, operación):** 4 vacantes vivas programadas vía Metricool (perfil del operador +
-página Efeonce, 11:00 Chile; **falta confirmar publicación**). Pendientes: ficha de `EO-OPN-0009` sin "caso ficticio" ·
-Careers sin UTM por postulación. Detalle: `docs/operations/hiring/2026-09-11-linkedin-vacancy-distribution.md`.
-
-**Performance & Commerce Distribution (2026-09-10, documental; `Proposed`, no autoriza venta):** ADR
-`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md` + ficha + Pricing Integrity Pack `hypothesis_only` + market
-update 2026-09-10 + PDR-022 (spoke `/servicios/performance-marketing`). La capability tiene dos motions (Demand & Commerce ·
-B2B Pipeline), los canales son cobertura y programmatic va vía partner con cláusula de transparencia. Niveles al piso de 45%:
-USD 2.400 / 5.900 / 11.800 al mes. El costo del Performance Lead (USD 5.500) es hipótesis: el catálogo no tiene el rol.
-Registry: diez relaciones nuevas `No iniciado`. Pendientes con dueño: retiro de `EFG-003` (asignado a Wave, bajo el
-piso), costo del lead, overhead y piso (Finance) · posición sobre datos first-party bajo la Ley 21.719, vigente el
-2026-12-01 (Legal) · verificar Google Partners y cerrar términos con Real Audiences, partner programático seleccionado por el CEO
-(fees, cláusula de transparencia, brand safety, CTV, ABM y certificación de trader; Commercial) · G1: dos
-Diagnostics pagados en 90 días, uno por motion · TASK ui-ux de la landing, sin crear. Sin runtime ni push.
-Canales emergentes: ChatGPT Ads `selectivo` donde existe (LATAM: sólo BR/MX; Chile no), X Ads bajo pedido, Perplexity
-`no disponible`. **Landing: `TASK-1865`** (to-do, ui-ux/flow, UI ready no; reservada como 1864 y renumerada porque la
-tomó en paralelo la task del MCP autosuficiente) con wireframe, flow, motion, dirección "La señal" y brief SEO/AEO. La
-legacy `/servicio-gestion-campanas-publicitarias/` (`242862`) muestra contadores en cero y un claim de Google/Meta
-Partners no verificado en producción; el owner decidió no parcharla: la página se construye desde cero y la legacy sale
-con 301. Investigación Semrush por país completada (`docs/audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md`):
-Chile busca "performance marketing", PE/MX/CO "publicidad digital", CO además "pauta", US en inglés (página aparte,
-follow-up). Title y copy ledger ajustados; FAQ a catorce.
-
-**Product Design 360 (2026-09-10, modelado y canonizado; oferta `Proposed`, no autoriza venta):** business model
-V1.1 + ficha `docs/services/wave/product-design-360.md` + ADR `EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`: capability de
-oficio con dos ofertas por comprador (producto → Product Design 360 · sitio público → Web Experience 360), siete lanes
-con accesibilidad primero; se venden lanes, nunca horas ni pantallas. `creative-practice` corregido: Superside mínimo
-USD 15.000/mes (decía ~5.000, error 3×). Landing `TASK-1859` creada (to-do, UI ready no; no se indexa hasta
-`Commercially approved`). **Colisión de ID resuelta:** la landing de Trade Marketing & BTL, que usó `TASK-1859` en
-paralelo, se registró como `TASK-1860` (`a2081e4f1`); `TASK-1859` es la landing de Product Design 360 y no
-cambió. Pendientes con dueño: G1 demanda (Commercial) · D7 loaded cost chileno de un
-senior product designer y piso de margen por lane (Finance) · IP del design system, datos de research y marco chileno
-de accesibilidad (Legal) · nombre público D1 (Strategy) · Calculadora de Capacidad (wedge, sin task). **BP9** (Head of Design in-house) agregada a `13_icp` como persona
-candidata: su plan de validación —≥ 5 conversaciones con Heads of Design— valida también el copy de la landing.
+**Archivadas el 02/10 (release develop→main):** entradas del 09–11/09 (Trendjacking «Nuestro Duo», vacantes LinkedIn, Performance & Commerce Distribution, Product Design 360, mapa de contenidos Notion, canales propios, social 09/09) en [2026-09](docs/operations/agent-context-history/handoff/2026-10-02-release-compaction.md).
 
 **TASK-1858 — conciliación bancaria ago–sep 2026 (2026-09-10, in-progress; Slices 1/2/3/5 hechos):** release
 `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` `released` 20:06Z (PR #233, run `34523159501`, un intento,
@@ -184,27 +196,6 @@ intactos. Para cerrar faltan la muestra steady por sujeto 2026-09-14→retiro y 
 No volver a correr revoke/cleanup.
 Lecciones: runbook §Diseño de la corrida.
 [Evidencia y alcance](docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md).
-
-**Sistema de contenidos Notion (2026-09-10, mapeado / sin mutaciones):**
-[mapa canónico](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md) de Pilares JTBD + Content Hub +
-Calendario + Wiki, con IDs y schema. Corrige `PDR-020` a rev 1.5: los Pilares JTBD son el eje temático
-canónico y las franquicias son ortogonales; `LinkedIn Julio` es canal aparte. Tres fracturas medidas: dos bases de Calendario con schema idéntico (100 filas de histórico vs 66 a
-futuro) que parten la evidencia de velocidad; **0 de 66 filas del calendario vigente declaran Pilar
-JTBD**; y el Content Hub no tiene propiedad de destino Think/WordPress (`Enlace` en 5 de 41). Pendiente
-del operador: autorizar los cambios propuestos, en orden — etiquetar Wiki, poblar Pilar JTBD, agregar
-Destino, luego schema del calendario, y por último decidir el corte de calendarios (el único que puede
-romper histórico). Nada escrito en Notion.
-
-**Canales propios Efeonce (2026-09-10, decisión cerrada / ejecución no autorizada):** seasonalities conservadas
-como línea propia de marca (rev 1.4): son temporadas con ventana por mercado, NO efemérides; hogar Instagram,
-sends+saves, LinkedIn recibe argumento y no caption. Plan 2026–2027 sin cambios de alcance.
-[PDR-020](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) rev 1.2 — rol y catálogo por
-canal, franquicias con canal-hogar, vocero Julio Reyes. Propagado a `TASK-1802`, `PDR-003/004/005/019`, roadmap,
-context pack y diez archivos de skills espejados. Pendiente: 7 decisiones, entre ellas canonical de video (bloquea
-TASK-1802 y YouTube) y el plan estacional 2026–2027. Nada producido ni publicado.
-
-**Social Efeonce, 09/09:** [13 piezas y skills](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
-Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cierre documental sin cambios Notion.
 
 **EPIC-046 / TASK-1852 (09/09):** Production `released`; [evidencia y pendientes](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
 PR #231/main `5726ce9d90`, orquestador `34416904936`; gates y watchdog verdes; excepción pause auditada.
@@ -354,96 +345,17 @@ tras drenar esa carrera. No existe todavía un nuevo canary humano directo compl
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-**MCP gateway — cartel del servidor, 2026-09-05 — DESPLEGADO:** `efeonce-mcp` `815df9b` en producción,
-revisión `efeonce-mcp-gateway-00036-5wc`. El gateway declara `title`/`websiteUrl`/`icons` y sirve UN ícono
-(isotipo blanco sobre placa navy opaca, sin `theme`, sin radio horneado). Front door verificado en vivo:
-`/icon-512.png` 200 `image/png` con bytes idénticos al asset del repo y sin challenge de auth;
-`/.well-known/oauth-protected-resource` 200; `POST /mcp` sin token 401 (fail-closed intacto);
-`/icon-512-dark.png` 404; `auth.efeonce.org/readyz` 200 (el piloto de TASK-1836 no se tocó). El deploy llevó
-sólo estos commits: la revisión anterior `00035-bhd` estaba construida desde `d7469d7`, su padre exacto. Sin
-impacto visible: ningún cliente Claude renderiza `icons` todavía. Razones:
-[ADR](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) §Delta 2026-09-05.
+Notas del 02–05/09 archivadas en [2026-09](docs/operations/agent-context-history/handoff/2026-09.md). Siguen abiertas: TASK-1829/1830 (rollout pendiente; magic link muerto en prod), TASK-1349 (Finance), TASK-1814 y TASK-1815.
 
-**Berel, 2026-09-04:** Playbook y feedback de septiembre incorporados a la skill espejo, sin tocar
-artículos, assets ni Drupal. Fuentes, decisiones y drift: `berel-content-production/SOURCES.md`.
+## 2026-09-30 — Deck SEO/AEO: docs y skills (TASK-1949 Slice 4, Claude)
 
-**SEO/AEO y Berel, 2026-09-04:** método de informes documentado en
-[modelo operativo](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) y skills espejo.
-[Auditoría agosto](docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) guardada y verificada en
-[Notion](https://app.notion.com/3d139c2fefe781ba8928eef8dadfb219) y Markdown. El run EO-GRUN-00049
-no es línea base comercial válida: categoría amplia y probes MCP/API falsos positivos. Corregir instrumento
-y repetir medición sigue pendiente; este cambio solo documenta el método y el caso.
-[Informe PDF A4](docs/audits/seo/berel-agosto-2026/BEREL_INFORME_AGOSTO_2026_A4.pdf): 55 páginas revisadas,
-desempeño de Berel y pie institucional completo. [Estándar de informes](docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md)
-y skill `report-studio` creada para Claude/Codex: investigación primaria, siete módulos, plantillas y preflight probado. HTML queda como insumo; cobertura On-time explícita y exportación reproducible. Entrega local, sin envío al cliente.
+Norma §4.6 v1.17, catálogo v1.11, manual v1.12, funcional 2.8, arquitectura 1.6 y cinco skills con espejo. Decisión del operador aplicada (datos tal cual, delta b de la task). `brand:compose` del documento SEO falla hoy en `section-cine` (`gl-px-bodyTop`) por el Slice 2 sin commitear.
 
-**Globe, 2026-09-03:** caller externo pausado; protección deploy sólo local, sin commit/push/deploy.
-Platform debe promoverla y medir ahorro. Reactivación/evidencia:
-[runbook TASK-1807](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
 
-**RELEASE 2026-09-04 `9100bbd2765d` — `released`** (greenhouse-eo-45; run `33893120972`; PR #221; manifest `9100bbd2765d-d5fae366-…`). EPIC-044 en producción: `auth-server` vivo (readyz 200, JWKS 2 kid, rev `auth-server-00005-pk8`, `oauth:false`); lane 1631 verificado (200/400/401); Vercel READY; watchdog `ok` 5/5 (ops-worker y auth-server change-gated, árbol idéntico). Post-release: `AUTH_SERVER_JWKS_URL` en Vercel Production+staging + redeploy; environment `efeonce-auth` registrado `draft` (`pnpm auth-server:register-issuer-environment`). Fix en develop: el watchdog ya clasifica el change-gate del `auth-server` (espejo + test de paridad). Pendientes: señales `identity.external_binding.*` en prod con sesión humana; retiro de llave v1 (eo-0f); `AUTH_SERVER_OAUTH_ENABLED` ON en staging con environment `active`. Detalle: ledger de tiempos.
+### AEO X-Ray — demo publicada y cierre documental (2026-09-30)
 
-🔴 **TASK-1830 — el correo del magic link está MUERTO en producción** (hallado 2026-09-05 por el canary nuevo): `RESEND_API_KEY is not configured`. Declaré el `*_SECRET_REF` sin montar el secreto, y `sendEmail` usa el cliente SÍNCRONO. Corregido en `services/auth-server/deploy.sh` (commit `38fbfaeeb`), **pendiente de redeploy del auth-server**. La respuesta HTTP es 202 idéntica por anti-enumeración, así que nadie se habría enterado hasta que una persona real reclamara. Gate nuevo: `pnpm auth-server:person-auth:canary` (22 ok en vivo; exit 2 = incompleto, 1 = rojo). El resto del carril autenticado quedó verificado en vivo por primera vez.
+Think `be8d484`: demo publicada y aceptada. [Dossier](docs/think/aeo-xray-implementation-dossier-2026-09-30.md), [manual](docs/think/radiografia-aeo-manual.md) y [kit](docs/think/aeo-xray-nuevo-cliente.md).
 
-**TASK-1830 (EPIC-044 U03) — `code complete, rollout pendiente`** (sesión greenhouse-eo-18, 2026-09-04, develop; commits `7459d96d4` · `937087404` · `db2622ba9` · `5b57b73f9`). Autenticación de personas externas sin contraseñas detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`: sesión propia `__Host-efeonce_auth` que implementa el `SubjectSessionPort` que dejaba a `authorize` en `login_required`, magic link (selector/verificador, 15 min, un uso, anti-enumeración con piso de latencia), passkeys (credenciales descubribles, contador anti-clonación), TOTP de step-up y recuperación por re-invitación. 8 tablas `greenhouse_auth` aplicadas y verificadas contra PG real; capability `identity.auth_person.revoke` + `POST /api/admin/auth-server/persons/revoke`; 3 señales `auth.person.*`. **Infra creada:** llave KMS simétrica `auth-server-totp-envelope` (HSM, rotación 90 d) — la de firma es EC y no cifra. **Desviaciones declaradas:** ledger propio `person_auth_attempts` (el del portal tiene CHECK de NextAuth y GRANT a otro rol) y `sha256`+timing-safe en vez de bcrypt (evita 300-800 ms de CPU en un endpoint no autenticado). **Próximo paso:** prender el flag en staging — exige `AUTH_SERVER_OAUTH_ENABLED=true` + environment `efeonce-auth` en `active`, si no la sesión se crea pero `authorize` responde `environment_inactive` — verificar que el correo sale de verdad por Resend (la respuesta es idéntica por anti-enumeración: un correo muerto NO se reporta solo) y ejercitar passkey en dos navegadores. Gate: `pnpm auth-server:person-auth:smoke`. TASK-1835 (pantallas Efeonce ID, sesión greenhouse-eo-45) consume el contrato del flujo maestro §5.bis.
+TASK-1950/1951: integración Greenhouse pendiente, sin promoción; `sample_` no acredita grant. Deal 65352884246 en `presentationscheduled` verificado; correo redactado, envío no verificado.
 
-**TASK-1829 (EPIC-044 U02) — `code complete, rollout pendiente`** (greenhouse-eo-45; commits `263ee3a74` · `19d1658de` · `d31e6e913`). Superficie OAuth del emisor detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (ya en producción por el release de arriba): metadata, CIMD primario + DCR compat, authorize/token/revoke/introspect/consent, JWT ES256 con `gv`, 7 tablas `greenhouse_auth` y 2 capabilities aplicadas, 3 señales `auth.oauth.*`; contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Decisión del operador: `localhost` como loopback sólo para clientes públicos. Próximo paso: flag ON en staging (environment `efeonce-auth` a `active`, metadata validada, clientes CIMD/DCR de prueba); persona real exige TASK-1830 (`SubjectSessionPort`). `pnpm build` de producción no se corrió localmente (CI/Vercel lo construyeron). No se corrió el canary de Globe OAuth (hibernado).
-
-**EPIC-044 (2026-09-03) — authorization server propio** (ADR `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`; WorkOS descartado). Estado por task en `docs/tasks/**/TASK-1828*`…`TASK-1834*`. **TASK-1631 (U04)** en producción desde el release 2026-09-04 (run 33893120972); próximo paso: el operador lee las 4 señales en `/admin/operations` prod; TASK-1829 emite tokens y activa el environment; TASK-1831 consume el reader. Paridad registry↔catálogo: 4 capabilities sembradas el 2026-09-25; el resto sigue como task aparte.
-
-Release SEO/D4 (2026-09-13): PR #235, run `34754161855`, manifiesto `released`; [auditoría](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
-
-Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
-skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
-
-Valentina (03/09): misma persona/usuario/member, correo nuevo y elegibilidad SSO verificados; login
-interactivo no probado. Último día anterior 30/05/2026, EO-CENG-0001 ending; EO-CENG-0002 activo desde
-20/08, bruto mensual 530.973 (450.000 líquidos). Agosto 12/31: EO-CPAY-0002 pending_readiness,
-neto 174.193,55, única falta boleta; sin obligación/orden nueva. Recuperación y evidencia abajo.
-
-TASK-1349 **EN PRODUCCIÓN + recovery aplicada** (2026-09-03; release `62356c9b7fd4`, run `33779259694`, flag
-`WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON prod+staging). Recovery por los commands canónicos, autorizada
-en chat: **Felipe** revisado `relationship_ended` con causal `termination` declarada por el operador → approved →
-scheduled → executed; member inactivo, compensación cerrada al 02/06, mayo `full_period`, junio `exclude_from_cutoff`,
-julio+ `exclude_entire_period`. **Luis Reyes y María Camila Hoyos**: lifecycle cerrado (relación employee terminada
-al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Snapshot inicial, sustituido por el cierre Maggie/María Fernanda de arriba: unresolved **1** (Maria Fernanda,
-draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprovisioned_without_case 0.
-
-🔴 **«Colaboradores fantasma» (2026-09-03 ~17:50Z, resuelto):** la pre-nómina de septiembre mostró seis
-`Colaborador <uuid>` sin contrato: sujetos sintéticos de mi live test con compensación abierta, que `derivePolicy`
-trataba como salida decidida (`identity_only` ejecutado → `full_period`). Compensaciones cerradas por command,
-`hasDecidedExitFact` ya excluye `identity_only`, el live test limpia al terminar; fix en PR #220 (`main`).
-
-**Valentina Hoyos (2026-09-03) — cerrado:** restauración gobernada aplicada (clave `valentina-lifecycle-reentry-restore-2026-09-03`, no repetir ni usar el SQL retirado); release `33795564223` released. Detalle: [auditoría](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) · [runbook](docs/operations/runbooks/workforce-reentry-recovery.md). Pendiente: Finance de Felipe (obligación junio + SII) sin command de anulación; UI TASK-1814.
-
-**Delta Claude 19:40Z — PR #220 CERRADO por Codex** (run `33795564223`, manifest released 19:30:49Z; ver arriba).
-Attempts 1 y 2 `aborted` por cancelaciones cruzadas: el webhook empareja por `target_sha` antes que por
-`workflow_run_id`, así que cancelar un run duplicado aborta el manifest ajeno (bug a tasquear). **Purga sintética
-APLICADA 18:37Z:** 12 members `TASK-1349 live …` (253 filas, `scripts/workforce/purge-task1349-live-subjects.sql`);
-265→253 members, 8 activos, reales. Barrido documental 20:10Z + [TASK-1815](docs/tasks/to-do/TASK-1815-release-webhook-reconciler-run-id-matching.md).
-
-Offboarding: la [auditoría inicial](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md)
-es antecedente, no estado vigente. [TASK-1349](docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md)
-conserva pendientes Finance; [TASK-1814](docs/tasks/to-do/TASK-1814-offboarding-case-review-recovery-ui.md) posee
-la UI aún sin implementar. No repetir las recoveries cerradas para probar ese recorrido.
-
-Cierre documental 03/09: tres subagentes sincronizaron Workforce/Talent, Contractors/Finance y Release/QA;
-root integró identidad, arquitectura, tareas e índices. [Cobertura y límites](docs/audits/payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
-Bug independiente de correlación de releases por SHA/run ID sigue pendiente; el runbook documenta mitigación
-con un coordinador y lectura de intentos/eventos, sin declararlo corregido.
-
-Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
-creada `to-do`, sin implementar. Codex 0.152.0 rechazó discovery; metadata pública revalidada a las 22:51Z.
-La [auditoría](docs/audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md) identifica scopes sin cualificar
-al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueba discovery. El plan B histórico
-de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
-no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
-
-## 2026-09-16 — TASK-1846 COMPLETE: render durable de Efeonce Insights en producción
-
-Release `917491fd02e4` (PR #237, run `35154555317`, manifest `917491fd02e4-9231b87b-20da-43c3-abce-4348dccdda99`
-`released` 22:02:41Z, un solo intento; watchdog `ok` 6/6, primer Job `artifact-worker` en el orquestador).
-`INSIGHTS_RENDER_ENABLED` ON en Vercel Production (redeploy `greenhouse-d6l33zils`) + Job + `ops-worker`. Gateway
-`efeonce-mcp` v1.6.0 desplegado (`00054-n78`). Canary productivo: render `202` → dispatcher automático → `completed`.
-Siguiente de EPIC-045: `INSIGHTS_ISSUANCE_ENABLED` sigue OFF; `report_pdf`/`web` en TASK-1847/1848. Detalle: la task
-(complete), ledgers de flags y tiempos, y la skill `efeonce-insights`.
+Diferenciador comercial reconocido: [experimentar capacidad antes de contratar](docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md); canon `context/09` y skills espejo Agency/Brand/SEO. Sistematización operativa aún propuesta.

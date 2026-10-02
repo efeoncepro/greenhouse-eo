@@ -1,0 +1,96 @@
+{
+  "profiles": [
+    {
+      "profile_id": "gprf-e7ab006a-541c-41f5-a265-e6640a42a46d",
+      "public_id": "EO-GAVP-0002",
+      "brand_name": "Efeonce",
+      "website_url": "https://efeoncepro.com",
+      "market": "Chile",
+      "locale": "es-CL",
+      "status": "active",
+      "recurring_regrade_enabled": false,
+      "recurring_regrade_cadence": "monthly",
+      "recurring_regrade_next_at": null,
+      "competitors_declared": [
+        "Cebra"
+      ],
+      "historic_runs": 10
+    },
+    {
+      "profile_id": "gprf-9a2b088b-9435-4c55-9e22-284ea28cf8a9",
+      "public_id": "EO-GAVP-0017",
+      "brand_name": "Efeonce Group",
+      "website_url": "https://efeoncepro.com",
+      "market": "CL",
+      "locale": "es-CL",
+      "status": "active",
+      "recurring_regrade_enabled": false,
+      "recurring_regrade_cadence": "monthly",
+      "recurring_regrade_next_at": null,
+      "competitors_declared": [
+        "Cebra"
+      ],
+      "historic_runs": 1
+    },
+    {
+      "profile_id": "gprf-c61bd27d-66ab-4bb4-8185-2c523046c48b",
+      "public_id": "EO-GAVP-0018",
+      "brand_name": "Efeonce",
+      "website_url": "https://efeoncepro.com",
+      "market": "CL",
+      "locale": "es-CL",
+      "status": "active",
+      "recurring_regrade_enabled": false,
+      "recurring_regrade_cadence": "monthly",
+      "recurring_regrade_next_at": null,
+      "competitors_declared": [
+        "Revops Latam"
+      ],
+      "historic_runs": 1
+    },
+    {
+      "profile_id": "gprf-2f24e9ca-b7ec-4128-af6e-b9b1feefdbf5",
+      "public_id": "EO-GAVP-0020",
+      "brand_name": "Efeonce Group",
+      "website_url": "https://efeoncepro.com",
+      "market": "Chile",
+      "locale": "es-CL",
+      "status": "active",
+      "recurring_regrade_enabled": false,
+      "recurring_regrade_cadence": "monthly",
+      "recurring_regrade_next_at": null,
+      "competitors_declared": [
+        "cebra",
+        "mind",
+        "wolfbcp",
+        "rompecabezas"
+      ],
+      "historic_runs": 2
+    }
+  ],
+  "markets": [
+    {
+      "count": 0
+    }
+  ],
+  "waits": [
+    {
+      "state": "active",
+      "wait_event_type": null,
+      "wait_event": null,
+      "count": 1
+    },
+    {
+      "state": "idle",
+      "wait_event_type": "Client",
+      "wait_event": "ClientRead",
+      "count": 13
+    },
+    {
+      "state": "idle in transaction",
+      "wait_event_type": "Client",
+      "wait_event": "ClientRead",
+      "count": 1
+    }
+  ]
+}

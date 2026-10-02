@@ -1,7 +1,9 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
+> **Nomenclatura vigente (2026-09-29):** el nombre comercial de la capacidad es **Efeonce AEO**; el diagnóstico público se llama **Efeonce AEO Assessment** y entrega el **Efeonce AI Visibility Report**. **AI Visibility Grader** permanece como nombre técnico de este manual, comandos y rutas hasta una migración de runtime separada. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.16 · **Ultima actualizacion:** 2026-09-11 por Claude (panel competitivo multi-marca: procedimiento, trampas del input y límites medidos; notas de corrección sobre `/score` manual y formato de `market`)
+> **Version:** 1.17 · **Ultima actualizacion:** 2026-09-28 (TASK-1863: catálogo, idioma, resolución de categoría y configuración comparable)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
@@ -19,7 +21,20 @@ Antes de una corrida real:
 4. no cargues el costo total de `ops-worker` a un run: es un worker compartido;
 5. documenta la evidencia en [`AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md`](../../audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md).
 
-## Estado actual del rollout (2026-06-29)
+## Estado y contrato vigente
+
+TASK-1863 quedó verificada en staging el 2026-09-28; `main` sigue en espera. Consulta las revisiones,
+readbacks y limitaciones en la [auditoría de rollout](../../audits/platform/2026-09-28-task-1863-verification.md).
+Para configurar países, idiomas, aliases, competidores y lotes, usa el
+[manual de mercados](configurar-mercados-aeo.md). Google recibe país numérico e idioma resueltos;
+no fuerces inglés ni nombres libres de ubicación. El command acepta ISO o nombre reconocido y
+valida el locale antes del gasto. El contrato se comparte entre ejecución inline y encolada.
+
+La base y el worker son compartidos. Los lotes explícitos están habilitados en Vercel staging; el
+flag multimer­cado del worker sigue OFF para retener la recurrencia secundaria hasta main. Un run
+partial puede entregar un informe honesto: revisa cobertura por motor antes de repetirlo y gastar.
+
+## Antecedente del rollout (snapshot 2026-06-29, no usar como inventario vigente)
 
 > **Nota 2026-09-11:** este bloque es el snapshot del 2026-06-29 y no se reescribió entero. Medido el 2026-09-11:
 > staging y producción **comparten `greenhouse_growth`** (un token publicado desde staging renderiza en el hub
@@ -139,12 +154,13 @@ pnpm staging:request /api/admin/growth/ai-visibility/runs/<runId>
 
 Campos del body POST: `brandName`/`market`/`locale`/`category` (requeridos), `mode` (`light`/`full`/`internal_audit`), `runKind` (default `smoke`), `websiteUrl`/`competitorsDeclared`/`onlyProviders`/`discoveryOnly`/`idempotencyKey` (opcionales). Respuesta: `{ run, observationCount, idempotentHit, costGuardTripped }`. Con `idempotencyKey` repetido NO reejecuta (devuelve el run previo).
 
-> **Nota 2026-09-11 (trampas medidas del input):** `market` va como **nombre** (`"Chile"`), no como ISO: el ISO se
-> interpola crudo en los prompts ("…en CL"), y fuera de CL/MX/CO/PE/US un ISO cae a Estados Unidos en el provider de
-> Google AI. `category` debe resolver en la taxonomía (`taxonomy/catalog.ts`). La ruta **no acepta `businessModel`**:
-> sin set activo en el perfil, el run sale con el pack genérico de 7 preguntas (`gn01`–`gn07`). El perfil se identifica
-> por marca + mercado + locale y sus competidores quedan fijos desde el primer run. Detalle y resto de trampas en
-> [Panel competitivo multi-marca](#panel-competitivo-multi-marca).
+> **Contrato TASK-1863:** `market` acepta ISO (`"CL"`) o nombre reconocido (`"Chile"`); ambos
+> resuelven la misma ubicación y etiqueta del prompt. `locale` se valida por separado. La ruta
+> no acepta `businessModel`: el command lo deriva de la categoría resuelta cuando falta, con
+> el flag de arquetipos vigente; una categoría ambigua conserva las guardas y no fuerza agencia.
+> Para perfiles organizacionales, edita aliases/competidores por los commands de mercados y ejecuta
+> el lote por perfil; no renombres una marca para evitar una configuración anterior.
+> Los cambios se aplican a runs futuros; los snapshots publicados permanecen inmutables.
 
 ### 4. Puntuar un run (normalización + score — TASK-1227)
 
@@ -533,16 +549,20 @@ curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' \
   citadas.
 - La presencia de descubrimiento se mide sólo en las preguntas que no nombran marca (en el caso SKY, las preguntas 1–8).
 
-### Trampas del input (reglas duras)
+### Trampas del input (contrato vigente desde TASK-1863)
 
-| Campo / tema | Regla | Qué pasa si no |
+| Campo / tema | Regla | Consecuencia |
 | --- | --- | --- |
-| `market` | Va como **nombre** (`"Chile"`), no como ISO. | El ISO se interpola crudo en los prompts ("…en CL"); el provider de Google AI acepta `location_name`, y fuera de CL/MX/CO/PE/US un ISO cae a Estados Unidos. |
-| `category` | Debe resolver en `taxonomy/catalog.ts` ("aerolinea de pasajeros" es alias exacto de `sector:passenger_airlines`). | La etiqueta canónica ("Aerolineas de pasajeros", sin tilde) aparece en los prompts sólo si el set usa `{{category}}`; el set curado la evita escribiendo "aerolínea(s)" literal. |
-| `businessModel` | La ruta admin **no lo acepta**. | Sin set activo en el perfil sale el pack genérico de 7 preguntas (`gn01`–`gn07`). |
-| Perfil | Se identifica por **marca + mercado + locale**; los competidores quedan fijos desde el primer run (no hay command para editarlos). | Un nombre ya usado reusa el perfil viejo: "SKY Airline"/Chile/es-CL resolvía un perfil antiguo con `blog.skyairline.com` y Flybondi; por eso el caso usó "SKY". |
-| Nombres de marca | Coincidencia **literal**, palabra completa, sin mayúsculas y **sin alias**. | Usa "LATAM" (no "LATAM Airlines") para contar ambas formas y "SKY" (no "SKY Airline"). "Gol" es palabra común en español (riesgo bajo en respuestas de aerolíneas). |
-| `{{competitor}}` | Usa sólo el **primer** competidor declarado. | Se descarta si la lista de competidores está vacía. |
+| `market` / `locale` | ISO o nombre reconocido; país e idioma son independientes. | País desconocido o locale no soportado se rechaza antes del gasto; Cuba produce skip Google explícito. |
+| `category` | Debe resolver en `taxonomy/catalog.ts`; el gate conserva su flag. | Define la etiqueta y el prior de modelo cuando éste no se suministra. No copies una categoría de agencia para otra marca. |
+| `businessModel` | La ruta admin directa no lo acepta; los commands conservan un modelo explícito o derivan el ausente de la categoría. | Con arquetipos ON, una aerolínea usa preguntas B2C; un modelo desconocido conserva el pack neutral. |
+| Perfil y competidores | Configura el mercado del perfil organizacional y sus competidores por commands. | Los competidores y aliases quedan congelados por run; los perfiles legacy activos se preservan. |
+| Nombres de marca | Usa aliases explícitos y el `matchMode` adecuado (`word_ci` / `word_cs`). | No renombres la marca para forzar matching. `Gol` puede distinguirse de `gol` con `word_cs`. |
+| Tendencias | Compara la misma marca, aliases, dominio, categoría, mercado, idioma y policy; revisa versión del pack. | Cambiar identidad inicia otra serie. Cambiar competidores elimina delta competitivo y overall. |
+| `{{competitor}}` | Usa sólo el primer competidor declarado. | Se descarta si la lista de competidores está vacía. |
+
+Las observaciones del panel de septiembre conservan la configuración que tenían al ejecutarse.
+Los aliases o mercados agregados después no reescriben ese caso histórico.
 
 ### Límites (declararlos siempre)
 

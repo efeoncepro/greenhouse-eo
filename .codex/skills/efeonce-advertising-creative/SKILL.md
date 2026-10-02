@@ -29,10 +29,12 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    `motion-design-studio`; para copy, con `copywriting`; para marca Efeonce, con `efeonce-brand-studio`.
    Si una de esas skills ya inició el encargo, no la vuelvas a cargar ni reinicies el brief.
    En piezas con Nexa, usa la identidad humana fotorrealista confirmada el 2026-09-24 y su set de ocho vistas
-   de polera gris en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`, resuelto con
+   de polera gris en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` (si no está en disco,
+   `pnpm ai-gen:pull` esa carpeta; nunca regenerarla), resuelto con
    `foto:prompt`. La polera es una referencia neutral, no vestuario obligatorio. Las poses OneDrive guían gesto
    y cuerpo, no el rostro; el set sintético previo no es ancla facial.
    Si la pieza muestra a Julio, usa las 11 referencias aprobadas de `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`
+   (rehidratarlas con `pnpm ai-gen:pull` si faltan)
    y sus seis ángulos en `set-identidad/angulos/`; consulta `refs-aprobadas/MANIFIESTO.json` y resuelve la vista
    con `foto:prompt`. No uses `julio-ap-02.png` (composición publicitaria) ni mezcles fuentes y descartes con
    el set aprobado. Canon: [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
@@ -41,7 +43,8 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
 6. **Para paid media, scroll-stop, hook/hold, cinematic ads o híbridos**, carga primero
    [palancas visuales y medición](references/paid-visual-attention-playbook.md): biblioteca de doce
    recursos, recetas por formato, diccionario de métricas y experimentos. Declara hipótesis, palanca
-   dominante, control y KPI antes de producir. Para Efeonce conserva el registro A/B/C y el pipeline de foto.
+   dominante, control y KPI antes de producir. Para Efeonce conserva el registro A/B/C y el pipeline de foto
+   (el registro cine, sólo en su alcance y hoy **en prueba** para publicidad: [§Registro cine](#registro-cine-en-publicidad--en-prueba-2026-09-27)).
    `Cinematic` es tratamiento; `thumb-stop` es una ratio custom con fórmula, no un estilo ni garantía.
    Estáticos: hook temporal de video N/A; CTR es respuesta, no atención. La
    [evidencia medida](references/ad-creative-evidence-2026.md) es su hermano y aporta lo que el playbook
@@ -171,6 +174,14 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    Si la pieza usa selección activa o presencia multiplayer, no dibujes cursores con coordenadas decorativas:
    declara un `AxisCollaborationSelectionIntent`, resuélvelo con `efeonce.collaboration-selection` y entrega el
    manifest `axis.collaboration-selection-composition.v1` al adapter de la superficie.
+   Si el texto seleccionado cierra con la esfera de la línea gráfica (respuesta o titular de marca propia), la
+   selección, las marcas de corte y los cursores miden la palabra **con** la esfera: es parte del texto, nunca queda
+   afuera (operador, 2026-09-26; `target.bounds` en el contrato 0.3.0, [manual §6](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)).
+   Íconos en una pieza de marca propia: sólo de la iconografía canónica de «La órbita» (Trazo o Plastilina según la
+   línea de la pieza), pintados con `resolveIcon` y con el grupo pasado por `auditIconGroup`; nunca dibujados ni
+   generados dentro de la pieza ([criterio](../efeonce-graphic-line/references/iconography.md)).
+   Un KV con un objeto protagonista puede usar la **Plastilina en volumen** (D24, 2026-09-27): el PNG con alfa de
+   `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`), uno por pieza, ≥ 160 px, nunca regenerado ni en un grupo.
 4. **Diseña contraste.** Prueba peso, ancho, tamaño, leading, tracking, cortes y densidad juntos. ExtraBold no
    es un default; una cursiva o Guttery larga tampoco. El contraste útil puede venir de peso, escala, espacio,
    color, posición o tiempo, pero cada capa debe conservar una función.
@@ -185,6 +196,82 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    tipográficas, provenance y resultado del gate. Distingue prueba producida, revisada, aprobada, programada,
    publicada y medida.
 
+### Vía pública de marca Efeonce: DOOH y pDOOH por superficie (2026-09-27)
+
+Para piezas de **marca propia** en vía pública, la composición es por superficie: norma
+[`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
+§4.2 (DOOH) y §4.3 (pDOOH), página «DOOH · pDOOH» del
+[canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina
+«Guía · cómo componer …») y guía AXIS `docs/agent-composition/surfaces/dooh-pdooh.md` (en `main` de AXIS;
+[Lab](https://axis.efeonce.org/references/surfaces/dooh-pdooh/)). Intent con `surface: "dooh"` o `"pdooh"` → `pnpm surface:resolve` en AXIS
+(contrato `efeonce.surface-composition` `candidate`, vigente 0.1.2; un intent 0.1.1 resuelve igual) → los `delegates` van a `pnpm creative:orbit:render` (lente,
+voz, firma) y a la ficha fotográfica. Formatos, escala de voces, distancias, firma por soporte y línea de tiempo del
+spot salen de `efeonceGraphicLine.surfaces.dooh|pdooh`; **nunca el canal `print` o `social` elegido a mano**. El
+caminero aprobado sale entero con `pnpm brand:compose -- --intent <intent.json>` (Artifact Composer,
+`dooh.caminero-lens`, TASK-1919); la paleta y todo pDOOH no tienen plantilla hasta su aprobación
+(`recipe-not-approved`).
+
+- **Aprobado:** el caminero 12 × 4 m con la lente AXIS y el **logo abajo a la izquierda**, al final del recorrido de
+  lectura. Paleta (logo centrado, tamaño por decidir), LED (sólo respuesta, logo bajo ella), mupi, spot sin audio y
+  variantes por franja son **opción**.
+- **Distancia y tiempo mandan:** a distancia de carretera el contrato puede admitir sólo la respuesta
+  (`question-not-allowed-at-distance`). Revisa con la hoja de prueba a distancia antes de entregar.
+- **Foto nativa del formato** (3:1 para el caminero; ese formato de `foto:prompt` sigue sin validar, TASK-1918), luz
+  motivada, nadie mira al lente; en LED, el sujeto mira hacia el texto.
+- **pDOOH:** sin audio; la voz se arma en 2 s como máximo; el mensaje ocupa ≥ 80 % del tiempo; el último cuadro es el
+  estático de respaldo; cada variante dinámica es un estático completo.
+- Sin íconos ni selección en DOOH estático. Una esfera y una órbita por pieza; el acento nunca en texto < 24 px.
+
+### Registro cine en publicidad — en prueba (2026-09-27)
+
+Canon vigente: [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) —cárgalo
+completo antes de escribir una ficha cine; para publicidad, sobre todo §2 (cuándo se usa), §11 y §11.1 (formatos 9:16 y
+4:5) y §13 (la barra de doce)—. Aquí va sólo lo que cambia una decisión publicitaria.
+
+- 🔴 **Estado: en prueba, no aprobado.** El registro está aprobado sólo con **Nexa protagonista** o en la receta de
+  deck **`proposal-cinematic`** (16:9). No existe receta de anuncio cine para 9:16 ni 4:5 (pendiente 3 del canon).
+  Con Nexa, la pieza cabe en el caso 1 del contrato; **con personas del equipo queda fuera del alcance aprobado hasta
+  decisión del operador** —AXIS la rechaza con el issue `cine-requires-nexa-or-proposal`—. En los dos casos, nada se
+  publica ni se pauta como cine sin esa decisión; una pieza social o de campaña con el equipo sigue en A, B o C.
+- **Para producir una prueba (2026-10-02):** el flujo del
+  [casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) con
+  `"alcance": "publicidad-prueba"`: `pnpm foto:cine:nueva --desde <receta> --formato <9:16|4:5> --alcance publicidad-prueba`
+  → campos cine → agente `cine-reviewer` → `foto:generar` → `pnpm foto:validar:cine` + `foto:validar` +
+  `foto:emblema` → revisor sobre el plate. Aún no hay ninguna foto cine vertical aprobada para partir. En 4:5 y 9:16,
+  `foto:prompt` deja el fenómeno y el fondo bajo el 36 % del alto y, con `identidad`, pide la escala por encuadre
+  (9:16 de la cintura arriba, 4:5 del pecho arriba; a confirmar en el próximo piloto vertical); `foto:validar:cine`
+  mide la reserva (L* p99 ≤ 45 en el 36 % superior). Un número de figuras no basta: ubica cada una por geografía.
+- **Primera tanda** (`ai-generations/2026-09-27_ads-cine/`, página «Publicidad · cine» del canvas por superficie).
+  Las cuatro son prueba: ninguna aprobada ni autorizada para pauta.
+
+  | Pieza | Formato | Placa | Voz | Ratio | Firma (bajo su caja) |
+  |---|---|---|---|---|---|
+  | Nexa frente a la órbita | 9:16 | `AD1d` | «¿Qué hace Efeonce? **Crecer.**» | 4,14× | 19,69:1 |
+  | RevOps, el moño de luz con agentes | 9:16 | `AD2b` | «¿Tu CRM vende contigo? **Con agentes.**» | 3,91× | 20,28:1 |
+  | AEO, la IA ilumina una | 4:5 | `AD3b` | «¿Te encuentra la IA? **Visible.**» | 4,00× | 19,83:1 |
+  | El equipo con agentes | 4:5 | `AD4f` | «¿Quién hace crecer tu marca? **Este equipo.**» | 4,00× | 17,53:1 |
+
+- **Lo que enseñó, medido** (§11.1 del canon):
+  - 🔴 **En vertical, el lecho es un objeto oscuro en primer plano que cruza todo el ancho y tapa la cintura o las
+    piernas** (canto de una mesa negra mate, o una tarima para el equipo). Sin él, la firma cayó **sobre el sujeto**
+    —sobre la ropa oscura— **con el contraste pasando** (16–18:1 en `AD1`, `AD4`/`AD4b`). Un contraste que pasa no
+    dice dónde cae la caja: mírala al 100 %.
+  - **Equipo en 4:5: una sola línea, hombro con hombro, cámara a unos 4 m y cabezas en la banda del 38–52 % del
+    alto.** La V escalonada subió una cabeza al 17 % y rompió la franja de texto (`AD4d`).
+  - **Robots agentes arriba de la cintura** (hombros, brazos, costados). A los pies ensucian el lecho (`AD4b`: 3,01).
+  - **Declara el estudio vacío** (*«an empty dark studio at night, no desks, no monitors, no plants, no lamps»*): si
+    la escena calla, vuelve la oficina (planta, monitor, lámpara en `AD4`), el default del bloque de realismo. Pero el
+    vacío no reemplaza el lugar: las aprobadas tienen un espacio real, oscuro y profundo, con escala, y un fenómeno
+    grande (observado en la prueba ciega del 2026-10-02, a confirmar; casebook).
+  - La geometría 16:9 (sujeto a la derecha, voz a la izquierda) no existe en vertical: la reserva sube y el sujeto
+    baja, y el fenómeno de luz vive **detrás o alrededor del sujeto, bajo la reserva**. El anillo de `BR1` sale como
+    elipse plana; probar un anillo vertical como el de `BR3` es criterio sin probar.
+- 🔴 **La composición de esa tanda fue un script de sesión** (`ai-generations/2026-09-27_ads-cine/componer-ads-cine.mjs`):
+  **no es canónico**; no se reutiliza ni se copia. La capa de producción sigue siendo `pnpm foto:componer`, o
+  `pnpm foto:componer:cta` + `pnpm foto:cta:gate` si la pieza lleva CTA. Una receta de anuncio cine, cuando exista,
+  nace en AXIS; las recetas en prueba viven en el taller `efeonce-brand-workshop`, nunca como catálogo de publicidad
+  en Greenhouse ([ADR del taller](../../../docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) §3).
+
 ## Tres voces + acción — ads con CTA
 
 **Paid Media multiformato:** entregar cada key visual en **4:5, 1:1, 9:16 y 16:9**, salvo reducción explícita del brief. Matriz concepto×ratio, recomposición nativa y QA propio; ocho piezas de cuatro conceptos en dos ratios son cobertura parcial. Detalle y tamaños en el canon enlazado abajo.
@@ -197,6 +284,8 @@ Un único cursor local hacia la acción cuando se use selección; multiplayer s�
 firma y envolvente completa del cursor; medir gaps de tinta, contraste y cada formato. El relleno acotado del CTA
 está autorizado sobre foto; no habilita tarjetas de contenido, paneles HUD ni scrims. Los tamaños de pilotos son
 casos, no nuevos tokens AXIS. Entregar copy/parámetros/compositor editables y conservar el estado de cada pieza.
+**Política por campaña (2026-09-25):** para una dirección contextual, declarar `cta.colorPolicy` con versión, campaña, archivo, SHA-256, tratamiento y razón por pieza. La política central fija paleta AXIS, roles y tratamientos; variante, prominencia y tokens del CTA deben coincidir. Permite integración, contraste deliberado o neutral sin convertir un color en default. Contraste sigue obligatorio; armonía y jerarquía requieren revisión visual. La ruta contextual no cambia colores automáticamente: `auto` y `--variantes` se conservan sólo en legacy; las alternativas contextuales se declaran como piezas con tratamientos autorizados. QA y gate comprueban la política y su evidencia; nunca marcar la pieza aprobada por pasar ese control. [Contrato y ejemplo](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#20-política-cromática-por-campaña-optativa).
+
 **Color a demanda:** lima no es obligatorio; naranja, teal u otro autorizado según composición. Elegir tinta,
 contorno y relleno por separado: CTA/descriptor ≥4,5:1; borde/silueta y controles significativos ≥3:1. Medir
 el fondo real desfavorable, no sólo paleta o p98; documentar color resuelto y prueba. Ver método en el canon.
@@ -272,6 +361,12 @@ acción, en las piezas nuevas).
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.
+
+**Acento por línea en la voz (2026-10-02).** Con `graphicVoice: "efeonce"`, declara `graphicLine` (`brand` en Servicios
+creativos, `engine`, `voice`, `revenue-*`; sin él queda `growth`, teal): el anillo y la esfera toman el acento de esa línea desde
+AXIS y el gate lo verifica. Elige en la política un CTA del mismo color para que la pieza tenga un solo acento. En ads con
+respuesta de una o dos palabras, el contorno es la variante que no compite con el titular. Detalle: contrato del compositor,
+§«Acento por línea de servicio».
 
 ### Componer y certificar una pieza con CTA
 
@@ -355,7 +450,7 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    `y: "auto"` descarta esas alturas. En las aprobadas avisa: KV-06-916 (CMP-002) mide 29,3 y queda como decisión del
    operador. Calibrado: el canto de «Que te elijan» 23,3; con el lecho subido, 6,0; pasan 85 de 86 firmas aprobadas. La
    guarda no reemplaza mirarla al 100 %.
-5. **CTA:** `variant: "auto"` + `prominencia` (ver arriba) o una variante fija con `cta.variantReason`. El acento es
+5. **CTA legacy sin `cta.colorPolicy`:** `variant: "auto"` + `prominencia` (ver arriba) o una variante fija con `cta.variantReason`. El acento es
    obligatorio: `surfaceToken` (contorno y relleno) o `inkToken` (texto) sólo aceptan `accentSurface`, `growthOnDark` o
    `accentInkOnLight`, y omitirlo resuelve lima. Si el acento no alcanza, se regenera el plate: el color no se apaga.
    **Nuevo:** en contorno y relleno, padding ≥ 0,5× (horizontal) y 0,25× (vertical) el cuerpo del CTA (`cta-aire`).
@@ -578,6 +673,27 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
   evidencia). Si no existe en la máquina, esa capa se omite; no se sustituye por otra familia.
 - Cobertura verificada 2026-09-19: `¿ ¡`, tildes y `ñ` (`¿apostamos?`, `¡a la orden!`, `¿hola?`).
 - Una por pieza, ≤ 3 palabras, rotación leve; **blanco sobre fondos cálidos** (el naranja se pierde en el atardecer).
+- **Glitch:** ahí Guttery es la voz del narrador (muletillas en el verde de Glitch, rotada −3/−5°; licenciada para web
+  y video, confirmado por el operador el 2026-09-27) y sólo ahí. La muletilla varía por edición y el Glitch Flash (una
+  noticia, sin número) tiene su propia cabecera y cierre (§14). Toda pieza de Glitch con texto carga
+  `efeonce-graphic-line` → `references/glitch.md`.
+- **Marketing con Manzanitas:** no lleva Guttery (es de Glitch, y los dos no se mezclan); su texto es el de La órbita
+  (Bricolage 760 en respuesta y cifras, Poppins en pregunta y cuerpo). Toda pieza de MCM con texto carga el **registro
+  Marketing con Manzanitas**, que complementa La órbita
+  ([norma](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) + `efeonce-graphic-line`
+  → `references/manzanitas.md`): la cabecera del programa siempre arriba a la izquierda (sin manzana en la portada
+  Pizarra y la contraportada); la respuesta ≤ 3 palabras y ≥ 3 veces la pregunta; el acento de la línea del tema sólo
+  en texto ≥ 24 px, a ≥ 3:1 contra su fondo y nunca como superficie; el contraste de la firma se mide sobre la foto
+  real (la burbuja URL sobre la mesa de la estratega no pasó: 3,80:1 en el 1 % peor, y esa lámina sigue con el logo).
+  Medido a 390 px: el cuerpo de las láminas de texto denso queda en 10–11,5 px y los rótulos en 9 px.
+
+## Dónde viven los archivos de `ai-generations/`
+
+- **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas de deck y por `src/**`/`scripts/**` (`pnpm ai-gen:protected`).
+- **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): identidades, prendas, logo 3D, mascotas y Sparks sellados; `pnpm creative:assets:publish`.
+- **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
+- Plate, referencia o banco citado como `ai-generations/…` es una ruta lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` antes de componer o certificar.
+- **NUNCA** regenerar, sustituir ni aproximar un asset aprobado porque falta; **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## Reglas duras
 

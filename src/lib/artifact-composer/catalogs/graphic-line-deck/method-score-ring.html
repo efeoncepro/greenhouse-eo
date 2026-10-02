@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el anillo del puntaje</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `method-score-ring` (surface deck, tema oscuro, TASK-1928). Cómo se mide: un anillo segmentado, un arco por
+      dimensión con barrido proporcional a su peso y separación fija; la de mayor peso, más gruesa y opaca. El total al
+      centro, los rótulos fuera del anillo y el CTA con corchetes abiertos y el cursor del lector; el descriptor, bajo el
+      cursor. La fuente de las cifras, en el pie. Una sola esfera: la de la respuesta. Referencia: DeckGrader (F3).
+    -->
+    <main class="gl-slide gl-sr" data-gl-root data-slot="frame">
+      <figure class="gl-layer" data-slot="ring">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-sr-total" data-slot="total">
+        <p class="gl-sr-total-value" data-slot-field="value">100</p>
+        <p class="gl-sr-total-label" data-slot-field="label">puntos en 7 dimensiones</p>
+      </div>
+
+      <ol class="gl-sr-labels" data-slot="labels">
+        <li class="gl-sr-label">
+          <span class="gl-sr-label-weight" data-slot-field="weight">25</span>
+          <span class="gl-sr-label-name" data-slot-field="name">AI Visibility</span>
+        </li>
+      </ol>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Brand Visibility Grader</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo te ve la IA?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">Mídelo</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body" data-slot="body">Cómo los motores de respuesta entienden y recomiendan tu marca.</p>
+
+      <div data-slot="cta">
+        <p class="gl-sr-cta" data-gl-cta-target data-slot-field="text">Mide tu marca gratis</p>
+        <p class="gl-sr-cta-url" data-gl-cta-descriptor data-slot-field="url">think.efeoncepro.com/brand-visibility</p>
+      </div>
+
+      <p class="gl-sr-source" data-slot="source">Pesos del Brand Visibility Grader, versión V1</p>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+      <!-- El lockup de submarca OPCIONAL (TASK-1949, deck SEO/AEO): archivo oficial de axis-brand-assets; su lugar y su alto
+           llegan del builder. Sin `productMark` el nodo queda vacío y la lámina es la de siempre. -->
+      <div class="gl-product-mark" data-slot="productMark">
+        <img data-slot-field="src" alt="" />
+      </div>
+    </main>
+  </body>
+</html>

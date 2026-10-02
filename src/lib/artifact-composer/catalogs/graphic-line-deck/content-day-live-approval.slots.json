@@ -1,0 +1,1326 @@
+{
+  "template": "ContentDayLiveApproval",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "revenue-salesforce"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 196
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 330
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 150
+        },
+        "answerLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-leading=0.9"
+        },
+        "answerTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-tracking=-0.05em"
+        },
+        "answerInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-inset=-8px"
+        },
+        "questionWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-question-width=500px"
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 690
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 26
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 420
+        },
+        "answerShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-shadow-y=10px"
+        },
+        "answerShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-shadow-blur=60px"
+        },
+        "answerShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-shadow-opacity=35%"
+        },
+        "answerShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-answer-shadow-color=#000000"
+        },
+        "lumWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lum-width=216px"
+        },
+        "lumBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lum-bottom=51px"
+        },
+        "noteRight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-note-right=120px"
+        },
+        "noteTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-note-top=112px"
+        },
+        "notePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-note-px=16px"
+        },
+        "noteWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-note-wght=400"
+        },
+        "noteColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-note-color=#e2e2e2"
+        },
+        "docFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-color=#ffffff"
+        },
+        "docInk": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-ink-color=#0b1f33"
+        },
+        "docMuted": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-muted-color=#5f6b7a"
+        },
+        "docRule": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-rule-color=#e3e8ee"
+        },
+        "docChip": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-chip-color=#f5f7fa"
+        },
+        "docShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-shadow-y=50px"
+        },
+        "docShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-shadow-blur=110px"
+        },
+        "docShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-shadow-color=#000610"
+        },
+        "docShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-shadow-opacity=75%"
+        },
+        "docHaloBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-halo-blur=90px"
+        },
+        "docHaloColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-halo-color=#2fb8ff"
+        },
+        "docHaloOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-halo-opacity=22%"
+        },
+        "docEdge": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-edge=1px"
+        },
+        "docEdgeColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-doc-edge-color=#ffffff"
+        },
+        "docEdgeOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-doc-edge-opacity=16%"
+        },
+        "lsGlassFrom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-glass-from-color=#ffffff"
+        },
+        "lsGlassFromOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-from-opacity=14%"
+        },
+        "lsGlassTo": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-glass-to-color=#ffffff"
+        },
+        "lsGlassToOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-to-opacity=4%"
+        },
+        "lsGlassAngle": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-angle=160deg"
+        },
+        "lsGlassBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-blur=6px"
+        },
+        "lsGlassBorder": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-border=1px"
+        },
+        "lsGlassBorderColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-glass-border-color=#ffffff"
+        },
+        "lsGlassBorderOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-border-opacity=18%"
+        },
+        "lsGlassShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-shadow-y=30px"
+        },
+        "lsGlassShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-shadow-blur=70px"
+        },
+        "lsGlassShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-ls-glass-shadow-color=#000610"
+        },
+        "lsGlassShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-glass-shadow-opacity=60%"
+        },
+        "cla-exGlassFrom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-ex-glass-from-color=#ffffff"
+        },
+        "cla-exGlassFromOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-ex-glass-from-opacity=14%"
+        },
+        "cla-exGlassTo": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-ex-glass-to-color=#ffffff"
+        },
+        "cla-exGlassToOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-ex-glass-to-opacity=4%"
+        },
+        "cla-exGlassAngle": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-ex-glass-angle=160deg"
+        },
+        "cla-exGlassBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-ex-glass-blur=6px"
+        },
+        "cla-exGlassBorder": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-ex-glass-border=1px"
+        },
+        "cla-exGlassBorderColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-ex-glass-border-color=#ffffff"
+        },
+        "cla-exGlassBorderOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-ex-glass-border-opacity=18%"
+        },
+        "cla-exGlassShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-ex-glass-shadow-y=30px"
+        },
+        "cla-exGlassShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-ex-glass-shadow-blur=70px"
+        },
+        "cla-exGlassShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-ex-glass-shadow-color=#000610"
+        },
+        "cla-exGlassShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-ex-glass-shadow-opacity=60%"
+        },
+        "messageLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-message-left=780px"
+        },
+        "messageTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-message-top=190px"
+        },
+        "messageWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-message-width=700px"
+        },
+        "messagePadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-message-pad-y=22px"
+        },
+        "messagePadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-message-pad-x=24px"
+        },
+        "messageRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-message-radius=24px"
+        },
+        "messagePerspective": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-message-perspective=2200px"
+        },
+        "messageRotateY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-message-rotate-y=-7deg"
+        },
+        "channelIconPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-channel-icon-px=30px"
+        },
+        "channelGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-channel-gap=10px"
+        },
+        "channelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-channel-px=16px"
+        },
+        "channelWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-channel-wght=700"
+        },
+        "channelPadBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-channel-pad-bottom=12px"
+        },
+        "channelRule": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-channel-rule-color=#e3e8ee"
+        },
+        "agentGapTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-agent-gap-top=16px"
+        },
+        "agentGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-agent-gap=14px"
+        },
+        "agentIconPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-agent-icon-px=44px"
+        },
+        "agentNamePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-agent-name-px=15px"
+        },
+        "agentNameWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-agent-name-wght=700"
+        },
+        "badgePadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-badge-pad-y=2px"
+        },
+        "badgePadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-badge-pad-x=8px"
+        },
+        "badgeRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-badge-radius=6px"
+        },
+        "badgeFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-badge-fill-color=#f5f7fa"
+        },
+        "badgePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-badge-px=11px"
+        },
+        "badgeWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-badge-wght=600"
+        },
+        "badgeColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-badge-color=#5f6b7a"
+        },
+        "badgeGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-badge-gap=6px"
+        },
+        "textPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-text-px=15px"
+        },
+        "textWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-text-wght=400"
+        },
+        "textLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-text-leading=1.5"
+        },
+        "textGapTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-text-gap-top=6px"
+        },
+        "chipsGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-chips-gap=8px"
+        },
+        "chipsGapTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-chips-gap-top=10px"
+        },
+        "chipPadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-chip-pad-y=5px"
+        },
+        "chipPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-chip-pad-x=10px"
+        },
+        "chipRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-chip-radius=8px"
+        },
+        "chipFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-chip-fill-color=#f5f7fa"
+        },
+        "chipBorder": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-chip-border=1px"
+        },
+        "chipBorderColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-chip-border-color=#e3e8ee"
+        },
+        "chipPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-chip-px=12px"
+        },
+        "chipWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-chip-wght=500"
+        },
+        "chipColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-chip-color=#5f6b7a"
+        },
+        "actionsGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-actions-gap=26px"
+        },
+        "actionsGapTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-actions-gap-top=14px"
+        },
+        "actionPadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-action-pad-y=9px"
+        },
+        "actionPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-action-pad-x=18px"
+        },
+        "actionRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-action-radius=10px"
+        },
+        "actionPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-action-px=14px"
+        },
+        "actionWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-action-wght=600"
+        },
+        "primaryFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-primary-fill-color=#0b1f33"
+        },
+        "primaryColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-primary-color=#ffffff"
+        },
+        "secondaryRing": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-secondary-ring=1.5px"
+        },
+        "secondaryRingColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-secondary-ring-color=#0b1f33"
+        },
+        "secondaryColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-secondary-color=#0b1f33"
+        },
+        "tertiaryRing": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-tertiary-ring=1.5px"
+        },
+        "tertiaryRingColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-tertiary-ring-color=#e3e8ee"
+        },
+        "tertiaryColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-tertiary-color=#5f6b7a"
+        },
+        "executedLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-left=1500px"
+        },
+        "executedTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-top=250px"
+        },
+        "executedWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-width=270px"
+        },
+        "executedPadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-pad-y=18px"
+        },
+        "executedPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-pad-x=18px"
+        },
+        "executedRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-radius=18px"
+        },
+        "executedIconPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-icon-px=36px"
+        },
+        "executedIconGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-icon-gap=10px"
+        },
+        "executedTitlePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-title-px=18px"
+        },
+        "executedTitleLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-title-leading=1.15"
+        },
+        "executedTitleColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-executed-title-color=#ffffff"
+        },
+        "executedTextPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-text-px=14px"
+        },
+        "executedTextWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-text-wght=400"
+        },
+        "executedTextLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-text-leading=1.45"
+        },
+        "executedTextGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-executed-text-gap=10px"
+        },
+        "executedTextColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-executed-text-color=#e2e2e2"
+        },
+        "loopLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-loop-left=780px"
+        },
+        "loopTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-loop-top=660px"
+        },
+        "loopGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-loop-gap=14px"
+        },
+        "stepWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-step-width=196px"
+        },
+        "stepPadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-step-pad-y=16px"
+        },
+        "stepPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-step-pad-x=18px"
+        },
+        "stepRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-step-radius=16px"
+        },
+        "currentFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-current-fill-color=#ffffff"
+        },
+        "numberPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-number-px=15px"
+        },
+        "numberColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-number-color=#e2e2e2"
+        },
+        "numberCurrentColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-number-current-color=#0b1f33"
+        },
+        "stepTitlePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-step-title-px=20px"
+        },
+        "stepTitleGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-step-title-gap=4px"
+        },
+        "stepTitleColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-step-title-color=#ffffff"
+        },
+        "stepTitleCurrentColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-step-title-current-color=#0b1f33"
+        },
+        "stepDetailPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-step-detail-px=13px"
+        },
+        "stepDetailWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-step-detail-wght=400"
+        },
+        "stepDetailGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cla-step-detail-gap=4px"
+        },
+        "stepDetailColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-step-detail-color=#e2e2e2"
+        },
+        "stepDetailCurrentColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cla-step-detail-current-color=#5f6b7a"
+        }
+      }
+    },
+    "stage": {
+      "selector": "[data-slot='stage']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "platform": {
+      "selector": "[data-slot='platform']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 44,
+          "example": "¿Dónde apruebas al agente?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 9,
+          "resolver": "gl-answer",
+          "example": "trabajas"
+        },
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 51,
+          "example": "Agentforce · supervisión en vivo"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 9,
+          "example": "Donde"
+        }
+      }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 179,
+        "maxLines": 6,
+        "overflow": "reject"
+      },
+      "example": "El agente propone con evidencia, tú <strong>apruebas</strong> en Slack y el cambio queda ejecutado y registrado."
+    },
+    "note": {
+      "selector": "[data-slot='note']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 115,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Ejemplo ilustrativo · la política y los límites se definen con tu equipo"
+    },
+    "channel": {
+      "selector": "[data-slot='channel']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "icon": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "name": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 69,
+          "example": "# servicio-aprobaciones"
+        }
+      }
+    },
+    "agentIcon": {
+      "selector": "[data-slot='agentIcon']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        }
+      }
+    },
+    "agent": {
+      "selector": "[data-slot='agent']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 56,
+          "example": "Agente de casos"
+        },
+        "badge": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "example": "Agentforce"
+        }
+      }
+    },
+    "message": {
+      "selector": "[data-slot='message']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 146,
+        "maxLines": 2,
+        "overflow": "reject"
+      },
+      "example": "Caso <strong>#4821</strong>: el cliente pide reembolso de <strong>[MONTO]</strong>. Según la política 3.2 corresponde aprobarlo."
+    },
+    "chips": {
+      "selector": "[data-slot='chips']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 2,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 41,
+            "example": "Historial del cliente"
+          }
+        }
+      },
+      "example": [
+        {
+          "label": "Historial del cliente"
+        },
+        {
+          "label": "Política 3.2"
+        }
+      ]
+    },
+    "actions": {
+      "selector": "[data-slot='actions']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "primary": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 14,
+          "example": "Aprobar"
+        },
+        "secondary": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 14,
+          "example": "Editar"
+        },
+        "tertiary": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 14,
+          "example": "Rechazar"
+        }
+      }
+    },
+    "executedIcon": {
+      "selector": "[data-slot='executedIcon']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        }
+      }
+    },
+    "executed": {
+      "selector": "[data-slot='executed']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "title": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 39,
+          "example": "Ejecutado en Service Cloud"
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 123,
+          "example": "Reembolso aplicado, cliente notificado y registro de quién aprobó y cuándo."
+        }
+      }
+    },
+    "loop": {
+      "selector": "[data-slot='loop']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 4,
+        "maxItems": 4,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "number": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 2,
+            "example": "01"
+          },
+          "title": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 30,
+            "example": "Propone"
+          },
+          "detail": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 24,
+            "example": "El agente, con evidencia"
+          },
+          "state": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-state",
+            "example": "todo"
+          }
+        }
+      },
+      "example": [
+        {
+          "number": "01",
+          "title": "Propone",
+          "detail": "El agente, con evidencia",
+          "state": "todo"
+        },
+        {
+          "number": "02",
+          "title": "Apruebas",
+          "detail": "La supervisora, en Slack",
+          "state": "now"
+        },
+        {
+          "number": "03",
+          "title": "Ejecuta",
+          "detail": "En Service Cloud",
+          "state": "todo"
+        },
+        {
+          "number": "04",
+          "title": "Queda registrado",
+          "detail": "Auditoría completa",
+          "state": "todo"
+        }
+      ]
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Cliente"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "bottom-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "role"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1
+        },
+        "targetKind": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "object"
+        },
+        "variant": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "eight-handles"
+        },
+        "padding": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "compact"
+        },
+        "overlay": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "none"
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-source.svg"
+    }
+  }
+}

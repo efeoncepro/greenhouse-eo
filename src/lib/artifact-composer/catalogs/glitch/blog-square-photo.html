@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Glitch · Banner cuadrado del blog A (noticia con foto)</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="glitch-tokens.css" />
+<link rel="stylesheet" href="glitch.css" />
+<style>
+  .gx-square-a .gx-photo { top: 0; width: 1080px; height: 500px; }
+  .gx-square-a .gx-credit { top: 474px; }
+  .gx-square-a .gx-masthead { left: 88px; right: 88px; top: 64px; }
+  .gx-square-a .gx-chip { left: 88px; top: 436px; }
+  .gx-square-a .gx-headline { left: 84px; right: 70px; top: 694px; font-size: 96px; line-height: 0.94; }
+  .gx-square-a .gx-signature { bottom: 44px; width: 160px; }
+</style>
+</head>
+<body>
+<main class="gx-canvas gx-canvas--1x1 gx-square-a" data-gx-root>
+  <div class="gx-photo" data-slot="photo"><img data-slot-field="src" src="assets/glitch-apple.svg" alt="" /></div>
+  <svg class="gx-bytes" data-gx-bytes viewBox="0 0 1080 1080" width="1080" height="1080" aria-hidden="true"></svg>
+  <p class="gx-credit" data-slot="credit">Foto: crédito de la foto</p>
+  <header class="gx-masthead">
+    <img class="gx-masthead__wordmark" src="assets/glitch-logo-negative.svg" alt="Glitch" />
+    <div class="gx-masthead__edition">
+      <span class="gx-masthead__label">EDICIÓN</span>
+      <span class="gx-masthead__number"><span class="gx-hash">#</span><span class="gx-num" data-slot="edition">17</span></span>
+    </div>
+  </header>
+  <div class="gx-chip"><span class="gx-chip__tag gx-chip__tag--accent">LA NOTICIA</span><span class="gx-chip__meta" data-slot="outlet">Medio · fecha</span></div>
+  <h1 class="gx-headline" data-slot="headline"><span class="gx-headline__entry" data-slot-field="entry">Entrada ligera</span><span data-slot-field="punchLead">remate que</span> <span class="gx-nowrap"><span data-slot-field="punchLast">cierra</span><img class="gx-apple" src="assets/glitch-apple.svg" alt="" /></span></h1>
+  <img class="gx-signature" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+</main>
+</body>
+</html>

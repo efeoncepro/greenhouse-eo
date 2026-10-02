@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · identidad y consentimiento</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `method-identity-consent` (surface deck, tema oscuro, TASK-1942). «¿Puedes contactar a ese cliente? Con
+      permiso.»: cinco fuentes en vidrio mandan su haz al perfil unificado (papel con reflejo, ícono oficial del producto
+      de datos y una fila por canal con propósito y permiso); del perfil salen tres haces a las activaciones, la primera en
+      papel. Sólo se activa por un canal con permiso. La selección «Cliente» toma el perfil.
+      Referencia: DeckSalesforceDataConsentimiento (SF12-data-consentimiento).
+    -->
+    <main class="gl-slide gl-ls gl-mic" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-beams" data-slot="beams">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-mic-sources" data-slot="sources">
+        <li class="gl-ls-glass gl-mic-source">
+          <span class="gl-mic-source-kicker" data-slot-field="kicker">Fuente</span>
+          <span class="gl-mic-source-name" data-slot-field="name">CRM</span>
+        </li>
+      </ol>
+
+      <section class="gl-ls-doc gl-ls-reflect gl-mic-profile" data-gl-selection-target>
+        <header class="gl-mic-head" data-slot="profile">
+          <img class="gl-mic-profile-icon" data-slot-field="icon" alt="" />
+          <span>
+            <span class="gl-mic-profile-kicker" data-slot-field="kicker">Perfil unificado</span>
+            <span class="gl-mic-profile-title" data-slot-field="title">Una persona, 5 fuentes</span>
+          </span>
+        </header>
+        <ol class="gl-mic-channels" data-slot="channels">
+          <li class="gl-mic-channel">
+            <span class="gl-mic-channel-name" data-slot-field="channel">Email</span>
+            <span class="gl-mic-purpose" data-slot-field="purpose">Marketing</span>
+            <span class="gl-mic-consent" data-slot-field="mark">✓</span>
+          </li>
+        </ol>
+      </section>
+
+      <ol class="gl-mic-activations" data-slot="activations">
+        <li class="gl-mic-act">
+          <img class="gl-mic-act-icon" data-slot-field="icon" alt="" />
+          <span>
+            <span class="gl-mic-act-title" data-slot-field="title">Journey</span>
+            <span class="gl-mic-act-desc" data-slot-field="detail">Sólo con email ✓</span>
+          </span>
+        </li>
+      </ol>
+
+      <p class="gl-ls-note" data-slot="note">Ejemplo ilustrativo · el diseño sale de tu inventario de datos</p>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Data 360 · identidad y consentimiento</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Puedes contactar a ese cliente?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Con</span><span data-slot-field="answer">permiso</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Unificar datos no da permiso para contactar: gobernamos <strong>canal</strong> y propósito antes de activar.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

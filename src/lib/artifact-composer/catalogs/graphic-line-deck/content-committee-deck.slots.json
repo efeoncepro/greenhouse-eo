@@ -1,0 +1,344 @@
+{
+  "template": "ContentCommitteeDeck",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "engine"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 130
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 196
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 330
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 176
+        },
+        "answerLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-leading=0.9"
+        },
+        "answerTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-tracking=-0.05em"
+        },
+        "answerInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-answer-inset=-8px"
+        },
+        "questionWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ls-question-width=440px"
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 690
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 26
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 560
+        },
+        "lumWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lum-width=160px"
+        },
+        "lumBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lum-bottom=62px"
+        },
+        "svBg": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-bg-color=#091951"
+        },
+        "svSoft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-soft-color=#cfe4fa"
+        },
+        "svMuted": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-muted-color=#c9d6e2"
+        },
+        "svHalo": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-halo-color=#72ded8"
+        },
+        "svShadow": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-shadow-color=#000610"
+        },
+        "svCardTo": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-card-to-color=#081c30"
+        },
+        "svMiniFrom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-mini-from-color=#12344f"
+        },
+        "svSlideFrom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-slide-from-color=#0f3556"
+        },
+        "svSlideBack": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-slide-back-color=#0a2138"
+        },
+        "svSlideMid": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-sv-slide-mid-color=#0c2640"
+        }
+      }
+    },
+    "stage": {
+      "selector": "[data-slot='stage']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "platform": {
+      "selector": "[data-slot='platform']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 37,
+          "example": "¿Y el PPT del comité?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "resolver": "gl-answer",
+          "example": "está"
+        },
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 46,
+          "example": "Sin armar láminas"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 12,
+          "example": "Ya"
+        }
+      }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 159,
+        "maxLines": 4,
+        "overflow": "reject"
+      },
+      "example": "La IA escribe el titular y destaca lo que importa; nuestro equipo lo revisa. Tú entras a la reunión y <strong>presentas</strong>."
+    },
+    "slide": {
+      "selector": "[data-slot='slide']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "kicker": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 62,
+          "example": "Comité · tercer trimestre"
+        },
+        "headline": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 48,
+          "example": "La IA ya te nombra en 4 de cada 10 respuestas"
+        },
+        "figure": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 5,
+          "example": "+38%"
+        },
+        "figureLabel": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 27,
+          "example": "visibilidad en el trimestre"
+        },
+        "annotation": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 17,
+          "example": "Guía de precios"
+        }
+      }
+    },
+    "features": {
+      "selector": "[data-slot='features']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 3,
+        "maxItems": 3,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "title": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 22,
+            "example": "Presentas en vivo"
+          },
+          "detail": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 62,
+            "example": "Desde el informe, con los datos al día"
+          }
+        }
+      }
+    },
+    "productMark": {
+      "selector": "[data-slot='productMark']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-alt",
+          "maxCharacters": 40,
+          "example": "Efeonce | Insights"
+        },
+        "left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pmk-left=140px"
+        },
+        "top": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pmk-top=44px"
+        },
+        "height": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pmk-height=40px"
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-source.svg"
+    }
+  }
+}

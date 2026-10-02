@@ -1,0 +1,215 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:28:16.093Z",
+  "run": "ai-generations/2026-09-28_manzanitas-iconos",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-28_manzanitas-iconos",
+  "totalBytes": 10734175,
+  "fileCount": 34,
+  "files": [
+    {
+      "path": "comparacion-con-el-set.png",
+      "sizeBytes": 76216,
+      "sha256": "082281e8440c4712f364492f8dc4de885e697800372232789eac3cef96d48494",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/comparacion-con-el-set.png"
+    },
+    {
+      "path": "deslizar-control-oscuro.png",
+      "sizeBytes": 17991,
+      "sha256": "520120fc7a89ce5c77b4c76ccec406bbb4ab8e62baee480d5b5a716dce605f63",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/deslizar-control-oscuro.png"
+    },
+    {
+      "path": "deslizar-control-papel.png",
+      "sizeBytes": 18005,
+      "sha256": "a8398d8ae12c13f33d2f8f0820519960866ce23d9edf8aff96e2585b95fb76ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/deslizar-control-papel.png"
+    },
+    {
+      "path": "plastilina/control-v1/mano-control-oscuro.png",
+      "sizeBytes": 11039,
+      "sha256": "693ded140ba7ec8b30e082ab925bfb49890ebce6353f27c8b10def862ee4bed7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/control-v1/mano-control-oscuro.png"
+    },
+    {
+      "path": "plastilina/control-v1/mano-control-papel.png",
+      "sizeBytes": 11078,
+      "sha256": "545b6161df46645452ce5165ed82fae0960b2f6d3fc246e53c852dbc18ecc202",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/control-v1/mano-control-papel.png"
+    },
+    {
+      "path": "plastilina/control-v2/mano-control-oscuro.png",
+      "sizeBytes": 11268,
+      "sha256": "73089ce33dd6777cb1bbb79456fb86e061144e86717d26a56e5f06c7d48a9fdb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/control-v2/mano-control-oscuro.png"
+    },
+    {
+      "path": "plastilina/control-v2/mano-control-papel.png",
+      "sizeBytes": 11330,
+      "sha256": "9e502d24ef27b72c266516bf2912fb68dd84c3d4102f59b5930f4d43dfde56cc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/control-v2/mano-control-papel.png"
+    },
+    {
+      "path": "plastilina/control-v3/mano-control-oscuro.png",
+      "sizeBytes": 11452,
+      "sha256": "c97a2a03bfab497ce0139f6158a777c04eff10c117b2aad8c60a26d55ce9bf1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/control-v3/mano-control-oscuro.png"
+    },
+    {
+      "path": "plastilina/control-v3/mano-control-papel.png",
+      "sizeBytes": 11457,
+      "sha256": "3fa329c526bba454a5a8989d9dd78440b6280106ab41230e15cd0f7ef7cbf3b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/control-v3/mano-control-papel.png"
+    },
+    {
+      "path": "plastilina/hoja-1.png",
+      "sizeBytes": 878140,
+      "sha256": "710286c52f6cfd430174de88c6f16ba73e89c76b7947e809af40eeddf0c8ef95",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/hoja-1.png"
+    },
+    {
+      "path": "plastilina/r2/control-f1/mano-control-oscuro.png",
+      "sizeBytes": 11872,
+      "sha256": "f400fff76a724b6aa7ce838f40bb251f996f281679d6cd42365fd2fbd833d1c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/control-f1/mano-control-oscuro.png"
+    },
+    {
+      "path": "plastilina/r2/control-f1/mano-control-papel.png",
+      "sizeBytes": 11911,
+      "sha256": "b553d09a6f415e7809d909b7c393e3821cfc7ffa81e5770c75bf12e7e95e83a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/control-f1/mano-control-papel.png"
+    },
+    {
+      "path": "plastilina/r2/control-s3/mano-control-oscuro.png",
+      "sizeBytes": 11893,
+      "sha256": "c10ec7b8d6602ecf54c5b6e201718e1dae7e253476f0fe6cb7496a5ace670c31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/control-s3/mano-control-oscuro.png"
+    },
+    {
+      "path": "plastilina/r2/control-s3/mano-control-papel.png",
+      "sizeBytes": 11893,
+      "sha256": "6240516e3223bd23b42f3a0d372635193e5994083625f973eb7e97254e3d69a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/control-s3/mano-control-papel.png"
+    },
+    {
+      "path": "plastilina/r2/control-s3b/mano-control-oscuro.png",
+      "sizeBytes": 11879,
+      "sha256": "f61b565c672bbe3192a6707929f569a0c63ece7dcfdf1d162c54a4fb7206ae7e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/control-s3b/mano-control-oscuro.png"
+    },
+    {
+      "path": "plastilina/r2/control-s3b/mano-control-papel.png",
+      "sizeBytes": 11933,
+      "sha256": "1431e0ea67ec4031c3d3475df2ceec9d06d2c408842832633db4469ac12054cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/control-s3b/mano-control-papel.png"
+    },
+    {
+      "path": "plastilina/r2/control-s6/mano-control-oscuro.png",
+      "sizeBytes": 11791,
+      "sha256": "74e2a464e91cb71f01115bb0d1e7072f2381497c0422e518a818a3b329626b37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/control-s6/mano-control-oscuro.png"
+    },
+    {
+      "path": "plastilina/r2/control-s6/mano-control-papel.png",
+      "sizeBytes": 11826,
+      "sha256": "b4f83a9bd74d29a4aec9bcfd26aa00929eb206ae5bd85b82b4cd2c73033cf254",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/control-s6/mano-control-papel.png"
+    },
+    {
+      "path": "plastilina/r2/hoja-2.png",
+      "sizeBytes": 953309,
+      "sha256": "dcc5959b20a519c754b06cf621a4c8dbbd845a7149c7a43bdff77fe1b82d5af8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/hoja-2.png"
+    },
+    {
+      "path": "plastilina/r2/hoja-3.png",
+      "sizeBytes": 914085,
+      "sha256": "bea4e538eb9e8d8b776d07da3a4142dae630dd3d8eaa28b9f7a827f1e19d326b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/hoja-3.png"
+    },
+    {
+      "path": "plastilina/r2/hoja-4.png",
+      "sizeBytes": 1085290,
+      "sha256": "ea86885a67da7b59e7a00ca7be90519a1cd1aad822ff514d83a3e5b4b18eeea8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/hoja-4.png"
+    },
+    {
+      "path": "plastilina/r2/trazo-aprobado.png",
+      "sizeBytes": 49713,
+      "sha256": "5d94da0ab655d0362d32d2b6b20ced51f9d0bdb06b53ba83fe01d4b46f8e5290",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/trazo-aprobado.png"
+    },
+    {
+      "path": "plastilina/r2/volumen/alfa/mano.png",
+      "sizeBytes": 1021532,
+      "sha256": "8bd8f8a2ecaee97fba3a0d80f4a356bf0a8d171f6a437285a5536c0ddc0923ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/volumen/alfa/mano.png"
+    },
+    {
+      "path": "plastilina/r2/volumen/check.png",
+      "sizeBytes": 203892,
+      "sha256": "0dfe3e099a5809caa86b09fd9925926643378cdc49a310fc3cefbb7fcf9b6608",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/volumen/check.png"
+    },
+    {
+      "path": "plastilina/r2/volumen/crudo/mano.png",
+      "sizeBytes": 973324,
+      "sha256": "16ba56ba5490e97f6fe2c8cb560802c033da7e4d62f9517110e14e2df778a8c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/volumen/crudo/mano.png"
+    },
+    {
+      "path": "plastilina/r2/volumen/ref/mano.png",
+      "sizeBytes": 33751,
+      "sha256": "83a9b971b471c54315e3d6cd2b9ede1503cc8a4ec6f90dc256f81c4e5043db11",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/volumen/ref/mano.png"
+    },
+    {
+      "path": "plastilina/r2/volumen2/alfa/mano.png",
+      "sizeBytes": 1020720,
+      "sha256": "308b5754aada88d0b87da0053e47d3ae32901379d1fbd711ef98049345679960",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/volumen2/alfa/mano.png"
+    },
+    {
+      "path": "plastilina/r2/volumen2/check.png",
+      "sizeBytes": 192292,
+      "sha256": "e8f22a691eae04eddcc6df45ff89ffa138400eff03665fe740618408e2970ce4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/volumen2/check.png"
+    },
+    {
+      "path": "plastilina/r2/volumen2/crudo/mano.png",
+      "sizeBytes": 988795,
+      "sha256": "f0b07a76cc62b38aac1c20fb748e04a18651b280a33293afbd2b3a1ad2e295cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/volumen2/crudo/mano.png"
+    },
+    {
+      "path": "plastilina/r2/volumen2/ref/mano.png",
+      "sizeBytes": 33644,
+      "sha256": "f090aa89d0465893e47cda9ffdba8f2cea842c6dd4fc59a81249e29098efa27e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/r2/volumen2/ref/mano.png"
+    },
+    {
+      "path": "plastilina/volumen/alfa-check.png",
+      "sizeBytes": 176574,
+      "sha256": "b8de2da1972d0f356eed6fd9d1c14bd2ce4eabda690cb1b2ede64f47656f50f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/volumen/alfa-check.png"
+    },
+    {
+      "path": "plastilina/volumen/alfa/mano.png",
+      "sizeBytes": 968665,
+      "sha256": "91f5574a17b56fb51da2331e2a2b27e28f5dfb25710574558839bbbcdb8e62ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/volumen/alfa/mano.png"
+    },
+    {
+      "path": "plastilina/volumen/crudo/mano.png",
+      "sizeBytes": 933237,
+      "sha256": "dfd69ff9d64d58b7de27a8d981ce489ae67f70d0918a9e7998e1d7c4e6ca5950",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/volumen/crudo/mano.png"
+    },
+    {
+      "path": "plastilina/volumen/ref/mano.png",
+      "sizeBytes": 32378,
+      "sha256": "d8e5397cff5b2fdbf029f686e9661f88c3df225e41d5a30cfe2e717338b2485e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-iconos/plastilina/volumen/ref/mano.png"
+    }
+  ]
+}

@@ -4,6 +4,26 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "creative-workbench",
+      "triggers": [
+        "Creative Workbench",
+        "creative-workbench",
+        "KV SKY en Workbench",
+        "adaptaciones SKY en Workbench",
+        "componentes SKY en Workbench",
+        "harness multimarcas",
+        "paquetes privados SKY"
+      ],
+      "skills": [
+        "efeonce-creative-workbench"
+      ],
+      "sources": [
+        ".codex/skills/efeonce-creative-workbench/SKILL.md",
+        ".codex/skills/efeonce-creative-workbench/references/architecture.md",
+        ".codex/skills/efeonce-creative-workbench/references/state-continuity.md"
+      ]
+    },
+    {
       "id": "efeonce-brand-photography",
       "triggers": [
         "fotografía de marca",
@@ -520,18 +540,47 @@
         "renditions de piezas",
         "EPIC-049",
         "TASK-1890",
-        "TASK-1891"
+        "TASK-1891",
+        "planificar campaña",
+        "plan de campaña",
+        "estrategia de campaña",
+        "message house",
+        "matriz de audiencias",
+        "plan de contenidos de campaña",
+        "agente de medios",
+        "planificador de medios",
+        "plan de medios IA",
+        "reparto de presupuesto de campaña",
+        "flight de campaña",
+        "agente SEO/AEO de campaña",
+        "plan SEO/AEO de campaña",
+        "seguimiento SEO de campaña",
+        "agentes de rol de Marketing Studio",
+        "work item de campaña",
+        "asignar trabajo a un agente",
+        "tarjeta de rol de agente",
+        "despachador de agentes",
+        "corrida de agente",
+        "evals de roles de agente",
+        "operación híbrida con agentes"
       ],
       "skills": [
         "efeonce-marketing-studio",
+        "efeonce-campaign-planning",
+        "efeonce-agent-media-planner",
+        "efeonce-agent-seo-aeo",
         "efeonce-mcp-platform"
       ],
       "sources": [
         "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md",
         "docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md",
         "docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md",
         "docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md",
-        "docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md"
+        "docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md",
+        "docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md"
       ]
     },
     {
@@ -597,7 +646,9 @@
         "Agent Hub",
         "Revenue Hub",
         "HubSpot sector",
-        "HubSpot landing"
+        "HubSpot landing",
+        "HubSpot Agent CLI",
+        "HubSpot MCP"
       ],
       "skills": [
         "hubspot-greenhouse-bridge",
@@ -607,7 +658,8 @@
       "sources": [
         "docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md",
         "docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md",
-        "docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md"
+        "docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md",
+        "docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md"
       ]
     },
     {

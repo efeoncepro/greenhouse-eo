@@ -207,7 +207,7 @@ Todo business model debe separar al menos estas dimensiones:
   todavía requiere reconciliación de Finance, Commercial, Product y Legal/IP.
 - [Efeonce Growth Platform Business Model V1](growth-platform/EFEONCE_GROWTH_PLATFORM_BUSINESS_MODEL_V1.md) —
   draft de la hipótesis de plataforma; no afirma SaaS, ARR ni PMF.
-- [Efeonce AEO Business Model V1](aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md) — draft de wedge/capability.
+- [Efeonce AEO Business Model V1](aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md) — draft de wedge/capability; [ADR de naming](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) para capacidad, Assessment y Report.
 - [Search Visibility 360 Business Model V1](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_V1.md) + [Business Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md) + [Customer Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md) —
   draft de capability en construcción; alcance comercial mid-market y enterprise.
 - [Search + Social Visibility Composition V1](search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) — composición propuesta entre Search Visibility 360 y Social Media; no es una tercera línea contractual.

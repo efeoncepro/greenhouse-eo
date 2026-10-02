@@ -1,0 +1,59 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:13:21.503Z",
+  "run": "ai-generations/2026-09-21_nexa-uniforme-terreno",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_nexa-uniforme-terreno",
+  "totalBytes": 15111877,
+  "fileCount": 8,
+  "files": [
+    {
+      "path": "plates/chaqueta-comite-v01.png",
+      "sizeBytes": 2090503,
+      "sha256": "d7821a8de83f640e1d1f80d90bfe3c3384df0bf1acd7093c848651ff9ea6e9c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-terreno/plates/chaqueta-comite-v01.png"
+    },
+    {
+      "path": "plates/chaqueta-comite-v02.png",
+      "sizeBytes": 2050565,
+      "sha256": "73e3b43943a2e8a7465e63d1f5efaee603173eff220ed2877ed9aa4de9f682a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-terreno/plates/chaqueta-comite-v02.png"
+    },
+    {
+      "path": "plates/chaqueta-v03-cerrado.png",
+      "sizeBytes": 2082275,
+      "sha256": "80863f93fe483ca4e814ffab89acfa776d9668dc05b140389653bfbb1cdd4e19",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-terreno/plates/chaqueta-v03-cerrado.png"
+    },
+    {
+      "path": "plates/chaqueta-v04-cerrado-high.png",
+      "sizeBytes": 2104714,
+      "sha256": "fa93a7f892b7220e746858a5db2d8ca43a7dcbde98662f44526077e94a8b9235",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-terreno/plates/chaqueta-v04-cerrado-high.png"
+    },
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 166685,
+      "sha256": "9047418e0436f4cba21e5da26aad227de498028bdb4c12bb7bcc50253e0425dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-terreno/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/gorra-polo-terreno-v01.png",
+      "sizeBytes": 2112627,
+      "sha256": "db9e457c0a57565664ed5927a608d20dbb10747b1c1da884344a9cc3846f9b2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-terreno/plates/gorra-polo-terreno-v01.png"
+    },
+    {
+      "path": "plates/hoodie-terreno-v01.png",
+      "sizeBytes": 2146472,
+      "sha256": "027fbcd9e6248f062e6d7f715414740838c5ebec78d6f5009e8380a7e0ef4bb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-terreno/plates/hoodie-terreno-v01.png"
+    },
+    {
+      "path": "plates/polo-blanco-proyeccion-v01.png",
+      "sizeBytes": 2358036,
+      "sha256": "5c1b0a17149d7f3c708d4163c7b48bfb9dcffc949c97d4fe92f3455b51639071",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-uniforme-terreno/plates/polo-blanco-proyeccion-v01.png"
+    }
+  ]
+}

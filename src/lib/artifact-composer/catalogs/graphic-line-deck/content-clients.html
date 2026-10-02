@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · nuestros clientes</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-clients` (surface deck, papel, TASK-1928). La prueba en escala gigante (dos cifras con su fuente; la
+      selección toma la que se elige) y el muro de logos reales en una grilla fina de 5 × 2: un tono, el mismo peso óptico
+      (normalizados al componer, con la excepción tonal de AXIS). La décima celda dice dónde operamos. Referencia:
+      DeckClientes (D6-clientes).
+    -->
+    <main class="gl-slide gl-paper gl-cc" data-gl-root data-slot="frame">
+      <figure class="gl-layer" data-slot="indicator">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-cc-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Clientes</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quién confía en nosotros?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Marcas</span><span data-slot-field="answer">líderes</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <ol class="gl-cc-stats" data-slot="stats">
+        <li class="gl-cc-stat" data-gl-select-item>
+          <p class="gl-cc-stat-value" data-slot-field="value">+127%</p>
+          <p class="gl-cc-stat-label" data-slot-field="label">tráfico orgánico de Sky</p>
+        </li>
+      </ol>
+
+      <div class="gl-cc-rules" aria-hidden="true">
+        <span class="gl-cc-rule-h"></span><span class="gl-cc-rule-h"></span><span class="gl-cc-rule-h"></span>
+        <span class="gl-cc-rule-v"></span><span class="gl-cc-rule-v"></span><span class="gl-cc-rule-v"></span><span class="gl-cc-rule-v"></span>
+      </div>
+
+      <ol class="gl-cc-logos" data-slot="clients">
+        <li class="gl-cc-cell"><img data-slot-field="src" alt="" /></li>
+      </ol>
+
+      <div class="gl-cc-markets" data-slot="markets">
+        <p class="gl-cc-markets-title" data-slot-field="title">Operamos en</p>
+        <p class="gl-cc-markets-text" data-slot-field="text">Chile, EE. UU., Colombia, México y Perú</p>
+      </div>
+
+      <p class="gl-cc-source" data-slot="source">Fuente: casos publicados.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-light.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

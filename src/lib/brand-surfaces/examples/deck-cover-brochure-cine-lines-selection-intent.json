@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "document-selection",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Brochure · Servicios 2026",
+    "question": "¿Qué hace Efeonce?",
+    "answer": [
+      "Crecer"
+    ]
+  },
+  "body": "**Cinco** líneas de servicio:\nGrowth · Brand · Engine · Voice · Revenue",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+    "alt": "Nexa con la chaqueta de Efeonce, rodeada por cinco esferas de luz en los colores de las líneas de servicio, la naranja en su palma"
+  },
+  "column": {
+    "topPx": 200
+  }
+}

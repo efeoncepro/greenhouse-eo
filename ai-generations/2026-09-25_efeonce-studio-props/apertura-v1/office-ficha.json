@@ -1,0 +1,18 @@
+{
+  "id": "apertura-oficina-concepto",
+  "formato": "16:9",
+  "impacto": true,
+  "escena": "SCENE (conceptual office design for Efeonce creative production, not an existing built location; Santiago, soft late afternoon sunlight): a credible compact creative studio just between working sessions, unoccupied. Right half: pale oak worktable with softly curved corners and navy folded-metal supports, one warm-white mug with royal blue interior, an ivory cloth notebook with large navy curved lower corner and small royal-blue oblique bottom plane, a silver laptop, navy pen, quiet ivory organizer. Behind it a completely transparent acrylic collaboration board with slim navy supports and royal-blue feet; a rail holds a few actual photographic print proofs, and a low camera tripod and an unlit product-photo softbox make the production function tangible. Light limestone and warm white wall finishes, calm pale oak cabinetry, slim blue drawer-edge detail, good acoustic fabric panels, real material grain. A frosted curved privacy cut in the glass partition repeats the notebook's open curved/oblique relationship at architectural scale. Natural warm sunlight grazes oak and aluminum; the blue belongs to small useful objects and construction details, warm amber light on oak is the story accent. Left 42 percent is one uninterrupted very light lime-plaster wall with naturally visible plaster texture, empty and clean for an exact official wall logo to be composed later. No logos, invented lettering or symbols generated. No ring ornaments, no spaceship-shaped furniture, no space theme, no large blue wall, no people, no generic conference table. Eye-level 28mm architectural lens, honest proportions and correct verticals, a strong view of the work zone. The proposed objects and room must read as one tasteful working studio, not a merch display.",
+  "lecho": {
+    "objeto": "the near edge of a pale oak material-review worktable, extremely close to the lens and softly out of focus, light ivory tonality",
+    "tono": "VERY LIGHT almost white"
+  },
+  "preflight": {
+    "referencias": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/K1-kv-cafe-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/K3-noche-final.png"
+    ],
+    "comparacion": "Useful blue ceramic and warm natural materials from K1/K3, meaningful work surfaces and real production artifacts; no people identities reused. Office is a proposed concept, not documentary evidence."
+  }
+}

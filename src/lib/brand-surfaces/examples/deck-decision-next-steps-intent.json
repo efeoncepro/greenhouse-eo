@@ -1,0 +1,72 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-next-steps",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Próximos pasos",
+    "question": "¿Y ahora qué sigue?",
+    "answer": [
+      "Empecemos"
+    ]
+  },
+  "body": "Un diagnóstico **sin costo** para saber dónde estás.",
+  "agenda": {
+    "kicker": "01 · Diagnóstico · Sin costo",
+    "title": "Agenda tu diagnóstico",
+    "descriptor": "45 min por videollamada · Brand Visibility Grader, CRM Gap Analysis o Creative Velocity Audit",
+    "days": [
+      {
+        "weekday": "Lun",
+        "day": "29"
+      },
+      {
+        "weekday": "Mar",
+        "day": "30"
+      },
+      {
+        "weekday": "Mié",
+        "day": "1"
+      },
+      {
+        "weekday": "Jue",
+        "day": "2"
+      },
+      {
+        "weekday": "Vie",
+        "day": "3"
+      }
+    ],
+    "times": [
+      "09:30",
+      "11:30",
+      "15:00",
+      "17:00"
+    ],
+    "chosen": {
+      "day": 2,
+      "time": 2
+    },
+    "summary": "Martes 30 · 11:30 · hora de Chile",
+    "cta": "Agenda un diagnóstico"
+  },
+  "nextSteps": [
+    {
+      "number": "02",
+      "label": "Piloto pagado",
+      "title": "Sample Sprint",
+      "desc": "Acotado y gobernado, para probar el encaje antes de comprometerte."
+    },
+    {
+      "number": "03",
+      "label": "On-Going",
+      "title": "Operación",
+      "desc": "Tus métricas en vivo en Greenhouse."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+open 9x16 dark: 145 cuadros → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/frames/open_9x16_dark
+open_9x16_dark → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/deliverables/apertura/9x16/navy
+OK open_9x16_dark 16:27:45
+open 9x16 light: 145 cuadros → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/frames/open_9x16_light
+open_9x16_light → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/deliverables/apertura/9x16/claro
+OK open_9x16_light 17:25:35
+open 1x1 dark: 145 cuadros → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/frames/open_1x1_dark
+open_1x1_dark → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/deliverables/apertura/1x1/navy
+OK open_1x1_dark 18:03:10
+open 1x1 light: 145 cuadros → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/frames/open_1x1_light
+open_1x1_light → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/deliverables/apertura/1x1/claro
+OK open_1x1_light 18:34:14
+open 4x5 dark: 145 cuadros → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/frames/open_4x5_dark
+open_4x5_dark → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/deliverables/apertura/4x5/navy
+OK open_4x5_dark 19:10:39
+open 4x5 light: 145 cuadros → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/frames/open_4x5_light
+open_4x5_light → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/deliverables/apertura/4x5/claro
+OK open_4x5_light 19:40:06
+open 16x9-4k dark: 145 cuadros → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/frames/open_16x9-4k_dark
+open_16x9-4k_dark → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/deliverables/apertura/16x9-4k/navy
+OK open_16x9-4k_dark 20:24:56

@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:09:54.856Z",
+  "run": "ai-generations/2026-09-21_nexa-acabado-v3",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_nexa-acabado-v3",
+  "totalBytes": 11960930,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "salidas/over-the-shoulder-v01.png",
+      "sizeBytes": 1983907,
+      "sha256": "20f52e62580a2ec654989bb38d56e5696cf33f51d3b9605835fa146438a62aea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-acabado-v3/salidas/over-the-shoulder-v01.png"
+    },
+    {
+      "path": "salidas/over-the-shoulder-v02.png",
+      "sizeBytes": 1959544,
+      "sha256": "478bfb17969e7a8d110dfbdce7996e4a0ab37121df913f7c4ece1b8f0bdcb53d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-acabado-v3/salidas/over-the-shoulder-v02.png"
+    },
+    {
+      "path": "salidas/over-the-shoulder-v03.png",
+      "sizeBytes": 2011717,
+      "sha256": "1b9e3fe823d9d0f9c8a8ad5154060804cf6e1b4f92742155c35f23328fb9715e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-acabado-v3/salidas/over-the-shoulder-v03.png"
+    },
+    {
+      "path": "salidas/piloto-angulo-45-der.png",
+      "sizeBytes": 1473473,
+      "sha256": "224eb2024fe588c8b62d89e93cd8d3aa923a4541e7e3f063beba9fe9ca13afe7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-acabado-v3/salidas/piloto-angulo-45-der.png"
+    },
+    {
+      "path": "salidas/z-brazos-v02.png",
+      "sizeBytes": 1102439,
+      "sha256": "fb031bfdff2093a0d1165eefb0ac97f3f3e6df72101452045c75fd533a63303c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-acabado-v3/salidas/z-brazos-v02.png"
+    },
+    {
+      "path": "salidas/z-manos-ots.png",
+      "sizeBytes": 1286099,
+      "sha256": "0a7291b40b6ba3ae01d5b35941e19d21b06339e436cba7fd7e135d0448835350",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-acabado-v3/salidas/z-manos-ots.png"
+    },
+    {
+      "path": "salidas/z100-mano-v02.png",
+      "sizeBytes": 302289,
+      "sha256": "c604b0ee311e1c297d2caed36f856a98819f544d45286a0aa2b31e1971889fa3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-acabado-v3/salidas/z100-mano-v02.png"
+    },
+    {
+      "path": "salidas/z100-v03-inferior-manos.png",
+      "sizeBytes": 1131826,
+      "sha256": "c85c6606d407a3d01bd27349a048b6e1cb2b242e8c973b6903c1c5541d28ac46",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-acabado-v3/salidas/z100-v03-inferior-manos.png"
+    },
+    {
+      "path": "salidas/z100-v03-pantalla.png",
+      "sizeBytes": 709636,
+      "sha256": "358286f7f425780e3faa8af1901ffc434e858f44dc478b872a70497beaef1bf2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-acabado-v3/salidas/z100-v03-pantalla.png"
+    }
+  ]
+}

@@ -2,6 +2,11 @@
 
 > **As-of: 2026-08-06.** Investigación contra la documentación oficial (`docs.dataforseo.com/v3/...`) y páginas de pricing oficiales (`dataforseo.com/pricing/...`) vía WebFetch/WebSearch. Solo se afirma lo verificado; cada sección lista su URL fuente. Páginas caídas declaradas al final.
 
+> **Inventario operativo 2026-09-28:** las 74 rutas `keywords_data` todavía bloqueadas, con método, uso eventual y
+> gate, se generan en
+> [`GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md`](../../../../docs/architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md).
+> Este dossier explica el oficio; el registro vigente gobierna la evaluación de rutas y no amplía el allowlist.
+
 ---
 
 ## 1. Resumen ejecutivo

@@ -37,6 +37,8 @@ Ninguno es el ganador universal ni tiene un lift demostrado. No asignarlos autom
 
 ## Accesibilidad del CTA y elección de color
 
+**Ampliación autorizada 2026-09-25 — política por campaña.** Con `cta.colorPolicy` se elige un tratamiento relacionado con la escena, un contraste deliberado o uno neutro, dentro de la paleta declarada de campaña. Se verifica archivo/hash, variante, prominencia y colores explícitos. Sin política se conserva la exigencia anterior de acento. Ninguna ruta exime contraste ni aprobación visual. Contrato, ejemplo y límites de `auto`/`--variantes`: [compositor §20](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#20-política-cromática-por-campaña-optativa).
+
 Regla del operador, 2026-09-22: armonía con la pieza **y** contraste comprobado. Un ad naranja no recibe un CTA verde por plantilla. Elegir el acento por composición y después la tinta por contraste; no asumir que naranja/blanco, teal/blanco o cualquier par de marca pasa.
 
 - Texto del CTA y descriptor: **≥4,5:1**. Para el CTA se mantiene este piso incluso si es grande; no usar la excepción de texto grande para rescatar una combinación débil. **Desde el 2026-09-23, APCA y daltonismo también bloquean en el CTA** (decisión del operador), exceptuables sólo como `cta-perceptual` con aprobador del registro; en las demás voces sólo avisan.

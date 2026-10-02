@@ -1,6 +1,6 @@
 {
   "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
-  "sellado": "2026-09-24",
+  "sellado": "2026-10-02",
   "assets": {
     "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
       "rol": "persona:julio",
@@ -28,7 +28,7 @@
     },
     "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-perfil-der.png": {
       "rol": "persona:julio/perfil-der",
-      "sha256": "c1ae6fb69c2dbb59f48e7da7a71496dcf1574fcb7ee158533137b5bc962e629c"
+      "sha256": "90ef70ed0500f7b30db698ecfe4a95d3a78abf3a9d5df76b60326c3362edea93"
     },
     "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-135-trasero.png": {
       "rol": "persona:julio/trasero",
@@ -38,6 +38,10 @@
       "rol": "persona:julio/espalda",
       "sha256": "640f278f70d13bb816b9889c0d8060623880f70ace639d4fa70b40894abd8c07"
     },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png": {
+      "rol": "persona:nexa",
+      "sha256": "0903de95472ed4eb4c1029da00ec05dcd976628910d8f062961c17db7a29f219"
+    },
     "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png": {
       "rol": "persona:nexa",
       "sha256": "a0d4864f6ae1829de110af860a973e8b41a51b03fb3c58728e9c8a0c12ae4a6d"
@@ -45,10 +49,6 @@
     "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png": {
       "rol": "persona:nexa/cuerpo",
       "sha256": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1"
-    },
-    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png": {
-      "rol": "persona:nexa",
-      "sha256": "0903de95472ed4eb4c1029da00ec05dcd976628910d8f062961c17db7a29f219"
     },
     "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-4-busto-tresquartos.png": {
       "rol": "persona:nexa/busto",
@@ -129,6 +129,54 @@
     "ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png": {
       "rol": "persona:nexa/mic-drop",
       "sha256": "1e05a848669405bd073522e703786802dbbbf6fd92c5fc4532471804f3b89df9"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-01-carcajada.png": {
+      "rol": "persona:nexa/carcajada",
+      "sha256": "5fd4399de4574892d057f89de3f21a8380a6575bb7e93ade4289994a382c51ff"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-02-risa-elegante.png": {
+      "rol": "persona:nexa/risa-elegante",
+      "sha256": "831e80b99050acfde8570b65edde4c9d1a94e191c1950c10f8fb8812a46f190c"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-03-sorprendida.png": {
+      "rol": "persona:nexa/sorprendida",
+      "sha256": "1c7538625cad5e5edc9711a1d94793455ea927827e0b5b5cdb79fe23f57b1c75"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-04-esceptica.png": {
+      "rol": "persona:nexa/esceptica",
+      "sha256": "3aaa187d7d8368f04a948b02200a2ce9d4772c02ff4144374247b704b5678541"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-05-pensativa.png": {
+      "rol": "persona:nexa/pensativa",
+      "sha256": "cda951d13cafe543a13c2dd4d72480afe9f7c34c02cb62f31dec488832b4be10"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-06-neutra-reposo.png": {
+      "rol": "persona:nexa/neutra",
+      "sha256": "7320c3d72c35811528880cbccd9a2b501eb862e60a90a1db5c2d6e302aeb2ac3"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-07-preocupada.png": {
+      "rol": "persona:nexa/preocupada",
+      "sha256": "88420ff0009204f657c11997795229c103545e6be5524ef24726c13bb13334b6"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-08-conviccion.png": {
+      "rol": "persona:nexa/conviccion",
+      "sha256": "aa76d4e6c2a3f76eb746dab9ecd215774221c7794d67fe51b8957b9fb18c620e"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-09-escucha-empatica.png": {
+      "rol": "persona:nexa/escucha-empatica",
+      "sha256": "beb65c8a7c80319d27ed936877108adac0a4684315513c269554b5f33d15d97d"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-10-curiosa.png": {
+      "rol": "persona:nexa/curiosa",
+      "sha256": "f81c71927a9bad6017050c56bfe7a986e83ff3bf6889d47c1228380f668a516f"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-11-complicidad.png": {
+      "rol": "persona:nexa/complicidad",
+      "sha256": "be98e52eb87c0fede856c4b73821e27a15632617f2423234e9dd419ad40ba2d4"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-12-mirada-lateral.png": {
+      "rol": "persona:nexa/mirada-lateral",
+      "sha256": "dbde6448bd8908af60fd3079e9bd3ee00e76196e8818c6f57663ae1c0ebf1667"
     },
     "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-1.png": {
       "rol": "persona:nexa/prof-1",
@@ -214,6 +262,34 @@
       "rol": "persona:nexa/lifestyle-4",
       "sha256": "336317422a32b20e680ed478daf9ed451f08be5c163ce67ea4084d5844a40203"
     },
+    "ai-generations/_identidad-equipo/andres/actual.png": {
+      "rol": "persona:andres/cuerpo",
+      "sha256": "f0d6b3ac3ef9b64b7e09c474fe51367a00fcfdb8acf37fb6e620c61d5313e829"
+    },
+    "ai-generations/_identidad-equipo/andres/antiguo.png": {
+      "rol": "persona:andres",
+      "sha256": "d3d0eaac4d0062c5d586f0663a1bd88f3bb38b582357da086e18613c0427ca02"
+    },
+    "ai-generations/_identidad-equipo/daniela/actual.png": {
+      "rol": "persona:daniela/cuerpo",
+      "sha256": "aec2989c53440e329ba36986c83d7d4143bbcffbd0b19001840b00d3c7244e29"
+    },
+    "ai-generations/_identidad-equipo/daniela/antiguo.png": {
+      "rol": "persona:daniela",
+      "sha256": "50dd595f8e45419d22dd79341dc10ca2280acb80c87eac51876e9453795c41dd"
+    },
+    "ai-generations/_identidad-equipo/humberly/antiguo.jpg": {
+      "rol": "persona:humberly/cuerpo",
+      "sha256": "7582bd9e234d44550107eff390b9bcaa45c052fdfc89338a2b29f33ef173fd5d"
+    },
+    "ai-generations/_identidad-equipo/melkin/actual.png": {
+      "rol": "persona:melkin/cuerpo",
+      "sha256": "e307af20687a760f5d10ddf15c21f9838eeffa4e629a902397adf1ddafefcf6d"
+    },
+    "ai-generations/_identidad-equipo/valentina/actual.png": {
+      "rol": "persona:valentina/cuerpo",
+      "sha256": "fc3766c570af188bdc67da6a45ca3cd4037dcbdb136301510e0854499ba17077"
+    },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",
       "sha256": "4bb97bc7fb7382b898fbdd76c4b97073dbe27e5e401c8c9a612ccf6a3026caf3"
@@ -246,6 +322,78 @@
       "rol": "kit:sprocket-hubspot/tres-cuartos-trasero",
       "sha256": "d0ea5ce54a6742f7bcf30efcf74a3a01fd903e75f3df374adc0ba3a6bcc01ad8"
     },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/efeonce-logo-3d-blanco-mediana-01-frente-altura-ojos-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-blanco/frente",
+      "sha256": "1ad8376e7b47174c8f98c040bcb3a121711e55aaee3414149a71c59e80b9e3b3"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/efeonce-logo-3d-blanco-mediana-01-frente-altura-ojos-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-blanco/frente-luz-izq",
+      "sha256": "bda3a58bb92402c766b722f2bd662989b3c85af2fc5337a76ffa50d495960df5"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/efeonce-logo-3d-blanco-mediana-02-tres-cuartos-izquierda-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-blanco/tres-cuartos-izq",
+      "sha256": "317ad05d4f3afd502abe25597ecbd121a1dd1c96a853ace7ecda8cf4e1386faa"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/efeonce-logo-3d-blanco-mediana-03-tres-cuartos-derecha-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-blanco/tres-cuartos-der",
+      "sha256": "8fbf6699614cfb35822154e9d20a5c006e86fb28482fbb507be1b5b1bcdb503b"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-navy/frente",
+      "sha256": "93013a0cbb40062af78d383596aa47a57caf083b055ab17a43ccfa73ed2d9386"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-navy/frente-luz-izq",
+      "sha256": "17dba09cf913129c8a6097fdcc7bae2554c94680e82e641b98cd2937ea5956f5"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-navy/tres-cuartos-izq",
+      "sha256": "afffc381865fd8b234f20da45785593f9bbe6683a3922c5e1760a67fa171d4b0"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-letrero-navy/tres-cuartos-der",
+      "sha256": "be2cba856fddfd7debce4db29ad9d2a1a53c9393dd223b66933372a9f9f83c25"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-02-picado-persona-sentada-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/sentada",
+      "sha256": "d009cf2376ea39378de5a5eb548e6bbdbc6783100b34f5d8c7635f77ae67ab8f"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-02-picado-persona-sentada-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/sentada-luz-izq",
+      "sha256": "aa4da9cba0e40c53e1adff7bdc9906c53390d6a24961ef937d7214753b0f7abb"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-01-frente-a-ras-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/a-ras",
+      "sha256": "56537895fd74081964f31137446e2a1e1441ec4ea674acd9fc6322aa21ee9df7"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-03-picado-tres-cuartos-izquierda-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/tres-cuartos-izq",
+      "sha256": "34edac15dbe39fee8c0886e3be06bbcc88250282917bdee2914fcf0826c060a3"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/efeonce-logo-3d-blanco-pequena-04-picado-tres-cuartos-derecha-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-blanco/tres-cuartos-der",
+      "sha256": "7de6ac4bb25c4957e1f7dfbd3eb511ae2e18a79c0568afcf7543e183a124c328"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-02-picado-persona-sentada-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/sentada",
+      "sha256": "62afac8b16f3f1d6639a480adb572c94367789e965e7915593a93d0730426d2c"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-02-picado-persona-sentada-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/sentada-luz-izq",
+      "sha256": "6c17de1c0a5039f25541ddbefb494e6f8ff2c658db337d9ccbe8041e616a4bf1"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-01-frente-a-ras-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/a-ras",
+      "sha256": "f5745c4fa5442d20c3c80c41fe8bbb31d5be6607bcaa0adead833518dfd0a264"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-03-picado-tres-cuartos-izquierda-luz-der-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/tres-cuartos-izq",
+      "sha256": "31984307ad640e95ecbbbdd4294bf7e37fc85fe99548e8de3928447f5e64a650"
+    },
+    "ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/efeonce-logo-3d-navy-pequena-04-picado-tres-cuartos-derecha-luz-izq-transparente.png": {
+      "rol": "kit:logo-efeonce-3d-escritorio-navy/tres-cuartos-der",
+      "sha256": "6abd8d7f437d1b044cb6b723077fec6a4d3f13e1dfbb8448707532177bb8e8fa"
+    },
     "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:nave-efeonce/frente",
       "sha256": "c12e6678db2dcb59fe11a38bc9e7806a957ba6f36ad9c58631d10fe6650384c2"
@@ -257,6 +405,734 @@
     "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-03-perfil-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:nave-efeonce/perfil",
       "sha256": "49a210d22337d2bec973f1f6f8ca81162177559e734e32e8ee6728e0fd4c1a9a"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-01-frente.png": {
+      "rol": "kit:spark/engine/frente",
+      "sha256": "f4a47845e697adb6d6fb8c4b486e2ff31d6d911dcfa5f09c076fe3c3c3d38080"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/engine/tres-cuartos-izq",
+      "sha256": "14d2820321ae86afb611719209cb686fe25fc2d1d65b6398607764fc77c85d0b"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/engine/tres-cuartos-der",
+      "sha256": "265f103c0444ad9a83f1d269aa3c7ca4133339d0c674fb49c98cc48ba06328a0"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-04-perfil.png": {
+      "rol": "kit:spark/engine/perfil",
+      "sha256": "d3be5c6ed9ed44f714e4e593695f7c56bb1b8550752237169d91e09be05b38a2"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-10-perfil-derecho.png": {
+      "rol": "kit:spark/engine/perfil-der",
+      "sha256": "21e3f2cc50bf0e7c1e86a0896ce549b21e1b52280acb277d2d3037dda2c3db19"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-05-espalda.png": {
+      "rol": "kit:spark/engine/espalda",
+      "sha256": "de44c66274c288e5d06bf8629cf7261ba1fe86bddd9ee8b98550715264a70f54"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-11-espalda-recta.png": {
+      "rol": "kit:spark/engine/espalda-recta",
+      "sha256": "6191e9cfd9e9f06e4a433aad12799fd8aafb6af85cf137709dd0303f828da48a"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/engine/trasero-izq",
+      "sha256": "2bb0c66065c5aea47d4bbed9381d643371de4d1c7f3c21e4239e76ff4c2b8d12"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-06-contrapicado.png": {
+      "rol": "kit:spark/engine/contrapicado",
+      "sha256": "cb60efdc2844a29f71c9882d18672f61922d80031717a055085acda0037db551"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-07-picado.png": {
+      "rol": "kit:spark/engine/picado",
+      "sha256": "6630f72740ee605637e61b65c025ecb70f5ee03d5d2a78bde56caf69c3651e97"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-08-mira-arriba.png": {
+      "rol": "kit:spark/engine/mira-arriba",
+      "sha256": "f4e5e43cb09de2b87327d85bf34de5ae155e935558da2be40b524a3c17bb4dc2"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-09-mira-abajo.png": {
+      "rol": "kit:spark/engine/mira-abajo",
+      "sha256": "0314534f78ad7d706a1aa76e40de4a15e88cf767f430aeedae47e0b319a76e66"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-20-expresion-atento.png": {
+      "rol": "kit:spark/engine/atento",
+      "sha256": "8b229a75764ddabd6a522a0a2d7b15b80f85f1d5b441151f4d37d280e99dcc6f"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-21-expresion-trabajando.png": {
+      "rol": "kit:spark/engine/trabajando",
+      "sha256": "fe4714e4ca215eb52bbae0ea2a65bd52c1a625881d6def997522c7f38deb24e5"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/engine/pide-revision",
+      "sha256": "b98dcc031c3be23c0d008dd84dd65748819c5a9a1b40f1f18ce1b68888bd26a7"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-23-expresion-listo.png": {
+      "rol": "kit:spark/engine/listo",
+      "sha256": "5ded148604690c914ef93c4588c11cc77a6de123abaeaba4b5ce5e28d11f198f"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/engine/sorprendido",
+      "sha256": "14f30c6082c7fa11d663fc7f44efac794fb903db0cc43fe028747de2930f7500"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-25-expresion-pensando.png": {
+      "rol": "kit:spark/engine/pensando",
+      "sha256": "fa4810549dcf4777a1084b2bbd31fa74eb078abb0463731f86fcf0f78b333633"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-30-cine-frente.png": {
+      "rol": "kit:spark/engine/cine-frente",
+      "sha256": "ca6fbb2bd95ef885d9d8a40d3ee3198a113ff8bc2d0965327f52dba01a02093b"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/engine/cine-tres-cuartos",
+      "sha256": "eb76416ee3f4afb77ece4ef66f9addeb95553bb149d63b54ad5f6ec78b092b08"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/engine/cine-mira-arriba",
+      "sha256": "f5f086e55e287df3bd3684c6f2b607bcbc04eede5a29a3f199234f9b152b0d5e"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-40-accion-volando.png": {
+      "rol": "kit:spark/engine/volando",
+      "sha256": "9c19058f188507598e53e4c890568f65f57b368fa744557883d384677dd2dd60"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-41-accion-senalando.png": {
+      "rol": "kit:spark/engine/senalando",
+      "sha256": "4d102a956707359e66d0e44f600f86ac2da2e7a359884fa1ad3278fd59c4f13f"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/engine/presenta",
+      "sha256": "59f3e7de121e215966abd53b37faae5ab083bfe1c20f1c65924a014e487e07cb"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/engine/entrega-tarjeta",
+      "sha256": "60caad6773760455de0f8c4c087912b760870643e40c6226318a43adaf192946"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-50-grupo-tres.png": {
+      "rol": "kit:spark/engine/grupo",
+      "sha256": "4df7f73dd7417f8b9747d73d83f54ecfc8fc5bf4d5926018405f8bfcbcfc2c34"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-01-frente.png": {
+      "rol": "kit:spark/growth/frente",
+      "sha256": "6c7646765230f122b3347e9bbeecf394972037b80d2484a5675c41271376676c"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/growth/tres-cuartos-izq",
+      "sha256": "60eb904ba8e037cca6d17247f6ae687c72634636e4a0f453792e7d6b897d1847"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/growth/tres-cuartos-der",
+      "sha256": "443989d8e87b1d0dbbf1895645537772123df4553d2e16dd1f18133c704f49df"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-04-perfil.png": {
+      "rol": "kit:spark/growth/perfil",
+      "sha256": "2fab5a037857af4309522548f55bf90ae7ea5ef8adf7792b3468dbd3b1b01a80"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-10-perfil-derecho.png": {
+      "rol": "kit:spark/growth/perfil-der",
+      "sha256": "c0f288c2efbd4587cc175960b20ac7f65ee072ee7df89bb5eef95cb38487a220"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-05-espalda.png": {
+      "rol": "kit:spark/growth/espalda",
+      "sha256": "75649a27b44cd0847dab630fc2cbf5ae7a6127db20bda25286ff07b97ef382f2"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-11-espalda-recta.png": {
+      "rol": "kit:spark/growth/espalda-recta",
+      "sha256": "4346d5ac453ee665e7e166a490614dab5dd8753ea024866e4d44a2db460b595b"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/growth/trasero-izq",
+      "sha256": "637109f39e05bbfb7967994300ea7217c0d29cfb257e2cc1afd48995f867dacc"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-06-contrapicado.png": {
+      "rol": "kit:spark/growth/contrapicado",
+      "sha256": "bdfa90b95938def3becc226b33cc42cbdc0f31351529599361d64d986761c3de"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-07-picado.png": {
+      "rol": "kit:spark/growth/picado",
+      "sha256": "4c42cf947d6553acc7d51ab1b789b49bae4d5d1c5bd1267d28e2f3298c1e5e54"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-08-mira-arriba.png": {
+      "rol": "kit:spark/growth/mira-arriba",
+      "sha256": "10ab4aefd6c877bd258dd4a9314f754fb696a43aa0e76d5f679b6308c55b5135"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-09-mira-abajo.png": {
+      "rol": "kit:spark/growth/mira-abajo",
+      "sha256": "09f1a90a6ff7a24e44eaf2772c57b557ea25148374755c44e97e6ab5b66e1a5b"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-20-expresion-atento.png": {
+      "rol": "kit:spark/growth/atento",
+      "sha256": "af701b4f1513a2b44a2a5cae0ae972dd2018694fe726986a20dfc7f0705633fa"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-21-expresion-trabajando.png": {
+      "rol": "kit:spark/growth/trabajando",
+      "sha256": "d46cb7ff7ccd31f325a2713f6ef0708cbfc9e106030cd82cdd9b2fe3d346a1c7"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/growth/pide-revision",
+      "sha256": "632a1727d19bd4c846207d8e4d8237ebc4480f8e780afea0928b71d2d0af95f2"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-23-expresion-listo.png": {
+      "rol": "kit:spark/growth/listo",
+      "sha256": "256eb8b64bc3e2cf912dd6b421c9161e1632894a4290ad18135bb3dc05a472cf"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/growth/sorprendido",
+      "sha256": "f74dea03924b2d11fe2f4ed91b847377233bc0e85e0d4ac744af0a6849fcf42e"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-25-expresion-pensando.png": {
+      "rol": "kit:spark/growth/pensando",
+      "sha256": "f06c2660747e34dbbbaad779b094efed29a01a5eb59e203423078a7bdc6f7efc"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-30-cine-frente.png": {
+      "rol": "kit:spark/growth/cine-frente",
+      "sha256": "a1d4e241e7d15aa0b33a853999ee9e346d540bd4c697adbbb97a735b68a96539"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/growth/cine-tres-cuartos",
+      "sha256": "8a32f7eb2ef8c013991cb90e232c037fa8e11a9cd699bb0d34541a64d7ebbede"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/growth/cine-mira-arriba",
+      "sha256": "78ab7690cf63c95a74a579d106329ee21e785999edd9d7c28f577ecc3125a6ba"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-40-accion-volando.png": {
+      "rol": "kit:spark/growth/volando",
+      "sha256": "f23866e02034c3ad3eecbcee709ec85bf089f02aa71bf32e683dbaa3b9403fb3"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-41-accion-senalando.png": {
+      "rol": "kit:spark/growth/senalando",
+      "sha256": "69bc57cb9be3dcb4878e65d335d7d28f9553da5f29a5f13a14dc78dbb64d535c"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/growth/presenta",
+      "sha256": "c679d601957aa5cea51ed60559a92cd53d9b10b8a2f839a3fa6b6087db84ffbb"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/growth/entrega-tarjeta",
+      "sha256": "30284f56ba48103ff3be37f32268c3962183fae852e343d73f0ca78f3c367590"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-growth-50-grupo-tres.png": {
+      "rol": "kit:spark/growth/grupo",
+      "sha256": "67e132d854999cd1634475c0dc12aaad308b5862e116899a13206702e1b89a14"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-01-frente.png": {
+      "rol": "kit:spark/brand/frente",
+      "sha256": "c64472acd3ec622439372d1a8c4a028ca2fc4b960df63c167af30fba32d547a5"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/brand/tres-cuartos-izq",
+      "sha256": "58aa8301a5230c87ad5556d7e9f57017c23d186ff3a281aa1503bd589e3be21b"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/brand/tres-cuartos-der",
+      "sha256": "c38304b56b1e03f47606a70b246588ee5e0858a0c107b5178dd84c7c675f17b3"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-04-perfil.png": {
+      "rol": "kit:spark/brand/perfil",
+      "sha256": "52f03055c57d949cee25121eda7b1c4f45abe6f9930b5ef91d2b6ecb8b9e8021"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-10-perfil-derecho.png": {
+      "rol": "kit:spark/brand/perfil-der",
+      "sha256": "d356ae748ff12a955e67bcbef6ed4fb2762143dc1a3a5ebf31c9009a10a3969c"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-05-espalda.png": {
+      "rol": "kit:spark/brand/espalda",
+      "sha256": "13fb73a3ec2bf99162ccb512e6e1a83684046a05a1c1705f5e4e05aeb63d3210"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-11-espalda-recta.png": {
+      "rol": "kit:spark/brand/espalda-recta",
+      "sha256": "cc37fbcfe857bf360f5cd208d4d2a81557a6b27bc814a300decce827bf583809"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/brand/trasero-izq",
+      "sha256": "fc864d6beafe9ed3dcbaa220edda31fe1c5f5c2d081e94873374a0a63c92fb0c"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-06-contrapicado.png": {
+      "rol": "kit:spark/brand/contrapicado",
+      "sha256": "6c4f9464fc8d068eca1004dfff9c9c170a07c6df153567f99a2e41e157be822f"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-07-picado.png": {
+      "rol": "kit:spark/brand/picado",
+      "sha256": "8e6fcf6cd46a6f8b273798234802c75013017497c05883fc983e598ba79c2d99"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-08-mira-arriba.png": {
+      "rol": "kit:spark/brand/mira-arriba",
+      "sha256": "ceaf9b2c62c0377fcf06d1c6d9a645838281ac8acecdddafab845849e548e37e"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-09-mira-abajo.png": {
+      "rol": "kit:spark/brand/mira-abajo",
+      "sha256": "450859ea9b98fe20a7ca194f1449a3264f3cd3d3341b4373e43921d224bc4425"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-20-expresion-atento.png": {
+      "rol": "kit:spark/brand/atento",
+      "sha256": "08f9d3c880553567d449f34e50504d90df9b6132cf7fd964f9840e8f664e38b4"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-21-expresion-trabajando.png": {
+      "rol": "kit:spark/brand/trabajando",
+      "sha256": "3a1cb0008382786e2998d576718825044e41e844f4f0623c9ac2c7f4272e4cf3"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/brand/pide-revision",
+      "sha256": "762d891147477d67914089be37df9b79e8ea8e1ff7380ebf4abe8d8ae2b39ddb"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-23-expresion-listo.png": {
+      "rol": "kit:spark/brand/listo",
+      "sha256": "88431b798c79b9482a879b20bc1754a6f6c348e2630285267685b74cd30a4ee8"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/brand/sorprendido",
+      "sha256": "9ad283bf7ddb302c7e096a5a5f1f60b0c52c58a159d89b5330ad1fb55aa90bae"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-25-expresion-pensando.png": {
+      "rol": "kit:spark/brand/pensando",
+      "sha256": "e59fa0069406ec0e51c2a64ab288e13301e9a53d564a9645e77d63f99f2bba69"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-30-cine-frente.png": {
+      "rol": "kit:spark/brand/cine-frente",
+      "sha256": "44548cfb347579cf4aeab98bd5276836a5d80c9fe3d720d961503a6eeea35e81"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/brand/cine-tres-cuartos",
+      "sha256": "08fae903b6069b9ace1f72867ffd47fa7c1a8d9257058a9caadcbab226c26be8"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/brand/cine-mira-arriba",
+      "sha256": "8b1772f9bba56426964d803d278221c94a5661dfe897530f6bf8f8ba4813d209"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-40-accion-volando.png": {
+      "rol": "kit:spark/brand/volando",
+      "sha256": "b3203cd498b8dceca24eedc7990a478c758b63903d5e00895319b8d9b63f65f2"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-41-accion-senalando.png": {
+      "rol": "kit:spark/brand/senalando",
+      "sha256": "3badf5c1f745fe4edca874d5b39aa0153ee7a1b1bfbb723ee5460d62a45e1deb"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/brand/presenta",
+      "sha256": "fbe533901e865d069f78a0d7babf76375684919c262367ea57faca8351f12b70"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/brand/entrega-tarjeta",
+      "sha256": "355af0caeeef4c6a3f41ee668e97d7ff3aacb0da245c7b657db49d38955fe0cc"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-brand-50-grupo-tres.png": {
+      "rol": "kit:spark/brand/grupo",
+      "sha256": "15eb12503771d50d1793335bc192525d87c13bbd12a0a9ad3bc2458384b12f78"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-01-frente.png": {
+      "rol": "kit:spark/voice/frente",
+      "sha256": "63069382302fd1a01f119d40507cc328b358e855bd57af78627d5c0f4df073b9"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/voice/tres-cuartos-izq",
+      "sha256": "f97ca23d2869f07087cd7af3262c18d36cdf387698dca5ed40b426772314d408"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/voice/tres-cuartos-der",
+      "sha256": "32389b666a69d30ba7764403dcdbde9a283ac2eef4169be0cceb2b0944438d78"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-04-perfil.png": {
+      "rol": "kit:spark/voice/perfil",
+      "sha256": "f866fab8d596772ddef5473d9126fd046eb22cc958849f9f270bf9d758810ff2"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-10-perfil-derecho.png": {
+      "rol": "kit:spark/voice/perfil-der",
+      "sha256": "5cf80fc8408448ab741d27616f1c51f61b749027efc01165c72277c2dce2879b"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-05-espalda.png": {
+      "rol": "kit:spark/voice/espalda",
+      "sha256": "749c06744b54411aa47ed8aa9960da814300ff026c0a81f2ed84b9a0545922cc"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-11-espalda-recta.png": {
+      "rol": "kit:spark/voice/espalda-recta",
+      "sha256": "0000b2dd24d3ce4ee5a417d51e1a5b89994bbd445ff91110ab046a04513ac098"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/voice/trasero-izq",
+      "sha256": "93decc93d8c0aad9ecdbda15f7b2c390c6d0f8ed83b3908379b73108dc21b1ea"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-06-contrapicado.png": {
+      "rol": "kit:spark/voice/contrapicado",
+      "sha256": "09049cf29bc45594976cbf43f920e230cfb51daae02b24244e7b9fa418217e56"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-07-picado.png": {
+      "rol": "kit:spark/voice/picado",
+      "sha256": "fbbedbcd4ced1f4c090cff76884bec6c5ccdb716f04fd1f8e8dbaea5a227c3b7"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-08-mira-arriba.png": {
+      "rol": "kit:spark/voice/mira-arriba",
+      "sha256": "1967577bcc5c5244abf39afb23cd0aec427f51265926e6087056ce21d7c9b590"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-09-mira-abajo.png": {
+      "rol": "kit:spark/voice/mira-abajo",
+      "sha256": "a7d2c7bc0ef28d966a34f2d8b01a3aa8146a092f124cff2c68a3d0b6aeca9e17"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-20-expresion-atento.png": {
+      "rol": "kit:spark/voice/atento",
+      "sha256": "26ac247e58cd4c44ed4ec5f2ed25c59c46a42c3d1b41ec35475187e0156a71b2"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-21-expresion-trabajando.png": {
+      "rol": "kit:spark/voice/trabajando",
+      "sha256": "c0f6e9f8db10770abd3ca395d57596211e922805f2283741e9f9381cce33edfd"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/voice/pide-revision",
+      "sha256": "3304e8058ae910e6a5007c67f0450c1b72b0b08fed77d888fa5bf1dd22961997"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-23-expresion-listo.png": {
+      "rol": "kit:spark/voice/listo",
+      "sha256": "207585538c46c871e018a66a0ac79521a8242402cf03d435d629763d8583fcf2"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/voice/sorprendido",
+      "sha256": "fe2eec0254837b26447021e5dc0af4ceaf781da39af23958df760b3ff5513bc6"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-25-expresion-pensando.png": {
+      "rol": "kit:spark/voice/pensando",
+      "sha256": "988ebbeb4496314c4399036ae678de70eb89f93db4e257e25c13874aae4f8d00"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-30-cine-frente.png": {
+      "rol": "kit:spark/voice/cine-frente",
+      "sha256": "f31806301f4fee197378bd602a383c5848c5474d97eb254a51daa47c3d0fc8bf"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/voice/cine-tres-cuartos",
+      "sha256": "13ddf1f9be82ed84e126b2c75cbf3942eba8ed190211cab72031eed291108958"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/voice/cine-mira-arriba",
+      "sha256": "ca8678a580642201913b4b1658a1135e6fcbefdaf510662cbe3d996f9aba80d0"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-40-accion-volando.png": {
+      "rol": "kit:spark/voice/volando",
+      "sha256": "e143506c19c6f08a389e230fb1b88fac1b9540a9fddff0dbfd2cc8f7de2d6595"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-41-accion-senalando.png": {
+      "rol": "kit:spark/voice/senalando",
+      "sha256": "6d04ef57981f3b5f136eb3810191a4a4ceb5417d9a8ae7bff05004ef435a941b"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/voice/presenta",
+      "sha256": "823067e9b492856c7e116ffb302e809e06f7453f23ecaf5d3103ad645dab3449"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/voice/entrega-tarjeta",
+      "sha256": "9707aa8508d9fd92aa16c606732c6db516a182627614631b3d99047adbb6d26a"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-voice-50-grupo-tres.png": {
+      "rol": "kit:spark/voice/grupo",
+      "sha256": "51ab977d481fccc4021e16ddfb964882e8eaba8fd9687bba26954b6dfed4f5c9"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-01-frente.png": {
+      "rol": "kit:spark/revenue-hubspot/frente",
+      "sha256": "c80ba9a903983f4d3d036f67f17f52e179d42db6159b485b81ca104cca2ebdfc"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/revenue-hubspot/tres-cuartos-izq",
+      "sha256": "b05c2aa3fef2690dbc834d9182dbd7fcbd4a55e219d755043038fb61f1dae226"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/revenue-hubspot/tres-cuartos-der",
+      "sha256": "31365ad7be2e89ff21bd4d495ca1ca853e51d80724c5dbf49f5765dd8ed670a0"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-04-perfil.png": {
+      "rol": "kit:spark/revenue-hubspot/perfil",
+      "sha256": "0d93754508fadce05b75657dc95077e08a45ad304b0162cffd0da598df183142"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-10-perfil-derecho.png": {
+      "rol": "kit:spark/revenue-hubspot/perfil-der",
+      "sha256": "796a63d4e3911d26d854eb20d680e39e965ed1aae4b58785b19891010e6dbdde"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-05-espalda.png": {
+      "rol": "kit:spark/revenue-hubspot/espalda",
+      "sha256": "4bb0348c6adf4b71de4f4ebfb3a05d2a86fb92fc18de7be5446be40a36780476"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-11-espalda-recta.png": {
+      "rol": "kit:spark/revenue-hubspot/espalda-recta",
+      "sha256": "4bbc1c4beb2b75443cc740a490386a1f96e83817b16f89233928b1d8262cc259"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/revenue-hubspot/trasero-izq",
+      "sha256": "34471bbab7a0a3641dd48554a00d18ff9c4c3b4103fd80c2984b7fe703cb5fbf"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-06-contrapicado.png": {
+      "rol": "kit:spark/revenue-hubspot/contrapicado",
+      "sha256": "bdb0646d878d35f4214abf3cd7863547589f7c112d8589e3b3c15589fadb62ef"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-07-picado.png": {
+      "rol": "kit:spark/revenue-hubspot/picado",
+      "sha256": "7fa13107491739ee7a16d49a85e24c99797e8819469558c0ff9d50acca0c5d81"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-08-mira-arriba.png": {
+      "rol": "kit:spark/revenue-hubspot/mira-arriba",
+      "sha256": "ce321d082f97b3dc70b8c216b9319c1418ea1e55a63dfc5b9c2bd138b8f0ffd5"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-09-mira-abajo.png": {
+      "rol": "kit:spark/revenue-hubspot/mira-abajo",
+      "sha256": "41dfdfa9036bc82f94002c307e3990e70e6bedb66c749dbce437309449061486"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-20-expresion-atento.png": {
+      "rol": "kit:spark/revenue-hubspot/atento",
+      "sha256": "240a058bd6b02471c80d581fcef01ec60fbc3bc656e1d8422b8522a44ec5e7f0"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-21-expresion-trabajando.png": {
+      "rol": "kit:spark/revenue-hubspot/trabajando",
+      "sha256": "e806c8579028836d9c1ac0163869de8a73a64ae4308846c29c9a3cbab49af60d"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/revenue-hubspot/pide-revision",
+      "sha256": "081970a08a55465ad2178734e183c9f5737a36952b3cdb8c529164fd52168f49"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-23-expresion-listo.png": {
+      "rol": "kit:spark/revenue-hubspot/listo",
+      "sha256": "5116ce3ae1e518a0eaf1446935822275d79a6388c07c729e838221f619502c1d"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/revenue-hubspot/sorprendido",
+      "sha256": "eac15bbee37b3c4c3594b98ae03bf5966a3fa054ddf456d73b20d13f095211eb"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-25-expresion-pensando.png": {
+      "rol": "kit:spark/revenue-hubspot/pensando",
+      "sha256": "04613c9f9f3b4ba90ed7a95d11d0dd3cd8682957ffb9e14103f5c0ca5c3bc4ae"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-30-cine-frente.png": {
+      "rol": "kit:spark/revenue-hubspot/cine-frente",
+      "sha256": "5ad40edf7ab1c2012b8c08ede8352e37c2fe69ef3813946ff8db62ca11a60f28"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/revenue-hubspot/cine-tres-cuartos",
+      "sha256": "5e9dc3440c782ed06d997c517fbb7ad42d3c224b05d84d559227c944472dab7e"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/revenue-hubspot/cine-mira-arriba",
+      "sha256": "825108478b48c1ceebab79c750e47ba9a599a5c773d0ca7206baa09aad40d912"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-40-accion-volando.png": {
+      "rol": "kit:spark/revenue-hubspot/volando",
+      "sha256": "4da8532aa277ac351b83ca7cf7e97cb43eea792144629b742a023d8bc60e705a"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-41-accion-senalando.png": {
+      "rol": "kit:spark/revenue-hubspot/senalando",
+      "sha256": "31054b2fc43f16c0b6cd6eb497f50fec1a26cf0aa925928766d3a089bae8a127"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/revenue-hubspot/presenta",
+      "sha256": "67ab74ad889d7e893b516f4bb2954f551dc04e191ade0e71c343e7f710ab3269"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/revenue-hubspot/entrega-tarjeta",
+      "sha256": "3cb53ed144f785c8023ece2085eedfe24df7b94c734ebf9aa9ce09f69c5145b8"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-hubspot-50-grupo-tres.png": {
+      "rol": "kit:spark/revenue-hubspot/grupo",
+      "sha256": "3a601f2598fb15e9def248f6b1f37c5f14351f53454db294ae1f3023f4d4663c"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-01-frente.png": {
+      "rol": "kit:spark/revenue-salesforce/frente",
+      "sha256": "c0ec8ef1b7567fbcdcfb62945d075b8b690cc90eb8ea730c31599b0f4d7e577e"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-02-tres-cuartos-izquierda.png": {
+      "rol": "kit:spark/revenue-salesforce/tres-cuartos-izq",
+      "sha256": "fd6db089c65ec3db7d0524330f53786c0ccac10c4d7e6f8d0c046595a5c4ab9e"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark/revenue-salesforce/tres-cuartos-der",
+      "sha256": "4a342136add8918e18065ab7b3f9860579c7e640cfd51cd797b4282fcfa02867"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-04-perfil.png": {
+      "rol": "kit:spark/revenue-salesforce/perfil",
+      "sha256": "598f9b3fc27eeea7f5f53eff8788234c4fcbfa9bc957abf342782298b7e43a42"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-10-perfil-derecho.png": {
+      "rol": "kit:spark/revenue-salesforce/perfil-der",
+      "sha256": "717e9e77a24f15c1f76217923734315362333911bf89069539fa2bc0c1bf890b"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-05-espalda.png": {
+      "rol": "kit:spark/revenue-salesforce/espalda",
+      "sha256": "6ee6a83462a264726ad224ff161b9d34dbcfc0f7e615974002f352791dd2abf4"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-11-espalda-recta.png": {
+      "rol": "kit:spark/revenue-salesforce/espalda-recta",
+      "sha256": "3faaa024e03b877e2ccb18838298f99d5cad99863fe3f73429048db0f264f204"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-12-tres-cuartos-trasero-izquierdo.png": {
+      "rol": "kit:spark/revenue-salesforce/trasero-izq",
+      "sha256": "b1079baf09e186f76cab875c0ff6905c7c4ef4f1614367138942b3b946e4919c"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-06-contrapicado.png": {
+      "rol": "kit:spark/revenue-salesforce/contrapicado",
+      "sha256": "19451adec6f0cbfec5751b851f756b0056b2d7c06f6ebfe84fc55db57a71e8eb"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-07-picado.png": {
+      "rol": "kit:spark/revenue-salesforce/picado",
+      "sha256": "0570a9b923056b7aceeff254d1fc093138a5a6f88d55a6b9afa9b629db346493"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-08-mira-arriba.png": {
+      "rol": "kit:spark/revenue-salesforce/mira-arriba",
+      "sha256": "88583a9228c6fa4b9e67181e56b5e27e5d95f07a14b77682437a5c34cbd7d85e"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-09-mira-abajo.png": {
+      "rol": "kit:spark/revenue-salesforce/mira-abajo",
+      "sha256": "14aa415edd3381d06bb2f06fe0bdc546ee53264da71be3524e5e9a8e8c8f35d3"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-20-expresion-atento.png": {
+      "rol": "kit:spark/revenue-salesforce/atento",
+      "sha256": "8539de6310ac6c316de0d618313fce826b29113c7198adeccd05fee543aa4671"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-21-expresion-trabajando.png": {
+      "rol": "kit:spark/revenue-salesforce/trabajando",
+      "sha256": "b9ed6c20ae08692438c56ab5b45a5a09c0ee957652c24bc22c56fbdf57f51fee"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-22-expresion-pide-revision.png": {
+      "rol": "kit:spark/revenue-salesforce/pide-revision",
+      "sha256": "7cb8f8e4d207573c0acf2c864bae9ad87ffab2d6b6c3231551b1850540f8f472"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-23-expresion-listo.png": {
+      "rol": "kit:spark/revenue-salesforce/listo",
+      "sha256": "39d87b1baa0e5bbbdfab0e74ee38917ed37c16d723c74a051d4ee6945556ff77"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-24-expresion-sorprendido.png": {
+      "rol": "kit:spark/revenue-salesforce/sorprendido",
+      "sha256": "a85b8588700c17724a164e5f1053d034940fa31714de2a3a696e7cf8ee8a42a9"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-25-expresion-pensando.png": {
+      "rol": "kit:spark/revenue-salesforce/pensando",
+      "sha256": "be0afc42309c267820a1ef7fee06ad40e06519b1e30ec7f22696937d3fb626af"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-30-cine-frente.png": {
+      "rol": "kit:spark/revenue-salesforce/cine-frente",
+      "sha256": "b2b19cfc37c1fd0d9bd5291c7127ab2b1aa65a11806b18b30feed553e652a8ae"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-31-cine-tres-cuartos.png": {
+      "rol": "kit:spark/revenue-salesforce/cine-tres-cuartos",
+      "sha256": "6ebe66dd2e8706b38b02281213cf7ca3f1bc1c02ce1287c1d3724b194767e3b8"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-32-cine-mira-arriba.png": {
+      "rol": "kit:spark/revenue-salesforce/cine-mira-arriba",
+      "sha256": "0c06e5cb3316366e9ee422ebfd7d6c7592291bac2a9dc7e2b7fe5100d77c377b"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-40-accion-volando.png": {
+      "rol": "kit:spark/revenue-salesforce/volando",
+      "sha256": "4d463f88fa55cec449b2966959dfe4405db62d5376b42d6c8e6f8a44d9026d99"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-41-accion-senalando.png": {
+      "rol": "kit:spark/revenue-salesforce/senalando",
+      "sha256": "a47bd1c354d73e6d6932e340e7334a1e983cd726c86a5ee982d69557b430cd0e"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-42-accion-presenta-en-la-palma.png": {
+      "rol": "kit:spark/revenue-salesforce/presenta",
+      "sha256": "9746fdffa031192d96766dda51ad315a59ca5d093b81fac777b6aeb780bcde11"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-43-accion-entrega-tarjeta.png": {
+      "rol": "kit:spark/revenue-salesforce/entrega-tarjeta",
+      "sha256": "c03c4a8c45a5047f1e05c66fc6fcfc9d585ed33b31e5b4cfb86de740ddb9e068"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-revenue-salesforce-50-grupo-tres.png": {
+      "rol": "kit:spark/revenue-salesforce/grupo",
+      "sha256": "62b68fdcebc5cf3055b9b793ff79b006c45cef6db528d42ead797e49aa711864"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-investigacion-01-heroe.png": {
+      "rol": "kit:spark-investigacion/heroe",
+      "sha256": "4de5017dfe86c17056a080c944817cbffae91ac7c7e8b0de1ac581df1a078049"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-investigacion-02-frente.png": {
+      "rol": "kit:spark-investigacion/frente",
+      "sha256": "ecaff5e1106cd8c06c2f4bec1ea430fac1fa628f25755ef9326c07658c3f1b18"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-investigacion-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-investigacion/tres-cuartos-der",
+      "sha256": "7c0c96887f27ed40ddc325458857fa7ca77e719b873ebbb46b7a78f0b39a41a4"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-investigacion-04-mira-arriba.png": {
+      "rol": "kit:spark-investigacion/mira-arriba",
+      "sha256": "292594e3e14e723e273409d952075c968acd6df2d78a8c5370ea1405bb58dd88"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-investigacion-05-cine.png": {
+      "rol": "kit:spark-investigacion/cine",
+      "sha256": "94aedf9b8d9ec051012a5491a18887c4e7246c5da30f98617c2fb3541c1801ca"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-contenido-01-heroe.png": {
+      "rol": "kit:spark-contenido/heroe",
+      "sha256": "5a728950f8b63a598c57c465a23882e7181fd246016b0dd61219c55156e0cf78"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-contenido-02-frente.png": {
+      "rol": "kit:spark-contenido/frente",
+      "sha256": "e28b829de55fbe5512555b90f12d003c6d9aa4bd8e8aa0e93e6d2e635c45137e"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-contenido-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-contenido/tres-cuartos-der",
+      "sha256": "4b3613d1e0fb31273a5b14e935a07d7ece7b44477ecde33d3d45fa0280602215"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-contenido-04-mira-arriba.png": {
+      "rol": "kit:spark-contenido/mira-arriba",
+      "sha256": "a457c51f9579f83c368ee84b89566cfaeb4ef403883cc75ea40a011247dc709d"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-contenido-05-cine.png": {
+      "rol": "kit:spark-contenido/cine",
+      "sha256": "2aebfeb8e20195782db5241d38f998f2983ab42e3ca92f439b2dee183bdcc2d3"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-crm-datos-01-heroe.png": {
+      "rol": "kit:spark-crm-datos/heroe",
+      "sha256": "4544e54fac4f0e933a6b6cb70abddc99ac166826c8dbe210c5a0f49f063003e7"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-crm-datos-02-frente.png": {
+      "rol": "kit:spark-crm-datos/frente",
+      "sha256": "6260089dcaf1c165caa89487c46c390b322612818735e869cdbc8e6303da4f1d"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-crm-datos-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-crm-datos/tres-cuartos-der",
+      "sha256": "9e681d113801ece9c51132f6e1038ddba6245d79b2c500ace1b46d2def40e417"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-crm-datos-04-mira-arriba.png": {
+      "rol": "kit:spark-crm-datos/mira-arriba",
+      "sha256": "2d11cf9acca3eec5a8d04949572981619bcc0abdc5a7b1308c01856b1f3d9957"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-crm-datos-05-cine.png": {
+      "rol": "kit:spark-crm-datos/cine",
+      "sha256": "9bdce493b512f685812facc09f16397c822fa83ab4e7424121771fb65fa2b498"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-servicio-01-heroe.png": {
+      "rol": "kit:spark-servicio/heroe",
+      "sha256": "de63b2e90989b1eeabb596dbd15aacf2144585c693bcae40d31b3b311b5fc631"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-servicio-02-frente.png": {
+      "rol": "kit:spark-servicio/frente",
+      "sha256": "5524f9d8acfe84be98e762276de3cde5d87e4e87969e01e0f4ad573fc84c439f"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-servicio-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-servicio/tres-cuartos-der",
+      "sha256": "09e57ac1a0c2c73476896d5fbce479e448f964a8dbdb9abbacdccba71c520939"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-servicio-04-mira-arriba.png": {
+      "rol": "kit:spark-servicio/mira-arriba",
+      "sha256": "00cce19b05e24383c850b86479e9aa7d7c2f378c5fcf70bbefd33a77915cb398"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-servicio-05-cine.png": {
+      "rol": "kit:spark-servicio/cine",
+      "sha256": "8ae4db838b37ba34b1365befc3533beb0e52024b64c49f6fe3f4c7298c962032"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-reportes-01-heroe.png": {
+      "rol": "kit:spark-reportes/heroe",
+      "sha256": "682a4ad4bc74e3e353300b2984618bdf742a8a8ecac7bf156e8fa5b3b8612e52"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-reportes-02-frente.png": {
+      "rol": "kit:spark-reportes/frente",
+      "sha256": "59158351a13ca7c78ad33ac185b8ecf6342c604d9902642a0b75dcc442228c93"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-reportes-03-tres-cuartos-derecha.png": {
+      "rol": "kit:spark-reportes/tres-cuartos-der",
+      "sha256": "15f91b3bcae1de335aab68ad52f8c24be3aff3f5037c9d27bdbc5f89010a5e29"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-reportes-04-mira-arriba.png": {
+      "rol": "kit:spark-reportes/mira-arriba",
+      "sha256": "d99b9ac0e72fa4a896ca7f5111cb9b54b818864245b55cc7f18130384ce05e78"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-reportes-05-cine.png": {
+      "rol": "kit:spark-reportes/cine",
+      "sha256": "0ce19fc8d7576f6aeca52970d44386052da04f4145857ec7b8f4f82a40cf3267"
+    },
+    "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/sparks-frente.png": {
+      "rol": "kit:sparks-plantel/frente",
+      "sha256": "d77ac800311921aeab121feb26bb07181a147138b498c6904dbcde9dc97344d3"
     },
     "ai-generations/2026-09-17_clawd-poses-3d/final/efeonce-clawd-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:clawd/frente",
@@ -597,6 +1473,46 @@
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png": {
       "rol": "macro:hoodie-efeonce",
       "sha256": "05adae8b6b020bd3d4395c6f640d39cd3607336e10ca5d5c8db5c0f0363535f6"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:traje-bionico-nexa/frente",
+      "sha256": "081b81ca6c4c6a2bd42369299a79f6635acddbd2e6f6c2cf1f3e94355d3faee2"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:traje-bionico-nexa/tres-cuartos-izq",
+      "sha256": "19d55f98c57ac5c3d8a0cd212ca0bf7629aca56da047cdbca3ab01fea7cd02af"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-04-tres-cuartos-derecha-1600x1600-v01-transparente.png": {
+      "rol": "kit:traje-bionico-nexa/tres-cuartos-der",
+      "sha256": "a3883e6c472b2f6160061b9ae584be665d7a1e12ece69f244844437d01b3e174"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-05-lateral-1600x1600-v01-transparente.png": {
+      "rol": "kit:traje-bionico-nexa/lateral",
+      "sha256": "2d3391f554e91bfd043f3bacdcc1cb81ebb351c14ea3604475ea307bf90b4684"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-02-espalda-1600x1600-v02-transparente.png": {
+      "rol": "kit:traje-bionico-nexa/espalda",
+      "sha256": "6dfacb8f292f054f1a0abbf8224138ce1f5c23514e45b2ab9ac652cfcb6c6092"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-sin-rostro-1200x1330-v01-fondo-estudio.png": {
+      "rol": "uso:traje-bionico-nexa/defecto",
+      "sha256": "db9ab79d68cfeece7a28a9c795df1e021e3599d70252d57cc44e3ef0865d416c"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-14-puesto-espalda-1200x1600-v02-fondo-estudio.png": {
+      "rol": "uso:traje-bionico-nexa/usoPorVista:espalda",
+      "sha256": "21a875d6d5b92115a99c167fac003c6600cbb16aa851a5c3f98bd66bc4f4fa96"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:traje-bionico-nexa",
+      "sha256": "77314300dfd9b36df54ed9eab8a50d8449c02ee76ec4cfe022ad3839a464b196"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-20-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:lentes-bionicos-nexa/frente",
+      "sha256": "3610a042d8c2e5be67d73a43ac1af918a38469204ecb6073ab53f4daabd2357b"
+    },
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-21-tres-cuartos-1600x1600-v01-transparente.png": {
+      "rol": "kit:lentes-bionicos-nexa/tres-cuartos",
+      "sha256": "524d6398be9ff3ad043595ce88995c7a62c125459415c7d3f62d6aaad57e9944"
     }
   }
 }

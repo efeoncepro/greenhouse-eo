@@ -1,0 +1,5 @@
+This is a portrait photo that was extended to the LEFT and RIGHT. The CENTRE band (the middle 683 pixels) is the real photo. The two SIDE bands are only mirrored PADDING, not real content.
+
+Replace the padding with the natural continuation of the same person: the shoulders, sleeves and arms of the same open navy bomber jacket continuing out of the frame, and the same studio background continuing as it is at the sides of the real photo, with the same light. The person stays centred and the same size.
+
+The jacket keeps a SINGLE embroidered mark, the one already in the centre band: do NOT add a second mark or any logo, text or badge on the sides. Keep the centre band exactly as it is.

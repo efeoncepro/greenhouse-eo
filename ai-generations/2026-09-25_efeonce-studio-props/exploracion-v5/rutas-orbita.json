@@ -1,0 +1,37 @@
+[
+  {
+    "id": "o-efeonce-blanca",
+    "base": "#F7F8F6",
+    "interior": "#001A33"
+  },
+  {
+    "id": "o-efeonce-navy",
+    "base": "#001A33",
+    "interior": "#36C8BF"
+  },
+  {
+    "id": "o-globe",
+    "base": "#091951",
+    "interior": "#FF6500"
+  },
+  {
+    "id": "o-efeonce-navy-palabra",
+    "base": "#001A33",
+    "interior": "#36C8BF"
+  },
+  {
+    "id": "o-globe-palabra",
+    "base": "#091951",
+    "interior": "#FF6500"
+  },
+  {
+    "id": "o-wave-palabra",
+    "base": "#091951",
+    "interior": "#0375DB"
+  },
+  {
+    "id": "o-reach-palabra",
+    "base": "#091951",
+    "interior": "#F83902"
+  }
+]

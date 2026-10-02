@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:19:42.220Z",
+  "run": "ai-generations/2026-09-24_design-context-lab",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-24_design-context-lab",
+  "totalBytes": 7684696,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "descartado-v1/contact-sheet.png",
+      "sizeBytes": 508202,
+      "sha256": "5a1c44052dbc7ddfe3b90fadd490af2160c9d4545a3ae695fd7fd458c7f78fd3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab/descartado-v1/contact-sheet.png"
+    },
+    {
+      "path": "descartado-v1/cubierta-plate-nexa-45-der.png",
+      "sizeBytes": 2283087,
+      "sha256": "74ed237252a97228ce6bf48ce8126d14fd3c836ee7351bc05a4f49dba3a78542",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab/descartado-v1/cubierta-plate-nexa-45-der.png"
+    },
+    {
+      "path": "descartado-v1/design-contexto-01.png",
+      "sizeBytes": 1231997,
+      "sha256": "19309b410d1a59a7dc17c41a0035535c56dcad9216e29d614e1a04eb674b2884",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab/descartado-v1/design-contexto-01.png"
+    },
+    {
+      "path": "descartado-v1/design-contexto-02.png",
+      "sizeBytes": 102437,
+      "sha256": "32d6b15ef60ed51d62f0b90465aae70dbbcc3cebcc41ea2fe59e070eb4c6b0b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab/descartado-v1/design-contexto-02.png"
+    },
+    {
+      "path": "descartado-v1/design-contexto-03.png",
+      "sizeBytes": 106718,
+      "sha256": "de99992ed6820944682fe97dbf767a4cd9d79d188b2584f7d538ff507f68a3d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab/descartado-v1/design-contexto-03.png"
+    },
+    {
+      "path": "descartado-v1/design-contexto-04.png",
+      "sizeBytes": 105562,
+      "sha256": "4dd37c7037db9fbda66c7629a08a9b5d7882a110ba7dbd3b5b792897787cef97",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab/descartado-v1/design-contexto-04.png"
+    },
+    {
+      "path": "descartado-v1/design-contexto-05.png",
+      "sizeBytes": 100604,
+      "sha256": "9e384c701fcc4c2f44e51ca2136e87e27b502dd49765b4060c6b6d8d834b7ba0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab/descartado-v1/design-contexto-05.png"
+    },
+    {
+      "path": "descartado-v1/design-contexto-06.png",
+      "sizeBytes": 456109,
+      "sha256": "4184637e1c91c821f87b80be9543339ec3cbf854b64e0783f8e161d005af3c09",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab/descartado-v1/design-contexto-06.png"
+    },
+    {
+      "path": "output/descartado-comic-full.png",
+      "sizeBytes": 2789980,
+      "sha256": "01fbd1f9221636043ba2f98e77afd71729fbf19f48450d53c6c55d027a249ab0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab/output/descartado-comic-full.png"
+    }
+  ]
+}

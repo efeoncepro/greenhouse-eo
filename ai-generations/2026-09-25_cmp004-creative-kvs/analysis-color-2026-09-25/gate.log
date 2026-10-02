@@ -1,0 +1,13 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 foto:cta:gate /Users/jreye/Documents/greenhouse-eo
+> node scripts/foto/componer-cta.gate.mjs ai-generations/2026-09-25_cmp004-creative-kvs/analysis-color-2026-09-25/neutros.json --reproducir
+
+Reproduciendo 4 pieza(s) con el comando vigente y segmentación nueva…
+✓ lo entregado es idéntico a la reproducción. Veredicto sobre el QA reproducido:
+✗ C01-CTA-neutro: `surfaceToken: inkOnDark` no es un acento (accentSurface · growthOnDark · accentInkOnLight). En `solid`/`outline` el acento lo porta la superficie; lo que se degrada por contraste es la tinta. Si el acento no alcanza el mínimo, se regenera el plate — no se apaga el color.
+✗ C02-CTA-neutro: `surfaceToken: inkOnDark` no es un acento (accentSurface · growthOnDark · accentInkOnLight). En `solid`/`outline` el acento lo porta la superficie; lo que se degrada por contraste es la tinta. Si el acento no alcanza el mínimo, se regenera el plate — no se apaga el color.
+✗ C03-CTA-neutro: `surfaceToken: inkOnDark` no es un acento (accentSurface · growthOnDark · accentInkOnLight). En `solid`/`outline` el acento lo porta la superficie; lo que se degrada por contraste es la tinta. Si el acento no alcanza el mínimo, se regenera el plate — no se apaga el color.
+✗ C04-CTA-neutro: `surfaceToken: inkOnDark` no es un acento (accentSurface · growthOnDark · accentInkOnLight). En `solid`/`outline` el acento lo porta la superficie; lo que se degrada por contraste es la tinta. Si el acento no alcanza el mínimo, se regenera el plate — no se apaga el color.
+
+✗ 4 fallo(s) en 4 pieza(s) con CTA.
+ ELIFECYCLE  Command failed with exit code 1.

@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+.DS_Store
+
+# Binarios: viven en GCS, nunca en git (ver AGENTS.md → Assets).
+ai-generations/
+public/images/generated/
+.captures/
+projects/**/salidas/
+projects/**/referencias-locales/
+*.psd
+*.ai
+*.mov
+*.mp4
+*.wav

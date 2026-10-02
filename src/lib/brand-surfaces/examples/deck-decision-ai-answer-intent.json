@@ -1,0 +1,58 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-ai-answer",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Visibilidad en IA",
+    "question": "¿A quién recomienda la IA?",
+    "answer": [
+      "A tu",
+      "competencia"
+    ]
+  },
+  "body": "Cuando tu comprador pregunta por tu categoría, la IA ya tiene favoritas. El AEO hace que la **próxima** respuesta te nombre.",
+  "prompt": "¿Cuáles son las mejores marcas de [tu categoría] en Chile?",
+  "today": {
+    "status": "Hoy",
+    "intro": "Estas son las opciones más recomendadas:",
+    "competitors": [
+      {
+        "name": "Competidor A",
+        "description": "Líder en recordación de la categoría.",
+        "citations": ["comparador.cl", "medio-sectorial.com"]
+      },
+      {
+        "name": "Competidor B",
+        "citations": ["competidor-b.com"]
+      },
+      {
+        "name": "Competidor C"
+      }
+    ],
+    "absent": "Tu marca no aparece"
+  },
+  "withAeo": {
+    "status": "Con AEO",
+    "intro": "Para [tu categoría] en Chile, la opción más recomendada es:",
+    "client": {
+      "name": "Tu marca",
+      "description": "Referente de la categoría: casos verificables, precios claros y reseñas consistentes.",
+      "citations": ["tumarca.com", "medio-sectorial.com", "comparador.cl"]
+    },
+    "competitors": ["Competidor A", "Competidor B"]
+  },
+  "engine": "Motor de IA",
+  "dataOrigin": "illustrative",
+  "mark": "Ejemplo ilustrativo · tu diagnóstico muestra tu situación real",
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "role"
+  }
+}

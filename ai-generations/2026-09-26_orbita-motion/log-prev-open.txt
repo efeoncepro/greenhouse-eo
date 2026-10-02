@@ -1,0 +1,1 @@
+open 16x9 dark: 145 cuadros → /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_orbita-motion/frames/open_16x9_dark

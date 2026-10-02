@@ -1,0 +1,45 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.1",
+  "surface": "audiovisual",
+  "format": "16x9",
+  "role": "plan",
+  "recipe": "shot-plan",
+  "line": "growth",
+  "theme": "dark",
+  "title": "Producción audiovisual · un video de 12,6 s «Cómo trabajamos», cuadros clave generados",
+  "shots": [
+    {
+      "segment": "shot-01-wide",
+      "title": "Plano general",
+      "spec": "Terreno, panadería del cliente · 35 mm · cámara en mano, avanza despacio · luz del horno + ventana",
+      "note": "Documental: nadie mira a cámara · gorra + hoodie (terreno)",
+      "plateRef": "ai-generations/2026-09-26_audiovisual/plates/V1-terreno.png",
+      "alt": "Una productora de Efeonce filma al panadero junto al horno"
+    },
+    {
+      "segment": "shot-02-insert",
+      "title": "Inserto",
+      "spec": "Detalle de manos · macro 100 mm · fijo, foco en la punta del lápiz · una lámpara rasante",
+      "note": "El oficio en primer plano · manga del polo (oficina)",
+      "plateRef": "ai-generations/2026-09-26_audiovisual/plates/V2-detalle.png",
+      "alt": "Las manos de un director de arte marcan una prueba de impresión con lápiz rojo y una lupa"
+    },
+    {
+      "segment": "shot-03-medium",
+      "title": "Plano medio",
+      "spec": "Sala del cliente · 50 mm · sobre el hombro del cliente, empuje lento · la pantalla es la luz",
+      "note": "Documental · chaqueta sobre polo (reunión importante)",
+      "plateRef": "ai-generations/2026-09-26_audiovisual/plates/V3-sala.png",
+      "alt": "Una estratega de Efeonce presenta la curva de resultados al equipo del cliente"
+    },
+    {
+      "segment": "shot-04-close",
+      "title": "Cierre",
+      "spec": "Reveal aprobado (3,6 s, con sonido) · masters de AXIS v1.1",
+      "note": "La toma nunca lleva logo: firma el cierre",
+      "plateRef": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/13- Branding/Motion Órbita Efeonce/v1.1/reveal/16x9/navy/efeonce-orbita-reveal_16x9_navy_cuadro-final.png",
+      "alt": "El último cuadro del reveal: el logo de Efeonce con su eslogan sobre el navy de la marca"
+    }
+  ]
+}

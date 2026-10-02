@@ -22,6 +22,11 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
 
 ## Auditorías
 
+- [DataForSEO CLI — validación productiva transversal del 2026-09-28](2026-09-28-dataforseo-cli-production-validation.md) —
+  consolida ocho corridas sobre retail, servicios SEO, servicios creativos y research editorial; registra task IDs,
+  costos, diferencias desktop/mobile, defectos corregidos y la corrección de dos afirmaciones que habían usado
+  `efeonce.org` en vez del dominio canónico `efeoncepro.com`.
+
 - [Berel — conteo del cupo septiembre–diciembre 2026 y descuento en 2027 — 2026-09-19](BEREL_CONTEO_CUPO_SEP_DIC_2026_DESCUENTO_2027_2026-09-19.md) —
   octubre, noviembre y diciembre contados con el método de septiembre (unidad archivo, una versión por pieza):
   octubre 8/66/8, noviembre 8/43/3 y diciembre 8/46/3 en artículos/gráficas/videos. Neto de septiembre a diciembre:

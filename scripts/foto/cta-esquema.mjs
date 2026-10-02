@@ -7,11 +7,16 @@
 // `../` escribía fuera de `out/`. Un campo desconocido en un objeto propio (cta, nota, firma…) es un error: así se
 // perdió `centerX`. En la raíz del plan sólo AVISA, porque ahí conviven metadatos de otras herramientas.
 import { z } from 'zod'
-import { axisAdvertising } from '@efeoncepro/axis-tokens'
+
 import {
   AXIS_COLLABORATION_PARTICIPANT_KINDS,
   AXIS_COLLABORATION_SELECTION_ANCHORS
 } from '@efeoncepro/axis-ui-contracts'
+
+import { LINEAS, ctaColors, validateGraphicVoice } from './cta-graphic-voice.mjs'
+
+
+import { colorPolicyReferenceSchema } from './cta-color-policy.mjs'
 
 // Letras, números, punto, guion y guion bajo; nunca empieza con punto. El id es parte de rutas de archivo.
 export const ID_VALIDO = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
@@ -62,7 +67,7 @@ export const REGLAS_EXCEPTUABLES = [
 export const IGNORAR_MAX_ZONA = 0.1
 export const IGNORAR_MAX_TOTAL = 0.15
 
-const TOKENS = Object.keys(axisAdvertising.color)
+const TOKENS = Object.keys(ctaColors)
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'debe ser un color #rrggbb')
 const fraccion = z.number().finite().min(0).max(1)
 const positivo = z.number().finite().positive()
@@ -148,6 +153,7 @@ const cta = z
     cursorScale: positivo.max(1.2).optional(),
     surfaceToken: z.enum(TOKENS).optional(),
     inkToken: z.enum(TOKENS).optional(),
+    colorPolicy: colorPolicyReferenceSchema.optional(),
     seleccion: z
       .object({
         marco: z.enum(['open-brackets', 'four-corners', 'eight-handles', 'ninguno']).optional(),
@@ -222,6 +228,8 @@ export const esquemaPieza = z
     top: fraccion.optional(),
     textWidth: z.number().finite().positive().max(1).optional(),
     ink: z.enum(['light', 'dark']).optional(),
+    graphicVoice: z.literal('efeonce').optional(),
+    graphicLine: z.enum(LINEAS).optional(),
     label: texto.optional(),
     labelSize: positivo.optional(),
     labelGap: noNegativo.optional(),
@@ -463,7 +471,7 @@ export function validarPiezaEsquema(p) {
   const r = esquemaPieza.safeParse(limpia)
 
   if (!r.success) for (const issue of r.error.issues) errores.push(traducir(issue))
-  errores.push(...reglasCruzadas(limpia))
+  errores.push(...reglasCruzadas(limpia), ...validateGraphicVoice(limpia))
   const internos = p && typeof p === 'object' ? Object.keys(p).filter(k => CAMPOS_INTERNOS.has(k)) : []
 
   if (internos.length) errores.push(`${internos.map(k => `\`${k}\``).join(', ')}: campo interno del compositor, no se declara en el plan`)

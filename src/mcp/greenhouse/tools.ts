@@ -230,6 +230,9 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getInsightSchedule'
   | 'getInsightCoverPreference'
   | 'setInsightCoverPreference'
+  | 'requestBrandRender'
+  | 'getBrandRenderRequest'
+  | 'listBrandRenderRequests'
   | 'getMcpSkill'
 >) => ({
   /**
@@ -842,6 +845,39 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         return `Cover preference ${data.changed ? 'set to' : 'already was'} ${String(data.preference?.coverTheme ?? input.coverTheme)}. It applies to editions generated from now on; issued and sealed editions keep their cover (${result.requestId}).`
       },
       () => client.setInsightCoverPreference(input)
+    )
+  },
+  // ── TASK-1921 — render gobernado de piezas de marca ─────────────────────
+  async requestBrandRender(input: { family: string; intent?: Record<string, unknown>; manifest?: Record<string, unknown>; sources?: Record<string, string>; organizationId?: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { request?: { requestId?: string; state?: string; jobs?: Array<{ catalogName: string; state: string }> }; idempotent?: boolean }
+        const jobs = (data.request?.jobs ?? []).map(job => `${job.catalogName}:${job.state}`).join(', ')
+
+        return `Brand render ${String(data.request?.requestId ?? 'unknown')} ${data.idempotent ? 'already existed (idempotent)' : 'queued'}; state=${String(data.request?.state ?? 'unknown')}; jobs=[${jobs}]. Poll get_brand_render_request (${result.requestId}).`
+      },
+      () => client.requestBrandRender(input)
+    )
+  },
+  async getBrandRenderRequest(input: { requestId: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { requestId?: string; state?: string; jobs?: Array<{ catalogName: string; state: string; failureCode?: string | null; outputs?: unknown[] }> }
+        const jobs = (data.jobs ?? []).map(job => `${job.catalogName}:${job.state}${job.failureCode ? `(${job.failureCode})` : ''}${job.outputs?.length ? ` ${job.outputs.length} file(s)` : ''}`).join(', ')
+
+        return `Brand render ${String(data.requestId ?? input.requestId)} state=${String(data.state ?? 'unknown')}; jobs=[${jobs}] (${result.requestId}).`
+      },
+      () => client.getBrandRenderRequest(input)
+    )
+  },
+  async listBrandRenderRequests(input: { limit?: number }) {
+    return callTool(
+      result => {
+        const data = result.data as Array<{ requestId: string; family: string; state: string }> | undefined
+
+        return `${(data ?? []).length} brand render request(s): ${(data ?? []).map(r => `${r.requestId} ${r.family} ${r.state}`).join('; ') || 'none'} (${result.requestId}).`
+      },
+      () => client.listBrandRenderRequests(input)
     )
   },
   async getSeoEntitlement(input: { organizationId?: string }) {

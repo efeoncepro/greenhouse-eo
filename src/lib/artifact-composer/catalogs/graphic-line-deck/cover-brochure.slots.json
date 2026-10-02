@@ -1,0 +1,465 @@
+{
+  "template": "CoverBrochure",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "voice"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "logoLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-logo-left=140px"
+        },
+        "logoTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-logo-top=300px"
+        },
+        "logoWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-logo-width=500px"
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 490
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 538
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 600
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 124
+        },
+        "answerInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-inset=-4px"
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 752
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 28
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 724
+        },
+        "bodyLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-body-leading=1.3"
+        },
+        "bodyWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-body-wght=400"
+        },
+        "bodyStrongWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-body-strong-wght=600"
+        },
+        "bodyColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-body-color=#ffffff"
+        },
+        "eyebrowPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-eyebrow-px=22px"
+        },
+        "eyebrowWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-eyebrow-wght=500"
+        },
+        "eyebrowLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-eyebrow-leading=1.2"
+        },
+        "eyebrowTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-eyebrow-tracking=0.24em"
+        },
+        "eyebrowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-eyebrow-color=#e2e2e2"
+        },
+        "questionPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-question-px=40px"
+        },
+        "questionLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-question-leading=1.2"
+        },
+        "questionColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-question-color=#ffffff"
+        },
+        "answerLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-leading=0.95"
+        },
+        "answerTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-tracking=-0.035em"
+        },
+        "answerColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-answer-color=#ffffff"
+        }
+      }
+    },
+    "backdrop": {
+      "selector": "[data-slot='backdrop']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-backdrop-ref",
+          "example": "asset-ref:plate:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 320,
+          "resolver": "gl-backdrop-alt",
+          "example": "Una líder de medios de Efeonce sostiene una esfera de luz de la que salen haces hacia muchas pantallas"
+        }
+      }
+    },
+    "logo": {
+      "selector": "[data-slot='logo']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/efeonce-logo-negative.svg"
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 48,
+          "example": "Brochure · Media & Distribution"
+        },
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "example": "¿Dónde invierto?"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 14,
+          "example": ""
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 14,
+          "resolver": "gl-answer",
+          "example": "Donde rinde"
+        }
+      }
+    },
+    "evidence": {
+      "selector": "[data-slot='evidence']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 190,
+        "maxLines": 5,
+        "overflow": "reject"
+      },
+      "example": "<strong>Tres</strong> soluciones y una operación:<br>Estrategia de distribución · Performance<br>Influencia y earned · Managed Media"
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Nexa"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "bottom-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "person"
+        },
+        "targetKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 8,
+          "consumer": "validation-only",
+          "example": "text"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1.1
+        },
+        "variant": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "eight-handles"
+        },
+        "padding": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "standard"
+        },
+        "overlay": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "none"
+        }
+      }
+    },
+    "partnerMark": {
+      "selector": "[data-slot='partnerMark']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-left=140px"
+        },
+        "badge": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "badgeTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-badge-top=920px"
+        },
+        "badgeHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-badge-height=84px"
+        }
+      }
+    },
+    "partnerMarkFallback": {
+      "selector": "[data-slot='partnerMarkFallback']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-left=140px"
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "example": "OPERAMOS SOBRE"
+        },
+        "labelTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-top=912px"
+        },
+        "labelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-px=16px"
+        },
+        "labelWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-wght=500"
+        },
+        "labelLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-leading=1"
+        },
+        "labelTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-label-tracking=0.2em"
+        },
+        "labelColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pm-label-color=#e2e2e2"
+        },
+        "logo": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "logoAlt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 60,
+          "resolver": "gl-alt",
+          "example": "Salesforce"
+        },
+        "logoTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-logo-top=942px"
+        },
+        "logoHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pm-logo-height=64px"
+        }
+      }
+    },
+    "productMark": {
+      "selector": "[data-slot='productMark']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 40,
+          "resolver": "gl-alt",
+          "example": "Efeonce | SV360"
+        },
+        "left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pmk-left=140px"
+        },
+        "top": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pmk-top=790px"
+        },
+        "height": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pmk-height=64px"
+        }
+      }
+    }
+  }
+}

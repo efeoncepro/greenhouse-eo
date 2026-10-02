@@ -3,6 +3,8 @@
 Tipo: documentacion tecnica / arquitectura UI publica.
 
 Estado: vigente desde la landing Brand Visibility publicada el 2026-07-05.
+Delta 2026-09-28: se agrega el patrón [Shared Tokenized Report](#pattern-shared-tokenized-report-efeonce-insights)
+(informe compartido de Efeonce Insights, TASK-1875).
 
 Owner: Growth / Think, con Greenhouse como source of truth de datos y contratos.
 
@@ -207,3 +209,81 @@ Antes de copiar este patron a una nueva landing Think:
 - preservar un asset principal inspeccionable;
 - validar el hero local y live con el mismo ancho;
 - documentar la excepcion si el patron se adapta al portal Greenhouse.
+
+## Pattern: Shared Tokenized Report (Efeonce Insights)
+
+> Estado 2026-09-28: en producción (Think `bbf8522`). El render vive en `src/components/insights/InsightReport.astro` y lo usan dos rutas: `/insights/r/[token]` (SSR, token) y `/insights/muestra` (prerenderizada, datos de ejemplo con marca ficticia, `mode="sample"`: sin descargas, sin logo, aviso en portada y pie, CTA a conversar). Un solo componente para que la muestra nunca se desalinee del producto.
+
+Estado: construido y verificado en local el 2026-09-28 (TASK-1875). **Sin desplegar**: `main` de `efeonce-think`
+publica producción automáticamente y el push queda pendiente del operador.
+
+Usar este patrón cuando Think presenta a un cliente una lectura privada que Greenhouse ya compuso y cuyo acceso
+Greenhouse gobierna con un token revocable. Ruta de referencia: `think.efeoncepro.com/insights/r/<token>`
+(`src/pages/insights/r/[token].astro` en `efeonce-think`).
+
+### Contrato consumido
+
+| Endpoint Greenhouse | Uso |
+|---|---|
+| `GET /api/public/insights/shared/{token}` | `InsightWebModelV1` (modelVersion `1.x`; `1.1` es aditivo: editorial v2, tasas del embudo, logo). Un major distinto se trata como error. |
+| `GET …/shared/{token}/outputs/{output}` | Descarga de `report_pdf` / `deck_pdf`. Greenhouse revalida el grant. |
+| `GET …/shared/{token}/logo` | Logo del cliente, con el mismo gate del token. |
+
+El fetch es server-side y lleva `x-efeonce-think-key` (exceptúa a Think del límite por IP del Firewall de
+`/api/public/**`) y, sólo contra staging, `x-vercel-protection-bypass`. Ambos son secretos de servidor en el schema
+de `astro.config.mjs` (`GREENHOUSE_API_BASE`, `GREENHOUSE_THINK_KEY`, `GREENHOUSE_API_BYPASS`); nunca llegan al browser.
+
+### Reglas de runtime
+
+- **SSR por request, sin cache.** `prerender = false`; revocar en Greenhouse revoca en la lectura siguiente.
+- **El token nunca entra al HTML.** Canonical genérico (`/insights`), descargas por `?descargar=report_pdf|deck_pdf`
+  y logo por `?logo=1` como query **relativa** sobre la misma URL (la página hace de proxy), enlaces copiados desde
+  `location`. Sin archivo disponible, `?descargar=` redirige (303) al informe, que muestra el estado real.
+- **Sin analítica.** El layout se monta con `analytics={false}` (sin GTM): el token no puede filtrarse a terceros.
+- **Cabeceras** en la página, el logo y las descargas: `Cache-Control: private, no-store`,
+  `X-Robots-Tag: noindex, nofollow`, `Referrer-Policy: no-referrer` (el logo agrega `X-Content-Type-Options: nosniff`).
+- **Estados honestos** con `StatusScreen`: `404` desconocido/expirado (indistinguibles por diseño), `410` revocado,
+  `429` límite, `502` error o modelo no soportado.
+- **OG sin datos.** `/branding/insights/og-insights.png` es genérica (lockup + una órbita), generada desde los tokens
+  con `node scripts/build-insights-og.mjs`: la vista previa en un chat nunca filtra contenido.
+
+### Reglas de presentación
+
+- **Un solo archivo con valores.** `src/lib/insights-tokens.ts` copia 1:1 de AXIS la línea «La órbita» (color, roles
+  de dato, curvas, duraciones). Ningún componente escribe un HEX, una curva o una duración; si AXIS cambia, se cambia
+  ahí. Assets en `public/branding/insights/*` desde `@efeoncepro/axis-brand-assets` 0.4.0. Tipografía: Bricolage
+  Grotesque (variable `opsz`) + Poppins 400/500/600/800/800 itálica/900 itálica.
+- **Chrome bilingüe.** El copy de interfaz vive en `src/lib/insights-copy.ts` con dos diccionarios de la misma forma
+  (es-CL y en-US); la página elige por `model.locale`, así una edición en inglés no queda con botones en español. Lo
+  editorial viene escrito en el modelo y nunca se reescribe.
+- **Render tonto.** Toda cifra impresa es `fact.display`; la geometría (`src/lib/insights-chart-geometry.ts`) sigue
+  las convenciones de `src/lib/artifact-composer/chart-geometry.ts` (los PDF) y sólo produce posiciones.
+- **Anatomía «tablero de respuestas»**: portada que abre con la respuesta → hallazgos que se expanden en su lugar →
+  barra fija con filtros por módulo y órbita de avance → una `ModuleScene` por capítulo (gráfico principal narrado por
+  pasos) → plan y metodología → descargas → pie con aviso de vencimiento del enlace.
+- **Mejora progresiva.** Sin JS la página está completa (hallazgos abiertos, gráfico y tabla visibles). Un script
+  inline antes del primer paint agrega `.ins-js` (habilita colapso e interruptores) y `.ins-motion` (sólo si no se pidió
+  movimiento reducido); si el módulo no monta en **3 s**, retira ambas clases y la página queda completa.
+- **Movimiento reducido**: toda la interacción, cero animación.
+- **Modo presentación**: diálogo modal con las láminas ya renderizadas en el HTML (portada, hallazgos, decisión,
+  plan, cierre); teclado (flechas, espacio, Re Pág/Av Pág, Inicio/Fin, Esc), foco atrapado y devuelto al salir;
+  pantalla completa sólo desde 900 px y sin movimiento reducido.
+- **Impresión**: `@media print` en A4, fondo blanco, oculta barra/presentación/interruptores, fuerza la tabla de cada
+  gráfico y deja todo el motion en estado final.
+
+### Verificación
+
+Con `pnpm dev --port 4331` corriendo en `efeonce-think` (los tokens `fixture-*` sólo resuelven en dev):
+
+```bash
+pnpm test:insights                                  # 14 pruebas de vista y geometría
+node scripts/verify-insights-report.mjs             # estados, cabeceras, token fuera del HTML, overflow 1440/390,
+                                                    # cifras del modelo, modelo sin campos v2, motion reducido
+node scripts/audit-insights-a11y.mjs                # contraste AA de todo texto visible + recorrido con Tab
+node scripts/capture-insights-report.mjs <dir>      # dossier visual desktop 1440 / mobile 390 + presentación
+```
+
+Resultado del 2026-09-28: verify «Todo verde», a11y AA en 1440 y 390, 14 pruebas verdes. Dossier:
+[`docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/`](../ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/).
+Componentes documentados en `efeonce-think/src/components/primitives/README.md` (sección Insights).
+

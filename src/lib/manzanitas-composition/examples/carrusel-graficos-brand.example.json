@@ -1,0 +1,157 @@
+{
+  "$comment": "Ejemplo de TASK-1939 (Marketing con Manzanitas). Fotos SINTÉTICAS: nunca se publica. Componer: pnpm manzanitas:compose -- --intent <este archivo>.",
+  "contract": "efeonce.manzanitas-register",
+  "version": "0.3.0",
+  "register": "marketing-con-manzanitas",
+  "channel": "carousel",
+  "topicLine": "brand",
+  "slides": [
+    {
+      "piece": "cover-pizarra",
+      "voice": {
+        "question": "¿Tu marca creció en las respuestas de IA?",
+        "answer": "Sí, así"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "chart-before-after",
+      "voice": {
+        "question": "¿Cuánto cambió en seis meses?",
+        "answer": "+140 %"
+      },
+      "chart": {
+        "before": 100,
+        "after": 240,
+        "source": "[FUENTE, AÑO]",
+        "illustrative": true
+      },
+      "swipe": true
+    },
+    {
+      "piece": "interior-escena",
+      "voice": {
+        "question": "¿Qué cambió en el equipo?",
+        "answer": "El brief"
+      },
+      "photo": {
+        "register": "cine",
+        "lightId": "sesion-1",
+        "subject": "Equipo creativo frente a una pared de referencias",
+        "alt": "Equipo mirando referencias pegadas en la pared",
+        "path": "fotos/escena-4x5.svg"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "chart-funnel",
+      "voice": {
+        "question": "¿Dónde se pierde la gente?",
+        "answer": "Al comprar"
+      },
+      "chart": {
+        "stages": [
+          {
+            "label": "Te ven",
+            "value": 1000
+          },
+          {
+            "label": "Te visitan",
+            "value": 420
+          },
+          {
+            "label": "Te escriben",
+            "value": 190
+          },
+          {
+            "label": "Te compran",
+            "value": 60
+          }
+        ],
+        "source": "[FUENTE, AÑO]",
+        "illustrative": true
+      },
+      "swipe": true
+    },
+    {
+      "piece": "interior-lente",
+      "voice": {
+        "question": "¿Qué mira quien compra?",
+        "answer": "El detalle"
+      },
+      "photo": {
+        "register": "cine",
+        "lightId": "sesion-1",
+        "subject": "Una mano sostiene un empaque con la etiqueta a la vista",
+        "alt": "Etiqueta de un empaque bajo la lente",
+        "path": "fotos/detalle-4x5.svg"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "chart-trend",
+      "voice": {
+        "question": "¿Cómo te nombra la IA mes a mes?"
+      },
+      "chart": {
+        "series": [
+          12,
+          13,
+          13,
+          15,
+          17,
+          18,
+          21,
+          24,
+          27,
+          30,
+          34,
+          38
+        ],
+        "source": "[FUENTE, AÑO]",
+        "illustrative": true
+      },
+      "swipe": true
+    },
+    {
+      "piece": "dense-steps",
+      "voice": {
+        "question": "¿Por dónde empiezo?",
+        "answer": "4 pasos"
+      },
+      "denseText": {
+        "steps": [
+          {
+            "title": "Pregunta",
+            "body": "Qué le preguntan tus clientes a la IA."
+          },
+          {
+            "title": "Mide",
+            "body": "En cuántas respuestas apareces hoy."
+          },
+          {
+            "title": "Publica",
+            "body": "La respuesta que nadie más da, con datos."
+          },
+          {
+            "title": "Repite",
+            "body": "Cada mes, las mismas preguntas."
+          }
+        ]
+      },
+      "swipe": true
+    },
+    {
+      "piece": "back-cover-a",
+      "voice": {
+        "question": "¿Cuánto te nombra hoy?",
+        "answer": "Mídelo",
+        "sub": "En los comentarios: cuéntanos tu primera cifra."
+      },
+      "slogan": true,
+      "conversions": 1
+    }
+  ],
+  "artifactId": "MCM-ejemplo-carrusel-graficos-brand",
+  "example": true
+}

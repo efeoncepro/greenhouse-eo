@@ -133,7 +133,9 @@ en motion:
   −4 a −8 dB durante la locución). Sin ducking, la VO pelea con la música y se pierde inteligibilidad.
 - **Rango de niveles guía** (referencia, ajustar a la mezcla): VO/diálogo pico ~−6 a −3 dBFS, música
   de fondo −18 a −12 dBFS bajo voz, SFX según impacto. Deja headroom, no clipees.
-- **EQ de separación:** haz espacio. Baja los medios de la música (~2-4 kHz) donde vive la voz.
+- **EQ de separación:** haz espacio con un corte suave de los medios de la música (~2-4 kHz) donde vive la voz;
+  primero el ducking. Vaciar los medios deja la música delgada y suena a arcade (medido en Glitch: 13 % de energía entre
+  300 Hz y 3 kHz contra 45 % del tema aprobado; ver `audio-studio/ANTIPATTERNS.md`).
   Filtra lo que no aporta (high-pass a ambiences, low-cut a SFX finos).
 - **Dinámica sobre volumen:** compresión suave para pegar, pero preserva el contraste
   fuerte/suave. Un master aplastado a loudness constante mata el impacto.

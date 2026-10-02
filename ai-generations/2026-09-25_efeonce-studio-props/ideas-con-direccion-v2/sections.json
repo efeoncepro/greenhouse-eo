@@ -1,0 +1,82 @@
+[
+  [
+    "linea",
+    "01-linea-grafica.png",
+    "01 / La línea gráfica",
+    "Dirección, encuadre y enfoque",
+    "Tres comportamientos de un mismo lenguaje. La curva abierta aporta continuidad; los corchetes ordenan; el círculo selecciona dentro de un campo de posibilidades. La tipografía lleva la idea.",
+    ""
+  ],
+  [
+    "coleccion",
+    "00-coleccion.png",
+    "02 / La colección",
+    "Expresión, firma y material",
+    "La agenda concentra la gráfica. El mug blanco tiene una voz breve. Mac y pizarra identifican. Lapicero, bandeja y sujetalibros participan por color y forma.",
+    ""
+  ],
+  [
+    "estudio",
+    "final/09-estudio.png",
+    "03 / Aplicación espacial",
+    "Un estudio que piensa y hace",
+    "Mural tipográfico, mesa de trabajo, materiales cálidos y herramientas a la vista. Boceto de ambiente para puesta en escena; aún no es un proyecto arquitectónico medido.",
+    ""
+  ],
+  [
+    "agenda",
+    "final/02-agenda.png",
+    "04 / Agenda",
+    "Ideas con dirección",
+    "Tela azul, impresión blanca, páginas punteadas y firma discreta al reverso. Frente, tres cuartos, reverso y apertura.",
+    "agenda"
+  ],
+  [
+    "mugs",
+    "final/03-mugs.png",
+    "05 / Cerámica",
+    "Una palabra. O solo color.",
+    "Blanco con interior azul y “Hacer.”; azul con interior blanco, sin gráfica. Cuatro vistas por variante.",
+    "mug-blanco-hacer,mug-azul"
+  ],
+  [
+    "mac",
+    "final/04-mac.png",
+    "06 / Mac",
+    "Dos gestos con intención",
+    "Ship oficial y sticker tipográfico. Cuatro vistas para mantener posiciones. El render sirve para explorar la aplicación; el modelo y las medidas del equipo se fijarán en producción.",
+    "mac"
+  ],
+  [
+    "pizarra",
+    "final/05-pizarra.png",
+    "07 / Acrílico",
+    "La gráfica ayuda a trabajar",
+    "Firma Efeonce, encuadre abierto y tres campos: Enfoque, Ideas y Acción. Frente, tres cuartos, perfil y reverso.",
+    "pizarra"
+  ],
+  [
+    "escritorio",
+    "final/06-escritorio.png",
+    "08 / Apoyos de estudio",
+    "Presencia sin logotipo",
+    "Lapicero, bandeja y sujetalibros. Navy, azul activo y materiales táctiles; tres vistas por objeto.",
+    "lapicero,bandeja,sujetalibros"
+  ],
+  [
+    "globe",
+    "final/07-globe-colores.png",
+    "09 / Acento de submarca",
+    "El magenta de Globe",
+    "El isotipo oficial del globo es principalmente #BB1954, con acento #FF6500. Se comparan magenta y naranja; naranja es también el primario del tema de producto. Efeonce conserva sus azules como base.",
+    "mug-globe-magenta,mug-globe-naranja"
+  ],
+  [
+    "ship",
+    "final/08-ship.png",
+    "10 / Símbolo",
+    "Un objeto de identidad",
+    "Se reutiliza el ship 3D de la biblioteca aprobada. Su presencia en esta colección está pendiente de revisión. Uso puntual como escultura de escritorio o utilería.",
+    "ship"
+  ]
+]

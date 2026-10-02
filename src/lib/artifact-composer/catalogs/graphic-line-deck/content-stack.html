@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · nuestro stack</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-stack` (surface deck, tema oscuro, TASK-1928). Tres capas de vidrio (Operar · Medir · Crear) sobre la
+      base de luz de Efeonce, en isométrica: la geometría la calcula el builder desde el token y la pinta en dos capas
+      (detrás y delante de las fichas); las herramientas van de pie sobre su capa, de atrás hacia adelante, con su isotipo
+      oficial. La única órbita, alrededor de la base. Referencia: DeckStack (D8c-stack-capas).
+    -->
+    <main class="gl-slide gl-stk" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-stk-back" data-slot="back">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-stk-tiles" data-slot="tiles">
+        <li class="gl-stk-tile"><img data-slot-field="src" alt="" /></li>
+      </ol>
+
+      <figure class="gl-layer gl-stk-front" data-slot="front">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-stk-labels" data-slot="labels">
+        <li class="gl-stk-label">
+          <p class="gl-stk-label-name" data-slot-field="name">Crear</p>
+          <p class="gl-stk-label-note" data-slot-field="note">8 herramientas · lo que se produce</p>
+        </li>
+      </ol>
+
+      <div class="gl-stk-base" data-slot="base">
+        <p class="gl-stk-base-lead" data-slot-field="lead">Todo se conecta en</p>
+        <img class="gl-stk-base-logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+        <p class="gl-stk-base-note" data-slot-field="note">donde cada pieza se mide</p>
+      </div>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Nuestro stack</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Con qué trabajamos?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Con lo</span><span data-slot-field="answer">mejor</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-stk-body" data-slot="body">16 herramientas en tres capas.</p>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

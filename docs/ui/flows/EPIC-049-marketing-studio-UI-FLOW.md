@@ -7,6 +7,23 @@
 > pantallas sueltas, y fija dónde vive cada acción, quién puede ejecutarla y qué ve cada actor cuando no puede.
 > **No reemplaza** los wireframe/flow por task: los enlaza y es dueño de los nodos `MS-N1…MS-N10`.
 
+## Delta 2026-09-26 — capa de estrategia (ADR aceptado)
+
+- Decisión: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md).
+  Toda operación declara nivel de riesgo: `T0` lectura, `T1` borrador o edición reversible (directa, idempotente,
+  auditada), `T2` aprobación, publicación, gasto, credenciales externas o destructivo (`dryRun` → digest → confirmación
+  de una persona). §5.2 y §5.3 de este contrato se leen con esos niveles.
+- Nodos nuevos (dueña de la superficie: TASK-1912; contratos: TASK-1905…1911), detallados en
+  [`TASK-1912-marketing-studio-strategy-planning-space-flow.md`](TASK-1912-marketing-studio-strategy-planning-space-flow.md):
+  `MS-N3.10` **Estrategia** (`?tab=strategy&section=…`, pestaña después de «Brief»; la fila de pestañas pasa a 8 con
+  scroll interno contenido en 390 px), `MS-N11` **Aprendizajes** (`/learnings`) y `MS-N12` **Programas** (`/programs`,
+  `/programs/[programId]`). `MS-N11` y `MS-N12` son destinos suplementarios por ⌘K y enlaces contextuales: el rail
+  conserva sus 5 destinos.
+- Sin UI por diseño en esta etapa (operación por API, CLI y agentes; follow-up de UI): catálogo de canales, reglas de
+  voz, conexiones de cuentas publicitarias y modelo de cliente (este último vive en Greenhouse, TASK-1906).
+- `MS-N7` (agentes) gana escritura de la capa de estrategia por las mismas operaciones; el rastreo de palabras clave no
+  es una acción de Studio: se ejecuta en Greenhouse (`track_seo_keywords`, TASK-1908).
+
 ## Meta
 
 - Status: `draft` (2026-09-25)
@@ -89,7 +106,7 @@ Así una regla de edición, conflicto o permiso se diseña una vez, en `MS-N3`, 
 | Sistema | Superficie vigente | Contrato |
 |---|---|---|
 | Global | `Rail` de 76 px (Hoy · Campañas · Calendario · Piezas · Medios); `BottomNav` bajo 860 px | máximo 5 destinos; `aria-current="page"` siempre visible; el espacio de campaña activa «Campañas» |
-| Local | pestañas del espacio de campaña (`nav.tabs`, `?tab=`) | 7 pestañas tras este programa (§4); scroll interno contenido en 390 px |
+| Local | pestañas del espacio de campaña (`nav.tabs`, `?tab=`) | 8 pestañas tras este programa (Brief · Estrategia · Piezas · Copys · Anuncios · Medios · Calendario · Resultados; §4 y Delta 2026-09-26; «Estrategia» = TASK-1912); scroll interno contenido en 390 px |
 | Contextual | tarjetas de Hoy, eventos del Calendario, filas de Medios, tiles de Piezas, pista de tres estados | cada una lleva a pestaña + elemento (`?tab=`, `?piece=`, `#copyId`, `?review=`) |
 | Suplementario | ⌘K (`CommandPalette`: campañas, piezas, copys + atajos «Ir a») | busca por `GET /api/v1/search`; la hoja abierta tiene prioridad sobre ⌘K |
 

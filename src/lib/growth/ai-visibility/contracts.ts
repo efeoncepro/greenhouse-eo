@@ -37,8 +37,7 @@ export const GROWTH_AI_VISIBILITY_PROVIDER_IDS = [
 export type GrowthAiVisibilityProviderId = (typeof GROWTH_AI_VISIBILITY_PROVIDER_IDS)[number]
 
 export const isGrowthAiVisibilityProviderId = (value: unknown): value is GrowthAiVisibilityProviderId =>
-  typeof value === 'string' &&
-  (GROWTH_AI_VISIBILITY_PROVIDER_IDS as readonly string[]).includes(value)
+  typeof value === 'string' && (GROWTH_AI_VISIBILITY_PROVIDER_IDS as readonly string[]).includes(value)
 
 // ── Execution modes ──────────────────────────────────────────────────────────
 
@@ -52,8 +51,7 @@ export const GROWTH_AI_VISIBILITY_EXECUTION_MODES = ['light', 'full', 'internal_
 export type GrowthAiVisibilityExecutionMode = (typeof GROWTH_AI_VISIBILITY_EXECUTION_MODES)[number]
 
 export const isGrowthAiVisibilityExecutionMode = (value: unknown): value is GrowthAiVisibilityExecutionMode =>
-  typeof value === 'string' &&
-  (GROWTH_AI_VISIBILITY_EXECUTION_MODES as readonly string[]).includes(value)
+  typeof value === 'string' && (GROWTH_AI_VISIBILITY_EXECUTION_MODES as readonly string[]).includes(value)
 
 // ── Run kinds ────────────────────────────────────────────────────────────────
 
@@ -93,15 +91,9 @@ export type GrowthAiVisibilityRunStatus = (typeof GROWTH_AI_VISIBILITY_RUN_STATU
  * Resultado de una llamada individual a un provider para un prompt.
  * `skipped` = provider deshabilitado o secret ausente (skip controlado, NO crash).
  */
-export const GROWTH_AI_VISIBILITY_OBSERVATION_STATUSES = [
-  'succeeded',
-  'failed',
-  'rate_limited',
-  'skipped'
-] as const
+export const GROWTH_AI_VISIBILITY_OBSERVATION_STATUSES = ['succeeded', 'failed', 'rate_limited', 'skipped'] as const
 
-export type GrowthAiVisibilityObservationStatus =
-  (typeof GROWTH_AI_VISIBILITY_OBSERVATION_STATUSES)[number]
+export type GrowthAiVisibilityObservationStatus = (typeof GROWTH_AI_VISIBILITY_OBSERVATION_STATUSES)[number]
 
 // ── Provider error classes ───────────────────────────────────────────────────
 
@@ -120,11 +112,13 @@ export const GROWTH_AI_VISIBILITY_PROVIDER_ERROR_CODES = [
   'provider_error',
   'invalid_response',
   'no_capability',
-  'no_ai_overview_block'
+  'no_ai_overview_block',
+  'market_unsupported',
+  'aeo_market_unknown',
+  'aeo_locale_unsupported'
 ] as const
 
-export type GrowthAiVisibilityProviderErrorCode =
-  (typeof GROWTH_AI_VISIBILITY_PROVIDER_ERROR_CODES)[number]
+export type GrowthAiVisibilityProviderErrorCode = (typeof GROWTH_AI_VISIBILITY_PROVIDER_ERROR_CODES)[number]
 
 /** Códigos de error que representan un skip controlado (config ausente), no un fallo de ejecución. */
 export const GROWTH_AI_VISIBILITY_SKIP_ERROR_CODES: readonly GrowthAiVisibilityProviderErrorCode[] = [
@@ -132,12 +126,12 @@ export const GROWTH_AI_VISIBILITY_SKIP_ERROR_CODES: readonly GrowthAiVisibilityP
   'provider_disabled',
   'missing_secret',
   'no_capability',
-  'no_ai_overview_block'
+  'no_ai_overview_block',
+  'market_unsupported'
 ]
 
-export const isGrowthAiVisibilitySkipErrorCode = (
-  code: GrowthAiVisibilityProviderErrorCode
-): boolean => GROWTH_AI_VISIBILITY_SKIP_ERROR_CODES.includes(code)
+export const isGrowthAiVisibilitySkipErrorCode = (code: GrowthAiVisibilityProviderErrorCode): boolean =>
+  GROWTH_AI_VISIBILITY_SKIP_ERROR_CODES.includes(code)
 
 // ── Citation source types ────────────────────────────────────────────────────
 

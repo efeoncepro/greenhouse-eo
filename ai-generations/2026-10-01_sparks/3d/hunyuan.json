@@ -1,0 +1,35 @@
+  $ costo: sin estimación (slug fuera del registro) · revisa fal.ai/models/fal-ai/hunyuan3d-v3/image-to-3d
+→ fal-ai/hunyuan3d-v3/image-to-3d · hasta 900s de espera
+  ⋯ encolado · request_id 01a0fa02-bb5c-7800-8f99-1dd0bac1aa89 · cuenta FAL_API_KEY_B
+{
+  "model_glb": {
+    "url": "https://v3b.fal.media/files/b/0aacb2b7/Q6sKQQK8abKOPw5NBO-kz_model.glb",
+    "content_type": "model/gltf-binary",
+    "file_name": "model.glb",
+    "file_size": 31093040
+  },
+  "thumbnail": {
+    "url": "https://v3b.fal.media/files/b/0aacb2b8/rYPGMqKx4vym5ckPnSwGQ_preview.png",
+    "content_type": "image/png",
+    "file_name": "preview.png",
+    "file_size": 92847
+  },
+  "model_urls": {
+    "glb": {
+      "url": "https://v3b.fal.media/files/b/0aacb2b7/Q6sKQQK8abKOPw5NBO-kz_model.glb",
+      "content_type": "model/gltf-binary",
+      "file_name": "model.glb",
+      "file_size": 31093040
+    },
+    "fbx": null,
+    "obj": {
+      "url": "https://v3b.fal.media/files/b/0aacb2b7/WA3gUIaPiys0J6avVz-Ot_model.obj",
+      "content_type": "text/plain",
+      "file_name": "model.obj",
+      "file_size": 25366069
+    },
+    "usdz": null
+  },
+  "seed": null
+}
+  ✓ sin assets descargables · 167782 ms

@@ -1,0 +1,31 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "brochure",
+  "recipe": "method-identity-consent",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Data 360 · identidad y consentimiento",
+    "question": "¿Puedes contactar a ese cliente?",
+    "answer": ["Con", "permiso"]
+  },
+  "body": "Unificar datos no da permiso para contactar: gobernamos **canal** y propósito antes de activar.",
+  "note": "Ejemplo ilustrativo · el diseño sale de tu inventario de datos",
+  "sources": ["CRM", "Web", "E-commerce", "ERP", "App"],
+  "profileTitle": "Una persona, 5 fuentes",
+  "channels": [
+    { "channel": "Email", "purpose": "Marketing", "permitted": true },
+    { "channel": "WhatsApp", "purpose": "Servicio", "permitted": true },
+    { "channel": "SMS", "purpose": "Marketing", "permitted": false },
+    { "channel": "Llamada", "purpose": "Ventas", "permitted": true }
+  ],
+  "activations": [
+    { "icon": "marketing", "title": "Journey", "detail": "Sólo con email ✓", "channel": "Email" },
+    { "icon": "agentforce", "title": "Agente de servicio", "detail": "Por WhatsApp ✓", "channel": "WhatsApp" },
+    { "icon": "sales", "title": "Siguiente acción", "detail": "Llamada del ejecutivo", "channel": "Llamada" }
+  ]
+}

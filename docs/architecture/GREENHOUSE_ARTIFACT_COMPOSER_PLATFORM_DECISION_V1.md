@@ -469,6 +469,7 @@ compilado hace que un catálogo nuevo declare **el suyo, una vez**.
 | Motor de composición | **Platform** | `src/lib/artifact-composer/**` (domain-free) |
 | Catálogo deck AXIS (16:9 → PDF) | Commercial | `catalogs/deck-axis/` |
 | Catálogo social (4:5 → PNG set) | Growth/Social | `catalogs/social-carousel/` |
+| Catálogos «La órbita» por superficie (deck PDF · fijos PNG · capas con alfa) | Brand (marca propia Efeonce) | `catalogs/graphic-line-{deck,stills,overlays}/` + `graphic-line-shared/`; mapper `src/lib/brand-surfaces` (TASK-1919, TASK-1927, TASK-1928). Spec: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) |
 | Tokens de marca | **Brand-pack SoT declarado** | `deck-axis`: Figma PPT `33:2` → CSS custom props generado; `axis-tokens.ts` queda como mirror UI con crosswalk exacto |
 | Aggregate de la oferta | Commercial | `greenhouse_commercial.proposals` (`origin`) |
 | Precio | **quote-to-cash** | `src/lib/commercial/quote-to-cash/**` — el Proposal **no** calcula |
@@ -489,6 +490,85 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 > frontera del primitive: el hash del manifest es domain-free en `src/lib/artifact-composer/manifest-hash.ts`,
 > y el lanzador del Job **no** vive en el composer sino en `src/lib/render-dispatch/job-runner.ts` (server-only;
 > el boundary del composer lo rechaza). Contrato: `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`.
+
+> **Delta 2026-09-27 (TASK-1919) — «La órbita» por superficie entra como tres catálogos, y el motor gana tres
+> capacidades genéricas.** Confirma de nuevo la tesis del ADR: la marca propia de Efeonce entra como **catálogos**,
+> no como fork, y lo que el motor necesitó se agregó **una vez** y sin nombre de marca.
+>
+> - **Catálogos nuevos** en `src/lib/artifact-composer/catalogs/`: `graphic-line-deck` (PDF 16:9: `proposal-cinematic`,
+>   `method-staircase`, `section-classic`, `section-split`, `content-measure`, `triptych`), `graphic-line-stills`
+>   (PNG: `web.hero-lens`, `web.hero-bleed`, `web.hero-uniform-tablet`, `web.hero-mobile-native` con una plantilla
+>   por ancho —360/390/430, `contentType` `web.hero-mobile-native.<formato>`—, `dooh.caminero-lens`,
+>   `motion.loop-lens-reveal` —el último cuadro del loop, su estático de respaldo— y `motion.storyboard`) y
+>   `graphic-line-overlays` (PNG con alfa: `audiovisual.cartela`, `zocalo`, `callout-selection`, `data-super`,
+>   `subtitles`; opacas: `split-screen` y `shot-plan`). 20 recetas, 22 plantillas, con piezas compartidas en
+>   `graphic-line-shared/` (resolvers, tokens compilados, ganchos de selección y CTA). **No** se mezclan con
+>   `deck-axis`, que conserva su molde y la línea base de SKY.
+> - **Sólo una receta APROBADA tiene plantilla.** Las opciones y pendientes de AXIS (paleta DOOH, pDOOH) fallan con
+>   `recipe-not-approved`; `audiovisual.close-reveal` es video y falla con `recipe-outside-composer` (lo producen los
+>   masters del reveal v1.1 / `orbit:video`). **El video no se compone aquí**: el composer entrega cuadros fijos y
+>   capas; la animación sigue en la pipeline de motion.
+> - **Motor (domain-free):** (1) `render.background: 'transparent'` por plantilla en el contrato
+>   (`contracts.ts`): la captura sale sin fondo (PNG con alfa) sólo cuando la plantilla lo declara; default opaco.
+>   (2) El gate de tinta (`quality-gates.ts`) pondera por alfa, así que una capa transparente vacía sigue fallando.
+>   (3) La limpieza de un slot ya no borra los campos de otro slot anidado dentro de él.
+> - **Pintura inyectada, no importada.** Cada catálogo de La órbita exporta `createCatalog(options)` y recibe los
+>   pintores de la selección colaborativa y del CTA: el motor no importa paquetes; la pintura es el adaptador de
+>   Greenhouse (`scripts/creative/layout-compiler`) sobre el contrato `efeonce.collaboration-selection`. Los ganchos
+>   miden texto o caja según `targetKind`, honran `variant`/`padding`/`overlay` y esperan `document.fonts.ready`.
+> - **Consumidor:** el mapper puro `src/lib/brand-surfaces` (intent → receta aprobada → `resolveSurfaceComposition`
+>   de AXIS → builder por receta → plan del composer + assets externos) y el CLI local `pnpm brand:compose`. La ruta
+>   productiva (API + `artifact-worker` + MCP) es TASK-1921. Tokens: `pnpm brand:tokens [--check]` compila
+>   `efeonceGraphicLine` (`@efeoncepro/axis-tokens`) a `graphic-line-tokens.{json,css}` por catálogo y copia byte a
+>   byte los archivos de marca desde `@efeoncepro/axis-brand-assets` (test de sincronía). El brand pack `axis` suma
+>   la extensión `graphic-line` (Bricolage Grotesque 760, Poppins 400/500).
+> - **Gate:** scope propio `pnpm composer:visual-gate --catalog=graphic-line` (22 frames a 0 px); ver
+>   `docs/operations/runbooks/composer-visual-gate.md`. Norma de marca:
+>   `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
+>
+> **Delta 2026-09-27 (TASK-1927) — contrato `efeonce.surface-composition` 0.1.2.** `graphic-line-deck` suma el marco
+> (`cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`), las composiciones `hero` y `lines` de
+> `proposal-cinematic` y las de `section-split`; el gate `--catalog=graphic-line` queda en 32 frames a 0 px.
+> `pnpm brand:compose` acepta un intent de documento (`pages`) y entrega un PDF multipágina con manifest y
+> procedencia (`planSurfaceDocument`, `src/lib/brand-surfaces/document.ts`). Los conteos de arriba son los de
+> TASK-1919. Task: `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`.
+>
+> **Delta 2026-09-28 (TASK-1928) — las 69 recetas del deck componen, sin tocar el motor.** `graphic-line-deck` pasa de
+> 16 a **50 plantillas** (34 nuevas) y cubre las **69 de 69** recetas aprobadas del deck; comparten plantilla las cuatro
+> propuestas sobrias (`ProposalService`), las secciones de cine de equipo y servicios (`SectionCine`) y las portadas de
+> brochure, incluida la que lleva la selección de Nexa (`CoverBrochure` con `deck.cover-brochure.document-selection`,
+> AXIS `v0.3.21`). Otra vez, todo lo nuevo entró como **dato del catálogo** y del consumidor:
+>
+> - **Catálogo:** `recipe-map.json` (receta → `contentType`, ejemplo y mapa de slots) con su test de paridad receta ↔
+>   plantilla; resolvers nuevos `gl-align`, `gl-item-role` y `gl-figure-size`; hooks nuevos de selección por ítem o
+>   nivel (`selection.item` / `selection.level`), aire por línea (`textPad: 'per-line'`), cursores extra sobre el mismo
+>   objetivo y cursor del lector con ocho manijas sobre texto. CSS acotado por el prefijo de cada familia.
+> - **Consumidor:** assets externos `logo` (logo de tercero normalizado) y `painted` (capa del motor de la línea gráfica
+>   con la foto adentro), y recorte dirigido del plate (`photo.focus`), materializados por `scripts/brand-surfaces/compose.ts`.
+> - **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` queda en **66 frames a 0 px** (50 del deck, 9 de stills,
+>   7 de overlays) y suma una auditoría renderizada (D1: acento nunca en texto < 24 px; 3×: respuesta ≥ 3× la pregunta
+>   en cotización, clientes, plan y partners). El scope `--catalog=glitch` (TASK-1923) tiene 26 frames a 0 px.
+> - AXIS fijado en `axis-tokens` 0.3.21 / `axis-ui-contracts` 0.3.19. La ruta productiva sigue en TASK-1921 (en curso).
+>
+> Spec técnica vigente del lado Greenhouse: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
+> Task: `docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md`.
+
+> **Delta 2026-09-28 (TASK-1929, complete) — el plan de un deck se valida antes de componer, fuera del motor.**
+> `src/lib/brand-surfaces/deck-recipes/` (consumidor, no motor) agrega un catálogo de recetas legible en runtime
+> (`catalog.generated.json`, generado por `pnpm brand:deck-recipes`), `validateDeckPlan` (piso de documento de AXIS con
+> `resolveSurfaceDocument` + reglas del catálogo con código propio) y `proposeDeckPlan` (`server-only`: un agente elige
+> recetas por id y falla cerrado), con la CLI `pnpm brand:deck-plan`. El Artifact Composer no cambia: el plan sigue
+> entrando por `pnpm brand:compose`. Detalle en §12 de
+> [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
+> Task: `docs/tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md`.
+>
+> **Delta 2026-09-28 — el Glitch Flash entra como plantillas del catálogo Glitch, sin tocar el motor.** El segundo
+> formato de Glitch (una noticia puntual, sin número de edición) suma seis plantillas `Flash*` al `registry.json` de
+> `catalogs/glitch/` (26 → 32; `glitch-carousel` 10, `glitch-stills` 22, `glitch-overlays` 10), un manifiesto hermano
+> `GlitchFlashManifest` y el despachador `planGlitchManifest` en `src/lib/glitch-composition/` (consumidor), y el
+> validador `glitch.edition-structure` 1.1.0. Las portadas con foto pasan el chip a «LA NOTICIA». El scope
+> `--catalog=glitch` queda en **32 frames a 0 px** (`BASELINE_DELTAS.md` (p)). `src/lib/artifact-composer/*.ts` sin
+> cambios. Contrato: `efeonce.glitch-line` 0.2.0 (AXIS `v0.3.24`). Commit `24e4c72ee`.
 
 ---
 

@@ -102,6 +102,11 @@ Canal (dónde nace).
   de marca) con el territorio de `PDR-019` (taxonomía del blog WordPress). Son dos taxonomías distintas.
 - **NUNCA** tratar `LinkedIn Página 💼` y `LinkedIn Julio 👤` como el mismo canal: el runtime los modela
   separados y su voz es distinta (marca vs `JULIO_REYES_VOICE_SYSTEM`).
+  - **LinkedIn Julio = thought leadership** (decisión del operador, 2026-09-28): primera persona, opinión propia y
+    una lectura que sólo él firmaría; la noticia es el pretexto, no el tema. Sin lista de specs ni resumen del
+    anuncio: eso ya lo dice la pieza. Si hace falta, cita a la página con la mención URN.
+  - **LinkedIn Página** con una franquicia editorial (Glitch) habla con la voz de esa franquicia: el narrador de
+    Glitch, no la voz personal de Julio. Caso: `docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md`.
 - **NUNCA** ejecutar una mutación en Notion sin autorización explícita del operador.
 - **NUNCA** asumir que "el calendario" es una sola base: hay **dos** con schema idéntico y el histórico
   está partido. Cualquier promedio de velocidad operativa medido sobre una sola usa la mitad de la
@@ -165,6 +170,12 @@ Rige toda pieza social de la marca propia Efeonce y su familia (Globe, Wave, Rea
 [graphic-line-orbit.md](../../efeonce-brand-studio/references/graphic-line-orbit.md). Los valores salen de los
 tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transcritos a mano.
 
+- **Marcas editoriales con reglas propias:** Glitch tiene su sub-línea (`efeonce-graphic-line` →
+  `references/glitch.md`) y Marketing con Manzanitas su **registro** (aprobado 2026-09-28): norma
+  [`MANZANITAS_REGISTER_V1.md`](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
+  y referencia `efeonce-graphic-line` → `references/manzanitas.md`. Suman reglas sólo para sus piezas (carrusel,
+  story, blog y banner, miniatura de YouTube, portada de pódcast), La órbita manda en todo lo demás y las dos no se
+  mezclan. Nada del registro Manzanitas está aún en AXIS.
 - **Lo que cambia en redes:** grosores ×1,75 en lienzos de hasta 1200 px; margen del 9 % del lado corto; en 9:16,
   la órbita y el texto respetan la zona que tapa la interfaz de cada red (medidas en
   `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras).
@@ -172,7 +183,8 @@ tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transc
   dato real; sin dato, no hay arco.
 - **Campaña con foto y lente declarada:** la órbita rodea la lente con aire y la esfera va arriba a la izquierda, lejos de la cara.
   La foto sale del banco propio `ai-generations/2026-09-25_banco-lente-orbita/` (8 tomas, una por palanca, fichas
-  en `fichas/`) o del pipeline `foto:*`; sin velo navy, sin emblema legible, sujeto dentro de un círculo del 55 %
+  en `fichas/`; si no está en disco: `pnpm ai-gen:pull ai-generations/2026-09-25_banco-lente-orbita`) o del pipeline
+  `foto:*`; sin velo navy, sin emblema legible, sujeto dentro de un círculo del 55 %
   del lado corto.
 - **La órbita no reemplaza la composición fotográfica.** Se declara a propósito en casos concretos (lente,
   medida, progreso, foco), nunca por defecto ni en todo post, y nunca cruza el sujeto, las reservas de texto, el
@@ -185,13 +197,33 @@ tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transc
   horneadas `deliverables/assets/url-lum-{light,dark}.svg` donde no hay fusión).
 - **Eslogan «Empower your …»:** sólo cierra (end-card, contraportada, cierre de campaña); nunca en todo post, nunca
   con esfera, nunca en mayúsculas. Estado: anillo = libre, esfera = ocupado, siempre con etiqueta y sin semáforo.
-- **Cómo se produce:** valores del contrato AXIS `efeonce.graphic-line-orbit` 0.2.0 (tokens `signature`, `slogan`,
+- **Cómo se produce:** valores del contrato AXIS `efeonce.graphic-line-orbit` 0.3.0 (tokens `signature`, `slogan`,
   `state`) y archivos oficiales de `@efeoncepro/axis-brand-assets`, nunca copias propias. Pieza suelta con la
   órbita: `pnpm creative:orbit:render` (sale 1 si falla un check); campaña: `pnpm creative:layout` con la capa
   `graphic_line` y `brand.signature: { brand_in_scene }`; foto con CTA: `pnpm foto:componer:cta` con
   `marcaEnEscena` (gate `firma-burbuja`). Detalle en la
   [referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md) §La firma de una pieza
   gráfica y §Componer con agentes.
+- **Íconos (canónicos 2026-09-26):** voz por la línea del post: Plastilina en Brand (lo que se crea), Trazo en
+  Growth/Engine/Revenue (lo que se mide); nunca las dos en un mismo grupo. En un post de Brand con objeto protagonista,
+  va dentro de su **órbita sesgada** (`skewedOrbitHeroSvg`): objeto en reposo, una por pieza, nunca mide y nunca cruza
+  el texto (la voz vive en el tercio inferior). Fuera de eso, reposo por defecto; responde uno solo y sólo si la pieza
+  no tiene otra esfera. Plastilina no baja de 32 px. Todo sale de `resolveIcon` y pasa `auditIconGroup`; nunca un ícono
+  generado suelto. Criterio: [`efeonce-graphic-line`](../../efeonce-graphic-line/references/iconography.md).
+- **Plastilina en volumen (D24, 2026-09-27):** un post con **un solo objeto** protagonista es uso válido de la tercera
+  capa: el glifo de Plastilina en arcilla mate, PNG con alfa desde `volumeIconUrl(glyph)` de
+  `@efeoncepro/axis-brand-assets` (o descarga del Lab `iconography/#volumen` mientras el paquete no se publique), en
+  respuesta con el acento de Brand, uno por pieza, ≥ 160 px, sin sombra de contacto salvo que la composición la pida.
+  Nunca en carruseles de listas ni junto a íconos planos o Trazo, y nunca regenerado con un modelo.
+- **Perfiles sociales de Efeonce (aprobados 2026-10-01):** portadas de LinkedIn (página 1128 × 191 y perfil personal
+  del equipo 1584 × 396), Facebook (1640 × 624) y YouTube (2560 × 1440), avatar de redes (un solo 1080 × 1080) y nueve
+  destacados de Instagram, con «La órbita»; las portadas, con Nexa en registro cine. La portada lleva una idea
+  propia, no un par del catálogo; los destacados son una mezcla de recursos, sin firma en el círculo. **Mecánica de un destacado:** la
+  imagen de portada sólo sirve para **cambiar** la de un destacado existente; para **crearlo** se publica antes una
+  historia 9:16 **completa** (sin bandas lisas) y se agrega, e Instagram toma la portada del círculo central. Piezas,
+  medidas, zonas seguras, logo y archivos (finales, kit del equipo, OneDrive): `efeonce-graphic-line` →
+  [`applications.md` §A11](../../efeonce-graphic-line/references/applications.md). Publicar en cada red y crear los
+  destacados lo decide y lo hace el operador.
 - **«Te hacemos visible»** siempre con su prueba y sin pauta mientras falte la revisión legal (§1.4). La prueba de
   atribución sin logo sigue sin medir: no afirmes que la órbita ya se reconoce sola.
 
@@ -211,6 +243,11 @@ negocio»**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../.
 - En piezas del servicio usar artefactos auténticos anonimizados (work chart, ficha, registro de excepción),
   escenas/entrevistas reales y baseline. Un mockup se rotula ilustrativo; métricas, nombres y logos de cliente
   exigen permiso específico. No usar robots/cerebros genéricos como sustituto de prueba.
+- Si la pieza personifica a los agentes, sólo con los **Sparks** del kit (los agentes de Efeonce, TASK-1941), siempre
+  con una persona que supervisa y nunca como prueba; en venta de Agent Ops, con el equipo humano. Canon:
+  [`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.md). La destacada «Agents» de Instagram
+  aprobada **se queda** (operador, 2026-10-02: sin Nexa ni texto en el círculo); un destacado con Nexa usa otro nombre
+  y otra destacada. Sus robots no se copian como receta de Sparks.
 - Salesforce sólo se nombra en orgánico de liderazgo de opinión, con respeto; nunca en pauta.
 - La cuenta regresiva a la Ley 21.719 (1 dic 2026) es orientación, no asesoría legal.
 - Seasonalities conservan su línea propia; no se les fuerza un capítulo.

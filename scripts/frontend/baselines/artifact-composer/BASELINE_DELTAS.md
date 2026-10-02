@@ -1,6 +1,572 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-30 (u) — TASK-1949: las seis láminas nativas del deck SEO/AEO y el lockup de submarca
+
+<!-- sealed-by-freeze: a631ba6cb06ad22d6dafa63c8fa09d09293f5631b1b5c49d41cfc2f6b1c360e9 -->
+
+El deck SEO/AEO «La órbita» sobre Search Visibility 360 (aprobado completo por el operador el 2026-09-30, sesión «SEO deck
+para brochure y propuestas»; láminas en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/slides/`) compone en el
+catálogo `graphic-line-deck` sin post-proceso: las seis láminas que se armaban fuera del compositor tienen plantilla, y el
+lockup de submarca, la propuesta de cine sin eyebrow y la bajada del equipo son slots opcionales de las recetas que ya
+existían. Los frames nuevos son el probe de cada plantilla (los `example` de su `slots.json`, sacados de la lámina aprobada;
+los lockups, íconos y capas llegan como `asset-ref:<kind>:probe`).
+
+Diferencias con las láminas aprobadas, todas regla o sistema, no estética:
+- La voz es la canónica de la familia `.gl-ls` (anillo, esfera y color suave del token) en vez de la copia a mano de las
+  nativas: la pregunta y el eyebrow van en el suave de AXIS, no en `#cfe4fa`.
+- `content-report-formats`: el rótulo «La lectura del mes» iba en el acento a 13 px; la regla `accent-text-min-size` manda
+  y va en el teal del informe. Los cinco íconos de formato son glifos Trazo de AXIS en reposo (el catálogo nunca dibuja
+  un ícono); las nativas los dibujaban a mano en el acento suave.
+
+Frames que cambian (existían): el probe llena el slot opcional nuevo; sin el slot la lámina no cambia, lo prueba
+`product-mark.test.ts` componiendo los intents aprobados.
+- `templates-graphic-line-deck/CoverBrochure.png` — cambia: `productMark` (el logo de SV360 al pie de la columna)
+- `templates-graphic-line-deck/CoverProposalOrbit.png` — cambia: `productMark`
+- `templates-graphic-line-deck/ProposalCinematic.png` — cambia: `productMark`
+- `templates-graphic-line-deck/ProposalService.png` — cambia: `productMark`
+- `templates-graphic-line-deck/MethodStaircase.png` — cambia: `productMark`
+- `templates-graphic-line-deck/MethodScoreRing.png` — cambia: `productMark`
+- `templates-graphic-line-deck/DecisionDiagnosisMap.png` — cambia: `productMark`
+- `templates-graphic-line-deck/ContentDayResults.png` — cambia: `productMark`
+- `templates-graphic-line-deck/SectionCine.png` — cambia: la bajada opcional del equipo (`body`, 22 px en 900)
+
+Frames nuevos:
+- `templates-graphic-line-deck/ContentBrandFamily.png` — 🆕 deck.content-brand-family: SV360 y sus cuatro piezas, cada una con su lockup oficial (content-brand-family)
+- `templates-graphic-line-deck/ContentServiceMockups.png` — 🆕 deck.content-service-mockups: SEO técnico, contenido y PR con maquetas nativas y tres entregables (content-service-mockups)
+- `templates-graphic-line-deck/ContentReportFormats.png` — 🆕 deck.content-report-formats: el informe vivo en interfaz blanca y sus cinco formatos (content-report-formats)
+- `templates-graphic-line-deck/ContentCommitteeDeck.png` — 🆕 deck.content-committee-deck: la lámina de comité armada, en perspectiva (content-committee-deck)
+- `templates-graphic-line-deck/ContentIndustries.png` — 🆕 deck.content-industries: seis industrias con la pregunta de su comprador (content-industries)
+- `templates-graphic-line-deck/ContentMarkets.png` — 🆕 deck.content-markets: las Américas desde la órbita con los cinco mercados (content-markets)
+
+## 2026-09-29 (t) — Avatares nuevos del equipo y deriva de Chromium en deck-axis
+
+<!-- sealed-by-freeze: 6c5b56126801a849edaf1c4c3c4863ecc181eda2072977487d8b920ffbfb8278 -->
+
+Decisión del operador (2026-09-29): todo el equipo con la bomber Efeonce sobre el polo piqué y el fondo oscuro de la
+línea con el halo de la órbita (el que pinta `orbitSvg` sobre oscuro, sin anillo ni arco). Se reemplazaron los avatares
+de `assets/squad/` (Julio, Andrés, Daniela, Melkin, Humberly y Valentina; mismas claves del resolver `squad-person`,
+800 px; commit `0d585f614`). Maestros de 1080 px y proceso: `ai-generations/2026-09-29_avatares-equipo/`; copia en GCP:
+`gs://efeonce-group-axis-public-media/team/avatars/v1/`.
+
+**Frames de los avatares (2):**
+
+- `sky/21-equipo.png` — 433208 píxeles: las fotos nuevas del equipo
+- `templates/TeamGalleryFull.png` — 715836 píxeles: las fotos nuevas del equipo
+
+**Deriva de rasterización del texto (57), sin cambio visible:** el baseline de estas láminas es del 2026-07-15 y el
+commit `0323fb933` (2026-07-19) cambió la versión de Playwright y con ella el Chromium que rasteriza. Los píxeles distintos
+están sólo en los bordes del texto (diff de `sky/13-dia-a-dia` revisado lado a lado: mismas letras, mismo color); los
+catálogos congelados después de esa fecha (graphic-line, glitch, manzanitas) dan 0 px. No es regresión: el render de
+estas plantillas no cambió.
+
+**Mismo píxel, otros bytes (2):** el gate las da en 0 píxeles, pero el freeze compara huellas de archivo y el PNG
+recodificado cambia sus bytes. Se re-promueven sin cambio visible:
+
+- `templates/CoverFull.png` — 0 píxeles
+- `templates/HighlightWave.png` — 0 píxeles
+
+- `sky/01-portada.png` — 1
+- `sky/02-agenda.png` — 887
+- `sky/03-entendimiento.png` — 293
+- `sky/04-near-miss.png` — 775
+- `sky/05-capa-tecnica.png` — 149
+- `sky/06-diagnostico.png` — 101
+- `sky/07-escalera.png` — 1868
+- `sky/08-informe.png` — 632
+- `sky/09-terreno.png` — 125
+- `sky/10-operacion.png` — 348
+- `sky/11-stack-operativo.png` — 1860
+- `sky/12-ciclo.png` — 1232
+- `sky/13-dia-a-dia.png` — 2366
+- `sky/14-arranque.png` — 910
+- `sky/15-lineas.png` — 6
+- `sky/16-seo-aeo.png` — 696
+- `sky/17-content-hub-anatomy.png` — 3148
+- `sky/18-muestra.png` — 758
+- `sky/19-portal.png` — 340
+- `sky/20-portal-vista.png` — 802
+- `sky/22-berel.png` — 3
+- `sky/23-clientes.png` — 447
+- `sky/24-testimonios.png` — 444
+- `sky/25-seguro.png` — 77
+- `sky/26-cumplimiento.png` — 525
+- `sky/27-economica.png` — 595
+- `sky/28-contraportada.png` — 198
+- `templates/AgendaFull.png` — 345
+- `templates/ArtifactShowcaseFull.png` — 27
+- `templates/BackCoverFull.png` — 198
+- `templates/BulletListSplit.png` — 4
+- `templates/CardGridFull.png` — 61
+- `templates/CaseStudySplit.png` — 148
+- `templates/ChartSplit.png` — 185
+- `templates/ClientLogosFull.png` — 46
+- `templates/ComparisonSplit.png` — 15
+- `templates/ContentHubAnatomyFull.png` — 613
+- `templates/CredentialsFull.png` — 7896
+- `templates/DailyOpsHubFull.png` — 700
+- `templates/DualListSplit.png` — 13
+- `templates/DualTextSplit.png` — 21
+- `templates/EvidenceStoryGrid.png` — 58
+- `templates/FourPillarsFull.png` — 25
+- `templates/HumanImpactFull.png` — 4
+- `templates/MaturityLadderFull.png` — 197
+- `templates/MetricsSplit.png` — 70
+- `templates/NarrativeSplit.png` — 1
+- `templates/PricingFull.png` — 121
+- `templates/ProcessStepsFull.png` — 443
+- `templates/QuoteSplit.png` — 5
+- `templates/RequirementsTableFull.png` — 129
+- `templates/SectionDividerSplit.png` — 35
+- `templates/StatSplit.png` — 7
+- `templates/TeamSplit.png` — 51
+- `templates/TestimonialsFull.png` — 34
+- `templates/TimelineFull.png` — 332
+- `templates/ToolStackFull.png` — 138
+
+## 2026-09-29 (s) — TASK-1942: las 16 láminas de práctica del deck Salesforce y la marca del partner
+
+<!-- sealed-by-freeze: c1d25681ec982b91e06fc045bebac0ecafe24278c5b317edb9285356f72c6a74 -->
+
+El deck Salesforce «La órbita» (canvas aprobado por el operador el 2026-09-29; valores en AXIS `axis-tokens` y
+`axis-ui-contracts` 0.3.33, `axis-brand-assets` 0.4.4) compone completo en el catálogo `graphic-line-deck`: las doce
+recetas de la primera ronda y las cuatro de la segunda (SF5, SF10, SF11 y SF18) tienen plantilla, con la familia
+`.gl-ls` (escenario de luz, plataforma y voz) y un bloque de CSS por receta anclado en `graphic-line.css`. Los frames
+nuevos son el probe de cada plantilla (los `example` de su `slots.json`; los logos de terceros llegan como
+`asset-ref:<kind>:probe`, nunca un archivo real).
+
+Diferencias con las láminas aprobadas, todas falla cerrada o regla, no estética:
+- SF18 `content-day-live-approval`: AXIS 0.3.33 mide el número del bucle a 15 px «en el acento»; la regla transversal
+  `accent-text-min-size` (el acento no colorea texto de menos de 24 px) manda, así que el número va en suave. Queda
+  reportado a AXIS para que el token deje de pedir el acento.
+- SF16/SF18: las negritas van en el peso 700 del token; las aprobadas caían a 800 por un fallback de fuente.
+
+Frames que cambian (existían):
+- `templates-graphic-line-deck/CoverBrochure.png` — cambia: el probe llena el slot opcional nuevo `partnerMark` (la
+  insignia del partner en la portada de línea; sin él la portada no cambia, lo prueba `partner-mark.test.ts`)
+- `templates-graphic-line-deck/CloseProposal.png` — cambia: el probe llena el slot opcional nuevo `partnerMark`, y el
+  cierre declara `contactSocialBelow` y `sloganRunLeading` (el eslogan en bloque de la contraportada Salesforce)
+
+Frames nuevos:
+- `templates-graphic-line-deck/ContentOnePlatform.png` — 🆕 deck.content-one-platform: una operación: la cuenta en el centro y sus áreas de trabajo (content-one-platform)
+- `templates-graphic-line-deck/MethodAgentSupervisor.png` — 🆕 deck.method-agent-supervisor: la supervisora y sus agentes, con la aprobación pendiente (method-agent-supervisor)
+- `templates-graphic-line-deck/DecisionPlatformCoexistence.png` — 🆕 deck.decision-platform-coexistence: dos plataformas que conviven, capacidad por capacidad (decision-platform-coexistence)
+- `templates-graphic-line-deck/DecisionProviderFit.png` — 🆕 deck.decision-provider-fit: los monolitos del encaje de proveedor (decision-provider-fit)
+- `templates-graphic-line-deck/DecisionDiagnosisVerdict.png` — 🆕 deck.decision-diagnosis-verdict: el diagnóstico abierto con su veredicto y las olas del roadmap (cinco módulos, cada uno su slot) (decision-diagnosis-verdict)
+- `templates-graphic-line-deck/ContentServiceLanes.png` — 🆕 deck.content-service-lanes: los carriles del servicio (content-service-lanes)
+- `templates-graphic-line-deck/ContentSeasonLaunches.png` — 🆕 deck.content-season-launches: los lanzamientos de la temporada (content-season-launches)
+- `templates-graphic-line-deck/MethodIdentityConsent.png` — 🆕 deck.method-identity-consent: identidad y consentimiento: fuentes, perfil y activaciones (method-identity-consent)
+- `templates-graphic-line-deck/MethodMigrationReconcile.png` — 🆕 deck.method-migration-reconcile: la migración con sus contadores y el cuadre final (method-migration-reconcile)
+- `templates-graphic-line-deck/MethodWaves.png` — 🆕 deck.method-waves: cuatro escalones de vidrio unidos por la trayectoria de luz (sin ícono en la cima: es opcional) (method-waves)
+- `templates-graphic-line-deck/ContentDayLiveConsole.png` — 🆕 deck.content-day-live-console: la consola de operación gestionada (content-day-live-console)
+- `templates-graphic-line-deck/ContentDayReleaseCycle.png` — 🆕 deck.content-day-release-cycle: el ciclo de release con el video de la demo (content-day-release-cycle)
+- `templates-graphic-line-deck/ContentDayLiveLibrary.png` — 🆕 deck.content-day-live-library: la biblioteca de tutoriales por rol (content-day-live-library)
+- `templates-graphic-line-deck/ContentLiveChat.png` — 🆕 deck.content-live-chat: el CRM en una conversación (content-live-chat)
+- `templates-graphic-line-deck/ContentMeasureFormulas.png` — 🆕 deck.content-measure-formulas: cinco métricas con fórmula, fuente y dueño (content-measure-formulas)
+- `templates-graphic-line-deck/ContentDayLiveApproval.png` — 🆕 deck.content-day-live-approval: el agente propone en el canal, la supervisora aprueba y queda registrado (content-day-live-approval)
+
+## 2026-09-29 (r) — TASK-1939: catálogo Marketing con Manzanitas (18 plantillas nuevas)
+
+<!-- sealed-by-freeze: bc3b60603b00415eed249a37ef87596354dba007dca1025d64bd16dfc0467573 -->
+
+El registro Marketing con Manzanitas (aprobado completo por el operador el 2026-09-28, canvas v39; publicado en AXIS
+`axis-tokens` 0.3.28 y `axis-ui-contracts` 0.3.28, contrato `efeonce.manzanitas-register` 0.2.0) compone en dos catálogos
+delgados sobre una sola carpeta: `manzanitas-carousel` (PDF) y `manzanitas-stills` (PNG). Las 18 plantillas pintan las 26
+piezas aprobadas; los valores salen de `manzanitas-tokens.css` (compilado por `pnpm manzanitas:tokens`), los gráficos los
+pinta `manzanitasChartSvg` desde el dato y la Lente y la órbita del paso las pinta `@efeoncepro/axis-graphic-line`. Los
+frames nuevos son el probe de cada plantilla (foto sintética del gate, nunca una foto real: ISSUE-122 no aplica).
+
+Diferencias con el canvas v39, todas regla del operador o falla cerrada, no estética: el eslogan de los tres cierres va
+**debajo** del logo y al 64 % de su ancho (regla del 2026-09-29; el cierre de YouTube del canvas lo tenía encima), con la
+palabra de la línea en la tinta cuando el cuerpo queda bajo 24 px; la respuesta va en una línea y, donde comparte línea
+con el «Desliza», le deja su espacio; en las láminas con contenido fijo bajo la voz la pregunta va en una línea. Las tres
+reglas fallan cerradas (el motor mide el recorte) y las prueba `manzanitas-fit.test.ts`.
+
+- `templates-manzanitas/CoverPizarra.png` — 🆕 mcm.cover.pizarra: portada Pizarra con la manzana grande y el «Desliza» (cover-pizarra, cover-pizarra-swipe-response)
+- `templates-manzanitas/CoverEscena.png` — 🆕 mcm.cover.escena: portada con foto a sangre (cover-escena)
+- `templates-manzanitas/StepPizarra.png` — 🆕 mcm.step: el paso sobre la cuadrícula con la órbita que cuenta (step-pizarra)
+- `templates-manzanitas/DataApples.png` — 🆕 mcm.data.apples: el dato en manzanas de diez (data-apples-of-ten)
+- `templates-manzanitas/InteriorEscena.png` — 🆕 mcm.interior.escena: interior con foto y «Paso n de N» (interior-escena)
+- `templates-manzanitas/InteriorLente.png` — 🆕 mcm.interior.lente: la Lente de La órbita sobre la foto (interior-lente)
+- `templates-manzanitas/ChartVoice.png` — 🆕 mcm.chart.*: los siete gráficos con voz; el probe pinta «De cada 100» (chart-ranking … chart-funnel)
+- `templates-manzanitas/ChartQuestion.png` — 🆕 mcm.chart.measure / trend: sólo la pregunta, la esfera es el dato (chart-measure, chart-trend)
+- `templates-manzanitas/DenseConcept.png` — 🆕 mcm.dense.concept: concepto y tres puntos (dense-concept)
+- `templates-manzanitas/DenseComparison.png` — 🆕 mcm.dense.comparison: comparación en dos columnas (dense-comparison)
+- `templates-manzanitas/DenseSteps.png` — 🆕 mcm.dense.steps: paso a paso (dense-steps)
+- `templates-manzanitas/BackCover.png` — 🆕 mcm.back.a: contraportada A que conversa, con el eslogan debajo del logo (back-cover-a)
+- `templates-manzanitas/StoryEscena.png` — 🆕 mcm.story.escena: la story con foto (story-escena)
+- `templates-manzanitas/StoryClose.png` — 🆕 mcm.story.close: la story de cierre en Pizarra (story-close)
+- `templates-manzanitas/BlogBanner.png` — 🆕 mcm.blog.banner: el banner del blog con foto (blog-banner-escena)
+- `templates-manzanitas/YoutubeThumbnail.png` — 🆕 mcm.youtube.thumbnail: la miniatura con foto (youtube-thumbnail)
+- `templates-manzanitas/YoutubeClose.png` — 🆕 mcm.youtube.close: el cierre del video, logo con el eslogan debajo (youtube-close)
+- `templates-manzanitas/PodcastCover.png` — 🆕 mcm.podcast.cover: la portada del pódcast (podcast-cover)
+
+## 2026-09-28 (q) — Glitch: la muletilla del cierre del video pasa a ser dato del manifiesto
+
+<!-- sealed-by-freeze: fbc50aba79536e19868dd075e0ba4d5c982e568d20e7fc5c97c1de0d81ca3ca4 -->
+
+Regla del operador (2026-09-28): la muletilla del narrador varía por edición, nunca es fija. Las plantillas de cierre
+del video (`overlay-cta-reel.html`, `overlay-cta-vlog.html`) traían «el #<span>N</span> sale el lunes.» con sólo el
+número como slot; ahora la frase entera es el slot `closingLine` (alimentado por `video.closingLine` del manifiesto,
+obligatoria cuando se piden overlays). El probe del gate usa el mismo texto de siempre («el #18 sale el lunes.»), así
+que no cambia nada de la composición: sólo que Guttery ya no parte el texto en tres tramos (`el #` · `18` ·
+` sale el lunes.`) y lo compone como una sola corrida, lo que mueve el antialias del «1» de «#18» (788 píxeles, ningún
+glifo cambia de lugar a la vista; comparado lado a lado). En el vlog el cambio no llega a los píxeles (0 px).
+
+- `templates-glitch/OverlayCtaReel.png` — ✏️ glitch.overlay.cta.reel: la muletilla es un solo slot (`closingLine`); mismo texto, antialias del «1» de «#18» por componerse como una corrida
+
+## 2026-09-28 (p) — Glitch Flash: seis plantillas nuevas y «LA NOTICIA» en las portadas con foto
+
+<!-- sealed-by-freeze: eda719cb0ccf69b2d2e0c9a20e32a84feba06977a5f9272812b997db50f148c4 -->
+
+El operador aprobó y publicó el primer **Glitch Flash** el 2026-09-28 (Claude Sonnet 5.5): el formato que se dispara ante
+una noticia puntual, sin número de edición ni avance n/8 y fuera de la rotación de portadas. AXIS lo publicó en
+`axis-tokens` 0.3.24 (`glitchLine.editions.flash` y las seis piezas `flash-*`) y `axis-ui-contracts` 0.3.22
+(`efeonce.glitch-line` 0.2.0). El catálogo suma una plantilla por pieza, derivadas de las aprobadas de la edición y con
+el markup de las láminas publicadas (canvas «Design»): cabecera «NO ESPERA AL LUNES» sobre la estela de bytes
+(`assets/flash-trail.svg`, generada desde el token con la semilla 1755 y comparada celda por celda con el SVG publicado)
+y «FLASH»; chips «LA NOTICIA» y «ANUNCIO»; sin avance; la muletilla de la contraportada en dos líneas. Los frames nuevos
+son el probe de cada plantilla (foto sintética del gate), como todos los del catálogo.
+
+Además, por decisión del operador del mismo día, toda portada productiva con foto cambia el chip «PORTADA» (que sirvió
+para la prueba) por «LA NOTICIA»: sólo cambia ese texto del chip en las tres plantillas que lo llevan; nada más se mueve.
+
+- `templates-glitch/CoverPhoto.png` — ✏️ glitch.cover.a: el chip dice «LA NOTICIA» (antes «PORTADA»)
+- `templates-glitch/BlogBannerPhoto.png` — ✏️ glitch.blog.banner.a: el chip dice «LA NOTICIA» (antes «PORTADA»)
+- `templates-glitch/BlogSquarePhoto.png` — ✏️ glitch.blog.square.a: el chip dice «LA NOTICIA» (antes «PORTADA»)
+- `templates-glitch/FlashCover.png` — 🆕 glitch.flash.cover: la portada del Flash (pieza flash-portada)
+- `templates-glitch/FlashInterior.png` — 🆕 glitch.flash.interior: la noticia, con «El micrófono se abre» y sin avance (flash-interior)
+- `templates-glitch/FlashBackCover.png` — 🆕 glitch.flash.back: la contraportada con la muletilla en dos líneas (flash-contraportada)
+- `templates-glitch/FlashBlogBanner.png` — 🆕 glitch.flash.blog.banner: el banner 16:9 del blog (flash-blog-banner)
+- `templates-glitch/FlashNewsBanner.png` — 🆕 glitch.flash.blog.news: el banner interno 1600 × 900 (flash-blog-banner-interno)
+- `templates-glitch/FlashThreads.png` — 🆕 glitch.flash.threads: la portada sola, sin «Desliza» (flash-threads)
+
+## 2026-09-28 (o) — TASK-1934: las nueve láminas SEO/AEO del deck
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Las nueve láminas SEO/AEO aprobadas por el operador el 2026-09-28 componen en `graphic-line-deck` sobre AXIS 0.3.23
+(`axis-tokens` 0.3.23, `axis-ui-contracts` 0.3.21; deltas (m) y (n) de AXIS). Siete plantillas nuevas y dos recetas sobre
+plantillas existentes (`proposal-service-seo` sobre `ProposalService`, `proposal-cinematic-seo` sobre
+`ProposalCinematic`). Compuestas con sus plates, logos e íconos reales, comparadas lado a lado contra sus referencias y
+**aprobadas a ojo por el operador el 2026-09-28**. Diferencias con la referencia, todas decisión de norma: la respuesta a
+120 px (3×) en DeckIARespuesta, DeckDiferencia y DeckEEAT, con la ventana «Hoy» de DeckIARespuesta en 860/450; la tarjeta
+Efeonce blanca; el wordmark de McKinsey a 700; la esfera de la trayectoria con su brillo redondo. Los frames nuevos son
+el probe de cada plantilla (assets de prueba), como todos los del catálogo.
+
+- `templates-graphic-line-deck/DecisionAiAnswer.png` — 🆕 deck.decision-ai-answer: a quién recomienda la IA (motor genérico, datos de ejemplo marcados)
+- `templates-graphic-line-deck/DecisionAiMarket.png` — 🆕 deck.decision-ai-market: tres cifras de mercado con su fuente
+- `templates-graphic-line-deck/MethodSurroundCycle.png` — 🆕 deck.method-surround-cycle: el ciclo Surround Discovery sobre la órbita
+- `templates-graphic-line-deck/DecisionDifference.png` — 🆕 deck.decision-difference: agencia commodity frente a método medible
+- `templates-graphic-line-deck/MethodEeat.png` — 🆕 deck.method-eeat: las cuatro letras de E-E-A-T y el medidor
+- `templates-graphic-line-deck/DecisionTrafficToRevenue.png` — 🆕 deck.decision-traffic-to-revenue: del tráfico calificado a los ingresos
+- `templates-graphic-line-deck/DecisionDiagnosisMap.png` — 🆕 deck.decision-diagnosis-map: el mapa del diagnóstico (datos de muestra marcados)
+- `templates-graphic-line-deck/ProposalCinematic.png` — ✏️ deck.proposal-cinematic: el probe suma la nota del pie («Sin promesas de ranking…»), que la AEO y la SEO cine aprobadas llevaban
+
+## 2026-09-28 (n) — TASK-1928: la portada de brochure con la selección de Nexa
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+El operador relajó «sin selección en `cover-brochure`» el 2026-09-28 y AXIS 0.3.21 (delta (l), `axis-ui-contracts`
+0.3.19) le da la composición `document-selection`: la receta aprobada `cover-brochure-cine-lines-selection` compone
+con la plantilla `CoverBrochure`, que ahora marca la respuesta como objetivo y declara el slot opcional `selection`. El
+probe del gate rellena todo slot no fijo, así que su frame suma el marco de ocho manijas y el cursor sobre la respuesta
+(runbook §4bis); el resto de la lámina no cambia. Compuesta con el plate NX6b y comparada a ojo contra la referencia
+`DeckPortadaPrincipal6Sel`: coincide (la burbuja URL de la referencia no está, igual que en la portada limpia de las
+cinco líneas de TASK-1927: la firma de `cover-brochure` es el logo). Con ella, las 69 recetas del deck tienen plantilla.
+
+- `templates-graphic-line-deck/CoverBrochure.png` — ✏️ deck.cover-brochure: el probe suma la selección sobre la respuesta
+
+## 2026-09-27 (m) — TASK-1928: los largos del catálogo mandan
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+La paridad de slots receta ↔ plantilla (`recipe-map.json` → `slots`, test `recipe-slot-parity.test.ts`) alinea los
+largos máximos de los `slots.json` de las 38 recetas con los de su receta en el catálogo de láminas. El ejemplo de la
+bajada de la cotización en vivo medía 111 caracteres visibles contra los 110 de la receta: se acorta («Los montos se
+definen en la propuesta.»), y su frame se re-promueve. Ningún otro frame cambia (los largos no se pintan).
+
+- `templates-graphic-line-deck/ContentPricingLive.png` — ✏️ deck.content-pricing.live: la bajada del probe, una palabra menos
+
+## 2026-09-27 (l) — TASK-1928: contenido y día a día
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Sexta y última familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.20, `axis-ui-contracts` 0.3.18, delta (k)
+de AXIS): la hoja de contactos, el texto, las viñetas, el día a día en sus cuatro composiciones (el reloj, las
+herramientas, el avance y los resultados en vivo) y la agenda. Compuestas con sus plates, isotipos y el panel de
+Greenhouse reales y comparadas a ojo contra las ocho referencias: coinciden salvo las decisiones de la norma — el rótulo
+«Revisamos contigo» y la etiqueta de la tarjeta en revisión en el texto claro (D1: iban en el acento a 13–20 px). El
+recorte de la lente del reloj sigue el foco del plate (`photo.focus`, recorte dirigido en el compositor sólo cuando el
+intent lo declara). Las interfaces del día a día son genéricas con el isotipo real de cada herramienta. El CSS nuevo está
+acotado a `.gl-cs`, `.gl-ct`, `.gl-cb`, `.gl-cd`, `.gl-cdl` (`.gl-cdt`, `.gl-cdp`, `.gl-cdr`) y `.gl-ag`; el resolver nuevo
+`gl-align` alinea los rótulos del reloj. Con esta familia las 69 recetas del deck tienen plantilla.
+
+- `templates-graphic-line-deck/ContactSheet.png` — 🆕 deck.contact-sheet
+- `templates-graphic-line-deck/ContentText.png` — 🆕 deck.content-text
+- `templates-graphic-line-deck/ContentBullets.png` — 🆕 deck.content-bullets
+- `templates-graphic-line-deck/ContentDay.png` — 🆕 deck.content-day
+- `templates-graphic-line-deck/ContentDayTools.png` — 🆕 deck.content-day.tools
+- `templates-graphic-line-deck/ContentDayProgress.png` — 🆕 deck.content-day.live-progress
+- `templates-graphic-line-deck/ContentDayResults.png` — 🆕 deck.content-day.live-results
+- `templates-graphic-line-deck/DecisionAgenda.png` — 🆕 deck.decision-agenda
+
+## 2026-09-27 (k) — TASK-1928: secciones y quiénes somos
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Quinta familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.19, `axis-ui-contracts` 0.3.17, delta (j) de AXIS):
+la sección con lente, la sección a sangre, la sección de cine en sus cuatro composiciones (equipo, servicios, quiénes
+somos y por qué lo hacemos), el equipo y el stack. Compuestas con sus plates, fotos del squad e isotipos reales y
+comparadas a ojo contra las ocho referencias: coinciden salvo las decisiones de la norma — sin el logo chico que
+conservaban las secciones de cine (lámina interior con foto: el eyebrow vuelve al margen), sin el velo lateral de
+quiénes somos y por qué lo hacemos, los rótulos de los pilares en blanco (D1), la fuente de las cifras de quiénes somos
+visible y sin los pilares de luz del stack (la referencia nunca los pintó). La lente la pinta entera el motor de la
+línea gráfica (asset `painted`: el plate lo inyecta quien compone). El CSS nuevo está acotado a `.gl-sec`, `.gl-tm`,
+`.gl-stk` y `.gl-live-voice`; el hook del CTA suma las ocho manijas sobre texto (servicios) sin cambiar a los CTAs
+previos, el indicador acepta su centro medido (la sangre) y el resolver nuevo `gl-item-role` marca la ficha al frente.
+
+- `templates-graphic-line-deck/SectionLens.png` — 🆕 deck.section-lens
+- `templates-graphic-line-deck/SectionBleed.png` — 🆕 deck.section-bleed
+- `templates-graphic-line-deck/SectionCine.png` — 🆕 deck.section-cine (+ services)
+- `templates-graphic-line-deck/SectionCineAbout.png` — 🆕 deck.section-cine.about
+- `templates-graphic-line-deck/SectionCinePurpose.png` — 🆕 deck.section-cine.purpose
+- `templates-graphic-line-deck/ContentTeam.png` — 🆕 deck.content-team
+- `templates-graphic-line-deck/ContentStack.png` — 🆕 deck.content-stack
+
+## 2026-09-27 (j) — TASK-1928: la familia prueba
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Cuarta familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.18, `axis-ui-contracts` 0.3.16, delta (i) de AXIS):
+el foco sobre la prueba, los clientes con su muro de logos, los partners, el riesgo, el caso, el gráfico, el testimonio
+y por qué elegirnos. Compuestas con sus plates y logos reales y comparadas a ojo contra las ocho referencias: coinciden
+salvo las correcciones de la norma — las respuestas de partners y testimonio a 120 px (3× la pregunta; las referencias,
+110 y 104), la fuente visible de las cifras de clientes, y la fuente real del foco (la referencia imprimía «Datos de
+muestra»). Las cifras llegan por `figures` del contrato con su fuente; una barra sale de su número; los logos de
+terceros se normalizan al componer (asset `logo`: un tono y el mismo peso óptico, con la excepción tonal de AXIS para
+Aguas Andinas y la UC de Temuco). En el probe cada logo es el rótulo sintético `file:probe`. El CSS nuevo está acotado a
+`.gl-cf`, `.gl-cc`, `.gl-cpt`, `.gl-dr`, `.gl-dc`, `.gl-dch`, `.gl-dt` y `.gl-dw`; el resolver nuevo `gl-figure-size`
+sólo lo usa por qué elegirnos. Los hooks suman `selection.item` a seis plantillas y la frase del testimonio a la selección
+sobre la respuesta, sin cambiar a las plantillas previas.
+
+- `templates-graphic-line-deck/ContentFocus.png` — 🆕 deck.content-focus
+- `templates-graphic-line-deck/ContentClients.png` — 🆕 deck.content-clients
+- `templates-graphic-line-deck/ContentPartners.png` — 🆕 deck.content-partners
+- `templates-graphic-line-deck/DecisionRisk.png` — 🆕 deck.decision-risk
+- `templates-graphic-line-deck/DecisionCase.png` — 🆕 deck.decision-case
+- `templates-graphic-line-deck/DecisionChart.png` — 🆕 deck.decision-chart
+- `templates-graphic-line-deck/DecisionTestimonial.png` — 🆕 deck.decision-testimonial
+- `templates-graphic-line-deck/DecisionWhyUs.png` — 🆕 deck.decision-why-us
+
+## 2026-09-27 (i) — TASK-1928: cotización, próximos pasos y respiro
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Tercera familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.17, `axis-ui-contracts` 0.3.15, delta (h) de AXIS):
+la cotización en sus tres composiciones (`table`, `stage` y `live`), los próximos pasos con la agenda del diagnóstico y
+la lámina de respiro. Compuestas con su plate real y comparadas a ojo contra las cinco referencias: coinciden salvo las
+correcciones de la norma — la respuesta de las cotizaciones a 120 px (3× la pregunta; las referencias, 118) y los
+kickers chicos sobre el papel en navy (D1: «Recomendado», «Propuesta · Cotización», «01 · Diagnóstico · Sin costo»
+iban en el acento a 14–15 px). Los montos se imprimen siempre como marcador y el contacto sale de `EFEONCE_CONTACT`.
+El CSS nuevo está acotado a `.gl-br`, `.gl-ns`, `.gl-pt`, `.gl-pcs`, `.gl-pv` y `.gl-flow-voice` (la escena de la
+cotización usa `gl-pcs`: `gl-ps` es la propuesta sobria, y compartir el prefijo movía su frame). Los hooks de selección
+y del CTA suman el ítem recomendado y la cotización en vivo sin cambiar a las plantillas previas. La auditoría
+renderizada (D1 y 3×, con las tres cotizaciones en la lista del 3×) pasa sobre los probes.
+
+- `templates-graphic-line-deck/Breather.png` — 🆕 deck.breather
+- `templates-graphic-line-deck/DecisionNextSteps.png` — 🆕 deck.decision-next-steps
+- `templates-graphic-line-deck/ContentPricing.png` — 🆕 deck.content-pricing
+- `templates-graphic-line-deck/ContentPricingStage.png` — 🆕 deck.content-pricing.stage
+- `templates-graphic-line-deck/ContentPricingLive.png` — 🆕 deck.content-pricing.live
+
+## 2026-09-27 (h) — TASK-1928: la familia método
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Segunda familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.16, `axis-ui-contracts` 0.3.14, delta (g) de
+AXIS): la escalera tipográfica (`method-staircase` · `flat`), el plan como trayectoria (`decision-plan`, reemplaza la
+órbita circular), el anillo del puntaje (`method-score-ring`) y la fuerza de trabajo híbrida con sus dos composiciones
+(`ladder` con dos cursores sobre la respuesta; `scene` con dos selecciones medidas en la foto). Compuestas con su
+plate real y comparadas a ojo contra las cinco referencias: coinciden salvo las correcciones de la norma — la
+respuesta del plan a 3× la pregunta (120 px; la referencia, 112), la fuente de los pesos del anillo visible en el pie
+y la ficha 3 del plan apoyada en la punta de su tallo (la referencia la dejaba 24 px arriba por un alto de ficha fijo).
+La escalera de vidrio sale ahora de los tokens de AXIS con los mismos valores: su frame NO cambia. El hook de
+selección mide el aire de la respuesta POR LÍNEA sólo cuando el slot lo pide (`textPad: 'per-line'`, la fuerza
+híbrida, como su lámina aprobada); el resto de las láminas con selección sobre texto no cambia. El CSS nuevo está
+acotado a `.gl-mf`, `.gl-dp`, `.gl-sr`, `.gl-hw` y `.gl-url-lum`. La auditoría renderizada (D1 y 3×, con
+`deck.decision-plan` en la lista del 3×) pasa sobre los probes.
+
+- `templates-graphic-line-deck/MethodStaircaseFlat.png` — 🆕 deck.method-staircase.flat
+- `templates-graphic-line-deck/DecisionPlan.png` — 🆕 deck.decision-plan
+- `templates-graphic-line-deck/MethodScoreRing.png` — 🆕 deck.method-score-ring
+- `templates-graphic-line-deck/MethodHybridWorkforce.png` — 🆕 deck.method-hybrid-workforce
+- `templates-graphic-line-deck/MethodHybridWorkforceScene.png` — 🆕 deck.method-hybrid-workforce.scene
+
+## 2026-09-27 (g) — TASK-1923: Glitch entra al gate (26 plantillas, scope `--catalog=glitch`)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Glitch (sólo Glitch) suma una entrada de probe: los catálogos `glitch-carousel`, `glitch-stills` y `glitch-overlays`
+comparten la carpeta `catalogs/glitch/`, así que el probe fotografía sus 26 plantillas una vez, en `templates-glitch/`.
+Todas están aprobadas: las 7 del carrusel, los banners del blog A/B/C y sus versiones 1:1, el banner de noticia, la
+portada del reel, la miniatura del vlog y los 10 overlays del reel y del vlog (el cuadro fijo del kit de motion). La
+foto de cada hueco es un SVG sintético (`GLITCH_PROBE_ASSETS`, `photo:probe`): ISSUE-122 no aplica al probe; la falla
+en bytes del probe es la del `example` de su slot (vacía). Los overlays se capturan sin alfa en el probe (fondo del
+navegador); el PNG entregado por `pnpm glitch:compose` sí lleva alfa. Selftest de dos corridas: 26 frames a 0 px.
+Ningún frame de otro catálogo cambia.
+
+- `templates-glitch/BackCover.png` — 🆕 glitch.back
+- `templates-glitch/BlogBannerMosaic.png` — 🆕 glitch.blog.banner.c
+- `templates-glitch/BlogBannerPhoto.png` — 🆕 glitch.blog.banner.a
+- `templates-glitch/BlogBannerType.png` — 🆕 glitch.blog.banner.b
+- `templates-glitch/BlogNewsBanner.png` — 🆕 glitch.blog.news
+- `templates-glitch/BlogSquareMosaic.png` — 🆕 glitch.blog.square.c
+- `templates-glitch/BlogSquarePhoto.png` — 🆕 glitch.blog.square.a
+- `templates-glitch/BlogSquareType.png` — 🆕 glitch.blog.square.b
+- `templates-glitch/CoverMosaic.png` — 🆕 glitch.cover.c
+- `templates-glitch/CoverPhoto.png` — 🆕 glitch.cover.a
+- `templates-glitch/CoverType.png` — 🆕 glitch.cover.b
+- `templates-glitch/Interior.png` — 🆕 glitch.interior
+- `templates-glitch/InteriorLens.png` — 🆕 glitch.interior.lens
+- `templates-glitch/InteriorOpening.png` — 🆕 glitch.interior.opening
+- `templates-glitch/OverlayCtaReel.png` — 🆕 glitch.overlay.cta.reel
+- `templates-glitch/OverlayCtaVlog.png` — 🆕 glitch.overlay.cta.vlog
+- `templates-glitch/OverlayDropReel.png` — 🆕 glitch.overlay.drop.reel
+- `templates-glitch/OverlayDropVlog.png` — 🆕 glitch.overlay.drop.vlog
+- `templates-glitch/OverlayHeaderReel.png` — 🆕 glitch.overlay.header.reel
+- `templates-glitch/OverlayHeaderVlog.png` — 🆕 glitch.overlay.header.vlog
+- `templates-glitch/OverlayLowerThirdReel.png` — 🆕 glitch.overlay.lower-third.reel
+- `templates-glitch/OverlayLowerThirdVlog.png` — 🆕 glitch.overlay.lower-third.vlog
+- `templates-glitch/OverlayNewsReel.png` — 🆕 glitch.overlay.news.reel
+- `templates-glitch/OverlayNewsVlog.png` — 🆕 glitch.overlay.news.vlog
+- `templates-glitch/ReelCover.png` — 🆕 glitch.reel.cover
+- `templates-glitch/VideoThumbnail.png` — 🆕 glitch.video.thumbnail
+
+## 2026-09-27 (f) — TASK-1928: la propuesta de servicio sobria (`proposal-service`)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Primera familia de las 38 recetas aprobadas sin plantilla. Las cuatro láminas de la propuesta sobria (AEO, servicios
+creativos, web y RevOps) comparten geometría y son UNA receta nueva de AXIS (`axis-tokens` 0.3.15, `axis-ui-contracts`
+0.3.13, delta (f)): la foto en la lente arriba a la derecha (la única órbita: anillo en el halo, arco y esfera en el
+acento, dibujados por el builder desde el token), la voz a la izquierda y tres o cuatro tarjetas sin íconos de ancho
+derivado del contenido; la primera en papel, objetivo de la selección «Cliente». Compuestas con su plate real y
+comparadas a ojo contra las cuatro referencias: coinciden salvo las dos correcciones de la norma, el kicker de la
+primera tarjeta en navy (D1; la referencia lo tenía en el acento a 15 px) y la prueba de la creativa con su fuente
+visible en el pie. El CSS nuevo está acotado a `.gl-ps`: los 32 frames previos no cambian. La auditoría renderizada
+(D1 y 3×) del gate pasa sobre el probe.
+
+- `templates-graphic-line-deck/ProposalService.png` — 🆕 deck.proposal-service
+
+## 2026-09-27 (e) — TASK-1927: portadas y contraportadas aprobadas del brochure y de la propuesta
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Las 17 referencias aprobadas del marco (decisión del operador, canvas Deck, 2026-09-27) pasan a plantillas del catálogo
+`graphic-line-deck`: `cover-brochure` (composiciones `document` y `line`), `cover-proposal` (`orbit` y `dawn`),
+`close-brochure` (`orbit` y `photo`) y `close-proposal`. El marco clásico (logo 230/220) no entra: el operador no lo
+aprobó. `cover-brochure-cine-lines-selection` queda fuera: el contrato de AXIS no admite selección en esa portada.
+
+Todas las medidas salen del manifest y de los tokens de AXIS (`axis-tokens` 0.3.14: columna de voz, eje del amanecer,
+pintura de las órbitas de luz, estilo del contacto, caja del logo del cliente); las plantillas nuevas no declaran
+respaldo. El contacto sale de `EFEONCE_CONTACT`. Compuestas con su plate real y comparadas a ojo contra las
+referencias. Diferencias conocidas, a favor de AXIS o del SSOT: «Cuando quieras.» a 124 px (la referencia, 118),
+dirección «71, of. 1105» y burbuja URL horneada. El CSS nuevo está acotado a `.gl-frame`: los 26 frames previos no
+cambian. El probe usa la capa de órbita, el plate y el logo de cliente sintéticos de `GRAPHIC_LINE_PROBE_ASSETS`.
+
+- `templates-graphic-line-deck/CoverBrochure.png` — 🆕 deck.cover-brochure
+- `templates-graphic-line-deck/CoverProposalOrbit.png` — 🆕 deck.cover-proposal
+- `templates-graphic-line-deck/CoverProposalDawn.png` — 🆕 deck.cover-proposal.dawn
+- `templates-graphic-line-deck/CloseBrochure.png` — 🆕 deck.close-brochure
+- `templates-graphic-line-deck/CloseBrochurePhoto.png` — 🆕 deck.close-brochure.photo
+- `templates-graphic-line-deck/CloseProposal.png` — 🆕 deck.close-proposal
+
+## 2026-09-27 (d) — TASK-1927: la sección partida sube por la izquierda y gana dos composiciones
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Corrección explícita del operador (canvas Deck, 2026-09-27; regla `split-indicator-rises-start` de AXIS): el indicador
+de la sección partida nace abajo a la izquierda (≈ las 8) y sube por la IZQUIERDA en sentido horario, con la esfera
+arriba a la izquierda en la 2 de 5. La versión que subía por la derecha queda rechazada. El arco sale del token
+(`progress.startFromTopDeg` −115, `sweep.rule: 'sections-completed'`, `axis-tokens` 0.3.13) y barre las secciones ya
+recorridas, como las tres referencias aprobadas; la pregunta «¿unificar a n / N?» sigue abierta en el token. La capa ya
+no se voltea.
+
+Las tres composiciones comparten `section-split.html`; cada una tiene su contrato de slots y su frame. Comparadas a
+ojo con el plate real contra `section-split`, `section-split-corner-bottom` y `section-split-panel-end`. El probe del
+gate usa una capa de órbita sintética (el arco real lo pinta AXIS al componer), así que `SectionSplit.png` **no
+cambia**: byte-idéntico al baseline.
+
+- `templates-graphic-line-deck/SectionSplitCornerBottom.png` — 🆕 deck.section-split.corner-bottom
+- `templates-graphic-line-deck/SectionSplitPanelEnd.png` — 🆕 deck.section-split.panel-end
+
+## 2026-09-27 (c) — TASK-1927: el tríptico pasa a una palabra por toma, cada una con su esfera
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Decisión del operador (canvas Deck, 2026-09-27), ya en el token de AXIS: `triptych.voice.sphere: 'per-panel'`,
+`wordsPerPanel: 1`, regla `triptych-word-per-panel` (la excepción aprobada a «una esfera por pieza»). La plantilla deja
+de esconder la esfera de las dos primeras tomas y el probe pasa de «Escucha, / crea / y mide» a «Escucha / Crea /
+Mide». Comparado a ojo con el plate real contra la referencia aprobada `triptych`. Ningún otro frame cambia.
+
+- `templates-graphic-line-deck/Triptych.png` — ✏️ deck.triptych: una palabra por toma y una esfera por toma
+
+## 2026-09-27 (b) — TASK-1927: composiciones `hero` y `lines` de `proposal-cinematic` (`efeonce.surface-composition` 0.1.2)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Greenhouse fija el contrato 0.1.2 de AXIS (tag `v0.3.11`). El bump **no movió ningún píxel**: los 22 frames del scope
+`graphic-line` quedaron a 0 px antes de tocar una plantilla, y el plan de los intents publicados es idéntico al previo
+(snapshot en `src/lib/brand-surfaces/__tests__/example-plans.test.ts`).
+
+`proposal-cinematic` gana una plantilla por composición en vez de ramas dentro de la existente: así
+`ProposalCinematic.png` (composición `service`) **no cambia**. El CSS nuevo está acotado a `.gl-pl`; `hero` reutiliza
+el molde de la voz sin modificarlo. Comparadas a ojo con el plate real contra las referencias aprobadas
+(`proposal-cinematic-nexa` y `proposal-cinematic-nexa-lines`): mismas posiciones y cuerpos; la caja de la selección
+sale del pintor canónico de Greenhouse y queda unos px más ajustada que en el prototipo.
+
+- `templates-graphic-line-deck/ProposalCinematicHero.png` — 🆕 deck.proposal-cinematic.hero
+- `templates-graphic-line-deck/ProposalCinematicLines.png` — 🆕 deck.proposal-cinematic.lines
+
+## 2026-09-27 — TASK-1919: los catálogos de «La órbita» entran al gate (scope `graphic-line`)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
+Tres catálogos nuevos (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`) con las 20 recetas
+aprobadas de la línea gráfica por superficie; el teléfono tiene una plantilla por ancho (22 frames). Scope propio,
+`pnpm composer:visual-gate --catalog=graphic-line`, para no rebaselinar frames ajenos. El probe no es el sintético
+genérico: cada contrato declara como `example` el plan real de su pieza aprobada, y la foto, los íconos y las capas
+de la órbita llegan como SVG sintéticos y deterministas (`GRAPHIC_LINE_PROBE_ASSETS` en `visual-gate.ts`), así que
+ISSUE-122 no aplica. Las capas audiovisuales transparentes se congelan con su alfa. Determinismo verificado en cuatro
+corridas `--selftest` (0 px). Los 60 frames de `deck-axis`/SKY/Insights que hoy difieren por pocos píxeles NO se
+tocan: la misma lista y las mismas cuentas aparecen con el `render.ts` anterior (deriva de entorno, ISSUE-122).
+
+- `templates-graphic-line-deck/ProposalCinematic.png` — 🆕 deck.proposal-cinematic
+- `templates-graphic-line-deck/SectionClassic.png` — 🆕 deck.section-classic
+- `templates-graphic-line-deck/SectionSplit.png` — 🆕 deck.section-split
+- `templates-graphic-line-deck/ContentMeasure.png` — 🆕 deck.content-measure
+- `templates-graphic-line-deck/Triptych.png` — 🆕 deck.triptych
+- `templates-graphic-line-deck/MethodStaircase.png` — 🆕 deck.method-staircase
+- `templates-graphic-line-stills/HeroLens.png` — 🆕 web.hero-lens
+- `templates-graphic-line-stills/HeroBleed.png` — 🆕 web.hero-bleed
+- `templates-graphic-line-stills/HeroUniformTablet.png` — 🆕 web.hero-uniform-tablet
+- `templates-graphic-line-stills/HeroMobileNative360.png` — 🆕 web.hero-mobile-native.phone-360
+- `templates-graphic-line-stills/HeroMobileNative390.png` — 🆕 web.hero-mobile-native.phone-390
+- `templates-graphic-line-stills/HeroMobileNative430.png` — 🆕 web.hero-mobile-native.phone-430
+- `templates-graphic-line-stills/CamineroLens.png` — 🆕 dooh.caminero-lens
+- `templates-graphic-line-stills/MotionStoryboard.png` — 🆕 motion.storyboard
+- `templates-graphic-line-stills/LoopLensReveal.png` — 🆕 motion.loop-lens-reveal
+- `templates-graphic-line-overlays/Cartela.png` — 🆕 audiovisual.cartela
+- `templates-graphic-line-overlays/Zocalo.png` — 🆕 audiovisual.zocalo
+- `templates-graphic-line-overlays/CalloutSelection.png` — 🆕 audiovisual.callout-selection
+- `templates-graphic-line-overlays/DataSuper.png` — 🆕 audiovisual.data-super
+- `templates-graphic-line-overlays/SplitScreen.png` — 🆕 audiovisual.split-screen
+- `templates-graphic-line-overlays/Subtitles.png` — 🆕 audiovisual.subtitles
+- `templates-graphic-line-overlays/ShotPlan.png` — 🆕 audiovisual.shot-plan
+
 ## 2026-09-25 (k) — TASK-1889: la tabla de respaldo con datos reales
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 Revisión del operador sobre Berel y Sky: la tabla comparaba unidades distintas en una sola escala y titulaba con «la
 fila más alta». Ahora la cifra principal es el hallazgo del capítulo (opcional: sin hallazgo, no hay cifra), las
@@ -12,6 +578,8 @@ fila sin dirección (neutra).
 
 ## 2026-09-25 (j) — TASK-1889 Slice 5: la capitular de la narrada sólo con cuerpo que la sostenga
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 Las ediciones reales de Berel y Sky mostraron una capitular suelta («V isibilidad en IA: 0.») en narradas de
 afirmaciones cortas. La capitular ahora la enciende un hook sólo cuando el primer párrafo compuesto ocupa tres
 líneas o más; el probe (texto corto) queda sin capitular. La fidelidad de las narradas del canvas no cambia.
@@ -19,6 +587,8 @@ líneas o más; el probe (texto corto) queda sin capitular. La fidelidad de las 
 - `templates-insights-report/ReportNarrativePage.png` — sin capitular con texto corto
 
 ## 2026-09-25 (i) — TASK-1889 Slice 4: se retiran las páginas de gráfico v1; la zona de metas sale del dato
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 Los mappers ya componen cada gráfico del plan en su página de figura premium, y salen del catálogo la página
 analítica v1 y la lámina de evidencia v1 (1920×1080), con sus moldes v1. La zona de atención de las metas deja
@@ -32,6 +602,8 @@ oscuro queda sobre el límite. El probe ejerce la banda con su `example`.
 - `templates-insights-deck/InsightsFigureTargetsSlide.png` — zona desde `band`
 
 ## 2026-09-25 (h) — TASK-1889 Slice 4: páginas de figura premium
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 Nacen las páginas de figura del canvas aprobado, una por familia con productor: comparación de períodos por
 métrica (`Premium-Evidencia` / `Deck-Comparacion`), columnas agrupadas sobre un eje compartido
@@ -51,6 +623,8 @@ compartida (`insights-shared/figure-svg.ts`). El probe las ejerce con el `exampl
 
 ## 2026-09-25 (g) — TASK-1889 Slice 3: portada blanca y logo del cliente
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 Nace la portada blanca (`Premium-Portada-Clara` / `-Creativo`: satélites por canal o arco corto, según el
 dato). Las portadas navy ganan el logo del cliente (variante `on_dark`), que el plan sella como
 `asset-ref:org-logo:<id>` y el worker entrega autorizado (`ComposeOptions.externalAssets`). El probe dibuja
@@ -62,6 +636,8 @@ el asset del catálogo en ese campo (regla nueva del sintetizador para campos `a
 
 ## 2026-09-25 (f) — TASK-1889: narrada y límites con la misma crítica
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 La narrada sigue la anatomía de «Nuestra lectura»: se retira el número en contorno decorativo y el filete
 redundante; la columna lateral pasa a ser útil (frase clave + «En este capítulo»/«En este informe» con folio
 real) y cierra con el panel navy cuando el plan trae decisión o lectura. Los límites ganan cuerpo por fila.
@@ -70,6 +646,8 @@ real) y cierra con el panel navy cuando el plan trae decisión o lectura. Los l�
 - `templates-insights-report/ReportLimitsPage.png` — filas con más cuerpo
 
 ## 2026-09-25 (e) — TASK-1889: la tabla vuelve a la anatomía de la evidencia aprobada
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 Crítica de diseño (operador: «no se ve premium»): la versión anterior cargaba navy arriba (cabecera y
 fila líder) y dejaba vacío el último tercio; las barras pálidas detrás del texto leían como interfaz. Se
@@ -81,6 +659,8 @@ lectura). El navy aparece sólo en el cierre.
 
 ## 2026-09-25 (d) — TASK-1889: la tabla de respaldo gana punch
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 Pedido del operador («la tabla necesita más punch»). Cabecera navy con la cifra contada en teal, tablero de
 barras (cada fila con su barra detrás, desde el dato) y la fila que alcanza el máximo de la tabla completa
 como banda navy. El ranking continúa entre páginas (`rankOffset`), antes volvía a 01.
@@ -88,6 +668,8 @@ como banda navy. El ranking continúa entre páginas (`rankOffset`), antes volv�
 - `templates-insights-report/ReportTablePage.png` — tablero de barras con cabecera navy y fila líder
 
 ## 2026-09-25 (c) — TASK-1889: narrada, tabla y límites elevadas al nivel del canvas
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 Pedido del operador («muy sencillas para lo premium del diseño V2»). Las cinco piezas sin página propia en
 el canvas pasan a la gramática aprobada: momento dominante (capitular o cifra protagonista contada del dato),
@@ -101,6 +683,8 @@ columna lateral o lista numerada, y cierre (panel navy o franja). La barra de la
 - `templates-insights-deck/InsightsLimitsSlide.png` — cifra de 132 px, lista numerada, franja «Cómo se midió»
 
 ## 2026-09-25 (b) — TASK-1889: las plantillas editoriales REEMPLAZAN a las v1
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 Decisión del operador: las v2 no conviven con las v1; ningún agente debe poder componer con una v1
 cuando existe su v2. Cada v2 toma el nombre y el contentType canónicos de la v1 que reemplaza, y la
@@ -127,6 +711,8 @@ excepción declarada: las páginas de gráfico (`ReportAnalysisPage`, `InsightsE
 La narrativa (A4 y deck) y los límites del deck son piezas derivadas, en revisión del operador.
 
 ## 2026-09-25 — TASK-1889: plantillas editoriales de Insights (canvas aprobado)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 Nacen las plantillas del diseño premium aprobado por el operador el 2026-09-25. **Todas son
 plantillas NUEVAS con contentType propio.** Las v1 de TASK-1847 siguen intactas porque las ediciones
@@ -161,6 +747,8 @@ se re-declaran aquí y se re-promueven; no se edita el PNG a mano.
 
 ## 2026-09-24 — Declaración del set de Insights con el índice A4
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 La ampliación de TASK-1847 agrega `ReportIndexPage.png` al set visual. El índice se deriva del plan
 de páginas y muestra los folios físicos calculados antes del render; el probe confirma el molde y los
 slots, mientras las pruebas del mapper verifican el contenido y la numeración. La revisión en grises
@@ -188,6 +776,8 @@ Las seis corridas pertenecen a la misma sesión de septiembre 24. Estos frames s
 `--freeze` requiere el commit atómico con los cambios de catálogo.
 
 ## 2026-09-21 — Dos catálogos nuevos entran al gate: `insights-deck` (16:9) e `insights-report` (A4)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 **Qué cambia y qué no.** El gate pasa de fotografiar UN catálogo a fotografiar tres, cada uno en su
 propia carpeta de frames. Los de `deck-axis` conservan su ruta histórica (`templates/`) y su
@@ -231,6 +821,8 @@ corridas no tienen campos numéricos. La diferencia es el drift de ISSUE-122, no
 
 ## 2026-08-13 — Dos slots opcionales que el probe rellena: `partnerBadge` y el `heroAsset` que llevaba 13 días sin declarar
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 Ambas láminas driftean por **la misma mecánica**, la del runbook §4bis: el gate no renderiza la
 plantilla cruda, la compone con **slots sintéticos** (`synthesizeProbeSlots`) que rellenan **todo**
 slot no-`fixed-` — incluidos los opcionales — y para cualquier `asset` el placeholder es
@@ -255,6 +847,8 @@ ajeno a medias). `git log` confirma que `narrative-split.html` está commiteada 
 
 ## 2026-07-15 (b) — Muro de clientes: +Grupo Berel (caballo de batalla MX) → grilla 3×3
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 **Feedback del operador (mismo día):** faltaba **Grupo Berel** (cliente clave de México) en el muro. Se
 agrega como **9º logo**, en el **centro del 3×3** (el spot más prominente tras SKY). El grid pasa de 4×2
 a **3×3** (9 entra simétrico). Sizing **por peso óptico**: los logos compactos/apilados (`berel`,
@@ -272,6 +866,8 @@ re-entregado a OneDrive (deadline mismo día).
 ---
 
 ## 2026-07-15 — Deck SKY 26 → 28: muro de clientes + testimonios del equipo de SKY (prueba social)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 **Aprobación del operador (sesión 2026-07-15):** dos plantillas reutilizables de prueba social entran
 en el cluster de cierre, entre `berel` y `seguro`. El deck pasa de 26 a 28 láminas. Ambos moldes son
@@ -325,6 +921,8 @@ SKY destacado con celda navy + logo dark.
 
 ## 2026-07-15 — `CoverFull` canonizada: lockup centrado, marca principal ampliada y cliente on-dark nativo
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 **Aprobación del operador (sesión 2026-07-15):** la portada conserva la composición centrada y reduce
 el primer vistazo a lo esencial: Efeonce, marca cliente, tipo de propuesta y URL Bubble. El wordmark
 Efeonce crece de 650px a 840px; la marca cliente se sirve como asset `native-on-dark` aprobado, sin
@@ -344,6 +942,8 @@ geometría y el verde del SVG oficial, con el componente violeta llevado a blanc
 ---
 
 ## 2026-07-15 — Deck SKY 23 → 26: operación reusable + anatomía antes de la prueba viva
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 **Aprobación del operador (sesión 2026-07-15):** las tres plantillas reutilizables se integran en la
 narrativa existente, sin crear una segunda Radiografía. `ToolStackFull` entra después de los cuatro
@@ -375,6 +975,8 @@ a **LA PRUEBA VIVA** y el lead recibe explícitamente el relevo de las tres capa
 ---
 
 ## 2026-07-15 — Stack operativo + día a día: dos plantillas reutilizables de operación
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 **Aprobación del operador (sesión 2026-07-15):** se canonizan como dos argumentos distintos y
 complementarios. `ToolStackFull` explica **con qué sistema se trabaja**; `DailyOpsHubFull` muestra
@@ -419,6 +1021,8 @@ píxeles en la corrida posterior; el umbral global no se relaja.
 
 ## 2026-07-15 — Fotos del squad: los avatares CANÓNICOS de Entra reemplazan a los recortes
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 **Feedback del operador (deck SKY, lámina equipo):** los recortes sobre fondo claro no se veían bien;
 el equipo YA tiene un set uniforme de avatares (Entra/Greenhouse: hoodie azul Efeonce sobre degradado
 violeta→naranja vibrante; Julio con su propio degradado azul coherente). Se usan TAL CUAL —
@@ -440,6 +1044,8 @@ transparencias). Cero cambios de color/gradiente CSS.
 ---
 
 ## 2026-07-14 (2ª promoción) — Feedback del operador: deck SKY 22 → 23 + agenda funcional + showcases vivos
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 **Motor:** los `layoutHooks` del catálogo ganan acceso opcional al `deckPlan` completo
 (`CatalogLayoutHook` 3er parámetro) — chrome que depende de OTRAS láminas (el número de página real
@@ -486,6 +1092,8 @@ Aprobado por el operador en sesión 2026-07-14 (feedback sobre los 6 frentes, co
 `sky/21-economica.png` · `sky/22-contraportada.png` · `sky/22-economica.png` · `sky/23-contraportada.png`
 
 ## 2026-07-14 — Deck SKY 19 → 22 + TeamGalleryFull + enlaces clickeables (iteración de la oferta, licitación Wherex)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 **Motor (afecta render, no baseline per-se):** el sanitizador de rich-strings admite `<a href>`
 (sólo `https://` o ancla), `deck-mold.css` estila el anchor (color heredado + subrayado — el default
@@ -541,7 +1149,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 2c7faaec7edb67f0a7c4e333a04eb2ca03967ae1f345c1835750b217e22d6e7f -->
+<!-- manifest-digest: a631ba6cb06ad22d6dafa63c8fa09d09293f5631b1b5c49d41cfc2f6b1c360e9 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.
@@ -550,12 +1158,17 @@ Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**
 
 - Todo cambio de píxel INTENCIONAL se declara acá, **lámina por lámina** (qué frame, qué cambió,
   por qué, quién lo aprobó) **ANTES** de correr `pnpm composer:visual-gate --freeze`.
-- `--freeze` se niega a promover un frame cambiado que no esté declarado en este archivo.
+- `--freeze` se niega a promover un frame cambiado que no esté declarado en la **sección nueva sin
+  sellar** (la única entrada `## ` sin el marcador `sealed-by-freeze`). Nombrarlo en una sección ya
+  sellada no cuenta: cada promoción sella su sección y la próxima necesita una entrada propia. Las
+  secciones anteriores al 2026-09-28 llevan el sello `legacy-2026-09-28` (runbook §5).
 - El marcador `manifest-digest` lo sella la promoción; el gate lo verifica. Editar el manifest o
   los PNG a mano, sin pasar por la promoción declarada, **también falla el gate**.
 - El baseline se re-promueve **en el mismo PR** que declara el delta.
 
 ## 2026-07-12 — Baseline inicial (TASK-1393 · Slice 0)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 - Congelado sobre el commit pre-refactor: 25 plantillas del catálogo (payload sintético compartido
   con `template-composability.test.ts`) + 15 láminas reales del deck SKY
@@ -563,6 +1176,8 @@ Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**
 - Sin deltas: es la fotografía de partida que todo el refactor debe conservar a CERO píxeles.
 
 ## 2026-07-14 — Deck SKY: entra la lámina de la muestra (TASK-1410 · licitación Wherex)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 **Qué cambió:** el deck SKY pasa de **15 a 16 láminas**. Se inserta `sky/12-muestra.png`
 (`contentType: highlight` → `HighlightWave`, derivado por el selector — el plan **no** declara
@@ -607,6 +1222,8 @@ a un día del cierre de la licitación.
 
 ## 2026-07-14 · `MaturityLadderFull` — plantilla NUEVA (el catálogo topaba en 4 y nuestros frameworks son de 5)
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 Ningún `contentType` podía afirmar una escalera de madurez: los tres candidatos topan en **4 items**
 (`several-kpis` `maxItems:4` · `chart` 4 series · `four-pillars` 4 pilares) y la escalera son **5**.
 Los 4 salieron de *lo que cabía en el layout*; los 5 salen de *la doctrina*. (Las **5 superficies** de
@@ -628,6 +1245,8 @@ dos peldaños como "el próximo". Umbrales idénticos a `severityFromScore` del 
 ---
 
 ## 2026-07-14 (b) · La escalera entra al deck de SKY — y renumera lo que va detrás
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 La lámina 4 traía la escalera **aplanada dentro de sus `goals`** (el boletín que la plantilla existe
 para evitar). Ahora carga **tres hechos verificados** (0 citas del blog en 35 respuestas · LATAM 17 vs
@@ -659,6 +1278,8 @@ Los 12 renumerados se verificaron **byte-idénticos** (`shasum -a 256`) antes de
 
 ## 2026-07-14 (c) · El portal en vivo (`comparison`) — sin plantilla nueva
 
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
+
 Faltaba el diferenciador más grande y **no estaba en ninguna pieza**: el acceso a **Greenhouse**, el
 portal de clientes. La landing de SEO lo promete textual (*«acceso a Greenhouse […] con la misma verdad
 que vemos nosotros»*) y la oferta técnica sólo ofrecía *«un informe dentro de los primeros 10 días
@@ -675,6 +1296,8 @@ Es además la lámina de *«por qué es seguro»* que el oficio exige: el portal
 ---
 
 ## 2026-07-14 (d) · `ArtifactShowcaseFull` — plantilla NUEVA: el portal se MUESTRA, no se describe
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 El mockup del tablero **ya existía** en la landing (`.gh-greenhouse-browser`) — no había que
 reinventarlo. Se abrió la plantilla que faltaba desde el follow-up de la Radiografía:
@@ -707,6 +1330,8 @@ el crédito de una fotografía — la lección que la Radiografía ya cobró.
 ---
 
 ## 🔴 Bug del propio `--freeze` — ENCONTRADO Y ARREGLADO (2026-07-14)
+
+<!-- sealed-by-freeze: legacy-2026-09-28 -->
 
 `--freeze` **rebobinaba este archivo entero a `INITIAL_DELTAS`**, llevándose puestas declaraciones ya
 commiteadas. Mordió **4 veces** en un día antes de que alguien mirara la causa.

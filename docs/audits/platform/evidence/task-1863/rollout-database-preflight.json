@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-09-28T09:44:56.202Z",
+  "mode": "read-only",
+  "releaseHold": "main_by_operator",
+  "schema": {
+    "markets": false,
+    "competitor_sets": false,
+    "batches": false
+  },
+  "queue": [],
+  "profiles": {
+    "active_profiles": 27,
+    "bound_organizations": 3
+  },
+  "duplicates": [
+    {
+      "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+      "active_profiles": 4
+    }
+  ],
+  "latestAppliedMigrations": [
+    "20260928052624397_task-1921-brand-render-queue",
+    "20260926075619118_task-1893-marketing-studio-asset-download-capability",
+    "20260926071321910_task-1891-marketing-studio-oauth-policy-fix"
+  ]
+}

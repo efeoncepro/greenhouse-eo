@@ -18,6 +18,19 @@ const manifest = resolveCollaborationSelectionIntent({
 const base = { manifest, targetBounds: { left: 300, top: 300, right: 780, bottom: 420 }, canvas: { width: 1080, height: 1350 }, measureLabel: (label, size) => label.length * size * 0.6 }
 const partnerEvidence = result => result.evidence.cursorEvidence.find(cursor => cursor.id === 'partner')
 
+test('optical bracket floor preserves anchors and defaults while surviving mobile downsampling', () => {
+  const brackets = resolveCollaborationSelectionIntent({ targetId: 'cta', targetKind: 'group', variant: 'open-brackets', cursors: [{ id: 'local', kind: 'local', targetId: 'cta', anchor: 'end-center', action: 'select' }] })
+  const input = { ...base, manifest: brackets }
+  const original = renderCollaborationSelection(input)
+  const stronger = renderCollaborationSelection({ ...input, presentation: { minBracketStrokePx: 3 } })
+
+  assert.deepEqual(original, renderCollaborationSelection({ ...input, presentation: { minBracketStrokePx: 0 } }))
+  assert.match(stronger.overlay, /stroke="#a6cdf5" stroke-width="3"/)
+  assert.deepEqual(stronger.evidence.cursorEvidence, original.evidence.cursorEvidence)
+  assert.deepEqual(stronger.bounds, original.bounds)
+  assert.throws(() => renderCollaborationSelection({ ...input, presentation: { minBracketStrokePx: -1 } }), /nonnegative/)
+})
+
 test('presentation vacío reproduce el contrato por defecto', () => {
   assert.deepEqual(renderCollaborationSelection({ ...base, presentation: {} }), renderCollaborationSelection(base))
   assert.match(renderCollaborationSelection(base).overlay, /fill="#5d50ff"/)
@@ -77,4 +90,3 @@ test('presentation.frame=false omite el marco y conserva el cursor anclado', () 
   assert.deepEqual(sinMarco.evidence.cursorEvidence, conMarco.evidence.cursorEvidence)
   assert.deepEqual(sinMarco.bounds, conMarco.bounds)
 })
-

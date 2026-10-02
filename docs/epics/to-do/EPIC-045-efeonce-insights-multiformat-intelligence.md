@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1848 (compartir/correo/recurrencia) en producción 2026-09-18 con flags OFF (release bda1cf2cd938, gateway 1.7.0), in-progress por in-app/Teams, portal_link, Think e ISSUE-174 → TASK-1876; TASK-1847 COMPLETE 2026-09-25 (render productivo de A4 y deck verificado); en producción desde 2026-09-24 (release ebb9212a32ce, PR #239: report_pdf en insights-report y deck_pdf en insights-deck; canary de contrato productivo verde, canary de render productivo pendiente; staging verificado con Berel/Sky); TASK-1849 y TASK-1875 en diseño (1875 ya desbloqueada); TASK-1888 (contrato editorial v2) code complete 2026-09-25 con flag OFF, rollout pendiente; TASK-1889 (catálogos premium) code complete 2026-09-25 en develop (sin push; A4 y deck sólo v2, 20 de 21 páginas ≤1 % del canvas + excepción aprobada, Berel y Sky revisados localmente), rollout pendiente: staging con el flag de TASK-1888, release por control plane y aprobación del operador de piezas derivadas y PDFs reales`
+- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1848 (compartir/correo/recurrencia) en producción desde 2026-09-18 (release bda1cf2cd938, gateway 1.7.0): compartir ON en producción desde 2026-09-28, correo y recurrencia OFF; in-progress por in-app/Teams, portal_link e ISSUE-174 → TASK-1876; TASK-1847 COMPLETE 2026-09-25 (render productivo de A4 y deck verificado); en producción desde 2026-09-24 (release ebb9212a32ce, PR #239: report_pdf en insights-report y deck_pdf en insights-deck; canary de contrato productivo verde, canary de render productivo pendiente; staging verificado con Berel/Sky); TASK-1849 en diseño; TASK-1875 (vista web en Think) COMPLETE 2026-09-28 (cierre df6f37ccd): en producción (efeonce-think main 544ecd4, `INSIGHTS_SHARING_ENABLED` ON en producción, canary productivo verde; producción sirve el modelo web 1.0 y el 1.1 queda en staging hasta el próximo release de Greenhouse); TASK-1888 (contrato editorial v2) COMPLETE 2026-09-26: en producción (releases 0e87c7a443a2 + f9257b9c94af, `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y ops-worker, gateway efeonce-mcp v1.9.0, canary sintético de producción con plan v2 sellado; emisión y entrega siguen OFF; compartir ON desde 2026-09-28); TASK-1889 (catálogos premium) COMPLETE 2026-09-26: en producción (mismos releases; A4 y deck sólo v2, 20 de 21 páginas ≤1 % del canvas + excepción aprobada, PDFs reales aprobados por el operador, primeras ediciones internas de Berel y Sky renderizadas en producción)`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery|ui|cross-domain`
 - Owner: `Platform / Client Experience; Julio Reyes (producto)`
@@ -94,12 +94,12 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U01 | [TASK-1845](../../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — **complete 2026-09-16: en producción desde 2026-09-15, rollback ensayado** | none |
 | U02 | [TASK-1846](../../tasks/complete/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor — **complete 2026-09-16: en producción** (`deck_pdf`; `report_pdf`/`web` en TASK-1847/1848) | none |
 | U03 | [TASK-1847](../../tasks/complete/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical — **complete 2026-09-25: en producción desde 2026-09-24**, render productivo de A4 y deck verificado con datos reales (Sky interno) | TASK-1845 |
-| U04 | [TASK-1848](../../tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados — **en producción 2026-09-18 con flags OFF** (release `bda1cf2cd938`; staging ON; gateway 1.7.0); in-progress | none |
+| U04 | [TASK-1848](../../tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados — **en producción 2026-09-18 con flags OFF** (release `bda1cf2cd938`; staging ON; gateway 1.7.0); enlace compartido ON en producción desde el 2026-09-28 (con TASK-1875), correo y recurrencia OFF; in-progress | none |
 | U05 | [TASK-1849](../../tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | TASK-1848 |
-| U06 | [TASK-1875](../../tasks/to-do/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en `efeonce-think` (nodo S6; decisión 2026-09-15) | TASK-1848 |
-| U07 | [TASK-1888](../../tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) | contrato editorial v2: 15 familias de gráfico, lectura por figura, `channelId` y portada por cliente/encargo sellada — **in-progress: code complete 2026-09-25** (local, sin push; migración aplicada; flag `INSIGHTS_EDITORIAL_V2_ENABLED` OFF; gateway PR efeonce-mcp#18 abierto; rollout pendiente) | none |
-| U08 | [TASK-1889](../../tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25), verificación con Berel y Sky y release — **in-progress: code complete 2026-09-25** (develop, sin push; `insights-report` A4 e `insights-deck` 16:9 sólo con el diseño v2, legado v1 retirado; fidelidad 20 de 21 páginas ≤1 %, Deck-Agrupadas 2,2 % como excepción aprobada; ediciones reales de Berel SEO+AEO y Sky ICO revisadas en local, 5 defectos corregidos; rollout pendiente: staging con el flag `INSIGHTS_EDITORIAL_V2_ENABLED` de TASK-1888, release por control plane y aprobación del operador de piezas derivadas y PDFs reales; nada se comparte con clientes antes de una edición interna en producción revisada por el operador) | TASK-1888 |
-| U09 | [TASK-1903](../../tasks/to-do/TASK-1903-efeonce-insights-editorial-agent.md) | agente redactor de informes de clientes: propone interpretación, próximos pasos, decisión y plan de acción sobre evidencia sellada; aceptación humana por campo; modelo por comparación medida — pedido del operador 2026-09-25 | TASK-1888, TASK-1889 |
+| U06 | [TASK-1875](../../tasks/complete/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en `efeonce-think` (nodo S6; decisión 2026-09-15) — **complete 2026-09-28: en producción** (`efeonce-think` `main` `544ecd4`; `/insights/r/<token>` y la muestra `/insights/muestra`; `INSIGHTS_SHARING_ENABLED` ON en producción) | TASK-1848 |
+| U07 | [TASK-1888](../../tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) | contrato editorial v2: 15 familias de gráfico, lectura por figura, `channelId` y portada por cliente/encargo sellada — **complete 2026-09-26: en producción 2026-09-26: releases `0e87c7a443a2` + `f9257b9c94af`; `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y `ops-worker`; gateway efeonce-mcp v1.9.0; canary sintético de producción con plan v2 sellado y ediciones internas v2 de Berel y Sky en staging** | none |
+| U08 | [TASK-1889](../../tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25), verificación con Berel y Sky y release — **complete 2026-09-26, en producción** (releases `0e87c7a443a2` + `f9257b9c94af`; `insights-report` A4 e `insights-deck` 16:9 sólo con el diseño v2; fidelidad 20 de 21 páginas ≤1 % + Deck-Agrupadas aprobada; PDFs reales aprobados por el operador; primeras ediciones internas de Berel y Sky renderizadas en producción) | none |
+| U09 | [TASK-1903](../../tasks/to-do/TASK-1903-efeonce-insights-editorial-agent.md) | agente redactor de informes de clientes, operable por MCP en dos modos (operar el redactor; autor externo que envía la propuesta): propone interpretación, próximos pasos, decisión y plan de acción sobre evidencia sellada; aceptación humana por campo; modelo por comparación medida — pedido del operador 2026-09-25 | TASK-1888, TASK-1889 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 
@@ -127,6 +127,31 @@ ya corregidos. Falta el rollout: staging con el flag de TASK-1888, release por e
 `artifact-worker` es único para staging y producción) y la aprobación del operador de las piezas derivadas y de los
 PDFs reales. Nada se comparte con clientes hasta una edición interna en producción revisada por el operador.
 TASK-1849 es consumer UI, backend none; si encuentra un gap de command vuelve a la dueña backend.
+
+**Delta 2026-09-26 — TASK-1889 complete, en producción.** Los catálogos premium están en producción (releases
+`0e87c7a443a2` + `f9257b9c94af`). Con autorización del operador se generaron en producción las primeras ediciones
+internas con el diseño nuevo: Berel (A4 16 páginas + deck 15 láminas) y Sky (A4 12 + deck 10), los cuatro PDF al primer
+intento. Emitir y compartir siguen OFF: nada llegó a clientes. Siguen en el programa TASK-1901/1902 (más familias de
+gráfico) y TASK-1903 (agente redactor).
+
+**Delta 2026-09-26 — TASK-1888 complete, en producción.** El flag `INSIGHTS_EDITORIAL_V2_ENABLED` que el rollout de
+TASK-1889 esperaba ya está ON en Vercel staging/Production y en el `ops-worker`: las ediciones nuevas sellan plan v2.
+Emisión, compartir y entrega siguen OFF en producción; ninguna edición llega a un cliente sin gate humano.
+
+**Delta 2026-09-28 — TASK-1875 complete, en producción; marca de producto Insights.** La vista web compartida vive en
+Think (`think.efeoncepro.com/insights/r/<token>`, más la muestra pública `/insights/muestra`) y el enlace compartido
+quedó encendido en producción; emitir sigue OFF, así que todavía no hay ediciones de clientes para compartir. El mismo
+día el operador canonizó la marca de producto Insights (logo, isotipo y lockup «Efeonce | Insights», publicados en
+`@efeoncepro/axis-brand-assets` 0.4.0) y AXIS publicó una página de referencia en el Lab: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/)
+(publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`); el ejemplo vivo del producto es la muestra `think.efeoncepro.com/insights/muestra`. Follow-ups nombrados, **sin task creada** (pendientes de decisión del
+operador; se abren como task cuando la decisión exista):
+
+- **Marca en el resto de superficies:** lockup oficial en portadas y aperturas de capítulo PDF A4 y deck (hoy
+  «efeonce | INSIGHTS» tipográfico, con «INSIGHTS» en el acento en las portadas navy: decisión abierta del operador,
+  arquitectura §6.3), correo de entrega, favicon del hub, portal (TASK-1849) y receta de deck «resultados en vivo»; tamaño
+  mínimo del lockup; subir `@efeoncepro/axis-brand-assets` en Greenhouse de 0.3.5 a 0.4.0 cuando algún render lo use.
+- **Tokens y geometría compartidos:** los roles de color de datos y la geometría de las 15 familias están copiados a
+  mano entre Greenhouse (PDF) y Think (web); candidatos a extraer a AXIS (arquitectura §6.4).
 
 ## Existing Related Work
 

@@ -1,0 +1,779 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:28:07.113Z",
+  "run": "ai-generations/2026-09-28_manzanitas-cine",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-28_manzanitas-cine",
+  "totalBytes": 223962176,
+  "fileCount": 128,
+  "files": [
+    {
+      "path": "plates/_MC5f-cuello-limpio.png",
+      "sizeBytes": 2868128,
+      "sha256": "ec53d3d38ef3d253bca5fa60f75188295593b34e9f8655e733f7487770e2ebdc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/_MC5f-cuello-limpio.png"
+    },
+    {
+      "path": "plates/_pair23.png",
+      "sizeBytes": 1919848,
+      "sha256": "33177393027bc8c04aa7dafad5dd46db5c97f820349c82f5ad258db9aa4232e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/_pair23.png"
+    },
+    {
+      "path": "plates/_pair45.png",
+      "sizeBytes": 1807827,
+      "sha256": "849601b2d5d1b455d00a5dd30644511414a4598e240d20c0a8888b23314eb6fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/_pair45.png"
+    },
+    {
+      "path": "plates/_pair45b.png",
+      "sizeBytes": 2797759,
+      "sha256": "aca294c59e8aeca4809a7ea2223cf54bb219223cee0c8c11c34e02a2dc1b7888",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/_pair45b.png"
+    },
+    {
+      "path": "plates/acabado/MC1h-acabado-recorte-terminado.png",
+      "sizeBytes": 1312531,
+      "sha256": "42878588a8f86052229dbace0808c2dff1f05155143431377b222eb9a00878d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1h-acabado-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MC1h-acabado-recorte.png",
+      "sizeBytes": 2266380,
+      "sha256": "8d1c4d8c309ba1b68b2447d02d9569c3b3159a485b1704c5b8d524c0743b6aca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1h-acabado-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MC1h-acabado-v2-comparar.png",
+      "sizeBytes": 248908,
+      "sha256": "274932607dfe9f27847577dd1b161682464bc39397428ea3c774f00c5e60c04f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1h-acabado-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC1h-acabado-v2.png",
+      "sizeBytes": 2275887,
+      "sha256": "a67008d4aa12095ae182679d8c243f77752c68c682c8f4590640fa6f8a90879a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1h-acabado-v2.png"
+    },
+    {
+      "path": "plates/acabado/MC1h-acabado.png",
+      "sizeBytes": 2277074,
+      "sha256": "a94dc8cb69be908acf6c4152506d84e2eca2ec8deda1fc1d5e2ccce9f790da69",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1h-acabado.png"
+    },
+    {
+      "path": "plates/acabado/MC1i-acabado-comparar.png",
+      "sizeBytes": 251726,
+      "sha256": "dc8acba2a0f805130bfc5388882468ce5fa0cd125cfbacdc02f023a99f73beb9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1i-acabado-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC1i-acabado-recorte-terminado.png",
+      "sizeBytes": 1236504,
+      "sha256": "2f39b38e7097ca9c58ad76fb8f3cc3965db24add4cb03cf74e33f1c3c3450e4c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1i-acabado-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MC1i-acabado-recorte.png",
+      "sizeBytes": 2142007,
+      "sha256": "049bcd9b5574ba13fec2963166653bd45c33fd31f7f5af0dbd43214374c4ea86",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1i-acabado-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MC1i-acabado-v2-comparar.png",
+      "sizeBytes": 224002,
+      "sha256": "0a8117a9113db672c290ad0292d617ad16ddb9b07ee94ad7f671f3bd33ed64dc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1i-acabado-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC1i-acabado-v2.png",
+      "sizeBytes": 2306413,
+      "sha256": "cb37413fc37644146e6d12d48b60582eacf29360349441ff1dc36f96d1f3adb1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1i-acabado-v2.png"
+    },
+    {
+      "path": "plates/acabado/MC1i-acabado.png",
+      "sizeBytes": 2306602,
+      "sha256": "a3dcadff4223f2a5358ce1aca95730cd40b532d00305a1924ea073ce44452776",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1i-acabado.png"
+    },
+    {
+      "path": "plates/acabado/MC1l-acabado-comparar.png",
+      "sizeBytes": 208569,
+      "sha256": "3b4adbc1c45ddd7f90c4682ac27f15b603a4aec339464bd60b584bfb46f5de2e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1l-acabado-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC1l-acabado-recorte-terminado.png",
+      "sizeBytes": 1312322,
+      "sha256": "c537af82a62d6229791301fdf5a0650ac0afa34b0bad2665b164f5421b49bd33",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1l-acabado-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MC1l-acabado-recorte.png",
+      "sizeBytes": 2107814,
+      "sha256": "34112d370226d4f4a45fd533b14e2f65aa91b578cdd30c405423862e1cb3c3b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1l-acabado-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MC1l-acabado-v2-comparar.png",
+      "sizeBytes": 188164,
+      "sha256": "2ed18fc96f813c2b36958fe3903f596f8c96c0fd479b03b063a5733d027b02a6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1l-acabado-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC1l-acabado-v2.png",
+      "sizeBytes": 2101351,
+      "sha256": "bd2658d321eafa7bd7fd316725674bdf1554b0660e1c3676608f5b9b13f1d469",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1l-acabado-v2.png"
+    },
+    {
+      "path": "plates/acabado/MC1l-acabado.png",
+      "sizeBytes": 2102590,
+      "sha256": "2d3ca03b734117531df9fa30fcedae54442e7290d1f5f8cf794d99b28d44040e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1l-acabado.png"
+    },
+    {
+      "path": "plates/acabado/MC1m-acabado-comparar.png",
+      "sizeBytes": 213165,
+      "sha256": "95e5020160a284d8d80f530f968e2a3e380fe965b84625decc15768b3ce4a0b1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1m-acabado-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC1m-acabado-recorte-terminado.png",
+      "sizeBytes": 1291237,
+      "sha256": "fc134ca563bdb2671de3fbf3ad8edfe05ca64765ae731a8cfbd892ebcf282f55",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1m-acabado-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MC1m-acabado-recorte.png",
+      "sizeBytes": 2092547,
+      "sha256": "cee18a212ccc2cc855f8d8f810073569671a8c83c9768d705280a2b9ee963aab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1m-acabado-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MC1m-acabado-v2-comparar.png",
+      "sizeBytes": 184497,
+      "sha256": "6d3ff668e16701704e135ca20c6c6463145768ab38e31c46688f4c818a39b3e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1m-acabado-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC1m-acabado-v2.png",
+      "sizeBytes": 2101911,
+      "sha256": "3baf49a34a60763b6bae347594603a8da8ae02fa2ac7936955c4a85e41979463",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1m-acabado-v2.png"
+    },
+    {
+      "path": "plates/acabado/MC1m-acabado.png",
+      "sizeBytes": 2104210,
+      "sha256": "de7c514585977351bb39704700f010888a5d9c5d9ab9d80976cd664d0c6b6153",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC1m-acabado.png"
+    },
+    {
+      "path": "plates/acabado/MC4g-acabado-recorte-terminado.png",
+      "sizeBytes": 1308607,
+      "sha256": "2b60ab671deebd55a6a547f5c31a2fa741aa5c588a2e8948a816d4c8887bbb4f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4g-acabado-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MC4g-acabado-recorte.png",
+      "sizeBytes": 2212751,
+      "sha256": "5896ded2d900ffb6ed6f6b4c5dcf902c67cb66064284ea87495475eb7759f03d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4g-acabado-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MC4g-acabado-v2-comparar.png",
+      "sizeBytes": 234885,
+      "sha256": "5b8a1f1813a33cf6133ee25e1b9f038c11008a3094b8d381720de74cea9c1081",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4g-acabado-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC4g-acabado-v2.png",
+      "sizeBytes": 3031685,
+      "sha256": "c31f1d922bdbdb0ef4204e815eb86881bd762e6a73c67785c603555082a73492",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4g-acabado-v2.png"
+    },
+    {
+      "path": "plates/acabado/MC4g-acabado.png",
+      "sizeBytes": 3032574,
+      "sha256": "8f888ba8e9da27eda336dfb8e827f3d9f5e7e072d4af584d6322d98d79b32954",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4g-acabado.png"
+    },
+    {
+      "path": "plates/acabado/MC4h-acabado-comparar.png",
+      "sizeBytes": 229433,
+      "sha256": "ebde7dca78d33c770d722ae350c6e9d97e2439d3c9669b7fec35352c9164efc5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4h-acabado-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC4h-acabado-recorte-terminado.png",
+      "sizeBytes": 1304058,
+      "sha256": "bce99939c7cc4ff125a0e4d3c6d3d7795a1a3721dfb5b05284b8fc40fc890942",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4h-acabado-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MC4h-acabado-recorte.png",
+      "sizeBytes": 1999496,
+      "sha256": "90c0943ec6c878f0a2dd78573e1821364a0e7246f7be65359da9ba363bf1e0a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4h-acabado-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MC4h-acabado-v2-comparar.png",
+      "sizeBytes": 198866,
+      "sha256": "41dd58c461def1ce116e5888a8e0c45bf113a646756a5f9293aa8a9da1087eff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4h-acabado-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC4h-acabado-v2.png",
+      "sizeBytes": 2943788,
+      "sha256": "79fe1c26e4f7e22a0b4cb53593bf86fc5a8f5e26875644664a2862eac4006e9b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4h-acabado-v2.png"
+    },
+    {
+      "path": "plates/acabado/MC4h-acabado.png",
+      "sizeBytes": 2945445,
+      "sha256": "b3b26ea243f7ae084b5cbd636734957b1332d31f8ab56350d4ce10d2327cd118",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC4h-acabado.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado-b-recorte-terminado.png",
+      "sizeBytes": 1252235,
+      "sha256": "64a0222a886d039f987a4d54051abe449772f6a86d30816ca83ddcdd6fc4ed29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado-b-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado-b-recorte.png",
+      "sizeBytes": 1818895,
+      "sha256": "d02ef937bfa1e6cb120b31ae737651196db83962e3685e7a1767542bec6c4250",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado-b-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado-b-v2-comparar.png",
+      "sizeBytes": 180196,
+      "sha256": "8040b7231f43025637246017a157df676c3e25d8bbbc909ebef63debd00e0681",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado-b-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado-b-v2.png",
+      "sizeBytes": 2737546,
+      "sha256": "b6f1ea355f56a1ddada8d1f141b0a16dca05e956937dfa3cb25eadd4c77b636d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado-b-v2.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado-b.png",
+      "sizeBytes": 2738001,
+      "sha256": "cced936a90d11007fd836614f8db3e74dcf3c9c6913e7a93cc430d6d77a6c62d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado-b.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado-recorte-terminado.png",
+      "sizeBytes": 1245088,
+      "sha256": "183bbabaf89d37efaef9e77362741b2e7298d7e9a16ebed9a210c4728f28df15",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado-recorte.png",
+      "sizeBytes": 1818895,
+      "sha256": "d02ef937bfa1e6cb120b31ae737651196db83962e3685e7a1767542bec6c4250",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado-v2-comparar.png",
+      "sizeBytes": 185427,
+      "sha256": "951606c3d63ed027574b8741887135208f75972c6ddcfc04519d9a0de8f5a1bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado-v2.png",
+      "sizeBytes": 2738177,
+      "sha256": "e5125dbebfb0fb0d144e06d40eb5c8d3052f4a88bb566ebe2335f4fcc6f62fb8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado-v2.png"
+    },
+    {
+      "path": "plates/acabado/MC5g-acabado.png",
+      "sizeBytes": 2739880,
+      "sha256": "49866dc12eeba944ceed06ae10e5dee36aaf7f713f7ddd8d7858fdc73bc57c34",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MC5g-acabado.png"
+    },
+    {
+      "path": "plates/acabado/MCB1b-acabado-comparar.png",
+      "sizeBytes": 188995,
+      "sha256": "3e5bcfbe4605a9e47e53d4e1837176866a0cf4a10f9df549bffb61226e832691",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1b-acabado-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MCB1b-acabado-recorte-terminado.png",
+      "sizeBytes": 1196132,
+      "sha256": "9b2af61c9cc55c77dd5f5043ec41d940f58a3005d1e3dd1cc2e5e9c11edab40d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1b-acabado-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MCB1b-acabado-recorte.png",
+      "sizeBytes": 1839845,
+      "sha256": "53a87e920be2bbdd21849c4935799747a0b1e6ed80b9ea2d1e37e52c5a23d4e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1b-acabado-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MCB1b-acabado-v2-comparar.png",
+      "sizeBytes": 167803,
+      "sha256": "33981b2d26b49e79211038f1571f7604874b29f8c1868517a500b1d87790bf81",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1b-acabado-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MCB1b-acabado-v2.png",
+      "sizeBytes": 1937673,
+      "sha256": "fb47b2e71f3c1f8519f42b6032d1ebe0f8580933b91d3eb0451d8b2810fe29db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1b-acabado-v2.png"
+    },
+    {
+      "path": "plates/acabado/MCB1b-acabado.png",
+      "sizeBytes": 1938678,
+      "sha256": "32ebd1babe8e872122223b1b93b5f2aad6d56b97730feb32a35570b21118a37f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1b-acabado.png"
+    },
+    {
+      "path": "plates/acabado/MCB1c-acabado-comparar.png",
+      "sizeBytes": 219043,
+      "sha256": "e3dc60d6681f3bbf469aeb41a396fef4e966cd98b7b3dc2f073264038f6f45ce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1c-acabado-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MCB1c-acabado-recorte-terminado.png",
+      "sizeBytes": 1250290,
+      "sha256": "4c72ecbe86ac68e40ef7ec818e52a2d15b8eee94e8688a5c384ad33760f69007",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1c-acabado-recorte-terminado.png"
+    },
+    {
+      "path": "plates/acabado/MCB1c-acabado-recorte.png",
+      "sizeBytes": 1967784,
+      "sha256": "66c18e6eb58f28090a7f13433fdfc66d99796e141647def23a0fdfad7f42e608",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1c-acabado-recorte.png"
+    },
+    {
+      "path": "plates/acabado/MCB1c-acabado-v2-comparar.png",
+      "sizeBytes": 192530,
+      "sha256": "34df627a12c2c5058bc7efd7cb29291c0bef32c2c6ab67fdd76da5575a2b5455",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1c-acabado-v2-comparar.png"
+    },
+    {
+      "path": "plates/acabado/MCB1c-acabado-v2.png",
+      "sizeBytes": 1810528,
+      "sha256": "210bb56d60eed1e714ca62cba2306c1ab982e317fd161327b19984871f95d45b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1c-acabado-v2.png"
+    },
+    {
+      "path": "plates/acabado/MCB1c-acabado.png",
+      "sizeBytes": 1812011,
+      "sha256": "46b5ce1a28182516e3c68190c9af1229da3163373dd4ffda16686e16fe207443",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/acabado/MCB1c-acabado.png"
+    },
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 110756,
+      "sha256": "c71ceeab11e238f1c8d872f62689d8e142209d14aa5935beff721d2b8b17d6ae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/MC1-45-portada-foco.png",
+      "sizeBytes": 1589819,
+      "sha256": "475369586ebe94b045f85b419e5e3e80b468bff48be6baa86790e5cd1165a01e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1-45-portada-foco.png"
+    },
+    {
+      "path": "plates/MC1b-45-portada-foco-isotipo.png",
+      "sizeBytes": 2242987,
+      "sha256": "5c1f86cf254f21fa29e1433df105a65c34415db3685f09eb8548a39193653cec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1b-45-portada-foco-isotipo.png"
+    },
+    {
+      "path": "plates/MC1e-45-portada-publico.png",
+      "sizeBytes": 1555410,
+      "sha256": "4e2bb3cfaa8c4fb01c66ea1afbab5bd2328abc05792f3463c9f838657981aeba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1e-45-portada-publico.png"
+    },
+    {
+      "path": "plates/MC1f-45-portada-publico-isotipo.png",
+      "sizeBytes": 2268560,
+      "sha256": "7f0a14646b4b9a51ee549385e9f78631819ce0cc1c1817a824b5205d1b7da546",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1f-45-portada-publico-isotipo.png"
+    },
+    {
+      "path": "plates/MC1f-45-portada-publico.png",
+      "sizeBytes": 1561813,
+      "sha256": "8df9e1c2865d5ecbd3cfe60dd8043c890bbb85e316982d2cbf1f869547e1e9c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1f-45-portada-publico.png"
+    },
+    {
+      "path": "plates/MC1g-45-portada-publico-isotipo.png",
+      "sizeBytes": 2316371,
+      "sha256": "d3e72d3a71bb6d014a5b67e2cb31e012d9034c1e2962e0dca9d73a61b22956de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1g-45-portada-publico-isotipo.png"
+    },
+    {
+      "path": "plates/MC1g-45-portada-publico.png",
+      "sizeBytes": 1569999,
+      "sha256": "47582a26b47630cac9c166543769d9c00c72b3633a95e7459f780939580d3dbe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1g-45-portada-publico.png"
+    },
+    {
+      "path": "plates/MC1h-45-portada-consola-isotipo.png",
+      "sizeBytes": 2275045,
+      "sha256": "52a84d067262f5c6ddf34560b3578131557e5670d5918a0df21830bb43138840",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1h-45-portada-consola-isotipo.png"
+    },
+    {
+      "path": "plates/MC1h-45-portada-consola.png",
+      "sizeBytes": 1557878,
+      "sha256": "1601b3f831b73cd52c67857ee5cb502843663f7eb48b20d3ec34acf9e75354d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1h-45-portada-consola.png"
+    },
+    {
+      "path": "plates/MC1i-45-portada-piso-isotipo.png",
+      "sizeBytes": 2305639,
+      "sha256": "22ce1f3f89462527467f45f4a2f3191476ccc1f3687336a3ca0624d3331d1ada",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1i-45-portada-piso-isotipo.png"
+    },
+    {
+      "path": "plates/MC1i-45-portada-piso.png",
+      "sizeBytes": 1558072,
+      "sha256": "328551912b898ddb713a686ec24d45e85e9a0a5b71ac77c8a5be2fc8784b0063",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1i-45-portada-piso.png"
+    },
+    {
+      "path": "plates/MC1j-45-portada-revision.png",
+      "sizeBytes": 1539472,
+      "sha256": "5605ae17de897507087d288ace4038ea480e30c95ad98362f78a2cbde2bc67e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1j-45-portada-revision.png"
+    },
+    {
+      "path": "plates/MC1k-45-portada-revision.png",
+      "sizeBytes": 1482542,
+      "sha256": "5b000a16a60242373da4ca3ce41000fef575fd3ac1b3f5ac6085f204403f76c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1k-45-portada-revision.png"
+    },
+    {
+      "path": "plates/MC1l-45-portada-revision-sentada.png",
+      "sizeBytes": 1594690,
+      "sha256": "c6e45f02bd30c01c1d669a91e48d57f9c6f022a3a916553409ef7fe01bd9c685",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1l-45-portada-revision-sentada.png"
+    },
+    {
+      "path": "plates/MC1l-isotipo.png",
+      "sizeBytes": 2100451,
+      "sha256": "bed6d008b131afd7973228fad41381f1921e5687e1e154c0c34c3bb6945ff2af",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1l-isotipo.png"
+    },
+    {
+      "path": "plates/MC1m-45-portada-revision-sentada.png",
+      "sizeBytes": 1590292,
+      "sha256": "bdd85b344c7aa3e7ef357e8adbbd04b1b7f77b1e3c348761cc4fd126d3f40d25",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1m-45-portada-revision-sentada.png"
+    },
+    {
+      "path": "plates/MC1m-isotipo.png",
+      "sizeBytes": 2101156,
+      "sha256": "346274826a76795123a57e4a610659808a19fd9623b8ec6d235e469ae775f6f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC1m-isotipo.png"
+    },
+    {
+      "path": "plates/MC2-45-entidad-estratega-isotipo.png",
+      "sizeBytes": 2251476,
+      "sha256": "56a06d87c5c0dccc4bc145be16a2e73d64a940b14de92378d8ef1d250c1c0002",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC2-45-entidad-estratega-isotipo.png"
+    },
+    {
+      "path": "plates/MC2-45-entidad-estratega.png",
+      "sizeBytes": 1607852,
+      "sha256": "453490863adae76ebbb06babe10f7d0953fd9b69fe13361b90713e95ddd4d00d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC2-45-entidad-estratega.png"
+    },
+    {
+      "path": "plates/MC2e-45-estratega-mesa-cliente.png",
+      "sizeBytes": 1527418,
+      "sha256": "1cc2cc194c3ba30ff846df663b6349c4a804fe693a7c000749e4a0ed465776d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC2e-45-estratega-mesa-cliente.png"
+    },
+    {
+      "path": "plates/MC2f-45-estratega-mesa-cliente.png",
+      "sizeBytes": 1480731,
+      "sha256": "a9ec343df70c5f98e6cf8ef1fec3d1c40cbabbe59aedfc59550dc07b93c38782",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC2f-45-estratega-mesa-cliente.png"
+    },
+    {
+      "path": "plates/MC2g-45-estratega-mesa-cliente.png",
+      "sizeBytes": 1510107,
+      "sha256": "e84968662cd663051f47daea4ce0711a7196a10952c7c961901d3ed389ecb725",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC2g-45-estratega-mesa-cliente.png"
+    },
+    {
+      "path": "plates/MC2h-45-estratega-mesa-nogal.png",
+      "sizeBytes": 1421530,
+      "sha256": "ed36ef0306327f118615c4e37ec5f8e8225797c51414062efd085fbb5d5fe1f6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC2h-45-estratega-mesa-nogal.png"
+    },
+    {
+      "path": "plates/MC3-45-lente-claridad.png",
+      "sizeBytes": 1632475,
+      "sha256": "574c2ea63f533ebdfdc71be5d12235d92da61d2af98a1f8701042124622746c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3-45-lente-claridad.png"
+    },
+    {
+      "path": "plates/MC3b-45-lente-claridad-bajada.png",
+      "sizeBytes": 1986383,
+      "sha256": "cf7058aca17cbaa42ee371b41d0e86cd1985e147123e2e1b7afb78f08a9fcfe1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3b-45-lente-claridad-bajada.png"
+    },
+    {
+      "path": "plates/MC3c-45-lente-tableta.png",
+      "sizeBytes": 1489603,
+      "sha256": "cbc62b0be3d22bcfcb520f2b8e5697d8595a9ddf2c15f262ca8f8673ebba8b2f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3c-45-lente-tableta.png"
+    },
+    {
+      "path": "plates/MC3d-45-lente-tarjeta.png",
+      "sizeBytes": 1662266,
+      "sha256": "1bcb0a06474eff2c783c9712de1f1d1714a601239c1c733873a5652d98790efb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3d-45-lente-tarjeta.png"
+    },
+    {
+      "path": "plates/MC3e-45-lente-tableta-baja.png",
+      "sizeBytes": 1460844,
+      "sha256": "56514d918ae285e11da61b9192a47f29e93b82ca2a6812135f1d1ff13f9d52fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3e-45-lente-tableta-baja.png"
+    },
+    {
+      "path": "plates/MC3f-45-lente-tableta-baja.png",
+      "sizeBytes": 1437850,
+      "sha256": "50142aabd2cc41aba6eb6d3dec10eef397b4fdba14c43ce252d2c0d76141fd4f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3f-45-lente-tableta-baja.png"
+    },
+    {
+      "path": "plates/MC3g-45-lente-tableta-isotipo.png",
+      "sizeBytes": 1901852,
+      "sha256": "6bbc5839c6aedb3aa9d853fcd915cae8f6dce2b8fdc768098b7ecab85bc468be",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3g-45-lente-tableta-isotipo.png"
+    },
+    {
+      "path": "plates/MC3h-45-lente-silla-isotipo.png",
+      "sizeBytes": 2018776,
+      "sha256": "101cc78e27f492dd26a61fefa9508e9336c4779c7d542d3efe260e1d75cd5b78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3h-45-lente-silla-isotipo.png"
+    },
+    {
+      "path": "plates/MC3h-45-lente-silla.png",
+      "sizeBytes": 1518469,
+      "sha256": "4aac382082212cc9150e8facf724cb097c2fa34f7656ed8d7c066c4e68cc7e49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3h-45-lente-silla.png"
+    },
+    {
+      "path": "plates/MC3i-45-lente-silla.png",
+      "sizeBytes": 1474267,
+      "sha256": "031b6cedfb8ecc8212f011ba093b03659e26996c992b728c86a14976141d7382",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC3i-45-lente-silla.png"
+    },
+    {
+      "path": "plates/MC4-916-story-foco.png",
+      "sizeBytes": 2270200,
+      "sha256": "e3863243fa7db3196443de47a69e6a4f0906c948069590ba32f938b470ba7eb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4-916-story-foco.png"
+    },
+    {
+      "path": "plates/MC4b-916-story-foco.png",
+      "sizeBytes": 2175105,
+      "sha256": "34f98e93beb975cd4682e68b4797e0d032174c80a37af2ce2dd441a0e08369fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4b-916-story-foco.png"
+    },
+    {
+      "path": "plates/MC4c-916-story-foco-isotipo.png",
+      "sizeBytes": 3071491,
+      "sha256": "a536ef2e3237cedb8b1b5913766aa79f4733859e44fbd94ca80403dfa5f7ae83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4c-916-story-foco-isotipo.png"
+    },
+    {
+      "path": "plates/MC4e-916-story-publico-isotipo.png",
+      "sizeBytes": 2808063,
+      "sha256": "50295d4466e89b4725cb521cadeaa3f11900d7ef68100146353198194dac2974",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4e-916-story-publico-isotipo.png"
+    },
+    {
+      "path": "plates/MC4e-916-story-publico.png",
+      "sizeBytes": 2103142,
+      "sha256": "101f156aa3a99883bfe7b4887d4fad61ab8fa7f0c2b7aa7f739a7fca50176c2e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4e-916-story-publico.png"
+    },
+    {
+      "path": "plates/MC4f-916-story-publico-isotipo.png",
+      "sizeBytes": 2994417,
+      "sha256": "7bed3c0786fe6074b91729b2114e68e1e8cfb06c1c505eb5c87fdb283b78e5bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4f-916-story-publico-isotipo.png"
+    },
+    {
+      "path": "plates/MC4f-916-story-publico.png",
+      "sizeBytes": 2117890,
+      "sha256": "b4f2dabc18bb00d1f2d5698a57e5a91d8ee5e25944665661b01849b77c515f91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4f-916-story-publico.png"
+    },
+    {
+      "path": "plates/MC4g-916-story-consola-isotipo.png",
+      "sizeBytes": 3030784,
+      "sha256": "45563028d89e7d1320fb2fbd2bae0098ade43a21484c767a88d8b383ea1b792b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4g-916-story-consola-isotipo.png"
+    },
+    {
+      "path": "plates/MC4g-916-story-consola.png",
+      "sizeBytes": 2182661,
+      "sha256": "7310afef4e2a3f107a6e6e69fdb12958a8638f8125f26807d248e2ca1949f071",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4g-916-story-consola.png"
+    },
+    {
+      "path": "plates/MC4h-916-story-revision.png",
+      "sizeBytes": 2201631,
+      "sha256": "20b14d51916fa27d790859b07a0c3b4fce1b0c2b6c860dbd1f31a50c3ae5c6d7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4h-916-story-revision.png"
+    },
+    {
+      "path": "plates/MC4h-isotipo.png",
+      "sizeBytes": 2942787,
+      "sha256": "327a83f623d0928528e62ee19417c7e079418885a66c099caf8d371cc5a25aab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC4h-isotipo.png"
+    },
+    {
+      "path": "plates/MC5-169-blog-foco.png",
+      "sizeBytes": 2227607,
+      "sha256": "ff305fe9c80476a0b38e38d5e4b5e36d8574d7a8cb350a54280de90bc2bd7990",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5-169-blog-foco.png"
+    },
+    {
+      "path": "plates/MC5-blog-1200x630.png",
+      "sizeBytes": 1392330,
+      "sha256": "b8de0c8c2396f0b6b14eef505b26e5af581b2b6d37256872a10ec9807775e9bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5-blog-1200x630.png"
+    },
+    {
+      "path": "plates/MC5b-169-blog-foco.png",
+      "sizeBytes": 2265470,
+      "sha256": "a0cd39e8b544146ae4c6f787e83f1729ce0c8acf7b3142cf05a69d6cd5863e2f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5b-169-blog-foco.png"
+    },
+    {
+      "path": "plates/MC5b-blog-1200x630.png",
+      "sizeBytes": 1180040,
+      "sha256": "cd3881b04b836c3ad69b55a05b26d829dbca7c0f48422c3dee8a72fbd71b4508",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5b-blog-1200x630.png"
+    },
+    {
+      "path": "plates/MC5c-169-blog-lecho.png",
+      "sizeBytes": 2230762,
+      "sha256": "056ce83938e56c726b0ffb2b51953eaf5f8152190f1f44d016cc0179c251a337",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5c-169-blog-lecho.png"
+    },
+    {
+      "path": "plates/MC5d-169-blog-lecho-isotipo.png",
+      "sizeBytes": 3383143,
+      "sha256": "6cbc99484fc0fe84097a4be4647b2c88330366cf8ca56e44feff8828e7e93b39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5d-169-blog-lecho-isotipo.png"
+    },
+    {
+      "path": "plates/MC5d-blog-1200x630.png",
+      "sizeBytes": 1341979,
+      "sha256": "ba1814f530b74c11f93cbbe5e009daf9cd3828d6aecc4615cb5d4b814bf8b8e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5d-blog-1200x630.png"
+    },
+    {
+      "path": "plates/MC5e-169-blog-publico-isotipo.png",
+      "sizeBytes": 3171160,
+      "sha256": "6e81f59c56824505abf718cb04bed6b928e08d8d01066d382ae267af0a95a738",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5e-169-blog-publico-isotipo.png"
+    },
+    {
+      "path": "plates/MC5e-169-blog-publico.png",
+      "sizeBytes": 2164837,
+      "sha256": "1cf2202bd08608c6af71052a275615c9f43bb1cf1487312b1b9f7f48793f1ead",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5e-169-blog-publico.png"
+    },
+    {
+      "path": "plates/MC5e-blog-1200x630.png",
+      "sizeBytes": 1281345,
+      "sha256": "d53af1204bd820ddc30a21d0c6a96cbd12c12a60d6f3e21e3b56d5f6d217cf13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5e-blog-1200x630.png"
+    },
+    {
+      "path": "plates/MC5f-169-blog-consola-isotipo.png",
+      "sizeBytes": 3013243,
+      "sha256": "6f76fa180471eb76858ec2fc2431bb2fb03e781097207c4aa7fa23fa368a6853",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5f-169-blog-consola-isotipo.png"
+    },
+    {
+      "path": "plates/MC5f-169-blog-consola.png",
+      "sizeBytes": 2132216,
+      "sha256": "aa321d416d05c2fa6f7d15c6627fe6c8b247da10afdbbdd42c3fca48e37808d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5f-169-blog-consola.png"
+    },
+    {
+      "path": "plates/MC5f-blog-1200x630.png",
+      "sizeBytes": 1237119,
+      "sha256": "9f2c0d1c97598830da7426084f33b54c103c1d48ca4107583f5f466d5a06dab7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5f-blog-1200x630.png"
+    },
+    {
+      "path": "plates/MC5g-169-blog-evidencia.png",
+      "sizeBytes": 2086575,
+      "sha256": "bd78c09e6b047c6a7eea84ee41048f305e46ca90c5b15031867ae8a19d9442fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5g-169-blog-evidencia.png"
+    },
+    {
+      "path": "plates/MC5g-blog-1200x630.png",
+      "sizeBytes": 1059016,
+      "sha256": "495c09e7a3fb7ed099f3552fa5e2f3a6ae4bc660770b91aa9f81f53e8682d09d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5g-blog-1200x630.png"
+    },
+    {
+      "path": "plates/MC5g-isotipo.png",
+      "sizeBytes": 2736627,
+      "sha256": "0363fcc05c32d14f9cf9d8ce6b5338bbaa6f0f17e5ec8fd134cb8bf43b573cd6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MC5g-isotipo.png"
+    },
+    {
+      "path": "plates/MCB1-45-portada-tres-pasos.png",
+      "sizeBytes": 1565699,
+      "sha256": "8c450c11b34135eace7c73fd715719034e0b1f19613d9157615b0877c7b8b927",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MCB1-45-portada-tres-pasos.png"
+    },
+    {
+      "path": "plates/MCB1b-45-portada-tres-pasos.png",
+      "sizeBytes": 1506549,
+      "sha256": "b6f7e987dd394c1aa1d8e3e0483ec2560ad345346624ba19a3503c5a4d1abe09",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MCB1b-45-portada-tres-pasos.png"
+    },
+    {
+      "path": "plates/MCB1b-isotipo.png",
+      "sizeBytes": 1936843,
+      "sha256": "f2eb131173a4af7fae811ee34062e3beaf7dc0275a1d02c995409539ee193fcd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MCB1b-isotipo.png"
+    },
+    {
+      "path": "plates/MCB1c-45-portada-tres-pasos.png",
+      "sizeBytes": 1471362,
+      "sha256": "4bcd05658492bab7cbe77e4e90158d979ad5ae16c4a163414b73bfcf55deafb8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MCB1c-45-portada-tres-pasos.png"
+    },
+    {
+      "path": "plates/MCB1c-isotipo.png",
+      "sizeBytes": 1809808,
+      "sha256": "21f4072749dda1030aa2c81c6d025c56e86b17780f2a18ec7d15f6fa80ad7ed1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MCB1c-isotipo.png"
+    },
+    {
+      "path": "plates/MCB3-45-lente-explorar.png",
+      "sizeBytes": 1501610,
+      "sha256": "c258971f9ef187d6138d620a035a93e273bf98992e4696a5cd5d8a504fd27d21",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MCB3-45-lente-explorar.png"
+    },
+    {
+      "path": "plates/MCB3-isotipo.png",
+      "sizeBytes": 1998601,
+      "sha256": "01efb68b86651a1ddf773261f79902ba5a0da1132840a1985f84323712f8e144",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-28_manzanitas-cine/plates/MCB3-isotipo.png"
+    }
+  ]
+}

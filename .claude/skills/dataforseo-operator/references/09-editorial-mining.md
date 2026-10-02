@@ -14,6 +14,16 @@
 - Registrar previsión del conjunto y costo real por run. Mantener intactos entitlements y flags; no
   habilitar runtime compartido ni tracking como efecto de minar.
 
+## Enriquecer una URL propia antes de expandir
+
+Para preparar o revisar un brief desde el contenido de una URL, la CLI local ofrece
+`quick keywords-for-site` y `site-keywords` (paginación/checkpoint). Procedimiento canónico:
+[Keywords for Site por URL](02-labs.md#21a-keywords-for-site-por-url--contrato-verificado-2026-09-30).
+Verificar mercado/idioma/propiedad, seleccionar ruido y distinguir intención local de comparativas antes
+de ampliar el gasto. Conservar JSON/CSV y cruzar con corpus/GSC; este carril no persiste automáticamente
+una cola editorial ni sustituye su runner. La relevancia por categoría no demuestra posiciones o demanda
+propia, y un total grande del proveedor no exige adquirir todo el universo.
+
 ## Expansión y control
 
 1. Suggestions para variantes léxicas; related para relaciones semánticas; ideas sólo por familia

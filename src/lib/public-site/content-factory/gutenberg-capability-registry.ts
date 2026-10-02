@@ -173,6 +173,52 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     exampleIntent: 'Refresh this pullquote so it connects Loop Marketing with faster learning cycles.'
   },
   {
+    blockName: 'efeoncepro/glitch-drop',
+    semanticKind: 'editorial_aside',
+    agentRole:
+      'Efeonce POV callout for Glitch posts (dynamic block, plugin efeonce-editorial-blocks). Authored as GutenbergArticleSpec kind="glitchDrop" with 1-4 plain-text lines.',
+    freedomLevel: 'guided',
+    editableSurfaces: ['attrs'],
+    semanticOperations: ['refresh_editorial_aside'],
+    compilesTo: ['update_attrs'],
+    requiredEvidence: [...baseEvidence, 'plugin_serialization_policy'],
+    applyPolicy: draftOnlyPolicy(
+      'The text lives in the content attribute; regenerate it from the spec (renderGlitchDropBlock) so WordPress serialization stays byte-identical.'
+    ),
+    previewPolicy: previewRequired(
+      'One visible <aside class="gh-glitch-drop"> per drop (offsetHeight > 0; Ohio hides bare asides without the plugin override).',
+      'The neighbouring paragraphs do not repeat the drop sentences (validator warning glitch_drop_redundant_with_neighbor).'
+    ),
+    guardrails: [
+      'Use only for Efeonce POV inside Glitch posts; it is not a quote and not a citation container.',
+      'No links or markup inside the drop: the source link goes in the next paragraph.',
+      '1-4 short lines joined by <br>; never hand-write the block comment.',
+      'Do not repeat the drop sentence in the paragraph before or after it.'
+    ],
+    exampleIntent: 'Sharpen this Glitch Drop so it states the business consequence without repeating the next paragraph.'
+  },
+  {
+    blockName: 'core/table',
+    semanticKind: 'editorial_table',
+    agentRole: 'Native comparison/data table with optional caption and the core-registered stripes style.',
+    freedomLevel: 'constrained',
+    editableSurfaces: ['text', 'attrs', 'structure'],
+    semanticOperations: ['refresh_table_cells'],
+    compilesTo: ['update_text', 'update_attrs', 'preserve'],
+    requiredEvidence: [...baseEvidence],
+    applyPolicy: draftOnlyPolicy('Cell and caption changes keep the column structure; header/column changes need a reviewed structure diff.'),
+    previewPolicy: previewRequired(
+      'Table remains readable at 390 px without page overflow.',
+      'Caption credits the data source when figures come from third parties.'
+    ),
+    guardrails: [
+      'Use only the core-registered is-style-stripes style (spec table.style="stripes"); no inline colors.',
+      'Every row keeps the header column count.',
+      'Prefer a table over columns for side-by-side comparisons.'
+    ],
+    exampleIntent: 'Update the prices in this comparison table and credit the source in the caption.'
+  },
+  {
     blockName: 'yoast-seo/table-of-contents',
     semanticKind: 'navigation_toc',
     agentRole: 'Yoast-generated navigation for long editorial posts.',
@@ -219,7 +265,11 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     requiredEvidence: [...baseEvidence, 'media_reconciliation', 'link_destination_review'],
     applyPolicy: draftOnlyPolicy('Embed updates require validated source URL and preview readback.'),
     previewPolicy: previewRequired('Embed resolves in WordPress preview.', 'Provider/source URL is approved.'),
-    guardrails: ['Do not invent video URLs.', 'Preserve existing embeds unless the refresh brief explicitly changes them.'],
+    guardrails: [
+      'Do not invent video URLs.',
+      'Preserve existing embeds unless the refresh brief explicitly changes them.',
+      'Credit the source in the embed caption (spec embed.caption, Glitch convention «Fuente: <medio>»).'
+    ],
     exampleIntent: 'Check whether this YouTube embed is still current before recommending a replacement.'
   },
   {
@@ -274,7 +324,11 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     requiredEvidence: [...baseEvidence, 'cta_target', 'link_destination_review'],
     applyPolicy: draftOnlyPolicy('CTA changes require reviewed destination and campaign/HubSpot intent.'),
     previewPolicy: previewRequired('CTA label and link match the approved offer.', 'Button remains readable and clickable.'),
-    guardrails: ['Never publish unreviewed CTA links.', 'Prefer existing CTA target unless the brief changes the offer.'],
+    guardrails: [
+      'Never publish unreviewed CTA links.',
+      'Prefer existing CTA target unless the brief changes the offer.',
+      'Generate only through spec kind="buttons": 1-3 buttons, variants fill|outline, no literal colors or unregistered classes.'
+    ],
     exampleIntent: 'Review this CTA against the current HubSpot campaign target.'
   },
   {
@@ -288,7 +342,11 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     requiredEvidence: [...baseEvidence, 'cta_target', 'link_destination_review'],
     applyPolicy: draftOnlyPolicy('Button text/link updates require destination review and draft preview.'),
     previewPolicy: previewRequired('Label fits inside the button.', 'Destination is approved.'),
-    guardrails: ['Keep labels short.', 'Do not alter conversion destination without explicit approval.'],
+    guardrails: [
+      'Keep labels short.',
+      'Do not alter conversion destination without explicit approval.',
+      'Destinations are https:, http: or mailto: only; styles are the core fill (default) or is-style-outline.'
+    ],
     exampleIntent: 'Make this CTA label more specific without changing the destination.'
   },
   {
@@ -348,7 +406,7 @@ export const getEfeonceGutenbergBlockCapabilityRegistry = (
     deepInspectionContract: 'contentFactoryPostDeepInspection.v1',
     refreshPlanContract: 'contentFactoryRefreshPlan.v1',
     observedRuntimeSample:
-      'WP-CLI read-only samples of recent efeoncepro.com posts, guided inspection of post 248398 on 2026-06-14, and Creative Workflows FAQ block registry inspection on 2026-07-15'
+      'WP-CLI read-only samples of recent efeoncepro.com posts, guided inspection of post 248398 on 2026-06-14, Creative Workflows FAQ block registry inspection on 2026-07-15, and the read-only runtime inventory of 2026-09-28 (glitch-drop, table stripes, embed caption, button styles)'
   },
   entries: EFEONCE_GUTENBERG_BLOCK_CAPABILITIES
 })

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el CRM en una conversación</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-live-chat` (surface deck, tema oscuro, TASK-1942). «¿Y si le preguntas a tu CRM? Te responde.»: una
+      conversación con el asistente de un partner conectado al CRM, en una ventana genérica de papel crema abierta en
+      perspectiva: la consulta, la respuesta con tres registros vivos (montos [MONTO]) y la acción gobernada con
+      «Confirmar», que toma la selección «Ejecutivo». Debajo, tres garantías en vidrio; arriba a la derecha, la nota. Las
+      marcas de terceros (logotipo del asistente, wordmark de la co-marca) son slots OPCIONALES sujetos a autorización:
+      sin ellas la ventana va sin marca del asistente y sin tarjeta de co-marca.
+      Referencia: DeckSalesforceCrmEnClaude (SF16-crm-en-claude).
+    -->
+    <main class="gl-slide gl-ls gl-clc" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <p class="gl-ls-note" data-slot="note">Salesforce en Claude · beta abierta desde sep. 2026 · ejemplo ilustrativo</p>
+
+      <section class="gl-ls-doc gl-clc-window">
+        <header class="gl-clc-head">
+          <span class="gl-clc-assistant" data-slot="assistantMark"><img class="gl-clc-assistant-logo" data-slot-field="src" alt="Claude" /></span>
+          <span class="gl-clc-connection" data-slot="connection">
+            <img class="gl-clc-platform-logo" data-slot-field="logo" alt="" />
+            <span data-slot-field="label">Conectado a Salesforce</span>
+          </span>
+        </header>
+
+        <div class="gl-clc-user">
+          <p class="gl-clc-prompt" data-slot="prompt">¿Qué oportunidades cierran este mes y cuál está en riesgo?</p>
+        </div>
+
+        <div class="gl-clc-answer">
+          <p class="gl-clc-intro" data-slot="intro">Tienes <strong>3 oportunidades</strong> con cierre este mes. <strong>Andes Retail</strong> lleva 21 días sin actividad:</p>
+          <ol class="gl-clc-records" data-slot="records">
+            <li class="gl-clc-record">
+              <span class="gl-clc-name" data-slot-field="name">Andes Retail</span>
+              <span class="gl-clc-stage" data-slot-field="stage">Propuesta</span>
+              <span class="gl-clc-amount" data-slot-field="amount">[MONTO]</span>
+              <span class="gl-clc-risk-slot"><span class="gl-clc-risk" data-slot-field="risk">En riesgo</span></span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="gl-clc-action" data-slot="action" data-gl-selection-target>
+          <span class="gl-clc-action-text" data-slot-field="text">Propongo agendar reunión y crear tarea para el ejecutivo en Salesforce</span>
+          <span class="gl-clc-button" data-slot-field="button">Confirmar</span>
+        </div>
+      </section>
+
+      <div class="gl-clc-cobrand" data-slot="platformMark"><img class="gl-clc-cobrand-mark" data-slot-field="src" alt="Claudeforce" /></div>
+
+      <ol class="gl-clc-guarantees" data-slot="guarantees">
+        <li class="gl-ls-glass gl-clc-guarantee">
+          <span class="gl-clc-guarantee-title" data-slot-field="title">Ve lo que tú ves</span>
+          <span class="gl-clc-guarantee-desc" data-slot-field="detail">Respeta los permisos de tu org.</span>
+        </li>
+      </ol>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Claudeforce · Enablement conversacional</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Y si le preguntas a tu CRM?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Te</span><span data-slot-field="answer">responde</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Configuramos Salesforce en Claude con permisos, skills y <strong>adopción</strong>: tu equipo consulta y actualiza el CRM conversando.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

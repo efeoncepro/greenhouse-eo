@@ -1,0 +1,17 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:03:34.399Z",
+  "run": "ai-generations/2026-09-17_kit-marca-fisica",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-17_kit-marca-fisica",
+  "totalBytes": 2252054,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "efeonce-kit-marca-fisica-v01-A4.png",
+      "sizeBytes": 2252054,
+      "sha256": "60298828154d9cadbe230bc00185b7ae63cdae12ec46238095e91e9bc9361355",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kit-marca-fisica/efeonce-kit-marca-fisica-v01-A4.png"
+    }
+  ]
+}

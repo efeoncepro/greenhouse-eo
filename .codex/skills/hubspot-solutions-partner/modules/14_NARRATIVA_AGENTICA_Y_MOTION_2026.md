@@ -41,7 +41,7 @@ Angela son señales ejecutivas directas, pero LinkedIn no reemplaza políticas, 
 | **Contexto** | Smart CRM + datos estructurados/no estructurados + Growth Context | ¿Dónde vive hoy el criterio con que tu mejor persona decide? | Auditoría de contexto, modelo de datos, calidad, integración y knowledge design |
 | **Acción** | Hubs, workspaces, Breeze Assistant y Breeze Agents | ¿Qué trabajo repetitivo, lento o frágil debe mejorar primero? | Configuración, implementación, training y activación de un caso medible |
 | **Coordinación** | Agent management, permisos, handoffs, sistemas conectados, auditoría | ¿Qué puede ejecutar un agente y qué exige aprobación humana? | Gobierno, `propose → confirmación humana → execute`, observabilidad y mejora continua |
-| **Acceso abierto** | APIs, remote MCP, conectores y Agent CLI | ¿El trabajo es conversacional o masivo/programado? | MCP para humano-en-el-loop; CLI/API para background, bulk y scheduled con dry-run y control |
+| **Acceso abierto** | APIs, remote MCP, conectores y Agent CLI | ¿El trabajo es conversacional o masivo/programado? | MCP para trabajo puntual en conversación; CLI/API para trabajo repetible, bulk y scheduled, con preview donde el comando lo soporte y readback |
 
 El corte final del 17–18/09 añade cuatro señales de producto que deben tratarse con disponibilidad escalonada:
 Customer Agent Voice, HubSpot Work, Agent CLI y Smart CRM Universal Record Page. Los tres primeros son superficies
@@ -61,7 +61,7 @@ por sí solo por qué se ganó un deal, cuándo escalar un ticket o qué excepci
 | **Customer Success Workspace** | Service Hub Pro/Enterprise | Cuentas, proyectos, revenue, renovaciones, health scores y vistas por equipo | CSMs con cartera grande, churn reactivo, expansión sin sistema |
 | **Help Desk + Customer Agent** | Capacidad comercial principal | Intake, routing, resolución, handoff y medición | Soporte saturado, tiempos altos, preguntas repetitivas |
 | **Agent Hub / Agent Builder** | **Agent Hub beta**; elegibilidad y catálogo cambian | Administrar agentes prebuilt/custom, workflows, instrucciones, tools y context | Readiness, gobierno, piloto y Managed Agentic Operations; sin SLA sobre beta |
-| **Agent CLI** | **Beta pública** desde 2026-06-23 | Operaciones repetitivas, masivas, programadas y de background | RevOps/CRM Ops operado con agentes, con OAuth, `--dry-run` y auditoría |
+| **Agent CLI** | **Beta pública** desde 2026-06-23 | Operaciones repetitivas, masivas, programadas y de background | RevOps/CRM Ops operado con agentes; OAuth o service key según endpoint, `--dry-run` sólo donde el comando lo soporte y auditoría según identidad |
 | **ChatGPT Ads** | **Beta**; opt-in de Super Admin y permiso `Ads publishing` | Crear/publicar campañas, medir, atribuir y sincronizar conversion events | Piloto de paid AI discovery; no prometer acceso ni performance |
 | **Lead scoring + AI insights** | Scoring disponible en Marketing/Sales Pro/Enterprise; AI insights documentado con permiso de edición | Priorizar contactos, compañías y deals según fit, engagement y eventos de conversión | Alinear scoring con lifecycle, consentimiento y handoff; validar objetos y reglas por portal |
 | **MCP remoto** | **GA** para reads/writes acotados; permisos existentes y Audit Log | Conectar agentes a contexto y ejecutar acciones gobernadas | Least privilege, OAuth/PKCE, auditoría, reautorización y readback; no paridad completa |

@@ -1,0 +1,10 @@
+{
+  "id": "CS3b-berel-squad",
+  "formato": "1:1",
+  "impacto": true,
+  "linea": "engine",
+  "caso": { "tipo": "cliente", "cliente": "Berel", "registro": "puesta-en-escena" },
+  "objetos": [{ "objeto": "chaqueta-softshell-efeonce" }],
+  "escena": "SCENE (a working session of the Efeonce squad with the client's marketing lead, Mexico City, evening, premium and intimate): a long dark walnut table in a quiet, elegant design studio. On the table, dozens of large paint color swatch cards and an open paint fan deck are spread out in a beautiful gradient of saturated colors — terracotta, cobalt blue, mustard yellow, deep teal, rose — the only strong color in the frame; the cards carry no brand names, no logos and no readable text. A thin current laptop sits at the right end of the table with its screen turned away from camera so nothing on it can be read, its soft glow on the table. Two women lean over the table together, shoulder to shoulder, on the RIGHT two thirds of the frame, in a moment of shared decision: on the left, a Mexican marketing director in her forties, dark hair in a low bun, elegant cream silk blouse and a black blazer, holding up one terracotta swatch card; beside her, a Latin American Efeonce strategist in her thirties, dark hair tied back, wearing the Efeonce softshell jacket from the reference, pointing at the same card and smiling, both looking at the card, never at the lens, never at each other's faces up close. A single warm pendant lamp low above the table is the key light, pooling light on the swatches and their hands and faces, with rich soft shadows falling off into a deep dark room behind them; a faint cool rim light from a window far behind separates their silhouettes. Shallow depth of field, 85mm, focus on the swatch in her hand and their faces. The LEFT 30% of the frame is only the dark end of the table and the dark room, calm, no objects in light. No readable text, no logos of any brand except the Efeonce mark on the jacket.",
+  "lecho": { "objeto": "a few swatch cards on the near edge of the walnut table, close to the lens and outside the lamp's pool", "tono": "DARK near black" }
+}

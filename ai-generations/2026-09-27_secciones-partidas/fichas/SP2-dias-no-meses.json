@@ -1,0 +1,11 @@
+{
+  "id": "SP2-dias-no-meses",
+  "formato": "1:1",
+  "impacto": true,
+  "objetos": [{ "objeto": "polo-efeonce" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic drama still, a creative studio at dusk, the moment a campaign comes together): a Latin American creative director in his early thirties, short dark hair and a trimmed beard, wearing the NAVY EFEONCE POLO, stands in the LEFT 65% of the frame in mid-motion, reaching up with one arm to pin the last large printed campaign key visual onto a wall already covered edge to edge with a grid of bold, colorful campaign prints (abstract color fields, product close-ups and bold shapes, no readable text, no logos); his other hand holds two more prints; he turns his head toward the RIGHT with a confident, energized smile, looking out of frame to the right as if calling the client over. A hard warm key light from a low window OUTSIDE the frame on the left rakes across him and the prints, throwing crisp long shadows of his arm across the wall; a cool teal rim from behind separates his shoulders. REALISTIC ADULT PROPORTIONS, both arms and hands anatomically correct, five fingers each, 50mm lens, camera at chest height about three meters away, slight low angle, focus on his face. Thin haze in the light beam. The RIGHT 30% of the frame, from top to bottom, is only the dark, evenly shadowed end of the studio wall with nothing on it: no prints, no window, no bright edge. Rich saturated color on the prints against deep shadow, no readable text, no logos of any other brand.",
+  "lecho": { "objeto": "the dark blurred corner of a worktable close to the lens at the bottom left, outside the light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the dark, evenly shadowed wall on the right 30% of the frame", "tinta": "blanca" } }
+}

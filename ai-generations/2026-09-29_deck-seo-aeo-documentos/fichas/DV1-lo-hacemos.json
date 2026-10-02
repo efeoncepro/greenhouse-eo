@@ -1,0 +1,12 @@
+{
+  "id": "DV1-lo-hacemos",
+  "formato": "16:9",
+  "impacto": true,
+  "linea": "engine",
+  "objetos": [{ "objeto": "chaqueta-softshell-efeonce" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark engineering studio at night, the moment the fix ships): an Efeonce front-end engineer, a Latin American woman in her early thirties, dark hair in a low ponytail, wearing the Efeonce softshell jacket from the reference, stands on the RIGHT half of the frame, framed from the waist up, looking straight into the lens with a calm, confident half-smile. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, focus on her eyes. With one raised hand she drags a glowing block of code into place inside a HUGE floating holographic landing page that towers beside and behind her: tall translucent panes of azure-blue (#0375DB) light layered in depth like sheets of glass — on the front pane the rendered landing page (hero block, cards, a button), and on the panes behind it the source code that builds it, columns of indented code lines and nested component brackets, plus a component tree diagram — every character too small and too blurred to read, no real words or logos. One code line on the front pane glows brighter white where her hand is placing it, like a fix being applied, with a tiny spark of light. The hologram is the main light source and throws azure light across her face, jacket and the haze, with a few teal (#36C8BF) highlights inside the code. A hard cool rim light from behind separates her hair and shoulders. The LEFT 45% of the frame is calm, deep dark studio space with no hologram, no code and no objects, only faint haze. Rich contrast, punchy, awe-inspiring, no logos of any other brand, no readable text.",
+  "lecho": { "objeto": "the near edge of the matte dark engineering desk, a few centimetres from the lens, dissolved into blur and outside every light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark studio space on the left 45% of the frame", "tinta": "blanca" } }
+}

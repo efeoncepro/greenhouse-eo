@@ -1,0 +1,17 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:25:03.393Z",
+  "run": "ai-generations/2026-09-26_prueba-axis-iconos",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-26_prueba-axis-iconos",
+  "totalBytes": 927501,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "guitarra-hoja.png",
+      "sizeBytes": 927501,
+      "sha256": "05c951af2ac1d84f7c8411d8a1c13bc141773e129c8d1c9d220afc0e42e6bd52",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_prueba-axis-iconos/guitarra-hoja.png"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "recipe": "proposal-cinematic",
+  "layout": "lines",
+  "voice": {
+    "eyebrow": "Nuestras líneas de servicio"
+  },
+  "body": "Cinco líneas. Una sola relación.",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+    "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara mientras cinco esferas de luz en teal, naranja, azul, rojo y magenta orbitan a su alrededor dejando estelas; la naranja flota sobre su palma"
+  },
+  "selection": {
+    "target": "lines",
+    "label": "Nexa"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "CA4b-45-exigencia-escala",
+  "formato": "4:5",
+  "registro": "cine",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "conviccion"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "traje-bionico-nexa"
+    },
+    {
+      "objeto": "lentes-bionicos-nexa"
+    },
+    {
+      "objeto": "spark-contenido",
+      "vista": "cine"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still with real depth of field, epic scale, a vast dark hangar at night): Nexa stands slightly RIGHT of center in the lower part of the frame, framed from the waist up, looking straight into the lens through her clear glasses with a calm, demanding half-smile, razor-thin focus on her eyes. Behind her, an immense slow VORTEX of HUNDREDS of glowing pieces of creative work recedes away from her like a tunnel in deep perspective, spiralling BACK and DOWN into the depth of the hangar toward a vanishing point at the height of her waist, never rising: vertical stories, square posts, banners, product shots, web pages and film frames, all clearly different in format and job yet sharing one consistent brand look of sweeping orange (#FF6500) forms on deep navy. With her raised LEFT hand, palm open at chest height about thirty centimetres from her face, she has pulled ONE single piece out of the vortex: a vertical story frame hovering above her palm, razor sharp, glowing warm orange, the brightest thing in the frame; she holds it to the standard. The Content Spark, copied EXACTLY from its reference and smaller than her head, is PERCHED ON HER RIGHT SHOULDER, one small hand resting on her shoulder plate, holding up its small card next to the pulled piece as if comparing it, lit from the side by the piece. LIGHT: the pulled piece is the only key light on her: hard, from the front right and slightly below, so her glasses, her raised hand and the white plates of her shoulder glow warm orange while the far side of her face falls into deep shadow; NO fill light, NO front light. A low cool azure (#0375DB) rim light from behind outlines her hair and shoulders. DEPTH: the pulled piece and her face sharp; the nearest pieces of the vortex at one to two meters slightly soft; the rest four to forty meters away melting into big soft bokeh. She wears the bionic suit exactly as in its reference, WITH the small navy Efeonce isotype inlaid on her chest plate exactly as in the reference and the macro (no other logo, no lettering), the bionic glasses exactly as in their reference, small silver earrings, NO watch, NO bracelet, NO ring. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm at f/1.8, nothing foreshortened, she does not lean toward the lens; her head about one quarter of the frame height, shoulders clearly wider than two head-widths. Thin haze catches the glow of the vortex. GEOGRAPHY: the vortex stays entirely BELOW 36% of the frame height; the TOP third of the frame is calm, deep dark hangar space: no pieces, no light, only faint haze. A near-black matte console crosses in front of her at waist height across the whole width of the frame, so the white plates of her suit end above it. Rich contrast, deep navy blacks, awe-inspiring. No readable text, no letters, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near-black matte rubber top of a launch console crossing in front of her at waist height, the lens only a few centimetres behind its near edge, filling the bottom fifth of the frame across its whole width, completely out of focus, non-reflective, with no light and no reflection reaching it",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "calm, deep dark hangar space with only faint haze",
+      "tinta": "blanca"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "id": "CMP-004-reconciliation-r04",
+  "campaignId": "CMP-004",
+  "direction": {
+    "paletteReason": "Azul y naranja pertenecen al trabajo fotografiado; teal pertenece a la voz de la marca madre.",
+    "sceneRole": "Evidencia digital coherente con el concepto y el registro declarado.",
+    "textRole": "Tres voces: pregunta ligera, respuesta dominante con esfera y sustento concreto.",
+    "actionRole": "Tratamiento elegido por tipo de invitación y jerarquía; contraste es verificación posterior. En trazos pequeños, el teal claro de AXIS conserva el parentesco con la esfera."
+  },
+  "palette": [
+    "brandAccentOnDark",
+    "inkOnDark",
+    "inkOnLight",
+    "brandAccentSoft"
+  ],
+  "treatments": [
+    {
+      "id": "text",
+      "strategy": "intentional-contrast",
+      "prominence": "discreta",
+      "variant": "text",
+      "inkToken": "brandAccentSoft",
+      "reason": "El acento teal identifica a Efeonce y vincula la acción con la esfera y el anillo de su voz."
+    },
+    {
+      "id": "outline",
+      "strategy": "intentional-contrast",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "inkToken": "inkOnDark",
+      "reason": "El acento teal identifica a Efeonce y vincula la acción con la esfera y el anillo de su voz.",
+      "surfaceToken": "brandAccentSoft"
+    },
+    {
+      "id": "solid",
+      "strategy": "intentional-contrast",
+      "prominence": "destacada",
+      "variant": "solid",
+      "inkToken": "inkOnLight",
+      "reason": "El acento teal identifica a Efeonce y vincula la acción con la esfera y el anillo de su voz.",
+      "surfaceToken": "brandAccentOnDark"
+    }
+  ]
+}

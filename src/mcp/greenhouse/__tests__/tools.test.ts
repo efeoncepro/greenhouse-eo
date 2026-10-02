@@ -81,6 +81,9 @@ describe('createGreenhouseMcpHandlers', () => {
       getInsightSchedule: vi.fn(),
       getInsightCoverPreference: vi.fn(),
       setInsightCoverPreference: vi.fn(),
+      requestBrandRender: vi.fn(),
+      getBrandRenderRequest: vi.fn(),
+      listBrandRenderRequests: vi.fn(),
       previewClientServiceEnablement: vi.fn(),
       applyClientServiceEnablement: vi.fn(),
       rollbackClientServiceEnablement: vi.fn()
@@ -210,6 +213,9 @@ describe('createGreenhouseMcpHandlers', () => {
       getInsightSchedule: vi.fn(),
       getInsightCoverPreference: vi.fn(),
       setInsightCoverPreference: vi.fn(),
+      requestBrandRender: vi.fn(),
+      getBrandRenderRequest: vi.fn(),
+      listBrandRenderRequests: vi.fn(),
       previewClientServiceEnablement: vi.fn(),
       applyClientServiceEnablement: vi.fn(),
       rollbackClientServiceEnablement: vi.fn()

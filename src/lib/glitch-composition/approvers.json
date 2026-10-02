@@ -1,0 +1,10 @@
+{
+  "_doc": "Quién puede aprobar una excepción de licencia de Glitch: hoy, la licencia `press` de una foto de terceros en un Glitch Flash (una aprobación por pieza, `approval.flash` = el slug del Flash). Mismo patrón que scripts/foto/aprobadores.json (id, nombre, rol), pero un registro propio: ese gobierna el compositor de piezas con CTA y éste corre también en el artifact-worker. El manifiesto rechaza cualquier `approvedBy` que no esté aquí. Agregar a alguien es decisión del operador y va con commit. Ver docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md.",
+  "aprobadores": [
+    {
+      "id": "julio-reyes",
+      "nombre": "Julio Reyes",
+      "rol": "Operador de marca y editor de Glitch"
+    }
+  ]
+}

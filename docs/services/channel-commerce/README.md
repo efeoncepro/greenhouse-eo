@@ -362,7 +362,9 @@ alguien pregunta por tu categoría.
 
 **Por qué es el diferenciador de la línea.** La auditoría de anaquel físico la hacen varios. La lectura de si un
 motor de IA cita o recomienda tu producto en el momento de compra no la hace nadie en trade marketing LATAM, y
-Efeonce ya tiene el motor: Search Visibility 360 y el AI Visibility Grader.
+Efeonce ya tiene el motor: Search Visibility 360 y **Efeonce AEO Assessment** (nombre público del
+diagnóstico operado por el `AI Visibility Grader`, nombre técnico/histórico). Su entregable de marca
+es **Efeonce AI Visibility Report**. [ADR de naming](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 **Alcance incluido.** Disponibilidad, precio y contenido en PDP de retailers y marketplaces; calidad de ficha de
 producto; reviews; share of shelf digital; y visibilidad de la marca y sus productos en motores de respuesta IA.

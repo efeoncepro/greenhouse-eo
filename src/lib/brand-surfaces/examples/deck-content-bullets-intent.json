@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "La experiencia Efeonce",
+    "question": "¿Qué recibes al trabajar con nosotros?",
+    "answer": [
+      "Un sistema"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 2
+  },
+  "items": [
+    {
+      "title": "Un solo interlocutor",
+      "desc": "Tu Director de Cuenta coordina todas las líneas. Sin pérdida de contexto entre equipos."
+    },
+    {
+      "title": "Un equipo que opera como sistema",
+      "desc": "Estrategia, creatividad, medios y tecnología bajo el mismo estándar y la misma metodología."
+    },
+    {
+      "title": "Métricas en vivo en Greenhouse",
+      "desc": "OTD, FTR y Revenue Enabled en tu portal, no en un informe que llega tarde."
+    },
+    {
+      "title": "Cada ciclo suma al anterior",
+      "desc": "Loop Marketing: ningún trimestre empieza de cero."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "Growth",
+    "participantKind": "department"
+  }
+}

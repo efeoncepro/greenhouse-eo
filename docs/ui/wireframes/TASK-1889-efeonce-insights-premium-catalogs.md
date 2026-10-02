@@ -3,6 +3,9 @@
 Creado 2026-09-25 a partir del canvas aprobado por el operador. Describe las páginas que TASK-1889 debe producir en los
 catálogos `insights-report` (A4) e `insights-deck` (16:9), región por región, con sus datos, estados y reglas.
 
+> **Estado 2026-09-26:** implementado y en producción (TASK-1889 complete; releases `0e87c7a443a2` y
+> `f9257b9c94af`). Evidencia en el [dossier](../reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).
+
 - Visual direction mode: source-led
 - **Dirección aprobada:** [`TASK-1889-efeonce-insights-premium-catalogs-direction.md`](../visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md)
   con hojas durables en `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs/`.
@@ -87,6 +90,11 @@ plan. El documento no tiene acciones de negocio ni controles; los enlaces (índi
   `public/images/logos/axis/{gpt-isotype,gemini-isotype,claude-isologo,perplexity-icon}.svg`) copiados a los assets de
   ambos catálogos; disco blanco con isotipo al 60 % y nombre al lado.
 - Redes y contacto: SVG de `catalogs/deck-axis/assets/{social,contact}`; datos desde `src/config/efeonce-brand.ts`.
+- Variación en tablas y figuras: el triángulo sigue al valor (▲ subió, ▼ bajó) y el tono dice si el cambio es mejor o
+  peor para esa métrica. La dirección sale del propio hecho (`dimension.direction`), de la posición («menor es
+  mejor») o de una meta/banda de la misma métrica; sin dirección conocida, tono neutro. Clases `delta--better` /
+  `delta--plain` y `fig-delta--plain`; lógica en `render/figure-slots.ts` (`directionOf`, `higherIsBetterOf`,
+  `trendOf`).
 
 ## Copy Ledger
 
@@ -118,7 +126,8 @@ series se distingue sólo por color; lectura verificada en escala de grises; enl
 - Superficie: documentos PDF de los outputs `report_pdf` y `deck_pdf`. `Nav placement: none`.
 - Catálogos: `src/lib/artifact-composer/catalogs/insights-report/**` y `src/lib/artifact-composer/catalogs/insights-deck/**`
   (plantillas `.html`, `*.slots.json`, `registry.json`, `resolvers.ts`, molde y tokens compilados).
-- Mappers: `src/lib/efeonce-insights/render/report-mapper.ts`, `insights-deck-mapper.ts`, `figure-pages.ts`.
+- Mappers: `src/lib/efeonce-insights/render/report-mapper.ts` e `insights-deck-mapper.ts`, que comparten
+  `render/figure-slots.ts` (el `figure-pages.ts` v1 se retiró junto con el legado).
 - Geometría: `src/lib/artifact-composer/chart-geometry.ts` (sin cambios de contrato; cada catálogo decide tono y énfasis).
 - Primitives: `extend` de los catálogos v1 y de la geometría domain-free; ninguna librería de gráficos nueva.
 - Datos: `ChartSpec`, `EditorialPlan` y portada sellada de TASK-1888. Sin command ni store nuevos en esta task.

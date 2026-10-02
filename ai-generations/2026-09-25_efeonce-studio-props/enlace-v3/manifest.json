@@ -1,0 +1,267 @@
+{
+  "title": "Enlace",
+  "version": 3,
+  "date": "2026-09-25",
+  "status": "recurso-grafico-candidato-no-validado",
+  "masterbrand": "Efeonce",
+  "views": [
+    {
+      "id": "mug-magenta-frente",
+      "object": "mug-magenta",
+      "view": "frente",
+      "file": "individuales/mug-magenta-frente.png",
+      "source": "final/02-mugs-magenta-naranja.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-magenta-tres-cuartos",
+      "object": "mug-magenta",
+      "view": "tres-cuartos",
+      "file": "individuales/mug-magenta-tres-cuartos.png",
+      "source": "final/02-mugs-magenta-naranja.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-magenta-reverso",
+      "object": "mug-magenta",
+      "view": "reverso",
+      "file": "individuales/mug-magenta-reverso.png",
+      "source": "final/02-mugs-magenta-naranja.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-magenta-cenital",
+      "object": "mug-magenta",
+      "view": "cenital",
+      "file": "individuales/mug-magenta-cenital.png",
+      "source": "final/02-mugs-magenta-naranja.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-naranja-frente",
+      "object": "mug-naranja",
+      "view": "frente",
+      "file": "individuales/mug-naranja-frente.png",
+      "source": "final/02-mugs-magenta-naranja.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-naranja-tres-cuartos",
+      "object": "mug-naranja",
+      "view": "tres-cuartos",
+      "file": "individuales/mug-naranja-tres-cuartos.png",
+      "source": "final/02-mugs-magenta-naranja.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-naranja-reverso",
+      "object": "mug-naranja",
+      "view": "reverso",
+      "file": "individuales/mug-naranja-reverso.png",
+      "source": "final/02-mugs-magenta-naranja.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-naranja-cenital",
+      "object": "mug-naranja",
+      "view": "cenital",
+      "file": "individuales/mug-naranja-cenital.png",
+      "source": "final/02-mugs-magenta-naranja.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-blanco-frente",
+      "object": "mug-blanco",
+      "view": "frente",
+      "file": "individuales/mug-blanco-frente.png",
+      "source": "final/03-mugs-blanco-azul.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-blanco-tres-cuartos",
+      "object": "mug-blanco",
+      "view": "tres-cuartos",
+      "file": "individuales/mug-blanco-tres-cuartos.png",
+      "source": "final/03-mugs-blanco-azul.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-blanco-reverso",
+      "object": "mug-blanco",
+      "view": "reverso",
+      "file": "individuales/mug-blanco-reverso.png",
+      "source": "final/03-mugs-blanco-azul.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-blanco-cenital",
+      "object": "mug-blanco",
+      "view": "cenital",
+      "file": "individuales/mug-blanco-cenital.png",
+      "source": "final/03-mugs-blanco-azul.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-azul-frente",
+      "object": "mug-azul",
+      "view": "frente",
+      "file": "individuales/mug-azul-frente.png",
+      "source": "final/03-mugs-blanco-azul.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-azul-tres-cuartos",
+      "object": "mug-azul",
+      "view": "tres-cuartos",
+      "file": "individuales/mug-azul-tres-cuartos.png",
+      "source": "final/03-mugs-blanco-azul.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-azul-reverso",
+      "object": "mug-azul",
+      "view": "reverso",
+      "file": "individuales/mug-azul-reverso.png",
+      "source": "final/03-mugs-blanco-azul.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mug-azul-cenital",
+      "object": "mug-azul",
+      "view": "cenital",
+      "file": "individuales/mug-azul-cenital.png",
+      "source": "final/03-mugs-blanco-azul.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "agenda-frente",
+      "object": "agenda",
+      "view": "frente",
+      "file": "individuales/agenda-frente.png",
+      "source": "final/04-agenda.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "agenda-tres-cuartos",
+      "object": "agenda",
+      "view": "tres-cuartos",
+      "file": "individuales/agenda-tres-cuartos.png",
+      "source": "final/04-agenda.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "agenda-reverso",
+      "object": "agenda",
+      "view": "reverso",
+      "file": "individuales/agenda-reverso.png",
+      "source": "final/04-agenda.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "agenda-abierta",
+      "object": "agenda",
+      "view": "abierta",
+      "file": "individuales/agenda-abierta.png",
+      "source": "final/04-agenda.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mac-tapa-cenital",
+      "object": "mac",
+      "view": "tapa-cenital",
+      "file": "individuales/mac-tapa-cenital.png",
+      "source": "final/05-mac.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mac-cerrado-tres-cuartos",
+      "object": "mac",
+      "view": "cerrado-tres-cuartos",
+      "file": "individuales/mac-cerrado-tres-cuartos.png",
+      "source": "final/05-mac.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mac-abierto-reverso",
+      "object": "mac",
+      "view": "abierto-reverso",
+      "file": "individuales/mac-abierto-reverso.png",
+      "source": "final/05-mac.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "mac-abierto-frente",
+      "object": "mac",
+      "view": "abierto-frente",
+      "file": "individuales/mac-abierto-frente.png",
+      "source": "final/05-mac.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "pizarra-frente",
+      "object": "pizarra",
+      "view": "frente",
+      "file": "individuales/pizarra-frente.png",
+      "source": "final/06-pizarra.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "pizarra-tres-cuartos",
+      "object": "pizarra",
+      "view": "tres-cuartos",
+      "file": "individuales/pizarra-tres-cuartos.png",
+      "source": "final/06-pizarra.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "pizarra-perfil",
+      "object": "pizarra",
+      "view": "perfil",
+      "file": "individuales/pizarra-perfil.png",
+      "source": "final/06-pizarra.png",
+      "status": "propuesta-para-aprobacion"
+    },
+    {
+      "id": "pizarra-reverso",
+      "object": "pizarra",
+      "view": "reverso",
+      "file": "individuales/pizarra-reverso.png",
+      "source": "final/06-pizarra.png",
+      "status": "propuesta-para-aprobacion"
+    }
+  ],
+  "feedbackPreserved": [
+    "Logo pequeño en zona baja",
+    "Reverso limpio de agenda",
+    "Objetos aislados sobre blanco y multivista"
+  ],
+  "changes": [
+    "Marca incorporada a mugs magenta y naranja",
+    "Mismo módulo de superficie entre objetos",
+    "F11 descartado tras encontrar uso en otras agencias"
+  ],
+  "fixed": {
+    "module": "art/modulo-enlace.svg",
+    "geometry": "dos codos opuestos, radio exterior 160, interior 80, terminales diagonales de 80, celda 470",
+    "rowOffset": "0.5 celda en filas alternadas"
+  },
+  "flexible": [
+    "escala uniforme",
+    "tinta",
+    "contraste tonal",
+    "recorte de patrón por superficie"
+  ],
+  "provenance": {
+    "baseRenders": "../apertura-v1/renders",
+    "notebookBase": "../ideas-con-direccion-v2/bases/agenda.png",
+    "officeBase": "../ideas-con-direccion-v2/bases/oficina.png",
+    "graphics": "SVG locales dibujados; logotipos oficiales intactos; tipografía de archivos de fuente reales",
+    "method": "composición vectorial con perspectiva sobre bases generadas previamente"
+  },
+  "validation": {
+    "visualReview": "realizada",
+    "brandRecall": "no-medido",
+    "brandLift": "no-medido",
+    "plan": "VALIDACION.md"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "AD4b-45-equipo",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    },
+    {
+      "objeto": "polo-efeonce"
+    },
+    {
+      "objeto": "hoodie-efeonce"
+    },
+    {
+      "objeto": "spark-investigacion",
+      "vista": "cine"
+    },
+    {
+      "objeto": "spark-contenido",
+      "vista": "cine"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic ensemble movie poster still, vertical, a dark studio at night): in the LOWER two thirds of the frame, a team of four stands in a loose staggered V, all facing the camera and all looking straight into the lens; nobody looks at anyone else. In FRONT and in the center of the group, she (the woman of the references) wears the NAVY EFEONCE SOFTSHELL JACKET, framed from the knees up, arms relaxed, a calm confident half-smile. Half a step behind her, to her left, a Chilean strategist in her thirties with dark hair tied back wears the NAVY EFEONCE POLO; to her right, a Chilean art director in his late twenties with short dark hair and a light beard wears the NAVY EFEONCE HOODIE; further back, slightly out of focus, a Chilean developer in his forties with glasses wears the NAVY EFEONCE POLO. FOUR small Sparks are with them, each smaller than a head: two at the far LEFT edge and two at the far RIGHT edge of the group, at chest height, always above the people's waists. On the left, the Research Spark, copied EXACTLY from its reference and sharp; on the right, the Content Spark, copied EXACTLY from its reference and sharp; behind each of them, EXACTLY ONE more Spark (FOUR in total, never more), the same figures as the Spark references, a step farther back, smaller and out of focus, their LED eyes reading as glowing dots. The CENTER of the lowest fifth of the frame stays empty dark floor, no Sparks, no feet lit, nothing bright. REALISTIC ADULT PROPORTIONS: camera about three and a half meters away at chest height, 85mm. A strong cool teal-white rim light from behind cuts every silhouette from the dark and crosses a thin haze; a soft low key from the front models the faces. All heads stay BELOW 36% of the frame height. The TOP 30% of the frame is calm, deep dark studio space with nothing in it, only faint haze. Rich contrast, deep navy blacks, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the empty dark studio floor in the center of the lowest fifth, dissolved into deep shadow, no robots and no light on it",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "calm, deep dark studio space with only faint haze",
+      "tinta": "blanca"
+    }
+  }
+}

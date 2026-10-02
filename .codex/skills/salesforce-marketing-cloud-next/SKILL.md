@@ -34,6 +34,15 @@ al 2026-09-18 no añade un nuevo lanzamiento de Marketing Cloud posterior al 16/
 [references/release-ledger.md](references/release-ledger.md) antes de convertir estas superficies en alcance,
 roadmap, pricing o claim comercial.
 
+## Deck de práctica aprobado
+
+El deck Salesforce de «La órbita» (aprobado el 2026-09-29, TASK-1942) ya dice esta postura en una lámina:
+`decision-platform-coexistence` («Marketing Cloud: ¿Hay que migrar a Next? No por defecto.»), junto a la de Data 360 y
+consentimiento (`method-identity-consent`). Se compone con `deck-studio` (norma §4.6 de
+`docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md`); íconos de producto, insignia de partner y
+co-marcas quedan sujetos a autorización escrita y readback. No cambies la postura de la lámina sin cambiar primero el
+contrato de decisión de esta skill.
+
 ## Reglas duras
 
 - **Nunca** presentes Marketing Cloud Next como cambio de nombre o reemplazo automático de Marketing Cloud Engagement o Account Engagement.

@@ -1,9 +1,9 @@
 # Colorimetría de la fotografía de marca Efeonce — V1
 
 > **Tipo de documento:** Especificación técnica de marca (colorimetría y medición)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-21
+> **Última actualización:** 2026-10-02 por Claude — 1.1: excepciones del registro cine a §5.1, §5.3 y §6 ([delta 2026-10-02](#delta-2026-10-02--excepciones-del-registro-cine)). Antes, 2026-09-21
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Bloques de prompt y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este documento fija **cómo se ve el color** en una foto de marca propia de Efeonce y **cómo se mide**. El objetivo
@@ -502,3 +502,16 @@ Las tres quedan dentro del rango neutro-cálido del canon, contra los **+20,1** 
 
 > **Regla que queda:** antes de pedir una corrección de color, pregunta **qué está fotografiando la pieza**. Si lo
 > que está en cuadro es genérico, la colorimetría correcta sólo produce una foto de stock bien medida.
+
+## Delta 2026-10-02 — excepciones del registro cine
+
+Las reglas de este documento valen para los registros documental, puesta en escena y C. El
+[registro cine](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (1.9) las relaja de forma declarada, y `pnpm foto:prompt` lo aplica
+sólo con `"registro": "cine"` en la ficha (`AJUSTES_CINE`; detalle en
+[prompts y pipeline, delta 2026-10-02 (b)](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02-b--el-registro-cine-en-fotoprompt)):
+
+| Regla de este documento | En cine |
+|---|---|
+| §5.1 Luz neutro-cálida, sombras nunca azules; llave de ventana o haz de sol | Balance **cool-neutral**, sombras **navy-negro** (nunca ámbar ni azul saturado); una sola fuente dura de lado, sin relleno |
+| §5.3 Lámparas prácticas apagadas | **[decisión del operador, 2026-10-02]** Pueden estar encendidas **sólo como bokeh grande, frío y lejano** al fondo; nunca nítidas, cálidas ni dentro de la reserva del titular. En los demás registros siguen apagadas |
+| §6 Uniforme navy nunca sobre set azul o tinta | El set cine es navy-negro y el uniforme se pide **navy profundo, nunca royal**; el **hoodie conserva el azul royal de su kit**. La convivencia sigue sin medir ([registro cine §6](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#6-el-color)) |

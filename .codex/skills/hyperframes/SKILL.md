@@ -24,6 +24,14 @@ If the composition belongs to Efeonce Creative Studio/Globe or the user asks abo
 deterministic finishing and consume `0 Studio Credits`; only separately invoked generative capabilities are
 metered. Zero credits does not mean zero capacity cost, and this skill never reserves or settles the ledger.
 
+If the composition is for **Glitch** (Efeonce's weekly magazine), do not author it here: its approved motion lives in
+the brand workshop repo (`efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion`) and is run with
+`pnpm -C ../efeonce-brand-workshop --filter glitch-motion …` (skill `efeonce-graphic-line` → `references/glitch.md` §12).
+It is also a live example of lessons that apply to any composition: register the timeline under its literal id
+(`window.__timelines["<id>"]`); set every initial state with `gsap.set` at t=0 and use `immediateRender: false` on later
+tweens of the same property; keep each composition under ~600 lines for `hyperframes lint` by generating repeated cells
+from JSON; and verify ProRes 4444 alpha output (`yuva444p12le`) with a real check, not by eye.
+
 ### Visual Identity Gate
 
 <HARD-GATE>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+<defs><clipPath id="a"><rect x="60" y="390" width="455" height="330"/></clipPath><clipPath id="b"><rect x="572" y="390" width="455" height="330"/></clipPath><clipPath id="c"><rect x="1084" y="390" width="455" height="330"/></clipPath></defs>
+<rect x="0" y="0" width="1600" height="1000" rx="0" fill="#F5F3EE" stroke="none"/><rect x="0" y="0" width="1600" height="172" rx="0" fill="#023C70" stroke="none"/>
+<text x="60" y="65" fill="#A7CBE4" font-family="Poppins,Arial,sans-serif" font-size="17" font-weight="600" letter-spacing="3">EFEONCE  /  EXPLORACIÓN DE LENGUAJE</text>
+<text x="60" y="130" fill="#FFFFFF" font-family="Poppins,Arial,sans-serif" font-size="48" font-weight="700" >Del círculo al sistema</text>
+<text x="60" y="210" fill="#667987" font-family="Poppins,Arial,sans-serif" font-size="18" font-weight="400" >Tres rutas de composición; ninguna copia ni despega fragmentos del isotipo sobre los objetos.</text>
+
+
+<rect x="60" y="244" width="455" height="590" rx="22" fill="#FFFFFF" stroke="none"/>
+<text x="88" y="296" fill="#0375DB" font-family="Poppins,Arial,sans-serif" font-size="15" font-weight="700" letter-spacing="2">01 / A</text>
+<text x="88" y="337" fill="#023C70" font-family="Poppins,Arial,sans-serif" font-size="28" font-weight="700" >Trayectoria abierta</text>
+<text x="88" y="365" fill="#667987" font-family="Poppins,Arial,sans-serif" font-size="15" font-weight="400" >El recorrido estructura la composición.</text>
+<g clip-path="url(#a)">
+<path d="M-18 670 C90 472 220 410 343 432 C484 457 493 594 407 680" fill="none" stroke="#023C70" stroke-width="29" stroke-linecap="round"/>
+<path d="M429 409 C482 443 514 495 537 552" fill="none" stroke="#0375DB" stroke-width="29" stroke-linecap="round"/>
+<rect x="144" y="498" width="180" height="125" rx="15" fill="#EEF3F2"/>
+<path d="M164 546 H300 M164 574 H260" stroke="#B8C9CB" stroke-width="12" stroke-linecap="round"/>
+</g>
+<path d="M88 742 H487" stroke="#D9E1E2" stroke-width="1"/>
+<text x="88" y="782" fill="#173044" font-family="Poppins,Arial,sans-serif" font-size="16" font-weight="500" >La curva rodea una obra o decisión;</text>
+<text x="88" y="808" fill="#173044" font-family="Poppins,Arial,sans-serif" font-size="16" font-weight="500" >el vacío permite que el trabajo respire.</text>
+
+
+<rect x="572" y="244" width="455" height="590" rx="22" fill="#FFFFFF" stroke="none"/>
+<text x="600" y="296" fill="#0375DB" font-family="Poppins,Arial,sans-serif" font-size="15" font-weight="700" letter-spacing="2">02 / B</text>
+<text x="600" y="337" fill="#023C70" font-family="Poppins,Arial,sans-serif" font-size="28" font-weight="700" >Punto de encuentro</text>
+<text x="600" y="365" fill="#667987" font-family="Poppins,Arial,sans-serif" font-size="15" font-weight="400" >Dos recorridos crean un foco común.</text>
+<g clip-path="url(#b)">
+<circle cx="736" cy="559" r="152" fill="none" stroke="#023C70" stroke-width="25"/>
+<circle cx="884" cy="559" r="152" fill="none" stroke="#0375DB" stroke-width="25"/>
+<path d="M810 492 L810 624" stroke="#88BFE2" stroke-width="12" stroke-linecap="round"/>
+<circle cx="810" cy="559" r="22" fill="#FFFFFF" stroke="#88BFE2" stroke-width="8"/>
+</g>
+<path d="M600 742 H999" stroke="#D9E1E2" stroke-width="1"/>
+<text x="600" y="782" fill="#173044" font-family="Poppins,Arial,sans-serif" font-size="16" font-weight="500" >La intersección marca una elección;</text>
+<text x="600" y="808" fill="#173044" font-family="Poppins,Arial,sans-serif" font-size="16" font-weight="500" >el foco pertenece al contenido.</text>
+
+
+<rect x="1084" y="244" width="455" height="590" rx="22" fill="#FFFFFF" stroke="none"/>
+<text x="1112" y="296" fill="#0375DB" font-family="Poppins,Arial,sans-serif" font-size="15" font-weight="700" letter-spacing="2">03 / C</text>
+<text x="1112" y="337" fill="#023C70" font-family="Poppins,Arial,sans-serif" font-size="28" font-weight="700" >Ritmo de retorno</text>
+<text x="1112" y="365" fill="#667987" font-family="Poppins,Arial,sans-serif" font-size="15" font-weight="400" >Variaciones con una misma dirección.</text>
+<g clip-path="url(#c)">
+<path d="M1045 712 A345 345 0 0 1 1516 350" fill="none" stroke="#023C70" stroke-width="22"/>
+<path d="M1093 716 A270 270 0 0 1 1490 416" fill="none" stroke="#0375DB" stroke-width="22"/>
+<path d="M1140 719 A200 200 0 0 1 1466 483" fill="none" stroke="#A8C6D9" stroke-width="22"/>
+<rect x="1294" y="522" width="128" height="105" rx="14" fill="#F0F3F0"/>
+</g>
+<path d="M1112 742 H1511" stroke="#D9E1E2" stroke-width="1"/>
+<text x="1112" y="782" fill="#173044" font-family="Poppins,Arial,sans-serif" font-size="16" font-weight="500" >La repetición expresa ciclos que suman;</text>
+<text x="1112" y="808" fill="#173044" font-family="Poppins,Arial,sans-serif" font-size="16" font-weight="500" >se usa con baja frecuencia.</text>
+
+<rect x="60" y="866" width="1479" height="53" rx="12" fill="#E7EFF2" stroke="none"/>
+<text x="84" y="899" fill="#023C70" font-family="Poppins,Arial,sans-serif" font-size="16" font-weight="600" >Lectura: A merece desarrollo; B y C revelan riesgos de verse como Venn o radar si se usan literalmente.</text>
+
+<text x="60" y="965" fill="#667987" font-family="Poppins,Arial,sans-serif" font-size="13" font-weight="400" >Estudio gráfico 01 · propuesta, no identidad aprobada</text>
+<text x="1538" y="965" fill="#023C70" font-family="Poppins,Arial,sans-serif" font-size="13" font-weight="600" text-anchor="end">25 SEP 2026</text>
+</svg>

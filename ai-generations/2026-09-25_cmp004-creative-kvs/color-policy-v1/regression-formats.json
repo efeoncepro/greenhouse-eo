@@ -1,0 +1,73 @@
+{
+  "ref": "HEAD",
+  "refSha": "19a00465c",
+  "candidato": "scripts/foto/componer-cta.mjs",
+  "resultados": [
+    {
+      "clave": "2691d7277cfceca2",
+      "id": "p1-atril-busqueda-16x9-cta",
+      "planes": [
+        "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json#p1-atril-busqueda-16x9-cta"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-PU7y9G/2691d7277cfceca2"
+    },
+    {
+      "clave": "83316d40fb80fea5",
+      "id": "p1-atril-busqueda-9x16-cta",
+      "planes": [
+        "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json#p1-atril-busqueda-9x16-cta"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-PU7y9G/83316d40fb80fea5"
+    },
+    {
+      "clave": "58efa0730f07c50b",
+      "id": "p2-expediente-9x16-cta",
+      "planes": [
+        "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json#p2-expediente-9x16-cta"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-PU7y9G/58efa0730f07c50b"
+    },
+    {
+      "clave": "acbed7b7061432b3",
+      "id": "p2-expediente-16x9-cta",
+      "planes": [
+        "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json#p2-expediente-16x9-cta"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-PU7y9G/acbed7b7061432b3"
+    },
+    {
+      "clave": "f99e6ebc5e574504",
+      "id": "p3-megafono-9x16-cta",
+      "planes": [
+        "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json#p3-megafono-9x16-cta"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-PU7y9G/f99e6ebc5e574504"
+    },
+    {
+      "clave": "d371646b7e1980bc",
+      "id": "p3-megafono-16x9-cta",
+      "planes": [
+        "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json#p3-megafono-16x9-cta"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-PU7y9G/d371646b7e1980bc"
+    }
+  ]
+}

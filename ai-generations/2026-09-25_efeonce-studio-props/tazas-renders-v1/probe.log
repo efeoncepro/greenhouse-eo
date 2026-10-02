@@ -1,0 +1,11 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/render.py:24: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world.use_nodes=True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/render.py:32: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name);m.use_nodes=True
+00:19.055  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/pruebas/blanco/01-frente-palabra.png'
+00:21.450  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/pruebas/blanco/09-cenital.png'
+00:23.574  render           | Saved: '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-25_efeonce-studio-props/tazas-renders-v1/pruebas/blanco/10-base-inferior.png'
+RENDER_FINISHED 3
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

@@ -25,6 +25,8 @@ Todos viven en OneDrive `5. Contenidos/`:
 
 Cada kit trae un **manifiesto** que dice qué es cada vista y **cuándo usarla**. Leerlo antes de elegir.
 
+**Dónde viven los archivos de `ai-generations/`:** las rutas `ai-generations/...` son lógicas; si una falta en disco, `pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>` antes de componer, nunca regenerarla ni sustituirla ([contrato](../AI_GENERATIONS_STORAGE_V1.md)).
+
 ## 2. Cómo elegir la referencia
 
 1. **Por el ángulo de la toma.** De espaldas → vista de espalda; tres cuartos → la que corresponda.

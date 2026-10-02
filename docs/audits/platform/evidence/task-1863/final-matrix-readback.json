@@ -1,0 +1,130 @@
+{
+  "checkedAt": "2026-09-28T11:11:00.374488+00:00",
+  "deploymentSha": "d86edb78419dad324943804e8d003dd18ffbea31",
+  "matrices": {
+    "Sky": {
+      "httpStatus": 200,
+      "blendedOverall": null,
+      "signals": [],
+      "rows": [
+        {
+          "market": "CL",
+          "locale": "es-CL",
+          "runId": "grun-c30c2278-233c-469d-8274-fe4e814155f0",
+          "gate": {
+            "status": "ready",
+            "reason": "Diagnóstico completo con cobertura suficiente.",
+            "nextAction": "Revisa el plan de acción priorizado del reporte."
+          },
+          "overallScore": 45.2
+        },
+        {
+          "market": "AR",
+          "locale": "es-AR",
+          "runId": "grun-3aa28d49-8810-4312-8d6f-d94b35fcd44d",
+          "gate": {
+            "status": "ready",
+            "reason": "Diagnóstico completo con cobertura suficiente.",
+            "nextAction": "Revisa el plan de acción priorizado del reporte."
+          },
+          "overallScore": 42
+        },
+        {
+          "market": "BR",
+          "locale": "pt-BR",
+          "runId": "grun-a4e1e533-e440-4210-abd5-74bd06ccdcaf",
+          "gate": {
+            "status": "ready",
+            "reason": "Diagnóstico completo con cobertura suficiente.",
+            "nextAction": "Revisa el plan de acción priorizado del reporte."
+          },
+          "overallScore": 36.1
+        },
+        {
+          "market": "CO",
+          "locale": "es-CO",
+          "runId": "grun-82be3d4d-c4ae-4012-99ba-23fca938d6d3",
+          "gate": {
+            "status": "ready",
+            "reason": "Diagnóstico completo con cobertura suficiente.",
+            "nextAction": "Revisa el plan de acción priorizado del reporte."
+          },
+          "overallScore": 38.7
+        },
+        {
+          "market": "PE",
+          "locale": "es-PE",
+          "runId": "grun-e74023ef-4dd8-46bb-bce1-d52a92d98ac4",
+          "gate": {
+            "status": "partial",
+            "reason": "Algunos motores no respondieron; el reporte es parcial pero honesto.",
+            "nextAction": "Vuelve a correr el análisis para completar los motores faltantes."
+          },
+          "overallScore": 37.6
+        },
+        {
+          "market": "UY",
+          "locale": "es-UY",
+          "runId": "grun-098218ce-3afa-4b98-b127-445dc875fcb1",
+          "gate": {
+            "status": "ready",
+            "reason": "Diagnóstico completo con cobertura suficiente.",
+            "nextAction": "Revisa el plan de acción priorizado del reporte."
+          },
+          "overallScore": 38.8
+        }
+      ]
+    },
+    "Efeonce": {
+      "httpStatus": 200,
+      "blendedOverall": null,
+      "signals": [],
+      "rows": [
+        {
+          "market": "CL",
+          "locale": "es-CL",
+          "runId": "grun-e7236640-99fc-4b71-807b-d83f4a78a825",
+          "gate": {
+            "status": "ready",
+            "reason": "Diagnóstico completo con cobertura suficiente.",
+            "nextAction": "Revisa el plan de acción priorizado del reporte."
+          },
+          "overallScore": 38.5
+        },
+        {
+          "market": "CO",
+          "locale": "es-CO",
+          "runId": "grun-7f1451b4-626c-46b8-99c0-2bf75aef1849",
+          "gate": {
+            "status": "ready",
+            "reason": "Diagnóstico completo con cobertura suficiente.",
+            "nextAction": "Revisa el plan de acción priorizado del reporte."
+          },
+          "overallScore": 43
+        },
+        {
+          "market": "MX",
+          "locale": "es-MX",
+          "runId": "grun-7704cf62-4b8e-4670-ac44-d37aef5832e0",
+          "gate": {
+            "status": "ready",
+            "reason": "Diagnóstico completo con cobertura suficiente.",
+            "nextAction": "Revisa el plan de acción priorizado del reporte."
+          },
+          "overallScore": 38.2
+        },
+        {
+          "market": "PE",
+          "locale": "es-PE",
+          "runId": "grun-5d9f5ef5-1c03-430b-98ff-1b8616ca7981",
+          "gate": {
+            "status": "ready",
+            "reason": "Diagnóstico completo con cobertura suficiente.",
+            "nextAction": "Revisa el plan de acción priorizado del reporte."
+          },
+          "overallScore": 38.9
+        }
+      ]
+    }
+  }
+}

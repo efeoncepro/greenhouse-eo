@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el foco sobre la prueba</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-focus` (surface deck, tema oscuro, TASK-1928). El foco de AXIS sobre la foto: la escena en penumbra
+      y un círculo de luz sobre lo que importa (la plantilla lo pinta con los valores que resolvió el contrato), con la
+      órbita del foco como capa. A la izquierda, la voz gigante y la cifra en Bricolage con su rótulo y su fuente. Foto a
+      sangre: sin logo ni burbuja. Referencia: DeckContenidoFoco (C-foco2).
+    -->
+    <main class="gl-slide gl-cf" data-gl-root data-slot="frame">
+      <figure class="gl-cf-photo" data-slot="photo">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <div class="gl-cf-veil" aria-hidden="true"></div>
+      <figure class="gl-cf-light" data-slot="light" aria-hidden="true">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-layer" data-slot="orbit">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-ring-small" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Resultados · Sky Airlines</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Llegan las entregas a tiempo?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Casi</span><span data-slot-field="answer">siempre</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <div data-slot="figure">
+        <p class="gl-cf-figure" data-slot-field="value">88 %</p>
+        <p class="gl-cf-label" data-slot-field="label">de las entregas de Sky llegaron a tiempo.</p>
+      </div>
+      <p class="gl-cf-source" data-slot="source">Fuente: caso publicado de Sky Airlines.</p>
+    </main>
+  </body>
+</html>

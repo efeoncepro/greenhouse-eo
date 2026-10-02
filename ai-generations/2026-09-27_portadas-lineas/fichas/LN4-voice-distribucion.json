@@ -1,0 +1,18 @@
+{
+  "id": "LN4-voice-distribucion",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    { "objeto": "chaqueta-softshell-efeonce" }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark studio at night): a Latin American media and distribution lead in her early thirties, straight dark hair tied back, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands on the RIGHT half of the frame, framed from the waist up, looking straight into the lens with calm confidence. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. In her open palm, held at chest height, glows ONE small bright sphere of warm red-orange light (#F83902). From that single sphere, dozens of thin beams of the same red-orange light fan out behind her into the depth of the studio, each beam ending on a small glowing screen floating far away in the haze: phones, a laptop, a billboard, a TV, a podcast microphone glow, all tiny and out of focus, like one message reaching many audiences at once. The sphere is the brightest light: it lights her face, hand and jacket in warm orange; a cool rim light from behind separates her from the dark. Haze catches the beams. The LEFT 45% of the frame is calm, deep dark studio space with only faint haze, no beams, no screens, no objects. Rich contrast, punchy color, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": { "muro": "the calm, deep dark studio space on the left 45% of the frame", "tinta": "blanca" }
+  }
+}

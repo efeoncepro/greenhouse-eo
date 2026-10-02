@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "httpStatus": 200,
+  "cost": 0.0035,
+  "secretSource": "secret_manager",
+  "summary": [
+    {
+      "keyword": "Banco Pichincha Perú",
+      "statusCode": 20000,
+      "statusMessage": "Ok.",
+      "totalCount": 0,
+      "pichincha": [
+        {
+          "rank": 1,
+          "groupRank": 1,
+          "url": "https://www.pichincha.pe/",
+          "title": "Banco Pichincha"
+        }
+      ],
+      "top5": [
+        {
+          "rank": 1,
+          "domain": "www.pichincha.pe",
+          "url": "https://www.pichincha.pe/",
+          "title": "Banco Pichincha"
+        },
+        {
+          "rank": 6,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/BancoPichinchaPeru/?locale=es_LA",
+          "title": "Banco Pichincha Perú | Lima"
+        },
+        {
+          "rank": 8,
+          "domain": "pe.linkedin.com",
+          "url": "https://pe.linkedin.com/company/banco-pichincha-pe",
+          "title": "Banco Pichincha Perú"
+        },
+        {
+          "rank": 10,
+          "domain": "play.google.com",
+          "url": "https://play.google.com/store/apps/details/APP_Banco_Pichincha_Per%C3%BA?id=pe.pichincha.bm&hl=es_PE",
+          "title": "APP Banco Pichincha Perú - Apps en Google Play"
+        },
+        {
+          "rank": 12,
+          "domain": "es.wikipedia.org",
+          "url": "https://es.wikipedia.org/wiki/Banco_Pichincha",
+          "title": "Banco Pichincha - Wikipedia, la enciclopedia libre"
+        }
+      ],
+      "aiOverview": []
+    },
+    {
+      "keyword": "cuenta de ahorros Banco Pichincha",
+      "statusCode": 40000,
+      "statusMessage": "You can set only one task at a time.",
+      "totalCount": null,
+      "pichincha": [],
+      "top5": [],
+      "aiOverview": []
+    },
+    {
+      "keyword": "mejor cuenta de ahorros Perú",
+      "statusCode": 40000,
+      "statusMessage": "You can set only one task at a time.",
+      "totalCount": null,
+      "pichincha": [],
+      "top5": [],
+      "aiOverview": []
+    },
+    {
+      "keyword": "cuenta de ahorros alto interés Perú",
+      "statusCode": 40000,
+      "statusMessage": "You can set only one task at a time.",
+      "totalCount": null,
+      "pichincha": [],
+      "top5": [],
+      "aiOverview": []
+    },
+    {
+      "keyword": "depósito a plazo fijo Perú",
+      "statusCode": 40000,
+      "statusMessage": "You can set only one task at a time.",
+      "totalCount": null,
+      "pichincha": [],
+      "top5": [],
+      "aiOverview": []
+    },
+    {
+      "keyword": "préstamo personal online Perú",
+      "statusCode": 40000,
+      "statusMessage": "You can set only one task at a time.",
+      "totalCount": null,
+      "pichincha": [],
+      "top5": [],
+      "aiOverview": []
+    },
+    {
+      "keyword": "préstamo personal Perú",
+      "statusCode": 40000,
+      "statusMessage": "You can set only one task at a time.",
+      "totalCount": null,
+      "pichincha": [],
+      "top5": [],
+      "aiOverview": []
+    },
+    {
+      "keyword": "banco para ahorrar Perú",
+      "statusCode": 40000,
+      "statusMessage": "You can set only one task at a time.",
+      "totalCount": null,
+      "pichincha": [],
+      "top5": [],
+      "aiOverview": []
+    }
+  ]
+}

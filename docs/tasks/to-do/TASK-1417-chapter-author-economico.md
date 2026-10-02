@@ -1,5 +1,19 @@
 # TASK-1417 — Chapter-author económico: la lámina `pricing` desde el motor de pricing (nunca desde el LLM)
 
+## Delta 2026-09-28 — el binder de montos de TASK-1930 espera estos hechos
+
+- `src/lib/brand-surfaces/deck-recipes/bindings/binders/money.ts` imprime hoy `[MONTO]` en todo slot `money`
+  (`no-frozen-quote`) y quita una línea de `content-pricing-live.lineItems` con un monto escrito. Al cerrar esta task,
+  el Slice 5 de TASK-1930 cambia ese binder para consumir los hechos económicos (ya redactados) con `source:
+  'economic-facts'` y su `evidenceRef`, sin recalcularlos. Mapa de slots: `content-pricing.amounts`,
+  `content-pricing-stage.amounts`, `content-pricing-live.total` y `content-pricing-live.lineItems`.
+
+## Delta 2026-09-27 — segundo consumidor de los hechos económicos
+
+- TASK-1930 liga los slots `money` de las recetas de cotización del deck «La órbita» (`content-pricing`,
+  `content-pricing-stage`, `content-pricing-live`) a los hechos económicos de esta task. No los recalcula ni lee la
+  cotización por su cuenta: por eso los hechos deben poder importarse sin la forma de `PricingFull`.
+
 ## Delta 2026-08-02 — Consumer de ProposalEconomicProjection
 
 El author ya no debe leer una simulación suelta como contrato final. Consumirá una `ProposalEconomicProjection`
@@ -248,6 +262,7 @@ Mismo diagrama que diagnóstico con la fuente cambiada: `simulación (engine) �
 - [ ] Eval baseline verde contra el golden SKY (fixture frozen) + mutaciones adversariales.
 - [ ] Corrida real: simulación → propose → confirm → `composeArtifact` renderiza; frame revisado.
 - [ ] `pnpm composer:visual-gate` sigue a 0 px (no se toca el catálogo).
+- [ ] (Delta 2026-09-27) Los hechos económicos se exportan desde un módulo sin dependencias de las plantillas de `deck-axis` (la forma de `PricingFull` vive sólo en `toSlides`), y TASK-1930 los consume sin copiar la derivación.
 
 ## Verification
 

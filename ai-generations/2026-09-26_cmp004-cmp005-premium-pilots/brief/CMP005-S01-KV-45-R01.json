@@ -1,0 +1,17 @@
+{
+  "id": "CMP005-S01-KV-45-R01",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "manos",
+  "escena": "PRECISE PHOTOGRAPHIC EDIT of the supplied image. Preserve the camera, three physical planes, screen with bright azure charts and tiny orange marker, white Magic Keyboard, silver Mac Studio, Studio Display, iPad showing a usability test, pointing hands, neutral daylight, silver mineral desk and genuinely blurred dark chair foreground. Change only the material and exposure of the real plaster wall: it becomes deeply shaded matte neutral CHARCOAL MINERAL PLASTER, with visible fine physical grain, RGB approximately 35,35,35 throughout the clear upper 35 percent. This is a real dark material in the photographed room, not a digital overlay, scrim, vignette or gradient. It remains neutral with no brown, amber or blue cast. Keep the desk, skin and digital screens well exposed and the azure #0375DB vivid and present in the work; the room is not underexposed. The motivated hard window light can still rake the far-right wall BELOW 40 percent frame height only. The upper 35 percent is uninterrupted charcoal plaster, without objects or bright patches, reserved for later headline and action. Do not move the iPad or reduce the digital work. Native portrait 4:5. Modern Apple hardware, slim aluminum screens and thin even tablet bezels. No captions, headlines, logos, words, numbers or signature in the generated photograph. The small orange #F55D01 friction marker is the only secondary accent; no green. Natural 5200K daylight, white materials stay white, neutral shadows. Maintain fine skin texture and a real precise professional gesture.",
+  "lecho": {
+    "objeto": "the nearest real charcoal upholstered chair back, a softly curved physical foreground edge completely out of focus",
+    "tono": "DARK neutral near-black charcoal, no brown cast"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the genuine very dark charcoal mineral plaster wall, neutral, finely grained and evenly shaded",
+      "tinta": "blanca"
+    }
+  }
+}

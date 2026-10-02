@@ -63,6 +63,10 @@ directo en la historia, encuadres cerrados y marca temprana [S1]. TikTok propone
 movimiento y sonido [S2], y también recomienda estética DIY/no excesivamente pulida [S3].
 Probar **cinematográfico vs documental/nativo** según placement; no convertir una estética en dogma.
 
+⚠️ **No confundir con el registro cine de la fotografía Efeonce** (ficción declarada: el servicio como fenómeno de
+luz). Ese registro tiene alcance acotado —los casos de §2 del registro cine; en publicidad con personas del equipo, `alcance: publicidad-prueba`, en prueba— y en 9:16 y 4:5 publicitarios
+está **en prueba**: [SKILL §Registro cine](../SKILL.md#registro-cine-en-publicidad--en-prueba-2026-09-27).
+
 Timelines siguientes = **hipótesis de montaje**, no ventanas universales de atención:
 
 | Receta | Apertura | Desarrollo | Resolución / CTA | Control |

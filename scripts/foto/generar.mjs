@@ -30,7 +30,16 @@ marca y el MACRO DEL BORDADO de cada prenda con emblema. Nadie copia rutas a man
 }
 
 const ficha = JSON.parse(readFileSync(fichaPath, 'utf8'))
-const { prompt, size, imagenes } = construirPrompt(ficha)
+const { prompt, size, imagenes, avisoCaso } = construirPrompt(ficha)
+
+// Ficha cine recién creada con `foto:cine:nueva`: no se gasta mientras la escena siga siendo la de la receta.
+if (ficha.registro === 'cine' && /^REESCRIBIR\b/.test(ficha.escena ?? '')) {
+  console.error(`  ✗ ${ficha.id ?? 'ficha'}: la escena todavía es la de la receta (empieza con «REESCRIBIR»). Escríbela y completa ${(ficha.__completar ?? []).join(', ') || 'los campos cine'} antes de generar.`)
+  process.exit(1)
+}
+
+// Excepción declarada de caso de cliente: se anuncia antes de gastar.
+if (avisoCaso) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${avisoCaso}`)
 
 const valor = k => {
   const i = args.indexOf(`--${k}`)

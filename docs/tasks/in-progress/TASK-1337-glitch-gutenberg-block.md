@@ -1,5 +1,18 @@
 # TASK-1337 — Public Site Gutenberg Glitch Block
 
+## Delta 2026-09-28 — el primer Glitch Flash salió con el callout v1
+
+- El post 251941 (`/glitch/glitch-flash-claude-sonnet-5-5/`, publicado el 2026-09-28) lleva un
+  `efeoncepro/glitch-drop` que rinde el **callout v1**: el v2 aprobado el 2026-09-27 sigue sin desplegar.
+- Content Factory (`GutenbergArticleSpec`) no tiene `kind` para `efeoncepro/glitch-drop`. Receta usada y documentada en
+  `.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md`: párrafo marcador
+  `__GLITCH_DROP__` en el spec → eval PHP gobernado (`parse_blocks`, reemplazar por el bloque con `attrs.content`,
+  `serialize_blocks`, `wp_update_post(wp_slash(…))`). El texto va en el atributo `content`, con `<br>` entre frases y
+  sin enlaces; nunca markup a mano.
+- Numeración abierta: el blog ya tiene «Glitch #16» (2026-07-21) y «Glitch #17» (2026-07-28, post 251605), mientras el
+  sistema gráfico dice que la próxima es la #17. El «antes de publicar la #17» del Delta 2026-09-27 depende de esa
+  respuesta del operador.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -32,6 +45,23 @@
 ## Summary
 
 Implementar un bloque Gutenberg propio para el POV editorial de `Glitch de la semana`: visible como **Glitch**, técnico como `efeoncepro/glitch-drop`. El bloque reemplaza el uso semánticamente incorrecto de `core/quote` para comentarios de Efeonce, sin migrar posts históricos en V1.
+
+## Delta 2026-09-27
+
+- **Callout «DROP» v2 aprobado por el operador** (Julio Reyes, 2026-09-27: «Vamos en todas con tu recomendación»),
+  desde la **#17**: bloque navy, puntos + wordmark + «DROP», remate en Bricolage 800 con manzana, porqué en Poppins,
+  bytes en la esquina. Reemplaza al v1 que está en producción (panel claro navy al 5 %, barra navy, wordmark 18 px).
+  Fuente: [norma de Glitch §6](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#6-blog--aprobado-2026-09-27)
+  y [Delta — blog y lente aprobados del ADR](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--blog-y-lente-aprobados).
+- **Qué exige:** el bloque `efeoncepro/glitch-drop` debe pasar al v2 **antes de publicar la #17**. Los posts anteriores
+  quedan con el v1.
+- `[verificar]` **Cómo convive el v1 con el v2:** el bloque es **dinámico** (`block.json` apiVersion 3 + `render.php`,
+  ver el Delta 2026-07-04), así que cambiar `render.php` re-renderiza también los posts anteriores. Para que esos posts
+  queden con el v1 hace falta versionar el render (por ejemplo, un atributo de variante con el v1 como valor por
+  defecto de los bloques existentes y el v2 para los nuevos) o un bloque nuevo. La decisión técnica se toma al
+  implementar; esta task no cambia de lifecycle por este Delta.
+- El callout v2 **no** es plantilla del Artifact Composer (TASK-1923 lo deja fuera de alcance): vive sólo en este
+  bloque.
 
 ## Delta 2026-07-04 — Implementación + verificación live
 

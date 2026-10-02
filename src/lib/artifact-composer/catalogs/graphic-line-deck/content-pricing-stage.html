@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · la cotización en escena</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-pricing`, composición `stage` (surface deck, tema oscuro, TASK-1928). Los tres planes como fichas
+      en perspectiva sobre la plataforma de luz, con su reflejo; el recomendado al frente, en blanco con el borde de
+      halo, y la selección de Finanzas. La voz en flujo a la izquierda. Referencia: DeckCotizacionEscena.
+    -->
+    <main class="gl-slide gl-pcs" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-pcs-bg" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-pcs-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-pcs-scene">
+        <ol class="gl-pcs-plans" data-slot="plans">
+          <li class="gl-pcs-plan" data-gl-select-item>
+            <p class="gl-pcs-label" data-slot-field="label">Recomendado</p>
+            <p class="gl-pcs-name" data-slot-field="name">Basic</p>
+            <p class="gl-pcs-tagline" data-slot-field="tagline">Para empezar a medir</p>
+            <p class="gl-pcs-amount" data-slot-field="amount">[MONTO]</p>
+            <p class="gl-pcs-period" data-slot-field="period">al mes · neto + IVA</p>
+            <ul class="gl-pcs-features" data-slot-field="features">
+              <li class="gl-pcs-feature"><span data-slot-field="text">Dashboard y KPIs</span></li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Inversión</p>
+        <div class="gl-flow-voice">
+          <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo se cotiza?</span></p>
+          <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Por</span><span data-slot-field="answer">capacidad</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+          <p class="gl-body gl-flow-body" data-slot="body">Capacidad gobernada, <strong>nunca</strong> por horas ni piezas.</p>
+          <p class="gl-flow-legal" data-slot="legal">Valores netos, IVA no incluido.</p>
+        </div>
+      </div>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

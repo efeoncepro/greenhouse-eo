@@ -1,0 +1,23 @@
+{
+  "document": "brochure",
+  "slides": [
+    {
+      "recipeId": "cover-brochure-line-brand"
+    },
+    {
+      "recipeId": "proposal-cinematic-creative"
+    },
+    {
+      "recipeId": "proposal-cinematic-seo"
+    },
+    {
+      "recipeId": "method-eeat"
+    },
+    {
+      "recipeId": "decision-ai-market"
+    },
+    {
+      "recipeId": "close-brochure-orbit"
+    }
+  ]
+}

@@ -77,12 +77,28 @@ Para Marketing con Manzanitas, consultar la
 [biblioteca gráfica](../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md):
 logos completos, versiones sin manzana y cinco símbolos; conservar el SVG original y distinguir
 marca física integrada de gráfico plano. No inventar lockups con efeonce.
+Sus piezas siguen el **registro Marketing con Manzanitas** (aprobado 2026-09-28; complementa La órbita sin
+reemplazarla y no se mezcla con Glitch): norma
+[`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) +
+`efeonce-graphic-line` → `references/manzanitas.md`. Ahí se deciden cabecera, formatos (Pizarra, Escena, Lente,
+Recreo), firma, contraportada y gráficos; la manzana y sus tres puntos van en el acento de la línea del tema, nunca en
+un color fijo. **Registro de marca ≠ registro fotográfico:** dentro del registro Manzanitas, las fotos van en
+**registro cine**: la luz de la foto es la órbita de la pieza (sin órbita dibujada en la Escena), la foto dice lo que
+dice el texto y el **lecho es nativo** (lo que de verdad hay entre la cámara y el sujeto, nunca un objeto agregado),
+con la firma dentro de su materia; la toma deja en calma el rincón de «Desliza» y, en la Lente, la cara y el objeto
+caben en el círculo fijo del formato y nadie mira al lente → `references/efeonce-photographic-language.md` §El lecho
+en el registro cine. Con personas del equipo, el cine en redes vale en MCM (personas reales del roster con la prenda
+de su línea); la publicidad con personas sigue en prueba.
 
 Para Nexa como personaje creativo, cargar
 [su biblioteca de recursos](../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md).
 La identidad vigente es la Nexa humana fotorrealista confirmada el 2026-09-24: rostro de la familia Avatar A y
-ocho vistas de continuidad con polera gris en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`.
+ocho vistas de continuidad con polera gris en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`
+(si no está en disco: `pnpm ai-gen:pull` esa carpeta; nunca regenerar la identidad).
 Resolver vistas por `pnpm foto:prompt`; usar las poses OneDrive para gesto/cuerpo, nunca como ancla facial.
+Las referencias dicen quién es, no cómo está: cada ficha declara `expresion` **o** `vista` y la escena describe la pose
+(sin copiar «confident half-smile»); su traje biónico y sus lentes sólo por catálogo y en registro cine
+(referencia, §11 y §Sparks).
 No recuperar el antiguo set sintético como rostro.
 Para globos fotorealistas y continuidad, cargar
 [la referencia de fotohistorias](../social-media-studio/references/dialogue-carousel-and-document-delivery.md).
@@ -93,6 +109,9 @@ Para fotografía propia Efeonce, cargar
 **preflight visual**: abrir imágenes aprobadas comparables antes de generar, declarar cómo se integra el color en
 la composición sin forzar utilería y comparar los píxeles finales con esas referencias. Haber leído la guía o
 reutilizado un prompt no lo cumple.
+**Antes de producir, abre el banco aprobado y la guía «El porqué» en AXIS** ([banco](https://axis.efeonce.org/references/photography/) · [por qué](https://axis.efeonce.org/references/photography/why/) · agentes: `manifest.json`, `recipes/<slug>.json` y `why.json`): parte de la receta de la foto más cercana y cierra con su lista de control. Detalle en la referencia `design-studio/references/efeonce-photographic-language.md` §«Banco aprobado y guía «El porqué» en AXIS».
+
+> **Skill dueña:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) — criterio, paquete, aplicaciones, motion y convergencia con el lenguaje fotográfico (`references/photography-convergence.md`).
 
 Para piezas de la marca propia Efeonce o su familia (Globe, Wave, Reach) con la **línea gráfica «La órbita»**
 (canónica 2026-09-25: anillo, arco con esfera, halo; lente y foco), cargar
@@ -106,18 +125,33 @@ nunca como texto. No aplica a UI de Greenhouse ni a clientes.
 - **Firma:** logo de Efeonce **centrado abajo**, sin URL. La burbuja `efeoncepro.com` sólo **reemplaza** al logo si
   el logo ya aparece dentro de la imagen (mockup, objeto, merch): centrada, sola, fusión de luminosidad a opacidad 1 y
   ≥ 4,5:1 medido (sólo pasa sobre lechos muy oscuros). Nunca a un costado ni junto al logo.
-- **Entradas:** `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.2.0; `render`
-  sale 1 si falla un check), `pnpm creative:layout` (capa `graphic_line` + `brand.signature`),
+- **Firma de correo ≠ firma de pieza:** la de correo es la v3.1 aprobada (A papel / B navy), con contrato AXIS
+  `efeonce.email-signature` y sus propias reglas (una sola línea con esfera, regla de partners sin esfera, franja de
+  logos oficiales, PNG por URL pública porque el correo no muestra SVG, `data:` ni fusiones). No se recompone a mano:
+  ver la referencia de la línea y el manual §10.2.
+- **Entradas:** `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.3.0; `render`
+  sale 1 si falla un check; lente siempre con arco y esfera, un solo anillo alrededor del contenido, piezas de
+  formato fijo reproducidas desde `pieces`/`portrait`), `pnpm creative:layout` (capa `graphic_line` + `brand.signature`),
   `pnpm foto:componer:cta` (`marcaEnEscena`, regla `firma-burbuja`). Logos y burbujas desde
   `@efeoncepro/axis-brand-assets`, nunca copias a mano.
 - **Foto de objetos/espacios con la línea (merch, oficina):** el arte plano es la referencia exacta y el modelo sólo
   pone espacio, material y luz. Lecciones medidas: la referencia va sin leyendas (el modelo las imprime), el logo chico
   se reinventa y se repone **editando** con el logo oficial como segunda referencia, la puntuación se revisa letra por
   letra y se corrige editando, no regenerando. Detalle en la referencia de la línea.
+- **Íconos de la marca Efeonce** (canónicos 2026-09-26): Trazo (lo que se mide) o Plastilina (lo que se crea, Brand)
+  según la línea de la pieza; glifos de `ICON_CATALOG` pintados con `resolveIcon` y grupo pasado por `auditIconGroup`
+  (`@efeoncepro/axis-graphic-line/icons`), nunca dibujados ni generados sueltos (no es el «icono» de UI de Greenhouse
+  del árbol §2). Glifo nuevo: método de alta de AXIS (Plastilina: referencia de estilo + prompt de AXIS vía
+  `pnpm ai:image`) y aprobación del operador. Criterio: [`efeonce-graphic-line` → iconography](../efeonce-graphic-line/references/iconography.md).
+  **Plastilina en volumen** (D24, 2026-09-27; tercera capa): el glifo de Plastilina en arcilla mate inflada, PNG con alfa
+  de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`), sólo como objeto protagonista (portada, KV, pieza social
+  de un objeto, escenario, merch), uno por pieza, ≥ 160 px, en respuesta con el acento de Brand, sin sombra de contacto
+  (se agrega al componer); nunca en listas, contenido, UI ni mezclado con plano o Trazo, y nunca regenerado ni inventado
+  directo en 3D. No es la ilustración «Clay 3D» del equipo: no se mezclan en una pieza.
 
 Cuando aparezca Julio, usar su identidad fotorrealista aprobada: `refs-aprobadas/` (11 referencias; `julio-ap-04`
 primera opción de rostro y `julio-ap-11` de cuerpo) más `set-identidad/angulos/` (seis ángulos), ambos bajo
-`ai-generations/2026-09-20_identidad-julio-nexa/`. Consultar el manifiesto y resolver vistas con `foto:prompt`;
+`ai-generations/2026-09-20_identidad-julio-nexa/` (si faltan en disco, `pnpm ai-gen:pull` antes de componer). Consultar el manifiesto y resolver vistas con `foto:prompt`;
 no usar `julio-ap-02` como ancla —es una pieza compuesta— ni mezclar las fotos fuente/descartes con el set aprobado.
 Canon: [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
 
@@ -329,6 +363,15 @@ referencias, anatomía, apetito, luz, profundidad, decisión foto/generación/3D
 El [caso Fiestas Patrias](../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
 conserva la metodología completa con evidencia y programación.
 
+## Dónde viven los archivos de `ai-generations/`
+
+- **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas de deck y por `src/**`/`scripts/**` (`pnpm ai-gen:protected`).
+- **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
+- **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
+- Una ruta `ai-generations/…` (referencia, plate, ficha) es lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` antes de dirigir o componer.
+- **NUNCA** regenerar, sustituir ni aproximar un asset aprobado porque falta; **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. Salidas nuevas: `ai-generations/<AAAA-MM-DD>_<slug>/`.
+- SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ## Fotografía de marca propia Efeonce
 
 Para fotografía o imagen fotorrealista de **la marca Efeonce** (no de clientes), cargar
@@ -343,8 +386,34 @@ máquina puede generar? seis chequeos que ejercitan la cadena, sin costo), `pnpm
 prompt desde una ficha de toma; formato, % del lecho y límite de sujetos salen de UNA tabla) y
 `pnpm foto:validar <plate.png>` (mide las **seis** reservas sobre el plate limpio). Canon de las reservas:
 [reserva de espacio en el plate](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md).
-La **capa de composición gráfica** sobre la foto (tipografía, jerarquía, cursores) **no está aprobada** y su canon es
-`efeonce-advertising-creative`, no los ejemplos de la carpeta de fotografía.
+La **capa de composición gráfica** sobre la foto (tipografía, jerarquía, cursores) **está aprobada desde el
+2026-09-26** (operador) y se compone sobre las reservas de la toma con los compositores canónicos (`foto:componer`,
+`foto:componer:cta`), sin scrim. Su canon es `efeonce-advertising-creative`, no los ejemplos de la carpeta de
+fotografía.
+
+**Cuatro registros, y se decide cuál ANTES de generar:** A documental · B puesta en escena · C la respuesta a la vista
+· **cine** «la marca en su película» (2026-09-27). Cine es ficción declarada —el servicio en acción como fenómeno de
+luz con el acento de su línea, sujeto a la derecha mirando al lente (en la sección partida, al panel), cámara ≈ 2 m y 85 mm, bruma y rim, reserva
+izquierda oscura en 16:9— y **sólo** se usa con **Nexa protagonista**, en la receta de deck **`proposal-cinematic`**
+(AXIS `cine-requires-nexa-or-proposal`) y, por **excepción aprobada el 2026-09-27**, en las láminas de **sección y
+«about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos»: personas en luz dramática; no se
+extiende a social, web, publicidad ni contenido); la publicidad 9:16 y 4:5 en cine está **en prueba**, no aprobada. Marcador,
+barra, trampas y comandos en la referencia (§Registros); canon vigente:
+[`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
+**Para producir, el [casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)**
+(2026-10-02): `pnpm foto:cine:nueva --desde <receta aprobada>` → campos cine de la ficha (`alcance` incluido) → agente
+`cine-reviewer` → `foto:generar` → `pnpm foto:validar:cine` + `foto:validar` + `foto:emblema` → revisor sobre el plate.
+**Plate de portada de brochure o propuesta** (operador, 2026-09-27): sujeto a la derecha, 45 % izquierdo oscuro y
+calmo para la columna de texto, 85 mm, lecho oscuro y la luz de acento de la línea; en la contraportada con foto, el
+sujeto de espaldas caminando hacia la órbita. Receta y ficha de ejemplo
+(`ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json`) en la referencia, §Cine.
+**Al reemplazar el plate de una pieza aprobada** (operador, 2026-09-28, caso `CR4` de Creative Services): se conserva el
+**concepto de impacto** y se cambia la toma (gesto, forma del fenómeno, disposición); la receta de portada fija
+geometría, no concepto, y un validador que pasa no valida el concepto. La forma de la órbita cambia el significado
+(cerrada = rodea y dirige; abierta = del equipo al lector). La reserva se ancla por geografía respecto del cuerpo del
+sujeto, no sólo por porcentaje; se mira al 100 % también después de `foto:isotipo`, y se aprueba con la pieza
+compuesta (`pnpm brand:compose`), nunca con el frame del probe. Caso y checklist:
+[registro cine §16.7](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto).
 
 🔴 **Tres trampas medidas el 2026-09-22 (CMP-001) que el validador da por buenas.** Detalle, frases exactas y
 casos en la regla auto-load `.claude/rules/brand-photography.md`:

@@ -1,0 +1,38 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-plan",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Plan de trabajo",
+    "question": "¿Qué pasa al empezar?",
+    "answer": [
+      "Movimiento"
+    ]
+  },
+  "body": "**90** días a la primera evidencia medible, en tres tramos de 30. Desde la primera semana ya hay piezas en marcha.",
+  "horizon": 90,
+  "currentStop": 1,
+  "stops": [
+    {
+      "range": "Días 1–30",
+      "title": "Arranque",
+      "desc": "Auditoría, línea base y primeras piezas: movimiento desde la primera semana."
+    },
+    {
+      "range": "Días 31–60",
+      "title": "Ritmo pleno",
+      "desc": "El ciclo mensual completo: planificar, producir, entregar y medir."
+    },
+    {
+      "range": "Días 61–90",
+      "title": "Evidencia",
+      "desc": "Primera evidencia medible y primer informe de resultados."
+    }
+  ]
+}

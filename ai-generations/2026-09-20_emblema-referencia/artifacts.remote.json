@@ -1,0 +1,113 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:06:43.015Z",
+  "run": "ai-generations/2026-09-20_emblema-referencia",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_emblema-referencia",
+  "totalBytes": 27701525,
+  "fileCount": 17,
+  "files": [
+    {
+      "path": "hoja-final.jpg",
+      "sizeBytes": 282382,
+      "sha256": "7d80c0362f5c3d2555cfa89f4222c3c0ec759d8e585a303c11852595e357d591",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/hoja-final.jpg"
+    },
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 164467,
+      "sha256": "cc4e8112c0ad2f4ef21fa9c8866f7635bed536569e075c54a56900f94b2d862a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/out/preview-390/Z1-polo-julio.png",
+      "sizeBytes": 387331,
+      "sha256": "d79a1f1424ce4de35d763c50d2bc115a28539f3bb8cf5d1584e37404cc468a22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/preview-390/Z1-polo-julio.png"
+    },
+    {
+      "path": "plates/out/preview-390/Z2-chaqueta-nexa.png",
+      "sizeBytes": 368820,
+      "sha256": "ca6ed7d897b7f75e78420d306ea0f34cf71e56306f51656b589801a18ef3a3f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/preview-390/Z2-chaqueta-nexa.png"
+    },
+    {
+      "path": "plates/out/preview-390/Z3-bomber-ambos.png",
+      "sizeBytes": 189917,
+      "sha256": "67e277c4a924e58accb04a02f2314b94a9cae974d667f5689cf6efede63f213f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/preview-390/Z3-bomber-ambos.png"
+    },
+    {
+      "path": "plates/out/preview-390/Z4-terreno-nexa.png",
+      "sizeBytes": 214648,
+      "sha256": "9feae13722a17b9ea60400434f208c6b5c4e6355368bfda483865d637ead1a03",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/preview-390/Z4-terreno-nexa.png"
+    },
+    {
+      "path": "plates/out/preview-390/Z5-hoodie-julio.png",
+      "sizeBytes": 499423,
+      "sha256": "a0bdbdf3f5936ba6b53cb2bdb044339c2c43c69dae6b92d376f3507ced5ace45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/preview-390/Z5-hoodie-julio.png"
+    },
+    {
+      "path": "plates/out/Z1-polo-julio.png",
+      "sizeBytes": 2419721,
+      "sha256": "390de8ef9438b109ea649a53935d90866748a35bd534b21aa6de17d761de6019",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/Z1-polo-julio.png"
+    },
+    {
+      "path": "plates/out/Z2-chaqueta-nexa.png",
+      "sizeBytes": 2365944,
+      "sha256": "ed814deab616ca226c8dd3f155315b078ab14ed95c92b55b7536307de7009a55",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/Z2-chaqueta-nexa.png"
+    },
+    {
+      "path": "plates/out/Z3-bomber-ambos.png",
+      "sizeBytes": 3449557,
+      "sha256": "a8c6a91959316f95ad54bf67ecc790a72cef58af4b0d1fcbe43345ac245636fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/Z3-bomber-ambos.png"
+    },
+    {
+      "path": "plates/out/Z4-terreno-nexa.png",
+      "sizeBytes": 3898688,
+      "sha256": "804c7cc1d21836b90f3f233266f364698f356611a61696b132f845b67abb262d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/Z4-terreno-nexa.png"
+    },
+    {
+      "path": "plates/out/Z5-hoodie-julio.png",
+      "sizeBytes": 3273038,
+      "sha256": "0a88a6f06e0cda0ecd5baa8d3505956ea60f4947dec74e6bc27710c296ef4e11",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/out/Z5-hoodie-julio.png"
+    },
+    {
+      "path": "plates/Z1-polo-julio.png",
+      "sizeBytes": 1601523,
+      "sha256": "0d32c37414aa6dddbda0d097e529a576827c3b48d2379fef293dc3198f76f8e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/Z1-polo-julio.png"
+    },
+    {
+      "path": "plates/Z2-chaqueta-nexa.png",
+      "sizeBytes": 1612009,
+      "sha256": "cd4a604e1497ada3aba03eafbca26ceb0859a63944f6115b4b1d4342c5c7e08c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/Z2-chaqueta-nexa.png"
+    },
+    {
+      "path": "plates/Z3-bomber-ambos.png",
+      "sizeBytes": 2314882,
+      "sha256": "2a44e4ebc851b058316f472f5a8fa5e69f19491c25f8ab1f9b513e95e7d4d37c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/Z3-bomber-ambos.png"
+    },
+    {
+      "path": "plates/Z4-terreno-nexa.png",
+      "sizeBytes": 2351202,
+      "sha256": "fc40f49603a044b7397103f69e654181c002819992c8df324889003811eab3fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/Z4-terreno-nexa.png"
+    },
+    {
+      "path": "plates/Z5-hoodie-julio.png",
+      "sizeBytes": 2307973,
+      "sha256": "5d0060dc1b2c1416291fca5faf4d1bf1ce4f2352b78f85cabbc9988b22ebc0df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-referencia/plates/Z5-hoodie-julio.png"
+    }
+  ]
+}

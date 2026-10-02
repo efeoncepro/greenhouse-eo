@@ -1,0 +1,25 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-service-lanes",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Nuestros servicios Salesforce",
+    "question": "¿Qué hacemos en Salesforce?",
+    "answer": ["Todo el ciclo"]
+  },
+  "lanes": [
+    { "icon": "sales", "title": "Ventas y revenue", "products": "Sales Cloud", "description": "Pipeline, forecast, territorios y la siguiente acción de cada oportunidad." },
+    { "icon": "service", "title": "Servicio al cliente", "products": "Agentforce Service", "description": "Casos, knowledge, routing y SLA con contexto completo del cliente." },
+    { "icon": "marketing", "title": "Marketing y lifecycle", "products": "Marketing Cloud Engagement · Next", "description": "Journeys, deliverability y campañas desde identidad y consentimiento." },
+    { "icon": "data-cloud", "title": "Datos y consentimiento", "products": "Data 360", "description": "Identidad unificada, preferencias por canal y activación gobernada." },
+    { "icon": "agentforce", "title": "Agentes y automatización", "products": "Agentforce · Flow", "description": "Agentes con ficha, supervisión humana y consumo medido." },
+    { "icon": "platform", "title": "Integración y experiencia", "products": "APIs · Experience Cloud", "description": "Migraciones con reconciliación, portales e integraciones con dueño." }
+  ],
+  "phases": ["Diagnóstico y arquitectura", "Implementación e integración", "Activación y adopción", "Operación gestionada"]
+}

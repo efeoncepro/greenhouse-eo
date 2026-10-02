@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "line",
+  "line": "brand",
+  "voice": {
+    "eyebrow": "Brochure · Creative Services",
+    "question": "¿Quién crea mi contenido?",
+    "answer": [
+      "Tu squad"
+    ]
+  },
+  "body": "**Seis** capacidades:\nSquad creativo · Brand systems · Campañas\nContenido y social · Audiovisual · Run & Gun",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png",
+    "alt": "Una directora creativa de Efeonce con hoodie mira a cámara y ofrece con las palmas una pieza terminada que brilla en azul; detrás, a su derecha, su squad trabaja y sus piezas viajan hacia ella por una cinta de luz naranja"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

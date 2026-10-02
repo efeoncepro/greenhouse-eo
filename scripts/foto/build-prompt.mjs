@@ -18,6 +18,8 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
+
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 // Los bloques viven AL LADO del comando, no en una carpeta de corrida fechada. La copia de
 // `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/` queda como evidencia histórica de
@@ -51,6 +53,32 @@ const FORMATOS = {
     limite: 'All people and objects stay entirely inside the RIGHT 55% of the frame.',
     zonaTexto: ({ muro, tinta }) =>
       `TEXT SPACE (planned, essential): the LEFT 42% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right half.`
+  },
+  // Gran formato horizontal (letrero caminero 12 × 4 m). SIN VALIDAR: el lecho hereda el 16 % del 16:9
+  // hasta medir una ronda nativa 3:1. Doctrina OOH en construcción (2026-09-26).
+  '3:1': {
+    size: '2304x768',
+    declara: 'WIDE 3:1 billboard composition.',
+    lecho: '16%',
+    limite: 'All people and objects stay entirely inside the RIGHT 50% of the frame.',
+    sinValidar: true,
+    zonaTexto: ({ muro, tinta }) =>
+      `TEXT SPACE (planned, essential): the LEFT 45% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right half.`
+  },
+  // Fondo de videollamada (Microsoft Teams, 1920×1080 al entregar). SIN VALIDAR hasta medir una ronda con la
+  // silueta encima. La persona se sienta al CENTRO y lo tapa: lo importante vive en los tercios laterales y arriba
+  // (operador, 2026-09-29: fondos de oficina con elementos de Efeonce que no pasen desapercibidos). No reserva texto:
+  // el centro es de la persona, no de un titular. Sin lecho: el cuerpo ocupa el borde inferior y no hay firma.
+  'teams': {
+    size: '2048x1152',
+    declara: 'HORIZONTAL 16:9 VIDEO-CALL BACKGROUND (Microsoft Teams): the photograph is what a person on a call would have behind their chair.',
+    lecho: '16%',
+    limite:
+      'CALL ZONE (essential): the CENTRE of the frame — from 30% to 70% of the width, from 12% of the height down to the bottom — stays calm and uncluttered, an even mid-dark surface with no text, no logo, no light beams and no bright spots, because the person on the call sits there and covers it. Every key element (lettering, signs, the logo, the main prop) lives in the LEFT or RIGHT third or high in the top band, never behind that zone.',
+    sinValidar: true,
+    zonaTexto: () => {
+      throw new Error('El formato `teams` no reserva texto: el centro es de la persona en la llamada. Pon el texto en la escena, en un tercio lateral.')
+    }
   },
   '1:1': {
     size: '1152x1152',
@@ -205,7 +233,7 @@ export const PERSONAS = {
     // que separa la identidad canónica de la descartada («el más rápido de verificar es el delineado»).
     // Entra como marcador de continuidad con el material aprobado.
     identity:
-      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.',
+      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her FACE and HAIR exactly as in the references — her features, not the moment they caught: her head turn, tilt, gaze and expression come from the scene and are never copied from a reference. Only pose, expression, clothing, light and setting change.',
     // Los CUATRO signature elements del Bible §5.1 —anillo, reloj, aretes y UÑAS— que el pipeline no pedía.
     // 🔴 El reloj dejó de ser analógico: es un SMARTWATCH **[decisión del operador, 2026-09-21]**. Nexa es
     // tecnológica y sus objetos lo dicen; un reloj de agujas la contradice. Ecosistema completo de props en
@@ -246,10 +274,14 @@ export const PERSONAS = {
     // Las tres referencias son ANCLAS fotográficas de 2560×3200 / 2304×3456 generadas el 2026-09-21: piel
     // con poros irregulares y vello facial real, no la piel sin poros del maestro sintético anterior.
     // Orden: rostro tres cuartos (la más decisiva), cuerpo entero, rostro frontal.
+    // 🔴 Orden cambiado el 2026-10-02 [operador: «Nexa en casi todas las fotos sale con la misma pose de cara de un
+    // lado»]: con el rostro en TRES CUARTOS primero, el modelo copiaba también su giro, su inclinación y su media
+    // sonrisa (medido en NX5b, NX7d y la vista puesta del traje). La frontal neutra va primero; un ángulo o una
+    // expresión pedidos en la ficha se anteponen igual que antes.
     refs: [
+      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png',
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png',
-      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
-      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png'
+      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png'
     ],
     cuerpo: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
     // Vistas aprobadas de Nexa. Las ocho direcciones del set gris son fotográficas y fueron editadas desde
@@ -287,7 +319,21 @@ export const PERSONAS = {
       'the-point': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-point.png',
       'got-it': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-got-it.png',
       'the-listen': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png',
-      'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png'
+      'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png',
+      // Las 12 expresiones FOTOGRÁFICAS de `5-expresiones/` (acabado de las anclas, no sintético). Existían en disco y
+      // el catálogo no las conocía: por eso casi toda ficha caía en el gesto por defecto (2026-10-02).
+      carcajada: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-01-carcajada.png',
+      'risa-elegante': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-02-risa-elegante.png',
+      sorprendida: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-03-sorprendida.png',
+      esceptica: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-04-esceptica.png',
+      pensativa: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-05-pensativa.png',
+      neutra: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-06-neutra-reposo.png',
+      preocupada: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-07-preocupada.png',
+      conviccion: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-08-conviccion.png',
+      'escucha-empatica': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-09-escucha-empatica.png',
+      curiosa: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-10-curiosa.png',
+      complicidad: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-11-complicidad.png',
+      'mirada-lateral': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-12-mirada-lateral.png'
     },
     // Los cinco contextos de vestuario del Bible §5.3. `lifestyle-*` se produjo el 2026-09-21 y NO arrastra la
     // deuda de acabado: las otras cuatro familias vienen de injerto sobre el maestro sintético, y éstas se
@@ -327,6 +373,52 @@ export const PERSONAS = {
     // `vistasDeCuerpo`: si la referencia ya es de cuerpo, añadir además el cuerpo frontal mete dos cuerpos
     // sin rostro cercano y hace derivar la cara.
     vestuarioDeCuerpo: ['casual-3', 'casual-4', 'casual-5', 'casual-6', 'home-2', 'home-4', 'prof-1', 'prof-2', 'prof-3', 'speaker-1', 'speaker-2', 'speaker-3', 'lifestyle-1', 'lifestyle-2', 'lifestyle-3', 'lifestyle-4']
+  },
+  // ── El equipo actual en el registro cine (decisión del operador, 2026-09-29, `cine-team-people-social`) ──
+  // «Las personas del equipo todas están en el repo, tienes que ponerlas sin la foto de María Fernanda; en
+  // sustitución de María Fernanda está Valentina Hoyos.» Las referencias son sus fotos REALES, en su hogar canónico
+  // `ai-generations/_identidad-equipo/<persona>/` (desde el 2026-09-29: los avatares del repo pasaron a ser derivados
+  // editados con la bomber y no sirven de referencia de identidad). `cuerpo` apunta al mismo retrato: no hay foto de cuerpo entero todavía, y
+  // la regla de 2026-09-17 («retrato solo deforma el cuerpo») se contrarresta en la ficha con encuadre de medio cuerpo,
+  // cámara a ~2 m a la altura del pecho y 85 mm. Identidades APROBADAS por el operador el 2026-09-29 sobre la ronda
+  // piloto `ai-generations/2026-09-29_manzanitas-equipo/` (roster: `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`).
+  // Luis salió del equipo (operador, 2026-09-29): ya no está en `PERSONAS`.
+  andres: {
+    etiqueta: 'Andrés',
+    identity:
+      'IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is a SHORT, SOFT OVAL, slightly wider at the cheekbones and narrowing to a small chin — never long, never square. HAIR black, thick and slightly wavy, TOUSLED on top with a loose, messy fringe falling toward the forehead, shorter at the sides. GLASSES rectangular frames in RED-BURGUNDY acetate of medium thickness — never metal, never rimless, never black. FACIAL HAIR a light moustache and a small, sparse goatee on the chin; the cheeks are clean-shaven. EXPRESSION a wide, warm smile showing the upper teeth, eyes crinkling behind the glasses. Light-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or smooth him.',
+    // La foto ACTUAL (con el hoodie, carpeta squad) va primera; el retrato antiguo suma detalle del rostro.
+    refs: ['ai-generations/_identidad-equipo/andres/actual.png', 'ai-generations/_identidad-equipo/andres/antiguo.png'],
+    cuerpo: 'ai-generations/_identidad-equipo/andres/actual.png'
+  },
+  daniela: {
+    etiqueta: 'Daniela',
+    identity:
+      'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a LONG OVAL with high, rounded cheekbones, narrowing to a soft pointed chin — never round, never square. HAIR black, very long and straight, parted slightly off-centre, falling well past the shoulders with a long side-swept section over one side of the forehead. EYES dark brown and almond-shaped; BROWS dark, softly arched. EXPRESSION a WIDE, BRIGHT SMILE showing the upper teeth, her natural expression. Warm medium-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or lighten her.',
+    refs: ['ai-generations/_identidad-equipo/daniela/actual.png', 'ai-generations/_identidad-equipo/daniela/antiguo.png'],
+    cuerpo: 'ai-generations/_identidad-equipo/daniela/actual.png'
+  },
+  humberly: {
+    etiqueta: 'Humberly',
+    identity:
+      'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a ROUNDED OVAL with full cheeks and a soft, rounded chin — never long, never angular. HAIR black, reaching the upper chest, parted to one side, with face-framing layers and soft loose waves at the ends. EYES dark brown; BROWS dark and softly arched; a tiny nose stud on one nostril. EXPRESSION a soft, calm, closed-mouth smile. Fair skin with a warm undertone, natural blush and visible pores, a young adult as in the reference: do not age, beautify or slim her face.',
+    refs: ['ai-generations/_identidad-equipo/humberly/antiguo.jpg'],
+    cuerpo: 'ai-generations/_identidad-equipo/humberly/antiguo.jpg'
+  },
+  melkin: {
+    etiqueta: 'Melkin',
+    // Sólo la foto ACTUAL (squad): el retrato antiguo lo muestra con el pelo largo amarrado, que ya no lleva.
+    identity:
+      'IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is LONG AND NARROW, a lean vertical oval with defined cheekbones and a narrow jaw — never round, never wide. HAIR black, medium-short, swept to one side from a side part, with loose strands falling across the forehead — never long, never tied back, never slicked flat. BROWS thick, dark and straight. FACIAL HAIR only a thin moustache and a narrow pointed goatee on the chin; the cheeks and jaw are clean-shaven. EXPRESSION calm, a slight closed-mouth smile. Light-brown skin with visible pores, an adult as in the reference: do not age, beautify or widen his face.',
+    refs: ['ai-generations/_identidad-equipo/melkin/actual.png'],
+    cuerpo: 'ai-generations/_identidad-equipo/melkin/actual.png'
+  },
+  valentina: {
+    etiqueta: 'Valentina',
+    identity:
+      'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a SOFT, ROUNDED OVAL with full cheeks and a small rounded chin — never long, never angular. HAIR black, very long and straight, falling well past the shoulders, with a thick straight FRINGE cut just above the eyebrows. EYES dark brown and almond-shaped; BROWS fine and straight under the fringe. NOSE small with a soft rounded tip. EXPRESSION calm and serene, closed mouth, a very slight smile. Light warm-beige skin with a natural blush on the cheeks and visible pores, a young adult as in the reference: do not age, beautify or slim her face.',
+    refs: ['ai-generations/_identidad-equipo/valentina/actual.png'],
+    cuerpo: 'ai-generations/_identidad-equipo/valentina/actual.png'
   }
 }
 
@@ -378,19 +470,48 @@ function resolverIdentidad(ficha) {
 
     const pedidas = typeof pedido === 'string' ? [] : DIMENSIONES_DE_IDENTIDAD.filter(d => pedido?.[d.campo])
 
-    if (pedidas.length > 1) {
+    // `vista` + `expresion` juntas [operador, 2026-10-02]: las 12 expresiones fotográficas de Nexa comparten el mismo
+    // tres cuartos del ancla, así que con una sola ranura la expresión arrastraba siempre ese ángulo. Con una persona
+    // sola en la toma se admite el par: la vista va primera y manda en el ángulo; la expresión, segunda, sólo en el
+    // gesto. Con dos personas el cupo no alcanza, y `vestuario` sigue sin combinarse.
+    const parAngulo = pedidas.length === 2 && pedidas.every(d => d.campo === 'vista' || d.campo === 'expresion')
+
+    if (pedidas.length > 1 && !(parAngulo && cupo >= 3)) {
       throw new Error(
-        `Para ${persona.etiqueta} se pidió ${pedidas.map(d => `\`${d.campo}\``).join(' y ')} a la vez, y las tres ` +
-          'dimensiones ocupan la MISMA ranura: la referencia que se antepone. Elige una.'
+        `Para ${persona.etiqueta} se pidió ${pedidas.map(d => `\`${d.campo}\``).join(' y ')} a la vez. ` +
+          (parAngulo
+            ? '`vista` + `expresion` sólo se combinan con una persona sola en la toma: con dos, el cupo de referencias no alcanza.'
+            : 'Esas dimensiones ocupan la MISMA ranura (la referencia que se antepone): elige una. Sólo `vista` + `expresion` se combinan.')
       )
     }
 
-    const dimension = pedidas[0] ?? null
+    // Con el par, la vista va primera (es la decisiva para el ángulo).
+    const ordenadas = parAngulo ? [...pedidas].sort(d => (d.campo === 'vista' ? -1 : 1)) : pedidas
+    const dimension = ordenadas[0] ?? null
     const pedidaEnDimension = dimension ? pedido[dimension.campo] : null
 
     // La dimensión manda: si la toma es de perfil, mandar sólo retratos frontales obliga al modelo a
     // inventar el giro, y lo que inventa ensancha la cara. Va PRIMERA por ser la decisiva.
     let refs = persona.refs.slice(0, cupo)
+
+    for (const d of ordenadas) {
+      const disponibles = persona[d.mapa] ?? {}
+      const valor = pedido[d.campo]
+
+      if (!disponibles[valor]) {
+        const esKit = Object.keys(OBJETOS).includes(valor)
+
+        throw new Error(
+          `La ${d.campo} "${valor}" no existe para ${persona.etiqueta}. ` +
+            `${d.etiqueta} disponibles: ${Object.keys(disponibles).join(', ') || 'ninguna'}.` +
+            (esKit
+              ? ` — "${valor}" SÍ existe, pero es un kit de marca: la ropa con marca se pide ` +
+                `por \`objetos\`, no por \`${d.campo}\`. Por ejemplo: ` +
+                `{ "objetos": [{ "objeto": "${valor}", "usoDe": "${clave}" }] }.`
+              : '')
+        )
+      }
+    }
 
     if (dimension) {
       const disponibles = persona[dimension.mapa] ?? {}
@@ -414,7 +535,10 @@ function resolverIdentidad(ficha) {
         )
       }
 
-      refs = [disponibles[pedidaEnDimension], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
+      refs = parAngulo
+        ? // vista + expresión + el ancla frontal (la cara); el cuerpo se suma abajo como cuarta si la vista no lo es.
+          [disponibles[pedidaEnDimension], persona[ordenadas[1].mapa][pedido[ordenadas[1].campo]], persona.refs[0]]
+        : [disponibles[pedidaEnDimension], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
     }
 
     // El CUERPO ENTERO tiene que viajar siempre que quepa. Con una persona sola el cupo es 3 y entra
@@ -428,7 +552,9 @@ function resolverIdentidad(ficha) {
     )
 
     if (persona.cuerpo && cupo >= 2 && !yaEsDeCuerpo && !refs.includes(persona.cuerpo)) {
-      refs[refs.length - 1] = persona.cuerpo
+      // Con el par vista + expresión el cuerpo entra como CUARTA: sustituir la última quitaría el ancla frontal.
+      if (parAngulo) refs.push(persona.cuerpo)
+      else refs[refs.length - 1] = persona.cuerpo
     }
 
     for (const ref of refs) {
@@ -444,7 +570,8 @@ function resolverIdentidad(ficha) {
     const hasta = imagenes.length + refs.length
 
     imagenes.push(...refs)
-    tramos.push({ persona, desde, hasta })
+    // Qué imagen manda en qué: la primera (o las dos primeras, con el par) son la vista y/o la expresión pedidas.
+    tramos.push({ persona, desde, hasta, marcas: ordenadas.map((d, i) => ({ campo: d.campo, imagen: desde + i })) })
   }
 
   // Texto verbatim de §3.7: una persona lo lleva todo en una frase; dos lo dicen por tramo y cierran
@@ -458,6 +585,22 @@ function resolverIdentidad(ficha) {
           .map(t => `${rango(t)} are ${t.persona.etiqueta} (identity only).`)
           .join(' ')} Ignore the clothing and backgrounds of all references.`
 
+  // Las referencias dicen QUIÉN es la persona, no CÓMO está: sin esta frase el modelo copiaba también el giro, la
+  // inclinación y el gesto de la primera imagen (Nexa salió con la misma pose en NX5b, NX7d y la vista del traje,
+  // 2026-10-02). La imagen que la ficha pide como ángulo manda en el ángulo; la de expresión, SÓLO en el gesto: las 12
+  // expresiones de `5-expresiones/` comparten el mismo tres cuartos del ancla (se editaron desde ella), así que copiarlas
+  // enteras arrastraba también la pose (medido en el A/B NX7f, 2026-10-02).
+  const queManda = tramos.flatMap(t =>
+    t.marcas
+      .filter(m => m.campo === 'vista' || m.campo === 'expresion')
+      .map(m => `Image ${m.imagen} is ${t.persona.etiqueta}'s ${m.campo === 'vista' ? 'ANGLE reference: it sets the head angle of this shot' : 'EXPRESSION reference: copy only its facial expression (eyes, brows, mouth), NOT its head angle or tilt'}, still with the face of the identity references.`)
+  )
+
+  const pose =
+    ' The references define WHO each person is — features, proportions, skin and hair — never how they hold their head: ' +
+    'the head turn, tilt, chin angle, gaze and facial expression come from the SCENE, not from any reference.' +
+    (queManda.length ? ` ${queManda.join(' ')}` : '')
+
   // Los accesorios van como BLOQUE APARTE, separados por \n\n, no pegados al IDENTITY. Si se unieran con
   // un espacio, el bloque emitido dejaría de existir verbatim en el canon y el test que lo verifica
   // fallaría — y, peor, IDENTITY dejaría de ser citable como unidad.
@@ -465,7 +608,7 @@ function resolverIdentidad(ficha) {
     identity: tramos
       .flatMap(t => [t.persona.identity, t.persona.accesorios].filter(Boolean))
       .join('\n\n'),
-    references,
+    references: references + pose,
     imagenes
   }
 }
@@ -497,6 +640,61 @@ export const OBJETOS = {
     },
     vistaDefecto: 'tres-cuartos-izq'
   },
+  // Logo completo de Efeonce en 3D (kit aprobado 2026-09-17). Referencia de FORMA; el material, el montaje y la luz
+  // los describe la escena. Blanco sobre superficies oscuras, navy sobre claras. Nunca se pega el render (el operador lo
+  // rechazó dos veces: «se ve muy falso»). `letrero` = escala mediana (≈ 1,2 m, corpóreo de pared); `escritorio` =
+  // escala pequeña (24 cm, objeto sobre una mesa o repisa). Preferir `escritorio` como product placement: en la pared
+  // de una sala se siente forzado (operador, 2026-09-29).
+  'logo-efeonce-3d-letrero-blanco': {
+    etiqueta: 'the official 3D model of the full Efeonce logo (white)',
+    instruccion:
+      'Reproduce EXACTLY this logo — every letter of «efeonce», the ship emblem with its orbit ring, its cuts and its three small windows, same proportions and spacing. It is dimensional signage: the scene decides its material, mounting and light. Do not redraw, respell, simplify or add parts.',
+    base: 'ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-blanco/',
+    patron: 'efeonce-logo-3d-blanco-mediana-<V>-transparente.png',
+    vistas: {
+      frente: '01-frente-altura-ojos-luz-der', 'frente-luz-izq': '01-frente-altura-ojos-luz-izq',
+      'tres-cuartos-izq': '02-tres-cuartos-izquierda-luz-der', 'tres-cuartos-der': '03-tres-cuartos-derecha-luz-izq'
+    },
+    vistaDefecto: 'frente'
+  },
+  'logo-efeonce-3d-letrero-navy': {
+    etiqueta: 'the official 3D model of the full Efeonce logo (navy)',
+    instruccion:
+      'Reproduce EXACTLY this logo — every letter of «efeonce», the ship emblem with its orbit ring, its cuts and its three small windows, same proportions and spacing. It is dimensional signage: the scene decides its material, mounting and light. Do not redraw, respell, simplify or add parts.',
+    base: 'ai-generations/2026-09-17_efeonce-logo-3d/render/mediana-navy/',
+    patron: 'efeonce-logo-3d-navy-mediana-<V>-transparente.png',
+    vistas: {
+      frente: '01-frente-altura-ojos-luz-der', 'frente-luz-izq': '01-frente-altura-ojos-luz-izq',
+      'tres-cuartos-izq': '02-tres-cuartos-izquierda-luz-der', 'tres-cuartos-der': '03-tres-cuartos-derecha-luz-izq'
+    },
+    vistaDefecto: 'frente'
+  },
+  'logo-efeonce-3d-escritorio-blanco': {
+    etiqueta: 'the official 3D model of the full Efeonce logo (blanco), a small desk object about 24 cm wide',
+    instruccion:
+      'Reproduce EXACTLY this logo — every letter of «efeonce», the ship emblem with its orbit ring, its cuts and its three small windows, same proportions and spacing. It is a small solid desk object about 24 cm wide and 6 cm tall standing on its base: the scene decides its material and light. Do not redraw, respell, simplify or add parts.',
+    base: 'ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-blanco/',
+    patron: 'efeonce-logo-3d-blanco-pequena-<V>-transparente.png',
+    vistas: {
+      sentada: '02-picado-persona-sentada-luz-der', 'sentada-luz-izq': '02-picado-persona-sentada-luz-izq',
+      'a-ras': '01-frente-a-ras-luz-der', 'tres-cuartos-izq': '03-picado-tres-cuartos-izquierda-luz-der',
+      'tres-cuartos-der': '04-picado-tres-cuartos-derecha-luz-izq'
+    },
+    vistaDefecto: 'sentada'
+  },
+  'logo-efeonce-3d-escritorio-navy': {
+    etiqueta: 'the official 3D model of the full Efeonce logo (navy), a small desk object about 24 cm wide',
+    instruccion:
+      'Reproduce EXACTLY this logo — every letter of «efeonce», the ship emblem with its orbit ring, its cuts and its three small windows, same proportions and spacing. It is a small solid desk object about 24 cm wide and 6 cm tall standing on its base: the scene decides its material and light. Do not redraw, respell, simplify or add parts.',
+    base: 'ai-generations/2026-09-17_efeonce-logo-3d/render/pequena-navy/',
+    patron: 'efeonce-logo-3d-navy-pequena-<V>-transparente.png',
+    vistas: {
+      sentada: '02-picado-persona-sentada-luz-der', 'sentada-luz-izq': '02-picado-persona-sentada-luz-izq',
+      'a-ras': '01-frente-a-ras-luz-der', 'tres-cuartos-izq': '03-picado-tres-cuartos-izquierda-luz-der',
+      'tres-cuartos-der': '04-picado-tres-cuartos-derecha-luz-izq'
+    },
+    vistaDefecto: 'sentada'
+  },
   'nave-efeonce': {
     etiqueta: 'the official white 3D model of the Efeonce ship emblem',
     instruccion:
@@ -505,6 +703,135 @@ export const OBJETOS = {
     patron: 'efeonce-nave-3d-blanco-<V>-1x1-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente-heroe', 'tres-cuartos-izq': '02-tres-cuartos-izquierda', perfil: '03-perfil' },
     vistaDefecto: 'tres-cuartos-izq'
+  },
+  spark: {
+    // Spark base v01 (TASK-1941, decisión del operador 2026-10-01: «Agents refinado» = dirección B «La órbita» + las
+    // tres ventanas de C «La nave»). Es un personaje PROPIO de Efeonce, no una mascota de partner: no lleva aviso de
+    // uso interno. El plantel de cinco (investigación, contenido, CRM/datos, servicio, reportes) sigue pendiente.
+    etiqueta: 'the official 3D figure of a Spark, the small agent companion of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide: a glossy white sphere ' +
+      'with a navy visor showing two LED eyes and a small smile, the four-pointed sparkle antenna on top, the tilted white ' +
+      'orbit ring with its small sphere, three round windows on the belly, short white arms with dark hands, and NO legs — it ' +
+      'floats a few centimetres above the surface with a soft glow under it. All its lights (eyes, smile, windows, antenna, seams, glow) are ONE colour, exactly the colour of the reference: azure by default, or the accent of the business line the reference shows. Copy its shape, proportions and colours exactly; ' +
+      'only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist (on the shoulder, beside the head, over the desk). It works WITH a person who supervises it: it never replaces ' +
+      'a person and never appears deciding alone. It is the only robot allowed in an Efeonce photograph.',
+    // Variante por línea de negocio (operador, 2026-10-01: «Aprobados todos»): el MISMO Spark con el LED en el acento
+    // de la línea (tokens efeonceGraphicLine.lines). El azul de Engine es el defecto; las demás sólo cuando la pieza es
+    // de esa línea. Brand y Voice (cálidos) se prueban en cine antes de usarse en una foto oscura.
+    // Fuente: el paquete versionado y sellado @efeoncepro/axis-brand-assets (≥ 0.4.10, recortes de 1024 px), no
+    // ai-generations/ (fuera de git). Los masters de 1600 px viven en el bucket de AXIS (sparks/v1/).
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
+    patron: 'spark-<V>.png',
+    patronPorColor: {
+      engine: 'spark-<V>.png',
+      growth: 'spark-growth-<V>.png',
+      brand: 'spark-brand-<V>.png',
+      voice: 'spark-voice-<V>.png',
+      'revenue-hubspot': 'spark-revenue-hubspot-<V>.png',
+      'revenue-salesforce': 'spark-revenue-salesforce-<V>.png'
+    },
+    colorDefecto: 'engine',
+    vistas: {
+      frente: '01-frente', 'tres-cuartos-izq': '02-tres-cuartos-izquierda', 'tres-cuartos-der': '03-tres-cuartos-derecha',
+      perfil: '04-perfil', 'perfil-der': '10-perfil-derecho', espalda: '05-espalda', 'espalda-recta': '11-espalda-recta',
+      'trasero-izq': '12-tres-cuartos-trasero-izquierdo', contrapicado: '06-contrapicado', picado: '07-picado',
+      'mira-arriba': '08-mira-arriba', 'mira-abajo': '09-mira-abajo',
+      atento: '20-expresion-atento', trabajando: '21-expresion-trabajando', 'pide-revision': '22-expresion-pide-revision',
+      listo: '23-expresion-listo', sorprendido: '24-expresion-sorprendido', pensando: '25-expresion-pensando',
+      'cine-frente': '30-cine-frente', 'cine-tres-cuartos': '31-cine-tres-cuartos', 'cine-mira-arriba': '32-cine-mira-arriba',
+      volando: '40-accion-volando', senalando: '41-accion-senalando', presenta: '42-accion-presenta-en-la-palma',
+      'entrega-tarjeta': '43-accion-entrega-tarjeta', grupo: '50-grupo-tres'
+    },
+    vistaDefecto: 'tres-cuartos-izq'
+  },
+  'spark-investigacion': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the Research Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small magnifying glass (white handle, thin navy rim, faintly azure lens) BESIDE its body, never in front of its visor; it reads and summarises sources. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
+    patron: 'spark-investigacion-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'spark-contenido': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the Content Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small thin white card with one azure brush stroke (no letters) and offers it; it proposes drafts. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
+    patron: 'spark-contenido-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'spark-crm-datos': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the CRM and Data Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a neat stack of small rounded white and navy tiles and places one more on top; it keeps records in order. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
+    patron: 'spark-crm-datos-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'spark-servicio': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the Service Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small white speech-bubble object with three azure dots and waves with the other hand; it answers and routes. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
+    patron: 'spark-servicio-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'spark-reportes': {
+    // Plantel de los Sparks (TASK-1941, 2026-10-01): mismo cuerpo y color que el Spark base; lo distingue el
+    // accesorio físico y el gesto. Canon: docs/operations/brand-characters/SPARKS_V1.md.
+    etiqueta: 'the official 3D figure of the Reports Spark, one of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small hovering companion about 22 cm wide (the Spark: glossy white ' +
+      'sphere, navy visor with two azure LED eyes and a small smile, sparkle antenna, tilted white orbit ring with its small sphere, three ' +
+      'azure belly windows, short arms, no legs, hovering with a soft azure glow under it). It holds a small desk model of a bar chart with three rising bars (the tallest azure) and points at the tallest bar; it measures and reports. Copy its shape, accessory and colours ' +
+      'exactly; only the pose, the gaze and the LED expression may follow the scene. SCALE: never larger than the head of the person, always ' +
+      'above the waist. It works WITH a person who supervises it: it never replaces a person and never appears deciding alone.',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
+    patron: 'spark-reportes-<V>.png',
+    vistas: { heroe: '01-heroe', frente: '02-frente', 'tres-cuartos-der': '03-tres-cuartos-derecha', 'mira-arriba': '04-mira-arriba', cine: '05-cine' },
+    vistaDefecto: 'heroe'
+  },
+  'sparks-plantel': {
+    // Los cinco Sparks juntos, cada uno con su accesorio (investigación, contenido, CRM/datos, servicio, reportes).
+    etiqueta: 'the official 3D group of the five Sparks of Efeonce',
+    instruccion:
+      'Reproduce EXACTLY these five figures as real, physical, finely made small hovering companions about 22 cm wide each, identical in body ' +
+      'and colour, each with its own accessory (magnifying glass, card with a stroke, stack of tiles, speech-bubble object, bar-chart model). ' +
+      'Their orbit rings never intersect. SCALE: each one never larger than the head of a person. They work WITH people who supervise them.',
+    base: 'node_modules/@efeoncepro/axis-brand-assets/assets/sparks/',
+    patron: 'sparks-<V>.png',
+    vistas: { frente: 'frente' },
+    vistaDefecto: 'frente'
   },
   clawd: {
     // Gobernanza que antes sólo vivía en los docs y nunca llegaba al operador en el momento de generar:
@@ -757,6 +1084,71 @@ export const OBJETOS = {
     },
     macroEmblema: 'efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
+  },
+  // Traje biónico de Nexa (TASK-1940, aprobado por el operador el 2026-10-01). Es FICCIÓN: sólo Nexa y sólo en
+  // registro cine (`validarTrajeNexa`). El isotipo va INCRUSTADO (navy, al ras de la placa) y llega YA ARMADO en la
+  // referencia: compuesto desde el SVG oficial con `foto:isotipo --prenda clara --acabado` sobre las vistas del kit, y
+  // el modelo lo copia en vez de inventarlo o borrarlo [operador, 2026-10-02: «dejarlo armado y con eso pasar la
+  // referencia al modelo para que no lo borre ni lo reinvente»]. Antes la pieza puesta iba lisa y la marca se componía
+  // después: las dos primeras escenas (NX7, NX7b) salieron sin logo. El macro viaja también en escena (`macroEnUso`).
+  // Si `foto:emblema` al 100 % muestra otra forma, se recompone con `foto:isotipo` como último recurso.
+  'traje-bionico-nexa': {
+    etiqueta: "Nexa's bionic suit (navy knit bodysuit with matte white armored plates and azure light seams)",
+    tipo: 'prenda',
+    instruccion:
+      'THIS SUIT IS ALREADY DESIGNED AND ALREADY CARRIES ITS EFEONCE MARK: copy it EXACTLY — deep navy one-piece knit ' +
+      'bodysuit, matte white armored plates on the shoulders, chest, upper arms and forearms, one white back plate, thin ' +
+      'glowing azure (#0375DB) LED seams along the plate edges, the torso sides and the outer legs, dark navy waist band, no ' +
+      'plates on the legs. The only mark is the small navy Efeonce isotype on the chest plate, on the wearer\'s left: copy ' +
+      'it as it is, never redraw it, never remove it, never add any other logo or lettering.',
+    instruccionEnUso:
+      'shows this suit ALREADY WORN, with its Efeonce mark already applied. Copy the SUIT exactly as it appears there — the ' +
+      'navy knit, every white plate in the same place and shape, the azure LED seams, the waist band, the way it sits on a ' +
+      'body — and copy its MARK exactly: the small navy Efeonce isotype inlaid flush on the chest plate, on the wearer\'s ' +
+      'left, at the same size and position. Do NOT remove it, redraw it, enlarge it or replace it with another symbol, and add ' +
+      'no other logo or lettering. The PERSON in that image only shows how the suit sits: copy her face and hair only from ' +
+      'the identity references. Ignore the background.',
+    base: 'ai-generations/2026-10-01_traje-bionico-nexa/final/',
+    // Entrega del kit (2026-10-02): vistas aisladas 1600×1600 transparentes (`entrega.mjs` + `ai:image:rmbg` + `--opacar`).
+    patron: 'efeonce-traje-bionico-nexa-<V>-1600x1600-v01-transparente.png',
+    vistas: {
+      frente: '01-frente',
+      'tres-cuartos-izq': '03-tres-cuartos-izquierda',
+      'tres-cuartos-der': '04-tres-cuartos-derecha',
+      lateral: '05-lateral'
+    },
+    vistasPorNombre: {
+      // v02: el logo completo serigrafiado en tinta navy metálica en la placa dorsal [operador, 2026-10-02].
+      espalda: 'efeonce-traje-bionico-nexa-02-espalda-1600x1600-v02-transparente.png'
+    },
+    vistaDefecto: 'frente',
+    // SIN ROSTRO (2026-10-02): la vista 13 completa trae la cara de Nexa con el gesto del ancla y la escena lo copiaba;
+    // el método de kits pide las vistas puestas recortadas bajo el mentón. La 13 completa queda en el kit como documento.
+    assetDeUso: 'efeonce-traje-bionico-nexa-13-puesto-frente-sin-rostro-1200x1330-v01-fondo-estudio.png',
+    usoPorVista: {
+      espalda: 'efeonce-traje-bionico-nexa-14-puesto-espalda-1200x1600-v02-fondo-estudio.png'
+    },
+    macroEmblema: 'efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1600x1600-v01-fondo-estudio.png',
+    macroEnUso: true,
+    tipoEmblema: 'isotipo',
+    acabadoMarca: 'inlaid flush into the matte white plate in navy, like a fine print set into the surface: no border, no relief, no bevel, no glow',
+    nota:
+      'el isotipo viaja armado en la referencia: amplíalo con `pnpm foto:emblema <plate>` y compáralo con el macro ' +
+      '`10-detalle-placa-isotipo` (nave a la derecha, tres ventanas, órbita con cortes, planeta arriba). Si difiere o falta, ' +
+      'recompónlo con `pnpm foto:isotipo <plate> --centro x,y --ancho w --prenda clara --acabado`.'
+  },
+  // Lentes biónicos de Nexa (TASK-1940, 2026-10-01): parte del traje, misma regla de uso.
+  'lentes-bionicos-nexa': {
+    etiqueta: "Nexa's bionic glasses",
+    instruccion:
+      'Copy these glasses EXACTLY and put them ON HER FACE: one frameless wraparound shield lens in CLEAR transparent ' +
+      'polycarbonate, very lightly tinted azure, with a thin glowing azure (#0375DB) LED line along its TOP edge, clear nose ' +
+      'pads and slim clear temple arms. Her eyes stay clearly visible through the lens: no mirror coating, no reflection ' +
+      'covering her eyes. No logo, no lettering.',
+    base: 'ai-generations/2026-10-01_traje-bionico-nexa/final/',
+    patron: 'efeonce-lentes-bionicos-nexa-<V>-1600x1600-v01-transparente.png',
+    vistas: { frente: '20-frente', 'tres-cuartos': '21-tres-cuartos' },
+    vistaDefecto: 'tres-cuartos'
   }
 }
 
@@ -825,7 +1217,7 @@ export const CLAVES_DE_REFERENCIA = {
 // el detector de drift de forma falla pidiendo clasificarla — ésa es la red que faltaba.
 export const CLAVES_SIN_ARCHIVO = {
   persona: ['etiqueta', 'identity', 'accesorios', 'vistasDeCuerpo', 'vestuarioDeCuerpo'],
-  objeto: ['etiqueta', 'aviso', 'instruccion', 'nota', 'base', 'vistas', 'vistaDefecto', 'tipo', 'tipoEmblema', 'tipoPorVista', 'colorDefecto']
+  objeto: ['etiqueta', 'aviso', 'instruccion', 'instruccionEnUso', 'acabadoMarca', 'macroEnUso', 'nota', 'base', 'vistas', 'vistaDefecto', 'tipo', 'tipoEmblema', 'tipoPorVista', 'colorDefecto']
 }
 
 /**
@@ -996,8 +1388,12 @@ function resolverObjetos(ficha, desde) {
     const tipoDeMarca = objeto.tipoPorVista?.[vista] ?? objeto.tipoEmblema
 
     const queMarca = tipoDeMarca && tipoDeMarca !== 'sin-marca'
-      ? ` The mark it carries is ${formaDeLaMarca(tipoDeMarca)} Render it as satin-stitch embroidery with visible ` +
-        'stitch direction, slightly raised over the knit — never flat ink. Do not resize or move it: it keeps ' +
+      ? ` The mark it carries is ${formaDeLaMarca(tipoDeMarca)} ` +
+        // El acabado lo decide la pieza: bordado en las prendas del uniforme, incrustado en el traje de Nexa.
+        (objeto.acabadoMarca
+          ? `It is ${objeto.acabadoMarca}. `
+          : 'Render it as satin-stitch embroidery with visible stitch direction, slightly raised over the knit — never flat ink. ') +
+        'Do not resize or move it: it keeps ' +
         'exactly the size and position it has in the reference — NO WIDER THAN A THIRD of the chest panel, ' +
         'barely wider than a lanyard badge hanging in the same shot. An oversized emblem is the most common ' +
         'failure of this kit.'
@@ -1005,7 +1401,11 @@ function resolverObjetos(ficha, desde) {
 
     // Con la prenda PUESTA, la referencia trae una persona que NO es la de la escena: hay que decirlo,
     // o el modelo mezcla identidades. Con la prenda aislada esto no hacía falta.
-    const instruccion = enUso
+    // Una pieza puesta SIN marca (el traje de Nexa: la marca se compone después) declara su propia
+    // instrucción; la genérica afirma que la marca ya está aplicada y le pediría al modelo copiarla.
+    const instruccion = enUso && objeto.instruccionEnUso
+      ? `Image ${n} ${objeto.instruccionEnUso}`
+      : enUso
       ? `Image ${n} shows this garment ALREADY WORN, with its Efeonce mark already applied. Copy the GARMENT ` +
         'exactly as it appears there — same colour, same cut, same mark at the same size and position, and the ' +
         'way it sits and creases on a body. The PERSON in that image is NOT the person in this scene and their ' +
@@ -1020,7 +1420,9 @@ function resolverObjetos(ficha, desde) {
     // 2026-09-20: tres prendas dieron tres emblemas distintos y ninguno era el de Efeonce. Los kits
     // YA traían su macro; lo que faltaba era exponerlo. No se compone encima —probado y rechazado
     // por el operador: se ve impreso, no bordado—: se le da al modelo el emblema en grande.
-    if (objeto.macroEmblema && !enUso) {
+    // `macroEnUso`: la pieza puesta tampoco sostiene una marca chica sola (el traje de Nexa, TASK-1940), así que
+    // el macro viaja también con ella.
+    if (objeto.macroEmblema && (!enUso || objeto.macroEnUso)) {
       const macro = objeto.base + (objeto.macroPorColor?.[color] ?? objeto.macroEmblema)
 
       if (!existsSync(path.join(raiz, macro))) {
@@ -1036,7 +1438,7 @@ function resolverObjetos(ficha, desde) {
       bloques.push(
         `IMAGE ${nm} (detail reference): Image ${nm} shows, in macro, the mark THAT IS ALREADY ON that garment — ${formaDeLaMarca(objeto.tipoPorVista?.[vista] ?? objeto.tipoEmblema)} ` +
           `It is here only so the small mark in the previous image is not lost or reinterpreted at its real scale. ` +
-          'Keep its proportions, its thread colour and its embroidered relief exactly as in the macro. Do NOT invent, ' +
+          `Keep its proportions, ${objeto.acabadoMarca ? `its colour and its finish (${objeto.acabadoMarca})` : 'its thread colour and its embroidered relief'} exactly as in the macro. Do NOT invent, ` +
           'simplify, redraw or substitute it with a spiral, an @ or any other shape, and do NOT change which of the ' +
           'two forms it is. It sits at the scale it has in the real garment. Ignore its studio background.'
       )
@@ -1107,6 +1509,13 @@ function bloqueSuspendido(ficha) {
       '`suspendido` debe decir QUÉ está en el aire, por ejemplo "the coffee beans tipped from the scoop". ' +
         'Un valor vacío o genérico deja que el modelo elija, y elige confeti.'
     )
+  }
+
+  // En cine el `suspendido` suele describir ya el congelado («frozen mid-air…», «hanging still…») y la plantilla de
+  // abajo lo volvía una frase rota («…hanging still along them is FROZEN IN MID-AIR at the peak of its arc», NX7d,
+  // prueba ciega 2026-10-02). En cine va como frase propia; fuera de cine queda igual para no mover la regresión.
+  if (ficha.registro === 'cine') {
+    return `SUSPENDED ACTION (one frozen, decisive instant): ${que.trim().replace(/[.\s]+$/, '')}. Every piece is sharp and clearly in flight, caught at a frozen shutter speed, with its real weight and trajectory — never a decorative scatter and never confetti.`
   }
 
   return `SUSPENDED ACTION: ${que} is FROZEN IN MID-AIR at the peak of its arc — every piece sharp and clearly in flight, caught at a frozen shutter speed, with its real weight and trajectory. It is a single decisive instant, not a decorative scatter and never confetti.`
@@ -1530,8 +1939,14 @@ export const auditarEmblema = objetos => {
   ]
 }
 
+// Con chaqueta, el polo es la capa de abajo: las dos chaquetas se diseñaron «para ir sobre el polo»
+// (`2026-09-17_chaqueta-efeonce/LEEME.md`) y sus vistas puestas lo llevan debajo. Ahí no marca registro.
+const CHAQUETAS = ['chaqueta-softshell-efeonce', 'chaqueta-bomber-efeonce']
+
 export const auditarRegistroVestuario = objetos => {
-  const prendas = (objetos ?? []).filter(o => REGISTRO_PRENDA[o])
+  const lista = objetos ?? []
+  const conChaqueta = lista.some(o => CHAQUETAS.includes(o))
+  const prendas = lista.filter(o => REGISTRO_PRENDA[o] && !(conChaqueta && o === 'polo-efeonce'))
 
   if (prendas.length < 2) return []
 
@@ -1768,12 +2183,110 @@ const FICHA_EJEMPLO = {
 // **[decisión del operador, 2026-09-19]** «nosotros NO somos Berel». Una sesión igual generó, el
 // 2026-09-20, un macro de un rodillo aplicando pintura azul: la regla estaba escrita en los docs y no
 // la ejecutaba nada. Tabla extensible; se agrega sólo lo que el operador declare, nunca por inferencia.
-const ANCLAS_PROHIBIDAS = [
+//
+// Cada ancla declara de qué CLIENTE es el rubro: es lo que permite la única excepción, un `caso` de ese
+// mismo cliente (ver `validarCaso`). La segunda alternativa del patrón (muestrarios, cartas y latas de
+// PINTURA) se agregó el 2026-09-30 porque la escena del caso Berel del deck SEO/AEO —«paint color swatch
+// cards» y un «paint fan deck» sobre la mesa— es la categoría de Berel y la guarda no la veía [medido].
+// Exige la palabra `paint`: los muestrarios de color impresos son oficio de Efeonce y siguen permitidos.
+export const ANCLAS_PROHIBIDAS = [
   {
-    patron: /\b(paint roller|rodillo|fresh paint|wet paint|painting the wall|paint(s|ing)? (a|the) wall)\b/i,
+    cliente: 'Berel',
+    patron:
+      /\b(paint roller|rodillo|fresh paint|wet paint|painting the wall|paint(s|ing)? (a|the) wall|paint (colou?r )?(swatch(es)?|cards?|chips?|fan ?decks?|samples?)|paint (cans?|buckets?|tins?))\b/i,
     porque: 'la pintura es la categoría de Berel, un cliente. La fotografía de Efeonce NUNCA se ancla en el rubro de un cliente'
   }
 ]
+
+// ── Excepción declarada: el caso de un cliente ─────────────────────────────────────────────────────
+// **[decisión del operador, 2026-09-30, deck SEO/AEO (TASK-1949), decisión 14]** En un CASO DE ÉXITO se
+// aceptan imágenes de ambiente generadas asociadas al cliente —la sesión del squad con el equipo de
+// Berel entre muestrarios de pintura—. No es una regla nueva: es UNA excepción que la ficha declara
+// (`caso`), sólo para ese cliente y sólo en el registro de puesta en escena. Sin `caso`, el ancla sigue
+// abortando igual que antes: la fotografía PROPIA de Efeonce nunca se ancla en el rubro de un cliente.
+// El logo del cliente jamás lo pinta el modelo: se compone después desde el archivo oficial (caso CS1b,
+// tarjeta en blanco + logo Banco BICE compuesto con sharp), y usar la marca del cliente queda sujeto a
+// su autorización (TASK-1937).
+const normalizar = t =>
+  String(t ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+
+const escaparRegex = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+export const REGISTRO_DE_CASO = 'puesta-en-escena'
+
+export const validarCaso = ficha => {
+  const id = ficha.id ?? 'esta ficha'
+  const anclas = ANCLAS_PROHIBIDAS.filter(a => a.patron.test(ficha.escena))
+  const caso = ficha.caso
+
+  if (caso === undefined) {
+    if (anclas.length) {
+      throw new Error(
+        `La escena de "${id}" usa un ancla prohibida: ${anclas[0].porque}. ` +
+          'Cambia la materia de la escena; esto no se corrige regenerando. ' +
+          '(Sólo si la pieza es el CASO de ese cliente —registro puesta en escena— la ficha puede declararlo en `caso`.)'
+      )
+    }
+
+    return null
+  }
+
+  if (typeof caso !== 'object' || caso === null || caso.tipo !== 'cliente') {
+    throw new Error(`"${id}": \`caso\` sólo admite { "tipo": "cliente", "cliente": "<nombre>", "registro": "${REGISTRO_DE_CASO}" }.`)
+  }
+
+  if (caso.registro !== REGISTRO_DE_CASO) {
+    throw new Error(
+      `"${id}": un caso de cliente sólo existe en el registro \`${REGISTRO_DE_CASO}\` (declaraste "${caso.registro ?? '—'}"). ` +
+        'El registro documental retrata el oficio de Efeonce, y ahí el rubro de un cliente nunca es el ancla.'
+    )
+  }
+
+  const conocidos = [...new Set(ANCLAS_PROHIBIDAS.map(a => a.cliente))]
+  const cliente = conocidos.find(c => normalizar(c) === normalizar(caso.cliente))
+
+  if (!cliente) {
+    throw new Error(
+      `"${id}": el cliente "${caso.cliente ?? '—'}" no tiene rubro declarado en ANCLAS_PROHIBIDAS (${conocidos.join(', ')}). ` +
+        'La excepción sólo abre el rubro de un cliente que el operador declaró; no se infiere.'
+    )
+  }
+
+  const ajenas = anclas.filter(a => a.cliente !== cliente)
+
+  if (ajenas.length) {
+    throw new Error(
+      `"${id}": el caso declara a ${cliente}, pero la escena se ancla en el rubro de ${ajenas.map(a => a.cliente).join(', ')}: ` +
+        `${ajenas[0].porque}. La excepción abre sólo el rubro del cliente del caso.`
+    )
+  }
+
+  // El nombre del cliente en la escena es cómo el modelo termina escribiendo su marca en un cartel,
+  // una lata o una pantalla. La escena lo evoca por su rubro; el logo se compone después.
+  if (new RegExp(`\\b${escaparRegex(normalizar(cliente))}\\b`, 'i').test(normalizar(ficha.escena))) {
+    throw new Error(
+      `"${id}": la escena nombra a ${cliente}. Descríbelo por su rubro («the client's marketing lead»), nunca por su nombre: ` +
+        'el modelo lo escribe como marca. Si la pieza lleva el logo del cliente, se COMPONE después desde el archivo oficial.'
+    )
+  }
+
+  return {
+    cliente,
+    anclado: anclas.length > 0,
+    bloque:
+      `CLIENT CASE (staged scene): the scene only evokes the client's category. No logo, brand name, wordmark, label, ` +
+      `signage or packaging of the client anywhere in the frame, and no invented brand names on any product; ` +
+      `any client logo is composited later from its official file, never drawn here.`,
+    aviso:
+      `caso de cliente declarado (${cliente}, registro ${REGISTRO_DE_CASO}): la guarda del rubro ` +
+      `${anclas.length ? 'se abre SÓLO para esta ficha' : 'no se disparó, pero el prompt igual prohíbe su marca'}. ` +
+      'El logo del cliente se compone desde el archivo oficial y su uso requiere la autorización del cliente (TASK-1937).'
+  }
+}
 
 // Vocabulario con el que una escena declara LUZ y MOMENTO. La ronda que el operador aprobó el 19/09
 // los tiene en el 100% de sus escenas; la tanda de 34 que perdió calidad, en 64% y 26%. No es una
@@ -1807,12 +2320,361 @@ return avisos
 // es vestir de navy» — y de paso empuja la escena al arquetipo consultora. Con identidad, el
 // vestuario se declara en la escena o lo decide la referencia por nosotros.
 const VESTUARIO =
-  /\b(wear|wearing|dressed|shirt|t-?shirt|sweater|jumper|hoodie|polo|blouse|apron|overall|coverall|jacket|vest|linen|denim|cotton|knit|sleeves?)\b/i
+  /\b(wears?|wearing|dressed|suit|bodysuit|shirt|t-?shirt|sweater|jumper|hoodie|polo|blouse|apron|overall|coverall|jacket|vest|linen|denim|cotton|knit|sleeves?)\b/i
+
+// La pose repetida de Nexa (2026-10-02): sin una expresión declarada cae en el gesto por defecto de la escena
+// («confident half-smile») y todas las piezas salen con la misma cara. Aviso, no error: la neutra es legítima.
+export const auditarExpresion = identidad =>
+  (identidad ?? []).some(p => (typeof p === 'string' ? p : p?.persona) === 'nexa' && !(typeof p === 'object' && (p.expresion || p.vista)))
+    ? 'trae a Nexa sin `expresion` ni `vista`: sale con el gesto por defecto y la serie se repite. Declárala, por ejemplo ' +
+      '{ "persona": "nexa", "expresion": "conviccion" } (12 fotográficas en _identidad-nexa/5-expresiones/).'
+    : null
 
 export const auditarVestuario = (escena, identidad) =>
   identidad?.length && !VESTUARIO.test(escena)
     ? 'no declara el VESTUARIO y hay identidad: el modelo copia la ropa de las referencias aunque el prompt diga "ignore their clothing"'
     : null
+
+// ── Vestuario del equipo por línea de servicio (decisión del operador, 2026-09-29) ──────────────────
+// «Para todas las líneas de negocio sea la bomber y/o softshell de los uniformes corporativos, y para los servicios
+// creativos sea el hoodie, por la personalidad de las líneas de negocio.» La línea la declara la ficha (`linea`, una
+// clave de `efeonceGraphicLine.lines`); la de servicios creativos es la que el token llama Creative Services (`brand`).
+// Aplica a las personas REALES del equipo (el roster); Nexa conserva su vestuario propio.
+export const EQUIPO_REAL = ['julio', 'andres', 'daniela', 'humberly', 'melkin', 'valentina']
+export const LINEA_CREATIVA = efeonceGraphicLine.lines.find(l => l.scope === 'Creative Services')?.key ?? 'brand'
+export const VESTUARIO_POR_LINEA = {
+  negocio: { prendas: ['chaqueta-bomber-efeonce', 'chaqueta-softshell-efeonce'], etiqueta: 'la bomber o la softshell del uniforme corporativo' },
+  creativa: { prendas: ['hoodie-efeonce'], etiqueta: 'el hoodie Efeonce' }
+}
+
+export const validarVestuarioDeLinea = ficha => {
+  const personas = (Array.isArray(ficha.identidad) ? ficha.identidad : []).map(p => (typeof p === 'string' ? p : p?.persona))
+  const delEquipo = personas.filter(p => EQUIPO_REAL.includes(p))
+
+  if (delEquipo.length === 0 || ficha.linea === undefined) return
+
+  const lineas = efeonceGraphicLine.lines.map(l => l.key)
+
+  if (!lineas.includes(ficha.linea)) {
+    throw new Error(`La línea "${ficha.linea}" no existe. Usa una de efeonceGraphicLine.lines: ${lineas.join(', ')}.`)
+  }
+
+  const familia = ficha.linea === LINEA_CREATIVA ? 'creativa' : 'negocio'
+  const regla = VESTUARIO_POR_LINEA[familia]
+  const otra = VESTUARIO_POR_LINEA[familia === 'creativa' ? 'negocio' : 'creativa']
+  const prendas = (ficha.objetos ?? []).map(o => (typeof o === 'string' ? o : o?.objeto))
+
+  if (!prendas.some(p => regla.prendas.includes(p)) || prendas.some(p => otra.prendas.includes(p))) {
+    throw new Error(
+      `En la línea ${ficha.linea} el equipo (${delEquipo.join(', ')}) va con ${regla.etiqueta} ` +
+        `(${regla.prendas.join(' o ')} en \`objetos\`), nunca con ${otra.etiqueta}. ` +
+        'Es la personalidad de la línea (decisión del operador, 2026-09-29); el polo nunca va solo: sólo debajo de la chaqueta.'
+    )
+  }
+}
+
+// ── Robots: sólo los Sparks del kit (TASK-1941, decisión del operador 2026-09-29/10-01) ────────────────
+// El canon prohíbe fotografiar «robots, circuitos ni interfaces flotantes». La única excepción son los
+// Sparks, los agentes de Efeonce, y salen SIEMPRE del kit (`objetos: [{ objeto: "spark…" }]`): describir
+// «three small friendly robot agents» a mano daba un robot distinto en cada foto, parecido a personajes
+// ajenos (NX3, AD4, RV1, WB1, BR4). Las negaciones («no robots», «NO robot») son legítimas: se ignoran.
+// Y los Sparks viven en cine o puesta en escena, nunca en el registro documental.
+export const PATRON_ROBOT = /\b(robots?|robotic|droids?|droides?|bots?|androids?|androides?|cyborgs?|mechas?)\b/gi
+const NEGACION_PREVIA = /\b(no|not|never|nor|without|sin|nunca|ni)\b(\s+[\w-]+){0,2}[\s,]*$/i
+
+export const PALANCAS_DOCUMENTALES = ['escucha', 'manos', 'sombra', 'silueta', 'marcado', 'quien-sostiene']
+
+export const declaraSpark = ficha =>
+  (ficha.objetos ?? []).some(o => String(typeof o === 'string' ? o : o?.objeto ?? '').startsWith('spark'))
+
+export const robotsSinNegar = escena => {
+  const texto = String(escena ?? '')
+  const hallados = []
+
+  for (const m of texto.matchAll(PATRON_ROBOT)) {
+    const clausula = texto.slice(Math.max(0, m.index - 60), m.index).split(/[.;:!?]/).pop()
+
+    if (!NEGACION_PREVIA.test(clausula)) hallados.push(m[0])
+  }
+
+  return hallados
+}
+
+export const validarRobots = ficha => {
+  const id = ficha.id ?? 'esta ficha'
+  const robots = robotsSinNegar(ficha.escena)
+  const spark = declaraSpark(ficha)
+
+  if (robots.length && !spark) {
+    throw new Error(
+      `La escena de "${id}" describe un robot («${robots[0]}») sin declarar un Spark. El único robot permitido en una ` +
+        'foto de Efeonce es un Spark del kit, y se declara en `objetos` (por ejemplo `{ "objeto": "spark", "vista": ' +
+        '"tres-cuartos-izq" }`), nunca se describe a mano: a mano sale distinto en cada foto y parecido a personajes ajenos.'
+    )
+  }
+
+  if (spark && (ficha.registro === 'documental' || PALANCAS_DOCUMENTALES.includes(ficha.palanca))) {
+    throw new Error(
+      `"${id}": los Sparks viven en el registro cine o de puesta en escena, nunca en el documental ` +
+        `(${ficha.registro === 'documental' ? 'declaraste `registro: "documental"`' : `la palanca "${ficha.palanca}" es documental`}). ` +
+        'El documental retrata el oficio real de Efeonce, y ahí un personaje de ficción no tiene lugar.'
+    )
+  }
+
+  return spark
+}
+
+// El traje biónico y sus lentes son ficción de Nexa (TASK-1940): sólo Nexa los lleva y sólo en el registro cine.
+// El registro cine no tenía campo propio en la ficha; para el traje se declara explícito, porque en un retrato de
+// oficina o en una persona del equipo el traje dice lo contrario de lo que la foto cuenta.
+export const PIEZAS_SOLO_NEXA_CINE = ['traje-bionico-nexa', 'lentes-bionicos-nexa']
+
+export const validarTrajeNexa = ficha => {
+  const id = ficha.id ?? 'esta ficha'
+
+  const pedidas = (ficha.objetos ?? [])
+    .map(o => String(typeof o === 'string' ? o : o?.objeto ?? ''))
+    .filter(o => PIEZAS_SOLO_NEXA_CINE.includes(o))
+
+  if (!pedidas.length) return false
+
+  const personas = (ficha.identidad ?? []).map(p => (typeof p === 'string' ? p : p?.persona))
+  const otras = personas.filter(p => p !== 'nexa')
+
+  if (!personas.includes('nexa') || otras.length) {
+    throw new Error(
+      `"${id}" pide ${pedidas.join(' y ')} ${otras.length ? `con ${otras.join(', ')} en cuadro` : 'sin Nexa en `identidad`'}. ` +
+        'El traje biónico y sus lentes son sólo de Nexa: nunca en una persona del equipo ni en una pieza sin ella.'
+    )
+  }
+
+  if (ficha.registro !== 'cine') {
+    throw new Error(
+      `"${id}" pide ${pedidas.join(' y ')} fuera del registro cine (declaraste \`registro: ${JSON.stringify(ficha.registro ?? null)}\`). ` +
+        'El traje es ficción y sólo vive en cine: declara `"registro": "cine"` en la ficha, o viste a Nexa con el uniforme ' +
+        'de su registro de escena.'
+    )
+  }
+
+  return true
+}
+
+// ── Registro cine: el oficio en la ficha (casebook, 2026-10-02) ─────────────────────────────────────
+// Ninguna sesión llegaba sola a una foto cine aprobable: las mismas diez fallas, consultadas una y otra vez
+// (`docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md`). Estos campos vuelven explícito lo que
+// las fichas aprobadas tenían en prosa. TODO lo de abajo actúa SÓLO con `registro: "cine"`: el prompt de los demás
+// registros no cambia en un solo byte (`scripts/foto/regresion-prompt.mjs` lo verifica sobre todas las fichas).
+export const ALCANCES_CINE = [
+  'nexa',
+  'proposal-cinematic',
+  'deck-seccion',
+  'deck-portada',
+  'manzanitas',
+  'social-nexa',
+  'publicidad-prueba'
+]
+
+// Objetos que son PERSONAJES (criaturas, mascotas): cada referencia de estudio dice «Reproduce EXACTLY» y el
+// modelo copia también su nitidez, su tamaño y su luz pareja — con muchos, salen stickers en abanico (NX7b: 10
+// referencias; NX7d, aprobada: dos Sparks con referencia y el resto sin imagen, lejos y desenfocados).
+export const esObjetoPersonaje = clave =>
+  /^spark/.test(clave) || ['clawd', 'codex', 'gigi', 'gigi-aeo', 'sprocket-hubspot'].includes(clave)
+
+export const MAX_PERSONAJES_CINE = 2
+const FORMATOS_VERTICALES = ['4:5', '9:16']
+
+const clavesDeObjetos = ficha =>
+  (ficha.objetos ?? []).map(o => (typeof o === 'string' ? o : o?.objeto)).filter(Boolean)
+
+export const auditarCine = ficha => {
+  if (ficha.registro !== 'cine') return []
+
+  const avisos = []
+  const ref = 'docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md'
+
+  if (!ficha.alcance) {
+    avisos.push(
+      `falta \`alcance\` (${ALCANCES_CINE.join(' · ')}). El cine sólo vive en esos casos; declararlo obliga a mirar el §2 del registro antes de gastar (casebook, falla 10).`
+    )
+  } else if (ficha.alcance === 'publicidad-prueba') {
+    avisos.push('`alcance: publicidad-prueba`: la publicidad cine con personas del equipo está EN PRUEBA; la pieza no se publica sin aprobación del operador.')
+  }
+
+  if (!ficha.llave) {
+    avisos.push('falta `llave` (fuente, lado, distancia): sin una sola fuente dura con lado y SIN relleno, la cara sale plana (casebook, falla 2).')
+  }
+
+  if (!ficha.primerPlano) {
+    avisos.push('falta `primerPlano`: sin algo real junto al lente, todo cae en un solo plano y no se siente cine (casebook, falla 3).')
+  }
+
+  if (!ficha.fondo) {
+    avisos.push('falta `fondo`: las luces prácticas grandes y frías en bokeh son las que dan escala (casebook, falla 3).')
+  }
+
+  if (!ficha.fenomeno?.que) {
+    avisos.push('falta `fenomeno.que`: el fenómeno de luz es la idea de la foto cine (casebook, falla 4).')
+  } else if (!ficha.fenomeno.esServicio || String(ficha.fenomeno.esServicio).trim().length < 8) {
+    avisos.push('falta `fenomeno.esServicio`: una frase que diga por qué la luz ES el servicio. Si sin la luz la idea sigue en pie, la luz sobra (casebook, falla 4).')
+  }
+
+  const personajes = clavesDeObjetos(ficha).filter(esObjetoPersonaje)
+
+  if (personajes.length > MAX_PERSONAJES_CINE) {
+    avisos.push(
+      `${personajes.length} personajes con referencia propia (${personajes.join(', ')}; máximo ${MAX_PERSONAJES_CINE}). Cada referencia sale nítida, del mismo tamaño y con luz propia: stickers en abanico. Deja con referencia sólo los del plano cercano; el resto, sin imagen, «the same figures as the references», lejos y desenfocado (casebook, falla 1; NX7b → NX7d).`
+    )
+  }
+
+  if (ficha.__revisar) {
+    avisos.push(`\`__revisar\` (${[].concat(ficha.__revisar).join(', ')}): vienen de la receta; confirma que sirven a esta escena y borra la clave.`)
+  }
+
+  if (ficha.__completar) {
+    avisos.push(`la ficha todavía lista \`__completar\` (${[].concat(ficha.__completar).join(', ')}): complétalos y borra la clave antes de generar.`)
+  }
+
+  if (ficha.formato === '1:1' && ficha.reservas?.texto && ficha.reservas.texto.lado !== 'izquierda' && ['deck-seccion'].includes(ficha.alcance)) {
+    avisos.push('sección partida 1:1 con la reserva arriba: declara `"reservas": { "texto": { "lado": "izquierda", … } }` para que el titular vaya a la izquierda (prueba ciega A, 2026-10-02).')
+  }
+
+  if (avisos.length) avisos.push(`casebook: ${ref} · revisión antes de gastar: agente \`cine-reviewer\`.`)
+
+  return avisos
+}
+
+const textoLlave = llave => {
+  if (typeof llave === 'string') return llave
+
+  return [llave.fuente, llave.lado, llave.distancia, llave.tamano].filter(Boolean).join(', ')
+}
+
+// El bloque se compila desde los campos; nunca se escribe a mano. Va después de la escena y antes del lecho.
+// Los bloques compartidos (realismo, impacto, tinta, lecho) se escribieron para el registro documental y
+// contradicen al cine: «documentary», «shadows open», «real sunlight», «warm-neutral», «a mug, a notebook».
+// Las tres sesiones de la prueba ciega del 2026-10-02 salieron con la cara rellena y una con el fondo ámbar
+// por esto. En cine se reemplazan esas frases; en los demás registros el bloque queda idéntico (regresión).
+export const AJUSTES_CINE = [
+  ['a real candid documentary photograph', 'a real cinematic film still'],
+  ['only one or two lived-in details (a mug, a notebook)', 'nothing lived-in, nothing analog: no mugs, notebooks, books or paper'],
+  ['highlights keep detail, shadows open.', 'highlights keep detail; shadows fall to deep near-black that still keeps texture (there is no fill light).'],
+  ['Latin American people with real, characterful faces.', 'Only the people the scene declares are in the frame, with real, characterful faces; no extra people.'],
+  [
+    'PRINTED MATTER EXISTS but is never readable: book spines, labels, packaging, papers and screens are present exactly as they would be in any real working room, and they are kept ILLEGIBLE BY PHYSICAL MEANS ONLY — too small, out of focus, cut by the frame edge, at a steep angle, turned away or lost in shadow — NEVER by being blank. NO blank book spines, NO empty labels, NO unmarked packaging, NO featureless screens: a room where nothing at all carries writing reads as fabricated.',
+    'There is no printed matter, no books and no screens unless the scene declares them; anything that carries writing is illegible by physical means (too small, out of focus or in shadow).'
+  ],
+  [
+    'a hard, directional beam of real sunlight or a single strong source sculpting the subject',
+    'a single hard source, close to the subject and to one side, sculpting the subject with NO fill light'
+  ],
+  [
+    'a restrained palette where bright azure blue (#0375DB) emerges naturally in the spatial composition through scene light, reflections, real materials or the relationship between depth planes, creating graphic rhythm without requiring a separate blue prop; everything else calm and neutral-warm',
+    'a restrained palette where the colour of the light phenomenon declared in the scene is the only accent; everything else deep cool navy and near-black'
+  ],
+  ['white balance warm-neutral, shadows never blue.', 'white balance cool-neutral; shadows deep navy-black, never amber, never warm tungsten, never saturated blue.'],
+  ['a DEEP, warm, evenly toned shadow', 'a DEEP, evenly toned near-black shadow'],
+  // Prueba ciega 2 (2026-10-02): restos documentales que seguían entrando en cine.
+  ['real paper texture, ', ''],
+  ['slight motion blur on moving hands, ', ''],
+  ['a DECISIVE MOMENT at the peak of the action', 'a single decisive instant'],
+  [
+    'a SOURCE THAT IS VISIBLE IN THE FRAME — a monitor, a screen, a practical lamp, a window — and that source is what lights them',
+    'a SOURCE THAT IS VISIBLE IN THE FRAME — the light object the scene declares as its phenomenon, never a monitor, a lamp or a window — and that source is what lights them'
+  ],
+  // Decisión del operador 2026-10-02: los aros de Nexa son dorados, como en su ancla de identidad (pedir plata
+  // perdía siempre contra la referencia). Sólo en cine por ahora; el resto de los registros no cambia.
+  [
+    'small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate',
+    'small gold earrings, geometric studs or medium hoops depending on context, matching her identity reference, never ornate'
+  ]
+]
+
+/** @param {string} texto @returns {string} */
+export const ajustarParaCine = texto => AJUSTES_CINE.reduce((/** @type {string} */ t, [de, a]) => t.split(de).join(a), texto)
+
+// Con el traje biónico, Nexa NO lleva smartwatch ni anillo [operador, 2026-10-02, TASK-1940]: los antebrazos son placas, y
+// la prueba ciega del mismo día mostró que la «bright rectangular screen» del reloj competía con la única fuente de luz
+// de la escena. Se reemplaza sólo esa cláusula del bloque de accesorios; los aretes quedan literales para que
+// AJUSTES_CINE los siga cambiando a dorados.
+export const CLAUSULA_RELOJ_ANILLO =
+  'a geometric matte-silver statement ring on the INDEX finger of her right hand — not a plain band, not gold, not on another finger; a modern SMARTWATCH on her LEFT wrist — a rounded-square aluminium or titanium case with a bright rectangular screen and a plain sport or woven band in navy or graphite, NEVER a round analogue dial with hands; '
+
+export const ajustarParaTraje = (/** @type {any} */ ficha, /** @type {string} */ texto) =>
+  clavesDeObjetos(ficha).includes('traje-bionico-nexa')
+    ? texto.split(CLAUSULA_RELOJ_ANILLO).join('NO ring and NO watch of any kind (with the bionic suit her forearms are armored plates); ')
+    : texto
+
+// En una sección partida 1:1 del deck la reserva va a la IZQUIERDA, no arriba (prueba ciega A, 2026-10-02:
+// el formato 1:1 sólo sabía reservar la banda superior y la frase salía rota). Sólo en cine.
+const SECCION_PARTIDA_1_1 = {
+  limite: 'All people and objects stay entirely inside the RIGHT 60% of the frame.',
+  zonaTexto: ({ muro, tinta }) =>
+    `TEXT SPACE (planned, essential): the LEFT 40% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right part of the frame.`
+}
+
+const ESCALA_VERTICAL = {
+  '9:16': 'SUBJECT SCALE: framed from the waist up; the head is small in the frame, about one sixth of the frame height, with a tall calm dark space above the head.',
+  '4:5': 'SUBJECT SCALE: framed from the chest up; the head is about one fifth of the frame height, with calm dark space above the head.'
+}
+
+export const bloqueCine = (ficha, formato) => {
+  if (ficha.registro !== 'cine') return null
+
+  const partes = []
+
+  if (ficha.llave) {
+    partes.push(
+      `KEY LIGHT: ${textoLlave(ficha.llave)}. It is the ONLY key light: NO fill light, NO front light, NO bounce. The face is modelled by that one source: the half turned away from it falls into clearly deeper shadow, the direction of the light reads at a glance and the nose shadow is legible on the cheek.`
+    )
+  }
+
+  if (ficha.primerPlano) {
+    partes.push(
+      `DEPTH: in the immediate foreground, very close to the lens: ${ficha.primerPlano}. It is soft and out of focus, and it is a separate object from the bed at the bottom of the frame. The subject is razor sharp; everything behind recedes into progressively softer focus.`
+    )
+  }
+
+  if (ficha.fondo) {
+    partes.push(
+      `BACKGROUND: ${ficha.fondo}.` +
+        (FORMATOS_VERTICALES.includes(formato) ? ' Every background light and figure stays BELOW 36% of the frame height; nothing bright hangs in the top third.' : '')
+    )
+  }
+
+  if (ficha.fenomeno?.que) {
+    let f = `THE LIGHT PHENOMENON: ${ficha.fenomeno.que}.`
+
+    if (FORMATOS_VERTICALES.includes(formato)) {
+      f += ' It stays entirely BELOW 36% of the frame height: the top third of the frame is calm, deep dark space with no part of it, no light and no objects.'
+    }
+
+    partes.push(f)
+  }
+
+  // Decisiones del operador 2026-10-02. Escala en vertical: la regla «cabeza ≈ ¼ del alto» es de 16:9; en vertical se
+  // pide por encuadre, con marcadores (el modelo ignora los porcentajes). Mirada: en la sección partida, al panel.
+  if (ficha.identidad && ESCALA_VERTICAL[formato]) partes.push(ESCALA_VERTICAL[formato])
+
+  if (ficha.alcance === 'deck-seccion') {
+    partes.push('GAZE: the person looks toward the empty dark side of the frame where the text will sit, never into the lens.')
+  }
+
+  // El traje biónico de Nexa también es navy profundo (TASK-1940): la prueba ciega del 2026-10-02 mostró que no recibía
+  // la línea porque no está en PRENDAS_CON_EMBLEMA (que dispara el aviso de bordado, que no le aplica).
+  if (clavesDeObjetos(ficha).some(k => PRENDAS_CON_EMBLEMA.includes(k) || k === 'traje-bionico-nexa')) {
+    // El hoodie del kit es azul royal y es correcto (registro cine §6, medido): no se le pide navy.
+    const claves = clavesDeObjetos(ficha)
+    const navy = claves.filter(k => k !== 'hoodie-efeonce')
+
+    partes.push(
+      navy.length
+        ? `UNIFORM COLOUR: every Efeonce garment keeps the exact colour of its reference${claves.includes('hoodie-efeonce') ? ' (the hoodie is the royal blue of its reference)' : ''}; the others are deep navy, never royal blue, cobalt or bright blue.`
+        : 'UNIFORM COLOUR: the hoodie keeps the exact royal blue of its reference.'
+    )
+  }
+
+  return partes.length ? `CINEMATIC CRAFT (registro cine):\n${partes.join('\n')}` : null
+}
 
 export const construirPrompt = ficha => {
   const fmt = FORMATOS[ficha.formato]
@@ -1820,14 +2682,10 @@ export const construirPrompt = ficha => {
   if (!fmt) throw new Error(`Formato "${ficha.formato}" desconocido. Usa uno de: ${Object.keys(FORMATOS).join(', ')}.`)
   if (!ficha.escena) throw new Error('La ficha necesita `escena`: el modelo no inventa la escena por vos.')
 
-  const ancla = ANCLAS_PROHIBIDAS.find(a => a.patron.test(ficha.escena))
+  const caso = validarCaso(ficha)
 
-  if (ancla) {
-    throw new Error(
-      `La escena de "${ficha.id ?? 'esta ficha'}" usa un ancla prohibida: ${ancla.porque}. ` +
-        `Cambia la materia de la escena; esto no se corrige regenerando.`
-    )
-  }
+  validarRobots(ficha)
+  validarTrajeNexa(ficha)
 
   // El canon contempla tomas SIN lecho —dron y todo-enfocadas— y el comando no lo sabía: abortaba
   // una toma legítima (caso: cenital perpendicular, 2026-09-20). Se declara `lecho: "sin-lecho"` con
@@ -1846,6 +2704,8 @@ export const construirPrompt = ficha => {
         'y declara `sinLechoPorque`.'
     )
   }
+
+  validarVestuarioDeLinea(ficha)
 
   if (ficha.toma) {
     for (const [reserva, regla] of Object.entries(INCOMPATIBLES)) {
@@ -1874,10 +2734,11 @@ export const construirPrompt = ficha => {
   if (suspendido) partes.push(suspendido)
 
   // Composición: el formato se declara UNA vez, acá, con el texto de la tabla.
-  const comp = [fmt.declara, fmt.limite]
   const r = ficha.reservas ?? {}
+  const partida = ficha.registro === 'cine' && ficha.formato === '1:1' && r.texto?.lado === 'izquierda' ? SECCION_PARTIDA_1_1 : null
+  const comp = [fmt.declara, (partida ?? fmt).limite]
 
-  if (r.texto) comp.push(fmt.zonaTexto({ muro: r.texto.muro ?? 'a plain wall', tinta: TINTA[r.texto.tinta ?? 'blanca'] }))
+  if (r.texto) comp.push((partida ?? fmt).zonaTexto({ muro: r.texto.muro ?? 'a plain wall', tinta: TINTA[r.texto.tinta ?? 'blanca'] }))
 
   for (const [k, args] of Object.entries(r)) {
     if (k !== 'texto') {
@@ -1904,32 +2765,50 @@ export const construirPrompt = ficha => {
 
   partes.push(ficha.escena)
 
+  const cine = bloqueCine(ficha, ficha.formato)
+
+  if (cine) partes.push(cine)
+
+  if (ficha.alcance && ficha.registro === 'cine' && !ALCANCES_CINE.includes(ficha.alcance)) {
+    throw new Error(`"${ficha.id ?? 'ficha'}": \`alcance\` "${ficha.alcance}" no existe. Usa uno de: ${ALCANCES_CINE.join(', ')}.`)
+  }
+
+  if (caso) partes.push(caso.bloque)
+
   // El lecho, con el porcentaje del formato. Nunca escrito a mano.
   if (ficha.lecho === 'sin-lecho') {
     return {
-      prompt: partes.join('\n\n'),
+      prompt: ajustarParaTraje(ficha, ficha.registro === 'cine' ? ajustarParaCine(partes.join('\n\n')) : partes.join('\n\n')),
       size: fmt.size,
       sinValidar: Boolean(fmt.sinValidar),
       imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
       avisosObjeto: objetos?.avisos ?? [],
       llevaSuspendido: Boolean(suspendido),
       sinMomento: Boolean(palanca?.sinMomento),
+      avisoCaso: caso?.aviso ?? null,
       sinLecho: true
     }
   }
 
   partes.push(
-    `FOREGROUND (planned): ${ficha.lecho.objeto}, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom ${fmt.lecho} of the frame (never a hard band), ${ficha.lecho.tono}; its center calm and even.`
+    (ficha.registro === 'cine'
+      ? `FOREGROUND (planned): ${ficha.lecho.objeto}, the lens only a few centimetres behind its near edge, so it is a soft out-of-focus mass that rises unevenly from the bottom of the frame and covers the bottom ${fmt.lecho} — it reads as a real object, never as a flat horizontal band — ${ficha.lecho.tono}; its center calm and even.`
+      : `FOREGROUND (planned): ${ficha.lecho.objeto}, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom ${fmt.lecho} of the frame (never a hard band), ${ficha.lecho.tono}; its center calm and even.`) +
+      // En cine el lecho lo mata el REFLEJO de la fuente, no la luz directa (NX7d: 2,98:1). Sólo en cine.
+      (ficha.registro === 'cine'
+        ? ' It is matte and non-reflective, outside the reach of the key light: no light and no reflection falls on it.'
+        : '')
   )
 
   return {
-    prompt: partes.join('\n\n'),
+    prompt: ajustarParaTraje(ficha, ficha.registro === 'cine' ? ajustarParaCine(partes.join('\n\n')) : partes.join('\n\n')),
     size: fmt.size,
     sinValidar: Boolean(fmt.sinValidar),
     imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
     avisosObjeto: objetos?.avisos ?? [],
     llevaSuspendido: Boolean(suspendido),
-    sinMomento: Boolean(palanca?.sinMomento)
+    sinMomento: Boolean(palanca?.sinMomento),
+    avisoCaso: caso?.aviso ?? null
   }
 }
 
@@ -2015,6 +2894,11 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     )
   }
 
+  // La excepción de caso se anuncia siempre, fuerte: es una puerta que se abrió a propósito.
+  for (const { ficha, avisoCaso } of resueltas) {
+    if (avisoCaso) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${avisoCaso}`)
+  }
+
   for (const { ficha, avisosObjeto, sinMomento } of resueltas) {
     // Una larga exposición no tiene momento decisivo y pedirle ambos es contradictorio: la palanca
     // apaga ese aviso concreto, no todos.
@@ -2030,10 +2914,17 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
 
     if (vestuario) avisos.push(vestuario)
 
+    const expresion = auditarExpresion(ficha.identidad)
+
+    if (expresion) avisos.push(expresion)
+
     for (const a of avisos) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: la escena ${a}`)
 
     // El aviso de derechos viaja con el kit, no con la memoria de quien lo usa.
     for (const a of avisosObjeto ?? []) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${a}`)
+
+    // Registro cine: los campos del oficio (casebook). Sólo con `registro: "cine"`.
+    for (const a of auditarCine(ficha)) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: cine — ${a}`)
   }
 
   for (const { ficha, imagenes } of resueltas) {
@@ -2089,12 +2980,14 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   // Las piezas que el operador aprobó son el estándar, y hoy ninguna sesión las tiene delante al
   // armar. Recordarlas cuesta dos líneas y evita reconstruir de memoria lo que ya existe medido.
   console.log(
-    '\n  Antes de gastar, mirá el estándar aprobado:\n' +
+    '\n  Antes de gastar, mira el estándar aprobado:\n' +
       '    ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/texto/  (la ronda que el operador aprobó)\n' +
       '    ai-generations/2026-09-20_piloto-reservas/rondas/p1/                  (piloto de las reservas nuevas)'
   )
 
   if (resueltas.some(r => r.sinValidar)) {
-    console.log('⚠ El formato 1:1 no tiene ronda validada: sus números son criterio, no medición.')
+    const sinRonda = [...new Set(resueltas.filter(r => r.sinValidar).map(r => r.ficha.formato))].join(', ')
+
+    console.log(`⚠ El formato ${sinRonda} no tiene ronda validada: sus números son criterio, no medición.`)
   }
 }

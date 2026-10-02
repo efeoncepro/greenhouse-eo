@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-07-08T09:05:55.012Z",
+  "generatedAt": "2026-10-01T22:00:00.686Z",
   "run": "ai-generations/2026-07-07_mural-guacamayas-hero",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-07_mural-guacamayas-hero",

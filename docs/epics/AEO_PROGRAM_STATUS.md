@@ -1,5 +1,7 @@
 # Programa AEO / AI Visibility — Estado y Qué Sigue
 
+> **Nomenclatura canónica desde 2026-09-29:** **Efeonce AEO** (capacidad) → **Efeonce AEO Assessment** (diagnóstico público) → **Efeonce AI Visibility Report** (entregable) → **Search Visibility 360** (oferta amplia). `AI Visibility Grader`, `Brand Visibility Grader` y `AEO Grader` permanecen como aliases técnicos o históricos en las tareas y el runtime. Este cambio documental no afirma que la UI pública ya exhiba los nombres nuevos. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo de documento:** Estado de programa + roadmap operativo (SSOT de "dónde estamos / qué sigue")
 > **Versión:** 1.5
 > **Creado:** 2026-07-16 por Claude (auditoría multi-agente del programa AEO)
@@ -274,3 +276,12 @@ Y en la segunda pasada sobre el propio AEO encontró **15 más en EPIC-020** que
 **Severidad: `warning` por defecto.** Con 193 violaciones preexistentes, hacerlo `error` hoy dejaría `pnpm epic:lint` rojo para todo el mundo por deuda ajena. Se enciende con **`pnpm epic:lint --strict-child-parity`** (exit 1), pensado para (a) verificar un epic recién reconciliado y (b) promoverse a gate de CI cuando el backlog esté limpio.
 
 **Estado tras esta pasada:** `EPIC-020`, `EPIC-021` y `EPIC-040` pasan `--strict-child-parity` limpios. Los otros 12 epics con drift quedan **fuera del alcance de este trabajo**: cada uno necesita el juicio de su dueño para decidir, task por task, si se agrega a la lista o si el campo `Epic:` está mal. No se tocaron a ciegas.
+
+## TASK-1863 — 28-09-2026
+
+Implementación multi-mercado/multidioma desplegada en staging (Vercel y worker `d86edb784`); main en espera.
+23 mercados LATAM/PR/ES/US, es/en/pt-BR/fr; Google verificado en 22, Cuba skip explícito sin fallback.
+Canaries: Efeonce cuatro mercados, Sky seis y API Brasil; 11 informes, Google 66/66. Sky Perú conserva
+informe parcial por un rate limit de Perplexity. Canal operador, sin ampliar derechos comerciales.
+[Evidencia final](../audits/platform/2026-09-28-task-1863-verification.md). MCP `TASK-1861` y UI dedicada
+son dependencias futuras; recurrencia secundaria y seguimiento de producción esperan el release a main.

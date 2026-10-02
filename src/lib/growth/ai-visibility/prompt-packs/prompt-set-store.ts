@@ -1,4 +1,9 @@
 import 'server-only'
+import type { PoolClient } from 'pg'
+
+import { ensurePrimaryMarket, listProfileMarkets, lockGraderProfile } from '../markets/store'
+import { projectProfile } from '../store'
+import { GraderMarketConfigError, type GraderMarket } from '../markets/contracts'
 
 /**
  * TASK-1290 Slice 2 — Growth AI Visibility · Prompt set store + lifecycle (server-only).
@@ -12,7 +17,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
-import { type GrowthAiVisibilityPromptDefinition } from './prompt-pack-v1'
+import type { GrowthAiVisibilityPromptDefinition } from './prompt-pack-v1'
 
 /** Query estructurada del set: el shape del pack + provenance opcional para el review (TASK-1291). */
 export interface PromptSetPrompt extends GrowthAiVisibilityPromptDefinition {
@@ -26,6 +31,7 @@ export type PromptSetStatus = 'draft' | 'approved' | 'active' | 'superseded'
 export type PromptSetGenerationStrategy = 'llm' | 'template_baseline'
 
 export interface GraderPromptSetRow {
+  marketId?: string | null
   setId: string
   profileId: string
   version: number
@@ -46,6 +52,7 @@ export interface GraderPromptSetRow {
 type RawRow = Record<string, unknown>
 
 const projectPromptSet = (row: RawRow): GraderPromptSetRow => ({
+  marketId: (row.market_id as string | null) ?? null,
   setId: String(row.set_id),
   profileId: String(row.profile_id),
   version: Number(row.version),
@@ -64,12 +71,20 @@ const projectPromptSet = (row: RawRow): GraderPromptSetRow => ({
 })
 
 /** El set `active` de un perfil (el que usan los runs), o null si no hay. */
-export const getActivePromptSet = async (profileId: string): Promise<GraderPromptSetRow | null> => {
-  const rows = await runGreenhousePostgresQuery<RawRow>(
+export const getActivePromptSet = async (
+  profileId: string,
+  marketId?: string,
+  client?: PoolClient
+): Promise<GraderPromptSetRow | null> => {
+  const read = client
+    ? async (sql: string, values: unknown[]) => (await client.query<RawRow>(sql, values)).rows
+    : runGreenhousePostgresQuery<RawRow>
+
+  const rows = await read(
     `SELECT * FROM greenhouse_growth.grader_prompt_sets
-      WHERE profile_id = $1 AND status = 'active'
+      WHERE profile_id = $1 AND status = 'active' AND (market_id = $2 OR ($2::text IS NULL AND (market_id IS NULL OR market_id IN (SELECT market_id FROM greenhouse_growth.grader_profile_markets WHERE profile_id=$1 AND is_primary))))
       LIMIT 1`,
-    [profileId]
+    [profileId, marketId ?? null]
   )
 
   return rows[0] ? projectPromptSet(rows[0]) : null
@@ -84,18 +99,19 @@ export const getPromptSet = async (setId: string): Promise<GraderPromptSetRow | 
   return rows[0] ? projectPromptSet(rows[0]) : null
 }
 
-export const listPromptSets = async (profileId: string): Promise<GraderPromptSetRow[]> => {
+export const listPromptSets = async (profileId: string, marketId?: string): Promise<GraderPromptSetRow[]> => {
   const rows = await runGreenhousePostgresQuery<RawRow>(
     `SELECT * FROM greenhouse_growth.grader_prompt_sets
-      WHERE profile_id = $1
+      WHERE profile_id = $1 AND ($2::text IS NULL OR market_id=$2)
       ORDER BY version DESC`,
-    [profileId]
+    [profileId, marketId ?? null]
   )
 
   return rows.map(projectPromptSet)
 }
 
 export interface CreateDraftPromptSetInput {
+  marketId?: string
   profileId: string
   businessModel: string | null
   categoryNodeId: string | null
@@ -108,10 +124,10 @@ export interface CreateDraftPromptSetInput {
 }
 
 /** Crea un `draft` (version = max+1 del perfil). NO lo activa; eso es `approvePromptSet`. */
-export const createDraftPromptSet = async (
-  input: CreateDraftPromptSetInput
-): Promise<GraderPromptSetRow> =>
+export const createDraftPromptSet = async (input: CreateDraftPromptSetInput): Promise<GraderPromptSetRow> =>
   withGreenhousePostgresTransaction(async client => {
+    const market = await resolvePromptSetMarket(input.profileId, input.marketId, client)
+
     const nextVersionResult = await client.query<{ next_version: number }>(
       `SELECT COALESCE(MAX(version), 0) + 1 AS next_version
          FROM greenhouse_growth.grader_prompt_sets
@@ -124,8 +140,8 @@ export const createDraftPromptSet = async (
     const inserted = await client.query<RawRow>(
       `INSERT INTO greenhouse_growth.grader_prompt_sets
          (profile_id, version, business_model, category_node_id, prompts_json,
-          generation_strategy, model, system_prompt_version, grounding_sources_json, status, created_by)
-       VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8, $9::jsonb, 'draft', $10)
+          generation_strategy, model, system_prompt_version, grounding_sources_json, status, created_by,market_id)
+       VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8, $9::jsonb, 'draft', $10, $11)
        RETURNING *`,
       [
         input.profileId,
@@ -137,7 +153,8 @@ export const createDraftPromptSet = async (
         input.model ?? null,
         input.systemPromptVersion ?? null,
         JSON.stringify(input.groundingSources ?? []),
-        input.createdBy
+        input.createdBy,
+        market.marketId
       ]
     )
 
@@ -159,11 +176,13 @@ export class PromptSetLifecycleError extends Error {
  * previo del MISMO perfil y activa este (un solo `active` por perfil, garantizado por el partial
  * unique index). Idempotente: aprobar uno ya `active` es no-op.
  */
-export const approvePromptSet = async (input: {
-  setId: string
-  approvedBy: string
-}): Promise<GraderPromptSetRow> =>
+export const approvePromptSet = async (input: { setId: string; approvedBy: string }): Promise<GraderPromptSetRow> =>
   withGreenhousePostgresTransaction(async client => {
+    await client.query(
+      `SELECT 1 FROM greenhouse_growth.grader_profiles WHERE profile_id=(SELECT profile_id FROM greenhouse_growth.grader_prompt_sets WHERE set_id=$1) FOR UPDATE`,
+      [input.setId]
+    )
+
     const current = await client.query<RawRow>(
       `SELECT * FROM greenhouse_growth.grader_prompt_sets WHERE set_id = $1 FOR UPDATE`,
       [input.setId]
@@ -187,8 +206,8 @@ export const approvePromptSet = async (input: {
     await client.query(
       `UPDATE greenhouse_growth.grader_prompt_sets
           SET status = 'superseded'
-        WHERE profile_id = $1 AND status = 'active' AND set_id <> $2`,
-      [row.profile_id, input.setId]
+        WHERE profile_id = $1 AND status = 'active' AND set_id <> $2 AND market_id IS NOT DISTINCT FROM $3::text`,
+      [row.profile_id, input.setId, row.market_id ?? null]
     )
 
     const activated = await client.query<RawRow>(
@@ -201,3 +220,22 @@ export const approvePromptSet = async (input: {
 
     return projectPromptSet(activated.rows[0])
   })
+
+/** Resolves ownership and locale before authoring incurs provider cost. */
+export const resolvePromptSetMarket = async (
+  profileId: string,
+  marketId?: string,
+  client?: PoolClient
+): Promise<GraderMarket> => {
+  if (!client) return withGreenhousePostgresTransaction(tx => resolvePromptSetMarket(profileId, marketId, tx))
+  const profile = projectProfile(await lockGraderProfile(profileId, client))
+  const primary = await ensurePrimaryMarket(profile, client)
+
+  const selected = marketId
+    ? (await listProfileMarkets(profileId, client)).find(market => market.marketId === marketId)
+    : primary
+
+  if (!selected || selected.status !== 'active') throw new GraderMarketConfigError('aeo_market_not_configured')
+
+  return selected
+}

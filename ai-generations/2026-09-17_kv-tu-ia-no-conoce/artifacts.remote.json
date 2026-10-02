@@ -1,0 +1,443 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:03:58.584Z",
+  "run": "ai-generations/2026-09-17_kv-tu-ia-no-conoce",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-17_kv-tu-ia-no-conoce",
+  "totalBytes": 177438011,
+  "fileCount": 72,
+  "files": [
+    {
+      "path": "clawd/clawd-3d-neutral-v01.png",
+      "sizeBytes": 2634008,
+      "sha256": "95f5ba352e88c12ac6c221031de887135fc3b1d34fe78d722d4e3d3ca7d87d64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/clawd/clawd-3d-neutral-v01.png"
+    },
+    {
+      "path": "clawd/clawd-3d-neutral-v02-alpha.png",
+      "sizeBytes": 499634,
+      "sha256": "c633c633e27718ee2d1d1f6e8294bb8daac964defc123dc27d74de16ecaef541",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/clawd/clawd-3d-neutral-v02-alpha.png"
+    },
+    {
+      "path": "clawd/clawd-3d-neutral-v02.png",
+      "sizeBytes": 2674722,
+      "sha256": "7d7d8638b06536a88d9c46433e85388d5e922544859ccff69d32706f9944ad91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/clawd/clawd-3d-neutral-v02.png"
+    },
+    {
+      "path": "clawd/clawd-3d-shrug-v01.png",
+      "sizeBytes": 2572297,
+      "sha256": "06998950132405e3899a66ecbb044f23509b3e59f1318f3141e00f248046b1d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/clawd/clawd-3d-shrug-v01.png"
+    },
+    {
+      "path": "clawd/clawd-3d-shrug-v02-alpha.png",
+      "sizeBytes": 442680,
+      "sha256": "236535f9f009ae8f409d859b30ead7363af590415e30a5cab32afbf9dc64d510",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/clawd/clawd-3d-shrug-v02-alpha.png"
+    },
+    {
+      "path": "clawd/clawd-3d-shrug-v02.png",
+      "sizeBytes": 2603565,
+      "sha256": "a8832489842bc398f5d6ab31114c5682c2fb041fa0f829ecf16c4bed36782b6c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/clawd/clawd-3d-shrug-v02.png"
+    },
+    {
+      "path": "clawd/clawd-sprite-ref.png",
+      "sizeBytes": 44737,
+      "sha256": "72762fa85c06a48acf01d1558477fd6edb7e455971b12cfc007e3c3c9c09a736",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/clawd/clawd-sprite-ref.png"
+    },
+    {
+      "path": "feed/canvas-navy.png",
+      "sizeBytes": 4009761,
+      "sha256": "53d9a4ed87b8c3cb3522ee960e51f7b462cee4bd7a826b1c0e99f0cacc7d767e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/canvas-navy.png"
+    },
+    {
+      "path": "feed/canvas-v05.png",
+      "sizeBytes": 4427471,
+      "sha256": "a3e2b52e80c33a63274b102b154246df72c5aac875a1116934028a337bfb5ccb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/canvas-v05.png"
+    },
+    {
+      "path": "feed/canvas.png",
+      "sizeBytes": 4409740,
+      "sha256": "4a52bebd54e283ecd1a7590110d685e2cf9d0fae265aed91951a1ef1a1dfd1f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/canvas.png"
+    },
+    {
+      "path": "feed/extended-raw-navy.png",
+      "sizeBytes": 3611004,
+      "sha256": "63c4be6ca2ab4d1ca78ec85e2f06b91df044d4455fa30ff859c92afa32e1318c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/extended-raw-navy.png"
+    },
+    {
+      "path": "feed/extended-raw-v05.png",
+      "sizeBytes": 3720652,
+      "sha256": "3a680604ce7528e460b0366742d204e9f321de2579343f7755dad3566db0c434",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/extended-raw-v05.png"
+    },
+    {
+      "path": "feed/extended-raw.png",
+      "sizeBytes": 3682369,
+      "sha256": "f61e9658c124dfc3423f431c2109c3e66df823dd463548c16b42488b89f7ff86",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/extended-raw.png"
+    },
+    {
+      "path": "feed/mask-navy.png",
+      "sizeBytes": 24783,
+      "sha256": "1669616dbcffd3bd80dded0246f367ba2364832d33cd1897c31dbb93369b6e1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/mask-navy.png"
+    },
+    {
+      "path": "feed/mask-v05.png",
+      "sizeBytes": 24783,
+      "sha256": "1669616dbcffd3bd80dded0246f367ba2364832d33cd1897c31dbb93369b6e1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/mask-v05.png"
+    },
+    {
+      "path": "feed/mask.png",
+      "sizeBytes": 24783,
+      "sha256": "1669616dbcffd3bd80dded0246f367ba2364832d33cd1897c31dbb93369b6e1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/mask.png"
+    },
+    {
+      "path": "feed/plate-4x5-wide-navy.png",
+      "sizeBytes": 6053920,
+      "sha256": "6cbfc6c7b39383d0119f2c8c718bd433c983786f6b92c1ec738c6bf203d99591",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/plate-4x5-wide-navy.png"
+    },
+    {
+      "path": "feed/plate-4x5-wide-v05.png",
+      "sizeBytes": 6617772,
+      "sha256": "58dd15ee581e3aaf354afb3d3761d6868a3fed44f1e8eb463c18b6ea0bc2bc25",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/plate-4x5-wide-v05.png"
+    },
+    {
+      "path": "feed/plate-4x5-wide.png",
+      "sizeBytes": 6532855,
+      "sha256": "43084143eed6580b42d702d13405b2338f36bdbed8d89ec9cde4b1a65b34e829",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/feed/plate-4x5-wide.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v01-mobile-390.png",
+      "sizeBytes": 391540,
+      "sha256": "366c879ecf1f8e46c631da85694267aa97fe29f4a7de4324906f8a5ce4731bd9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v01-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v01.png",
+      "sizeBytes": 2484070,
+      "sha256": "a287ed0627fa36ae383cfaf8589a6d913eb213231fd7baa37bc7b6fca0921ddb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v01.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v02-mobile-390.png",
+      "sizeBytes": 413233,
+      "sha256": "ff95409b29de8d2d41e0980664a76bbc5ca867ec661a2f9420ff1d619850cc1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v02-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v02.png",
+      "sizeBytes": 2615610,
+      "sha256": "6d43b20402b2f0be2bb95fdfe276a3f105837a3cf4c77354ca937bad60a08f37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v02.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v03-mobile-390.png",
+      "sizeBytes": 439156,
+      "sha256": "b0e8194aefeb2fac3dfcf069d2a63ea8b53681bc2d02752b2756240ce655e49b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v03-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v03.png",
+      "sizeBytes": 3006078,
+      "sha256": "c81c1641eddf462c74c833fdf309f557ca9a89f33b1b46af71428b1262074d85",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v03.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v03a-mobile-390.png",
+      "sizeBytes": 440632,
+      "sha256": "920342b43739dd1bdec3ab5556a397cb9767d90b8565e6d62214c3796b2cc160",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v03a-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v03a.png",
+      "sizeBytes": 2968237,
+      "sha256": "b240f7b37e62382da8aae8691063e927ef95f3b33300dc773e2dc9220ea39a48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v03a.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v03b-mobile-390.png",
+      "sizeBytes": 384109,
+      "sha256": "23da2cc77dd04fe669449f73d1679b372dc712597d02f5c037cc619079024d5a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v03b-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v03b.png",
+      "sizeBytes": 2491080,
+      "sha256": "6b46d97418df3a42e3bd3031d031a20a69dbf3bb860596e817f8be3fec623d94",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v03b.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v04-mobile-390.png",
+      "sizeBytes": 415445,
+      "sha256": "7fbc84da590ed41a5fecb71b18272c7a91f27bee4ce3f619221ae5a21e565190",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v04-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v04.png",
+      "sizeBytes": 2814984,
+      "sha256": "20276312d4196f13495d619477a7770d32bbbac7f00261083f6e5678498f9588",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v04.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v05-mobile-390.png",
+      "sizeBytes": 450073,
+      "sha256": "1f4724e773f29a3d58e1d1a0e3797e099518287b302aa7592d413a17403965c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v05-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-4x5-v05.png",
+      "sizeBytes": 3037193,
+      "sha256": "70a1c49bd647da890c17f8bcb34a0fd3e0b603cdc545e7badf5ab6465518c9ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-4x5-v05.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v03-mobile-390.png",
+      "sizeBytes": 542285,
+      "sha256": "9c35813fb2c3e2ad78467a38ade01ad16687b2c0b332ae98e86497ecc99a410a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v03-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v03.png",
+      "sizeBytes": 3801703,
+      "sha256": "91db92c0d3ea61d1367653dcd78189a0b33c802a865dd5a5f484113d4496856d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v03.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v03a-mobile-390.png",
+      "sizeBytes": 548244,
+      "sha256": "9f6bf671844bb8ab14180ab43650c941fd60d9382726f5071dbbc2bca6e413c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v03a-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v03a.png",
+      "sizeBytes": 3771999,
+      "sha256": "1d74cc75d64f3a722f8d173369f10897d67a575010c4050cdfe63d26899b7468",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v03a.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v03b-mobile-390.png",
+      "sizeBytes": 467714,
+      "sha256": "186cb4a81140cde2900e16ad02f14a9929619e30a06ec60a00ff5052eba3ca71",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v03b-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v03b.png",
+      "sizeBytes": 3145407,
+      "sha256": "3183feff8f03db9721b50cabc8ef8f485ddf05f87aebc77a070bdd9d253dd7e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v03b.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v04-mobile-390.png",
+      "sizeBytes": 508492,
+      "sha256": "48ff881aa08e82b6f996044a02d6beecbadac096497edcfc03c34af965ee5869",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v04-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v04.png",
+      "sizeBytes": 3492854,
+      "sha256": "221404df17f57fceea520ebfd47101cee6fc75be0e72e82d8cfc4189fe023e4c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v04.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v05-mobile-390.png",
+      "sizeBytes": 544556,
+      "sha256": "9b5e0687e2a1c79fb4585d02a45de92697398d114bb5248656d5af5b18aad1f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v05-mobile-390.png"
+    },
+    {
+      "path": "kv-tu-ia-no-conoce-clawd-9x16-v05.png",
+      "sizeBytes": 3819949,
+      "sha256": "188a495c3621d3c81e48be2adfccfb19a52231a06225d0ca3aa70b66fd465af0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/kv-tu-ia-no-conoce-clawd-9x16-v05.png"
+    },
+    {
+      "path": "plates/plate-kv-4x5-v01.png",
+      "sizeBytes": 4534554,
+      "sha256": "cc79c156175a91700e985a0088f56a38a4c918f55f55c90048b3bbefcc8e7bb3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/plates/plate-kv-4x5-v01.png"
+    },
+    {
+      "path": "plates/plate-kv-4x5-v02.png",
+      "sizeBytes": 4463779,
+      "sha256": "c108ff57f0dba4dda0d0c68d803af899fd2c9439d37786703fd81d0e37d7dc13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/plates/plate-kv-4x5-v02.png"
+    },
+    {
+      "path": "plates/plate-kv-4x5-v03.png",
+      "sizeBytes": 3943217,
+      "sha256": "1831388088c97ad7703872df8965b9fc2ee6e9452f92664f2392cc1489573729",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/plates/plate-kv-4x5-v03.png"
+    },
+    {
+      "path": "plates/plate-kv-9x16-v05-1.png",
+      "sizeBytes": 2973849,
+      "sha256": "e10f3767b9a72c1e326564a20205413d852f7aa7a04c86122446695ca76f3181",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/plates/plate-kv-9x16-v05-1.png"
+    },
+    {
+      "path": "plates/plate-kv-9x16-v05-2.png",
+      "sizeBytes": 2897521,
+      "sha256": "79267e7449d33a81d15ec04f929e2f8323765ecf47e6749dc2728a22f279e97d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/plates/plate-kv-9x16-v05-2.png"
+    },
+    {
+      "path": "plates/plate-kv-9x16-v05b-1.png",
+      "sizeBytes": 2845116,
+      "sha256": "9928309db224e5f37f13c55dd355432c6eaa4a8a03284fd3bf332d3c2745ae1e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/plates/plate-kv-9x16-v05b-1.png"
+    },
+    {
+      "path": "plates/plate-kv-9x16-v05b-2.png",
+      "sizeBytes": 2843011,
+      "sha256": "334624faa662ab573f6dc68283a9b874851d9f48d5fa7861a7c5cf8632d4eebb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/plates/plate-kv-9x16-v05b-2.png"
+    },
+    {
+      "path": "refs/efeonce-hoodie.png",
+      "sizeBytes": 785834,
+      "sha256": "6e6443618b53c0e4e5955583862475d064c3c446b2bff6e62a6b8832d94227fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/efeonce-hoodie.png"
+    },
+    {
+      "path": "refs/nexa-avatar-34-v2.png",
+      "sizeBytes": 2341629,
+      "sha256": "91b581b0c952232bc2c284e830c2ac44a65296de01bb7cf5b0de0c1f12f372c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/nexa-avatar-34-v2.png"
+    },
+    {
+      "path": "refs/nexa-cuerpo-completo-v2.png",
+      "sizeBytes": 2149799,
+      "sha256": "7f34d10b67f1c2da1cf316fbcfd99c6dcf2505bc070470beeccd2953c46b1818",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/nexa-cuerpo-completo-v2.png"
+    },
+    {
+      "path": "refs/nexa-the-breakdown.png",
+      "sizeBytes": 8674392,
+      "sha256": "91a5517b193c154c2bb6621309d82726f98a2b2c34e88128de03f04d0764864f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/nexa-the-breakdown.png"
+    },
+    {
+      "path": "story/canvas.png",
+      "sizeBytes": 3417711,
+      "sha256": "01a262ad3831a03a29ded54fddf1a1305eaa40b71ae8828ef1a398ab75372a1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/story/canvas.png"
+    },
+    {
+      "path": "story/extended-raw.png",
+      "sizeBytes": 2680892,
+      "sha256": "4dff685b293af4310d8ea6a979a8796eac8fd66c52a8df5301a907b91627c3a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/story/extended-raw.png"
+    },
+    {
+      "path": "story/mask.png",
+      "sizeBytes": 12161,
+      "sha256": "45e7c46cfee3ea33c03e0d3b625862ba7148a789f898717a5ce9e759dde68161",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/story/mask.png"
+    },
+    {
+      "path": "story/plate-9x16.png",
+      "sizeBytes": 4259038,
+      "sha256": "ec80f0440c0b0f2e3659bda4342de936d28011dce5da0cbb7f5504807456eb44",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/story/plate-9x16.png"
+    },
+    {
+      "path": "v05/canvas-b.png",
+      "sizeBytes": 3430497,
+      "sha256": "698bc4e04affe589ab6625cc83fbeff80606b05bc83918b632ba81f3e0132234",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/v05/canvas-b.png"
+    },
+    {
+      "path": "v05/canvas.png",
+      "sizeBytes": 2648865,
+      "sha256": "582ff8f3a45b29f05e3242685a97e9d752a855b1d47520d4a0eafeb6c8071e6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/v05/canvas.png"
+    },
+    {
+      "path": "v05/extended-raw-b.png",
+      "sizeBytes": 2732724,
+      "sha256": "1ef51acd7b3425864dd7a35130844f5cbdb535e967354d8d49e0c7810cf42473",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/v05/extended-raw-b.png"
+    },
+    {
+      "path": "v05/extended-raw.png",
+      "sizeBytes": 2640128,
+      "sha256": "b521bb25119c515b4084a757365cc34c0372626467b0d71122fe07fda6101b14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/v05/extended-raw.png"
+    },
+    {
+      "path": "v05/layout-sketch.png",
+      "sizeBytes": 88547,
+      "sha256": "1148097d15db99d8e6bf47879b068449542464a3234f4772c573bc0780396986",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/v05/layout-sketch.png"
+    },
+    {
+      "path": "v05/mask-b.png",
+      "sizeBytes": 19738,
+      "sha256": "6cd75568b353a6cb68c6d4f1c423972a30849280536687fb5b041007aa869d6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/v05/mask-b.png"
+    },
+    {
+      "path": "v05/mask.png",
+      "sizeBytes": 14519,
+      "sha256": "cfd84f174a0559bd42b7600affe02448ce2382780f5d1797d3d2b94ee105966d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/v05/mask.png"
+    },
+    {
+      "path": "v05/plate-9x16-v05-b.png",
+      "sizeBytes": 4271333,
+      "sha256": "25d343fe322e8f51b2ebb5d250add95a7171219672bb6ec02fdf1773b2f19068",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/v05/plate-9x16-v05-b.png"
+    },
+    {
+      "path": "v05/plate-9x16-v05.png",
+      "sizeBytes": 4320448,
+      "sha256": "e8dc67c74e825f341b967104db9f695b13b09cbc63f47f888dc1ae00e1d2df08",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/v05/plate-9x16-v05.png"
+    },
+    {
+      "path": "wall/edited-raw.png",
+      "sizeBytes": 2544382,
+      "sha256": "e23ea88f75000656ecb45501b753f680036e338e2b201cf6843e6452ed362075",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/wall/edited-raw.png"
+    },
+    {
+      "path": "wall/input.png",
+      "sizeBytes": 4259038,
+      "sha256": "ec80f0440c0b0f2e3659bda4342de936d28011dce5da0cbb7f5504807456eb44",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/wall/input.png"
+    },
+    {
+      "path": "wall/mask.png",
+      "sizeBytes": 35077,
+      "sha256": "e0528a1c1e1782f1c221437a78431c7e5ebb97a8b433c982bafb590f8f875014",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/wall/mask.png"
+    },
+    {
+      "path": "wall/plate-9x16-navy.png",
+      "sizeBytes": 3662884,
+      "sha256": "3c7d6490ff7dd1726f6c1ecd6c1264d75f728623025496bd0f87b4c280f57949",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/wall/plate-9x16-navy.png"
+    },
+    {
+      "path": "wall/subject-alpha.png",
+      "sizeBytes": 341149,
+      "sha256": "b0e26ea1442b4b5d4b82fdfc8c6b30ae275d000566644634e5962c9a394433bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_kv-tu-ia-no-conoce/wall/subject-alpha.png"
+    }
+  ]
+}

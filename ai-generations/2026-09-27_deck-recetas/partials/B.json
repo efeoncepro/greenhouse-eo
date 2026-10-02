@@ -1,0 +1,1238 @@
+[
+  {
+    "id": "content-text",
+    "board": "DeckTexto",
+    "name": "Texto · el porqué, dicho en una palabra gigante",
+    "family": "content",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckTexto.jpg",
+    "communicates": "Una sola idea de marca dicha tan grande que ocupa la lámina: tu marca crece contigo, no gracias a nosotros.",
+    "useWhen": [
+      "Para fijar el porqué o la promesa de marca antes de entrar al detalle de la oferta.",
+      "Como primera lámina de un capítulo de posicionamiento («Quiénes somos», «Por qué existimos»).",
+      "Cuando la idea se sostiene sin cifras y quien presenta la desarrolla en voz alta; en el brochure la bajada y los tres pilares hacen ese trabajo."
+    ],
+    "avoidWhen": [
+      "La respuesta necesita más de una palabra: la escala que la justifica se pierde.",
+      "Hay que demostrar algo con datos.",
+      "Ya hay otra lámina de palabra gigante en el mismo capítulo: el golpe se gasta."
+    ],
+    "preferInstead": [
+      { "recipe": "content-bullets", "when": "la idea se explica en tres o cuatro puntos concretos" },
+      { "recipe": "decision-why-us", "when": "el porqué se prueba con cifras" },
+      { "recipe": "content-measure", "when": "la respuesta es una cifra que la órbita puede medir" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-bullets", "relation": "sequence" },
+      { "recipe": "decision-why-us", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 28, "example": "Por qué existimos", "notes": "Versalitas con tracking, en el suave de la voz." },
+      { "name": "question", "type": "text", "required": true, "maxChars": 32, "example": "¿Con quién crece tu marca?", "notes": "Una línea, con el anillo delante." },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 8, "example": "Contigo", "notes": "UNA palabra. Va a 0,37 del alto: con más de 8 caracteres se sale del ancho útil. La esfera la cierra." },
+      { "name": "body", "type": "text", "required": true, "maxChars": 95, "example": "No te entregamos crecimiento. Lo construimos contigo y te dejamos más capaz de sostenerlo.", "notes": "Dos líneas bajo la respuesta, a la izquierda." },
+      { "name": "pillars", "type": "list", "required": true, "maxChars": 46, "example": "Co-creación · operas con nosotros en vivo", "notes": "Exactamente tres filas «Título · descriptor» a la derecha del pie (título en seminegrita, descriptor en light); sin viñeta ni esfera." },
+      { "name": "nav", "type": "section", "required": true, "example": "1 de 5", "notes": "Alimenta el indicador de navegación de la esquina." }
+    ],
+    "fixed": [
+      "Fondo oscuro de Efeonce (color.dark).",
+      "Anillo de la pregunta y esfera de la respuesta en el acento teal.",
+      "Indicador de navegación (pieza pieces.deck.content) arriba a la derecha: es la única órbita de la lámina.",
+      "Burbuja URL horneada en el pie, a la izquierda, en el margen de deck.",
+      "Filetes finos sobre cada pilar.",
+      "Selección de ocho manijas con overlay sutil y cursor de colaborador abajo a la derecha, a escala 1,6."
+    ],
+    "selection": { "kind": "collaborator", "label": "Cliente", "target": "La respuesta entera, palabra y esfera (targetKind text, overlay sutil, anchor bottom-end)." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Compón una lámina 16:9 sobre color.dark. Arriba a la izquierda, en el margen de deck (140/1920), el eyebrow en versalitas en el suave de la voz (slogan.leadColor.onDark); debajo la pregunta en Poppins light con el anillo en el acento. La respuesta es UNA palabra en Bricolage a la escala de surfaces.deck.content-text.type.answer (≈0,37 del alto), blanca, cerrada por la esfera en el acento; la selección de AXIS (efeonce.collaboration-selection, ocho manijas, overlay sutil) la toma entera con el cursor del colaborador «Cliente» en bottom-end. En el tercio inferior: la bajada a la izquierda (dos líneas) y a la derecha tres pilares «Título · descriptor» separados por filetes. Indicador de navegación pieces.deck.content arriba a la derecha con la sección actual; burbuja URL horneada en el pie. Ningún texto toca la caja de selección ni el indicador."
+    },
+    "renderSource": { "script": "render-src/deck-interior.mjs", "slideId": "D1-texto" },
+    "rules": [
+      "La respuesta es una sola palabra y la esfera la cierra; no hay otra esfera en la lámina.",
+      "La respuesta mide al menos tres veces la pregunta (en la referencia, más de ocho veces).",
+      "Una sola órbita: el indicador de navegación.",
+      "El acento sólo en anillo, esfera y elementos de 24 px o más.",
+      "La selección toma una sola cosa: la respuesta."
+    ],
+    "notes": "En AXIS es content-text (status option, voice answer-only); el operador la aprobó el 2026-09-27. La referencia lleva eyebrow y pregunta aunque el token declara answer-only: revisar el modo de voz al pasarla a approved. La bajada repite la de decision-why-us: no usar las dos con la misma frase en un mismo deck."
+  },
+  {
+    "id": "content-bullets",
+    "board": "DeckVinetas",
+    "name": "Texto con viñetas · cuatro puntos numerados",
+    "family": "content",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckVinetas.jpg",
+    "communicates": "Lo que recibe el cliente no es un servicio suelto sino un sistema de cuatro piezas, y una de ellas es la que decide.",
+    "useWhen": [
+      "Para explicar qué recibe el cliente en cuatro ideas del mismo peso.",
+      "Cuando uno de los cuatro puntos es el diferencial y conviene marcarlo con la selección.",
+      "En el brochure, donde cada punto necesita su descripción porque nadie lo presenta."
+    ],
+    "avoidWhen": [
+      "Son más o menos de cuatro puntos: la grilla es de 2 × 2.",
+      "Los puntos son pasos en el tiempo (eso es un plan o próximos pasos).",
+      "Los puntos son cifras."
+    ],
+    "preferInstead": [
+      { "recipe": "content-text", "when": "hay una sola idea que decir" },
+      { "recipe": "decision-plan", "when": "los puntos son etapas en el tiempo" },
+      { "recipe": "decision-why-us", "when": "cada punto es una cifra con fuente" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-text", "relation": "sequence" },
+      { "recipe": "content-day", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 28, "example": "La experiencia Efeonce" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 40, "example": "¿Qué recibes al trabajar con nosotros?", "notes": "Una línea." },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 14, "example": "Un sistema", "notes": "Una línea; la esfera la cierra." },
+      { "name": "items", "type": "list", "required": true, "maxChars": 95, "example": "Métricas en vivo en Greenhouse — OTD, FTR y Revenue Enabled en tu portal, no en un informe que llega tarde.", "notes": "Exactamente cuatro: título ≤ 34 caracteres (una línea) y descripción ≤ 95 (dos líneas). La numeración 01–04 la pone la plantilla." },
+      { "name": "selectedItem", "type": "enum", "required": true, "example": "3", "notes": "1 a 4: el punto que define la oferta." },
+      { "name": "selectionLabel", "type": "enum", "required": true, "example": "Growth", "notes": "El rol o área que toma el punto (colaborador)." },
+      { "name": "nav", "type": "section", "required": true, "example": "2 de 5" }
+    ],
+    "fixed": [
+      "Fondo color.dark; grilla de 2 × 2 desde el 48 % del alto.",
+      "Números 01–04 en Bricolage light en el acento (tamaño de titular, nunca la esfera).",
+      "Filete sobre cada punto.",
+      "Indicador de navegación pieces.deck.content arriba a la derecha.",
+      "Burbuja URL horneada en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Growth", "target": "Un punto completo, número y texto (en la referencia el 03), con ocho manijas y cursor en bottom-end." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con la cabecera canónica de contenido: eyebrow en el suave, pregunta con el anillo en el acento y respuesta en Bricolage (tres veces la pregunta como mínimo) cerrada por la esfera. Debajo, desde el 48 % del alto y en el ancho útil del margen de deck, una grilla de 2 × 2 con cuatro puntos: número 01–04 en Bricolage light en el acento, filete superior, título en Poppins seminegrita y descripción en light. Nunca uses la esfera como viñeta. La selección de AXIS (ocho manijas) toma el punto indicado con el cursor del colaborador en bottom-end. Indicador de navegación pieces.deck.content arriba a la derecha y burbuja URL horneada en el pie."
+    },
+    "renderSource": { "script": "render-src/deck-interior.mjs", "slideId": "D2-vinetas" },
+    "rules": [
+      "Las viñetas nunca llevan la esfera (bullets-never-sphere).",
+      "Exactamente cuatro puntos.",
+      "La selección toma un solo punto.",
+      "La respuesta mide al menos tres veces la pregunta (en la referencia, exactamente tres)."
+    ],
+    "notes": "En AXIS es content-bullets (status option); aprobada por el operador el 2026-09-27."
+  },
+  {
+    "id": "content-team",
+    "board": "DeckEquipo",
+    "name": "El equipo · el squad real en fichas de vidrio sobre la órbita",
+    "family": "about",
+    "documents": ["proposal", "pitch", "qbr", "brochure"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckEquipo.jpg",
+    "communicates": "Detrás de la cuenta hay personas reales con nombre y cargo, y una sola que responde: tu Responsable de Cuenta.",
+    "useWhen": [
+      "En una propuesta o pitch con el squad ya asignado a la cuenta.",
+      "En una QBR, para presentar cambios en el equipo.",
+      "Cuando el cliente teme hablar con una agencia sin rostro."
+    ],
+    "avoidWhen": [
+      "El squad no está asignado: nunca fotos genéricas, de stock ni generadas.",
+      "Son más de cinco personas o gente que no trabajará la cuenta.",
+      "No hay un Responsable de Cuenta definido para poner al frente."
+    ],
+    "preferInstead": [
+      { "recipe": "section-cine", "when": "el equipo es escena de marca en un brochure, sin cuenta asignada" },
+      { "recipe": "content-text", "when": "sólo quieres afirmar la idea de un solo interlocutor" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-day", "relation": "sequence" },
+      { "recipe": "decision-plan", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 20, "example": "Tu equipo" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 40, "example": "¿Quién trabaja en tu cuenta?", "notes": "Hasta dos líneas en la columna de voz." },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 18, "example": "Personas reales", "notes": "Dos líneas de 9 caracteres como máximo cada una; la esfera cierra la segunda." },
+      { "name": "body", "type": "richText", "required": true, "maxChars": 85, "example": "Un squad que orbita tu marca y **un** solo interlocutor: tu Responsable de Cuenta." },
+      { "name": "lead", "type": "person", "required": true, "maxChars": 26, "example": "Julio · Responsable de Cuenta", "notes": "Foto real del catálogo del squad; nombre ≤ 16 y cargo ≤ 26. Va al frente, más grande, con borde halo." },
+      { "name": "team", "type": "list", "required": true, "maxChars": 26, "example": "María Fernanda · SEO Copywriter", "notes": "De dos a cuatro fichas (person: foto real, nombre ≤ 16, cargo ≤ 26), repartidas simétricas a los lados y cada vez más atrás." }
+    ],
+    "fixed": [
+      "Escenario oscuro con halo radial y fichas de vidrio en perspectiva CSS con su reflejo en el piso.",
+      "La órbita como plataforma de luz bajo las fichas (elipse con arco de acento), con «Tu marca» y «al centro de todo» en su centro.",
+      "Ficha del líder: más ancha, al frente, sin giro, borde y halo en color.halo.",
+      "Sin indicador de navegación: la plataforma es la órbita de la lámina.",
+      "Burbuja URL en luminosidad (url-lum) en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Cliente", "target": "La ficha del Responsable de Cuenta (targetKind object, anchor top-end, escala 1,1); nunca otra persona." },
+    "photo": {
+      "uses": true,
+      "register": "none",
+      "plate": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-<persona>.png",
+      "replaceable": "Cada ficha usa la foto real del catálogo del squad (squad-julio, squad-maria-fernanda, squad-andres, squad-daniela, squad-melkin en la referencia); se cambia por el squad asignado a la cuenta. Son retratos del catálogo, no plates de la línea fotográfica."
+    },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con halo radial en color.halo. Columna de voz a la izquierda (margen de deck): eyebrow, pregunta con anillo en el acento, respuesta en dos líneas en Bricolage cerrada por la esfera, bajada con una palabra en negrita. A la derecha, un escenario con perspectiva: la plataforma de luz (elipse con su arco de acento) y encima las fichas de vidrio del squad con foto real, nombre y cargo, el Responsable de Cuenta al frente y más grande con borde en color.halo, las demás a los lados giradas hacia el centro, más chicas y atrás, todas con reflejo. En el centro de la plataforma, «Tu marca / al centro de todo». La selección de AXIS toma sólo la ficha del líder con el cursor del colaborador «Cliente» en top-end. Sin indicador de navegación; burbuja URL en luminosidad en el pie. Ningún texto sobre las fichas ni cruzando la plataforma."
+    },
+    "renderSource": { "script": "render-src/vive.mjs", "slideId": "EQ-equipo-impacto" },
+    "rules": [
+      "Sólo personas reales del squad, con su cargo real.",
+      "Un solo interlocutor al frente.",
+      "Una sola órbita: la plataforma; sin indicador.",
+      "La selección nunca toma a una persona que no sea el líder, y el cursor no tapa rostros.",
+      "La órbita con satélites no lleva esfera (satellites-arc-no-sphere)."
+    ],
+    "notes": "En AXIS es content-team, pero el token y su referencia describen la versión anterior (D3-equipo: anillo con el squad como satélites, en render-src/deck-interior.mjs). El operador pidió «más impacto» y aprobó el 2026-09-27 la versión en fichas de vidrio (EQ-equipo-impacto): AXIS debe actualizar referencia y token. Hallazgo: el cargo del líder va en color.halo a 18 px; revisar contra D1 (acento sólo en 24 px o más)."
+  },
+  {
+    "id": "content-day",
+    "board": "DeckDiaADia",
+    "name": "El día a día · cuatro momentos con horario en la órbita-reloj",
+    "family": "content",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckDiaADia.jpg",
+    "communicates": "Trabajar con Efeonce tiene un ritmo de oficio visible, y hay una hora en la que entra el cliente: a las 15:00 revisamos juntos.",
+    "useWhen": [
+      "Para mostrar cómo se trabaja con fotos reales de oficio (terreno, taller, revisión, medición).",
+      "Cuando el argumento es la cercanía: el cliente revisa en vivo, no espera el informe.",
+      "Como versión base del «día a día»; las alternativas con herramientas y los dos «vívelo» lo desarrollan."
+    ],
+    "avoidWhen": [
+      "No hay fotos aprobadas de los momentos.",
+      "La audiencia pregunta con qué herramientas se trabaja.",
+      "Se necesitan más de cuatro momentos."
+    ],
+    "preferInstead": [
+      { "recipe": "content-day-tools", "when": "la pregunta es con qué herramientas se trabaja y dónde se ve todo" },
+      { "recipe": "content-day-live-progress", "when": "quieres que quien lo ve viva la aprobación de una pieza" },
+      { "recipe": "content-day-live-results", "when": "quieres que viva la llegada de los resultados" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-day-tools", "relation": "variant" },
+      { "recipe": "content-team", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 24, "example": "Un día con Efeonce" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 34, "example": "¿Cómo es un día con nosotros?", "notes": "Dos líneas." },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 5, "example": "Así", "notes": "Va a 0,21 del alto: más de 5 caracteres choca con el satélite de las 9." },
+      { "name": "body", "type": "text", "required": true, "maxChars": 120, "example": "Del terreno a la medición en el mismo día. A las 15:00 entras tú: no esperas el informe, lo revisas con nosotros." },
+      { "name": "keyMoment", "type": "image", "required": true, "example": "T3-mide · 15:00 · Revisamos contigo", "notes": "La foto de la lente (plate documental) + hora HH:MM + rótulo ≤ 20. Es el momento en que entra el cliente." },
+      { "name": "moments", "type": "list", "required": true, "maxChars": 24, "example": "09:00 · Escuchamos en terreno", "notes": "Tres satélites: foto circular + hora HH:MM + descriptor ≤ 24. Cada uno se ubica en su hora de reloj." }
+    ],
+    "fixed": [
+      "La órbita como reloj: anillo con aire (orbit.ringAirRatio) alrededor de la lente y los momentos como satélites en su posición horaria.",
+      "Arco en degradé del acento desde el momento anterior hasta el actual, sin esfera.",
+      "Halo radial detrás de la lente.",
+      "Hora del momento clave en Bricolage blanca junto al anillo.",
+      "Sin indicador de navegación: la órbita-reloj es la órbita de la lámina.",
+      "Burbuja URL horneada en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Cliente", "target": "La hora y el rótulo del momento clave (targetKind group, anchor top-end)." },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+      "ficha": "ai-generations/2026-09-26_deck-triptico-v2/fichas/T3-mide.json",
+      "prompt": "ai-generations/2026-09-26_deck-triptico-v2/prompts/T3-mide.txt",
+      "postprocess": ["Revisar el emblema de la chaqueta con pnpm foto:emblema al 100 %; si difiere del oficial, componerlo con pnpm foto:isotipo (no hay registro de isotipo compuesto para este plate)."],
+      "replaceable": "La lente (T3-mide, luz motivada) y los tres satélites: L2-terreno-panaderia y L3-taller-post-its (ai-generations/2026-09-26_deck-mosaico-documental, fichas y prompts en la misma carpeta) y H2-pov-tablet (ai-generations/2026-09-26_web-hero; su ficha es de puesta en escena, palanca pov). Se reemplazan por fotos reales o aprobadas de la cuenta."
+    },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark. Columna de voz a la izquierda: eyebrow, pregunta en dos líneas con anillo, respuesta de una palabra en Bricolage muy grande cerrada por la esfera, bajada. Al centro-derecha, la lente circular con la foto del momento clave y alrededor un anillo con aire (orbit.ringAirRatio) que funciona como reloj: los otros tres momentos son satélites circulares en su posición horaria, cada uno con la hora en Bricolage light y su descriptor, del lado que no cruza la órbita. El arco en degradé del acento recorre del momento anterior al actual y NO lleva esfera. Junto al anillo, en la hora del momento clave, la hora grande y su rótulo; la selección de AXIS toma ese grupo con el cursor del colaborador «Cliente» en top-end. Sin indicador; burbuja URL horneada en el pie."
+    },
+    "renderSource": { "script": "render-src/deck-interior.mjs", "slideId": "D4-dia" },
+    "rules": [
+      "La órbita con satélites lleva el arco en degradé sin esfera (satellites-arc-no-sphere).",
+      "Cada satélite va en su hora de reloj.",
+      "Ningún texto sobre la lente ni sobre las fotos satélite.",
+      "La selección nunca toma a la persona de la foto: toma la hora."
+    ],
+    "notes": "En AXIS es content-day (status option); aprobada el 2026-09-27. Es la versión de cuatro momentos; el operador aprobó además la alternativa con herramientas (content-day-tools) y dos «vívelo» (content-day-live-progress y content-day-live-results). Hallazgo: el rótulo «Revisamos contigo» va en el acento a 20 px; D1 pide 24 px o más para el acento: al recomponer, subirlo o pasarlo al suave."
+  },
+  {
+    "id": "content-pricing",
+    "board": "DeckCotizacion",
+    "name": "Cotización · tabla de tres planes con Pro recomendado",
+    "family": "pricing",
+    "documents": ["proposal"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckCotizacion.jpg",
+    "communicates": "Se cotiza por capacidad gobernada, en tres planes claros, y Pro es el que recomendamos.",
+    "useWhen": [
+      "En una propuesta, para presentar los planes de Greenhouse junto al fee del equipo.",
+      "Cuando el cliente necesita comparar opciones lado a lado.",
+      "Cuando la sala es de lectura (finanzas, compras) y la tabla pesa más que la escena."
+    ],
+    "avoidWhen": [
+      "En un brochure: los montos se definen en cada propuesta.",
+      "El deal tiene una sola cotización cerrada.",
+      "Se necesita más impacto visual para una presentación en sala."
+    ],
+    "preferInstead": [
+      { "recipe": "content-pricing-live", "when": "hay una cotización única y el siguiente gesto es aprobarla" },
+      { "recipe": "content-pricing-stage", "when": "la presentación pide más impacto con los mismos tres planes" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-pricing-stage", "relation": "variant" },
+      { "recipe": "content-pricing-live", "relation": "variant" },
+      { "recipe": "decision-risk", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 16, "example": "Inversión" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 24, "example": "¿Cómo se cotiza?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 14, "example": "Por capacidad", "notes": "Dos líneas de 10 caracteres como máximo." },
+      { "name": "body", "type": "text", "required": true, "maxChars": 120, "example": "El fee del equipo se cotiza por capacidad gobernada, nunca por horas ni piezas. Greenhouse suma la capa de producto." },
+      { "name": "plans", "type": "list", "required": true, "maxChars": 40, "example": "Pro · Para operar y decidir · [MONTO] · Dashboard, KPIs y acciones…", "notes": "Tres planes: nombre ≤ 12, bajada ≤ 24, monto (money), y de cuatro a cinco atributos de ≤ 40 caracteres (hasta dos líneas cada uno)." },
+      { "name": "amounts", "type": "money", "required": true, "example": "[MONTO]", "notes": "Siempre [MONTO] hasta la propuesta; nunca un precio real en la plantilla." },
+      { "name": "recommendedPlan", "type": "enum", "required": true, "example": "Pro", "notes": "Basic | Pro | Enterprise: sale de la grilla en papel y más alto." }
+    ],
+    "fixed": [
+      "Nota legal bajo la bajada: «Valores netos, IVA no incluido. Los montos se definen en cada propuesta.»",
+      "«al mes · neto + IVA» bajo cada monto.",
+      "Plan recomendado en papel (color.paper), más alto, con «Recomendado» y sombra; los otros en contorno fino sobre oscuro.",
+      "Sin indicador de navegación ni otra órbita: la única esfera es la de la respuesta.",
+      "Burbuja URL horneada en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Finanzas", "target": "La ficha del plan recomendado (targetKind object, anchor top-end, escala 1,2, participantKind department)." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark. Voz a la izquierda en el margen de deck: eyebrow «Inversión», pregunta con anillo, respuesta en dos líneas en Bricolage cerrada por la esfera, bajada y la nota legal fija en el suave. A la derecha, tres fichas de plan de igual ancho: las laterales en contorno fino sobre oscuro, la recomendada en color.paper, más alta y con sombra, con el rótulo «Recomendado». Cada ficha: nombre en Bricolage, bajada, [MONTO] en Poppins seminegrita, «al mes · neto + IVA», y sus atributos separados por filetes. La selección de AXIS toma la ficha recomendada con el cursor del colaborador «Finanzas» en top-end. Sin indicador; burbuja URL horneada en el pie. Los montos siempre como [MONTO]."
+    },
+    "renderSource": { "script": "render-src/deck-interior.mjs", "slideId": "D5-cotizacion" },
+    "rules": [
+      "Montos siempre como [MONTO] hasta la propuesta.",
+      "Se cotiza por capacidad gobernada, nunca por horas ni piezas.",
+      "Cada monto declara neto + IVA.",
+      "Una sola ficha recomendada y una sola selección."
+    ],
+    "notes": "En AXIS es content-pricing (status option). El operador aprobó TRES variantes de cotización el 2026-09-27: esta tabla, la «en escena» en 3D con Pro al frente (content-pricing-stage) y la «en vivo» con la cotización y el cursor en «Aprobar propuesta» (content-pricing-live). Hallazgos para el operador: la respuesta mide 2,95 veces la pregunta (118 contra 40 en el script; la regla pide 3×); «Recomendado» va en el acento a 15 px (D1 pide 24 px o más)."
+  },
+  {
+    "id": "content-clients",
+    "board": "DeckClientes",
+    "name": "Nuestros clientes · logos reales en un tono y dos pruebas gigantes",
+    "family": "proof",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "paper",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckClientes.jpg",
+    "communicates": "Marcas líderes confían en Efeonce, y dos resultados medidos lo prueban antes de ver los logos.",
+    "useWhen": [
+      "Como credencial en propuestas, pitches y brochures.",
+      "Cuando hay dos resultados de clientes con fuente que conviene poner antes de los logos."
+    ],
+    "avoidWhen": [
+      "No hay autorización para mostrar un logo.",
+      "La audiencia compite directamente con un cliente de la grilla (se quita ese logo).",
+      "Las cifras no tienen fuente citable."
+    ],
+    "preferInstead": [
+      { "recipe": "decision-case", "when": "una sola marca con su historia completa" },
+      { "recipe": "content-partners", "when": "la credencial son los fabricantes, no los clientes" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-partners", "relation": "sequence" },
+      { "recipe": "decision-case", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 20, "example": "Clientes" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 30, "example": "¿Quién confía en nosotros?", "notes": "Dos líneas." },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 16, "example": "Marcas líderes", "notes": "Dos líneas de 8 caracteres como máximo." },
+      { "name": "proofs", "type": "metric", "required": true, "maxChars": 50, "example": "+127% · tráfico orgánico de **Sky** frente a LATAM Airlines · fuente", "notes": "Dos cifras: valor ≤ 6 caracteres en escala gigante, etiqueta ≤ 50 en dos líneas con el nombre del cliente en negrita, y fuente." },
+      { "name": "logos", "type": "list", "required": true, "example": "sky, berel, bresler, carozzi, aguas-andinas, anam, marca-chile, gobierno-santiago, universidad-temuco", "notes": "Nueve logos (type logo) del catálogo deck-axis/assets/clients; la décima celda es la de mercados." },
+      { "name": "markets", "type": "text", "required": true, "maxChars": 45, "example": "Chile, EE. UU., Colombia, México y Perú", "notes": "Bajo el título fijo «Operamos en»." },
+      { "name": "selectedProof", "type": "enum", "required": true, "example": "1", "notes": "Qué cifra toma la selección." },
+      { "name": "nav", "type": "section", "required": true, "example": "4 de 5" }
+    ],
+    "fixed": [
+      "Fondo papel (color.paper) con la tinta en navy.",
+      "Grilla fina de 5 × 2 bajo las cifras, con filetes; décima celda «Operamos en».",
+      "Logos en un solo tono navy (color.navy) y con el mismo peso óptico (misma área de tinta).",
+      "Excepción aprobada: Aguas Andinas y la UC de Temuco van en tonos del mismo navy (color principal en navy, secundario en un tinte más claro, el blanco se conserva) para no perder sus formas internas.",
+      "Indicador de navegación en papel arriba a la derecha y burbuja URL horneada clara en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Growth", "target": "Una de las dos cifras con su etiqueta (en la referencia +127 %), anchor bottom-end." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.paper. Voz a la izquierda: eyebrow, pregunta en dos líneas con anillo en el acento de papel (color.tealDark), respuesta en dos líneas en Bricolage navy cerrada por la esfera. A su derecha, dos cifras en Bricolage light a escala gigante con su etiqueta (el cliente en negrita) y su fuente. Abajo, en todo el ancho útil, una grilla fina de 5 × 2: nueve logos de clientes recoloreados a un solo tono color.navy y normalizados al mismo peso óptico por área de tinta; Aguas Andinas y UC Temuco en tonos del mismo navy para conservar sus formas; la décima celda dice «Operamos en» y los mercados. La selección de AXIS toma la cifra indicada con el cursor del colaborador en bottom-end. Indicador de navegación arriba a la derecha y burbuja URL clara en el pie."
+    },
+    "renderSource": { "script": "render-src/deck-interior.mjs", "slideId": "D6-clientes" },
+    "rules": [
+      "Logos de terceros en un tono y con el mismo peso (third-party-logos-one-tone-same-ink), con la excepción tonal aprobada para Aguas Andinas y UC Temuco.",
+      "Cifras sólo con fuente citada en la pieza.",
+      "Sólo logos de clientes que autorizan su uso."
+    ],
+    "notes": "En AXIS es content-clients (status option, voice none; la referencia sí lleva voz). Matiz del operador (2026-09-27): logos en un solo tono navy salvo Aguas Andinas y UC Temuco, en tonos de navy. Hallazgo: la referencia no muestra la fuente de +127 % ni de +180 %; al componer hay que agregarla (nota bajo la grilla o en la etiqueta). La respuesta mide 2,9 veces la pregunta (116 contra 40): la regla pide 3×."
+  },
+  {
+    "id": "content-partners",
+    "board": "DeckPartners",
+    "name": "Nuestros partners · los nueve programas que se pueden declarar",
+    "family": "proof",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPartners.jpg",
+    "communicates": "Efeonce construye con los grandes: es partner oficial de los fabricantes con los que opera el crecimiento del cliente.",
+    "useWhen": [
+      "Como credencial técnica en propuestas y pitches.",
+      "Cuando la oferta depende de una plataforma (HubSpot, Salesforce, IA) y conviene mostrar el programa oficial."
+    ],
+    "avoidWhen": [
+      "Hay que mostrar las herramientas que se usan, no los programas de partner.",
+      "Un programa no está vigente o no se puede declarar."
+    ],
+    "preferInstead": [
+      { "recipe": "content-stack", "when": "se habla de herramientas de trabajo, no de programas de partner" },
+      { "recipe": "content-clients", "when": "la credencial son los clientes" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-clients", "relation": "sequence" },
+      { "recipe": "content-stack", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 20, "example": "Partners" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 30, "example": "¿Con quién construimos?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 18, "example": "Con los grandes", "notes": "Una línea; no puede invadir la bajada de la derecha." },
+      { "name": "body", "type": "text", "required": true, "maxChars": 80, "example": "Programas oficiales de los fabricantes con los que operamos tu crecimiento.", "notes": "Alineada a la derecha, dos líneas." },
+      { "name": "partners", "type": "list", "required": true, "example": "HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI, BytePlus", "notes": "Nueve logos (type logo) en dos filas de 5 + 4, sólo programas declarables." },
+      { "name": "selectedPartner", "type": "enum", "required": true, "example": "Claude" },
+      { "name": "selectionLabel", "type": "enum", "required": true, "example": "Agentes IA", "notes": "El rol que se asocia al partner elegido." },
+      { "name": "nav", "type": "section", "required": true, "example": "4 de 5" }
+    ],
+    "fixed": [
+      "Lockup «logo de Efeonce | Partner oficial de» sobre un filete que cruza el ancho útil.",
+      "Logos en blanco, un solo tono y la misma área de tinta, con el fondo propio eliminado.",
+      "Indicador de navegación arriba a la derecha.",
+      "Fondo color.dark."
+    ],
+    "selection": { "kind": "collaborator", "label": "Agentes IA", "target": "Un logo de partner (en la referencia Claude), anchor bottom-end." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark. Cabecera canónica: eyebrow, pregunta con anillo, respuesta en una línea en Bricolage cerrada por la esfera; bajada alineada a la derecha a la altura de la respuesta. Debajo, el lockup con el logo negativo de Efeonce, un separador y «Partner oficial de», y un filete de lado a lado. Dos filas de logos de partner (5 + 4) repartidas en el ancho útil, en blanco, un solo tono y el mismo peso por área de tinta. La selección de AXIS toma un logo con el cursor del colaborador en bottom-end. Indicador de navegación pieces.deck.content arriba a la derecha. Sólo programas declarables según el registro de partnerships."
+    },
+    "renderSource": { "script": "render-src/deck-interior.mjs", "slideId": "D7-partners" },
+    "rules": [
+      "Logos de terceros en un tono y con el mismo peso (third-party-logos-one-tone-same-ink).",
+      "Sólo los programas que se pueden declarar (docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).",
+      "Una sola selección."
+    ],
+    "notes": "En AXIS es content-partners (status option, voice none; la referencia lleva voz). El logo de Efeonce aparece en esta lámina interior como parte del lockup «Partner oficial de», tal como lo aprobó el operador. La respuesta mide 2,75 veces la pregunta (110 contra 40 en el script): la regla pide 3×. En la referencia no se ve la burbuja URL en el pie."
+  },
+  {
+    "id": "content-stack",
+    "board": "DeckStack",
+    "name": "Nuestro stack · tres capas de herramientas sobre Efeonce",
+    "family": "about",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckStack.jpg",
+    "communicates": "Trabajamos con lo mejor en tres capas —crear, medir y operar— y todo se conecta en Efeonce, donde cada pieza se mide.",
+    "useWhen": [
+      "Para justificar un delivery premium por el stack que lo sostiene.",
+      "Cuando el cliente pregunta con qué se produce, se mide y se coordina."
+    ],
+    "avoidWhen": [
+      "La conversación es de programas de partner.",
+      "Se quiere mostrar cómo vive el cliente esas herramientas."
+    ],
+    "preferInstead": [
+      { "recipe": "content-partners", "when": "se habla de programas oficiales de fabricantes" },
+      { "recipe": "content-day-tools", "when": "interesa cómo el cliente usa las herramientas en su día a día" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-partners", "relation": "sequence" },
+      { "recipe": "content-day-tools", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 20, "example": "Nuestro stack" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 26, "example": "¿Con qué trabajamos?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 12, "example": "Con lo mejor", "notes": "Dos líneas de 7 caracteres como máximo." },
+      { "name": "body", "type": "richText", "required": true, "maxChars": 100, "example": "**16** herramientas en tres capas, conectadas en Efeonce: así cada pieza sale con calidad y se mide.", "notes": "La cifra en negrita debe ser el total de herramientas de las capas." },
+      { "name": "layers", "type": "list", "required": true, "maxChars": 22, "example": "Crear · lo que se produce · Photoshop, Illustrator, Premiere, After Effects, Firefly, Higgsfield, Magnific, Frame.io", "notes": "Tres capas de abajo hacia arriba (Operar, Medir, Crear): nombre ≤ 8, descriptor ≤ 22 y de 4 a 8 isotipos del catálogo deck-axis/assets/tools." },
+      { "name": "highlightedLayer", "type": "enum", "required": true, "example": "Medir", "notes": "La capa cuyo nombre va en el acento y sobre la que corre el arco." }
+    ],
+    "fixed": [
+      "Base: el logo negativo de Efeonce con «Todo se conecta en» y «donde cada pieza se mide», unido a la base de luz por una guía.",
+      "Tres capas de vidrio en isométrica con pilares de luz en las esquinas y las fichas de pie, ordenadas de atrás hacia adelante.",
+      "Fichas blancas de vidrio; fichas oscuras con el fondo nativo de la app para Photoshop, Illustrator, Premiere, After Effects y Higgsfield (sus isotipos se pierden sobre blanco).",
+      "Una sola órbita, alrededor de la base, con su arco de acento y sin esfera.",
+      "Sin indicador de navegación; burbuja URL horneada en el pie."
+    ],
+    "selection": { "kind": "none" },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con halo en color.halo. Voz a la izquierda: eyebrow, pregunta con anillo, respuesta en dos líneas cerrada por la esfera y la bajada con el total de herramientas en negrita. A la derecha, en isométrica: una base de luz teal y encima tres capas de vidrio apiladas (Operar abajo, Medir al medio, Crear arriba) con pilares de luz en las esquinas; sobre cada capa, las fichas de sus herramientas de pie, con el isotipo del catálogo; Photoshop, Illustrator, Premiere, After Effects y Higgsfield en ficha oscura con su fondo nativo, el resto en ficha blanca. A la izquierda de cada capa, su nombre (la destacada en el acento) y «N herramientas · descriptor» con una guía. Junto a la base, «Todo se conecta en», el logo de Efeonce y «donde cada pieza se mide». Una órbita rodea la base con su arco de acento, sin esfera. Sin selección ni indicador; burbuja URL en el pie."
+    },
+    "renderSource": { "script": "render-src/deck-interior.mjs", "slideId": "D8c-stack-capas" },
+    "rules": [
+      "El logo de Efeonce es la base del stack: es el sujeto, por eso aparece en una lámina interior.",
+      "Una sola órbita, sin esfera (satellites-arc-no-sphere).",
+      "Isotipos sólo del catálogo; ficha oscura nativa donde el isotipo se pierde sobre blanco.",
+      "El total de la bajada coincide con las fichas."
+    ],
+    "notes": "En AXIS es content-stack, pero el token (Greenhouse al centro, herramientas como satélites) y su referencia describen la versión anterior (D8-stack; hubo también D8b-stack-impacto). La aprobada el 2026-09-27 es D8c: tres capas sobre el logo de Efeonce como base, con fichas oscuras nativas para Adobe e Higgsfield (matiz del operador). AXIS debe actualizar token y referencia."
+  },
+  {
+    "id": "content-day-tools",
+    "board": "DeckDiaADiaHerramientas",
+    "name": "El día a día con las herramientas · el panel de Greenhouse al centro",
+    "family": "content",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckDiaADiaHerramientas.jpg",
+    "communicates": "Cada cosa pasa en su herramienta —Teams, Notion, Frame.io, Efeonce Insights— y todo se ve en un solo lugar: tu panel de Greenhouse.",
+    "useWhen": [
+      "Cuando el cliente pregunta cómo se coordina el trabajo y dónde ve lo que pasa.",
+      "Como alternativa al día a día de cuatro momentos, antes de los dos «vívelo»."
+    ],
+    "avoidWhen": [
+      "La cuenta no usa esas herramientas o no tiene panel de Greenhouse.",
+      "Se quiere mostrar el oficio con fotos."
+    ],
+    "preferInstead": [
+      { "recipe": "content-day", "when": "el argumento es el ritmo del oficio con fotos reales" },
+      { "recipe": "content-stack", "when": "la pregunta es con qué herramientas se produce, no cómo se trabaja con el cliente" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-day", "relation": "variant" },
+      { "recipe": "content-day-live-progress", "relation": "sequence" },
+      { "recipe": "content-day-live-results", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 26, "example": "Tu día a día con Efeonce" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 30, "example": "¿Cómo trabajamos contigo?", "notes": "Dos líneas." },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 5, "example": "Así" },
+      { "name": "body", "type": "richText", "required": true, "maxChars": 100, "example": "Cada cosa en su herramienta y **todo** a la vista en tu panel, sin esperar el informe." },
+      { "name": "panel", "type": "image", "required": true, "example": "src/lib/artifact-composer/catalogs/deck-axis/assets/product/greenhouse-seo-dashboard.png", "notes": "Captura del panel de Greenhouse (vista de muestra o la del cliente)." },
+      { "name": "tools", "type": "list", "required": true, "maxChars": 22, "example": "Microsoft Teams · Nos reunimos", "notes": "Cuatro fichas: isotipo del catálogo (Efeonce Insights usa el isotipo de Efeonce en ficha oscura), nombre ≤ 18 en versalitas y acción ≤ 22." }
+    ],
+    "fixed": [
+      "Panel de Greenhouse gigante e inclinado en perspectiva, con reflejo.",
+      "La órbita como plataforma de luz bajo el panel (elipse con arco de acento).",
+      "Haces de luz de cada ficha hacia el panel; fichas a distinta profundidad.",
+      "Rótulo bajo la plataforma: isotipo de Greenhouse, «Tu panel en Greenhouse» y «todo en un solo lugar, en vivo».",
+      "Sin indicador; burbuja URL en luminosidad en el pie."
+    ],
+    "selection": { "kind": "none" },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con un escenario de halo (color.halo y color.teal) y un degradé de piso. Voz a la izquierda: eyebrow, pregunta en dos líneas con anillo, respuesta de una palabra en Bricolage grande cerrada por la esfera, bajada con una palabra en negrita. Al centro-derecha, la captura del panel de Greenhouse en perspectiva (girado e inclinado), con sombra profunda y reflejo, flotando sobre la plataforma de luz: una elipse con su arco de acento. Alrededor, a distintas profundidades, cuatro fichas de herramienta con su isotipo real y, bajo cada una, el nombre en versalitas y la acción; un haz de luz va de cada ficha al panel. Bajo la plataforma, el rótulo de Greenhouse. Interfaces genéricas: no recrees el diseño propietario de nadie. Sin selección ni indicador; burbuja URL en luminosidad en el pie."
+    },
+    "renderSource": { "script": "render-src/vive.mjs", "slideId": "V0-herramientas-impacto" },
+    "rules": [
+      "Una sola órbita: la plataforma bajo el panel.",
+      "Isotipos reales de cada herramienta, interfaces genéricas.",
+      "Ningún texto sobre el panel ni cruzando la plataforma."
+    ],
+    "notes": "Receta nueva (no existe en AXIS). Matiz del operador: es la alternativa del día a día con herramientas (Frame.io, Notion, Teams, Efeonce Insights y el panel de Greenhouse); la desarrollan los dos «vívelo». Antecedente sin impacto: D4b-dia-herramientas en render-src/deck-interior.mjs (órbita circular con cuatro paradas)."
+  },
+  {
+    "id": "content-day-live-progress",
+    "board": "DeckVivoAvanza",
+    "name": "Vívelo 1 · el plan en Notion y la aprobación en Frame.io",
+    "family": "content",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckVivoAvanza.jpg",
+    "communicates": "El cliente ve avanzar su proyecto y aprueba cada pieza con un gesto, comentando sobre la imagen.",
+    "useWhen": [
+      "Después del día a día con herramientas, para que quien lo ve viva la aprobación.",
+      "Cuando la objeción es el control: «¿cómo sé qué pasa y cómo pido cambios?»."
+    ],
+    "avoidWhen": [
+      "La cuenta no aprueba piezas visuales (servicios sin producción creativa).",
+      "No se usa Notion ni Frame.io en la cuenta."
+    ],
+    "preferInstead": [
+      { "recipe": "content-day-live-results", "when": "el argumento son los resultados, no la aprobación" },
+      { "recipe": "content-day-tools", "when": "basta con mostrar dónde pasa cada cosa" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-day-live-results", "relation": "sequence" },
+      { "recipe": "content-day-tools", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 26, "example": "Tu día a día con Efeonce" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 28, "example": "¿Cómo avanza tu proyecto?", "notes": "Dos líneas." },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 12, "example": "A la vista", "notes": "Dos líneas de 6 caracteres como máximo." },
+      { "name": "body", "type": "richText", "required": true, "maxChars": 100, "example": "Sigues el plan en Notion y apruebas cada pieza en Frame.io, comentando **sobre** la imagen." },
+      { "name": "boardTitle", "type": "text", "required": true, "maxChars": 24, "example": "Plan de la campaña" },
+      { "name": "boardProgress", "type": "text", "required": false, "maxChars": 14, "example": "Semana 3 de 6" },
+      { "name": "boardCards", "type": "list", "required": true, "maxChars": 24, "example": "Key visual · Esperando tu visto bueno", "notes": "Hasta cinco tarjetas repartidas en En curso, En revisión y Listo (título ≤ 22, etiqueta ≤ 24); la de «En revisión» se enciende y es la que se revisa." },
+      { "name": "reviewTitle", "type": "text", "required": true, "maxChars": 20, "example": "Key visual" },
+      { "name": "reviewImage", "type": "image", "required": true, "example": "ai-generations/2026-09-27_ads-cine/plates/AD3b-45-aeo-foco-isotipo.png", "notes": "La pieza en revisión, 4:5." },
+      { "name": "clientComment", "type": "text", "required": true, "maxChars": 32, "example": "¿Podemos subir el logo?", "notes": "Firmado «Tú · v1»." },
+      { "name": "teamReply", "type": "text", "required": true, "maxChars": 32, "example": "Listo, quedó en la v2.", "notes": "Firmado «Efeonce · v2» con el isotipo." }
+    ],
+    "fixed": [
+      "El tablero de Notion atrás, girado hacia la revisión; la revisión de Frame.io al frente, más grande, con reflejo.",
+      "Chips de versión v1 y v2, marcador 1 sobre la pieza y botones «Comentar» y «Aprobar» (este en el acento, encendido).",
+      "Haz de luz de la tarjeta en revisión hacia Frame.io.",
+      "La órbita como plataforma de luz bajo la revisión.",
+      "Sin indicador; burbuja URL en luminosidad en el pie."
+    ],
+    "selection": { "kind": "local-cta", "target": "El botón «Aprobar»: corchetes abiertos y el cursor local del cliente en end-center, sin etiqueta." },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_ads-cine/plates/AD3b-45-aeo-foco-isotipo.png",
+      "ficha": "ai-generations/2026-09-27_ads-cine/fichas/AD3-45-aeo-foco.json",
+      "prompt": "ai-generations/2026-09-27_ads-cine/prompts/AD3-45-aeo-foco.txt",
+      "postprocess": ["Isotipo ya compuesto con pnpm foto:isotipo (registro ai-generations/2026-09-27_ads-cine/plates/AD3b-45-aeo-foco-isotipo.json: isotipo negativo oficial, centro 0,423 / 0,567 y ancho 0,064 del plate)."],
+      "replaceable": "La pieza dentro de la revisión es un ejemplo (un aviso aprobado de la campaña de ads de cine): se reemplaza por una pieza real de la cuenta o de marca propia aprobada. Es contenido de la interfaz, no la foto de la lámina."
+    },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con escenario de halo. Voz a la izquierda: eyebrow, pregunta en dos líneas con anillo, respuesta en dos líneas en Bricolage cerrada por la esfera, bajada con una palabra en negrita. A la derecha, en perspectiva: detrás, una tarjeta clara con el tablero de Notion (isotipo real, título, avance y tres columnas), girada hacia la revisión, con la tarjeta «En revisión» encendida en el acento; al frente, más grande y con reflejo, la revisión de Frame.io (isotipo real, título de la pieza, chips v1 y v2), con la pieza a la izquierda y su marcador 1, y a la derecha el comentario del cliente, la respuesta de Efeonce y los botones «Comentar» y «Aprobar». Un haz de luz une la tarjeta en revisión con Frame.io. Bajo la revisión, la plataforma de luz con su arco de acento. El grupo CTA aprobado de AXIS toma «Aprobar»: corchetes abiertos y cursor local en end-center. Interfaces genéricas con isotipos reales; burbuja URL en luminosidad en el pie."
+    },
+    "renderSource": { "script": "render-src/vive.mjs", "slideId": "V1b-avanza-impacto" },
+    "rules": [
+      "El gesto es del cliente: cursor local sin etiqueta sobre el botón.",
+      "Interfaces genéricas; sólo los isotipos son reales. No se recrea el diseño propietario.",
+      "Una sola órbita: la plataforma.",
+      "El isotipo del uniforme en la pieza de ejemplo es el compuesto, nunca el del modelo."
+    ],
+    "notes": "Receta nueva (no existe en AXIS). Primer «vívelo» del día a día (matiz del operador: «que quien lo ve VIVA la experiencia de trabajar con nosotros»). Antecedente sin 3D: V1-avanza-a-la-vista en el mismo script. Hallazgo: dentro del tablero, la etiqueta «Esperando tu visto bueno» va en color.tealDark a 13 px (D1 reserva el acento para 24 px o más)."
+  },
+  {
+    "id": "content-day-live-results",
+    "board": "DeckVivoResultados",
+    "name": "Vívelo 2 · los resultados en vivo en Insights, Greenhouse y Teams",
+    "family": "content",
+    "documents": ["proposal", "brochure", "pitch", "qbr"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckVivoResultados.jpg",
+    "communicates": "Los resultados llegan solos: Efeonce Insights arma el reporte, se ve en Greenhouse y se conversa en Teams.",
+    "useWhen": [
+      "Después de «Vívelo 1», o sola cuando la objeción es la reportería.",
+      "En una QBR, para mostrar cómo el cliente recibe sus resultados cada semana."
+    ],
+    "avoidWhen": [
+      "La cuenta no tiene Efeonce Insights ni panel de Greenhouse.",
+      "No hay cifras con fuente ni se pueden marcar como datos de muestra."
+    ],
+    "preferInstead": [
+      { "recipe": "decision-chart", "when": "hay un resultado real que merece su gráfico" },
+      { "recipe": "content-day-tools", "when": "basta con mostrar dónde pasa cada cosa" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-day-live-progress", "relation": "sequence" },
+      { "recipe": "content-day-tools", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 26, "example": "Tu día a día con Efeonce" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 16, "example": "¿Cómo va?", "notes": "Una línea." },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 10, "example": "En vivo", "notes": "Dos líneas de 5 caracteres como máximo." },
+      { "name": "body", "type": "richText", "required": true, "maxChars": 100, "example": "Efeonce Insights arma el reporte **solo**: lo ves en tu panel de Greenhouse y lo conversamos en Teams." },
+      { "name": "panel", "type": "image", "required": true, "example": "src/lib/artifact-composer/catalogs/deck-axis/assets/product/greenhouse-seo-dashboard.png" },
+      { "name": "meeting", "type": "text", "required": true, "maxChars": 40, "example": "Revisión de resultados · Jueves 10:00 · 30 min · con tu equipo", "notes": "Título ≤ 26 y detalle ≤ 40 de la invitación de Teams." },
+      { "name": "reportTitle", "type": "text", "required": true, "maxChars": 36, "example": "Tu reporte de la semana está listo" },
+      { "name": "metrics", "type": "metric", "required": true, "maxChars": 18, "example": "+22 % · tráfico orgánico", "notes": "Tres cifras: valor ≤ 6, etiqueta ≤ 18; con fuente o con el rótulo «Datos de muestra»." }
+    ],
+    "fixed": [
+      "Panel de Greenhouse gigante e inclinado, con reflejo, sobre la plataforma de luz.",
+      "Tarjeta de Efeonce Insights al frente con borde y halo encendidos, rótulo «Efeonce Insights · ahora» y la primera cifra en color.tealDark.",
+      "Botón «Ver en Greenhouse» con el isotipo de Greenhouse.",
+      "Invitación de Microsoft Teams flotando arriba, con su isotipo real.",
+      "Sin indicador; burbuja URL en luminosidad en el pie."
+    ],
+    "selection": { "kind": "local-cta", "target": "El botón «Ver en Greenhouse»: corchetes abiertos y cursor local en end-center." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con escenario de halo. Voz a la izquierda: eyebrow, pregunta corta con anillo, respuesta en dos líneas en Bricolage cerrada por la esfera, bajada con una palabra en negrita. A la derecha, la captura del panel de Greenhouse en perspectiva, con reflejo, sobre la plataforma de luz con su arco de acento. Al frente, encendida, la tarjeta clara de Efeonce Insights (isotipo de Efeonce en ficha oscura, título del reporte, tres cifras con la primera en color.tealDark y el rótulo «Datos de muestra» si no son reales) y el botón oscuro «Ver en Greenhouse». Arriba a la derecha, flotando, la invitación de Microsoft Teams. El grupo CTA aprobado de AXIS toma el botón con corchetes abiertos y cursor local. Burbuja URL en luminosidad en el pie."
+    },
+    "renderSource": { "script": "render-src/vive.mjs", "slideId": "V2b-resultados-impacto" },
+    "rules": [
+      "Cifras con fuente o marcadas «Datos de muestra»; nunca una cifra inventada presentada como real.",
+      "Una sola órbita: la plataforma.",
+      "Cursor local del cliente, sin etiqueta."
+    ],
+    "notes": "Receta nueva (no existe en AXIS). Segundo «vívelo» del día a día. Antecedente sin 3D: V2-resultados-en-vivo en el mismo script. Las cifras de la referencia (+22 %, +14, 61 %) son de la vista de muestra y así lo dice la tarjeta."
+  },
+  {
+    "id": "content-pricing-stage",
+    "board": "DeckCotizacionEscena",
+    "name": "Cotización en escena · los tres planes en 3D con Pro al frente",
+    "family": "pricing",
+    "documents": ["proposal"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckCotizacionEscena.jpg",
+    "communicates": "Se cotiza por capacidad y el plan que recomendamos sale al frente, con todo lo que incluye a la vista.",
+    "useWhen": [
+      "En una propuesta presentada en sala, cuando la cotización necesita el mismo impacto que el resto del deck.",
+      "Cuando se quiere empujar el plan recomendado sin esconder los otros dos."
+    ],
+    "avoidWhen": [
+      "En un brochure.",
+      "La audiencia necesita leer y comparar atributo por atributo en detalle.",
+      "Hay una sola cotización cerrada."
+    ],
+    "preferInstead": [
+      { "recipe": "content-pricing", "when": "la sala es de lectura y compara en detalle" },
+      { "recipe": "content-pricing-live", "when": "hay una cotización única lista para aprobar" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-pricing", "relation": "variant" },
+      { "recipe": "content-pricing-live", "relation": "variant" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 16, "example": "Inversión" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 24, "example": "¿Cómo se cotiza?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 14, "example": "Por capacidad", "notes": "Dos líneas de 10 caracteres como máximo." },
+      { "name": "body", "type": "richText", "required": true, "maxChars": 90, "example": "Capacidad gobernada, **nunca** por horas ni piezas. Greenhouse suma la capa de producto." },
+      { "name": "plans", "type": "list", "required": true, "maxChars": 32, "example": "Enterprise · Para escalar con IA · [MONTO] · Suma IA y API…", "notes": "Tres planes: nombre ≤ 12, bajada ≤ 24, monto y de cuatro a cinco atributos ≤ 32 (una línea en la ficha)." },
+      { "name": "amounts", "type": "money", "required": true, "example": "[MONTO]" },
+      { "name": "recommendedPlan", "type": "enum", "required": true, "example": "Pro", "notes": "Va al centro, al frente, en ficha clara." }
+    ],
+    "fixed": [
+      "Nota legal bajo la bajada: «Valores netos, IVA no incluido. Los montos se definen en cada propuesta.»",
+      "«al mes · neto + IVA» bajo cada monto.",
+      "Planes como fichas de vidrio en perspectiva con reflejo: los laterales oscuros y girados hacia el centro, el recomendado claro, más grande y con borde y halo.",
+      "La órbita como plataforma de luz bajo las fichas.",
+      "Sin indicador; burbuja URL en luminosidad en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Finanzas", "target": "La ficha del plan recomendado (targetKind object, anchor top-end, escala 1,1, participantKind department)." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con escenario de halo. Voz a la izquierda: eyebrow «Inversión», pregunta con anillo, respuesta en dos líneas en Bricolage cerrada por la esfera, bajada con «nunca» en negrita y la nota legal en el suave. A la derecha, en perspectiva, tres fichas de plan de vidrio sobre la plataforma de luz: las laterales oscuras y giradas hacia el centro, la recomendada al centro, clara, más grande, con «Recomendado», borde y halo en color.halo; cada ficha con nombre, bajada, [MONTO], «al mes · neto + IVA» y sus atributos; todas con reflejo. La selección de AXIS toma la ficha recomendada con el cursor del colaborador «Finanzas» en top-end. Montos siempre como [MONTO]; burbuja URL en luminosidad en el pie."
+    },
+    "renderSource": { "script": "render-src/vive.mjs", "slideId": "CQ1-cotizacion-escena" },
+    "rules": [
+      "Montos siempre como [MONTO] hasta la propuesta.",
+      "Nunca horas ni piezas.",
+      "Una sola órbita (la plataforma) y una sola selección."
+    ],
+    "notes": "Receta nueva: alternativa «en escena» de content-pricing aprobada el 2026-09-27 (el operador pidió «dos variaciones más, elegantes, con punch»). Hallazgos: la respuesta mide 2,95 veces la pregunta (118 contra 40; la regla pide 3×) y «Recomendado» va en el acento a 14 px (D1)."
+  },
+  {
+    "id": "content-pricing-live",
+    "board": "DeckCotizacionVivo",
+    "name": "Cotización en vivo · cada línea a la vista y el cursor en «Aprobar propuesta»",
+    "family": "pricing",
+    "documents": ["proposal"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckCotizacionVivo.jpg",
+    "communicates": "Lo que cuesta está a la vista, línea por línea y sin letra chica, y el siguiente gesto es aprobar.",
+    "useWhen": [
+      "En una propuesta con alcance acordado y una cotización única.",
+      "Como cierre de la parte económica, justo antes de los próximos pasos."
+    ],
+    "avoidWhen": [
+      "El alcance no está acordado o hay que comparar planes.",
+      "En un brochure o un pitch temprano."
+    ],
+    "preferInstead": [
+      { "recipe": "content-pricing", "when": "hay que comparar planes" },
+      { "recipe": "content-pricing-stage", "when": "se presentan los tres planes con impacto" }
+    ],
+    "pairsWith": [
+      { "recipe": "content-pricing", "relation": "variant" },
+      { "recipe": "content-pricing-stage", "relation": "variant" },
+      { "recipe": "decision-risk", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 16, "example": "Inversión" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 22, "example": "¿Cuánto cuesta?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 16, "example": "Sin letra chica", "notes": "Dos líneas de 9 caracteres como máximo." },
+      { "name": "body", "type": "richText", "required": true, "maxChars": 110, "example": "Cada línea de la cotización a la vista, con su **monto** y lo que incluye. Los montos se definen en cada propuesta." },
+      { "name": "quoteTitle", "type": "text", "required": true, "maxChars": 20, "example": "Para tu marca" },
+      { "name": "lineItems", "type": "list", "required": true, "maxChars": 48, "example": "Greenhouse Pro · Dashboard, KPIs, acciones y reporting quincenal · [MONTO] / mes", "notes": "De una a cuatro líneas: nombre ≤ 20, descripción ≤ 48, monto (money) y periodicidad «/ mes» o «· único»." },
+      { "name": "total", "type": "money", "required": true, "example": "[MONTO]", "notes": "Con «Total mensual» y «neto + IVA»." }
+    ],
+    "fixed": [
+      "Documento claro en perspectiva leve con el isotipo de Efeonce y «Propuesta · Cotización».",
+      "Línea de total con filete grueso y el botón «Aprobar propuesta» en el acento.",
+      "Dos chips laterales fijos: «Cómo se mide · Capacidad gobernada, nunca horas ni piezas» y «Sin sorpresas · Valores netos, IVA no incluido».",
+      "La órbita como plataforma de luz bajo el documento.",
+      "Sin indicador; burbuja URL en luminosidad en el pie."
+    ],
+    "selection": { "kind": "local-cta", "target": "El botón «Aprobar propuesta»: corchetes abiertos (padding compacto, targetKind group) y cursor local del cliente en end-center." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con escenario de halo. Voz a la izquierda: eyebrow «Inversión», pregunta con anillo, respuesta en dos líneas en Bricolage cerrada por la esfera, bajada con una palabra en negrita. A la derecha, la cotización tal como la recibe el cliente: un documento claro en perspectiva leve con el isotipo de Efeonce, «Propuesta · Cotización» y el título; cada línea numerada con nombre, descripción y [MONTO] con su periodicidad; filete grueso, «Total mensual», [MONTO] grande, «neto + IVA» y el botón «Aprobar propuesta» en el acento. Dos chips oscuros flotan a la derecha con las garantías fijas. Debajo, la plataforma de luz con su arco. El grupo CTA aprobado de AXIS toma el botón con corchetes compactos y cursor local. Montos siempre [MONTO]; burbuja URL en luminosidad en el pie."
+    },
+    "renderSource": { "script": "render-src/vive.mjs", "slideId": "CQ2-cotizacion-vivo" },
+    "rules": [
+      "Montos siempre como [MONTO] hasta la propuesta; cada uno con su periodicidad y neto + IVA.",
+      "El cursor es del cliente (local) y está sobre «Aprobar propuesta».",
+      "Una sola órbita."
+    ],
+    "notes": "Receta nueva: alternativa «en vivo» de content-pricing aprobada el 2026-09-27. Hallazgos: la respuesta mide 2,95 veces la pregunta (118 contra 40; la regla pide 3×) y el rótulo «Propuesta · Cotización» va en color.tealDark a 14 px (D1)."
+  },
+  {
+    "id": "decision-agenda",
+    "board": "DeckAgenda",
+    "name": "Agenda · cinco temas y el que importa marcado",
+    "family": "content",
+    "documents": ["proposal", "pitch", "qbr"],
+    "surface": "paper",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckAgenda.jpg",
+    "communicates": "Hoy veremos cinco temas y ya sabes cuál es el que importa.",
+    "useWhen": [
+      "Después de la portada de una presentación en sala (propuesta, pitch, QBR).",
+      "Cuando conviene anunciar desde el inicio qué tema es el central."
+    ],
+    "avoidWhen": [
+      "En un brochure que se lee solo: no hay «hoy».",
+      "El deck tiene menos de tres temas o muy pocas láminas."
+    ],
+    "preferInstead": [
+      { "recipe": "section-classic", "when": "basta con abrir cada capítulo con su número" }
+    ],
+    "pairsWith": [
+      { "recipe": "section-classic", "relation": "sequence" },
+      { "recipe": "content-text", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 16, "example": "Agenda" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 24, "example": "¿Qué veremos hoy?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 14, "example": "Cinco temas", "notes": "Dos líneas de 7 caracteres como máximo; el número dicho debe coincidir con los temas." },
+      { "name": "items", "type": "list", "required": true, "maxChars": 26, "example": "Nuestra propuesta", "notes": "Cinco temas (lista numerada 01–05 por la plantilla)." },
+      { "name": "highlightedItem", "type": "enum", "required": true, "example": "4", "notes": "El tema central: número en el acento y texto en seminegrita." },
+      { "name": "nav", "type": "section", "required": true, "example": "0 de 5", "notes": "La agenda va antes de la primera sección." }
+    ],
+    "fixed": [
+      "Fondo papel (color.paper), tinta navy.",
+      "Números 01–05 en Bricolage light a escala de titular; el destacado en el acento de papel (color.tealDark).",
+      "Filetes entre temas, lista desde el 43 % del ancho.",
+      "Indicador de navegación en papel arriba a la derecha y burbuja URL clara en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Cliente", "target": "La fila del tema destacado (targetKind object, anchor bottom-start)." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.paper. Voz a la izquierda: eyebrow «Agenda», pregunta con anillo en color.tealDark, respuesta en dos líneas en Bricolage navy cerrada por la esfera, que dice cuántos temas son. A la derecha, desde el 43 % del ancho, la lista de temas separados por filetes: número 01–05 en Bricolage light y el tema en Poppins; el tema central con el número en color.tealDark y el texto en seminegrita. La selección de AXIS toma esa fila con el cursor del colaborador «Cliente» en bottom-start. Indicador de navegación en papel arriba a la derecha (antes de la primera sección) y burbuja URL clara en el pie."
+    },
+    "renderSource": { "script": "render-src/deck2.mjs", "slideId": "E6-agenda" },
+    "rules": [
+      "La cantidad de temas coincide con la respuesta y con el total del indicador.",
+      "Un solo tema destacado y una sola selección.",
+      "Sin esfera en la lista: la única esfera cierra la respuesta."
+    ],
+    "notes": "En AXIS es decision-agenda (status option, list count 5); aprobada el 2026-09-27."
+  },
+  {
+    "id": "decision-risk",
+    "board": "DeckSeguro",
+    "name": "Por qué es seguro · cada riesgo con su cobertura",
+    "family": "proof",
+    "documents": ["proposal", "pitch"],
+    "surface": "paper",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckSeguro.jpg",
+    "communicates": "Cada riesgo tiene su cobertura escrita, y el primer paso es chico: un piloto, no un contrato largo.",
+    "useWhen": [
+      "Para responder la objeción «¿y si no funciona?» antes de la cotización o justo después.",
+      "Con audiencias de compras, finanzas o dirección que evalúan riesgo."
+    ],
+    "avoidWhen": [
+      "Una cobertura no se ofrece de verdad en este servicio (por ejemplo, no hay Sample Sprint disponible).",
+      "Son más de cuatro riesgos."
+    ],
+    "preferInstead": [
+      { "recipe": "decision-plan", "when": "la preocupación es el tiempo hasta ver resultados" },
+      { "recipe": "decision-case", "when": "la mejor respuesta al riesgo es un caso probado" }
+    ],
+    "pairsWith": [
+      { "recipe": "decision-plan", "relation": "sequence" },
+      { "recipe": "content-pricing", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 24, "example": "Riesgo controlado" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 22, "example": "¿Y si no funciona?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 18, "example": "Empiezas chico", "notes": "Dos líneas de 9 caracteres como máximo." },
+      { "name": "body", "type": "text", "required": true, "maxChars": 100, "example": "Cada riesgo tiene su cobertura escrita. Y el primer paso es un piloto, no un contrato largo." },
+      { "name": "rows", "type": "list", "required": true, "maxChars": 100, "example": "Que se atrase · Métricas con umbral · OTD ≥ 90 % y FTR ≥ 80 %, medidos cada semana y visibles en tu portal.", "notes": "Cuatro filas: riesgo ≤ 30 (hasta dos líneas), cobertura ≤ 24 en Bricolage y cómo se cubre ≤ 100 (dos líneas)." },
+      { "name": "selectedRow", "type": "enum", "required": true, "example": "1" },
+      { "name": "nav", "type": "section", "required": true, "example": "5 de 5" }
+    ],
+    "fixed": [
+      "Fondo papel, tinta navy.",
+      "Encabezados de tabla «El riesgo» y «Cómo lo cubrimos» en versalitas.",
+      "Filas con filete superior, desde el 42 % del ancho.",
+      "Indicador de navegación en papel y burbuja URL clara en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Cliente", "target": "Una fila completa (en la referencia la primera, Sample Sprint), anchor top-start." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.paper. Voz a la izquierda: eyebrow, pregunta con anillo en color.tealDark, respuesta en dos líneas en Bricolage navy cerrada por la esfera y bajada. A la derecha, desde el 42 % del ancho, una tabla de cuatro filas con encabezados en versalitas: a la izquierda el riesgo en Poppins light en el gris suave, a la derecha la cobertura en Bricolage navy y cómo se cubre en light. La selección de AXIS toma una fila con el cursor del colaborador «Cliente» en top-start, sin tapar la voz. Indicador de navegación en papel y burbuja URL clara en el pie."
+    },
+    "renderSource": { "script": "render-src/deck2.mjs", "slideId": "E1-seguro" },
+    "rules": [
+      "Cada cobertura existe en la oferta y es verificable (los umbrales citados son los del contrato).",
+      "Exactamente cuatro filas y una sola selección."
+    ],
+    "notes": "En AXIS es decision-risk (status option); aprobada el 2026-09-27."
+  },
+  {
+    "id": "decision-case",
+    "board": "DeckCaso",
+    "name": "Caso de éxito · Sky en 12 meses, con foto de ejemplo",
+    "family": "proof",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "split-paper-photo",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckCaso.jpg",
+    "communicates": "Con Sky el equipo creativo produjo más y más rápido, y cuatro cifras con fuente lo prueban.",
+    "useWhen": [
+      "Para demostrar con un caso publicado lo que se promete en la propuesta.",
+      "Cuando el caso es del mismo servicio o del mismo sector que el prospecto."
+    ],
+    "avoidWhen": [
+      "No hay foto real del caso: la de la referencia es sólo de ejemplo y no sale a una pieza final.",
+      "El caso no está publicado o las cifras no tienen fuente.",
+      "El cliente del caso compite con el prospecto."
+    ],
+    "preferInstead": [
+      { "recipe": "decision-chart", "when": "el caso se cuenta mejor con una sola cifra graficada" },
+      { "recipe": "decision-testimonial", "when": "lo más fuerte es la voz del cliente" }
+    ],
+    "pairsWith": [
+      { "recipe": "decision-chart", "relation": "sequence" },
+      { "recipe": "decision-testimonial", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "clientLogo", "type": "logo", "required": true, "example": "clients/sky.svg", "notes": "Logo del cliente en un tono (navy) arriba de la voz." },
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 20, "example": "Caso · 12 meses" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 26, "example": "¿Qué cambió con Sky?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 11, "example": "Más rápido", "notes": "Una línea dentro del panel de papel." },
+      { "name": "stats", "type": "metric", "required": true, "maxChars": 24, "example": "−25 % · tiempo de producción", "notes": "Cuatro cifras en grilla de 2 × 2: valor ≤ 7 en Bricolage light, etiqueta ≤ 24." },
+      { "name": "source", "type": "text", "required": true, "maxChars": 120, "example": "Métricas de entrega del equipo creativo de Sky Airlines en 12 meses, en 5 mercados. Caso publicado." },
+      { "name": "photo", "type": "image", "required": true, "example": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png", "notes": "Foto REAL del caso; la de la referencia es de ejemplo." },
+      { "name": "selectedStat", "type": "enum", "required": true, "example": "4" }
+    ],
+    "fixed": [
+      "Sección partida: panel de papel en la mitad izquierda (1000/1920 del ancho) con una esquina curva grande arriba a la derecha (radio del token decision-case.panel).",
+      "La foto se extiende a la derecha, a sangre, bajo la curva.",
+      "Sin logo de Efeonce ni indicador: la lámina tiene foto.",
+      "Burbuja URL clara en el pie del panel."
+    ],
+    "selection": { "kind": "collaborator", "label": "Performance", "target": "Una cifra con su etiqueta (en la referencia −25 %), anchor bottom-end; nunca la persona de la foto." },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+      "ficha": "ai-generations/2026-09-26_deck-triptico-v2/fichas/T2-crea.json",
+      "prompt": "ai-generations/2026-09-26_deck-triptico-v2/prompts/T2-crea.txt",
+      "postprocess": ["Si se reutiliza el plate: revisar el emblema del hoodie con pnpm foto:emblema al 100 % y componerlo con pnpm foto:isotipo si difiere (no hay registro de isotipo compuesto para este plate)."],
+      "replaceable": "FOTO DE EJEMPLO (T2-crea, el diseñador moviendo una prueba en la pared de layouts): se reemplaza por una foto real del caso antes de enviar la pieza."
+    },
+    "prompts": {
+      "composition": "Lámina 16:9 partida: a la derecha, la foto real del caso a sangre; encima, un panel de color.paper que ocupa la mitad izquierda con una esquina curva grande arriba a la derecha (token surfaces.deck.decision-case.panel), bajo la cual sigue la foto. En el panel, en el margen de deck: el logo del cliente en un tono navy con «Caso · N meses» a su lado, la pregunta con anillo en color.tealDark, la respuesta en una línea en Bricolage navy cerrada por la esfera, cuatro cifras en grilla de 2 × 2 con filetes y la nota de fuente al pie; burbuja URL clara abajo. La selección de AXIS toma una cifra con el cursor del colaborador en bottom-end. Sin logo de Efeonce ni indicador. Nada de texto ni selección sobre la persona de la foto."
+    },
+    "renderSource": { "script": "render-src/deck2.mjs", "slideId": "E2-caso" },
+    "rules": [
+      "La lámina con foto no lleva el logo de Efeonce (photo-slide-no-logo); el logo del cliente va en un tono.",
+      "Cifras sólo con fuente citada (figures-with-source).",
+      "La foto de ejemplo se marca para reemplazo y no sale a una pieza final.",
+      "Ningún texto ni cursor sobre la persona de la foto."
+    ],
+    "notes": "En AXIS es decision-case (status option). Matiz del operador (2026-09-27): la foto es de EJEMPLO y se reemplaza por una del caso real. La composición es la sección partida aprobada aplicada a un caso."
+  },
+  {
+    "id": "decision-chart",
+    "board": "DeckGrafico",
+    "name": "Gráfico · el dato con su anotación",
+    "family": "proof",
+    "documents": ["proposal", "brochure", "pitch", "qbr"],
+    "surface": "paper",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckGrafico.jpg",
+    "communicates": "El dato manda: con Efeonce, producir toma un cuarto menos de tiempo.",
+    "useWhen": [
+      "Para mostrar un antes y después medido de un caso.",
+      "En una QBR, para mostrar la mejora del período con su fuente."
+    ],
+    "avoidWhen": [
+      "No hay línea base comparable.",
+      "Hay más de dos series o el dato necesita otro tipo de gráfico."
+    ],
+    "preferInstead": [
+      { "recipe": "content-measure", "when": "el dato es un porcentaje que la órbita puede medir" },
+      { "recipe": "decision-case", "when": "hay varias cifras del caso y una foto real" }
+    ],
+    "pairsWith": [
+      { "recipe": "decision-case", "relation": "sequence" },
+      { "recipe": "decision-testimonial", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 30, "example": "Resultados · Sky Airlines" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 24, "example": "¿Cuánto más rápido?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 10, "example": "Un cuarto" },
+      { "name": "body", "type": "text", "required": true, "maxChars": 100, "example": "El tiempo de producción bajó 25 % en 12 meses de operación con el equipo creativo." },
+      { "name": "bars", "type": "list", "required": true, "maxChars": 14, "example": "Antes · 100 / Con Efeonce · 75", "notes": "Dos barras en índice (antes = 100): etiqueta ≤ 14 y valor numérico." },
+      { "name": "annotation", "type": "text", "required": true, "maxChars": 7, "example": "−25 %", "notes": "La diferencia entre las barras, en el acento." },
+      { "name": "chartNote", "type": "text", "required": true, "maxChars": 70, "example": "Tiempo de producción por campaña, en índice (antes = 100)." },
+      { "name": "kpis", "type": "metric", "required": true, "maxChars": 22, "example": "+2.000 · piezas aprobadas", "notes": "Cuatro cifras de apoyo del mismo caso: valor ≤ 6, etiqueta ≤ 22." },
+      { "name": "source", "type": "text", "required": true, "maxChars": 90, "example": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses." },
+      { "name": "nav", "type": "section", "required": true, "example": "3 de 5" }
+    ],
+    "fixed": [
+      "Fondo papel; barra de antes en gris claro y barra de después en navy con el valor en blanco.",
+      "Guía punteada de la barra a la anotación, en Bricolage en el acento de papel (color.tealDark) a tamaño grande.",
+      "Franja de cuatro cifras con filete superior en todo el ancho útil.",
+      "Indicador de navegación en papel y burbuja URL clara en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Performance", "target": "La barra de después (targetKind object, anchor bottom-end)." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.paper. Voz a la izquierda: eyebrow con el cliente, pregunta con anillo en color.tealDark, respuesta en una línea en Bricolage navy cerrada por la esfera y bajada. A la derecha, dos barras horizontales en índice con su etiqueta encima: antes en gris claro, después en color.navy con el valor en blanco; una guía punteada lleva a la anotación de la diferencia en Bricolage en color.tealDark, grande; bajo las barras, la nota del índice. Abajo, en todo el ancho útil y con filete, cuatro cifras del caso, y al pie la fuente. La selección de AXIS toma la barra de después con el cursor del colaborador en bottom-end. Indicador en papel y burbuja URL clara."
+    },
+    "renderSource": { "script": "render-src/deck2.mjs", "slideId": "E4-grafico" },
+    "rules": [
+      "Cifras con fuente citada (figures-with-source).",
+      "La anotación es la diferencia real entre las barras.",
+      "Barras en índice, con la base explicada en la nota."
+    ],
+    "notes": "En AXIS es decision-chart (status option, voice none; la referencia sí lleva voz). Aprobada el 2026-09-27."
+  },
+  {
+    "id": "decision-testimonial",
+    "board": "DeckTestimonio",
+    "name": "Testimonio · la frase del cliente a escala de titular",
+    "family": "proof",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckTestimonio.jpg",
+    "communicates": "El cliente lo dice con sus palabras —agilizamos mucho su carga de trabajo— y las cifras del mismo caso lo respaldan.",
+    "useWhen": [
+      "Hay una cita real, textual y publicada, con autorización del cliente.",
+      "Después del caso o del gráfico, para cerrar la prueba con una voz humana."
+    ],
+    "avoidWhen": [
+      "La cita no es textual o no está autorizada.",
+      "No hay cifras del mismo caso para el costado."
+    ],
+    "preferInstead": [
+      { "recipe": "decision-case", "when": "la prueba son las cifras y no hay cita" },
+      { "recipe": "content-clients", "when": "se quiere mostrar amplitud de clientes, no un caso" }
+    ],
+    "pairsWith": [
+      { "recipe": "decision-case", "relation": "sequence" },
+      { "recipe": "decision-chart", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 28, "example": "En palabras de Sky" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 34, "example": "¿Cómo es trabajar con nosotros?" },
+      { "name": "keyPhrase", "type": "text", "required": true, "maxChars": 36, "example": "Agilizar mucho la carga de trabajo", "notes": "Fragmento literal de la cita, a escala de titular en dos líneas de 18 caracteres como máximo." },
+      { "name": "fullQuote", "type": "text", "required": true, "maxChars": 170, "example": "Hemos mejorado muchísimo en cuanto a las herramientas tecnológicas. Siento que hemos podido, gracias a ellos, agilizar mucho la carga de trabajo.", "notes": "Textual, entre comillas; hasta tres líneas." },
+      { "name": "clientLogo", "type": "logo", "required": true, "example": "clients/sky.svg", "notes": "En blanco, un tono." },
+      { "name": "author", "type": "text", "required": true, "maxChars": 24, "example": "Adriana Contreras · Team SKY", "notes": "Nombre ≤ 24 y cargo o equipo ≤ 24." },
+      { "name": "proof", "type": "metric", "required": true, "maxChars": 24, "example": "88 % · entregadas a tiempo", "notes": "Tres cifras del mismo caso: valor ≤ 6, etiqueta ≤ 24; la última en el acento." },
+      { "name": "source", "type": "text", "required": true, "maxChars": 90, "example": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses." },
+      { "name": "nav", "type": "section", "required": true, "example": "3 de 5" }
+    ],
+    "fixed": [
+      "Fondo color.dark con un halo suave detrás de la cita.",
+      "Comilla de apertura grande en el acento y comilla de cierre en el acento pegada a la frase.",
+      "Firma: logo del cliente, separador vertical, nombre y cargo.",
+      "Columna de prueba a la derecha con filetes.",
+      "Indicador de navegación y burbuja URL horneada en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Cliente", "target": "La frase clave (targetKind text, anchor top-end, escala 1,15)." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con un halo suave en color.halo a la izquierda. Arriba: eyebrow y pregunta con anillo. Debajo, la comilla de apertura grande en el acento y la frase clave del cliente en Bricolage a escala de titular, blanca, en dos líneas, cerrada por la comilla en el acento (sin esfera). Bajo ella, la cita completa textual entre comillas en Poppins light y la firma con el logo del cliente en blanco, un separador, el nombre y el cargo. A la derecha, tres cifras del mismo caso con filetes, la última en el acento, y la fuente. La selección de AXIS toma la frase clave con el cursor del colaborador «Cliente» en top-end. Indicador de navegación y burbuja URL en el pie."
+    },
+    "renderSource": { "script": "render-src/deck2.mjs", "slideId": "E5b-testimonio" },
+    "rules": [
+      "Cita real, textual, publicada y autorizada; la frase clave es un fragmento literal de ella.",
+      "Cifras del mismo caso y con fuente.",
+      "La referencia no lleva esfera: la frase del cliente cierra con la comilla en el acento."
+    ],
+    "notes": "En AXIS es decision-testimonial, pero el token (cita a 54 px, voice none) y su referencia describen la versión anterior (E5-testimonio). El operador pidió mejorarla («no se ve bien») y aprobó el 2026-09-27 la E5b: la frase como titular, la cita completa debajo y la prueba a la derecha. AXIS debe actualizar token y referencia."
+  },
+  {
+    "id": "decision-plan",
+    "board": "DeckPlan",
+    "name": "Plan de 90 días · la trayectoria que sube en tres tramos",
+    "family": "method",
+    "documents": ["proposal", "pitch"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPlan.jpg",
+    "communicates": "Desde la primera semana hay movimiento y a los 90 días hay evidencia medible.",
+    "useWhen": [
+      "Para responder «¿qué pasa al empezar?» con tramos y plazos concretos.",
+      "Después del riesgo o de la cotización, antes de los próximos pasos."
+    ],
+    "avoidWhen": [
+      "El plan tiene más de tres tramos o plazos no comprometidos.",
+      "Es un proyecto cerrado con hitos de entrega (eso es un cronograma, no esta lámina)."
+    ],
+    "preferInstead": [
+      { "recipe": "decision-next-steps", "when": "lo que importa es el siguiente paso, no el plan completo" },
+      { "recipe": "content-bullets", "when": "las etapas no dependen del tiempo" }
+    ],
+    "pairsWith": [
+      { "recipe": "decision-risk", "relation": "sequence" },
+      { "recipe": "decision-next-steps", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 20, "example": "Plan de trabajo" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 26, "example": "¿Qué pasa al empezar?", "notes": "Dos líneas." },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 11, "example": "Movimiento", "notes": "Una línea." },
+      { "name": "body", "type": "richText", "required": true, "maxChars": 120, "example": "**90** días a la primera evidencia medible, en tres tramos de 30. Desde la primera semana ya hay piezas en marcha." },
+      { "name": "horizon", "type": "number", "required": true, "example": "90", "notes": "Días totales; se pinta gigante y tenue como horizonte." },
+      { "name": "stops", "type": "list", "required": true, "maxChars": 84, "example": "Días 31–60 · Ritmo pleno · El ciclo mensual completo: planificar, producir, entregar y medir.", "notes": "Tres paradas: rango ≤ 12, título ≤ 13 y descripción ≤ 84 (tres líneas)." },
+      { "name": "currentStop", "type": "enum", "required": true, "example": "1", "notes": "La parada encendida con «Estás aquí»." }
+    ],
+    "fixed": [
+      "La órbita convertida en trayectoria de luz que sube en perspectiva de adelante-izquierda a atrás-derecha; el primer tramo encendido en el acento.",
+      "Tres paradas con nodo y tallo, y una ficha de vidrio cada vez más alta; la actual encendida con borde halo.",
+      "El total de días gigante y tenue como horizonte, detrás.",
+      "Sin indicador ni selección; burbuja URL en luminosidad en el pie."
+    ],
+    "selection": { "kind": "none" },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con escenario de halo. Voz a la izquierda: eyebrow, pregunta en dos líneas con anillo, respuesta de una palabra en Bricolage cerrada por la esfera y, abajo, la bajada con el total de días en negrita. A la derecha, una trayectoria de luz que sube en perspectiva desde abajo a la izquierda hacia arriba a la derecha, con el primer tramo encendido en el acento; tres paradas con nodo y tallo, cada una con su ficha de vidrio más alta que la anterior (rango en versalitas, título en Bricolage, descripción); la actual encendida con borde en color.halo y «Estás aquí». Detrás, el total de días gigante y muy tenue en color.halo. Es la única órbita: sin indicador ni selección. Burbuja URL en luminosidad en el pie."
+    },
+    "renderSource": { "script": "render-src/vive.mjs", "slideId": "PL-plan-impacto" },
+    "rules": [
+      "Una sola órbita: la trayectoria.",
+      "Plazos comprometidos en la propuesta; nunca fechas inventadas.",
+      "Una sola parada marcada como actual."
+    ],
+    "notes": "En AXIS es decision-plan, pero el token (la órbita circular mide el plan alrededor del 90) y su referencia describen la versión anterior (E3-plan en render-src/deck2.mjs). El operador pidió mejorarla y aprobó el 2026-09-27 la trayectoria (PL-plan-impacto); AXIS debe actualizar token y referencia. Hallazgos: la respuesta mide 2,8 veces la pregunta (112 contra 40; la regla pide 3×); los rangos de las fichas van en color.halo a 15 px, revisar contra D1."
+  },
+  {
+    "id": "decision-next-steps",
+    "board": "DeckProximosPasos",
+    "name": "Próximos pasos · la agenda del diagnóstico abierta y el cursor en «Agenda un diagnóstico»",
+    "family": "next-steps",
+    "documents": ["pitch", "brochure", "proposal"],
+    "surface": "dark",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckProximosPasos.jpg",
+    "communicates": "El siguiente paso es concreto y está a un clic: agendar un diagnóstico sin costo; después vienen el Sample Sprint y la operación.",
+    "useWhen": [
+      "Al final de un pitch o de un brochure, para convertir el interés en una reunión.",
+      "Cuando el diagnóstico sin costo es la puerta de entrada."
+    ],
+    "avoidWhen": [
+      "En una propuesta enviada después del diagnóstico: ese paso ya ocurrió y el gesto es aprobar.",
+      "No hay agenda real que ofrecer (los horarios son de muestra y no se prometen)."
+    ],
+    "preferInstead": [
+      { "recipe": "content-pricing-live", "when": "en la propuesta, el siguiente gesto es aprobar la cotización" }
+    ],
+    "pairsWith": [
+      { "recipe": "decision-plan", "relation": "sequence" },
+      { "recipe": "decision-risk", "relation": "sequence" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 20, "example": "Próximos pasos" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 22, "example": "¿Y ahora qué sigue?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 10, "example": "Empecemos", "notes": "Una línea; no puede tocar la tarjeta de agenda." },
+      { "name": "body", "type": "richText", "required": true, "maxChars": 60, "example": "Un diagnóstico **sin costo** para saber dónde estás." },
+      { "name": "cardDescriptor", "type": "text", "required": true, "maxChars": 100, "example": "45 min por videollamada · Brand Visibility Grader, CRM Gap Analysis o Creative Velocity Audit" },
+      { "name": "days", "type": "list", "required": true, "example": "Lun 29, Mar 30, Mié 1, Jue 2, Vie 3", "notes": "Cinco días (date)." },
+      { "name": "times", "type": "list", "required": true, "example": "09:30, 11:30, 15:00, 17:00", "notes": "Cuatro horarios." },
+      { "name": "chosenSlot", "type": "date", "required": true, "example": "Martes 30 · 11:30 · hora de Chile", "notes": "El día y la hora elegidos (se marcan en navy) y su resumen ≤ 40; son de muestra." },
+      { "name": "nextSteps", "type": "list", "required": true, "maxChars": 70, "example": "02 · Piloto pagado · Sample Sprint · Acotado y gobernado, para probar el encaje antes de comprometerte.", "notes": "Dos fichas: número, rótulo ≤ 16, título ≤ 14 y descripción ≤ 70." }
+    ],
+    "fixed": [
+      "Tarjeta clara de agenda con el isotipo de Efeonce, «01 · Diagnóstico · Sin costo» y «Agenda tu diagnóstico».",
+      "Botón «Agenda un diagnóstico» en el acento.",
+      "Contacto oficial bajo la bajada (desde src/config/efeonce-brand.ts).",
+      "Las dos fichas siguientes oscuras, en profundidad y más tenues.",
+      "La órbita rodea la escena como elipse, con su arco de acento encendido.",
+      "Sin indicador; burbuja URL en luminosidad en el pie."
+    ],
+    "selection": { "kind": "local-cta", "target": "El botón «Agenda un diagnóstico»: corchetes abiertos (padding compacto, targetKind group) y cursor local del cliente en end-center, a escala 1,25." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.dark con escenario de halo. Voz a la izquierda: eyebrow, pregunta con anillo, respuesta de una palabra en Bricolage cerrada por la esfera, bajada con «sin costo» en negrita y, debajo, el contacto oficial de Efeonce en el suave. A la derecha, la órbita como gran elipse que rodea la escena con su arco de acento; al centro, la tarjeta clara de agenda: isotipo de Efeonce, rótulo del paso 01, título, descriptor, cinco días y cuatro horarios con el elegido en color.dark, el resumen del horario y el botón «Agenda un diagnóstico» en el acento. Detrás, en profundidad y más tenues, las fichas oscuras de los pasos 02 y 03. El grupo CTA aprobado de AXIS toma el botón con corchetes compactos y cursor local. Horarios de muestra; burbuja URL en luminosidad en el pie."
+    },
+    "renderSource": { "script": "render-src/vive.mjs", "slideId": "PP-proximos-impacto" },
+    "rules": [
+      "El cursor es del cliente (local) y está sobre el botón.",
+      "Una sola órbita: la elipse que rodea la escena.",
+      "Los horarios son de muestra; el contacto sale del SSOT de marca."
+    ],
+    "notes": "En AXIS es decision-next-steps, pero el token (tres columnas de 500 px, CTA con el descriptor bajo el cursor) y su referencia describen la versión anterior (E7-pasos en render-src/deck2.mjs). El operador aprobó el 2026-09-27 la versión con impacto (la agenda abierta); AXIS debe actualizar token y referencia. Hallazgo: el rótulo «01 · Diagnóstico · Sin costo» va en color.tealDark a 14 px (D1)."
+  },
+  {
+    "id": "decision-why-us",
+    "board": "DeckPorQue",
+    "name": "Por qué elegirnos · un muro de seis cifras",
+    "family": "proof",
+    "documents": ["proposal", "brochure", "pitch"],
+    "surface": "paper",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPorQue.jpg",
+    "communicates": "Hay razones concretas para elegir a Efeonce, y cada una cabe en una cifra.",
+    "useWhen": [
+      "Para responder «¿por qué ustedes?» con hechos citables.",
+      "Cerca del cierre de un pitch o de un brochure, antes de los próximos pasos."
+    ],
+    "avoidWhen": [
+      "Las cifras no tienen fuente.",
+      "Ya se usó la misma bajada en la lámina de texto («No te entregamos crecimiento…»)."
+    ],
+    "preferInstead": [
+      { "recipe": "content-text", "when": "el porqué es una idea, no una lista de hechos" },
+      { "recipe": "content-clients", "when": "la mejor razón son los clientes" }
+    ],
+    "pairsWith": [
+      { "recipe": "decision-next-steps", "relation": "sequence" },
+      { "recipe": "content-text", "relation": "variant" }
+    ],
+    "slots": [
+      { "name": "eyebrow", "type": "text", "required": true, "maxChars": 22, "example": "Por qué elegirnos" },
+      { "name": "question", "type": "text", "required": true, "maxChars": 22, "example": "¿Por qué Efeonce?" },
+      { "name": "answer", "type": "text", "required": true, "maxChars": 9, "example": "Por esto", "notes": "Una línea." },
+      { "name": "body", "type": "text", "required": true, "maxChars": 100, "example": "No te entregamos crecimiento: lo construimos contigo y te dejamos más capaz de sostenerlo." },
+      { "name": "facts", "type": "metric", "required": true, "maxChars": 54, "example": "+90 · empresas operan con Efeonce", "notes": "Seis hechos en grilla de 3 × 2: valor ≤ 4 caracteres a escala plena o ≤ 8 a escala reducida (en la referencia, «En vivo» y «Revenue»), etiqueta ≤ 54 en dos líneas." },
+      { "name": "source", "type": "text", "required": true, "maxChars": 100, "example": "Fuente: [documento que respalda cada cifra]", "notes": "Falta en la referencia; la regla la exige. No inventar la fuente: citar la real de cada hecho." },
+      { "name": "selectedFact", "type": "enum", "required": true, "example": "4" },
+      { "name": "nav", "type": "section", "required": true, "example": "1 de 5" }
+    ],
+    "fixed": [
+      "Fondo papel, tinta navy.",
+      "Grilla de 3 × 2 desde el 42 % del ancho, cada hecho con filete superior y la cifra en Bricolage light.",
+      "Indicador de navegación en papel y burbuja URL clara en el pie."
+    ],
+    "selection": { "kind": "collaborator", "label": "Cliente", "target": "Un hecho completo (en la referencia el «1 solo interlocutor»), anchor bottom-end." },
+    "photo": { "uses": false, "register": "none" },
+    "prompts": {
+      "composition": "Lámina 16:9 sobre color.paper. Voz a la izquierda: eyebrow, pregunta con anillo en color.tealDark, respuesta en una línea en Bricolage navy cerrada por la esfera y bajada. A la derecha, desde el 42 % del ancho, una grilla de 3 × 2 con seis hechos: filete superior, la cifra en Bricolage light a escala gigante (reducida si es una palabra) y la etiqueta en Poppins. Agrega la nota de fuente al pie de la grilla. La selección de AXIS toma un hecho con el cursor del colaborador «Cliente» en bottom-end. Indicador de navegación en papel y burbuja URL clara en el pie."
+    },
+    "renderSource": { "script": "render-src/deck2.mjs", "slideId": "F5-porque" },
+    "rules": [
+      "Cifras sólo con fuente citada (figures-with-source).",
+      "Seis hechos, una sola selección.",
+      "Sin esfera en las cifras: la única esfera cierra la respuesta."
+    ],
+    "notes": "En AXIS es decision-why-us (status option, voice none; la referencia lleva voz). Aprobada el 2026-09-27. Hallazgo: la referencia no muestra la fuente de las cifras; al componer hay que agregarla. Existe otra versión aprobada de esta lámina en el canvas (DeckPorQue2, de otro grupo de recetas)."
+  }
+]

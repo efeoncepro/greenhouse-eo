@@ -1,0 +1,40 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "purpose",
+  "voice": {
+    "eyebrow": "Por qué lo hacemos",
+    "question": "¿Por qué lo hacemos así?",
+    "answer": [
+      "Contigo"
+    ]
+  },
+  "body": "No te entregamos crecimiento. Lo construimos contigo, y te dejamos **más capaz** de sostenerlo.",
+  "pillars": [
+    {
+      "label": "Co-creación",
+      "text": "operas con nosotros en vivo, en tu panel, no con un PDF el viernes."
+    },
+    {
+      "label": "Educación",
+      "text": "te dejamos más capaz, no dependiente: mejores briefs, mejor trabajo."
+    },
+    {
+      "label": "Crecimiento integral",
+      "text": "se compone ciclo a ciclo; los números son el resultado, no el origen."
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS2-contigo.png",
+    "alt": "Una directora de marketing del cliente explica una curva que sube; a su lado, la estratega de Efeonce la acompaña"
+  }
+}

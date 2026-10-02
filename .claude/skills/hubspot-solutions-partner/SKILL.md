@@ -17,9 +17,12 @@ description: >-
 
 # HubSpot Solutions Partner — operador de la práctica
 
+> **Naming de la cuña AEO de Efeonce:** capacidad **Efeonce AEO**; diagnóstico público **Efeonce AEO Assessment**; entregable compartible **Efeonce AI Visibility Report**. `AI Visibility Grader`/`AEO Grader` son aliases técnicos o históricos al buscar evidencias e integraciones. **Search Visibility 360** es la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 Esta skill opera **el negocio HubSpot de Efeonce**, no el CRM interno de Efeonce.
-Si la pregunta es "cómo configuro una property en nuestro portal" → `hubspot-ops`.
+Si la pregunta es "cómo configuro una property en nuestro portal" → `hubspot-as-a-service` + el runbook de operación directa.
 Si la pregunta es "cómo vendemos, implementamos, retenemos o expandimos HubSpot en un cliente" → acá.
+Para operar un portal directamente, usar `hubspot-as-a-service` y el [runbook Agent CLI/MCP](../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); ni la disponibilidad local de la CLI ni una demo prueban acceso al portal de un cliente.
 
 HubSpot es el caso de referencia de una relación donde pueden coexistir licencia/referral, implementación, Managed CRM
 Ops, CRM Intelligence y expansión. El contrato transversal para separar licencia, pass-through, margen, delivery e IP
@@ -144,6 +147,9 @@ retainer de Managed CRM Ops.
 **Programa**
 11. **NUNCA** leas la insignia de tier sin leer la **curva de expiración de puntos**. El badge dice
     "Gold válido hasta enero 2027"; el gráfico de puntos antiguos dice que tu piso se disuelve en diciembre.
+    Tampoco la muestres en piezas propias mientras el registro de partnerships tenga el tier sin revalidar: la
+    firma de correo Efeonce v3.1 lleva el **logo oficial de marca** de HubSpot, no la insignia de tier
+    (`docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §10.2).
 12. **NUNCA** cierres un deal sin **deal registration** (es obligatorio y exclusivo) y sin la firma del cliente
     en el **Proof of Involvement**. Rige **Best Partner Wins**: quien obtiene la firma se lleva el crédito.
     Corta para los dos lados — puedes entrar a cuentas de otros, y otros pueden entrar a las tuyas.
@@ -210,7 +216,7 @@ Esta skill es **dominio**, no método. No duplica; compone.
 | **`hubspot-ops`** | **Las manos en el portal.** | Properties, pipelines, workflows, deal registration como objeto CRM, CLI `hs`. Esta skill dice *qué* registrar; `hubspot-ops` lo *escribe*. |
 | **`seo-aeo`** | **La visibilidad.** | Dueña del método AEO/GEO. La cuña de `modules/07` la **consume**, no la reimplementa. Se enchufa con el **AI Visibility Grader** ya construido (`src/lib/growth/ai-visibility/**`). |
 | **`research-benchmark-operator`** + `/deep-research` | **La evidencia.** | Todo refresh de `SOURCES.md` pasa por ahí. Esta skill **no guarda hechos de memoria**. |
-| **`deck-studio`** | **El deck.** | La propuesta y el pitch se componen ahí. Esta skill es *consumer*, no dueña. |
+| **`deck-studio`** | **El deck.** | La propuesta y el pitch se componen ahí. Esta skill es *consumer*, no dueña. **La serie de contenido HubSpot de «La órbita» no existe todavía:** es [TASK-1943](../../../docs/tasks/to-do/TASK-1943-hubspot-deck-content-series.md), equivalente al deck de práctica Salesforce (TASK-1942), con logos e íconos oficiales de HubSpot, insignia de partner con su propio readback y sin mascota inventada. Hoy sólo existen la portada y la propuesta RevOps en `revenue-hubspot`. |
 | **`content-marketing-studio`** + **`digital-marketing`** | **Canal y contenido.** | Assets de captura (comparador, calculadora TCO, migration assessment). ⚠️ El overlay de `digital-marketing` todavía dice *"HubSpot es CRM-only, no asumas campañas"*: esa frontera quedó obsoleta y hay que corregirla — HubSpot ahora también es **producto vendible**. |
 | **`legal-privacy-ip-operator`** | **MSA / SOW / DPA.** | Y el marco de datos del mercado como **trigger de venta**, no solo como compliance. |
 | **`greenhouse-public-private-tenders`** | **Si el deal entra por licitación.** | El Proposal Studio ya existe y renderiza. |

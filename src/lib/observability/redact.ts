@@ -33,6 +33,9 @@ interface RedactionPattern {
 }
 
 const PATTERNS: RedactionPattern[] = [
+  // TASK-1950 — redact both valid and malformed bearer URL segments.
+  { label: 'xray_share_path', pattern: /(\/aeo-xray\/(?:shared|r)\/)[^/?#\s"']+/g, replacement: '$1[redacted]' },
+  { label: 'xray_share_token', pattern: /\bxrg_[A-Za-z0-9_-]{20,}/g, replacement: '[redacted:share-token]' },
   // TASK-1848 — bearer de enlace compartido de Insights en el PATH de una URL (`/insights/shared/<token>`
   // en Greenhouse, `/insights/r/<token>` en Think). Va primero: el segmento puede no llevar prefijo.
   {

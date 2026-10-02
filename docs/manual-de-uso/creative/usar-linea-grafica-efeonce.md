@@ -1,9 +1,9 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.9
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-26 por Claude
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.9: los 19 íconos de IA, redes sociales y staff, D26, en «buscar un ícono», sus notas de uso y en volumen; set de 79 y 43 volúmenes, AXIS main@cf77452 (2026-09-27), tag `v0.6.0`) · 2026-09-27 (1.8: los 30 íconos de oficio, D25, en «buscar un ícono» y en volumen; set de 60, verificado contra AXIS main@aa66225, 2026-09-27) · 2026-09-27 (1.7: usar y pedir un ícono en volumen — Plastilina en volumen, D24) · 2026-09-26 (1.6: usar y pedir un ícono de la marca — iconografía Trazo y Plastilina, AXIS `v0.3.6`)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — es un sistema de marca; los valores viven en AXIS y el PDF se regenera con un comando local
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Manual técnico-operativo V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
@@ -11,7 +11,8 @@
 ## Para qué sirve
 
 Este manual explica cómo hacer una pieza de Efeonce con la órbita (post, slide, portada, informe, merch, papelería,
-señalética) sin romper sus reglas, y cómo regenerar el manual en PDF cuando cambia su fuente.
+señalética) sin romper sus reglas, cómo usar las animaciones de marca (la órbita y las tres animaciones del logo), cómo
+usar y pedir un ícono de la marca y cómo regenerar el manual en PDF cuando cambia su fuente.
 
 La órbita es la forma canónica de la marca propia de Efeonce y de su familia (Globe, Wave, Reach). **No se usa** en la
 interfaz de Greenhouse ni en el trabajo de clientes.
@@ -56,7 +57,9 @@ la órbita no va por defecto y no reemplaza la composición de la foto. Si la us
 | Papel o blanco (Efeonce) | teal oscuro, **sólo como gráfico**; el texto va en navy |
 | Producto (Globe, Wave o Reach) | el acento de ese producto; nunca el teal |
 
-Un acento por pieza. Los valores exactos están en los tokens y en el §2 del manual técnico.
+Un acento por pieza. **El acento sirve para gráficos y para texto de 24 px o más; nunca para texto más chico**, que va
+en navy sobre claro y en blanco sobre oscuro (decisión del operador, 2026-09-26). Sobre papel, el halo va a la mitad.
+Los valores exactos están en los tokens y en el §2 del manual técnico.
 
 ### Paso 3 · Ubica el texto y la órbita
 
@@ -71,9 +74,14 @@ Un acento por pieza. Los valores exactos están en los tokens y en el §2 del ma
 
 - Usa una toma del banco o produce una nueva con la cadena del lenguaje fotográfico: arma la ficha y corre
   `pnpm foto:generar <ficha.json>` (o `pnpm foto:prompt` + `pnpm foto:validar`). Nunca armes el prompt a mano.
-- La toma debe tener el sujeto dentro de un círculo del 55 % del lado corto, **sin emblemas legibles** (el logo lo pone
-  la pieza, no la ropa) y en registro documental: nadie mira a la cámara.
-- No le pongas velo oscuro encima: fuera del círculo la foto va en navy apagado, dentro va a todo color.
+- La toma debe tener el sujeto dentro de un círculo del 55 % del **círculo visible de la lente** en el formato de la
+  pieza (no del lado corto de la foto), **sin emblemas legibles** (el logo lo pone la pieza, no la ropa) y en registro
+  documental: nadie mira a la cámara. Si el sujeto no cabe, rehaz la toma; no cambies la pieza.
+- No le pongas velo oscuro encima: fuera del círculo la foto va en navy apagado, dentro va a todo color. Ese exterior
+  apagado es el espacio del texto de la lente; en una pieza **sin** lente sigue prohibido oscurecer la foto.
+- Pide el lecho igual, aunque la pieza firme sobre la foto apagada. Si la escena ya trae un anillo dibujado (en una
+  pizarra, por ejemplo), cuenta como órbita: elige otra foto. Con lente manda el encuadre del círculo; las palancas que
+  llenan el cuadro (`variantes`, `manos`) quedan para piezas de sólo foto. (Decisiones del operador, 2026-09-26.)
 - Respeta la composición de la foto: la órbita nunca cruza el sujeto, el espacio reservado para el texto, el lecho
   (la zona oscura donde se apoya el texto) ni la firma.
 
@@ -88,7 +96,7 @@ Un acento por pieza. Los valores exactos están en los tokens y en el §2 del ma
 
 ### Paso 6 · Firma la pieza
 
-1. **Pieza gráfica (post, anuncio, portada con foto):** firma con el **logo de Efeonce centrado abajo**. No agregues la
+1. **Pieza gráfica (post, anuncio, portada con foto):** firma con el **logo de Efeonce centrado abajo**. La portada de un deck, brochure o propuesta no sigue esta regla: lleva el logo de 500 px arriba, en la columna de voz (`EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6, 2026-09-27). No agregues la
    burbuja de URL.
 2. **¿El logo de Efeonce ya aparece dentro de la imagen** (una maqueta, un objeto, una prenda)? Entonces no repitas el
    logo: firma con la **burbuja URL, centrada y con fusión de luminosidad**, sola. Nunca a un costado ni junto al logo.
@@ -96,14 +104,16 @@ Un acento por pieza. Los valores exactos están en los tokens y en el §2 del ma
    oscuro; sobre fondos medios o claros no llega (1,6–3,1:1). Si no llega, la pieza no pasa.
 4. Fuera de las piezas gráficas: logo completo si cabe a 96 px o más; si no, el isotipo. **Nunca los dos en la misma
    vista.**
-5. La órbita **nunca rodea el logo**. En objetos, el logo va solo en el dorso.
+5. La órbita **nunca rodea el logo**, salvo en los tres cierres de marca: el final del deck, el final de video y el
+   muro de recepción, con el anillo fuera del área de resguardo del logo (decisión del operador, 2026-09-26). En
+   objetos, en el banner de LinkedIn y en el reverso de la tarjeta, el logo va solo.
 
 - Los pies con la burbuja (deck, informe, papelería, stand, firma de mail) siguen como siempre.
 - Si aparece `efeoncepro.com`, usa la **burbuja oficial**, no la dirección escrita. En web y en herramientas que
   soportan fusión, el SVG gris con fusión de luminosidad; en PDF, correo, visores o referencias para IA, la variante
   horneada (`url-lum-light.svg` sobre blanco o papel, `url-lum-dark.svg` sobre navy).
 - El eslogan «Empower your Growth» sólo va en cierres (último slide, contratapa, firma, final de video) y desde el
-  archivo oficial.
+  archivo oficial. En el cierre del deck, la palabra final va en el acento de la línea, no en blanco.
 
 ### Paso 7 · Revisa antes de entregar
 
@@ -147,10 +157,88 @@ Un agente no dibuja la órbita a mano: declara qué hace en la pieza y AXIS resu
    texto, la firma queda descentrada o bajo 4,5:1, o la órbita cruza el sujeto, sale con error y `qa.json` dice cuál.
 5. **Mira el PNG al 100 %** antes de usarlo: el chequeo del sujeto dentro de la lente es visual.
 
-> Detalle técnico: contrato `efeonce.graphic-line-orbit` 0.2.0 (candidate) en `@efeoncepro/axis-ui-contracts`
-> 0.2.7; archivos oficiales en `@efeoncepro/axis-brand-assets` 0.2.7; capa opcional en `pnpm creative:layout`
-> (`graphic_line` por formato); adapter en `scripts/creative/layout-compiler/graphic-line.mjs`; manual del contrato en AXIS
-> `docs/agent-composition/graphic-line-orbit.md`.
+> Detalle técnico: contrato `efeonce.graphic-line-orbit` 0.3.0 (`stable`) en `@efeoncepro/axis-ui-contracts`
+> 0.3.0; archivos oficiales en `@efeoncepro/axis-brand-assets` 0.3.0 (Greenhouse los fija en `develop`; llegan a
+> producción con el próximo release); capa opcional en `pnpm creative:layout` (`graphic_line` por formato); adapter en
+> `scripts/creative/layout-compiler/graphic-line.mjs`; manual del contrato en AXIS
+> `docs/agent-composition/graphic-line-orbit.md`. Fuera de Greenhouse (por ejemplo en el Lab), la órbita, sus recetas
+> (lente, foco, deck, retrato de la firma de mail) y su movimiento salen del paquete `@efeoncepro/axis-graphic-line`
+> 0.3.1; Greenhouse no depende de él.
+
+## Paso a paso — usar las animaciones de marca
+
+Hay dos tipos de animación. Ninguna se genera con un modelo de video (el logo no se sostiene) y ninguna es para
+clientes ni para la UI de Greenhouse.
+
+| Animación | Qué hace | Dura | Úsala en |
+|---|---|---|---|
+| **Órbita** (sin logo) | anillo → arco → la esfera asienta → halo | 2,0 s + 0,5 s de reposo | fondos de portada, cierres de presentación y piezas que ya tienen su propia firma o texto |
+| **Reveal** | la línea se vuelve logo | 3,6 s | cierre de video, apertura de presentación, intro de evento |
+| **Apertura** | el logo se abre en la línea | 2,4 s | paso del logo al lenguaje de la línea, antes de componer |
+| **Sting** | el golpe corto | 1,6 s | cortinillas, redes y cierres breves |
+
+### Paso 1 · Elige el archivo según dónde lo vas a usar
+
+Cada animación del logo existe por formato (16:9, 16:9 4K, 1:1, 4:5, 9:16) y por fondo (`navy` para fondo oscuro,
+`claro` para fondo claro; la versión «para fondo oscuro» lleva el logo en blanco y la «para fondo claro», en navy).
+
+| Si la vas a usar en… | Toma | Dónde |
+|---|---|---|
+| After Effects, Premiere, Final Cut o DaVinci, sobre tu propio fondo | `…_alpha-para-fondo-{oscuro\|claro}_prores4444.mov` (transparente) | bucket |
+| una página web, con transparencia (Chrome, Firefox) | `…_alpha-para-fondo-{oscuro\|claro}.webm` | bucket |
+| Keynote, Safari o un dispositivo Apple, con transparencia | `…_alpha-para-fondo-{oscuro\|claro}_hevc.mov` | bucket |
+| un video, una presentación o una red social tal cual, con fondo y sonido | `…_60fps.mp4` o `…_30fps.mp4` | OneDrive o bucket |
+| una vista previa en un chat o un correo | `…_960.gif` (sólo 16:9 y 1:1) | OneDrive o bucket |
+| una imagen fija del final | `…_cuadro-final.png` (con fondo o transparente) | OneDrive o bucket |
+
+### Paso 2 · Descárgalo
+
+- **OneDrive (equipo):** `Alineación › 5. Contenidos › 13- Branding › Motion Órbita Efeonce › v1.1`, una carpeta por
+  animación (`reveal`, `apertura`, `sting`) y dentro por formato y fondo. Lee el `LEEME.txt` de la carpeta.
+- **Masters pesados (bucket público de AXIS):**
+  `https://storage.googleapis.com/efeonce-group-axis-public-media/motion/logo/v1.1/<animación>/<formato>/<fondo>/`.
+  Ejemplo: `…/reveal/16x9/navy/efeonce-orbita-reveal_16x9_alpha-para-fondo-oscuro_prores4444.mov`.
+- **Fichas y descargas desde el navegador:** Lab de AXIS, sección 4.4.2 «Animaciones de marca»
+  ([axis.efeonce.org/references/graphic-line/#animaciones](https://axis.efeonce.org/references/graphic-line/#animaciones)),
+  con versiones web livianas para mirarlas antes de bajar el master.
+- **La órbita sin logo** no está en OneDrive: se exporta desde el repo de AXIS con
+  `pnpm orbit:video -- --format 16x9 --surface dark --out <carpeta>` (formatos `16x9`, `1x1`, `4x5`, `9x16`; fondos
+  `dark` y `light`; `--line` elige la línea de servicio). En una página web no hace falta video: el paquete la anima
+  con CSS (`ORBIT_MOTION_CSS`, `<AxisOrbit animate>` o `<axis-orbit animate>`). Se ve en el Lab, sección 4.4.2.
+
+### Paso 3 · Úsala sin romperla
+
+- El sonido viene mezclado en los MP4; en los masters transparentes no hay audio.
+- El halo es parte del cuadro; si necesitas bajarlo o quitarlo, pide las secuencias PNG por capas (`principal`,
+  `halo`, `combinada`), que quedan en el taller `ai-generations/2026-09-26_orbita-motion/` y no se publican.
+- No recolorees, no recortes el logo, no cambies la velocidad ni agregues el eslogan en mayúsculas o con esfera.
+- Si falta una variante (formato o fondo), no la armes a mano: las que faltan se suman a medida que termina el
+  render. Pídela.
+
+### Paso 4 · Si vas a animar algo nuevo de la marca, sigue el lenguaje de movimiento
+
+Antes de animar cualquier pieza nueva de Efeonce (una cortinilla, un cierre de evento, una transición, otra marca de
+la familia), lee la [norma del lenguaje de movimiento de la órbita](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)
+y aplica sus siete reglas:
+
+1. Define el protagonista de cada tramo y ordénalos: nunca dos a la vez.
+2. Pon una pausa o una anticipación antes de cada arranque y un golpe al final (sobrepaso, pulso y, si encaja algo,
+   la onda de acento).
+3. Elige la curva por papel: llega (`emphasized`), se transforma (`standard`) o se va (`emphasizedAccelerate`).
+4. Revisa los relevos: la velocidad no puede saltar.
+5. Agrega desenfoque real sólo donde el movimiento es rápido.
+6. Usa los archivos oficiales y compara el cuadro final con el logo original.
+7. Si lleva sonido, un golpe por impacto y cierre con fundido.
+
+Los números salen del token `efeonceGraphicLine.motion` de `@efeoncepro/axis-tokens` (0.3.3 o superior): no los
+copies de un documento ni de un script. Si tu pieza necesita un valor que no existe, pide que se agregue al token con
+su razón.
+
+> Detalle técnico: [norma del lenguaje de movimiento](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)
+> · [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) (tiempos,
+> oclusión, entregables y QA) · [manual técnico §10.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#101-pantalla-y-campaña)
+> · generador en `scripts/creative/brand-motion/` (lee los valores de `efeonceGraphicLine.motion`) · animación de la órbita en `@efeoncepro/axis-graphic-line`
+> (`ORBIT_MOTION_*`).
 
 ## Paso a paso — fotografiar una aplicación (merch u oficina)
 
@@ -167,6 +255,164 @@ foto nueva de ese tipo:
    logo, pasa el logo oficial como segunda referencia.
 5. Trátala como **maqueta de dirección**: la producción sale de los archivos vectoriales, con prueba de color sobre el
    material real.
+
+## Paso a paso — armar una firma de correo
+
+La firma v3.1 está aprobada en dos versiones: **A · sobre papel** y **B · tarjeta navy**. Las reglas completas están
+en el [manual §10.2](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#102-firma-de-mail); el contrato
+que las hace cumplir es `efeonce.email-signature` de AXIS.
+
+1. **Reúne los datos de la persona:** nombre, cargo, teléfono, correo, LinkedIn y su foto aprobada.
+2. **Genera la firma** con `node ai-generations/2026-09-26_firma-partners/build4.mjs` (hoy tiene los datos de Julio
+   Reyes en `P`; cámbialos para otra persona). Sale en `out/v3.1/`: A y B en escritorio, móvil y sin fuentes web, y
+   la firma de respuesta.
+3. **Revisa las tres vistas.** La versión sin fuentes web es la que ven Outlook y Gmail: debe leerse bien en Arial.
+4. **Revisa los partners** contra el [registro de partnerships](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
+   Sólo entran relaciones activas, aceptadas o declaradas por el operador. Truora no va en la firma.
+5. **Publica las imágenes** (sólo si cambió algo o es otra persona): corre el generador con
+   `HOST_BASE=https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1` y `PERSON=<nombre-apellido>`, y sube la carpeta `out/v3.1/hosted/` con
+   `gcloud storage cp -r out/v3.1/hosted/* gs://efeonce-group-axis-public-media/email-signature/v3.1/`. Nunca uses la
+   versión con imágenes incrustadas: Outlook y Gmail las bloquean o las muestran como adjuntos.
+6. **Instálala en Outlook:** abre `out/v3.1/outlook-b.html` (o `outlook-a.html`) en el navegador, selecciona todo,
+   copia y pega en Configuración → Cuentas → Firmas como firma para mensajes nuevos. Crea una segunda firma con
+   `outlook-respuesta.html` y elígela para respuestas y reenvíos. Envíate un correo de prueba y revísalo en escritorio
+   y en el teléfono.
+
+**Firmas personales del equipo (2026-09-29).** Las seis firmas del equipo actual (Julio, Daniela, Andrés, Melkin,
+Humberly y Valentina) se generan con `ai-generations/2026-09-29_avatares-equipo/firmas/build-firmas.mjs`: el mismo
+constructor v3.1 con la tabla del equipo (nombres y correos de Entra, cargos del operador, el WhatsApp de la agencia
++56 9 3732 3064 como teléfono salvo Julio) y la foto con órbita sacada del avatar oficial (bomber y fondo con el halo de
+la órbita; [roster](../../operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md)). Corre
+`HOST_BASE=https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1 PERSON=<nombre-apellido> node
+…/build-firmas.mjs` y sube sólo `hosted/people/*` (las imágenes compartidas ya están publicadas y otras firmas instaladas
+dependen de ellas). Los paquetes para cada persona quedan en OneDrive: `Alineación/6. Marca/Kit media/Firmas/
+firma-<nombre-apellido>.zip`, con la instrucción de instalación adentro. Un cambio de foto se ve solo en las firmas ya
+instaladas: la URL de la foto no cambia. Las fotos con órbita salen de `firmas/fotos-orbita.mjs`, que lee el tamaño del
+token y las exporta a 3× (390 px). **Desde el 2026-09-29 el avatar mide 130 px**, a la altura del bloque de texto de al
+lado: quien pegó la firma antes sigue viendo la foto nueva, pero a 96 px; para verla más grande tiene que volver a copiarla
+desde su página. En pantallas angostas el correo largo se parte antes de la «@» en vez de desbordar la firma.
+
+**Cómo lo instala cada persona:** su página con el botón «Copiar mi firma»
+(`https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1/instalar/<nombre-apellido>.html`; los
+buzones, `instalar/area-<talent|finance|commercial>.html`): la abre, aprieta el botón y la pega en Outlook. Nadie tiene que
+tocar HTML. Tres detalles de Outlook que el constructor ya resuelve (2026-09-29): la foto va en su propia celda, del
+tamaño del token (130 px; la marca de área, 106 px), porque con el margen dentro de la celda Outlook la achataba; la esfera de la línea es una imagen (el círculo por estilos se
+perdía al pegar) y el **eslogan va horneado** con sus pesos canónicos (Outlook no carga Poppins y lo dejaba en Arial).
+Adaptarse sola al tema claro u oscuro del sistema no es posible: Outlook quita esas reglas al pegar; la versión de
+fondo blanco está preparada para el oscurecido automático de Outlook (logo y eslogan con halo blanco, partners transparente).
+
+**Firma de un buzón de área (equipo).** Talent, Finance y Commercial tienen firma propia, sin foto: la órbita rodea el
+ícono del área y sólo lleva su correo. Se genera con `AREA=talent` (o `finance`, `commercial`) delante del mismo
+comando, y se instala igual, en la cuenta del buzón. `people@efeoncepro.com` usa la firma de **Talent** (no es un área
+aparte). Un área nueva se pide primero en AXIS (tokens de la firma).
+
+**Quién la instala:** cada persona, en su propia cuenta de Outlook, desde el HTML generado (decisión del operador,
+2026-09-26). La firma de equipo todavía no lleva LinkedIn: falta que el operador confirme la URL de la empresa.
+
+**Qué no hacer con la firma:** agregar «Quedo atento.» o «Saludos» (van en el cuerpo del correo) · poner una
+segunda esfera en la línea de los partners · mostrar logos de partners a color o en insignias de nivel sin haberlas
+confirmado en el portal del programa · escribir la URL como texto en vez de usar la burbuja.
+
+## Paso a paso — usar un ícono de la marca
+
+La iconografía de la línea tiene dos voces: **Trazo** (lo que se mide) y **Plastilina** (lo que se crea). Las reglas
+completas están en el [manual §14](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina)
+y en la [guía de AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md);
+este paso a paso no las repite todas.
+
+1. **Confirma que la pieza es de Efeonce** (o de su familia). Para clientes o para la interfaz de Greenhouse no se
+   usan estos íconos.
+2. **Elige la voz por la línea de servicio de la pieza:** Growth, Engine o Revenue → Trazo; Brand → Plastilina. La
+   línea Voice todavía no tiene voz fija: elige con criterio y decláralo en la pieza. Una voz por grupo, nunca las dos
+   juntas.
+3. **Busca el ícono en la [página del Lab](https://axis.efeonce.org/references/iconography/):** muestra los 79
+   aprobados (36 de Trazo y 43 de Plastilina) en cada línea y fondo, con «Copiar SVG». Desde el 2026-09-27 incluye los
+   **30 íconos de oficio**: en Trazo, correo, llamada, calendario, reunión, objetivo, presentación, contrato, checklist,
+   código, base de datos, nube, integración, seguridad, ubicación y reloj; en Plastilina, lápiz, rodillo, aerosol,
+   escuadra, post-it, encuadre, película, vinilo, guitarra, reproducir, varita, taza, lámpara, trofeo y estrella. Y los
+   **19 de IA, redes sociales y staff** (D26): en Trazo, ia, composer, buscador, influencer, prensa, social, multimedia,
+   assets y staff-gorra («Staff»); en Plastilina, chispa, prompt, barra de búsqueda, aro de luz, televisión, like
+   («Me gusta»), galería, biblioteca («Biblioteca de assets»), hoodie («Hoodie Efeonce») y gorra («Gorra Efeonce»).
+   Cada idea tiene su clave en cada voz (ia/chispa, composer/prompt, buscador/barra-busqueda, influencer/aro-de-luz,
+   prensa/television, social/like, multimedia/galeria, assets/biblioteca, staff-gorra/gorra); el hoodie existe sólo
+   en Plastilina. Al elegir, ten en cuenta:
+   - **Llamada o teléfono:** «llamada» es el teléfono en Trazo; «teléfono» es el móvil en Plastilina. Elige según la
+     voz de la pieza.
+   - **Checklist:** su esfera cae en la columna de vistos. No lo uses como viñeta de una lista de verdad.
+   - **Varita y estrella:** comparten la estrella; no las pongas en el mismo grupo.
+   - **Encuadre** es composición y formatos, no recortar (para eso está tijeras).
+   - **Influencer (Trazo) y talent:** al responder se parecen; no los pongas juntos.
+   - **Chispa:** no va con la estrella ni con la varita.
+   - **Galería y biblioteca:** se parecen; úsalas por separado.
+   - **Prompt:** es el más débil a 32 px; míralo a ese tamaño antes de entregar.
+   - **Hoodie y gorra:** no llevan logo dibujado; la marca la pone la esfera (en la capucha y en el panel frontal).
+     Ningún ícono de IA imita la pantalla ni el logo de ChatGPT o Gemini: no les agregues uno.
+   Si el que necesitas no está, **no lo dibujes**: pídelo (ver abajo).
+4. **Decide el estado.** Reposo por defecto. **Responde uno solo**, el que importa, y sólo si la pieza no tiene otra
+   esfera (una órbita, una voz con esfera o un marcador de estado). En listas, tablas, contacto y navegación, reposo.
+5. **Toma el color de la línea de la pieza**, no del ícono: en un deck de Growth todos van con el acento de Growth,
+   aunque el ícono «pertenezca» a otra línea. Sin línea clara, Growth.
+6. **Respeta los tamaños mínimos:** el Trazo responde desde 20 px (más chico, sólo reposo); Plastilina no baja de
+   32 px (más chico, usa el Trazo).
+7. **Si Plastilina es la protagonista de la pieza,** va dentro de su **órbita sesgada** y en reposo: la esfera la pone
+   la órbita. Una por pieza, rodea sólo al objeto y el texto vive fuera.
+8. **Si trabajas en código o con un agente,** pinta con `resolveIcon`, revisa el grupo con
+   `auditIconGroup(items, { pieceHasSphere })` antes de entregar y usa `skewedOrbitHeroSvg` para la protagonista
+   (`@efeoncepro/axis-graphic-line/icons`, desde 0.4.0; los íconos de oficio, desde 0.5.0, tag `v0.5.0`; los de IA,
+   redes sociales y staff, desde 0.6.0, tag `v0.6.0`). El set completo como archivos sale con `pnpm icons:export` en
+   el repositorio de AXIS. Nunca copies HEX ni px: salen de `efeonceGraphicLine.icons`. Greenhouse fija
+   axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4; dentro de Greenhouse sólo lo usa el generador de piezas por
+   superficie. Para otra pieza, úsalo desde AXIS o copia el SVG del Lab.
+
+### Pedir un ícono nuevo
+
+1. **Revisa el catálogo** de la página del Lab: confirma que no hay uno que sirva.
+2. **Pídelo al operador de la línea** con cuatro datos: el objeto, la voz (Trazo o Plastilina), dónde se va a usar y
+   dónde ocurre la acción (ahí va la esfera cuando responde).
+3. **Quien lo produce sigue el método de AXIS** ([guía, glifo nuevo](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md#un-glifo-nuevo-de-trazo)):
+   - **Trazo:** se dibuja en la grilla de 24 con remates redondos y se verifica con `pnpm icons:check`.
+   - **Plastilina:** se genera sólo la forma (nunca el color) con la referencia de estilo y el prompt modelo que
+     guarda AXIS (`docs/agent-composition/iconography/`), se vectoriza con `pnpm icons:vectorize` y se verifica con
+     `pnpm icons:check`. La esfera se compone después.
+4. **El operador aprueba** mirando las hojas de control que deja `icons:check`.
+5. **Recién entonces entra al set** y se publica una versión nueva del paquete. Mientras no esté aprobado, no se usa
+   en piezas.
+
+## Paso a paso — usar un ícono en volumen
+
+**Plastilina en volumen** es la tercera capa de los íconos: cada Plastilina en arcilla mate e inflada, como imagen PNG
+con fondo transparente. Es para el objeto protagonista de una pieza, no para acompañar texto. Reglas completas en el
+[manual §14.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27).
+
+1. **Confirma que es un momento protagonista:** portada, key visual, pieza social con un solo objeto, escenario, merch
+   o el objeto en escena. Si el ícono va en una lista, tabla, menú, lámina de contenido de un deck, dashboard o
+   interfaz, **no uses el volumen**: usa el ícono plano o el Trazo.
+2. **Confirma que es uno solo en la pieza** y que no va agrupado con íconos planos (de Plastilina o de Trazo).
+3. **Búscalo en la sección «Plastilina en volumen» del [Lab](https://axis.efeonce.org/references/iconography/#volumen)**
+   y descarga el PNG. Hay 43, uno por cada Plastilina plana (incluidos los 15 de oficio y los 10 de IA, redes sociales
+   y staff). Si el objeto no está, ve a
+   «Pedir un ícono en volumen».
+4. **Si trabajas con un agente o en código,** pídele que tome el archivo de `@efeoncepro/axis-brand-assets` con
+   `volumeIconUrl(glyph)` (falla si el glifo no es de Plastilina). Greenhouse fija la 0.3.4 (tag `v0.6.0`), con los 43
+   (los 18 de la base, los 15 de oficio y los 10 de IA, redes sociales y staff). El Lab sirve para descargarlos a mano.
+5. **Colócalo a 160 px o más.** Si tiene que ir más chico, usa el ícono plano.
+6. **Ponlo tal como viene:** ya está en respuesta, con el naranja de Brand y su gesto. No lo recolorees ni le cambies
+   la forma. El PNG trae fondo transparente y los huecos abiertos, así que sirve sobre cualquier fondo; si la pieza
+   necesita una sombra en el piso, agrégala al componer.
+
+### Pedir un ícono en volumen
+
+1. **Si el objeto ya tiene su Plastilina plana,** pide su volumen al operador de la línea.
+2. **Si no la tiene,** primero se pide el ícono plano (ver «Pedir un ícono nuevo»). Nunca se genera un objeto nuevo
+   directo en 3D.
+3. **Quien lo produce sigue el método de AXIS** (guía `iconography.md` §9 del repositorio de AXIS):
+   `pnpm icons:volume -- refs` arma la referencia desde el ícono plano; en Greenhouse,
+   `pnpm ai:image --model gpt-image-2.5-sunburst --quality high --size 1024x1024 --image <ref.png> --prompt-file <volume-prompt.txt> --out <crudo.png>` (sin `--input-fidelity`: la familia 2.5 lo ignora; la fidelidad la da el prompt)
+   genera el volumen con el prompt canónico (no se reescribe; si un detalle falla, se agrega una línea que lo nombre);
+   `pnpm icons:volume -- key` recorta por color, `-- check` compara con el plano y `-- publish` lo deja en el paquete y
+   en el Lab.
+4. **El operador aprueba** mirando cada ícono al 100 %. Los avisos de `check` no rechazan solos: se rechaza sólo si la
+   forma se reinventó, un hueco se volvió relieve o figura y fondo se invirtieron.
 
 ## Paso a paso — regenerar el PDF del manual
 
@@ -191,6 +437,18 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
      Corrige la fuente y vuelve a correr.
 5. Abre el PDF y revisa al menos la portada, una hoja con la burbuja de URL y una hoja del anexo.
 
+## Paso a paso — fondos de Teams y kit de cada persona
+
+Cada persona del equipo tiene su página con el kit completo: su avatar, los nueve fondos de Teams y su firma
+(`https://storage.googleapis.com/efeonce-group-axis-public-media/team/kit/<nombre-apellido>.html`). Los fondos
+también están en OneDrive, `Kit media/Fondos de Teams/2026-09 La órbita/`.
+
+1. **Poner un fondo:** en Teams, antes o durante la reunión, Efectos de fondo → Agregar nuevo → elige el archivo.
+2. **Hacer un fondo nuevo:** se parte de una ficha con `"formato": "teams"` en `pnpm foto:prompt` (el centro queda
+   libre para la persona) y del arte exacto de cada texto; el logo de Efeonce va como objeto (`logo-efeonce-3d-escritorio-*`).
+3. **Revisar antes de repartir:** el texto y el logo al 100 %, y la prueba con una silueta sentada encima reducida a
+   480 y 1280 px: nada importante puede quedar detrás de la persona.
+
 ## Qué significan los estados
 
 | Estado | Qué significa |
@@ -198,9 +456,11 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 | **Canónica (2026-09-25)** | la órbita es la forma oficial de la marca propia; cuando una pieza la usa, toma sus valores de los tokens de AXIS. No va por defecto en toda pieza |
 | **Sistema consistente, no activo distintivo demostrado** | no se ha medido si la gente reconoce a Efeonce sin el logo; no afirmes que la órbita se reconoce sola |
 | **Candidato sin aprobar** | pares de copy del banco; sirven de referencia, no de copy final |
-| **Decisión pendiente** | firma de mail A o B; panel de la prueba sin logo; si el contraste mínimo de la burbuja-firma sigue en 4,5:1 o baja a 3:1 |
+| **Decisión pendiente** | proveedor y presupuesto del panel de la prueba sin logo (que debe correr antes de pauta pagada); revisión del banco de pares; URL de LinkedIn de la empresa. El contraste mínimo de la burbuja quedó en 4,5:1 (2026-09-26) |
 | **No certificable** (`foto:cta:gate`) | pieza del canon anterior que firma con la URL; se dibuja igual que antes y no se recertificó |
 | **Maqueta de presentación** | las fotos de merch y de oficina del canvas generadas con IA; la producción sale de los archivos vectoriales y de una muestra física del proveedor |
+| **Reposo** (ícono) | el ícono es sólo su forma, sin esfera; es el estado por defecto |
+| **Respuesta** (ícono) | aparece la esfera en el acento de la línea de la pieza; sólo uno por pieza y nunca junto a otra esfera |
 | **[propuesta]** en el manual técnico | valor a validar con prueba de impresión (por ejemplo, tamaños mínimos del logo e isotipo impresos) |
 
 ### Salida del comando del PDF
@@ -228,8 +488,19 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
   Reach.
 - No uses la órbita en la UI de Greenhouse ni en piezas de clientes.
 - No copies HEX ni medidas de una captura o de este manual: tómalos de los tokens.
+- No escribas tiempos, sobrepasos ni proporciones de una animación en un script: salen de
+  `efeonceGraphicLine.motion`.
 - No uses fotos de banco ni pongas un velo navy sobre la foto.
 - No publiques el claim «Te hacemos visible» en pauta: está pendiente de revisión legal.
+- No mezcles Trazo y Plastilina en un mismo grupo ni hagas que todos los íconos respondan.
+- No dibujes un ícono a mano dentro de una pieza: si no está en el catálogo, pídelo.
+- No pintes el cuerpo, el gesto o el trazo de un ícono con el acento, ni le des volumen, brillo o sombra: el acento va
+  sólo en la esfera. El volumen sólo existe como los PNG aprobados de «Plastilina en volumen».
+- No uses un ícono en volumen en listas, tablas, menús, decks de contenido, dashboards ni UI; no pongas más de uno por
+  pieza ni lo mezcles con íconos planos; no lo generes de nuevo si ya existe.
+- No recortes un ícono en volumen con `pnpm ai:image:rmbg`: rellena los huecos. El recorte es por color.
+- No uses la órbita sesgada para medir: lo que mide va en la órbita circular.
+- No cambies los íconos Tabler de la firma de correo o de equipo por los de la línea: espera la decisión del operador.
 
 ## Problemas comunes
 
@@ -247,6 +518,15 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 
 | La burbuja-firma **no llega a 4,5:1** | la fusión de luminosidad fija el gris de la burbuja; sobre fondos medios o claros queda entre 1,6 y 3,1:1 | ubícala sobre un lecho muy oscuro; si la pieza no tiene el logo de Efeonce en la imagen, firma con el logo centrado. El umbral está pendiente de decisión del operador |
 | El gate de `foto:cta:gate` sale con código **3** («no certificable») en piezas ya aprobadas | el tramo 17 cambió la huella del comando y esas piezas no se recertificaron | se resuelve al recomponerlas; ningún workflow de CI corre este gate, así que no rompe CI |
+| Un ícono pedido en respuesta **sale sin esfera** | es Trazo a menos de 20 px: `resolveIcon` lo deja en reposo y avisa `response-below-min` | agrándalo a 20 px o más, o déjalo en reposo |
+| `resolveIcon` falla con `plastilina-below-min` | Plastilina a menos de 32 px | agrándalo o usa el ícono equivalente en Trazo |
+| `auditIconGroup` reporta `mixed-voices`, `more-than-one-response` o `response-with-piece-sphere` | dos voces en un grupo, varios íconos respondiendo, o un ícono respondiendo en una pieza que ya tiene esfera | una voz por grupo; que responda uno solo; si la pieza ya tiene esfera, todos en reposo |
+| Un ícono en volumen tiene **los huecos rellenos** o una pieza suelta semitransparente | se recortó con matting por IA (`pnpm ai:image:rmbg`) | recórtalo por color con `pnpm icons:volume -- key` o, mejor, usa el PNG aprobado del Lab |
+| Un ícono en volumen se ve **plano, como una galleta** | se extruyó el vector en Blender | ese método está descartado; el volumen se genera editando el ícono plano con el método de AXIS |
+| `pnpm icons:volume -- check` sale con código 1 | hay avisos de silueta, huecos o piezas sueltas | míralo al 100 %: se rechaza sólo si la forma se reinventó, un hueco se volvió relieve o figura y fondo se invirtieron; si no, se acepta |
+| `volumeIconUrl` lanza un error | el glifo no es de Plastilina | usa un glifo de Plastilina o el ícono plano que corresponda |
+| `resolveIcon` falla con `unknown-glyph` | el ícono no está en el catálogo aprobado | pídelo con el método de alta; no lo dibujes en la pieza |
+| Un repositorio nuevo no puede instalar `@efeoncepro/axis-graphic-line` o `axis-tokens` (error 403) | el acceso de GitHub Packages es por paquete y ese repositorio no lo tiene | pide `Manage Actions access → Read` para el repositorio en cada paquete ([runbook de paquetes AXIS](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)) |
 | Una foto de merch u oficina trae **las notas de la lámina** pintadas | el arte de referencia llevaba leyendas | corrige editando la foto; en adelante pasa el arte sin leyendas |
 
 ## Referencias técnicas
@@ -259,5 +539,7 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 - Lenguaje fotográfico: [`docs/operations/brand-photography/README.md`](../../operations/brand-photography/README.md)
 - Banco de la lente: `ai-generations/2026-09-25_banco-lente-orbita/LEEME.md`
 - Canvas de trabajo (privado, 40 láminas): [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii)
-- Contrato y herramientas (AXIS 0.2.7, `creative:orbit:render`, `creative:layout`, `foto:componer:cta` tramo 17): [manual técnico §13](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-027)
+- Contrato y herramientas (AXIS 0.3.0 y `axis-graphic-line` 0.3.1, `creative:orbit:render`, `creative:layout`, `foto:componer:cta` tramo 17): [manual técnico §13](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-03)
+- Animaciones de marca: [norma del lenguaje de movimiento](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) · [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · valores en `efeonceGraphicLine.motion` (`@efeoncepro/axis-tokens` 0.3.3) · masters en `gs://efeonce-group-axis-public-media/motion/logo/v1.1/`
 - Compositor de piezas con CTA: [manual de uso](./compositor-piezas-cta.md)
+- Iconografía (Trazo y Plastilina): [manual técnico §14](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina) · [guía en AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md) · [página del Lab](https://axis.efeonce.org/references/iconography/) y [datos para agentes](https://axis.efeonce.org/references/iconography.json) · `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens` 0.3.6) · `@efeoncepro/axis-graphic-line/icons` (0.4.0) · comandos `pnpm icons:export|check|vectorize` en el repo de AXIS · Plastilina en volumen: [manual técnico §14.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27) · [Lab, sección 05](https://axis.efeonce.org/references/iconography/#volumen) · `efeonceGraphicLine.icons.volume` (`axis-tokens` 0.3.7) · `@efeoncepro/axis-brand-assets` 0.3.2 (publicado con el tag `v0.3.7`) · `pnpm icons:volume` en el repo de AXIS · Oficio (D25, 60 glifos y 33 volúmenes): `@efeoncepro/axis-graphic-line` 0.5.0 y `@efeoncepro/axis-brand-assets` 0.3.3 (tag `v0.5.0`), guía de AXIS §«Catálogo aprobado»

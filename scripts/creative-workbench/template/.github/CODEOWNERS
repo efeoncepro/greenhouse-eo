@@ -1,0 +1,5 @@
+# Gestionado desde efeoncepro/greenhouse-eo (scripts/creative-workbench/template/.github/CODEOWNERS).
+# Todo cambio a archivos gestionados lo revisa el dueño del workbench. Las piezas del equipo
+# (projects/**) las revisa el aprobador declarado en cada pieza.json.
+*                 @cesargrowth11
+/projects/        @cesargrowth11

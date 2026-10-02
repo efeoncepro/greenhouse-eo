@@ -1,0 +1,10 @@
+{
+  "id": "CS1-bicecorp",
+  "formato": "1:1",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (epic cinematic establishing shot, Santiago de Chile's financial district at blue hour): from a high vantage point, the cluster of modern glass office towers of the eastern business district rises in the RIGHT two thirds of the frame, their windows glowing warm and cool from inside, one tall tower catching the last pink light on its glass edge; behind them the snow-capped Andes range glows in the fading sunset, enormous and calm; below, long exposure light trails of traffic flow along the avenues like rivers of light. Thin evening haze layers the distance so the towers read in depth. 85mm telephoto compression, camera on a far rooftop, slight elevation. The LEFT 25% of the frame is quieter: soft haze over darker lower buildings, no bright tower edges. No readable signs, no company names, no logos on any building, no text. Deep navy blues and warm window light, rich contrast, awe-inspiring scale.",
+  "lecho": { "objeto": "the dark blurred edge of the rooftop parapet close to the lens at the bottom, outside every light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the quiet hazy lower-left area of the frame", "tinta": "blanca" } }
+}

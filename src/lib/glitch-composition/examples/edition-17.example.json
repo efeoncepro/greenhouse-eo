@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "example": true,
+  "edition": {
+    "number": 17,
+    "publishDate": "2026-10-05",
+    "weekRange": {
+      "from": "2026-09-28",
+      "to": "2026-10-04"
+    }
+  },
+  "thesis": "[Ejemplo] Esta semana la IA dejó de ser una herramienta aparte y pasó a estar dentro de cada canal.",
+  "previousEdition": {
+    "number": 16,
+    "coverTemplate": "C"
+  },
+  "cover": {
+    "newsId": "n1",
+    "standalonePov": {
+      "entry": "La IA ya no está",
+      "punch": "al lado. Está adentro."
+    },
+    "mosaic": [
+      "n2",
+      "n4",
+      "n5",
+      "n7"
+    ],
+    "muletilla": "spoiler:",
+    "headline": {
+      "entry": "Te responden antes",
+      "punch": "del clic."
+    },
+    "lines": [
+      {
+        "newsId": "n2",
+        "text": "[Ejemplo] Campaña con video generativo"
+      },
+      {
+        "newsId": "n8",
+        "text": "[Ejemplo] El agente llena el formulario"
+      }
+    ]
+  },
+  "news": [
+    {
+      "id": "n1",
+      "section": "marketing",
+      "headline": "[Ejemplo] Un buscador responde antes de que el usuario haga clic",
+      "outlet": "[Ejemplo] Medio",
+      "date": "2026-09-28",
+      "photo": {
+        "file": "fotos/n1.png",
+        "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+        "license": {
+          "kind": "generated",
+          "ref": "glitch-example-fixtures"
+        },
+        "strong": true,
+        "fractureEdge": "bottom",
+        "faceRegions": [
+          {
+            "x": 0.58,
+            "y": 0.12,
+            "w": 0.16,
+            "h": 0.28
+          }
+        ]
+      },
+      "pov": {
+        "entry": "Si te responden antes,",
+        "punch": "ya no te visitan."
+      },
+      "why": "[Ejemplo] El porqué en dos líneas: qué cambia para una marca y qué conviene hacer esta semana.",
+      "lens": null
+    },
+    {
+      "id": "n2",
+      "section": "creatividad",
+      "headline": "[Ejemplo] Una marca de retail estrena su campaña hecha con video generativo",
+      "outlet": "[Ejemplo] Medio",
+      "date": "2026-09-29",
+      "photo": {
+        "file": "fotos/n2.png",
+        "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+        "license": {
+          "kind": "generated",
+          "ref": "glitch-example-fixtures"
+        },
+        "strong": false,
+        "fractureEdge": "right",
+        "faceRegions": []
+      },
+      "pov": {
+        "entry": "La herramienta no firma",
+        "punch": "la idea."
+      },
+      "why": "[Ejemplo] El porqué en dos líneas: qué cambia para una marca y qué conviene hacer esta semana.",
+      "lens": null
+    },
+    {
+      "id": "n3",
+      "section": "tecnologia",
+      "headline": "[Ejemplo] Un modelo nuevo lee planillas completas sin copiar y pegar",
+      "outlet": "[Ejemplo] Medio",
+      "date": "2026-09-30",
+      "photo": {
+        "file": "fotos/n3.png",
+        "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+        "license": {
+          "kind": "generated",
+          "ref": "glitch-example-fixtures"
+        },
+        "strong": false,
+        "fractureEdge": "bottom",
+        "faceRegions": []
+      },
+      "pov": {
+        "entry": "El Excel no muere,",
+        "punch": "se entiende solo."
+      },
+      "why": "[Ejemplo] El porqué en dos líneas: qué cambia para una marca y qué conviene hacer esta semana.",
+      "lens": {
+        "region": {
+          "x": 0.3,
+          "y": 0.35,
+          "w": 0.22,
+          "h": 0.22
+        }
+      }
+    },
+    {
+      "id": "n4",
+      "section": "marketing",
+      "headline": "[Ejemplo] El correo vuelve a crecer como canal de venta B2B",
+      "outlet": "[Ejemplo] Medio",
+      "date": "2026-10-01",
+      "photo": {
+        "file": "fotos/n4.png",
+        "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+        "license": {
+          "kind": "generated",
+          "ref": "glitch-example-fixtures"
+        },
+        "strong": false,
+        "fractureEdge": "right",
+        "faceRegions": [
+          {
+            "x": 0.2,
+            "y": 0.1,
+            "w": 0.18,
+            "h": 0.3
+          }
+        ]
+      },
+      "pov": {
+        "entry": "El correo nunca se fue,",
+        "punch": "se fue la creatividad."
+      },
+      "why": "[Ejemplo] El porqué en dos líneas: qué cambia para una marca y qué conviene hacer esta semana.",
+      "lens": null
+    },
+    {
+      "id": "n5",
+      "section": "tecnologia",
+      "headline": "[Ejemplo] Una plataforma de anuncios deja que la IA arme la segmentación",
+      "outlet": "[Ejemplo] Medio",
+      "date": "2026-10-02",
+      "photo": {
+        "file": "fotos/n5.png",
+        "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+        "license": {
+          "kind": "generated",
+          "ref": "glitch-example-fixtures"
+        },
+        "strong": false,
+        "fractureEdge": "bottom",
+        "faceRegions": []
+      },
+      "pov": {
+        "entry": "La segmentación ya no es",
+        "punch": "tu ventaja."
+      },
+      "why": "[Ejemplo] El porqué en dos líneas: qué cambia para una marca y qué conviene hacer esta semana.",
+      "lens": null
+    },
+    {
+      "id": "n6",
+      "section": "creatividad",
+      "headline": "[Ejemplo] Un estudio de diseño publica su sistema de marca abierto",
+      "outlet": "[Ejemplo] Medio",
+      "date": "2026-10-03",
+      "photo": {
+        "file": "fotos/n6.png",
+        "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+        "license": {
+          "kind": "generated",
+          "ref": "glitch-example-fixtures"
+        },
+        "strong": false,
+        "fractureEdge": "right",
+        "faceRegions": []
+      },
+      "pov": {
+        "entry": "Abrir la marca",
+        "punch": "la hace más fuerte."
+      },
+      "why": "[Ejemplo] El porqué en dos líneas: qué cambia para una marca y qué conviene hacer esta semana.",
+      "lens": null
+    },
+    {
+      "id": "n7",
+      "section": "marketing",
+      "headline": "[Ejemplo] Las reseñas en video ganan peso en la decisión de compra",
+      "outlet": "[Ejemplo] Medio",
+      "date": "2026-10-01",
+      "photo": {
+        "file": "fotos/n7.png",
+        "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+        "license": {
+          "kind": "generated",
+          "ref": "glitch-example-fixtures"
+        },
+        "strong": false,
+        "fractureEdge": "bottom",
+        "faceRegions": [
+          {
+            "x": 0.44,
+            "y": 0.08,
+            "w": 0.2,
+            "h": 0.34
+          }
+        ]
+      },
+      "pov": {
+        "entry": "La reseña pesa más",
+        "punch": "que el anuncio."
+      },
+      "why": "[Ejemplo] El porqué en dos líneas: qué cambia para una marca y qué conviene hacer esta semana.",
+      "lens": null
+    },
+    {
+      "id": "n8",
+      "section": "tecnologia",
+      "headline": "[Ejemplo] Un navegador suma un agente que completa formularios",
+      "outlet": "[Ejemplo] Medio",
+      "date": "2026-10-02",
+      "photo": {
+        "file": "fotos/n8.png",
+        "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+        "license": {
+          "kind": "generated",
+          "ref": "glitch-example-fixtures"
+        },
+        "strong": false,
+        "fractureEdge": "right",
+        "faceRegions": []
+      },
+      "pov": {
+        "entry": "El formulario deja de ser",
+        "punch": "fricción."
+      },
+      "why": "[Ejemplo] El porqué en dos líneas: qué cambia para una marca y qué conviene hacer esta semana.",
+      "lens": null
+    }
+  ],
+  "back": {
+    "closingLine": "Nos vemos el lunes."
+  },
+  "video": {
+    "host": {
+      "name": "Julio Reyes",
+      "role": "Director · Efeonce"
+    },
+    "guest": null,
+    "newsIds": [
+      "n1",
+      "n2",
+      "n3"
+    ],
+    "shortHeadlines": {
+      "n1": "El buscador contesta solo",
+      "n2": "Campaña con video generativo",
+      "n3": "El modelo lee tu planilla"
+    },
+    "drop": {
+      "newsId": "n1"
+    },
+    "cta": {
+      "reel": "Sigue a",
+      "vlog": "Las otras noticias, en el blog de"
+    },
+    "closingLine": "el #18 sale el lunes.",
+    "transition": "basic",
+    "hostPhoto": {
+      "file": "fotos/host.png",
+      "license": {
+        "kind": "generated",
+        "ref": "glitch-example-fixtures"
+      },
+      "faceRegions": [
+        {
+          "x": 0.4,
+          "y": 0.22,
+          "w": 0.2,
+          "h": 0.24
+        }
+      ]
+    },
+    "cover": {
+      "entry": "3 noticias.",
+      "punch": "Un solo aviso"
+    }
+  },
+  "outputs": {
+    "stills": [
+      "cover",
+      "back",
+      "blog:banner",
+      "blog:square",
+      "blog:news:n1",
+      "reel:cover",
+      "video:thumbnail"
+    ],
+    "overlays": [
+      "reel",
+      "vlog"
+    ]
+  }
+}

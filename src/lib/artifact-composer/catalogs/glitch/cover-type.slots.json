@@ -1,0 +1,89 @@
+{
+  "template": "CoverType",
+  "version": "0.1",
+  "viewport": {
+    "width": 1080,
+    "height": 1350
+  },
+  "slots": {
+    "edition": {
+      "selector": "[data-slot='edition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 4,
+        "overflow": "reject"
+      },
+      "example": "17"
+    },
+    "muletilla": {
+      "selector": "[data-slot='muletilla']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 18,
+        "overflow": "reject",
+        "maxLines": 1
+      },
+      "example": "spoiler:"
+    },
+    "headline": {
+      "selector": "[data-slot='headline']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "entry": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 44,
+          "example": "La IA ya no está al lado."
+        },
+        "punch": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 22,
+          "example": "Está adentro."
+        }
+      }
+    },
+    "lines": {
+      "selector": "[data-slot='lines']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "section": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 16,
+            "example": "Marketing"
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 44,
+            "example": "El buscador contesta solo"
+          }
+        }
+      }
+    },
+    "previousCoverTemplate": {
+      "selector": "[data-gx-root]",
+      "type": "enum",
+      "required": true,
+      "consumer": "validation-only",
+      "values": {
+        "A": "Portada A",
+        "B": "Portada B",
+        "C": "Portada C",
+        "none": "Primera edición compuesta"
+      },
+      "example": "A"
+    }
+  }
+}

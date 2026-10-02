@@ -1,0 +1,11 @@
+Use the attached sheet ONLY as the style reference: soft, chunky, flat icon silhouettes with a hand-made contour, like pressed modelling clay seen from the front, no outlines, no shading.
+
+Draw a 3 x 3 grid of NINE different GUITAR icons on one plain, flat, uniform dark navy background. Each guitar is a separate object with generous empty space around it; objects never touch each other or the edges of their cell.
+
+Style rules, strictly:
+- Exactly two flat colors on the objects: pure white for the whole object, and a single orange (#ff6500) used only for ONE small round dot per guitar, placed on the sound hole.
+- Fat, soft, rounded mass; every corner rounded; the contour keeps the slight irregularity of a hand, never geometric or mechanical.
+- Each guitar is tilted and taken in use (rotated between 20 and 45 degrees), never straight and frontal.
+- Details are round cut-outs through the white mass showing the navy background: the sound hole, a slot between body and bridge, the gaps between tuning pegs. Strings, if any, are short fat rounded bars cut out of the white.
+- No gradients, no shadows, no highlights, no volume, no texture, no outlines, no text, no letters, no other colors.
+Variations across the nine: acoustic guitars with a round sound hole, a few with slightly different body shapes (rounder, more waisted), different tilt angles left and right. All nine keep the same style so they read as one family.

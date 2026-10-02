@@ -1,5 +1,7 @@
 # Overlay Efeonce — el ecosistema de contenidos real
 
+> **Naming AEO para contenido:** **Efeonce AEO** es la capacidad de marca, **Efeonce AEO Assessment** el diagnóstico público y **Efeonce AI Visibility Report** su informe. `AI Visibility Grader`/`AEO Grader` quedan como aliases técnicos e históricos; **Search Visibility 360** conserva el servicio SEO + AEO amplio. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 El studio es genérico y reutilizable, pero Efeonce tiene un **motor de contenidos concreto**. Este overlay ancla las superficies, el motor y las reglas reales. La **doctrina de marca/voz/ICP/bow-tie NO se decide aquí** — es de `efeonce-agency` + `commercial-expert` + `docs/context/`. Aquí se opera el content engine sobre esa doctrina.
 
 > **ICP:** Efeonce tiene **múltiples ICPs/segmentos** (no solo Globe). No hardcodees un ICP único en la estrategia de contenidos. La segmentación viene de `efeonce-agency`/`commercial-expert`; el contenido se produce para el segmento que el trabajo indique.
@@ -12,8 +14,8 @@ Layering canónico del ecosistema digital (SSOT: `docs/public-site/decisions/PDR
 |---|---|---|
 | **Think** — producto/hub editorial multi-runtime | demand-gen + nurturing top-of-funnel | Agrupa Marketing con Manzanitas, Glitch, tools y lead magnets. No equivale al host `think.efeoncepro.com`; placement de Pillars por PDR-018 |
 | **`think.efeoncepro.com`** — runtime Astro especializado | tools, reportes y experiencias enfocadas | Repo/Vercel `efeonce-think`; no es el destino automático de artículos o Pillars |
-| **Marketing con Manzanitas** — blog | thought leadership / autoridad / demanda | **Multiformato** (PDR-020 §4.2): pillars y clusters, **casos de éxito completos (canonical)**, tools/graders, webinars, ebooks, data studies y archivo Glitch. Formato ≠ categoría |
-| **Glitch** — newsletter semanal (IA / Marketing / Negocios) | audiencia propia / nurturing | Canal owned de mayor ROI; consume átomos del pillar y genera piezas |
+| **Marketing con Manzanitas** — blog | thought leadership / autoridad / demanda | **Multiformato** (PDR-020 §4.2): pillars y clusters, **casos de éxito completos (canonical)**, tools/graders, webinars, ebooks, data studies y archivo Glitch. Formato ≠ categoría. Su pieza gráfica (carrusel, story, imagen del artículo y banner, miniatura, pódcast) sigue el **registro Marketing con Manzanitas** (aprobado 2026-09-28), que complementa La órbita sin reemplazarla y no se mezcla con Glitch: norma `docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md` + `efeonce-graphic-line` → `references/manzanitas.md` |
+| **Glitch** — newsletter semanal (IA / Marketing / Negocios) + **Glitch Flash** (una noticia puntual, sin número, desde 2026-09-28) | audiencia propia / nurturing | Canal owned de mayor ROI; consume átomos del pillar y genera piezas. El Flash no reemplaza ni numera la semanal: formato y piezas en `efeonce-graphic-line` → `references/glitch.md` §14 |
 | **Tools / lead magnets** (AI Visibility Grader, ebooks, webinars) | demand-capture / captura | Contenido gated que convierte audiencia en lead |
 | **efeoncepro.com** (WordPress/Kinsta, recalibración a Astro) | demand-capture + conversión | Landings de servicio, comparison tables, páginas de conversión |
 | **Experiencia** (cliente sky / cockpit Greenhouse) | post-venta | Contenido de enablement/retención cuando aplique |

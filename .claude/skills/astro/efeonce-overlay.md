@@ -16,6 +16,30 @@ this file is what makes the advice *correct for our setup*.
 - Follow-up context: TASK-1324 (repoint correo, still 404), TASK-1327 (public
   lead-magnet landing + form embed — the AEO grader form).
 
+## AEO X-Ray composition (2026-09-30)
+
+For X-Ray work load `../seo-aeo/references/aeo-xray.md` and the Think architecture,
+manual, new-client kit and release handoff in `docs/think/` of Greenhouse.
+Preserve the original `Experience.astro`, legacy collection and four-step journey;
+`adaptExperience` adds typed landing/article composition rather than replacing the renderer.
+`acceptSharedXray` validates frozen AXIS tokens/adapter checks and fails closed on drift.
+
+There are three delivery lanes: DEV fixtures, governed Greenhouse editions/grants, and
+bundled unlisted `sample_…` demonstrations served by Think without a Greenhouse request.
+A bundled sample is a distribution link, not an authenticated/revocable grant; remove it
+through registry/media removal and Think redeploy. Rendering an approved resolved manifest
+is not permission to compute Assessment scores or introduce business decisions in Astro.
+Do not require or deploy Greenhouse for a Think-only publication. Assets declared public
+for a published demo are delivery exports; private production masters remain separate.
+
+Validate `no-store`, `noindex/nofollow`, no-referrer and inert example schema at the route.
+Native View Transitions share the same entity; artifact switches keep the shell but do not
+morph unrelated content. Named selector indicator snapshots must not cover labels/icons.
+The welcome curtain uses a native dialog/form fallback and session-scoped entry. Its CSS
+motion token currently is 1400ms; production may serialize it as 1.4s, so convert seconds
+to milliseconds before calling WAAPI. Verify animation geometry/duration in production,
+reduced-motion, focus, no-JS, internal navigation and deep links—not only source CSS.
+
 ## The load-bearing doctrine: "dumb render" = SSOT
 
 The intelligence (scoring, model, snapshots, decisions) lives in the **Greenhouse

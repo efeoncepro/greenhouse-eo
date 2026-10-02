@@ -63,11 +63,12 @@ Referencias aprobadas comparables: [mínimo exigido por canon]. Restricciones y 
 Un agente con motor propio **tiene que adjuntar el archivo a su modelo**. Y hay dos trampas:
 
 **1. Las referencias no vienen con un clone.** Los kits pesan ~640 MB y están **fuera de git**
-(`.gitignore: /ai-generations/**/*.png`). Clonar el repo **no las trae**.
+(`.gitignore: /ai-generations/**/*.png`). Clonar el repo **no las trae**: `pnpm ai-gen:pull ai-generations/<kit>` las baja
+a la misma ruta con sha256 verificado (lo sellado en el lock, también `pnpm assets:pull`).
 
 | Dónde conseguirla | Cuándo |
 |---|---|
-| **Ruta local del repo** — `ai-generations/<kit>/final/<vista>.png` | si esta máquina tiene el set completo |
+| **Ruta local del repo** — `ai-generations/<kit>/final/<vista>.png` | si esta máquina tiene el set completo; si no, `pnpm ai-gen:where` + `pnpm ai-gen:pull` |
 | **Kit de recursos de la campaña** — `5. Contenidos/15. Paid Media/01. Recursos/<fecha>_<kit>/` | 🎯 **copias fijadas de la tanda**, pensadas justo para esto |
 | OneDrive del kit original | si falta en las dos anteriores |
 

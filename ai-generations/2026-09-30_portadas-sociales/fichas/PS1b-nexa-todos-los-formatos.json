@@ -1,0 +1,26 @@
+{
+  "id": "PS1b-nexa-todos-los-formatos",
+  "formato": "3:1",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark creative studio at night): she stands at about 66% of the frame width, clearly in the right half, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. One arm raised like an orchestra conductor, fingers spread, and she looks straight into the lens with a confident, knowing half-smile; her head stays almost frontal, both eyes and both eyebrows visible. Around her flows a wide tilted elliptical ORBIT made of DOZENS of thin frameless glowing screens of every real digital format — tall vertical 9:16 story and reel screens, square 1:1 and 4:5 feed posts, wide 16:9 video frames, slim phones, long horizontal web banners, a few tiny thumbnail-size ones — hovering at many different depths ONLY to her sides and behind her, between 52% and 100% of the frame width, stretching away into the darkness on the right edge, as if the orbit kept going beyond the edge: some sharp, many softly out of focus, the nearest one partly motion-blurred as it swings past the lens. Each screen shows bold, vivid, art-directed campaign imagery from the SAME campaign adapted to each format: saturated color-block graphics, a product close-up splashed with paint, a dancer mid-jump, a bold abstract gradient; the screens are the brightest objects and throw colored light onto her face, jacket and the haze in vivid orange, hot magenta, deep azure-blue (#0375DB), violet and teal (#36C8BF). Any tiny text on the screens is too small and too blurred to read. A thin luminous line of light traces the orbit path between the screens. Hard cool rim light from behind; haze catches the colored beams. The LEFT HALF of the frame (from 0% to 50% of the width) is calm, deep dark studio space with only faint haze: no screens, no orbit, no light trails, no monitors, no lamps and no objects there; the orbit of screens never crosses the vertical center line of the frame. Her raised hand stays to the right of the center line. Her head stays in the middle band of the frame height, never touching the top edge. Rich contrast, punchy saturated color, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near corner of a dark walnut editing desk with a closed graphics pen lying on it, the lens only a few centimetres behind its near edge, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left 50% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

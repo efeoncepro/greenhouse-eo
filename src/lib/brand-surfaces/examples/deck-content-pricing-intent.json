@@ -1,0 +1,63 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-pricing",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Inversión",
+    "question": "¿Cómo se cotiza?",
+    "answer": [
+      "Por",
+      "capacidad"
+    ]
+  },
+  "body": "El fee del equipo se cotiza por capacidad gobernada, nunca por horas ni piezas. Greenhouse suma la capa de producto.",
+  "legal": "Valores netos, IVA no incluido. Los montos se definen en cada propuesta.",
+  "period": "al mes · neto + IVA",
+  "recommended": 2,
+  "recommendedLabel": "Recomendado",
+  "plans": [
+    {
+      "name": "Basic",
+      "tagline": "Para empezar a medir",
+      "features": [
+        "Dashboard y KPIs",
+        "OTD y RpA",
+        "Gobierno de marca con IA",
+        "Reporting mensual"
+      ]
+    },
+    {
+      "name": "Pro",
+      "tagline": "Para operar y decidir",
+      "features": [
+        "Dashboard, KPIs y acciones",
+        "Suma Revenue Enabled",
+        "Recomendaciones de IA",
+        "Aprobar y solicitar en el portal",
+        "Reporting quincenal"
+      ]
+    },
+    {
+      "name": "Enterprise",
+      "tagline": "Para escalar con IA",
+      "features": [
+        "Suma IA y API",
+        "Benchmarks de industria",
+        "Agentes a medida",
+        "Integraciones",
+        "Reporting en tiempo real"
+      ]
+    }
+  ],
+  "selection": {
+    "target": "object",
+    "label": "Finanzas",
+    "participantKind": "department"
+  }
+}

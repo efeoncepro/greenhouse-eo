@@ -1,0 +1,1835 @@
+[
+  {
+    "id": "section-lens",
+    "board": "DeckSeccionLente",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckSeccionLente.jpg",
+    "name": "Sección con lente · el arco mide en qué sección vamos",
+    "family": "section",
+    "documents": [
+      "proposal",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "dark",
+    "communicates": "Entramos a una sección nueva y su respuesta ya está dicha; la lente muestra el oficio que la sostiene y su arco dice cuánto del recorrido llevamos.",
+    "useWhen": [
+      "Abrir una sección de un deck que alguien presenta, cuando existe una foto documental del oficio de esa sección.",
+      "Cuando el avance tiene que leerse como navegación real: el arco barre sección actual / total.",
+      "Decks de 3 a 7 secciones, donde la fracción del arco todavía se distingue a simple vista."
+    ],
+    "avoidWhen": [
+      "Cuando la foto no aguanta el recorte circular (sujeto pegado al borde o escena que necesita todo el ancho).",
+      "Cuando la lámina siguiente también usa la lente (content-measure): dos lentes seguidas se leen como la misma lámina.",
+      "Brochure en PDF que se lee solo: ahí la sección sobre papel ordena mejor.",
+      "Más de 7 secciones: el arco pierde lectura."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "section-classic",
+        "when": "no hay foto del oficio de la sección o el documento es un brochure en papel"
+      },
+      {
+        "recipe": "section-bleed",
+        "when": "la foto es una escena ancha que pierde sentido dentro de un círculo"
+      },
+      {
+        "recipe": "section-split",
+        "when": "se quiere la sección sobre papel con un retrato fuerte al lado"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-classic",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-bleed",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-split",
+        "relation": "variant"
+      },
+      {
+        "recipe": "content-measure",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "section",
+        "type": "section",
+        "required": true,
+        "example": "2 de 5",
+        "notes": "Da el arco: nace a las 12 y barre actual/total × 360°. También alimenta el eyebrow «Sección n de N»."
+      },
+      {
+        "name": "sectionName",
+        "type": "text",
+        "required": false,
+        "maxChars": 16,
+        "example": "Producción",
+        "notes": "Se suma al eyebrow tras « · »; el eyebrow completo cabe en ~40 caracteres."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 34,
+        "example": "¿Quién decide el corte?",
+        "notes": "Una línea; la columna termina antes del anillo de la lente (≈ mitad izquierda del lienzo)."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 14,
+        "example": "El dato",
+        "notes": "Una línea, 1–3 palabras; la esfera la agrega la voz."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+        "notes": "Foto nativa 16:9 con el sujeto hacia el centro-derecha, para que el recorte circular de la lente lo contenga entero."
+      }
+    ],
+    "fixed": [
+      "La lente: pieza medida `efeonceGraphicLine.pieces.lens['deck-cover']` (posición, radio, anillo, arco y esfera), con el arco desde las 12.",
+      "Fondo oscuro Efeonce (`color.dark`) alrededor de la lente; la foto sólo vive dentro del círculo.",
+      "Columna de voz a la izquierda en el margen de deck: eyebrow, pregunta con anillo y respuesta con esfera.",
+      "Acento de la línea en arco, esfera, anillo de la pregunta y esfera de la respuesta (en marca propia, teal de Growth).",
+      "Sin logo, sin indicador chico y sin burbuja URL (así quedó la referencia aprobada)."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+      "ficha": "ai-generations/2026-09-26_deck-web-motion/fichas/P1-deck-lente-edicion.json",
+      "prompt": "ai-generations/2026-09-26_deck-web-motion/prompts/P1-deck-lente-edicion.txt",
+      "postprocess": [
+        "Sin uniforme en cuadro (sobrecamisa oliva lisa): no aplica foto:isotipo."
+      ],
+      "replaceable": "La foto se cambia por la del oficio de la sección; debe mirar al trabajo, no al lente, y dejar al sujeto dentro del círculo."
+    },
+    "prompts": {
+      "composition": "Compón una lámina de sección 16:9 del deck Efeonce sobre el fondo oscuro Efeonce. A la derecha, la lente de portada de deck (`efeonceGraphicLine.pieces.lens['deck-cover']`) con la foto del oficio dentro del círculo; su arco es la navegación: nace a las 12 y barre sección actual / total × 360°, con la esfera al final del arco. A la izquierda, en el margen de deck, la voz: eyebrow en Poppins 300 «Sección n de N · <nombre>», la pregunta en Poppins Light con su anillo en el acento y la respuesta en Bricolage 760 de 1–3 palabras cerrada por la esfera, a más de 3× la pregunta (escala de voces de `surfaces.deck.recipes['section-lens']`). Ningún texto entra al anillo. No agregues indicador chico, logo ni burbuja URL: la lente ya es la órbita de la lámina. Pinta la lente con `paintGraphicLine` y la respuesta con `answerHtml`."
+    },
+    "renderSource": {
+      "script": "render-src/deck-web.mjs",
+      "slideId": "D1-seccion-lente"
+    },
+    "rules": [
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita.",
+      "El arco es navegación real: actual/total × 360° desde las 12; nunca un arco decorativo.",
+      "Lámina interior con foto: sin logo de Efeonce (firman la portada y el cierre)."
+    ],
+    "notes": "El título original la marcaba como «una opción»; la norma (§4.6) y el token de AXIS (`surfaces.deck.recipes['section-lens']`) todavía la tienen como `option` con uso sólo en propuesta: con la aprobación del 2026-09-27 hay que subirla a `approved`. Comparte el plate P1 con section-bleed, content-measure y la hoja de contactos: no repetir ese plate dos veces en un mismo deck. Pie sin burbuja URL, igual que las otras secciones aprobadas (pregunta abierta de TASK-1919 sobre la burbuja en secciones)."
+  },
+  {
+    "id": "section-classic",
+    "board": "DeckSeccionClasica",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckSeccionClasica.jpg",
+    "name": "Sección clásica AXIS · el número dentro del anillo",
+    "family": "section",
+    "documents": [
+      "proposal",
+      "brochure",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "paper",
+    "communicates": "Cambio de tema: el número grande dice dónde estamos, el arco cuánto falta y la respuesta resume la sección antes de abrirla.",
+    "useWhen": [
+      "Abrir una sección cuando no hay foto propia del tema o el deck ya tiene suficiente fotografía.",
+      "Brochure en PDF y propuestas que se leen sin presentador: el número y «Sección n de N» orientan solos.",
+      "Como respiro claro entre láminas oscuras o de cine."
+    ],
+    "avoidWhen": [
+      "Cuando la sección necesita emoción o mostrar al equipo trabajando: una sección sin foto no lo hace.",
+      "Decks de una o dos secciones, donde el contador no aporta."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "section-split",
+        "when": "hay un retrato fuerte del tema y se quiere mantener el papel"
+      },
+      {
+        "recipe": "section-lens",
+        "when": "el deck se presenta sobre oscuro y hay una foto del oficio"
+      },
+      {
+        "recipe": "section-cine-services",
+        "when": "la sección abre los servicios en un brochure o propuesta con registro cine"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-split",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-lens",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-bleed",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "section",
+        "type": "section",
+        "required": true,
+        "example": "2 de 5",
+        "notes": "Da el número «02» dentro del anillo, el rótulo «Sección n de N» y el arco (actual/total × 360° desde las 12)."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 36,
+        "example": "¿Quién decide el corte?",
+        "notes": "Una línea; la columna termina antes del anillo de la derecha."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 14,
+        "example": "El dato",
+        "notes": "Una línea, 1–3 palabras, en navy con la esfera en el acento."
+      }
+    ],
+    "fixed": [
+      "`deckSlideHtml('section')` tal cual: papel, anillo grande a la derecha con el número de sección dentro (`surfaces.deck.recipes['section-classic'].type.number`) y el arco en el acento.",
+      "Voz a la izquierda: pregunta en navy con su anillo en `lines.growth.accentOnLight`, respuesta en navy con la esfera en el mismo acento.",
+      "Sin foto, sin logo y sin burbuja URL (como la referencia aprobada)."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": false,
+      "register": "none",
+      "plate": "",
+      "ficha": "",
+      "prompt": "",
+      "postprocess": [],
+      "replaceable": "No lleva foto."
+    },
+    "prompts": {
+      "composition": "Compón la sección clásica AXIS con `deckSlideHtml('section', { sections, current, question, answer })` o, en el Artifact Composer, con `pnpm brand:compose -- --intent src/lib/brand-surfaces/examples/deck-section-classic-intent.json` cambiando `progress` y `voice`. Papel; a la derecha el anillo con el número de la sección dentro y «Sección n de N» debajo, el arco barriendo actual/total desde las 12 con su esfera; a la izquierda, en el margen de deck, la pregunta con anillo y la respuesta con esfera, a más de 3× la pregunta. Sobre papel el acento es `accentOnLight` de la línea y la tinta es navy. No agregues foto, logo ni burbuja."
+    },
+    "renderSource": {
+      "script": "render-src/secciones-var.mjs",
+      "slideId": "S-clasica"
+    },
+    "rules": [
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita.",
+      "Sobre papel: tinta navy y acento `accentOnLight`; el acento nunca en texto de menos de 24 px."
+    ],
+    "notes": "Receta ya aprobada en la norma (§4.6) y con plantilla en el catálogo `graphic-line-deck` del Artifact Composer (TASK-1919). La misma lámina se repite en todos los `secciones*.mjs` como `S-clasica`."
+  },
+  {
+    "id": "section-bleed",
+    "board": "DeckSeccionSangre",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckSeccionSangre.jpg",
+    "name": "Sección con foto a sangre · el indicador chico arriba a la izquierda",
+    "family": "section",
+    "documents": [
+      "proposal",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "photo-bleed",
+    "communicates": "La foto manda: el oficio de la sección ocupa la lámina entera y la voz, apoyada en el muro calmo, dice de qué se trata.",
+    "useWhen": [
+      "Abrir una sección con una escena ancha del oficio que pierde fuerza recortada en un círculo.",
+      "Decks presentados en sala o pantalla, donde la foto a pantalla completa tiene impacto."
+    ],
+    "avoidWhen": [
+      "Cuando la foto no trae una zona calma y oscura a la izquierda para la voz (reservar después de generar no existe).",
+      "Dos láminas seguidas a sangre (sección + respiro): se pierde la señal de «empieza algo nuevo».",
+      "Brochure impreso con mucho texto alrededor: se lee mejor la sección sobre papel."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "section-lens",
+        "when": "se quiere que el avance sea protagonista y la foto admite el círculo"
+      },
+      {
+        "recipe": "section-classic",
+        "when": "no hay foto con reserva izquierda"
+      },
+      {
+        "recipe": "breather",
+        "when": "no se abre una sección sino que se da una pausa dentro de ella"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-lens",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-classic",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-split",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "section",
+        "type": "section",
+        "required": true,
+        "example": "2 de 5",
+        "notes": "Da el indicador chico (anillo de la pieza `pieces.deck.content`, 80 px) y el eyebrow en mayúsculas «Sección n de N»."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "¿Quién decide el corte?",
+        "notes": "Una línea; no puede pasar el muro calmo (el sujeto empieza cerca del 40 % del ancho)."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 10,
+        "example": "El dato",
+        "notes": "Una línea corta; más larga, choca con el hombro del sujeto."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+        "notes": "Nativa 16:9 con el tercio izquierdo como muro calmo y oscuro declarado en la ficha (`reservas.texto`)."
+      }
+    ],
+    "fixed": [
+      "Foto a sangre, sin velos ni degradados agregados.",
+      "Indicador chico arriba a la izquierda (`surfaces.deck.recipes['section-bleed'].progress.indicator`), anillo al 40 % sobre oscuro, arco y esfera en el acento.",
+      "Voz blanca en la columna del margen de deck: eyebrow Poppins 500 en mayúsculas espaciadas, pregunta con anillo, respuesta con esfera (escala del token: 22 / 40 / 132).",
+      "Sin logo ni burbuja URL."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+      "ficha": "ai-generations/2026-09-26_deck-web-motion/fichas/P1-deck-lente-edicion.json",
+      "prompt": "ai-generations/2026-09-26_deck-web-motion/prompts/P1-deck-lente-edicion.txt",
+      "postprocess": [
+        "Sin uniforme en cuadro: no aplica foto:isotipo.",
+        "pnpm foto:validar <plate> --zona-texto para confirmar la reserva izquierda."
+      ],
+      "replaceable": "La foto de la sección; exige muro calmo a la izquierda y lecho oscuro abajo."
+    },
+    "prompts": {
+      "composition": "Compón una sección 16:9 con la foto documental a sangre (receta `surfaces.deck.recipes['section-bleed']`). Arriba a la izquierda, el indicador chico del deck (`pieces.deck.content`) que marca sección n de N; debajo, en el margen de deck y sobre el muro calmo que la ficha reservó, el eyebrow «SECCIÓN N DE N» en Poppins 500 mayúsculas espaciadas en el suave de la voz, la pregunta en Poppins Light blanca con su anillo en el acento y la respuesta en Bricolage 760 blanca con la esfera, a más de 3× la pregunta. Ningún texto toca al sujeto ni a su pantalla. Sin logo, sin burbuja, sin velos: si el contraste no da, se regenera el plate."
+    },
+    "renderSource": {
+      "script": "render-src/secciones-var.mjs",
+      "slideId": "S-sangre"
+    },
+    "rules": [
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita.",
+      "Nunca un scrim: el contraste de la voz lo da la reserva del plate.",
+      "Lámina interior con foto: sin logo de Efeonce (firman la portada y el cierre)."
+    ],
+    "notes": "Aprobada el 2026-09-27; en la norma (§4.6) y en el token de AXIS sigue como `option` con uso sólo en propuesta: subirla. Comparte el plate P1 con section-lens y content-measure: en un mismo deck, elegir una."
+  },
+  {
+    "id": "section-split",
+    "board": "DeckSeccionMedia72",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckSeccionMedia72.jpg",
+    "name": "Sección partida · la órbita sube por la izquierda",
+    "family": "section",
+    "documents": [
+      "proposal",
+      "brochure",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "split-paper-photo",
+    "communicates": "Una sección nueva con cara humana: el número y la respuesta sobre papel, y al lado una persona que carga el tono del tema.",
+    "useWhen": [
+      "Abrir una sección de brochure o propuesta cuando hay un retrato fuerte relacionado con el tema.",
+      "Alternar con secciones oscuras para dar ritmo claro/oscuro al documento.",
+      "Cuando el deck necesita mostrar personas sin pasar al registro cine."
+    ],
+    "avoidWhen": [
+      "Si la persona del retrato mira fuera de la lámina, hacia el borde opuesto al panel: la mirada saca al lector.",
+      "Si el plate no tiene su zona calma bajo la curva del panel.",
+      "Tres secciones partidas iguales seguidas: alternar la esquina (arriba, abajo) o el lado del panel."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "section-split-corner-bottom",
+        "when": "el sujeto ocupa la parte baja del cuadro o conviene que la curva abra arriba"
+      },
+      {
+        "recipe": "section-split-panel-end",
+        "when": "la persona mira hacia la derecha o la foto trae su reserva a la izquierda"
+      },
+      {
+        "recipe": "section-classic",
+        "when": "no hay retrato"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-split-corner-bottom",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-split-panel-end",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-classic",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "section",
+        "type": "section",
+        "required": true,
+        "example": "2 de 5",
+        "notes": "Da el número grande «02», el rótulo «Sección n de N» y el indicador de la esquina."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "¿Quién decide el corte?",
+        "notes": "Una línea, en navy, dentro del panel de papel."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "El dato",
+        "notes": "Una línea en navy; la esfera en `accentOnLight`."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_ronda-1x1/plates/Q3c-retrato-seccion.png",
+        "notes": "Retrato con la persona en la mitad derecha, mirando hacia el panel o hacia el lector; el 1:1 se recorta a la franja de la foto."
+      }
+    ],
+    "fixed": [
+      "Panel de papel en la mitad izquierda (`surfaces.deck.recipes['section-split'].panel`) con UNA esquina curva grande arriba a la derecha; la foto se extiende bajo la curva.",
+      "Indicador (pieza `pieces.deck.content`, anillo claro sobre papel) arriba a la izquierda: el arco nace abajo a la izquierda (≈ las 8) y avanza en sentido horario subiendo por la izquierda, con la esfera arriba a la izquierda en la sección 2 de 5 (corrección explícita del operador).",
+      "Número de sección en Bricolage 300 navy (escala del token), rótulo «Sección n de N» en Poppins 500 gris, pregunta y respuesta debajo.",
+      "Sin logo ni burbuja URL."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_ronda-1x1/plates/Q3c-retrato-seccion.png",
+      "ficha": "ai-generations/2026-09-26_ronda-1x1/fichas/Q3c-retrato-seccion.json",
+      "prompt": "ai-generations/2026-09-26_ronda-1x1/prompts/Q3c-retrato-seccion.txt",
+      "postprocess": [
+        "Sin uniforme (knit carbón liso): no aplica foto:isotipo.",
+        "El plate 1:1 se recorta en `cover` a la franja de foto de la receta."
+      ],
+      "replaceable": "El retrato se cambia por uno del tema de la sección, del equipo o del cliente, con la luz dura y la reserva de la ficha."
+    },
+    "prompts": {
+      "composition": "Compón la sección partida 16:9 (`surfaces.deck.recipes['section-split']`). A la izquierda, el panel de papel con una sola esquina curva grande arriba a la derecha; la foto del retrato ocupa la derecha y continúa bajo la curva. Dentro del panel, en el margen de deck y de arriba abajo: el indicador de sección (pieza `pieces.deck.content`) cuyo arco nace abajo a la izquierda y sube por la izquierda en sentido horario, con la esfera arriba a la izquierda; el número de sección grande en Bricolage 300 navy; «Sección n de N»; la pregunta en Poppins Light navy con su anillo en `accentOnLight`; y la respuesta en Bricolage 760 navy con la esfera en el mismo acento, a más de 3× la pregunta. Nada del texto sale del panel. Sin logo ni burbuja. La plantilla `pnpm brand:compose` de section-split todavía pinta el indicador subiendo por la derecha: no la uses tal cual hasta que se corrija."
+    },
+    "renderSource": {
+      "script": "render-src/secciones-sube.mjs",
+      "slideId": "S-sube-72"
+    },
+    "rules": [
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita.",
+      "El indicador sube por la IZQUIERDA con la esfera arriba a la izquierda (corrección del operador); nunca por la derecha.",
+      "El texto vive entero en el panel de papel; nunca sobre la foto.",
+      "Sobre papel: tinta navy y acento `accentOnLight`."
+    ],
+    "notes": "Aprobada el 2026-09-27 con la corrección del operador: la órbita-indicador sube por la izquierda. Choca con lo escrito: la norma §4.6 («el arco sube por la derecha»), el token AXIS (`progress.flipped`, referencia «el arco sube por la derecha», archivo DeckSeccionMedia) y la plantilla de `src/lib/brand-surfaces/recipes/deck.ts` (`sectionSplit`) describen la versión anterior; hay que actualizar los tres. Medido en los scripts: el arco barre (n−1) × 72° en un deck de 5 (72° en la 2 de 5, 144° en la 3, 216° en la 4), mientras la lente y la clásica barren n/N; está sin decidir si se unifica. El gris del rótulo «Sección n de N» no tiene token (pregunta abierta de TASK-1919)."
+  },
+  {
+    "id": "section-split-corner-bottom",
+    "board": "DeckSeccionMediaAbajo",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckSeccionMediaAbajo.jpg",
+    "name": "Sección partida · esquina abajo («¿Cuánto tarda tu campaña? En días.»)",
+    "family": "section",
+    "documents": [
+      "proposal",
+      "brochure",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "split-paper-photo",
+    "communicates": "La sección promete velocidad y la foto la actúa: la campaña se termina de armar en el muro mientras su director mira hacia la respuesta.",
+    "useWhen": [
+      "Abrir una sección sobre velocidad, producción o campaña, con una persona del equipo en acción.",
+      "Como variante de ritmo de la sección partida: la curva abajo abre el aire arriba del retrato.",
+      "Cuando el sujeto mira hacia el panel (hacia la izquierda) y lleva el uniforme de su registro de escena."
+    ],
+    "avoidWhen": [
+      "Si la promesa de la respuesta («en días») no se prueba en la lámina siguiente con una cifra con fuente.",
+      "Si el sujeto mira hacia fuera de la lámina.",
+      "Junto a otra sección partida con la misma esquina."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "section-split",
+        "when": "el retrato necesita aire abajo y la curva arriba"
+      },
+      {
+        "recipe": "section-split-panel-end",
+        "when": "la persona mira a la derecha"
+      },
+      {
+        "recipe": "content-measure",
+        "when": "la promesa ya viene con su cifra y conviene decirla medida"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-split",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-split-panel-end",
+        "relation": "variant"
+      },
+      {
+        "recipe": "content-measure",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "section",
+        "type": "section",
+        "required": true,
+        "example": "2 de 5",
+        "notes": "Da el número «03», «Sección n de N» y el arco del indicador."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 30,
+        "example": "¿Cuánto tarda tu campaña?",
+        "notes": "Una línea en navy."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "En días",
+        "notes": "Una línea; la curva inferior del panel empieza bajo la respuesta, no la toca."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_secciones-partidas/plates/SP2b-dias-no-meses-isotipo.png",
+        "notes": "Persona del equipo en la mitad derecha, mirando hacia el panel; la reserva izquierda oscura queda bajo el papel."
+      }
+    ],
+    "fixed": [
+      "Panel de papel en la mitad izquierda con UNA esquina curva grande abajo a la derecha; la foto sigue bajo la curva.",
+      "Indicador arriba a la izquierda: nace abajo a la izquierda y sube por la izquierda en sentido horario; la esfera marca el avance.",
+      "Número, rótulo, pregunta y respuesta con la misma escala y posiciones que section-split (respuesta algo mayor en la referencia).",
+      "Sin logo ni burbuja URL."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_secciones-partidas/plates/SP2b-dias-no-meses-isotipo.png",
+      "ficha": "ai-generations/2026-09-27_secciones-partidas/fichas/SP2b-dias-no-meses.json",
+      "prompt": "ai-generations/2026-09-27_secciones-partidas/prompts/SP2b-dias-no-meses.txt",
+      "postprocess": [
+        "pnpm foto:isotipo sobre el polo (ya aplicado: `SP2b-dias-no-meses-isotipo.json`, isotipo negativo de @efeoncepro/axis-brand-assets 0.3.4).",
+        "pnpm foto:emblema para revisar el bordado al 100 %."
+      ],
+      "replaceable": "La foto se cambia por la del tema de la sección con una persona del equipo en su uniforme por registro de escena."
+    },
+    "prompts": {
+      "composition": "Compón la sección partida con la esquina abajo: igual que `section-split`, pero el panel de papel lleva su única esquina curva grande abajo a la derecha. Arriba a la izquierda, el indicador (`pieces.deck.content`) que sube por la izquierda con la esfera marcando sección n de N; debajo, el número grande en Bricolage 300 navy, «Sección n de N», la pregunta con anillo en `accentOnLight` y la respuesta en Bricolage 760 navy con su esfera, a más de 3× la pregunta. La foto a la derecha, con el sujeto mirando hacia el panel. Sin logo ni burbuja."
+    },
+    "renderSource": {
+      "script": "render-src/secciones-var.mjs",
+      "slideId": "S-var-abajo"
+    },
+    "rules": [
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita.",
+      "El indicador sube por la izquierda (corrección del operador).",
+      "Una promesa en la respuesta exige su prueba con fuente en la lámina siguiente; la sección no lleva cifra.",
+      "Isotipo del uniforme siempre compuesto (`pnpm foto:isotipo`), nunca el del modelo."
+    ],
+    "notes": "Foto nueva SP2b de `ai-generations/2026-09-27_secciones-partidas/`. La ficha pide un «cinematic drama still» con una persona que no es Nexa: la norma limita el registro cine a Nexa protagonista o a `proposal-cinematic`; el operador aprobó la lámina, pero la excepción no está escrita: confirmarla o registrar la foto como puesta en escena. Arco medido en el script: (n−1) × 72° (144° en la 3 de 5)."
+  },
+  {
+    "id": "section-split-panel-end",
+    "board": "DeckSeccionMediaDerecha",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckSeccionMediaDerecha.jpg",
+    "name": "Sección partida · panel a la derecha («¿Qué responde la IA? Tu marca.»)",
+    "family": "section",
+    "documents": [
+      "proposal",
+      "brochure",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "split-paper-photo",
+    "communicates": "La escena del cliente llega primero: de noche, su directora descubre en el teléfono que la respuesta de la IA es su marca; el panel lo nombra.",
+    "useWhen": [
+      "Abrir una sección sobre el resultado del cliente (AEO, visibilidad, respuesta), cuando la protagonista es la persona del cliente.",
+      "Cuando la foto trae a la persona a la izquierda y la mirada o la acción apuntan hacia la derecha.",
+      "Para alternar el lado del panel dentro de una serie de secciones partidas."
+    ],
+    "avoidWhen": [
+      "Si la persona mira hacia el borde izquierdo: el panel a la derecha la dejaría mirando fuera.",
+      "Si la pieza muestra una respuesta de IA legible en la pantalla: no se inventa una interfaz de terceros."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "section-split",
+        "when": "la persona está a la derecha del cuadro"
+      },
+      {
+        "recipe": "section-split-corner-bottom",
+        "when": "se quiere el panel a la izquierda con la curva abajo"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-split",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-split-corner-bottom",
+        "relation": "variant"
+      }
+    ],
+    "slots": [
+      {
+        "name": "section",
+        "type": "section",
+        "required": true,
+        "example": "2 de 5",
+        "notes": "Da el número «04», «Sección n de N» y el arco."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 30,
+        "example": "¿Qué responde la IA?",
+        "notes": "Una línea en navy dentro del panel derecho."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Tu marca",
+        "notes": "Una línea; el panel termina en el borde derecho del lienzo."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_secciones-partidas/plates/SP1-la-ia-te-cita.png",
+        "notes": "La persona en la mitad izquierda; la ficha reserva su oscuro a un lado y el plate se espeja al componer para que la acción apunte al panel."
+      }
+    ],
+    "fixed": [
+      "Panel de papel en la mitad derecha con UNA esquina curva grande arriba a la izquierda; la foto ocupa la izquierda y sigue bajo la curva.",
+      "Columna de voz dentro del panel, alineada a su margen interior; indicador arriba a la izquierda de la columna, subiendo por la izquierda en sentido horario (en la 4 de 5 la esfera ya pasó la cima).",
+      "Número Bricolage 300 navy, rótulo gris, pregunta con anillo `accentOnLight`, respuesta navy con esfera.",
+      "Sin logo ni burbuja URL."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_secciones-partidas/plates/SP1-la-ia-te-cita.png",
+      "ficha": "ai-generations/2026-09-27_secciones-partidas/fichas/SP1-la-ia-te-cita.json",
+      "prompt": "ai-generations/2026-09-27_secciones-partidas/prompts/SP1-la-ia-te-cita.txt",
+      "postprocess": [
+        "Espejado horizontal al componer (sharp `flop`) para que la persona quede a la izquierda mirando hacia el panel.",
+        "Sin uniforme Efeonce (blazer del cliente): no aplica foto:isotipo."
+      ],
+      "replaceable": "La escena de la persona del cliente; se cambia por la del cliente real sólo con su autorización de imagen."
+    },
+    "prompts": {
+      "composition": "Compón la sección partida espejada: panel de papel en la mitad derecha con una sola esquina curva grande arriba a la izquierda y la foto a la izquierda, extendida bajo la curva (plate espejado si hace falta para que la persona actúe hacia el panel). Dentro del panel, en su margen interior: el indicador (`pieces.deck.content`) que sube por la izquierda con la esfera marcando sección n de N; el número grande en Bricolage 300 navy; «Sección n de N»; la pregunta en Poppins Light navy con su anillo en `accentOnLight`; y la respuesta en Bricolage 760 navy con la esfera, a más de 3× la pregunta. Sin logo ni burbuja, sin texto sobre la foto."
+    },
+    "renderSource": {
+      "script": "render-src/secciones-var.mjs",
+      "slideId": "S-var-derecha"
+    },
+    "rules": [
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita.",
+      "El indicador sube por la izquierda aunque el panel esté a la derecha (corrección del operador).",
+      "La pantalla del teléfono no muestra una interfaz legible de terceros."
+    ],
+    "notes": "Foto nueva SP1 de `ai-generations/2026-09-27_secciones-partidas/`, compuesta espejada. Como SP2b, la ficha pide un «cinematic drama still» sin Nexa: excepción al registro cine aprobada en el canvas pero no escrita en la norma. Ninguna receta de AXIS describe todavía el panel a la derecha; el token de section-split fija `panel.side: start`. Arco medido: (n−1) × 72° (216° en la 4 de 5)."
+  },
+  {
+    "id": "content-measure",
+    "board": "DeckContenidoFoto",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckContenidoFoto.jpg",
+    "name": "Contenido · la órbita mide la cifra",
+    "family": "content",
+    "documents": [
+      "proposal",
+      "brochure",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "dark",
+    "communicates": "Una cifra es la respuesta y el arco de la lente la dibuja: el lector ve el porcentaje antes de leerlo.",
+    "useWhen": [
+      "Cuando el hallazgo o el resultado principal es UN porcentaje real con fuente.",
+      "Resultados, diagnósticos y QBR donde una métrica explica la sección.",
+      "Hasta dos cifras de apoyo, cada una con su fuente."
+    ],
+    "avoidWhen": [
+      "Si la cifra no es un porcentaje entre 0 y 100: el arco no puede medir días, montos ni multiplicadores.",
+      "Si no hay fuente: sin fuente no hay prueba (en plantillas vale «Datos de muestra», nunca en un entregable).",
+      "Justo después de una sección con lente: dos lentes seguidas.",
+      "Cuando hay que comparar varias cifras: eso es un gráfico."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "content-focus",
+        "when": "la prueba se entiende mejor como una frase con una persona iluminada"
+      },
+      {
+        "recipe": "decision-chart",
+        "when": "hay más de dos cifras o una serie en el tiempo"
+      },
+      {
+        "recipe": "decision-why-us",
+        "when": "son varias cifras de credenciales, cada una con fuente"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "content-focus",
+        "relation": "variant"
+      },
+      {
+        "recipe": "section-lens",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 28,
+        "example": "Resultados · 3 de 5",
+        "notes": "Poppins 500 en mayúsculas espaciadas; nombre de la sección y posición."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 38,
+        "example": "¿Cuántos cortes pasan a la primera?",
+        "notes": "Una línea que termina antes del anillo de la lente."
+      },
+      {
+        "name": "measure",
+        "type": "metric",
+        "required": true,
+        "maxChars": 5,
+        "example": "62 %",
+        "notes": "Valor entre 0 y 1 que barre el arco desde las 12 (0,62 → 62 % del círculo) + fuente. Se escribe como respuesta gigante con su esfera."
+      },
+      {
+        "name": "body",
+        "type": "text",
+        "required": true,
+        "maxChars": 90,
+        "example": "de los cortes se aprueban sin cambios. El arco de la lente recorre ese 62 %.",
+        "notes": "Dos líneas como máximo; completa la frase de la cifra."
+      },
+      {
+        "name": "figures",
+        "type": "list",
+        "required": false,
+        "maxChars": 8,
+        "example": "12 días · de idea a pieza; −38 % · costo por lead",
+        "notes": "Hasta 2 `metric` (valor ≤ 8 caracteres, etiqueta ≤ 22, fuente obligatoria)."
+      },
+      {
+        "name": "source",
+        "type": "text",
+        "required": true,
+        "maxChars": 60,
+        "example": "Datos de muestra",
+        "notes": "La fuente de la cifra; en un entregable real, la fuente citada."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+        "notes": "Foto del oficio que produjo la cifra, con el sujeto contenido en el círculo."
+      }
+    ],
+    "fixed": [
+      "Lente de portada de deck (`pieces.lens['deck-cover']`) a la derecha, con el arco desde las 12 barriendo el valor × 360° y la esfera donde termina.",
+      "Fondo oscuro Efeonce; la foto sólo dentro del círculo.",
+      "Escala de voces del token `surfaces.deck.recipes['content-measure'].type` (eyebrow, pregunta, cifra, cuerpo, cifras de apoyo y nota).",
+      "Sin logo ni burbuja URL."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+      "ficha": "ai-generations/2026-09-26_deck-web-motion/fichas/P1-deck-lente-edicion.json",
+      "prompt": "ai-generations/2026-09-26_deck-web-motion/prompts/P1-deck-lente-edicion.txt",
+      "postprocess": [
+        "Sin uniforme en cuadro: no aplica foto:isotipo."
+      ],
+      "replaceable": "La foto del oficio relacionado con la cifra; la cifra y su fuente se cambian por las del cliente."
+    },
+    "prompts": {
+      "composition": "Compón la lámina `content-measure` con `pnpm brand:compose -- --intent src/lib/brand-surfaces/examples/deck-content-measure-intent.json` cambiando `voice`, `measure.value`, `measure.source`, `body`, `figures` y `photo`. Sobre el fondo oscuro Efeonce: a la derecha la lente de portada con la foto dentro y el arco que barre exactamente el valor medido desde las 12; a la izquierda, en el margen de deck, el eyebrow, la pregunta con su anillo, la cifra gigante en Bricolage 760 blanca con la esfera, el cuerpo que completa la frase, hasta dos cifras de apoyo con su etiqueta y la fuente al pie. Ningún texto entra al anillo; nada de logo ni burbuja."
+    },
+    "renderSource": {
+      "script": "render-src/contenido2.mjs",
+      "slideId": "C-mide"
+    },
+    "rules": [
+      "El arco mide el valor real: nunca un arco decorativo ni redondeado a ojo.",
+      "Cifras sólo con fuente citada en la lámina; «Datos de muestra» sólo en plantillas y ejemplos.",
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita.",
+      "Lámina interior con foto: sin logo de Efeonce (firman la portada y el cierre)."
+    ],
+    "notes": "Receta aprobada en la norma (§4.6) y con plantilla en el catálogo `graphic-line-deck` (TASK-1919). La lámina lleva dos esferas por diseño: la del arco de la lente (la órbita) y la que cierra la respuesta (la voz). Comparte el plate P1 con section-lens y section-bleed."
+  },
+  {
+    "id": "content-focus",
+    "board": "DeckContenidoFoco",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckContenidoFoco.jpg",
+    "name": "Contenido · el foco sobre la prueba",
+    "family": "proof",
+    "documents": [
+      "proposal",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "photo-bleed",
+    "communicates": "La respuesta es una frase corta y la prueba una cifra; el círculo de luz pone la persona que la logró en el centro.",
+    "useWhen": [
+      "Cuando el resultado se dice mejor como frase («A la primera.») y la cifra la respalda.",
+      "Para poner cara al resultado: una persona del equipo en su uniforme, mirando al lector.",
+      "Como variante de content-measure en el mismo deck, para no repetir la lente."
+    ],
+    "avoidWhen": [
+      "Sin una cifra con fuente que respalde la frase.",
+      "Si la foto no tiene una sola persona clara donde caiga el foco.",
+      "En brochure sin presentador, si la frase necesita contexto que la lámina no da."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "content-measure",
+        "when": "la cifra es un porcentaje y es el mensaje principal"
+      },
+      {
+        "recipe": "decision-testimonial",
+        "when": "la prueba es una cita del cliente"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "content-measure",
+        "relation": "variant"
+      },
+      {
+        "recipe": "breather",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 28,
+        "example": "Resultados · 3 de 5",
+        "notes": "Poppins 500 en mayúsculas espaciadas."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 44,
+        "example": "¿Cuántos cortes pasan a la primera?",
+        "notes": "Hasta dos líneas de ~22 caracteres; la columna termina antes del círculo de luz."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 16,
+        "example": "A la primera",
+        "notes": "Hasta dos líneas de ≤ 9 caracteres (se parte antes de la última palabra); la esfera cierra la última."
+      },
+      {
+        "name": "proof",
+        "type": "metric",
+        "required": true,
+        "maxChars": 6,
+        "example": "62 %",
+        "notes": "Cifra en Bricolage en el acento (texto grande, D1 lo admite) + frase + fuente."
+      },
+      {
+        "name": "proofText",
+        "type": "text",
+        "required": true,
+        "maxChars": 70,
+        "example": "de los cortes se aprueban sin cambios.",
+        "notes": "Dos líneas como máximo, en el suave de la voz."
+      },
+      {
+        "name": "source",
+        "type": "text",
+        "required": true,
+        "maxChars": 60,
+        "example": "Datos de muestra",
+        "notes": "Fuente de la cifra."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+        "notes": "Una persona del equipo a la derecha del centro, mirando al lente, con la escena en penumbra."
+      }
+    ],
+    "fixed": [
+      "El foco de AXIS (`spotlightRecipe('photo')`): la escena en penumbra y un círculo de luz sobre la persona, con su arco corto y su esfera en el acento.",
+      "Columna de voz a la izquierda en el margen de deck; respuesta gigante blanca en dos líneas; prueba en el acento a tamaño de titular.",
+      "Nota de fuente al pie izquierdo; sin logo ni burbuja URL."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "puesta-en-escena",
+      "plate": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+      "ficha": "ai-generations/2026-09-26_web-hero/fichas/H1b-estratega-uniforme.json",
+      "prompt": "ai-generations/2026-09-26_web-hero/prompts/H1b-estratega-uniforme.txt",
+      "postprocess": [
+        "pnpm foto:emblema sobre el polo y el lanyard (la carpeta trae `emblemas-al-100.jpg`); si el emblema difiere del oficial, pnpm foto:isotipo. No hay procedencia de foto:isotipo junto al plate."
+      ],
+      "replaceable": "La persona del equipo que representa el resultado; la cifra y la frase se cambian por las del cliente."
+    },
+    "prompts": {
+      "composition": "Compón la lámina de foco sobre una foto de puesta en escena a sangre: pinta `spotlightRecipe('photo')` de AXIS para dejar la escena en penumbra y un círculo de luz, con su arco corto y su esfera, sobre la persona que mira al lente. A la izquierda, en el margen de deck: eyebrow en mayúsculas espaciadas, la pregunta en Poppins Light en dos líneas con su anillo, la respuesta en Bricolage 760 blanca en dos líneas cerrada por la esfera, la prueba (la cifra) en Bricolage en el acento a tamaño de titular, su frase en el suave de la voz y la fuente al pie. El texto no entra al círculo de luz. Sin logo ni burbuja."
+    },
+    "renderSource": {
+      "script": "render-src/foco2.mjs",
+      "slideId": "C-foco2"
+    },
+    "rules": [
+      "La cifra de prueba lleva fuente citada; sin fuente, no hay lámina.",
+      "El acento sólo en texto de 24 px o más (la cifra); la frase de prueba va en el suave de la voz.",
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita.",
+      "Lámina interior con foto: sin logo de Efeonce (firman la portada y el cierre)."
+    ],
+    "notes": "Aprobada el 2026-09-27; en la norma y en AXIS sigue como `option` (uso sólo en propuesta). La versión aprobada es la de `foco2.mjs` (estratega con uniforme, plate H1b); `contenido2.mjs` `C-foco` es la anterior con el plate P2 y no es la referencia. Lleva el arco con su esfera del foco y la esfera de la respuesta."
+  },
+  {
+    "id": "breather",
+    "board": "DeckRespiro",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckRespiro.jpg",
+    "name": "Respiro · foto a sangre y sólo la voz",
+    "family": "breather",
+    "documents": [
+      "proposal",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "photo-bleed",
+    "communicates": "Una pausa con remate: la foto cuenta el momento y la voz lo cierra en una palabra.",
+    "useWhen": [
+      "Después de dos o tres láminas densas, para bajar el ritmo sin perder el hilo.",
+      "Para cerrar una sección con su desenlace humano (el cliente aprueba, el equipo celebra).",
+      "Cuando la foto se entiende sola y la respuesta la remata."
+    ],
+    "avoidWhen": [
+      "Si la lámina tiene que probar algo: un respiro no lleva cifra ni fuente.",
+      "Seguido de otra lámina a sangre (sección a sangre, tríptico).",
+      "Si la foto no tiene muro calmo a la izquierda para la voz."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "content-focus",
+        "when": "la pausa necesita una prueba"
+      },
+      {
+        "recipe": "section-bleed",
+        "when": "lo que viene es una sección nueva, no una pausa"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "content-focus",
+        "relation": "sequence"
+      },
+      {
+        "recipe": "contact-sheet",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "section",
+        "type": "section",
+        "required": true,
+        "example": "2 de 5",
+        "notes": "Da el indicador chico arriba a la derecha (pieza `pieces.deck.content`): la pausa sigue siendo parte de la sección."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "¿Y el cliente?",
+        "notes": "Una línea corta."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 12,
+        "example": "Aprobó",
+        "notes": "Una palabra idealmente; la esfera la cierra."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-web-motion/plates/P2-web-hero-taller.png",
+        "notes": "Foto documental 16:9 con el momento en la mitad derecha y el muro calmo a la izquierda."
+      }
+    ],
+    "fixed": [
+      "Foto a sangre sin velos.",
+      "Indicador chico arriba a la derecha, anillo al 40 % sobre oscuro.",
+      "Voz en el margen de deck a media altura (reservas del token `surfaces.deck.recipes.breather`): pregunta con anillo y respuesta con esfera; sin eyebrow ni cuerpo.",
+      "Sin logo ni burbuja URL."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_deck-web-motion/plates/P2-web-hero-taller.png",
+      "ficha": "ai-generations/2026-09-26_deck-web-motion/fichas/P2-web-hero-taller.json",
+      "prompt": "ai-generations/2026-09-26_deck-web-motion/prompts/P2-web-hero-taller.txt",
+      "postprocess": [
+        "Sin uniforme en cuadro: no aplica foto:isotipo."
+      ],
+      "replaceable": "El momento del cliente o del equipo que cierra la sección; con la reserva izquierda declarada en la ficha."
+    },
+    "prompts": {
+      "composition": "Compón un respiro 16:9 (`surfaces.deck.recipes.breather`): la foto documental a sangre, el indicador chico del deck arriba a la derecha marcando sección n de N, y a media altura, en el margen izquierdo y sobre el muro calmo, sólo la voz: la pregunta en Poppins Light blanca con su anillo y la respuesta en Bricolage 760 blanca de una o dos palabras con su esfera, a más de 3× la pregunta. Nada más: sin eyebrow, cifra, logo ni burbuja."
+    },
+    "renderSource": {
+      "script": "render-src/deck-web.mjs",
+      "slideId": "D3-respiro"
+    },
+    "rules": [
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita.",
+      "El respiro no lleva cifras ni cuerpo de texto.",
+      "Lámina interior con foto: sin logo de Efeonce (firman la portada y el cierre)."
+    ],
+    "notes": "Aprobada el 2026-09-27; en la norma y en AXIS figura como `option`. El plate P2 aparece también en la hoja de contactos y en el hero web: no repetirlo dentro del mismo deck."
+  },
+  {
+    "id": "contact-sheet",
+    "board": "DeckMosaico",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckMosaico.jpg",
+    "name": "Varias fotos · hoja de contactos con profundidad",
+    "family": "content",
+    "documents": [
+      "proposal",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "dark",
+    "communicates": "Elegimos con criterio: de varias tomas reales, dirección de arte marca la que sale al cliente.",
+    "useWhen": [
+      "Mostrar un proceso creativo con varias tomas reales y la decisión sobre ellas.",
+      "Presentar alternativas de una producción y cuál se recomienda.",
+      "Cuando hay entre 3 y 4 fotos del mismo proyecto con un hilo narrativo en los pies."
+    ],
+    "avoidWhen": [
+      "Con fotos de formatos distintos que habría que recortar: todas nativas 16:9.",
+      "Si no hay una elegida: sin decisión, la lámina es un collage.",
+      "Con más de 4 tomas: la tira se vuelve ruido."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "triptych",
+        "when": "las tomas son tres momentos de un proceso y ninguna se elige sobre las otras"
+      },
+      {
+        "recipe": "breather",
+        "when": "basta una sola foto"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "triptych",
+        "relation": "variant"
+      },
+      {
+        "recipe": "breather",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 32,
+        "example": "¿Cuál sale al cliente?",
+        "notes": "Hasta dos líneas de ~16 caracteres; la columna termina antes de la selección."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 6,
+        "example": "Ésta",
+        "notes": "Una palabra (la respuesta es enorme); la esfera la cierra."
+      },
+      {
+        "name": "chosen",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-mosaico-documental/plates/L2-terreno-panaderia.png",
+        "notes": "La toma elegida, nativa 16:9, en grande y con sombra."
+      },
+      {
+        "name": "alternatives",
+        "type": "list",
+        "required": true,
+        "maxChars": 30,
+        "example": "02 · El corte; 03 · Revisión en mesa de luz; 04 · El cliente la aprueba",
+        "notes": "Exactamente 3 `image` 16:9 con su pie (número · momento, ≤ 30 caracteres)."
+      },
+      {
+        "name": "collaborator",
+        "type": "enum",
+        "required": true,
+        "maxChars": 20,
+        "example": "Dirección de arte",
+        "notes": "Etiqueta del cursor del colaborador (rol o departamento que decide)."
+      }
+    ],
+    "fixed": [
+      "Fondo navy con caída de luz radial hacia la toma elegida (profundidad de mesa de revisión).",
+      "Medidas de la hoja del token `surfaces.deck.recipes['contact-sheet'].sheet`: la elegida grande y la tira de 3 debajo, con sombras.",
+      "Marcas de corte en el azul del token (`sheet.cropMarks`) alrededor de las tres alternativas.",
+      "Selección AXIS de ocho manijas sobre la elegida, con velo sutil, y el cursor del colaborador abajo a la izquierda (escala del token).",
+      "Voz a la izquierda a media altura; sin indicador, sin logo, sin burbuja URL."
+    ],
+    "selection": {
+      "kind": "collaborator",
+      "label": "Dirección de arte",
+      "target": "la toma elegida (objeto), ocho manijas; cursor anclado abajo a la izquierda"
+    },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_deck-mosaico-documental/plates/L2-terreno-panaderia.png",
+      "ficha": "ai-generations/2026-09-26_deck-mosaico-documental/fichas/L2-terreno-panaderia.json",
+      "prompt": "ai-generations/2026-09-26_deck-mosaico-documental/prompts/L2-terreno-panaderia.txt",
+      "postprocess": [
+        "Sin uniforme Efeonce en las tomas: no aplica foto:isotipo."
+      ],
+      "replaceable": "Las cuatro tomas son del proyecto real. Plates del ejemplo: elegida ai-generations/2026-09-26_deck-mosaico-documental/plates/L2-terreno-panaderia.png; tira ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png, ai-generations/2026-09-26_deck-mosaico-documental/plates/L1-mesa-de-luz.png, ai-generations/2026-09-26_deck-web-motion/plates/P2-web-hero-taller.png."
+    },
+    "prompts": {
+      "composition": "Compón una hoja de contactos 16:9 sobre el fondo navy con una caída de luz radial hacia la toma elegida (`surfaces.deck.recipes['contact-sheet']`). A la derecha, la toma elegida en grande con sombra profunda y, debajo, la tira de tres alternativas con sombra, marcas de corte en el azul del token y su pie «NN · momento» en Poppins Light gris suave. Sobre la elegida, la selección de `efeonce.collaboration-selection` (ocho manijas, velo sutil) resuelta con `resolveCollaborationSelectionIntent` y pintada con `renderCollaborationSelection`, con el cursor del colaborador («Dirección de arte») anclado abajo a la izquierda. A la izquierda, a media altura: la pregunta en Poppins Light en dos líneas con su anillo y la respuesta de una palabra en Bricolage 760 enorme con su esfera. Sin indicador, logo ni burbuja."
+    },
+    "renderSource": {
+      "script": "render-src/contactos.mjs",
+      "slideId": "X-contactos"
+    },
+    "rules": [
+      "La selección toma una sola cosa: la toma elegida. Nunca una persona dentro de la foto.",
+      "Todas las tomas nativas 16:9; no se recortan formatos lejanos.",
+      "Los pies van en gris suave, nunca en el acento (texto de menos de 24 px).",
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita."
+    ],
+    "notes": "Aprobada el 2026-09-27 («con profundidad»); en la norma y en AXIS sigue como `option`. `mosaico.mjs` es una versión anterior (mosaico plano y tríptico 4:5) que no es la referencia. El token declara el cursor con `participantKind: role`; el script usó `department`: alinear. Fichas del ejemplo: ai-generations/2026-09-26_deck-mosaico-documental/fichas/L2-terreno-panaderia.json, ai-generations/2026-09-26_deck-web-motion/fichas/P1-deck-lente-edicion.json, ai-generations/2026-09-26_deck-mosaico-documental/fichas/L1-mesa-de-luz.json, ai-generations/2026-09-26_deck-web-motion/fichas/P2-web-hero-taller.json."
+  },
+  {
+    "id": "triptych",
+    "board": "DeckTriptico",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckTriptico.jpg",
+    "name": "Tríptico · Escucha. Crea. Mide.",
+    "family": "method",
+    "documents": [
+      "proposal",
+      "brochure",
+      "pitch",
+      "qbr"
+    ],
+    "surface": "photo-bleed",
+    "communicates": "Así trabajamos: tres momentos reales del equipo, del cliente al estudio y de vuelta al cliente, en tres palabras.",
+    "useWhen": [
+      "Explicar el método o la forma de trabajo en tres pasos con fotos reales del equipo.",
+      "Brochure o propuesta que necesita mostrar el oficio a la vista en una sola lámina.",
+      "Cuando hay tres tomas verticales nativas del mismo proyecto o del mismo equipo."
+    ],
+    "avoidWhen": [
+      "Con fotos horizontales recortadas a vertical: las tomas nacen 9:16.",
+      "Con más o menos de tres pasos.",
+      "Si los pasos necesitan explicación: eso es una lámina de viñetas o el método por niveles."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "method-staircase",
+        "when": "el método es por niveles y la imagen es el propio método"
+      },
+      {
+        "recipe": "contact-sheet",
+        "when": "las fotos son alternativas de una misma toma y hay una elegida"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "contact-sheet",
+        "relation": "variant"
+      },
+      {
+        "recipe": "method-staircase",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 22,
+        "example": "¿Cómo trabajamos?",
+        "notes": "Arriba a la izquierda, sobre el primer panel."
+      },
+      {
+        "name": "words",
+        "type": "list",
+        "required": true,
+        "maxChars": 9,
+        "example": "Escucha; Crea; Mide",
+        "notes": "Exactamente 3 palabras, una por panel, ≤ 9 caracteres cada una."
+      },
+      {
+        "name": "panels",
+        "type": "list",
+        "required": true,
+        "example": "ai-generations/2026-09-26_deck-triptico-v2/plates/T1-escucha.png; ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png; ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+        "notes": "Exactamente 3 `image` verticales nativas 9:16, con el lecho oscuro abajo donde va la palabra."
+      }
+    ],
+    "fixed": [
+      "Tres paneles verticales a altura completa separados por un canal fino (`surfaces.deck.recipes.triptych.panels`).",
+      "Lecho de la pregunta: difuminado de la foto con máscara y degradé navy del token (`questionBed`), sólo en la esquina superior izquierda.",
+      "Palabras en Bricolage 760 blancas sobre el lecho oscuro de cada toma, a la misma altura (`reserves.phrase`).",
+      "Sin indicador, logo ni burbuja URL."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "documental",
+      "plate": "ai-generations/2026-09-26_deck-triptico-v2/plates/T1-escucha.png",
+      "ficha": "ai-generations/2026-09-26_deck-triptico-v2/fichas/T1-escucha.json",
+      "prompt": "ai-generations/2026-09-26_deck-triptico-v2/prompts/T1-escucha.txt",
+      "postprocess": [
+        "pnpm foto:emblema sobre el polo (T1), el hoodie (T2) y la softshell (T3); no hay procedencia de foto:isotipo junto a los plates: si el emblema difiere, pnpm foto:isotipo."
+      ],
+      "replaceable": "Las tres tomas se cambian por momentos reales del proyecto; cada una en el uniforme de su registro de escena. Plates: ai-generations/2026-09-26_deck-triptico-v2/plates/T1-escucha.png, ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png, ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png."
+    },
+    "prompts": {
+      "composition": "Compón el tríptico 16:9 (`surfaces.deck.recipes.triptych`, plantilla `pnpm brand:compose` con `deck-triptych-intent.json`): tres tomas verticales nativas a sangre separadas por un canal fino; arriba a la izquierda, sobre el lecho difuminado del primer panel, la pregunta en Poppins Light con su anillo; abajo, sobre el lecho oscuro de cada toma y alineadas, las tres palabras en Bricolage 760 blancas. La referencia aprobada cierra cada palabra con su esfera; la norma y la plantilla piden una sola frase con la esfera sólo al final: sigue la referencia aprobada sólo si el operador confirma la excepción, y en caso contrario usa la frase única. Sin indicador, logo ni burbuja."
+    },
+    "renderSource": {
+      "script": "render-src/triptico4.mjs",
+      "slideId": "X-triptico4"
+    },
+    "rules": [
+      "Tres tomas verticales nativas; nunca recortes desde otro formato.",
+      "Las palabras van sobre el lecho oscuro de cada toma, no sobre el sujeto.",
+      "Una sola órbita en la lámina (aquí no hay órbita: sólo la voz)."
+    ],
+    "notes": "CONTRADICCIÓN A RESOLVER POR EL OPERADOR: la referencia aprobada muestra «Escucha.», «Crea.» y «Mide.», cada una con su esfera (tres esferas); la norma §4.6, el token AXIS (`voice.mode: phrase-across-panels`, «la esfera sólo al final») y la plantilla del Artifact Composer (que exige la frase «Escucha, | crea | y mide.») piden una sola esfera. El comentario del script también dice frase única, pero el código pinta una esfera por palabra. No se decide aquí: la regla de «una esfera por pieza» sigue vigente hasta que el operador registre la excepción."
+  },
+  {
+    "id": "section-cine-services",
+    "board": "DeckBrochurePortadaOrbita",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckBrochurePortadaOrbita.jpg",
+    "name": "Sección de cine · abre los servicios («¿Qué hace Efeonce? Crecer.»)",
+    "family": "section",
+    "documents": [
+      "brochure",
+      "proposal"
+    ],
+    "surface": "cine",
+    "communicates": "Lo que hace Efeonce cabe en una palabra, y el lector es quien la elige.",
+    "useWhen": [
+      "Abrir la sección de servicios de un brochure o de una propuesta.",
+      "Cuando el documento ya tiene su portada y se necesita un golpe visual antes de las láminas de servicio (proposal-cinematic)."
+    ],
+    "avoidWhen": [
+      "Como portada: el operador la reubicó como lámina interior (la portada de brochure es otra receta).",
+      "Dos láminas de cine con Nexa seguidas.",
+      "Si la respuesta no es una sola palabra: la selección y el cursor no caben."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "section-cine-team",
+        "when": "la sección que se abre es la del equipo"
+      },
+      {
+        "recipe": "section-classic",
+        "when": "el documento no usa registro cine"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-cine-team",
+        "relation": "variant"
+      },
+      {
+        "recipe": "proposal-cinematic",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "Servicios · 2026",
+        "notes": "Poppins 500 en mayúsculas espaciadas, al lado del logo."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 20,
+        "example": "¿Qué hace Efeonce?",
+        "notes": "Una línea; más larga cruza el haz de la órbita (caso real: «¿Qué hacemos por tu marca?» se acortó a esta)."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 8,
+        "example": "Crecer",
+        "notes": "Una sola palabra: la selección de ocho manijas y el cursor van a su derecha."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png",
+        "notes": "Registro cine con Nexa protagonista en la mitad derecha, mirando al lente; el 45 % izquierdo oscuro y calmo."
+      }
+    ],
+    "fixed": [
+      "Cabeza de la receta `section-cine` tal como la referencia: logo negativo de Efeonce arriba a la izquierda y el eyebrow a su lado.",
+      "Voz en la mitad baja de la columna izquierda: pregunta con anillo teal y respuesta en Bricolage 760 con su esfera (escala del token `section-cine`).",
+      "Selección de ocho manijas sobre la respuesta y cursor propio a su derecha (contrato `efeonce.collaboration-selection`).",
+      "Sin indicador de deck y sin burbuja URL."
+    ],
+    "selection": {
+      "kind": "local-cta",
+      "label": "",
+      "target": "la respuesta «Crecer.» con su esfera: ocho manijas y cursor propio anclado a su derecha, al centro"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png",
+      "ficha": "ai-generations/2026-09-27_brochure/fichas/BR1-portada-orbita.json",
+      "prompt": "ai-generations/2026-09-27_brochure/prompts/BR1-portada-orbita.txt",
+      "postprocess": [
+        "pnpm foto:isotipo sobre la softshell (ya aplicado: `BR1b-portada-orbita-isotipo.json`, isotipo negativo de @efeoncepro/axis-brand-assets 0.3.4).",
+        "pnpm foto:emblema para revisar al 100 %."
+      ],
+      "replaceable": "No se cambia por cliente: es una lámina de marca propia."
+    },
+    "prompts": {
+      "composition": "Compón la sección de cine de servicios (`surfaces.deck.recipes['section-cine']`, layout `services`): la foto de cine a sangre con Nexa en la mitad derecha y la órbita de luz de la escena; arriba a la izquierda el logo negativo de Efeonce y a su lado el eyebrow en mayúsculas espaciadas; en la mitad baja de la columna izquierda, la pregunta en Poppins Light con su anillo teal y la respuesta de una palabra en Bricolage 760 con su esfera, a más de 3× la pregunta. Sobre la respuesta, con `paintSelection`/`renderCollaborationSelection`, la selección de ocho manijas que incluye la esfera y el cursor propio anclado a la derecha al centro. Ningún texto cruza el haz de la órbita ni a Nexa. Sin indicador ni burbuja."
+    },
+    "renderSource": {
+      "script": "render-src/brochure.mjs",
+      "slideId": "BRO-portada-orbita"
+    },
+    "rules": [
+      "Registro cine permitido porque Nexa es la protagonista.",
+      "La órbita de luz es de la foto; la única esfera de la voz es la de la respuesta.",
+      "La selección incluye la esfera y nunca toca a la persona; un solo cursor en 16:9.",
+      "Ningún texto cruza la órbita ni al sujeto.",
+      "Isotipo del uniforme compuesto, nunca el del modelo."
+    ],
+    "notes": "Nació como portada de brochure («Nexa frente a la órbita») y el operador la reubicó como lámina interior que abre la sección de servicios. AXIS la tiene como layout `services` de `section-cine` en estado `option`: subir a `approved`. Pendiente del operador (norma §6, fila 19, y AXIS): la referencia conserva el logo chico de cuando era portada, que choca con «lámina con foto sin logo»."
+  },
+  {
+    "id": "section-cine-team",
+    "board": "DeckBrochurePortadaEquipo",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckBrochurePortadaEquipo.jpg",
+    "name": "Sección de cine · abre el equipo («¿Quién hace crecer tu marca? Este equipo.»)",
+    "family": "section",
+    "documents": [
+      "brochure",
+      "proposal"
+    ],
+    "surface": "cine",
+    "communicates": "Detrás del crecimiento hay personas y agentes trabajando juntos, y este es el equipo que lo hace.",
+    "useWhen": [
+      "Abrir la sección del equipo en un brochure o una propuesta, antes de la lámina con las personas asignadas.",
+      "Cuando conviene presentar el modelo humano + agentes antes de los nombres."
+    ],
+    "avoidWhen": [
+      "Como portada: se reubicó como interior.",
+      "Si la propuesta presenta un equipo con nombres distintos al de la foto: la foto es de marca, no el equipo asignado.",
+      "Junto a otra lámina de cine con Nexa."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "content-team",
+        "when": "hay que mostrar el equipo real asignado con nombres y roles"
+      },
+      {
+        "recipe": "section-cine-about",
+        "when": "se quiere presentar a Efeonce, no abrir la sección del equipo"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-cine-services",
+        "relation": "variant"
+      },
+      {
+        "recipe": "content-team",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "Nuestro equipo",
+        "notes": "Al lado del logo, en mayúsculas espaciadas."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 40,
+        "example": "¿Quién hace crecer tu marca?",
+        "notes": "Hasta dos líneas de ~20 caracteres; la primera persona empieza pasado el 38 % del ancho."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 16,
+        "example": "Este equipo",
+        "notes": "Dos líneas de ≤ 9 caracteres; la segunda no puede llegar al agente de abajo."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+        "notes": "Registro cine: Nexa al frente del equipo en uniformes y los agentes mini robots, todos mirando al lente, en la mitad derecha."
+      }
+    ],
+    "fixed": [
+      "Cabeza de `section-cine`: logo negativo arriba a la izquierda con el eyebrow a su lado.",
+      "Voz en la mitad baja de la columna izquierda: pregunta con anillo teal y respuesta en dos líneas con la esfera al final.",
+      "Sin selección, sin indicador y sin burbuja URL."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+      "ficha": "ai-generations/2026-09-27_brochure/fichas/BR2-portada-equipo.json",
+      "prompt": "ai-generations/2026-09-27_brochure/prompts/BR2-portada-equipo.txt",
+      "postprocess": [
+        "Isotipos de polo, softshell y hoodie compuestos con pnpm foto:isotipo (el plate se llama «-isotipo», pero no hay su ficha de procedencia `.json` junto a él): confirmar con pnpm foto:emblema al 100 %."
+      ],
+      "replaceable": "No se cambia por cliente: es una lámina de marca propia."
+    },
+    "prompts": {
+      "composition": "Compón la sección de cine del equipo (`surfaces.deck.recipes['section-cine']`, layout `team`): la foto de cine a sangre con Nexa al frente del equipo y los agentes mini robots en la mitad derecha; arriba a la izquierda el logo negativo de Efeonce con el eyebrow a su lado; en la mitad baja de la columna izquierda, la pregunta en Poppins Light en dos líneas con su anillo teal y la respuesta en Bricolage 760 en dos líneas con la esfera al final, a más de 3× la pregunta. Ningún texto toca a las personas ni a los agentes. Sin selección, indicador ni burbuja."
+    },
+    "renderSource": {
+      "script": "render-src/brochure.mjs",
+      "slideId": "BRO-portada-equipo"
+    },
+    "rules": [
+      "Registro cine permitido porque Nexa es la protagonista.",
+      "Los agentes mini robots son el hilo visual entre láminas de propuesta: aparecen, no protagonizan.",
+      "Ningún texto cruza al sujeto.",
+      "Isotipo del uniforme compuesto, nunca el del modelo."
+    ],
+    "notes": "Aprobada como sección interior (norma §4.6, «Láminas de sección»; AXIS `section-cine`, layout `team`, `approved`). Misma pregunta abierta que la de servicios: la referencia conserva el logo chico de cuando era portada."
+  },
+  {
+    "id": "section-cine-about",
+    "board": "DeckQuienesSomos",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckQuienesSomos.jpg",
+    "name": "Sección de cine · quiénes somos («¿Quiénes somos? Un solo equipo.»)",
+    "family": "about",
+    "documents": [
+      "brochure",
+      "proposal",
+      "pitch"
+    ],
+    "surface": "cine",
+    "communicates": "Efeonce es un solo equipo que disfruta el trabajo: creatividad, datos, medios y tecnología en la misma mesa, con un solo interlocutor.",
+    "useWhen": [
+      "Presentar a Efeonce en un brochure, una propuesta o un pitch, antes de los servicios.",
+      "Cuando el argumento es el modelo integrado (un interlocutor) y no una lista de credenciales."
+    ],
+    "avoidWhen": [
+      "Si las cifras no están verificadas y vigentes: cada cifra necesita respaldo.",
+      "Como portada: es lámina interior con foto y firma con la burbuja URL.",
+      "Si el deck ya abrió con la sección del equipo: dirían lo mismo dos veces."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "decision-why-us",
+        "when": "el argumento son credenciales con fuente (un muro de cifras)"
+      },
+      {
+        "recipe": "section-cine-team",
+        "when": "se abre la sección del equipo asignado"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-cine-purpose",
+        "relation": "sequence"
+      },
+      {
+        "recipe": "section-cine-services",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "Quiénes somos",
+        "notes": "Poppins 500 en mayúsculas espaciadas, arriba en el margen."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "¿Quiénes somos?",
+        "notes": "Una línea."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 16,
+        "example": "Un solo equipo",
+        "notes": "Dos líneas de ≤ 8 caracteres; la esfera cierra la segunda."
+      },
+      {
+        "name": "body",
+        "type": "text",
+        "required": true,
+        "maxChars": 100,
+        "example": "Creatividad, datos, medios y tecnología en una misma mesa, con un solo interlocutor.",
+        "notes": "Tres líneas como máximo."
+      },
+      {
+        "name": "figures",
+        "type": "list",
+        "required": true,
+        "maxChars": 4,
+        "example": "+10 · años como agencia; 5 · países; 1 · interlocutor",
+        "notes": "Exactamente 3 `metric` (valor ≤ 4 caracteres en Bricolage, etiqueta ≤ 18), separadas por filetes."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png",
+        "notes": "Registro cine con Nexa y el equipo en pleno trabajo en la mitad derecha; nadie posa ni mira al lente."
+      }
+    ],
+    "fixed": [
+      "Columna de voz a la izquierda en el margen de deck, de arriba abajo: eyebrow, pregunta con anillo teal, respuesta gigante en dos líneas con esfera, cuerpo y la fila de tres cifras.",
+      "Burbuja URL abajo a la izquierda (luminosidad, opacidad completa); sin logo.",
+      "Sin indicador de deck ni selección."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png",
+      "ficha": "ai-generations/2026-09-27_quienes-somos/fichas/QS1b-un-solo-equipo.json",
+      "prompt": "ai-generations/2026-09-27_quienes-somos/prompts/QS1b-un-solo-equipo.txt",
+      "postprocess": [
+        "pnpm foto:emblema sobre el polo y el hoodie; no hay procedencia de foto:isotipo junto al plate: si el emblema difiere, pnpm foto:isotipo."
+      ],
+      "replaceable": "No se cambia por cliente; las cifras se actualizan cuando cambian."
+    },
+    "prompts": {
+      "composition": "Compón la sección de cine «quiénes somos»: foto de cine a sangre con Nexa y el equipo en pleno trabajo en la mitad derecha, con el 45 % izquierdo oscuro que la ficha reservó. En la columna izquierda, en el margen de deck: eyebrow en mayúsculas espaciadas, la pregunta en Poppins Light con su anillo teal, la respuesta en Bricolage 760 blanca en dos líneas con la esfera (a más de 3× la pregunta), el cuerpo en Poppins Light de hasta tres líneas y una fila de tres cifras en Bricolage con su etiqueta, separadas por filetes. Al pie, la burbuja URL a la izquierda. Sin logo, indicador ni selección; ningún texto toca a las personas."
+    },
+    "renderSource": {
+      "script": "render-src/quienes.mjs",
+      "slideId": "QS1-un-solo-equipo"
+    },
+    "rules": [
+      "Registro cine permitido porque Nexa está en la escena.",
+      "Cifras sólo con respaldo: son datos institucionales y se verifican antes de cada uso.",
+      "El pie lleva sólo la burbuja URL; la lámina con foto no lleva logo.",
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita."
+    ],
+    "notes": "Receta nueva del 2026-09-27 (operador): «quiénes somos» y «por qué lo hacemos» expresan la pasión por el trabajo; «+10 años» es un dato, no el centro. No existe en AXIS: id nuevo. Las tres cifras no traen fuente en la lámina; confirmarlas contra el context pack (`docs/context/`) antes de usarlas. El script oscurece el lado izquierdo con un degradado sobre el plate; la norma de fotografía prohíbe velos: verificar que la columna se lea sin él o rehacer el plate con la reserva."
+  },
+  {
+    "id": "section-cine-purpose",
+    "board": "DeckPorQue2",
+    "status": "approved",
+    "approvedAt": "2026-09-27",
+    "reference": "references/DeckPorQue2.jpg",
+    "name": "Sección de cine · por qué lo hacemos («¿Por qué lo hacemos así? Contigo.»)",
+    "family": "about",
+    "documents": [
+      "brochure",
+      "proposal",
+      "pitch"
+    ],
+    "surface": "cine",
+    "communicates": "Efeonce no entrega crecimiento: lo construye con el cliente y lo deja más capaz de sostenerlo.",
+    "useWhen": [
+      "Explicar el propósito y la forma de trabajo de Efeonce, después de «quiénes somos».",
+      "Cuando el cliente valora la transferencia de capacidades: co-creación, educación y crecimiento integral."
+    ],
+    "avoidWhen": [
+      "Si la lámina anterior ya dijo el propósito con otra receta.",
+      "Si los pilares cambian: son tres y vienen del Why de Efeonce, no se inventan por cliente."
+    ],
+    "preferInstead": [
+      {
+        "recipe": "decision-why-us",
+        "when": "el cliente necesita pruebas cuantitativas, no el propósito"
+      },
+      {
+        "recipe": "section-cine-about",
+        "when": "todavía no se presentó a Efeonce"
+      }
+    ],
+    "pairsWith": [
+      {
+        "recipe": "section-cine-about",
+        "relation": "sequence"
+      }
+    ],
+    "slots": [
+      {
+        "name": "eyebrow",
+        "type": "text",
+        "required": true,
+        "maxChars": 24,
+        "example": "Por qué lo hacemos",
+        "notes": "Poppins 500 en mayúsculas espaciadas."
+      },
+      {
+        "name": "question",
+        "type": "text",
+        "required": true,
+        "maxChars": 26,
+        "example": "¿Por qué lo hacemos así?",
+        "notes": "Una línea."
+      },
+      {
+        "name": "answer",
+        "type": "text",
+        "required": true,
+        "maxChars": 9,
+        "example": "Contigo",
+        "notes": "Una palabra en una línea; la esfera la cierra."
+      },
+      {
+        "name": "evidence",
+        "type": "richText",
+        "required": true,
+        "maxChars": 110,
+        "example": "No te entregamos crecimiento. Lo construimos contigo, y te dejamos **más capaz** de sostenerlo.",
+        "notes": "Tres líneas como máximo, con UNA expresión en negrita."
+      },
+      {
+        "name": "pillars",
+        "type": "list",
+        "required": true,
+        "maxChars": 70,
+        "example": "Co-creación · operas con nosotros en vivo, en tu panel, no con un PDF el viernes.",
+        "notes": "Exactamente 3 filas: rótulo ≤ 22 caracteres + descripción ≤ 70 (dos líneas)."
+      },
+      {
+        "name": "photo",
+        "type": "image",
+        "required": true,
+        "example": "ai-generations/2026-09-27_quienes-somos/plates/QS2-contigo.png",
+        "notes": "Registro cine: la directora del cliente lleva la pantalla y la estratega de Efeonce (Nexa) la acompaña mirándola a ella; en la mitad derecha."
+      }
+    ],
+    "fixed": [
+      "Columna izquierda en el margen de deck: eyebrow, pregunta con anillo teal, respuesta gigante con esfera, evidencia y la tabla de tres pilares con filetes finos.",
+      "Rótulos de los pilares en Poppins semibold en `color.halo`; descripciones en el suave de la voz.",
+      "Burbuja URL abajo a la izquierda; sin logo, indicador ni selección."
+    ],
+    "selection": {
+      "kind": "none"
+    },
+    "photo": {
+      "uses": true,
+      "register": "cine",
+      "plate": "ai-generations/2026-09-27_quienes-somos/plates/QS2-contigo.png",
+      "ficha": "ai-generations/2026-09-27_quienes-somos/fichas/QS2-contigo.json",
+      "prompt": "ai-generations/2026-09-27_quienes-somos/prompts/QS2-contigo.txt",
+      "postprocess": [
+        "pnpm foto:emblema sobre el polo; no hay procedencia de foto:isotipo junto al plate: si el emblema difiere, pnpm foto:isotipo."
+      ],
+      "replaceable": "No se cambia por cliente: la escena representa al cliente genérico."
+    },
+    "prompts": {
+      "composition": "Compón la sección de cine «por qué lo hacemos»: foto de cine a sangre con la directora del cliente y la estratega de Efeonce en la mitad derecha, con el 45 % izquierdo oscuro reservado por la ficha. En la columna izquierda, en el margen de deck: eyebrow en mayúsculas espaciadas; la pregunta en Poppins Light con su anillo teal; la respuesta de una palabra en Bricolage 760 blanca con la esfera, a más de 3× la pregunta; la evidencia en Poppins Light blanca con una sola expresión en negrita; y la tabla de tres pilares (rótulo en semibold en `color.halo`, descripción en el suave de la voz) separados por filetes. Al pie, la burbuja URL. Sin logo, indicador ni selección; ningún texto toca a las personas ni la pantalla."
+    },
+    "renderSource": {
+      "script": "render-src/quienes.mjs",
+      "slideId": "QS2-contigo"
+    },
+    "rules": [
+      "Registro cine permitido porque Nexa está en la escena; nunca dos personas mirándose de cerca: la estratega mira a la directora y la directora a la pantalla.",
+      "Evidencia con UNA expresión en negrita.",
+      "El pie lleva sólo la burbuja URL; la lámina con foto no lleva logo.",
+      "Voz de la línea: pregunta en Poppins Light con su anillo en el acento; respuesta en Bricolage 760, de una a tres palabras, cerrada por UNA esfera en el acento y al menos 3× la pregunta.",
+      "Una sola órbita por lámina; la esfera nunca como viñeta.",
+      "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita."
+    ],
+    "notes": "Receta nueva del 2026-09-27 (operador), pareja de «quiénes somos»; no existe en AXIS: id nuevo (distinto de `decision-why-us`, que es el muro de seis cifras de DeckPorQue). Los rótulos de los pilares van a 22 px en `color.halo` (teal claro): confirmar con el operador que el halo no cuenta como acento bajo D1; si cuenta, subirlos a 24 px o pasarlos a blanco. Mismo degradado lateral sobre el plate que «quiénes somos»: verificar que la columna se lea sin él."
+  }
+]

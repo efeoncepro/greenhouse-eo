@@ -1,0 +1,44 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "contact-sheet",
+  "voice": {
+    "question": "¿Cuál sale al cliente?",
+    "answer": [
+      "Ésta"
+    ]
+  },
+  "sheet": [
+    {
+      "plateRef": "ai-generations/2026-09-26_deck-mosaico-documental/plates/L2-terreno-panaderia.png",
+      "alt": "Rodaje documental en una panadería: la directora de fotografía encuadra al panadero frente al horno",
+      "caption": "01 · Rodaje en la panadería"
+    },
+    {
+      "plateRef": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+      "alt": "Un editor decide el corte frente a la línea de tiempo",
+      "caption": "02 · El corte"
+    },
+    {
+      "plateRef": "ai-generations/2026-09-26_deck-mosaico-documental/plates/L1-mesa-de-luz.png",
+      "alt": "El equipo revisa las pruebas impresas en la mesa de luz",
+      "caption": "03 · Revisión en mesa de luz"
+    },
+    {
+      "plateRef": "ai-generations/2026-09-26_deck-web-motion/plates/P2-web-hero-taller.png",
+      "alt": "Una estratega muestra la prueba aprobada al equipo del cliente",
+      "caption": "04 · El cliente la aprueba"
+    }
+  ],
+  "selection": {
+    "target": "object",
+    "label": "Dirección de arte",
+    "participantKind": "department"
+  }
+}

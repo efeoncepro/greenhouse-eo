@@ -1,0 +1,47 @@
+{
+  "campaignId": "CMP-004",
+  "round": "R02-color-policy-v1",
+  "assets": [
+    {
+      "id": "CMP004-C01-KV-45-R02",
+      "concept": "C01",
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/CMP-004/4x5/R02-color-policy-v1/CMP004-C01-KV-45-R02.png",
+      "sha256": "453fc99e97a7924996519f0dc299e54c1ee9bd82a52e01f76ef95672b7d02a64",
+      "technicalQa": "reproduction-pass",
+      "creativeApproval": "pending",
+      "publication": "not-published"
+    },
+    {
+      "id": "CMP004-C02-KV-45-R02",
+      "concept": "C02",
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/CMP-004/4x5/R02-color-policy-v1/CMP004-C02-KV-45-R02.png",
+      "sha256": "05f83965d667f824325b90df8c90d5e503ce0a54de7baffdb1fbfdb51bf4169a",
+      "technicalQa": "reproduction-pass",
+      "creativeApproval": "pending",
+      "publication": "not-published"
+    },
+    {
+      "id": "CMP004-C03-KV-45-R02",
+      "concept": "C03",
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/CMP-004/4x5/R02-color-policy-v1/CMP004-C03-KV-45-R02.png",
+      "sha256": "0aac3a99077c88774d113a1ab5d7d14d9f34b586c049c7c022f79e8ab6a453ae",
+      "technicalQa": "reproduction-pass",
+      "creativeApproval": "pending",
+      "publication": "not-published"
+    },
+    {
+      "id": "CMP004-C04-KV-45-R02",
+      "concept": "C04",
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/CMP-004/4x5/R02-color-policy-v1/CMP004-C04-KV-45-R02.png",
+      "sha256": "bccaa585123afa9062cea8edb98c94a35d1a9417ca3dd9ce27d0a0f5b91f0e45",
+      "technicalQa": "reproduction-pass",
+      "creativeApproval": "pending",
+      "publication": "not-published"
+    }
+  ],
+  "plan": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/01. Recursos/CMP-004 - Produccion y editables/R02-color-policy-v1/composicion/piezas.json",
+  "policySnapshot": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/01. Recursos/CMP-004 - Produccion y editables/R02-color-policy-v1/politica.snapshot.json",
+  "policySha256": "790e5b9e4c5f5ce540f35c979e52697642bf24b1fe407d864bc5940ba10f0994",
+  "authority": "docs/campaigns/policies/CMP-004-color-v1.json en greenhouse-eo",
+  "verification": "Lectura local; no se afirma sincronización remota de OneDrive."
+}

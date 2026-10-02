@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · vívelo: los resultados en vivo</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-day`, composición `live-results` (surface deck, tema oscuro, TASK-1928). El panel de Greenhouse
+      gigante y en 3D; el reporte de Efeonce Insights llega al frente con su luz y la invitación de Teams flota arriba. El
+      cursor del lector va sobre «Ver en Greenhouse». Las cifras del reporte llevan su procedencia («Datos de muestra»).
+      Referencia: DeckVivelo (V2b-resultados-impacto).
+    -->
+    <main class="gl-slide gl-cdl gl-cdr" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-cdl-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-layer gl-cdl-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-cdl-scene">
+        <figure class="gl-cdl-panel" data-slot="panel">
+          <img data-slot-field="src" alt="" />
+        </figure>
+      </div>
+
+      <section class="gl-cdr-meeting" data-slot="meeting">
+        <header class="gl-cdl-head gl-cdr-meeting-head">
+          <span class="gl-cdl-tile"><img data-slot-field="tool" alt="" /></span>
+          <p class="gl-cdl-kicker" data-slot-field="kicker">En Microsoft Teams</p>
+        </header>
+        <p class="gl-cdl-title" data-slot-field="title">Revisión de resultados</p>
+        <p class="gl-cdr-meta" data-slot-field="meta">Jueves 10:00 · 30 min · con tu equipo</p>
+      </section>
+
+      <section class="gl-cdr-report">
+        <header class="gl-cdr-report-head" data-slot="report">
+          <span class="gl-cdr-own"><img src="assets/efeonce-isotype-negative.svg" alt="" /></span>
+          <div>
+            <p class="gl-cdl-kicker" data-slot-field="kicker">Efeonce Insights · ahora</p>
+            <p class="gl-cdl-title gl-cdr-title" data-slot-field="title">Tu reporte de la semana está listo</p>
+          </div>
+          <span class="gl-cdr-sample" data-slot-field="sample">Datos de muestra</span>
+        </header>
+        <ol class="gl-cdr-kpis" data-slot="kpis">
+          <li class="gl-cdr-kpi">
+            <p class="gl-cdr-kpi-value" data-slot-field="value">+22 %</p>
+            <p class="gl-cdr-kpi-label" data-slot-field="label">tráfico orgánico</p>
+          </li>
+        </ol>
+        <span class="gl-cdr-action" data-slot="cta" data-gl-cta-target><img class="gl-cdr-action-logo" data-slot-field="logo" alt="" /><span data-slot-field="text">Ver en Greenhouse</span></span>
+      </section>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Tu día a día con Efeonce</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo trabajamos contigo?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">A la</span><span data-slot-field="answer">vista</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Cada cosa en su herramienta y todo a la vista en tu panel.</p>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+      <!-- El lockup de submarca OPCIONAL (TASK-1949, deck SEO/AEO): archivo oficial de axis-brand-assets; su lugar y su alto
+           llegan del builder. Sin `productMark` el nodo queda vacío y la lámina es la de siempre. -->
+      <div class="gl-product-mark" data-slot="productMark">
+        <img data-slot-field="src" alt="" />
+      </div>
+    </main>
+  </body>
+</html>

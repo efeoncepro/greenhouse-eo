@@ -24,6 +24,18 @@ import {
   DECK_TOKENS_PATH
 } from '@/lib/artifact-composer/catalogs/deck-axis/compile-tokens'
 import {
+  buildGlitchTokensCss,
+  syncGlitchFontBinaries,
+  GLITCH_FONTS_PATH,
+  GLITCH_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/glitch/compile-tokens'
+import {
+  buildManzanitasTokensCss,
+  syncManzanitasFontBinaries,
+  MANZANITAS_FONTS_PATH,
+  MANZANITAS_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/manzanitas/compile-tokens'
+import {
   buildInsightsReportTokensCss,
   syncReportFontBinaries,
   REPORT_FONTS_PATH,
@@ -35,6 +47,24 @@ import {
   INSIGHTS_DECK_FONTS_PATH,
   INSIGHTS_DECK_TOKENS_PATH
 } from '@/lib/artifact-composer/catalogs/insights-deck/compile-tokens'
+import {
+  buildGraphicLineDeckTokensCss,
+  syncGraphicLineDeckFontBinaries,
+  GRAPHIC_LINE_DECK_FONTS_PATH,
+  GRAPHIC_LINE_DECK_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/graphic-line-deck/compile-tokens'
+import {
+  buildGraphicLineStillsTokensCss,
+  syncGraphicLineStillsFontBinaries,
+  GRAPHIC_LINE_STILLS_FONTS_PATH,
+  GRAPHIC_LINE_STILLS_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/graphic-line-stills/compile-tokens'
+import {
+  buildGraphicLineOverlaysTokensCss,
+  syncGraphicLineOverlaysFontBinaries,
+  GRAPHIC_LINE_OVERLAYS_FONTS_PATH,
+  GRAPHIC_LINE_OVERLAYS_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/graphic-line-overlays/compile-tokens'
 import type { CatalogTokensBuild, PackFontEntry } from '@/lib/artifact-composer/compile-catalog-tokens'
 
 /**
@@ -69,6 +99,41 @@ const CATALOGS: {
     tokensPath: REPORT_TOKENS_PATH,
     fontsPath: REPORT_FONTS_PATH,
     syncFonts: syncReportFontBinaries
+  },
+  {
+    name: 'graphic-line-deck',
+    build: buildGraphicLineDeckTokensCss,
+    tokensPath: GRAPHIC_LINE_DECK_TOKENS_PATH,
+    fontsPath: GRAPHIC_LINE_DECK_FONTS_PATH,
+    syncFonts: syncGraphicLineDeckFontBinaries
+  },
+  {
+    name: 'graphic-line-stills',
+    build: buildGraphicLineStillsTokensCss,
+    tokensPath: GRAPHIC_LINE_STILLS_TOKENS_PATH,
+    fontsPath: GRAPHIC_LINE_STILLS_FONTS_PATH,
+    syncFonts: syncGraphicLineStillsFontBinaries
+  },
+  {
+    name: 'graphic-line-overlays',
+    build: buildGraphicLineOverlaysTokensCss,
+    tokensPath: GRAPHIC_LINE_OVERLAYS_TOKENS_PATH,
+    fontsPath: GRAPHIC_LINE_OVERLAYS_FONTS_PATH,
+    syncFonts: syncGraphicLineOverlaysFontBinaries
+  },
+  {
+    name: 'glitch',
+    build: buildGlitchTokensCss,
+    tokensPath: GLITCH_TOKENS_PATH,
+    fontsPath: GLITCH_FONTS_PATH,
+    syncFonts: syncGlitchFontBinaries
+  },
+  {
+    name: 'manzanitas',
+    build: buildManzanitasTokensCss,
+    tokensPath: MANZANITAS_TOKENS_PATH,
+    fontsPath: MANZANITAS_FONTS_PATH,
+    syncFonts: syncManzanitasFontBinaries
   }
 ]
 

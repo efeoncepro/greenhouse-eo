@@ -46,10 +46,41 @@ visual transversal requiere validación en varias portadas.
   composición del lenguaje fotográfico** (no cruza sujeto, reservas, lecho ni firma). **Firma de pieza gráfica:** logo
   de Efeonce centrado abajo; la burbuja URL sólo lo reemplaza si el logo ya está dentro de la imagen, centrada, sola,
   fusionada a opacidad 1 y ≥ 4,5:1 medido. Se compone por intención con `pnpm creative:orbit:resolve|render`
-  (contrato AXIS 0.2.0), `pnpm creative:layout` o `pnpm foto:componer:cta`. **No** se aplica a la UI de Greenhouse
+  (contrato AXIS 0.3.0), `pnpm creative:layout` o `pnpm foto:componer:cta`. **No** se aplica a la UI de Greenhouse
   ni a piezas de clientes Globe. Operación y QA:
   [`graphic-line-orbit.md`](../../efeonce-brand-studio/references/graphic-line-orbit.md) · manual
   [`EFEONCE_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).
+- **Iconografía de «La órbita»** (canónica 2026-09-26, sólo marca propia): Trazo en Growth/Engine/Revenue, Plastilina
+  en Brand; responde un solo ícono y sólo si la pieza no tiene otra esfera; Plastilina protagonista dentro de su órbita
+  sesgada. Salen de `resolveIcon` (`@efeoncepro/axis-graphic-line/icons`), nunca se dibujan ni generan sueltos. Guía en
+  AXIS `docs/agent-composition/iconography.md`; criterio en
+  [`efeonce-graphic-line`](../../efeonce-graphic-line/references/iconography.md). **Plastilina en volumen** (D24,
+  2026-09-27): el objeto protagonista en arcilla mate, PNG con alfa desde `volumeIconUrl(glyph)` de
+  `@efeoncepro/axis-brand-assets` (0.3.2, publicado con el tag `v0.3.7`); uno por pieza, ≥ 160 px, nunca en listas ni UI, nunca
+  regenerado. Es otra cosa que las librerías «Clay 3D» de OneDrive (ilustración de propuestas): no se mezclan.
+- **Registro cine ampliado (operador, 2026-09-27):** la foto de cine de ficción se permite en **tres casos** (el tercero, más abajo): piezas
+  con **Nexa protagonista** (traje de ficción permitido) y la receta de deck **`proposal-cinematic`**, ahora también
+  con **personas del equipo**, que conservan su **uniforme por registro de escena** (piqué, chaqueta, gorra y polo,
+  hoodie). Guardas que no se relajan: identidad por ficha (nunca injerto de cara), **cámara a ~2 m y 85 mm** en plano
+  medio sin escorzo, la prenda **por su kit**, que trae el isotipo oficial armado (revisar con `pnpm foto:emblema`;
+  `foto:isotipo --acabado` sólo si difiere), reserva de texto declarada (el espacio oscuro a la izquierda), sujeto a la
+  derecha mirando a cámara (en la sección partida, al panel del texto: operador, 2026-10-02), lo digital o el servicio en acción y el color saliendo de la escena, y **nunca dos personas
+  mirándose de cerca** (se lee romántico). **Tercer caso, excepción aprobada el 2026-09-27:** las láminas de
+  **sección y «about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») con personas en luz
+  dramática; el contrato ya la conoce (desde TASK-1927, `axis-tokens` 0.3.14: `section-split`, `section-cine` y las
+  portadas y contraportadas `cover-brochure`, `close-brochure` y `close-proposal`). Fuera de esos tres casos el cine no se usa (el contrato de
+  superficie lo rechaza con `cine-requires-nexa-or-proposal`). La publicidad 9:16 y 4:5 en cine está **en prueba**
+  (`ai-generations/2026-09-27_ads-cine/`), no aprobada ni autorizada para pauta. Canon vigente desde el 2026-09-27:
+  [registro cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (los deltas del
+  [maestro](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) quedan como historia)
+  y [composición por superficie §4.6](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
+  En la lámina aprobada de líneas de servicio con Nexa, las cinco esferas de luz son **luz de la foto**, no la esfera
+  de la voz.
+  **Producir cine (2026-10-02):** el alcance creció después (MCM con el roster, perfiles sociales con Nexa; la ficha lo
+  declara en `alcance`) y el flujo operable es el
+  [casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md): `pnpm foto:cine:nueva`
+  → campos cine → `cine-reviewer` → `foto:generar` → `foto:validar:cine` + `foto:validar` + `foto:emblema` → revisor
+  sobre el plate. Personas reales del roster llevan la prenda de su línea; el casting por rol, el código por registro.
 - **Ilustraciones propietarias** (`characters/greenhouse-*.png`, mascota **Nexa**) = obra del equipo
   creativo de Efeonce, **NO stock ni Vuexy**. Úsalas con criterio de marca; producción nueva → §tooling.
 

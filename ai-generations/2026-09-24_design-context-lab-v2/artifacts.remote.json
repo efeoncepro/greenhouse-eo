@@ -1,0 +1,77 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:19:52.529Z",
+  "run": "ai-generations/2026-09-24_design-context-lab-v2",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-24_design-context-lab-v2",
+  "totalBytes": 15943825,
+  "fileCount": 11,
+  "files": [
+    {
+      "path": "finales/01-portada.png",
+      "sizeBytes": 2365057,
+      "sha256": "e211a86e234a567e0f1055c08b0f1f0a22bc669b3eae7766c0bfc7c372039700",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/finales/01-portada.png"
+    },
+    {
+      "path": "finales/02-brief.png",
+      "sizeBytes": 878764,
+      "sha256": "e55c79c10d9379d52fa53d5f7c1e72eb4d823146d7bd2b474f3306793cec7aa8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/finales/02-brief.png"
+    },
+    {
+      "path": "finales/03-identidad-assets.png",
+      "sizeBytes": 778124,
+      "sha256": "79f71514735f3989155866ffc19248511ee2fd03befe623f4dc0d4be264918e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/finales/03-identidad-assets.png"
+    },
+    {
+      "path": "finales/04-canal-formato.png",
+      "sizeBytes": 1013408,
+      "sha256": "f8f9701240bffbc4e8badc7e8b79b2a207177a9aae0df5f9bfaa6034006dddeb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/finales/04-canal-formato.png"
+    },
+    {
+      "path": "finales/05-concepto-direccion.png",
+      "sizeBytes": 894169,
+      "sha256": "50f1701053cb08485d9e7024ffa74384e7abe28b234a10320c68ab19459fed98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/finales/05-concepto-direccion.png"
+    },
+    {
+      "path": "finales/06-prompt-modelo.png",
+      "sizeBytes": 986359,
+      "sha256": "d5f3530e1a9a11343b3f94e02a6d22ae99a1615ed4bd07b60fde2e89b7e9aeaa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/finales/06-prompt-modelo.png"
+    },
+    {
+      "path": "finales/07-ingrediente-x.png",
+      "sizeBytes": 1862580,
+      "sha256": "02ef358bd4206ec94abbcaafa341a47be4365ec2bde0afba22a1c4f34da364dc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/finales/07-ingrediente-x.png"
+    },
+    {
+      "path": "finales/contact-sheet.png",
+      "sizeBytes": 737519,
+      "sha256": "41ace3d12d2ea0fff2148374a2675a1b07b0ce74d0f7588159c6ca317b2cd9b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/finales/contact-sheet.png"
+    },
+    {
+      "path": "plates/01-portada-lecho-edit.png",
+      "sizeBytes": 2075309,
+      "sha256": "d9b551339b73fb19f0021db74d239814c74f79e45e07a273f13844138f220170",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/plates/01-portada-lecho-edit.png"
+    },
+    {
+      "path": "plates/01-portada-plate.png",
+      "sizeBytes": 2192591,
+      "sha256": "3e2834e32a4bed46b92bd1614b0c52d97d3e74c18b628267e1a08a34561f0513",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/plates/01-portada-plate.png"
+    },
+    {
+      "path": "plates/07-cierre-plate.png",
+      "sizeBytes": 2159945,
+      "sha256": "530005e53192b05530718db2701ba8c9c303caef7b60658e1b0bcda2a6aba5c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v2/plates/07-cierre-plate.png"
+    }
+  ]
+}

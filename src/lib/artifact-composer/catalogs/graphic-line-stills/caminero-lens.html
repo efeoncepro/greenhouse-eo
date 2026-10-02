@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · caminero con lente</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `dooh.caminero-lens` (caminero 12 × 4 m → 3000 × 1000 px, 250 px por metro). La lente de AXIS a la
+      derecha con la escena a color adentro y en penumbra afuera; la voz arriba a la izquierda, dimensionada por
+      distancia de lectura; y la firma: el logo de 2 m ABAJO A LA IZQUIERDA, al final del recorrido de lectura
+      (en carretera el ojo termina ahí). Referencia aprobada: tablero Main de la página «DOOH».
+    -->
+    <main class="gl-canvas" data-gl-root data-slot="frame">
+      <div data-slot="photo">
+        <img class="gl-photo-layer gl-lens-outside" data-slot-field="src" alt="" />
+        <div class="gl-lens-veil" aria-hidden="true"></div>
+        <div class="gl-lens-clip" aria-hidden="true">
+          <img class="gl-photo-layer gl-lens-inside" data-slot-field="lensSrc" alt="" />
+        </div>
+      </div>
+
+      <div data-slot="orbit">
+        <img class="gl-layer" data-slot-field="src" alt="" />
+      </div>
+
+      <div data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Lo medimos?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">Siempre</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <img class="gl-signature" data-slot="logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+    </main>
+  </body>
+</html>

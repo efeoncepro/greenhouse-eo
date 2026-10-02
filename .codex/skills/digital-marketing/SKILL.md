@@ -39,6 +39,8 @@ argument-hint: "[canal/campaña o pregunta específica — ej: 'plan de paid med
 
 # Marketing Digital — Skill operativa 2026
 
+> **Naming Efeonce para campañas:** **Efeonce AEO** = capacidad; **Efeonce AEO Assessment** = diagnóstico público; **Efeonce AI Visibility Report** = informe compartible. Los nombres `AI Visibility Grader` y `AEO Grader` siguen como aliases técnicos/históricos. **Search Visibility 360** conserva la oferta SEO + AEO amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 > **📊 Medición GTM/GA4 — reference canónico.** Para martech/tag management, taxonomía UTM, medición de campañas y eventos: la documentación completa de Google Tag Manager + GA4 + naming + la house style `gh_<object>_<action>` de Efeonce vive en **`docs/reference/measurement-gtm-ga4/`** (canónica, dueña = skill `growth-marketing-cro`). Cargarlo al taggear/medir. Empezar por `04-greenhouse-gh-event-convention.md`.
 
 > **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
@@ -286,6 +288,12 @@ El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la
 Usar los templates versionados `templates/campaign-brief.md`, `campaign-assets.md` y `campaign-piece.md`;
 sus copias operativas viven en OneDrive `2. Campañas/_templates/`. Distinguir canal, placement, medio y ratio;
 presupuesto, fechas y metas pendientes no se inventan. Cada export tiene fila estable en ASSETS y receta en canal.
+
+**Dónde viven los archivos de `ai-generations/`:** las referencias y kits que cita una pieza (`ai-generations/<kit>/...`)
+son rutas lógicas: local, canon `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) (lo sellado en
+`scripts/foto/assets.lock.json`; `pnpm assets:pull`) o archivo `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`.
+Antes de adjuntarlas a un modelo o componer: `pnpm ai-gen:where` + `pnpm ai-gen:pull` si faltan; **NUNCA** sustituir ni
+aproximar una referencia aprobada ni resellar el lock para tapar un faltante. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## Manifiesto de pauta y continuidad MCP
 

@@ -15,6 +15,8 @@ import {
 } from '../contracts'
 
 export interface ProviderAdapterCapabilities {
+  /** Absent only on legacy/fake adapters. */
+  geoMode?: 'native' | 'prompt_only'
   provider: GrowthAiVisibilityProviderId
   /** Si el provider hace grounding/web search en este adapter. */
   supportsWebSearch: boolean

@@ -11,10 +11,12 @@ import { describe, expect, it } from 'vitest'
 // hace falta `@ts-expect-error` — al exportar OBJETOS y PALANCAS, TS resuelve el módulo y la
 // directiva quedaría sin uso (TS2578 rompe el pre-push).
 import {
+  ANCLAS_PROHIBIDAS,
   auditarAcentoDeTanda,
   auditarColor,
   auditarContradicciones,
   auditarEmblema,
+  auditarExpresion,
   auditarEscena,
   auditarLechoDeTanda,
   auditarRegistroVestuario,
@@ -27,9 +29,16 @@ import {
   familiaDeLecho,
   OBJETOS,
   PALANCAS,
+  EQUIPO_REAL,
+  LINEA_CREATIVA,
   PERSONAS,
   referenciasDeclaradas,
-  ROLES_DE_REFERENCIA
+  ROLES_DE_REFERENCIA,
+  validarCaso,
+  validarRobots,
+  validarTrajeNexa,
+  robotsSinNegar,
+  validarVestuarioDeLinea
 } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
@@ -85,6 +94,16 @@ describe('foto:prompt · la tabla de formatos es la única fuente', () => {
   it('1:1 se marca como no validado para que nadie cite sus números como medidos', () => {
     expect(construirPrompt({ ...fichaBase, formato: '1:1' }).sinValidar).toBe(true)
     expect(construirPrompt({ ...fichaBase, formato: '4:5' }).sinValidar).toBe(false)
+  })
+
+  it('el fondo de Teams deja el centro a la persona y no reserva texto', () => {
+    const r = construirPrompt({ ...fichaBase, formato: 'teams', lecho: 'sin-lecho', sinLechoPorque: 'fondo de Teams: el cuerpo ocupa el borde inferior' })
+
+    expect(r.size).toBe('2048x1152')
+    expect(r.sinValidar).toBe(true)
+    expect(r.prompt).toContain('CALL ZONE')
+    expect(r.prompt).toContain('from 30% to 70% of the width')
+    expect(() => construirPrompt({ ...fichaBase, formato: 'teams', reservas: { texto: { muro: 'a wall' } } })).toThrow(/no reserva texto/)
   })
 })
 
@@ -211,6 +230,17 @@ describe('foto:prompt · anclas prohibidas y auditoría de escena', () => {
     expect(() => construirPrompt(fichaBase)).not.toThrow()
   })
 
+  // La escena del caso Berel del deck SEO/AEO (2026-09-29) pasaba la guarda sin tocarla: muestrarios y
+  // abanico de PINTURA sobre la mesa. Los muestrarios de color IMPRESOS siguen siendo oficio de Efeonce.
+  it('ve también los muestrarios de pintura, sin tocar los muestrarios impresos del oficio', () => {
+    const patron = ANCLAS_PROHIBIDAS.find(a => a.cliente === 'Berel')?.patron ?? /(?!)/
+
+    expect(patron.test('dozens of large paint color swatch cards and an open paint fan deck')).toBe(true)
+    expect(patron.test('the paint buckets carry no labels')).toBe(true)
+    expect(patron.test('printed proofs, sticky notes, color swatches and a coffee cup')).toBe(false)
+    expect(patron.test('a big handful of printed color swatch cards thrown into the air')).toBe(false)
+  })
+
   // Avisos, no bloqueos: la medición es débil (la ronda aprobada da 100/100, mis pilotos aprobados
   // 66/33), así que bloquear por esto tiraría trabajo bueno.
   it('avisa cuando la escena no declara luz ni momento', () => {
@@ -260,6 +290,56 @@ conAssets('foto:prompt · identidad', () => {
     expect(r.prompt).toContain(
       'REFERENCES: Images 1-2 are Julio (identity only). Images 3-4 are Nexa (identity only). Ignore the clothing and backgrounds of all references.'
     )
+  })
+
+  // La pose repetida de Nexa (2026-10-02): las referencias dicen QUIÉN es, no CÓMO está; la frontal va primero y la
+  // imagen pedida como expresión o ángulo es la única que manda en el gesto.
+  it('las referencias definen quién es, no su pose: el giro y el gesto salen de la escena', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['nexa'] })
+
+    expect(r.prompt).toContain('never how they hold their head')
+    expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
+  })
+
+  it('una expresión pedida va primero y se nombra como la que manda en el gesto', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'conviccion' }] })
+
+    expect(r.imagenes[0]).toMatch(/5-expresiones\/nexa-expr-08-conviccion/)
+    expect(r.prompt).toContain("Image 1 is Nexa's EXPRESSION reference: copy only its facial expression")
+  })
+
+  it('vista + expresión conviven con una persona sola: ángulo primero, gesto segundo, cara y cuerpo después', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: '45-izq', expresion: 'curiosa' }] })
+
+    expect(r.imagenes[0]).toMatch(/nexa-45-izq/)
+    expect(r.imagenes[1]).toMatch(/nexa-expr-10-curiosa/)
+    expect(r.imagenes[2]).toMatch(/nexa-ancla-1-rostro-frontal/)
+    expect(r.imagenes[3]).toMatch(/nexa-ancla-5-cuerpo-frontal/)
+    expect(r.prompt).toContain("Image 1 is Nexa's ANGLE reference")
+    expect(r.prompt).toContain("Image 2 is Nexa's EXPRESSION reference")
+  })
+
+  it('vista + expresión con dos personas, o vestuario con otra dimensión, abortan explicando por qué', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: '45-izq', expresion: 'curiosa' }, 'julio'] })).toThrow(/persona sola/)
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: '45-izq', vestuario: Object.keys(PERSONAS.nexa.vestuario)[0] }] })).toThrow(/Sólo `vista` \+ `expresion`/)
+  })
+
+  it('con el traje, Nexa no lleva reloj ni anillo, el traje recibe la línea de navy y la acción suspendida se lee como frase propia', () => {
+    const ficha = JSON.parse(readFileSync(path.join(raiz, 'ai-generations/2026-10-01_traje-bionico-nexa/fichas/NX7d-nexa-despliega-squad.json'), 'utf8'))
+    const p = construirPrompt(ficha).prompt
+
+    expect(p).not.toContain('SMARTWATCH')
+    expect(p).toContain('NO ring and NO watch of any kind')
+    expect(p).toContain('small gold earrings') // AJUSTES_CINE sigue aplicándose
+    expect(p).toContain('deep navy, never royal blue')
+    expect(p).toContain('SUSPENDED ACTION (one frozen, decisive instant):')
+    expect(p).not.toMatch(/hanging still along them is FROZEN IN MID-AIR/)
+  })
+
+  it('avisa cuando Nexa no trae expresión ni vista', () => {
+    expect(auditarExpresion(['nexa'])).toMatch(/gesto por defecto/)
+    expect(auditarExpresion([{ persona: 'nexa', expresion: 'curiosa' }])).toBeNull()
+    expect(auditarExpresion(['julio'])).toBeNull()
   })
 
   // El orden del canon (§3.6/§3.7) no es decorativo: IDENTITY y REFERENCES condicionan la escena que
@@ -400,10 +480,15 @@ conAssets('foto:prompt · expresiones y vestuario de Nexa', () => {
 
   // Las tres dimensiones ocupan la MISMA ranura —la referencia que se antepone— así que pedir dos es
   // ambiguo y el comando tiene que decirlo en vez de elegir por su cuenta.
-  it('aborta si se piden dos dimensiones a la vez', () => {
+  // Desde el 2026-10-02 `vista` + `expresion` se combinan con una persona sola (el ángulo y el gesto son ejes distintos);
+  // las otras combinaciones siguen ocupando la misma ranura.
+  it('aborta si se piden dos dimensiones que comparten ranura (vestuario con otra)', () => {
+    expect(() =>
+      construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: 'perfil-izq', vestuario: 'prof-1' }] })
+    ).toThrow(/MISMA ranura/)
     expect(() =>
       construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: 'perfil-izq', expresion: 'the-read' }] })
-    ).toThrow(/MISMA ranura/)
+    ).not.toThrow()
   })
 
   it('un vestuario que ya es de cuerpo entero no duplica cuerpo', () => {
@@ -639,7 +724,10 @@ conAssets('foto:prompt · el catálogo de kits apunta a archivos reales', () => 
   )
 
   it.each(pares)('%s declara una vista por defecto que existe', (_clave, o) => {
-    expect(Object.keys(o.vistas)).toContain(o.vistaDefecto)
+    // El resolver acepta la vista por sufijo (`vistas`) o por nombre completo (`vistasPorNombre`).
+    const porNombre = (o as { vistasPorNombre?: Record<string, string> }).vistasPorNombre ?? {}
+
+    expect([...Object.keys(o.vistas), ...Object.keys(porNombre)]).toContain(o.vistaDefecto)
   })
 })
 
@@ -1107,6 +1195,13 @@ describe('código de vestuario — la prenda dice el registro', () => {
     expect(auditarRegistroVestuario(['chaqueta-softshell-efeonce', 'lanyard-efeonce'])).toHaveLength(0)
   })
 
+  // Las dos chaquetas se diseñaron para ir sobre el polo: con chaqueta, el polo es la capa de abajo.
+  it('el polo debajo de la chaqueta no mezcla registros', () => {
+    expect(auditarRegistroVestuario(['chaqueta-softshell-efeonce', 'polo-efeonce'])).toHaveLength(0)
+    expect(auditarRegistroVestuario(['chaqueta-bomber-efeonce', 'polo-efeonce'])).toHaveLength(0)
+    expect(auditarRegistroVestuario(['chaqueta-bomber-efeonce', 'polo-efeonce', 'gorra-efeonce'])).toHaveLength(1)
+  })
+
   it('una sola prenda nunca se contradice a sí misma', () => {
     expect(auditarRegistroVestuario(['hoodie-efeonce'])).toHaveLength(0)
     expect(auditarRegistroVestuario([])).toHaveLength(0)
@@ -1187,6 +1282,17 @@ describe('la prenda se copia tal cual; el macro sólo refuerza el detalle', () =
 
   itConAssets('un objeto sin bordado sigue aportando una sola', () => {
     expect(construirPrompt({ ...base, objetos: ['nave-efeonce'] }).imagenes).toHaveLength(1)
+  })
+
+  itConAssets('el logo 3D entra como referencia de forma, por escala, color y vista', () => {
+    for (const color of ['blanco', 'navy']) {
+      const letrero = construirPrompt({ ...base, objetos: [{ objeto: `logo-efeonce-3d-letrero-${color}`, vista: 'frente' }] })
+      const escritorio = construirPrompt({ ...base, objetos: [`logo-efeonce-3d-escritorio-${color}`] })
+
+      expect(letrero.imagenes).toHaveLength(1)
+      expect(letrero.imagenes[0]).toContain(`efeonce-logo-3d-${color}-mediana-01-frente-altura-ojos-luz-der-transparente.png`)
+      expect(escritorio.imagenes[0]).toContain(`efeonce-logo-3d-${color}-pequena-02-picado-persona-sentada-luz-der-transparente.png`)
+    }
   })
 })
 
@@ -1462,5 +1568,178 @@ describe('el asset de USO es la prenda puesta, y es el defecto', () => {
   itConAssets('la gorra resuelve su asset de uso por persona', () => {
     expect(construirPrompt({ ...base, objetos: [{ objeto: 'gorra-efeonce', usoDe: 'julio' }] }).imagenes[0]).toMatch(/prueba-julio/)
     expect(() => construirPrompt({ ...base, objetos: [{ objeto: 'gorra-efeonce', usoDe: 'pedro' }] })).toThrow(/no tiene prueba en persona/)
+  })
+})
+
+// Decisión del operador, 2026-09-29: el equipo real se viste según la PERSONALIDAD de la línea de la pieza. Las líneas
+// de negocio llevan el uniforme corporativo (bomber o softshell); la de servicios creativos, el hoodie.
+// La regla se prueba sobre la guarda pura (corre en CI, sin assets); el cableado en `construirPrompt`, con assets.
+describe('foto:prompt · vestuario del equipo por línea de servicio', () => {
+  const conEquipo = (linea: string | undefined, objetos: string[]) => ({ identidad: ['daniela'], linea, objetos: objetos.map(objeto => ({ objeto })) })
+
+  it('las líneas de negocio van con bomber o softshell', () => {
+    for (const linea of ['growth', 'engine', 'voice', 'revenue-hubspot', 'revenue-salesforce']) {
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['chaqueta-bomber-efeonce'])), linea).not.toThrow()
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['chaqueta-bomber-efeonce', 'polo-efeonce'])), linea).not.toThrow()
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['chaqueta-softshell-efeonce', 'polo-efeonce'])), linea).not.toThrow()
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['hoodie-efeonce'])), linea).toThrow(/bomber o la softshell/)
+      expect(() => validarVestuarioDeLinea(conEquipo(linea, ['polo-efeonce'])), linea).toThrow(/bomber o la softshell/)
+    }
+  })
+
+  it('servicios creativos (brand) van con el hoodie, nunca con la chaqueta corporativa', () => {
+    expect(LINEA_CREATIVA).toBe('brand')
+    expect(() => validarVestuarioDeLinea(conEquipo('brand', ['hoodie-efeonce']))).not.toThrow()
+    expect(() => validarVestuarioDeLinea(conEquipo('brand', ['chaqueta-bomber-efeonce']))).toThrow(/hoodie Efeonce/)
+    expect(() => validarVestuarioDeLinea(conEquipo('brand', ['hoodie-efeonce', 'chaqueta-softshell-efeonce']))).toThrow(/nunca con/)
+  })
+
+  it('una línea que no existe se rechaza; sin línea o sin equipo real, la guarda no aplica', () => {
+    expect(() => validarVestuarioDeLinea(conEquipo('creative', ['hoodie-efeonce']))).toThrow(/no existe/)
+    expect(() => validarVestuarioDeLinea(conEquipo(undefined, ['hoodie-efeonce']))).not.toThrow()
+    expect(() => validarVestuarioDeLinea({ identidad: ['nexa'], linea: 'growth', objetos: [{ objeto: 'hoodie-efeonce' }] })).not.toThrow()
+    expect(() => validarVestuarioDeLinea({ identidad: [{ persona: 'julio', vista: 'frente' }], linea: 'growth', objetos: ['hoodie-efeonce'] })).toThrow(/julio/)
+    expect(EQUIPO_REAL).toEqual(['julio', 'andres', 'daniela', 'humberly', 'melkin', 'valentina'])
+  })
+})
+
+conAssets('foto:prompt · la guarda de vestuario está cableada', () => {
+  it('construirPrompt se detiene con la prenda de la otra línea y arma el prompt con la correcta', () => {
+    const ficha = (objetos: string[]) => ({ ...fichaBase, identidad: ['daniela'], linea: 'growth', objetos: objetos.map(objeto => ({ objeto })) })
+
+    expect(() => construirPrompt(ficha(['hoodie-efeonce']))).toThrow(/bomber o la softshell/)
+    expect(() => construirPrompt(ficha(['chaqueta-bomber-efeonce']))).not.toThrow()
+  })
+})
+
+// **[decisión del operador, 2026-09-30, TASK-1949]** Un caso de éxito puede anclarse en el rubro de SU
+// cliente, en puesta en escena, si la ficha lo declara. Cada `it` cierra una forma de abrir la puerta de más.
+describe('foto:prompt · excepción declarada de caso de cliente', () => {
+  const escenaBerel =
+    'SCENE (a working session with the client\'s marketing lead, evening): paint color swatch cards spread on a walnut table, a single warm pendant lamp as key light, two women pointing at the same card. 85mm.'
+
+  const casoBerel = { tipo: 'cliente', cliente: 'Berel', registro: 'puesta-en-escena' }
+
+  it('sin `caso`, el rubro del cliente sigue abortando (regresión)', () => {
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel })).toThrow(/ancla prohibida.*categoría de Berel/s)
+  })
+
+  it('con `caso` del cliente correcto compila, prohíbe su marca en el prompt y avisa', () => {
+    const r = construirPrompt({ ...fichaBase, escena: escenaBerel, caso: casoBerel })
+
+    expect(r.prompt).toContain('CLIENT CASE (staged scene)')
+    expect(r.prompt).toMatch(/No logo, brand name, wordmark.*composited later from its official file/s)
+    expect(r.avisoCaso).toMatch(/caso de cliente declarado \(Berel.*se abre SÓLO para esta ficha.*TASK-1937/s)
+
+    // el nombre se compara sin mayúsculas ni tildes
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel, caso: { ...casoBerel, cliente: 'BEREL' } })).not.toThrow()
+  })
+
+  it('con `caso` de OTRO cliente aborta: la excepción no es un pase general', () => {
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel, caso: { ...casoBerel, cliente: 'Banco BICE' } })).toThrow(
+      /no tiene rubro declarado/
+    )
+  })
+
+  it('con otro registro aborta: el documental retrata el oficio de Efeonce', () => {
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel, caso: { ...casoBerel, registro: 'documental' } })).toThrow(
+      /sólo existe en el registro `puesta-en-escena`/
+    )
+    expect(() => construirPrompt({ ...fichaBase, escena: escenaBerel, caso: { tipo: 'cliente', cliente: 'Berel' } })).toThrow(
+      /puesta-en-escena/
+    )
+  })
+
+  it('un `caso` mal formado aborta', () => {
+    expect(() => validarCaso({ ...fichaBase, escena: escenaBerel, caso: { tipo: 'marca', cliente: 'Berel', registro: 'puesta-en-escena' } })).toThrow(
+      /sólo admite/
+    )
+  })
+
+  it('la escena no puede nombrar al cliente: el modelo lo escribe como marca', () => {
+    expect(() =>
+      construirPrompt({ ...fichaBase, escena: escenaBerel.replace("the client's", "Berel's"), caso: casoBerel })
+    ).toThrow(/la escena nombra a Berel/)
+  })
+
+  it('sin `caso` y sin rubro de cliente, nada cambia en el prompt', () => {
+    const r = construirPrompt(fichaBase)
+
+    expect(r.prompt).not.toContain('CLIENT CASE')
+    expect(r.avisoCaso).toBeNull()
+  })
+})
+
+describe('foto:prompt · robots: sólo Sparks del kit (TASK-1941)', () => {
+  const base = { id: 'T', formato: '4:5', lecho: 'sin-lecho', sinLechoPorque: 'prueba de la guarda de robots' }
+
+  it('aborta si la escena describe robots sin declarar un Spark', () => {
+    expect(() => validarRobots({ ...base, escena: 'three small friendly robot agents ride the streams' })).toThrow(/sin declarar un Spark/)
+    expect(() => validarRobots({ ...base, escena: 'a cute droid beside her' })).toThrow(/Spark/)
+  })
+
+  it('ignora las negaciones', () => {
+    expect(robotsSinNegar('There is NO object, NO creature, NO robot, NO toy')).toEqual([])
+    expect(robotsSinNegar('calm dark space with no hologram, no robots and no objects')).toEqual([])
+    expect(() => validarRobots({ ...base, escena: 'empty studio, without robots' })).not.toThrow()
+  })
+
+  it('acepta robots cuando la ficha declara un Spark', () => {
+    expect(validarRobots({ ...base, escena: 'the small robot hovers by her shoulder', objetos: [{ objeto: 'spark', vista: 'frente' }] })).toBe(true)
+  })
+
+  it('aborta un Spark en registro documental', () => {
+    expect(() => validarRobots({ ...base, escena: 'x', objetos: [{ objeto: 'spark' }], palanca: 'escucha' })).toThrow(/documental/)
+    expect(() => validarRobots({ ...base, escena: 'x', objetos: [{ objeto: 'spark' }], registro: 'documental' })).toThrow(/documental/)
+  })
+
+  it('las fichas del kit de los Sparks compilan', () => {
+    const dir = 'ai-generations/2026-10-01_sparks/fichas'
+
+    if (!existsSync(dir)) return
+
+    for (const f of readdirSync(dir).filter(x => x.endsWith('.json'))) {
+      const ficha = JSON.parse(readFileSync(path.join(dir, f), 'utf8'))
+
+      expect(validarRobots(ficha)).toBe(true)
+    }
+  })
+})
+
+describe('foto:prompt · traje biónico: sólo Nexa, sólo cine (TASK-1940)', () => {
+  const base = { id: 'T', formato: '16:9', escena: 'x', objetos: [{ objeto: 'traje-bionico-nexa' }] }
+
+  it('la escena que dice «wears the bionic suit» declara vestuario', () => {
+    expect(auditarVestuario('She wears the bionic suit', ['nexa'])).toBeNull()
+  })
+
+  it('no actúa si la ficha no pide el traje ni los lentes', () => {
+    expect(validarTrajeNexa({ id: 'T', identidad: ['julio'], objetos: [{ objeto: 'polo-efeonce' }] })).toBe(false)
+  })
+
+  it('acepta a Nexa en registro cine', () => {
+    expect(validarTrajeNexa({ ...base, identidad: [{ persona: 'nexa' }], registro: 'cine' })).toBe(true)
+    expect(validarTrajeNexa({ ...base, identidad: ['nexa'], registro: 'cine', objetos: ['lentes-bionicos-nexa'] })).toBe(true)
+  })
+
+  it('aborta en otra persona o con otra persona en cuadro', () => {
+    expect(() => validarTrajeNexa({ ...base, identidad: ['julio'], registro: 'cine' })).toThrow(/sólo de Nexa/)
+    expect(() => validarTrajeNexa({ ...base, identidad: ['nexa', 'julio'], registro: 'cine' })).toThrow(/julio/)
+    expect(() => validarTrajeNexa({ ...base, registro: 'cine' })).toThrow(/sin Nexa/)
+  })
+
+  it('aborta fuera del registro cine', () => {
+    expect(() => validarTrajeNexa({ ...base, identidad: ['nexa'] })).toThrow(/registro cine/)
+    expect(() => validarTrajeNexa({ ...base, identidad: ['nexa'], registro: 'puesta-en-escena' })).toThrow(/registro cine/)
+  })
+
+  it('la pieza puesta lleva el isotipo ya armado y el macro viaja con ella [operador, 2026-10-02]', () => {
+    const traje = OBJETOS['traje-bionico-nexa']
+
+    expect(traje.tipoEmblema).toBe('isotipo')
+    expect(traje.macroEnUso).toBe(true)
+    expect(traje.assetDeUso).not.toMatch(/sin-marca/)
+    expect(traje.instruccionEnUso).toMatch(/Do NOT remove it/)
+    expect(traje.acabadoMarca).toMatch(/inlaid/)
   })
 })

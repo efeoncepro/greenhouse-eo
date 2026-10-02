@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · caso de éxito</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-case` (surface deck, papel, TASK-1928). El panel de papel con su esquina curva sobre la foto a
+      sangre; el logo del cliente (en navy, normalizado al componer) con el kicker, la voz y cuatro cifras del caso con su
+      fuente; la selección toma la que se elige. Referencia: DeckCaso (E2-caso).
+    -->
+    <main class="gl-slide gl-paper gl-dc" data-gl-root data-slot="frame">
+      <figure class="gl-dc-photo" data-slot="photo">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <div class="gl-dc-panel" aria-hidden="true"></div>
+
+      <div data-slot="voice">
+        <div class="gl-dc-head">
+          <figure class="gl-dc-logo" data-slot="clientLogo">
+            <img data-slot-field="src" alt="" />
+          </figure>
+          <p class="gl-eyebrow gl-dc-kicker" data-slot-field="eyebrow">Caso · 12 meses</p>
+        </div>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Qué cambió con Sky?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">Más rápido</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <ol class="gl-dc-figures" data-slot="figures">
+        <li class="gl-dc-figure" data-gl-select-item>
+          <p class="gl-dc-value" data-slot-field="value">+2.000</p>
+          <p class="gl-dc-label" data-slot-field="label">piezas aprobadas</p>
+        </li>
+      </ol>
+
+      <p class="gl-dc-source" data-slot="source">Fuente: caso publicado de Sky Airlines.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-light.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

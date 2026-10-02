@@ -1,0 +1,89 @@
+{
+  "task": "TASK-1875",
+  "surface": "think.insights.shared",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-09-28",
+  "reviewer": "claude-opus-5-5 (34 capturas miradas en hoja de contactos y por archivo; fixtures del modelo 1.1 en astro dev)",
+  "evidence": {
+    "dossier": "docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/README.md",
+    "desktop": "docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/desktop-first-fold.png",
+    "mobile": "docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/mobile-first-fold.png",
+    "states": "docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/desktop-status-not-found.png",
+    "presentation": "docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/desktop-present-cover.png"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "La respuesta del mes (titular en Bricolage) domina la portada; debajo, «Lo esencial» con una cifra protagonista por hallazgo y la decisión en un panel navy; cada capítulo repite el orden cifra → conclusión → lo que significa → próximo paso.",
+      "evidence": "desktop-first-fold.png"
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Portada a pantalla completa con la órbita fuera de la columna de texto; hallazgos en pares con el principal a ancho completo; figura y pasos en 7/5 en escritorio y una columna en 390.",
+      "evidence": "desktop-summary.png"
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Escenas separadas por el mismo aire; los pasos narrados avanzan con el scroll y los gráficos secundarios alternan lado. El capítulo vacío queda corto (una línea de motivo), a propósito.",
+      "evidence": "desktop-chapter-figure.png"
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "Un hallazgo cerrado ocupa una tarjeta; la evidencia (figura + lectura + procedencia) sólo aparece al abrirlo. Las 15 familias entran en el fixture completo sin pantallas saturadas.",
+      "evidence": "desktop-finding-open.png"
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "Tres planos: fondo oscuro de marca, papel de lectura y un único panel de énfasis por bloque (decisión, próximo paso). Sin card-on-card: la evidencia se abre dentro de la tarjeta, no en otra tarjeta.",
+      "evidence": "desktop-finding-open.png"
+    },
+    "surfaceEconomy": {
+      "score": 4.5,
+      "rationale": "Primer pliegue sin tarjetas: portada tipográfica con una sola órbita. Barra superior compacta que aparece al hacer scroll; en móvil, un dock con dos acciones.",
+      "evidence": "mobile-first-fold.png"
+    },
+    "visualImpact": {
+      "score": 4.7,
+      "rationale": "La portada con la órbita de acento viva y el titular grande es el momento dominante; el modo presentación convierte el mismo modelo en láminas para una reunión.",
+      "evidence": "desktop-present-cover.png"
+    },
+    "typography": {
+      "score": 4.7,
+      "rationale": "Bricolage (idea) para titulares y cifras, Poppins (estructura) para el resto, cifras tabulares; el eslogan con sus pesos oficiales; 7 archivos de fuente (123 KB).",
+      "evidence": "desktop-footer.png"
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "Paleta «La órbita» desde insights-tokens.ts; acento nunca en texto bajo 24 px; roles de dato de los PDF (actual/anterior por luminosidad). Contraste AA medido contra el fondo real en 1440 y 390 (audit:insights-a11y).",
+      "evidence": "desktop-chapter-aeo.png"
+    },
+    "iconography": {
+      "score": 4.3,
+      "rationale": "Íconos de trazo mínimos para acciones (copiar, descargar, presentar) y marcas de procedencia Medido/Estimado. Todavía no usa el set canónico «Trazo» de AXIS (misma deuda que los catálogos PDF: adopción en tarea propia).",
+      "evidence": "desktop-downloads.png",
+      "nextAction": "Adoptar el set Trazo de AXIS junto con los catálogos PDF, en una tarea propia con aprobación del operador."
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "Sin scroll horizontal en 1440 y 390, también con el fixture extremo (textos y cifras largas, nueve hallazgos); tabla equivalente en cada figura; dock móvil que no tapa el footer al final.",
+      "evidence": "mobile-chapter-figure.png"
+    },
+    "motion": {
+      "score": 4.6,
+      "rationale": "Órbita que recorre al cargar, reveals y pasos narrados con scroll, conteo de cifras, View Transitions al abrir un hallazgo; todo desaparece con movimiento reducido y el contenido es idéntico (verify-insights-report).",
+      "evidence": "desktop-first-fold.png"
+    },
+    "fidelity": {
+      "score": 4.5,
+      "rationale": "Dirección A aprobada por el operador (web nativa, no el PDF animado); lockup Efeonce | Insights canónico de axis-brand-assets 0.4.0; geometría de las 15 familias con las convenciones de chart-geometry de los PDF.",
+      "evidence": "desktop-first-fold.png"
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "Nada de dashboard genérico: portada editorial con la forma propia de la marca, hallazgos que se abren como evidencia y escenas narradas; estados de error con Nexa y la marca, sin nombre de organización ni código.",
+      "evidence": "desktop-status-gone.png"
+    }
+  },
+  "average": 4.56,
+  "notes": "Loop real con el operador en el canvas y en localhost: la primera versión con sidebar (el PDF con vida) fue rechazada y reemplazada por la dirección A web nativa; se pidió más impacto, todas las familias en la narrativa y un footer más contenido. Las capturas usan fixtures del modelo 1.1; falta la prueba contra una edición real de staging (grant sintético) antes de publicar. Deuda: set de íconos Trazo de AXIS."
+}

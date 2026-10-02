@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "name": "panel-visibilidad-marca-cl",
+  "market": "CL",
+  "locale": "es-CL",
+  "queries": [
+    "¿Qué agencias de transformación digital recomiendas en Chile?",
+    "¿Qué empresas implementan experiencias digitales con IA?"
+  ],
+  "target": "efeonce.org",
+  "maxOutputTokens": 1024,
+  "lanes": [
+    {
+      "id": "chatgpt-api",
+      "preset": "chatgpt-response",
+      "surface": "api",
+      "model": "REEMPLAZAR_CON_MODELO_VIGENTE",
+      "webSearch": true,
+      "estimatedCostUsdPerTask": 0.02
+    },
+    {
+      "id": "claude-api",
+      "preset": "claude-response",
+      "surface": "api",
+      "model": "REEMPLAZAR_CON_MODELO_VIGENTE",
+      "webSearch": true,
+      "estimatedCostUsdPerTask": 0.02
+    },
+    {
+      "id": "gemini-api",
+      "preset": "gemini-response",
+      "surface": "api",
+      "model": "REEMPLAZAR_CON_MODELO_VIGENTE",
+      "webSearch": true,
+      "estimatedCostUsdPerTask": 0.02
+    },
+    {
+      "id": "perplexity-api",
+      "preset": "perplexity-response",
+      "surface": "api",
+      "model": "REEMPLAZAR_CON_MODELO_VIGENTE",
+      "webSearch": true,
+      "estimatedCostUsdPerTask": 0.02
+    },
+    {
+      "id": "chatgpt-consumer",
+      "preset": "chatgpt-scraper",
+      "surface": "consumer",
+      "estimatedCostUsdPerTask": 0.03
+    },
+    {
+      "id": "gemini-consumer",
+      "preset": "gemini-scraper",
+      "surface": "consumer",
+      "estimatedCostUsdPerTask": 0.03
+    }
+  ]
+}

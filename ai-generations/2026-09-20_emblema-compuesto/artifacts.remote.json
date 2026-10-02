@@ -1,0 +1,17 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:06:34.078Z",
+  "run": "ai-generations/2026-09-20_emblema-compuesto",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_emblema-compuesto",
+  "totalBytes": 1533700,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "plates/Y1-polo-liso.png",
+      "sizeBytes": 1533700,
+      "sha256": "06cf01c8eb4e4a8696ac062cb2b1eeb28506e85feb3c53cab42c05339196553d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_emblema-compuesto/plates/Y1-polo-liso.png"
+    }
+  ]
+}

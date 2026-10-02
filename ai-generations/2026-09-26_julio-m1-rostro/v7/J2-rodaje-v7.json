@@ -1,0 +1,19 @@
+{
+  "id": "J2-rodaje-v7",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "julio",
+      "vista": "45-der"
+    }
+  ],
+  "objetos": [
+    "polo-efeonce"
+  ],
+  "escena": "SCENE (directing a commercial shoot, clean industrial film studio with a large skylight, late morning): low camera at knee height looking slightly up, 35mm lens at f/2.8, so the face is not distorted. Julio stands in the middle of the frame wearing the deep navy Efeonce pique polo (the embroidered mark on his left chest, exactly as in the reference), dark jeans, a steel wristwatch. His right arm is extended toward the RIGHT edge of the frame, index finger pointing decisively at the next shot, caught at the exact moment he calls the angle, mid-word, while the operator is already turning the camera toward where he points; his head is turned in three-quarter toward the RIGHT edge, the bridge of his nose points to the right, the far cheek partly hidden, and his eyes follow his pointing hand — he never looks at the camera. His left hand holds a current-generation tablet with an edge-to-edge screen and a thin dark aluminium body, screen facing him, showing a shot list that is out of focus and unreadable. A confident, natural, masculine stance: feet apart, shoulders square, weight forward. At the LEFT edge, partly cut by the frame, a camera operator shoulders a top-tier large-format digital cinema camera: a matte-black body with a matte box, follow-focus, top handle, a large cinema prime lens, a V-mount battery and a small on-camera monitor — the most professional production kit in the world, with no readable brand names. Behind Julio, softly out of focus, a large LED fresnel on a stand and a C-stand; the only bright azure blue is a gel on a distant light. Hard directional sunlight from the skylight rakes across his shoulder and the side of his face; shadows warm-neutral, never blue. Everything unbranded except the polo mark; no readable text anywhere.",
+  "lecho": {
+    "objeto": "the matte black lid of a closed hard equipment case on the floor right against the lens, spanning the full width of the bottom of the frame, with nothing on it",
+    "tono": "DARK near black, matte, no highlights"
+  }
+}

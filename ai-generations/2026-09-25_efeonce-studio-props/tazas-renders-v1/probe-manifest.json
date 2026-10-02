@@ -1,0 +1,23 @@
+[
+  {
+    "color": "blanco",
+    "file": "blanco/01-frente-palabra.png",
+    "view": "01-frente-palabra",
+    "azimuth_deg": -90,
+    "elevation_deg": 10
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/09-cenital.png",
+    "view": "09-cenital",
+    "azimuth_deg": -90,
+    "elevation_deg": 90
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/10-base-inferior.png",
+    "view": "10-base-inferior",
+    "azimuth_deg": -90,
+    "elevation_deg": -65
+  }
+]

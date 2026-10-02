@@ -106,9 +106,7 @@ export const generateStructuredAnthropic = async <T>(
     }
   }
 
-  const toolUse = response.content.find(
-    (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
-  )
+  const toolUse = response.content.find((block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use')
 
   if (!toolUse) {
     throw new Error('Claude no devolvió salida estructurada (sin tool_use).')
@@ -152,6 +150,7 @@ export interface AnthropicWebSearchResult {
  */
 export const runAnthropicWebSearch = async (input: {
   prompt: string
+  countryCode?: string
   model?: string
   maxUses?: number
   maxTokens?: number
@@ -166,7 +165,14 @@ export const runAnthropicWebSearch = async (input: {
       model,
       max_tokens: input.maxTokens ?? 1024,
       messages: [{ role: 'user', content: input.prompt }],
-      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: input.maxUses ?? 5 }]
+      tools: [
+        {
+          type: 'web_search_20250305',
+          name: 'web_search',
+          max_uses: input.maxUses ?? 5,
+          ...(input.countryCode ? { user_location: { type: 'approximate' as const, country: input.countryCode } } : {})
+        }
+      ]
     },
     input.timeoutMs ? { timeout: input.timeoutMs } : undefined
   )

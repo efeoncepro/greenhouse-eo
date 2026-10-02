@@ -32,6 +32,12 @@ Hallazgos visuales:
 Los precedentes son evidencia de sistema, no archivos para copiar literalmente. La ejecución nueva debe conservar
 la lógica y modernizar escala, aire, accesibilidad y calidad tipográfica.
 
+> Este sistema gobierna las infografías del cuerpo del artículo. Las piezas gráficas de Marketing con Manzanitas
+> (carrusel, story, imagen del artículo y banner) siguen el **registro Marketing con Manzanitas**, con su propia
+> gramática de gráficos (9 gráficos y 3 láminas de texto denso aprobados el 2026-09-28): norma
+> [`MANZANITAS_REGISTER_V1.md`](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md).
+> No uses esta paleta ni estos arquetipos en esas láminas.
+
 ## 2. Paleta observada y roles
 
 ### Núcleo Efeonce
@@ -110,6 +116,17 @@ portada con foto) firma en cambio con **el logo de Efeonce centrado abajo**; la 
 cuando el logo ya aparece dentro de la imagen, centrada, fusionada a opacidad 1 y sobre lecho muy oscuro (≥ 4,5:1).
 Los archivos oficiales (logo, `url-bubble-source` y variantes horneadas) son el dibujo de
 `@efeoncepro/axis-brand-assets`; las copias del repo están vigiladas por `src/config/efeonce-brand-assets.test.ts`.
+
+**Íconos de la línea (canónicos desde 2026-09-26, sólo marca propia Efeonce; nunca en piezas de clientes):** si un
+nodo o categoría de la infografía lleva ícono, sale de `ICON_CATALOG` y se pinta con `resolveIcon` de
+`@efeoncepro/axis-graphic-line/icons` (`pnpm icons:export` en AXIS mientras Greenhouse no consuma el paquete); nunca
+se dibuja a mano ni se usa como adorno. La voz la decide la línea de la pieza (`iconVoiceForLine`: **Trazo** para lo
+que se mide, **Plastilina** para lo que se crea, desde 32 px) y no se mezclan en un mismo grupo. Reposo por defecto:
+en un grupo responde uno solo, en el acento de la línea de la pieza, y ninguno si la pieza ya tiene esfera. Un glifo
+que falta se da de alta (`icons:check` + aprobación). Criterio:
+[iconography.md](../../efeonce-graphic-line/references/iconography.md); guía en AXIS
+`docs/agent-composition/iconography.md`. La **Plastilina en volumen** (D24, 2026-09-27: el glifo en arcilla mate, PNG
+de AXIS) **no va en infografías**: es sólo para un objeto protagonista; en nodos y categorías van el plano o el Trazo.
 
 Wordmarks públicos oficiales: `public/branding/logo-full.svg` en light y
 `public/branding/logo-negative.svg` en dark. `AxisWordmark` es interno y no se usa en piezas públicas.

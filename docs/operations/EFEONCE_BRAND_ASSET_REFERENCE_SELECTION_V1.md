@@ -37,6 +37,7 @@ inventar una vista: casi siempre ya está.
 | `2026-09-17_codex-poses-3d` (mascota) | 16 | 8 | — | — |
 | `2026-09-17_sprocket-3d` (mascota HubSpot) | 16 | 8 | — | — |
 | `2026-09-21_gigi-poses-3d` (mascota Google Gemini) | 48 | 24 | — | — |
+| `2026-10-01_traje-bionico-nexa` (traje biónico + lentes de Nexa, sólo cine) | 18 en `final/` (10 vistas, 7 transparentes, manifiesto) | 10 | sí | **`13-puesto-frente`, `14-puesto-espalda`** (Nexa) |
 | `2026-09-17_efeonce-logo-3d` | 414 archivos en `kit/`, por **escala × color** | — | LEEME | `prueba/` |
 
 Los kits 3D traen **ocho poses o ángulos** cada uno —frente héroe, tres cuartos izquierda y derecha,
@@ -46,6 +47,8 @@ incluye—: trae **24 vistas**, los mismos 8 ángulos, los mismos 8 accesorios d
 búsqueda y AEO** que ninguna otra mascota tiene (ver delta al final). El logo 3D está además
 resuelto por **escala** (pequeña, mediana, grande, monumental) **y color** (blanco, navy), porque una
 pieza monumental y una de sobremesa no se iluminan igual.
+
+> **Dónde viven los archivos de `ai-generations/`:** las rutas `ai-generations/...` son lógicas; si una falta en disco, `pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>` antes de componer, nunca regenerarla ni sustituirla ([contrato](AI_GENERATIONS_STORAGE_V1.md)). Los kits sellados en `scripts/foto/assets.lock.json` también están en el canon; una copia en canon no autoriza borrar el original local.
 
 ## 2. Las tres clases de asset, y para qué sirve cada una
 
@@ -142,6 +145,7 @@ Comando: **`pnpm foto:lanyard --nombre "<N>" --cargo "<C>" --foto <retrato.png> 
 | **Lanyard** | el **carnet**, que cambia por persona — Julio, Nexa, cada quien el suyo | **Sí.** No puede existir una vista fija: se arma cada vez con `pnpm foto:lanyard` |
 | **Hoodie** | la estampa de espalda: logo + «Empower your Growth», **siempre la misma** | **No.** Se compuso una vez con `estampa-espalda.mjs`, entró como referencia a las 35 vistas del kit y quedó lista — incluida `16-puesto-espalda`, con la estampa impecable sobre la prenda puesta |
 | **Polo, chaqueta, gorra** | emblema o logotipo **fijo** | **No.** Mismo caso que el hoodie |
+| **Traje biónico de Nexa** | isotipo incrustado en el pecho y logo completo serigrafiado en la espalda, **fijos** | **No.** Se compusieron una vez con `foto:isotipo` (`--marca logotipo` en la espalda) y viajan armados en la referencia, con el macro de la placa en escena [operador, 2026-10-02]. TASK-1940 |
 
 **Este documento nació de un error de esta clase y estuvo a punto de repetirlo.** Tras resolver el
 lanyard se anotó «el parche de la espalda del hoodie es el siguiente candidato» — y el operador

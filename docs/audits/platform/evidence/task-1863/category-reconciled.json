@@ -1,0 +1,53 @@
+{
+  "checkedAt": "2026-09-28T10:12:41.192Z",
+  "before": {
+    "public_id": "EO-GAVP-0020",
+    "category": "Growth Operating System",
+    "category_node_id": null
+  },
+  "category": {
+    "nodeId": "sector:marketing_services",
+    "label": {
+      "es": "Servicios de marketing",
+      "en": "Marketing services"
+    },
+    "source": "taxonomy_alias",
+    "confidence": 0.9
+  },
+  "stopped": [
+    {
+      "public_id": "EO-GRUN-00060",
+      "status": "failed"
+    },
+    {
+      "public_id": "EO-GRUN-00059",
+      "status": "failed"
+    },
+    {
+      "public_id": "EO-GRUN-00058",
+      "status": "failed"
+    }
+  ],
+  "runs": [
+    {
+      "public_id": "EO-GRUN-00057",
+      "status": "running",
+      "estimated_cost_usd": "0.0000"
+    },
+    {
+      "public_id": "EO-GRUN-00058",
+      "status": "failed",
+      "estimated_cost_usd": "0.0000"
+    },
+    {
+      "public_id": "EO-GRUN-00059",
+      "status": "failed",
+      "estimated_cost_usd": "0.0000"
+    },
+    {
+      "public_id": "EO-GRUN-00060",
+      "status": "failed",
+      "estimated_cost_usd": "0.0000"
+    }
+  ]
+}

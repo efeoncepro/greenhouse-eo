@@ -59,7 +59,7 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 | Domain | `render/store.ts` | claim (lease+fence+reclaim+org quota), transitions (+events), retry, cancel, inserts, readers by edition/run |
 | Domain | `render/commands.ts` · `render/readers.ts` | `requestInsightRender`, `retryInsightRender`, `cancelInsightRender`; `readInsightRenderRun(s)` |
 | Domain | `render/outputs-port.ts` | real `InsightOutputsPort` + `wireInsightOutputsPort()` (called from `commands/index.ts`) |
-| Domain | `render/insights-deck-mapper.ts` · `render/report-mapper.ts` · `render/figure-pages.ts` · `render/composition-helpers.ts` · `render/labels.ts` · `render/plan-limits.ts` | frozen plan → `insights-deck` slides (deck_pdf, since 2026-09-22; the deck-axis mapper was retired) and `insights-report` pages (report_pdf); also line/pie/donut/scatter and a paginated A4 index; in production since release `ebb9212a32ce` (2026-09-24), first productive A4 + deck render 2026-09-25 |
+| Domain | `render/insights-deck-mapper.ts` · `render/report-mapper.ts` · `render/figure-slots.ts` (replaced `figure-pages.ts`, TASK-1889) · `render/composition-helpers.ts` · `render/labels.ts` · `render/plan-limits.ts` | frozen plan → `insights-deck` slides (deck_pdf, since 2026-09-22; the deck-axis mapper was retired) and `insights-report` pages (report_pdf); also line/pie/donut/scatter and a paginated A4 index; in production since release `ebb9212a32ce` (2026-09-24), first productive A4 + deck render 2026-09-25 |
 | Composer | `src/lib/artifact-composer/manifest-hash.ts` | `hashResolvedManifest` domain-free (re-exported by Proposal `render-jobs.ts`) |
 | Worker | `services/artifact-worker/consumer-contract.ts`, `consumers/{proposal,insights,index}.ts`, `main.ts` | registry dispatch; `INSIGHTS_RENDER_ENABLED` in `deploy.sh` (+ `deploy-contract.test.ts`) |
 | Lanes | `src/lib/api-platform/resources/{app,ecosystem}-insights.ts` + routes `…/insights/editions/[editionId]/render`, `…/insights/render-runs/[renderRunId]{,/retry,/cancel}` | request/list/get/retry/cancel |
@@ -97,7 +97,7 @@ sharing/delivery/schedules flags OFF there (ON in staging); the four migrations 
 | Domain | `sharing/web-model.ts` + `contracts/web-model.ts` | `InsightWebModelV1` resolver and `InsightSharedEditionResponseV1` DTO for Think |
 | Domain | `delivery/contracts.ts` | modalities, states, skip reasons, transport statuses, honest rollup, per-attempt correlation, `INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE = false` |
 | Domain | `delivery/commands.ts` · `delivery/store.ts` | request / cancel / retry / reconcile / read deliveries |
-| Domain | `delivery/dispatch.ts` | `dispatchInsightDeliveryIntent`: atomic claim, revalidation, share_link or attachment send, accepted/failed/ambiguous |
+| Domain | `delivery/dispatch.ts` | `dispatchInsightDeliveryIntent`: atomic claim, revalidation, share_link or attachment send, accepted/failed/ambiguous; `email_delivery_id` = the recipient's `email_deliveries` row (attachment resolves it by `source_event_id` after sending, never the batch id — `8882af0e3`) |
 | Domain | `schedules/contracts.ts` · `schedules/commands.ts` · `schedules/store.ts` | create/activate/pause/retire/read schedules; DTO hides the authority user id |
 | Domain | `schedules/tick.ts` | `runInsightSchedulesTick`: authority revalidation via `session_360`, closed periods, occurrence claim, create edition + render, retention purge |
 | Domain | `window.ts` (extended) | `civilToday`, `resolveClosedInsightPeriods` (calendar month, ISO week, civil day in the zone) |
@@ -105,6 +105,7 @@ sharing/delivery/schedules flags OFF there (ON in staging); the four migrations 
 | Domain | `flags.ts` · `errors.ts` · `events.ts` · `authz.ts` · `ports.ts` | new flags, errors (`InsightsQuotaExceededError`, `*DisabledError`), events, needs `share_*`/`delivery_*`/`schedule_*` |
 | Public route | `src/app/api/public/insights/shared/[token]/route.ts` | JSON `InsightSharedEditionResponseV1` (404/410/429/503, `no-store`) |
 | Public route | `src/app/api/public/insights/shared/[token]/outputs/[output]/route.ts` | download proxy through `downloadPrivateAsset` with actor `null` + `insights_share_grant` channel, grant revalidated before bytes |
+| Edge guard (TASK-1876) | `src/lib/security/public-burst-guard/firewall-rules.ts` + `scripts/security/public-burst-guard.ts` (`pnpm security:public-burst-guard [--apply]`) | Vercel Firewall rate limit on `/api/public/**`, 20 req / 10 s per IP; enforce staging/preview, observe production; edge 429 before the function (no PG); domain limiter stays behind; Think (TASK-1875) exempted by explicit condition |
 | App lane | `…/app/insights/editions/[editionId]/shares`, `…/insights/shares/[shareGrantId]/revoke` | create/list/revoke links |
 | App lane | `…/app/insights/editions/[editionId]/deliveries`, `…/deliveries/[deliveryIntentId]{,/cancel,/retry}`, `…/delivery-recipients/[deliveryRecipientId]/reconcile` | request/list/read/cancel/retry/reconcile deliveries (human only) |
 | App lane | `…/app/insights/schedules{,/[scheduleId]{,/activate,/pause,/retire}}` | define/activate/pause/retire/read schedules (human only) |
@@ -122,10 +123,10 @@ sharing/delivery/schedules flags OFF there (ON in staging); the four migrations 
 | MCP | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` | 7 tools (62 total, hash `9fc46c8d90d3`) |
 | Gateway | `efeonce-mcp` 1.7.0 (PR #16 `4c9d7c44`, revision `00055-gk6`, 58 tools), provider `greenhouse-insights` contract `task-1848-v1` | federates the 7 tools; share create/revoke on `efeonce.mcp.insights.write` (fail-closed: no client carries it), 5 reads on the base scope; native authority `unsupported` per tool with the surface's real capability |
 
-## TASK-1888 / TASK-1889 — approved redesign (2026-09-25): code complete, rollout pending
+## TASK-1888 / TASK-1889 — approved redesign: both complete 2026-09-26, in production
 
 Status legend: **exists** = committed and verified in the repo; **planificado (TASK-18xx)** = named by the task, not built.
-Production still renders with the TASK-1847 v1 catalogs and the v1 contract until the 1888/1889 release.
+Production renders with these catalogs and the v2 contract since the 2026-09-26 releases (`0e87c7a443a2` + `f9257b9c94af`).
 
 ### Design references (exist, committed in `1ae82624d` and `568bfa669`)
 
@@ -138,7 +139,7 @@ Production still renders with the TASK-1847 v1 catalogs and the v1 contract unti
 | Wireframe | `docs/ui/wireframes/TASK-1889-efeonce-insights-premium-catalogs.md` | region-by-region spec of every A4 page and slide, with data, states and rules |
 | Editable source | canvas «Gráficos de Efeonce Insights» (private Artifact of the operator, version 36) | editable origin; the repo copies above are the durable contract |
 
-### Pieces the redesign built on (TASK-1847; v1 templates replaced by TASK-1889 in `develop`)
+### Pieces the redesign built on (TASK-1847; v1 templates replaced by TASK-1889, in production since 2026-09-26)
 
 | Piece | Where |
 | --- | --- |
@@ -147,7 +148,7 @@ Production still renders with the TASK-1847 v1 catalogs and the v1 contract unti
 | Geometry of 15 families | `src/lib/artifact-composer/chart-geometry.ts` (Vercel-safe values via `@/lib/artifact-composer/pure`) |
 | Local preview over real data | `scripts/insights/preview-edition.ts` |
 
-### Built by TASK-1888 (backend-data) — code complete 2026-09-25, flag OFF
+### Built by TASK-1888 (backend-data) — complete 2026-09-26, in production, flag ON
 
 | Piece | Where | Responsibility |
 | --- | --- | --- |
@@ -164,11 +165,11 @@ Production still renders with the TASK-1847 v1 catalogs and the v1 contract unti
 | Dark logo | `greenhouse_core.organizations.logo_on_dark_asset_id`; `account-360/organization-brand-assets.ts` (`attachOrganizationLogoAsset({ variant })`); `account-360/organization-logo-variants-reader.ts` | write only via account-360; light reader safe for ops-worker |
 | Lanes | `app/api/platform/{app,ecosystem}/insights/cover-preference/route.ts` + `api-platform/resources/{app,ecosystem}-insights(-read).ts` | GET/POST |
 | MCP | `src/mcp/greenhouse/{tool-manifest,tools,http-client,server}.ts` | `get/set_insight_cover_preference`; manifest 64 tools `a08f649aab8f` |
-| Flag | `flags.ts` `isInsightsEditorialV2Enabled`; `services/ops-worker/deploy.sh` (`:-false`) | Vercel + ops-worker |
+| Flag | `flags.ts` `isInsightsEditorialV2Enabled` (`=== 'true'`); `services/ops-worker/deploy.sh` (`:-true`) | Vercel + ops-worker; ON in staging, Production and ops-worker since 2026-09-26 (render Job does not read it) |
 | Copy | `src/lib/copy/insights.ts` (`scopeLines`, `chapterOpenings`, `channels`, `targets`, `figures`, `reading`) | TASK-1889 owns `GH_INSIGHTS.catalog` |
 | Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | read-only v2 plan over real data |
 
-### Built by TASK-1889 (ui-ux) — code complete 2026-09-25, not pushed (rollout pending)
+### Built by TASK-1889 (ui-ux) — complete 2026-09-26, in production
 
 Detail: architecture §14.9, implementation record §8.z.
 
@@ -186,7 +187,42 @@ Detail: architecture §14.9, implementation record §8.z.
 | Shared engine | `artifact-composer/render.ts` (`img.decode()` before capture), `contracts.ts` + `synthesize.ts` (`example?`) | probe uses the contract's sample value |
 | Fidelity gate | `pnpm insights:canvas-fidelity [--gray]` → `scripts/insights/canvas-fidelity.ts` + `canvas-fixtures/{report,deck}` | ≤ 1 % per page; `approvedException` only with operator approval |
 | Review dossier | `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/` | fidelity table, gray sheets, scorecard (`ui:quality` 4,59) |
-| Visual baseline | Insights frames of `pnpm composer:visual-gate --catalog=insights` | 27 frames at 0 px; deltas g–j in `BASELINE_DELTAS.md` |
+| Visual baseline | Insights frames of `pnpm composer:visual-gate --catalog=insights` | 27 frames at 0 px; deltas g–k in `BASELINE_DELTAS.md` |
 
 Removed: `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `render/figure-pages.ts`, v1
-bar/family/path resolvers. `artifact-composer/chart-figure.ts` has no consumers left (own test kept; follow-up to retire).
+bar/family/path resolvers. `artifact-composer/chart-figure.ts` and its test were retired on 2026-09-26 (no consumers).
+
+## TASK-1875 — shared web in Think (complete 2026-09-28; Think `main@544ecd4` in production, Greenhouse model 1.0 in production / 1.1 in staging; `INSIGHTS_SHARING_ENABLED` ON in production since 2026-09-28)
+
+| Layer | Where | What |
+| --- | --- | --- |
+| Contract | `src/lib/efeonce-insights/contracts/web-model.ts` | `INSIGHT_WEB_MODEL_VERSION = '1.1'` (additive over 1.0): `InsightWebChartDerivedV1.funnelStepRates`, `InsightWebReadingV1`, `chapter.opening/readings`, `essentials`, `decision`, `measurement`, `ask`, `scopeLines`, `header.clientLogo` |
+| Projection | `sharing/web-model.ts` (`projectReading`, `deriveChart`) | editorial v2 fields via conditional spreads; funnel rates from `funnelGeometry` (`@/lib/artifact-composer/pure`) + `formatFactValue(rate, 'percent', locale)` |
+| Public resolve | `sharing/public.ts` (`readSharedInsightClientLogo`) | `header.clientLogo` only when sealed `plan.cover` has `logoAssetId` + `logoVariant`; logo bytes through `downloadPrivateAsset` with the same gate as the view |
+| Public route | `src/app/api/public/insights/shared/[token]/logo/route.ts` | `GET` sealed cover logo; `INSIGHT_SHARE_PUBLIC_HEADERS` (private `no-store`, `noindex`, `no-referrer`) |
+| Edge guard | `src/lib/security/public-burst-guard/firewall-rules.ts` | `THINK_SERVER_KEY_HEADER = 'x-efeonce-think-key'`; `buildPublicBurstGuardRule(spec, {thinkKey})` adds a negated `header eq` condition; drift if the live rule lacks it |
+| Script env | `scripts/security/public-burst-guard.ts` | reads `PUBLIC_BURST_GUARD_THINK_KEY` (never printed) |
+| Share URL | `sharing/token.ts` (`buildInsightShareUrl`) → `delivery/dispatch.ts` (email), `sharing/commands.ts` (create response) | `${INSIGHTS_SHARE_PUBLIC_BASE_URL \|\| 'https://think.efeoncepro.com'}/insights/r/<token>` |
+| Think route (repo `efeonce-think`) | `src/pages/insights/r/[token].astro` (SSR) | renders `InsightWebModelV1`; downloads `?descargar=<output>` and logo `?logo=1` relative to the same URL (token never in HTML) |
+| Think client | `efeonce-think/src/lib/insights.ts` | server headers `x-efeonce-think-key` (`GREENHOUSE_THINK_KEY`) + `x-vercel-protection-bypass` (`GREENHOUSE_API_BYPASS`), both astro server secrets default `''`; accepts `modelVersion` `/^1\.\d+$/`; never logs the token |
+| Think acceptance gate | `efeonce-think/src/lib/insights-accept.ts` (`acceptSharedEdition`) | single gate for real responses and dev fixtures (Think `7485e32`); unsupported major or payload without `model`/`header` ⇒ 502 without edition data |
+| Think public sample | `efeonce-think/src/pages/insights/muestra.astro` + `src/lib/insights-fixtures.ts` | prerendered sample with a fictitious brand, `noindex`, out of the sitemap; never calls Greenhouse (the sharing flag does not gate it) and loads GTM on purpose (no token) |
+| Think UI | `efeonce-think/src/components/insights/{InsightReport,ModuleScene,ChartFigure,FactMark}.astro` (`InsightReport` is the single render for `/insights/r/[token]` and `/insights/muestra`), `src/lib/insights-{view,copy,tokens,chart-geometry}.ts`, `src/scripts/insights-report.ts`, `src/styles/insights.css`; states via `src/components/primitives/StatusScreen.astro` | anatomy, 1.0 vs 1.1, presentation mode, motion, print and responsive in [`ui-and-brand.md`](ui-and-brand.md) §4 |
+| Think verification | `efeonce-think`: `pnpm test:insights` (`tests/insights.test.ts`, 16 tests), `pnpm verify:insights` (`scripts/verify-insights-report.mjs`), `pnpm audit:insights-a11y` (`scripts/audit-insights-a11y.mjs`), `scripts/capture-insights-report.mjs` (not in `package.json`) | dossier in Greenhouse `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/` (+ `.scorecard.json`, avg 4.56) |
+
+## Product mark, brand assets and the AXIS reference (2026-09-28)
+
+Detail and rules: [`ui-and-brand.md`](ui-and-brand.md).
+
+| Piece | Where | Responsibility |
+| --- | --- | --- |
+| Mark generator | `scripts/brand/build-insights-logo.mjs` (commits `7deed5888` logo/isotype, `b64f07ffa` lockup) | builds `insights-{logo,isotype,lockup}-{positive,negative}.svg` from Poppins Bold outlines; never edit a SVG by hand |
+| Official files | AXIS `packages/brand-assets` → `@efeoncepro/axis-brand-assets` **0.4.0** (tag `v0.4.0`; AXIS `25b5ecf` + `4760e3e`); ids in `src/manifest.ts`, brand `insights` in `AXIS_BRAND_ASSET_BRANDS` (`src/index.ts`), rules in the package README | sealed SHA-256; new asset kind `lockup` |
+| Greenhouse pin | `package.json` `@efeoncepro/axis-brand-assets` **0.3.5** | does NOT carry the Insights files yet (gap) |
+| Think copies | `efeonce-think/public/branding/insights/` (5 SVG + `og-insights.png`, manual copies; the OG is generated by `efeonce-think/scripts/build-insights-og.mjs`) | lockup in the hero and presentation mode; OG image of the report and the sample |
+| Catalog logos | `src/lib/artifact-composer/catalogs/insights-*/assets/brand/logo-*.svg`; covers `insights-report/report-cover{,-light}.html` (`.brand-lockup` / `.brand-product`, `report-editorial.css`), the mini-lockup of `insights-report/report-chapter.html`, and `insights-deck/insights-cover.html` + `insights-chapter.html` (cover lockup and foot, `.lockup` / `.product`) | covers and chapter openings compose Efeonce logo + rule + «INSIGHTS» as uppercase with 0.34em tracking (spaced capitals, not true small caps; type version; accent on navy covers = open operator decision, `ui-and-brand.md` §7.7); page footers and the A4 back cover use the Efeonce logo; the official `insights-lockup-*` file is not used yet (gap) |
+| Data-color roles | `src/lib/artifact-composer/brand-packs/axis/editorial-roles.json` (copied by hand in `efeonce-think/src/lib/insights-tokens.ts` `dataRoles`) | extraction candidate to AXIS (two consumers); the copies diverged on «prior on paper» (`#0e8c82` in Think) — resolved 2026-09-28 in Think `b3c5820` (`#1f9e94`, same as the PDFs); Think copies only 4 of the roles |
+| Chart geometry | `src/lib/artifact-composer/chart-geometry.ts` + `catalogs/insights-shared/figure-svg.ts` (copied in `efeonce-think/src/lib/insights-chart-geometry.ts`) | extraction candidate to AXIS (two consumers) |
+| AXIS Lab reference page | AXIS `apps/lab/src/pages/references/insights.astro` (+ `insights.json.ts`), guide `docs/agent-composition/insights.md` — **published 2026-09-28 (AXIS main `3dfbf0e`)**: `https://axis.efeonce.org/references/insights/` and `/references/insights.json` answer 200; the live example of the product is `think.efeoncepro.com/insights/muestra` | reference only (mark, approved applications, report sections, live-report UI with sample data); no components or contracts |
+| Earlier Lab boards | AXIS `apps/lab/src/pages/references/graphic-line.astro` chapter 9, boards 7.1 / 7.2 (`apps/lab/src/data/graphic-line-elements.json`) | design tests with sample figures, not the Insights design |
+

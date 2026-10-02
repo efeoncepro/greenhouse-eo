@@ -1,0 +1,21 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.1",
+  "surface": "audiovisual",
+  "format": "16x9",
+  "role": "callout",
+  "recipe": "callout-selection",
+  "line": "growth",
+  "theme": "dark",
+  "selection": {
+    "target": "object",
+    "label": "Dirección de arte",
+    "participantKind": "role",
+    "box": {
+      "left": 0.375,
+      "top": 0.5185,
+      "right": 0.5521,
+      "bottom": 0.7407
+    }
+  }
+}

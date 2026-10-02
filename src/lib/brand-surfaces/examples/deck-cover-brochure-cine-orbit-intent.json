@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "document",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Brochure · Servicios 2026",
+    "question": "¿Qué hace Efeonce?",
+    "answer": [
+      "Crecer"
+    ]
+  },
+  "body": "**Cinco** líneas de servicio:\nGrowth · Brand · Engine · Voice · Revenue",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png",
+    "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara frente a una órbita de luz teal gigante con una sola esfera"
+  },
+  "column": {
+    "topPx": 300
+  }
+}

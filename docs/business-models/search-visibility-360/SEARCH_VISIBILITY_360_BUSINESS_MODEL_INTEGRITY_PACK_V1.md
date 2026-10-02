@@ -145,7 +145,7 @@ No se considera aprobación hasta que Finance la confirme en el cotizador y exis
 |---|---|---|
 | Cliente, Search Console, Analytics, CMS y first-party data | cliente, con acceso limitado para delivery | autorización, retención, revocación y exportación |
 | Diagnósticos, baselines y reports | output contractual para cliente; método reusable de Efeonce/Wave | derechos de reutilización, anonimización y portability |
-| AI Visibility Grader | capability/IP de Efeonce/Greenhouse según runtime | licencia de uso, claims, disponibilidad y datos de entrenamiento |
+| AI Visibility Grader (nombre técnico/histórico del [Efeonce AEO Assessment](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md)) | capability/IP de Efeonce/Greenhouse según runtime | licencia de uso, claims, disponibilidad y datos de entrenamiento |
 | Templates, método, prompts, taxonomías y playbooks | Efeonce/Wave salvo pacto contrario | background IP vs. foreground work product |
 | Contenido producido por Globe | derechos según SOW y proveedor | licencia, buyout, aprobación, uso en casos y expiración |
 | Datos de providers | subject to provider terms | pass-through, subprocessor, retención y fallback |

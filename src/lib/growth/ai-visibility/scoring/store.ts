@@ -11,8 +11,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import { type NormalizedFinding } from '../normalization/contracts'
-import { type GraderScoreStatus } from './config'
+import type { NormalizedFinding } from '../normalization/contracts'
+import type { GraderScoreStatus } from './config'
 import { type DimensionScore, type PersistedGraderScore } from './engine'
 
 type RawFinding = Record<string, unknown>
@@ -161,6 +161,7 @@ export const upsertGraderScore = async (score: PersistedGraderScore): Promise<Pe
 
 /** Score previo comparable de un perfil + metadata del run que lo produjo (TASK-1236). */
 export interface PreviousComparableScore {
+  competitorSetComparable?: boolean
   score: PersistedGraderScore
   promptPackVersion: string
   finishedAt: string | null
@@ -180,11 +181,17 @@ export const getPreviousComparableScore = async (input: {
   currentRunId: string
 }): Promise<PreviousComparableScore | null> => {
   const rows = await runGreenhousePostgresQuery<RawScore>(
-    `SELECT s.*, r.prompt_pack_version, r.finished_at
+    `SELECT s.*, r.prompt_pack_version, r.finished_at,
+      (r.competitor_set_id IS NOT DISTINCT FROM (SELECT competitor_set_id FROM greenhouse_growth.grader_runs WHERE run_id=$3)) AS competitor_set_comparable
        FROM greenhouse_growth.grader_scores s
        JOIN greenhouse_growth.grader_runs r ON r.run_id = s.run_id
       WHERE r.profile_id = $1
         AND s.score_version = $2
+        AND (r.market_id, r.market_code, r.locale, r.provider_policy_version)
+          IS NOT DISTINCT FROM (SELECT ROW(market_id,market_code,locale,provider_policy_version)
+            FROM greenhouse_growth.grader_runs WHERE run_id=$3)
+        AND (r.matching_snapshot -> 'brand') IS NOT DISTINCT FROM
+          (SELECT matching_snapshot -> 'brand' FROM greenhouse_growth.grader_runs WHERE run_id=$3)
         AND r.created_at < (
           SELECT created_at FROM greenhouse_growth.grader_runs WHERE run_id = $3
         )
@@ -198,16 +205,14 @@ export const getPreviousComparableScore = async (input: {
   if (!row) return null
 
   return {
+    competitorSetComparable: row.competitor_set_comparable !== false,
     score: projectScore(row),
     promptPackVersion: String(row.prompt_pack_version),
     finishedAt: (row.finished_at as string | null) ?? null
   }
 }
 
-export const getGraderScore = async (
-  runId: string,
-  scoreVersion?: string
-): Promise<PersistedGraderScore | null> => {
+export const getGraderScore = async (runId: string, scoreVersion?: string): Promise<PersistedGraderScore | null> => {
   const rows = scoreVersion
     ? await runGreenhousePostgresQuery<RawScore>(
         `SELECT * FROM greenhouse_growth.grader_scores WHERE run_id = $1 AND score_version = $2 LIMIT 1`,

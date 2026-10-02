@@ -1,0 +1,7 @@
+interface:
+  display_name: "Planificar campaña (Efeonce)"
+  short_description: "Plan an Efeonce campaign end-to-end with AI (EPIC-049): strategy, KPIs, audience matrix, message house, content plan, SEO/AEO from Search Visibility 360, measurement, copy drafts and a human decision checklist. Reads Marketing Studio; never approves, publishes or spends alone."
+  default_prompt: "Use $efeonce-campaign-planning when asked to plan a campaign or to decide what to do with a CMP-###. Read the brief or the Studio campaign first (studio.* tools), follow references/workflow-tools.md step by step, fill references/plan-template.md with a source and date for every number (write «no registrado» when absent), and close with the decision checklist. Writes into Studio only through the governed commands in references/studio-write-mapping.md once they exist."
+
+policy:
+  allow_implicit_invocation: true

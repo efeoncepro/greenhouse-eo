@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · cuadro a cuadro del loop</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `motion.storyboard`: la hoja del cuadro a cuadro del loop (8 s con foto fija). Cada cuadro es el
+      lienzo 16:9 del loop, a escala, en un estado de su timeline: anticipación, la lente se abre, el arco corre y
+      la esfera golpea, la voz entra, la selección encaja, el sostén, el cierre (reveal) y la tapa. Cada cuadro trae
+      todas las capas y su clase de escena (`gl-sb-kind-*`) muestra sólo las suyas. La foto la copia un hook desde
+      el slot `photo` (un solo plate para los ocho cuadros). Referencia aprobada: tablero MotionStoryboard.
+    -->
+    <main class="gl-sheet" data-gl-root data-slot="frame">
+      <p class="gl-sheet-title" data-slot="title">Motion · 8 s con foto fija</p>
+
+      <div class="gl-hidden" data-slot="photo">
+        <img data-slot-field="src" data-gl-sb-source alt="" />
+      </div>
+
+      <ol class="gl-sb-grid" data-slot="frames">
+        <li class="gl-sb-frame">
+          <div class="gl-sb-window">
+            <div class="gl-sb-stage" data-gl-sb-stage>
+              <img class="gl-photo-layer gl-lens-outside" data-gl-sb-photo alt="" />
+              <div class="gl-lens-veil" aria-hidden="true"></div>
+              <div class="gl-lens-clip" aria-hidden="true">
+                <img class="gl-photo-layer" data-gl-sb-photo alt="" />
+              </div>
+              <img class="gl-layer" data-slot-field="orbit" alt="" />
+              <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Tu marketing mide<br />lo que vende?</span></p>
+              <p class="gl-answer" data-gl-sb-selection-target><span class="gl-answer-lead" data-slot-field="answerLead">Ahora</span><span class="gl-answer-last"><span data-slot-field="answer">sí</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></span></p>
+              <div class="gl-sb-close gl-sb-reveal" aria-hidden="true">
+                <img class="gl-sb-isotype" src="assets/efeonce-isotype-negative.svg" alt="" />
+              </div>
+              <div class="gl-sb-close gl-sb-endcard">
+                <img class="gl-sb-logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+                <p class="gl-sb-slogan"><span class="gl-slogan-empower">Empower</span> <span class="gl-slogan-your">your</span> <span class="gl-slogan-growth">Growth</span></p>
+              </div>
+            </div>
+          </div>
+          <p class="gl-sb-time"><span data-slot-field="time">0,0–0,3 s</span> · <span data-slot-field="title">Anticipación</span></p>
+          <p class="gl-sb-caption" data-slot-field="caption">Navy vacío. El anillo aparece chico y la esfera retrocede antes de salir.</p>
+        </li>
+      </ol>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "f-efeonce",
+    "base": "#F7F8F6",
+    "interior": "#023C70"
+  },
+  {
+    "id": "f-globe",
+    "base": "#091951",
+    "interior": "#FF6500"
+  },
+  {
+    "id": "f-wave",
+    "base": "#091951",
+    "interior": "#0375DB"
+  },
+  {
+    "id": "f-reach",
+    "base": "#091951",
+    "interior": "#F83902"
+  },
+  {
+    "id": "f-wave-color",
+    "base": "#0375DB",
+    "interior": "#082E8E"
+  },
+  {
+    "id": "f-reach-color",
+    "base": "#F83902",
+    "interior": "#FF6F00"
+  },
+  {
+    "id": "f-globe-color",
+    "base": "#BB1954",
+    "interior": "#FF6500"
+  }
+]

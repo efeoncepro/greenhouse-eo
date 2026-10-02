@@ -1,0 +1,53 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:24:56.999Z",
+  "run": "ai-generations/2026-09-26_plastilina-volumen",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-26_plastilina-volumen",
+  "totalBytes": 8611432,
+  "fileCount": 7,
+  "files": [
+    {
+      "path": "A-liso.png",
+      "sizeBytes": 1624990,
+      "sha256": "2551659029012c0a21184074dcb6754f92edd1667550d7719ea6175b69d80d8e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_plastilina-volumen/A-liso.png"
+    },
+    {
+      "path": "B-plasticina.png",
+      "sizeBytes": 1637240,
+      "sha256": "f0205d8d500b5cc06793c41775ddeb9433c1cd5dc3080b51816d15a3c7de387e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_plastilina-volumen/B-plasticina.png"
+    },
+    {
+      "path": "C-bombillo-primer-plano.png",
+      "sizeBytes": 1638690,
+      "sha256": "48ddab562b0fa4d1fdb61584a01a2ce1705fce754dde8ee6061cee0f790482a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_plastilina-volumen/C-bombillo-primer-plano.png"
+    },
+    {
+      "path": "prueba-liso-2.png",
+      "sizeBytes": 929308,
+      "sha256": "6ab03c571e1adbd06822aa269d6cb5b706a4059ae10e3ece312c18f6effcfebb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_plastilina-volumen/prueba-liso-2.png"
+    },
+    {
+      "path": "prueba-liso-3.png",
+      "sizeBytes": 911935,
+      "sha256": "ef0536d8a6a1795b4cb713596c7762b55d16f1c1926ae16126fcdeb46d97cbec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_plastilina-volumen/prueba-liso-3.png"
+    },
+    {
+      "path": "prueba-liso-4.png",
+      "sizeBytes": 934958,
+      "sha256": "454a1da74ce2016bec1229748e8f76418ef1e9084c02ab37b7084f27ab57b7d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_plastilina-volumen/prueba-liso-4.png"
+    },
+    {
+      "path": "prueba-liso.png",
+      "sizeBytes": 934311,
+      "sha256": "829a17505735499e1398c21b39feb7385c7d9dcefa0054be4c665930be19da4c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_plastilina-volumen/prueba-liso.png"
+    }
+  ]
+}

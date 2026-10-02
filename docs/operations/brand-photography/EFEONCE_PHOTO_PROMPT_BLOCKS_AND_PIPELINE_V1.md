@@ -1,9 +1,9 @@
 # Bloques de prompt y pipeline de producción — fotografía de marca Efeonce V1
 
 > **Tipo de documento:** Especificación técnica de producción (prompts, comandos, scripts, QA)
-> **Versión:** 1.0
+> **Versión:** 1.6
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-20
+> **Última actualización:** 2026-10-02 por Claude — 1.6: el registro cine en `foto:prompt` — `AJUSTES_CINE`, el bloque `CINEMATIC CRAFT` y sus inyecciones, `foto:cine:nueva`, `foto:validar:cine` y `regresion-prompt.mjs` como gate de no-regresión ([delta 2026-10-02 (b)](#delta-2026-10-02-b--el-registro-cine-en-fotoprompt)). 1.5: §3.7.1 lista el traje y los lentes biónicos de Nexa entre los kits y las tres claves de kit que estrenaron (`instruccionEnUso`, `acabadoMarca`, `macroEnUso`). 1.4: las referencias de identidad dicen QUIÉN es, no CÓMO está ([delta 2026-10-02](#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)). Antes, 2026-09-26: conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este documento es el **cómo se produce**: los bloques de texto que incorpora `pnpm foto:prompt` en cada prompt, la ficha de
@@ -16,6 +16,111 @@ verbatim en `rondas/<ronda>/batch*.json` y `*.txt` (versionados); las imágenes 
 Marcas: **[medido]**, **[decisión del operador]**, **[criterio]**, **[pendiente]** (ver [índice](./README.md)).
 
 ---
+
+## Delta 2026-10-02 (b) — el registro cine en `foto:prompt`
+
+**[medido, TASK-1926]** Ninguna sesión llegaba sola a una foto cine aprobable: todas consultaban a la sesión de la línea
+gráfica. La primera prueba ciega (`ai-generations/2026-10-02_prueba-ciega-cine/`) mostró la causa en el compilador:
+tres sesiones nuevas llegaron solas a un plate, y las tres con la **cara rellena**, porque los bloques compartidos se
+escribieron para el registro documental y contradecían al cine. Todo lo de este delta actúa **sólo** con
+`"registro": "cine"` en la ficha; en los demás registros el prompt queda idéntico. La guía de oficio es el
+[casebook](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md); el canon, el [registro cine](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (1.9).
+
+**1. `AJUSTES_CINE` — frases de los bloques compartidos que en cine se reemplazan** (`scripts/foto/build-prompt.mjs`):
+
+| Frase documental | En cine pasa a | Por qué |
+|---|---|---|
+| «a real candid documentary photograph» | «a real cinematic film still» | El cine es ficción dirigida, no documental |
+| «a mug, a notebook» como detalles vividos | nada vivido ni analógico: sin tazas, cuadernos, libros ni papel | Utilería documental dentro de una escena de cine |
+| «shadows open» | sombras a casi negro con textura, sin relleno | Era la causa de la cara rellena |
+| «real sunlight» o una fuente fuerte | una sola fuente dura, cerca y de lado, sin relleno | Ídem |
+| Paleta «neutral-warm» con el azul emergiendo | el color del fenómeno de luz declarado es el único acento; el resto navy profundo y casi negro | El color del cine sale de la luz de la línea |
+| Balance «warm-neutral, shadows never blue» | «cool-neutral»; sombras navy-negro, nunca ámbar ni azul saturado | Una prueba salió con el fondo ámbar |
+| Sombra «warm» de la reserva | sombra casi negra pareja | Ídem |
+| PRINTED MATTER (lomos, etiquetas, pantallas legibles por medios físicos) | sin impresos, libros ni pantallas salvo que la escena los declare | La sala de trabajo real no existe en cine |
+| Personas latinoamericanas genéricas | sólo las personas que declara la escena, sin extras | Figuras sobrantes |
+| «real paper texture», desenfoque de manos, «DECISIVE MOMENT» | se quitan o pasan a «a single decisive instant» | Restos documentales que siguieron entrando en la segunda prueba ciega |
+| Luz motivada por un monitor, una lámpara o una ventana en cuadro | la fuente en cuadro es el objeto de luz que la escena declara como fenómeno | Ídem |
+| Aros de Nexa plateados | dorados, como su ancla de identidad | [decisión del operador, 2026-10-02] |
+
+**2. El bloque `CINEMATIC CRAFT (registro cine)`** se compila desde los campos cine de la ficha —nunca se escribe a
+mano— y va después de la escena. `foto:prompt` avisa cuando falta un campo y aborta con un `alcance` inválido:
+
+| Campo de la ficha | Qué inyecta |
+|---|---|
+| `llave {fuente, lado, distancia, tamano}` | `KEY LIGHT`: la única fuente, sin relleno, con la cara modelada por ella |
+| `primerPlano` | `DEPTH`: primer plano junto al lente, desenfocado y separado del lecho |
+| `fondo` | `BACKGROUND`; en 4:5 y 9:16, todo bajo el 36 % del alto |
+| `fenomeno {que, esServicio}` | `THE LIGHT PHENOMENON`; en 4:5 y 9:16, bajo el 36 % del alto con el tercio superior oscuro y calmo |
+| `alcance` (`nexa` · `proposal-cinematic` · `deck-seccion` · `deck-portada` · `manzanitas` · `social-nexa` · `publicidad-prueba`) | Con `deck-seccion`, `GAZE`: la mirada va al lado vacío del texto, nunca al lente |
+
+Además, sin campo propio: el lecho pedido **mate, no reflectante, como objeto real y no como banda**; la **escala
+vertical por encuadre** cuando la ficha trae `identidad` (`SUBJECT SCALE`: 9:16 de la cintura arriba, 4:5 del pecho
+arriba); el **uniforme navy** de las prendas Efeonce y del traje de Nexa, salvo el hoodie, que conserva el azul royal
+de su kit (`UNIFORM COLOUR`); y la **sección partida 1:1** con `"reservas": {"texto": {"lado": "izquierda", …}}`, que
+reserva el 40 % izquierdo en vez de la banda superior. Las decisiones que lo motivan están en el
+[registro cine, delta 2026-10-02 (b)](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega).
+
+**3. Comandos nuevos del registro cine:**
+
+```bash
+pnpm foto:cine:nueva --listar                               # las recetas aprobadas (scripts/foto/cine-recetas.json)
+pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta> [--formato <f>] [--alcance <a>]
+pnpm foto:validar:cine <plate.png>                          # aparte de foto:validar, que no cambió
+```
+
+- `foto:cine:nueva` copia la ficha de una foto aprobada, marca la escena «REESCRIBIR» y lista en `__completar` los campos
+  que faltan y en `__revisar` lo heredado (suspendido, objetos, identidad). **`foto:generar` no gasta mientras la escena
+  empiece con «REESCRIBIR»**, y `foto:prompt` avisa con `__completar` y `__revisar`. El índice tiene 12 fotos aprobadas,
+  ninguna vertical todavía.
+- `foto:validar:cine` tiene dos gates calibrados: sombra ≥ 35 % del cuadro con L\* < 20 y, en vertical, L\* p99 ≤ 45 en
+  el 36 % superior. Profundidad y llave son sólo informativas. No ve stickers, relleno ni azul rey bajo luz azul: eso lo
+  mira el agente `cine-reviewer` (sólo Claude Code; Codex aplica la rúbrica leyendo `.claude/agents/cine-reviewer.md`).
+
+**4. 🔴 Gate de no-regresión al tocar `build-prompt.mjs`.** La condición del operador fue no romper los comandos de los
+demás registros. Antes y después de cualquier cambio al compilador:
+
+```bash
+node scripts/foto/regresion-prompt.mjs --foto <scratchpad>/antes.json      # congela el prompt de todas las fichas en disco
+node scripts/foto/regresion-prompt.mjs --comparar <scratchpad>/antes.json  # sale con 1 si cambió una ficha NO cine
+```
+
+Las fichas viven fuera de git, así que la foto se guarda en el scratchpad de la sesión. Resultado de toda la
+iniciativa: **0 fichas no cine cambiadas** **[medido]**.
+
+## Delta 2026-10-02 — las referencias dicen quién es, no cómo está
+
+**[pedido del operador, 2026-10-02]** *«Nexa en casi todas las fotos sale con la misma pose de cara de un lado teniendo
+tantas poses»*. **Causa [medida]:** cuatro fuentes empujaban al mismo gesto —cabeza en tres cuartos, ladeada, mirada al
+lente y media sonrisa—:
+
+1. El bloque de Nexa ponía primero el **rostro en tres cuartos** y pedía «Preserve her face and hair EXACTLY as in the
+   references»: el modelo copiaba también el giro y la expresión de esa imagen.
+2. La vista puesta del traje biónico traía la cara de Nexa con ese gesto.
+3. Las **12 expresiones fotográficas** de `_identidad-nexa/5-expresiones/` comparten el mismo tres cuartos del ancla (se
+   editaron desde ella): pedir una expresión arrastraba la pose.
+4. Las fichas cine repiten «confident half-smile».
+
+**Corrección en `foto:prompt` [A/B medido sobre la ficha de `NX7d`]:**
+
+| Cambio | Alcance |
+|---|---|
+| REFERENCES agrega: *«The references define WHO each person is — features, proportions, skin and hair — never how they hold their head: the head turn, tilt, chin angle, gaze and facial expression come from the SCENE»*. La imagen pedida como `vista` manda en el ángulo; la de `expresion`, **sólo** en el gesto (*«copy only its facial expression… NOT its head angle or tilt»*) | todas las personas |
+| IDENTITY de Nexa: *«her features, not the moment they caught»* | bloque `nexa` |
+| Anclas de Nexa en orden **frontal → tres cuartos → cuerpo** | bloque `nexa` |
+| Las 12 expresiones fotográficas entran al catálogo: `carcajada`, `risa-elegante`, `sorprendida`, `esceptica`, `pensativa`, `neutra`, `preocupada`, `conviccion`, `escucha-empatica`, `curiosa`, `complicidad`, `mirada-lateral` | `expresiones` de `nexa` |
+| Aviso cuando la ficha trae a Nexa sin `expresion` ni `vista` (`auditarExpresion`) | `foto:prompt` |
+| El traje pasa a la escena **sin rostro** (vista 13 recortada bajo el mentón), como pide el método de kits | `traje-bionico-nexa` |
+
+**Resultado:** `NX7e` (sólo texto y orden) salió algo más frontal, con el mismo gesto; `NX7f` (expresión
+`conviccion` copiada entera) **no cambió nada**, porque esa referencia trae el mismo tres cuartos; `NX7g` (todo, con
+`sorprendida` y la pose descrita en la escena) salió **sin la inclinación y con otra expresión**, con la identidad A
+intacta (delineado con rabillo, lunar). El giro hacia el lado pedido **no** se cumplió: el ángulo se pide con `vista`,
+que trae su propia imagen. **Cerrado el mismo día:** `vista` + `expresion` se combinan con una persona sola (orden de
+imágenes: vista → expresión → ancla frontal → cuerpo) y en `NX7j` (`45-izq` + `curiosa`) la cabeza tomó el giro de la vista
+con la identidad intacta. Con el traje, además, Nexa no lleva reloj ni anillo (`ajustarParaTraje`). **Para variar de verdad, la ficha declara la expresión y la escena describe la pose; la
+frase fija «confident half-smile» deja de copiarse entre fichas.** Plates en
+`ai-generations/2026-10-01_traje-bionico-nexa/plates/NX7{d,e,f,g}-nexa-despliega-squad.png`.
 
 ## 0. Portabilidad de motor — el estilo NO depende del generador
 
@@ -191,7 +296,31 @@ IDENTITY (critical): the man is the SAME real person shown in the reference imag
 ```
 
 ```text
-IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
+IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her FACE and HAIR exactly as in the references — her features, not the moment they caught: her head turn, tilt, gaze and expression come from the scene and are never copied from a reference. Only pose, expression, clothing, light and setting change.
+```
+
+El equipo actual (decisión del operador, 2026-09-29): Andrés, Daniela, Humberly, Melkin y Valentina, en ese orden (Luis salió del equipo el mismo día); identidades aprobadas por el operador el 2026-09-29 ([roster](./EFEONCE_TEAM_ROSTER_V1.md)).
+
+**El vestuario del equipo lo decide la línea de la pieza** (decisión del operador, 2026-09-29): la ficha declara `"linea"` (una clave de `efeonceGraphicLine.lines`) y `pnpm foto:prompt` exige en `objetos` el hoodie en `brand` y la bomber o la softshell (con el polo debajo, si se quiere) en las líneas de negocio. Tabla y razón en el [roster §«El vestuario lo decide la línea de servicio»](./EFEONCE_TEAM_ROSTER_V1.md#el-vestuario-lo-decide-la-línea-de-servicio).
+
+```text
+IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is a SHORT, SOFT OVAL, slightly wider at the cheekbones and narrowing to a small chin — never long, never square. HAIR black, thick and slightly wavy, TOUSLED on top with a loose, messy fringe falling toward the forehead, shorter at the sides. GLASSES rectangular frames in RED-BURGUNDY acetate of medium thickness — never metal, never rimless, never black. FACIAL HAIR a light moustache and a small, sparse goatee on the chin; the cheeks are clean-shaven. EXPRESSION a wide, warm smile showing the upper teeth, eyes crinkling behind the glasses. Light-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or smooth him.
+```
+
+```text
+IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a LONG OVAL with high, rounded cheekbones, narrowing to a soft pointed chin — never round, never square. HAIR black, very long and straight, parted slightly off-centre, falling well past the shoulders with a long side-swept section over one side of the forehead. EYES dark brown and almond-shaped; BROWS dark, softly arched. EXPRESSION a WIDE, BRIGHT SMILE showing the upper teeth, her natural expression. Warm medium-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or lighten her.
+```
+
+```text
+IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a ROUNDED OVAL with full cheeks and a soft, rounded chin — never long, never angular. HAIR black, reaching the upper chest, parted to one side, with face-framing layers and soft loose waves at the ends. EYES dark brown; BROWS dark and softly arched; a tiny nose stud on one nostril. EXPRESSION a soft, calm, closed-mouth smile. Fair skin with a warm undertone, natural blush and visible pores, a young adult as in the reference: do not age, beautify or slim her face.
+```
+
+```text
+IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is LONG AND NARROW, a lean vertical oval with defined cheekbones and a narrow jaw — never round, never wide. HAIR black, medium-short, swept to one side from a side part, with loose strands falling across the forehead — never long, never tied back, never slicked flat. BROWS thick, dark and straight. FACIAL HAIR only a thin moustache and a narrow pointed goatee on the chin; the cheeks and jaw are clean-shaven. EXPRESSION calm, a slight closed-mouth smile. Light-brown skin with visible pores, an adult as in the reference: do not age, beautify or widen his face.
+```
+
+```text
+IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a SOFT, ROUNDED OVAL with full cheeks and a small rounded chin — never long, never angular. HAIR black, very long and straight, falling well past the shoulders, with a thick straight FRINGE cut just above the eyebrows. EYES dark brown and almond-shaped; BROWS fine and straight under the fringe. NOSE small with a soft rounded tip. EXPRESSION calm and serene, closed mouth, a very slight smile. Light warm-beige skin with a natural blush on the cheeks and visible pores, a young adult as in the reference: do not age, beautify or slim her face.
 ```
 
 ```text
@@ -271,10 +400,18 @@ Kits en el catálogo, por tipo:
 | Tipo | Kits |
 |---|---|
 | Prenda (viste a la persona) | `polo-efeonce` · `hoodie-efeonce` · `chaqueta-softshell-efeonce` · `chaqueta-bomber-efeonce` · `gorra-efeonce` |
+| Ficción de Nexa (sólo Nexa, sólo `"registro": "cine"`; desde 2026-10-02) | `traje-bionico-nexa` (prenda: frente, tres cuartos izq./der., lateral, espalda; puesta por defecto y `puesta: "espalda"`) · `lentes-bionicos-nexa` (`frente`, `tres-cuartos` por defecto) |
 | Merch | `lanyard-efeonce` (cinta, yoyo y portacarnet de marco rígido) |
-| Marca propia | `nave-efeonce` |
+| Marca propia | `nave-efeonce` · logo 3D completo: `logo-efeonce-3d-letrero-{blanco,navy}` (escala mediana ≈ 1,2 m, corpóreo de pared) y `logo-efeonce-3d-escritorio-{blanco,navy}` (escala pequeña, 24 cm, objeto de mesa; vistas `sentada`, `sentada-luz-izq`, `a-ras`, `tres-cuartos-izq/der`) |
 | Mascota de partner | `clawd` · `codex` · `gigi` (16 vistas) · `gigi-aeo` (8 vistas propias de búsqueda y AEO) |
 | Marca de tercero | `sprocket-hubspot` |
+
+**El traje de Nexa estrenó tres claves de kit (2026-10-02, TASK-1940)**, disponibles para cualquier prenda:
+`instruccionEnUso` (la instrucción propia de la pieza puesta, en vez de la genérica), `acabadoMarca` (cómo está
+aplicada la marca; reemplaza el «satin-stitch embroidery» por defecto, porque el isotipo del traje va incrustado y no
+bordado) y `macroEnUso` (el macro de la marca viaja también con la pieza puesta, no sólo al construir). La guarda
+`validarTrajeNexa` aborta si el traje o los lentes se piden para otra persona, sin Nexa o sin `"registro": "cine"`.
+Uso paso a paso: [manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
 
 **La vista de una prenda se elige por el ángulo de la toma**, no por costumbre: de espaldas → vista de espalda.
 Agregar un kit nuevo es una entrada de datos —base, patrón de archivo y tabla de vistas—, no un cambio de lógica.
@@ -390,13 +527,13 @@ el error que la guarda ahora nombra.
 
 ### 3.10 Palancas de encuadre y punto de vista — `palanca` **[aprobadas 2026-09-20]**
 
-**Veintitrés** palancas, probadas en seis rondas del 2026-09-20 (`palancas-nuevas/`, `palancas-disruptivas/`,
+**Veinticuatro** palancas, probadas en las rondas del 2026-09-20 y del 2026-09-21 (`palancas-nuevas/`, `palancas-disruptivas/`,
 `palancas-ronda3/`, `palancas-con-color/`, `palancas-podcast/`, `palancas-oficio-digital/`). Se declaran con el campo `palanca` y **UNA sola por pieza**.
 
 > **El dueño del catálogo es [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md)**: ahí
-> están las 23 con su ficha completa —qué es, cómo se logran, marcadores verbatim, evidencia, qué no hacer—, las
+> están las 24 con su ficha completa —qué es, cómo se logran, marcadores verbatim, evidencia, qué no hacer—, las
 > otras tres familias de palancas (5 siempre activas · 4 atmósferas · acción suspendida), las 20 tomas de cámara
-> y las cuatro descartadas. Esta tabla conserva **las cinco primeras**, que son las que nacieron en esta spec.
+> y las cinco descartadas. Esta tabla conserva **las cinco primeras**, que son las que nacieron en esta spec.
 
 | `palanca` | Qué hace | Marcadores que emite | Exige |
 |---|---|---|---|
@@ -694,7 +831,7 @@ La ficha declara **intención**; el comando resuelve los valores:
 
 | Campo de la ficha | Qué es |
 |---|---|
-| `formato` | `4:5` · `9:16` · `16:9` · `1:1`. Determina `--size`, la frase que declara el formato, el **porcentaje del lecho** y el **límite de sujetos**. Es la única fuente de esos cuatro valores |
+| `formato` | `4:5` · `9:16` · `16:9` · `1:1` · `teams` (fondo de videollamada 2048×1152, sin validar: el centro, 30–70 % del ancho desde el 12 % del alto, es de la persona; no reserva texto; va con `lecho: "sin-lecho"`). Determina `--size`, la frase que declara el formato, el **porcentaje del lecho** y el **límite de sujetos**. Es la única fuente de esos cuatro valores |
 | `escena` | El párrafo `SCENE (...)` de la toma. Obligatorio: el modelo no inventa la escena |
 | `lecho.objeto` / `lecho.tono` | Qué se pone cerca del lente y con qué tono declarado. Obligatorio: la firma siempre necesita su lecho |
 | `reservas.texto` | `{ muro, tinta }` — zona de titular, con la geometría del formato |
@@ -806,7 +943,7 @@ azules, pintura) **[criterio]**.
 
 | Reserva | Umbral | Origen |
 |---|---|---|
-| 1 · zona de texto | contraste ≥ 4,5:1 con alguna tinta **y calma L\* < 0,5**; banda ≥ 0,28 del alto (vertical) o ≥ 0,45 del ancho (16:9) | **[medido]** ronda `texto` |
+| 1 · zona de texto | contraste ≥ 4,5:1 con alguna tinta **y calma L\* < 0,5**; banda ≥ 0,28 del alto (vertical) o ≥ 0,42 del ancho (16:9) | **[medido]** ronda `texto` |
 | 2 · objeto para enmarcar | trazo `#a6cdf5` ≥ 3:1 en los **cuatro** lados del perímetro de la caja | **[medido]** capa gráfica |
 | 3 · lecho de la firma | mejor tinta ≥ 4,5:1 **y** nitidez < 0,004 — **señal débil, ver §5.1** | **[frágil]** |
 | 4 · aire para cursores | calma L* < 1,0 en ambos costados | **[criterio]** |
@@ -1050,6 +1187,10 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | `efeonce-look.mjs` | Ídem | **Descartado** (grade V0) |
 | Script de máscara | No persistido | Receta en §6.2 **[pendiente: persistir]** |
 | Comando `pnpm` (p. ej. `pnpm brand-photo:measure`) | — | **[pendiente]**: promover a `scripts/` del repo con tests y umbrales por contexto |
+| `cine-nueva.mjs` (`pnpm foto:cine:nueva`) + `cine-recetas.json` | `scripts/foto/` | Vigente desde 2026-10-02: ficha cine nueva desde una receta aprobada ([delta (b)](#delta-2026-10-02-b--el-registro-cine-en-fotoprompt)) |
+| `validar-cine.mjs` (`pnpm foto:validar:cine`) | `scripts/foto/` | Vigente desde 2026-10-02: gates de sombra y techo oscuro del registro cine |
+| `regresion-prompt.mjs` | `scripts/foto/` | Vigente desde 2026-10-02: gate de no-regresión, correrlo antes y después de tocar `build-prompt.mjs` |
+| Orquestador `pnpm foto:cine` | — | **[pendiente]**: resto de TASK-1926 |
 
 ## Ads: proporción del lecho y continuidad
 

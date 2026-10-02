@@ -1,0 +1,83 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:11:28.348Z",
+  "run": "ai-generations/2026-09-21_nexa-expresiones",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_nexa-expresiones",
+  "totalBytes": 88886366,
+  "fileCount": 12,
+  "files": [
+    {
+      "path": "salidas/01-carcajada.png",
+      "sizeBytes": 7367420,
+      "sha256": "5fd4399de4574892d057f89de3f21a8380a6575bb7e93ade4289994a382c51ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/01-carcajada.png"
+    },
+    {
+      "path": "salidas/02-risa-elegante.png",
+      "sizeBytes": 7097123,
+      "sha256": "831e80b99050acfde8570b65edde4c9d1a94e191c1950c10f8fb8812a46f190c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/02-risa-elegante.png"
+    },
+    {
+      "path": "salidas/03-sorprendida.png",
+      "sizeBytes": 7267877,
+      "sha256": "1c7538625cad5e5edc9711a1d94793455ea927827e0b5b5cdb79fe23f57b1c75",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/03-sorprendida.png"
+    },
+    {
+      "path": "salidas/04-esceptica.png",
+      "sizeBytes": 7425789,
+      "sha256": "3aaa187d7d8368f04a948b02200a2ce9d4772c02ff4144374247b704b5678541",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/04-esceptica.png"
+    },
+    {
+      "path": "salidas/05-pensativa.png",
+      "sizeBytes": 7389742,
+      "sha256": "cda951d13cafe543a13c2dd4d72480afe9f7c34c02cb62f31dec488832b4be10",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/05-pensativa.png"
+    },
+    {
+      "path": "salidas/06-neutra-reposo.png",
+      "sizeBytes": 7476711,
+      "sha256": "7320c3d72c35811528880cbccd9a2b501eb862e60a90a1db5c2d6e302aeb2ac3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/06-neutra-reposo.png"
+    },
+    {
+      "path": "salidas/07-preocupada.png",
+      "sizeBytes": 7624538,
+      "sha256": "88420ff0009204f657c11997795229c103545e6be5524ef24726c13bb13334b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/07-preocupada.png"
+    },
+    {
+      "path": "salidas/08-conviccion.png",
+      "sizeBytes": 7567872,
+      "sha256": "aa76d4e6c2a3f76eb746dab9ecd215774221c7794d67fe51b8957b9fb18c620e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/08-conviccion.png"
+    },
+    {
+      "path": "salidas/09-escucha-empatica.png",
+      "sizeBytes": 7539383,
+      "sha256": "beb65c8a7c80319d27ed936877108adac0a4684315513c269554b5f33d15d97d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/09-escucha-empatica.png"
+    },
+    {
+      "path": "salidas/10-curiosa.png",
+      "sizeBytes": 7383008,
+      "sha256": "f81c71927a9bad6017050c56bfe7a986e83ff3bf6889d47c1228380f668a516f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/10-curiosa.png"
+    },
+    {
+      "path": "salidas/11-complicidad.png",
+      "sizeBytes": 7196636,
+      "sha256": "be98e52eb87c0fede856c4b73821e27a15632617f2423234e9dd419ad40ba2d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/11-complicidad.png"
+    },
+    {
+      "path": "salidas/12-mirada-lateral.png",
+      "sizeBytes": 7550267,
+      "sha256": "dbde6448bd8908af60fd3079e9bd3ee00e76196e8818c6f57663ae1c0ebf1667",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-expresiones/salidas/12-mirada-lateral.png"
+    }
+  ]
+}

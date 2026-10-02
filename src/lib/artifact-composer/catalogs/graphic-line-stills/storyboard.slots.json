@@ -1,0 +1,321 @@
+{
+  "template": "MotionStoryboard",
+  "version": "0.1",
+  "viewport": {
+    "width": 1840,
+    "height": 794
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 214
+        },
+        "questionPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-question-px=40px"
+        },
+        "questionLineHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-question-lh=1.2"
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 352
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 170
+        },
+        "answerLineHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-lh=0.92"
+        },
+        "answerTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-tracking=-0.035em"
+        },
+        "answerNudge": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-nudge=-0.0706em"
+        },
+        "lensCx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lens-cx=1150.08px"
+        },
+        "lensCy": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lens-cy=420.012px"
+        },
+        "photoX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-photo-x=636px"
+        },
+        "photoY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-photo-y=-138px"
+        }
+      }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 100,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Motion · 8 s con foto fija · el lenguaje de movimiento de la órbita, cuadro a cuadro"
+    },
+    "photo": {
+      "selector": "[data-slot='photo']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-plate-ref",
+          "example": "asset-ref:plate:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 320,
+          "resolver": "gl-alt",
+          "example": "Una directora de cuentas con el polo de Efeonce avanza hacia la cámara y la mira"
+        }
+      }
+    },
+    "frames": {
+      "selector": "[data-slot='frames']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 8,
+        "maxItems": 8,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-sb-kind",
+            "example": "voice"
+          },
+          "time": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 14
+          },
+          "title": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40
+          },
+          "caption": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 120
+          },
+          "lensR": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-css",
+            "example": "--gl-lens-r=350px"
+          },
+          "orbit": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-layer-ref",
+            "example": "asset-ref:layer:probe"
+          },
+          "question": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 52
+          },
+          "answerLead": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 12
+          },
+          "answer": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "resolver": "gl-answer",
+            "example": "sí"
+          }
+        }
+      },
+      "example": [
+        {
+          "time": "0,0–0,3 s",
+          "title": "Anticipación",
+          "caption": "Navy vacío. El anillo aparece chico y la esfera retrocede antes de salir.",
+          "lensR": "--gl-lens-r=350.0357px",
+          "orbit": "asset-ref:layer:probe",
+          "question": "¿Tu marketing mide<br>lo que vende?",
+          "answerLead": "Ahora",
+          "answer": "sí",
+          "kind": "orbit"
+        },
+        {
+          "time": "0,3–0,8 s",
+          "title": "La lente se abre",
+          "caption": "El círculo crece y descubre la foto: la escena entra por la lente, rápido y con curva de llegada.",
+          "lensR": "--gl-lens-r=203.0207px",
+          "orbit": "asset-ref:layer:probe",
+          "question": "¿Tu marketing mide<br>lo que vende?",
+          "answerLead": "Ahora",
+          "answer": "sí",
+          "kind": "lens"
+        },
+        {
+          "time": "0,8–1,2 s",
+          "title": "El arco corre y la esfera golpea",
+          "caption": "Tramo rápido con estela; la esfera llega con sobrepaso y un pulso de impacto con eco.",
+          "lensR": "--gl-lens-r=350.0357px",
+          "orbit": "asset-ref:layer:probe",
+          "question": "¿Tu marketing mide<br>lo que vende?",
+          "answerLead": "Ahora",
+          "answer": "sí",
+          "kind": "lens"
+        },
+        {
+          "time": "1,2–1,8 s",
+          "title": "La voz entra con sobrepaso",
+          "caption": "Pregunta primero; «Ahora» ya asentó; «sí» llega un 12 % más grande y se asienta.",
+          "lensR": "--gl-lens-r=350.0357px",
+          "orbit": "asset-ref:layer:probe",
+          "question": "¿Tu marketing mide<br>lo que vende?",
+          "answerLead": "Ahora",
+          "answer": "sí",
+          "kind": "overshoot"
+        },
+        {
+          "time": "1,8–2,4 s",
+          "title": "La selección encaja",
+          "caption": "Los corchetes de AXIS se ajustan a la respuesta y entra el cursor de Growth. Un protagonista a la vez.",
+          "lensR": "--gl-lens-r=350.0357px",
+          "orbit": "asset-ref:layer:probe",
+          "question": "¿Tu marketing mide<br>lo que vende?",
+          "answerLead": "Ahora",
+          "answer": "sí",
+          "kind": "voice"
+        },
+        {
+          "time": "2,4–4,4 s",
+          "title": "Sostén",
+          "caption": "Todo quieto salvo la foto, que respira dentro de la lente (hasta 10 %). Este cuadro es el estático de respaldo.",
+          "lensR": "--gl-lens-r=350.0357px",
+          "orbit": "asset-ref:layer:probe",
+          "question": "¿Tu marketing mide<br>lo que vende?",
+          "answerLead": "Ahora",
+          "answer": "sí",
+          "kind": "voice"
+        },
+        {
+          "time": "4,4–5,4 s",
+          "title": "Cierre: reveal",
+          "caption": "El reveal aprobado v1.1, el mismo cierre del audiovisual: la nave entra en su órbita y se asienta.",
+          "lensR": "--gl-lens-r=350.0357px",
+          "orbit": "asset-ref:layer:probe",
+          "question": "¿Tu marketing mide<br>lo que vende?",
+          "answerLead": "Ahora",
+          "answer": "sí",
+          "kind": "reveal"
+        },
+        {
+          "time": "5,4–8,0 s",
+          "title": "Tapa final",
+          "caption": "Logo con el eslogan: la tapa de cierre del reveal. Con sonido, el golpe del lenguaje de movimiento.",
+          "lensR": "--gl-lens-r=350.0357px",
+          "orbit": "asset-ref:layer:probe",
+          "question": "¿Tu marketing mide<br>lo que vende?",
+          "answerLead": "Ahora",
+          "answer": "sí",
+          "kind": "endcard"
+        }
+      ]
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Growth"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "bottom-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "role"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1.6
+        }
+      }
+    }
+  }
+}

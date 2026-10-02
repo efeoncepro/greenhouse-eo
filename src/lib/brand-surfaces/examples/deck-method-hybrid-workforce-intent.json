@@ -1,0 +1,37 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-hybrid-workforce",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Fuerza de trabajo híbrida",
+    "question": "¿Quién hace el trabajo?",
+    "answer": [
+      "Personas",
+      "y agentes"
+    ]
+  },
+  "body": "Diseñamos, activamos y operamos equipos donde personas y agentes comparten un trabajo medible. Las personas conservan la responsabilidad.",
+  "ladderTitle": "La autoridad del agente crece por tramos",
+  "ladder": [
+    "Leer y resumir",
+    "Proponer",
+    "Ejecutar con límites",
+    "Actuar con aprobación"
+  ],
+  "path": "Blueprint → primer equipo híbrido → operación híbrida → operación agéntica gestionada",
+  "progress": {
+    "sections": 5,
+    "current": 2
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Estrategia",
+    "participantKind": "department"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "SX1c-seo-o-aeo-cine",
+  "formato": "1:1",
+  "impacto": true,
+  "linea": "engine",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic drama still, a dark strategy room at night, the moment two paths become one): an Efeonce SEO strategist, a Latin American woman in her early thirties, dark hair tied back, wearing the Efeonce softshell jacket from the reference, stands behind the far end of a long matte dark meeting table in the RIGHT half of the frame, centered around 68% of the width, framed from the waist up, turned three-quarters toward the LEFT with a calm, certain half smile, eyes toward the left edge of the frame, never at the lens. Behind her on the right stands a tall edge-lit glass panel: its edges glow a clean azure blue (#0375DB) and on the glass, drawn in light marker strokes, two separate branching paths of small nodes come from the top and the bottom and merge into one single bright node beside her shoulder, a small solid point of light, not a ring or circle; only thin lines and small dots, no letters, no handwriting, no arrows with labels, no numbers. The azure glow of the glass is the key light: it rakes across her cheek, shoulder and jacket from behind and the side, and a hard cool rim from a second low source behind her separates her hair from the dark. Thin haze makes the azure glow of the glass edge visible as a soft column of light. The glass panel and all of its glow stay entirely inside the right half of the frame. REALISTIC ADULT PROPORTIONS, 85mm lens, the lens only a few centimetres behind the near edge of the matte dark meeting table, camera at her eye level about two meters from her, focus on her eyes, shallow depth of field. The LEFT 35% of the frame, from top to bottom, is only a dark, evenly shadowed bare wall with faint haze that receives only even shadow: no glass, no blue glow or spill, no light, no objects, no bright edge. The near edge of the table stays outside every light. Rich contrast, deep navy blacks, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near edge of the matte dark meeting table, a few centimetres from the lens, dissolved into blur and outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark, evenly shadowed bare wall on the left 35% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

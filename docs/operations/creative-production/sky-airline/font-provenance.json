@@ -1,0 +1,304 @@
+{
+  "schema": "workbench.font-evidence.v1",
+  "brandId": "sky-airline",
+  "family": "Metric",
+  "status": "local-verified",
+  "source": "operator-supplied-zip",
+  "zipSha256": "a6e597073ccf2ae8f74e8ab0ceedf257ad9502c813fc2e2db2d7b8544f5a3e06",
+  "remoteDistribution": "not-established",
+  "fonts": [
+    {
+      "id": "metric-black",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Black",
+      "postscriptName": "Metric-Black",
+      "weight": 900,
+      "embeddingFsType": 8,
+      "file": "Metric-Black.otf",
+      "bytes": 50656,
+      "sha256": "d12dbf7da63f84538f31e9ea8bc62f5840cec2ce5e79247709dd859a5ad82e6c",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-Black.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Black",
+        "6": "Metric-Black",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Black"
+      }
+    },
+    {
+      "id": "metric-blackitalic",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Black Italic",
+      "postscriptName": "Metric-BlackItalic",
+      "weight": 900,
+      "embeddingFsType": 8,
+      "file": "Metric-BlackItalic.otf",
+      "bytes": 50996,
+      "sha256": "c18b6655a1105cfa7d41e24f903a2577725eb0a5cdab8409ab983f4b812004d3",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-BlackItalic.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Black Italic",
+        "6": "Metric-BlackItalic",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Black Italic"
+      }
+    },
+    {
+      "id": "metric-bold",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Bold",
+      "postscriptName": "Metric-Bold",
+      "weight": 700,
+      "embeddingFsType": 8,
+      "file": "Metric-Bold.otf",
+      "bytes": 52484,
+      "sha256": "ee7ca5214d3af37171403717762876baab4d273bac356499912a0feb1be0ebdc",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-Bold.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Bold",
+        "6": "Metric-Bold",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Bold"
+      }
+    },
+    {
+      "id": "metric-bolditalic",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Bold Italic",
+      "postscriptName": "Metric-BoldItalic",
+      "weight": 700,
+      "embeddingFsType": 8,
+      "file": "Metric-BoldItalic.otf",
+      "bytes": 53264,
+      "sha256": "b0d17bcfc8bdddb56abab117eb064e142a4b6e99822fded27887e97599a963bd",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-BoldItalic.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Bold Italic",
+        "6": "Metric-BoldItalic",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Bold Italic"
+      }
+    },
+    {
+      "id": "metric-light",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Light",
+      "postscriptName": "Metric-Light",
+      "weight": 300,
+      "embeddingFsType": 8,
+      "file": "Metric-Light.otf",
+      "bytes": 49244,
+      "sha256": "c477d430e93e61c8e8cceb89c403a0154ccd7bf01a7a3be9517e3c13ab50c3c2",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-Light.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Light",
+        "6": "Metric-Light",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Light"
+      }
+    },
+    {
+      "id": "metric-lightitalic",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Light Italic",
+      "postscriptName": "Metric-LightItalic",
+      "weight": 300,
+      "embeddingFsType": 8,
+      "file": "Metric-LightItalic.otf",
+      "bytes": 50844,
+      "sha256": "414465e131d22743ac940e73e5aa5d6e224257674193bb06dbbdf60455f9cf7e",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-LightItalic.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Light Italic",
+        "6": "Metric-LightItalic",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Light Italic"
+      }
+    },
+    {
+      "id": "metric-medium",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Medium",
+      "postscriptName": "Metric-Medium",
+      "weight": 500,
+      "embeddingFsType": 8,
+      "file": "Metric-Medium.otf",
+      "bytes": 47260,
+      "sha256": "f26fc310785791e65bd8e1e8000e0811632e1ce94bfb217e646a515c495d99b9",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-Medium.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Medium",
+        "6": "Metric-Medium",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Medium"
+      }
+    },
+    {
+      "id": "metric-mediumitalic",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Medium Italic",
+      "postscriptName": "Metric-MediumItalic",
+      "weight": 500,
+      "embeddingFsType": 8,
+      "file": "Metric-MediumItalic.otf",
+      "bytes": 48492,
+      "sha256": "23ea74fcaeab24e160af3a9a2c3316a765fe4af7c10714efa9026f03a6df6d27",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-MediumItalic.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Medium Italic",
+        "6": "Metric-MediumItalic",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Medium Italic"
+      }
+    },
+    {
+      "id": "metric-regular",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Regular",
+      "postscriptName": "Metric-Regular",
+      "weight": 400,
+      "embeddingFsType": 8,
+      "file": "Metric-Regular.otf",
+      "bytes": 49292,
+      "sha256": "7b5189469ce6140596ef7a7b4ccf7646d8ece17fbb54d9e2d4a427a78d9c4f94",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-Regular.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Regular",
+        "6": "Metric-Regular",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric"
+      }
+    },
+    {
+      "id": "metric-regularitalic",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Regular Italic",
+      "postscriptName": "Metric-RegularItalic",
+      "weight": 400,
+      "embeddingFsType": 8,
+      "file": "Metric-RegularItalic.otf",
+      "bytes": 50776,
+      "sha256": "af7dc9c73e95a40927d46e9aec59304256c02916d0ba7621a1e84b3efed69bba",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-RegularItalic.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Regular Italic",
+        "6": "Metric-RegularItalic",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Regular Italic"
+      }
+    },
+    {
+      "id": "metric-semibold",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Semibold",
+      "postscriptName": "Metric-Semibold",
+      "weight": 600,
+      "embeddingFsType": 8,
+      "file": "Metric-Semibold.otf",
+      "bytes": 51596,
+      "sha256": "a5b45317e9f0950fd40e67f04dec80a5acd4c55180d099b8ea614c94e1eaada9",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-Semibold.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Semibold",
+        "6": "Metric-Semibold",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Semibold"
+      }
+    },
+    {
+      "id": "metric-semibolditalic",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Semibold Italic",
+      "postscriptName": "Metric-SemiboldItalic",
+      "weight": 600,
+      "embeddingFsType": 8,
+      "file": "Metric-SemiboldItalic.otf",
+      "bytes": 52420,
+      "sha256": "ffb1fb00113fc5db95572d12666e2a9973eb53970820d2a252978bdda1ee2627",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-SemiboldItalic.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Semibold Italic",
+        "6": "Metric-SemiboldItalic",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Semibold Italic"
+      }
+    },
+    {
+      "id": "metric-thin",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Thin",
+      "postscriptName": "Metric-Thin",
+      "weight": 250,
+      "embeddingFsType": 8,
+      "file": "Metric-Thin.otf",
+      "bytes": 45948,
+      "sha256": "280cd5d709227ce7d120a709a08be37aa262d9dfd4de34029ddafbaaf17f4638",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-Thin.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Thin",
+        "6": "Metric-Thin",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Thin"
+      }
+    },
+    {
+      "id": "metric-thinitalic",
+      "brandId": "sky-airline",
+      "family": "Metric",
+      "subfamily": "Thin Italic",
+      "postscriptName": "Metric-ThinItalic",
+      "weight": 250,
+      "embeddingFsType": 8,
+      "file": "Metric-ThinItalic.otf",
+      "bytes": 46896,
+      "sha256": "78b58749274a5ffb5aa1f71880a3b63e319c2b8a74207b52c0abeed4eb6d4770",
+      "localPath": "/Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-09-29/fonts/Metric-ThinItalic.otf",
+      "nameRecords": {
+        "1": "Metric",
+        "2": "Thin Italic",
+        "6": "Metric-ThinItalic",
+        "14": "http://www.klim.co.nz/licensing.php",
+        "16": "Metric",
+        "17": "Thin Italic"
+      }
+    }
+  ]
+}

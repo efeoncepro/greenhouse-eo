@@ -1,5 +1,7 @@
 # Greenhouse EO — Manual de Uso
 
+> **Naming AEO vigente (2026-09-29):** la capacidad pública es **Efeonce AEO**, el diagnóstico **Efeonce AEO Assessment** y su entregable **Efeonce AI Visibility Report**. Los manuales conservan `AI Visibility Grader` para comandos y rutas existentes. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 Esta carpeta guarda guias practicas para usar capacidades concretas del portal Greenhouse.
 
 La diferencia con otras capas de documentacion:
@@ -26,8 +28,94 @@ La diferencia con otras capas de documentacion:
   sha256 del plate y `hasta`, firma externa, decisiones pendientes y problemas comunes (mensaje → causa → solución).
 - [Usar la línea gráfica de Efeonce](creative/usar-linea-grafica-efeonce.md) — hacer una pieza con la órbita
   (qué trabajo hace, color, ubicación del texto, foto de la lente, voz, firma con el logo centrado o burbuja URL sólo
-  con el logo en la imagen), componer con un agente, fotografiar merch u oficina, checklist de revisión, regenerar el
+  con el logo en la imagen), componer con un agente, usar las animaciones de marca (la órbita y las animaciones del
+  logo V1.1: qué archivo para qué editor y dónde bajar los masters), usar y pedir un ícono de la marca (Trazo y Plastilina), fotografiar merch u oficina, checklist de revisión, regenerar el
   PDF del manual y problemas comunes (burbuja negra en visores, burbuja-firma bajo 4,5:1, texto que cruza la órbita).
+- [Usar las portadas, el avatar y los destacados sociales de Efeonce](creative/usar-portadas-y-destacados-sociales-efeonce.md) —
+  qué archivo subir en LinkedIn (página y perfil personal), Facebook, YouTube e Instagram, cómo cambiar una portada,
+  el avatar único de las cuatro redes, **crear** un destacado (publicar primero la historia completa 9:16, `v02`) frente
+  a **cambiar** su portada (`v01`), cómo cada persona del equipo elige su portada de LinkedIn desde su página del kit,
+  dónde están los archivos en OneDrive, qué no hacer y problemas comunes. Aprobado el 2026-10-01; publicación pendiente.
+- [Usar los Sparks en fotos de marca](creative/usar-sparks-en-fotos-de-marca.md) — poner a un Spark (los agentes de
+  Efeonce, único robot permitido en una foto de marca) en una ficha de `foto:prompt`: elegir el Spark del plantel y la
+  vista, declararlo en `objetos`, escala y registro (cine o puesta en escena, nunca documental), qué frena la guarda
+  contra robots, qué no hacer y problemas comunes. Kit aprobado el 2026-10-01 (TASK-1941).
+- [Usar el traje biónico de Nexa en fotos](creative/usar-traje-bionico-de-nexa-en-fotos.md) — vestir a Nexa con su
+  traje y sus lentes biónicos desde el catálogo de `foto:prompt` (sólo Nexa y sólo con `"registro": "cine"`), elegir
+  una de sus 12 expresiones fotográficas o un ángulo (nunca los dos), escribir la escena sin describir el traje, la
+  receta de una escena con Sparks (dos con referencia como máximo, como `NX7d`), revisar las marcas con
+  `pnpm foto:emblema` y recomponerlas con `pnpm foto:isotipo` (incluido el logo de la espalda con `--marca logotipo
+  --tecnica`), reproducir el kit y sellarlo y publicarlo al canon. Errores, avisos y problemas comunes. Kit aprobado el
+  2026-10-02 (TASK-1940).
+- [Producir una foto de marca en registro cine](creative/producir-foto-cine-de-marca.md) — llegar a una foto cine
+  aprobable sin consultar a nadie: elegir entre las 12 recetas aprobadas (`pnpm foto:cine:nueva --listar`), crear la
+  ficha desde ella (con `--formato` y `--alcance`; revisar lo heredado en `__revisar`), cuidar primero el escenario con
+  escala, completar `llave`, `primerPlano`, `fondo`, `fenomeno` y `alcance`, armar la sección partida 1:1 con la
+  reserva a la izquierda, aplicar las siete decisiones del operador, revisar con el agente `cine-reviewer` (sólo en
+  Claude Code; en Codex, su rúbrica) antes y después de generar, juzgar la luz contra la foto aprobada de la receta y
+  medir con `pnpm foto:validar:cine`. Qué significan los avisos, qué no hacer y problemas comunes. Disponible desde el
+  2026-10-02 (TASK-1926); v1.1 del mismo día.
+- [Recuperar y archivar archivos de `ai-generations/`](creative/recuperar-y-archivar-ai-generations.md) — qué hacer
+  cuando una composición no encuentra un plate o una referencia (`pnpm ai-gen:where` y `pnpm ai-gen:pull` a la misma
+  ruta, nunca regenerar), qué está protegido, cómo el operador archiva exploración con `pnpm ai-gen:archive` y cómo se
+  promueve algo a referencia aprobada (sellar + publicar al canon). Contrato vigente desde el 2026-10-01.
+- [Usar la identidad sonora de Efeonce](creative/usar-identidad-sonora-efeonce.md) — elegir registro (fondo o energía) y
+  pieza (logo, etiqueta con voz, sting/reveal/apertura, pieza larga, cierre de energía), bajar el archivo del kit en AXIS,
+  sincronizar la esfera al golpe o a la palabra final, nivelar al destino y qué no hacer. Estado recomendada; Glitch no usa
+  este kit: tiene su sonido y su música propios, sólo de Glitch.
+- [Componer una pieza por superficie con AXIS](creative/componer-por-superficie-con-axis.md) — web, DOOH, pDOOH,
+  motion, video y deck: declarar superficie, formato, papel y receta; **Ruta A** para las recetas aprobadas con
+  plantilla, `pnpm brand:compose` (Artifact Composer: PDF del deck, PNG de web/DOOH/motion y capas de video con alfa;
+  TASK-1919), incluidas **las 69 láminas del deck** (TASK-1927 y TASK-1928), la portada de brochure con la selección de
+  Nexa (`document-selection`) y el brochure o la propuesta como documento de varias páginas en un solo PDF; **Ruta B**
+  para el resto, `pnpm surface:resolve` en AXIS (contrato `candidate`) y cada delegate a su
+  compositor de Greenhouse; la receta de deck `proposal-cinematic` y el registro cine, qué significan los estados, los
+  `issues` y los errores `recipe-not-approved` / `recipe-outside-composer` / `surface-issues`, y problemas comunes.
+- [Pedir el render de una pieza de marca](creative/pedir-render-de-piezas-de-marca.md) — subir las fuentes, armar el
+  pedido, enviarlo por el lane App o la tool MCP, consultar y descargar; errores y problemas comunes. Hoy apagado
+  (TASK-1921).
+- [Componer un deck con las recetas por lámina](creative/componer-deck-con-recetas.md) — armar un brochure, una
+  propuesta, un pitch o un QBR de marca Efeonce con las 69 láminas aprobadas el 2026-09-27, **las 69 con plantilla**
+  desde el 2026-09-28: elegir documento, portada y contraportada, esqueleto por familias, receta por tramo («cuándo
+  sí», «cuándo no», alternativa), pares y ritmo, **validar el plan con `pnpm brand:deck-plan`** (cómo escribir
+  `plan.json`, tabla de códigos con su arreglo, pedirle el plan al agente con `--propose --context`, costo y
+  credenciales locales; TASK-1929), **ligar los datos reales con `--bind`** (paso 5b: logo del cliente, cifras,
+  casos, testimonios y logos desde la evidencia, montos en `[MONTO]`, equipo pendiente, la tabla de slots y sus
+  motivos; TASK-1930), cómo elegir la composición (`layout`) de cada receta, slots con su
+  largo máximo, cifras con fuente, `[MONTO]`, selección (`selected`, `recommended`, `selection.level`), `photo.focus`,
+  intent propio, lámina o documento completo con `pnpm brand:compose`, estados y problemas comunes. La ruta dentro de la
+  plataforma es TASK-1921, en curso.
+- [Componer piezas de Glitch](creative/componer-piezas-glitch.md) — **sólo para Glitch** (no para piezas de
+  Efeonce): elegir la portada con la regla de rotación, armar portada, láminas interiores, noticia 1 y contraportada,
+  piezas del blog y del video (mapa de zonas del reel), qué cambia en el Glitch Flash, checklist, estados y problemas
+  comunes. Las piezas estáticas se componen con `pnpm glitch:compose` (manual siguiente); el motion está aprobado
+  (2026-09-27) y su flujo para agentes está en la sección «Video y motion».
+- [Componer una edición de Glitch con `pnpm glitch:compose`](creative/componer-una-edicion-de-glitch.md) — **sólo
+  para Glitch**: el taller local de TASK-1923 (la ruta productiva es TASK-1921). Copiar el ejemplo de la #17, llenar el
+  manifiesto campo por campo (fotos con licencia `licensed`/`owned`/`generated`, rostros declarados), correr
+  `pnpm glitch:compose -- --manifest …` con `--out` y `--only`, qué sale (carrusel PDF para LinkedIn, piezas sueltas,
+  overlays PNG con alfa y la procedencia), qué significa cada error (`manifest-invalid`, `cover-rotation-unsatisfiable`,
+  `font-license-missing`, `contract-issues`, `fracture-over-face`, `carousel-too-heavy`) y problemas comunes. Desde el
+  2026-09-28 también compone el **Glitch Flash** (una noticia puntual, sin número de edición; manifiesto con
+  `edition.kind: "flash"`, ejemplo `flash-sonnet-5-5`). No publica.
+- [Editar el video de Glitch](creative/editar-video-glitch.md) — **sólo para Glitch** (la transición de la manzana en
+  bytes es exclusiva de Glitch): para el editor en Premiere Pro y After Effects, dónde están los gráficos en OneDrive
+  (ProRes 4444 con alfa, 30 fps), apertura y tarjeta final en bucle con su cuadro de sincronía, cada pieza del kit
+  (soltar en 0,0, cabecera sostenida con el PNG `_fijo`, plano dividido, rótulo del host sólo la primera vez), la
+  transición entre escenas con Track Matte Key, cómo pedir la versión héroe o un cambio de texto, montar el sonido y la
+  música (intro con su pre-roll, cortina, salida y cama bajo la noticia con ducking), estados y problemas comunes.
+- [Producir el motion, el sonido y la música de Glitch](creative/producir-motion-glitch.md) — **sólo para Glitch**:
+  runbook de quien corre el taller (persona o agente): requisitos de la máquina, `doctor`, flujo de una edición (archivo
+  de edición → `kit` → `render` si cambia el número → entrega con `--deliver`), todos los scripts y argumentos, qué
+  verifica cada comando (una FALLA no entrega), manifiestos en `corridas/`, música por huella (nunca regenerada),
+  re-entrega con `--skip-render`, edición sin música y problemas comunes.
+- [Componer piezas de Marketing con Manzanitas](creative/componer-piezas-de-marketing-con-manzanitas.md) — **sólo
+  para Marketing con Manzanitas** (registro complementario de La órbita; no se mezcla con Glitch): armar un carrusel
+  1080 × 1350 en el canvas de la línea con los componentes del DS «Efeonce — La órbita» — elegir la línea del tema,
+  repartir las fotos con el Recreo, elegir el gráfico por la pregunta (tabla de los nueve), preparar el dato con su
+  fuente o marcarlo «Ejemplo ilustrativo», láminas de texto denso, Escena y Lente, la contraportada con una sola
+  conversión, checklist (acento, contraste, una esfera, «Desliza», firma, fuente), story, blog, YouTube y pódcast,
+  estados y señales, problemas comunes y pendientes. Todavía sin comando: el registro en AXIS llega por una task aparte.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19.
@@ -191,6 +279,7 @@ La diferencia con otras capas de documentacion:
 - [Knowledge Platform (foundation)](plataforma/knowledge-platform.md) — operar la base del Knowledge Platform: aplicar la migración del schema `greenhouse_knowledge`, usar los helpers server-only de `src/lib/knowledge/` (registrar fuente, crear/publicar documento con chunks, transicionar lifecycle, feedback), qué significan los estados y qué no hacer.
 - [MCP Greenhouse — Inventario de Tools](plataforma/mcp-greenhouse-tool-inventory.md) — cómo levantar el MCP local `stdio` o conectarse al gateway remoto HTTP privado, qué variables necesita, qué tools existen hoy —la mayoría lee, **siete escriben** y cuatro comprometen gasto del proveedor—, cómo cargar el manual de uso de la propia superficie (`get_greenhouse_skill` / `skill://`, TASK-1804), qué límites de scope respeta y qué follow-ups siguen fuera de alcance.
 - [Operar los manuales MCP servidos por el protocolo](plataforma/operar-manuales-mcp.md) — agregar o cambiar un manual (`docs/mcp/skills/<nombre>/SKILL.md` + entrada en `skill-manifest.ts`), qué significa cada falla del guard de cobertura y de la prueba de fuga, y cómo verificar en staging/producción que el catálogo servido tiene la cuenta EXACTA del manifiesto. TASK-1804.
+- [Operar el Creative Workbench](plataforma/operar-creative-workbench.md) — operar el harness nativo desde su repo, distinguir rutas gestionadas y verificar producción, acceso y distribución; [usar el Lab premium](creative/usar-creative-workbench-lab.md) explica navegación, filtros, inspector, bibliotecas y comprobación del sitio protegido.
 - [Operar Efeonce MCP Gateway](plataforma/operar-efeonce-mcp-gateway.md) — verificar y operar el gateway federado público OAuth de Efeonce sin confundirlo con el MCP local de Greenhouse ni abrir capacidades de Globe fuera de su entitlement.
 - [Operar el provider Greenhouse-SEO del MCP](plataforma/operar-provider-greenhouse-seo-mcp.md) — verificar que las tools de Search Visibility 360 (28 al 2026-09-02, más `get_greenhouse_skill` del provider hermano `greenhouse-skills`, que comparte su configuración) están vivas en `mcp.efeonce.org` (3 niveles: borde público, revisión activa con el token como secret ref, canary del provider contra el lane), correr el smoke autenticado por el front door (exige login Entra interactivo, no automatizable en CI), interpretar 401/403/404, los 3 niveles de rollback (provider OFF → `GROWTH_SEO_ENABLED` multi-runtime → revocar `seo_v2` por org) y los dos gotchas que rompen el deploy (secreto sin binding IAM + `--set-secrets` destructivo). TASK-1647.
 - [Operar Kortex Command Adapter](plataforma/kortex-command-adapter.md) — como ejecutar comandos Kortex gobernados desde Greenhouse con `Idempotency-Key`, binding preflight, dry-run obligatorio y live execute apagado por defecto.
@@ -202,6 +291,7 @@ La diferencia con otras capas de documentacion:
 - [Organization Workspace — rollout y operación](plataforma/organizaciones-workspace-rollout.md) — cómo activar progresivamente el nuevo workspace de organizaciones (TASK-612) en `/agency/organizations/[id]` por usuario → rol → global, supervisar las 2 reliability signals, revertir instantáneo per-user, y diagnosticar issues comunes.
 - [Skills de Product Design](plataforma/skills-product-design.md) — qué cambió cuando se incorporó la suite de 17 skills (a11y, motion, performance, forms, state, dataviz, IA, frontend-architect, design-system-governance), cuándo se invoca cada una, cómo se componen, cuándo correr `greenhouse-ui-review` antes de commit y cómo extender el sistema sin romperlo.
 - [Activar y desactivar el Modo Mantenimiento](plataforma/modo-mantenimiento.md) — paso a paso para poner el portal detrás de la página `/maintenance` durante una mantención planificada: setear `MAINTENANCE_MODE=true` (+ `MAINTENANCE_BYPASS_SECRET`) + redeploy, verificar con `?gh_bypass`, apagar, qué significan el 503/cookie/mensajes rotativos, qué no hacer y troubleshooting.
+- [Operar el guard de rutas públicas y la saturación de PostgreSQL](plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md) — plan/apply de las reglas del Firewall de Vercel para `/api/public/**` (`pnpm security:public-burst-guard`), cutover de producción de observe a enforce, alerta `num_backends` de Cloud SQL, permiso de lectura de métricas y ráfaga controlada de verificación (TASK-1876).
 - [Greenhouse Visual Capture](plataforma/captura-visual-playwright.md) — `pnpm fe:capture` para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patrón de `_cap.mjs` ad-hoc. Scenario DSL declarativo, agent auth canónico, scroll robusto, captura full-page/por sección, 5 capas defense-in-depth Safety, GC de artifacts.
 - [Operar el scanner de malware de assets (ClamAV)](plataforma/operar-scanner-malware-assets.md) — prender, verificar con EICAR y apagar el escaneo de firmas sobre archivos subidos desde afuera (CV público, Growth Forms, RFP y entregables de Proposal). Cubre el fail-closed, los veredictos, la postura de red del servicio Cloud Run y los modos de falla reales.
 - [Operar UI Platform y Design System](plataforma/operar-ui-platform-design-system.md) — runbook para diseñar/implementar superficies con primitives, tokens, Composition Shell, Adaptive Card Density, GVC, design-system catalog y gobernanza Figma.

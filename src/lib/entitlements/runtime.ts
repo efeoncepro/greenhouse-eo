@@ -339,6 +339,21 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    if (
+      subject.tenantType === 'efeonce_internal' &&
+      [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_ACCOUNT, ROLE_CODES.EFEONCE_OPERATIONS].some(role =>
+        hasRole(subject, role)
+      )
+    ) {
+      addEntitlement(entries, {
+        module: 'growth',
+        capability: 'growth.ai_visibility.market.manage',
+        action: 'execute',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+
     // TASK-1289 — profile.set_business_model: el operador corrige el modelo de negocio
     // derivado de un perfil AEO (reencuadra el buyer-intent de todo run futuro de la org).
     // Mismo set operador que run.operator. El command self-guarda con can() (profile arbitrario).
@@ -3092,6 +3107,23 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1950 — prospect demonstrations are internal. Client roles receive no grant.
+  if (subject.tenantType === 'efeonce_internal' &&
+      (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT))) {
+    for (const grant of [
+      { capability: 'growth.xray.case.read', action: 'read' },
+      { capability: 'growth.xray.draft.manage', action: 'create' },
+      { capability: 'growth.xray.draft.manage', action: 'update' },
+      { capability: 'growth.xray.edition.issue', action: 'approve' },
+      { capability: 'growth.xray.edition.issue', action: 'update' },
+      { capability: 'growth.xray.share.manage', action: 'create' },
+      { capability: 'growth.xray.share.manage', action: 'read' },
+      { capability: 'growth.xray.share.manage', action: 'update' }
+    ] as const) {
+      addEntitlement(entries, { module: 'growth', ...grant, scope: 'tenant', source: 'role' })
+    }
+  }
+
   // TASK-1845 — Efeonce Insights. La PUERTA real es el entitlement per-ORG
   // (module_assignments: insights_v1) que verifica el command; estos grants autorizan
   // DENTRO de una org habilitada y el target se revalida en cada command. Admin + Account
@@ -3195,7 +3227,13 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     // §7.1): un enlace saca el informe fuera del portal, así que no nace con leer ni con generar.
     if (hasRole(subject, ROLE_CODES.CLIENT_EXECUTIVE)) {
       for (const action of ['create', 'read', 'update'] as const) {
-        addEntitlement(entries, { module: 'insights', capability: 'insights.share.manage', action, scope: 'own', source: 'role' })
+        addEntitlement(entries, {
+          module: 'insights',
+          capability: 'insights.share.manage',
+          action,
+          scope: 'own',
+          source: 'role'
+        })
       }
     }
   }
@@ -3273,6 +3311,25 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       module: 'design_system',
       capability: 'design_system.figma_node.link',
       action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  // TASK-1921 — render gobernado de piezas de marca (La órbita y Glitch). Pedir y leer es del equipo de diseño y de
+  // administración: DESIGNER ∪ EFEONCE_ADMIN. Nunca `client_*` (hoy sólo la marca propia de Efeonce).
+  if (hasRole(subject, ROLE_CODES.DESIGNER) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'brand_render',
+      capability: 'brand_render.request.create',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'brand_render',
+      capability: 'brand_render.request.read',
+      action: 'read',
       scope: 'tenant',
       source: 'role'
     })

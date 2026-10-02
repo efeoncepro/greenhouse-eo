@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · nuestros partners</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-partners` (surface deck, tema oscuro, TASK-1928). El sello «Efeonce · Partner oficial de» y los
+      programas que la línea permite declarar, en blanco y con el mismo peso óptico (normalizados al componer), en dos
+      filas (5 + 4); la selección toma al que se elige. Referencia: DeckPartners (D7-partners).
+    -->
+    <main class="gl-slide gl-cpt" data-gl-root data-slot="frame">
+      <figure class="gl-layer" data-slot="indicator">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Partners</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Con quién construimos?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">Con los grandes</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-cpt-body" data-slot="body">Programas oficiales de los fabricantes con los que operamos tu crecimiento.</p>
+
+      <div class="gl-cpt-seal">
+        <img class="gl-cpt-seal-logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+        <span class="gl-cpt-divider" aria-hidden="true"></span>
+        <span class="gl-cpt-seal-text" data-slot="seal">Partner oficial de</span>
+      </div>
+
+      <div class="gl-cpt-rule" aria-hidden="true"></div>
+
+      <ol class="gl-cpt-row gl-cpt-row-1" data-slot="row1">
+        <li class="gl-cpt-logo" data-gl-select-item><img data-slot-field="src" alt="" /></li>
+      </ol>
+      <ol class="gl-cpt-row gl-cpt-row-2" data-slot="row2">
+        <li class="gl-cpt-logo" data-gl-select-item><img data-slot-field="src" alt="" /></li>
+      </ol>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

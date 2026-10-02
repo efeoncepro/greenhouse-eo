@@ -1,0 +1,32 @@
+{
+  "id": "AD2-916-revops-mono",
+  "formato": "9:16",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    },
+    {
+      "objeto": "spark",
+      "vista": "volando",
+      "color": "revenue-hubspot"
+    },
+    {
+      "objeto": "spark-contenido",
+      "vista": "cine"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, vertical, a dark studio at night): a Latin American RevOps lead in her mid thirties, dark wavy shoulder-length hair, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands centered in the LOWER two thirds of the frame, framed from the waist up, looking straight into the lens with a confident half-smile, one open hand raised at chest height toward a glowing knot of light beside her as if steering it. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. Around her flows a huge BOW-TIE made of streams of light at the height of her chest and waist: from the far background thousands of tiny glowing particles pour in and converge, narrowing into one brilliant knot of light next to her raised hand, and from that knot the streams open out again toward the foreground, wider and brighter, like a revenue engine that keeps growing after the sale. The streams are vivid magenta-pink (#E86BD0) with azure (#0375DB) and a few teal (#36C8BF) particles; the knot blazes white-magenta and lights her face, hand and jacket. Riding along the streams, THREE Sparks, each smaller than her head and above her waist: one, copied EXACTLY from the first Spark reference, surfs a stream toward the knot, sharp; one, the Content Spark copied EXACTLY from its reference, carries its small glowing card, sharp; and ONE more Spark (THREE in total, never more), the same figure as the Spark references, farther back along the stream, smaller and out of focus, gives a thumbs-up. Cool rim light from behind, haze catching the colored streams. Every stream, particle and Spark stays BELOW 36% of the frame height. The TOP third of the frame is calm, deep dark studio space with only faint haze, no streams, no Sparks, no objects. Rich contrast, punchy color, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens across the bottom, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "calm, deep dark studio space with only faint haze",
+      "tinta": "blanca"
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "efeonce.foto.isotipo.v1",
+  "plate": "PS8-nexa-formatos-mosaico.png",
+  "salida": "PS8-nexa-formatos-mosaico-isotipo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.4.7",
+  "archivo": "assets/efeonce-isotype-negative.svg",
+  "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74",
+  "prenda": "oscura",
+  "caja": {
+    "centro": [
+      0.6671,
+      0.6523
+    ],
+    "ancho": 0.0373,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": {
+    "umbral": 38
+  },
+  "creado": "2026-10-01T02:40:07.891Z",
+  "acabado": {
+    "veredicto": "aprobado",
+    "salida": "PS8-nexa-formatos-mosaico-isotipo-acabado.png",
+    "sha256": "05e2c51a6296d98876e6105f4bfe1b9508528a619b53431023c7df8c18673eb4",
+    "recorte": {
+      "archivo": "PS8-nexa-formatos-mosaico-isotipo-acabado-recorte.png",
+      "sha256": "ab29227b1a18507d4006649d7af1c8e94ef8f3133cdffdf7feb6fb3ffeca8725",
+      "caja": {
+        "lado": 512,
+        "left": 1281,
+        "top": 245
+      },
+      "ampliadoA": 1024
+    },
+    "edicion": {
+      "archivo": "PS8-nexa-formatos-mosaico-isotipo-acabado-edicion.png",
+      "sha256": "228aa911c4243f95765bf8d22d79aac5e3ebd846e5d1fd81ea0c695d02b9b297"
+    },
+    "modelo": {
+      "solicitado": "gpt-image-2.5-sunburst",
+      "devuelto": "gpt-image-2.5-sunburst",
+      "calidad": "high",
+      "tamano": "1024x1024",
+      "uso": {
+        "entrada": 1273,
+        "salida": 1756,
+        "total": 3029
+      },
+      "costoEstimadoUsd": 0.053
+    },
+    "prompt": "This is a crop of a real photograph: the chest of a navy blue technical softshell jacket, the mark embroidered flat in light grey thread. A small white Efeonce mark (a rocket with three round windows inside an elliptical orbit, with a small sphere on top) was placed flat on it. It is finished, official artwork: keep its shape, every part, its proportions, its white colour, its exact size and its exact position — do NOT redraw, restyle, re-letter, simplify, resize or move it. You are only adding MATERIAL and LIGHT so it reads as a real mark applied to that surface: let it follow the gentle curvature of the surface, pick up the same lighting gradient, the soft rim light and the faint reflections of the scene, lie perfectly flush with the surface as a thin printed decal — NO relief, NO bevel, NO emboss, NO highlight rim around it — with only a tiny edge softness, and carry the same grain, softness and depth of field as the surface around it. Keep everything else in the image exactly as it is: same framing, same surface, same colours. No text, no extra marks.",
+    "promptSha256": "cb700861fe10b614f746b60352e49a35f4efc0b46afa6872116ea4733e5f1a95",
+    "superficie": "the chest of a navy blue technical softshell jacket, the mark embroidered flat in light grey thread",
+    "mezcla": {
+      "umbralSilueta": 10,
+      "siluetaPx": 2249,
+      "dilatacionPx": 3,
+      "sigmaAlfa": 1.6,
+      "anilloColorPx": 14,
+      "desplazamientoColor": [
+        0.6,
+        -1.35,
+        -4.29
+      ]
+    },
+    "verificacion": {
+      "zonaMarcaPx": 8,
+      "cambiadosFueraDeLaMarca": 0,
+      "cambiadosEnLaMarca": 4092
+    },
+    "comparacion": "PS8-nexa-formatos-mosaico-isotipo-acabado-comparar.png",
+    "creado": "2026-10-01T02:40:44.791Z"
+  }
+}

@@ -68,30 +68,23 @@ const knownPeople: KnownPersonProfile[] = [
   {
     id: 'efeonce-julio-reyes',
     name: 'Julio Reyes',
-    role: 'Efeonce Team',
-    avatarPath: '/images/greenhouse/team/EO_Avatar-Jullio.png',
+    role: 'Managing & GTM Director',
+    avatarPath: '/images/greenhouse/team/EO_Avatar-Julio-Reyes.png',
     aliases: ['julio reyes', 'jullio', 'julio', 'julio.reyes@efeonce.org']
   },
   {
     id: 'efeonce-valentina',
-    name: 'Valentina',
-    role: 'Efeonce Team',
+    name: 'Valentina Hoyos',
+    role: 'Content Lead',
     avatarPath: '/images/greenhouse/team/EO_Avatar-Valentina.png',
-    aliases: ['valentina']
+    aliases: ['valentina', 'valentina hoyos', 'valentina.hoyos@efeonce.org']
   },
   {
     id: 'efeonce-humberly',
-    name: 'Humberly',
-    role: 'Efeonce Team',
+    name: 'Humberly Henriquez',
+    role: 'Head of Finance',
     avatarPath: '/images/greenhouse/team/Humberly.jpg',
-    aliases: ['humberly']
-  },
-  {
-    id: 'efeonce-luis',
-    name: 'Luis',
-    role: 'Efeonce Team',
-    avatarPath: '/images/greenhouse/team/Luis.jpg',
-    aliases: ['luis']
+    aliases: ['humberly', 'humberly henriquez', 'hhumberly@efeoncepro.com']
   }
 ]
 
@@ -136,7 +129,7 @@ const tenantOverrides: Record<string, TenantDashboardOverride> = {
       {
         id: 'efeonce-julio-reyes',
         name: 'Julio Reyes',
-        role: 'Efeonce Leadership',
+        role: 'Managing & GTM Director',
         allocationPct: 100,
         monthlyHours: 160
       },
@@ -163,22 +156,15 @@ const tenantOverrides: Record<string, TenantDashboardOverride> = {
       },
       {
         id: 'efeonce-valentina',
-        name: 'Valentina',
-        role: 'Efeonce Team',
+        name: 'Valentina Hoyos',
+        role: 'Content Lead',
         allocationPct: 100,
         monthlyHours: 160
       },
       {
         id: 'efeonce-humberly',
-        name: 'Humberly',
-        role: 'Efeonce Team',
-        allocationPct: 100,
-        monthlyHours: 160
-      },
-      {
-        id: 'efeonce-luis',
-        name: 'Luis',
-        role: 'Efeonce Team',
+        name: 'Humberly Henriquez',
+        role: 'Head of Finance',
         allocationPct: 100,
         monthlyHours: 160
       }

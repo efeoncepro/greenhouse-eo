@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · sección partida</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `section-split` (surface deck, papel section). Un panel de papel con UNA esquina curva grande y la foto
+      que se extiende por debajo de la curva. Tres composiciones aprobadas (contrato 0.1.2, `manifest.layout`):
+      `corner-top` (panel a la izquierda, curva arriba a la derecha), `corner-bottom` (curva abajo a la derecha) y
+      `panel-end` (panel a la derecha, curva arriba a la izquierda, foto espejada a la izquierda). El indicador de
+      sección nace abajo a la izquierda y SUBE POR LA IZQUIERDA en sentido horario (corrección del operador, regla
+      `split-indicator-rises-start`); lo pinta AXIS. Número, «Sección n de N», pregunta y respuesta sobre el papel.
+    -->
+    <main class="gl-slide gl-paper gl-ss gl-ss-corner-top gl-ring-small" data-gl-root data-slot="frame">
+      <figure class="gl-split-photo" data-slot="photo">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-split-panel" aria-hidden="true"></div>
+
+      <figure class="gl-layer" data-slot="indicator">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-column" data-slot="progress">
+        <p class="gl-section-number" data-slot-field="number">02</p>
+        <p class="gl-section-label" data-slot-field="label">Sección 2 de 5</p>
+      </div>
+
+      <div class="gl-column" data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quién decide el corte?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">El dato</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+    </main>
+  </body>
+</html>

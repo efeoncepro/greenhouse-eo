@@ -75,7 +75,14 @@ const s = StyleSheet.create({
   // Ancho EXPLÍCITO por aspecto real (837.07:196.68 ≈ 4.256) — react-pdf <Image>
   // con width:'auto' estira al ancho del contenedor (deforma el wordmark).
   coverWm: { width: 85, height: 20 },
-  coverEyebrow: { fontFamily: F.bodySemibold, fontSize: 7, letterSpacing: 1.4, color: K.onNavyMuted, textTransform: 'uppercase', marginTop: 46 },
+  coverEyebrow: {
+    fontFamily: F.bodySemibold,
+    fontSize: 7,
+    letterSpacing: 1.4,
+    color: K.onNavyMuted,
+    textTransform: 'uppercase',
+    marginTop: 46
+  },
   coverOrg: { fontFamily: F.displayBold, fontSize: 42, letterSpacing: -1.2, marginTop: 8, color: '#fff' },
   coverPeriod: { fontFamily: F.body, fontSize: 10, color: K.onNavyStrong, marginTop: 12 },
   coverHero: { flexDirection: 'row', alignItems: 'center', gap: 28, marginTop: 64 },
@@ -83,23 +90,74 @@ const s = StyleSheet.create({
   // Path (no dasharray) + colores OPACOS: el navy se pinta con coverBackdrop, no
   // con Page.backgroundColor — así react-pdf renderiza bien el arco y el color.
   gaugeWrap: { position: 'relative', width: 118, height: 118 },
-  gaugeCtr: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
+  gaugeCtr: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   gaugeNum: { fontFamily: F.displayExtra, fontSize: 38, color: '#fff', lineHeight: 1 },
   gaugeUnit: { fontFamily: F.body, fontSize: 8, color: K.onNavyStrong, marginTop: 3 },
   verdictTitle: { fontFamily: F.display, fontSize: 14, color: '#fff', marginTop: 6 },
-  verdictBody: { fontFamily: F.body, fontSize: 9.5, lineHeight: 1.55, color: K.onNavyStrong, marginTop: 7, maxWidth: 300 },
+  verdictBody: {
+    fontFamily: F.body,
+    fontSize: 9.5,
+    lineHeight: 1.55,
+    color: K.onNavyStrong,
+    marginTop: 7,
+    maxWidth: 300
+  },
   coverEngines: { position: 'absolute', left: P.padX, bottom: 60 },
-  coverEnginesLbl: { fontFamily: F.bodySemibold, fontSize: 7, letterSpacing: 1.3, color: K.onNavyFaint, textTransform: 'uppercase', marginBottom: 9 },
+  coverEnginesLbl: {
+    fontFamily: F.bodySemibold,
+    fontSize: 7,
+    letterSpacing: 1.3,
+    color: K.onNavyFaint,
+    textTransform: 'uppercase',
+    marginBottom: 9
+  },
   engineStrip: { flexDirection: 'row', gap: 8 },
-  engineTile: { width: 30, height: 30, borderRadius: 8, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  engineTile: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   engineTileImg: { width: 17, height: 17, objectFit: 'contain' },
   coverFoot: { position: 'absolute', left: P.padX, right: P.padX, bottom: 28 },
   coverFootText: { fontFamily: F.body, fontSize: 7, color: K.onNavyFaint },
 
   // ── content page ──
-  page: { backgroundColor: K.paper, color: K.text, paddingHorizontal: P.padX, paddingTop: P.padTop, paddingBottom: P.padBottom, fontFamily: F.body, fontSize: 9.5 },
-  pageNo: { position: 'absolute', top: 32, right: P.padX, fontFamily: F.body, fontSize: 7.5, color: K.subtle, letterSpacing: 1 },
-  eyebrow: { fontFamily: F.bodySemibold, fontSize: 7.5, letterSpacing: 1.4, color: K.accent, textTransform: 'uppercase' },
+  page: {
+    backgroundColor: K.paper,
+    color: K.text,
+    paddingHorizontal: P.padX,
+    paddingTop: P.padTop,
+    paddingBottom: P.padBottom,
+    fontFamily: F.body,
+    fontSize: 9.5
+  },
+  pageNo: {
+    position: 'absolute',
+    top: 32,
+    right: P.padX,
+    fontFamily: F.body,
+    fontSize: 7.5,
+    color: K.subtle,
+    letterSpacing: 1
+  },
+  eyebrow: {
+    fontFamily: F.bodySemibold,
+    fontSize: 7.5,
+    letterSpacing: 1.4,
+    color: K.accent,
+    textTransform: 'uppercase'
+  },
   sectionTitle: { fontFamily: F.display, fontSize: 15, color: K.navy, letterSpacing: -0.3, marginTop: 5 },
   helper: { fontFamily: F.body, fontSize: 8.5, color: K.muted, marginTop: 4, maxWidth: 440 },
   section: { marginTop: 26 },
@@ -109,19 +167,60 @@ const s = StyleSheet.create({
 
   // levels
   levelsRow: { flexDirection: 'row', gap: 10, marginTop: 13 },
-  level: { flex: 1, borderWidth: 1, borderColor: K.divider, borderStyle: 'solid', borderRadius: 9, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 9 },
-  levelFull: { borderWidth: 1, borderColor: K.divider, borderStyle: 'solid', borderRadius: 9, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 9, marginTop: 10 },
+  level: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: K.divider,
+    borderStyle: 'solid',
+    borderRadius: 9,
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9
+  },
+  levelFull: {
+    borderWidth: 1,
+    borderColor: K.divider,
+    borderStyle: 'solid',
+    borderRadius: 9,
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9,
+    marginTop: 10
+  },
   levelOrd: { fontFamily: F.displayBold, fontSize: 13, color: K.accent, width: 18 },
   levelMain: { flex: 1 },
   levelLabel: { fontFamily: F.bodySemibold, fontSize: 9.5, color: K.text },
   levelEn: { fontFamily: F.body, fontSize: 8, color: K.subtle },
   levelQ: { fontFamily: F.body, fontSize: 8, color: K.muted, marginTop: 2 },
   levelScore: { fontFamily: F.displayBold, fontSize: 14 },
-  coverChip: { fontFamily: F.bodySemibold, fontSize: 7.5, color: K.muted, backgroundColor: K.surface, borderWidth: 1, borderColor: K.divider, borderStyle: 'solid', borderRadius: 999, paddingVertical: 3, paddingHorizontal: 8 },
+  coverChip: {
+    fontFamily: F.bodySemibold,
+    fontSize: 7.5,
+    color: K.muted,
+    backgroundColor: K.surface,
+    borderWidth: 1,
+    borderColor: K.divider,
+    borderStyle: 'solid',
+    borderRadius: 999,
+    paddingVertical: 3,
+    paddingHorizontal: 8
+  },
 
   // engine rows
   engineRow: { flexDirection: 'row', alignItems: 'center', gap: 11, marginTop: 14 },
-  engineRowTile: { width: 27, height: 27, borderRadius: 7, backgroundColor: K.surface, borderWidth: 1, borderColor: K.divider, borderStyle: 'solid', alignItems: 'center', justifyContent: 'center' },
+  engineRowTile: {
+    width: 27,
+    height: 27,
+    borderRadius: 7,
+    backgroundColor: K.surface,
+    borderWidth: 1,
+    borderColor: K.divider,
+    borderStyle: 'solid',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   engineRowImg: { width: 15, height: 15, objectFit: 'contain' },
   engineRowBody: { flex: 1 },
 
@@ -133,7 +232,17 @@ const s = StyleSheet.create({
   fill: { height: 6.5, borderRadius: 4 },
 
   // gap callout
-  gap: { borderWidth: 1, borderColor: K.divider, borderLeftWidth: 4, borderLeftColor: K.error, borderStyle: 'solid', borderRadius: 9, padding: 15, marginTop: 13, backgroundColor: K.surface },
+  gap: {
+    borderWidth: 1,
+    borderColor: K.divider,
+    borderLeftWidth: 4,
+    borderLeftColor: K.error,
+    borderStyle: 'solid',
+    borderRadius: 9,
+    padding: 15,
+    marginTop: 13,
+    backgroundColor: K.surface
+  },
   gapTitle: { fontFamily: F.display, fontSize: 11.5, color: K.text },
   gapMotion: { fontFamily: F.body, fontSize: 8.5, color: K.muted, marginTop: 7, lineHeight: 1.5 },
   gapMotionStrong: { fontFamily: F.bodySemibold, color: K.accent },
@@ -146,14 +255,27 @@ const s = StyleSheet.create({
   // kpis
   kpis: { flexDirection: 'row', gap: 11, marginTop: 14 },
   kpi: { flex: 1, borderWidth: 1, borderColor: K.divider, borderStyle: 'solid', borderRadius: 9, padding: 13 },
-  kpiOverline: { fontFamily: F.bodySemibold, fontSize: 6.5, letterSpacing: 1.1, color: K.subtle, textTransform: 'uppercase' },
+  kpiOverline: {
+    fontFamily: F.bodySemibold,
+    fontSize: 6.5,
+    letterSpacing: 1.1,
+    color: K.subtle,
+    textTransform: 'uppercase'
+  },
   kpiValue: { fontFamily: F.displayBold, fontSize: 19, color: K.navy, marginTop: 8 },
   kpiValueSm: { fontFamily: F.displayBold, fontSize: 16, color: K.navy, marginTop: 9 },
   kpiHint: { fontFamily: F.body, fontSize: 8, color: K.muted, marginTop: 6 },
 
   // sentiment
   senti: { marginTop: 16 },
-  sentiOverline: { fontFamily: F.bodySemibold, fontSize: 6.5, letterSpacing: 1.1, color: K.subtle, textTransform: 'uppercase', marginBottom: 8 },
+  sentiOverline: {
+    fontFamily: F.bodySemibold,
+    fontSize: 6.5,
+    letterSpacing: 1.1,
+    color: K.subtle,
+    textTransform: 'uppercase',
+    marginBottom: 8
+  },
   sentiBar: { flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden' },
   sentiLegend: { flexDirection: 'row', gap: 18, marginTop: 9 },
   sentiItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
@@ -165,7 +287,14 @@ const s = StyleSheet.create({
   rec: { flexDirection: 'row', gap: 11, marginTop: 11 },
   // View contenedor (centra el dígito vertical+horizontalmente; un <Text> con
   // justifyContent NO centra en vertical en react-pdf → el número quedaba arriba).
-  recNum: { width: 21, height: 21, borderRadius: 6, backgroundColor: K.navy, alignItems: 'center', justifyContent: 'center' },
+  recNum: {
+    width: 21,
+    height: 21,
+    borderRadius: 6,
+    backgroundColor: K.navy,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   recNumText: { color: '#fff', fontFamily: F.displayBold, fontSize: 10, lineHeight: 1 },
   recBody: { flex: 1 },
   recTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
@@ -175,14 +304,28 @@ const s = StyleSheet.create({
 
   // provenance
   prov: { marginTop: 12 },
-  provRow: { flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: K.divider, borderBottomStyle: 'solid', paddingVertical: 6 },
+  provRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: K.divider,
+    borderBottomStyle: 'solid',
+    paddingVertical: 6
+  },
   provKey: { fontFamily: F.body, fontSize: 9, color: K.muted },
   provVal: { fontFamily: F.bodySemibold, fontSize: 9, color: K.text },
 
   // disclaimer + closing
   disc: { marginTop: 14, paddingTop: 11, borderTopWidth: 1, borderTopColor: K.divider, borderTopStyle: 'solid' },
   discText: { fontFamily: F.body, fontSize: 7, color: K.subtle, lineHeight: 1.5 },
-  closing: { marginTop: 18, paddingTop: 13, borderTopWidth: 1, borderTopColor: K.divider, borderTopStyle: 'solid', alignItems: 'center' },
+  closing: {
+    marginTop: 18,
+    paddingTop: 13,
+    borderTopWidth: 1,
+    borderTopColor: K.divider,
+    borderTopStyle: 'solid',
+    alignItems: 'center'
+  },
   closingLogo: { width: 77, height: 18, marginBottom: 8 },
   closingLegal: { fontFamily: F.body, fontSize: 6.5, color: K.subtle, marginTop: 7 }
 })
@@ -242,7 +385,7 @@ const StaticBar = ({ value, color }: { value: number; color: string }) => (
 const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) => {
   const show = (section: Parameters<typeof reportSectionVisible>[1]) => reportSectionVisible('attachment', section)
 
-  const sampledCount = model.provenance.providersSampled.length
+  const sampledCount = (model.provenance.providersRequested ?? model.provenance.providersSampled).length
   const arcSeverity = model.overallSeverity
 
   const sovRows = [
@@ -266,7 +409,12 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
   }
 
   return (
-    <Document title={`${C.header.title} — ${header.organizationName}`} author='Efeonce' creator='Greenhouse EO' producer='Greenhouse EO'>
+    <Document
+      title={`${C.header.title} — ${header.organizationName}`}
+      author='Efeonce'
+      creator='Greenhouse EO'
+      producer='Greenhouse EO'
+    >
       {/* ── PAGE 1 · COVER (full navy hero) ── */}
       <Page size='A4' style={s.cover}>
         <View style={s.coverBackdrop} fixed />
@@ -283,7 +431,8 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
             <Text style={s.verdictBody}>{C.verdict.scoreContext}</Text>
             <Text style={[s.coverFootText, { marginTop: 12 }]}>
               {GH_GROWTH_AI_VISIBILITY.severity_label[model.overallSeverity]} ·{' '}
-              {C.verdict.coverageValue(sampledCount, sampledCount)} · {C.verdict.scoreDisclaimer}
+              {C.verdict.coverageValue(model.provenance.providersResponded?.length ?? null, sampledCount)} ·{' '}
+              {C.verdict.scoreDisclaimer}
             </Text>
           </View>
         </View>
@@ -366,7 +515,9 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
                 {model.levels[4].status === 'coverage' ? (
                   <Text style={s.coverChip}>{C.levelsBand.coverageBadge}</Text>
                 ) : (
-                  <Text style={[s.levelScore, { color: toneInk(model.levels[4].severity) }]}>{model.levels[4].score}</Text>
+                  <Text style={[s.levelScore, { color: toneInk(model.levels[4].severity) }]}>
+                    {model.levels[4].score}
+                  </Text>
                 )}
               </View>
             ) : null}
@@ -381,8 +532,9 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
               const pct = engine.resolved === 0 ? 0 : Math.round((engine.present / engine.resolved) * 100)
 
               const name =
-                GH_GROWTH_AI_VISIBILITY.provider_label[engine.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label] ??
-                engine.provider
+                GH_GROWTH_AI_VISIBILITY.provider_label[
+                  engine.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label
+                ] ?? engine.provider
 
               const barColor = pct >= 70 ? K.success : pct >= 45 ? K.warning : K.error
 
@@ -396,7 +548,9 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
                   <View style={s.engineRowBody}>
                     <View style={s.barHead}>
                       <Text style={s.barName}>{name}</Text>
-                      <Text style={[s.barVal, { color: K.muted }]}>{C.engineSnapshot.presentLabel(engine.present, engine.resolved)}</Text>
+                      <Text style={[s.barVal, { color: K.muted }]}>
+                        {C.engineSnapshot.presentLabel(engine.present, engine.resolved)}
+                      </Text>
                     </View>
                     <StaticBar value={pct} color={barColor} />
                   </View>
@@ -457,25 +611,38 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
         {show('aeoSignals') ? (
           <View style={s.section}>
             <Text style={s.sectionTitle}>{C.signals.title}</Text>
-            <Text style={s.helper}>Cómo te citan, con qué tono te mencionan y qué tan arriba apareces en las respuestas.</Text>
+            <Text style={s.helper}>
+              Cómo te citan, con qué tono te mencionan y qué tan arriba apareces en las respuestas.
+            </Text>
             <View style={s.kpis}>
               <View style={s.kpi}>
                 <Text style={s.kpiOverline}>{C.signals.citationShareTitle}</Text>
-                <Text style={s.kpiValue}>{model.citationInsight.ownDomainShare === null ? '—' : `${model.citationInsight.ownDomainShare}%`}</Text>
+                <Text style={s.kpiValue}>
+                  {model.citationInsight.ownDomainShare === null ? '—' : `${model.citationInsight.ownDomainShare}%`}
+                </Text>
                 <Text style={s.kpiHint}>
-                  {C.signals.citationShareHelper(model.citationInsight.findingsCitingOwnDomain, model.citationInsight.findingsWithCitations)}
+                  {C.signals.citationShareHelper(
+                    model.citationInsight.findingsCitingOwnDomain,
+                    model.citationInsight.findingsWithCitations
+                  )}
                 </Text>
               </View>
               <View style={s.kpi}>
                 <Text style={s.kpiOverline}>{C.signals.sentimentTitle}</Text>
-                <Text style={s.kpiValueSm}>{GH_GROWTH_AI_VISIBILITY.sentiment_net_label[model.sentimentSummary.net]}</Text>
+                <Text style={s.kpiValueSm}>
+                  {GH_GROWTH_AI_VISIBILITY.sentiment_net_label[model.sentimentSummary.net]}
+                </Text>
                 <Text style={s.kpiHint}>{C.signals.sentimentBasis(model.sentimentSummary.evaluated)}</Text>
               </View>
               <View style={s.kpi}>
                 <Text style={s.kpiOverline}>{C.signals.prominenceTitle}</Text>
-                <Text style={s.kpiValue}>{model.positionSummary.best === null ? '—' : `#${model.positionSummary.best}`}</Text>
+                <Text style={s.kpiValue}>
+                  {model.positionSummary.best === null ? '—' : `#${model.positionSummary.best}`}
+                </Text>
                 <Text style={s.kpiHint}>
-                  {model.positionSummary.best === null ? C.signals.prominenceHelper : `${C.signals.prominenceBest(model.positionSummary.best)} · ${C.signals.prominenceAverage(model.positionSummary.average ?? model.positionSummary.best)}`}
+                  {model.positionSummary.best === null
+                    ? C.signals.prominenceHelper
+                    : `${C.signals.prominenceBest(model.positionSummary.best)} · ${C.signals.prominenceAverage(model.positionSummary.average ?? model.positionSummary.best)}`}
                 </Text>
               </View>
             </View>
@@ -543,7 +710,9 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
                 <View style={s.recBody}>
                   <View style={s.recTitleRow}>
                     <Text style={s.recTitle}>{rec.title}</Text>
-                    <Text style={[s.sevChip, sevChipStyle(rec.severity)]}>{GH_GROWTH_AI_VISIBILITY.severity_label[rec.severity]}</Text>
+                    <Text style={[s.sevChip, sevChipStyle(rec.severity)]}>
+                      {GH_GROWTH_AI_VISIBILITY.severity_label[rec.severity]}
+                    </Text>
                   </View>
                   <Text style={s.recAction}>{rec.action}</Text>
                 </View>
@@ -581,7 +750,9 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
         <View style={s.closing}>
           <Image src={asset('branding/logo-full.png')} style={s.closingLogo} />
           <EfeonceSloganPdf fontSize={11} />
-          <Text style={s.closingLegal}>{EFEONCE_LEGAL_NAME_FALLBACK} · {EFEONCE_URL}</Text>
+          <Text style={s.closingLegal}>
+            {EFEONCE_LEGAL_NAME_FALLBACK} · {EFEONCE_URL}
+          </Text>
         </View>
       </Page>
     </Document>

@@ -29,14 +29,11 @@ import 'server-only'
  * lado AEO se lee con EL MISMO org del target, nunca con uno del request.
  */
 
+import { resolveGrowthMarket } from '@/lib/growth/markets'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import {
-  type SeoAeoGapResult,
-  type SeoAeoKeywordStanding,
-  type SeoAeoQuadrantEntry
-} from '../contracts'
+import { type SeoAeoGapResult, type SeoAeoKeywordStanding, type SeoAeoQuadrantEntry } from '../contracts'
 import { isSeoModuleEnabled } from '../flags'
 import { classifyQuadrant, DEFAULT_QUADRANT_THRESHOLDS, type QuadrantThresholds } from './quadrant'
 
@@ -89,8 +86,12 @@ export const readSeoAeoGap = async (
 
   try {
     // Tenant binding server-side: el target define la org; TODO lo demás usa ESTE org.
-    const targets = await runGreenhousePostgresQuery<{ organization_id: string }>(
-      `SELECT organization_id FROM greenhouse_growth.seo_targets WHERE seo_target_id = $1`,
+    const targets = await runGreenhousePostgresQuery<{
+      organization_id: string
+      location_code: string
+      language_code: string
+    }>(
+      `SELECT organization_id,location_code,language_code FROM greenhouse_growth.seo_targets WHERE seo_target_id = $1`,
       [seoTargetId]
     )
 
@@ -98,6 +99,16 @@ export const readSeoAeoGap = async (
 
     if (!organizationId) {
       return { ok: false, errorCode: 'target_not_found', status: null }
+    }
+
+    let market: ReturnType<typeof resolveGrowthMarket>
+
+    try {
+      const location = targets[0].location_code
+
+      market = resolveGrowthMarket(/^\d+$/.test(location) ? Number(location) : location, targets[0].language_code)
+    } catch {
+      return { ok: false, errorCode: 'no_aeo_data', status: null }
     }
 
     // ── Lente SEO (query 1: SOLO tablas seo_*) ─────────────────────────────
@@ -161,6 +172,7 @@ export const readSeoAeoGap = async (
              JOIN greenhouse_growth.grader_profiles p ON p.profile_id = r.profile_id
             WHERE p.organization_id = $1
               AND r.status = ANY($2::text[])
+              AND r.market_code=$3 AND r.locale=$4
             ORDER BY r.finished_at DESC NULLS LAST, r.created_at DESC
             LIMIT 1
          ) lr
@@ -172,7 +184,7 @@ export const readSeoAeoGap = async (
             ORDER BY s.created_at DESC
             LIMIT 1
          ) ls ON TRUE`,
-      [organizationId, REPORTABLE_RUN_STATUSES]
+      [organizationId, REPORTABLE_RUN_STATUSES, market.code, market.locale]
     )
 
     const aeoRow = aeoRows[0]

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · por qué te citaría la IA</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `method-eeat` (surface deck, tema oscuro, TASK-1934). Cuatro tarjetas de vidrio con las letras de E-E-A-T
+      sobre la plataforma de luz, con su reflejo; la cuarta (Confianza) más alta, con el filete de halo y su brillo.
+      Arriba, el medidor en dos columnas: cada barra sale de su valor (`--gl-ee-fill`) y la de la IA va en el acento con
+      brillo. La voz «viva» a la izquierda y la burbuja URL en luminosidad al pie. Referencia: DeckEEAT (MD2-eeat).
+    -->
+    <main class="gl-slide gl-ee" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ee-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-layer gl-ee-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-ee-meter" data-slot="meter">
+        <li class="gl-ee-reading">
+          <p class="gl-ee-reading-head">
+            <span class="gl-ee-reading-label"><span data-slot-field="topic">Peso de E-E-A-T ·</span> <span data-slot-field="label">En SEO clásico</span></span>
+            <span class="gl-ee-reading-value" data-slot-field="value">Importante</span>
+          </p>
+          <span class="gl-ee-track" aria-hidden="true"><span class="gl-ee-bar"></span></span>
+        </li>
+      </ol>
+
+      <ol class="gl-ee-cards" data-slot="letters">
+        <li class="gl-ee-card">
+          <p class="gl-ee-letter" data-slot-field="letter">E</p>
+          <p class="gl-ee-name" data-slot-field="name">Experiencia</p>
+          <p class="gl-ee-desc" data-slot-field="description">Contenido de primera mano, escrito por quien lo vivió.</p>
+          <div class="gl-ee-footer">
+            <p class="gl-ee-kicker" data-slot-field="kicker">Lo construimos con</p>
+            <p class="gl-ee-built" data-slot-field="builtWith">Autoría demostrable y casos reales</p>
+            <p class="gl-ee-deliverable" data-slot-field="deliverable">Contenido &amp; landings</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">E-E-A-T</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Por qué te citaría la IA?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Porque</span><span data-slot-field="answer">confía</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">La IA no adivina: cita a quien puede <strong>verificar</strong>. Cada entregable construye una de estas señales.</p>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

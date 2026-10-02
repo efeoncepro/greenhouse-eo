@@ -1,0 +1,10 @@
+{
+  "id": "SX3-a-otra-marca",
+  "formato": "1:1",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic drama still, a client's commercial director alone in his dark office late at night, the moment he realizes the AI assistant recommended another brand instead of his): a Chilean man in his late forties, short dark hair greying at the temples, dark navy-grey client blazer over a white shirt with an open collar, stands in the LEFT 65% of the frame, turned three-quarters toward the RIGHT, holding a smartphone low in front of his chest with one hand, slowly lowering it; the phone screen is the only key light: a cool white glow hits his jaw, his hand and the underside of his face from below, his brow tightened, lips pressed, looking past the phone into the dark on the right, the quiet shock of losing the answer to a competitor. A single azure-blue (#0375DB) rim light from behind his left shoulder outlines his hair and shoulder against the dark. The phone is seen from behind or at a steep angle so its screen content is never visible. REALISTIC ADULT PROPORTIONS, 85mm lens, camera at his eye level about two meters away, focus on his eyes, shallow depth of field. Thin haze catching the glow around the phone. Background: a deep dark office, far out-of-focus city lights through a window as tiny soft bokeh on the left. The RIGHT 30% of the frame, from top to bottom, is only calm deep dark space with faint haze, no objects, no bright edges. Nobody looks at the lens. Rich contrast, deep navy blacks, no readable text, no logos of any brand, no Efeonce uniform.",
+  "lecho": { "objeto": "the dark blurred edge of a desk close to the lens at the bottom, outside the light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark space on the right 30% of the frame", "tinta": "blanca" } }
+}

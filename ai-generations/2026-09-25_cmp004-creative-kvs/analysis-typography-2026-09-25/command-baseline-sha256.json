@@ -1,0 +1,7 @@
+{
+  "scripts/foto/componer-cta.mjs": "0d6761afc4f3295f41c2797da3117889697f7aa5a287d78bfaed2b0ee55d7464",
+  "scripts/foto/componer-cta.gate.mjs": "8c93f03952d39b48ebb2e86d7838ffa831536922765fa0bf00f3cc303a4dcf2c",
+  "scripts/foto/cta-esquema.mjs": "e31e8eac17d423697ff2d6face36989360047005cc241e8c0a242b3b736bea48",
+  "scripts/foto/cta-invariantes.mjs": "71532ca6f90d5a8a6cc72239728d76a2e167632d69f179dd69d55ba2dadf34ac",
+  "scripts/foto/cta-variantes.mjs": "825d402153f1190c8d2d758716a6712f8968115236a14a3a085b944c61886dc6"
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm doctor)",
+      "Bash(pnpm gates)",
+      "Bash(pnpm assets:pull)",
+      "Bash(pnpm pieza:nueva:*)",
+      "Bash(pnpm pieza:subir:*)",
+      "Bash(pnpm pieza:bajar:*)",
+      "Bash(pnpm foto:doctor)",
+      "Bash(pnpm foto:prompt:*)",
+      "Bash(pnpm foto:validar:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "ask": [
+      "Bash(pnpm ai:image:*)",
+      "Bash(pnpm ai:fal:*)",
+      "Bash(pnpm ai:omni:*)",
+      "Bash(pnpm foto:generar:*)",
+      "Bash(git push:*)"
+    ],
+    "deny": [
+      "Read(./.env.local)",
+      "Read(./.env)",
+      "Bash(gcloud secrets:*)",
+      "Bash(gcloud storage rm:*)",
+      "Bash(gsutil rm:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Edit(./.claude/**)",
+      "Edit(./.codex/**)",
+      "Edit(./.workbench/**)",
+      "Edit(./.github/**)",
+      "Edit(./scripts/**)",
+      "Edit(./src/**)",
+      "Edit(./docs/**)",
+      "Edit(./clients/**)",
+      "Edit(./gates/**)",
+      "Edit(./tools/**)",
+      "Edit(./AGENTS.md)",
+      "Edit(./CLAUDE.md)",
+      "Edit(./package.json)",
+      "Edit(./pnpm-lock.yaml)",
+      "Edit(./workbench.config.json)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs\"" }]
+      }
+    ]
+  }
+}

@@ -56,14 +56,23 @@
     }
   }
 
+  // Lenguaje de movimiento: tokens `efeonceGraphicLine.motion` de AXIS (los valores aprobados de la V1.1), fijados en init.
+  let M = null
+
   // Resorte casi crítico para asentar: sobrepasa ≤ 1,5 % y vuelve una vez.
   const settle = x => {
     if (x <= 0) return 0
     if (x >= 1) return 1
-    const z = 0.82, w = 11
+    const z = M.settle.damping, w = M.settle.omega
 
     return 1 - Math.exp(-z * w * x) * (Math.cos(w * Math.sqrt(1 - z * z) * x) + (z / Math.sqrt(1 - z * z)) * Math.sin(w * Math.sqrt(1 - z * z) * x))
   }
+
+  // Pulso de impacto: sube rápido y decae (0 → pico → 0). Para rebotes y destellos al encajar.
+  const pulse = x => (x <= 0 || x >= 1 ? 0 : Math.sin(Math.PI * Math.min(1, x * M.pulse.rise)) * Math.exp(-M.pulse.decay * x) * M.pulse.gain)
+
+  // Salida con sobrepaso (back-out): llega rápido, se pasa un poco y vuelve. s = cuánto se pasa.
+  const backOut = (x, s = M.overshoot.default) => (x <= 0 ? 0 : x >= 1 ? 1 : 1 + (s + 1) * (x - 1) ** 3 + s * (x - 1) ** 2)
 
   const EASE = {}
 
@@ -153,6 +162,7 @@
 
   window.orbitScene = {
     init(cfg) {
+      M = cfg.motion
       S.cfg = cfg
       const { W, H } = cfg
       const root = document.getElementById('stage')
@@ -195,6 +205,8 @@
 
       S.haloStops = cfg.tokens.orbit.halo.map(s => el('stop', { offset: s.offset, 'stop-color': cfg.colors.accent, 'stop-opacity': 0 }, halo))
       S.haloGrad = halo
+      // Onda de impacto: la órbita en acento que se expande y se desvanece cuando la nave encaja o se lanza.
+      S.wave = el('path', { fill: 'none', 'stroke-linejoin': 'round' }, S.cam)
       const BIG = { maskUnits: 'userSpaceOnUse', x: -4000, y: -4000, width: 9000, height: 9000 }
       const white = m => el('rect', { x: -4000, y: -4000, width: 9000, height: 9000, fill: '#fff' }, m)
       const E = S.E
@@ -655,68 +667,105 @@
       const lineScale = (W / S.cfg.tokens.orbit.baseWidthPx) * (social ? S.cfg.tokens.orbit.socialMultiplier : 1)
 
       S.lineScale = Math.min(lineScale, short / 480)
-      // Héroe: el isotipo mide 62 % del lado corto (el anillo de la línea toma ese diámetro) y queda algo arriba del centro.
-      const heroW = short * (format === '16x9' ? 0.56 : 0.62)
+      // Héroe: el anillo de la línea mide ~80 % del lado corto (78 % en 16:9): llena el cuadro y le da recorrido a la cámara.
+      const L = M.layout
+      const heroW = short * (format === '16x9' ? L.heroRingOfShortSide.wide : W < H ? L.heroRingOfShortSide.tall : L.heroRingOfShortSide.square)
 
       S.hero = { s: heroW / (2 * S.E.a) }
       S.hero.tx = W / 2 - S.E.cx * S.hero.s
-      S.hero.ty = H * 0.47 - S.E.cy * S.hero.s
-      // Final: logotipo al 46 % del lado corto (58 % en verticales), centrado un poco sobre el centro para el eslogan.
-      const logoW = short * (W < H ? 0.66 : W === H ? 0.56 : 0.5)
+      S.hero.ty = H * L.heroCenterYOfHeight - S.E.cy * S.hero.s
+      // Final: logotipo al 50 % del lado corto en 16:9, 56 % en cuadrado y 66 % en vertical (layout.logoOfShortSide),
+      // centrado un poco sobre el centro para el eslogan.
+      const logoW = short * (W < H ? L.logoOfShortSide.tall : W === H ? L.logoOfShortSide.square : L.logoOfShortSide.wide)
       const ls = logoW / 837.07
 
-      S.logoT = { s: ls, tx: W / 2 - (837.07 * ls) / 2, ty: H * 0.46 - (196.68 * ls) / 2 }
+      S.logoT = { s: ls, tx: W / 2 - (837.07 * ls) / 2, ty: H * L.logoCenterYOfHeight - (196.68 * ls) / 2 }
       S.logoG.setAttribute('transform', `translate(${S.logoT.tx},${S.logoT.ty}) scale(${ls})`)
       S.fin_final = {
         s: ls * S.isoToLogo.s,
         tx: S.logoT.tx + S.isoToLogo.tx * ls,
         ty: S.logoT.ty + S.isoToLogo.ty * ls
       }
-      // Eslogan: ancho = 78 % del logotipo, debajo con aire de medio alto del logotipo.
+      // Eslogan: ancho = 64 % del logotipo (subordinado: acompaña al logo sin competir), debajo con aire de medio alto.
       S.slogan.setAttribute('font-size', 100)
       const w100 = S.slogan.getComputedTextLength() || 900
-      const fs = (logoW * 0.78) / w100 * 100
+      const fs = (logoW * L.sloganOfLogo) / w100 * 100
 
       S.slogan.setAttribute('font-size', fs)
-      S.sloganBase = { x: W / 2, y: S.logoT.ty + 196.68 * ls + fs * 1.35, fs }
+      S.sloganBase = { x: W / 2, y: S.logoT.ty + 196.68 * ls + fs * L.sloganGapOfFont, fs }
     },
 
     // Estado de todos los elementos para el tiempo t (ms) de la animación elegida.
     render(t, anim, pass = 'main') {
-      const st = anim === 'open' ? this.stateOpen(t) : this.stateReveal(t)
+      const st = anim === 'open' ? this.stateOpen(t) : anim === 'sting' ? this.stateSting(t) : this.stateReveal(t)
 
       this.apply(st, pass)
 
       return st
     },
 
+    // Ritmo lento–rápido–lento: cada acción arranca después de una pausa corta y se resuelve con un golpe.
     stateReveal(t) {
       const seg = (a, b) => clamp((t - a) / (b - a))
       const e = EASE
+      const P = M.pieces.reveal
 
       return {
-        ringOpacity: e.emphasized(seg(0, 450)),
-        ringBreath: lerp(0.96, 1, e.emphasized(seg(0, 450))),
-        arc: e.standard(seg(250, 1150)),
-        sphereBirth: e.emphasized(seg(250, 450)),
-        tilt: e.standard(seg(950, 1850)),
-        thick: e.standard(seg(1050, 1850)),
-        color: e.standard(seg(1050, 1750)),
-        planet: e.standard(seg(1450, 1850)),
-        planetSettle: settle(seg(1700, 2100)),
-        gapsPlanet: e.emphasized(seg(1500, 1850)),
-        // La nave vuela sobre el anillo del giro (continuo); el anillo oficial, con sus cruces, entra de golpe recién
-        // cuando la nave está en su lugar y los tapa.
-        ringSwap: t >= 2250 ? 1 : 0,
-        ship: e.emphasized(seg(1550, 2250)),
-        swap: seg(2300, 2400),
-        isoSettle: settle(seg(2250, 2450)),
-        cam: e.standard(seg(2450, 3250)),
+        ringOpacity: e.emphasized(seg(...P.ringOpacity)),
+        ringBreath: lerp(P.ringBreathFrom, 1, e.emphasized(seg(...P.ringBreath))),
+        arc: e.emphasized(seg(...P.arc)),
+        sphereBirth: backOut(seg(...P.sphereBirth), M.overshoot.sphereBirth),
+        tilt: e.emphasized(seg(...P.tilt)),
+        thick: e.emphasized(seg(...P.thick)),
+        color: e.standard(seg(...P.color)),
+        planet: e.emphasized(seg(...P.planet)),
+        planetSettle: settle(seg(...P.planetSettle)),
+        gapsPlanet: e.emphasized(seg(...P.gapsPlanet)),
+        // La nave entra rápido, se pasa un poco y vuelve: encaja. El anillo oficial entra con la nave en su lugar.
+        ship: backOut(seg(...P.ship), M.overshoot.ship),
+        ringSwap: t >= P.ringSwapMs ? 1 : 0,
+        swap: seg(...P.swap),
+        bump: pulse(seg(...P.bump[0])) + M.pulse.echo * pulse(seg(...P.bump[1])),
+        wave: seg(...P.wave),
+        flash: pulse(seg(...P.flash)),
+        cam: e.emphasized(seg(...P.camera)),
         letters: t,
-        lettersFrom: 2750,
-        slogan: e.emphasized(seg(3100, 3600)),
-        halo: e.standard(seg(1200, 2200)),
-        haloEnd: e.standard(seg(2450, 3250))
+        lettersFrom: P.lettersFromMs,
+        slogan: e.emphasized(seg(...P.slogan)),
+        halo: e.standard(seg(...P.halo)),
+        haloEnd: e.standard(seg(...P.haloEnd))
+      }
+    },
+
+    // Versión corta (sting, 1,6 s): el isotipo ya formado, la nave encaja de un golpe y la cámara salta al logotipo.
+    stateSting(t) {
+      const seg = (a, b) => clamp((t - a) / (b - a))
+      const e = EASE
+      const P = M.pieces.sting
+
+      return {
+        ringOpacity: e.emphasized(seg(...P.ringOpacity)),
+        ringBreath: lerp(P.ringBreathFrom, 1, e.emphasized(seg(...P.ringBreath))),
+        arc: 0,
+        sphereBirth: 1,
+        tilt: 1,
+        thick: 1,
+        color: 1,
+        planet: 1,
+        planetSettle: 1,
+        gapsPlanet: 1,
+        ship: backOut(seg(...P.ship), M.overshoot.ship),
+        ringSwap: t >= P.ringSwapMs ? 1 : 0,
+        swap: seg(...P.swap),
+        bump: pulse(seg(...P.bump[0])) + M.pulse.echo * pulse(seg(...P.bump[1])),
+        wave: seg(...P.wave),
+        flash: pulse(seg(...P.flash)),
+        cam: e.emphasized(seg(...P.camera)),
+        letters: t,
+        lettersFrom: P.lettersFromMs,
+        slogan: 0,
+        halo: e.standard(seg(...P.halo)),
+        haloEnd: e.standard(seg(...P.haloEnd))
       }
     },
 
@@ -724,32 +773,36 @@
       const seg = (a, b) => clamp((t - a) / (b - a))
       const e = EASE
       const back = x => 1 - x
+      const P = M.pieces.open
+      // Anticipación: la nave retrocede un poco antes de lanzarse (ship > 1 = hacia atrás).
+      const pullback = P.pullbackAmount * e.emphasized(seg(...P.pullback)) * (t < P.pullback[1] ? 1 : 0)
 
       return {
         ringOpacity: 1,
-        ringBreath: lerp(1, 1.18, e.emphasized(seg(2000, 2800))),
-        arcOpen: e.emphasized(seg(2000, 2800)),
+        ringBreath: lerp(1, P.ringBreathTo, e.emphasized(seg(...P.ringBreath))),
+        arcOpen: e.emphasized(seg(...P.arcOpen)),
         arc: 0,
-        sphereBirth: 1,
-        tilt: back(e.standard(seg(1400, 2200))),
-        thick: back(e.standard(seg(1400, 2100))),
-        color: back(e.standard(seg(1500, 2200))),
-        planet: back(e.standard(seg(1400, 1800))),
+        sphereBirth: 1 + P.sphereBirthPulseGain * pulse(seg(...P.sphereBirthPulse)),
+        tilt: back(e.emphasized(seg(...P.tilt))),
+        thick: back(e.emphasized(seg(...P.thick))),
+        color: back(e.standard(seg(...P.color))),
+        planet: back(e.emphasized(seg(...P.planet))),
         planetSettle: 1,
-        gapsPlanet: back(e.emphasizedAccelerate(seg(1400, 1700))),
-        // Oficial → anillo cerrado (1000–1080) → anillo continuo del giro (1085), todo antes de que la nave arranque.
-        ringSwap: t < 1085 ? 1 : 0,
-        ship: back(e.emphasizedAccelerate(seg(1100, 1700))),
+        gapsPlanet: back(e.emphasizedAccelerate(seg(...P.gapsPlanet))),
+        // Oficial → anillo cerrado → anillo continuo del giro, antes de la anticipación.
+        ringSwap: t < P.ringSwapMs ? 1 : 0,
+        ship: 1 + pullback - e.emphasizedAccelerate(seg(...P.ship)),
         shipExit: true,
-        // El isotipo oficial cede a la construcción ANTES de que la nave arranque.
-        swap: back(seg(1000, 1080)),
-        isoSettle: 1,
-        cam: back(e.standard(seg(600, 1300))),
+        swap: back(seg(...P.swap)),
+        bump: P.bumpGains[0] * pulse(seg(...P.bump[0])) + P.bumpGains[1] * pulse(seg(...P.bump[1])),
+        wave: seg(...P.wave),
+        flash: pulse(seg(...P.flash)),
+        cam: back(e.emphasized(seg(...P.camera))),
         letters: t,
-        lettersOut: [300, 800],
+        lettersOut: P.lettersOut,
         slogan: 0,
         halo: 1,
-        haloEnd: back(e.standard(seg(600, 1300)))
+        haloEnd: back(e.standard(seg(...P.haloEnd)))
       }
     },
 
@@ -766,7 +819,7 @@
       const heroC = [S.hero.tx + E.cx * S.hero.s, S.hero.ty + E.cy * S.hero.s]
       const finC = [S.fin_final.tx + E.cx * S.fin_final.s, S.fin_final.ty + E.cy * S.fin_final.s]
       const cx = lerp(heroC[0], finC[0], k), cy = lerp(heroC[1], finC[1], k)
-      const settleScale = lerp(0.975, 1, st.isoSettle)
+      const settleScale = 1 + M.impactScale * (st.bump ?? 0)
 
       const camT = `translate(${cx},${cy}) scale(${sc * settleScale}) translate(${-E.cx},${-E.cy})`
 
@@ -855,7 +908,8 @@
         cx: lerp(sx, 363.7, land),
         cy: lerp(sy, 61.83, land),
         r: pr * lerp(1, 1, st.planetSettle),
-        fill: mixColor(col.accent, col.logo, land)
+        fill: mixColor(col.accent, col.logo, land),
+        opacity: st.ringOpacity
       })
 
       // ── Cruce a las piezas oficiales (cuando todo calza) ──
@@ -868,11 +922,24 @@
 
       // ── Halo (capa propia; en la pasada principal sólo si la variante lo lleva) ──
       // En fondo claro el halo se lee como mancha: va a la mitad (token × 0,5); en oscuro, el token tal cual.
-      const haloOp = st.halo * lerp(1, 0.55, st.haloEnd) * (cfg.colors.haloScale ?? 1)
+      const haloOp = st.halo * lerp(1, M.halo.endOpacity, st.haloEnd) * (cfg.colors.haloScale ?? 1)
 
       set(S.halo, { cx: E.cx, cy: E.cy, r: E.a * tok.haloRadiusRatio })
       set(S.haloGrad, { cx: E.cx, cy: E.cy, r: E.a * tok.haloRadiusRatio })
-      S.haloStops.forEach((s, i) => s.setAttribute('stop-opacity', (tok.halo[i].opacity * haloOp).toFixed(4)))
+      S.haloStops.forEach((s, i) => s.setAttribute('stop-opacity', Math.min(1, tok.halo[i].opacity * haloOp * (1 + M.halo.flashGain * (st.flash ?? 0))).toFixed(4)))
+
+      // Onda de impacto: la elipse oficial en acento se expande 1 → 1,5 y se apaga.
+      const wv = st.wave ?? 0
+
+      if (wv > 0 && wv < 1) {
+        const g = 1 - (1 - wv) ** 3
+        const wp = []
+
+        for (let i = 0; i <= 96; i++) wp.push(this.point((i / 96) * TAU, lerp(M.wave.fromScale, M.wave.toScale, g), E.a, E.b))
+        set(S.wave, { d: pathOf(wp), stroke: col.accent, 'stroke-width': lerp(M.wave.fromStrokePx, M.wave.toStrokePx, g) * px, opacity: M.wave.opacity * (1 - wv) ** M.wave.fadeExponent, visibility: 'visible' })
+      } else {
+        S.wave.setAttribute('visibility', 'hidden')
+      }
 
       // ── Letras: salen desde detrás del isotipo hacia afuera, una tras otra; en la apertura se recogen ──
       const order = [2, 1, 0, 3, 4, 5] // e(235) f e(56) · n c e: las más cercanas a la «o» primero
@@ -884,17 +951,17 @@
 
         if (st.lettersOut) {
           const [a, b] = st.lettersOut
-          const d = (2 - rank) * 45
+          const d = (2 - rank) * M.letters.outStaggerMs
 
-          q = 1 - EASE.emphasizedAccelerate(clamp((st.letters - a - d) / (b - a - 90)))
+          q = 1 - EASE.emphasizedAccelerate(clamp((st.letters - a - d) / (b - a - 2 * M.letters.outStaggerMs)))
         } else {
-          q = st.lettersFrom === undefined ? 1 : EASE.emphasized(clamp((st.letters - st.lettersFrom - rank * 30) / 520))
+          q = st.lettersFrom === undefined ? 1 : backOut(clamp((st.letters - st.lettersFrom - rank * M.letters.staggerMs) / M.letters.durationMs), M.overshoot.letters)
         }
 
         const bb = n.getBBox()
         const dir = bb.x + bb.width / 2 < center ? -1 : 1
 
-        set(n, { transform: `translate(${(1 - q) * -dir * 60},0)`, fill: col.logo, 'fill-opacity': clamp(q * 1.4) })
+        set(n, { transform: `translate(${(1 - q) * -dir * M.letters.travelPx},0)`, fill: col.logo, 'fill-opacity': clamp(q * 1.4) })
       })
       // Las letras sólo existen cuando la cámara ya acercó el isotipo a la «o».
       S.logoG.setAttribute('visibility', st.cam > 0.3 ? 'visible' : 'hidden')

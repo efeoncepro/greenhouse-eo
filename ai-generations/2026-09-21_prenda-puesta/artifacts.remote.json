@@ -1,0 +1,35 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:13:41.198Z",
+  "run": "ai-generations/2026-09-21_prenda-puesta",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_prenda-puesta",
+  "totalBytes": 6457326,
+  "fileCount": 4,
+  "files": [
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 175365,
+      "sha256": "1798b65a5756d387a511bd62b0b5d35117f75c6c0c4fe9d7e86a62a58a2a93d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_prenda-puesta/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/polo-uso-julio.png",
+      "sizeBytes": 1629429,
+      "sha256": "f56ea1108cc5d0e286e7c8d081d4a08c88592403ca9bb2215753c111cc1d379d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_prenda-puesta/plates/polo-uso-julio.png"
+    },
+    {
+      "path": "plates/prenda-puesta-julio.png",
+      "sizeBytes": 2357598,
+      "sha256": "b6ff5e6df7ac3290a261da79272817a84cf5f4f170208bf06dcf6d5956773b2b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_prenda-puesta/plates/prenda-puesta-julio.png"
+    },
+    {
+      "path": "plates/prenda-puesta.png",
+      "sizeBytes": 2294934,
+      "sha256": "eb933cc9e594c2dd39f463f51105a3dc8c4c8960d56cb055daab32e2ca78dad6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_prenda-puesta/plates/prenda-puesta.png"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day",
+  "layout": "tools",
+  "voice": {
+    "eyebrow": "Tu día a día con Efeonce",
+    "question": "¿Cómo trabajamos contigo?",
+    "answer": [
+      "Así"
+    ]
+  },
+  "body": "Cada cosa en su herramienta y **todo** a la vista en tu panel, sin esperar el informe.",
+  "tools": [
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+      "name": "Microsoft Teams",
+      "label": "Nos reunimos"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+      "name": "Notion",
+      "label": "Proyectos y tareas"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+      "name": "Frame.io",
+      "label": "Revisas las piezas"
+    }
+  ],
+  "insights": {
+    "name": "Efeonce Insights",
+    "label": "Reportes automáticos"
+  },
+  "panel": {
+    "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/product/greenhouse-seo-dashboard.png",
+    "alt": "Tu panel de Greenhouse, en vivo",
+    "logo": {
+      "path": "public/images/greenhouse/SVG/negative-isotipo-green.svg",
+      "alt": "Greenhouse"
+    },
+    "title": "Tu panel en Greenhouse",
+    "note": "todo en un solo lugar, en vivo"
+  }
+}

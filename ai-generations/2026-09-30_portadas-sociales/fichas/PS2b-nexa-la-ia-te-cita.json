@@ -1,0 +1,26 @@
+{
+  "id": "PS2b-nexa-la-ia-te-cita",
+  "formato": "3:1",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, a vast dark cathedral-like space at night, slight low camera angle): she stands at about 66% of the frame width, clearly in the right half, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings, holding a thin tablet loosely at her side. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. She looks straight into the lens with a quiet, confident half-smile; her head stays almost frontal, both eyes and both eyebrows visible, and stays in the middle band of the frame height, never touching the top edge. Behind her, receding for hundreds of meters into the darkness, floats an immense field of THOUSANDS of identical thin dark glass cards in endless rows and columns, all unlit, anonymous and barely visible, like every brand nobody sees; the field fills only the RIGHT HALF of the frame. High above, at the top right, a colossal glowing AI answer bubble made of pure azure light, with three luminous typing dots. From it a VERY WIDE, dramatic volumetric azure-blue (#0375DB) follow-spot beam, as wide as a theatre spotlight, pours diagonally down through thick haze and lands on ONE single card that floats at shoulder height about 80% of the frame width, close to her, slightly in front of the field: that ONE card is large, about the size of her torso, tilted toward the lens, and it BLAZES — brilliant white face with an intense azure core, a thin teal (#36C8BF) rim, radiating sharp light rays and a cloud of fine glowing particles, clearly the hero object of the frame, the only card anyone notices. The beam and that card are by far the brightest elements of the frame; the card's light floods her face, hair, shoulder and jacket with cool white-blue light and throws long light rays through the haze. Every other card in the endless field stays dark and anonymous, catching only a faint blue reflection of the beam on its edges. Dust and haze sparkle inside the beam. The LEFT HALF of the frame (from 0% to 50% of the width) is calm, deep dark space with only faint haze: no cards, no beam, no bubble, no light, no objects there; nothing crosses the vertical center line. Enormous contrast, punchy, awe-inspiring, no logos of any other brand, no readable text.",
+  "lecho": {
+    "objeto": "the near corner of a dark walnut desk with a slim black stylus lying on it, the lens only a few centimetres behind its near edge, outside every light and outside the beam",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 50% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

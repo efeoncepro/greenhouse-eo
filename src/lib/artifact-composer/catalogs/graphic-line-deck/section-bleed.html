@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · sección con foto a sangre</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `section-bleed` (surface deck, tema oscuro, TASK-1928). La foto manda, a sangre y sin velo (el contraste lo da
+      la reserva del plate); el indicador chico arriba a la izquierda, con el anillo al 40 %. Sin logo ni burbuja.
+      Referencia: DeckSeccionSangre (S-sangre).
+    -->
+    <main class="gl-slide gl-sec" data-gl-root data-slot="frame">
+      <figure class="gl-photo" data-slot="photo">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-layer" data-slot="indicator">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-ring-small" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Sección 2 de 5</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quién decide el corte?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">El dato</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+    </main>
+  </body>
+</html>

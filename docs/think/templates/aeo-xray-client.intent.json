@@ -1,0 +1,568 @@
+{
+  "contract": "efeonce.aeo-xray",
+  "version": "0.1.0",
+  "locale": "{{LOCALE}}",
+  "title": "{{CLIENT}} · Muestra de contenido",
+  "preparedFor": "{{CLIENT}}",
+  "preparedAt": "{{DATE}}",
+  "sources": [],
+  "assets": [],
+  "brand": {
+    "name": "{{CLIENT}}",
+    "accent": "#243746",
+    "ink": "#18242E",
+    "action": "#D6E8EE",
+    "actionText": "#18242E",
+    "fontFamily": "system-sans",
+    "displayFontFamily": "system-serif"
+  },
+  "artifacts": [
+    {
+      "id": "landing",
+      "kind": "landing",
+      "title": "PENDIENTE: propuesta de valor del producto real",
+      "summary": "PENDIENTE: explicar el alcance y la intención de esta pieza.",
+      "blocks": [
+        {
+          "id": "hero",
+          "kind": "hero",
+          "title": "PENDIENTE: propuesta de valor del producto real",
+          "text": "PENDIENTE: explicar el alcance y la intención de esta pieza.",
+          "cta": {
+            "label": "Conocer más",
+            "blockId": "criterios",
+            "artifactId": "landing"
+          }
+        },
+        {
+          "id": "respuesta",
+          "kind": "answer-capsule",
+          "text": "PENDIENTE: respuesta directa respaldada por fuentes."
+        },
+        {
+          "id": "criterios",
+          "kind": "heading",
+          "level": 2,
+          "text": "PENDIENTE: criterios para decidir",
+          "short": "Criterios"
+        },
+        {
+          "id": "detalle",
+          "kind": "paragraph",
+          "text": "PENDIENTE: desarrollar el argumento con ejemplos propios y fuentes del cliente.",
+          "sourceIds": []
+        },
+        {
+          "id": "faq",
+          "kind": "faq",
+          "title": "Preguntas frecuentes",
+          "items": [
+            {
+              "question": "PENDIENTE: pregunta real",
+              "answer": "PENDIENTE: respuesta verificable"
+            }
+          ]
+        },
+        {
+          "id": "relacionado",
+          "kind": "cta",
+          "title": "Sigue explorando",
+          "text": "Conecta esta pieza con su complemento.",
+          "action": {
+            "label": "Ver la otra pieza",
+            "artifactId": "article"
+          }
+        }
+      ],
+      "annotations": [
+        {
+          "id": "respuesta-aeo",
+          "scope": "block",
+          "blockId": "respuesta",
+          "category": "aeo",
+          "title": "Respuesta directa",
+          "explanation": "PENDIENTE: explicar el criterio de esta respuesta.",
+          "status": "proposed",
+          "sourceIds": []
+        }
+      ],
+      "seo": {
+        "title": "PENDIENTE: propuesta de valor del producto real",
+        "description": "PENDIENTE: explicar el alcance y la intención de esta pieza.",
+        "canonical": "https://example.com/landing",
+        "robots": "index,follow",
+        "lang": "{{LOCALE}}"
+      },
+      "experience": {
+        "thesis": "PENDIENTE: conectar la necesidad del cliente con la oportunidad editorial.",
+        "meta": {
+          "instrument": "AEO X-Ray",
+          "sampleFor": "{{CLIENT}}",
+          "sampleTitle": "PENDIENTE: propuesta de valor del producto real",
+          "preparedAt": "{{DATE}}",
+          "preparedBy": "Efeonce"
+        },
+        "gap": {
+          "kicker": "Investigación pendiente",
+          "headline": "PENDIENTE: definir la oportunidad con evidencia",
+          "serpTitle": "Observación de búsqueda pendiente",
+          "serpNote": "No se han consultado resultados para este cliente.",
+          "serp": [],
+          "punch": "PENDIENTE: hipótesis editorial",
+          "punchNote": "No es un resultado medido.",
+          "aside": "Esta plantilla no contiene datos del cliente ni resultados inventados."
+        },
+        "machine": {
+          "seo": [
+            {
+              "id": "meta-title",
+              "label": "Title propuesto",
+              "value": "PENDIENTE: propuesta de valor del producto real",
+              "why": "Resume la promesa editorial.",
+              "tier": 2,
+              "coupleId": "hero",
+              "sourceScope": "block",
+              "sourceStatus": "proposed"
+            },
+            {
+              "id": "meta-description",
+              "label": "Descripción propuesta",
+              "value": "PENDIENTE: explicar el alcance y la intención de esta pieza.",
+              "why": "Anticipa el contenido visible.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            },
+            {
+              "id": "canonical",
+              "label": "Canonical propuesto",
+              "value": "https://example.com/landing",
+              "why": "PENDIENTE: confirmar la URL de destino.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            }
+          ],
+          "og": [],
+          "headings": {
+            "why": "Mismo orden que la pieza.",
+            "tree": [
+              {
+                "level": 1,
+                "text": "PENDIENTE: propuesta de valor del producto real",
+                "coupleId": "hero"
+              },
+              {
+                "level": 2,
+                "text": "PENDIENTE: criterios para decidir",
+                "coupleId": "criterios"
+              },
+              {
+                "level": 2,
+                "text": "Preguntas frecuentes",
+                "coupleId": "faq"
+              }
+            ],
+            "sourceScope": "page",
+            "sourceStatus": "proposed"
+          },
+          "alts": [],
+          "jsonld": [],
+          "craft": [
+            {
+              "label": "Respuesta directa",
+              "detail": "PENDIENTE: explicar la decisión aplicada.",
+              "why": "Ayuda a encontrar la respuesta dentro de la pieza.",
+              "tier": 3,
+              "coupleId": "respuesta",
+              "sourceStatus": "proposed",
+              "sourceScope": "block"
+            }
+          ]
+        },
+        "flow": [
+          {
+            "step": "",
+            "label": "El hueco",
+            "next": "Conoce la pieza."
+          },
+          {
+            "step": "articulo",
+            "label": "La pieza",
+            "next": "Explora su radiografía."
+          },
+          {
+            "step": "radiografia",
+            "label": "La radiografía",
+            "next": "Descubre sus derivados."
+          },
+          {
+            "step": "atomizacion",
+            "label": "Dónde más vive",
+            "next": ""
+          }
+        ],
+        "atomsIntro": "Un mismo contenido puede adaptarse a otros formatos.",
+        "atoms": [
+          {
+            "id": "social",
+            "kind": "Post social",
+            "bornFrom": "La respuesta principal",
+            "coupleId": "respuesta",
+            "sourceScope": "block",
+            "sourceStatus": "proposed",
+            "why": "Adaptar la idea al canal sin inventar una promesa.",
+            "honesty": "Borrador de copy; no publicado.",
+            "deliverable": [
+              {
+                "k": "Idea",
+                "v": "PENDIENTE: ángulo social"
+              },
+              {
+                "k": "Formato",
+                "v": "Post con imagen por producir"
+              }
+            ],
+            "post": {
+              "hook": "PENDIENTE: apertura social",
+              "body": "PENDIENTE: desarrollar la idea desde la pieza",
+              "cta": "PENDIENTE: siguiente paso"
+            }
+          }
+        ],
+        "evidence": {
+          "intro": "Investigación por completar.",
+          "facts": [],
+          "fanOut": {
+            "title": "Preguntas por investigar",
+            "note": "No son evidencia de citas de IA.",
+            "items": []
+          },
+          "honesty": "No se han medido rankings, conversiones ni citas para este cliente."
+        },
+        "ui": {
+          "disclaimerLabel": "Demostración de Efeonce",
+          "disclaimerBody": "Borrador de muestra editorial para {{CLIENT}}.",
+          "paneArticleTitle": "La pieza",
+          "paneArticleSubtitle": "Lo que ve la persona",
+          "paneMachineTab": "Lo que lee una máquina",
+          "paneEvidenceTab": "La evidencia",
+          "hintDesktop": "Pasa el cursor o enfoca un bloque para ver sus datos. Haz clic para fijarlo.",
+          "hintMobile": "Toca un bloque para ver qué información produce.",
+          "whyLabel": "Para qué sirve",
+          "schemaNote": "JSON-LD propuesto mostrado como texto; no acredita publicación del cliente.",
+          "sourceLabel": "Fuente",
+          "thesisLabel": "Por qué existe esta pieza",
+          "licenseTitle": "Fotografía real y licencia",
+          "licenseNote": "PENDIENTE: incorporar imágenes con procedencia, derechos y revisión visual.",
+          "backToArticle": "Volver a la pieza",
+          "bylineBy": "Por",
+          "readTime": "min de lectura",
+          "instrumentTitle": "La radiografía",
+          "specimenChip": "Propuesta editorial",
+          "producesLabel": "datos",
+          "producesLabelOne": "dato",
+          "flowNext": "Siguiente",
+          "flowOf": "de",
+          "srProduces": "Este bloque produce {n} datos en la capa de máquina.",
+          "closing": "Una pieza puede explicar las condiciones, responder una duda y dar origen a otros formatos. La misma fuente sostiene cada versión; su publicación y resultados requieren validación posterior.",
+          "verifyTitle": "Comprueba la propuesta",
+          "verifyNote": "Distinguir observación fechada, propuesta e implementación. No prometer resultados.",
+          "verifySteps": [
+            {
+              "what": "Fuentes",
+              "how": "Contrastar cada afirmación con fuentes fechadas del cliente."
+            },
+            {
+              "what": "Representación",
+              "how": "Comprobar que la capa técnica coincide con el contenido visible."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "article",
+      "kind": "article",
+      "title": "PENDIENTE: pregunta editorial elegida",
+      "summary": "PENDIENTE: explicar el alcance y la intención de esta pieza.",
+      "blocks": [
+        {
+          "id": "hero",
+          "kind": "hero",
+          "title": "PENDIENTE: pregunta editorial elegida",
+          "text": "PENDIENTE: explicar el alcance y la intención de esta pieza.",
+          "cta": {
+            "label": "Conocer más",
+            "blockId": "criterios",
+            "artifactId": "article"
+          }
+        },
+        {
+          "id": "respuesta",
+          "kind": "answer-capsule",
+          "text": "PENDIENTE: respuesta directa respaldada por fuentes."
+        },
+        {
+          "id": "criterios",
+          "kind": "heading",
+          "level": 2,
+          "text": "PENDIENTE: criterios para decidir",
+          "short": "Criterios"
+        },
+        {
+          "id": "detalle",
+          "kind": "paragraph",
+          "text": "PENDIENTE: desarrollar el argumento con ejemplos propios y fuentes del cliente.",
+          "sourceIds": []
+        },
+        {
+          "id": "faq",
+          "kind": "faq",
+          "title": "Preguntas frecuentes",
+          "items": [
+            {
+              "question": "PENDIENTE: pregunta real",
+              "answer": "PENDIENTE: respuesta verificable"
+            }
+          ]
+        },
+        {
+          "id": "relacionado",
+          "kind": "cta",
+          "title": "Sigue explorando",
+          "text": "Conecta esta pieza con su complemento.",
+          "action": {
+            "label": "Ver la otra pieza",
+            "artifactId": "landing"
+          }
+        }
+      ],
+      "annotations": [
+        {
+          "id": "respuesta-aeo",
+          "scope": "block",
+          "blockId": "respuesta",
+          "category": "aeo",
+          "title": "Respuesta directa",
+          "explanation": "PENDIENTE: explicar el criterio de esta respuesta.",
+          "status": "proposed",
+          "sourceIds": []
+        }
+      ],
+      "seo": {
+        "title": "PENDIENTE: pregunta editorial elegida",
+        "description": "PENDIENTE: explicar el alcance y la intención de esta pieza.",
+        "canonical": "https://example.com/article",
+        "robots": "index,follow",
+        "lang": "{{LOCALE}}"
+      },
+      "experience": {
+        "thesis": "PENDIENTE: conectar la necesidad del cliente con la oportunidad editorial.",
+        "meta": {
+          "instrument": "AEO X-Ray",
+          "sampleFor": "{{CLIENT}}",
+          "sampleTitle": "PENDIENTE: pregunta editorial elegida",
+          "preparedAt": "{{DATE}}",
+          "preparedBy": "Efeonce"
+        },
+        "gap": {
+          "kicker": "Investigación pendiente",
+          "headline": "PENDIENTE: definir la oportunidad con evidencia",
+          "serpTitle": "Observación de búsqueda pendiente",
+          "serpNote": "No se han consultado resultados para este cliente.",
+          "serp": [],
+          "punch": "PENDIENTE: hipótesis editorial",
+          "punchNote": "No es un resultado medido.",
+          "aside": "Esta plantilla no contiene datos del cliente ni resultados inventados."
+        },
+        "machine": {
+          "seo": [
+            {
+              "id": "meta-title",
+              "label": "Title propuesto",
+              "value": "PENDIENTE: pregunta editorial elegida",
+              "why": "Resume la promesa editorial.",
+              "tier": 2,
+              "coupleId": "hero",
+              "sourceScope": "block",
+              "sourceStatus": "proposed"
+            },
+            {
+              "id": "meta-description",
+              "label": "Descripción propuesta",
+              "value": "PENDIENTE: explicar el alcance y la intención de esta pieza.",
+              "why": "Anticipa el contenido visible.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            },
+            {
+              "id": "canonical",
+              "label": "Canonical propuesto",
+              "value": "https://example.com/article",
+              "why": "PENDIENTE: confirmar la URL de destino.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            }
+          ],
+          "og": [],
+          "headings": {
+            "why": "Mismo orden que la pieza.",
+            "tree": [
+              {
+                "level": 1,
+                "text": "PENDIENTE: pregunta editorial elegida",
+                "coupleId": "hero"
+              },
+              {
+                "level": 2,
+                "text": "PENDIENTE: criterios para decidir",
+                "coupleId": "criterios"
+              },
+              {
+                "level": 2,
+                "text": "Preguntas frecuentes",
+                "coupleId": "faq"
+              }
+            ],
+            "sourceScope": "page",
+            "sourceStatus": "proposed"
+          },
+          "alts": [],
+          "jsonld": [],
+          "craft": [
+            {
+              "label": "Respuesta directa",
+              "detail": "PENDIENTE: explicar la decisión aplicada.",
+              "why": "Ayuda a encontrar la respuesta dentro de la pieza.",
+              "tier": 3,
+              "coupleId": "respuesta",
+              "sourceStatus": "proposed",
+              "sourceScope": "block"
+            }
+          ]
+        },
+        "flow": [
+          {
+            "step": "",
+            "label": "El hueco",
+            "next": "Conoce la pieza."
+          },
+          {
+            "step": "articulo",
+            "label": "La pieza",
+            "next": "Explora su radiografía."
+          },
+          {
+            "step": "radiografia",
+            "label": "La radiografía",
+            "next": "Descubre sus derivados."
+          },
+          {
+            "step": "atomizacion",
+            "label": "Dónde más vive",
+            "next": ""
+          }
+        ],
+        "atomsIntro": "Un mismo contenido puede adaptarse a otros formatos.",
+        "atoms": [
+          {
+            "id": "social",
+            "kind": "Post social",
+            "bornFrom": "La respuesta principal",
+            "coupleId": "respuesta",
+            "sourceScope": "block",
+            "sourceStatus": "proposed",
+            "why": "Adaptar la idea al canal sin inventar una promesa.",
+            "honesty": "Borrador de copy; no publicado.",
+            "deliverable": [
+              {
+                "k": "Idea",
+                "v": "PENDIENTE: ángulo social"
+              },
+              {
+                "k": "Formato",
+                "v": "Post con imagen por producir"
+              }
+            ],
+            "post": {
+              "hook": "PENDIENTE: apertura social",
+              "body": "PENDIENTE: desarrollar la idea desde la pieza",
+              "cta": "PENDIENTE: siguiente paso"
+            }
+          }
+        ],
+        "evidence": {
+          "intro": "Investigación por completar.",
+          "facts": [],
+          "fanOut": {
+            "title": "Preguntas por investigar",
+            "note": "No son evidencia de citas de IA.",
+            "items": []
+          },
+          "honesty": "No se han medido rankings, conversiones ni citas para este cliente."
+        },
+        "ui": {
+          "disclaimerLabel": "Demostración de Efeonce",
+          "disclaimerBody": "Borrador de muestra editorial para {{CLIENT}}.",
+          "paneArticleTitle": "La pieza",
+          "paneArticleSubtitle": "Lo que ve la persona",
+          "paneMachineTab": "Lo que lee una máquina",
+          "paneEvidenceTab": "La evidencia",
+          "hintDesktop": "Pasa el cursor o enfoca un bloque para ver sus datos. Haz clic para fijarlo.",
+          "hintMobile": "Toca un bloque para ver qué información produce.",
+          "whyLabel": "Para qué sirve",
+          "schemaNote": "JSON-LD propuesto mostrado como texto; no acredita publicación del cliente.",
+          "sourceLabel": "Fuente",
+          "thesisLabel": "Por qué existe esta pieza",
+          "licenseTitle": "Fotografía real y licencia",
+          "licenseNote": "PENDIENTE: incorporar imágenes con procedencia, derechos y revisión visual.",
+          "backToArticle": "Volver a la pieza",
+          "bylineBy": "Por",
+          "readTime": "min de lectura",
+          "instrumentTitle": "La radiografía",
+          "specimenChip": "Propuesta editorial",
+          "producesLabel": "datos",
+          "producesLabelOne": "dato",
+          "flowNext": "Siguiente",
+          "flowOf": "de",
+          "srProduces": "Este bloque produce {n} datos en la capa de máquina.",
+          "closing": "Una pieza puede explicar las condiciones, responder una duda y dar origen a otros formatos. La misma fuente sostiene cada versión; su publicación y resultados requieren validación posterior.",
+          "verifyTitle": "Comprueba la propuesta",
+          "verifyNote": "Distinguir observación fechada, propuesta e implementación. No prometer resultados.",
+          "verifySteps": [
+            {
+              "what": "Fuentes",
+              "how": "Contrastar cada afirmación con fuentes fechadas del cliente."
+            },
+            {
+              "what": "Representación",
+              "how": "Comprobar que la capa técnica coincide con el contenido visible."
+            }
+          ]
+        }
+      },
+      "byline": {
+        "author": "Efeonce · muestra editorial",
+        "publishedAt": "{{DATE}}"
+      }
+    }
+  ],
+  "flow": {
+    "entryArtifactId": "landing",
+    "links": [
+      {
+        "fromArtifactId": "landing",
+        "toArtifactId": "article",
+        "label": "Leer la guía"
+      },
+      {
+        "fromArtifactId": "article",
+        "toArtifactId": "landing",
+        "label": "Conocer la propuesta"
+      }
+    ]
+  }
+}

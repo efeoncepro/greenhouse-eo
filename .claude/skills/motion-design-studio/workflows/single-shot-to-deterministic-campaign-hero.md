@@ -99,4 +99,6 @@ dirección. Cotiza segundos × variantes, aprueba gasto, produce sólo ese shot 
   H.264/AAC. Los 10/6 reutilizaron el shot aprobado y composición determinística; no añadieron inferencia.
 - QA: 16:9 `−16.3 LUFS / −2.0 dBFS`; 9:16 `−16.4 LUFS / −2.2 dBFS`.
 - Script reproducible:
-  `ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/10-compose-hero-15s.mjs`.
+  `ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/10-compose-hero-15s.mjs` (el script está en git; el shot,
+  los stills y el audio que lee pueden estar en archivo: `pnpm ai-gen:pull ai-generations/2026-07-18_high-frequency-campaign-e2e`
+  antes de re-correrlo).

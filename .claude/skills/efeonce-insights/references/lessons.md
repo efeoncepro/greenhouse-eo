@@ -1,5 +1,61 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-29 · correo de entrega · La pieza aprobada no es la plantilla.** Síntoma: al canonizar el correo de entrega
+  aprobado (canvas v21), lo natural era publicarlo entero como «el correo de Efeonce». El operador acotó: se canonizan el
+  pie, los CTA y el bloque de marca; el correo de Insights es **una aplicación**. Regla: la cabecera, «Lo esencial del
+  mes», la órbita de medida y la tarjeta de decisión son de Insights y no se copian a otros correos; los módulos salen de
+  AXIS (`efeonce.email-modules`, `efeonceEmail`, PNG `email-*`), no del HTML de Insights. Diseño aprobado ≠ runtime:
+  `InsightsEditionDeliveryEmail.tsx` sigue sin cambios hasta que una task lo implemente.
+- **2026-09-29 · correo de entrega · Un 62 % con sólo la estela se lee como menos.** El operador lo vio en la órbita de
+  medida del correo; la decisión («aplícalo en todas») cambió La órbita para toda medida: camino recorrido tenue desde
+  las 12 (60 %, 0,75 × la estela; contrato de la órbita 0.5.0). Regla: una medida de Insights en cualquier superficie
+  (correo, PDF, Think) sigue esa regla cuando su consumidor adopte AXIS `0.3.38`; mientras tanto, no la pintes a mano
+  ni la mezcles con la versión sin camino dentro de una misma pieza.
+
+- **2026-09-28 · marca + AXIS · La copia a mano de los roles de color ya divergió.** Síntoma: el dato «anterior» sobre
+  papel era `#1f9e94` (`--axis-deck-teal-650`, `editorial-roles.json`) en los PDF y `#0e8c82` (`orbita.accentLight`,
+  `efeonce-think/src/lib/insights-tokens.ts`) en la web. Era un desvío de Think: se corrigió el mismo día
+  (efeonce-think `b3c5820`, producción) al valor del PDF, `#1f9e94`, y se recapturó el dossier (greenhouse-eo
+  `24571e566`). Es el costo de dos copias sin fuente común. Regla: antes de tocar un color de dato en un consumidor,
+  compara los dos; el valor de referencia es el rol de `editorial-roles.json`; la salida duradera es extraer los roles
+  a AXIS (follow-up en [`ui-and-brand.md`](ui-and-brand.md) §1), no otra copia.
+- **2026-09-28 · marca + AXIS · Publicar la marca en AXIS no la pone en ninguna superficie.** `axis-brand-assets` 0.4.0
+  trae `insights-{logo,isotype,lockup}-*`, pero Greenhouse fija 0.3.5, las portadas A4/deck componen una versión
+  tipográfica («INSIGHTS» en mayúsculas espaciadas junto al logo de Efeonce) en vez del archivo oficial, el correo usa
+  `brand='efeonce'` y sólo Think usa los archivos oficiales, con copias manuales. Regla: antes de afirmar que una
+  superficie «lleva la marca de Insights», revisa el mapa de aplicación de [`ui-and-brand.md`](ui-and-brand.md) §2 y el
+  archivo real; agregarla a una superficie nueva es decisión del operador.
+- **2026-09-28 · TASK-1875 · Pasar a medios de impresión con transiciones activas deja elementos a medio camino.** Las
+  transiciones CSS ganan incluso a `!important` (su origen en la cascada está por encima): al imprimir, los elementos que
+  estaban animando quedaron congelados en `opacity: 0`. Regla: la hoja de impresión fija `transition: none` y
+  `animation: none` en todo lo que pueda estar en movimiento.
+- **2026-09-28 · TASK-1875 · Un elemento sólo-impresión oculto con igual especificidad reaparece por una regla más
+  específica.** El logo del pie quedó duplicado en pantalla porque otra regla, más específica, lo volvía a mostrar.
+  Regla: ocultar lo sólo-impresión con `@media screen { … display: none !important }`, no con una regla de la misma
+  especificidad.
+- **2026-09-28 · TASK-1875 · Salir de pantalla completa mueve el foco después del evento.** Restaurar el foco en el
+  handler de `fullscreenchange` no sirve: el navegador lo mueve después. Regla: restaurarlo dos `requestAnimationFrame`
+  más tarde.
+- **2026-09-28 · TASK-1875 · Una auditoría de contraste que toma el fondo del ancestro miente con etiquetas fuera de su
+  caja.** Los valores sobre las barras están posicionados fuera de su padre, así que el fondo «heredado» no es el que
+  está detrás del texto. Regla: medir contra el ancestro cuya caja contiene el centro del texto.
+- **2026-09-28 · TASK-1875 · Un waffle con total declarado ≠ suma de las partes regalaba celdas.** Greenhouse ya rechaza
+  ese caso (`waffle_parts_sum_total`), pero la web distribuía sobre el total declarado. Regla: la web reparte sobre la
+  suma de las partes, igual que `waffleGeometry`; la geometría de la web nunca diverge de la de los PDF.
+- **2026-09-28 · TASK-1875 · El acento en etiquetas de 12 px viola «La órbita».** El acento nunca va bajo 24 px; en
+  texto chico se usa el color de texto del rol, no el acento.
+- **2026-09-26 · TASK-1889 · El tono de una variación sale de la dirección de la métrica, y las metas ICO se casan por
+  `dimension.metric`.** El triángulo sigue al valor (▲ subió, ▼ bajó) y el tono dice mejor o peor. Para saber qué es
+  «mejor», posición = menor es mejor; si no, la dirección del propio hecho y, si falta, la de su meta. Las metas ICO
+  reales se llaman `target.rpa`/`band.rpa` y nombran su métrica en `dimension.metric`: buscarlas por `metricId` no
+  encuentra nada y deja todo en tono neutro. El test con un fixture que compartía `metricId` pasaba por construcción;
+  lo detectó la revisión del PDF real de Sky. Se testea con la forma real del adapter.
+- **2026-09-26 · TASK-1889 · Los releases son squash: la ancestría no dice qué está desplegado.** Ningún commit de
+  1889 era ancestro de `main` y, aun así, todo el código estaba en producción. Se verifica comparando blobs de los
+  archivos (`git rev-parse origin/main:<path>` vs `origin/develop:<path>`) y el `headSha` del release exitoso.
+- **2026-09-26 · TASK-1889 · Un render real en producción escribe en producción: pedir la autorización al minuto
+  cero.** Crear ediciones por el lane ecosystem es una escritura real; el clasificador de permisos la bloquea sin la
+  autorización explícita del operador en el chat. Pedirla al proponer el paso, no después de intentarlo.
 - **2026-09-25 · A per-figure reading that repeats the page is not a reading.** Real PDFs (Berel p. 5, Sky p. 7)
   printed the same sentence twice, and the targets page was titled with the period comparison because the planner
   emitted no `conclusion`. Also: bounded AI authoring only REWRITES, so interpretation has to be computed by the
@@ -342,3 +398,40 @@
 - **2026-09-26 · Un rewrite de historia cambia todos los SHAs citados.** Tras sacar blobs de `ai-generations/`, los SHAs
   de las tasks dejaron de existir en origin con contenido idéntico. Anotar el vigente con el viejo entre paréntesis y
   verificar despliegues por blobs, nunca por ancestría (el release a main es squash).
+- **2026-09-26 · Ecosystem tiene dos capas de idempotencia.** Repetir con `Idempotency-Key` HTTP reproduce el status/body
+  originales (incluido 202); para comprobar el replay de dominio `200 idempotent:true`, conserva `idempotencyKey` en
+  el body y omite el header de transporte. En la primera canary Production el env Vercel se había guardado como
+  `true` + salto de línea; `isOn` usa igualdad estricta con `true`, así que la generación emitió plan v1. Actualizar
+  el env con `--value true` lo dejó en cuatro caracteres y el nuevo deployment selló v2. La canary SEO+AEO+ICO aún
+  tenía cero facts y nueve rejections (SEO 3, AEO 2, ICO 4), por lo que falló validación; eso es independiente del
+  contrato v2, cuya prueba son las tres `scopeLines` y el cover congelado.
+- **2026-09-26 · Un flag comparado con `=== 'true'` muere con un salto de línea en el valor.** La primera canary de
+  producción selló un plan v1 con la var «en `true»: según Codex el valor tenía `\n` final (una lectura por API no lo
+  mostró). Regla: cargar flags con `printf %s true | vercel env add …` (nunca `echo`) y probar el COMPORTAMIENTO con una
+  canary que selle algo que sólo existe con el flag (aquí `plan.scopeLines`), no el listado de vars.
+- **2026-09-26 · Un script que reescribe docs compartidos debe LEER antes de abrir para escribir.** En Python,
+  `open(p,'w').write(fn(open(p).read()))` trunca el archivo antes de leerlo: vació `docs/tasks/README.md` con WIP ajeno.
+  Se recuperó desde un blob colgante (`git fsck --unreachable` + búsqueda de una línea única del WIP) con hash idéntico.
+- **2026-09-28 · `sendEmail().deliveryId` es el id del BATCH, no la fila de `email_deliveries`, y en el envío
+  secuencial de primer intento `recipientResults[].deliveryId` TAMBIÉN es el batch** (`sendEmail` descarta el id de
+  `createDeliveryRow`). La modalidad `attachment` guardó el batch en `insight_delivery_recipients.email_delivery_id`:
+  referencia a una fila inexistente. Ningún test lo vio porque el estado de transporte se lee por `source_event_id`; lo
+  destapó un JOIN contra datos reales. **El primer fix (`34d763460`, `recipientResults[0]`) no corregía nada y su test
+  pasaba porque el mock inventaba la fila: el mismo modo de falla que ocultó el bug.** Lo refutó un subagente leyendo
+  `src/lib/email/delivery.ts`. Fix real `8882af0e3`: resolver la fila por `source_entity` + `source_event_id`. Reglas:
+  (1) al persistir una referencia a otra tabla, verifícala con un JOIN contra datos reales; (2) un mock de un contrato
+  ajeno se escribe leyendo el código de ese contrato, nunca con el valor que tu fix espera.
+
+### 2026-09-28 — Un enlace sin `downloadOutputs` no descarga nada (TASK-1875)
+
+Síntoma: el canary de Think en staging mostró la edición sin botones de descarga y `?descargar=deck_pdf` devolvió 303,
+con el deck renderizado y la edición emitida. Causa: el grant se creó con `{"ttlDays":1}`; ese campo no existe
+(el correcto es `expiresInDays`) y `downloadOutputs` vacío es el default. Regla: al crear un enlace, pasar
+`downloadOutputs` explícito y verificar el TTL en la respuesta (`expiresAt`), no en lo que se mandó.
+
+### 2026-09-28 — Astro permite un solo `astro dev` por proyecto (TASK-1875)
+
+Síntoma: el servidor de Think contra staging salía con código 1 en 4 s («Another astro dev server is already
+running»). Regla: parar el servidor de fixtures antes de levantar el de staging; en `--mode staging` los tokens
+`fixture-*` siguen resolviendo porque `import.meta.env.DEV` sigue en `true`.
+

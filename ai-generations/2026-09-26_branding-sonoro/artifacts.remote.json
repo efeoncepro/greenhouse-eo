@@ -1,0 +1,3203 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:23:02.727Z",
+  "run": "ai-generations/2026-09-26_branding-sonoro",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-26_branding-sonoro",
+  "totalBytes": 917477991,
+  "fileCount": 532,
+  "files": [
+    {
+      "path": "bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-brand.wav",
+      "sizeBytes": 835302,
+      "sha256": "e123e8f1ef8be93da786244c30999d9ab4b2a2c1579ff4d3f09c00dfb3378548",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-brand.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-engine.wav",
+      "sizeBytes": 835302,
+      "sha256": "a16885b3d421a5b0bd131804b2eb9eedcf75cc98c170f242928cc15be6ac10ba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-engine.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-growth.wav",
+      "sizeBytes": 835302,
+      "sha256": "452579258dfade363eaff1f089f8fce2f9ea8dfec5f687c448904064860411a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-growth.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-revenue.wav",
+      "sizeBytes": 835302,
+      "sha256": "d2ed22ff16ea43a0affd801244cb592362d34b1c9cb95ee45318eafe2e04ee59",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-revenue.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-voice.wav",
+      "sizeBytes": 835302,
+      "sha256": "25ea81ab103e3c817d5955874461984ba833c236b742f0e7a8b7cbc22b0d4781",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-voice.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-brand-brian.wav",
+      "sizeBytes": 915942,
+      "sha256": "00febc7e207346863d79640b5ec8de12e6b204b21c868e2ba5f227fb3fa8b3ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-brand-brian.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-engine-brian.wav",
+      "sizeBytes": 921702,
+      "sha256": "b2bb11ce283f4e125187a1bc89dae8e334ad275a32febc3b74fef5f2350cd46f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-engine-brian.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-growth-brian.wav",
+      "sizeBytes": 904422,
+      "sha256": "70281f8ed8a121a78c990b7ce866a89c41abe3440992806b57d3c56a43f5b8cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-growth-brian.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-revenue-brian.wav",
+      "sizeBytes": 910182,
+      "sha256": "39e47f46aca9a460d2e69b9e2c0983c6d7c2eff8e99d3bb2986106136dff82d0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-revenue-brian.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-voice-brian.wav",
+      "sizeBytes": 927462,
+      "sha256": "e86ff55d3c99049b4751004bd45a70ff24dad1add3b03a268b1d8c15b61f5d99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-voice-brian.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-apertura_16x9.mp4",
+      "sizeBytes": 572473,
+      "sha256": "d344e10a7a12c8cbab1741d8b54262d79d73f6c9bbd261663c2101e8d916a948",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-apertura_16x9.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-apertura_9x16.mp4",
+      "sizeBytes": 597891,
+      "sha256": "633a1822c8713d30358b5fee73ebea2b1f069227c36d61d671ca7247029b77c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-apertura_9x16.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-apertura.wav",
+      "sizeBytes": 979302,
+      "sha256": "6bd3fdae5f351ff509d393d6f47755406abbb83cdaeeb4fc6c9098501656b9dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-apertura.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-reveal_16x9.mp4",
+      "sizeBytes": 598144,
+      "sha256": "54538d9bde673aada7a005827b5c2e483581199aaaf8ae77c36f6d0c114a9a9e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-reveal_16x9.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-reveal_9x16.mp4",
+      "sizeBytes": 651018,
+      "sha256": "2ded7357f5aed345fcd649f8121533734f27adba3f4f4a3b9205853580d182f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-reveal_9x16.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-reveal-brian_16x9.mp4",
+      "sizeBytes": 598544,
+      "sha256": "87f8a7308231d21b47bd4d9a545b8f31ad044dab80186f63e8177b91765aa765",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-reveal-brian_16x9.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-reveal-brian_9x16.mp4",
+      "sizeBytes": 651418,
+      "sha256": "baababb3cd9f848bf29eff084b483f9398524ec7d6f8fadae492678a871db67d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-reveal-brian_9x16.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-reveal-brian.wav",
+      "sizeBytes": 1324902,
+      "sha256": "698bce23091bfbb7a9f7077620fedbf21cda9cbe8189cd4cc7c483f8b45db4c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-reveal-brian.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-reveal.wav",
+      "sizeBytes": 1324902,
+      "sha256": "0b3a0e309e813a3adb22e7573863e13ea18cbc1d3e0d2354287ab1320162558c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-reveal.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-sting_16x9.mp4",
+      "sizeBytes": 406859,
+      "sha256": "92b4af986f2267ba844453b6fb51e82f67e5a1a1b3829ed2166a1e50d9618a44",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-sting_16x9.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-sting_9x16.mp4",
+      "sizeBytes": 430172,
+      "sha256": "ce3cd062beb526b6dff4c2655d75463508c16c4d4f10e53c42fe78038eaa85c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-sting_9x16.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/03-motion/efeonce-sting.wav",
+      "sizeBytes": 633702,
+      "sha256": "826ef87b552ce799731f9c6191c6a353ecee4c146b7130ad7214d63614b259ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/03-motion/efeonce-sting.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-energia-brian.wav",
+      "sizeBytes": 10656102,
+      "sha256": "48c4ad72422e302f860ff760e24c1c477dcd19a5bb8e64bfa120dead20ecdcca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-energia-brian.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-energia.wav",
+      "sizeBytes": 10656102,
+      "sha256": "1b23b0a1801f78290a46ff0243173a8493ad38fd286f13e55ee232cab4a7f4f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-energia.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-fondo-brian.wav",
+      "sizeBytes": 11664102,
+      "sha256": "78e73adbdb4d401c3d2a53389b1a32dead18a4781d76b75e142d634d02c3e9e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-fondo-brian.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-fondo.wav",
+      "sizeBytes": 11664102,
+      "sha256": "a15e07b75a39ebc73cbb7e8f59f24ab956457848da61ca6e0f9bbb7813847717",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-fondo.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/05-cierre-energia/efeonce-cierre-energia-brian.wav",
+      "sizeBytes": 1468902,
+      "sha256": "3ea91c9a5b75d851b0fd553209e3fce7521d163f7c25457e63455974166c636b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/05-cierre-energia/efeonce-cierre-energia-brian.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/05-cierre-energia/efeonce-cierre-energia.wav",
+      "sizeBytes": 1468902,
+      "sha256": "0a64392268471dba6ea3889f0e8c97052f66973117909493831865cb02ceb852",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/05-cierre-energia/efeonce-cierre-energia.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-brand.wav",
+      "sizeBytes": 439980,
+      "sha256": "c8b48ae56608aee3cb3f6c9d0f3bcbbbd61e2aecb26102cdcb1cd61d80d006d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-brand.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-engine.wav",
+      "sizeBytes": 411654,
+      "sha256": "69c2eb36c0329fe0fec34d8c5db385d7efa0c34f4d0e888123c3d911a739be66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-engine.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-growth.wav",
+      "sizeBytes": 406362,
+      "sha256": "c249897ed137f9616ecb182971fd172376c29568de367a88eafea3c744738dd9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-growth.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-revenue.wav",
+      "sizeBytes": 439980,
+      "sha256": "d95d6a24b97c4e6e08797492fec1d9f50ca02a51687f1ee284130712381c1327",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-revenue.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-voice.wav",
+      "sizeBytes": 433752,
+      "sha256": "fef03e6dfca5d286aefcaab5a712c2c65d0ed828c4b784efd7e93e9f63e9b165",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-voice.wav"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-apertura_16x9.mp4",
+      "sizeBytes": 218616,
+      "sha256": "934e249936434769505225a70a6104378d1b95488904916a2bdaf3e5aa266399",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-apertura_16x9.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-apertura_16x9.webp",
+      "sizeBytes": 4122,
+      "sha256": "e5ef0a48140b18bf3e3a2b39e96621a8ed4bb18d30078bd2adff9d69676597b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-apertura_16x9.webp"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-apertura_9x16.mp4",
+      "sizeBytes": 223285,
+      "sha256": "c713a625782660818d9d5ecc3bda53ea52ebb73cf227661c9701d7954a8cb280",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-apertura_9x16.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-apertura_9x16.webp",
+      "sizeBytes": 4436,
+      "sha256": "b82866537247d96864bf25a3e2b272eea97cd22a0c139eac44252c0236c17004",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-apertura_9x16.webp"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-cierre-energia-brian.mp3",
+      "sizeBytes": 144525,
+      "sha256": "00da38de78207c74ef0537f66427488e25043fd4543f87f8f783725415816fc9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-cierre-energia-brian.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-cierre-energia.mp3",
+      "sizeBytes": 144525,
+      "sha256": "0fbc2dbcbec3d4d820d924c9a8cecda58ad4df835e1776efbe3ae9b9d929c9f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-cierre-energia.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-etiqueta-brand-brian.mp3",
+      "sizeBytes": 90765,
+      "sha256": "76d999011ecf9ffaeb76405002134d8d9141fb873c8f5e82fea2119efbf6ef0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-etiqueta-brand-brian.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-etiqueta-engine-brian.mp3",
+      "sizeBytes": 91437,
+      "sha256": "264f9af546d2fa0dbb186817a2fb1e27d9a1f7ccdb3f979d5e7b901c70d77a4e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-etiqueta-engine-brian.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-etiqueta-growth-brian.mp3",
+      "sizeBytes": 89421,
+      "sha256": "0fd700cb9b0f363a1b88f2d7cd1f91d9f67916fb6efe351b72733f1bdc7abd28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-etiqueta-growth-brian.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-etiqueta-revenue-brian.mp3",
+      "sizeBytes": 90093,
+      "sha256": "0df86af2f6e4067be61a12022fe38cf47de0941f3617ce8cdb9ac47f9b290bd6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-etiqueta-revenue-brian.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-etiqueta-voice-brian.mp3",
+      "sizeBytes": 92109,
+      "sha256": "cf8743b7b255734babb19222b301b5d91d18eb0c902bc765b52e75b880fb78c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-etiqueta-voice-brian.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-logo-sonoro-brand.mp3",
+      "sizeBytes": 82701,
+      "sha256": "0a887e4c41fad02216551648b387e5f44987e26a188623bb07f47d5ef00e4ccf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-logo-sonoro-brand.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-logo-sonoro-engine.mp3",
+      "sizeBytes": 82701,
+      "sha256": "7cd6c22bd35444d12d84cb0662c50f44f23e4a0d09bcfa4a8af2bf6343db06b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-logo-sonoro-engine.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-logo-sonoro-growth.mp3",
+      "sizeBytes": 82701,
+      "sha256": "84b5dce3ba39a2498634600b597dc650a4376a9eb97caf516b9e3372e7dcf26b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-logo-sonoro-growth.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-logo-sonoro-revenue.mp3",
+      "sizeBytes": 82701,
+      "sha256": "414ddfab5429da062e8593a28f1f1f86f278f4c0570f5296b6e254cb8d69cb20",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-logo-sonoro-revenue.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-logo-sonoro-voice.mp3",
+      "sizeBytes": 82701,
+      "sha256": "c40b9ce922a2b807eee84209d28706aa8cf13327f193e1d3fb99d38277eaeb72",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-logo-sonoro-voice.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-pieza-larga-energia-brian.mp3",
+      "sizeBytes": 1037613,
+      "sha256": "29c65521a85c2ed29c8b2293dae6e41e8acc583d9fbfb5a8916ac87c7367f129",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-pieza-larga-energia-brian.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-pieza-larga-energia.mp3",
+      "sizeBytes": 1037613,
+      "sha256": "49e31313b85402fdd1e6ea001609bee934d23020f5b94ff2b34901df4835419e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-pieza-larga-energia.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-pieza-larga-fondo-brian.mp3",
+      "sizeBytes": 1135725,
+      "sha256": "1480bebe2110114a3f23ba5ecfa45ae3a1f740540169b283175772568e97ba27",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-pieza-larga-fondo-brian.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-pieza-larga-fondo.mp3",
+      "sizeBytes": 1135725,
+      "sha256": "0751dd81480d94208aad6c61d32affdf4d0f8d4bb71367f7d8cac06acd5eb9c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-pieza-larga-fondo.mp3"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-reveal_16x9.mp4",
+      "sizeBytes": 239050,
+      "sha256": "bce7842fb1a9f4d8820537209cdf3ee9eda1a0ade0c73d0d9c2657fb010c0da0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-reveal_16x9.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-reveal_16x9.webp",
+      "sizeBytes": 5698,
+      "sha256": "0a50af9c8345c58920635244b7df3ba7872456bc4535b266b672aa77aaa8ecd3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-reveal_16x9.webp"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-reveal_9x16.mp4",
+      "sizeBytes": 254655,
+      "sha256": "2212dfbe9f876f02ed9043664ab19aeb42c46385b164b6ebd27947dc3092ba69",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-reveal_9x16.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-reveal_9x16.webp",
+      "sizeBytes": 7328,
+      "sha256": "2d507857b2acc2b9bdc3b5df3cd0968035fbbd3514c0d84b2cfea21a9ff597e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-reveal_9x16.webp"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-reveal-brian_16x9.mp4",
+      "sizeBytes": 239555,
+      "sha256": "1ebc6a95471e4e98b1c8b6bb963c20f190d66d9a6b8447f9f0c2be50f9f5afa0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-reveal-brian_16x9.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-reveal-brian_16x9.webp",
+      "sizeBytes": 5698,
+      "sha256": "0a50af9c8345c58920635244b7df3ba7872456bc4535b266b672aa77aaa8ecd3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-reveal-brian_16x9.webp"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-reveal-brian_9x16.mp4",
+      "sizeBytes": 255160,
+      "sha256": "cef1041585c9095a7c182a7272c76d67035385b367fd64d65c85ff6ee563f684",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-reveal-brian_9x16.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-reveal-brian_9x16.webp",
+      "sizeBytes": 7328,
+      "sha256": "2d507857b2acc2b9bdc3b5df3cd0968035fbbd3514c0d84b2cfea21a9ff597e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-reveal-brian_9x16.webp"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-sting_16x9.mp4",
+      "sizeBytes": 152474,
+      "sha256": "5f4275a7b96161baed8d298faa6ef489ef7af6816660dc06f97b2c60341f8e8f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-sting_16x9.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-sting_16x9.webp",
+      "sizeBytes": 4102,
+      "sha256": "b8eabd26a0048bbe6856d5d1eec10fa04cf8f812f2f71acc82259b829298a973",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-sting_16x9.webp"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-sting_9x16.mp4",
+      "sizeBytes": 158505,
+      "sha256": "8a80404156a9eebd953b6432fb2d308a561261b7843090359f533da48bf27e5b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-sting_9x16.mp4"
+    },
+    {
+      "path": "bucket/sonic/v1/web/efeonce-sting_9x16.webp",
+      "sizeBytes": 5214,
+      "sha256": "31bfe77e4ef38838a7aac5c03c3e29ef17ae28c0ec8ddd55466c2440248d5231",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/bucket/sonic/v1/web/efeonce-sting_9x16.webp"
+    },
+    {
+      "path": "candidatos/orbita-logo.wav",
+      "sizeBytes": 835244,
+      "sha256": "41ed9dccbe831ee21e3a414b006f0488d85d9b94aa636d48a93a62c3b8be6dd4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/candidatos/orbita-logo.wav"
+    },
+    {
+      "path": "candidatos/pregunta-logo.wav",
+      "sizeBytes": 835244,
+      "sha256": "8e21dfcfa0df451fa0e5c758eba385034c418b7f69de78fd3d9814420bd5bd18",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/candidatos/pregunta-logo.wav"
+    },
+    {
+      "path": "candidatos/puntos-logo.wav",
+      "sizeBytes": 835244,
+      "sha256": "9d8b961421ad9258b5968deae9df389161274ab0877dcb48dc7de0db522e196b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/candidatos/puntos-logo.wav"
+    },
+    {
+      "path": "cierre-lineas/bed-brand.wav",
+      "sizeBytes": 835244,
+      "sha256": "df82bec97f39a6d2f238c622d7826eb6efc11d05a788009633670e5b8d8531ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/bed-brand.wav"
+    },
+    {
+      "path": "cierre-lineas/bed-engine.wav",
+      "sizeBytes": 835244,
+      "sha256": "81300b93c20e075b20389a7c4cd461d4e4e505f740824e5cbc6560cd98c88e4f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/bed-engine.wav"
+    },
+    {
+      "path": "cierre-lineas/bed-growth.wav",
+      "sizeBytes": 835244,
+      "sha256": "9d8b961421ad9258b5968deae9df389161274ab0877dcb48dc7de0db522e196b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/bed-growth.wav"
+    },
+    {
+      "path": "cierre-lineas/bed-revenue.wav",
+      "sizeBytes": 835244,
+      "sha256": "1d8fbe0a55e870a61b4c165ea8dadb4ea53409f2d7c0404a63566befd1806b17",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/bed-revenue.wav"
+    },
+    {
+      "path": "cierre-lineas/bed-voice.wav",
+      "sizeBytes": 835244,
+      "sha256": "0b2a1edeea7e81e8af5492229413ebe85e43d6fd7344eba97c1fba70525b2f64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/bed-voice.wav"
+    },
+    {
+      "path": "cierre-lineas/cierre-brand.wav",
+      "sizeBytes": 915942,
+      "sha256": "52fe5fb424d886986cd165f5b43a735a64020b95a10b219e5e8846da1af80bd4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/cierre-brand.wav"
+    },
+    {
+      "path": "cierre-lineas/cierre-engine.wav",
+      "sizeBytes": 921702,
+      "sha256": "334bb4ce8eb83844628e6f189178c244e62a56e83bf0375dba71d7b301652b79",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/cierre-engine.wav"
+    },
+    {
+      "path": "cierre-lineas/cierre-growth.wav",
+      "sizeBytes": 904422,
+      "sha256": "869b8c2293d95539e06ac35b8d6b7480e5d0cbae9f588f50b82835db66afe4e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/cierre-growth.wav"
+    },
+    {
+      "path": "cierre-lineas/cierre-revenue.wav",
+      "sizeBytes": 910182,
+      "sha256": "252588ed6c18947699284708d7b7a37ea150d3555e4b9eec0289d9e7dcad664e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/cierre-revenue.wav"
+    },
+    {
+      "path": "cierre-lineas/cierre-voice.wav",
+      "sizeBytes": 927462,
+      "sha256": "bb3472d8eedd570f39051ab6e63eced0566c1d34d4af7b1e9ca1a3252012a065",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre-lineas/cierre-voice.wav"
+    },
+    {
+      "path": "cierre/cierre-puntos-alice.wav",
+      "sizeBytes": 938982,
+      "sha256": "c974ac712e3678ad0762a31d2cd65af74efb58b48cff0fc7fc85c4d50b45bda5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre/cierre-puntos-alice.wav"
+    },
+    {
+      "path": "cierre/cierre-puntos-brian.wav",
+      "sizeBytes": 904422,
+      "sha256": "4a114802e0222b0f0e84a166e5c780c9d57c0223d637c2481f76ee14e65697e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre/cierre-puntos-brian.wav"
+    },
+    {
+      "path": "cierre/cierre-puntos-george.wav",
+      "sizeBytes": 892902,
+      "sha256": "e3c085785996e67f55865f9e3406e843522b61b17e42822bc73966d0254402d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre/cierre-puntos-george.wav"
+    },
+    {
+      "path": "cierre/cierre-puntos-sarah.wav",
+      "sizeBytes": 904422,
+      "sha256": "ec508d1b9e60d3f580111e453da2f2fa0e29d8bd9fcc011f61ed63f5e1b080b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/cierre/cierre-puntos-sarah.wav"
+    },
+    {
+      "path": "entrega/01-logo-sonoro/efeonce-logo-sonoro-brand.wav",
+      "sizeBytes": 835302,
+      "sha256": "e123e8f1ef8be93da786244c30999d9ab4b2a2c1579ff4d3f09c00dfb3378548",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/01-logo-sonoro/efeonce-logo-sonoro-brand.wav"
+    },
+    {
+      "path": "entrega/01-logo-sonoro/efeonce-logo-sonoro-engine.wav",
+      "sizeBytes": 835302,
+      "sha256": "a16885b3d421a5b0bd131804b2eb9eedcf75cc98c170f242928cc15be6ac10ba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/01-logo-sonoro/efeonce-logo-sonoro-engine.wav"
+    },
+    {
+      "path": "entrega/01-logo-sonoro/efeonce-logo-sonoro-growth.wav",
+      "sizeBytes": 835302,
+      "sha256": "452579258dfade363eaff1f089f8fce2f9ea8dfec5f687c448904064860411a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/01-logo-sonoro/efeonce-logo-sonoro-growth.wav"
+    },
+    {
+      "path": "entrega/01-logo-sonoro/efeonce-logo-sonoro-revenue.wav",
+      "sizeBytes": 835302,
+      "sha256": "d2ed22ff16ea43a0affd801244cb592362d34b1c9cb95ee45318eafe2e04ee59",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/01-logo-sonoro/efeonce-logo-sonoro-revenue.wav"
+    },
+    {
+      "path": "entrega/01-logo-sonoro/efeonce-logo-sonoro-voice.wav",
+      "sizeBytes": 835302,
+      "sha256": "25ea81ab103e3c817d5955874461984ba833c236b742f0e7a8b7cbc22b0d4781",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/01-logo-sonoro/efeonce-logo-sonoro-voice.wav"
+    },
+    {
+      "path": "entrega/02-etiqueta-voz/efeonce-etiqueta-brand-brian.wav",
+      "sizeBytes": 915942,
+      "sha256": "00febc7e207346863d79640b5ec8de12e6b204b21c868e2ba5f227fb3fa8b3ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/02-etiqueta-voz/efeonce-etiqueta-brand-brian.wav"
+    },
+    {
+      "path": "entrega/02-etiqueta-voz/efeonce-etiqueta-engine-brian.wav",
+      "sizeBytes": 921702,
+      "sha256": "b2bb11ce283f4e125187a1bc89dae8e334ad275a32febc3b74fef5f2350cd46f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/02-etiqueta-voz/efeonce-etiqueta-engine-brian.wav"
+    },
+    {
+      "path": "entrega/02-etiqueta-voz/efeonce-etiqueta-growth-brian.wav",
+      "sizeBytes": 904422,
+      "sha256": "70281f8ed8a121a78c990b7ce866a89c41abe3440992806b57d3c56a43f5b8cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/02-etiqueta-voz/efeonce-etiqueta-growth-brian.wav"
+    },
+    {
+      "path": "entrega/02-etiqueta-voz/efeonce-etiqueta-revenue-brian.wav",
+      "sizeBytes": 910182,
+      "sha256": "39e47f46aca9a460d2e69b9e2c0983c6d7c2eff8e99d3bb2986106136dff82d0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/02-etiqueta-voz/efeonce-etiqueta-revenue-brian.wav"
+    },
+    {
+      "path": "entrega/02-etiqueta-voz/efeonce-etiqueta-voice-brian.wav",
+      "sizeBytes": 927462,
+      "sha256": "e86ff55d3c99049b4751004bd45a70ff24dad1add3b03a268b1d8c15b61f5d99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/02-etiqueta-voz/efeonce-etiqueta-voice-brian.wav"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-apertura_16x9.mp4",
+      "sizeBytes": 572473,
+      "sha256": "d344e10a7a12c8cbab1741d8b54262d79d73f6c9bbd261663c2101e8d916a948",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-apertura_16x9.mp4"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-apertura_9x16.mp4",
+      "sizeBytes": 597891,
+      "sha256": "633a1822c8713d30358b5fee73ebea2b1f069227c36d61d671ca7247029b77c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-apertura_9x16.mp4"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-apertura.wav",
+      "sizeBytes": 979302,
+      "sha256": "6bd3fdae5f351ff509d393d6f47755406abbb83cdaeeb4fc6c9098501656b9dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-apertura.wav"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-reveal_16x9.mp4",
+      "sizeBytes": 598144,
+      "sha256": "54538d9bde673aada7a005827b5c2e483581199aaaf8ae77c36f6d0c114a9a9e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-reveal_16x9.mp4"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-reveal_9x16.mp4",
+      "sizeBytes": 651018,
+      "sha256": "2ded7357f5aed345fcd649f8121533734f27adba3f4f4a3b9205853580d182f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-reveal_9x16.mp4"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-reveal-brian_16x9.mp4",
+      "sizeBytes": 598544,
+      "sha256": "87f8a7308231d21b47bd4d9a545b8f31ad044dab80186f63e8177b91765aa765",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-reveal-brian_16x9.mp4"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-reveal-brian_9x16.mp4",
+      "sizeBytes": 651418,
+      "sha256": "baababb3cd9f848bf29eff084b483f9398524ec7d6f8fadae492678a871db67d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-reveal-brian_9x16.mp4"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-reveal-brian.wav",
+      "sizeBytes": 1324902,
+      "sha256": "698bce23091bfbb7a9f7077620fedbf21cda9cbe8189cd4cc7c483f8b45db4c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-reveal-brian.wav"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-reveal.wav",
+      "sizeBytes": 1324902,
+      "sha256": "0b3a0e309e813a3adb22e7573863e13ea18cbc1d3e0d2354287ab1320162558c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-reveal.wav"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-sting_16x9.mp4",
+      "sizeBytes": 406859,
+      "sha256": "92b4af986f2267ba844453b6fb51e82f67e5a1a1b3829ed2166a1e50d9618a44",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-sting_16x9.mp4"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-sting_9x16.mp4",
+      "sizeBytes": 430172,
+      "sha256": "ce3cd062beb526b6dff4c2655d75463508c16c4d4f10e53c42fe78038eaa85c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-sting_9x16.mp4"
+    },
+    {
+      "path": "entrega/03-motion/efeonce-sting.wav",
+      "sizeBytes": 633702,
+      "sha256": "826ef87b552ce799731f9c6191c6a353ecee4c146b7130ad7214d63614b259ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/03-motion/efeonce-sting.wav"
+    },
+    {
+      "path": "entrega/04-piezas-largas/efeonce-pieza-larga-energia-brian.wav",
+      "sizeBytes": 10656102,
+      "sha256": "48c4ad72422e302f860ff760e24c1c477dcd19a5bb8e64bfa120dead20ecdcca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/04-piezas-largas/efeonce-pieza-larga-energia-brian.wav"
+    },
+    {
+      "path": "entrega/04-piezas-largas/efeonce-pieza-larga-energia.wav",
+      "sizeBytes": 10656102,
+      "sha256": "1b23b0a1801f78290a46ff0243173a8493ad38fd286f13e55ee232cab4a7f4f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/04-piezas-largas/efeonce-pieza-larga-energia.wav"
+    },
+    {
+      "path": "entrega/04-piezas-largas/efeonce-pieza-larga-fondo-brian.wav",
+      "sizeBytes": 11664102,
+      "sha256": "78e73adbdb4d401c3d2a53389b1a32dead18a4781d76b75e142d634d02c3e9e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/04-piezas-largas/efeonce-pieza-larga-fondo-brian.wav"
+    },
+    {
+      "path": "entrega/04-piezas-largas/efeonce-pieza-larga-fondo.wav",
+      "sizeBytes": 11664102,
+      "sha256": "a15e07b75a39ebc73cbb7e8f59f24ab956457848da61ca6e0f9bbb7813847717",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/04-piezas-largas/efeonce-pieza-larga-fondo.wav"
+    },
+    {
+      "path": "entrega/05-cierre-energia/efeonce-cierre-energia-brian.wav",
+      "sizeBytes": 1468902,
+      "sha256": "3ea91c9a5b75d851b0fd553209e3fce7521d163f7c25457e63455974166c636b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/05-cierre-energia/efeonce-cierre-energia-brian.wav"
+    },
+    {
+      "path": "entrega/05-cierre-energia/efeonce-cierre-energia.wav",
+      "sizeBytes": 1468902,
+      "sha256": "0a64392268471dba6ea3889f0e8c97052f66973117909493831865cb02ceb852",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/05-cierre-energia/efeonce-cierre-energia.wav"
+    },
+    {
+      "path": "entrega/06-voz-sola/efeonce-voz-brian-empower-your-brand.wav",
+      "sizeBytes": 439980,
+      "sha256": "c8b48ae56608aee3cb3f6c9d0f3bcbbbd61e2aecb26102cdcb1cd61d80d006d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/06-voz-sola/efeonce-voz-brian-empower-your-brand.wav"
+    },
+    {
+      "path": "entrega/06-voz-sola/efeonce-voz-brian-empower-your-engine.wav",
+      "sizeBytes": 411654,
+      "sha256": "69c2eb36c0329fe0fec34d8c5db385d7efa0c34f4d0e888123c3d911a739be66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/06-voz-sola/efeonce-voz-brian-empower-your-engine.wav"
+    },
+    {
+      "path": "entrega/06-voz-sola/efeonce-voz-brian-empower-your-growth.wav",
+      "sizeBytes": 406362,
+      "sha256": "c249897ed137f9616ecb182971fd172376c29568de367a88eafea3c744738dd9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/06-voz-sola/efeonce-voz-brian-empower-your-growth.wav"
+    },
+    {
+      "path": "entrega/06-voz-sola/efeonce-voz-brian-empower-your-revenue.wav",
+      "sizeBytes": 439980,
+      "sha256": "d95d6a24b97c4e6e08797492fec1d9f50ca02a51687f1ee284130712381c1327",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/06-voz-sola/efeonce-voz-brian-empower-your-revenue.wav"
+    },
+    {
+      "path": "entrega/06-voz-sola/efeonce-voz-brian-empower-your-voice.wav",
+      "sizeBytes": 433752,
+      "sha256": "fef03e6dfca5d286aefcaab5a712c2c65d0ed828c4b784efd7e93e9f63e9b165",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/entrega/06-voz-sola/efeonce-voz-brian-empower-your-voice.wav"
+    },
+    {
+      "path": "glitch-musica/ai/club-cortina-mezcla.wav",
+      "sizeBytes": 864102,
+      "sha256": "9505e6a8e93b1e643897c17e83a306cae94eefeb79c4c971bf1bf490e9f92624",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/club-cortina-mezcla.wav"
+    },
+    {
+      "path": "glitch-musica/ai/club-cortina-sa60.wav",
+      "sizeBytes": 542302,
+      "sha256": "fffa8bf08eb501c7817943677d5473bfaf36ad2bb9b9741ebdbcb9b9ca218369",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/club-cortina-sa60.wav"
+    },
+    {
+      "path": "glitch-musica/ai/club-cortina-sello.wav",
+      "sizeBytes": 864044,
+      "sha256": "29c180d2a7c67e64cf000e8012fa907a676531b9eccb860a22979a9bcc496188",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/club-cortina-sello.wav"
+    },
+    {
+      "path": "glitch-musica/ai/club-intro-mezcla.wav",
+      "sizeBytes": 5760102,
+      "sha256": "8e4f07a9a83bb8b9b5ce619b048cf0650c0b5205853afe45ddcd666020745e38",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/club-intro-mezcla.wav"
+    },
+    {
+      "path": "glitch-musica/ai/club-intro-sa60.wav",
+      "sizeBytes": 3541102,
+      "sha256": "dd1e791f5fc840da3f58809a9ee0458ecb9ef5496437db27871346a2940545f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/club-intro-sa60.wav"
+    },
+    {
+      "path": "glitch-musica/ai/club-intro-sello.wav",
+      "sizeBytes": 5760044,
+      "sha256": "fc26c398a6c76b9f715639932608476b0b882df63af4ae12e75f586a35540131",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/club-intro-sello.wav"
+    },
+    {
+      "path": "glitch-musica/ai/pulso-cortina-mezcla.wav",
+      "sizeBytes": 864102,
+      "sha256": "f7a466cc42b72978d73f9cee95b7e6797095023c2bce834bcc6782edbd55b41b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/pulso-cortina-mezcla.wav"
+    },
+    {
+      "path": "glitch-musica/ai/pulso-cortina-sa60.wav",
+      "sizeBytes": 542302,
+      "sha256": "a05290c4df255d132d7cd5bf083af279ddf6bef3834af4922d9f7dcb7e23cd42",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/pulso-cortina-sa60.wav"
+    },
+    {
+      "path": "glitch-musica/ai/pulso-cortina-sello.wav",
+      "sizeBytes": 864044,
+      "sha256": "560d61b2c3568e78050df2841ad00451f464dd260ec8d6bc9aa594d59d230f80",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/pulso-cortina-sello.wav"
+    },
+    {
+      "path": "glitch-musica/ai/pulso-intro-mezcla.wav",
+      "sizeBytes": 5760102,
+      "sha256": "0ff5689d0487c59ded5f28ed583a313b1f4be43e28bb3381f47a5efdf9b12e5c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/pulso-intro-mezcla.wav"
+    },
+    {
+      "path": "glitch-musica/ai/pulso-intro-sa60.wav",
+      "sizeBytes": 3541102,
+      "sha256": "33c156ca81f6fdeadb07d41867e82975c9692de03cc71cc0bb1dbfaa46f863f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/pulso-intro-sa60.wav"
+    },
+    {
+      "path": "glitch-musica/ai/pulso-intro-sello.wav",
+      "sizeBytes": 5760044,
+      "sha256": "ed57c039ea81ac4498554f240100c92e0fa41274a06017e260f5a73883cab08d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/ai/pulso-intro-sello.wav"
+    },
+    {
+      "path": "glitch-musica/final/glitch-club-cortina-maqueta.wav",
+      "sizeBytes": 864102,
+      "sha256": "eb955b7147c649c91b94ed41a56a50c096244763a761b10f0d3dce22293b9be9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/final/glitch-club-cortina-maqueta.wav"
+    },
+    {
+      "path": "glitch-musica/final/glitch-club-cortina.wav",
+      "sizeBytes": 864102,
+      "sha256": "2b055d773058bacc6a1471c0130e0cadbb01f8878190997f23968b10f39b34b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/final/glitch-club-cortina.wav"
+    },
+    {
+      "path": "glitch-musica/final/glitch-club-intro-maqueta.wav",
+      "sizeBytes": 5760102,
+      "sha256": "7c9415f5d8b3558f381e0305bc3037de52742daf8e4fcd57f20a65ac325e1618",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/final/glitch-club-intro-maqueta.wav"
+    },
+    {
+      "path": "glitch-musica/final/glitch-club-intro.wav",
+      "sizeBytes": 5760102,
+      "sha256": "115f1267b5696179b4a713a613819ad372c0ea31cfd7f272553fb20b763cc993",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/final/glitch-club-intro.wav"
+    },
+    {
+      "path": "glitch-musica/final/glitch-pulso-cortina-maqueta.wav",
+      "sizeBytes": 864102,
+      "sha256": "85b6deccdb3b2ecd132da4e2cec034e2480481f84a1746c73f08c349b015338a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/final/glitch-pulso-cortina-maqueta.wav"
+    },
+    {
+      "path": "glitch-musica/final/glitch-pulso-cortina.wav",
+      "sizeBytes": 864102,
+      "sha256": "70f69c7996f37b1920c5dd35dad2f3c7aa0b8370db76d9f37e9318ee19201827",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/final/glitch-pulso-cortina.wav"
+    },
+    {
+      "path": "glitch-musica/final/glitch-pulso-intro-maqueta.wav",
+      "sizeBytes": 5760102,
+      "sha256": "1b9b3b79cf25cdd54b77b232ee9733cf126373969a070d6fc8960462ad87dd9c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/final/glitch-pulso-intro-maqueta.wav"
+    },
+    {
+      "path": "glitch-musica/final/glitch-pulso-intro.wav",
+      "sizeBytes": 5760102,
+      "sha256": "e3f6eefb387a164cd0bf1ea9a41ed169def5e6438c65af5dfa876e20d5a8abab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/final/glitch-pulso-intro.wav"
+    },
+    {
+      "path": "glitch-musica/maqueta/club-cortina-sin-manzana.wav",
+      "sizeBytes": 864044,
+      "sha256": "b6dd6a861510cc9ad590b8bcf2b4e47f0e3f33c90873087469ee9a77ebab1fb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/maqueta/club-cortina-sin-manzana.wav"
+    },
+    {
+      "path": "glitch-musica/maqueta/club-cortina.wav",
+      "sizeBytes": 864044,
+      "sha256": "79935f5c8163e518d5abc83ffb95945905048824c65dbcfbbfbc355f5ec04638",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/maqueta/club-cortina.wav"
+    },
+    {
+      "path": "glitch-musica/maqueta/club-intro-sin-manzana.wav",
+      "sizeBytes": 5760044,
+      "sha256": "2835881b3477839737ddad0868b14704f1825fb1d23c9abc9e0626a516a8123b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/maqueta/club-intro-sin-manzana.wav"
+    },
+    {
+      "path": "glitch-musica/maqueta/club-intro.wav",
+      "sizeBytes": 5760044,
+      "sha256": "c99c737b6fec921a290e41c709a9c464a5f3b101cc0a00bd6ea1d173b86a3bb6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/maqueta/club-intro.wav"
+    },
+    {
+      "path": "glitch-musica/maqueta/pulso-cortina-sin-manzana.wav",
+      "sizeBytes": 864044,
+      "sha256": "12d2aeffd04f6da03203732b55d50fece2fab9c8895773f253eb6c273c41aa95",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/maqueta/pulso-cortina-sin-manzana.wav"
+    },
+    {
+      "path": "glitch-musica/maqueta/pulso-cortina.wav",
+      "sizeBytes": 864044,
+      "sha256": "292e725983f2e83c88b2235c73c189d4f7780a611496649a94ec9bbe5f2f83cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/maqueta/pulso-cortina.wav"
+    },
+    {
+      "path": "glitch-musica/maqueta/pulso-intro-sin-manzana.wav",
+      "sizeBytes": 5760044,
+      "sha256": "3d39d987819c62f3b9e670d4111626f8c2bd96118162d049c4efbf69073566f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/maqueta/pulso-intro-sin-manzana.wav"
+    },
+    {
+      "path": "glitch-musica/maqueta/pulso-intro.wav",
+      "sizeBytes": 5760044,
+      "sha256": "b572af5ecc8fcdf742dfce1df234fcb5fd00c39603e2096483e3c5530b43beb9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/maqueta/pulso-intro.wav"
+    },
+    {
+      "path": "glitch-musica/web/glitch-club-cortina-maqueta.mp3",
+      "sizeBytes": 85389,
+      "sha256": "d8ef05af599aeb08b9a5bbe1c8cf1bdd850e224a76469a4a581128677732ebdb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/web/glitch-club-cortina-maqueta.mp3"
+    },
+    {
+      "path": "glitch-musica/web/glitch-club-cortina.mp3",
+      "sizeBytes": 85389,
+      "sha256": "c13d4c6a03c0d04be008e785c2e5825fd91c54fcc6f5cf348b96eea98d269031",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/web/glitch-club-cortina.mp3"
+    },
+    {
+      "path": "glitch-musica/web/glitch-club-intro-maqueta.mp3",
+      "sizeBytes": 561837,
+      "sha256": "145c5aa58322827393df0e6b0031d1db854e3df30fbedf80be8540f2255e350b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/web/glitch-club-intro-maqueta.mp3"
+    },
+    {
+      "path": "glitch-musica/web/glitch-club-intro.mp3",
+      "sizeBytes": 561837,
+      "sha256": "809be3bf28bb2b7738fa3ec6ca44db63bc29e464a9808c06f581346833d90b04",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/web/glitch-club-intro.mp3"
+    },
+    {
+      "path": "glitch-musica/web/glitch-pulso-cortina-maqueta.mp3",
+      "sizeBytes": 85389,
+      "sha256": "f176fb3c23cd4feaddb2992bfc98dff1463c0a75f764876fd1358010a7910ccb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/web/glitch-pulso-cortina-maqueta.mp3"
+    },
+    {
+      "path": "glitch-musica/web/glitch-pulso-cortina.mp3",
+      "sizeBytes": 85389,
+      "sha256": "da0648a80e909241e8bda3490e1a0d777589358518a6165d7ffd6dff7f81e505",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/web/glitch-pulso-cortina.mp3"
+    },
+    {
+      "path": "glitch-musica/web/glitch-pulso-intro-maqueta.mp3",
+      "sizeBytes": 561837,
+      "sha256": "f5be31b7a13fc76d26c0d1298dcd0d7b409a1231d196cd9ef0803bb2d2ceeb22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/web/glitch-pulso-intro-maqueta.mp3"
+    },
+    {
+      "path": "glitch-musica/web/glitch-pulso-intro.mp3",
+      "sizeBytes": 561837,
+      "sha256": "b4871a923a2aaac77dbe01414b9dbf5e6d19abaa310761ab0a8ba96dd034d310",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-musica/web/glitch-pulso-intro.mp3"
+    },
+    {
+      "path": "glitch-sfx/a/animatic.wav",
+      "sizeBytes": 13017702,
+      "sha256": "2ab9af52935f495831e7b44fda332a234dc7275063113cb758ef312bfd14c134",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/animatic.wav"
+    },
+    {
+      "path": "glitch-sfx/a/apertura.wav",
+      "sizeBytes": 1152102,
+      "sha256": "706a3919a74ea7845deabb87e36c1bdfa6c8d702290502a9123c62077da0b936",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/apertura.wav"
+    },
+    {
+      "path": "glitch-sfx/a/bucle.wav",
+      "sizeBytes": 2016102,
+      "sha256": "8a8a77f1067ad67251f35f8dd094ce9ca535d385f09a3459d07b359ff0a4875f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/bucle.wav"
+    },
+    {
+      "path": "glitch-sfx/a/cierre.wav",
+      "sizeBytes": 864102,
+      "sha256": "bbe1a557ea423c4fdb8840ab84639a4c48c9c703bb3372f3ea7cc2049dfbfb23",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/cierre.wav"
+    },
+    {
+      "path": "glitch-sfx/a/demos/demo_vlog_centro.wav",
+      "sizeBytes": 1094444,
+      "sha256": "8cfa3c1c6c16ece22d2b1c7fc5df9eaf59b7e2ce1049340e0b48fa8c161f92e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/demos/demo_vlog_centro.wav"
+    },
+    {
+      "path": "glitch-sfx/a/demos/demo_vlog_izquierda.wav",
+      "sizeBytes": 1094444,
+      "sha256": "c0e4f2902145ced8d5ff33bbbb0da6560a9016a8ae5e6092f019e4cc74f7ba30",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/demos/demo_vlog_izquierda.wav"
+    },
+    {
+      "path": "glitch-sfx/a/demos/demo_vlog_marca.wav",
+      "sizeBytes": 1094444,
+      "sha256": "117da3f7a6f958fb1fa909bf48d095a659cc6da8120b8ce7c0ca1437774d43b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/demos/demo_vlog_marca.wav"
+    },
+    {
+      "path": "glitch-sfx/a/demos/demo-heroe_vlog.wav",
+      "sizeBytes": 1209644,
+      "sha256": "63ad8c2ee1d959a5dd3eee2af010b5dd0952e3b4575ebd108610d19b84c6536a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/demos/demo-heroe_vlog.wav"
+    },
+    {
+      "path": "glitch-sfx/a/demos/recorrido-bytes.wav",
+      "sizeBytes": 4752044,
+      "sha256": "df3ea24229683be639b10d6b450247171f353ed46a284924ef3f10384bf1831f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/demos/recorrido-bytes.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/cabecera-1.wav",
+      "sizeBytes": 576044,
+      "sha256": "ff089ea862ea8fb39b2e324be14b261684ed8588b46cd7e181edb52379eb8b73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/cabecera-1.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/cabecera-2.wav",
+      "sizeBytes": 345644,
+      "sha256": "4c7e139d60c0280e037345d67d906a06aca0570a2b17c68b819c95c392bb5023",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/cabecera-2.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/cabecera-3.wav",
+      "sizeBytes": 345644,
+      "sha256": "dd3b6fc6f945f3a6dfe52b439b09f6915af6493fa2e3c240b4c589f525f5c392",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/cabecera-3.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/cabecera-salida.wav",
+      "sizeBytes": 115244,
+      "sha256": "b8611b7dc7fa4e4561425f2468b01f725789007abb120e88bc8ecaaec008b449",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/cabecera-salida.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/cta.wav",
+      "sizeBytes": 1152044,
+      "sha256": "3433c1fa6a514524c2ac67900e691c0dd609d76ba3c6b788a1a634fca369edb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/cta.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/drop-bytes.wav",
+      "sizeBytes": 1296044,
+      "sha256": "b05e634369d4efac0231d098cdd30cb7ddcc0b39437363b0e724e6e278a2aa87",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/drop-bytes.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/drop.wav",
+      "sizeBytes": 1152044,
+      "sha256": "0fdeeaed674cd1c2b9a9bbc92837e40a4415b2bdca97de1d6b54583cf4a6bf62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/drop.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/fuente.wav",
+      "sizeBytes": 1440044,
+      "sha256": "cfc6cb83569d57714e76403aa5805d77cd1172effdcfa9e962cdf630440284a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/fuente.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/lower-third-host.wav",
+      "sizeBytes": 1440044,
+      "sha256": "eb73a81d08b406d8c58ff60df0f16de61a8ed74e828d51393a78c137b45a142b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/lower-third-host.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/lower-third-invitado.wav",
+      "sizeBytes": 1440044,
+      "sha256": "416452226c5b27a0bbf4d429b225062318720d40e5cea74d2165f1d74e9cde6c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/lower-third-invitado.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/noticia-bytes.wav",
+      "sizeBytes": 1440044,
+      "sha256": "c3c25855fa4a1a9373c7328c1fcafd05ed292d911211c3b3105f0da02c4a3c98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/noticia-bytes.wav"
+    },
+    {
+      "path": "glitch-sfx/a/kit/noticia.wav",
+      "sizeBytes": 1440044,
+      "sha256": "359854d5b21a3cb13e2788aa1d5006955f82950432cd5437a4d6cca267642654",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/kit/noticia.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/reel/glitch-transicion-reel-centro-heroe.wav",
+      "sizeBytes": 345644,
+      "sha256": "73e913009a58bbcf31779420d621b4ee32247e86fae7ac729d2441324a18e4da",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/reel/glitch-transicion-reel-centro-heroe.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/reel/glitch-transicion-reel-centro-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "ef61629a38268ce019600adfeea04d72562499ffa9784e0a6ae9ddb21b66f67e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/reel/glitch-transicion-reel-centro-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/reel/glitch-transicion-reel-centro-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "18ef72352a710c98286d49dcb8312619ee262f4a2c6343d03879a940933ce4b0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/reel/glitch-transicion-reel-centro-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/reel/glitch-transicion-reel-izquierda-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "2536e44dc075292b987d56ab5d25e714bd2a500016dea5edfc5df19fb7143d30",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/reel/glitch-transicion-reel-izquierda-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/reel/glitch-transicion-reel-izquierda-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "15dd41393b205cfcd90a761b6409fcc592d5601c3f66dcc89169f4c430902692",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/reel/glitch-transicion-reel-izquierda-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/reel/glitch-transicion-reel-marca-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "7c46eaf557e7af09c3a9ce3a859ce4b9662abe8bf05d33daa02cb7cd5594067b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/reel/glitch-transicion-reel-marca-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/reel/glitch-transicion-reel-marca-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "202f1cd42800043fb3156de1e7efd8983ec7be402c96e598c40e29907fa6896c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/reel/glitch-transicion-reel-marca-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-centro-heroe.wav",
+      "sizeBytes": 345644,
+      "sha256": "a66031262e62c582569fe2cee9fb99469f3a2d88642ddd7851902f3f6d0d8c19",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-centro-heroe.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-centro-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "25acb4e1939062bedbc5da3b76c9ce1f7c83093b576be7c352b6cb7ba212e667",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-centro-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-centro-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "7fd1b652ee56d3ab5587a28dd596380c22beefb83f875c78062e57982b9908a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-centro-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-izquierda-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "170cb8160acc9ebf5e4e00b3950cf3791afb460b2dcd05fefdb823d73a6af852",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-izquierda-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-izquierda-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "9ca478299ba1caee0035bb940e66a532e0db9f9ab71b243aef33d65c43f377b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-izquierda-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-marca-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "fc3157857acda2936d4539b06b0b9941a7dd7a0074dc99e5aa25e156d1d60d88",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-marca-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-marca-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "53ea04114d201fbcc3bdb2ae8705c4cd42aa3d5fa3f6def3b98af3d8018e0ab0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/a/transiciones/vlog/glitch-transicion-vlog-marca-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/b/animatic.wav",
+      "sizeBytes": 13017702,
+      "sha256": "f5b0cc6e073b08a13f79a8e261b14ed78ff420b1136dd156fada7e436bfa4fba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/animatic.wav"
+    },
+    {
+      "path": "glitch-sfx/b/apertura.wav",
+      "sizeBytes": 1152102,
+      "sha256": "4dd350af453bb8a317a341918affb6fac7438c027abffba93bf58051d78a8d13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/apertura.wav"
+    },
+    {
+      "path": "glitch-sfx/b/bucle.wav",
+      "sizeBytes": 2016102,
+      "sha256": "03c199fadeb4960a9e3c14c90dba9502ba650bc4964a515ccd527debec558ca1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/bucle.wav"
+    },
+    {
+      "path": "glitch-sfx/b/cierre.wav",
+      "sizeBytes": 864102,
+      "sha256": "c9fb2d688954cd98b3e7f6b10353ba9a9afdb25e6353121e062a4267d5bc46cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/cierre.wav"
+    },
+    {
+      "path": "glitch-sfx/b/demos/demo_vlog_centro.wav",
+      "sizeBytes": 1094444,
+      "sha256": "0f1873a8461d8ae4ef00db28460615e78fc9fe4afa8d59beeb2bdc94fd85eb39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/demos/demo_vlog_centro.wav"
+    },
+    {
+      "path": "glitch-sfx/b/demos/demo_vlog_izquierda.wav",
+      "sizeBytes": 1094444,
+      "sha256": "f87f8a1a46a34146a04337d37b036457986e39d2557595176c26a189ccc1e587",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/demos/demo_vlog_izquierda.wav"
+    },
+    {
+      "path": "glitch-sfx/b/demos/demo_vlog_marca.wav",
+      "sizeBytes": 1094444,
+      "sha256": "5a1759626507c573cd054500ae27470962df0e241bbedee99e58978b4b8f87cc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/demos/demo_vlog_marca.wav"
+    },
+    {
+      "path": "glitch-sfx/b/demos/demo-heroe_vlog.wav",
+      "sizeBytes": 1209644,
+      "sha256": "c0c3e1fe2deaac4c5b9a5252f76b8c382772779ed10efae944d08b16327c09c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/demos/demo-heroe_vlog.wav"
+    },
+    {
+      "path": "glitch-sfx/b/demos/recorrido-bytes.wav",
+      "sizeBytes": 4752044,
+      "sha256": "5984317e80109821626a62ddc975295fa9f237d111bac6f2a6158b8a0e5e1e75",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/demos/recorrido-bytes.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/cabecera-1.wav",
+      "sizeBytes": 576044,
+      "sha256": "b94b75ee02c681cf36d4a5cd0b0cf34393954cacc68f39ab371da5a6eb845332",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/cabecera-1.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/cabecera-2.wav",
+      "sizeBytes": 345644,
+      "sha256": "421c61bd14a034a4f15af4af9ce393216014c03d4b60a0d605fe058418b6c95b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/cabecera-2.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/cabecera-3.wav",
+      "sizeBytes": 345644,
+      "sha256": "940f765b621a3e6a385aa520581155b914694f16e3711bcecf266418b3b5879d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/cabecera-3.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/cabecera-salida.wav",
+      "sizeBytes": 115244,
+      "sha256": "5e0151137a532307c8a2abff71dd026a1c23e34485596b4002c375d767f73cf1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/cabecera-salida.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/cta.wav",
+      "sizeBytes": 1152044,
+      "sha256": "47a502668a8201a8008941df88886d05cde88166bd64054c235602fabbbfa0ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/cta.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/drop-bytes.wav",
+      "sizeBytes": 1296044,
+      "sha256": "087ad3892be4bf78051f8e85be6ee238738d9de084068d73f135341b913db3d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/drop-bytes.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/drop.wav",
+      "sizeBytes": 1152044,
+      "sha256": "8676ecc645eed559063e7034b4e92848697db7357e4c7ba1eec6cf607e9dcec9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/drop.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/fuente.wav",
+      "sizeBytes": 1440044,
+      "sha256": "be80110bc49f4a5758dc4dca9a819b2e5cab03c22de64bd2c027030451e8f755",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/fuente.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/lower-third-host.wav",
+      "sizeBytes": 1440044,
+      "sha256": "c38096371a1e403f812f35f59bd1325f535529b38b2c4484aae9009aff6bc380",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/lower-third-host.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/lower-third-invitado.wav",
+      "sizeBytes": 1440044,
+      "sha256": "dcdeeabee444c8b912bd7b3459c4d0bd54a026c0e975d0f07ce80c6e182a4103",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/lower-third-invitado.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/noticia-bytes.wav",
+      "sizeBytes": 1440044,
+      "sha256": "37f7f78d31de95a009d174ac86cdb925e48a7faf1af3a3adb13ad210a9fa6fa5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/noticia-bytes.wav"
+    },
+    {
+      "path": "glitch-sfx/b/kit/noticia.wav",
+      "sizeBytes": 1440044,
+      "sha256": "8587a56b2b29b65feb5207e082f3c5c97f615ba137b6b12b154e8409549a1052",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/kit/noticia.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/reel/glitch-transicion-reel-centro-heroe.wav",
+      "sizeBytes": 345644,
+      "sha256": "ce95ddc31c7b928c42f67c7c747bb200aa8f5e5a8fe29cf7944de6e2da73e610",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/reel/glitch-transicion-reel-centro-heroe.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/reel/glitch-transicion-reel-centro-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "4f7d258e4c3fe76f5afda1c2a469283c20ee936f2a2431241a2474f90901c364",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/reel/glitch-transicion-reel-centro-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/reel/glitch-transicion-reel-centro-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "e3010d33aa5991e91d4f1632fb4b2add5677c73634ca1965518fe901d747fde5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/reel/glitch-transicion-reel-centro-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/reel/glitch-transicion-reel-izquierda-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "c7beb7bc4669f6f0de18906e4de41e72cc53bcfe23f681ee6b5feed913435e42",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/reel/glitch-transicion-reel-izquierda-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/reel/glitch-transicion-reel-izquierda-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "aa88ea156faf4369845f840faadb6ed9054d6406600110c0ff96220d002de085",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/reel/glitch-transicion-reel-izquierda-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/reel/glitch-transicion-reel-marca-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "a2a098bb69612b698e044f9267b3beae6d864dbd76f67014a2979adcfb137758",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/reel/glitch-transicion-reel-marca-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/reel/glitch-transicion-reel-marca-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "42c0f7601049b8520956c6f671eafc8a1b073ad8ec08f751db8b407902cf9774",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/reel/glitch-transicion-reel-marca-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-centro-heroe.wav",
+      "sizeBytes": 345644,
+      "sha256": "d835a1600b311630eec9498d2090ba4ddcb90463aef2eb8541bcd5c26e187d85",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-centro-heroe.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-centro-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "92fdd2b51086b9a84b398b4b9e1278425cacfec0eaccceb0aa407e949199717a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-centro-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-centro-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "fb2241238ebfd734ab264c01ded1e443f422ca6ad060ea59b31124e70d089958",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-centro-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-izquierda-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "ea867418b52c68f6c6da4670f792ba1974df5ed88eb3046b98694af28781061a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-izquierda-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-izquierda-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "4620a054c72be606d375c96148bfb0f5becd5165816cd975fe128e4399b030fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-izquierda-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-marca-normal.wav",
+      "sizeBytes": 230444,
+      "sha256": "d6c1c937fe7111b6cc62af48d71aefbc5fcb69dc3f19bac813fbeca8ee60ad4c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-marca-normal.wav"
+    },
+    {
+      "path": "glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-marca-rapida.wav",
+      "sizeBytes": 144044,
+      "sha256": "228deb765590189a410354229e751c4fdd27b6775e33a803f16af7eae7690eb3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/b/transiciones/vlog/glitch-transicion-vlog-marca-rapida.wav"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-apertura-16x9-a.mp4",
+      "sizeBytes": 278609,
+      "sha256": "3510f6869cb7483784241ff18b8c3429a93ce46386c32f6a51aa7962211fce16",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-apertura-16x9-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-apertura-16x9-b.mp4",
+      "sizeBytes": 273611,
+      "sha256": "ccf1a7ce18f394d15984ba332545e6e8c4664ccac994940d90874075f0ed3efe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-apertura-16x9-b.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-bucle-16x9-a.mp4",
+      "sizeBytes": 488310,
+      "sha256": "cf3187f43064efe1cc75938ae6c1030b02a1a8efa2d22c8dfb78dad0cbf69a10",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-bucle-16x9-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-bucle-16x9-b.mp4",
+      "sizeBytes": 482532,
+      "sha256": "4ba52e0797f29dcbcffa9574c17f33b5db6ffd180da3baaa3eedecc8146ddb21",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-bucle-16x9-b.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-bucle-9x16-a.mp4",
+      "sizeBytes": 392235,
+      "sha256": "fd5b4435229ca86240bbce556ff2cdda828e1e99b04341811e9cefc21e0edb63",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-bucle-9x16-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-bucle-9x16-b.mp4",
+      "sizeBytes": 386457,
+      "sha256": "9dab127c53afad4a78b86ae8ee2aa1ac98d1cd176ded75ee23ecd4ae29c69072",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-bucle-9x16-b.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-cierre-16x9-a.mp4",
+      "sizeBytes": 205872,
+      "sha256": "a8b233c4d170cab67d388eacfbad70e102dc0b2eea23a0b5a47d73187d75d470",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-cierre-16x9-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-cierre-16x9-b.mp4",
+      "sizeBytes": 206262,
+      "sha256": "385abf29354395ffa4d41802162609d883f69ef691a3fa9fec96644a4fbc7b7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-cierre-16x9-b.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-edicion-16x9-a.mp4",
+      "sizeBytes": 2642407,
+      "sha256": "9012cda85b4b6cd938e6e383f1a1e23517142feccf06b8958986dac2960f8191",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-edicion-16x9-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-edicion-16x9-b.mp4",
+      "sizeBytes": 2640357,
+      "sha256": "d7a93b5f6420f4c599922a91b63e3db6d113f21b9d3be54607c8588ec6a1e2f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-edicion-16x9-b.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-lower-third-bytes-16x9-a.mp4",
+      "sizeBytes": 989147,
+      "sha256": "0b613335e669dfa5083db412e41a1254a7817d2381d65d582b61ca9114f3f81e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-lower-third-bytes-16x9-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-lower-third-bytes-16x9-b.mp4",
+      "sizeBytes": 989818,
+      "sha256": "c9b12b64631ee4c49a63e4a15635c428480cac5ea8a2e01a8eeaf71e262f2264",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-lower-third-bytes-16x9-b.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-transicion-centro-16x9-a.mp4",
+      "sizeBytes": 596611,
+      "sha256": "1da9368ff603eb59aa410cc14deba6aba398a7bd8cf22d3d940ebfc2d8064dfc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-transicion-centro-16x9-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-transicion-centro-16x9-b.mp4",
+      "sizeBytes": 596051,
+      "sha256": "d95d5c69378de9b800a18f535489132f8507abbb2b7b316f0aace5c64d82c5de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-transicion-centro-16x9-b.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-transicion-heroe-16x9-a.mp4",
+      "sizeBytes": 820188,
+      "sha256": "04560f0eb080b844bd27987bb0f287ebb3e5fc9d2ac1b0d93e5803f2bb3edde3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-transicion-heroe-16x9-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-transicion-heroe-16x9-b.mp4",
+      "sizeBytes": 820961,
+      "sha256": "5f960cd4a41cb24e04261ceebcd4ebd42b635672e1583ca405c3beff0b2177ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-transicion-heroe-16x9-b.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-transicion-izquierda-16x9-a.mp4",
+      "sizeBytes": 583126,
+      "sha256": "a74e62c7f90ecd178c5c7ec3a76d6ad6fce38d2f4e0b2e8e361fa6bd97a1808d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-transicion-izquierda-16x9-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-transicion-izquierda-16x9-b.mp4",
+      "sizeBytes": 583965,
+      "sha256": "c60e3cd3aa4ef14b0c2caced447ad934c0a876309621e14e3e53cdaee712b9be",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-transicion-izquierda-16x9-b.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-transicion-marca-16x9-a.mp4",
+      "sizeBytes": 588343,
+      "sha256": "b35114c6b713f24de2835feed633033468700e879988d285ee15803f3390e323",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-transicion-marca-16x9-a.mp4"
+    },
+    {
+      "path": "glitch-sfx/web/glitch-transicion-marca-16x9-b.mp4",
+      "sizeBytes": 590067,
+      "sha256": "2f2299e272808ba53a7af5e71dd0b861bca5c4fac3011f4f104f28fee37a0921",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-sfx/web/glitch-transicion-marca-16x9-b.mp4"
+    },
+    {
+      "path": "glitch-tema/b/cama-b-sa70.wav",
+      "sizeBytes": 4599502,
+      "sha256": "60e835bce90e7d75f60ea5a903a458a7773a37dd37c329903f8be3e04ad837bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/cama-b-sa70.wav"
+    },
+    {
+      "path": "glitch-tema/b/cama-bajo-voz.wav",
+      "sizeBytes": 3686502,
+      "sha256": "0b27170d2ded07bbd5135d4328fe5a27057fb6aa76c39cae1f6d2232799b7101",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/cama-bajo-voz.wav"
+    },
+    {
+      "path": "glitch-tema/b/demo-noticia-14.wav",
+      "sizeBytes": 6336102,
+      "sha256": "8e3b47d7382bef4a99e35548921f26f574a28965acfc04cb625ed8270ed42d82",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/demo-noticia-14.wav"
+    },
+    {
+      "path": "glitch-tema/b/demo-noticia-audio.wav",
+      "sizeBytes": 6336102,
+      "sha256": "fc198124026448c05371c3703199ef3b04512bc44fc95893a6df83b62dc280e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/demo-noticia-audio.wav"
+    },
+    {
+      "path": "glitch-tema/b/demo-noticia-mix.wav",
+      "sizeBytes": 6336102,
+      "sha256": "9a1f9362bf8857cbcf0eeaf52d7c5013073f524c474dc3fbd15342ba4f5a46fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/demo-noticia-mix.wav"
+    },
+    {
+      "path": "glitch-tema/b/final-cama.wav",
+      "sizeBytes": 3686444,
+      "sha256": "10bbabcc14b53e34f4b63a734427a0d80e414f29d80f4b6fe0eedfdd8edaf70f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/final-cama.wav"
+    },
+    {
+      "path": "glitch-tema/b/final-cortina-14.wav",
+      "sizeBytes": 576102,
+      "sha256": "f496f8ce8d3998d7111b9b509608c39f7510db664b121e0e62f18c25fe5a292b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/final-cortina-14.wav"
+    },
+    {
+      "path": "glitch-tema/b/final-cortina.wav",
+      "sizeBytes": 576044,
+      "sha256": "cb1425f0e4fc3026a37c135d6962e85b19f722c0461f74c0b3898e9763a2eb81",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/final-cortina.wav"
+    },
+    {
+      "path": "glitch-tema/b/final-intro-podcast-14.wav",
+      "sizeBytes": 3916902,
+      "sha256": "8b1a7483607e634ce464034bc83708b22cc26c8719268969eacd18852f0a2e04",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/final-intro-podcast-14.wav"
+    },
+    {
+      "path": "glitch-tema/b/final-intro-vlog-14.wav",
+      "sizeBytes": 2073702,
+      "sha256": "353b05bca5069ab09a40ffec663382b375e43555ecc52f1de0f39f61e0ae910d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/final-intro-vlog-14.wav"
+    },
+    {
+      "path": "glitch-tema/b/final-salida-podcast-14.wav",
+      "sizeBytes": 2016102,
+      "sha256": "e365e147f7dd074ebf9484b40c1873128229810f9a6b94faf9bbc4f2371af20a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/final-salida-podcast-14.wav"
+    },
+    {
+      "path": "glitch-tema/b/final-salida-podcast.wav",
+      "sizeBytes": 2016044,
+      "sha256": "77cf5b70c38538fb161ea0db8dfe032b777ec2406feea4be755a86905f4ab6bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/final-salida-podcast.wav"
+    },
+    {
+      "path": "glitch-tema/b/final-salida-vlog-14.wav",
+      "sizeBytes": 864102,
+      "sha256": "a4150f4c10b0217db1797df073b5d4de72c1eabd62589c91a4a286916b61ed61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/final-salida-vlog-14.wav"
+    },
+    {
+      "path": "glitch-tema/b/final-salida-vlog.wav",
+      "sizeBytes": 864044,
+      "sha256": "64f889bb9b73633596336a004fdbb2f9cd5a744c0a8e8bd613609eba9e9a3f0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/final-salida-vlog.wav"
+    },
+    {
+      "path": "glitch-tema/b/maqueta-cama.wav",
+      "sizeBytes": 7488044,
+      "sha256": "21b755b267f4de2e619e2dba5245f095dd1be24ef8dc949ba570cb5ebe3d060e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/maqueta-cama.wav"
+    },
+    {
+      "path": "glitch-tema/b/maqueta-cortina.wav",
+      "sizeBytes": 576044,
+      "sha256": "324388b9875e6c17aa4bd5d11e74cec849319116c1fd85082da3ea9cf1eb2ae9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/maqueta-cortina.wav"
+    },
+    {
+      "path": "glitch-tema/b/maqueta-salida-podcast.wav",
+      "sizeBytes": 2016044,
+      "sha256": "272b93810a1d4ac21b0ba2f5d5aae244369dd18a33090694f59985e48e8088d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/maqueta-salida-podcast.wav"
+    },
+    {
+      "path": "glitch-tema/b/maqueta-salida-vlog.wav",
+      "sizeBytes": 864044,
+      "sha256": "322bb9ce39c9fd724458c0360891fb1a6bf40e55373b9d829e095ef633b930db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/maqueta-salida-vlog.wav"
+    },
+    {
+      "path": "glitch-tema/b/tema-b-cortina-sa75.wav",
+      "sizeBytes": 365902,
+      "sha256": "827533c7594a20b5e0297019c2a62464ff12264183625c1147a3edbf6dc7501f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/tema-b-cortina-sa75.wav"
+    },
+    {
+      "path": "glitch-tema/b/tema-b-salida-podcast-sa75.wav",
+      "sizeBytes": 1247902,
+      "sha256": "acc601d19f88f9268e1e2be210c48bcaee3649916b61ab3bea45b0d01da31bb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/tema-b-salida-podcast-sa75.wav"
+    },
+    {
+      "path": "glitch-tema/b/tema-b-salida-vlog-sa75.wav",
+      "sizeBytes": 542302,
+      "sha256": "0973413eb03f61bc8cbb0f000f96d275c9218da480afbd36130afe82f519ab30",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/tema-b-salida-vlog-sa75.wav"
+    },
+    {
+      "path": "glitch-tema/b/voz-prueba-16.wav",
+      "sizeBytes": 2889036,
+      "sha256": "8b437ea815db205628da14c61274ea8dcf6daace6b70d2a64bcc4f7971517746",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/voz-prueba-16.wav"
+    },
+    {
+      "path": "glitch-tema/b/voz-prueba.mp3",
+      "sizeBytes": 338708,
+      "sha256": "80c06b077b52b8633134257fa077b6609b6f4604ecc54721bdc7e219a13eee69",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/voz-prueba.mp3"
+    },
+    {
+      "path": "glitch-tema/b/web-cama.mp3",
+      "sizeBytes": 922797,
+      "sha256": "65bc50220e924536c8052fbc1c8e8b6a2afb711ce5b76557336a1d03733a18fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/web-cama.mp3"
+    },
+    {
+      "path": "glitch-tema/b/web-cortina.mp3",
+      "sizeBytes": 57837,
+      "sha256": "66c0478f63abf852028be5a96d9e658f4b054ca6987e158ba5d0a407dc01da11",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/web-cortina.mp3"
+    },
+    {
+      "path": "glitch-tema/b/web-demo-noticia.mp4",
+      "sizeBytes": 1952181,
+      "sha256": "f00418dbd1416df6ff46e6d835a03cbeabb44b4b203bc1bcad97347c7c2dfe79",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/web-demo-noticia.mp4"
+    },
+    {
+      "path": "glitch-tema/b/web-intro-podcast.mp3",
+      "sizeBytes": 382413,
+      "sha256": "cd1d96ecc2d4f2721b357524ee4723c30d16c769b19db5ff0694239e6b5f4f29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/web-intro-podcast.mp3"
+    },
+    {
+      "path": "glitch-tema/b/web-salida-podcast.mp3",
+      "sizeBytes": 197613,
+      "sha256": "7243373cb28617b2e3385b3c89dbcd48d8b1733f3e2b8703f7a1486675272df4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/web-salida-podcast.mp3"
+    },
+    {
+      "path": "glitch-tema/b/web-secuencia-vlog.mp4",
+      "sizeBytes": 769154,
+      "sha256": "15e888da0086a61e0c576088622885b3b29ad2b1eb6673572a06522655826416",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/b/web-secuencia-vlog.mp4"
+    },
+    {
+      "path": "glitch-tema/cama/cama-hiphop-el.mp3",
+      "sizeBytes": 769005,
+      "sha256": "2012ceef4ebbdf3905c2917fe5f3b430e5343030717445e2f6cd757af3f39d52",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/cama-hiphop-el.mp3"
+    },
+    {
+      "path": "glitch-tema/cama/cama-hiphop-sa.wav",
+      "sizeBytes": 5657902,
+      "sha256": "d692cf956a533f00b49293c0ae9a5cd1cfdbde6f3eac35c568ee01c3b97d845a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/cama-hiphop-sa.wav"
+    },
+    {
+      "path": "glitch-tema/cama/cama-postpunk-el.mp3",
+      "sizeBytes": 769005,
+      "sha256": "89d50a818a40601e309ea151797a35bb39ffd14e6ac95cfcdd6e42813c91c979",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/cama-postpunk-el.mp3"
+    },
+    {
+      "path": "glitch-tema/cama/cama-postpunk-sa.wav",
+      "sizeBytes": 5657902,
+      "sha256": "190c000357626678f7c4e920ef4a3a1f5eaa5d6b1461ee96dbe42344c6546068",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/cama-postpunk-sa.wav"
+    },
+    {
+      "path": "glitch-tema/cama/cama-tension-el.mp3",
+      "sizeBytes": 769005,
+      "sha256": "e34b54bc71cb6b694a6c8ffad5ccd4da701cff823d6b7161c138a1dde51deb91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/cama-tension-el.mp3"
+    },
+    {
+      "path": "glitch-tema/cama/cama-tension-sa.wav",
+      "sizeBytes": 5657902,
+      "sha256": "9d9b51d048006d8760d1e8ea6b1fd72e340e2c528753460ad94aa01c2d91fa38",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/cama-tension-sa.wav"
+    },
+    {
+      "path": "glitch-tema/cama/hiphop-16.wav",
+      "sizeBytes": 7488102,
+      "sha256": "81c531123e34552061870af9896c43eac0328a87e2af7d02d470336eb6b0c21b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/hiphop-16.wav"
+    },
+    {
+      "path": "glitch-tema/cama/hiphop-31.wav",
+      "sizeBytes": 7488102,
+      "sha256": "189bee2b4d9f123257ace6964c78a19ebb9c5f646aa93075f32e0be114531aed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/hiphop-31.wav"
+    },
+    {
+      "path": "glitch-tema/cama/hiphop-trim.wav",
+      "sizeBytes": 7488102,
+      "sha256": "90d135012b4b301fd69eb08015145cb1360ff2757ffff7e55ae6583bf5530531",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/hiphop-trim.wav"
+    },
+    {
+      "path": "glitch-tema/cama/hiphop-voz-14.wav",
+      "sizeBytes": 6912102,
+      "sha256": "0f61720e975d552cf695b73b95100d761f9580b514959562b155023728466aa9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/hiphop-voz-14.wav"
+    },
+    {
+      "path": "glitch-tema/cama/hiphop-voz-mix.wav",
+      "sizeBytes": 6912102,
+      "sha256": "d470c3ba7e465adfc2b29172719f696598fef0e139c77e75e942b9860580e0b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/hiphop-voz-mix.wav"
+    },
+    {
+      "path": "glitch-tema/cama/postpunk-16.wav",
+      "sizeBytes": 7488102,
+      "sha256": "9ea965e387e66c977eb581d57340c836b34a536424647dab938c1d9b492abc90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/postpunk-16.wav"
+    },
+    {
+      "path": "glitch-tema/cama/postpunk-31.wav",
+      "sizeBytes": 7488102,
+      "sha256": "e678b934e5d577ec48e45884f38f2a350e64d96266e8ec2f2def1831cecffbbd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/postpunk-31.wav"
+    },
+    {
+      "path": "glitch-tema/cama/postpunk-trim.wav",
+      "sizeBytes": 7488102,
+      "sha256": "7cda2452094afb446f5ce292dd93ec018f04d9fbd68ba17c619612d6aaff913c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/postpunk-trim.wav"
+    },
+    {
+      "path": "glitch-tema/cama/postpunk-voz-14.wav",
+      "sizeBytes": 6912102,
+      "sha256": "4a3a58fae0b2c1c2aa893aa7d5cbcaa03462625e49ea0e33c0dab2f95be62a3a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/postpunk-voz-14.wav"
+    },
+    {
+      "path": "glitch-tema/cama/postpunk-voz-mix.wav",
+      "sizeBytes": 6912102,
+      "sha256": "4a26fdecd395a3319647456f02ecfea1959cbe6acfb4591c0eb778fc6165dcd4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/postpunk-voz-mix.wav"
+    },
+    {
+      "path": "glitch-tema/cama/tension-16.wav",
+      "sizeBytes": 7488102,
+      "sha256": "9e99a28da83800cc5cca83e92a0751f9b5f704da861a327b4b83aab810d02375",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/tension-16.wav"
+    },
+    {
+      "path": "glitch-tema/cama/tension-31.wav",
+      "sizeBytes": 7488102,
+      "sha256": "9a7b1f53846ac01510459e728d196d32920b4bd6eb2b446b4517d54dc34fb208",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/tension-31.wav"
+    },
+    {
+      "path": "glitch-tema/cama/tension-trim.wav",
+      "sizeBytes": 7488102,
+      "sha256": "bcaefb69d05c966767b3494aee1aed4685bddb097a6d8b002d94ecd7de1b7f3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/tension-trim.wav"
+    },
+    {
+      "path": "glitch-tema/cama/tension-voz-14.wav",
+      "sizeBytes": 6912102,
+      "sha256": "9007f9165adf34c42e52272951b6509d9e908552a6f78f184125abe8186d6277",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/tension-voz-14.wav"
+    },
+    {
+      "path": "glitch-tema/cama/tension-voz-mix.wav",
+      "sizeBytes": 6912102,
+      "sha256": "73a21a94fd9d61c1dc0677620579206d1120a8b5fd4ccdf05036a4b929a44509",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/tension-voz-mix.wav"
+    },
+    {
+      "path": "glitch-tema/cama/web-hiphop-sola.mp3",
+      "sizeBytes": 625581,
+      "sha256": "a006016f58da5158526a6b5430809a6e3be94b724384d57617f29c6e466b0342",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/web-hiphop-sola.mp3"
+    },
+    {
+      "path": "glitch-tema/cama/web-hiphop-voz.mp3",
+      "sizeBytes": 577197,
+      "sha256": "0ab00b8526a6026875156f31292e5ce1d49358408eb2ef9b8b31f2abe3792110",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/web-hiphop-voz.mp3"
+    },
+    {
+      "path": "glitch-tema/cama/web-postpunk-sola.mp3",
+      "sizeBytes": 625581,
+      "sha256": "ab5764656a606f5553a49000d4ac323156c1e69aa3f37afabb196f55b7948a7f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/web-postpunk-sola.mp3"
+    },
+    {
+      "path": "glitch-tema/cama/web-postpunk-voz.mp3",
+      "sizeBytes": 577197,
+      "sha256": "152ee9eee170a89345210730d430d3079a46076321695635ad13d1e911bc641c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/web-postpunk-voz.mp3"
+    },
+    {
+      "path": "glitch-tema/cama/web-tension-sola.mp3",
+      "sizeBytes": 625581,
+      "sha256": "b8c81017993485f445a54b3ffa5a8c3a2b5a21fd6179ca0f6e9dafae7ddeaf75",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/web-tension-sola.mp3"
+    },
+    {
+      "path": "glitch-tema/cama/web-tension-voz.mp3",
+      "sizeBytes": 577197,
+      "sha256": "9ee059f82deab7fa8a9efa30052a038d16c29eebae9ce15c13fc119490f24c9a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/cama/web-tension-voz.mp3"
+    },
+    {
+      "path": "glitch-tema/final/cama-x3.wav",
+      "sizeBytes": 16588902,
+      "sha256": "709c9dfd884936c912272ce596d816293577a46bddbe85a221ab8c431a244e64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/cama-x3.wav"
+    },
+    {
+      "path": "glitch-tema/final/demo-14.wav",
+      "sizeBytes": 6912102,
+      "sha256": "754802feaf9a319573794ea51e44711d374d135f13052610016649c3fe80d245",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/demo-14.wav"
+    },
+    {
+      "path": "glitch-tema/final/glitch-cama-bucle.wav",
+      "sizeBytes": 5529702,
+      "sha256": "7fcfe7c7efe818a05a94d99a7496bd46336af0be024a080c408cec6544c9f8f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/glitch-cama-bucle.wav"
+    },
+    {
+      "path": "glitch-tema/final/glitch-cortina-podcast.wav",
+      "sizeBytes": 576102,
+      "sha256": "7b8eeafe106e83d837667818a976afba7c4a00602ab96992e4ae45e761fb607d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/glitch-cortina-podcast.wav"
+    },
+    {
+      "path": "glitch-tema/final/glitch-cortina-vlog.wav",
+      "sizeBytes": 576102,
+      "sha256": "f496f8ce8d3998d7111b9b509608c39f7510db664b121e0e62f18c25fe5a292b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/glitch-cortina-vlog.wav"
+    },
+    {
+      "path": "glitch-tema/final/glitch-intro-podcast.wav",
+      "sizeBytes": 3916902,
+      "sha256": "c15fe1da1ec7ac351617177e14a92f64a64c1099f0fc07d0daeff3a50a74f59b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/glitch-intro-podcast.wav"
+    },
+    {
+      "path": "glitch-tema/final/glitch-intro-vlog.wav",
+      "sizeBytes": 2073702,
+      "sha256": "353b05bca5069ab09a40ffec663382b375e43555ecc52f1de0f39f61e0ae910d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/glitch-intro-vlog.wav"
+    },
+    {
+      "path": "glitch-tema/final/glitch-salida-podcast.wav",
+      "sizeBytes": 2016102,
+      "sha256": "04e31a3030798d0cac101490b77b9a653c86a92e5a63069ae8a49fa7f9fda25b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/glitch-salida-podcast.wav"
+    },
+    {
+      "path": "glitch-tema/final/glitch-salida-vlog.wav",
+      "sizeBytes": 864102,
+      "sha256": "a4150f4c10b0217db1797df073b5d4de72c1eabd62589c91a4a286916b61ed61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/glitch-salida-vlog.wav"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-cama-3-vueltas.mp3",
+      "sizeBytes": 1383597,
+      "sha256": "2dbe3e70b6f2f96720450b7ad841613203ac26ca91ea3eb25e601b52a1ba5691",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-cama-3-vueltas.mp3"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-cortina-vlog.mp3",
+      "sizeBytes": 49581,
+      "sha256": "8d4eca8c76f9492c52387cbcb11cc3e82b073e0e2ea2d7a698af3d32736bdae6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-cortina-vlog.mp3"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-intro-podcast.mp3",
+      "sizeBytes": 327789,
+      "sha256": "10a7c1cd1715c1ea082dcb6ce63491a930d7cb92421630f3fc04aa6a9b3f08b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-intro-podcast.mp3"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-intro-vlog.mp3",
+      "sizeBytes": 173997,
+      "sha256": "3a1aa5497562f7c9fc5f076354c8100512f96e6944716effafc144ac989bad95",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-intro-vlog.mp3"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-noticia-con-cama-16x9.mp4",
+      "sizeBytes": 2008310,
+      "sha256": "e682b285ab8548d992fbd416e5c97597dd156adb093be965b65c8f5cd16137df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-noticia-con-cama-16x9.mp4"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-noticia-con-cama-16x9.webp",
+      "sizeBytes": 32854,
+      "sha256": "d3524e0256b238f672e21fcdbcd38a41e694b9761bbd912054855140e9c90c22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-noticia-con-cama-16x9.webp"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-salida-podcast.mp3",
+      "sizeBytes": 169389,
+      "sha256": "961a6c6719a6c0078af95c9589d1cf061801cd2c0aa07838cc5a3097b5257d89",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-salida-podcast.mp3"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-salida-vlog.mp3",
+      "sizeBytes": 73197,
+      "sha256": "2b87103e87737c3d320f651e495a79eb4b6d0e1237ae3d961b603bd96b120c7a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-salida-vlog.mp3"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-tema-edicion-16x9.mp4",
+      "sizeBytes": 769154,
+      "sha256": "15e888da0086a61e0c576088622885b3b29ad2b1eb6673572a06522655826416",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-tema-edicion-16x9.mp4"
+    },
+    {
+      "path": "glitch-tema/final/web/glitch-tema-edicion-16x9.webp",
+      "sizeBytes": 9532,
+      "sha256": "bb20bfa1e63beb661dffb60246bc395f9f12d64ead0cae53cc408172d69ef6bd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/final/web/glitch-tema-edicion-16x9.webp"
+    },
+    {
+      "path": "glitch-tema/glitch-tema-intro-reel.mp4",
+      "sizeBytes": 783991,
+      "sha256": "fd9c1f6da16e7383624bb675afdff93597be440c6c49c64884e26fb2f2be3f58",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/glitch-tema-intro-reel.mp4"
+    },
+    {
+      "path": "glitch-tema/glitch-tema-intro-vlog.mp4",
+      "sizeBytes": 755133,
+      "sha256": "143485c482d948600d0dfc5e7a981ef97be9bb1219fe067546ac2c79e06b37c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/glitch-tema-intro-vlog.mp4"
+    },
+    {
+      "path": "glitch-tema/glitch-tema-podcast-14.wav",
+      "sizeBytes": 3916902,
+      "sha256": "3b645db075a129a6f428000598f8df1f0a2b17bff533b73e440aafa3bb2baadc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/glitch-tema-podcast-14.wav"
+    },
+    {
+      "path": "glitch-tema/glitch-tema-podcast.mp3",
+      "sizeBytes": 382413,
+      "sha256": "13bde2ed453b2dad8c162b7ce2e37e11a74cca2b097561229064cefa46e380d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/glitch-tema-podcast.mp3"
+    },
+    {
+      "path": "glitch-tema/glitch-tema-podcast.wav",
+      "sizeBytes": 3916844,
+      "sha256": "1b789cf484cd052ed8475be770ccdbabfc49a63c0988abf758ceefb0a35393e2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/glitch-tema-podcast.wav"
+    },
+    {
+      "path": "glitch-tema/glitch-tema-vlog-14.wav",
+      "sizeBytes": 2073702,
+      "sha256": "a353544f53a6fe7950952d4f1ade922a99df6181a64cfd420a464b94ff8d8b8f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/glitch-tema-vlog-14.wav"
+    },
+    {
+      "path": "glitch-tema/glitch-tema-vlog.wav",
+      "sizeBytes": 2073644,
+      "sha256": "af10a380ecf7033ac7c04aa0f7f97c9fef884ae813f7c04417e2f9194336fe46",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/glitch-tema-vlog.wav"
+    },
+    {
+      "path": "glitch-tema/r9/final-a-podcast-14.wav",
+      "sizeBytes": 3916902,
+      "sha256": "6222fb3fa73ec95cc686f6b2d91422d98cedf212a09f7dda6b3a29c9dd149cf9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/final-a-podcast-14.wav"
+    },
+    {
+      "path": "glitch-tema/r9/final-a-podcast.wav",
+      "sizeBytes": 3916844,
+      "sha256": "72a7abb6722dc655cd641c525ecfd1a9b9603e196a6afcd8660b5e10233f6703",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/final-a-podcast.wav"
+    },
+    {
+      "path": "glitch-tema/r9/final-a-vlog-14.wav",
+      "sizeBytes": 2073702,
+      "sha256": "d4cbf0a6f0a1c9413442a1fcad1539d8b1f3b6f7d02b3af9b640cb9d5ecf4d1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/final-a-vlog-14.wav"
+    },
+    {
+      "path": "glitch-tema/r9/final-a-vlog.wav",
+      "sizeBytes": 2073644,
+      "sha256": "cc0a5a290a83125ea47b8bdd506a5768eb383927ff46262d17eaa04911c20308",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/final-a-vlog.wav"
+    },
+    {
+      "path": "glitch-tema/r9/final-b-podcast-14.wav",
+      "sizeBytes": 3916902,
+      "sha256": "8b1a7483607e634ce464034bc83708b22cc26c8719268969eacd18852f0a2e04",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/final-b-podcast-14.wav"
+    },
+    {
+      "path": "glitch-tema/r9/final-b-podcast.wav",
+      "sizeBytes": 3916844,
+      "sha256": "880b7e66b5eae0f1274bcdcd3f8bd833e231200006e4f9e9235e7b88fd30e4df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/final-b-podcast.wav"
+    },
+    {
+      "path": "glitch-tema/r9/final-b-vlog-14.wav",
+      "sizeBytes": 2073702,
+      "sha256": "353b05bca5069ab09a40ffec663382b375e43555ecc52f1de0f39f61e0ae910d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/final-b-vlog-14.wav"
+    },
+    {
+      "path": "glitch-tema/r9/final-b-vlog.wav",
+      "sizeBytes": 2073644,
+      "sha256": "cc25a3efff133c7f5b2d13190b978d7e7050001a181f9c83e86dfb95aa43612d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/final-b-vlog.wav"
+    },
+    {
+      "path": "glitch-tema/r9/maqueta-podcast.wav",
+      "sizeBytes": 4032044,
+      "sha256": "7f8e1251a5925e72367de771499c29059f650fc9e0f14e7a6f7987658d0c3cde",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/maqueta-podcast.wav"
+    },
+    {
+      "path": "glitch-tema/r9/maqueta-vlog.wav",
+      "sizeBytes": 2304044,
+      "sha256": "50174a83eb89db2f7a0361a6e00a91246a01292ff12da2b887fdb7d994140a53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/maqueta-vlog.wav"
+    },
+    {
+      "path": "glitch-tema/r9/tema-a-podcast-sa75.wav",
+      "sizeBytes": 2482702,
+      "sha256": "daf80cd2d902dab74e570414d88898ae37a34ba1fb556e072db4bb9f7e04eb0e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/tema-a-podcast-sa75.wav"
+    },
+    {
+      "path": "glitch-tema/r9/tema-a-vlog-sa75.wav",
+      "sizeBytes": 1424302,
+      "sha256": "a54e5eb73cd3bb580cad08a964ee5531e6a53ad07c35e16659ed15e3ef025b24",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/tema-a-vlog-sa75.wav"
+    },
+    {
+      "path": "glitch-tema/r9/tema-b-podcast-sa75.wav",
+      "sizeBytes": 2482702,
+      "sha256": "5f7f9eae9ad17240f855736a9dc320e799ee8f801011a781c0ecd596875a29b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/tema-b-podcast-sa75.wav"
+    },
+    {
+      "path": "glitch-tema/r9/tema-b-vlog-sa75.wav",
+      "sizeBytes": 1424302,
+      "sha256": "3954f3213fe186bcf86f9b22ce89cc5e95dac76fc0de23c94328dd3b2ecf3174",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/tema-b-vlog-sa75.wav"
+    },
+    {
+      "path": "glitch-tema/r9/web-intro-reel-a.mp4",
+      "sizeBytes": 366409,
+      "sha256": "20b0724a4d67c23d6c8b0f30193255aedff03e963fb79c845e2683cc4f0b40df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/web-intro-reel-a.mp4"
+    },
+    {
+      "path": "glitch-tema/r9/web-intro-reel-b.mp4",
+      "sizeBytes": 365639,
+      "sha256": "f429ce42a852f934f96ce9a8979013c8ec6e5debe3e5deb71b13d6746fba1f78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/web-intro-reel-b.mp4"
+    },
+    {
+      "path": "glitch-tema/r9/web-intro-vlog-a.mp4",
+      "sizeBytes": 451604,
+      "sha256": "39de91d5cc5444e3d48569a84880d4a222780c793254958fd1e9b0f61404b6f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/web-intro-vlog-a.mp4"
+    },
+    {
+      "path": "glitch-tema/r9/web-intro-vlog-b.mp4",
+      "sizeBytes": 450834,
+      "sha256": "f1be509355bfb3c1f76d6f3fd2d47c4396d85783ed6e9f9d49285047931e8571",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/web-intro-vlog-b.mp4"
+    },
+    {
+      "path": "glitch-tema/r9/web-podcast-a.mp3",
+      "sizeBytes": 382413,
+      "sha256": "fb30fcc864e97eeee7a0cad18e0d3ecfc215ed8b37d40091cac3a91a9df8a5c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/web-podcast-a.mp3"
+    },
+    {
+      "path": "glitch-tema/r9/web-podcast-b.mp3",
+      "sizeBytes": 382413,
+      "sha256": "cd1d96ecc2d4f2721b357524ee4723c30d16c769b19db5ff0694239e6b5f4f29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/r9/web-podcast-b.mp3"
+    },
+    {
+      "path": "glitch-tema/web-intro-reel.mp4",
+      "sizeBytes": 383647,
+      "sha256": "88be2e003fb5dd9bbc507edb6338cd3cd9f488b6facf1d5e5809795a3d4f9c2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/web-intro-reel.mp4"
+    },
+    {
+      "path": "glitch-tema/web-intro-vlog.mp4",
+      "sizeBytes": 467223,
+      "sha256": "fa6087741d92d6529f86391e5e4907f83522c9fc8a39dd5007474d9298cba42f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/glitch-tema/web-intro-vlog.mp4"
+    },
+    {
+      "path": "guia/media/efeonce-apertura_16x9.mp4",
+      "sizeBytes": 218616,
+      "sha256": "934e249936434769505225a70a6104378d1b95488904916a2bdaf3e5aa266399",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-apertura_16x9.mp4"
+    },
+    {
+      "path": "guia/media/efeonce-apertura_9x16.mp4",
+      "sizeBytes": 223285,
+      "sha256": "c713a625782660818d9d5ecc3bda53ea52ebb73cf227661c9701d7954a8cb280",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-apertura_9x16.mp4"
+    },
+    {
+      "path": "guia/media/efeonce-cierre-energia-brian.mp3",
+      "sizeBytes": 144525,
+      "sha256": "00da38de78207c74ef0537f66427488e25043fd4543f87f8f783725415816fc9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-cierre-energia-brian.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-cierre-energia.mp3",
+      "sizeBytes": 144525,
+      "sha256": "0fbc2dbcbec3d4d820d924c9a8cecda58ad4df835e1776efbe3ae9b9d929c9f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-cierre-energia.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-etiqueta-brand-brian.mp3",
+      "sizeBytes": 90765,
+      "sha256": "76d999011ecf9ffaeb76405002134d8d9141fb873c8f5e82fea2119efbf6ef0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-etiqueta-brand-brian.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-etiqueta-engine-brian.mp3",
+      "sizeBytes": 91437,
+      "sha256": "264f9af546d2fa0dbb186817a2fb1e27d9a1f7ccdb3f979d5e7b901c70d77a4e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-etiqueta-engine-brian.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-etiqueta-growth-brian.mp3",
+      "sizeBytes": 89421,
+      "sha256": "0fd700cb9b0f363a1b88f2d7cd1f91d9f67916fb6efe351b72733f1bdc7abd28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-etiqueta-growth-brian.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-etiqueta-revenue-brian.mp3",
+      "sizeBytes": 90093,
+      "sha256": "0df86af2f6e4067be61a12022fe38cf47de0941f3617ce8cdb9ac47f9b290bd6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-etiqueta-revenue-brian.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-etiqueta-voice-brian.mp3",
+      "sizeBytes": 92109,
+      "sha256": "cf8743b7b255734babb19222b301b5d91d18eb0c902bc765b52e75b880fb78c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-etiqueta-voice-brian.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-logo-sonoro-brand.mp3",
+      "sizeBytes": 82701,
+      "sha256": "0a887e4c41fad02216551648b387e5f44987e26a188623bb07f47d5ef00e4ccf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-logo-sonoro-brand.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-logo-sonoro-engine.mp3",
+      "sizeBytes": 82701,
+      "sha256": "7cd6c22bd35444d12d84cb0662c50f44f23e4a0d09bcfa4a8af2bf6343db06b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-logo-sonoro-engine.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-logo-sonoro-growth.mp3",
+      "sizeBytes": 82701,
+      "sha256": "84b5dce3ba39a2498634600b597dc650a4376a9eb97caf516b9e3372e7dcf26b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-logo-sonoro-growth.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-logo-sonoro-revenue.mp3",
+      "sizeBytes": 82701,
+      "sha256": "414ddfab5429da062e8593a28f1f1f86f278f4c0570f5296b6e254cb8d69cb20",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-logo-sonoro-revenue.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-logo-sonoro-voice.mp3",
+      "sizeBytes": 82701,
+      "sha256": "c40b9ce922a2b807eee84209d28706aa8cf13327f193e1d3fb99d38277eaeb72",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-logo-sonoro-voice.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-pieza-larga-energia-brian.mp3",
+      "sizeBytes": 1037613,
+      "sha256": "29c65521a85c2ed29c8b2293dae6e41e8acc583d9fbfb5a8916ac87c7367f129",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-pieza-larga-energia-brian.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-pieza-larga-energia.mp3",
+      "sizeBytes": 1037613,
+      "sha256": "49e31313b85402fdd1e6ea001609bee934d23020f5b94ff2b34901df4835419e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-pieza-larga-energia.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-pieza-larga-fondo-brian.mp3",
+      "sizeBytes": 1135725,
+      "sha256": "1480bebe2110114a3f23ba5ecfa45ae3a1f740540169b283175772568e97ba27",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-pieza-larga-fondo-brian.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-pieza-larga-fondo.mp3",
+      "sizeBytes": 1135725,
+      "sha256": "0751dd81480d94208aad6c61d32affdf4d0f8d4bb71367f7d8cac06acd5eb9c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-pieza-larga-fondo.mp3"
+    },
+    {
+      "path": "guia/media/efeonce-reveal_16x9.mp4",
+      "sizeBytes": 239050,
+      "sha256": "bce7842fb1a9f4d8820537209cdf3ee9eda1a0ade0c73d0d9c2657fb010c0da0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-reveal_16x9.mp4"
+    },
+    {
+      "path": "guia/media/efeonce-reveal_9x16.mp4",
+      "sizeBytes": 254655,
+      "sha256": "2212dfbe9f876f02ed9043664ab19aeb42c46385b164b6ebd27947dc3092ba69",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-reveal_9x16.mp4"
+    },
+    {
+      "path": "guia/media/efeonce-reveal-brian_16x9.mp4",
+      "sizeBytes": 239555,
+      "sha256": "1ebc6a95471e4e98b1c8b6bb963c20f190d66d9a6b8447f9f0c2be50f9f5afa0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-reveal-brian_16x9.mp4"
+    },
+    {
+      "path": "guia/media/efeonce-reveal-brian_9x16.mp4",
+      "sizeBytes": 255160,
+      "sha256": "cef1041585c9095a7c182a7272c76d67035385b367fd64d65c85ff6ee563f684",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-reveal-brian_9x16.mp4"
+    },
+    {
+      "path": "guia/media/efeonce-sting_16x9.mp4",
+      "sizeBytes": 152474,
+      "sha256": "5f4275a7b96161baed8d298faa6ef489ef7af6816660dc06f97b2c60341f8e8f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-sting_16x9.mp4"
+    },
+    {
+      "path": "guia/media/efeonce-sting_9x16.mp4",
+      "sizeBytes": 158505,
+      "sha256": "8a80404156a9eebd953b6432fb2d308a561261b7843090359f533da48bf27e5b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/guia/media/efeonce-sting_9x16.mp4"
+    },
+    {
+      "path": "lineas/puntos-brand.wav",
+      "sizeBytes": 835244,
+      "sha256": "df82bec97f39a6d2f238c622d7826eb6efc11d05a788009633670e5b8d8531ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/lineas/puntos-brand.wav"
+    },
+    {
+      "path": "lineas/puntos-engine.wav",
+      "sizeBytes": 835244,
+      "sha256": "81300b93c20e075b20389a7c4cd461d4e4e505f740824e5cbc6560cd98c88e4f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/lineas/puntos-engine.wav"
+    },
+    {
+      "path": "lineas/puntos-growth.wav",
+      "sizeBytes": 835244,
+      "sha256": "9d8b961421ad9258b5968deae9df389161274ab0877dcb48dc7de0db522e196b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/lineas/puntos-growth.wav"
+    },
+    {
+      "path": "lineas/puntos-revenue.wav",
+      "sizeBytes": 835244,
+      "sha256": "1d8fbe0a55e870a61b4c165ea8dadb4ea53409f2d7c0404a63566befd1806b17",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/lineas/puntos-revenue.wav"
+    },
+    {
+      "path": "lineas/puntos-voice.wav",
+      "sizeBytes": 835244,
+      "sha256": "0b2a1edeea7e81e8af5492229413ebe85e43d6fd7344eba97c1fba70525b2f64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/lineas/puntos-voice.wav"
+    },
+    {
+      "path": "qa/cierre-brian-spec.png",
+      "sizeBytes": 658524,
+      "sha256": "51cac6ce0fd5dbe018ef9d0627c48b2b7dc53c28de18863676f303f60247dc2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/cierre-brian-spec.png"
+    },
+    {
+      "path": "qa/glitch-intro-spec.png",
+      "sizeBytes": 506794,
+      "sha256": "8df72034685ba317ca81db35e46f3ae2eb9bf74924a90cf059c2bf6827b5d883",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/glitch-intro-spec.png"
+    },
+    {
+      "path": "qa/larga-el-high-spec.png",
+      "sizeBytes": 793527,
+      "sha256": "98d79cdee9f285e3876533b91aa1eb684b185d6531bc8121def4e542f2247608",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/larga-el-high-spec.png"
+    },
+    {
+      "path": "qa/larga-el-xhigh-spec.png",
+      "sizeBytes": 785115,
+      "sha256": "e34f8b22d39b404c84b3f931869fc97ffff47fe5ef36748e771f1a6f0e88dcdd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/larga-el-xhigh-spec.png"
+    },
+    {
+      "path": "qa/larga-sa50-spec.png",
+      "sizeBytes": 834164,
+      "sha256": "0e0d532656d1460014357b2974593e31cdf43ff2bacc173946cd14ad0794a647",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/larga-sa50-spec.png"
+    },
+    {
+      "path": "qa/larga-sa70-spec.png",
+      "sizeBytes": 847177,
+      "sha256": "5fdac80d15bfe9384299001be40fe4c5a7acc20b984813caa1886c0ecdd8f173",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/larga-sa70-spec.png"
+    },
+    {
+      "path": "qa/larga-spec.png",
+      "sizeBytes": 703991,
+      "sha256": "6c7c543d6191d78a6551803431fbe2048bdeaa5305d6d33dc9038c44b177f80d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/larga-spec.png"
+    },
+    {
+      "path": "qa/open-spec.png",
+      "sizeBytes": 534838,
+      "sha256": "d89b2a54c9049fd210a31b72df0cb225050c5fdc5d61ee915c8547b3e77b40ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/open-spec.png"
+    },
+    {
+      "path": "qa/orbita-logo-spec.png",
+      "sizeBytes": 617093,
+      "sha256": "98673733653270c1441d1ddcb06a9ef5871179164723e7f1ca275afc21d98577",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/orbita-logo-spec.png"
+    },
+    {
+      "path": "qa/orbita-sting-spec.png",
+      "sizeBytes": 694530,
+      "sha256": "0ab448aadb65c3eb156085cbb194ed6f0d304db46269b7a3779b2752c3cbb15b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/orbita-sting-spec.png"
+    },
+    {
+      "path": "qa/puntos-logo-spec.png",
+      "sizeBytes": 609403,
+      "sha256": "690fb6cd0870ffab336755a2fa763ccbc6cba182c4fa15ea265a8ac144178de7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/puntos-logo-spec.png"
+    },
+    {
+      "path": "qa/puntos-logo-wave.png",
+      "sizeBytes": 4925,
+      "sha256": "14a2d4e24b241c62719bf57c75d071748becdb343556123b2e741b5ffeaf4f76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/puntos-logo-wave.png"
+    },
+    {
+      "path": "qa/reveal-brian-spec.png",
+      "sizeBytes": 746613,
+      "sha256": "a3a57170061480bb80db2bff2ea64fa062186c816e330cec9130ca12f93259b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/reveal-brian-spec.png"
+    },
+    {
+      "path": "qa/rock-larga-spec.png",
+      "sizeBytes": 841381,
+      "sha256": "e02f0ef99f56fe1badfa34e50c5e82ae057d2297cdaa0a7cd525eb0af876a86d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/rock-larga-spec.png"
+    },
+    {
+      "path": "qa/voice-cuerda-spec.png",
+      "sizeBytes": 426808,
+      "sha256": "9245c47df23a5702e52d9c5de0ad1e78e5e26aa7fbdfa821f66e1cc3c603c6aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/qa/voice-cuerda-spec.png"
+    },
+    {
+      "path": "referencia/9x16/efeonce-orbita-apertura_9x16_navy_30fps.mp4",
+      "sizeBytes": 690595,
+      "sha256": "ba83c1563499add8c955f1a4fa6d22b4b28d96eaa50588aeccc6f683c146d710",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/referencia/9x16/efeonce-orbita-apertura_9x16_navy_30fps.mp4"
+    },
+    {
+      "path": "referencia/9x16/efeonce-orbita-reveal_9x16_navy_30fps.mp4",
+      "sizeBytes": 785441,
+      "sha256": "791d662077966778f82c2853cba6843f2cec18d3c9f5b32a0cd8e31c5326178b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/referencia/9x16/efeonce-orbita-reveal_9x16_navy_30fps.mp4"
+    },
+    {
+      "path": "referencia/9x16/efeonce-orbita-sting_9x16_navy_30fps.mp4",
+      "sizeBytes": 516859,
+      "sha256": "a5ddada2a9cb7acaee252d91e33f484a8b64dcf1605a657474d896f49f4f3b64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/referencia/9x16/efeonce-orbita-sting_9x16_navy_30fps.mp4"
+    },
+    {
+      "path": "referencia/efeonce-orbita-apertura_16x9_navy_30fps.mp4",
+      "sizeBytes": 666006,
+      "sha256": "777bbcaead6e3955d2be6ea0ef286af9a37ef76ed0eed528ad3d99b9d5941956",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/referencia/efeonce-orbita-apertura_16x9_navy_30fps.mp4"
+    },
+    {
+      "path": "referencia/efeonce-orbita-reveal_16x9_navy_30fps.mp4",
+      "sizeBytes": 727084,
+      "sha256": "ea46148a260db91b7946bbc14e5953f22f28cf08e839eac97ee4d27720c30099",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/referencia/efeonce-orbita-reveal_16x9_navy_30fps.mp4"
+    },
+    {
+      "path": "referencia/efeonce-orbita-sting_16x9_navy_30fps.mp4",
+      "sizeBytes": 494539,
+      "sha256": "b53e10ed38b6da044b83f430bb0901e22f514817806b772202c01d87e06a6bcb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/referencia/efeonce-orbita-sting_16x9_navy_30fps.mp4"
+    },
+    {
+      "path": "rock/ai/glitch-cortina-sa50.wav",
+      "sizeBytes": 365902,
+      "sha256": "69a0936c7e1e37544d372657d3330530c3d0063b762a81132aa5a75bbd6091dc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/ai/glitch-cortina-sa50.wav"
+    },
+    {
+      "path": "rock/ai/glitch-intro-sa50.wav",
+      "sizeBytes": 1424302,
+      "sha256": "97f7dfdc5c2fe5d4aef0459b056e63262413b64530a013b0bd9304c3b22e928e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/ai/glitch-intro-sa50.wav"
+    },
+    {
+      "path": "rock/ai/glitch-outro-sa50.wav",
+      "sizeBytes": 1071502,
+      "sha256": "1da95623d116fee099562ddd9bc7b8686ceb91b95a5d46ab98466414c6fd63e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/ai/glitch-outro-sa50.wav"
+    },
+    {
+      "path": "rock/ai/larga-el-high.mp3",
+      "sizeBytes": 888813,
+      "sha256": "ed8334ff4f7b221a6ff3e04054a827eea188ff56273ed740e6eca6f8cbf300cc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/ai/larga-el-high.mp3"
+    },
+    {
+      "path": "rock/ai/larga-el-xhigh.mp3",
+      "sizeBytes": 888813,
+      "sha256": "1d16329f5f0377d67d8af3a3d53723a512a58eec58c1da1e8a2ab70d143f2e36",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/ai/larga-el-xhigh.mp3"
+    },
+    {
+      "path": "rock/ai/larga-sa50.wav",
+      "sizeBytes": 6539902,
+      "sha256": "f5d62adeec9d9d98ccb280f9d7e52c24c85f32f917272ec51377d1fdb4202848",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/ai/larga-sa50.wav"
+    },
+    {
+      "path": "rock/ai/larga-sa70.wav",
+      "sizeBytes": 6539902,
+      "sha256": "07e57f56dfab5c848c410a0dbd89abf6544a77670beee05d57b9d4a7fe796411",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/ai/larga-sa70.wav"
+    },
+    {
+      "path": "rock/maqueta-glitch-cortina.mp3",
+      "sizeBytes": 85293,
+      "sha256": "404785cb7a69f44aed9c86431e81de9d161412a9067460ac85753994a3fe3697",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/maqueta-glitch-cortina.mp3"
+    },
+    {
+      "path": "rock/maqueta-glitch-cortina.wav",
+      "sizeBytes": 748844,
+      "sha256": "0df39bcd81b593564dc1bddf7a1e944f571480343e9f19f38ce404d300fe59cc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/maqueta-glitch-cortina.wav"
+    },
+    {
+      "path": "rock/maqueta-glitch-intro.mp3",
+      "sizeBytes": 274221,
+      "sha256": "afb5cb9bd6b12167bae393531cb802d38126955b72cc6bbe390364dce91fadf2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/maqueta-glitch-intro.mp3"
+    },
+    {
+      "path": "rock/maqueta-glitch-intro.wav",
+      "sizeBytes": 2448044,
+      "sha256": "8b6f77d84cc4e6ff7050415a4223e36f3316cc875684aa469e6990c403824be1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/maqueta-glitch-intro.wav"
+    },
+    {
+      "path": "rock/maqueta-glitch-outro.mp3",
+      "sizeBytes": 209709,
+      "sha256": "5b03e0b1bce064918ab841e9a3e990fff7c332f20e853b67da6d51d706a53b29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/maqueta-glitch-outro.mp3"
+    },
+    {
+      "path": "rock/maqueta-glitch-outro.wav",
+      "sizeBytes": 1872044,
+      "sha256": "95a4ed270607275e5174e953e1f4deede552ee5fc044ec6e08924a8908183c14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/maqueta-glitch-outro.wav"
+    },
+    {
+      "path": "rock/maqueta-larga.mp3",
+      "sizeBytes": 1185837,
+      "sha256": "6679a18d77899f1b95ffec428f861cafb9f630ff5358ef170e54312470d0cf14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/maqueta-larga.mp3"
+    },
+    {
+      "path": "rock/maqueta-larga.wav",
+      "sizeBytes": 10656044,
+      "sha256": "82070d2592b5edfaeda8c2b7970d70a48da0544cd0d85ebf6a4ed68fb197ccea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/maqueta-larga.wav"
+    },
+    {
+      "path": "rock/master/glitch-cortina.wav",
+      "sizeBytes": 576102,
+      "sha256": "839fcb274c09f79e6a08d3eb3c744673a018eb4a336910acad9cb547494a9f61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/master/glitch-cortina.wav"
+    },
+    {
+      "path": "rock/master/glitch-intro.wav",
+      "sizeBytes": 2304102,
+      "sha256": "ffdeea86e7a566ca0ad09adba50f1edc8ffd2cb799fed219ca231f871a75a9d7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/master/glitch-intro.wav"
+    },
+    {
+      "path": "rock/master/glitch-outro-brian.wav",
+      "sizeBytes": 1728102,
+      "sha256": "4451b65593406e9c4b9c300fe5e4e146af9fd18b2f1adfb3cedd26cf7693382b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/master/glitch-outro-brian.wav"
+    },
+    {
+      "path": "rock/master/glitch-outro.wav",
+      "sizeBytes": 1728102,
+      "sha256": "19e53186ee4d81c91ccddd80226f253827f24a95c6ce7cb263cf3074a9daacaa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/master/glitch-outro.wav"
+    },
+    {
+      "path": "rock/master/larga-hibrido.wav",
+      "sizeBytes": 10656102,
+      "sha256": "c0ad4506f39941775dc4778db4c33a1a6c2c9a459b31763bec1a12254dd92450",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/master/larga-hibrido.wav"
+    },
+    {
+      "path": "rock/master/larga-sa50.wav",
+      "sizeBytes": 10656102,
+      "sha256": "0f2b24f44cea47090ddd41a64cf62e34ac436643588ba99339a3f9e8c23132dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/master/larga-sa50.wav"
+    },
+    {
+      "path": "rock/master/larga-sa70-brian.wav",
+      "sizeBytes": 10656102,
+      "sha256": "48c4ad72422e302f860ff760e24c1c477dcd19a5bb8e64bfa120dead20ecdcca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/master/larga-sa70-brian.wav"
+    },
+    {
+      "path": "rock/master/larga-sa70.wav",
+      "sizeBytes": 10656102,
+      "sha256": "1b23b0a1801f78290a46ff0243173a8493ad38fd286f13e55ee232cab4a7f4f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/master/larga-sa70.wav"
+    },
+    {
+      "path": "rock/mix/glitch-cortina.wav",
+      "sizeBytes": 576102,
+      "sha256": "f23f20c642531bdb2cf7c8d05ff8937c1d1c7f7c893aa678564563a817f267b1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/glitch-cortina.wav"
+    },
+    {
+      "path": "rock/mix/glitch-intro.wav",
+      "sizeBytes": 2304102,
+      "sha256": "ed625c5cddd08d33014d977c4c69f7e670dc8627071bfa60f87a7cabf9f9bf68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/glitch-intro.wav"
+    },
+    {
+      "path": "rock/mix/glitch-outro-brian.wav",
+      "sizeBytes": 1728102,
+      "sha256": "e82cc176b10977a60b147cf900f19dfd3b495ffdc6f6d620b4f8f900ce42529c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/glitch-outro-brian.wav"
+    },
+    {
+      "path": "rock/mix/glitch-outro.wav",
+      "sizeBytes": 1728102,
+      "sha256": "aa77ca653592e2e2ae738f6868fe6f525506e8360b839610aaf68e336b93e268",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/glitch-outro.wav"
+    },
+    {
+      "path": "rock/mix/larga-hibrido-base.wav",
+      "sizeBytes": 10656102,
+      "sha256": "4bdd284a477ef7932bf72a89ce055c5dcdd47d5f6f161e4c026a51b175673a64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/larga-hibrido-base.wav"
+    },
+    {
+      "path": "rock/mix/larga-hibrido.wav",
+      "sizeBytes": 10656102,
+      "sha256": "7121abe7b3caaae8bada608b9648b896a938f8881e28c5ec2ebf08bf45bae38f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/larga-hibrido.wav"
+    },
+    {
+      "path": "rock/mix/larga-sa50.wav",
+      "sizeBytes": 10656102,
+      "sha256": "cce19169907547c61048196ba6b187a628d4b2780fe2155d8ee41abb14e0cbdd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/larga-sa50.wav"
+    },
+    {
+      "path": "rock/mix/larga-sa70-brian.wav",
+      "sizeBytes": 10656102,
+      "sha256": "9226d2a99865d28770dd18c18bb69215249a44ce2b2a9c1d767e77a2a9ba0241",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/larga-sa70-brian.wav"
+    },
+    {
+      "path": "rock/mix/larga-sa70.wav",
+      "sizeBytes": 10656102,
+      "sha256": "04ba01522eb29b4354dc303dc9b010ce524698d72d632d1db788f199cda0c475",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/larga-sa70.wav"
+    },
+    {
+      "path": "rock/mix/sello-glitch-cortina.wav",
+      "sizeBytes": 576044,
+      "sha256": "f3632dc2930af09d2b03b40e1006dfa3dae5b2b08f9879fc5d34b52be745c1c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/sello-glitch-cortina.wav"
+    },
+    {
+      "path": "rock/mix/sello-glitch-intro.wav",
+      "sizeBytes": 2304044,
+      "sha256": "e2fce597234b2fad7e61fe3208ec5637d0713e5f81e5a6e13131b751d61d870e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/sello-glitch-intro.wav"
+    },
+    {
+      "path": "rock/mix/sello-glitch-outro.wav",
+      "sizeBytes": 1728044,
+      "sha256": "8444e543521f228aa088c1c046e92b737497b6b77f42f2a5800b659ee33546d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/sello-glitch-outro.wav"
+    },
+    {
+      "path": "rock/mix/sello-larga.wav",
+      "sizeBytes": 10656044,
+      "sha256": "7ab4f4f8bdc4b93c9a0803d000ef9a6e231c323598f2536ef24c336d5902dc94",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/rock/mix/sello-larga.wav"
+    },
+    {
+      "path": "ronda2/apertura-puntos.mp4",
+      "sizeBytes": 573766,
+      "sha256": "de1bd59331a087919757e78c1c0c97f613cd7db5d3fcd88db034601925c2fbc9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/apertura-puntos.mp4"
+    },
+    {
+      "path": "ronda2/open-puntos-norm.wav",
+      "sizeBytes": 979302,
+      "sha256": "f5f423084a0b678c618c01fec03530351460628c33adbb5e296dab9b0718b1a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/open-puntos-norm.wav"
+    },
+    {
+      "path": "ronda2/open-puntos.wav",
+      "sizeBytes": 979244,
+      "sha256": "4988325ff698b371c2765fad518c90ad54593d4cc654ab2dddd45aa5998b1547",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/open-puntos.wav"
+    },
+    {
+      "path": "ronda2/reveal-puntos-bed-voz.wav",
+      "sizeBytes": 1324844,
+      "sha256": "87808450faac093ebea2c132113fee91499597bd0049c4ea0dbd4709f59f1c2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/reveal-puntos-bed-voz.wav"
+    },
+    {
+      "path": "ronda2/reveal-puntos-brian.mp4",
+      "sizeBytes": 599538,
+      "sha256": "4bf352d044c6edbd2979e3eda63ac417809546fc6450172d1dc90011df15f4e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/reveal-puntos-brian.mp4"
+    },
+    {
+      "path": "ronda2/reveal-puntos-brian.wav",
+      "sizeBytes": 1324902,
+      "sha256": "12b4bed7a18ec9bdff0e08bcb84f1722803f5fa94ea8af5d0e13c98a04d42d6f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/reveal-puntos-brian.wav"
+    },
+    {
+      "path": "ronda2/reveal-puntos-norm.wav",
+      "sizeBytes": 1324902,
+      "sha256": "8aeceb4a655f235e85b80370b422b6769c55be20ffca7c2303a20865d610c04c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/reveal-puntos-norm.wav"
+    },
+    {
+      "path": "ronda2/reveal-puntos.mp4",
+      "sizeBytes": 598389,
+      "sha256": "43e1cea889433aad2a426822c887e1f4740d97dd8c50d33470c5e0b8df6a17d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/reveal-puntos.mp4"
+    },
+    {
+      "path": "ronda2/reveal-puntos.wav",
+      "sizeBytes": 1324844,
+      "sha256": "ae0d2c1ec972f86ab0d9e537d6e45f214b9b244610f446df9d017b62e9884e06",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/reveal-puntos.wav"
+    },
+    {
+      "path": "ronda2/voice-cuerda.wav",
+      "sizeBytes": 835244,
+      "sha256": "97b64c77311adfdecae2084dedabad387d322055afdbc3b8be47008183ad4c7a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/voice-cuerda.wav"
+    },
+    {
+      "path": "ronda2/voice-eco.wav",
+      "sizeBytes": 835244,
+      "sha256": "0b2a1edeea7e81e8af5492229413ebe85e43d6fd7344eba97c1fba70525b2f64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/voice-eco.wav"
+    },
+    {
+      "path": "ronda2/voice-pulso.wav",
+      "sizeBytes": 835244,
+      "sha256": "7c1ac267decba6f39ed59fce3edc833e5a2fdf77e94cf1d24b5689f1d4f4b5a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda2/voice-pulso.wav"
+    },
+    {
+      "path": "ronda4/glitch-cortina.wav",
+      "sizeBytes": 691244,
+      "sha256": "bda14d4114aa7d97b76b2eb5ba0144602737bd67b85fd5a7fb94332a0a176754",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/glitch-cortina.wav"
+    },
+    {
+      "path": "ronda4/glitch-intro.wav",
+      "sizeBytes": 2448044,
+      "sha256": "212358fe5e33dcc70bc0d5cbefaa88cf0ee1e5d5fbea785f8c5aa8736d93ec09",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/glitch-intro.wav"
+    },
+    {
+      "path": "ronda4/glitch-outro-brian-raw.wav",
+      "sizeBytes": 1872102,
+      "sha256": "2bef73feb3aee0e17afd2786dc6c809ddefce08e1817ecc8b0d5c0e75228b9aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/glitch-outro-brian-raw.wav"
+    },
+    {
+      "path": "ronda4/glitch-outro.wav",
+      "sizeBytes": 1872044,
+      "sha256": "82b3dda9e4cfbf759b0917bae07eb196f173d86b0bed2955eb5fe24e8de09389",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/glitch-outro.wav"
+    },
+    {
+      "path": "ronda4/larga-brian-raw.wav",
+      "sizeBytes": 11664102,
+      "sha256": "f11a0dd31c0209078673ebeaf614abafe492d8497dc12c5fac52449e63bfead1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/larga-brian-raw.wav"
+    },
+    {
+      "path": "ronda4/larga.wav",
+      "sizeBytes": 11664044,
+      "sha256": "91fdcc255adba0c23bd2ab50690360b4a54bf1f0e8e3d2ab42a9597933bc5fad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/larga.wav"
+    },
+    {
+      "path": "ronda4/master/glitch-cortina.wav",
+      "sizeBytes": 691302,
+      "sha256": "2fd0ca8a4e5acd783093e8211734e8e2a581822cbe677cc7e5e2df847595b0fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/master/glitch-cortina.wav"
+    },
+    {
+      "path": "ronda4/master/glitch-intro.wav",
+      "sizeBytes": 2448102,
+      "sha256": "2838b29514f8c132b61dccffa4865264845c21e27b297a1c3e0b4f6b15790b57",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/master/glitch-intro.wav"
+    },
+    {
+      "path": "ronda4/master/glitch-outro-brian.wav",
+      "sizeBytes": 1872102,
+      "sha256": "a762667c55580d28222ae3bcd43c265d83346e2f297493bee8a63a261915dc6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/master/glitch-outro-brian.wav"
+    },
+    {
+      "path": "ronda4/master/glitch-outro.wav",
+      "sizeBytes": 1872102,
+      "sha256": "9d6cf5664ff1ec4a22dedcb02e2885e8f6cc3104fa9278c7dbd812fdef5d5a89",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/master/glitch-outro.wav"
+    },
+    {
+      "path": "ronda4/master/larga-brian.wav",
+      "sizeBytes": 11664102,
+      "sha256": "78e73adbdb4d401c3d2a53389b1a32dead18a4781d76b75e142d634d02c3e9e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/master/larga-brian.wav"
+    },
+    {
+      "path": "ronda4/master/larga.wav",
+      "sizeBytes": 11664102,
+      "sha256": "a15e07b75a39ebc73cbb7e8f59f24ab956457848da61ca6e0f9bbb7813847717",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/ronda4/master/larga.wav"
+    },
+    {
+      "path": "sting/orbita-sting.wav",
+      "sizeBytes": 633644,
+      "sha256": "e95e36d6ddbdd4c80a21127b27250a6460e266b640ab00f25b16beb672965aa0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/sting/orbita-sting.wav"
+    },
+    {
+      "path": "sting/pregunta-sting.wav",
+      "sizeBytes": 633644,
+      "sha256": "ba283db0d28c7d0f2597d99d484c2fbcec213b89f6b8295e0629c92c8fe17a85",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/sting/pregunta-sting.wav"
+    },
+    {
+      "path": "sting/puntos-sting.wav",
+      "sizeBytes": 633644,
+      "sha256": "b716518aca11b305cfcf6230057866592ab14e8bcfd52bfe0f9269a18204bdb3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/sting/puntos-sting.wav"
+    },
+    {
+      "path": "sting/sting-orbita.mp4",
+      "sizeBytes": 406757,
+      "sha256": "41f82d04dde456b4e83542187b198fca83e01dee0e6fc038c9551263b4aa028f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/sting/sting-orbita.mp4"
+    },
+    {
+      "path": "sting/sting-pregunta.mp4",
+      "sizeBytes": 407692,
+      "sha256": "4497a19e23de71c1792c4d8bf396ecee852bca801aa767f676942894be262567",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/sting/sting-pregunta.mp4"
+    },
+    {
+      "path": "sting/sting-puntos.mp4",
+      "sizeBytes": 406764,
+      "sha256": "34e72892aef3a262746046fd0124ce91cf3734b257c33ae37462569296786422",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/sting/sting-puntos.mp4"
+    },
+    {
+      "path": "voz/brand-brian.mp3",
+      "sizeBytes": 25122,
+      "sha256": "fa119c42b285c4257db116692a9eebedbf8b33768e69c840305443bf345a86ba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/brand-brian.mp3"
+    },
+    {
+      "path": "voz/conector/growth-brian-premade-nPczCjzI2devNBz1zQrb.mp3",
+      "sizeBytes": 44883,
+      "sha256": "6e7b9b5ad398fb450f65ee24702d962596986a670523a4a655c837dd0b300324",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/conector/growth-brian-premade-nPczCjzI2devNBz1zQrb.mp3"
+    },
+    {
+      "path": "voz/engine-brian.mp3",
+      "sizeBytes": 28884,
+      "sha256": "722b2fecf1dbc3f2a819e4858037482348c2999a61d251534ae032a6ee59118e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/engine-brian.mp3"
+    },
+    {
+      "path": "voz/engine-t2-brian.mp3",
+      "sizeBytes": 25122,
+      "sha256": "9091713b21734b8fe47b758aec9529d5ae3de8ea8abc442c989e72c981a38942",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/engine-t2-brian.mp3"
+    },
+    {
+      "path": "voz/engine-t3-brian.mp3",
+      "sizeBytes": 23868,
+      "sha256": "d662efe698e88972c04944b1cb8da819523c0187143f7591e1f2ac1f63a677e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/engine-t3-brian.mp3"
+    },
+    {
+      "path": "voz/final/brand.mp3",
+      "sizeBytes": 38061,
+      "sha256": "e5154d3278372fc3700eaaf2423cea11d118b03c4cde6e9bdbf9d2a58199acd3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/brand.mp3"
+    },
+    {
+      "path": "voz/final/brand.wav",
+      "sizeBytes": 439980,
+      "sha256": "c8b48ae56608aee3cb3f6c9d0f3bcbbbd61e2aecb26102cdcb1cd61d80d006d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/brand.wav"
+    },
+    {
+      "path": "voz/final/engine.mp3",
+      "sizeBytes": 35757,
+      "sha256": "b5686ba18f85465553cb93d15251f724f7e4f411612562ad71aaac333559f4b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/engine.mp3"
+    },
+    {
+      "path": "voz/final/engine.wav",
+      "sizeBytes": 411654,
+      "sha256": "69c2eb36c0329fe0fec34d8c5db385d7efa0c34f4d0e888123c3d911a739be66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/engine.wav"
+    },
+    {
+      "path": "voz/final/growth.mp3",
+      "sizeBytes": 35181,
+      "sha256": "46706e71adda6c4a3c4362f04df81b80ebd1bbd5794af857d7fc76dc3960ce72",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/growth.mp3"
+    },
+    {
+      "path": "voz/final/growth.wav",
+      "sizeBytes": 406362,
+      "sha256": "c249897ed137f9616ecb182971fd172376c29568de367a88eafea3c744738dd9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/growth.wav"
+    },
+    {
+      "path": "voz/final/revenue.mp3",
+      "sizeBytes": 38061,
+      "sha256": "d281344bf432f973bc5ede95a68f5636bfbb4c1ec0508d8c9d096c433de128f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/revenue.mp3"
+    },
+    {
+      "path": "voz/final/revenue.wav",
+      "sizeBytes": 439980,
+      "sha256": "d95d6a24b97c4e6e08797492fec1d9f50ca02a51687f1ee284130712381c1327",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/revenue.wav"
+    },
+    {
+      "path": "voz/final/voice.mp3",
+      "sizeBytes": 37485,
+      "sha256": "b903d7ada976f7f45a4f5462b2bbc364f8f9adb9831d9c55b9a719b3edf92b74",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/voice.mp3"
+    },
+    {
+      "path": "voz/final/voice.wav",
+      "sizeBytes": 433752,
+      "sha256": "fef03e6dfca5d286aefcaab5a712c2c65d0ed828c4b784efd7e93e9f63e9b165",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/final/voice.wav"
+    },
+    {
+      "path": "voz/growth-alice.mp3",
+      "sizeBytes": 25122,
+      "sha256": "8162ef1299f195e7eb9bcb205f44734f6e988879743898626343fe902bc1c6b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/growth-alice.mp3"
+    },
+    {
+      "path": "voz/growth-brian.mp3",
+      "sizeBytes": 22614,
+      "sha256": "4a982cfed197fdabca421c30f0a913eceb44e98be801210dc56237649ad41c26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/growth-brian.mp3"
+    },
+    {
+      "path": "voz/growth-george.mp3",
+      "sizeBytes": 22614,
+      "sha256": "16aac9f4470f6575374d15bdd9e002df6df4198941ed7de729f3b881cd8fa582",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/growth-george.mp3"
+    },
+    {
+      "path": "voz/growth-sarah.mp3",
+      "sizeBytes": 25122,
+      "sha256": "085c13b47330cc0850bbe761f307a1e1dbe471d15deba734caf0181af24bb5a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/growth-sarah.mp3"
+    },
+    {
+      "path": "voz/revenue-brian.mp3",
+      "sizeBytes": 30138,
+      "sha256": "9a5283fb651b999473b0cea83afc7c90bdd7c53b47c67771cac34d3afb19dab9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/revenue-brian.mp3"
+    },
+    {
+      "path": "voz/revenue-t2-brian.mp3",
+      "sizeBytes": 25122,
+      "sha256": "6f215a81f63fbb37649aebaad5bb746f9e618e2ee8f0c6b1ba0e611bcdda32ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/revenue-t2-brian.mp3"
+    },
+    {
+      "path": "voz/revenue-t3-brian.mp3",
+      "sizeBytes": 28884,
+      "sha256": "3dc6691c4f08a36bd8b2e46cade768af496c097c3e09eaad00d159fe0aef3ff0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/revenue-t3-brian.mp3"
+    },
+    {
+      "path": "voz/voice-brian.mp3",
+      "sizeBytes": 30138,
+      "sha256": "843849b7cc7e05fbfd6d31b7411553f11f5b72335a5d39a4676f60362db93bea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/voice-brian.mp3"
+    },
+    {
+      "path": "voz/voice-t2-brian.mp3",
+      "sizeBytes": 26376,
+      "sha256": "6f71990ff17b3ead048e00aaf6097af3eb5f40cb3cac10d24cf40e4e753bbb01",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/voice-t2-brian.mp3"
+    },
+    {
+      "path": "voz/voice-t3-brian.mp3",
+      "sizeBytes": 26376,
+      "sha256": "b11b5f4930b8cc5caae0000669aca13e814abe25806a969b11dce8e1662f5fdc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/voz/voice-t3-brian.mp3"
+    },
+    {
+      "path": "web/apertura-puntos.mp4",
+      "sizeBytes": 573766,
+      "sha256": "11c88fbb44c5a043333bfd1f25b0a12e981d23dcf276be373cb6679e7ccb975d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/apertura-puntos.mp4"
+    },
+    {
+      "path": "web/candidatos-orbita-logo.mp3",
+      "sizeBytes": 94509,
+      "sha256": "c1e9fda1dfb7d143893f6d76024c37d12a81dbcf9bb288efdef501aa6be45d39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/candidatos-orbita-logo.mp3"
+    },
+    {
+      "path": "web/candidatos-pregunta-logo.mp3",
+      "sizeBytes": 94509,
+      "sha256": "c6cc3fb3f9dc759aab7fe3c41953fa6e0f69b9737bea5fd3f7985230351116e3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/candidatos-pregunta-logo.mp3"
+    },
+    {
+      "path": "web/candidatos-puntos-logo.mp3",
+      "sizeBytes": 94509,
+      "sha256": "ccfe764eb2e16a50ca13da9daa622826fe2304ce539ccb268e945c41b176ca96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/candidatos-puntos-logo.mp3"
+    },
+    {
+      "path": "web/cierre-cierre-puntos-alice.mp3",
+      "sizeBytes": 106029,
+      "sha256": "c0df5e92a5caf56c97bb082e562ae1b1dd5b027538a3fceac9fe69b6abd8d681",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/cierre-cierre-puntos-alice.mp3"
+    },
+    {
+      "path": "web/cierre-cierre-puntos-brian.mp3",
+      "sizeBytes": 102189,
+      "sha256": "a02f71f168a338697ce6fa8d3700fd07609de1e20e1fd8c3652ba6566c562389",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/cierre-cierre-puntos-brian.mp3"
+    },
+    {
+      "path": "web/cierre-cierre-puntos-george.mp3",
+      "sizeBytes": 101421,
+      "sha256": "73502c622f25d68790c663d0b402ff71535a7e96126a7481acb2fc65ab89c66b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/cierre-cierre-puntos-george.mp3"
+    },
+    {
+      "path": "web/cierre-cierre-puntos-sarah.mp3",
+      "sizeBytes": 102189,
+      "sha256": "9cb29161cebdb66d51558a9feb3e2cedfe6266ac3c2e4b33aef1a0c46c1e2d01",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/cierre-cierre-puntos-sarah.mp3"
+    },
+    {
+      "path": "web/cierre-linea-brand.mp3",
+      "sizeBytes": 103725,
+      "sha256": "07645be45b6875fe8a7c32674d4bcd2d8238cc6e743ecf1efbbe4c5d1e4d3670",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/cierre-linea-brand.mp3"
+    },
+    {
+      "path": "web/cierre-linea-engine.mp3",
+      "sizeBytes": 104493,
+      "sha256": "37b2e91f7b9e5617f2f0077a9daed67e38ca4722c643a9cc00d665aa7f8cfa72",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/cierre-linea-engine.mp3"
+    },
+    {
+      "path": "web/cierre-linea-growth.mp3",
+      "sizeBytes": 102189,
+      "sha256": "8e9822fb7e6a5c750977cbf0558d7dd8cff2f7f75e6963e2e27bd0fdc81f5ba7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/cierre-linea-growth.mp3"
+    },
+    {
+      "path": "web/cierre-linea-revenue.mp3",
+      "sizeBytes": 102957,
+      "sha256": "4cb4cec680bef64879ff7808ce3bdf5a35581fb19f287080ff99ee113c145fe8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/cierre-linea-revenue.mp3"
+    },
+    {
+      "path": "web/cierre-linea-voice.mp3",
+      "sizeBytes": 105261,
+      "sha256": "5c73a198e54bf9929977a79f61ca79c3b6aee427416ca8767ab14e68586e57ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/cierre-linea-voice.mp3"
+    },
+    {
+      "path": "web/lineas-puntos-brand.mp3",
+      "sizeBytes": 94509,
+      "sha256": "b43b8674579aba9f63a792929e1584bf54eac85a63548dce86e1db52048f90cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/lineas-puntos-brand.mp3"
+    },
+    {
+      "path": "web/lineas-puntos-engine.mp3",
+      "sizeBytes": 94509,
+      "sha256": "c30ab813148ecffd261170f8c61b10667a2999a04b8e0e051c5f9dd3afcf7218",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/lineas-puntos-engine.mp3"
+    },
+    {
+      "path": "web/lineas-puntos-growth.mp3",
+      "sizeBytes": 94509,
+      "sha256": "ccfe764eb2e16a50ca13da9daa622826fe2304ce539ccb268e945c41b176ca96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/lineas-puntos-growth.mp3"
+    },
+    {
+      "path": "web/lineas-puntos-revenue.mp3",
+      "sizeBytes": 94509,
+      "sha256": "571842994893b27363443ff2492ad2f896a7edf27fa76907bb01c079357d776f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/lineas-puntos-revenue.mp3"
+    },
+    {
+      "path": "web/lineas-puntos-voice-eco.mp3",
+      "sizeBytes": 94509,
+      "sha256": "b4ebbebe618641791c1b3285f129c0b7f88a709a11f5b296178fa1e70bea2edf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/lineas-puntos-voice-eco.mp3"
+    },
+    {
+      "path": "web/lineas-puntos-voice.mp3",
+      "sizeBytes": 94509,
+      "sha256": "66a498247a11863f4fc254d2566947f86c75f8161c2b502b711a91be1784b2c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/lineas-puntos-voice.mp3"
+    },
+    {
+      "path": "web/r4-glitch-cortina.mp3",
+      "sizeBytes": 78381,
+      "sha256": "12b745457dd5407c440295fb4c43a291fbd9e8fe5a56db3f1ee6bb57e31123a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/r4-glitch-cortina.mp3"
+    },
+    {
+      "path": "web/r4-glitch-intro.mp3",
+      "sizeBytes": 274221,
+      "sha256": "76d8a79d947fb551dac81a60cb3a8237de528edf2b6b6e736f8479e48ec5ea01",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/r4-glitch-intro.mp3"
+    },
+    {
+      "path": "web/r4-glitch-outro-brian.mp3",
+      "sizeBytes": 209709,
+      "sha256": "dad418f58fbf3ecf70ee6b944f81def7310477ef7c8bc14947c658f58f7073c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/r4-glitch-outro-brian.mp3"
+    },
+    {
+      "path": "web/r4-glitch-outro.mp3",
+      "sizeBytes": 209709,
+      "sha256": "0a392d721dafb786be0d83c01fe2e2d32e1f2c9ac8f1e6a4b7608eeb747fb562",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/r4-glitch-outro.mp3"
+    },
+    {
+      "path": "web/r4-larga-brian.mp3",
+      "sizeBytes": 1297965,
+      "sha256": "6d0701d7e53ad40dede76c0ce3cc30852a84fae7b71026cb429f2f212f02b176",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/r4-larga-brian.mp3"
+    },
+    {
+      "path": "web/r4-larga.mp3",
+      "sizeBytes": 1297965,
+      "sha256": "e5cb0efcaa1e8e6f19866249f6b5550c66f0a12f4184d4a31756b473708f2be0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/r4-larga.mp3"
+    },
+    {
+      "path": "web/reveal-puntos-brian.mp4",
+      "sizeBytes": 599538,
+      "sha256": "4bf352d044c6edbd2979e3eda63ac417809546fc6450172d1dc90011df15f4e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/reveal-puntos-brian.mp4"
+    },
+    {
+      "path": "web/reveal-puntos.mp4",
+      "sizeBytes": 598389,
+      "sha256": "43e1cea889433aad2a426822c887e1f4740d97dd8c50d33470c5e0b8df6a17d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/reveal-puntos.mp4"
+    },
+    {
+      "path": "web/rock-glitch-cortina.mp3",
+      "sizeBytes": 66093,
+      "sha256": "01e2059ed12af1bb715721143045e049516bf297931eb446db7fc96dc77bdb3b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/rock-glitch-cortina.mp3"
+    },
+    {
+      "path": "web/rock-glitch-intro.mp3",
+      "sizeBytes": 258093,
+      "sha256": "6d57f355aef7fb66940ac6dec96fbabf1a51570102a96d548b27457abe5f0484",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/rock-glitch-intro.mp3"
+    },
+    {
+      "path": "web/rock-glitch-outro-brian.mp3",
+      "sizeBytes": 193581,
+      "sha256": "28aedec9f4ec54b9d1f363e6b0cd302cd3c31333b631fa2b877db10a3e876298",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/rock-glitch-outro-brian.mp3"
+    },
+    {
+      "path": "web/rock-glitch-outro.mp3",
+      "sizeBytes": 193581,
+      "sha256": "5de881cdddf5e316bcc2343e8a032f1d9bfcb9a2484e94539c1591b27a497411",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/rock-glitch-outro.mp3"
+    },
+    {
+      "path": "web/rock-larga-hibrido.mp3",
+      "sizeBytes": 1185837,
+      "sha256": "0cf6160323cdff62460307216279db2e77e6d252c3f4e1cedc0d8e3f8ad16357",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/rock-larga-hibrido.mp3"
+    },
+    {
+      "path": "web/rock-larga-sa50.mp3",
+      "sizeBytes": 1185837,
+      "sha256": "eef38ad529923adb523ebfe8ec51884dd08a3aaf3a58dfe7ad9f6d5c276e1847",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/rock-larga-sa50.mp3"
+    },
+    {
+      "path": "web/rock-larga-sa70-brian.mp3",
+      "sizeBytes": 1185837,
+      "sha256": "5a9b98bd704b1484a8109d16a9f43c7019c32d2ab0bbad30a83f23dc16b2f50e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/rock-larga-sa70-brian.mp3"
+    },
+    {
+      "path": "web/rock-larga-sa70.mp3",
+      "sizeBytes": 1185837,
+      "sha256": "beb266e289964fc241d2aac4db8111e4499e4aee4963f495b15b824ac906de81",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/rock-larga-sa70.mp3"
+    },
+    {
+      "path": "web/rock-maqueta-larga.mp3",
+      "sizeBytes": 1185837,
+      "sha256": "6679a18d77899f1b95ffec428f861cafb9f630ff5358ef170e54312470d0cf14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/rock-maqueta-larga.mp3"
+    },
+    {
+      "path": "web/ronda2-voice-cuerda.mp3",
+      "sizeBytes": 94509,
+      "sha256": "3ca5443192cdd91e1791cdf8a91796ce2cc421c551e4e10fe7e8b765cf8d510c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/ronda2-voice-cuerda.mp3"
+    },
+    {
+      "path": "web/ronda2-voice-eco.mp3",
+      "sizeBytes": 94509,
+      "sha256": "b4ebbebe618641791c1b3285f129c0b7f88a709a11f5b296178fa1e70bea2edf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/ronda2-voice-eco.mp3"
+    },
+    {
+      "path": "web/ronda2-voice-pulso.mp3",
+      "sizeBytes": 94509,
+      "sha256": "431e490de9b2df0f9e7fd6d9fcea5b839c8a63ffbbace933d8cade12cdac455b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/ronda2-voice-pulso.mp3"
+    },
+    {
+      "path": "web/sting-orbita.mp4",
+      "sizeBytes": 406757,
+      "sha256": "41f82d04dde456b4e83542187b198fca83e01dee0e6fc038c9551263b4aa028f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/sting-orbita.mp4"
+    },
+    {
+      "path": "web/sting-pregunta.mp4",
+      "sizeBytes": 407692,
+      "sha256": "4497a19e23de71c1792c4d8bf396ecee852bca801aa767f676942894be262567",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/sting-pregunta.mp4"
+    },
+    {
+      "path": "web/sting-puntos.mp4",
+      "sizeBytes": 406764,
+      "sha256": "34e72892aef3a262746046fd0124ce91cf3734b257c33ae37462569296786422",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/sting-puntos.mp4"
+    },
+    {
+      "path": "web/voz-growth-alice.mp3",
+      "sizeBytes": 52269,
+      "sha256": "740f6a05b4a07df9f27b7610acb9a201fe62f248c0576e4e0034f387a86aaf98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/voz-growth-alice.mp3"
+    },
+    {
+      "path": "web/voz-growth-brian.mp3",
+      "sizeBytes": 46893,
+      "sha256": "a04f405c73a7da5fc5d9d4821abe9be2dd94f9e8f8e8fefd02bc57e7b1ef40be",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/voz-growth-brian.mp3"
+    },
+    {
+      "path": "web/voz-growth-george.mp3",
+      "sizeBytes": 46893,
+      "sha256": "e5fa9bcf7408fcfdecc00263e1a5e7289ba5fe1c0d6c9c7aeca3fb28e06a5445",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/voz-growth-george.mp3"
+    },
+    {
+      "path": "web/voz-growth-sarah.mp3",
+      "sizeBytes": 52269,
+      "sha256": "5a44b07e4bca1da4bc3a35ee577c637070d9ef809b682044b643c60d7dab11ba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_branding-sonoro/web/voz-growth-sarah.mp3"
+    }
+  ]
+}

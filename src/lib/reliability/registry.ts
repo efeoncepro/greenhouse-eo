@@ -682,6 +682,30 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     // rechazó evidencia o un adapter caído) y ediciones atascadas en una fase de generación (lag).
     expectedSignalKinds: ['data_quality', 'lag'],
     incidentDomainTag: 'insights'
+  },
+  {
+    moduleKey: 'brand_render',
+    label: 'Render de piezas de marca',
+    description:
+      'Render gobernado de piezas de marca propia (TASK-1921): «La órbita» (piezas y documentos) y ediciones de Glitch. Un pedido por el lane App o la tool MCP se valida contra el contrato AXIS y la receta aprobada, se sella y se encola; el artifact-worker lo compone y guarda las salidas como assets privados. Flag BRAND_RENDER_ENABLED default OFF.',
+    domain: 'platform',
+    routes: [],
+    apis: [
+      { path: '/api/platform/app/brand-render/requests', label: 'Pedidos de render de marca (app lane)' }
+    ],
+    dependencies: [
+      'greenhouse_brand.brand_render_requests',
+      'greenhouse_brand.brand_render_jobs',
+      'greenhouse_brand.brand_render_events',
+      'greenhouse_core.assets (brand_render_source, brand_render_output)',
+      'greenhouse_sync.outbox_events (brand.render.*)',
+      'Cloud Run Job artifact-worker'
+    ],
+    smokeTests: [],
+    filesOwned: ['src/lib/brand-surfaces/production/**', 'services/artifact-worker/consumers/brand-render.ts', 'src/lib/reliability/queries/brand-render-stuck.ts'],
+    // TASK-1921 — una señal steady 0: jobs en cola o en proceso que nadie drena.
+    expectedSignalKinds: ['data_quality'],
+    incidentDomainTag: 'brand_render'
   }
 ]
 

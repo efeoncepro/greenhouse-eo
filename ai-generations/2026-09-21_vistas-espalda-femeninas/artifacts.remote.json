@@ -1,0 +1,113 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:14:03.038Z",
+  "run": "ai-generations/2026-09-21_vistas-espalda-femeninas",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_vistas-espalda-femeninas",
+  "totalBytes": 40374542,
+  "fileCount": 17,
+  "files": [
+    {
+      "path": "out/bomber-puesto-espalda-mujer.png",
+      "sizeBytes": 2175570,
+      "sha256": "dbd4e61b5335c15629fb0715d563dc8cb615ce876b302bf5e12474357c947488",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/bomber-puesto-espalda-mujer.png"
+    },
+    {
+      "path": "out/bomber-puesto-espalda.png",
+      "sizeBytes": 2050006,
+      "sha256": "28cdce55b7b3e29ab653945d7342503f3db36f39be35fe027e97d0c1c64d5f9e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/bomber-puesto-espalda.png"
+    },
+    {
+      "path": "out/bomber-puesto-frente-cuerpo-b.png",
+      "sizeBytes": 2485670,
+      "sha256": "da6a724c899c3a669b20b5c740fd70d4d7df62abdcbe1b3404bff2c08583a7ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/bomber-puesto-frente-cuerpo-b.png"
+    },
+    {
+      "path": "out/hoodie-puesto-espalda-mujer.png",
+      "sizeBytes": 2632549,
+      "sha256": "2111878d4fd3cf4d1fb8eef5d9e33443013d4ff770995ca169bfa33e10060334",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/hoodie-puesto-espalda-mujer.png"
+    },
+    {
+      "path": "out/polo-espalda-lanyard-mujer-v3.png",
+      "sizeBytes": 2588690,
+      "sha256": "af3a45db1d0c7e02e5b072a989e30d137a70d2e771901a7193fd98da1980381a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/polo-espalda-lanyard-mujer-v3.png"
+    },
+    {
+      "path": "out/polo-espalda-lanyard-mujer-v4.png",
+      "sizeBytes": 2695236,
+      "sha256": "2f81a1c45376760e052e5d12d7b95c4eb585ab173b2fde7ff922dd0e5fc8f65f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/polo-espalda-lanyard-mujer-v4.png"
+    },
+    {
+      "path": "out/polo-navy-espalda-lanyard-mujer-v2.png",
+      "sizeBytes": 2636064,
+      "sha256": "e00db7a48b59cb157bc533f3bb4f00856f8f69cf0cdc27a5aabda31a5ac5fca4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/polo-navy-espalda-lanyard-mujer-v2.png"
+    },
+    {
+      "path": "out/polo-navy-espalda-lanyard-mujer.png",
+      "sizeBytes": 2718711,
+      "sha256": "82352bab3b58279e196137718721bc2d251053aced69f713ef2f87f9423a54e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/polo-navy-espalda-lanyard-mujer.png"
+    },
+    {
+      "path": "out/polo-navy-espalda-lanyard-v2.png",
+      "sizeBytes": 2444004,
+      "sha256": "06de5693d2049df9191d73ff80a2501e61f2aa637f69442ba22dbc5a6e4dadcf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/polo-navy-espalda-lanyard-v2.png"
+    },
+    {
+      "path": "out/polo-navy-espalda-lanyard.png",
+      "sizeBytes": 2577855,
+      "sha256": "2ad4a68fb3f6b536cab3deb7d4d34bd84708377fb54866169feef1b9b06b6446",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/polo-navy-espalda-lanyard.png"
+    },
+    {
+      "path": "out/polo-navy-puesto-espalda-mujer.png",
+      "sizeBytes": 2624555,
+      "sha256": "cb92f1fa03542d18a12f708dec7e8e58b53040a9eabbfd25d2746e69a8a35a13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/polo-navy-puesto-espalda-mujer.png"
+    },
+    {
+      "path": "out/softshell-puesto-espalda-mujer.png",
+      "sizeBytes": 2079703,
+      "sha256": "01b09794863326773ebbeb8f92e426fc076d0062211a46cec15f80a3fa0d086b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/out/softshell-puesto-espalda-mujer.png"
+    },
+    {
+      "path": "polo-bordado/blanco-02-espalda.png",
+      "sizeBytes": 1603087,
+      "sha256": "a23d8dea505e5bb7e00034e78d3d3f2974ecd305d7138864854900eedd8529f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/polo-bordado/blanco-02-espalda.png"
+    },
+    {
+      "path": "polo-bordado/navy-02-espalda.png",
+      "sizeBytes": 1726983,
+      "sha256": "3127f31853e64042df35a265af1c1d9b1d41d3799b3ee315c1f27c1b1ea68ab4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/polo-bordado/navy-02-espalda.png"
+    },
+    {
+      "path": "polo-bordado/navy-09-plano-espalda.png",
+      "sizeBytes": 1920002,
+      "sha256": "f576504e24a49d811759bb9b45287f3c259b9b61701ca3a4f6b14106cd0cbbe1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/polo-bordado/navy-09-plano-espalda.png"
+    },
+    {
+      "path": "polo-bordado/navy-14-puesto-espalda.png",
+      "sizeBytes": 2741589,
+      "sha256": "2afb6445ed3daf026236b1ee177eb503c5c93e33901345993eca7d62bed5546d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/polo-bordado/navy-14-puesto-espalda.png"
+    },
+    {
+      "path": "polo-bordado/navy-16-puesto-espalda-mujer.png",
+      "sizeBytes": 2674268,
+      "sha256": "d7bfd495c507c50296db00b9ae9e704627a18a72e349249c9e2174b5b44bd46f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_vistas-espalda-femeninas/polo-bordado/navy-16-puesto-espalda-mujer.png"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-09-28T11:10:10.136612+00:00",
+  "revision": "ops-worker-00732-86r",
+  "traffic": [
+    {
+      "latestRevision": true,
+      "percent": 100,
+      "revisionName": "ops-worker-00732-86r"
+    }
+  ],
+  "conditions": [
+    {
+      "lastTransitionTime": "2026-09-28T10:47:35.707353Z",
+      "status": "True",
+      "type": "Ready"
+    },
+    {
+      "lastTransitionTime": "2026-09-28T10:47:22.384081Z",
+      "status": "True",
+      "type": "ConfigurationsReady"
+    },
+    {
+      "lastTransitionTime": "2026-09-28T10:47:35.675930Z",
+      "status": "True",
+      "type": "RoutesReady"
+    }
+  ],
+  "configuration": {
+    "GROWTH_AI_VISIBILITY_MULTI_MARKET_ENABLED": "false",
+    "GROWTH_AI_VISIBILITY_BATCH_DAILY_BUDGET_USD": "25",
+    "GIT_SHA": "999492e8d328d21b10ea137bebc56b25826e9957"
+  }
+}

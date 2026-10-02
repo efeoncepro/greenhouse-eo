@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
 
+import { z } from 'zod'
+
 import { canonicalErrorResponse, type CanonicalErrorCode } from '@/lib/api/canonical-error-response'
+
+import { marketDomainErrorResponse } from '@/lib/growth/ai-visibility/markets/http'
 import { can } from '@/lib/entitlements/runtime'
-import {
-  requestGraderRunForOrganization,
-  type RequestRunBlockedReason
-} from '@/lib/growth/ai-visibility/request-run'
+import { requestGraderRunForOrganization, type RequestRunBlockedReason } from '@/lib/growth/ai-visibility/request-run'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireClientTenantContext } from '@/lib/tenant/authorization'
 
@@ -38,7 +39,7 @@ const BLOCK_TO_CANONICAL: Record<RequestRunBlockedReason, CanonicalErrorCode> = 
   budget_exhausted: 'aeo_budget_exhausted'
 }
 
-export async function POST() {
+export async function POST(request?: Request) {
   const { tenant, errorResponse } = await requireClientTenantContext()
 
   if (!tenant) {
@@ -63,9 +64,23 @@ export async function POST() {
   }
 
   try {
+    const raw = request ? await request.text() : ''
+
+    const body = z
+      .object({
+        marketId: z.string().min(1).max(120).optional(),
+        idempotencyKey: z.string().min(1).max(200).optional()
+      })
+      .strict()
+      .safeParse(raw.trim() ? JSON.parse(raw) : {})
+
+    if (!body.success) return canonicalErrorResponse('invalid_request')
+
     const result = await requestGraderRunForOrganization({
       organizationId,
-      requestedBy: tenant.userId
+      requestedBy: tenant.userId,
+      marketId: body.data.marketId,
+      idempotencyKey: body.data.idempotencyKey
     })
 
     if (result.status === 'blocked') {
@@ -83,6 +98,11 @@ export async function POST() {
       { status: 202 }
     )
   } catch (error) {
+    if (error instanceof SyntaxError) return canonicalErrorResponse('invalid_request')
+    const domain = marketDomainErrorResponse(error)
+
+    if (domain) return domain
+
     captureWithDomain(error, 'growth', {
       tags: { source: 'growth_ai_visibility_portal_run_route' },
       extra: { organizationId }

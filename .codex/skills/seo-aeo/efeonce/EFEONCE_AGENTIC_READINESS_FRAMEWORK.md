@@ -87,8 +87,8 @@ debajo — así el lead magnet y el pitch comercial hablan el mismo idioma.
 
 | Nivel | Cómo lo mide el grader (dominio `growth.ai_visibility`) |
 |---|---|
-| **01 · Be Found** | Dim. percepción `ai_visibility` + probes técnicos `robots.txt` (acceso GPTBot/PerplexityBot/ClaudeBot/Google-Extended/OAI-SearchBot), `sitemap`, indexación. Cobertura de motores: OpenAI/Anthropic/Perplexity/Gemini + **Google AI Overviews / AI Mode** (TASK-1265). |
-| **02 · Be Readable** | Probes structural readiness: JSON-LD/schema.org, `llms.txt`, answer-capsules/chunking, CWV/render + dim. `entity_clarity` (TASK-1266). |
+| **01 · Be Found** | Dim. percepción `ai_visibility` + probes técnicos `robots.txt` por plataforma y finalidad. Distingue controles de búsqueda/indexación, training/desarrollo y acceso iniciado por usuario; `Google-Extended` no es control de Google Search. Cobertura de motores declarada: OpenAI/Anthropic/Perplexity/Gemini + **Google AI Overviews / AI Mode** (TASK-1265); verificar superficie real por ejecución. |
+| **02 · Be Readable** | Probes de legibilidad estructural: JSON-LD/schema.org cuando aplique, presencia de `llms.txt` solo como dato (no señal de Search), claridad editorial, CWV/render + dim. `entity_clarity` (TASK-1266). No puntuar chunking ni answer capsules como requisitos universales. |
 | **03 · Be Correct** | Accuracy detector: `hallucinated_feature`, `confused_with_competitor`, claims falsos → gate `review_required` (existe en `accuracy/`, TASK-1238). Surface como axis propio = follow-up. |
 | **04 · Be Actionable** | **`agentic_readiness`** — WebMCP tools (Lighthouse `registered-webmcp-tools`), `.well-known/mcp` / API discoverability, DOM semántico/ARIA, `potentialAction`/`SearchAction` (TASK-1266). *El nivel que prueba que el framework no es humo: lo podemos medir.* |
 | **05 · Be Intrinsic** | `category_ownership` + `competitive_sov` + `message_alignment` + autoridad de entidad (Knowledge Graph/Wikidata/Reddit, TASK-1267) + SoV recurrente en el tiempo (TASK-1270). |

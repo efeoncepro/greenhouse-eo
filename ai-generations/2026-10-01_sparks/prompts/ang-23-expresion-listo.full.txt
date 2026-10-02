@@ -1,0 +1,17 @@
+High quality photorealistic 3D product photograph of this exact character: a SPARK, the small robot agent companion of the brand Efeonce. Keep its identity EXACTLY as described here in every view:
+
+- BODY: one perfect glossy white sphere about the size of a football, with a few small deep-navy (#001A33) panels and vents, tiny visible seams and screws, realistic glossy plastic with very fine micro-scratches.
+- FACE: a horizontal oval deep-navy glass visor across the front upper half of the sphere; inside it, exactly TWO glowing azure (#0375DB) LED eyes shaped as soft upward arcs and ONE small azure smile arc below them, made of fine LED dots. Never more eyes, never a mouth outside the visor.
+- BELLY: below the visor, on the front lower half, THREE small round porthole windows in a horizontal row, evenly spaced, glowing softly azure from inside (like the three windows of the Efeonce ship).
+- ANTENNA: on the very top of the sphere, a tiny glowing azure four-pointed sparkle star on a short base.
+- ORBIT: a clean thick glossy white ring circles the sphere at its equator, tilted about 25 degrees (higher on its left side, lower on its right side), floating a few centimetres away from the body with no visible supports, with ONE small glossy white sphere riding on the ring at the front-right.
+- ARMS: two short white arms with deep-navy joints and dark articulated four-fingered hands, attached at the sides below the ring.
+- NO LEGS: it hovers a few centimetres above the floor, with a soft azure glow under the bottom of the sphere.
+- COLOURS: only glossy white, deep navy and glowing azure (#0375DB); no cyan, no teal, no other colours, no text, no logos, no letters.
+- It must never look like a third-party robot (not Astro Bot, not EVE, not BB-8).
+
+Image 1 (front view) and image 2 (three-quarter view) are the approved Spark: copy its shape, proportions, visor, eyes, smile, three belly windows, sparkle antenna, orbit ring with its small sphere, arms, hands and colours EXACTLY. Only the camera angle, the pose and the expression change.
+
+POSE AND CAMERA: EXPRESSION DONE AND PROUD: the LED eyes are happy closed upward arcs (smiling eyes), the smile a wide arc; one hand gives a clear thumbs-up toward the camera, the other hand on its side. TIGHT FRAMING: STRAIGHT FRONT VIEW at eye level, the Spark large in the frame, the whole figure still visible.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, a soft contact shadow and faint azure glow on the floor under it, crisp focus on the whole figure, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame, no text. The whole figure fully visible with generous margin, centered.

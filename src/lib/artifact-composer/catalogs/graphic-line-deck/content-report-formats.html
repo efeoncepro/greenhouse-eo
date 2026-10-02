@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · cómo te llega el informe</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-report-formats` (surface deck, tema oscuro, TASK-1949). «¿Cómo te llega? Como la necesites.»: la
+      edición mensual de Efeonce Insights como informe VIVO en interfaz blanca, apenas inclinado hacia atrás: cabecera con la
+      píldora «En vivo», tres KPIs, la curva de seis meses contra el promedio del sector, el ranking de quién aparece en las
+      respuestas y la lectura del mes. Del informe bajan haces de luz a los cinco formatos; el destacado lleva contorno y
+      halo. La píldora, la leyenda y el rótulo de la lectura son de la plantilla. Sin selección.
+      Referencia: deck SEO/AEO, Completo · 22 (aprobada el 2026-09-30).
+    -->
+    <main class="gl-slide gl-ls gl-sv gl-srf" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-srf-beams" data-slot="beams">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-srf-scene">
+        <section class="gl-srf-report" data-slot="report">
+          <header class="gl-srf-head">
+            <p class="gl-srf-label" data-slot-field="label">Informe vivo · septiembre</p>
+            <span class="gl-srf-live"><span class="gl-srf-live-dot" aria-hidden="true"></span>En vivo</span>
+          </header>
+
+          <ol class="gl-srf-kpis" data-slot="kpis">
+            <li class="gl-srf-kpi">
+              <p class="gl-srf-kpi-label" data-slot-field="label">Visibilidad en IA</p>
+              <p class="gl-srf-kpi-row"><span class="gl-srf-kpi-value" data-slot-field="value">64%</span><span class="gl-srf-kpi-delta" data-slot-field="delta">▲ 9 pts</span></p>
+            </li>
+          </ol>
+
+          <div class="gl-srf-row">
+            <div class="gl-srf-panel gl-srf-trend">
+              <p class="gl-srf-panel-title" data-slot-field="trendTitle">Visibilidad en IA · 6 meses</p>
+              <svg class="gl-srf-chart" viewBox="0 0 440 150" aria-hidden="true">
+                <defs><linearGradient id="gl-srf-area-fade" x1="0" y1="0" x2="0" y2="1"><stop class="gl-srf-fade-top" offset="0" /><stop class="gl-srf-fade-bottom" offset="1" /></linearGradient></defs>
+                <g class="gl-srf-grid"><line x1="0" y1="30" x2="440" y2="30" /><line x1="0" y1="75" x2="440" y2="75" /><line x1="0" y1="120" x2="440" y2="120" /></g>
+                <path class="gl-srf-area" d="M0 118 L86 108 L172 112 L258 82 L344 60 L430 26 L430 150 L0 150 Z" />
+                <path class="gl-srf-line" d="M0 118 L86 108 L172 112 L258 82 L344 60 L430 26" />
+                <path class="gl-srf-sector" d="M0 132 L86 128 L172 126 L258 122 L344 118 L430 114" />
+                <circle class="gl-srf-dot" cx="430" cy="26" r="7" />
+                <circle class="gl-srf-dot-ring" cx="430" cy="26" r="14" />
+              </svg>
+              <p class="gl-srf-legend"><span><span class="gl-srf-swatch" aria-hidden="true"></span> Tu marca</span><span><span class="gl-srf-swatch gl-srf-swatch-dash" aria-hidden="true"></span> Promedio del sector</span></p>
+            </div>
+
+            <div class="gl-srf-panel gl-srf-ranking">
+              <p class="gl-srf-panel-title" data-slot-field="rankingTitle">Quién aparece en las respuestas</p>
+              <ol class="gl-srf-rows" data-slot="ranking">
+                <li class="gl-srf-rank"><span data-slot-field="name">Tu marca</span><span class="gl-srf-bar"></span><span class="gl-srf-share" data-slot-field="share">34%</span></li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="gl-srf-reading">
+            <span class="gl-srf-spark" aria-hidden="true"></span>
+            <div>
+              <p class="gl-srf-reading-kicker">La lectura del mes</p>
+              <p class="gl-srf-reading-text" data-slot-field="reading">Subes por tus guías nuevas. En «precios» el rival A todavía te gana: ahí va el próximo contenido.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <ol class="gl-srf-formats" data-slot="formats">
+        <li class="gl-srf-format">
+          <img class="gl-srf-format-icon" data-slot-field="icon" alt="" />
+          <p class="gl-srf-format-title" data-slot-field="title">Correo</p>
+          <p class="gl-srf-format-detail" data-slot-field="detail">Te llega solo</p>
+        </li>
+      </ol>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Un informe, cinco formatos</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo te llega?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Como la</span><span data-slot-field="answer">necesites</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Cada mes la IA cruza tus datos y escribe la lectura; nuestro equipo la revisa. Tú solo la abres y la usas, <strong>sin armar</strong> reportes ni láminas.</p>
+
+      <div class="gl-product-mark" data-slot="productMark">
+        <img data-slot-field="src" alt="" />
+      </div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

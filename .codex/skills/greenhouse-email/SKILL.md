@@ -19,7 +19,11 @@ Lee solo lo que el cambio necesita:
 - `docs/architecture/GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `EPIC-042`, `TASK-1764` y
   [references/footer-presentation.md](references/footer-presentation.md) cuando cambien marca, firma, footer,
   identidad legal, RRSS, preferencias o unsubscribe. El mockup aprobado vive en
-  `/admin/emails/footer-profiles/mockup`; es referencia visual, no runtime productivo.
+  `/admin/emails/footer-profiles/mockup`; es referencia visual, no runtime productivo. La firma de correo
+  personal de Outlook (v3.1) no pertenece a esta skill: ver `EFEONCE_GRAPHIC_LINE_V1.md` §10.2.
+- Los **módulos de correo de Efeonce** canonizados en AXIS (pie, CTA principal, tarjeta de agenda, bloque de marca;
+  2026-09-29, sin adoptar en Greenhouse) cuando el correo sea de Efeonce o de un producto suyo: sección «Delta
+  2026-09-29» abajo y [references/footer-presentation.md](references/footer-presentation.md) §«Módulos canónicos».
 - `resend-email-platform` cuando cambien provider, dominio, tracking, webhook, suppression, retry o entregabilidad.
 - `greenhouse-ai-image-generator` y
   `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md` cuando el correo necesite
@@ -138,6 +142,84 @@ Lo que cambió en `src/lib/email/delivery.ts` y afecta a cualquier correo del ca
 - **Buzones bloqueados** (`bounced|complained|suppressed`): el predicado canónico es `providerBlockedConditionSql`
   en `src/lib/email/provider-block.ts` (`src/lib/hiring/assessment/access-recovery/provider-block.ts` sólo
   re-exporta). Reintento y revive lo excluyen; ningún template ni caller redefine ese predicado.
+
+## Delta 2026-09-28 — qué id devuelve `sendEmail()` (TASK-1848)
+
+`sendEmail()` genera un `batchId = randomUUID()` por llamada, que se persiste como `email_deliveries.batch_id`.
+Ese id **no** es la fila (`delivery_id`). Contrato leído en `src/lib/email/delivery.ts` + `SendEmailResult`
+(`src/lib/email/types.ts`):
+
+- **`result.deliveryId`**: con exactamente un `recipientResults` devuelve `recipientResults[0].deliveryId ?? batchId`;
+  con varios, el batch. Los retornos tempranos (tipo pausado sin intent, sin destinatarios, fallo al resolverlos)
+  devuelven el batch y no crean fila.
+- **`recipientResults[].deliveryId`** es la fila **sólo** en tres caminos: Batch API de broadcast (captura el
+  `RETURNING delivery_id`), `token_sensitive` (intent pre-reclamado con `claimTokenSensitiveEmailIntent`) y
+  reintento de una fila existente. En el **camino secuencial estándar de primer intento** (un destinatario,
+  prioridad no-broadcast o con `attachments`), `deliverRecipient` devuelve `durableDeliveryId || batchId` y
+  descarta el id que retorna `createDeliveryRow`: ahí **también es el batch** (igual en `rate_limited` e
+  `undeliverable`).
+- **Regla:** nunca guardes `result.deliveryId` como referencia a una fila de `email_deliveries`, y no asumas que
+  `recipientResults[].deliveryId` lo es fuera de esos tres caminos. Para correlacionar un envío con su fila usa
+  `source_entity` + `source_event_id` (+ `recipient_email`), o `batch_id` + `recipient_email`. Si un dominio
+  necesita el `delivery_id` real en un envío estándar, se corrige en `delivery.ts` (propagar el retorno de
+  `createDeliveryRow`), no en el caller.
+- Caso fuente: la modalidad `attachment` de Insights guardaba el batch en
+  `insight_delivery_recipients.email_delivery_id` (medido en staging 2026-09-28: `idlr-2984…` → `bb79bbb7…`,
+  su correo real `c4fb8f5c…`); el estado de transporte no se afectó porque se lee por `source_event_id`. Ningún
+  test lo vio porque el mock de `sendEmail` no distinguía batch de fila. Un primer fix que leía
+  `recipientResults?.[0]?.deliveryId` (`34d763460`) **seguía** recibiendo el batch en ese camino secuencial (su test
+  pasaba con un mock que asumía la fila). Fix real `8882af0e3`: resolver la fila por `source_event_id`
+  (verificado contra PG: `idlr-2984…` → `c4fb8f5c…`).
+
+## Delta 2026-09-29 — módulos de correo de Efeonce en AXIS (canon aprobado, **sin adoptar**)
+
+El operador aprobó el correo de entrega de Efeonce Insights (canvas https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd
+v21, página «Correo»: enlace en escritorio, en celular y PDF adjunto) y lo canonizó con este alcance: **el correo de
+Insights es una aplicación, no la plantilla única**. Lo definitivo son tres módulos que cualquier correo de Efeonce
+reutiliza con su propio cuerpo:
+
+- **Pie**, en este orden: tarjeta de agenda → bloque de marca → burbuja URL + 4 redes (LinkedIn, Instagram, YouTube,
+  Threads) → filete → bloque legal (11 px `#9fb3c8`; «Efeonce Group SpA» en 600 `#cfe4fa` · RUT 77.357.182-1;
+  dirección; teléfonos · `sales@efeoncepro.com`; valores desde `src/config/efeonce-brand.ts`) → filete → preferencias
+  y baja (11 px) → motivo y © (10 px). Banda `#001a33` en toda línea.
+- **CTA**: el principal es una píldora navy `#001a33` a todo el ancho (p. ej. «Ver el informe completo →»), como mucho
+  uno; la **agenda** es una tarjeta `#023c70` radio 16 con «¿Lo revisamos juntos?» (Bricolage 700 22 px), bajada 13 px
+  `#cfe4fa` y píldora blanca «Agendar una reunión».
+- **Bloque de marca**: logo de Efeonce a 220 px y, **debajo**, el eslogan al 64 % del ancho del logo, con la palabra de
+  la **línea de servicio** que firma (Growth, Brand, Engine, Voice o Revenue; nunca el producto: Insights firma
+  Growth). A 220 px la palabra va en blanco (bajo 24 px el acento no se usa).
+- **«Suscribirme» está retirado** en todo correo; la agenda lo reemplaza y va a `https://efeoncepro.com/contacto/`
+  con UTM `utm_medium=email`, `utm_source={producto}`, `utm_content=pie` (y `utm_campaign` si hay), **nunca** a un
+  `mailto:`. El enlace personal de un informe no lleva UTM.
+
+Dónde vive: AXIS `v0.3.38` — token `efeonceEmail` (`axis-tokens` 0.3.38), contrato `efeonce.email-modules` 0.1.0
+`candidate` (`axis-ui-contracts` 0.3.38; 23 códigos, entre ellos `cta-subscribe-retired`, `agenda-never-email` y
+`footer-unsubscribe-required`; 6 chequeos del adapter: `images-png-with-dimensions`, `no-inline-svg-in-email`,
+`legal-block-live-text`, `bulletproof-buttons`, `footer-contrast`, `dark-mode-safe`), `pnpm email:resolve` en AXIS,
+guía `docs/agent-composition/email-modules.md`, ADR `docs/architecture/EMAIL_MODULES_DECISION_V1.md`, Lab
+https://axis.efeonce.org/references/email/. **PNG seguros para correo** en `@efeoncepro/axis-brand-assets` 0.4.6
+(`AXIS_EMAIL_ASSETS`, @2x con alfa, `pnpm email:assets`): `email-logo-negative`, `email-slogan-<línea>-negative`,
+`email-social-{linkedin,instagram,youtube,threads}-white` y `url-bubble-baked-dark-email`. **Logo y eslogan son dos
+archivos** apilados con el `stack.gapBelowLogoImagePx` del sello: nunca un solo PNG ni un eslogan escalado a otro ancho.
+Dirección sellada en Greenhouse: `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` (+ PNG en
+`docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1/`). Criterio de marca: `efeonce-graphic-line` →
+`references/applications.md` §C4.
+
+**Estado real (2026-09-29):** Greenhouse **no** los adoptó. Fija el set anterior de AXIS (`axis-tokens` y
+`axis-ui-contracts` 0.3.37, `axis-brand-assets` 0.4.5) y `src/emails/InsightsEditionDeliveryEmail.tsx` y
+`src/emails/components/EmailLayout.tsx` no cambiaron. La implementación del correo de Insights está pendiente
+(`efeonce-insights`). No declares el pie nuevo como runtime ni lo copies a mano desde el canvas: se consume desde el
+manifiesto y los PNG de AXIS cuando haya task de adopción.
+
+**Pie por propósito (decisión del operador, 2026-09-29).** Los correos de Insights (`insights_edition_delivery*`)
+van a clientes: `relationship_transactional` con la **excepción explícita** `efeonce-insights-delivery`, que conserva
+el pie aprobado completo (agenda, redes, preferencias y baja «Dejar de recibir estos informes»). **Todo otro correo
+sigue la policy:** sin agenda, redes ni baja en transaccionales y de servicio; baja obligatoria en suscripción y
+marketing; redes opcionales en suscripción y obligatorias en marketing. Las excepciones son por tipo, con aprobador,
+fecha y motivo, en el registro `EMAIL_PRESENTATION_POLICY`; nunca se infieren. El adapter pasa `purpose` y, si hay
+excepción, `application` al contrato `efeonce.email-modules` `0.2.0` (publicado en `v0.3.39`, commit `1c18a2e`), que ya no exige la
+agenda; nunca quita módulos por su cuenta. Adopción: TASK-1944. Detalle en
+[references/footer-presentation.md](references/footer-presentation.md) §«Módulos canónicos».
 
 ## Verificación mínima
 

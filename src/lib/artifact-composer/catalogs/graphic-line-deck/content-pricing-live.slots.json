@@ -1,0 +1,784 @@
+{
+  "template": "ContentPricingLive",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "engine"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 196
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 26
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 380
+        },
+        "questionWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-flow-question-width=470px"
+        },
+        "answerGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-flow-answer-gap=36px"
+        },
+        "bodyGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-flow-body-gap=144px"
+        },
+        "answerSize": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-flow-answer-px=120px"
+        },
+        "answerLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-flow-answer-leading=0.9"
+        },
+        "answerShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-flow-answer-shadow-y=10px"
+        },
+        "answerShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-flow-answer-shadow-blur=60px"
+        },
+        "answerShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-flow-answer-shadow-opacity=35%"
+        },
+        "docLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-left=800px"
+        },
+        "docTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-top=170px"
+        },
+        "docWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-width=780px"
+        },
+        "docPadTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-pad-top=38px"
+        },
+        "docPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-pad-x=42px"
+        },
+        "docPadBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-pad-bottom=40px"
+        },
+        "docRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-radius=26px"
+        },
+        "docPerspective": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-perspective=1800px"
+        },
+        "docRotate": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-rotate=-7deg"
+        },
+        "tileSize": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-tile=56px"
+        },
+        "tileRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-tile-radius=16px"
+        },
+        "isotypeSize": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-isotype=30px"
+        },
+        "headerGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-header-gap=16px"
+        },
+        "kickerGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-kicker-gap=4px"
+        },
+        "kickerPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-kicker-px=14px"
+        },
+        "kickerColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-kicker-color=#023c70"
+        },
+        "titlePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-title-px=34px"
+        },
+        "rowsGapTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-rows-gap-top=26px"
+        },
+        "rowPad": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-pad=20px"
+        },
+        "rowRule": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-rule=1.5px"
+        },
+        "rowGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-gap=18px"
+        },
+        "rowTile": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-tile=44px"
+        },
+        "rowTileRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-tile-radius=12px"
+        },
+        "rowNumberPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-number-px=20px"
+        },
+        "rowNamePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-name-px=22px"
+        },
+        "rowDescPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-desc-px=16px"
+        },
+        "rowDescGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-desc-gap=2px"
+        },
+        "rowAmountPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-row-amount-px=21px"
+        },
+        "totalPad": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-total-pad=22px"
+        },
+        "totalRule": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-total-rule=2px"
+        },
+        "totalLabelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-total-label-px=15px"
+        },
+        "totalAmountPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-total-amount-px=56px"
+        },
+        "totalAmountGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-total-amount-gap=6px"
+        },
+        "taxPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-tax-px=15px"
+        },
+        "taxGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-tax-gap=6px"
+        },
+        "ctaPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-cta-px=22px"
+        },
+        "ctaPadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-cta-pad-y=20px"
+        },
+        "ctaPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-cta-pad-x=32px"
+        },
+        "ctaRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-cta-radius=14px"
+        },
+        "chipPerspective": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip-perspective=1400px"
+        },
+        "chipPadY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip-pad-y=18px"
+        },
+        "chipPadX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip-pad-x=22px"
+        },
+        "chipRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip-radius=18px"
+        },
+        "chipKickerPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip-kicker-px=13px"
+        },
+        "chipTextPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip-text-px=21px"
+        },
+        "chipTextGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip-text-gap=6px"
+        },
+        "haloColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-halo-color=#72ded8"
+        },
+        "lumWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lum-width=216px"
+        },
+        "lumBottom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lum-bottom=51px"
+        },
+        "docFill": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-doc-color=#ffffff"
+        },
+        "docInk": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-doc-ink-color=#0b1f33"
+        },
+        "docMuted": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-doc-muted-color=#5f6b7a"
+        },
+        "docRule": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-doc-rule-color=#e3e8ee"
+        },
+        "docChip": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-doc-chip-color=#f5f7fa"
+        },
+        "docShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-doc-shadow-color=#000610"
+        },
+        "docShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-shadow-y=50px"
+        },
+        "docShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-shadow-blur=110px"
+        },
+        "docShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-shadow-opacity=75%"
+        },
+        "docHaloBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-halo-blur=90px"
+        },
+        "docHaloOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-halo-opacity=22%"
+        },
+        "docEdgeOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-doc-edge-opacity=16%"
+        },
+        "glassFrom": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-glass-from-color=#12344f"
+        },
+        "glassTo": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-glass-to-color=#081c30"
+        },
+        "glassAngle": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-glass-angle=160deg"
+        },
+        "glassEdgeOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-glass-edge-opacity=16%"
+        },
+        "glassShadowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-pv-glass-shadow-color=#000610"
+        },
+        "glassShadowY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-glass-shadow-y=30px"
+        },
+        "glassShadowBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-glass-shadow-blur=70px"
+        },
+        "glassShadowOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-glass-shadow-opacity=65%"
+        },
+        "glassHaloBlur": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-glass-halo-blur=40px"
+        },
+        "glassHaloOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-glass-halo-opacity=16%"
+        },
+        "chip1Left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip1-left=1520px"
+        },
+        "chip1Top": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip1-top=110px"
+        },
+        "chip1Rotate": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip1-rotate=-14deg"
+        },
+        "chip2Left": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip2-left=1600px"
+        },
+        "chip2Top": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip2-top=850px"
+        },
+        "chip2Rotate": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-pv-chip2-rotate=-16deg"
+        }
+      }
+    },
+    "stage": {
+      "selector": "[data-slot='stage']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "platform": {
+      "selector": "[data-slot='platform']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "example": "Inversión"
+        },
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 22,
+          "example": "¿Cuánto cuesta?"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 12,
+          "example": "Sin letra"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "resolver": "gl-answer",
+          "example": "chica"
+        }
+      }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 5,
+        "overflow": "reject"
+      },
+      "example": "Cada línea de la cotización a la vista, con su <strong>monto</strong> y lo que incluye. Los montos se definen en la propuesta."
+    },
+    "quote": {
+      "selector": "[data-slot='quote']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "kicker": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 28,
+          "example": "Propuesta · Cotización"
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 20,
+          "example": "Para tu marca"
+        },
+        "totalLabel": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 20,
+          "example": "Total mensual"
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 10,
+          "example": "[MONTO]"
+        },
+        "tax": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 20,
+          "example": "neto + IVA"
+        }
+      }
+    },
+    "lines": {
+      "selector": "[data-slot='lines']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 4,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "number": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 1
+          },
+          "name": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 20
+          },
+          "desc": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 48
+          },
+          "amount": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 20
+          }
+        }
+      },
+      "example": [
+        {
+          "number": "1",
+          "name": "Equipo",
+          "desc": "Capacidad gobernada del squad",
+          "amount": "[MONTO] / mes"
+        },
+        {
+          "number": "2",
+          "name": "Greenhouse Pro",
+          "desc": "Dashboard, KPIs, acciones y reporting quincenal",
+          "amount": "[MONTO] / mes"
+        },
+        {
+          "number": "3",
+          "name": "Sample Sprint",
+          "desc": "Piloto pagado y acotado para arrancar",
+          "amount": "[MONTO] · único"
+        }
+      ]
+    },
+    "chips": {
+      "selector": "[data-slot='chips']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 2,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kicker": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 18
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 48
+          }
+        }
+      },
+      "example": [
+        {
+          "kicker": "Cómo se mide",
+          "text": "Capacidad gobernada,\nnunca horas ni piezas"
+        },
+        {
+          "kicker": "Sin sorpresas",
+          "text": "Valores netos,\nIVA no incluido"
+        }
+      ]
+    },
+    "cta": {
+      "selector": "[data-slot='cta']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "example": "Aprobar propuesta"
+        },
+        "cursorScale": {
+          "type": "number",
+          "required": true,
+          "consumer": "validation-only",
+          "example": 1.2
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-source.svg"
+    }
+  }
+}

@@ -101,7 +101,10 @@ $title   = ${nowdoc(draft.title.trim())};
 $excerpt = ${nowdoc(draft.excerpt ?? '')};
 $content = ${nowdoc(postContent)};
 
-$post_id = wp_insert_post( array(
+// wp_insert_post() and update_post_meta() expect SLASHED input and run wp_unslash():
+// without wp_slash() the \\uXXXX escapes WordPress stores in block attributes
+// (glitch-drop content, embed URLs with &, FAQ JSON-LD) would lose their backslash.
+$post_id = wp_insert_post( wp_slash( array(
   'post_type'    => 'post',
   'post_status'  => 'private',
   'post_title'   => $title,
@@ -109,7 +112,7 @@ $post_id = wp_insert_post( array(
   'post_excerpt' => $excerpt,
   'post_content' => $content,
   'post_author'  => $author_id,
-), true );
+) ), true );
 
 if ( is_wp_error( $post_id ) ) {
   echo "GHCF_RESULT " . wp_json_encode( array( 'outcome' => 'error', 'message' => $post_id->get_error_message() ) ) . "\\n";
@@ -119,8 +122,8 @@ if ( is_wp_error( $post_id ) ) {
 update_post_meta( $post_id, '_greenhouse_owned', '1' );
 update_post_meta( $post_id, '_greenhouse_manifest_id', $manifest );
 update_post_meta( $post_id, '_greenhouse_source', 'content-factory' );
-update_post_meta( $post_id, '_yoast_wpseo_title', ${nowdoc(draft.seo?.title ?? '')} );
-update_post_meta( $post_id, '_yoast_wpseo_metadesc', ${nowdoc(draft.seo?.description ?? '')} );
+update_post_meta( $post_id, '_yoast_wpseo_title', wp_slash( ${nowdoc(draft.seo?.title ?? '')} ) );
+update_post_meta( $post_id, '_yoast_wpseo_metadesc', wp_slash( ${nowdoc(draft.seo?.description ?? '')} ) );
 
 $p = get_post( $post_id );
 $blocks = array_values( array_filter( parse_blocks( $p->post_content ), function( $b ) { return ! empty( $b['blockName'] ); } ) );

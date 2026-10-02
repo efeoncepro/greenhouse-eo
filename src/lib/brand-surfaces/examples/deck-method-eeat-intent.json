@@ -1,0 +1,64 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-eeat",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "E-E-A-T",
+    "question": "¿Por qué te citaría la IA?",
+    "answer": [
+      "Porque",
+      "confía"
+    ]
+  },
+  "body": "La IA no adivina: cita a quien puede **verificar**. Cada entregable construye una de estas señales.",
+  "meterTopic": "Peso de E-E-A-T",
+  "meter": [
+    {
+      "label": "En SEO clásico",
+      "value": "Importante",
+      "fill": 0.55
+    },
+    {
+      "label": "En AEO / IA",
+      "value": "Determinante",
+      "fill": 1
+    }
+  ],
+  "builtWithLabel": "Lo construimos con",
+  "letters": [
+    {
+      "letter": "E",
+      "name": "Experiencia",
+      "description": "Contenido de primera mano, escrito por quien lo vivió.",
+      "builtWith": "Autoría demostrable y casos reales",
+      "deliverable": "Contenido & landings"
+    },
+    {
+      "letter": "E",
+      "name": "Pericia",
+      "description": "Profundidad, precisión y fuentes que respaldan cada afirmación.",
+      "builtWith": "Autores con credenciales, contenido revisado",
+      "deliverable": "Contenido & landings"
+    },
+    {
+      "letter": "A",
+      "name": "Autoridad",
+      "description": "Que tu marca sea el referente de su sector.",
+      "builtWith": "PR, link building y entidad clara",
+      "deliverable": "PR & link building"
+    },
+    {
+      "letter": "T",
+      "name": "Confianza",
+      "description": "Un sitio seguro, transparente y verificable.",
+      "builtWith": "Schema, HTTPS y señales de confianza",
+      "deliverable": "Técnico & schema"
+    }
+  ]
+}

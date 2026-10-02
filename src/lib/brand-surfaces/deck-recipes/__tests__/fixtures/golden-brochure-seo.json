@@ -1,0 +1,110 @@
+{
+  "document": "brochure",
+  "line": "engine",
+  "slides": [
+    {
+      "recipeId": "cover-brochure-line-engine",
+      "plateRef": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png",
+      "purpose": "01 · ¿Te encuentran Google y la IA? Visible. (logo SV360 al pie, productMark)"
+    },
+    {
+      "recipeId": "decision-ai-market",
+      "purpose": "02 · ¿Dónde busca tu cliente? En la IA."
+    },
+    {
+      "recipeId": "decision-ai-answer",
+      "purpose": "03 · ¿A quién recomienda la IA? A tu competencia."
+    },
+    {
+      "recipeId": "section-cine-about",
+      "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png",
+      "purpose": "04 · ¿Quiénes somos? Un solo equipo. (QS1b)"
+    },
+    {
+      "recipeId": "section-split",
+      "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/SX4-busqueda-y-respuesta.png",
+      "purpose": "05 · ¿SEO o AEO? Ambos. (plate SX4; navegación por capítulos, 5)"
+    },
+    {
+      "recipeId": "content-brand-family",
+      "purpose": "06 · ¿Qué hay dentro? Cuatro piezas. (receta nueva, nativa)"
+    },
+    {
+      "recipeId": "section-cine-team",
+      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+      "purpose": "07 · ¿Quién ejecuta tu SEO? Este equipo. (BR2b; bajada en el slot opcional body)"
+    },
+    {
+      "recipeId": "content-service-mockups",
+      "purpose": "08 · ¿Y qué hace ese equipo? Todo esto. (receta nueva, nativa)"
+    },
+    {
+      "recipeId": "proposal-cinematic-seo",
+      "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+      "purpose": "09 · ¿Te encuentra Google? Y la IA. (SE1; lockup SV360)"
+    },
+    {
+      "recipeId": "method-eeat",
+      "purpose": "10 · ¿Por qué te citaría la IA? Porque confía."
+    },
+    {
+      "recipeId": "proposal-cinematic-aeo",
+      "plateRef": "ai-generations/2026-09-26_deck-aeo/plates/AE2b-la-ia-te-elige-isotipo.png",
+      "purpose": "11 · ¿Te distingue la IA? Entre miles. (AE2b; sin eyebrow, lockup AEO en su lugar)"
+    },
+    {
+      "recipeId": "method-surround-cycle",
+      "purpose": "12 · ¿Cómo se sostiene? En ciclo."
+    },
+    {
+      "recipeId": "proposal-cinematic-web",
+      "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/DV1-lo-hacemos.png",
+      "purpose": "13 · ¿Y si hay que tocar código? Lo hacemos. (plate DV1)"
+    },
+    {
+      "recipeId": "content-day-live-progress",
+      "purpose": "14 · ¿Cómo avanza tu SEO? A la vista."
+    },
+    {
+      "recipeId": "content-day-live-results",
+      "purpose": "15 · ¿Cómo avanza? Cada mes. (lockup Insights)"
+    },
+    {
+      "recipeId": "content-report-formats",
+      "purpose": "16 · ¿Cómo te llega? Como la necesites. (receta nueva, nativa)"
+    },
+    {
+      "recipeId": "content-committee-deck",
+      "purpose": "17 · ¿Y el PPT del comité? Ya está. (receta nueva, nativa)"
+    },
+    {
+      "recipeId": "decision-difference",
+      "purpose": "18 · ¿Qué nos hace distintos? Lo puedes ver."
+    },
+    {
+      "recipeId": "content-clients",
+      "purpose": "21 · ¿Quién confía en nosotros? Marcas líderes."
+    },
+    {
+      "recipeId": "content-industries",
+      "purpose": "19 · ¿Conocemos tu industria? Por dentro. (receta nueva, nativa)"
+    },
+    {
+      "recipeId": "content-markets",
+      "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
+      "purpose": "20 · ¿Dónde operamos? Cinco países. (receta nueva, plate MK2)"
+    },
+    {
+      "recipeId": "decision-diagnosis-map",
+      "purpose": "22 · ¿Qué recibes primero? El mapa. (lockup AI Visibility Report)"
+    },
+    {
+      "recipeId": "decision-next-steps",
+      "purpose": "23 · ¿Y ahora qué sigue? Empecemos."
+    },
+    {
+      "recipeId": "close-brochure-orbit",
+      "purpose": "24 · ¿Conversamos? Cuando quieras. (sin cambios)"
+    }
+  ]
+}

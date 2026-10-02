@@ -125,7 +125,7 @@ export const setDataForSeoSpendRecorder = (recorder: DataForSeoSpendRecorder | n
 /**
  * Argumentos de `postDataForSeoTask`.
  *
- * `organizationId` es OBLIGATORIO para las 4 familias SEO y opcional sólo para `serp`. No es
+ * `organizationId` es OBLIGATORIO para los POST de las familias per-org y opcional en GET. No es
  * una preferencia de estilo: el gasto de una familia SEO sin organización sería gasto no
  * atribuible, y "el caller se acuerda de pasarlo" es justo la disciplina que falla en
  * silencio. El tipo lo vuelve imposible; el runtime lo revalida por si el caller es JS.
@@ -139,8 +139,43 @@ export const setDataForSeoSpendRecorder = (recorder: DataForSeoSpendRecorder | n
  * familia COMPARTIDA (la compran el rank capture del módulo SEO y el adapter de AI Mode del
  * grader AEO). Un default silencioso haría que el gasto del grader se descuente del presupuesto
  * SEO del cliente sin que nada falle — el modo de falla exacto que esta dimensión cierra. Que sea
- * obligatorio en las cuatro familias SEO, donde hoy no hay ambigüedad, es lo que impide que la
- * próxima familia (p. ej. `ai_optimization`) herede un default que ya no le corresponde.
+ * obligatorio en todas las familias per-org, donde puede no haber ambigüedad, impide que una
+ * familia nueva herede un default que no le corresponde. Los GET de catálogo/polling no crean
+ * gasto y pueden operar sin inventar una organización.
+ */
+export type DataForSeoRequestInput =
+  | {
+      family: Extract<DataForSeoFamily, 'serp'>
+      endpoint: string
+      tasks: DataForSeoSerpTask[]
+      method?: 'GET' | 'POST'
+      timeoutMs?: number
+      organizationId?: string
+      consumer: DataForSeoSpendConsumer
+    }
+  | {
+      family: Exclude<DataForSeoFamily, 'serp'>
+      endpoint: string
+      tasks: DataForSeoTaskPayload[]
+      method: 'GET'
+      timeoutMs?: number
+      organizationId?: string
+      consumer: DataForSeoSpendConsumer
+    }
+  | {
+      family: Exclude<DataForSeoFamily, 'serp'>
+      endpoint: string
+      // Genérico a propósito: OnPage/Backlinks toman `target`, Labs bulk toma `keywords[]`.
+      tasks: DataForSeoTaskPayload[]
+      method?: 'POST'
+      timeoutMs?: number
+      organizationId: string
+      consumer: DataForSeoSpendConsumer
+    }
+
+/**
+ * Transporte canónico: una sola implementación de fetch + auth + timeout + breaker + costo,
+ * parametrizada por familia. Todo lo que hable con DataForSEO pasa por acá.
  */
 export type DataForSeoTaskInput =
   | {
@@ -154,22 +189,18 @@ export type DataForSeoTaskInput =
   | {
       family: Exclude<DataForSeoFamily, 'serp'>
       endpoint: string
-      // Genérico a propósito: OnPage/Backlinks toman `target`, Labs bulk toma `keywords[]`.
       tasks: DataForSeoTaskPayload[]
       timeoutMs?: number
       organizationId: string
       consumer: DataForSeoSpendConsumer
     }
 
-/**
- * Transporte canónico: una sola implementación de fetch + auth + timeout + breaker + costo,
- * parametrizada por familia. Todo lo que hable con DataForSEO pasa por acá.
- */
-export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<DataForSeoSerpResult> => {
+export const requestDataForSeo = async (input: DataForSeoRequestInput): Promise<DataForSeoSerpResult> => {
   const { family } = input
+  const method = input.method ?? 'POST'
   const definition = DATAFORSEO_FAMILIES[family]
 
-  if (definition?.requiresOrganization && !input.organizationId) {
+  if (method === 'POST' && definition?.requiresOrganization && !input.organizationId) {
     throw new Error(`La familia DataForSEO "${family}" exige organizationId para atribuir su gasto.`)
   }
 
@@ -225,15 +256,35 @@ export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<Da
   const auth = Buffer.from(`${credentials.login}:${credentials.password}`, 'utf8').toString('base64')
 
   try {
-    const response = await fetch(`${DATAFORSEO_API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${auth}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(input.tasks),
-      signal: controller.signal
-    })
+    let response: Response | null = null
+
+    // GET es seguro de reintentar: sólo lee catálogos, estado o resultados ya creados.
+    // POST nunca se repite automáticamente: un timeout puede ocurrir después de que el
+    // proveedor cobró/encoló, y repetirlo duplicaría gasto o tasks.
+    for (let attempt = 0; attempt < (method === 'GET' ? 3 : 1); attempt += 1) {
+      response = await fetch(`${DATAFORSEO_API_BASE_URL}${endpoint}`, {
+        method,
+        headers: {
+          Authorization: `Basic ${auth}`,
+          'Content-Type': 'application/json'
+        },
+        ...(method === 'POST' ? { body: JSON.stringify(input.tasks) } : {}),
+        signal: controller.signal
+      })
+
+      if (method !== 'GET' || (response.status !== 429 && response.status < 500) || attempt === 2) break
+
+      const retryAfterSeconds = Number(response.headers.get('retry-after') ?? '0')
+
+      const delayMs = Math.min(
+        2_000,
+        Math.max(250, Number.isFinite(retryAfterSeconds) ? retryAfterSeconds * 1_000 : 250 * 2 ** attempt)
+      )
+
+      await new Promise(resolve => setTimeout(resolve, delayMs))
+    }
+
+    if (!response) throw new Error('dataforseo_transport_no_response')
 
     const latencyMs = Date.now() - started
 
@@ -307,6 +358,10 @@ export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<Da
   }
 }
 
+/** Compatibilidad y puerta explícita para writes: jamás reintenta un POST automáticamente. */
+export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<DataForSeoSerpResult> =>
+  requestDataForSeo({ ...input, method: 'POST' })
+
 /**
  * Contrato histórico del AEO. Se conserva su firma y su shape de retorno; internamente delega
  * en el transporte compartido con la familia `serp`. No agregar parámetros acá: los consumers
@@ -364,6 +419,37 @@ export const checkDataForSeoConnection = async (
   } finally {
     clearTimeout(timeout)
   }
+}
+
+/** Free, allowlisted provider catalogs. Never accepts an arbitrary URL or paid endpoint. */
+export const getDataForSeoGoogleCatalog = async (
+  catalog: 'locations' | 'ai_mode/languages'
+): Promise<Record<string, unknown>[]> => {
+  if (catalog !== 'locations' && catalog !== 'ai_mode/languages') throw new Error('dataforseo_catalog_unknown')
+
+  const credentials = await resolveDataForSeoCredentials()
+  const auth = Buffer.from(`${credentials.login}:${credentials.password}`, 'utf8').toString('base64')
+
+  const response = await fetch(`${DATAFORSEO_API_BASE_URL}/v3/serp/google/${catalog}`, {
+    method: 'GET',
+    headers: { Authorization: `Basic ${auth}` },
+    signal: AbortSignal.timeout(30_000)
+  })
+
+  if (!response.ok) throw new Error(`dataforseo_catalog_http_${response.status}`)
+
+  const body = (await response.json()) as {
+    status_code?: number
+    tasks?: Array<{ status_code?: number; result?: unknown }>
+  }
+
+  const task = body.tasks?.[0]
+
+  if (body.status_code !== 20000 || task?.status_code !== 20000 || !Array.isArray(task.result)) {
+    throw new Error('dataforseo_catalog_invalid_response')
+  }
+
+  return task.result.filter((row): row is Record<string, unknown> => !!row && typeof row === 'object')
 }
 
 export const runDataForSeoGoogleAiModeSerp = async (input: {

@@ -1,5 +1,7 @@
 # Commercial
 
+> **Naming AEO vigente:** **Efeonce AEO** es la capacidad comercial; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su entregable. Casos y propuestas fechados conservan sus nombres de época (`AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader`). [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 Índice operativo de ventas de Efeonce. Esta carpeta conecta las metas aprobadas, el forecast y los negocios
 verificados sin convertir Markdown en una segunda base de datos comercial.
 
@@ -31,6 +33,10 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
    explícita, motivo, fecha y versión.
 
 ## Workspaces comerciales
+
+- [Venta con demostración contextual](EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md): metodología observada en Berel y SKY y aplicada a Banco Pichincha; diagnóstico, muestra de ejecución, operación y propuesta. Sistematización propuesta, sin atribuir causalidad exclusiva ni cambiar el pipeline.
+
+- [Banco Pichincha Perú — SEO, GEO y AEO](prospects/banco-pichincha-peru-seo-2026/README.md): Prospect Case, sales pod, investigación de cuenta y ejecución del Brand Visibility Grader; búsqueda pública de proveedor, sin RFP confirmado.
 
 - [Berel — App móvil](tenders/berel-app-movil/README.md): expansión de cliente SEO; brief de venta y análisis del lanzamiento de nueva Color Berel, con ASO, creatividad, adquisición, activación y medición. Propuesta interna pendiente de build, alcance y aprobación.
 

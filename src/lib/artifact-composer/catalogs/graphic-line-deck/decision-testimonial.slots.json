@@ -1,0 +1,425 @@
+{
+  "template": "DecisionTestimonial",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 200
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 392
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 120
+        },
+        "answerLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-answer-leading=0.98"
+        },
+        "answerTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-answer-tracking=-0.04em"
+        },
+        "answerWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-answer-width=1080px"
+        },
+        "markTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-mark-top=236px"
+        },
+        "markPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-mark-px=190px"
+        },
+        "markInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-mark-inset=-14px"
+        },
+        "quoteTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-quote-top=696px"
+        },
+        "quotePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-quote-px=27px"
+        },
+        "quoteWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-quote-width=980px"
+        },
+        "signatureTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-signature-top=854px"
+        },
+        "signatureGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-signature-gap=28px"
+        },
+        "logoMaxWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-logo-max-width=200px"
+        },
+        "logoMaxHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-logo-max-height=64px"
+        },
+        "dividerWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-divider-width=2px"
+        },
+        "dividerHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-divider-height=48px"
+        },
+        "namePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-name-px=26px"
+        },
+        "rolePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-role-px=20px"
+        },
+        "roleGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-role-gap=4px"
+        },
+        "proofLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-proof-left=1390px"
+        },
+        "proofTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-proof-top=330px"
+        },
+        "proofWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-proof-width=390px"
+        },
+        "proofPad": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-proof-pad=26px"
+        },
+        "proofRule": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-proof-rule=2px"
+        },
+        "proofPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-proof-px=88px"
+        },
+        "proofTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-proof-tracking=-0.04em"
+        },
+        "proofLabelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-proof-label-px=22px"
+        },
+        "proofLabelGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-proof-label-gap=8px"
+        },
+        "sourcePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-source-px=15px"
+        },
+        "sourceGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dt-source-gap=18px"
+        }
+      }
+    },
+    "glow": {
+      "selector": "[data-slot='glow']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "indicator": {
+      "selector": "[data-slot='indicator']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 34,
+          "example": "¿Cómo es trabajar con nosotros?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 22,
+          "resolver": "gl-answer",
+          "example": "la carga de trabajo"
+        },
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 28,
+          "example": "En palabras de Sky"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 18,
+          "example": "Agilizar mucho"
+        }
+      }
+    },
+    "quote": {
+      "selector": "[data-slot='quote']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 170,
+        "maxLines": 3,
+        "overflow": "reject"
+      },
+      "example": "«Hemos mejorado muchísimo en cuanto a las herramientas tecnológicas. Siento que hemos podido, gracias a ellos, agilizar mucho la carga de trabajo.»"
+    },
+    "clientLogo": {
+      "selector": "[data-slot='clientLogo']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 320,
+          "resolver": "gl-alt",
+          "example": "Descripción de la imagen"
+        }
+      }
+    },
+    "author": {
+      "selector": "[data-slot='author']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "example": "Adriana Contreras"
+        },
+        "role": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "example": "Team SKY"
+        }
+      }
+    },
+    "proof": {
+      "selector": "[data-slot='proof']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 3,
+        "maxItems": 3,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 7
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 24
+          }
+        }
+      },
+      "example": [
+        {
+          "value": "+2.000",
+          "label": "piezas aprobadas"
+        },
+        {
+          "value": "88 %",
+          "label": "entregadas a tiempo"
+        },
+        {
+          "value": "−25 %",
+          "label": "tiempo de producción"
+        }
+      ]
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 3,
+        "overflow": "reject"
+      },
+      "example": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Cliente"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "top-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "department"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1.15
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-baked-dark.svg"
+    }
+  }
+}

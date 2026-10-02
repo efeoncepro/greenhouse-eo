@@ -1,0 +1,298 @@
+{
+  "template": "ProposalCinematicLines",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 96
+        },
+        "logoTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-logo-top=150px"
+        },
+        "logoHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-logo-height=52px"
+        },
+        "phraseLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-phrase-left=430px"
+        },
+        "phraseTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-phrase-top=160px"
+        },
+        "phrasePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-phrase-px=30px"
+        },
+        "phraseWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-phrase-wght=300"
+        },
+        "linesTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lines-top=262px"
+        },
+        "rowGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lines-row-gap=10px"
+        },
+        "wordGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lines-word-gap=2px"
+        },
+        "lineNamePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-line-name-px=17px"
+        },
+        "lineNameWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-line-name-wght=500"
+        },
+        "lineNameTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-line-name-tracking=0.12em"
+        },
+        "lineWordPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-line-word-px=96px"
+        },
+        "lineWordLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-line-word-leading=0.95"
+        },
+        "lineWordTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-line-word-tracking=-0.04em"
+        }
+      }
+    },
+    "photo": {
+      "selector": "[data-slot='photo']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-plate-ref",
+          "example": "asset-ref:plate:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 320,
+          "resolver": "gl-alt",
+          "example": "Nexa mira a cámara mientras cinco esferas de luz orbitan a su alrededor"
+        }
+      }
+    },
+    "logo": {
+      "selector": "[data-slot='logo']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/efeonce-logo-negative.svg"
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Nuestras líneas de servicio"
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Cinco líneas. Una sola relación."
+    },
+    "lines": {
+      "selector": "[data-slot='lines']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 5,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "key": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-line"
+          },
+          "name": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40
+          },
+          "word": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12
+          }
+        }
+      },
+      "example": [
+        {
+          "key": "growth",
+          "name": "Growth Strategy & Measurement",
+          "word": "Growth"
+        },
+        {
+          "key": "brand",
+          "name": "Creative Services",
+          "word": "Brand"
+        },
+        {
+          "key": "engine",
+          "name": "Digital Services & Engineering",
+          "word": "Engine"
+        },
+        {
+          "key": "voice",
+          "name": "Media & Distribution",
+          "word": "Voice"
+        },
+        {
+          "key": "revenue-hubspot",
+          "name": "RevOps & CRM",
+          "word": "Revenue"
+        }
+      ]
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Nexa"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "bottom-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "department"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1.25
+        },
+        "targetKind": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "group"
+        },
+        "variant": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "eight-handles"
+        },
+        "padding": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "standard"
+        },
+        "overlay": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "none"
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-baked-dark.svg"
+    }
+  }
+}

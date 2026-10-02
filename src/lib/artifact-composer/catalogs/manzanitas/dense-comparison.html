@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Marketing con Manzanitas · Comparación en dos columnas</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="manzanitas-tokens.css" />
+<link rel="stylesheet" href="manzanitas.css" />
+<style>
+.mcm-dense-comparison .mcm-masthead { left: 80px; top: 72px; width: 200px; height: 90px; }
+.mcm-dense-comparison .mcm-voice { --mcm-answer-px: var(--mcm-dense-answer-px); left: 80px; top: var(--mcm-dense-voice-top); width: 820px; }
+.mcm-dense-comparison .mcm-table { left: 80px; top: var(--mcm-table-top); width: var(--mcm-table-width); display: flex; flex-direction: column; }
+.mcm-dense-comparison .mcm-table__head { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; padding-bottom: 14px; font-family: var(--mcm-answer-family), sans-serif; font-weight: var(--mcm-answer-weight); letter-spacing: var(--mcm-answer-tracking); font-size: var(--mcm-table-header-px); line-height: 1; }
+.mcm-dense-comparison .mcm-table__head span:last-child { color: var(--mcm-accent); }
+.mcm-dense-comparison .mcm-table__rows { display: flex; flex-direction: column; }
+.mcm-dense-comparison .mcm-table__row { display: flex; flex-direction: column; gap: 6px; padding: 16px 0; border-top: 2px solid color-mix(in srgb, var(--mcm-ink) 14%, transparent); }
+.mcm-dense-comparison .mcm-table__label { font-size: var(--mcm-table-label-px); font-weight: 600; line-height: 1.3; color: var(--mcm-muted); }
+.mcm-dense-comparison .mcm-table__cells { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; font-size: var(--mcm-table-cell-px); font-weight: 400; line-height: 1.35; }
+.mcm-dense-comparison .mcm-closer { left: 80px; top: var(--mcm-closer-top); width: var(--mcm-closer-width); font-size: var(--mcm-closer-px); font-weight: 500; line-height: 1.4; }
+</style>
+</head>
+<body>
+<main class="mcm-canvas mcm-canvas--4x5 mcm-tone-navy mcm-line-engine mcm-dense-comparison" data-mcm-root data-slot="theme">
+  <img class="mcm-masthead" data-mcm-masthead src="assets/manzanitas-logo-negative-engine.svg" alt="Marketing con Manzanitas" />
+  <div class="mcm-voice" data-slot="voice">
+    <p class="mcm-q mcm-q--one-line"><span class="mcm-ring" aria-hidden="true"></span><span data-slot-field="question">¿La pregunta?</span></p>
+    <p class="mcm-a"><span data-slot-field="answer">Respuesta</span><span class="mcm-sphere" aria-hidden="true"></span></p>
+  </div>
+  <div class="mcm-dense mcm-table">
+    <div class="mcm-table__head" data-slot="columns"><span data-slot-field="a">SEO</span><span data-slot-field="b">AEO</span></div>
+    <div class="mcm-table__rows" data-slot="rows">
+      <div class="mcm-table__row"><span class="mcm-table__label" data-slot-field="label">Etiqueta</span><div class="mcm-table__cells"><span data-slot-field="a">Columna A</span><span data-slot-field="b">Columna B</span></div></div>
+    </div>
+  </div>
+  <p class="mcm-dense mcm-closer" data-slot="closer">El remate de la comparación.</p>
+  <img class="mcm-swipe mcm-swipe--interior" data-mcm-swipe src="assets/swipe-rest-navy-engine.svg" alt="Desliza" />
+  <img class="mcm-signature mcm-signature--carousel" data-mcm-signature src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+</main>
+</body>
+</html>

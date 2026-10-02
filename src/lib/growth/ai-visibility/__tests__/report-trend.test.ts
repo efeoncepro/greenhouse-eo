@@ -66,7 +66,12 @@ describe('growth/ai-visibility — report temporal trend', () => {
   })
 
   it('mismo score en ambos extremos → sin_cambio (delta 0)', () => {
-    const result = buildReportTrend(makeScore({ ai_visibility: 30 }), 'prompt-pack.v1', previousOf({ ai_visibility: 30 }))
+    const result = buildReportTrend(
+      makeScore({ ai_visibility: 30 }),
+      'prompt-pack.v1',
+      previousOf({ ai_visibility: 30 })
+    )
+
     const ai = result.dimensions.find(d => d.key === 'ai_visibility')!
 
     expect(ai.delta).toBe(0)
@@ -118,4 +123,15 @@ describe('growth/ai-visibility — report temporal trend', () => {
 
     expect(noPrev.trend.status).toBe('sin_historico')
   })
+})
+
+it('competitor-set change suppresses competitive and overall deltas, retaining independent dimensions', () => {
+  const current = makeScore({ ai_visibility: 40, competitive_sov: 80 })
+  const previous = { ...previousOf({ ai_visibility: 20, competitive_sov: 10 }), competitorSetComparable: false }
+  const result = buildReportTrend(current, 'prompt-pack.v1', previous)
+
+  expect(result.dimensions.find(d => d.key === 'ai_visibility')?.delta).toBe(20)
+  expect(result.dimensions.find(d => d.key === 'competitive_sov')?.delta).toBeNull()
+  expect(result.dimensions.find(d => d.key === 'competitive_sov')?.comparison).toBe('competitor_set_changed')
+  expect(result.overall?.delta).toBeNull()
 })

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · por qué es seguro</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-risk` (surface deck, papel, TASK-1928). Cada riesgo con su cobertura, en una tabla de cuatro filas;
+      la selección toma la fila que se elige (el primer paso chico). Referencia: DeckSeguro (E1-seguro).
+    -->
+    <main class="gl-slide gl-paper gl-dr" data-gl-root data-slot="frame">
+      <figure class="gl-layer" data-slot="indicator">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Riesgo controlado</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Y si no funciona?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Empiezas</span><span data-slot-field="answer">chico</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-dr-body" data-slot="body">Cada riesgo tiene su cobertura escrita.</p>
+
+      <div data-slot="headers">
+        <p class="gl-dr-header gl-dr-header-risk" data-slot-field="risk">El riesgo</p>
+        <p class="gl-dr-header gl-dr-header-how" data-slot-field="how">Cómo lo cubrimos</p>
+      </div>
+
+      <ol class="gl-dr-rows" data-slot="risks">
+        <li class="gl-dr-row" data-gl-select-item>
+          <p class="gl-dr-risk" data-slot-field="risk">Que no encajemos</p>
+          <div>
+            <p class="gl-dr-name" data-slot-field="name">Sample Sprint</p>
+            <p class="gl-dr-how" data-slot-field="how">Un piloto pagado, acotado y gobernado.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-light.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

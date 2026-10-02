@@ -1,0 +1,502 @@
+<title>Identidad sonora Efeonce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,760&family=Poppins:wght@300;400;600&display=swap">
+<style>
+  :root {
+    --ground: #f7f8f6;
+    --surface: #ffffff;
+    --ink: #001a33;
+    --muted: #4b5a68;
+    --rule: #d8dee2;
+    --ring: #b9c6cf;
+    --accent: #0e8c82;
+    --hero-bg: #001a33;
+    --hero-ink: #f7f8f6;
+    --hero-muted: #a8b7c5;
+    --hero-ring: #2c4d6b;
+    --hero-accent: #36c8bf;
+    --growth: #0e8c82;
+    --brand: #bb1954;
+    --engine: #0375db;
+    --voice: #c42d00;
+    --revenue: #8e1b82;
+    --warn: #8a5a00;
+    --display: "Bricolage Grotesque", "Poppins", system-ui, sans-serif;
+    --body: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #001a33;
+      --surface: #04243f;
+      --ink: #f7f8f6;
+      --muted: #a8b7c5;
+      --rule: #173552;
+      --ring: #2c4d6b;
+      --accent: #36c8bf;
+      --hero-bg: #04243f;
+      --growth: #36c8bf;
+      --brand: #ff6500;
+      --engine: #3b95ee;
+      --voice: #f83902;
+      --revenue: #e86bd0;
+      --warn: #f0b44c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #001a33;
+    --surface: #04243f;
+    --ink: #f7f8f6;
+    --muted: #a8b7c5;
+    --rule: #173552;
+    --ring: #2c4d6b;
+    --accent: #36c8bf;
+    --hero-bg: #04243f;
+    --growth: #36c8bf;
+    --brand: #ff6500;
+    --engine: #3b95ee;
+    --voice: #f83902;
+    --revenue: #e86bd0;
+    --warn: #f0b44c;
+  }
+
+  body { background: var(--ground); color: var(--ink); font: 400 15px/1.6 var(--body); }
+  .page { max-width: 1040px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 80px; display: grid; gap: 64px; }
+
+  .eyebrow { font: 600 11px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  h1, h2 { font-family: var(--display); font-weight: 760; margin: 0; text-wrap: balance; }
+  h2 { font-size: clamp(24px, 3.4vw, 32px); line-height: 1.1; letter-spacing: -.01em; }
+  h3 { font: 600 16px/1.3 var(--body); margin: 0; }
+  p { margin: 0; }
+  .muted { color: var(--muted); }
+  strong { font-weight: 600; }
+
+  /* Portada: el logo sonoro es la tesis. */
+  .hero {
+    background: var(--hero-bg); color: var(--hero-ink);
+    border-radius: 16px; padding: clamp(24px, 5vw, 48px);
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: center;
+  }
+  .hero .eyebrow { color: var(--hero-muted); }
+  .hero h1 { font-size: clamp(36px, 6.4vw, 64px); line-height: 1; letter-spacing: -.025em; margin-top: 12px; }
+  .hero h1 .sphere { display: inline-block; width: .19em; height: .19em; border-radius: 50%; background: var(--hero-accent); margin-left: .06em; vertical-align: .06em; }
+  .hero p { color: var(--hero-muted); max-width: 52ch; margin-top: 16px; font-size: 16px; }
+  .hero p strong { color: var(--hero-ink); }
+  .hero-play { display: grid; justify-items: center; gap: 12px; }
+  .hero-play .orbit { width: 132px; height: 132px; color: var(--hero-ink); --line: var(--hero-accent); }
+  .hero-play .orbit .track { stroke: var(--hero-ring); }
+  .hero-play .caption { font-size: 12px; color: var(--hero-muted); text-align: center; }
+  .motif { display: flex; align-items: flex-end; gap: 12px; height: 34px; }
+  .motif i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--hero-muted); }
+  .motif i.s { width: 16px; height: 16px; background: var(--hero-accent); margin-left: 14px; margin-bottom: 14px; }
+
+  .section-head { display: grid; gap: 8px; max-width: 70ch; }
+  .section-head p { color: var(--muted); }
+  .section-head strong { color: var(--ink); }
+  section { display: grid; gap: 20px; }
+
+  .grammar { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  .grammar div { background: var(--surface); padding: 16px; display: grid; gap: 4px; align-content: start; }
+  .grammar b { font: 600 13px/1.3 var(--body); }
+  .grammar span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* Dos registros */
+  .registers { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .register { border: 1px solid var(--rule); border-radius: 12px; padding: 20px; display: grid; gap: 14px; background: var(--surface); align-content: start; }
+  .register header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .register h3 { font: 760 22px/1.1 var(--display); }
+  .register .tempo { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .register ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; display: grid; gap: 4px; }
+
+  .list { display: grid; border-top: 1px solid var(--rule); }
+  .row { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding-block: 12px; border-bottom: 1px solid var(--rule); }
+  .register .list { border-top: 0; }
+  .register .row:last-child { border-bottom: 0; }
+  .row p { font-size: 13.5px; color: var(--muted); line-height: 1.5; margin-top: 2px; }
+  .row .meta { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .orbit { appearance: none; border: 0; background: none; padding: 0; width: 56px; height: 56px; cursor: pointer; color: var(--ink); border-radius: 50%; }
+  .orbit:focus-visible, .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .orbit svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .orbit .track { fill: none; stroke: var(--ring); stroke-width: 1.5; }
+  .orbit .arc { fill: none; stroke: var(--line, var(--accent)); stroke-width: 2.5; stroke-linecap: round; }
+  .orbit .dot { fill: var(--line, var(--accent)); }
+  .orbit .icon { fill: currentColor; }
+
+  .chip { display: inline-flex; align-items: center; gap: 8px; font: 600 13px/1.2 var(--body); }
+  .chip::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--line); flex: none; }
+  .chip small { font-weight: 400; color: var(--muted); font-size: 12px; }
+
+  .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; }
+
+  /* Motion */
+  .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; padding: 3px; gap: 2px; width: max-content; }
+  .seg button { appearance: none; border: 0; background: none; color: var(--muted); font: 600 12px/1 var(--body); padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--ground); }
+  .videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+  .videos.vertical { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+  figure { margin: 0; display: grid; gap: 8px; align-content: start; }
+  video { width: 100%; max-width: 100%; border-radius: 8px; background: #001a33; display: block; aspect-ratio: 16 / 9; }
+  .vertical video { aspect-ratio: 9 / 16; }
+  figcaption { font-size: 13px; color: var(--muted); }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  /* Mapa de uso */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 13.5px; background: var(--surface); }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font: 600 11px/1.2 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--muted); }
+  td .none { color: var(--muted); }
+  .tag { display: inline-block; font: 600 11px/1.2 var(--body); padding: 3px 8px; border-radius: 999px; border: 1px solid var(--rule); color: var(--muted); white-space: nowrap; }
+  .tag.fondo { border-color: var(--accent); color: var(--accent); }
+  .tag.energia { border-color: var(--ink); color: var(--ink); }
+  .tag.pend { border-color: var(--warn); color: var(--warn); }
+
+  .rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .rules div { border-top: 3px solid var(--accent); padding-top: 14px; display: grid; gap: 10px; align-content: start; }
+  .rules div.no { border-color: var(--ink); }
+  .rules ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; }
+
+  dl.spec { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr); margin: 0; border-top: 1px solid var(--rule); }
+  dl.spec dt, dl.spec dd { padding: 10px 0; border-bottom: 1px solid var(--rule); margin: 0; font-size: 14px; }
+  dl.spec dt { color: var(--muted); padding-right: 16px; }
+  dl.spec dd { font-variant-numeric: tabular-nums; }
+
+  .status { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .status > div { display: grid; gap: 10px; align-content: start; }
+  .status ol, .status ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 14px; }
+  .status li::marker { color: var(--accent); font-weight: 600; }
+  code { font-size: 12.5px; background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; overflow-wrap: anywhere; }
+
+  @media (max-width: 640px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-play { justify-items: start; }
+    .row { grid-template-columns: 48px minmax(0, 1fr); }
+    .row .meta { grid-column: 2; }
+    .orbit { width: 48px; height: 48px; }
+    dl.spec { grid-template-columns: 1fr; }
+    dl.spec dt { border-bottom: 0; padding-bottom: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main class="page">
+  <section class="hero" aria-label="Logo sonoro">
+    <div>
+      <div class="eyebrow">Identidad sonora · Efeonce · versión recomendada · la guía oficial vive en axis.efeonce.org/references/sonic-brand</div>
+      <h1>Tres puntos que se vuelven uno<span class="sphere" aria-hidden="true"></span></h1>
+      <p>El sonido de <strong>La órbita</strong>. Tres notas breves piensan —las tres ventanas de la nave—, hay una pausa y la esfera responde con un golpe. <strong>Mi, Mi, Mi → La.</strong> La melodía no cambia nunca: cambia el registro según el contexto y el timbre de la esfera según la línea de servicio.</p>
+    </div>
+    <div class="hero-play">
+      <button class="orbit" data-src="media/efeonce-logo-sonoro-growth.mp3" aria-label="Escuchar el logo sonoro"></button>
+      <div class="motif" aria-hidden="true"><i></i><i></i><i></i><i class="s"></i></div>
+      <div class="caption">Logo sonoro · 2,9 s</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>La gramática</h2>
+      <p>El sonido dice lo mismo que la línea gráfica: <strong>el anillo pregunta, la esfera responde</strong>.</p>
+    </div>
+    <div class="grammar">
+      <div><b>Anillo · la pregunta</b><span>Un acorde abierto de quinta, tenue, sin resolver.</span></div>
+      <div><b>Tres ventanas · lo que se piensa</b><span>Tres notas en Mi, a 140 ms una de otra, sin golpe.</span></div>
+      <div><b>Esfera · la respuesta</b><span>La, 370 ms después, con el único golpe de la pieza.</span></div>
+      <div><b>Halo · la luz</b><span>El acorde de La florece y se apaga con una cola corta.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Dos registros, el mismo ADN</h2>
+      <p>La misma melodía y la misma esfera, en dos intensidades. Se elige por el contexto, nunca se cambian dentro de una misma pieza.</p>
+    </div>
+    <div class="registers">
+      <article class="register">
+        <header><h3>Fondo</h3><span class="tempo">96 BPM · sereno</span></header>
+        <ul>
+          <li>Debajo de una locución, webinars, videos explicativos.</li>
+          <li>La esfera responde siempre La mientras los acordes cambian: el contexto cambia, la respuesta no.</li>
+        </ul>
+        <div class="list">
+          <div class="row">
+            <button class="orbit" data-src="media/efeonce-pieza-larga-fondo.mp3" aria-label="Escuchar pieza larga, fondo"></button>
+            <div><h3>Pieza larga</h3><p>Para editar debajo de una voz.</p></div>
+            <div class="meta">40,5 s</div>
+          </div>
+          <div class="row">
+            <button class="orbit" data-src="media/efeonce-pieza-larga-fondo-brian.mp3" aria-label="Escuchar pieza larga, fondo, con Brian"></button>
+            <div><h3>Pieza larga con Brian</h3><p>Cierra con «Empower your Growth».</p></div>
+            <div class="meta">40,5 s</div>
+          </div>
+        </div>
+      </article>
+      <article class="register">
+        <header><h3>Energía</h3><span class="tempo">120 BPM · rock</span></header>
+        <ul>
+          <li>Redes, lanzamientos, arranque de eventos.</li>
+          <li>Las tres ventanas son tres golpes apagados de guitarra y la esfera, el acorde con toda la banda. La pausa sigue siendo la misma: 375 ms.</li>
+        </ul>
+        <div class="list">
+          <div class="row">
+            <button class="orbit" data-src="media/efeonce-pieza-larga-energia.mp3" aria-label="Escuchar pieza larga, energía"></button>
+            <div><h3>Pieza larga</h3><p>Guitarra sola, entra la banda, coro y firma.</p></div>
+            <div class="meta">37 s</div>
+          </div>
+          <div class="row">
+            <button class="orbit" data-src="media/efeonce-pieza-larga-energia-brian.mp3" aria-label="Escuchar pieza larga, energía, con Brian"></button>
+            <div><h3>Pieza larga con Brian</h3><p>«Growth» cae con el acorde final.</p></div>
+            <div class="meta">37 s</div>
+          </div>
+          <div class="row">
+            <button class="orbit" data-src="media/efeonce-cierre-energia.mp3" aria-label="Escuchar cierre de energía"></button>
+            <div><h3>Cierre de energía</h3><p>El corte, los tres golpes y el acorde: para rematar cualquier pieza.</p></div>
+            <div class="meta">5,1 s</div>
+          </div>
+          <div class="row">
+            <button class="orbit" data-src="media/efeonce-cierre-energia-brian.mp3" aria-label="Escuchar cierre de energía con Brian"></button>
+            <div><h3>Cierre de energía con Brian</h3><p>El mismo, con el eslogan.</p></div>
+            <div class="meta">5,1 s</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="two-col">
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="section-head">
+        <h2>El logo sonoro por línea</h2>
+        <p>Como el acento de color en la gráfica: <strong>la línea cambia sólo el timbre de la esfera</strong>.</p>
+      </div>
+      <div class="list">
+        <div class="row" style="--line: var(--growth)">
+          <button class="orbit" data-src="media/efeonce-logo-sonoro-growth.mp3" aria-label="Logo sonoro Growth"></button>
+          <div><span class="chip">Growth <small>· Efeonce</small></span><p>Campana.</p></div>
+        </div>
+        <div class="row" style="--line: var(--brand)">
+          <button class="orbit" data-src="media/efeonce-logo-sonoro-brand.mp3" aria-label="Logo sonoro Brand"></button>
+          <div><span class="chip">Brand <small>· Globe</small></span><p>Marimba: madera tocada.</p></div>
+        </div>
+        <div class="row" style="--line: var(--engine)">
+          <button class="orbit" data-src="media/efeonce-logo-sonoro-engine.mp3" aria-label="Logo sonoro Engine"></button>
+          <div><span class="chip">Engine <small>· Wave</small></span><p>FM sintético, preciso.</p></div>
+        </div>
+        <div class="row" style="--line: var(--voice)">
+          <button class="orbit" data-src="media/efeonce-logo-sonoro-voice.mp3" aria-label="Logo sonoro Voice"></button>
+          <div><span class="chip">Voice <small>· Reach</small></span><p>Eco: el mensaje que se propaga.</p></div>
+        </div>
+        <div class="row" style="--line: var(--revenue)">
+          <button class="orbit" data-src="media/efeonce-logo-sonoro-revenue.mp3" aria-label="Logo sonoro Revenue"></button>
+          <div><span class="chip">Revenue <small>· RevOps</small></span><p>Campana grave, una octava abajo.</p></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="section-head">
+        <h2>La etiqueta con voz</h2>
+        <p>Brian dice el eslogan de la línea y <strong>la esfera cae en la palabra final</strong>, como el acento cierra en la gráfica.</p>
+      </div>
+      <div class="list">
+        <div class="row" style="--line: var(--growth)">
+          <button class="orbit" data-src="media/efeonce-etiqueta-growth-brian.mp3" aria-label="Empower your Growth"></button>
+          <div><span class="chip">Empower your Growth</span></div>
+        </div>
+        <div class="row" style="--line: var(--brand)">
+          <button class="orbit" data-src="media/efeonce-etiqueta-brand-brian.mp3" aria-label="Empower your Brand"></button>
+          <div><span class="chip">Empower your Brand</span></div>
+        </div>
+        <div class="row" style="--line: var(--engine)">
+          <button class="orbit" data-src="media/efeonce-etiqueta-engine-brian.mp3" aria-label="Empower your Engine"></button>
+          <div><span class="chip">Empower your Engine</span></div>
+        </div>
+        <div class="row" style="--line: var(--voice)">
+          <button class="orbit" data-src="media/efeonce-etiqueta-voice-brian.mp3" aria-label="Empower your Voice"></button>
+          <div><span class="chip">Empower your Voice</span></div>
+        </div>
+        <div class="row" style="--line: var(--revenue)">
+          <button class="orbit" data-src="media/efeonce-etiqueta-revenue-brian.mp3" aria-label="Empower your Revenue"></button>
+          <div><span class="chip">Empower your Revenue</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="motion">
+    <div class="section-head">
+      <h2>Con el logo en movimiento</h2>
+      <p>Las animaciones V1.1 aprobadas, sin tocar la imagen: la esfera sonora cae con el golpe de encaje de la nave.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Formato">
+      <button type="button" id="fmt-16x9" data-fmt="16x9" aria-pressed="true">Horizontal 16:9</button>
+      <button type="button" id="fmt-9x16" data-fmt="9x16" aria-pressed="false">Vertical 9:16</button>
+    </div>
+    <div class="videos" id="videos">
+      <figure><video controls preload="metadata" playsinline data-base="media/efeonce-sting"></video><figcaption><b>Sting</b> · cortinillas y cierres de menos de 2 s</figcaption></figure>
+      <figure><video controls preload="metadata" playsinline data-base="media/efeonce-reveal"></video><figcaption><b>Reveal</b> · cierre de video de marca</figcaption></figure>
+      <figure><video controls preload="metadata" playsinline data-base="media/efeonce-reveal-brian"></video><figcaption><b>Reveal con Brian</b> · cuando el video no cierra con locución</figcaption></figure>
+      <figure><video controls preload="metadata" playsinline data-base="media/efeonce-apertura"></video><figcaption><b>Apertura</b> · inicio de video o presentación; termina abierta</figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Qué usar en cada caso</h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Contexto</th><th>Pieza</th><th>Registro</th><th>Volumen</th></tr></thead>
+        <tbody>
+          <tr><td>Cierre de un video de marca</td><td>Reveal; con Brian si el video no cierra con locución</td><td><span class="tag fondo">Fondo</span></td><td class="num">−14 LUFS</td></tr>
+          <tr><td>Inicio de un video o presentación</td><td>Apertura</td><td><span class="tag fondo">Fondo</span></td><td class="num">−14 LUFS</td></tr>
+          <tr><td>Reels, cortinillas, cierres cortos</td><td>Sting</td><td><span class="tag fondo">Fondo</span></td><td class="num">−14 LUFS</td></tr>
+          <tr><td>Video con locución, webinar, explicativo</td><td>Pieza larga de fondo, unos 15 dB debajo de la voz</td><td><span class="tag fondo">Fondo</span></td><td class="num">−14 LUFS</td></tr>
+          <tr><td>Lanzamiento, pieza de redes con ritmo, arranque de evento</td><td>Pieza larga de energía o cierre de energía</td><td><span class="tag energia">Energía</span></td><td class="num">−14 LUFS</td></tr>
+          <tr><td>Pieza de una línea de servicio</td><td>Logo sonoro o etiqueta con el timbre de esa línea</td><td>Según contexto</td><td class="num">−14 LUFS</td></tr>
+          <tr><td>Podcast Glitch</td><td>Por decidir</td><td><span class="tag pend">Pendiente</span></td><td class="num">−16 LUFS</td></tr>
+          <tr><td>Pantalla de recepción</td><td class="none">Sin sonido, como define la línea gráfica</td><td>—</td><td class="num">—</td></tr>
+          <tr><td>Piezas de clientes · interfaz de Greenhouse</td><td class="none">No se usa: es la marca Efeonce</td><td>—</td><td class="num">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Reglas</h2></div>
+    <div class="rules">
+      <div>
+        <h3>Siempre</h3>
+        <ul>
+          <li>La melodía es Mi, Mi, Mi → La, con su pausa. No se cambia ni se acorta.</li>
+          <li>La línea de servicio cambia sólo el timbre de la esfera.</li>
+          <li>Un solo golpe por pieza: el de la esfera.</li>
+          <li>El eslogan va en inglés, nunca traducido, y su palabra final cae con la esfera.</li>
+          <li>Se nivela por destino: −14 LUFS en video y redes, −16 en podcast, pico en −1 dBFS.</li>
+          <li>Se usan los archivos del kit, no versiones regeneradas.</li>
+        </ul>
+      </div>
+      <div class="no">
+        <h3>Nunca</h3>
+        <ul>
+          <li>Cambiar de registro dentro de una misma pieza.</li>
+          <li>Poner el registro de energía debajo de una locución.</li>
+          <li>Comprimir el golpe para que el archivo suene más fuerte.</li>
+          <li>Usar el sistema en piezas de clientes o en la interfaz de Greenhouse.</li>
+          <li>Sonorizar la pantalla de recepción.</li>
+          <li>Otra voz para el eslogan que no sea la de Brian.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Ficha técnica</h2></div>
+    <dl class="spec">
+      <dt>Tonalidad</dt><dd>La mayor, la misma del motion V1.1</dd>
+      <dt>Motivo</dt><dd>Mi5 · Mi5 · Mi5 → La5 · notas a 140 ms · pausa de 370 ms</dd>
+      <dt>Registro de fondo</dt><dd>96 BPM · La · Re/La · Fa♯m7 · Mi sus4</dd>
+      <dt>Registro de energía</dt><dd>120 BPM · la pausa son tres semicorcheas (375 ms)</dd>
+      <dt>Timbre de la esfera</dt><dd>Growth campana · Brand marimba · Engine FM · Voice eco · Revenue campana grave</dd>
+      <dt>Voz</dt><dd>Brian (ElevenLabs v3) · pausa «Empower» → «your» igualada a 0,14 s en las cinco líneas</dd>
+      <dt>Formato</dt><dd>WAV 48 kHz, 24 bits · video H.264 en 16:9 y 9:16</dd>
+      <dt>Origen</dt><dd>Logo, fondo y motion: síntesis propia, sin muestras. Energía: maqueta propia re-grabada con Stable Audio 2.5, con la esfera propia encima.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Estado</h2><p>Es la versión recomendada. Todavía no es canon.</p></div>
+    <div class="status">
+      <div>
+        <h3>Antes de canonizar</h3>
+        <ol>
+          <li><strong>Glitch:</strong> decidir su registro.</li>
+          <li><strong>Licencias:</strong> fal marca «Commercial use» Stable Audio 2.5 y la voz ElevenLabs v3. Queda para legal si el umbral de USD 1 millón de Stability aplica vía fal (afecta sólo al registro de energía).</li>
+          <li><strong>Prueba de reconocimiento</strong> sin logo antes de pautar, como la pendiente de la órbita.</li>
+          <li><strong>Canonizar:</strong> valores a los tokens de AXIS y reemplazo del sonido de los masters V1.1. La guía ya está publicada en <a href="https://axis.efeonce.org/references/sonic-brand/">AXIS</a>, con el JSON para agentes.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>El kit</h3>
+        <ul>
+          <li><code>01-logo-sonoro</code> · 5 líneas</li>
+          <li><code>02-etiqueta-voz</code> · 5 líneas con Brian</li>
+          <li><code>03-motion</code> · sting, reveal, reveal con Brian y apertura, en 16:9 y 9:16, más sus WAV</li>
+          <li><code>04-piezas-largas</code> · fondo y energía, con y sin voz</li>
+          <li><code>05-cierre-energia</code> · con y sin voz</li>
+          <li><code>06-voz-sola</code> · las cinco etiquetas de Brian sin música, para editores</li>
+          <li>Copia para el equipo en OneDrive: <code>13- Branding › Identidad Sonora Efeonce › v1</code></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  (() => {
+    const R = 26, C = 2 * Math.PI * R
+    const PLAY = 'M28 24.5v15l12-7.5z'
+    const PAUSE = 'M27 24h3.6v16H27zM33.4 24H37v16h-3.6z'
+    let current = null
+    const videos = () => document.querySelectorAll('video')
+
+    // El SVG se arma una vez y sólo cambian atributos: reemplazarlo en cada cuadro dejaba sin destino el clic humano.
+    const build = (btn) => {
+      btn.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true" style="pointer-events:none"><circle class="track" cx="32" cy="32" r="${R}"/><circle class="arc" cx="32" cy="32" r="${R}" transform="rotate(-90 32 32)" stroke-dasharray="0 ${C.toFixed(2)}" visibility="hidden"/><circle class="dot" cx="32" cy="${32 - R}" r="4" visibility="hidden"/><path class="icon" d="${PLAY}"/></svg>`
+      return { arc: btn.querySelector('.arc'), dot: btn.querySelector('.dot'), icon: btn.querySelector('.icon') }
+    }
+    const draw = (parts, p, playing) => {
+      const a = p * 2 * Math.PI - Math.PI / 2, shown = p > 0 ? 'visible' : 'hidden'
+      parts.arc.setAttribute('stroke-dasharray', `${(p * C).toFixed(2)} ${C.toFixed(2)}`); parts.arc.setAttribute('visibility', shown)
+      parts.dot.setAttribute('cx', (32 + R * Math.cos(a)).toFixed(2)); parts.dot.setAttribute('cy', (32 + R * Math.sin(a)).toFixed(2)); parts.dot.setAttribute('visibility', shown)
+      parts.icon.setAttribute('d', playing ? PAUSE : PLAY)
+    }
+
+    document.querySelectorAll('.orbit').forEach(btn => {
+      const audio = new Audio()
+      audio.preload = 'none'
+      audio.src = btn.dataset.src
+      const parts = build(btn)
+      draw(parts, 0, false)
+      let raf = 0
+      const tick = () => {
+        const p = audio.duration ? Math.min(1, audio.currentTime / audio.duration) : 0
+        draw(parts, p, !audio.paused)
+        if (!audio.paused) raf = requestAnimationFrame(tick)
+      }
+      audio.addEventListener('play', () => { raf = requestAnimationFrame(tick) })
+      audio.addEventListener('pause', () => { cancelAnimationFrame(raf); tick() })
+      audio.addEventListener('ended', () => { cancelAnimationFrame(raf); draw(parts, 1, false) })
+      btn.addEventListener('click', () => {
+        if (current && current !== audio) current.pause()
+        videos().forEach(v => v.pause())
+        if (audio.paused) {
+          if (audio.ended) audio.currentTime = 0
+          current = audio
+          audio.play().catch(() => {})
+        } else audio.pause()
+      })
+    })
+
+    const grid = document.getElementById('videos')
+    const setFormat = fmt => {
+      grid.classList.toggle('vertical', fmt === '9x16')
+      grid.querySelectorAll('video').forEach(v => { v.pause(); v.src = `${v.dataset.base}_${fmt}.mp4` })
+      document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.fmt === fmt)))
+      try { localStorage.setItem('efeonce-sonido-fmt', fmt) } catch {}
+    }
+    document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.fmt)))
+    let saved = '16x9'
+    try { saved = localStorage.getItem('efeonce-sonido-fmt') || '16x9' } catch {}
+    setFormat(saved === '9x16' ? '9x16' : '16x9')
+
+    videos().forEach(v => v.addEventListener('play', () => {
+      if (current) current.pause()
+      videos().forEach(o => { if (o !== v) o.pause() })
+    }))
+  })()
+</script>

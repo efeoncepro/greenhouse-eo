@@ -37,6 +37,7 @@ import { promisify } from 'node:util'
 import sharp from 'sharp'
 
 import { extraerReferencia } from './regresion-ref.mjs'
+import { resolveColorPolicyPath } from './cta-color-policy.mjs'
 
 const run = promisify(execFile)
 const ROOT = fileURLToPath(new URL('../../', import.meta.url))
@@ -135,7 +136,7 @@ for (const plan of planes.sort()) {
       }
     }
 
-    const pieza = { ...p, plate }
+    const pieza = resolveColorPolicyPath({ ...p, plate }, path.dirname(plan))
     const clave = sha(JSON.stringify({ ...p, plate: plateSha.get(plate) })).slice(0, 16)
 
     if (!casos.has(clave)) casos.set(clave, { clave, planes: [], pieza, plateSha: plateSha.get(plate) })

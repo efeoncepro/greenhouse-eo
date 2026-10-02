@@ -1,0 +1,13 @@
+CMP005-S02-KV-45-R01-plate.png  1122×1402  · formato 4:5
+
+  reserva                                 medido                                              pasa
+  1 · zona de texto (banda)               blanca 0.30 · oscura 0.00 del alto                  ✓
+  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —
+  3 · lecho de la firma (18% · señal débil)blanco 13.1 · navy 1.75 · nitidez 0.0003 (frágil)   ✓
+  color · sombras no azules               b* del cuartil oscuro -1.3 (negativo = azul; ojo si hay un objeto azul grande)✓
+  4 · aire para cursores                  costados calma 1.15 / 1.22                          ✗
+  5 · campo profundo al margen            banda continua hasta 0.00 (tinta —)                 ✗
+
+  3/5 reservas cumplidas
+
+exit=1

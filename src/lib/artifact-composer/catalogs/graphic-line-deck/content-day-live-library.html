@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · la biblioteca a su ritmo</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-day-live-library` (surface deck, tema oscuro, TASK-1942). «¿Cómo aprende tu equipo? A su ritmo.»:
+      la biblioteca de tutoriales en video por rol, grabados sobre la org del cliente, abierta en perspectiva sobre la
+      plataforma de luz: cabecera con el isotipo de la herramienta (si la cuenta la usa) y la marca de datos de muestra,
+      cuatro videos con el ícono oficial de su producto y tres cifras. Interfaz genérica: sólo los isotipos son reales.
+      Sin selección. Referencia: DeckSalesforceAdopcionLoom (SF15-adopcion-loom).
+    -->
+    <main class="gl-slide gl-ls gl-cll" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <section class="gl-ls-doc gl-cll-library">
+        <header class="gl-cll-head">
+          <span class="gl-cll-head-start">
+            <span class="gl-cll-tool" data-slot="libraryTool"><img class="gl-cll-tool-icon" data-slot-field="src" alt="" /></span>
+            <span data-slot="library">
+              <span class="gl-cll-kicker" data-slot-field="kicker">En Loom · sobre tu org</span>
+              <span class="gl-cll-title" data-slot-field="title">Tutoriales de tu equipo</span>
+            </span>
+          </span>
+          <span class="gl-cll-mark" data-slot="sampleMark">Datos de muestra</span>
+        </header>
+
+        <ol class="gl-cll-videos" data-slot="videos">
+          <li class="gl-cll-card">
+            <span class="gl-cll-thumb">
+              <img class="gl-cll-thumb-icon" data-slot-field="icon" alt="" />
+              <span class="gl-cll-play" aria-hidden="true"><span class="gl-cll-play-glyph"></span></span>
+              <span class="gl-cll-duration" data-slot-field="duration">2:40</span>
+            </span>
+            <span class="gl-cll-role" data-slot-field="role">Ventas</span>
+            <span class="gl-cll-video-title" data-slot-field="title">Cómo registrar una oportunidad</span>
+          </li>
+        </ol>
+
+        <ol class="gl-cll-stats" data-slot="stats">
+          <li class="gl-cll-stat">
+            <span class="gl-cll-stat-value" data-slot-field="value">24</span>
+            <span class="gl-cll-stat-label" data-slot-field="label">tutoriales grabados</span>
+          </li>
+        </ol>
+      </section>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Activación y adopción</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo aprende tu equipo?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">A su</span><span data-slot-field="answer">ritmo</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Tutoriales cortos en video, grabados sobre <strong>tu</strong> Salesforce: responden «¿cómo hago…?» sin agendar una reunión.</p>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

@@ -1,5 +1,7 @@
 # ADR — Greenhouse SEO Module as "Search Visibility 360" (complemento del AEO)
 
+> **Delta de nomenclatura 2026-09-29:** [ADR Efeonce AEO](EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) fija el nombre de la capacidad AEO y su diagnóstico público. `AEO Grader` conserva aquí su sentido histórico/técnico; **Search Visibility 360** sigue nombrando la oferta más amplia SEO+AEO. Las decisiones arquitectónicas de este ADR permanecen vigentes.
+
 > **Status:** Accepted · 2026-07-01
 > **Scope:** Growth / SEO / AEO / DataForSEO / Search Console / Entitlements / Commercial
 > **Canonical architecture doc:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)

@@ -1,0 +1,45 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "line": "engine",
+  "theme": "dark",
+  "recipe": "content-committee-deck",
+  "voice": {
+    "eyebrow": "Sin armar láminas",
+    "question": "¿Y el PPT del comité?",
+    "answer": [
+      "Ya",
+      "está"
+    ]
+  },
+  "body": "La IA escribe el titular y destaca lo que importa; nuestro equipo lo revisa. Tú entras a la reunión y **presentas**.",
+  "productMark": {
+    "asset": "insights-lockup-negative",
+    "alt": "Efeonce | Insights"
+  },
+  "slideKicker": "Comité · tercer trimestre",
+  "slideHeadline": "La IA ya te nombra en 4 de cada 10 respuestas",
+  "slideFigure": {
+    "value": "+38%",
+    "label": "visibilidad en el trimestre"
+  },
+  "annotation": "Guía de precios",
+  "features": [
+    {
+      "title": "Presentas en vivo",
+      "detail": "Desde el informe, con los datos al día"
+    },
+    {
+      "title": "Deck 16:9",
+      "detail": "Las láminas del comité, ya armadas"
+    },
+    {
+      "title": "PDF A4",
+      "detail": "Para mandarlo al directorio"
+    }
+  ]
+}

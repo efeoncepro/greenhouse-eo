@@ -1,5 +1,23 @@
 # TASK-1848 — Efeonce Insights: acceso compartido, correo y recurrencia gobernados
 
+## Delta 2026-09-28 (TASK-1875)
+
+- El enlace que emite esta capacidad — `buildInsightShareUrl` (`src/lib/efeonce-insights/sharing/token.ts`) →
+  `https://think.efeoncepro.com/insights/r/<token>`, usado por el correo (`delivery/dispatch.ts`) y por la respuesta
+  de crear enlace (`sharing/commands.ts`) — es la ruta que TASK-1875 implementó en `efeonce-think`
+  (`src/pages/insights/r/[token].astro`). El reader público ahora responde `InsightWebModelV1` **1.1, aditivo** (campos
+  editoriales v2 opcionales + logo del cliente por `GET /api/public/insights/shared/[token]/logo`); un consumidor 1.0
+  sigue funcionando.
+- **Todavía no está en vivo en producción:** los commits de Greenhouse y de Think son locales, sin push. Por defecto el
+  enlace apunta a Think de producción, que lee Greenhouse de producción: un token de staging da 404 allí. — por trabajo
+  en TASK-1875
+
+## Delta 2026-09-28
+
+- Verificado en datos reales: cero doble envío (1 correo por destinatario). Corregido `email_delivery_id` de la modalidad `attachment`: guardaba el id del batch de `sendEmail()` en vez de la fila; ahora la resuelve por `source_event_id` (commit `8882af0e3`; el primer intento `34d763460` no corregía — `recipientResults[].deliveryId` también es el batch en el camino secuencial —, sin push; la fila sintética de staging queda con el batch, sin efecto funcional porque el transporte se lee por `source_event_id`).
+- ISSUE-174 → TASK-1876 code complete (guard WAF, timeout de sesión Vercel, pico de Cloud SQL); su rollout lo aplica el operador.
+- Lo que sigue abierto aquí no es código de esta task: tiene dueño (TASK-690–693, TASK-1849, TASK-1875) o exige sesión humana (negativos MCP). Producción sigue con flags OFF hasta TASK-1875.
+
 ## Delta 2026-09-18 — producción
 
 - **Release `bda1cf2cd938`** (PR #238 squash, orquestador `35349506106`, manifest `released` 13:41Z, sin retry; `bypass_preflight_reason` por `db_migrations` ya aplicadas + marker `[release-coupled]` auth_access/cloud_release). Vercel READY, 6 workers Cloud Run en `bda1cf2cd938`, Azure `no_infra_diff`, post-release health verde.
@@ -34,7 +52,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `En producción 2026-09-18 con flags OFF (release bda1cf2cd938) + gateway efeonce-mcp 1.7.0 federado; abierto por criterios de canales in-app/Teams, ruta de portal (TASK-1849), lector público en Think (TASK-1875) y ISSUE-174 (TASK-1876)`
+- Status real: `En producción 2026-09-18 con flags OFF (release bda1cf2cd938) + gateway efeonce-mcp 1.7.0; 2026-09-28: cero doble envío verificado en datos reales y fix de email_delivery_id en adjuntos (8882af0e3, local sin push). Abierto por dependencias con dueño propio: in-app/Teams y preferencias (TASK-690–693), portal_link (TASK-1849), lector Think (TASK-1875, bloquea flags de producción), guard ISSUE-174 (TASK-1876 code complete, rollout pendiente) y negativos MCP con sesión humana`
 - Rank: `TBD`
 - Domain: `platform|identity|ops|data`
 - Blocked by: `none`
@@ -327,10 +345,10 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [ ] Deep link normal lleva a la edición autenticada y conserva contexto tras login; valida cuenta/módulo/acción en servidor. ShareGrant es explícito y separado; GET/scanner no ejecuta acciones ni marca leído. — **Abierto:** la ruta de la edición en el portal es de TASK-1849; `portal_link` responde `not_ready` (`INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE=false`). Sí verificado: ShareGrant separado y el GET público sólo lee (access log mínimo, no marca leído).
 - [ ] Destinatarios cliente se resuelven por persona/usuario canónico sin exigir member laboral; se revalidan al despachar. Teamsbot sin destino autorizado se registra no disponible; no hay publicación a canales generales como fallback. — **Parcial:** resolución por `session_360` sin exigir member y revalidación al despachar verificadas (`delivery.test.ts`); Teams no implementado (ver primer criterio).
 - [ ] Recurrencia/recordatorios respetan cadencia, zona, preferencias, baja aplicable y estado vigente; resueltos/retirados no se recuerdan. Cada flujo conserva correlación hasta consulta/acción sin usar aperturas como prueba humana. — **Parcial:** cadencia/zona/estado vigente y correlación ocurrencia→edición verificados (`schedules.test.ts`, live); recordatorios, preferencias y baja no existen en V1 (sin envío automático).
-- [ ] Integración previa al Hub usa la projection reactiva existente y servicios canónicos; cutover por sus dueñas conserva dedupe/preferencias y demuestra cero doble envío. No otro Hub, projection, self-webhook o cron por cuenta. — **Parcial:** usa el framework reactivo existente (projection `insights_delivery_dispatch`, lane notifications) sin cron ni webhook nuevos; «cero doble envío» en runtime queda para el canary de staging.
+- [ ] Integración previa al Hub usa la projection reactiva existente y servicios canónicos; cutover por sus dueñas conserva dedupe/preferencias y demuestra cero doble envío. No otro Hub, projection, self-webhook o cron por cuenta. — **Parcial:** usa el framework reactivo existente (projection `insights_delivery_dispatch`, lane notifications) sin cron ni webhook nuevos. **Cero doble envío en runtime verificado 2026-09-28** (lectura de la instancia única): 3 intents `completed`, 3 destinatarios, 0 claves `(intent, recipient_key)` duplicadas y exactamente 1 fila de `email_deliveries` por destinatario (`source_event_id`). Falta sólo la parte que no es de esta task: el cutover al Hub por sus dueñas (TASK-690 criterio de doble envío).
 - [x] La matriz cliente/interno/shared de arquitectura §7.1 se aplica a descargas, grants, correo y schedules: generar no concede distribuir; token no da identidad/biblioteca; correo desde Efeonce conserva capability interna separada. — Verificado: `sharing.test.ts`/`delivery.test.ts`/`schedules.test.ts` (compartir exige capability propia, enviar y programar son internos, token no da identidad).
 - [x] Cliente con capability explícita puede gestionar grants propios de ediciones elegibles; interno sólo sobre cuentas autorizadas. Audiencia, módulos, revocación y autoridad de cada ocurrencia se revalidan, también con cambios concurrentes. — Verificado: sólo `client_executive` comparte su org; `client_manager` 403; org ajena 404 (`sharing.test.ts`); cupo y bloqueo de edición en transacción.
-- [ ] Manual operativo incluye y prueba aprobación por versión/destinatario, revocación, retry ambiguo, accepted frente a delivered y pausa de schedule; fixtures sanitizados y negativos de permiso/tenant por MCP. — **Parcial:** manual `operar-efeonce-insights-api-mcp.md` v1.5 con las recetas; la prueba por MCP (negativos de permiso/tenant contra el gateway) espera la federación en `efeonce-mcp`.
+- [ ] Manual operativo incluye y prueba aprobación por versión/destinatario, revocación, retry ambiguo, accepted frente a delivered y pausa de schedule; fixtures sanitizados y negativos de permiso/tenant por MCP. — **Parcial:** manual `operar-efeonce-insights-api-mcp.md` v1.5 con las recetas; la federación ya existe (gateway 1.7.0). Falta ejecutar los negativos de permiso/tenant por MCP, que exigen una sesión humana PKCE contra `mcp.efeonce.org` (no disponible en sesión no interactiva 2026-09-28).
 
 - [x] Dos grants activos de una edición se revocan individualmente; token desconocido/expirado/revocado no revela identidad ni datos del cliente. — Verificado: `sharing.live.test.ts` (PG real) + reader 404/410 anti-oracle (`sharing.test.ts`).
 - [x] Sólo digest persistido; tests de logs/outbox/analytics/referrer/HTML verifican ausencia de bearer fuera de respuesta autorizada y del carril cifrado efímero. — Verificado: fila sin bearer (live), outbox sin token/digest, scrub Sentry de path/breadcrumbs/spans (`sentry-server-event-scrub.test.ts`); el HTML es de Think (TASK-1875).

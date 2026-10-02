@@ -532,6 +532,65 @@ export interface GreenhouseAuthTotpEnrollments {
   subject: string;
 }
 
+export interface GreenhouseBrandBrandRenderEvents {
+  actor_kind: string;
+  created_at: Generated<Timestamp>;
+  detail: Generated<Json>;
+  from_state: string | null;
+  job_id: string | null;
+  organization_id: string;
+  render_event_id: Generated<Int8>;
+  request_id: string;
+  to_state: string;
+}
+
+export interface GreenhouseBrandBrandRenderJobs {
+  artifact_id: string;
+  asset_requests: Generated<Json>;
+  attempts: Generated<number>;
+  catalog_name: string;
+  constraints: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  deadline: Timestamp | null;
+  execution_name: string | null;
+  failure_code: string | null;
+  failure_detail: string | null;
+  fence_token: Generated<Int8>;
+  finished_at: Timestamp | null;
+  job_id: Generated<string>;
+  lease_expires_at: Timestamp | null;
+  manifest: Json;
+  manifest_hash: string;
+  max_attempts: Generated<number>;
+  organization_id: string;
+  output_asset_ids: Generated<string[]>;
+  output_report: Json | null;
+  output_target: string;
+  provenance: Json | null;
+  request_id: string;
+  started_at: Timestamp | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseBrandBrandRenderRequests {
+  axis_versions: Generated<Json>;
+  cancelled_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  family: string;
+  finished_at: Timestamp | null;
+  idempotency_key: string;
+  organization_id: string;
+  request_id: Generated<string>;
+  request_summary: Generated<Json>;
+  requested_by_kind: string;
+  requested_by_user_id: string | null;
+  source_asset_ids: Generated<string[]>;
+  started_at: Timestamp | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseClientPortalModuleAssignmentEvents {
   actor_user_id: string;
   assignment_id: string;
@@ -7467,6 +7526,15 @@ export interface GreenhouseGrowthFormVersion {
   version: number;
 }
 
+export interface GreenhouseGrowthGraderBrandAliasHistory {
+  aliases_json: Json;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  history_id: Generated<string>;
+  profile_id: string;
+  reason: string;
+}
+
 export interface GreenhouseGrowthGraderBrandIntelligence {
   brand_intelligence_id: Generated<string>;
   candidate_business_model: string | null;
@@ -7494,6 +7562,17 @@ export interface GreenhouseGrowthGraderBusinessModelHistory {
   reason: string | null;
   to_business_model: string;
   to_source: string;
+}
+
+export interface GreenhouseGrowthGraderCompetitorSets {
+  competitor_set_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  market_id: string;
+  members_json: Json;
+  reason: string;
+  status: string;
+  version: number;
 }
 
 export interface GreenhouseGrowthGraderIntakeEvents {
@@ -7547,7 +7626,25 @@ export interface GreenhouseGrowthGraderProbeResults {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseGrowthGraderProfileMarkets {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  is_primary: Generated<boolean>;
+  locale: string;
+  market_code: string;
+  market_id: Generated<string>;
+  profile_id: string;
+  recurring_regrade_cadence: Generated<string>;
+  recurring_regrade_enabled: Generated<boolean>;
+  recurring_regrade_last_at: Timestamp | null;
+  recurring_regrade_last_run_id: string | null;
+  recurring_regrade_next_at: Timestamp | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseGrowthGraderProfiles {
+  brand_aliases: Generated<Json>;
   brand_name: string;
   business_model: string | null;
   business_model_confidence: Numeric | null;
@@ -7583,6 +7680,7 @@ export interface GreenhouseGrowthGraderPromptSets {
   created_by: string;
   generation_strategy: string;
   grounding_sources_json: Generated<Json>;
+  market_id: string | null;
   model: string | null;
   profile_id: string;
   prompts_json: Generated<Json>;
@@ -7690,8 +7788,25 @@ export interface GreenhouseGrowthGraderReportShortLinks {
   use_count: Generated<number>;
 }
 
+export interface GreenhouseGrowthGraderRunBatches {
+  batch_id: Generated<string>;
+  cost_ceiling_total_usd: Numeric;
+  created_at: Generated<Timestamp>;
+  idempotency_key: string;
+  market_ids: string[];
+  mode: string;
+  organization_id: string | null;
+  profile_id: string;
+  public_id: Generated<string>;
+  request_channel: string;
+  request_hash: string;
+  requested_by_user_id: string;
+}
+
 export interface GreenhouseGrowthGraderRuns {
   assignment_id: string | null;
+  batch_id: string | null;
+  competitor_set_id: string | null;
   cost_attribution: string | null;
   cost_ceiling_usd: Numeric | null;
   created_at: Generated<Timestamp>;
@@ -7699,6 +7814,10 @@ export interface GreenhouseGrowthGraderRuns {
   execution_prompts: Generated<Json>;
   finished_at: Timestamp | null;
   idempotency_key: string | null;
+  locale: string | null;
+  market_code: string | null;
+  market_id: string | null;
+  matching_snapshot: Json | null;
   mode: string;
   organization_id: string | null;
   poll_token: Generated<string>;
@@ -7850,6 +7969,8 @@ export interface GreenhouseGrowthProviderObservations {
   citations: Generated<Json>;
   created_at: Generated<Timestamp>;
   error_code: string | null;
+  geo_country: string | null;
+  geo_mode: string | null;
   latency_ms: Generated<number>;
   model: string;
   observation_id: string;
@@ -13586,6 +13707,69 @@ export interface GreenhouseSyncWebhookSubscriptions {
   webhook_subscription_id: string;
 }
 
+export interface GreenhouseXrayCases {
+  case_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  organization_id: string;
+  prospect_reference: string;
+  title: string;
+}
+
+export interface GreenhouseXrayDrafts {
+  case_id: string;
+  intent_json: Json;
+  organization_id: string;
+  revision: Generated<number>;
+  updated_at: Generated<Timestamp>;
+  updated_by: string;
+}
+
+export interface GreenhouseXrayEditions {
+  case_id: string;
+  content_hash: string;
+  contract_version: string;
+  draft_revision: number;
+  edition_id: Generated<string>;
+  idempotency_key: string;
+  issued_at: Generated<Timestamp>;
+  issued_by: string;
+  manifest_json: Json;
+  model_version: Generated<string>;
+  organization_id: string;
+  withdrawn_at: Timestamp | null;
+  withdrawn_by: string | null;
+}
+
+export interface GreenhouseXrayEvents {
+  action: string;
+  actor_id: string;
+  case_id: string;
+  created_at: Generated<Timestamp>;
+  event_id: Generated<Int8>;
+  organization_id: string;
+  resource_id: string;
+}
+
+export interface GreenhouseXrayRateBuckets {
+  hits: number;
+  subject_hash: string;
+  window_start: Timestamp;
+}
+
+export interface GreenhouseXrayShareGrants {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  edition_id: string;
+  expires_at: Timestamp;
+  grant_id: Generated<string>;
+  label: string | null;
+  organization_id: string;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  token_digest: string;
+}
+
 export interface Pgmigrations {
   id: Generated<number>;
   name: string;
@@ -13625,6 +13809,9 @@ export interface DB {
   "greenhouse_auth.signing_keys": GreenhouseAuthSigningKeys;
   "greenhouse_auth.totp_backup_codes": GreenhouseAuthTotpBackupCodes;
   "greenhouse_auth.totp_enrollments": GreenhouseAuthTotpEnrollments;
+  "greenhouse_brand.brand_render_events": GreenhouseBrandBrandRenderEvents;
+  "greenhouse_brand.brand_render_jobs": GreenhouseBrandBrandRenderJobs;
+  "greenhouse_brand.brand_render_requests": GreenhouseBrandBrandRenderRequests;
   "greenhouse_client_portal.module_assignment_events": GreenhouseClientPortalModuleAssignmentEvents;
   "greenhouse_client_portal.module_assignments": GreenhouseClientPortalModuleAssignments;
   "greenhouse_client_portal.modules": GreenhouseClientPortalModules;
@@ -13942,11 +14129,14 @@ export interface DB {
   "greenhouse_growth.form_submission": GreenhouseGrowthFormSubmission;
   "greenhouse_growth.form_submission_consent_snapshot": GreenhouseGrowthFormSubmissionConsentSnapshot;
   "greenhouse_growth.form_version": GreenhouseGrowthFormVersion;
+  "greenhouse_growth.grader_brand_alias_history": GreenhouseGrowthGraderBrandAliasHistory;
   "greenhouse_growth.grader_brand_intelligence": GreenhouseGrowthGraderBrandIntelligence;
   "greenhouse_growth.grader_business_model_history": GreenhouseGrowthGraderBusinessModelHistory;
+  "greenhouse_growth.grader_competitor_sets": GreenhouseGrowthGraderCompetitorSets;
   "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
   "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
   "greenhouse_growth.grader_probe_results": GreenhouseGrowthGraderProbeResults;
+  "greenhouse_growth.grader_profile_markets": GreenhouseGrowthGraderProfileMarkets;
   "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
   "greenhouse_growth.grader_prompt_sets": GreenhouseGrowthGraderPromptSets;
   "greenhouse_growth.grader_recommendation_status": GreenhouseGrowthGraderRecommendationStatus;
@@ -13956,6 +14146,7 @@ export interface DB {
   "greenhouse_growth.grader_report_send_log": GreenhouseGrowthGraderReportSendLog;
   "greenhouse_growth.grader_report_short_links": GreenhouseGrowthGraderReportShortLinks;
   "greenhouse_growth.grader_reports": GreenhouseGrowthGraderReports;
+  "greenhouse_growth.grader_run_batches": GreenhouseGrowthGraderRunBatches;
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
   "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
   "greenhouse_growth.lead_pii_reveal_audit": GreenhouseGrowthLeadPiiRevealAudit;
@@ -14241,5 +14432,11 @@ export interface DB {
   "greenhouse_sync.webhook_endpoints": GreenhouseSyncWebhookEndpoints;
   "greenhouse_sync.webhook_inbox_events": GreenhouseSyncWebhookInboxEvents;
   "greenhouse_sync.webhook_subscriptions": GreenhouseSyncWebhookSubscriptions;
+  "greenhouse_xray.cases": GreenhouseXrayCases;
+  "greenhouse_xray.drafts": GreenhouseXrayDrafts;
+  "greenhouse_xray.editions": GreenhouseXrayEditions;
+  "greenhouse_xray.events": GreenhouseXrayEvents;
+  "greenhouse_xray.rate_buckets": GreenhouseXrayRateBuckets;
+  "greenhouse_xray.share_grants": GreenhouseXrayShareGrants;
   pgmigrations: Pgmigrations;
 }

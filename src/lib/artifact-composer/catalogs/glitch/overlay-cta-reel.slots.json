@@ -1,0 +1,35 @@
+{
+  "template": "OverlayCtaReel",
+  "version": "0.2",
+  "viewport": {
+    "width": 1080,
+    "height": 1920
+  },
+  "render": {
+    "background": "transparent"
+  },
+  "slots": {
+    "closingLine": {
+      "selector": "[data-slot='closingLine']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 28,
+        "overflow": "reject",
+        "maxLines": 1
+      },
+      "example": "el #18 sale el lunes."
+    },
+    "invite": {
+      "selector": "[data-slot='invite']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 40,
+        "overflow": "reject",
+        "maxLines": 1
+      },
+      "example": "Sigue a"
+    }
+  }
+}

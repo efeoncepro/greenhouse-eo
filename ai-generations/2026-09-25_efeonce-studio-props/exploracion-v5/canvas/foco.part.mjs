@@ -1,0 +1,26 @@
+// ================= A3·2+ · El foco: «Te hacemos visible» =================
+// Foco de escenario: todo en penumbra; un círculo de luz de borde suave. La esfera chica tangente es la lámpara.
+const lamp=(cx,cy,D,ang=-45,color=C.teal)=>{const r=D/2,d=D*.12,g=D*.04,a=ang*Math.PI/180;return abs(cx+(r+g+d/2)*Math.cos(a)-d/2,cy+(r+g+d/2)*Math.sin(a)-d/2,d,d,{borderRadius:'50%',background:color,boxShadow:`0 0 ${d*.6}px ${color}66`});};
+const spot=({src,W,H,cx,cy,D,pos='50% 45%',alt,ang=-45})=>{const r=D/2;
+ return `<img src="${src}" alt="${alt}" style="position: absolute; left: 0; top: 0; width: ${W}px; height: ${H}px; object-fit: cover; object-position: ${pos}; filter: grayscale(0.85) brightness(0.32)">`+abs(0,0,W,H,{background:'#021a33',mixBlendMode:'multiply',opacity:.6})+
+  abs(0,0,W,H,{WebkitMaskImage:`radial-gradient(circle ${r}px at ${cx}px ${cy}px, #000 78%, transparent 100%)`,maskImage:`radial-gradient(circle ${r}px at ${cx}px ${cy}px, #000 78%, transparent 100%)`},`<img src="${src}" alt="" style="position: absolute; left: 0; top: 0; width: ${W}px; height: ${H}px; object-fit: cover; object-position: ${pos}; filter: brightness(1.12) contrast(1.05)">`)+
+  lamp(cx,cy,D,ang);};
+// Campo de palabras en penumbra; una sola en el foco.
+S.f_aeo=()=>{const W=1080,H=1350,cx=560,cy=760,D=560;let field='';const rows=[[90,440],[380,440],[680,440],[90,560],[430,560],[90,680],[760,680],[90,800],[790,800],[90,920],[360,920],[690,920],[120,1040],[470,1040]];
+ rows.forEach(([x,y],i)=>{field+=abs(x,y,null,null,{},div(W8(64,'#1C4570',i%3?800:300),'Otra marca'));});
+ return {W,H,bg:'#021F3D',html:field+abs(cx-D/2,cy-D/2,D,D,{borderRadius:'50%',background:'radial-gradient(circle, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.10) 70%, rgba(255,255,255,0) 100%)'})+abs(cx-200,cy-60,null,null,{},dom('Tú',150,C.white))+lamp(cx,cy,D)+
+  abs(90,110,900,null,{},q('¿Quién aparece cuando le preguntan a la IA por tu categoría?',38,C.soft))+abs(90,1230,900,null,{},p(`Te hacemos visible. ${b('Y lo medimos.')}`,30,C.soft))};};
+S.f_photo=()=>({W:1920,H:1080,bg:'#021F3D',html:spot({src:IMG.studio,W:1920,H:1080,cx:1150,cy:420,D:720,alt:'Estudio en penumbra; el estratega iluminado por un círculo de luz'})+abs(120,720,null,null,{},div(W8(120,C.white,300),'Te hacemos'))+abs(120,850,null,null,{},dom('visible',150,C.white))});
+S.f_event=()=>{const W=1920,H=1080,cx=960,cy=440,D=760;return {W,H,bg:'#0A1826',html:abs(cx-D/2,cy-D/2,D,D,{borderRadius:'50%',background:'radial-gradient(circle, rgba(236,244,242,0.95) 0%, rgba(214,236,232,0.9) 72%, rgba(214,236,232,0) 100%)'})+
+ `<img src="${LK.efeonce.full}" alt="Logo Efeonce iluminado por el foco" style="position: absolute; left: ${cx-230}px; top: ${cy-90}px; width: 460px; height: ${+(460*LK.efeonce.r).toFixed(1)}px">`+abs(cx-300,cy+60,600,null,{},p('Te hacemos visible.',38,C.navy,600,{textAlign:'center'}))+
+ lamp(cx,cy,D,-60)+abs(0,900,W,180,{background:'linear-gradient(#0A1826,#07121C)'})+abs(cx-D*.45,905,D*.9,40,{borderRadius:'50%',background:'radial-gradient(ellipse, rgba(214,236,232,0.35), rgba(214,236,232,0) 70%)'})};};
+S.f_frame=(k)=>()=>{const W=1080,H=608,pos=[[260,330],[520,300],[540,300],[540,300]][k],D=300;let field='';[[60,150],[330,150],[640,150],[60,300],[700,300],[60,450],[380,450],[700,450]].forEach(([x,y])=>{field+=abs(x,y,null,null,{},div(W8(46,'#1C4570',700),'Otra marca'));});
+ const lit=k>=2?abs(pos[0]-80,pos[1]-40,null,null,{},dom('Tú',90,C.white)):'';
+ return {W,H,bg:'#021F3D',html:field+abs(pos[0]-D/2,pos[1]-D/2,D,D,{borderRadius:'50%',background:'radial-gradient(circle, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0) 100%)'})+lamp(pos[0],pos[1],D)+lit+(k===3?abs(60,520,900,null,{},p('Te hacemos visible.',34,C.white,600)):'')};};
+boards['A3-2b-foco.dc.html']=board('A3·2+ · El foco',
+ head('A3·2+ · El foco','Te hacemos visible.','La lente leída como foco de escenario. La esfera chica es la lámpara; el círculo, su luz; lo que queda dentro, el cliente. Es la promesa más clara del marketing dicha con la forma de la marca, y siempre va con su prueba: la visibilidad se mide.')+
+ place(64,300,'Post AEO · muchas marcas en penumbra, la tuya en el foco',S.f_aeo,.33)+place(460,300,'Foto · luz de escenario sobre el equipo',S.f_photo,.37)+
+ place(460,760,'Evento o recepción · un foco real proyecta el círculo',S.f_event,.37)+
+ lab(1200,300,'Movimiento · el foco barre y aterriza')+abs(1200,300,336,null,{display:'flex',flexDirection:'column',gap:8},[0,1,2,3].map(k=>tileOf(S.f_frame(k),.31)).join(''))+
+ col(64,780,360,420,'Cómo se expresa',list(['Verbal: «Te hacemos visible.» como idea de campaña bajo «Empower your Growth», con remate de prueba: «Y lo medimos.»','Visual: penumbra navy y un solo foco; la esfera chica es la lámpara.','Espacio: un foco real con el círculo en recepción, stand o escenario.','Motion: el foco barre la escena y se posa sobre el cliente.'],12.5))+
+ col(64,1230,1472,200,'Cuidar',list(['Anti-humo: «visible» siempre con mecanismo al lado (visibilidad en buscadores y respuestas de IA, alcance medido); calza sobre todo con Wave y Reach.','El foco de escenario es un recurso conocido: lo propio es la lámpara-esfera tangente, la penumbra navy y una sola luz por pieza.','Nunca nombres reales de competidores en el campo en penumbra.'],13)),1600,1440);

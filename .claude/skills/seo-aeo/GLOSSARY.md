@@ -3,7 +3,7 @@
 > Léxico técnico canónico de la categoría de visibilidad de marca en motores de
 > respuesta + SEO clásico. Sirve para diagnóstico, copy, FAQ, schema y para hablar
 > la categoría con precisión. El vocabulario de este espacio colisiona y muta
-> rápido; reverifica lo volátil (ver `SOURCES.md`). Sello: as-of 2026-07.
+> rápido; reverifica lo volátil (ver `SOURCES.md`). Sello: as-of 2026-09.
 > Cross-refs a módulos (`modules/*.md`) donde aplica.
 
 ## 1. Nombres de la categoría (las siglas que compiten)
@@ -35,13 +35,17 @@
 - **SGE** — *Search Generative Experience*. Nombre **viejo** (2023–24) del experimento
   de Google; sustituido por "AI Overviews" + "AI Mode". Si alguien dice SGE, se refiere
   a esto; usa la nomenclatura actual.
-- **AI Overviews (AIO)** — la respuesta generada de Google **arriba** de los resultados
-  orgánicos; la superficie GEO más grande por volumen. Impulsada por Gemini; usa
-  Googlebot + índice de Google; cita un panel de fuentes. ~48–50% de queries (2026).
-- **AI Mode** — la interfaz **conversacional separada** de Google (2026): su propio
-  destino, no un snippet embebido en la SERP. Usa **Query Fan-Out** de forma intensiva.
-- **ChatGPT Search** — búsqueda de OpenAI (bots `OAI-SearchBot` + `ChatGPT-User`).
-- **Perplexity** — answer engine con citas explícitas (bot `PerplexityBot`).
+- **AI Overviews (AIO)** — respuesta generada en Google Search con enlaces de apoyo;
+  elegibilidad y controles según la documentación vigente de Google.
+- **AI Mode** — experiencia conversacional de Google Search. Google documenta que
+  puede usar ramificación de consultas; su mecánica y respuestas pueden diferir de AIO.
+- **ChatGPT Search** — superficie de búsqueda web de OpenAI. `OAI-SearchBot` controla
+  descubrimiento en Search; `ChatGPT-User` corresponde a ciertas acciones iniciadas
+  por usuarios y no determina inclusión en Search.
+- **Claude Search** — búsqueda de Anthropic cuando está disponible en el producto
+  utilizado. Distingue `Claude-SearchBot` de `Claude-User` y `ClaudeBot`.
+- **Perplexity** — búsqueda de Perplexity; distingue `PerplexityBot` de
+  `Perplexity-User` y de cualquier crawler de entrenamiento de terceros.
 - **Gemini** — IA de Google; integra Knowledge Graph + ecosistema Google.
 - **Copilot** — IA de Microsoft sobre índice de **Bing**.
 - **Answer box / Featured snippet** — el antecesor "una sola fuente" del extracto
@@ -51,8 +55,8 @@
 
 ## 3. Métricas (lo que se mide) — el núcleo
 
-- **AI Visibility Score** — número compuesto (típicamente 0–100) que resume tu presencia
-  across motores. Estándar de facto.
+- **AI Visibility Score** — número compuesto definido por un proveedor o metodología;
+  no existe una escala estándar comparable entre herramientas.
 - **Share of Voice (AI SOV)** — tus menciones frente a las de tus competidores; posición
   relativa. Denominador = menciones totales de competidores.
 - **Share of Model™** — % del set de prompts en que aparece tu marca (visibilidad
@@ -77,8 +81,8 @@
 - **Prompt tracking** — seguimiento de tu visibilidad prompt por prompt.
 - **Position / Rank within answer** — dónde apareces dentro de la respuesta (no hay
   posiciones 1–10; hay citas y menciones).
-- **Index freshness** — cuán reciente es el re-crawl e indexación del motor (Perplexity
-  rota a diario; AIO puede tardar semanas).
+- **Index freshness** — recencia del rastreo/indexación observada o documentada para
+  una plataforma y URL. No atribuyas una cadencia fija al motor sin evidencia actual.
 
 ## 4. Contenido: cómo se gana la cita
 
@@ -90,14 +94,16 @@
   funciona fuera de contexto.
 - **BLUF (Bottom Line Up Front) / Answer-first** — patrón de redacción que pone la
   conclusión en la primera frase o párrafo.
-- **Direct answer / Answer capsule** — respuesta directa, autocontenida (40–60 palabras
-  bajo un H2); patrón de alta citabilidad (`04_AEO_GEO.md`).
+- **Direct answer / Answer capsule** — respuesta directa y contextual cuando
+  sirve al lector. No tiene longitud fija ni es requisito universal de cita
+  (`04_AEO_GEO.md`).
 - **AI snippet** — extracto corto que un motor cita textualmente dentro de su respuesta.
-- **Passage / Passage retrieval** — se recupera y cita a nivel de párrafo/pasaje, no de
-  página completa (AIO y Perplexity muestran pasajes).
-- **Chunk / Chunking** — el motor parte el contenido largo en pasajes (típico 200–500
-  tokens con 10–20% de solape) antes de generar embeddings; los cortes afectan qué se
-  cita. Se optimiza para que cada chunk sea autocontenido (`04_AEO_GEO.md`).
+- **Passage / Passage retrieval** — algunos sistemas recuperan o presentan pasajes;
+  no asumir que todos lo hacen igual ni que la cita se decide solo a ese nivel.
+- **Chunk / Chunking** — división de documentos en fragmentos usada por algunos
+  sistemas de recuperación. Tamaño, solapamiento y método dependen de la
+  implementación y normalmente no son configurables por quien publica. Google
+  dice que no hace falta fragmentar páginas para sus funciones de IA.
 - **Answer graph / Answer-graph node** — red de contenido interconectado; el retrieval
   premia evidencia densa e interconectada.
 - **Topic cluster / Pillar page** — página madre que cubre un concepto primario más
@@ -110,8 +116,9 @@
 
 ## 5. Técnico: cómo la IA te lee
 
-- **RAG (Retrieval-Augmented Generation)** — arquitectura estándar de la búsqueda con IA:
-  recuperar documentos relevantes y luego generar una respuesta anclada en ellos.
+- **RAG (Retrieval-Augmented Generation)** — patrón arquitectónico que recupera
+  fuentes y las aporta como contexto a la generación. No es una descripción
+  confirmada de todos los modos de todos los productos.
 - **Grounding** — anclar la salida del modelo a fuentes reales (así lo llama Google). Es
   el reverso de la alucinación.
 - **Hallucination** — salida del modelo confiada pero falsa o no respaldada por las
@@ -120,17 +127,19 @@
   recuperar por **significado**, no solo por keyword match.
 - **Reranker / ColBERT** — modelos que reordenan por relevancia el set inicial recuperado
   (infraestructura de retrieval).
-- **Query Fan-Out** — el motor descompone la query en N sub-consultas simultáneas, recupera
-  fuentes para cada una y sintetiza una sola respuesta. Google lo llama internamente
-  **"Scatter-Gather with Planning"**; 8–12 sub-queries típicas.
+- **Query fan-out / ramificación de consultas** — técnica que descompone una
+  consulta en búsquedas relacionadas. Google documenta su uso posible en AI
+  Overviews y AI Mode; no publica un número universal ni establece que otros
+  productos compartan su implementación.
 - **Structured data / Schema.org** — marcado semántico (FAQ, HowTo, Service, DefinedTerm,
   Organization) que hace el contenido legible por máquina (`01_SEO_TECHNICAL.md`).
 - **Entity / Entity clarity / Entity home / Entity disambiguation / sameAs** — que el motor
   entienda "quién eres" como entidad y no te confunda con otra (nombres consistentes,
   schema, `sameAs`). Base del razonamiento entidad-céntrico 2026 (`03_EEAT_ENTITY.md`).
-- **AI crawlers** — bots que recuperan páginas para **entrenar** (GPTBot de OpenAI,
-  ClaudeBot de Anthropic, Google-Extended) o para **responder en vivo** (OAI-SearchBot,
-  PerplexityBot); Googlebot para AIO. Crawlean de forma independiente (`01_SEO_TECHNICAL.md`).
+- **AI crawlers** — identifica cada agente por proveedor y finalidad documentada:
+  entrenamiento/desarrollo, búsqueda/indexación o acceso iniciado por usuario.
+  No agrupes `ClaudeBot` con `Claude-SearchBot`, ni `Google-Extended` con
+  Googlebot. Ver `01_SEO_TECHNICAL.md` y `SOURCES.md`.
 - **robots.txt / llms.txt** — archivos que permiten o bloquean el acceso de esos bots.
   `llms.txt` (markdown para "resumir" un sitio a LLMs): Google no lo usa; ROI marginal en
   2026 (`04_AEO_GEO.md`).

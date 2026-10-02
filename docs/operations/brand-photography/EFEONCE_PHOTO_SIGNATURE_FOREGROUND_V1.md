@@ -1,9 +1,9 @@
 # Firma fotográfica Efeonce V1 — primer plano planeado y logo
 
 > **Tipo de documento:** Especificación técnica y funcional de marca
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-26 por Claude — regla de la firma de piezas gráficas: logo centrado; burbuja URL sólo con el logo ya en la imagen ([§5.1](#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26))
+> **Última actualización:** 2026-09-28 por Claude — en portada de blog y banner la firma puede ir fuera del centro ([delta 2026-09-28](#delta-2026-09-28--banner-y-portada-de-blog-la-firma-no-tiene-que-ir-al-centro)). Antes: regla de la firma de piezas gráficas: logo centrado; burbuja URL sólo con el logo ya en la imagen ([§5.1](#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26))
 > **Estado:** Aprobado por el operador el 2026-09-19 (con pendientes en §8)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Marca en escena (regla previa)](../../../.claude/skills/social-media-studio/references/brand-in-scene.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · Scripts `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/{medir.mjs,componer.mjs}`
 
@@ -138,7 +138,7 @@ material** entre piezas consecutivas (hallazgo del revisor adversarial) **[crite
 | Rango logrado | **4,9–20,2:1** **[medido]** en las piezas aprobadas | Salida del script por pieza |
 | Nitidez | Ninguna degradación: el desenfoque es del lecho, la marca se lee | `brand-in-scene.md` |
 | Apariciones | Una por pieza | — |
-| Dibujo del archivo | Las copias locales del logo y de la burbuja son el dibujo del paquete `@efeoncepro/axis-brand-assets` 0.2.7 | Guarda de deriva `src/config/efeonce-brand-assets.test.ts` |
+| Dibujo del archivo | Las copias locales del logo y de la burbuja son el dibujo del paquete `@efeoncepro/axis-brand-assets` (0.3.0 desde el 2026-09-26) | Guarda de deriva `src/config/efeonce-brand-assets.test.ts` |
 
 Uso:
 
@@ -177,7 +177,7 @@ exige un aprobador del registro en el compositor CTA.
 | `pnpm foto:componer:cta` + `pnpm foto:cta:gate` (tramo 17) | Plan con `"marcaEnEscena": true` y `"url": { … }`, **sin** `logo` | En una pieza nueva, la burbuja se fusiona a opacidad 1 y se mide el 1 % peor de su tinta sólida contra el fondo y si cae sobre el sujeto. La juzga la regla exceptuable `firma-burbuja` (burbuja con marca en escena y sin logo al lado; también salta con `marcaEnEscena` y logo sin burbuja), junto a `firma-contraste` (≥ 4,5:1) y `firma-sobre-sujeto` |
 | `pnpm creative:layout` | `brand.signature: { brand_in_scene }` | `false` → logo centrado y **sin** URL; `true` → burbuja centrada sola (exige `brand.url_bubble`), opacidad 1, y el QA falla bajo 4,5:1. Los contratos sin el campo (CMP-00x) quedan exactamente como antes: logo y burbuja a 0,72 |
 | `pnpm creative:orbit:render` | Intent de la órbita con su firma | Firma con logo o con la burbuja fusionada a opacidad 1 y mide el contraste de la firma sobre los píxeles finales |
-| AXIS | Elemento `signature` de `efeonce.graphic-line-orbit` 0.2.0 y token `efeonceGraphicLine.signature` | Centrada al pie, modo por defecto `logo`, burbuja sólo con la marca en escena, contraste mínimo 4,5 (checks `signature-centered` y `signature-min-contrast`) |
+| AXIS | Elemento `signature` de `efeonce.graphic-line-orbit` (0.3.0) y token `efeonceGraphicLine.signature` | Centrada al pie, modo por defecto `logo`, burbuja sólo con la marca en escena, contraste mínimo 4,5 (checks `signature-centered` y `signature-min-contrast`) |
 
 Detalle del compositor en el [contrato CTA §19.6](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#196-la-firma-cinco-maneras-de-declararla):
 prueba `P11` y mutantes `gate-t17-burbuja-sin-marca`, `gate-t17-burbuja-con-logo` y `compositor-t17-burbuja-opacidad`
@@ -336,3 +336,13 @@ subirla mucho destruye el cierre, elevar ligeramente el inicio del lecho para al
 de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% ni la franja de v07 en preset.
 No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites sobre el export y el preview
 del placement; esta instrucción no afirma que los exports históricos ya hayan sido recompuestos.
+
+## Delta 2026-09-28 — banner y portada de blog: la firma no tiene que ir al centro
+
+**Decisión del operador:** «*en la firma de portada de blog o banner el logo no necesariamente tiene que estar al
+centro; puedes ponerlo en otra parte si se ve mejor*». En formatos horizontales con columna de texto (1200×630,
+banners) el logo puede ir **abajo a la izquierda, alineado con la columna del texto**, cuando así cierra la lectura y
+no compite con el sujeto. Caso: portada de blog de Marketing con Manzanitas (`MC5g`, 2026-09-28): margen 72 px,
+ancho 25 % del lado corto (157 px), sobre la madera oscura vacía de la mesa donde trabaja el sujeto, **19:1**. No
+cambia el resto de §5: dentro de la materia calma del lecho, con aire sobre su borde, nunca sobre el sujeto, contraste
+≥ 4,5:1 medido bajo la caja real. En piezas verticales y cuadradas la firma sigue centrada.

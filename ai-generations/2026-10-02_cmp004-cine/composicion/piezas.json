@@ -1,0 +1,232 @@
+[
+  {
+    "id": "CMP004-C02-KV-45-CINE01",
+    "plate": "plates/CA2-45-proximo-capitulo.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Tu marca ya cuenta lo que viene?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.21,
+    "dominant": "Imagen propia",
+    "dominantSize": 106,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Marca y campañas para la siguiente etapa de tu negocio.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.21,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.9,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida.",
+      "radius": 14,
+      "text": "Hablemos de tu marca",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-color-policy.json",
+        "sha256": "8022b55e57e4077fe3d923cb139f958a1ab74b14fd670cd94fc6595608bc07ae",
+        "treatment": "outline",
+        "reason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida."
+      },
+      "surfaceToken": "brandAccentSoft"
+    },
+    "safeArea": "axis",
+    "altText": "Una ejecutiva camina de espaldas hacia un gran portal de luz naranja que se abre en un salón oscuro de pantallas apagadas.",
+    "styleReason": "Registro cine, silueta en escala invertida: el portal es la nueva expresión de marca. Pregunta con anillo, respuesta con esfera.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "bottom-end",
+          "action": "select"
+        }
+      ]
+    }
+  },
+  {
+    "id": "CMP004-C03-KV-45-CINE01",
+    "plate": "plates/CA3c-45-seis-segundos-trayectoria.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Qué cabe en seis segundos?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.21,
+    "dominant": "Cada detalle",
+    "dominantSize": 106,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Dirección creativa que se nota en cada instante.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.21,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.9,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida.",
+      "radius": 14,
+      "text": "Descubre cómo lo hacemos",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-color-policy.json",
+        "sha256": "8022b55e57e4077fe3d923cb139f958a1ab74b14fd670cd94fc6595608bc07ae",
+        "treatment": "outline",
+        "reason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida."
+      },
+      "surfaceToken": "brandAccentSoft"
+    },
+    "safeArea": "axis",
+    "altText": "Larga exposición de seis segundos en un set: un director de arte quieto y una estela de luz naranja que termina en el brillo de un frasco de perfume ficticio.",
+    "styleReason": "Registro cine, prueba con persona del equipo. Larga exposición real: la estela es el movimiento planeado que llega al detalle. Pregunta con anillo, respuesta con esfera.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "bottom-end",
+          "action": "select"
+        }
+      ]
+    }
+  },
+  {
+    "id": "CMP004-C04-KV-45-CINE01",
+    "plate": "plates/CA4b-45-exigencia-escala.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Más volumen, mismo estándar?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.21,
+    "dominant": "Con criterio",
+    "dominantSize": 106,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Design Ops, IA y **dirección humana**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.21,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.9,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "text",
+      "variantReason": "Servicio de continuidad: enlace editorial prolonga la revisión experta y deja protagonismo al criterio seleccionado.",
+      "radius": 0,
+      "text": "Escala tu producción",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 3,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "brandAccentSoft",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "open-brackets"
+      },
+      "prominencia": "discreta",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-color-policy.json",
+        "sha256": "8022b55e57e4077fe3d923cb139f958a1ab74b14fd670cd94fc6595608bc07ae",
+        "treatment": "text",
+        "reason": "Servicio de continuidad: enlace editorial prolonga la revisión experta y deja protagonismo al criterio seleccionado."
+      }
+    },
+    "safeArea": "axis",
+    "altText": "Nexa, el personaje de Efeonce, sostiene una pieza elegida de un túnel de cientos de piezas creativas, con un Spark que la compara en su hombro.",
+    "styleReason": "Registro cine, Nexa protagonista con un Spark de referencia. Volumen en profundidad y una pieza elegida a mano. Pregunta con anillo, respuesta con esfera.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "bottom-end",
+          "action": "select"
+        }
+      ]
+    }
+  }
+]

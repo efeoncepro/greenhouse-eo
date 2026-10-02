@@ -1,0 +1,19 @@
+{
+  "id": "NX1-nexa-presenta",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "objetos": [
+    { "objeto": "chaqueta-softshell-efeonce" }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (staged, Efeonce studio at night, the opening of a client presentation): she stands in three-quarter view on the RIGHT third of the frame, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, and turns her open right palm toward the empty left side of the frame as if presenting something that lives there, looking straight into the lens with a confident, warm half-smile, caught in the exact second she introduces it. Low camera, a slight low angle. A hard key light from the left rakes across her face and hand; a cool blue rim from behind cuts her hair and shoulders from the dark and its beam crosses a thin haze BELOW the middle of the frame. The LEFT two thirds of the frame are a calm, evenly shadowed, deep navy-black bare studio wall with nothing on it. She is framed from the waist up. 50mm f/2.",
+  "lecho": {
+    "objeto": "the dark edge of a presentation table close to the lens, dissolved into blur and outside every beam",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": { "muro": "the calm, evenly shadowed bare wall on the left two thirds", "tinta": "blanca" }
+  }
+}

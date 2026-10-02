@@ -4,6 +4,25 @@
 > **Ambiente:** local (composer `pnpm composer:visual-gate` + baseline `scripts/frontend/baselines/artifact-composer/**`)
 > **Detectado:** 2026-07-15, durante trabajo concurrente de dos agentes (Claude + Codex) sobre el deck de SKY
 
+## Delta 2026-09-28 — `--freeze` aceptaba declaraciones viejas (unidad de promoción = sección sin sellar)
+
+- Hueco del contrato de dos vías, del mismo espíritu que la causa 2: `--freeze` buscaba el nombre del frame en **todo**
+  `BASELINE_DELTAS.md`, así que un frame declarado alguna vez por otra task quedaba autorizado para siempre. Caso
+  2026-09-27 (TASK-1928, `2c7c67c5d`): el hook de selección movió 10 frames ya aprobados y el freeze los re-promovió
+  sin error aunque la sección nueva no los nombraba.
+- Fix: la regla vive en `scripts/artifact-composer/baseline-deltas-ledger.ts` (+ test). `--freeze` exige exactamente
+  una sección sin el marcador `sealed-by-freeze`, acepta sólo los frames que ESA sección nombra y la sella al
+  promover. Las secciones previas quedaron selladas como `legacy-2026-09-28` (incluida la declaración sin promover de
+  TASK-1847: para promoverla hay que copiarla a una sección nueva). Runbook §5.
+- No toca las causas 1 y 2 (determinismo de render, concurrencia).
+
+## Delta 2026-09-27 — Glitch (TASK-1923): fotos reales deterministas entre procesos
+
+- `pnpm glitch:compose` pre-rasteriza cada foto al tamaño exacto de su hueco (DSF 1, recorte centrado, PNG sin perfil)
+  y la entrega como data URI: dos corridas en procesos separados dieron 35 PNG idénticos byte a byte, fotos incluidas.
+  El probe del gate de Glitch no usa fotos reales (SVG sintético `photo:probe`). Evidencia a favor de la mitigación de
+  la causa 1; no cierra el issue para `TeamGalleryFull`.
+
 ## Resumen
 
 En una sola sesión, **dos agentes con contexto del repo tropezaron con el visual gate**: colisión de

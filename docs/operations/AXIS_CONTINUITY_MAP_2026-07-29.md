@@ -46,6 +46,103 @@ copian la implementación visual del Lab. La versión privada publicada continú
 adopción runtime en Greenhouse, Globe o los compositores hasta completar release, adapter y evidencia de cada
 consumer. El runbook de consumo conserva la secuencia autorizada y este mapa no autoriza bump ni promoción.
 
+## Actualización — 2026-09-26: iconografía de La órbita publicada en AXIS
+
+El tag `v0.3.6` de AXIS (PR `efeoncepro/axis-design-system#3`, mergeado) publicó la iconografía canónica de la marca
+propia Efeonce: `@efeoncepro/axis-tokens` `0.3.6` (`efeonceGraphicLine.icons`) y `@efeoncepro/axis-graphic-line`
+`0.4.0` (subpath `/icons`), con página en el Lab (`/references/iconography/`). AXIS es la fuente de verdad; Greenhouse
+sólo la documenta (manual de la línea §14). **No hay adopción runtime en Greenhouse:** `develop` fija `axis-tokens` y
+`axis-ui-contracts` en `0.3.5` y no depende de `axis-graphic-line`. El acceso de Actions es por paquete y se conserva
+entre versiones; un consumidor nuevo necesita su propio `Read` (runbook, Delta 2026-09-26 (d)). Este mapa no autoriza
+el bump.
+
+## Actualización — 2026-09-27: `axis-tokens` 0.3.10 y pines vigentes de Greenhouse
+
+El tag `v0.3.10` de AXIS publicó `@efeoncepro/axis-tokens` `0.3.10`: `efeonceTokens.color.info`, `efeonceTokens.motion`
+como alias de `axisMotion.duration` (`standard` 200 ms) y un build que falla si `tokens.css` emite una propiedad con
+dos valores. Los pines de la actualización anterior quedaron superados: Greenhouse **sí** depende de
+`axis-graphic-line` (`0.6.0`, usado por `src/lib/brand-surfaces`) y fija `axis-tokens` `0.3.8`, `axis-ui-contracts`
+`0.3.7`, `axis-brand-assets` `0.3.4` y `axis-ui-registry` `0.3.1` (`package.json`, verificado el 2026-09-27). Subir a
+`0.3.10` rompe a propósito el drift test de Greenhouse, porque `efeonceTokens.color` gana `info`; el detalle y el
+arreglo están en el runbook, Delta 2026-09-27 (c). Este mapa no autoriza el bump.
+
+**Pines vigentes tras TASK-1927 (mismo día, `package.json`):** `axis-tokens` `0.3.14`, `axis-ui-contracts` `0.3.12`,
+`axis-graphic-line` `0.7.0`, `axis-brand-assets` `0.3.5` y `axis-ui-registry` `0.3.1`. Los del párrafo anterior quedan
+como historia.
+
+## Actualización — 2026-09-28: serie `v0.3.11`…`v0.3.21` consumida por TASK-1927 y TASK-1928
+
+**Pines vigentes** (`package.json` y `node_modules`, 2026-09-28; en `origin/develop`): `axis-tokens` `0.3.21`,
+`axis-ui-contracts` `0.3.19`, `axis-graphic-line` `0.7.0`, `axis-brand-assets` `0.3.5` y `axis-ui-registry` `0.3.1`.
+Superan a los de la actualización anterior.
+
+La composición por superficie de «La órbita» consumió once tags seguidos de AXIS, cada uno con `axis-tokens` y
+`axis-ui-contracts`: `v0.3.11`, `v0.3.13` y `v0.3.14` (TASK-1927: contrato `efeonce.surface-composition` 0.1.2, tokens
+del marco y tipografía de las contraportadas), `v0.3.12` (TASK-1922, Glitch) y `v0.3.15` a `v0.3.21` (TASK-1928: una
+familia de recetas del deck por tag, más la portada con selección en `v0.3.21`). Con eso las 69 recetas del deck
+componen desde el Artifact Composer. Tabla por tag, transitivos, instalación con credencial efímera (`gh auth token`
+dentro de un subshell, nunca impreso) y prueba con el overlay local del build de AXIS: runbook, Delta 2026-09-28 (f) y
+Delta 2026-09-27 (e). Tras cada bump corren `pnpm brand:tokens` (y `pnpm glitch:tokens` si cambia `glitchLine`). Spec
+técnica del consumidor: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
+Este mapa no autoriza bumps nuevos.
+
+## Actualización — 2026-09-28 (noche): `v0.3.24`, el Glitch Flash
+
+**Pines vigentes** (`package.json`, commit `53002b352`): `axis-tokens` `0.3.24`, `axis-ui-contracts` `0.3.22`,
+`axis-graphic-line` `0.7.0`, `axis-brand-assets` `0.3.5` y `axis-ui-registry` `0.3.1`. Superan a los de la actualización
+anterior. El tag `v0.3.24` de AXIS (commit `5b3056f`) agrega `glitchLine.editions` (`weekly` y `flash`) y el contrato
+`efeonce.glitch-line` 0.2.0. El Artifact Composer de Greenhouse ya compone el Flash (`24e4c72ee`: seis plantillas
+`flash-*` y `pnpm glitch:compose`); la ruta productiva (TASK-1921) todavía no.
+
+**Corrige la regla del párrafo anterior:** tras **todo** bump de `axis-tokens` corren `pnpm brand:tokens` **y**
+`pnpm glitch:tokens`, con sus `--check`, sin importar qué parte del token cambió. El bump `53002b352` corrió sólo
+`glitch:tokens` y el CI falló en `graphic-line-tokens-sync.test.ts`; arreglo en `609353e83`. Detalle: runbook, Delta
+2026-09-28 (g). Este mapa no autoriza bumps nuevos.
+
+## Actualización — 2026-09-29: `v0.3.30`, el AI Visibility Report
+
+**Pines vigentes** (`package.json`, 2026-09-29, bump `2c95e60b2`, tag `v0.3.29` de AXIS): `axis-tokens` `0.3.29`,
+`axis-ui-contracts` `0.3.29`, `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.1` y `axis-ui-registry` `0.3.1`.
+Superan a los de la actualización anterior. Los tags `v0.3.25` a `v0.3.29` no tienen una actualización propia en este
+mapa.
+
+El tag `v0.3.30` de AXIS (`main` `26097c5`, registro verificado) publicó:
+
+- `axis-tokens` `0.3.30`: `aiVisibilityReport` y `efeonceGraphicLine.measureSeverity`.
+- `axis-ui-contracts` `0.3.30`: contrato nuevo `efeonce.ai-visibility-report` `0.1.0` (`candidate`) y
+  `efeonce.graphic-line-orbit` `0.4.0`.
+- `axis-graphic-line` `0.12.0`: `/report`, con `aiVisibilityReportOrbitSvg` y `aiVisibilityReportSeverityColor`.
+- `axis-brand-assets` `0.4.3`: órbitas estáticas re-selladas, sin cambio de dibujo.
+- `axis-ui-registry` `0.3.2`.
+
+**Greenhouse no lo fija todavía.** Lo adopta TASK-1938 (el PDF del AI Visibility Report). El adapter de la órbita
+(`scripts/creative/layout-compiler/graphic-line.mjs`) acepta sólo el contrato `0.3.1`, así que ese bump tiene que llevar
+el soporte de `0.4.0`. Detalle en el runbook, Delta 2026-09-29 (h). Este mapa no autoriza el bump.
+
+## Actualización — 2026-09-29 (b): `v0.3.38`, módulos de correo y recorrido de la medida
+
+**Pines vigentes** (`package.json`, 2026-09-29, bump `bacd6a4ea`, tag `v0.3.37` de AXIS): `axis-tokens` `0.3.37`,
+`axis-ui-contracts` `0.3.37`, `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.5` y `axis-ui-registry` `0.3.1`.
+Superan a los de la actualización anterior: los tags `v0.3.31` a `v0.3.37` (deck Salesforce, firma, sub-líneas Glitch y
+Manzanitas) se fijaron sin una actualización propia en este mapa.
+
+El tag `v0.3.38` de AXIS (`main` `c92160b`, registro verificado) publicó:
+
+- `axis-tokens` `0.3.38`: export nuevo `efeonceEmail` (módulos de correo) y `efeonceGraphicLine.trajectory.measure.travelledPath`
+  (el recorrido de toda medida, también en `aiVisibilityReport.cover.orbit.travelled`).
+- `axis-ui-contracts` `0.3.38`: contrato nuevo `efeonce.email-modules` `0.1.0` (`candidate`) y
+  `efeonce.graphic-line-orbit` `0.5.0`.
+- `axis-graphic-line` `0.13.0`: el pintor y la portada del AI Visibility Report dibujan el recorrido.
+- `axis-brand-assets` `0.4.6`: doce PNG @2x para correo con sello SHA-256 y órbitas estáticas re-selladas.
+- `axis-ui-registry` `0.3.3`. Lab `/references/email/`.
+
+**Greenhouse no lo fija todavía.** Lo adoptan TASK-1944 (módulos de correo) y TASK-1938 (PDF del AI Visibility Report),
+la que llegue primero. **Hallazgo 2026-09-29:** con los pines vigentes el contrato de la órbita ya es `0.4.0` (entró con
+`9289cab0c`, `v0.3.31`), y el adapter `scripts/creative/layout-compiler/graphic-line.mjs` sigue en `0.3.1`:
+`node --test scripts/creative/layout-compiler/graphic-line.test.mjs` da 0 de 7. La suite no corre en CI. El bump a
+`v0.3.38` tiene que llevar el soporte de `0.5.0` en el mismo commit. Detalle en el runbook, Delta 2026-09-29 (i). Este
+mapa no autoriza el bump.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro

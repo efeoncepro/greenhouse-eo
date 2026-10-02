@@ -1,0 +1,16 @@
+{
+  "id": "J2-rodaje-v8",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "julio"
+  ],
+  "objetos": [
+    "polo-efeonce"
+  ],
+  "escena": "SCENE (directing a commercial shoot, clean industrial film studio with a large skylight, late morning): low camera at knee height looking slightly up, 35mm lens at f/2.8, so the face is not distorted. Julio stands in the middle of the frame wearing the deep navy Efeonce pique polo (the embroidered mark on his left chest, exactly as in the reference), dark jeans, a steel wristwatch. His right arm is extended toward the RIGHT edge of the frame, index finger pointing decisively at the next shot, caught at the exact moment he calls the angle, mid-word, while the operator is already turning the camera toward where he points; his head stays ALMOST FRONTAL to the camera, turned only a few degrees toward the right: both eyes and both eyebrows fully visible, both cheeks visible, the far ear still in frame, and the bridge of the nose does NOT cut the far cheek. Only his EYES turn toward his pointing hand, so the irises sit toward the right corners of the eyes — he never looks at the camera. His mid-face stays flat and natural, the mouth and jaw never pushed forward. His left hand holds a current-generation tablet with an edge-to-edge screen and a thin dark aluminium body, screen facing him, showing a shot list that is out of focus and unreadable. A confident, natural, masculine stance: feet apart, shoulders square, weight forward. At the LEFT edge, partly cut by the frame, a camera operator shoulders a top-tier large-format digital cinema camera: a matte-black body with a matte box, follow-focus, top handle, a large cinema prime lens, a V-mount battery and a small on-camera monitor — the most professional production kit in the world, with no readable brand names. Behind Julio, softly out of focus, a large LED fresnel on a stand and a C-stand; the only bright azure blue is a gel on a distant light. Hard directional sunlight from the skylight rakes across his shoulder and the side of his face; shadows warm-neutral, never blue. Everything unbranded except the polo mark; no readable text anywhere.",
+  "lecho": {
+    "objeto": "the matte black lid of a closed hard equipment case on the floor right against the lens, spanning the full width of the bottom of the frame, with nothing on it",
+    "tono": "DARK near black, matte, no highlights"
+  }
+}

@@ -207,7 +207,11 @@ export const resolveSharedInsightEdition = async (context: SharedInsightRequestC
         periodEndExclusive: edition.request.period.endExclusive,
         timeZone: edition.periodTimeZone,
         issuedAt: edition.issuedAt,
-        asOfMax: snapshot.asOfMax
+        asOfMax: snapshot.asOfMax,
+        // 1.1 — el logo sellado en la portada del plan, por proxy con el mismo gate del token.
+        ...(plan.plan.cover?.logoAssetId && plan.plan.cover.logoVariant
+          ? { clientLogo: { href: `/api/public/insights/shared/${context.token}/logo`, variant: plan.plan.cover.logoVariant } }
+          : {})
       },
       model: buildInsightWebModel({ plan: plan.plan, facts: snapshot.facts }),
       downloads,
@@ -259,6 +263,39 @@ export const downloadSharedInsightOutput = async (context: SharedInsightRequestC
   } catch (error) {
     captureWithDomain(error, 'insights', { tags: { source: 'insights_share_download', output }, extra: { shareGrantId: gate.resolved.grant.shareGrantId } })
     await logAccess(context, gate.resolved, 'download', 'unavailable', output)
+
+    return { status: 'not_found' }
+  }
+}
+
+export type SharedInsightLogoResult = { status: 'ok'; bytes: ArrayBuffer; contentType: string } | { status: SharedInsightDenial }
+
+/**
+ * 1.1 (TASK-1875) — logo del cliente sellado en la portada del plan. Mismo gate que la lectura (flag, token, revocación,
+ * organización y módulo activos, edición emitida): revocar corta también el logo. Sólo el asset que el plan selló, nunca
+ * uno elegido por quien pide.
+ */
+export const readSharedInsightClientLogo = async (context: SharedInsightRequestContext): Promise<SharedInsightLogoResult> => {
+  const gate = await gateSharedAccess(context, 'view')
+
+  if (!gate.ok) return { status: gate.denial }
+
+  const { grant } = gate.resolved
+  const plan = await getInsightEditorialPlanByEdition(undefined, grant.organizationId, grant.editionId)
+  const assetId = plan?.frozenAt ? plan.plan.cover?.logoAssetId ?? null : null
+
+  if (!assetId) return { status: 'not_found' }
+
+  try {
+    const { file } = await downloadPrivateAsset({
+      assetId,
+      actorUserId: null,
+      accessMetadata: { accessChannel: 'insights_share_grant', shareGrantId: grant.shareGrantId }
+    })
+
+    return { status: 'ok', bytes: file.arrayBuffer, contentType: file.contentType || 'image/png' }
+  } catch (error) {
+    captureWithDomain(error, 'insights', { tags: { source: 'insights_share_logo' }, extra: { shareGrantId: grant.shareGrantId } })
 
     return { status: 'not_found' }
   }

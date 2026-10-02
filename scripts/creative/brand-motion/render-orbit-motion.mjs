@@ -7,7 +7,7 @@
 // Todo sale de los archivos oficiales (`@efeoncepro/axis-brand-assets`), de los tokens `efeonceGraphicLine` y de las
 // curvas `axisMotion.ease`. Dos pasadas por cuadro, con transparencia real: `main` (anillo, nave, letras, eslogan) y
 // `halo`. Las versiones con fondo se componen después (fondo + halo + main). `--storyboard` rinde sólo cuadros clave.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -21,7 +21,10 @@ const REPO = path.resolve(HERE, '../../..')
 const args = process.argv.slice(2)
 const opt = (name, fallback) => (args.includes(name) ? args[args.indexOf(name) + 1] : fallback)
 
-export const DURATION = { reveal: 4200, open: 2800 }
+// Tiempos, desenfoque y jerarquía del lenguaje de movimiento: tokens `efeonceGraphicLine.motion` de AXIS (V1.1 aprobada).
+const MOTION = GL.motion
+
+export const DURATION = Object.fromEntries(Object.entries(MOTION.pieces).map(([k, v]) => [k, v.durationMs]))
 export const FORMATS = { '16x9': [1920, 1080], '16x9-4k': [3840, 2160], '1x1': [1080, 1080], '4x5': [1080, 1350], '9x16': [1080, 1920] }
 
 // Paletas por fondo. Oscuro: logo negativo; claro: logo positivo y acento «sobre claro». Todo desde tokens.
@@ -29,7 +32,7 @@ const member = GL.family.find(f => f.key === 'efeonce')
 
 export const SCHEMES = {
   dark: { background: GL.color.dark, logo: '#ffffff', ringLine: GL.color.halo, accent: member.accentOnDark, slogan: '#e2e2e2' },
-  light: { background: GL.color.paper, logo: GL.color.navy, ringLine: GL.color.navy, accent: member.accentOnLight, slogan: '#848484', haloScale: 0.5 }
+  light: { background: GL.color.paper, logo: GL.color.navy, ringLine: GL.color.navy, accent: member.accentOnLight, slogan: '#848484', haloScale: GL.orbit.haloOnLightScale }
 }
 
 const bez = s => s.match(/[\d.]+/g).map(Number)
@@ -55,6 +58,7 @@ export async function openScene(browser, { format, scheme, ss }) {
     isotypeSvg: readFileSync(brandAssetUrl('efeonce-isotype-negative'), 'utf8'),
     logoSvg: readFileSync(brandAssetUrl('efeonce-logo-negative'), 'utf8'),
     tokens: { orbit: GL.orbit },
+    motion: MOTION,
     colors: SCHEMES[scheme],
     slogan: { parts: [{ text: 'Empower', weight: 800, italic: true }, { text: 'your', weight: 800, italic: false }, { text: member.sloganWord, weight: 900, italic: true, accent: true }] }
   }
@@ -68,8 +72,9 @@ export async function openScene(browser, { format, scheme, ss }) {
 }
 
 // Tramos rápidos: ahí cada cuadro promedia subcuadros (obturador de 180°) para un desenfoque de movimiento real.
-export const BLUR = { reveal: [[1550, 2250], [2450, 3250]], open: [[600, 1300], [1100, 1700]] }
-const SUB = 5
+export const BLUR = Object.fromEntries(Object.entries(MOTION.pieces).map(([k, v]) => [k, v.blurMs]))
+// Subcuadros por cuadro en los tramos rápidos (5 en masters; --sub 3 para vistas previas).
+const SUB = Number(opt('--sub', MOTION.motionBlur.subframes))
 
 export async function shootBlurred(scene, t, anim, pass, ss, fps) {
   if (!BLUR[anim].some(([a, b]) => t > a && t < b)) return shoot(scene, t, anim, pass, ss)
@@ -108,7 +113,17 @@ export async function shootBlurred(scene, t, anim, pass, ss, fps) {
 
 export async function shoot(scene, t, anim, pass, ss) {
   await scene.page.evaluate(({ t, anim, pass }) => window.orbitScene.render(t, anim, pass), { t, anim, pass })
-  const png = await scene.page.screenshot({ omitBackground: true, type: 'png' })
+  let png
+
+  // Con varios renders en paralelo, un cuadro pesado puede tardar más que el límite por defecto: plazo amplio y reintento.
+  for (let attempt = 1; ; attempt++) {
+    try {
+      png = await scene.page.screenshot({ omitBackground: true, type: 'png', timeout: 180000 })
+      break
+    } catch (err) {
+      if (attempt >= 3) throw err
+    }
+  }
 
   return ss === 1 ? png : sharp(png).resize(scene.W, scene.H, { kernel: 'lanczos3' }).png().toBuffer()
 }
@@ -133,7 +148,7 @@ async function main() {
           const dir = path.join(out, `${anim}_${format}_${scheme}`)
 
           const times = storyboard
-            ? (anim === 'reveal' ? [0, 300, 700, 1100, 1450, 1700, 1950, 2250, 2600, 2950, 3300, 4200] : [0, 500, 900, 1250, 1500, 1800, 2100, 2400, 2800])
+            ? ({ reveal: [0, 250, 600, 1000, 1300, 1600, 1900, 2000, 2300, 2600, 3000, 3600], open: [0, 300, 700, 1000, 1150, 1300, 1500, 1800, 2400], sting: [0, 200, 450, 600, 700, 900, 1100, 1300, 1600] })[anim]
             : Array.from({ length: total + 1 }, (_, i) => (i * 1000) / fps)
 
           mkdirSync(path.join(dir, 'main'), { recursive: true })
@@ -144,6 +159,9 @@ async function main() {
 
           for (const [i, t] of times.entries()) {
             const name = storyboard ? `t${String(Math.round(t)).padStart(4, '0')}.png` : `${String(i).padStart(4, '0')}.png`
+
+            // Reanudable: si el cuadro ya existe en las tres capas, se salta.
+            if (!storyboard && ['main', 'halo', 'bg'].every(l => existsSync(path.join(dir, l, name)))) continue
             const tt = Math.min(t, DURATION[anim])
             const main = storyboard ? await shoot(scene, tt, anim, 'main', ss) : await shootBlurred(scene, tt, anim, 'main', ss, fps)
             const halo = await shoot(scene, tt, anim, 'halo', ss)

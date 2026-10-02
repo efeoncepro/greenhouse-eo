@@ -1020,3 +1020,10 @@ pueden colisionar con otra organización.
 4. **Idioma de los manuales.** Los SEO están en inglés; el de client services, en español. Propuesto: español neutro.
 5. **Caché del bearer delegado en el gateway.** ¿Reusar el bearer de 5 min entre llamadas de la misma persona y scope, o
    intercambiar por llamada? Seguir lo que haga `greenhouse-client-services.ts` [verificar].
+
+## Impacto cruzado TASK-1863 (2026-09-28)
+
+El Grader multi-mercado está implementado y verificado en staging (Vercel y worker `d86edb784`):
+catálogo es/en/pt-BR/fr, mercados, lotes, snapshots y readers por país/locale. Main sigue en espera;
+no asumir habilitación comercial ni geografía inferida en históricos. Esta publicación no cierra
+la capacidad propia de esta task. Consumir los commands existentes; [contrato y manual](../../manual-de-uso/growth/configurar-mercados-aeo.md).

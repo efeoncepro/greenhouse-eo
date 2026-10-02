@@ -1,0 +1,951 @@
+<title>Logo sonoro Efeonce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,760&family=Poppins:wght@300;400;600&display=swap">
+<style>
+  :root {
+    --ground: #f7f8f6;
+    --surface: #ffffff;
+    --ink: #001a33;
+    --muted: #4b5a68;
+    --rule: #d8dee2;
+    --ring: #b9c6cf;
+    --accent: #0e8c82;
+    --growth: #0e8c82;
+    --brand: #bb1954;
+    --engine: #0375db;
+    --voice: #c42d00;
+    --revenue: #8e1b82;
+    --display: "Bricolage Grotesque", "Poppins", system-ui, sans-serif;
+    --body: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #001a33;
+      --surface: #04243f;
+      --ink: #f7f8f6;
+      --muted: #a8b7c5;
+      --rule: #173552;
+      --ring: #2c4d6b;
+      --accent: #36c8bf;
+      --growth: #36c8bf;
+      --brand: #ff6500;
+      --engine: #3b95ee;
+      --voice: #f83902;
+      --revenue: #e86bd0;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #001a33;
+    --surface: #04243f;
+    --ink: #f7f8f6;
+    --muted: #a8b7c5;
+    --rule: #173552;
+    --ring: #2c4d6b;
+    --accent: #36c8bf;
+    --growth: #36c8bf;
+    --brand: #ff6500;
+    --engine: #3b95ee;
+    --voice: #f83902;
+    --revenue: #e86bd0;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 15px/1.6 var(--body);
+  }
+  .page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding-inline: 20px;
+    padding-block: 40px 72px;
+    display: grid;
+    gap: 56px;
+  }
+
+  header { display: grid; gap: 14px; max-width: 68ch; }
+  .eyebrow {
+    font: 600 11px/1 var(--body);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    font: 760 clamp(34px, 6vw, 56px)/1.02 var(--display);
+    letter-spacing: -.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h1 .sphere {
+    display: inline-block;
+    width: .2em; height: .2em;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-left: .06em;
+    vertical-align: .08em;
+  }
+  .lede { margin: 0; color: var(--muted); font-size: 16px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  .grammar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .grammar div { background: var(--surface); padding: 14px 16px; display: grid; gap: 4px; }
+  .grammar b { font: 600 13px/1.3 var(--body); }
+  .grammar span { font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+  section { display: grid; gap: 18px; }
+  .section-head { display: grid; gap: 6px; max-width: 68ch; }
+  h2 {
+    font: 760 clamp(24px, 3.4vw, 32px)/1.1 var(--display);
+    letter-spacing: -.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .section-head p { margin: 0; color: var(--muted); }
+  .section-head strong { color: var(--ink); font-weight: 600; }
+
+  .list { display: grid; border-top: 1px solid var(--rule); }
+  .row {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .row h3 { font: 600 16px/1.3 var(--body); margin: 0; }
+  .row p { margin: 2px 0 0; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+  .row .meta { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* Reproductor: el arco mide el avance real de la reproducción; la esfera recorre, nunca llena. */
+  .orbit {
+    appearance: none; border: 0; background: none; padding: 0;
+    width: 64px; height: 64px; cursor: pointer; color: var(--ink);
+    border-radius: 50%;
+  }
+  .orbit:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .orbit svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .orbit .track { fill: none; stroke: var(--ring); stroke-width: 1.5; }
+  .orbit .arc { fill: none; stroke: var(--line, var(--accent)); stroke-width: 2.5; stroke-linecap: round; }
+  .orbit .dot { fill: var(--line, var(--accent)); }
+  .orbit .icon { fill: currentColor; }
+
+  .melody { display: flex; align-items: flex-end; gap: 10px; height: 38px; margin-top: 8px; }
+  .melody i { display: block; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .melody i.s { width: 13px; height: 13px; background: var(--accent); margin-left: 12px; }
+  .melody + .notes { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 4px; }
+
+  .videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+  figure { margin: 0; display: grid; gap: 8px; }
+  video { width: 100%; max-width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; background: #001a33; display: block; }
+  figcaption { font-size: 13.5px; color: var(--muted); }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 600 12px/1 var(--body); letter-spacing: .02em;
+  }
+  .chip::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+
+  .status {
+    display: inline-block; margin-left: 8px; padding: 3px 8px; border-radius: 999px;
+    font: 600 11px/1.2 var(--body); letter-spacing: .04em; vertical-align: 2px;
+    border: 1px solid var(--accent); color: var(--accent);
+  }
+  .status.off { border-color: var(--rule); color: var(--muted); text-decoration: line-through; }
+  .chosen { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; }
+  .chosen span { display: inline-flex; gap: 6px; align-items: baseline; }
+  .chosen b { font-weight: 600; }
+  .round { font: 600 11px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--rule); }
+  .videos.two { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .videos.vert { grid-template-columns: repeat(auto-fit, minmax(170px, 240px)); }
+  .videos.vert video { aspect-ratio: 9 / 16; }
+  .cues { display: grid; gap: 6px; margin: 0; padding-left: 20px; max-width: 72ch; font-size: 14px; }
+  .cues b { font-weight: 600; }
+  .decide { display: grid; gap: 12px; max-width: 72ch; }
+  .decide ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; }
+  .decide li::marker { font-weight: 600; color: var(--accent); }
+  .note {
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    background: var(--surface);
+    border-radius: 0 8px 8px 0;
+    font-size: 13.5px;
+    color: var(--muted);
+    max-width: 72ch;
+  }
+  .note b { color: var(--ink); }
+
+  @media (max-width: 560px) {
+    .row { grid-template-columns: 56px minmax(0, 1fr); }
+    .row .meta { grid-column: 2; }
+    .orbit { width: 56px; height: 56px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main class="page">
+  <header>
+    <div class="eyebrow">Branding sonoro · ronda 10 · Glitch: el tema B</div>
+    <h1>Tres puntos que se vuelven uno<span class="sphere" aria-hidden="true"></span></h1>
+    <p class="lede">El logo sonoro traduce la gramática de <strong>La órbita</strong>: el anillo pregunta, tres notas breves piensan
+      (las tres ventanas de la nave), hay una pausa y la esfera responde con golpe. Todo está en <strong>La mayor</strong>, la
+      tonalidad del motion aprobado. El logo y las piezas serenas salen de síntesis propia, sin muestras; la versión rock parte de una maqueta propia re-grabada con IA.</p>
+  </header>
+
+  <div class="chosen" aria-label="Lo que ya elegiste">
+    <span>Territorio <b>Puntos suspensivos</b></span>
+    <span>Voz <b>Brian</b></span>
+    <span>Acento por línea <b>se queda</b></span>
+    <span>Voice <b>Eco</b></span>
+    <span>Reveal <b>con y sin voz</b></span>
+    <span>Apertura <b>termina abierta</b></span>
+    <span>Etiquetas <b>las cinco con Brian</b></span>
+  </div>
+
+  <div class="grammar" aria-label="Cómo se traduce la línea gráfica a sonido">
+    <div><b>Anillo · la pregunta</b><span>Acorde abierto de quinta, tenue y sin resolver.</span></div>
+    <div><b>Tres ventanas · lo que se piensa</b><span>Tres notas breves de mazo, livianas y sin golpe.</span></div>
+    <div><b>Esfera · la respuesta</b><span>Una nota de campana con impacto grave. Es el único golpe.</span></div>
+    <div><b>Halo · la luz</b><span>El acorde de La florece debajo y se apaga con una cola corta.</span></div>
+  </div>
+
+  <div class="round">Ronda 11b · Glitch, la cama sin arcade</div>
+
+  <section id="glitch-cama-b">
+    <div class="section-head">
+      <h2>La cama, rehecha<span class="status">Post-punk elegida</span></h2>
+      <p><strong>Por qué sonaba arcade, medido:</strong> en la intro aprobada, el 45 % de la energía está en los medios (300 Hz–3 kHz), que es el cuerpo de una banda real. En la cama quedó sólo un 13 %: bajo profundo y un chisporroteo agudo. La maqueta sintetizada ya era delgada, y el recorte que le hice para dejar espacio a la voz se llevó justo el cuerpo.</p>
+      <p><strong>Qué cambió:</strong> las tres nacen desde texto, sin mi maqueta, con instrumentos reales (36–38 % en los medios). El espacio para la voz lo da el ducking: la cama baja cuando alguien habla y no se recorta. Las tres van a tempo con la grilla de Glitch (150 BPM, o su mitad) y con energía pareja, sin subidas. Como se generan al largo que haga falta, una noticia larga no oye un bucle repetido. La voz sigue siendo sintética y provisional.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/cama-postpunk-voz.mp3" aria-label="Reproducir Post-punk con voz"></button>
+        <div><h3>Post-punk · bajo la noticia</h3><p>Bajo eléctrico saturado con actitud, batería seca de sala y una guitarra rasgueada en los contratiempos. La más irreverente y la más cercana a la banda del tema B.</p></div>
+        <div class="meta">24 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cama-postpunk-sola.mp3" aria-label="Reproducir Post-punk sola"></button>
+        <div><h3>Post-punk · sola</h3><p>Al frente, para oír el detalle. Bajo la voz va 15 dB más abajo.</p></div>
+        <div class="meta">26 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cama-hiphop-voz.mp3" aria-label="Reproducir Hip-hop tocado con voz"></button>
+        <div><h3>Hip-hop tocado · bajo la noticia</h3><p>Batería con golpe a 75 BPM (la mitad de 150), bajo eléctrico cálido y acordes de Rhodes apagados. Segura y un poco desafiante; la más «podcast de noticias».</p></div>
+        <div class="meta">24 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cama-hiphop-sola.mp3" aria-label="Reproducir Hip-hop tocado sola"></button>
+        <div><h3>Hip-hop tocado · sola</h3><p>Al frente, para oír el detalle. Bajo la voz va 15 dB más abajo.</p></div>
+        <div class="meta">26 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cama-tension-voz.mp3" aria-label="Reproducir Tensión de redacción con voz"></button>
+        <div><h3>Tensión de redacción · bajo la noticia</h3><p>Pulso de bajo en corcheas a 150, escobillas, clicks de aro y notas sueltas de piano con fieltro. La más experta y oscura; empuja sin llamar la atención.</p></div>
+        <div class="meta">24 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cama-tension-sola.mp3" aria-label="Reproducir Tensión de redacción sola"></button>
+        <div><h3>Tensión de redacción · sola</h3><p>Al frente, para oír el detalle. Bajo la voz va 15 dB más abajo.</p></div>
+        <div class="meta">26 s · −16 LUFS</div>
+      </div>
+    </div>
+    <div class="decide">
+      <h3>Lo que necesito que decidas</h3>
+      <ol>
+        <li><b>Elegiste la post-punk (2026-09-27):</b> «Post-punk definitivamente». Quedó como bucle sin costura de 12 compases (19,2 s, exacto a 150 BPM) y reemplaza la regla de «la voz sola bajo las noticias». El tema completo —intro, cortina, salida y cama— está publicado en el bucket <code>glitch/music/v1</code> con su sha256, documentado en la norma de Glitch (§13.12) y listo para AXIS (<code>/references/glitch/#musica</code>).</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="round">Ronda 11 · Glitch, la cama bajo la noticia</div>
+
+  <section id="glitch-cama">
+    <div class="section-head">
+      <h2>La música de fondo mientras se cuenta la noticia<span class="status">Descartada: sonaba arcade</span></h2>
+      <p>Con voz sola, una noticia larga cansa: tienes razón. La cama es <strong>el mismo tema B, en segundo plano</strong>: batería con filtro, el bajo sucio en La y, cada cuatro compases, el motivo Mi · Mi · Mi → La, apenas asomado. Lo que la separa de la intro: <strong>el medio queda libre para la voz</strong> (corte entre 300 Hz y 3 kHz, sin acordes ahí), va <strong>15 dB por debajo</strong> de la voz y <strong>baja sola cuando alguien habla</strong> y sube un poco en las pausas. No tiene manzanas, tartamudeos fuertes ni cortes secos: eso queda para la intro, la cortina y la salida.</p>
+      <p>Es un bucle sin costura de 12,8 s (8 compases a 150 BPM). La cortina entre noticias la corta y la noticia siguiente entra con ella de nuevo.</p>
+    </div>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/b-demo-noticia.mp4"></video><figcaption><b>Noticia con cama (22 s).</b> Cabecera «NOTICIA 1 / 3», lower third de la noticia y el relato encima de la cama. <b>La voz es sintética y provisional:</b> ahí va la del host.</figcaption></figure>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/b-cama.mp3" aria-label="Reproducir la cama sola"></button>
+        <div><h3>La cama sola</h3><p>Tres vueltas del bucle, a nivel de mezcla para que se oiga el detalle. Bajo la voz va 15 dB más abajo.</p></div>
+        <div class="meta">38 s</div>
+      </div>
+    </div>
+    <div class="decide">
+      <h3>Lo que necesito que decidas</h3>
+      <ol>
+        <li><b>¿La cama va?</b> Si la apruebas, cambia la regla anterior de «la voz sola bajo las noticias» por «cama bajo la voz, con estas reglas», y con eso documento el tema completo en la norma, AXIS y el taller.</li>
+        <li><b>Noticias largas.</b> Si una noticia dura más de un minuto, el bucle de 12,8 s puede cansar también. Te propongo una variante larga que cambia cada 8 compases (se abre y se cierra el filtro, entra y sale el motivo), sin cambiar de tema.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="round">Ronda 10 · Glitch, el tema B completo</div>
+
+  <section id="glitch-tema-b">
+    <div class="section-head">
+      <h2>El tema B, pieza por pieza<span class="status">Aprobado</span></h2>
+      <p>Elegiste la B: irreverente, desafiante. Con la misma regla —<strong>150 BPM amarrados al motion, los cortes sobre la grabación real, el silencio como ritmo y el grave sólo en la manzana</strong>— están la <strong>cortina entre noticias</strong> y la <strong>salida con la tarjeta final</strong>. Aquí van juntas en una edición, para juzgarlas en contexto.</p>
+    </div>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/b-secuencia-vlog.mp4"></video><figcaption><b>Una edición de principio a fin (15 s).</b> Intro con la apertura · el host (aquí va su voz) · la cortina, que corta justo cuando entra «NOTICIA 2 / 3» · el host · la salida: la banda entra con «se cierra.», corta con la falla y la manzana implosiona sola.</figcaption></figure>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/b-cortina.mp3" aria-label="Reproducir Cortina entre noticias"></button>
+        <div><h3>Cortina entre noticias</h3><p>Un compás de banda con el motivo Mi · Mi · Mi → La en el bajo; el último tiempo tartamudea sobre la grabación y corta en seco. Se monta para que el corte caiga cuando entra la cabecera de la noticia siguiente.</p></div>
+        <div class="meta">2 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/b-salida-podcast.mp3" aria-label="Reproducir Salida del podcast"></button>
+        <div><h3>Salida del podcast</h3><p>La tarjeta final con la banda (de «se cierra.» al corte con falla), el silencio y la manzana que implosiona; luego dos compases más, el segundo tartamudea, y la respuesta en La, cortada en seco.</p></div>
+        <div class="meta">7 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/b-intro-podcast.mp3" aria-label="Reproducir Intro del podcast (B)"></button>
+        <div><h3>Intro del podcast (B)</h3><p>La elegida, para tenerla junto a las demás.</p></div>
+        <div class="meta">14 s · −14 LUFS</div>
+      </div>
+    </div>
+    <div class="decide">
+      <h3>Lo que necesito que decidas</h3>
+      <ol>
+        <li><b>Aprobadas las tres (2026-09-27).</b> Falta la cama bajo la noticia (ronda 11); con ella se documenta el tema completo.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="round">Ronda 9 · Glitch, el tema con banda</div>
+
+  <section id="glitch-tema-banda">
+    <div class="section-head">
+      <h2>Glitch: el tema, con banda<span class="status">Elegida: B</span></h2>
+      <p>La ronda 8 sonaba arcade porque era síntesis pura: senos, bytes y plucks, lo que el oído asocia a un videojuego. Glitch es un experto irreverente. Aquí se conserva lo que funcionó —<strong>150 BPM amarrados al motion, los cortes y el silencio como ritmo, el grave sólo en la manzana y la apertura aprobada como drop</strong>— y cambia el material: <strong>una maqueta de banda re-grabada con Stable Audio</strong> (bajo distorsionado con el motivo Mi · Mi · Mi → La, batería, guitarras sucias) y <strong>los cortes hechos después, sobre la grabación real</strong>. Sin bleeps.</p>
+    </div>
+
+    <h3>A · Experto, oscuro <span class="status off">Descartada</span></h3>
+    <p class="note"><b>Tensión de sala de redacción:</b> bajo analógico distorsionado, percusión industrial, contención. Seguro de sí mismo.</p>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/r9-intro-vlog-a.mp4"></video><figcaption><b>Intro del vlog · A</b></figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/r9-intro-reel-a.mp4" style="aspect-ratio:9/16;max-width:240px"></video><figcaption><b>Reel · A</b></figcaption></figure>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/r9-podcast-a.mp3" aria-label="Reproducir Intro del podcast · A"></button>
+        <div><h3>Intro del podcast · A</h3><p>Seis compases con la banda, un compás con cortes, el tartamudeo sobre la grabación y el corte en seco a la apertura.</p></div>
+        <div class="meta">14 s · −14 LUFS</div>
+      </div>
+    </div>
+
+    <h3>B · Irreverente, desafiante <span class="status">Elegida</span></h3>
+    <p class="note"><b>Breakbeat con swagger:</b> bajo sucio, guitarras cortadas, actitud. Provoca.</p>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/r9-intro-vlog-b.mp4"></video><figcaption><b>Intro del vlog · B</b></figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/r9-intro-reel-b.mp4" style="aspect-ratio:9/16;max-width:240px"></video><figcaption><b>Reel · B</b></figcaption></figure>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/r9-podcast-b.mp3" aria-label="Reproducir Intro del podcast · B"></button>
+        <div><h3>Intro del podcast · B</h3><p>La misma estructura con la banda irreverente.</p></div>
+        <div class="meta">14 s · −14 LUFS</div>
+      </div>
+    </div>
+
+    <div class="decide">
+      <h3>Lo que necesito que decidas</h3>
+      <ol>
+        <li><b>¿A, B o ninguna?</b> Si ninguna, dime qué se acerca más: así afino la dirección en vez de adivinar.</li>
+        <li>Si alguna va, hago las cortinas entre noticias y la salida con la misma regla.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="round">Ronda 8 · Glitch, el tema</div>
+
+  <section id="glitch-tema">
+    <div class="section-head">
+      <h2>Glitch: el tema, desde el sonido aprobado<span class="status off">Descartada: arcade</span></h2>
+      <p>Pulso y Club no tenían el espíritu de Glitch: eran géneros, aparte del sonido B. Este tema <strong>sale del sonido aprobado y se amarra al motion</strong>. Los instrumentos son la paleta B (bytes afinados, tartamudeo, desgarro, la manzana) y <strong>la edición es el instrumento</strong>: el groove se graba derecho y después se corta como una cinta, con repeticiones y silencio digital en seco.</p>
+      <p><strong>150 BPM: una semicorchea dura 3 cuadros.</strong> Todos los golpes del motion caen en la grilla: el quiebre, la manzana (tiempo 1), «se abre» (una semicorchea antes del tiempo), el corte y el silencio. <strong>La apertura aprobada, intacta, es el drop</strong>: sus primeros 0,8 s quedan solos (la pregunta), la banda pega con el quiebre, el bombo se acelera mientras se arman los bytes y la manzana trae <strong>el único grave</strong> del tema. El ticker 3-3-2 de bytes es la urgencia de noticiero, dicha en datos.</p>
+    </div>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-tema-intro-vlog.mp4"></video><figcaption><b>Intro del vlog (16:9).</b> Dos compases antes de la apertura, con el gancho con bug que resuelve en el tiempo 3 y un tartamudeo que se acelera hasta el corte. Los puntos quietos del pre-roll son provisorios: el motion de esa espera lo definimos si el tema va.</figcaption></figure>
+    </div>
+    <div class="videos vert">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-tema-intro-reel.mp4"></video><figcaption><b>El mismo tema en el reel.</b></figcaption></figure>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/glitch-tema-podcast.mp3" aria-label="Reproducir la intro del podcast"></button>
+        <div><h3>Intro del podcast</h3><p>Seis compases: el ticker solo · entra la banda · el groove con el gancho · un compás con cortes y silencio · el gancho con bug y el tartamudeo que acelera · corte en seco · la apertura con la banda.</p></div>
+        <div class="meta">13,6 s · −14 LUFS</div>
+      </div>
+    </div>
+    <div class="decide">
+      <h3>Lo que necesito que decidas</h3>
+      <ol>
+        <li><b>¿Este es el camino?</b> Si va, hago las cortinas entre noticias y la salida con la tarjeta final, con la misma regla.</li>
+        <li><b>¿Más o menos cortes?</b> El pre-roll puede tartamudear más, o respirar más.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="round">Ronda 7 · Glitch, la música</div>
+
+  <section id="glitch-musica">
+    <div class="section-head">
+      <h2>Glitch: la música<span class="status off">Descartada</span></h2>
+      <p>La música va <strong>alrededor de la voz, nunca debajo</strong>: intro del vlog y del podcast, cortinas entre noticias, salida, y reels sin voz. Dos registros del mismo ADN, en La mayor, con el motivo con bug como gancho: <strong>Mi · Mi · Mi</strong>, la tercera nota tartamudea, y <strong>La</strong> con la manzana. Sólo Glitch.</p>
+      <p>Cómo se hizo: una <strong>maqueta propia</strong> con la estructura exacta, <strong>re-grabada con Stable Audio 2.5</strong> (intensidad 0,6) para que suene producida, y encima <strong>la manzana propia</strong> (golpe grave y campana en La) en el instante exacto. Stable Audio conservó el golpe final al milisegundo en las intros. Masterizado a −14 LUFS.</p>
+    </div>
+
+    <h3>Pulso · ~120 BPM</h3>
+    <p class="note"><b>Electrónica hipnótica y precisa</b> (la escuela de Four Tet y Jon Hopkins). Los bytes afinados son la percusión; el arpegio lleva la armonía La · Re/La · Fa♯m7 · Mi sus4. Para la intro del vlog y del podcast, las cortinas y la salida.</p>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/glitch-pulso-intro.mp3" aria-label="Reproducir Intro · Pulso"></button>
+        <div><h3>Intro · Pulso</h3><p>Aire y bytes · entra el pulso (compás 3) · el gancho se adelanta (compás 8) · quiebre · el gancho con bug resuelve en la manzana a los 18,0 s.</p></div>
+        <div class="meta">20 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/glitch-pulso-cortina.mp3" aria-label="Reproducir Cortina · Pulso"></button>
+        <div><h3>Cortina · Pulso</h3><p>Entre noticias: un compás de bytes, el gancho con bug y la manzana.</p></div>
+        <div class="meta">3 s · −14 LUFS</div>
+      </div>
+    </div>
+
+    <h3>Club · 144 BPM</h3>
+    <p class="note"><b>Ritmo quebrado y rebotado</b> del club actual: bombo en 1 · 2 · 3 · 3&amp; · 4&amp;, palmas, 808 y chirridos afinados a contratiempo (propios, no la muestra clásica). Aquí la falla es el ritmo: el bombo se acelera y tartamudea antes del golpe. Sólo para reels y redes, nunca cerca de la voz.</p>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/glitch-club-intro.mp3" aria-label="Reproducir Intro · Club"></button>
+        <div><h3>Intro · Club</h3><p>El gancho picado · el patrón (compás 3) · el bombo se acelera y tartamudea (compases 9 y 10) · un silencio · la manzana con toda la banda a los 18,33 s.</p></div>
+        <div class="meta">20 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/glitch-club-cortina.mp3" aria-label="Reproducir Cortina · Club"></button>
+        <div><h3>Cortina · Club</h3><p>El gancho con bug, la manzana, el 808 y una palma.</p></div>
+        <div class="meta">3 s · −14 LUFS</div>
+      </div>
+    </div>
+
+    <details class="note">
+      <summary><b>Las maquetas</b>, para comparar con lo re-grabado</summary>
+      <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/glitch-pulso-intro-maqueta.mp3" aria-label="Reproducir Maqueta · Pulso intro"></button>
+        <div><h3>Maqueta · Pulso intro</h3><p>Síntesis propia, antes de Stable Audio.</p></div>
+        <div class="meta">20 s</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/glitch-club-intro-maqueta.mp3" aria-label="Reproducir Maqueta · Club intro"></button>
+        <div><h3>Maqueta · Club intro</h3><p>Síntesis propia, antes de Stable Audio.</p></div>
+        <div class="meta">20 s</div>
+      </div>
+      </div>
+    </details>
+
+    <div class="decide">
+      <h3>Lo que necesito que decidas</h3>
+      <ol>
+        <li><b>¿Pulso y Club, las dos?</b> Mi recomendación: Pulso para el programa (intro, cortinas, salida) y Club sólo para reels.</li>
+        <li><b>¿La re-grabación o la maqueta?</b> La re-grabación suena más producida; la maqueta es más exacta.</li>
+        <li><b>¿Algo que cambiar?</b> Tempo, cuánto dura la intro, cuánta falla lleva el gancho.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="round">Ronda 6 · Glitch</div>
+
+  <section id="glitch-sfx">
+    <div class="section-head">
+      <h2>Glitch: el sonido de Efeonce, con un bug<span class="status">Aprobado · B</span></h2>
+      <p>No es música: es <strong>diseño sonoro</strong> sobre el piloto de motion v2. El motivo de Efeonce, <strong>Mi · Mi · Mi → La</strong>, con la tercera nota que falla: se rompe en bytes y se rearma como la manzana, que da <strong>el único golpe grave</strong> (La en campana, el timbre de Growth). Cada sonido cae en un cuadro de la animación.</p>
+      <p>Toda la falla está <strong>afinada en La mayor</strong>. Nada de chiptune, módem, máquina de escribir, vinilo ni whooshes: el corte es silencio digital. La voz del host nunca recibe la falla y la firma de Efeonce no suena. Síntesis propia, sin muestras.</p>
+    </div>
+
+    <h3>El bucle: tarjeta final → apertura (16:9)</h3>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-bucle-16x9-a.mp4"></video><figcaption><b>A · contenida.</b> La falla se oye, pero no empuja.</figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-bucle-16x9-b.mp4"></video><figcaption><b>B · más punch.</b> Más tartamudeo, cuerpo en los golpes de texto y la campana al revés cuando la manzana implosiona.</figcaption></figure>
+    </div>
+
+    <h3>La edición completa (animatic de 45 s)</h3>
+    <p class="note"><b>El video entero es el motivo en cámara lenta.</b> Cada cabecera «NOTICIA n/3» suena en Mi: la 1 y la 2 limpias, la 3 falla. El Glitch Drop es La: la manzana y el segundo golpe grave del video. En el animatic no hay voz: entre golpes queda sólo el aire del estudio, que es donde entra el host.</p>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-edicion-16x9-a.mp4"></video><figcaption><b>A · contenida</b></figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-edicion-16x9-b.mp4"></video><figcaption><b>B · más punch</b></figcaption></figure>
+    </div>
+
+    <h3>En el reel (9:16)</h3>
+    <div class="videos vert">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-bucle-9x16-a.mp4"></video><figcaption><b>A</b></figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-bucle-9x16-b.mp4"></video><figcaption><b>B</b></figcaption></figure>
+    </div>
+
+    <h3>Las transiciones: lower third y bytes</h3>
+    <p class="note"><b>Sobre la toma del host.</b> El lower third «AL AIRE» se abre con bytes que suben por la escala, la manzana nace en la órbita con un tintineo agudo (no es un golpe) y el nombre cae con un clic liviano; al salir, los bytes bajan. Después, la tarjeta de noticia y el Drop con la transición «manzana en bytes»: la manzana aparece en la esquina, se rompe y los bytes barren la pieza subiendo de altura; a la salida vuelven, bajando, y la manzana se va.</p>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-lower-third-bytes-16x9-a.mp4"></video><figcaption><b>A · contenida</b></figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-lower-third-bytes-16x9-b.mp4"></video><figcaption><b>B · más punch</b></figcaption></figure>
+    </div>
+
+    <h3>Entre escenas (intensidad B)</h3>
+    <p class="note"><b>El sonido sale de la misma programación de celdas que la imagen.</b> La manzana nace en el origen y se rompe cuando se abre la primera celda; el barrido es una lluvia de clics, uno por celda, que viaja en estéreo con ellas; los destellos verdes, grises y blancos son bytes afinados. Sin soplo ni whoosh. Hacia o desde el host no suena nada: ahí va corte seco.</p>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-transicion-centro-16x9-b.mp4"></video><figcaption><b>Desde el centro</b> · 0,8 s</figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-transicion-izquierda-16x9-b.mp4"></video><figcaption><b>Desde la izquierda</b> · 0,8 s</figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-transicion-marca-16x9-b.mp4"></video><figcaption><b>Desde la marca</b> · 0,8 s (arriba a la derecha: el sonido nace ahí)</figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-transicion-heroe-16x9-b.mp4"></video><figcaption><b>Héroe</b> · 1,2 s: los bytes despegan con un deslizamiento y llegan afinados, subiendo, mientras B se arma.</figcaption></figure>
+    </div>
+
+    <h3>Qué suena en cada momento</h3>
+    <ul class="cues">
+      <li><b>Los puntos escriben:</b> tres notas Mi, breves y puras.</li>
+      <li><b>El tercer punto tiembla y se rompe (0,8 s):</b> el Mi salta de altura cuadro a cuadro, pierde resolución y se corta en repeticiones cada vez más cortas.</li>
+      <li><b>Los bytes se arman como la manzana:</b> granos afinados que suben de altura fila por fila y recuperan resolución al llegar.</li>
+      <li><b>La manzana (1,6 s):</b> el golpe grave con la campana en La; su eco vuelve con la falla.</li>
+      <li><b>«El micrófono» / «se abre» (2,3 s):</b> ticks por letra, el clic del canal y el aire del estudio que entra.</li>
+      <li><b>El número decodifica:</b> ticks al azar que se asientan en La.</li>
+      <li><b>Salida:</b> desgarro de tres cuadros y silencio digital en seco.</li>
+      <li><b>«se cierra.»:</b> el clic del canal y el aire que se va. La muletilla en Guttery es el único sonido orgánico: un trazo de plumón.</li>
+      <li><b>La manzana implosiona:</b> los bytes vuelven hacia adentro, bajan de altura y caen en el Mi del tercer punto, que empalma con la apertura.</li>
+    </ul>
+
+    <div class="decide">
+      <h3>Lo que necesito que decidas</h3>
+      <ol>
+        <li><b>¿A o B?</b> O una mezcla: por ejemplo, la apertura de B con la tarjeta final de A.</li>
+        <li><b>¿Dos golpes graves en el video (apertura y Drop)?</b> Uno por cada aparición de la manzana.</li>
+        <li><b>¿Voz sola bajo las noticias, sin música?</b> Es mi recomendación.</li>
+        <li><b>El clic del micrófono y el plumón están sintetizados.</b> Si suenan artificiales, los paso a ElevenLabs.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="round">Ronda 5</div>
+
+  <section id="rock">
+    <div class="section-head">
+      <h2>Con punch: la versión rock</h2>
+      <p>Los puntos suspensivos dichos por una banda: <strong>tres golpes apagados de guitarra en Mi y el acorde abierto con bombo, platillo y bajo</strong>. A 120 BPM, la pausa entre el tercer golpe y el acorde son tres semicorcheas (0,375 s): la misma del logo aprobado. La armonía es la de la pieza serena, así que la nota La sigue sonando en cada golpe.</p>
+      <p>Cómo se hizo: una <strong>maqueta propia</strong> con el riff exacto, <strong>re-grabada con IA</strong> para que suene a banda real, y encima <strong>la esfera del sistema</strong> (campana en La y golpe grave), idéntica a la aprobada. Masterizado a −14 LUFS.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-larga-sa50.mp3" aria-label="Reproducir rock, re-grabación fiel"></button>
+        <div><h3>Re-grabación fiel</h3><p>Stable Audio 2.5 a intensidad 0,5: la más cercana a la maqueta, con el riff y los tiempos intactos.</p></div>
+        <div class="meta">37 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-larga-sa70.mp3" aria-label="Reproducir rock, re-grabación libre"></button>
+        <div><h3>Re-grabación libre</h3><p>Stable Audio 2.5 a 0,7: reinterpreta más el sonido y mantiene la estructura y el golpe final al milisegundo.</p></div>
+        <div class="meta">37 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-larga-hibrido.mp3" aria-label="Reproducir rock, híbrido"></button>
+        <div><h3>Híbrido</h3><p>ElevenLabs Music v2.5 hasta la subida (la más «producida») y el final de Stable Audio. ElevenLabs no respetó el corte ni el golpe final en ningún intento.</p></div>
+        <div class="meta">37 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-larga-sa70-brian.mp3" aria-label="Reproducir rock con Brian"></button>
+        <div><h3>Re-grabación libre, con Brian</h3><p>«Growth» cae con el golpe (32,84 s y 32,875 s).</p></div>
+        <div class="meta">37 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-maqueta-larga.mp3" aria-label="Reproducir la maqueta rock"></button>
+        <div><h3>La maqueta</h3><p>Para comparar: el esqueleto sintetizado que guió a la IA.</p></div>
+        <div class="meta">37 s</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="glitch-rock">
+    <div class="section-head">
+      <h2>Glitch con punch</h2>
+      <p>La misma banda. La falla digital pasa a ser un <strong>tartamudeo de toda la banda</strong>: el tercer golpe y la caja se repiten cada vez más degradados antes del acorde. Re-grabado con Stable Audio y masterizado a −16 LUFS.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-glitch-intro.mp3" aria-label="Reproducir intro de Glitch rock"></button>
+        <div><h3>Intro</h3><p>Redoble de entrada, los tres golpes, el tartamudeo y el acorde; la banda sigue dos compases y baja.</p></div>
+        <div class="meta">8 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-glitch-cortina.mp3" aria-label="Reproducir cortina de Glitch rock"></button>
+        <div><h3>Cortina</h3><p>Los tres golpes, el tartamudeo y el acorde.</p></div>
+        <div class="meta">2 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-glitch-outro.mp3" aria-label="Reproducir outro de Glitch rock"></button>
+        <div><h3>Outro</h3><p>Un compás de banda y la firma limpia.</p></div>
+        <div class="meta">6 s · −15 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-glitch-outro-brian.mp3" aria-label="Reproducir outro de Glitch rock con Brian"></button>
+        <div><h3>Outro con Brian</h3><p>«Growth» sobre el acorde (2,84 s y 2,875 s).</p></div>
+        <div class="meta">6 s · −15 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="round">Ronda 4 · versión serena</div>
+
+  <section id="larga">
+    <div class="section-head">
+      <h2>La pieza larga</h2>
+      <p>40 segundos para videos de marca, eventos y webinars, a 96 BPM, construida sobre el logo sonoro. Empieza con el anillo y dos preguntas sin respuesta; entra la armonía y la esfera empieza a responder. La idea: <strong>la esfera responde siempre La mientras los acordes cambian debajo</strong> (La, Re, Fa♯ menor y Mi): el contexto cambia, la respuesta no. Sube con el arco, hace silencio y cierra con el logo sonoro completo.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-larga.mp3" aria-label="Reproducir pieza larga"></button>
+        <div><h3>Sin voz</h3><p>Para usar debajo de un video o de una locución: el cierre queda libre.</p></div>
+        <div class="meta">40,5 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-larga-brian.mp3" aria-label="Reproducir pieza larga con Brian"></button>
+        <div><h3>Con Brian</h3><p>Cierra con «Empower your Growth»; «growth» cae con la esfera (35,92 s y 35,95 s).</p></div>
+        <div class="meta">40,5 s · −14 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="glitch">
+    <div class="section-head">
+      <h2>Glitch, el podcast</h2>
+      <p>Glitch lleva su propio guiño sin salirse del sistema: la tercera ventana <strong>tartamudea</strong>, como una falla digital, antes de que la esfera responda. En el cierre ya no hay falla: el logo sonoro suena limpio. Masterizado a −16 LUFS, el estándar de podcast.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-glitch-intro.mp3" aria-label="Reproducir intro de Glitch"></button>
+        <div><h3>Intro</h3><p>Pulso, el motivo con la falla y la esfera; después la base sigue unos segundos y se apaga para que entre la voz del anfitrión.</p></div>
+        <div class="meta">8,5 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-glitch-cortina.mp3" aria-label="Reproducir cortina de Glitch"></button>
+        <div><h3>Cortina</h3><p>Entre segmentos: el motivo con la falla y una esfera suave, sin golpe.</p></div>
+        <div class="meta">2,4 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-glitch-outro.mp3" aria-label="Reproducir outro de Glitch"></button>
+        <div><h3>Outro</h3><p>El logo sonoro limpio, que resuelve.</p></div>
+        <div class="meta">6,5 s · −15 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-glitch-outro-brian.mp3" aria-label="Reproducir outro de Glitch con Brian"></button>
+        <div><h3>Outro con Brian</h3><p>Igual, con «Empower your Growth» sobre la esfera.</p></div>
+        <div class="meta">6,5 s · −15 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="round">Ronda 3</div>
+
+  <section id="apertura">
+    <div class="section-head">
+      <h2>En la apertura<span class="status">Aprobada</span></h2>
+      <p>La apertura cuenta la historia al revés: el logo se abre y vuelve a ser línea. Las tres notas suenan mientras las letras se recogen, la pausa cae en el retroceso de la nave y la esfera, con el golpe del lanzamiento, a los 1,15 s. Termina en el anillo abierto, sin resolver, porque después empieza el video.</p>
+    </div>
+    <div class="videos two">
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/apertura-puntos.mp4"></video>
+        <figcaption><b>Apertura</b> · 2,4 s más un segundo de cuadro final</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="etiquetas">
+    <div class="section-head">
+      <h2>La etiqueta de cada línea, con Brian<span class="status">Aprobadas</span></h2>
+      <p>La misma melodía, la esfera con el timbre de su línea y el golpe sobre la palabra final. Las tomas se igualaron en ritmo: la pausa entre «Empower» y «your» mide 0,14 s en las cinco (Brian la alargaba hasta 0,28 s en algunas), recortada sólo en el silencio.</p>
+    </div>
+    <div class="list">
+      <div class="row" style="--line: var(--growth)">
+        <button class="orbit" data-src="audio/cierre-linea-growth.mp3" aria-label="Reproducir Empower your Growth"></button>
+        <div><span class="chip">Empower your Growth</span><p>Campana.</p></div>
+        <div class="meta">−13,2 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--brand)">
+        <button class="orbit" data-src="audio/cierre-linea-brand.mp3" aria-label="Reproducir Empower your Brand"></button>
+        <div><span class="chip">Empower your Brand</span><p>Marimba.</p></div>
+        <div class="meta">−12,6 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--engine)">
+        <button class="orbit" data-src="audio/cierre-linea-engine.mp3" aria-label="Reproducir Empower your Engine"></button>
+        <div><span class="chip">Empower your Engine</span><p>FM sintético.</p></div>
+        <div class="meta">−12,3 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/cierre-linea-voice.mp3" aria-label="Reproducir Empower your Voice"></button>
+        <div><span class="chip">Empower your Voice</span><p>Eco.</p></div>
+        <div class="meta">−12,9 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--revenue)">
+        <button class="orbit" data-src="audio/cierre-linea-revenue.mp3" aria-label="Reproducir Empower your Revenue"></button>
+        <div><span class="chip">Empower your Revenue</span><p>Campana grave.</p></div>
+        <div class="meta">−13,0 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="round">Ronda 2</div>
+
+  <section id="reveal">
+    <div class="section-head">
+      <h2>En el reveal<span class="status">Se quedan las dos</span></h2>
+      <p>El video V1.1 no cambia. Las tres notas suenan mientras entra la nave y la esfera cae con el golpe del encaje, a los 1,87 s. Se conservan el aire de la línea, el arco que sube, el giro y la cámara del sonido aprobado; la campanilla del planeta la reemplazan las tres ventanas. Se agregó un segundo de cuadro final para oír la cola.</p>
+    </div>
+    <div class="videos two">
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/reveal-puntos.mp4"></video>
+        <figcaption><b>Sin voz</b> · el acorde de La florece con las letras, a los 2,75 s</figcaption>
+      </figure>
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/reveal-puntos-brian.mp4"></video>
+        <figcaption><b>Con Brian</b> · «Growth» y el acorde caen juntos cuando termina de entrar el eslogan, a los 3,05 s</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="voice">
+    <div class="section-head">
+      <h2>Voice: tres timbres nuevos</h2>
+      <p>El coro quedó fuera. Voice es medios y distribución (Reach): estas tres buscan el mensaje que llega a otros, sin nada vocal. La melodía es la misma.</p>
+    </div>
+    <div class="list">
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/ronda2-voice-eco.mp3" aria-label="Reproducir Voice, eco"></button>
+        <div><h3>Eco<span class="status">Elegido</span></h3><p>La esfera suena y se repite cuatro veces de lado a lado, cada vez más lejos: el mensaje que se propaga.</p></div>
+        <div class="meta">−15,0 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/ronda2-voice-cuerda.mp3" aria-label="Reproducir Voice, cuerda"></button>
+        <div><h3>Cuerda pulsada<span class="status off">Descartada</span></h3><p>Una cuerda tocada, cercana: la voz de quien cuenta algo. Afinada exacto en La.</p></div>
+        <div class="meta">−15,2 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/ronda2-voice-pulso.mp3" aria-label="Reproducir Voice, pulso"></button>
+        <div><h3>Pulso<span class="status off">Descartado</span></h3><p>La nota vibra con un trémolo de 6 Hz, como una señal que se transmite.</p></div>
+        <div class="meta">−14,4 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="round">Ronda 1</div>
+
+  <section id="logo">
+    <div class="section-head">
+      <h2>El logo sonoro: tres territorios</h2>
+      <p>Misma gramática y mismo timbre; cambian las cuatro notas. Escúchalos con audífonos y después en el parlante del celular: un buen logo sonoro sobrevive a los dos.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/candidatos-puntos-logo.mp3" aria-label="Reproducir Puntos suspensivos"></button>
+        <div>
+          <h3>Puntos suspensivos<span class="status">Elegido</span></h3>
+          <p>Tres puntos iguales que se vuelven uno. La esfera sube una cuarta: la cadencia más decidida de las tres.</p>
+          <div class="melody" data-notes="76,76,76,81"></div>
+          <div class="notes">Mi · Mi · Mi → La</div>
+        </div>
+        <div class="meta">2,9 s · −14,3 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/candidatos-pregunta-logo.mp3" aria-label="Reproducir Pregunta y respuesta"></button>
+        <div>
+          <h3>Pregunta y respuesta</h3>
+          <p>Sube con la entonación de una pregunta y la respuesta asienta un paso abajo. La más conversacional.</p>
+          <div class="melody" data-notes="73,76,83,81"></div>
+          <div class="notes">Do♯ · Mi · Si → La</div>
+        </div>
+        <div class="meta">2,9 s · −14,8 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/candidatos-orbita-logo.mp3" aria-label="Reproducir Órbita abierta"></button>
+        <div>
+          <h3>Órbita abierta</h3>
+          <p>Quintas apiladas, como el anillo, y la esfera cae en la tercera del acorde: la más luminosa, la que más se acerca a «te hacemos visible».</p>
+          <div class="melody" data-notes="69,76,83,85"></div>
+          <div class="notes">La · Mi · Si → Do♯</div>
+        </div>
+        <div class="meta">2,9 s · −15,1 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sting">
+    <div class="section-head">
+      <h2>Sobre el sting aprobado</h2>
+      <p>El video V1.1 no cambia; sólo el sonido. Las tres notas suenan mientras la nave se acerca y la esfera cae con el golpe de encaje, a los 0,58 s. El video se extendió un segundo con el cuadro final para que se oiga la cola.</p>
+    </div>
+    <div class="videos">
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/sting-puntos.mp4"></video>
+        <figcaption><b>Puntos suspensivos</b> · Mi Mi Mi → La</figcaption>
+      </figure>
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/sting-pregunta.mp4"></video>
+        <figcaption><b>Pregunta y respuesta</b> · Do♯ Mi Si → La</figcaption>
+      </figure>
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/sting-orbita.mp4"></video>
+        <figcaption><b>Órbita abierta</b> · La Mi Si → Do♯</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="voz">
+    <div class="section-head">
+      <h2>El cierre con voz: la esfera cae en «Growth»</h2>
+      <p>En la línea gráfica, la palabra final del eslogan hace el papel de la esfera. Aquí también: el golpe coincide con el inicio de la palabra, medido por transcripción. Cuatro voces de ElevenLabs v3 sobre «Puntos suspensivos»; la voz y el territorio se eligen por separado.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/cierre-cierre-puntos-brian.mp3" aria-label="Reproducir voz Brian"></button>
+        <div><h3>Brian<span class="status">Elegida</span></h3><p>Masculina, grave y resonante. La de más autoridad.</p></div>
+        <div class="meta">«growth» en 0,96 s</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cierre-cierre-puntos-george.mp3" aria-label="Reproducir voz George"></button>
+        <div><h3>George</h3><p>Masculina, cálida, con acento británico. La más cercana.</p></div>
+        <div class="meta">«growth» en 0,92 s</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cierre-cierre-puntos-sarah.mp3" aria-label="Reproducir voz Sarah"></button>
+        <div><h3>Sarah</h3><p>Femenina, suave y segura.</p></div>
+        <div class="meta">«growth» en 0,96 s</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cierre-cierre-puntos-alice.mp3" aria-label="Reproducir voz Alice"></button>
+        <div><h3>Alice</h3><p>Femenina, clara, con acento británico.</p></div>
+        <div class="meta">«growth» en 1,08 s</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="lineas">
+    <div class="section-head">
+      <h2>El acento de cada línea de servicio</h2>
+      <p>Como el color del acento en la gráfica, la línea de servicio cambia sólo el timbre de la esfera. La melodía no cambia nunca. Demostrado sobre «Puntos suspensivos».</p>
+    </div>
+    <div class="list">
+      <div class="row" style="--line: var(--growth)">
+        <button class="orbit" data-src="audio/lineas-puntos-growth.mp3" aria-label="Reproducir Growth"></button>
+        <div><span class="chip">Growth · Efeonce</span><p>Campana: la esfera del motion aprobado. Es la base del sistema.</p></div>
+        <div class="meta">−14,3 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--brand)">
+        <button class="orbit" data-src="audio/lineas-puntos-brand.mp3" aria-label="Reproducir Brand"></button>
+        <div><span class="chip">Brand · Globe</span><p>Marimba: madera tocada, táctil. La voz de Plastilina, la del oficio creativo.</p></div>
+        <div class="meta">−15,0 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--engine)">
+        <button class="orbit" data-src="audio/lineas-puntos-engine.mp3" aria-label="Reproducir Engine"></button>
+        <div><span class="chip">Engine · Wave</span><p>FM sintético: preciso, de máquina bien afinada.</p></div>
+        <div class="meta">−13,3 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/lineas-puntos-voice.mp3" aria-label="Reproducir Voice"></button>
+        <div><span class="chip">Voice · Reach</span><span class="status off">Descartado</span><p>Coro breve en «a». Reemplazado por los tres timbres de arriba.</p></div>
+        <div class="meta">−13,2 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--revenue)">
+        <button class="orbit" data-src="audio/lineas-puntos-revenue.mp3" aria-label="Reproducir Revenue"></button>
+        <div><span class="chip">Revenue · RevOps</span><p>Campana grave una octava abajo: peso, estructura.</p></div>
+        <div class="meta">−15,3 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="decidir">
+    <div class="section-head">
+      <h2>Qué necesito de ti ahora</h2>
+    </div>
+    <div class="decide">
+      <ol>
+        <li><b>El rock:</b> ¿re-grabación fiel, libre o híbrido? ¿Convive con la versión serena (una para energía, otra para fondo) o la reemplaza?</li>
+        <li><b>Glitch:</b> ¿rock o sereno?</li>
+      </ol>
+      <p class="note"><b>Cómo se revisó.</b> La estructura, las notas, los tiempos y el volumen se verificaron con espectrogramas, medición de volumen y transcripción de las voces. Lo que no se puede medir así —si suena propio, si se recuerda, si se siente Efeonce— sólo lo decide tu oído. Con esto aprobado, lo que falta es formalizar: los valores a tokens de AXIS, la guía de identidad sonora y los formatos por red.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+  (() => {
+    const R = 26, C = 2 * Math.PI * R
+    const PLAY = 'M28 24.5v15l12-7.5z'
+    const PAUSE = 'M27 24h3.6v16H27zM33.4 24H37v16h-3.6z'
+    let current = null
+
+    // Melodía: la altura de cada punto es la nota; la esfera, en acento.
+    document.querySelectorAll('.melody').forEach(el => {
+      const notes = el.dataset.notes.split(',').map(Number)
+      const lo = 68, hi = 86
+      notes.forEach((n, k) => {
+        const i = document.createElement('i')
+        if (k === notes.length - 1) i.className = 's'
+        i.style.marginBottom = `${((n - lo) / (hi - lo)) * 26}px`
+        el.appendChild(i)
+      })
+      el.setAttribute('aria-hidden', 'true')
+    })
+
+    // El SVG se arma una vez y sólo cambian atributos: reemplazarlo en cada cuadro dejaba sin destino el clic humano.
+    const build = (btn) => {
+      btn.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true" style="pointer-events:none"><circle class="track" cx="32" cy="32" r="${R}"/><circle class="arc" cx="32" cy="32" r="${R}" transform="rotate(-90 32 32)" stroke-dasharray="0 ${C.toFixed(2)}" visibility="hidden"/><circle class="dot" cx="32" cy="${32 - R}" r="4" visibility="hidden"/><path class="icon" d="${PLAY}"/></svg>`
+      return { arc: btn.querySelector('.arc'), dot: btn.querySelector('.dot'), icon: btn.querySelector('.icon') }
+    }
+    const draw = (parts, p, playing) => {
+      const a = p * 2 * Math.PI - Math.PI / 2, shown = p > 0 ? 'visible' : 'hidden'
+      parts.arc.setAttribute('stroke-dasharray', `${(p * C).toFixed(2)} ${C.toFixed(2)}`); parts.arc.setAttribute('visibility', shown)
+      parts.dot.setAttribute('cx', (32 + R * Math.cos(a)).toFixed(2)); parts.dot.setAttribute('cy', (32 + R * Math.sin(a)).toFixed(2)); parts.dot.setAttribute('visibility', shown)
+      parts.icon.setAttribute('d', playing ? PAUSE : PLAY)
+    }
+
+    document.querySelectorAll('.orbit').forEach(btn => {
+      const audio = new Audio()
+      audio.preload = 'none'
+      audio.src = btn.dataset.src
+      const parts = build(btn)
+      draw(parts, 0, false)
+      let raf = 0
+      const tick = () => {
+        const p = audio.duration ? Math.min(1, audio.currentTime / audio.duration) : 0
+        draw(parts, p, !audio.paused)
+        if (!audio.paused) raf = requestAnimationFrame(tick)
+      }
+      audio.addEventListener('play', () => { raf = requestAnimationFrame(tick) })
+      audio.addEventListener('pause', () => { cancelAnimationFrame(raf); tick() })
+      audio.addEventListener('ended', () => { cancelAnimationFrame(raf); draw(parts, 1, false) })
+      btn.addEventListener('click', () => {
+        if (current && current !== audio) current.pause()
+        document.querySelectorAll('video').forEach(v => v.pause())
+        if (audio.paused) {
+          if (audio.ended) audio.currentTime = 0
+          current = audio
+          audio.play().catch(() => {})
+        } else audio.pause()
+      })
+    })
+
+    document.querySelectorAll('video').forEach(v => v.addEventListener('play', () => {
+      if (current) current.pause()
+      document.querySelectorAll('video').forEach(o => { if (o !== v) o.pause() })
+    }))
+  })()
+</script>

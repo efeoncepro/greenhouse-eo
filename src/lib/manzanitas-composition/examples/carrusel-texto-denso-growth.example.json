@@ -1,0 +1,209 @@
+{
+  "$comment": "Ejemplo de TASK-1939 (Marketing con Manzanitas). Fotos SINTÉTICAS: nunca se publica. Componer: pnpm manzanitas:compose -- --intent <este archivo>.",
+  "contract": "efeonce.manzanitas-register",
+  "version": "0.3.0",
+  "register": "marketing-con-manzanitas",
+  "channel": "carousel",
+  "topicLine": "growth",
+  "slides": [
+    {
+      "piece": "cover-escena",
+      "voice": {
+        "question": "¿Qué es el AEO, en simple?",
+        "answer": "Que te citen"
+      },
+      "photo": {
+        "register": "cine",
+        "lightId": "sesion-2",
+        "subject": "Una persona pregunta algo a su teléfono en la cocina",
+        "alt": "Persona hablándole al teléfono en su cocina",
+        "path": "fotos/escena-4x5.svg"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "dense-concept",
+      "voice": {
+        "question": "¿Qué cambia con la IA?",
+        "answer": "Quién cita"
+      },
+      "denseText": {
+        "paragraph": "Antes, el buscador te daba diez enlaces. Hoy, una IA te da una respuesta y cita a quien le sirvió para armarla.",
+        "points": [
+          {
+            "title": "Pregunta",
+            "body": "La gente pregunta como habla."
+          },
+          {
+            "title": "Respuesta",
+            "body": "La IA arma una sola."
+          },
+          {
+            "title": "Cita",
+            "body": "Nombra a quien la ayudó."
+          }
+        ]
+      },
+      "swipe": true
+    },
+    {
+      "piece": "dense-comparison",
+      "voice": {
+        "question": "¿SEO o AEO?",
+        "answer": "Los dos"
+      },
+      "denseText": {
+        "columns": [
+          "SEO",
+          "AEO"
+        ],
+        "rows": [
+          [
+            "Qué buscas",
+            "Posición",
+            "Cita"
+          ],
+          [
+            "Unidad",
+            "Página",
+            "Respuesta"
+          ],
+          [
+            "Señal",
+            "Enlaces",
+            "Evidencia"
+          ],
+          [
+            "Se mide en",
+            "Clics",
+            "Menciones"
+          ]
+        ],
+        "closer": "El AEO no reemplaza al SEO: se apoya en él."
+      },
+      "swipe": true
+    },
+    {
+      "piece": "interior-lente",
+      "voice": {
+        "question": "¿Qué mira la IA?",
+        "answer": "La evidencia"
+      },
+      "photo": {
+        "register": "cine",
+        "lightId": "sesion-2",
+        "subject": "Una ficha técnica impresa sobre la mesa",
+        "alt": "Ficha técnica con datos subrayados bajo la lente",
+        "path": "fotos/detalle-4x5.svg"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "data-apples-of-ten",
+      "voice": {
+        "question": "¿Cuántas marcas cita en promedio?",
+        "answer": "3 de 10"
+      },
+      "chart": {
+        "value": 3,
+        "source": "[FUENTE, AÑO]",
+        "illustrative": true
+      },
+      "swipe": true
+    },
+    {
+      "piece": "chart-parts",
+      "voice": {
+        "question": "¿Cuánto tráfico te trae la IA?",
+        "answer": "1 de 8"
+      },
+      "chart": {
+        "parts": [
+          {
+            "label": "Búsqueda clásica",
+            "value": 62,
+            "tone": "ink"
+          },
+          {
+            "label": "Redes y directo",
+            "value": 26,
+            "tone": "neutral"
+          },
+          {
+            "label": "Respuestas de IA",
+            "value": 12,
+            "tone": "accent"
+          }
+        ],
+        "source": "[FUENTE, AÑO]",
+        "illustrative": true
+      },
+      "swipe": true
+    },
+    {
+      "piece": "interior-escena",
+      "voice": {
+        "question": "¿Quién lo hace en tu equipo?",
+        "answer": "Contenido"
+      },
+      "photo": {
+        "register": "cine",
+        "lightId": "sesion-2",
+        "subject": "Dos personas editan un texto en una pantalla",
+        "alt": "Dos personas editando un texto juntas",
+        "path": "fotos/escena-4x5.svg"
+      },
+      "swipe": true
+    },
+    {
+      "piece": "chart-matrix-2x2",
+      "voice": {
+        "question": "¿Qué conviene hacer primero?",
+        "answer": "Las FAQ"
+      },
+      "chart": {
+        "tasks": [
+          {
+            "label": "FAQ con datos",
+            "effort": 0.2,
+            "impact": 0.84,
+            "focus": true
+          },
+          {
+            "label": "Schema en fichas",
+            "effort": 0.3,
+            "impact": 0.66
+          },
+          {
+            "label": "Guías de expertos",
+            "effort": 0.76,
+            "impact": 0.84
+          },
+          {
+            "label": "Rediseñar el sitio",
+            "effort": 0.8,
+            "impact": 0.3
+          },
+          {
+            "label": "Más posts genéricos",
+            "effort": 0.22,
+            "impact": 0.16
+          }
+        ]
+      },
+      "swipe": true
+    },
+    {
+      "piece": "back-cover-a",
+      "voice": {
+        "question": "¿Ya te citan?",
+        "answer": "Búscate",
+        "sub": "En los comentarios: cuéntanos qué te respondió."
+      },
+      "slogan": true,
+      "conversions": 1
+    }
+  ],
+  "artifactId": "MCM-ejemplo-carrusel-texto-denso-growth",
+  "example": true
+}

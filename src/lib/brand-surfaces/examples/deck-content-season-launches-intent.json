@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-season-launches",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "asOf": "2026-09-18",
+  "voice": {
+    "eyebrow": "Dreamforce 2026 · al 18-09-2026",
+    "question": "¿Qué trajo Dreamforce?",
+    "answer": ["Agentes"]
+  },
+  "body": "Lo aterrizamos en tu org: verificamos **disponibilidad**, permisos y consumo antes de comprometerlo.",
+  "note": "Estado anunciado por Salesforce al 18-09-2026 · se verifica en cada org",
+  "launches": [
+    { "status": "GA", "name": "Agentes con oficio", "description": "Casey, Paige, Carter, Marshall, Piper y Fin", "icon": "agentforce" },
+    { "status": "GA", "name": "Multi-Agent Orchestration", "description": "Varios agentes coordinados en un flujo", "icon": "agentforce" },
+    { "status": "Disponible", "name": "Agentforce Coworker", "description": "El agente junto a Lightning", "icon": "agentforce" },
+    { "status": "Piloto · GA nov.", "name": "Hunter", "description": "Agente de ventas outbound", "icon": "agentforce" },
+    { "status": "Anunciado", "name": "AIforce", "description": "Salesforce dentro de Claude, Slack y otras interfaces", "icon": "platform" },
+    { "status": "GA · oct.", "name": "Campaign Agent", "description": "Campañas, audiencias y journeys con guardrails", "icon": "marketing" },
+    { "status": "GA · oct.", "name": "Headless Marketing + MCP", "description": "Journeys y flows en lenguaje natural", "icon": "marketing" },
+    { "status": "Piloto", "name": "Koa", "description": "Modelo de razonamiento CRM", "icon": "agentforce" }
+  ]
+}

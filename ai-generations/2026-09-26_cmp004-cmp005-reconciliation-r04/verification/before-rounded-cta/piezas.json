@@ -1,0 +1,289 @@
+[
+  {
+    "id": "CMP004-C01-KV-45-R04",
+    "plate": "plates/CMP004-C01-KV-45-R04-plate.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Cómo nos reconocerán sin el logo?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Por tu identidad",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Branding que conecta cada experiencia.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.9,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida.",
+      "radius": 0,
+      "text": "Hablemos de tu marca",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-color-policy.json",
+        "sha256": "8022b55e57e4077fe3d923cb139f958a1ab74b14fd670cd94fc6595608bc07ae",
+        "treatment": "outline",
+        "reason": "Conversación consultiva de branding: contorno delimita una invitación sin competir con la identidad exhibida."
+      },
+      "surfaceToken": "brandAccentSoft"
+    },
+    "safeArea": "axis",
+    "altText": "Identidad reconocible en diferentes experiencias digitales, ilustrada mediante una exploración de marca ficticia.",
+    "styleReason": "Fotografía C: respuesta a la vista. Pregunta Poppins Light con anillo, respuesta Bricolage con esfera. Énfasis en la respuesta independiente del CTA.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "bottom-end",
+          "action": "select"
+        }
+      ]
+    }
+  },
+  {
+    "id": "CMP004-C04-KV-45-R04",
+    "plate": "plates/CMP004-C04-KV-45-R04-plate.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Cómo producimos más sin perder calidad?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.19,
+    "dominant": "Con criterio",
+    "dominantSize": 106,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Design Ops, IA y **dirección humana**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.19,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.9,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "text",
+      "variantReason": "Servicio de continuidad: enlace editorial prolonga la revisión experta y deja protagonismo al criterio seleccionado.",
+      "radius": 0,
+      "text": "Escala tu producción",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 26,
+      "paddingX": 22,
+      "paddingY": 3,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "brandAccentSoft",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "open-brackets"
+      },
+      "prominencia": "discreta",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-color-policy.json",
+        "sha256": "8022b55e57e4077fe3d923cb139f958a1ab74b14fd670cd94fc6595608bc07ae",
+        "treatment": "text",
+        "reason": "Servicio de continuidad: enlace editorial prolonga la revisión experta y deja protagonismo al criterio seleccionado."
+      }
+    },
+    "safeArea": "axis",
+    "altText": "Producción creativa consistente entre formatos con revisión humana; nunca automatización sin criterio.",
+    "styleReason": "Fotografía A: documental de oficio. Pregunta Poppins Light con anillo, respuesta Bricolage con esfera. Énfasis en la respuesta independiente del CTA.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "bottom-end",
+          "action": "select"
+        }
+      ]
+    }
+  },
+  {
+    "id": "CMP005-S01-KV-45-R02",
+    "plate": "plates/CMP005-S01-KV-45-R02-plate.png",
+    "align": "left",
+    "top": 0.06,
+    "textWidth": 0.635,
+    "label": null,
+    "lead": "¿Qué está frenando nuestro crecimiento?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.16,
+    "dominant": "Diagnóstico",
+    "dominantSize": 116,
+    "dominantMax": 0.635,
+    "dominantTracking": -0.035,
+    "after": "Datos conectados con decisiones.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.15,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.9,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Diagnóstico de negocio: contorno señala una entrada acotada a revisar la estrategia, sin fingir una compra inmediata.",
+      "radius": 0,
+      "text": "Revisemos tu estrategia",
+      "descriptor": "Agencia estratégica",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-005",
+        "source": "CMP-005-color-policy.json",
+        "sha256": "0c8bee7fdd805a24b71807bebe316b0ea3c2631403f807b7c4ac112b724ed8ef",
+        "treatment": "outline",
+        "reason": "Diagnóstico de negocio: contorno señala una entrada acotada a revisar la estrategia, sin fingir una compra inmediata."
+      },
+      "surfaceToken": "brandAccentOnDark"
+    },
+    "safeArea": {
+      "x0": 0.26,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "profile": "reserva-real-a-la-derecha-de-la-luz"
+    },
+    "altText": "El diagnóstico contrasta un resumen de métricas con una fricción concreta del cliente. Escena ilustrativa, sin cifras ni caso atribuido.",
+    "styleReason": "Fotografía A: diagnóstico documental. Pregunta Poppins Light con anillo, respuesta Bricolage con esfera. Énfasis en la respuesta independiente del CTA.",
+    "graphicVoice": "efeonce"
+  },
+  {
+    "id": "CMP005-S02-KV-45-R02",
+    "plate": "plates/CMP005-S02-KV-45-R02-plate.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Dónde conviene invertir primero?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.16,
+    "dominant": "Con foco",
+    "dominantSize": 116,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Prioridades claras antes de invertir.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.15,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.9,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "solid",
+      "variantReason": "Decisión y próximo paso: superficie sólida concentra la acción después de la respuesta breve y la mirada directa.",
+      "radius": 0,
+      "text": "Definamos prioridades",
+      "descriptor": "Agencia estratégica",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "brandDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "destacada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-005",
+        "source": "CMP-005-color-policy.json",
+        "sha256": "0c8bee7fdd805a24b71807bebe316b0ea3c2631403f807b7c4ac112b724ed8ef",
+        "treatment": "solid",
+        "reason": "Decisión y próximo paso: superficie sólida concentra la acción después de la respuesta breve y la mirada directa."
+      },
+      "surfaceToken": "brandAccentOnDark"
+    },
+    "safeArea": "axis",
+    "altText": "Estrategia como elección y renuncia: concentrar el esfuerzo antes de ejecutar todas las rutas.",
+    "styleReason": "Fotografía B: retrato dirigido. Pregunta Poppins Light con anillo, respuesta Bricolage con esfera. Énfasis en la respuesta independiente del CTA.",
+    "graphicVoice": "efeonce"
+  }
+]

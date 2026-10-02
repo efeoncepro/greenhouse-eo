@@ -1,0 +1,12 @@
+[
+  {
+    "id": "r2-blanco",
+    "base": "#F7F8F6",
+    "interior": "#023C70"
+  },
+  {
+    "id": "r2-navy",
+    "base": "#023C70",
+    "interior": "#F7F8F6"
+  }
+]

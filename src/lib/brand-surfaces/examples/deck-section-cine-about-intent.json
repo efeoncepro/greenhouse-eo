@@ -1,0 +1,44 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "about",
+  "voice": {
+    "eyebrow": "Quiénes somos",
+    "question": "¿Quiénes somos?",
+    "answer": [
+      "Un solo",
+      "equipo"
+    ]
+  },
+  "body": "Creatividad, datos, medios y tecnología en una misma mesa, con un solo interlocutor.",
+  "figures": [
+    {
+      "value": "+10",
+      "label": "años como agencia",
+      "source": "Efeonce, 2026"
+    },
+    {
+      "value": "5",
+      "label": "países",
+      "source": "Efeonce, 2026"
+    },
+    {
+      "value": "1",
+      "label": "interlocutor",
+      "source": "Efeonce, 2026"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png",
+    "alt": "El equipo de Efeonce en el taller de noche, en pleno trabajo alrededor de una mesa de luz"
+  }
+}

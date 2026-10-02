@@ -19,6 +19,14 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // La línea gráfica «La órbita» es una skill viva: si Codex y Claude componen con criterios distintos, la marca
+    // sale con dos gramáticas bajo la misma firma. Nace byte-identical.
+    id: 'efeonce-graphic-line',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-graphic-line',
+    claude: '.claude/skills/efeonce-graphic-line',
+  },
+  {
     // El método de video debe conservar producción, post y evidencia entre ambos agentes.
     id: 'motion-design-studio',
     mode: 'byte-identical',
@@ -134,6 +142,30 @@ const mirroredSkills = [
     mode: 'byte-identical',
     codex: '.codex/skills/efeonce-marketing-studio',
     claude: '.claude/skills/efeonce-marketing-studio',
+  },
+  {
+    // EPIC-049 — planificar campañas con IA sobre Studio, ICP y Search Visibility 360. Codex y Claude deben
+    // aplicar las mismas reglas de fuente/fecha, canales canónicos y niveles de gobierno (T0/T1/T2): un drift aquí
+    // produce dos planes con criterios distintos sobre qué puede escribir, aprobar o gastar un agente.
+    id: 'efeonce-campaign-planning',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-campaign-planning',
+    claude: '.claude/skills/efeonce-campaign-planning',
+  },
+  {
+    // EPIC-049 — agentes de rol de Marketing Studio (modo interactivo). Una tarjeta de rol fija qué lee, qué redacta
+    // y qué nunca ejecuta un agente: si Codex y Claude divergen, uno de los dos podría aprobar, autorizar medios o
+    // gastar presupuesto de proveedor donde el otro sólo propone.
+    id: 'efeonce-agent-media-planner',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-agent-media-planner',
+    claude: '.claude/skills/efeonce-agent-media-planner',
+  },
+  {
+    id: 'efeonce-agent-seo-aeo',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-agent-seo-aeo',
+    claude: '.claude/skills/efeonce-agent-seo-aeo',
   },
   {
     // La operación de imágenes comparte código, modelos y restricciones de formato. Una divergencia

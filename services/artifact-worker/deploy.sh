@@ -144,6 +144,13 @@ ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLE
 # desaparecer en el próximo deploy, en silencio. Ledger: FEATURE_FLAG_STATE_LEDGER.md
 ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"
 
+# 🚩 TASK-1921 — flag del render de piezas de marca («La órbita» y Glitch), lado RECLAMO. SEPARADO de Proposal e
+# Insights. Default ON desde 2026-09-28, autorizado por el operador: el Job es único para staging y producción;
+# la puerta por ambiente es el encolado en Vercel, que sólo existe en staging. Declararlo aquí y en el ops-worker,
+# nunca sólo con `--update-env-vars` (el `--set-env-vars` de abajo lo borraría en el próximo deploy).
+# Ledger: FEATURE_FLAG_STATE_LEDGER.md
+ENV_VARS="${ENV_VARS},BRAND_RENDER_ENABLED=${BRAND_RENDER_ENABLED:-true}"
+
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
 
 SENTRY_DSN_SECRET_NAME="${SENTRY_DSN_SECRET_NAME:-greenhouse-sentry-dsn}"

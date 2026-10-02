@@ -107,7 +107,8 @@ batch. Recorta/transcodea sólo lo elegido.
 
 ## Evidencia
 
-- Script: `ai-generations/2026-07-08_social-wall-assets/render-omni-motion-v3.mjs`.
+- Script: `ai-generations/2026-07-08_social-wall-assets/render-omni-motion-v3.mjs` (en git; sus refs/masters de
+  `motion-v3/` pueden estar en archivo: `pnpm ai-gen:pull ai-generations/2026-07-08_social-wall-assets/motion-v3`).
 - Review: `ai-generations/2026-07-08_social-wall-assets/motion-v3/review/wall-motion-v3-living-contact-sheet.jpg`.
 - Runtime: `assets/video/social/wall/v3/`.
 - Live verifier: `/Users/jreye/Documents/greenhouse-eo/tmp/verify-social-wall-motion-v3.mjs`.

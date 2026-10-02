@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 live in production since 2026-09-26 with `INSIGHTS_EDITORIAL_V2_ENABLED` ON in Vercel and the ops-worker, premium catalogs TASK-1889 code complete 2026-09-25, not pushed, rollout pending), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -24,7 +24,13 @@ it without repeating what already cost a day*. It grows with every task: see the
 5. [`references/operations.md`](references/operations.md) — flags, module assignment, canaries,
    rollback, deploy traps.
 6. [`references/lessons.md`](references/lessons.md) — the traps that already bit someone.
-7. Canon docs only when you need the full contract:
+7. [`references/ui-and-brand.md`](references/ui-and-brand.md) — what Insights LOOKS like and where: product mark
+   (ids, rules, where it applies and where it is missing), the A4/deck report (15 + 12 templates, family → page,
+   variation rule, data roles, cover), the live Think report (anatomy, 1.0 vs 1.1, presentation mode, states, motion,
+   print, routes, public guard), email/portal/MCP, the AXIS boundary and the open gaps. Visual reference: the AXIS Lab
+   page `https://axis.efeonce.org/references/insights/`, published 2026-09-28 (AXIS main `3dfbf0e`; agent data at
+   `/references/insights.json`). The live example of the product is the sample `https://think.efeoncepro.com/insights/muestra`.
+8. Canon docs only when you need the full contract:
    `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` (§5 windows, §7 API/MCP/authz, §10 gates,
    §14 state), `EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md` (ADR), and the exhaustive
    `EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md` (file-by-file record of the foundation).
@@ -65,6 +71,17 @@ it without repeating what already cost a day*. It grows with every task: see the
   `ops-worker` also reads `INSIGHTS_GENERATION_ENABLED`, `INSIGHTS_DELIVERY_ENABLED` and `INSIGHTS_SCHEDULES_ENABLED`
   (declared in its `deploy.sh`); a worker that reads one must declare it in its `deploy.sh`. A Vercel deployment created
   before `vercel env add` does not see the variable: redeploy.
+- **`INSIGHTS_EDITORIAL_V2_ENABLED` is read in TWO runtimes** — Vercel (create/revise/recover) and the `ops-worker`
+  (schedules tick; `deploy.sh` default `:-true`, pinned by `deploy-contract.test.ts`). The render Job does NOT read it:
+  it composes the frozen plan. ON in Vercel staging, Vercel Production and the `ops-worker` since 2026-09-26. The
+  reader compares `=== 'true'`: load the value with `printf %s true | vercel env add …` (a trailing newline leaves it
+  OFF), create the deployment AFTER the variable, and prove the flip with a canary that seals `plan.scopeLines` /
+  `plan.cover`, never with the env listing. Rollback = OFF in BOTH runtimes (see `references/operations.md`).
+- **Editorial v2 claims are findings, never loose values** (`editorial/editorial-v2.ts`): a superlative needs a
+  UNIQUE maximum in the printed values — with a tie the plan says the tie (the key figure is the tied value and its
+  caption the common name, never the first tied fact); essentials and the thesis cite only findings (target met or
+  missed, a change that prints, a unique superlative or a tie), never a bare value nor a 0,0 % change; the first
+  reading of every chapter is its main finding. Sealed editions are immutable, so a fix applies to new editions only.
 - **Share links (TASK-1848): the bearer is never persisted** — not even encrypted; only its sha256 digest. It is
   returned once on create and lives only in memory during an email send. A lost link is revoked and replaced, never
   recovered. Only ISSUED client editions; TTL 1–90 days (default 30); max 20 active links per edition (429
@@ -73,8 +90,11 @@ it without repeating what already cost a day*. It grows with every task: see the
 - **The public reader is anti-oracle and uncacheable**: `404` for unknown/malformed/expired/flag OFF/suspended org/
   retired module (indistinguishable), `410` revoked or withdrawn, `429` rate limit that FAILS CLOSED, and always
   `Cache-Control: private, no-store` + `noindex`. Never copy the Grader's link (token in clear, `public, max-age=300`).
-  Think consumes it server-side as `InsightWebModelV1` (`modelVersion '1.0'`, client-facing projection only). NEVER
-  probe its limits with concurrent bursts: the DB-backed limiter spends a connection before rejecting (ISSUE-174).
+  Think consumes it server-side as `InsightWebModelV1` (`modelVersion` `'1.0'` or `'1.1'`; 1.1 is additive — optional
+  editorial v2 fields + client logo — so a 1.0 consumer still works; client-facing projection only). Think's server
+  reads are exempted from the `/api/public` edge limit only by its key header `x-efeonce-think-key`, never by raising
+  the limit. NEVER probe its limits with concurrent bursts: the DB-backed limiter spends a connection before rejecting
+  (ISSUE-174).
 - **Email delivery and schedule writes are App lane only, human internal actor** (capabilities without `own`: a
   client never sends). Ecosystem lane and MCP only read deliveries and schedules; MCP never sends email.
 - **Schedules never issue nor send**: `review_policy = 'draft_for_review'` (DB CHECK); each occurrence creates the
@@ -83,8 +103,11 @@ it without repeating what already cost a day*. It grows with every task: see the
   revokes its grant and a retry issues a new one with a per-attempt correlation (`…:aN`). Accepted ≠ delivered ≠ read.
   The link email uses the token-sensitive EmailType: its grant is issued in the same transaction that claims the
   `email_deliveries` row. EmailTypes are seeded OFF (the config table fails open without a row).
-- **TASK-1848 state (2026-09-18):** in production since release `bda1cf2cd938` with sharing/delivery/schedules flags
-  OFF there (ON in staging) until the Think reader (TASK-1875) exists. Gateway `efeonce-mcp` 1.7.0 federates the 7 tools
+- **TASK-1848 state (2026-09-28):** in production since release `bda1cf2cd938`. `INSIGHTS_SHARING_ENABLED` is ON in
+  Vercel Production since 2026-09-28 (redeploy `dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`, prod canary on synthetic
+  `EO-INS-000014` green) now that the Think reader (TASK-1875, complete) exists; delivery, schedules and issuance stay
+  OFF in production (ON in staging). Production serves `InsightWebModelV1` 1.0; 1.1 is staging-only until the next
+  Greenhouse release. Gateway `efeonce-mcp` 1.7.0 federated the 7 tools
   (58 total): share create/revoke require `efeonce.mcp.insights.write` (no client carries it ⇒ fail-closed), the 5
   reads use the base scope; sending email and scheduling do not exist over MCP.
 - **Figures are never invented, never "0" when absent.** `no_data`, `unsupported_window`,
@@ -100,14 +123,18 @@ it without repeating what already cost a day*. It grows with every task: see the
 ## Routing
 
 - Rendering, PDF/deck, Artifact Worker → `references/program-ledger.md` § TASK-1846 + `artifact-composer` docs; Proposal stays a compatible consumer adapter (behaviour untouched).
-- Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847 (v1 catalogs, what production serves today).
-  Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (live
-  since 2026-09-26, `INSIGHTS_EDITORIAL_V2_ENABLED` ON in Vercel staging/Production and the ops-worker; see `references/contracts.md` § Editorial contract v2). Premium A4/deck templates → TASK-1889 (code complete 2026-09-25 in local `develop`, not pushed; see
+- Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847 (v1 catalogs).
+  Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (**complete
+  2026-09-26, in production**: releases `0e87c7a443a2` + `f9257b9c94af`, flag ON in Vercel staging, Vercel Production
+  and the `ops-worker`, gateway `efeonce-mcp` v1.9.0; issuance/delivery/schedules stay OFF in Production, sharing ON
+  there since 2026-09-28 (TASK-1875 complete); see
+  `references/contracts.md` § Editorial contract v2 and `references/program-ledger.md`).
+  Premium A4/deck templates → TASK-1889 (complete 2026-09-26: releases `0e87c7a443a2` + `f9257b9c94af`; first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt; see
   `references/contracts.md` § Render contract of the premium catalogs and `references/operations.md` § TASK-1889) with the approved direction
   `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`, its wireframe and its fidelity
   contract (41 reference pages in `…/TASK-1889-efeonce-insights-premium-catalogs/paginas/`, `pixelmatch` 0.1, ≤ 1 % of
-  differing pixels per page). **The approved canvas is built but not deployed:** until TASK-1889 releases with
-  `INSIGHTS_EDITORIAL_V2_ENABLED`, every report comes out with the v1 design — never describe the redesign as live.
+  differing pixels per page). Every new edition renders with these templates; editions created before the release
+  keep the PDFs they already have (outputs are immutable).
 - Brand graphic line «La órbita» (canonical for the Efeonce brand since 2026-09-25; manual
   `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md`, operational reference
   [`graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md)): the orbit was born in the
@@ -119,7 +146,37 @@ it without repeating what already cost a day*. It grows with every task: see the
   when the logo is already inside the image) governs graphic pieces such as social posts and ads, not report footers.
   The catalogs' `assets/url-lum.svg` copies are the `url-bubble-source` drawing of `@efeoncepro/axis-brand-assets`,
   guarded by `src/config/efeonce-brand-assets.test.ts` — never edit them by hand.
+- Brand iconography «La órbita» (Trazo + Plastilina, canonical since 2026-09-26, Efeonce brand only; source of truth
+  AXIS `@efeoncepro/axis-graphic-line/icons`, criterion in
+  [`iconography.md`](../efeonce-graphic-line/references/iconography.md)): the Insights catalogs **already carry icons**
+  — inline Tabler-lineage stroke SVGs (eyebrows, bands, `FIGURE_ICON_KEYS` in
+  `catalogs/insights-shared/editorial-resolvers.ts`) frozen by the TASK-1889 fidelity contract. They are **not** yet
+  the canonical set. Adopting it (Insights measures, so **Trazo**; rest state in lists/tables; one responds per group,
+  none on a page that already has a sphere) needs its own task with the visual gate and operator approval: never
+  swap or mix sets piecemeal, and never hand-draw a new icon into a catalog. The third layer, **Plastilina en volumen**
+  (D24, 2026-09-27: matte-clay PNG from AXIS, hero moments only), never goes into Insights reports, dashboards or UI.
+- Product mark, report look, live-report UI, AXIS Lab page → [`references/ui-and-brand.md`](references/ui-and-brand.md)
+  + `efeonce-graphic-line` (`criteria.md` «Insights, marca de producto que acompaña», `applications.md` §B3–B4) +
+  `axis-design-system`. Boundary (binding): AXIS publishes the brand files (`insights-{logo,isotype,lockup}-*`,
+  `axis-brand-assets` 0.4.0) and a reference page, **never** Insights UI components or contracts; the UI lives in its
+  consumers (Greenhouse catalogs, Think). Data-color roles and chart geometry are duplicated in both consumers and are
+  a documented extraction follow-up, not something to fix inline. The PDF/deck covers and chapter openings show a TYPE
+  version (Efeonce logo + rule + «INSIGHTS» as uppercase with 0.34em tracking —spaced capitals, not true small caps—,
+  `.brand-product` / `.product`), not the official `insights-lockup-*` file; on the navy covers that word is painted in
+  the accent, an open operator decision (`ui-and-brand.md` §7.7). Email/favicon/portal/MCP carry no mark; Greenhouse
+  pins `axis-brand-assets` 0.4.5 (verified 2026-09-29), which already carries the Insights files. Swapping or adding the mark anywhere is an operator decision, never yours.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
+- **Delivery email design (approved 2026-09-29, implementation pending):** the operator approved the Insights delivery
+  email — canvas https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd v21, page «Correo», boards share link desktop,
+  mobile and PDF attached; sealed direction `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`. It is
+  **one application of the canonical Efeonce email modules** (AXIS `v0.3.38`: token `efeonceEmail`, contract
+  `efeonce.email-modules` 0.1.0 `candidate`, email PNGs in `axis-brand-assets` 0.4.6), **not the email template**: the
+  footer (agenda card, brand block with «Empower your Growth», URL bubble + 4 socials, legal, preferences/unsubscribe,
+  reason), the navy primary CTA and the agenda card are canon; the Insights header, «Lo esencial del mes», its measure
+  orbit (with the travelled path, decided the same day) and the decision card belong to this email only. «Suscribirme»
+  is retired. Greenhouse has **not** adopted it: `src/emails/InsightsEditionDeliveryEmail.tsx` and `EmailLayout.tsx`
+  are unchanged and pin the older AXIS set. Open tension with TASK-1764 (footer policy). Route: `greenhouse-email`
+  («Delta 2026-09-29»), `efeonce-graphic-line` → `applications.md` §C4, [`references/ui-and-brand.md`](references/ui-and-brand.md) §5.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).
 - Metrics semantics → `greenhouse-ico`, `seo-aeo`, growth SEO docs; never re-derive a formula here.
@@ -148,6 +205,9 @@ this skill reflects what it built. At closure, in the same commit as the task's 
    `pnpm skills:mirrors`, and if `docs/mcp/skills/efeonce-insights/SKILL.md` (the MCP-served manual)
    needs the same knowledge for an external agent, update it too and regenerate with
    `pnpm mcp:skills:generate` + `pnpm mcp:skills:check` (no TASK ids, paths, UUIDs, org ids, secrets).
+
+Any change to the product mark, a catalog template, the Think report anatomy, the email look or the AXIS Lab page also
+updates `references/ui-and-brand.md` (and its gaps list) in the same commit.
 
 Sessions that do partial work (a slice, a canary, an incident) append to `references/lessons.md`
 and to the ledger's "sessions" list immediately, not at task closure. Codex, Claude and Cursor all

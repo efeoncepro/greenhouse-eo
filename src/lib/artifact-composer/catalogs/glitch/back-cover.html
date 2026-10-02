@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Glitch · Contraportada</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="glitch-tokens.css" />
+<link rel="stylesheet" href="glitch.css" />
+<style>
+  .gx-back .gx-texture { position: absolute; left: 467px; top: 30px; width: 720px; height: auto; }
+  .gx-back .gx-halo--wide { left: 180px; top: -50px; width: 1040px; height: 1040px; background: radial-gradient(closest-side, color-mix(in srgb, var(--gx-accent) 16%, transparent) 0%, color-mix(in srgb, var(--gx-accent) 5%, transparent) 55%, color-mix(in srgb, var(--gx-accent) 0%, transparent) 100%); }
+  .gx-back .gx-floor { position: absolute; left: 0; top: 880px; width: 1080px; height: 470px; background: linear-gradient(to bottom, color-mix(in srgb, var(--gx-ground) 0%, transparent), color-mix(in srgb, var(--gx-ground) 60%, black)); }
+  .gx-back .gx-masthead { left: 88px; right: 88px; top: 70px; }
+  .gx-back .gx-headline { left: 84px; right: 60px; top: 290px; font-size: 176px; line-height: 0.9; letter-spacing: -0.01em; }
+  .gx-back .gx-headline__entry { font-size: 0.56em; margin-bottom: 0.04em; }
+  .gx-back .gx-close { display: inline-flex; align-items: flex-end; gap: 22px; margin-left: 24px; position: relative; }
+  .gx-back .gx-close__dot { display: inline-block; width: 36px; height: 36px; border-radius: 50%; background: var(--gx-text-strong); margin-bottom: 4px; }
+  .gx-back .gx-close__apple { position: relative; display: inline-block; }
+  .gx-back .gx-close__apple::before { content: ''; position: absolute; left: 50%; top: 45%; width: 140px; height: 140px; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--gx-accent) 45%, transparent) 0%, color-mix(in srgb, var(--gx-accent) 0%, transparent) 100%); }
+  .gx-back .gx-close__apple img { position: relative; display: block; width: 64px; height: auto; }
+  .gx-back .gx-narrator { left: 540px; top: 596px; font-size: 56px; }
+  .gx-back .gx-kicker { left: 88px; top: 736px; }
+  .gx-back .gx-actions { left: 88px; right: 88px; top: 772px; }
+  .gx-back .gx-subscribe { left: 88px; right: 88px; top: 930px; }
+  .gx-back .gx-signoff { top: 1184px; }
+</style>
+</head>
+<body>
+<main class="gx-canvas gx-canvas--4x5 gx-back" data-gx-root>
+  <img class="gx-texture" src="assets/apple-bytes-texture.svg" alt="" />
+  <div class="gx-halo gx-halo--wide" aria-hidden="true"></div>
+  <div class="gx-floor" aria-hidden="true"></div>
+  <header class="gx-masthead">
+    <img class="gx-masthead__wordmark" src="assets/glitch-logo-negative.svg" alt="Glitch" />
+    <div class="gx-masthead__edition">
+      <span class="gx-masthead__label">EDICIÓN</span>
+      <span class="gx-masthead__number"><span class="gx-hash">#</span><span class="gx-num" data-slot="edition">17</span></span>
+    </div>
+  </header>
+  <h1 class="gx-headline" data-slot="headline"><span class="gx-headline__entry" data-slot-field="entry">El micrófono</span><span data-slot-field="punch">se cierra</span><span class="gx-close" aria-hidden="true"><span class="gx-close__dot"></span><span class="gx-close__dot"></span><span class="gx-close__apple"><img src="assets/glitch-apple.svg" alt="" /></span></span></h1>
+  <div class="gx-narrator" data-slot="closingLine">nos vemos el lunes.</div>
+  <div class="gx-kicker">SI TE SIRVIÓ</div>
+  <div class="gx-actions"><div class="gx-action"><img class="gx-action__icon" src="assets/icon-guardar.svg" alt="" /><span class="gx-action__label">GUÁRDALO</span></div><div class="gx-action"><img class="gx-action__icon" src="assets/icon-compartir.svg" alt="" /><span class="gx-action__label">COMPÁRTELO</span></div><div class="gx-action"><img class="gx-action__icon" src="assets/icon-recomendar.svg" alt="" /><span class="gx-action__label">RECOMIÉNDALO</span></div><div class="gx-action"><img class="gx-action__icon" src="assets/icon-comentar.svg" alt="" /><span class="gx-action__label">COMÉNTALO</span></div></div>
+  <div class="gx-subscribe"><span class="gx-pill"><span class="gx-pill__label">Suscríbete a</span><img class="gx-pill__wordmark" src="assets/glitch-logo-positive.svg" alt="Glitch" /></span><span class="gx-subscribe__note" data-slot="note">Cada lunes en tu correo, gratis.<br />El enlace, en el primer comentario.</span></div>
+  <div class="gx-signoff"><img class="gx-signoff__logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" /><div class="gx-slogan"><span class="gx-slogan__lead"><em>Empower</em> your</span> <span class="gx-slogan__word">Growth</span></div></div>
+</main>
+</body>
+</html>

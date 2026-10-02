@@ -112,3 +112,20 @@ HubSpot-first favorece un customer context y GTM integrados cuando el fit lo pru
 El operador confirmó que la oferta está aprobada y ya se ha prestado como servicio probado. El registro documental anterior (`Approved for validation`, sin primera prueba pagada) queda superado como estado comercial; no debe usarse para bloquear la comunicación de la oferta. La evidencia concreta todavía no está inventariada aquí: antes de publicar una métrica, nombre, logo, captura, testimonio o caso, registrar cliente/permiso, proceso, período, baseline, denominador, resultado, alcance de Efeonce y fuente verificable. La aprobación comercial tampoco convierte por sí sola una fórmula de precio, margen, ROI, disponibilidad de producto o tenant en dato aprobado.
 
 La landing y la campaña pueden describir el método, entregables, roles y servicio vigente. Finance/Commercial conservan precios y economics transaccionales; Legal/cliente conservan derechos y permisos; la práctica verifica la elegibilidad y el runtime de cada capacidad de HubSpot o Salesforce. Investigación y fuentes de mercado: [revisión 2026-09-19](../../audits/commercial/HUMAN_AGENT_TEAMS_MARKET_RESEARCH_2026-09-19.md). Arquitecturas de provider: [HubSpot](../hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md) y [Salesforce](../salesforce/EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md).
+
+## Delta 2026-10-01 — los Sparks, la cara de Agent Ops en piezas de marca
+
+Desde el 2026-10-01, Agent Ops tiene cara en las piezas de marca de Efeonce: los **Sparks**, cinco personajes propios
+(investigación, contenido, CRM y datos, servicio y reportes) que se distinguen por un accesorio y un gesto. Canon y
+reglas: [`SPARKS_V1.md`](../../operations/brand-characters/SPARKS_V1.md) (TASK-1941).
+
+**No cambian los límites de esta oferta.** Un Spark es un personaje, no un agente desplegado ni una SKU:
+
+- **No se vende un organigrama de bots.** Una pieza que muestra cinco Sparks ilustra familias de trabajo, no un
+  equipo de agentes que Efeonce instala por defecto.
+- **Cada agente con dueño humano.** Los Sparks trabajan con contexto y siempre con una persona que supervisa; nunca
+  reemplazan personas ni aparecen solos decidiendo. Las piezas de venta de Agent Ops llevan al equipo humano.
+- **Su ficha de personaje refleja la ficha de rol** (qué lee, qué propone, qué ejecuta) y la progresión de autoridad
+  de esta oferta; en un cliente, lo que un agente puede hacer lo fija su ficha de rol real, no el personaje.
+- **El nombre es interno.** En público se dice «los Sparks de Efeonce»; no se usa como nombre de producto o servicio
+  ni se registra sin revisión de Legal.

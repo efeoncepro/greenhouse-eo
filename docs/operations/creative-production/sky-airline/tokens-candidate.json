@@ -1,0 +1,1347 @@
+{
+  "schema": "sky-airline.tokens-candidate.v1",
+  "brandId": "sky-airline",
+  "status": "candidate",
+  "version": "0.1.0",
+  "observedOn": "2026-09-29",
+  "source": {
+    "fileKey": "ZhnJUPqzvYqy7nTcLLKLr1",
+    "inventory": "figma-variables.json",
+    "aliasDependencies": "figma-alias-dependencies.json"
+  },
+  "typographyDecision": {
+    "family": "Metric",
+    "source": "OPERATOR_DECISIONS.md",
+    "auxiliaryFamily": "Inter",
+    "fontFiles": "local-verified",
+    "fontEvidence": "font-provenance.json"
+  },
+  "tokens": [
+    {
+      "name": "purple/50",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7692",
+      "values": {
+        "Default": {
+          "hex": "#f8dcfd",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/100",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7693",
+      "values": {
+        "Default": {
+          "hex": "#f1bafc",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/200",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7694",
+      "values": {
+        "Default": {
+          "hex": "#c028dc",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/300",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7695",
+      "values": {
+        "Default": {
+          "hex": "#ab13c5",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/400",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7696",
+      "values": {
+        "Default": {
+          "hex": "#9207a9",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/500",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7697",
+      "values": {
+        "Default": {
+          "hex": "#78028a",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/600",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7698",
+      "values": {
+        "Default": {
+          "hex": "#72167a",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/700",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7699",
+      "values": {
+        "Default": {
+          "hex": "#671e75",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/800",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7700",
+      "values": {
+        "Default": {
+          "hex": "#50015c",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/muted",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7701",
+      "values": {
+        "Default": {
+          "hex": "#a47baa",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "purple/surface",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7702",
+      "values": {
+        "Default": {
+          "hex": "#f0e8f1",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "green/50",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7703",
+      "values": {
+        "Default": {
+          "hex": "#e2fddc",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "green/100",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7704",
+      "values": {
+        "Default": {
+          "hex": "#c5fcba",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "green/200",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7705",
+      "values": {
+        "Default": {
+          "hex": "#7fdf35",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "green/300",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7706",
+      "values": {
+        "Default": {
+          "hex": "#46dc28",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "green/400",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7707",
+      "values": {
+        "Default": {
+          "hex": "#26de00",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "green/700",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7708",
+      "values": {
+        "Default": {
+          "hex": "#198a02",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "neutral/white",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7715",
+      "values": {
+        "Default": {
+          "hex": "#ffffff",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "neutral/50",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7716",
+      "values": {
+        "Default": {
+          "hex": "#fcfcfc",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "neutral/100",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7717",
+      "values": {
+        "Default": {
+          "hex": "#efefef",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "neutral/200",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7718",
+      "values": {
+        "Default": {
+          "hex": "#d9d9d9",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "neutral/300",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7719",
+      "values": {
+        "Default": {
+          "hex": "#c5c5c5",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "neutral/400",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7720",
+      "values": {
+        "Default": {
+          "hex": "#b3b3b3",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "neutral/500",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7721",
+      "values": {
+        "Default": {
+          "hex": "#999999",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "neutral/600",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7722",
+      "values": {
+        "Default": {
+          "hex": "#747474",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "neutral/black",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7725",
+      "values": {
+        "Default": {
+          "hex": "#000000",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    },
+    {
+      "name": "background/primary",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7727",
+      "values": {
+        "Default": {
+          "hex": "#671e75",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7699"
+      }
+    },
+    {
+      "name": "background/secondary",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7728",
+      "values": {
+        "Default": {
+          "hex": "#f0e8f1",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7702"
+      }
+    },
+    {
+      "name": "background/dark",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7729",
+      "values": {
+        "Default": {
+          "hex": "#50015c",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7700"
+      }
+    },
+    {
+      "name": "background/accent",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7730",
+      "values": {
+        "Default": {
+          "hex": "#26de00",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7707"
+      }
+    },
+    {
+      "name": "background/accent-soft",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7731",
+      "values": {
+        "Default": {
+          "hex": "#e2fddc",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7703"
+      }
+    },
+    {
+      "name": "background/highlight",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7732",
+      "values": {
+        "Default": {
+          "hex": "#78028a",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7697"
+      }
+    },
+    {
+      "name": "background/surface",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7733",
+      "values": {
+        "Default": {
+          "hex": "#ffffff",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7715"
+      }
+    },
+    {
+      "name": "text/on-dark",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7734",
+      "values": {
+        "Default": {
+          "hex": "#ffffff",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7715"
+      }
+    },
+    {
+      "name": "text/on-light",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7735",
+      "values": {
+        "Default": {
+          "hex": "#50015c",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7700"
+      }
+    },
+    {
+      "name": "text/primary",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7736",
+      "values": {
+        "Default": {
+          "hex": "#ffffff",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7715"
+      }
+    },
+    {
+      "name": "text/secondary",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7737",
+      "values": {
+        "Default": {
+          "hex": "#747474",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7722"
+      }
+    },
+    {
+      "name": "text/tertiary",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7738",
+      "values": {
+        "Default": {
+          "hex": "#c5c5c5",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7719"
+      }
+    },
+    {
+      "name": "text/accent",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7739",
+      "values": {
+        "Default": {
+          "hex": "#46dc28",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7706"
+      }
+    },
+    {
+      "name": "text/accent-soft",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7740",
+      "values": {
+        "Default": {
+          "hex": "#c5fcba",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7704"
+      }
+    },
+    {
+      "name": "text/brand",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7741",
+      "values": {
+        "Default": {
+          "hex": "#f1bafc",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7693"
+      }
+    },
+    {
+      "name": "text/brand-soft",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7742",
+      "values": {
+        "Default": {
+          "hex": "#f8dcfd",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7692"
+      }
+    },
+    {
+      "name": "text/highlight",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7743",
+      "values": {
+        "Default": {
+          "hex": "#3900ff",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7711"
+      }
+    },
+    {
+      "name": "border/primary",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7744",
+      "values": {
+        "Default": {
+          "hex": "#671e75",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7699"
+      }
+    },
+    {
+      "name": "border/accent",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7745",
+      "values": {
+        "Default": {
+          "hex": "#78028a",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7697"
+      }
+    },
+    {
+      "name": "border/light",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7746",
+      "values": {
+        "Default": {
+          "hex": "#f1bafc",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7693"
+      }
+    },
+    {
+      "name": "border/green",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7747",
+      "values": {
+        "Default": {
+          "hex": "#26de00",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7707"
+      }
+    },
+    {
+      "name": "border/subtle",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7748",
+      "values": {
+        "Default": {
+          "hex": "#d9d9d9",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7718"
+      }
+    },
+    {
+      "name": "action/primary",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7749",
+      "values": {
+        "Default": {
+          "hex": "#78028a",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7697"
+      }
+    },
+    {
+      "name": "action/primary-hover",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7750",
+      "values": {
+        "Default": {
+          "hex": "#72167a",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7698"
+      }
+    },
+    {
+      "name": "action/secondary",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7751",
+      "values": {
+        "Default": {
+          "hex": "#26de00",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7707"
+      }
+    },
+    {
+      "name": "action/secondary-hover",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7752",
+      "values": {
+        "Default": {
+          "hex": "#46dc28",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7706"
+      }
+    },
+    {
+      "name": "surface/card",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7753",
+      "values": {
+        "Default": {
+          "hex": "#f8dcfd",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7692"
+      }
+    },
+    {
+      "name": "surface/card-alt",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7754",
+      "values": {
+        "Default": {
+          "hex": "#f0e8f1",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7702"
+      }
+    },
+    {
+      "name": "surface/muted",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7755",
+      "values": {
+        "Default": {
+          "hex": "#a47baa",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7701"
+      }
+    },
+    {
+      "name": "surface/page",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7756",
+      "values": {
+        "Default": {
+          "hex": "#ffffff",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7715"
+      }
+    },
+    {
+      "name": "surface/disabled",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7757",
+      "values": {
+        "Default": {
+          "hex": "#d9d9d9",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7718"
+      }
+    },
+    {
+      "name": "status/success",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7758",
+      "values": {
+        "Default": {
+          "hex": "#26de00",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7707"
+      }
+    },
+    {
+      "name": "status/info",
+      "type": "COLOR",
+      "collection": "Semantic",
+      "sourceId": "VariableID:2099:7759",
+      "values": {
+        "Default": {
+          "hex": "#3900ff",
+          "alpha": 1
+        }
+      },
+      "aliases": {
+        "2099:1": "VariableID:2099:7711"
+      }
+    },
+    {
+      "name": "font-size/display/3xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7742",
+      "values": {
+        "Default": 128
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/display/2xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7743",
+      "values": {
+        "Default": 120
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/display/xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7744",
+      "values": {
+        "Default": 112
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/display/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7745",
+      "values": {
+        "Default": 96
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/display/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7746",
+      "values": {
+        "Default": 80
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/display/sm",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7747",
+      "values": {
+        "Default": 72
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/display/xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7748",
+      "values": {
+        "Default": 64
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/heading/2xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7749",
+      "values": {
+        "Default": 56
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/heading/xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7750",
+      "values": {
+        "Default": 48
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/heading/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7751",
+      "values": {
+        "Default": 40
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/heading/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7752",
+      "values": {
+        "Default": 32
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/heading/sm",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7753",
+      "values": {
+        "Default": 28
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/heading/xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7754",
+      "values": {
+        "Default": 24
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/label/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7755",
+      "values": {
+        "Default": 28
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/label/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7756",
+      "values": {
+        "Default": 24
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/label/sm",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7757",
+      "values": {
+        "Default": 20
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/label/xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7758",
+      "values": {
+        "Default": 16
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/label/2xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7759",
+      "values": {
+        "Default": 12
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/body/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7760",
+      "values": {
+        "Default": 24
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/body/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7761",
+      "values": {
+        "Default": 20
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/body/sm",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7762",
+      "values": {
+        "Default": 16
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/body/xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7763",
+      "values": {
+        "Default": 12
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/subtitle/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7764",
+      "values": {
+        "Default": 32
+      },
+      "aliases": {}
+    },
+    {
+      "name": "font-size/subtitle/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7765",
+      "values": {
+        "Default": 30
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/display/3xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7766",
+      "values": {
+        "Default": 128
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/display/2xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7767",
+      "values": {
+        "Default": 120
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/display/xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7768",
+      "values": {
+        "Default": 112
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/display/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7769",
+      "values": {
+        "Default": 96
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/display/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7770",
+      "values": {
+        "Default": 80
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/display/sm",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7771",
+      "values": {
+        "Default": 72
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/display/xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7772",
+      "values": {
+        "Default": 64
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/heading/2xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7773",
+      "values": {
+        "Default": 56
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/heading/xl",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7774",
+      "values": {
+        "Default": 48
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/heading/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7775",
+      "values": {
+        "Default": 40
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/heading/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7776",
+      "values": {
+        "Default": 32
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/heading/sm",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7777",
+      "values": {
+        "Default": 28
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/heading/xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7778",
+      "values": {
+        "Default": 24
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/label/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7779",
+      "values": {
+        "Default": 28
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/label/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7780",
+      "values": {
+        "Default": 24
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/label/sm",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7781",
+      "values": {
+        "Default": 20
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/label/xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7782",
+      "values": {
+        "Default": 16
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/label/2xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7783",
+      "values": {
+        "Default": 12
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/body/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7784",
+      "values": {
+        "Default": 24
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/body/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7785",
+      "values": {
+        "Default": 20
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/body/sm",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7786",
+      "values": {
+        "Default": 16
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/body/xs",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7787",
+      "values": {
+        "Default": 12
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/subtitle/lg",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7788",
+      "values": {
+        "Default": 32
+      },
+      "aliases": {}
+    },
+    {
+      "name": "line-height/subtitle/md",
+      "type": "FLOAT",
+      "collection": "Typography",
+      "sourceId": "VariableID:2102:7789",
+      "values": {
+        "Default": 35
+      },
+      "aliases": {}
+    },
+    {
+      "name": "blue/500",
+      "type": "COLOR",
+      "collection": "Primitives",
+      "sourceId": "VariableID:2099:7711",
+      "values": {
+        "Default": {
+          "hex": "#3900ff",
+          "alpha": 1
+        }
+      },
+      "aliases": {}
+    }
+  ]
+}

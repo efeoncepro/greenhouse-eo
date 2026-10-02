@@ -1,0 +1,498 @@
+{
+  "template": "DecisionChart",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 200
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 270
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 120
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 420
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 25
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 520
+        },
+        "sourceLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-source-left=500px"
+        },
+        "sourceTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-source-top=1000px"
+        },
+        "sourcePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-source-px=15px"
+        },
+        "chartLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-chart-left=780px"
+        },
+        "chartTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-chart-top=330px"
+        },
+        "barHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-bar-height=120px"
+        },
+        "barStep": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-bar-step=210px"
+        },
+        "barRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-bar-radius=10px"
+        },
+        "valueInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-value-inset=28px"
+        },
+        "beforeColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-dch-before-color=#c9d2dc"
+        },
+        "afterColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-dch-after-color=#023c70"
+        },
+        "barLabelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-bar-label-px=22px"
+        },
+        "barLabelGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-bar-label-gap=44px"
+        },
+        "barValuePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-bar-value-px=64px"
+        },
+        "barValueWght": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-bar-value-wght=300"
+        },
+        "annotationPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-annotation-px=64px"
+        },
+        "annotationLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-annotation-left=1485px"
+        },
+        "leaderWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-leader-width=70px"
+        },
+        "leaderStroke": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-leader-stroke=2px"
+        },
+        "leaderGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-leader-gap=18px"
+        },
+        "noteTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-note-top=690px"
+        },
+        "notePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-note-px=16px"
+        },
+        "kpisTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-kpis-top=800px"
+        },
+        "kpisWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-kpis-width=1640px"
+        },
+        "kpisRule": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-kpis-rule=2px"
+        },
+        "kpiPadTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-kpi-pad-top=18px"
+        },
+        "kpiPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-kpi-px=64px"
+        },
+        "kpiWght": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-kpi-wght=300"
+        },
+        "kpiLabelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-kpi-label-px=20px"
+        },
+        "kpiLabelGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-kpi-label-gap=6px"
+        },
+        "bar1Width": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-bar1-width=900px"
+        },
+        "bar2Width": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dch-bar2-width=675px"
+        }
+      }
+    },
+    "indicator": {
+      "selector": "[data-slot='indicator']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "example": "¿Cuánto más rápido?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 10,
+          "resolver": "gl-answer",
+          "example": "Un cuarto"
+        },
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 30,
+          "example": "Resultados · Sky Airlines"
+        }
+      }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 100,
+        "maxLines": 4,
+        "overflow": "reject"
+      },
+      "example": "El tiempo de producción bajó 25 % en 12 meses de operación con el equipo creativo."
+    },
+    "bars": {
+      "selector": "[data-slot='bars']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 2,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 14
+          },
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 3
+          }
+        }
+      },
+      "example": [
+        {
+          "label": "Antes",
+          "value": "100"
+        },
+        {
+          "label": "Con Efeonce",
+          "value": "75"
+        }
+      ]
+    },
+    "annotation": {
+      "selector": "[data-slot='annotation']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 7,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "−25 %"
+    },
+    "note": {
+      "selector": "[data-slot='note']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 70,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Tiempo de producción por campaña, en índice (antes = 100)."
+    },
+    "kpis": {
+      "selector": "[data-slot='kpis']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 4,
+        "maxItems": 4,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 7
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 22
+          }
+        }
+      },
+      "example": [
+        {
+          "value": "+2.000",
+          "label": "piezas aprobadas"
+        },
+        {
+          "value": "39",
+          "label": "campañas"
+        },
+        {
+          "value": "0,12",
+          "label": "ajustes por pieza"
+        },
+        {
+          "value": "5",
+          "label": "mercados"
+        }
+      ]
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Performance"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "bottom-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "department"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1.1
+        },
+        "targetKind": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "object"
+        },
+        "variant": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "eight-handles"
+        },
+        "padding": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "standard"
+        },
+        "overlay": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "none"
+        },
+        "item": {
+          "type": "number",
+          "required": true,
+          "consumer": "validation-only",
+          "example": 2
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-baked-light.svg"
+    }
+  }
+}

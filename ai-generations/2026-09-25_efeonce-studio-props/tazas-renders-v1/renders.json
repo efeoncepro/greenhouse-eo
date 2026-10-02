@@ -1,0 +1,282 @@
+[
+  {
+    "color": "blanco",
+    "file": "blanco/01-frente-palabra.png",
+    "view": "01-frente-palabra",
+    "azimuth_deg": -90,
+    "elevation_deg": 10
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/02-tres-cuartos-palabra-asa.png",
+    "view": "02-tres-cuartos-palabra-asa",
+    "azimuth_deg": -45,
+    "elevation_deg": 22
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/03-tres-cuartos-palabra-opuesto.png",
+    "view": "03-tres-cuartos-palabra-opuesto",
+    "azimuth_deg": -135,
+    "elevation_deg": 22
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/04-perfil-asa.png",
+    "view": "04-perfil-asa",
+    "azimuth_deg": 0,
+    "elevation_deg": 12
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/05-perfil-sin-asa.png",
+    "view": "05-perfil-sin-asa",
+    "azimuth_deg": 180,
+    "elevation_deg": 12
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/06-reverso-logo.png",
+    "view": "06-reverso-logo",
+    "azimuth_deg": 90,
+    "elevation_deg": 10
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/07-tres-cuartos-logo-asa.png",
+    "view": "07-tres-cuartos-logo-asa",
+    "azimuth_deg": 45,
+    "elevation_deg": 22
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/08-tres-cuartos-logo-opuesto.png",
+    "view": "08-tres-cuartos-logo-opuesto",
+    "azimuth_deg": 135,
+    "elevation_deg": 22
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/09-cenital.png",
+    "view": "09-cenital",
+    "azimuth_deg": -90,
+    "elevation_deg": 90
+  },
+  {
+    "color": "blanco",
+    "file": "blanco/10-base-inferior.png",
+    "view": "10-base-inferior",
+    "azimuth_deg": -90,
+    "elevation_deg": -65
+  },
+  {
+    "color": "azul",
+    "file": "azul/01-frente-palabra.png",
+    "view": "01-frente-palabra",
+    "azimuth_deg": -90,
+    "elevation_deg": 10
+  },
+  {
+    "color": "azul",
+    "file": "azul/02-tres-cuartos-palabra-asa.png",
+    "view": "02-tres-cuartos-palabra-asa",
+    "azimuth_deg": -45,
+    "elevation_deg": 22
+  },
+  {
+    "color": "azul",
+    "file": "azul/03-tres-cuartos-palabra-opuesto.png",
+    "view": "03-tres-cuartos-palabra-opuesto",
+    "azimuth_deg": -135,
+    "elevation_deg": 22
+  },
+  {
+    "color": "azul",
+    "file": "azul/04-perfil-asa.png",
+    "view": "04-perfil-asa",
+    "azimuth_deg": 0,
+    "elevation_deg": 12
+  },
+  {
+    "color": "azul",
+    "file": "azul/05-perfil-sin-asa.png",
+    "view": "05-perfil-sin-asa",
+    "azimuth_deg": 180,
+    "elevation_deg": 12
+  },
+  {
+    "color": "azul",
+    "file": "azul/06-reverso-logo.png",
+    "view": "06-reverso-logo",
+    "azimuth_deg": 90,
+    "elevation_deg": 10
+  },
+  {
+    "color": "azul",
+    "file": "azul/07-tres-cuartos-logo-asa.png",
+    "view": "07-tres-cuartos-logo-asa",
+    "azimuth_deg": 45,
+    "elevation_deg": 22
+  },
+  {
+    "color": "azul",
+    "file": "azul/08-tres-cuartos-logo-opuesto.png",
+    "view": "08-tres-cuartos-logo-opuesto",
+    "azimuth_deg": 135,
+    "elevation_deg": 22
+  },
+  {
+    "color": "azul",
+    "file": "azul/09-cenital.png",
+    "view": "09-cenital",
+    "azimuth_deg": -90,
+    "elevation_deg": 90
+  },
+  {
+    "color": "azul",
+    "file": "azul/10-base-inferior.png",
+    "view": "10-base-inferior",
+    "azimuth_deg": -90,
+    "elevation_deg": -65
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/01-frente-palabra.png",
+    "view": "01-frente-palabra",
+    "azimuth_deg": -90,
+    "elevation_deg": 10
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/02-tres-cuartos-palabra-asa.png",
+    "view": "02-tres-cuartos-palabra-asa",
+    "azimuth_deg": -45,
+    "elevation_deg": 22
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/03-tres-cuartos-palabra-opuesto.png",
+    "view": "03-tres-cuartos-palabra-opuesto",
+    "azimuth_deg": -135,
+    "elevation_deg": 22
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/04-perfil-asa.png",
+    "view": "04-perfil-asa",
+    "azimuth_deg": 0,
+    "elevation_deg": 12
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/05-perfil-sin-asa.png",
+    "view": "05-perfil-sin-asa",
+    "azimuth_deg": 180,
+    "elevation_deg": 12
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/06-reverso-logo.png",
+    "view": "06-reverso-logo",
+    "azimuth_deg": 90,
+    "elevation_deg": 10
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/07-tres-cuartos-logo-asa.png",
+    "view": "07-tres-cuartos-logo-asa",
+    "azimuth_deg": 45,
+    "elevation_deg": 22
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/08-tres-cuartos-logo-opuesto.png",
+    "view": "08-tres-cuartos-logo-opuesto",
+    "azimuth_deg": 135,
+    "elevation_deg": 22
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/09-cenital.png",
+    "view": "09-cenital",
+    "azimuth_deg": -90,
+    "elevation_deg": 90
+  },
+  {
+    "color": "magenta",
+    "file": "magenta/10-base-inferior.png",
+    "view": "10-base-inferior",
+    "azimuth_deg": -90,
+    "elevation_deg": -65
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/01-frente-palabra.png",
+    "view": "01-frente-palabra",
+    "azimuth_deg": -90,
+    "elevation_deg": 10
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/02-tres-cuartos-palabra-asa.png",
+    "view": "02-tres-cuartos-palabra-asa",
+    "azimuth_deg": -45,
+    "elevation_deg": 22
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/03-tres-cuartos-palabra-opuesto.png",
+    "view": "03-tres-cuartos-palabra-opuesto",
+    "azimuth_deg": -135,
+    "elevation_deg": 22
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/04-perfil-asa.png",
+    "view": "04-perfil-asa",
+    "azimuth_deg": 0,
+    "elevation_deg": 12
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/05-perfil-sin-asa.png",
+    "view": "05-perfil-sin-asa",
+    "azimuth_deg": 180,
+    "elevation_deg": 12
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/06-reverso-logo.png",
+    "view": "06-reverso-logo",
+    "azimuth_deg": 90,
+    "elevation_deg": 10
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/07-tres-cuartos-logo-asa.png",
+    "view": "07-tres-cuartos-logo-asa",
+    "azimuth_deg": 45,
+    "elevation_deg": 22
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/08-tres-cuartos-logo-opuesto.png",
+    "view": "08-tres-cuartos-logo-opuesto",
+    "azimuth_deg": 135,
+    "elevation_deg": 22
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/09-cenital.png",
+    "view": "09-cenital",
+    "azimuth_deg": -90,
+    "elevation_deg": 90
+  },
+  {
+    "color": "naranja",
+    "file": "naranja/10-base-inferior.png",
+    "view": "10-base-inferior",
+    "azimuth_deg": -90,
+    "elevation_deg": -65
+  }
+]

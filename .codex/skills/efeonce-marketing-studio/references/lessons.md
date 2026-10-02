@@ -52,6 +52,24 @@
   session's work in `scripts/foto`. Rule: in the shared checkout, never sweep foreign WIP into a Studio commit; stage
   and commit in one call with explicit paths.
 
+## 2026-09-26 — Rolling out TASK-1893 and TASK-1896 to production
+
+- **Sentry project creation is disabled for members via API** («Your organization has disabled this feature for
+  members»). Rule: create the project in the UI, then run `sentry.sh` for scrubbing and keys.
+- **Sentry issue-alert rules moved to Workflows.** `/projects/{org}/{project}/rules/` now returns 404, so the scripted
+  rules (new issue in `production`, > 10 events in 5 min, regression) were not created. The default «Send a
+  notification for high priority issues» workflow notifies the operator. Rule: port `sentry.sh` step 4 to the
+  Workflows API before relying on custom rules; never assume a green dry-run of that step means the rules exist.
+- **`GRANT CONNECT` on a Studio DB must come from its owner, `marketing_studio_migrator`.** The rollout of the new
+  roles (`marketing_studio_restore`, `marketing_studio_worker`) needed it; the Studio scripts now run those grants as
+  the owner (`f9e6cbb`, `82aeab6`).
+- **`media_object_pending` retries are expected on the first ingest.** The bucket notification can reach the worker
+  before the ingest transaction commits the `media_object` row; Pub/Sub retries (25 in staging, 27 in prod for 30
+  objects) and every event ended `succeeded` with the DLQ at 0. Do not read those retries as failures.
+- **A new AXIS package needs GitHub Packages access for each consumer before adoption.** `@efeoncepro/axis-brand-assets`
+  only granted its source repo and broke Greenhouse CI with `ERR_PNPM_FETCH_403`. Rule and verification:
+  `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`.
+
 ## 2026-09-26 — Turning on the provider in production
 
 - **A sister-platform OAuth client policy is validated by `sisterPlatformOAuthPolicyV1Schema`, not by the migration's DO

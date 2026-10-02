@@ -6,6 +6,12 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26
+
+- TASK-1896 complete: Sentry, logs con `requestId` y la señal de salud de Studio ya están en producción; se quita de
+  `Blocked by`. La descarga de originales (TASK-1893) hoy sólo la usa un `api_client`: al abrir el login, decidir si
+  una persona puede pedirla desde la web.
+
 ## Delta 2026-09-25
 
 - TASK-1899 comparte con esta task el reader de acceso a producto de Greenhouse y el verificador JWKS de Studio; quien llegue primero lo construye.
@@ -29,7 +35,7 @@
 - Status real: `Diseno. Última task del programa por decisión del operador (2026-09-25): «construir primero todo y después lo cierro». El código de Studio ya modela el actor user y el modo efeonce_id, que hoy falla cerrado con 401.`
 - Rank: `TBD`
 - Domain: `platform|identity`
-- Blocked by: `TASK-1894, TASK-1895; además depende de la foundation OIDC first-party reusable de TASK-1834 (Slice 0–1). TASK-1896 recomendada antes.`
+- Blocked by: `TASK-1894, TASK-1895; además depende de la foundation OIDC first-party reusable de TASK-1834 (Slice 0–1).`
 - Branch: `Greenhouse develop (reader de acceso, registro del RP, docs) · efeonce-marketing-studio main (código); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

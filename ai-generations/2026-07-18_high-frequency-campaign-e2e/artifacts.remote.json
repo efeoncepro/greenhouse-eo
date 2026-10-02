@@ -1,11 +1,11 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-07-19T11:51:48.739Z",
+  "generatedAt": "2026-10-01T22:01:57.328Z",
   "run": "ai-generations/2026-07-18_high-frequency-campaign-e2e",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-18_high-frequency-campaign-e2e",
-  "totalBytes": 148861636,
-  "fileCount": 84,
+  "totalBytes": 227841526,
+  "fileCount": 88,
   "files": [
     {
       "path": "delivery/16x9/high-frequency-m01-digital-landscape-16x9-v1.jpg",
@@ -98,6 +98,24 @@
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/a2/high-frequency-m03-print-poster-proof-a2-v1.jpg"
     },
     {
+      "path": "delivery/high-frequency-campaign-release-v1.zip",
+      "sizeBytes": 2877301,
+      "sha256": "634e5d72202e4a5dd33f7d956b55cf6dad30f496b2e5db4f9944725794c37ff3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/high-frequency-campaign-release-v1.zip"
+    },
+    {
+      "path": "delivery/high-frequency-campaign-release-v2.zip",
+      "sizeBytes": 28115428,
+      "sha256": "ba460d7d7cf0f2a525e9187484090ebf2763a0baf7796b46bf8358711258be16",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/high-frequency-campaign-release-v2.zip"
+    },
+    {
+      "path": "delivery/high-frequency-campaign-release-v3.zip",
+      "sizeBytes": 46412071,
+      "sha256": "13a84dbbffd9be389c2304fbc5360c3410cd5d91b2a45e5b14ae372e2322d24b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/high-frequency-campaign-release-v3.zip"
+    },
+    {
       "path": "delivery/layout-compiler/high-frequency-layout-design-16x9-v1.jpg",
       "sizeBytes": 618198,
       "sha256": "fd3d6699b2683343cb17b5cf50b3800fe89e0d2fefc2ab4f73a054e45db04abc",
@@ -132,6 +150,12 @@
       "sizeBytes": 566929,
       "sha256": "d719e4b6614f946cc0aefc1113de106e87d58ceca5fc3c85734198c73130261d",
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/layout-design/high-frequency-layout-design-9x16-v1.jpg"
+    },
+    {
+      "path": "delivery/layout-design/high-frequency-layout-design-pilot-v1.zip",
+      "sizeBytes": 1575090,
+      "sha256": "6efa884d9b10a2d442bbc5a786a00948a41cbffeaafb507ffc35a797a31ab912",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_high-frequency-campaign-e2e/delivery/layout-design/high-frequency-layout-design-pilot-v1.zip"
     },
     {
       "path": "delivery/motion/high-frequency-m01-brand-light-bumper-16x9-6s-v1-poster.jpg",

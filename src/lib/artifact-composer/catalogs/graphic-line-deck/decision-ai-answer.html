@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · a quién recomienda la IA</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-ai-answer` (surface deck, tema oscuro, TASK-1934). El mismo prompt en dos ventanas de un motor de
+      IA GENÉRICO: atrás «Hoy», girada y atenuada, con tres competidores y «Tu marca no aparece»; al frente «Con AEO»,
+      plana y destacada, con tu marca primera (la selección «Cliente») y dos competidores. El haz une las ventanas, la
+      plataforma de luz las sostiene y la marca de datos ilustrativos va bajo la ventana del frente. La voz «viva» a la
+      izquierda y la burbuja URL en luminosidad al pie. Todo texto llega por slot; los de aquí son el respaldo del probe.
+      Referencia: DeckIARespuesta (MX1-ia-responde).
+    -->
+    <main class="gl-slide gl-aa" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-aa-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-layer gl-aa-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <section class="gl-aa-window gl-aa-back" data-slot="back">
+        <header class="gl-aa-head">
+          <p class="gl-aa-engine"><img class="gl-aa-disc" data-slot-field="engineIcon" alt="" /><span data-slot-field="engine">Motor de IA</span></p>
+          <p class="gl-aa-status" data-slot-field="status">Hoy</p>
+        </header>
+        <div class="gl-aa-ask"><p class="gl-aa-prompt" data-slot-field="prompt">¿Cuáles son las mejores marcas de [tu categoría] en Chile?</p></div>
+        <p class="gl-aa-intro" data-slot-field="intro">Estas son las opciones más recomendadas:</p>
+        <ol class="gl-aa-rows" data-slot="backRows">
+          <li class="gl-aa-row">
+            <span class="gl-aa-number" data-slot-field="number">1</span>
+            <div class="gl-aa-entry">
+              <p class="gl-aa-name" data-slot-field="name">Competidor A</p>
+              <p class="gl-aa-desc" data-slot-field="description">Líder en recordación de la categoría.</p>
+              <ul class="gl-aa-cites" data-slot-field="citations">
+                <li class="gl-aa-cite"><img class="gl-aa-globe" data-slot-field="icon" alt="" /><span data-slot-field="text">comparador.cl</span></li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+        <p class="gl-aa-absent"><span class="gl-aa-absent-circle" aria-hidden="true"></span><span data-slot-field="absent">Tu marca no aparece</span></p>
+      </section>
+
+      <figure class="gl-layer gl-aa-beam" data-slot="beam">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <section class="gl-aa-window gl-aa-front" data-slot="front">
+        <header class="gl-aa-head">
+          <p class="gl-aa-engine"><img class="gl-aa-disc" data-slot-field="engineIcon" alt="" /><span data-slot-field="engine">Motor de IA</span></p>
+          <p class="gl-aa-status" data-slot-field="status">Con AEO</p>
+        </header>
+        <div class="gl-aa-ask"><p class="gl-aa-prompt" data-slot-field="prompt">¿Cuáles son las mejores marcas de [tu categoría] en Chile?</p></div>
+        <p class="gl-aa-intro" data-slot-field="intro">Para [tu categoría] en Chile, la opción más recomendada es:</p>
+        <div class="gl-aa-row gl-aa-client" data-slot="client" data-gl-selection-target>
+          <span class="gl-aa-number" data-slot-field="number">1</span>
+          <div class="gl-aa-entry">
+            <p class="gl-aa-name" data-slot-field="name">Tu marca</p>
+            <p class="gl-aa-desc" data-slot-field="description">Referente de la categoría: casos verificables, precios claros y reseñas consistentes.</p>
+            <ul class="gl-aa-cites" data-slot-field="citations">
+              <li class="gl-aa-cite"><img class="gl-aa-globe" data-slot-field="icon" alt="" /><span data-slot-field="text">tumarca.com</span></li>
+            </ul>
+          </div>
+        </div>
+        <ol class="gl-aa-rows" data-slot="frontRows">
+          <li class="gl-aa-row">
+            <span class="gl-aa-number" data-slot-field="number">2</span>
+            <div class="gl-aa-entry">
+              <p class="gl-aa-name" data-slot-field="name">Competidor A</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <p class="gl-aa-mark" data-slot="mark">Ejemplo ilustrativo · tu diagnóstico muestra tu situación real</p>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Visibilidad en IA</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿A quién recomienda la IA?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">A tu</span><span data-slot-field="answer">competencia</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Cuando tu comprador pregunta por tu categoría, la IA ya tiene favoritas. El AEO hace que la <strong>próxima</strong> respuesta te nombre.</p>
+
+      <div class="gl-hidden" data-slot="provenance"></div>
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

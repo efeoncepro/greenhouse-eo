@@ -1,0 +1,12 @@
+{
+  "id": "QS1-un-solo-equipo",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "objetos": [{ "objeto": "polo-efeonce" }, { "objeto": "hoodie-efeonce" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood drama still, a creative workshop at night): on the RIGHT half of the frame, four people are gathered around a large glowing light table, caught in the middle of the work, nobody poses and nobody looks at the camera. She (the woman of the references) wears the NAVY EFEONCE POLO and leans over the table marking a printed proof with a marker, fully absorbed, a spark of excitement on her face. Beside her a Chilean art director in his late twenties with short dark hair and a light beard, in the NAVY EFEONCE HOODIE, holds a printed proof up against the light, smiling at what he sees. Across the table a strategist in her thirties with dark hair tied back points at a sticky note on the proof, mid-sentence; behind them, slightly out of focus, a developer in his forties with glasses laughs, a laptop open. The light table is the key light: it lights their faces and hands from below in cool white with a teal edge; printed proofs, sticky notes, color swatches and a coffee cup cover the table. On the wall behind them, softly out of focus, a long strip of printed pieces from many past campaigns is pinned edge to edge, like years of work. REALISTIC ADULT PROPORTIONS: camera about three meters away at table height, 50mm, shallow depth of field. Thin haze catches the light. The LEFT 45% of the frame is calm, deep dark workshop space with nothing in it, only faint haze. Rich contrast, deep navy blacks, no readable text, no logos of any other brand.",
+  "lecho": { "objeto": "the dark blurred near edge of the light table's frame, close to the lens, outside the light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark workshop space on the left 45% of the frame", "tinta": "blanca" } }
+}

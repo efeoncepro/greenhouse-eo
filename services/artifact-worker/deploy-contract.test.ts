@@ -62,6 +62,11 @@ describe('artifact-worker · deploy.sh (SoT de env vars del Job)', () => {
     expect(deploySh).toMatch(/INSIGHTS_RENDER_ENABLED:-true/)
   })
 
+  it('el flag BRAND_RENDER_ENABLED está DECLARADO con default ON para el Job compartido (TASK-1921)', () => {
+    // Declarado en deploy.sh porque --set-env-vars es destructivo; Vercel gobierna el encolado por ambiente.
+    expect(deploySh).toContain('ENV_VARS="${ENV_VARS},BRAND_RENDER_ENABLED=${BRAND_RENDER_ENABLED:-true}"')
+  })
+
   it('el bucket de assets NO depende del carril: el Job es único y no puede darse vuelta por deploy (TASK-1846)', () => {
     expect(deploySh).toMatch(/^STORAGE_ENV="staging"$/m)
     expect(deploySh).not.toMatch(/if \[\[ "\$\{ENV\}" == "production" \]\]; then\s+STORAGE_ENV=/)

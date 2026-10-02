@@ -4,12 +4,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { classifyBusinessModel, resolveCanonicalCategory } from './taxonomy'
 
-// country (ISO-2) -> market + locale del grader. Conservador; ampliar cuando emerja otro país.
-const MARKET_BY_COUNTRY: Record<string, { market: string; locale: string }> = {
-  MX: { market: 'MX', locale: 'es-MX' },
-  CL: { market: 'CL', locale: 'es-CL' },
-  US: { market: 'US', locale: 'en-US' }
-}
+import { resolveGrowthMarket } from '@/lib/growth/markets'
 
 export type ProvisionGraderProfileErrorCode = 'org_not_found' | 'website_required'
 
@@ -43,6 +38,8 @@ interface OrganizationRow extends Record<string, unknown> {
 interface ProfileRow extends Record<string, unknown> {
   profile_id: string
   public_id: string | null
+  market: string
+  locale: string
   website_url?: string | null
 }
 
@@ -55,12 +52,10 @@ export interface ProvisionGraderProfileResult {
   readonly locale: string
 }
 
-const resolveMarketLocale = (
-  country: string | null
-): { market: string; locale: string } => {
-  const countryCode = (country ?? '').trim().toUpperCase()
+const resolveMarketLocale = (country: string | null): { market: string; locale: string } => {
+  const resolved = resolveGrowthMarket(country ?? '')
 
-  return MARKET_BY_COUNTRY[countryCode] ?? { market: countryCode || 'CL', locale: 'es' }
+  return { market: resolved.code, locale: resolved.locale }
 }
 
 export const provisionGraderProfileForOrganization = async (
@@ -85,7 +80,7 @@ export const provisionGraderProfileForOrganization = async (
   }
 
   const existingRows = await runGreenhousePostgresQuery<ProfileRow>(
-    `SELECT profile_id, public_id, website_url
+    `SELECT profile_id, public_id, website_url, market, locale
        FROM greenhouse_growth.grader_profiles
       WHERE organization_id = $1 AND status = 'active'
       ORDER BY created_at DESC
@@ -107,7 +102,8 @@ export const provisionGraderProfileForOrganization = async (
       )
     }
 
-    const { market, locale } = resolveMarketLocale(org.country)
+    const resolved = resolveGrowthMarket(existing.market, existing.locale)
+    const { code: market, locale } = resolved
 
     return {
       profileId: existing.profile_id,

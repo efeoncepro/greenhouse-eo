@@ -1,0 +1,21 @@
+{
+ "id": "MC1k-45-portada-revision",
+ "formato": "4:5",
+ "impacto": true,
+ "identidad": [
+  "nexa"
+ ],
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark space at night with a thin haze; far behind her, softly out of focus, an immense field of thousands of unlit dark glass cards recedes into the darkness): she stands behind a long dark walnut review table, centered, in a WIDER shot, framed from the hips up and SMALLER in the frame, wearing a sleek, form-fitting BIONIC SUIT in deep navy with matte white armored plates on the shoulders, chest and forearms, thin glowing azure-blue (#0375DB) light seams along the plates; the chest plate is plain, smooth white with NO emblem, NO logo, NO symbol, NO rocket, NO lettering; no watch, no bracelet and no ring, sleek futuristic wraparound glasses with CLEAR TRANSPARENT lenses lightly tinted azure blue, a thin frameless edge and a fine glowing azure line along the top of the lenses; her eyes are clearly visible through the transparent lenses, no mirror reflection covers her eyes. REALISTIC ADULT PROPORTIONS: we sit across the review table from her, camera at her chest height, well above the table top, about three meters from her, 85mm; she does not lean toward the lens. On the table in front of her lie EXACTLY FIVE thin glass cards in one neat row, evenly spaced (one, two, three, four, five), plain, with NO text, NO symbols and NO marks on them. A thin azure-blue (#0375DB) scan light sweeps across the row of cards and lights up ONE of them; her right hand rests lightly on that lit card, caught at the exact moment she pauses her review and looks up straight into the lens with a quiet, confident half-smile. The lit card is the brightest element; a cool rim light from behind separates her from the dark; every other card stays dim. The TOP 30% of the frame is calm, deep dark space with only faint haze, no cards, no light, no objects; the WHOLE UPPER 40% of the frame above her head is empty dark space and the TOP OF HER HAIR is at about 44% of the frame height; the table top with the row of five cards sits at about three quarters of the frame height. The near half of the table is in deep shadow, outside every light: the scan light only touches the cards and never reaches the near edge. Enormous contrast, no text, no logos of any other brand. No monitors, no plants, no lamps.",
+ "lecho": {
+  "objeto": "the near edge of the dark walnut review table she is working at, only a few centimetres in front of the lens, in deep shadow, outside every light",
+  "tono": "DARK walnut in deep shadow, near black"
+ },
+ "reservas": {
+  "texto": {
+   "muro": "calm, deep dark space with only faint haze",
+   "tinta": "blanca"
+  }
+ }
+}

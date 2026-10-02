@@ -1,0 +1,11 @@
+{
+  "id": "SF1-una-operacion",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [{ "objeto": "polo-efeonce" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, a vast dark studio at night): an EFEONCE Salesforce architect, a Latin American woman in her early forties, short dark hair cut at the jaw, small silver earrings, wearing the NAVY EFEONCE POLO, stands on the RIGHT side of the frame, framed from the waist up, looking straight into the lens with a calm, confident half-smile, one open hand raised at shoulder height beside her as if gathering something together. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, focus on her eyes. Five separate streams of fine glowing particles arrive from five different directions of the dark space behind her (from high left, from the far background, from low right, from above, from the right edge), each stream a different texture of the same sky-blue light (#2FB8FF), and all five braid together next to her raised hand into ONE single ring of brilliant sky-blue and white light seen in perspective, the one orbit of the frame, with ONE small blazing white sphere riding on that ring. The ring is the brightest element: it lights her face, her hand and her shoulder from the side; a cool rim light from behind separates her from the background. Everything else stays in deep shadow. Fine haze catches the streams and the ring. The LEFT 45% of the frame is calm, deep dark space with only faint haze: no streams, no particles, no objects. No robots, no mascots, no cartoon characters, no clouds as symbols, no logos of any other brand, no readable text, no screens. Enormous contrast, punchy, awe-inspiring, cool and contemporary: nothing warm, amber or orange.",
+  "lecho": { "objeto": "the near edge of a matte black standing meeting table, the lens only a few centimetres behind it, outside every light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark space on the left 45% of the frame", "tinta": "blanca" } }
+}

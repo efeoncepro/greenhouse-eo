@@ -47,7 +47,8 @@ para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.
 [inventario y contrato de selección](../../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
 antes de reutilizarla; incluye rutas y particularidades Unicode verificadas. Identidad vigente confirmada
 2026-09-24: rostro humano fotorrealista Avatar A, con set de ocho vistas de polera gris en
-`ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`, resuelto con `foto:prompt`. El banco
+`ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`, resuelto con `foto:prompt` (si no está en
+disco: `pnpm ai-gen:pull ai-generations/2026-09-20_identidad-julio-nexa`). El banco
 OneDrive de poses guía actuación/cuerpo, no identidad facial.
 
 **Mascotas de partners:** `14. Mascotas de partners/<Mascota (Partner)>/` (incluye `Sprocket (HubSpot)`, logo de uso interno hasta aprobación) con subcarpetas por familia y versión

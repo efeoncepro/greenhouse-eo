@@ -1,0 +1,31 @@
+{
+  "id": "CC1-contenido-que-la-ia-cita",
+  "formato": "1:1",
+  "impacto": true,
+  "registro": "cine",
+  "desde": "SP2b",
+  "alcance": "deck-seccion",
+  "objetos": [
+    {
+      "objeto": "polo-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic drama still, a vast dark studio at night, the moment an AI answer cites her work): an EFEONCE content strategist, a Latin American woman in her early thirties, dark straight hair tied back in a low ponytail, wearing the Efeonce team polo exactly as in its reference, stands at the far end of a long, bare table of matte oiled dark walnut that runs from just in front of the lens toward her, centered around 68% of the frame width, framed from the waist up, her head about one quarter of the frame height with its top roughly one sixth down from the top edge, looking straight into the lens with calm, quiet certainty. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm f/2, she does not lean toward the lens, focus on her eyes. Her left arm is bent and her LEFT hand, on the right side of the frame, is held open, palm up, at chest height, a little away from her body; resting on that palm is ONE palm-sized card of frosted glass with softly rounded corners, a piece of her own writing: fine lines of text etched in it, far too small and too bright to read. Her right hand rests flat and still on the table top, the whole arm visible. Behind her, high to the right of her head and about three meters further back, floats a large rounded AI answer bubble of thick frosted glass, softly glowing cool white from inside, with a few lines of an answer inside it, out of focus and far too small to read, no logos, cut by the right edge of the frame and softly out of focus; its glow draws a thin cool rim along her hair and her left shoulder. From one small bright point on the lower edge of that bubble, ONE fine, taut thread of azure (#0375DB) light runs down through the haze and touches the card on her palm: the answer pointing back to her content. Where the thread touches it, the card blazes nearly white with a faint azure tint. Far behind, five to six meters back, thousands of other glass cards hang in loose rows in the haze, unlit and dark, only a few catching faint cold glints that melt into small round bokeh. Nothing lit, no card, no thread and no bubble appears to the LEFT of her right shoulder: the LEFT 40% of the frame, from top to bottom, is calm, deep dark studio space with only faint haze and the soft texture of a distant dark wall. The space is bare: no books, no plants, no mugs, no notebooks, no monitors, no lamps. Rich contrast, deep navy blacks, no readable text anywhere, no logos of any other brand.",
+  "llave": {
+    "fuente": "the blazing frosted-glass card on her open left palm, a palm-sized core of nearly white light with only a faint azure tint",
+    "lado": "below her chin and to the right side of the frame, lighting her face from below and from her left",
+    "distancia": "about 35 cm from her face"
+  },
+  "primerPlano": "the near end of that long table of matte, oiled dark walnut, the lens only a few centimetres behind its edge, crossing the bottom of the frame",
+  "fondo": "five to six meters behind her, thousands of dim glass cards hanging in loose rows in the haze, a few faint cold glints melted into small round bokeh discs, giving the space its scale",
+  "fenomeno": {
+    "que": "one fine, taut thread of azure (#0375DB) light runs from a glowing AI answer bubble behind her down to the single card of her own content resting on her palm, which blazes white-azure, while thousands of other cards in the dark behind stay unlit",
+    "esServicio": "AEO de contenidos: entre todo lo publicado, la respuesta de la IA cita el contenido que ella escribió; el hilo de luz es la cita"
+  },
+  "lecho": {
+    "objeto": "the near end of the long table of matte, oiled dark walnut she stands behind, the lens only a few centimetres behind its edge",
+    "tono": "DARK near black"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:11:59.096Z",
+  "run": "ai-generations/2026-09-21_nexa-lifestyle",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_nexa-lifestyle",
+  "totalBytes": 31861940,
+  "fileCount": 14,
+  "files": [
+    {
+      "path": "salidas/contacto-fix.png",
+      "sizeBytes": 5681124,
+      "sha256": "21dd046bea622b1120f8220aa8a70192e8dc0d89e7efb4cb21c19d287af45f0d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/contacto-fix.png"
+    },
+    {
+      "path": "salidas/contacto-lifestyle.png",
+      "sizeBytes": 3964515,
+      "sha256": "cae7610bfacce122cff0905a352ed052000ce30192277f3cd5dbd74b53324165",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/contacto-lifestyle.png"
+    },
+    {
+      "path": "salidas/lifestyle-1-piloto-smartwatch.png",
+      "sizeBytes": 2058829,
+      "sha256": "c865217aea19489a485eed835a36e07a4e316e7f7dbca7018b10ea6090babdb8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/lifestyle-1-piloto-smartwatch.png"
+    },
+    {
+      "path": "salidas/lifestyle-1-piloto.png",
+      "sizeBytes": 2162321,
+      "sha256": "cbc32f5fd74962c9d138b86846dcb2c311284a69bbe0fb4d18840139fb5108ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/lifestyle-1-piloto.png"
+    },
+    {
+      "path": "salidas/lifestyle-2-smartwatch.png",
+      "sizeBytes": 2084263,
+      "sha256": "dc91577fde2c59e2edd81ad00c5bd0088319652355fc530c5a3f2e1b25b324c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/lifestyle-2-smartwatch.png"
+    },
+    {
+      "path": "salidas/lifestyle-2.png",
+      "sizeBytes": 2181465,
+      "sha256": "c8a9c8ca3ec573d655d630e0ebd1e56b777088698f2fe2d600bd76ef375086f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/lifestyle-2.png"
+    },
+    {
+      "path": "salidas/lifestyle-3-smartwatch.png",
+      "sizeBytes": 2061206,
+      "sha256": "3d5065db6799234b534d8578b083ac0670904691a8886b26a4718df480cf4ba6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/lifestyle-3-smartwatch.png"
+    },
+    {
+      "path": "salidas/lifestyle-3.png",
+      "sizeBytes": 2155149,
+      "sha256": "260a6823e006803eab3173f89b710b400bfc30293ec910d581d3308c14c3ff26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/lifestyle-3.png"
+    },
+    {
+      "path": "salidas/lifestyle-4-smartwatch.png",
+      "sizeBytes": 2045630,
+      "sha256": "336317422a32b20e680ed478daf9ed451f08be5c163ce67ea4084d5844a40203",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/lifestyle-4-smartwatch.png"
+    },
+    {
+      "path": "salidas/lifestyle-4.png",
+      "sizeBytes": 2172171,
+      "sha256": "c3bbe6e928c6209dd30058fbd83f7585dbc32c8c431c0e827dec27e8110ba063",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/lifestyle-4.png"
+    },
+    {
+      "path": "salidas/verif-prop-fix.png",
+      "sizeBytes": 3658707,
+      "sha256": "481936d8b3aebd69f9a943bec3f05443fedda252c5bd4f0871798514b77a8ab4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/verif-prop-fix.png"
+    },
+    {
+      "path": "salidas/z-manos.png",
+      "sizeBytes": 747822,
+      "sha256": "67f027828e8d96a362652e1a48c65787ddf3f4fb0b850929a70051dcca733f93",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/z-manos.png"
+    },
+    {
+      "path": "salidas/z-reloj-fix.png",
+      "sizeBytes": 442015,
+      "sha256": "a786c8fbb4f668e78a398a82a118ddc22bdf11e11f7766aa9158ae3cf8e12c56",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/z-reloj-fix.png"
+    },
+    {
+      "path": "salidas/z-rostro.png",
+      "sizeBytes": 446723,
+      "sha256": "ba73a06d46c5d688430ce562595cc24bbfccc02aa4f08aea696be2eed4936836",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-lifestyle/salidas/z-rostro.png"
+    }
+  ]
+}

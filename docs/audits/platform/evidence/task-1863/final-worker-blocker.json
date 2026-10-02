@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-09-28T11:09:50.608478+00:00",
+  "sourceSha": "d86edb78419dad324943804e8d003dd18ffbea31",
+  "workflowRun": 36413423962,
+  "cloudBuild": "88689e49-8cc0-4f90-a979-561f40f3e383",
+  "status": "blocked",
+  "phase": "private_package_download",
+  "package": "@efeoncepro/axis-graphic-line@0.7.0",
+  "httpStatus": 403,
+  "registryMessage": "Account has reached its billing limit. Contact support or your organization admin to increase the quota.",
+  "liveWorkerRevision": "ops-worker-00732-86r",
+  "liveWorkerSha": "999492e8d328d21b10ea137bebc56b25826e9957",
+  "trafficPercent": 100,
+  "credentialRotated": false,
+  "mainPromoted": false
+}

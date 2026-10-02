@@ -31,6 +31,8 @@ import { compositeLuminosity } from '../../scripts/creative/layout-compiler/comp
 import { ANCHO_PANTALLA, DPR_REFERENCIA, TECHO_CANTO, UMBRALES, hexARgb, medicionImposible, pendienteBajoCaja, medirAnillo, medirContraColor, medirGlifos, medirVoz, tamanoEnPantalla, textoAlternativo, umbralWcag } from './accesibilidad.mjs'
 import { ORDEN as ORDEN_VARIANTES, elegirVariante } from './cta-variantes.mjs'
 import { validarPiezaEsquema } from './cta-esquema.mjs'
+import { GL, ctaColors, answerSphere, questionRing, graphicLineAccent } from './cta-graphic-voice.mjs'
+import { resolveCtaColorPolicy } from './cta-color-policy.mjs'
 import { fueraDeReserva, invariantesMaquetacion, recorteFinalEnPlate } from './cta-invariantes.mjs'
 import { desescaparXml } from './svg-texto.mjs'
 import { CANON_VIGENTE, canonDe, escribirAtomico, huellaComando, huellaPieza, rutaQa, sha, tomarBloqueo, versionPaquete } from './cta-integridad.mjs'
@@ -53,7 +55,7 @@ const REPO = fileURLToPath(new URL('../../', import.meta.url))
 const repo = rel => path.join(REPO, rel)
 
 const R = axisAdvertising.recipes
-const C = axisAdvertising.color
+const C = ctaColors
 
 let W = 1152
 let H = 1440
@@ -63,6 +65,7 @@ const ACCENT = C.accentSurface // #ff6500, naranja Efeonce = el atardecer de la 
 const bric = fontkit.openSync(repo('src/assets/fonts/BricolageGrotesque-Variable.ttf'))
 
 const pop = {
+  300: fontkit.openSync(repo('src/assets/fonts/Poppins-Light.ttf')),
   400: fontkit.openSync(repo('src/assets/fonts/Poppins-Regular.ttf')),
   500: fontkit.openSync(repo('src/assets/fonts/Poppins-Medium.ttf')),
   600: fontkit.openSync(repo('src/assets/fonts/Poppins-SemiBold.ttf')),
@@ -279,12 +282,16 @@ const richBlock = ({ text, fonts, size, tracking = 0, leading, x, topY, maxWidth
     return { ink, parts }
   }
 
+  const measuredLines = []
+
   lines.forEach((line, i) => {
     const { ink, parts } = lineInk(line)
 
     if (firstTop === null) firstTop = ink.top
     const baseline = topY - firstTop + i * size * leading
     const lx = align === 'center' ? x - (ink.left + ink.right) / 2 : align === 'right' ? x - ink.right : x - ink.left
+
+    measuredLines.push({ left: lx + ink.left, right: lx + ink.right, baseline })
 
     for (const { seg, sh, dx } of parts) {
       const color = seg.accent ? accentFill : fill
@@ -299,7 +306,7 @@ const richBlock = ({ text, fonts, size, tracking = 0, leading, x, topY, maxWidth
     box.bottom = Math.max(box.bottom, baseline + ink.bottom)
   })
 
-  return { svg, box, accentBoxes, lines: lines.map(l => l.map(w => w.map(s => s.text).join('')).join(' ')) }
+  return { svg, box, accentBoxes, measuredLines, lines: lines.map(l => l.map(w => w.map(s => s.text).join('')).join(' ')) }
 }
 
 const BRIC = (recipe, width = recipe.width, boldWeight = 800) => ({
@@ -496,6 +503,7 @@ const SLIDES = JSON.parse(fs.readFileSync(PLAN, 'utf8'))
 // del mismo archivo y, si no coincide, el plan cambió después de componer.
 const HUELLAS_PLAN = new Map((Array.isArray(SLIDES) ? SLIDES : []).filter(p => p && typeof p === 'object').map(p => [p.id, huellaPieza(JSON.parse(JSON.stringify(p)))]))
 const PLAN_DIR = path.dirname(path.resolve(PLAN))
+const POLITICAS_COLOR = new Map()
 // `--variantes`: compone cada pieza en sus TRES tratamientos (texto · contorno · relleno) en out/variantes/, con una
 // hoja comparativa por pieza. Existe porque dos de tres agentes terminaron usando una sola variante: no veían las
 // otras sobre la foto real (operador, 2026-09-22). No toca el QA ni las salidas del plan.
@@ -574,6 +582,15 @@ function validarPlan(plan) {
     r.errores.forEach(e)
     r.avisos.forEach(a => avisos.push(`${p.id}: ${a}`))
     if (r.errores.length) continue
+
+    try {
+      const policy = resolveCtaColorPolicy(p.cta, PLAN_DIR)
+
+      if (policy) {
+        POLITICAS_COLOR.set(p.id, policy)
+        if (VARIANTES) e('con colorPolicy, declara cada alternativa en el plan con su tratamiento autorizado; --variantes sólo explora planes sin política')
+      }
+    } catch (error) { e(error.message) }
 
     if (!fs.existsSync(path.resolve(PLAN_DIR, p.plate))) e(`no existe el plate \`${p.plate}\``)
 
@@ -1123,6 +1140,10 @@ async function composePiece(s, opts = {}) {
     y = lab.box.bottom + Math.round((s.labelGap ?? 0.10) * (s.dominantSize ?? 160))
   }
 
+  // El acento de la voz lo decide la línea de servicio (La órbita, regla 8); sin `graphicLine`, growth (teal), como siempre.
+  const graphicAccent = graphicLineAccent(s.graphicLine, s.ink)
+  const graphicVoice = s.graphicVoice ? { contract: 'efeonce.graphic-line-orbit', questionWeight: GL.type.question.weight, answerWeight: GL.type.answer.weight, ...(s.graphicLine ? { line: s.graphicLine, accent: graphicAccent } : {}) } : null
+
   // 2 · entrada
   if (s.lead) {
     const lr = R.ideaLead
@@ -1132,18 +1153,28 @@ async function composePiece(s, opts = {}) {
     // cielo violeta. Sobre FOTOGRAFÍA DE MARCA el fondo es neutro-cálido por contrato de colorimetría, y
     // ahí ese pastel azul pelea con la luz de la escena en vez de acompañarla: la jerarquía sobre foto se
     // construye con escala, peso y familia, y el color lo pone la fotografía.
-    const le = richBlock({ text: s.lead, fonts: leadPoppins ? POP : BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: leadPoppins ? em(R.structureCopy.tracking) : em(lr.tracking), leading: leadPoppins ? 1.5 : lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8) - reservaMarcos, fill: s.leadFill ?? SOFT, accentFill: INK, align: s.align })
+    const ring = graphicVoice ? questionRing({ x, top: y + (s.leadSize ?? 70) * 0.12, size: s.leadSize ?? 70, color: graphicAccent, canvasWidth: W }) : null
+
+    if (ring) {
+      body += ring.svg
+      graphicVoice.questionRing = ring.box
+      guard.push({ id: 'pregunta-anillo', box: ring.box })
+      visibles.push({ id: 'pregunta-anillo', box: ring.box })
+      voces.push({ id: 'pregunta-anillo', box: ring.box, tinta: graphicAccent, limite: true })
+    }
+
+    const le = richBlock({ text: s.lead, fonts: graphicVoice ? { base: pop[300], bold: pop[300] } : leadPoppins ? POP : BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: leadPoppins ? em(R.structureCopy.tracking) : em(lr.tracking), leading: leadPoppins ? 1.5 : lr.lineHeight, x: x + (ring?.advance ?? 0), topY: y, maxWidth: W * (s.textWidth ?? 0.8) - reservaMarcos - (ring?.advance ?? 0), fill: s.leadFill ?? SOFT, accentFill: INK, align: s.align })
 
     body += le.svg
     lineas.entrada = le.lines
-    voces.push({ id: 'entrada', box: le.box, tinta: s.leadFill ?? SOFT, acento: INK, peso: leadPoppins ? 400 : lr.weight, px: s.leadSize ?? 70, lineas: le.lines.length })
+    voces.push({ id: 'entrada', box: le.box, tinta: s.leadFill ?? SOFT, acento: INK, peso: graphicVoice ? 300 : leadPoppins ? 400 : lr.weight, px: s.leadSize ?? 70, lineas: le.lines.length })
     checks.push({ id: 'entrada', box: le.box, inkL: INK_L }); tramos.push(['entrada', le.box, s.leadSize ?? 70])
     y = le.box.bottom + Math.round((s.leadGap ?? 0.09) * (s.dominantSize ?? 160))
   }
 
   // 3 · dominante (+ selección colaborativa) — sólo en la pieza con voz
-  const ir = R.ideaImpact
-  const domFont = fontFor(ir, DOMINANT_WIDTH)
+  const ir = graphicVoice ? { ...R.ideaImpact, weight: GL.type.answer.weight, tracking: GL.type.answer.tracking } : R.ideaImpact
+  const domFont = fontFor(ir, graphicVoice ? 100 : DOMINANT_WIDTH)
   // Ajuste al ancho máximo declarado (deja aire para etiquetas de colaboradores fuera de la caja).
   let domSize = s.dominantSize
 
@@ -1151,7 +1182,7 @@ async function composePiece(s, opts = {}) {
 
 
 
-return k.ink.right - k.ink.left }))
+return k.ink.right - k.ink.left + (graphicVoice ? (GL.sphere.diameterEm + Math.max(...Object.values(GL.sphere.opticalGapEm))) * domSize : 0) }))
 
   // La reserva de los marcos (canon nuevo) corre la columna a la derecha: se descuenta del ancho, para que el borde derecho
   // del texto no se mueva (0 en las piezas del canon anterior).
@@ -1167,6 +1198,23 @@ return k.ink.right - k.ink.left }))
     dom.accentBoxes.forEach((b, i) => checks.push({ id: `dominante-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
     voces.push({ id: 'dominante', box: dom.box, tinta: INK, peso: ir.weight, px: domSize, lineas: dom.lines.length })
     dom.accentBoxes.forEach((b, i) => voces.push({ id: `dominante-acento-${i}`, box: b, tinta: ACCENT, peso: ir.weight, px: domSize, lineas: 1, daltonismo: true }))
+  }
+
+  if (graphicVoice) {
+    const lastLine = dom.measuredLines.at(-1)
+    const sphere = answerSphere({ lastLine: { ...lastLine, text: dom.lines.at(-1) }, baseline: lastLine.baseline, size: domSize, color: graphicAccent })
+
+    graphicVoice.answerText = { ...dom.box }
+    graphicVoice.answerSphere = sphere.box
+    graphicVoice.answerSize = domSize
+    graphicVoice.sphereCssPx = GL.sphere.diameterEm * domSize * 390 / W
+    if (graphicVoice.sphereCssPx < GL.sphere.minScreenPx) throw new Error(`${s.id}: esfera menor que el mínimo AXIS`)
+    dom.svg += sphere.svg
+    dom.box = { ...dom.box, right: Math.max(dom.box.right, sphere.box.right), bottom: Math.max(dom.box.bottom, sphere.box.bottom) }
+    graphicVoice.answerGroup = { ...dom.box }
+    guard.push({ id: 'respuesta-esfera', box: sphere.box })
+    visibles.push({ id: 'respuesta-esfera', box: sphere.box })
+    voces.push({ id: 'respuesta-esfera', box: sphere.box, tinta: graphicAccent, limite: true })
   }
 
   let selection = ''
@@ -1209,12 +1257,12 @@ return k.ink.right - k.ink.left }))
     selection = labelToPaths(rendered.overlay)
     if (/<text/.test(selection)) throw new Error(`${s.id}: quedó <text>`)
     selEvidence = { selection: rendered.evidence.selection, cursores: rendered.evidence.cursorEvidence.map(c => ({ id: c.id, labelBounds: c.labelBounds })) }
-    if (!onObject) for (const c of rendered.evidence.cursorEvidence) { guard.push({ id: `cursor-${c.id}`, box: c.bounds }, { id: `etiqueta-${c.id}`, box: c.labelBounds }) }
+    if (!onObject) for (const c of rendered.evidence.cursorEvidence) { guard.push({ id: `cursor-${c.id}`, box: c.bounds }, ...(c.labelBounds ? [{ id: `etiqueta-${c.id}`, box: c.labelBounds }] : [])) }
     // Sobre un OBJETO de la foto (`selection.box`), cursores y etiquetas también entran en la guarda del sujeto y en
     // `protect` (el marco no: envuelve al objeto por construcción). Antes quedaban fuera de todo: la etiqueta tapaba la
     // mano y el gate daba 0 (tramo 10; auditorías de arquitectura y de diseño, hallazgo 1).
     else for (const c of rendered.evidence.cursorEvidence) guard.push({ id: `cursor-${c.id}`, box: c.bounds }, ...(c.labelBounds ? [{ id: `etiqueta-${c.id}`, box: c.labelBounds }] : []))
-    visibles.push({ id: 'seleccion', box: rendered.bounds }, ...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor-${c.id}`, box: c.bounds }, { id: `etiqueta-${c.id}`, box: c.labelBounds }]))
+    visibles.push({ id: 'seleccion', box: rendered.bounds }, ...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor-${c.id}`, box: c.bounds }, ...(c.labelBounds ? [{ id: `etiqueta-${c.id}`, box: c.labelBounds }] : [])]))
     if (!onObject) elementosSeleccion.push(...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor «${c.label ?? c.id}»`, box: c.bounds, destino: 'dominante' }, ...(c.labelBounds ? [{ id: `etiqueta «${c.label}»`, box: c.labelBounds, destino: 'dominante' }] : [])]))
     // El MARCO de la selección del titular, con media manija por fuera de su línea (tramo 12; auditorías de la cuarta
     // certificación, N1: con los gaps de piezas reales tachaba la entrada y el cierre con el gate en 0).
@@ -1397,14 +1445,14 @@ return k.ink.right - k.ink.left }))
     const cm=resolveCollaborationSelectionIntent(ci);
     const sel=c.seleccion??{};
     const coloresCta=Object.fromEntries((sel.cursores??[]).filter(k=>k.color).map(k=>[k.id,k.color]));
-    const cr=renderCollaborationSelection({manifest:cm,targetBounds:b,canvas:{width:W,height:H},measureLabel,presentation:{localCursorScale:c.cursorScale,collaboratorScale:sel.escala??1.8,participantColors:coloresCta,frame:marcoCta(c)!=='ninguno'}});
+    const cr=renderCollaborationSelection({manifest:cm,targetBounds:b,canvas:{width:W,height:H},measureLabel,presentation:{localCursorScale:c.cursorScale,collaboratorScale:sel.escala??1.8,participantColors:coloresCta,minBracketStrokePx:graphicVoice?Math.ceil(W/ANCHO):0,frame:marcoCta(c)!=='ninguno'}});
 
     ctaMarco=cr.bounds;
     ctaMarcoPintado=marcoCta(c)!=='ninguno'||cm.selection.overlayOpacity>0;
 
     // Corchetes del CTA de texto (tramo 8; auditoría de diseño, N10): el trazo que AXIS dibuja (22 % del manejador, que
     // es el 0,8 % del ancho) medido como se ve en un teléfono, y su contraste contra la escena en las cuatro esquinas.
-    if(marcoCta(c)==='open-brackets'){const hs=Math.max(7,W*0.008),g=hs*0.22,arm=Math.min(cr.bounds.right-cr.bounds.left,cr.bounds.bottom-cr.bounds.top)*0.12;const bb=cr.bounds;
+    if(marcoCta(c)==='open-brackets'){const hs=Math.max(7,W*0.008),g=Math.max(hs*0.22,graphicVoice?Math.ceil(W/ANCHO):0),arm=Math.min(cr.bounds.right-cr.bounds.left,cr.bounds.bottom-cr.bounds.top)*0.12;const bb=cr.bounds;
 
 corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.right-arm,bb.top],[bb.left,bb.bottom-arm],[bb.right-arm,bb.bottom-arm]].map(([x0,y0])=>({left:x0-g,top:y0-g,right:x0+arm+g,bottom:y0+arm+g}))};}
 
@@ -1729,7 +1777,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
 
   if (fueraDeZonaFinal.length) console.warn(`  ⚠ ${s.id}: fuera de la zona segura ${ZE.perfil} de AXIS: ${fueraDeZonaFinal.join(', ')}`)
   // El layout se escribe con la firma incluida y con los elementos que el gate vuelve a verificar.
-  const layoutJson = JSON.stringify({ canvas: { width: W, height: H }, subjectProtection: s.subjectProtection, elements: checks.map(({ id, box }) => ({ id, box })), typography: { ...(s.label ? { label: s.labelSize ?? Math.round(W * 0.024) } : {}), lead: s.lead ? (s.leadSize ?? 70) : s.leadSize, dominant: domSize, closure: s.after ? (s.afterSize ?? 74) : s.afterSize, benefit: s.note ? (s.note.size ?? Math.round(W * 0.026)) : undefined, ...(s.footer ? { footer: s.footer.size } : {}), cta: s.cta.fontSize, descriptor: s.cta.descriptorSize }, selection: selEvidence, maquetacion: { elementos: elementosFinales }, columna: s.align === 'center' ? null : x, ctaMarco, zonaSegura: { ...ZE } }, null, 2)
+  const layoutJson = JSON.stringify({ ...(graphicVoice ? { graphicVoice } : {}), canvas: { width: W, height: H }, subjectProtection: s.subjectProtection, elements: checks.map(({ id, box }) => ({ id, box })), typography: { ...(s.label ? { label: s.labelSize ?? Math.round(W * 0.024) } : {}), lead: s.lead ? (s.leadSize ?? 70) : s.leadSize, dominant: domSize, closure: s.after ? (s.afterSize ?? 74) : s.afterSize, benefit: s.note ? (s.note.size ?? Math.round(W * 0.026)) : undefined, ...(s.footer ? { footer: s.footer.size } : {}), cta: s.cta.fontSize, descriptor: s.cta.descriptorSize }, selection: selEvidence, maquetacion: { elementos: elementosFinales }, columna: s.align === 'center' ? null : x, ctaMarco, zonaSegura: { ...ZE } }, null, 2)
 
   salidas.push([`${s.id}-layout.json`, layoutJson])
   const out = s.final ? sharp(master).resize({ width: s.final[0], height: s.final[1] }) : sharp(master)
@@ -1859,9 +1907,10 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson), alt: sha(`${accesibilidad.altText}\n`) }
   // Pendiente de luz bajo la firma real (tramo 16; octava, F1): el gate la juzga.
   const firmaCanto = firmaReal.length ? +Math.max(...firmaReal.map(f => pendienteBajoCaja(bareRgb, W, H, f.box))).toFixed(2) : null
-  const registro = { id: s.id, canon: opts.canon, firmaCanto, ...(urlQa ? { url: urlQa } : {}), ...(s.marcaEnEscena !== undefined ? { marcaEnEscena: s.marcaEnEscena } : {}), ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(s.selection?.box && opts.mask ? { seleccionSujeto: fraccionSujeto(opts.mask, s.selection.box) } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
+  const registro = { id: s.id, ...(graphicVoice ? { graphicVoice } : {}), canon: opts.canon, firmaCanto, ...(urlQa ? { url: urlQa } : {}), ...(s.marcaEnEscena !== undefined ? { marcaEnEscena: s.marcaEnEscena } : {}), ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(s.selection?.box && opts.mask ? { seleccionSujeto: fraccionSujeto(opts.mask, s.selection.box) } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
+  if (opts.colorPolicy) registro.ctaColorPolicy = opts.colorPolicy
   qa.push(registro)
   registrarQa(registro)
 }
@@ -2003,7 +2052,7 @@ for (let s0 of trabajo) {
   // `variant: "auto"` se resuelve UNA vez, a tamaño original, y queda fija mientras el texto crece: si se volviera a
   // decidir en cada prueba de tamaño, el crecimiento compararía contrastes de variantes distintas.
   // El canon de la pieza: el de su definición en el PLAN (la de `--variantes` es la base, sin sufijo) y su plate.
-  const extra = { canon: canonDe(SLIDES.find(x => x.id === (VARIANTES ? s0.id.replace(/--(text|outline|solid)$/, '') : s0.id)), plateSha), varianteResuelta: null }
+  const extra = { colorPolicy: POLITICAS_COLOR.get(s0.id), canon: canonDe(SLIDES.find(x => x.id === (VARIANTES ? s0.id.replace(/--(text|outline|solid)$/, '') : s0.id)), plateSha), varianteResuelta: null }
 
   if (s0.cta?.variant === 'auto') {
     const r = await probar(scaleSpec(s0, 1, pw), mask, extra)

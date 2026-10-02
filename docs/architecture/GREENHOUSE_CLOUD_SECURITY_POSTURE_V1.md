@@ -2,7 +2,7 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-28
-> **Last updated:** 2026-08-07
+> **Last updated:** 2026-09-28
 > **Audience:** Platform engineers, security reviewers, on-call operators
 > **Companion doc:** `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (resource inventory)
 > **Task track:** TASK-096, TASK-098 through TASK-103 (Cloud Posture Hardening 1–7)
@@ -501,6 +501,21 @@ requireCronAuth(request)
 └── Neither → 401
 ```
 
+#### Guard volumétrico de rutas públicas (Vercel WAF, TASK-1876)
+
+`/api/public/**` no tiene sesión y cada request abre conexión a PostgreSQL (los rate limiters de dominio consultan la base antes de rechazar). ISSUE-174 mostró que una ráfaga de 64 requests concurrentes a un enlace público basta para ocupar la instancia Cloud SQL compartida. El control vive en el **Firewall de Vercel (WAF)**, no en `src/proxy.ts`: un contador en memoria es por instancia, mientras el WAF cuenta global por IP y rechaza antes de invocar la función.
+
+| Aspecto | Estado |
+| --- | --- |
+| Fuente de verdad | `src/lib/security/public-burst-guard/firewall-rules.ts` (reglas versionadas; el estado vivo se sincroniza desde ahí) |
+| Límite | 20 requests / 10 s por IP (`fixed_window`, key `ip`), prefijo `/api/public/` |
+| Regla no productiva | `greenhouse-public-burst-guard-non-production` — `enforce` (429) en todo host que no sea producción |
+| Regla productiva | `greenhouse-public-burst-guard-production` — `observe` (sólo registra) en `greenhouse.efeoncepro.com` y `greenhouse-eo.vercel.app`; pasar a `enforce` es cambiar su `mode` y aplicar |
+| Operación | `pnpm security:public-burst-guard` (plan read-only, exit 2 con drift) · `--apply` (habilita el firewall, inserta/actualiza sólo las reglas del guard y relee; falla si no converge) |
+| Estado vivo (2026-09-28) | reglas aplicadas y sin drift (firewall habilitado); staging/preview en `enforce`, producción en `observe` hasta el cutover (≥ 2026-10-05). Verificado con ráfaga controlada: 20×404 + 10×429 del borde |
+
+No hay env flag: el `mode` por regla es la palanca de rollout. Las reglas ajenas al guard no se tocan. Runbook: `docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md`.
+
 ### 3.4 Database Resilience
 
 | Control         | Before                  | After                                             |
@@ -593,7 +608,7 @@ These are common cloud strategy recommendations that we explicitly choose **not*
 | **Terraform / Pulumi (IaC)**             | ~10 GCP resources, manual provisioning is tractable. IaC overhead > value for 1 developer | Second developer joins, or >25 GCP resources                  |
 | **Kubernetes / GKE**                     | Vercel + Cloud Run solve compute. K8s is a full-time job                                  | Need for long-running background workers or custom networking |
 | **Multiple service accounts per domain** | WIF eliminates the static key problem. Least-privilege SA separation is overhead          | Security audit requires it, or second team/service            |
-| **Cloud Armor WAF**                      | Vercel Edge provides basic DDoS. Cloud Armor needs a GCP load balancer                    | Regulatory requirement, or DDoS incident                      |
+| **Cloud Armor WAF**                      | Vercel Edge provides basic DDoS and the Vercel Firewall (WAF) carries the versioned public-route burst guard (§3.3, TASK-1876). Cloud Armor needs a GCP load balancer | Regulatory requirement, or DDoS incident the Vercel WAF cannot absorb |
 | **Multi-region DR**                      | Audience is Chile + internal team. Latency doesn't justify dual-region                    | SLA commitment >99.9%, or international expansion             |
 | **Redis / external cache**               | Next.js `unstable_cache` + ISR sufficient. Redis is another service to manage             | Cache invalidation becomes a bottleneck at scale              |
 | **OpenTelemetry tracing**                | Monolith → no service-to-service traces needed. Sentry covers errors                      | Decompose into microservices                                  |
@@ -601,7 +616,7 @@ These are common cloud strategy recommendations that we explicitly choose **not*
 | **E2E tests (Playwright)**               | 86 unit tests don't even run in CI yet. Fix that first                                    | Unit tests stable in CI + high regression rate on UI flows    |
 | **GitOps / ArgoCD**                      | No Kubernetes → no GitOps target                                                          | Kubernetes adoption                                           |
 | **PgBouncer**                            | Pool of 15 is sufficient for current load. PgBouncer is ops overhead                      | Connection pool exhaustion under sustained load               |
-| **Global rate limiting**                 | Only auth tokens are rate-limited. API abuse risk is low (internal + authenticated users) | Public API exposure, or abuse incident                        |
+| **Global rate limiting**                 | `/api/public/**` already has a per-IP edge guard in the Vercel WAF (§3.3, TASK-1876); authenticated routes rely on session + domain limiters | Abuse incident on authenticated routes                        |
 
 ---
 

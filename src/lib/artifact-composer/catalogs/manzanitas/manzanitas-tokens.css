@@ -1,0 +1,115 @@
+/**
+ * GENERADO — NO EDITAR A MANO.
+ * Tokens de Marketing con Manzanitas desde @efeoncepro/axis-tokens 0.3.41 (manzanitasRegister),
+ * compilados por `pnpm manzanitas:tokens`. Una plantilla del registro sólo usa estas variables:
+ * un HEX o una familia escrita a mano en el HTML o en manzanitas.css es una regresión.
+ */
+:root {
+  --mcm-navy: #001a33;
+  --mcm-paper: #f7f8f6;
+  --mcm-ink-paper: #023c70;
+  --mcm-ink-navy: #ffffff;
+  --mcm-muted-paper: #6d6777;
+  --mcm-muted-navy: #cfe4fa;
+  --mcm-neutral-paper: #c9d2dc;
+  --mcm-neutral-navy: #cfe4fa;
+  --mcm-neutral-navy-opacity: 0.22;
+  --mcm-ink-on-accent: #001a33;
+  --mcm-logo-ink-paper: #022a4e;
+  --mcm-logo-ink-navy: #ffffff;
+  --mcm-slogan-lead-paper: #6b6b6b;
+  --mcm-slogan-lead-navy: #e2e2e2;
+  --mcm-answer-family: 'Bricolage Grotesque';
+  --mcm-answer-weight: 760;
+  --mcm-answer-tracking: -0.035em;
+  --mcm-answer-width: 96;
+  --mcm-answer-opsz: 88;
+  --mcm-answer-lh: 0.95;
+  --mcm-question-family: 'Poppins';
+  --mcm-question-weight: 300;
+  --mcm-question-lh: 1.25;
+  --mcm-question-of-answer: 0.296875;
+  --mcm-ring-of-question: 0.42;
+  --mcm-ring-gap-of-question: 0.35;
+  --mcm-answer-gap-of-question: 0.25;
+  --mcm-sphere-diameter: 0.2em;
+  --mcm-sphere-gap: 0.03em;
+  --mcm-text-family: 'Poppins';
+  --mcm-swipe-x: 936px;
+  --mcm-swipe-y-cover: 1033px;
+  --mcm-swipe-y-interior: 985px;
+  --mcm-swipe-size: 64px;
+  --mcm-signature-y: 1202px;
+  --mcm-signature-w: 216px;
+  --mcm-signature-h: 51px;
+  --mcm-close-logo-w: 400px;
+  --mcm-accent-min-text-px: 24px;
+  --mcm-close-block-ends-y: 1253px;
+  --mcm-slogan-of-logo: 0.64;
+  --mcm-slogan-gap-of-font: 1.35;
+  --mcm-back-apple-scale: 3.8;
+  --mcm-chart-source-px: 24px;
+  --mcm-chart-voice-top: 842px;
+  --mcm-chart-voice-width: 820px;
+  --mcm-chart-answer-px: 150px;
+  --mcm-question-only-top: 222px;
+  --mcm-question-only-width: 900px;
+  --mcm-question-only-px: 44px;
+  --mcm-question-only-lh: 1.25;
+  --mcm-dense-voice-top: 216px;
+  --mcm-dense-answer-px: 130px;
+  --mcm-concept-paragraph-top: 440px;
+  --mcm-concept-paragraph-px: 32px;
+  --mcm-concept-paragraph-lh: 1.45;
+  --mcm-concept-points-top: 672px;
+  --mcm-concept-points-gap: 22px;
+  --mcm-dense-numeral-px: 56px;
+  --mcm-dense-title-px: 30px;
+  --mcm-dense-body-px: 28px;
+  --mcm-table-top: 440px;
+  --mcm-table-width: 880px;
+  --mcm-table-header-px: 60px;
+  --mcm-table-label-px: 24px;
+  --mcm-table-cell-px: 30px;
+  --mcm-closer-top: 1010px;
+  --mcm-closer-px: 28px;
+  --mcm-closer-width: 820px;
+  --mcm-steps-top: 450px;
+  --mcm-steps-gap: 30px;
+}
+
+.mcm-line-growth {
+  --mcm-accent-paper: #0e8c82;
+  --mcm-accent-navy: #36c8bf;
+  --mcm-slogan-em: 11.586;
+}
+
+.mcm-line-brand {
+  --mcm-accent-paper: #bb1954;
+  --mcm-accent-navy: #ff6500;
+  --mcm-slogan-em: 10.903;
+}
+
+.mcm-line-engine {
+  --mcm-accent-paper: #0375db;
+  --mcm-accent-navy: #0375db;
+  --mcm-slogan-em: 11.263;
+}
+
+.mcm-line-voice {
+  --mcm-accent-paper: #f83902;
+  --mcm-accent-navy: #f83902;
+  --mcm-slogan-em: 10.641;
+}
+
+.mcm-line-revenue-hubspot {
+  --mcm-accent-paper: #8e1b82;
+  --mcm-accent-navy: #e86bd0;
+  --mcm-slogan-em: 12.278;
+}
+
+.mcm-line-revenue-salesforce {
+  --mcm-accent-paper: #00739e;
+  --mcm-accent-navy: #2fb8ff;
+  --mcm-slogan-em: 12.278;
+}

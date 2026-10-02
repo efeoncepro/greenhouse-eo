@@ -185,10 +185,12 @@ import { getAuthServerSignals } from './queries/auth-server-signals'
 import { getInsightsEditionSignals } from './queries/insights-edition-signals'
 import { getInsightsRenderOrphanedSignal } from './queries/insights-render-orphaned'
 import { getInsightsDeliveryAmbiguousSignal } from './queries/insights-delivery-ambiguous'
+import { getBrandRenderStuckSignal } from './queries/brand-render-stuck'
 import { getGlobeCreditFundingStaleProposalsSignal } from './queries/globe-credit-funding-stale-proposals'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
 import { getGrowthAiVisibilityArchetypeCoverageSignals } from './queries/growth-ai-visibility-archetype-coverage-signals'
+import { getGrowthAiVisibilityMarketSignals } from './queries/growth-ai-visibility-market-signals'
 import { getGrowthAiVisibilityCategorySignals } from './queries/growth-ai-visibility-category-signals'
 import { getGrowthAiVisibilityBusinessModelSignals } from './queries/growth-ai-visibility-business-model-signals'
 import { getGrowthAiVisibilityProbeSignals } from './queries/growth-ai-visibility-probe-signals'
@@ -707,12 +709,15 @@ interface ReliabilityOverviewSources {
   insightsRenderOrphanedSignal?: ReliabilitySignal | null
   /** TASK-1848 — insights.delivery.ambiguous: destinatarios con resultado de correo desconocido (steady 0). */
   insightsDeliveryAmbiguousSignal?: ReliabilitySignal | null
+  /** TASK-1921 — brand.render.stuck_job: piezas de marca en cola o en proceso que nadie drena (steady 0). */
+  brandRenderStuckSignal?: ReliabilitySignal | null
   globeCreditFundingStaleProposals?: ReliabilitySignal | null
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
   growthAiVisibilityProbe?: ReliabilitySignal[] | null
   growthAiVisibilityArchetypeCoverage?: ReliabilitySignal[] | null
   growthAiVisibilityCategory?: ReliabilitySignal[] | null
+  growthAiVisibilityMarkets?: ReliabilitySignal[] | null
   growthAiVisibilityBusinessModel?: ReliabilitySignal[] | null
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
   growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
@@ -1199,6 +1204,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityProbe ?? []),
     ...(sources.growthAiVisibilityArchetypeCoverage ?? []),
     ...(sources.growthAiVisibilityCategory ?? []),
+    ...(sources.growthAiVisibilityMarkets ?? []),
     ...(sources.growthAiVisibilityBusinessModel ?? []),
     ...(sources.growthAiVisibilityPublicIntake ?? []),
     ...(sources.growthAiVisibilityPublicDelivery ?? []),
@@ -1302,6 +1308,7 @@ export const buildReliabilityOverview = (
     // TASK-1846 — Efeonce Insights: outputs de render huérfanos.
     ...(sources.insightsRenderOrphanedSignal ? [sources.insightsRenderOrphanedSignal] : []),
     ...(sources.insightsDeliveryAmbiguousSignal ? [sources.insightsDeliveryAmbiguousSignal] : []),
+    ...(sources.brandRenderStuckSignal ? [sources.brandRenderStuckSignal] : []),
     ...(sources.globeCreditFundingStaleProposals ? [sources.globeCreditFundingStaleProposals] : []),
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
@@ -1662,6 +1669,11 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityArchetypeCoverage !== undefined
       ? preloadedSources.growthAiVisibilityArchetypeCoverage
       : await getGrowthAiVisibilityArchetypeCoverageSignals().catch(() => null)
+
+  const growthAiVisibilityMarkets =
+    preloadedSources.growthAiVisibilityMarkets !== undefined
+      ? preloadedSources.growthAiVisibilityMarkets
+      : await getGrowthAiVisibilityMarketSignals().catch(() => null)
 
   const growthAiVisibilityCategory =
     preloadedSources.growthAiVisibilityCategory !== undefined
@@ -2028,6 +2040,12 @@ export const getReliabilityOverview = async (
     preloadedSources.insightsDeliveryAmbiguousSignal !== undefined
       ? preloadedSources.insightsDeliveryAmbiguousSignal
       : await getInsightsDeliveryAmbiguousSignal().catch(() => null)
+
+  // TASK-1921 — una pieza de marca que nadie drena no avisa sola: la señal es la que lo dice.
+  const brandRenderStuckSignal =
+    preloadedSources.brandRenderStuckSignal !== undefined
+      ? preloadedSources.brandRenderStuckSignal
+      : await getBrandRenderStuckSignal().catch(() => null)
 
   // TASK-1566 — propuestas de fondeo de Globe sin confirmar. Steady=0: un valor > 0 es una decision
   // humana pendiente, no un fallo del sistema, y por eso escala por ANTIGUEDAD y no por cantidad.
@@ -2983,6 +3001,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityProbe,
     growthAiVisibilityArchetypeCoverage,
     growthAiVisibilityCategory,
+    growthAiVisibilityMarkets,
     growthAiVisibilityBusinessModel,
     growthAiVisibilityPublicIntake,
     growthAiVisibilityPublicDelivery,
@@ -3038,6 +3057,7 @@ export const getReliabilityOverview = async (
     insightsEditionSignals,
     insightsRenderOrphanedSignal,
     insightsDeliveryAmbiguousSignal,
+    brandRenderStuckSignal,
     globeCreditFundingStaleProposals,
     knowledgeQuarantineCount,
     assetScanOpenQuarantine,

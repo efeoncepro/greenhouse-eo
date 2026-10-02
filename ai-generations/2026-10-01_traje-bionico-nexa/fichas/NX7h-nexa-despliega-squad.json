@@ -1,0 +1,42 @@
+{
+  "id": "NX7h-nexa-despliega-squad",
+  "formato": "16:9",
+  "registro": "cine",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "conviccion"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "suspendido": "four streams of azure light frozen mid-air as they leave the core on her palm and fly back into the depth of the hangar, fine glowing particles hanging still along them",
+  "objetos": [
+    {
+      "objeto": "traje-bionico-nexa"
+    },
+    {
+      "objeto": "lentes-bionicos-nexa"
+    },
+    {
+      "objeto": "spark-reportes",
+      "vista": "cine"
+    },
+    {
+      "objeto": "spark-investigacion",
+      "vista": "cine"
+    }
+  ],
+  "escena": "SCENE (cinematic, Hollywood blockbuster still with real depth of field, the instant a leader deploys her squad inside a vast dark hangar at night): Nexa stands well to the RIGHT of the frame, her face centred at about 70% of the frame width, framed from the waist up, a heroic medium shot. Her LEFT hand (on the right side of the frame) is raised palm up at chest height, about thirty centimetres in front of her face, and on her palm burns a FIST-SIZED CORE of azure-white light, the brightest thing in the frame. From the core, four streams of azure light fly away from her, back and to the right into the depth of the hangar. LIGHT: the core is the only key light on her: hard, from below and to the right, so the right side of her face, her glasses, her raised hand and the white plates of her shoulder and chest glow azure, while the far side of her face falls into deep shadow with the nose shadow legible on her cheek. NO fill light, NO front light. A low cool rim light from behind outlines her hair and shoulder. REALISTIC ADULT PROPORTIONS: the camera is about two meters away at chest height with an 85mm lens at f/1.8, nothing foreshortened, she does not lean toward the lens; her head is about one quarter of the frame height, her shoulders clearly wider than two head-widths. Her head stays almost frontal, both eyes and both eyebrows visible, and she looks straight into the lens through her clear glasses with the quiet conviction of her expression reference, razor-thin focus on her eyes. She wears the bionic suit exactly as in its reference, WITH the small navy Efeonce isotype inlaid on her chest plate on her left side exactly as in the reference and the macro (no other logo, no lettering), the bionic glasses exactly as in their reference, small silver earrings, NO watch, NO bracelet, NO ring. THE SPARKS, copied EXACTLY from their two references, each smaller than her head, all above her waist, never arranged in a symmetric arc: the Reports Spark hovers just above the core on her palm, sharp, lit from below by the core, its bar-chart model glowing, pointing at the tallest bar; the Research Spark is PERCHED ON HER RIGHT SHOULDER (on the left side of her body in the frame), one small hand resting on her shoulder plate, holding its magnifying glass to its side and peering toward the core, half in her shadow, sharp. Both Sparks are lit only by the scene light and obey the same depth of field as everything else, never a clean product shot. FAR AWAY in the haze, four to six meters behind her on the right, at unequal heights and distances, EXACTLY THREE more Sparks (so the whole frame holds FIVE Sparks in total, never more), the same figures as the two Spark references, small in frame and clearly OUT OF FOCUS, reduced to soft shapes whose azure LED eyes read as glowing dots, each catching the end of one stream; one of them is partly hidden behind her head. Further back, a long row of large round cold practical lights hangs across the hangar, melted into big soft bokeh discs. Thin haze catches the streams and the core. GEOGRAPHY: the Research Spark on her right shoulder is the leftmost lit element of the whole frame and sits just right of the centre of the frame; nothing lit, no Spark, no stream and no part of her body appears to the left of it. The LEFT half of the frame is calm, dark, empty hangar space with soft haze, no objects, no streams, no Sparks, no people. Rich contrast, deep navy blacks, awe-inspiring. No logos of any other brand, no readable text.",
+  "lecho": {
+    "objeto": "the edge of a launch console in deep NON-REFLECTIVE matte black rubber, the lens only a few centimetres behind it, filling the bottom sixth of the frame across its whole width, completely out of focus, far outside the reach of the light of the core, catching no reflection and no highlight at all",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, dark, empty hangar space on the left half",
+      "tinta": "blanca"
+    }
+  }
+}

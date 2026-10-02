@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el diagnóstico con su veredicto</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-diagnosis-verdict` (surface deck, tema oscuro, TASK-1942). «¿Qué recibes primero? Una decisión.»:
+      el diagnóstico como informe en papel, en perspectiva sobre la plataforma de luz; cabecera con el ícono Trazo
+      «informe», título, bajada y la píldora de muestra; cinco módulos numerados en dos columnas — mapa, veredicto,
+      riesgos, registro y roadmap. Cada módulo es un ítem y trae sólo su cuerpo. La selección «Cliente» toma las olas.
+      Referencia: DeckSalesforceDiagnostico (SF5-diagnostico-decision).
+    -->
+    <main class="gl-slide gl-ls gl-ddv" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <section class="gl-ls-doc gl-ddv-report">
+        <header class="gl-ddv-head">
+          <div class="gl-ddv-head-main" data-slot="report">
+            <span class="gl-ddv-icon-box"><img class="gl-ddv-icon" data-slot-field="icon" alt="" /></span>
+            <span>
+              <span class="gl-ddv-title" data-slot-field="title">Diagnóstico de valor y arquitectura</span>
+              <span class="gl-ddv-subtitle" data-slot-field="subtitle">Salesforce · estado actual, encaje y roadmap</span>
+            </span>
+          </div>
+          <span class="gl-ddv-mark" data-slot="sampleMark">Datos de muestra</span>
+        </header>
+
+        <ol class="gl-ddv-grid">
+          <li class="gl-ddv-module" data-slot="moduleState">
+            <p class="gl-ddv-kicker" data-slot-field="kicker">01 · Estado actual</p>
+            <p class="gl-ddv-module-title" data-slot-field="title">Mapa de tu operación</p>
+            <ul class="gl-ddv-nodes" data-slot-field="nodes">
+              <li class="gl-ddv-node"><span data-slot-field="text">Ventas</span></li>
+            </ul>
+            <p class="gl-ddv-footnote" data-slot-field="footnote">14 integraciones · 3 sin dueño</p>
+          </li>
+          <li class="gl-ddv-module" data-slot="moduleVerdict">
+            <p class="gl-ddv-kicker" data-slot-field="kicker">02 · Veredicto</p>
+            <p class="gl-ddv-module-title" data-slot-field="title">Encaje de la plataforma</p>
+            <ol class="gl-ddv-options" data-slot-field="options">
+              <li class="gl-ddv-option"><span data-slot-field="text">Fit condicionado</span></li>
+            </ol>
+            <p class="gl-ddv-condition" data-slot-field="condition">Condición: resolver identidad y consentimiento antes de canales</p>
+          </li>
+          <li class="gl-ddv-module" data-slot="moduleRisks">
+            <p class="gl-ddv-kicker" data-slot-field="kicker">03 · Riesgos</p>
+            <p class="gl-ddv-module-title" data-slot-field="title">Lo que hoy frena</p>
+            <ul class="gl-ddv-risks" data-slot-field="risks">
+              <li class="gl-ddv-risk"><img class="gl-ddv-risk-icon" data-slot-field="icon" alt="" /><span data-slot-field="text">Duplicados en cuentas</span></li>
+            </ul>
+          </li>
+          <li class="gl-ddv-module" data-slot="moduleRecord">
+            <p class="gl-ddv-kicker" data-slot-field="kicker">04 · Evidencia</p>
+            <p class="gl-ddv-module-title" data-slot-field="title">Registro verificable</p>
+            <p class="gl-ddv-record" data-slot-field="record">Cada hallazgo con su fuente: la org, los datos y las entrevistas con tu equipo.</p>
+          </li>
+          <li class="gl-ddv-module" data-slot="moduleRoadmap">
+            <p class="gl-ddv-kicker" data-slot-field="kicker">05 · Roadmap</p>
+            <p class="gl-ddv-module-title" data-slot-field="title">Plan por olas</p>
+            <ol class="gl-ddv-waves" data-slot-field="waves" data-gl-selection-target>
+              <li class="gl-ddv-wave">
+                <span class="gl-ddv-wave-name" data-slot-field="name">Ola 1</span>
+                <span class="gl-ddv-wave-title" data-slot-field="title">Datos y consentimiento</span>
+                <span class="gl-ddv-wave-kicker" data-slot-field="kicker">Base</span>
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Lo que recibes primero</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Qué recibes primero?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Una</span><span data-slot-field="answer">decisión</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Una decisión informada, con <strong>evidencia</strong>, no una recomendación por defecto.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+Firma de correo Efeonce — cómo instalarla en Outlook
+
+La forma más fácil: abre la página, aprieta «Copiar mi firma» y pégala en Outlook.
+https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1/instalar/daniela-ferreira.html
+
+En Outlook: Configuración → Cuentas → Firmas → Nueva firma. Pega (Cmd+V en Mac o Ctrl+V en Windows), guarda y
+elígela para «Mensajes nuevos». En la misma página, «Copiar firma para respuestas» da la versión corta para
+«Respuestas y reenvíos».
+
+Hay dos versiones: fondo blanco (se adapta al modo oscuro de Outlook) y fondo navy. Los archivos .html de esta
+carpeta son las mismas firmas, por si prefieres abrirlos en el navegador y copiar desde ahí.
+
+No agregues «Saludos» ni «Quedo atento» a la firma: eso va en el cuerpo del correo.
+La foto, el eslogan y los logos se cargan desde internet; si Outlook pregunta, permite descargar imágenes.

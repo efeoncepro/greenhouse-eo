@@ -98,6 +98,16 @@ conserva PKCE, callbacks, anti-SSRF, auth method y allowlist de scopes. Canon: c
 
 ## ChatGPT, Codex y superficie
 
+DevDay 2026-09-29: las [plugin extensions](https://developers.openai.com/plugins/build/extensions) pueden abrir sidebar,
+paneles y file viewers; no sustituyen el dispatch MCP ni el OAuth. [MCP Events](https://developers.openai.com/plugins/build/mcp-events)
+requiere MCP 2.0 `2026-07-28`, `events/subscribe` y callback HTTPS firmado; no se certifica con un `tools/list`.
+TASK-1904 U21 debe construirlo para ChatGPT y Claude, con storage durable, callback verificado,
+firma Standard Webhooks, filtros, refresh, baja, revocación, duplicados y efecto autorizado. El SDK
+v2 instalado no demuestra el protocolo. Claude Code documenta negociación v2 y `list_changed`,
+pero no acredita `events/subscribe` nativo: certificar cada host o documentar y probar el adaptador
+Efeonce decidido por ADR, sin presentar `list_changed` como evento de negocio. El [inventario fechado](../../../../docs/audits/platform/OPENAI_DEVDAY_2026_09_29_LAUNCH_INVENTORY.md)
+separa disponibilidad pública de certificación Efeonce.
+
 - El gateway `efeonce-mcp` `1.4.0` fija `@modelcontextprotocol/server`, `node` y `fastify` `2.0.0`; el registro
   npm seguía publicando `2.0.0` como latest al 2026-09-10. No usa el SDK monolítico v1 en mantenimiento ni está
   atrasado frente a esos paquetes oficiales.

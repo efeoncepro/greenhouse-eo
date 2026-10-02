@@ -1,0 +1,23 @@
+{
+  "document": "pitch",
+  "slides": [
+    {
+      "recipeId": "cover-classic"
+    },
+    {
+      "recipeId": "content-measure"
+    },
+    {
+      "recipeId": "decision-case"
+    },
+    {
+      "recipeId": "content-bullets"
+    },
+    {
+      "recipeId": "decision-why-us"
+    },
+    {
+      "recipeId": "close-classic"
+    }
+  ]
+}

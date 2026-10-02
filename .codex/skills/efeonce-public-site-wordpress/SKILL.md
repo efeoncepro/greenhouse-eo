@@ -5,6 +5,8 @@ description: Operate and update the Efeonce public WordPress site safely. Use fo
 
 # Efeonce Public Site WordPress
 
+> **Nomenclatura pública AEO:** presentar la capacidad como **Efeonce AEO**, su diagnóstico como **Efeonce AEO Assessment** y el entregable como **Efeonce AI Visibility Report**. `AI Visibility Grader` en documentos y rutas es alias técnico/histórico; **Search Visibility 360** es la oferta SEO + AEO amplia. Esta decisión de naming no cambia URLs, formularios ni contratos de runtime por sí sola. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
 > **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema. Para Pillars, cargar también `PDR-018`: Think como producto editorial no equivale al host `think.efeoncepro.com`.
 
 This skill is a **router**, not the full memory store. Keep this file short.
@@ -45,6 +47,8 @@ Read the minimal set:
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
 | Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |
+| Glitch post visuals: `efeoncepro/glitch-drop` callout, Glitch banners, post layout | `references/content-factory-gutenberg.md` (spec `kind: 'glitchDrop'` in §Extensión de GutenbergArticleSpec, implemented 2026-09-28, with `embed.caption`, `table.style: 'stripes'` and governed `buttons` + §Inventario live y brecha; the marker recipe is historical/fallback) + `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §6. Blog **approved 2026-09-27** (banners 16:9/1:1, news banner with mandatory credit, opening, rundown, callout «DROP» v2, subscription banner, closing). Live runtime still serves callout **v1** (plugin v0.1.0): v2 needs a plugin update before it ships; opening/rundown/subscription/«El hilo» have no block or style yet |
+| Gutenberg blocks/styles available vs. what Content Factory can emit | `references/content-factory-gutenberg.md` §Inventario live y brecha + §Propuesta de extensión |
 | Pillar Experience, cluster map or post-vs-page/Think placement | `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md` + `references/content-factory-gutenberg.md`; add `references/landing-workflow.md` only if Elementor composition is actually chosen |
 | Agentic blogpost from governed write through human publication and live QA | `references/agentic-blogpost-end-to-end.md` |
 | Category hierarchy, published-post permalink or Yoast redirect migration | `references/taxonomy-permalink-migrations.md` + `references/agentic-blogpost-end-to-end.md` |
@@ -63,6 +67,14 @@ Read the minimal set:
 | Content Marketing / Content Ops `/servicio-marketing-de-contenidos/` | `references/landings/content-marketing.md` + `references/source-led-elementor-patterns.md` |
 
 If several domains apply, load the smallest union. Do not preload every reference.
+
+### Dónde viven los archivos de `ai-generations/`
+
+Los paquetes fuente citados en `references/landings/*` (`ai-generations/...`: keyframes, scripts, masters) son rutas
+**lógicas**: local, canon `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) o archivo
+`gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador). Antes de re-renderizar o re-codificar desde uno
+que no está en disco: `pnpm ai-gen:where <ruta>` → `pnpm ai-gen:pull <carpeta>`; **NUNCA** regenerar ni aproximar un
+asset aprobado porque falta, ni archivar/borrar a mano. Los assets públicos del runtime WP no cambian. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## Canonical Docs
 

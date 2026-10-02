@@ -6,7 +6,8 @@
 > [`garment-reference-kit.md`](garment-reference-kit.md); §1.d es su resumen operativo.
 
 Fuente de verdad: [`ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md`](../../../../ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md)
-(aprobado por el operador 2026-09-17). Bitácora:
+(aprobado por el operador 2026-09-17; el LEEME está en git, los PNG del kit son canon sellado: si no están en disco,
+`pnpm ai-gen:pull ai-generations/2026-09-17_efeonce-logo-3d`). Bitácora:
 [`docs/operations/social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md`](../../../../docs/operations/social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md).
 
 ## Cuándo usarlo
@@ -144,7 +145,7 @@ forma y el bloque STYLE de la serie (`brief/style.txt`) fija el acabado.
   sobre una estructura de cartel en una azotea con helipuerto (c09, contraportada).
 - **Referencias:** `Blanco/Monumental/efeonce-logo-3d-blanco-monumental-01-frente-nivel-calle-luz-<izq|der>-transparente.png`
   o `…-02-contrapicado-frente-luz-<izq|der>-transparente.png` como imagen 1 + `ai-generations/2026-09-17_efeonce-logo-3d/ref/logo-silueta.png`
-  como imagen 2 (el emblema es lo frágil, §1.c). Contrato del §3 al inicio del prompt, sin variar.
+  (`pnpm ai-gen:pull` si falta) como imagen 2 (el emblema es lo frágil, §1.c). Contrato del §3 al inicio del prompt, sin variar.
   `gpt-image-2.5-sunburst`, 1152×1440, `high`.
 - **El layout va en el prompt, con porcentajes.** Sin él: **s3 v1** cortó el logo contra el borde del cuadro y
   **s3 v2** lo subió tanto que no quedó cielo para el titular. **s3 v3** (aprobada) llevó la regla estricta:
@@ -207,7 +208,8 @@ devuelven **3 canales**; sin `.toColourspace('b-w')` el índice se corre y la m�
 decir *todo editable*, sin ningún error visible. Por eso el conteo de píxeles protegidos de arriba es obligatorio
 **antes** de llamar al modelo: una máscara rota se ve igual de bien en el visor y se paga igual.
 
-Herramientas de la corrida (en `ai-generations/2026-09-17_efeonce-logo-3d/prueba/`): `preparar-mascara.mjs` (base +
+Herramientas de la corrida (en `ai-generations/2026-09-17_efeonce-logo-3d/prueba/`; si sus insumos no están en disco,
+`pnpm ai-gen:pull`): `preparar-mascara.mjs` (base +
 máscara de halo, `HALO` por variable de entorno) · `componer-escritorio.mjs` (composición determinística, sólo
 respaldo) · `reanclar.mjs` (re-anclar el render sobre la salida: **descartado**, reintroduce el aspecto pegado y
 los fringes).
@@ -266,6 +268,9 @@ relativas al centro real del objeto, incluida su elevación. Blanco calibrado po
 entorno hasta que la cara lea blanco sin perder los costados.
 
 ## 8. Reproducir
+
+Scripts y JSON en git; renders y kit pueden estar en archivo o canon: antes,
+`pnpm ai-gen:pull ai-generations/2026-09-17_efeonce-logo-3d`.
 
 ```bash
 cd ai-generations/2026-09-17_efeonce-logo-3d

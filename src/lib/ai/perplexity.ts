@@ -67,6 +67,7 @@ const normalizeCitations = (raw: unknown): Array<{ url: string; title: string | 
 /** Ejecuta un prompt contra Perplexity Sonar (search-grounded). No lanza por HTTP no-ok. */
 export const runPerplexitySearch = async (input: {
   prompt: string
+  countryCode?: string
   model?: string
   timeoutMs?: number
 }): Promise<PerplexitySearchResult> => {
@@ -83,7 +84,11 @@ export const runPerplexitySearch = async (input: {
         Authorization: `Bearer ${apiKey.value}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ model, messages: [{ role: 'user', content: input.prompt }] }),
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: input.prompt }],
+        ...(input.countryCode ? { web_search_options: { user_location: { country: input.countryCode } } } : {})
+      }),
       signal: controller.signal
     })
 

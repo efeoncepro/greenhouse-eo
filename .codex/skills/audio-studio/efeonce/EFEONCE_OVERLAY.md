@@ -21,11 +21,99 @@ Nexa) o un cliente Globe. Para audio genérico basta `../modules/`.
 
 - **Efeonce ≠ Greenhouse.** Greenhouse es el portal operativo interno (los clientes NO lo ven).
   Todo lo público/audio es **marca Efeonce** (agencia). SSOT: `src/config/efeonce-brand.ts`.
-- **Sonic identity de Efeonce:** si Efeonce define un audio logo/mnemonic, se diseña como **sistema**
-  (`../modules/05`) alineado a los mismos atributos que la identidad visual (coordinar con `design-studio`).
+- **Sonic identity de Efeonce:** ver la sección «Identidad sonora de Efeonce» abajo (recomendada, NO canon).
 - **Voz de Nexa:** `audio-studio` produce el **asset de voz** de Nexa (TTS/persona sonora — timbre, tono,
   idioma, audio tags), pero la **integración en producto** (chat, RAG, providers, elección de voz en runtime)
   es de `greenhouse-nexa-conversational`. Coordina; no invadas su runtime.
+
+## Identidad sonora de Efeonce (recomendada 2026-09-26)
+
+> **Estado: recomendada, NO canon** (el operador: «vamos con tu recomendación»). Doc canónico:
+> [`EFEONCE_SONIC_IDENTITY_V1.md`](../../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md).
+> Todo se produce en casa, sin músico ni compositor humano (motor propio + ElevenLabs + Stable Audio vía fal).
+
+- **Concepto «Tres puntos que se vuelven uno»:** la gramática de La órbita en sonido. Anillo = acorde abierto
+  de quinta (pregunta) · tres ventanas de la nave = tres notas breves en Mi · esfera = La con el **único golpe**
+  (la respuesta) · halo = el acorde de La mayor florece y se apaga. Territorio elegido: «Puntos suspensivos».
+- **Motivo:** Mi5 · Mi5 · Mi5 → La5 (MIDI 76 76 76 81), notas de 140 ms, pausa de 370 ms, La mayor (la del motion V1.1).
+- **Dos registros, mismo ADN:** **fondo** (96 BPM, sereno, síntesis propia determinística; la esfera responde
+  siempre La mientras la armonía cambia) y **energía** (120 BPM, rock; maqueta propia re-grabada con Stable
+  Audio 2.5 a intensidad 0,7 + la esfera propia encima). NUNCA cambiar de registro dentro de una pieza ni
+  poner energía debajo de una locución; el fondo va ~15 dB bajo la voz.
+- **Acento por línea = timbre de la esfera:** Growth campana · Brand marimba · Engine FM · Voice eco · Revenue
+  campana grave (Revenue HubSpot y Salesforce comparten). La melodía y su pausa no cambian nunca.
+- **Voz:** Brian (ElevenLabs v3, ID `nPczCjzI2devNBz1zQrb`, nunca por nombre fuera de fal), «Empower your <Línea>.», inglés nunca traducido; la palabra final cae con la
+  esfera; pausa «Empower»→«your» igualada a 0,14 s. NUNCA otra voz para el eslogan.
+- **Reglas clave:** un solo golpe por pieza y sin comprimirlo; nivelar por destino (−14 LUFS video/redes,
+  −16 podcast, pico −1 dBFS); usar los archivos del kit, no regenerar. NUNCA en clientes ni en la UI de
+  Greenhouse; la pantalla de recepción va sin sonido.
+- **Dónde vive:** página AXIS `https://axis.efeonce.org/references/sonic-brand/` y JSON para agentes
+  `https://axis.efeonce.org/references/sonic-brand.json` (esquema `axis.efeonce-sonic-brand.v1`; se publican
+  publicado 2026-09-26, PR AXIS #4 squash `55486aa`) · bucket `gs://efeonce-group-axis-public-media/sonic/v1/` (`masters/` + `web/`) ·
+  producción en Greenhouse `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/`, `entrega/`, `guia/`;
+  scripts y `.md` en git, los WAV de `entrega/` pueden estar en archivo: `pnpm ai-gen:pull ai-generations/2026-09-26_branding-sonoro/entrega`).
+- **Pendiente para canonizar:** licencias (Stable Audio vía
+  fal; voz ElevenLabs) · prueba de reconocimiento sin logo antes de pautar · tokens AXIS + reemplazo del
+  sonido de los masters V1.1. Glitch ya no es pendiente de esta identidad: tiene su diseño sonoro propio, aprobado (B),
+  sólo de Glitch (ver §Glitch abajo); esta identidad sigue «recomendada».
+
+## Glitch (sólo Glitch, APROBADO versión B — 2026-09-27)
+
+> **No es parte de la identidad sonora de Efeonce.** Glitch (el magazine semanal) tiene un diseño sonoro propio en
+> **APROBADO, versión B** (2026-09-27): «el sonido de Efeonce, con un bug» — Mi · Mi · Mi (el tercero se rompe en bytes) → La (la manzana,
+> el único golpe grave). Nunca en piezas de Efeonce, su familia ni clientes; nunca mezclado con el kit de arriba.
+> Canon: norma de Glitch [`GLITCH_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
+> §13.11; operativo en `efeonce-graphic-line` → `references/glitch.md` §13.
+
+- **Reglas clave:** afinado en La mayor; el sonido de la ronda 6 es diseño sonoro, no música (la música aprobada
+  va aparte, ver **Música** abajo); sin whooshes, subidas de tráiler ni chiptune (el
+  corte es silencio digital en seco); un golpe grave por aparición de la manzana y el golpe sin comprimir; **la falla
+  nunca sobre la voz del host** y ninguna transición suena hacia o desde la toma del host; la firma de Efeonce muda.
+- **Qué hay:** un WAV sidecar por cada `.mov` del motion (mismo nombre y duración; las transiciones con pista por
+  formato), en la versión **B** (más punch), la aprobada; la A (contenida) queda como alternativa descartada. Motor
+  determinístico migrado al taller `efeonce-brand-workshop` (commit `2d411b8`): `tools/glitch-motion/src/sound.mjs`
+  sobre `tools/brand-sound`; regenerar = correr el mismo comando de `glitch-motion` (la copia
+  `motor/glitch-sfx.mjs` queda como histórico; ver `STUDIO_TOOLING.md`); archivos por URL + SHA-256 desde
+  `https://axis.efeonce.org/references/glitch.json` (campo `sound`), en el bucket
+  `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (sólo la B: `masters/` y `web/`); entrega al editor en
+  OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/sonido-propuesta/b/` (la carpeta conserva su nombre).
+- **Estado:** **aprobado, versión B** (2026-09-27): «La b me encanta más. Sus sonidos están aprobados». Quedaron
+  resueltas las cuatro decisiones: B; dos golpes graves (apertura y Drop); ~~voz sola bajo las noticias~~ (**reemplazada
+  el 2026-09-27** por la cama post-punk, ver abajo); el clic del micrófono y el trazo del plumón sintetizados se quedan. Observación no bloqueante: en B, el golpe del cuadro 74 de la
+  tarjeta final queda más tapado que en A.
+- **Música (APROBADA 2026-09-27, sólo Glitch):** tema B, irreverente y desafiante (big beat de banda: breakbeat, bajo
+  saturado con Mi · Mi · Mi → La, quintas sucias; 150 BPM amarrados al motion, una semicorchea = 3 cuadros a 30 fps):
+  intro con pre-roll, cortina entre noticias (corta en seco en 1,6 s, cae con la cabecera siguiente) y salida, en
+  versión vlog (−14 LUFS) y podcast (−16); y **cama post-punk** en bucle de 19,2 s bajo el relato de cada noticia
+  («Post-punk definitivamente»). Cama: 15 dB bajo la voz, ducking por sidechain (umbral 0,05, 3:1, 15 ms / 350 ms),
+  **sin recortar medios**, nunca bajo el Drop ni la tarjeta final. **Fuera de las noticias, la voz del host va sola:**
+  la cama no va bajo el cierre sobre el host ni bajo ninguna toma del host fuera del relato de una noticia (marca «el
+  tiempo de la noticia»). Lección medida: lo «arcade» es falta de medios
+  (13 % en la cama rechazada contra 45 % en la intro y 38 % en la cama aprobada); nunca síntesis pura para la música de
+  Glitch. Másteres por URL + sha256 en `gs://efeonce-group-axis-public-media/glitch/music/v1/` (con `index.json`);
+  **nunca se regeneran**: un cambio es una ronda nueva aprobada por el operador. Detalle, tabla de sha256, producción y
+  argumentos: `efeonce-graphic-line` → `references/glitch.md` §13.7; canon: norma §13.12 «Música — sólo Glitch».
+- **Producción y entrega (en el taller, 2026-09-27):** sonido B y música se producen y entregan **con el motion**, en
+  el repo taller `efeoncepro/efeonce-brand-workshop` (`main` = `ed89a0b`): `tools/glitch-motion/src/sound.mjs` sobre
+  `tools/brand-sound` (síntesis propia, determinista, byte a byte) y `src/music.mjs`, que **baja los siete másteres por
+  URL y verifica su sha256 fijado en el código** (falla cerrado si el bucket cambia; nunca regenera). Desde
+  `greenhouse-eo`: `pnpm -C ../efeonce-brand-workshop --filter glitch-motion <render|kit|transiciones|heroe|sonido>`
+  con `--sound b|a|off` (`b` por defecto) y `--music on|off` (`on` por defecto); comandos y argumentos completos en la
+  norma de Glitch §13.13. Con música, la intro (pre-roll + apertura) y la salida (con la tarjeta final) **reemplazan**
+  a `apertura.wav`/`cierre.wav`: nunca se sueltan ambos (sonaría doble). El reel usa los másteres de vlog. En el
+  animatic no hay voz: la cama va a −13 dB y el ducking lo aplica el editor. Nunca sonorices una pieza de Glitch a mano
+  ni con el kit sonoro de Efeonce: separación total.
+  - Música integrada en los commits `2c8f36c` y `ed89a0b` del taller; el **pre-roll animado de la intro** lo eligió el
+    operador; `kit` entrega cama y cortina y mezcla el animatic de 48,4 s.
+  - **En producción en AXIS** (PR #10, `87c3298`): `https://axis.efeonce.org/references/glitch/#musica` y
+    `/references/glitch.json` → `music` (17 archivos con URL y sha256); `/references/sonic-brand/` enlaza a ella.
+  - **Por qué, en corto:** banda real y no síntesis (tres rondas de síntesis sonaron a videojuego); 150 BPM porque una
+    semicorchea = 3 cuadros y todo golpe del motion cae en la grilla; cortes y tartamudeo aplicados después sobre la
+    grabación (el modelo difumina la falla); espacio para la voz por ducking, no por EQ (el recorte volvió arcade la
+    primera cama); 15 dB bajo la voz es valor sólo de Glitch (cama con actitud; el 18–20 dB genérico es para camas
+    neutras).
+  - **Único pendiente:** probar la mezcla con la voz real del host en una edición real (la demo usa una voz TTS
+    provisional); el ducking lo aplica el editor.
 
 ## Ecosistema digital (SSOT: `docs/public-site/decisions/PDR-003`)
 

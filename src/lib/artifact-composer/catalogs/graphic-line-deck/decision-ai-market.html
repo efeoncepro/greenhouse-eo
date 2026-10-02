@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el contexto de mercado</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-ai-market` (surface deck, tema oscuro, TASK-1934). «¿Dónde busca tu cliente? En la IA.»: tres
+      monolitos de vidrio en perspectiva sobre la plataforma de luz, una cifra por fuente; el del centro, adelante. Cada
+      monolito imprime su fuente al pie (el logo del tercero en un tono, o el wordmark) con el año. La voz «viva» a la
+      izquierda y la burbuja URL en luminosidad al pie. Referencia: DeckMercadoIA (MX2-mercado).
+    -->
+    <main class="gl-slide gl-am" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-am-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-layer gl-am-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-am-monoliths" data-slot="figures">
+        <li class="gl-am-monolith">
+          <p class="gl-am-value" data-slot-field="value">50%</p>
+          <p class="gl-am-label" data-slot-field="label">Tu comprador ya le pregunta a la IA qué elegir.</p>
+          <p class="gl-am-detail" data-slot-field="detail">Uno de cada dos consumidores ya usa búsqueda con IA.</p>
+          <div class="gl-am-footer">
+            <span class="gl-am-source" data-slot-field="logo"><span class="gl-am-logo"><img data-slot-field="src" alt="" /></span></span>
+            <span class="gl-am-wordmark" data-slot-field="wordmark">McKinsey &amp; Company</span>
+            <span class="gl-am-year" data-slot-field="year">2025</span>
+          </div>
+        </li>
+      </ol>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">El contexto</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Dónde busca tu cliente?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">En la IA</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">SEO te hacía competir por el ranking. AEO te hace competir por la <strong>recomendación</strong>.</p>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

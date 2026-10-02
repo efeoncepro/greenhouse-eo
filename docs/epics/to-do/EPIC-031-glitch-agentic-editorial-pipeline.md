@@ -1,5 +1,16 @@
 # EPIC-031 — Glitch Agentic Editorial Pipeline
 
+## Delta 2026-09-27
+
+- **El motor de video de Glitch ya existe y es una CLI:** motion, sonido (versión B) y música aprobados, en el repo
+  taller `efeonce-brand-workshop`, `tools/glitch-motion` (TASK-1924). Con un archivo de edición y las imágenes de las
+  fuentes entrega apertura, pre-roll, tarjeta final, kit de overlays, WAV y música para el editor
+  ([norma de Glitch §13 y §13.13](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1313-referencia-de-comandos-y-argumentos)).
+- **El paso que falta para este pipeline** es que el dominio de ediciones (TASK-1442) produzca ese archivo de edición
+  y dispare el render. Hoy cada edición la corre una persona en su máquina (repo taller, `gh`, ffmpeg, HyperFrames y
+  Guttery instalados; el kit completo tarda ≈ 4 min), sin autoservicio. Cómo se dispara el render desde el pipeline
+  (el taller no tiene despliegue ni runtime, según su ADR) queda por decidir.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -47,6 +58,9 @@ El flujo cruza doctrina editorial, skills, datos, API, Notion, scheduler/worker,
 - `TASK-1446` — ejecuta rollout gradual y cierre operativo/documental.
 - `TASK-1447` — crea Glitch Desk como workbench humano de supervisión, evidencia y recovery.
 - `TASK-1448` — formaliza promoción gobernada de candidata Daily/Flash a `glitchFlash` publicable.
+- `TASK-1922` — Glitch en AXIS: token de franquicia `glitchLine`, archivos oficiales y contrato `efeonce.glitch-line` (composición visual; sub-línea gráfica sólo de Glitch).
+- `TASK-1923` — Glitch en el Artifact Composer: catálogos `glitch-carousel` (PDF LinkedIn), `glitch-stills` y `glitch-overlays` (PNG), selector de rotación y validadores; consume el manifiesto de edición que a futuro produce `TASK-1442`.
+- `TASK-1924` — Glitch en movimiento: overlays del reel/vlog, apertura y tarjeta final con HyperFrames, video con alfa por edición.
 
 ## Existing Related Work
 

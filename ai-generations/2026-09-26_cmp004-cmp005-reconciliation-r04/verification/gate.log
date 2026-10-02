@@ -1,0 +1,3 @@
+⚠ CMP004-C04-KV-45-R04: los corchetes del CTA miden 0.69 CSS px en el teléfono y 8.43:1 contra la escena (piso: 1 CSS px y 3:1).
+✓ 4 pieza(s) con CTA cumplen el canon según su QA (verificación rápida: confía en el QA; la imagen se certifica con `--reproducir`) · huellas del plan, el plate, el PNG, el layout, el texto alternativo y el comando · texto ≥4.5:1 · superficie ≥3:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon.
+  Política cromática verificada en 4 pieza(s); armonía, jerarquía del conjunto y aprobación creativa requieren revisión visual.

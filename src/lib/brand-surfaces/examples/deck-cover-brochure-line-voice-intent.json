@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "line",
+  "line": "voice",
+  "voice": {
+    "eyebrow": "Brochure · Media & Distribution",
+    "question": "¿Dónde invierto?",
+    "answer": [
+      "Donde rinde"
+    ]
+  },
+  "body": "**Tres** soluciones y una operación:\nEstrategia de distribución · Performance\nInfluencia y earned · Managed Media",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png",
+    "alt": "Una líder de medios de Efeonce con la chaqueta sostiene una esfera de luz naranja de la que salen haces hacia muchas pantallas"
+  },
+  "column": {
+    "topPx": 300
+  }
+}

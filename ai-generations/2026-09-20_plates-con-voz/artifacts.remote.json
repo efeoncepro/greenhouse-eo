@@ -1,0 +1,47 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:08:08.611Z",
+  "run": "ai-generations/2026-09-20_plates-con-voz",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_plates-con-voz",
+  "totalBytes": 10056202,
+  "fileCount": 6,
+  "files": [
+    {
+      "path": "hoja-contacto.jpg",
+      "sizeBytes": 258253,
+      "sha256": "9880644d3b6e2fe98076393fcdaa8e22011d0762d554dc233d971a3e14717a0c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_plates-con-voz/hoja-contacto.jpg"
+    },
+    {
+      "path": "plates/V1-escucha-45.png",
+      "sizeBytes": 1380793,
+      "sha256": "593509e4c648e73225875e2e369dd00d9625e83e72d7afb64573e927e0c6af39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_plates-con-voz/plates/V1-escucha-45.png"
+    },
+    {
+      "path": "plates/V2-marcado-45.png",
+      "sizeBytes": 1674714,
+      "sha256": "b171e9efc17716a50b97c1dde47f1f3c2486e964d65cb5dbf9ed5fbafbd1173f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_plates-con-voz/plates/V2-marcado-45.png"
+    },
+    {
+      "path": "plates/V3-quien-sostiene-916.png",
+      "sizeBytes": 2311052,
+      "sha256": "56ac53cf5751d76b0f70dfcf5c1dbc0254ee5ceb0a6c41c03bdb21b8ba2cbd43",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_plates-con-voz/plates/V3-quien-sostiene-916.png"
+    },
+    {
+      "path": "plates/V4-manos-169.png",
+      "sizeBytes": 2146479,
+      "sha256": "52875acedf97e7851bd20dfb477f2f91098a2c9034b85e0904bfe1bcec33c46a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_plates-con-voz/plates/V4-manos-169.png"
+    },
+    {
+      "path": "plates/V5-atraviesa-169.png",
+      "sizeBytes": 2284911,
+      "sha256": "806a8c8adc5548a0bf777a67349035360eb44df1eed39f9c3c7ff2c37efeb5aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_plates-con-voz/plates/V5-atraviesa-169.png"
+    }
+  ]
+}

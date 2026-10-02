@@ -1,0 +1,983 @@
+{
+  "status": "observed-not-approved",
+  "observedOn": "2026-09-29",
+  "fileKey": "ZhnJUPqzvYqy7nTcLLKLr1",
+  "page": "0:1",
+  "total": 101,
+  "components": [
+    {
+      "id": "2001:322",
+      "type": "COMPONENT",
+      "name": "Arrow back",
+      "width": 94,
+      "height": 256,
+      "variants": null
+    },
+    {
+      "id": "2001:324",
+      "type": "COMPONENT",
+      "name": "Arrow front",
+      "width": 94,
+      "height": 256,
+      "variants": null
+    },
+    {
+      "id": "2001:326",
+      "type": "COMPONENT_SET",
+      "name": "Precio",
+      "width": 1327,
+      "height": 370
+    },
+    {
+      "id": "2001:327",
+      "type": "COMPONENT",
+      "name": "Property 1=Default",
+      "width": 435,
+      "height": 328,
+      "variants": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "2001:340",
+      "type": "COMPONENT",
+      "name": "Property 1=2",
+      "width": 350,
+      "height": 320,
+      "variants": {
+        "Property 1": "2"
+      }
+    },
+    {
+      "id": "2001:353",
+      "type": "COMPONENT",
+      "name": "Property 1=3",
+      "width": 260,
+      "height": 288,
+      "variants": {
+        "Property 1": "3"
+      }
+    },
+    {
+      "id": "2001:366",
+      "type": "COMPONENT_SET",
+      "name": "Arrow content/Text",
+      "width": 869,
+      "height": 614
+    },
+    {
+      "id": "2001:367",
+      "type": "COMPONENT",
+      "name": "Property 1=Default",
+      "width": 593,
+      "height": 498,
+      "variants": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "2001:373",
+      "type": "COMPONENT",
+      "name": "Arrow middle",
+      "width": 435,
+      "height": 376,
+      "variants": null
+    },
+    {
+      "id": "2001:375",
+      "type": "COMPONENT_SET",
+      "name": "Condiciones+Franja corporativa",
+      "width": 1048,
+      "height": 1394
+    },
+    {
+      "id": "2001:376",
+      "type": "COMPONENT",
+      "name": "Theme=Default",
+      "width": 1000,
+      "height": 172,
+      "variants": {
+        "Theme": "Default"
+      }
+    },
+    {
+      "id": "2001:398",
+      "type": "COMPONENT",
+      "name": "Theme=Theme3",
+      "width": 1000,
+      "height": 172,
+      "variants": {
+        "Theme": "Theme3"
+      }
+    },
+    {
+      "id": "2001:420",
+      "type": "COMPONENT",
+      "name": "Theme=Theme4",
+      "width": 1000,
+      "height": 172,
+      "variants": {
+        "Theme": "Theme4"
+      }
+    },
+    {
+      "id": "2001:442",
+      "type": "COMPONENT",
+      "name": "Theme=Theme5",
+      "width": 1000,
+      "height": 172,
+      "variants": {
+        "Theme": "Theme5"
+      }
+    },
+    {
+      "id": "2001:464",
+      "type": "COMPONENT",
+      "name": "Theme=Variant2",
+      "width": 1000,
+      "height": 172,
+      "variants": {
+        "Theme": "Variant2"
+      }
+    },
+    {
+      "id": "2001:486",
+      "type": "COMPONENT",
+      "name": "Theme=Frame 1171274721",
+      "width": 1000,
+      "height": 104,
+      "variants": {
+        "Theme": "Frame 1171274721"
+      }
+    },
+    {
+      "id": "2001:495",
+      "type": "COMPONENT",
+      "name": "Primeros en puntualidad",
+      "width": 256,
+      "height": 48,
+      "variants": null
+    },
+    {
+      "id": "2001:571",
+      "type": "COMPONENT_SET",
+      "name": "Stickers",
+      "width": 2038,
+      "height": 272.62200927734375
+    },
+    {
+      "id": "2001:572",
+      "type": "COMPONENT",
+      "name": "Type=Dcto Round",
+      "width": 196,
+      "height": 196,
+      "variants": {
+        "Type": "Dcto Round"
+      }
+    },
+    {
+      "id": "2001:577",
+      "type": "COMPONENT",
+      "name": "Type=Dcto icon",
+      "width": 196,
+      "height": 196,
+      "variants": {
+        "Type": "Dcto icon"
+      }
+    },
+    {
+      "id": "2001:582",
+      "type": "COMPONENT",
+      "name": "Type=Modo Vacaciones",
+      "width": 196,
+      "height": 196,
+      "variants": {
+        "Type": "Modo Vacaciones"
+      }
+    },
+    {
+      "id": "2001:590",
+      "type": "COMPONENT",
+      "name": "Type=Check-in y a volar",
+      "width": 308.462890625,
+      "height": 118.7920150756836,
+      "variants": {
+        "Type": "Check-in y a volar"
+      }
+    },
+    {
+      "id": "2001:601",
+      "type": "COMPONENT",
+      "name": "Type=Ventana+ playlist",
+      "width": 243,
+      "height": 230.62200927734375,
+      "variants": {
+        "Type": "Ventana+ playlist"
+      }
+    },
+    {
+      "id": "2001:614",
+      "type": "COMPONENT",
+      "name": "Type=Dcto star dark",
+      "width": 203.3800048828125,
+      "height": 200.42999267578125,
+      "variants": {
+        "Type": "Dcto star dark"
+      }
+    },
+    {
+      "id": "2001:619",
+      "type": "COMPONENT",
+      "name": "Type=Dcto star light",
+      "width": 203.3800048828125,
+      "height": 200.42999267578125,
+      "variants": {
+        "Type": "Dcto star light"
+      }
+    },
+    {
+      "id": "2001:624",
+      "type": "COMPONENT_SET",
+      "name": "Destino",
+      "width": 6185,
+      "height": 534
+    },
+    {
+      "id": "2001:625",
+      "type": "COMPONENT",
+      "name": "Property 1=1, Size=Big, Theme=Light",
+      "width": 387,
+      "height": 316
+    },
+    {
+      "id": "2133:9708",
+      "type": "COMPONENT",
+      "name": "Property 1=1, Size=Big, Theme=Light",
+      "width": 387,
+      "height": 316
+    },
+    {
+      "id": "2001:635",
+      "type": "COMPONENT",
+      "name": "Property 1=1, Size=Medium, Theme=Light",
+      "width": 322,
+      "height": 284
+    },
+    {
+      "id": "2001:645",
+      "type": "COMPONENT",
+      "name": "Property 1=1, Size=Small, Theme=Light",
+      "width": 258,
+      "height": 252
+    },
+    {
+      "id": "2001:655",
+      "type": "COMPONENT",
+      "name": "Property 1=1, Size=Big, Theme=Dark",
+      "width": 387,
+      "height": 316
+    },
+    {
+      "id": "2001:665",
+      "type": "COMPONENT",
+      "name": "Property 1=1, Size=Medium, Theme=Dark",
+      "width": 322,
+      "height": 284
+    },
+    {
+      "id": "2001:675",
+      "type": "COMPONENT",
+      "name": "Property 1=1, Size=Small, Theme=Dark",
+      "width": 258,
+      "height": 252
+    },
+    {
+      "id": "2001:685",
+      "type": "COMPONENT",
+      "name": "Property 1=2, Size=Big, Theme=Light",
+      "width": 483,
+      "height": 492
+    },
+    {
+      "id": "2001:695",
+      "type": "COMPONENT",
+      "name": "Property 1=2, Size=Medium, Theme=Light",
+      "width": 386,
+      "height": 368
+    },
+    {
+      "id": "2001:705",
+      "type": "COMPONENT",
+      "name": "Property 1=2, Size=Small, Theme=Light",
+      "width": 322,
+      "height": 366
+    },
+    {
+      "id": "2001:715",
+      "type": "COMPONENT",
+      "name": "Property 1=2, Size=Big, Theme=Dark",
+      "width": 483,
+      "height": 492
+    },
+    {
+      "id": "2001:725",
+      "type": "COMPONENT",
+      "name": "Property 1=2, Size=Medium, Theme=Dark",
+      "width": 386,
+      "height": 368
+    },
+    {
+      "id": "2001:735",
+      "type": "COMPONENT",
+      "name": "Property 1=2, Size=Small, Theme=Dark",
+      "width": 322,
+      "height": 366
+    },
+    {
+      "id": "2001:745",
+      "type": "COMPONENT_SET",
+      "name": "Logo Campañas dcto",
+      "width": 1417.052734375,
+      "height": 244
+    },
+    {
+      "id": "2001:746",
+      "type": "COMPONENT",
+      "name": "Property 1=Group 200",
+      "width": 261.23077392578125,
+      "height": 72,
+      "variants": {
+        "Property 1": "Group 200"
+      }
+    },
+    {
+      "id": "2001:763",
+      "type": "COMPONENT",
+      "name": "Property 1=Group 195",
+      "width": 261.23077392578125,
+      "height": 72,
+      "variants": {
+        "Property 1": "Group 195"
+      }
+    },
+    {
+      "id": "2001:779",
+      "type": "COMPONENT",
+      "name": "Property 1=Group 198",
+      "width": 288,
+      "height": 72,
+      "variants": {
+        "Property 1": "Group 198"
+      }
+    },
+    {
+      "id": "2001:797",
+      "type": "COMPONENT",
+      "name": "Property 1=Group 232",
+      "width": 288,
+      "height": 72,
+      "variants": {
+        "Property 1": "Group 232"
+      }
+    },
+    {
+      "id": "2001:815",
+      "type": "COMPONENT",
+      "name": "Property 1=Group 199",
+      "width": 286.1538391113281,
+      "height": 72,
+      "variants": {
+        "Property 1": "Group 199"
+      }
+    },
+    {
+      "id": "2001:833",
+      "type": "COMPONENT",
+      "name": "Property 1=Group 233",
+      "width": 286.1538391113281,
+      "height": 72,
+      "variants": {
+        "Property 1": "Group 233"
+      }
+    },
+    {
+      "id": "2001:851",
+      "type": "COMPONENT",
+      "name": "Property 1=Group 201",
+      "width": 273.23077392578125,
+      "height": 72,
+      "variants": {
+        "Property 1": "Group 201"
+      }
+    },
+    {
+      "id": "2001:868",
+      "type": "COMPONENT",
+      "name": "Property 1=Group 234",
+      "width": 273.23077392578125,
+      "height": 72,
+      "variants": {
+        "Property 1": "Group 234"
+      }
+    },
+    {
+      "id": "2001:886",
+      "type": "COMPONENT_SET",
+      "name": "Descuento flecha",
+      "width": 558.625,
+      "height": 150
+    },
+    {
+      "id": "2001:887",
+      "type": "COMPONENT",
+      "name": "Property 1=Default",
+      "width": 198.3125,
+      "height": 108,
+      "variants": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "2001:893",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant2",
+      "width": 198.3125,
+      "height": 108,
+      "variants": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "2001:899",
+      "type": "COMPONENT_SET",
+      "name": "Franja Skyplus",
+      "width": 1255,
+      "height": 158
+    },
+    {
+      "id": "2001:900",
+      "type": "COMPONENT",
+      "name": "Property 1=Default",
+      "width": 534.0003662109375,
+      "height": 56,
+      "variants": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "2001:905",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant2",
+      "width": 534.0003662109375,
+      "height": 116,
+      "variants": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "2001:910",
+      "type": "COMPONENT_SET",
+      "name": "Flechas",
+      "width": 2051.625,
+      "height": 402
+    },
+    {
+      "id": "2001:911",
+      "type": "COMPONENT",
+      "name": "Property 1=Standard",
+      "width": 668,
+      "height": 320,
+      "variants": {
+        "Property 1": "Standard"
+      }
+    },
+    {
+      "id": "2001:916",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant2",
+      "width": 577.125,
+      "height": 312,
+      "variants": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "2001:921",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant3",
+      "width": 484.5,
+      "height": 288,
+      "variants": {
+        "Property 1": "Variant3"
+      }
+    },
+    {
+      "id": "2001:926",
+      "type": "COMPONENT_SET",
+      "name": "Título campaña",
+      "width": 799,
+      "height": 314
+    },
+    {
+      "id": "2001:927",
+      "type": "COMPONENT",
+      "name": "Property 1=Default",
+      "width": 364,
+      "height": 272,
+      "variants": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "2001:931",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant2",
+      "width": 273,
+      "height": 224,
+      "variants": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "2001:949",
+      "type": "COMPONENT_SET",
+      "name": "Destino cuadrado",
+      "width": 2986.00146484375,
+      "height": 666
+    },
+    {
+      "id": "2001:950",
+      "type": "COMPONENT",
+      "name": "Property 1=Default",
+      "width": 646.0003662109375,
+      "height": 624,
+      "variants": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "2001:963",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant3",
+      "width": 646.0003662109375,
+      "height": 624,
+      "variants": {
+        "Property 1": "Variant3"
+      }
+    },
+    {
+      "id": "2001:988",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant2",
+      "width": 646.0003662109375,
+      "height": 624,
+      "variants": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "2001:1001",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant4",
+      "width": 646.0003662109375,
+      "height": 624,
+      "variants": {
+        "Property 1": "Variant4"
+      }
+    },
+    {
+      "id": "2001:1026",
+      "type": "COMPONENT_SET",
+      "name": "Logos marcas asociadas",
+      "width": 143.00039672851562,
+      "height": 148
+    },
+    {
+      "id": "2001:1027",
+      "type": "COMPONENT",
+      "name": "Property 1=Skyplus",
+      "width": 103.00039672851562,
+      "height": 44,
+      "variants": {
+        "Property 1": "Skyplus"
+      }
+    },
+    {
+      "id": "2001:1030",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant2",
+      "width": 103.00039672851562,
+      "height": 44,
+      "variants": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "2001:1033",
+      "type": "COMPONENT_SET",
+      "name": "Destino Flecha",
+      "width": 4165.3759765625,
+      "height": 606
+    },
+    {
+      "id": "2001:1034",
+      "type": "COMPONENT",
+      "name": "Property 1=Default",
+      "width": 933.5003662109375,
+      "height": 544,
+      "variants": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "2001:1038",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant3",
+      "width": 948.1875,
+      "height": 564,
+      "variants": {
+        "Property 1": "Variant3"
+      }
+    },
+    {
+      "id": "2001:1042",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant2",
+      "width": 933.5003662109375,
+      "height": 544,
+      "variants": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "2001:1046",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant4",
+      "width": 948.1875,
+      "height": 564,
+      "variants": {
+        "Property 1": "Variant4"
+      }
+    },
+    {
+      "id": "2001:1050",
+      "type": "COMPONENT",
+      "name": "Precio 3 destinos",
+      "width": 382,
+      "height": 768,
+      "variants": null
+    },
+    {
+      "id": "2001:1070",
+      "type": "COMPONENT_SET",
+      "name": "Precios 3 destinos flecha",
+      "width": 1494.51953125,
+      "height": 810
+    },
+    {
+      "id": "2001:1071",
+      "type": "COMPONENT",
+      "name": "Property 1=Default",
+      "width": 666.259765625,
+      "height": 768,
+      "variants": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "2001:1074",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant2",
+      "width": 666.259765625,
+      "height": 768,
+      "variants": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "2001:1078",
+      "type": "COMPONENT_SET",
+      "name": "Tag",
+      "width": 1497,
+      "height": 102
+    },
+    {
+      "id": "2001:1079",
+      "type": "COMPONENT",
+      "name": "Size=Large, Color=Purple",
+      "width": 124,
+      "height": 60,
+      "variants": {
+        "Size": "Large",
+        "Color": "Purple"
+      }
+    },
+    {
+      "id": "2001:1082",
+      "type": "COMPONENT",
+      "name": "Size=Large, Color=Dark",
+      "width": 124,
+      "height": 60,
+      "variants": {
+        "Size": "Large",
+        "Color": "Dark"
+      }
+    },
+    {
+      "id": "2001:1085",
+      "type": "COMPONENT",
+      "name": "Size=Large, Color=Green",
+      "width": 124,
+      "height": 60,
+      "variants": {
+        "Size": "Large",
+        "Color": "Green"
+      }
+    },
+    {
+      "id": "2001:1088",
+      "type": "COMPONENT",
+      "name": "Size=Large, Color=White",
+      "width": 124,
+      "height": 60,
+      "variants": {
+        "Size": "Large",
+        "Color": "White"
+      }
+    },
+    {
+      "id": "2001:1091",
+      "type": "COMPONENT",
+      "name": "Size=Medium, Color=Purple",
+      "width": 98,
+      "height": 48,
+      "variants": {
+        "Size": "Medium",
+        "Color": "Purple"
+      }
+    },
+    {
+      "id": "2001:1093",
+      "type": "COMPONENT",
+      "name": "Size=Medium, Color=Dark",
+      "width": 98,
+      "height": 48,
+      "variants": {
+        "Size": "Medium",
+        "Color": "Dark"
+      }
+    },
+    {
+      "id": "2001:1095",
+      "type": "COMPONENT",
+      "name": "Size=Medium, Color=Green",
+      "width": 98,
+      "height": 48,
+      "variants": {
+        "Size": "Medium",
+        "Color": "Green"
+      }
+    },
+    {
+      "id": "2001:1097",
+      "type": "COMPONENT",
+      "name": "Size=Medium, Color=White",
+      "width": 98,
+      "height": 48,
+      "variants": {
+        "Size": "Medium",
+        "Color": "White"
+      }
+    },
+    {
+      "id": "2001:1099",
+      "type": "COMPONENT",
+      "name": "Size=Small, Color=Purple",
+      "width": 79,
+      "height": 36,
+      "variants": {
+        "Size": "Small",
+        "Color": "Purple"
+      }
+    },
+    {
+      "id": "2001:1101",
+      "type": "COMPONENT",
+      "name": "Size=Small, Color=Dark",
+      "width": 79,
+      "height": 36,
+      "variants": {
+        "Size": "Small",
+        "Color": "Dark"
+      }
+    },
+    {
+      "id": "2001:1103",
+      "type": "COMPONENT",
+      "name": "Size=Small, Color=Green",
+      "width": 79,
+      "height": 36,
+      "variants": {
+        "Size": "Small",
+        "Color": "Green"
+      }
+    },
+    {
+      "id": "2001:1105",
+      "type": "COMPONENT",
+      "name": "Size=Small, Color=White",
+      "width": 79,
+      "height": 36,
+      "variants": {
+        "Size": "Small",
+        "Color": "White"
+      }
+    },
+    {
+      "id": "2001:1108",
+      "type": "COMPONENT_SET",
+      "name": "Código descuento",
+      "width": 362,
+      "height": 220
+    },
+    {
+      "id": "2001:1109",
+      "type": "COMPONENT",
+      "name": "Property 1=Default",
+      "width": 322,
+      "height": 80,
+      "variants": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "2001:1111",
+      "type": "COMPONENT",
+      "name": "Property 1=Variant2",
+      "width": 245,
+      "height": 68,
+      "variants": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "2001:1113",
+      "type": "COMPONENT",
+      "name": "Logo campaña cyber",
+      "width": 497,
+      "height": 164.97000122070312,
+      "variants": null
+    },
+    {
+      "id": "2001:1129",
+      "type": "COMPONENT_SET",
+      "name": "Logo Sky",
+      "width": 258,
+      "height": 481
+    },
+    {
+      "id": "2001:1130",
+      "type": "COMPONENT",
+      "name": "Property 1=80px",
+      "width": 218,
+      "height": 80,
+      "variants": {
+        "Property 1": "80px"
+      }
+    },
+    {
+      "id": "2001:1136",
+      "type": "COMPONENT",
+      "name": "Property 1=72px",
+      "width": 197,
+      "height": 72,
+      "variants": {
+        "Property 1": "72px"
+      }
+    },
+    {
+      "id": "2001:1142",
+      "type": "COMPONENT",
+      "name": "Property 1=64px",
+      "width": 175,
+      "height": 64,
+      "variants": {
+        "Property 1": "64px"
+      }
+    },
+    {
+      "id": "2001:1148",
+      "type": "COMPONENT",
+      "name": "Property 1=56px",
+      "width": 153,
+      "height": 56,
+      "variants": {
+        "Property 1": "56px"
+      }
+    },
+    {
+      "id": "2001:1154",
+      "type": "COMPONENT",
+      "name": "Property 1=48px",
+      "width": 131,
+      "height": 48,
+      "variants": {
+        "Property 1": "48px"
+      }
+    }
+  ],
+  "errors": [
+    {
+      "id": "2001:625",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2133:9708",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:635",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:645",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:655",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:665",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:675",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:685",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:695",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:705",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:715",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:725",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    },
+    {
+      "id": "2001:735",
+      "error": "Error: in get_variantProperties: Component set for node has existing errors"
+    }
+  ]
+}

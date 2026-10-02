@@ -1,0 +1,10 @@
+{
+  "id": "CS3-berel",
+  "formato": "1:1",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "polvo",
+  "escena": "SCENE (epic cinematic still, Mexico City at golden hour, a house changes color): on a tall facade of a colonial-style building in a Mexico City neighborhood, a Mexican painter in his thirties in plain paint-speckled work clothes stands on a scaffold in the RIGHT half of the frame, framed from the knees up, mid-stroke, rolling a long vertical band of vivid saturated terracotta-red paint over an old pale wall with a long-handled roller; fine droplets of paint mist and dust glow in the air in the low backlight. The setting sun behind the scaffold is the key light: a warm golden rim outlines him, the roller and the wet paint, which gleams. Neighboring facades in bold Mexican colors (cobalt blue, mustard yellow, deep pink) recede along the street in warm haze. REALISTIC ADULT PROPORTIONS, 85mm lens, camera about three meters away at chest height, slight low angle, focus on the painter and the wet stroke. The paint buckets carry no labels or logos. The LEFT 25% of the frame is the calm, evenly shaded old wall not yet painted. No readable text, no logos of any brand, no signs.",
+  "lecho": { "objeto": "the dark blurred edge of a wooden scaffold plank close to the lens at the bottom, in shadow", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, evenly shaded unpainted wall on the left 25% of the frame", "tinta": "blanca" } }
+}

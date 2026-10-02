@@ -1,12 +1,83 @@
 # Radiografía AEO — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Versión:** 1.0
+> **Versión:** 2.0
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-09-23
+> **Última actualización:** 2026-09-30
 > **Documentación técnica:** [Radiografía AEO — Arquitectura](radiografia-aeo-architecture.md)
 > **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
 > **Repo del runtime:** `efeonce-think` (**NO** `greenhouse-eo`)
+
+---
+
+## Otro cliente: entrada recomendada
+
+Usar el [kit reutilizable y guía de producción](aeo-xray-nuevo-cliente.md): crea un expediente neutral, compone con AXIS y abre una preview DEV por configuración. Conserva los cuatro pasos originales; no copiar el caso Pichincha ni generar un token legacy para una edición nueva.
+
+## Extensión multipieza — experiencia publicada, 30/09/2026
+
+El caso Banco Pichincha Perú ya se puede enviar desde **Think**, sin publicar Greenhouse.
+Es una extensión del mismo `Experience.astro`: conserva lectura, radiografía acoplada,
+proveniencia, derivados y coreografía entre etapas. Añade una landing completa y un artículo
+con marca, módulos, fuentes y medios específicos por cliente. El selector conserva la etapa.
+
+Hay **tres accesos distintos**; no intercambiar sus garantías:
+
+| Carril | Uso | Seguridad y retiro |
+|---|---|---|
+| `/muestras/<slug>-<token>` | Legacy, incluido SKY | Payload estático histórico; token de oscuridad, sin autenticación |
+| `/aeo-xray/r/sample_<clave>` | Muestra compuesta autónoma publicada por Think | Enlace no listado, contenido y medios públicos para quien tiene el enlace; retiro mediante redeploy |
+| `/aeo-xray/r/xrg_<grant>` | Integración gobernada Greenhouse diseñada e implementada localmente | Ediciones inmutables, medios privados, TTL y revocación; **no validada como operativa en producción** |
+
+La muestra autónoma no necesita flags, migraciones ni llamadas a Greenhouse. La fundación
+Greenhouse permanece separada: ni el deploy Think ni su demo prueban permisos, storage,
+migración o canary productivos. No promover Greenhouse para enviar este ejemplo.
+
+Estado verificable de publicación al cierre del 30/09: Think
+`be8d4841e1124818bd7f4c88d0d7ad7b970e5122`, deployment
+`dpl_7AEWYHEiiWWUyCiwrcTj1US1e3vB`, `READY`, alias `think.efeoncepro.com`.
+El enlace concreto del cliente se conserva en su expediente privado y en el registro runtime;
+este manual usa placeholders. Es una fotografía del release, no comprobación de salud futura.
+
+### Preparar y compartir una edición nueva
+
+**Carril futuro gobernado.** El procedimiento siguiente describe el contrato implementado;
+no ejecutarlo contra producción antes del release, migración y canary del provider. Para
+compartir hoy una demo autorizada, seguir la publicación autónoma descrita más abajo.
+
+1. Preparar un intent AXIS con landing/artículo, fuentes fechadas y `experience` completa por pieza.
+   El contenido bancario va en la pieza; el aviso de demostración pertenece al marco de Efeonce.
+2. Crear el caso por `POST /api/platform/app/growth/aeo-xray/cases` con `title`,
+   `prospectReference` e `intent`. La organización dueña se resuelve desde la identidad interna
+   vigente; el prospecto no concede acceso. No hay editor visual nuevo.
+3. Cargar cada PNG/JPEG/WebP por `POST .../cases/<caseId>/assets` como cuerpo binario.
+   La API normaliza a WebP privado y devuelve identidad, hash y dimensiones. Reemplazar las
+   referencias de preview por esos valores; la emisión rechaza medios públicos o ajenos al caso.
+4. Actualizar `PATCH .../cases/<caseId>/draft` con `expectedRevision` e `intent` completo.
+   Una revisión obsoleta requiere releer el caso y reconciliar, no sobrescribir a ciegas.
+5. Emitir `POST .../cases/<caseId>/editions` con `expectedRevision` e `idempotencyKey`.
+   Se congela el manifest validado. Cambiar el borrador no cambia esta edición.
+6. Crear `POST .../editions/<editionId>/shares` con `expiresInDays` y `label` opcionales.
+   El enlace se devuelve una sola vez; no usar el header `Idempotency-Key` en esta operación.
+   No registrar ni pegar el bearer en evidencias. Si se pierde, revocar el grant y crear otro.
+7. Revocar con `POST .../shares/<grantId>/revoke` y `{}`; retirar la edición con
+   `POST .../editions/<editionId>/withdraw` y `{}`. Verificar tanto documento como imágenes.
+
+Todos los endpoints de autoría requieren sesión interna autorizada y capacidades X-Ray actuales.
+La lectura pública usa el grant exacto, default OFF con `AEO_XRAY_SHARING_ENABLED`; una habilitación
+productiva necesita migración, distribución AXIS, release de Greenhouse/Think y readback reales.
+El TTL predeterminado es 30 días, máximo 90. Las imágenes revalidan el acceso en cada solicitud.
+
+### Verificación antes del envío
+
+Recorrer las cuatro etapas de ambas piezas a desktop y móvil; revisar fotografías, copy, TOC,
+acoplamiento, derivados, teclado, sin JS y movimiento reducido. Distinguir propuesta, implementado,
+verificado y medido: la muestra no prueba resultados del sitio bancario. El guion audiovisual
+propuesto no es un video producido. Revalidar tasas y condiciones oficiales antes de enviar.
+
+Pruebas locales: `node scripts/qa/verify-aeo-xray-distribution.mjs`, tests de `src/lib/aeo-xray`
+y `python3 scripts/qa/verify-aeo-xray-local-pg.py` en Greenhouse; build y verificadores X-Ray en Think.
+El runner PG usa una base efímera aislada. [ADR de la extensión](../architecture/EFEONCE_AEO_XRAY_COMPOSITION_AND_SHARING_DECISION_V1.md).
 
 ---
 
@@ -14,7 +85,7 @@
 
 Es una **muestra de trabajo** que se le entrega **por enlace** a un cliente, a un prospecto o a un comité de licitación.
 
-Muestra, en cuatro pantallas: **el hueco** que encontramos en su espacio de búsqueda, **el artículo** que lo tapa, **la capa técnica** que lo hace citable por motores de respuesta con IA, y **dónde más vive** esa pieza (video, social, imágenes).
+Muestra, en cuatro etapas: **La oportunidad** sustentada en investigación, **La pieza** completa (landing o artículo), **La radiografía** que explica su capa técnica y **Dónde más vive** el contenido (video, social, imágenes). No garantiza citación ni ranking por aplicar una estructura.
 
 ### Hace DOS trabajos — no los confundas
 
@@ -53,7 +124,13 @@ Cuatro pantallas: `/` (el hueco) · `/articulo` · `/radiografia` · `/atomizaci
 
 ---
 
-## Cómo se crea la muestra de un cliente nuevo
+## Procedimiento legacy — conservar muestras existentes
+
+El procedimiento SKY de esta sección es histórico. Para un cliente nuevo, usar el kit
+[landing + artículo](aeo-xray-nuevo-cliente.md) y elegir expresamente el carril de distribución.
+No copiar tokens ni datos de SKY/Pichincha.
+
+### Cómo se creó la muestra legacy
 
 **El cliente es un payload, no código.** No se toca ni un componente.
 
@@ -141,7 +218,7 @@ src/assets/muestras/<cliente>-<slug>/
 - 🔴 **TODAS a 16:9, hero incluido.** Sacar una franja 21:9 de una foto 3:2 **tira el 60% del alto**: se va el primer plano y queda cielo. Desde 3:2, un 16:9 recorta apenas **16%**. **El formato se elige por la foto, no al revés.**
 - **Recorta la fuente al formato que se muestra, a 2× retina** (hero 2800×1575, inline 2000×1125). El source de 5760px **nunca se sirve**: Astro emite AVIF al ancho exacto vía `srcset`.
 - ⚠️ **NO uses recorte por entropía (`sharp.strategy.attention`)** — se comió la carretera del hero. Centrado, o desde el borde donde vive el sujeto.
-- **Cero imágenes generadas con IA.** Licencia verificable + crédito visible.
+- **En el caso SKY original: fotografía licenciada, sin generación IA.** En casos nuevos el operador puede autorizar generación; registrar procedencia, derechos y disclosure. Una persona generada nunca es un testimonio ni fotografía documental del cliente.
 - El `alt` **es contenido** de la muestra (se exhibe): descríbelo de verdad, **desde el metadata de la foto, nunca desde su título**.
 
 **Fuente: Shutterstock** (credenciales en Secret Manager; ver `TASK-1411`). Wikimedia sirve de respaldo pero sus fotos son de aficionado — **y sus miniaturas se ven pixeladas** (bájate el **original**, no el thumb).
@@ -276,3 +353,209 @@ curl -s -L "https://think.efeoncepro.com/muestras/<cliente>-<slug>-<token>" | gr
 - [`TASK-1410`](../tasks/complete/TASK-1410-aeo-article-xray.md) — la historia completa, con los seis deltas de diseño y los bugs que cazó el gate
 - [Investigación Semrush del blog de SKY](../commercial/research/sky-blog-aeo-gap-2026-07.md) — ejemplo de cómo se elige el artículo
 - Skills a cargar al tocar esto: **`seo-aeo`** (el oficio · el schema tiene que ser defendible ante un comité que lo puede verificar), **`astro`** + su `efeonce-overlay.md` (el repo), `copywriting`, `modern-ui`, `typography-design`, `a11y-architect`
+
+
+## Operación de la experiencia compuesta publicada
+
+### Entrada y selección
+
+La URL SSR acepta `artifact=<artifact.id>` y `step`. Los nombres visibles son **La oportunidad**,
+**La pieza**, **La radiografía** y **Dónde más vive**; los valores técnicos mantienen `''`,
+`articulo`, `radiografia` y `atomizacion` para conservar enlaces existentes. `articulo` sirve
+la lectura de ambos tipos: no renombrar la query a `landing` para una landing.
+
+Abrir `/aeo-xray/r/<clave>?artifact=<id>` presenta un telón azul. Lleva logo oficial del cliente,
+«Esto preparamos para ti», botón «Haz click aquí», lockup Efeonce AEO y burbuja URL oficial
+más abajo. El logo procede de `brand.logoAssetId`; hay fallback textual si no existe logo.
+La cabecera posterior usa el mismo cliente y un lockup Efeonce AEO; X-Ray tiene su propia
+barra de edición, con icono y subtítulo. El selector Landing/Artículo es un control segmentado
+con iconos, estado activo y foco visibles; sus enlaces nativos conservan el paso actual.
+La atribución «Demostración de Efeonce» queda al final, junto a legal y enlaces del footer.
+
+La bienvenida se recuerda con `sessionStorage` por pathname, en la pestaña actual. Una
+pestaña nueva permite repetirla; no pedir al cliente que borre cookies. Un enlace profundo a
+lectura/radiografía/derivados entra directamente en ese destino. Back, cambio de pieza y
+navegación interna no reintroducen el telón; almacenamiento bloqueado no impide continuar.
+
+El `dialog` y `form method=dialog` mantienen teclado, Escape y apertura sin JavaScript.
+Con JS es modal: foco dentro, scroll bloqueado, botón protegido de doble clic y foco al título
+al terminar. Sin JS se cierra de forma inmediata; con movimiento reducido también.
+
+### Coreografía y advertencia de build
+
+La apertura normal dura **1400 ms**, con `cubic-bezier(0.65,0,0.35,1)`: el azul se desplaza
+hasta `translateY(-100%)` y revela el contenido, que asciende desde 56 px. La secuencia de
+pregunta/respuesta espera al evento `xray:curtain-opened`; `xray:curtain-opening` reinicia el
+estado bajo la cubierta. No arrancar la simulación mientras el visitante mira la invitación.
+
+**La CSS compilada puede serializar `1400ms` como `1.4s`.** La Web Animations API espera
+milisegundos. `parseFloat` solo devolvería `1.4` y produciría el salto casi inmediato observado
+por el operador. El componente lee el sufijo `ms` o `s` y convierte a milisegundos. El gate del
+telón incluye esta conversión y verifica desplazamiento gradual real, no sólo CSS declarada.
+Una corrección de motion exige comprobar el build y producción además del servidor DEV.
+
+El `ClientRouter` conserva geometría compartida en lectura↔radiografía (`620ms`) y
+preview↔pieza (abrir `820ms`, volver `700ms`). El selector usa `300ms`; sus textos/iconos
+requieren una capa encima del indicador para no desaparecer durante el snapshot. Cambiar
+**de artefacto** desactiva nombres compartidos del espécimen: no deformar una landing en
+un artículo distinto. Listeners se reinician con `astro:page-load`, y los anteriores se limpian
+antes del swap. Motion reducido elimina movimiento sin perder contenido ni rutas.
+
+### La oportunidad
+
+La portada explica el ángulo, conserva evidencia de investigación y agrega un recorrido
+**ilustrativo** pregunta→respuesta→fuente. Incluye avance, repetición y acceso a la pieza que
+respalda la respuesta. Es una demostración de recuperación y lectura, no una captura de
+Google AI Mode, una respuesta observada de un LLM ni un resultado de posicionamiento.
+No cambiar ese disclaimer por un logo de un motor que sugiera ejecución real.
+
+Separar una métrica observada (consulta, mercado, proveedor, fecha) de la hipótesis de
+contenido. El volumen no equivale a tráfico, conversiones ni frecuencia de prompts IA; no
+sumar consultas solapadas para inflar demanda. Conservar snapshot y unidad en el expediente.
+
+### La pieza: landing y artículo reales
+
+`LandingModules.astro` agrupa bloques según `landingSections`: hero/imagen, respuesta,
+beneficios, condiciones y comparación, pasos, documentación/confianza, FAQ, relacionado y
+CTA. Cada sección conserva IDs y semántica; una tabla incompatible con un control visual
+mantiene fallback completo. Iconos ayudan a localizar módulos, sin sustituir títulos ni texto.
+El CTA bancario dirige al canal oficial; la demo no abre cuentas ni captura solicitudes.
+
+El artículo mantiene byline propuesta, respuesta inicial, TOC con anclas, desarrollo narrativo,
+respuestas autocontenidas, tabla, FAQ, CTA y fuentes. Los dos banners contextuales son
+bloques reales dentro del desarrollo, uno para comparación y otro para preparación de la
+apertura. Se sirven con proporción intrínseca, ALT, crédito y fuente; no como fondo invisible
+sin procedencia. El crédito `Composición:` se presenta como «Diseño» y no «Foto».
+
+Los productos, tasas y condiciones se reverifican antes de cada envío o reutilización. La
+muestra Pichincha utiliza **Cuenta de Ahorros Preferente**, no cuenta corriente. Los números
+son los de las fuentes de esa edición y fecha, no una promesa bancaria vigente indefinidamente.
+No generalizar sobre moneda, saldo mínimo, mantenimiento ni proceso desde otro mercado.
+
+**Fuentes consultadas del contenido:** banco, regulador y documentación que respalda sus
+condiciones. DataForSEO se retiró de las fuentes editoriales; permanece donde corresponde,
+en la observación de investigación y su metodología. Borrarlo del expediente destruiría
+trazabilidad; añadirlo como fuente de tasas atribuiría una autoridad que no tiene.
+
+### Valor SEO/AEO y radiografía
+
+`ValueExplorer.astro` conecta cada pregunta de `experience.evidence.fanOut.items` mediante
+`coveredBy` con el bloque real, respuesta, anotación y fuentes. Permite entender una decisión
+sin leer primero JSON-LD. Una referencia huérfana o una explicación distinta entre el bloque,
+la anotación y `machine.craft` debe fallar la revisión, no quedar como decorado.
+
+En radiografía, lectura y máquina se acoplan mediante IDs/`coupleId`: hover, toque o teclado
+seleccionan el origen y sus nodos; en móvil el inspector se abre como hoja. Expone meta,
+encabezados, ALT, enlaces y schemas como texto escapado. **Cero JSON-LD activo** atribuido
+al banco en Think. Canonical es propuesta, no publicación bancaria. No garantizar rich
+results FAQ, rankings, citas en IA ni CWV del dominio cliente desde esta demo.
+
+Anotaciones distinguen alcance `block/page/site` y estados `proposed/implemented/verified/measured`.
+Un módulo implementado en la muestra no está implementado en pichincha.pe; una consulta
+medida no convierte toda la propuesta en resultado medido. Site-level (robots, sitemap,
+indexación, autoridad, infraestructura) exige revisión del sitio real y acceso correspondiente.
+
+### Dónde más vive y reproducción
+
+`SocialShowcase.astro` renderiza **todos** los átomos, sin tope de tres. El caso contiene tres
+feeds, una Story y un video vertical de diez segundos; el video y la gráfica comparten un
+formato seleccionable. Cada derivado tiene propósito, copy, CTA, detalle de producción,
+disclosure y vínculo al bloque de origen. Ampliación y descarga permiten evaluar la pieza.
+
+Con JS, pestañas accesibles admiten flechas/Home/End, reflejan selección en fragmento sin
+sumar entradas artificiales al historial y pausan video al cambiar formato/ruta. «Video»
+intenta reproducir; Play grande permite reanudar/repetir. Fallo de carga o reproducción muestra
+estado recuperable y descarga; no asumir autoplay permitido. Sin JS todos los formatos y
+controles nativos quedan accesibles. El gate verifica avance de `currentTime`, no sólo `<video>`.
+
+### Expediente y archivos privados
+
+El expediente del caso se conserva fuera de Git: carpeta **Banco Pichincha Peru — Prospect Case**.
+Incluye research y sus snapshots, intent/manifests, medios y decisiones. Los masters y fuentes
+se distribuyen en `06-Social-production`, `07-Video-production` y `08-Article-banners`.
+No copiar API keys, grants gobernados, correos, notas CRM, prompts privados o originales
+pesados al runtime. Registrar proveedor/modelo, solicitud/prompt autorizado, referencia,
+consumo y responsable de revisión donde corresponda. Una autorización de generación/gasto
+para Pichincha no autoriza otro cliente. No presentar modelos generados como personas reales.
+
+Logo cliente oficial: verificar origen y versión; Efeonce AEO y burbuja URL se toman del paquete
+AXIS autorizado sin vectorizaciones aproximadas. El runtime copia assets oficiales finales en
+`public/branding/`; las entregas cliente del carril autónomo se sirven desde
+`public/aeo-xray-media/<clave>/`, con autorización de distribución pública. Esto no es el
+storage privado del carril gobernado. Los originales permanecen en el expediente.
+
+### Publicar solamente Think
+
+1. Componer y revisar en el kit [otro cliente](aeo-xray-nuevo-cliente.md).
+2. Elegir explícitamente muestra pública no listada. Si contiene información confidencial,
+   no usar `sample_*`; esperar al carril gobernado y su canary.
+3. Registrar JSON `{key, editionId, model, assets}` en `src/lib/aeo-xray/published/` y su import
+   en `published.ts`. Generar clave `sample_` aleatoria estable **una vez**, no en cada build.
+   El mapa relaciona IDs lógicos con rutas de entregas autorizadas; no transportar rutas locales.
+4. Copiar sólo medios finales autorizados a la carpeta de distribución; verificar hashes,
+   MIME, dimensiones y carga. No duplicar los componentes por cliente.
+5. Ejecutar gates abajo y abrir capturas reales. Stagear rutas propias y revisar diff.
+6. Commit y push a `main` de `efeonce-think` sólo si están autorizados. El autodeploy Vercel
+   usa proyecto Think y scope `efeonce-7670142f`; nunca promover develop→main de Greenhouse.
+7. Esperar `READY`; contrastar `meta.githubCommitSha` con commit y alias productivo correcto.
+   Leer el enlace en producción, ambos artefactos/cuatro pasos, headers, imagen y video.
+8. Guardar deployment/SHA/readbacks y capturas en evidencia ignorada o expediente; compartir
+   enlace por canal autorizado. Publicar no autoriza enviar email ni actualizar CRM.
+
+Headers documento compuesto: `Cache-Control: private, no-store`, `X-Robots-Tag: noindex, nofollow`,
+`Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`. Sin analytics y fuera del sitemap.
+Los medios estáticos autónomos siguen públicos; esos headers no transforman el link en auth.
+El `expiresAt` de compatibilidad en el registro no representa TTL real ni revocación central.
+Retirar una muestra exige quitar registro **y medios** y redeploy/readback de ambos. Para
+rollback registrar deployment anterior; evitar restaurar material retirado sin autorización.
+
+### QA reproducible
+
+Desde Greenhouse, antes de abrir Think:
+
+```bash
+node --test scripts/aeo-xray/client-kit.test.mjs
+node scripts/aeo-xray/client-kit.mjs validate --dir /ruta/privada/caso
+node scripts/aeo-xray/client-kit.mjs build --dir /ruta/privada/caso
+```
+
+Desde Think, con servidor de prueba corriendo y clave local elegida en entorno (no en Git):
+
+```bash
+pnpm type-check
+pnpm build
+pnpm test:aeo-xray-v2
+node scripts/qa/verify-aeo-xray-distribution.mjs
+XRAY_SAMPLE=sky-carretera-austral pnpm verify:aeo-xray
+XRAY_VERIFY_BASE=http://127.0.0.1:4345 XRAY_VERIFY_TOKEN=fixture-pichincha pnpm verify:aeo-xray-v2
+XRAY_VERIFY_BASE=http://127.0.0.1:4345 XRAY_VERIFY_TOKEN=fixture-pichincha node scripts/verify-aeo-xray-motion.mjs
+XRAY_VERIFY_BASE=http://127.0.0.1:4345 XRAY_VERIFY_TOKEN=fixture-pichincha node scripts/verify-aeo-xray-value.mjs
+XRAY_VERIFY_BASE=http://127.0.0.1:4345 XRAY_VERIFY_TOKEN=fixture-pichincha node scripts/verify-aeo-xray-media.mjs
+XRAY_VERIFY_BASE=http://127.0.0.1:4345 XRAY_VERIFY_TOKEN=fixture-pichincha node scripts/verify-aeo-xray-curtain.mjs
+```
+
+Los gates bancarios usan IDs Pichincha y son regresión del caso: no certifican otro cliente
+con IDs distintos. Sustituir el token sólo cuando el contenido es compatible; construir QA
+proporcional del nuevo expediente sin hardcodear la UI. Fixtures son **sólo DEV**; un build
+publicado debe negar `fixture-*`. Para canary de producción usar la clave real desde entorno,
+guardar resultados privadamente y no pegarlos en docs. No correr HMR/ediciones simultáneas
+sobre una prueba de transición: un reload del compilador invalida la observación.
+
+Revisar desktop 1440, móvil 390 y compacto 320, tablet, overflow, contraste/foco, encuadres,
+prosa completa, datos sensibles, fuente↔claim, video, no-JS, movimiento reducido y estados de
+error. Capturas: `.captures/aeo-xray-v2`, `aeo-xray-motion`, `aeo-xray-value`, `aeo-xray-media`,
+`aeo-xray-curtain`; son evidencia ignorada, no assets de entrega. Verde automático no sustituye
+revisión de píxeles. No llamar a una medición local de demo «CWV del banco».
+
+### Diagnóstico rápido
+
+| Síntoma | Revisar | Acción |
+|---|---|---|
+| Telón desaparece instantáneamente | Preferencia reduced-motion, CSS compilada con `s`, sesión ya abierta | Repetir pestaña nueva; comprobar conversión de unidades en build; no desactivar accesibilidad |
+| No aparece telón | Deep link o sesión recordada | Abrir primera etapa en pestaña nueva; comportamiento previsto |
+| Texto activo del selector desaparece al cambiar | Capas de snapshots/indicador | Revisar transición real y z-index de nombres compartidos, no sólo DOM en reposo |
+| Video no reproduce | Media path, MIME, carga, política de playback | Probar Video/Play y `currentTime`; leer estado visible; verificar archivo servido |
+| Fixture da error | Map incompleto, hash distinto, ruta/symlink fuera de assets | Corregir expediente; no relajar containment ni usar `public/` como bypass |
+| Preview conserva versión anterior | Build kit rechazado, manifest anterior conservado | Leer salida/exit code; no confundir draft nuevo con manifest viejo |
+| Página muestra marca anterior | Servidor Astro existente o manifest equivocado | `astro dev status`; detener sólo sesión prescindible y reiniciar con expediente correcto |
+| Grant gobernado no abre | Provider/flag/migración/canary pendientes | No improvisar auth; separar demo autónoma de integración futura |

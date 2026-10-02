@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · una sola operación</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-one-platform` (surface deck, tema oscuro, TASK-1942). «¿Cuántos Salesforce tienes? Uno.»: la cuenta
+      del cliente al centro, en papel y con reflejo, sobre la plataforma de luz; cinco áreas de trabajo en vidrio, cada
+      una con el ícono oficial de su producto, mandan su luz a la cuenta. La selección «Cliente» toma la cuenta.
+      Referencia: DeckSalesforceUnaOperacion (SF1-una-operacion).
+    -->
+    <main class="gl-slide gl-ls gl-opl" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-beams" data-slot="beams">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-opl-areas" data-slot="workAreas">
+        <li class="gl-ls-glass gl-opl-tile">
+          <img class="gl-opl-icon" data-slot-field="icon" alt="" />
+          <span class="gl-opl-tile-text">
+            <span class="gl-opl-area" data-slot-field="area">Ventas</span>
+            <span class="gl-opl-product" data-slot-field="product">Sales Cloud</span>
+          </span>
+        </li>
+      </ol>
+
+      <section class="gl-ls-doc gl-ls-reflect gl-opl-account" data-gl-selection-target>
+        <header class="gl-opl-head" data-slot="account">
+          <span class="gl-opl-avatar" data-slot-field="initials">TC</span>
+          <span>
+            <span class="gl-opl-name" data-slot-field="name">Tu cliente</span>
+            <span class="gl-opl-subtitle" data-slot-field="subtitle">Una sola cuenta, todos los equipos</span>
+          </span>
+        </header>
+        <ol class="gl-opl-facts" data-slot="accountFacts">
+          <li class="gl-opl-fact">
+            <span class="gl-opl-fact-key" data-slot-field="label">Oportunidad</span>
+            <span class="gl-opl-fact-value" data-slot-field="value">En negociación</span>
+          </li>
+        </ol>
+      </section>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Salesforce · RevOps y CRM</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cuántos Salesforce tienes?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">Uno</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Conectamos CRM, servicio, marketing, datos y agentes para que Salesforce funcione como <strong>una</strong> sola operación alrededor del cliente.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

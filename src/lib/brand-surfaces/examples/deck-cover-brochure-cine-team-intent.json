@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "document",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Brochure · Servicios 2026",
+    "question": "¿Qué hace Efeonce?",
+    "answer": [
+      "Crecer"
+    ]
+  },
+  "body": "**Cinco** líneas de servicio:\nGrowth · Brand · Engine · Voice · Revenue",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+    "alt": "Nexa al frente del equipo de Efeonce con sus uniformes y cinco agentes mini robots, todos mirando a cámara"
+  },
+  "column": {
+    "topPx": 250
+  }
+}

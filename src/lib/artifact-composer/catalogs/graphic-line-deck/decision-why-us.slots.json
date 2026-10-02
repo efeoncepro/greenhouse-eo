@@ -1,0 +1,364 @@
+{
+  "template": "DecisionWhyUs",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 200
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 270
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 140
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 450
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 26
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 520
+        },
+        "sourceLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-source-left=500px"
+        },
+        "sourceTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-source-top=1000px"
+        },
+        "sourcePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-source-px=15px"
+        },
+        "gridLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-grid-left=800px"
+        },
+        "gridTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-grid-top=230px"
+        },
+        "cellWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-cell-width=300px"
+        },
+        "columnGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-column-gap=30px"
+        },
+        "rowStep": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-row-step=360px"
+        },
+        "ruleStroke": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-rule=2px"
+        },
+        "cellPadTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-cell-pad-top=20px"
+        },
+        "figurePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-figure-px=150px"
+        },
+        "figureSecondaryPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-figure-secondary-px=92px"
+        },
+        "figureWght": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-figure-wght=300"
+        },
+        "figureTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-figure-tracking=-0.05em"
+        },
+        "labelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-label-px=22px"
+        },
+        "labelGap": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-dw-label-gap=14px"
+        }
+      }
+    },
+    "indicator": {
+      "selector": "[data-slot='indicator']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 22,
+          "example": "¿Por qué Efeonce?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 9,
+          "resolver": "gl-answer",
+          "example": "Por esto"
+        },
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 22,
+          "example": "Por qué elegirnos"
+        }
+      }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 100,
+        "maxLines": 4,
+        "overflow": "reject"
+      },
+      "example": "No te entregamos crecimiento: lo construimos contigo y te dejamos más capaz de sostenerlo."
+    },
+    "facts": {
+      "selector": "[data-slot='facts']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 6,
+        "maxItems": 6,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "size": {
+            "type": "string",
+            "required": true,
+            "resolver": "gl-figure-size"
+          },
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 8
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 54
+          }
+        }
+      },
+      "example": [
+        {
+          "size": "large",
+          "value": "+10",
+          "label": "años ejecutando en LATAM"
+        },
+        {
+          "size": "large",
+          "value": "5",
+          "label": "mercados: Chile, EE. UU., Colombia, México y Perú"
+        },
+        {
+          "size": "large",
+          "value": "+90",
+          "label": "empresas operan con Efeonce"
+        },
+        {
+          "size": "large",
+          "value": "1",
+          "label": "solo interlocutor para todas las líneas"
+        },
+        {
+          "size": "small",
+          "value": "En vivo",
+          "label": "tu operación visible en Greenhouse"
+        },
+        {
+          "size": "small",
+          "value": "Revenue",
+          "label": "Enabled: medimos negocio, no vanidad"
+        }
+      ]
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Fuente: Efeonce, 2026"
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Cliente"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "bottom-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "department"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1.1
+        },
+        "targetKind": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "object"
+        },
+        "variant": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "eight-handles"
+        },
+        "padding": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "standard"
+        },
+        "overlay": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "none"
+        },
+        "item": {
+          "type": "number",
+          "required": true,
+          "consumer": "validation-only",
+          "example": 4
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-baked-light.svg"
+    }
+  }
+}

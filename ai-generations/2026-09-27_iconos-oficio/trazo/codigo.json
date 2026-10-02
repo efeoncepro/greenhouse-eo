@@ -1,0 +1,19 @@
+{
+  "key": "codigo",
+  "label": "Código",
+  "use": "Engine · desarrollo, código",
+  "mode": "replace",
+  "rest": [
+    "M7.5 7.5l-4.5 4.5l4.5 4.5",
+    "M16.5 7.5l4.5 4.5l-4.5 4.5",
+    "M13.75 5l-3.5 14"
+  ],
+  "response": [
+    "M7.5 7.5l-4.5 4.5l4.5 4.5",
+    "M16.5 7.5l4.5 4.5l-4.5 4.5"
+  ],
+  "dot": [
+    12,
+    12
+  ]
+}

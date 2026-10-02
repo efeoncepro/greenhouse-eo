@@ -1,0 +1,72 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day",
+  "layout": "clock",
+  "voice": {
+    "eyebrow": "Un día con Efeonce",
+    "question": "¿Cómo es un día con nosotros?",
+    "answer": [
+      "Así"
+    ]
+  },
+  "body": "Del terreno a la medición en el mismo día. A las 15:00 entras tú: no esperas el informe, lo revisas con nosotros.",
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+    "alt": "15:00, la líder de cuenta revisa los resultados con el cliente frente a la pantalla",
+    "focus": {
+      "xOfWidth": 0.5,
+      "yOfHeight": 0
+    }
+  },
+  "moments": [
+    {
+      "photo": {
+        "plateRef": "ai-generations/2026-09-26_deck-mosaico-documental/plates/L2-terreno-panaderia.png",
+        "alt": "Escuchamos en terreno"
+      },
+      "hour": 9,
+      "time": "09:00",
+      "label": "Escuchamos en terreno",
+      "side": "below"
+    },
+    {
+      "photo": {
+        "plateRef": "ai-generations/2026-09-26_deck-mosaico-documental/plates/L3-taller-post-its.png",
+        "alt": "Creamos en el taller"
+      },
+      "hour": 11.5,
+      "time": "11:30",
+      "label": "Creamos en el taller",
+      "side": "start"
+    },
+    {
+      "photo": {
+        "plateRef": "ai-generations/2026-09-26_web-hero/plates/H2-pov-tablet.png",
+        "alt": "Medimos lo que vendió"
+      },
+      "hour": 18,
+      "time": "18:00",
+      "label": "Medimos lo que vendió",
+      "side": "end"
+    }
+  ],
+  "now": {
+    "hour": 15,
+    "time": "15:00",
+    "label": "Revisamos contigo"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "role"
+  }
+}

@@ -1,0 +1,5 @@
+DESIGN C — THE SHIP: the Spark's body borrows the language of image 3 (the white Efeonce ship): a slightly elongated rounded body, smooth glossy white like the ship, with a small swept tail fin on its back like the ship's tail, and on its belly THREE small round porthole windows in a row, exactly like the three windows of the ship, glowing softly azure from inside. The navy visor shows two glowing azure LED eyes shaped as soft upward arcs and the smooth smile arc of image 2 as its mouth. A thin white orbit ring with one small white sphere circles its body diagonally, like the orbit around the ship in image 3. It keeps two short legs with wheels.
+
+POSE AND CAMERA: standing, friendly, giving a small thumbs-up. THREE-QUARTER FRONT VIEW from the left at eye level.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow, crisp focus on the whole figure. Plain seamless light warm-gray studio background, nothing else in the frame, no text, no logos. The whole figure fully visible with generous margin, centered.

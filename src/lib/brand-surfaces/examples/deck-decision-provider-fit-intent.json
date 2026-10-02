@@ -1,0 +1,25 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "brochure",
+  "recipe": "decision-provider-fit",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Diagnóstico de encaje",
+    "question": "¿Salesforce o HubSpot?",
+    "answer": ["El que", "encaje"]
+  },
+  "body": "No vendemos una plataforma: vendemos la **decisión**, con evidencia de tu operación.",
+  "note": "Ejemplo ilustrativo · el veredicto sale del diagnóstico",
+  "verdicts": [
+    { "glyph": "crm", "title": "Salesforce", "description": "Org compleja, gobierno enterprise, servicio a escala, varios países." },
+    { "glyph": "embudo", "title": "HubSpot", "description": "Crecimiento B2B, equipo mid-market, valor en semanas." },
+    { "glyph": "integracion", "title": "Híbrida", "description": "Cada plataforma donde rinde mejor, conectadas." },
+    { "glyph": "checklist", "title": "No avanzar", "description": "Mantener lo que funciona y ordenar primero los datos." }
+  ],
+  "selectedVerdict": 3
+}

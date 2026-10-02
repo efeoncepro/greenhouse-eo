@@ -1,0 +1,17 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:03:17.326Z",
+  "run": "ai-generations/2026-09-17_higgsfield-api-canary",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-17_higgsfield-api-canary",
+  "totalBytes": 1215405,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "zimage-turbo-1k.png",
+      "sizeBytes": 1215405,
+      "sha256": "a5f65ee1cbf10d3caa2a6c7b195ac8deeb15fd05a73aa19a6d8aa8914c8f53bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_higgsfield-api-canary/zimage-turbo-1k.png"
+    }
+  ]
+}

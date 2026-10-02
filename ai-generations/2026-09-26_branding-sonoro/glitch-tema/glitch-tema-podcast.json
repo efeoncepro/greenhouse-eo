@@ -1,0 +1,10 @@
+{
+ "version": "podcast",
+ "bpm": 150,
+ "preBars": 6,
+ "aperturaAt": 9.6,
+ "apple": 11.2,
+ "seAbre": 11.9,
+ "silence": 13.2,
+ "durationSec": 13.600000000000001
+}

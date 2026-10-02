@@ -1,9 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { queryMock, captureWithDomainMock } = vi.hoisted(() => ({
+const { queryMock, captureWithDomainMock, peakMock } = vi.hoisted(() => ({
   queryMock: vi.fn(),
-  captureWithDomainMock: vi.fn()
+  captureWithDomainMock: vi.fn(),
+  peakMock: vi.fn()
 }))
+
+vi.mock('./postgres-backends-peak', () => ({ readPostgresBackendsPeak: peakMock }))
 
 vi.mock('@/lib/db', () => ({ query: queryMock }))
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: captureWithDomainMock }))
@@ -33,6 +36,8 @@ describe('postgres-connection-saturation (TASK-846 Slice 6)', () => {
   beforeEach(() => {
     queryMock.mockReset()
     captureWithDomainMock.mockReset()
+    peakMock.mockReset()
+    peakMock.mockResolvedValue(null)
   })
 
   describe('getPostgresConnectionSaturationSnapshot', () => {
@@ -191,6 +196,50 @@ describe('postgres-connection-saturation (TASK-846 Slice 6)', () => {
       expect(evidenceLabels).toContain('Detector')
       expect(evidenceLabels).toContain('ADR')
       expect(evidenceLabels).toContain('V2 trigger')
+    })
+  })
+
+  describe('recent peak from Cloud SQL native metric (TASK-1876 Slice 3)', () => {
+    it('raises a healthy instant to warning when the 24h peak reached >=90% of usable', async () => {
+      queryMock.mockResolvedValueOnce([buildRow()])
+      peakMock.mockResolvedValueOnce({ peak: 99, peakAt: '2026-09-18T11:05:00Z', windowHours: 24 })
+
+      const signal = await getPostgresConnectionSaturationSignal()
+
+      expect(signal.severity).toBe('warning')
+      expect(signal.summary).toContain('Pico reciente')
+      expect(signal.evidence).toContainEqual({ kind: 'metric', label: 'peak_backends_24h', value: '99' })
+    })
+
+    it('keeps ok for a normal daily peak below the ratio', async () => {
+      queryMock.mockResolvedValueOnce([buildRow()])
+      peakMock.mockResolvedValueOnce({ peak: 77, peakAt: '2026-09-26T15:00:00Z', windowHours: 24 })
+
+      expect((await getPostgresConnectionSaturationSignal()).severity).toBe('ok')
+    })
+
+    it('reports the peak even when the DB detector cannot connect (saturated instance)', async () => {
+      queryMock.mockRejectedValueOnce(Object.assign(new Error('remaining connection slots are reserved'), { code: '53300' }))
+      peakMock.mockResolvedValueOnce({ peak: 97, peakAt: '2026-09-28T10:00:00Z', windowHours: 24 })
+
+      const signal = await getPostgresConnectionSaturationSignal()
+
+      expect(signal.severity).toBe('unknown')
+      expect(signal.summary).toContain('97 backends')
+      expect(signal.evidence).toContainEqual({ kind: 'metric', label: 'peak_backends_24h', value: '97' })
+    })
+
+    it('declares the peak as unavailable (never ok by omission) when Monitoring cannot be read', async () => {
+      queryMock.mockResolvedValueOnce([buildRow()])
+      peakMock.mockRejectedValueOnce(new Error('403'))
+
+      const signal = await getPostgresConnectionSaturationSignal()
+
+      expect(signal.evidence).toContainEqual({
+        kind: 'metric',
+        label: 'peak_backends_24h',
+        value: 'no disponible (lectura de Cloud Monitoring falló)'
+      })
     })
   })
 })

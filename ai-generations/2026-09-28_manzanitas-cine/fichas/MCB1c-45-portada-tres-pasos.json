@@ -1,0 +1,21 @@
+{
+ "id": "MCB1c-45-portada-tres-pasos",
+ "formato": "4:5",
+ "impacto": true,
+ "identidad": [
+  "nexa"
+ ],
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark space at night with a thin haze; far behind her, softly out of focus, an immense field of thousands of unlit dark glass cards recedes into the darkness): a WIDE shot from further back of her SEATED at a long review table of matte oiled walnut with no reflections, centered, wearing a sleek, form-fitting BIONIC SUIT in deep navy with matte white armored plates on the shoulders, chest and forearms, thin glowing azure-blue (#0375DB) light seams along the plates; the chest plate is plain, smooth white with NO emblem, NO logo, NO symbol, NO rocket, NO lettering; no watch, no bracelet and no ring, sleek futuristic wraparound glasses with CLEAR TRANSPARENT lenses lightly tinted azure blue, a thin frameless edge and a fine glowing azure line along the top of the lenses; her eyes are clearly visible through the transparent lenses, no mirror reflection covers her eyes. REALISTIC ADULT PROPORTIONS: we sit across the same table from her, the camera at her seated eye level and tilted slightly upward, 85mm; she is small in the frame; the whole review table and the three cards are in frame in the lower third, and above her head a tall, empty expanse of dark hazy space fills the whole upper half of the frame. On the table in front of her lie EXACTLY THREE thin glass cards in one neat, compact row, evenly spaced (one, two, three), each carrying a soft, blurred, colorful abstract picture like a frame from a storyboard, with NO text, NO letters and NO symbols on them; the three cards are small, each about the width of her hand, and lie close together right in front of her torso: the whole row fits between her two shoulders, and both ends of the table, left and right, are empty dark walnut. A single fine trace of warm orange (#FF6500) light runs like a path from the first card to the second and on to the third, and stops on the THIRD card, which glows warm orange; she leans slightly forward over the table with both forearms resting on it, and the fingertips of one hand rest lightly on that lit card, caught at the exact moment she pauses her review and looks up straight into the lens with a quiet, confident half-smile. The lit card is the brightest element; a cool rim light from behind separates her from the dark; every other card stays dim. The TOP 30% of the frame is calm, deep dark space with only faint haze, no cards, no light, no objects. The near half of the table is in deep shadow, outside every light: the orange light only touches the cards and never reaches the near edge. Enormous contrast, no text, no logos of any other brand. No monitors, no plants, no lamps.",
+ "lecho": {
+  "objeto": "the near edge of the matte oiled walnut review table she is working at, only a few centimetres in front of the lens, in deep shadow, outside every light, with no reflections",
+  "tono": "DARK walnut in deep shadow, near black"
+ },
+ "reservas": {
+  "texto": {
+   "muro": "calm, deep dark space with only faint haze",
+   "tinta": "blanca"
+  }
+ }
+}

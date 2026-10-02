@@ -18,7 +18,7 @@ import {
 } from './contracts'
 
 /** Versión del contrato de policy. Bump al cambiar elegibilidad/caps (las observations la persisten). */
-export const GROWTH_AI_VISIBILITY_PROVIDER_POLICY_VERSION = 'policy.v1'
+export const GROWTH_AI_VISIBILITY_PROVIDER_POLICY_VERSION = 'policy.v2.multilingual-geo'
 
 export interface GrowthAiVisibilityProviderPolicy {
   policyVersion: string
@@ -75,9 +75,7 @@ const POLICY_BY_MODE: Record<GrowthAiVisibilityExecutionMode, GrowthAiVisibility
 }
 
 /** Devuelve la policy (copia inmutable) para un modo de ejecución. */
-export const resolveProviderPolicy = (
-  mode: GrowthAiVisibilityExecutionMode
-): GrowthAiVisibilityProviderPolicy => {
+export const resolveProviderPolicy = (mode: GrowthAiVisibilityExecutionMode): GrowthAiVisibilityProviderPolicy => {
   const policy = POLICY_BY_MODE[mode]
 
   return {

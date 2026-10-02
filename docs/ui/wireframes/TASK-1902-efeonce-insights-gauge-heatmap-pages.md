@@ -73,7 +73,7 @@ Documento de lectura, sin acciones. El orden de lectura es cifra → conclusión
 | Pista del arco | `gaugeTrack` | |
 | Brecha a la meta | `dataOpportunityOnPaper` | con rótulo «faltan N»; nunca sólo color |
 | Rampa del mapa de calor | escala de `dataCurrentOnPaper` por opacidad | la cifra se imprime siempre; contraste AA medido en cada escalón |
-| Píldora de cambio | `delta-pill` de TASK-1889 | dirección con triángulo |
+| Píldora de cambio | `delta-pill` de TASK-1889 (`delta--better` / `delta--plain`) | el triángulo sigue al valor; el tono dice si el cambio es mejor o peor para la métrica (`trendOf` de `render/figure-slots.ts`); sin dirección conocida, tono neutro |
 
 ## Copy Ledger
 
@@ -91,6 +91,7 @@ más arriba», «Subió», «Bajó»), «Cambio». Los nombres de zona salen del
 | Celda sin dato | celda vacía con borde, sin cifra |
 | Keyword sin cambio | píldora neutra «= 0» |
 | Más filas que la capacidad | continuación en la página siguiente |
+| Menos de 3 keywords objetivo | el mapa de calor no se produce (sólo keywords del set con intención `target`, decisión del operador 2026-09-26) |
 
 ## Accessibility Contract
 

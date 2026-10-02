@@ -1,0 +1,38 @@
+{
+  "id": "CT1-contenido-trabaja",
+  "formato": "16:9",
+  "impacto": true,
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "desde": "SE1",
+  "objetos": [
+    {
+      "objeto": "polo-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark studio at night, empty with only her own dark matte desk between her and the camera, no other furniture, no monitors, no plants, no lamps, nothing printed or analog anywhere, not even out of focus): an EFEONCE content strategist, a Latin American woman in her early thirties, dark curly hair tied up loosely, wearing the NAVY EFEONCE POLO exactly as in its reference, stands on the RIGHT side of the frame, her face at about 70% of the frame width, her right elbow (frame left), hanging at her side, at about 58% of the frame width; between the left edge of the frame and that elbow there is a wide band of empty darkness; framed from the waist up, looking straight into the lens with a calm, rested, quietly confident expression and only the trace of a smile; her left hand rests in her trouser pocket and her right arm hangs relaxed at her side: she is not touching anything, the work happens on its own around her. REALISTIC ADULT PROPORTIONS: the camera is about two meters away at chest height with an 85mm lens at f/1.8, so nothing is foreshortened and she does not lean toward the lens; her head occupies about one quarter of the frame height and her shoulders are clearly wider than two head-widths. Just beside her left shoulder (frame right), at the height of her chin and about 40 cm from her cheek, floats ONE published content piece made of light: a frameless sheet of pure light the size of a small paperback, thin as glass, with no bezel, no device and no screen, carrying the faint ghost of an article layout — a wide image block and a few bars of body text — burned out by its own white-hot glow and impossible to read, white-hot at its core with a vivid azure-blue (#0375DB) glow along its edges. From the dark far right background a slow, continuous stream of tiny separate azure points of light keeps arriving into that pane as long-exposure light trails, each point a visitor finding the piece, the trails thin and steady as if they had been flowing all night. Behind her, ALL of them to the RIGHT of her head, between 74% and 97% of the frame width, and six to eight meters away, hang more of the same sheets of light at different depths, small and deeply out of focus, each one with its own faint thread of arriving azure trails: the whole archive keeps pulling people in while nobody tends it. The near pane is the only light on her face: it paints the near side of her face (frame right), her neck and her near shoulder with white-azure light, while the far side of her face (frame left) falls into deep shadow. The embroidered mark on her chest keeps exactly the colour and relief of its reference, catching only a grazing edge of the light, never tinted azure or flattened; the polo stays a deep navy piqué with azure only on its highlights, never a royal-blue garment; nothing lights her from the camera side; a thin cool rim light from behind separates her hair and shoulders from the dark; thin haze catches the trails. Everything stays inside the RIGHT 55% of the frame: no sheet of light, no trail, no point and no light appears to the left of her right shoulder; between the left edge of the frame and her body there is a wide band of empty darkness. The LEFT 45% of the frame is calm, deep dark studio space with only faint haze, no sheets of light, no trails, no objects. Rich contrast, deep navy blacks, one single accent colour (azure), no readable text, no screens, no logos of any other brand.",
+  "llave": {
+    "fuente": "the glowing paperback-sized sheet of white-hot light with an azure (#0375DB) edge floating beside her",
+    "lado": "on her left side (frame right), level with her chin, exactly at the side of her face at 90 degrees to the lens axis, never in front of her face or of her chest",
+    "tamano": "the size of a small paperback, its white-hot core a narrow bright edge facing her cheek",
+    "distancia": "about 40 cm from her cheek"
+  },
+  "primerPlano": "a dark smoked-glass sheet that emits no light and receives no trails, hovering very close to the lens at the top-right corner of the frame, large and soft out of focus, cut by the frame edge, only a hairline azure glint on its edge",
+  "fondo": "far behind her, six to eight meters away, the rest of the archive: dozens of small glowing sheets of light melted into large round cold azure-white bokeh discs, all of them to the right of her head, between 74% and 97% of the frame width",
+  "fenomeno": {
+    "que": "published content pieces as frameless sheets of light; each one keeps pulling a continuous stream of tiny azure points (visitors) out of the dark as long-exposure trails, the nearest one beside her and the rest of the archive far behind, while nobody touches them",
+    "esServicio": "Contenido y SEO: cada pieza publicada sigue rankeando y atrayendo visitas y clientes de noche, sin que nadie la empuje; sin las piezas y sus estelas de llegada sólo queda una persona en un estudio oscuro."
+  },
+  "lecho": {
+    "objeto": "the near edge of her dark matte work desk between the camera and her, out of focus, non-reflective, outside every light and every reflection",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space to the left of her body",
+      "tinta": "blanca"
+    }
+  }
+}

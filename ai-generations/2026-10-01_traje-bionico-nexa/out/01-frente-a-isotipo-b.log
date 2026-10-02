@@ -1,0 +1,12 @@
+  $ costo estimado ≈ USD 0.053 (1 × 1756 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-01_traje-bionico-nexa/out/01-frente-a-isotipo-b-acabado-edicion.png (edit) …
+  ✓ 1227KB · gpt-image-2.5-sunburst · 1024x1024 · high
+    usage: in 1265 (img 1024 · txt 241) · out 1756 · total 3021
+done
+foto:isotipo → ai-generations/2026-10-01_traje-bionico-nexa/out/01-frente-a-isotipo-b.png
+  efeonce-isotype-positive de @efeoncepro/axis-brand-assets@0.4.10 (sha256 e8204298df02…), 62 px de ancho.
+  acabado → ai-generations/2026-10-01_traje-bionico-nexa/out/01-frente-a-isotipo-b-acabado.png
+  gpt-image-2.5-sunburst · high · 1024x1024 · ≈ USD 0.053
+  fuera de la marca: 0 px cambiados · en la marca: 2494 px
+  antes/después al 300 %: ai-generations/2026-10-01_traje-bionico-nexa/out/01-frente-a-isotipo-b-acabado-comparar.png (izquierda el compuesto, derecha el acabado)
+  Revisa al 100 %: pnpm foto:emblema ai-generations/2026-10-01_traje-bionico-nexa/out/01-frente-a-isotipo-b-acabado.png

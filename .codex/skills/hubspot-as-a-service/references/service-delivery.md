@@ -10,6 +10,10 @@ Use the strongest available evidence:
 4. Source document or approved client email.
 5. Inference, clearly labelled and never executed as fact.
 
+## Direct HubSpot execution route
+
+Use the [Agent CLI/MCP operator runbook](../../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md). For a conversational lookup or bounded change, use the authenticated HubSpot MCP connector when its portal, tool and permission are verified. For repeatable searches, bulk manifests or scheduled work, use Agent CLI when `hubspot whoami`, command help and a live reader prove the target portal. Keep the same proposed change, approval and readback contract across both routes. A failure in one route is not permission to switch portal, identity or authority silently. The developer `hs` CLI and Greenhouse bridge are separate.
+
 ## Change-set format
 
 Before a write, capture:
@@ -18,6 +22,7 @@ Before a write, capture:
 |---|---|---|---|---|---|---|
 
 Batch independently reversible writes. Separate schema creation, backfill, automation activation and reporting changes.
+For Agent CLI, check each command's installed `--help`: the local `properties create` command does not offer `--dry-run`, while `properties update` does. Do not describe a preview as proof that a write permission works or that the change was applied.
 
 ## Service workstreams
 

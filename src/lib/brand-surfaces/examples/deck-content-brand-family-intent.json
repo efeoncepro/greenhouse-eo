@@ -1,0 +1,47 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "line": "engine",
+  "theme": "dark",
+  "recipe": "content-brand-family",
+  "voice": {
+    "eyebrow": "El producto · SEO + AEO",
+    "question": "¿Qué hay dentro?",
+    "answer": [
+      "Cuatro",
+      "piezas"
+    ]
+  },
+  "body": "SV360 es SEO y AEO en un solo sistema: una capacidad, un proceso, un entregable y una edición mensual, todo firmado por **Efeonce**.",
+  "productMark": {
+    "asset": "sv360-logo-negative",
+    "alt": "SV360 · Search Visibility 360"
+  },
+  "familyMark": "sv360-name-lockup-negative",
+  "pieces": [
+    {
+      "mark": "aeo-lockup-negative",
+      "role": "Capacidad",
+      "description": "Que la IA te encuentre, te entienda y te recomiende."
+    },
+    {
+      "mark": "aeo-assessment-lockup-negative",
+      "role": "Proceso",
+      "description": "Mide cómo te ven los motores de IA, en siete dimensiones."
+    },
+    {
+      "mark": "ai-visibility-report-lockup-negative",
+      "role": "Entregable",
+      "description": "Lo que recibes y compartes: dónde estás y qué hacer primero."
+    },
+    {
+      "mark": "insights-lockup-negative",
+      "role": "Edición mensual",
+      "description": "Cada mes, qué se movió en tu SEO y tu AEO, y qué sigue."
+    }
+  ]
+}

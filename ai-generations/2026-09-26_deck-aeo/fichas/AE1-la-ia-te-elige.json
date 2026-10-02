@@ -1,0 +1,18 @@
+{
+  "id": "AE1-la-ia-te-elige",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    { "objeto": "polo-efeonce" }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark space at night): an EFEONCE SEO strategist, a Latin American woman in her early thirties, dark hair in a low bun, wearing the NAVY EFEONCE POLO, stands on the RIGHT side of the frame, framed from the waist up, looking straight into the lens with a quiet, confident half-smile, one hand on a tablet held at her side. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. Behind her, filling the right and upper background, stands an immense WALL of hundreds of identical dark grey rectangular cards floating in rows into the distance, all unlit and anonymous, like brands nobody sees. High above them floats a huge glowing AI answer panel made of light: a rounded chat bubble with three luminous typing dots and soft lines of text too blurred and too small to read. From that panel a single powerful azure-blue (#0375DB) beam of light cuts down through the haze and lands on ONE card in the wall, just behind her shoulder: that one card glows bright white-azure, lifts slightly forward out of the wall and throws light on her hair and shoulder, with a thin teal (#36C8BF) halo around it. Every other card stays dark. The beam and the chosen card are the main light source; cool rim light from behind. The LEFT 45% of the frame is calm, deep dark space with only faint haze, no cards, no panel, no objects. Rich contrast, punchy, no logos of any other brand, no readable text.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a desk close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": { "muro": "the calm, deep dark space on the left 45% of the frame", "tinta": "blanca" }
+  }
+}

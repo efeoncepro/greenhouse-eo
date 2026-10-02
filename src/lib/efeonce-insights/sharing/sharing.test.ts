@@ -105,6 +105,68 @@ describe('buildInsightWebModel', () => {
     expect(serialized).not.toContain('evidenceRef')
   })
 
+  it('1.1 — un plan v1 no trae campos v2 (aditivo: el consumer 1.0 ve lo mismo)', async () => {
+    const { buildInsightWebModel } = await import('./web-model')
+    const { INSIGHT_WEB_MODEL_VERSION } = await import('../contracts/web-model')
+    const model = buildInsightWebModel({ plan: plan(), facts: [fact(), fact({ factId: 'seo.clicks.previous', value: null })] })
+
+    expect(INSIGHT_WEB_MODEL_VERSION).toBe('1.1')
+    expect(model.modelVersion).toBe('1.1')
+    expect(model).not.toHaveProperty('essentials')
+    expect(model).not.toHaveProperty('decision')
+    expect(model.chapters[0]).not.toHaveProperty('readings')
+    expect(model.chapters[0]!.charts[0]).not.toHaveProperty('derived')
+  })
+
+  it('1.1 — proyecta lo editorial v2 y las tasas del embudo con la geometría de los PDF', async () => {
+    const { buildInsightWebModel } = await import('./web-model')
+    const base = plan()
+
+    const v2: EditorialPlanV1 = {
+      ...base,
+      essentials: [{ claimId: 'e1', text: 'Más clics.', factIds: ['seo.clicks.current'] }],
+      decision: { claimId: 'd1', text: 'Aprobar el plan.', factIds: [] },
+      scopeLines: ['Visibilidad orgánica en Google'],
+      chapters: [{
+        ...base.chapters[0]!,
+        opening: { claimId: 'o1', text: 'Abre el capítulo.', factIds: [] },
+        readings: [{ chartId: 'ch1', keyFigure: { factId: 'seo.clicks.current', value: '12.345', caption: { claimId: 'k1', text: 'clics', factIds: [] } }, conclusion: { claimId: 'co1', text: 'Subió.', factIds: [] }, nextStep: null }],
+        charts: [...base.chapters[0]!.charts, {
+          specVersion: 'chart_spec_v1', chartId: 'f1', family: 'funnel', relation: 'conversion', title: 'Embudo', series: [], dimensionLabels: [], unit: 'count',
+          scale: { kind: 'linear', baseline: 0 }, references: [], tabularEquivalent: { columns: ['Etapa', 'N'], rows: [] },
+          data: { kind: 'funnel', stages: [{ stageId: 'a', label: 'Clics', factId: 'seo.f1' }, { stageId: 'b', label: 'Visitas', factId: 'seo.f2' }] }
+        }]
+      }]
+    }
+
+    const model = buildInsightWebModel({ plan: v2, facts: [fact(), fact({ factId: 'seo.clicks.previous', value: null }), fact({ factId: 'seo.f1', value: 200 }), fact({ factId: 'seo.f2', value: 50 })] })
+
+    expect(model.essentials?.[0]!.text).toBe('Más clics.')
+    expect(model.decision?.text).toBe('Aprobar el plan.')
+    expect(model.scopeLines).toEqual(['Visibilidad orgánica en Google'])
+    expect(model.chapters[0]!.opening?.text).toBe('Abre el capítulo.')
+    expect(model.chapters[0]!.readings?.[0]).toMatchObject({ chartId: 'ch1', keyFigure: { value: '12.345' }, nextStep: null })
+    expect(model.chapters[0]!.charts[1]!.derived?.funnelStepRates).toEqual([{ stageId: 'a', display: null }, { stageId: 'b', display: '25,0 %' }])
+  })
+
+  it('1.1 — un embudo que crece no inventa tasas', async () => {
+    const { buildInsightWebModel } = await import('./web-model')
+    const base = plan()
+
+    const v2: EditorialPlanV1 = {
+      ...base,
+      chapters: [{ ...base.chapters[0]!, charts: [{
+        specVersion: 'chart_spec_v1', chartId: 'f1', family: 'funnel', relation: 'conversion', title: 'Embudo', series: [], dimensionLabels: [], unit: 'count',
+        scale: { kind: 'linear', baseline: 0 }, references: [], tabularEquivalent: { columns: ['Etapa', 'N'], rows: [] },
+        data: { kind: 'funnel', stages: [{ stageId: 'a', label: 'A', factId: 'seo.f1' }, { stageId: 'b', label: 'B', factId: 'seo.f2' }] }
+      }] }]
+    }
+
+    const model = buildInsightWebModel({ plan: v2, facts: [fact({ factId: 'seo.f1', value: 10 }), fact({ factId: 'seo.f2', value: 20 })] })
+
+    expect(model.chapters[0]!.charts[0]).not.toHaveProperty('derived')
+  })
+
   it('etiqueta el período con fechas civiles (último día = endExclusive − 1)', async () => {
     const { formatInsightPeriodLabel } = await import('./web-model')
 

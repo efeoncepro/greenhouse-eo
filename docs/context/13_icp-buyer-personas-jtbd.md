@@ -32,6 +32,37 @@
 
 ⭐ = **Puertas de entrada primarias (Tier 1)**: AEO, Vocería/PR, Velocidad Web. Ciclo corto, dolor concreto, ticket bajo → es por donde entra la mayoría. El producto debe brillar rápido para estos.
 
+### Tamaño de la cuenta en la calificación comercial
+
+El tamaño es una dimensión del ICP de **la empresa que contrataría**, no del perfil personal del interlocutor. Para
+clientes nuevos, **menos de 50 personas queda fuera del ICP de servicios Efeonce**. Las 50 personas son el piso para
+evaluar fit, no una aprobación automática. Registrar una banda operativa (`1–10`, `11–49`, `50–200`, `201+`), con
+fuente y fecha; estas bandas no son una clasificación legal de PYME.
+
+1. Identificar primero la razón social o marca que pagaría. Si la persona tiene empresa y marca personal, calificar
+   ambas por separado hasta saber cuál contrataría.
+2. Buscar el rango en una fuente oficial aplicable al país (por ejemplo, el estrato de personal ocupado por
+   **establecimiento** de [DENUE en México](https://www.inegi.org.mx/servicios/api_denue.html)); contrastarlo con
+   la página corporativa, LinkedIn y un proveedor de datos de empresas. No convertir perfiles vinculados en LinkedIn
+   en nómina total, ni sumar establecimientos como si fueran empresas distintas.
+3. Registrar `banda observada`, `fuente/fecha` y `confianza`. Si las fuentes discrepan o una banda cruza el umbral
+   de 50, conservar el rango completo y **no calificar la cuenta como ICP hasta confirmar al menos 50 personas**.
+   No promediar rangos ni usar ingresos estimados por un directorio como facturación confirmada.
+
+| Banda operativa | Decisión de ICP para clientes nuevos |
+| --- | --- |
+| `1–10` | Fuera del ICP; no abrir preventa de servicios. |
+| `11–49` | Fuera del ICP; un presupuesto disponible por sí solo no cambia el fit. |
+| `50–200` | Piso de evaluación; validar problema, capacidad de compra, decisor y encaje de delivery antes de invertir en diagnóstico o propuesta. |
+| `201+` | Candidata a prospección prioritaria si hay trigger, problema y buying group identificable. |
+
+Para ofertas Spot o recurrentes del plan outbound, el gate económico vigente es capacidad razonable de comprar
+**USD 8.000–15.000 Spot** o **USD 3.000–5.000 MRR**, además de señal verificable y 2–3 integrantes del buying group
+([plan de pipeline §5](../commercial/PIPELINE_GENERATION_AND_OUTBOUND_PLAN_2027_V1.md#5-micro-icp-y-puertas-de-entrada-outbound)).
+Ese gate económico se aplica **después** del piso de 50 personas; una banda grande tampoco demuestra por sí sola
+capacidad de compra. Para una respuesta inbound o warm, aclarar primero la entidad compradora y su tamaño;
+diagnóstico y propuesta sólo tras confirmar fit, alcance y orden de magnitud del presupuesto.
+
 ---
 
 ## Buyer Personas (comités de compra)

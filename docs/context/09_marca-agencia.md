@@ -41,6 +41,7 @@ El Why sin mecanismo es humo de agencia. Cada faceta se sostiene en algo concret
 - **Automatización con autoría** — en Creative Studio automatizamos fricción y repetición, ampliamos exploración y reservamos criterio/aprobación para las personas.
 - **Educación como sistema** — Think educa al mercado; el protocolo de transparencia + los frameworks compartidos educan al cliente.
 - **Experiencia Efeonce** — el cliente no entra solo a una agencia: entra a un ecosistema de crecimiento con operación, software, aprendizaje, contenido, tools, networking y memoria.
+- **Capacidad que se puede experimentar antes de contratar** — en oportunidades seleccionadas, mostramos cómo entendemos el negocio y cómo trabajaríamos mediante un diagnóstico y una muestra contextual. El comprador puede evaluar criterio, ejecución y operación sobre su caso. Diferenciador reconocido por el operador el 2026-09-30; método y evidencia en [Venta con demostración contextual](../commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md). El formato puede ser X-Ray, Notion, contenido o prototipo; la herramienta no define el diferencial. No implica demostraciones ilimitadas, resultados garantizados ni exclusividad de mercado.
 
 ### WHAT — lo tangible
 
@@ -108,6 +109,19 @@ Nexa es la personificación del Why dentro de Greenhouse. No es un chatbot ni un
 
 Regla de marca: Nexa nunca debe presentarse como "asistente virtual" genérico ni usarse decorativamente. Su identidad aparece cuando hay contexto, evidencia, permiso, intención y siguiente paso. El rostro aprobado vive en `NexaFace` / `public/images/avatar-nexa/nexa-face.webp`; el sistema de marca vive en `GreenhouseNexaBrandMark` y `public/images/nexa-mark/*`. En CTAs o superficies que invocan a Nexa, usar Nexa Mark (arco + sparkle), no iconos genéricos. Canon: `docs/architecture/nexa-intelligence/voice/nexa-identity-canon.md`.
 
+### Personajes de marca: Nexa y los Sparks (2026-10-01)
+
+La marca propia tiene dos clases de personaje. **Nexa** es la personificación del Why (arriba). Los **Sparks** (un
+Spark) son los agentes de Efeonce: cinco personajes propios —investigación, contenido, CRM y datos, servicio y
+reportes— con el mismo cuerpo derivado de la marca (la esfera, la órbita, las tres ventanas de la nave y la chispa
+del Nexa Mark como antena) y un accesorio y un gesto por familia. Son la cara de Agent Ops en la Transformación
+humano-agente. Reglas que no se negocian: trabajan con contexto y siempre con una persona que supervisa, nunca
+reemplazan personas ni deciden solos; Nexa puede liderarlos en la ficción, pero las piezas que venden Agent Ops llevan
+al equipo humano; nunca más grandes que la cabeza de la persona; registro cine o puesta en escena, nunca documental.
+Son el único robot permitido en una foto de Efeonce y se declaran desde el catálogo de `foto:prompt`. En público,
+«los Sparks de Efeonce»; el nombre no es producto ni marca registrada. Canon:
+[`SPARKS_V1.md`](../operations/brand-characters/SPARKS_V1.md).
+
 ---
 
 ## Arquitectura de marca: masterbrand con capabilities
@@ -127,6 +141,8 @@ Una sola marca lidera toda la relación externa: **Efeonce es la marca paraguas*
 | **Control plane / experiencia** | **Greenhouse** | Operación, cliente, memoria, medición y convergencia del ecosistema. |
 
 > Implicación de producto: Greenhouse puede organizar internamente por líneas de negocio, product brands, ownership y delivery. La experiencia de cara al cliente debe liderar con "Efeonce" como marca paraguas y mostrar la product brand solo cuando aporte claridad. No expongas líneas o marcas como proveedores contractuales separados.
+
+> **Submarcas de producto que acompañan (2026-09-29):** distintas de las product brands de la tabla, **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** (línea Engine / Digital Services & Engineering) son submarcas de producto de Efeonce con logo: van siempre en lockup con Efeonce (mismo patrón que Efeonce Insights) y nunca firman solas. [ADR de naming §Delta 2026-09-29](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md#delta-2026-09-29--submarcas-de-producto-seoaeo-con-logo).
 
 ---
 
@@ -202,7 +218,8 @@ operativo, la elegibilidad social y sus planos de medición viven en PDR-018, no
 | Nested Loops™ | "Cada fase construye sobre la anterior." | Propuestas. |
 | ICO | "Ves en tiempo real qué pasa con tu marketing." | Diferenciador en pitches. Onboarding. |
 | **Ecosistema de producto** (Greenhouse + Kortex + Verk) | "Tienes login a tres plataformas donde ves tu operación, tu CRM y tu contenido en tiempo real. Cada ciclo el sistema se vuelve más valioso." | Demo en pitch. Ecosystem Tour. Switching cost. Referrals. |
-| Frameworks específicos (Surround Discovery™ —incluye SOLVE como etapa—, AEO, CSC, Revenue Enabled) | Se traducen a beneficios. | Solo en profundidad técnica. |
+| **Efeonce AEO** | "Descubre cómo aparece tu marca en respuestas de IA y qué conviene mejorar." El diagnóstico es **Efeonce AEO Assessment** y el entregable **Efeonce AI Visibility Report**. | Puerta de entrada de marca; [naming canónico](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md). |
+| Frameworks específicos (Surround Discovery™ —incluye SOLVE como etapa—, CSC, Revenue Enabled) | Se traducen a beneficios. | Solo en profundidad técnica. |
 
 ---
 
@@ -287,6 +304,14 @@ logo es un sistema consistente, no un activo distintivo demostrado. Manual y val
 [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · tokens
 `efeonceGraphicLine` y archivos oficiales `@efeoncepro/axis-brand-assets` de AXIS 0.2.7 ·
 [índice de la carpeta](../operations/brand-graphic-line/README.md).
+
+**Íconos (desde el 2026-09-26):** la línea tiene iconografía propia en dos voces —**Trazo**, lo que se mide (Growth,
+Engine, Revenue), y **Plastilina**, lo que se crea (Brand)—; la esfera es un estado (responde uno solo) y no aplica a
+clientes ni a la UI de Greenhouse. Fuente de verdad en AXIS (`efeonceGraphicLine.icons`,
+`@efeoncepro/axis-graphic-line/icons`): [manual §14](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina).
+Desde el 2026-09-27 (D24) hay una tercera capa, **Plastilina en volumen**: cada glifo de Plastilina en arcilla mate
+inflada (PNG con alfa), sólo para momentos protagonistas —portada, key visual, escenario, merch—, uno por pieza y
+nunca en UI, listas ni decks ([manual §14.1](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27)).
 
 ## Identidad en informes
 

@@ -10,7 +10,10 @@ Pedido del operador: «las imágenes deben dejar espacio a veces para donde se v
 probó la reserva de espacio para titular y los formatos **nativos** 4:5, 9:16 y 16:9 (nunca recortados de otro).
 
 
-> 🔴 **ESTADO (2026-09-19, decisión del operador): la CAPA DE COMPOSICIÓN de este documento NO está aprobada.**
+> ✅ **Actualización 2026-09-26 (decisión del operador): la capa gráfica sobre la foto está aprobada.** Las piezas
+> compuestas de este documento siguen rechazadas como ejemplos; lo que vale son sus reglas y prohibiciones.
+>
+> 🔴 **ESTADO (2026-09-19, decisión del operador, histórico): la CAPA DE COMPOSICIÓN de este documento NO está aprobada.**
 > Lo aprobado de esta sesión es **la fotografía**: dirección, colorimetría, cámaras/ángulos, firma sobre el lecho,
 > realismo, personas y escenarios (ver los otros documentos de esta carpeta). Las piezas compuestas que aparecen
 > aquí (§4, §8, §9, §13) fueron **rechazadas**: mala jerarquía, interespaciado y aplicación tipográfica. Un

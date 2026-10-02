@@ -1,0 +1,11 @@
+CMP004-C04-KV-45-R04-plate.png  1122×1402  · formato 4:5
+
+  reserva                                 medido                                              pasa
+  1 · zona de texto (banda)               blanca 0.34 · oscura 0.00 del alto                  ✓
+  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —
+  3 · lecho de la firma (18% · señal débil)blanco 5.31 · navy 1.78 · nitidez 0.0007 (frágil)   ✓
+  color · sombras no azules               b* del cuartil oscuro -0.8 (negativo = azul; ojo si hay un objeto azul grande)✓
+  4 · aire para cursores                  costados calma 1.10 / 0.33                          ✗
+  5 · campo profundo al margen            banda continua hasta 0.35 (tinta blanca)            ✗
+
+  3/5 reservas cumplidas

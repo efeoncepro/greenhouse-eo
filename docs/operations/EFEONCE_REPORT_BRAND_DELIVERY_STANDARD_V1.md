@@ -1,7 +1,9 @@
 # Estándar de marca y entrega de informes Efeonce
 
-**Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04 · **Última actualización:** 2026-09-25
-(dirección premium de Efeonce Insights; dueño del contacto por tipo de documento tras TASK-1889).
+**Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04 · **Última actualización:** 2026-09-28
+(cómo firman hoy los informes de Insights, variantes del lockup en Think, el gap del lockup en portadas PDF/deck y el color
+de «INSIGHTS» en esas portadas como decisión abierta; antes, 2026-09-26, estado de la
+dirección premium de Insights tras el cierre de TASK-1888 y dueño del contacto por tipo de documento tras TASK-1889).
 **Alcance:** todos los informes de Efeonce, internos o dirigidos a clientes, cualquiera que sea su disciplina.
 La metodología y las cifras siguen bajo el contrato del dominio; este estándar gobierna su presentación.
 
@@ -110,9 +112,12 @@ cerró con «así quiero que se vea un informe». Referencias durables: la
 (tesis, tabla de tokens y anti-patrones), su carpeta `paginas/` con las 41 páginas a tamaño nativo, la prueba en
 escala de grises y el [wireframe](../ui/wireframes/TASK-1889-efeonce-insights-premium-catalogs.md) por región.
 
-**Estado:** diseño aprobado; **implementación en curso**. Producción sigue sirviendo los catálogos v1 de Insights
-(TASK-1847). El contrato editorial lo fija TASK-1888 y los catálogos premium los construye TASK-1889. Esta sección
-no describe lo que hoy emite producción. Las reglas siguientes sirven a cualquier informe Efeonce; lo propio de
+**Estado (2026-09-26):** diseño aprobado. El contrato editorial v2 (TASK-1888) está **encendido en producción**
+desde el 2026-09-26: toda edición nueva de Insights sella lectura por figura, «Lo esencial», líneas de alcance y
+portada. Los catálogos premium (TASK-1889, complete 2026-09-26) están en producción (releases `0e87c7a443a2` y
+`f9257b9c94af`): el operador aprobó los PDF internos de Berel y Sky y la estructura del deck, y las primeras ediciones
+internas con el diseño nuevo se renderizaron en producción; emitir y compartir siguen apagados. Las ediciones anteriores son inmutables y
+conservan el diseño con que se sellaron. Las reglas siguientes sirven a cualquier informe Efeonce; lo propio de
 Insights se indica como tal.
 
 ### Color de estructura
@@ -154,8 +159,9 @@ para lectura y datos con cifras tabulares.
 
 - Una sola portada, navy o blanca; en Insights cambia por módulo, no hay una portada por servicio. La blanca lleva un bloque
   navy a sangre en el 55 % superior y el título en navy de marca sobre papel.
-- El logo del cliente nunca va en positivo sobre navy. Si el cliente no tiene versión para fondo oscuro, se usa la
-  portada blanca. Sin logo, «Preparado para» muestra el nombre del cliente; sin nombre, el bloque desaparece. Nunca se
+- El logo del cliente nunca va en positivo sobre navy. Si el cliente no tiene versión para fondo oscuro, la portada
+  automática es la blanca; una portada navy pedida expresamente va sin logo del cliente. En Insights la portada se
+  resuelve al crear la edición (encargo > preferencia de la organización > automática) y queda sellada en ella. Sin logo, «Preparado para» muestra el nombre del cliente; sin nombre, el bloque desaparece. Nunca se
   inventa un nombre ni un logo.
 - **Precisión del pie para esta dirección:** las portadas aprobadas no llevan el pie institucional. Muestran logo,
   período, «Preparado para», eslogan y la línea «Confidencial · Versión · fecha». El contacto completo va en la
@@ -169,7 +175,7 @@ Navy, con logo y eslogan al centro. Su pie reúne URL bubble, seis redes (Spotif
 YouTube y TikTok), correo, teléfonos de Chile y Estados Unidos, dirección, mercados (Chile · Estados Unidos ·
 Colombia · México · Perú) y la línea legal con razón social, RUT, confidencialidad y fecha de corte. Ningún valor se
 escribe en la plantilla: salen del SSOT de marca `src/config/efeonce-brand.ts`, que ya contiene URL, razón social,
-RUT, mercados, eslogan y los cuatro perfiles sociales con URL canónica. Desde TASK-1889 (code complete 2026-09-25)
+RUT, mercados, eslogan y los cuatro perfiles sociales con URL canónica. Desde TASK-1889 (en producción desde 2026-09-26)
 contiene además el contacto (`EFEONCE_CONTACT`: correo, teléfonos de Chile y Estados Unidos y dirección de
 presentación) y los seis canales sociales de documentos (`EFEONCE_DOCUMENT_SOCIAL_CHANNELS`). Para los catálogos de
 Insights ese es el único dueño del contacto: los mappers lo inyectan, y
@@ -182,6 +188,31 @@ los documentos que reutilizan su contraportada.
 El deck aprobado lleva un pie con logo, edición (p. ej. «Insights · Informe de agosto 2026»), URL bubble y folio «NN / total»,
 sin dirección ni teléfonos. Es una excepción aprobada a la regla general de decks, limitada al deck de Insights; los
 demás decks conservan el pie con, como máximo, la URL bubble.
+
+### Marca de producto Insights: cómo firman hoy los informes (2026-09-28)
+
+Insights tiene marca de producto propia desde el 2026-09-28 (manual de la línea gráfica §7.1; archivos en
+`@efeoncepro/axis-brand-assets` 0.4.0). **La firma de un informe no cambia: siempre es el logo de Efeonce.** Insights
+acompaña y nunca firma. Estado por superficie, sin regla nueva:
+
+| Superficie | Cómo se ve hoy |
+|---|---|
+| Informe A4 y deck (PDF) | Pie y contraportada con el logo de Efeonce. Portadas con logo de Efeonce + filete + «INSIGHTS» en mayúsculas espaciadas (`uppercase` + `letter-spacing: 0.34em`; no son versalitas de fuente), tipografiado por la plantilla, como aprobó el canvas del 2026-09-25; aperturas de capítulo con un mini-lockup tipográfico al pie en `navyMuted` |
+| Informe compartido en Think | Lockup oficial «Efeonce \| Insights»: `insights-lockup-negative` en el hero oscuro y en la portada del modo presentación (también oscura); `insights-lockup-positive` **sólo al imprimir**. La lámina de cierre de la presentación y el pie firman con el logo de Efeonce y el eslogan (el pie suma la línea legal). Imagen para compartir propia (`og-insights.png`, 1200 × 630, sin datos del informe) |
+| Correo de entrega | Plantilla de Efeonce, sin marca de producto |
+
+**Gap abierto, pendiente de decisión del operador:** el lockup oficial se aprobó el 2026-09-28 en el canvas
+«Insights en vivo», pero **no está implementado** en las portadas PDF/deck, que siguen con la composición tipográfica.
+Este estándar no fija todavía si el lockup la reemplaza, ni su tamaño mínimo en portada; hasta que el operador decida,
+las plantillas quedan como están y ningún agente lo cambia por su cuenta. Mapa técnico: arquitectura de Insights §6.3.
+
+**Segunda decisión abierta, del operador:** en las portadas PDF/deck, «INSIGHTS» se pinta en el acento (`navyAccent`,
+teal-500, a 12 px) y con proporciones propias. Choca con «junto a Efeonce, Insights baja su brillo; sólo la esfera
+conserva el acento» (2026-09-28) y con «el acento nunca en texto de menos de 24 px». Cambiarlo toca el contrato de
+fidelidad de TASK-1889; detalle en el manual de la línea gráfica §7.1.
+
+Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`), con datos de ejemplo.
+El ejemplo vivo del producto es la muestra `think.efeoncepro.com/insights/muestra`.
 
 ## Aplicación y propietarios
 

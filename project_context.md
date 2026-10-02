@@ -6,13 +6,13 @@ CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
 ## Actualización documental reciente
 
-Ledgers CRM Dreamforce/UNBOUND al 2026-09-19; el provider-fit admite
-`HubSpot-first | Salesforce-first | híbrida | no-fit`. La [transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
-está aprobado y probado comercialmente por confirmación del operador; pruebas publicables, pricing y elegibilidad
-de cada capacidad siguen sujetos a verificación.
+CRM (Dreamforce/UNBOUND, 19/09): provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
+[Transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): aprobada y probada comercialmente por el operador; pruebas publicables, pricing y elegibilidad de cada capacidad requieren verificación.
 
-Greenhouse: plataforma operativa Efeonce Group (Next.js 16/MUI 7/Vuexy/TS). Estado: `Handoff.md`. Historia:
+Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
+
+HubSpot directo: [Agent CLI/MCP](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); portal y permisos separados.
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
@@ -113,9 +113,8 @@ y federado en `mcp.efeonce.org`, fail-closed por organización. `GROWTH_SEO_ENAB
 `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` e
 `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`.
 
-ETV DataForSEO: producción sirve `improved_layout_clickstream_v2` desde 2026-09-03 (legacy = rollback pre-corte):
-`docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` ·
-[auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
+DataForSEO: ETV `improved_layout_clickstream_v2`; CLI 1.1.0 URL/host: ADR operador; AI/DB: TASK-1651.
+[ADR ETV](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
 
 Efeonce Insights (EPIC-045): [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14 = estado real.
 
@@ -183,6 +182,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 
 | Pregunta | Fuente primaria |
 | --- | --- |
+| Creative Workbench / SKY | `.codex/skills/efeonce-creative-workbench/SKILL.md` + `references/state-continuity.md`; motor en Workbench |
 | Qué hago ahora | `Handoff.md` + artefacto activo |
 | Qué existe y qué contrato gobierna | `docs/architecture/**`, ADRs, código/runtime |
 | Por qué se decidió | `docs/architecture/DECISIONS_INDEX.md` + ADR |
@@ -195,16 +195,16 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo modelar Wave y sus boundaries con Efeonce Digital, Kortex, Globe y Reach | `docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md` + `docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md` |
 | Qué tooling/modelos evalúa Efeonce Globe / Creative Studio | `docs/architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md` + capability registry |
 | Cómo crea y captura valor Creative Studio, sus créditos y qué skills lo adoptan | `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md` |
-| Cómo crear o auditar publicidad/social con texto o selección colaborativa | `docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md` + [Creative Typography Workbench público](https://axis.efeonce.org/references/creative-typography/) + skill espejo `efeonce-advertising-creative`; AXIS `0.2.5` posee `axisAdvertising`/`efeonce.advertising-typography` (`trial`) y `efeonce.collaboration-selection` (`candidate`) + manifest agent-facing. Greenhouse fija esa versión y `pnpm creative:layout` adapta supporting tagline, targets `headline|support|hook|lockup` y el URL Bubble canónico con blend raster `luminosity`; otro motor sin adapter reporta `pending adapter`. Para social compone con `social-media-studio`; producir/revisar no autoriza publicar. MCP no sirve este manual mientras no exista una tool creativa federada real. |
+| Cómo crear o auditar publicidad/social con texto o selección colaborativa | `docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md` + [Creative Typography Workbench público](https://axis.efeonce.org/references/creative-typography/) + skill espejo `efeonce-advertising-creative`; AXIS `0.2.5` posee `axisAdvertising`/`efeonce.advertising-typography` (`trial`) y `efeonce.collaboration-selection` (`candidate`) + manifest agent-facing. Versión fijada; `pnpm creative:layout`: tagline, `headline|support|hook|lockup` y URL Bubble con blend raster `luminosity`; sin adapter: `pending adapter`. CTA color: `docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md` §20. Para social compone con `social-media-studio`; producir/revisar no autoriza publicar. MCP no sirve este manual mientras no exista una tool creativa federada real. |
 | Qué tipografías y firma de marca usan las seasonalities Efeonce | UI: `DESIGN.md` + `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`; guía de publicidad/social: `../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md`; casos auditados y límites de peso/interlineado: `.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md`; seasonalities: Bricolage display + Poppins apoyo, con Guttery sólo como gesto breve y con atribución oficial o activo distintivo validado; assets y skills: `src/assets/fonts/BricolageGrotesque-Variable.ttf` + `BricolageGrotesque-SOURCE.md` + `efeonce-advertising-creative`/`social-media-studio`/`design-studio`/`greenhouse-ai-image-generator` |
 | Cómo producir posts sociales visuales con reportes, dashboards o evidencia de producto | `docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md` + capas funcional/manual + skills `design-studio` y `social-media-studio` |
 | Video | Motion/Audio: companions; CDR-008 |
 | Cómo crear o modificar templates, footers y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera aparte con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
 | Cómo diseñar, auditar o mejorar dashboards en Google Data Studio (antes Looker Studio) | `.codex/skills/google-data-studio/SKILL.md` + `.claude/skills/google-data-studio/SKILL.md`; usar `inspect` por defecto; validar modelado, filtros, browser, permisos y sharing en sus references |
-| Cómo modelar Efeonce Group, Media & Distribution, Growth Platform, AEO y Search Visibility 360 | `docs/business-models/README.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + modelos vigentes |
+| Modelos Efeonce: Group, Media, Growth, AEO y Search Visibility 360 | [ADR AEO](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) + `docs/business-models/README.md` |
 | Qué contenido escribir para un cliente de SEO y cómo entregarlo | `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`. Striking distance ya está en `/admin/growth/seo/keywords` (`TASK-1308`); verificar habilitación por org. Brief: `SEO_CONTENT_BRIEF_STRUCTURE_V1.md` |
-| Cómo leer un site audit de crawler sin mentir el diagnóstico (orden, lab vs campo, techo del crawl, cobertura AEO, crawlers de IA) y qué método ajeno no gobierna | `.codex/skills/seo-aeo/modules/01_SEO_TECHNICAL.md` §8 + `.claude/skills/dataforseo-operator/references/04-onpage.md` §11 + `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 + `seo-aeo/references/competitor-methodologies-2026-09.md` |
-| Cómo reconciliar el costo del AI Visibility Grader | `docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md` + doc funcional/runbook del grader |
+| SEO/AEO: site audit y X-Ray | `.codex/skills/seo-aeo/modules/01_SEO_TECHNICAL.md` §8 + `.claude/skills/dataforseo-operator/references/04-onpage.md` §11 + `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 + `seo-aeo/references/competitor-methodologies-2026-09.md`; X-Ray: `docs/think/README.md` + `.codex/skills/seo-aeo/references/aeo-xray.md` (sample autónoma ≠ grant Greenhouse) |
+| Grader: mercados y costo | [manual](docs/manual-de-uso/growth/configurar-mercados-aeo.md) + `docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md` |
 | Cómo evaluar el portafolio de partners/providers de IA | `.codex/skills/efeonce-business-model-operator/SKILL.md` + `.codex/skills/efeonce-customer-model-operator/SKILL.md` + audit comercial fechado; economics y routing directo/Fal en `design-studio` y `motion-design-studio` |
 | Qué es un Product Service y cómo separar oferta, productización, delivery, operación, engagement | `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` |
 | Cómo separar Organization, Engagement comercial, oferta/servicio, Project/Campaign, Task y Deliverable en On-Going y On-Demand; Product Service sólo cuando aplica; Ficha de Activación venta→Delivery | `docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md` + `EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` |
@@ -222,7 +222,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo se priorizan beachheads, ofertas de entrada, rutas de expansión, proof y cross-sell | `docs/strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md` + `docs/context/13_icp-buyer-personas-jtbd.md` + `gtm-architect`/`efeonce-customer-model-operator` |
 | Contrato transversal de producto y crecimiento operator-first | `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md` + `docs/context/03_ecosistema-producto.md` + `docs/context/10_experiencia-cliente.md` + `efeonce-business-model-operator`/`efeonce-customer-model-operator`/`research-benchmark-operator` |
 | Mapa de dolores y fallas del journey del operador | `docs/strategy/EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md` + `efeonce-customer-experience` + RESEARCH-010 |
-| Relación Why → operator-first → CX → Greenhouse | `docs/context/09_marca-agencia.md` + `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md` + `docs/context/10_experiencia-cliente.md` |
+| Why, operator-first, demostración comercial y CX | `docs/context/09_marca-agencia.md` + `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md` + `docs/context/10_experiencia-cliente.md` |
 | Arquitectura de contenido y learn moments | `docs/strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md` + `content-marketing-studio` + `efeonce-customer-experience` |
 | Cómo se separan marca paraguas, líneas de negocio/prácticas, product brands, oferta y delivery | `docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` |
 | Directriz estratégica 2028 para todos los servicios | `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md` |
@@ -258,6 +258,7 @@ Todo trabajo formal sigue `intake -> taxonomy -> plan -> execution -> verificati
 - Captura visual: `pnpm fe:capture`, `pnpm fe:capture:review`, `pnpm fe:capture:diff`.
 - Producción estática reproducible: `pnpm creative:layout -- --contract <yaml|json> --mode plan|compile|check`; los binarios de `ai-generations` se archivan con `pnpm media:archive-ai-generation` y Git conserva su manifest.
 - PostgreSQL: `pnpm pg:connect`; no improvisar pools ni credenciales.
+- Guard de `/api/public/**` (WAF): `pnpm security:public-burst-guard [--apply]`.
 - Workers/Cloud Build: `pnpm worker:build-contract-gate` valida toolchain, inputs `file:`, Docker contexts y triggers; `pnpm worker:runtime-deps-gate`, la dependency closure runtime de los cuatro workers.
 - Sitio público por SSH/WP-CLI: `pnpm public-website:ssh-check` antes de mutar.
 - Contexto histórico: `rg -n '<keyword>' docs/operations/agent-context-history`.
@@ -274,13 +275,10 @@ Todo trabajo formal sigue `intake -> taxonomy -> plan -> execution -> verificati
 
 ## Contexto por dominio
 
-El mapa canónico está en [AGENTS.md](AGENTS.md#router-de-dominios): cargar solo la fila aplicable (skill,
-invariantes, arquitectura, task). Su versión machine-readable vive en
-`docs/operations/agent-context-router.json`. Si una regla no aparece en el router:
-
-1. buscar keyword en arquitectura, operations y skills;
-2. buscar en el snapshot `docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md`;
-3. contrastar con código/runtime y corregir el router o el doc canónico antes de fiarse de memoria histórica.
+[Router AGENTS](AGENTS.md#router-de-dominios): cargar skill, invariantes, arquitectura y task de la fila aplicable.
+Manifest: `docs/operations/agent-context-router.json`. Fallback: arquitectura/operations/skills →
+`docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md`. Verificar código/runtime y
+corregir router o canon antes de usar memoria histórica.
 
 ## Memoria histórica e integridad
 

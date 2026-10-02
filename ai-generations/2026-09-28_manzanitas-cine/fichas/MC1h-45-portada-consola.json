@@ -1,0 +1,21 @@
+{
+ "id": "MC1h-45-portada-consola",
+ "formato": "4:5",
+ "impacto": true,
+ "identidad": [
+  "nexa"
+ ],
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, a vast dark cathedral-like space at night): she stands centered in a WIDE shot, framed from the hips up and SMALL in the frame: the WHOLE UPPER THIRD of the frame above her head is calm dark space and the TOP OF HER HAIR is at 38% of the frame height, wearing a sleek, form-fitting BIONIC SUIT in deep navy with matte white armored plates on the shoulders, chest and forearms, thin glowing azure-blue (#0375DB) light seams along the plates; the chest plate is plain, smooth white with NO emblem, NO logo, NO symbol, NO rocket, NO lettering; no watch, no bracelet and no ring, sleek futuristic wraparound glasses with CLEAR TRANSPARENT lenses lightly tinted azure blue, a thin frameless edge and a fine glowing azure line along the top of the lenses; her eyes are clearly visible through the transparent lenses, no mirror reflection covers her eyes. REALISTIC ADULT PROPORTIONS: camera about two meters away from her at chest height, 85mm, she does not lean toward the lens. She looks straight into the lens with a quiet, confident half-smile, arms relaxed. Behind her, receding for hundreds of meters into the darkness, floats an immense field of THOUSANDS of identical thin dark glass cards in endless rows and columns, all unlit, anonymous and barely visible, like every brand nobody sees. From the upper right, OUTSIDE the frame, a WIDE, dramatic volumetric azure-blue (#0375DB) follow-spot beam, like a stage spotlight, cuts diagonally down through thick haze and lands on ONE single card just beside her right shoulder: that card blazes brilliant white with an azure core, larger and closer than the others, lifted forward out of the field, radiating fine glowing particles; its light floods her face and shoulder. The beam enters the frame only below 36% of its height. The beam is the brightest element of the frame and the only strong light besides a cool rim behind her; every other card stays in darkness. The TOP 30% of the frame is calm, deep dark space with only faint haze, no cards, no beam, no objects. Enormous contrast, punchy, awe-inspiring, no text, no logos of any other brand. We watch her from the operator’s seat of a dark monitoring console that faces the space: the lens is only a few centimetres behind the near edge of the console, whose low, flat surface with rows of unlit keys and faders crosses the whole bottom of the frame, outside every light, with no screens and nothing lit on it; her body below the hips is hidden behind it. No desks other than the console, no monitors, no plants, no lamps.",
+ "lecho": {
+  "objeto": "the near edge of the dark monitoring console we shoot past, a low flat surface with rows of unlit keys and faders, the lens only a few centimetres behind it, outside every light",
+  "tono": "DARK near black"
+ },
+ "reservas": {
+  "texto": {
+   "muro": "calm, deep dark space with only faint haze",
+   "tinta": "blanca"
+  }
+ }
+}

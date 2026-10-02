@@ -1,0 +1,43 @@
+{
+  "responder-m": [
+    "arte/responder-tercio.png",
+    "arte/panel-responder.png",
+    "arte/aeo-pantalla.png"
+  ],
+  "organico-m": [
+    "arte/organico.png",
+    "arte/aeo-pantalla.png"
+  ],
+  "cerrar-m": [
+    "arte/cerrar.png",
+    "arte/panel-cerrar.png"
+  ],
+  "cocina-m": [
+    "arte/cocina.png",
+    "arte/nexa-mes.png",
+    "arte/tazas.png"
+  ],
+  "v27-m": [
+    "arte/v27.png",
+    "arte/canvas-seleccion.png"
+  ],
+  "hecho-a-mano-m": [
+    "arte/hecho-a-mano.png"
+  ],
+  "formatos-m": [
+    "arte/voz-formatos.png",
+    "arte/muro-pantallas.png"
+  ],
+  "noche-m": [
+    "arte/vinilo-horas.png",
+    "arte/app-variantes.png"
+  ],
+  "captura-m": [
+    "arte/voz-tomas.png",
+    "arte/hoja-contactos.png"
+  ],
+  "memoria-m": [
+    "arte/voz-marca.png",
+    "arte/archivo-marca.png"
+  ]
+}

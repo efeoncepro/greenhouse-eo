@@ -5,6 +5,12 @@ description: Estrategia, arquitectura, posicionamiento, identidad verbal, reputa
 
 # Efeonce Brand Studio
 
+## Naming canónico AEO de Efeonce
+
+**Efeonce AEO** es la capacidad de marca; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su entregable compartible. **Search Visibility 360** sigue nombrando la oferta amplia de SEO + AEO. En comunicación externa, repetir Efeonce como masterbrand y explicar el beneficio en lenguaje claro (*AI visibility*, cómo aparece la marca en respuestas de IA); AEO/GEO sueltos son términos de categoría; «AEO» sólo funciona como submarca junto a Efeonce (**Efeonce | AEO**, ver abajo). **AI Visibility Grader**, **Brand Visibility Grader** y **AEO Grader** permanecen como aliases técnicos o históricos para buscar código, rutas, documentos y mediciones; no son el nombre comercial actual. Decisión: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
+**Submarcas de producto con logo (Delta 2026-09-29):** el operador aprobó **Efeonce | SV360** (Search Visibility 360, la capacidad completa SEO + AEO), **Efeonce | AEO**, **Efeonce | AEO Assessment** (el proceso que evalúa la marca; nunca «AI Assessment») y **Efeonce | AI Visibility Report** (el entregable) como **submarcas de producto de Efeonce**, con logo. Acompañan a Efeonce en un lockup (patrón de Efeonce Insights) y **nunca firman solas**: Efeonce sigue siendo la masterbrand y la firma. Pertenecen a la línea Engine (acento `#0375db`, «Empower your Engine»); «la órbita vive en la O». Archivos oficiales en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29, AXIS `main` `7f9c8bb`), nunca armados a mano; referencia visual en el Lab de AXIS `/references/seo-aeo/`. Detalle: ADR de naming §Delta 2026-09-29 y skill `efeonce-graphic-line` (criteria «Submarcas de producto SEO/AEO», applications §B3c).
+
 Opera la marca como un sistema de crecimiento: posicionamiento relevante, diferencia defendible, memoria acumulada, experiencia demostrable, confianza verificable y decisiones gobernadas.
 
 ## Alcance y fronteras
@@ -24,6 +30,67 @@ Esta skill es dueña de:
 No produce identidad visual detallada, UI, motion, piezas, medios ni contenido diario. Define criterios y briefs, y deriva la ejecución a `design-studio`, `creative-practice`, `copywriting`, `deck-studio`, `seo-aeo` o `greenhouse-ux-content-accessibility` según el caso.
 
 Para Efeonce, cargar primero `docs/context/00_INDEX.md`, `docs/context/09_marca-agencia.md`, `docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`, `docs/business-models/EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md` y `docs/services/README.md`. `efeonce-agency` sigue siendo el router de negocio; esta skill gobierna el trabajo de marca.
+
+## Diferenciador comercial: experimentar la capacidad antes de comprarla
+
+**Decisión del operador, 2026-09-30:** Efeonce incorpora como diferenciador de su experiencia comercial
+**hacer que el cliente experimente nuestra capacidad antes de comprarla**. Se materializa mediante
+**venta con demostración contextual**: entender una necesidad de la cuenta, mostrar una oportunidad
+con evidencia, construir una muestra pertinente y explicar cómo se ejecutaría y evaluaría el trabajo.
+Canon de marca: [`docs/context/09_marca-agencia.md`](../../../docs/context/09_marca-agencia.md).
+Método, casos y medición: [metodología comercial](../../../docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md).
+
+Es un mecanismo para vivir la marca durante la evaluación comercial. No reemplaza el Why, la categoría
+Integrated Growth Partner, el tagline ni la arquitectura de ofertas; tampoco crea una nueva submarca.
+El valor está en hacer evaluables el criterio, la calidad de ejecución y la forma de colaboración.
+Una muestra pertinente permite que el comprador formule mejores preguntas y comparta evidencia con
+su comité. Reducir incertidumbre es una **hipótesis de mecanismo**, no un efecto causal ya medido.
+
+### Mensaje y razones para creer
+
+- **Núcleo interno aprobado:** «Hacemos que el cliente experimente nuestra capacidad antes de comprarla».
+- **Traducción al comprador:** «Preparamos una muestra para tu negocio para que puedas evaluar cómo
+  pensamos, qué calidad de trabajo entregamos y cómo lo implementaríamos contigo».
+- **Prueba que acompaña el mensaje:** un hallazgo trazable, una muestra identificada como demo y una
+  explicación de decisiones, condiciones de implementación y medición. En una oportunidad real,
+  adaptar el tiempo verbal al estado: «preparamos» requiere una muestra existente y revisada;
+  una propuesta de producirla se expresa como tal.
+- **Límite de atribución:** Berel es aprendizaje declarado por el operador; SKY es un caso adjudicado
+  en cuyo éxito el operador identifica la milla extra como factor; Pichincha es una aplicación abierta.
+  Consultar los expedientes fechados antes de usar estados. No atribuir un cierre exclusivamente a la
+  muestra ni presentar Pichincha como cliente ganado. Usar nombres, material y testimonios públicos
+  sólo cuando exista autorización; una referencia interna no autoriza su publicación.
+
+No comunicar «somos los únicos», «ganamos por dar la milla extra» o «garantizamos resultados».
+Diferenciador de Efeonce significa una conducta que elegimos sostener; no prueba exclusividad frente a
+competidores. No presentar este mecanismo como win rate, mayor revenue o menor ciclo sin medición.
+
+### Aplicación en la experiencia de marca
+
+1. Identificar qué necesita evaluar el comprador: comprensión de su negocio, criterio, ejecución,
+   implementación o continuidad. Elegir una incertidumbre antes de elegir un formato.
+2. Conectar oportunidad, muestra y explicación de trabajo; el comprador debe poder reconocer su
+   contexto y comprender por qué se eligió esa solución. Personalizar sólo el logo no demuestra esto.
+3. Distinguir diagnóstico observado, contenido ilustrativo, propuesta y desempeño medido. Una
+   animación de respuesta de IA no es evidencia de una citación real; una muestra de Insights no
+   son resultados del prospecto.
+4. Crear un recorrido breve y compartible para la reunión y su comité: qué vemos, qué proponemos,
+   por qué y qué debemos validar juntos. Evaluar si cada elemento facilita una decisión.
+5. Mantener continuidad entre demo, propuesta y servicio: aclarar qué muestra la capacidad y qué
+   entregables, revisiones, publicación y condiciones se contratan. La demo no obliga a producir o
+   implementar gratuitamente; fijar inversión de preventa proporcional desde el método comercial.
+6. Recoger feedback específico y el siguiente paso bilateral. Separar aprobación visual, interés,
+   intención de compra y contratación; una reunión o un cambio de stage no acredita las cuatro.
+
+X-Ray, Efeonce AI Visibility Report, Notion, piezas y Efeonce Insights son vehículos posibles.
+La metodología precede a esos vehículos y puede aplicarse a otras prácticas con una muestra adecuada.
+Esta skill gobierna mensaje, coherencia y prueba de marca; `efeonce-agency` y los modelos comerciales
+rutean calificación y alcance, y las skills de oficio producen y verifican cada artefacto.
+
+**Gate de marca:** antes de llamar diferenciadora a una demo, comprobar contexto real, criterio visible,
+calidad revisada, límites explícitos y utilidad para decidir. Medir feedback, objeciones resueltas,
+avance bilateral y costo de preventa junto al resultado comercial. Un acabado premium por sí solo
+no demuestra comprensión del negocio, ventaja competitiva ni brand equity.
 
 ## Modos de operación
 
@@ -105,9 +172,14 @@ Leer solo lo necesario:
 - `references/metrics-and-scorecards.md` para métricas y scorecards.
 - `references/branding-as-a-service.md` para ofertas, delivery, pricing logic y handoff.
 - `references/research-sources-2026.md` para evidencia fechada, confianza y fuentes de investigación.
-- `references/graphic-line-orbit.md` para la línea gráfica «La órbita» de Efeonce: usos, regla de la firma, reglas duras, tokens y archivos oficiales, contrato y comandos, fotografía generada, artefactos y QA.
+- `references/graphic-line-orbit.md` para la línea gráfica «La órbita» de Efeonce: usos, regla de la firma, reglas duras, tokens y archivos oficiales, contrato y comandos, íconos (Trazo y Plastilina), fotografía generada, artefactos y QA.
 
 Usar las plantillas de `templates/` cuando el usuario necesite un artefacto formal. Ejecutar `scripts/validate-brand-artifact.py` antes de cerrar entregables estructurados.
+
+## Dónde viven los archivos de `ai-generations/`
+
+Las rutas `ai-generations/…` de esta skill son lógicas. **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json` o citado por recetas de deck y `src/**`/`scripts/**`. **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): identidades, prendas, logo 3D, mascotas y Sparks sellados (`pnpm creative:assets:publish`). **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes.
+Si falta en disco: `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer. **NUNCA** regenerar, sustituir ni aproximar un asset aprobado, resellar el lock para taparlo ni archivar o borrar a mano; promover exploración = sellarla o citarla en la receta + publicar a canon. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## Activación cultural y social
 
@@ -137,9 +209,12 @@ decisiones del operador, ejecución y evidencia; no tratar una aprobación esté
 
 ### Línea gráfica «La órbita» (canónica 2026-09-25)
 
+> **Skill dueña de la línea:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) (viva) guarda el criterio, todo lo disponible en AXIS, las aplicaciones, el motion y la convergencia con la foto. Cárgala para componer; esta sección resume sólo lo que decide marca.
+
 La forma propia de Efeonce: anillo fino + arco con esfera + halo, nacida del isotipo. Tres usos: **rodea** (palabra,
-lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el foco «Te hacemos visible»). La familia
-(Efeonce, Globe, Wave, Reach) comparte la órbita y cambia el acento. Operar con
+lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el foco «Te hacemos visible»). **Efeonce firma
+todo:** Globe (suite de estudio creativo, en desarrollo), Wave y Reach aparecen como contexto, nunca como firma;
+Kortex y Verk, fuera por ahora. Operar con
 [la referencia](references/graphic-line-orbit.md); contenido en el
 [manual V1](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) y decisión en el
 [ADR](../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md).
@@ -148,6 +223,16 @@ lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el fo
   clientes), papel de la órbita en la pieza, voz pregunta-respuesta y su banco de pares, y el estado de evidencia.
   **Qué decide `design-studio`:** composición, lente, foto y QA de píxeles; los valores salen de los tokens
   `efeonceGraphicLine` de AXIS, **nunca** HEX/px transcritos.
+- **Marcas editoriales con reglas propias** (arquitectura): Glitch (magazine semanal) tiene su sub-línea
+  (`efeonce-graphic-line` → `references/glitch.md`) y Marketing con Manzanitas, la marca editorial evergreen del blog,
+  su **registro Marketing con Manzanitas** (aprobado por el operador el 2026-09-28 sobre el
+  [canvas v39](https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG)): norma
+  [`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md),
+  [ADR](../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md) y `efeonce-graphic-line` →
+  `references/manzanitas.md`. El registro **complementa La órbita, no la reemplaza**: La órbita manda en todo lo que el
+  registro no dice. Glitch y Manzanitas son hermanos y no se mezclan (Glitch: manzana llena, su verde, bytes, Guttery y
+  «EDICIÓN #N»; Manzanitas: manzana en contorno con tres puntos y el acento de la línea del tema). «Registro» de marca
+  ≠ registro fotográfico. Nada del registro está aún en AXIS.
 - **Reglas duras:** ningún texto cruza la órbita · una lente u órbita por pieza, muro o vidrio, nunca patrón · sin
   dato real con fuente no hay arco · `efeoncepro.com` siempre en la burbuja oficial, nunca como texto · el logo en una
   frase de display sólo alineado a línea base y altura de x · sin velo navy sobre fotos de banco.
@@ -159,9 +244,36 @@ lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el fo
   imagen (mockup, objeto, merch), centrada, sola, con fusión de luminosidad a opacidad 1 y ≥ 4,5:1 medido (sólo pasa
   sobre lechos muy oscuros). Nunca a un costado ni junto al logo. Como pie de deck, informe, papelería o mail sigue
   como antes (horneada donde no hay fusión). Umbral 4,5 vs 3:1: pendiente del operador.
-- **Cómo se ejecuta:** contrato AXIS `efeonce.graphic-line-orbit` 0.2.0 (`pnpm creative:orbit:resolve|render`),
+- **Firma de correo v3.1** (aprobada por el operador, 2026-09-26): versiones A papel y B tarjeta navy, sin decisión
+  pendiente. Una sola línea con esfera; la regla que abre «Partner oficial de» **nunca** lleva esfera; franja de logos
+  oficiales (no insignias de nivel) en un tono y mismo peso óptico, sólo relaciones que permite el
+  [registro de partnerships](../../../docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md), sin Truora; «Quedo
+  atento» y cualquier cierre van en el cuerpo. Contrato AXIS `efeonce.email-signature`; imágenes PNG publicadas
+  (`email-signature/v3.1/`), falta instalar en Outlook. Detalle en la referencia y en el
+  [manual §10.2](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).
+- **Cómo se ejecuta:** contrato AXIS `efeonce.graphic-line-orbit` 0.3.0 estable (`pnpm creative:orbit:resolve|render`),
   capa `graphic_line` y `brand.signature` en `pnpm creative:layout`, `marcaEnEscena` en `pnpm foto:componer:cta`;
-  logos y burbujas sólo desde `@efeoncepro/axis-brand-assets`, nunca copias a mano. Detalle y QA en la referencia.
+  logos, burbujas y órbitas estáticas sólo desde `@efeoncepro/axis-brand-assets`, nunca copias a mano. Las piezas de
+  formato fijo (lente, foco, deck, retrato) se **reproducen** desde los tokens `pieces`/`portrait`; la lente siempre
+  lleva arco y esfera, y un solo anillo rodea el contenido. Fuera de Greenhouse, la órbita pintada sale del paquete
+  `@efeoncepro/axis-graphic-line`. Detalle y QA en la referencia.
+- **Íconos** (canónicos 2026-09-26, D16–D22; sólo marca propia, nunca clientes ni UI de Greenhouse): dos voces por la
+  línea de la pieza, **Trazo** (lo que se mide: Growth, Engine, Revenue) y **Plastilina** (lo que se crea: Brand);
+  Voice sin voz fija. La esfera es un estado: responde uno solo y sólo si la pieza no tiene otra esfera. Glifos de
+  `ICON_CATALOG`, pintados con `resolveIcon` (`@efeoncepro/axis-graphic-line/icons`); nunca un ícono dibujado o
+  generado suelto. Criterio en [`efeonce-graphic-line` → iconography](../efeonce-graphic-line/references/iconography.md).
+  Tercera capa, **Plastilina en volumen** (D24, 2026-09-27): cada glifo de Plastilina en arcilla mate inflada, PNG con
+  alfa derivado de su vector aprobado (`volumeIconUrl(glyph)`, `@efeoncepro/axis-brand-assets`); complementa al plano,
+  no lo reemplaza. Sólo en momentos protagonistas, uno por pieza, ≥ 160 px; nunca en listas, contenido de deck,
+  dashboards ni UI. Detalle en [la referencia](references/graphic-line-orbit.md) §Íconos.
+- **Motion:** animaciones del logo V1.1 aprobadas (reveal 3,6 s, apertura 2,4 s, sting 1,6 s;
+  [spec](../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md)); la animación de la órbita
+  sin logo sale del paquete de AXIS. Masters en el bucket público de AXIS, nunca en git (ver referencia). **Antes de
+  animar cualquier pieza de Efeonce, la norma
+  [lenguaje de movimiento de la órbita](../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)**
+  (siete reglas: lento–rápido–lento, llegar con golpe, curvas por papel, sin saltos en los relevos, movimiento real,
+  geometría oficial, sonido en el golpe); los valores viven en el token `efeonceGraphicLine.motion`
+  (`@efeoncepro/axis-tokens` 0.3.3) y nunca se escriben en un script.
 - **Estado:** **sistema consistente, NO activo distintivo demostrado**: la prueba de atribución sin logo (600
   personas) no se ha corrido. «Te hacemos visible» no sale a pauta sin revisión legal.
 
@@ -184,6 +296,50 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
   [índice](../../../docs/operations/brand-photography/README.md) ·
   [manual de uso](../../../docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md). Referencias en OneDrive
   `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/`.
+- **Banco y guía para el equipo [operador, 2026-09-26]:** las fotos aprobadas con su receta viven en
+  [axis.efeonce.org/references/photography/](https://axis.efeonce.org/references/photography/) y el porqué de cada
+  regla, para personas y agentes, en [/references/photography/why/](https://axis.efeonce.org/references/photography/why/)
+  (`why.json` para agentes). Úsalos para explicar y defender las decisiones de marca ante el equipo o el cliente.
+- **Registro cine «la marca en su película» [operador, 2026-09-27]:** ficción declarada donde el servicio aparece en
+  acción y **el color de su línea sale de la escena como luz** (anillo, haz, holograma, moño, esferas), con el sujeto
+  mirando al lente. Dónde entra en la marca propia, y sólo ahí:
+  - **Piezas con Nexa protagonista** (traje de ficción permitido sólo a ella: el traje biónico y sus lentes tienen kit
+    desde el 2026-10-01, se piden por catálogo con `"registro": "cine"` y su marca viaja armada en la referencia,
+    nunca descritos a mano; TASK-1940) y la **receta de deck
+    `proposal-cinematic`**, con personas del equipo en su **uniforme por registro de escena** o con Nexa. AXIS rechaza
+    el resto con `cine-requires-nexa-or-proposal`: una pieza social, un hero web o una lámina de contenido con el
+    equipo sigue en A, B o C.
+  - **Excepción aprobada (operador, 2026-09-27):** las láminas de **sección y «about»** del deck (secciones partidas,
+    «Quiénes somos», «Por qué lo hacemos») con personas en luz dramática; no amplía el cine fuera del deck y el
+    contrato AXIS ya la conoce (desde `axis-tokens` 0.3.14, TASK-1927): admite cine en `section-split`, `section-cine`
+    (composiciones `team`, `services`, `about` y `purpose` desde TASK-1928) y en `cover-brochure`, `close-brochure` y
+    `close-proposal`. Receta de cada lámina: `docs/operations/brand-graphic-line/deck-recipes/`.
+  - **Deck y brochure** (PDF horizontal 16:9) se componen con `pnpm brand:compose` (Artifact Composer, contrato AXIS
+    `efeonce.surface-composition` 0.1.2, integrado en Greenhouse por TASK-1927: `use: proposal|brochure`, el marco
+    `cover-brochure`, `cover-proposal`, `close-brochure` y `close-proposal`, las composiciones `service|hero|lines` de
+    `proposal-cinematic` y el documento multipágina con `pages`). **Las 69 recetas del catálogo componen** (TASK-1928,
+    2026-09-28: 50 plantillas en el catálogo `graphic-line-deck`; AXIS `axis-tokens` 0.3.21 / `axis-ui-contracts`
+    0.3.19; intent de ejemplo por receta en `src/lib/brand-surfaces/examples/deck-<receta>-intent.json`), incluida la
+    portada de brochure con la selección de Nexa (`cover-brochure` layout `document-selection`). Es composición local
+    por CLI: la ruta productiva (API, worker, MCP) es TASK-1921 y **no está disponible**. Para armar el deck, carga la
+    skill `deck-studio`; detalle de plantillas y gates en `efeonce-graphic-line`. **Los datos de las láminas** (logo del
+    cliente, cifras, casos, testimonios, logos de terceros, montos, equipo) **no se escriben a mano**: se ligan con
+    `pnpm brand:deck-plan -- --bind` (`bindDeckSlots`, TASK-1930) desde evidencia verificada; ningún deck, ni uno
+    interno, usa evidencia interna, y el uso de la marca de un tercero exige su autorización con documento (biblioteca
+    por tercero: TASK-1937). La lámina de líneas es la única con los cinco acentos;
+    en todo lo demás, un acento por pieza, tomado del `accentOnDark` de la línea que se vende. **Portadas y
+    contraportadas** (operador, 2026-09-27): foto ↔ sin foto; «Empower your Growth» como mensaje de la contraportada de
+    propuesta y «¿Conversamos? Cuando quieras.» en la de brochure; nunca el eslogan en la portada; `cover-classic` y
+    `close-classic` retiradas para estos documentos (no están en el catálogo del composer). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6; resumen en
+    [graphic-line-orbit.md](references/graphic-line-orbit.md) regla 11b.
+  - **Publicidad 9:16 y 4:5: en prueba** (`ai-generations/2026-09-27_ads-cine/`), **no aprobada ni autorizada para
+    pauta**. La receta de anuncio cine no existe en AXIS: el script de esa tanda fue de sesión, y en producción la capa
+    va por `pnpm foto:componer` / `foto:componer:cta`.
+  - **Qué decide esta skill:** si la pieza cabe en uno de los dos casos, qué línea (y qué acento) representa, y que no
+    se presente como activo distintivo: la prueba de reconocimiento del registro está pendiente. **Qué decide
+    `design-studio`:** la toma, la luz, las trampas y la barra de juicio, en
+    [su referencia](../design-studio/references/efeonce-photographic-language.md) (§Registros). Canon vigente:
+    [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
 
 ### Isotipo 3D de Efeonce (biblioteca aprobada 2026-09-17)
 
@@ -239,7 +395,10 @@ texto a un modelo de imagen es cómo se pierde la ortografía y los pesos. Méto
 
 - **Signature elements** (identidad, viajan en toda pieza suya y los resuelve `foto:prompt`): anillo
   geométrico plata mate en el **índice derecho** · **SMARTWATCH** en la muñeca izquierda —**nunca** un reloj
-  analógico— · aretes de **plata**, nunca dorados · uñas de un solo color.
+  analógico— · aretes de **plata**, nunca dorados · uñas de un solo color. **[pendiente]** En el registro cine las
+  fichas piden «no watch, no ring» y el compilador igual inyecta el smartwatch: si el traje biónico y el uniforme cine
+  llevan los signature elements lo decide el operador (trampa 8 del
+  [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)).
 - **Props de escena** (se declaran en la `escena`): iPhone, iPad con Pencil, MacBook, Mac de escritorio,
   AirPods · **DJI Osmo Pocket** y **Osmo Action** · **DJI Mic 3** o lavalier **Rode** · **Shure** en podcast ·
   cuerpo **Sony α** o **Canon EOS R**.
@@ -248,6 +407,19 @@ texto a un modelo de imagen es cómo se pierde la ortografía y los pesos. Méto
 Encendidos y en uso, nunca de adorno; la silueta sí, **ningún logotipo de tercero legible**; un objeto manda
 por escena. No es atrezzo: el valor §1.3 del Character Bible es «tecnología con criterio», y los objetos son
 donde eso se ve sin decirlo. Canon: [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+
+### Sparks, los agentes de Efeonce **[operador, 2026-09-29 y 2026-10-01; TASK-1941]**
+
+Personajes propios que dan cara a Agent Ops: cinco Sparks (investigación, contenido, CRM y datos, servicio y reportes)
+con la misma forma y color —esfera blanca, órbita, chispa del Nexa Mark, tres ventanas de la nave— que se distinguen
+por accesorio y gesto. **No son Nexa**: Nexa puede liderarlos en la ficción. Relato: trabajan con contexto y siempre
+con una persona que supervisa; nunca reemplazan personas ni aparecen solos decidiendo, y las piezas de venta de Agent
+Ops llevan al equipo humano. **Nombre:** «Sparks» sirve como nombre interno de personajes; en uso público, siempre
+«los Sparks de Efeonce», nunca como nombre de producto o servicio ni para registrarlo sin revisión de Legal (hay
+«Sparks AI», «Gemini Spark», «SPARK AI» de LogicGate y Spark Mail). Son la única excepción del canon a «nunca robots»
+y salen del kit: reglas de foto en `design-studio` (`efeonce-photographic-language.md` §11 «Sparks»; en cine, dos
+con referencia como máximo y el resto lejos y desenfocado, escena `NX7d` aprobada el 2026-10-02). Canon:
+[`SPARKS_V1.md`](../../../docs/operations/brand-characters/SPARKS_V1.md).
 
 ### Sistema de credencial (lanyard, yoyo, portacarnet y carnet — aprobado 2026-09-17)
 

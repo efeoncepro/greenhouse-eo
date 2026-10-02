@@ -1,7 +1,7 @@
 # Reserva de espacio en la toma — Lenguaje Fotográfico Efeonce
 
 > **Tipo de documento:** Especificación técnica (capa fotográfica)
-> **Versión:** 1.0 · **Creado:** 2026-09-19 por Claude
+> **Versión:** 1.1 · **Creado:** 2026-09-19 por Claude · **Última actualización:** 2026-09-27 por Claude (delta de la portada 16:9)
 > **Estado:** parte de la capa **fotográfica aprobada** el 2026-09-19. No cubre la composición gráfica
 > (titulares, jerarquía, cursores), que **no está aprobada**: ver el aviso de
 > [zonas de composición y formatos](EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
@@ -264,3 +264,38 @@ sobre el canto de una mesa y queda como decisión del operador.
 > **Regla que queda:** la toma deja el canto del lecho por encima de la banda de la firma. Si el plate no lo cumple, en
 > una pieza nueva se rehace (§2, regla 6); subir el primer plano de un plate ya generado es un arreglo sólo para piezas
 > aprobadas.
+
+## Delta 2026-09-26 — excepciones de la lente de la línea gráfica **[decisión del operador, 2026-09-26]**
+
+El operador resolvió los conflictos entre este documento y la lente de la línea gráfica «La órbita» (detalle en el
+[lenguaje fotográfico §11](EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) y en el manual de la línea §9.1):
+
+- **Regla 5 (nunca un scrim):** sigue vigente para toda pieza **sin lente**. En una pieza con lente, el exterior
+  apagado del círculo es el tratamiento de la línea y **cuenta como la reserva del texto** (P-1).
+- **Regla 2 (cabezas y manos bajo el 36 %):** aplica **sólo cuando la toma tiene reserva de texto**. Una foto para lente
+  sin reserva de texto no la necesita (P-8); `foto:prompt` todavía la emite siempre: el cambio queda en la task de
+  `foto:prompt` y chequeos de la lente.
+- **Regla 4 (nunca se recorta un formato desde otro):** sigue vigente. El formato 1200 × 627 de la imagen de LinkedIn
+  se suma como formato nativo de `foto:prompt` en esa misma task (P-6).
+- **Lecho:** en piezas con lente se pide igual (P-2 / P12).
+
+## Delta 2026-09-27 — la portada 16:9 reserva el 45 % izquierdo para la columna de voz **[decisión del operador, 2026-09-27]**
+
+El operador aprobó portadas y contraportadas de brochure y propuesta sobre plates del
+[registro cine](EFEONCE_PHOTO_REGISTER_CINE_V1.md#16-plates-para-portada-y-contraportada-aprobado-2026-09-27). En una
+**portada 16:9 con foto**, el plate reserva el **45 % izquierdo** como estudio oscuro y calmo —sin haces, objetos ni
+órbita— para la **columna de voz**; el sujeto va en la mitad derecha y el lecho oscuro, abajo.
+
+**La columna que ese espacio aloja [medido, 1920 × 1080]:** columna a la izquierda en x = 140. Desde un `top` (típico
+200–300): logo de 500 px en `top` · eyebrow de 22 px en `top + 190` · pregunta de 40 px en `top + 238` · respuesta de
+124 px en Bricolage 760 (interlineado 0,95) en `top + 300` (+ 28 si lleva selección) · evidencia de 28 px / 1,3 en
+Poppins 400, 34 px bajo la respuesta (130 si lleva selección, para que quepa la etiqueta del colaborador). Burbuja URL
+abajo a la izquierda (bottom 51–72). En el cierre de propuesta, el eslogan va a 72 px en `top` 420 y el bloque de
+contacto en 600.
+
+**Regla que queda:** ninguna palabra cruza al sujeto, un haz, una mano o la órbita; si cruza, se acorta la pregunta o se
+parte la evidencia, no se mueve la foto. Cómo se compone encima, qué portada va con qué contraportada y el mensaje de
+cada cierre viven en [superficie §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+
+⚠️ **Dos porcentajes todavía [medido]:** `foto:prompt` compila la reserva del 16:9 como «LEFT 42%» mientras la receta
+pide 45 % (trampa 7 del registro cine). Leer el prompt compilado antes de generar.

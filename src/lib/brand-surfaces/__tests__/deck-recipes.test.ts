@@ -1,0 +1,776 @@
+/**
+ * Las recetas aprobadas de la superficie deck (TASK-1919): cada intent de ejemplo se traduce a un plan del catálogo
+ * `graphic-line-deck` con las medidas que resolvió AXIS, el plan pasa el contrato de slots de su plantilla, y lo que
+ * la receta no admite falla cerrado. Desde el contrato 0.1.1 todo el contenido de la lámina viaja en claves canónicas
+ * (voz, niveles, nota, paneles, cifras) y lo que AXIS valida (niveles, cifras con fuente, nivel de la selección, largo
+ * de la respuesta) lo rechaza AXIS con `surface-issues` antes de llegar al builder.
+ */
+
+import fs from 'node:fs'
+import path from 'node:path'
+
+import { describe, expect, it } from 'vitest'
+
+import type { SlideSpec, TemplateContract } from '@/lib/artifact-composer/contracts'
+import { validateSlide } from '@/lib/artifact-composer/validate'
+
+import { planSurfacePiece, SurfacePieceError, type SurfaceIntent } from '../index'
+import type { SurfaceAssetRequest } from '../types'
+
+const EXAMPLES = path.join(__dirname, '..', 'examples')
+const CATALOG = path.join(__dirname, '..', '..', 'artifact-composer', 'catalogs', 'graphic-line-deck')
+
+const example = (recipe: string): SurfaceIntent =>
+  JSON.parse(fs.readFileSync(path.join(EXAMPLES, `deck-${recipe}-intent.json`), 'utf8')) as SurfaceIntent
+
+const registry = JSON.parse(fs.readFileSync(path.join(CATALOG, 'registry.json'), 'utf8')) as {
+  selector: { map: Record<string, string> }
+  templates: { name: string; slotsRef: string }[]
+}
+
+/** El plan de la receta, validado contra el contrato de slots de la plantilla que el registry le asigna. */
+const plan = (intent: SurfaceIntent) => {
+  const piece = planSurfacePiece(intent, { artifactId: 'prueba' })
+  const template = registry.selector.map[piece.contentType]!
+  const entry = registry.templates.find(t => t.name === template)!
+  const contract = JSON.parse(fs.readFileSync(path.join(CATALOG, entry.slotsRef), 'utf8')) as TemplateContract
+  const slide = piece.plan.slides[0]!
+  const violations = validateSlide({ ...(slide as unknown as SlideSpec), template } as SlideSpec, contract)
+
+  return { piece, template, violations, slots: slide.slots as Record<string, Record<string, unknown>> }
+}
+
+/** El intent sin una de sus claves. */
+const without = (intent: SurfaceIntent, key: string): SurfaceIntent => {
+  const copy: Record<string, unknown> = { ...intent }
+
+  delete copy[key]
+
+  return copy as SurfaceIntent
+}
+
+const expectCode = (fn: () => unknown, code: SurfacePieceError['code']) => {
+  try {
+    fn()
+  } catch (error) {
+    expect(error).toBeInstanceOf(SurfacePieceError)
+    expect((error as SurfacePieceError).code).toBe(code)
+
+    return
+  }
+
+  throw new Error(`se esperaba SurfacePieceError ${code}`)
+}
+
+/** Los códigos con que AXIS rechazó el intent (falla si no lo rechazó con `surface-issues`). */
+const issuesOf = (candidate: SurfaceIntent): string[] => {
+  let caught: unknown
+
+  try {
+    planSurfacePiece(candidate, { artifactId: 'prueba' })
+  } catch (error) {
+    caught = error
+  }
+
+  expect(caught).toBeInstanceOf(SurfacePieceError)
+  expect((caught as SurfacePieceError).code).toBe('surface-issues')
+
+  return (caught as SurfacePieceError).issues.map(issue => (issue as { code: string }).code)
+}
+
+describe('recetas aprobadas del deck', () => {
+  it('section-classic: número dentro del anillo de pieces.deck.section y la voz a su izquierda', () => {
+    const { piece, template, violations, slots } = plan(example('section-classic'))
+
+    expect(piece.catalog).toBe('graphic-line-deck')
+    expect(piece.contentType).toBe('deck.section-classic')
+    expect(template).toBe('SectionClassic')
+    expect(violations).toEqual([])
+    expect(slots.frame!.ringCx).toBe('--gl-ring-cx=1420px')
+    expect(slots.frame!.numberPx).toBe('--gl-number-px=190px')
+    expect(slots.frame!.columnWidth).toBe('--gl-column-width=1080px')
+    expect(slots.progress).toEqual({ number: '02', label: 'Sección 2 de 5' })
+    expect(slots.voice!.answer).toBe('El dato')
+
+    // El anillo y su arco los pinta AXIS: una capa SVG externa, nunca la plantilla.
+    const layer = piece.assets.find(a => a.kind === 'svg')
+
+    expect(layer?.ref).toMatch(/^asset-ref:layer:/)
+    expect(layer && 'svg' in layer ? layer.svg : '').toContain('data-axis-kind="progress"')
+  })
+
+  it('section-classic: sin la voz de la lámina aprobada falla, y una respuesta de más de tres palabras la rechaza AXIS', () => {
+    const intent = example('section-classic')
+
+    expectCode(() => planSurfacePiece(without(intent, 'voice'), { artifactId: 'prueba' }), 'invalid-intent')
+    expectCode(
+      () =>
+        planSurfacePiece({ ...intent, voice: { question: '¿Quién decide?', answer: ['El dato', 'de todos los días'] } }, { artifactId: 'prueba' }),
+      'surface-issues'
+    )
+  })
+
+  it('un intent del contrato 0.1.0 no trae el contenido de la lámina y falla cerrado', () => {
+    // AXIS lee un 0.1.0 como se escribió (ignora las claves de 0.1.1): la escalera la rechaza el contrato y el
+    // tríptico llega sin sus tomas, y el builder no compone una lámina a medias.
+    expectCode(() => planSurfacePiece({ ...example('method-staircase'), version: '0.1.0' }, { artifactId: 'prueba' }), 'surface-issues')
+    expectCode(() => planSurfacePiece({ ...example('triptych'), version: '0.1.0' }, { artifactId: 'prueba' }), 'missing-photo')
+  })
+
+  it('section-split: reservas, panel e indicador salen de la receta de AXIS', () => {
+    const { piece, violations, slots } = plan(example('section-split'))
+
+    expect(piece.contentType).toBe('deck.section-split')
+    expect(violations).toEqual([])
+    expect(slots.frame!.numberTop).toBe('--gl-number-top=260px')
+    expect(slots.frame!.labelTop).toBe('--gl-label-top=450px')
+    expect(slots.frame!.questionTop).toBe(600)
+    expect(slots.frame!.answerTop).toBe(670)
+    expect(slots.frame!.answerPx).toBe(120)
+    expect(slots.frame!.panelWidth).toBe('--gl-panel-width=960px')
+    expect(slots.frame!.panelRadius).toBe('--gl-panel-radius=300px')
+    expect(slots.frame!.photoLeft).toBe('--gl-photo-left=660px')
+
+    const plate = piece.assets.find(a => a.kind === 'plate')
+
+    expect(plate && 'fit' in plate ? plate.fit : null).toEqual({ width: 1260, height: 1080 })
+
+    const layer = piece.assets.find(a => a.kind === 'svg')
+
+    // El arco nace abajo a la izquierda (≈ las 8) y sube por la IZQUIERDA en sentido horario: en la 2 de 5 empieza a
+    // la izquierda y debajo del centro del indicador (180 · 170) y termina arriba a la izquierda, donde va la esfera.
+    const svg = layer && 'svg' in layer ? layer.svg : ''
+    const arc = /data-axis-part="arc"[^>]* d="M ([\d.]+) ([\d.]+) A 40 40 0 0 1 ([\d.]+) ([\d.]+)"/.exec(svg)
+
+    expect(arc).not.toBeNull()
+
+    const [startX, startY, endX, endY] = arc!.slice(1).map(Number) as [number, number, number, number]
+
+    expect(startX).toBeLessThan(180)
+    expect(startY).toBeGreaterThan(170)
+    expect(endX).toBeLessThan(180)
+    expect(endY).toBeLessThan(170)
+    expect(svg).not.toContain('matrix(')
+  })
+
+  it('section-split: sin foto falla cerrado', () => {
+    const bare = without(example('section-split'), 'photo')
+
+    expectCode(() => planSurfacePiece(bare as SurfaceIntent, { artifactId: 'prueba' }), 'missing-photo')
+  })
+
+  it('content-measure: la lente de la reserva de AXIS y la medida recorren el valor', () => {
+    const { piece, violations, slots } = plan(example('content-measure'))
+
+    expect(piece.contentType).toBe('deck.content-measure')
+    expect(violations).toEqual([])
+    expect(slots.frame!.answerPx).toBe(300)
+    expect(slots.frame!.lensCx).toBe('--gl-lens-cx=1420px')
+    expect(slots.frame!.lensCy).toBe('--gl-lens-cy=600px')
+    // El radio de la foto deja el aire oficial del anillo: 403,2 / 1,12 ≈ 360 (la reserva viene redondeada a 4 decimales).
+    expect(Math.abs(Number(String(slots.frame!.lensR).match(/=([\d.]+)px$/)![1]) - 360)).toBeLessThan(0.5)
+    expect(slots.frame!.lensMultiply).toBe('--gl-lens-multiply=0.8')
+    expect(slots.note).toBe('Datos de muestra')
+    expect(slots.figures).toHaveLength(2)
+
+    const layer = piece.assets.find(a => a.kind === 'svg')
+
+    expect(layer && 'svg' in layer ? layer.svg : '').toContain('data-axis-kind="measure"')
+  })
+
+  it('content-measure: las cifras de apoyo salen del manifest con valor y leyenda', () => {
+    const { slots } = plan(example('content-measure'))
+
+    expect(slots.figures).toEqual([
+      { value: '12 días', label: 'de idea a pieza' },
+      { value: '−38 %', label: 'costo por lead' }
+    ])
+  })
+
+  it('content-measure: sin medida, con tres cifras o con una cifra sin fuente la rechaza AXIS', () => {
+    const bare = without(example('content-measure'), 'measure')
+
+    expectCode(() => planSurfacePiece(bare as SurfaceIntent, { artifactId: 'prueba' }), 'surface-issues')
+
+    const intent = example('content-measure')
+    const figures = intent.figures as { value: string; label: string; source: string }[]
+
+    expect(issuesOf({ ...intent, figures: [...figures, { value: '3x', label: 'más', source: 'Datos de muestra' }] })).toContain(
+      'figures-over-limit'
+    )
+    expect(issuesOf({ ...intent, figures: [figures[0], { value: '−38 %', label: 'costo por lead' }] })).toContain('figure-source-required')
+  })
+
+  it('triptych: tres tomas nativas 9:16 de 636 px y una palabra por toma, cada una con su esfera', () => {
+    const { piece, violations, slots } = plan(example('triptych'))
+
+    expect(piece.contentType).toBe('deck.triptych')
+    expect(violations).toEqual([])
+    expect(slots.frame!.panelWidth).toBe('--gl-panel-width=636px')
+    expect(slots.frame!.gutter).toBe('--gl-gutter=6px')
+    expect(slots.frame!.answerTop).toBe(944)
+    expect(slots.frame!.answerPx).toBe(108)
+
+    const panels = slots.panels as unknown as { word: string }[]
+
+    expect(panels.map(p => p.word)).toEqual(['Escucha', 'Crea', 'Mide'])
+
+    const plates = piece.assets.filter(a => a.kind === 'plate')
+
+    expect(plates).toHaveLength(3)
+    expect(plates.every(p => 'fit' in p && p.fit.width === 636 && p.fit.height === 1131)).toBe(true)
+  })
+
+  it('triptych: una toma con más de una palabra falla cerrado', () => {
+    const intent = example('triptych')
+
+    expectCode(
+      () => planSurfacePiece({ ...intent, voice: { ...intent.voice, answer: ['Escucha,', 'crea', 'y mide'] } }, { artifactId: 'prueba' }),
+      'invalid-intent'
+    )
+  })
+
+  it('triptych: una frase que no reparte en tres tomas falla cerrado; otro número de tomas lo rechaza AXIS', () => {
+    const intent = example('triptych')
+    const panels = intent.panels as unknown[]
+
+    expectCode(
+      () => planSurfacePiece({ ...intent, voice: { ...intent.voice, answer: ['Escucha', 'y crea'] } }, { artifactId: 'prueba' }),
+      'invalid-intent'
+    )
+
+    expect(issuesOf({ ...intent, panels: panels.slice(0, 2) })).toContain('panels-count-invalid')
+  })
+
+  it('method-staircase: los cinco niveles del token, la respuesta en el rango del deck y la selección de un nivel', () => {
+    const { piece, violations, slots } = plan(example('method-staircase'))
+
+    expect(piece.contentType).toBe('deck.method-staircase')
+    expect(violations).toEqual([])
+    expect(slots.levels).toHaveLength(5)
+    expect(slots.frame!.answerPx).toBeGreaterThanOrEqual(104)
+    expect(slots.frame!.answerPx).toBeLessThanOrEqual(176)
+    expect(Math.abs((slots.frame!.answerPx as number) - 140)).toBeLessThanOrEqual(3)
+    expect(slots.note).toBe('Be Intrinsic es una trayectoria, no una garantía.')
+
+    // La selección del peldaño sale entera del delegado de AXIS: nivel, escala y el objetivo sin velo.
+    expect(slots.selection).toEqual({
+      level: 3,
+      label: 'SEO · AEO',
+      anchor: 'bottom-end',
+      participantKind: 'department',
+      scale: 1.1,
+      targetKind: 'object',
+      variant: 'eight-handles',
+      padding: 'standard',
+      overlay: 'none'
+    })
+    expect(piece.assets).toEqual([])
+  })
+
+  it('method-staircase: otro número de niveles, una selección fuera de la escalera o una respuesta larga los rechaza AXIS', () => {
+    const intent = example('method-staircase')
+    const levels = intent.levels as unknown[]
+
+    expect(issuesOf({ ...intent, levels: levels.slice(0, 4) })).toContain('levels-count-invalid')
+    expect(issuesOf({ ...intent, selection: { ...intent.selection, level: 7 } })).toContain('selection-level-invalid')
+    expect(issuesOf({ ...intent, voice: { question: '¿Te recomienda la IA?', answer: ['Capa por capa', 'siempre'] } })).toContain(
+      'voice-answer-too-long'
+    )
+  })
+
+  it('method-staircase: un nivel sin descriptor falla cerrado (AXIS lo deja opcional, el peldaño aprobado no)', () => {
+    const intent = example('method-staircase')
+    const levels = (intent.levels as { name: string; descriptor: string }[]).map((level, i) => (i === 2 ? { name: level.name } : level))
+
+    expectCode(() => planSurfacePiece({ ...intent, levels }, { artifactId: 'prueba' }), 'invalid-intent')
+  })
+})
+
+/**
+ * Las tres composiciones de `proposal-cinematic` (TASK-1927, contrato 0.1.2). La composición es explícita
+ * (`layout` del intent) y cada una tiene su plantilla: la de `service` no cambia.
+ */
+describe('deck · composiciones de proposal-cinematic', () => {
+  const service = JSON.parse(
+    fs.readFileSync(path.join(__dirname, 'deck-proposal-cinematic-intent.json'), 'utf8')
+  ) as SurfaceIntent
+
+  it('un intent anterior a 0.1.2 compone `service` con su plantilla de siempre', () => {
+    const { template, violations, piece } = plan(service)
+
+    expect(service.layout).toBeUndefined()
+    expect(template).toBe('ProposalCinematic')
+    expect(piece.contentType).toBe('deck.proposal-cinematic')
+    expect(violations).toEqual([])
+  })
+
+  it('`layout: service` explícito compone el mismo plan que sin layout', () => {
+    const implicit = plan({ ...service, version: '0.1.2' }).piece.plan
+    const explicit = plan({ ...service, version: '0.1.2', layout: 'service' }).piece.plan
+
+    expect(explicit).toEqual(implicit)
+  })
+
+  it('`hero` lleva la respuesta a su tamaño mayor y la selección sobre la respuesta, sin prueba ni pasos', () => {
+    const { template, violations, slots, piece } = plan(example('proposal-cinematic-hero'))
+
+    expect(template).toBe('ProposalCinematicHero')
+    expect(piece.layout).toBe('hero')
+    expect(violations).toEqual([])
+    expect(slots.frame).toMatchObject({ answerPx: 176, answerTop: 285, eyebrowTop: 110, questionTop: 200, bodyTop: 560 })
+    expect(slots.proof).toBeUndefined()
+    expect(slots.steps).toBeUndefined()
+    expect(slots.selection).toMatchObject({ label: 'Nexa', anchor: 'top-end' })
+  })
+
+  it('`hero` con prueba o pasos lo rechaza AXIS', () => {
+    const hero = example('proposal-cinematic-hero')
+
+    expectCode(() => plan({ ...hero, proof: { text: 'Sky: +2.000 piezas', source: 'deck Sky' } }), 'surface-issues')
+    expectCode(() => plan({ ...hero, steps: service.steps }), 'surface-issues')
+  })
+
+  it('`lines` arma el stack desde `content.lines`, con la selección del grupo', () => {
+    const { template, violations, slots, piece } = plan(example('proposal-cinematic-lines'))
+
+    expect(template).toBe('ProposalCinematicLines')
+    expect(piece.layout).toBe('lines')
+    expect(violations).toEqual([])
+
+    const lines = slots.lines as unknown as { key: string; name: string; word: string }[]
+
+    expect(lines.map(line => line.word)).toEqual(['Growth', 'Brand', 'Engine', 'Voice', 'Revenue'])
+    expect(lines[1]).toMatchObject({ key: 'brand', name: 'Creative Services' })
+    expect(slots.selection).toMatchObject({ targetKind: 'group', anchor: 'bottom-end', scale: 1.25 })
+    expect(slots.voice).toBeUndefined()
+  })
+
+  it('el intent elige qué líneas mostrar; una desconocida o repetida la rechaza AXIS', () => {
+    const lines = example('proposal-cinematic-lines')
+    const two = plan({ ...lines, lines: ['brand', 'engine'] }).slots.lines as unknown as { word: string }[]
+
+    expect(two.map(line => line.word)).toEqual(['Brand', 'Engine'])
+    expectCode(() => plan({ ...lines, lines: ['brand', 'brand'] }), 'surface-issues')
+    expectCode(() => plan({ ...lines, lines: ['no-existe'] }), 'surface-issues')
+  })
+
+  it('`lines` fuera de su composición lo rechaza AXIS', () => {
+    expectCode(() => plan({ ...service, version: '0.1.2', lines: ['brand'] }), 'surface-issues')
+  })
+})
+
+/**
+ * La sección partida corregida (TASK-1927, delta d): el indicador sube por la IZQUIERDA y la receta tiene tres
+ * composiciones. El arco sale del token de AXIS (`progress.startFromTopDeg`, `sweep.rule`).
+ */
+describe('deck · section-split por la izquierda y sus composiciones', () => {
+  const arcOf = (intent: SurfaceIntent): string => {
+    const asset = plan(intent).piece.assets.find(a => a.ref.startsWith('asset-ref:layer:section-split-indicator'))!
+
+    return (asset as { svg: string }).svg
+  }
+
+  it('sin layout compone `corner-top`, con su plantilla de siempre', () => {
+    const { template, violations, slots, piece } = plan(example('section-split'))
+
+    expect(template).toBe('SectionSplit')
+    expect(piece.contentType).toBe('deck.section-split')
+    expect(violations).toEqual([])
+    expect(slots.frame).toMatchObject({ layout: 'corner-top', margin: 140, panelLeft: '--gl-panel-left=0px', photoLeft: '--gl-photo-left=660px' })
+  })
+
+  it('el arco barre las secciones ya recorridas: crece con la sección y no existe en la primera', () => {
+    const intent = example('section-split')
+    const svg = (current: number) => arcOf({ ...intent, progress: { sections: 5, current } })
+
+    expect(svg(2)).not.toBe(svg(3))
+    expect(svg(3)).not.toBe(svg(4))
+    // El indicador ya no se voltea: el arco nace donde dice el token, sin transformaciones sobre el SVG.
+    expect(svg(2)).not.toContain('matrix(1 0 0 -1')
+  })
+
+  it('`corner-bottom` y `panel-end` componen desde su intent con su propio contrato', () => {
+    const bottom = plan(example('section-split-corner-bottom'))
+    const end = plan(example('section-split-panel-end'))
+
+    expect(bottom.template).toBe('SectionSplitCornerBottom')
+    expect(bottom.violations).toEqual([])
+    expect(bottom.slots.frame).toMatchObject({ layout: 'corner-bottom', answerPx: 132, margin: 140 })
+
+    expect(end.template).toBe('SectionSplitPanelEnd')
+    expect(end.violations).toEqual([])
+    expect(end.slots.frame).toMatchObject({
+      layout: 'panel-end',
+      margin: 1100,
+      panelLeft: '--gl-panel-left=960px',
+      photoLeft: '--gl-photo-left=0px',
+      photoWidth: '--gl-photo-width=1260px'
+    })
+  })
+
+  it('una composición desconocida la rechaza AXIS', () => {
+    expectCode(() => plan({ ...example('section-split'), version: '0.1.2', layout: 'panel-start' }), 'surface-issues')
+  })
+})
+
+describe('deck · proposal-service, la propuesta sobria (TASK-1928)', () => {
+  const services = ['aeo', 'creative', 'web', 'revops'] as const
+
+  it.each(services)('%s compone con su plantilla y pasa su contrato de slots', service => {
+    const { template, violations, piece } = plan(example(`proposal-service-${service}`))
+
+    expect(template).toBe('ProposalService')
+    expect(piece.contentType).toBe('deck.proposal-service')
+    expect(violations).toEqual([])
+  })
+
+  it('las tarjetas reparten el contenido: cuatro de 395 px o tres de 533,33 px, con el canal del token', () => {
+    const four = plan(example('proposal-service-aeo')).slots.frame
+    const three = plan(example('proposal-service-creative')).slots.frame
+
+    expect(four).toMatchObject({ margin: 140, cardWidth: '--gl-ps-card-width=395px', cardGutter: '--gl-ps-card-gutter=20px' })
+    expect(three.cardWidth).toBe('--gl-ps-card-width=533.33px')
+    expect(four).toMatchObject({ lensLeft: '--gl-ps-lens-left=1300px', lensTop: '--gl-ps-lens-top=110px', lensSize: '--gl-ps-lens-size=440px' })
+  })
+
+  it('la respuesta nunca baja de 3× la pregunta y va en una línea', () => {
+    for (const service of services) {
+      expect(Number(plan(example(`proposal-service-${service}`)).slots.frame.answerPx)).toBeGreaterThanOrEqual(120)
+    }
+
+    expectCode(() => plan({ ...example('proposal-service-aeo'), voice: { question: '¿Te encuentra la IA?', answer: ['Visible', 'hoy'] } }), 'invalid-intent')
+  })
+
+  it('el pie lleva la nota, o la prueba con su fuente en la misma línea; nunca las dos', () => {
+    expect(plan(example('proposal-service-aeo')).slots.footnote).toBe('Sin promesas de ranking: medimos y mostramos el avance.')
+    expect(plan(example('proposal-service-creative')).slots.footnote).toBe(
+      'Sky: +2.000 piezas aprobadas en 12 meses, 88 % a tiempo. · Fuente: deck Sky, caso publicado'
+    )
+    expect(plan(example('proposal-service-web')).slots.footnote).toBeUndefined()
+
+    const both = { ...example('proposal-service-aeo'), proof: { text: '+30 %', source: 'caso publicado' } }
+
+    expectCode(() => plan(both), 'invalid-intent')
+  })
+
+  it('la lente es la única órbita: anillo, arco y esfera en una capa; la selección toma la primera tarjeta', () => {
+    const { piece, slots } = plan(example('proposal-service-aeo'))
+    const layer = piece.assets.find(asset => asset.ref.startsWith('asset-ref:layer:proposal-service-lens')) as { svg: string }
+
+    expect(layer.svg.match(/<circle/g)).toHaveLength(2)
+    expect(layer.svg.match(/<path/g)).toHaveLength(1)
+    expect(slots.selection).toMatchObject({ label: 'Cliente', anchor: 'top-end', targetKind: 'object' })
+  })
+
+  it('dos tarjetas o un paso con ícono los rechaza AXIS', () => {
+    const intent = example('proposal-service-aeo')
+
+    expect(issuesOf({ ...intent, steps: intent.steps!.slice(0, 2) })).toContain('steps-under-limit')
+    expect(issuesOf({ ...intent, steps: intent.steps!.map(step => ({ ...step, glyph: 'rayo' })) })).toContain('step-glyph-not-in-recipe')
+  })
+})
+
+describe('deck · la familia método (TASK-1928)', () => {
+  it.each([
+    ['method-staircase-flat', 'MethodStaircaseFlat', 'deck.method-staircase.flat'],
+    ['decision-plan', 'DecisionPlan', 'deck.decision-plan'],
+    ['method-score-ring', 'MethodScoreRing', 'deck.method-score-ring'],
+    ['method-hybrid-workforce', 'MethodHybridWorkforce', 'deck.method-hybrid-workforce'],
+    ['method-hybrid-workforce-scene', 'MethodHybridWorkforceScene', 'deck.method-hybrid-workforce.scene']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template, contentType) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(contentType)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('la escalera sale de AXIS: la de vidrio no cambia y la plana usa su propia geometría y su respuesta medida', () => {
+    const steps = plan(example('method-staircase')).slots.frame
+    const flat = plan(example('method-staircase-flat')).slots.frame
+
+    expect(steps).toMatchObject({ stairX0: '--gl-stair-x0=760px', slabHeight: '--gl-slab-height=124px', bodyWidth: 500 })
+    expect(flat).toMatchObject({ stairX0: '--gl-stair-x0=800px', rowGap: '--gl-row-gap=26px', answerPx: 140, bodyWidth: 520 })
+    expect(flat.slabHeight).toBeUndefined()
+  })
+
+  it('el plan: tres paradas, una actual, la respuesta a 3× y cada ficha apoyada en su tallo', () => {
+    const { slots, piece } = plan(example('decision-plan'))
+
+    expect(slots.frame).toMatchObject({ answerSize: '--gl-dp-answer-px=120px', currentStop: '1', card1Left: '--gl-dp-card1-left=787.74px' })
+    expect(slots.body).toContain('<strong>90</strong>')
+    expect((slots.stops as unknown as { range: string }[]).map(stop => stop.range)).toEqual(['1 · Días 1–30', '2 · Días 31–60', '3 · Días 61–90'])
+    expect(piece.assets.map(asset => asset.ref)).toEqual(['asset-ref:layer:decision-plan-stage', 'asset-ref:layer:decision-plan-trajectory-growth-1'])
+
+    const intent = example('decision-plan')
+
+    expectCode(() => plan({ ...intent, currentStop: 4 }), 'invalid-intent')
+    expectCode(() => plan({ ...intent, stops: (intent.stops as unknown[]).slice(0, 2) }), 'invalid-intent')
+    expectCode(() => plan({ ...intent, horizon: 'noventa' }), 'invalid-intent')
+  })
+
+  it('el anillo: los pesos suman una vuelta, la de más peso va gruesa y cada cifra lleva su fuente', () => {
+    const { slots, piece } = plan(example('method-score-ring'))
+    const ring = piece.assets.find(asset => asset.ref.startsWith('asset-ref:layer:method-score-ring')) as { svg: string }
+
+    expect(ring.svg.match(/<path/g)).toHaveLength(7)
+    expect(ring.svg.match(/stroke-width="34"/g)).toHaveLength(1)
+    expect(slots.source).toBe('Pesos del Brand Visibility Grader, versión V1')
+    expect(slots.cta).toMatchObject({ cursorScale: 1.3, descriptorGapPx: 20 })
+
+    const intent = example('method-score-ring')
+    const dimensions = intent.dimensions as { name: string; weight: number }[]
+
+    expectCode(() => plan({ ...intent, dimensions: dimensions.slice(1) }), 'invalid-intent')
+    expectCode(() => plan({ ...intent, total: { value: '100', label: 'puntos' } }), 'invalid-intent')
+  })
+
+  it('la fuerza híbrida: dos cursores sobre la respuesta, o dos selecciones medidas en la toma con el agente en Engine', () => {
+    const ladder = plan(example('method-hybrid-workforce')).slots
+    const scene = plan(example('method-hybrid-workforce-scene')).slots
+
+    expect(ladder.selection).toMatchObject({ label: 'Estrategia', anchor: 'top-end', also: [{ label: 'Agente IA', action: 'resize' }] })
+    expect((scene.selection as unknown as { targets: { label: string; color?: string }[] }).targets.map(t => [t.label, t.color])).toEqual([
+      ['Estrategia', undefined],
+      ['Agente IA', '#0375db']
+    ])
+
+    const intent = example('method-hybrid-workforce-scene')
+
+    expectCode(() => plan({ ...intent, selectionTargets: (intent.selectionTargets as unknown[]).slice(0, 1) }), 'invalid-intent')
+    expectCode(() => plan({ ...intent, selectionTargets: [{ label: 'Estrategia', anchor: 'bottom-start', box: { x: 1800, y: 388, width: 260, height: 142 } }, (intent.selectionTargets as unknown[])[1]] }), 'invalid-intent')
+  })
+})
+
+describe('deck · cotización, próximos pasos y respiro (TASK-1928)', () => {
+  it.each([
+    ['breather', 'Breather', 'deck.breather'],
+    ['decision-next-steps', 'DecisionNextSteps', 'deck.decision-next-steps'],
+    ['content-pricing', 'ContentPricing', 'deck.content-pricing'],
+    ['content-pricing-stage', 'ContentPricingStage', 'deck.content-pricing.stage'],
+    ['content-pricing-live', 'ContentPricingLive', 'deck.content-pricing.live']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template, contentType) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(contentType)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('los montos son siempre el marcador, aunque el intent traiga una cifra', () => {
+    const table = plan({ ...example('content-pricing'), amount: '$ 2.500.000' } as SurfaceIntent).slots
+    const live = plan(example('content-pricing-live')).slots
+
+    expect((table.plans as unknown as { amount: string }[]).map(p => p.amount)).toEqual(['[MONTO]', '[MONTO]', '[MONTO]'])
+    expect((live.lines as unknown as { amount: string }[]).map(line => line.amount)).toEqual(['[MONTO] / mes', '[MONTO] / mes', '[MONTO] · único'])
+    expect((live.quote as unknown as { total: string }).total).toBe('[MONTO]')
+  })
+
+  it('el rótulo del recomendado va sólo en su plan y la selección de Finanzas toma ese plan', () => {
+    const { slots } = plan(example('content-pricing'))
+    const plans = slots.plans as unknown as { label?: string }[]
+
+    expect(plans.map(p => p.label)).toEqual([undefined, 'Recomendado', undefined])
+    expect(slots.selection).toMatchObject({ label: 'Finanzas', item: 2 })
+    expectCode(() => plan({ ...example('content-pricing-stage'), recommended: 1 }), 'invalid-intent')
+  })
+
+  it('el contacto de los próximos pasos sale de los datos de Efeonce, nunca del intent', () => {
+    const { slots } = plan({ ...example('decision-next-steps'), contact: { email: 'otro@ejemplo.com' } } as SurfaceIntent)
+
+    expect(slots.contact).toEqual({ email: 'sales@efeoncepro.com', phone: '+56 9 3732 3064' })
+    expectCode(() => plan({ ...example('decision-next-steps'), agenda: { ...(example('decision-next-steps').agenda as object), chosen: { day: 6, time: 1 } } }), 'invalid-intent')
+  })
+
+  it('el respiro no firma: sin burbuja ni logo; el indicador lleva la opacidad medida', () => {
+    const { slots, piece } = plan(example('breather'))
+
+    expect(slots.urlBubble).toBeUndefined()
+    expect(piece.assets.some(asset => asset.ref.startsWith('asset-ref:layer:gl-br-progress-4-of-5'))).toBe(true)
+  })
+})
+
+describe('deck · la familia prueba (TASK-1928)', () => {
+  it.each([
+    ['content-focus', 'ContentFocus'],
+    ['content-clients', 'ContentClients'],
+    ['content-partners', 'ContentPartners'],
+    ['decision-risk', 'DecisionRisk'],
+    ['decision-case', 'DecisionCase'],
+    ['decision-chart', 'DecisionChart'],
+    ['decision-testimonial', 'DecisionTestimonial'],
+    ['decision-why-us', 'DecisionWhyUs']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(`deck.${recipe}`)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('cada cifra llega con su fuente y la lámina la imprime; una cifra sin fuente la rechaza AXIS', () => {
+    expect(plan(example('decision-chart')).slots.source).toBe('Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses')
+    expect(plan(example('content-clients')).slots.source).toBe('Fuente: caso publicado de Sky Airlines · caso publicado de Bresler')
+
+    const figures = (example('decision-why-us').figures as { value: string; label: string }[]).map(({ value, label }) => ({ value, label }))
+
+    expectCode(() => plan({ ...example('decision-why-us'), figures } as SurfaceIntent), 'surface-issues')
+  })
+
+  it('los logos de terceros se normalizan al componer: un tono y el mismo peso, con la excepción tonal de AXIS', () => {
+    const clients = plan(example('content-clients')).piece.assets.filter(asset => asset.kind === 'logo') as Extract<SurfaceAssetRequest, { kind: 'logo' }>[]
+    const partners = plan(example('content-partners')).piece.assets.filter(asset => asset.kind === 'logo') as Extract<SurfaceAssetRequest, { kind: 'logo' }>[]
+
+    expect(clients).toHaveLength(9)
+    expect(new Set(clients.map(logo => `${logo.tone}·${logo.inkArea}`)).size).toBe(1)
+    expect(clients.filter(logo => logo.recolor).map(logo => logo.path.split('/').pop())).toEqual(['aguas-andinas.svg', 'universidad-temuco.svg'])
+    expect(partners).toHaveLength(9)
+    expect(partners.every(logo => logo.tone === '#ffffff' && logo.knockout)).toBe(true)
+  })
+
+  it('una barra sale de su número: el largo es el valor sobre el máximo del eje; fuera de 1–100 falla cerrado', () => {
+    const { slots } = plan(example('decision-chart'))
+
+    expect(slots.frame.bar1Width).toBe('--gl-dch-bar1-width=900px')
+    expect(slots.frame.bar2Width).toBe('--gl-dch-bar2-width=675px')
+    expect(slots.frame.annotationLeft).toBe('--gl-dch-annotation-left=1485px')
+    expectCode(() => plan({ ...example('decision-chart'), bars: [{ label: 'Antes', value: 100 }, { label: 'Después', value: 140 }] } as SurfaceIntent), 'invalid-intent')
+  })
+
+  it('la selección toma el ítem elegido; fuera de rango falla cerrado', () => {
+    expect(plan(example('content-partners')).slots.selection).toMatchObject({ label: 'Agentes IA', item: 7 })
+    expect(plan(example('decision-why-us')).slots.selection).toMatchObject({ label: 'Cliente', item: 4 })
+    expectCode(() => plan({ ...example('decision-risk'), selected: 5 } as SurfaceIntent), 'invalid-intent')
+  })
+
+  it('el testimonio cita al cliente: la frase es la respuesta (hasta 6 palabras) y la selección la toma', () => {
+    const { slots } = plan(example('decision-testimonial'))
+
+    expect(slots.voice).toMatchObject({ answerLead: 'Agilizar mucho', answer: 'la carga de trabajo' })
+    expect(slots.selection).toMatchObject({ label: 'Cliente' })
+    expect(slots.selection).not.toHaveProperty('item')
+    expectCode(() => plan({ ...example('content-clients'), voice: { ...example('content-clients').voice, answer: ['Marcas líderes', 'de verdad'] } } as SurfaceIntent), 'surface-issues')
+  })
+
+  it('una cifra larga del muro baja de cuerpo sin mover su rótulo', () => {
+    const facts = plan(example('decision-why-us')).slots.facts as unknown as { size: string; value: string }[]
+
+    expect(facts.map(fact => fact.size)).toEqual(['large', 'large', 'large', 'large', 'small', 'small'])
+  })
+})
+
+describe('deck · secciones y quiénes somos (TASK-1928)', () => {
+  it.each([
+    ['section-lens', 'SectionLens', 'deck.section-lens'],
+    ['section-bleed', 'SectionBleed', 'deck.section-bleed'],
+    ['section-cine-team', 'SectionCine', 'deck.section-cine'],
+    ['section-cine-services', 'SectionCine', 'deck.section-cine.services'],
+    ['section-cine-about', 'SectionCineAbout', 'deck.section-cine.about'],
+    ['section-cine-purpose', 'SectionCinePurpose', 'deck.section-cine.purpose'],
+    ['content-team', 'ContentTeam', 'deck.content-team'],
+    ['content-stack', 'ContentStack', 'deck.content-stack']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template, contentType) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(contentType)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('la lente la pinta el motor con la foto adentro: el arco es la navegación real y la foto la inyecta quien compone', () => {
+    const { piece } = plan(example('section-lens'))
+    const layer = piece.assets.find(asset => asset.kind === 'painted') as Extract<SurfaceAssetRequest, { kind: 'painted' }>
+
+    expect(layer.svg).toContain(layer.photo.marker)
+    expect(layer.svg).toContain('data-axis-part="arc"')
+    expect(layer.photo.path).toContain('P1-deck-lente-edicion.png')
+    expectCode(() => plan({ ...example('section-lens'), progress: undefined } as SurfaceIntent), 'surface-issues')
+  })
+
+  it('ninguna sección con foto lleva logo; quiénes somos y por qué lo hacemos firman con la burbuja', () => {
+    for (const recipe of ['section-bleed', 'section-cine-team', 'section-cine-services', 'section-cine-about', 'section-cine-purpose']) {
+      expect(plan(example(recipe)).piece.assets.some(asset => asset.ref.includes('logo'))).toBe(false)
+    }
+
+    expect(plan(example('section-cine-about')).slots.source).toBe('Fuente: Efeonce, 2026')
+    expect(plan(example('section-cine-services')).slots.cta).toEqual({ variant: 'eight-handles', cursorScale: 1.1 })
+  })
+
+  it('el equipo: fichas del squad real y la selección sobre el interlocutor, al frente', () => {
+    const { slots } = plan(example('content-team'))
+    const team = slots.team as unknown as { role: string; src: string }[]
+
+    expect(team.map(member => member.role)).toEqual(['rest', 'rest', 'lead', 'rest', 'rest'])
+    expect(team[2]!.src).toBe('asset-ref:file:squad-julio')
+    expect(slots.selection).toMatchObject({ label: 'Cliente', item: 3 })
+  })
+
+  it('el stack: el conteo de la bajada sale de las herramientas y la capa que se mide va en el acento', () => {
+    const { slots } = plan(example('content-stack'))
+
+    expect(slots.body).toContain('<strong>16</strong>')
+    expect((slots.tiles as unknown as unknown[]).length).toBe(16)
+    expect((slots.labels as unknown as { tone: string }[]).map(label => label.tone)).toEqual(['rest', 'lead', 'rest'])
+    expectCode(() => plan({ ...example('content-stack'), body: '16 herramientas a mano.' } as SurfaceIntent), 'invalid-intent')
+  })
+})
+
+describe('deck · contenido y día a día (TASK-1928)', () => {
+  it.each([
+    ['contact-sheet', 'ContactSheet', 'deck.contact-sheet'],
+    ['content-text', 'ContentText', 'deck.content-text'],
+    ['content-bullets', 'ContentBullets', 'deck.content-bullets'],
+    ['content-day', 'ContentDay', 'deck.content-day'],
+    ['content-day-tools', 'ContentDayTools', 'deck.content-day.tools'],
+    ['content-day-live-progress', 'ContentDayProgress', 'deck.content-day.live-progress'],
+    ['content-day-live-results', 'ContentDayResults', 'deck.content-day.live-results'],
+    ['decision-agenda', 'DecisionAgenda', 'deck.decision-agenda']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template, contentType) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(contentType)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('la hoja de contactos: la elegida lleva la selección y la tira sus marcas de corte', () => {
+    const { slots, piece } = plan(example('contact-sheet'))
+
+    expect(slots.selection).toMatchObject({ label: 'Dirección de arte', item: 1 })
+    expect((slots.strip as unknown as unknown[]).length).toBe(3)
+    expect((piece.assets.find(asset => asset.ref.includes('contact-sheet-marks')) as { svg: string }).svg.match(/<line /g)).toHaveLength(24)
+  })
+
+  it('el reloj: el momento de ahora lleva la selección y el recorte de la lente sigue el foco del plate', () => {
+    const { slots, piece } = plan(example('content-day'))
+    const lens = piece.assets.find(asset => asset.kind === 'plate' && asset.ref.includes('lens')) as Extract<SurfaceAssetRequest, { kind: 'plate' }>
+
+    expect(slots.now).toEqual({ time: '15:00', label: 'Revisamos contigo' })
+    expect(lens.focus).toEqual({ xOfWidth: 0.5, yOfHeight: 0 })
+    expectCode(() => plan({ ...example('content-day'), moments: (example('content-day').moments as object[]).slice(0, 2) } as SurfaceIntent), 'invalid-intent')
+  })
+
+  it('las láminas vivas: el cursor del lector va sobre la acción, y las cifras del reporte dicen su procedencia', () => {
+    expect(plan(example('content-day-live-progress')).slots.cta).toEqual({ text: 'Aprobar', cursorScale: 1 })
+    expect(plan(example('content-day-live-results')).slots.report).toMatchObject({ sample: 'Datos de muestra' })
+    expectCode(() => plan({ ...example('content-day-live-results'), report: { ...(example('content-day-live-results').report as object), sample: '' } } as SurfaceIntent), 'invalid-intent')
+  })
+
+  it('la agenda y las viñetas: el ítem elegido se marca y fuera de rango falla cerrado', () => {
+    const topics = plan(example('decision-agenda')).slots.topics as unknown as { role: string }[]
+
+    expect(topics.map(topic => topic.role)).toEqual(['rest', 'rest', 'rest', 'lead', 'rest'])
+    expect(plan(example('content-bullets')).slots.selection).toMatchObject({ label: 'Growth', item: 3 })
+    expectCode(() => plan({ ...example('decision-agenda'), selected: 6 } as SurfaceIntent), 'invalid-intent')
+  })
+})
+
+describe('deck · el largo del catálogo manda (TASK-1928)', () => {
+  it('un texto que supera su maxChars hace fallar la composición con el slot que lo recibe', () => {
+    const long = 'x'.repeat(101)
+    const { violations } = plan({ ...example('decision-risk'), body: long } as SurfaceIntent)
+
+    expect(violations.some(violation => (violation as { slot?: string }).slot === 'body')).toBe(true)
+  })
+})

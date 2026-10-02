@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "example": true,
+  "edition": {
+    "kind": "flash",
+    "slug": "ejemplo-claude-sonnet-5-5",
+    "title": "[Ejemplo] Claude Sonnet 5.5",
+    "publishDate": "2026-09-28"
+  },
+  "news": [
+    {
+      "section": "tecnologia",
+      "headline": "Anthropic lanzó Claude Sonnet 5.5: más rápido, al mismo precio y casi al nivel de Opus 5.5",
+      "outlet": "[Ejemplo] Anthropic",
+      "date": "2026-09-28",
+      "photo": {
+        "file": "fotos/n3.png",
+        "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+        "license": {
+          "kind": "generated",
+          "ref": "glitch-example-fixtures"
+        },
+        "fractureEdge": "bottom",
+        "faceRegions": []
+      },
+      "pov": {
+        "entry": "El modelo del medio",
+        "punch": "dejó de ser el plan B"
+      },
+      "why": "[Ejemplo] Supera a Opus 5.5 en una prueba de agentes y cuesta la mitad. Toca revisar qué modelo usas para cada tarea."
+    }
+  ],
+  "cover": {
+    "photo": {
+      "file": "fotos/n5.png",
+      "credit": "Foto: Glitch (imagen sintética de ejemplo)",
+      "license": {
+        "kind": "generated",
+        "ref": "glitch-example-fixtures"
+      },
+      "fractureEdge": "bottom",
+      "faceRegions": []
+    },
+    "headline": {
+      "entry": "Sonnet 5.5 roza a Opus,",
+      "punch": "a mitad de precio"
+    },
+    "lines": [
+      {
+        "section": "tecnologia",
+        "text": "[Ejemplo] Más rápido que Sonnet 5"
+      },
+      {
+        "section": "marketing",
+        "text": "[Ejemplo] Menos costo por tarea"
+      }
+    ]
+  },
+  "back": {
+    "closingLine": ["léelo completo", "en nuestro blog."]
+  },
+  "outputs": {
+    "stills": ["threads", "blog:banner", "blog:news"]
+  }
+}

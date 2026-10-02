@@ -1,0 +1,39 @@
+<body style="margin:0">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js'
+const SCALE=2.4
+new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load('web.glb',(g)=>{
+ const m=g.scene; let box=new THREE.Box3().setFromObject(m); const s=SCALE/box.getSize(new THREE.Vector3()).x; m.scale.setScalar(s); m.updateMatrixWorld(true)
+ box=new THREE.Box3().setFromObject(m); m.position.sub(box.getCenter(new THREE.Vector3())); m.updateMatrixWorld(true)
+ const sc=new THREE.Scene(); sc.add(m); sc.add(new THREE.AmbientLight(0xffffff,3))
+ // 1) render ortho de frente sin luz direccional: albedo aproximado
+ const N=600, half=1.3; const r=new THREE.WebGLRenderer({preserveDrawingBuffer:true}); r.setSize(N,N); r.outputColorSpace=THREE.SRGBColorSpace; document.body.appendChild(r.domElement)
+ m.traverse(o=>{if(o.isMesh){o.material=new THREE.MeshBasicMaterial({map:o.material.map})}})
+ const cam=new THREE.OrthographicCamera(-half,half,half,-half,0.01,100); cam.position.set(0,0,10); cam.lookAt(0,0,0); sc.background=new THREE.Color(1,1,1); r.render(sc,cam)
+ const gl=r.getContext(); const px=new Uint8Array(N*N*4); gl.readPixels(0,0,N,N,gl.RGBA,gl.UNSIGNED_BYTE,px)
+ // flood fill del visor desde su centro (en coordenadas de readPixels: fila 0 = abajo)
+ const dark=(i,j)=>{const k=(j*N+i)*4; return 0.3*px[k]+0.59*px[k+1]+0.11*px[k+2] < 80}
+ const seen=new Uint8Array(N*N); const st=[[300, N-1-290]]; let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,count=0
+ while(st.length){const [i,j]=st.pop(); if(i<0||j<0||i>=N||j>=N) continue; const id=j*N+i; if(seen[id]) continue; seen[id]=1; if(!dark(i,j)) continue; count++
+  const wx=-half+2*half*(i+.5)/N, wy=-half+2*half*(j+.5)/N; x0=Math.min(x0,wx);x1=Math.max(x1,wx);y0=Math.min(y0,wy);y1=Math.max(y1,wy); st.push([i+1,j],[i-1,j],[i,j+1],[i,j-1])}
+ const vis={x0,x1,y0,y1,count}
+ // 2) rayos de frente sobre la elipse inscrita (80%) → puntos de la superficie del visor
+ const ray=new THREE.Raycaster(); const pts=[]; const cx=(x0+x1)/2, cy=(y0+y1)/2, ax=(x1-x0)/2*0.8, ay=(y1-y0)/2*0.8
+ for(let a=-1;a<=1;a+=0.1)for(let b=-1;b<=1;b+=0.1){ if(a*a+b*b>1) continue; ray.set(new THREE.Vector3(cx+a*ax,cy+b*ay,10),new THREE.Vector3(0,0,-1)); const h=ray.intersectObject(m,true)[0]; if(h) pts.push(h.point.clone()) }
+ // ajuste de esfera por mínimos cuadrados: x²+y²+z² = 2ax+2by+2cz+d
+ const A=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]], B=[0,0,0,0]
+ for(const p of pts){const row=[2*p.x,2*p.y,2*p.z,1], rhs=p.x*p.x+p.y*p.y+p.z*p.z; for(let i=0;i<4;i++){B[i]+=row[i]*rhs; for(let j=0;j<4;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<4;i++){let mx=i;for(let k=i+1;k<4;k++)if(Math.abs(A[k][i])>Math.abs(A[mx][i]))mx=k;[A[i],A[mx]]=[A[mx],A[i]];[B[i],B[mx]]=[B[mx],B[i]];for(let k=i+1;k<4;k++){const f=A[k][i]/A[i][i];for(let j=i;j<4;j++)A[k][j]-=f*A[i][j];B[k]-=f*B[i]}}
+ const X=[0,0,0,0];for(let i=3;i>=0;i--){let s2=B[i];for(let j=i+1;j<4;j++)s2-=A[i][j]*X[j];X[i]=s2/A[i][i]}
+ const C=new THREE.Vector3(X[0],X[1],X[2]); const R=Math.sqrt(X[3]+C.lengthSq())
+ const res=pts.map(p=>Math.abs(p.distanceTo(C)-R)); const rms=Math.sqrt(res.reduce((a,b)=>a+b*b,0)/res.length)
+ // extents angulares del visor completo (bbox) desde el centro de la esfera
+ const zAt=(x,y)=>C.z+Math.sqrt(Math.max(0,R*R-(x-C.x)**2-(y-C.y)**2))
+ const ang=(x,y)=>{const v=new THREE.Vector3(x,y,zAt(x,y)).sub(C); return {az:Math.atan2(v.x,v.z), el:Math.asin(v.y/v.length())}}
+ const L_=ang(x0,cy), R_=ang(x1,cy), T=ang(cx,y1), Bt=ang(cx,y0)
+ window.OUT={vis,pts:pts.length,center:C.toArray().map(v=>+v.toFixed(4)),R:+R.toFixed(4),rms:+rms.toFixed(4),azL:L_.az,azR:R_.az,elT:T.el,elB:Bt.el}
+ document.title='done'})
+</script>

@@ -1,0 +1,51 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "line": "engine",
+  "theme": "dark",
+  "recipe": "content-industries",
+  "voice": {
+    "eyebrow": "Industrias",
+    "question": "¿Conocemos tu industria?",
+    "answer": [
+      "Por",
+      "dentro"
+    ]
+  },
+  "body": "Seis industrias donde tu comprador ya le pregunta a la IA antes de llamarte. Nosotros sabemos **qué pregunta**.",
+  "productMark": {
+    "asset": "sv360-lockup-negative",
+    "alt": "Efeonce | SV360"
+  },
+  "industries": [
+    {
+      "name": "Banca y finanzas",
+      "question": "¿Qué banco tiene la mejor cuenta para pymes?"
+    },
+    {
+      "name": "Seguros",
+      "question": "¿Qué seguro de auto cubre más por menos?"
+    },
+    {
+      "name": "Retail",
+      "question": "¿Dónde compro buenas zapatillas de running?"
+    },
+    {
+      "name": "Manufactura",
+      "question": "¿Qué proveedor de envases cumple la norma?"
+    },
+    {
+      "name": "Servicios profesionales",
+      "question": "¿Qué estudio contable me recomiendas?"
+    },
+    {
+      "name": "SaaS",
+      "question": "¿Qué CRM me sirve para una pyme B2B?"
+    }
+  ],
+  "highlightedIndustry": 1
+}

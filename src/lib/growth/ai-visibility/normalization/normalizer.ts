@@ -11,12 +11,10 @@
  * DOMINIO (`efeoncepro.com`), NO por name-match ingenuo (colisión con `f11.es`).
  */
 
+import { type MatchingSnapshot, matchesAlias } from '../markets/contracts'
 import { GROWTH_AI_VISIBILITY_PROMPT_PACK_V1 } from '../prompt-packs/prompt-pack-v1'
 import { MESSAGE_RECALL_STAGE, isRevenueIntentStage, type PromptTag } from '../prompt-packs/tag-vocabulary'
-import {
-  type GrowthAiVisibilityProviderObservation,
-  type GrowthAiVisibilitySourceType
-} from '../contracts'
+import { type GrowthAiVisibilityProviderObservation, type GrowthAiVisibilitySourceType } from '../contracts'
 import {
   createEmptyNormalizedFinding,
   NORMALIZED_FINDING_SCHEMA_VERSION,
@@ -27,6 +25,7 @@ import {
 import { classifySourceType, isSameSiteDomain } from './source-type-classifier'
 
 export interface NormalizationContext {
+  matchingSnapshot?: MatchingSnapshot | null
   /** Nombre de la marca sujeto del grado. */
   subjectBrand: string
   /** Dominio canónico del sujeto (para desambiguación por dominio). null si no se conoce. */
@@ -47,7 +46,12 @@ const staticPackTag = (promptId: string): PromptTag | undefined => {
   const prompt = GROWTH_AI_VISIBILITY_PROMPT_PACK_V1.prompts.find(p => p.id === promptId)
 
   return prompt
-    ? { family: prompt.family, fanOutType: prompt.fanOutType, intentStage: prompt.intentStage, namesBrand: prompt.namesBrand }
+    ? {
+        family: prompt.family,
+        fanOutType: prompt.fanOutType,
+        intentStage: prompt.intentStage,
+        namesBrand: prompt.namesBrand
+      }
     : undefined
 }
 
@@ -109,7 +113,13 @@ const resolveBrandPresence = (
     ? citationDomains.some(domain => isSameSiteDomain(domain, context.subjectDomain))
     : false
 
-  const nameInExcerpt = nameAppearsInText(context.subjectBrand, excerpt)
+  const nameInExcerpt = context.matchingSnapshot
+    ? [
+        { name: context.matchingSnapshot.brand.name, matchMode: 'word_ci' as const },
+        ...context.matchingSnapshot.brand.aliases
+      ].some(alias => matchesAlias(excerpt, alias))
+    : nameAppearsInText(context.subjectBrand, excerpt)
+
   const isDiscovery = tag ? !tag.namesBrand : false
 
   // Presencia confirmada por dominio del sujeto → señal fuerte.
@@ -167,6 +177,16 @@ const resolveCompetitors = (
 
   // OQ#2: declarados ∪ detectados. Determinista = declarados que aparecen en el excerpt.
   // Los "detectados" libres (no declarados) requieren extracción de prosa → LLM hook.
+  if (context.matchingSnapshot) {
+    return context.matchingSnapshot.competitors
+      .filter(member =>
+        [{ name: member.name, matchMode: member.matchMode }, ...member.aliases].some(alias =>
+          matchesAlias(excerpt, alias)
+        )
+      )
+      .map(member => member.name)
+  }
+
   return dedupe(context.competitorsDeclared.filter(competitor => nameAppearsInText(competitor, excerpt)))
 }
 

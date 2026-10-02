@@ -1,0 +1,14 @@
+{
+  "project": "greenhouse-eo",
+  "flags": [
+    {
+      "id": "sNBPbHMzNQWO6l3d",
+      "key": "GROWTH_AI_VISIBILITY_MULTI_MARKET_ENABLED",
+      "target": [],
+      "customEnvironmentIds": [
+        "env_lGAfZ8MxuuDPpWKO6kWu9L7IuuNW"
+      ],
+      "value": "true"
+    }
+  ]
+}

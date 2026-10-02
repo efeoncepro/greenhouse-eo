@@ -24,6 +24,12 @@ Globe, Reach y Efeonce Digital no se presentan como agencias o proveedores contr
 | Digital Automation & Integrations | Aceptada | Pendiente |
 | **Product Design 360** | **Propuesta** — sexta familia, pendiente de aprobación en el ADR | [`product-design-360.md`](product-design-360.md) |
 
+**Efeonce AEO** nombra la capacidad de entrada a visibilidad de marca en respuestas de IA;
+**Efeonce AEO Assessment** es su diagnóstico público y **Efeonce AI Visibility Report** su
+entregable. Su ruta de expansión pertenece a **Search Visibility 360**, no constituye una familia
+Wave adicional. El [modelo AEO](../../business-models/aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md)
+sigue `Draft`. [ADR de naming](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 Product Design 360 es la primera familia de Wave con ficha de servicio. Las cinco familias aceptadas siguen
 gobernadas por el Wave Business Model y el ADR; que no tengan ficha todavía es un gap conocido de documentación,
 no una diferencia de estatus en el portfolio.

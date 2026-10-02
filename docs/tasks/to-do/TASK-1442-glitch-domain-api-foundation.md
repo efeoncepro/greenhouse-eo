@@ -1,5 +1,22 @@
 # TASK-1442 — Glitch Domain, State and API Foundation
 
+## Delta 2026-09-28 — el manifiesto tiene un hermano: el Glitch Flash
+
+- `GlitchFlashManifest` (misma ruta, commit local `24e4c72ee`) convive con `GlitchEditionManifest`, que queda idéntico;
+  `parseGlitchManifest` / `planGlitchManifest` despachan por forma. El dominio persiste el tipo de edición (`weekly` |
+  `flash`, como `glitchLine.editions` en AXIS 0.3.24) y entrega a cada mapper su manifiesto; el Flash no lleva número
+  ni rotación de portada.
+- Numeración abierta: el blog tiene «Glitch #16» (2026-07-21) y «Glitch #17» (2026-07-28, post 251605) y el sistema
+  gráfico dice que la próxima es la #17 (AXIS `pendingDecisions.edition-numbering-blog-vs-system`). La unicidad de la
+  edición numerada depende de esa respuesta del operador.
+
+## Delta 2026-09-27 — el contrato de datos de una edición existe (TASK-1923)
+
+- `GlitchEditionManifest` (`src/lib/glitch-composition/manifest.ts`, zod strict, `schemaVersion: 1`) es el contrato que
+  el dominio de ediciones debe producir: numeración, `previousEdition.coverTemplate` (de ella sale la rotación de
+  portada), 8 noticias con foto, crédito, licencia y regiones de rostro, POV, lente opcional, contraportada, sección
+  `video` y `outputs`. El dominio no redefine esos campos: los persiste y los entrega a `planGlitchEdition`.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

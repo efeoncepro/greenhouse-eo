@@ -1,5 +1,7 @@
 # EPIC-022 — Growth SEO Module (Search Visibility 360)
 
+> **Naming vigente (2026-09-29):** **Efeonce AEO** nombra la capacidad de IA, y **Efeonce AEO Assessment** su diagnóstico público. `AEO Grader` sigue como alias técnico del motor hermano `growth.ai_visibility`; **Search Visibility 360** conserva el alcance SEO+AEO de este epic. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -178,6 +180,7 @@ posee el reparto de experiencia cliente y coordina las dependencias de comunicac
 > inventada, y no hay gate que lo detecte.
 
 
+- `TASK-1948` — [complete, tooling local] CLI 1.1.0: Keywords for Site por URL/dominio/subdominio con sujeto explícito, relevancia separada de rankings, checkpoint y techo; 96 tests verdes e integración live MX con paginación/resume y ledger verificados; selección editorial requerida; [evidencia consolidada](../../audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md). Follow-up de TASK-1935, sin cambiar targets SEO ni series del cliente.
 - `TASK-1299` — schema `growth.seo` (targets, keyword_sets, competitors, snapshots append-only) — bloqueador fundacional.
 - `TASK-1300` — DataForSEO family registry (ampliar allowlist + breaker + cost por familia) — bloquea todo lo provider-facing.
 - `TASK-1301` — capabilities `growth.seo.*` + entitlement per-org + chokepoint `enforceSeoRunEntitlement`.

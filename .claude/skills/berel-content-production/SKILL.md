@@ -21,6 +21,9 @@ argument-hint: '[fase del ciclo, artículo, tutorial o pregunta concreta]'
 **Berel = Pinturas Berel, México.** El contenido vive en `berel.com`, sección **Inspiración**, sobre
 Drupal. La voz pública es español de México y habla como la marca, no como Efeonce.
 Los informes dirigidos a Berel hablan desde Efeonce como su agencia: ver módulo 17.
+Research SEO/DataForSEO usa México (`MX`/es), con URL/propiedad verificadas; no hereda Chile/default del
+operador. Relevancia por URL y selección de intención local frente a comparativas: módulo 14 +
+`dataforseo-operator` (Labs §2.1a). No atribuir otros hostnames a la marca por parecido.
 
 ## Precedencia documental
 

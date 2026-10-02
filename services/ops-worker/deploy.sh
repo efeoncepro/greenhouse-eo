@@ -274,6 +274,12 @@ ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLE
 # Default ON por la misma razón que el flag de Proposal: el ops-worker es un servicio ÚNICO, y la
 # puerta de producto por ambiente es el ENCOLADO en Vercel (`requestInsightRender`), no el dispatch.
 ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"
+# 🚩 TASK-1921 — el mismo `/artifact-render/dispatch` drena la cola de piezas de marca (`dispatchNextBrandRender`),
+# que lee su propio flag. Default ON desde 2026-09-28, autorizado por el operador: el ops-worker es único para
+# staging y producción; la puerta por ambiente es el encolado en Vercel, que sólo existe en staging. Declararlo
+# aquí y en el Job, no con `--update-env-vars` suelto: `--set-env-vars` de abajo es destructivo y lo borraría
+# en el próximo deploy. Ledger: FEATURE_FLAG_STATE_LEDGER.md
+ENV_VARS="${ENV_VARS},BRAND_RENDER_ENABLED=${BRAND_RENDER_ENABLED:-true}"
 # 🚩 TASK-1848 — la projection `insights_delivery_dispatch` (lane ops-reactive-notifications) despacha
 # los correos de Efeonce Insights y lee este flag SOLO acá. Default ON por la misma razón que el
 # render: el ops-worker es ÚNICO para staging y producción; la puerta de producto por ambiente es
@@ -781,6 +787,7 @@ ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_CONTRACTED_MONTHLY_BUDGET_USD=${GROWT
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PILOT_MONTHLY_BUDGET_USD=${GROWTH_AI_VISIBILITY_PILOT_MONTHLY_BUDGET_USD}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_TRIAL_MONTHLY_BUDGET_USD=${GROWTH_AI_VISIBILITY_TRIAL_MONTHLY_BUDGET_USD}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED=${GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_MULTI_MARKET_ENABLED=${GROWTH_AI_VISIBILITY_MULTI_MARKET_ENABLED:-false},GROWTH_AI_VISIBILITY_BATCH_DAILY_BUDGET_USD=${GROWTH_AI_VISIBILITY_BATCH_DAILY_BUDGET_USD:-25}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED=${GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE=${GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD=${GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD}"

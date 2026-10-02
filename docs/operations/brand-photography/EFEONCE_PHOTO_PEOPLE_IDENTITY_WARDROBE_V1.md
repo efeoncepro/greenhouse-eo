@@ -1,9 +1,9 @@
 # Personas en la fotografía Efeonce V1 — casting, identidad y vestuario
 
 > **Tipo de documento:** Especificación técnica y funcional de marca
-> **Versión:** 1.0
+> **Versión:** 1.3
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-21
+> **Última actualización:** 2026-10-02 por Claude (1.3: el traje biónico y los lentes biónicos de Nexa se piden por catálogo, sólo Nexa y sólo cine, con las marcas armadas en la referencia; la pose y la expresión salen de la escena y de las 12 expresiones fotográficas; anclas de Nexa con la frontal primero, [delta 2026-10-02](#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo). 1.2: lo compuesto se termina con el modelo; 1.1: el bordado del uniforme lo trae la referencia puesta; `foto:isotipo` sólo si el emblema difiere, y siempre en el traje de Nexa)
 > **Estado:** Aprobado por el operador el 2026-09-19 (piezas de exploración; ninguna publicada)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Guía de kits de marca](../social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [Biblioteca de Nexa](../social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) · Evidencia `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/`
 
@@ -55,7 +55,7 @@ Requisito del operador: el sistema funciona en los tres **[decisión del operado
 |---|---|---|
 | Julio | Rostro | `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` (`julio-ap-04` primero; vista resuelta por `foto:prompt`) |
 | Julio | Cuerpo | El mismo set aprobado (`julio-ap-11` primero) |
-| Nexa | Rostro | `ai-generations/_identidad-nexa/1-anclas/` (`nexa-ancla-2-rostro-tresquartos` primero; vista resuelta por `foto:prompt`) |
+| Nexa | Rostro | `ai-generations/_identidad-nexa/1-anclas/` (desde el 2026-10-02, `nexa-ancla-1-rostro-frontal` primero y el tres cuartos después: con el tres cuartos primero el modelo copiaba su giro y su gesto; vista resuelta por `foto:prompt`) |
 | Nexa | Cuerpo | El mismo home (`nexa-ancla-5-cuerpo-frontal` primero) |
 
 🔴 **Las rutas anteriores de Nexa quedan RETIRADAS** **[2026-09-21]**. Esta tabla mandaba a
@@ -303,6 +303,21 @@ personas de Efeonce.
 
 ### El emblema bordado NO se genera **[medido 2026-09-20]**
 
+> **Delta 2026-09-28 [decisión del operador]:** «*no estás agarrando las referencias de ropa corporativa de
+> Efeonce, si no te saldría el bordado*»; «*para el uniforme sí tiene varias referencias armadas, no sólo Nexa:
+> cualquier personaje que use uniforme*». El uniforme, en cualquier persona, se pide por su kit en `objetos`
+> (llega la prenda **puesta**) y, si `pnpm foto:emblema` al 100 % muestra nave, órbita y tres ventanas, **se
+> publica el bordado generado**, sin componer encima. Componer por defecto fue el error del 2026-09-28
+> (`MC2`, Marketing con Manzanitas): el bordado generado ya era correcto y el isotipo compuesto lo dejó impreso,
+> además de tapar la mano vecina con la limpieza. `foto:isotipo` queda para cuando el emblema difiere, y para el
+> **traje biónico de Nexa**, que no tiene referencia (se compone siempre, como `NX5b`). *(Superado el 2026-10-02: el
+> traje ya tiene kit y su marca viaja armada en la referencia; `foto:isotipo` vuelve a ser sólo para cuando difiere.
+> Ver el [delta 2026-10-02](#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo).)*
+>
+> **Y lo compuesto se termina con el modelo [operador, 2026-09-28]:** el isotipo compuesto se ve pegado encima; se
+> recorta la zona, el modelo le da materia y luz sin tocar la marca, y la edición vuelve sólo sobre su silueta. Desde
+> el 2026-09-29 lo hace `pnpm foto:isotipo … --acabado` (método medido en `.claude/rules/brand-photography.md`).
+
 **El modelo no reproduce el emblema: inventa uno distinto cada vez.** Medido sobre la tanda
 `2026-09-20_vestuario-registros/`: tres prendas dieron **tres emblemas diferentes entre sí y ninguno
 era el de Efeonce** — una espiral tipo arroba en un polo, dos barras verticales en otro, otras dos
@@ -335,7 +350,7 @@ propia, no.
    que el operador rechazó.
 3. **Editar con máscara** sobre la zona del emblema, partiendo del kit.
 
-**Nunca**: publicar el emblema tal como sale del generador.
+**Nunca**: publicar el emblema sin mirarlo al 100 % con `pnpm foto:emblema`. Si coincide con el del kit, se publica tal como salió; si no, se corrige o se rehace la toma.
 
 > **Por qué falló el control que ya existía.** La instrucción estaba en el kit —«never let the model
 > spell the emblem by itself — inspect it at 100% before publishing»— y se emitía en cada prompt. Pero
@@ -347,6 +362,14 @@ propia, no.
 > emblema, y **`pnpm foto:emblema <plate.png>`** recorta y amplía las zonas del bordado en una hoja
 > para mirarlas. No deciden —un emblema se compara letra por letra contra el kit, no por píxeles—:
 > quitan la excusa de no haberlo mirado.
+>
+> Desde el 2026-09-27 hay un tercero para corregir: **`pnpm foto:isotipo <plate.png> --centro x,y --ancho w`**
+> limpia el emblema inventado midiendo el tono de la tela y compone el isotipo oficial de
+> `@efeoncepro/axis-brand-assets` (negativo sobre prenda oscura, positivo sobre clara) con la luz de la escena,
+> y escribe un `.json` de procedencia con la versión del paquete y el SHA-256 del SVG. El orden no cambia: las
+> vistas del kit en la ficha primero, `foto:emblema` al 100 % siempre, y `foto:isotipo` sólo cuando esa revisión
+> muestra un emblema distinto del oficial. No simula bordado: un primer plano que pide bordado verosímil se
+> rehace con otro encuadre.
 
 ### La técnica de aplicación la decide la TELA, no la costumbre del kit **[decisión del operador, 2026-09-21]**
 
@@ -731,3 +754,103 @@ selección existente; no altera los assets ni el orden del manifiesto.
 
 Bitácora con las seis piezas, sus palancas y los errores de proceso:
 `ai-generations/2026-09-21_nexa-uniforme-terreno/LEEME.md`.
+
+## Delta 2026-09-26 — poner a Julio en una escena: regenerar la escena, nunca injertar la cara **[operador · medido]**
+
+Caso: las fotos del banco del 19-09 (J2, JN1–JN4, M1, M3, M4) se hicieron con el set de identidad retirado. Al
+corregirles el rostro se probaron cuatro métodos el mismo día; el operador aprobó sólo los que regeneran la escena.
+
+| Método | Resultado | Veredicto del operador |
+|---|---|---|
+| Injerto de cara con 2 refs sobre la escena completa | La cara crece, se alarga; retoca a la otra persona en cuadro | «parece que mi cara hubiese crecido» |
+| Injerto con las 11 refs sobre la escena completa | La mirada se va a cámara (las refs son frontales) | «mirada perdida, típico de IA» |
+| Recorte de la cabeza + ángulo + pegado con borde difuso | Escena intacta, pero la cara se fuerza al sonreír o de lado | «como un mandril», «muy forzado» |
+| **Escena completa con `pnpm foto:generar` (Sunburst)** | Identidad, pose y mirada coherentes | **aprobada** (J2 v8, JN4 v7, M1 v7) |
+
+**Receta que funcionó** (fichas en `ai-generations/2026-09-26_julio-m1-rostro/v7/`):
+
+1. **Describir la escena original como ficha** (`formato`, `identidad`, `objetos`, `escena`, `lecho`) y generar con
+   `pnpm foto:prompt` → `pnpm foto:generar`. El modelo construye a Julio en la pose; no le pega una cara encima.
+2. **La cabeza casi no gira: giran los ojos.** Un tres cuartos marcado empuja boca y mandíbula hacia adelante y se lee
+   «de lado como un mono» (J2 v7, rechazada). Pedir la cabeza casi frontal con los marcadores del casi-frontal y
+   mover sólo los iris hacia el objetivo (J2 v8, aprobada). Evitar tres cuartos marcados y perfiles de Julio en escena.
+3. **La mirada necesita un destino físico en cuadro.** Con dos personas, o se miran entre sí (líneas de mirada que se
+   encuentran) o miran el MISMO objeto (atención compartida: JN4 v7). Miradas a lados distintos delatan la IA.
+4. **Sonrisa con la boca cerrada y nada apoyado en la cara.** La mano en la mejilla y la risa abierta deforman el
+   rostro en edición y en generación.
+5. **Uniforme y utilería desde el kit**, no desde la descripción: `objetos: ["polo-efeonce"]` trae el piqué navy con su
+   isotipo (verificar con `pnpm foto:emblema`); la utilería se declara con precisión de oficio (tablet actual, cámara de
+   cine de gran formato con matte box, follow focus, óptica cine, V-mount, monitor) y sin marcas legibles.
+6. **Luz con carácter, si la escena salió plana, se agrega reiluminando la misma foto** (edición con la foto aprobada
+   como imagen 1 y dos refs de identidad sólo para sostener la cara): un haz duro y estrecho, contraluz baja que
+   recorta pelo y hombro, sala en oscuros ricos. La primera pasada tiende a quedar tímida; se pide «visible a simple
+   vista» y un lado del rostro en sombra abierta (M1 v7 + luz, aprobada).
+
+**Dónde sí sirve editar por zona:** corregir a la SEGUNDA persona cuando la primera ya está aprobada (Nexa en M3 v5,
+aprobada): recorte de su cabeza, edición sutil con sus anclas canónicas y la vista del set que coincide con su giro,
+y pegado con borde difuso sobre la foto aprobada. Con dos personas, el modelo nunca respeta del todo a la que no se
+edita, así que no se le pide «no toques a la otra»: se compone por zona.
+
+«Editar conserva, generar reconstruye» sigue valiendo para **derivar vistas o vestuario de una foto aprobada de la
+misma persona**; no para cambiar la identidad de alguien dentro de una escena ajena.
+
+El perfil derecho del set (`julio-perfil-der.png`) se reemplazó el 26-09 por una v2 regenerada desde el perfil izquierdo
+aprobado; el anterior deformaba el perfil. Lock de assets resellado.
+
+## Delta 2026-10-02 — el traje biónico y los lentes biónicos de Nexa, por catálogo
+
+Fuente: TASK-1940 (kit en `ai-generations/2026-10-01_traje-bionico-nexa/`, con su `LEEME.md` y su manifiesto) y la
+corrección de pose del mismo día. Hasta ahora el traje vivía como texto copiado entre fichas (`NX3`–`NX5`) y el modelo
+lo redibujaba en cada corrida, hasta inventarle un cohete en el pecho.
+
+### El código de vestuario suma una fila, sólo para Nexa **[decisión del operador]**
+
+| Registro | Prenda | Quién | Qué comunica |
+|---|---|---|---|
+| **Cine** | **Traje biónico** (`traje-bionico-nexa`) **+ lentes biónicos** (`lentes-bionicos-nexa`) | **Sólo Nexa** | El personaje en su película: ficción declarada. Nunca en documental, nunca en una persona del equipo |
+
+- **Se declara por catálogo, nunca se describe a mano.** La ficha pide `"registro": "cine"` explícito y los dos
+  objetos en `objetos`; la escena sólo dice que lo lleva («She wears the bionic suit exactly as in its reference»), y
+  con eso cumple la regla de declarar el vestuario: el detector de `foto:prompt` reconoce `wears`, `suit` y
+  `bodysuit` **[medido en código]**. El paso a paso está en el
+  [manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
+- **La guarda lo hace cumplir** (`validarTrajeNexa`): aborta si el traje o los lentes se piden para otra persona, en una
+  ficha sin Nexa o sin `"registro": "cine"`. El registro cine no tenía campo propio en la ficha; para el traje se
+  declara.
+- **En cine, Nexa también puede llevar el uniforme** (la softshell de `NX6`, `BR1`–`BR3`): el traje es una opción del
+  registro, no su obligación ([registro cine §7.1](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#71-nexa)).
+
+### Las marcas viajan armadas en la referencia **[decisión del operador, 2026-10-02]**
+
+*«Dejarlo armado y con eso pasar la referencia al modelo para que no lo borre ni lo reinvente»*. Con la pechera lisa
+y la marca para componer después, las dos primeras escenas (`NX7`, `NX7b`) salieron sin logo; con la marca armada y
+el macro de la placa en escena, el modelo la copió fiel en `NX7c`, `NX7d` y en las vistas puestas **[medido]**.
+
+| Dónde | Marca | Técnica |
+|---|---|---|
+| Pechera, lado izquierdo de quien lo lleva | Isotipo oficial | **Incrustado**: navy, al ras de la placa blanca, sin borde ni relieve |
+| Placa dorsal, entre los omóplatos | Logo completo «efeonce» | **Serigrafiado** en tinta navy levemente metálica |
+
+Esto **supera** la nota del 2026-09-28 que decía que el traje «se compone siempre». Ahora vale para el traje lo mismo
+que para el uniforme: `pnpm foto:emblema` al 100 % siempre, y `pnpm foto:isotipo` sólo si el emblema difiere o falta.
+
+### La pose y la expresión salen de la escena **[medido, A/B `NX7d`→`NX7g`]**
+
+Nexa salía casi siempre con la misma cabeza en tres cuartos, ladeada y con media sonrisa. Desde el 2026-10-02:
+
+- Las referencias de identidad dicen **quién** es, no **cómo** está: el giro, la inclinación, la mirada y el gesto los
+  pone la escena. Por eso la vista puesta del traje que va a escena es la **13 sin rostro**, recortada bajo el mentón.
+- Una ficha con Nexa declara **una** de dos cosas: `expresion` (una de las 12 fotográficas de
+  `_identidad-nexa/5-expresiones/` o de las ocho del Bible) **o** `vista` (el ángulo), o las dos juntas si Nexa está sola
+  en la toma (desde el 2026-10-02 conviven: con una persona sola en la toma, `vista` + `expresion` juntas — el ángulo de la vista y el gesto de la expresión; medido en `NX7j`). Las 12 comparten el mismo tres cuartos del ancla y por eso aportan **sólo el gesto**: el
+  ángulo se pide con `vista`. Si Nexa llega sin ninguna, `foto:prompt` avisa.
+- Las anclas van con la **frontal primero** (ver §5.1). Lista y nombres en la
+  [ficha de Nexa](./NEXA_CHARACTER_BIBLE_FICHA_V1.md#delta-2026-10-02--traje-biónico-12-expresiones-fotográficas-y-la-pose);
+  causa y bloques en [prompts y pipeline, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está).
+
+### Accesorios con el traje
+
+En las vistas puestas del kit los **aretes salieron dorados**, como en las anclas, aunque su bloque pide plata; el
+operador **aprobó las vistas así** **[decisión del operador]**. La escena aprobada `NX7d` declara aretes plateados y
+quita reloj, pulsera y anillo. Si el traje lleva o no el smartwatch y el anillo sigue abierto, igual que en el resto del
+registro cine **[pendiente]**.

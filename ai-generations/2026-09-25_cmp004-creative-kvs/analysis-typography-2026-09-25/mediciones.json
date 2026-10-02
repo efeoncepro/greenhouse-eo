@@ -1,0 +1,82 @@
+[
+  {
+    "id": "C01-frase-completa-compacta",
+    "before": {
+      "dominant_size": 95,
+      "dominant_ink_width": 468.657,
+      "gap_copy_to_button": 34.0,
+      "gap_button_to_descriptor": 24.064
+    },
+    "candidate": {
+      "dominant_size": 95,
+      "dominant_ink_width": 776.775,
+      "gap_copy_to_button": 25.0,
+      "gap_button_to_descriptor": 24.064
+    },
+    "headline_lines": [
+      "Seguiría siendo tu marca."
+    ],
+    "render_width": 1152,
+    "review_width": 390
+  },
+  {
+    "id": "C02-frase-completa-compacta",
+    "before": {
+      "dominant_size": 95,
+      "dominant_ink_width": 361.727,
+      "gap_copy_to_button": 34.0,
+      "gap_button_to_descriptor": 24.064
+    },
+    "candidate": {
+      "dominant_size": 95,
+      "dominant_ink_width": 832.405,
+      "gap_copy_to_button": 25.0,
+      "gap_button_to_descriptor": 24.064
+    },
+    "headline_lines": [
+      "merece una imagen propia."
+    ],
+    "render_width": 1152,
+    "review_width": 390
+  },
+  {
+    "id": "C03-frase-completa-compacta",
+    "before": {
+      "dominant_size": 95,
+      "dominant_ink_width": 436.519,
+      "gap_copy_to_button": 34.0,
+      "gap_button_to_descriptor": 24.064
+    },
+    "candidate": {
+      "dominant_size": 95,
+      "dominant_ink_width": 668.811,
+      "gap_copy_to_button": 25.0,
+      "gap_button_to_descriptor": 24.064
+    },
+    "headline_lines": [
+      "Ningún detalle casual."
+    ],
+    "render_width": 1152,
+    "review_width": 390
+  },
+  {
+    "id": "C04-frase-completa-compacta",
+    "before": {
+      "dominant_size": 100,
+      "dominant_ink_width": 507.192,
+      "gap_copy_to_button": 34.0,
+      "gap_button_to_descriptor": 24.064
+    },
+    "candidate": {
+      "dominant_size": 100,
+      "dominant_ink_width": 919.96,
+      "gap_copy_to_button": 25.0,
+      "gap_button_to_descriptor": 24.064
+    },
+    "headline_lines": [
+      "La exigencia también escala."
+    ],
+    "render_width": 1152,
+    "review_width": 390
+  }
+]

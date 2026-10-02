@@ -1,0 +1,9 @@
+  ⚠ --count 2: son 2 pedidos separados por prompt y se paga cada uno
+  $ costo estimado ≈ USD 0.158 (2 × 2627 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-01_sparks/rig/capas/mano-senala-1.png (edit) …
+  ✓ 2532KB · gpt-image-2.5-sunburst · 1600x1600 · high
+    usage: in 1684 (img 1521 · txt 163) · out 2627 · total 4311
+→ ./ai-generations/2026-10-01_sparks/rig/capas/mano-senala-2.png (edit) …
+  ✓ 2497KB · gpt-image-2.5-sunburst · 1600x1600 · high
+    usage: in 1684 (img 1521 · txt 163) · out 2627 · total 4311
+done

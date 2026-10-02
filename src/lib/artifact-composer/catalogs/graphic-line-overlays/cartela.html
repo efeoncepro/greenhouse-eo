@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · cartela de apertura</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `cartela` (audiovisual, papel opening-title). Capa transparente de 0 a 2,5 s: la voz de la línea
+      —pregunta con su anillo y respuesta gigante con su esfera— y la órbita que mide el capítulo (1 de 3), con
+      el nombre del capítulo dentro del anillo. La selección colaborativa encaja sobre la respuesta al final.
+      El arco lo pinta AXIS en el builder y llega como capa (`asset-ref:layer:*`). Referencia aprobada:
+      «Escenas con texto · 01 cartela de apertura».
+    -->
+    <main class="gl-layer gl-cartela" data-gl-root data-slot="frame">
+      <figure class="gl-orbit" data-slot="orbit">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-chapter" data-slot="chapter">
+        <p class="gl-chapter-title" data-slot-field="title">Escucha</p>
+        <p class="gl-chapter-label" data-slot-field="label">capítulo 1 de 3</p>
+      </div>
+
+      <div data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo trabajamos?</span></p>
+        <p class="gl-answer" data-gl-selection-target><span data-slot-field="answer">Así</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+    </main>
+  </body>
+</html>

@@ -1,5 +1,9 @@
 # AI Visibility Grader / Surround Discovery Audit — integración skill ↔ producto Greenhouse
 
+> **Naming comercial vigente (2026-09-29):** **Efeonce AEO** (capacidad) → **Efeonce AEO Assessment** (diagnóstico público) → **Efeonce AI Visibility Report** (entregable). **Search Visibility 360** es la oferta SEO + AEO más amplia. El título de este archivo, `AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader`, rutas y contratos son aliases técnicos o históricos; `Surround Discovery Audit` es lenguaje metodológico interno, no marca comercial. Ver `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+>
+> **Submarcas de producto con logo (2026-09-29):** **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** son submarcas de producto de Efeonce con logos oficiales en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29); acompañan a Efeonce y nunca firman solas. Referencia visual: Lab de AXIS `https://axis.efeonce.org/references/seo-aeo/` (publicados el 2026-09-29; responden 200). ADR de naming §Delta 2026-09-29; uso visual en la skill `efeonce-graphic-line`.
+
 > **Qué es esto.** Greenhouse está construyendo un producto que *operacionaliza*
 > esta skill: un **grader público de visibilidad en IA**, gobernado desde
 > Greenhouse, en el nuevo dominio `growth`. Esta skill es el **conocimiento de
@@ -172,25 +176,33 @@ Rutas de código relativas a `src/lib/growth/ai-visibility/`.
 
 ### 🔴 Trampas del input
 
-- **`market` va como nombre** (`"Chile"`), no ISO: el ISO se interpola crudo en
-  los prompts ("…en CL") y el provider de Google AI acepta `location_name`.
-  Fuera de CL/MX/CO/PE/US, un ISO cae a Estados Unidos.
+- **`market` acepta ISO o nombre reconocido** (`"CL"` o `"Chile"`) mediante
+  `resolveGrowthMarket`; el prompt recibe la etiqueta localizada y Google AI Mode,
+  `location_code` numérico. Un país explícito desconocido falla; nunca cae a Estados
+  Unidos. El formulario público legacy conserva un default CL auditado como
+  `form_default`, separado de la configuración explícita.
 - **`category` debe resolver en la taxonomía** (`taxonomy/catalog.ts`):
   `"aerolinea de pasajeros"` es alias exacto de `sector:passenger_airlines`. La
   etiqueta canónica ("Aerolineas de pasajeros", sin tilde) aparece en los
   prompts sólo si el set usa `{{category}}`; el set curado la evita escribiendo
   "aerolínea(s)" literal.
-- **La ruta admin no acepta `businessModel`:** sin set activo, sale el pack
-  genérico de 7 preguntas (`gn01`–`gn07`).
-- **El perfil se identifica por marca + mercado + locale** y los competidores
-  quedan fijos desde el primer run (no hay command para editarlos). Un nombre ya
-  usado reusa el perfil viejo: `"SKY Airline"`/Chile/es-CL traía
-  `blog.skyairline.com` y Flybondi; por eso el caso usó `"SKY"`.
-- **Coincidencia de nombres literal**, palabra completa, sin mayúsculas y **sin
-  alias**: `"LATAM"` (no "LATAM Airlines") para contar ambas formas; `"SKY"` (no
-  "SKY Airline"). "Gol" es palabra común en español (riesgo bajo en respuestas
-  de aerolíneas). El slot `{{competitor}}` usa sólo el primer competidor
-  declarado y se descarta si la lista está vacía.
+- **La ruta admin legacy no recibe `businessModel`**, pero `buildExecuteInput`
+  resuelve el arquetipo desde la categoría canónica cuando falta. Con el flag de
+  arquetipos ON, no fuerza un pack de agencia ni siempre el genérico. Un modelo
+  explícito en los commands que lo reciben prevalece; una clasificación ambigua
+  conserva el pack neutral. Los sets autorados aprobados mantienen su contrato.
+- **Las configuraciones nuevas se identifican por perfil + país + locale**;
+  conservan los perfiles legacy y sus runs. Los competidores se versionan por
+  mercado con `PUT /markets/{id}/competitors` y razón auditada, bajo el prefijo
+  `/api/admin/growth/ai-visibility`. No renombres una marca para eludir una
+  configuración antigua: usa los commands y conserva el histórico.
+- **Nombres y aliases tienen matching explícito**: `word_ci` ignora mayúsculas
+  y acentos; `word_cs` los distingue. Los aliases de marca se administran con
+  `PUT /profiles/{id}/aliases`; los de competidores, dentro de su set de mercado.
+  Declara variantes reales y usa `word_cs` cuando corresponda para nombres como
+  `Gol`. Cada run congela el set y los aliases al encolar: editarlos después no
+  recalcula resultados anteriores. El slot `{{competitor}}` sigue usando sólo
+  el primer competidor declarado y se descarta si la lista está vacía.
 
 ### ⚠️ Límites conocidos (declararlos siempre)
 
@@ -213,8 +225,8 @@ cierren, se declaran en cada entrega.
 ## Tesis del producto (por qué importa para la skill)
 HubSpot mide *percepción de marca* en answer engines. Efeonce convierte los
 **gaps de visibilidad en IA en un plan operativo** (contenido, CRM, PR, SEO/AEO,
-ventas) que entra a HubSpot/Greenhouse. Público = "AI Visibility Grader";
-frame propietario interno = **"Surround Discovery Audit"**. La durabilidad no es
+ventas) que entra a HubSpot/Greenhouse. Público = **"Efeonce AEO Assessment"**;
+`AI Visibility Grader` conserva la identidad técnica y **"Surround Discovery Audit"** el frame metodológico interno. La durabilidad no es
 "tu score es 47/100", es el diagnóstico accionable — que es exactamente lo que
 esta skill sabe producir.
 
@@ -321,9 +333,10 @@ provider **no es verdad de negocio**: se normaliza y puntúa después.
 
 ## Estado y secuencia (as-of 2026-06-24)
 
-> **Delta 2026-09-11:** esta sección es histórica. `TASK-1226`, `TASK-1227` y
-> `TASK-1228` están **complete**; lo que viene es `TASK-1861`, `TASK-1863` y
-> `TASK-1864` (ver *Docs canónicos del plan*).
+> **Delta 2026-09-28:** esta sección es histórica. `TASK-1226`, `TASK-1227` y
+> `TASK-1228` están **complete**; `TASK-1863` está desplegada en staging y mantiene
+> main en espera. `TASK-1861` y `TASK-1864` conservan sus alcances propios
+> (ver *Docs canónicos del plan*).
 - **Fase 0 (hecha):** ADR + arquitectura + dominio aceptados, sin runtime.
 - **TASK-1228 (to-do, P1) — Discovery & Eval Spike (precursor):** valida
   empíricamente el modelo de medición ANTES de hornearlo — corre un prompt pack
@@ -360,3 +373,30 @@ provider **no es verdad de negocio**: se normaliza y puntúa después.
 > **Cross-refs:** núcleo `../SKILL.md`; medición/SoV `../modules/07_MEASUREMENT.md`;
 > AEO/fan-out `../modules/04_AEO_GEO.md`; entidad `../modules/03_EEAT_ENTITY.md`;
 > overlay Efeonce + nota Astro `EFEONCE_OVERLAY.md`.
+
+## TASK-1863 — mercados e idiomas (2026-09-28)
+
+El catálogo compartido `src/lib/growth/markets` declara 23 mercados de LATAM, Puerto Rico,
+España y EE. UU., con packs es/en/pt-BR/fr. TASK-1863 está desplegada en staging;
+main permanece en espera. Estado y evidencia: `docs/audits/platform/2026-09-28-task-1863-verification.md`.
+La recurrencia de mercados secundarios permanece OFF en el worker compartido hasta la promoción
+coordinada; los lotes explícitos de staging están habilitados.
+
+- Google AI Mode recibe `location_code` numérico y el idioma resuelto; no es English-only.
+  Cuba existe en el catálogo del producto, pero no tiene ubicación DataForSEO: Google devuelve
+  `skipped:market_unsupported` sin compra ni fallback. Gemini declara `prompt_only`;
+  OpenAI/Anthropic/Sonar/Google usan ubicación nativa. La cobertura se declara por proveedor.
+- Operador, portal, formulario, API directa y recurrencia comparten la resolución de país,
+  idioma, categoría y arquetipo en el dominio. La capacidad no depende de la marca Efeonce.
+  La exposición multimer­cado MCP sigue bajo TASK-1861; no se infiere de esta paridad interna.
+- Un lote reserva el costo total y encola sus runs atómicamente; repetir su clave y selección
+  devuelve el mismo lote. Cada mercado/idioma consume un run y conserva los gates de servicio.
+  Configurar un país no amplía el contrato comercial. No usar formularios públicos para lotes.
+- El snapshot inmutable conserva marca, aliases, dominio, categoría, competidores y versión,
+  país/locale y policy. Una tendencia exige la misma identidad de marca, mercado/idioma,
+  policy y versión de score; un cambio de set competitivo se declara no comparable.
+  La matriz entrega resultados por mercado con `blendedOverall: null`, nunca un promedio global.
+  Un proveedor sin respuesta conserva el informe parcial y su cobertura, sin fabricar un cero.
+
+Contrato: `docs/architecture/GREENHOUSE_AEO_MULTI_MARKET_MEASUREMENT_DECISION_V1.md`.
+Operación y rutas: `docs/manual-de-uso/growth/configurar-mercados-aeo.md`.

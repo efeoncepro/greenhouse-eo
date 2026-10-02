@@ -1,0 +1,41 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:02:28.120Z",
+  "run": "ai-generations/2026-09-14_axis-advertising-harness-smoke",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-14_axis-advertising-harness-smoke",
+  "totalBytes": 8432541,
+  "fileCount": 5,
+  "files": [
+    {
+      "path": "delivery/feed-4x5.png",
+      "sizeBytes": 2181174,
+      "sha256": "2e8833f35b726455dbc5beb3b06dbed8cb2d98d78caccad2acaf1e15512186b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-14_axis-advertising-harness-smoke/delivery/feed-4x5.png"
+    },
+    {
+      "path": "review/layout-compiler-contact-sheet.jpg",
+      "sizeBytes": 70258,
+      "sha256": "057559e51e398961da15ce9712d156f70358b4a56cc983cbddb749264bfa27de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-14_axis-advertising-harness-smoke/review/layout-compiler-contact-sheet.jpg"
+    },
+    {
+      "path": "work/finished/neutral-generated-finish.png",
+      "sizeBytes": 2005715,
+      "sha256": "225e1f5a0c518a8057672f25d7dbbe60722a9138928059e80b14f790dfe88771",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-14_axis-advertising-harness-smoke/work/finished/neutral-generated-finish.png"
+    },
+    {
+      "path": "work/layout-compiler/editable/feed-4x5-underlay.png",
+      "sizeBytes": 2169679,
+      "sha256": "1d3eb37f93d61b733e8008239b83f4980f5aa8d93c4176f7de0ab0e4a45b421b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-14_axis-advertising-harness-smoke/work/layout-compiler/editable/feed-4x5-underlay.png"
+    },
+    {
+      "path": "work/plates/neutral-generated-plate.png",
+      "sizeBytes": 2005715,
+      "sha256": "225e1f5a0c518a8057672f25d7dbbe60722a9138928059e80b14f790dfe88771",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-14_axis-advertising-harness-smoke/work/plates/neutral-generated-plate.png"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-traffic-to-revenue",
+  "voice": {
+    "eyebrow": "De tráfico a negocio",
+    "question": "¿Dónde termina el SEO?",
+    "answer": ["En", "ingresos"]
+  },
+  "body": "Conectamos el SEO con tus indicadores de negocio —leads, pipeline e **ingresos**—, como siempre debió medirse.",
+  "steps": [
+    {
+      "number": "01",
+      "name": "Tráfico calificado",
+      "description": "Visitas con intención comercial, segmentadas por cluster de tema.",
+      "channel": "Google · IA"
+    },
+    {
+      "number": "02",
+      "name": "Leads",
+      "description": "Quién llegó, desde qué búsqueda y qué pidió.",
+      "channel": "Formularios · CRM"
+    },
+    {
+      "number": "03",
+      "name": "Pipeline",
+      "description": "Oportunidades que nacen del orgánico, en tu CRM.",
+      "channel": "HubSpot · Salesforce"
+    },
+    {
+      "number": "04",
+      "name": "Ingresos",
+      "description": "Lo que el SEO trae al negocio, medido.",
+      "channel": "Greenhouse"
+    }
+  ],
+  "cutLabel": "La mayoría de las agencias se detiene aquí"
+}

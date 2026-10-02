@@ -1,5 +1,13 @@
 # Marketing con Manzanitas — biblioteca de identidad gráfica
 
+> **Cómo se usan estos archivos en una pieza lo decide el registro Marketing con Manzanitas** (aprobado el
+> 2026-09-28; complementa la línea gráfica «La órbita», no la reemplaza): norma
+> [`MANZANITAS_REGISTER_V1.md`](../brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) y
+> [ADR](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md). Este documento sigue siendo el inventario de
+> archivos. En el registro, la manzana y sus tres puntos van en el acento de la línea del tema, nunca en un color
+> fijo: no elijas una manzana de color de la tabla por su color. Los SVG usan `<style>`: inlinea los fills antes de
+> subirlos.
+
 Inventario leído del filesystem y de los SVG el **2026-09-13**. Recurso reutilizable de Marketing
 Efeonce, no exclusivo de la campaña del Pódcast. Conservar los originales como fuente gráfica.
 

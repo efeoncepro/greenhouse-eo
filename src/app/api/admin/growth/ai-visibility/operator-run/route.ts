@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server'
 
 import { canonicalErrorResponse, type CanonicalErrorCode } from '@/lib/api/canonical-error-response'
+import { marketDomainErrorResponse } from '@/lib/growth/ai-visibility/markets/http'
 import { can } from '@/lib/entitlements/runtime'
-import {
-  requestGraderRunAsOperator,
-  type RequestRunBlockedReason
-} from '@/lib/growth/ai-visibility/request-run'
+import { requestGraderRunAsOperator, type RequestRunBlockedReason } from '@/lib/growth/ai-visibility/request-run'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
@@ -35,6 +33,7 @@ const BLOCK_TO_CANONICAL: Record<RequestRunBlockedReason, CanonicalErrorCode> = 
 
 interface OperatorRunBody {
   subjectOrganizationId?: unknown
+  marketId?: unknown
   idempotencyKey?: unknown
 }
 
@@ -74,6 +73,7 @@ export async function POST(request: Request) {
     const result = await requestGraderRunAsOperator({
       subjectOrganizationId,
       requestedBy: tenant.userId,
+      marketId: asNonEmptyString(body.marketId) ?? undefined,
       idempotencyKey: asNonEmptyString(body.idempotencyKey)
     })
 
@@ -91,6 +91,10 @@ export async function POST(request: Request) {
       { status: 202 }
     )
   } catch (error) {
+    const marketError = marketDomainErrorResponse(error)
+
+    if (marketError) return marketError
+
     captureWithDomain(error, 'growth', {
       tags: { source: 'growth_ai_visibility_operator_run_route' },
       extra: { subjectOrganizationId }

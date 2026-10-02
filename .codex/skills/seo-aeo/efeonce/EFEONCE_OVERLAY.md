@@ -1,5 +1,9 @@
 # Overlay Efeonce / efeoncepro.com
 
+> **Nomenclatura vigente:** capacidad **Efeonce AEO**; diagnóstico público **Efeonce AEO Assessment**; entregable **Efeonce AI Visibility Report**. `AI Visibility Grader` en este archivo nombra el motor/alias histórico. **Search Visibility 360** sigue siendo la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+>
+> **Submarcas de producto con logo (2026-09-29):** **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** son submarcas de producto de Efeonce con logos oficiales en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29); acompañan a Efeonce y nunca firman solas. Referencia visual: Lab de AXIS `https://axis.efeonce.org/references/seo-aeo/` (publicados el 2026-09-29; responden 200). ADR de naming §Delta 2026-09-29; uso visual en la skill `efeonce-graphic-line`.
+
 > **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
 
 > Capa de aplicación del núcleo SEO+AEO al caso concreto de Efeonce. **No
@@ -66,13 +70,14 @@
 ## Cómo aplicar el núcleo a Efeonce (mapeo)
 1. **Técnico (`01`)** — ejecutar vía la skill WordPress: indexación, CWV en
    Kinsta (caché/CDN), JSON-LD (Organization de Efeonce + Article + Person de los
-   autores), robots permitiendo retrieval bots IA.
+   autores), y acceso a crawlers evaluado por finalidad/proveedor según la
+   superficie objetivo. No clasifiques todos los bots como retrieval.
 2. **Entidad (`03`)** — construir la entidad **Efeonce** (no Greenhouse):
    Organization schema + `sameAs` (LinkedIn, redes, prensa), descripción canónica
    alineada al context pack `09_marca-agencia.md`. Verificar qué saben ChatGPT/
    Perplexity/Gemini de "Efeonce" hoy y corregir vía fuentes.
-3. **Contenido + AEO (`02`,`04`)** — clusters por servicio/industria con answer
-   capsules; el AI Content Factory produce el draft, pero con data propia y
+3. **Contenido + AEO (`02`,`04`)** — clusters por servicio/industria que resuelvan
+   necesidades reales; respuestas directas cuando ayuden al lector. El AI Content Factory produce el draft, pero con data propia y
    revisión experta. Copy SIEMPRE validado con `greenhouse-ux-writing` (es-CL
    tuteo, sin voseo) y el context pack `05_voz-tono-estilo.md`.
 4. **Off-page (`05`)** — digital PR con data propia de la agencia (casos,

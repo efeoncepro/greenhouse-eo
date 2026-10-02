@@ -1,12 +1,13 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-24 por Claude — v1.8: la CLI `higgsfield` **ya tiene sesión** (1.1.26, mkt@efeoncepro.com, workspace Private ultra); Recraft V4.1 por CLI pasa de «sin sesión» a «con sesión, salida SVG sin corrida real» (§6.14, §8.4, §10.1). Además quedan instalados los puentes MCP locales de Blender, Illustrator y Photoshop (skill `higgsfield-provider`), fuera del alcance de esta guía.
-> **Historial anterior:** 2026-09-24 por Codex — v1.7: `pnpm ai:omni` conecta las seis operaciones Cloud de Gemini Omni 1.1, con canaries reales y manual propio.
+> **Ultima actualizacion:** 2026-09-27 por Claude — v1.9: nueva ficha §5.9 **Música de marca vía fal** (Stable Audio 2.5 audio-to-audio y text-to-audio, ElevenLabs Music v2.5), con la evidencia de uso real de la música de Glitch [verificado 2026-09-27] y la regla «nunca síntesis pura para música de marca; medir medios ≥ ~35 % antes de mostrar».
+> **Historial anterior:** 2026-09-24 por Claude — v1.8: la CLI `higgsfield` **ya tiene sesión** (1.1.26, mkt@efeoncepro.com, workspace Private ultra); Recraft V4.1 por CLI pasa de «sin sesión» a «con sesión, salida SVG sin corrida real» (§6.14, §8.4, §10.1). Además quedan instalados los puentes MCP locales de Blender, Illustrator y Photoshop (skill `higgsfield-provider`), fuera del alcance de esta guía.
+> 2026-09-24 por Codex — v1.7: `pnpm ai:omni` conecta las seis operaciones Cloud de Gemini Omni 1.1, con canaries reales y manual propio.
 > 2026-09-23 por Claude — v1.6: 🔴 `--mask` de 2.5 no sirve para mover material que ya está en la foto: sobre un primer plano oscuro y desenfocado, Sunburst rellenó toda la zona editable con un panel plano de borde recto y borró un objeto que el prompt pedía conservar [verificado 2026-09-23] (§5.1). · v1.5: primer motion de Efeonce producido («No fuiste tú», CMP-001). Tres hallazgos medidos: **`h3max-r2v` SÍ acepta `--aspect`, y sin él devuelve 1920×1080 horizontal** aunque todas las referencias sean verticales (§5.5); **`--aspect adaptive` NO adopta el ratio de las referencias** (1152×1440 → 1920×1080); y 🔴 **ningún motor de video del carril soporta 4:5** — medido en los cinco, todos ofrecen `3:4` — siendo 4:5 el formato principal de los estáticos de Efeonce: se genera en 3:4 y se recorta (§3, §4.2). · v1.4: Seedance 2.5 **entrega 1080×1920 verificado** en dos corridas reales (i2v y r2v); nitidez nativa vs reescalado sigue [sin dato]. La contradicción con la tabla oficial (480p/720p) queda parcialmente resuelta. · v1.3: la máscara de 2.5 orienta pero no preserva: la «deriva fuera de zona 2,4/255» es una media; el 2026-09-17 la zona protegida llegó a delta máximo 221/255 (media 4,85) y se recompone desde la base. v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
-> **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI), `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API) y `pnpm ai:omni` (Gemini Omni 1.1 Cloud), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados.
+> **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI), `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API) y `pnpm ai:omni` (Gemini Omni 1.1 Cloud), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados. Desde v1.9, además, la música de marca vía fal (§5.9), que no pasa por esos CLIs.
 > **Documentación relacionada (no se duplica acá):**
 > [Catálogo de modelos fal](GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) ·
 > [Generador de assets visuales](GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) ·
@@ -688,6 +689,26 @@ pnpm ai:higgsfield:sync-schemas
 ```
 
 **Fuentes.** docs.higgsfield.ai (requests, polling, errors, webhooks, billing, rate limits, file uploads, SDK), console.higgsfield.ai (catálogo y JSON Schema por playground), barrido `--estimate` con la cuenta de Efeonce (2026-09-16).
+
+### 5.9 Música de marca vía fal (fuera de `pnpm ai:fal`): Stable Audio 2.5 y ElevenLabs Music v2.5
+
+**Qué es.** Tres rutas de música usadas por el script de corrida `ai-generations/2026-09-26_branding-sonoro/motor/ai-music.ts` sobre el cliente canónico `src/lib/ai/fal.ts`; **no son capacidades de `pnpm ai:fal`** ni están en `fal-capabilities.ts` [contrato]. `--route sa` = `fal-ai/stable-audio-25/audio-to-audio` (re-grabar una maqueta propia); `--route el-bed` = `elevenlabs/music/v2.5` desde texto; `--route sa-bed` = `fal-ai/stable-audio-25/text-to-audio` [contrato]. Evidencia de uso real: la música aprobada de Glitch (tema B + cama post-punk), producida el 2026-09-27 [verificado 2026-09-27]. Oficio, licencias y precios: skill `audio-studio` (`SOURCES.md`, `efeonce/STUDIO_TOOLING.md`).
+
+| Ruta | Rindió así en producción | Úsalo para |
+|---|---|---|
+| **Stable Audio 2.5 audio-to-audio** (`--route sa`, strength 0,7–0,75) | Conserva el tiempo de la maqueta (0–5 ms) y **redondea la duración a segundos enteros**; volvió banda real la maqueta del tema B de Glitch [verificado 2026-09-27] | Re-grabar una maqueta propia cuando el tiempo manda (motivo, golpes y compases fijos) |
+| **ElevenLabs Music v2.5** desde texto (`--route el-bed`, `composition_plan` de un tramo, **sin referencia de audio**) | Dio la cama aprobada con instrumentos reales y tempo exacto (150,00 BPM medido), 38 % de medios [verificado 2026-09-27]. Con un plan con referencia de audio (rondas del rock de Efeonce) **no respetó cortes ni el golpe final** [verificado 2026-09-26] | Camas y tracks libres desde texto; los cortes y golpes se aplican después, editando el audio |
+| **Stable Audio 2.5 text-to-audio** (`--route sa-bed`) | Camas con cuerpo (36–37 % de medios), no elegidas [verificado 2026-09-27] | Alternativa para camas desde texto |
+
+**Cuándo SÍ.** Música de marca con instrumentos reales: regrabar una maqueta (tempo exacto) o una cama desde texto con los instrumentos descritos y negativos explícitos (`chiptune`, `video game`, `8-bit`, `synthwave`, `arcade`, `lead synth`…) [verificado 2026-09-27].
+
+**Cuándo NO.** 🔴 **Nunca síntesis pura para música de marca:** tres rondas de síntesis de Glitch se rechazaron por sonar «arcade» (a videojuego); lo medido fue falta de cuerpo en los medios (cama rechazada 13 % de su energía entre 300 Hz y 3 kHz contra 45 % de la intro aprobada) [verificado 2026-09-27]. Una **maqueta sintetizada delgada contagia la regrabación** [verificado 2026-09-27]. No pedirle al modelo cortes al cuadro, tartamudeos ni silencio en seco: difumina la falla; se aplican después sobre la grabación [decisión]. No regenerar una pieza aprobada: otra corrida es otra toma; la fuente de verdad es el archivo aprobado (URL + sha256) [decisión].
+
+**Control antes de mostrar.** Medir los medios (300 Hz–3 kHz ≥ ~35 % de la energía) con balance espectral por bandas, además de sonoridad (ebur128) y tempo (autocorrelación de ataques). El número no reemplaza el oído del operador, que aprueba siempre [decisión].
+
+**Trampas.** Stable Audio 2.5 redondea la duración a segundos enteros: arma maquetas de duración entera [verificado]. La licencia comercial de cada modelo **vía fal** sigue por confirmar con legal (`audio-studio` → `SOURCES.md`) [sin dato].
+
+**Fuentes.** Corrida de Glitch en `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/ai-music.ts`); norma de Glitch `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §13.12; skill `audio-studio`.
 
 ---
 

@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "method",
+  "recipe": "method-surround-cycle",
+  "voice": {
+    "eyebrow": "Surround Discovery",
+    "question": "¿Cómo se sostiene?",
+    "answer": [
+      "En ciclo"
+    ]
+  },
+  "body": "La visibilidad ante la IA no se «logra»: se sostiene. Cada ciclo aprende del anterior y te sube un **nivel**.",
+  "startLabel": "Empieza aquí",
+  "stations": [
+    {
+      "icon": "docs/assets/public-site/aeo-service-icons/v2/measure.png",
+      "title": "Medir",
+      "description": "Tu visibilidad en ChatGPT, AI Overviews, Gemini, Perplexity, Copilot y Claude, por mercado y por prompt."
+    },
+    {
+      "icon": "docs/assets/public-site/aeo-service-icons/v2/create.png",
+      "title": "Crear",
+      "description": "Los activos que los motores entienden, citan y reproducen. No más contenido: el correcto."
+    },
+    {
+      "icon": "docs/assets/public-site/aeo-service-icons/v2/distribute.png",
+      "title": "Distribuir",
+      "description": "Tu presencia en cada superficie donde los motores descubren marcas, no sólo en tu sitio."
+    },
+    {
+      "icon": "docs/assets/public-site/aeo-service-icons/v2/optimize.png",
+      "title": "Optimizar",
+      "description": "Cada ciclo aprende del anterior: subes un nivel, medimos y corregimos."
+    }
+  ],
+  "core": {
+    "title": "Tu marca",
+    "caption": "sube un nivel en cada vuelta"
+  }
+}

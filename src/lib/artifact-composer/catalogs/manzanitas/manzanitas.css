@@ -1,0 +1,337 @@
+/**
+ * Marketing con Manzanitas — molde compartido de las plantillas (TASK-1939). Sólo piezas de MCM: el registro complementa
+ * La órbita y nunca se mezcla con Glitch.
+ *
+ * Todo valor de marca sale de `manzanitas-tokens.css` (compilado desde `manzanitasRegister` por `pnpm manzanitas:tokens`);
+ * aquí no hay HEX, colores rgb ni familias escritas a mano. El layout en px de cada pieza vive en el `<style>` de su plantilla,
+ * medido en el canvas v39 aprobado. La línea del tema (`.mcm-line-<línea>`) y el tono (`.mcm-tone-paper|navy`) los pone
+ * el resolver del slot `theme` sobre la raíz: un solo selector cambia todo a la vez.
+ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.mcm-canvas {
+  /* Aire del glifo sobre y bajo su línea (ver la respuesta): no se ve, sólo evita que la medición lea el acento como recorte. */
+  --mcm-glyph-room: 0.3em;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--mcm-text-family), sans-serif;
+}
+
+.mcm-canvas--4x5 { width: 1080px; height: 1350px; }
+.mcm-canvas--9x16 { width: 1080px; height: 1920px; }
+.mcm-canvas--blog { width: 1200px; height: 630px; }
+.mcm-canvas--16x9 { width: 1280px; height: 720px; }
+.mcm-canvas--1x1 { width: 1080px; height: 1080px; }
+
+/* El tono decide la tinta y cuál de los dos acentos de la línea usa la pieza (papel: el oscuro; navy: el claro). */
+.mcm-tone-navy {
+  --mcm-ink: var(--mcm-ink-navy);
+  --mcm-muted: var(--mcm-muted-navy);
+  --mcm-accent: var(--mcm-accent-navy);
+  --mcm-slogan-lead: var(--mcm-slogan-lead-navy);
+  background: var(--mcm-navy);
+  color: var(--mcm-ink);
+}
+
+.mcm-tone-paper {
+  --mcm-ink: var(--mcm-ink-paper);
+  --mcm-muted: var(--mcm-muted-paper);
+  --mcm-accent: var(--mcm-accent-paper);
+  --mcm-slogan-lead: var(--mcm-slogan-lead-paper);
+  background: var(--mcm-paper);
+  color: var(--mcm-ink);
+}
+
+/* La cuadrícula del paso: la tinta al 5 %, cada 40 px (canvas v39, láminas de paso). */
+.mcm-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--mcm-ink-paper) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--mcm-ink-paper) 5%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.mcm-layer,
+.mcm-photo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mcm-layer img,
+.mcm-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mcm-chart {
+  position: absolute;
+  inset: 0;
+}
+
+.mcm-chart svg {
+  display: block;
+}
+
+/* Lo que sangra fuera del lienzo (la manzana grande) se recorta en su propia capa: el lienzo no desborda. */
+.mcm-bleed {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mcm-masthead,
+.mcm-big-apple {
+  position: absolute;
+  display: block;
+}
+
+/* ── La voz: la pregunta con su anillo abierto y la respuesta cerrada por su esfera (EfeonceOrbit.Voice) ────────── */
+
+.mcm-voice {
+  --mcm-q-px: round(nearest, calc(var(--mcm-answer-px) * var(--mcm-question-of-answer)), 1px);
+  position: absolute;
+  color: var(--mcm-ink);
+}
+
+.mcm-q {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--mcm-q-px) * var(--mcm-ring-gap-of-question));
+  margin: 0;
+  font-family: var(--mcm-question-family), sans-serif;
+  font-weight: var(--mcm-question-weight);
+  font-size: var(--mcm-q-px);
+  line-height: var(--mcm-question-lh);
+}
+
+.mcm-ring {
+  flex: none;
+  width: max(8px, round(nearest, calc(var(--mcm-q-px) * var(--mcm-ring-of-question)), 1px));
+  height: max(8px, round(nearest, calc(var(--mcm-q-px) * var(--mcm-ring-of-question)), 1px));
+  border: 1.5px solid var(--mcm-accent);
+  border-radius: 50%;
+}
+
+.mcm-a {
+  margin: calc(var(--mcm-q-px) * var(--mcm-answer-gap-of-question)) 0 0;
+  font-family: var(--mcm-answer-family), sans-serif;
+  font-weight: var(--mcm-answer-weight);
+  font-size: var(--mcm-answer-px);
+  line-height: var(--mcm-answer-lh);
+  letter-spacing: var(--mcm-answer-tracking);
+  font-variation-settings: 'wdth' var(--mcm-answer-width), 'opsz' var(--mcm-answer-opsz);
+}
+
+/*
+ * La respuesta va en UNA línea y, con su esfera, cabe en su espacio (canvas v39: nunca parte en dos ni pisa el «Desliza»
+ * que comparte su línea). La caja del texto recorta a lo ancho, así el motor mide el recorte y la lámina falla cerrada
+ * con «acorta el copy» en vez de salir con la esfera sola en la línea siguiente. `--mcm-answer-room` lo baja cada
+ * plantilla donde el «Desliza» comparte la línea de la respuesta.
+ */
+.mcm-a [data-slot-field='answer'] {
+  display: inline-block;
+  max-width: calc(var(--mcm-answer-room, 100%) - var(--mcm-sphere-diameter) - var(--mcm-sphere-gap));
+  /* El alto de la línea (0,95) es menor que el del glifo: el relleno le da aire al acento y la cola de las letras, y el
+     margen negativo lo devuelve, así la línea mide lo mismo. Sin esto, el motor leería el acento como recorte. */
+  padding-block: var(--mcm-glyph-room);
+  margin-block: calc(var(--mcm-glyph-room) * -1);
+  white-space: nowrap;
+  overflow-x: clip;
+  vertical-align: baseline;
+}
+
+/* El «Desliza» deja libre la mitad de su tamaño antes de él. */
+.mcm-voice--beside-swipe {
+  --mcm-answer-room: calc(var(--mcm-swipe-x) - var(--mcm-voice-left) - var(--mcm-swipe-size) / 2);
+}
+
+/* En las láminas de gráfico la pregunta va en una línea: debajo están la respuesta y la fuente, fijas (canvas v39). */
+.mcm-q--one-line [data-slot-field='question'] {
+  min-width: 0;
+  padding-block: var(--mcm-glyph-room);
+  margin-block: calc(var(--mcm-glyph-room) * -1);
+  white-space: nowrap;
+  overflow-x: clip;
+}
+
+/* Una esfera por pieza: cierra la respuesta. En la Lente y en los gráficos con esfera propia, la respuesta no la lleva. */
+.mcm-sphere {
+  display: inline-block;
+  width: var(--mcm-sphere-diameter);
+  height: var(--mcm-sphere-diameter);
+  margin-left: var(--mcm-sphere-gap);
+  border-radius: 50%;
+  background: var(--mcm-accent);
+}
+
+/* La Medida y la Tendencia llevan sólo la pregunta: su esfera es el dato. */
+.mcm-question-only {
+  position: absolute;
+  top: var(--mcm-question-only-top);
+  width: var(--mcm-question-only-width);
+  margin: 0;
+  font-family: var(--mcm-question-family), sans-serif;
+  font-weight: var(--mcm-question-weight);
+  font-size: var(--mcm-question-only-px);
+  line-height: var(--mcm-question-only-lh);
+  color: var(--mcm-ink);
+}
+
+.mcm-sub {
+  margin: 0;
+  font-family: var(--mcm-text-family), sans-serif;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--mcm-muted);
+}
+
+.mcm-sub strong {
+  font-weight: 700;
+  color: var(--mcm-ink);
+}
+
+.mcm-label {
+  margin: 0;
+  font-family: var(--mcm-text-family), sans-serif;
+  font-weight: 500;
+  color: var(--mcm-muted);
+}
+
+/* ── «Desliza» y la firma, siempre en su sitio ───────────────────────────────────────────────────────────── */
+
+.mcm-swipe {
+  position: absolute;
+  left: var(--mcm-swipe-x);
+  display: block;
+  width: var(--mcm-swipe-size);
+  height: var(--mcm-swipe-size);
+}
+
+.mcm-swipe--cover { top: var(--mcm-swipe-y-cover); }
+.mcm-swipe--interior { top: var(--mcm-swipe-y-interior); }
+
+.mcm-signature {
+  position: absolute;
+  display: block;
+}
+
+.mcm-signature--carousel {
+  left: calc(50% - var(--mcm-signature-w) / 2);
+  top: var(--mcm-signature-y);
+  width: var(--mcm-signature-w);
+  height: var(--mcm-signature-h);
+}
+
+/* ── El cierre: el logo de Efeonce con el eslogan debajo, en bloque ───────────────────────────────────────── */
+
+/*
+ * El eslogan es un elemento gráfico que acompaña la marca, no un texto (operador, 2026-09-29): va SIEMPRE debajo del
+ * logo, en bloque, al 64 % del ancho del logo y separado 1,35 veces su cuerpo. Se dimensiona desde el logo:
+ * cuerpo = ancho del logo × 0,64 ÷ ancho del eslogan en em (`--mcm-slogan-em`, medido por línea en la compilación).
+ * Cada plantilla sólo declara el ancho de su logo (`--mcm-lockup-logo-w`). La palabra de la línea va en el acento
+ * sólo si el cuerpo llega a `--mcm-accent-min-text-px`; si no, el hook del cierre la pasa a la tinta.
+ */
+.mcm-lockup {
+  --mcm-lockup-logo-w: var(--mcm-close-logo-w);
+  --mcm-slogan-font: calc(var(--mcm-lockup-logo-w) * var(--mcm-slogan-of-logo) / var(--mcm-slogan-em));
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--mcm-slogan-font) * var(--mcm-slogan-gap-of-font));
+}
+
+.mcm-lockup__logo {
+  display: block;
+  width: var(--mcm-lockup-logo-w);
+  height: auto;
+}
+
+.mcm-slogan {
+  display: block;
+  margin: 0;
+  font-family: var(--mcm-text-family), sans-serif;
+  font-size: var(--mcm-slogan-font);
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--mcm-slogan-lead);
+}
+
+.mcm-slogan__lead { font-weight: 800; font-style: italic; }
+.mcm-slogan__your { font-weight: 800; }
+
+.mcm-slogan__word {
+  font-weight: 900;
+  font-style: italic;
+  color: var(--mcm-accent);
+}
+
+/* Bajo el cuerpo mínimo del acento, la palabra va en la tinta de la superficie (blanco sobre navy, navy sobre papel). */
+.mcm-slogan--ink .mcm-slogan__word {
+  color: var(--mcm-ink);
+}
+
+/* ── Texto denso ─────────────────────────────────────────────────────────────────────────────────────── */
+
+.mcm-dense {
+  position: absolute;
+  color: var(--mcm-ink);
+}
+
+.mcm-dense p {
+  margin: 0;
+}
+
+.mcm-dense strong {
+  font-weight: 600;
+}
+
+.mcm-numeral {
+  flex: none;
+  width: 64px;
+  font-family: var(--mcm-answer-family), sans-serif;
+  font-weight: var(--mcm-answer-weight);
+  font-size: var(--mcm-dense-numeral-px);
+  line-height: 1;
+  letter-spacing: var(--mcm-answer-tracking);
+  color: var(--mcm-accent);
+}
+
+.mcm-point {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.mcm-point__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mcm-point__title {
+  font-size: var(--mcm-dense-title-px);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--mcm-ink);
+}
+
+.mcm-point__body {
+  font-size: var(--mcm-dense-body-px);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--mcm-muted);
+  text-wrap: pretty;
+}

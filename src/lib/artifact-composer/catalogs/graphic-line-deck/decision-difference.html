@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · la diferencia</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-difference` (surface deck, tema oscuro, TASK-1934). Dos tarjetas enfrentadas en perspectiva:
+      atrás, girada, la alternativa genérica en vidrio oscuro con sus promesas tachadas; al frente, en papel, el método
+      de Efeonce con sus checks. El disco «vs» entre ambas y, al pie, la franja de la objeción del equipo propio con sus
+      tres pilares. La voz «viva» a la izquierda y la burbuja URL en luminosidad. Referencia: DeckDiferencia
+      (MD1-diferencia). Cada medida llega del builder desde los tokens de AXIS; los textos de abajo son el respaldo del
+      probe.
+    -->
+    <main class="gl-slide gl-df" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-df-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <section class="gl-df-card gl-df-alt">
+        <div class="gl-df-head" data-slot="alternative">
+          <p class="gl-df-kicker" data-slot-field="kicker">La alternativa</p>
+          <p class="gl-df-title" data-slot-field="title">Agencia commodity</p>
+        </div>
+        <ul class="gl-df-rows" data-slot="alternativeRows">
+          <li class="gl-df-row">
+            <img class="gl-df-mark" data-slot-field="mark" alt="" />
+            <span class="gl-df-row-text" data-slot-field="text">Promete «el #1 en Google» garantizado</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="gl-df-card gl-df-ef">
+        <div class="gl-df-head" data-slot="efeonce">
+          <p class="gl-df-kicker" data-slot-field="kicker">Efeonce</p>
+          <p class="gl-df-title" data-slot-field="title">Método medible</p>
+        </div>
+        <ul class="gl-df-rows" data-slot="efeonceRows">
+          <li class="gl-df-row">
+            <img class="gl-df-mark" data-slot-field="mark" alt="" />
+            <span class="gl-df-row-text" data-slot-field="text">Estima según tu punto de partida, sin promesas vacías</span>
+          </li>
+        </ul>
+      </section>
+
+      <p class="gl-df-vs" data-slot="versus">vs</p>
+
+      <section class="gl-df-own">
+        <div class="gl-df-own-head" data-slot="ownTeam">
+          <p class="gl-df-own-kicker" data-slot-field="kicker">¿Y si lo hace mi equipo?</p>
+          <p class="gl-df-own-title" data-slot-field="title">Complemento, no reemplazo</p>
+        </div>
+        <ul class="gl-df-pillars" data-slot="pillars">
+          <li class="gl-df-pillar">
+            <p class="gl-df-pillar-title" data-slot-field="title">Velocidad</p>
+            <p class="gl-df-pillar-desc" data-slot-field="description">Sin meses de curva de aprendizaje</p>
+          </li>
+        </ul>
+      </section>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">La diferencia</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Qué nos hace distintos?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Lo puedes</span><span data-slot-field="answer">ver</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">La mayoría vende promesas. Nosotros, un mecanismo que puedes ver y <strong>medir</strong>.</p>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

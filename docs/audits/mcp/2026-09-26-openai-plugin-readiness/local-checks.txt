@@ -1,0 +1,50 @@
+✔ ambas tools tienen política exacta y sólo aceptan issuer nativo / población externa (1.197833ms)
+✔ persona externa con scope de identidad: crear resuelve la organización desde su única membership (0.164541ms)
+✔ crear sin el scope identity.write se niega por insufficient_scope; listar sólo exige el base (0.06775ms)
+✔ Entra y población interna nativa quedan fuera: no son clientes de Efeonce ID (0.060583ms)
+✔ varias organizaciones: el agente debe nombrar una; una ajena se niega (0.064333ms)
+{"severity":"INFO","requestId":"9e245556-75e8-4970-997d-102e03d401bd","method":"POST","path":"/mcp","status":200,"durationMs":28.02854099999996}
+{"severity":"INFO","requestId":"b95d943f-ee6f-4fb1-931f-060df9524cb8","method":"POST","path":"/mcp","status":200,"durationMs":37.57162499999998}
+{"severity":"INFO","requestId":"ea428867-87e6-440e-989e-e0d7b6763158","method":"POST","path":"/mcp","status":200,"durationMs":10.696167000000003}
+{"severity":"INFO","requestId":"4602888a-fe6e-40f9-b962-919b21e786f8","method":"POST","path":"/mcp","status":200,"durationMs":16.869708000000003}
+{"severity":"INFO","requestId":"b91675c3-e181-44f4-bd53-31ba87723e0d","method":"POST","path":"/mcp","status":200,"durationMs":5.991916000000003}
+{"severity":"INFO","requestId":"2630e408-efbe-4bf7-a3b1-70fb82768388","method":"POST","path":"/mcp","status":401,"durationMs":4.394709000000034}
+{"severity":"INFO","requestId":"306a254d-9a7f-4ff0-b7e5-21c65d5af1ae","method":"POST","path":"/mcp","status":200,"durationMs":5.562834000000009}
+{"severity":"INFO","requestId":"8bdc7c91-d5ad-4247-b4e5-e77a7185976d","method":"POST","path":"/mcp","status":401,"durationMs":0.24937499999998636}
+✔ native JWT -> machine binding reader -> per-request tools and scoped provider; revoke/OFF isolate concurrent users (143.421125ms)
+{"severity":"INFO","requestId":"cc748ff2-e34d-4619-b17f-2e3dbb52b1e3","method":"GET","path":"/.well-known/oauth-protected-resource","status":200,"durationMs":1.6550829999999905}
+{"severity":"INFO","requestId":"9d6a43ae-4d90-4da5-bdf0-53e6c6c5ec7a","method":"GET","path":"/.well-known/oauth-protected-resource/mcp","status":200,"durationMs":0.1424589999999739}
+{"severity":"INFO","requestId":"5bd92000-c2b4-4d2d-bbd9-966d46fe9b8f","method":"GET","path":"/.well-known/oauth-authorization-server","status":404,"durationMs":0.103999999999985}
+{"severity":"INFO","requestId":"b8c3065c-931c-48f6-a116-434bb1abd0ff","method":"GET","path":"/.well-known/oauth-authorization-server/mcp","status":404,"durationMs":0.0620829999999728}
+{"severity":"INFO","requestId":"e554a031-8cb5-4396-baec-f38480bbdaa2","method":"POST","path":"/register","status":404,"durationMs":1.521082999999976}
+✔ native discovery announces one coherent authorization server and only the base scope (75.03025ms)
+{"severity":"INFO","requestId":"44ae11a2-d1aa-4b8c-9776-70ff0c792692","method":"GET","path":"/.well-known/oauth-protected-resource","status":200,"durationMs":2.6789589999999635}
+✔ behavioral harness rejects the former origin/issuer mismatch and accepts a distinct resource server (5.586042ms)
+{"severity":"INFO","requestId":"8522f068-1f32-43fd-8602-a61b3eef5fad","method":"GET","path":"/.well-known/oauth-protected-resource","status":200,"durationMs":0.06604099999998425}
+✔ legacy-only discovery stays issuer-coherent and uses Entra-requestable base scope (1.340125ms)
+{"severity":"INFO","requestId":"83fd526e-864e-4998-b4df-3a9fa58b0639","method":"POST","path":"/mcp","status":403,"durationMs":0.6939580000000092}
+✔ additional scopes are disclosed incrementally and never dispatch without the exact grant (1.8035ms)
+{"severity":"INFO","requestId":"891702a1-be8f-4b63-a26c-95a5493ee753","method":"POST","path":"/mcp","status":401,"durationMs":0.42516599999999016}
+{"severity":"INFO","requestId":"f5b241b4-4db1-459a-80e7-fa14188eaa77","method":"POST","path":"/mcp","status":401,"durationMs":0.7801249999999982}
+{"severity":"INFO","requestId":"76f2ca20-44d1-48aa-bcb5-174d7a250315","method":"POST","path":"/mcp","status":401,"durationMs":0.24425000000002228}
+{"severity":"INFO","requestId":"1b165597-eea6-4610-b0fb-6ac642f594b6","method":"POST","path":"/mcp","status":403,"durationMs":0.26541700000001356}
+{"severity":"INFO","requestId":"2fa6cc02-df55-49fa-a297-1ed1f424cabb","method":"POST","path":"/mcp","status":503,"durationMs":0.12991700000003448}
+✔ issuer, audience, expiry, base scope and absent OAuth all deny before provider dispatch (24.70225ms)
+✔ current personal capability resolves org, rejects foreign handles organization before dispatch (0.595375ms)
+✔ list and direct calls both deny revoked rights, missing reader, stale version, and context swap (0.085ms)
+✔ scope and capability are independent; capabilities cannot union across memberships (0.05875ms)
+✔ unsupported providers never open from issuer or granted scope (0.10375ms)
+✔ external personal membership does not become internal and status still needs current binding (0.041792ms)
+✔ only get_seo_entitlement admits the synthetic canary business lane (0.065541ms)
+✔ la versión declarada se deriva; nunca es un literal en el server (0.919208ms)
+✔ el semver sale de package.json y el build metadata del deploy (0.16175ms)
+✔ la superficie declarada cubre las tools propias del gateway, no sólo las federadas (14.278917ms)
+✔ si la superficie del servidor cambió, la versión tuvo que moverse (8.6215ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 427.372167

@@ -1,9 +1,10 @@
 # Commercial / Tenders — invariantes operativos para agentes
 
 > **Tipo:** Companion de invariantes (load-on-demand)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-07-12 por Claude
-> **Cargar al tocar:** `src/lib/commercial/tenders/**` · `docs/architecture/tender-deck-composer-prototypes/**` · `scripts/commercial/compose-tender-deck.ts` · cualquier oferta/deck/propuesta de licitación
+> **Última actualización:** 2026-09-28 por Claude (1.1: TASK-1930 — Delta 2026-09-28, la evidencia de la `Proposal` liga los slots del deck «La órbita»; ningún deck usa evidencia `internal`)
+> **Cargar al tocar:** `src/lib/commercial/tenders/**` · `docs/architecture/tender-deck-composer-prototypes/**` · `scripts/commercial/compose-tender-deck.ts` · `src/lib/brand-surfaces/deck-recipes/bindings/**` (datos de la `Proposal` en el deck «La órbita») · cualquier oferta/deck/propuesta de licitación
 > **Contrato completo:** `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` (el deck) · `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (el aggregate; **leer su §0 — estado real**) · `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (discovery público)
 > **Skills:** `greenhouse-public-private-tenders` (método) + `deck-studio` (argumento, composición y
 > entrega del deck) + `deck-visual-system.md` (el deck) + `bid-construction-playbook.md` (las 10 fases)
@@ -112,6 +113,34 @@ melkin, valentina` → `assets/squad/squad-<nombre>.png`); nombre desconocido �
    real con **chrome de navegador y la URL horneada en la barra** (assets `radiografia-sky-xray.png`,
    `informe-grader-sky.png`) + enlace clickeable en el lead. La pieza interactiva se muestra Y se
    enlaza; el screenshot solo, sin URL, no es verificable por el comité.
+
+---
+
+## Delta 2026-09-28 — la evidencia de la `Proposal` liga los slots del deck «La órbita» (TASK-1930)
+
+`bindDeckSlots(plan, context)` (`src/lib/brand-surfaces/deck-recipes/bindings/`) llena los slots de datos de un plan
+del deck de marca propia desde readers canónicos (`getProposalById`, `buildProposalRenderProjection`,
+`readOrganizationLogoVariants` y, fuera de una propuesta, `getAssetById`) y deja el rastro por slot. Contrato:
+`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md` §13 · task
+[TASK-1930](../../tasks/in-progress/TASK-1930-deck-recipe-slot-data-bindings.md) (en curso).
+
+- **NUNCA** un deck usa evidencia `internal`, **ni siquiera un deck interno** (decisión del operador 2026-09-28):
+  `binding-internal-evidence`, error. El binder no sabe qué significa un número y la evidencia interna es donde viven
+  el costo cargado y el margen. Caso real: en `prop-5965260d` (SKY blog 2026) la única evidencia `measured` era el costo
+  cargado del equipo y quedó bloqueada. Toda evidencia ligada vuelve a pasar por `assertEvidenceAllowedForAudience`
+  como artefacto `client_facing`.
+- **NUNCA** el valor de un slot de datos sale del texto del plan: `proposal_evidence` no guarda valores ni citas, así
+  que el valor viaja en un hecho (`EvidencedFact`, con `evidenceRef`) y la evidencia lo autoriza (`measured` para una
+  cifra propia; `attested` **con** documento de respaldo para prueba de terceros). Sin hecho verificado el slot se
+  quita y el plan falla cerrado (`slot-required-missing`); el binder nunca completa un slot para que pase.
+- **NUNCA** una evidencia ajena a la propuesta se omite en silencio: `binding-evidence-unknown` rechaza el deck.
+- **NUNCA** un monto ni una cara en el deck desde el binder: todo monto es `[MONTO]` hasta los hechos económicos de
+  TASK-1417 y la lámina de equipo no compone hasta el roster de TASK-1418.
+- **NUNCA** se quita la marca de una lámina de muestra (`decision-ai-answer`, `decision-diagnosis-map`) sin un hecho
+  `sample-data` con evidencia `measured`.
+- Fuera de una `Proposal`, la prueba de terceros queda `no-authorization`: la biblioteca de autorizaciones por tercero
+  es TASK-1937.
+- El binder no autoriza personas: el consumer (TASK-1932, TASK-1921 o la CLI) ya autorizó al sujeto.
 
 ---
 
@@ -379,7 +408,8 @@ command canónico y cruza la MISMA puerta que las rutas.
 - **NUNCA** toques `src/lib/artifact-composer/**` ni `src/lib/commercial/tenders/**` sin correr
   `pnpm vitest run src/lib/artifact-composer src/lib/commercial/tenders` (las suites cubren las bug
   classes que ya nos costaron un deck roto) **y `pnpm composer:visual-gate`** (0 píxeles contra el
-  baseline; rebaseline sólo declarado en `BASELINE_DELTAS.md` + `--freeze`).
+  baseline; rebaseline sólo declarado en la sección nueva sin sellar de `BASELINE_DELTAS.md` + `--freeze`,
+  que sella esa sección — una declaración de otra entrada no autoriza nada; runbook §5).
 - **ANTES de cualquier `--freeze`, lee el runbook `docs/operations/runbooks/composer-visual-gate.md`**
   (fuente única del proceso — cualquier agente lo carga al tocar el composer). Bug class `ISSUE-122`, dos
   reglas duras: **(a)** el `--freeze` es **SINGLE-OWNER, serializado y atómico** (freeze + commit juntos);

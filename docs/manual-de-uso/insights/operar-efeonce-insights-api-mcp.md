@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.10
+> **Version:** 1.16
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1889: revisar el diseño aprobado antes de compartir; antes, TASK-1888: portada preferida por cliente, logo para fondo oscuro, preview del contrato editorial v2)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -19,8 +19,12 @@ recetas de enlaces compartidos, envío por correo y recurrencia (TASK-1848) est�
 
 1. Flags en el runtime donde vas a operar (ledger `FEATURE_FLAG_STATE_LEDGER.md`; se leen sólo en Vercel):
    `INSIGHTS_GENERATION_ENABLED` para crear/revisar — **ON en staging y producción desde 2026-09-15**, OFF en
-   Preview; `INSIGHTS_ISSUANCE_ENABLED` (emitir) e `INSIGHTS_AUTHORING_AI_ENABLED` (IA) — **OFF en todos los
-   targets**. Sin generación, crear responde `503 service_unavailable` con `details.code = generation_disabled`.
+   Preview; `INSIGHTS_ISSUANCE_ENABLED` (emitir) — **OFF en producción**; `INSIGHTS_AUTHORING_AI_ENABLED` (IA) —
+   **ON en producción desde 2026-09-26** (sólo Vercel; staging OFF; las recurrencias del `ops-worker` salen con plan
+   determinista). Verifícalo en el plan sellado: `authoringMode = ai_bounded`, `modelId`, `promptVersion`. Sin generación, crear responde `503 service_unavailable` con `details.code = generation_disabled`.
+   `INSIGHTS_EDITORIAL_V2_ENABLED` (contrato editorial v2) es la excepción a «sólo Vercel»: se lee en Vercel (crear,
+   revisar, recuperar) **y** en el `ops-worker` (tick de recurrencias); está **ON en staging y producción desde
+   2026-09-26** (ver «Portada del informe y contrato editorial v2»).
    Trampa de Vercel: un env var nuevo no lo ve una deployment construida antes; tras `vercel env add` hace falta
    `vercel redeploy` del target (pasó en staging y en producción).
 2. La organización debe tener el módulo `insights_v1` asignado. Se asigna con el script canónico (pasa por
@@ -99,12 +103,13 @@ del gateway (binding interno del provider SEO/Insights, scope `internal`), nunca
 Evidencia del 2026-09-15: `EO-INS-000012` (app, staging), `EO-INS-000013` (ecosystem, staging),
 `EO-INS-000014` (ecosystem, producción); las tres `ready_for_review` sobre la org sintética Greenhouse Demo.
 
-Vista web compartida: el resolver por token ya existe (TASK-1848); cuando exista la página de Think (TASK-1875), el enlace apuntará a `think.efeoncepro.com/insights/r/<token>`;
+Vista web compartida: el enlace apunta a `think.efeoncepro.com/insights/r/<token>` (TASK-1875, en producción desde 2026-09-28);
 Think resuelve el token contra Greenhouse en cada visita, así que revocar el enlace corta el acceso de inmediato.
 
 MCP: `get_insights_catalog` → `create_insight_edition` → `get_insight_edition` (con `includeEvidence`),
 con el manual servido `efeonce-insights` (`get_greenhouse_skill`). Las cuatro tools **ya están federadas** en el
-gateway `efeonce-mcp` (federadas en la versión 1.5.0 del 2026-09-15; hoy el gateway está en **1.7.0, 58 tools**, 2026-09-18): las tres de
+gateway `efeonce-mcp` (federadas en la versión 1.5.0 del 2026-09-15; hoy el gateway está en **1.9.0**, 2026-09-26, que
+además federa `get_insight_cover_preference` y `set_insight_cover_preference`): las tres de
 lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la clase
 `efeonce.mcp.insights.write`, que ya existe en Entra pero **ningún cliente porta todavía** → responde
 `insufficient_scope` hasta un consentimiento/grant gobernado. Canary de lectura del gateway:
@@ -232,9 +237,13 @@ Con la org sintética «Greenhouse Demo» y la persona cliente:
    persona cliente → `404`, sin outputs.
 5. Contra PostgreSQL real: `pnpm test:live src/lib/efeonce-insights/render` (4/4 el 2026-09-16).
 
-## Enlaces, correo y recurrencia (TASK-1848 — en producción con flags OFF desde 2026-09-18)
+## Enlaces, correo y recurrencia (TASK-1848; enlace encendido en producción desde 2026-09-28)
 
-> **Estado (2026-09-18):** código en producción (release `bda1cf2cd938`) con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED`
+> **Estado 2026-09-28:** `INSIGHTS_SHARING_ENABLED` **ON en producción** (valor exacto `true`, redeploy
+> `greenhouse-cssemzyzb`); canary por lane ecosystem sobre `EO-INS-000014`: crear 201 → Think 200 con cabeceras →
+> deck por el proxy → revocar → 410. Envío y recurrencia siguen OFF en producción; la emisión también.
+>
+> **Estado (2026-09-18, histórico):** código en producción (release `bda1cf2cd938`) con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED`
 > y la emisión **OFF en producción** hasta que exista el lector de Think (TASK-1875). En **staging** los cuatro flags
 > están ON y el canary sintético corrió completo en la org sandbox (`EO-INS-000015`); los dos correos llegaron al buzón
 > autorizado del operador (evidencia humana: Resend no reporta `delivered`, ISSUE-160). Canary de contrato en
@@ -256,7 +265,7 @@ Con la org sintética «Greenhouse Demo» y la persona cliente:
 
 | Flag | Vercel | `ops-worker` | Con OFF |
 |---|---|---|---|
-| `INSIGHTS_SHARING_ENABLED` | crear enlace + reader público | — | crear → `503 sharing_disabled`; reader → `404`; revocar sigue funcionando |
+| `INSIGHTS_SHARING_ENABLED` (Production ON desde 2026-09-28) | crear enlace + reader público | — | crear → `503 sharing_disabled`; reader → `404`; revocar sigue funcionando |
 | `INSIGHTS_DELIVERY_ENABLED` | crear el envío | despacho (default `true` en `deploy.sh`) | crear y reintentar → `503 delivery_disabled`; cancelar y reconciliar siguen funcionando |
 | `INSIGHTS_SCHEDULES_ENABLED` | escrituras de schedule | tick (default `true` en `deploy.sh`) | crear → `503 schedules_disabled`; pausar y retirar siguen funcionando |
 | `INSIGHTS_GENERATION_ENABLED` | ya existente | **ahora también** en el tick (default `true`) | el tick no genera ediciones |
@@ -271,12 +280,73 @@ Prender un flag del worker es multi-runtime: `deploy.sh` + revisión activa (led
 1. `POST /api/platform/app/insights/editions/<editionId>/shares` con `{ "organizationId": "<org>", "expiresInDays": 30,
    "downloadOutputs": ["deck_pdf"] }` (`expiresInDays` 1–90, default 30; `downloadOutputs` sólo `deck_pdf`/`report_pdf`
    que existan en la edición). Responde `201` con el grant, **el token y la URL, una sola vez**. Guárdalo en el canal
-   seguro que corresponda; Greenhouse no puede mostrarlo de nuevo.
+   seguro que corresponda; Greenhouse no puede mostrarlo de nuevo. **Sin `downloadOutputs` el enlace no descarga nada**
+   (Think no muestra botones y `?descargar=` vuelve al informe): pásalo explícito. El campo de vencimiento es
+   `expiresInDays`; otro nombre se ignora y queda el default de 30 días (verifica `expiresAt` en la respuesta).
 2. Listar: `GET …/editions/<editionId>/shares` (sin token ni digest).
 3. Revocar: `POST /api/platform/app/insights/shares/<shareGrantId>/revoke`. Idempotente; nunca reactiva.
 - Ecosystem: mismas rutas bajo `/api/platform/ecosystem/insights/**`; crear y revocar exigen binding `internal`.
 - MCP: `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (federadas en el gateway 1.7.0; crear y revocar exigen `efeonce.mcp.insights.write`, que ningún cliente porta).
 - Límite: 20 activos por edición → `429 quota_exceeded`. Permiso: `insights.share.manage` (Admin/Account; cliente executive sobre su org).
+
+### La página del enlace en Think (TASK-1875)
+
+- **URL:** `https://think.efeoncepro.com/insights/r/<token>`: es lo que devuelve la creación del enlace y lo que lleva el
+  correo. Think resuelve el token en cada visita (sin caché): revocar corta el acceso en la visita siguiente.
+- **Estados:** 200 informe · 404 enlace inexistente, vencido o mal copiado (indistintos a propósito) · 410 revocado o
+  edición retirada · 429 demasiadas lecturas seguidas · 502 cuando el fetch falla, Greenhouse responde otro no-2xx
+  (p. ej. 403 del WAF, 500/503), el JSON es inválido, el major no es 1.x o falta `model`/`header` (misma puerta
+  `acceptSharedEdition` para fixtures). Con `INSIGHTS_SHARING_ENABLED` OFF, Greenhouse responde 404; el flag no afecta
+  a la muestra, que nunca llama a Greenhouse.
+- **Descargas:** botón en la barra (y en el dock del celular) y en «Descargas»; pasan por `?descargar=report_pdf` o
+  `?descargar=deck_pdf` en la misma URL y Think las pide al proxy de Greenhouse. Si el archivo no existe o el enlace se
+  revocó, vuelve al informe (303). El logo del cliente va por `?logo=1` (404 si no hay).
+- **Muestra para vender:** `https://think.efeoncepro.com/insights/muestra` (datos de ejemplo, marca ficticia, sin
+  descargas, `noindex`). Se puede compartir libremente: no tiene token ni datos de clientes.
+- **Probar staging:** los enlaces de staging también apuntan a `think.efeoncepro.com`, que lee producción ⇒ 404. Para
+  verlos, levanta Think local contra staging: `efeonce-think/.env.staging.local` (en `.gitignore`) con
+  `GREENHOUSE_API_BASE` = staging `.vercel.app` y `GREENHOUSE_API_BYPASS`, y `pnpm --dir ../efeonce-think dev --port 4332
+  --mode staging` (launch config `think-staging`). Astro admite un solo `astro dev` por proyecto.
+- **Verificación del hub** (repo `efeonce-think`, con `astro dev` arriba): `pnpm verify:insights` (o `node
+  scripts/verify-insights-report.mjs [base]`; incluye el fixture de versión 2 ⇒ 502), `pnpm audit:insights-a11y` (o
+  `node scripts/audit-insights-a11y.mjs [base] [token|/ruta]`; AA y foco a 1440 y 390), `pnpm test:insights` (16
+  pruebas) y `node scripts/capture-insights-report.mjs <dir>` (dossier de 34 PNG; no está en `package.json`).
+- **Problemas comunes:** página 404 con un enlace recién creado en staging (mirar la nota de arriba); sin botón de
+  descarga (el enlace se creó sin `downloadOutputs`); 429 al probar muchas veces seguidas (espera un minuto y nunca
+  pruebes con ráfagas: la base es compartida).
+
+### Cómo se ve el informe
+
+Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`): marca, aplicaciones, secciones del informe y UI de la página live, con datos de ejemplo (sin clientes
+reales). Ejemplo vivo del producto: la muestra
+**[think.efeoncepro.com/insights/muestra](https://think.efeoncepro.com/insights/muestra)**. Para una edición concreta, abre su enlace de Think; para los PDF, «Revisar el diseño antes de compartir»
+(abajo).
+
+**Página live (Think), de arriba abajo:** portada oscura con la órbita, el lockup Efeonce | Insights, el estado del
+enlace y la respuesta del período → aviso de período abierto (si aplica) → barra fija (filtros por módulo, copiar
+enlace, presentar, descargar) → «Lo esencial» con hallazgos que se abren en su lugar → decisión → un capítulo por
+módulo con el gráfico principal por pasos (cifra, conclusión, significado, próximo paso) y opción de ver la tabla →
+plan de acción → «Cómo se midió» (cerrado; dentro: «Qué mide este informe», metodología, límites y referencias) →
+descargas (o, en la muestra, «Conversemos») → pie con la firma de Efeonce. «Presentar» abre las láminas en un diálogo
+(flechas, Espacio, Re Pág/Av Pág, Inicio/Fin, Esc); no está en el celular porque las acciones de la barra se ocultan
+bajo 720 px. Estados: 404, 410, 429 y 502 (ver arriba). Imprimir la página es sólo un respaldo: para papel, descarga
+el PDF.
+
+> **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
+> capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a
+> paso de cada capítulo, sin «Qué mide este informe», sin «Cómo lo mediremos / Qué necesitamos», sin logo del cliente
+> y sin tasas del embudo. Eso llega con el modelo 1.1 (en staging) en el próximo release de Greenhouse; la muestra ya
+> lo enseña. Si revisas un enlace real y falta la decisión, no es un error.
+
+**PDF:** el A4 tiene portada (navy o blanca), índice, «Lo esencial», aperturas de capítulo, una página por gráfico
+(comparación, columnas, metas o tendencia), tabla, plan, límites y contraportada; el deck, lo mismo en 12 tipos de
+lámina, sin portada blanca, índice ni tabla. Las portadas y las aperturas de capítulo muestran «efeonce | INSIGHTS»
+tipográfico (mayúsculas espaciadas); el lockup oficial en PDF y el color de acento de «INSIGHTS» en las portadas navy
+están pendientes de decisión del operador (no los cambies por tu cuenta).
+
+**Qué revisar antes de compartir:** que el lockup y la firma de Efeonce se vean en la portada y el pie; que las cifras
+de la página live coincidan con las del PDF (salen del mismo plan); que la muestra nunca se confunda con un informe real
+(lleva el aviso «Muestra con datos de ejemplo»).
 
 ### Leer el reader público
 
@@ -291,6 +361,11 @@ leer bytes). Sin sesión.
 | `410` | Revocado o edición retirada |
 | `429` | Rate limit: por IP 300 vistas/60 descargas por minuto, por grant 60/20. También si la base no responde (falla cerrado) |
 | `503` | Error interno sanitizado |
+
+> **Guard en el borde (TASK-1876, pendiente de aplicar):** delante de todo `/api/public/**` hay un límite del
+> Firewall de Vercel de 20 requests cada 10 s por IP. En staging/preview corta con `429` desde el borde; en
+> producción sólo registra (`observe`). Ese `429` no llega a Greenhouse: no trae el cuerpo JSON del dominio ni
+> `Retry-After: 60`, y no deja evento `rate_limited`. Ver «Problemas comunes».
 
 Verifica las cabeceras en cualquier canary: `Cache-Control: private, no-store, max-age=0`, `X-Robots-Tag: noindex,
 nofollow, noarchive`, `Referrer-Policy: no-referrer`. El access log (`insight_share_access_events`) registra resultado y
@@ -366,15 +441,21 @@ Un destinatario `ambiguous` (o `claimed` hace más de 30 min; señal `insights.d
 - No prometer que revocar recupera lo descargado o un PDF adjunto ya enviado: no es revocable.
 - No crear un cron por cliente para recurrencias: hay un solo tick para todas las organizaciones.
 
-## Portada del informe y contrato editorial v2 (TASK-1888 — construido, flag OFF)
+## Portada del informe y contrato editorial v2 (TASK-1888 — en producción, flag ON desde 2026-09-26)
 
 Para qué: fijar si los informes de un cliente llevan portada azul marino o blanca, cargar el logo que se lee sobre fondo
-oscuro, y revisar con datos reales cómo saldría el plan del diseño nuevo antes de prenderlo.
+oscuro, revisar con datos reales el plan del diseño nuevo, comprobar que una edición salió con el contrato v2 y, si
+hace falta, apagarlo.
+
+**Estado.** `INSIGHTS_EDITORIAL_V2_ENABLED` está ON en Vercel staging, Vercel Production y el `ops-worker` (default
+`:-true` en `services/ops-worker/deploy.sh`). Toda edición **nueva** sale con el plan v2 (lectura por figura,
+apertura de capítulo, «Lo esencial», `scopeLines`, `cover` sellada, tabla de respaldo, acciones con
+impacto/esfuerzo/semanas). Las ediciones ya creadas no cambian: son inmutables. Emisión, sharing y delivery siguen
+OFF en Production.
 
 **Antes de empezar.** Fijar la preferencia exige ser administración o cuentas de Efeonce (capability
 `insights.cover_preference.manage`); leerla, poder leer los informes de esa organización. La organización debe tener
-el módulo `insights_v1`. Todo esto funciona con `INSIGHTS_EDITORIAL_V2_ENABLED` apagado: la preferencia se guarda y se
-aplica a las ediciones que se generen después de prender el flag.
+el módulo `insights_v1`. La preferencia se aplica a las ediciones que se generen después de fijarla.
 
 **Fijar la preferencia (lane App, sesión interna).**
 
@@ -387,8 +468,10 @@ curl -sX POST "$BASE/api/platform/app/insights/cover-preference" -H 'content-typ
 - Respuesta `200` con `{ preference, changed }`. El mismo valor otra vez responde `changed: false` y no escribe nada.
 - Leerla: `GET …/insights/cover-preference?organizationId=<org-…>`. `isDefault: true` = nunca se fijó (se lee `auto`).
 - Por MCP: `get_insight_cover_preference` / `set_insight_cover_preference` (fijar = binding interno y scope
-  `efeonce.mcp.insights.write`). Las dos tools existen en el gateway sólo después del deploy de efeonce-mcp#18.
+  `efeonce.mcp.insights.write`). Federadas desde el gateway v1.9.0 (2026-09-26).
 - **Para un solo encargo:** `request.brand.coverTheme` en `create_insight_edition` o en la API. Gana sobre la preferencia.
+- Orden de resolución: encargo (`request`) > preferencia de la organización > `auto`. La portada queda sellada en la
+  edición al crearla: volver a renderizar da la misma, aunque después cambie la preferencia.
 
 **Cargar el logo para fondo oscuro.** Igual que el logo normal (sube el asset con el flujo de logos de la organización)
 y adjúntalo con la variante:
@@ -401,7 +484,7 @@ curl -sX POST "$BASE/api/organizations/<org-…>/brand-assets/logo" -H 'content-
 Sin esa variante, `auto` siempre da portada blanca, y una portada `dark` forzada va **sin** logo del cliente (nunca el
 logo normal sobre azul marino).
 
-**Revisar el plan v2 con datos reales, sin escribir nada.** Con el proxy arriba (`pnpm pg:connect`):
+**Revisar el plan v2 de una edición existente con datos reales, sin escribir nada.** Con el proxy arriba (`pnpm pg:connect`):
 
 ```bash
 GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
@@ -418,30 +501,70 @@ las metas usadas. `0 violaciones` es la condición para seguir; una violación e
 - `nextStep` en `null` = el dato alcanzó la meta: no hay un paso que la evidencia sostenga.
 - `cover.source`: `request`, `organization` o `auto`.
 
-**Prender el contrato v2 (sólo junto al release de TASK-1889).** Es multi-runtime: Vercel (`vercel env add
-INSIGHTS_EDITORIAL_V2_ENABLED …` + redeploy) **y** `ops-worker` (`deploy.sh` a `true` + `gcloud run services update`).
-Para probar en staging, prende sólo **Vercel staging**: el `ops-worker` es el mismo para producción. Verifica con una
-edición **interna** (Berel `seo`+`aeo`, Sky `ico`) antes de compartir nada con un cliente. Registra el flip en el ledger.
+**Verificar que una edición salió con el contrato v2.** Lee la edición como interno:
+`GET …/insights/editions/<insed-…>?include=evidence&organizationId=<org-…>` (o `get_insight_edition` con
+`includeEvidence` por MCP) y mira el plan congelado:
+
+- `plan.scopeLines` es un arreglo con líneas de alcance y `plan.cover` trae la portada sellada (con `cover.source`):
+  la edición es **v2**. Así selló la canary sintética de producción del 2026-09-26: 3 `scopeLines`, `cover` y apertura
+  en los 3 capítulos.
+- Ni `scopeLines` ni `cover` en el plan: la edición se selló con el plan **v1** (ver «Problemas comunes»).
+- Una canary sobre la org sintética Greenhouse Demo termina `failed` en `validating` (`evidence_rejected`, snapshot sin
+  hechos) **después** de sellar el plan: es lo esperado; lo que se verifica es la forma del plan.
+
+**Rollback (apagar el contrato v2).** Es multi-runtime: hay que apagarlo en los **dos** lugares donde se lee, y
+registrar el cambio en el ledger.
+
+1. Vercel: `vercel env rm INSIGHTS_EDITORIAL_V2_ENABLED production` (y el entorno de staging si corresponde) y
+   `vercel redeploy` del target: una deployment ya construida no ve el cambio.
+2. `ops-worker`: `gcloud run services update ops-worker --update-env-vars INSIGHTS_EDITORIAL_V2_ENABLED=false` para
+   efecto inmediato **y** default `:-false` en `services/ops-worker/deploy.sh` (el `--set-env-vars` del próximo deploy
+   borra lo agregado a mano). Ajustar `deploy-contract.test.ts`, que hoy fija `:-true`.
+3. Verificar en la revisión activa del `ops-worker` y con una edición interna nueva: el plan vuelve a v1. Las
+   ediciones ya selladas con v2 no cambian.
+
+Para volver a prenderlo, el mismo camino al revés, cargando el valor exacto (ver «Problemas comunes»):
+`printf %s true | vercel env add INSIGHTS_EDITORIAL_V2_ENABLED production` + redeploy, y `true` en el `ops-worker`
+(`deploy.sh` + `--update-env-vars`).
 
 **Qué no hacer.**
 - No escribas la meta de una métrica ICO a mano en un texto ni en un gráfico: sale del registro.
 - No pongas el logo normal en una portada azul marino ni decidas la portada al renderizar.
-- No prendas el flag en el `ops-worker` para una prueba de staging.
-- No esperes que cambiar la preferencia cambie una edición ya generada: su portada quedó sellada.
+- No apagues el flag sólo en Vercel o sólo en el `ops-worker`: las ediciones de recurrencias y las pedidas a mano
+  saldrían con contratos distintos.
+- No cargues el valor del flag con `echo` ni pegándolo en un prompt interactivo con Enter: el salto de línea final
+  apaga el flag en silencio.
+- No esperes que cambiar la preferencia o el flag cambie una edición ya generada: su plan y su portada quedaron
+  sellados.
 
 **Problemas comunes.**
 - `404` al fijar la preferencia: la organización no tiene el módulo `insights_v1` o no es tuya (anti-oráculo).
 - `403 scope_not_allowed` por el lane ecosystem: el binding es de una organización; sólo un binding interno escribe.
 - `400 invalid_request`: `coverTheme` fuera de `auto|dark|light`.
 - La portada salió blanca con preferencia `auto`: la organización no tiene logo para fondo oscuro.
+- **El flag está en `true` pero la edición sale v1** (sin `plan.scopeLines` ni `plan.cover`): el valor guardado en
+  Vercel trae un salto de línea final (`true\n`) y el flag compara exactamente con `'true'`. Pasó en la primera canary
+  de producción del 2026-09-26. Corrige cargando el valor con `printf %s true | vercel env add
+  INSIGHTS_EDITORIAL_V2_ENABLED production` (tras `vercel env rm`), haz `vercel redeploy` y repite la verificación
+  con una edición interna nueva. En el `ops-worker`, confirma el valor exacto en la revisión activa.
 
-## Revisar el diseño antes de compartir (TASK-1889 — code complete, rollout pendiente)
+## Revisar el diseño antes de compartir (TASK-1889 — en producción)
 
 Para qué: ver cómo sale un informe A4 o un deck con el diseño aprobado (portada, índice, «Lo esencial», páginas de
 gráfico, límites, contraportada) usando datos reales, y comprobar que las plantillas siguen fieles al canvas aprobado.
-Nada de esto comparte ni emite: es revisión local. Estado al 2026-09-25: los catálogos `insights-report` e
-`insights-deck` están sólo en v2 en develop (sin push); falta staging con el flag de TASK-1888, release por el control
-plane y la aprobación del operador de las piezas derivadas y los PDF reales.
+Nada de esto comparte ni emite: es revisión local. Estado al 2026-09-26: los catálogos `insights-report` e
+`insights-deck` (sólo v2) están en producción junto con el contrato v2 de TASK-1888 (flag ON). Toda edición nueva sale
+con este diseño; las primeras ediciones internas de Berel y Sky se generaron en producción el 2026-09-26.
+
+**Verificar un render en producción (escribe en producción: pide antes la autorización del operador).**
+1. Crea una edición `internal` de un cliente con datos por el lane ecosystem (`POST
+   /api/platform/ecosystem/insights/editions` con el token del gateway y
+   `externalScopeType=other&externalScopeId=efeonce-mcp-gateway&organizationId=<org>`). Usa un título de cliente, no
+   «Canary…».
+2. Pide el render con `POST …/editions/<id>/render` y `{"outputs":["deck_pdf","report_pdf"]}`.
+3. Espera al dispatcher: toma un PDF cada 2 minutos. Un informe completo (deck + A4) tarda unos 4 a 5 minutos.
+4. Consulta `GET …/render-runs/<id>` hasta `completed` y revisa los PDF (número de páginas, portada, tabla y tonos).
+   Emitir y compartir siguen apagados en producción: el cliente no ve nada.
 
 **Antes de empezar.**
 
@@ -569,6 +692,8 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 | Output `running` que no avanza | Worker caído o flag OFF en su revisión activa (señal `insights.render.orphaned_output`) | Verificar el Job y el flag en Cloud Run; los reclamos por lease vencido son automáticos si el worker corre. Un `running` **sin lease** no se reclama solo: decisión humana |
 | `failed` en `validating` con `evidence_rejected` | Un módulo requerido no aportó hechos | Revisar rechazos; pedir meses completos o `policy.allowPartial=true` explícito |
 | Edición > 30 min en una fase | Proceso caído (señal `insights.editions.stuck_generation`) | `recover` desde la fase |
+| `429` en el lector público **sin** cuerpo `{ "error", "code": "rate_limited" }` ni `Retry-After: 60` | Lo cortó el Firewall de Vercel en el borde (20 req / 10 s por IP, `enforce` en staging/preview); la función no se invocó y no hay evento en `insight_share_access_events` | Espera 10 s y secuencia las requests. No subas el límite: un consumidor server-side legítimo (Think, TASK-1875) se exceptúa con una condición explícita en `src/lib/security/public-burst-guard/firewall-rules.ts` + `pnpm security:public-burst-guard --apply` |
+| `429` en el lector público **con** `{ "code": "rate_limited" }` y `Retry-After: 60` | Límite del dominio: por IP 300 vistas / 60 descargas por minuto o por grant 60 / 20; también si la base no responde (falla cerrado) | Espera el minuto que indica `Retry-After`; si se repite sin tráfico, revisa la salud de PostgreSQL (`pnpm pg:doctor`) |
 
 ## Referencias técnicas
 

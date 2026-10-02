@@ -1,0 +1,21 @@
+{
+  "spec": {
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100
+      }
+    ]
+  },
+  "status": {
+    "latestCreatedRevisionName": "ops-worker-00733-5s6",
+    "latestReadyRevisionName": "ops-worker-00733-5s6",
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100,
+        "revisionName": "ops-worker-00733-5s6"
+      }
+    ]
+  }
+}

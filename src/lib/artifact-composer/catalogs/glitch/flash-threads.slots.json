@@ -1,0 +1,124 @@
+{
+  "template": "FlashThreads",
+  "version": "0.1",
+  "viewport": {
+    "width": 1080,
+    "height": 1350
+  },
+  "slots": {
+    "photo": {
+      "selector": "[data-slot='photo']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gx-photo-ref",
+          "example": "asset-ref:photo:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 240,
+          "resolver": "gx-alt",
+          "example": "Foto de la noticia de portada, en duotono navy."
+        }
+      }
+    },
+    "credit": {
+      "selector": "[data-slot='credit']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 90,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Foto: Glitch (imagen sintética de ejemplo)"
+    },
+    "outlet": {
+      "selector": "[data-slot='outlet']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Medio · 28 sep"
+    },
+    "headline": {
+      "selector": "[data-slot='headline']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "entry": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 28,
+          "example": "Te responden antes"
+        },
+        "punchLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 30,
+          "example": "del"
+        },
+        "punchLast": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 14,
+          "example": "clic."
+        }
+      }
+    },
+    "lines": {
+      "selector": "[data-slot='lines']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "section": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 16,
+            "example": "Marketing"
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 44,
+            "example": "El buscador contesta solo"
+          }
+        }
+      }
+    },
+    "bytes": {
+      "selector": "[data-gx-bytes]",
+      "type": "string",
+      "required": false,
+      "consumer": "validation-only",
+      "example": "[]"
+    },
+    "photoLicense": {
+      "selector": "[data-gx-root]",
+      "type": "string",
+      "required": true,
+      "consumer": "validation-only",
+      "example": "generated:glitch-probe"
+    },
+    "faces": {
+      "selector": "[data-gx-root]",
+      "type": "string",
+      "required": true,
+      "consumer": "validation-only",
+      "example": "[]"
+    }
+  }
+}

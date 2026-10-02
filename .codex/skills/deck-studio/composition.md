@@ -65,68 +65,184 @@ operaciones determinísticas con **0 Studio Credits**. El costo humano/plataform
 asset generativo incluido en un slot conserva su propio run y ledger; el Composer no lo recobra por slide ni
 convierte costo de provider en créditos. Reemitir el mismo plan o derivar otro target tampoco crea inferencia.
 
-### Patrón de licitación reusable: evidencia que progresa
-
-La segunda licitación producida con el Artifact Composer, Brightcell, consolidó un patrón que debe
-reutilizarse cuando una propuesta combina diagnóstico, servicios recurrentes y herramientas
-operativas. El plan no agrupa láminas por disponibilidad de templates: las encadena por la decisión
-que el lector necesita tomar.
-
-```text
-Diagnóstico  →  Intervención  →  Operación  →  Conversión
-qué ocurre       qué cambia       cómo se sostiene  qué acción habilita
-```
-
-#### Aplicación práctica
-
-1. **Diagnóstico:** mostrar la brecha con evidencia trazable. En SEO/AEO puede ser un AEO Grader o
-   una línea base de visibilidad. Si el dato todavía no fue medido, mostrar el método y rotular la
-   pieza como conceptual; nunca convertir un ejemplo en resultado.
-2. **Intervención:** mostrar una página, contenido o journey mediante un mockup X-Ray. Anotar qué se
-   corrige: intención, arquitectura, entidad, schema, preguntas, prueba y CTA. El mockup demuestra
-   cómo se trabaja, no que el trabajo ya fue ejecutado.
-3. **Operación:** mostrar el ritmo mensual con un dashboard tipo Greenhouse: acciones, publicaciones,
-   visibilidad, citabilidad, conversiones y siguientes decisiones. El caption debe explicar qué
-   pregunta responde el tablero.
-4. **Conversión:** hacer explícito el siguiente paso: cotización, agendamiento, formulario o contacto
-   comercial. Una lámina de medición que no cambia una decisión es un reporte decorativo.
-
-#### Templates que reducen riesgo de compra
-
-- `ToolStackFull` aparece cuando el lector ya entiende el método y necesita comprobar con qué se
-  ejecutará. Organiza el stack por función, no como una lista de logos sin relación con la oferta.
-- `TeamGalleryFull` aparece cuando el lector necesita comprobar ownership y capacidad de delivery.
-  Cada persona lleva un rol real y verificable; no se generan rostros para representar al equipo.
-- Los mockups de Grader, X-Ray, dashboard o pipeline llevan captions del tipo `vista conceptual`,
-  `ejemplo de lectura` o `flujo propuesto` mientras no haya evidencia viva del cliente. La caption
-  debe aclarar el propósito del artefacto y evitar que el comité lo interprete como una métrica
-  histórica.
-
-La regla de selección es: **si la lámina no cambia la comprensión del método, la confianza en la
-ejecución o la acción siguiente, se elimina**. La continuidad visual del catálogo importa, pero la
-continuidad argumental importa más.
-
-#### QA específico y protección de decks previos
-
-Después de componer:
-
-- mirar todos los frames, no sólo la lámina nueva;
-- comprobar que cada mockup conserva su caption y no muestra datos ficticios como hechos;
-- revisar que `ToolStackFull` y `TeamGalleryFull` no repitan información ya explicada ni rompan la
-  densidad del arco;
-- verificar que los titulares se leen como una cadena de afirmaciones;
-- confirmar que el output, el plan, los assets y las capturas pertenecen al deal actual;
-- ejecutar `git status --short` y `git diff --stat` para comprobar que un deck anterior (por ejemplo,
-  SKY) no fue sustituido ni reescrito.
-
-Brightcell es la segunda implementación de este método con Artifact Composer; SKY es la primera
-referencia. La protección es parte del método: cada licitación conserva su propio plan, evidencia,
-assets y output. Reusar una plantilla o una capacidad no autoriza reusar datos, screenshots,
-branding, equipo, métricas o artefactos internos de otro cliente.
-
 **El entregable es UN PDF de N páginas**, no un puñado de PNGs. El merge y el **gate de peso** son
 parte del contrato: **los portales rechazan adjuntos sobre su límite** — el peso es **admisibilidad**,
 no cosmética. *(Y el límite lo fijan **las bases**, no el portal. Ver [`evidence-integrity.md`](evidence-integrity.md).)*
+
+### Catálogos de La órbita (marca propia Efeonce) — no son `deck-axis`
+
+Desde el 2026-09-27 (TASK-1919, ampliado por TASK-1927, TASK-1928 y TASK-1934) las láminas de «La órbita» con plantilla son un
+catálogo propio, **`graphic-line-deck`** (PDF 16:9). TASK-1927 dejó 16 `contentType`: `deck.proposal-cinematic`
+(+ `.hero`, `.lines`), `deck.method-staircase`, `deck.section-classic`, `deck.section-split` (+ `.corner-bottom`,
+`.panel-end`), `deck.content-measure`, `deck.triptych` y el marco `deck.cover-brochure`, `deck.cover-proposal`
+(+ `.dawn`), `deck.close-brochure` (+ `.photo`) y `deck.close-proposal`. TASK-1928 sumó 34 plantillas para las 38
+recetas restantes (propuestas sobrias, método, cotización y cierre, prueba, secciones y quiénes somos, contenido y día
+a día; p. ej. `deck.proposal-service`, `deck.content-pricing` + `.stage`/`.live`, `deck.section-cine` +
+`.services`/`.about`/`.purpose`, `deck.content-day` + `.tools`/`.live-progress`/`.live-results`);
+`cover-brochure-cine-lines-selection` entró el 2026-09-28 como `deck.cover-brochure.document-selection` (misma
+plantilla `CoverBrochure`, AXIS 0.3.21). TASK-1934 sumó las nueve SEO/AEO aprobadas el 2026-09-28: siete plantillas
+nuevas (`deck.decision-ai-answer`, `deck.decision-ai-market`, `deck.method-surround-cycle`, `deck.decision-difference`,
+`deck.method-eeat`, `deck.decision-traffic-to-revenue`, `deck.decision-diagnosis-map`) y dos recetas que reutilizan
+`ProposalService` y `ProposalCinematic`. **78 de 78** recetas componen con 57 plantillas y `recipe-map.json` no tiene
+`blocked`. Viven junto a `graphic-line-stills` (heros web, caminero,
+cuadros de motion) y `graphic-line-overlays` (capas de video con alfa). Mapa completo de las 78: §«Mapa receta →
+plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose`».
+
+- **Antes de componer, el plan de recetas** (TASK-1929): un `DeckPlan` (`document`, `line?`, `diagnosisDone?`,
+  `slides[{ recipeId, slots?, plateRef?, progress?, purpose? }]`) se valida con
+  `pnpm brand:deck-plan -- --plan plan.json` (`validateDeckPlan`, pura: piso AXIS `resolveSurfaceDocument` en
+  propuesta y brochure + reglas del catálogo) o lo propone el agente con `--propose --context` (sólo elige ids de un
+  enum, un reintento, fail-closed). No confundirlo con el `Plan` del composer (`deck-plan.json` que escribe
+  `brand:compose`): el de recetas nombra recetas, el del composer ya trae plantillas. Códigos y arreglos:
+  [SKILL.md](SKILL.md) §«Plan del deck».
+- **Después del plan, los datos reales** (TASK-1930, `in-progress`): `bindDeckSlots(plan, context)` (`server-only`,
+  `src/lib/brand-surfaces/deck-recipes/bindings/index.ts`; núcleo puro `bindDeckSlotsWith` en `bindings/core.ts`) liga
+  los slots de **datos** (logo del cliente, cifras, casos, testimonios, logos de terceros, montos, equipo, datos de
+  muestra) desde readers canónicos y deja el rastro por slot; CLI `pnpm brand:deck-plan -- --bind --plan plan.json …`.
+  Un slot de datos **nunca** sale del texto del plan: se reemplaza por el hecho verificado o se quita, y el plan falla
+  cerrado. Se compone el plan **ligado**. Reglas de evidencia y comando: [SKILL.md](SKILL.md) §«Datos reales en los
+  slots».
+- **Se componen desde un intent de superficie**, no desde un `Plan` escrito a mano:
+  `pnpm brand:compose -- --intent <intent.json>`. El mapper `src/lib/brand-surfaces` exige receta aprobada, valida con
+  el contrato AXIS `efeonce.surface-composition` y deriva el `contentType`; el autor nunca elige plantilla (sigue
+  vigente `TemplateAuthorityError`).
+- **El contenido es dato del intent.** Foto (`photo.plateRef`, `photo.alt`), copy (`voice`, `body`) y sección
+  (`progress`) se cambian en el intent y se vuelve a componer; la plantilla nunca se edita para una pieza. El intent
+  de una pieza nueva vive fuera de `src/lib/brand-surfaces/examples/` (carpeta vigilada por el snapshot de
+  `__tests__/example-plans.test.ts`). Qué cuidar al cambiar la foto: [SKILL.md](SKILL.md) §«Cambiar la foto, el copy o
+  la sección de una lámina».
+- **No se mezclan con `deck-axis`.** `deck-axis` es el catálogo de las ofertas a comité, con su molde y la línea base
+  de SKY; meter ahí el fondo Efeonce, la voz con esfera o las fotos de cine degradaría lo que protege. Un deck de
+  marca propia se compone entero con `brand:compose` (lámina a lámina o como documento); una lámina que no esté en el
+  catálogo es una receta nueva y entra sólo con la aprobación del operador (hasta entonces, maqueta declarada).
+- **Paridad receta ↔ plantilla.** `recipe-map.json` (en `graphic-line-deck/`) declara en `slots` dónde vive cada slot
+  de la receta dentro del `slots.json`, y `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` exige campo,
+  tipo compatible, obligatoriedad y el **mismo largo máximo**. El compositor rechaza un texto que excede el
+  `maxCharacters` del campo (`overflow=reject`): los largos medidos del catálogo son el límite real.
+- **La pintura de la selección y del CTA se inyecta** (`createCatalog({ selectionPainter, ctaPainter })`): el catálogo
+  no importa paquetes.
+- **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (73 frames a 0 px desde TASK-1934 —66 tras TASK-1928—;
+  las siete plantillas SEO/AEO y el re-congelado de `ProposalCinematic` se congelaron el 2026-09-28 tras la aprobación
+  visual del operador, en `c652f4f83`; altas y cambios
+  declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`: 2026-09-27 (b)–(e) de TASK-1927,
+  (f) y (h)…(m) de TASK-1928 —la (g) y la (p), el Glitch Flash, son Glitch— 2026-09-28 (n), el re-promovido de `CoverBrochure`, y (o), las nueve SEO/AEO de TASK-1934; ojo: esas letras
+  no son las de los deltas del ADR de AXIS; runbook `docs/operations/runbooks/composer-visual-gate.md`). El probe del
+  gate **rellena todo slot no fijo** y una auditoría renderizada aborta si hay acento en texto < 24 px o respuesta < 3×
+  la pregunta (`graphic-line-shared/rendered-audit.ts`; las siete SEO/AEO están en `ANSWER_RATIO_CONTENT_TYPES`).
+  Como el probe rellena todo slot opcional, **el gate nunca ejercita el camino «ausente»** de un slot opcional nuevo:
+  eso lo cubre un test que componga una receta existente sin el slot (lección de TASK-1934 en la skill
+  `efeonce-graphic-line`). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
+- **Contrato 0.1.2, integrado (TASK-1927 y TASK-1928, `complete`, en `origin/develop`; TASK-1934 en curso).**
+  Greenhouse fija `@efeoncepro/axis-tokens` **0.3.23** y `@efeoncepro/axis-ui-contracts` **0.3.21** (tag AXIS
+  `v0.3.23`). El mapper
+  lee `use` y `layout` (el que resolvió AXIS, nunca inferido); los builders viven en `src/lib/brand-surfaces/recipes/`
+  (`deck.ts`, `frame.ts` para el marco, y `proposal-service.ts`, `method.ts`, `close.ts`, `proof.ts`, `sections.ts`,
+  `content.ts` con ayudas en `kit.ts`, y las siete SEO/AEO en `seo-aeo/<receta>.ts` agregadas en `seo-aeo.ts`), registrados en `src/lib/brand-surfaces/index.ts`. Un intent 0.1.0 o 0.1.1
+  resuelve igual.
+- **Documentos.** Un intent con `pages` compone **un PDF multipágina** con su manifest `axis.surface-document.v1` y su
+  procedencia (`planSurfaceDocument` en `src/lib/brand-surfaces/document.ts`, que valida con
+  `resolveSurfaceDocument` de AXIS). Un solo issue (`brochure-cover-first`, `brochure-close-last`,
+  `brochure-needs-service-page`, `document-line-mismatch`, `frame-photo-must-alternate`, …) deja el documento sin
+  componer: nunca se arma página por página para esquivar la validación ni se «adivina» el manifest a mano. El
+  documento completo no tiene frame en el gate (usa fotos reales); lo cubren sus páginas.
+- **Portadas y contraportadas (operador, 2026-09-27).** `cover-classic` y `close-classic` **no se usan**: el
+  operador no las aprobó, en AXIS quedan `supersededBy` y no tienen plantilla. El marco aprobado sí la tiene:
+  `cover-brochure` (con foto), `cover-proposal` (sin foto, logo del cliente), `close-brochure` (`orbit` sin foto,
+  `photo` con foto) y `close-proposal` (con foto, «Empower your Growth»). Portada con foto ↔ contraportada sin foto, y
+  al revés. La producción idempotente de los plates es TASK-1926. Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6;
+  resumen en [SKILL.md](SKILL.md) §«Portadas y contraportadas».
+- **Recetas por lámina (operador, 2026-09-27 y 2026-09-28): las 78 láminas del canvas «Deck» están aprobadas** (69 más
+  nueve SEO/AEO) y cada una tiene su
+  receta en `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` (esquema
+  `efeonce.deck-slide-recipes.v1`; índice humano en el README de esa carpeta, regenerado con `pnpm brand:deck-recipes`).
+  Para el composer, la receta es el **contrato de slots** de la plantilla: cada `slots[]` trae `name`, `type`
+  (`text`, `richText`, `number`, `metric`, `list`, `image`, `logo`, `person`, `money`, `date`, `enum`, `section`),
+  `required` y `maxChars` **medido en la referencia aprobada** (lo que cabe sin cruzar la órbita ni al sujeto);
+  `fixed[]` es lo que la plantilla quema y el autor no toca; `selection` declara el objetivo para
+  `efeonce.collaboration-selection`; `pairsWith` alimenta la validación del plan (TASK-1929): `cover↔close` →
+  `pair-cover-close-mismatch`, `variant` → `variant-both-in-deck` (alternativas: nunca las dos en el mismo deck,
+  seguidas o no; reemplaza a `variant-adjacent`); `sequence` **no se valida** porque no tiene dirección. Una cifra del
+  plan (objeto con `value`) sin `source` → `figure-source-missing`. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
+  `method-staircase`…); los nuevos son kebab-case en inglés. **El catálogo de recetas sirve para elegir la lámina; se
+  compone con el intent de AXIS.** Hoy componen **las 78** con **57 plantillas**: TASK-1927 dejó 30 recetas sobre 16
+  plantillas; TASK-1928 sumó las 38 restantes sobre 34 plantillas y, el 2026-09-28, la portada con selección
+  (`cover-brochure-cine-lines-selection`, layout `document-selection`) sin plantilla nueva; TASK-1934 sumó las nueve
+  SEO/AEO sobre siete plantillas nuevas. **Nunca** se agrega una
+  plantilla sin su receta ni una receta sin la aprobación del operador.
+
+### Mapa receta → plantilla (las 78, verificado contra `recipe-map.json` y `registry.json` el 2026-09-28)
+
+El autor escribe la columna 2; la 3 la deriva el mapper y la 4 la elige el selector del catálogo (nunca el autor).
+Ejemplo de cada fila: `src/lib/brand-surfaces/examples/deck-<id>-intent.json` (el campo `example` de
+`recipe-map.json`). Plantillas compartidas: `CoverBrochure` (portadas de brochure, con y sin selección),
+`SectionCine` (`team` y `services`), `ProposalService` (las cinco sobrias) y `ProposalCinematic` (las cinco de
+servicio). `recipe-map.json → slots` declara el campo del `slots.json` de cada slot en las 38 recetas de TASK-1928 y
+en ocho de las nueve de TASK-1934 (las 30 anteriores lo declaran `null`: su contrato sale del manifest de AXIS; también
+`proposal-cinematic-seo`, como sus cuatro hermanas de cine, porque su plantilla compartida no admite los largos
+menores de una sola receta: ahí el freno es `slot-over-max-chars` de `validateDeckPlan`).
+
+| Láminas (id del catálogo) | `recipe` + `layout` del intent | `contentType` | Plantilla |
+|---|---|---|---|
+| `breather` | `breather` | `deck.breather` | `Breather` |
+| `close-brochure-orbit` | `close-brochure` + `orbit` | `deck.close-brochure` | `CloseBrochure` |
+| `close-brochure-horizon` · `close-brochure-dawn` | `close-brochure` + `photo` | `deck.close-brochure.photo` | `CloseBrochurePhoto` |
+| `close-proposal-horizon` · `close-proposal-dawn` | `close-proposal` | `deck.close-proposal` | `CloseProposal` |
+| `contact-sheet` | `contact-sheet` | `deck.contact-sheet` | `ContactSheet` |
+| `content-bullets` | `content-bullets` | `deck.content-bullets` | `ContentBullets` |
+| `content-clients` | `content-clients` | `deck.content-clients` | `ContentClients` |
+| `content-day` | `content-day` + `clock` | `deck.content-day` | `ContentDay` |
+| `content-day-live-progress` | `content-day` + `live-progress` | `deck.content-day.live-progress` | `ContentDayProgress` |
+| `content-day-live-results` | `content-day` + `live-results` | `deck.content-day.live-results` | `ContentDayResults` |
+| `content-day-tools` | `content-day` + `tools` | `deck.content-day.tools` | `ContentDayTools` |
+| `content-focus` | `content-focus` | `deck.content-focus` | `ContentFocus` |
+| `content-measure` | `content-measure` | `deck.content-measure` | `ContentMeasure` |
+| `content-partners` | `content-partners` | `deck.content-partners` | `ContentPartners` |
+| `content-pricing` | `content-pricing` + `table` (por defecto) | `deck.content-pricing` | `ContentPricing` |
+| `content-pricing-live` | `content-pricing` + `live` | `deck.content-pricing.live` | `ContentPricingLive` |
+| `content-pricing-stage` | `content-pricing` + `stage` | `deck.content-pricing.stage` | `ContentPricingStage` |
+| `content-stack` | `content-stack` | `deck.content-stack` | `ContentStack` |
+| `content-team` | `content-team` | `deck.content-team` | `ContentTeam` |
+| `content-text` | `content-text` | `deck.content-text` | `ContentText` |
+| `cover-brochure-cine-orbit` · `-cine-lines` · `-cine-team` | `cover-brochure` + `document` | `deck.cover-brochure` | `CoverBrochure` |
+| `cover-brochure-line-growth` · `-line-brand` · `-line-engine` · `-line-voice` · `-line-revenue` | `cover-brochure` + `line` | `deck.cover-brochure` | `CoverBrochure` |
+| `cover-brochure-cine-lines-selection` | `cover-brochure` + `document-selection` | `deck.cover-brochure.document-selection` | `CoverBrochure` |
+| `cover-proposal-orbit` · `cover-proposal-orbit-sky` | `cover-proposal` + `orbit` | `deck.cover-proposal` | `CoverProposalOrbit` |
+| `cover-proposal-dawn` · `cover-proposal-dawn-sky` | `cover-proposal` + `dawn` | `deck.cover-proposal.dawn` | `CoverProposalDawn` |
+| `decision-agenda` | `decision-agenda` | `deck.decision-agenda` | `DecisionAgenda` |
+| `decision-ai-answer` | `decision-ai-answer` | `deck.decision-ai-answer` | `DecisionAiAnswer` |
+| `decision-ai-market` | `decision-ai-market` | `deck.decision-ai-market` | `DecisionAiMarket` |
+| `decision-case` | `decision-case` | `deck.decision-case` | `DecisionCase` |
+| `decision-chart` | `decision-chart` | `deck.decision-chart` | `DecisionChart` |
+| `decision-diagnosis-map` | `decision-diagnosis-map` | `deck.decision-diagnosis-map` | `DecisionDiagnosisMap` |
+| `decision-difference` | `decision-difference` | `deck.decision-difference` | `DecisionDifference` |
+| `decision-next-steps` | `decision-next-steps` | `deck.decision-next-steps` | `DecisionNextSteps` |
+| `decision-plan` | `decision-plan` | `deck.decision-plan` | `DecisionPlan` |
+| `decision-risk` | `decision-risk` | `deck.decision-risk` | `DecisionRisk` |
+| `decision-testimonial` | `decision-testimonial` | `deck.decision-testimonial` | `DecisionTestimonial` |
+| `decision-traffic-to-revenue` | `decision-traffic-to-revenue` | `deck.decision-traffic-to-revenue` | `DecisionTrafficToRevenue` |
+| `decision-why-us` | `decision-why-us` | `deck.decision-why-us` | `DecisionWhyUs` |
+| `method-eeat` | `method-eeat` | `deck.method-eeat` | `MethodEeat` |
+| `method-hybrid-workforce` | `method-hybrid-workforce` + `ladder` (por defecto) | `deck.method-hybrid-workforce` | `MethodHybridWorkforce` |
+| `method-hybrid-workforce-scene` | `method-hybrid-workforce` + `scene` | `deck.method-hybrid-workforce.scene` | `MethodHybridWorkforceScene` |
+| `method-score-ring` | `method-score-ring` | `deck.method-score-ring` | `MethodScoreRing` |
+| `method-staircase` | `method-staircase` + `steps` (por defecto) | `deck.method-staircase` | `MethodStaircase` |
+| `method-staircase-flat` | `method-staircase` + `flat` | `deck.method-staircase.flat` | `MethodStaircaseFlat` |
+| `method-surround-cycle` | `method-surround-cycle` | `deck.method-surround-cycle` | `MethodSurroundCycle` |
+| `proposal-cinematic-creative` · `-web` · `-aeo` · `-revops` (páginas de `deck-proposal-document.json`) · `-seo` (`deck-proposal-cinematic-seo-intent.json`) | `proposal-cinematic` + `service` | `deck.proposal-cinematic` | `ProposalCinematic` |
+| `proposal-cinematic-nexa` | `proposal-cinematic` + `hero` | `deck.proposal-cinematic.hero` | `ProposalCinematicHero` |
+| `proposal-cinematic-nexa-lines` | `proposal-cinematic` + `lines` | `deck.proposal-cinematic.lines` | `ProposalCinematicLines` |
+| `proposal-service-aeo` · `-creative` · `-web` · `-revops` · `-seo` | `proposal-service` | `deck.proposal-service` | `ProposalService` |
+| `section-bleed` | `section-bleed` | `deck.section-bleed` | `SectionBleed` |
+| `section-cine-team` | `section-cine` + `team` | `deck.section-cine` | `SectionCine` |
+| `section-cine-about` | `section-cine` + `about` | `deck.section-cine.about` | `SectionCineAbout` |
+| `section-cine-purpose` | `section-cine` + `purpose` | `deck.section-cine.purpose` | `SectionCinePurpose` |
+| `section-cine-services` | `section-cine` + `services` | `deck.section-cine.services` | `SectionCine` |
+| `section-classic` | `section-classic` | `deck.section-classic` | `SectionClassic` |
+| `section-lens` | `section-lens` | `deck.section-lens` | `SectionLens` |
+| `section-split` | `section-split` + `corner-top` (o sin layout) | `deck.section-split` | `SectionSplit` |
+| `section-split-corner-bottom` | `section-split` + `corner-bottom` | `deck.section-split.corner-bottom` | `SectionSplitCornerBottom` |
+| `section-split-panel-end` | `section-split` + `panel-end` | `deck.section-split.panel-end` | `SectionSplitPanelEnd` |
+| `triptych` | `triptych` | `deck.triptych` | `Triptych` |
 
 ### Destinos editables posteriores — no confundir fuente, conversión ni renderer
 
@@ -318,5 +434,11 @@ Tres capacidades del motor que cambian lo que un deck puede afirmar:
   rechazarlo y el autor debe resolver el contenido o el schedule.
 - **NUNCA** declares un deck listo sin **MIRAR TODOS LOS FRAMES**. Los tests verdes no son el gate.
 - **SIEMPRE** el `Plan` es el artefacto auditable; el PDF es derivado y re-componible.
+- **NUNCA** escribas a mano un slot de datos de un deck de marca propia (logo del cliente, cifra, caso, testimonio,
+  logo de tercero, monto, equipo): lo liga `bindDeckSlots` desde evidencia verificada o queda sin ligar. Ningún deck,
+  ni uno interno, usa evidencia `internal` (TASK-1930).
+- **SIEMPRE** que edites `EFEONCE_DECK_SLIDE_RECIPES_V1.json`, corre `pnpm brand:deck-recipes` (regenera el índice del
+  README y `src/lib/brand-surfaces/deck-recipes/catalog.generated.json`); el runtime nunca lee el JSON de `docs/`, y
+  `--check` + el test `catalog-drift` fallan si quedaron desalineados.
 - **SIEMPRE** preserva el lineage/ledger de un asset generativo insertado, sin imputar el render del deck como
   nueva operación generativa.

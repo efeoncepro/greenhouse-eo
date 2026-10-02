@@ -1,0 +1,52 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "proposal",
+  "recipe": "proposal-service",
+  "line": "engine",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Nuestra propuesta · Web",
+    "question": "¿Para quién es tu web?",
+    "answer": [
+      "Para todos"
+    ]
+  },
+  "body": "Web diseñada para humanos, buscadores y agentes: que convierta, que se encuentre y que un agente pueda operarla.",
+  "steps": [
+    {
+      "kicker": "Empieza aquí",
+      "name": "Web Foundation",
+      "desc": "La base: arquitectura, contenido y medición bien hechos."
+    },
+    {
+      "kicker": "Proyecto",
+      "name": "Conversion Website",
+      "desc": "Una web pensada para convertir, con experimentos y datos."
+    },
+    {
+      "kicker": "Agentes",
+      "name": "Agent-Ready",
+      "desc": "Lista para que los agentes la lean y actúen sobre ella."
+    },
+    {
+      "kicker": "On-Going",
+      "name": "Performance Ops",
+      "desc": "Operación continua de rendimiento y mejora."
+    }
+  ],
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_ooh-caminero-lente/plates/D3-led-medicion-mira-izquierda.png",
+    "alt": "Un analista de growth de una cervecería artesanal se inclina hacia el laptop a su izquierda para revisar la medición de la primera semana"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  }
+}

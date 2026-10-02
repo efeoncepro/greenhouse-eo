@@ -1,0 +1,9 @@
+Image 1 is the original scene. Images 2 and 3 are identity references of the same real man (Julio).
+
+Edit image 1 and change ONLY the face of the man on the LEFT (the bearded man in glasses and dark sweater) so it is unmistakably the man in images 2 and 3: his real facial proportions (width of the face, jaw and cheekbones), eye shape and spacing, eyebrows, nose, mouth and lips, the shape, density and salt-and-pepper color of his full beard and moustache, his hairline and the texture and grey of his short curly hair, and his thin metal half-rim glasses as in image 2. Render his face with the same mild fisheye perspective the rest of the scene has, as a real wide lens would.
+
+Do NOT change the woman on the right in any way: her face, hair, expression, cream sweater and hands stay exactly as in image 1.
+
+Keep EVERYTHING else from image 1 exactly as it is: both poses, his hand holding the orange marker over the printed photos, his smile and downward gaze, the dark sweater, the white mug, the printed coffee photos on the table, the office, the windows with mountains, the wall of coffee photos, the fisheye framing, the crop and the daylight. Do not change the size of any head.
+
+Photographic realism: a real photograph of real people, not a render. Skin shows irregular pores and fine facial hair with an even, healthy tone; no plastic smoothing, no beauty retouch, no added blemishes. Natural catchlights. No new text, no logos.

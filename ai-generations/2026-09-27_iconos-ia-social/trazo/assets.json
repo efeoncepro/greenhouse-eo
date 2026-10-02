@@ -1,0 +1,20 @@
+{
+  "key": "assets",
+  "label": "Assets",
+  "use": "Brand · biblioteca de assets, archivos creativos",
+  "mode": "complete",
+  "rest": [
+    "M5.5 9h13a2.5 2.5 0 0 1 2.5 2.5v7a2.5 2.5 0 0 1 -2.5 2.5h-13a2.5 2.5 0 0 1 -2.5 -2.5v-7a2.5 2.5 0 0 1 2.5 -2.5z",
+    "M5.5 6h13",
+    "M8 3h8"
+  ],
+  "response": [
+    "M5.5 9h13a2.5 2.5 0 0 1 2.5 2.5v7a2.5 2.5 0 0 1 -2.5 2.5h-13a2.5 2.5 0 0 1 -2.5 -2.5v-7a2.5 2.5 0 0 1 2.5 -2.5z",
+    "M5.5 6h13",
+    "M8 3h8"
+  ],
+  "dot": [
+    12,
+    15
+  ]
+}

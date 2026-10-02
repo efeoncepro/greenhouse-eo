@@ -1,14 +1,16 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.26
+> **Version:** 1.27
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-09-11 por Claude (sets de preguntas curados para paneles competitivos multi-marca + límites conocidos medidos en el primer panel real)
+> **Ultima actualizacion:** 2026-09-28 (TASK-1863: mercados, idiomas, identidad comparable y estado de staging)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
 
+> **Nombre público canónico (2026-09-29):** **Efeonce AEO** es la capacidad; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su entregable. Este documento conserva **AI Visibility Grader**, **Brand Visibility Grader** y **AEO Grader** para identificar el motor, rutas, contratos e historia existentes; el cambio de nombre no altera el runtime. [ADR de naming](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 ## Que hace
 
-Mide como los "answer engines" de IA (ChatGPT/OpenAI, Claude/Anthropic, Perplexity, Gemini y Google AI Overview / AI Mode via DataForSEO) representan a una marca cuando alguien les pregunta por un servicio. El objetivo es ver si la marca **aparece o no** cuando un comprador busca proveedores, que dicen de ella y a quien citan.
+Mide como los "answer engines" de IA (ChatGPT/OpenAI, Claude/Anthropic, Perplexity, Gemini y Google AI Overview / AI Mode via DataForSEO) representan a una marca cuando alguien consulta su categoría, productos o servicios. Las preguntas siguen el modelo de negocio de cada marca. El objetivo es ver si la marca **aparece o no**, qué dicen de ella y a quién citan.
 
 El grader ya es una capacidad completa de diagnostico y monitoreo: corre prompts contra providers, guarda evidencia cruda, normaliza findings, calcula score, arma reporte interno/publico, publica snapshots seguros, orquesta email/HubSpot cuando corresponde, ejecuta probes tecnicos/entity del sitio y puede re-gradear perfiles de cliente opt-in en el tiempo. La evidencia sigue siendo muestral y asistida por IA: sirve para decision comercial y priorizacion AEO, no como verdad absoluta del negocio.
 
@@ -95,15 +97,29 @@ Hay primitives server-side gobernados y todos los entrypoints consumen esos cami
 - **CLI de smoke:** `pnpm growth:ai-visibility:smoke` (ver el [manual](../../manual-de-uso/growth/ai-visibility-grader-smoke.md)).
 - **UI/report surfaces:** la pantalla publica, el portal cliente, PDF/email y artefactos Fix-It leen DTOs public-safe/client-safe; ninguno llama proveedores por su cuenta.
 
-## Estado del rollout (2026-06-29)
+## Mercados, idiomas y estado de disponibilidad
 
-- **staging:** grader encendido. El worker efectivo (`ops-worker-00418-2m6`) tiene OpenAI + Anthropic + Perplexity + Gemini + Google AI Overview + probes + entity probes + email + HubSpot + re-grade encendidos. Gemini usa **Gemini 3** (`gemini-3-flash-preview` vía Vertex) y el modelo es ajustable por env.
-- **producción:** apagado — el encendido es un proceso aparte (migración + release controlado) que se hará después.
-- **Perplexity:** encendido en el ops-worker de staging desde el 2026-06-29 (`GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=true`, revision `ops-worker-00418-2m6`). `services/ops-worker/deploy.sh` queda persistido con default staging ON / production OFF, para que futuros redeploys no lo apaguen. Falta un smoke async low-volume post-flip para capturar una observation nueva del worker.
-- **Google AI Overviews / AI Mode (surface AI Search):** **encendido + verificado en staging (TASK-1265, 2026-06-28).** Usa DataForSEO como fuente gobernada, sin scraping directo de Google. Smoke real verde end-to-end (observación `succeeded` con 27 citas en PG, ejecutada por el worker real). Está disponible en los 3 entrypoints de análisis (público / cliente / operador) por construcción. Si DataForSEO no trae bloque de AI Overview/AI Mode, la observación queda `skipped:no_ai_overview_block` (es "no apareces", no un fallo). El costo se mide por request reportado por DataForSEO. DataForSEO documenta AI Mode como English-only hoy, así que el adapter manda `language_code=en` y conserva mercado/location para segmentar. **Producción:** apagado (gated por el launch) + rotar la credencial DataForSEO antes de prod. **Delta TASK-1652 (2026-08-27):** los runs con mercados ISO-2 (CL/MX/CO/PE/US) ahora consultan Google con el **código de ubicación correcto** (antes el código de país caía crudo en el request y DataForSEO fallaba en silencio bajo HTTP 200); un fallo del proveedor **ya no se reporta como "Google no mostró bloque AI"** — ese estado queda reservado a consultas realmente ejecutadas; y las citas de Google AI Mode ahora **identifican la fuente real** cuando Google la expone (Google envuelve todas las citas en redirects propios, así que las que entrega solo como nombre de marca no se atribuyen a ningún dominio y quedan contadas aparte en la telemetría del run).
-- **DB staging/dev auditada:** 24 runs, 266 provider observations, 60 findings, 10 scores, 8 reports, 7 reviews, 23 probe results, 1 lead y 1 email dispatch. No hay perfiles org-bound opt-in para re-grade (`opt_in_profiles=0`, `due_profiles=0`).
-- **Prompt pack v2 (TASK-1249):** existe como versión seleccionable (corrige el prompt p12, que nombraba sectores y ensuciaba las marcas de control). El **default sigue siendo v1** hasta una validación real; v2 es opt-in.
-- **Pesos del score:** se mantiene **V1** (decisión documentada — el set de calibración es muy chico para reajustar pesos sin sobreajustar; detalle en `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` §Delta 2026-06-27).
+TASK-1863 está desplegada y verificada en staging al 2026-09-28; su promoción a `main` permanece en
+espera. Vercel y el worker comparten la versión funcional `d86edb784`; las revisiones, canaries y
+lecturas de producción se conservan en la [auditoría de rollout](../../audits/platform/2026-09-28-task-1863-verification.md).
+Ese estado no significa que el Grader previo esté apagado en producción.
+
+- Un perfil puede tener varios mercados (país + idioma); cada run mide uno. Los lotes reservan costo y
+  cuota por todos sus runs, y la matriz presenta cada mercado por separado, sin promedio combinado.
+- El catálogo cubre 23 mercados y cuatro familias de idioma. Google AI Mode recibe el `location_code`
+  y el idioma resueltos; no fuerza inglés ni sustituye un país desconocido por Estados Unidos.
+  Cuba tiene `skipped:market_unsupported` para Google. La disponibilidad de catálogo no concede
+  derechos de servicio al cliente.
+- Marca, aliases, dominio, categoría y competidores quedan congelados en el run. Una identidad de marca
+  distinta no genera una falsa mejora histórica; cambiar competidores elimina deltas competitivos y
+  globales entre esos universos. Los snapshots publicados permanecen inmutables.
+- Un fallo de proveedor conserva `failed` o `rate_limited`. `no_ai_overview_block` significa que una
+  solicitud ejecutada no devolvió bloque AI; no demuestra ausencia de la marca. Sin evidencia no es cero.
+- Staging permite lotes explícitos. El worker y PostgreSQL son compartidos; el flag multimer­cado del
+  worker permanece OFF para retener la recurrencia secundaria hasta la promoción acordada.
+
+Cobertura, límites y compatibilidad: [Grader AEO por mercado](aeo-grader-multi-mercado.md).
+Operación: [configurar mercados AEO](../../manual-de-uso/growth/configurar-mercados-aeo.md).
 
 ## Experiencia del cliente en el portal — tiers + trial PLG (TASK-1278)
 

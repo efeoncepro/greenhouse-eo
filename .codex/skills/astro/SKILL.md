@@ -33,6 +33,8 @@ Greenhouse headless model. When a task is about efeonce-think, **read
 `efeonce-overlay.md` first** — it pins the repo-specific decisions that override
 generic Astro advice.
 
+For Greenhouse-governed work (`TASK-1376+`), also validate the task's `## Modular Placement Contract` and `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`. Astro/public is a candidate future home; do not create or extract a deployable without its approved architecture task/ADR.
+
 ---
 
 ## Load order
@@ -59,6 +61,7 @@ generic Astro advice.
 | API endpoints, `src/middleware.ts`, `Astro.session`, cookies, `context.locals` | `topics/endpoints-middleware.md` |
 | type-safe server functions + form handling (the AEO grader form) | `topics/actions.md` |
 | `<ClientRouter />`, SPA-like nav, `transition:*`, persistence | `topics/view-transitions.md` |
+| AEO X-Ray, composed landing/article, welcome curtain, client-specific sample | `efeonce-overlay.md` + `../seo-aeo/references/aeo-xray.md` |
 | `<Image>`/`<Picture>`, `astro:assets`, remote images, optimization | `topics/images-assets.md` |
 | typed env (`astro:env`), public vs secret, `astro.config.mjs`, Vite 8 | `topics/env-config.md` |
 | scoped CSS, Tailwind v4 (`@tailwindcss/vite`), CSS vars ↔ AXIS tokens | `topics/styling.md` |

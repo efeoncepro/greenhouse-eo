@@ -1,0 +1,161 @@
+{
+  "checkedAt": "2026-09-28T09:19:39.487Z",
+  "countries": [
+    {
+      "country": "BO",
+      "locationCode": 2068,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "CR",
+      "locationCode": 2188,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "CU",
+      "locationCode": null,
+      "availability": "unsupported",
+      "verified": true
+    },
+    {
+      "country": "DO",
+      "locationCode": 2214,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "EC",
+      "locationCode": 2218,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "SV",
+      "locationCode": 2222,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "GT",
+      "locationCode": 2320,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "HT",
+      "locationCode": 2332,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "HN",
+      "locationCode": 2340,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "NI",
+      "locationCode": 2558,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "PA",
+      "locationCode": 2591,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "PY",
+      "locationCode": 2600,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "VE",
+      "locationCode": 2862,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "PR",
+      "locationCode": 2630,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "CL",
+      "locationCode": 2152,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "PE",
+      "locationCode": 2604,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "AR",
+      "locationCode": 2032,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "BR",
+      "locationCode": 2076,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "UY",
+      "locationCode": 2858,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "CO",
+      "locationCode": 2170,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "MX",
+      "locationCode": 2484,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "ES",
+      "locationCode": 2724,
+      "availability": "catalogued",
+      "verified": true
+    },
+    {
+      "country": "US",
+      "locationCode": 2840,
+      "availability": "catalogued",
+      "verified": true
+    }
+  ],
+  "languages": [
+    {
+      "language": "es",
+      "verified": true
+    },
+    {
+      "language": "en",
+      "verified": true
+    },
+    {
+      "language": "pt-BR",
+      "verified": true
+    },
+    {
+      "language": "fr",
+      "verified": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "PS6-nexa-formatos-estallido",
+  "formato": "3:1",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark creative studio at night): she stands at about 66% of the frame width, framed from the waist up, both hands opening outward in front of her chest as if she had just released something: from between her hands ONE campaign image BURSTS into DOZENS of thin frameless glowing screens of every real digital format — tall vertical 9:16 story screens, square 1:1 and 4:5 feed posts, wide 16:9 video frames, long horizontal web banners — all showing the SAME bold, vivid, art-directed campaign adapted to each format: saturated color-block graphics, a product close-up splashed with paint, a dancer mid-jump; they throw colored light in vivid orange, hot magenta, deep azure-blue (#0375DB), violet and teal (#36C8BF); any tiny text on them is too small and blurred to read, frozen mid-flight as they fly outward in every direction on the right side of the frame, some sharp, many motion-blurred, the nearest ones flying past the lens. She looks straight into the lens with a confident, knowing half-smile. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. She wears the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings. Her head stays almost frontal, both eyes and both eyebrows visible, and stays in the middle band of the frame height, never touching the top edge. The LEFT HALF of the frame (from 0% to 50% of the width) is calm, deep dark space with only faint haze: no cards, no screens, no beams, no light and no objects there; nothing crosses the vertical center line. The screens are the brightest objects; their colored light paints her face, hands and jacket. Hard cool rim light from behind. Enormous contrast, punchy, cinematic, no logos of any other brand, no readable text, no letters or numbers anywhere.",
+  "lecho": {
+    "objeto": "the near corner of a dark walnut editing desk with a black wireless mouse on it, the lens only a few centimetres behind its near edge, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 50% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "suspendido": "dozens of format screens frozen mid-burst around her open hands"
+}

@@ -1,0 +1,1010 @@
+[
+  {
+    "id": "C01-CTA-neutro",
+    "canon": "2026-09-23",
+    "firmaCanto": 2.21,
+    "dominante": [
+      "Seguiría siendo tu marca."
+    ],
+    "ratioDominanteEntrada": 3.1,
+    "contraste": {
+      "entrada": 16.03,
+      "dominante": 16.07,
+      "cierre-frase": 15.8,
+      "cta": 16.08,
+      "descriptor": 16.16,
+      "logo": 17.71
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 10,
+        "ratioDominante": 0.105
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 10,
+        "ratioDominante": 0.105
+      }
+    ],
+    "seleccion": null,
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "Podrías tapar el logo."
+      ],
+      "cierre": [
+        "Identidad propia en cada canal."
+      ],
+      "cta": [
+        "Conoce nuestro trabajo"
+      ],
+      "descriptor": [
+        "Efeonce · Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "entrada": {
+          "cssPx": 10.5,
+          "grande": false,
+          "wcag": 15.98,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.56,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1912,
+            "caja": [
+              86,
+              86,
+              343,
+              114
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 32.2,
+          "grande": true,
+          "wcag": 16.07,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -105.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.76,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 28598,
+            "caja": [
+              86,
+              123,
+              864,
+              205
+            ]
+          }
+        },
+        "cierre-frase": {
+          "cssPx": 9.5,
+          "grande": false,
+          "wcag": 15.8,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.3,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2676,
+            "caja": [
+              86,
+              214,
+              535,
+              243
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11.8,
+          "grande": false,
+          "wcag": 16.08,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 16.26,
+            "deutan": 15.94,
+            "tritan": 16.08
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.94,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 4920,
+            "caja": [
+              106,
+              277,
+              530,
+              316
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 16.08,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 16.26,
+            "deutan": 15.94,
+            "tritan": 16.08
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 14.14,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.02
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 16.15,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.98,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1937,
+            "caja": [
+              86,
+              349,
+              440,
+              378
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Tres pantallas reales muestran una familia visual azul y lima en soportes de tamaños distintos; una directora de arte sostiene el móvil. Texto en la imagen: «Podrías tapar el logo.» «Seguiría siendo tu marca.» «Identidad propia en cada canal.» Llamado a la acción: «Conoce nuestro trabajo» Efeonce · Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "b444fd5fcdfa2cabcaae21687f8dae296ea1d5c80b12c2b6aa8c1a65d8c9fc7c",
+      "cobertura": 0.1317
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8903,
+      "trazo": {
+        "wcag": 17.74,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      }
+    },
+    "huellas": {
+      "pieza": "755ed343ab58652ae18915175db4075ad8acf03b93cb879c2cbb909cca27bf57",
+      "plate": "b60474c30c01dae914939c3c804bc215e7099c94cf1239c65b61d6007cbcc284",
+      "compositor": "b9282e3fc24115a30a5d7838807c08597cce872647faac29ae7d576e7ba92341",
+      "png": "453fc99e97a7924996519f0dc299e54c1ee9bd82a52e01f76ef95672b7d02a64",
+      "layout": "35072d69a6e70c731de85ffffb02e9e4172ab2e49a996ed6743dcd1b2e742808",
+      "alt": "3c216a659cff2ccce64f06257f2dd4806b447840f7e35599cc27cfbfdb4b0eef"
+    }
+  },
+  {
+    "id": "C02-CTA-neutro",
+    "canon": "2026-09-23",
+    "firmaCanto": 1.58,
+    "dominante": [
+      "merece una imagen propia."
+    ],
+    "ratioDominanteEntrada": 3.1,
+    "contraste": {
+      "entrada": 14.69,
+      "dominante": 15.4,
+      "cierre-frase": 15.34,
+      "cta": 15.32,
+      "descriptor": 15.09,
+      "logo": 6.66
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 10,
+        "ratioDominante": 0.105
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 10,
+        "ratioDominante": 0.105
+      }
+    ],
+    "seleccion": null,
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "Tu próximo capítulo"
+      ],
+      "cierre": [
+        "Marca y campañas para lo que viene."
+      ],
+      "cta": [
+        "Hablemos de tu marca"
+      ],
+      "descriptor": [
+        "Efeonce · Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "entrada": {
+          "cssPx": 10.5,
+          "grande": false,
+          "wcag": 14.69,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -104.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 14.69,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1777,
+            "caja": [
+              86,
+              86,
+              328,
+              113
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 32.2,
+          "grande": true,
+          "wcag": 15.4,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -105,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.01,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 30466,
+            "caja": [
+              86,
+              122,
+              919,
+              204
+            ]
+          }
+        },
+        "cierre-frase": {
+          "cssPx": 9.5,
+          "grande": false,
+          "wcag": 15.34,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.07,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2924,
+            "caja": [
+              86,
+              213,
+              615,
+              243
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11.2,
+          "grande": false,
+          "wcag": 15.32,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 15.36,
+            "deutan": 15.32,
+            "tritan": 15.36
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.03,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 4171,
+            "caja": [
+              106,
+              277,
+              489,
+              303
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 15.28,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 15.35,
+            "deutan": 15.18,
+            "tritan": 15.3
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 11.11,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.02
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 15.09,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -104.8,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 14.69,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1919,
+            "caja": [
+              86,
+              336,
+              440,
+              365
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Una responsable entra en una instalación digital con dos pantallas que comparten un lenguaje visual azul y una abertura luminosa naranja. Texto en la imagen: «Tu próximo capítulo» «merece una imagen propia.» «Marca y campañas para lo que viene.» Llamado a la acción: «Hablemos de tu marca» Efeonce · Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "6b65ecce87e828c543976dd20c4b4352d42dcc08f8e6aa975b51c160cfb35544",
+      "cobertura": 0.0984
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8903,
+      "trazo": {
+        "wcag": 6.75,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      }
+    },
+    "huellas": {
+      "pieza": "c841eca2637c8583c129bb7ca01483c51e6566567da21681083d0215617d1318",
+      "plate": "72aa0852e3c40f37e94b5f6a91108ca94f1fdb7b501463e48e306815ed407a2d",
+      "compositor": "b9282e3fc24115a30a5d7838807c08597cce872647faac29ae7d576e7ba92341",
+      "png": "32a6a574ca78699b963eb3b3e00b9c6b95b16261150aa150287300a805298d4d",
+      "layout": "076e50064195ddc226ef81ce521ef7ab4649d3be560b087b865e715bf44644c5",
+      "alt": "26af00511da9f0dbc131591d566e02e0a75419001379c7d5abe26e349d732842"
+    }
+  },
+  {
+    "id": "C03-CTA-neutro",
+    "canon": "2026-09-23",
+    "firmaCanto": 4.22,
+    "dominante": [
+      "Ningún detalle casual."
+    ],
+    "ratioDominanteEntrada": 3.1,
+    "contraste": {
+      "entrada": 15.68,
+      "dominante": 16.08,
+      "cierre-frase": 15.85,
+      "cta": 15.8,
+      "descriptor": 15.33,
+      "logo": 19.02
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 10,
+        "ratioDominante": 0.105
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 10,
+        "ratioDominante": 0.105
+      }
+    ],
+    "seleccion": null,
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "Seis segundos."
+      ],
+      "cierre": [
+        "Dirección creativa en cada instante."
+      ],
+      "cta": [
+        "Descubre cómo lo hacemos"
+      ],
+      "descriptor": [
+        "Efeonce · Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "entrada": {
+          "cssPx": 10.5,
+          "grande": false,
+          "wcag": 15.68,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105.3,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.5,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1392,
+            "caja": [
+              86,
+              86,
+              272,
+              113
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 32.2,
+          "grande": true,
+          "wcag": 16.08,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -105.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.64,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 26274,
+            "caja": [
+              86,
+              122,
+              756,
+              204
+            ]
+          }
+        },
+        "cierre-frase": {
+          "cssPx": 9.5,
+          "grande": false,
+          "wcag": 15.85,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.45,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2785,
+            "caja": [
+              86,
+              213,
+              589,
+              237
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11.8,
+          "grande": false,
+          "wcag": 15.8,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 15.92,
+            "deutan": 15.74,
+            "tritan": 15.79
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.56,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 5634,
+            "caja": [
+              106,
+              271,
+              602,
+              301
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 15.79,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 15.91,
+            "deutan": 15.73,
+            "tritan": 15.79
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 9.8,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.02
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 15.36,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 14.89,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1929,
+            "caja": [
+              86,
+              334,
+              440,
+              363
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Un monitor muestra un perfume ficticio mientras una mano ajusta el color del fotograma en una consola de edición. Texto en la imagen: «Seis segundos.» «Ningún detalle casual.» «Dirección creativa en cada instante.» Llamado a la acción: «Descubre cómo lo hacemos» Efeonce · Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "e2e5b2b7dac98a4af4b05d861bd93862d7c9809b61d3e9eab1ade07577563a8b",
+      "cobertura": 0.0635
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8903,
+      "trazo": {
+        "wcag": 19.24,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      }
+    },
+    "huellas": {
+      "pieza": "71c60d602a21a93f1e22c3d14c02b4880bee8b8020e63479028d05ed4d39d1d6",
+      "plate": "29cbfba256372969918d804b0641016ac74f8c557da30c54e5c803340cea55a8",
+      "compositor": "b9282e3fc24115a30a5d7838807c08597cce872647faac29ae7d576e7ba92341",
+      "png": "0aac3a99077c88774d113a1ab5d7d14d9f34b586c049c7c022f79e8ab6a453ae",
+      "layout": "2f3826518cc3dcefa6ae4303c0d7cb6561c2270e8a0b32b45d57ebc50bf338e5",
+      "alt": "782491ea13721350fb04c2ab8bb6eaa45f71e138d727f219faa613a8053d61f6"
+    }
+  },
+  {
+    "id": "C04-CTA-neutro",
+    "canon": "2026-09-23",
+    "firmaCanto": 1.4,
+    "dominante": [
+      "La exigencia también escala."
+    ],
+    "ratioDominanteEntrada": 3.2,
+    "contraste": {
+      "entrada": 17.35,
+      "dominante": 16.09,
+      "cierre-frase": 17.2,
+      "cta": 16.83,
+      "descriptor": 17.4,
+      "logo": 20.14
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 10,
+        "ratioDominante": 0.1
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 10,
+        "ratioDominante": 0.1
+      }
+    ],
+    "seleccion": null,
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "Producción creativa"
+      ],
+      "cierre": [
+        "Design Ops e IA con criterio."
+      ],
+      "cta": [
+        "Hablemos de tu producción"
+      ],
+      "descriptor": [
+        "Efeonce · Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "entrada": {
+          "cssPx": 10.5,
+          "grande": false,
+          "wcag": 17.35,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -106.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 17.17,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1796,
+            "caja": [
+              86,
+              86,
+              331,
+              109
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 33.9,
+          "grande": true,
+          "wcag": 16.07,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -105.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 15.76,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 35998,
+            "caja": [
+              86,
+              118,
+              1007,
+              205
+            ]
+          }
+        },
+        "cierre-frase": {
+          "cssPx": 9.5,
+          "grande": false,
+          "wcag": 17.2,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -106.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 17.02,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2157,
+            "caja": [
+              86,
+              214,
+              471,
+              244
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11.5,
+          "grande": false,
+          "wcag": 16.83,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -106.2,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 16.86,
+            "deutan": 16.83,
+            "tritan": 16.79
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 16.64,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 5536,
+            "caja": [
+              106,
+              278,
+              585,
+              316
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 16.83,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 16.84,
+            "deutan": 16.83,
+            "tritan": 16.79
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 10.06,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.02
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 17.42,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -106.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 17.24,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1931,
+            "caja": [
+              86,
+              349,
+              440,
+              378
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Dos integrantes del equipo revisan una familia diversa de aplicaciones digitales en un muro de pantallas. Texto en la imagen: «Producción creativa» «La exigencia también escala.» «Design Ops e IA con criterio.» Llamado a la acción: «Hablemos de tu producción» Efeonce · Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "04657979dd7693e03cca7d3abbfb51c1542906e9b9de8eceb50d4039733882bc",
+      "cobertura": 0.0958
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8903,
+      "trazo": {
+        "wcag": 20.14,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      }
+    },
+    "huellas": {
+      "pieza": "f8e915693e21435f803dc143a22908534f4d682534d34211a0e60c838692fcc7",
+      "plate": "fa52a4894cf7e3b482bbce2fdc51aa929faa860351bb92886996864052674e33",
+      "compositor": "b9282e3fc24115a30a5d7838807c08597cce872647faac29ae7d576e7ba92341",
+      "png": "3a00fadcb89b5899ed42c4511db8c2e7b68b875f9aa1ea1f59bae3bdb7e75dac",
+      "layout": "903a1630cb5c69ac4cbe7fc349b205daa031006094e45d84dc9edd5f4530e55c",
+      "alt": "8f02e6e4d69a7ebf861f279496a2c0024f33f84e21d082b47716b76ea5093f27"
+    }
+  }
+]

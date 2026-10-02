@@ -1,0 +1,21 @@
+  $ costo: sin estimación (slug fuera del registro) · revisa fal.ai/models/tripo3d/tripo/v2.5/multiview-to-3d
+→ tripo3d/tripo/v2.5/multiview-to-3d · hasta 900s de espera
+  ⋯ encolado · request_id 01a0fa02-beed-7950-8530-3e02ccd78dea · cuenta FAL_API_KEY_B
+{
+  "task_id": "358f5054-80cb-40fb-8d46-d7ce6cc730c6",
+  "model_mesh": null,
+  "base_model": null,
+  "pbr_model": {
+    "url": "https://v3b.fal.media/files/b/0aacb2b1/5D0pcWHerKYG67VM2kyln_tripo_pbr_model_358f5054-80cb-40fb-8d46-d7ce6cc730c6.glb",
+    "content_type": "application/octet-stream",
+    "file_name": "tripo_pbr_model_358f5054-80cb-40fb-8d46-d7ce6cc730c6.glb",
+    "file_size": 11379644
+  },
+  "rendered_image": {
+    "url": "https://v3b.fal.media/files/b/0aacb2b1/YUJnPQsVDO92mNYo_LjOQ_legacy_mesh.webp",
+    "content_type": "application/octet-stream",
+    "file_name": "legacy_mesh.webp",
+    "file_size": 169566
+  }
+}
+  ✓ sin assets descargables · 103092 ms

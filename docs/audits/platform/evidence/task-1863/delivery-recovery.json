@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-09-28T10:22:31.406Z",
+  "actor": "user-agent-e2e-001",
+  "recovery": "canonical finalizeRunDelivery; persisted observations only",
+  "runs": [
+    {
+      "publicId": "EO-GRUN-00061",
+      "country": "CL",
+      "delivery": "ready"
+    },
+    {
+      "publicId": "EO-GRUN-00062",
+      "country": "CO",
+      "delivery": "ready"
+    },
+    {
+      "publicId": "EO-GRUN-00063",
+      "country": "MX",
+      "delivery": "ready"
+    },
+    {
+      "publicId": "EO-GRUN-00064",
+      "country": "PE",
+      "delivery": "ready"
+    }
+  ]
+}

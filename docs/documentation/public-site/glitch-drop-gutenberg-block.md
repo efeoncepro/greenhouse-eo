@@ -14,12 +14,12 @@ The long-lived target is a dedicated Gutenberg block, not a styled `core/quote`.
 
 ## Status
 
-- Current runtime: existing posts may still use quote/freeform fragments.
+- Current runtime: `efeoncepro/glitch-drop` is **live** on efeoncepro.com (plugin `efeonce-editorial-blocks` v0.1.0, activated 2026-07-04). Glitch posts use it since #14 (34 drops in 6 posts as of 2026-09-28); older posts may still carry quote/freeform fragments.
 - Target block: `efeoncepro/glitch-drop`.
 - Visible/editorial name: `Glitch`.
 - Target owner: a public-site/editorial WordPress plugin, tentatively
   `efeonce-editorial-blocks`.
-- Implementation state: planned; no runtime block exists yet.
+- Implementation state: **implemented and live — callout v1** (dynamic block, text in the `content` attribute). Callout v2 is approved in the Glitch norm (§5) but not deployed yet. Agent authoring: `GutenbergArticleSpec` `{ kind: 'glitchDrop', lines }` since 2026-09-28 (serialized like WordPress, validated in its governed shape, redundancy warning); see `.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md` (§Extensión de GutenbergArticleSpec). The marker recipe (§Glitch Drop por marcador) is historical/fallback.
 - Canonical docs:
   - This contract.
   - `docs/documentation/public-site/gutenberg-post-authoring-recipes.md` for

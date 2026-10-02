@@ -1,0 +1,177 @@
+{
+  "prenda": "Traje biónico de Nexa y sus lentes biónicos (ficción del registro cine)",
+  "decision": "Diseño fijado desde el plate aprobado NX5b y aprobado por el operador el 2026-10-01/02 (TASK-1940): hoja de diseño, Nexa con el traje y lentes. Isotipo movido sobre el pecho; logo completo serigrafiado en la espalda; la referencia lleva las marcas ya armadas para que el modelo no las borre ni las reinvente.",
+  "regla_de_uso": "SÓLO Nexa y SÓLO en registro cine. foto:prompt aborta si la ficha lo pide para otra persona o sin \"registro\": \"cine\" (validarTrajeNexa). Nunca en documental ni en personas del equipo.",
+  "invariantes": {
+    "construccion": "body de una pieza en punto técnico navy mate; placas blancas mate (polímero inyectado, satinado) en hombros, pecho (pechera + placa abdominal), brazos bajo una correa oscura y antebrazos; una placa dorsal entre los omóplatos; cinturón navy oscuro; cuello redondo navy; piernas sin placas",
+    "luz": "costuras LED azul #0375DB en los bordes de las placas, los costados del torso y el exterior de las piernas",
+    "marca_pecho": "isotipo oficial navy INCRUSTADO al ras de la pechera, sobre el pecho, en el lado izquierdo de quien lo lleva, ≈ un cuarto del ancho de la pechera; sin borde, relieve ni brillo",
+    "marca_espalda": "logotipo completo «efeonce» (la nave en la «o») centrado entre los omóplatos, SERIGRAFIADO en tinta navy levemente metálica",
+    "lentes": "una mica envolvente sin marco de policarbonato transparente apenas teñido de azul, línea LED azul #0375DB en el borde superior, puente y patillas transparentes; los ojos se ven a través; sin logo"
+  },
+  "tecnica_de_marca": {
+    "pecho": {
+      "tecnica": "incrustado",
+      "comando": "pnpm foto:isotipo <plate> --centro x,y --ancho w --prenda clara --sin-limpiar --acabado --superficie \"a smooth matte white armored chest plate of a futuristic suit\"",
+      "medidas": {
+        "01-frente": {
+          "centro": [
+            0.559,
+            0.155
+          ],
+          "ancho": 0.061
+        },
+        "03-tres-cuartos-izquierda": {
+          "centro": [
+            0.484,
+            0.143
+          ],
+          "ancho": 0.046
+        },
+        "10-detalle-placa": {
+          "centro": [
+            0.67,
+            0.47
+          ],
+          "ancho": 0.18
+        },
+        "13-puesto-frente": {
+          "centro": [
+            0.558,
+            0.255
+          ],
+          "ancho": 0.048
+        }
+      },
+      "brillo": 0.85,
+      "nota": "medidas sobre la vista de 1024 px antes de la entrega; en fracciones, sobreviven al reescalado"
+    },
+    "espalda": {
+      "tecnica": "serigrafiado (tinta navy metálica)",
+      "comando": "pnpm foto:isotipo <plate> --marca logotipo --centro 0.501,0.118 --ancho 0.118 --prenda clara --sin-limpiar --acabado --tecnica \"screen-printed with a slightly metallic navy ink, as on an aerospace metal panel…\""
+    },
+    "en_escena": "la referencia lleva ambas marcas armadas y el macro viaja a la escena (macroEnUso); verificar con pnpm foto:emblema y recomponer con foto:isotipo sólo si difieren"
+  },
+  "como_usarla": "Por catálogo, nunca descrito a mano: objetos: [{ objeto: \"traje-bionico-nexa\" }, { objeto: \"lentes-bionicos-nexa\" }] y \"registro\": \"cine\". Sin vista llega la pieza PUESTA en Nexa (13); de espaldas, { puesta: \"espalda\" } (14). La vista aislada (vista: …) es para construir, no para escenas. Escena con Sparks: dos con referencia como máximo (registro cine, delta 2026-10-02).",
+  "vistas": [
+    {
+      "id": "01-frente",
+      "descripcion": "Traje solo, frente (maniquí invisible), isotipo en el pecho",
+      "cuando_usarla": "construcción; tomas frontales",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-01-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-traje-bionico-nexa-01-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "02-espalda",
+      "descripcion": "Traje solo, espalda, logo completo serigrafiado en la placa dorsal (v02)",
+      "cuando_usarla": "construcción; tomas de espaldas",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-02-espalda-1600x1600-v02-fondo-estudio.png",
+      "archivo_transparente": "efeonce-traje-bionico-nexa-02-espalda-1600x1600-v02-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "03-tres-cuartos-izquierda",
+      "descripcion": "Traje solo, tres cuartos hacia la izquierda",
+      "cuando_usarla": "construcción; tomas en tres cuartos",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-traje-bionico-nexa-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "04-tres-cuartos-derecha",
+      "descripcion": "Traje solo, tres cuartos hacia la derecha; el isotipo en el lado cercano",
+      "cuando_usarla": "construcción; tomas en tres cuartos del otro lado",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-04-tres-cuartos-derecha-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-traje-bionico-nexa-04-tres-cuartos-derecha-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "05-lateral",
+      "descripcion": "Traje solo, perfil derecho",
+      "cuando_usarla": "construcción; tomas de perfil",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-05-lateral-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-traje-bionico-nexa-05-lateral-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "10-detalle-placa-isotipo",
+      "descripcion": "Macro de la pechera con el isotipo incrustado",
+      "cuando_usarla": "viaja como macro en toda escena con el traje; QA del isotipo",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1600x1600-v01-fondo-estudio.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "13-puesto-frente",
+      "descripcion": "Nexa (identidad A) con el traje, de frente, sin lentes",
+      "cuando_usarla": "documento del kit: Nexa vestida de frente (lleva su cara; NO se pasa a escenas)",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-13-puesto-frente-1200x1600-v01-fondo-estudio.png",
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "13-puesto-frente-sin-rostro",
+      "descripcion": "La vista 13 recortada bajo el mentón: el traje puesto en el cuerpo de Nexa, sin cara",
+      "cuando_usarla": "ESCENA: la referencia por defecto del traje puesto. Sin rostro para que el modelo no copie el gesto de esa foto (2026-10-02)",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-13-puesto-frente-sin-rostro-1200x1330-v01-fondo-estudio.png",
+      "resolucion": [
+        1200,
+        1330
+      ]
+    },
+    {
+      "id": "14-puesto-espalda",
+      "descripcion": "Nexa con el traje, de espaldas, el pelo sobre el hombro y el logo dorsal a la vista (v02)",
+      "cuando_usarla": "ESCENA: tomas de espaldas (puesta: espalda)",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-14-puesto-espalda-1200x1600-v02-fondo-estudio.png",
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "20-lentes-frente",
+      "descripcion": "Lentes biónicos, frente",
+      "cuando_usarla": "construcción; referencia de los lentes en tomas frontales",
+      "archivo_fondo_estudio": "efeonce-lentes-bionicos-nexa-20-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-lentes-bionicos-nexa-20-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "21-lentes-tres-cuartos",
+      "descripcion": "Lentes biónicos, tres cuartos",
+      "cuando_usarla": "referencia por defecto de los lentes en escena",
+      "archivo_fondo_estudio": "efeonce-lentes-bionicos-nexa-21-tres-cuartos-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-lentes-bionicos-nexa-21-tres-cuartos-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    }
+  ],
+  "entrega": "entrega.mjs: lanczos3 + fondo de estudio extendido; transparentes con pnpm ai:image:rmbg y entrega.mjs --opacar (el matting dejaba las placas blancas semitransparentes)",
+  "costo_usd_aprox": 1.1
+}

@@ -1,0 +1,91 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "line": "engine",
+  "theme": "dark",
+  "recipe": "content-report-formats",
+  "voice": {
+    "eyebrow": "Un informe, cinco formatos",
+    "question": "¿Cómo te llega?",
+    "answer": [
+      "Como la",
+      "necesites"
+    ]
+  },
+  "body": "Cada mes la IA cruza tus datos y escribe la lectura; nuestro equipo la revisa. Tú solo la abres y la usas, **sin armar** reportes ni láminas.",
+  "productMark": {
+    "asset": "insights-lockup-negative",
+    "alt": "Efeonce | Insights"
+  },
+  "reportLabel": "Informe vivo · septiembre",
+  "kpis": [
+    {
+      "label": "Visibilidad en IA",
+      "value": "64%",
+      "delta": "▲ 9 pts"
+    },
+    {
+      "label": "Clics orgánicos",
+      "value": "12,4 k",
+      "delta": "▲ 18%"
+    },
+    {
+      "label": "Te citan en respuestas",
+      "value": "37",
+      "delta": "▲ 11"
+    }
+  ],
+  "trendTitle": "Visibilidad en IA · 6 meses",
+  "rankingTitle": "Quién aparece en las respuestas",
+  "ranking": [
+    {
+      "name": "Tu marca",
+      "share": 34
+    },
+    {
+      "name": "Rival A",
+      "share": 28
+    },
+    {
+      "name": "Rival B",
+      "share": 21
+    },
+    {
+      "name": "Rival C",
+      "share": 17
+    }
+  ],
+  "reading": "Subes por tus guías nuevas. En «precios» el rival A todavía te gana: ahí va el próximo contenido.",
+  "formats": [
+    {
+      "icon": "mail",
+      "title": "Correo",
+      "detail": "Te llega solo"
+    },
+    {
+      "icon": "web-mobile",
+      "title": "Web y celular",
+      "detail": "Lo revisas donde estés"
+    },
+    {
+      "icon": "presentation",
+      "title": "Presentación",
+      "detail": "Presentas sin PPT"
+    },
+    {
+      "icon": "pdf",
+      "title": "PDF A4",
+      "detail": "Listo para circular"
+    },
+    {
+      "icon": "deck",
+      "title": "Deck 16:9",
+      "detail": "El del comité, armado"
+    }
+  ],
+  "highlightedFormat": 3
+}

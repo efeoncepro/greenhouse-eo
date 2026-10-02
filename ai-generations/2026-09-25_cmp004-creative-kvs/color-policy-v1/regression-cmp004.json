@@ -1,0 +1,51 @@
+{
+  "ref": "HEAD",
+  "refSha": "19a00465c",
+  "candidato": "scripts/foto/componer-cta.mjs",
+  "resultados": [
+    {
+      "clave": "54dad40726c41f82",
+      "id": "CMP004-C02-KV-45",
+      "planes": [
+        "ai-generations/2026-09-25_cmp004-creative-kvs/piezas-45.json#CMP004-C02-KV-45"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-oHClRU/54dad40726c41f82"
+    },
+    {
+      "clave": "411e733f23b3c928",
+      "id": "CMP004-C01-KV-45",
+      "planes": [
+        "ai-generations/2026-09-25_cmp004-creative-kvs/piezas-45.json#CMP004-C01-KV-45"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-oHClRU/411e733f23b3c928"
+    },
+    {
+      "clave": "8584592b410b90b3",
+      "id": "CMP004-C03-KV-45",
+      "planes": [
+        "ai-generations/2026-09-25_cmp004-creative-kvs/piezas-45.json#CMP004-C03-KV-45"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-oHClRU/8584592b410b90b3"
+    },
+    {
+      "clave": "6a7b0630d8ab4422",
+      "id": "CMP004-C04-KV-45",
+      "planes": [
+        "ai-generations/2026-09-25_cmp004-creative-kvs/piezas-45.json#CMP004-C04-KV-45"
+      ],
+      "ref": "compone",
+      "cand": "compone",
+      "tipo": "igual",
+      "dir": "/var/folders/cc/vqgjwxy57bbb49rp6ncvrtt80000gn/T/foto-regresion-oHClRU/6a7b0630d8ab4422"
+    }
+  ]
+}

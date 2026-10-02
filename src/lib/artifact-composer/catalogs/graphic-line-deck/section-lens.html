@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · sección con lente</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `section-lens` (surface deck, tema oscuro, TASK-1928). La foto en la lente de la portada del deck, y fuera
+      de ella apagada: la pinta entera el motor de la línea gráfica con la pieza medida (el plate lo inyecta quien
+      compone). El arco es la navegación real: actual/total × 360° desde las 12. La voz a la izquierda, antes del anillo.
+      Sin logo, burbuja ni indicador chico. Referencia: DeckSeccionLente (D1-seccion-lente).
+    -->
+    <main class="gl-slide gl-sec gl-sec-plain" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-sec-backdrop" data-slot="lens">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-ring-small" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Sección 2 de 5 · Producción</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quién decide el corte?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">El dato</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+    </main>
+  </body>
+</html>

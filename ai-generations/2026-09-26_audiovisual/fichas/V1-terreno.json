@@ -1,0 +1,20 @@
+{
+  "formato": "16:9",
+  "impacto": true,
+  "id": "V1-terreno",
+  "palanca": "luz-motivada",
+  "objetos": [
+    {
+      "objeto": "gorra-efeonce",
+      "vista": "trucker-navy"
+    },
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "escena": "SCENE (documentary video keyframe, on location at a client's neighbourhood bakery at dawn): an Efeonce content producer in the Efeonce cap and the navy Efeonce hoodie, caught at the exact moment she crouches and films the baker pulling a tray of bread from the oven with a phone on a small gimbal; nobody looks at the lens. The open oven mouth is the brightest thing in the frame and its warm light, with cool daylight from the shop window, lights both faces and the steam. White tiled walls, steel racks, flour on the counter. One plain azure-blue (#0375DB) crate carries the only blue. 35mm f/2.8, wide shot, the two figures in the right two thirds. No readable signs or labels, unbranded.",
+  "lecho": {
+    "objeto": "the floury steel counter edge right at the lens, dissolved into blur",
+    "tono": "DARK near black"
+  }
+}

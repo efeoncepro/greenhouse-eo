@@ -1,6 +1,11 @@
 # DataForSEO — Resto del catálogo: Business Data, Merchant, App Data, Content Analysis, Content Generation, AI Optimization
 
 > **As-of:** 2026-08-06 · Fuente: documentación oficial `https://docs.dataforseo.com/v3/` + páginas de pricing `https://dataforseo.com/pricing/*`, verificadas hoy vía fetch directo.
+
+> **Inventario operativo 2026-09-28:** el
+> [`registro catalog-only`](../../../../docs/architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md)
+> enumera las 52 rutas Business Data, 40 Merchant, 40 App Data y 10 Content Analysis todavía bloqueadas. Conserva
+> método, uso eventual y gate por path; este dossier aporta semántica y pricing, no autorización.
 > **Nota de estructura de URLs:** la doc v3 fue reestructurada; las rutas canónicas hoy usan guiones (`/v3/business_data-social_media-overview/`), no slashes anidados. Varias URLs "clásicas" (`/v3/business_data/social_media/overview/`) devuelven **404** aunque la navegación aún las referencia.
 
 ---

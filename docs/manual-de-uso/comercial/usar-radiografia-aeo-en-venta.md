@@ -1,5 +1,7 @@
 # Manual de uso — Usar la Radiografía AEO en venta y educación
 
+> **Naming vigente:** la Radiografía AEO mantiene su nombre; muestra trabajo posible después del **Efeonce AEO Assessment** y su **Efeonce AI Visibility Report**, bajo la capacidad **Efeonce AEO**. `AI Visibility Grader` en los pasos existentes es el alias técnico del motor. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo de documento:** Manual de uso / runbook comercial
 > **Version:** 1.0
 > **Creado:** 2026-07-15 por Codex

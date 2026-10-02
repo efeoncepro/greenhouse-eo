@@ -1,0 +1,323 @@
+{
+  "template": "ContentFocus",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 150
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 240
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 370
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 170
+        },
+        "eyebrowPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-eyebrow-px=20px"
+        },
+        "eyebrowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cf-eyebrow-color=#9fb3c8"
+        },
+        "questionWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-question-width=400px"
+        },
+        "questionLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-question-leading=1.25"
+        },
+        "answerLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-answer-leading=0.92"
+        },
+        "answerTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-answer-tracking=-0.05em"
+        },
+        "answerInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-answer-inset=-12px"
+        },
+        "figureTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-figure-top=720px"
+        },
+        "figurePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-figure-px=110px"
+        },
+        "figureTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-figure-tracking=-0.04em"
+        },
+        "labelTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-label-top=840px"
+        },
+        "labelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-label-px=28px"
+        },
+        "labelWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-label-width=520px"
+        },
+        "labelInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-label-inset=2px"
+        },
+        "sourceTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-source-top=960px"
+        },
+        "sourcePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-source-px=17px"
+        },
+        "sourceColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cf-source-color=#7f93a8"
+        },
+        "outGray": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-out-gray=0.85"
+        },
+        "outBright": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-out-bright=0.32"
+        },
+        "veilColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-cf-veil-color=#021a33"
+        },
+        "veilOpacity": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-veil-opacity=60%"
+        },
+        "inBright": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-in-bright=1.12"
+        },
+        "inContrast": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-in-contrast=1.05"
+        },
+        "lightX": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-light-x=1150px"
+        },
+        "lightY": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-light-y=420px"
+        },
+        "lightR": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-light-r=360px"
+        },
+        "lightSoft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-cf-light-soft=78%"
+        }
+      }
+    },
+    "photo": {
+      "selector": "[data-slot='photo']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-plate-ref",
+          "example": "asset-ref:plate:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 320,
+          "resolver": "gl-alt",
+          "example": "Descripción de la imagen"
+        }
+      }
+    },
+    "light": {
+      "selector": "[data-slot='light']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-plate-ref",
+          "example": "asset-ref:plate:probe"
+        }
+      }
+    },
+    "orbit": {
+      "selector": "[data-slot='orbit']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 44,
+          "example": "¿Llegan las entregas a tiempo?"
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "resolver": "gl-answer",
+          "example": "siempre"
+        },
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 28,
+          "example": "Resultados · Sky Airlines"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 18,
+          "example": "Casi"
+        }
+      }
+    },
+    "figure": {
+      "selector": "[data-slot='figure']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "value": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 6,
+          "example": "88 %"
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 70,
+          "example": "de las entregas de Sky llegaron a tiempo en 12 meses."
+        }
+      }
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    }
+  }
+}

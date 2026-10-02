@@ -4,8 +4,9 @@
 > staging y producción, emisión e IA apagadas; render en producción (TASK-1846, §14.5); enlaces compartidos, correo
 > y recurrencia en producción con flags OFF (TASK-1848, release `bda1cf2cd938`, §14.6); catálogos v1 A4 (`report_pdf`)
 > y deck (`insights-deck`) en producción desde el 2026-09-24 (TASK-1847, complete 2026-09-25, §14.7); UI y vista web en
-> Think siguen pendientes (TASK-1849, TASK-1875); el rediseño premium aprobado el 2026-09-25 está **code complete,
-> rollout pendiente** (TASK-1888 §14.8, TASK-1889 §14.9; delta de §6). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
+> la vista web compartida en Think está en producción desde el 2026-09-28 (TASK-1875 complete, §14.10) y la UI del portal sigue
+> pendiente (TASK-1849); del rediseño premium aprobado el 2026-09-25, el contrato editorial v2 está **en producción y encendido desde el
+> 2026-09-26** (TASK-1888 §14.8) y los catálogos premium se registran en TASK-1889 §14.9 (delta de §6). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
 > rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
@@ -176,10 +177,10 @@ TASK-1846 incorpora únicamente la primitive domain-free, y TASK-1847 conserva l
 Versionar y fijar brand pack, fuentes, catálogo, plan y renderer. Fidelidad semántica/visual es obligatoria;
 igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la demuestra.
 
-### Delta 2026-09-25 — rediseño premium aprobado (contrato y catálogos construidos; rollout pendiente, §14.9)
+### Delta 2026-09-25 — rediseño premium aprobado (contrato en producción, §14.8; catálogos, §14.9)
 
-> **Estado (2026-09-25).** El contrato editorial v2 (TASK-1888) está **construido y apagado** detrás de
-> `INSIGHTS_EDITORIAL_V2_ENABLED` (code complete en `develop`, sin release; estado en §14.8). Las plantillas las
+> **Estado (2026-09-26).** El contrato editorial v2 (TASK-1888) está **en producción y encendido**:
+> `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y en el `ops-worker` (estado en §14.8). Las plantillas las
 > construye TASK-1889 (`ui-ux`); producción sirve lo que ya está desplegado (§14.7) hasta ese release.
 > Dirección visual y copia durable del canvas:
 > [`TASK-1889-efeonce-insights-premium-catalogs-direction.md`](../ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md).
@@ -192,7 +193,7 @@ igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la
 - **Una portada con variantes por módulo, nunca una por servicio.** Navy, o blanca (bloque navy arriba y título sobre
   papel) con variante de visibilidad (`seo`/`aeo`: logos de canal como satélites en la órbita) y variante creativa
   (`ico`: sin logos). La variante blanca la elige el catálogo desde los módulos y `channelId`, sin campo nuevo.
-- **Regla de resolución de portada (TASK-1888, construida).** `resolveInsightCover` (`contracts/cover.ts`): cambio en
+- **Regla de resolución de portada (TASK-1888, en producción).** `resolveInsightCover` (`contracts/cover.ts`): cambio en
   el encargo (`brand.coverTheme`, si ≠ `auto`) > preferencia de la organización (`insight_cover_preferences`, si ≠
   `auto`) > `auto`; `auto` = navy sólo si la organización tiene logo apto para fondo oscuro
   (`organizations.logo_on_dark_asset_id`), si no blanca. Una portada navy **nunca** lleva el logo por defecto: la
@@ -209,7 +210,7 @@ igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la
   byte). Cada plantilla renderizada con los datos de ejemplo del canvas debe quedar a **≤ 1 % de píxeles distintos**
   (`pixelmatch`, umbral 0,1) y la aprueba el operador página por página. Portada, apertura y contraportada del **deck**
   no están en el canvas: se derivan de A4 con aprobación del operador.
-- **Contrato editorial v2 (TASK-1888), aditivo y construido.** `ChartSpec` de 7 a 15 familias (las 8 nuevas describen
+- **Contrato editorial v2 (TASK-1888), aditivo y en producción.** `ChartSpec` de 7 a 15 familias (las 8 nuevas describen
   sus datos en `data`, tipo discriminado; todo número es un `factId`), con validación estructural en
   `contracts/chart-spec.ts` y de VALOR en `editorial/chart-values.ts`, que llama a la misma `chart-geometry.ts` que
   dibuja. Plan con campos opcionales: `chapter.opening`, `chapter.readings[]` (cifra principal, «Lo que significa»,
@@ -239,6 +240,171 @@ igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la
   relativa siguen validando.
 - **Primeras ediciones con el diseño nuevo:** Berel (`seo`/`aeo`) y Sky (`ico`), como informe **interno**, sin
   compartir con el cliente hasta la revisión del operador.
+
+### 6.1 Anatomía del informe live (Think, vigente desde 2026-09-28)
+
+Render de `InsightWebModelV1` en `efeonce-think` (TASK-1875; estado en §14.10; producción en `main` `544ecd4`). Código:
+`src/components/insights/` (`InsightReport.astro`, `ModuleScene.astro`, `ChartFigure.astro`, `FactMark.astro`),
+`src/lib/insights-{view,copy,tokens,chart-geometry,fixtures,accept}.ts`, `src/scripts/insights-report.ts`,
+`src/styles/insights.css`. `InsightReport.astro` es **el único render** de las dos rutas:
+`src/pages/insights/r/[token].astro` (SSR por request, `private, no-store`, `noindex, nofollow`, `no-referrer`; `?logo=1`
+y `?descargar=` en la misma URL) y `src/pages/insights/muestra.astro` (fixtures, prerender, `noindex`, fuera del
+sitemap). Contratos de UI: `docs/ui/wireframes/TASK-1875-*.md`, `docs/ui/flows/TASK-1875-*-flow.md`,
+`docs/ui/motion/TASK-1875-*-motion.md`; dossier `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/`.
+Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`). Ejemplo vivo del producto, con datos de ejemplo: la muestra
+`https://think.efeoncepro.com/insights/muestra`.
+
+> **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
+> capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a
+> paso de cada capítulo, sin «Qué mide este informe», sin «Cómo lo mediremos / Qué necesitamos», sin logo del cliente
+> y sin tasas del embudo. Eso llega con el modelo 1.1 (en staging) en el próximo release de Greenhouse; la muestra ya
+> lo enseña.
+
+**Secciones, en orden (`InsightReport.astro`):**
+
+| # | Sección | Qué hace |
+|---|---|---|
+| 1 | Hero oscuro | Órbita animada; lockup Efeonce \| Insights; chips de estado («Enlace vigente» + «vence el …», o «Muestra con datos de ejemplo»); kicker (título · período); titular = `executiveSummary[0]` (o `reportTitle`) partido por `splitLead`: cabeza peso 740, resto 340 en `ink-soft`; las demás afirmaciones como bajada; logo del cliente sobre placa blanca si `variant = default` (1.1, nunca en la muestra); meta (organización, edición, datos al); cue a `#hallazgos`. ≤ 720 px se ocultan el chip «vence» y el cue |
+| 2 | Aviso de período parcial | Sólo si `header.asOfMax` es anterior al cierre del período |
+| 3 | Topbar fija | Filtros Todo / SEO / Respuestas de IA / Entrega creativa (View Transitions; si el lector está más abajo, vuelve a `#hallazgos`); «Plan» sólo con acciones; «Presentar»; copiar enlace; «Descargar» la primera salida disponible; la órbita reaparece chica y marca el avance por secciones `[data-section]`. ≤ 720 px las acciones se ocultan |
+| 4 | `#hallazgos` «Lo esencial del mes» | Tiles (el primero a todo el ancho, cifra en acento) que se expanden en su lugar: conclusión, gráfico oscuro compacto, «Lo que significa» / «Próximo paso», hechos, Fuente, Datos al; «Copiar enlace a este hallazgo» y «Cerrar»; enlace directo `#h-<claimId>`; uno a la vez, Escape cierra. Cifra ausente = «Sin dato», nunca cero; `FactMark` Medido = anillo sólido, Estimado = punteado. Con 1.0 los tiles son las afirmaciones del resumen que citan hechos; con 1.1, `essentials` |
+| 5 | Decisión (sólo 1.1) | Etiqueta «Para decidir en la reunión»; `splitLead` pone la petición grande (Bricolage 680) y la lectura debajo (Poppins 400); enlace «Plan de acción →» |
+| 6 | Un `ModuleScene` por capítulo (`#cap-01`, `#cap-02`…) | Apertura del capítulo (1.1); figura principal = la primera con lectura, fija, avanza por pasos (cifra, conclusión, significado, próximo paso) observados con `rootMargin` −40 % / −45 %; el resto como beats alternados con la etiqueta de su familia; afirmaciones, hechos sueltos y límites debajo |
+| 7 | `#plan` | Contador; «Cómo lo mediremos» y «Qué necesitamos de ustedes» (1.1); acciones con chip de módulo |
+| 8 | `#metodologia` | `<details>` cerrado «Cómo se midió», bajada «Fuentes, cortes y límites de cada cifra.»; dentro: «Qué mide este informe» (`scopeLines`, sólo 1.1), metodología, «Límites de la edición», «Referencias» |
+| 9 | `#conversemos` **o** `#descargas` | Alternativas: `#conversemos` sólo en la muestra; `#descargas` sólo en el enlace compartido (outputs del grant, sin `web`; «No disponible en esta edición» si falta) |
+| 10 | Footer | Firma Efeonce, eslogan, contacto, aviso del enlace o de la muestra, línea legal |
+| 11 | Dock, modo presentación y toast | Dock sólo ≤ 720 px («Copiar enlace» + «Descargar» si hay descarga); diálogo de presentación; toast «Enlace copiado» (2200 ms) |
+
+**`splitLead`** (`insights-view.ts`): parte en los dos puntos si caen entre los caracteres 12 y 80 y quedan más de 20
+después; si no, en la primera oración de 12 a 110 caracteres; si no, todo es cabeza. El texto queda íntegro (`joiner`).
+
+**Modo presentación.** Láminas: portada (lockup negativo, kicker, titular en dos pesos, «Preparado para»), una por
+hallazgo, decisión (sólo 1.1), plan (primeras 5 acciones), cierre (logo Efeonce + eslogan). Teclas: flechas, Espacio,
+Re Pág / Av Pág, Inicio / Fin, Esc; clic en el escenario avanza; foco atrapado y devuelto al salir. Pantalla completa
+sólo ≥ 900 px y sin movimiento reducido; salir de pantalla completa cierra. Contador «n de t», progreso, pista oculta
+≤ 720 px. No es alcanzable en móvil (el botón vive en las acciones de la topbar, ocultas ≤ 720 px).
+
+**Estados** (`StatusScreen`, códigos en `[token].astro`, siempre en es-CL): `not_found` 404 (desconocido, vencido, mal
+copiado o flag `INSIGHTS_SHARING_ENABLED` OFF, indistinguibles), `gone` 410 (revocado o retirado), `rate_limited` 429,
+`error` 502. **Causas de 502:** fallo del fetch; cualquier no-2xx distinto de 404/410/429 (p. ej. 403 del WAF, 500/503);
+JSON inválido; major distinto de 1.x; payload sin `model` o `header` (`acceptSharedEdition` en
+`src/lib/insights-accept.ts`, la misma puerta para fixtures). Ninguno revela el nombre del cliente. El flag de sharing
+gobierna sólo la ruta con token: la muestra nunca llama a Greenhouse.
+
+**Descargas y logo.** `?descargar=` acepta sólo `report_pdf` y `deck_pdf`; sin archivo, 303 de vuelta al informe.
+`?logo=1` responde 404 si no hay logo. `x-vercel-protection-bypass` se envía sólo contra staging.
+
+**Gráficos.** `ChartFigure.astro` + `insights-chart-geometry.ts` dibujan las 15 familias de `ChartSpecV1`; el PDF sólo
+cuatro (§6.2). Toda cifra impresa sale del `display` del modelo; la geometría sólo produce posiciones y tamaños.
+Interruptor «Gráfico» / «Tabla» sólo con JS; grupos de barras como botones con tooltip y `aria-label`; nota «Barras con
+origen en cero.»; familia desconocida → «Esta figura se lee en su tabla equivalente.»; embudo «pasa el X» sólo con
+`funnelStepRates` (1.1). Color: Think copia 4 roles (actual `#023c70`, anterior `#1f9e94`, actual sobre navy
+`#36c8bf`, anterior sobre navy `#8aa8d8`); la 3.ª serie en adelante es `color-mix(actual 45 %)` y la ausencia, trama.
+
+**Motion** (`src/scripts/insights-report.ts`; tiempos en `insights-tokens.ts`): órbita de portada ≈ 2,1 s (anillo
+350 ms, recorrido 1100 ms tras 200 ms, halo 800 ms, curva `easeStandard`, todo desde `motion.orbitMs` desde Think
+`544ecd4`); anillo «en vivo» 2400 ms en bucle desde los 1600 ms. Entrada del hero 900 ms (retardos 120/220/360/460 ms);
+revelados `data-reveal` 32 px / 900 ms y `data-stagger` 24 px / 700 ms con pasos de 70 ms hasta el 6.º hijo
+(IntersectionObserver `threshold` 0,12, margen inferior −10 %); conteo 1100 ms (easeOutQuart) que termina exactamente
+en `display`; hallazgo que se despliega 520 ms con View Transitions si existe; gráficos 800–1400 ms. Mejora
+progresiva: sin JS la página queda completa; si el módulo no monta en 3 s, el failsafe retira **`ins-motion` e
+`ins-js`**; `prefers-reduced-motion` conserva la interacción sin animación.
+
+**Responsive, idioma, fuentes e impresión.** Breakpoints 1000 px y 720 px. Idioma sólo del chrome: es-CL por defecto,
+en-US cuando `model.locale` empieza por `en`; la muestra siempre es-CL; `og:locale` `es_CL`. Fuentes: Bricolage
+Grotesque Variable (opsz) + Poppins 400/500/600/800/800i/900i (7 archivos, 123 KB); `BaseLayout` carga además Geist.
+**La impresión es sólo un respaldo; el camino real para papel es el PDF descargable.** `@page` A4 14 mm; oculta
+topbar, dock, toast, cue, órbita, interruptor y presentación; repinta las secciones oscuras en blanco con texto navy;
+muestra las tablas; fuerza abierto «Cómo se midió»; usa los logos positivos (`.ins-print-only`); la evidencia de los
+hallazgos cerrados no se imprime.
+
+**OG y SEO.** `og-insights.png` 1200 × 630 sin datos (`scripts/build-insights-og.mjs`). Canonical `/insights` para la
+ruta con token y `/insights/muestra` para la muestra. La ruta con token no carga GTM y lleva `meta referrer
+no-referrer`; la muestra sí carga GTM a propósito (no hay token). El sitemap excluye `/insights/*`.
+
+**Muestra.** Organización «Marca de ejemplo», chip «Muestra con datos de ejemplo», aviso en el pie, CTA «Conversemos» →
+`mailto:sales@efeoncepro.com?subject=Efeonce Insights`, título «Muestra · Efeonce Insights»; conserva un código
+ficticio `EO-INS-000123 · versión 2`.
+
+**Verificación en Think.** `pnpm test:insights` (16 pruebas), `pnpm verify:insights` (incluye el fixture de versión 2 ⇒
+502 y la presencia/ausencia de «Qué mide este informe» con 1.1/1.0), `pnpm audit:insights-a11y` (AA y foco a 1440 y
+390); `scripts/capture-insights-report.mjs` regenera el dossier de 34 PNG (fuera de `package.json`). Claves de copy sin
+uso: `methodologyHeading`, `essentialsTitle`, `backToTop`.
+
+### 6.2 Catálogo de plantillas A4 y deck (vigente desde 2026-09-26)
+
+| `report_pdf` — `insights-report`, A4 794×1123 | Propósito | `deck_pdf` — `insights-deck`, 16:9 1280×720 |
+|---|---|---|
+| `ReportCoverPage` | Portada navy | `InsightsCoverSlide` (el deck siempre es navy) |
+| `ReportCoverLightPage` | Portada blanca con `scopeLines` y logos de canal (visibilidad) o sin ellos (creativa) | — |
+| `ReportIndexPage` | Índice con folio real | — |
+| `ReportSummaryPage` | Tesis, «Lo esencial» (≤ 5) y decisión | `InsightsSummarySlide` |
+| `ReportChapterPage` | Apertura navy: numeral, canales medidos, contenidos | `InsightsChapterSlide` |
+| `ReportNarrativePage` | Afirmación, párrafos, pullQuote y evidencia | `InsightsNarrativeSlide` |
+| `ReportReadingPage` | Lectura por figura | `InsightsReadingSlide` |
+| `ReportTablePage` | Tabla como tablero de barras, con continuación | — |
+| `ReportPlanPage` | Plan de acción | `InsightsPlanSlide` |
+| `ReportLimitsPage` | «Lo que esta edición no puede afirmar» | `InsightsLimitsSlide` |
+| `ReportBackCoverPage` | Contraportada: contacto, mercados, burbuja URL, redes | `InsightsBackCoverSlide` |
+| `ReportFigureComparisonPage` | `bar_grouped` con dimensiones métricas | `InsightsFigureComparisonSlide` |
+| `ReportFigureColumnsPage` | `bar`, o `bar_grouped` con canales distintos | `InsightsFigureColumnsSlide` |
+| `ReportFigureTargetsPage` | `bullet` | `InsightsFigureTargetsSlide` |
+| `ReportFigureTrendPage` | `line` | `InsightsFigureTrendSlide` |
+
+15 plantillas A4 y 12 láminas (`insights-deck-mapper.ts` declara `light: null` para la portada del deck). Las otras 11
+familias se rechazan en PDF con causa (`render/figure-slots.ts`); TASK-1902 (to-do) suma medidor y mapa de calor.
+Compartidos en `catalogs/insights-shared/` (`figure-svg.ts`, `figure-hooks.ts`, `editorial-resolvers.ts`, `channels.ts`,
+`layout-hooks.ts`). Fidelidad: 41 PNG de referencia en
+`docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs/paginas/`, tolerancia ≤ 1 % (§14.9).
+
+### 6.3 Marca de producto Insights: dónde se aplica y dónde falta
+
+Construcción y reglas en el manual de marca (`docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §7.1);
+archivos oficiales en `@efeoncepro/axis-brand-assets` 0.4.0 (`insights-logo-*`, `insights-isotype-*`,
+`insights-lockup-*`), generados por `scripts/brand/build-insights-logo.mjs`. Efeonce firma siempre; Insights acompaña.
+
+| Superficie | Estado | Dónde |
+|---|---|---|
+| Informe live (Think) | **Aplicada**: lockup negativo en pantalla, positivo en impresión, también en el modo presentación | `InsightReport.astro`; copias en `efeonce-think/public/branding/insights/` (5 SVG) |
+| Imagen al compartir (OG) de Think | **Aplicada** | `public/branding/insights/og-insights.png`, usada en `[token].astro` y `muestra.astro` |
+| Portadas y aperturas de capítulo PDF A4 y deck | **Tipográfica, no el archivo oficial**: logo Efeonce + filete + «INSIGHTS» en mayúsculas espaciadas (`text-transform: uppercase`, `letter-spacing: 0.34em`; no son versalitas reales) — clase `.brand-product` en A4 `report-cover*.html`, mini-lockup del pie de `report-chapter.html`; `.product` en deck `insights-cover.html` e `insights-chapter.html` (portada y pie) —, como aprobó el canvas de TASK-1889 | `report-cover.html`, `report-cover-light.html`, `report-chapter.html`, `insights-cover.html`, `insights-chapter.html`; los catálogos sólo traen `assets/brand/logo-*.svg` de Efeonce |
+| Correo de entrega | Falta: `EmailLayout` con `brand='efeonce'` | `src/emails/InsightsEditionDeliveryEmail.tsx` |
+| Favicon de Think | Falta: favicon genérico del hub | `efeonce-think/src/layouts/BaseLayout.astro` |
+| Receta de deck «resultados en vivo» | Usa el isotipo de Efeonce para la ficha de Insights | `deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` |
+| Portal (S1–S5) y MCP | Sin marca de producto | TASK-1849 (diseño); MCP sin superficie visual |
+| Dependencia en Greenhouse | Fija `@efeoncepro/axis-brand-assets` 0.3.5: no trae los assets de Insights | `package.json:419` |
+
+**Pendiente de decisión (gaps, sin regla aprobada):** si el lockup oficial (aprobado el 2026-09-28 en el canvas
+«Insights en vivo») reemplaza la composición tipográfica de las portadas PDF/deck; marca en correo, favicon, portal y
+receta del deck; tamaño mínimo del lockup (el ledger de la línea sugiere 18 px sólo para el logo). Hasta decidir, cada
+superficie sigue como está.
+
+**Decisión abierta — acento de «INSIGHTS» en las portadas navy del PDF.** En la portada A4 (`report-editorial.css:51`)
+y en la del deck (`insights-deck/insights-cover.html:40`) la palabra va en el acento (`navyAccent` = teal-500, 12 px),
+con proporciones propias (logo Efeonce 32 px, aire 16, filete 1 × 24 al 26 %). Choca con la regla del 2026-09-28
+(junto a Efeonce, Insights baja su brillo; sólo la esfera conserva el acento) y con «el acento nunca en texto
+< 24 px». Pendiente de decisión del operador; cambiarlo toca el contrato de fidelidad de TASK-1889.
+
+### 6.4 Candidatos a AXIS (follow-up, no implementado)
+
+Frontera vigente: AXIS publica valores, significado y activos; la UI de producto vive en sus consumidores hasta que un
+segundo consumidor real justifique extraerla. Insights ya tiene **dos consumidores con copias a mano**:
+
+- **Roles de color de datos:** `src/lib/artifact-composer/brand-packs/axis/editorial-roles.json` (PDF) copiados en
+  `efeonce-think/src/lib/insights-tokens.ts` («valores copiados 1:1 de AXIS … mientras Think no consuma los paquetes
+  privados»). Think copia sólo 4 roles (actual, anterior, y ambos sobre navy); oportunidad, ausencia y realce no
+  existen allí. La copia llegó a divergir: el dato «anterior» sobre papel era `#0e8c82` en Think; se resolvió el
+  2026-09-28 en Think `b3c5820`, que usa `#1f9e94` (`--axis-deck-role-dataPriorOnPaper` / teal-650), igual que los PDF
+  (3,29:1 como relleno sobre blanco: sirve para gráficos, nunca para texto chico).
+- **Geometría de las 15 familias:** `src/lib/artifact-composer/chart-geometry.ts` + `catalogs/insights-shared/figure-svg.ts`
+  (PDF) frente a `efeonce-think/src/lib/insights-chart-geometry.ts` + `ChartFigure.astro` (web), que declara seguir
+  «las mismas convenciones».
+
+Hoy la deriva se evita a mano. Extraerlos a AXIS (tokens de roles de datos y una geometría compartida) es **pendiente de
+decisión** del operador y de una task propia; mientras tanto, AXIS sólo publica una página de referencia en el Lab
+(`apps/lab/src/pages/references/insights.astro`, publicada el 2026-09-28, AXIS main `3dfbf0e`), no componentes ni
+contratos nuevos.
 
 ## 7. API, MCP y autorización
 
@@ -318,13 +484,38 @@ y auth en servidor.
   guarda sólo el digest sha256 (`token_digest` UNIQUE). URL: `${INSIGHTS_SHARE_PUBLIC_BASE_URL ??
   'https://think.efeoncepro.com'}/insights/r/<token>`, devuelta una única vez al crear.
 - **Respuesta:** `InsightSharedEditionResponseV1 {modelVersion, header, model, downloads, expiresAt}`, con
-  `InsightWebModelV1` (`modelVersion 1.0`, `contracts/web-model.ts`): resumen, capítulos (claims, `ChartSpecV1` +
+  `InsightWebModelV1` (`contracts/web-model.ts`): resumen, capítulos (claims, `ChartSpecV1` +
   tabla resuelta, tablas, límites), acciones sin `ownerRef`, metodología, referencias sin `evidenceRef` y hechos
   formateados por locale. Nunca `authoringMode`, `modelId`, prompts, historial ni ids de actor.
+- **`modelVersion` 1.1, aditiva sobre 1.0 (TASK-1875; en staging, sale a producción con el próximo release de Greenhouse —
+  producción sirve 1.0, que Think también acepta):**
+  `INSIGHT_WEB_MODEL_VERSION = '1.1'`. Suma, todos opcionales y sólo cuando el plan sellado es editorial v2 (§14.8):
+  `chapter.opening`, `chapter.readings[]` (`InsightWebReadingV1 {chartId, keyFigure?, conclusion?, meaning?,
+  nextStep}`, a lo más una por figura), `essentials`, `decision`, `measurement`, `ask`, `scopeLines`,
+  `chart.derived.funnelStepRates` (`{stageId, display}`, calculadas en `sharing/web-model.ts` con la misma
+  `funnelGeometry` de los PDF y `formatFactValue(…, 'percent', locale)`; la primera etapa va con `display: null` y un
+  embudo que crece no lleva tasas) y `header.clientLogo {href, variant: 'on_dark'|'default'}`. Un plan v1 se proyecta
+  igual que antes (spreads condicionales) y un consumidor 1.0 ignora lo nuevo; Think acepta cualquier `1.x`.
+- **Logo del cliente:** `GET /api/public/insights/shared/[token]/logo` sirve el logo sellado en `plan.cover` por
+  `downloadPrivateAsset`, con el mismo gate que la vista (`readSharedInsightClientLogo` en `sharing/public.ts`) y las
+  mismas cabeceras anti-cache/anti-índice. `header.clientLogo` sólo aparece si la portada sellada trae `logoAssetId` y
+  `logoVariant`.
 - **Semántica:** `404` = token desconocido, mal formado, expirado, flag OFF, org suspendida o módulo retirado
   (indistinguibles entre sí); `410` = revocado o edición retirada; `429` = rate limit; `503` sanitizado.
 - **Rate limit** (`insight_share_rate_buckets`, ventana por minuto sobre sujeto hasheado, UPSERT atómico): por IP
   300 vistas / 60 descargas por minuto; por grant 60 / 20. Si la base no responde, **falla cerrado**.
+- **Guard en el borde (TASK-1876, aplicado en staging 2026-09-28; producción en observe hasta el cutover):** delante de todo
+  `/api/public/**` —lector y proxy de descarga incluidos— hay un rate limit del Firewall de Vercel de 20 req / 10 s
+  por IP: `enforce` en staging/preview (429 desde el borde, sin invocar la función ni abrir conexión PostgreSQL) y
+  `observe` (sólo registro) en producción. Reglas versionadas en `src/lib/security/public-burst-guard/firewall-rules.ts`,
+  sincronizadas con `pnpm security:public-burst-guard [--apply]`. El rate limit del dominio (arriba; su 429 lleva
+  `Retry-After: 60` y deja evento `rate_limited`) sigue detrás sin cambios; el 429 del borde no trae ni lo uno ni lo
+  otro. El consumidor server-side de Think (TASK-1875) se exceptúa con una **condición explícita** en esas reglas,
+  nunca subiendo el límite para todos: la cabecera `x-efeonce-think-key` igual a la llave de Think no cuenta
+  (`buildPublicBurstGuardRule(spec, {thinkKey})` agrega la condición negada; `planPublicBurstGuardChanges` marca drift
+  si la regla viva no la tiene). La llave llega al script como `PUBLIC_BURST_GUARD_THINK_KEY` y a Think como
+  `GREENHOUSE_THINK_KEY`; nunca se imprime (aplicado el 2026-09-28: reglas releídas sin drift con la condición negada, según el cierre de TASK-1875).
+  Complemento: las sesiones PG de Vercel piden `idle_session_timeout=60s`.
 - **Cabeceras:** `Cache-Control: private, no-store, max-age=0`, `Pragma: no-cache`, `Referrer-Policy: no-referrer`,
   `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-Robots-Tag: noindex, nofollow, noarchive`, CSP
   `default-src 'none'; frame-ancestors 'none'`.
@@ -345,13 +536,19 @@ y auth en servidor.
 más las cabeceras de `hiring/assessment/public-session/http.ts`.
 
 **Dónde se renderiza (delta ADR 2026-09-15):** la vista compartida vive en el hub público `efeonce-think`
-(`think.efeoncepro.com`; ruta propuesta `/insights/r/<token>`, hermana de `/brand-visibility/r/<token>` del
-Grader). Greenhouse expone dos endpoints públicos sin sesión que TASK-1848 materializa: `resolveSharedEdition`
+(`think.efeoncepro.com`; ruta `/insights/r/<token>`, hermana de `/brand-visibility/r/<token>` del Grader,
+implementada por TASK-1875 como ruta SSR `src/pages/insights/r/[token].astro` — en producción desde el 2026-09-28; anatomía en §6.1). Greenhouse expone dos endpoints públicos sin sesión que TASK-1848 materializa: `resolveSharedEdition`
 (`GET /api/public/insights/shared/[token]` → `InsightWebModelV1`, proyección client-facing versionada del plan
 y el snapshot: capítulos, claims, `ChartSpecV1`, tablas, límites, metodología, referencias; nunca evidencia
 interna, prompts ni ids de actor) y `downloadSharedOutput` (proxy de PDF con chequeo de revocación). Think hace
 fetch **server-side por request** (el token no llega al browser, no hay pre-render ni cache), no re-deriva
-cifras ni consulta productores, y responde `not_found`/`gone` con pantallas seguras sin nombre de cliente.
+cifras ni consulta productores, y responde `not_found`/`gone` con pantallas seguras sin nombre de cliente. El
+cliente de Think (`src/lib/insights.ts`) envía server-side `x-efeonce-think-key` (`GREENHOUSE_THINK_KEY`) y, contra
+un deployment protegido, `x-vercel-protection-bypass` (`GREENHOUSE_API_BYPASS`); nunca registra el token. Descargas
+(`?descargar=<output>`) y logo (`?logo=1`) son relativos a la misma URL de Think, así que el token tampoco aparece en
+el HTML. El enlace sale de `buildInsightShareUrl` (correo en `delivery/dispatch.ts`, respuesta de creación en
+`sharing/commands.ts`) y por defecto apunta a Think de producción, que lee Greenhouse de producción: un token de
+staging da 404 allí; staging se prueba con Think local apuntando (`GREENHOUSE_API_BASE`) al `.vercel.app` de staging.
 Contrato de marca: tokens AXIS en Tailwind (mismo mecanismo del Grader), sin MUI. Cambiar el modelo web es
 bump de `modelVersion` con compatibilidad hacia atrás, como el `ReportArtifactModel` público del Grader.
 
@@ -402,6 +599,20 @@ genera borrador para revisión; autoemisión/envío exige autorización previa e
   `insights_edition_delivery_attachment` (estándar, con PDF; exige `acknowledgeIrrevocableAttachment=true`).
   Dominio de correo `insights`, marca Efeonce. Ambos sembrados `enabled=false` en `email_type_config`, que falla
   abierto si falta la fila. Template funcional `src/emails/InsightsEditionDeliveryEmail.tsx` (presentación: 1849).
+- **Presentación aprobada (2026-09-29), sin implementar.** El operador aprobó el diseño del correo de entrega (canvas
+  v21: enlace en escritorio y celular, y PDF adjunto) y lo declaró **una aplicación** de los módulos canónicos de correo
+  Efeonce —pie oscuro, CTA principal, tarjeta de agenda «Agendar una reunión» y bloque de marca con «Empower your
+  Growth»—, no la plantilla de los demás correos. Dirección:
+  `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`; canon en AXIS `v0.3.38` (contrato
+  `efeonce.email-modules` 0.1.0). El template actual no cambia hasta
+  [TASK-1944](../tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md), que construye los módulos y la
+  presentación; TASK-1849 conserva el cableado de los datos de la edición (hallazgos, cifras, tarjeta de decisión).
+  **Propósito decidido (operador, 2026-09-29):** los dos `EmailType` van a clientes y son `relationship_transactional`,
+  con la **excepción explícita** `efeonce-insights-delivery` que conserva el pie aprobado completo (agenda, redes,
+  preferencias y baja «Dejar de recibir estos informes»); los demás correos siguen la política de presentación. La
+  excepción se declara con aprobador, fecha y motivo en el registro de política (TASK-1764) y viaja al contrato
+  `efeonce.email-modules` `0.2.0` como `purpose` + `application` (publicado en `v0.3.39`, commit `1c18a2e`). Antes del primer envío la
+  baja tiene que funcionar (TASK-1774).
 - **Despacho:** projection `insights_delivery_dispatch` (lane `ops-reactive-notifications`) →
   `dispatchInsightDeliveryIntent`: claim atómico, revalida edición/persona/buzón; `share_link` usa
   `claimTokenSensitiveEmailIntent`, que crea la fila de `email_deliveries` y el grant (`source='delivery'`) en la
@@ -993,7 +1204,12 @@ sandbox «Greenhouse Demo» no sirve para este canary: sus espacios no tienen fi
 (correcto). El render es idempotente por salida viva: una edición ya renderizada devuelve su run anterior.
 El rediseño premium aprobado por el operador sigue en TASK-1888 (contrato) y TASK-1889 (catálogos).
 
-### 14.6 Estado de TASK-1848 — sharing, correo y recurrencia (en producción con flags OFF, 2026-09-18)
+### 14.6 Estado de TASK-1848 — sharing, correo y recurrencia (en producción; sharing ON desde 2026-09-28)
+
+> **Estado vigente (2026-09-28).** `INSIGHTS_SHARING_ENABLED` ON en Vercel Production desde 2026-09-28 (redeploy
+> `greenhouse-cssemzyzb`, canary de TASK-1875 verde, §14.10); correo (`INSIGHTS_DELIVERY_ENABLED`), recurrencia
+> (`INSIGHTS_SCHEDULES_ENABLED`) y emisión siguen OFF en producción. Las líneas «flags OFF en producción» de abajo son
+> el estado del 2026-09-18.
 
 > Los bloques «Construido» y «Pendiente» de abajo registran el estado al cerrar el código (commits locales, sin
 > deploy). **Superados** por el delta de producción al final de esta sección; se conservan como historia.
@@ -1054,13 +1270,15 @@ contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate`
 - **Incidente durante el canary — ISSUE-174:** una ráfaga concurrente de 64 requests al lector público dejó 86–88
   conexiones ociosas en la instancia Cloud SQL compartida durante 5 min. Corrección: TASK-1876 (P1, to-do). Regla:
   nunca probar límites con ráfagas concurrentes contra la base compartida.
+  *Delta 2026-09-28:* TASK-1876 aplicó el guard en el borde descrito en §8 (staging en `enforce`, verificado con
+  ráfaga controlada; producción en `observe` hasta el cutover a `enforce`, ≥ 2026-10-05).
 - **Sigue abierto:** lector web en Think (TASK-1875, ya desbloqueada: `InsightWebModelV1` y el resolver existen);
   `portal_link` `not_ready` (TASK-1849); in-app/Teams (TASK-690–693 / TASK-1849); recordatorios, preferencias y baja
   no existen en V1; TASK-1876. El encendido en producción espera a TASK-1875.
 
-### 14.8 Estado de TASK-1888 — contrato editorial v2 (code complete 2026-09-25, rollout pendiente)
+### 14.8 Estado de TASK-1888 — contrato editorial v2 (complete 2026-09-26, en producción y encendido)
 
-**Qué existe (en `develop`, sin release).**
+**Qué existe (en producción desde el release `0e87c7a443a2`, 2026-09-26).**
 
 | Pieza | Dónde | Estado |
 |---|---|---|
@@ -1076,8 +1294,8 @@ contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate`
 | Capability | `insights.cover_preference.manage` (Admin + Account); leer = `insights.report.read` | seed en `capabilities_registry` + grant |
 | Evento | `insights.cover_preference.updated` (`insight_cover_preference`) | catálogo actualizado |
 | Lanes | `GET/POST /api/platform/{app,ecosystem}/insights/cover-preference` | construidos (escritura ecosystem sólo binding interno) |
-| MCP | `get_insight_cover_preference`, `set_insight_cover_preference` (manifest 64 tools, hash `a08f649aab8f`) | en Greenhouse; federadas en [`efeonce-mcp#18`](https://github.com/efeoncepro/efeonce-mcp/pull/18) (gateway 1.9.0 sobre Marketing Studio 1.8.0, superficie 70 → 72; lectura con el scope base y escritura con `efeonce.mcp.insights.write` reusado, sin scope ni Entra nuevos), **sin merge ni deploy**: se despliega después del release de Greenhouse |
-| Flag | `INSIGHTS_EDITORIAL_V2_ENABLED` (Vercel + `ops-worker`, default OFF) | OFF en todo runtime |
+| MCP | `get_insight_cover_preference`, `set_insight_cover_preference` (manifest 64 tools, hash `a08f649aab8f`) | en Greenhouse; federadas por [`efeonce-mcp#18`](https://github.com/efeoncepro/efeonce-mcp/pull/18) (gateway 1.9.0 sobre Marketing Studio 1.8.0, superficie 70 → 72; lectura con el scope base y escritura con `efeonce.mcp.insights.write` reusado, sin scope ni Entra nuevos): mergeado `2cf78af91`, desplegado 2026-09-26 (run `36226550358`, revisión `efeonce-mcp-gateway-00062-ct5` al 100 %) |
+| Flag | `INSIGHTS_EDITORIAL_V2_ENABLED` (Vercel + `ops-worker`; el Job de render no lo lee) | **ON** desde 2026-09-26: Vercel staging, Vercel Production (`greenhouse-8hl5hf54w`) y `ops-worker-00719-gbm` (`deploy.sh` default `:-true`) |
 | Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | construido |
 
 **Verificado con datos reales (2026-09-25, sólo lectura, flag simulado ON en local).** Sky Airlines `EO-INS-000022`
@@ -1086,11 +1304,18 @@ contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate`
 24 hechos, 0 violaciones; sin línea (ventana de un mes parcial) y sin medidor (sin run AEO anterior), como dice la
 matriz. Ambas portadas resuelven blanca por `auto`: ninguna tiene logo para fondo oscuro.
 
-**Pendiente de rollout (no es «listo»).** Release de Greenhouse con el flag OFF; ediciones **internas** de Berel y Sky
-en staging con el flag ON sólo en **Vercel staging** (el `ops-worker` es compartido con producción: prenderlo ahí lo
-prende para producción); merge y deploy del PR de `efeonce-mcp` **después** de ese release; prender el flag en
-producción sólo junto al release de TASK-1889; el operador fija la preferencia de Berel y Sky y carga logos aptos
-para fondo oscuro si los hay.
+**Rollout 2026-09-26 (verificado).** Release `0e87c7a443a2` (código, flag OFF; canary de la lane ecosystem
+`cover-preference` 200) → gateway v1.9.0 → flag ON en Vercel staging, con ediciones internas v2 de Berel (`seo`+`aeo`) y
+Sky (`ico`) en `ready_for_review` sin emitir → fix del empate (la cifra principal de un empate es el valor empatado) →
+release `2add63c61fd6` **abortado** (al deploy del `ops-worker` le faltaba `DATAFORSEO_API_LOGIN`; rollback del flag
+verificado) → secretos del `ops-worker` reenviados por el release → release `f9257b9c94af` `released` → flag ON en
+Vercel Production y `ops-worker`. La primera canary de producción selló un plan v1: el valor de la var tenía, según
+Codex, un salto de línea final (el flag compara `=== 'true'`); corregido a `true` exacto y con redeploy, la canary
+sintética selló el plan v2 (3 `scopeLines`, `cover`, apertura en los 3 capítulos; `failed` en `validating` por snapshot
+vacío, como corresponde). Emisión, sharing y correo siguen OFF en Vercel Production. **Rollback:** flag OFF en los dos
+runtimes (`vercel env rm` + redeploy; `--update-env-vars INSIGHTS_EDITORIAL_V2_ENABLED=false` + `:-false` en
+`deploy.sh`). La preferencia de portada de Berel y Sky y los logos aptos para fondo oscuro los fija el operador cuando
+quiera; sin ellos, `auto` resuelve blanca.
 
 **Metas ICO: el registro manda.** La meta impresa sale de `ICO_METRIC_REGISTRY` (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5),
 que es lo que calcula el motor. El 2026-09-25 el operador lo fijó como fuente única del semáforo y la documentación
@@ -1102,9 +1327,16 @@ TASK-1900. Si el registro cambia, el informe lo sigue sin tocar este dominio.
 (`reading.conclusion`) tampoco. El medidor necesita que el adapter AEO elija el run por ventana (follow-up en el
 dominio del grader). Métricas por página o keyword de SEO, conjuntos por consulta de IA y embudo CRM siguen fuera.
 
-### 14.9 Estado de TASK-1889 — catálogos premium del canvas (code complete 2026-09-25, rollout pendiente)
+### 14.9 Estado de TASK-1889 — catálogos premium del canvas (complete 2026-09-26, en producción)
 
-**Qué existe (en `develop`, sin push ni release).** Commits: Slices 1–2 `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`); Slice 3
+> **Estado verificado 2026-09-26.** El código salió en el release `0e87c7a443a2` y quedó completo en producción con
+> `f9257b9c94af` (run `36236940651`, success, con el Job `artifact-worker` desplegado). El código de Insights en
+> `origin/main` es idéntico al de `develop` (blobs comparados; los releases son squash, así que la ancestría no sirve).
+> El operador aprobó el 2026-09-25 los PDFs internos de Berel y Sky y la estructura del deck. **Render real en
+> producción:** primeras ediciones internas renderizadas en producción con el diseño nuevo el 2026-09-26 — Berel `insed-7d470d9f-7119-4a84-b8af-c3fb584ceb92` (run `irun-dcd1fbed…`: A4 16 páginas + deck 15 láminas) y Sky `insed-9370d0cc-eb60-43c5-a547-70f10e011309` (run `irun-e5882459…`: A4 12 + deck 10), los cuatro PDF al primer intento (dispatcher 13:00Z, ejecución `artifact-worker-j47zl`). Emitir y compartir siguen OFF en producción.
+> `artifact-composer/chart-figure.ts` quedó retirado.
+
+**Qué se construyó (commits en `develop`).** Commits: Slices 1–2 `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`); Slice 3
 `5c2bcb5a1` (antes `4ff72fe3a`) (+ evidencia `8075a2930` (antes `2410e5156`)); Slice 4 `f0b0d78cc` (antes `3fa493efe`) (plantillas de figura) y `30c11aba7` (antes `85785e7fc`) (mappers + retiro del
 legado), docs `29a54885e` (antes `1120e86e4`)/`3709d9424` (antes `5968e35e8`); excepción aprobada `7ab466c88` (antes `289b6eca4`); «Lo esencial» `ae2c34b59` (antes `738ceb748`); correcciones por
 ediciones reales `198ce883a` (antes `b88fd447c`); dossier + scorecard `2f0776e0f` (antes `9529a1b25`).
@@ -1112,7 +1344,7 @@ ediciones reales `198ce883a` (antes `b88fd447c`); dossier + scorecard `2f0776e0f
 | Pieza | Dónde | Estado |
 |---|---|---|
 | Catálogos editoriales v2 | `artifact-composer/catalogs/insights-report` (A4 794×1123) e `insights-deck` (1280×720) | construidos; **sólo** diseño editorial v2 — la guarda `__tests__/insights-catalogs-v2-only.test.ts` no admite legado |
-| Legado retirado | `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `efeonce-insights/render/figure-pages.ts` y los resolvers v1 de barra/familia/path | borrado. `artifact-composer/chart-figure.ts` quedó sin consumidores (conserva su test); candidato a retiro en follow-up |
+| Legado retirado | `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `efeonce-insights/render/figure-pages.ts` y los resolvers v1 de barra/familia/path | borrado. `artifact-composer/chart-figure.ts` y su test, retirados el 2026-09-26 (sin consumidores) |
 | Páginas de figura (A4) | `report-figure-{comparison,columns,targets,trend}` → `ReportFigure{Comparison,Columns,Targets,Trend}Page` | construidas |
 | Láminas de figura (deck) | `insights-figure-{comparison,columns,targets,trend}` → `InsightsFigure{Comparison,Columns,Targets,Trend}Slide` | construidas |
 | Regla de familia (compartida por `report-mapper` e `insights-deck-mapper`) | `efeonce-insights/render/figure-slots.ts` | construida (ver abajo) |
@@ -1173,3 +1405,42 @@ canal `google` iban a un eje común (ahora comparación); la capitular quedaba s
 el control plane (el Job `artifact-worker` es único para staging y producción, así que el render nuevo llega a ambos
 con el release); aprobación del operador de las piezas derivadas y de los PDFs reales; una edición interna en
 producción antes de compartir con un cliente.
+
+### 14.10 Estado de TASK-1875 — vista web compartida en Think (complete 2026-09-28, en producción)
+
+> **Estado vigente (2026-09-28).** Task cerrada (`df6f37ccd`: `pnpm test` completo 16 474 en verde + `pnpm build` de
+> producción). Think en producción con `efeonce-think` `main` `544ecd4` (`/insights/r/<token>` y la muestra
+> `/insights/muestra`; después de `7485e32` entraron `b3c5820`, color del dato «anterior» igual al PDF, y `544ecd4`,
+> tiempos de la órbita desde tokens y «Qué mide este informe»); `INSIGHTS_SHARING_ENABLED=true` en Vercel Production (redeploy `greenhouse-cssemzyzb`);
+> WAF releído sin drift con la condición `x-efeonce-think-key`; canary de producción sobre `EO-INS-000014` verde (crear,
+> leer en Think, descargar por el proxy, revocar ⇒ 410, descarga ⇒ 303); major no soportado ⇒ 502 probado. Producción
+> de Greenhouse sirve `InsightWebModelV1` 1.0; el 1.1 queda en staging hasta el próximo release. Fuente:
+> `docs/tasks/complete/TASK-1875-efeonce-insights-shared-web-render-think.md` (Delta 2026-09-28 y Status real). Lo que
+> sigue abajo es el registro previo al despliegue y el orden de rollout que se ejecutó.
+
+
+**Estado al 2026-09-28 (histórico, antes del rollout; superado por el bloque de arriba):** código terminado en local, **nada desplegado**. Los commits de Greenhouse (`d45fc780f`,
+`27b458aec`) están en `develop` local sin push; los de `efeonce-think` están en su `main` local sin push (ese `main`
+despliega producción automáticamente). `INSIGHTS_SHARING_ENABLED` sigue igual: ON en staging, OFF en producción.
+
+**Greenhouse:**
+- `InsightWebModelV1` 1.1 aditivo (§8): campos editoriales v2 opcionales, tasas de paso del embudo derivadas con la
+  geometría de los PDF y `header.clientLogo`; ruta `GET /api/public/insights/shared/[token]/logo`. Tests:
+  `sharing.test.ts` +3 (plan v1 intacto; proyección v2 con tasas `[{a, null}, {b, '25,0 %'}]`; embudo que crece sin
+  `derived`); suite de sharing 21, dominio Insights 264, typecheck en 0.
+- Excepción de Think en el guard de `/api/public/**` por la cabecera `x-efeonce-think-key` (§8); 14 tests.
+
+**Think (`efeonce-think`):** ruta SSR `src/pages/insights/r/[token].astro`; modo presentación, impresión con
+respaldo, en-US, logo del cliente, tests (`pnpm test:insights`), auditoría AA y fuentes; scripts
+`verify-insights-report.mjs`, `audit-insights-a11y.mjs`, `capture-insights-report.mjs`. Dossier de UI en Greenhouse:
+`docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/` (scorecard promedio 4,56).
+
+**Rollout pendiente, en este orden y con gate del operador:**
+1. Generar la llave de Think; `GREENHOUSE_THINK_KEY` en el env de producción del proyecto Vercel de Think y
+   `PUBLIC_BURST_GUARD_THINK_KEY=… pnpm security:public-burst-guard --apply` (lo corre el operador) para que la regla
+   del WAF lleve la excepción ANTES de que Think salga.
+2. Push de `develop` → staging; verificar el modelo 1.1 con un grant sintético sobre la edición sandbox (crear →
+   render en Think local → revocar → 410 → descarga por el proxy).
+3. Release de Greenhouse a producción por el control plane.
+4. Push del `main` de Think (despliega producción).
+5. Encender `INSIGHTS_SHARING_ENABLED` en producción sólo con aprobación del operador.

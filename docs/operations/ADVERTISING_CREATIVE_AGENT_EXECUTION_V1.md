@@ -31,6 +31,10 @@ Si el brief pide evocar búsqueda con IA, una conversación LLM o citabilidad, c
 
 Esta biblioteca **no** modifica `axisAdvertising` ni implica que los gráficos estén aprobados o publicados como paquete/adapter/MCP. Cada pieza conserva brief, procedencia, verificación de fuentes, revisión visual y gate comercial. Nunca conviertas una muestra editorial en una supuesta respuesta real ni mezcles controles, citas o logos de proveedores. La lupa de Modo IA de Google no lleva aro arcoíris; la selección de búsqueda de ChatGPT no se añade al texto de la burbuja enviada.
 
+## Dónde viven los archivos de `ai-generations/`
+
+Las rutas `ai-generations/...` de este documento son **rutas lógicas**: el binario puede estar en disco, en el canon (`gs://efeonce-creative-canon`) o en el archivo (`gs://efeonce-group-greenhouse-private-assets-prod`, inventario en su `artifacts.remote.json`). Si falta en disco, `pnpm ai-gen:where <ruta>` y `pnpm ai-gen:pull <carpeta>` antes de componer; nunca regenerar, sustituir ni resellar el lock para tapar el faltante. Contrato: [`AI_GENERATIONS_STORAGE_V1.md`](AI_GENERATIONS_STORAGE_V1.md).
+
 ## Activación
 
 Los routers raíz y el manifiesto machine-readable cargan `efeonce-advertising-creative` cuando el pedido menciona
@@ -159,7 +163,7 @@ sujeto, las reservas de texto, el lecho ni la firma. Una lente u órbita por pie
   QA falla si la órbita cruza el campo de copy o un sujeto protegido.
 - Fuera del compilador: `pnpm creative:orbit:resolve` y `pnpm creative:orbit:render -- --intent <intent.json>
   --bindings <bindings.json> --out-dir <dir>` (adapter `scripts/creative/layout-compiler/graphic-line.mjs`, contrato
-  AXIS `efeonce.graphic-line-orbit` 0.2.0 en estado `candidate`; `bindings.protect` declara sujeto, reserva y lecho).
+  AXIS `efeonce.graphic-line-orbit` 0.3.0 en estado `stable`; `bindings.protect` declara sujeto, reserva y lecho).
   Sale con 1 si falla un check.
 - Los valores vienen de los tokens `efeonceGraphicLine` de AXIS; no se transcriben HEX ni px del manual. Canon:
   [ADR de la línea](../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) y

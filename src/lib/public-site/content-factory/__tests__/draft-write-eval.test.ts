@@ -38,6 +38,23 @@ describe('buildGovernedDraftWriteEval', () => {
     expect(php).toContain("<<<'GHCFWRITE'")
   })
 
+  it('slashes the insert payload so block-attribute escapes survive wp_unslash (glitch-drop, embeds, JSON-LD)', () => {
+    const withDrop = authorGutenbergDraft({
+      ...spec,
+      sections: [
+        ...spec.sections,
+        { level: 2, heading: 'El POV', blocks: [{ kind: 'glitchDrop', lines: ['Primera frase.', 'Segunda frase.'] }] }
+      ]
+    })
+
+    const phpWithDrop = buildGovernedDraftWriteEval({ draft: withDrop, authorId: 1, manifestId: 'greenhouse-cf-test-002' })
+
+    expect(phpWithDrop).toContain('wp_insert_post( wp_slash( array(')
+    expect(phpWithDrop).toContain(') ), true );')
+    expect(phpWithDrop).toContain(String.raw`{"content":"Primera frase.\u003cbr\u003eSegunda frase."}`)
+    expect(phpWithDrop).toContain("update_post_meta( $post_id, '_yoast_wpseo_metadesc', wp_slash( <<<'GHCFWRITE'")
+  })
+
   it('stamps ownership + Yoast SEO metadata', () => {
     expect(php).toContain("update_post_meta( $post_id, '_greenhouse_owned', '1' )")
     expect(php).toContain('_greenhouse_manifest_id')

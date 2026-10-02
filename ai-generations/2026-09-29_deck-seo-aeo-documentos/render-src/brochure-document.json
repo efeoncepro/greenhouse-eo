@@ -1,0 +1,917 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "brochure",
+  "line": "engine",
+  "sections": 5,
+  "pages": [
+    {
+      "role": "cover",
+      "recipe": "cover-brochure",
+      "layout": "line",
+      "voice": {
+        "eyebrow": "Brochure · Search Visibility 360",
+        "question": "¿Te encuentran Google y la IA?",
+        "answer": [
+          "Visible"
+        ]
+      },
+      "body": "**SV360**: SEO y AEO en un solo sistema\nAEO Assessment · AI Visibility Report · Insights",
+      "photo": {
+        "register": "cine",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png",
+        "alt": "Un ingeniero de Efeonce con polo toca una web holográfica que usan personas y pequeños agentes robot"
+      },
+      "column": {
+        "topPx": 220
+      }
+    },
+    {
+      "role": "decision",
+      "recipe": "decision-ai-market",
+      "voice": {
+        "eyebrow": "El contexto",
+        "question": "¿Dónde busca tu cliente?",
+        "answer": [
+          "En la IA"
+        ]
+      },
+      "body": "SEO te hacía competir por el ranking. AEO te hace competir por la **recomendación**: antes de que exista un clic.",
+      "figures": [
+        {
+          "value": "−27%",
+          "label": "El tráfico que llegaba solo ya no está garantizado.",
+          "source": "HubSpot",
+          "detail": "El tráfico orgánico de clientes HubSpot cayó 27% interanual.",
+          "year": "2026",
+          "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+        },
+        {
+          "value": "50%",
+          "label": "Tu comprador ya le pregunta a la IA qué elegir.",
+          "source": "McKinsey & Company",
+          "detail": "Uno de cada dos consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir compras.",
+          "year": "2025"
+        },
+        {
+          "value": "<1 en 100",
+          "label": "Aparecer una vez no es una estrategia.",
+          "source": "SparkToro",
+          "detail": "Los motores de IA casi nunca repiten la misma lista de marcas.",
+          "year": "2026",
+          "sourceLogo": "docs/assets/public-site/aeo-market-logos/sparktoro-logo.svg"
+        }
+      ]
+    },
+    {
+      "role": "decision",
+      "recipe": "decision-ai-answer",
+      "voice": {
+        "eyebrow": "Visibilidad en IA",
+        "question": "¿A quién recomienda la IA?",
+        "answer": [
+          "A tu",
+          "competencia"
+        ]
+      },
+      "body": "Cuando tu comprador pregunta por tu categoría, la IA ya tiene favoritas. El AEO trabaja para que la **próxima** respuesta te nombre.",
+      "prompt": "¿Cuáles son las mejores marcas de [tu categoría] en Chile?",
+      "today": {
+        "status": "Hoy",
+        "intro": "Estas son las opciones más recomendadas:",
+        "competitors": [
+          {
+            "name": "Competidor A",
+            "description": "Líder en recordación de la categoría.",
+            "citations": [
+              "comparador.cl",
+              "medio-sectorial.com"
+            ]
+          },
+          {
+            "name": "Competidor B",
+            "citations": [
+              "competidor-b.com"
+            ]
+          },
+          {
+            "name": "Competidor C"
+          }
+        ],
+        "absent": "Tu marca no aparece"
+      },
+      "withAeo": {
+        "status": "Con AEO",
+        "intro": "Para [tu categoría] en Chile, la opción más recomendada es:",
+        "client": {
+          "name": "Tu marca",
+          "description": "Referente de la categoría: casos verificables, precios claros y reseñas consistentes.",
+          "citations": [
+            "tumarca.com",
+            "medio-sectorial.com",
+            "comparador.cl"
+          ]
+        },
+        "competitors": [
+          "Competidor A",
+          "Competidor B"
+        ]
+      },
+      "engine": "Motor de IA",
+      "dataOrigin": "illustrative",
+      "mark": "Ejemplo ilustrativo · tu diagnóstico muestra tu situación real",
+      "selection": {
+        "target": "object",
+        "label": "Cliente",
+        "participantKind": "role"
+      }
+    },
+    {
+      "role": "section",
+      "recipe": "section-cine",
+      "layout": "about",
+      "voice": {
+        "eyebrow": "Quiénes somos",
+        "question": "¿Quiénes somos?",
+        "answer": [
+          "Un solo",
+          "equipo"
+        ]
+      },
+      "body": "Creatividad, datos, medios y tecnología en una misma mesa, con un solo interlocutor.",
+      "figures": [
+        {
+          "value": "+10",
+          "label": "años como agencia",
+          "source": "Efeonce, 2026"
+        },
+        {
+          "value": "5",
+          "label": "países",
+          "source": "Efeonce, 2026"
+        },
+        {
+          "value": "1",
+          "label": "interlocutor",
+          "source": "Efeonce, 2026"
+        }
+      ],
+      "photo": {
+        "register": "cine",
+        "subject": "nexa",
+        "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png",
+        "alt": "El equipo de Efeonce en el taller de noche, en pleno trabajo alrededor de una mesa de luz"
+      }
+    },
+    {
+      "role": "section",
+      "recipe": "section-split",
+      "voice": {
+        "question": "¿SEO o AEO?",
+        "answer": [
+          "Ambos"
+        ]
+      },
+      "progress": {
+        "sections": 5,
+        "current": 2
+      },
+      "photo": {
+        "register": "cine",
+        "subject": "object",
+        "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/SX4-busqueda-y-respuesta.png",
+        "alt": "Una caja de búsqueda y un composer de IA flotan en una nave oscura; sus haces de luz se unen en un solo punto sobre el piso"
+      },
+      "line": "growth",
+      "theme": "light"
+    },
+    {
+      "role": "section",
+      "recipe": "section-cine",
+      "layout": "team",
+      "voice": {
+        "eyebrow": "Nuestro equipo",
+        "question": "¿Quién ejecuta tu SEO?",
+        "answer": [
+          "Este",
+          "equipo"
+        ]
+      },
+      "photo": {
+        "register": "cine",
+        "subject": "nexa",
+        "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+        "alt": "Nexa al frente del equipo de Efeonce con sus uniformes y cinco agentes mini robots, todos mirando a cámara"
+      }
+    },
+    {
+      "role": "proposal",
+      "recipe": "proposal-cinematic",
+      "layout": "service",
+      "voice": {
+        "eyebrow": "SEO",
+        "question": "¿Te encuentra Google?",
+        "answer": [
+          "Y la IA"
+        ]
+      },
+      "body": "Posicionamiento SEO con método: base técnica, autoridad temática y entidad, para que Google te encuentre y la IA no te ignore.",
+      "steps": [
+        {
+          "glyph": "busqueda",
+          "kicker": "Sin costo",
+          "name": "Diagnóstico"
+        },
+        {
+          "glyph": "contenido",
+          "kicker": "Proyecto",
+          "name": "Técnica y contenido"
+        },
+        {
+          "glyph": "medicion",
+          "kicker": "On-Going",
+          "name": "Autoridad y entidad"
+        },
+        {
+          "glyph": "informe",
+          "kicker": "Cada mes",
+          "name": "Insights"
+        }
+      ],
+      "note": "No prometemos rankings. Reportamos lo que se mueve.",
+      "photo": {
+        "register": "cine",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+        "alt": "Un estratega SEO con el polo de Efeonce mira a cámara; detrás, un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita al que todo se conecta"
+      },
+      "selection": {
+        "target": "answer",
+        "label": "Cliente",
+        "participantKind": "department",
+        "anchor": "bottom-end"
+      }
+    },
+    {
+      "role": "method",
+      "recipe": "method-eeat",
+      "voice": {
+        "eyebrow": "E-E-A-T",
+        "question": "¿Por qué te citaría la IA?",
+        "answer": [
+          "Porque",
+          "confía"
+        ]
+      },
+      "body": "La IA no adivina: cita a quien puede **verificar**. Cada entregable construye una de estas señales.",
+      "meterTopic": "Peso de E-E-A-T",
+      "meter": [
+        {
+          "label": "En SEO clásico",
+          "value": "Importante",
+          "fill": 0.55
+        },
+        {
+          "label": "En AEO / IA",
+          "value": "Determinante",
+          "fill": 1
+        }
+      ],
+      "builtWithLabel": "Lo construimos con",
+      "letters": [
+        {
+          "letter": "E",
+          "name": "Experiencia",
+          "description": "Contenido de primera mano, escrito por quien lo vivió.",
+          "builtWith": "Autoría demostrable y casos reales",
+          "deliverable": "Contenido & landings"
+        },
+        {
+          "letter": "E",
+          "name": "Pericia",
+          "description": "Profundidad, precisión y fuentes que respaldan cada afirmación.",
+          "builtWith": "Autores con credenciales, contenido revisado",
+          "deliverable": "Contenido & landings"
+        },
+        {
+          "letter": "A",
+          "name": "Autoridad",
+          "description": "Que tu marca sea el referente de su sector.",
+          "builtWith": "PR, link building y entidad clara",
+          "deliverable": "PR & link building"
+        },
+        {
+          "letter": "T",
+          "name": "Confianza",
+          "description": "Un sitio seguro, transparente y verificable.",
+          "builtWith": "Schema, HTTPS y señales de confianza",
+          "deliverable": "Técnico & schema"
+        }
+      ]
+    },
+    {
+      "recipe": "proposal-cinematic",
+      "layout": "service",
+      "voice": {
+        "eyebrow": "Visibilidad en IA",
+        "question": "¿Te distingue la IA?",
+        "answer": [
+          "Entre miles"
+        ]
+      },
+      "body": "Entre miles de marcas, que ChatGPT, Claude, Perplexity, Gemini y Google te encuentren, te entiendan y te recomienden.",
+      "steps": [
+        {
+          "glyph": "busqueda",
+          "kicker": "Sin costo",
+          "name": "Diagnóstico"
+        },
+        {
+          "glyph": "contenido",
+          "kicker": "Proyecto",
+          "name": "Fundación"
+        },
+        {
+          "glyph": "medicion",
+          "kicker": "On-Going",
+          "name": "Operación"
+        },
+        {
+          "glyph": "informe",
+          "kicker": "Greenhouse",
+          "name": "Plataforma"
+        }
+      ],
+      "note": "Sin promesas de ranking: medimos y mostramos el avance.",
+      "photo": {
+        "register": "cine",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-26_deck-aeo/plates/AE2b-la-ia-te-elige-isotipo.png",
+        "alt": "Una estratega SEO con el polo de Efeonce mira a cámara; detrás, entre miles de tarjetas oscuras que se pierden en la distancia, el haz azul de una burbuja de respuesta de IA ilumina una sola tarjeta, que brilla y se adelanta"
+      },
+      "selection": {
+        "target": "answer",
+        "label": "Cliente",
+        "participantKind": "department"
+      },
+      "role": "proposal"
+    },
+    {
+      "role": "method",
+      "recipe": "method-surround-cycle",
+      "voice": {
+        "eyebrow": "Surround Discovery",
+        "question": "¿Cómo se sostiene?",
+        "answer": [
+          "En ciclo"
+        ]
+      },
+      "body": "La visibilidad ante la IA no se «logra»: se sostiene. Cada ciclo aprende del anterior y te sube un **nivel**.",
+      "startLabel": "Empieza aquí",
+      "stations": [
+        {
+          "icon": "docs/assets/public-site/aeo-service-icons/v2/measure.png",
+          "title": "Medir",
+          "description": "Tu visibilidad en ChatGPT, AI Overviews, Gemini, Perplexity, Copilot y Claude, por mercado y por prompt."
+        },
+        {
+          "icon": "docs/assets/public-site/aeo-service-icons/v2/create.png",
+          "title": "Crear",
+          "description": "Los activos que los motores entienden, citan y reproducen. No más contenido: el correcto."
+        },
+        {
+          "icon": "docs/assets/public-site/aeo-service-icons/v2/distribute.png",
+          "title": "Distribuir",
+          "description": "Tu presencia en cada superficie donde los motores descubren marcas, no sólo en tu sitio."
+        },
+        {
+          "icon": "docs/assets/public-site/aeo-service-icons/v2/optimize.png",
+          "title": "Optimizar",
+          "description": "Cada ciclo aprende del anterior: subes un nivel, medimos y corregimos."
+        }
+      ],
+      "core": {
+        "title": "Tu marca",
+        "caption": "sube un nivel en cada vuelta"
+      }
+    },
+    {
+      "recipe": "proposal-cinematic",
+      "layout": "service",
+      "voice": {
+        "eyebrow": "Desarrollo web",
+        "question": "¿Y si hay que tocar código?",
+        "answer": [
+          "Lo hacemos"
+        ]
+      },
+      "body": "No sólo lo recomendamos: armamos la landing y aplicamos el fix en tu stack, de punta a punta.",
+      "steps": [
+        {
+          "glyph": "codigo",
+          "kicker": "Apps y landings",
+          "name": "React y Next.js"
+        },
+        {
+          "glyph": "web",
+          "kicker": "Shopify",
+          "name": "Liquid"
+        },
+        {
+          "glyph": "nube",
+          "kicker": "CMS",
+          "name": "Drupal y WordPress"
+        },
+        {
+          "glyph": "checklist",
+          "kicker": "El fix",
+          "name": "HTML, CSS y schema"
+        }
+      ],
+      "photo": {
+        "register": "cine",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/DV1-lo-hacemos.png",
+        "alt": "Una ingeniera front-end de Efeonce, con la chaqueta del equipo, mira a cámara mientras arrastra un bloque de código dentro de una landing holográfica de luz azul"
+      },
+      "selection": {
+        "target": "answer",
+        "label": "Engine",
+        "participantKind": "department"
+      }
+    },
+    {
+      "role": "content",
+      "recipe": "content-day",
+      "layout": "live-progress",
+      "voice": {
+        "eyebrow": "Tu día a día con Efeonce",
+        "question": "¿Cómo avanza tu SEO?",
+        "answer": [
+          "A la",
+          "vista"
+        ]
+      },
+      "body": "Sigues el plan en Notion y apruebas cada landing en Frame.io, comentando **sobre** la página.",
+      "plan": {
+        "tool": {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+          "name": "Notion"
+        },
+        "kicker": "En Notion",
+        "title": "Plan editorial",
+        "meta": "Mes 2 de 3",
+        "columns": [
+          {
+            "name": "En curso",
+            "cards": [
+              {
+                "title": "Guía de precios",
+                "tag": "Pillar"
+              },
+              {
+                "title": "Comparativa",
+                "tag": "Artículo"
+              }
+            ]
+          },
+          {
+            "name": "En revisión",
+            "cards": [
+              {
+                "title": "Landing de precios",
+                "tag": "Esperando tu visto bueno",
+                "highlight": true
+              }
+            ]
+          },
+          {
+            "name": "Listo",
+            "cards": [
+              {
+                "title": "Auditoría técnica",
+                "tag": "Fundación"
+              },
+              {
+                "title": "Schema de la marca",
+                "tag": "Entidad"
+              }
+            ]
+          }
+        ]
+      },
+      "review": {
+        "tool": {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+          "name": "Frame.io"
+        },
+        "kicker": "En Frame.io",
+        "title": "Landing de precios",
+        "versions": [
+          "v1",
+          "v2"
+        ],
+        "piece": {
+          "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/landing-precios-45.png",
+          "alt": "La pieza en revisión: una landing de precios"
+        },
+        "pin": "1",
+        "comments": [
+          {
+            "mark": "1",
+            "author": "Tú",
+            "version": "v1",
+            "text": "¿Sumamos preguntas frecuentes?"
+          },
+          {
+            "own": true,
+            "author": "Efeonce",
+            "version": "v2",
+            "text": "Listas, y con su schema."
+          }
+        ],
+        "secondary": "Comentar",
+        "primary": "Aprobar"
+      }
+    },
+    {
+      "role": "content",
+      "recipe": "content-day",
+      "layout": "live-results",
+      "voice": {
+        "eyebrow": "Tu reporte mensual",
+        "question": "¿Cómo avanza?",
+        "answer": [
+          "Cada",
+          "mes"
+        ]
+      },
+      "body": "Cada mes, Efeonce Insights arma tu reporte de SEO y AEO **solo**, y lo conversamos en Teams.",
+      "panel": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/product/greenhouse-seo-dashboard.png",
+        "alt": "Tu panel de Greenhouse, en vivo"
+      },
+      "meeting": {
+        "tool": {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+          "name": "Microsoft Teams"
+        },
+        "kicker": "En Microsoft Teams",
+        "title": "Revisión de resultados",
+        "meta": "Jueves 10:00 · 30 min · con tu equipo"
+      },
+      "report": {
+        "kicker": "Efeonce Insights · ahora",
+        "title": "Tu edición del mes está lista",
+        "sample": "Datos de muestra",
+        "kpis": [
+          {
+            "value": "+22 %",
+            "label": "tráfico orgánico"
+          },
+          {
+            "value": "+14",
+            "label": "keywords top 10"
+          },
+          {
+            "value": "61 %",
+            "label": "citabilidad IA"
+          }
+        ],
+        "action": "Ver la edición",
+        "logo": {
+          "path": "public/images/greenhouse/SVG/negative-isotipo-green.svg",
+          "alt": "Greenhouse"
+        }
+      }
+    },
+    {
+      "role": "decision",
+      "recipe": "decision-difference",
+      "voice": {
+        "eyebrow": "La diferencia",
+        "question": "¿Qué nos hace distintos?",
+        "answer": [
+          "Lo puedes",
+          "ver"
+        ]
+      },
+      "body": "La mayoría vende promesas. Nosotros, un mecanismo que puedes ver y **medir**.",
+      "alternative": {
+        "kicker": "La alternativa",
+        "title": "Agencia commodity"
+      },
+      "efeonce": {
+        "kicker": "Efeonce",
+        "title": "Método medible"
+      },
+      "versus": "vs",
+      "rows": [
+        {
+          "alternative": "Promete «el #1 en Google» garantizado",
+          "efeonce": "Estima según tu punto de partida, sin promesas vacías"
+        },
+        {
+          "alternative": "Precio «desde $X» que no dice nada de tu caso",
+          "efeonce": "Alcance definido por prioridad e impacto real"
+        },
+        {
+          "alternative": "Reporte lleno de vanity metrics",
+          "efeonce": "Métricas que mueven el negocio + visibilidad en IA"
+        },
+        {
+          "alternative": "Caja negra: no sabes qué se hace",
+          "efeonce": "Ves qué se hace en cada ciclo, con entregables"
+        },
+        {
+          "alternative": "SEO aislado que ignora la era de la IA",
+          "efeonce": "Cimiento SEO + puente a AEO para que la IA te cite"
+        }
+      ],
+      "ownTeam": {
+        "kicker": "¿Y si lo hace mi equipo?",
+        "title": "Complemento, no reemplazo",
+        "pillars": [
+          {
+            "title": "Velocidad",
+            "description": "Sin meses de curva de aprendizaje"
+          },
+          {
+            "title": "Método",
+            "description": "Un sistema probado, multimercado y en español"
+          },
+          {
+            "title": "Foco",
+            "description": "Tu equipo sigue en lo suyo"
+          }
+        ]
+      }
+    },
+    {
+      "role": "content",
+      "recipe": "content-clients",
+      "voice": {
+        "eyebrow": "Clientes",
+        "question": "¿Quién confía en nosotros?",
+        "answer": [
+          "Marcas",
+          "líderes"
+        ]
+      },
+      "progress": {
+        "sections": 5,
+        "current": 5
+      },
+      "figures": [
+        {
+          "value": "+127%",
+          "label": "tráfico orgánico de Sky frente a LATAM Airlines",
+          "source": "caso publicado de Sky Airlines"
+        },
+        {
+          "value": "+180%",
+          "label": "ventas digitales de Bresler",
+          "source": "caso publicado de Bresler"
+        }
+      ],
+      "selected": 1,
+      "clients": [
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+          "alt": "Sky Airline"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg",
+          "alt": "Berel"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/bresler.svg",
+          "alt": "Bresler"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/carozzi.svg",
+          "alt": "Carozzi"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/aguas-andinas.svg",
+          "alt": "Aguas Andinas"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg",
+          "alt": "ANAM"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/marca-chile.svg",
+          "alt": "Marca Chile"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/gobierno-santiago.svg",
+          "alt": "Gobierno de Santiago"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/universidad-temuco.svg",
+          "alt": "Universidad Católica de Temuco"
+        }
+      ],
+      "markets": {
+        "title": "Operamos en",
+        "text": "Chile, EE. UU., Colombia, México y Perú"
+      },
+      "selection": {
+        "target": "object",
+        "label": "SEO",
+        "participantKind": "department"
+      },
+      "line": "growth",
+      "theme": "light"
+    },
+    {
+      "role": "decision",
+      "recipe": "decision-diagnosis-map",
+      "voice": {
+        "eyebrow": "Tu primer entregable",
+        "question": "¿Qué recibes primero?",
+        "answer": [
+          "El mapa"
+        ]
+      },
+      "body": "En 24–48 h sabes en qué nivel estás y por dónde empezamos a **subirte**. Gratis y sin compromiso.",
+      "report": {
+        "kicker": "Efeonce AI Visibility Report",
+        "title": "Tu marca · Chile"
+      },
+      "modules": [
+        {
+          "kicker": "01 · Score real",
+          "title": "Tu score por motor de IA"
+        },
+        {
+          "kicker": "02 · Share of voice",
+          "title": "Frente a tus competidores"
+        },
+        {
+          "kicker": "03 · Prompts críticos",
+          "title": "Donde hoy no apareces"
+        },
+        {
+          "kicker": "04 · Plan priorizado",
+          "title": "Tus primeros movimientos"
+        }
+      ],
+      "engineScores": [
+        {
+          "engine": "ChatGPT",
+          "score": 38
+        },
+        {
+          "engine": "AI Overviews",
+          "score": 52
+        },
+        {
+          "engine": "Gemini",
+          "score": 31
+        },
+        {
+          "engine": "Perplexity",
+          "score": 24
+        },
+        {
+          "engine": "Copilot",
+          "score": 18
+        },
+        {
+          "engine": "Claude",
+          "score": 27
+        }
+      ],
+      "shareOfVoice": [
+        {
+          "label": "Tu marca",
+          "percent": 14
+        },
+        {
+          "label": "Competidor A",
+          "percent": 41
+        },
+        {
+          "label": "Competidor B",
+          "percent": 28
+        },
+        {
+          "label": "Otros",
+          "percent": 17
+        }
+      ],
+      "lostPrompts": [
+        "«mejor agencia de [categoría] en Chile»",
+        "«[categoría] precios y comparativa»",
+        "«alternativas a Competidor A»"
+      ],
+      "plan": [
+        {
+          "title": "Corregir cómo te describe la IA",
+          "kind": "Alto impacto"
+        },
+        {
+          "title": "Schema de organización y entidad",
+          "kind": "Base"
+        },
+        {
+          "title": "Cluster para los prompts perdidos",
+          "kind": "Contenido"
+        }
+      ],
+      "expertNote": {
+        "kicker": "Lectura experta",
+        "text": "El dato lo da la máquina; el criterio lo pone nuestro equipo."
+      },
+      "dataOrigin": "illustrative",
+      "sampleMark": "Datos de muestra",
+      "selection": {
+        "target": "object",
+        "label": "Cliente",
+        "participantKind": "role"
+      }
+    },
+    {
+      "role": "decision",
+      "recipe": "decision-next-steps",
+      "voice": {
+        "eyebrow": "Próximos pasos",
+        "question": "¿Y ahora qué sigue?",
+        "answer": [
+          "Empecemos"
+        ]
+      },
+      "body": "Un diagnóstico **sin costo**: cómo te ven Google y la IA.",
+      "agenda": {
+        "kicker": "01 · Diagnóstico · Sin costo",
+        "title": "Agenda tu diagnóstico",
+        "descriptor": "45 min por videollamada · Efeonce AEO Assessment",
+        "days": [
+          {
+            "weekday": "Lun",
+            "day": "5"
+          },
+          {
+            "weekday": "Mar",
+            "day": "6"
+          },
+          {
+            "weekday": "Mié",
+            "day": "7"
+          },
+          {
+            "weekday": "Jue",
+            "day": "8"
+          },
+          {
+            "weekday": "Vie",
+            "day": "9"
+          }
+        ],
+        "times": [
+          "09:30",
+          "11:30",
+          "15:00",
+          "17:00"
+        ],
+        "chosen": {
+          "day": 2,
+          "time": 2
+        },
+        "summary": "Martes 6 · 11:30 · hora de Chile",
+        "cta": "Agenda un diagnóstico"
+      },
+      "nextSteps": [
+        {
+          "number": "02",
+          "label": "Proyecto",
+          "title": "Fundación",
+          "desc": "La base técnica, la entidad y el schema en orden, a precio fijo."
+        },
+        {
+          "number": "03",
+          "label": "On-Going",
+          "title": "SV360",
+          "desc": "SEO y AEO cada mes, con tus métricas en Efeonce Insights."
+        }
+      ]
+    },
+    {
+      "role": "close",
+      "recipe": "close-brochure",
+      "layout": "orbit",
+      "voice": {
+        "question": "¿Conversamos?",
+        "answer": [
+          "Cuando",
+          "quieras"
+        ]
+      }
+    }
+  ]
+}

@@ -4,6 +4,7 @@
 > **Owner:** Strategy + Wave + Product/Architecture + Finance + Legal/IP
 > **ADR:** [`EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md)
 > **Pricing Integrity Pack:** [`WAVE_PRICING_INTEGRITY_PACK_V1.md`](WAVE_PRICING_INTEGRITY_PACK_V1.md)
+> **Naming AEO:** [`EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md)
 
 ## Tesis
 
@@ -59,12 +60,14 @@ puertas especializadas, cada una con su propio problema, evidencia y ruta de exp
 
 | Puerta | Diagnóstico | Product Service primario | Expansión natural |
 |---|---|---|---|
-| **AI Visibility & Search** | Brand Visibility Snapshot / Grader | Search Visibility 360 | Web Experience, Measurement, Content/Creative |
+| **Efeonce AEO** | Efeonce AEO Assessment → Efeonce AI Visibility Report | Search Visibility 360 | Web Experience, Measurement, Content/Creative |
 | **Agentic Readiness** | Agentic Readiness Snapshot / Audit | Web Experience 360 + Agent Systems & Platforms | Automation, Measurement, Search Visibility |
 | **Launch Readiness** | Experience / Launch Diagnostic | Experience LaunchOps | Search, Web, Measurement, Agents, Automation y Globe cuando corresponda |
 
-El Brand Visibility Grader es la primera puerta de Wave y permanece especializado en cómo la IA y los motores de
-búsqueda representan a la marca. Agentic Readiness es una segunda puerta para evaluar si la capa digital puede ser
+**Efeonce AEO Assessment** es la primera puerta de visibilidad de marca en IA. El motor conocido internamente como
+Brand Visibility Grader / AI Visibility Grader permanece especializado en cómo la IA representa a la marca; su
+nombre técnico no cambia por esta decisión editorial. El entregable visible es **Efeonce AI Visibility Report**.
+Agentic Readiness es una segunda puerta para evaluar si la capa digital puede ser
 descubierta, interpretada y operada por agentes. Experience LaunchOps es una entrada posterior para organizaciones
 que necesitan coordinar la producción, aprobación, publicación, medición y mejora de experiencias digitales.
 

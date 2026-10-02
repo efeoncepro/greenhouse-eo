@@ -1,0 +1,101 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:23:47.351Z",
+  "run": "ai-generations/2026-09-26_iconos-aplicaciones",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-26_iconos-aplicaciones",
+  "totalBytes": 20682935,
+  "fileCount": 15,
+  "files": [
+    {
+      "path": "arte/area.png",
+      "sizeBytes": 46644,
+      "sha256": "3e929578aea761551d9e6297ea1775237d8ca47f9bbb0787b5c6cac5556a3adc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/arte/area.png"
+    },
+    {
+      "path": "arte/escenario.png",
+      "sizeBytes": 53382,
+      "sha256": "2372a224565206dd9bb5dbdc7c345080a23be9d85232ae72f142a6ea7e6740e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/arte/escenario.png"
+    },
+    {
+      "path": "arte/informe.png",
+      "sizeBytes": 66940,
+      "sha256": "2c8ddb5f26ab24640c174ddfd3dff7cd0a827671391917fc4476029ed8b82673",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/arte/informe.png"
+    },
+    {
+      "path": "arte/stickers.png",
+      "sizeBytes": 57212,
+      "sha256": "cef484cc76ef0ba1645e490b4ba6f56e26caf0184f221db1db2ff5f450ad45fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/arte/stickers.png"
+    },
+    {
+      "path": "arte/story.png",
+      "sizeBytes": 46615,
+      "sha256": "d0d8160f0c5c5345cf7792c1ce025c9685385b55c1e814448b24cb816761228c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/arte/story.png"
+    },
+    {
+      "path": "arte/tote.png",
+      "sizeBytes": 13372,
+      "sha256": "54606fd5f792fa1d4cb4c8391cb3bc1c30c0c4cda8ad803f30fd96293c9d94af",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/arte/tote.png"
+    },
+    {
+      "path": "out-v2/tote-compuesta.png",
+      "sizeBytes": 3606388,
+      "sha256": "0aeadbbb337f5dac807035392c4f9ea4e64ef26abb0d5123a8c8b39a46dc0f52",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/out-v2/tote-compuesta.png"
+    },
+    {
+      "path": "out-v2/tote-lisa.png",
+      "sizeBytes": 2267461,
+      "sha256": "eb26ab072b324c81eceb850a0b493412089bdb50f334331bfd34cbb21d5a5686",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/out-v2/tote-lisa.png"
+    },
+    {
+      "path": "out-v2/tote.png",
+      "sizeBytes": 2277266,
+      "sha256": "a629bddc60d99da8c6773f79e8b3ad5cc208999c3494c55372769533543f8867",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/out-v2/tote.png"
+    },
+    {
+      "path": "out/area.png",
+      "sizeBytes": 1997897,
+      "sha256": "33c29c9e6633973d269ce6f03cae75c528f21f46043225314e20f631ac1256d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/out/area.png"
+    },
+    {
+      "path": "out/escenario.png",
+      "sizeBytes": 1605250,
+      "sha256": "103d57945f6c5259e7387ad297d16b26bcf81e29006b0a033fdca63c10f248b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/out/escenario.png"
+    },
+    {
+      "path": "out/informe.png",
+      "sizeBytes": 2273060,
+      "sha256": "f83899d767318772407227e8f07c10a4ad9daad687481ecbd08dc5357d41859a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/out/informe.png"
+    },
+    {
+      "path": "out/stickers.png",
+      "sizeBytes": 2152836,
+      "sha256": "95cec04e7b9fef0c0824aeb0ecd8f9ac3d613c5ac66718c4c5d91b8c66fc9019",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/out/stickers.png"
+    },
+    {
+      "path": "out/story.png",
+      "sizeBytes": 1859369,
+      "sha256": "a0c2ba79450b7e21ce5582e7db647f8ca0213f650294208274bbbdc65f8a778d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/out/story.png"
+    },
+    {
+      "path": "out/tote.png",
+      "sizeBytes": 2359243,
+      "sha256": "b0e15c254156ea63edcc2b8dce9985df5a91152f937d4cd46a0d77e9813cd2b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-26_iconos-aplicaciones/out/tote.png"
+    }
+  ]
+}

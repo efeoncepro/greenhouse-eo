@@ -1,0 +1,86 @@
+[
+  {
+    "assetId": "CMP004-C01-KV-45-R03",
+    "campaignId": "CMP-004",
+    "idea": "Identidad reconocible en diferentes experiencias digitales, ilustrada mediante una exploración de marca ficticia.",
+    "copy": {
+      "entrada": "¿Sin el logo?",
+      "titular": "Sigue siendo tuya.",
+      "remate": "Branding para cada punto de contacto.",
+      "cta": "Hablemos de tu marca",
+      "descriptor": "Agencia creativa"
+    },
+    "state": "pilot_for_review",
+    "funnel": "consideracion",
+    "audience": "CMO, dirección de marketing y líderes de marca de mid-market/enterprise",
+    "ratio": "4:5",
+    "scope": "Una muestra por concepto solicitada por el operador; adaptaciones a otros formatos fuera de esta ronda",
+    "destination": "Por validar antes de activación",
+    "generation": "Fotografía generada mediante image_gen; copy y firma determinísticos con compositor canónico",
+    "rights": "Exploración interna; sin uso de casos, cifras o identidades de clientes",
+    "successCriterion": "Comprensión de la capacidad y percepción de criterio premium; sin promesa de performance"
+  },
+  {
+    "assetId": "CMP004-C04-KV-45-R03",
+    "campaignId": "CMP-004",
+    "idea": "Producción creativa consistente entre formatos con revisión humana; nunca automatización sin criterio.",
+    "copy": {
+      "entrada": "¿Más entregas?",
+      "titular": "El mismo criterio.",
+      "remate": "Design Ops, IA y dirección humana.",
+      "cta": "Escala tu producción",
+      "descriptor": "Agencia creativa"
+    },
+    "state": "pilot_for_review",
+    "funnel": "consideracion",
+    "audience": "CMO, dirección de marketing y líderes de marca de mid-market/enterprise",
+    "ratio": "4:5",
+    "scope": "Una muestra por concepto solicitada por el operador; adaptaciones a otros formatos fuera de esta ronda",
+    "destination": "Por validar antes de activación",
+    "generation": "Fotografía generada mediante image_gen; copy y firma determinísticos con compositor canónico",
+    "rights": "Exploración interna; sin uso de casos, cifras o identidades de clientes",
+    "successCriterion": "Comprensión de la capacidad y percepción de criterio premium; sin promesa de performance"
+  },
+  {
+    "assetId": "CMP005-S01-KV-45-R01",
+    "campaignId": "CMP-005",
+    "idea": "El diagnóstico contrasta un resumen de métricas con una fricción concreta del cliente. Escena ilustrativa, sin cifras ni caso atribuido.",
+    "copy": {
+      "entrada": "¿Todo en verde?",
+      "titular": "Falta una pregunta.",
+      "remate": "Del dato a la decisión de negocio.",
+      "cta": "Revisemos tu estrategia",
+      "descriptor": "Agencia estratégica"
+    },
+    "state": "pilot_for_review",
+    "funnel": "consideracion",
+    "audience": "CMO, dirección de marketing y líderes de marca de mid-market/enterprise",
+    "ratio": "4:5",
+    "scope": "Una muestra por concepto solicitada por el operador; adaptaciones a otros formatos fuera de esta ronda",
+    "destination": "Por validar antes de activación",
+    "generation": "Fotografía generada mediante image_gen; copy y firma determinísticos con compositor canónico",
+    "rights": "Exploración interna; sin uso de casos, cifras o identidades de clientes",
+    "successCriterion": "Comprensión de la capacidad y percepción de criterio premium; sin promesa de performance"
+  },
+  {
+    "assetId": "CMP005-S02-KV-45-R01",
+    "campaignId": "CMP-005",
+    "idea": "Estrategia como elección y renuncia: concentrar el esfuerzo antes de ejecutar todas las rutas.",
+    "copy": {
+      "entrada": "¿Lanzarlo todo?",
+      "titular": "Primero, decidir.",
+      "remate": "Prioridades claras antes de invertir.",
+      "cta": "Definamos el siguiente paso",
+      "descriptor": "Agencia estratégica"
+    },
+    "state": "pilot_for_review",
+    "funnel": "consideracion",
+    "audience": "CMO, dirección de marketing y líderes de marca de mid-market/enterprise",
+    "ratio": "4:5",
+    "scope": "Una muestra por concepto solicitada por el operador; adaptaciones a otros formatos fuera de esta ronda",
+    "destination": "Por validar antes de activación",
+    "generation": "Fotografía generada mediante image_gen; copy y firma determinísticos con compositor canónico",
+    "rights": "Exploración interna; sin uso de casos, cifras o identidades de clientes",
+    "successCriterion": "Comprensión de la capacidad y percepción de criterio premium; sin promesa de performance"
+  }
+]

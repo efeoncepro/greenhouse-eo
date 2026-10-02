@@ -1,0 +1,26 @@
+{
+  "document": "brochure",
+  "slides": [
+    {
+      "recipeId": "cover-brochure-cine-lines"
+    },
+    {
+      "recipeId": "proposal-cinematic-creative"
+    },
+    {
+      "recipeId": "section-cine-about"
+    },
+    {
+      "recipeId": "method-staircase"
+    },
+    {
+      "recipeId": "content-measure"
+    },
+    {
+      "recipeId": "decision-case"
+    },
+    {
+      "recipeId": "close-brochure-orbit"
+    }
+  ]
+}

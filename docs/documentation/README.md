@@ -1,5 +1,7 @@
 # Greenhouse EO — Documentacion Funcional del Portal
 
+> **Naming AEO vigente (2026-09-29):** **Efeonce AEO** es la capacidad; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su salida. Los títulos históricos `AI Visibility Grader`/`Brand Visibility Grader` siguen identificando el motor y su documentación técnica. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 Documentacion oficial de la plataforma Greenhouse. Cada documento describe como opera un modulo o dominio del portal en terminos claros, orientados a entender el funcionamiento y las reglas de negocio. Para detalle tecnico (schemas, APIs, decisiones de diseno), cada seccion enlaza a su spec de arquitectura correspondiente.
 
 ## Regla obligatoria
@@ -31,7 +33,43 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   Efeonce y su familia (Globe, Wave, Reach) desde 2026-09-25: qué es, sus tres trabajos (rodea, mide, enfoca), a qué
   piezas aplica (y que no aplica a la UI de Greenhouse ni a clientes), reglas clave (firma con el logo centrado; la
   burbuja URL sólo con el logo ya en la imagen; la órbita no reemplaza la composición de la foto), merch y oficina
-  fotografiados, dónde vive cada cosa y pendientes.
+  fotografiados, la línea en movimiento (la órbita y las animaciones del logo V1.1), los íconos (Trazo y Plastilina), dónde vive cada cosa y pendientes.
+  Desde el 2026-09-27, las 69 láminas del deck aprobadas con su receta: [catálogo de recetas por lámina](../operations/brand-graphic-line/deck-recipes/README.md)
+  y [cómo armar un deck con ellas](../manual-de-uso/creative/componer-deck-con-recetas.md); desde el 2026-09-28 las 69
+  se componen solas. Desde el 2026-10-02, el traje biónico de Nexa (sólo en fotos de cine) y su escena modelo con los
+  Sparks: [cómo usarlo](../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
+- [Composición de decks y brochures de marca propia](creative/composicion-de-decks-y-brochures.md) — qué es pedir
+  una lámina o un documento completo (brochure o propuesta) y recibirlo compuesto con «La órbita»: **las 69 láminas
+  aprobadas se componen** (TASK-1927 y TASK-1928), sus familias y cómo elegir entre versiones, la portada de brochure
+  con la selección de Nexa, qué decide la persona (contenido, cifras con fuente, foto, ítem destacado) y qué decide el
+  sistema (medidas, colores, tipografía, montos como `[MONTO]`, contacto), las reglas que hace cumplir (largos
+  máximos, fuentes visibles, logos normalizados, sin logo ni velo en láminas interiores con foto, una selección por
+  lámina), las reglas de un documento de varias páginas, **validar y proponer el plan del deck antes de componer**
+  (`pnpm brand:deck-plan`: AXIS y el catálogo revisan la secuencia, errores y avisos, el agente propone recetas por id y
+  la persona confirma; TASK-1929), **ligar los datos reales de cada lámina** (logo del cliente, cifras, casos,
+  testimonios y logos desde la evidencia verificada, nunca a mano; ningún deck usa evidencia interna; TASK-1930, en
+  curso), qué entrega y qué no hace todavía (ruta dentro de la plataforma TASK-1921 en curso;
+  montos y equipo con TASK-1417 y TASK-1418; TASK-1931 y TASK-1932). Actualizado el 2026-09-28.
+- [Render gobernado de piezas de marca — La órbita y Glitch](creative/render-gobernado-piezas-de-marca.md) — pedir
+  una pieza, un documento o una edición de Glitch dentro de Greenhouse y recibir los archivos con su procedencia; qué
+  se revisa antes de encolar, estados y quién puede usarlo. Construido y apagado (TASK-1921, rollout pendiente).
+- [Identidad sonora de Efeonce — Tres puntos que se vuelven uno](creative/identidad-sonora-efeonce.md) — el sonido de
+  la marca propia (recomendado por el operador el 2026-09-26, todavía no canon): la idea, el logo sonoro, los registros
+  fondo y energía, el acento por línea de servicio, la voz del eslogan, el sonido de las animaciones del logo, qué se
+  usa en cada caso y pendientes (licencias, prueba de reconocimiento); Glitch tiene su sonido y su música propios, aparte.
+- [Línea gráfica de Glitch — sub-línea de La órbita](creative/linea-grafica-glitch.md) — **sólo para Glitch**, el
+  magazine semanal (no es la línea de Efeonce): qué toma de La órbita y qué es propio (manzana, verde, bytes, Guttery,
+  cabecera «EDICIÓN #N»), portada A/B/C con regla de rotación, carrusel de LinkedIn, el **Glitch Flash** (segundo
+  formato desde el 2026-09-28: una noticia puntual, sin número, cabecera «NO ESPERA AL LUNES» + «FLASH»), video y motion
+  aprobados (apertura, tarjeta final, kit de gráficos y la transición de la manzana en bytes, exclusiva de Glitch), qué está
+  aprobado y qué es propuesta, reglas que nunca se rompen y pendientes. Incluye su sonido y su música (aprobados, sólo de Glitch) y el porqué de la música.
+- [Registro Marketing con Manzanitas — registro complementario de La órbita](creative/registro-marketing-con-manzanitas.md) —
+  **sólo para Marketing con Manzanitas**, la marca editorial del blog (complementa La órbita, no la reemplaza, y no se
+  mezcla con Glitch): qué hereda de La órbita, los acentos por la línea del tema con un solo selector, la cabecera con la
+  manzana en contorno, los formatos Pizarra, Escena, Lente y Recreo, la mano «Desliza» en su sitio fijo, la firma y el
+  eslogan, la contraportada «A a escala» con una sola conversión, los nueve gráficos (qué pregunta responde cada uno y
+  cuándo elegirlo) y las tres láminas de texto denso. Aprobado el 2026-09-28 en el canvas; todavía no está en AXIS
+  (plan por una task aparte).
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar
@@ -88,6 +126,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Experiencia Conversacional de Nexa](plataforma/nexa-conversational-experience.md) — cómo funciona la lente Nexa (preguntar y recibir respuesta-primero con grounding, evidencia bajo demanda y chrome de confianza): la coreografía paso a paso, las piezas que la componen, el modelo de confianza y por qué es una sola experiencia reutilizable en todo el portal (Knowledge primero, no único). Contrato técnico: `architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md`
 - [Roadmap — Índice de Work Items](plataforma/roadmap-cockpit.md) — modulo historico read-only del backlog operativo (epics/tasks/mini-tasks/issues). **Runtime deshabilitado desde 2026-07-15**: `/roadmap` ya no aparece en el portal y `GET /api/roadmap/work-items*` responde `410 roadmap_disabled` hasta mover el indice fuera del runtime del portal. El Markdown sigue siendo SSOT.
 - [API Platform Ecosystem](plataforma/api-platform-ecosystem.md) — nueva lane ecosystem-facing de APIs machine-to-machine: cómo funciona hoy, qué expone, cómo convive con `/api/integrations/v1/*`, cómo sirve al MCP local/remoto y cuál es el camino correcto de hardening sin romper consumers actuales
+- [Creative Workbench](plataforma/creative-workbench.md) — harness multimarcas del equipo: producción modular, recursos admitidos y límites de distribución/acceso; [Lab premium](creative/creative-workbench-lab.md) para explorar composiciones, adaptaciones, zonas y bibliotecas del cliente.
 - [Manuales MCP servidos por el protocolo](plataforma/manuales-mcp-servidos-por-el-protocolo.md) — el segundo canal de conocimiento de uso de la superficie MCP: seis manuales (`seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`, `seo-discovery-to-tracking`, `seo-technical-health`, `seo-prospect-diagnostic`) que el asistente carga bajo demanda con `get_greenhouse_skill`, también como recurso `skill://` y por la lane ecosystem; audiencia interna con 404 anti-oráculo para bindings de cliente; publicar es un acto explícito y la fuga de contenido interno la controla una prueba. TASK-1804.
 - [Efeonce MCP Gateway](plataforma/efeonce-mcp-gateway.md) — gateway federado: Efeonce ID como bootstrap, sesiones Entra legacy, providers y catálogo según autoridad. TASK-1844 suma discovery interno multiorganización; el canary externo y el piloto cliente conservan límites separados.
 - [Kortex Command Adapter](plataforma/kortex-command-adapter.md) — contrato `greenhouse-kortex-command-adapter.v1` para solicitar desde Greenhouse auditorias, compilacion, dry-run y execute de Kortex con binding preflight, idempotencia, audit trail y live execute gated.
@@ -95,6 +134,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Feature Flags y Rollouts Graduales](plataforma/feature-flags-rollout.md) — plataforma canónica para activar variantes de UI sin redeploy: tabla `home_rollout_flags` con scope precedence user/role/tenant/global, resolver con cache + fallback graceful, reliability signal `home.rollout.drift`, endpoint admin REST. Reemplaza el patrón frágil de env vars `*_ENABLED` que no escalaba
 - [Página "En mantenimiento" + Modo Mantenimiento](plataforma/pagina-mantenimiento.md) — la página institucional `/maintenance` (familia 404/401/coming-soon, 5 mensajes rotativos, ilustración Efeonce) + el gate de mantenimiento env-driven (`MAINTENANCE_MODE`, default OFF, fail-open) aplicado por `src/proxy.ts`: 503 honesto, allowlist, bypass de operador `?gh_bypass`
 - [Proxy Global de Greenhouse](plataforma/middleware-edge.md) — la única capa request-global (Next.js `src/proxy.ts`, singleton del framework) que corre antes del routing: qué la distingue de los guards por ruta, sus responsabilidades actuales (security headers + gate de mantenimiento), para qué MÁS sirve (geo/locale, rate limit, A/B, redirects masivos), qué NO meterle (cero DB/IO por request) y cómo extenderla sin crear un segundo entrypoint
+- [Protección de Rutas Públicas — Conexiones a la Base de Datos](plataforma/proteccion-rutas-publicas-y-conexiones.md) — límite de 20 llamadas/10 s por IP en `/api/public/**` en el Firewall de Vercel (antes de tocar la base), conexiones de Vercel que se cierran al minuto sin uso y aviso cuando la base compartida se llena (TASK-1876, ISSUE-174)
 - [Contrato Visual DESIGN.md](plataforma/contrato-visual-design-md.md) — sistema de protección automática del contrato visual de Greenhouse: CI gate `pnpm design:lint` strict (errors + warnings block) en cada PR, 17 warnings cerrados vía contratos de componente reales (anti-bandaid), skills UI cargan DESIGN.md como mandatory context, `pnpm design:diff` operativo contra cualquier ref de git, decisión arquitectónica Opción A canonizada (DESIGN.md refleja runtime, no lo genera). TASK-764, 2026-05-04
 - [Deep Link Platform](plataforma/deep-link-platform.md) — capa compartida para resolver referencias semánticas a links canónicos, URLs absolutas por ambiente, fallback y metadata de acceso sin repartir strings de ruta por todo el portal
 - [Capa de Contexto Estructurado](plataforma/capa-contexto-estructurado.md) — memoria estructurada sidecar para payloads normalizados, auditoría, replay operativo y trabajo asistido por agentes sin reemplazar la verdad relacional

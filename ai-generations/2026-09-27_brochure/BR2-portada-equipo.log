@@ -1,0 +1,13 @@
+BR2-portada-equipo · 2048x1152 · 6 referencia(s):
+   ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png
+   ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png
+   ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png
+   ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-14-puesto-frente-1200x1600-v01-fondo-estudio.png
+   ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png
+   ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png
+  $ costo estimado ≈ USD 0.037 (1 × 1243 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-09-27_brochure/plates/BR2-portada-equipo.png (edit) …
+  ✓ 2172KB · gpt-image-2.5-sunburst · 1792x1024 · high
+    usage: in 10918 (img 8902 · txt 2016) · out 1243 · total 12161
+done
+exit 0

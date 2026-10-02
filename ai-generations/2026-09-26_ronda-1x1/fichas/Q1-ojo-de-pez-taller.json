@@ -1,0 +1,17 @@
+{
+  "formato": "1:1",
+  "impacto": true,
+  "id": "Q1-ojo-de-pez-taller",
+  "palanca": "luz-motivada",
+  "escena": "SCENE (creative workshop, Santiago studio, the team lays out the first cut of a campaign): 8mm FISHEYE lens with strong, obvious barrel distortion, camera very low right at the near edge of a round dark walnut work table. Three people lean in over the table from the far side, placing printed storyboard frames and pointing at one of them; one woman laughing at the exact moment she slides the chosen frame to the centre. A single low practical softbox on a floor stand, riggeed between knee and chest height on the right, is the key light and rakes across the table and their hands. Plain clothes in charcoal, cream and olive; one plain azure-blue (#0375DB) notebook on the table carries the only blue. The ceiling curves but stays dark and plain. Nobody looks at the lens. Frames and notes carry only tiny, out-of-focus illegible marks, unbranded.",
+  "lecho": {
+    "objeto": "the curved near edge of the dark walnut table, so close to the lens that it dissolves into blur",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, evenly shadowed plaster wall",
+      "tinta": "blanca"
+    }
+  }
+}

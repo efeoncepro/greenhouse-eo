@@ -1,0 +1,23 @@
+{
+  "id": "SP2b-dias-no-meses",
+  "formato": "1:1",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "polo-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic drama still, a creative studio at dusk, the moment a campaign comes together): a Latin American creative director in his early thirties, short dark hair and a trimmed beard, wearing the NAVY EFEONCE POLO, stands in the RIGHT half of the frame, centered around 70% of the width, seen from his left side three-quarters, in mid-motion: he reaches up and to the RIGHT with his right arm to pin the last large printed campaign key visual onto a wall behind him that is covered edge to edge with a grid of bold, colorful campaign prints (abstract color fields, product close-ups, bold shapes, no readable text, no logos); the print wall fills the RIGHT 55% of the background only; his left hand holds two more prints at waist height; he turns his head back toward the LEFT, toward the camera side, with a confident, energized smile, looking out of frame to the left as if calling the client over. A hard warm key light from a low window OUTSIDE the frame on the right rakes across him and the prints, throwing crisp long shadows; a cool teal rim from behind separates his shoulders. REALISTIC ADULT PROPORTIONS, both arms and hands anatomically correct and fully inside the frame, five fingers each, 50mm lens, camera at chest height about three meters away, slight low angle, focus on his face. Thin haze in the light beam. The LEFT 35% of the frame, from top to bottom, is only a dark, evenly shadowed bare studio wall with faint haze: no prints, no shelves, no plants, no window, no bright edge. Rich saturated color on the prints against deep shadow, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred corner of a worktable close to the lens at the bottom right, outside the light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark, evenly shadowed bare wall on the left 35% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

@@ -5,6 +5,12 @@
  *   pnpm composer:visual-gate --catalog=insights            # gate aislado de los catálogos Insights
  *   pnpm composer:visual-gate --catalog=insights --selftest # determinismo de Insights (2 corridas)
  *   pnpm composer:visual-gate --catalog=insights --freeze   # promueve sólo los frames declarados de Insights
+ *   pnpm composer:visual-gate --catalog=graphic-line        # gate aislado de los catálogos de La órbita (TASK-1919)
+ *   pnpm composer:visual-gate --catalog=graphic-line --freeze
+ *   pnpm composer:visual-gate --catalog=glitch              # gate aislado de los catálogos de Glitch (TASK-1923)
+ *   pnpm composer:visual-gate --catalog=glitch --freeze
+ *   pnpm composer:visual-gate --catalog=manzanitas          # gate aislado de Marketing con Manzanitas (TASK-1939)
+ *   pnpm composer:visual-gate --catalog=manzanitas --freeze
  *   pnpm composer:visual-gate --freeze                      # congela/re-promueve el baseline completo
  *
  * Por qué existe: las tres operaciones centrales de TASK-1393 (tokenizar 80 bases de color, mover
@@ -18,7 +24,8 @@
  *     mismo sintetizador, mismo píxel) + las 15 láminas reales del deck SKY.
  *   - Umbral: CERO píxeles (`threshold: 0`, `maxChangedPixels: 0`). No "se ve parecido".
  *   - Rebaseline EXPLÍCITO, nunca silencioso: `--freeze` se niega a promover un frame cambiado que
- *     no esté declarado en `BASELINE_DELTAS.md` (contrato de dos vías, como el `KNOWN_BROKEN` de
+ *     no esté declarado en la sección SIN SELLAR de `BASELINE_DELTAS.md` (`baseline-deltas-ledger.ts`;
+ *     cada promoción sella su sección y las viejas ya no autorizan nada) (contrato de dos vías, como el `KNOWN_BROKEN` de
  *     composability: la lista no puede mentir). Además sella un digest del manifest dentro del
  *     ledger; el gate verifica ese digest — editar el manifest o los PNG a mano, sin pasar por la
  *     promoción declarada, TAMBIÉN falla el gate.
@@ -34,6 +41,10 @@ import path from 'node:path'
 
 import type { Browser } from 'playwright'
 
+import { lensRecipe, orbitSvg } from '@efeoncepro/axis-graphic-line'
+
+import { evaluatePromotion, sealUnsealedSections } from './baseline-deltas-ledger'
+
 // Barrel del primitive — cero deep-imports (TASK-1393: el motor vive en artifact-composer/).
 import {
   composeArtifact,
@@ -48,6 +59,22 @@ import {
 import { deckAxisCatalog, deckAxisCatalogDir } from '@/lib/artifact-composer/catalogs/deck-axis'
 import { insightsDeckCatalog, insightsDeckCatalogDir } from '@/lib/artifact-composer/catalogs/insights-deck'
 import { insightsReportCatalog, insightsReportCatalogDir } from '@/lib/artifact-composer/catalogs/insights-report'
+import { createCatalog as createGraphicLineDeck, graphicLineDeckCatalogDir } from '@/lib/artifact-composer/catalogs/graphic-line-deck'
+import {
+  createCatalog as createGraphicLineOverlays,
+  graphicLineOverlaysCatalogDir
+} from '@/lib/artifact-composer/catalogs/graphic-line-overlays'
+import { createCatalog as createGraphicLineStills, graphicLineStillsCatalogDir } from '@/lib/artifact-composer/catalogs/graphic-line-stills'
+import { createGlitchStillsCatalog, glitchCatalogDir } from '@/lib/artifact-composer/catalogs/glitch'
+import { createManzanitasStillsCatalog, manzanitasCatalogDir } from '@/lib/artifact-composer/catalogs/manzanitas'
+import { MANZANITAS_STEP_ORBIT } from '@/lib/manzanitas-composition'
+import {
+  auditGraphicLineRendered,
+  type RenderedAuditViolation
+} from '@/lib/artifact-composer/catalogs/graphic-line-shared/rendered-audit'
+
+import { greenhouseCtaPainter, greenhouseSelectionPainter } from '../brand-surfaces/compose'
+import { manzanitasChartPainter } from '../manzanitas/painters'
 
 import { compareImages, loadPng } from '../frontend/lib/visual-diff'
 
@@ -64,21 +91,114 @@ const ROOT = process.cwd()
  * y captura el frame. Un harness web aparte sería una copia peor —y rompería la autocontención del
  * catálogo, que se sirve por `file://` con sus assets relativos.
  */
+/**
+ * Bytes sintéticos y DETERMINISTAS para los assets externos de los probes de La órbita (TASK-1919): la foto, los
+ * íconos y las capas de la órbita llegan como `asset-ref:*` que en producción materializa quien compone. Un SVG
+ * rasteriza igual en cada corrida (no hay foto real: ISSUE-122 no aplica) y no depende de archivos fuera de git.
+ */
+const svgDataUri = (svg: string): string => `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
+
+const GRAPHIC_LINE_PROBE_ASSETS: Readonly<Record<string, string>> = {
+  'plate:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1a2b"/><stop offset="1" stop-color="#3d5a73"/></linearGradient></defs><rect width="1920" height="1080" fill="url(#g)"/><circle cx="1320" cy="430" r="190" fill="#8aa1b4"/><rect x="1120" y="600" width="400" height="480" rx="120" fill="#5b7488"/></svg>'
+  ),
+  'icon:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="#ffffff" stroke-width="3"/></svg>'
+  ),
+  // El logo de un cliente (portadas de propuesta): un rótulo sintético, nunca la marca de un cliente real.
+  'file:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="460" height="200" viewBox="0 0 460 200"><rect x="30" y="50" width="400" height="100" rx="50" fill="#ffffff"/></svg>'
+  ),
+  'layer:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"><circle cx="1400" cy="540" r="300" fill="none" stroke="#36c8bf" stroke-width="4"/></svg>'
+  )
+}
+
+const graphicLineProbe = <T extends object>(catalog: T) => ({ ...catalog, externalAssets: GRAPHIC_LINE_PROBE_ASSETS })
+
+/**
+ * Glitch (TASK-1923): una sola entrada para sus tres catálogos, que comparten carpeta y registry (el probe fotografía
+ * las 26 plantillas con los mismos resolvers y el mismo hook de la falla). La foto de cada hueco llega como
+ * `asset-ref:photo:probe`: un SVG sintético y determinista (nunca una foto real: ISSUE-122 no aplica). La falla en
+ * bytes del probe es la del `example` de su slot (vacía): la geometría real la prueban los tests de la falla.
+ */
+const GLITCH_PROBE_ASSETS: Readonly<Record<string, string>> = {
+  'photo:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800"><rect width="1200" height="800" fill="#2f4258"/><rect x="120" y="140" width="320" height="220" rx="18" fill="#cfe4fa" fill-opacity="0.25"/><circle cx="820" cy="300" r="120" fill="#cfe4fa" fill-opacity="0.6"/><rect x="660" y="430" width="320" height="370" rx="110" fill="#cfe4fa" fill-opacity="0.45"/></svg>'
+  )
+}
+
+/**
+ * Marketing con Manzanitas (TASK-1939): una sola entrada para sus dos catálogos, que comparten carpeta y registry (el
+ * probe fotografía las 18 plantillas con los mismos resolvers, el painter de gráficos y el hook del eslogan). La foto
+ * llega como `asset-ref:photo:probe` (un SVG sintético, nunca una foto real: ISSUE-122 no aplica); la Lente y la órbita
+ * del paso se pintan con `@efeoncepro/axis-graphic-line` sobre esa misma foto sintética, como lo hace el comando.
+ */
+const MANZANITAS_PROBE_PHOTO = svgDataUri(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350"><rect width="1080" height="1350" fill="#0b1a2b"/><circle cx="540" cy="560" r="170" fill="#8aa1b4"/><rect x="330" y="760" width="420" height="590" rx="150" fill="#5b7488"/><rect x="0" y="1080" width="1080" height="270" fill="#1d2a38"/></svg>'
+)
+
+const MANZANITAS_PROBE_ASSETS: Readonly<Record<string, string>> = {
+  'photo:probe': MANZANITAS_PROBE_PHOTO,
+  'lens:probe': svgDataUri(
+    lensRecipe('post', { photoId: 'photo', photoSrc: MANZANITAS_PROBE_PHOTO, alt: 'Foto sintética del probe', question: '', answer: '', line: 'engine', surface: 'dark' }).svg.replace(
+      /<image data-axis-part="signature"[^>]*\/>/,
+      ''
+    )
+  ),
+  'orbit:probe': svgDataUri(orbitSvg({ width: 1080, height: 1350, circle: MANZANITAS_STEP_ORBIT, line: 'engine', surface: 'light', channel: 'social', halo: false }).svg)
+}
+
+const painters = { selectionPainter: greenhouseSelectionPainter, ctaPainter: greenhouseCtaPainter }
+
 const PROBE_CATALOGS = [
   { catalog: deckAxisCatalog, dir: deckAxisCatalogDir, frameDir: 'templates' },
   { catalog: insightsDeckCatalog, dir: insightsDeckCatalogDir, frameDir: 'templates-insights-deck' },
-  { catalog: insightsReportCatalog, dir: insightsReportCatalogDir, frameDir: 'templates-insights-report' }
+  { catalog: insightsReportCatalog, dir: insightsReportCatalogDir, frameDir: 'templates-insights-report' },
+  { catalog: graphicLineProbe(createGraphicLineDeck(painters)), dir: graphicLineDeckCatalogDir, frameDir: 'templates-graphic-line-deck' },
+  { catalog: graphicLineProbe(createGraphicLineStills(painters)), dir: graphicLineStillsCatalogDir, frameDir: 'templates-graphic-line-stills' },
+  {
+    catalog: graphicLineProbe(createGraphicLineOverlays(painters)),
+    dir: graphicLineOverlaysCatalogDir,
+    frameDir: 'templates-graphic-line-overlays'
+  },
+  { catalog: { ...createGlitchStillsCatalog(), externalAssets: GLITCH_PROBE_ASSETS }, dir: glitchCatalogDir, frameDir: 'templates-glitch' },
+  {
+    catalog: { ...createManzanitasStillsCatalog({ chartPainter: manzanitasChartPainter }), externalAssets: MANZANITAS_PROBE_ASSETS },
+    dir: manzanitasCatalogDir,
+    frameDir: 'templates-manzanitas'
+  }
 ]
 
-type CatalogScope = 'all' | 'insights'
+type CatalogScope = 'all' | 'insights' | 'graphic-line' | 'glitch' | 'manzanitas'
 
-const INSIGHTS_FRAME_PREFIXES = ['templates-insights-deck/', 'templates-insights-report/']
+const SCOPE_FRAME_PREFIXES: Record<Exclude<CatalogScope, 'all'>, string> = {
+  insights: 'templates-insights-',
+  'graphic-line': 'templates-graphic-line-',
+  glitch: 'templates-glitch',
+  manzanitas: 'templates-manzanitas'
+}
+
+const SCOPE_LABEL: Record<CatalogScope, string> = {
+  all: 'el set completo',
+  insights: 'Insights',
+  'graphic-line': 'La órbita',
+  glitch: 'Glitch',
+  manzanitas: 'Marketing con Manzanitas'
+}
 
 const frameInScope = (frame: string, scope: CatalogScope): boolean =>
-  scope === 'all' || INSIGHTS_FRAME_PREFIXES.some(prefix => frame.startsWith(prefix))
+  scope === 'all' || frame.startsWith(SCOPE_FRAME_PREFIXES[scope])
+
+/**
+ * Las reglas de La órbita que sólo se ven renderizadas (D1: acento bajo 24 px; 3× en láminas de decisión) se miden
+ * sobre cada probe de sus catálogos. Una violación aborta el render: no se congela ni se aprueba un frame que rompe
+ * la norma, aunque coincida píxel a píxel con un baseline viejo.
+ */
+const renderedAuditFindings: { frame: string; violation: RenderedAuditViolation }[] = []
 
 const catalogsInScope = (scope: CatalogScope) =>
-  scope === 'all' ? PROBE_CATALOGS : PROBE_CATALOGS.filter(target => target.frameDir.startsWith('templates-insights-'))
+  scope === 'all' ? PROBE_CATALOGS : PROBE_CATALOGS.filter(target => target.frameDir.startsWith(SCOPE_FRAME_PREFIXES[scope]))
 
 /** El deck real que protege este gate: 15 láminas de la oferta SKY. */
 const SKY_PLAN_PATH = path.resolve(ROOT, 'docs/commercial/tenders/sky-blog-2026/deck-plan.json')
@@ -188,6 +308,12 @@ const renderOneCatalogProbes = async (
     try {
       await fillSlide(page, path.join(target.dir, entry.prototype), slide, contract, target.catalog)
       await page.screenshot({ path: path.join(outDir, rel) })
+
+      if (target.frameDir.startsWith(SCOPE_FRAME_PREFIXES['graphic-line'])) {
+        for (const violation of await auditGraphicLineRendered(page, entry.contentTypes)) {
+          renderedAuditFindings.push({ frame: rel, violation })
+        }
+      }
     } finally {
       await page.close()
     }
@@ -217,14 +343,28 @@ const renderAll = async (runDir: string, scope: CatalogScope = 'all'): Promise<s
 
   const browser = await launchComposerBrowser()
 
+  renderedAuditFindings.length = 0
+
+  let frames: string[]
+
   try {
     const probeFrames = await renderCatalogProbes(browser, runDir, catalogsInScope(scope))
     const skyFrames = scope === 'all' ? await renderSkyDeck(runDir) : []
 
-    return [...probeFrames, ...skyFrames].sort()
+    frames = [...probeFrames, ...skyFrames].sort()
   } finally {
     await browser.close()
   }
+
+  if (renderedAuditFindings.length > 0) {
+    throw new Error(
+      'La norma de La órbita falla sobre la lámina renderizada:\n' +
+        renderedAuditFindings.map(({ frame, violation }) => `  - ${frame} · ${violation.rule}: ${violation.detail}`).join('\n') +
+        '\n  Se corrige la plantilla o su token en AXIS; la regla no se relaja.'
+    )
+  }
+
+  return frames
 }
 
 interface FrameDiff {
@@ -351,7 +491,7 @@ const listBaselinePngs = async (): Promise<string[]> => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const selftest = async (scope: CatalogScope): Promise<number> => {
-  console.log(`\n0a · Determinismo: componiendo ${scope === 'all' ? 'el set completo' : 'los catálogos Insights'} DOS veces…\n`)
+  console.log(`\n0a · Determinismo: componiendo ${SCOPE_LABEL[scope]} DOS veces…\n`)
 
   const runA = path.join(WORK_DIR, 'selftest-a')
   const runB = path.join(WORK_DIR, 'selftest-b')
@@ -397,7 +537,9 @@ Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**
 
 - Todo cambio de píxel INTENCIONAL se declara acá, **lámina por lámina** (qué frame, qué cambió,
   por qué, quién lo aprobó) **ANTES** de correr \`pnpm composer:visual-gate --freeze\`.
-- \`--freeze\` se niega a promover un frame cambiado que no esté declarado en este archivo.
+- \`--freeze\` se niega a promover un frame cambiado que no esté declarado en la **sección nueva sin
+  sellar** (la única entrada sin el marcador \`sealed-by-freeze\`). Una sección ya sellada no autoriza
+  nada: cada promoción sella la suya y la próxima necesita una entrada propia.
 - El marcador \`manifest-digest\` lo sella la promoción; el gate lo verifica. Editar el manifest o
   los PNG a mano, sin pasar por la promoción declarada, **también falla el gate**.
 - El baseline se re-promueve **en el mismo PR** que declara el delta.
@@ -411,7 +553,7 @@ Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**
 `
 
 const freeze = async (scope: CatalogScope): Promise<number> => {
-  console.log(`\n0b/0d · Congelando baseline ${scope === 'all' ? '(set completo)' : '(sólo Insights)'}…\n`)
+  console.log(`\n0b/0d · Congelando baseline (${SCOPE_LABEL[scope]})…\n`)
 
   const runDir = path.join(WORK_DIR, 'freeze')
   const frames = await renderAll(runDir, scope)
@@ -437,25 +579,35 @@ const freeze = async (scope: CatalogScope): Promise<number> => {
       if (previous.frames[frame] !== nextManifest.frames[frame]) changed.push(frame)
     }
 
-    const undeclared = changed.filter(frame => !deltasRaw.includes(frame))
-
-    if (undeclared.length > 0) {
-      console.error(
-        '✗ Rebaseline NO declarado. Estos frames cambian y no aparecen en BASELINE_DELTAS.md:\n' +
-          undeclared.map(frame => `  - ${frame}`).join('\n') +
-          '\n\nDeclará cada lámina (qué cambió, por qué, quién lo aprobó) y vuelve a correr --freeze.\n'
-      )
-
-      return 1
-    }
-
     if (changed.length === 0) {
       console.log('✓ El baseline ya coincide con el render actual: nada que promover.\n')
 
       return 0
     }
 
-    console.log(`  ${changed.length} frame(s) declarados se re-promueven:\n${changed.map(f => `    - ${f}`).join('\n')}`)
+    // Sólo cuenta la sección SIN SELLAR (la declaración de esta promoción). Un frame nombrado en una
+    // sección ya sellada —de otra task, de otro mes— NO autoriza re-promoverlo: esa declaración ya
+    // se consumió. Antes bastaba con que el nombre apareciera en cualquier parte del archivo, y un
+    // cambio compartido re-promovió 10 frames aprobados sin que nadie los declarara (TASK-1928).
+    const verdict = evaluatePromotion(deltasRaw, changed.sort(), frame => frameInScope(frame, scope))
+
+    if (!verdict.ok) {
+      console.error(verdict.message)
+
+      return 1
+    }
+
+    if (verdict.declaredButUnchanged.length > 0) {
+      console.warn(
+        `  ⚠ Declarados en la sección pero sin cambio en este render (revisa que la entrada no mienta):\n` +
+          verdict.declaredButUnchanged.map(frame => `    - ${frame}`).join('\n')
+      )
+    }
+
+    console.log(
+      `  Sección que se sella: ${verdict.section.heading.slice(3)}\n` +
+        `  ${changed.length} frame(s) declarados en ella se re-promueven:\n${changed.map(f => `    - ${f}`).join('\n')}`
+    )
   }
 
   // 🔴 El ledger VIVE DENTRO de `BASELINE_DIR`, y abajo hacemos `rm -r` de ese directorio. Hay que
@@ -504,13 +656,16 @@ const freeze = async (scope: CatalogScope): Promise<number> => {
 
   const digest = manifestDigest(finalManifest)
 
-  const sealed = DIGEST_MARKER.test(deltasRaw)
+  const digestSealed = DIGEST_MARKER.test(deltasRaw)
     ? deltasRaw.replace(DIGEST_MARKER, `<!-- manifest-digest: ${digest} -->`)
     : deltasRaw.replace('<!-- manifest-digest: PENDING -->', `<!-- manifest-digest: ${digest} -->`)
 
+  // La sección consumida queda sellada: la próxima promoción necesita su propia entrada nueva.
+  const sealed = sealUnsealedSections(digestSealed, digest)
+
   await fs.writeFile(DELTAS_PATH, sealed, 'utf8')
 
-  console.log(`\n✓ Baseline congelado: ${frames.length} frame(s) ${scope === 'all' ? 'del set completo' : 'de Insights'} → ${path.relative(ROOT, BASELINE_DIR)}`)
+  console.log(`\n✓ Baseline congelado: ${frames.length} frame(s) de ${SCOPE_LABEL[scope]} → ${path.relative(ROOT, BASELINE_DIR)}`)
   console.log(`  manifest-digest sellado en BASELINE_DELTAS.md: ${digest.slice(0, 12)}…`)
   console.log('  Commitealo COMPLETO (PNGs + manifest + BASELINE_DELTAS.md) en el mismo PR.\n')
 
@@ -522,7 +677,7 @@ const freeze = async (scope: CatalogScope): Promise<number> => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const gate = async (scope: CatalogScope): Promise<number> => {
-  console.log(`\ncomposer:visual-gate · recomponiendo ${scope === 'all' ? 'el set completo' : 'Insights'} y diffeando a CERO píxeles…\n`)
+  console.log(`\ncomposer:visual-gate · recomponiendo ${SCOPE_LABEL[scope]} y diffeando a CERO píxeles…\n`)
 
   const manifest = await readManifest()
 
@@ -619,8 +774,8 @@ const main = async (): Promise<void> => {
   const args = process.argv.slice(2)
   const catalogArg = args.find(arg => arg.startsWith('--catalog='))?.slice('--catalog='.length) ?? 'all'
 
-  if (catalogArg !== 'all' && catalogArg !== 'insights') {
-    console.error(`✗ Catálogo desconocido: ${catalogArg}. Usa --catalog=all o --catalog=insights.\n`)
+  if (catalogArg !== 'all' && catalogArg !== 'insights' && catalogArg !== 'graphic-line' && catalogArg !== 'glitch' && catalogArg !== 'manzanitas') {
+    console.error(`✗ Catálogo desconocido: ${catalogArg}. Usa --catalog=all, --catalog=insights, --catalog=graphic-line, --catalog=glitch o --catalog=manzanitas.\n`)
     process.exit(1)
   }
 

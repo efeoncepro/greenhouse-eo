@@ -1,0 +1,35 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:04:38.686Z",
+  "run": "ai-generations/2026-09-17_polera-efeonce",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-17_polera-efeonce",
+  "totalBytes": 10819038,
+  "fileCount": 4,
+  "files": [
+    {
+      "path": "out/polera-opcion-a-royal.png",
+      "sizeBytes": 3771996,
+      "sha256": "c785dab60162140d7ef7645d3d16ea1134e5e03c683dc070da0f104751b6f786",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_polera-efeonce/out/polera-opcion-a-royal.png"
+    },
+    {
+      "path": "out/polera-opcion-b-navy.png",
+      "sizeBytes": 3644224,
+      "sha256": "8372e676ef49f21061cce1b145f9fbaf334917afc6c2a5d39a386b5c0c0990f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_polera-efeonce/out/polera-opcion-b-navy.png"
+    },
+    {
+      "path": "out/polera-opcion-c-crudo.png",
+      "sizeBytes": 3352347,
+      "sha256": "0739d9f7a6eb42d8b5f16bd56fe704a667468e5ea6ab287c7157eaa934b56dc1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_polera-efeonce/out/polera-opcion-c-crudo.png"
+    },
+    {
+      "path": "ref/estampa-espalda.png",
+      "sizeBytes": 50471,
+      "sha256": "74693e850531b5c819e5b5eed8d3de03193d75f86812f8bc44610db24d9286b0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_polera-efeonce/ref/estampa-espalda.png"
+    }
+  ]
+}

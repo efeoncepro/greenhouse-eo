@@ -44,7 +44,9 @@ already cost a day*. It grows with every task (see the maintenance contract).
 6. [`references/lessons.md`](references/lessons.md) — the traps that already bit someone.
 7. Canon docs in `greenhouse-eo` when you need the full contract:
    `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` (ADR, delta 2026-09-25),
-   `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (v1.2),
+   `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md` (ADR 2026-09-26:
+   Studio + GCS as single source of truth; one command, three entry doors),
+   `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (v1.6),
    `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` (live runtime),
    `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md`, the flow
    `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md`, functional doc
@@ -74,6 +76,86 @@ TASK-1887 and TASK-1890…1899.
 - **`packages/domain` is framework-free** (no `next`, `react`, `@vercel/*`, MCP SDKs — `domain-boundary-gate`);
   every visible web read has its `/api/v1` endpoint and both consume the same domain readers with an `Actor`.
 - **Never SQL against Greenhouse's database**; Greenhouse data arrives by API (e.g. TASK-1892 via the ecosystem lane).
+
+## Source of truth and ingest (ADR accepted 2026-09-26)
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`.
+
+- **SSOT**: the `marketing_studio` database (schema `studio`) owns campaigns, concepts, pieces, versions, rights,
+  approvals and publication evidence; the private bucket `efeonce-marketing-studio-originals` owns the final bytes
+  (`originals/sha256/<2>/<sha256>`, versioned, 30-day soft delete, never overwritten). OneDrive/SharePoint is the
+  team's **workshop** (editables, drafts, exploration): a final exists for the platform only once it entered Studio.
+- **One command, three doors**: `createAssetVersion` (working name; route under `/api/v1`, tool
+  `studio.asset.version.create`) is the only way a version is born — idempotent by sha256 + `Idempotency-Key`,
+  `If-Match`, the person as actor, `audit_event`, minimal rights (license kind) required, derivatives via the existing
+  worker. Upload is two-step: signed V4 URL scoped to one object (resumable for big video; skipped if the sha256 is
+  already stored) → client uploads straight to GCS → confirm; Studio verifies size, mime and the **recomputed** sha256
+  before creating the version. Doors: CLI `pnpm studio:upload` (TASK-1894), MCP write tools with delegated identity
+  (`studio.asset.upload.request` + `studio.asset.version.create`, TASK-1899), UI (TASK-1895).
+- **Inference**: CLI and agents infer campaign, concept, format and version from the canonical filename
+  (`CMP001-02 - <título> - 4x5.png`) and the catalog, and only ask for what they cannot infer.
+- **Approval stays human**: a new version lands pending review; a person approves (or an agent with that person's
+  delegated identity, `dryRun` → `confirm`) with `marketing_studio.campaign.approve`. Uploading needs
+  `marketing_studio.asset.write` (admin, operations, account, designer).
+- **Cutover per campaign, dated** (new campaigns first). After it, `import:catalog`/`media:ingest` never create finals
+  for that campaign; `media:ingest` stays only as history backfill and is retired afterwards. Signal: «pieza aprobada
+  sin original en Studio». A Microsoft Graph mirror of SharePoint is **not planned** (a Graph read is only for
+  one-off backfill/reconciliation).
+- None of this is in runtime yet: until a campaign's cutover, the TASK-1893 regime holds (OneDrive = source, GCS =
+  verified copy of already registered finals).
+
+## Strategy layer (ADR accepted 2026-09-26)
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md` (architecture §3.1).
+Nothing of it is in runtime yet; EPIC-049 tasks implement it by theme.
+
+- **Full parity with agent execution**: every capability, read AND write, is born with command, `/api/v1` route,
+  registry entry and federated MCP tool; agents (Claude, Codex, Nexa) execute every UI action with the person's
+  delegated identity (TASK-1899 mechanics). Each operation declares its risk tier in the registry: **T0** read
+  (direct) · **T1** reversible draft/edit (direct, idempotent, `If-Match`, audited, actor = person) · **T2** approve,
+  publish, spend, external credentials or destructive (`dryRun` → proposal digest → explicit human confirm).
+- **Channel catalog** (Studio, versioned `channel_key`: type, platform, placements, formats, copy limits, objectives,
+  source + verified date per spec) validates copies/pieces/ads at write time and replaces free-text `channel`
+  (expand → human-reviewed backfill → contract). Market is never encoded in the channel key.
+- **ICP lives in Greenhouse** as a versioned catalog **per organization** (segments, personas, JTBD, buying-group roles,
+  bow-tie stages) exposed by ecosystem lane + MCP; Studio references `(org, version, id)`. Bow-tie stage ≠ creative
+  funnel phase.
+- **Campaign plan**: strategy (objective, KPIs with target and source, hypotheses), persona × stage × channel matrix,
+  message house (proof points need evidence), content plan with visible gap, SEO/AEO plan, measurement plan.
+- **SEO/AEO**: references to the Search Visibility 360 subject + dated snapshot of what justified the decision; follow-up
+  read live via lanes; competitive lanes are `internal`-only; tracking keywords is T2 executed by Greenhouse's owning
+  command, never by Studio's service identity.
+- **AI agent-first**; AI proposes, a person confirms, the command executes; every AI draft carries immutable
+  provenance (model, instruction/skill version, sources, who accepted and when).
+
+## Hybrid operation with agents (ADR accepted 2026-09-26)
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md` (architecture §4.2).
+Nothing of it is in runtime yet; interactive mode (person + role skill + Efeonce MCP) already works for reads.
+Provider update (2026-09-29): load `docs/audits/platform/OPENAI_DEVDAY_2026_09_29_LAUNCH_INVENTORY.md`
+before selecting an OpenAI runtime/model. Agents API + computer use is an evaluation candidate, not an approved
+fifth adapter: its managed sessions currently lack ZDR and support US data residency only. GPT-6.1 Sol is
+available in API/Codex/Work but not Chat; its public benchmarks and prices require role-specific evals and
+cost-per-accepted-output measurement before routing. Dots, Space and Team Tasks are OpenAI products, not Studio
+runtime, memory or delegated authority.
+
+- **Work items** are the unit of hybrid work per campaign: assignee = person **or** agent role@version, requester,
+  state machine, versioned inputs by reference, deliverable = draft with provenance (TASK-1909), review, handoff =
+  a **new work item** (never a provider handoff). Assigning to an agent is `T1` within the cost cap, `T2` above it.
+- **MCP is the only action path** for agents (`mcp.efeonce.org`); per-role tool allowlist enforced in the runtime
+  and again in Studio/gateway. Never the `mst_` bearer, SQL or internal APIs.
+- **Agent role registry** (versioned data, portable Claude ↔ OpenAI): mission, skills@version, tools with tier
+  (`T0`/`T1` direct, `T2` proposal only), cost/turn caps, preferred runtime/model, eval set, enabled modes, kill switch.
+  Interactive role skills: `efeonce-agent-media-planner`, `efeonce-agent-seo-aeo` (+ `efeonce-campaign-planning`).
+- **Identity**: delegated run = assigning person ∩ role allowlist; background delegation minted only by Efeonce ID
+  (`act` claim, short, revocable — design pending); scheduled run = per-role service identity, `T0`/`T1` drafts only;
+  a `T2` confirmation is valid only from a token **without** `act`.
+- **Three modes, one run contract**; durable state only in Studio; a thin **dispatcher in Studio** (Cloud Run) with
+  adapters `claude-agent-sdk`, `claude-managed-agents`, `openai-agents-sdk`, `openai-responses` behind flags; one
+  idempotency key per logical run, read-back before retry. It reuses Globe/Nexa **patterns**, never their runtime;
+  Nexa is a gateway client. Never build on OpenAI Agent Builder (shutdown 2026-11-30).
+- **Autonomy gate**: evals per role × runtime × model before background/scheduled; cost caps per run, role and org;
+  no-ZDR runtimes (Managed Agents) only with the organization's authorization.
 
 ## The operations-registry rule (binding)
 
@@ -113,6 +195,13 @@ TASK-1887 and TASK-1890…1899.
 ## Hard rules
 
 - **NUNCA** confuse Marketing Studio with Efeonce Creative Studio (Globe).
+- **NUNCA** infer that a file is a «final» from its OneDrive/SharePoint folder; a final exists only once it entered
+  Studio through `createAssetVersion` (ADR 2026-09-26). **NUNCA** build a scheduled Graph mirror of SharePoint.
+- **NUNCA** pass binaries inside an MCP call or through a web function: bytes go straight to GCS by signed URL.
+- **NUNCA** create an asset version without a sha256 recomputed over the bytes and matching the declared one.
+- **NUNCA** approve without a person (an agent approves only with the person's delegated identity + explicit confirm),
+  and **NUNCA** record the gateway or an agent as the actor of a write.
+- **SIEMPRE** the same command for CLI, MCP and UI, and **SIEMPRE** minimal rights (license kind) at upload.
 - **NUNCA** create ADRs, runbooks, handoffs or task docs inside `efeonce-marketing-studio`; they live in `greenhouse-eo`.
 - **NUNCA** add a `/api/v1` route without its registry entry (tool or reasoned exclusion), and **NUNCA** hand-edit
   `generated/tool-manifest.json` or the gateway's `marketing-studio-tool-manifest.generated.ts` (hash-verified at
@@ -134,6 +223,13 @@ TASK-1887 and TASK-1890…1899.
   + manual, and never call a gateway deploy "done" without the canary with a real human Entra token.
 - **NUNCA** federate a write tool without its own scope class, delegated person identity and `dryRun` → confirm loop.
 - **SIEMPRE** write copy in neutral Spanish (no voseo) and keep null ≠ 0 in every reader, tool description and report.
+- **NUNCA** a Studio capability only in the UI, and **NUNCA** a read-only tool when the UI writes that capability; every
+  operation declares its risk tier (T0/T1/T2) in the registry and no caller can downgrade it.
+- **NUNCA** a parallel ICP in Studio (local segments/personas/JTBD): reference Greenhouse's catalog by org, version and id.
+- **NUNCA** read Search Visibility 360 by SQL, present a planning snapshot as current data, or spend provider budget
+  (track keywords, declare competitors) with Studio's service identity.
+- **NUNCA** AI that approves, publishes or spends alone; **SIEMPRE** provenance on every AI draft and a catalog
+  `channel_key` on every copy, piece, ad, audience and budget line.
 - **NUNCA** restore, clone or PITR the shared Cloud SQL instance to recover Studio (it rolls Greenhouse back). Recovery
   is logical per database (`pnpm ops:restore-rehearsal`, restore runbook); PITR only into a NEW temporary instance.
 - **NUNCA** call `Sentry.captureException` directly or log tokens/cookies/bodies: use `captureWithDomain` and `logEvent`
@@ -184,20 +280,17 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
 - **MCP `forbidden`** → the Greenhouse exchange denied: person lacks `marketing_studio.campaign.read`, or
   `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` lacks `efeonce-mcp-marketing-studio` in that deployment.
 
-## Program status (2026-09-25) and pending
+## Program status (2026-09-26) and pending
 
-- Studio in production at `d3ab68e`; API 1.1.0; 12 tools + 5 exclusions; manifest hash `96d1f0caf6e5…`.
-- TASK-1887 complete. TASK-1890 in-progress (code complete; pending: Greenhouse release that serves the manual).
-- TASK-1896 in-progress: code complete in Studio + Greenhouse (not pushed), `ops_run` on staging; rollout pending
-  (Sentry, Vercel env, uptime, restore role/job/scheduler, production migration, Greenhouse release). See ledger.
-  TASK-1891 in-progress (gateway 1.8.0 deployed with provider flag **OFF**; pending: Greenhouse release → flag ON +
-  dispatch → canary with human Entra token → MCP session).
-- Greenhouse local `develop` holds the exchange client, capability, manual and registry drift fix, **not pushed**
-  (remote commit collides with foreign WIP in `scripts/foto`).
-- TASK-1893 (2026-09-26) code complete, rollout pending: original store in GCS, `studio.asset.download` (API 1.2.0,
-  13 tools), rights, media worker `apps/worker`, Metricool readback. **Apply the Studio production migration before
-  pushing `main`**: the readers now select `media_object` and the rights columns.
-- Order: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
+- Studio in production; API 1.2.0; 13 tools + 5 exclusions in the Studio manifest; the gateway federates 12 (the
+  `studio.asset.download` federation is a TASK-1893 follow-up).
+- Complete: TASK-1887, TASK-1890, TASK-1891, TASK-1893 and TASK-1896 (the last two rolled out on 2026-09-26 with the
+  Greenhouse release `92002873ced9`). Restore is proven in production (rehearsal job 49 s, monthly scheduler).
+- Open follow-ups: 24 CMP-002 images without sha256 (still only in OneDrive); gateway federation of
+  `studio.asset.download`; Sentry custom rules (API moved to Workflows); forced prod error, simulated uptime outage and
+  real Teams message not exercised; first scheduled rehearsal on 2026-09-29; first-month costs.
+- Accepted 2026-09-26 (docs only): ADR Studio + GCS as SSOT and ingest by CLI/MCP/UI — implemented by 1894/1899/1895.
+- Next: TASK-1892 → 1894 → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
 
 ## Routing
 

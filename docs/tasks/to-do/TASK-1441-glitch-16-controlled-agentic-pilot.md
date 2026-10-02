@@ -1,5 +1,12 @@
 # TASK-1441 — Glitch #16 Controlled Agentic Pilot
 
+## Delta 2026-09-28 — la numeración del blog no coincide con la del sistema gráfico
+
+- El blog ya tiene «Glitch #16» (2026-07-21, `/glitch/glitch-costo-real-ia-tarea/`) y «Glitch #17» (2026-07-28, post
+  251605), mientras esta task sigue en `Diseno` y el sistema gráfico dice que la próxima es la #17. Pregunta abierta
+  para el operador (AXIS `pendingDecisions.edition-numbering-blog-vs-system`); este Delta no cambia el lifecycle ni da
+  por hecho el piloto.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

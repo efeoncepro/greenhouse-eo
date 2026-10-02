@@ -7,6 +7,15 @@
 > Creada: `2026-04-25` por TASK-600
 > Última actualización: `2026-09-06` por TASK-1837 (3 signals del ciclo de vida de la invitación externa `identity.external_invitation.*` — `undelivered`, `expired_unaccepted`, `token_revealed` — en el mismo grupo `getExternalIdentityBindingSignals`, que pasa a 9 readers; verificado end-to-end en staging el 2026-09-06 con `undelivered` y `token_revealed` observadas encendiéndose; **vivas en producción** desde el release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` del 2026-09-06, primera lectura contra la base real: `undelivered=0`, `expired_unaccepted=0`, `token_revealed=3` por las revelaciones de prueba, que se apaga sola al vencer su ventana de 24 h). Antes, `2026-09-04` por el release `9100bbd2765d` (semántica de `platform.release.worker_revision_drift`: change-gate por servicio — `ops-worker` + `auth-server` — con espejo de rutas y test de paridad; 5 servicios Cloud Run mapeados). Ese mismo día TASK-1829 agregó 3 signals `incident` de la superficie OAuth del emisor propio bajo el módulo `identity` (`auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`, `auth.oauth.cimd_rejected`), TASK-1828 `auth.issuer.jwks_unreachable` + `auth.signing_keys.lifecycle` y TASK-1631 las 4 de `identity.external_binding.*` (TASK-1836 sumó `unaudited_write` + `mixed_population` el 2026-09-05).
 
+## Delta 2026-09-28 — TASK-1876: `runtime.postgres.connection_saturation` suma el pico de `num_backends`
+
+La señal (módulo `cloud`, `kind=runtime`, reader `src/lib/reliability/queries/postgres-connection-saturation.ts`; umbrales vigentes `warning` ≥ 60 %, `error` ≥ 80 % del máximo utilizable) ahora también lee el **pico de 24 h** de la métrica nativa de Cloud SQL `cloudsql.googleapis.com/database/postgresql/num_backends` (`src/lib/reliability/queries/postgres-backends-peak.ts`, REST de Cloud Monitoring). Motivo: ISSUE-174 — el detector por `pg_stat_activity` sólo ve el instante y falla justo cuando la instancia está saturada (`53300`). Reglas:
+
+- Pico ≥ 90 % del utilizable eleva `ok` → `warning` aunque el instante esté sano; nunca baja una severidad.
+- Si el detector PG falla, la señal queda `unknown` pero el resumen y la evidencia reportan el pico de Cloud SQL.
+- Si Monitoring no se puede leer, la evidencia declara `peak_backends_24h: no disponible`; nunca se interpreta como `ok`.
+- La SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/monitoring.viewer` desde 2026-09-28 (lectura del pico verificada). Alerta complementaria `num_backends > 85` por 2 min: `projects/efeonce-group/alertPolicies/11425632472409123636`. Contrato: `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md` §V1.3.
+
 ## Delta 2026-09-04 — Release `9100bbd2765d`: `platform.release.worker_revision_drift` clasifica el change-gate por servicio
 
 Cambio de semántica del signal del subsistema `Platform Release` (reader

@@ -22,15 +22,15 @@ const spies = {
   profileUpdate: vi.fn()
 }
 
-vi.mock('../commands', () => ({
-  enqueueGraderDiagnostic: async (input: unknown) => {
+vi.mock('../markets/run-batch', () => ({
+  requestRunBatchInternal: async (input: unknown) => {
     spies.enqueue(input)
 
     if (state.enqueueError) {
       throw state.enqueueError
     }
 
-    return state.enqueueResult
+    return { runs: [state.enqueueResult.run], idempotentHit: state.enqueueResult.idempotentHit }
   }
 }))
 
@@ -38,7 +38,7 @@ vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: vi.fn() }))
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: async (sql: string, params?: unknown[]) => {
-    if (sql.includes('SUM(estimated_cost_usd)')) {
+    if (sql.includes('AS total')) {
       return [{ total: state.monthCost }]
     }
 
@@ -59,10 +59,7 @@ vi.mock('@/lib/postgres/client', () => ({
   }
 }))
 
-import {
-  buildRecurringRegradeIdempotencyKey,
-  handleRecurringRegradeBatch
-} from '../regrade'
+import { buildRecurringRegradeIdempotencyKey, handleRecurringRegradeBatch } from '../regrade'
 
 const ENABLED_ENV = {
   NODE_ENV: 'test',
@@ -126,16 +123,11 @@ describe('handleRecurringRegradeBatch', () => {
     expect(result.enqueuedRuns).toBe(1)
     expect(spies.enqueue).toHaveBeenCalledWith(
       expect.objectContaining({
-        brandName: 'Acme',
+        organizationId: 'org-1',
+        markets: 'primary',
+        channel: 'recurring',
         mode: 'full',
-        runKind: 'public_diagnostic',
-        idempotencyKey: 'growth-ai-visibility-regrade:gprof-1:monthly:2026-06-01',
-        attribution: expect.objectContaining({
-          organizationId: 'org-1',
-          assignmentId: 'cpma-1',
-          runSource: 'portal_contracted',
-          costAttribution: 'client'
-        })
+        idempotencyKey: 'growth-ai-visibility-regrade:gprof-1:monthly:2026-06-01'
       })
     )
     expect(spies.profileUpdate).toHaveBeenCalled()

@@ -1,0 +1,59 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:20:02.533Z",
+  "run": "ai-generations/2026-09-24_design-context-lab-v3",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-24_design-context-lab-v3",
+  "totalBytes": 14760353,
+  "fileCount": 8,
+  "files": [
+    {
+      "path": "finales/01-pagina-mision.png",
+      "sizeBytes": 1562140,
+      "sha256": "3d4c2adb40305a863033d3a0076651dd098fa1adf816c04e78e6009f267d9e5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v3/finales/01-pagina-mision.png"
+    },
+    {
+      "path": "finales/02-pagina-receta.png",
+      "sizeBytes": 1656579,
+      "sha256": "7a59e6b01c34f3f58829962b831df6c24e82ebed736351cd305eafc49b9a707f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v3/finales/02-pagina-receta.png"
+    },
+    {
+      "path": "finales/03-pagina-revelacion.png",
+      "sizeBytes": 1832238,
+      "sha256": "1d6956dee24f119412c06fe8c7c1d38916e244cf376d77d619d8a202dd49b7c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v3/finales/03-pagina-revelacion.png"
+    },
+    {
+      "path": "finales/contact-sheet.png",
+      "sizeBytes": 855827,
+      "sha256": "9ce36bb529b7b5f8e9c728d2927637cad681ec82bb109b9414c0050f577726a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v3/finales/contact-sheet.png"
+    },
+    {
+      "path": "plates/01-laboratorio.png",
+      "sizeBytes": 2204108,
+      "sha256": "ac1539f0181062ce44dce217e745fc6474394f0cf34914aef79a24df63bce387",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v3/plates/01-laboratorio.png"
+    },
+    {
+      "path": "plates/02-ingredientes.png",
+      "sizeBytes": 2255701,
+      "sha256": "87f5472f5b8bbe37b74b6207d3ae60852b9b74162f2ba4b793dddd1e8c23f184",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v3/plates/02-ingredientes.png"
+    },
+    {
+      "path": "plates/03-mezcla.png",
+      "sizeBytes": 2168581,
+      "sha256": "77a079bc990caca2ec046861308a1a65ad92bf71f17afdac6b8dfa33d54c536e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v3/plates/03-mezcla.png"
+    },
+    {
+      "path": "plates/04-revision.png",
+      "sizeBytes": 2225179,
+      "sha256": "fb887c54367d3ddf855e10a2ee96ea857c99a899e854d732958d580ff4f71b8f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-24_design-context-lab-v3/plates/04-revision.png"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "document": "proposal",
+  "slides": [
+    {
+      "recipeId": "cover-proposal-orbit"
+    },
+    {
+      "recipeId": "decision-ai-market"
+    },
+    {
+      "recipeId": "decision-ai-answer"
+    },
+    {
+      "recipeId": "method-surround-cycle"
+    },
+    {
+      "recipeId": "method-eeat"
+    },
+    {
+      "recipeId": "proposal-service-seo"
+    },
+    {
+      "recipeId": "decision-traffic-to-revenue"
+    },
+    {
+      "recipeId": "decision-difference"
+    },
+    {
+      "recipeId": "decision-diagnosis-map"
+    },
+    {
+      "recipeId": "close-proposal-horizon"
+    }
+  ]
+}

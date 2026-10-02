@@ -1,8 +1,33 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { type GrowthAiVisibilityProviderObservation } from '../contracts'
+import type { GrowthAiVisibilityProviderObservation } from '../contracts'
 import { createFakeProviderAdapter } from '../providers/fake-adapter'
+import { resolveGrowthMarket } from '@/lib/growth/markets'
+
 import { type GraderExecutionPrompt, type GraderRunRow } from '../store'
+
+vi.mock('@/lib/db', () => ({ withTransaction: async (work: (client: unknown) => Promise<unknown>) => work({}) }))
+vi.mock('../markets/store', () => ({
+  ensurePrimaryMarket: async () => ({
+    marketId: 'gpmk-1',
+    marketCode: 'CL',
+    locale: 'es-CL',
+    status: 'active',
+    isPrimary: true
+  }),
+  listProfileMarkets: async () => [
+    { marketId: 'gpmk-1', marketCode: 'CL', locale: 'es-CL', status: 'active', isPrimary: true }
+  ],
+  snapshotMarket: async (_profile: unknown, _market: unknown, policy: string) => ({
+    version: 'matching.v1',
+    brand: { name: PROFILE.brandName, aliases: [], websiteUrl: PROFILE.websiteUrl, category: PROFILE.category },
+    market: resolveGrowthMarket('CL', 'es-CL'),
+    competitors: [],
+    competitorSetId: 'gcset-1',
+    setVersion: 1,
+    providerPolicyVersion: policy
+  })
+}))
 
 // ── In-memory store mock (stateful) ──────────────────────────────────────────
 // TASK-1234: el store ahora persiste prompts + soporta claim/recovery; el mock
@@ -30,6 +55,8 @@ const db: {
 } = { runsById: new Map(), runsByKey: new Map(), observations: [], insertCalls: [] }
 
 const makeRun = (input: Record<string, unknown>): GraderRunRow => ({
+  marketId: input.marketId as string,
+  matchingSnapshot: input.matchingSnapshot as GraderRunRow['matchingSnapshot'],
   runId: `grun-${++runSeq}`,
   publicId: `EO-GRUN-${String(runSeq).padStart(5, '0')}`,
   pollToken: `gpt-test-${runSeq}`,
@@ -67,7 +94,7 @@ vi.mock('../public-delivery/finalize-delivery', () => ({
     executionEvents.push(`delivery:${run.runId}`)
 
     return null
-  },
+  }
 }))
 
 vi.mock('../probes/command', () => ({
@@ -76,7 +103,7 @@ vi.mock('../probes/command', () => ({
     executionEvents.push(`probes:${runId}`)
 
     return { results: [], skippedReason: 'probes_disabled' }
-  },
+  }
 }))
 
 // Auto-scoring en la finalización (fix 2026-07-02): el run-engine ahora scorea el run terminal-con-
@@ -89,7 +116,7 @@ vi.mock('../scoring/command', () => ({
     scoreCalls.push(input.runId)
 
     return { score: {}, findings: [] }
-  },
+  }
 }))
 
 vi.mock('../store', () => ({
@@ -147,16 +174,12 @@ vi.mock('../store', () => ({
 
     return claimed
   },
-  findStuckRunningRuns: async () =>
-    Array.from(db.runsById.values()).filter(run => run.status === 'running')
+  findStuckRunningRuns: async () => Array.from(db.runsById.values()).filter(run => run.status === 'running')
 }))
 
-const {
-  executeGraderRun,
-  enqueueGraderRun,
-  drainPendingGraderRuns,
-  recoverStuckRunningRuns
-} = await import('../run-engine')
+const { executeGraderRun, enqueueGraderRun, drainPendingGraderRuns, recoverStuckRunningRuns } = await import(
+  '../run-engine'
+)
 
 const baseInput = {
   profile: {
@@ -275,7 +298,12 @@ describe('growth/ai-visibility — executeGraderRun (primitive síncrono)', () =
     const insertsAfterFirst = db.insertCalls.length
 
     const spy = vi.spyOn(openaiAdapter, 'runPrompt')
-    const result = await executeGraderRun({ ...baseInput, idempotencyKey: 'key-1', adapters: { openai: openaiAdapter } })
+
+    const result = await executeGraderRun({
+      ...baseInput,
+      idempotencyKey: 'key-1',
+      adapters: { openai: openaiAdapter }
+    })
 
     expect(result.idempotentHit).toBe(true)
     expect(spy).not.toHaveBeenCalled()
@@ -321,7 +349,11 @@ describe('growth/ai-visibility — enqueue + worker async (TASK-1234)', () => {
     const { run } = await enqueueGraderRun(baseInput)
 
     // Lo dejamos huérfano en running con una observación succeeded ya persistida.
-    db.runsById.set(run.runId, { ...db.runsById.get(run.runId)!, status: 'running', startedAt: '2026-06-24T00:00:01.000Z' })
+    db.runsById.set(run.runId, {
+      ...db.runsById.get(run.runId)!,
+      status: 'running',
+      startedAt: '2026-06-24T00:00:01.000Z'
+    })
     db.observations.push({
       observationId: 'obs-1',
       runId: run.runId,
@@ -352,7 +384,11 @@ describe('growth/ai-visibility — enqueue + worker async (TASK-1234)', () => {
   it('recoverStuckRunningRuns sin observaciones → failed (corrió pero no produjo evidencia)', async () => {
     const { run } = await enqueueGraderRun(baseInput)
 
-    db.runsById.set(run.runId, { ...db.runsById.get(run.runId)!, status: 'running', startedAt: '2026-06-24T00:00:01.000Z' })
+    db.runsById.set(run.runId, {
+      ...db.runsById.get(run.runId)!,
+      status: 'running',
+      startedAt: '2026-06-24T00:00:01.000Z'
+    })
 
     const result = await recoverStuckRunningRuns(0)
 

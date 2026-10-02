@@ -8,22 +8,20 @@ import 'server-only'
  * ventana de cadencia y deja que el worker async normal ejecute el run.
  */
 
-import { enqueueGraderDiagnostic } from '@/lib/growth/ai-visibility/commands'
+import { requestRunBatchInternal } from '@/lib/growth/ai-visibility/markets/run-batch'
 import { AI_VISIBILITY_MODULE_KEY } from '@/lib/growth/ai-visibility/entitlement'
 import {
+  isMultiMarketEnabled,
   isRecurringRegradeEnabled,
   resolveRecurringRegradeConfig
 } from '@/lib/growth/ai-visibility/flags'
 import { resolveProviderPolicy } from '@/lib/growth/ai-visibility/policy'
 import { captureWithDomain } from '@/lib/observability/capture'
-import {
-  runGreenhousePostgresQuery,
-  withGreenhousePostgresTransaction
-} from '@/lib/postgres/client'
+import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 export const RECURRING_REGRADE_IDEMPOTENCY_PREFIX = 'growth-ai-visibility-regrade'
 
-export type RecurringRegradeCadence = 'weekly' | 'monthly'
+export type RecurringRegradeCadence = 'weekly' | 'monthly' | 'quarterly'
 
 export type RecurringRegradeSkipReason = 'disabled' | 'budget_exhausted' | 'no_due_profiles'
 
@@ -54,6 +52,7 @@ export interface HandleRecurringRegradeBatchResult {
 }
 
 interface ClaimedProfile extends Record<string, unknown> {
+  market_id?: string
   profile_id: string
   organization_id: string
   brand_name: string
@@ -83,7 +82,9 @@ const regradeWindowStart = (cadence: RecurringRegradeCadence, now: Date): string
     return toIsoDate(startOfUtcWeek(now))
   }
 
-  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-01`
+  const month = cadence === 'quarterly' ? Math.floor(now.getUTCMonth() / 3) * 3 + 1 : now.getUTCMonth() + 1
+
+  return `${now.getUTCFullYear()}-${String(month).padStart(2, '0')}-01`
 }
 
 export const buildRecurringRegradeIdempotencyKey = (input: {
@@ -100,9 +101,9 @@ export const buildRecurringRegradeIdempotencyKey = (input: {
 
 const readMonthToDateRegradeCost = async (): Promise<number> => {
   const rows = await runGreenhousePostgresQuery<{ total: string | number | null }>(
-    `SELECT COALESCE(SUM(estimated_cost_usd), 0) AS total
+    `SELECT COALESCE(SUM(CASE WHEN status IN ('pending','running') THEN GREATEST(COALESCE(cost_ceiling_usd,0),estimated_cost_usd) ELSE estimated_cost_usd END), 0) AS total
        FROM greenhouse_growth.grader_runs
-      WHERE idempotency_key LIKE $1
+      WHERE (idempotency_key LIKE $1 OR batch_id IN (SELECT batch_id FROM greenhouse_growth.grader_run_batches WHERE idempotency_key LIKE $1))
         AND created_at >= date_trunc('month', CURRENT_DATE)`,
     [`${RECURRING_REGRADE_IDEMPOTENCY_PREFIX}:%`]
   )
@@ -126,6 +127,7 @@ const claimDueProfiles = async (limit: number): Promise<ClaimedProfile[]> =>
            p.recurring_regrade_cadence,
            a.assignment_id,
            CASE p.recurring_regrade_cadence
+             WHEN 'quarterly' THEN NOW() + INTERVAL '3 months'
              WHEN 'weekly' THEN NOW() + INTERVAL '7 days'
              ELSE NOW() + INTERVAL '1 month'
            END AS next_at
@@ -166,10 +168,36 @@ const claimDueProfiles = async (limit: number): Promise<ClaimedProfile[]> =>
     return result.rows
   })
 
-const markProfileRegradeSuccess = async (input: {
-  profileId: string
-  runId: string
-}): Promise<void> => {
+const claimDueMarkets = async (limit: number): Promise<ClaimedProfile[]> =>
+  withGreenhousePostgresTransaction(async client => {
+    const rows = await client.query<ClaimedProfile>(
+      `WITH due AS (
+    SELECT m.market_id,p.profile_id,p.organization_id,p.brand_name,p.website_url,m.market_code AS market,m.locale,p.category,
+      p.competitors_declared,m.recurring_regrade_cadence,a.assignment_id,
+      CASE m.recurring_regrade_cadence WHEN 'weekly' THEN now()+INTERVAL '7 days' WHEN 'quarterly' THEN now()+INTERVAL '3 months' ELSE now()+INTERVAL '1 month' END AS next_at
+    FROM greenhouse_growth.grader_profile_markets m
+    JOIN greenhouse_growth.grader_profiles p ON p.profile_id=m.profile_id
+    JOIN greenhouse_client_portal.module_assignments a ON a.organization_id=p.organization_id
+      AND a.module_key=$2 AND a.status='active' AND a.effective_to IS NULL AND (a.expires_at IS NULL OR a.expires_at>now())
+      AND a.metadata_json->>'aeo_tier'='contracted'
+    WHERE m.status='active' AND p.status='active' AND m.recurring_regrade_enabled
+      AND COALESCE(m.recurring_regrade_next_at,'-infinity'::timestamptz)<=now()
+    ORDER BY m.recurring_regrade_next_at NULLS FIRST,m.created_at FOR UPDATE OF m SKIP LOCKED LIMIT $1
+  ) UPDATE greenhouse_growth.grader_profile_markets m SET recurring_regrade_next_at=due.next_at
+    FROM due WHERE m.market_id=due.market_id RETURNING due.*`,
+      [limit, AI_VISIBILITY_MODULE_KEY]
+    )
+
+    await client.query(
+      `UPDATE greenhouse_growth.grader_profiles p SET recurring_regrade_next_at=m.recurring_regrade_next_at
+    FROM greenhouse_growth.grader_profile_markets m WHERE p.profile_id=m.profile_id AND m.is_primary AND m.market_id=ANY($1::text[])`,
+      [rows.rows.map(row => row.market_id)]
+    )
+
+    return rows.rows
+  })
+
+const markProfileRegradeSuccess = async (input: { profileId: string; runId: string }): Promise<void> => {
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_growth.grader_profiles
         SET recurring_regrade_last_run_id = $2,
@@ -232,7 +260,9 @@ export const handleRecurringRegradeBatch = async (
     }
   }
 
-  const claimed = await claimDueProfiles(Math.min(requestedBatchSize, remainingSlots))
+  const claimed = await (isMultiMarketEnabled(env) ? claimDueMarkets : claimDueProfiles)(
+    Math.min(requestedBatchSize, remainingSlots)
+  )
 
   if (claimed.length === 0) {
     return {
@@ -254,35 +284,41 @@ export const handleRecurringRegradeBatch = async (
 
   for (const profile of claimed) {
     const idempotencyKey = buildRecurringRegradeIdempotencyKey({
-      profileId: profile.profile_id,
+      profileId: profile.market_id ?? profile.profile_id,
       cadence: profile.recurring_regrade_cadence,
       now
     })
 
     try {
-      const enqueue = await enqueueGraderDiagnostic({
-        brandName: profile.brand_name,
-        websiteUrl: profile.website_url,
-        market: profile.market,
-        locale: profile.locale,
-        category: profile.category ?? '',
-        competitorsDeclared: profile.competitors_declared ?? [],
+      const batch = await requestRunBatchInternal({
+        organizationId: profile.organization_id,
+        markets: profile.market_id ? [profile.market_id] : 'primary',
         mode: 'full',
-        runKind: 'public_diagnostic',
+        actor: 'system:recurring-regrade',
+        channel: 'recurring',
         idempotencyKey,
-        attribution: {
-          organizationId: profile.organization_id,
-          assignmentId: profile.assignment_id,
-          runSource: 'portal_contracted',
-          costAttribution: 'client'
-        }
+        env
       })
+
+      const enqueue = { run: batch.runs[0], idempotentHit: batch.idempotentHit }
 
       if (enqueue.idempotentHit) {
         idempotentHits += 1
       }
 
-      await markProfileRegradeSuccess({ profileId: profile.profile_id, runId: enqueue.run.runId })
+      if (profile.market_id) {
+        await runGreenhousePostgresQuery(
+          `UPDATE greenhouse_growth.grader_profile_markets SET recurring_regrade_last_run_id=$2,recurring_regrade_last_at=now() WHERE market_id=$1`,
+          [profile.market_id, enqueue.run.runId]
+        )
+        await runGreenhousePostgresQuery(
+          `UPDATE greenhouse_growth.grader_profiles p SET recurring_regrade_last_run_id=m.recurring_regrade_last_run_id,recurring_regrade_last_at=m.recurring_regrade_last_at
+          FROM greenhouse_growth.grader_profile_markets m WHERE p.profile_id=m.profile_id AND m.is_primary AND m.market_id=$1`,
+          [profile.market_id]
+        )
+      } else {
+        await markProfileRegradeSuccess({ profileId: profile.profile_id, runId: enqueue.run.runId })
+      }
 
       runs.push({
         profileId: profile.profile_id,
@@ -300,7 +336,20 @@ export const handleRecurringRegradeBatch = async (
       })
 
       failedProfiles += 1
-      await markProfileRegradeFailure(profile.profile_id)
+
+      if (profile.market_id) {
+        await runGreenhousePostgresQuery(
+          `UPDATE greenhouse_growth.grader_profile_markets SET recurring_regrade_next_at=now()+INTERVAL '1 day' WHERE market_id=$1`,
+          [profile.market_id]
+        )
+        await runGreenhousePostgresQuery(
+          `UPDATE greenhouse_growth.grader_profiles p SET recurring_regrade_next_at=m.recurring_regrade_next_at
+          FROM greenhouse_growth.grader_profile_markets m WHERE p.profile_id=m.profile_id AND m.is_primary AND m.market_id=$1`,
+          [profile.market_id]
+        )
+      } else {
+        await markProfileRegradeFailure(profile.profile_id)
+      }
     }
   }
 

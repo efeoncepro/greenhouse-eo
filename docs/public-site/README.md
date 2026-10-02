@@ -1,5 +1,7 @@
 # Public Site — Producto (efeoncepro.com + think.efeoncepro.com)
 
+> **Naming AEO vigente (2026-09-29):** **Efeonce AEO** es la capacidad de entrada; **Efeonce AEO Assessment** nombra el diagnóstico público y **Efeonce AI Visibility Report** su salida. `AI Visibility Grader`/`Brand Visibility` siguen siendo aliases técnicos e históricos y `/brand-visibility` conserva su ruta hasta un cambio de runtime independiente. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Qué es esto.** El hogar-producto del sitio público de Efeonce: dónde viven
 > las **decisiones de producto/posicionamiento** y el **roadmap de ejecución**
 > del sitio público como superficie comercial. Es el índice descubrible por
@@ -82,6 +84,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 - [PDR-020 — Canales propios de Efeonce: un motor editorial, cinco roles de canal](decisions/PDR-020-canales-propios-sistema-editorial.md)
 - [PDR-021 — Landing Trade Marketing & BTL](decisions/PDR-021-landing-trade-marketing-btl-posicionamiento.md) — posición en el medio entre plataformas que detectan y agencias que ejecutan; término cabeza `trade marketing`, no el modificador `agencia de`. Brief: [Channel & Commerce Landing SEO/AEO Brief V1](CHANNEL_COMMERCE_LANDING_SEO_AEO_BRIEF_V1.md). Ejecución: `TASK-1860`.
 - [PDR-023 — Landing ASO](decisions/PDR-023-landing-aso-posicionamiento.md) — tercera superficie del grupo `Visibilidad` junto a SEO y AEO; página de expansión y citabilidad en español, no de captura (`aso` es ambiguo y `app store optimization` casi no se busca en español); publicación por fases atada a la extensión Search & App Visibility. Brief: [ASO Landing SEO/AEO Brief V1](ASO_LANDING_SEO_AEO_BRIEF_V1.md). Ejecución: `TASK-1862`.
+- [PDR-024 — AXIS en el sitio público: composición agéntica](decisions/PDR-024-axis-en-el-sitio-publico-composicion-agentica.md) — el sitio consume AXIS como versión fija incluida en `eo-elementor-widgets` y encolada sólo donde se usa (los packages son privados: nada de registry ni `-latest`); los agentes componen intents validados y el SVG se sirve en el HTML del servidor; AXIS es capa gráfica y de valores, nunca de texto ni de layout. Brecha previa: `tokens.css` no emite rampas, superficies ni tipografía. Ejecución: task por crear.
 - **[Content Engineering Pillar Brief V1](CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md)** — foundation brief de la futura masterpiece: tesis, audiencia, arco, primitives de comprensión/decisión, SEO/AEO, medición, distribución y gates de publicación.
 - **[Creative Workflows Pillar + Cluster Brief V1](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md)** — brief maestro de audiencia, tesis, arquitectura editorial, prioridades, enlaces, medición y atomización.
 - **[Web agéntica Pillar + Cluster Brief V1](WEB_AGENTICA_PILLAR_CLUSTER_BRIEF_V1.md)** — contrato editorial de la pillar que soporta `/desarrollo-sitios-web/`: definición citable, recorrido, cluster, enlaces, visuales, medición y gate de publicación.

@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "id": "CMP-005-pilots-color-v2",
+  "campaignId": "CMP-005",
+  "direction": {
+    "paletteReason": "Azul activo en la obra digital; naranja como señal de decisión y azul claro para acciones ligadas al sistema de producción. La elección responde al relato de cada pieza.",
+    "sceneRole": "La fotografía muestra trabajo y decisiones concretas. Conserva iluminación neutro-cálida, materiales reales y sombras neutras.",
+    "textRole": "El concepto es la voz principal; los apoyos explican la capacidad y la acción propone el siguiente paso.",
+    "actionRole": "La acción se integra con una selección AXIS de ocho controles y cursor: expresa intervención y criterio. Naranja para señalar identidad o fricción, azul claro para continuidad y priorización. Un solo marco de selección; sin relleno blanco. El contraste valida la decisión comercial y visual."
+  },
+  "palette": [
+    "inkOnDark",
+    "inkOnLight",
+    "softOnDark",
+    "accentSurface"
+  ],
+  "treatments": [
+    {
+      "id": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "inkToken": "inkOnDark",
+      "reason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "surfaceToken": "accentSurface"
+    },
+    {
+      "id": "system-cool-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "text",
+      "inkToken": "softOnDark",
+      "reason": "Texto azul claro relacionado con el sistema digital; bounding box y cursor aportan la gramática de selección sin otro rectángulo de botón."
+    }
+  ]
+}

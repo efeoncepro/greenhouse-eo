@@ -659,3 +659,10 @@ extractor sin tocarlo.
   deja el carril cliente como follow-up; confirmar antes de reservar la capability.
 - ¿La política de comparabilidad corta la serie histórica del cliente en el reporte (dos tramos
   visibles) o sólo anota el cambio? Decisión de producto, no técnica.
+
+## Impacto cruzado TASK-1863 (2026-09-28)
+
+El Grader multi-mercado está implementado y verificado en staging (Vercel y worker `d86edb784`):
+catálogo es/en/pt-BR/fr, mercados, lotes, snapshots y readers por país/locale. Main sigue en espera;
+no asumir habilitación comercial ni geografía inferida en históricos. Esta publicación no cierra
+la capacidad propia de esta task. Consumir los commands existentes; [contrato y manual](../../manual-de-uso/growth/configurar-mercados-aeo.md).

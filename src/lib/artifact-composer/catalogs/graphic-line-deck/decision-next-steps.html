@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · los próximos pasos</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `decision-next-steps` (surface deck, tema oscuro, TASK-1928), la versión con impacto: la agenda del
+      diagnóstico abierta (un documento claro con cinco días y cuatro horas, el elegido en el fondo), el cursor del
+      lector sobre el botón y los pasos siguientes como dos fichas de vidrio en profundidad, bajo una órbita elíptica
+      que termina en la esfera. El contacto sale de los datos de Efeonce. Referencia: DeckProximosPasos.
+    -->
+    <main class="gl-slide gl-ns" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ns-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ns-orbit" data-slot="orbit">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Próximos pasos</p>
+        <div class="gl-ns-voice">
+          <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Y ahora qué sigue?</span></p>
+          <p class="gl-answer"><span data-slot-field="answer">Empecemos</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+        </div>
+      </div>
+
+      <div class="gl-ns-copy">
+        <p class="gl-body gl-ns-body" data-slot="body">Un diagnóstico <strong>sin costo</strong> para saber dónde estás.</p>
+        <p class="gl-ns-contact" data-slot="contact"><span data-slot-field="email">sales@efeoncepro.com</span><br /><span data-slot-field="phone">+56 9 3732 3064</span></p>
+      </div>
+
+      <ol class="gl-ns-steps" data-slot="nextSteps">
+        <li class="gl-ns-step">
+          <p class="gl-ns-step-head"><span class="gl-ns-step-number" data-slot-field="number">02</span><span data-slot-field="label">Piloto pagado</span></p>
+          <p class="gl-ns-step-title" data-slot-field="title">Sample Sprint</p>
+          <p class="gl-ns-step-desc" data-slot-field="desc">Acotado y gobernado.</p>
+        </li>
+      </ol>
+
+      <section class="gl-ns-agenda" data-slot="agenda">
+        <div class="gl-ns-head">
+          <span class="gl-ns-tile"><img src="assets/efeonce-isotype-negative.svg" alt="" /></span>
+          <div>
+            <p class="gl-ns-kicker" data-slot-field="kicker">01 · Diagnóstico · Sin costo</p>
+            <p class="gl-ns-title" data-slot-field="title">Agenda tu diagnóstico</p>
+          </div>
+        </div>
+
+        <p class="gl-ns-descriptor" data-slot-field="descriptor">45 min por videollamada.</p>
+
+        <ol class="gl-ns-days" data-slot="days">
+          <li class="gl-ns-day"><span class="gl-ns-weekday" data-slot-field="weekday">Lun</span><span class="gl-ns-daynum" data-slot-field="day">29</span></li>
+        </ol>
+
+        <ol class="gl-ns-times" data-slot="times">
+          <li class="gl-ns-time"><span data-slot-field="time">09:30</span></li>
+        </ol>
+
+        <div class="gl-ns-foot">
+          <p class="gl-ns-summary" data-slot-field="summary">Martes 30 · 11:30 · hora de Chile</p>
+          <div data-slot="cta">
+            <p class="gl-ns-cta" data-gl-cta-target data-slot-field="text">Agenda un diagnóstico</p>
+          </div>
+        </div>
+      </section>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

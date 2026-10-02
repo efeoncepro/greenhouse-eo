@@ -18,11 +18,11 @@ export interface DataForSeoFamilyDefinition {
   /** Prefijo canónico de la familia. `normalizeEndpoint` valida contra esto. */
   prefix: string
   /**
-   * `true` cuando la familia SIEMPRE opera para una organización cliente concreta.
+   * `true` cuando todo POST de la familia opera para una organización cliente concreta.
    *
-   * Las 4 familias SEO son trabajo per-cliente y su gasto DEBE quedar atribuido, así que el
-   * tipo obliga a pasar `organizationId` — el gasto no rastreado se vuelve imposible por
-   * construcción, no por disciplina del caller.
+   * Las familias per-org compran datos para un cliente y su gasto DEBE quedar atribuido, así que
+   * el tipo obliga a pasar `organizationId` en POST. Los GET de catálogo/modelos/polling no crean
+   * gasto y pueden operar sin inventar una organización.
    *
    * ⚠️ `serp` queda en `false` POR DISEÑO, no por deuda — y desde TASK-1696 esa distinción es
    * verificable, no una promesa. La atribución YA existe: `ProviderAdapterContext` transporta la
@@ -67,6 +67,12 @@ export const DATAFORSEO_FAMILIES = {
     prefix: '/v3/domain_analytics/',
     requiresOrganization: true,
     purpose: 'Analítica de dominio (tecnologías, Whois).'
+  },
+  ai_optimization: {
+    prefix: '/v3/ai_optimization/',
+    requiresOrganization: true,
+    purpose:
+      'Research AEO: respuestas de ChatGPT/Claude/Gemini/Perplexity, LLM Scraper, AI Keyword Data y LLM Mentions.'
   }
 } as const satisfies Record<string, DataForSeoFamilyDefinition>
 
@@ -76,12 +82,9 @@ export const DATAFORSEO_FAMILIES = {
  * Que una familia esté en el allowlist significa "el prefijo se acepta", NO "el transporte
  * puede llamar ese endpoint". Antes de integrar una capability nueva, contrastá contra esto:
  *
- * 1. **El transporte es POST-only, con el body `JSON.stringify(tasks)`.** Toda la convención
- *    `task_get/$id` y `tasks_ready` de DataForSEO es **GET, con el id en el path y sin
- *    body** — `normalizeEndpoint` los aceptaría (el prefijo calza) y el proveedor
- *    respondería 404/405. OnPage se salva porque `summary`/`pages` son POST; **Lighthouse
- *    (`lighthouse/task_get/json/$id`) y el SERP task-based NO**. Si los necesitas, el
- *    transporte requiere soporte de método/path, no un prefijo nuevo.
+ * 1. **El transporte soporta GET y POST.** Los GET (`models`, `tasks_ready`, `task_get/$id`,
+ *    locations/languages) viajan sin body; los POST envían `JSON.stringify(tasks)`. Que el
+ *    método exista no elimina la validación de prefijo ni convierte un endpoint en gratuito.
  * 2. **`cost` es del BATCH, no de la tarea.** Se lee de `json.cost` en la raíz de la
  *    respuesta. Con N tareas en un POST no hay forma de repartirlo entre N filas, así que un
  *    `provider_cost` "por fila" en una tabla snapshot no se puede poblar con exactitud desde

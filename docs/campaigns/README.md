@@ -55,6 +55,7 @@ Sólo `CDR-###` y `EPIC-CMP-###` tienen numeración propia.
 
 ## Registro de decisiones
 
+- [CDR-012](decisions/CDR-012-cmp004-reorientacion-por-servicios.md) · Accepted: CMP-004 se ordena por servicio (S01–S08, un ad por servicio de Creative Services); pilotos N2 en cine nativo para ad, voz y CTA en el acento Brand. Revisión creativa, formatos, destinos y medios pendientes.
 - [CDR-010](decisions/CDR-010-cmp004-agencia-creativa-premium.md) · Accepted en alcance creativo: CMP-004, vía creativa premium para mid-market/enterprise. Brief completo y activación propuesta en OneDrive; email incluido; sin pauta/envíos.
 - [CDR-011](decisions/CDR-011-cmp005-agencia-estrategica-premium.md) · Accepted en alcance creativo: CMP-005, vía estratégica premium para mid-market/enterprise. Brief completo y activación propuesta en OneDrive; email incluido; sin pauta/envíos.
 

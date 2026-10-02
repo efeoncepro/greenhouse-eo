@@ -1,0 +1,20 @@
+{
+  "document": "qbr",
+  "slides": [
+    {
+      "recipeId": "cover-classic"
+    },
+    {
+      "recipeId": "decision-agenda"
+    },
+    {
+      "recipeId": "content-measure"
+    },
+    {
+      "recipeId": "decision-chart"
+    },
+    {
+      "recipeId": "close-classic"
+    }
+  ]
+}

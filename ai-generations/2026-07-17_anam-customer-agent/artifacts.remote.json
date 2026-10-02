@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-09-23T12:32:34.238Z",
+  "generatedAt": "2026-10-01T22:00:19.762Z",
   "run": "ai-generations/2026-07-17_anam-customer-agent",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-17_anam-customer-agent",

@@ -1,0 +1,304 @@
+{
+  "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+  "blendedOverall": null,
+  "scoreVersionsComparable": true,
+  "signals": [],
+  "rows": [
+    {
+      "country": "CL",
+      "locale": "es-CL",
+      "runId": "grun-e7236640-99fc-4b71-807b-d83f4a78a825",
+      "gate": {
+        "status": "ready",
+        "reason": "Diagnóstico completo con cobertura suficiente.",
+        "nextAction": "Revisa el plan de acción priorizado del reporte."
+      },
+      "overallScore": 38.5,
+      "trend": {
+        "status": "sin_historico",
+        "reason": "Primer análisis: aún no hay un período anterior para comparar.",
+        "previousAsOf": null,
+        "overall": null,
+        "dimensions": []
+      },
+      "provenance": {
+        "market": {
+          "code": "CL",
+          "label": "Chile",
+          "locale": "es-CL",
+          "language": "es",
+          "locationCode": 2152,
+          "googleAiModeLanguageCode": "es"
+        },
+        "providersRequested": [
+          "openai",
+          "perplexity",
+          "gemini",
+          "google_ai_overview"
+        ],
+        "providersAttempted": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "providersResponded": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "geoModes": {
+          "openai": {
+            "mode": "native",
+            "country": "CL"
+          },
+          "perplexity": {
+            "mode": "native",
+            "country": "CL"
+          },
+          "gemini": {
+            "mode": "prompt_only",
+            "country": "CL"
+          },
+          "google_ai_overview": {
+            "mode": "native",
+            "country": "CL"
+          }
+        },
+        "asOfDate": "2026-09-28T10:17:25.227Z",
+        "promptPackVersion": "prompt-pack.v1.market-v1.es-CL",
+        "scoreVersion": "ai_visibility_score_v2",
+        "providersSampled": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "promptCount": 6
+      }
+    },
+    {
+      "country": "CO",
+      "locale": "es-CO",
+      "runId": "grun-7f1451b4-626c-46b8-99c0-2bf75aef1849",
+      "gate": {
+        "status": "ready",
+        "reason": "Diagnóstico completo con cobertura suficiente.",
+        "nextAction": "Revisa el plan de acción priorizado del reporte."
+      },
+      "overallScore": 43,
+      "trend": {
+        "status": "sin_historico",
+        "reason": "Primer análisis: aún no hay un período anterior para comparar.",
+        "previousAsOf": null,
+        "overall": null,
+        "dimensions": []
+      },
+      "provenance": {
+        "market": {
+          "code": "CO",
+          "label": "Colombia",
+          "locale": "es-CO",
+          "language": "es",
+          "locationCode": 2170,
+          "googleAiModeLanguageCode": "es"
+        },
+        "providersRequested": [
+          "openai",
+          "perplexity",
+          "gemini",
+          "google_ai_overview"
+        ],
+        "providersAttempted": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "providersResponded": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "geoModes": {
+          "openai": {
+            "mode": "native",
+            "country": "CO"
+          },
+          "perplexity": {
+            "mode": "native",
+            "country": "CO"
+          },
+          "gemini": {
+            "mode": "prompt_only",
+            "country": "CO"
+          },
+          "google_ai_overview": {
+            "mode": "native",
+            "country": "CO"
+          }
+        },
+        "asOfDate": "2026-09-28T10:18:14.389Z",
+        "promptPackVersion": "prompt-pack.v1.market-v1.es-CO",
+        "scoreVersion": "ai_visibility_score_v2",
+        "providersSampled": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "promptCount": 6
+      }
+    },
+    {
+      "country": "MX",
+      "locale": "es-MX",
+      "runId": "grun-7704cf62-4b8e-4670-ac44-d37aef5832e0",
+      "gate": {
+        "status": "ready",
+        "reason": "Diagnóstico completo con cobertura suficiente.",
+        "nextAction": "Revisa el plan de acción priorizado del reporte."
+      },
+      "overallScore": 38.2,
+      "trend": {
+        "status": "sin_historico",
+        "reason": "Primer análisis: aún no hay un período anterior para comparar.",
+        "previousAsOf": null,
+        "overall": null,
+        "dimensions": []
+      },
+      "provenance": {
+        "market": {
+          "code": "MX",
+          "label": "México",
+          "locale": "es-MX",
+          "language": "es",
+          "locationCode": 2484,
+          "googleAiModeLanguageCode": "es"
+        },
+        "providersRequested": [
+          "openai",
+          "perplexity",
+          "gemini",
+          "google_ai_overview"
+        ],
+        "providersAttempted": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "providersResponded": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "geoModes": {
+          "openai": {
+            "mode": "native",
+            "country": "MX"
+          },
+          "perplexity": {
+            "mode": "native",
+            "country": "MX"
+          },
+          "gemini": {
+            "mode": "prompt_only",
+            "country": "MX"
+          },
+          "google_ai_overview": {
+            "mode": "native",
+            "country": "MX"
+          }
+        },
+        "asOfDate": "2026-09-28T10:19:23.709Z",
+        "promptPackVersion": "prompt-pack.v1.market-v1.es-MX",
+        "scoreVersion": "ai_visibility_score_v2",
+        "providersSampled": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "promptCount": 6
+      }
+    },
+    {
+      "country": "PE",
+      "locale": "es-PE",
+      "runId": "grun-5d9f5ef5-1c03-430b-98ff-1b8616ca7981",
+      "gate": {
+        "status": "ready",
+        "reason": "Diagnóstico completo con cobertura suficiente.",
+        "nextAction": "Revisa el plan de acción priorizado del reporte."
+      },
+      "overallScore": 38.9,
+      "trend": {
+        "status": "sin_historico",
+        "reason": "Primer análisis: aún no hay un período anterior para comparar.",
+        "previousAsOf": null,
+        "overall": null,
+        "dimensions": []
+      },
+      "provenance": {
+        "market": {
+          "code": "PE",
+          "label": "Perú",
+          "locale": "es-PE",
+          "language": "es",
+          "locationCode": 2604,
+          "googleAiModeLanguageCode": "es"
+        },
+        "providersRequested": [
+          "openai",
+          "perplexity",
+          "gemini",
+          "google_ai_overview"
+        ],
+        "providersAttempted": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "providersResponded": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "geoModes": {
+          "openai": {
+            "mode": "native",
+            "country": "PE"
+          },
+          "perplexity": {
+            "mode": "native",
+            "country": "PE"
+          },
+          "gemini": {
+            "mode": "prompt_only",
+            "country": "PE"
+          },
+          "google_ai_overview": {
+            "mode": "native",
+            "country": "PE"
+          }
+        },
+        "asOfDate": "2026-09-28T10:21:19.995Z",
+        "promptPackVersion": "prompt-pack.v1.market-v1.es-PE",
+        "scoreVersion": "ai_visibility_score_v2",
+        "providersSampled": [
+          "gemini",
+          "google_ai_overview",
+          "openai",
+          "perplexity"
+        ],
+        "promptCount": 6
+      }
+    }
+  ]
+}

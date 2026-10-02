@@ -69,6 +69,20 @@ Read only what the task needs:
 
 If the request is a real third-party logo or payment mark, stop and use `greenhouse-digital-brand-asset-designer` instead.
 
+**Íconos de la marca propia Efeonce** (no los de la UI de Greenhouse): no se generan íconos sueltos. La iconografía de
+«La órbita» (Trazo y Plastilina) es canónica en AXIS y se pinta con `resolveIcon`. Un ícono Plastilina **nuevo** se
+genera sólo con el método de AXIS: `pnpm ai:image --image ../axis-design-system/docs/agent-composition/iconography/plastilina-style-reference.png --prompt-file <plastilina-prompt.txt con {{OBJETOS}}>`,
+luego `icons:vectorize` + `icons:check` y aprobación del operador; nunca un prompt ad hoc. Ver
+`axis-design-system/docs/agent-composition/iconography.md` §Un glifo nuevo de Plastilina.
+
+**Plastilina en volumen (D24, 2026-09-27):** el PNG de un objeto protagonista se usa desde AXIS (`volumeIconUrl(glyph)`
+de `@efeoncepro/axis-brand-assets`), nunca se regenera. Sólo para dar de alta el volumen de un glifo que ya está en el set
+plano: EDITAR desde su vector aprobado (`pnpm icons:volume -- refs` en AXIS) con el prompt canónico de AXIS
+`docs/agent-composition/iconography/volume-prompt.txt` (no se reescribe; si un detalle falla, se agrega UNA línea que lo
+nombre): `pnpm ai:image --model gpt-image-2.5-sunburst --quality high --size 1024x1024 --image <ref.png> --prompt-file <volume-prompt.txt> --out <crudo.png>`,
+luego `icons:volume -- key|check|publish` y mirar al 100 %. Extruir el vector en Blender dio una «galleta» plana y el
+operador lo rechazó. Criterio: [`efeonce-graphic-line` → iconography](../efeonce-graphic-line/references/iconography.md).
+
 For art direction, Key Visual design or **audit**, marketing/campaign imagery, visual concept/mood, or choosing which AI model to use for a task (Nano Banana / Midjourney / Ideogram / Recraft / FLUX / Firefly / Seedance / Veo, etc.), the director is the `design-studio` skill — it directs and delegates production back here for assets that live in the Greenhouse UI.
 
 ## Core Rule
@@ -426,12 +440,22 @@ marca), 1152×1440, `high`, ≈ USD 2–2,5 en total.
   contexto y ropa; no insistir con la misma redacción ni forzar otro proveedor para saltarse el filtro.
 - 🔴 **Nexa: sus accesorios y su equipo son parte de la identidad, no atrezzo.** Los cuatro signature
   elements viajan solos en el bloque `accesorios` de `foto:prompt` —anillo geométrico plata mate en el
-  índice derecho, **SMARTWATCH** en la muñeca izquierda (nunca analógico), aretes de plata, uñas de un
-  color— y los **gadgets de escena** se declaran en la `escena`: Apple Watch, iPhone, iPad con Pencil,
+  índice derecho, **SMARTWATCH** en la muñeca izquierda (nunca analógico), aretes de plata (en cine,
+  dorados: operador, 2026-10-02), uñas de un color— y los **gadgets de escena** se declaran en la `escena`: Apple Watch, iPhone, iPad con Pencil,
   MacBook, AirPods, **DJI Osmo Pocket/Action**, **DJI Mic 3** o lavalier **Rode**, **Shure** en podcast,
   cuerpo **Sony α** o **Canon EOS R**. Siempre la generación vigente, nunca un modelo descontinuado;
   encendidos y en uso; ningún logotipo de tercero legible. Canon:
   [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+- 🔴 **Las referencias de Nexa dicen QUIÉN es, no CÓMO está** **[operador, 2026-10-02; A/B `NX7d`→`NX7g`]**: sin
+  declararlo, casi todas sus fotos salían con el mismo gesto (tres cuartos, cabeza ladeada, media sonrisa) copiado de
+  la primera referencia. `foto:prompt` ya lo dice en REFERENCES; a la ficha le toca declarar **una** dimensión:
+  `{ "persona": "nexa", "expresion": "…" }` —12 fotográficas de `_identidad-nexa/5-expresiones/`: `carcajada`,
+  `risa-elegante`, `sorprendida`, `esceptica`, `pensativa`, `neutra`, `preocupada`, `conviccion`, `escucha-empatica`,
+  `curiosa`, `complicidad`, `mirada-lateral`— **o** `"vista"` para el ángulo, o las dos juntas con Nexa sola en la toma (desde el 2026-10-02: la vista manda en
+  el ángulo y la expresión sólo en el gesto, `NX7j`). Las 12 comparten el tres cuartos del ancla, así que sólo mandan en el gesto: **el giro se pide con `vista`**
+  (con `conviccion` copiada entera, `NX7f` no cambió nada). La escena describe la pose, y «confident half-smile» deja
+  de copiarse entre fichas; `foto:prompt` avisa si Nexa llega sin `expresion` ni `vista` (`auditarExpresion`). Canon:
+  [bloques y pipeline, delta 2026-10-02](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 - 🔴 **El DEDO del anillo se gana editando, no generando** [medido 2026-09-21]. Pedirlo por prompt en una
   generación desde cero da metal y forma correctos pero el dedo equivocado; editar una foto existente con
   instrucción posicional sí lo coloca. Es «editar conserva, generar reconstruye» aplicado a dos centímetros.
@@ -440,9 +464,9 @@ marca), 1152×1440, `high`, ≈ USD 2–2,5 en total.
   canon es 4:5 y el modelo entrega 1:1, 2:3 y 3:2, así que **hay que padear, editar y recortar**. Receta en
   [bloques y pipeline](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 - **Nexa en estilo pintado: pedir el navy explícito.** Con la referencia de cuerpo completo
-  (hoy `ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png`; en esa corrida era
+  (hoy `ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png`, `pnpm ai-gen:pull` si falta; en esa corrida era
   `2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`) + la vista frontal transparente
-  del kit hoodie (`ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-…-transparente.png`), la
+  del kit hoodie (`ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-…-transparente.png`; idem), la
   v1 salió con hoodie **azul rey**. Corrigió «deep navy (#023c70), not royal blue». La identidad de Nexa se conservó
   en el estilo pintado; aun así el hoodie quedó algo más brillante que `#023c70`: revisar el color al 100 %.
 
@@ -456,12 +480,18 @@ pnpm ai:image --image <ref.png> --prompt "keep this exact <subject>, change ONLY
 #   --mask <path>         INPAINTING: PNG con las zonas a reemplazar en TRANSPARENTE. Requiere --image
 #                         (sin ella aborta), mismo formato y mismas dimensiones que la primera --image.
 #   --input-fidelity high strict reference preservation — SÓLO gpt-image-1.5 / gpt-image-1 / gpt-image-1-mini.
-#                         En 2.5 no se envía (la guía lo excluye); la identidad se pide por prompt.
+#                         Con cualquier otro modelo (2.5, gpt-image-2) el CLI y el helper ABORTAN antes de gastar
+#                         (desde 2026-09-27; antes lo descartaban en silencio). En 2.5 la identidad se pide por prompt.
 pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (AI matting, soft edges)
 ```
 
 `ai:image:rmbg` rellena **por defecto** los huecos internos que el matting deja transparentes y no son fondo
 (glifos, emblemas); el fondo real encerrado se conserva. `--no-fill-holes` lo desactiva.
+
+🔴 **Con fondo liso conocido, recorte por COLOR, no matting con IA — medido 2026-09-27 (Plastilina en volumen):**
+`ai:image:rmbg` rellenó calados que debían quedar abiertos (3 966 px en el bombillo) y dejó **semitransparente una
+esfera suelta** (la de la cámara). El recorte por color (distancia al fondo + des-mezcla del borde) de
+`pnpm icons:volume -- key` en AXIS dejó los calados abiertos y sin halo.
 
 🔴 **Editar NO abarata — medido 2026-09-16, `flare · low · 1024x1024`:** el modelo devuelve la imagen
 **completa** aunque la máscara acote qué cambia, así que el output se cobra **idéntico** a una generación
@@ -580,6 +610,10 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   [Gasta](https://www.gasta.org/portfolio/gemini-free/), el estudio que la creó para el back-to-school de Gemini.
   Sus tres reglas duras de utilería (tono hueso, prop que toca al personaje, nada translúcido sobre la cara) están en
   la misma biblioteca.
+- **Personaje propio: los Sparks** (agentes de Efeonce, TASK-1941). Mismo método, con fuente = diseño aprobado; dos
+  lecciones: el blanco en sombra sobre fondo de estudio claro se recorta editando antes la fuente a gris medio
+  `#7F7F7F`, y el giro no se espeja (el anillo inclinado se invertiría). Detalle:
+  [biblioteca §11](references/mascot-3d-pose-library.md#11-personaje-propio-los-sparks-task-1941-2026-10-01).
 - **Cambiar el fondo detrás de una persona o mascota: regenerar, no recortar.** Repintar un muro alrededor de un
   sujeto con matte + máscara deja bordes «mordidos» en pelo y deforma partes finas o sueltas (el «?» de Clawd).
   Acabado profesional = plate nativo con el set nuevo, guiado por un **boceto de composición** de formas planas
@@ -594,7 +628,8 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   y fue rechazada; la recoloreada desde cada render navy conservó geometría, cortes y cámara.
 - **Ángulos extremos (gusano, picado, gran angular, sobrevuelo) necesitan guía de perspectiva como imagen 1.** Con
   la cámara sólo en texto el modelo devuelve casi frontal. Guía = silueta oficial extruida y proyectada con cámara
-  real (`ai-generations/2026-09-17_efeonce-ship-3d/guias/proyectar.mjs`), «copiar cámara, no su aspecto plano»;
+  real (`ai-generations/2026-09-17_efeonce-ship-3d/guias/proyectar.mjs`, en git; la base 3D, con `pnpm ai-gen:pull`
+  si falta), «copiar cámara, no su aspecto plano»;
   base 3D aprobada como imagen 2 y logo como 3. La isométrica siguió frontal; una vista inferior pura de un logo
   plano sólo muestra su canto.
 - **Recorte de objeto claro sobre fondo oscuro:** `pnpm ai:image:rmbg` deja OPACOS los huecos que muestran el fondo
@@ -676,7 +711,9 @@ diagnostica sin costo.
   pasa, o si el lecho sale de tono medio, **se regenera**. Sin grade: la corrección técnica es la excepción. Las **seis**
   reservas del plate se miden con `pnpm foto:validar`; el lecho sigue medido en luminancia y es **señal débil [frágil]**
   (medir desenfoque bien queda **[pendiente]**).
-- **Firma:** SVG oficial compuesto con `scripts/componer.mjs` (`LOGO=0.15`), nunca generado.
+- **Firma:** SVG oficial compuesto después con `pnpm foto:componer` (o `pnpm foto:componer:cta` si la pieza lleva CTA),
+  al **20 % del lado corto** (25 % en 16:9 nuevas) y con contraste ≥ 4,5:1 medido; nunca generada. El
+  `scripts/componer.mjs` de la corrida del 2026-09-19 (`LOGO=0.15`) es histórico.
 - **Pantallas por curación generativa:** plate con pantalla en chroma `#00FF00` → UI de referencia → edit con
   `--image plate --image ui --mask <máscara>` → restaurar fuera de la pantalla desde el plate. La máscara se arma
   detectando chroma (g>120, g>1,4r, g>1,4b), dilatando (blur 2 + threshold 20) y con **`.extractChannel(0)`**: sin eso
@@ -686,6 +723,82 @@ diagnostica sin costo.
   costo); `setopt nullglob` antes de copiar con globs (un glob sin match aborta el comando entero).
 - **Lotes:** JSON con `json.dump` (§Serie con estética de trend) y `--batch <json> --out <dir>` ya respeta el
   directorio (corregido 2026-09-19, §Brechas conocidas).
+
+### Registro cine: placas, emblema y tamaños
+
+🔴 **Para producir, el flujo es el del [casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)**
+(2026-10-02): `pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta> [--formato] [--alcance]` (`--listar`:
+12 recetas aprobadas en `scripts/foto/cine-recetas.json`, ninguna vertical) → reescribir la escena «REESCRIBIR»
+(`foto:generar` no gasta mientras siga así) y los `__completar`/`__revisar` → campos cine (`llave`, `primerPlano`,
+`fondo`, `fenomeno`, `alcance`) → `foto:prompt` → agente `cine-reviewer` → `foto:generar --quality high` →
+`pnpm foto:validar:cine` + `pnpm foto:validar` + `pnpm foto:emblema` → `cine-reviewer` sobre el plate (APROBABLE no
+es aprobado). `foto:validar:cine` es aparte de `foto:validar` (que no cambió) y sólo tiene dos gates: sombra ≥ 35 % del
+cuadro con L* < 20 y, en vertical, L* p99 ≤ 45 en el 36 % superior; no ve stickers, relleno ni azul rey bajo luz azul.
+En cine, `foto:prompt` reemplaza las frases documentales de los bloques compartidos (`AJUSTES_CINE`) e inyecta llave
+sin relleno, lecho mate, uniforme navy (el hoodie conserva su royal del kit), aros de Nexa dorados, escala y mirada;
+los demás registros quedan idénticos. Si tocas `build-prompt.mjs`, corre `scripts/foto/regresion-prompt.mjs --foto`
+antes y `--comparar` después. Lo de abajo son trampas de producción que el casebook referencia.
+
+El registro cine («la marca en su película», 2026-09-27) sólo se usa en los alcances que la ficha declara en `alcance`:
+Nexa protagonista, la receta de deck **`proposal-cinematic`**, secciones y «about» del deck, portadas y contraportadas,
+Marketing con Manzanitas con el roster y perfiles sociales con Nexa; la publicidad, en prueba. Fuera de eso, la foto es A, B o C. La dirección (idea, marcador, barra, trampas) vive en
+[`design-studio` → §Registros](../design-studio/references/efeonce-photographic-language.md) y el canon vigente es
+[`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
+(plantilla de ficha en su §12). Lo que toca a la mano:
+
+- **Se genera con `pnpm foto:generar <ficha.json> --quality high --out <dir>`**, después de `pnpm foto:prompt` y de
+  **leer el prompt compilado** (el compilador fuerza la reserva izquierda del 16:9 —en la sección partida 1:1, con
+  `"reservas": {"texto": {"lado": "izquierda", …}}`— y le inyecta a Nexa un smartwatch aunque la ficha lo niegue,
+  salvo en cine con el traje biónico, donde quita el reloj y el anillo). Sin `--out`, deja el plate en `plates/` junto a la carpeta de fichas. Motor observado en
+  los logs: `gpt-image-2.5-sunburst` `high`, ≈ USD 0,037 de salida por placa más la entrada de 4–6 referencias.
+- **Las placas salen en el tamaño del motor, no en el de la tabla.** `foto:generar` traduce a propósito: 9:16
+  1152×2048 → **1024×1792**, 4:5 1152×1440 → **1024×1280**, 16:9 2048×1152 → **1792×1024** (medido en los logs del
+  brochure y de `ai-generations/2026-09-27_ads-cine/`). Por eso las cajas (isotipo, reservas, firma) se miden **en
+  fracciones**, nunca en píxeles.
+- 🔴 **El bordado del uniforme lo trae la referencia; no se compone a mano** **[operador, 2026-09-28]**: *«para el
+  uniforme sí tiene varias referencias armadas, no sólo Nexa: cualquier personaje que use uniforme»*. La prenda se pide
+  con su kit en `objetos` (sin `vista`: llega la prenda PUESTA) → `pnpm foto:emblema <plate.png>` al 100 % → si muestra
+  nave, órbita y tres ventanas, **se publica tal como salió**, sin sufijo `b`. `pnpm foto:isotipo <plate.png> --centro x,y
+  --ancho w [--prenda oscura|clara] --acabado` sólo si el emblema difiere (una vez por pecho; deja `<plate>-isotipo.png` y un
+  `.json` de procedencia con el SHA-256 del SVG). Componer por defecto dejó el isotipo
+  impreso en vez de bordado y la limpieza tapó lo vecino: una cinta de luz en `CR4` ([registro cine §16.7](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)) y una mano en `MC2` (2026-09-28).
+  Si compones, mira la `b` al 100 % también después. Desde el 2026-10-02 `foto:isotipo` compone también el **logotipo**
+  completo (`--marca logotipo`, proporción desde el `viewBox` del SVG oficial) y, con `--acabado`, declara la técnica
+  de aplicación con `--tecnica "<frase en inglés>"` (reemplaza la impresión fina por defecto); la procedencia registra
+  la `marca`. Canon: `.claude/rules/brand-photography.md` y
+  [personas y vestuario](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+- 🔴 **El traje biónico de Nexa y sus lentes se piden por catálogo, nunca descritos a mano** **[operador, 2026-10-01 y
+  2026-10-02; TASK-1940]**: `"objetos": [{ "objeto": "traje-bionico-nexa" }, { "objeto": "lentes-bionicos-nexa" }]`
+  (`{ "objeto": "traje-bionico-nexa", "puesta": "espalda" }` para la toma de espaldas). Son ficción: **sólo Nexa** en `identidad`, sin otra persona con identidad, y **sólo con
+  `"registro": "cine"` explícito** en la ficha; `foto:prompt` aborta lo demás (`validarTrajeNexa`). Las marcas **viajan
+  armadas en la referencia** —isotipo oficial **incrustado** navy al ras de la pechera, del lado izquierdo de quien lo
+  lleva, y logo completo **serigrafiado** en tinta navy metálica en la placa dorsal— y el macro de la placa va también
+  a la escena (`macroEnUso`): la pechera lisa más un isotipo compuesto después dejó `NX7` y `NX7b` sin logo. Se
+  verifica con `pnpm foto:emblema` contra el macro `10-detalle-placa-isotipo`; `foto:isotipo --prenda clara --acabado`
+  (o `--marca logotipo --tecnica "…"` en la espalda) sólo si difiere o falta. Kit:
+  `ai-generations/2026-10-01_traje-bionico-nexa/LEEME.md`; método de kit:
+  [`references/garment-reference-kit.md`](references/garment-reference-kit.md), delta 2026-10-02.
+- 🔴 **Escena cine con Sparks: dos con referencia como máximo** **[operador, 2026-10-02; `NX7d` aprobada]**: con los
+  cinco Sparks con su foto de estudio salieron nítidos, del mismo tamaño y con luz propia (stickers en abanico). El
+  resto entra sin imagen propia («the same figures as the Spark references»), lejos y fuera de foco. La receta de
+  `NX7d` además declara planos con distancia y apertura (cerca · ~1 m · 4–6 m, 85 mm f/1.8), un Spark en contacto
+  (posado en el hombro), una fuente con tamaño cerca de la cara como única llave y sin relleno, bokeh de luces
+  prácticas, el conteo exacto («EXACTLY THREE more (FIVE in total, never more)») y la geografía de la reserva. Canon:
+  [registro cine, delta 2026-10-02](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
+- 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: compuesto solo se ve pegado. Se hace
+  con **`pnpm foto:isotipo <plate.png> --centro x,y --ancho w --acabado [--superficie "<soporte, en inglés>"]`**, nunca a
+  mano: recorta 512 px alrededor de la marca, pide a `gpt-image-2.5-sunburst` (high, 1024×1024) sólo materia y luz con
+  la marca declarada terminada e intacta, y devuelve la edición **sólo sobre la silueta** del isotipo con el color
+  corregido por el desplazamiento de la media del entorno. Deja `<plate>-isotipo-acabado.png`, el recorte, la edición,
+  la hoja antes/después al 300 % y la procedencia (modelo, prompt, hashes) en el `.json`; **falla si cambia un píxel
+  fuera de la marca**. ≈ USD 0,05. Rehacerlo a mano reintroduce las trampas medidas: mezclar el recorte entero deja
+  halo y escalar el desvío de color cambia el tono de la marca. Método y mediciones en
+  `.claude/rules/brand-photography.md`.
+- **Nunca describir el emblema en la escena**: pedir *«the white Efeonce rocket emblem»* dio un cohete genérico. Se
+  prohíbe por nombre (*«NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*) cuando la prenda no tiene kit y se compone el oficial; en el uniforme y en el traje biónico de Nexa, la marca la trae la referencia.
+- **Ubicación de la herramienta:** hoy `scripts/foto/` en Greenhouse;
+  [TASK-1925](../../../docs/tasks/to-do/TASK-1925-brand-workshop-migration.md) la migra al repo taller
+  `efeoncepro/efeonce-brand-workshop` con delegadores, y los comandos `pnpm foto:*` no cambian para el operador.
 
 ## Provider Choice
 
@@ -906,6 +1019,15 @@ This skill executes image operations; it does not define price, packages or cred
 
 The lifecycle is `estimate → reservation → approval → execution → settlement | release | refund adjustment`.
 Do not publish `1 credit = money`, vendor→credit conversion, per-piece tables or illustrative bands as approved.
+
+## Dónde viven los archivos de `ai-generations/`
+
+- **Local (protegido):** lo sellado en `scripts/foto/assets.lock.json`, lo citado por las recetas de deck y por `src/**`/`scripts/**` (`pnpm ai-gen:protected`).
+- **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
+- **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
+- Una ruta `ai-generations/…` usada como `--image`, máscara o guía es lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` (verifica sha256) **antes** de generar o componer.
+- **NUNCA** regenerar, sustituir ni aproximar una referencia aprobada porque falta (es justo la deriva de identidad que el kit evita); **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. Las salidas nuevas siguen en `ai-generations/<AAAA-MM-DD>_<slug>/`.
+- SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ## Workflow
 

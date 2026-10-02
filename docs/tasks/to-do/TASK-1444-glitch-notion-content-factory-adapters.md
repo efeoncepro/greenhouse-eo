@@ -1,5 +1,23 @@
 # TASK-1444 — Glitch Notion and Content Factory Adapters
 
+## Delta 2026-09-28 (tarde) — gap cerrado: el spec emite `glitchDrop`
+
+- `GutenbergArticleSpec` ya tiene `{ kind: 'glitchDrop', lines }` (1–4 líneas, serializado igual que WordPress,
+  validado en su forma gobernada, aviso `glitch_drop_redundant_with_neighbor`), además de `embed.caption`,
+  `table.style: 'stripes'` y `kind: 'buttons'`. El adapter Notion → spec debe mapear el POV a `glitchDrop`, no al
+  párrafo marcador. Detalle: `.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md`
+  §Extensión de GutenbergArticleSpec — cerrado por el trabajo de extensión del spec del 2026-09-28 (sin TASK propia).
+
+## Delta 2026-09-28 — Content Factory no emite `efeoncepro/glitch-drop`
+
+- El primer Glitch Flash (post 251941, 2026-09-28) salió por Content Factory (`pnpm public-website:content-factory:run
+  --spec … --send --author-id 1`), privado primero. `GutenbergArticleSpec` no tiene `kind` para
+  `efeoncepro/glitch-drop`: el drop se insertó con un párrafo marcador `__GLITCH_DROP__` y un eval PHP gobernado. La
+  receta y la propuesta de `kind` están en `.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md`.
+  El adapter de esta task debe emitir el drop con un `kind` del spec, no con esa receta.
+- El post sólo usó `paragraph`, `list`, `table`, `image` y el TOC de Yoast: Content Factory no está al día con los
+  bloques y estilos disponibles (inventario en la misma referencia).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

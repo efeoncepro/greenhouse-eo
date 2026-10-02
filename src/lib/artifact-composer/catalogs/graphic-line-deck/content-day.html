@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el día a día</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-day`, composición `clock` (surface deck, tema oscuro, TASK-1928). La órbita es el reloj del día: la
+      lente con el momento que importa y los otros como satélites en su hora; el arco en degradé, sin esfera (lleva
+      satélites), va del último momento al de ahora, que lleva la selección de Cliente. Referencia: DeckDiaADia (D4-dia).
+    -->
+    <main class="gl-slide gl-cd" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-cd-orbit" data-slot="orbit">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-cd-lens" data-slot="lens">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-cd-moments" data-slot="moments">
+        <li class="gl-cd-moment">
+          <img class="gl-cd-sat" data-slot-field="src" alt="" />
+          <div class="gl-cd-label">
+            <p class="gl-cd-time" data-slot-field="time">09:00</p>
+            <p class="gl-cd-time-label" data-slot-field="label">Escuchamos en terreno</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="gl-cd-now" data-slot="now" data-gl-selection-target>
+        <p class="gl-cd-now-time" data-slot-field="time">15:00</p>
+        <p class="gl-cd-now-label" data-slot-field="label">Revisamos contigo</p>
+      </div>
+
+      <div class="gl-ring-hang" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Un día con Efeonce</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo es un día con nosotros?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">Así</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-cd-body" data-slot="body">Del terreno a la medición en el mismo día.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

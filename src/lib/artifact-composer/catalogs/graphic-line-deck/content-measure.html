@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · la órbita mide la cifra</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-measure` (surface deck, papel content). La cifra es la respuesta y la órbita de la lente la
+      MIDE: la esfera parte a las 12 y recorre el valor. Fuera del círculo, la foto con el tratamiento de la lente de
+      AXIS; dentro, limpia. Bajada, hasta dos cifras de apoyo y la nota de fuente. Referencia: DeckContenidoFoto.
+    -->
+    <main class="gl-slide gl-cm gl-ring-small" data-gl-root data-slot="frame">
+      <div data-slot="photo">
+        <figure class="gl-cm-photo"><img data-slot-field="src" alt="" /></figure>
+        <div class="gl-cm-shade" aria-hidden="true"></div>
+        <div class="gl-cm-lens" aria-hidden="true"><img data-slot-field="lensSrc" alt="" /></div>
+      </div>
+
+      <figure class="gl-layer" data-slot="orbit">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-column">
+        <div data-slot="voice">
+          <p class="gl-eyebrow" data-slot-field="eyebrow">Resultados · 3 de 5</p>
+          <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cuántos cortes pasan a la primera?</span></p>
+          <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">62 %</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+        </div>
+
+        <p class="gl-body" data-slot="body">de los cortes se aprueban sin cambios.</p>
+
+        <ul class="gl-cm-figures" data-slot="figures">
+          <li class="gl-cm-figure">
+            <p class="gl-cm-figure-value" data-slot-field="value">12 días</p>
+            <p class="gl-cm-figure-label" data-slot-field="label">de idea a pieza</p>
+          </li>
+        </ul>
+
+        <p class="gl-cm-note" data-slot="note">Datos de muestra</p>
+      </div>
+    </main>
+  </body>
+</html>

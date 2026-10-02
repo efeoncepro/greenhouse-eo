@@ -1,0 +1,22 @@
+{
+  "schema": "efeonce.foto.isotipo.v1",
+  "plate": "SP2b-dias-no-meses.png",
+  "salida": "SP2b-dias-no-meses-isotipo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.3.4",
+  "archivo": "assets/efeonce-isotype-negative.svg",
+  "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74",
+  "prenda": "oscura",
+  "caja": {
+    "centro": [
+      0.672,
+      0.416
+    ],
+    "ancho": 0.042,
+    "rotacion": -8
+  },
+  "brillo": 0.85,
+  "limpieza": {
+    "umbral": 38
+  },
+  "creado": "2026-09-27T17:11:24.492Z"
+}

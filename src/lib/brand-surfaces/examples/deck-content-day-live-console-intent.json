@@ -1,0 +1,35 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-day-live-console",
+  "line": "revenue-salesforce",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Operación gestionada",
+    "question": "¿Y después del go-live?",
+    "answer": ["Lo", "operamos"]
+  },
+  "body": "Releases, soporte, datos, permisos y agentes, con SLA y una revisión **trimestral** de valor.",
+  "console": {
+    "icon": "platform",
+    "title": "Operación gestionada · este mes",
+    "subtitle": "Sales · Service · Marketing Cloud · Agentforce",
+    "sampleMark": "Datos de muestra",
+    "metrics": [
+      { "value": "96 %", "label": "Soporte en SLA", "detail": "48 de 50 solicitudes" },
+      { "value": "3", "label": "Releases", "detail": "con pruebas y rollback" },
+      { "value": "0", "label": "Flows con error", "detail": "monitoreo continuo" }
+    ],
+    "checks": [
+      { "label": "Calidad de datos · duplicados en cuentas", "status": "Bajo control", "done": true },
+      { "label": "Revisión de permisos del trimestre", "status": "Hecha", "done": true },
+      { "label": "Consumo de Agentforce vs. presupuesto", "status": "En rango", "done": true },
+      { "label": "Nuevo journey de reactivación", "status": "En pruebas", "done": false }
+    ],
+    "review": { "kicker": "Próxima revisión trimestral", "title": "Arquitectura, adopción, deuda y prioridades", "cta": "Ver agenda" }
+  }
+}

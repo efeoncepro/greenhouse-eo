@@ -1,0 +1,178 @@
+{
+  "evidenceClass": "live-anonymous-public-http",
+  "capturedAt": "2026-09-26T07:09:39.403864+00:00",
+  "probes": [
+    {
+      "url": "https://mcp.efeonce.org/health",
+      "method": "GET",
+      "capturedAt": "2026-09-26T07:09:37.723002+00:00",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "wwwAuthenticate": null,
+      "body": {
+        "status": "ok",
+        "oauthConfigured": true
+      }
+    },
+    {
+      "url": "https://mcp.efeonce.org/.well-known/oauth-protected-resource",
+      "method": "GET",
+      "capturedAt": "2026-09-26T07:09:37.789375+00:00",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "wwwAuthenticate": null,
+      "body": {
+        "resource": "https://mcp.efeonce.org/mcp",
+        "authorization_servers": ["https://auth.efeonce.org"],
+        "scopes_supported": ["efeonce.mcp.read"],
+        "bearer_methods_supported": ["header"]
+      }
+    },
+    {
+      "url": "https://auth.efeonce.org/.well-known/oauth-authorization-server",
+      "method": "GET",
+      "capturedAt": "2026-09-26T07:09:37.828920+00:00",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "wwwAuthenticate": null,
+      "body": {
+        "issuer": "https://auth.efeonce.org",
+        "authorization_endpoint": "https://auth.efeonce.org/oauth/authorize",
+        "token_endpoint": "https://auth.efeonce.org/oauth/token",
+        "jwks_uri": "https://auth.efeonce.org/.well-known/jwks.json",
+        "registration_endpoint": "https://auth.efeonce.org/oauth/register",
+        "revocation_endpoint": "https://auth.efeonce.org/oauth/revoke",
+        "introspection_endpoint": "https://auth.efeonce.org/oauth/introspect",
+        "scopes_supported": ["efeonce.mcp.read", "efeonce.mcp.globe.read", "efeonce.mcp.hiring.read"],
+        "response_types_supported": ["code"],
+        "response_modes_supported": ["query"],
+        "grant_types_supported": ["authorization_code", "refresh_token"],
+        "code_challenge_methods_supported": ["S256"],
+        "token_endpoint_auth_methods_supported": ["none", "client_secret_basic", "client_secret_post"],
+        "revocation_endpoint_auth_methods_supported": ["none", "client_secret_basic", "client_secret_post"],
+        "introspection_endpoint_auth_methods_supported": ["client_secret_basic", "client_secret_post"],
+        "subject_types_supported": ["public"],
+        "client_id_metadata_document_supported": true,
+        "authorization_response_iss_parameter_supported": true
+      }
+    },
+    {
+      "url": "https://auth.efeonce.org/.well-known/openid-configuration",
+      "method": "GET",
+      "capturedAt": "2026-09-26T07:09:38.470912+00:00",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "wwwAuthenticate": null,
+      "body": {
+        "issuer": "https://auth.efeonce.org",
+        "authorization_endpoint": "https://auth.efeonce.org/oauth/authorize",
+        "token_endpoint": "https://auth.efeonce.org/oauth/token",
+        "jwks_uri": "https://auth.efeonce.org/.well-known/jwks.json",
+        "registration_endpoint": "https://auth.efeonce.org/oauth/register",
+        "revocation_endpoint": "https://auth.efeonce.org/oauth/revoke",
+        "introspection_endpoint": "https://auth.efeonce.org/oauth/introspect",
+        "scopes_supported": ["efeonce.mcp.read", "efeonce.mcp.globe.read", "efeonce.mcp.hiring.read"],
+        "response_types_supported": ["code"],
+        "response_modes_supported": ["query"],
+        "grant_types_supported": ["authorization_code", "refresh_token"],
+        "code_challenge_methods_supported": ["S256"],
+        "token_endpoint_auth_methods_supported": ["none", "client_secret_basic", "client_secret_post"],
+        "revocation_endpoint_auth_methods_supported": ["none", "client_secret_basic", "client_secret_post"],
+        "introspection_endpoint_auth_methods_supported": ["client_secret_basic", "client_secret_post"],
+        "subject_types_supported": ["public"],
+        "client_id_metadata_document_supported": true,
+        "authorization_response_iss_parameter_supported": true,
+        "id_token_signing_alg_values_supported": ["ES256"],
+        "claims_supported": ["iss", "sub", "aud", "azp", "scope", "gv", "exp", "iat", "jti"]
+      }
+    },
+    {
+      "url": "https://mcp.efeonce.org/mcp",
+      "method": "POST",
+      "capturedAt": "2026-09-26T07:09:39.086081+00:00",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "wwwAuthenticate": "Bearer resource_metadata=\"https://mcp.efeonce.org/.well-known/oauth-protected-resource\", scope=\"efeonce.mcp.read\"",
+      "body": {
+        "error": "authorization_required"
+      }
+    },
+    {
+      "url": "https://mcp.efeonce.org/icon-512.png",
+      "method": "GET",
+      "capturedAt": "2026-09-26T07:09:39.126513+00:00",
+      "status": 200,
+      "contentType": "image/png",
+      "wwwAuthenticate": null,
+      "sha256": "87f02096d4aed199296dbe48739dddd39485befb1eb58267567a66433783c4de",
+      "bytes": 14830
+    },
+    {
+      "url": "https://mcp.efeonce.org/.well-known/openai-apps-challenge",
+      "method": "GET",
+      "capturedAt": "2026-09-26T07:09:39.176862+00:00",
+      "status": 404,
+      "contentType": "application/json; charset=utf-8",
+      "wwwAuthenticate": null,
+      "body": {
+        "message": "Route GET:/.well-known/openai-apps-challenge not found",
+        "error": "Not Found",
+        "statusCode": 404
+      }
+    },
+    {
+      "url": "https://efeoncepro.com",
+      "method": "GET",
+      "capturedAt": "2026-09-26T07:09:39.221617+00:00",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "wwwAuthenticate": null,
+      "relevantLinks": [
+        "/contacto",
+        "/politica-de-privacidad",
+        "/terminos-y-condiciones",
+        "https://efeoncepro.com/contacto/",
+        "https://efeoncepro.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+        "https://efeoncepro.com/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-forms/src/../dist/contact-form/css/jetpack-forms-layout.css?ver=16.2"
+      ]
+    },
+    {
+      "url": "https://efeoncepro.com/politica-de-privacidad",
+      "status": 200,
+      "capturedAt": "2026-09-26T07:10:10.696161+00:00",
+      "contentType": "text/html; charset=UTF-8",
+      "finalUrl": "https://efeoncepro.com/politica-de-privacidad/",
+      "bodyPreview": "\n<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n\t<meta charset=\"UTF-8\">\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\n\t<link rel=\"stylesheet\" href=\"https://fonts.",
+      "firstAttemptErrorType": "HTTPError",
+      "retryNote": "Repeated with explicit audit User-Agent; final status shown. First attempt did not record HTTP status."
+    },
+    {
+      "url": "https://efeoncepro.com/terminos-y-condiciones",
+      "status": 404,
+      "capturedAt": "2026-09-26T07:10:11.427919+00:00",
+      "contentType": "text/html; charset=UTF-8",
+      "finalUrl": "https://efeoncepro.com/terminos-y-condiciones",
+      "bodyPreview": "\n<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n\t<meta charset=\"UTF-8\">\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\n\t<link rel=\"stylesheet\" href=\"https://fonts.",
+      "firstAttemptErrorType": "HTTPError",
+      "retryNote": "Repeated with explicit audit User-Agent; final status shown. First attempt did not record HTTP status."
+    },
+    {
+      "url": "https://efeoncepro.com/contacto",
+      "status": 200,
+      "capturedAt": "2026-09-26T07:10:12.580018+00:00",
+      "contentType": "text/html; charset=UTF-8",
+      "finalUrl": "https://efeoncepro.com/contacto/",
+      "bodyPreview": "\n<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n\t<meta charset=\"UTF-8\">\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\n\t<link rel=\"stylesheet\" href=\"https://fonts.",
+      "firstAttemptErrorType": "HTTPError",
+      "retryNote": "Repeated with explicit audit User-Agent; final status shown. First attempt did not record HTTP status."
+    }
+  ],
+  "authenticatedConnector": {
+    "status": "UNAUTHORIZED",
+    "description": "Existing Efeonce connector describes TASK-1832 canary; gateway status call required reauthentication. No connector changes or new grants."
+  },
+  "publisherPortal": {
+    "status": "login_required",
+    "description": "In-app browser redirected from /plugins to /login?next=%2Fplugins. No verified publisher or Apps Management state observed."
+  }
+}

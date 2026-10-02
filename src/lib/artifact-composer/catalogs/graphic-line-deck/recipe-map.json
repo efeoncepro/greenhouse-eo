@@ -1,0 +1,506 @@
+{
+  "$comment": "Qué receta del catálogo de láminas (docs/operations/brand-graphic-line/deck-recipes/) compone con qué plantilla de este catálogo. Lo lee `pnpm brand:deck-recipes` para marcar en el índice qué lámina tiene plantilla, y el test de paridad de slots. `slots` mapea cada slot de la receta al campo del slots.json (obligatorio en las recetas nuevas de TASK-1928; las 30 anteriores lo declaran nulo porque su contrato sale del manifest de AXIS, no del catálogo). `example` apunta a un intent de pieza o a una página de un documento (`archivo.json#page=N`, desde 1). Una receta sin fila aquí no tiene plantilla.",
+  "schema": "efeonce.deck-recipe-map.v1",
+  "recipes": {
+    "content-pricing": {
+      "contentType": "deck.content-pricing",
+      "example": "src/lib/brand-surfaces/examples/deck-content-pricing-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "plans": "plans", "amounts": "plans[].amount", "recommendedPlan": "frame.recommended"}
+    },
+    "content-pricing-stage": {
+      "contentType": "deck.content-pricing.stage",
+      "example": "src/lib/brand-surfaces/examples/deck-content-pricing-stage-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "plans": "plans", "amounts": "plans[].amount", "recommendedPlan": "frame.recommended"}
+    },
+    "content-pricing-live": {
+      "contentType": "deck.content-pricing.live",
+      "example": "src/lib/brand-surfaces/examples/deck-content-pricing-live-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "quoteTitle": "quote.title", "lineItems": "lines", "total": "quote.total"}
+    },
+    "decision-next-steps": {
+      "contentType": "deck.decision-next-steps",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-next-steps-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "cardDescriptor": "agenda.descriptor", "days": "days", "times": "times", "chosenSlot": "frame.chosenDay", "nextSteps": "nextSteps"}
+    },
+    "content-focus": {
+      "contentType": "deck.content-focus",
+      "example": "src/lib/brand-surfaces/examples/deck-content-focus-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "proof": "figure.value", "proofText": "figure.label", "source": "source#composite", "photo": "photo"}
+    },
+    "content-clients": {
+      "contentType": "deck.content-clients",
+      "example": "src/lib/brand-surfaces/examples/deck-content-clients-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "proofs": "stats", "logos": "clients", "markets": "markets.text", "selectedProof": "selection.item", "nav": "indicator"}
+    },
+    "content-partners": {
+      "contentType": "deck.content-partners",
+      "example": "src/lib/brand-surfaces/examples/deck-content-partners-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "partners": "row1", "selectedPartner": "selection.item", "selectionLabel": "selection.label", "nav": "indicator"}
+    },
+    "decision-risk": {
+      "contentType": "deck.decision-risk",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-risk-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "rows": "risks", "selectedRow": "selection.item", "nav": "indicator"}
+    },
+    "decision-case": {
+      "contentType": "deck.decision-case",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-case-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "clientLogo": "clientLogo", "stats": "figures", "source": "source#composite", "photo": "photo", "selectedStat": "selection.item"}
+    },
+    "decision-chart": {
+      "contentType": "deck.decision-chart",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-chart-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "bars": "bars", "annotation": "annotation", "chartNote": "note", "kpis": "kpis", "source": "source#composite", "nav": "indicator"}
+    },
+    "decision-testimonial": {
+      "contentType": "deck.decision-testimonial",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-testimonial-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "keyPhrase": "voice.answerLead+voice.answer", "fullQuote": "quote", "clientLogo": "clientLogo", "author": "author.name", "proof": "proof", "source": "source#composite", "nav": "indicator"}
+    },
+    "decision-why-us": {
+      "contentType": "deck.decision-why-us",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-why-us-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "facts": "facts", "source": "source#composite", "selectedFact": "selection.item", "nav": "indicator"}
+    },
+    "section-lens": {
+      "contentType": "deck.section-lens",
+      "example": "src/lib/brand-surfaces/examples/deck-section-lens-intent.json",
+      "slots": {"question": "voice.question", "answer": "voice.answer", "section": "lens", "sectionName": "voice.eyebrow#composite", "photo": "lens"}
+    },
+    "section-bleed": {
+      "contentType": "deck.section-bleed",
+      "example": "src/lib/brand-surfaces/examples/deck-section-bleed-intent.json",
+      "slots": {"question": "voice.question", "answer": "voice.answer", "section": "indicator", "photo": "photo"}
+    },
+    "section-cine-services": {
+      "contentType": "deck.section-cine.services",
+      "example": "src/lib/brand-surfaces/examples/deck-section-cine-services-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "photo": "photo"}
+    },
+    "section-cine-team": {
+      "contentType": "deck.section-cine",
+      "example": "src/lib/brand-surfaces/examples/deck-section-cine-team-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "photo": "photo", "body": "body"}
+    },
+    "section-cine-about": {
+      "contentType": "deck.section-cine.about",
+      "example": "src/lib/brand-surfaces/examples/deck-section-cine-about-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "figures": "figures[].value", "photo": "photo"}
+    },
+    "section-cine-purpose": {
+      "contentType": "deck.section-cine.purpose",
+      "example": "src/lib/brand-surfaces/examples/deck-section-cine-purpose-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "pillars": "pillars", "photo": "photo"}
+    },
+    "content-team": {
+      "contentType": "deck.content-team",
+      "example": "src/lib/brand-surfaces/examples/deck-content-team-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lead": "team", "team": "team"}
+    },
+    "content-stack": {
+      "contentType": "deck.content-stack",
+      "example": "src/lib/brand-surfaces/examples/deck-content-stack-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "layers": "labels#composite", "highlightedLayer": "labels[].tone"}
+    },
+    "contact-sheet": {
+      "contentType": "deck.contact-sheet",
+      "example": "src/lib/brand-surfaces/examples/deck-contact-sheet-intent.json",
+      "slots": {"question": "voice.question", "answer": "voice.answer", "chosen": "chosen", "alternatives": "strip", "collaborator": "selection.label"}
+    },
+    "content-text": {
+      "contentType": "deck.content-text",
+      "example": "src/lib/brand-surfaces/examples/deck-content-text-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "pillars": "points", "nav": "indicator"}
+    },
+    "content-bullets": {
+      "contentType": "deck.content-bullets",
+      "example": "src/lib/brand-surfaces/examples/deck-content-bullets-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "items": "items", "selectedItem": "selection.item", "selectionLabel": "selection.label", "nav": "indicator"}
+    },
+    "content-day": {
+      "contentType": "deck.content-day",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "keyMoment": "lens", "moments": "moments"}
+    },
+    "content-day-tools": {
+      "contentType": "deck.content-day.tools",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-tools-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "panel": "panel", "tools": "tiles"}
+    },
+    "content-day-live-progress": {
+      "contentType": "deck.content-day.live-progress",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-progress-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "boardTitle": "plan.title", "boardProgress": "plan.meta", "boardCards": "columns", "reviewTitle": "review.title", "reviewImage": "piece", "clientComment": "comments[].text", "teamReply": "comments[].text"}
+    },
+    "content-day-live-results": {
+      "contentType": "deck.content-day.live-results",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-results-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "panel": "panel", "meeting": "meeting.title", "reportTitle": "report.title", "metrics": "kpis", "productMark": "productMark"}
+    },
+    "decision-agenda": {
+      "contentType": "deck.decision-agenda",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-agenda-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "items": "topics", "highlightedItem": "selection.item", "nav": "indicator"}
+    },
+    "breather": {
+      "contentType": "deck.breather",
+      "example": "src/lib/brand-surfaces/examples/deck-breather-intent.json",
+      "slots": {"question": "voice.question", "answer": "voice.answer", "section": "indicator", "photo": "photo"}
+    },
+    "method-hybrid-workforce": {
+      "contentType": "deck.method-hybrid-workforce",
+      "example": "src/lib/brand-surfaces/examples/deck-method-hybrid-workforce-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "body": "body", "ladderTitle": "ladderTitle", "ladder": "ladder", "path": "path", "nav": "indicator"}
+    },
+    "method-hybrid-workforce-scene": {
+      "contentType": "deck.method-hybrid-workforce.scene",
+      "example": "src/lib/brand-surfaces/examples/deck-method-hybrid-workforce-scene-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "body": "body", "photo": "photo", "selectionTargets": "selection.targets"}
+    },
+    "method-score-ring": {
+      "contentType": "deck.method-score-ring",
+      "example": "src/lib/brand-surfaces/examples/deck-method-score-ring-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "dimensions": "labels", "total": "total", "cta": "cta.text", "ctaUrl": "cta.url", "productMark": "productMark"}
+    },
+    "decision-plan": {
+      "contentType": "deck.decision-plan",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-plan-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "horizon": "horizon", "stops": "stops", "currentStop": "frame.currentStop"}
+    },
+    "method-staircase-flat": {
+      "contentType": "deck.method-staircase.flat",
+      "example": "src/lib/brand-surfaces/examples/deck-method-staircase-flat-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "body": "body", "levels": "levels[].name", "note": "note", "selectedLevel": "selection.level", "selectionLabel": "selection.label"}
+    },
+    "proposal-service-aeo": {
+      "contentType": "deck.proposal-service",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-service-aeo-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite", "productMark": "productMark"}
+    },
+    "proposal-service-seo": {
+      "contentType": "deck.proposal-service",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-service-seo-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite", "productMark": "productMark"}
+    },
+    "proposal-service-creative": {
+      "contentType": "deck.proposal-service",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-service-creative-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "proof": "footnote#composite"}
+    },
+    "proposal-service-web": {
+      "contentType": "deck.proposal-service",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-service-web-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps"}
+    },
+    "proposal-service-revops": {
+      "contentType": "deck.proposal-service",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-service-revops-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite"}
+    },
+    "cover-brochure-cine-orbit": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-cine-orbit-intent.json",
+      "slots": null
+    },
+    "cover-brochure-cine-lines": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-cine-lines-intent.json",
+      "slots": null
+    },
+    "cover-brochure-cine-team": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-cine-team-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-growth": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-growth-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-brand": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-brand-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-engine": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-engine-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-voice": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-voice-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-revenue": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-revenue-intent.json",
+      "slots": null
+    },
+    "cover-proposal-orbit": {
+      "contentType": "deck.cover-proposal",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-proposal-orbit-intent.json",
+      "slots": null
+    },
+    "cover-proposal-orbit-sky": {
+      "contentType": "deck.cover-proposal",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-proposal-orbit-sky-intent.json",
+      "slots": null
+    },
+    "cover-proposal-dawn": {
+      "contentType": "deck.cover-proposal.dawn",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-proposal-dawn-intent.json",
+      "slots": null
+    },
+    "cover-proposal-dawn-sky": {
+      "contentType": "deck.cover-proposal.dawn",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-proposal-dawn-sky-intent.json",
+      "slots": null
+    },
+    "close-brochure-orbit": {
+      "contentType": "deck.close-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-close-brochure-orbit-intent.json",
+      "slots": null
+    },
+    "close-brochure-horizon": {
+      "contentType": "deck.close-brochure.photo",
+      "example": "src/lib/brand-surfaces/examples/deck-close-brochure-horizon-intent.json",
+      "slots": null
+    },
+    "close-brochure-dawn": {
+      "contentType": "deck.close-brochure.photo",
+      "example": "src/lib/brand-surfaces/examples/deck-close-brochure-dawn-intent.json",
+      "slots": null
+    },
+    "close-proposal-horizon": {
+      "contentType": "deck.close-proposal",
+      "example": "src/lib/brand-surfaces/examples/deck-close-proposal-horizon-intent.json",
+      "slots": null
+    },
+    "close-proposal-dawn": {
+      "contentType": "deck.close-proposal",
+      "example": "src/lib/brand-surfaces/examples/deck-close-proposal-dawn-intent.json",
+      "slots": null
+    },
+    "section-classic": {
+      "contentType": "deck.section-classic",
+      "example": "src/lib/brand-surfaces/examples/deck-section-classic-intent.json",
+      "slots": null
+    },
+    "section-split": {
+      "contentType": "deck.section-split",
+      "example": "src/lib/brand-surfaces/examples/deck-section-split-intent.json",
+      "slots": null
+    },
+    "section-split-corner-bottom": {
+      "contentType": "deck.section-split.corner-bottom",
+      "example": "src/lib/brand-surfaces/examples/deck-section-split-corner-bottom-intent.json",
+      "slots": null
+    },
+    "section-split-panel-end": {
+      "contentType": "deck.section-split.panel-end",
+      "example": "src/lib/brand-surfaces/examples/deck-section-split-panel-end-intent.json",
+      "slots": null
+    },
+    "content-measure": {
+      "contentType": "deck.content-measure",
+      "example": "src/lib/brand-surfaces/examples/deck-content-measure-intent.json",
+      "slots": null
+    },
+    "triptych": {
+      "contentType": "deck.triptych",
+      "example": "src/lib/brand-surfaces/examples/deck-triptych-intent.json",
+      "slots": null
+    },
+    "method-staircase": {
+      "contentType": "deck.method-staircase",
+      "example": "src/lib/brand-surfaces/examples/deck-method-staircase-intent.json",
+      "slots": null
+    },
+    "proposal-cinematic-creative": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=1",
+      "slots": null
+    },
+    "proposal-cinematic-web": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=2",
+      "slots": null
+    },
+    "proposal-cinematic-aeo": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=3",
+      "slots": null
+    },
+    "proposal-cinematic-seo": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-cinematic-seo-intent.json",
+      "slots": null
+    },
+    "decision-ai-answer": {
+      "contentType": "deck.decision-ai-answer",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-ai-answer-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "prompt": "back.prompt", "answerIntroToday": "back.intro", "competitorsToday": "backRows", "answerIntroWithAeo": "front.intro", "clientName": "client.name", "clientDescription": "client.description", "clientCitations": "client.citations", "competitorsWithAeo": "frontRows", "illustrativeMark": "mark"}
+    },
+    "decision-ai-market": {
+      "contentType": "deck.decision-ai-market",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-ai-market-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "figures": "figures"}
+    },
+    "method-surround-cycle": {
+      "contentType": "deck.method-surround-cycle",
+      "example": "src/lib/brand-surfaces/examples/deck-method-surround-cycle-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "stations": "stations", "coreLabel": "core.title", "coreCaption": "core.caption"}
+    },
+    "decision-difference": {
+      "contentType": "deck.decision-difference",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-difference-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "alternativeTitle": "alternative.title", "rows": "alternativeRows[].text+efeonceRows[].text", "efeonceTitle": "efeonce.title", "ownTeamTitle": "ownTeam.title", "ownTeamPillars": "pillars"}
+    },
+    "method-eeat": {
+      "contentType": "deck.method-eeat",
+      "example": "src/lib/brand-surfaces/examples/deck-method-eeat-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "meter": "meter", "letters": "letters"}
+    },
+    "decision-traffic-to-revenue": {
+      "contentType": "deck.decision-traffic-to-revenue",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-traffic-to-revenue-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "steps": "steps[].description", "cutLabel": "cutLabel"}
+    },
+    "decision-diagnosis-map": {
+      "contentType": "deck.decision-diagnosis-map",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-diagnosis-map-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "reportTitle": "report.title", "engineScores": "engineScores", "shareOfVoice": "shareOfVoice", "lostPrompts": "lostPrompts", "plan": "plan", "sampleMark": "report.mark", "expertNote": "expertNote.text", "productMark": "productMark"}
+    },
+    "proposal-cinematic-revops": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=4",
+      "slots": null
+    },
+    "proposal-cinematic-nexa": {
+      "contentType": "deck.proposal-cinematic.hero",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-cinematic-hero-intent.json",
+      "slots": null
+    },
+    "proposal-cinematic-nexa-lines": {
+      "contentType": "deck.proposal-cinematic.lines",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-cinematic-lines-intent.json",
+      "slots": null
+    },
+    "cover-brochure-cine-lines-selection": {
+      "contentType": "deck.cover-brochure.document-selection",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-cine-lines-selection-intent.json",
+      "slots": null
+    },
+    "content-one-platform": {
+      "contentType": "deck.content-one-platform",
+      "example": "src/lib/brand-surfaces/examples/deck-content-one-platform-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "workAreas": "workAreas", "accountName": "account.name", "accountInitials": "account.initials", "accountSubtitle": "account.subtitle", "accountFacts": "accountFacts"}
+    },
+    "method-agent-supervisor": {
+      "contentType": "deck.method-agent-supervisor",
+      "example": "src/lib/brand-surfaces/examples/deck-method-agent-supervisor-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "supervisorKicker": "supervisor.kicker", "supervisorRole": "supervisor.role", "supervisorInitials": "supervisor.initials", "supervisorDuty": "supervisor.duty", "agents": "agents", "pendingApproval": "approval.text"}
+    },
+    "decision-platform-coexistence": {
+      "contentType": "deck.decision-platform-coexistence",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-platform-coexistence-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "platforms": "platforms", "tableTitle": "tableTitle", "capabilities": "capabilities", "selectedCapability": "selection.item"}
+    },
+    "decision-provider-fit": {
+      "contentType": "deck.decision-provider-fit",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-provider-fit-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "verdicts": "verdicts", "selectedVerdict": "selection.item"}
+    },
+    "content-service-lanes": {
+      "contentType": "deck.content-service-lanes",
+      "example": "src/lib/brand-surfaces/examples/deck-content-service-lanes-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "lanes": "lanes", "phases": "phases", "mascot": "mascot"}
+    },
+    "content-season-launches": {
+      "contentType": "deck.content-season-launches",
+      "example": "src/lib/brand-surfaces/examples/deck-content-season-launches-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "evidence": "body", "asOf": "asOf", "note": "note", "launches": "launches", "mascot": "mascot"}
+    },
+    "method-identity-consent": {
+      "contentType": "deck.method-identity-consent",
+      "example": "src/lib/brand-surfaces/examples/deck-method-identity-consent-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "sources": "sources", "profileTitle": "profile.title", "channels": "channels", "activations": "activations"}
+    },
+    "method-migration-reconcile": {
+      "contentType": "deck.method-migration-reconcile",
+      "example": "src/lib/brand-surfaces/examples/deck-method-migration-reconcile-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "stages": "stages", "reconciliation": "reconcile.result", "rollbackBadge": "reconcile.badge"}
+    },
+    "content-day-release-cycle": {
+      "contentType": "deck.content-day-release-cycle",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-release-cycle-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "releaseKicker": "release.kicker", "releaseTitle": "release.title", "releaseIcon": "release.icon", "currentStep": "steps[].state", "videoDuration": "video.duration", "presenterInitials": "video.initials", "videoCaption": "approval.caption", "approveCta": "approval.cta", "tools": "tools"}
+    },
+    "content-day-live-library": {
+      "contentType": "deck.content-day-live-library",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-library-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "libraryKicker": "library.kicker", "libraryTitle": "library.title", "sampleMark": "sampleMark", "videos": "videos", "stats": "stats"}
+    },
+    "content-live-chat": {
+      "contentType": "deck.content-live-chat",
+      "example": "src/lib/brand-surfaces/examples/deck-content-live-chat-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "assistantMark": "assistantMark", "connectionLabel": "connection.label", "userPrompt": "prompt", "answerIntro": "intro", "records": "records", "proposedAction": "action.text", "platformMark": "platformMark", "guarantees": "guarantees"}
+    },
+    "content-measure-formulas": {
+      "contentType": "deck.content-measure-formulas",
+      "example": "src/lib/brand-surfaces/examples/deck-content-measure-formulas-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "metrics": "metrics"}
+    },
+    "decision-diagnosis-verdict": {
+      "contentType": "deck.decision-diagnosis-verdict",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-diagnosis-verdict-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "reportTitle": "report.title", "reportSubtitle": "report.subtitle", "sampleMark": "sampleMark", "modules": "moduleState.kicker", "operationNodes": "moduleState.nodes", "operationFootnote": "moduleState.footnote", "verdictOptions": "moduleVerdict.options", "selectedVerdict": "moduleVerdict.options", "verdictCondition": "moduleVerdict.condition", "risks": "moduleRisks.risks", "recordText": "moduleRecord.record", "waves": "moduleRoadmap.waves"}
+    },
+    "method-waves": {
+      "contentType": "deck.method-waves",
+      "example": "src/lib/brand-surfaces/examples/deck-method-waves-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "steps": "steps", "selectedStep": "selection.item", "topMark": "topMark.src"}
+    },
+    "content-day-live-console": {
+      "contentType": "deck.content-day-live-console",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-console-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "panelIcon": "consoleIcon", "panelTitle": "console.title", "panelSubtitle": "console.subtitle", "sampleMark": "sampleMark", "metrics": "metrics", "checks": "checks", "reviewKicker": "review.kicker", "reviewTitle": "review.title", "reviewCta": "review.cta"}
+    },
+    "content-day-live-approval": {
+      "contentType": "deck.content-day-live-approval",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-approval-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answerLead+voice.answer", "evidence": "body", "note": "note", "channelIcon": "channel.icon", "channel": "channel.name", "agentIcon": "agentIcon", "agentName": "agent.name", "agentBadge": "agent.badge", "agentMessage": "message", "evidenceChips": "chips", "actions": "actions", "executedIcon": "executedIcon", "executedTitle": "executed.title", "executedText": "executed.text", "loop": "loop", "currentLoopStep": "loop[].state"}
+    },
+    "content-brand-family": {
+      "contentType": "deck.content-brand-family",
+      "example": "src/lib/brand-surfaces/examples/deck-content-brand-family-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "family.kicker", "question": "voice.question", "answer": "voice.answer", "body": "body", "familyMark": "family.lockup", "pieces": "pieces"}
+    },
+    "content-service-mockups": {
+      "contentType": "deck.content-service-mockups",
+      "example": "src/lib/brand-surfaces/examples/deck-content-service-mockups-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "technicalTitle": "technical.title", "technicalScore": "technical.score", "technicalScoreLabel": "technical.scoreLabel", "technicalChecks": "checks", "technicalCaption": "technical.caption", "contentTitle": "cluster.title", "contentPillar": "cluster.pillar", "contentNodes": "nodes", "contentCaption": "cluster.caption", "authorityTitle": "authority.title", "authorityMetric": "authority.value", "authorityOutlets": "outlets", "authorityCaption": "authority.caption", "chips": "chips"}
+    },
+    "content-report-formats": {
+      "contentType": "deck.content-report-formats",
+      "example": "src/lib/brand-surfaces/examples/deck-content-report-formats-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "reportLabel": "report.label", "kpis": "kpis", "trendTitle": "report.trendTitle", "rankingTitle": "report.rankingTitle", "ranking": "ranking", "reading": "report.reading", "formats": "formats", "highlightedFormat": "formats[].role"}
+    },
+    "content-committee-deck": {
+      "contentType": "deck.content-committee-deck",
+      "example": "src/lib/brand-surfaces/examples/deck-content-committee-deck-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "slideKicker": "slide.kicker", "slideHeadline": "slide.headline", "slideFigure": "slide.figure+slide.figureLabel", "annotation": "slide.annotation", "features": "features"}
+    },
+    "content-industries": {
+      "contentType": "deck.content-industries",
+      "example": "src/lib/brand-surfaces/examples/deck-content-industries-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "industries": "industries", "highlightedIndustry": "industries[].role"}
+    },
+    "content-markets": {
+      "contentType": "deck.content-markets",
+      "example": "src/lib/brand-surfaces/examples/deck-content-markets-intent.json",
+      "slots": {"productMark": "productMark", "eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "markets": "markets", "photo": "photo"}
+    }
+  }
+}

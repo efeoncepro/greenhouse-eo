@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · la operación gestionada</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-day-live-console` (surface deck, tema oscuro, TASK-1942). «¿Y después del go-live? Lo operamos.»:
+      la consola de la operación gestionada abierta, en papel y en perspectiva sobre la plataforma de luz: cabecera con el
+      ícono oficial del producto (opcional), el título, los productos operados y la píldora «Datos de muestra»; tres cifras
+      del mes con su detalle, cuatro controles con su estado y la franja de la revisión trimestral, que toma la selección
+      «Cliente».
+      Referencia: DeckSalesforceOperacion (SF11-operacion).
+    -->
+    <main class="gl-slide gl-ls gl-clv" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-ls-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer gl-ls-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <section class="gl-ls-doc gl-clv-console">
+        <header class="gl-clv-head">
+          <div class="gl-clv-head-main">
+            <span class="gl-clv-icon" data-slot="consoleIcon"><img data-slot-field="src" alt="" /></span>
+            <div data-slot="console">
+              <p class="gl-clv-title" data-slot-field="title">Operación gestionada · este mes</p>
+              <p class="gl-clv-subtitle" data-slot-field="subtitle">Sales · Service · Marketing Cloud · Agentforce</p>
+            </div>
+          </div>
+          <span class="gl-clv-mark" data-slot="sampleMark">Datos de muestra</span>
+        </header>
+
+        <ol class="gl-clv-metrics" data-slot="metrics">
+          <li class="gl-clv-metric">
+            <p class="gl-clv-metric-label" data-slot-field="label">Soporte en SLA</p>
+            <p class="gl-clv-metric-value" data-slot-field="value">96 %</p>
+            <p class="gl-clv-metric-detail" data-slot-field="detail">48 de 50 solicitudes</p>
+          </li>
+        </ol>
+
+        <ol class="gl-clv-checks" data-slot="checks">
+          <li class="gl-clv-check">
+            <span class="gl-clv-check-label" data-slot-field="label">Calidad de datos · duplicados en cuentas</span>
+            <span class="gl-clv-status" data-slot-field="status">Bajo control</span>
+          </li>
+        </ol>
+
+        <div class="gl-clv-review" data-slot="review" data-gl-selection-target>
+          <div>
+            <p class="gl-clv-review-kicker" data-slot-field="kicker">Próxima revisión trimestral</p>
+            <p class="gl-clv-review-title" data-slot-field="title">Arquitectura, adopción, deuda y prioridades</p>
+          </div>
+          <span class="gl-clv-cta" data-slot-field="cta">Ver agenda</span>
+        </div>
+      </section>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Operación gestionada</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Y después del go-live?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Lo</span><span data-slot-field="answer">operamos</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Releases, soporte, datos, permisos y agentes, con SLA y una revisión <strong>trimestral</strong> de valor.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

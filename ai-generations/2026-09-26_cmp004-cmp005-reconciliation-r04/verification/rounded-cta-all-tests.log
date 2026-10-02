@@ -1,0 +1,47 @@
+✔ optical bracket floor preserves anchors and defaults while surviving mobile downsampling (3.149333ms)
+✔ presentation vacío reproduce el contrato por defecto (24.252958ms)
+✔ collaboratorScale agranda etiqueta y cursor sin mover el anclaje semántico (0.386333ms)
+✔ participantColors aplica el color del participante con tinta que alcanza 4,5:1 (0.187666ms)
+✔ participantColors rechaza colores inválidos o sin contraste suficiente (0.217625ms)
+✔ cada cursor declara su caja en el lienzo, con la punta en el hotspot, y crece con la escala (0.299958ms)
+✔ presentation.frame=false omite el marco y conserva el cursor anclado (0.2485ms)
+✔ legacy permanece sin política ni tokens nuevos (1.201875ms)
+✔ resuelve roles reales sin modificar el plan y mantiene revisión visual pendiente (2.951458ms)
+✔ reproducción desde otra carpeta conserva exactamente la decisión (1.492958ms)
+✔ política alterada, ausente o JSON inválido falla sin fallback (2.616ms)
+✔ no acepta campaña distinta, tratamiento inexistente ni versiones desconocidas (1.574625ms)
+✔ tokens, variante y prominencia deben coincidir; no rellena omisiones ni acepta auto (1.538875ms)
+✔ todos los tratamientos de campaña deben pertenecer a su paleta (1.008833ms)
+✔ IDs duplicados, campos desconocidos y tintas inventadas son inválidos (0.950125ms)
+✔ text sólo tiene tinta; solid registra relleno y tinta por separado (1.02825ms)
+✔ no simula superficies que no se pintan ni omite las que sí se pintan (2.390125ms)
+✔ el esquema de pieza reconoce la referencia estricta y rechaza URLs y campos desconocidos (2.671333ms)
+✔ La pieza mínima es válida (18.509542ms)
+✔ La zona de la firma tiene forma: una zona incompleta o invertida se rechaza (antes era z.any()) (2.319417ms)
+✔ Un campo interno del compositor en la raíz se rechaza (no se inyecta estado resuelto) (0.402084ms)
+✔ Las escalas de la selección tienen techo (una etiqueta de 148 px pasaba con escala 5) (2.704542ms)
+✔ Las aprobaciones que apagan una medición aceptan el sha del plate (0.428125ms)
+✔ Sin velo: scrimTop y scrimBottom se rechazan (el lecho sale del prompt) (0.419708ms)
+✔ El canon declarado sólo puede ser el vigente, y la nota nunca sube con un gap negativo (0.483542ms)
+✔ Las reglas del canon nuevo se pueden exceptuar con aprobación (0.580666ms)
+✔ Marcado, entidades, saltos de línea y placement chico se rechazan donde se dibujarían mal (tramo 12) (1.565792ms)
+✔ Entidades sin punto y coma con la lista oficial de HTML5, y el CTA en la columna del bloque (tramo 15) (86.1415ms)
+✔ Se valida lo que se dibuja: invisibles, marcado vacío, la barra en la etiqueta de un cursor y el alternativo (tramo 16) (1.327709ms)
+✔ voice is opt-in and fails unsupported or contradictory declarations (72.48775ms)
+✔ sphere follows final line baseline and AXIS optical kerning (0.2135ms)
+✔ Efeonce rejects square outline and solid CTAs without changing text or legacy plans (0.16675ms)
+✔ CTA brand aliases resolve to the canonical graphic-line tokens (0.080958ms)
+✔ Reclamar un bloqueo muerto deja un solo dueño: sin el reclamo, nadie lo borra (1898.15ms)
+✔ Ctrl-C suelta el bloqueo: un proceso interrumpido no deja la carpeta tomada (457.937625ms)
+✔ Un bloqueo VACÍO huérfano se reclama; uno recién creado no se pisa, y el error nombra el archivo (2313.717375ms)
+✔ La ruta REAL decide si un plan está en el repo: otras mayúsculas o un enlace no lo sacan (1.702292ms)
+✔ La marca de la suite vale sólo con el valor que exporta la suite, en la carpeta del plan o más arriba (14.717458ms)
+✔ El canon de una pieza lo decide su huella en el registro, no un campo del plan (1.138167ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5264.921708

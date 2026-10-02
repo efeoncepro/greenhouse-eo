@@ -1,0 +1,10 @@
+{
+  "mode": "apply",
+  "profiles": 27,
+  "unresolved": [],
+  "organizationsWithMultipleLegacyProfiles": [
+    "org-2df565fb-98aa-42f7-b324-ea9a2209017f"
+  ],
+  "historicalRuns": "preserved_without_inferred_geography"
+}
+{"applied":true,"verifiedProfiles":27,"created":27}

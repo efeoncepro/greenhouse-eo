@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · hero web a sangre</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Recetas `web.hero-bleed` y `web.hero-uniform-tablet` (escritorio 1440 × 900): la foto de puesta en escena
+      a sangre, la voz gigante sobre el aire de la toma con su selección, el CTA con corchetes y cursor local y el
+      descriptor bajo el cursor. Comparten molde: la respuesta en una línea («Ahora sí») o en dos («Ahora» /
+      «sí», la tableta que viene hacia ti) sale del plan, no de la plantilla. La foto no lleva logo: firma el
+      encabezado del sitio. Referencias aprobadas: tableros WebHeroB y WebHeroSobre de la página «Web».
+    -->
+    <main class="gl-canvas" data-gl-root data-slot="frame">
+      <div data-slot="photo">
+        <img class="gl-photo-layer gl-bleed" data-slot-field="src" alt="" />
+      </div>
+
+      <header class="gl-nav">
+        <img class="gl-nav-logo" data-slot="logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+        <nav class="gl-nav-menu" data-slot="nav">
+          <ul class="gl-nav-links" data-slot-field="links">
+            <li>Servicios</li>
+          </ul>
+          <span class="gl-nav-action" data-slot-field="action">Conversemos</span>
+        </nav>
+      </header>
+
+      <div data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Tu marketing ya mide lo que vende?</span></p>
+        <p class="gl-answer" data-gl-selection-target><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">Ahora sí</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <div data-slot="cta">
+        <p class="gl-cta" data-gl-cta-target data-slot-field="label">Agenda un diagnóstico</p>
+        <p class="gl-descriptor" data-gl-cta-descriptor data-slot-field="descriptor">Revisamos contigo qué mide hoy tu marketing.</p>
+      </div>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+    </main>
+  </body>
+</html>

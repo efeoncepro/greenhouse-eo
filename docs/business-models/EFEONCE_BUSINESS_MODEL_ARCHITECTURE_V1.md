@@ -124,7 +124,7 @@ Ejemplos actuales:
 
 | Modelo | Naturaleza | Por qué merece análisis propio |
 |---|---|---|
-| AEO | Wedge/capability | buyer, metodología, métricas y ruta de expansión propias |
+| [Efeonce AEO](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) | Wedge/capability | entrada de marca en visibilidad de respuestas IA; buyer, metodología, métricas y ruta de expansión aún requieren validación en el modelo `Draft` |
 | Search Visibility 360 | Capability/product line en construcción dentro de Wave | combina SEO, AEO, arquitectura de entidades, intelligence, medición y operación; Globe aporta contenido cuando corresponde |
 | Wave | Productora/capability en construcción | web para humanos/buscadores/agentes, Search Visibility 360, measurement, Agent Systems & Platforms y automatización/integraciones |
 | Creative Studio | Capability/product line | squads, créditos, derechos, providers, autoría y modos operativos propios |

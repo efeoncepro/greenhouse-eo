@@ -42,15 +42,27 @@ La campaña necesita pruebas autorizadas y destinos alineados. La lectura públi
 - [x] Decisión creativa y alcance documentados.
 - [x] ID reservado e indexado junto con carpeta de campaña.
 - [x] Brief y planes redactados como v1 propuesta.
-- [ ] Pilotos producidos y juzgados.
+- [x] Pilotos 4:5 producidos y revisados técnicamente/visualmente por el agente: R01 y R02 contextual; feedback del operador incorporado. [Evidencia R02](../../audits/social/2026-09-25-cmp004-typography-grouping-review.md#cierre-de-implementación-cromática--2026-09-25). Aprobación creativa final separada abajo.
 - [ ] Copy/render finales aprobados y derechos acreditados.
 - [ ] Destino, formulario, CRM y atribución probados extremo a extremo.
 - [ ] Responsables, listas de email elegibles, sender y secuencias probados.
 - [ ] Monto, pagador, geografía y T0 autorizados para activar.
 - [ ] Publicación/envío y resultados verificados.
 
-Próximo paso: producir pilotos de ola 1 desde las fichas y resolver pruebas/destinos. La aprobación de medios/envíos se pide sobre el paquete revisable cuando esté preparado, no antes de completar este trabajo documental.
+Próximo paso: revisar la dirección creativa de R02 y resolver pruebas/destinos y los demás formatos. La aprobación de medios/envíos se pide sobre el paquete revisable cuando esté preparado, no antes de completar ese trabajo.
 
 ## 7. Canon y revisión
 
 [Registro de campañas](../../operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md), [ICP corporativo](../../context/13_icp-buyer-personas-jtbd.md), [oferta Creative Services](../../services/creative-services/README.md), [canales propios](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md). Sin cambio de arquitectura/runtime; no se crea ADR. Revisar tras piloto y primer ciclo. Cambios sustantivos se registran aquí o en un CDR sucesor, sin borrar la decisión original.
+
+## 8. Adopción de política cromática — 2026-09-25
+
+El operador aprobó el método por campaña → elección por pieza → validación técnica → revisión visual («Hagámoslo así»), tras observar CTA que chocaban con la composición. La decisión técnica transversal se registra ahora en la [ADR de política cromática](../../architecture/EFEONCE_ADVERTISING_CAMPAIGN_COLOR_POLICY_DECISION_V1.md); esto amplía el estado técnico descrito en §7 sin alterar la decisión creativa original.
+
+La [política ejecutable CMP-004](../policies/CMP-004-color-v1.json) conserva paleta y tratamientos explícitos. Su aplicación produce cuatro candidatas 4:5: C01/C03 contorno neutro, C02 superficie clara con tinta azul, C04 contorno azul pálido. Son decisiones de dirección propuestas para revisión, no aprobación final del operador. La documentación de campaña conserva el razonamiento y las rutas a los assets en su canal; el JSON es el contrato ejecutable único.
+
+El gate técnico no decide armonía ni eficacia. Las decisiones tipográficas/espaciales del análisis anterior se mantienen como propuestas separadas; esta implementación sólo habilita la política de color. Sin pauta, envíos, commit o deploy implícitos.
+
+## 9. Delta 2026-10-02 — reorientación por servicios
+
+El operador reorientó la campaña por servicio: [CDR-012](CDR-012-cmp004-reorientacion-por-servicios.md). Los conceptos C01–C04 aceptados aquí siguen vivos dentro de S01, S02, S04 y S07; los pilotos R01–R04 quedan como historia y el teal de su CTA se reemplaza por el acento de la línea Brand.

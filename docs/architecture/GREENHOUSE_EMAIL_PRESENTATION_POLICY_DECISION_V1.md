@@ -286,6 +286,27 @@ liquidación a colaborador no-Chile; remittance de contractors) imprimen en cast
 retirar el alias. Se agrega test de paridad que se apoya en la mecánica del defecto (detectar que ambas claves sean
 el mismo objeto), molde: `src/lib/copy/hiring-desk-stage-locale-parity.test.ts` (`TASK-1754`).
 
+## Delta 2026-09-29 — excepción explícita para el correo de Insights
+
+El operador aprobó y canonizó en AXIS los módulos de correo de Efeonce (pie oscuro con agenda, redes, preferencias y
+baja; dirección `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md`; adopción `TASK-1944`). Esa aprobación
+chocaba con esta política en los correos de Insights. Decisión del operador, 2026-09-29:
+
+- `insights_edition_delivery` e `insights_edition_delivery_attachment` van a clientes: propósito
+  `relationship_transactional`.
+- **Excepción explícita `efeonce-insights-delivery`:** conservan el pie aprobado completo, con la agenda «Agendar una
+  reunión», las redes y los enlaces de preferencias y baja («Dejar de recibir estos informes»). El operador la eligió
+  frente a dejar sólo el botón.
+- Los demás tipos siguen esta política sin cambios: sin agenda, redes ni baja en transaccionales y de servicio; baja
+  obligatoria en suscripción y marketing; redes opcionales en suscripción y obligatorias en marketing.
+
+**Regla nueva:** una excepción al perfil base es **explícita y por tipo**, con aprobador, fecha y motivo, y vive en el
+registro `EMAIL_PRESENTATION_POLICY`. Sin excepción registrada rige el perfil base; nunca se infiere del template, del
+diseño aprobado ni de la prioridad de entrega. La excepción de Insights no crea precedente para otro tipo: cada una es
+una decisión del operador. AXIS la espeja en `efeonce.email-modules` `0.2.0` (`purpose` obligatorio y `application`
+contra un registro de excepciones), publicado en `v0.3.39` (commit `1c18a2e`). La baja de Insights sigue dependiendo de `TASK-1774`
+(§D1). El estado de esta ADR no cambia.
+
 ## Alternatives Considered
 
 ### Un footer único global

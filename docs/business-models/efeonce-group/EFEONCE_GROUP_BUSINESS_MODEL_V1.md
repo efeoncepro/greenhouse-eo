@@ -26,7 +26,7 @@
 | Greenhouse | Platform/control plane | operación, cliente, métricas y memoria | runtime-dependent |
 | Kortex | Product/platform capability | CRM e inteligencia comercial | runtime-dependent |
 | Verk | Product/platform capability | contenido, distribución y data/AI tooling | runtime-dependent |
-| AEO / Search Visibility 360 | Wedge/capability | visibilidad en búsqueda clásica y generativa | Search Visibility 360 es el producto SEO+AEO 360 dentro de Wave; ver modelos propios |
+| [Efeonce AEO](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) / Search Visibility 360 | Wedge/capability | Efeonce AEO introduce visibilidad de marca en respuestas de IA; Search Visibility 360 integra SEO+AEO | El naming AEO está decidido; su modelo comercial sigue `Draft`. Search Visibility 360 es la familia integral dentro de Wave; ver modelos propios |
 
 ## 3. Revenue architecture pendiente
 

@@ -59,7 +59,8 @@ Para fotohistorias, globos y PDF social, cargar
 [dialogue-carousel-and-document-delivery.md](references/dialogue-carousel-and-document-delivery.md).
 Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes de generar. La identidad humana
 fotorrealista aprobada el 2026-09-24 es la familia Avatar A con continuidad de polera gris; sus ocho vistas
-están en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` y se resuelven por `foto:prompt`.
+están en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` y se resuelven por `foto:prompt`
+(si no están en disco: `pnpm ai-gen:pull ai-generations/2026-09-20_identidad-julio-nexa`).
 Las poses de OneDrive son guías de actuación/cuerpo, no anclas faciales. No reutilizar el set sintético anterior
 como rostro de Nexa.
 Cuando Julio aparezca como vocero o personaje de una pieza, aplicar el mismo preflight de identidad: usar las 11
@@ -67,6 +68,26 @@ referencias aprobadas y los seis ángulos de `ai-generations/2026-09-20_identida
 `refs-aprobadas/MANIFIESTO.json` y seleccionar por `foto:prompt`. No usar el archivo excluido `julio-ap-02.png`
 ni fotos fuente/descartes como anclas. Canon:
 [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+
+**Registro cine (2026-09-27): fuera de social salvo con Nexa protagonista.** El registro cine de la fotografía
+Efeonce —el servicio como fenómeno de luz, ficción declarada— sólo está aprobado con **Nexa protagonista**, en la
+receta de deck `proposal-cinematic` y en las láminas de sección y «about» del deck (excepción del 2026-09-27, que no
+alcanza a social). **Excepción social (2026-10-01):** las portadas de perfil y los destacados de Instagram de
+Efeonce con Nexa protagonista, aprobados (overlay §Marca, «Perfiles sociales de Efeonce»). Una pieza social con
+personas del equipo **sigue en A, B o C** (salvo las fotos de Marketing con Manzanitas con personas reales del roster,
+con la prenda de su línea), y sus formatos
+9:16 y 4:5 están **en prueba**: nada se publica como cine sin decisión del operador. Canon:
+[registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) §2 y §11; lecciones de la
+primera tanda publicitaria en `efeonce-advertising-creative` §«Registro cine en publicidad».
+**Producir una foto cine social (2026-10-02):** el flujo del
+[casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md):
+`pnpm foto:cine:nueva --desde <receta> [--formato] [--alcance]` (para perfiles y destacados con Nexa, `PH2` o `PS1b`;
+`alcance: social-nexa`, o `manzanitas` en MCM) → campos cine → agente `cine-reviewer` → `foto:generar` →
+`pnpm foto:validar:cine` + `foto:validar` + `foto:emblema` → revisor sobre el plate. No hay todavía ninguna foto cine
+vertical aprobada; en 9:16 y 4:5, `foto:prompt` deja el fenómeno y el fondo bajo el 36 % del alto y, con `identidad`,
+pide la escala por encuadre (9:16 de la cintura arriba, 4:5 del pecho arriba; a confirmar en el próximo piloto
+vertical). En social, Nexa mira al lente. **El destacado «Agents» aprobado se queda** (operador, 2026-10-02): tres
+Sparks, sin Nexa ni texto en el círculo; un destacado con Nexa usa otro nombre y otra destacada.
 
 1. **Clasifica la intención** con el árbol de §2. ¿Es realmente social de ejecución
    profunda, o pertenece a una skill hermana? Si pertenece a otra, carga la skill dueña (§5). Para encargos sociales integrales,
@@ -89,7 +110,7 @@ ni fotos fuente/descartes como anclas. Canon:
    `greenhouse-talent-people-operator`.
 5. **Aterriza a Efeonce** si el trabajo es de canales propios o de un cliente internacional:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`. Globe es un adaptador futuro gated, no una dependencia.
-   Pieza de marca propia Efeonce o de su familia (nunca cliente): aplica la línea gráfica «La órbita» ([referencia operativa](../efeonce-brand-studio/references/graphic-line-orbit.md); reglas de redes en `efeonce/EFEONCE_OVERLAY.md` §Marca). La órbita se usa en casos declarados y nunca reemplaza la composición fotográfica; la pieza firma con el logo de Efeonce centrado y la burbuja URL sólo lo reemplaza si el logo ya está en la imagen.
+   Pieza de marca propia Efeonce o de su familia (nunca cliente): aplica la línea gráfica «La órbita» ([referencia operativa](../efeonce-brand-studio/references/graphic-line-orbit.md); reglas de redes en `efeonce/EFEONCE_OVERLAY.md` §Marca). La órbita se usa en casos declarados y nunca reemplaza la composición fotográfica; la pieza firma con el logo de Efeonce centrado y la burbuja URL sólo lo reemplaza si el logo ya está en la imagen. Los íconos salen sólo de la iconografía canónica de la línea (Plastilina en Brand, Trazo en Growth/Engine/Revenue), nunca generados sueltos; reglas en el overlay §Marca. Un post de un solo objeto protagonista puede llevar la **Plastilina en volumen** (D24: PNG con alfa de AXIS, uno por pieza, ≥ 160 px; nunca regenerado).
 6. **Cierra con el resultado solicitado**: artefacto de `templates/` en ejecución, pieza si se encargó producción,
    o explicación si sólo se pidió comprender/evaluar. No inventar un entregable para una pregunta.
    Para seasonalities, metáforas visuales y planificación anticipada de canales propios,
@@ -221,6 +242,17 @@ herramientas conectadas (detalle en `efeonce/STUDIO_TOOLING.md`):
   - Frontera con **Media Foundry**: Foundry **genera** el pixel (IA); el Composer **compone** el frame. Un
     carrusel puede usar los dos. **NO** se fusionan.
 
+### Dónde viven los archivos de `ai-generations/`
+
+Una ruta `ai-generations/...` en esta skill (ancla de identidad, plate, kit 3D, pieza vigente, master) es **lógica**: el
+archivo vive local (protegido), en el canon `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) (lo sellado en
+`scripts/foto/assets.lock.json`; el equipo lo baja con `pnpm assets:pull`) o en el archivo
+`gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (exploración, rondas, descartes; sólo operador). Los `.md` van en
+git; los PNG/MP4, no. **Antes de componer, editar o adaptar** desde un asset que no está en disco:
+`pnpm ai-gen:where <ruta>` → `pnpm ai-gen:pull <carpeta|ruta>` (misma ruta, sha256 verificado). **NUNCA** regenerar,
+sustituir ni aproximar un asset aprobado porque falta; **NUNCA** resellar el lock para tapar un faltante ni archivar/borrar
+a mano. Salidas nuevas: `ai-generations/<AAAA-MM-DD>_<slug>/` local. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
+
 ### Reportes y evidencia de producto
 
 Para posts visuales de reportes, dashboards o Brand Visibility, cargar el contrato canónico
@@ -244,6 +276,26 @@ conversación. Definir una sola conversión antes del guion: guardar/compartir/c
 Instagram, optimizar tensión → descubrimiento → utilidad → conversación; para LinkedIn, patrón → implicación de
 negocio → mecanismo → prueba → aplicación → debate. Ver la investigación en
 [`docs/audits/social/2026-07-28-carousel-storytelling-platform-research.md`](../../../docs/audits/social/2026-07-28-carousel-storytelling-platform-research.md).
+**Glitch** (magazine semanal): su carrusel de LinkedIn y su reel siguen una sub-línea propia → `efeonce-graphic-line`
+`references/glitch.md` (portada A/B/C con rotación semanal, lámina interior y contraportada aprobadas; reel = overlays
+sobre el host, en propuesta). Manzana, verde Glitch, bytes, Guttery y «EDICIÓN #N» nunca en otras piezas de Efeonce.
+Glitch tiene dos formatos: la **edición semanal** (lunes, numerada «Edición #N») y el **Glitch Flash** (una noticia
+puntual, sin número); contrato de cada uno en `efeonce-graphic-line` `references/glitch.md`. Primer caso Flash:
+[bitácora 2026-09-28](../../../docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md).
+**Marketing con Manzanitas** (marca editorial evergreen del blog): sus piezas siguen el **registro Marketing con
+Manzanitas** (aprobado 2026-09-28), que **complementa La órbita, no la reemplaza** (La órbita manda en todo lo que el
+registro no dice) y no se mezcla con Glitch: su manzana es la del logo del programa, en contorno con tres puntos; la
+manzana llena es de Glitch. Norma
+[`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) ·
+[ADR](../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md) · referencia de agentes `efeonce-graphic-line`
+`references/manzanitas.md`. En el carrusel: láminas Pizarra, Escena y Lente mezcladas según **Recreo** (nunca dos fotos
+seguidas ni más de tres Pizarras seguidas; el dato con fuente y el cierre, siempre en Pizarra); la cabecera del
+programa va arriba a la izquierda y el logo de Efeonce firma abajo al centro, a una sola altura en todo el carrusel;
+la mano **«Desliza»** va en su sitio fijo, en reposo, y nunca en la última lámina; la contraportada pide **una sola
+conversión** (el comentario, con la bajada «En los comentarios: …») y nada simula un botón; los 9 gráficos y las 3
+láminas de texto denso se calculan desde su dato. Un solo selector, «Línea del tema», cambia a la vez la manzana, los
+puntos, el gráfico, la palabra del eslogan y la voz del ícono. Nada del registro está aún en AXIS: la fuente de las
+piezas es el [canvas v39](https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG).
 - **Programar y medir**: **Metricool** MCP (`getBestTimeToPostByNetwork`,
   `createScheduledPost`, `getAnalyticsDataByMetrics`, `getBrandSettings`).
 - **Publicar y HubSpot**: atribución/lead capture social → `growth-marketing-cro` +

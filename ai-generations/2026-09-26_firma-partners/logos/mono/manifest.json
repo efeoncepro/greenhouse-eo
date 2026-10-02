@@ -1,0 +1,47 @@
+{
+  "hubspot": {
+    "name": "HubSpot",
+    "w": 68,
+    "h": 19
+  },
+  "salesforce": {
+    "name": "Salesforce",
+    "w": 30,
+    "h": 21
+  },
+  "adobe": {
+    "name": "Adobe",
+    "w": 59,
+    "h": 13
+  },
+  "microsoft": {
+    "name": "Microsoft",
+    "w": 73,
+    "h": 16
+  },
+  "claude": {
+    "name": "Claude",
+    "w": 80,
+    "h": 17
+  },
+  "openai": {
+    "name": "OpenAI",
+    "w": 77,
+    "h": 21
+  },
+  "googlecloud": {
+    "name": "Google Cloud",
+    "w": 80,
+    "h": 13
+  },
+  "aws": {
+    "name": "AWS",
+    "w": 40,
+    "h": 24
+  },
+  "byteplus": {
+    "name": "BytePlus",
+    "w": 80,
+    "h": 15
+  }
+}

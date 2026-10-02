@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-hybrid-workforce",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Fuerza de trabajo híbrida",
+    "question": "¿Quién hace el trabajo?",
+    "answer": [
+      "Personas",
+      "y agentes"
+    ]
+  },
+  "layout": "scene",
+  "body": "Sobre la misma pieza, al mismo tiempo. El agente suma capacidad medible; la persona decide y responde.",
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+    "alt": "Una estratega de Efeonce con polo y lanyard señala el gráfico en un monitor grande mientras un agente trabaja las imágenes de la misma pieza"
+  },
+  "selectionTargets": [
+    {
+      "label": "Estrategia",
+      "anchor": "bottom-start",
+      "box": {
+        "x": 1606,
+        "y": 388,
+        "width": 260,
+        "height": 142
+      }
+    },
+    {
+      "label": "Agente IA",
+      "anchor": "top-start",
+      "box": {
+        "x": 1614,
+        "y": 172,
+        "width": 258,
+        "height": 196
+      }
+    }
+  ]
+}

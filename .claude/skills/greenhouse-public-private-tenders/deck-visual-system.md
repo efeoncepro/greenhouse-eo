@@ -116,6 +116,53 @@ Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 | `ToolStackFull` · `DailyOpsHubFull` · `ContentHubAnatomyFull` | stack operativo · día a día colaborativo · anatomía de entregable |
 | `EvidenceStoryGrid` · `HumanImpactFull` | provisionales |
 
+> **Delta 2026-09-27 — portada y contraportada de propuesta comercial en La órbita (operador).** Si la propuesta se
+> arma como deck de marca propia con La órbita (catálogo `graphic-line-deck`, **nunca** mezclado con este
+> `deck-axis`), la **portada va sin foto con el logo del cliente** en una caja fija dentro de la órbita (el nombre
+> del cliente sólo en la evidencia: «Preparada para **[Cliente]** · Confidencial»; «¿Cómo crecemos en 2027? Con
+> foco.») y la **contraportada va con foto y «Empower your Growth» como mensaje principal**, sin «¿Conversamos?»
+> (la propuesta llega después de conversar). Ejemplo aprobado: SKY. Norma:
+> `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6; resumen en `deck-studio`
+> §«Portadas y contraportadas». Se componen con `pnpm brand:compose` (`cover-proposal` layouts `orbit`/`dawn`, con
+> `clientLogo: { path, alt }`, y `close-proposal`; TASK-1927). En este catálogo siguen `CoverFull` / `BackCoverFull`: si la oferta a comité adopta
+> el set nuevo lo decide el operador, no el agente.
+>
+> **Delta 2026-09-27 (c) — qué láminas usa una propuesta de marca propia (recetas por lámina).** Las 69 láminas de La
+> órbita quedaron aprobadas y cada una tiene receta en `docs/operations/brand-graphic-line/deck-recipes/` (JSON
+> `efeonce.deck-slide-recipes.v1`; índice con `pnpm brand:deck-recipes`). Una **propuesta comercial** de marca propia
+> se arma con las recetas cuyo `documents` incluye `proposal`: portada sin foto (`cover-proposal-orbit` o
+> `cover-proposal-dawn`) → agenda (`decision-agenda`) → sección → contexto → página del servicio
+> (`proposal-cinematic-*` para sala, `proposal-service-*` sobria para lectura) → método (`triptych`, `method-staircase`,
+> `decision-plan`) → prueba con fuente (`content-clients`, `decision-case` —foto de Sky **de ejemplo**, se reemplaza—,
+> `decision-chart`, `decision-testimonial`) → equipo real (`content-team`) → riesgo (`decision-risk`) → cotización
+> (`content-pricing`, `content-pricing-stage` o `content-pricing-live`; montos siempre `[MONTO]`) → contraportada con
+> foto (`close-proposal-horizon` o `close-proposal-dawn`). **No va** `decision-next-steps` si el diagnóstico ya
+> ocurrió (el gesto es aprobar: `content-pricing-live`). **Esto no cambia este catálogo:** una licitación o una oferta
+> a comité sigue en `deck-axis` con su selector; las recetas de La órbita no se mezclan con él. Manual:
+> `docs/manual-de-uso/creative/componer-deck-con-recetas.md`.
+>
+> **Delta 2026-09-28 — las 69 recetas componen, pero no desde Proposal Studio.** Desde TASK-1928 cada receta de La
+> órbita tiene plantilla en `graphic-line-deck` y se compone lámina a lámina por CLI con
+> `pnpm brand:compose -- --intent <intent.json>` (detalle en `deck-studio`). **Proposal Studio sigue emitiendo
+> `deck-axis`:** que arme el deck de La órbita desde recetas es TASK-1932 (to-do), y la ruta productiva de piezas de
+> marca (API, worker, MCP) es TASK-1921, en curso; ninguna de las dos está disponible todavía.
+> TASK-1932 consumirá `validateDeckPlan` / `proposeDeckPlan` (`src/lib/brand-surfaces/deck-recipes`, TASK-1929) para el
+> plan de recetas antes de la confirmación humana; hoy sólo existen por CLI (`pnpm brand:deck-plan`).
+>
+> **Delta 2026-09-28 (b) — los datos de una propuesta de La órbita se LIGAN, no se escriben (TASK-1930, en curso).**
+> `bindDeckSlots(plan, context)` (`server-only`, `src/lib/brand-surfaces/deck-recipes/bindings/index.ts`; núcleo puro
+> `bindDeckSlotsWith` en `bindings/core.ts`) llena los slots de datos del plan de recetas desde la `Proposal`
+> (`getProposalById`), su evidencia (proyección allowlisted `buildProposalRenderProjection`) y el logo del cliente
+> (`readOrganizationLogoVariants`). El valor viaja en un hecho con `evidenceRef` y la evidencia lo autoriza; un slot
+> de datos nunca sale del texto del plan. Cifras: evidencia `measured`, la fuente visible sale de la evidencia. Casos,
+> testimonios, logos de terceros y foto de caso: evidencia `attested` con documento de respaldo. Montos: `[MONTO]`
+> hasta TASK-1417; equipo: sin ligar hasta TASK-1418. **Ningún deck usa evidencia `internal`, ni siquiera uno
+> interno** (ahí vive el costo cargado y el margen; decisión del operador 2026-09-28), y el muro de logos pide nueve
+> autorizados como mínimo. TASK-1932 lo consumirá antes de la confirmación humana; hoy es CLI
+> (`pnpm brand:deck-plan -- --bind --plan <plan.json> --proposal <id> --org <ownerOrgId>`, con `pnpm pg:connect`).
+> **No toca `deck-axis`:** una oferta a comité sigue con su selector. Detalle: `deck-studio` §«Datos reales en los
+> slots».
+
 ### Las que puntúan (no son opcionales)
 
 Del gap-analysis contra `propuesta-tecnica-economica.md`, estas mueven la adjudicación o **evitan el

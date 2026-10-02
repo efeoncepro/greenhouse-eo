@@ -180,6 +180,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Audits
 
 - [Audits Index](audits/README.md)
+- [OpenAI DevDay 2026 — 25 anuncios y consecuencias para Efeonce](audits/platform/OPENAI_DEVDAY_2026_09_29_LAUNCH_INVENTORY.md) — investigación de proveedor fechada; no acredita disponibilidad en cuentas o runtimes propios.
 - [TASK-1844 — producción y clientes internos certificados](audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) · [Cobertura documental y skills](audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
 - [Efeonce MCP — interoperabilidad OAuth Codex/Claude — 2026-09-02](audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md)
 - [Efeonce MCP — matriz de clientes y tokens del canary externo — 2026-09-06](audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md) — certificación sintética con evidencia fechada y retiro bajo su propio runbook; no equivale a acceso de clientes reales.

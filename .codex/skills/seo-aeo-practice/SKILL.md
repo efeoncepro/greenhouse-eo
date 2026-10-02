@@ -14,10 +14,19 @@ description: >-
   "descuento", "prospección SEO", "outbound de SEO", "canales para vender SEO",
   "objeción SEO", "el cliente dice que es caro", "competimos con un freelancer",
   "AI Visibility Grader como venta", "licitación de contenido", "vender ASO",
-  "ASO para un cliente con app", "servicios complementarios de ASO".
+  "ASO para un cliente con app", "servicios complementarios de ASO", "deck SEO",
+  "deck SV360", "brochure SEO", "qué lámina muestro".
 ---
 
 # SEO/AEO Practice — el negocio, no el oficio
+
+## Nombre comercial vigente
+
+La capacidad se llama **Efeonce AEO**; el diagnóstico público, **Efeonce AEO Assessment**; el entregable, **Efeonce AI Visibility Report**. **Search Visibility 360** conserva el alcance más amplio de SEO + AEO. Usar **AI Visibility Grader**, **Brand Visibility Grader** o **AEO Grader** sólo como aliases técnicos o históricos al localizar el motor y sus documentos. El diagnóstico debe acumular reconocimiento para la masterbrand Efeonce; no depende de posicionar primero una metodología interna. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
+Las cuatro son **submarcas de producto de Efeonce** con logos oficiales (aprobadas el 2026-09-29): **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report**, en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29). Acompañan a Efeonce en un lockup y nunca firman solas; referencia visual en el Lab de AXIS `https://axis.efeonce.org/references/seo-aeo/` (publicados el 2026-09-29; responden 200). Canon: ADR de naming §Delta 2026-09-29.
+
+El canon visual del **AI Visibility Report** vive en AXIS desde `v0.3.30` (2026-09-29): página `https://axis.efeonce.org/references/ai-visibility-report/` y contrato `efeonce.ai-visibility-report` 0.1.0 (`candidate`). La portada muestra la gravedad en su órbita (color del nivel con etiqueta y escala visibles; sin dato, «—»); la versión para prospecto cierra con la agenda, nunca con correo, y la de cliente no lleva oferta. El renderer del PDF es de TASK-1938.
 
 Para decisiones transversales de packaging, pricing, billing, margen, descuentos y créditos cargar también
 `efeonce-pricing-operator`. Esta skill conserva las reglas específicas de Search Visibility 360 y sus hipótesis de
@@ -237,11 +246,45 @@ panorama, límites y reunión)*
 
 ## 4b. 🔴 La Radiografía AEO — el activo que ya tenemos (educa Y vende)
 
-En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es la pieza que la hace **tangible**. Escribe un artículo **real** para el cliente y lo **abre en canal** en cuatro pantallas: el hueco de búsqueda medido · el artículo · la capa de máquina **acoplada** (tocas un párrafo y ves qué produce) · dónde más vive.
+En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es la pieza que la hace **tangible**. Escribe un artículo **real** para el cliente y lo **abre en canal** en cuatro pantallas: **La oportunidad · La pieza · La radiografía · Dónde más vive**. Desde el 2026-09-30 compone landing y artículo, conecta sus bloques con evidencia y mantiene derivados y motion en el Experience original. La oportunidad declara qué es medido, estimado o ilustrativo.
 
-**Live:** `think.efeoncepro.com/muestras/<slug>-<token>` · runtime en el repo **`efeonce-think`** (NO `greenhouse-eo`) · **el cliente es un payload JSON, cero código.**
+**Rutas:** legacy `/muestras/<slug>-<token>`; composición `/aeo-xray/r/<token>?artifact=<id>&step=<paso>`, en `think.efeoncepro.com`. Runtime en **`efeonce-think`**; el cliente se configura en un intent JSON resuelto por AXIS, sin copiar código del caso anterior. Las muestras publicadas Think y los grants Greenhouse tienen lifecycles diferentes: un enlace `sample_…` distribuye una demo no listada, no acceso privado/revocable de un grant.
 
-**Cadena comercial:** **Grader mide → diagnóstico SEO de prospecto cuantifica (§4c) → Radiografía demuestra → propuesta/deck convierte → servicio opera.** Si el prospecto todavía no tiene evidencia, primero Grader. Si ya vio un score y pregunta *"¿cómo se arregla?"*, entra la Radiografía. En licitaciones y QBR se registra como evidencia `client_facing` sólo si el enlace tokenizado puede viajar al comité.
+**Cadena comercial:** **Assessment diagnostica → diagnóstico SEO de prospecto contextualiza (§4c) → Radiografía demuestra → operación y reportería hacen visible la continuidad → propuesta define el alcance.** Elegir el punto de entrada según la evidencia y el avance de la cuenta; no reiniciar un Assessment ya presentado ni exigir todos los artefactos. Si ya vio un score y pregunta *"¿cómo se arregla?"*, entra la Radiografía. En licitaciones y QBR se registra como evidencia `client_facing` sólo si el enlace tokenizado puede viajar al comité.
+
+### Diferenciador comercial Efeonce: experimentar la capacidad antes de comprar
+
+**Hacer que el cliente experimente nuestra capacidad antes de comprarla** es un diferenciador que el operador
+reconoce en su proceso comercial (2026-09-30). Su aplicación es la **venta con demostración contextual**:
+elegir una necesidad relevante de la cuenta y mostrar criterio, ejecución y continuidad con trabajo concreto.
+No afirmar que somos los únicos que lo hacemos ni que esto garantiza adjudicación, rankings, citación o revenue.
+Canon y registro de casos: `docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md`.
+
+| Momento | Qué debe poder evaluar el comprador | Aplicación SEO/AEO |
+|---|---|---|
+| Diagnóstico | ¿Entienden nuestra oportunidad? | Hallazgo con fuente, fecha, mercado, método y límites; Assessment/Report si aportan evidencia pertinente |
+| Muestra | ¿Cómo la abordarían y con qué criterio? | Una intención → contenido representativo → decisiones editoriales/técnicas → fuentes; X-Ray o formato adecuado |
+| Operación | ¿Cómo trabajaríamos y revisaríamos el avance? | Responsables, validación, plan de medición y muestra de Insights claramente ilustrativa |
+| Alcance | ¿Qué contrataríamos y cuál es el siguiente paso? | Necesidad validada, capacidad, responsabilidades e inversión; acuerdo bilateral con responsable y fecha |
+
+**El método precede a la herramienta.** Berel recibió Notion, artículo, banners y video con IA: el operador
+reporta que funcionó comercialmente; falta completar su evidencia original. SKY recibió X-Ray, informe y propuesta;
+la adjudicación está documentada, mientras que la contribución de la «milla extra» es interpretación del operador,
+sin atribución causal aislada. Pichincha aplica el patrón y sigue abierto: preparación no prueba envío, lectura ni
+compra. Estos ejemplos son aprendizajes internos; no convertirlos en casos públicos de desempeño sin evidencia
+y autorización de cada cuenta.
+
+**La demostración se dimensiona como inversión de preventa.** Antes de producir, declarar incertidumbre a
+resolver, audiencia, siguiente interacción, owner, plazo y presupuesto proporcional. Reutilizar estructura y
+componentes, personalizar necesidad y contenido, preservar aislamiento entre clientes. No hay horas, montos ni
+intensidad obligatorios aprobados para este método; no inventarlos. Ampliar sólo si responde a una duda concreta
+del comprador. La demo no crea obligaciones de implementación o revisiones ilimitadas.
+
+Registrar versión y entrega efectiva, costo/horas reales, feedback del comprador y próximo paso bilateral;
+aprender también de oportunidades perdidas o detenidas. Una experiencia visual demuestra capacidad; una respuesta
+simulada no demuestra aparición en un motor y un dashboard de muestra no demuestra resultados del prospecto.
+Para producir, cargar la referencia X-Ray y el kit `docs/think/aeo-xray-nuevo-cliente.md`; aquí vive su propósito
+comercial, no otro manual técnico.
 
 **Dos trabajos — no los confundas:**
 
@@ -264,7 +307,7 @@ En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es
 
 🔴 **NUNCA** prometer el rich snippet de FAQ de Google (restringido desde 2023 a gobierno/salud). 🔴 **NUNCA** dejar que la pieza cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola**. 🔴 **Gate humano:** el operador elige el ángulo del artículo.
 
-**Cargar al tocarla:** `docs/think/radiografia-aeo-architecture.md` (invariantes vigentes + gate de 46 asserts) · `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente) · `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` (encuadre funcional) · `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` (playbook comercial).
+**Cargar al tocarla:** [`../seo-aeo/references/aeo-xray.md`](../seo-aeo/references/aeo-xray.md) (criterios reutilizables y boundaries con Assessment, Report e Insights) · `docs/think/radiografia-aeo-architecture.md` (invariantes vigentes y gates legacy/composición) · `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente) · `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` (encuadre funcional) · `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` (playbook comercial).
 
 ---
 
@@ -369,6 +412,58 @@ Tres reglas al mandar tráfico —pagado u orgánico— a una landing de la prá
 
 **Canon:** `docs/campaigns/decisions/CDR-007-cmp001-bofu-conversion-a-landing.md` (destinos verificados en vivo,
 bloqueos B1/B2 y su delta) · `docs/campaigns/CMP-001-MEDIA-PLAN-Q4-2026.md` (estructura de campañas y medición).
+
+---
+
+## 4f. 🎯 El deck SEO/AEO (Search Visibility 360) — el activo comercial aprobado (2026-09-30)
+
+El operador aprobó el deck de la práctica en tres documentos: **completo** (33 láminas), **brochure** (24) y
+**propuesta** (29), línea Engine, con SV360 como marca paraguas y sus piezas (AEO Assessment, AI Visibility Report,
+Insights). Se compone desde el catálogo de «La órbita» (`deck-studio`; norma
+`docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO»; TASK-1949). Esta skill
+decide **qué lámina sostiene qué conversación**; `deck-studio` la arma.
+
+| Objeción o momento | Lámina (receta) | Cuidado |
+|---|---|---|
+| «Mi tráfico cae y no sé si es Google, la IA o la agencia» (CMO) | `decision-ai-market` → `decision-ai-answer` | cifras de mercado con fuente y año; la respuesta de IA es un ejemplo y lo dice |
+| «El SEO trae visitas, no ventas» | `decision-traffic-to-revenue` | sin CRM ni medición de leads, no se promete el escalón |
+| «¿Me garantizas que voy a rankear?» | `proposal-cinematic-seo` o `proposal-service-seo` | la nota «No prometemos rankings…» es obligatoria (§2, regla 8) |
+| «Ya tuve una agencia» · «Un freelancer me cobra menos» · «Semrush y lo hago yo» | `decision-difference`, `section-cine-team` → `content-service-mockups` | la alternativa siempre genérica, nunca un competidor real; las maquetas son ilustrativas |
+| «¿Y si hay que tocar el sitio?» (IT / Dev) | `proposal-cinematic-web` («Lo hacemos») | alcance técnico por escrito en la propuesta |
+| «¿Cómo sé qué pasa y quién arma el reporte?» | `content-day-live-progress` → `content-day-live-results` → `content-report-formats` → `content-committee-deck` | tal cual (decisión del operador, abajo); conoce el estado real de cada formato por si preguntan |
+| «¿Cómo sé que funciona?» | `content-measure-formulas` | sin cifras: fórmula, fuente y dueño |
+| «Muéstrame casos» | `decision-case` (BICECORP, Banco BICE, Berel) + `content-clients` | cifras tal cual (decisión del operador, abajo); logos con autorización; el Grader o la Radiografía en vivo (§4b) los complementan |
+| «¿Entienden mi industria?» | `content-industries` | preguntas de ejemplo, **no** prueba por industria |
+| «¿Cubren fuera de Chile?» | `content-markets` | mercados de `EFEONCE_OPERATING_MARKETS`, nunca oficinas |
+| «¿Y si no funciona?» (propuesta) | `decision-risk` → `decision-plan` → `content-pricing` | montos `[MONTO]` hasta la cotización |
+| Cierre | brochure: `decision-diagnosis-map` → `decision-next-steps`; propuesta: `decision-diagnosis-map` (salvo diagnóstico ya hecho) | las fechas de la agenda (5–9 oct) son de ejemplo |
+
+**Decisión del operador sobre los datos (2026-09-30):** «Deja esos datos... No marques nada en el deck como
+provisional, asumo la responsabilidad.» Las cifras de los tres casos, su fuente, los formatos de Insights, las
+industrias y la cifra de Bresler **quedan tal cual**, sin marca de «provisional» ni «próximamente». El operador asume la
+responsabilidad; esta skill no los rotula, no los quita y no los presenta como bloqueo para mostrar el deck.
+Lo que sí condiciona: los logos de BICECORP, Banco BICE y Berel se usan con su autorización (TASK-1937) y las fechas de
+la agenda (5–9 oct) se mueven al usar el deck.
+
+**Contexto, sólo como registro** (`ai-generations/2026-09-29_deck-seo-aeo-documentos/DECISIONES.md`) — para que quien
+presente sepa qué hay detrás si el cliente pregunta:
+
+- Las cifras reales de los casos (cuatro por caso, con fuente, período, servicio y permiso) no se han cargado; la fuente
+  de la lámina dice «Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses». Grupo Security se fusionó con
+  BICECORP en sep-2025 (marca BICE).
+- Formatos de Insights (2026-09-30): web y celular, PDF A4 y deck 16:9 vivos; modo presentación desplegado sin probar
+  con una edición real; el correo que llega solo no está vivo; ningún cliente real ha recibido una edición todavía.
+- Industrias: no hay clientes de banca, seguros ni SaaS en `content-clients`. Bresler (+180 % de ventas digitales) no
+  es una cifra de SEO.
+- La URL `think.efeoncepro.com/brand-visibility` todavía dice «Brand Visibility Grader» (alias histórico).
+
+Las láminas nativas (familia de marcas, servicios, formatos, comité, industrias y mercados) todavía no se componen
+solas: el PDF aprobado vive en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/` (fuera de git; si no está en
+disco: `pnpm ai-gen:pull ai-generations/2026-09-29_deck-seo-aeo-documentos/out`, nunca re-exportar uno aproximado).
+
+**Dónde viven los archivos de `ai-generations/`:** toda ruta `ai-generations/...` es lógica (local, canon
+`gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) o archivo `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`);
+si falta en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull`, nunca sustituirla. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
 ---
 

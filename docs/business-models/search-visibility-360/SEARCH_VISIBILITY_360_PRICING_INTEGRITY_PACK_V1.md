@@ -8,7 +8,8 @@
 > **Método:** `efeonce-pricing-operator` + `seo-aeo-practice`
 
 Este documento aplica pricing específicamente a Search Visibility 360. No redefine Wave, SEO/AEO como oficio,
-content production, CRM, Globe, Reach ni el runtime del AI Visibility Grader.
+content production, CRM, Globe, Reach ni el runtime del AI Visibility Grader (nombre técnico/histórico;
+[Efeonce AEO Assessment](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) es el nombre del diagnóstico público).
 
 ## 1. Decisión de pricing a validar
 

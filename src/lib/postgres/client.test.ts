@@ -9,6 +9,7 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
 }))
 
 import {
+  buildGreenhousePostgresSessionOptions,
   getGreenhousePostgresConfig,
   getGreenhousePostgresMissingConfig,
   handleGreenhousePostgresPoolError,
@@ -156,6 +157,38 @@ describe('postgres secret-manager config', () => {
       const config = getGreenhousePostgresConfig()
 
       expect(config.idleTimeoutMillis).toBe(5_000)
+    })
+
+    it('requests a 60s server idle_session_timeout only on Vercel (TASK-1876)', () => {
+      vi.stubEnv('VERCEL', '1')
+
+      const config = getGreenhousePostgresConfig()
+
+      expect(config.sessionIdleTimeoutMs).toBe(60_000)
+      expect(buildGreenhousePostgresSessionOptions(config.sessionIdleTimeoutMs)).toBe('-c idle_session_timeout=60000')
+    })
+
+    it('leaves the role default (no startup option) on Cloud Run, which holds session-scoped work', () => {
+      vi.stubEnv('VERCEL', '')
+
+      const config = getGreenhousePostgresConfig()
+
+      expect(config.sessionIdleTimeoutMs).toBeNull()
+      expect(buildGreenhousePostgresSessionOptions(config.sessionIdleTimeoutMs)).toBeUndefined()
+    })
+
+    it('never requests a server timeout of 0 and treats 0 as "use the role default"', () => {
+      vi.stubEnv('VERCEL', '1')
+      vi.stubEnv('GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS', '0')
+
+      expect(getGreenhousePostgresConfig().sessionIdleTimeoutMs).toBeNull()
+    })
+
+    it('clamps the server timeout above the pool idle timeout so the client evicts first', () => {
+      vi.stubEnv('VERCEL', '1')
+      vi.stubEnv('GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS', '2000')
+
+      expect(getGreenhousePostgresConfig().sessionIdleTimeoutMs).toBe(15_000)
     })
 
     it('treats VERCEL=true as non-Vercel (only literal "1" matches per Vercel docs)', () => {

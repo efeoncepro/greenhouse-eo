@@ -270,11 +270,18 @@ const dispatchAttachment = async (
       sourceEntity: SOURCE_ENTITY
     })
 
-    if (result.status === 'skipped' && !result.dispatchOutcome) return settle(recipient, 'skipped', { skipReason: 'email_type_paused', emailDeliveryId: result.deliveryId || null })
-    if (result.dispatchOutcome === 'accepted') return settle(recipient, 'accepted', { emailDeliveryId: result.deliveryId })
-    if (result.dispatchOutcome === 'failed') return settle(recipient, 'failed', { emailDeliveryId: result.deliveryId, lastErrorCode: 'provider_rejected' })
+    // En el envío secuencial de primer intento `sendEmail()` devuelve el id del BATCH, también en
+    // `recipientResults[].deliveryId` (descarta el id de `createDeliveryRow`). La fila se resuelve por
+    // la correlación canónica `source_entity` + `source_event_id`, igual que el estado de transporte.
+    // Guardar el batch dejaba `email_delivery_id` apuntando a una fila inexistente (staging 2026-09-28).
+    const ledgerRow = await readInsightDeliveryTransportForAttempt(sourceEventId).catch(() => null)
+    const emailDeliveryId = ledgerRow?.deliveryId ?? null
 
-    return settle(recipient, 'ambiguous', { emailDeliveryId: result.deliveryId || null, lastErrorCode: 'dispatch_unknown' })
+    if (result.status === 'skipped' && !result.dispatchOutcome) return settle(recipient, 'skipped', { skipReason: 'email_type_paused', emailDeliveryId })
+    if (result.dispatchOutcome === 'accepted') return settle(recipient, 'accepted', { emailDeliveryId })
+    if (result.dispatchOutcome === 'failed') return settle(recipient, 'failed', { emailDeliveryId, lastErrorCode: 'provider_rejected' })
+
+    return settle(recipient, 'ambiguous', { emailDeliveryId, lastErrorCode: 'dispatch_unknown' })
   } catch (error) {
     captureWithDomain(error, 'insights', { tags: { source: 'insights_delivery_attachment' }, extra: { deliveryRecipientId: recipient.deliveryRecipientId } })
 

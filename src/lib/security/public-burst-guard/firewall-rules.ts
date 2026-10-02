@@ -1,0 +1,232 @@
+/**
+ * TASK-1876 — Guard volumétrico de `/api/public/**` en el Firewall de Vercel (WAF).
+ *
+ * Por qué en el WAF y no en `src/proxy.ts`: un contador en memoria vive por instancia y una
+ * ráfaga repartida entre instancias no lo cruza; el WAF cuenta global por IP y corta ANTES de
+ * invocar cualquier función, así que un rechazo no abre conexión a PostgreSQL (ISSUE-174).
+ * Los rate limiters de dominio (por grant, por submission) siguen detrás, sin cambios.
+ *
+ * Este archivo es la fuente de verdad versionada de las reglas. El estado vivo se sincroniza
+ * con `pnpm security:public-burst-guard` (plan por defecto; `--apply` escribe y relee).
+ *
+ * Rollout por etapas:
+ *   - staging/preview: `enforce` (429 cuando se excede el límite).
+ *   - producción: `observe` (sólo registra) hasta tener una ventana de logs que respalde el
+ *     límite con tráfico legítimo real; pasar a `enforce` es cambiar `mode` aquí y aplicar.
+ *
+ * Tráfico server-side de Think (TASK-1875): Think lee el informe compartido desde pocas IPs de
+ * runtime, así que se exceptúa con una condición EXPLÍCITA —la regla sólo aplica a pedidos sin la
+ * llave de servidor de Think en `x-efeonce-think-key`—, nunca subiendo el límite para todos. La
+ * llave no vive en este archivo: el script la inyecta al aplicar desde
+ * `PUBLIC_BURST_GUARD_THINK_KEY` y nunca la imprime. Sin la variable, la regla se construye sin
+ * excepción (el comportamiento anterior).
+ */
+
+export type PublicBurstGuardMode = 'observe' | 'enforce'
+
+export const PUBLIC_BURST_GUARD_PATH_PREFIX = '/api/public/'
+
+/** Hosts que sirven producción. Todo lo demás del proyecto (staging, preview) es no-productivo. */
+export const PRODUCTION_HOSTS = ['greenhouse.efeoncepro.com', 'greenhouse-eo.vercel.app'] as const
+
+/** 20 requests cada 10 s por IP: ~2 req/s sostenidos; un navegador legítimo no se acerca. */
+export const PUBLIC_BURST_GUARD_LIMIT = { windowSeconds: 10, requests: 20 } as const
+
+export interface VercelFirewallCondition {
+  type: 'path' | 'host' | 'header'
+  op: 'pre' | 'eq' | 'inc'
+  value: string | string[]
+  /** Sólo en `header`: el nombre de la cabecera. */
+  key?: string
+  neg?: boolean
+}
+
+/** Cabecera con la que Think se identifica server-side ante `/api/public/**` (TASK-1875). */
+export const THINK_SERVER_KEY_HEADER = 'x-efeonce-think-key'
+
+export interface PublicBurstGuardBuildOptions {
+  /** Llave de servidor de Think; si viene, la regla exceptúa los pedidos que la presentan. */
+  thinkKey?: string | null
+}
+
+export interface VercelFirewallRuleValue {
+  name: string
+  description: string
+  active: boolean
+  conditionGroup: Array<{ conditions: VercelFirewallCondition[] }>
+  action: {
+    mitigate: {
+      action: 'rate_limit'
+      rateLimit: {
+        algo: 'fixed_window'
+        window: number
+        limit: number
+        keys: string[]
+        action: 'rate_limit' | 'log'
+      }
+      redirect: null
+      actionDuration: null
+    }
+  }
+}
+
+export interface PublicBurstGuardRuleSpec {
+  name: string
+  scope: 'production' | 'non_production'
+  mode: PublicBurstGuardMode
+}
+
+/** Estado deseado. Cambiar `mode` de producción a `enforce` es la única palanca de cutover. */
+export const PUBLIC_BURST_GUARD_RULES: readonly PublicBurstGuardRuleSpec[] = [
+  { name: 'greenhouse-public-burst-guard-non-production', scope: 'non_production', mode: 'enforce' },
+  { name: 'greenhouse-public-burst-guard-production', scope: 'production', mode: 'observe' }
+]
+
+export const buildPublicBurstGuardRule = (spec: PublicBurstGuardRuleSpec, options: PublicBurstGuardBuildOptions = {}): VercelFirewallRuleValue => ({
+  name: spec.name,
+  description:
+    `TASK-1876/ISSUE-174: ${PUBLIC_BURST_GUARD_LIMIT.requests} req/${PUBLIC_BURST_GUARD_LIMIT.windowSeconds}s por IP ` +
+    `en ${PUBLIC_BURST_GUARD_PATH_PREFIX} (${spec.scope}, ${spec.mode})${options.thinkKey ? '; exceptúa Think server-side' : ''}. ` +
+    'Fuente: src/lib/security/public-burst-guard/firewall-rules.ts',
+  active: true,
+  conditionGroup: [
+    {
+      conditions: [
+        { type: 'path', op: 'pre', value: PUBLIC_BURST_GUARD_PATH_PREFIX },
+        {
+          type: 'host',
+          op: 'inc',
+          value: [...PRODUCTION_HOSTS],
+          ...(spec.scope === 'non_production' ? { neg: true } : {})
+        },
+        ...(options.thinkKey
+          ? [{ type: 'header' as const, key: THINK_SERVER_KEY_HEADER, op: 'eq' as const, value: options.thinkKey, neg: true }]
+          : [])
+      ]
+    }
+  ],
+  action: {
+    mitigate: {
+      action: 'rate_limit',
+      rateLimit: {
+        algo: 'fixed_window',
+        window: PUBLIC_BURST_GUARD_LIMIT.windowSeconds,
+        limit: PUBLIC_BURST_GUARD_LIMIT.requests,
+        keys: ['ip'],
+        action: spec.mode === 'enforce' ? 'rate_limit' : 'log'
+      },
+      redirect: null,
+      actionDuration: null
+    }
+  }
+})
+
+export interface ActiveFirewallRule {
+  id: string
+  name: string
+  description?: string
+  active?: boolean
+  conditionGroup?: unknown
+  action?: unknown
+}
+
+export type FirewallRuleChange =
+  | { kind: 'insert'; value: VercelFirewallRuleValue }
+  | { kind: 'update'; id: string; value: VercelFirewallRuleValue }
+  | { kind: 'unchanged'; id: string; name: string }
+
+type UnknownRecord = Record<string, unknown>
+
+const asRecord = (value: unknown): UnknownRecord =>
+  typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as UnknownRecord) : {}
+
+const sortedStrings = (value: unknown) =>
+  Array.isArray(value) && value.every(item => typeof item === 'string') ? [...value].sort() : value
+
+/**
+ * Serialización canónica: el orden de las claves de un objeto no es semántico. Los arrays se
+ * conservan aquí porque `conditionGroup` y `conditions` sí tienen orden; los arrays-set se
+ * ordenan explícitamente al proyectarlos.
+ */
+const canonicalize = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(canonicalize)
+  if (typeof value !== 'object' || value === null) return value
+
+  return Object.fromEntries(
+    Object.entries(value as UnknownRecord)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, nested]) => [key, canonicalize(nested)])
+  )
+}
+
+/** Proyección comparable: sólo los campos que gobierna esta fuente versionada. */
+const comparable = (rule: Omit<ActiveFirewallRule, 'id'>) => {
+  const conditionGroup = Array.isArray(rule.conditionGroup)
+    ? rule.conditionGroup.map(rawGroup => {
+        const group = asRecord(rawGroup)
+
+        return {
+          conditions: Array.isArray(group.conditions)
+            ? group.conditions.map(rawCondition => {
+                const condition = asRecord(rawCondition)
+
+                return {
+                  type: condition.type,
+                  ...(typeof condition.key === 'string' ? { key: condition.key } : {}),
+                  op: condition.op,
+                  value: sortedStrings(condition.value),
+                  neg: condition.neg === true
+                }
+              })
+            : []
+        }
+      })
+    : []
+
+  const action = asRecord(rule.action)
+  const mitigate = asRecord(action.mitigate)
+  const rateLimit = asRecord(mitigate.rateLimit)
+
+  return JSON.stringify(
+    canonicalize({
+      name: rule.name,
+      description: rule.description,
+      active: rule.active,
+      conditionGroup,
+      action: {
+        mitigate: {
+          action: mitigate.action,
+          rateLimit: {
+            algo: rateLimit.algo,
+            window: rateLimit.window,
+            limit: rateLimit.limit,
+            keys: sortedStrings(rateLimit.keys),
+            action: rateLimit.action
+          }
+        }
+      }
+    })
+  )
+}
+
+/**
+ * Plan idempotente por nombre de regla: inserta las que faltan, actualiza las que difieren y
+ * no toca reglas ajenas (otras reglas del proyecto no son de este guard).
+ */
+export const planPublicBurstGuardChanges = (
+  activeRules: readonly ActiveFirewallRule[],
+  specs: readonly PublicBurstGuardRuleSpec[] = PUBLIC_BURST_GUARD_RULES,
+  options: PublicBurstGuardBuildOptions = {}
+): FirewallRuleChange[] =>
+  specs.map(spec => {
+    const desired = buildPublicBurstGuardRule(spec, options)
+    const existing = activeRules.find(rule => rule.name === spec.name)
+
+    if (!existing) return { kind: 'insert', value: desired }
+
+    if (comparable(existing) === comparable(desired)) {
+      return { kind: 'unchanged', id: existing.id, name: existing.name }
+    }
+
+    return { kind: 'update', id: existing.id, value: desired }
+  })

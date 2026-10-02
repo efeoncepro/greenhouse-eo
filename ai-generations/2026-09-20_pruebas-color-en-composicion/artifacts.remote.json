@@ -1,0 +1,83 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:08:25.071Z",
+  "run": "ai-generations/2026-09-20_pruebas-color-en-composicion",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_pruebas-color-en-composicion",
+  "totalBytes": 30298860,
+  "fileCount": 12,
+  "files": [
+    {
+      "path": "julio-uniforme/final.png",
+      "sizeBytes": 1727673,
+      "sha256": "6cbb185b0c815747e63887e9c6484913e88ca1cb1fc6e6272c1dce4aaa7f3df4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/julio-uniforme/final.png"
+    },
+    {
+      "path": "julio-uniforme/plate.png",
+      "sizeBytes": 1727673,
+      "sha256": "6cbb185b0c815747e63887e9c6484913e88ca1cb1fc6e6272c1dce4aaa7f3df4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/julio-uniforme/plate.png"
+    },
+    {
+      "path": "julio/final-v1.png",
+      "sizeBytes": 3297492,
+      "sha256": "0a091c561b34b9c2dc5f06fb1c1841b101566cb948343c8aa9f2ccfcbd67028e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/julio/final-v1.png"
+    },
+    {
+      "path": "julio/final-v3.png",
+      "sizeBytes": 3611585,
+      "sha256": "57174763c08e0b45a6601a454d62bd3d1c6c361597705c1429a323390500e450",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/julio/final-v3.png"
+    },
+    {
+      "path": "julio/final.png",
+      "sizeBytes": 3611585,
+      "sha256": "57174763c08e0b45a6601a454d62bd3d1c6c361597705c1429a323390500e450",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/julio/final.png"
+    },
+    {
+      "path": "julio/plate-v2.png",
+      "sizeBytes": 1796132,
+      "sha256": "8c5e20340fbdc761a9a9077854d2c91d05dca543b90d9be7eb40d0190b8c575c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/julio/plate-v2.png"
+    },
+    {
+      "path": "julio/plate-v3.png",
+      "sizeBytes": 2001965,
+      "sha256": "8a4f2b345a1c7e1f6c6551879889d18a9804112c20275de4a76240b20db4c104",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/julio/plate-v3.png"
+    },
+    {
+      "path": "julio/plate.png",
+      "sizeBytes": 1821781,
+      "sha256": "8981df15f52c4f7dd3c5b4cf6fd2efe0cdeb65b502fcd68eb0477427eb146c32",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/julio/plate.png"
+    },
+    {
+      "path": "juntos/final.png",
+      "sizeBytes": 3592482,
+      "sha256": "c979b53cd88022f8da98199d9b401dc84ecade5c1a3a847e1d9fff28e1a110f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/juntos/final.png"
+    },
+    {
+      "path": "juntos/plate.png",
+      "sizeBytes": 2016962,
+      "sha256": "2c7b685cb3382dc595de1e585338dd3ea357867f7ce931d97f5315220329605b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/juntos/plate.png"
+    },
+    {
+      "path": "nexa/final.png",
+      "sizeBytes": 3219422,
+      "sha256": "084a57386e054cb655e4412922a7c353081720052cb27a79f7ef17b90afd77b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/nexa/final.png"
+    },
+    {
+      "path": "nexa/plate.png",
+      "sizeBytes": 1874108,
+      "sha256": "85aa7f3783fc4811a144de0a92f7dea715170ad9fa198ea7a5fc23b0b2eae6da",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-color-en-composicion/nexa/plate.png"
+    }
+  ]
+}

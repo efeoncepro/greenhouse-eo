@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { type GrowthAiVisibilityPromptInput } from '../contracts'
+import type { GrowthAiVisibilityPromptInput } from '../contracts'
 import { createProviderAdapterContext, type ProviderAdapterContext } from '../providers/types'
 
 const mockConfigured = vi.fn()
@@ -21,10 +21,9 @@ vi.mock('@/lib/observability/capture', () => ({
   captureWithDomain: (...args: unknown[]) => captureSpy(...args)
 }))
 
-const {
-  createGoogleAiOverviewProviderAdapter,
-  parseDataForSeoGoogleAiModeBlock
-} = await import('../providers/google-ai-overview-adapter')
+const { createGoogleAiOverviewProviderAdapter, parseDataForSeoGoogleAiModeBlock } = await import(
+  '../providers/google-ai-overview-adapter'
+)
 
 const PROMPT: GrowthAiVisibilityPromptInput = {
   runId: 'run-1',
@@ -139,13 +138,53 @@ describe('growth/ai-visibility — Google AI Overview adapter', () => {
         tasks: [
           expect.objectContaining({
             keyword: PROMPT.promptText,
-            location_name: 'Chile',
-            language_code: 'en',
+            location_code: 2152,
+            language_code: 'es',
             device: 'desktop'
           })
         ]
       })
     )
+  })
+
+  it.each([
+    ['Perú', 'es-PE', 2604, 'es'],
+    ['Peru', 'en-PE', 2604, 'en'],
+    ['United States', 'en-US', 2840, 'en'],
+    ['EEUU', 'es-US', 2840, 'es'],
+    ['Brasil', 'pt-BR', 2076, 'pt-BR'],
+    ['Uruguay', 'es-UY', 2858, 'es']
+  ])('sends numeric geography and provider language for %s/%s', async (market, locale, location, language) => {
+    enable()
+    mockConfigured.mockResolvedValue(true)
+    mockPost.mockResolvedValue({
+      ok: true,
+      httpStatus: 200,
+      endpoint: '/v3/serp/google/ai_mode/live/advanced',
+      tasks: dataForSeoTasksWithAiBlock(),
+      cost: 0.004,
+      latencyMs: 100
+    })
+    const obs = await createGoogleAiOverviewProviderAdapter().runPrompt({ ...PROMPT, market, locale }, ctx())
+
+    expect(obs.status).toBe('succeeded')
+    expect(mockPost.mock.calls[0][0].tasks[0]).toMatchObject({ location_code: location, language_code: language })
+    expect(mockPost.mock.calls[0][0].tasks[0]).not.toHaveProperty('location_name')
+    expect(obs.usage).toMatchObject({ dataforseo_location_code: location, dataforseo_language_code: language })
+  })
+
+  it.each([
+    ['Atlantis', 'es', 'aeo_market_unknown'],
+    ['', 'en', 'aeo_market_unknown'],
+    ['PE', 'de-PE', 'aeo_locale_unsupported'],
+    ['BR', 'pt-PT', 'aeo_locale_unsupported']
+  ])('rejects %s/%s before paid transport', async (market, locale, errorCode) => {
+    enable()
+    mockConfigured.mockResolvedValue(true)
+    const obs = await createGoogleAiOverviewProviderAdapter().runPrompt({ ...PROMPT, market, locale }, ctx())
+
+    expect(obs).toMatchObject({ status: 'failed', errorCode })
+    expect(mockPost).not.toHaveBeenCalled()
   })
 
   it('HTTP provider error -> failed con error canonico sanitizado', async () => {
@@ -214,7 +253,7 @@ describe('growth/ai-visibility — Google AI Overview adapter', () => {
     expect(sentTask.location_name).toBeUndefined()
   })
 
-  it('market ISO-2 sin mapear -> fallback US observado, nunca el codigo crudo', async () => {
+  it('Brasil usa su propio codigo numerico, nunca fallback US', async () => {
     enable()
     mockConfigured.mockResolvedValue(true)
     mockPost.mockResolvedValue({
@@ -231,10 +270,9 @@ describe('growth/ai-visibility — Google AI Overview adapter', () => {
 
     const sentTask = mockPost.mock.calls[0][0].tasks[0]
 
-    expect(sentTask.location_code).toBe(2840)
+    expect(sentTask.location_code).toBe(2076)
     expect(sentTask.location_name).toBeUndefined()
-    expect(captureSpy).toHaveBeenCalledTimes(1)
-    expect(captureSpy.mock.calls[0][2]).toMatchObject({ level: 'warning', extra: expect.objectContaining({ market: 'BR' }) })
+    expect(captureSpy).not.toHaveBeenCalled()
   })
 
   it('task DataForSEO con status_code != 20000 -> failed provider_error, NUNCA skip honesto', async () => {
@@ -527,4 +565,17 @@ describe('growth/ai-visibility — Google AI Overview adapter', () => {
       { url: 'https://www.efeoncepro.com/casos', domain: 'efeoncepro.com', title: 'Case study' }
     ])
   })
+})
+
+it('Cuba is an explicit unsupported market and never buys a US fallback', async () => {
+  enable()
+  mockConfigured.mockResolvedValue(true)
+
+  const observation = await createGoogleAiOverviewProviderAdapter().runPrompt(
+    { ...PROMPT, market: 'CU', locale: 'es-CU' },
+    ctx()
+  )
+
+  expect(observation).toMatchObject({ status: 'skipped', errorCode: 'market_unsupported', latencyMs: 0 })
+  expect(mockPost).not.toHaveBeenCalled()
 })

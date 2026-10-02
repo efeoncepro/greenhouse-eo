@@ -1,0 +1,77 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:08:33.714Z",
+  "run": "ai-generations/2026-09-20_pruebas-julio-nexa-codex",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-20_pruebas-julio-nexa-codex",
+  "totalBytes": 25105359,
+  "fileCount": 11,
+  "files": [
+    {
+      "path": "julio/final.png",
+      "sizeBytes": 3273514,
+      "sha256": "89c227fda3a9dc0f4aaaa5824159fe6c214455f84727a2e07603f08a77f814dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/julio/final.png"
+    },
+    {
+      "path": "julio/plate-v1.png",
+      "sizeBytes": 1999502,
+      "sha256": "674ef397a24e7bb57de419aee6a81188b2023b21c0659e82510723cf0e61bba7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/julio/plate-v1.png"
+    },
+    {
+      "path": "julio/plate-v2.png",
+      "sizeBytes": 1911298,
+      "sha256": "a31af389a1beee0fe0589f6d133a45b3c335e37abcddaa78f747d296f9826ee2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/julio/plate-v2.png"
+    },
+    {
+      "path": "julio/plate.png",
+      "sizeBytes": 1912398,
+      "sha256": "bda90ef8dfdd4eea6e54bf6e0bf7e608de17c999682816a8643affd847ec8f4d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/julio/plate.png"
+    },
+    {
+      "path": "juntos/final.png",
+      "sizeBytes": 3517060,
+      "sha256": "fb8faea252182adee18fcf35d862c5c55288ecc9db9008f932bc7ea8fabff54f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/juntos/final.png"
+    },
+    {
+      "path": "juntos/plate-v2.png",
+      "sizeBytes": 2078695,
+      "sha256": "8bf5c1b08c0026cc25a7d1ecc600e1dbc2dbfcb3999079fd8d31b67a7c2f7844",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/juntos/plate-v2.png"
+    },
+    {
+      "path": "juntos/plate.png",
+      "sizeBytes": 1937039,
+      "sha256": "f49fa9f9d456e00129c6a5b1d798c7e9806946a78b63be3160928fb965eb5dba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/juntos/plate.png"
+    },
+    {
+      "path": "nexa/final-v3.png",
+      "sizeBytes": 2987582,
+      "sha256": "8297bcc50329d6d87bdf02bb06f78c5b60228732ca351365b0c1f60f741b8951",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/nexa/final-v3.png"
+    },
+    {
+      "path": "nexa/plate-v2.png",
+      "sizeBytes": 1870465,
+      "sha256": "29de71a97d67b6b79d14588522aa489ca8b4b08c45f7f4d713adb6d869f47810",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/nexa/plate-v2.png"
+    },
+    {
+      "path": "nexa/plate-v3.png",
+      "sizeBytes": 1760682,
+      "sha256": "11816ec87699ee52d959d3cd0631064312d98a767fdc1d249d146695e35c0f39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/nexa/plate-v3.png"
+    },
+    {
+      "path": "nexa/plate.png",
+      "sizeBytes": 1857124,
+      "sha256": "749623f2b1b9d17690ac388323b674fb65b1e18513d07515d1f1e181adfc67b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-20_pruebas-julio-nexa-codex/nexa/plate.png"
+    }
+  ]
+}

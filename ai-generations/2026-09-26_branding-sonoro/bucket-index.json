@@ -1,0 +1,434 @@
+[
+ {
+  "path": "masters/01-logo-sonoro/efeonce-logo-sonoro-brand.wav",
+  "bytes": 835302,
+  "sha256": "e123e8f1ef8be93da786244c30999d9ab4b2a2c1579ff4d3f09c00dfb3378548",
+  "durationSec": 2.9,
+  "lufs": -15.1,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/01-logo-sonoro/efeonce-logo-sonoro-engine.wav",
+  "bytes": 835302,
+  "sha256": "a16885b3d421a5b0bd131804b2eb9eedcf75cc98c170f242928cc15be6ac10ba",
+  "durationSec": 2.9,
+  "lufs": -14.0,
+  "truePeakDbfs": -1.7
+ },
+ {
+  "path": "masters/01-logo-sonoro/efeonce-logo-sonoro-growth.wav",
+  "bytes": 835302,
+  "sha256": "452579258dfade363eaff1f089f8fce2f9ea8dfec5f687c448904064860411a0",
+  "durationSec": 2.9,
+  "lufs": -14.3,
+  "truePeakDbfs": -1.1
+ },
+ {
+  "path": "masters/01-logo-sonoro/efeonce-logo-sonoro-revenue.wav",
+  "bytes": 835302,
+  "sha256": "d2ed22ff16ea43a0affd801244cb592362d34b1c9cb95ee45318eafe2e04ee59",
+  "durationSec": 2.9,
+  "lufs": -15.3,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/01-logo-sonoro/efeonce-logo-sonoro-voice.wav",
+  "bytes": 835302,
+  "sha256": "25ea81ab103e3c817d5955874461984ba833c236b742f0e7a8b7cbc22b0d4781",
+  "durationSec": 2.9,
+  "lufs": -15.1,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/02-etiqueta-voz/efeonce-etiqueta-brand-brian.wav",
+  "bytes": 915942,
+  "sha256": "00febc7e207346863d79640b5ec8de12e6b204b21c868e2ba5f227fb3fa8b3ff",
+  "durationSec": 3.18,
+  "lufs": -14.0,
+  "truePeakDbfs": -2.4
+ },
+ {
+  "path": "masters/02-etiqueta-voz/efeonce-etiqueta-engine-brian.wav",
+  "bytes": 921702,
+  "sha256": "b2bb11ce283f4e125187a1bc89dae8e334ad275a32febc3b74fef5f2350cd46f",
+  "durationSec": 3.2,
+  "lufs": -13.9,
+  "truePeakDbfs": -2.6
+ },
+ {
+  "path": "masters/02-etiqueta-voz/efeonce-etiqueta-growth-brian.wav",
+  "bytes": 904422,
+  "sha256": "70281f8ed8a121a78c990b7ce866a89c41abe3440992806b57d3c56a43f5b8cd",
+  "durationSec": 3.14,
+  "lufs": -13.9,
+  "truePeakDbfs": -1.8
+ },
+ {
+  "path": "masters/02-etiqueta-voz/efeonce-etiqueta-revenue-brian.wav",
+  "bytes": 910182,
+  "sha256": "39e47f46aca9a460d2e69b9e2c0983c6d7c2eff8e99d3bb2986106136dff82d0",
+  "durationSec": 3.16,
+  "lufs": -13.9,
+  "truePeakDbfs": -1.8
+ },
+ {
+  "path": "masters/02-etiqueta-voz/efeonce-etiqueta-voice-brian.wav",
+  "bytes": 927462,
+  "sha256": "e86ff55d3c99049b4751004bd45a70ff24dad1add3b03a268b1d8c15b61f5d99",
+  "durationSec": 3.22,
+  "lufs": -14.0,
+  "truePeakDbfs": -2.1
+ },
+ {
+  "path": "masters/03-motion/efeonce-apertura.wav",
+  "bytes": 979302,
+  "sha256": "6bd3fdae5f351ff509d393d6f47755406abbb83cdaeeb4fc6c9098501656b9dd",
+  "durationSec": 3.4,
+  "lufs": -14.0,
+  "truePeakDbfs": -1.4
+ },
+ {
+  "path": "masters/03-motion/efeonce-apertura_16x9.mp4",
+  "bytes": 572473,
+  "sha256": "d344e10a7a12c8cbab1741d8b54262d79d73f6c9bbd261663c2101e8d916a948",
+  "durationSec": 3.4
+ },
+ {
+  "path": "masters/03-motion/efeonce-apertura_9x16.mp4",
+  "bytes": 597891,
+  "sha256": "633a1822c8713d30358b5fee73ebea2b1f069227c36d61d671ca7247029b77c6",
+  "durationSec": 3.4
+ },
+ {
+  "path": "masters/03-motion/efeonce-reveal-brian.wav",
+  "bytes": 1324902,
+  "sha256": "698bce23091bfbb7a9f7077620fedbf21cda9cbe8189cd4cc7c483f8b45db4c9",
+  "durationSec": 4.6,
+  "lufs": -14.0,
+  "truePeakDbfs": -2.2
+ },
+ {
+  "path": "masters/03-motion/efeonce-reveal-brian_16x9.mp4",
+  "bytes": 598544,
+  "sha256": "87f8a7308231d21b47bd4d9a545b8f31ad044dab80186f63e8177b91765aa765",
+  "durationSec": 4.6
+ },
+ {
+  "path": "masters/03-motion/efeonce-reveal-brian_9x16.mp4",
+  "bytes": 651418,
+  "sha256": "baababb3cd9f848bf29eff084b483f9398524ec7d6f8fadae492678a871db67d",
+  "durationSec": 4.6
+ },
+ {
+  "path": "masters/03-motion/efeonce-reveal.wav",
+  "bytes": 1324902,
+  "sha256": "0b3a0e309e813a3adb22e7573863e13ea18cbc1d3e0d2354287ab1320162558c",
+  "durationSec": 4.6,
+  "lufs": -13.8,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/03-motion/efeonce-reveal_16x9.mp4",
+  "bytes": 598144,
+  "sha256": "54538d9bde673aada7a005827b5c2e483581199aaaf8ae77c36f6d0c114a9a9e",
+  "durationSec": 4.6
+ },
+ {
+  "path": "masters/03-motion/efeonce-reveal_9x16.mp4",
+  "bytes": 651018,
+  "sha256": "2ded7357f5aed345fcd649f8121533734f27adba3f4f4a3b9205853580d182f5",
+  "durationSec": 4.6
+ },
+ {
+  "path": "masters/03-motion/efeonce-sting.wav",
+  "bytes": 633702,
+  "sha256": "826ef87b552ce799731f9c6191c6a353ecee4c146b7130ad7214d63614b259ad",
+  "durationSec": 2.2,
+  "lufs": -14.0,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/03-motion/efeonce-sting_16x9.mp4",
+  "bytes": 406859,
+  "sha256": "92b4af986f2267ba844453b6fb51e82f67e5a1a1b3829ed2166a1e50d9618a44",
+  "durationSec": 2.2
+ },
+ {
+  "path": "masters/03-motion/efeonce-sting_9x16.mp4",
+  "bytes": 430172,
+  "sha256": "ce3cd062beb526b6dff4c2655d75463508c16c4d4f10e53c42fe78038eaa85c1",
+  "durationSec": 2.2
+ },
+ {
+  "path": "masters/04-piezas-largas/efeonce-pieza-larga-energia-brian.wav",
+  "bytes": 10656102,
+  "sha256": "48c4ad72422e302f860ff760e24c1c477dcd19a5bb8e64bfa120dead20ecdcca",
+  "durationSec": 37.0,
+  "lufs": -13.9,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/04-piezas-largas/efeonce-pieza-larga-energia.wav",
+  "bytes": 10656102,
+  "sha256": "1b23b0a1801f78290a46ff0243173a8493ad38fd286f13e55ee232cab4a7f4f5",
+  "durationSec": 37.0,
+  "lufs": -13.9,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/04-piezas-largas/efeonce-pieza-larga-fondo-brian.wav",
+  "bytes": 11664102,
+  "sha256": "78e73adbdb4d401c3d2a53389b1a32dead18a4781d76b75e142d634d02c3e9e1",
+  "durationSec": 40.5,
+  "lufs": -13.9,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/04-piezas-largas/efeonce-pieza-larga-fondo.wav",
+  "bytes": 11664102,
+  "sha256": "a15e07b75a39ebc73cbb7e8f59f24ab956457848da61ca6e0f9bbb7813847717",
+  "durationSec": 40.5,
+  "lufs": -13.9,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/05-cierre-energia/efeonce-cierre-energia-brian.wav",
+  "bytes": 1468902,
+  "sha256": "3ea91c9a5b75d851b0fd553209e3fce7521d163f7c25457e63455974166c636b",
+  "durationSec": 5.1,
+  "lufs": -14.1,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/05-cierre-energia/efeonce-cierre-energia.wav",
+  "bytes": 1468902,
+  "sha256": "0a64392268471dba6ea3889f0e8c97052f66973117909493831865cb02ceb852",
+  "durationSec": 5.1,
+  "lufs": -14.1,
+  "truePeakDbfs": -1.0
+ },
+ {
+  "path": "masters/06-voz-sola/efeonce-voz-brian-empower-your-brand.wav",
+  "bytes": 439980,
+  "sha256": "c8b48ae56608aee3cb3f6c9d0f3bcbbbd61e2aecb26102cdcb1cd61d80d006d3",
+  "durationSec": 1.53,
+  "lufs": -17.7,
+  "truePeakDbfs": -3.5
+ },
+ {
+  "path": "masters/06-voz-sola/efeonce-voz-brian-empower-your-engine.wav",
+  "bytes": 411654,
+  "sha256": "69c2eb36c0329fe0fec34d8c5db385d7efa0c34f4d0e888123c3d911a739be66",
+  "durationSec": 1.43,
+  "lufs": -17.5,
+  "truePeakDbfs": -3.9
+ },
+ {
+  "path": "masters/06-voz-sola/efeonce-voz-brian-empower-your-growth.wav",
+  "bytes": 406362,
+  "sha256": "c249897ed137f9616ecb182971fd172376c29568de367a88eafea3c744738dd9",
+  "durationSec": 1.41,
+  "lufs": -18.3,
+  "truePeakDbfs": -5.7
+ },
+ {
+  "path": "masters/06-voz-sola/efeonce-voz-brian-empower-your-revenue.wav",
+  "bytes": 439980,
+  "sha256": "d95d6a24b97c4e6e08797492fec1d9f50ca02a51687f1ee284130712381c1327",
+  "durationSec": 1.53,
+  "lufs": -18.4,
+  "truePeakDbfs": -5.1
+ },
+ {
+  "path": "masters/06-voz-sola/efeonce-voz-brian-empower-your-voice.wav",
+  "bytes": 433752,
+  "sha256": "fef03e6dfca5d286aefcaab5a712c2c65d0ed828c4b784efd7e93e9f63e9b165",
+  "durationSec": 1.51,
+  "lufs": -18.2,
+  "truePeakDbfs": -6.1
+ },
+ {
+  "path": "web/efeonce-apertura_16x9.mp4",
+  "bytes": 218616,
+  "sha256": "934e249936434769505225a70a6104378d1b95488904916a2bdaf3e5aa266399",
+  "durationSec": 3.41
+ },
+ {
+  "path": "web/efeonce-apertura_16x9.webp",
+  "bytes": 4122,
+  "sha256": "e5ef0a48140b18bf3e3a2b39e96621a8ed4bb18d30078bd2adff9d69676597b3"
+ },
+ {
+  "path": "web/efeonce-apertura_9x16.mp4",
+  "bytes": 223285,
+  "sha256": "c713a625782660818d9d5ecc3bda53ea52ebb73cf227661c9701d7954a8cb280",
+  "durationSec": 3.41
+ },
+ {
+  "path": "web/efeonce-apertura_9x16.webp",
+  "bytes": 4436,
+  "sha256": "b82866537247d96864bf25a3e2b272eea97cd22a0c139eac44252c0236c17004"
+ },
+ {
+  "path": "web/efeonce-cierre-energia-brian.mp3",
+  "bytes": 144525,
+  "sha256": "00da38de78207c74ef0537f66427488e25043fd4543f87f8f783725415816fc9",
+  "durationSec": 5.1
+ },
+ {
+  "path": "web/efeonce-cierre-energia.mp3",
+  "bytes": 144525,
+  "sha256": "0fbc2dbcbec3d4d820d924c9a8cecda58ad4df835e1776efbe3ae9b9d929c9f3",
+  "durationSec": 5.1
+ },
+ {
+  "path": "web/efeonce-etiqueta-brand-brian.mp3",
+  "bytes": 90765,
+  "sha256": "76d999011ecf9ffaeb76405002134d8d9141fb873c8f5e82fea2119efbf6ef0b",
+  "durationSec": 3.18
+ },
+ {
+  "path": "web/efeonce-etiqueta-engine-brian.mp3",
+  "bytes": 91437,
+  "sha256": "264f9af546d2fa0dbb186817a2fb1e27d9a1f7ccdb3f979d5e7b901c70d77a4e",
+  "durationSec": 3.2
+ },
+ {
+  "path": "web/efeonce-etiqueta-growth-brian.mp3",
+  "bytes": 89421,
+  "sha256": "0fd700cb9b0f363a1b88f2d7cd1f91d9f67916fb6efe351b72733f1bdc7abd28",
+  "durationSec": 3.14
+ },
+ {
+  "path": "web/efeonce-etiqueta-revenue-brian.mp3",
+  "bytes": 90093,
+  "sha256": "0df86af2f6e4067be61a12022fe38cf47de0941f3617ce8cdb9ac47f9b290bd6",
+  "durationSec": 3.16
+ },
+ {
+  "path": "web/efeonce-etiqueta-voice-brian.mp3",
+  "bytes": 92109,
+  "sha256": "cf8743b7b255734babb19222b301b5d91d18eb0c902bc765b52e75b880fb78c8",
+  "durationSec": 3.22
+ },
+ {
+  "path": "web/efeonce-logo-sonoro-brand.mp3",
+  "bytes": 82701,
+  "sha256": "0a887e4c41fad02216551648b387e5f44987e26a188623bb07f47d5ef00e4ccf",
+  "durationSec": 2.9
+ },
+ {
+  "path": "web/efeonce-logo-sonoro-engine.mp3",
+  "bytes": 82701,
+  "sha256": "7cd6c22bd35444d12d84cb0662c50f44f23e4a0d09bcfa4a8af2bf6343db06b3",
+  "durationSec": 2.9
+ },
+ {
+  "path": "web/efeonce-logo-sonoro-growth.mp3",
+  "bytes": 82701,
+  "sha256": "84b5dce3ba39a2498634600b597dc650a4376a9eb97caf516b9e3372e7dcf26b",
+  "durationSec": 2.9
+ },
+ {
+  "path": "web/efeonce-logo-sonoro-revenue.mp3",
+  "bytes": 82701,
+  "sha256": "414ddfab5429da062e8593a28f1f1f86f278f4c0570f5296b6e254cb8d69cb20",
+  "durationSec": 2.9
+ },
+ {
+  "path": "web/efeonce-logo-sonoro-voice.mp3",
+  "bytes": 82701,
+  "sha256": "c40b9ce922a2b807eee84209d28706aa8cf13327f193e1d3fb99d38277eaeb72",
+  "durationSec": 2.9
+ },
+ {
+  "path": "web/efeonce-pieza-larga-energia-brian.mp3",
+  "bytes": 1037613,
+  "sha256": "29c65521a85c2ed29c8b2293dae6e41e8acc583d9fbfb5a8916ac87c7367f129",
+  "durationSec": 37.0
+ },
+ {
+  "path": "web/efeonce-pieza-larga-energia.mp3",
+  "bytes": 1037613,
+  "sha256": "49e31313b85402fdd1e6ea001609bee934d23020f5b94ff2b34901df4835419e",
+  "durationSec": 37.0
+ },
+ {
+  "path": "web/efeonce-pieza-larga-fondo-brian.mp3",
+  "bytes": 1135725,
+  "sha256": "1480bebe2110114a3f23ba5ecfa45ae3a1f740540169b283175772568e97ba27",
+  "durationSec": 40.5
+ },
+ {
+  "path": "web/efeonce-pieza-larga-fondo.mp3",
+  "bytes": 1135725,
+  "sha256": "0751dd81480d94208aad6c61d32affdf4d0f8d4bb71367f7d8cac06acd5eb9c6",
+  "durationSec": 40.5
+ },
+ {
+  "path": "web/efeonce-reveal-brian_16x9.mp4",
+  "bytes": 239555,
+  "sha256": "1ebc6a95471e4e98b1c8b6bb963c20f190d66d9a6b8447f9f0c2be50f9f5afa0",
+  "durationSec": 4.61
+ },
+ {
+  "path": "web/efeonce-reveal-brian_16x9.webp",
+  "bytes": 5698,
+  "sha256": "0a50af9c8345c58920635244b7df3ba7872456bc4535b266b672aa77aaa8ecd3"
+ },
+ {
+  "path": "web/efeonce-reveal-brian_9x16.mp4",
+  "bytes": 255160,
+  "sha256": "cef1041585c9095a7c182a7272c76d67035385b367fd64d65c85ff6ee563f684",
+  "durationSec": 4.61
+ },
+ {
+  "path": "web/efeonce-reveal-brian_9x16.webp",
+  "bytes": 7328,
+  "sha256": "2d507857b2acc2b9bdc3b5df3cd0968035fbbd3514c0d84b2cfea21a9ff597e7"
+ },
+ {
+  "path": "web/efeonce-reveal_16x9.mp4",
+  "bytes": 239050,
+  "sha256": "bce7842fb1a9f4d8820537209cdf3ee9eda1a0ade0c73d0d9c2657fb010c0da0",
+  "durationSec": 4.61
+ },
+ {
+  "path": "web/efeonce-reveal_16x9.webp",
+  "bytes": 5698,
+  "sha256": "0a50af9c8345c58920635244b7df3ba7872456bc4535b266b672aa77aaa8ecd3"
+ },
+ {
+  "path": "web/efeonce-reveal_9x16.mp4",
+  "bytes": 254655,
+  "sha256": "2212dfbe9f876f02ed9043664ab19aeb42c46385b164b6ebd27947dc3092ba69",
+  "durationSec": 4.61
+ },
+ {
+  "path": "web/efeonce-reveal_9x16.webp",
+  "bytes": 7328,
+  "sha256": "2d507857b2acc2b9bdc3b5df3cd0968035fbbd3514c0d84b2cfea21a9ff597e7"
+ },
+ {
+  "path": "web/efeonce-sting_16x9.mp4",
+  "bytes": 152474,
+  "sha256": "5f4275a7b96161baed8d298faa6ef489ef7af6816660dc06f97b2c60341f8e8f",
+  "durationSec": 2.22
+ },
+ {
+  "path": "web/efeonce-sting_16x9.webp",
+  "bytes": 4102,
+  "sha256": "b8eabd26a0048bbe6856d5d1eec10fa04cf8f812f2f71acc82259b829298a973"
+ },
+ {
+  "path": "web/efeonce-sting_9x16.mp4",
+  "bytes": 158505,
+  "sha256": "8a80404156a9eebd953b6432fb2d308a561261b7843090359f533da48bf27e5b",
+  "durationSec": 2.22
+ },
+ {
+  "path": "web/efeonce-sting_9x16.webp",
+  "bytes": 5214,
+  "sha256": "31bfe77e4ef38838a7aac5c03c3e29ef17ae28c0ec8ddd55466c2440248d5231"
+ }
+]

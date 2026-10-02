@@ -88,6 +88,43 @@ Contrato vigente del cliente canónico `src/lib/postgres/client.ts`:
 - Ese caso **no** emite `console.error`, **no** adjunta el objeto `Error` como stack trace agrupable por Vercel/Sentry y **no** llama `closeGreenhousePostgres()`. Resetear el pool/Cloud SQL Connector completo ante un cliente idle descartado amplifica reconexiones y convierte una defensa esperada en ruido operativo.
 - Errores de pool no clasificados como idle timeout siguen siendo loud y resetean estado (`pool_error`) para preservar recuperación ante sockets/connector realmente corruptos.
 
+### V1.3 — Rutas públicas: guard en el borde + timeout de sesión serverless (TASK-1876, 2026-09-28)
+
+Resuelve `ISSUE-174`: 64 requests concurrentes a una ruta pública sin sesión dejaron 86–99 de 97 conexiones
+ocupadas durante 5 minutos. Cada invocación de Vercel abre su propio pool; el `idleTimeoutMillis` no corre con la
+función congelada; los rate limiters de dominio consultan la base, así que consumen una conexión ANTES de rechazar.
+
+Decisiones:
+
+1. **Guard volumétrico en el Firewall de Vercel (WAF), no en `src/proxy.ts`.** Un contador en memoria es por
+   instancia y una ráfaga repartida no lo cruza; el WAF cuenta global por IP y corta antes de invocar cualquier
+   función. Regla: 20 req/10 s por IP en `/api/public/`, `enforce` en staging/preview y `observe` (log) en los
+   hosts de producción hasta tener una ventana de tráfico legítimo. Fuente versionada:
+   `src/lib/security/public-burst-guard/firewall-rules.ts`; sync con readback: `pnpm security:public-burst-guard`.
+   Sin env flag: el modo por regla ES la palanca de cutover. Los limitadores de dominio siguen detrás.
+2. **`idle_session_timeout=60s` pedido por conexión sólo desde Vercel** (opción de arranque
+   `-c idle_session_timeout=…` en `client.ts`), **no `ALTER ROLE`**: `greenhouse_app` lo comparten Vercel y los
+   cuatro workers de Cloud Run, que guardan trabajo de sesión en conexiones ociosas (advisory lock de
+   `sync-nubox-quotes-hot`). El rol conserva 5 min. Override `GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS`
+   (`0` = default del rol; nunca bajo `idleTimeoutMillis + 5 s`). Verificado contra PG real: Vercel → `1min`,
+   resto → `5min`.
+3. **Detección sin depender de la base.** La señal `runtime.postgres.connection_saturation` lee el pico de 24 h
+   de la métrica nativa `cloudsql.googleapis.com/database/postgresql/num_backends` (1 min de resolución; registró
+   99 el 2026-09-18 11:05Z). Pico ≥ 90 % del utilizable eleva a `warning`; con el detector sin conexión reporta
+   el pico. Alerta de Cloud Monitoring `num_backends > 85` por 2 min al canal Slack de alertas.
+
+**Estado vigente (2026-09-28):** reglas WAF aplicadas sin drift (staging/preview `enforce`, producción `observe`
+hasta el cutover, ≥ 2026-10-05); alerta `projects/efeonce-group/alertPolicies/11425632472409123636`
+(`infra/gcp/monitoring/cloudsql-connection-saturation.alert-policy.json`); `roles/monitoring.viewer` para
+`greenhouse-portal@`. Ráfaga controlada en staging (`pnpm security:public-burst-guard:verify`, deploy `43931ea73`):
+20×404 + 10×429 del borde; pico 26 conexiones con base 5, de vuelta a 6 al minuto siguiente (ISSUE-174: 99 por 5 min).
+
+Alternativas rechazadas: PgBouncer (TASK-847, ~USD 75–85/mes; sigue contingente a evidencia); límite en memoria en
+`proxy.ts` (no ve ráfagas distribuidas entre instancias); `ALTER ROLE` global (corta locks de sesión de workers).
+Límite honesto: una ráfaga distribuida entre muchas IPs no la frena un límite por IP; si la alerta muestra ese
+patrón, es el trigger de TASK-847 o de Attack Challenge Mode. Runbook:
+`docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md`.
+
 ### V2 (futuro, contingente — TASK-847)
 
 Si reliability signal `runtime.postgres.connection_saturation` alerta sustained > 60% utilización (señal real de demanda creciendo), Greenhouse despliega **PgBouncer en GKE Autopilot** (no Cloud Run — ver caveat abajo) como multiplexer canónico:
@@ -178,7 +215,13 @@ canónico `runGreenhousePostgresQuery()` aplica `GREENHOUSE_POSTGRES_QUERY_CONCU
 (default 2 Vercel / 4 no-Vercel) y debe ser la ruta estándar para queries PG.
 
 NUNCA configurar idle_session_timeout=0 en greenhouse_app o greenhouse_ops roles.
-ALTER ROLE canónico: greenhouse_app=5min, greenhouse_ops=15min.
+ALTER ROLE canónico: greenhouse_app=5min, greenhouse_ops=15min. NUNCA bajarlo para
+resolver conexiones de Vercel: el runtime serverless pide su propio idle_session_timeout
+por conexión (60s, TASK-1876); los workers de Cloud Run conservan el del rol.
+
+NUNCA proteger rutas públicas sin sesión sólo con rate limiters que consultan la base:
+consumen una conexión antes de rechazar. El guard volumétrico vive en el Firewall de
+Vercel (src/lib/security/public-burst-guard/firewall-rules.ts, TASK-1876).
 
 NUNCA tratar `57P05 terminating connection due to idle-session timeout` emitido
 por `pool.on('error')` como connector roto. Es un cliente idle descartado por la

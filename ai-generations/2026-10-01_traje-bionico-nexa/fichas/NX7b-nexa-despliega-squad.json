@@ -1,0 +1,51 @@
+{
+  "id": "NX7b-nexa-despliega-squad",
+  "formato": "16:9",
+  "registro": "cine",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "suspendido": "the five streams of azure light frozen mid-air as they fan out from her palm, with fine glowing particles hanging still along each stream",
+  "objetos": [
+    {
+      "objeto": "traje-bionico-nexa"
+    },
+    {
+      "objeto": "lentes-bionicos-nexa"
+    },
+    {
+      "objeto": "spark-reportes",
+      "vista": "cine"
+    },
+    {
+      "objeto": "spark-contenido",
+      "vista": "cine"
+    },
+    {
+      "objeto": "spark-investigacion",
+      "vista": "cine"
+    },
+    {
+      "objeto": "spark-crm-datos",
+      "vista": "cine"
+    },
+    {
+      "objeto": "spark-servicio",
+      "vista": "cine"
+    }
+  ],
+  "escena": "SCENE (cinematic, Hollywood blockbuster still with real depth, the moment a leader deploys her squad inside a vast dark hangar-like studio at night): Nexa stands on the RIGHT half of the frame, framed from the waist up, a heroic medium shot. She raises her LEFT forearm (on the right side of the frame) so her open palm faces up at the height of her chin, a little in front of her shoulder; on her palm burns a small, intense core of azure-white light, and from that core ALL the light streams are born: one stream that immediately splits into FIVE thinner streams that arc outward and away from her, each ending exactly at one of the five Sparks. No stream passes behind her body or her hair. The core and the streams are the KEY LIGHT of the whole frame: a hard azure light from just below and to the right of her face, so the right side of her face, her glasses and the white plates of her shoulder and chest glow azure while the far side of her face falls into soft shadow; a cool rim light from behind outlines her hair and shoulders. REALISTIC ADULT PROPORTIONS: the camera is about two meters away at chest height with an 85mm lens at f/2, so nothing is foreshortened and she does not lean toward the lens; her head is in natural proportion to her athletic body, about one quarter of the frame height, her shoulders clearly wider than two head-widths. Her head stays almost frontal, both eyes and both eyebrows visible, and she looks straight into the lens through her clear glasses with a fearless, confident half-smile, razor-thin focus on her eyes. She wears the bionic suit exactly as in its reference with its chest plate PLAIN smooth white (NO emblem, NO logo, NO rocket, NO lettering), the bionic glasses exactly as in their reference, small silver earrings, NO watch, NO bracelet, NO ring. THE FIVE SPARKS at THREE DEPTHS, each copied EXACTLY from its own reference, each smaller than her head, all of them above her waist, their orbit rings never crossing: NEAR (same focal plane as her face, sharp): the Reports Spark hovers just above and beyond her raised palm, its bar-chart model lit from below by the core, pointing at the tallest bar; MIDDLE (about one meter behind her, still almost sharp, slightly smaller in frame): the Content Spark rises above her raised hand holding its card up into its stream, and the Research Spark hovers just above her right shoulder, examining its stream through its magnifying glass held to its side; FAR (three to four meters behind her, small in frame, clearly out of focus with soft bokeh, their LED eyes reading as glowing dots): the CRM and Data Spark and the Service Spark, each catching the end of its long stream. No Spark and no stream appears to the left of her right shoulder. Thin haze catches the streams so each reads as a volumetric beam with fine glowing particles. Far behind, out of focus, the dark steel structure of the hangar and a few tiny cold practical lights. The LEFT half of the frame is calm, dark, empty hangar space with soft haze, no objects, no light streams, no people. Rich contrast, deep navy blacks, awe-inspiring. No logos of any other brand, no readable text.",
+  "lecho": {
+    "objeto": "the dark matte edge of a steel launch console close to the lens, along the bottom of the frame, out of all light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, dark, empty hangar space on the left half",
+      "tinta": "blanca"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "CC1b-contenido-que-la-ia-cita",
+  "formato": "1:1",
+  "impacto": true,
+  "registro": "cine",
+  "desde": "SP2b",
+  "alcance": "deck-seccion",
+  "objetos": [
+    {
+      "objeto": "polo-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic drama still, a vast dark studio at night, the moment an AI answer cites her work): an EFEONCE content strategist, a Latin American woman in her early thirties, dark straight hair tied back in a low ponytail, wearing the Efeonce team polo exactly as in its reference, deep navy, nearly black where the shadow falls, stands at the far end of a long, bare table of matte oiled dark walnut, framed from the waist up, her head about one quarter of the frame height, looking straight into the lens with calm, quiet certainty. She is placed well to the RIGHT: her whole body sits in the right half of the frame, her right shoulder just to the right of the vertical center line of the frame and her raised left hand near the right edge. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm f/2, she does not lean toward the lens, focus on her eyes. Her LEFT arm, the whole arm visible, is raised and bent so that her open left hand holds ONE palm-sized card of frosted glass up beside her face, on the frame-right side, at the height of her jaw and about 30 cm from her cheek; the card is a piece of her own writing: fine lines of text etched in it, far too small and too bright to read. Her right hand rests flat and still on the table top in front of her. Her face is lit ONLY by that card: the frame-right side of her face, her jaw and her eye glow with its light, the frame-left side of her face falls into deep shadow, the nose shadow lies across her cheek, and no light comes from the camera. Behind her, high in the upper right corner and about three meters further back, floats a large rounded AI answer bubble of thick frosted glass, glowing cool white from inside, with a few lines of an answer inside it, out of focus and far too small to read, no logos, cut by the right edge of the frame; its glow draws a thin cool rim along the top of her hair. From one small bright point on the lower edge of that bubble, ONE fine, taut thread of azure (#0375DB) light runs down through the haze and touches the card beside her face: the answer pointing back to her content. Where the thread touches it, the card blazes nearly white with a faint azure tint. Far behind her and only on the RIGHT half of the frame, five to six meters back, thousands of other glass cards hang in loose rows in the haze, unlit and dark, a few catching faint cold glints that melt into small round bokeh. The whole LEFT half of the frame, from top to bottom, is one bare, distant dark wall in calm deep shadow with only faint haze: nothing hangs there, no cards, no bokeh, no thread, no light. The space is bare: no books, no plants, no mugs, no notebooks, no monitors, no lamps. Rich contrast, deep navy blacks, no readable text anywhere, no logos of any other brand.",
+  "llave": {
+    "fuente": "the blazing frosted-glass card held up in her open left hand, a palm-sized core of nearly white light with only a faint azure tint",
+    "lado": "beside her face on the frame-right side, at the height of her jaw",
+    "distancia": "about 30 cm from her cheek"
+  },
+  "primerPlano": "the near end of that long table of matte, oiled dark walnut, the lens only a few centimetres behind its edge",
+  "fondo": "five to six meters behind her and only on the right half of the frame, thousands of dim glass cards hanging in loose rows in the haze, a few faint cold glints melted into small round bokeh discs, giving the space its scale",
+  "fenomeno": {
+    "que": "one fine, taut thread of azure (#0375DB) light runs from a glowing AI answer bubble high behind her down to the single card of her own content that she holds up beside her face, which blazes nearly white, while thousands of other cards in the dark behind stay unlit",
+    "esServicio": "AEO de contenidos: entre todo lo publicado, la respuesta de la IA cita el contenido que ella escribió; el hilo de luz es la cita"
+  },
+  "lecho": {
+    "objeto": "the near end of the long table of matte, oiled dark walnut she stands behind, the lens only a few centimetres behind its edge",
+    "tono": "DARK near black"
+  }
+}

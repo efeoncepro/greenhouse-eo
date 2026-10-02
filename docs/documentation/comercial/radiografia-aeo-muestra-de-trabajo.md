@@ -1,21 +1,44 @@
 # Radiografía AEO — Muestra de Trabajo, Educación y Habilitación de Ventas
 
+> **Naming vigente:** la Radiografía AEO conserva su nombre como muestra de trabajo; se relaciona con **Efeonce AEO** y puede seguir al **Efeonce AEO Assessment** / **Efeonce AI Visibility Report**. `AI Visibility Grader` queda como alias técnico/histórico del motor que genera evidencia. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.1
+> **Versión:** 2.0
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-09-23 por Claude
+> **Última actualización:** 2026-09-30
 > **Documentación técnica:** [Radiografía AEO — Arquitectura](../../think/radiografia-aeo-architecture.md)
 > **Manual técnico:** [Radiografía AEO — Manual](../../think/radiografia-aeo-manual.md)
 > **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
-> **Runtime:** repo `efeonce-think` (**NO** `greenhouse-eo`) → `think.efeoncepro.com/muestras/<slug>-<token>`
+> **Runtime:** repo `efeonce-think` (**NO** `greenhouse-eo`) → `think.efeoncepro.com`: legacy `/muestras/<slug>-<token>`; compuesto `/aeo-xray/r/<clave>`
 
 ---
+
+## Experiencia compuesta publicada — Banco Pichincha Perú, 30/09/2026
+
+La extensión conserva el renderer y las capacidades del X-Ray original. La muestra Pichincha
+ya está publicada en Think y lista para acompañar el correo previo a una reunión agendada.
+Incluye una landing de Cuenta de Ahorros Preferente y un artículo sobre apertura de cuenta
+online; ambos comparten el recorrido y se alternan sin perder el paso actual.
+
+La experiencia suma entrada con telón y marcas oficiales, selector segmentado con iconos,
+módulos completos, respuestas con fuentes, exploración de valor SEO/AEO, dos banners dentro
+del artículo, tres feeds, una Story y un video vertical reproducible. No reemplaza la radiografía
+ni los derivados por una página aislada: cada adaptación permite volver a su contenido de origen.
+
+El enlace `sample_*` se sirve desde Think sin consultas a Greenhouse. Es público no listado,
+con noindex, sin analytics y retiro por redeploy; **no tiene autenticación ni revocación central**.
+El contrato `xrg_*` para edición inmutable, medios privados, TTL y revocación permanece como
+integración pendiente de release/migración/canary. No depender de ese release para enviar
+esta demo ni presentar como operativo un control aún no validado en producción.
+
+El enlace concreto del cliente reside en el expediente privado y registro runtime; no se publica
+en este documento. [Manual](../../think/radiografia-aeo-manual.md) · [Otro cliente](../../think/aeo-xray-nuevo-cliente.md).
 
 ## Qué es
 
 Una **pieza web de cuatro pantallas** que le entregamos a un cliente o a un prospecto **por enlace**, y que hace algo que un PDF **no puede hacer**: escribe un artículo real para ese cliente y después **lo abre en canal** para mostrar la capa técnica que lo vuelve citable por los motores de respuesta con IA.
 
-No es un mockup. El artículo está escrito de verdad, con fotos licenciadas de verdad, contra un hueco de búsqueda medido de verdad.
+El contenido se desarrolla completo para poder evaluarlo. La investigación y los medios conservan su procedencia: fotografía licenciada o composición/generación autorizada y declarada según el caso. La propuesta no equivale a contenido publicado en el sitio del cliente ni a resultados alcanzados.
 
 ## Los DOS trabajos que hace
 
@@ -67,8 +90,8 @@ La frase operativa es simple: **el Grader mide el problema; la Radiografía mues
 
 ### Durante la reunión
 
-1. **El hueco:** "este es el espacio que hoy no está capturando la marca".
-2. **El artículo:** "no describimos lo que haríamos; lo escribimos".
+1. **La oportunidad:** explicar qué consulta o necesidad sustenta el ángulo, qué observamos y qué falta verificar; no afirmar ausencia competitiva sin evidencia.
+2. **La pieza:** recorrer la landing o el artículo completos y conectar claridad del contenido con la decisión del lector.
 3. **La radiografía:** "cada dato de máquina corresponde a contenido visible".
 4. **Dónde más vive:** "el artículo es una fuente; no una pieza aislada".
 
@@ -86,12 +109,12 @@ El runbook completo para venta y educación vive en [el manual comercial](../../
 
 | # | Pantalla | Qué hace |
 |---|---|---|
-| ① | **El hueco** | El resultado de búsqueda real del término: quién ocupa hoy ese espacio y por qué el cliente no está. Es la portada y es el golpe |
-| ② | **El artículo** | El artículo completo, a ancho completo, **sin anotaciones**. Acá se LEE. El cliente juzga lo que está comprando |
+| ① | **La oportunidad** | Ángulo y evidencia fechada; recorrido ilustrativo pregunta→respuesta→fuente. Distingue observación de investigación y simulación; no representa una respuesta real de Google/LLM |
+| ② | **La pieza** | Landing o artículo completos, sin aparato de auditoría sobre la lectura. Beneficios, condiciones, comparación, proceso, FAQ, banners, fuentes y CTA según artefacto |
 | ③ | **La radiografía** | Tocas un párrafo y ves **qué produce** en la capa de máquina. En móvil primero se ve el artículo; la máquina aparece como hoja inferior al tocar |
 | ④ | **Dónde más vive** | El video, la pieza social y el set de imágenes que nacen del mismo artículo. La pantalla muestra primero los artefactos derivados en su hábitat, con iconografía funcional de canal y línea de sangre desde el artículo |
 
-Cada pantalla es **una URL propia**: el deck o el correo pueden enlazar directo a la que convenga.
+Cada etapa admite **enlace directo**: legacy usa rutas; la edición compuesta usa `artifact` y `step`. Los enlaces profundos conservan destino y saltan la bienvenida. Una pestaña nueva en La oportunidad permite ver el telón: logo cliente, invitación, botón, marca Efeonce AEO y burbuja URL; sube durante 1,4 segundos, o continúa de inmediato con movimiento reducido/sin JS.
 
 ## Cuándo alcanzarla (y cuándo no)
 
@@ -105,7 +128,7 @@ Cada pantalla es **una URL propia**: el deck o el correo pueden enlazar directo 
 **No:**
 
 - Como lead magnet. **No captura, no pide email, no tiene formulario** — y no debe tenerlo.
-- Sin un hueco medido. Si el artículo no salió de un dato (Semrush + el AI Visibility Grader), el panel de evidencia es decorativo y **la pieza miente sobre su propio método**.
+- Sin una oportunidad sustentada. Research puede venir de herramientas SEO, fuentes oficiales y/o diagnóstico de visibilidad; no exigir un Grader si no hay diagnóstico emitido. Lo pendiente se identifica como hipótesis y nunca como score o cita observados.
 - Para un competidor directo de un cliente vigente, sin pensarlo dos veces (ver "lo que no hay que hacer").
 
 ## Qué demuestra y qué NO demuestra
@@ -141,13 +164,46 @@ La pieza **entera** se apoya en una sola cosa: **no exagera**. Por eso, tres reg
 
 El motor es genérico: **el cliente es un payload** (un archivo JSON), no código. Crear la muestra del siguiente cliente es escribir ese payload. Los pasos están en el [manual](../../think/radiografia-aeo-manual.md).
 
-⚠️ Ya existe una **fixture no publicada** de segundo cliente para probar que el gate no depende de IDs de SKY. Mientras exista **un solo** cliente comercial publicado, falta comprobar la reutilización operativa completa con otro payload real.
+La muestra SKY y la composición Pichincha están publicadas; además existe un kit neutral y fixtures de segundo dominio para probar reutilización. El próximo cliente requiere investigación, marca, derechos, validación de contenido y QA propios. El kit no automatiza esas decisiones ni transforma aprobación de un caso en aprobación de otro.
 
 ## Lo que NO hay que hacer
 
 - **Nunca** prometer "la cajita de FAQ en Google" — Google la restringió en 2023 a gobierno y salud.
 - **Nunca** inventar datos para tapar un hueco del cliente.
-- **Nunca** compartir el patrón de URL sin el token: es lo único que impide que un cliente adivine la URL de la muestra de otro.
+- **Nunca** tratar un enlace no listado como autenticación. Elegir `sample_*` sólo para entregas cuya distribución pública esté autorizada; usar el carril privado cuando sea operativo para confidencialidad, TTL y revocación.
 - **Nunca** dejar que la pieza hable de **nuestros** documentos ("nuestra oferta dice…") ni que le narre la interfaz al lector. La muestra **se defiende sola**.
 
 > **Detalle técnico:** los invariantes vigentes, el gate de 46 asserts y las razones de cada decisión están en la [arquitectura](../../think/radiografia-aeo-architecture.md). Cómo se crea la muestra de un cliente nuevo, paso a paso, en el [manual](../../think/radiografia-aeo-manual.md). El caso vivo (SKY, licitación Wherex 2026 — adjudicada a Efeonce el 2026-09-23; la Radiografía con artículo real figura entre la evidencia verificable que explica el cierre) en [`TASK-1410`](../../tasks/complete/TASK-1410-aeo-article-xray.md).
+
+
+## Qué puede evaluar el cliente en la extensión
+
+| Capa | Trabajo visible | Límite que debe acompañarlo |
+|---|---|---|
+| Contenido | Respuestas directas, desarrollo útil, TOC, tablas, FAQ y condiciones | Demostración propuesta, revisión del banco pendiente para implementación |
+| Conversión | Jerarquía de landing y CTA a canal oficial | No hay apertura, formulario ni captura bancaria en Think |
+| SEO técnico/on-page | Meta, encabezados, enlaces, ALT, canonical y marcado propuesto | No son cambios aplicados a pichincha.pe ni auditoría completa de infraestructura |
+| AEO | Pregunta relacionada con respuesta, bloque y fuente, estructura autocontenida | Simulación pedagógica; no ranking, frecuencia de prompts ni cita garantizada |
+| Distribución | Gráficas/feed/Story/video con linaje y detalle de producción | Ejemplos de producción, no campaña ya publicada ni alcance medido |
+| Medición futura | Estados y evidencias por bloque/página/sitio; qué se verificaría después | Propuesto/implementado/verificado/medido no son equivalentes |
+
+DataForSEO aparece como procedencia de investigación, no en «Fuentes consultadas» del
+artículo/landing. Las fuentes del producto respaldan moneda, tasas, saldos y condiciones.
+Una cifra se interpreta con fecha y unidad; no extrapolar volumen a aperturas ni rendimientos.
+
+El footer reúne atribución de Efeonce, legal y enlaces. La lectura de la pieza mantiene voz
+cliente; la atribución de demostración está en el marco de Efeonce. Marca, iconografía y motion
+ayudan a orientarse y a entender el vínculo entre contenido/técnica; no son evidencia de éxito SEO.
+
+## Roles y responsabilidades para repetición
+
+Comercial define el uso y próximo paso y comparte sólo enlaces autorizados; el operador
+aprueba ángulo/medio/gasto/publicación cuando corresponda; SEO/AEO conserva fuente y
+contexto; diseño revisa marcas y píxeles; implementación extiende renderer genérico; QA
+verifica rutas, acoplamiento, reproducción, accesibilidad y build; release publica Think con
+SHA/deployment/readback. La integración Greenhouse tiene aceptación independiente.
+
+Preparación → composición → revisión de contenido y medios → QA → publicación autorizada
+→ lectura live → envío autorizado. No mover el deal ni enviar correo por haber desplegado.
+El cierre comercial puede registrar la demo como material de presentación, sin inventar
+entrega, implementación en el banco, acuerdos de alcance ni resultados de negocio.

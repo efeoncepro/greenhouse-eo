@@ -16,6 +16,11 @@ type GreenhousePostgresConfig = {
   maxConnections: number
   /** TASK-845 — Pool idle timeout in ms. Vercel default 10s, Cloud Run default 30s. */
   idleTimeoutMillis: number
+  /**
+   * TASK-1876 — Server-side `idle_session_timeout` requested per connection (startup option).
+   * Vercel default 60s; `null` elsewhere (the role default of 5 min applies).
+   */
+  sessionIdleTimeoutMs: number | null
   sslEnabled: boolean
 }
 
@@ -252,19 +257,53 @@ const isVercelRuntime = (): boolean => process.env.VERCEL === '1'
 const getDefaultMaxConnections = (): number => (isVercelRuntime() ? 3 : 15)
 const getDefaultIdleTimeoutMs = (): number => (isVercelRuntime() ? 10_000 : 30_000)
 
-export const getGreenhousePostgresConfig = (): GreenhousePostgresConfig => ({
-  instanceConnectionName: process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME?.trim() || null,
-  ipType: toIpType(process.env.GREENHOUSE_POSTGRES_IP_TYPE),
-  host: process.env.GREENHOUSE_POSTGRES_HOST?.trim() || null,
-  port: normalizeNumber(process.env.GREENHOUSE_POSTGRES_PORT, 5432),
-  database: process.env.GREENHOUSE_POSTGRES_DATABASE?.trim() || null,
-  user: process.env.GREENHOUSE_POSTGRES_USER?.trim() || null,
-  password: process.env.GREENHOUSE_POSTGRES_PASSWORD || null,
-  passwordSecretRef: process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF?.trim() || null,
-  maxConnections: normalizeNumber(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS, getDefaultMaxConnections()),
-  idleTimeoutMillis: normalizeNumber(process.env.GREENHOUSE_POSTGRES_IDLE_TIMEOUT_MS, getDefaultIdleTimeoutMs()),
-  sslEnabled: normalizeBoolean(process.env.GREENHOUSE_POSTGRES_SSL)
-})
+/**
+ * TASK-1876 — Server-side idle-session timeout for the serverless runtime only.
+ *
+ * A frozen Vercel function cannot run the pool's `idleTimeoutMillis` timer, so its idle
+ * connections survive until PostgreSQL cuts them. The role default (`greenhouse_app`,
+ * 5 min) is shared with the Cloud Run workers, which hold session-scoped work (advisory
+ * locks) on idle connections, so it is NOT lowered with `ALTER ROLE`. Instead the Vercel
+ * pool asks for a shorter timeout on its own sessions via the startup `options` parameter.
+ *
+ * Override: `GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS` (`0` → do not request; the role
+ * default applies). Never below the pool's own idle timeout + 5 s, so the client evicts an
+ * idle connection before the server kills it while the process is awake. Never `0` on the
+ * server side (that would disable the defense).
+ */
+const DEFAULT_VERCEL_SESSION_IDLE_TIMEOUT_MS = 60_000
+const SESSION_IDLE_TIMEOUT_MARGIN_MS = 5_000
+
+const resolveSessionIdleTimeoutMs = (idleTimeoutMillis: number): number | null => {
+  const raw = process.env.GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS?.trim()
+  const requested = raw ? Number(raw) : isVercelRuntime() ? DEFAULT_VERCEL_SESSION_IDLE_TIMEOUT_MS : null
+
+  if (requested === null || !Number.isFinite(requested) || requested <= 0) return null
+
+  return Math.max(Math.round(requested), idleTimeoutMillis + SESSION_IDLE_TIMEOUT_MARGIN_MS)
+}
+
+export const buildGreenhousePostgresSessionOptions = (sessionIdleTimeoutMs: number | null): string | undefined =>
+  sessionIdleTimeoutMs === null ? undefined : `-c idle_session_timeout=${sessionIdleTimeoutMs}`
+
+export const getGreenhousePostgresConfig = (): GreenhousePostgresConfig => {
+  const idleTimeoutMillis = normalizeNumber(process.env.GREENHOUSE_POSTGRES_IDLE_TIMEOUT_MS, getDefaultIdleTimeoutMs())
+
+  return {
+    instanceConnectionName: process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME?.trim() || null,
+    ipType: toIpType(process.env.GREENHOUSE_POSTGRES_IP_TYPE),
+    host: process.env.GREENHOUSE_POSTGRES_HOST?.trim() || null,
+    port: normalizeNumber(process.env.GREENHOUSE_POSTGRES_PORT, 5432),
+    database: process.env.GREENHOUSE_POSTGRES_DATABASE?.trim() || null,
+    user: process.env.GREENHOUSE_POSTGRES_USER?.trim() || null,
+    password: process.env.GREENHOUSE_POSTGRES_PASSWORD || null,
+    passwordSecretRef: process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF?.trim() || null,
+    maxConnections: normalizeNumber(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS, getDefaultMaxConnections()),
+    idleTimeoutMillis,
+    sessionIdleTimeoutMs: resolveSessionIdleTimeoutMs(idleTimeoutMillis),
+    sslEnabled: normalizeBoolean(process.env.GREENHOUSE_POSTGRES_SSL)
+  }
+}
 
 export const getGreenhousePostgresMissingConfig = () => {
   const config = getGreenhousePostgresConfig()
@@ -314,7 +353,8 @@ const buildPool = async () => {
     database: config.database,
     max: config.maxConnections,
     connectionTimeoutMillis: 15_000,
-    idleTimeoutMillis: config.idleTimeoutMillis
+    idleTimeoutMillis: config.idleTimeoutMillis,
+    options: buildGreenhousePostgresSessionOptions(config.sessionIdleTimeoutMs)
   }
 
   if (config.instanceConnectionName) {

@@ -1,0 +1,36 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.1",
+  "surface": "motion",
+  "format": "16x9",
+  "role": "loop",
+  "recipe": "loop-lens-reveal",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "question": "¿Tu marketing mide lo que vende?",
+    "answer": [
+      "Ahora",
+      "sí"
+    ]
+  },
+  "timeline": {
+    "close": "reveal"
+  },
+  "photo": {
+    "register": "respuesta",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_web-movil/plates/M1-avanza-polo.png",
+    "alt": "Una directora de cuentas con el polo de Efeonce avanza hacia la cámara y la mira",
+    "native": "4:7",
+    "focus": {
+      "xOfWidth": 0.456,
+      "yOfHeight": 0.2372
+    }
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Growth",
+    "participantKind": "role"
+  }
+}

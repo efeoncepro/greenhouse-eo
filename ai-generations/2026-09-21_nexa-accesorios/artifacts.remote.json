@@ -1,0 +1,53 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:10:12.951Z",
+  "run": "ai-generations/2026-09-21_nexa-accesorios",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-21_nexa-accesorios",
+  "totalBytes": 23248559,
+  "fileCount": 7,
+  "files": [
+    {
+      "path": "salidas/_original-ancla-8-manos.png",
+      "sizeBytes": 12020714,
+      "sha256": "6211aed68c243821ad4a441e3678395f5843700c3efb8aa10508430996f495a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-accesorios/salidas/_original-ancla-8-manos.png"
+    },
+    {
+      "path": "salidas/antes-despues.png",
+      "sizeBytes": 3768611,
+      "sha256": "edb669129e4500dd730c327dedb0f6aa57790eb40327ba0bc05e40961b968293",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-accesorios/salidas/antes-despues.png"
+    },
+    {
+      "path": "salidas/manos-accesorios-v01.png",
+      "sizeBytes": 2503269,
+      "sha256": "45242c7d76e61dab0a7102879de251e5997fbc3440bfa61a2ee1a820f65bad43",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-accesorios/salidas/manos-accesorios-v01.png"
+    },
+    {
+      "path": "salidas/manos-accesorios-v02.png",
+      "sizeBytes": 2771526,
+      "sha256": "da2c3f1ea4ec9110f67b89221bae69f59b0444fd7c3d57620974497b1e5f9c23",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-accesorios/salidas/manos-accesorios-v02.png"
+    },
+    {
+      "path": "salidas/z-cara.png",
+      "sizeBytes": 498464,
+      "sha256": "89235f57ae2ae39bae91fc25875b27ef84a820bb07598bf8b8a44c5534f9e7e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-accesorios/salidas/z-cara.png"
+    },
+    {
+      "path": "salidas/z-manos-v01.png",
+      "sizeBytes": 968983,
+      "sha256": "d3266876020d63898ac33e197507918dcb0919b8056e6d2bee1ff54c5cb19b2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-accesorios/salidas/z-manos-v01.png"
+    },
+    {
+      "path": "salidas/z-muneca.png",
+      "sizeBytes": 716992,
+      "sha256": "4e4f70dd987877d7da94c5f5ade11bb37e63cd98993378b68da9701e7c657d48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-21_nexa-accesorios/salidas/z-muneca.png"
+    }
+  ]
+}

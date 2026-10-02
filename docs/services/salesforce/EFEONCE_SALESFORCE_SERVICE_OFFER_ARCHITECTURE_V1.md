@@ -298,6 +298,11 @@ expansión/retiro. Una configuración de Agentforce o AIforce no acredita por s�
 - No se publica “Salesforce Partner”, tier, badge, certificación, expertise, reseller ni co-selling sin readback
   primario vigente y evidencia aplicable al claim exacto.
 - La aceptación histórica de Efeonce como `Provisional Consulting Partner` no prueba el estado actual.
+- **Delta 2026-09-29:** la insignia «Salesforce Partner» (y el logo y los íconos de producto) tiene uso **autorizado por
+  Salesforce**, declarado por el operador (referencia `salesforce-partner-authorization-2026-09-29` en el
+  [registro de partnerships](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md)): el deck de práctica Salesforce la
+  lleva por defecto. No autoriza claims de tier, certificación, expertise, reseller ni co-selling, que siguen exigiendo
+  readback.
 - Consulting Partner no implica Cloud Reseller.
 - Logos, badges, personajes, imágenes, screenshots y demás assets Salesforce sólo se usan dentro de la
   autorización y las brand guidelines vigentes; una referencia estética no autoriza copiar personajes o diseños.

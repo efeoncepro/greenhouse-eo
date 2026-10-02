@@ -47,7 +47,8 @@ El cielo final de las cartelas viene de la MISMA película generada y permanece 
 
 ## Evidencia
 
-- `ai-generations/2026-09-23_cmp003-sky-video/seedance/v10-local/README.md`: reproducción y capas.
+- `ai-generations/2026-09-23_cmp003-sky-video/seedance/v10-local/README.md`: reproducción y capas (para reproducir o
+  reusar el punch aprobado, si las capas binarias no están en disco: `pnpm ai-gen:pull ai-generations/2026-09-23_cmp003-sky-video/seedance/v10-local`).
 - `approval-punch-v3.json`, `versions/approved-punch-v3/`, `qa/engine-check.json`, `qa/export-check.json`, `qa/luminosity-check.json` dentro de esa corrida.
 - CDR-008 registra el alcance aprobado; el guion y plan detallado viven en la carpeta CMP-003 de OneDrive.
 - Marco existente: `GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md` para Cloud Omni; no cambia esa integración, ni Globe, ni contratos de datos.

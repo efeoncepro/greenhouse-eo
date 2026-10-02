@@ -1,0 +1,73 @@
+{
+  "schema": "efeonce.foto.isotipo.v1",
+  "plate": "03-tres-cuartos-izquierda-a.png",
+  "salida": "03-tres-cuartos-izquierda-a-isotipo-c.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.4.10",
+  "archivo": "assets/efeonce-isotype-positive.svg",
+  "sha256": "e8204298df02608e0edd9717a17317a84239b5c6d63b4db31104babba1bcd4d2",
+  "prenda": "clara",
+  "caja": {
+    "centro": [
+      0.484,
+      0.143
+    ],
+    "ancho": 0.046,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": null,
+  "creado": "2026-10-02T00:40:53.113Z",
+  "acabado": {
+    "veredicto": "aprobado",
+    "salida": "03-tres-cuartos-izquierda-a-isotipo-c-acabado.png",
+    "sha256": "d2167d5f69442dd52a0d27a9fed6b17ee51beb2add0d15318beb8e7a73763e6b",
+    "recorte": {
+      "archivo": "03-tres-cuartos-izquierda-a-isotipo-c-acabado-recorte.png",
+      "sha256": "6ad5c061583823c101bca749fddd1a1fc2c3a3f8c4d3219224a407525150bfe2",
+      "caja": {
+        "lado": 512,
+        "left": 240,
+        "top": 0
+      },
+      "ampliadoA": 1024
+    },
+    "edicion": {
+      "archivo": "03-tres-cuartos-izquierda-a-isotipo-c-acabado-edicion.png",
+      "sha256": "cda1bcacee510e043d2b2952a2098723e9573203513ab0f9e593947092b38442"
+    },
+    "modelo": {
+      "solicitado": "gpt-image-2.5-sunburst",
+      "devuelto": "gpt-image-2.5-sunburst",
+      "calidad": "high",
+      "tamano": "1024x1024",
+      "uso": {
+        "entrada": 1265,
+        "salida": 1756,
+        "total": 3021
+      },
+      "costoEstimadoUsd": 0.053
+    },
+    "prompt": "This is a crop of a real photograph: a smooth matte white armored chest plate of a futuristic suit. A small navy Efeonce mark (a rocket with three round windows inside an elliptical orbit, with a small sphere on top) was placed flat on it. It is finished, official artwork: keep its shape, every part, its proportions, its navy colour, its exact size and its exact position — do NOT redraw, restyle, re-letter, simplify, resize or move it. You are only adding MATERIAL and LIGHT so it reads as a real mark applied to that surface: let it follow the gentle curvature of the surface, pick up the same lighting gradient, the soft rim light and the faint reflections of the scene, lie perfectly flush with the surface as a thin printed decal — NO relief, NO bevel, NO emboss, NO highlight rim around it — with only a tiny edge softness, and carry the same grain, softness and depth of field as the surface around it. Keep everything else in the image exactly as it is: same framing, same surface, same colours. No text, no extra marks.",
+    "promptSha256": "8a897cdf29f727ba275391a3997c1fb799dd7949f30e1eb2948da7c56ec2fb62",
+    "superficie": "a smooth matte white armored chest plate of a futuristic suit",
+    "mezcla": {
+      "umbralSilueta": 10,
+      "siluetaPx": 725,
+      "dilatacionPx": 3,
+      "sigmaAlfa": 1.6,
+      "anilloColorPx": 14,
+      "desplazamientoColor": [
+        -0.35,
+        -0.74,
+        -1.53
+      ]
+    },
+    "verificacion": {
+      "zonaMarcaPx": 8,
+      "cambiadosFueraDeLaMarca": 0,
+      "cambiadosEnLaMarca": 1546
+    },
+    "comparacion": "03-tres-cuartos-izquierda-a-isotipo-c-acabado-comparar.png",
+    "creado": "2026-10-02T00:41:29.299Z"
+  }
+}

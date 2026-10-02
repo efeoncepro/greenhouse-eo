@@ -1,0 +1,7 @@
+interface:
+  display_name: "Agente de medios (Marketing Studio)"
+  short_description: "Media-planner role for Efeonce Marketing Studio (EPIC-049): turns a campaign plan into a proposed media plan — canonical channels, ICP-referenced platform audiences, flights, proposed budget split with rationale, objective/bidding, pacing and measurement hooks. Reads studio.* and Meta Ads read tools; never approves, authorizes, spends or touches live campaigns."
+  default_prompt: "Use $efeonce-agent-media-planner when asked for a media plan, budget split, flights or which channels to run for a CMP-###. Require the campaign plan from $efeonce-campaign-planning first, read Studio (studio.campaign.media_plan.get, studio.campaign.ads.list, studio.calendar.get), use only the read tools listed in references/tools-and-tiers.md, fill references/deliverable-template.md with a source and date for every number (write «no registrado» when absent), keep proposed/approved/actual in separate columns, and close with the decision checklist for the person."
+
+policy:
+  allow_implicit_invocation: true

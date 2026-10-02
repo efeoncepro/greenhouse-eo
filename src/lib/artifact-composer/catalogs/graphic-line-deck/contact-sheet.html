@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · hoja de contactos</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `contact-sheet` (surface deck, tema oscuro, TASK-1928). La elegida grande, con su sombra y la selección de
+      Dirección de arte; las otras tres en una tira con marcas de corte y su rótulo. La voz a la izquierda. Referencia:
+      DeckMosaico (X-contactos).
+    -->
+    <main class="gl-slide gl-cs" data-gl-root data-slot="frame">
+      <figure class="gl-cs-chosen" data-slot="chosen" data-gl-select-item>
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-cs-strip" data-slot="strip">
+        <li class="gl-cs-shot">
+          <img data-slot-field="src" alt="" />
+          <p class="gl-cs-caption" data-slot-field="caption">02 · El corte</p>
+        </li>
+      </ol>
+
+      <figure class="gl-layer gl-cs-marks" data-slot="marks">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-ring-small" data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cuál sale al cliente?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">Ésta</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+    </main>
+  </body>
+</html>

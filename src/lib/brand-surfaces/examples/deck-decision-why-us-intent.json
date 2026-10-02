@@ -1,0 +1,61 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-why-us",
+  "theme": "light",
+  "voice": {
+    "eyebrow": "Por qué elegirnos",
+    "question": "¿Por qué Efeonce?",
+    "answer": [
+      "Por esto"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 1
+  },
+  "body": "No te entregamos crecimiento: lo construimos contigo y te dejamos más capaz de sostenerlo.",
+  "figures": [
+    {
+      "value": "+10",
+      "label": "años ejecutando en LATAM",
+      "source": "Efeonce, 2026"
+    },
+    {
+      "value": "5",
+      "label": "mercados: Chile, EE. UU., Colombia, México y Perú",
+      "source": "Efeonce, 2026"
+    },
+    {
+      "value": "+90",
+      "label": "empresas operan con Efeonce",
+      "source": "Efeonce, 2026"
+    },
+    {
+      "value": "1",
+      "label": "solo interlocutor para todas las líneas",
+      "source": "Efeonce, 2026"
+    },
+    {
+      "value": "En vivo",
+      "label": "tu operación visible en Greenhouse",
+      "source": "Efeonce, 2026"
+    },
+    {
+      "value": "Revenue",
+      "label": "Enabled: medimos negocio, no vanidad",
+      "source": "Efeonce, 2026"
+    }
+  ],
+  "selected": 4,
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-01T22:20:51.751Z",
+  "run": "ai-generations/2026-09-25_formato-chile",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-25_formato-chile",
+  "totalBytes": 14460065,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "out/formato-chile-4x5-v1.png",
+      "sizeBytes": 2436320,
+      "sha256": "1bb4fd14dd80c3a55e0343e6aa79a32b6711bb4485968f3d3f08d7edd936bc36",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_formato-chile/out/formato-chile-4x5-v1.png"
+    },
+    {
+      "path": "out/formato-chile-4x5-v2.png",
+      "sizeBytes": 2424008,
+      "sha256": "6978a56f2edceaf30bc6e01a8ac0a3ea46abf25bb9a9e9418fdc9a00ecc0a65f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_formato-chile/out/formato-chile-4x5-v2.png"
+    },
+    {
+      "path": "out/preview-390/formato-chile-4x5-v1.png",
+      "sizeBytes": 339481,
+      "sha256": "7ceaab373b67a64e94c7a2951d501c550805d16fc8d426a99648a2f4b096b176",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_formato-chile/out/preview-390/formato-chile-4x5-v1.png"
+    },
+    {
+      "path": "out/preview-390/formato-chile-4x5-v2.png",
+      "sizeBytes": 339982,
+      "sha256": "54d04da647c4dd23f31647089a1663ce34e784cc5569af13250c4eb2394fcd10",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_formato-chile/out/preview-390/formato-chile-4x5-v2.png"
+    },
+    {
+      "path": "plates/plate-v1-1.png",
+      "sizeBytes": 3769293,
+      "sha256": "4c547a624a19b647f347ec822d7076685ec7d627b90af66bb0bea014c29a751e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_formato-chile/plates/plate-v1-1.png"
+    },
+    {
+      "path": "plates/plate-v1-2.png",
+      "sizeBytes": 3966701,
+      "sha256": "b3d3db393ce410b4625e6795e97b0c4a6865ec510aff881b5a1a41f9ab39decb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_formato-chile/plates/plate-v1-2.png"
+    },
+    {
+      "path": "qa/zoom-banner-mujer.png",
+      "sizeBytes": 390322,
+      "sha256": "06e6e238f41b7a821d7f7abbc88f5d6ea9cf5923bf75acaa2fe5481793a576b0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_formato-chile/qa/zoom-banner-mujer.png"
+    },
+    {
+      "path": "qa/zoom-disenador.png",
+      "sizeBytes": 190482,
+      "sha256": "d15b685f2202875f08d172fce36fb418f007ebff13110ff9f92a75012d679cf9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_formato-chile/qa/zoom-disenador.png"
+    },
+    {
+      "path": "qa/zoom-pruebas.png",
+      "sizeBytes": 603476,
+      "sha256": "150e11d04c04fb8e12cbeec1ed730f63756ec0a4b72ec5683821d7e3b6568b46",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-25_formato-chile/qa/zoom-pruebas.png"
+    }
+  ]
+}

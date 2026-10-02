@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · la familia de marcas</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-brand-family` (surface deck, tema oscuro, TASK-1949). «¿Qué hay dentro? Cuatro piezas.»: la familia
+      de marcas de Search Visibility 360. A la izquierda el logo del producto abre la voz (en el lugar del eyebrow) y la
+      bajada; a la derecha el nombre completo del producto y sus cuatro piezas, cada una con su lockup OFICIAL de
+      axis-brand-assets, su papel y una línea de qué hace. Fondo de producto, sin escenario ni selección.
+      Referencia: deck SEO/AEO, Completo · 07 (aprobada el 2026-09-30).
+    -->
+    <main class="gl-slide gl-ls gl-sv gl-sbf" data-gl-root data-slot="frame">
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Qué hay dentro?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">Cuatro</span><span data-slot-field="answer">piezas</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">SV360 es SEO y AEO en un solo sistema: una capacidad, un proceso, un entregable y una edición mensual, todo firmado por <strong>Efeonce</strong>.</p>
+
+      <section class="gl-sbf-family" data-slot="family">
+        <p class="gl-sbf-kicker" data-slot-field="kicker">El producto · SEO + AEO</p>
+        <img class="gl-sbf-lockup" data-slot-field="lockup" alt="" />
+      </section>
+
+      <ol class="gl-sbf-pieces" data-slot="pieces">
+        <li class="gl-sbf-piece">
+          <div class="gl-sbf-piece-head">
+            <img class="gl-sbf-mark" data-slot-field="mark" alt="" />
+            <span class="gl-sbf-role" data-slot-field="role">Capacidad</span>
+          </div>
+          <p class="gl-sbf-description" data-slot-field="description">Que la IA te encuentre, te entienda y te recomiende.</p>
+        </li>
+      </ol>
+
+      <div class="gl-product-mark" data-slot="productMark">
+        <img data-slot-field="src" alt="" />
+      </div>
+
+      <img class="gl-url-lum" data-slot="urlBubble" src="assets/url-bubble-source.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

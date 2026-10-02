@@ -1,0 +1,68 @@
+{
+ "masters": {
+  "anillo-adelante": {
+   "sha256": "191631c24fc1de1dc0335e8fd724c41606a634ad48659edc718cceddaa53eaa3",
+   "bytes": 114325
+  },
+  "anillo-atras": {
+   "sha256": "3246de0bbbb59ceee39bfd4562eb50aa790fe3df4b41001076e7e31749badbf7",
+   "bytes": 59444
+  },
+  "antena": {
+   "sha256": "29c2dc1910d2b123abf08182d4cefa71d8990c205897d09299c0710071d230b9",
+   "bytes": 15362
+  },
+  "brazo-der": {
+   "sha256": "c1217f16fcfca1a48ab6c975a835ff09b5400651543bd20464ea839f76249b27",
+   "bytes": 37757
+  },
+  "brazo-izq": {
+   "sha256": "77286e23e446392c5561799f5c902311fbd61d8777f0b8cf343e62ce38aac02f",
+   "bytes": 37615
+  },
+  "cuerpo": {
+   "sha256": "7f81fe996db05587643a8958455e21f65723ca6e17fa2e59170aa35a521d0796",
+   "bytes": 479527
+  },
+  "mano-der-abierta": {
+   "sha256": "490a2dee25dadf0d4dd1392a66cecf74838f9e5c89a07cdb23f2b0fbddb63fd0",
+   "bytes": 155968
+  },
+  "mano-der-palma": {
+   "sha256": "e55b63b2f5c9935e80073100d65aacb19bc2b76275f7e0f77f5b1a667d8fb7a1",
+   "bytes": 56099
+  },
+  "mano-der-puno": {
+   "sha256": "94b1c0ed9b32cfeb981c63ded2a3009d180550bf1d4939d8f5684573e6063255",
+   "bytes": 117869
+  },
+  "mano-der-senala": {
+   "sha256": "f5a7a924605ae2470e3ca4bfb0d912acdc89203c91a4c713159bb97b1fc6d8eb",
+   "bytes": 113444
+  },
+  "mano-izq-abierta": {
+   "sha256": "023cb33c65e275de4b7a97ffab500679ce355ba677c5eb94e0a4af0feb330079",
+   "bytes": 155874
+  },
+  "mano-izq-palma": {
+   "sha256": "b155ff312c903850b5a61dbd067dba2b068103132582fc91d433da8d1d4c23ec",
+   "bytes": 56331
+  },
+  "mano-izq-puno": {
+   "sha256": "f04d8ce9a206cfe9a7a76437cc2577c997b3237bd0d1893b687367c800cfd82c",
+   "bytes": 117847
+  },
+  "mano-izq-senala": {
+   "sha256": "325138933a731fcadc38f1c3dbdb4e53afbca1d4cd45c6b2b1264b7fd711725a",
+   "bytes": 113446
+  }
+ },
+ "webBytesPorLinea": {
+  "brand": 230556,
+  "engine": 229452,
+  "growth": 230486,
+  "revenue-hubspot": 229912,
+  "revenue-salesforce": 230020,
+  "voice": 230700
+ }
+}

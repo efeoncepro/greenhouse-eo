@@ -893,6 +893,9 @@ Domain: `cost_intelligence`. Canonical source of truth for the commercial state 
 | `insight_delivery_intent` | `insights.delivery.requested` (TASK-1848) | `efeonce-insights/events.ts` (from `requestInsightDelivery`; también al re-encolar fallidos con `retryInsightDelivery`) | `{ version: 1, deliveryIntentId, editionId, organizationId, modality, recipientCount, reason: 'initial' \| 'retry', actorKind }` — sin direcciones de correo | Projection `insights_delivery_dispatch` (lane `ops-reactive-notifications`) → `dispatchInsightDeliveryIntent` |
 | `insight_schedule` | `insights.schedule.changed` (TASK-1848) | `efeonce-insights/events.ts` (commands de recurrencia y pausas del tick) | `{ version: 1, scheduleId, organizationId, state, scheduleVersion, reason?, actorKind }` — `reason` cuando pausa el sistema | Audit |
 | `insight_schedule` | `insights.schedule.occurrence_generated` (TASK-1848) | `efeonce-insights/events.ts` (from `runInsightSchedulesTick`) | `{ version: 1, occurrenceId, scheduleId, organizationId, periodStart, periodEndExclusive, editionId, renderRunId }` | Audit; futura notificación de borrador listo (TASK-1849) |
+| `brand_render_request` | `brand.render.requested` (TASK-1921) | `brand-surfaces/production/events.ts` (from `insertBrandRenderRequest`, misma tx que el INSERT del pedido y sus jobs; sólo si el pedido es nuevo) | `{ version: 1, requestId, organizationId, family, jobs: [{ jobId, catalogName, manifestHash }], actorKind }` — nunca el intent, el plan, nombres de fuentes, bytes ni URLs | Audit; el despacho lee la tabla (ops-worker `/artifact-render/dispatch`) |
+| `brand_render_request` | `brand.render.job_completed` (TASK-1921) | `brand-surfaces/production/store.ts` (`transitionJob`, misma tx; lo dispara el worker vía `markBrandRenderJobCompleted`) | `{ version: 1, requestId, jobId, organizationId, catalogName, state, attempts, failureCode: null, outputAssetIds }` — ids, nunca bytes ni URL | Audit |
+| `brand_render_request` | `brand.render.job_failed` (TASK-1921) | `brand-surfaces/production/store.ts` (`transitionJob`; sólo al llegar a `dead_letter`, un reintento no emite) | `{ version: 1, requestId, jobId, organizationId, catalogName, state, attempts, failureCode, outputAssetIds: [] }` | Audit; la señal `brand.render.stuck_job` lee la tabla, no el evento |
 | `insight_cover_preference` | `insights.cover_preference.updated` (TASK-1888) | `efeonce-insights/events.ts` (`setInsightCoverPreference`) | `{ version: 1, organizationId, coverTheme, previousCoverTheme, actorKind }` — sólo si el valor cambió | Audit |
 
 Invariants:
@@ -1516,3 +1519,14 @@ dominio — `src/lib/growth/seo/work-queue/contracts.ts:169-170` — y **no** en
 mismo seam de extracción a Wave (arquitectura SEO §17.3) que los eventos de TASK-1303/1308/1664/1662.
 
 Contrato completo del aggregate: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §18.
+
+## TASK-1863 — eventos AEO por mercado (implementación local)
+
+| Evento | Aggregate | Payload | Entrega |
+| --- | --- | --- | --- |
+| `growth.ai_visibility.market_configured` | growth_ai_visibility_profile | version, profileId, actor, action, marketId/set cuando corresponda | Outbox en la transacción de configuración; auditoría, sin efectos externos |
+| `growth.ai_visibility.run_batch.requested` | growth_ai_visibility_run_batch | version, batchId, organizationId, marketIds, runIds, actor | Outbox en la misma transacción de los N runs; observabilidad |
+| `growth.ai_visibility.profile_reconciled` | growth_ai_visibility_profile | version, organizationId, retainedProfileId, archivedProfileIds, actor | Sólo CLI apply explícito; histórico de runs intacto |
+
+Se conserva además `growth.ai_visibility.run.requested` por run. No se introducen consumers de correo,
+CRM ni publicación para estos eventos. El worker sigue reclamando la cola canónica de grader_runs.

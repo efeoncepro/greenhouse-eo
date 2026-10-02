@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-09-23T12:27:57.795Z",
+  "generatedAt": "2026-10-01T22:00:23.171Z",
   "run": "ai-generations/2026-07-17_anam-revops-cover-v2",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-17_anam-revops-cover-v2",

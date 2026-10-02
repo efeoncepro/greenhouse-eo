@@ -1,16 +1,16 @@
 # Efeonce Marketing Studio — Runtime handoff
 
 > **Tipo:** runbook operativo
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-09-26 por Claude (TASK-1896: observabilidad y restauración)
+> **Última actualización:** 2026-09-26 por Claude (cierre en producción de TASK-1893 y TASK-1896)
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Gateway MCP:** [EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md](../EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 > **Repo de código:** `efeoncepro/efeonce-marketing-studio` (privado, rama `main`, local en `~/Documents/efeonce-marketing-studio`)
 
 Este documento dice **cómo operar** Studio. El porqué y los contratos viven en la arquitectura; no se repiten acá.
 
-## Estado vivo (2026-09-25)
+## Estado vivo (2026-09-26)
 
 | Pieza | Estado |
 |---|---|
@@ -22,7 +22,9 @@ Este documento dice **cómo operar** Studio. El porqué y los contratos viven en
 | Acceso | `STUDIO_ACCESS_MODE=open` (lectura sin login, noindex). `efeonce_id` falla cerrado hasta TASK-1898 |
 | Bearer de servicio | Cliente del gateway en producción (secreto `marketing-studio-mcp-gateway-token`, organización Efeonce) |
 | Provider MCP | Encendido en producción desde 2026-09-26: gateway `958c9de30` (`00061-sbc`), `MARKETING_STUDIO_PROVIDER_ENABLED=true`, canary MCP real verde (TASK-1891) |
-| Greenhouse | Capability `marketing_studio.campaign.read` y cliente de canje `efeonce-mcp-marketing-studio` migrados; el manual y el canje llegan a producción con el próximo release de Greenhouse |
+| Greenhouse | Capabilities `marketing_studio.campaign.read` y `marketing_studio.asset.download`, cliente de canje y manual en producción; señal `platform.marketing_studio.health` + aviso Teams «EO - Admin» desde el release `92002873ced9` (2026-09-26) |
+| Originales y worker (TASK-1893) | En producción desde 2026-09-26: buckets de originales, worker `marketing-studio-media-worker` (`00001-sgb`) y `-staging` (`00002-svt`), 30 versiones en `gcs` por ambiente (24 de CMP-002 siguen en OneDrive, sin sha256), descarga ON sólo en production, readback de Metricool activo |
+| Observabilidad y restauración (TASK-1896) | En producción desde 2026-09-26: Sentry, uptime con email, health profundo, `studio.ops_run`, ensayo verde contra `marketing_studio` y scheduler mensual activo |
 
 ## Recursos
 
@@ -46,10 +48,10 @@ Este documento dice **cómo operar** Studio. El porqué y los contratos viven en
 | `marketing-studio-pg-migrator-password` | contraseña del migrador (CLI del operador) | operador |
 | `marketing-studio-mcp-gateway-token` | token `mst_…` del `api_client` del gateway en producción (v1, scalar crudo, organización Efeonce) | `efeonce-mcp-gateway@efeonce-group.iam.gserviceaccount.com` (`roles/secretmanager.secretAccessor`); se monta en el gateway sólo con el flag ON |
 | `axis-packages-read-token` | `.npmrc` completo con token de lectura del registro AXIS | operador; a Vercel va sólo el `_authToken` |
-| `marketing-studio-sentry-dsn` | DSN del proyecto Sentry `efeonce-marketing-studio` (TASK-1896, **pendiente de crear**) | Vercel (`SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`) y `marketing-studio-restore@` |
-| `marketing-studio-sentry-auth-token` | token de org para subir source maps (TASK-1896, pendiente) | Vercel (`SENTRY_AUTH_TOKEN`, encrypted) |
-| `marketing-studio-pg-restore-password` | contraseña del rol `marketing_studio_restore` (TASK-1896, pendiente; generada, nunca impresa) | `marketing-studio-restore@` |
-| `greenhouse-marketing-studio-health-token` | token `mst_…` con scope `studio:health` para la señal de Greenhouse (TASK-1896, pendiente) | `greenhouse-portal@` (Vercel de Greenhouse y ops-worker) |
+| `marketing-studio-sentry-dsn` | DSN del proyecto Sentry `efeonce-marketing-studio` (v1, 2026-09-26) | Vercel (`SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`) y `marketing-studio-restore@` |
+| `marketing-studio-sentry-auth-token` | token de org para subir source maps (**sin crear**, opcional; Follow-up de TASK-1896) | Vercel (`SENTRY_AUTH_TOKEN`, encrypted) |
+| `marketing-studio-pg-restore-password` | contraseña del rol `marketing_studio_restore` (TASK-1896; generada, nunca impresa) | `marketing-studio-restore@` |
+| `greenhouse-marketing-studio-health-token` | token `mst_…` con scope `studio:health` para la señal de Greenhouse (TASK-1896, en uso desde 2026-09-26) | `greenhouse-portal@` (Vercel de Greenhouse y ops-worker) |
 
 Publicar siempre como scalar crudo: `printf %s "$VALOR" | gcloud secrets versions add <secreto> --data-file=-`.
 
@@ -67,8 +69,8 @@ Publicar siempre como scalar crudo: `printf %s "$VALOR" | gcloud secrets version
 | `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` | — |
 | `STUDIO_MEDIA_URL_SECRET` | secreto HMAC de los enlaces de imagen (sensitive, ≥ 32 caracteres) | **uno distinto** por ambiente |
 | `NODE_AUTH_TOKEN` | `_authToken` del registro AXIS (encrypted) | igual |
-| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | DSN del proyecto Sentry (TASK-1896, pendiente) | igual (environment `preview` se deriva de `VERCEL_ENV`) |
-| `SENTRY_AUTH_TOKEN` | token de source maps (encrypted; sin él el build no sube nada) | igual |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | DSN del proyecto Sentry (configurado 2026-09-26) | igual (environment `preview` se deriva de `VERCEL_ENV`) |
+| `SENTRY_AUTH_TOKEN` | token de source maps (encrypted; **sin configurar**: el build no sube source maps) | igual |
 | `STUDIO_MEDIA_BUCKET` | `efeonce-marketing-studio-media` (sonda del health profundo; si falta se deduce de las renditions) | `efeonce-marketing-studio-media-staging` |
 
 Opcional: `STUDIO_PG_MAX_CONNECTIONS` (pool por instancia; por defecto 3 en Vercel, 5 fuera). Cambiar una variable
@@ -158,9 +160,12 @@ No imprimir `$TOKEN`. Si la ráfaga devuelve 500, revisar si los readers cayeron
 
 ## Originales y worker de medios (TASK-1893)
 
-Estado: **code complete, rollout pendiente**. Contrato: arquitectura §7.2. Todo lo de abajo está escrito como scripts
-idempotentes con dry-run por defecto; nada se aplicó todavía. Staging tiene la migración `1790409193629_media-originals`
-aplicada; producción no.
+Estado: **en producción desde 2026-09-26** (TASK-1893 complete). Contrato: arquitectura §7.2. Todo lo de abajo está
+escrito como scripts idempotentes con dry-run por defecto y ya se aplicó en staging y producción: migración
+`1790409193629` en ambas bases, buckets e IAM verificados (sin bindings públicos), worker `00001-sgb` (prod) y
+`00002-svt` (staging), notificación `OBJECT_FINALIZE` del prefijo `originals/`, schedulers ENABLED. Pendiente: 24
+imágenes de CMP-002 sin sha256 (siguen en OneDrive), federación de `studio.asset.download` en el gateway y costo real
+del primer mes.
 
 ### Recursos (por ambiente; staging con sufijo `-staging` / `-stg`)
 
@@ -192,12 +197,12 @@ tópico; agente de Pub/Sub → `pubsub.publisher` en la DLQ, `pubsub.subscriber`
 |---|---|---|
 | Vercel de Studio (production) | `STUDIO_ORIGINALS_BUCKET` | `efeonce-marketing-studio-originals` |
 | Vercel de Studio (preview + development) | `STUDIO_ORIGINALS_BUCKET` | `efeonce-marketing-studio-originals-staging` |
-| Vercel de Studio (todos) | `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` | `false` hasta el canary; luego `true` (primero preview) |
+| Vercel de Studio | `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` | production `true` desde 2026-09-26 (canary verde); preview `false` |
 | Vercel de Studio (opcional) | `STUDIO_DOWNLOAD_SIGNER_EMAIL` | por defecto `GCP_SERVICE_ACCOUNT_EMAIL` |
-| Cloud Run (SoT `apps/worker/deploy.sh`) | `MEDIA_WORKER_DERIVATIVES_ENABLED`, `MEDIA_WORKER_METRICOOL_READBACK_ENABLED`, `MEDIA_WORKER_ARCHIVE_TIERING_ENABLED` | `false` |
-| Cloud Run prod | `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | ref del secreto · `userId` de la pestaña API (falta) · `3961547,5105024` |
+| Cloud Run (SoT `apps/worker/deploy.sh`) | `MEDIA_WORKER_DERIVATIVES_ENABLED` · `MEDIA_WORKER_METRICOOL_READBACK_ENABLED` · `MEDIA_WORKER_ARCHIVE_TIERING_ENABLED` | `true` en staging y prod · `true` en prod, `false` en staging · `false` |
+| Cloud Run prod | `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | ref de `marketing-studio-metricool-api-token` (v1) · `3116862` · `3961547,5105024` (verificados) |
 
-Estos flags viven en el repo de Studio y no se leen en Greenhouse: no entran al ledger de flags de Greenhouse.
+Estos flags viven en el repo de Studio y no se leen en Greenhouse; su estado se refleja en `FEATURE_FLAG_STATE_LEDGER.md` para que sea visible, pero la fuente de verdad sigue siendo Vercel de Studio y `apps/worker/deploy.sh`.
 
 ### Secuencia de rollout (en orden)
 
@@ -245,10 +250,15 @@ Verificación de datos: `SELECT storage_provider, count(*) FROM studio.asset_ver
 `SELECT kind, count(*) FROM studio.asset_rendition GROUP BY 1;` ·
 `SELECT kind, status, error_code, started_at FROM studio.worker_run ORDER BY started_at DESC LIMIT 20;`
 
-### Dry-run de la ingesta (2026-09-26, staging)
+### Ingesta (2026-09-26, staging y producción)
 
-54 versiones: `to_upload` 30, `unverifiable` 24 (las 24 imágenes de CMP-002 no traen sha256 en el catálogo), `drift` 0,
-`rejected` 0, `missing_local` 0, `dedup` 0. Para ingestarlas: regenerar el catálogo del Campaign Manager con la huella
+Dry-run en ambos ambientes, 54 versiones: `to_upload` 30, `unverifiable` 24 (las 24 imágenes de CMP-002 no traen
+sha256 en el catálogo), `drift` 0, `rejected` 0, `missing_local` 0, `dedup` 0. Apply en ambos: 30 subidas, 30
+enlazadas, 0 fallidas; re-run en staging: 0 subidas, `already_gcs` 30. El worker procesó 30 `original_finalized` por
+ambiente (más reintentos esperados `media_object_pending`: 25 staging, 27 prod), DLQ 0; renditions `thumb` 54,
+`preview` 54, `poster` 4, `crop_1x1` 11, `crop_16x9` 5, `crop_4x5` 2. Barrido probado en staging (`repaired 1`).
+Canary de descarga en producción verde (200 con URL de 10,0 min, 403 anónimo, 404 ajena, 404 `original_not_stored`,
+`audit_event` registrado). Readback de Metricool: 6 candidatos, 5 observados, 2 publicados, 1 `not_found`. Para ingestarlas: regenerar el catálogo del Campaign Manager con la huella
 de esas piezas y reimportar (el import la adopta en la misma versión), luego volver a correr la ingesta.
 
 ### Rollback
@@ -291,7 +301,13 @@ El CNAME en `studio` no afecta el correo (MX, `autodiscover` y SPF de Outlook vi
 
 ## Observabilidad y restauración (TASK-1896)
 
-Estado: **code complete, rollout pendiente**. Contrato en la arquitectura §9; restauración en
+Estado: **en producción desde 2026-09-26** (TASK-1896 complete): proyecto Sentry `efeonce-marketing-studio` (id
+`4512153019809792`, creado por la UI porque la API de la org no permite crear proyectos), uptime check
+`studio-api-v1-health-A2vbXH5AjzI` con política `17467591732187545239` y email a `jreyes@efeoncepro.com`, ensayo verde
+contra `marketing_studio` y scheduler `marketing-studio-restore-rehearsal` ENABLED, señal de Greenhouse con scheduler
+`ops-marketing-studio-health-watch` ENABLED. El paso 4 de `sentry.sh` (reglas de alerta) no aplica: Sentry movió las
+alertas de issues a Workflows y `/projects/.../rules/` responde 404; queda el workflow por defecto de alta prioridad
+(portarlo es Follow-up de TASK-1896). Contrato en la arquitectura §9; restauración en
 [`MARKETING_STUDIO_RESTORE_RUNBOOK.md`](MARKETING_STUDIO_RESTORE_RUNBOOK.md). Toda la infraestructura vive como scripts
 idempotentes del repo Studio, **dry-run por defecto** (`--apply` ejecuta):
 
@@ -340,4 +356,5 @@ Rollback: DSN vacío en Vercel + redeploy (Sentry); `pnpm migrate down` de `ops_
 - **Fechas de Postgres.** El parser de `DATE` (OID 1082) devuelve string; formatear fechas sin hora en UTC y horas con `hourCycle: 'h23'`.
 - **Constantes compartidas.** Un Server Component no puede importar constantes desde un módulo `'use client'`. La cookie del tema vive en `components/theme.ts`.
 - **`next dev` reescribe archivos.** Genera `apps/web/AGENTS.md`/`CLAUDE.md` (commiteados) y reescribe `next-env.d.ts`: no commitear la variante de dev.
+- **`GRANT CONNECT` lo da el dueño de la base.** Para los roles `marketing_studio_restore` y `marketing_studio_worker` el `GRANT CONNECT` debe correrlo `marketing_studio_migrator` (dueño de las bases), no el admin de la instancia; los scripts de Studio ya lo hacen así (`f9e6cbb`, `82aeab6`).
 - **Gate de versión del gateway.** Mide la superficie construida con todos los providers habilitados: un provider nuevo debe declararse en `src/surface.ts` y en el test de cobertura de políticas, o sus tools quedan fuera de la cuenta.
