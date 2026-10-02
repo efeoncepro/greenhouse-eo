@@ -449,8 +449,15 @@ valor inicial lo fija el agente en Discovery con los datos reales de Berel y Sky
      (magnitudes ≥10× en un eje sin `perDimension`). El puntaje por dimensión ordena último en tesis y esenciales.
   2. El Grader puntúa `competitive_sov` = 100 sin competidores (marca / (marca + 0)) y esa dimensión pesa 15 % del puntaje
      global. El adapter (`aeo_report_adapter_v2`) ya no emite la dimensión en ese caso y ahora tampoco el puntaje global
-     (límite propio «Puntaje de visibilidad en IA: sin datos suficientes»). Medido 2026-10-02: 10 de 50 runs con
-     competidores vacíos y la dimensión en 100; 9 entregados como informe público (Berel dos veces).
+     (límite propio «Puntaje de visibilidad en IA: sin datos suficientes»). Verificado 2026-10-02 con tres subagentes
+     adversariales (código + base, sólo lectura): 10 de 50 filas de `grader_scores` (10 runs) con competidores vacíos y la
+     dimensión en 100; inflan el global entre +9,8 y +13,3 puntos frente a excluirla y redistribuir su peso. 9 tienen
+     informe público publicado, pero sólo 1 consta como enviado (Berel run 49, 2026-09-04); los 4 «restantes» son runs de
+     smoke, no prospectos. Causa más frecuente: la lista de competidores estaba vacía (Berel ×2, Vercel, Banco de Chile)
+     o el set de competidores del mercado nació sin miembros (Efeonce CO/MX/PE, aunque el perfil declara 4). Segunda
+     fuente de inflación, aun CON competidores: la fórmula compara menciones de marca contra competidores DISTINTOS
+     (Sky 2026-09-28: dimensión 66,7 vs ~30,8 por menciones); por eso Insights no debe usar esa dimensión como Share of
+     Voice.
 - Vista previa regenerada con datos reales: Berel abre con «El mayor cambio fue en clics orgánicos: de 10.662 a 9.377
   (-12,1 %)» y «Lo esencial» trae las impresiones; validación y gate sin hallazgos para Berel y Sky.
 
