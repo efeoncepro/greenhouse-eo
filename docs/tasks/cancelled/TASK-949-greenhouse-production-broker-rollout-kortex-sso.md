@@ -8,13 +8,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `cancelled`
+- Cancelled date: `2026-10-02`
+- Cancelled by: `Operador`
+- Cancellation reason: `Kortex fue pausado; no se ejecutará el rollout productivo de SSO desde el backlog de Greenhouse.`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Cancelada por pausa de Kortex`
 - Rank: `TBD`
 - Domain: `identity|platform|ops`
 - Blocked by: `TASK-948`
@@ -99,8 +102,8 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-949-greenhouse-production-broker-rollout-kortex-sso.md`
-- `docs/tasks/in-progress/TASK-948-greenhouse-identity-broker-kortex-sso.md`
+- `docs/tasks/cancelled/TASK-949-greenhouse-production-broker-rollout-kortex-sso.md`
+- `docs/tasks/cancelled/TASK-948-greenhouse-identity-broker-kortex-sso.md`
 - `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
 - `docs/documentation/plataforma/sister-platform-bindings.md`

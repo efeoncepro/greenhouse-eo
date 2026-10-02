@@ -608,7 +608,7 @@ Este carril es aditivo. No autoriza cambios al SSO existente de Greenhouse, SCIM
 
 ### 15.3 Estado V1
 
-Kortex fue el primer consumer de este carril. TASK-1454 generalizó la elegibilidad mediante `SisterPlatformOAuthPolicy` validada por client y añadió Globe como segundo consumer internal-only, sin condicionales por producto en el broker. La implementación Kortex y su rollout independiente siguen en `docs/tasks/in-progress/TASK-948-greenhouse-identity-broker-kortex-sso.md`.
+Kortex fue el primer consumer de este carril. TASK-1454 generalizó la elegibilidad mediante `SisterPlatformOAuthPolicy` validada por client y añadió Globe como segundo consumer internal-only, sin condicionales por producto en el broker. La implementación Kortex se conserva apagada y su rollout fue cancelado al pausar el producto; el registro histórico vive en `docs/tasks/cancelled/TASK-948-greenhouse-identity-broker-kortex-sso.md`.
 
 El piloto Globe usa authorization code + PKCE S256, redirect exacto, consumo atómico one-time, claims mínimos sin roles Greenhouse y revocación explícita/convergente. La identidad de workload es un plano separado: Vercel OIDC → WIF → service-account impersonation → Google ID token de audience exacto para Cloud Run. Ningún plano admite service-account JSON keys.
 

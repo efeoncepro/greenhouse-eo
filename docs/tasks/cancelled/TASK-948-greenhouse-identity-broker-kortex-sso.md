@@ -2,20 +2,23 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `cancelled`
+- Cancelled date: `2026-10-02`
+- Cancelled by: `Operador`
+- Cancellation reason: `Kortex fue pausado; el broker implementado se conserva apagado y no continuará a rollout ni smoke desde esta task.`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Implementation complete; staging rollout/smoke pending`
+- Status real: `Cancelada por pausa de Kortex; implementación preservada, rollout no autorizado`
 - Rank: `TBD`
 - Domain: `identity|platform|ops`
 - Blocked by: `none`
 - Branch: `develop` (operator override: no branch switch)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
-- Cross-ref: `TASK-413` (password identity bridge hardening), `TASK-884`/`TASK-885` (ecosystem access control plane + Kortex capability catalog)
+- Cross-ref: `TASK-413` (cancelled; password identity bridge hardening), `TASK-884`/`TASK-885` (ecosystem access control plane + Kortex capability catalog)
 
 ## Summary
 
@@ -87,7 +90,7 @@ Reglas obligatorias:
 - `docs/documentation/identity/sistema-auth-resiliente.md`
 - `docs/documentation/identity/sistema-identidad-roles-acceso.md`
 - `docs/documentation/plataforma/sister-platform-bindings.md`
-- `docs/tasks/to-do/TASK-413-kortex-identity-bridge-hardening.md`
+- `docs/tasks/cancelled/TASK-413-kortex-identity-bridge-hardening.md` (cancelada al pausar Kortex)
 - Sibling runtime reference: `../dev/kortex/apps/web/src/libs/auth.ts`
 - Sibling runtime reference: `../dev/kortex/services/agent/kortex_agent/card_api.py`
 
@@ -104,7 +107,7 @@ Reglas obligatorias:
 
 - Kortex operator login with Greenhouse Microsoft SSO.
 - Future sister-platform SSO lane for Verk or other peer systems.
-- TASK-413 should remain as hardening of the legacy/password lane, not the primary login direction.
+- TASK-413 was cancelled when Kortex was paused; no legacy/password hardening lane remains in the active backlog.
 
 ### Files owned
 
@@ -121,7 +124,7 @@ Reglas obligatorias:
 - `src/lib/reliability/queries/sister-platform-oauth-signals.ts` — NEW
 - `src/lib/reliability/get-reliability-overview.ts`
 - `src/lib/reliability/registry.ts`
-- `docs/tasks/in-progress/TASK-948-greenhouse-identity-broker-kortex-sso.md`
+- `docs/tasks/cancelled/TASK-948-greenhouse-identity-broker-kortex-sso.md`
 - Sibling Kortex repo: `../dev/kortex/apps/web/src/libs/auth.ts`
 - Sibling Kortex repo: `../dev/kortex/apps/web/src/app/login/*`
 
@@ -194,7 +197,7 @@ Reglas obligatorias:
 - Enable in staging for Kortex only.
 - Run manual browser smoke Kortex -> Greenhouse Microsoft SSO -> Kortex dashboard.
 - Update functional documentation and operator runbook.
-- Decide whether TASK-413 remains open only for password lane hardening or is superseded by a follow-up deprecation task.
+- TASK-413 was cancelled on `2026-10-02`; any future password-lane work requires fresh intake after Kortex reactivation.
 
 ## Out of Scope
 

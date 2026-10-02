@@ -6,13 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `cancelled`
+- Cancelled date: `2026-10-02`
+- Cancelled by: `Operador`
+- Cancellation reason: `Kortex fue pausado; se retira completa la task mixta Kortex/Verk del backlog. Cualquier lane futura de Verk requiere una task nueva sin dependencia Kortex.`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Cancelada por pausa de Kortex`
 - Rank: `TBD`
 - Domain: `ui|identity|platform`
 - Blocked by: `TASK-888`

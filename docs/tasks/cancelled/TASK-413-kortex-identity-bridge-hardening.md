@@ -8,12 +8,15 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `cancelled`
+- Cancelled date: `2026-10-02`
+- Cancelled by: `Operador`
+- Cancellation reason: `Kortex fue pausado; el hardening del bridge legacy sale del backlog activo.`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cancelada por pausa de Kortex`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`

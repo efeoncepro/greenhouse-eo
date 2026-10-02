@@ -7,12 +7,15 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `cancelled`
+- Cancelled date: `2026-10-02`
+- Cancelled by: `Operador`
+- Cancellation reason: `Kortex fue pausado; no se mantiene un bridge Kortex pendiente en el backlog de Greenhouse.`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `policy`
-- Status real: `Diseno`
+- Status real: `Cancelada por pausa de Kortex`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `TASK-375`, `TASK-376`
@@ -78,7 +81,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-377-kortex-operational-intelligence-bridge.md`
+- `docs/tasks/cancelled/TASK-377-kortex-operational-intelligence-bridge.md`
 - `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
 

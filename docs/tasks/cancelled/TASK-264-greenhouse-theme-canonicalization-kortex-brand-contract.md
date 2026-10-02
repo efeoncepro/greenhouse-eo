@@ -7,12 +7,15 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `cancelled`
+- Cancelled date: `2026-10-02`
+- Cancelled by: `Operador`
+- Cancellation reason: `Kortex fue pausado; el umbrella deja de pertenecer al backlog activo de Greenhouse.`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `umbrella`
-- Status real: `Descompuesta en sub-tasks`
+- Status real: `Cancelada; las sub-tasks ya cerradas permanecen como historia`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -139,7 +142,7 @@ Reglas obligatorias:
 - `src/configs/themeConfig.ts`
 - `src/config/greenhouse-nomenclature.ts`
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
-- `docs/tasks/to-do/TASK-264-greenhouse-theme-canonicalization-kortex-brand-contract.md`
+- `docs/tasks/cancelled/TASK-264-greenhouse-theme-canonicalization-kortex-brand-contract.md`
 
 ## Current Repo State
 

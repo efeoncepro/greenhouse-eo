@@ -2,6 +2,8 @@
 
 **Kortex hibernado + corte FinOps (02/10):** desde `2026-10-02T13:44:27Z`, Vercel pausado, Cloud Run internal/IAM/min0,
 Cloud Tasks pausado/0 y `kortex-pg-dev` `STOPPED/NEVER`; no ejecutar adapter, smokes ni deploys para despertarlo.
+Backlog Kortex retirado: `TASK-264/377/413/889/948/949` pasaron a `cancelled` por la pausa; ya no queda ninguna
+task explícita de Kortex en `to-do` ni `in-progress`. Una reactivación requiere intake y tasks nuevas.
 Septiembre observado: CLP 10.480,64 netos. Residual Kortex ~CLP 3.500/mes y total GCP CLP 237.068,14/mes
 (rango 230k–245k) son **modelos**, no ahorro realizado; confirmar con ventanas post-corte. [Runbook](docs/architecture/kortex/operations/runbook.md) · [auditoría](docs/audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
 
