@@ -1,0 +1,109 @@
+{
+  "schema": "efeonce.foto.cine-recetas.v1",
+  "nota": "Fotos cine aprobadas por el operador, desde las que se parte con `pnpm foto:cine:nueva --desde <id>`. Casebook: docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md. `isotipoPintado: true` = la foto aprobada lleva el isotipo compuesto plano (casebook, falla 8): sirve como receta de luz, encuadre y escena, no de bordado.",
+  "recetas": [
+    {
+      "id": "NX7d",
+      "ficha": "ai-generations/2026-10-01_traje-bionico-nexa/fichas/NX7d-nexa-despliega-squad.json",
+      "plate": "ai-generations/2026-10-01_traje-bionico-nexa/plates/NX7d-nexa-despliega-squad.png",
+      "formato": "16:9",
+      "alcance": "nexa",
+      "protagonista": "Nexa con el traje biónico + dos Sparks con referencia",
+      "porque": "Un núcleo de luz del tamaño de un puño a ~30 cm de la cara como única llave, sin relleno; tres planos con distancia (cerca, ~1 m, 4–6 m); un Spark posado en el hombro; luces prácticas grandes en bokeh al fondo.",
+      "ojo": "Columna de texto 0,38 y lecho 2,98:1: como pieza con titular, Nexa cerca del 70 % del ancho y consola en negro mate."
+    },
+    {
+      "id": "NX5b",
+      "ficha": "ai-generations/2026-09-26_deck-nexa/fichas/NX5-nexa-bionica-lentes-cintura.json",
+      "plate": "ai-generations/2026-09-26_deck-nexa/plates/NX5b-nexa-bionica-isotipo.png",
+      "formato": "16:9",
+      "alcance": "proposal-cinematic",
+      "protagonista": "Nexa con el traje biónico",
+      "porque": "Llave dura nombrada con lado («a hard key light from the left sculpts her face»), un objeto junto al lente fuera de foco, una hilera de luces de partida en bokeh; proporciones con marcadores.",
+      "ojo": "Los robots de esta foto son anteriores a los Sparks: no se copian."
+    },
+    {
+      "id": "NX6b",
+      "ficha": "ai-generations/2026-09-26_deck-nexa/fichas/NX6-nexa-cinco-orbitas.json",
+      "plate": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+      "formato": "16:9",
+      "alcance": "deck-portada",
+      "protagonista": "Nexa con la softshell del kit",
+      "porque": "La órbita es la única luz y modela a la persona; reserva del 45 % izquierdo limpia; lecho de mesa fuera de la luz.",
+      "isotipoPintado": true
+    },
+    {
+      "id": "AE2b",
+      "ficha": "ai-generations/2026-09-26_deck-aeo/fichas/AE2-la-ia-te-elige-foco.json",
+      "plate": "ai-generations/2026-09-26_deck-aeo/plates/AE2b-la-ia-te-elige-isotipo.png",
+      "formato": "16:9",
+      "alcance": "proposal-cinematic",
+      "protagonista": "Estratega SEO con el polo",
+      "porque": "El fenómeno ES el servicio: un haz elige UNA tarjeta entre miles y el resto queda en oscuridad.",
+      "isotipoPintado": true,
+      "ojo": "El polo salió azul rey."
+    },
+    {
+      "id": "SE1",
+      "ficha": "ai-generations/2026-09-28_deck-seo-aeo/fichas/SE1-te-encuentran.json",
+      "plate": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+      "formato": "16:9",
+      "alcance": "proposal-cinematic",
+      "protagonista": "Estratega SEO con el polo",
+      "porque": "Un mapa de luz con núcleo de entidad y su órbita: estructura, autoridad y entidad como luz.",
+      "isotipoPintado": true,
+      "ojo": "El anillo quedó a la altura de la frente: en vertical rompería la reserva."
+    },
+    {
+      "id": "RV1b",
+      "ficha": "ai-generations/2026-09-26_deck-revops/fichas/RV1-motor-de-revenue.json",
+      "plate": "ai-generations/2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png",
+      "formato": "16:9",
+      "alcance": "proposal-cinematic",
+      "protagonista": "Líder RevOps con la softshell",
+      "porque": "La fuente (el moño de luz) está en la mano y modela a la persona.",
+      "isotipoPintado": true,
+      "ojo": "Lleva robots genéricos anteriores a los Sparks: no se copian."
+    },
+    {
+      "id": "CR4",
+      "ficha": "ai-generations/2026-09-28_portada-creativa/fichas/CR4-el-squad-te-la-entrega-v2.json",
+      "plate": "ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png",
+      "formato": "16:9",
+      "alcance": "deck-portada",
+      "protagonista": "Directora creativa con el hoodie",
+      "porque": "La pieza nace del squad al fondo y llega a sus manos: el fenómeno cuenta el servicio; bordado generado desde el kit.",
+      "ojo": "Nunca usar CR4-…-v2-isotipo.png: tiene un rectángulo de la limpieza que borra la cinta de luz."
+    },
+    {
+      "id": "SP2b",
+      "ficha": "ai-generations/2026-09-27_secciones-partidas/fichas/SP2b-dias-no-meses.json",
+      "plate": "ai-generations/2026-09-27_secciones-partidas/plates/SP2b-dias-no-meses-isotipo.png",
+      "formato": "1:1",
+      "alcance": "deck-seccion",
+      "protagonista": "Director creativo con el polo",
+      "porque": "Sección partida: sujeto cerca del 70 %, reserva del 35 % izquierdo donde sube el indicador de la órbita, luz dramática.",
+      "isotipoPintado": true
+    },
+    {
+      "id": "SP1",
+      "ficha": "ai-generations/2026-09-27_secciones-partidas/fichas/SP1-la-ia-te-cita.json",
+      "plate": "ai-generations/2026-09-27_secciones-partidas/plates/SP1-la-ia-te-cita.png",
+      "formato": "1:1",
+      "alcance": "deck-seccion",
+      "protagonista": "Cliente (persona ilustrativa, su ropa, sin marca Efeonce)",
+      "porque": "La luz del teléfono como llave desde abajo y un rim azul: el cliente en su momento de logro, nunca en su dolor.",
+      "ojo": "Sólo en la sección partida con el panel a la derecha."
+    },
+    {
+      "id": "WB1c",
+      "ficha": "ai-generations/2026-09-26_deck-web/fichas/WB1-web-para-todos.json",
+      "plate": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png",
+      "formato": "16:9",
+      "alcance": "proposal-cinematic",
+      "protagonista": "Desarrollador con el polo",
+      "porque": "El polo del kit editado con su receta y el emblema bordado en el pecho: el modelo de cómo corregir un isotipo pintado.",
+      "ojo": "Receta de edición en ai-generations/2026-09-26_deck-web/fichas/WB1c/LEEME.md."
+    }
+  ]
+}

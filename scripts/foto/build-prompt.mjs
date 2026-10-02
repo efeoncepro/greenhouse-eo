@@ -2415,6 +2415,121 @@ export const validarTrajeNexa = ficha => {
   return true
 }
 
+// ── Registro cine: el oficio en la ficha (casebook, 2026-10-02) ─────────────────────────────────────
+// Ninguna sesión llegaba sola a una foto cine aprobable: las mismas diez fallas, consultadas una y otra vez
+// (`docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md`). Estos campos vuelven explícito lo que
+// las fichas aprobadas tenían en prosa. TODO lo de abajo actúa SÓLO con `registro: "cine"`: el prompt de los demás
+// registros no cambia en un solo byte (`scripts/foto/regresion-prompt.mjs` lo verifica sobre todas las fichas).
+export const ALCANCES_CINE = [
+  'nexa',
+  'proposal-cinematic',
+  'deck-seccion',
+  'deck-portada',
+  'manzanitas',
+  'social-nexa',
+  'publicidad-prueba'
+]
+
+// Objetos que son PERSONAJES (criaturas, mascotas): cada referencia de estudio dice «Reproduce EXACTLY» y el
+// modelo copia también su nitidez, su tamaño y su luz pareja — con muchos, salen stickers en abanico (NX7b: 10
+// referencias; NX7d, aprobada: dos Sparks con referencia y el resto sin imagen, lejos y desenfocados).
+export const esObjetoPersonaje = clave =>
+  /^spark/.test(clave) || ['clawd', 'codex', 'gigi', 'gigi-aeo', 'sprocket-hubspot'].includes(clave)
+
+export const MAX_PERSONAJES_CINE = 2
+const FORMATOS_VERTICALES = ['4:5', '9:16']
+
+const clavesDeObjetos = ficha =>
+  (ficha.objetos ?? []).map(o => (typeof o === 'string' ? o : o?.objeto)).filter(Boolean)
+
+export const auditarCine = ficha => {
+  if (ficha.registro !== 'cine') return []
+
+  const avisos = []
+  const ref = 'docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md'
+
+  if (!ficha.alcance) {
+    avisos.push(
+      `falta \`alcance\` (${ALCANCES_CINE.join(' · ')}). El cine sólo vive en esos casos; declararlo obliga a mirar el §2 del registro antes de gastar (casebook, falla 10).`
+    )
+  } else if (ficha.alcance === 'publicidad-prueba') {
+    avisos.push('`alcance: publicidad-prueba`: la publicidad cine con personas del equipo está EN PRUEBA; la pieza no se publica sin aprobación del operador.')
+  }
+
+  if (!ficha.llave) {
+    avisos.push('falta `llave` (fuente, lado, distancia): sin una sola fuente dura con lado y SIN relleno, la cara sale plana (casebook, falla 2).')
+  }
+
+  if (!ficha.primerPlano) {
+    avisos.push('falta `primerPlano`: sin algo real junto al lente, todo cae en un solo plano y no se siente cine (casebook, falla 3).')
+  }
+
+  if (!ficha.fondo) {
+    avisos.push('falta `fondo`: las luces prácticas grandes y frías en bokeh son las que dan escala (casebook, falla 3).')
+  }
+
+  if (!ficha.fenomeno?.que) {
+    avisos.push('falta `fenomeno.que`: el fenómeno de luz es la idea de la foto cine (casebook, falla 4).')
+  } else if (!ficha.fenomeno.esServicio || String(ficha.fenomeno.esServicio).trim().length < 8) {
+    avisos.push('falta `fenomeno.esServicio`: una frase que diga por qué la luz ES el servicio. Si sin la luz la idea sigue en pie, la luz sobra (casebook, falla 4).')
+  }
+
+  const personajes = clavesDeObjetos(ficha).filter(esObjetoPersonaje)
+
+  if (personajes.length > MAX_PERSONAJES_CINE) {
+    avisos.push(
+      `${personajes.length} personajes con referencia propia (${personajes.join(', ')}; máximo ${MAX_PERSONAJES_CINE}). Cada referencia sale nítida, del mismo tamaño y con luz propia: stickers en abanico. Deja con referencia sólo los del plano cercano; el resto, sin imagen, «the same figures as the references», lejos y desenfocado (casebook, falla 1; NX7b → NX7d).`
+    )
+  }
+
+  if (avisos.length) avisos.push(`casebook: ${ref} · revisión antes de gastar: agente \`cine-reviewer\`.`)
+
+  return avisos
+}
+
+const textoLlave = llave => {
+  if (typeof llave === 'string') return llave
+
+  return [llave.fuente, llave.lado, llave.distancia, llave.tamano].filter(Boolean).join(', ')
+}
+
+// El bloque se compila desde los campos; nunca se escribe a mano. Va después de la escena y antes del lecho.
+export const bloqueCine = (ficha, formato) => {
+  if (ficha.registro !== 'cine') return null
+
+  const partes = []
+
+  if (ficha.llave) {
+    partes.push(
+      `KEY LIGHT: ${textoLlave(ficha.llave)}. It is the ONLY key light: NO fill light, NO front light. The far side of the face falls into deep shadow and the nose shadow is legible on the cheek.`
+    )
+  }
+
+  if (ficha.primerPlano) {
+    partes.push(
+      `DEPTH: in the immediate foreground, very close to the lens, ${ficha.primerPlano}, soft and out of focus. The subject is razor sharp; everything behind recedes into progressively softer focus.`
+    )
+  }
+
+  if (ficha.fondo) partes.push(`BACKGROUND: ${ficha.fondo}.`)
+
+  if (ficha.fenomeno?.que) {
+    let f = `THE LIGHT PHENOMENON: ${ficha.fenomeno.que}.`
+
+    if (FORMATOS_VERTICALES.includes(formato)) {
+      f += ' It stays entirely BELOW 36% of the frame height: the top third of the frame is calm, deep dark space with no part of it, no light and no objects.'
+    }
+
+    partes.push(f)
+  }
+
+  if (clavesDeObjetos(ficha).some(k => PRENDAS_CON_EMBLEMA.includes(k))) {
+    partes.push('UNIFORM COLOUR: every Efeonce garment is deep navy, never royal blue, cobalt or bright blue.')
+  }
+
+  return partes.length ? `CINEMATIC CRAFT (registro cine):\n${partes.join('\n')}` : null
+}
+
 export const construirPrompt = ficha => {
   const fmt = FORMATOS[ficha.formato]
 
@@ -2503,6 +2618,14 @@ export const construirPrompt = ficha => {
 
   partes.push(ficha.escena)
 
+  const cine = bloqueCine(ficha, ficha.formato)
+
+  if (cine) partes.push(cine)
+
+  if (ficha.alcance && ficha.registro === 'cine' && !ALCANCES_CINE.includes(ficha.alcance)) {
+    throw new Error(`"${ficha.id ?? 'ficha'}": \`alcance\` "${ficha.alcance}" no existe. Usa uno de: ${ALCANCES_CINE.join(', ')}.`)
+  }
+
   if (caso) partes.push(caso.bloque)
 
   // El lecho, con el porcentaje del formato. Nunca escrito a mano.
@@ -2521,7 +2644,11 @@ export const construirPrompt = ficha => {
   }
 
   partes.push(
-    `FOREGROUND (planned): ${ficha.lecho.objeto}, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom ${fmt.lecho} of the frame (never a hard band), ${ficha.lecho.tono}; its center calm and even.`
+    `FOREGROUND (planned): ${ficha.lecho.objeto}, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom ${fmt.lecho} of the frame (never a hard band), ${ficha.lecho.tono}; its center calm and even.` +
+      // En cine el lecho lo mata el REFLEJO de la fuente, no la luz directa (NX7d: 2,98:1). Sólo en cine.
+      (ficha.registro === 'cine'
+        ? ' It is matte and non-reflective, outside the reach of the key light: no light and no reflection falls on it.'
+        : '')
   )
 
   return {
@@ -2646,6 +2773,9 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
 
     // El aviso de derechos viaja con el kit, no con la memoria de quien lo usa.
     for (const a of avisosObjeto ?? []) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${a}`)
+
+    // Registro cine: los campos del oficio (casebook). Sólo con `registro: "cine"`.
+    for (const a of auditarCine(ficha)) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: cine — ${a}`)
   }
 
   for (const { ficha, imagenes } of resueltas) {

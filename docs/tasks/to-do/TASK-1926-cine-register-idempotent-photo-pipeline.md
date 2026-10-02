@@ -1,5 +1,34 @@
 # TASK-1926 — Registro cine en el pipeline `foto:*` y comando idempotente de punta a punta
 
+## Delta 2026-10-02 (b) — el registro cine se opera sin consultor
+
+Pedido del operador el 2026-10-02: «solo lo sabes usar tú… ninguna sesión ha llegado al resultado sin preguntarte»,
+con la condición de no tocar los comandos de los demás registros. Se suma a esta task porque es su superficie
+(registro cine en `foto:*`); el orquestador idempotente (Slices 2–5) sigue pendiente.
+
+- **Slice 1 queda cubierto con otra forma** (avisos en vez de abortos; guarda de no-regresión por snapshot):
+  `foto:prompt` entiende `llave`, `primerPlano`, `fondo`, `fenomeno { que, esServicio }` y `alcance` en fichas
+  `"registro": "cine"`, los compila en un bloque «CINEMATIC CRAFT», inyecta el lecho mate y el uniforme navy, baja el
+  fenómeno del 36 % en vertical y avisa cada campo faltante con su falla del casebook (`auditarCine`, `bloqueCine`).
+  El campo se llama **`alcance`, no `caso`**: `caso` ya lo usa la excepción de caso de cliente (TASK-1949). Un
+  `alcance` fuera de la lista aborta. «Pecho liso, NO emblem» del Slice 1 original quedó obsoleto: el bordado viene
+  de la referencia del kit (regla del 2026-09-28).
+- **No-regresión de los demás registros**: `scripts/foto/regresion-prompt.mjs` congela el prompt compilado de todas
+  las fichas en disco y compara: 332 fichas, 10 cine cambiadas, **0 no cine cambiadas**.
+- **Casebook** `docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md`: flujo en seis pasos, las diez
+  fallas con síntoma, causa medida, corrección y quién la atrapa, las fotos aprobadas y los límites medidos del
+  medidor.
+- **Recetas**: `scripts/foto/cine-recetas.json` (10 fotos aprobadas) y `pnpm foto:cine:nueva --desde <id>` que copia
+  la ficha, marca la escena «REESCRIBIR» y lista lo que falta; `foto:generar` no gasta con esa escena.
+- **Medidor** `pnpm foto:validar:cine` (aparte de `foto:validar`, que no cambia): sólo dos gates sobrevivieron a la
+  calibración (sombra y reserva vertical). Stickers, luz con relleno y azul rey bajo luz azul **no se separan en
+  píxeles** (NX7b, rechazada, pasa todo) y quedan para el revisor.
+- **Revisor** `.claude/agents/cine-reviewer.md`: revisa la ficha antes de gastar y el plate después, con veredicto
+  de formato fijo.
+- **AXIS**: sección «Registro cine» en el banco fotográfico del Lab con las 10 fotos y su receta (commit local
+  `4efeb8d` en `axis-design-system`, push pendiente de visto bueno).
+- Pendiente: la prueba ciega con tres sesiones nuevas (criterio abajo) y el orquestador idempotente.
+
 ## Delta 2026-10-02
 
 - El traje biónico de Nexa y sus lentes ya se declaran por catálogo (`traje-bionico-nexa`, `lentes-bionicos-nexa`) y `foto:prompt` exige `"registro": "cine"` en la ficha (`validarTrajeNexa`): es el primer campo explícito de registro cine; `foto:cine` debería emitirlo. Escena con Sparks: dos con referencia como máximo (registro cine 1.7) — cerrado por trabajo en TASK-1940.
@@ -149,6 +178,8 @@ Reglas obligatorias:
 - `scripts/foto/cine.mjs` (nuevo, orquestador) y sus pruebas
 - `scripts/foto/bloques/` (bloque cine)
 - `package.json` (entrada `foto:cine`)
+- `scripts/foto/cine-nueva.mjs`, `scripts/foto/cine-recetas.json`, `scripts/foto/validar-cine.mjs`, `scripts/foto/regresion-prompt.mjs` y sus pruebas (`cine-nueva.test.ts`, `build-prompt-cine.test.ts`)
+- `docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md`, `.claude/agents/cine-reviewer.md`
 
 ## Current Repo State
 
@@ -285,6 +316,12 @@ pegada, cabeza ~35 % del alto), `AD1`/`AD4` (firma sobre el sujeto en vertical),
 - [ ] AD1–AD4 y BR1b/BR2b/BR3 se reproducen desde manifiestos.
 - [ ] Ningún script de composición nuevo: la capa pasa por `foto:componer:cta` o su extensión.
 - [ ] §12 del registro cine y las skills citan `foto:cine`.
+- [x] (Delta 2026-10-02 b) Una ficha `"registro": "cine"` compila `llave`, `primerPlano`, `fondo`, `fenomeno` y `alcance` y avisa cada campo faltante; un `alcance` inválido aborta (`build-prompt-cine.test.ts`, 10 pruebas).
+- [x] (Delta 2026-10-02 b) `scripts/foto/regresion-prompt.mjs --comparar` sobre todas las fichas en disco reporta 0 fichas no cine cambiadas.
+- [x] (Delta 2026-10-02 b) `pnpm foto:cine:nueva --desde <id>` crea la ficha desde una receta aprobada y `foto:generar` se niega a gastar mientras la escena empiece con «REESCRIBIR» (`cine-nueva.test.ts`).
+- [x] (Delta 2026-10-02 b) `pnpm foto:validar:cine` mide sombra y reserva vertical con umbrales calibrados y declara lo que no puede medir; casebook y agente `cine-reviewer` publicados.
+- [ ] (Delta 2026-10-02 b) Prueba ciega: tres sesiones nuevas, sin consultar a la sesión de la línea gráfica, llegan a una ficha que `cine-reviewer` da por APROBABLE y el operador aprueba al menos dos de los tres plates.
+- [ ] (Delta 2026-10-02 b) La sección «Registro cine» del banco fotográfico de AXIS está publicada en `axis.efeonce.org` (push con visto bueno del operador).
 - [ ] (Delta d) Cada plate producido por `foto:cine`/`foto:generar` deja su procedencia (ficha y su sha256, modelo, proveedor, sha del prompt, resultado de `foto:emblema`, registro de `foto:isotipo`) en un formato que `pnpm foto:banco -- --register` (TASK-1931) lee sin transformación manual.
 
 ## Verification

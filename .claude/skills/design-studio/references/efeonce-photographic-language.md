@@ -116,6 +116,12 @@ cine**: aquí va sólo lo operativo. Es **ficción declarada**: el servicio (o l
 una película de gran presupuesto, y **el color de la línea sale de la escena como luz** —anillo, haz, holograma, moño
 de partículas, esferas—, nunca pintado encima ni puesto como grade.
 
+🔴 **Producir cine (2026-10-02): sigue el [casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).**
+Parte de una foto aprobada con `pnpm foto:cine:nueva --desde <id>` (`--listar` muestra las diez), declara en la ficha
+`llave`, `primerPlano`, `fondo`, `fenomeno { que, esServicio }` y `alcance` (`foto:prompt` los compila y avisa los que
+faltan), pide revisión al agente `cine-reviewer` antes de gastar y después del plate, y mide con `pnpm foto:validar:cine`.
+Nunca reconstruyas la receta de memoria ni consultes a otra sesión: si el casebook no cubre tu caso, agrégale la fila.
+
 **Marcador rápido — estás en cine si se cumple todo esto:**
 
 - La luz fuerte del cuadro **es un objeto imposible con el `accentOnDark` de una línea** (no una ventana, lámpara o

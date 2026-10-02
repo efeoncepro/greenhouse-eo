@@ -18,6 +18,11 @@
 > láminas «about» del deck); seis láminas de deck aprobadas;
 > portadas y contraportadas de brochure y propuesta aprobadas el 2026-09-27 (§16); formatos publicitarios 9:16 y 4:5
 > **en prueba**; sin prueba de reconocimiento.
+> 🔴 **Para PRODUCIR una foto cine, empieza por el [casebook](EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)** (2026-10-02): flujo en
+> seis pasos, las diez fallas con su corrección y las fotos aprobadas. `pnpm foto:cine:nueva --desde <id>` parte de una
+> aprobada; la ficha declara `llave`, `primerPlano`, `fondo`, `fenomeno` y `alcance`; `pnpm foto:validar:cine` mide lo
+> medible y el agente `cine-reviewer` revisa la ficha antes de gastar y el plate después. Este documento sigue siendo
+> el canon (qué es el registro); el casebook es cómo se llega sin consultar a nadie.
 > **Documentación relacionada:** [maestro](EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [registro C](EFEONCE_PHOTO_REGISTER_C_V1.md) ·
 > [personas y vestuario](EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [colorimetría](EFEONCE_PHOTO_COLORIMETRY_V1.md) ·
 > [palancas](EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) · [firma](EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) ·

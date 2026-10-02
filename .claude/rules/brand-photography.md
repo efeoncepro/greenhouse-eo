@@ -67,6 +67,12 @@ estructura**) y **la contaminación del emblema**.
 🔴 **El registro cine tiene documento propio: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)**
 (2026-09-27) — sólo Nexa protagonista o la receta `proposal-cinematic`; cámara ≈ 2 m y 85 mm, la línea como luz, isotipo
 compuesto, plantilla de ficha y trampas del compilador. Cárgalo antes de escribir una ficha cine.
+🔴 **Para producir cine, el flujo es el del [casebook](../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)**
+(2026-10-02), no la memoria de otra sesión: `pnpm foto:cine:nueva --desde <id>` (parte de una foto aprobada; `--listar`) →
+campos cine en la ficha (`llave`, `primerPlano`, `fondo`, `fenomeno { que, esServicio }`, `alcance`; `foto:prompt` avisa
+cada uno que falta) → agente **`cine-reviewer`** sobre la ficha → `foto:generar --quality high` → `pnpm foto:validar:cine`
++ `foto:validar` + `foto:emblema` → `cine-reviewer` sobre el plate. `foto:validar:cine` no ve stickers, relleno ni azul
+rey bajo luz azul: eso lo mira el revisor.
 🔴 **En cine el lecho es un OBJETO EXCUSA, nunca una banda** **[operador, 2026-09-28]**: objeto del oficio con nombre
 y materia, cámara anclada a él (*«the lens only a few centimetres behind its near edge»*), fuera de toda luz. Una mesa
 «matte black» en un «empty studio, no notebooks» sale como banda de blur; las cabezas del público a 2 m/85 mm tapan al

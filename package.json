@@ -311,6 +311,8 @@
     "foto:doctor": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/foto/doctor.ts",
     "foto:prompt": "node scripts/foto/build-prompt.mjs",
     "foto:validar": "node scripts/foto/validar-reservas.mjs",
+    "foto:validar:cine": "node scripts/foto/validar-cine.mjs",
+    "foto:cine:nueva": "node scripts/foto/cine-nueva.mjs",
     "foto:componer": "node scripts/foto/componer.mjs",
     "foto:emblema": "node scripts/foto/emblema.mjs",
     "foto:isotipo": "node scripts/foto/isotipo.mjs",

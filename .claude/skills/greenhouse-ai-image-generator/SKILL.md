@@ -726,6 +726,11 @@ diagnostica sin costo.
 
 ### Registro cine: placas, emblema y tamaños
 
+🔴 **Para producir, el flujo es el del [casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)**
+(2026-10-02): `pnpm foto:cine:nueva --desde <id>` → campos cine de la ficha → agente `cine-reviewer` →
+`foto:generar --quality high` → `pnpm foto:validar:cine` → `cine-reviewer` sobre el plate. Lo de abajo son trampas de
+producción que el casebook referencia.
+
 El registro cine («la marca en su película», 2026-09-27) sólo se usa con **Nexa protagonista** o en la receta de deck
 **`proposal-cinematic`** (y, por excepción aprobada el 2026-09-27, en las láminas de sección y «about» del deck; no se extiende fuera del deck); fuera de eso, la foto es A, B o C. La dirección (idea, marcador, barra, trampas) vive en
 [`design-studio` → §Registros](../design-studio/references/efeonce-photographic-language.md) y el canon vigente es
