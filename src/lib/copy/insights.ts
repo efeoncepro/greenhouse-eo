@@ -131,7 +131,7 @@ export const GH_INSIGHTS = {
     sovOfMentions: 'de las menciones; tu marca, el',
     sovBrandLeads: 'Tu marca lidera las menciones frente a competidores con el',
     tableTitle: 'De dónde sale lo que dicen los motores',
-    tableLead: 'Los sitios que más citan los motores, el tipo de fuente y el tono de las respuestas, tal como los midió el análisis.'
+    tableLead: 'Los sitios que más citan los motores, el tipo de fuente y el tono de las respuestas.'
   },
 
   readerLimits: {

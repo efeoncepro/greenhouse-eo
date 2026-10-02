@@ -8,7 +8,7 @@ import { PDFDocument } from 'pdf-lib'
 import { composeArtifact } from '@/lib/artifact-composer'
 import { insightsReportCatalog } from '@/lib/artifact-composer/catalogs/insights-report'
 
-import { buildInsightReportPlanInput } from './report-mapper'
+import { buildInsightReportPlanInput, tableRowsCapacity } from './report-mapper'
 import { formatFactValue } from '../editorial/format'
 import { InsightsRenderRejectedError } from '../errors'
 import type { EditorialPlanV1, PlanChapterV1 } from '../contracts/plan'
@@ -241,9 +241,20 @@ describe('buildInsightReportPlanInput', () => {
       expect((page.slots as { tableColumns: { label: string }[] }).tableColumns[0]).toEqual({ label: '#' })
     }
 
-    // El ranking continúa en la página siguiente: la segunda página empieza en la fila 17.
+    // El ranking continúa en la página siguiente donde terminó la primera: tantas filas como dejó la cabecera.
+    const firstPageRows = (pages[0]!.slots as { tableRows: unknown[] }).tableRows.length
+
+    expect(firstPageRows).toBe(tableRowsCapacity('Páginas', (pages[0]!.slots as { lead: string }).lead))
     expect((pages[0]!.slots as { rankOffset?: string }).rankOffset).toBeUndefined()
-    expect((pages[1]!.slots as { rankOffset?: string }).rankOffset).toBe('16')
+    expect((pages[1]!.slots as { rankOffset?: string }).rankOffset).toBe(String(firstPageRows))
+  })
+
+  it('la cabecera de la tabla le quita filas a la página: cada línea extra de título o de bajada es una fila menos', () => {
+    const short = tableRowsCapacity('Páginas', 'Todo lo que se midió en el período.')
+
+    // «De dónde sale lo que dicen los motores» (2 líneas) con una bajada de 3 dejaba la fuente bajo el pie con 14 filas.
+    expect(tableRowsCapacity('De dónde sale lo que dicen los motores', 'Los sitios que más citan los motores, el tipo de fuente y el tono de las respuestas, tal como los midió el análisis.')).toBe(short - 2)
+    expect(tableRowsCapacity('De dónde sale lo que dicen los motores', 'Los sitios que más citan los motores, el tipo de fuente y el tono de las respuestas.')).toBe(short - 1)
   })
 
   it('ninguna página de tabla excede la capacidad declarada del molde', () => {
