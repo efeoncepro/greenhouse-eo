@@ -37,6 +37,8 @@ Proveedor:
   --seed <n>                 Sólo adaptadores que la acepten
   --provider-mask auto|on|off  Si la máscara viaja al proveedor (openai). auto: Sunburst edita sin máscara —con
                              máscara devuelve un panel negro— y el pipeline recompone; los demás, con máscara
+  --color-match auto|on|off  Corrige el desplazamiento de color de la salida en un anillo alrededor de la zona antes de
+                             recomponer (evita el halo). auto: sólo cuando la máscara no viajó (Sunburst)
   --count <n>                Candidatos (1–8); cada uno es un pedido pagado; con más de uno, contact-sheet.png
 
 Control:
@@ -60,6 +62,7 @@ interface ImageCliArgs {
   quality?: string
   seed?: number
   providerMask?: ProviderMaskMode
+  colorMatch?: 'auto' | 'on' | 'off'
   count: number
   crop: CropMode
   run?: string
@@ -117,6 +120,14 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
       case '--quality': args.quality = next(); break
       case '--seed': args.seed = toNumber(next(), flag, true); break
       case '--count': args.count = toNumber(next(), flag, true); break
+
+      case '--color-match': {
+        const value = next()
+
+        if (!['auto', 'on', 'off'].includes(value)) throw new Error('--color-match espera auto | on | off.')
+        args.colorMatch = value as 'auto' | 'on' | 'off'
+        break
+      }
 
       case '--provider-mask': {
         const value = next()
@@ -176,6 +187,7 @@ const runImage = async (argv: string[]): Promise<number> => {
     quality: args.quality,
     seed: args.seed,
     providerMask: args.providerMask,
+    colorMatch: args.colorMatch,
     count: args.count,
     crop: args.crop,
     runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),

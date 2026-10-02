@@ -1,6 +1,6 @@
 import sharp from 'sharp'
 
-import type { CanonicalMask, PixelBox } from './mask'
+import { dilate, type CanonicalMask, type PixelBox } from './mask'
 import { cloneRgba, readRaw, type RgbaImage } from './raw'
 
 /**
@@ -41,6 +41,41 @@ export const recompose = (base: RgbaImage, generated: RgbaImage, mask: Canonical
   }
 
   return out
+}
+
+/**
+ * Corrige el desplazamiento de color de la salida ANTES de recomponer: la media por canal de (salida − base) en un
+ * anillo protegido de `ringPx` alrededor de la zona se resta de toda la salida. Sin esto, un modelo que edita la imagen
+ * entera y la aclara deja un halo en la costura: Sunburst sin máscara aclaró −16 niveles todo el recorte (MC1h,
+ * medido 2026-09-28). Sólo el desplazamiento de la media: igualar también el desvío volvió la marca verde azulada o
+ * lavada (mismo caso). Es el método de `pnpm foto:isotipo --acabado`.
+ */
+export const matchColorInRing = (base: RgbaImage, generated: RgbaImage, mask: CanonicalMask, ringPx = 14): { image: RgbaImage; shift: [number, number, number]; ringPixels: number } => {
+  assertSameSize(base, generated, 'Corrección de color')
+
+  const touched = { ...mask, data: mask.data.map(value => (value > 0 ? 255 : 0)) }
+  const ring = dilate(touched, ringPx)
+  const sums = [0, 0, 0]
+  let count = 0
+
+  for (let i = 0; i < mask.data.length; i += 1) {
+    if (ring.data[i] !== 255 || mask.data[i] !== 0) continue
+
+    for (let c = 0; c < 3; c += 1) sums[c] += generated.data[i * 4 + c] - base.data[i * 4 + c]
+
+    count += 1
+  }
+
+  if (!count) return { image: generated, shift: [0, 0, 0], ringPixels: 0 }
+
+  const shift = sums.map(sum => Math.round((sum / count) * 100) / 100) as [number, number, number]
+  const data = new Uint8Array(generated.data)
+
+  for (let i = 0; i < mask.data.length; i += 1) {
+    for (let c = 0; c < 3; c += 1) data[i * 4 + c] = Math.max(0, Math.min(255, Math.round(generated.data[i * 4 + c] - shift[c])))
+  }
+
+  return { image: { ...generated, data }, shift, ringPixels: count }
 }
 
 /** Copia de la base con `patch` (del tamaño de `box`) pegado en `box`. */

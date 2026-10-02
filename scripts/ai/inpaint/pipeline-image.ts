@@ -6,7 +6,7 @@ import type { InpaintImageAdapter, ProviderMaskMode } from './adapters/types'
 import { assertBrandSafePrompt } from './brand'
 import { planCrop, type CropMode, type CropPlan } from './crop'
 import { assertMaskUsable, cropMask, encodeMaskPng, loadMask, renderMaskPreview, resizeMask, type MaskConvention } from './mask'
-import { cropRgba, measureZones, placePatch, recompose, renderDiff, resizeRgba, verifyRecomposition, type VerificationReport, type ZoneDelta } from './recompose'
+import { cropRgba, matchColorInRing, measureZones, placePatch, recompose, renderDiff, resizeRgba, verifyRecomposition, type VerificationReport, type ZoneDelta } from './recompose'
 import { encodeRgbaPng, loadRgba } from './raw'
 import { exists, INPAINT_PIPELINE_VERSION, readJson, renderContactSheet, runDirFor, sha256, stableStringify, writeFileEnsured, writeJson } from './run-io'
 
@@ -27,6 +27,8 @@ export interface ImageInpaintOptions {
   quality?: string
   seed?: number
   providerMask?: ProviderMaskMode
+  /** Corrige el desplazamiento de color en un anillo antes de recomponer. auto = sólo si la máscara no viajó. */
+  colorMatch?: 'auto' | 'on' | 'off'
   count?: number
   crop?: CropMode
   /** Carpeta de la pieza (p. ej. `ai-generations/2026-10-02_mi-pieza`); la corrida vive en `<runRoot>/inpaint/<id>/`. */
@@ -52,6 +54,10 @@ export interface CandidateRecord {
   editedMeanDelta: number
   /** La zona editable volvió como panel negro plano (salida cruda): el candidato no sirve aunque pase la verificación. */
   suspectFlatPanel: boolean
+  /** Si la máscara viajó al proveedor en este candidato. */
+  providerMaskSent: boolean
+  /** Desplazamiento medio RGB corregido antes de recomponer (null = sin corrección). */
+  colorShift: [number, number, number] | null
   protected: ZoneDelta
   editable: ZoneDelta
   seam: ZoneDelta
@@ -182,6 +188,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       quality: options.quality ?? null,
       seed: options.seed ?? null,
       providerMask: options.providerMask ?? 'auto',
+      colorMatch: options.colorMatch ?? 'auto',
       count,
       crop: { box: plan.box, target: plan.target }
     })
@@ -271,8 +278,14 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       const generatedFull = placePatch(base, { ...patch, hadAlpha: base.hadAlpha }, plan.box)
       const drift = measureZones(base, generatedFull, mask).protected
       const blackShare = flatBlackFraction(generatedFull, mask)
+      const maskSent = typeof output.meta.providerMask === 'boolean' ? output.meta.providerMask : adapter.sendsMask
+      const colorMode = options.colorMatch ?? 'auto'
+      const corrected = colorMode === 'on' || (colorMode === 'auto' && !maskSent) ? matchColorInRing(base, generatedFull, mask) : null
+      const toCompose = corrected?.image ?? generatedFull
 
-      await writeFileEnsured(join(runDir, finalName), await encodeRgbaPng(recompose(base, generatedFull, mask)))
+      await writeFileEnsured(join(runDir, finalName), await encodeRgbaPng(recompose(base, toCompose, mask)))
+
+      if (corrected) log(`    · color corregido en el anillo (${corrected.ringPixels} px): RGB −${corrected.shift.map(v => v.toFixed(1)).join(' / ')}`)
 
       // La verificación lee el ARCHIVO, no el buffer.
       const written = await loadRgba(join(runDir, finalName), 'resultado escrito')
@@ -289,6 +302,8 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
         reason: report.reason,
         editedMeanDelta: Math.round(editedMeanDelta(report) * 1000) / 1000,
         suspectFlatPanel: blackShare > FLAT_PANEL_THRESHOLD,
+        providerMaskSent: maskSent,
+        colorShift: corrected?.shift ?? null,
         protected: report.protected,
         editable: report.editable,
         seam: report.seam,

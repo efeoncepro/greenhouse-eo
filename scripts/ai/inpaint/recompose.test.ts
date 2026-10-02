@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { pickGridSize, planCrop } from './crop'
 import { createMask, feather, maskFromRect } from './mask'
-import { cropRgba, measureZones, placePatch, recompose, resizeRgba, verifyRecomposition } from './recompose'
+import { cropRgba, matchColorInRing, measureZones, placePatch, recompose, resizeRgba, verifyRecomposition } from './recompose'
 import { encodeRgbaPng, loadRgba, type RgbaImage } from './raw'
 
 const noise = (width: number, height: number, seed: number, hadAlpha = false): RgbaImage => {
@@ -89,6 +89,20 @@ describe('recomposición', () => {
     // Fuera de la caja nada cambió: la máscara editable es exactamente la caja (x 4–12, y 6–11 de 20).
     expect(measureZones(base, placed, maskFromRect(20, 20, { x0: 0.2, y0: 0.3, x1: 0.6, y1: 0.55 })).protected.maxDelta).toBe(0)
     expect(() => placePatch(base, patch, { ...box, left: 15 })).toThrow()
+  })
+
+  it('corrige el desplazamiento de color medido en el anillo protegido (método de foto:isotipo --acabado)', () => {
+    const flat = (value: number) => new Uint8Array(40 * 40 * 4).map((_, i) => (i % 4 === 3 ? 255 : value))
+    const base: RgbaImage = { width: 40, height: 40, channels: 4, hadAlpha: false, data: flat(120) }
+    const brighter: RgbaImage = { ...base, data: flat(136) } // el modelo aclaró +16 todo el RGB
+    const mask = maskFromRect(40, 40, { x0: 0.3, y0: 0.3, x1: 0.7, y1: 0.7 })
+    const { image, shift, ringPixels } = matchColorInRing(base, brighter, mask, 4)
+
+    expect(shift).toEqual([16, 16, 16])
+    expect(ringPixels).toBeGreaterThan(0)
+    expect(image.data[(20 * 40 + 20) * 4]).toBe(120)
+    // Sin corrección la costura salta 16 niveles; corregida, la zona calza con la base.
+    expect(measureZones(base, recompose(base, image, mask), mask).editable.maxDelta).toBe(0)
   })
 
   it('reescala a tamaño exacto', async () => {
