@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { GH_INSIGHTS } from '@/lib/copy/insights'
+import { INSIGHT_SCOPE_CATALOG, INSIGHT_SCOPE_KEYS, scopeChipsFor } from './scope-catalog'
+
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { InsightWebModelV1 } from '../contracts/web-model'
 import { buildDeterministicPlan } from '../editorial/deterministic-planner'
@@ -260,5 +263,25 @@ describe('TASK-1957 — el gate compara la razón del límite entera', () => {
     expect(rulesOf(['Share of Voice: sin datos suficientes en este período.'])).toEqual([])
     expect(rulesOf(['Share of Voice: sin datos.'])).toEqual(['internal_limit_wording'])
     expect(rulesOf(['Motores de respuesta: en el período anterior, la fuente no sirve esta ventana con exactitud.'])).toEqual(['internal_limit_wording'])
+  })
+})
+
+describe('alcance de la portada por servicio', () => {
+  it('cada alcance del catálogo tiene etiqueta y un glifo Trazo que existe en AXIS', async () => {
+    const { ICON_CATALOG } = await import('@efeoncepro/axis-graphic-line/icons')
+    const stroke = new Set(ICON_CATALOG.filter(icon => icon.voice === 'stroke').map(icon => icon.key))
+
+    for (const key of INSIGHT_SCOPE_KEYS) {
+      expect(GH_INSIGHTS.scopeChips[key], key).toBeTruthy()
+      expect(stroke.has(INSIGHT_SCOPE_CATALOG[key].glyph), `${key} → ${INSIGHT_SCOPE_CATALOG[key].glyph}`).toBe(true)
+    }
+  })
+
+  it('sin alcance elegido se deriva de los módulos; con alcance, manda el encargo', () => {
+    expect(scopeChipsFor(undefined, ['seo', 'aeo']).map(chip => chip.label)).toEqual(['SEO', 'Respuestas de IA'])
+    expect(scopeChipsFor(['creative', 'performance'], ['ico'])).toEqual([
+      { key: 'creative', label: 'Servicios creativos', glyph: 'contenido', line: 'brand' },
+      { key: 'performance', label: 'Performance', glyph: 'medios', line: 'voice' }
+    ])
   })
 })

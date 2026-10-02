@@ -1,3 +1,4 @@
+import { INSIGHT_SCOPE_KEYS, INSIGHT_SCOPE_MAX, scopeChipsFor, type InsightScopeChipV1 } from './presentation/scope-catalog'
 import 'server-only'
 
 /**
@@ -36,6 +37,14 @@ export interface InsightsCatalog {
   limits: { maxWindowDays: number; maxModulesPerEdition: number }
   /** Salidas que el motor puede producir hoy (TASK-1846: `deck_pdf`; A4 y web llegan con 1847/1848). */
   renderableOutputs: readonly string[]
+  /**
+   * Alcances que la portada puede mostrar (`request.scope`): servicio o módulo con etiqueta, glifo Trazo de AXIS y
+   * línea de marca. Para informes de otros servicios (creativos, Performance, Revenue…); sin `scope`, se derivan de
+   * los módulos.
+   */
+  scopes: InsightScopeChipV1[]
+  /** Máximo de alcances por encargo. */
+  maxScopesPerEdition: number
 }
 
 const MODULE_REQUIREMENTS: Record<InsightModule, { moduleKeys: string[] } | { spaces: true }> = {
@@ -105,6 +114,8 @@ export const getInsightsCatalog = async (grant: InsightsAccessGrant): Promise<In
     depths: INSIGHT_DEPTHS,
     locales: INSIGHT_LOCALES,
     limits: { maxWindowDays: MAX_INSIGHT_WINDOW_DAYS, maxModulesPerEdition: INSIGHT_MODULES.length },
-    renderableOutputs: INSIGHT_RENDERABLE_OUTPUTS
+    renderableOutputs: INSIGHT_RENDERABLE_OUTPUTS,
+    scopes: scopeChipsFor(INSIGHT_SCOPE_KEYS, []),
+    maxScopesPerEdition: INSIGHT_SCOPE_MAX
   }
 }

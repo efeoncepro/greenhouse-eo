@@ -160,6 +160,11 @@ export interface InsightSharedHeaderV1 {
    * al API de Greenhouse; Think la resuelve server-side). `variant` dice sobre qué fondo se diseñó.
    */
   clientLogo?: { href: string; variant: 'on_dark' | 'default' }
+  /**
+   * 1.2 — alcance de la portada: chips con etiqueta y glifo Trazo del catálogo AXIS (`scope-catalog.ts`), del encargo
+   * o derivados de los módulos. El consumer resuelve el glifo a su archivo; nunca elige el ícono por su cuenta.
+   */
+  scopeChips?: Array<{ key: string; label: string; glyph: string; line: 'growth' | 'brand' | 'engine' | 'voice' | 'revenue' }>
 }
 
 export type InsightSharedDownloadStatus = 'available' | 'unavailable'

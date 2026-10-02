@@ -29,6 +29,28 @@ export interface InsightModuleCopy {
 }
 
 export const GH_INSIGHTS = {
+  /**
+   * Alcance del informe en la portada (chips): servicio o módulo que cubre. Lo elige quien compone el encargo
+   * (`request.scope`); sin elección, se deriva de los módulos. Ícono y línea en `presentation/scope-catalog.ts`.
+   */
+  scopeChips: {
+    seo: 'SEO',
+    aeo: 'Respuestas de IA',
+    ico: 'Entrega creativa',
+    creative: 'Servicios creativos',
+    design: 'Diseño',
+    content: 'Contenido',
+    performance: 'Performance',
+    paid_social: 'Paid social',
+    social: 'Redes sociales',
+    revenue: 'Revenue',
+    crm: 'CRM',
+    email: 'Email marketing',
+    automation: 'Automatización',
+    web: 'Web',
+    analytics: 'Analítica'
+  } as Readonly<Record<string, string>>,
+
   modules: {
     seo: { title: 'Visibilidad orgánica', label: 'Visibilidad orgánica', inTitle: 'visibilidad orgánica' },
     aeo: { title: 'Visibilidad en motores de respuesta', label: 'Motores de respuesta', inTitle: 'respuestas de IA' },

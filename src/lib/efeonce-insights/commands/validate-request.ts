@@ -4,6 +4,7 @@
  * leen del payload — el caller ya los resolvió y aquí sólo se exige coherencia.
  */
 
+import { INSIGHT_SCOPE_KEYS, INSIGHT_SCOPE_MAX } from '../presentation/scope-catalog'
 import {
   INSIGHT_AUDIENCES,
   INSIGHT_COMPARISON_KINDS,
@@ -114,6 +115,12 @@ export const validateInsightRequest = (
   // TASK-1888 — sólo entra al encargo si viene: su ausencia deja el request (y su hash) idéntico al de antes.
   const coverTheme = brand.coverTheme === undefined || brand.coverTheme === null ? undefined : assertEnum(brand.coverTheme, 'brand.coverTheme', INSIGHT_COVER_PREFERENCES)
 
+  // Alcance de la portada (servicio o módulo): sólo entra al encargo si viene, así el hash de los encargos previos no
+  // cambia. Claves del catálogo, sin repetir y como máximo INSIGHT_SCOPE_MAX.
+  const scope = raw.scope === undefined || raw.scope === null ? undefined : [...new Set(assertEnumArray(raw.scope, 'scope', INSIGHT_SCOPE_KEYS))]
+
+  if (scope && scope.length > INSIGHT_SCOPE_MAX) throw new InsightsInputError(`scope admite como máximo ${INSIGHT_SCOPE_MAX} alcances`, { field: 'scope', max: INSIGHT_SCOPE_MAX })
+
   const projectIds = raw.projectIds === undefined ? [] : Array.isArray(raw.projectIds) ? raw.projectIds.map(item => assertString(item, 'projectIds[]', { min: 1, max: 200 })) : null
 
   if (projectIds === null) throw new InsightsInputError('projectIds debe ser una lista', { field: 'projectIds' })
@@ -136,6 +143,7 @@ export const validateInsightRequest = (
       depth,
       outputs,
       brand: { efeoncePackVersion, clientBrandRef, ...(coverTheme ? { coverTheme } : {}) },
+      ...(scope ? { scope } : {}),
       policy,
       idempotencyKey,
       title,

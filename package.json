@@ -418,7 +418,8 @@
     "ai-gen:archive": "node scripts/ai-generations/archive.mjs",
     "ai-gen:test": "node --test scripts/ai-generations/*.test.mjs",
     "security:public-burst-guard": "tsx scripts/security/public-burst-guard.ts",
-    "security:public-burst-guard:verify": "tsx --require ./scripts/lib/server-only-shim.cjs --env-file=.env.local scripts/security/public-burst-guard-verify.ts"
+    "security:public-burst-guard:verify": "tsx --require ./scripts/lib/server-only-shim.cjs --env-file=.env.local scripts/security/public-burst-guard-verify.ts",
+    "insights:think-icons": "node scripts/insights/export-think-icons.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [
