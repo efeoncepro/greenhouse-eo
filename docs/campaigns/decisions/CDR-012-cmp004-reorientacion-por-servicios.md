@@ -76,3 +76,13 @@ Evidencia: `foto:cta:gate --reproducir` con código 0 en las tres piezas; contra
 - [ ] Aprobación creativa del operador.
 - [ ] Fechas de vuelo de temporada, destino y permiso de medios.
 - [ ] Formatos 1:1, 9:16 y 16:9 nativos y export final 1440×1800.
+
+## Delta 2026-10-02 · formatos de pauta
+
+El operador aprobó los vigentes (S01–S08 Always On Q4, BF1–BF3 Black Friday) y pidió adaptaciones para Meta y LinkedIn, verificando las proporciones de cada ubicación. Verificado en el Meta Ads Guide y la ayuda de LinkedIn: la horizontal de **imagen** es **1,91:1** (16:9 es sólo video in-stream); 9:16 tiene zona segura 14/35/6 %; 1:1 es la única que LinkedIn muestra en escritorio y móvil.
+
+- [x] 4:5 1440×1800 (11), 9:16 1440×2560 (11) y 1:1 1440×1440 (9), certificados con `foto:cta:gate --reproducir` al tamaño de entrega. Finales en OneDrive `5. Contenidos/15. Paid Media/03. Finales/CMP-004 - Agencia creativa premium/`.
+- [ ] Decisión del operador sobre 1,91:1 (el texto completo legible no cabe: menos texto o no producirlo) y 1:1 de S08 y BF1.
+- [ ] Aprobación creativa de las adaptaciones; permiso de medios.
+
+Aprendizaje canonizado a pedido del operador: un ad nace multiformato desde la ficha (`efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0).

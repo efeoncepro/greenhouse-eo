@@ -105,7 +105,7 @@ const calmaTexto = async (x0, y0, x1, y1) => {
 }
 
 // El lecho no mide igual en los tres formatos [medido en rondas/texto/bv2-{45,916,169}.json].
-const LECHO = { '4:5': 0.18, '9:16': 0.22, '16:9': 0.16, '1:1': 0.18 }
+const LECHO = { '4:5': 0.18, '9:16': 0.22, '16:9': 0.16, '1.91:1': 0.16, '1:1': 0.18 }
 
 const args = process.argv.slice(2)
 const file = args[0]
@@ -122,7 +122,7 @@ const meta = await base.metadata()
 const W = meta.width
 const H = meta.height
 const r = W / H
-const formato = Math.abs(r - 0.8) < 0.02 ? '4:5' : Math.abs(r - 0.5625) < 0.02 ? '9:16' : Math.abs(r - 1.7778) < 0.03 ? '16:9' : Math.abs(r - 1) < 0.02 ? '1:1' : `otro (${r.toFixed(3)})`
+const formato = Math.abs(r - 0.8) < 0.02 ? '4:5' : Math.abs(r - 0.5625) < 0.02 ? '9:16' : Math.abs(r - 1.7778) < 0.03 ? '16:9' : Math.abs(r - 1.9104) < 0.03 ? '1.91:1' : Math.abs(r - 1) < 0.02 ? '1:1' : `otro (${r.toFixed(3)})`
 
 const zona = async (x0, y0, x1, y1) => {
   const left = Math.max(0, Math.round(x0 * W))
@@ -185,6 +185,8 @@ console.log(`${path.basename(file)}  ${W}×${H}  · formato ${formato}\n`)
 // señalando en los docs de ella.
 const GEOMETRIA_ZONA = {
   '16:9': { eje: 'columna', x0: 0.06, x1: 0.48, desde: 0.05, hasta: 0.95, minimo: 0.42 },
+  // 1,91:1 (pauta de imagen en Meta y LinkedIn, 2026-10-02): misma columna izquierda que el 16:9. SIN VALIDAR.
+  '1.91:1': { eje: 'columna', x0: 0.06, x1: 0.48, desde: 0.05, hasta: 0.95, minimo: 0.42 },
   __default: { eje: 'banda', x0: 0.07, x1: 0.69, desde: 0, hasta: 0.6, minimo: 0.28 }
 }
 

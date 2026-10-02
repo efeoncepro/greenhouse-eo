@@ -54,6 +54,18 @@ const FORMATOS = {
     zonaTexto: ({ muro, tinta }) =>
       `TEXT SPACE (planned, essential): the LEFT 42% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right half.`
   },
+  // Horizontal de pauta para IMAGEN (2026-10-02): Meta la recomienda en columna derecha y es la única horizontal en
+  // búsqueda de Facebook; LinkedIn la recomienda a 1200×628. 16:9 sólo es la recomendada de video in-stream. Se genera
+  // a 2048×1072 (1,91:1 exacto con lados múltiplos de 16). SIN VALIDAR: el lecho hereda el 16 % del 16:9.
+  '1.91:1': {
+    size: '2048x1072',
+    declara: 'HORIZONTAL 1.91:1 composition for feed and link ads.',
+    lecho: '16%',
+    limite: 'All people and objects stay entirely inside the RIGHT 54% of the frame.',
+    sinValidar: true,
+    zonaTexto: ({ muro, tinta }) =>
+      `TEXT SPACE (planned, essential): the LEFT 44% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right half.`
+  },
   // Gran formato horizontal (letrero caminero 12 × 4 m). SIN VALIDAR: el lecho hereda el 16 % del 16:9
   // hasta medir una ronda nativa 3:1. Doctrina OOH en construcción (2026-09-26).
   '3:1': {

@@ -71,6 +71,10 @@ siguen siendo candidatos, sin aprobación de marca o publicación automática.
 7. **Al adaptar una pieza a 9:16 o 16:9, o al componer un CTA**, carga
    [safe zones y trampas de formato](references/paid-format-safe-zones-and-craft.md) (`as-of 2026-09-22`,
    evidencia local de producción creativa; no resultados de pauta). Lo que más caro sale ignorar:
+   - 🔴 **un ad nace multiformato** (operador, 2026-10-02): fija los formatos y el presupuesto de texto del más
+     estrecho (1:1 y 1,91:1) **antes de la primera ficha**, con sujeto compacto y bajo, y prueba el piloto en todos los
+     formatos antes de aprobar el 4:5. La horizontal de imagen es **1,91:1**, no 16:9 (16:9 es sólo video). Medido en
+     CMP-004: adaptar después dio 1:1 en 9/11 y horizontal en 0/11 (§0 de la referencia);
    - 🔴 **la reserva del comando NO es la safe zone de la plataforma.** En 9:16 la banda del comando empieza
      en 10% y la UI del placement puede invadir esa banda; el14% es referencia de Meta, no regla de LinkedIn: obedecer sólo al comando pone el titular
      debajo del nombre de la cuenta. Manda la más restrictiva;

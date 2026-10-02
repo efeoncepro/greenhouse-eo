@@ -214,6 +214,8 @@ oficio y receta del plan en la skill `efeonce-advertising-creative`. Lo que un a
   salen con 3 hasta recomponerlas. Nunca compongas en la carpeta de otra sesión para «probar»: usa una copia temporal
   (dos composiciones en la misma `out/` no se mezclan: la segunda se rechaza).
 
+🔴 **Un ad nace multiformato** *(operador, 2026-10-02)*: decide los formatos y el presupuesto de texto del más estrecho (1:1, 1,91:1) **antes** de la primera ficha; sujeto compacto y bajo; prueba el piloto en todos los formatos antes de aprobar el 4:5. Horizontal de imagen = **1,91:1** (16:9 es video). Regla, medición y proporciones verificadas de Meta/LinkedIn: `efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0.
+
 🔴 **Para un AD con titular, los valores por formato ya están medidos — no los redescubras.**
 [`RECETA-POR-FORMATO.json`](../../ai-generations/2026-09-21_ads-brand-visibility/RECETA-POR-FORMATO.json)
 trae `top`, `textWidth`, tamaños de las tres voces, gaps, anclas de cursores y firma para **4:5, 9:16 y

@@ -26,6 +26,10 @@ probó la reserva de espacio para titular y los formatos **nativos** 4:5, 9:16 y
 > [reserva de espacio en la toma](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md). Úsalo para planear el plate;
 > este documento queda como bitácora de la ronda y de lo que se rechazó.
 
+> **Delta 2026-10-02 · multiformato:** un ad se diseña desde la ficha para el formato más estrecho (1:1 y 1,91:1); la
+> horizontal de imagen para pauta es 1,91:1 (`foto:prompt` la acepta, sin validar) y el 9:16 se recorta a 1008×1792
+> antes de componer. Regla y medición: `.claude/skills/efeonce-advertising-creative/references/paid-format-safe-zones-and-craft.md` §0.
+
 ## 1. Resultado (pruebas NO aprobadas; sólo evidencia de medición)
 
 Tres escenas × tres formatos. Los números son de contraste medido, **no** un veredicto de diseño: el operador

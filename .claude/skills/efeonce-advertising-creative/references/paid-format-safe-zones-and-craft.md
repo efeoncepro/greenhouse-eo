@@ -7,6 +7,51 @@
 > [compositor de CTA](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (el contrato del gate) ·
 > [brief y QA](creative-brief-and-qa.md#gate-del-compositor-de-cta) (qué certifica el gate y qué se mira a ojo).
 
+## 0. 🔴 Un ad nace multiformato: se diseña para el formato más estrecho desde la ficha *(operador, 2026-10-02)*
+
+> «Al producir ads hay que pensar desde el inicio que la pieza de forma nativa pueda servir para todos los formatos
+> para evitar esto.» — operador, al cerrar las adaptaciones de CMP-004.
+
+**Qué pasó [medido, CMP-004, 11 piezas × 4 formatos]:** los 4:5 se aprobaron primero y las adaptaciones se
+plantearon después. Regenerar cada escena por formato desde su ficha costó ~60 generaciones y aun así:
+
+| Formato | Resultado | Por qué |
+|---|---|---|
+| 9:16 | 11/11 certificadas | La escena 4:5 (cielo arriba, escena al medio, lecho abajo) traslada casi igual. |
+| 1:1 | 9/11 | El bloque completo (pregunta, respuesta, bajada de 2–3 líneas, CTA, descriptor) al tamaño mínimo legible ocupa **~35 % del alto**. El modelo **no respeta las alturas pedidas**: sube cabezas y pantallas hasta el 26–38 % aun pidiéndolas bajo el 56–60 %. Las dos piezas de **Nexa** (cine con identidad) no entraron. |
+| 1,91:1 | 0/11 | A 390 px de teléfono el piso exige voces de **47 px** y CTA de **58 px** sobre 2048 de ancho: el bloque pide **~46 % del ancho y ~75 % del alto**. Las escenas invaden la mitad izquierda aun con límite explícito al 52–56 %. |
+
+**La regla:**
+
+1. **Antes de la primera ficha, fija los formatos de la pieza** y el **presupuesto de texto del más estrecho**. El 1:1
+   y el horizontal mandan sobre el 4:5, no al revés. Si va a haber horizontal, el copy de la imagen se diseña para
+   caber ahí; la bajada larga puede vivir en el titular del anuncio y no en la imagen.
+2. **Una escena, una geometría que sirva a todos:** sujeto **compacto** y **bajo** (cabeza bajo el 50 % del alto),
+   aire calmo continuo arriba **y** a un costado, lecho oscuro al pie, elementos de luz que no suban. Un grupo de
+   cuatro personas o un muro LED de lado a lado no cabe en 1:1 ni en horizontal: se decide en la idea.
+3. **El piloto se prueba en los formatos antes de aprobar el 4:5:** componer el piloto también en 1:1 y en el
+   horizontal (y pasar `foto:cta:gate`) es más barato que descubrirlo con la pieza aprobada.
+4. **Proporciones de pauta verificadas (2026-10-02; Meta Ads Guide y ayuda de LinkedIn):**
+
+| Proporción · tamaño | Ubicaciones |
+|---|---|
+| 4:5 · 1440×1800 | feed FB/IG, Explorar IG, LinkedIn móvil (LinkedIn no lo muestra en escritorio) |
+| 9:16 · 1440×2560 | Stories y Reels FB/IG, Messenger · zona segura **14 % arriba, 35 % abajo, 6 % lados** (40 % abajo con texto legal) |
+| 1:1 · 1440×1440 (LinkedIn 1200×1200) | Marketplace, columna derecha FB, **LinkedIn escritorio y móvil** |
+| **1,91:1** · LinkedIn 1200×628 | imagen horizontal: columna derecha y búsqueda FB, LinkedIn. **16:9 es sólo la recomendada de video in-stream** |
+
+   LinkedIn: máximo **5 MB** por imagen. Meta genera sola la variante que falte (relleno, expansión o recorte con
+   IA): entregar 4:5 + 9:16 + 1:1 cubre la pauta; el horizontal es opcional.
+5. **Tamaño exacto:** `foto:generar` produce el 9:16 a **1024×1792 = 4:7** (1,6 % fuera; Meta tolera 1 %). Recorta el
+   plate a **1008×1792** antes de componer y entrega con `final: [1440, 2560]` (el gate certifica al tamaño de
+   entrega). 1:1 → `final: [1440, 1440]`; 4:5 → `final: [1440, 1800]`. El 1,91:1 existe en `foto:prompt` desde el
+   2026-10-02 (`2048×1072`, sin validar).
+6. **Herramientas de la corrida** (copiar, no reinventar): `ai-generations/2026-10-02_cmp004-cine-nativo/formatos/`
+   — `armar-fichas.py` (reubica la geometría vertical de una ficha aprobada por formato), `probar-variantes.sh` y
+   `certificar-variantes.sh` (compone y certifica cada variante de plate y deja la primera que pasa),
+   `composicion/armar-plan.py` + `formatos.json` + `ajustes.json` (el layout por formato y los ajustes por pieza a la
+   vista).
+
 ## 1. 🔴 La reserva del comando NO es la safe zone de la plataforma
 
 Son dos cosas distintas y hay que cumplir **las dos**. `foto:prompt` reserva espacio **en la fotografía**
