@@ -2603,7 +2603,7 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 - [TASK-1959](to-do/TASK-1959-aeo-grader-competitive-sov-scoring-fix.md): EPIC-020; `competitive_sov` = menciones contra menciones, `null` sin competidores, versión de score nueva y decisión sobre informes publicados; P1/Medio.
 - [TASK-1960](to-do/TASK-1960-efeonce-insights-report-per-contracted-service.md): EPIC-045; informe por servicio contratado, vínculo proyecto↔servicio, ICO acotado y destinatarios por informe; P1/Medio.
 - [TASK-1961](to-do/TASK-1961-efeonce-insights-aeo-per-market.md): EPIC-045; evidencia AEO por mercado, lectura por país sin promedio, límites por país; P1/Medio.
-- [TASK-1965](to-do/TASK-1965-ai-inpaint-image-video-cli-pipeline.md): tooling; `ai:mask` + `ai:inpaint image|video`, recomposición obligatoria, delta máximo 0 en zona protegida, adaptadores OpenAI/fal, video con recomposición por frame; P1/Alto.
+- [TASK-1965](in-progress/TASK-1965-ai-inpaint-image-video-cli-pipeline.md): **In Progress** — tooling; `ai:mask` + `ai:inpaint image|video`, recomposición obligatoria, delta máximo 0 en zona protegida, adaptadores OpenAI/fal, video con recomposición por frame; P1/Alto.
 
 ## AEO X-Ray — composición y experiencia
 
