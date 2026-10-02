@@ -2505,6 +2505,20 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1894 — escribir en Marketing Studio por API/MCP con autoridad de persona: subir y versionar piezas
+  // (asset.write) y crear/editar campañas (campaign.write). Separadas de la lectura y de la aprobación (TASK-1899).
+  {
+    key: 'marketing_studio.asset.write',
+    module: 'marketing_studio',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'marketing_studio.campaign.write',
+    module: 'marketing_studio',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1921 — pedir el render de una pieza de marca (endpoint, MCP y Nexa llaman al mismo command) y leer su estado.
   { key: 'brand_render.request.create', module: 'brand_render', actions: ['create'] as const, defaultScope: 'tenant' },
   { key: 'brand_render.request.read', module: 'brand_render', actions: ['read'] as const, defaultScope: 'tenant' }

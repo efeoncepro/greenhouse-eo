@@ -3204,6 +3204,27 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1894 — escritura en Marketing Studio (subir/versionar piezas y crear/editar campañas) con autoridad de
+  // persona. Los roles que operan campañas más diseño, que produce las piezas. La aprobación es aparte (TASK-1899).
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS) ||
+    hasRole(subject, ROLE_CODES.DESIGNER)
+  ) {
+    for (const capability of ['marketing_studio.asset.write', 'marketing_studio.campaign.write'] as const) {
+      for (const action of ['create', 'update'] as const) {
+        addEntitlement(entries, {
+          module: 'marketing_studio',
+          capability,
+          action,
+          scope: 'tenant',
+          source: 'role'
+        })
+      }
+    }
+  }
+
   if (subject.tenantType === 'client') {
     addEntitlement(entries, {
       module: 'insights',
