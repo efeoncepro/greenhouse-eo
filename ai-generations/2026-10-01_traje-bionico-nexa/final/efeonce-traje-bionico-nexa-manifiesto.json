@@ -122,11 +122,21 @@
     {
       "id": "13-puesto-frente",
       "descripcion": "Nexa (identidad A) con el traje, de frente, sin lentes",
-      "cuando_usarla": "ESCENA: referencia por defecto del traje puesto",
+      "cuando_usarla": "documento del kit: Nexa vestida de frente (lleva su cara; NO se pasa a escenas)",
       "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-13-puesto-frente-1200x1600-v01-fondo-estudio.png",
       "resolucion": [
         1200,
         1600
+      ]
+    },
+    {
+      "id": "13-puesto-frente-sin-rostro",
+      "descripcion": "La vista 13 recortada bajo el mentón: el traje puesto en el cuerpo de Nexa, sin cara",
+      "cuando_usarla": "ESCENA: la referencia por defecto del traje puesto. Sin rostro para que el modelo no copie el gesto de esa foto (2026-10-02)",
+      "archivo_fondo_estudio": "efeonce-traje-bionico-nexa-13-puesto-frente-sin-rostro-1200x1330-v01-fondo-estudio.png",
+      "resolucion": [
+        1200,
+        1330
       ]
     },
     {

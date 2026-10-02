@@ -1,9 +1,9 @@
 # Bloques de prompt y pipeline de producción — fotografía de marca Efeonce V1
 
 > **Tipo de documento:** Especificación técnica de producción (prompts, comandos, scripts, QA)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-26 por Claude — conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
+> **Última actualización:** 2026-10-02 por Claude — 1.4: las referencias de identidad dicen QUIÉN es, no CÓMO está ([delta 2026-10-02](#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)). Antes, 2026-09-26: conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este documento es el **cómo se produce**: los bloques de texto que incorpora `pnpm foto:prompt` en cada prompt, la ficha de
@@ -16,6 +16,38 @@ verbatim en `rondas/<ronda>/batch*.json` y `*.txt` (versionados); las imágenes 
 Marcas: **[medido]**, **[decisión del operador]**, **[criterio]**, **[pendiente]** (ver [índice](./README.md)).
 
 ---
+
+## Delta 2026-10-02 — las referencias dicen quién es, no cómo está
+
+**[pedido del operador, 2026-10-02]** *«Nexa en casi todas las fotos sale con la misma pose de cara de un lado teniendo
+tantas poses»*. **Causa [medida]:** cuatro fuentes empujaban al mismo gesto —cabeza en tres cuartos, ladeada, mirada al
+lente y media sonrisa—:
+
+1. El bloque de Nexa ponía primero el **rostro en tres cuartos** y pedía «Preserve her face and hair EXACTLY as in the
+   references»: el modelo copiaba también el giro y la expresión de esa imagen.
+2. La vista puesta del traje biónico traía la cara de Nexa con ese gesto.
+3. Las **12 expresiones fotográficas** de `_identidad-nexa/5-expresiones/` comparten el mismo tres cuartos del ancla (se
+   editaron desde ella): pedir una expresión arrastraba la pose.
+4. Las fichas cine repiten «confident half-smile».
+
+**Corrección en `foto:prompt` [A/B medido sobre la ficha de `NX7d`]:**
+
+| Cambio | Alcance |
+|---|---|
+| REFERENCES agrega: *«The references define WHO each person is — features, proportions, skin and hair — never how they hold their head: the head turn, tilt, chin angle, gaze and facial expression come from the SCENE»*. La imagen pedida como `vista` manda en el ángulo; la de `expresion`, **sólo** en el gesto (*«copy only its facial expression… NOT its head angle or tilt»*) | todas las personas |
+| IDENTITY de Nexa: *«her features, not the moment they caught»* | bloque `nexa` |
+| Anclas de Nexa en orden **frontal → tres cuartos → cuerpo** | bloque `nexa` |
+| Las 12 expresiones fotográficas entran al catálogo: `carcajada`, `risa-elegante`, `sorprendida`, `esceptica`, `pensativa`, `neutra`, `preocupada`, `conviccion`, `escucha-empatica`, `curiosa`, `complicidad`, `mirada-lateral` | `expresiones` de `nexa` |
+| Aviso cuando la ficha trae a Nexa sin `expresion` ni `vista` (`auditarExpresion`) | `foto:prompt` |
+| El traje pasa a la escena **sin rostro** (vista 13 recortada bajo el mentón), como pide el método de kits | `traje-bionico-nexa` |
+
+**Resultado:** `NX7e` (sólo texto y orden) salió algo más frontal, con el mismo gesto; `NX7f` (expresión
+`conviccion` copiada entera) **no cambió nada**, porque esa referencia trae el mismo tres cuartos; `NX7g` (todo, con
+`sorprendida` y la pose descrita en la escena) salió **sin la inclinación y con otra expresión**, con la identidad A
+intacta (delineado con rabillo, lunar). El giro hacia el lado pedido **no** se cumplió: el ángulo se pide con `vista`,
+que trae su propia imagen. **Para variar de verdad, la ficha declara la expresión y la escena describe la pose; la
+frase fija «confident half-smile» deja de copiarse entre fichas.** Plates en
+`ai-generations/2026-10-01_traje-bionico-nexa/plates/NX7{d,e,f,g}-nexa-despliega-squad.png`.
 
 ## 0. Portabilidad de motor — el estilo NO depende del generador
 
@@ -191,7 +223,7 @@ IDENTITY (critical): the man is the SAME real person shown in the reference imag
 ```
 
 ```text
-IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
+IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her FACE and HAIR exactly as in the references — her features, not the moment they caught: her head turn, tilt, gaze and expression come from the scene and are never copied from a reference. Only pose, expression, clothing, light and setting change.
 ```
 
 El equipo actual (decisión del operador, 2026-09-29): Andrés, Daniela, Humberly, Melkin y Valentina, en ese orden (Luis salió del equipo el mismo día); identidades aprobadas por el operador el 2026-09-29 ([roster](./EFEONCE_TEAM_ROSTER_V1.md)).

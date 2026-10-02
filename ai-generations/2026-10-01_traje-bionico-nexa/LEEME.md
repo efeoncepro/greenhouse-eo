@@ -41,7 +41,8 @@ manifiesto.
 |---|---|---|
 | 01 · 02 · 03 · 04 · 05 | Traje solo: frente, espalda (v02, con el logo), tres cuartos izq. y der., perfil | Construcción. 1600×1600, fondo de estudio y transparente |
 | 10 | Macro de la pechera con el isotipo | Viaja como macro en toda escena; QA |
-| 13 | Nexa con el traje, de frente | **Escena**: la referencia por defecto |
+| 13 | Nexa con el traje, de frente | Documento del kit (lleva su cara) |
+| 13 sin rostro | La misma, recortada bajo el mentón | **Escena**: la referencia por defecto. Sin cara para que el modelo no copie su gesto (2026-10-02) |
 | 14 | Nexa con el traje, de espaldas (v02, pelo sobre el hombro, logo a la vista) | **Escena** de espaldas: `{ "puesta": "espalda" }` |
 | 20 · 21 | Lentes biónicos, frente y tres cuartos | Referencia de los lentes (21 por defecto) |
 

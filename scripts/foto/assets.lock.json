@@ -38,6 +38,10 @@
       "rol": "persona:julio/espalda",
       "sha256": "640f278f70d13bb816b9889c0d8060623880f70ace639d4fa70b40894abd8c07"
     },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png": {
+      "rol": "persona:nexa",
+      "sha256": "0903de95472ed4eb4c1029da00ec05dcd976628910d8f062961c17db7a29f219"
+    },
     "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png": {
       "rol": "persona:nexa",
       "sha256": "a0d4864f6ae1829de110af860a973e8b41a51b03fb3c58728e9c8a0c12ae4a6d"
@@ -45,10 +49,6 @@
     "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png": {
       "rol": "persona:nexa/cuerpo",
       "sha256": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1"
-    },
-    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png": {
-      "rol": "persona:nexa",
-      "sha256": "0903de95472ed4eb4c1029da00ec05dcd976628910d8f062961c17db7a29f219"
     },
     "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-4-busto-tresquartos.png": {
       "rol": "persona:nexa/busto",
@@ -129,6 +129,54 @@
     "ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png": {
       "rol": "persona:nexa/mic-drop",
       "sha256": "1e05a848669405bd073522e703786802dbbbf6fd92c5fc4532471804f3b89df9"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-01-carcajada.png": {
+      "rol": "persona:nexa/carcajada",
+      "sha256": "5fd4399de4574892d057f89de3f21a8380a6575bb7e93ade4289994a382c51ff"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-02-risa-elegante.png": {
+      "rol": "persona:nexa/risa-elegante",
+      "sha256": "831e80b99050acfde8570b65edde4c9d1a94e191c1950c10f8fb8812a46f190c"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-03-sorprendida.png": {
+      "rol": "persona:nexa/sorprendida",
+      "sha256": "1c7538625cad5e5edc9711a1d94793455ea927827e0b5b5cdb79fe23f57b1c75"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-04-esceptica.png": {
+      "rol": "persona:nexa/esceptica",
+      "sha256": "3aaa187d7d8368f04a948b02200a2ce9d4772c02ff4144374247b704b5678541"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-05-pensativa.png": {
+      "rol": "persona:nexa/pensativa",
+      "sha256": "cda951d13cafe543a13c2dd4d72480afe9f7c34c02cb62f31dec488832b4be10"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-06-neutra-reposo.png": {
+      "rol": "persona:nexa/neutra",
+      "sha256": "7320c3d72c35811528880cbccd9a2b501eb862e60a90a1db5c2d6e302aeb2ac3"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-07-preocupada.png": {
+      "rol": "persona:nexa/preocupada",
+      "sha256": "88420ff0009204f657c11997795229c103545e6be5524ef24726c13bb13334b6"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-08-conviccion.png": {
+      "rol": "persona:nexa/conviccion",
+      "sha256": "aa76d4e6c2a3f76eb746dab9ecd215774221c7794d67fe51b8957b9fb18c620e"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-09-escucha-empatica.png": {
+      "rol": "persona:nexa/escucha-empatica",
+      "sha256": "beb65c8a7c80319d27ed936877108adac0a4684315513c269554b5f33d15d97d"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-10-curiosa.png": {
+      "rol": "persona:nexa/curiosa",
+      "sha256": "f81c71927a9bad6017050c56bfe7a986e83ff3bf6889d47c1228380f668a516f"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-11-complicidad.png": {
+      "rol": "persona:nexa/complicidad",
+      "sha256": "be98e52eb87c0fede856c4b73821e27a15632617f2423234e9dd419ad40ba2d4"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-12-mirada-lateral.png": {
+      "rol": "persona:nexa/mirada-lateral",
+      "sha256": "dbde6448bd8908af60fd3079e9bd3ee00e76196e8818c6f57663ae1c0ebf1667"
     },
     "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-1.png": {
       "rol": "persona:nexa/prof-1",
@@ -1446,9 +1494,9 @@
       "rol": "kit:traje-bionico-nexa/espalda",
       "sha256": "6dfacb8f292f054f1a0abbf8224138ce1f5c23514e45b2ab9ac652cfcb6c6092"
     },
-    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+    "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-sin-rostro-1200x1330-v01-fondo-estudio.png": {
       "rol": "uso:traje-bionico-nexa/defecto",
-      "sha256": "f60430e5c7c7d77fe4d6d4efd84771fa097c489bd60f01c85db7670fd72ab642"
+      "sha256": "db9ab79d68cfeece7a28a9c795df1e021e3599d70252d57cc44e3ef0865d416c"
     },
     "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-14-puesto-espalda-1200x1600-v02-fondo-estudio.png": {
       "rol": "uso:traje-bionico-nexa/usoPorVista:espalda",

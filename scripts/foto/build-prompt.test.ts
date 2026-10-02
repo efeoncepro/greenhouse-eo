@@ -16,6 +16,7 @@ import {
   auditarColor,
   auditarContradicciones,
   auditarEmblema,
+  auditarExpresion,
   auditarEscena,
   auditarLechoDeTanda,
   auditarRegistroVestuario,
@@ -289,6 +290,28 @@ conAssets('foto:prompt · identidad', () => {
     expect(r.prompt).toContain(
       'REFERENCES: Images 1-2 are Julio (identity only). Images 3-4 are Nexa (identity only). Ignore the clothing and backgrounds of all references.'
     )
+  })
+
+  // La pose repetida de Nexa (2026-10-02): las referencias dicen QUIÉN es, no CÓMO está; la frontal va primero y la
+  // imagen pedida como expresión o ángulo es la única que manda en el gesto.
+  it('las referencias definen quién es, no su pose: el giro y el gesto salen de la escena', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['nexa'] })
+
+    expect(r.prompt).toContain('never how they hold their head')
+    expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
+  })
+
+  it('una expresión pedida va primero y se nombra como la que manda en el gesto', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'conviccion' }] })
+
+    expect(r.imagenes[0]).toMatch(/5-expresiones\/nexa-expr-08-conviccion/)
+    expect(r.prompt).toContain("Image 1 is Nexa's EXPRESSION reference: copy only its facial expression")
+  })
+
+  it('avisa cuando Nexa no trae expresión ni vista', () => {
+    expect(auditarExpresion(['nexa'])).toMatch(/gesto por defecto/)
+    expect(auditarExpresion([{ persona: 'nexa', expresion: 'curiosa' }])).toBeNull()
+    expect(auditarExpresion(['julio'])).toBeNull()
   })
 
   // El orden del canon (§3.6/§3.7) no es decorativo: IDENTITY y REFERENCES condicionan la escena que

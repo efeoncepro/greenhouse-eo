@@ -465,6 +465,10 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 - **Retrato: 85 mm f/2, nunca 35 mm de cerca** **[del brief aprobado]**. El gran angular a distancia de retrato
   **ensancha y distorsiona el rostro**: parte de lo que se lee como «no es ella» es el lente, no deriva de identidad.
   La pieza aprobada es *chest-up medium close-up, 85 mm f/2*.
+- 🔴 **La pose y la expresión de Nexa salen de la escena, no de las referencias** **[operador, 2026-10-02]**: las
+  referencias dicen quién es; el giro, la inclinación y el gesto los da la escena. Declara `{ "persona": "nexa",
+  "expresion": "…" }` (12 fotográficas en `5-expresiones/`, todas con el mismo tres cuartos: copian sólo el gesto) y no
+  copies «confident half-smile» de ficha en ficha: `foto:prompt` avisa si falta. Detalle: bloques de prompt, delta 2026-10-02.
 - 🔴 **La cabeza casi no gira: giran los ojos.** Pedir «gira la cabeza hacia el hombro» es pedir un **tres cuartos
   marcado**, y **pedir un ángulo que el set de referencias no cubre hace que el modelo reconstruya el rostro**. En la
   pieza aprobada la cabeza está casi frontal y **sólo los ojos** van hacia la mascota. Marcadores del casi-frontal:

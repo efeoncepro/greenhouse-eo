@@ -233,7 +233,7 @@ export const PERSONAS = {
     // que separa la identidad canónica de la descartada («el más rápido de verificar es el delineado»).
     // Entra como marcador de continuidad con el material aprobado.
     identity:
-      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.',
+      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her FACE and HAIR exactly as in the references — her features, not the moment they caught: her head turn, tilt, gaze and expression come from the scene and are never copied from a reference. Only pose, expression, clothing, light and setting change.',
     // Los CUATRO signature elements del Bible §5.1 —anillo, reloj, aretes y UÑAS— que el pipeline no pedía.
     // 🔴 El reloj dejó de ser analógico: es un SMARTWATCH **[decisión del operador, 2026-09-21]**. Nexa es
     // tecnológica y sus objetos lo dicen; un reloj de agujas la contradice. Ecosistema completo de props en
@@ -274,10 +274,14 @@ export const PERSONAS = {
     // Las tres referencias son ANCLAS fotográficas de 2560×3200 / 2304×3456 generadas el 2026-09-21: piel
     // con poros irregulares y vello facial real, no la piel sin poros del maestro sintético anterior.
     // Orden: rostro tres cuartos (la más decisiva), cuerpo entero, rostro frontal.
+    // 🔴 Orden cambiado el 2026-10-02 [operador: «Nexa en casi todas las fotos sale con la misma pose de cara de un
+    // lado»]: con el rostro en TRES CUARTOS primero, el modelo copiaba también su giro, su inclinación y su media
+    // sonrisa (medido en NX5b, NX7d y la vista puesta del traje). La frontal neutra va primero; un ángulo o una
+    // expresión pedidos en la ficha se anteponen igual que antes.
     refs: [
+      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png',
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png',
-      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
-      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png'
+      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png'
     ],
     cuerpo: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
     // Vistas aprobadas de Nexa. Las ocho direcciones del set gris son fotográficas y fueron editadas desde
@@ -315,7 +319,21 @@ export const PERSONAS = {
       'the-point': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-point.png',
       'got-it': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-got-it.png',
       'the-listen': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png',
-      'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png'
+      'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png',
+      // Las 12 expresiones FOTOGRÁFICAS de `5-expresiones/` (acabado de las anclas, no sintético). Existían en disco y
+      // el catálogo no las conocía: por eso casi toda ficha caía en el gesto por defecto (2026-10-02).
+      carcajada: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-01-carcajada.png',
+      'risa-elegante': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-02-risa-elegante.png',
+      sorprendida: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-03-sorprendida.png',
+      esceptica: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-04-esceptica.png',
+      pensativa: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-05-pensativa.png',
+      neutra: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-06-neutra-reposo.png',
+      preocupada: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-07-preocupada.png',
+      conviccion: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-08-conviccion.png',
+      'escucha-empatica': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-09-escucha-empatica.png',
+      curiosa: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-10-curiosa.png',
+      complicidad: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-11-complicidad.png',
+      'mirada-lateral': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-12-mirada-lateral.png'
     },
     // Los cinco contextos de vestuario del Bible §5.3. `lifestyle-*` se produjo el 2026-09-21 y NO arrastra la
     // deuda de acabado: las otras cuatro familias vienen de injerto sobre el maestro sintético, y éstas se
@@ -518,7 +536,7 @@ function resolverIdentidad(ficha) {
     const hasta = imagenes.length + refs.length
 
     imagenes.push(...refs)
-    tramos.push({ persona, desde, hasta })
+    tramos.push({ persona, desde, hasta, dimension: dimension?.campo ?? null })
   }
 
   // Texto verbatim de §3.7: una persona lo lleva todo en una frase; dos lo dicen por tramo y cierran
@@ -532,6 +550,20 @@ function resolverIdentidad(ficha) {
           .map(t => `${rango(t)} are ${t.persona.etiqueta} (identity only).`)
           .join(' ')} Ignore the clothing and backgrounds of all references.`
 
+  // Las referencias dicen QUIÉN es la persona, no CÓMO está: sin esta frase el modelo copiaba también el giro, la
+  // inclinación y el gesto de la primera imagen (Nexa salió con la misma pose en NX5b, NX7d y la vista del traje,
+  // 2026-10-02). La imagen que la ficha pide como ángulo manda en el ángulo; la de expresión, SÓLO en el gesto: las 12
+  // expresiones de `5-expresiones/` comparten el mismo tres cuartos del ancla (se editaron desde ella), así que copiarlas
+  // enteras arrastraba también la pose (medido en el A/B NX7f, 2026-10-02).
+  const queManda = tramos
+    .filter(t => t.dimension === 'vista' || t.dimension === 'expresion')
+    .map(t => `Image ${t.desde} is ${t.persona.etiqueta}'s ${t.dimension === 'vista' ? 'ANGLE reference: it sets the head angle of this shot' : 'EXPRESSION reference: copy only its facial expression (eyes, brows, mouth), NOT its head angle or tilt'}, still with the face of the identity references.`)
+
+  const pose =
+    ' The references define WHO each person is — features, proportions, skin and hair — never how they hold their head: ' +
+    'the head turn, tilt, chin angle, gaze and facial expression come from the SCENE, not from any reference.' +
+    (queManda.length ? ` ${queManda.join(' ')}` : '')
+
   // Los accesorios van como BLOQUE APARTE, separados por \n\n, no pegados al IDENTITY. Si se unieran con
   // un espacio, el bloque emitido dejaría de existir verbatim en el canon y el test que lo verifica
   // fallaría — y, peor, IDENTITY dejaría de ser citable como unidad.
@@ -539,7 +571,7 @@ function resolverIdentidad(ficha) {
     identity: tramos
       .flatMap(t => [t.persona.identity, t.persona.accesorios].filter(Boolean))
       .join('\n\n'),
-    references,
+    references: references + pose,
     imagenes
   }
 }
@@ -1053,7 +1085,9 @@ export const OBJETOS = {
       espalda: 'efeonce-traje-bionico-nexa-02-espalda-1600x1600-v02-transparente.png'
     },
     vistaDefecto: 'frente',
-    assetDeUso: 'efeonce-traje-bionico-nexa-13-puesto-frente-1200x1600-v01-fondo-estudio.png',
+    // SIN ROSTRO (2026-10-02): la vista 13 completa trae la cara de Nexa con el gesto del ancla y la escena lo copiaba;
+    // el método de kits pide las vistas puestas recortadas bajo el mentón. La 13 completa queda en el kit como documento.
+    assetDeUso: 'efeonce-traje-bionico-nexa-13-puesto-frente-sin-rostro-1200x1330-v01-fondo-estudio.png',
     usoPorVista: {
       espalda: 'efeonce-traje-bionico-nexa-14-puesto-espalda-1200x1600-v02-fondo-estudio.png'
     },
@@ -2244,6 +2278,14 @@ return avisos
 const VESTUARIO =
   /\b(wears?|wearing|dressed|suit|bodysuit|shirt|t-?shirt|sweater|jumper|hoodie|polo|blouse|apron|overall|coverall|jacket|vest|linen|denim|cotton|knit|sleeves?)\b/i
 
+// La pose repetida de Nexa (2026-10-02): sin una expresión declarada cae en el gesto por defecto de la escena
+// («confident half-smile») y todas las piezas salen con la misma cara. Aviso, no error: la neutra es legítima.
+export const auditarExpresion = identidad =>
+  (identidad ?? []).some(p => (typeof p === 'string' ? p : p?.persona) === 'nexa' && !(typeof p === 'object' && (p.expresion || p.vista)))
+    ? 'trae a Nexa sin `expresion` ni `vista`: sale con el gesto por defecto y la serie se repite. Declárala, por ejemplo ' +
+      '{ "persona": "nexa", "expresion": "conviccion" } (12 fotográficas en _identidad-nexa/5-expresiones/).'
+    : null
+
 export const auditarVestuario = (escena, identidad) =>
   identidad?.length && !VESTUARIO.test(escena)
     ? 'no declara el VESTUARIO y hay identidad: el modelo copia la ropa de las referencias aunque el prompt diga "ignore their clothing"'
@@ -2595,6 +2637,10 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     avisos.push(...auditarContradicciones(ficha))
 
     if (vestuario) avisos.push(vestuario)
+
+    const expresion = auditarExpresion(ficha.identidad)
+
+    if (expresion) avisos.push(expresion)
 
     for (const a of avisos) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: la escena ${a}`)
 
