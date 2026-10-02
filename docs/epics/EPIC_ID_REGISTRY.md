@@ -64,7 +64,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-047` | `to-do` | `docs/epics/to-do/EPIC-047-public-site-landing-portfolio-prioritization.md` |
 | `EPIC-048` | `to-do` | `docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md` |
 | `EPIC-049` | `in-progress` | `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md` |
+| `EPIC-050` | `to-do` | `docs/epics/to-do/EPIC-050-creative-workbench-campaign-scale-production.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-050`
+- `EPIC-051`
