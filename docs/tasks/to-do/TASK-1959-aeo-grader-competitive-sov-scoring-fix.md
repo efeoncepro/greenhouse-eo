@@ -63,7 +63,9 @@ frente a competencia lideran con 100». Verificado con tres revisiones adversari
 Mitigación ya aplicada fuera del Grader: Insights (TASK-1957, `aeo_report_adapter_v2`) no emite la dimensión ni el
 puntaje global cuando no hay competidores. Los competidores de Berel en México quedaron declarados el 2026-10-02
 (set `gcset-da6edfa2…`, versión 2: Comex, Sherwin-Williams, Behr, Pinturas Osel, Pinturas Doal, Pinturas Prisa) y se
-re-corrió EO-GRUN-00072. El Grader mismo sigue publicando la cifra inflada a cualquier organización sin lista.
+re-corrió EO-GRUN-00072: Berel aparece en 8 de 24 respuestas, Comex en 11 y Sherwin-Williams en 4. El Grader puntuó la
+dimensión 80 («8 vs 2 competidores distintos») cuando la participación por menciones es 34,8 % (8 de 23), y el global
+39,3 cuando con la dimensión bien medida sería ~32,5. El Grader sigue publicando cifras infladas, con o sin lista.
 
 ## Goal
 
