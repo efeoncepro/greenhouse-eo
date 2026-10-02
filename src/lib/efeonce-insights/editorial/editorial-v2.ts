@@ -513,7 +513,8 @@ export const scopeLinesFor = (modules: InsightModule[]): string[] => modules.map
 const conclusionsOf = (chapter: PlanChapterV1): PlanClaimV1[] => {
   // TASK-1957 — el puntaje por dimensión (`chart.aeo.score`) va al final: un empate de dimensiones no es el hallazgo del
   // mes frente a una meta, una tendencia o un cambio real (Berel, 2026-10-02: la tesis era «… lideran con 100»).
-  const rank = (chartId: string) => (chartId.includes('.bullet.') ? 0 : chartId.includes('.line.') ? 1 : chartId.endsWith('.score') ? 3 : 2)
+  // TASK-1962 — las causas (`.drivers.`) explican el resultado: van detrás de él, nunca son la tesis.
+  const rank = (chartId: string) => (chartId.includes('.bullet.') ? 0 : chartId.includes('.line.') ? 1 : chartId.endsWith('.score') ? 4 : chartId.includes('.drivers.') ? 3 : 2)
 
   return [...(chapter.readings ?? [])]
     .sort((a, b) => rank(a.chartId) - rank(b.chartId))

@@ -199,7 +199,7 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
         ...(spec.scale.perDimension ? { note: GH_INSIGHTS.reading.ownScaleNote } : {})
       }
     }),
-    tables: chapter.tables.map(table => ({ tableId: table.tableId, title: table.title, columns: [...table.columns], rows: table.rows.map(row => [...row]) })),
+    tables: chapter.tables.map(table => ({ tableId: table.tableId, title: table.title, columns: [...table.columns], rows: table.rows.map(row => [...row]), ...(table.lead ? { lead: table.lead } : {}) })),
     limits: [...chapter.limits],
     ...(chapter.opening ? { opening: projectClaim(chapter.opening) } : {}),
     ...(chapter.readings?.length ? { readings: chapter.readings.map(projectReading) } : {}),

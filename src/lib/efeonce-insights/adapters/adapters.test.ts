@@ -30,7 +30,8 @@ const seoMocks = vi.hoisted(() => ({
   resolveUnambiguousSeoTarget: vi.fn(),
   readSeoOverviewKpisForWindow: vi.fn(),
   readRankEvolution: vi.fn(),
-  readDomainOverviewForTarget: vi.fn()
+  readDomainOverviewForTarget: vi.fn(),
+  readSeoWindowMovers: vi.fn()
 }))
 
 vi.mock('@/lib/growth/seo/flags', () => ({ isSeoModuleEnabled: seoMocks.isSeoModuleEnabled }))
@@ -38,6 +39,7 @@ vi.mock('@/lib/growth/seo/resolve-target', () => ({ resolveUnambiguousSeoTarget:
 vi.mock('@/lib/growth/seo/overview/read-overview-kpis', () => ({ readSeoOverviewKpisForWindow: seoMocks.readSeoOverviewKpisForWindow }))
 vi.mock('@/lib/growth/seo/rank-evolution-reader', () => ({ readRankEvolution: seoMocks.readRankEvolution }))
 vi.mock('@/lib/growth/seo/domain-overview/reader', () => ({ readDomainOverviewForTarget: seoMocks.readDomainOverviewForTarget }))
+vi.mock('@/lib/growth/seo/overview/read-window-movers', () => ({ readSeoWindowMovers: seoMocks.readSeoWindowMovers }))
 
 const aeoMocks = vi.hoisted(() => ({ readClientGraderReport: vi.fn() }))
 
@@ -82,6 +84,49 @@ describe('SEO adapter', () => {
       { keyword: 'c', points: [{ date: '2026-09-01', position: 1, url: null }] }
     ], provenance: [] })
     seoMocks.readDomainOverviewForTarget.mockResolvedValue({ ok: true, subject: 'x.cl', capturedAt: '2026-09-01', etvMethodology: { version: 'improved_layout_clickstream_v2' }, history: [{ month: '2026-08', organicEtv: 1200 }, { month: '2026-07', organicEtv: 1000 }] })
+    seoMocks.readSeoWindowMovers.mockImplementation(async (_org: string, input: { dimension: 'query' | 'page' }) => ({
+      ok: true,
+      dimension: input.dimension,
+      totalClicks: 500,
+      previousTotalClicks: 400,
+      movers: input.dimension === 'query'
+        ? [{ key: 'pintura 19 litros', clicks: 120, previousClicks: 60, impressions: 900, previousImpressions: 800 }, { key: 'x marca', clicks: 30, previousClicks: 50, impressions: 300, previousImpressions: 310 }]
+        : [{ key: 'https://x.cl/', clicks: 300, previousClicks: 250, impressions: 9000, previousImpressions: 8000 }]
+    }))
+  })
+
+  it('TASK-1962 — con v2 y período anterior, las consultas y páginas que más movieron los clics son hechos con su comparable', async () => {
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
+    const { seoReportAdapter, pageLabelOf } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+
+    const top = result.facts.find(fact => fact.factId === 'seo.driver.query.clicks.2026-08-01_2026-09-01.1')!
+
+    expect(top).toMatchObject({ label: 'pintura 19 litros', value: 120, unit: 'count', comparisonFactId: 'seo.driver.query.clicks.2026-07-01_2026-08-01.1', dimension: { query: 'pintura 19 litros', rank: '1' } })
+    expect(result.facts.find(fact => fact.factId === top.comparisonFactId)).toMatchObject({ value: 60, comparisonFactId: null })
+    // La página se rotula con su ruta; la raíz es la página de inicio.
+    expect(result.facts.find(fact => fact.metricId === 'driver.page.clicks' && fact.value === 300)!.label).toBe('Página de inicio')
+    expect(pageLabelOf('https://x.cl/colores/grises/')).toBe('/colores/grises')
+    expect(result.sources.some(source => source.reader === 'readSeoWindowMovers')).toBe(true)
+    expectContentContract(result.facts)
+
+    // Sin período anterior no hay qué descomponer, y sin v2 la evidencia queda igual que antes.
+    const noComparison = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+    const v1 = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [] })
+
+    expect(noComparison.facts.some(fact => fact.metricId.startsWith('driver.'))).toBe(false)
+    expect(v1.facts.some(fact => fact.metricId.startsWith('driver.'))).toBe(false)
+  })
+
+  it('TASK-1962 — un reader de causas sin datos se declara como límite, no como silencio', async () => {
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async () => gscWindow(500, 20000, 31, '2026-08-31'))
+    seoMocks.readSeoWindowMovers.mockResolvedValue({ ok: false, errorCode: 'no_data' })
+    const { seoReportAdapter } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+
+    expect(result.rejections).toEqual(expect.arrayContaining([expect.objectContaining({ metricId: 'driver.query', reason: 'insufficient_data' }), expect.objectContaining({ metricId: 'driver.page', reason: 'insufficient_data' })]))
   })
 
   it('produce hechos GSC/rank/ETV con unidad, población, cobertura, asOf, método y comparisonFactId', async () => {

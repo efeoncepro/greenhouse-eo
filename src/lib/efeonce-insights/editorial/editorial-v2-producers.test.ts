@@ -395,3 +395,69 @@ describe('TASK-1888 — tabla de respaldo y hallazgo principal primero (Sky 2026
     expect(chapter.charts.map(chart => chart.chartId)).toEqual(v2(icoSnapshot, ['ico']).chapters[0]!.charts.map(chart => chart.chartId))
   })
 })
+
+describe('TASK-1962 — «¿por qué cambió?»: consultas y páginas que más movieron los clics', () => {
+  const seo = (factId: string, metricId: string, label: string, value: number, comparisonFactId: string | null = null, dimension?: Record<string, string>): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId, module: 'seo', metricId, label, unit: 'count', numerator: null, denominator: null, dimension, channelId: 'google', comparisonFactId })
+
+  const mover = (dimension: 'query' | 'page', rank: number, label: string, now: number, before: number): EvidenceFactV1[] => {
+    const id = `seo.driver.${dimension}.clicks.w.${rank}`
+
+    return [
+      seo(id, `driver.${dimension}.clicks`, label, now, `${id}.prev`, { [dimension]: label, rank: String(rank) }),
+      seo(`${id}.prev`, `driver.${dimension}.clicks`, label, before, null, { [dimension]: label, rank: String(rank) })
+    ]
+  }
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      seo('seo.clicks', 'clicks', 'Clics orgánicos', 9377, 'seo.clicks.prev'),
+      seo('seo.clicks.prev', 'clicks', 'Clics orgánicos', 10662),
+      seo('seo.impressions', 'impressions', 'Impresiones', 512113, 'seo.impressions.prev'),
+      seo('seo.impressions.prev', 'impressions', 'Impresiones', 566297),
+      ...mover('query', 1, 'berel', 1579, 1933),
+      ...mover('query', 2, 'pinturas berel', 910, 1059),
+      ...mover('query', 3, 'pintura 19 litros', 16, 40),
+      ...mover('page', 1, 'Página de inicio', 4263, 4893),
+      ...mover('page', 2, '/colores', 875, 1104),
+      ...mover('page', 3, '/colores/grises', 79, 124)
+    ],
+    sources: [],
+    rejections: []
+  }
+
+  it('hallazgo de descomposición por dimensión, figura de la misma escala y una tabla con todas', () => {
+    const plan = v2(snapshot, ['seo'])
+    const chapter = plan.chapters[0]!
+    const texts = chapter.claims.map(item => item.text)
+
+    expect(texts).toContain('La consulta que más cambió fue «berel»: bajó de 1.933 a 1.579 clics (-18,3 %).')
+    expect(texts).toContain('La página que más cambió fue «Página de inicio»: bajó de 4.893 a 4.263 clics (-12,9 %).')
+    expect(chapter.claims.find(item => item.claimId === 'claim.seo.drivers.query')!.role).toBe('finding')
+
+    const queries = chapter.charts.find(chart => chart.chartId === 'chart.seo.drivers.query')!
+    const pages = chapter.charts.find(chart => chart.chartId === 'chart.seo.drivers.page')!
+
+    // Una consulta de decenas no comparte eje con una de miles; la portada tampoco con una página de decenas.
+    expect(queries.dimensionLabels).toEqual(['berel', 'pinturas berel'])
+    expect(pages.dimensionLabels).toEqual(['Página de inicio', '/colores'])
+    expect(queries.scale).not.toHaveProperty('perDimension')
+
+    const table = chapter.tables.find(item => item.tableId === 'table.seo.drivers')!
+
+    expect(table.rows.map(row => row[0])).toEqual(['berel', 'pinturas berel', 'pintura 19 litros', 'Página de inicio', '/colores', '/colores/grises'])
+    // Las causas no se mezclan con la tabla general ni compiten como hallazgo de resultado.
+    expect(chapter.tables[0]!.rows.map(row => row[0])).toEqual(['Clics orgánicos', 'Impresiones'])
+    // La causa nunca es la tesis del resumen: el resultado va primero.
+    expect(plan.executiveSummary[0]!.factIds).not.toEqual(expect.arrayContaining(['seo.driver.query.clicks.w.1']))
+    // La lectura de la figura dice lo mismo que el hallazgo (más clics movidos), no el mayor cambio relativo (/colores).
+    const pageReading = chapter.readings!.find(reading => reading.chartId === 'chart.seo.drivers.page')!
+
+    expect(pageReading.conclusion!.text).toBe('La página que más cambió fue «Página de inicio»: bajó de 4.893 a 4.263 clics (-12,9 %).')
+    expect(pageReading.keyFigure).toMatchObject({ factId: 'seo.driver.page.clicks.w.1', value: '4.263' })
+    // La primera lectura del capítulo sigue siendo la del resultado, no la de una causa.
+    expect(chapter.readings![0]!.chartId).not.toContain('.drivers.')
+    // Una consulta con dígitos no se lee como cifra sin respaldo.
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+})

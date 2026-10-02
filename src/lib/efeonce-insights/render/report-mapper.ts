@@ -280,7 +280,7 @@ const chapterBodyPages = (
             eyebrow: L.tableEyebrow,
             ...hero,
             tableTitle: rejectIfLonger(table.title, BUDGET.tableTitle, `${table.tableId}.title`),
-            lead: L.tableLeadAll(periodInline, withPrevious),
+            lead: table.lead ?? L.tableLeadAll(periodInline, withPrevious),
             // La continuación se declara: una tabla que sigue sin decirlo obliga a retroceder.
             ...(i > 0 ? { continuationLabel: L.tableContinued, rankOffset: String(i * CAPACITY.tableRows) } : {}),
             boardTitle: rejectIfLonger(`${L.tableDetailBy} ${entityColumn.toLowerCase()}`, 48, `${table.tableId}.boardTitle`),

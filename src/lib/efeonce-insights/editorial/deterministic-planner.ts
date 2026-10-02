@@ -6,7 +6,7 @@
 
 import type { ChartSpecV1 } from '../contracts/chart-spec'
 import { isReferenceFact, type EvidenceFactV1, type EvidenceRejectionV1, type EvidenceSnapshotContentV1, type EvidenceSourceV1 } from '../contracts/evidence'
-import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1, PlanCoverV1, PlanTableV1 } from '../contracts/plan'
+import { PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanChapterV1, type PlanClaimV1, type PlanCoverV1, type PlanFigureReadingV1, type PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
 import { assertChartsAllowed, bulletCharts, contextOfFacts, essentialsFor, humanFactSentence, lineCharts, openingFor, printedChange, readingsFor, scopeLinesFor, summaryFindingsFor, type ChapterContext as ChapterContextV2 } from './editorial-v2'
 import { asOfLabelOf, windowLabelOf } from '../presentation/vocabulary'
@@ -353,6 +353,113 @@ const tableFor = (tableId: string, title: string, facts: EvidenceFactV1[], byId:
   })
 })
 
+/**
+ * TASK-1962 — «¿por qué cambió?» (contrato de contenido, pregunta 2). Los hechos `driver.<consulta|página>.clicks` son
+ * las consultas y páginas que más movieron los clics, cada una con su período anterior. Producen, por dimensión:
+ *  - un hallazgo sobre la que más cambió, en lenguaje de descomposición («La consulta que más cambió fue…»), nunca de
+ *    causa;
+ *  - una figura sólo con las que comparten escala con la de mayor pico (dentro de `MAGNITUDE_BAND`): la portada con
+ *    miles de clics no aplasta a páginas de decenas, y una figura de una barra no compara nada;
+ * y una tabla única con todas, con las columnas de la tabla del capítulo para que el informe A4 la reconozca.
+ * No entran a la tesis antes que el resultado (ver el rango de `.drivers.` en `conclusionsOf`).
+ */
+const isDriverFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('driver.')
+
+const DRIVER_DIMENSIONS = [
+  { dimension: 'query', lead: GH_INSIGHTS.reading.driverQueryLead, title: GH_INSIGHTS.figures.driversQueryTitle },
+  { dimension: 'page', lead: GH_INSIGHTS.reading.driverPageLead, title: GH_INSIGHTS.figures.driversPageTitle }
+] as const
+
+const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string) => {
+  const charts: ChartSpecV1[] = []
+  const claims: PlanClaimV1[] = []
+  const readings: PlanFigureReadingV1[] = []
+  const rows: Array<Array<string | null>> = []
+  const previousOf = (fact: EvidenceFactV1) => (fact.comparisonFactId ? byId.get(fact.comparisonFactId) : undefined)
+  const fmtCount = (value: number | null) => formatFactValue(value, 'count', locale)
+
+  for (const { dimension, lead, title } of DRIVER_DIMENSIONS) {
+    const movers = facts
+      .filter(fact => fact.metricId === `driver.${dimension}.clicks` && fact.value !== null && previousOf(fact)?.value != null)
+      .sort((a, b) => Number(a.dimension?.rank ?? 0) - Number(b.dimension?.rank ?? 0))
+
+    const top = movers[0]
+
+    if (!top) continue
+
+    const before = previousOf(top)!
+    const delta = formatDeltaForUnit(top.value!, before.value!, 'count', locale)
+    const verb = top.value! > before.value! ? GH_INSIGHTS.reading.rose : top.value! < before.value! ? GH_INSIGHTS.reading.fell : GH_INSIGHTS.reading.held
+
+    const change = `${verb} ${GH_INSIGHTS.reading.from} ${fmtCount(before.value)} ${GH_INSIGHTS.reading.lineTo} ${fmtCount(top.value)} ${GH_INSIGHTS.reading.clicksWord}${delta ? ` (${delta})` : ''}`
+    const named = `${lead} «${top.label}»: ${change}.`
+    const factIds = [top.factId, before.factId]
+
+    claims.push({ claimId: `claim.${moduleKey}.drivers.${dimension}`, text: named, factIds, role: 'finding' })
+
+    const peak = (fact: EvidenceFactV1) => Math.max(Math.abs(fact.value!), Math.abs(previousOf(fact)!.value!))
+    const topPeak = Math.max(...movers.map(peak))
+    const band = movers.filter(fact => peak(fact) * MAGNITUDE_BAND >= topPeak)
+
+    if (band.length >= 2) {
+      const chartId = `chart.${moduleKey}.drivers.${dimension}`
+      const channel = band[0]!.channelId
+
+      // La lectura de la figura dice lo MISMO que el hallazgo: «más cambió» es más clics movidos. La lectura genérica de
+      // barras elige el mayor cambio relativo y nombraba otra página (/colores, -20,7 %) que el hallazgo (la portada).
+      // Si la frase con el nombre no cabe en el molde, va sin el nombre: la figura ya lo muestra; nunca se recorta.
+      const conclusion = [named, `${lead} ${change}.`].find(text => text.length <= PLAN_TEXT_LIMITS.conclusion)!
+
+      readings.push({
+        chartId,
+        keyFigure: {
+          factId: top.factId,
+          value: fmtCount(top.value),
+          caption: { claimId: `caption.${chartId}`, text: [`«${top.label}» · ${GH_INSIGHTS.reading.previousPeriod}: ${fmtCount(before.value)}`, `${GH_INSIGHTS.reading.previousPeriod}: ${fmtCount(before.value)}`].find(text => text.length <= PLAN_TEXT_LIMITS.keyFigureCaption)!, factIds }
+        },
+        conclusion: { claimId: `conclusion.${chartId}`, text: conclusion, factIds },
+        nextStep: null
+      })
+
+      charts.push({
+        specVersion: 'chart_spec_v1',
+        chartId,
+        family: 'bar_grouped',
+        relation: 'comparison',
+        title,
+        series: [
+          { seriesId: `${chartId}.previous`, label: GH_INSIGHTS.figures.previousLabel, factIds: band.map(fact => fact.comparisonFactId!), unit: 'count', ...(channel ? { channelId: channel } : {}) },
+          { seriesId: `${chartId}.current`, label: GH_INSIGHTS.figures.currentLabel, factIds: band.map(fact => fact.factId), unit: 'count', ...(channel ? { channelId: channel } : {}) }
+        ],
+        dimensionLabels: band.map(fact => fact.label),
+        unit: 'count',
+        // Misma métrica (clics) en todas las barras: eje compartido, nunca una escala por fila.
+        scale: { kind: 'linear', baseline: 0 },
+        references: [],
+        tabularEquivalent: {
+          columns: [dimension === 'query' ? GH_INSIGHTS.figures.driversQueryColumn : GH_INSIGHTS.figures.driversPageColumn, GH_INSIGHTS.figures.previousLabel, GH_INSIGHTS.figures.currentLabel],
+          rows: band.map(fact => [null, fact.comparisonFactId!, fact.factId])
+        }
+      })
+    }
+
+    for (const fact of movers) rows.push([fact.label, fmtCount(fact.value), fmtCount(previousOf(fact)!.value), asOfLabelOf(fact.freshness.asOf, locale) ?? '—'])
+  }
+
+  const tables: PlanTableV1[] = rows.length > 0
+    ? [{ tableId: `table.${moduleKey}.drivers`, title: GH_INSIGHTS.figures.driversTableTitle, lead: GH_INSIGHTS.figures.driversTableLead, columns: [GH_INSIGHTS.figures.driversEntityColumn, 'Período', 'Período anterior', 'Corte de la fuente'], rows }]
+    : []
+
+  return { charts, claims, tables, readings }
+}
+
+/** Reemplaza la lectura genérica de cada figura de causas por la del productor de causas (mismo criterio que el hallazgo). */
+const withDriverReadings = (readings: PlanFigureReadingV1[], driverReadings: PlanFigureReadingV1[]): PlanFigureReadingV1[] => {
+  const byChart = new Map(driverReadings.map(reading => [reading.chartId, reading]))
+
+  return readings.map(reading => byChart.get(reading.chartId) ?? reading)
+}
+
 export interface DeterministicPlanInput {
   modules: InsightModule[]
   locale: string
@@ -372,7 +479,10 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
   for (const moduleKey of input.modules) {
     // Hechos del período actual (los del período anterior sólo entran como comparación). Una meta oficial es un
     // hecho de REFERENCIA (TASK-1888): se cita en gráficos y lecturas, nunca como hallazgo propio.
-    const facts = snapshot.facts.filter(fact => fact.module === moduleKey && !comparisonIds.has(fact.factId) && !isReferenceFact(fact))
+    const moduleFacts = snapshot.facts.filter(fact => fact.module === moduleKey && !comparisonIds.has(fact.factId) && !isReferenceFact(fact))
+    // TASK-1962 — las causas (`driver.*`) tienen su propia sección; no compiten como hallazgo ni van a la tabla general.
+    const facts = moduleFacts.filter(fact => !isDriverFact(fact))
+    const drivers = editorialV2 ? driverSectionFor(moduleKey, moduleFacts.filter(isDriverFact), byId, input.locale) : null
     const referenceFacts = snapshot.facts.filter(fact => fact.module === moduleKey && isReferenceFact(fact))
     const rejections = snapshot.rejections.filter(rejection => rejection.module === moduleKey)
     const v2Context = editorialV2 ? contextOfFacts(facts) : null
@@ -415,7 +525,9 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     }
 
     // TASK-1957 — roles: hallazgos materiales arriba, el resto respaldo. Las frases de figuras descartadas abren la lista.
-    const claims = withRoles([...uniformClaims, ...factClaims], facts, byId, input.locale)
+    const claims = [...withRoles([...uniformClaims, ...factClaims], facts, byId, input.locale), ...(drivers?.claims ?? [])]
+
+    charts.push(...(drivers?.charts ?? []))
 
     if (editorialV2) {
       charts.push(...bulletCharts(moduleKey, facts, referenceFacts), ...lineCharts(moduleKey, facts))
@@ -431,9 +543,12 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       claims,
       charts,
       // v2: la tabla es el respaldo de TODO el capítulo, no un resumen (revisión del operador, 2026-09-25).
-      tables: facts.length > 0 ? [tableFor(`table.${moduleKey}`, editorialV2 ? `${MODULE_TITLES[moduleKey]}: ${GH_INSIGHTS.tableAllFigures}` : `${MODULE_TITLES[moduleKey]} · resumen`, facts, byId, input.locale)] : [],
+      tables: [
+        ...(facts.length > 0 ? [tableFor(`table.${moduleKey}`, editorialV2 ? `${MODULE_TITLES[moduleKey]}: ${GH_INSIGHTS.tableAllFigures}` : `${MODULE_TITLES[moduleKey]} · resumen`, facts, byId, input.locale)] : []),
+        ...(drivers?.tables ?? [])
+      ],
       limits: limitsFor(rejections),
-      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: readingsFor(charts, byId, input.locale) } : {})
+      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: withDriverReadings(readingsFor(charts, byId, input.locale), drivers?.readings ?? []) } : {})
     })
   }
 

@@ -10,8 +10,11 @@ import 'server-only'
 import { readDomainOverviewForTarget } from '@/lib/growth/seo/domain-overview/reader'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { readSeoOverviewKpisForWindow } from '@/lib/growth/seo/overview/read-overview-kpis'
+import { type SeoMoverDimension, readSeoWindowMovers } from '@/lib/growth/seo/overview/read-window-movers'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
+
+import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 import { SEO_SEARCH_CHANNEL } from '../contracts/channels'
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
@@ -196,6 +199,89 @@ const etvFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comp
 
 const SEO_LOWER_IS_BETTER = new Set(['position'])
 
+/**
+ * TASK-1962 — «¿por qué cambió?»: las consultas y páginas que más movieron los clics entre la ventana y su período
+ * anterior, del reader dueño `readSeoWindowMovers` (misma tabla y suma que los clics del informe). Es descomposición
+ * medida: dice DÓNDE cambió, nunca por qué. Sólo con contrato editorial v2 y período anterior pedido; si Search Console
+ * no tiene la ventana actual, no se busca nada (el límite de Search Console ya lo dice).
+ */
+const MOVERS_METHOD = { name: 'gsc_window_movers', version: 'seo_movers_v1' }
+const MOVERS_LIMIT = 5
+
+/** Etiqueta legible de una página: la ruta, sin dominio; la raíz es la página de inicio. */
+export const pageLabelOf = (url: string): string => {
+  try {
+    const path = decodeURIComponent(new URL(url).pathname).replace(/\/+$/, '')
+
+    return path === '' ? GH_INSIGHTS.reading.homePage : path
+  } catch {
+    return url
+  }
+}
+
+const moverFacts = async (
+  organizationId: string,
+  window: ResolvedInsightWindow,
+  previous: ResolvedInsightWindow,
+  current: EvidenceFactV1 | undefined
+): Promise<{ facts: EvidenceFactV1[]; rejections: EvidenceRejectionV1[]; sources: EvidenceSourceV1[] }> => {
+  const facts: EvidenceFactV1[] = []
+  const rejections: EvidenceRejectionV1[] = []
+  const sources: EvidenceSourceV1[] = []
+
+  if (!current || current.value === null) return { facts, rejections, sources }
+
+  for (const dimension of ['query', 'page'] as SeoMoverDimension[]) {
+    const metricId = `driver.${dimension}.clicks`
+
+    const result = await readSeoWindowMovers(organizationId, {
+      window: { from: window.start, toExclusive: window.endExclusive },
+      previous: { from: previous.start, toExclusive: previous.endExclusive },
+      dimension,
+      limit: MOVERS_LIMIT
+    })
+
+    if (!result.ok) {
+      rejections.push({ module: 'seo', metricId: `driver.${dimension}`, reason: result.errorCode === 'disabled' ? 'module_disabled' : 'insufficient_data', detail: `Movers ${dimension}: ${result.errorCode}` })
+      continue
+    }
+
+    if (result.movers.length === 0) continue
+
+    const base = {
+      factVersion: 'evidence_fact_v1' as const,
+      module: 'seo' as const,
+      metricId,
+      population: dimension === 'query' ? 'Consultas con texto de Search Console' : 'Páginas de Search Console',
+      source: 'greenhouse_growth.seo_gsc_daily',
+      method: MOVERS_METHOD,
+      coverage: current.coverage,
+      freshness: current.freshness,
+      observation: 'observed' as const,
+      unit: 'count' as const,
+      numerator: null,
+      denominator: null,
+      channelId: SEO_SEARCH_CHANNEL
+    }
+
+    result.movers.forEach((mover, index) => {
+      const rank = String(index + 1)
+      const label = dimension === 'page' ? pageLabelOf(mover.key) : mover.key
+      const dims = { [dimension]: label, rank }
+      const previousId = factId('seo', metricId, previous, rank)
+
+      facts.push(
+        { ...base, factId: factId('seo', metricId, window, rank), label, value: mover.clicks, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}`, comparisonFactId: previousId, dimension: dims },
+        { ...base, factId: previousId, label, value: mover.previousClicks, window: evidenceWindow(previous, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${previous.start}_${previous.endExclusive}`, comparisonFactId: null, dimension: dims }
+      )
+    })
+
+    sources.push({ module: 'seo', adapterVersion: SEO_ADAPTER_VERSION, reader: 'readSeoWindowMovers', asOf: current.freshness.asOf, method: MOVERS_METHOD, coverage: current.coverage, servedWindow: null })
+  }
+
+  return { facts, rejections, sources }
+}
+
 const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsightWindow, seoTargetId: string | null, comparisonIds: Record<string, string | null>) => {
   const gsc = await gscFacts(input.organizationId, window, comparisonIds)
   const rank = seoTargetId ? await rankFacts(seoTargetId, window, comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
@@ -247,15 +333,19 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
 
     const current = await collectForWindow(input, input.window, seoTargetId, comparisonIds)
 
+    const movers = input.editorialV2 === true && input.comparison
+      ? await moverFacts(input.organizationId, input.window, input.comparison, current.facts.find(fact => fact.metricId === 'clicks'))
+      : { facts: [], rejections: [], sources: [] }
+
     // TASK-1888 — con v2, la dirección de las métricas donde MENOR es mejor (posición media), para que el render no
     // lea una subida de posición como mejora. El resto queda sin dirección (neutro), como antes.
     const directed = (facts: EvidenceFactV1[]) =>
       input.editorialV2 === true ? facts.map(fact => (SEO_LOWER_IS_BETTER.has(fact.metricId) ? { ...fact, dimension: { ...fact.dimension, direction: 'lower_is_better' } } : fact)) : facts
 
     return {
-      facts: [...directed(current.facts), ...directed(comparison?.facts ?? [])],
-      sources: [...current.sources, ...(comparison?.sources ?? [])],
-      rejections: [...rejections, ...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
+      facts: [...directed(current.facts), ...directed(comparison?.facts ?? []), ...movers.facts],
+      sources: [...current.sources, ...(comparison?.sources ?? []), ...movers.sources],
+      rejections: [...rejections, ...current.rejections, ...movers.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }
   }
 }

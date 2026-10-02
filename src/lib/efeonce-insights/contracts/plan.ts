@@ -32,6 +32,8 @@ export interface PlanTableV1 {
   title: string
   columns: string[]
   rows: Array<Array<string | null>>
+  /** TASK-1962 — bajada propia de la tabla (sin cifras); ausente = la bajada general «todo lo que se midió». */
+  lead?: string
 }
 
 /**

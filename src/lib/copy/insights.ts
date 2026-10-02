@@ -117,6 +117,8 @@ export const GH_INSIGHTS = {
     'sov.brand': 'Tu marca',
     citation_share: 'Respuestas que citan tu sitio',
     gsc: 'Search Console',
+    'driver.query': 'Consultas que más cambiaron',
+    'driver.page': 'Páginas que más cambiaron',
     rank: 'Posiciones en buscadores',
     organic_etv: 'Tráfico orgánico estimado',
     overall_score: 'Puntaje de visibilidad en IA',
@@ -175,7 +177,15 @@ export const GH_INSIGHTS = {
     lineTitle: 'evolución mensual',
     targetLabel: 'Meta',
     previousLabel: 'Período anterior',
-    currentLabel: 'Período'
+    currentLabel: 'Período',
+    /** TASK-1962 — «¿por qué cambió?»: figuras y tablas de las consultas y páginas que más movieron los clics. */
+    driversQueryTitle: 'Consultas que más movieron los clics',
+    driversPageTitle: 'Páginas que más movieron los clics',
+    driversQueryColumn: 'Consulta',
+    driversPageColumn: 'Página',
+    driversTableTitle: 'Consultas y páginas que más movieron los clics',
+    driversTableLead: 'Las consultas y páginas con mayor cambio de clics frente al período anterior. Dicen dónde cambió, no por qué.',
+    driversEntityColumn: 'Consulta o página'
   },
 
   /**
@@ -201,6 +211,11 @@ export const GH_INSIGHTS = {
     previousPeriod: 'período anterior',
     /** TASK-1962 — nota de una figura con una escala por métrica (modelo web 1.3, `chart.note`). */
     ownScaleNote: 'Cada métrica en su propia escala: compara cada par actual contra anterior, no entre métricas.',
+    /** TASK-1962 — hallazgos de descomposición: dicen DÓNDE cambió, nunca por qué. */
+    driverQueryLead: 'La consulta que más cambió fue',
+    driverPageLead: 'La página que más cambió fue',
+    clicksWord: 'clics',
+    homePage: 'Página de inicio',
     variation: 'variación',
     againstPrevious: 'Contra el período anterior',
     rose: 'subió',
@@ -283,6 +298,7 @@ export const GH_INSIGHTS = {
    */
   sources: {
     gsc_window_aggregate: 'Google Search Console',
+    gsc_window_movers: 'Google Search Console',
     dataforseo_serp_rank: 'mediciones de posiciones en buscadores',
     dataforseo_etv: 'estimación de tráfico orgánico',
     // Nombre de producto del diagnóstico (ADR de naming Efeonce AEO): la fuente se nombra como lo conoce el cliente.

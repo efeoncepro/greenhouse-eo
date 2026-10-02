@@ -89,6 +89,8 @@ export interface InsightWebTableV1 {
   title: string
   columns: string[]
   rows: Array<Array<string | null>>
+  /** 1.3 — bajada propia de la tabla, si el plan la trae. */
+  lead?: string
 }
 
 /** 1.1 — cifras derivadas por la geometría compartida con los PDF (nunca por el render). */
