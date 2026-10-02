@@ -106,7 +106,7 @@ export const openAIInpaintAdapter: InpaintImageAdapter = {
       basis: `${count} × salida ${sizeString(size)} ${quality ?? DEFAULT_QUALITY} (fórmula oficial de tokens × USD ${OPENAI_IMAGE_OUTPUT_USD_PER_MILLION}/1M; la entrada suma aparte)`
     }
   },
-  async run({ prompt, image, mask, size, model, quality, providerMask }) {
+  async run({ prompt, image, extraImages = [], mask, size, model, quality, providerMask }) {
     const resolved = asModel(model)
     const sendMask = resolveOpenAIProviderMask(resolved, providerMask)
 
@@ -114,7 +114,8 @@ export const openAIInpaintAdapter: InpaintImageAdapter = {
 
     const result = await editOpenAIImage({
       prompt,
-      image: { bytes: image, filename: 'base.png', mimeType: 'image/png' },
+      // Varias imágenes: la máscara se aplica a la primera (guía de OpenAI); el resto son boceto y referencias.
+      image: [image, ...extraImages].map((bytes, index) => ({ bytes, filename: index === 0 ? 'base.png' : `ref-${index}.png`, mimeType: 'image/png' })),
       ...(sendMask ? { mask: { bytes: await toProviderMaskPng(mask, 'alpha-transparent-editable'), filename: 'mask.png', mimeType: 'image/png' } } : {}),
       model: resolved,
       size: sizeString(size),

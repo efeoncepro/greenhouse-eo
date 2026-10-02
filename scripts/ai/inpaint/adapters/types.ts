@@ -26,6 +26,8 @@ export interface ImageAdapterRunInput extends ImageAdapterParams {
   prompt: string
   /** PNG al tamaño `size`. */
   image: Buffer
+  /** Imágenes 2..N en orden: boceto (al tamaño `size`) y referencias del objeto. El adaptador las rechaza si su proveedor no las admite. */
+  extraImages?: Buffer[]
   /** Máscara canónica al tamaño `size`; el adaptador la convierte o la ignora si su proveedor no la usa. */
   mask: CanonicalMask
   size: TargetSize

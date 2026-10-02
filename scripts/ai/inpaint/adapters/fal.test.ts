@@ -36,6 +36,16 @@ describe('adaptadores fal de ai:inpaint', () => {
     expect(createFalInpaintAdapter('seedream5-pro-edit').sendsMask).toBe(false)
   })
 
+  it('Seedream recibe boceto y referencias después de la imagen; Fill los rechaza', async () => {
+    const input = buildFalInpaintInput(findFalCapability('seedream5-pro-edit')!, { prompt: 'p', imageUrl: 'u1', extraUrls: ['u2', 'u3'], maskUrl: null, size: { width: 1024, height: 1024 } })
+
+    expect(input.image_urls).toEqual(['u1', 'u2', 'u3'])
+
+    const fill = createFalInpaintAdapter('flux-pro-fill')
+
+    await expect(fill.run({ prompt: 'p', image: Buffer.alloc(1), extraImages: [Buffer.alloc(1)], mask: maskFromRect(4, 4, { x0: 0, y0: 0, x1: 0.5, y1: 0.5 }), size: { width: 4, height: 4 }, model: fill.defaultModel })).rejects.toThrow(/no admite boceto/)
+  })
+
   it('valida antes de gastar', () => {
     const fill = createFalInpaintAdapter('flux-pro-fill')
     const lite = createFalInpaintAdapter('seedream5-lite-edit')

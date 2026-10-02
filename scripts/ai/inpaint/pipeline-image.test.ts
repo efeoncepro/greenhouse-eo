@@ -181,6 +181,34 @@ describe('pnpm ai:inpaint image — pipeline', () => {
     expect(lines.join('\n')).toMatch(/negra y plana/)
   })
 
+  it('con boceto y referencia: deriva la máscara del trazo, manda boceto + referencia en orden y numera los roles', async () => {
+    const { adapter, run } = fakeAdapter()
+    const sketchPath = join(dir, 'sketch.png')
+    const referencePath = join(dir, 'lamp.png')
+
+    await sharp(Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg"><rect x="400" y="300" width="80" height="100" fill="none" stroke="#ff00ff" stroke-width="4"/></svg>`))
+      .png()
+      .toFile(sketchPath)
+    await sharp({ create: { width: 300, height: 300, channels: 3, background: '#d0a020' } }).png().toFile(referencePath)
+
+    const result = await runImageInpaint({ ...base(adapter), maskPath: undefined, sketchPath, referencePaths: [referencePath], prompt: 'Add the lamp from the reference.' })
+    const call = run.mock.calls[0][0] as unknown as { extraImages: Buffer[]; prompt: string }
+
+    expect(result.exitCode).toBe(0)
+    expect(result.manifest.inputs.sketch?.form).toBe('overlay')
+    expect(result.manifest.inputs.mask).toBeNull()
+    expect(call.extraImages).toHaveLength(2)
+    expect(call.prompt).toMatch(/Image 2 is the same photo with a hand-drawn sketch/)
+    expect(call.prompt).toMatch(/Image 3 is a reference/)
+    expect(result.manifest.request.prompt).toBe('Add the lamp from the reference.')
+  })
+
+  it('exige máscara o boceto', async () => {
+    const { adapter } = fakeAdapter()
+
+    await expect(runImageInpaint({ ...base(adapter), maskPath: undefined })).rejects.toThrow(/--mask o --sketch/)
+  })
+
   it('código de salida: 0 todo PASS, 2 si alguno FAIL, 1 si la corrida falló', () => {
     const candidate = { verdict: 'PASS' } as ImageInpaintManifest['candidates'][number]
 

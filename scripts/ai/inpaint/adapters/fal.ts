@@ -27,10 +27,13 @@ const SIZE_RULES: Readonly<Record<string, Parameters<typeof pickGridSize>[2]>> =
 export const FAL_INPAINT_CAPABILITY_IDS = Object.keys(SIZE_RULES)
 
 /** Arma el input del endpoint. Exportado para probar la forma del pedido sin red. */
-export const buildFalInpaintInput = (capability: FalCapability, params: { prompt: string; imageUrl: string; maskUrl: string | null; size: TargetSize; seed?: number }) => {
+export const buildFalInpaintInput = (
+  capability: FalCapability,
+  params: { prompt: string; imageUrl: string; extraUrls?: string[]; maskUrl: string | null; size: TargetSize; seed?: number }
+) => {
   const input: Record<string, unknown> = { prompt: params.prompt, num_images: 1 }
 
-  if (capability.inputMediaField === 'image_urls') input.image_urls = [params.imageUrl]
+  if (capability.inputMediaField === 'image_urls') input.image_urls = [params.imageUrl, ...(params.extraUrls ?? [])]
   else input.image_url = params.imageUrl
 
   if (capability.mask) {
@@ -89,8 +92,12 @@ export const createFalInpaintAdapter = (capabilityId: string): InpaintImageAdapt
 
       return estimate.usd === null ? { usd: null, basis: estimate.basis } : { usd: Math.round(estimate.usd * count * 10_000) / 10_000, basis: `${count} × ${estimate.basis}` }
     },
-    async run({ prompt, image, mask, size, seed }) {
+    async run({ prompt, image, extraImages = [], mask, size, seed }) {
+      if (extraImages.length && capability.inputMedia !== 'many') throw new Error(`fal:${capability.id} no admite boceto ni referencias: usa openai o fal:seedream5-pro-edit.`)
+      if (extraImages.length + 1 > (capability.maxInputImages ?? 10)) throw new Error(`fal:${capability.id} usa como máximo ${capability.maxInputImages ?? 10} imágenes.`)
+
       const uploadedImage = await uploadFalFile({ bytes: image, fileName: 'base.png', contentType: 'image/png' })
+      const uploadedExtras = await Promise.all(extraImages.map((bytes, index) => uploadFalFile({ bytes, fileName: `ref-${index + 1}.png`, contentType: 'image/png' })))
 
       const uploadedMask = capability.mask
         ? await uploadFalFile({ bytes: await toProviderMaskPng(mask, capability.mask.convention), fileName: 'mask.png', contentType: 'image/png' })
@@ -98,7 +105,7 @@ export const createFalInpaintAdapter = (capabilityId: string): InpaintImageAdapt
 
       const result = await runFalModel<Record<string, unknown>>({
         model: capability.slug,
-        input: buildFalInpaintInput(capability, { prompt, imageUrl: uploadedImage.url, maskUrl: uploadedMask?.url ?? null, size, seed })
+        input: buildFalInpaintInput(capability, { prompt, imageUrl: uploadedImage.url, extraUrls: uploadedExtras.map(item => item.url), maskUrl: uploadedMask?.url ?? null, size, seed })
       })
 
       if (!result.ok || !result.output) {

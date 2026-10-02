@@ -27,7 +27,11 @@ código 2. Todo queda en <run>/inpaint/<id>/ con manifest.json; repetir la misma
 
 Entrada:
   --image <img>              Imagen base (obligatorio)
-  --mask <png>               Máscara (obligatorio); --convention white-editable (default) | alpha-transparent-editable
+  --mask <png>               Máscara; --convention white-editable (default) | alpha-transparent-editable
+  --sketch <png>             Boceto sobre la foto, como el Markup de ChatGPT: overlay con fondo transparente o la foto
+                             con trazos encima. Viaja como imagen 2 (guía de posición); sin --mask, la máscara se deriva
+                             del trazo (+ --sketch-margin px, default 40)
+  --reference <img>          Referencia del objeto a incorporar (repetible): «Place the X from image N into image 1»
   --prompt <texto> | --prompt-file <txt>
 
 Proveedor:
@@ -54,6 +58,9 @@ Control:
 interface ImageCliArgs {
   image?: string
   mask?: string
+  sketch?: string
+  sketchMargin?: number
+  references: string[]
   convention: MaskConvention
   prompt?: string
   promptFile?: string
@@ -86,7 +93,7 @@ const toNumber = (raw: string, flag: string, integer = false): number => {
 }
 
 export const parseImageArgs = (argv: string[]): ImageCliArgs => {
-  const args: ImageCliArgs = { convention: 'white-editable', count: 1, crop: 'auto', dryRun: false, force: false, yes: false, allowBrand: false, allowFull: false, help: false }
+  const args: ImageCliArgs = { references: [], convention: 'white-editable', count: 1, crop: 'auto', dryRun: false, force: false, yes: false, allowBrand: false, allowFull: false, help: false }
 
   for (let i = 0; i < argv.length; i += 1) {
     const flag = argv[i]
@@ -104,6 +111,9 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
       case '--': break
       case '--image': args.image = next(); break
       case '--mask': args.mask = next(); break
+      case '--sketch': args.sketch = next(); break
+      case '--sketch-margin': args.sketchMargin = toNumber(next(), flag, true); break
+      case '--reference': args.references.push(next()); break
 
       case '--convention': {
         const value = next()
@@ -171,7 +181,7 @@ const runImage = async (argv: string[]): Promise<number> => {
     return 0
   }
 
-  if (!args.image || !args.mask) throw new Error('--image y --mask son obligatorios. Ver pnpm ai:inpaint image --help.')
+  if (!args.image || (!args.mask && !args.sketch)) throw new Error('--image y (--mask o --sketch) son obligatorios. Ver pnpm ai:inpaint image --help.')
 
   const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
 
@@ -179,7 +189,10 @@ const runImage = async (argv: string[]): Promise<number> => {
 
   const result = await runImageInpaint({
     imagePath: resolvePath(args.image),
-    maskPath: resolvePath(args.mask),
+    maskPath: args.mask ? resolvePath(args.mask) : undefined,
+    sketchPath: args.sketch ? resolvePath(args.sketch) : undefined,
+    sketchMargin: args.sketchMargin,
+    referencePaths: args.references.map(resolvePath),
     maskConvention: args.convention,
     prompt,
     adapter: resolveImageAdapter(args.adapter),

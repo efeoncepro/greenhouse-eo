@@ -6,6 +6,7 @@ import type { InpaintImageAdapter, ProviderMaskMode } from './adapters/types'
 import { assertBrandSafePrompt } from './brand'
 import { planCrop, type CropMode, type CropPlan } from './crop'
 import { assertMaskUsable, cropMask, encodeMaskPng, loadMask, renderMaskPreview, resizeMask, type MaskConvention } from './mask'
+import { buildRolePrompt, loadSketch, maskFromSketch } from './sketch'
 import { cropRgba, matchColorInRing, measureZones, placePatch, recompose, renderDiff, resizeRgba, verifyRecomposition, type VerificationReport, type ZoneDelta } from './recompose'
 import { encodeRgbaPng, loadRgba } from './raw'
 import { exists, INPAINT_PIPELINE_VERSION, readJson, renderContactSheet, runDirFor, sha256, stableStringify, writeFileEnsured, writeJson } from './run-io'
@@ -19,8 +20,15 @@ import { exists, INPAINT_PIPELINE_VERSION, readJson, renderContactSheet, runDirF
  */
 export interface ImageInpaintOptions {
   imagePath: string
-  maskPath: string
+  /** Máscara canónica. Opcional si hay `sketchPath`: entonces se deriva del trazo. */
+  maskPath?: string
   maskConvention?: MaskConvention
+  /** Boceto sobre la foto (overlay con alfa o foto anotada): viaja como imagen 2, guía de posición, no como máscara. */
+  sketchPath?: string
+  /** Holgura en px alrededor del trazo para la máscara derivada (default 40). */
+  sketchMargin?: number
+  /** Referencias del objeto o elemento a incorporar (imágenes 2..N, después del boceto). */
+  referencePaths?: string[]
   prompt: string
   adapter: InpaintImageAdapter
   model?: string
@@ -76,9 +84,19 @@ export interface ImageInpaintManifest {
   key: string
   status: 'dry-run' | 'completed' | 'failed'
   createdAt: string
-  inputs: { image: string; imageSha256: string; mask: string; maskSha256: string; maskConvention: MaskConvention; width: number; height: number }
+  inputs: {
+    image: string
+    imageSha256: string
+    mask: string | null
+    maskSha256: string
+    maskConvention: MaskConvention
+    width: number
+    height: number
+    sketch: { path: string; sha256: string; form: 'overlay' | 'annotated' } | null
+    references: Array<{ path: string; sha256: string }>
+  }
   adapter: { id: string; provider: string; sendsMask: boolean; verifiedAt: string | null }
-  request: { model: string; quality: string | null; seed: number | null; count: number; prompt: string }
+  request: { model: string; quality: string | null; seed: number | null; count: number; prompt: string; providerPrompt: string }
   mask: { touchedFraction: number; editable: number; soft: number; protected: number }
   crop: CropPlan
   estimate: { usd: number | null; basis: string }
@@ -155,7 +173,20 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
 
   const [imageBytes, baseMeta] = await Promise.all([sharp(options.imagePath).toBuffer(), sharp(options.imagePath).metadata()])
   const base = await loadRgba(options.imagePath, 'base')
-  const mask = await loadMask(options.maskPath, convention)
+
+  if (!options.maskPath && !options.sketchPath) throw new Error('Indica --mask o --sketch (la máscara se deriva del trazo).')
+
+  const sketch = options.sketchPath ? await loadSketch(options.sketchPath, base) : null
+  const mask = options.maskPath ? await loadMask(options.maskPath, convention) : await maskFromSketch(sketch!.strokes, options.sketchMargin ?? 40)
+
+  const references = await Promise.all(
+    (options.referencePaths ?? []).map(async path => ({ path, png: await sharp(path).resize({ width: 2048, height: 2048, fit: 'inside', withoutEnlargement: true }).png().toBuffer() }))
+  )
+
+  if (sketch) log(`  ✎ boceto ${sketch.form === 'overlay' ? 'con fondo transparente' : 'dibujado sobre la foto'}${options.maskPath ? '' : `: máscara derivada del trazo (+${options.sketchMargin ?? 40} px)`}`)
+  if (references.length) log(`  ⧉ ${references.length} referencia(s) del objeto`)
+
+  const providerPrompt = buildRolePrompt({ prompt: options.prompt, hasSketch: Boolean(sketch), referenceCount: references.length })
 
   if (mask.width !== base.width || mask.height !== base.height) {
     throw new Error(`La máscara mide ${mask.width}x${mask.height} y la base ${base.width}x${base.height}: deben medir lo mismo (pnpm ai:mask --base).`)
@@ -181,7 +212,9 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       image: sha256(base.data),
       mask: sha256(mask.data),
       size: [base.width, base.height],
-      prompt: options.prompt,
+      prompt: providerPrompt,
+      sketch: sketch ? sha256(sketch.guide.data) : null,
+      references: references.map(reference => sha256(reference.png)),
       adapter: adapter.id,
       adapterRevision: adapter.revision,
       model,
@@ -217,6 +250,10 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
   const cropImage = await resizeRgba(cropRgba(base, plan.box), plan.target.width, plan.target.height)
   const cropMaskTarget = await resizeMask(cropMask(mask, plan.box), plan.target.width, plan.target.height)
   const providerImage = await encodeRgbaPng(cropImage)
+  const guideImage = sketch ? await encodeRgbaPng(await resizeRgba(cropRgba(sketch.guide, plan.box), plan.target.width, plan.target.height)) : null
+  const extraImages = [...(guideImage ? [guideImage] : []), ...references.map(reference => reference.png)]
+
+  if (guideImage) await writeFileEnsured(join(runDir, 'provider-sketch.png'), guideImage)
 
   await writeFileEnsured(join(runDir, 'mask-preview.png'), await renderMaskPreview(base, mask))
   await writeFileEnsured(join(runDir, 'provider-input.png'), providerImage)
@@ -232,14 +269,16 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
     inputs: {
       image: options.imagePath,
       imageSha256: sha256(imageBytes),
-      mask: options.maskPath,
+      mask: options.maskPath ?? null,
       maskSha256: sha256(mask.data),
       maskConvention: convention,
       width: base.width,
-      height: base.height
+      height: base.height,
+      sketch: sketch ? { path: options.sketchPath!, sha256: sha256(sketch.guide.data), form: sketch.form } : null,
+      references: references.map(reference => ({ path: reference.path, sha256: sha256(reference.png) }))
     },
     adapter: { id: adapter.id, provider: adapter.provider, sendsMask: adapter.sendsMask, verifiedAt: adapter.verifiedAt },
-    request: { model, quality: options.quality ?? null, seed: options.seed ?? null, count, prompt: options.prompt },
+    request: { model, quality: options.quality ?? null, seed: options.seed ?? null, count, prompt: options.prompt, providerPrompt },
     mask: { touchedFraction: stats.touchedFraction, editable: stats.editable, soft: stats.soft, protected: stats.protected },
     crop: plan,
     estimate,
@@ -258,8 +297,9 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       log(`  → candidato ${index + 1}/${count} …`)
 
       const output = await adapter.run({
-        prompt: options.prompt,
+        prompt: providerPrompt,
         image: providerImage,
+        extraImages,
         mask: cropMaskTarget,
         size: plan.target,
         model,
