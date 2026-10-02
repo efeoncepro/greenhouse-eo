@@ -34,6 +34,26 @@ La producción local cero IA está probada; flujo pagado y onboarding requieren 
 Auth definitivo usa Efeonce ID (TASK-1952 diferida), no Google OAuth paralelo ni binding por email.
 Los topes50/500 admiten aumentos por decisión del operador; nadie los eleva automáticamente.
 
+### Revisar la corrección SKY local
+
+Consultar el [cierre del feedback](../../../.codex/skills/efeonce-creative-workbench/references/layout-feedback-handoff.md)
+y los contratos Workbench `workbench-sky-designer-content-rules.md` y
+`workbench-sky-destination-content-flow.md` en `docs/architecture/`.
+Contenido `1.5.0` y destino `1.2.0` son las recetas de este corte; no usar la instrucción histórica
+de corregir en el próximo chat ni aplicar una alineación global a todos los legales.
+
+1. Abrir el PDF local `prueba-modular-24-v6/SKY-24-adaptaciones.pdf` en el canon privado
+   `sky-airline/2026-10-01`, junto a sus PNG/SVG y `reproducibilidad/final-review.json`.
+2. Revisar badge de tarifa LEFT en su columna y label centrado dentro; conservar los offsets
+   nativos del precio, los badges de origen y los contratos de moneda/doble tarifa.
+3. Comprobar footer/condiciones por función, separación de prefijo/ciudad, balance de 2668
+   y eje común del bloque editorial 4685. Registrar aceptación visual por separado de los tests.
+4. Si se cambia copy, recurso o receta, validar y ejecutar un job propio nuevo desde Workbench.
+   Conservar los UUID anteriores; los exports v3/v4/v5 no se sobrescriben.
+
+El PDF v6 es una prueba sintética; comparte número de versión con el Lab publicado, pero es
+otro artefacto. Su existencia no acredita que el renderer corregido esté publicado.
+
 ## Bootstrap histórico — 2026-09-29
 
 El bloque siguiente preserva el procedimiento original. Sus instrucciones de sync total, templates,

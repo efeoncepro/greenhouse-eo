@@ -167,6 +167,12 @@ si cambió la operación. Comparar ambos bundles con `scripts/validate.py`. No c
 fonts Metric, biblioteca serializada ni outputs a la skill. Dejar pendientes con siguiente evidencia
 y owner; no cerrar IA, onboarding de todos o Efeonce ID por producir un lote sin proveedor.
 
-## Implementación local y feedback de alineación pendiente — 2026-10-01
+## Contenido y alineación vigentes — 2026-10-01
 
-Leer [destinos y espacios adaptativos](destination-content-flow.md) para conocer la implementación local y sus límites. **Antes de continuar, leer [feedback pendiente de alineación](layout-feedback-handoff.md)**: el operador invalidó LEFT global de legales y señaló huecos/ejes en 03-2668, 01-2611 y 23-4685. Corregir en el próximo chat por función y source pin; no aplicar CENTER global por deducción. El código 1.3.0 sigue LEFT, los 377 tests no certifican aceptación visual y el documento v3 queda parcial/rechazado en esos aspectos. No mover fotos/ventanas como origen, aplicar autofit a otros componentes ni sustituir corridas históricas.
+Leer [destinos y espacios adaptativos](destination-content-flow.md) y el
+[cierre del feedback](layout-feedback-handoff.md). Contenido 1.5.0 / destino 1.2.0 corrige
+los 76 badges tarifarios y las relaciones footer/fila/prefijo/editorial; v6 es el export local
+revisado. La auditoría conserva cobertura, runs y checks. Preservar geometría admitida,
+fotos/ventanas y corridas históricas; aceptación visual del operador y aprobación comercial
+siguen pendientes. El pedido posterior autoriza commit local de lo propio; registrar su
+evidencia separada de push, publicación y deploy.

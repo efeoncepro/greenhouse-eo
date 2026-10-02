@@ -10,16 +10,22 @@ Guía operativa viva del harness compartido. Su implementación pertenece al rep
 SKY es el primer cliente habilitado, no el alcance completo del espacio. Todo el equipo puede
 trabajar para todas las marcas; cada ejecución tiene una sola identidad visual explícita.
 
-## Feedback visual pendiente: corregir en el próximo chat — 2026-10-01
+## SKY: feedback corregido localmente — 2026-10-01
 
-Leer primero [handoff de alineación](references/layout-feedback-handoff.md). El operador
-invalidó LEFT global de legales y señaló huecos/ejes en 03-2668, 01-2611 y 23-4685.
-Los pies legales indicados deben ir centrados, con alineación admitida por función/source pin;
-no inferir CENTER global para todos los textos. El código local 1.3.0 todavía aplica LEFT.
-Los 377 tests no prueban aceptación visual y el PDF v3 queda parcial/rechazado en esos aspectos.
-Este corte prepara un chat nuevo; no se corrigió código, regeneró arte ni publicó por documentarlo.
-Canon de la continuación: `docs/operations/sky-layout-feedback-handoff-2026-10-01.md`
-en el repo Workbench. Conservar resultados previos y WIP ajeno.
+Contenido `designer-rules@1.5.0` y destino `content-flow@1.2.0` en Workbench.
+**TODOS los 76 badges tarifarios** usan ancla LEFT (42 pilas simples + 34 Tags complejos/dobles),
+por pedido posterior del operador. Los labels siguen centrados DENTRO de sus cápsulas; ancho,
+padding, precio y orientación de doble moneda conservan sus contratos. Sólo los footer-legal
+1387 de 2611/2668 pasan a CENTER, condiciones LEFT preservadas. 2668 equilibra destino/origen
+frente a la flecha completa; 2611/2668 dejan 16 px entre prefijo con icono y ciudad. 4685 es
+bloque editorial LEFT con destino/CTA, separado de stickers. Jobs no eligen geometría.
+
+Leer [handoff y cierre del feedback](references/layout-feedback-handoff.md) y el canon Workbench
+`docs/audits/sky-layout-feedback-correction-2026-10-01.md`. El export actual es v6;
+v3/v4/v5, recursos y corridas anteriores son evidencia inmutable. El pedido posterior autoriza
+subagentes, actualización de docs/skills y commit local de lo propio. Registrar su evidencia cuando
+exista; implementación local no equivale a aceptación visual/comercial, push, paquete o deploy. El contenido
+sigue ficticio y las fotografías source-reference. No ejecutar/alterar CLIs Greenhouse.
 
 ## Corte integrado y recorrido recomendado — 2026-10-01
 
@@ -133,20 +139,22 @@ Refrescar estado, rama y runtime antes de atribuir un rollout o una aprobación 
 ## Reglas de contenido SKY recibidas de la diseñadora — 2026-10-01
 
 Para producir nuevos KV, leer en Workbench
-`docs/architecture/workbench-sky-designer-content-rules.md`. La extensión local
-`sky-airline.content-layout.designer-rules@1.0.0` aplica por source pins el centrado de
+`docs/architecture/workbench-sky-designer-content-rules.md`. La base local
+`sky-airline.content-layout.designer-rules@1.0.0` introdujo por source pins el centrado de
 stickers y moneda, importes Metric Black, condiciones en estilo de oración, espaciado
 de destino/origen y pilas simples de tarifa con badge adaptativo y legal dentro de la flecha.
 `contentLayoutRecipe` aparece en el plan; `contentLayouts` y transformaciones de copy en QA.
+El contrato vigente 1.5.0 conserva esos mecanismos y aplica las excepciones tarifarias/editoriales
+indicadas en [componentes](references/components.md): 76 badges LEFT y 4685 editorial LEFT.
 No reescribir geometría desde un job ni retocar PNGs. Pack y referencias históricas intactos.
 Esta extensión se verifica localmente; no equivale a merge, publicación del paquete ni deploy.
 
-La extensión local 1.1.0 fija condiciones compactas en una línea (el código 1.3.0 aplica LEFT, ahora pendiente de corregir por función/source pin), con tamaños 12/10/8 px según la variante admitida. Es una regla explícita por fuente, nunca autofit ni permiso para disminuir otros textos. Ver [componentes](references/components.md) y el contrato Workbench.
+La extensión local 1.1.0 fija condiciones compactas en una línea (contenido 1.5.0 conserva LEFT de condiciones y centra sólo los dos footer-legal revisados), con tamaños 12/10/8 px según la variante admitida. Es una regla explícita por fuente, nunca autofit ni permiso para disminuir otros textos. Ver [componentes](references/components.md) y el contrato Workbench.
 
-La extensión local1.2.0 distingue titulares porcentuales en flecha de stickers. En seis fuentes SKY, conserva el eje izquierdo nativo de HASTA para todas las líneas del titular y las condiciones. No aplicar el centrado de sticker a bloques editoriales; ver contrato de contenido y [componentes](references/components.md).
+La extensión local 1.2.0 distingue titulares porcentuales en flecha de stickers. En seis fuentes SKY, conserva el eje izquierdo nativo de HASTA para todas las líneas del titular y las condiciones. No aplicar el centrado de sticker a bloques editoriales; ver contrato de contenido y [componentes](references/components.md).
 
 La implementación de [destinos y espacios adaptativos](references/destination-content-flow.md)
-selecciona perfiles Metric finitos en 95 fuentes y refluye por tinta. **La generalización de
-169 legales LEFT en1.3.0 fue invalidada por el feedback posterior**; sigue en el código y
-requiere corrección por función/source pin. Leer [handoff pendiente](references/layout-feedback-handoff.md)
-antes de continuar. No concede autofit a otros textos ni aceptación visual del documento v3.
+selecciona perfiles Metric finitos en 95 fuentes y refluye por tinta. La regla 1.5.0 separa
+footer/condiciones y ancla TODOS los badges tarifarios a LEFT; 1.2.0 de destino equilibra
+2668 y separa prefijo/ciudad en 2611/2668. Leer [cierre del feedback](references/layout-feedback-handoff.md).
+No concede autofit a otros textos ni aceptación comercial o del operador por pasar tests.

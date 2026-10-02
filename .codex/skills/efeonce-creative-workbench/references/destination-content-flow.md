@@ -1,13 +1,10 @@
 # Destinos SKY: longitud, alineación y espacio
 
-**Feedback posterior pendiente:** leer [handoff de alineación](layout-feedback-handoff.md).
-LEFT global de legales fue invalidado por el operador; el código local todavía lo aplica.
-Las observaciones de huecos, badge/ejes y promoción se corrigen en un chat nuevo.
-Este documento describe la implementación y no aprueba el PDF v3 ni su composición.
+**Estado actual:** destino 1.2.0 y contenido 1.5.0; [corrección verificada localmente](layout-feedback-handoff.md),
+pendiente aceptación visual del operador. Export v6, históricos v3/v4/v5 intactos.
 
-Canon operativo en Creative Workbench: `docs/architecture/workbench-sky-destination-content-flow.md`.
-Aislar `sky-airline` / pack 0.1.0; receta `sky-airline.destination.content-flow@1.0.0`
-y contenido `designer-rules@1.3.0`. Archivos destination/admissions forman parte del adapter sellado.
+Canon Workbench: `docs/architecture/workbench-sky-destination-content-flow.md`.
+Marca única `sky-airline` / pack 0.1.0. Destination/admissions pertenecen al adapter sellado.
 
 ## Antes de componer
 
@@ -29,8 +26,10 @@ SOLO para destino: precio, CTA, badges, legales y financiación conservan su pol
 Origen se sitúa tras la tinta efectiva y gap admitido 8–20 px. Banner: conjunto de nombre/prefijo/
 origen centrado verticalmente en banda fuente, vecinos fijos. Panel blanco: precio y condiciones
 siguen la altura del destino; el bloque completo se centra dentro de su banda admitida, con el objetivo de evitar
-huecos heredados de nombres largos. El hueco señalado en 03-2668 muestra que aún falta
-revisión de la relación entre bandas, no sólo del interior de un componente. Otros KV conservan ancla superior. Fotos, logo, CTA,
+huecos heredados de nombres largos. 2668 usa center-row: equilibra prefijo/ciudad/origen
+frente a toda la flecha, preserva fila 280/banda 8–272 y al menos 40 px de gap al footer.
+2611/2668 dejan 16 px entre prefijo visible con icono de flecha y ciudad; origen conserva su gap.
+Otros KV conservan ancla superior. Fotos, logo, CTA,
 fidelidad, servicios y ventanas de viaje no se mueven por deducción semántica.
 
 Si no cabe ningún perfil: falla explícitamente. Cambiar formato o revisar el copy con el operador,
@@ -39,19 +38,18 @@ con salto en determinados banners/paneles; no se promete en todos los slots estr
 
 ## Legal y revisión
 
-La implementación local 1.3.0 fuerza LEFT por tinta y por línea en 169 campos de 104 fuentes;
-las condiciones compactas siguen una línea con tamaños fijos 12/10/8 px. **El feedback nuevo
-invalida esa generalización**: los pies legales señalados deben ir centrados y la corrección
-debe separar funciones y source pins. No aplicar CENTER a todas las condiciones ni
-modificar ejes del precio/badge por parecido semántico. Footer, condiciones y promociones
-requieren admisión propia; no heredar cláusulas. El diagnóstico sellado de01-2611/03-2668
-confirma footer1387 CENTER y condiciones1241/1242/1254 LEFT. El bloque promocional
-de23-4685 es editorial, con fuente LEFT compartida, aunque el runtime lo trata como stickers.
-Los titulares porcentuales de seis fuentes siguen el eje HASTA (regla 1.2.0 vigente).
+Contenido 1.5.0 separa función y source pin: de los 169 campos legales admitidos,
+los dos footer-legal 1387 de 2611/2668 usan CENTER y los otros 167 conservan LEFT.
+Condiciones 1241/1242/1254 siguen LEFT; las compactas mantienen una línea con tamaños
+fijos 12/10/8 px. No extrapolar CENTER a todas las condiciones ni heredar cláusulas.
+Los 76 badges tarifarios usan ancla LEFT propia, con label centrado dentro y precio conservado.
+4685 usa editorialDiscount LEFT con eje final de destino/CTA; los titulares porcentuales
+de las seis fuentes admitidas mantienen el eje HASTA. El comportamiento 1.3.0 y el rechazo
+visual de v3 son historia, conservada en el [handoff](layout-feedback-handoff.md).
 
 Revisar QA `destination-content-flow` (copy declarado/efectivo, perfil, tamaño/SHA fuente, líneas,
-ancla, centros, tinta, límite y dependientes), `destination-origin-spacing`, `legal-left-axis`
-y `offer-stack.conditionAlignment`. Clipping de destinos/dependientes obligatorio, sin excepción
+ancla, centros, tinta, límite y dependientes), `destination-origin-spacing`, `destination-prefix-city-spacing`, `destination-row-balance`,
+`footer-center-axis`, `legal-left-axis` y `offer-stack.conditionAlignment`. Clipping de destinos/dependientes obligatorio, sin excepción
 histórica de overhang. Ver PNG a tamaño nativo y detalles: alineación, respiración, logo, flecha,
 CTA, condiciones y pie legal completo. Un fit no es aprobación comercial ni derechos.
 

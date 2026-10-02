@@ -22,6 +22,13 @@ Hay 126 adaptaciones nativas SKY y componentes autónomos con tokens, slots, dep
 Se pueden descomponer, inspeccionar, extraer y recomponer dentro de su contrato admitido. Las nuevas
 campañas mantienen QA propio: una escena técnicamente correcta no autentica tarifas, vigencias o derechos.
 
+La corrección SKY local de 2026-10-01 alinea los badges de tarifa a la izquierda de su columna,
+manteniendo el texto centrado dentro de su cápsula adaptable. También distingue el pie legal
+centrado de las condiciones LEFT y corrige el espacio entre prefijo y destino. Las 24 adaptaciones
+de prueba están en el export v6; su revisión técnica no concede aprobación comercial ni actualiza
+las referencias del sitio publicado. Alcance, recetas y aceptación visual pendiente en
+[el cierre documental](../../audits/creative-workbench/2026-10-01-sky-layout-feedback-closure.md).
+
 El [Lab premium integral](../creative/creative-workbench-lab.md) muestra composiciones, adaptaciones,
 recetas e inspector, con subpáginas de tokens, tipografía y recursos. La opción 2 conserva variantes
 propias/original proporcional/zonas, y v6 completa los menús abiertos de familias y colecciones.

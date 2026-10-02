@@ -1,6 +1,6 @@
 # Handoff activo
 
-**Workbench:** Lab v6 en main (PR16/17), Vercel público. Íconos SKY y `/iconos/` en commit local `af6f5e2`, docs/skills al día; publicación/admisión pendientes. [Estado y evidencia](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md). Efeonce ID diferido.
+**Workbench:** Lab v6 publicado. Íconos: `af6f5e2` local, publicación pendiente. SKY local: 76 badges LEFT, 24 adaptaciones v6, 394 pruebas PASS; aceptación visual pendiente. [Estado](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md). Efeonce ID diferido.
 
 **Deck SEO/AEO — Search Visibility 360 (30/09):** [TASK-1949](docs/tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-canonization.md) in-progress, code complete parcial: Slices 1 y 4 hechos (catálogo a 100 recetas, planes golden, docs y skills); Slice 2 (plantillas) y 3 (AXIS) en otras sesiones. Datos del deck tal cual por decisión del operador; logos de clientes con TASK-1937.
 

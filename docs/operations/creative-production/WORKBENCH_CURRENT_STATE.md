@@ -8,17 +8,28 @@ por sí solo flags, presupuesto, permisos o un despliegue del broker.
 **Acceso vigente:** [sitio sin login, autorizado y verificado](WORKBENCH_LAB_ACCESS_STATE.md).
 El alias sirve una publicación posterior al corte PR17 de abajo; los readbacks protegidos son históricos.
 
-## Revisión visual local posterior — pendiente de corrección
+## Corrección SKY local — verificada, aceptación visual pendiente
 
-2026-10-01. El operador pidió documentar con subagentes y corregir en el próximo chat.
-El export local de24adaptaciones `prueba-modular-24-v3` sigue en revisión: footer centrado
-por función, hueco destino/origen03-2668, eje DESDE/tarifa01-2611 y bloque editorial
-HASTA/porcentaje/DE DCTO.23-4685. El comportamiento local1.3.0 LEFT global no es norma
-visual aprobada;377tests previos no equivalen a aceptación de esos detalles.
+2026-10-01. Contenido `1.5.0` y destino `1.2.0` corrigen el feedback posterior:
+los 76 badges tarifarios (42 pilas simples y 34 complejos/dobles) se anclan a la izquierda
+de su columna; el texto permanece centrado dentro de la cápsula adaptable. El barrido de
+126 fuentes no deja un DESDE tarifario sin admisión. Los badges de origen mantienen su contrato.
+Se centran sólo los footer-legal 1387 de 2611/2668, conservando condiciones LEFT;
+se separa el prefijo con flecha de la ciudad por 16 px en ambas fuentes, se equilibra
+la columna de 2668 y el bloque editorial 4685 comparte eje LEFT con destino/CTA.
 
-Canon en Workbench: `docs/operations/sky-layout-feedback-handoff-2026-10-01.md`.
-[Skill y diagnóstico para retomar](../../../.codex/skills/efeonce-creative-workbench/references/layout-feedback-handoff.md).
-Este corte documental no cambia código, resultados, selección, main ni runtime publicado.
+14 corridas nuevas completadas, 24 selecciones verificadas y cero invocaciones de proveedores.
+384 pruebas harness, 10 SKY y cuatro gates PASS; 2.310 archivos anteriores conservan sus hashes.
+El export `prueba-modular-24-v6` incluye las 24 adaptaciones, PNG/SVG y PDF real de 25 páginas
+revisado; v3/v4/v5 se conservan como historia. Datos sintéticos y fotografía source-reference;
+la aceptación visual del operador y aprobación comercial siguen pendientes.
+
+Canon en Workbench: `docs/audits/sky-layout-feedback-correction-2026-10-01.md` y
+`docs/operations/sky-layout-feedback-handoff-2026-10-01.md`.
+[Skill vigente](../../../.codex/skills/efeonce-creative-workbench/references/layout-feedback-handoff.md) ·
+[Cierre documental con alcance y evidencia](../../audits/creative-workbench/2026-10-01-sky-layout-feedback-closure.md).
+El operador autorizó actualizar docs/skills con subagentes y hacer commit local; push y despliegue
+no forman parte de este cierre. Esta unidad local no actualiza main ni el runtime publicado del Lab.
 
 ## Cambios integrados y sus fuentes
 

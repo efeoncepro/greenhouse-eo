@@ -1,4 +1,46 @@
-# SKY: feedback de alineación pendiente para el próximo chat
+# SKY: feedback de alineación y corrección local
+
+**Status real: corregido en componentes del Workbench; pendiente aceptación visual del operador.**
+El pedido posterior «Corrígela en TODAS» amplió el alcance a los 76 badges tarifarios admitidos,
+no sólo al 2611 inicial. Contenido 1.5.0 / destino 1.2.0. Export v6 conserva v3/v4/v5.
+El catálogo completo de 126 fuentes no contiene DESDE tarifarios sin admisión; los 34 Tags
+incluyen 18 prefijos IDA Y VUELTA DESDE que antes figuraban como other-copy.
+
+Canon vivo: `docs/audits/sky-layout-feedback-correction-2026-10-01.md` en Workbench;
+contratos `workbench-sky-designer-content-rules.md` y `workbench-sky-destination-content-flow.md`
+en `docs/architecture/`. [Componentes](components.md) y [flujo de destino](destination-content-flow.md)
+explican las reglas actuales. El bloque histórico inferior conserva el diagnóstico inicial y
+sus restricciones de aquel corte; sus instrucciones de diferir el trabajo ya fueron reemplazadas
+por la autorización de implementarlo. No tratar pendientes históricos como defectos actuales.
+
+- Footer: CENTER sólo en los dos pins 1387 de 2611/2668; condiciones 1241/1242/1254 LEFT.
+- 2668: columna equilibrada contra banda completa de flecha; fila/footer/foto conservados.
+- 76 badges: cápsula LEFT sobre eje nativo del bloque tarifario; label centrado por tinta dentro.
+  42 pilas simples usan `offer.badgeAnchor`; 34 complejas/dobles usan `fareBadges[].anchor`.
+  No convertir stickers, origen o CTA a LEFT por el nombre DESDE. Precio conserva su layout propio.
+- 4685: HASTA/porcentaje/DE DCTO. pertenece a `editorialDiscount`; eje LEFT con destino/CTA
+  comprobado DESPUÉS del reflujo. CTA conserva centrado interno.
+- Prefijo: 2611/2668 dejan 16 px entre icono+texto del prefijo y tinta de ciudad, con origen separado.
+
+QA `footer-center-axis`, `destination-row-balance`, `destination-prefix-city-spacing`,
+`fare-badge-left-axis`, `fare-badge-price-conditions-axis` y
+`editorial-discount-destination-cta-axis`. Regresiones de TODOS los badges, longitudes y duales;
+revisión PNG/PDF y selección final con evidencia en la auditoría. Los jobs mantienen copy completo,
+Metric y fotos selladas, sin overrides de geometría ni retocar PNGs. Overflow sigue rechazándose.
+
+Greenhouse sólo contiene esta skill espejo; mantener ejecución en el checkout Workbench autorizado,
+preservar WIP y corridas previas. El pedido posterior autoriza subagentes, actualización documental
+y commit local de lo propio; no autoriza push, publicación, auth/infra ni deploy.
+La verificación anterior al commit está registrada en `layout-feedback-correction-v6/final-review.json`:
+384 harness + 10 SKY + cuatro gates PASS; 14 runs nuevos, 24 selecciones, cero proveedores y
+2.310 archivos previos SHA intactos. PDF v6 de 25 páginas/24 adaptaciones, atlas de 76 badges y
+matriz de 13 variantes revisados. No hay aprobación comercial de muestras ficticias.
+El commit se registra por separado cuando exista; no reinterpretar `commit: false` del snapshot
+como prohibición vigente ni editar ese corte histórico para aparentar evidencia posterior.
+
+---
+
+# Histórico: handoff de alineación previo a la corrección
 
 Corte: 2026-10-01, posterior al documento `prueba-modular-24-v3`. El operador pidió
 actualizar documentación y skills ahora y corregir las piezas en un chat nuevo. Este corte
@@ -21,15 +63,15 @@ Leerlo junto con `docs/architecture/workbench-sky-designer-content-rules.md` y
 - `03-2668`: revisar el hueco bajo destino/origen y la relación con el pie legal. Compactar
   y equilibrar el conjunto en su banda admitida; no trasladar foto, logo o flecha por una
   corrección aislada de ciudad ni considerar suficiente que todos los campos quepan.
-  Diagnóstico: el destino/origen acaba en172,8px locales, la fila conserva280px, la
-  flecha272px y el pie inicia en320px. Esos datos explican el hueco y la dependencia:
+  Diagnóstico: el destino/origen acaba en172,8 px locales, la fila conserva280 px, la
+  flecha272 px y el pie inicia en320 px. Esos datos explican el hueco y la dependencia:
   no subir el pie sin verificar colisión con la flecha ni enviar esas coordenadas en jobs.
 - `01-2611`: revisar el badge DESDE y su eje respecto al precio y las condiciones dentro
   de la flecha. Ancho adaptativo y texto centrado dentro de la cápsula no prueban que el
   bloque completo esté alineado. Comprobar el eje visual de la pila por tinta, no sólo cajas.
   Diagnóstico: la oferta compleja tiene `offer=null`; `fareBadges`1231 conserva
   `sourceCenterX=62.5`, pero el runtime centra DESDE usando `(maxWidth-w)/2` en el
-  parent de435px, separándolo del eje LEFT de precio/condiciones. El centro interno
+  parent de435 px, separándolo del eje LEFT de precio/condiciones. El centro interno
   del label no comprueba la alineación entre componentes.
 - `23-4685`: revisar HASTA / 5% / DE DCTO. / CTA junto al destino. Medir y comparar el
   conjunto completo para que sus ejes y separación sean coherentes con la receta fuente.

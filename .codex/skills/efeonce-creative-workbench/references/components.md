@@ -222,8 +222,10 @@ usar `marca:disenar`/`marca:lote` con la autoridad normal y contenido explícito
 ## Reglas de la diseñadora para contenido variable — 2026-10-01
 
 Canon: Workbench `docs/architecture/workbench-sky-designer-content-rules.md`.
-La receta local `sky-airline.content-layout.designer-rules@1.0.0` tiene 104 fuentes selladas:
+La base `sky-airline.content-layout.designer-rules@1.0.0` admitió 104 fuentes selladas:
 119 campos de precio, 126 de sticker, 76 relaciones destino/origen y 42 pilas simples en flecha.
+El contrato vigente es 1.5.0: la ampliación tarifaria cubre 76 badges del catálogo de 126 fuentes.
+4685 se trata como editorialDiscount LEFT, con su admisión propia, no como sticker circular.
 Cada variante sólo recibe las reglas de sus elementos admitidos.
 
 - Medir tinta real de Metric para centrar stickers y alinear cada moneda con su precio.
@@ -231,7 +233,7 @@ Cada variante sólo recibe las reglas de sus elementos admitidos.
 - Condiciones debajo del precio en estilo de oración, conservando acrónimos y URLs.
 - Origen tras las líneas efectivas del destino con gap nativo; badge de origen con icono, altura
   y padding nativos, ancho adaptativo. No mover un frame compartido que también contiene la ciudad.
-- Badge de tarifa adaptativo y centrado; badge/precio/condiciones en una pila con separación.
+- Badge de tarifa adaptativo: cápsula LEFT y label centrado dentro; pila con separación admitida.
   El legal de tarifa permanece dentro de la flecha. `footer-legal` sigue independiente.
 - Filas dobles de moneda se resuelven por pares fuente; un overflow se rechaza, no se omite la moneda.
 
@@ -248,16 +250,31 @@ Cambios locales sin publicación acreditada; nunca modificar los CLIs de Greenho
 
 ### Condiciones compactas, regla 1.1.0 — local 2026-10-01
 
-El operador autorizó una sola línea y tamaño menor en condiciones de la flecha compacta. `content-layout-admissions.mjs` fija 24 ofertas: display 12 px, banners 10 px y verticales 8 px; se conserva Metric/peso/color. La implementación 1.3.0 aplica LEFT, pendiente de corregir por función/source pin según [feedback nuevo](layout-feedback-handoff.md); lineHeight1,2; sin selección desde job ni cálculo de autofit por longitud. Máximo una línea: copy excesivo falla explícitamente. Plan `conditionTypography` y QA `offer-stack.conditionTypography` + `measurements.size`. No aplicar a pies legales, doble moneda o financiación. Prueba `projects/sky/prueba-modular-24-adaptaciones/`, incluyendo condiciones completas en display/vertical. Leer contrato Workbench actualizado, no redibujar la pieza o corregir PNG.
+El operador autorizó una sola línea y tamaño menor en condiciones de la flecha compacta. `content-layout-admissions.mjs` fija 24 ofertas: display 12 px, banners 10 px y verticales 8 px; se conserva Metric/peso/color. Contenido 1.5.0 conserva LEFT de condiciones; centra únicamente los dos footer-legal revisados según [cierre del feedback](layout-feedback-handoff.md); lineHeight 1,2; sin selección desde job ni cálculo de autofit por longitud. Máximo una línea: copy excesivo falla explícitamente. Plan `conditionTypography` y QA `offer-stack.conditionTypography` + `measurements.size`. No aplicar a pies legales, doble moneda o financiación. Prueba `projects/sky/prueba-modular-24-adaptaciones/`, incluyendo condiciones completas en display/vertical. Leer contrato Workbench actualizado, no redibujar la pieza o corregir PNG.
 
 La prueba de 24 variantes añadió dos reglas de visibilidad/separación: al mover condiciones dentro de una flecha, heredar la pintura sellada del precio (también en los estilos de glifos), para evitar morado sobre morado; las dobles monedas conservan la orientación fijada por fuente y sus slots laterales o filas, con cajas finales que no se intersectan. QA `conditionPaintFromPrice`, `dual-currency-row` y `dual-currency-separation`. No aceptar fit como evidencia de visibilidad.
 
-El badge DESDE de tarifas dobles/complejas usa ahora 16 pins adicionales, además de las 42 pilas simples: ancho de tinta + padding fuente, altura fija, extremos reales y centros de tinta comprobados. Plan `contentLayoutRecipe.fareBadges`; QA `fare-badge-adaptive`. No asumir que el badge de una doble moneda participa en `offer-stack`; revisar su admisión propia. Overflow se rechaza.
+Los badges tarifarios complejos/dobles usan 34 pins, además de las 42 pilas simples. Incluyen
+18 prefijos IDA Y VUELTA DESDE antes catalogados como other-copy. Todos usan ancla LEFT:
+ancho de tinta + padding fuente, altura fija, extremos reales y centro interno de label comprobados.
+Plan `contentLayoutRecipe.fareBadges`; QA `fare-badge-adaptive` y `fare-badge-price-conditions-axis`.
+No asumir que una doble moneda participa en `offer-stack`; revisar su admisión propia. Overflow se rechaza.
 
 ### Titular porcentual en flecha: eje izquierdo
 
-Receta local1.2.0: seis fuentes3032/3040/3051/3059/3070/3078. El bloque «20% Dcto. / en rutas de prueba» sigue la referencia «50% Dcto. / en todos los destinos»: titular multilineal LEFT, todas las líneas y condiciones sobre el eje izquierdo nativo del badge HASTA. HASTA permanece centrado dentro de su badge. Se conservan tamaños, fuentes y bandas verticales; no centrar el titular como sticker. Pins exactos y `promotion-arrow-left-axis` en QA; ancho y clips finales obligatorios.
+Receta local 1.2.0: seis fuentes 3032/3040/3051/3059/3070/3078. El bloque «20% Dcto. / en rutas de prueba» sigue la referencia «50% Dcto. / en todos los destinos»: titular multilineal LEFT, todas las líneas y condiciones sobre el eje izquierdo nativo del badge HASTA. HASTA permanece centrado dentro de su badge. Se conservan tamaños, fuentes y bandas verticales; no centrar el titular como sticker. Pins exactos y `promotion-arrow-left-axis` en QA; ancho y clips finales obligatorios.
 
-## Implementación local y feedback de alineación pendiente — 2026-10-01
+## Corrección local de relaciones y TODOS los badges — 2026-10-01
 
-Leer [destinos y espacios adaptativos](destination-content-flow.md) para conocer la implementación local y sus límites. **Antes de continuar, leer [feedback pendiente de alineación](layout-feedback-handoff.md)**: el operador invalidó LEFT global de legales y señaló huecos/ejes en 03-2668, 01-2611 y 23-4685. Corregir en el próximo chat por función y source pin; no aplicar CENTER global por deducción. El código 1.3.0 sigue LEFT, los 377 tests no certifican aceptación visual y el documento v3 queda parcial/rechazado en esos aspectos. No mover fotos/ventanas como origen, aplicar autofit a otros componentes ni sustituir corridas históricas.
+Contenido 1.5.0 / destino 1.2.0, con admisiones selladas propias. [Cierre y evidencia](layout-feedback-handoff.md).
+Todos los 76 badges tarifarios usan LEFT: 42 pilas en flecha (`offer.badgeAnchor`) y 34 Tags
+complejos/dobles (`fareBadges[].anchor`). La cápsula se alinea con el borde izquierdo de su
+bloque de tarifa, y el label se centra por tinta dentro. Los offsets nativos del frame de precio,
+importe/moneda y orientación de dobles se preservan. No centrar por ancho sobrante del padre.
+`fare-badge-left-axis` y `fare-badge-price-conditions-axis` comprueban ambos contratos.
+
+Footer CENTER sólo en 1387 de 2611/2668, condiciones LEFT. 2668 usa balance de fila completo y
+ambos KV separan prefijo con flecha de ciudad por 16 px. 4685 usa editorialDiscount LEFT y
+QA de eje con destino/CTA después del reflujo. Mantener clipping final y rechazo de overflow.
+Export v6 local revisado; aceptación visual del operador y aprobación comercial permanecen
+separadas. No mover fotos/ventanas por inferencia ni sustituir resultados/recursos históricos.

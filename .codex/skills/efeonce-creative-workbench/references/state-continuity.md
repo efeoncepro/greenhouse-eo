@@ -1,10 +1,13 @@
 # Estado y continuidad de Workbench
 
-**Último feedback visual — 2026-10-01:** [handoff de alineación](layout-feedback-handoff.md).
-LEFT global de legales fue invalidado; el código local 1.3.0 todavía lo aplica. El PDF v3
-queda parcial/rechazado en los aspectos señalados. Las correcciones de03-2668, 01-2611
-y 23-4685 se ejecutan en un chat nuevo; este cambio sólo registra documentación.
-El corte al final de esta referencia prevalece sobre la declaración de regla vigente anterior.
+**Último corte local SKY — 2026-10-01:** [cierre del feedback](layout-feedback-handoff.md).
+Contenido 1.5.0 / destino 1.2.0: TODOS los 76 badges tarifarios LEFT, footer por función,
+balance 2668, prefijo separado 16 px en 2611/2668 y descuento editorial 4685. Export v6;
+aceptación visual del operador pendiente, sin aprobación comercial, push ni deploy.
+El pedido posterior autoriza subagentes, actualización documental y commit local de lo propio;
+registrar los hashes cuando se cree el commit, sin alterar la evidencia anterior al commit.
+Los estados de rollout/acceso del host se verifican por separado; esta unidad sólo cambia
+componentes SKY y continuidad documental. El corte final prevalece sobre los históricos.
 
 ## Corte consolidado — 2026-10-01
 
@@ -264,7 +267,7 @@ de este candidato; no habilitan pagos ni certifican toda la matriz de controles 
 | Authorization legacy solo / junto al header propio | 400 / 400 |
 | Bearer GitHub falso | 400 |
 | Body con otro ID | 400 |
-| Validate SKY | 200, providerInvocations0 |
+| Validate SKY | 200, providerInvocations 0 |
 | Execute con IA OFF | 400, sin paid call |
 
 **Primer mint real medido:** audit/readback de cuatro tokens, GET de scope para cada uno con
@@ -863,20 +866,20 @@ Harness privado 366/366 PASS, cero skips, 58 archivos; cuatro gates PASS. Skills
 
 Feedback del operador: el titular del20% debe seguir el eje de la referencia50%. Causa corregida: promotion-sticker incluía bloques editoriales a los que se aplicaba CENTER. Receta content-layout designer-rules@1.2.0 distingue seis fuentes3032/3040/3051/3059/3070/3078: todas las líneas del titular y condiciones alineadas por tinta al eje izquierdo nativo del badge HASTA, con texto del badge centrado dentro. Geometría, tamaño y tipografía nativos preservados; QA promotion-arrow-left-axis y clipping final obligatorios. Packs/FIG/fuentes históricos intactos.
 
-Regeneradas09-3032 (ea7067ad-4b57-49d8-93fd-ad3e7aa9c755) y10-3059 (3bb0f914-1652-4a9e-be81-88dfc77c451a), identidad viva, cero providers. Las otras22 piezas seleccionadas conservan sus bytes; corridas y documento anterior intactos. Revisión visual de ambos PNG, portada y páginas10/11 del PDF nuevo. PDF25páginas con QA de geometría/fuentes/imágenes en todas; canon privado sky-airline/2026-10-01/prueba-modular-24-v2.
+Regeneradas09-3032 (ea7067ad-4b57-49d8-93fd-ad3e7aa9c755) y10-3059 (3bb0f914-1652-4a9e-be81-88dfc77c451a), identidad viva, cero providers. Las otras22 piezas seleccionadas conservan sus bytes; corridas y documento anterior intactos. Revisión visual de ambos PNG, portada y páginas10/11 del PDF nuevo. PDF25 páginas con QA de geometría/fuentes/imágenes en todas; canon privado sky-airline/2026-10-01/prueba-modular-24-v2.
 
-Harness privado367/367 PASS, cero skips/58archivos; cuatro gates PASS. Skills Codex/Claude byte-equivalentes (18archivos,256links) y diff sin whitespaceerrors. Local, sin commit/push/deploy ni aprobación comercial. No ejecutar/alterar CLIs Greenhouse.
+Harness privado367/367 PASS, cero skips/58 archivos; cuatro gates PASS. Skills Codex/Claude byte-equivalentes (18 archivos,256links) y diff sin whitespaceerrors. Local, sin commit/push/deploy ni aprobación comercial. No ejecutar/alterar CLIs Greenhouse.
 
 ## Histórico técnico: destinos adaptativos y feedback PDF — 2026-10-01, local
 
 Content-layout1.3.0 sustituye CENTER por LEFT para169 campos legales de 104 fuentes; condiciones compactas siguen tamaños fijos 12/10/8 px y una línea. Destino content-flow1.0.0 admite95 fuentes: tamaños Metric finitos, dos líneas por palabras, origen/precio por tinta y banda limitada, banners centrados y panel blanco refluido. Fotos, ventanas, logo, CTA, fidelidad y servicios conservan posición. El PDF Mesa de trabajo2 copia2 aporta los tres criterios; no contiene lógica ejecutable. Leer [destinos y espacios](destination-content-flow.md) y el contrato en Workbench.
 
-Verificación:377/377 harness privado PASS sin skips (59archivos),10/10 suite SKY y cuatro gates PASS. Regresiones propias25/25: short/long/acento, fuente/sello ajeno, overflow explícito, ventanas/fotos fijas, legales por línea y footer preservado. Inventario CI explícito:53casos licenciados en ambas suites, sin afirmar ejecución de public mode.
+Verificación:377/377 harness privado PASS sin skips (59 archivos),10/10 suite SKY y cuatro gates PASS. Regresiones propias25/25: short/long/acento, fuente/sello ajeno, overflow explícito, ventanas/fotos fijas, legales por línea y footer preservado. Inventario CI explícito:53 casos licenciados en ambas suites, sin afirmar ejecución de public mode.
 
-24/24 corridas nuevas completadas con autoridad real, cero providers; selecciones previas/runs/documentos inmutables. Export v3:24PNG+24SVG coinciden con outcomes; ZIP48 originales. PDF25páginas A4, fuentes listas/imágenes decodificadas, mínimo margen cuerpo-footer75,9375px. Revisado contacto24, detalles de destino/panel y páginas12/15 del PDF real. Matriz adicional de9 renders de diagnóstico: Calama/Buenos Aires/San Pedro de Atacama en banner/fidelidad/servicios; no son recibos productivos. Canon privado: sky-airline/2026-10-01/prueba-modular-24-v3. Sin commit/push/deploy ni aprobación comercial. CLIs de Greenhouse intactas.
+24/24 corridas nuevas completadas con autoridad real, cero providers; selecciones previas/runs/documentos inmutables. Export v3:24 PNG+24 SVG coinciden con outcomes; ZIP48 originales. PDF25 páginas A4, fuentes listas/imágenes decodificadas, mínimo margen cuerpo-footer75,9375 px. Revisado contacto24, detalles de destino/panel y páginas12/15 del PDF real. Matriz adicional de9 renders de diagnóstico: Calama/Buenos Aires/San Pedro de Atacama en banner/fidelidad/servicios; no son recibos productivos. Canon privado: sky-airline/2026-10-01/prueba-modular-24-v3. Sin commit/push/deploy ni aprobación comercial. CLIs de Greenhouse intactas.
 
 
-## Corte vigente: feedback visual pendiente para chat nuevo — 2026-10-01
+## Histórico: feedback visual diferido antes de la continuación autorizada — 2026-10-01
 
 El operador pidió actualizar docs/skills con subagentes ahora y corregir en otro chat.
 [Handoff de alineación](layout-feedback-handoff.md) y el canon Workbench
@@ -894,3 +897,36 @@ corridas y selección para comparaciones posteriores, sin declarar nueva entrega
 
 Documentación únicamente; sin commit/push/deploy ni comprobación nueva de runtime.
 Greenhouse sólo contiene la skill espejo; sus CLIs y el resto del WIP permanecen intactos.
+
+## Corte final vigente: TODOS los badges de tarifa LEFT — 2026-10-01, local
+
+**Status real: implementación y verificación local completas; aceptación visual del operador pendiente.**
+Contenido 1.5.0 / destino 1.2.0: 76 badges tarifarios = 42 pilas simples + 34 Tags complejos/dobles.
+Incluye 18 IDA Y VUELTA DESDE antes catalogados como other-copy; barrido de las 126 fuentes,
+sin DESDE tarifario sin admisión. Cápsulas LEFT con label centrado dentro, offsets de precio y
+orientación de dobles conservados. [Componentes](components.md), [destinos](destination-content-flow.md)
+y [handoff/cierre](layout-feedback-handoff.md) contienen el contrato y sus límites actuales.
+
+Evidencia previa al commit en el canon privado `sky-airline/2026-10-01/layout-feedback-correction-v6/`:
+
+- `final-review.json`: 384/384 harness, 10/10 SKY, cuatro gates PASS; atlas 76 y matriz 13 revisados.
+- `selection-and-immutability-verification.json`: 14 runs nuevos, 24 selecciones/output hashes
+  verificados, cero proveedores y 2.310 archivos anteriores inmutables. Contra v5 cambian 13 PNG;
+  contra v3 cambian 15. Jobs/copy, recursos, v3/v4/v5 y outcomes previos preservados.
+- `fare-badge-catalog-coverage.json`: cobertura completa de badges en las 126 fuentes.
+- `prueba-modular-24-v6/`: PDF/HTML de 25 páginas A4, 24 PNG + 24 SVG y ZIP de 48 originales.
+  PDF real revisado en contacto completo y páginas 4/14/17/18/19/21; fuentes listas, imágenes
+  decodificadas y clearance mínimo cuerpo/footer 75,9375 px. PDF SHA
+  `489244b17e7979c475ce353e22f345c05d93de8b77098b4859667c5c49fc0113`.
+
+Canon técnico y registro detallado: Workbench `docs/audits/sky-layout-feedback-correction-2026-10-01.md`.
+No duplicar aquí la tabla de UUIDs; los receipts de la pieza y la auditoría conservan sus vínculos.
+Copy ficticio y fotografía source-reference, sin aprobación comercial. Pendiente visual: revisar v6.
+El operador autorizó después subagentes, actualización de docs/skills y commit local; evidencia de
+commit, push y deploy se registra por separado. No editar el snapshot `git.commit: false` para
+simular un commit posterior. No hay cambio de arquitectura del host, de autoridad, auth/infra ni pack.
+
+Esta revisión sincroniza todas las referencias de la skill afectadas y conserva ambos bundles byte
+a byte. Ejecutar `scripts/validate.py` después de la última edición para el conteo vigente de archivos
+y enlaces; el snapshot previo de 20 archivos/298 enlaces sigue siendo histórico. Preservar el WIP
+concurrente en `ai-generations/` y el resto de las skills; no ejecutar/alterar CLIs Greenhouse.
