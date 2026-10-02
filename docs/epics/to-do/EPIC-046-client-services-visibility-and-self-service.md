@@ -174,7 +174,7 @@ conservan su epic. P01 se conecta con TASK-1834 por contrato y rollout nativo co
 |---|---|---|---|
 | P01 | [TASK-1852](../../tasks/in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md) | Habilitación de servicios, acceso y canales para Berel y Sky | none |
 | P02 | [TASK-1853](../../tasks/to-do/TASK-1853-client-service-progress-and-metrics-read-model.md) | Lectura cliente de servicios, avance y métricas | TASK-1852 |
-| P04 | [TASK-1854](../../tasks/to-do/TASK-1854-client-home-services-and-cycle-experience.md) | Inicio y Mis servicios: resultados, avance y próximos pasos | TASK-1852, TASK-1853 |
+| P04 | [TASK-1854](../../tasks/to-do/TASK-1854-client-home-services-and-cycle-experience.md) | Inicio y Mis servicios: resultados, avance y próximos pasos (absorbida 2026-10-02 como hija G de TASK-1967; dirección visual del canvas aprobado) | TASK-1852, TASK-1853, TASK-1967 (hijas A, B, D) |
 | P06 | [TASK-1855](../../tasks/to-do/TASK-1855-client-service-requests-and-briefs-commands.md) | Solicitudes y briefs del servicio: commands y seguimiento | TASK-1852, TASK-1853 |
 | P07 | [TASK-1856](../../tasks/to-do/TASK-1856-client-service-request-and-brief-self-service-ui.md) | Autogestión de solicitudes y briefs del cliente | TASK-1854, TASK-1855 |
 | P01-b | [TASK-1857](../../tasks/to-do/TASK-1857-sky-creative-hub-client-surface.md) | Creative Hub del portal cliente: materializar `/creative-hub` para Sky (registrada 2026-09-10; decisión del operador sobre TASK-1687) | none |
