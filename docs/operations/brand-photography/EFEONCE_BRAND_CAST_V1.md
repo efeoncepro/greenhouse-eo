@@ -101,7 +101,7 @@ parecido familiar sea real.
 |---|---|
 | Rostro de corazón y mentón fino | Rizos **cortos**: bob rizado a la altura de la mandíbula |
 | La misma nariz | **Lentes** de montura metálica fina |
-| La misma textura de rizo y el mismo cobrizo | Seria, analítica; sonrisa contenida, boca cerrada |
+| La misma textura de rizo | Pelo **castaño oscuro** (Karo es cobriza) **[decisión del operador, 2026-10-02]** · seria, analítica; sonrisa contenida, boca cerrada |
 | Piel blanca con rosado | Tres años mayor (31), 1,65 m, apenas menos delgada |
 
 Vestuario propio: sobrio, camisa y neutros.
