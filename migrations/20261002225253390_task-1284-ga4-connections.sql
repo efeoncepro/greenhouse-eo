@@ -2,7 +2,7 @@
 
 SET search_path = greenhouse_growth, greenhouse_core, public;
 
-CREATE TABLE greenhouse_growth.ga4_connections (
+CREATE TABLE IF NOT EXISTS greenhouse_growth.ga4_connections (
   connection_id TEXT PRIMARY KEY DEFAULT ('ga4-conn-' || gen_random_uuid()::text),
   organization_id TEXT NOT NULL UNIQUE REFERENCES greenhouse_core.organizations (organization_id) ON DELETE CASCADE,
   property_id TEXT NULL,
@@ -19,9 +19,9 @@ CREATE TABLE greenhouse_growth.ga4_connections (
   CONSTRAINT ga4_active_requires_property CHECK (status <> 'active' OR (property_id IS NOT NULL AND token_secret_ref IS NOT NULL))
 );
 
-CREATE INDEX ga4_connections_status_idx ON greenhouse_growth.ga4_connections (status);
+CREATE INDEX IF NOT EXISTS ga4_connections_status_idx ON greenhouse_growth.ga4_connections (status);
 
-CREATE TABLE greenhouse_growth.ga4_oauth_states (
+CREATE TABLE IF NOT EXISTS greenhouse_growth.ga4_oauth_states (
   state_id TEXT PRIMARY KEY DEFAULT ('ga4-state-' || gen_random_uuid()::text),
   state_hash TEXT NOT NULL UNIQUE,
   organization_id TEXT NOT NULL REFERENCES greenhouse_core.organizations (organization_id) ON DELETE CASCADE,
@@ -31,7 +31,7 @@ CREATE TABLE greenhouse_growth.ga4_oauth_states (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX ga4_oauth_states_expires_idx ON greenhouse_growth.ga4_oauth_states (expires_at) WHERE consumed_at IS NULL;
+CREATE INDEX IF NOT EXISTS ga4_oauth_states_expires_idx ON greenhouse_growth.ga4_oauth_states (expires_at) WHERE consumed_at IS NULL;
 
 INSERT INTO greenhouse_core.capabilities_registry
   (capability_key, module, allowed_actions, allowed_scopes, description, introduced_at, deprecated_at)

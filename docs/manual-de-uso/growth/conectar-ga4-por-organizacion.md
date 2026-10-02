@@ -1,6 +1,6 @@
 # Conectar GA4 a una organización
 
-> Estado: flujo implementado localmente; habilitación y prueba OAuth reales pendientes.
+> Estado (2026-10-02): tablas creadas y flag encendido en staging y producción con el cliente OAuth de Search Console. Para usarlo desde staging faltan el permiso de Secret Manager para `ga4-token-*` y las URIs de redirección en el cliente OAuth; producción necesita además el release del código.
 
 1. Abre **Agencia → Cliente → Ciclo de vida** de la organización correcta. Para Berel, usa **Grupo Berel**.
 2. En la tarjeta **Google Analytics 4**, selecciona **Conectar Google Analytics**. Autoriza el alcance de solo lectura con una cuenta que tenga acceso a la propiedad GA4 del cliente.

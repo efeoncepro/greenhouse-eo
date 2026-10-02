@@ -7551,6 +7551,32 @@ export interface GreenhouseGrowthFormVersion {
   version: number;
 }
 
+export interface GreenhouseGrowthGa4Connections {
+  connected_at: Timestamp | null;
+  connected_by_user_id: string | null;
+  connection_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  last_error_code: string | null;
+  last_verified_at: Timestamp | null;
+  organization_id: string;
+  property_id: string | null;
+  property_name: string | null;
+  scopes: Generated<string[]>;
+  status: Generated<string>;
+  token_secret_ref: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthGa4OauthStates {
+  consumed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  expires_at: Timestamp;
+  organization_id: string;
+  state_hash: string;
+  state_id: Generated<string>;
+}
+
 export interface GreenhouseGrowthGraderBrandAliasHistory {
   aliases_json: Json;
   created_at: Generated<Timestamp>;
@@ -14170,6 +14196,8 @@ export interface DB {
   "greenhouse_growth.form_submission": GreenhouseGrowthFormSubmission;
   "greenhouse_growth.form_submission_consent_snapshot": GreenhouseGrowthFormSubmissionConsentSnapshot;
   "greenhouse_growth.form_version": GreenhouseGrowthFormVersion;
+  "greenhouse_growth.ga4_connections": GreenhouseGrowthGa4Connections;
+  "greenhouse_growth.ga4_oauth_states": GreenhouseGrowthGa4OauthStates;
   "greenhouse_growth.grader_brand_alias_history": GreenhouseGrowthGraderBrandAliasHistory;
   "greenhouse_growth.grader_brand_intelligence": GreenhouseGrowthGraderBrandIntelligence;
   "greenhouse_growth.grader_business_model_history": GreenhouseGrowthGraderBusinessModelHistory;

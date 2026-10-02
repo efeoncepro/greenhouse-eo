@@ -1,6 +1,6 @@
 # GA4 Connection UI V1
 
-> Estado: implementado localmente; rollout y prueba OAuth real pendientes.
+> Estado (2026-10-02): migración aplicada; flag y cliente OAuth (compartido con Search Console) configurados en Vercel staging y Production. Pendientes: IAM `ga4-token-*`, URIs de redirección, release a producción y prueba OAuth real.
 > Superficie: Account 360, `/agency/clients/[organizationId]/lifecycle`.
 
 ## Dirección visual
@@ -18,6 +18,6 @@ La UI consume comandos/rutas del dominio `src/lib/growth/analytics-ga4`; nunca r
 
 ## Verificación pendiente
 
-- Aplicar la migración junto con el release y configurar OAuth/IAM para `ga4-token-*`.
+- Configurar IAM para `ga4-token-*` y las URIs de redirección del callback (migración y variables ya aplicadas el 2026-10-02).
 - Completar consentimiento real, selección de la propiedad de Grupo Berel y lectura Data API.
 - Revisar captura GVC en desktop y 390 px, teclado, foco y diálogo de desconexión sobre el runtime configurado.
