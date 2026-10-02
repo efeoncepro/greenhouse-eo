@@ -611,10 +611,15 @@ const aiSourceFinding = (facts: EvidenceFactV1[], locale: string): PlanClaimV1 |
   return {
     claimId: `claim.${top.factId}.top`,
     text: `${top.label} ${lead} ${formatFactValue(top.value, 'count', locale)} ${R.of} ${formatFactValue(total.value, 'count', locale)}.`,
-    factIds: [top.factId, total.factId],
+    // El total va primero: «Lo esencial» toma el primer hecho de un hallazgo, y el del asistente (con su período anterior)
+    // se leía «ChatGPT: de 1.343 a 1.648 de 1.686». Con el total, la esencial es la de las visitas desde IA, sin repetir.
+    factIds: [total.factId, top.factId],
     role: 'finding'
   }
 }
+
+/** TASK-1962 — hechos de GA4 (visitas al sitio): su propia tabla, no la de Search Console ni la del Grader. */
+const isGa4Fact = (fact: EvidenceFactV1): boolean => fact.method.name === 'ga4_channel_sessions'
 
 const isPlanFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('opportunity.')
 
@@ -902,7 +907,9 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       charts,
       // v2: la tabla es el respaldo de TODO el capítulo, no un resumen (revisión del operador, 2026-09-25).
       tables: [
-        ...((main => (main.length > 0 ? [tableFor(`table.${moduleKey}`, editorialV2 ? `${MODULE_TITLES[moduleKey]}: ${GH_INSIGHTS.tableAllFigures}` : `${MODULE_TITLES[moduleKey]} · resumen`, main, byId, input.locale)] : []))(facts.filter(fact => !isAeoSourceFact(fact)))),
+        ...((main => (main.length > 0 ? [tableFor(`table.${moduleKey}`, editorialV2 ? `${MODULE_TITLES[moduleKey]}: ${GH_INSIGHTS.tableAllFigures}` : `${MODULE_TITLES[moduleKey]} · resumen`, main, byId, input.locale)] : []))(facts.filter(fact => !isAeoSourceFact(fact) && !isGa4Fact(fact)))),
+        // TASK-1962 — lo que mide GA4 (visitas al sitio) en su propia tabla: es otra fuente y otra unidad (sesiones).
+        ...((siteFacts => (siteFacts.length > 0 ? [{ ...tableFor(`table.${moduleKey}.ga4`, GH_INSIGHTS.ga4.tableTitle[moduleKey] ?? GH_INSIGHTS.ga4.tableTitle.seo!, siteFacts, byId, input.locale), lead: GH_INSIGHTS.ga4.tableLead }] : []))(facts.filter(isGa4Fact))),
         // TASK-1962 — fuentes, tipos y tono del Grader en su propia tabla: no inflan la de los indicadores.
         ...((sourceFacts => (sourceFacts.length > 0 ? [{ ...tableFor(`table.${moduleKey}.sources`, GH_INSIGHTS.aeoFindings.tableTitle, sourceFacts, byId, input.locale), lead: GH_INSIGHTS.aeoFindings.tableLead }] : []))(facts.filter(isAeoSourceFact))),
         ...(drivers?.tables ?? [])

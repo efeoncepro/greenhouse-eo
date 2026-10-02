@@ -122,6 +122,8 @@ describe('SEO adapter', () => {
     // La página se rotula con su ruta; la raíz es la página de inicio.
     expect(result.facts.find(fact => fact.metricId === 'driver.page.clicks' && fact.value === 300)!.label).toBe('Página de inicio')
     expect(pageLabelOf('https://x.cl/colores/grises/')).toBe('/colores/grises')
+    // Una ruta que no cabe en la columna del informe se nombra por su último tramo (Berel, septiembre 2026).
+    expect(pageLabelOf('https://x.cl/sites/default/files/2025-06/FT_PINTURA%20AUTOENFRIANTE.pdf')).toBe('…/FT_PINTURA AUTOENFRIANTE.pdf')
     expect(result.sources.some(source => source.reader === 'readSeoWindowMovers')).toBe(true)
     // Aportes al cambio de clics: cada consulta más el resto suman exactamente el cambio total (500 − 400).
     const deltas = result.facts.filter(fact => fact.metricId === 'driver.query.delta' && fact.window.start === '2026-08-01')

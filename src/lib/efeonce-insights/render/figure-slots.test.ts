@@ -48,7 +48,7 @@ describe('texto de la página de figura con datos reales (revisión de TASK-1846
   it('la fuente es la de los hechos que la figura dibuja, legible y sin repetir', () => {
     const [slide] = buildFigureSlides(grouped([null, null]), withMethod, undefined, [claim], 'es-CL', FIGURE_CAPACITY.report)
 
-    expect(slide!.sourceText).toBe('Google Search Console · Mediciones de posiciones en buscadores')
+    expect(slide!.sourceText).toBe('Google Search Console · Posiciones en buscadores')
   })
 
   it('«Lo que significa» que repite la conclusión no se dibuja', () => {

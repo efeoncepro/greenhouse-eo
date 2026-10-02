@@ -679,7 +679,12 @@ describe('TASK-1962 — GA4 en el Search Visibility 360', () => {
     const chapter = v2(skewed, ['aeo']).chapters[0]!
 
     expect(chapter.charts.some(chart => chart.chartId.includes('ai-source'))).toBe(false)
-    expect(chapter.tables[0]!.rows.map(row => row[0])).toEqual(expect.arrayContaining(['ChatGPT', 'Gemini', 'Copilot']))
+    // GA4 va en su propia tabla (otra fuente), no en la de los indicadores del Grader.
+    const ga4Table = chapter.tables.find(table => table.tableId === 'table.aeo.ga4')!
+
+    expect(ga4Table.title).toBe('Visitas desde asistentes de IA')
+    expect(ga4Table.rows.map(row => row[0])).toEqual(['Visitas desde asistentes de IA', 'ChatGPT', 'Gemini', 'Copilot'])
+    expect(chapter.tables.some(table => table.tableId === 'table.aeo')).toBe(false)
   })
 
   it('las visitas orgánicas al sitio son figura propia, sin compartir eje con los clics de Search Console', () => {

@@ -98,7 +98,9 @@ export const GH_INSIGHTS = {
   /** TASK-1962 — población de los hechos de GA4 (trazabilidad del snapshot; no se imprime como cifra). */
   ga4: {
     organicPopulation: 'Sesiones del canal Organic Search de la propiedad GA4 conectada',
-    aiPopulation: 'Sesiones del canal AI Assistant de la propiedad GA4 conectada'
+    aiPopulation: 'Sesiones del canal AI Assistant de la propiedad GA4 conectada',
+    tableTitle: { seo: 'Visitas al sitio desde buscadores', aeo: 'Visitas desde asistentes de IA' } as Readonly<Record<string, string>>,
+    tableLead: 'Sesiones medidas por Google Analytics 4 en el sitio, según su agrupación de canales.'
   },
 
   /** TASK-1962 — nombres de los tipos de fuente y tonos del Grader en el informe (nunca la clave cruda). */
@@ -388,12 +390,12 @@ export const GH_INSIGHTS = {
     gsc_window_aggregate: 'Google Search Console',
     seo_work_queue: 'cola de trabajo SEO priorizada',
     gsc_window_movers: 'Google Search Console',
-    dataforseo_serp_rank: 'mediciones de posiciones en buscadores',
-    dataforseo_etv: 'estimación de tráfico orgánico',
+    dataforseo_serp_rank: 'posiciones en buscadores',
+    dataforseo_etv: 'tráfico orgánico estimado',
     // Nombre de producto del diagnóstico (ADR de naming Efeonce AEO): la fuente se nombra como lo conoce el cliente.
     ai_visibility_grader: 'Efeonce AEO Assessment',
     ico_engine_monthly: 'métricas mensuales de entrega',
-    ga4_channel_sessions: 'Google Analytics 4 (agrupación de canales por defecto)'
+    ga4_channel_sessions: 'Google Analytics 4'
   } as Readonly<Record<string, string>>,
 
   /** Unidad legible de una figura (por `EvidenceUnit`). La unidad cruda (`count`) nunca llega al documento. */

@@ -266,12 +266,22 @@ const SEO_LOWER_IS_BETTER = new Set(['position'])
 const MOVERS_METHOD = { name: 'gsc_window_movers', version: 'seo_movers_v1' }
 const MOVERS_LIMIT = 5
 
-/** Etiqueta legible de una página: la ruta, sin dominio; la raíz es la página de inicio. */
+/**
+ * Etiqueta legible de una página: la ruta, sin dominio; la raíz es la página de inicio. Una ruta larga se nombra por
+ * su último tramo («…/FT_PINTURA AUTOENFRIANTE.pdf»): la ruta completa de un archivo de 57 caracteres no cabe en la
+ * columna del informe A4 y el render falla cerrado (Berel, septiembre 2026). El tramo final es lo que identifica la
+ * página; la URL completa queda en el `evidenceRef` del snapshot.
+ */
+const PAGE_LABEL_MAX = 40
+
 export const pageLabelOf = (url: string): string => {
   try {
     const path = decodeURIComponent(new URL(url).pathname).replace(/\/+$/, '')
 
-    return path === '' ? GH_INSIGHTS.reading.homePage : path
+    if (path === '') return GH_INSIGHTS.reading.homePage
+    if (path.length <= PAGE_LABEL_MAX) return path
+
+    return `…/${path.split('/').filter(Boolean).at(-1)}`
   } catch {
     return url
   }

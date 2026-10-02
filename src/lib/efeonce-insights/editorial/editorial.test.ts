@@ -191,7 +191,7 @@ describe('TASK-1847 — límites y metodología sin identificadores internos', (
     ])
     expect(plan.methodology).toEqual([
       'Visibilidad orgánica: Google Search Console, corte al 31 de agosto de 2026.',
-      'Visibilidad orgánica: mediciones de posiciones en buscadores, corte al 30 de agosto de 2026.',
+      'Visibilidad orgánica: posiciones en buscadores, corte al 30 de agosto de 2026.',
       'Visibilidad en motores de respuesta: Efeonce AEO Assessment, corte al 3 de septiembre de 2026.',
       'Entrega y cumplimiento: sin fecha de corte declarada.'
     ])

@@ -20,6 +20,7 @@
  *   GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
  *   pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
  *     --edition=insed-... --org=org-... [--output=report_pdf|deck_pdf|both] [--editorial-v2] [--plan-only] [--ai-authoring]
+ *     [--start=YYYY-MM-DD --end-exclusive=YYYY-MM-DD]
  *
  * TASK-1888 — `--editorial-v2` recorre el contrato editorial v2 como lo haría la generación con
  * `INSIGHTS_EDITORIAL_V2_ENABLED=true`: evidencia v2 (FTR y metas ICO), portada resuelta con la preferencia y los
@@ -98,8 +99,14 @@ const main = async () => {
 
   if (!report) throw new Error(`No existe el reporte de la edición ${editionId}`)
 
-  const request = edition.request
+  // `--start=YYYY-MM-DD --end-exclusive=YYYY-MM-DD`: otra ventana con el mismo encargo (p. ej. el mes que todavía no
+  // tiene edición), para revisar el documento antes de generarla. Misma zona horaria y comparación del encargo.
+  const start = arg('start')
+  const endExclusive = arg('end-exclusive')
+  const request = start && endExclusive ? { ...edition.request, period: { ...edition.request.period, start, endExclusive } } : edition.request
   const windows = resolveInsightWindows(request.period, request.comparison)
+  // El documento rotula el período con el encargo de la edición: con otra ventana, la portada y los encabezados dicen ésa.
+  const previewEdition = { ...edition, request }
 
   const content = await collectInsightEvidence({
     organizationId,
@@ -158,8 +165,8 @@ const main = async () => {
     const isDeck = target === 'deck_pdf'
 
     const input = isDeck
-      ? buildInsightsDeckPlanInput({ edition, report, plan, snapshot })
-      : buildInsightReportPlanInput({ edition, report, plan, snapshot })
+      ? buildInsightsDeckPlanInput({ edition: previewEdition, report, plan, snapshot })
+      : buildInsightReportPlanInput({ edition: previewEdition, report, plan, snapshot })
 
     const outDir = path.join(process.cwd(), '.captures', 'insights-preview', `${report.reportCode}-${target}`)
     const externalAssets: Record<string, string> = {}
