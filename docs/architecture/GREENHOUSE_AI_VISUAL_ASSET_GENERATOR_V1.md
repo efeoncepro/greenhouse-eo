@@ -499,7 +499,11 @@ que Sunburst edite **sin máscara** —la imagen entera, por instrucción— y e
 avisa. En ese modo, `--color-match auto` resta antes de recomponer el desplazamiento medio por canal medido en un anillo
 protegido de 14 px (Sunburst aclara todo lo que edita: −16 niveles en MC1h, 2026-09-28): es el método ya medido de
 `pnpm foto:isotipo --acabado`, que reproduce byte a byte MC1h y MC4g. Canario propio de Sunburst sin máscara en este
-pipeline: pendiente.
+pipeline **verificado 2026-10-02**: sin guía, Sunburst puso el objeto FUERA de la zona (no sabía dónde); con
+`--guide auto` (default cuando la máscara no viaja) recibe la zona en magenta como imagen 2 y lo pone dentro, sin
+reproducir el contorno. `alignment.ts` detecta reencuadres por bordes (la media no los ve sobre superficies lisas) y
+el código de salida 3 marca «todos pasan, ninguno sirve». La CLI recuerda que Sunburst es el más potente cuando se usa
+el default.
 
 Canario: `ai-generations/2026-10-02_task-1965-canary/README.md`. Manuales:
 [imagen](../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md) ·

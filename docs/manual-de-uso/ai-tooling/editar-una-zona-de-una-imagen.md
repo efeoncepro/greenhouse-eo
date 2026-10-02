@@ -28,7 +28,7 @@ Lo medido en el canario del 2026-10-02 (`ai-generations/2026-10-02_task-1965-can
 | `--adapter` / `--model` | Cuando | Que tener en cuenta |
 |---|---|---|
 | `openai` · `gpt-image-2.5-flare` (**default**, `medium`) | Edicion con mascara de uso diario | Puso el objeto con luz y sombra correctas; ≈ USD 0,01 a 1536×1024 `medium` |
-| `openai` · `gpt-image-2.5-sunburst` | Cuando la pieza necesita la calidad de Sunburst | **Con mascara devuelve la zona como un panel negro plano** (3 de 3 pasadas). Con `--provider-mask auto` (default) edita **sin mascara** —la imagen entera, por instruccion— y el comando recompone la zona. Ese modo aun no tiene canario propio |
+| `openai` · `gpt-image-2.5-sunburst` ★ | **El mas potente**: la pieza final de mayor impacto | **Con mascara devuelve la zona como un panel negro plano** (3 de 3 pasadas). Con `--provider-mask auto` (default) edita **sin mascara**, recibe la zona marcada en magenta como guia (imagen 2) y el comando recompone y corrige el color. Verificado 2026-10-02: planta dentro de la zona, sin rastro del magenta. Sin la guia puso la planta fuera de la zona |
 | `fal:flux-pro-fill` | Rellenar una zona con algo nuevo; buena alternativa a OpenAI | Mascara blanca = editable; USD 0,05 por megapixel (redondeado arriba). Puso el objeto limpio en el canario |
 | `fal:seedream5-pro-edit` / `fal:seedream5-lite-edit` | Edicion por instruccion de Seedream | No usan mascara: la mascara solo recompone |
 
@@ -218,6 +218,9 @@ Compara el resultado con la base **midiendo por zona**, no en promedio global:
 | `⚠ la zona editable casi no cambio` | El modelo probablemente ignoro el pedido. Reescribe el prompt o agranda la mascara. |
 | `⚠ el modelo movio la zona protegida en promedio …` | Puede haber corrido el encuadre: la costura se notara. Mira la union al 100 %. |
 | `↺ misma entrada ya generada` | Cache: no se paga de nuevo. `--force` para regenerar. |
+| `⚠ el modelo REENCUADRO (…)` (`suspectMisaligned`) | El detector de bordes vio la escena corrida o escalada: la zona pegada no corresponde a lo generado. |
+| `⚠ REVISAR (codigo 3)` | Todos los candidatos pasaron la verificacion, pero ninguno muestra la edicion pedida (panel negro, reencuadre o zona sin cambio). |
+| `★ usando gpt-image-2.5-flare (default…)` | Recordatorio: para la pieza final, `--model gpt-image-2.5-sunburst`. |
 | `El prompt nombra "logo"…` | Guarda de marca: compone el SVG oficial despues; `--allow-brand` si la edicion solo toca el contexto. |
 
 ## Que no hacer

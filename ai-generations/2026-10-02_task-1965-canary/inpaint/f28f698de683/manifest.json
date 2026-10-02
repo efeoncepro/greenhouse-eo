@@ -1,0 +1,138 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "f28f698de683",
+  "key": "f28f698de683013308ab2e83b78d999befde30bab6fe7d76b806b67b24e491ba",
+  "status": "completed",
+  "createdAt": "2026-10-02T22:14:29.184Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/mask.png",
+    "maskSha256": "91fb8a55965123950ff4d656daae726ca48b813b27a6e00efa74f6b4a9e5d245",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "medium",
+    "seed": null,
+    "count": 1,
+    "prompt": "A small green potted plant in a matte terracotta pot standing on the bare wooden desk, lit by the same soft window light from the right, with a soft contact shadow on the wood.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nA small green potted plant in a matte terracotta pot standing on the bare wooden desk, lit by the same soft window light from the right, with a soft contact shadow on the wood.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.17076810201009116,
+    "editable": 189567,
+    "soft": 79028,
+    "protected": 1304269
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 55 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0103,
+    "basis": "1 × salida 1536x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 35.457,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.54,
+        "bestError": 1.54,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -3.63,
+        -3.87,
+        -4.66
+      ],
+      "protected": {
+        "pixels": 1304269,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 189567,
+        "maxDelta": 168,
+        "meanDelta": 47.314,
+        "worst": {
+          "x": 303,
+          "y": 620
+        }
+      },
+      "seam": {
+        "pixels": 79028,
+        "maxDelta": 125,
+        "meanDelta": 7.016,
+        "worst": {
+          "x": 501,
+          "y": 324
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1304269,
+        "maxDelta": 105,
+        "meanDelta": 4.621,
+        "worst": {
+          "x": 1171,
+          "y": 456
+        }
+      },
+      "outputUsd": 0.0103,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3234,
+        "input_tokens_details": {
+          "image_tokens": 3072,
+          "text_tokens": 162
+        },
+        "output_tokens": 343,
+        "output_tokens_details": {
+          "image_tokens": 343,
+          "text_tokens": 0
+        },
+        "total_tokens": 3577
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "medium",
+        "providerMask": false
+      }
+    }
+  ]
+}

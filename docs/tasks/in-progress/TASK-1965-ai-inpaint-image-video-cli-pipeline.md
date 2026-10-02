@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete local 2026-10-02 (Slices 1–6 + boceto/referencias + Sunburst sin máscara, commits c215c16d3…9528d5301 en develop, sin push). Pendiente: canario real de Sunburst sin máscara y de boceto (requiere autorización de gasto) y de Seedream edit`
+- Status real: `Code complete local 2026-10-02 (commits c215c16d3…3eee2cb2e en develop, sin push). Verificados en vivo: Flare, Flux Fill, flux3-edit y Sunburst sin máscara con guía de zona. Pendiente: canario de --sketch/--reference y de Seedream edit`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`

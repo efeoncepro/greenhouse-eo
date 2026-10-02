@@ -11,6 +11,8 @@ mesa vacía. Gasto total de la jornada ≈ USD 0,14 (autorizado por el operador)
 | `inpaint/0df0cbbe0fc1` | openai · Sunburst `medium`, máscara con RGB de la imagen | **rectángulo negro** (hipótesis del RGB refutada) | delta 0 | 99,2 % |
 | `inpaint/e8f26fe6d7aa` | openai · **Flare** `medium` | planta bien puesta | delta 0 | 0,1 % |
 | `inpaint/52f4e5d799dd` | fal · **Flux Pro Fill** | planta bien puesta | delta 0 | 0,2 % |
+| `inpaint/d39260af18b1` | openai · **Sunburst sin máscara**, sin guía | buena planta pero **fuera de la zona**: lo pegado quedó vacío (`PASS` con aviso «casi no cambió») | delta 0 | — |
+| `inpaint/f28f698de683` | openai · **Sunburst sin máscara + guía de zona en magenta** | **planta dentro de la zona**, 0 píxeles magenta en la salida, sin reencuadre | delta 0 | — |
 
 Hallazgos:
 
@@ -22,7 +24,10 @@ Hallazgos:
    editaba. `feather` ahora repone el núcleo en 255.
 4. La verificación prueba lo que NO se toca, no si el pedido se cumplió: la primera corrida pasó sin planta.
    El pipeline avisa cuando la zona abierta casi no cambió.
-5. Si el objeto generado excede la máscara (hojas de Flare al borde derecho), la recomposición lo funde con la
+5. **Sin máscara, Sunburst no sabe dónde va el objeto**: en `d39260af18b1` puso la planta a la derecha de la zona (no
+   reencuadró: taza y cuaderno en los mismos píxeles). Con la zona marcada como imagen 2 de guía la puso dentro
+   (`f28f698de683`). Es el modo por defecto de Sunburst desde este canario.
+6. Si el objeto generado excede la máscara (hojas de Flare al borde derecho), la recomposición lo funde con la
    base: la máscara debe cubrir el objeto entero con margen.
 
 Los binarios (`*.png`) viven fuera de git; archivar con `pnpm ai-gen:archive`.

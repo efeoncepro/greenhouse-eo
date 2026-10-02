@@ -130,8 +130,9 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
    `pnpm ai:mask`, recorta, genera, recompone y verifica el ARCHIVO en delta máximo 0 (código 2 si no). 🔴 **Sunburst
    CON máscara devuelve la zona como PANEL NEGRO PLANO** [verificado 3 de 3: 2026-09-23 y dos el 2026-10-02]: el
    pipeline usa Flare con máscara por defecto y, si eliges Sunburst, lo hace editar **sin máscara** (`--provider-mask
-   auto`), corrige el desplazamiento de color en un anillo (Sunburst aclara todo: −16 niveles medidos en MC1h) y
-   recompone — el mismo método de `pnpm foto:isotipo --acabado`. Alternativa con máscara: `fal:flux-pro-fill`.
+   auto`), le manda la zona en magenta como imagen 2 de guía (sin ella puso el objeto FUERA de la zona, medido
+   2026-10-02), corrige el desplazamiento de color en un anillo (Sunburst aclara todo: −16 niveles medidos en MC1h) y
+   recompone — el mismo método de `pnpm foto:isotipo --acabado`. Verificado 2026-10-02. Código 3 = revisar. Alternativa con máscara: `fal:flux-pro-fill`.
    **¿Incorporar un objeto o guiar con un dibujo, como el Markup de ChatGPT?** → `--sketch` (trazo sobre la foto; viaja
    como imagen 2 de guía y la máscara sale del trazo) y `--reference` (el objeto, imágenes 3..N). En la API no hay
    parámetro de boceto: es una imagen más con su rol numerado (guía de prompting 2.5, leída 2026-10-02).
