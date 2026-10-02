@@ -16,6 +16,7 @@ import { channelForAeoProvider } from '../contracts/channels'
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
 import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
+import { ga4AiFacts, readGa4ChannelWindow } from './ga4-site-facts'
 
 // v2 (TASK-1957): tasa de mención por motor, Share of Model, Share of Voice y citation share en vez de conteos de presencia.
 export const AEO_ADAPTER_VERSION = 'aeo_report_adapter_v2'
@@ -214,10 +215,17 @@ export const aeoReportAdapter: ModuleReportAdapterV1 = {
 
     const current = await collectForWindow(input.organizationId, input.window, comparisonIds, input.editorialV2 === true)
 
+    // TASK-1962 — la otra mitad de la visibilidad en IA: cuántas visitas llegan desde asistentes de IA (GA4). Es
+    // independiente del run del Grader: existe aunque no haya análisis en la ventana. Sólo con contrato v2.
+    const editorialV2 = input.editorialV2 === true
+    const aiComparison = editorialV2 && input.comparison ? ga4AiFacts(input.organizationId, input.comparison, await readGa4ChannelWindow(input.organizationId, input.comparison), {}, true) : null
+    const aiComparisonIds = Object.fromEntries((aiComparison?.facts ?? []).map(fact => [fact.metricId, fact.factId]))
+    const ai = editorialV2 ? ga4AiFacts(input.organizationId, input.window, await readGa4ChannelWindow(input.organizationId, input.window), aiComparisonIds, true) : null
+
     return {
-      facts: [...current.facts, ...(comparison?.facts ?? [])],
-      sources: [current.source, comparison?.source ?? null].filter((source): source is EvidenceSourceV1 => source !== null),
-      rejections: [...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
+      facts: [...current.facts, ...(comparison?.facts ?? []), ...(ai?.facts ?? []), ...(aiComparison?.facts ?? [])],
+      sources: [current.source, comparison?.source ?? null, ai?.source ?? null, aiComparison?.source ?? null].filter((source): source is EvidenceSourceV1 => source !== null),
+      rejections: [...current.rejections, ...(ai?.rejections ?? []), ...asComparisonRejections([...(comparison?.rejections ?? []), ...(aiComparison?.rejections ?? [])])]
     }
   }
 }

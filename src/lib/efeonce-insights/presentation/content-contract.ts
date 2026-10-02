@@ -18,7 +18,7 @@
 
 import type { InsightModule } from '../contracts/request'
 
-export const CONTENT_CONTRACT_VERSION = 'content_contract_v3' as const
+export const CONTENT_CONTRACT_VERSION = 'content_contract_v4' as const
 
 /** Las ocho preguntas, en el orden en que un informe de agencia las responde. */
 export const INSIGHT_CONTENT_QUESTIONS = [
@@ -69,8 +69,8 @@ export const CONTENT_CONTRACT: readonly InsightContentQuestionRow[] = [
     planSections: ['executive_summary', 'essentials', 'chapter'],
     answeredBy: 'facts',
     byModule: {
-      seo: { verdict: 'producer_now', evidence: 'Search Console por ventana (clics, impresiones, CTR, posición), ranking (keywords en primera página) y ETV mensual' },
-      aeo: { verdict: 'producer_now', evidence: 'run del Grader en la ventana: mención por motor, Share of Model, citas del sitio, puntaje y dimensiones' },
+      seo: { verdict: 'producer_now', evidence: 'Search Console por ventana (clics, impresiones, CTR, posición), ranking (keywords en primera página), ETV mensual y visitas orgánicas al sitio de GA4 (sesiones y sesiones con interacción del canal Organic Search)' },
+      aeo: { verdict: 'producer_now', evidence: 'run del Grader en la ventana (mención por motor, Share of Model, citas del sitio, puntaje y dimensiones) y visitas desde asistentes de IA de GA4 (canal AI Assistant), en total y por asistente' },
       ico: { verdict: 'producer_now', evidence: 'snapshot mensual por space: OTD, FTR y RpA' }
     }
   },
@@ -124,8 +124,8 @@ export const CONTENT_CONTRACT: readonly InsightContentQuestionRow[] = [
     planSections: ['ask'],
     answeredBy: 'plan',
     byModule: {
-      seo: { verdict: 'producer_now', evidence: 'Search Console sin conectar (`gsc` `not_connected`): el cliente da el acceso; es lo único que se le puede pedir sin una persona' },
-      aeo: { verdict: 'needs_input', evidence: 'sin análisis configurado es trabajo interno de Efeonce, no un pedido al cliente; las peticiones de negocio las agrega una persona en la revisión' },
+      seo: { verdict: 'producer_now', evidence: 'Search Console o Google Analytics 4 sin conectar (`gsc`/`ga4` `not_connected`): el cliente da el acceso; es lo único que se le puede pedir sin una persona' },
+      aeo: { verdict: 'producer_now', evidence: 'Google Analytics 4 sin conectar (`ga4` `not_connected`): el cliente da el acceso. Sin análisis configurado es trabajo interno de Efeonce, no un pedido; las peticiones de negocio las agrega una persona' },
       ico: { verdict: 'needs_input', evidence: 'sin space activo es configuración interna de Efeonce; lo que se pide al cliente (aprobaciones, insumos) lo agrega una persona en la revisión' }
     }
   },
@@ -168,6 +168,7 @@ export const CONTENT_METRIC_RULES: ReadonlyArray<{ module: InsightModule; prefix
   { module: 'seo', prefix: 'clicks_week.', question: 'outcome' },
   { module: 'seo', prefix: 'driver.', question: 'drivers' },
   { module: 'seo', prefix: 'opportunity.', question: 'recommendations' },
+  { module: 'seo', prefix: 'site.', question: 'outcome' },
   { module: 'aeo', prefix: 'overall_score', question: 'outcome' },
   { module: 'aeo', prefix: 'dimension.', question: 'outcome' },
   { module: 'aeo', prefix: 'mention_rate.', question: 'outcome' },
@@ -177,6 +178,8 @@ export const CONTENT_METRIC_RULES: ReadonlyArray<{ module: InsightModule; prefix
   { module: 'aeo', prefix: 'cited_source.', question: 'drivers' },
   { module: 'aeo', prefix: 'source_type.', question: 'drivers' },
   { module: 'aeo', prefix: 'sentiment.', question: 'outcome' },
+  { module: 'aeo', prefix: 'ai_sessions', question: 'outcome' },
+  { module: 'aeo', prefix: 'ai_source.', question: 'outcome' },
   { module: 'ico', prefix: 'otd', question: 'outcome' },
   { module: 'ico', prefix: 'ftr', question: 'outcome' },
   { module: 'ico', prefix: 'rpa', question: 'outcome' },

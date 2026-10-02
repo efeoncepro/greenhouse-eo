@@ -390,3 +390,14 @@ Sky Blog: conectar Search Console del blog, set de keywords y competidores (oper
 ## Open Questions
 
 - ¿Se expone competencia SEO al cliente en el informe (hoy prohibido por auditoría §7)? Default: no.
+
+## Delta 2026-10-02 — GA4 en el informe (`content_contract_v4`)
+
+- GA4 entra al Search Visibility 360 del informe: visitas orgánicas al sitio y con interacción (SEO) y visitas desde
+  asistentes de IA, en total y por asistente (AEO), desde `readGa4Analytics` (`adapters/ga4-site-facts.ts`). GA4 sin
+  conectar es límite «falta conectar la fuente» y petición al cliente. La lectura semanal ya no compara una semana con
+  el bloque corto de fin de mes.
+- Verificado con datos reales de Grupo Berel (septiembre contra agosto, sin crear edición): 43.949 visitas orgánicas
+  (−13,5 %), 1.686 visitas desde IA (+23,4 %), ChatGPT 1.648 de 1.686; plan válido (`validateEditorialPlan` sin errores).
+- Rollout: Vercel staging/Production ya tienen flag y OAuth (TASK-1284); `ops-worker` lo declara en `deploy.sh` y
+  necesita su deploy para las ediciones programadas. Release a producción pendiente junto con el resto de TASK-1962.

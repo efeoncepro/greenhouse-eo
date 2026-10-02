@@ -394,5 +394,10 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   emula SÓLO en fixtures).
 - **Grader ya medido** (`content_contract_v2`): `cited_source.*` y `source_type.*` responden «¿por qué?» y `sentiment.*`
   «¿cómo nos fue?»; los dominios citados nunca van en columnas (sólo hallazgo y tabla `table.aeo.sources`).
-- **Peticiones**: sólo `gsc` `not_connected` (Search Console sin conectar) produce `ask`; lo interno no se le pide al
-  cliente.
+- **Peticiones**: `gsc` y/o `ga4` `not_connected` (Search Console o GA4 sin conectar) producen `ask`; lo interno no se
+  le pide al cliente.
+- **GA4** (`content_contract_v4`, `adapters/ga4-site-facts.ts`, sólo v2): SEO `site.organic_sessions` /
+  `site.organic_engaged_sessions` (Organic Search, sin canal `google`, figura `count:site`); AEO `ai_sessions`
+  (hallazgo siempre) y `ai_source.<asistente>` (figura completa o ninguna + hallazgo del asistente que más trae). Flag
+  OFF ⇒ silencio (sin límite); lo leen Vercel y `ops-worker`.
+- **Línea semanal**: la lectura usa sólo bloques completos de 7 días como extremos.

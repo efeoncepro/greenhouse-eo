@@ -1492,7 +1492,7 @@ Un informe de Insights responde ocho preguntas del cliente, en este orden. El re
 | 3 | ¿Cómo estamos frente a la competencia? | capítulo | **bloqueada por política** (comparativa SEO nunca client-facing, auditoría §7 del módulo SEO) | productor (Share of Voice) | no aplica |
 | 4 | ¿Qué hicimos este mes? | capítulo | necesita registro de entregables | necesita registro de entregables | productor (piezas completadas, throughput) |
 | 5 | ¿Qué recomendamos? | `actions` | productor (cola SEO, sólo orígenes propios) | agente redactor (TASK-1903) | agente redactor |
-| 6 | ¿Qué necesitamos de ustedes? | `ask` | productor (Search Console sin conectar) | persona en la revisión (lo que falta es configuración interna) | persona en la revisión |
+| 6 | ¿Qué necesitamos de ustedes? | `ask` | productor (Search Console o GA4 sin conectar) | productor (GA4 sin conectar); lo demás, persona en la revisión | persona en la revisión |
 | 7 | ¿Cómo lo mediremos? | `measurement` | necesita metas pactadas | necesita metas pactadas | productor (metas oficiales) |
 | 8 | ¿Qué no podemos afirmar? | `limits` | productor | productor | productor |
 
@@ -1537,9 +1537,20 @@ redactor; nunca llega al cliente.
   `declared_target`; nunca `competitor_gap` ni `discovery_candidate`), máximo 5, en su orden. Cada acción cita
   impresiones y posición medidas, la posición objetivo (referencia) y el techo estimado de la banda 1; sin techo no
   promete cifra. Depende de `GROWTH_SEO_WORK_QUEUE_ENABLED` (Vercel, ON en staging y Production).
-- **Petición** (`ask`): sólo Search Console sin conectar (`readSeoOverviewConnection` → rechazo `gsc`
-  `not_connected`, límite «falta conectar la fuente»). Lo que falta por configuración interna (perfil del Grader,
+- **GA4 en el Search Visibility 360** (`content_contract_v4`, `adapters/ga4-site-facts.ts`): una consulta por ventana al
+  reader dueño `readGa4Analytics` (conexión OAuth por organización de TASK-1284) con la agrupación de canales por defecto
+  de GA4. SEO recibe `site.organic_sessions` y `site.organic_engaged_sessions` (canal Organic Search, todos los
+  buscadores: sin canal `google`), en figura propia que no comparte eje con los clics de Search Console. AEO recibe
+  `ai_sessions` (canal AI Assistant; hallazgo siempre, como el Share of Model) y `ai_source.<asistente>` (partes del
+  total con isotipo; varios hosts de un asistente son una fila). La figura por asistente va completa o no va (si las
+  bandas de magnitud la parten queda el hallazgo «ChatGPT trae la mayoría…: 1.648 de 1.686» y la tabla). Flag apagado
+  en el runtime ⇒ sin hechos ni límite; sin conexión ⇒ rechazo `ga4` `not_connected` y petición; fallo ⇒
+  `insufficient_data`. Lo leen Vercel y el `ops-worker` (ediciones programadas; declarado en su `deploy.sh`).
+- **Petición** (`ask`): Search Console y/o GA4 sin conectar (rechazos `gsc`/`ga4` `not_connected`, límite «falta
+  conectar la fuente»), en una sola frase si faltan los dos. Lo que falta por configuración interna (perfil del Grader,
   spaces, target SEO) no se le pide al cliente.
+- **Línea semanal**: la lectura compara sólo bloques COMPLETOS de 7 días (el último del mes puede ser de 2 o 3 días y
+  se leía como caída); la figura sigue mostrando el bloque corto con su etiqueta.
 
 **Modelo web 1.3 — las decisiones de contenido viven en el API.** Cada frase del resumen y de las esenciales trae
 `module` y `evidence {chapterId, chartId}`; el modelo trae `essentialsByModule` (incluido 0), cada capítulo su `label`

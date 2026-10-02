@@ -720,3 +720,8 @@ internas, y TASK-1958 para la jerarquía visual (Think todavía imprime `spec.un
   1.3 (decisiones de contenido en el API; Think deja de deducir), causas SEO (`readSeoWindowMovers`), piezas entregadas
   ICO, plan de acción desde la cola SEO (orígenes propios) y petición de Search Console. Código local en develop; sin
   release. Think consume 1.3 en commits locales de `efeonce-think`.
+- 2026-10-02 · Claude (TASK-1962 + TASK-1284) · GA4 entra al informe (`content_contract_v4`): visitas orgánicas al sitio
+  (SEO) y visitas desde asistentes de IA por asistente (AEO) desde `readGa4Analytics`; petición de GA4 sin conectar;
+  lectura semanal sin bloques cortos. GA4 conectado para Grupo Berel (propiedad 328274754) desde la UI de staging;
+  flag + OAuth en Vercel staging/Production y declarado en `ops-worker/deploy.sh` (deploy del worker pendiente). Local,
+  sin push.

@@ -568,6 +568,11 @@ describe('TASK-1962 — lo que el Grader ya mide: sitios citados, tipo de fuente
 })
 
 describe('TASK-1962 — más familias con evidencia: cascada de consultas y línea semanal de clics', () => {
+  const span = (month: string, block: number) => ({
+    from: `2026-${month}-${String(block * 7 - 6).padStart(2, '0')}`,
+    to: new Date(Date.UTC(2026, Number(month) - 1, block * 7 + 1)).toISOString().slice(0, 10)
+  })
+
   const seo = (factId: string, metricId: string, label: string, value: number, comparisonFactId: string | null = null, dimension?: Record<string, string>): EvidenceFactV1 =>
     ({ ...aeo('x', value), factId, module: 'seo', metricId, label, unit: 'count', numerator: null, denominator: null, dimension, channelId: 'google', comparisonFactId })
 
@@ -581,9 +586,12 @@ describe('TASK-1962 — más familias con evidencia: cascada de consultas y lín
       seo('seo.driver.query.delta.w.2', 'driver.query.delta', 'pinturas berel', -149, null, { query: 'pinturas berel', rank: '2' }),
       seo('seo.driver.query.delta.w.rest', 'driver.query.delta', 'Resto de consultas', -782, null, { query: 'Resto de consultas', rank: 'rest' }),
       ...[1, 2, 3, 4].flatMap(block => [
-        seo(`seo.clicks_week.${block}.w`, `clicks_week.${block}`, `${block * 7 - 6}–${block * 7} sept`, 2300 + block * 10, `seo.clicks_week.${block}.p`, { block: String(block) }),
-        seo(`seo.clicks_week.${block}.p`, `clicks_week.${block}`, `${block * 7 - 6}–${block * 7} ago`, 2600 + block * 10, null, { block: String(block) })
-      ])
+        seo(`seo.clicks_week.${block}.w`, `clicks_week.${block}`, `${block * 7 - 6}–${block * 7} sept`, 2300 + block * 10, `seo.clicks_week.${block}.p`, { block: String(block), ...span('09', block) }),
+        seo(`seo.clicks_week.${block}.p`, `clicks_week.${block}`, `${block * 7 - 6}–${block * 7} ago`, 2600 + block * 10, null, { block: String(block), ...span('08', block) })
+      ]),
+      // Bloque corto de fin de mes (29–30): se dibuja, pero la lectura no lo compara con una semana entera.
+      seo('seo.clicks_week.5.w', 'clicks_week.5', '29–30 sept', 552, 'seo.clicks_week.5.p', { block: '5', from: '2026-09-29', to: '2026-10-01' }),
+      seo('seo.clicks_week.5.p', 'clicks_week.5', '29–31 ago', 980, null, { block: '5', from: '2026-08-29', to: '2026-09-01' })
     ],
     sources: [],
     rejections: []
@@ -609,7 +617,7 @@ describe('TASK-1962 — más familias con evidencia: cascada de consultas y lín
     const plan = v2(snapshot, ['seo'])
     const line = plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.line.clicks-week')!
 
-    expect(line).toMatchObject({ family: 'line', relation: 'trend', dimensionLabels: ['1–7 sept', '8–14 sept', '15–21 sept', '22–28 sept'] })
+    expect(line).toMatchObject({ family: 'line', relation: 'trend', dimensionLabels: ['1–7 sept', '8–14 sept', '15–21 sept', '22–28 sept', '29–30 sept'] })
     expect(line.series.map(series => series.label)).toEqual(['Período', 'Período anterior'])
     expect(plan.chapters[0]!.claims.some(claim => claim.factIds.some(id => id.includes('clicks_week')))).toBe(false)
     expect(plan.chapters[0]!.readings!.find(reading => reading.chartId === 'chart.seo.line.clicks-week')).toMatchObject({
@@ -617,5 +625,91 @@ describe('TASK-1962 — más familias con evidencia: cascada de consultas y lín
       meaning: { text: 'En el período anterior, de 2.610 (1–7 ago) a 2.640 (22–28 ago).' }
     })
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+})
+
+describe('TASK-1962 — GA4 en el Search Visibility 360', () => {
+  const base = (factId: string, module: 'seo' | 'aeo', metricId: string, label: string, value: number, extra: Partial<EvidenceFactV1> = {}): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId, module, metricId, label, unit: 'count', numerator: null, denominator: null, dimension: undefined, comparisonFactId: null, method: { name: 'ga4_channel_sessions', version: 'ga4_default_channel_group_v1' }, ...extra })
+
+  const assistant = (key: string, label: string, value: number, channelId?: EvidenceFactV1['channelId']) =>
+    base(`aeo.ai_source.${key}.w`, 'aeo', `ai_source.${key}`, label, value, { numerator: value, denominator: 1687, dimension: { assistant: label }, ...(channelId ? { channelId } : {}) })
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      base('aeo.ai_sessions.w', 'aeo', 'ai_sessions', 'Visitas desde asistentes de IA', 1687, { comparisonFactId: 'aeo.ai_sessions.prev' }),
+      base('aeo.ai_sessions.prev', 'aeo', 'ai_sessions', 'Visitas desde asistentes de IA', 1210),
+      assistant('chatgpt', 'ChatGPT', 1200, 'chatgpt'),
+      assistant('gemini', 'Gemini', 300, 'gemini'),
+      assistant('copilot', 'Copilot', 187),
+      base('seo.site.organic_sessions.w', 'seo', 'site.organic_sessions', 'Visitas orgánicas al sitio', 43575, { comparisonFactId: 'seo.site.organic_sessions.prev' }),
+      base('seo.site.organic_sessions.prev', 'seo', 'site.organic_sessions', 'Visitas orgánicas al sitio', 41000),
+      base('seo.site.organic_engaged_sessions.w', 'seo', 'site.organic_engaged_sessions', 'Visitas orgánicas con interacción', 29636, { comparisonFactId: 'seo.site.organic_engaged_sessions.prev' }),
+      base('seo.site.organic_engaged_sessions.prev', 'seo', 'site.organic_engaged_sessions', 'Visitas orgánicas con interacción', 27100),
+      base('seo.clicks.w', 'seo', 'clicks', 'Clics orgánicos', 9377, { channelId: 'google', comparisonFactId: 'seo.clicks.prev' }),
+      base('seo.clicks.prev', 'seo', 'clicks', 'Clics orgánicos', 10662, { channelId: 'google' })
+    ],
+    sources: [],
+    rejections: []
+  }
+
+  it('las visitas desde IA son hallazgo y se reparten por asistente en su propia figura, con isotipo', () => {
+    const plan = v2(snapshot, ['seo', 'aeo'])
+    const chapter = plan.chapters.find(item => item.module === 'aeo')!
+    const finding = chapter.claims.find(claim => claim.factIds.includes('aeo.ai_sessions.w'))!
+
+    expect(finding.role).toBe('finding')
+    expect(finding.text).toBe('Las visitas desde asistentes de IA subieron de 1.210 a 1.687 (+39,4 %).')
+    // Cada asistente vive en la figura y la tabla; la frase dice sólo cuál trae más, con su parte del total.
+    expect(chapter.claims.filter(claim => claim.factIds.some(id => id.startsWith('aeo.ai_source.'))).map(claim => [claim.role, claim.text])).toEqual([
+      ['finding', 'ChatGPT trae la mayoría de las visitas desde asistentes de IA: 1.200 de 1.687.']
+    ])
+
+    const byAssistant = chapter.charts.find(chart => chart.chartId.startsWith('chart.aeo.count.ai-source'))!
+
+    expect(byAssistant.title).toBe('Visitas desde cada asistente de IA')
+    expect(byAssistant.dimensionLabels).toEqual(['ChatGPT', 'Gemini', 'Copilot'])
+    expect(byAssistant.dimensionChannelIds).toEqual(['chatgpt', 'gemini', null])
+    expect(byAssistant.series).toHaveLength(1)
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+
+  it('si un asistente deja a los demás sin escala no hay figura parcial: quedan el hallazgo y la tabla', () => {
+    const skewed = { ...snapshot, facts: snapshot.facts.map(fact => (fact.factId === 'aeo.ai_source.gemini.w' ? { ...fact, value: 30, numerator: 30 } : fact.factId === 'aeo.ai_source.copilot.w' ? { ...fact, value: 2, numerator: 2 } : fact)) }
+    const chapter = v2(skewed, ['aeo']).chapters[0]!
+
+    expect(chapter.charts.some(chart => chart.chartId.includes('ai-source'))).toBe(false)
+    expect(chapter.tables[0]!.rows.map(row => row[0])).toEqual(expect.arrayContaining(['ChatGPT', 'Gemini', 'Copilot']))
+  })
+
+  it('las visitas orgánicas al sitio son figura propia, sin compartir eje con los clics de Search Console', () => {
+    const plan = v2(snapshot, ['seo'])
+    const chapter = plan.chapters[0]!
+    const site = chapter.charts.find(chart => chart.chartId === 'chart.seo.count.site')!
+
+    expect(site.title).toBe('Visitas orgánicas al sitio')
+    expect(site.dimensionLabels).toEqual(['Visitas orgánicas al sitio', 'Visitas orgánicas con interacción'])
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.seo.count')?.dimensionLabels ?? []).not.toContain('Visitas orgánicas al sitio')
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+
+  it('sin un asistente dominante, la frase dice cuál trae más sin decir «la mayoría»', () => {
+    const balanced = { ...snapshot, facts: snapshot.facts.map(fact => (fact.factId === 'aeo.ai_source.chatgpt.w' ? { ...fact, value: 700, numerator: 700 } : fact)) }
+    const chapter = v2(balanced, ['aeo']).chapters[0]!
+
+    expect(chapter.claims.find(claim => claim.claimId.endsWith('.top'))?.text).toBe('ChatGPT es el asistente de IA que más visitas trae: 700 de 1.687.')
+  })
+
+  it('GA4 sin conectar se pide al cliente, solo o junto con Search Console, y su límite dice que falta conectarlo', () => {
+    const ga4 = { module: 'aeo' as const, metricId: 'ga4', reason: 'not_connected' as const, detail: 'x' }
+    const gsc = { module: 'seo' as const, metricId: 'gsc', reason: 'not_connected' as const, detail: 'x' }
+
+    expect(v2({ ...snapshot, rejections: [ga4] }, ['aeo']).ask?.text).toBe('Darnos acceso de lectura a Google Analytics 4 del sitio para medir las visitas que llegan desde buscadores y asistentes de IA.')
+    expect(v2({ ...snapshot, rejections: [gsc, { ...ga4, module: 'seo' }] }, ['seo', 'aeo']).ask?.claimId).toBe('ask.connect_search_console_ga4')
+    expect(v2({ ...snapshot, rejections: [ga4] }, ['aeo']).limits).toContain('Google Analytics 4: falta conectar la fuente.')
+    // Un rechazo de un módulo que no está en la edición no se pide.
+    expect(v2({ ...snapshot, rejections: [ga4] }, ['seo']).ask).toBeUndefined()
+    // Del período anterior no se pide nada.
+    expect(v2({ ...snapshot, rejections: [{ ...ga4, scope: 'comparison' }] }, ['aeo']).ask).toBeUndefined()
   })
 })

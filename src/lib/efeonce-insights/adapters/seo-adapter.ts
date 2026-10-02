@@ -23,6 +23,7 @@ import { SEO_SEARCH_CHANNEL } from '../contracts/channels'
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
 import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
+import { ga4OrganicFacts, readGa4ChannelWindow } from './ga4-site-facts'
 
 export const SEO_ADAPTER_VERSION = 'seo_report_adapter_v1'
 
@@ -428,11 +429,13 @@ const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsi
   const gsc = await gscFacts(input.organizationId, window, comparisonIds, input.editorialV2 === true)
   const rank = seoTargetId ? await rankFacts(seoTargetId, window, comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
   const etv = seoTargetId ? await etvFacts(seoTargetId, window, comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
+  // TASK-1962 — qué pasa después del clic: visitas orgánicas al sitio según GA4 (sólo contrato v2).
+  const site = input.editorialV2 === true ? ga4OrganicFacts(input.organizationId, window, await readGa4ChannelWindow(input.organizationId, window), comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
 
   return {
-    facts: [...gsc.facts, ...rank.facts, ...etv.facts],
-    rejections: [...gsc.rejections, ...rank.rejections, ...etv.rejections],
-    sources: [gsc.source, rank.source, etv.source].filter((source): source is EvidenceSourceV1 => source !== null)
+    facts: [...gsc.facts, ...rank.facts, ...etv.facts, ...site.facts],
+    rejections: [...gsc.rejections, ...rank.rejections, ...etv.rejections, ...site.rejections],
+    sources: [gsc.source, rank.source, etv.source, site.source].filter((source): source is EvidenceSourceV1 => source !== null)
   }
 }
 

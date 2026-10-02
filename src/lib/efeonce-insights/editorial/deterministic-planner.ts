@@ -39,7 +39,7 @@ const currentLimitText = (reason: EvidenceRejectionV1['reason'], metricId: strin
   reason === 'insufficient_data' || reason === 'no_data'
     ? READER.insufficientData
     : // TASK-1962 — Search Console sin conectar es algo que el cliente puede resolver (lo pide el plan), no un alcance.
-      reason === 'not_connected' && metricId === 'gsc'
+      reason === 'not_connected' && (metricId === 'gsc' || metricId === 'ga4')
       ? READER.notConnected
       : READER.outOfScope
 
@@ -303,7 +303,7 @@ const materialityOf = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, 
  * Indicadores clave de visibilidad en motores de respuesta (skill seo-aeo §07): son hallazgos siempre que tengan valor,
  * aunque no haya período anterior con qué compararlos. El resto compite por materialidad.
  */
-const HEADLINE_METRICS = new Set(['share_of_model', 'sov.brand', 'citation_share'])
+const HEADLINE_METRICS = new Set(['share_of_model', 'sov.brand', 'citation_share', 'ai_sessions'])
 
 const withRoles = (claims: PlanClaimV1[], facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanClaimV1[] => {
   const headline = new Set(facts.filter(fact => HEADLINE_METRICS.has(fact.metricId) && fact.value !== null).map(fact => `claim.${fact.factId}`))
@@ -343,6 +343,11 @@ const chartGroupKeyOf = (moduleKey: InsightModule, fact: EvidenceFactV1): string
   if (moduleKey === 'aeo' && fact.unit === 'score') return 'score:single'
   // TASK-1962 — conteos AEO distintos (sitios citados, tipos de fuente, tono) son figuras propias, nunca una sola.
   if (moduleKey === 'aeo' && fact.unit === 'count' && isAeoSourceFact(fact)) return `count:${fact.metricId.split('.')[0]!}`
+  // TASK-1962 — GA4: las visitas por asistente de IA son su propia figura (partes de un total, con isotipo por asistente) y
+  // las visitas orgánicas al sitio no comparten eje con clics e impresiones de Search Console (otra fuente, otra unidad
+  // de medida: sesiones, no clics).
+  if (moduleKey === 'aeo' && fact.metricId.startsWith('ai_source.')) return `${fact.unit}:ai_source`
+  if (moduleKey === 'seo' && fact.metricId.startsWith('site.')) return `${fact.unit}:site`
   if (moduleKey !== 'aeo' || fact.unit !== 'percent') return fact.unit
 
   const family = fact.metricId.includes('.') ? fact.metricId.split('.')[0]! : 'single'
@@ -411,11 +416,27 @@ const weeklyLineChart = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId
   }
 }
 
+const isFullWeek = (fact: EvidenceFactV1): boolean => {
+  const from = fact.dimension?.from
+  const to = fact.dimension?.to
+
+  return Boolean(from && to) && Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000) >= 7
+}
+
 /** TASK-1962 — lectura propia de la línea semanal (la genérica nombraba la semana como sujeto: «1–7 sept: de…»). */
 const weeklyReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string): PlanFigureReadingV1 | null => {
   const [current, previous] = chart.series.map(series => series.factIds.map(id => byId.get(id)!))
-  const first = current?.[0]
-  const last = current?.at(-1)
+  // Los extremos de la lectura son bloques COMPLETOS de 7 días: el último bloque del mes puede ser de 2 o 3 días, y
+  // compararlo con una semana entera se leía como caída («de 3.717 (1–7 sept) a 552 (29–30 sept)», Berel 2026-10-02).
+  // La figura sigue mostrando el bloque corto con su etiqueta; sólo la frase lo deja fuera.
+  const fullIndexes = (current ?? []).map((fact, index) => (isFullWeek(fact) ? index : -1)).filter(index => index >= 0)
+  const firstIndex = fullIndexes[0]
+  const lastIndex = fullIndexes.at(-1)
+
+  if (firstIndex === undefined || lastIndex === undefined || firstIndex === lastIndex) return null
+
+  const first = current?.[firstIndex]
+  const last = current?.[lastIndex]
 
   if (!first || !last || first.value === null || last.value === null) return null
 
@@ -423,8 +444,8 @@ const weeklyReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
   const R = GH_INSIGHTS.reading
   const verb = last.value > first.value ? R.roseMany : last.value < first.value ? R.fellMany : R.heldMany
   const conclusion = `${GH_INSIGHTS.figures.weeklyLead} ${verb} ${R.from} ${n(first)} (${first.label}) ${R.lineTo} ${n(last)} (${last.label}).`
-  const before = previous?.[0]
-  const after = previous?.at(-1)
+  const before = previous?.[firstIndex]
+  const after = previous?.[lastIndex]
   const meaning = before && after && before.value !== null && after.value !== null ? `${GH_INSIGHTS.figures.weeklyPrevious} ${n(before)} (${before.label}) ${R.lineTo} ${n(after)} (${after.label}).` : null
 
   if (conclusion.length > PLAN_TEXT_LIMITS.conclusion) return null
@@ -562,6 +583,39 @@ const aeoSourceFindings = (facts: EvidenceFactV1[], locale: string): PlanClaimV1
 }
 
 /** TASK-1962 — hechos que sólo sostienen el plan de acción (oportunidades de la cola SEO): no son hallazgos ni tabla. */
+/**
+ * TASK-1962 — visitas por asistente de IA: partes de un mismo total. La figura va completa o no va: si las bandas de
+ * magnitud la parten (ChatGPT con 1.648 y Gemini con 30), mostrar sólo la banda chica escondía al asistente que más trae
+ * (vista previa Berel, 2026-10-02). Sin período anterior por asistente: el cambio del total ya lo dice su hallazgo.
+ */
+const aiSourceGroups = (unit: string, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string): ChartableGroups => {
+  const current = facts.filter(fact => fact.value !== null).map(fact => ({ ...fact, comparisonFactId: null }))
+  const { groups } = chartableGroupsFor(unit, current, byId, locale)
+
+  return { groups: groups.length === 1 && groups[0]!.length === current.length ? groups : [], uniform: null }
+}
+
+/**
+ * TASK-1962 — de qué asistente de IA llegan las visitas (GA4): el asistente que más trae, con su parte del total. Es el
+ * hallazgo aunque la figura por asistente no se dibuje (ChatGPT con 1.648 de 1.686 deja a los demás sin escala).
+ */
+const aiSourceFinding = (facts: EvidenceFactV1[], locale: string): PlanClaimV1 | null => {
+  const total = facts.find(fact => fact.metricId === 'ai_sessions')
+  const top = facts.filter(fact => fact.metricId.startsWith('ai_source.') && fact.value !== null).sort((a, b) => b.value! - a.value!)[0]
+
+  if (!total || !top || total.value === null || total.value <= 0 || top.value === null) return null
+
+  const R = GH_INSIGHTS.reading
+  const lead = top.value * 2 > total.value ? R.aiTopSourceMost : R.aiTopSource
+
+  return {
+    claimId: `claim.${top.factId}.top`,
+    text: `${top.label} ${lead} ${formatFactValue(top.value, 'count', locale)} ${R.of} ${formatFactValue(total.value, 'count', locale)}.`,
+    factIds: [top.factId, total.factId],
+    role: 'finding'
+  }
+}
+
 const isPlanFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('opportunity.')
 
 /**
@@ -608,10 +662,20 @@ const actionsFor = (facts: EvidenceFactV1[], locale: string): PlanActionV1[] => 
  * cliente tiene que conectar (Search Console). Lo que falta por configuración interna (análisis de IA, spaces) no es un
  * pedido al cliente; las peticiones de negocio las agrega una persona en la revisión.
  */
-const askFor = (rejections: readonly EvidenceRejectionV1[], modules: InsightModule[]): PlanClaimV1 | null =>
-  modules.includes('seo') && rejections.some(rejection => rejection.module === 'seo' && rejection.metricId === 'gsc' && rejection.reason === 'not_connected' && rejection.scope !== 'comparison')
-    ? { claimId: 'ask.connect_search_console', text: GH_INSIGHTS.plan.connectSearchConsole, factIds: [] }
-    : null
+const askFor = (rejections: readonly EvidenceRejectionV1[], modules: InsightModule[]): PlanClaimV1 | null => {
+  const missing = (metricId: string, module?: InsightModule) =>
+    rejections.some(rejection => rejection.metricId === metricId && rejection.reason === 'not_connected' && rejection.scope !== 'comparison' && (!module || rejection.module === module) && modules.includes(rejection.module))
+
+  const gsc = modules.includes('seo') && missing('gsc', 'seo')
+  // TASK-1962 — Google Analytics 4 sin conectar también lo resuelve el cliente (lo leen SEO y AEO).
+  const ga4 = missing('ga4')
+
+  if (gsc && ga4) return { claimId: 'ask.connect_search_console_ga4', text: GH_INSIGHTS.plan.connectBoth, factIds: [] }
+  if (gsc) return { claimId: 'ask.connect_search_console', text: GH_INSIGHTS.plan.connectSearchConsole, factIds: [] }
+  if (ga4) return { claimId: 'ask.connect_ga4', text: GH_INSIGHTS.plan.connectGa4, factIds: [] }
+
+  return null
+}
 
 const DRIVER_DIMENSIONS = [
   { dimension: 'query', lead: GH_INSIGHTS.reading.driverQueryLead, title: GH_INSIGHTS.figures.driversQueryTitle },
@@ -773,12 +837,13 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // TASK-1957 — las dimensiones internas del Grader (claridad de entidad, dominio de categoría…) son lecturas del
     // método, no indicadores para el cliente: no se dicen ni van como tarjeta; quedan en la tabla de respaldo.
     const factClaims = facts
-      .filter(fact => !(moduleKey === 'aeo' && (fact.metricId.startsWith('dimension.') || isAeoSourceFact(fact))))
+      .filter(fact => !(moduleKey === 'aeo' && (fact.metricId.startsWith('dimension.') || isAeoSourceFact(fact) || fact.metricId.startsWith('ai_source.'))))
       .map(fact => claimFor(fact, byId, input.locale, v2Context))
       // TASK-1962 — con v2, el Share of Voice de la marca lo dice la frase que lo compara con el líder: la cifra suelta
       // («Tu marca: 25,0 %») queda como respaldo.
       .map(claim => (editorialV2 && moduleKey === 'aeo' && claim.factIds.length === 1 && byId.get(claim.factIds[0]!)?.metricId === 'sov.brand' ? { ...claim, role: 'backing' as const } : claim))
       .concat(moduleKey === 'aeo' && editorialV2 ? aeoSourceFindings(facts, input.locale) : [])
+      .concat(moduleKey === 'aeo' && editorialV2 ? ((claim => (claim ? [claim] : []))(aiSourceFinding(facts, input.locale))) : [])
 
     const uniformClaims: PlanClaimV1[] = []
     const charts: ChartSpecV1[] = []
@@ -804,7 +869,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       const title = familyTitle ?? (GH_INSIGHTS.units[unit] ? `${GH_INSIGHTS.modules[moduleKey].label} · ${GH_INSIGHTS.units[unit]}` : GH_INSIGHTS.modules[moduleKey].label)
       const baseId = family && family !== 'single' ? `chart.${moduleKey}.${unit}.${family.replace(/_/g, '-')}` : `chart.${moduleKey}.${unit}`
       // Indicadores AEO distintos (Share of Model, citas) no se comparan entre sí en barras: son hallazgos con su base.
-      const { groups, uniform } = family === 'single' ? { groups: [], uniform: null } : chartableGroupsFor(unit, unitFacts, byId, input.locale)
+      const { groups, uniform } = family === 'single' ? { groups: [], uniform: null } : family === 'ai_source' ? aiSourceGroups(unit, unitFacts, byId, input.locale) : chartableGroupsFor(unit, unitFacts, byId, input.locale)
 
       groups.forEach((group, index) => {
         const chart = chartFor(moduleKey, group, byId, unit, index === 0 ? baseId : `${baseId}.${index + 1}`, familyTitle ?? metricsTitle(group) ?? title, editorialV2)

@@ -88,8 +88,18 @@ export const GH_INSIGHTS = {
     // TASK-1962 — lo que el Grader ya mide y el informe no usaba.
     cited_source: 'Sitios que más citan los motores',
     source_type: 'Tipo de fuente que citan los motores',
-    sentiment: 'Cómo hablan de la marca los motores'
+    sentiment: 'Cómo hablan de la marca los motores',
+    // TASK-1962 — visitas desde asistentes de IA (GA4), por asistente.
+    ai_source: 'Visitas desde cada asistente de IA',
+    // TASK-1962 — visitas orgánicas al sitio (GA4), en el capítulo de búsqueda.
+    site: 'Visitas orgánicas al sitio'
   } as Readonly<Record<string, string>>,
+
+  /** TASK-1962 — población de los hechos de GA4 (trazabilidad del snapshot; no se imprime como cifra). */
+  ga4: {
+    organicPopulation: 'Sesiones del canal Organic Search de la propiedad GA4 conectada',
+    aiPopulation: 'Sesiones del canal AI Assistant de la propiedad GA4 conectada'
+  },
 
   /** TASK-1962 — nombres de los tipos de fuente y tonos del Grader en el informe (nunca la clave cruda). */
   aeoSourceTypes: {
@@ -154,6 +164,10 @@ export const GH_INSIGHTS = {
     'sov.brand': 'Tu marca',
     citation_share: 'Respuestas que citan tu sitio',
     gsc: 'Search Console',
+    ga4: 'Google Analytics 4',
+    'site.organic_sessions': 'Visitas orgánicas al sitio',
+    'site.organic_engaged_sessions': 'Visitas orgánicas con interacción',
+    ai_sessions: 'Visitas desde asistentes de IA',
     'driver.query': 'Consultas que más cambiaron',
     'driver.page': 'Páginas que más cambiaron',
     rank: 'Posiciones en buscadores',
@@ -247,7 +261,9 @@ export const GH_INSIGHTS = {
     atTarget: 'en la posición',
     wouldAdd: 'sumaría hasta',
     clicks: 'clics',
-    connectSearchConsole: 'Darnos acceso a Google Search Console del sitio para medir clics, impresiones y posiciones.'
+    connectSearchConsole: 'Darnos acceso a Google Search Console del sitio para medir clics, impresiones y posiciones.',
+    connectGa4: 'Darnos acceso de lectura a Google Analytics 4 del sitio para medir las visitas que llegan desde buscadores y asistentes de IA.',
+    connectBoth: 'Darnos acceso a Google Search Console y de lectura a Google Analytics 4 del sitio para medir clics, posiciones y las visitas que llegan desde buscadores y asistentes de IA.'
   },
 
   /**
@@ -255,6 +271,10 @@ export const GH_INSIGHTS = {
    * contra su meta o su período anterior. NUNCA una causa ni una explicación: eso no está en la evidencia.
    */
   reading: {
+    // TASK-1962 — de qué asistente de IA llegan las visitas (GA4). Las cifras las pone el planner desde los hechos.
+    aiTopSourceMost: 'trae la mayoría de las visitas desde asistentes de IA:',
+    aiTopSource: 'es el asistente de IA que más visitas trae:',
+    of: 'de',
     aboveTarget: 'sobre la meta de',
     belowTarget: 'bajo la meta de',
     atTarget: 'en la meta de',
@@ -354,7 +374,10 @@ export const GH_INSIGHTS = {
     otd: { subject: 'Las entregas a tiempo', plural: true },
     ftr: { subject: 'La primera entrega correcta', plural: false },
     rpa: { subject: 'Las rondas de revisión por pieza', plural: true },
-    'delivered.completed': { subject: 'Las piezas entregadas', plural: true }
+    'delivered.completed': { subject: 'Las piezas entregadas', plural: true },
+    'site.organic_sessions': { subject: 'Las visitas orgánicas al sitio', plural: true },
+    'site.organic_engaged_sessions': { subject: 'Las visitas orgánicas con interacción', plural: true },
+    ai_sessions: { subject: 'Las visitas desde asistentes de IA', plural: true }
   } as Readonly<Record<string, { subject: string; plural: boolean }>>,
 
   /**
@@ -369,7 +392,8 @@ export const GH_INSIGHTS = {
     dataforseo_etv: 'estimación de tráfico orgánico',
     // Nombre de producto del diagnóstico (ADR de naming Efeonce AEO): la fuente se nombra como lo conoce el cliente.
     ai_visibility_grader: 'Efeonce AEO Assessment',
-    ico_engine_monthly: 'métricas mensuales de entrega'
+    ico_engine_monthly: 'métricas mensuales de entrega',
+    ga4_channel_sessions: 'Google Analytics 4 (agrupación de canales por defecto)'
   } as Readonly<Record<string, string>>,
 
   /** Unidad legible de una figura (por `EvidenceUnit`). La unidad cruda (`count`) nunca llega al documento. */

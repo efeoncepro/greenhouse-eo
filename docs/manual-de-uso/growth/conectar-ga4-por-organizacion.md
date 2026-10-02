@@ -14,3 +14,10 @@ El botón solo está disponible para operadores con `growth.ga4.connect` cuando 
 No hace falta desplegar Greenhouse en producción para completar el consentimiento. Con el servidor en `http://localhost:3000`, registra exactamente `http://localhost:3000/api/admin/growth/analytics-ga4/oauth/callback` como URI de redirección autorizada en el cliente OAuth web de Google. Configura en el entorno local `GOOGLE_GA4_OAUTH_CLIENT_ID`, `GOOGLE_GA4_OAUTH_CLIENT_SECRET` y `GROWTH_GA4_ENABLED=true`, además de acceso del runtime a Secret Manager. El esquema de conexión debe estar migrado en la base usada por ese entorno; el SQL de esta task permanece pendiente del release y no se aplica anticipadamente a la base compartida.
 
 El estado **Testing** de la pantalla de consentimiento de Google permite usuarios de prueba, pero sus autorizaciones y refresh tokens expiran a los siete días. Es una limitación del estado OAuth de Google, distinta del ambiente dev o producción de Greenhouse.
+
+## Qué hace la conexión en el informe de Efeonce Insights
+
+Con GA4 conectado, el informe de Insights suma dos lecturas del sitio: en **Visibilidad orgánica**, las visitas que
+llegan desde buscadores y cuántas interactúan; en **Visibilidad en motores de respuesta**, las visitas que llegan desde
+asistentes de IA (ChatGPT, Gemini, Perplexity, Claude, Copilot…) y cuál trae más. Si la organización no tiene GA4
+conectado, el informe lo dice como límite y le pide al cliente el acceso de lectura.

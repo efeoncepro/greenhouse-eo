@@ -832,6 +832,22 @@ if [ -n "${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID}" ]; then
 fi
 ensure_secret_accessor_binding "${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF}:latest"
 
+# TASK-1962 / TASK-1284 — GA4 por organización. Las ediciones programadas de Efeonce Insights se arman ACÁ (tick de
+# schedules), y sus adapters SEO y AEO leen GA4 en vivo con `readGa4Analytics` (visitas orgánicas al sitio y visitas
+# desde asistentes de IA). Sin flag + config OAuth el reader devuelve `disabled` y la edición programada sale sin GA4
+# en silencio, mientras la creada desde Vercel sí lo trae. Mismo cliente OAuth web que Search Console (decisión
+# 2026-10-02): el client id reutiliza el GH secret de Search Console y el secreto sale de Secret Manager. Los refresh
+# tokens viven en `ga4-token-*`, leídos con el binding IAM condicional `ga4-tokens-read` de `greenhouse-portal`.
+# Rollback: `GROWTH_GA4_ENABLED=false` acá + redeploy (los adapters omiten GA4 sin dejar límite).
+GROWTH_GA4_ENABLED="${GROWTH_GA4_ENABLED:-true}"
+GOOGLE_GA4_OAUTH_CLIENT_ID="${GOOGLE_GA4_OAUTH_CLIENT_ID:-${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID}}"
+GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF="${GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF:-${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF}}"
+ENV_VARS="${ENV_VARS},GROWTH_GA4_ENABLED=${GROWTH_GA4_ENABLED}"
+ENV_VARS="${ENV_VARS},GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF=${GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF}"
+if [ -n "${GOOGLE_GA4_OAUTH_CLIENT_ID}" ]; then
+  ENV_VARS="${ENV_VARS},GOOGLE_GA4_OAUTH_CLIENT_ID=${GOOGLE_GA4_OAUTH_CLIENT_ID}"
+fi
+
 # TASK-1302 — Módulo SEO (materialización diaria GSC).
 #
 # **ON desde el rollout 2026-08-05** (autorizado por el operador). Declarativo acá y no sólo
