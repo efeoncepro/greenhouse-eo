@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-02 — El registro cine se opera sin consultor (TASK-1926, delta b)
+
+Ninguna sesión llegaba sola a una foto cine aprobable. La ficha cine gana cinco campos propios (`llave`, `primerPlano`, `fondo`, `fenomeno`, `alcance`) que `foto:prompt` compila y avisa cuando faltan; `pnpm foto:cine:nueva` parte de una de las diez fotos aprobadas (`scripts/foto/cine-recetas.json`) y `foto:generar` no gasta con la escena de la receta; `pnpm foto:validar:cine` mide sombra y reserva vertical (calibrado: stickers, relleno y azul rey bajo luz azul no se separan en píxeles y los revisa el agente `cine-reviewer`); casebook, manual y punteros en canon, regla y skills. Los demás registros no cambian: `scripts/foto/regresion-prompt.mjs` compara todas las fichas en disco (0 no cine cambiadas). AXIS: sección «Registro cine» en el banco fotográfico (commit local).
+
 ## 2026-10-02 — Traje biónico de Nexa: kit, catálogo y escena cine con Sparks (TASK-1940)
 
 El traje de ficción de Nexa deja de describirse a mano: kit de 10 vistas desde `NX5b` (aisladas, puestas en Nexa A, macro de la placa y lentes biónicos), entradas `traje-bionico-nexa` y `lentes-bionicos-nexa` en `foto:prompt` con la guarda `validarTrajeNexa` (sólo Nexa, sólo `"registro": "cine"`), marcas armadas en la referencia (isotipo incrustado en el pecho y logo completo serigrafiado en la espalda, con `foto:isotipo --marca logotipo`) y la escena aprobada `NX7d`, canonizada en el registro cine 1.7.
@@ -648,7 +652,3 @@ Release develop→main PR #240 (run `36222331450`, released): canje RFC 8693 `ef
 ## 2026-09-25 — La órbita se compone por intención (AXIS 0.2.6)
 
 Contrato candidate `efeonce.graphic-line-orbit` 0.1.0 en `@efeoncepro/axis-ui-contracts` 0.2.6: un agente declara órbita, medida (con fuente o sin arco), progreso de deck, lente, foco, mapa de familia, burbuja de URL, voz o logo en frase, y AXIS valida las reglas y resuelve cada valor desde los tokens. Adapter de Greenhouse: `pnpm creative:orbit:resolve` y `pnpm creative:orbit:render` (SVG, PNG y `qa.json`; falla si un texto cruza el anillo). Pines AXIS a 0.2.6. [Manual](docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md) · [skill](.claude/skills/efeonce-brand-studio/references/graphic-line-orbit.md).
-
-## 2026-09-25 — Línea gráfica «La órbita»: banco de fotos y canon en AXIS
-
-Banco propio de 8 fotos para la lente, hecho con el lenguaje fotográfico (`pnpm foto:generar`, 11 generaciones, ~USD 0,55; tres rehechas por el lenguaje). Reemplaza a las tres fotos repetidas con emblema en canvas, estímulos de la prueba sin logo, PDF y AXIS. ADR de canonización y tokens `efeonceGraphicLine` pasados a `canonical` en AXIS. [ADR](docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [manual](docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). Atribución sin logo sin medir.

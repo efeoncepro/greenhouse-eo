@@ -47,6 +47,11 @@ La diferencia con otras capas de documentacion:
   `pnpm foto:emblema` y recomponerlas con `pnpm foto:isotipo` (incluido el logo de la espalda con `--marca logotipo
   --tecnica`), reproducir el kit y sellarlo y publicarlo al canon. Errores, avisos y problemas comunes. Kit aprobado el
   2026-10-02 (TASK-1940).
+- [Producir una foto de marca en registro cine](creative/producir-foto-cine-de-marca.md) — llegar a una foto cine
+  aprobable sin consultar a nadie: elegir la receta aprobada más cercana (`pnpm foto:cine:nueva --listar`), crear la
+  ficha desde ella, completar `llave`, `primerPlano`, `fondo`, `fenomeno` y `alcance`, revisar con el agente
+  `cine-reviewer` antes y después de generar y medir con `pnpm foto:validar:cine`. Qué significan los avisos, qué no
+  hacer y problemas comunes. Disponible desde el 2026-10-02 (TASK-1926).
 - [Recuperar y archivar archivos de `ai-generations/`](creative/recuperar-y-archivar-ai-generations.md) — qué hacer
   cuando una composición no encuentra un plate o una referencia (`pnpm ai-gen:where` y `pnpm ai-gen:pull` a la misma
   ruta, nunca regenerar), qué está protegido, cómo el operador archiva exploración con `pnpm ai-gen:archive` y cómo se

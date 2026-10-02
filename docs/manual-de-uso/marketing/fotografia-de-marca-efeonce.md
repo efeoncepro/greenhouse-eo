@@ -220,6 +220,7 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 | Tomas y lentes | [Catálogo](../../operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) |
 | Prompts, comandos, scripts, QA, costos | [Pipeline](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) |
 | Julio, Nexa y uniforme | [Personas](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) |
+| Producir una foto cine sin consultar a nadie | [Producir una foto de marca en registro cine](../creative/producir-foto-cine-de-marca.md) · [Casebook](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) |
 | Nexa con su traje biónico y lentes (sólo cine) | [Usar el traje biónico de Nexa en fotos](../creative/usar-traje-bionico-de-nexa-en-fotos.md) |
 | Evidencia (prompts y scripts) | `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/` |
 | CLI de imagen | `scripts/ai/generate-image.ts` (`pnpm ai:image --help`) |

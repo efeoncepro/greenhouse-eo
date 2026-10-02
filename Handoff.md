@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Registro cine sin consultor (02/10):** [TASK-1926](docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md) delta b — `4ebc63158` local, AXIS `4efeb8d` local; push pendiente de visto bueno. Pendiente: prueba ciega (`ai-generations/2026-10-02_prueba-ciega-cine/`) y orquestador idempotente. Detalle en el delta y el [casebook](docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).
+
 **Traje biónico de Nexa (02/10):** [TASK-1940](docs/tasks/complete/TASK-1940-nexa-bionic-suit-reference-kit.md) complete: kit sellado y publicado, catálogo sólo Nexa/cine, marcas armadas, NX7d canonizada. Pendientes (OneDrive, NX7d con titular, pose repetida de Nexa, Sparks en el publicador) en el delta de cierre de la task.
 
 **Workbench:** Lab v6 publicado. Íconos: `af6f5e2` local, publicación pendiente. SKY local: 76 badges LEFT, 24 adaptaciones v6, 394 pruebas PASS; aceptación visual pendiente. [Estado](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md). Efeonce ID diferido.
